@@ -32,6 +32,7 @@
 		{else}
 			{assign var=hook_arg_id_hotel value=null}
 		{/if}
+		{hook h='displayAdminAddHotelFormTop' id_hotel=$hook_arg_id_hotel}
 		{if count($languages) > 1}
 			<div class="col-lg-12">
 				<label class="control-label">{l s='Choose Language' mod='hotelreservationsystem'}</label>
@@ -55,6 +56,8 @@
 		{/if}
 
 		<div class="tabs wk-tabs-panel">
+			{hook h='displayAdminAddHotelFormTabsBefore' id_hotel=$hook_arg_id_hotel}
+
 			<ul class="nav nav-tabs">
 				<li class="active">
 					<a href="#hotel-information" data-toggle="tab">
@@ -84,6 +87,8 @@
 			</ul>
 			<div class="tab-content panel collapse in">
 				<div class="tab-pane active" id="hotel-information">
+					{hook h='displayAdminAddHotelFormInformationTabBefore' id_hotel=$hook_arg_id_hotel}
+
 					{if isset($edit)}
 						<input id="id-hotel" type="hidden" value="{$hotel_info.id|escape:'html':'UTF-8'}" name="id" />
 					{/if}
@@ -288,8 +293,12 @@
 							</div>
 						</div>
 					{/if}
+
+					{hook h='displayAdminAddHotelFormInformationTabAfter' id_hotel=$hook_arg_id_hotel}
 				</div>
 				<div class="tab-pane" id="hotel-images">
+					{hook h='displayAdminAddHotelFormImagesTabBefore' id_hotel=$hook_arg_id_hotel}
+
 					{if isset($hotel_info.id) && $hotel_info.id}
 						<div class="form-group row">
 							<label for="hotel_images" class="col-sm-3 control-label padding-top-0">
@@ -312,8 +321,12 @@
 							{l s='Please save hotel information before saving hotel images.' mod='hotelreservationsystem'}
 						</div>
 					{/if}
+
+					{hook h='displayAdminAddHotelFormImagesTabAfter' id_hotel=$hook_arg_id_hotel}
 				</div>
 				<div class="tab-pane" id="hotel-booking-restrictions">
+					{hook h='displayAdminAddHotelFormRestrictionsTabBefore' id_hotel=$hook_arg_id_hotel}
+
 					{if isset($hotel_info.id) && $hotel_info.id}
 						<div class="form-group">
 							<label class="control-label col-lg-3">
@@ -363,8 +376,12 @@
 							{l s='Please save the hotel information before saving the hotel booking restrictions.' mod='hotelreservationsystem'}
 						</div>
 					{/if}
+
+					{hook h='displayAdminAddHotelFormRestrictionsTabAfter' id_hotel=$hook_arg_id_hotel}
 				</div>
 				<div class="tab-pane" id="hotel-refund-policies">
+					{hook h='displayAdminAddHotelFormRefundPoliciesBefore' id_hotel=$hook_arg_id_hotel}
+
 					{if isset($hotel_info.id) && $hotel_info.id}
 						<div class="form-group">
 							<label for="active_refund" class="control-label col-sm-5">
@@ -449,10 +466,15 @@
 							{l s='Please save hotel information before saving refund policy options.' mod='hotelreservationsystem'}
 						</div>
 					{/if}
+
+					{hook h='displayAdminAddHotelFormRefundPoliciesAfter' id_hotel=$hook_arg_id_hotel}
 				</div>
 				{hook h='displayAdminAddHotelFormTabContent' id_hotel=$hook_arg_id_hotel}
 			</div>
 		</div>
+
+		{hook h='displayAdminAddHotelFormBottom' id_hotel=$hook_arg_id_hotel}
+
 		<div class="panel-footer">
 			<a href="{$link->getAdminLink('AdminAddHotel')|escape:'html':'UTF-8'}" class="btn btn-default">
 				<i class="process-icon-cancel"></i>{l s='Cancel' mod='hotelreservationsystem'}
