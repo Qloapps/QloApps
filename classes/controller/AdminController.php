@@ -4009,7 +4009,7 @@ class AdminControllerCore extends Controller
      * @return bool true if success
      * @throws PrestaShopException
      */
-    protected function processBulkStatusSelection($status)
+    protected function processBulkStatusSelection($status, $redirect = true)
     {
         $result = true;
         if (is_array($this->boxes) && !empty($this->boxes)) {
@@ -4021,6 +4021,11 @@ class AdminControllerCore extends Controller
                 $result &= $object->update();
             }
         }
+
+        if ($redirect && $result) {
+            $this->redirect_after = self::$currentIndex.'&conf=5&token='.$this->token;
+        }
+
         return $result;
     }
 
