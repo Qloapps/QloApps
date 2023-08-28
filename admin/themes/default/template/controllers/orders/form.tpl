@@ -115,7 +115,8 @@
 						ajax: "1",
 						token: "{getAdminToken tab='AdminCartRules'}",
 						tab: "AdminCartRules",
-						action: "searchCartRuleVouchers"
+						action: "searchCartRuleVouchers",
+						id_customer: function () { return window.id_customer },
 					}
 				}
 			)
