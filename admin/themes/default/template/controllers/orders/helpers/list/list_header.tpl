@@ -152,7 +152,7 @@
 							</span>
 						</div>
 					{/if}
-					<div class="panel" id="list_filters_panel">
+					<div class="panel collapse" id="list_filters_panel">
 						<div class="row">
 							<div class="col-sm-12">
 								<div class="list_filters">
