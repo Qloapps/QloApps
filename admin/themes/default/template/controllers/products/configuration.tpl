@@ -499,10 +499,10 @@
                 dateFormat: 'yy-mm-dd',
                 minDate: 0,
                 onSelect: function(selectedDate) {
-                    var date_format = selectedDate.split('-');
-                    selectedDate = new Date($.datepicker.formatDate('yy-mm-dd', new Date(date_format[0], date_format[1] - 1, date_format[2])));
-                    selectedDate.setDate(selectedDate.getDate() + 1);
-                    $(this).closest('tr').find('.disabled_date_to').datepicker('option', 'minDate', selectedDate);
+                    let objDateToMin = $.datepicker.parseDate('yy-mm-dd', selectedDate);
+                    objDateToMin.setDate(objDateToMin.getDate() + 1);
+
+                    $(this).closest('tr').find('.disabled_date_to').datepicker('option', 'minDate', objDateToMin);
                 },
                 onClose: function(selectedDate) {
                     var dateTo = $(this).closest('tr').find('.disabled_date_to').val();
@@ -517,16 +517,17 @@
                 dateFormat: 'yy-mm-dd',
                 minDate: 0,
                 beforeShow: function (input, instance) {
-                    var date_to = $(this).closest('tr').find('.disabled_date_from').val();
-                    if (typeof date_to != 'undefined' && date_to != '') {
-                        var date_format = date_to.split('-');
-                        var selectedDate = new Date($.datepicker.formatDate('yy-mm-dd', new Date(date_format[0], date_format[1] - 1, date_format[2])));
+                    let dateFrom = $(this).closest('tr').find('.disabled_date_from').val();
+
+                    let objDateToMin = null;
+                    if (typeof dateFrom != 'undefined' && dateFrom != '') {
+                        objDateToMin = $.datepicker.parseDate('yy-mm-dd', dateFrom);
                     } else {
-                        var date_format = new Date();
-                        var selectedDate = new Date($.datepicker.formatDate('yy-mm-dd', new Date()));
+                        objDateToMin = new Date();
                     }
-                    selectedDate.setDate(selectedDate.getDate()+1);
-                    $(this).datepicker('option', 'minDate', selectedDate);
+
+                    objDateToMin.setDate(objDateToMin.getDate() + 1);
+                    $(this).datepicker('option', 'minDate', objDateToMin);
                 },
             });
         });
