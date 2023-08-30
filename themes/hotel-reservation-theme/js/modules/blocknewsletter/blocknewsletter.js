@@ -22,39 +22,28 @@
 *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
-$(document).ready(function() {
 
-    $('#newsletter-input').on({
-        focus: function() {
-            if ($(this).val() == placeholder_blocknewsletter || $(this).val() == msg_newsl)
-                $(this).val('');
+$(document).on('click', '#blocknewsletter .newsletter-btn', function (e) {
+    e.preventDefault();
+
+    $.ajax({
+        url: url_newsletter_subscription,
+        type: 'POST',
+        dataType: 'JSON',
+        cache: false,
+        data: $(this).closest('form').serialize(),
+        beforeSend: function () {
+            let messageBlock = $('#blocknewsletter .message-block');
+            $(messageBlock).fadeOut('fast');
         },
-        blur: function() {
-            if ($(this).val() == '')
-                $(this).val(placeholder_blocknewsletter);
+        success: function (response) {
+            let messageBlock = $('#blocknewsletter .message-block');
+            $(messageBlock).html(response.message_html).stop(true, true).fadeIn('fast');
+        },
+        error: function (jqXHR) {
+            if (jqXHR.readyState == 0) {
+                showErrorMessage(no_internet_txt);
+            }
         }
     });
-
-	var cssClass = 'alert alert-danger';
-    if (typeof nw_error != 'undefined' && !nw_error)
-		cssClass = 'alert alert-success';
-
-    if (typeof msg_newsl != 'undefined' && msg_newsl)
-	{
-        $('#columns').prepend('<div class="clearfix"></div><p class="' + cssClass + '"> ' + alert_blocknewsletter + '</p>');
-		$('html, body').animate({scrollTop: $('#columns').offset().top}, 'slow');
-	}
-
-	$(".submitNewsletter").on("click", function()
-	{
-		var email = $("#newsletter-input").val();
-		if (email == "" || !validate_isEmail(email))
-		{
-			$("#newsletter-input").popover({content: email_js_error, placement: "top", container: "body"});
-			$("#newsletter-input").popover("show");
-			return false;
-		}
-
-		return true;
-	});
 });

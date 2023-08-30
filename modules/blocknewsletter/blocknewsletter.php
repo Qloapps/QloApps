@@ -50,6 +50,7 @@ class Blocknewsletter extends Module
         $this->description = $this->l('Adds a block for newsletter subscription.');
         $this->confirmUninstall = $this->l('Are you sure that you want to delete all of your contacts?');
         $this->ps_versions_compliancy = array('min' => '1.6', 'max' => _PS_VERSION_);
+        $this->secure_key = Tools::encrypt($this->name);
 
         $this->version = '2.2.2';
         $this->author = 'PrestaShop';
@@ -66,6 +67,8 @@ class Blocknewsletter extends Module
         $this->_searched_email = null;
 
         $this->_html = '';
+
+        $this->hookPrepared = false;
     }
 
     public function registerHooks()
@@ -128,7 +131,7 @@ class Blocknewsletter extends Module
 
     public function uninstall()
     {
-        Db::getInstance()->execute('DROP TABLE '._DB_PREFIX_.'newsletter');
+        Db::getInstance()->execute('DROP TABLE IF EXISTS '._DB_PREFIX_.'newsletter');
         return parent::uninstall();
     }
 
@@ -141,6 +144,8 @@ class Blocknewsletter extends Module
             $voucher = Tools::getValue('NW_VOUCHER_CODE');
             if ($voucher && !Validate::isDiscountName($voucher)) {
                 $this->_html .= $this->displayError($this->l('The voucher code is invalid.'));
+            } elseif (!CartRule::cartRuleExists($voucher)) {
+                $this->_html .= $this->displayError($this->l('The voucher code does not exist.'));
             } else {
                 Configuration::updateValue('NW_VOUCHER_CODE', pSQL($voucher));
                 $this->_html .= $this->displayConfirmation($this->l('Settings updated'));
@@ -292,7 +297,7 @@ class Blocknewsletter extends Module
     {
         $this->smarty->assign(
             array(
-                'href' => 'index.php?controller=AdminCustomers&id_customer='.(int)$id.'&updatecustomer&token='.
+                'href' => 'index.php?controller=AdminCustomers&id_customer='.(int)$id.'&viewcustomer&token='.
                 Tools::getAdminTokenLite('AdminCustomers'),
                 'action' => $this->l('View'),
                 'disable' => !((int)$id > 0),
@@ -368,14 +373,14 @@ class Blocknewsletter extends Module
     /**
      * Register in block newsletter
      */
-    protected function newsletterRegistration()
+    public function newsletterRegistration()
     {
         if (empty($_POST['email']) || !Validate::isEmail($_POST['email'])) {
             return $this->error = $this->l('Invalid email address.');
         }
 
         /* Unsubscription */
-        elseif ($_POST['action'] == '1') {
+        elseif ($_POST['newsletter_action'] == '1') {
             $register_status = $this->isNewsletterRegistered($_POST['email']);
 
             if ($register_status < 1) {
@@ -389,7 +394,7 @@ class Blocknewsletter extends Module
             return $this->valid = $this->l('Unsubscription successful.');
         }
         /* Subscription */
-        elseif ($_POST['action'] == '0') {
+        elseif ($_POST['newsletter_action'] == '0') {
             $register_status = $this->isNewsletterRegistered($_POST['email']);
             if ($register_status > 0) {
                 return $this->error = $this->l('This email address is already registered.');
@@ -744,38 +749,25 @@ class Blocknewsletter extends Module
 
     protected function _prepareHook($params)
     {
-        if (Tools::isSubmit('submitNewsletter')) {
-            $this->newsletterRegistration();
-            if ($this->error) {
-                $this->smarty->assign(
-                    array(
-                        'color' => 'red',
-                        'msg' => $this->error,
-                        'nw_value' => isset($_POST['email']) ? pSQL($_POST['email']) : false,
-                        'nw_error' => true,
-                        'action' => $_POST['action']
-                    )
-                );
-            } elseif ($this->valid) {
-                $this->smarty->assign(
-                    array(
-                        'color' => 'green',
-                        'msg' => $this->valid,
-                        'nw_error' => false
-                    )
-                );
-            }
+        if (!$this->hookPrepared) {
+            $this->context->smarty->assign(array(
+                'csrf_token' => $this->secure_key,
+            ));
+
+            Media::addJsDef(array(
+                'url_newsletter_subscription' => $this->context->link->getModuleLink($this->name, 'subscription'),
+            ));
+
+            $this->hookPrepared = true;
         }
-        $this->smarty->assign('this_path', $this->_path);
     }
 
     public function hookDisplayLeftColumn($params)
     {
-        if (!isset($this->prepared) || !$this->prepared) {
-            $this->_prepareHook($params);
-        }
-        $this->prepared = true;
+        $this->_prepareHook($params);
+
         $this->smarty->assign(array('id_module' => $this->id));
+
         return $this->display(__FILE__, 'blocknewsletter.tpl');
     }
 
@@ -872,7 +864,10 @@ class Blocknewsletter extends Module
                         'label' => $this->l('Welcome voucher code'),
                         'name' => 'NW_VOUCHER_CODE',
                         'class' => 'fixed-width-md',
-                        'desc' => $this->l('Leave blank to disable by default.')
+                        'desc' => sprintf(
+                            $this->l('You can create a voucher from %s page. Leave blank to disable by default.'),
+                            '<a href="'.$this->context->link->getAdminLink('AdminCartRules').'" target="_blank">'.$this->l('Cart Rules').'</a>'
+                        )
                     ),
                 ),
                 'submit' => array(

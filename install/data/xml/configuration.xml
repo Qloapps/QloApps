@@ -878,9 +878,6 @@
 	<configuration id="PS_LOG_EMAILS" name="PS_LOG_EMAILS">
 		<value>1</value>
 	</configuration>
-	<configuration id="PS_CUSTOMER_NWSL" name="PS_CUSTOMER_NWSL">
-		<value>1</value>
-	</configuration>
 	<configuration id="PS_CUSTOMER_OPTIN" name="PS_CUSTOMER_OPTIN">
 		<value>1</value>
 	</configuration>

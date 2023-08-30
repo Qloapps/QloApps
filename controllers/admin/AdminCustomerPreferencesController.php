@@ -99,13 +99,6 @@ class AdminCustomerPreferencesControllerCore extends AdminController
                         'cast' => 'intval',
                         'type' => 'bool'
                     ),
-                    'PS_CUSTOMER_NWSL' => array(
-                        'title' => $this->l('Enable newsletter registration'),
-                        'hint' => $this->l('Display or not the newsletter registration tick box.'),
-                        'validation' => 'isBool',
-                        'cast' => 'intval',
-                        'type' => 'bool'
-                    ),
                     'PS_CUSTOMER_OPTIN' => array(
                         'title' => $this->l('Enable opt-in'),
                         'hint' => $this->l('Display or not the opt-in tick box, to receive offers from the store\'s partners.'),

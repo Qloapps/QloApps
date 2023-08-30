@@ -115,23 +115,24 @@
     }
 
 #newsletter-input::-webkit-input-placeholder {
-   color: #ffffff;
+   color: #bfbfbf;
 }
 
 #newsletter-input:-moz-placeholder { /* Firefox 18- */
-   color: #ffffff;  
+   color: #bfbfbf;  
 }
 
 #newsletter-input::-moz-placeholder {  /* Firefox 19+ */
-   color: #ffffff;  
+   color: #bfbfbf;  
 }
 
-#newsletter-input:-ms-input-placeholder {  
-   color: #ffffff;  
+#newsletter-input:-ms-input-placeholder {
+   color: #bfbfbf;  
 }
 
 /*# sourceMappingURL=blocknewsletter.css.map */
 .button.button-medium.newsletter-btn {
+  position: relative;
   padding: 0px 20px;
 }
 #newsletter-input
