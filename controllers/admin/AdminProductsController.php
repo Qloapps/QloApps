@@ -2299,69 +2299,6 @@ class AdminProductsControllerCore extends AdminController
         parent::initContent();
     }
 
-    public function renderKpis()
-    {
-        $time = time();
-        $kpis = array();
-
-        // if (Configuration::get('PS_STOCK_MANAGEMENT')) {
-        //     $helper = new HelperKpi();
-        //     $helper->id = 'box-products-stock';
-        //     $helper->icon = 'icon-archive';
-        //     $helper->color = 'color1';
-        //     $helper->title = $this->l('Out of stock items', null, null, false);
-        //     if (ConfigurationKPI::get('PERCENT_PRODUCT_OUT_OF_STOCK') !== false) {
-        //         $helper->value = ConfigurationKPI::get('PERCENT_PRODUCT_OUT_OF_STOCK');
-        //     }
-        //     $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=percent_product_out_of_stock';
-        //     $helper->tooltip = $this->l('X% of your room types for sale are out of stock.', null, null, false);
-        //     $helper->refresh = (bool)(ConfigurationKPI::get('PERCENT_PRODUCT_OUT_OF_STOCK_EXPIRE') < $time);
-        //     $helper->href = Context::getContext()->link->getAdminLink('AdminProducts').'&productFilter_sav!quantity=0&productFilter_active=1&submitFilterproduct=1';
-        //     $kpis[] = $helper->generate();
-        // }
-
-        $helper = new HelperKpi();
-        $helper->id = 'box-avg-gross-margin';
-        $helper->icon = 'icon-tags';
-        $helper->color = 'color2';
-        $helper->title = $this->l('Average Gross Margin %', null, null, false);
-        $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=product_avg_gross_margin';
-        $helper->tooltip = $this->l('Gross margin expressed in percentage assesses how cost-effectively you sell your room types / products. Out of $100, you will retain $X to cover profit and expenses.', null, null, false);
-        $kpis[] = $helper->generate();
-
-        $helper = new HelperKpi();
-        $helper->id = 'box-8020-sales-catalog';
-        $helper->icon = 'icon-beaker';
-        $helper->color = 'color3';
-        $helper->title = $this->l('Purchased References', null, null, false);
-        $helper->subtitle = $this->l('30 days', null, null, false);
-        $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=8020_sales_catalog';
-        $helper->tooltip = $this->l('X% of your references have been purchased for the past 30 days.', null, null, false);
-        if (Module::isInstalled('statsbestproducts')) {
-            $helper->href = Context::getContext()->link->getAdminLink('AdminStats').'&module=statsbestproducts&datepickerFrom='.date('Y-m-d', strtotime('-30 days')).'&datepickerTo='.date('Y-m-d');
-        }
-        $kpis[] = $helper->generate();
-
-        $helper = new HelperKpi();
-        $helper->id = 'box-disabled-products';
-        $helper->icon = 'icon-off';
-        $helper->color = 'color4';
-        $helper->href = $this->context->link->getAdminLink('AdminProducts');
-        $helper->title = $this->l('Disabled Room Types', null, null, false);
-        if (ConfigurationKPI::get('DISABLED_ROOM_TYPES') !== false) {
-            $helper->value = ConfigurationKPI::get('DISABLED_ROOM_TYPES');
-        }
-        $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=disabled_room_types';
-        $helper->refresh = (bool)(ConfigurationKPI::get('DISABLED_ROOM_TYPES_EXPIRE') < $time);
-        $helper->tooltip = $this->l('X% of your room types are disabled and not visible to your customers', null, null, false);
-        $helper->href = Context::getContext()->link->getAdminLink('AdminProducts').'&productFilter_active=0&submitFilterproduct=1';
-        $kpis[] = $helper->generate();
-
-        $helper = new HelperKpiRow();
-        $helper->kpis = $kpis;
-        return $helper->generate();
-    }
-
     public function renderList()
     {
         $this->addRowAction('edit');
