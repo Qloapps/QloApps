@@ -291,7 +291,7 @@ class AdminHotelFeaturePricesSettingsController extends ModuleAdminController
                 false,
                 $idFeaturePrice
             );
-        } elseif (isset($isSpecialDaysExists) && $isSpecialDaysExists == 'on') {
+        } elseif (isset($isSpecialDaysExists) && $isSpecialDaysExists == 1) {
             if ($jsonSpecialDays != "false") {
                 $isPlanTypeExists = $objFeaturePricing->checkRoomTypeFeaturePriceExistance(
                     $roomTypeId,
@@ -361,7 +361,7 @@ class AdminHotelFeaturePricesSettingsController extends ModuleAdminController
                 if ($dateTo < $dateFrom) {
                     $this->errors[] = $this->l('Date To must be a date after Date From.');
                 }
-                if (isset($isSpecialDaysExists) && $isSpecialDaysExists == 'on') {
+                if (isset($isSpecialDaysExists) && $isSpecialDaysExists == 1) {
                     $isSpecialDaysExists = 1;
                     if (!isset($specialDays) || !$specialDays) {
                         $isSpecialDaysExists = 0;

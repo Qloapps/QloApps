@@ -486,8 +486,8 @@ $(document).ready(function() {
     });
 
 
-    $(".is_special_days_exists").on ('click', function() {
-        if ($(this).is(':checked')) {
+    $('[name="is_special_days_exists"]').on('change', function() {
+        if (parseInt($('[name="is_special_days_exists"]:checked').val())) {
             $('.week_days').show(200);
         } else {
             $('.week_days').hide(200);
