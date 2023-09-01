@@ -138,6 +138,7 @@ class Blocknewsletter extends Module
     public function getContent()
     {
         if (Tools::isSubmit('submitUpdate')) {
+            Configuration::updateValue('PS_CUSTOMER_NEWSLETTER', (bool)Tools::getValue('PS_CUSTOMER_NEWSLETTER'));
             Configuration::updateValue('NW_CONFIRMATION_EMAIL', (bool)Tools::getValue('NW_CONFIRMATION_EMAIL'));
             Configuration::updateValue('NW_VERIFICATION_EMAIL', (bool)Tools::getValue('NW_VERIFICATION_EMAIL'));
 
@@ -827,6 +828,23 @@ class Blocknewsletter extends Module
                 'input' => array(
                     array(
                         'type' => 'switch',
+                        'label' => $this->l('Enable newsletter registration'),
+                        'name' => 'PS_CUSTOMER_NEWSLETTER',
+                        'values' => array(
+                            array(
+                                'id' => 'active_on',
+                                'value' => 1,
+                                'label' => $this->l('Yes')
+                            ),
+                            array(
+                                'id' => 'active_off',
+                                'value' => 0,
+                                'label' => $this->l('No')
+                            )
+                        ),
+                    ),
+                    array(
+                        'type' => 'switch',
                         'label' => $this->l('Would you like to send a verification email after subscription?'),
                         'name' => 'NW_VERIFICATION_EMAIL',
                         'values' => array(
@@ -971,6 +989,7 @@ class Blocknewsletter extends Module
     public function getConfigFieldsValues()
     {
         return array(
+            'PS_CUSTOMER_NEWSLETTER' => Tools::getValue('PS_CUSTOMER_NEWSLETTER', Configuration::get('PS_CUSTOMER_NEWSLETTER')),
             'NW_VERIFICATION_EMAIL' => Tools::getValue('NW_VERIFICATION_EMAIL', Configuration::get('NW_VERIFICATION_EMAIL')),
             'NW_CONFIRMATION_EMAIL' => Tools::getValue('NW_CONFIRMATION_EMAIL', Configuration::get('NW_CONFIRMATION_EMAIL')),
             'NW_VOUCHER_CODE' => Tools::getValue('NW_VOUCHER_CODE', Configuration::get('NW_VOUCHER_CODE')),

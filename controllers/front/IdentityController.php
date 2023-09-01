@@ -151,7 +151,7 @@ class IdentityControllerCore extends FrontController
             'HOOK_CUSTOMER_IDENTITY_FORM' => Hook::exec('displayCustomerIdentityForm'),
         ));
 
-        $newsletter = Module::isInstalled('blocknewsletter') && Module::getInstanceByName('blocknewsletter')->active;
+        $newsletter = Module::isEnabled('blocknewsletter') && Configuration::get('PS_CUSTOMER_NEWSLETTER');
         $this->context->smarty->assign('newsletter', $newsletter);
         $this->context->smarty->assign('optin', (bool)Configuration::get('PS_CUSTOMER_OPTIN'));
 

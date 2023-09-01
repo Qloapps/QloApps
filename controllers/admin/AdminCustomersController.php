@@ -458,7 +458,7 @@ class AdminCustomersControllerCore extends AdminController
                             'label' => $this->l('Disabled')
                         )
                     ),
-                    'disabled' => true,
+                    'disabled' =>  (bool)!Configuration::get('PS_CUSTOMER_NEWSLETTER'),
                     'hint' => $this->l('This customer will receive your newsletter via email.')
                 ),
                 array(
