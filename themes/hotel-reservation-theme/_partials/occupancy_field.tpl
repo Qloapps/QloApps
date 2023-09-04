@@ -173,7 +173,7 @@
                 </div>
             {/if}
         </div>
-        <div class="add_occupancy_block">
+        <div class="add_occupancy_block" {if isset($total_available_rooms) && $total_available_rooms <= 1}style="display: none;"{/if}>
             <a class="add_new_occupancy_btn" href="#"><i class="icon-plus"></i> <span>{l s='Add Room'}</span></a>
         </div>
     </div>
