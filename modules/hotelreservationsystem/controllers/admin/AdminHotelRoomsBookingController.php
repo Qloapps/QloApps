@@ -30,7 +30,7 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
 
         parent::__construct();
 
-        $this->initCart();
+        $this->hasBookingProducts = false;
     }
 
     public function initCart()
@@ -84,55 +84,77 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
         return $objCart;
     }
 
+    public function initProcess()
+    {
+        parent::initProcess();
+
+        $this->hasBookingProducts = $this->getHasBookingProducts();
+
+        if ($this->hasBookingProducts) {
+            $this->initCart();
+        }
+    }
 
     public function postProcess()
     {
-        if (Tools::getValue('date_from')) {
-            $date_from = Tools::getValue('date_from');
-        } else {
-            $date_from = date('Y-m-d');
-        }
-        if (Tools::getValue('date_to')) {
-            $date_to = Tools::getValue('date_to');
-        } else {
-            $date_to = date('Y-m-d');
-            if (strtotime($date_from) >= strtotime($date_to)) {
-                $date_to = date('Y-m-d', strtotime('+1 day', strtotime($date_to)));
-            }
-        }
-
-        if (Tools::getValue('id_hotel')) {
-            $id_hotel = Tools::getValue('id_hotel');
-        } else {
-            $obj_htl_info = new HotelBranchInformation();
-            if ($htl_info = $obj_htl_info->hotelBranchesInfo(false, 1)) {
-                // filter hotels as per accessed hotels
-                $htl_info = HotelBranchInformation::filterDataByHotelAccess(
-                    $htl_info,
-                    $this->context->employee->id_profile,
-                    1
-                );
-                $id_hotel = reset($htl_info)['id'];
+        if ($this->hasBookingProducts) {
+            if (Tools::getValue('date_from')) {
+                $date_from = Tools::getValue('date_from');
             } else {
-                $id_hotel = 0;
+                $date_from = date('Y-m-d');
             }
-        }
+            if (Tools::getValue('date_to')) {
+                $date_to = Tools::getValue('date_to');
+            } else {
+                $date_to = date('Y-m-d');
+                if (strtotime($date_from) >= strtotime($date_to)) {
+                    $date_to = date('Y-m-d', strtotime('+1 day', strtotime($date_to)));
+                }
+            }
 
-        if (Tools::getValue('id_room_type')) {
-            $id_room_type = Tools::getValue('id_room_type');
-        } else {
-            $id_room_type = 0;
-        }
+            if (Tools::getValue('id_hotel')) {
+                $id_hotel = Tools::getValue('id_hotel');
+            } else {
+                $obj_htl_info = new HotelBranchInformation();
+                if ($htl_info = $obj_htl_info->hotelBranchesInfo(false, 1)) {
+                    // filter hotels as per accessed hotels
+                    $htl_info = HotelBranchInformation::filterDataByHotelAccess(
+                        $htl_info,
+                        $this->context->employee->id_profile,
+                        1
+                    );
+                    $id_hotel = reset($htl_info)['id'];
+                } else {
+                    $id_hotel = 0;
+                }
+            }
 
-        $occupancy = Tools::getValue('occupancy');
-        if (!Validate::isOccupancy($occupancy)) {
-            $occupancy = array();
-        }
+            if (Tools::getValue('id_room_type')) {
+                $id_room_type = Tools::getValue('id_room_type');
+            } else {
+                $id_room_type = 0;
+            }
 
-        // $booking_product = 1;
-        // if (Tools::getisset('booking_product')) {
-        //     $booking_product = Tools::getValue('booking_product');
-        // }
+            $occupancy = Tools::getValue('occupancy');
+            if (!Validate::isOccupancy($occupancy)) {
+                $occupancy = array();
+            }
+
+            // $booking_product = 1;
+            // if (Tools::getisset('booking_product')) {
+            //     $booking_product = Tools::getValue('booking_product');
+            // }
+
+            $this->id_cart = $this->context->cart->id;
+            $this->id_guest = $this->context->cookie->id_guest;
+            $this->id_hotel = $id_hotel;
+            $this->id_room_type = $id_room_type;
+            $this->date_from = $date_from;
+            $this->date_to = $date_to;
+            // $this->booking_product = $booking_product;
+            $this->booking_product = 1;
+            $this->occupancy = $occupancy;
+        }
 
         if (Tools::isSubmit('search_hotel_list')) {
             $urlData = array (
@@ -179,6 +201,7 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
                 }
             }
         }
+
         if (Tools::isSubmit('swap_allocated_rooms')) {
             $current_room_id = Tools::getValue('modal_id_room');
             $current_room = Tools::getValue('modal_curr_room_num');
@@ -213,17 +236,15 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
             }
         }
 
-        $this->id_cart = $this->context->cart->id;
-        $this->id_guest = $this->context->cookie->id_guest;
-        $this->id_hotel = $id_hotel;
-        $this->id_room_type = $id_room_type;
-        $this->date_from = $date_from;
-        $this->date_to = $date_to;
-        // $this->booking_product = $booking_product;
-        $this->booking_product = 1;
-        $this->occupancy = $occupancy;
-
         parent::postprocess();
+    }
+
+    public function getHasBookingProducts()
+    {
+        $objHotelBranchInformation = new HotelBranchInformation();
+        $allHotels = $objHotelBranchInformation->getAllHotels(true);
+
+        return is_array($allHotels) && count($allHotels);
     }
 
     public function initContent()
@@ -277,19 +298,20 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
 
     public function renderView()
     {
-        $this->tpl_view_vars = array(
-            'id_cart' => $this->context->cart->id,
-            'id_guest' => $this->context->cookie->id_guest,
-        );
-        $this->initSearchFormData();
-        if (count($this->tpl_view_vars['hotel_list'])) {
-            if ($this->booking_product) {
-                $this->assignRoomBookingForm();
-            } else {
-                $this->assignServiceProductsForm();
-            }
+        $this->tpl_view_vars['has_booking_products'] = $this->hasBookingProducts;
+        if ($this->hasBookingProducts) {
+            $this->tpl_view_vars['id_cart'] = $this->context->cart->id;
+            $this->tpl_view_vars['id_guest'] = $this->context->cookie->id_guest;
+            $this->initSearchFormData();
+            if (count($this->tpl_view_vars['hotel_list'])) {
+                if ($this->booking_product) {
+                    $this->assignRoomBookingForm();
+                } else {
+                    $this->assignServiceProductsForm();
+                }
 
-            $this->initCartData();
+                $this->initCartData();
+            }
         }
 
         return parent::renderView();

@@ -1,5 +1,5 @@
 <div class="row">
-	{if $hotel_list|count > 0}
+	{if isset($has_booking_products) && $has_booking_products && $hotel_list|count > 0}
 		<div class="col-sm-4">
 			<div class="panel">
 				<div class="panel-heading">
@@ -206,7 +206,7 @@
 		{/if}
 	{else}
 		<p class="alert alert-warning">
-			{l s='No hotels available for booking'}
+			{l s='No rooms are currently available for booking.'}
 		</p>
 	{/if}
 </div>
