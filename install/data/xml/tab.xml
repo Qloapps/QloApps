@@ -285,12 +285,12 @@
     <tab id="Stats_1" id_parent="Stats" active="1" hide_host_mode="0">
       <class_name>AdminStats</class_name>
     </tab>
-    <tab id="Search_Engines" id_parent="Stats" active="1" hide_host_mode="0">
+    <!-- <tab id="Search_Engines" id_parent="Stats" active="1" hide_host_mode="0">
       <class_name>AdminSearchEngines</class_name>
-    </tab>
-    <tab id="Referrers" id_parent="Stats" active="1" hide_host_mode="0">
+    </tab> -->
+    <!-- <tab id="Referrers" id_parent="Stats" active="1" hide_host_mode="0">
       <class_name>AdminReferrers</class_name>
-    </tab>
+    </tab> -->
     <tab id="Warehouses" id_parent="Stock" active="1" hide_host_mode="0">
       <class_name>AdminWarehouses</class_name>
     </tab>
