@@ -175,13 +175,12 @@ class AdminGroupsControllerCore extends AdminController
 
     protected function renderCustomersList($group)
     {
-        $genders = array(0 => '?');
-        $genders_icon = array('default' => 'unknown.gif');
-        foreach (Gender::getGenders() as $gender) {
-            /** @var Gender $gender */
-            $genders_icon[$gender->id] = '../genders/'.(int)$gender->id.'.jpg';
-            $genders[$gender->id] = $gender->name;
+        $titles_array = array();
+        $genders = Gender::getGenders($this->context->language->id);
+        foreach ($genders as $gender) {
+            $titles_array[$gender->id_gender] = $gender->name;
         }
+
         $this->table = 'customer_group';
         $this->lang = false;
         $this->list_id = 'customer_group';
@@ -194,7 +193,7 @@ class AdminGroupsControllerCore extends AdminController
 
         $this->fields_list = (array(
             'id_customer' => array('title' => $this->l('ID'), 'align' => 'center', 'filter_key' => 'c!id_customer', 'class' => 'fixed-width-xs'),
-            'id_gender' => array('title' => $this->l('Social title'), 'icon' => $genders_icon, 'list' => $genders),
+            'title' => array('title' => $this->l('Social title'), 'filter_key' => 'c!id_gender', 'type' => 'select', 'list' => $titles_array),
             'firstname' => array('title' => $this->l('First name')),
             'lastname' => array('title' => $this->l('Last name')),
             'email' => array('title' => $this->l('Email address'), 'filter_key' => 'c!email', 'orderby' => true),
@@ -202,8 +201,9 @@ class AdminGroupsControllerCore extends AdminController
             'date_add' => array('title' => $this->l('Registration date'), 'type' => 'date', 'class' => 'fixed-width-md', 'align' => 'center'),
             'active' => array('title' => $this->l('Enabled'), 'align' => 'center', 'class' => 'fixed-width-sm', 'type' => 'bool', 'search' => false, 'orderby' => false, 'filter_key' => 'c!active', 'callback' => 'printOptinIcon')
         ));
-        $this->_select = 'c.*, a.id_group';
+        $this->_select = 'c.*, a.id_group, gl.`name` AS title';
         $this->_join = 'LEFT JOIN `'._DB_PREFIX_.'customer` c ON (a.`id_customer` = c.`id_customer`)';
+        $this->_join .= ' LEFT JOIN '._DB_PREFIX_.'gender_lang gl ON (gl.`id_gender` = c.`id_gender` AND gl.`id_lang` = '.(int) $this->context->language->id.')';
         $this->_where = 'AND a.`id_group` = '.(int)$group->id.' AND c.`deleted` != 1';
         $this->_where .= Shop::addSqlRestriction(Shop::SHARE_CUSTOMER, 'c');
         self::$currentIndex = self::$currentIndex.'&id_group='.(int)$group->id.'&viewgroup';
