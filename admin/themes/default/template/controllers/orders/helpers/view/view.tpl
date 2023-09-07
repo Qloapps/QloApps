@@ -2100,7 +2100,8 @@
 		$('.datepicker').datetimepicker({
 			prevText: '',
 			nextText: '',
-			dateFormat: 'yy-mm-dd ' + hours + ':' + mins + ':' + secs
+			dateFormat: 'yy-mm-dd',
+			timeFormat: 'hh:mm:ss',
 		});
 	});
 </script>
