@@ -282,7 +282,7 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
                     $totalAvailableRooms = 0;
                 }
 
-                $roomTypePrice = self::getRoomTypeTotalPrice($id_product, $currentDate, $nextDayDate);
+                $roomTypePrice = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice($id_product, $currentDate, $nextDayDate);
                 $roomTypeRatesAndInventory[$incr]['date'] = $currentDate;
                 $roomTypeRatesAndInventory[$incr]['room_types'][0]['id'] = $id_product;
                 $roomTypeRatesAndInventory[$incr]['room_types'][0]['rates'] = $roomTypePrice;
@@ -292,7 +292,7 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
                 if ($hotelRoomTypes) {
                     $roomTypeRatesAndInventory[$incr]['date'] = $currentDate;
                     foreach ($hotelRoomTypes as $key => $product) {
-                        $roomTypePrice = self::getRoomTypeTotalPrice(
+                        $roomTypePrice = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice(
                             $product['id_product'],
                             $currentDate,
                             $nextDayDate
