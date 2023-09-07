@@ -423,11 +423,11 @@ var ajaxCart = {
                     }
                     //$('#quantity_wanted_'+idProduct).val(1);
 
-                    let addRoomButton = $(callerElement).closest('.room_info_cont').find('.booking_guest_occupancy_conatiner .dropdown-menu .add_occupancy_block');
+                    let addRoomButton = $(callerElement).closest('.room_info_cont').find('.booking_guest_occupancy_conatiner .dropdown-menu .add_occupancy_block .add_new_occupancy_btn');
                     if (jsonData.avail_rooms > 1) {
-                        $(addRoomButton).show();
+                        $(addRoomButton).removeClass('disabled');
                     } else {
-                        $(addRoomButton).hide();
+                        $(addRoomButton).addClass('disabled');
                     }
                 }
 
@@ -672,11 +672,11 @@ var ajaxCart = {
                         }
                     });
 
-                    let addRoomButton = $('.room_cont[data-id-product="'+idProduct+'"]').find('.room_info_cont').find('.booking_guest_occupancy_conatiner .dropdown-menu .add_occupancy_block');
+                    let addRoomButton = $('.room_cont[data-id-product="'+idProduct+'"]').find('.room_info_cont').find('.booking_guest_occupancy_conatiner .dropdown-menu .add_occupancy_block .add_new_occupancy_btn');
                     if (jsonData.avail_rooms > 1) {
-                        $(addRoomButton).show();
+                        $(addRoomButton).removeClass('disabled');
                     } else {
-                        $(addRoomButton).hide();
+                        $(addRoomButton).addClass('disabled');
                     }
                 }
                 if (pagename == 'orderopc') {
