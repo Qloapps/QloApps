@@ -102,7 +102,7 @@ class AdminWebserviceControllerCore extends AdminController
 
     public function initPageHeaderToolbar()
     {
-        if (!in_array($this->display, array('add', 'edit')) ) {
+        if (empty($this->display)) {
             $this->page_header_toolbar_btn['new_webservice'] = array(
                 'href' => self::$currentIndex.'&addwebservice_account&token='.$this->token,
                 'desc' => $this->l('Add new webservice key', null, null, false),
@@ -118,6 +118,10 @@ class AdminWebserviceControllerCore extends AdminController
     {
         parent::processUpdateOptions();
         Tools::generateHtaccess();
+
+        if (!count($this->errors)) {
+            Tools::redirectAdmin(self::$currentIndex.'&token='.$this->token.'&conf=6');
+        }
     }
 
     public function renderForm()
