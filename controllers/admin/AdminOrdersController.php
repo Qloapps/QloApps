@@ -1080,6 +1080,7 @@ class AdminOrdersControllerCore extends AdminController
                         'total_wrapping',
                         'total_wrapping_tax_incl',
                         'total_wrapping_tax_excl',
+                        'advance_paid_amount',
                     );
 
                     $invoices = $order->getInvoicesCollection();
@@ -1105,6 +1106,96 @@ class AdminOrdersControllerCore extends AdminController
                     // Update exchange rate
                     $order->conversion_rate = (float)$currency->conversion_rate;
                     $order->update();
+
+                    // update rooms bookings prices (htl_booking_detail)
+                    $objHtlBookingDetail = new HotelBookingDetail();
+                    if ($orderRoomBookings = $objHtlBookingDetail->getBookingDataByOrderId($order->id)) {
+                        $fields = array(
+                            'total_price_tax_excl',
+                            'total_price_tax_incl',
+                            'total_paid_amount',
+                        );
+                        foreach ($orderRoomBookings as $roomBooking) {
+                            $objHtlBookingDetail = new HotelBookingDetail($roomBooking['id']);
+                            foreach ($fields as $field) {
+                                $objHtlBookingDetail->{$field} = Tools::convertPriceFull(
+                                    $objHtlBookingDetail->{$field},
+                                    $old_currency,
+                                    $currency
+                                );
+                            }
+                            $objHtlBookingDetail->update();
+                        }
+                    }
+
+                    // update rooms bookings demands (htl_booking_demands)
+                    $objBookingDemand = new HotelBookingDemands();
+                    if ($orderBookingDemands = $objBookingDemand->getRoomTypeBookingExtraDemands($order->id, 0, 0, 0, 0, 0)) {
+                        $fields = array(
+                            'unit_price_tax_excl',
+                            'unit_price_tax_incl',
+                            'total_price_tax_excl',
+                            'total_price_tax_incl',
+                        );
+
+                        $vatAddress = new Address((int)$order->id_address_tax);
+                        $idLang = (int) $order->id_lang;
+                        foreach ($orderBookingDemands as $bookingDemand) {
+                            $objBookingDemand = new HotelBookingDemands($bookingDemand['id_booking_demand']);
+                            foreach ($fields as $field) {
+                                $objBookingDemand->{$field} = Tools::convertPriceFull(
+                                    $objBookingDemand->{$field},
+                                    $old_currency,
+                                    $currency
+                                );
+                            }
+
+                            // update Tax of bookings demands
+                            if ($objBookingDemand->save()) {
+                                $taxManager = TaxManagerFactory::getManager(
+                                    $vatAddress,
+                                    $objBookingDemand->id_tax_rules_group
+                                );
+                                $taxCalculator = $taxManager->getTaxCalculator();
+                                $objBookingDemand->tax_computation_method = (int)$taxCalculator->computation_method;
+                                $objBookingDemand->tax_calculator = $taxCalculator;
+
+                                // Now save tax details of the extra demand with replace = 1
+                                $objBookingDemand->setBookingDemandTaxDetails(1);
+                            }
+                        }
+                    }
+
+                    // Update order service product prices
+                    $objRoomTypeServProdOrderDtl = new RoomTypeServiceProductOrderDetail();
+                    if ($orderServiceProducts = $objRoomTypeServProdOrderDtl->getroomTypeServiceProducts($order->id)) {
+                        $fields = array(
+                            'unit_price_tax_excl',
+                            'unit_price_tax_incl',
+                            'total_price_tax_excl',
+                            'total_price_tax_incl',
+                        );
+
+                        foreach ($orderServiceProducts as $htlBokingServices) {
+                            if (isset($htlBokingServices['additional_services']) && $htlBokingServices['additional_services']) {
+                                foreach ($htlBokingServices['additional_services'] as $serviceProduct) {
+                                    $objRoomTypeServProdOrderDtl = new RoomTypeServiceProductOrderDetail($serviceProduct['id_room_type_service_product_order_detail']);
+                                    foreach ($fields as $field) {
+                                        $objRoomTypeServProdOrderDtl->{$field} = Tools::convertPriceFull(
+                                            $objRoomTypeServProdOrderDtl->{$field},
+                                            $old_currency,
+                                            $currency
+                                        );
+                                    }
+
+                                    $objRoomTypeServProdOrderDtl->save();
+                                }
+                            }
+                        }
+                    }
+
+                    // If everything is updated, then redirect to view order with success message
+                    Tools::redirectAdmin(self::$currentIndex.'&id_order='.$order->id.'&vieworder&conf=4&token='.$this->token);
                 } else {
                     $this->errors[] = Tools::displayError('You cannot change the currency.');
                 }
@@ -4723,6 +4814,9 @@ class AdminOrdersControllerCore extends AdminController
 
             $objBookingDemand = new HotelBookingDemands();
 
+            // set context currency So that we can get prices in the order currency
+            $this->context->currency = new Currency($objOrder->id_currency);
+
             if ($extraDemands = $objBookingDemand->getRoomTypeBookingExtraDemands(
                 $idOrder,
                 $idProduct,
@@ -4803,6 +4897,10 @@ class AdminOrdersControllerCore extends AdminController
         }
 
         if ($orderEdit) {
+            $objOrder = new Order($idOrder);
+            // set context currency So that we can get prices in the order currency
+            $this->context->currency = new Currency($objOrder->id_currency);
+
             $smartyVars['orderEdit'] = $orderEdit;
 
             // get room type additional demands
@@ -4841,6 +4939,9 @@ class AdminOrdersControllerCore extends AdminController
         );
 
         $smartyVars['id_booking_detail'] = $htlBookingDetail['id'];
+
+        // set context currency So that we can get prices in the order currency
+        $this->context->currency = new Currency($objOrder->id_currency);
 
         $objBookingDemand = new HotelBookingDemands();
 
@@ -5001,6 +5102,10 @@ class AdminOrdersControllerCore extends AdminController
         if ($selectedServices = Tools::getValue('selected_service')) {
             // valiadate services being added
             if (Validate::isLoadedObject($objHotelBookingDetail = new HotelBookingDetail($idBookingDetail))) {
+                $objOrder = new Order($objHotelBookingDetail->id_order);
+                // set context currency So that we can get prices in the order currency
+                $this->context->currency = new Currency($objOrder->id_currency);
+
                 $objRoomTypeServiceProduct = new RoomTypeServiceProduct();
                 $qty = Tools::getValue('service_qty');
                 foreach ($selectedServices as $key => $service) {
@@ -5205,6 +5310,9 @@ class AdminOrdersControllerCore extends AdminController
                 $roomDemands = Tools::getValue('room_demands');
                 if ($roomDemands = json_decode($roomDemands, true)) {
                     $order = new Order($objBookingDetail->id_order);
+                    // set context currency So that we can get prices in the order currency
+                    $this->context->currency = new Currency($order->id_currency);
+
                     $vatAddress = new Address((int)$order->id_address_tax);
                     $idLang = (int)$order->id_lang;
                     $idProduct = $objBookingDetail->id_product;
@@ -5273,7 +5381,6 @@ class AdminOrdersControllerCore extends AdminController
                         $objBookingDemand->tax_computation_method = (int)$taxCalc->computation_method;
                         if ($objBookingDemand->save()) {
                             $objBookingDemand->tax_calculator = $taxCalc;
-                            $objBookingDemand->id_global_demand = $idGlobalDemand;
                             // Now save tax details of the extra demand
                             $objBookingDemand->setBookingDemandTaxDetails();
                         }
