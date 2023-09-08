@@ -920,7 +920,6 @@ abstract class PaymentModuleCore extends Module
                                             $objBookingDemand->tax_computation_method = (int)$taxCalc->computation_method;
                                             if ($objBookingDemand->save()) {
                                                 $objBookingDemand->tax_calculator = $taxCalc;
-                                                $objBookingDemand->id_global_demand = $idGlobalDemand;
                                                 // Now save tax details of the extra demand
                                                 $objBookingDemand->setBookingDemandTaxDetails();
                                             }
