@@ -2588,7 +2588,7 @@ class ProductCore extends ObjectModel
             $id_country = (int) Configuration::get('PS_COUNTRY_DEFAULT');
         }
 
-	return SpecificPrice::getProductIdByDate(
+	    return SpecificPrice::getProductIdByDate(
             $context->shop->id,
             $context->currency->id,
             $id_country,
