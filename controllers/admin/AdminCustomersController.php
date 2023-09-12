@@ -39,8 +39,6 @@ class AdminCustomersControllerCore extends AdminController
     public function __construct()
     {
         $this->bootstrap = true;
-        $this->required_database = true;
-        $this->required_fields = array('newsletter','optin');
         $this->table = 'customer';
         $this->className = 'Customer';
         $this->lang = false;
@@ -458,7 +456,6 @@ class AdminCustomersControllerCore extends AdminController
                             'label' => $this->l('Disabled')
                         )
                     ),
-                    'disabled' =>  (bool)!Configuration::get('PS_CUSTOMER_NEWSLETTER'),
                     'hint' => $this->l('This customer will receive your newsletter via email.')
                 ),
                 array(

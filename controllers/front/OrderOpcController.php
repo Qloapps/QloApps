@@ -519,7 +519,7 @@ class OrderOpcControllerCore extends ParentOrderController
         }
         Tools::safePostVars();
 
-        $newsletter = Module::isEnabled('blocknewsletter') && Configuration::get('PS_CUSTOMER_NEWSLETTER');
+        $newsletter = Module::isInstalled('blocknewsletter') && Module::getInstanceByName('blocknewsletter')->active && Configuration::get('PS_CUSTOMER_NWSL');
         $this->context->smarty->assign('newsletter', $newsletter);
         $this->context->smarty->assign('optin', (bool)Configuration::get('PS_CUSTOMER_OPTIN'));
         $this->context->smarty->assign('field_required', $this->context->customer->validateFieldsRequiredDatabase());

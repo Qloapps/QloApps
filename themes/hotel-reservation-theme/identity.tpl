@@ -147,17 +147,15 @@
                     </label>
                     <input class="is_required validate form-control" type="password" data-validate="isPasswd" name="confirmation" id="confirmation" />
                 </div>
-                {if isset($newsletter) && $newsletter}
-                    <div class="checkbox">
-                        <label for="newsletter">
-                            <input type="checkbox" id="newsletter" name="newsletter" value="1" {if isset($smarty.post.newsletter) && $smarty.post.newsletter == 1} checked="checked"{/if}/>
-                            {l s='Sign up for our newsletter!'}
-                            {if isset($required_fields) && array_key_exists('newsletter', $field_required)}
-                              <sup> *</sup>
-                            {/if}
-                        </label>
-                    </div>
-                {/if}
+                <div class="checkbox">
+                    <label for="newsletter">
+                        <input type="checkbox" id="newsletter" name="newsletter" value="1" {if isset($smarty.post.newsletter) && $smarty.post.newsletter == 1} checked="checked"{/if}/>
+                        {l s='Sign up for our newsletter!'}
+                        {if isset($required_fields) && array_key_exists('newsletter', $field_required)}
+                            <sup> *</sup>
+                        {/if}
+                    </label>
+                </div>
                 {if isset($optin) && $optin}
                     <div class="checkbox">
                         <label for="optin">

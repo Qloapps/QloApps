@@ -101,7 +101,7 @@ class AdminCustomerPreferencesControllerCore extends AdminController
                     ),
                     'PS_CUSTOMER_OPTIN' => array(
                         'title' => $this->l('Enable opt-in'),
-                        'hint' => $this->l('Display or not the opt-in tick box, to receive offers from the store\'s partners.'),
+                        'hint' => $this->l('Display or not the opt-in tick box, to receive offers from your hotel partners.'),
                         'validation' => 'isBool',
                         'cast' => 'intval',
                         'type' => 'bool'
