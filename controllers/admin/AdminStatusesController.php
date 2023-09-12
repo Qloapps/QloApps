@@ -99,16 +99,6 @@ class AdminStatusesControllerCore extends AdminController
                 'orderby' => false,
                 'class' => 'fixed-width-sm'
             ),
-            'delivery' => array(
-                'title' => $this->l('Delivery'),
-                'align' => 'text-center',
-                'active' => 'delivery',
-                'type' => 'bool',
-                'ajax' => true,
-                'orderby' => false,
-                'class' => 'fixed-width-sm'
-            )
-            ,
             'invoice' => array(
                 'title' => $this->l('Invoice'),
                 'align' => 'text-center',
