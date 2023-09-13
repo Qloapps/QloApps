@@ -598,7 +598,7 @@ class AdminCustomersControllerCore extends AdminController
         );
 
         $birthday = explode('-', $this->getFieldValue($obj, 'birthday'));
-        
+
         $this->fields_value = array(
             'years' => Tools::getValue('years', $this->getFieldValue($obj, 'birthday') ? $birthday[0] : 0),
             'months' => Tools::getValue('months', $this->getFieldValue($obj, 'birthday') ? $birthday[1] : 0),
@@ -866,6 +866,27 @@ class AdminCustomersControllerCore extends AdminController
 
     public function processDelete()
     {
+        // If customer is going to be deleted permanently then if customer has orders the change this customer as an anonymous customer
+        if (Validate::isLoadedObject($objCustomer = $this->loadObject())) {
+           if ($this->delete_mode == 'real' && Order::getCustomerOrders($objCustomer->id, true)) {
+                $anonymousEmail = 'anonymous'.'-'.$objCustomer->id.'@'.Tools::getShopDomain();
+                // Somehow client domain is creating invalid email the create it with qloapps.com
+                if (!Validate::isEmail($anonymousEmail)) {
+                    $anonymousEmail = 'anonymous'.'-'.$objCustomer->id.'@anonymous.com';
+                }
+                $objCustomer->email = $anonymousEmail;
+                $objCustomer->deleted = 1;
+                $objCustomer->update();
+
+                $this->redirect_after = self::$currentIndex.'&conf=1&token='.$this->token;
+
+                return;
+            }
+        } else {
+            $this->errors[] = Tools::displayError('Customer not found.');
+            return;
+        }
+
         $this->_setDeletedMode();
         parent::processDelete();
     }
@@ -884,6 +905,48 @@ class AdminCustomersControllerCore extends AdminController
 
     protected function processBulkDelete()
     {
+        // If customer is going to be deleted permanently then if customer has orders the change this customer as an anonymous customer
+        if ($this->delete_mode == 'real') {
+            if (is_array($this->boxes) && !empty($this->boxes)) {
+                foreach ($this->boxes as $key => $idCustomer) {
+                    if (Validate::isLoadedObject($objCustomer = new Customer($idCustomer))) {
+                        // check if customer has orders for email change else customer will be deleted
+                        if (Order::getCustomerOrders($objCustomer->id, true)) {
+                            $anonymousEmail = 'anonymous'.'-'.$objCustomer->id.'@'.Tools::getShopDomain();
+                            // client somehow client domain is creating invalid email the create it with qloapps.com
+                            if (!Validate::isEmail($anonymousEmail)) {
+                                $anonymousEmail = 'anonymous'.'-'.$objCustomer->id.'@anonymous.com';
+                            }
+                            $objCustomer->email = $anonymousEmail;
+                            $objCustomer->deleted = 1;
+
+                            if ($objCustomer->update()) {
+                                // unset the customer which is processed
+                                // not processed customers will be deleted with default process if no errors are there
+                                unset($this->boxes[$key]);
+                            }
+                        }
+                    } else {
+                        $this->errors[] = Tools::displayError('Customer id').': '.$idCustomer.' '.Tools::displayError('not found.');
+                    }
+                }
+
+                // if all the customers are process above then redirect with success
+                if (!count($this->boxes)) {
+                    $this->redirect_after = self::$currentIndex.'&conf=1&token='.$this->token;
+                    return;
+                }
+            } else {
+                $this->errors[] = Tools::displayError('Customers not found.');
+                return;
+            }
+
+            // if errors are there then do not proceed for default process
+            if ($this->errors) {
+                return;
+            }
+        }
+
         $this->_setDeletedMode();
         parent::processBulkDelete();
     }
@@ -947,7 +1010,7 @@ class AdminCustomersControllerCore extends AdminController
         $days = Tools::getValue('days');
         $months = Tools::getValue('months');
         $years = Tools::getValue('years');
-        
+
         if ($days || $months || $years) {
             if (!$days) {
                 $this->errors[] = Tools::displayError("Please select a valid date of birthday");
@@ -959,10 +1022,10 @@ class AdminCustomersControllerCore extends AdminController
                 $this->errors[] = Tools::displayError("Please select a valid month of birthday");
             }
         }
-        
+
         $customer = new Customer();
         $this->errors = array_merge($this->errors, $customer->validateFieldsRequiredDatabase());
-        
+
         return parent::processSave();
     }
 
