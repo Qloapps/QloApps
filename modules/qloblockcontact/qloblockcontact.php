@@ -46,6 +46,8 @@ class QloBlockContact extends Module
             || !$this->registerHook('actionFrontControllerSetMedia')
             || !$this->registerHook('displayNav')
             || !$this->registerHook('displayExternalNavigationHook')
+            || !$this->registerHook('actionAdminHotelGeneralSettingsOptionsModifier')
+            || !$this->registerHook('actionAdminHotelGeneralSettingsControllerUpdate_optionsBefore')
         ) {
             return false;
         }
@@ -54,14 +56,9 @@ class QloBlockContact extends Module
 
     public function getContent()
     {
-        if (Tools::isSubmit('submitModuleConfig')) {
-            Configuration::updateValue('QBC_PHONE', Tools::getValue('QBC_PHONE'));
-            Configuration::updateValue('QBC_EMAIL', Tools::getValue('QBC_EMAIL'));
-            Tools::redirectAdmin(
-                $this->context->link->getAdminLink('AdminModules').'&configure='.$this->name.'&conf=6'
-            );
-        }
-        return $this->renderForm();
+        Tools::redirectAdmin(
+            $this->context->link->getAdminLink('AdminHotelGeneralSettings').'#configuration_fieldset_contactdetail'
+        );
     }
 
     public function hookActionFrontControllerSetMedia()
@@ -78,56 +75,6 @@ class QloBlockContact extends Module
         return $this->display(__FILE__, 'display-nav.tpl');
     }
 
-    public function renderForm()
-    {
-        $fields_form = array(
-            'form' => array(
-                'legend' => array(
-                    'title' => $this->l('Configuration'),
-                    'icon' => 'icon-cogs',
-                ),
-                'input' => array(
-                    array(
-                        'type' => 'text',
-                        'label' => $this->l('Phone'),
-                        'hint' => $this->l('The phone number used for customer service.'),
-                        'name' => 'QBC_PHONE',
-                        'class' => 'fixed-width-xxl',
-                    ),
-                    array(
-                        'type' => 'text',
-                        'label' => $this->l('Email'),
-                        'hint' => $this->l('The email used for customer service.'),
-                        'name' => 'QBC_EMAIL',
-                        'class' => 'fixed-width-xxl',
-                    ),
-                ),
-                'submit' => array(
-                    'title' => $this->l('Save'),
-                )
-            ),
-        );
-
-        $helper = new HelperForm();
-        $helper->show_toolbar = false;
-        $helper->table =  $this->table;
-        $lang = new Language((int)Configuration::get('PS_LANG_DEFAULT'));
-        $helper->default_form_language = $lang->id;
-        $helper->allow_employee_form_lang = Configuration::get('PS_BO_ALLOW_EMPLOYEE_FORM_LANG') ? Configuration::get('PS_BO_ALLOW_EMPLOYEE_FORM_LANG') : 0;
-        $this->fields_form = array();
-
-        $helper->identifier = $this->identifier;
-        $helper->submit_action = 'submitModuleConfig';
-        $helper->currentIndex = $this->context->link->getAdminLink('AdminModules', false).'&configure='.$this->name.'&tab_module='.$this->tab.'&module_name='.$this->name;
-        $helper->token = Tools::getAdminTokenLite('AdminModules');
-        $helper->tpl_vars = array(
-            'fields_value' => $this->getConfigFieldsValues(),
-            'languages' => $this->context->controller->getLanguages(),
-            'id_language' => $this->context->language->id
-        );
-        return $helper->generateForm(array($fields_form));
-    }
-
     public function hookDisplayExternalNavigationHook()
     {
         $this->smarty->assign(array(
@@ -137,12 +84,44 @@ class QloBlockContact extends Module
         return $this->display(__FILE__, 'external-navigation-hook.tpl');
     }
 
-    public function getConfigFieldsValues()
+    public function hookActionAdminHotelGeneralSettingsOptionsModifier($params)
     {
-        return array(
-            'QBC_PHONE' => Tools::getValue('QBC_PHONE', Configuration::get('QBC_PHONE')),
-            'QBC_EMAIL' => Tools::getValue('QBC_EMAIL', Configuration::get('QBC_EMAIL')),
+        $params['options']['contactdetail']['fields'] = array_merge(
+            $params['options']['contactdetail']['fields'],
+            array(
+                'QBC_PHONE' => array(
+                    'title' => $this->l('Support Contact Number'),
+                    'type' => 'text',
+                    'hint' => $this->l('The phone number used for customer service.'),
+                    'class' => 'fixed-width-xxl',
+                ),
+                'QBC_EMAIL' => array(
+                    'title' => $this->l('Support Email'),
+                    'type' => 'text',
+                    'hint' => $this->l('The email used for customer service.'),
+                    'class' => 'fixed-width-xxl',
+                ),
+            )
         );
+    }
+
+    public function hookActionAdminHotelGeneralSettingsControllerUpdate_optionsBefore()
+    {
+        $phone = Tools::getValue('QBC_PHONE');
+        $email = Tools::getValue('QBC_EMAIL');
+
+        if ($phone != '' && !Validate::isPhoneNumber($phone)) {
+            $this->context->controller->errors[] = $this->l('Support Contact Number is invalid.');
+        }
+
+        if ($email != '' && !Validate::isEmail($email)) {
+            $this->context->controller->errors[] = $this->l('Support Email is invalid.');
+        }
+
+        if (!count($this->context->controller->errors)) {
+            Configuration::updateValue('QBC_PHONE', $phone);
+            Configuration::updateValue('QBC_EMAIL', $email);
+        }
     }
 
     public function uninstall()
