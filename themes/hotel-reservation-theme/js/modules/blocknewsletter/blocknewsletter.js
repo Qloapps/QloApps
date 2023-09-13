@@ -35,6 +35,8 @@ $(document).on('click', '#blocknewsletter .newsletter-btn', function (e) {
         beforeSend: function () {
             let messageBlock = $('#blocknewsletter .message-block');
             $(messageBlock).fadeOut('fast');
+
+            $('#blocknewsletter .loader').show();
         },
         success: function (response) {
             let messageBlock = $('#blocknewsletter .message-block');
@@ -44,6 +46,9 @@ $(document).on('click', '#blocknewsletter .newsletter-btn', function (e) {
             if (jqXHR.readyState == 0) {
                 showErrorMessage(no_internet_txt);
             }
+        },
+        complete: function () {
+            $('#blocknewsletter .loader').hide();
         }
     });
 });

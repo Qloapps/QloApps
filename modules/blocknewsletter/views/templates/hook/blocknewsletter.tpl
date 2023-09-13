@@ -46,6 +46,7 @@
                     <button type="submit" name="submitNewsletter" class="btn button button-medium newsletter-btn">
                         <span>{l s='Subscribe' mod='blocknewsletter'}</span>
                     </button>
+                    <span class="loader loading" style="display: none;"></span>
                 </div>
             </form>
         </div>

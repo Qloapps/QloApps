@@ -1,3 +1,22 @@
+/**
+ * 2010-2023 Webkul.
+ *
+ * NOTICE OF LICENSE
+ *
+ * All right is reserved,
+ * Please go through LICENSE.txt file inside our module
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade this module to newer
+ * versions in the future. If you wish to customize this module for your
+ * needs please refer to CustomizationPolicy.txt file inside our module for more information.
+ *
+ * @author Webkul IN
+ * @copyright 2010-2023 Webkul IN
+ * @license LICENSE.txt
+ */
+
 /* Block newsletter */
 #columns #newsletter_block_left .form-group {
   margin-bottom: 0; }
@@ -129,6 +148,31 @@
 #newsletter-input:-ms-input-placeholder {
    color: #bfbfbf;  
 }
+
+#blocknewsletter .loader {
+    margin-left: 10px;
+    position: relative;
+    top: 10px;
+}
+
+#blocknewsletter .loader.loading {
+    display: inline-flex;
+    justify-content: center;
+}
+
+#blocknewsletter .loader.loading::after {
+    content: '';
+    width: 30px;
+    height: 30px;
+    border: 4px solid #dddddd;
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: loading 0.5s linear infinite;
+}
+
+@-webkit-keyframes loading { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+@-moz-keyframes loading { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+@keyframes loading { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
 /*# sourceMappingURL=blocknewsletter.css.map */
 .button.button-medium.newsletter-btn {
