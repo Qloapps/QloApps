@@ -870,13 +870,12 @@ class AdminCustomersControllerCore extends AdminController
         if (Validate::isLoadedObject($objCustomer = $this->loadObject())) {
            if ($this->delete_mode == 'real' && Order::getCustomerOrders($objCustomer->id, true)) {
                 $anonymousEmail = 'anonymous'.'-'.$objCustomer->id.'@'.Tools::getShopDomain();
-                // Somehow client domain is creating invalid email the create it with qloapps.com
-                if (!Validate::isEmail($anonymousEmail)) {
-                    $anonymousEmail = 'anonymous'.'-'.$objCustomer->id.'@anonymous.com';
-                }
                 $objCustomer->email = $anonymousEmail;
                 $objCustomer->deleted = 1;
-                $objCustomer->update();
+				if (!$objCustomer->update()) {
+					$this->errors[] = Tools::displayError('Some error ocurred while deleting the Customer');
+                    return;
+				}
 
                 $this->redirect_after = self::$currentIndex.'&conf=1&token='.$this->token;
 
@@ -913,18 +912,15 @@ class AdminCustomersControllerCore extends AdminController
                         // check if customer has orders for email change else customer will be deleted
                         if (Order::getCustomerOrders($objCustomer->id, true)) {
                             $anonymousEmail = 'anonymous'.'-'.$objCustomer->id.'@'.Tools::getShopDomain();
-                            // client somehow client domain is creating invalid email the create it with qloapps.com
-                            if (!Validate::isEmail($anonymousEmail)) {
-                                $anonymousEmail = 'anonymous'.'-'.$objCustomer->id.'@anonymous.com';
-                            }
                             $objCustomer->email = $anonymousEmail;
                             $objCustomer->deleted = 1;
-
                             if ($objCustomer->update()) {
                                 // unset the customer which is processed
                                 // not processed customers will be deleted with default process if no errors are there
                                 unset($this->boxes[$key]);
-                            }
+                            } else {
+								$this->errors[] = Tools::displayError('Some error ocurred while deleting the Customer with id').': '.$idCustomer;
+							}
                         }
                     } else {
                         $this->errors[] = Tools::displayError('Customer id').': '.$idCustomer.' '.Tools::displayError('not found.');
@@ -942,7 +938,7 @@ class AdminCustomersControllerCore extends AdminController
             }
 
             // if errors are there then do not proceed for default process
-            if ($this->errors) {
+            if (count($this->errors)) {
                 return;
             }
         }
