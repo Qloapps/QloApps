@@ -74,9 +74,6 @@
 					<input type="hidden" class="max_avail_type_qty" value="">
 					<div class="dropdown-menu booking_occupancy_wrapper fixed-width-xxl well well-sm">
 						<div class="booking_occupancy_inner">
-							<input type="hidden" class="max_adults" value="">
-							<input type="hidden" class="max_children" value="">
-							<input type="hidden" class="max_guests" value="">
 							<div class="occupancy_info_block col-sm-12" occ_block_index="0">
 								<div class="occupancy_info_head col-sm-12"><label class="room_num_wrapper">{l s='Room - 1'}</label></div>
 								<div class="col-sm-12">
@@ -87,7 +84,7 @@
 										</div>
 										<div class="form-group col-xs-6 occupancy_count_block">
 											<label>{l s='Child'} <span class="label-desc-txt"></span></label>
-											<input type="number" class="form-control num_occupancy num_children" name="occupancy[0][children]" value="0" min="0" {if $max_child_in_room}max="{$max_child_in_room}"{/if}>
+											<input type="number" class="form-control num_occupancy num_children" name="occupancy[0][children]" value="0" min="0">
 											({l s='Below'}  {$max_child_age|escape:'htmlall':'UTF-8'} {l s='years'})
 										</div>
 									</div>

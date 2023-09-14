@@ -1517,7 +1517,7 @@ class AdminOrdersControllerCore extends AdminController
 
             // if the current stock requires a warning
             if ($product['current_stock'] <= 0 && $display_out_of_stock_warning) {
-                $this->displayWarning($this->l('This product is out of stock: ').' '.$product['product_name']);
+                $this->displayWarning($this->l('This booked room type is not found: ').' '.$product['product_name']);
             }
             if ($product['id_warehouse'] != 0) {
                 $warehouse = new Warehouse((int)$product['id_warehouse']);
@@ -3254,7 +3254,7 @@ class AdminOrdersControllerCore extends AdminController
         if (!Validate::isLoadedObject($product)) {
             die(json_encode(array(
                 'result' => false,
-                'error' => Tools::displayError('The product object cannot be loaded.')
+                'error' => Tools::displayError('The Room type cannot be loaded.')
             )));
         }
 
