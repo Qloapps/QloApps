@@ -12,7 +12,7 @@ PASSWORD: {passwd}
 
 Please be careful when sharing these login details with others. 
 
-You can access your customer account on our shop: {shop_url} 
+You can access your customer account on our website: {shop_url} 
 
 {shop_name} [/{shop_url}] powered by Webkul(tm)
 [https://webkul.com] 
