@@ -97,6 +97,8 @@ class AdminLogsControllerCore extends AdminController
         $this->list_no_link = true;
         $this->_select .= 'CONCAT(e.firstname, \' \', e.lastname) employee';
         $this->_join .= ' LEFT JOIN '._DB_PREFIX_.'employee e ON (a.id_employee = e.id_employee)';
+        $this->_orderBy = 'a.date_add';
+        $this->_orderWay = 'DESC';
         $this->_use_found_rows = false;
         parent::__construct();
     }
