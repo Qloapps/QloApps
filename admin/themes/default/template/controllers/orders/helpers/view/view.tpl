@@ -1228,7 +1228,7 @@
 						</div>
 						<div class="col-xs-6 pull-right">
 							<div class="panel panel-vouchers" style="{if !sizeof($discounts)}display:none;{/if}">
-								{if (sizeof($discounts) || $can_edit)}
+								{if sizeof($discounts)}
 									<div class="table-responsive">
 										<table class="table">
 											<thead>
@@ -1271,6 +1271,8 @@
 											</tbody>
 										</table>
 									</div>
+								{/if}
+								{if $can_edit}
 									<div class="current-edit" id="voucher_form" style="display:none;">
 										{include file='controllers/orders/_discount_form.tpl'}
 									</div>
@@ -2098,7 +2100,8 @@
 		$('.datepicker').datetimepicker({
 			prevText: '',
 			nextText: '',
-			dateFormat: 'yy-mm-dd ' + hours + ':' + mins + ':' + secs
+			dateFormat: 'yy-mm-dd',
+			timeFormat: 'hh:mm:ss',
 		});
 	});
 </script>
