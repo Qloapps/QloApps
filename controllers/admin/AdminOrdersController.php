@@ -2812,8 +2812,9 @@ class AdminOrdersControllerCore extends AdminController
                         $objCartBookingData->children = $room_occupancy['children'];
                         $objCartBookingData->child_ages = $room_occupancy['children'] ? json_encode($room_occupancy['child_ages']) : json_encode(array());
                     } else {
+                        // if room is being booked without occupancy selection the for adults set base occupancy and children will be 0
                         $objCartBookingData->adults = $room_info_by_id_product['adults'];
-                        $objCartBookingData->children = $room_info_by_id_product['children'];
+                        $objCartBookingData->children = 0;
                         $objCartBookingData->child_ages = json_encode(array());
                     }
                     $objCartBookingData->save();
@@ -3335,12 +3336,10 @@ class AdminOrdersControllerCore extends AdminController
         $product_quantity = (int) $obj_booking_detail->getNumberOfDays($new_date_from, $new_date_to);
         $old_product_quantity =  (int) $obj_booking_detail->getNumberOfDays($old_date_from, $old_date_to);
         $qty_diff = $product_quantity - $old_product_quantity;
-        if ($order->with_occupancy) {
-            $occupancy = array_shift(Tools::getValue('occupancy'));
-            $adults = $occupancy['adults'];
-            $children = $occupancy['children'];
-            $child_ages = $occupancy['child_ages'];
-        }
+        $occupancy = array_shift(Tools::getValue('occupancy'));
+        $adults = $occupancy['adults'];
+        $children = $occupancy['children'];
+        $child_ages = $occupancy['child_ages'];
 
         /*By webkul to validate fields before deleting the cart and order data form the tables*/
         if ($id_hotel == '') {
@@ -3401,33 +3400,31 @@ class AdminOrdersControllerCore extends AdminController
         }
 
         // validations if order is with occupancy
-        if ($order->with_occupancy) {
-            if (!isset($adults) || !$adults || !Validate::isUnsignedInt($adults)) {
-                die(json_encode(array(
-                    'result' => false,
-                    'error' => Tools::displayError('Invalid number of adults.'),
-                )));
-            } elseif (!Validate::isUnsignedInt($children)) {
-                die(json_encode(array(
-                    'result' => false,
-                    'error' => Tools::displayError('Invalid number of children.'),
-                )));
-            }
+        if (!isset($adults) || !$adults || !Validate::isUnsignedInt($adults)) {
+            die(json_encode(array(
+                'result' => false,
+                'error' => Tools::displayError('Invalid number of adults.'),
+            )));
+        } elseif (!Validate::isUnsignedInt($children)) {
+            die(json_encode(array(
+                'result' => false,
+                'error' => Tools::displayError('Invalid number of children.'),
+            )));
+        }
 
-            if ($children > 0) {
-                if (!isset($child_ages) || ($children != count($child_ages))) {
-                    die(json_encode(array(
-                        'result' => false,
-                        'error' => Tools::displayError('Please provide all children age.'),
-                    )));
-                } else {
-                    foreach($child_ages as $childAge) {
-                        if (!Validate::isUnsignedInt($childAge)) {
-                            die(json_encode(array(
-                                'result' => false,
-                                'error' => Tools::displayError('Invalid children age.'),
-                            )));
-                        }
+        if ($children > 0) {
+            if (!isset($child_ages) || ($children != count($child_ages))) {
+                die(json_encode(array(
+                    'result' => false,
+                    'error' => Tools::displayError('Please provide all children age.'),
+                )));
+            } else {
+                foreach($child_ages as $childAge) {
+                    if (!Validate::isUnsignedInt($childAge)) {
+                        die(json_encode(array(
+                            'result' => false,
+                            'error' => Tools::displayError('Invalid children age.'),
+                        )));
                     }
                 }
             }
