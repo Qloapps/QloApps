@@ -3,7 +3,7 @@
 
 Hello 
 
-This is a TEST E-MAIL from your shop.
+This is a TEST E-MAIL from your website.
 
 If you can read this, the test was successful!. 
 
