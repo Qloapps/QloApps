@@ -290,9 +290,9 @@ $(document).ready(function() {
             url: statebycountryurl,
             success: function(data) {
                 var html = "";
-                if (data) {
-                    $.each(data, function(index, value) {
-                        html += "<option value=" + value.id + ">" + value.name + "</option>";
+                if (data.status && data.states.length) {
+                    $.each(data.states, function(index, value) {
+                        html += "<option value=" + value.id_state + ">" + value.name + "</option>";
                     });
                 }
                 $('#hotel_state').append(html);
