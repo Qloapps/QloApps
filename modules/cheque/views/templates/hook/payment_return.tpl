@@ -30,10 +30,12 @@
 		<br />- {l s='Payable to the order of' mod='cheque'} <strong>{if $chequeName}{$chequeName}{else}___________{/if}</strong>
 		<br />- {l s='Mail to' mod='cheque'} <strong>{if $chequeAddress}{$chequeAddress}{else}___________{/if}</strong>
 		{if !isset($reference) && isset($id_order) && $id_order}
-			<br />- {l s='Do not forget to insert your order number #%d.' sprintf=$id_order mod='cheque'}
+			<br /><br />- {l s='Do not forget to insert your order number #%d.' sprintf=$id_order mod='cheque'}
 		{else}
-			<br />- {l s='Do not forget to insert your order reference %s.' sprintf=$reference mod='cheque'}
+			<br /><br />- {l s='Do not forget to insert your order reference %s.' sprintf=$reference mod='cheque'}
 		{/if}
+		<br />
+		<br />
 {else}
 	<p class="alert alert-warning">
 		{l s='We noticed a problem with your order. If you think this is an error, feel free to contact our' mod='cheque'}
