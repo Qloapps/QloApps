@@ -296,11 +296,13 @@ class AdminNewsletterController extends ModuleAdminController
     public function postProcess()
     {
         if (Tools::isSubmit('submitNewsletterOptions')) {
-            $voucherCode = trim(Tools::getValue('NW_VOUCHER_CODE'));
-            if ($voucherCode && !Validate::isDiscountName($voucherCode)) {
-                $this->errors[] = $this->l('The voucher code is invalid.');
-            } elseif (!CartRule::cartRuleExists($voucherCode)) {
-                $this->errors[] = $this->l('The voucher code does not exist.');
+            $voucherCode = Tools::getValue('NW_VOUCHER_CODE');
+            if (Tools::strlen($voucherCode) > 0) {
+                if (!Validate::isDiscountName($voucherCode)) {
+                    $this->errors[] = $this->l('The voucher code is invalid.');
+                } elseif (!CartRule::cartRuleExists($voucherCode)) {
+                    $this->errors[] = $this->l('The voucher code does not exist.');
+                }
             }
 
             if (!count($this->errors)) {
