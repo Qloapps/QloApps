@@ -437,7 +437,6 @@
 													<p class="avail_voucher_name">
 														<span class="voucher_name" data-code="{$voucher.code|escape:'html':'UTF-8'}">{$voucher.code|escape:'html':'UTF-8'} - </span>{$voucher.name}
 													</p>
-													<p class="avail_voucher_des">{$voucher['description']}</p>
 													{if not $smarty.foreach.availVoucher.last}
 														<hr class="seperator">
 													{/if}
