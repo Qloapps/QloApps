@@ -98,12 +98,13 @@
 										</div>
 									</div>
 								</div>
-								<hr class="occupancy-info-separator col-sm-12">
 							</div>
 						</div>
-						<div class="add_occupancy_block">
-							<a class="add_new_occupancy_btn" href="#"><i class="icon-plus"></i> <span>{l s='Add Room'}</span></a>
-						</div>
+                        <hr class="occupancy-info-separator col-sm-12">
+                        <div class="add_occupancy_block col-sm-12">
+                            <a class="add_new_occupancy_btn" href="#"><i class="icon-plus"></i> <span>{l s='Add Room'}</span></a>
+                            <a class="pull-right close_occupancy_link" href="#">{l s='close'} <i class="icon-remove"></i></a>
+                        </div>
 					</div>
 				</div>
 			</div>

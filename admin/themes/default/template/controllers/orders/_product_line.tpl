@@ -107,17 +107,16 @@
                     </span>
                 </button>
                 <div class="dropdown-menu booking_occupancy_wrapper fixed-width-xxl well well-sm">
-                    <div class="booking_occupancy_inner">
-                        <div class="occupancy_info_block" occ_block_index="0">
-                            <div class="occupancy_info_head col-sm-12"><span class="room_num_wrapper">{l s='Room - 1'}</span></div>
+                    <div class="booking_occupancy_inner row">
+                        <div class="occupancy_info_block col-sm-12" occ_block_index="0">
                             <div class="row">
-                                <div class="col-xs-6 occupancy_count_block">
+                                <div class="col-xs-6 form-group occupancy_count_block">
                                     <div class="col-sm-12">
                                         <label>{l s='Adults'}</label>
                                         <input type="number" class="form-control num_occupancy num_adults" name="occupancy[0][adults]" value="{$data['adults']}" min="1">
                                     </div>
                                 </div>
-                                <div class="col-xs-6 occupancy_count_block">
+                                <div class="col-xs-6 form-group occupancy_count_block">
                                     <div class="col-sm-12">
                                         <label>{l s='Child'} <span class="label-desc-txt"></span></label>
                                         <input type="number" class="form-control num_occupancy num_children" name="occupancy[0][children]" value="{$data['children']}" min="0">
@@ -126,7 +125,7 @@
                                 </div>
                             </div>
                             <div class="row children_age_info_block" {if !isset($data['child_ages']) || !$data['child_ages']}style="display:none"{/if}>
-                                <div class="col-sm-12">
+                                <div class="col-sm-12 form-group">
                                     <label class="col-sm-12">{l s='All Children'}</label>
                                     <div class="col-sm-12">
                                         <div class="row children_ages">
@@ -147,7 +146,10 @@
                                     </div>
                                 </div>
                             </div>
-                            <hr class="occupancy-info-separator">
+                            <hr class="occupancy-info-separator col-sm-12">
+                            <div class="col-sm-12">
+                                <a class="pull-right close_occupancy_link" href="#">{l s='close'} <i class="icon-remove"></i></a>
+    						</div>
                         </div>
                     </div>
                 </div>
