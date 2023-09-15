@@ -194,12 +194,17 @@ class AdminProductsControllerCore extends AdminController
 				LEFT JOIN `'._DB_PREFIX_.'image_shop` image_shop ON (image_shop.`id_product` = a.`id_product` AND image_shop.`cover` = 1 AND image_shop.id_shop = '.$id_shop.')
 				LEFT JOIN `'._DB_PREFIX_.'image` i ON (i.`id_image` = image_shop.`id_image`)
 				LEFT JOIN `'._DB_PREFIX_.'product_download` pd ON (pd.`id_product` = a.`id_product` AND pd.`active` = 1)
-				LEFT JOIN `'._DB_PREFIX_.'address` aa ON (aa.`id_hotel` = hb.`id`)';
+				LEFT JOIN `'._DB_PREFIX_.'address` aa ON (aa.`id_hotel` = hb.`id`)
+				LEFT JOIN `'._DB_PREFIX_.'htl_advance_payment` hap ON (hap.`id_product` = a.`id_product`)
+				LEFT JOIN `'._DB_PREFIX_.'feature_product` fp ON (fp.`id_product` = a.`id_product`)
+				LEFT JOIN `'._DB_PREFIX_.'htl_room_type_demand` hrtd ON (hrtd.`id_product` = a.`id_product`)
+				LEFT JOIN `'._DB_PREFIX_.'htl_room_type_service_product` hrtsp ON ((hrtsp.`element_type` = '.(int) RoomTypeServiceProduct::WK_ELEMENT_TYPE_HOTEL.' AND hrtsp.`id_element` = hrt.`id_hotel`) OR (hrtsp.`element_type` = '.(int) RoomTypeServiceProduct::WK_ELEMENT_TYPE_ROOM_TYPE.' AND hrtsp.`id_element` = a.`id_product`))';
 
         $this->_select .= ' (SELECT COUNT(hri.`id`) FROM `'._DB_PREFIX_.'htl_room_information` hri WHERE hri.`id_product` = a.`id_product`) as num_rooms, ';
-        $this->_select .= 'hrt.`adults`, hrt.`children`, hb.`id` as id_hotel, aa.`city`, hbl.`hotel_name`, ';
+        $this->_select .= 'hrt.`adults`, hrt.`children`, hrt.`max_guests`, hb.`id` as id_hotel, aa.`city`, hbl.`hotel_name`, ';
         $this->_select .= 'shop.`name` AS `shopname`, a.`id_shop_default`, ';
         $this->_select .= $alias_image.'.`id_image` AS `id_image`, cl.`name` AS `name_category`, '.$alias.'.`price`, 0 AS `price_final`, a.`is_virtual`, pd.`nb_downloadable`, sav.`quantity` AS `sav_quantity`, '.$alias.'.`active`, IF(sav.`quantity`<=0, 1, 0) AS `badge_danger`';
+        $this->_select .= ', hap.`active` AS advance_payment';
 
         if ($join_category) {
             $this->_join .= ' INNER JOIN `'._DB_PREFIX_.'category_product` cp ON (cp.`id_product` = a.`id_product` AND cp.`id_category` = '.(int)$this->_category->id.') ';
@@ -210,7 +215,8 @@ class AdminProductsControllerCore extends AdminController
         $this->_where .= ' AND a.`booking_product` = 1';
 
         $this->_use_found_rows = false;
-        $this->_group = '';
+        $this->_group = ' GROUP BY a.`id_product`';
+        $this->_orderBy = 'a.id_product';
 
         $this->fields_list = array();
         $this->fields_list['id_product'] = array(
@@ -246,22 +252,25 @@ class AdminProductsControllerCore extends AdminController
         $this->fields_list['adults'] = array(
             'title' => $this->l('Adults'),
             'filter_key' => 'hrt!adults',
+            'type' => 'range',
             'align' => 'center',
         );
         $this->fields_list['child'] = array(
             'title' => $this->l('Children'),
             'filter_key' => 'hrt!children',
+            'type' => 'range',
             'align' => 'center',
         );
         // use it for total rooms
         $this->fields_list['num_rooms'] = array(
             'title' => $this->l('Total Rooms'),
             'align' => 'center',
+            'type' => 'range',
             'havingFilter' => true,
         );
         $this->fields_list['price'] = array(
-            'title' => $this->l('Base price'),
-            'type' => 'price',
+            'title' => $this->l('Base Price'),
+            'type' => 'range',
             'align' => 'text-left',
             'filter_key' => 'a!price'
         );
@@ -279,9 +288,85 @@ class AdminProductsControllerCore extends AdminController
             'active' => 'status',
             'filter_key' => $alias.'!active',
             'align' => 'text-center',
-            'type' => 'bool',
-            'class' => 'fixed-width-sm',
+            'type' => 'select',
+            'list' => array(1 => $this->l('Yes'), 0 => $this->l('No')),
+            'optional' => true,
+            'visible_default' => true,
             'orderby' => false
+        );
+
+        $this->fields_list['max_guests'] = array(
+            'title' => $this->l('Maximum Occupancy'),
+            'filter_key' => 'hrt!max_guests',
+            'type' => 'range',
+            'align' => 'center',
+            'optional' => true,
+        );
+
+        $this->fields_list['advance_payment'] = array(
+            'title' => $this->l('Advance Payment'),
+            'active' => 'advance_payment',
+            'filter_key' => 'hap!active',
+            'align' => 'text-center',
+            'type' => 'select',
+            'list' => array(1 => $this->l('Yes'), 0 => $this->l('No')),
+            'optional' => true,
+            'visible_default' => true,
+            'orderby' => false
+        );
+
+        $taxRulesGroups = array();
+        foreach (TaxRulesGroup::getTaxRulesGroups(true) as $taxRulesGroup) {
+            $taxRulesGroups[$taxRulesGroup['id_tax_rules_group']] = $taxRulesGroup['name'];
+        }
+        $this->fields_list['id_tax_rules_group'] = array(
+            'title' => $this->l('Tax Rules'),
+            'align' => 'text-center',
+            'type' => 'select_multiple_or',
+            'filter_key' => 'a!id_tax_rules_group',
+            'list' => $taxRulesGroups,
+            'displayed' => false,
+        );
+
+        $features = array();
+        foreach (Feature::getFeatures($this->context->language->id) as $feature) {
+            $features[$feature['id_feature']] = $feature['name'];
+        }
+        $this->fields_list['id_feature'] = array(
+            'title' => $this->l('Features'),
+            'align' => 'text-center',
+            'type' => 'select_multiple_and',
+            'filter_key' => 'fp!id_feature',
+            'list' => $features,
+            'displayed' => false,
+        );
+
+        $serviceProducts = array();
+        foreach (Product::getAllServiceProducts() as $serviceProduct) {
+            $serviceProducts[$serviceProduct['id_product']] = $serviceProduct['name'];
+        }
+        $this->fields_list['id_service_product'] = array(
+            'title' => $this->l('Service Products'),
+            'align' => 'text-center',
+            'type' => 'select_multiple_and',
+            'filter_key' => 'hrtsp!id_product',
+            'list' => $serviceProducts,
+            'displayed' => false,
+        );
+
+        $additionalFacilities = array();
+        $objHotelRoomTypeGlobalDemand = new HotelRoomTypeGlobalDemand();
+        $demands = $objHotelRoomTypeGlobalDemand->getAllDemands();
+        foreach ($demands as $demand) {
+            $additionalFacilities[$demand['id_global_demand']] = $demand['name'];
+        }
+        $this->fields_list['id_global_demand'] = array(
+            'title' => $this->l('Additional Facilities'),
+            'align' => 'text-center',
+            'type' => 'select_multiple_and',
+            'filter_key' => 'hrtd!id_global_demand',
+            'list' => $additionalFacilities,
+            'displayed' => false,
         );
 
         if ($join_category && (int)$this->id_current_category) {
@@ -2264,36 +2349,6 @@ class AdminProductsControllerCore extends AdminController
                 }
                 $this->tpl_form_vars['product_tabs'] = $product_tabs;
             }
-        } else {
-            if ($id_category = (int)$this->id_current_category) {
-                self::$currentIndex .= '&id_category='.(int)$this->id_current_category;
-            }
-
-            // If products from all categories are displayed, we don't want to use sorting by position
-            if (!$id_category) {
-                $this->_defaultOrderBy = $this->identifier;
-                if ($this->context->cookie->{$this->table.'Orderby'} == 'position') {
-                    unset($this->context->cookie->{$this->table.'Orderby'});
-                    unset($this->context->cookie->{$this->table.'Orderway'});
-                }
-            }
-            if (!$id_category) {
-                $id_category = Configuration::get('PS_ROOT_CATEGORY');
-            }
-            $this->tpl_list_vars['is_category_filter'] = (bool)$this->id_current_category;
-
-            // Generate category selection tree
-            $catFilter = $this->l('Filter by Places');
-            $tree = new HelperTreeCategories('categories-tree', $catFilter);
-            $tree->setAttribute('is_category_filter', (bool)$this->id_current_category)
-                ->setAttribute('base_url', preg_replace('#&id_category=[0-9]*#', '', self::$currentIndex).'&token='.$this->token)
-                ->setInputName('id-category')
-                ->setRootCategory((int)Configuration::get('PS_LOCATIONS_CATEGORY'))
-                ->setSelectedCategories(array((int)$id_category));
-            $this->tpl_list_vars['category_tree'] = $tree->render();
-
-            // used to build the new url when changing category
-            $this->tpl_list_vars['base_url'] = preg_replace('#&id_category=[0-9]*#', '', self::$currentIndex).'&token='.$this->token;
         }
 
         parent::initContent();

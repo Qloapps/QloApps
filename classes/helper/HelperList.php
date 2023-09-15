@@ -681,6 +681,11 @@ class HelperListCore extends Helper
                     }
                     break;
 
+                case 'select_multiple_and':
+                case 'select_multiple_or':
+                    $value = json_decode($value, true);
+                    break;
+
                 case 'text':
                     if (!Validate::isCleanHtml($value)) {
                         $value = '';

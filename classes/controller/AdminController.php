@@ -875,7 +875,7 @@ class AdminControllerCore extends Controller
 
                 if ($field = $this->filterToField($key, $filter)) {
                     $type = (array_key_exists('filter_type', $field) ? $field['filter_type'] : (array_key_exists('type', $field) ? $field['type'] : false));
-                    if (($type == 'date' || $type == 'datetime' || $type == 'range') && is_string($value)) {
+                    if ((in_array($type, array('date', 'datetime', 'range', 'select_multiple_and', 'select_multiple_or'))) && is_string($value)) {
                         $value = json_decode($value, true);
                     }
                     $key = isset($tmp_tab[1]) ? $tmp_tab[0].'.`'.$tmp_tab[1].'`' : '`'.$tmp_tab[0].'`';
@@ -895,7 +895,12 @@ class AdminControllerCore extends Controller
                     }
                     /* Only for date filtering (from, to) */
                     if (is_array($value)) {
-                        if ($type == 'range') {
+                        if ($type == 'select_multiple_and') {
+                            $sql_filter .= ' AND '.pSQL($key).' IN ('.pSQL(implode(',', $value)).')';
+                            $this->_filterHaving .= ' AND COUNT(DISTINCT '.pSQL($key).') = '.(int) count($value);
+                        } elseif ($type == 'select_multiple_or') {
+                            $sql_filter .= ' AND '.pSQL($key).' IN ('.pSQL(implode(',', $value)).')';
+                        } elseif ($type == 'range') {
                             if (isset($value[0]) && !empty($value[0])) {
                                 if (!Validate::isUnsignedInt($value[0])) {
                                     $this->errors[] = Tools::displayError('The \'From\' value is invalid');
