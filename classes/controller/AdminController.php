@@ -749,7 +749,7 @@ class AdminControllerCore extends Controller
             }
 
             if (count($filters)) {
-                return sprintf($this->l('filter by %s'), implode(', ', $filters));
+                return sprintf($this->l('Filter by %s'), implode(', ', $filters));
             }
         }
     }
