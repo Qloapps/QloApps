@@ -327,7 +327,7 @@
 					setTimeout(function () {
 						// chosen prevents redraws if already drawn
 						$('#list_filters_panel select[multiple]').chosen({
-							disable_search_threshold: 6,
+							disable_search_threshold: 5,
 							search_contains: true
 						});
 					}, 1);
