@@ -9025,11 +9025,9 @@ a.open_rooms_extra_services_panel {
 
 
 /* fancybox changes */
-.fancybox-skin {
-  box-shadow: none!important;}
-  .fancybox-skin .fancybox-close:after {
+.fancybox-skin .fancybox-close:after {
   content: "";}
-  .fancybox-skin .fancybox-close {
+.fancybox-skin .fancybox-close {
   background-image: url(../img/icon/icon-close.svg);}
 
 /* skeleton loading animations - start */
