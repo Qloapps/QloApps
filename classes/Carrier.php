@@ -1300,7 +1300,8 @@ class CarrierCore extends ObjectModel
         }
 
         $id_address = (int)((!is_null($id_address_delivery) && $id_address_delivery != 0) ? $id_address_delivery :  $cart->id_address_delivery);
-        if ($id_address) {
+        $obj_address = new Address($id_address);
+        if (Validate::isLoadedObject($obj_address)) {
             $id_zone = Address::getZoneById($id_address);
 
             // Check the country of the address is activated
