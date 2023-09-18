@@ -78,6 +78,11 @@ class AdminOrderPreferencesControllerCore extends AdminController
                         'class' => 'fixed-width-xl',
                         'suffix' => $this->l('day(s)'),
                     ),
+                    'BACKDATE_ORDER_EMPLOYEES' => array(
+                        'title' => $this->l('Allow backdate order from Back-office'),
+                        'hint' => $this->l('Allow backoffice employees to create bookings for backdate'),
+                        'type' => 'bool',
+                    ),
                 ),
                 'submit' => array(
                     'title' => $this->l('Save'),

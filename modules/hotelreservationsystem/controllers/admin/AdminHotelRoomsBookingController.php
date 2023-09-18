@@ -63,6 +63,11 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
         $objCustomer->id_guest = (int) $this->context->cookie->id_guest;
 
         $this->context->customer = $objCustomer;
+
+        if (!Configuration::get('BACKDATE_ORDER_EMPLOYEES')) {
+            $htlCart = new HotelCartBookingData();
+            $htlCart->removeBackdateRoomsFromCart($this->context->cart->id);
+        }
     }
 
     protected function createNewCart()
@@ -92,13 +97,18 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
         } else {
             $date_from = date('Y-m-d');
         }
+        if (!Configuration::get('BACKDATE_ORDER_EMPLOYEES')) {
+            if (strtotime(date('Y-m-d')) > strtotime($date_from)) {
+                $date_from = date('Y-m-d');
+            }
+        }
         if (Tools::getValue('date_to')) {
             $date_to = Tools::getValue('date_to');
         } else {
             $date_to = date('Y-m-d');
-            if (strtotime($date_from) >= strtotime($date_to)) {
-                $date_to = date('Y-m-d', strtotime('+1 day', strtotime($date_to)));
-            }
+        }
+        if (strtotime($date_from) >= strtotime($date_to)) {
+            $date_to = date('Y-m-d', strtotime('+1 day', strtotime($date_to)));
         }
 
         if (Tools::getValue('id_hotel')) {
@@ -842,6 +852,7 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
             'years_txt' => $this->l('years', null, true),
             'all_children_txt' => $this->l('All Children', null, true),
             'invalid_occupancy_txt' => $this->l('Invalid occupancy(adults/children) found.', null, true),
+            'BACKDATE_ORDER_EMPLOYEES' => Configuration::get('BACKDATE_ORDER_EMPLOYEES'),
             // 'check_calender_var' => $check_calender_var,
         );
         if (Configuration::get('PS_BACKOFFICE_SEARCH_TYPE') == HotelBookingDetail::SEARCH_TYPE_OWS ) {

@@ -76,24 +76,8 @@ class HotelReservationSystem extends Module
         if (!Configuration::get('PS_CATALOG_MODE')) {
             /*To remove room from cart before todays date*/
             if (isset($this->context->cart->id) && $this->context->cart->id) {
-                $htlCart = new HotelCartBookingData();
-                if ($cartBookingData = $htlCart->getCartBookingDetailsByIdCartIdGuest(
-                    $this->context->cart->id,
-                    $this->context->cart->id_guest,
-                    $this->context->language->id
-                )) {
-                    foreach ($cartBookingData as $cartRoom) {
-                        if (strtotime($cartRoom['date_from']) < strtotime(date('Y-m-d'))) {
-                            $htlCart->deleteRoomDataFromOrderLine(
-                                $cartRoom['id_cart'],
-                                $cartRoom['id_guest'],
-                                $cartRoom['id_product'],
-                                $cartRoom['date_from'],
-                                $cartRoom['date_to']
-                            );
-                        }
-                    }
-                }
+                $objHotelCartBookingData = new HotelCartBookingData();
+                $objHotelCartBookingData->removeBackdateRoomsFromCart($this->context->cart->id);
             }
         }
         //End

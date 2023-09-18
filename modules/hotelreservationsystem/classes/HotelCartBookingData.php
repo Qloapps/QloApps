@@ -767,6 +767,34 @@ class HotelCartBookingData extends ObjectModel
     }
 
     /**
+     * [removeBackdateRoomsFromCart :: To delete the rooms from cart whose booking date is before the current date
+     *
+     * @param [int] $idCart [Id of the cart]
+     *
+     * @return [boolean] [If removed successfully returns true else returns false]
+     */
+    public function removeBackdateRoomsFromCart($idCart)
+    {
+        if ($cartBookingData = $this->getCartCurrentDataByCartId($idCart)) {
+            $res = true;
+            foreach ($cartBookingData as $cartRoom) {
+                if (strtotime($cartRoom['date_from']) < strtotime(date('Y-m-d'))) {
+                    $res = $res && $this->deleteRoomDataFromOrderLine(
+                        $cartRoom['id_cart'],
+                        $cartRoom['id_guest'],
+                        $cartRoom['id_product'],
+                        $cartRoom['date_from'],
+                        $cartRoom['date_to']
+                    );
+                }
+            }
+            return $res;
+        }
+
+        return true;
+    }
+
+    /**
      * [getCustomerIdRoomsByIdCartIdProduct :: To get array of rooms ids in the cart booked by a customer for a date range].
      *
      * @param [int]  $id_cart    [Id of the cart]

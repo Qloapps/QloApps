@@ -286,6 +286,10 @@ class AdminOrdersControllerCore extends AdminController
             $cart_order_exists = $cart->orderExists();
             if (!$cart_order_exists) {
                 $this->context->cart = $cart;
+                if (!Configuration::get('BACKDATE_ORDER_EMPLOYEES')) {
+                    $objHotelCartBookingData = new HotelCartBookingData();
+                    $objHotelCartBookingData->removeBackdateRoomsFromCart($this->context->cart->id);
+                }
                 $this->context->currency = new Currency((int)$cart->id_currency);
                 $cart_detail_data = array();
                 $cart_detail_data_obj = new HotelCartBookingData();
