@@ -72,7 +72,7 @@ class DbMySQLiCore extends Db
         }
 
         // UTF-8 support
-        if (!$this->link->query('SET NAMES \'utf8\'')) {
+        if (!$this->link->query('SET NAMES \'utf8mb4\'')) {
             throw new PrestaShopDatabaseException(Tools::displayError('PrestaShop Fatal error: no utf-8 support. Please check your server configuration.'));
         }
 
@@ -405,7 +405,7 @@ class DbMySQLiCore extends Db
     public static function tryUTF8($server, $user, $pwd)
     {
         $link = @new mysqli($server, $user, $pwd);
-        $ret = $link->query("SET NAMES 'UTF8'");
+        $ret = $link->query("SET NAMES 'UTF8MB4'");
         $link->close();
         return $ret;
     }

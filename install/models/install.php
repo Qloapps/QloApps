@@ -119,7 +119,7 @@ class InstallModelInstall extends InstallAbstractModel
             $this->clearDatabase();
         }
 
-        $allowed_collation = array('utf8_general_ci', 'utf8_unicode_ci');
+        $allowed_collation = array('utf8mb4_general_ci', 'utf8mb4_unicode_ci');
         $collation_database = Db::getInstance()->getValue('SELECT @@collation_database');
         // Install database structure
         $sql_loader = new InstallSqlLoader();

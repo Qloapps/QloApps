@@ -60,6 +60,7 @@ class DbPDOCore extends Db
         } else {
             $dsn .= 'host='.$host;
         }
+        $dsn .= ';charset=utf8mb4';
 
         return new PDO($dsn, $user, $password, array(PDO::ATTR_TIMEOUT => $timeout, PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => true));
     }
@@ -103,7 +104,7 @@ class DbPDOCore extends Db
         }
 
         // UTF-8 support
-        if ($this->link->exec('SET NAMES \'utf8\'') === false) {
+        if ($this->link->exec('SET NAMES \'utf8mb4\'') === false) {
             throw new PrestaShopException('PrestaShop Fatal error: no utf-8 support. Please check your server configuration.');
         }
 
@@ -405,7 +406,7 @@ class DbPDOCore extends Db
         } catch (PDOException $e) {
             return false;
         }
-        $result = $link->exec('SET NAMES \'utf8\'');
+        $result = $link->exec('SET NAMES \'utf8mb4\'');
         unset($link);
 
         return ($result === false) ? false : true;

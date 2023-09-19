@@ -63,7 +63,7 @@ abstract class ImportModuleCore extends Module
             if (!mysql_select_db($this->database, $this->_link)) {
                 die(Tools::displayError('The database selection cannot be made.'));
             }
-            if (!mysql_query('SET NAMES \'utf8\'', $this->_link)) {
+            if (!mysql_query('SET NAMES \'utf8mb4\'', $this->_link)) {
                 die(Tools::displayError('Fatal error: no UTF-8 support. Please check your server configuration.'));
             }
         } else {

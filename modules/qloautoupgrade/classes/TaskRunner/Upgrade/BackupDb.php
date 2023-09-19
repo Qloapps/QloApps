@@ -150,7 +150,7 @@ class BackupDb extends AbstractTask
 
                 $written += fwrite($fp, '/* Backup ' . $this->container->getState()->getDbStep() . ' for ' . Tools14::getHttpHost(false, false) . __PS_BASE_URI__ . "\n *  at " . date('r') . "\n */\n");
                 $written += fwrite($fp, "\n" . 'SET SESSION sql_mode = \'\';' . "\n\n");
-                $written += fwrite($fp, "\n" . 'SET NAMES \'utf8\';' . "\n\n");
+                $written += fwrite($fp, "\n" . 'SET NAMES \'utf8mb4\';' . "\n\n");
                 $written += fwrite($fp, "\n" . 'SET FOREIGN_KEY_CHECKS=0;' . "\n\n");
                 // end init file
             }

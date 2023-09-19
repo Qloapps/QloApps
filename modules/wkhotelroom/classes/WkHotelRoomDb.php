@@ -45,7 +45,7 @@ class WkHotelRoomDb
                 `date_add` datetime NOT NULL,
                 `date_upd` datetime NOT NULL,
                 PRIMARY KEY (`id_room_block`)
-            ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;"
+            ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8mb4 AUTO_INCREMENT=1;"
         );
     }
 

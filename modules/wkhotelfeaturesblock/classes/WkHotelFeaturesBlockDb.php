@@ -44,7 +44,7 @@ class WkHotelFeaturesBlockDb
                 `date_add` datetime NOT NULL,
                 `date_upd` datetime NOT NULL,
                 PRIMARY KEY (`id_features_block`)
-            ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;",
+            ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8mb4 AUTO_INCREMENT=1;",
 
             "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."htl_features_block_data_lang` (
                 `id_features_block` int(11) NOT NULL,

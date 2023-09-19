@@ -218,7 +218,7 @@ class PrestaShopBackupCore
         $this->id = realpath($backupfile);
 
         fwrite($fp, '/* Backup for '.Tools::getHttpHost(false, false).__PS_BASE_URI__."\n *  at ".date($date)."\n */\n");
-        fwrite($fp, "\n".'SET NAMES \'utf8\';');
+        fwrite($fp, "\n".'SET NAMES \'utf8mb4\';');
         fwrite($fp, "\n".'SET SQL_MODE=\'ALLOW_INVALID_DATES\';'."\n\n");
 
         // Find all tables

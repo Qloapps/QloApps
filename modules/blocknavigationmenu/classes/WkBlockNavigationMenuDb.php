@@ -41,7 +41,7 @@ class WkBlockNavigationMenuDb
                 `id_lang` int(11) NOT NULL,
                 `name` varchar(255) NOT NULL,
                 PRIMARY KEY (`id_navigation_link`, `id_lang`)
-                ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8 ;",
+                ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8mb4 ;",
         );
     }
 

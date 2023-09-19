@@ -1,4 +1,4 @@
-SET NAMES 'utf8';
+SET NAMES 'utf8mb4';
 
 UPDATE `PREFIX_configuration` SET value = '1' WHERE name = 'PS_CONDITIONS';
 UPDATE `PREFIX_configuration` SET value = '12' WHERE name = 'PS_PRODUCTS_PER_PAGE';

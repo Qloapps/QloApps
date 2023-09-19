@@ -25,25 +25,25 @@ class WkPaypalCommerceDb
         return array(
             "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."wk_paypal_commerce_order` (
                 `id_paypal_commerce_order` int(10) UNSIGNED NOT NULL AUTO_INCREMENT,
-                `environment` varchar(15) CHARACTER SET utf8 NOT NULL,
+                `environment` varchar(15) NOT NULL,
                 `order_reference` varchar(20) NOT NULL,
                 `id_cart` int(10) UNSIGNED NOT NULL,
                 `id_currency` int(10) UNSIGNED NOT NULL,
                 `id_customer` int(10) UNSIGNED NOT NULL,
                 `order_total` decimal(10,5) NOT NULL,
                 `pp_paid_total` decimal(10,5) NOT NULL,
-                `checkout_currency` varchar(5) CHARACTER SET utf8 NOT NULL,
-                `pp_paid_currency` varchar(5) CHARACTER SET utf8 NOT NULL,
-                `pp_reference_id` varchar(50) CHARACTER SET utf8 NOT NULL,
-                `pp_order_id` varchar(50) CHARACTER SET utf8 NOT NULL,
-                `pp_transaction_id` varchar(50) CHARACTER SET utf8 NOT NULL,
-                `pp_payment_status` varchar(10) CHARACTER SET utf8 NOT NULL,
-                `response` text CHARACTER SET utf8 NOT NULL,
+                `checkout_currency` varchar(5) NOT NULL,
+                `pp_paid_currency` varchar(5) NOT NULL,
+                `pp_reference_id` varchar(50) NOT NULL,
+                `pp_order_id` varchar(50) NOT NULL,
+                `pp_transaction_id` varchar(50) NOT NULL,
+                `pp_payment_status` varchar(10) NOT NULL,
+                `response` text NOT NULL,
                 `order_date` datetime NOT NULL,
                 `date_add` datetime NOT NULL,
                 `date_upd` datetime NOT NULL,
                 PRIMARY KEY (`id_paypal_commerce_order`)
-              ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8;",
+              ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8mb4;",
               "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."wk_paypal_commerce_refund` (
                 `id_paypal_commerce_refund` int(10) UNSIGNED NOT NULL AUTO_INCREMENT,
                 `order_trans_id` int(10) UNSIGNED NOT NULL,
@@ -57,7 +57,7 @@ class WkPaypalCommerceDb
                 `date_add` datetime NOT NULL,
                 `date_upd` datetime NOT NULL,
                 PRIMARY KEY (`id_paypal_commerce_refund`)
-            ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8;"
+            ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8mb4;"
         );
     }
 
