@@ -44,13 +44,13 @@ if (Configuration::get('PS_UPGRADE_CLEAR_CACHE')) {
 }
 
 // For retrocompatibility with "tab" parameter
-if (!isset($_GET['controller']) && isset($_GET['tab']) && is_string($_GET['tab'])) {
+if (!isset($_GET['controller']) && isset($_GET['tab'])) {
     $_GET['controller'] = strtolower($_GET['tab']);
 }
-if (!isset($_POST['controller']) && isset($_POST['tab']) && is_string($_POST['tab'])) {
+if (!isset($_POST['controller']) && isset($_POST['tab'])) {
     $_POST['controller'] = strtolower($_POST['tab']);
 }
-if (!isset($_REQUEST['controller']) && isset($_REQUEST['tab']) && is_string($_REQUEST['tab'])) {
+if (!isset($_REQUEST['controller']) && isset($_REQUEST['tab'])) {
     $_REQUEST['controller'] = strtolower($_REQUEST['tab']);
 }
 
