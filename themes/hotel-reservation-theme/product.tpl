@@ -346,7 +346,7 @@
 			</div> <!-- end pb-left-column -->
 
 			<div class="pb-right-column col-xs-12 col-sm-4 col-md-4">
-				{if ($product->show_price && !isset($restricted_country_mode)) || isset($groups) || $product->reference || (isset($HOOK_PRODUCT_ACTIONS) && $HOOK_PRODUCT_ACTIONS)}
+				{if !isset($restricted_country_mode) || isset($groups) || $product->reference || (isset($HOOK_PRODUCT_ACTIONS) && $HOOK_PRODUCT_ACTIONS)}
 					<p class="hidden">
 						<input type="hidden" name="token" value="{$static_token}" />
 						<input type="hidden" name="id_product" value="{$product->id|intval}" id="product_page_product_id" />

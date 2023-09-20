@@ -392,6 +392,9 @@ class OrderOpcControllerCore extends ParentOrderController
         // check all service products are available
         RoomTypeServiceProductCartDetail::validateServiceProductsInCart();
 
+        // check rooms in cart are still available for front office
+        HotelRoomType::validateForRoomTypesShownAtFrontOffice();
+
         parent::initContent();
 
         // check ORDER RESTRICT condition before payment by the customer

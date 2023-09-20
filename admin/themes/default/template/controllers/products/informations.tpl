@@ -273,6 +273,27 @@
 		</div>
 	</div>
 
+	<div class="form-group" id="show_at_front_container">
+		<label class="control-label col-lg-3">
+			<span class="label-tooltip" data-toggle="tooltip" title="{l s='Enable if you want this room type to be shown at front office.'}">
+				{l s='Show at front office'}
+			</span>
+		</label>
+		<div class="col-lg-3">
+			<span class="switch prestashop-switch fixed-width-lg">
+				<input type="radio" name="show_at_front" id="show_at_front_on" value="1" {if $product->show_at_front || !$product->isAssociatedToShop()}checked="checked"{/if}/>
+				<label for="show_at_front_on" class="radioCheck">
+					{l s='Yes'}
+				</label>
+				<input type="radio" name="show_at_front" id="show_at_front_off" value="0" {if !$product->show_at_front && $product->isAssociatedToShop()}checked="checked"{/if}/>
+				<label for="show_at_front_off" class="radioCheck">
+					{l s='No'}
+				</label>
+				<a class="slide-button btn"></a>
+			</span>
+		</div>
+	</div>
+
 	<div id="product_options" class="form-group hidden">
 		<div class="col-lg-12">
 			<div class="form-group">

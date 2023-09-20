@@ -314,15 +314,19 @@ class HotelRoomType extends ObjectModel
      *
      * @return [array|false] [If data found returns array containing information of the room types else returns false ]
      */
-    public function getIdProductByHotelId($idHotel, $idRoomType = 0, $onlyActiveProd = 0, $onlyActiveHotel = 0)
+    public function getIdProductByHotelId($idHotel, $idRoomType = 0, $onlyActiveProd = 0, $onlyActiveHotel = 0, $checkShowAtFront = null)
     {
+        if (is_null($checkShowAtFront)) {
+            $checkShowAtFront = isset(Context::getContext()->employee->id) ? 0 : 1;
+        }
+
         $sql = 'SELECT DISTINCT hrt.`id_product`, hrt.`adults`, hrt.`children`, hrt.`id`
                 FROM `'._DB_PREFIX_.'htl_room_type` AS hrt ';
 
         if ($onlyActiveHotel) {
             $sql .= 'INNER JOIN `'._DB_PREFIX_.'htl_branch_info` AS hti ON (hti.id = hrt.id_hotel AND hti.active = 1)';
         }
-        if ($onlyActiveProd) {
+        if ($onlyActiveProd || $checkShowAtFront) {
             $sql .= 'INNER JOIN `'._DB_PREFIX_.'product` AS pp ON (hrt.id_product = pp.id_product AND pp.active = 1)';
         }
         $sql .= 'WHERE hrt.`id_hotel`='. (int)$idHotel;
@@ -330,6 +334,10 @@ class HotelRoomType extends ObjectModel
         if ($idRoomType) {
             $sql .= ' AND hrt.`id_product` = '. (int)$idRoomType;
         }
+        if ($checkShowAtFront) {
+            $sql .= ' AND pp.`show_at_front` = 1';
+        }
+
         return Db::getInstance()->executeS($sql);
     }
 
@@ -389,6 +397,19 @@ class HotelRoomType extends ObjectModel
             $taxRate = 0;
         }
         return $taxRate;
+    }
+
+    public static function validateForRoomTypesShownAtFrontOffice()
+    {
+        $context = Context::getContext();
+        if ($cartProducts = $context->cart->getProducts()) {
+            foreach ($cartProducts as $product) {
+                if ($product['booking_product'] && !$product['show_at_front']) {
+                    $objHotelCartBookingData = new HotelCartBookingData();
+                    $objHotelCartBookingData->deleteCartBookingData($context->cart->id, $product['id_product']);
+                }
+            }
+        }
     }
 
     // Webservice funcions

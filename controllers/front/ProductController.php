@@ -112,7 +112,7 @@ class ProductControllerCore extends FrontController
             $this->product = new Product($id_product, true, $this->context->language->id, $this->context->shop->id);
         }
 
-        if (!$this->product->booking_product) {
+        if (!$this->product->booking_product || ($this->product->booking_product && !$this->product->show_at_front)) {
             Tools::redirect($this->context->link->getPageLink('pagenotfound'));
         }
 
