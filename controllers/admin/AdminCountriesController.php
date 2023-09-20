@@ -54,20 +54,20 @@ class AdminCountriesControllerCore extends AdminController
             'dir' => 'st'
         );
 
-        $this->fields_options = array(
-            'general' => array(
-                'title' =>    $this->l('Country options'),
-                'fields' =>    array(
-                    'PS_RESTRICT_DELIVERED_COUNTRIES' => array(
-                        'title' => $this->l('Restrict country selections in front office to those covered by active carriers'),
-                        'cast' => 'intval',
-                        'type' => 'bool',
-                        'default' => '0'
-                    )
-                ),
-                'submit' => array('title' => $this->l('Save'))
-            )
-        );
+        // $this->fields_options = array(
+        //     'general' => array(
+        //         'title' =>    $this->l('Country options'),
+        //         'fields' =>    array(
+        //             'PS_RESTRICT_DELIVERED_COUNTRIES' => array(
+        //                 'title' => $this->l('Restrict country selections in front office to those covered by active carriers'),
+        //                 'cast' => 'intval',
+        //                 'type' => 'bool',
+        //                 'default' => '0'
+        //             )
+        //         ),
+        //         'submit' => array('title' => $this->l('Save'))
+        //     )
+        // );
 
         $zones_array = array();
         $this->zones = Zone::getZones();
