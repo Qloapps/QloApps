@@ -152,7 +152,7 @@ class AdminOrderRefundRulesController extends ModuleAdminController
         }
 
         //lang vars
-        $currentLangId = Configuration::get('PS_LANG_DEFAULT');
+        $currentLangId = $this->default_form_language ? $this->default_form_language : Configuration::get('PS_LANG_DEFAULT');
         $smartyVars['languages'] = Language::getLanguages(false);
         $smartyVars['currentLang'] = Language::getLanguage((int) $currentLangId);
 

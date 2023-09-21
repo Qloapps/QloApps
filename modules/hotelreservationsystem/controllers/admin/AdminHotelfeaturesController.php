@@ -61,7 +61,7 @@ class AdminHotelFeaturesController extends ModuleAdminController
         $smartyVars = array();
         //lang vars
         $languages = Language::getLanguages(false);
-        $currentLangId = Configuration::get('PS_LANG_DEFAULT');
+        $currentLangId = $this->default_form_language ? $this->default_form_language : Configuration::get('PS_LANG_DEFAULT');
         $currentLang = Language::getLanguage((int) $currentLangId);
         $smartyVars['languages'] = $languages;
         $smartyVars['currentLang'] = $currentLang;

@@ -483,6 +483,9 @@
 
 {block name=script}
 <script type="text/javascript">
+	var id_language = {$defaultFormLanguage|intval};
+	allowEmployeeFormLang = {$allowEmployeeFormLang|intval};
+
 	// for tiny mce setup
 	var iso = "{$iso|escape:'htmlall':'UTF-8'}";
 	var pathCSS = "{$smarty.const._THEME_CSS_DIR_|escape:'htmlall':'UTF-8'}";
