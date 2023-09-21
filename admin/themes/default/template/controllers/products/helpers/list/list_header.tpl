@@ -251,7 +251,7 @@
 															</select>
 														{/if}
 													{elseif $params.type == 'select_multiple_and'}
-														<select id="filter_input_{$key}" class="filter{if isset($params.align) && $params.align == 'center'}center{/if} select_multiple_and chosenzzz" multiple name="{$list_id}Filter_{$params.filter_key}[]" {if isset($params.width)} style="width:{$params.width}px"{/if}>
+														<select id="filter_input_{$key}" class="filter{if isset($params.align) && $params.align == 'center'}center{/if} select_multiple_and chosen" multiple name="{$list_id}Filter_{$params.filter_key}[]" {if isset($params.width)} style="width:{$params.width}px"{/if}>
 															{if isset($params.list) && is_array($params.list)}
 																{foreach $params.list AS $option_value => $option_display}
 																	<option value="{$option_value}" {if isset($params.value) && $params.value}{if in_array($option_value, $params.value)} selected="selected"{/if}{/if}>{$option_display}</option>
@@ -259,7 +259,7 @@
 															{/if}
 														</select>
 													{elseif $params.type == 'select_multiple_or'}
-														<select id="filter_input_{$key}" class="filter{if isset($params.align) && $params.align == 'center'}center{/if} select_multiple_or chosenzzz" multiple name="{$list_id}Filter_{$params.filter_key}[]" {if isset($params.width)} style="width:{$params.width}px"{/if}>
+														<select id="filter_input_{$key}" class="filter{if isset($params.align) && $params.align == 'center'}center{/if} select_multiple_or chosen" multiple name="{$list_id}Filter_{$params.filter_key}[]" {if isset($params.width)} style="width:{$params.width}px"{/if}>
 															{if isset($params.list) && is_array($params.list)}
 																{foreach $params.list AS $option_value => $option_display}
 																	<option value="{$option_value}" {if isset($params.value) && $params.value}{if in_array($option_value, $params.value)} selected="selected"{/if}{/if}>{$option_display}</option>
@@ -321,16 +321,6 @@
 					});
 
 					form.submit();
-				});
-
-				$('#list_filters_panel').on('show.bs.collapse', function () {
-					setTimeout(function () {
-						// chosen prevents redraws if already drawn
-						$('#list_filters_panel select[multiple]').chosen({
-							disable_search_threshold: 5,
-							search_contains: true
-						});
-					}, 1);
 				});
 			});
 		</script>
