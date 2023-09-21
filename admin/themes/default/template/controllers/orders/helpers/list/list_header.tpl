@@ -305,12 +305,12 @@
 				});
 			});
 
-			// manage Hotel and Room type filter inputs
-			$(document).on('change', '#filter_input_hotel_name', function () {
+			function updateRoomTypeFilter() {
 				let filterInputHotelName = $('#filter_input_hotel_name');
 				let filterInputRoomTypeName = $('#filter_input_room_type_name');
 
-				let idHotel = parseInt($(filterInputHotelName).val());
+				let idHotel = parseInt($(filterInputHotelName).val() || '0');
+
 				$.ajax({
 					url: currentIndex + '&token=' + token,
 					data: {
@@ -324,15 +324,58 @@
 						if (response.status) {
 							$(filterInputRoomTypeName).html(response.html_room_types);
 
-							// destoy current chosen and re-initialize
+							// destroy current chosen and re-initialize
 							$(filterInputRoomTypeName).chosen('destroy');
 							$(filterInputRoomTypeName).chosen({
-								disable_search_threshold: 10,
+								disable_search_threshold: 5,
 								search_contains: true,
 							});
 						}
 					},
 				});
+			}
+
+			function updateHotelRoomsFilter(useRoomType = true) {
+				let filterInputHotelName = $('#filter_input_hotel_name');
+				let filterInputRoomTypeName = $('#filter_input_room_type_name');
+				let filterInputRoomNumber = $('#filter_input_id_room_information');
+
+				let idHotel = parseInt($(filterInputHotelName).val() || '0');
+				let idProduct = parseInt($(filterInputRoomTypeName).val() || '0');
+
+				$.ajax({
+					url: currentIndex + '&token=' + token,
+					data: {
+						ajax: true,
+						action: 'GetHotelRooms',
+						id_hotel: idHotel,
+						id_product: useRoomType ? idProduct : 0,
+					},
+					type: 'POST',
+					dataType: 'JSON',
+					success: function(response) {
+						if (response.status) {
+							$(filterInputRoomNumber).html(response.html_hotel_rooms);
+
+							// destroy current chosen and re-initialize
+							$(filterInputRoomNumber).chosen('destroy');
+							$(filterInputRoomNumber).chosen({
+								disable_search_threshold: 5,
+								search_contains: true,
+							});
+						}
+					},
+				});
+			}
+
+			// manage Hotel and Room type filter inputs
+			$(document).on('change', '#filter_input_hotel_name', function () {
+				updateRoomTypeFilter();
+				updateHotelRoomsFilter(false);
+			});
+
+			$(document).on('change', '#filter_input_room_type_name', function () {
+				updateHotelRoomsFilter();
 			});
 		</script>
 		<style>

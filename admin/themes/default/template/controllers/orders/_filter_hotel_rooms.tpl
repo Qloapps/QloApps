@@ -17,9 +17,9 @@
  * @license LICENSE.txt
  *}
 
-{if is_array($room_types_info) && count($room_types_info)}
+{if is_array($hotel_rooms_info) && count($hotel_rooms_info)}
     <option value="" selected="selected">-</option>
-    {foreach from=$room_types_info item=room_type}
-        <option value="{$room_type.id_product}">{$room_type.room_type}, {$room_type.hotel_name}</option>
+    {foreach from=$hotel_rooms_info item=hotel_room}
+        <option value="{$hotel_room.id_product}">{$hotel_room.room_num}, {$hotel_room.room_type_name}, {$hotel_room.hotel_name}</option>
     {/foreach}
 {/if}
