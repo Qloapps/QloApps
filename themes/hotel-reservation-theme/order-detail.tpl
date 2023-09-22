@@ -138,8 +138,6 @@
 				{if !$hasCompletelyRefunded}
 					<a refund_fields_on="0" id="order_refund_request" class="btn btn-default pull-right" href="#" title="{l s='Proceed to refund'}"><span>{l s='Cancel Bookings'}</span></a>
 				{/if}
-
-				{if isset($id_cms_refund_policy) && $id_cms_refund_policy}<a target="_blank" class="btn btn-default pull-right refund_policy_link" href="{$link->getCMSLink($id_cms_refund_policy)|escape:'html':'UTF-8'}">{l s='Refund Policies'}</a>{/if}
 			{/if}
 			{hook h='displayBookingAction' id_order=$order->id}
 		</div>
@@ -563,6 +561,19 @@
 		{/if}
 	</form>
 
+	{if $refund_allowed}
+		<h3 class="page-heading">{l s='Refund Policies'}</h3>
+		{if isset($refundRules) && $refundRules}
+			<ul id="refund-rules-list">
+				{foreach $refundRules as $refundRule}
+						<li><label>{$refundRule['name']|escape:'html':'UTF-8'}</label> - {$refundRule['description']|escape:'html':'UTF-8'}</li>
+				{/foreach}
+			</ul>
+		{/if}
+		{if isset($id_cms_refund_policy) && $id_cms_refund_policy}{l s='Read the complete refund policy here : '}<a target="_blank" class="refund_policy_link" href="{$link->getCMSLink($id_cms_refund_policy)|escape:'html':'UTF-8'}">{l s='Refund Policies'}</a>{/if}
+
+	{/if}
+
 	{if $any_back_order}
 		{if $shw_bo_msg}
 			<p class="back_o_msg"><strong><sup>*</sup>{l s='Some of your rooms are on back order. Please read the following message for rooms with status on backorder'}</strong></p>
@@ -634,83 +645,83 @@
 					</tbody>
 				</table>
 			</div>
-			{/if}
-			{if isset($errors) && $errors}
-				<div class="alert alert-danger">
-					<p>{if $errors|@count > 1}{l s='There are %d errors' sprintf=$errors|@count}{else}{l s='There is %d error' sprintf=$errors|@count}{/if}</p>
-					<ol>
-					{foreach from=$errors key=k item=error}
-						<li>{$error}</li>
-					{/foreach}
-					</ol>
-				</div>
-			{/if}
-			{if isset($message_confirmation) && $message_confirmation}
+		{/if}
+		{if isset($errors) && $errors}
+			<div class="alert alert-danger">
+				<p>{if $errors|@count > 1}{l s='There are %d errors' sprintf=$errors|@count}{else}{l s='There is %d error' sprintf=$errors|@count}{/if}</p>
+				<ol>
+				{foreach from=$errors key=k item=error}
+					<li>{$error}</li>
+				{/foreach}
+				</ol>
+			</div>
+		{/if}
+		{if isset($message_confirmation) && $message_confirmation}
 			<p class="alert alert-success">
 				{l s='Message successfully sent'}
 			</p>
-			{/if}
-			<form action="{$link->getPageLink('order-detail', true)|escape:'html':'UTF-8'}" method="post" class="std" id="sendOrderMessage">
-				<h3 class="page-heading bottom-indent">{l s='Add a message'}</h3>
-				<p>{l s='If you would like to add a comment about your order, please write it in the field below.'}</p>
-				<p class="form-group">
-				<label for="id_product">{l s='Room Type'}</label>
-					<select name="id_product" class="form-control">
-						<option value="0">{l s='-- Choose --'}</option>
-						{foreach from=$products item=product name=products}
-							{if $product.is_booking_product}
-								<option value="{$product.product_id}">{$product.product_name|escape:'html':'UTF-8'}</option>
-							{/if}
-						{/foreach}
-					</select>
-				</p>
-				<p class="form-group">
-					<textarea class="form-control" cols="67" rows="3" name="msgText"></textarea>
-				</p>
-				<div class="submit">
-					<input type="hidden" name="id_order" value="{$order->id|intval|escape:'html':'UTF-8'}" />
-					<input type="submit" class="unvisible" name="submitMessage" value="{l s='Send'}"/>
-					<button type="submit" name="submitMessage" class="button btn btn-default button-medium"><span>{l s='Send'}<i class="icon-chevron-right right"></i></span></button>
-				</div>
-			</form>
-		{else}
-			<p class="alert alert-info"><i class="icon-info-sign"></i> {l s='You cannot request refund with a guest account'}</p>
 		{/if}
-	{/if}
-
-
-	{* Fancybox for extra demands*}
-	<div style="display:none;" id="rooms_extra_services">
-		{* <div id="rooms_type_extra_demands">
-			<div class="panel">
-				<div class="rooms_extra_demands_head">
-					<h3>{l s='Additional Facilities'}</h3>
-					<p class="rooms_extra_demands_text">{l s='Below are the additional facilities chosen by you in this booking'}</p>
-				</div>
-				<div id="room_type_demands_desc"></div>
+		<form action="{$link->getPageLink('order-detail', true)|escape:'html':'UTF-8'}" method="post" class="std" id="sendOrderMessage">
+			<h3 class="page-heading bottom-indent">{l s='Add a message'}</h3>
+			<p>{l s='If you would like to add a comment about your order, please write it in the field below.'}</p>
+			<p class="form-group">
+			<label for="id_product">{l s='Room Type'}</label>
+				<select name="id_product" class="form-control">
+					<option value="0">{l s='-- Choose --'}</option>
+					{foreach from=$products item=product name=products}
+						{if $product.is_booking_product}
+							<option value="{$product.product_id}">{$product.product_name|escape:'html':'UTF-8'}</option>
+						{/if}
+					{/foreach}
+				</select>
+			</p>
+			<p class="form-group">
+				<textarea class="form-control" cols="67" rows="3" name="msgText"></textarea>
+			</p>
+			<div class="submit">
+				<input type="hidden" name="id_order" value="{$order->id|intval|escape:'html':'UTF-8'}" />
+				<input type="submit" class="unvisible" name="submitMessage" value="{l s='Send'}"/>
+				<button type="submit" name="submitMessage" class="button btn btn-default button-medium"><span>{l s='Send'}<i class="icon-chevron-right right"></i></span></button>
 			</div>
-		</div> *}
-	</div>
+		</form>
+	{else}
+		<p class="alert alert-info"><i class="icon-info-sign"></i> {l s='You cannot request refund with a guest account'}</p>
+	{/if}
+{/if}
 
-	{* Fancybox *}
-	<div style="display: none;" id="reason_fancybox_content">
-		<div id="htlRefundReasonForm">
-			<h2 class="refund_reason_head">
-				{l s='Mention a reason for cancelation'}
-			</h2>
-			<div class="refundReasonFormContent">
-				<input type="hidden" id="bookings_to_refund">
-				<textarea class="form-control reasonForRefund" rows="4" name="reasonForRefund" placeholder="{l s='Type here....'}"></textarea>
-				<div>
-					<p class="required required_err" style="color:#AA1F00; display:none"><sup>*</sup> {l s='Required field'}</p><br>
-					<p class="reason_submit_wrapper">
-						<button  name="submit_refund_reason" type="button" id="submit_refund_reason" class="btn"  data-id_order="{$order->id|intval|escape:'html':'UTF-8'}"><span>{l s='Submit'}</span></button>
-					</p>
-				</div>
+
+{* Fancybox for extra demands*}
+<div style="display:none;" id="rooms_extra_services">
+	{* <div id="rooms_type_extra_demands">
+		<div class="panel">
+			<div class="rooms_extra_demands_head">
+				<h3>{l s='Additional Facilities'}</h3>
+				<p class="rooms_extra_demands_text">{l s='Below are the additional facilities chosen by you in this booking'}</p>
+			</div>
+			<div id="room_type_demands_desc"></div>
+		</div>
+	</div> *}
+</div>
+
+{* Fancybox *}
+<div style="display: none;" id="reason_fancybox_content">
+	<div id="htlRefundReasonForm">
+		<h2 class="refund_reason_head">
+			{l s='Mention a reason for cancelation'}
+		</h2>
+		<div class="refundReasonFormContent">
+			<input type="hidden" id="bookings_to_refund">
+			<textarea class="form-control reasonForRefund" rows="4" name="reasonForRefund" placeholder="{l s='Type here....'}"></textarea>
+			<div>
+				<p class="required required_err" style="color:#AA1F00; display:none"><sup>*</sup> {l s='Required field'}</p><br>
+				<p class="reason_submit_wrapper">
+					<button  name="submit_refund_reason" type="button" id="submit_refund_reason" class="btn"  data-id_order="{$order->id|intval|escape:'html':'UTF-8'}"><span>{l s='Submit'}</span></button>
+				</p>
 			</div>
 		</div>
 	</div>
+</div>
 
-	<div class="loading_overlay">
-		<img src="{$THEME_DIR}img/ajax-loader.gif" class="loading-img"/>
-	</div>
+<div class="loading_overlay">
+	<img src="{$THEME_DIR}img/ajax-loader.gif" class="loading-img"/>
+</div>

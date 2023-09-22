@@ -623,6 +623,14 @@ class OrderDetailControllerCore extends FrontController
                     );
                 // }
 
+                if ($refundAllowed = $order->isReturnable()) {
+                    $objHtlRefundRules = new HotelBranchRefundRules();
+
+                    $this->context->smarty->assign(array(
+                        'refundRules' => $objHtlRefundRules->getHotelRefundRules(HotelBookingDetail::getIdHotelByIdOrder($order->id), 0, 1)
+                    ));
+                }
+
                 $objOrderReturn = new OrderReturn();
                 $refundedAmount = 0;
                 if ($refundReqBookings = $objOrderReturn->getOrderRefundRequestedBookings($order->id, 0, 1)) {
@@ -632,7 +640,7 @@ class OrderDetailControllerCore extends FrontController
                     array(
                         'hasOrderPaid' => $order->hasBeenPaid(),
                         // refund info
-                        'refund_allowed' => (int) $order->isReturnable(),
+                        'refund_allowed' => (int) $refundAllowed,
                         'returns' => OrderReturn::getOrdersReturn($order->id_customer, $order->id),
                         'refundReqBookings' => $refundReqBookings,
                         'hasCompletelyRefunded' => $order->hasCompletelyRefunded(),
