@@ -288,14 +288,18 @@ class AdminSpecificPriceRuleControllerCore extends AdminController
         );
 
         $price = $this->getFieldValue($this->object, 'price');
-        if ($price != -1 && floatval($price) != 0) {
+        if ($price != -1 && Validate::isPrice($price)) {
             $price = number_format($price, 6);
         } else {
             $price = '';
         }
 
-        $reduction = floatval($this->getFieldValue($this->object, 'reduction'));
-        $reduction = number_format($reduction, 6);
+        $reduction = $this->getFieldValue($this->object, 'reduction');
+        if (Validate::isPrice($reduction)) {
+            $reduction = number_format($reduction, 6);
+        } else {
+            $reduction = 0;
+        }
 
         $this->fields_value = array(
             'price' => $price,
