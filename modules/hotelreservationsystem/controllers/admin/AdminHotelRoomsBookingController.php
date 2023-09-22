@@ -45,9 +45,8 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
         } else {
             // use previous cart
             $objCart = new Cart($this->context->cookie->id_cart);
-            if (!Validate::isLoadedObject($objCart)
-                || (Validate::isLoadedObject($objCart) && $objCart->orderExists())
-            ) {
+            $isCartValid = Validate::isLoadedObject($objCart);
+            if (!$isCartValid || ($isCartValid && $objCart->orderExists())) {
                 $objCart = $this->createNewCart();
                 $this->context->cookie->id_cart = (int) $objCart->id;
             }
