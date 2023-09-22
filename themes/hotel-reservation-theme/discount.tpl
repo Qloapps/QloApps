@@ -33,6 +33,7 @@
 		<thead>
 			<tr>
 				<th data-sort-ignore="true" class="discount_code first_item">{l s='Code'}</th>
+				<th data-sort-ignore="true" class="discount_description item">{l s='Name'}</th>
 				<th class="discount_quantity item">{l s='Quantity'}</th>
 				<th data-sort-ignore="true" data-hide="phone,tablet" class="discount_value item">{l s='Value'}</th>
 				<th data-hide="phone,tablet" class="discount_minimum item">{l s='Minimum'}</th>
@@ -44,6 +45,7 @@
 			{foreach from=$cart_rules item=discountDetail name=myLoop}
 				<tr class="{if $smarty.foreach.myLoop.first}first_item{elseif $smarty.foreach.myLoop.last}last_item{else}item{/if} {if $smarty.foreach.myLoop.index % 2}alternate_item{/if}">
 					<td class="discount_code">{$discountDetail.code}</td>
+					<td class="discount_description">{$discountDetail.name}</td>
 					<td data-value="{$discountDetail.quantity_for_user}" class="discount_quantity">{$discountDetail.quantity_for_user}</td>
 					<td class="discount_value">
 						{if $discountDetail.reduction_percent > 0}
