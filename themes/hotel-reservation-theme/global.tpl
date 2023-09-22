@@ -61,6 +61,10 @@
 {addJsDef max_child_age=$max_child_age}
 {addJsDef max_child_in_room=$max_child_in_room}
 
+{addJsDefL name='max_occupancy_reached_txt'}{l s='Room Maximum occupancy reached' js=1}{/addJsDefL}
+{addJsDefL name='max_adults_txt'}{l s='Cannot add more adults' js=1}{/addJsDefL}
+{addJsDefL name='max_children_txt'}{l s='Cannot add more children' js=1}{/addJsDefL}
+{addJsDefL name='no_children_allowed_txt'}{l s='This room cannot accomodate children' js=1}{/addJsDefL}
 {addJsDefL name='select_occupancy_txt'}{l s='Select Occupancy' js=1}{/addJsDefL}
 {addJsDefL name='select_age_txt'}{l s='Select age' js=1}{/addJsDefL}
 {addJsDefL name='under_1_age'}{l s='Under 1' js=1}{/addJsDefL}

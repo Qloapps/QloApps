@@ -84,6 +84,7 @@
                                 </div>
                             </div>
                         </div>
+                        <p style="display:none;"><span class="text-danger occupancy-input-errors"></span></p>
                         <div class="form-group row children_age_info_block" {if isset($occupancy['child_ages']) && $occupancy['child_ages']}style="display:block;"{/if}>
                             <label class="col-sm-12">{l s='All Children'}</label>
                             <div class="col-sm-12">
@@ -162,6 +163,7 @@
                             </div>
                         </div>
                     </div>
+                    <p style="display:none;"><span class="text-danger occupancy-input-errors"></span></p>
                     <div class="form-group row children_age_info_block">
                         <label class="col-sm-12">{l s='All Children'}</label>
                         <div class="col-sm-12">

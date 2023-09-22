@@ -364,10 +364,10 @@ class CartControllerCore extends FrontController
                         if ($occupancyRequiredForBooking) {
                             foreach($occupancy as $key => $roomOccupancy) {
                                 if ($roomOccupancy['adults'] > $roomTypeInfo['max_adults']) {
-                                    $this->errors[] = sprintf(Tools::displayError('Room %s cannot have adults more than %s'), $key + 1, $roomTypeInfo['max_adults']);
+                                    $this->errors[] = sprintf(Tools::displayError('Room %s cannot have adults more than %s adults'), $key + 1, $roomTypeInfo['max_adults']);
                                 }
                                 if ($roomOccupancy['children'] > $roomTypeInfo['max_children']) {
-                                    $this->errors[] = sprintf(Tools::displayError('Room %s cannot have children more than %s'), $key + 1, $roomTypeInfo['max_children']);
+                                    $this->errors[] = sprintf(Tools::displayError('Room %s cannot have children more than %s children'), $key + 1, $roomTypeInfo['max_children']);
                                 }
                                 if ($roomOccupancy['adults'] + $roomOccupancy['children'] > $roomTypeInfo['max_guests']) {
                                     $this->errors[] = sprintf(Tools::displayError('Room %s cannot have total guests more than %s'), $key + 1, $roomTypeInfo['max_guests']);

@@ -78,6 +78,16 @@ $(document).ready(function(){
 
                 // set input field value
                 $(this).closest('.occupancy_count_block').find('.occupancy_count > span').text(elementVal + 1);
+            } else {
+                if (elementVal >= max_child_in_room) {
+                    if (elementVal == 0) {
+                        showOccupancyError(no_children_allowed_txt, $(this).closest(".booking_occupancy_wrapper"));
+                    } else {
+                        showOccupancyError(max_children_txt, $(this).closest(".booking_occupancy_wrapper"));
+                    }
+                } else {
+                    showOccupancyError(max_occupancy_reached_txt, $(this).closest(".booking_occupancy_wrapper"));
+                }
             }
         } else {
 			let max_adults_in_room;
@@ -87,10 +97,29 @@ $(document).ready(function(){
 			if (elementVal < max_adults_in_room && elementVal < max_allowed_for_current) {
 				element.val(elementVal + 1);
 				$(this).closest('.occupancy_count_block').find('.occupancy_count > span').text(elementVal + 1);
+            } else {
+                if (elementVal >= max_adults_in_room) {
+                    showOccupancyError(max_adults_txt, $(this).closest(".booking_occupancy_wrapper"));
+                } else {
+                    showOccupancyError(max_occupancy_reached_txt, $(this).closest(".booking_occupancy_wrapper"));
+                }
 			}
         }
         setRoomTypeGuestOccupancy($(this).closest('.booking_occupancy_wrapper'));
     });
+
+    var errorMsgTime;
+    $('.occupancy-input-errors').parent().hide();
+    function showOccupancyError(msg, booking_occupancy_wrapper)
+    {
+        var errorMsgBlock = $(booking_occupancy_wrapper).find('.occupancy-input-errors')
+        $(errorMsgBlock).html(msg).parent().show('fast');
+        clearTimeout(errorMsgTime);
+        errorMsgTime = setTimeout(function() {
+            $(errorMsgBlock).parent().hide('fast');
+        }, 1000);
+
+    }
 
 	$(document).on('click', '.booking_occupancy_wrapper .occupancy_quantity_down', function(e) {
         e.preventDefault();
