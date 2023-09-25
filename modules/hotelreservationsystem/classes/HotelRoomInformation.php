@@ -230,7 +230,7 @@ class HotelRoomInformation extends ObjectModel
             $idLang = Context::getContext()->language->id;
         }
 
-        $sql = 'SELECT hri.*, hri.`id`, hri.`id_product`, hri.`id_hotel`, hrt.`adults`, hrt.`children`, hrt.`max_adults`,
+        $sql = 'SELECT hri.*, hri.`id_product`, hri.`id_hotel`, hrt.`adults`, hrt.`children`, hrt.`max_adults`,
         hrt.`max_children`, hrt.`max_guests`, hrt.`min_los`, hrt.`max_los`, pl.`name` AS room_type_name, hbil.`hotel_name` AS hotel_name
         FROM `'._DB_PREFIX_.'htl_room_information` hri
         INNER JOIN `'._DB_PREFIX_.'htl_room_type` hrt ON (hrt.`id_product` = hri.`id_product`)
