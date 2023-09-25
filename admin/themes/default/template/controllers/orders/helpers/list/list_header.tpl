@@ -141,6 +141,16 @@
 												{$params['title']|escape:'html':'UTF-8'}: <span class="filter_value">{$params['list'][$params['value']]|escape:'html':'UTF-8'}</span>
 												<i class="icon-times"></i>
 											</span>
+										{else if $params.type == 'select_multiple_or'}
+											<span data-filter_key="{if isset($params.filter_key)}{$params.filter_key}{else}{$key}{/if}" data-filter_type="{$params.type}">
+												{$params['title']|escape:'html':'UTF-8'}:
+												<span class="filter_value">
+													{foreach from=$params.value item=option name=foreachInfo}
+														{$params.list[$option]}{if !$smarty.foreach.foreachInfo.last} | {/if}
+													{/foreach}
+												</span>
+												<i class="icon-times"></i>
+											</span>
 										{else}
 											<span data-filter_key="{if isset($params.filter_key)}{$params.filter_key}{else}{$key}{/if}" data-filter_type="{$params.type}">
 												{$params['title']|escape:'html':'UTF-8'}: <span class="filter_value">{$params['value']|escape:'html':'UTF-8'}</span>
@@ -255,6 +265,14 @@
 																{/if}
 															</select>
 														{/if}
+													{elseif $params.type == 'select_multiple_or'}
+														<select id="filter_input_{$key}" class="filter{if isset($params.align) && $params.align == 'center'}center{/if} select_multiple_or chosen" multiple name="{$list_id}Filter_{$params.filter_key}[]" {if isset($params.width)} style="width:{$params.width}px"{/if}>
+															{if isset($params.list) && is_array($params.list)}
+																{foreach $params.list AS $option_value => $option_display}
+																	<option value="{$option_value}" {if isset($params.value) && $params.value}{if in_array($option_value, $params.value)} selected="selected"{/if}{/if}>{$option_display}</option>
+																{/foreach}
+															{/if}
+														</select>
 													{else}
 														<input type="text" id="filter_input_{$key}" class="filter" name="{$list_id}Filter_{if isset($params.filter_key)}{$params.filter_key}{else}{$key}{/if}" value="{$params.value|escape:'html':'UTF-8'}" {if isset($params.width) && $params.width != 'auto'} style="width:{$params.width}px"{/if} />
 													{/if}
@@ -296,11 +314,19 @@
 						$('#list_filters_panel').find('[name*="'+$(this).parent().data('filter_key')+'"]').val('');
 					} else if (type == 'range') {
 						$('#list_filters_panel').find('[name*="orderFilter_'+$(this).parent().data('filter_key')+'"]').val('');
-					} else if (type == 'select') {
-						$('#list_filters_panel').find('select[name="orderFilter_'+$(this).parent().data('filter_key')+'"] option:selected').prop("selected", false);
+						} else if (type == 'select' || type == 'select_multiple_or') {
+						$('#list_filters_panel').find('select[name*="orderFilter_'+$(this).parent().data('filter_key')+'"] option:selected').prop('selected', false);
 					} else {
 						$('#list_filters_panel').find('input[name="orderFilter_'+$(this).parent().data('filter_key')+'"]').val('');
 					}
+
+					// set post data for empty multi-select filters
+					$(form).find('select[multiple]').each(function (i, selectElement) {
+						if ($(selectElement).find('option:selected').length == 0) {
+							$(form).append('<input type="hidden" name="' + $(selectElement).attr('name').slice(0, -2) + '" value="">');
+						}
+					});
+
 					form.submit();
 				});
 			});

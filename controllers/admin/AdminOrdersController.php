@@ -246,11 +246,10 @@ class AdminOrdersControllerCore extends AdminController
             ),
             'osname' => array(
                 'title' => $this->l('Status'),
-                'type' => 'select',
+                'type' => 'select_multiple_or',
                 'color' => 'color',
                 'list' => $this->statuses_array,
                 'filter_key' => 'os!id_order_state',
-                'filter_type' => 'int',
                 'order_key' => 'osname',
                 'optional' => true,
                 'visible_default' => true
