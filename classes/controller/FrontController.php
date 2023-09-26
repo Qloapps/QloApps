@@ -918,18 +918,18 @@ class FrontControllerCore extends Controller
             $excluded_key = array('isolang', 'id_lang', 'controller', 'fc', 'id_product', 'id_category', 'id_manufacturer', 'id_supplier', 'id_cms');
             foreach ($_GET as $key => $value) {
                 if (!in_array($key, $excluded_key)) {
-                    if (is_string($value)) {
-                        if (Validate::isUrl($key) && Validate::isUrl($value)) {
-                            $params[Tools::safeOutput($key)] = Tools::safeOutput($value);
+                    if (is_array($value)) {
+                        if (Validate::isUrl($key)) {
+                            $params[Tools::safeOutput($key)] = $this->sanitizeQueryOutput($value);
                         }
                     } else {
-                        $tempValue = http_build_query($value);
-                        if (Validate::isUrl($key) && Validate::isUrl($tempValue)) {
-                            $params[Tools::safeOutput($key)] = $value;
+                        if (Validate::isUrl($key) && Validate::isUrl($value)) {
+                            $params[Tools::safeOutput($key)] = Tools::safeOutput($value);
                         }
                     }
                 }
             }
+
             $str_params = http_build_query($params, '', '&');
             if (!empty($str_params)) {
                 $final_url = preg_replace('/^([^?]*)?.*$/', '$1', $canonical_url).'?'.$str_params;
@@ -949,6 +949,24 @@ class FrontControllerCore extends Controller
             header('Cache-Control: no-cache');
             Tools::redirectLink($final_url);
         }
+    }
+
+    protected function sanitizeQueryOutput($query)
+    {
+        $params = array();
+        foreach ($query as $key => $value) {
+            if (Validate::isUrl($key)) {
+                if (is_array($value)) {
+                    $params[Tools::safeOutput($key)] = $this->sanitizeQueryOutput($value);
+                } else {
+                    if (Validate::isUrl($value)) {
+                        $params[Tools::safeOutput($key)] = Tools::safeOutput($value);
+                    }
+                }
+            }
+        }
+
+        return $params;
     }
 
     /**
