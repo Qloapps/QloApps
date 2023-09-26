@@ -402,28 +402,28 @@ class AdminStatusesControllerCore extends AdminController
                             'name' => 'name'
                         ),
                     ),
-                    array(
-                        'type' => 'checkbox',
-                        'name' => 'pdf_delivery',
-                        'values' => array(
-                            'query' => array(
-                                array('id' => 'on',  'name' => $this->l('Attach delivery slip PDF to email.'), 'val' => '1'),
-                                ),
-                            'id' => 'id',
-                            'name' => 'name'
-                        ),
-                    ),
-                    array(
-                        'type' => 'checkbox',
-                        'name' => 'shipped',
-                        'values' => array(
-                            'query' => array(
-                                array('id' => 'on',  'name' => $this->l('Set the order as shipped.'), 'val' => '1'),
-                                ),
-                            'id' => 'id',
-                            'name' => 'name'
-                        )
-                    ),
+                    // array(
+                    //     'type' => 'checkbox',
+                    //     'name' => 'pdf_delivery',
+                    //     'values' => array(
+                    //         'query' => array(
+                    //             array('id' => 'on',  'name' => $this->l('Attach delivery slip PDF to email.'), 'val' => '1'),
+                    //             ),
+                    //         'id' => 'id',
+                    //         'name' => 'name'
+                    //     ),
+                    // ),
+                    // array(
+                    //     'type' => 'checkbox',
+                    //     'name' => 'shipped',
+                    //     'values' => array(
+                    //         'query' => array(
+                    //             array('id' => 'on',  'name' => $this->l('Set the order as shipped.'), 'val' => '1'),
+                    //             ),
+                    //         'id' => 'id',
+                    //         'name' => 'name'
+                    //     )
+                    // ),
                     array(
                         'type' => 'checkbox',
                         'name' => 'paid',
@@ -435,17 +435,17 @@ class AdminStatusesControllerCore extends AdminController
                             'name' => 'name'
                         )
                     ),
-                    array(
-                        'type' => 'checkbox',
-                        'name' => 'delivery',
-                        'values' => array(
-                            'query' => array(
-                                array('id' => 'on', 'name' => $this->l('Show delivery PDF.'), 'val' => '1'),
-                                ),
-                            'id' => 'id',
-                            'name' => 'name'
-                        )
-                    ),
+                    // array(
+                    //     'type' => 'checkbox',
+                    //     'name' => 'delivery',
+                    //     'values' => array(
+                    //         'query' => array(
+                    //             array('id' => 'on', 'name' => $this->l('Show delivery PDF.'), 'val' => '1'),
+                    //             ),
+                    //         'id' => 'id',
+                    //         'name' => 'name'
+                    //     )
+                    // ),
                     array(
                         'type' => 'select_template',
                         'is_customer_template' => 1,
