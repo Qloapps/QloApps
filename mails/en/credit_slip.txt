@@ -8,7 +8,7 @@ reference {order_name}.
 
 You can review this credit slip and download your invoice from the
 "My credit slips" [/{credit_slip_url}] section of your account by clicking
-"My account" [/{my_account_url}] on our shop. 
+"My account" [/{my_account_url}] on our website. 
 
 {shop_name} [/{shop_url}] powered by Webkul(tm)
 [https://webkul.com] 
