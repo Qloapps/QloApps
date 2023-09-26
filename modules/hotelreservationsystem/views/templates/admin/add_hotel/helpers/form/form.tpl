@@ -112,9 +112,27 @@
 							{foreach from=$languages item=language}
 								{assign var="hotel_name" value="hotel_name_`$language.id_lang`"}
 								<input type="text"
-								id="hotel_name_{$language.id_lang}"
+								id="name_{$language.id_lang}"
 								name="hotel_name_{$language.id_lang}"
 								value="{if isset($smarty.post.$hotel_name)}{$smarty.post.$hotel_name|escape:'htmlall':'UTF-8'}{elseif isset($edit)}{$hotel_info.hotel_name[{$language.id_lang}]|escape:'htmlall':'UTF-8'}{/if}"
+								class="form-control wk_text_field_all wk_text_field_{$language.id_lang} copy2friendlyUrl"
+								maxlength="128"
+								{if $currentLang.id_lang != $language.id_lang}style="display:none;"{/if} />
+							{/foreach}
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-sm-3 control-label required" for="link_rewrite" >
+							{l s='Friendly URL :' mod='hotelreservationsystem'}
+							{include file="../../../_partials/htl-form-fields-flag.tpl"}
+						</label>
+						<div class="col-lg-6">
+							{foreach from=$languages item=language}
+								{assign var="link_rewrite" value="link_rewrite_`$language.id_lang`"}
+								<input type="text"
+								id="link_rewrite_{$language.id_lang}"
+								name="link_rewrite_{$language.id_lang}"
+								value="{if isset($smarty.post.$link_rewrite)}{$smarty.post.$link_rewrite|escape:'htmlall':'UTF-8'}{elseif isset($edit)}{$link_rewrite_info[{$language.id_lang}]|escape:'htmlall':'UTF-8'}{/if}"
 								class="form-control wk_text_field_all wk_text_field_{$language.id_lang}"
 								maxlength="128"
 								{if $currentLang.id_lang != $language.id_lang}style="display:none;"{/if} />
@@ -483,6 +501,10 @@
 
 {block name=script}
 <script type="text/javascript">
+	var id_language = {$defaultFormLanguage|intval};
+	allowEmployeeFormLang = {$allowEmployeeFormLang|intval};
+	var ps_force_friendly_product = false;
+
 	// for tiny mce setup
 	var iso = "{$iso|escape:'htmlall':'UTF-8'}";
 	var pathCSS = "{$smarty.const._THEME_CSS_DIR_|escape:'htmlall':'UTF-8'}";
