@@ -249,10 +249,9 @@ abstract class PaymentModuleCore extends Module
             // Make sure CartRule caches are empty
             CartRule::cleanCache();
             $cart_rules = $this->context->cart->getCartRules();
-            foreach ($cart_rules as $key => $cart_rule) {
+            foreach ($cart_rules as $cart_rule) {
                 if (($rule = new CartRule((int)$cart_rule['obj']->id)) && Validate::isLoadedObject($rule)) {
                     if ($error = $rule->checkValidity($this->context, true, true)) {
-                        unset($cart_rules[$key]);
                         $this->context->cart->removeCartRule((int)$rule->id);
                         if (isset($this->context->cookie) && isset($this->context->cookie->id_customer) && $this->context->cookie->id_customer && !empty($rule->code)) {
                             if (Configuration::get('PS_ORDER_PROCESS_TYPE') == 1) {
