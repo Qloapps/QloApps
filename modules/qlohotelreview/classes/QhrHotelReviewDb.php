@@ -49,7 +49,7 @@ class QhrHotelReviewDb
                 `date_add` DATETIME NOT NULL,
                 `date_upd` DATETIME NOT NULL,
                 PRIMARY KEY (`id_hotel_review`)
-            ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8",
+            ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8mb4",
 
             "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."qhr_category` (
                 `id_category` INT(10) NOT NULL AUTO_INCREMENT,
@@ -57,33 +57,33 @@ class QhrHotelReviewDb
                 `date_add` DATETIME NOT NULL,
                 `date_upd` DATETIME NOT NULL,
                 PRIMARY KEY (`id_category`)
-            ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8",
+            ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8mb4",
 
             "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."qhr_category_lang` (
                 `id_category` INT(10) NOT NULL,
                 `id_lang` INT(10) NOT NULL,
                 `name` VARCHAR(255) NOT NULL,
                 PRIMARY KEY (`id_category`, `id_lang`)
-            ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8",
+            ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8mb4",
 
             "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."qhr_review_category_rating` (
                 `id_hotel_review` INT(10) NOT NULL,
                 `id_category` INT(10) NOT NULL,
                 `rating` FLOAT UNSIGNED NOT NULL,
                 PRIMARY KEY (`id_hotel_review`, `id_category`)
-            ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8",
+            ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8mb4",
 
             "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."qhr_review_usefulness` (
                 `id_hotel_review` INT(10) NOT NULL,
                 `id_customer` INT(10) NOT NULL,
                 PRIMARY KEY (`id_hotel_review`, `id_customer`)
-            ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8",
+            ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8mb4",
 
             "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."qhr_review_report` (
                 `id_hotel_review` INT(10) NOT NULL,
                 `id_customer` INT(10) NOT NULL,
                 PRIMARY KEY (`id_hotel_review`, `id_customer`)
-            ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8",
+            ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8mb4",
 
             "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."qhr_review_reply` (
                 `id_review_reply` INT(10) NOT NULL AUTO_INCREMENT,
@@ -92,7 +92,7 @@ class QhrHotelReviewDb
                 `message` TEXT NOT NULL,
                 `date_add` DATETIME NOT NULL,
                 PRIMARY KEY (`id_review_reply`)
-            ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8",
+            ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8mb4",
         );
     }
 

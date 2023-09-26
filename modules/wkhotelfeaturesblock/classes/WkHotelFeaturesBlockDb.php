@@ -52,7 +52,7 @@ class WkHotelFeaturesBlockDb
                 `feature_title` text NOT NULL,
                 `feature_description` text NOT NULL,
                 PRIMARY KEY (`id_features_block`, `id_lang`)
-            ) ENGINE=ENGINE_TYPE DEFAULT CHARSET=utf8;"
+            ) ENGINE=ENGINE_TYPE DEFAULT CHARSET=utf8mb4;"
         );
     }
 

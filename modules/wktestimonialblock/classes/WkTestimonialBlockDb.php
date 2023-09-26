@@ -53,7 +53,7 @@ class WkTestimonialBlockDb
                 `id_lang` int(11) NOT NULL,
                 `testimonial_content` text NOT NULL,
                 PRIMARY KEY (`id_testimonial_block`, `id_lang`)
-            ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8;"
+            ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8mb4;"
         );
     }
 
