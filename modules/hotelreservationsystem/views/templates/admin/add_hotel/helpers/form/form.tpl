@@ -138,6 +138,9 @@
 								{if $currentLang.id_lang != $language.id_lang}style="display:none;"{/if} />
 							{/foreach}
 						</div>
+						<div class="col-lg-2">
+							<button type="button" class="btn btn-default" id="generate-friendly-url" onmousedown="updateFriendlyURLByName();"><i class="icon-random"></i> {l s='Generate'}</button>
+						</div>
 					</div>
 					<div class="form-group">
 						<label class="col-sm-3 control-label">
