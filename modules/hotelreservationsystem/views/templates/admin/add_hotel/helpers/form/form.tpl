@@ -139,7 +139,7 @@
 							{/foreach}
 						</div>
 						<div class="col-lg-2">
-							<button type="button" class="btn btn-default" id="generate-friendly-url" onmousedown="updateFriendlyURLByName();"><i class="icon-random"></i> {l s='Generate'}</button>
+							<button type="button" class="btn btn-default" onmousedown="updateFriendlyURLByName();"><i class="icon-random"></i> {l s='Generate'}</button>
 						</div>
 					</div>
 					<div class="form-group">
