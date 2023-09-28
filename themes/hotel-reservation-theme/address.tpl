@@ -30,7 +30,7 @@
 		{$navigationPipe}
 	</span>
 	<span class="navigation_page">
-		{l s='My address'}
+		{l s='Address'}
 	</span>
 {/capture}
 	{if isset($smarty.get.updated) && $smarty.get.updated}
@@ -39,7 +39,7 @@
 		</p>
 	{/if}
 <div class="box">
-	<h1 class="page-subheading">{l s='Your address'}</h1>
+	<h1 class="page-subheading">{l s='Address'}</h1>
 	<p class="info-title">
 		{if isset($id_address) && (isset($smarty.post.alias) || isset($address->alias))}
 			{l s='Modify address'}
@@ -225,7 +225,7 @@
 <ul class="footer_links clearfix">
 	<li>
 		<a class="btn btn-defaul button button-small" href="{$link->getPageLink('my-account', true)|escape:'html':'UTF-8'}">
-			<span><i class="icon-chevron-left"></i> {l s='Back to your account'}</span>
+			<span><i class="icon-chevron-left"></i> {l s='Back to My account'}</span>
 		</a>
 	</li>
 </ul>
