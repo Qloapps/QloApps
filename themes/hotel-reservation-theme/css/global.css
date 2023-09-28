@@ -8321,38 +8321,27 @@ table.discount i {
   #pagenotfound .pagenotfound h1 {
     font: 600 28px/34px 'Oxygen', serif;
     color: #333;
-    text-transform: uppercase;
     margin-bottom: 7px; }
   #pagenotfound .pagenotfound p {
     font: 600 16px/20px 'Oxygen', serif;
     color: #555454;
-    text-transform: uppercase;
-    border-bottom: 1px solid #d6d4d4;
     padding-bottom: 19px;
-    margin-bottom: 20px; }
-  #pagenotfound .pagenotfound h3 {
-    font-weight: bold;
-    color: #333;
-    font-size: 13px;
-    line-height: normal;
-    margin-bottom: 18px; }
-  #pagenotfound .pagenotfound label {
-    font-weight: normal; }
-    @media (max-width: 767px) {
-      #pagenotfound .pagenotfound label {
-        display: block; } }
-  #pagenotfound .pagenotfound .form-control {
-    max-width: 293px;
-    display: inline-block;
-    margin-right: 5px; }
-    @media (max-width: 767px) {
-      #pagenotfound .pagenotfound .form-control {
-        margin: 0 auto 15px auto;
-        display: block; } }
+    margin-top: 30px;
+    margin-bottom: 0; }
   #pagenotfound .pagenotfound .buttons {
-    padding: 48px 0 20px 0; }
-    #pagenotfound .pagenotfound .buttons .button-medium i.left {
-      font-size: 17px; }
+    margin-top: 5px; }
+    #pagenotfound .pagenotfound .buttons a.btn-primary {
+      border: none;
+      border-radius: 2px;
+      font-size: 14px;
+      padding: 10px 25px;
+      font-weight: 600;
+      background-color: #1292FF;
+      color: #FFFFFF; }
+      #pagenotfound .pagenotfound .buttons a.btn-primary:hover {
+        opacity: 0.8; }
+        #pagenotfound .pagenotfound .buttons a.btn-primary:hover span {
+          background: none; }
 
 #account-creation_form fieldset.reversoform {
   padding: 10px !important; }
