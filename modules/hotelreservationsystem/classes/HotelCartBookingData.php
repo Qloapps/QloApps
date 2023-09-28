@@ -445,7 +445,9 @@ class HotelCartBookingData extends ObjectModel
         $serviceProducts,
         $roomsAvailableList,
         $id_cart,
-        $id_room = 0
+        $id_room = 0,
+        $booking_type = HotelBookingDetail::ALLOTMENT_AUTO,
+        $comment = ''
     ) {
         $chkQty = 0;
         $num_days = HotelHelper::getNumberOfDays($date_from, $date_to);
@@ -475,11 +477,12 @@ class HotelCartBookingData extends ObjectModel
                     $obj_htl_cart_booking_data->id_product = $id_product;
                     $obj_htl_cart_booking_data->id_room = $hotelRoomInfo['id_room'];
                     $obj_htl_cart_booking_data->id_hotel = $id_hotel;
-                    $obj_htl_cart_booking_data->booking_type = 1;
                     $obj_htl_cart_booking_data->quantity = $num_days;
                     $obj_htl_cart_booking_data->extra_demands = $roomDemand;
                     $obj_htl_cart_booking_data->date_from = $date_from;
                     $obj_htl_cart_booking_data->date_to = $date_to;
+                    $obj_htl_cart_booking_data->booking_type = $booking_type;
+                    $obj_htl_cart_booking_data->comment = $comment;
                     if ($PS_ROOM_UNIT_SELECTION_TYPE == HotelBookingDetail::PS_ROOM_UNIT_SELECTION_TYPE_OCCUPANCY) {
                         $room_occupancy = array_shift($occupancy);
                         $obj_htl_cart_booking_data->adults = $room_occupancy['adults'];
@@ -542,7 +545,9 @@ class HotelCartBookingData extends ObjectModel
         $roomDemand = array(),
         $serviceProducts = array(),
         $id_cart = 0,
-        $id_guest = 0
+        $id_guest = 0,
+        $booking_type = HotelBookingDetail::ALLOTMENT_AUTO,
+        $comment = ''
     ) {
         $context = Context::getContext();
         if (!$id_cart) {
@@ -622,7 +627,9 @@ class HotelCartBookingData extends ObjectModel
                                 $serviceProducts,
                                 $roomsAvailableList,
                                 $id_cart,
-                                $id_room
+                                $id_room,
+                                $booking_type,
+                                $comment
                             );
                         } else {
                             return false;
