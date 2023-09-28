@@ -18,4 +18,17 @@ $(document).ready(function(){
     $("input[type='radio'][name='PS_SHOP_ENABLE']").change(function() {
         $("#conf_id_PS_ALLOW_EMP").toggle('slow');
     });
+
+    // manage dropdown
+    $(document).on('click', 'button.dropdown-toggle', function () {
+        $(this).closest('.dropdown').toggleClass('open');
+    });
+
+    $(document).on('click', function (e) {
+        if ($('.language-selector-wrap .dropdown').hasClass('open')
+            && !$(e.target).closest('.dropdown-toggle').length
+        ) {
+            $('.language-selector-wrap .dropdown').removeClass('open');
+        }
+    });
 });
