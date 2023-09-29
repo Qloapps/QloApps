@@ -25,7 +25,7 @@
         <div class="panel-content">
             <div class="alert alert-info">
                 <p>{l s='Some overbookings are now available to be resolved. You can directly resolve overbookings from below list as per your choice.'}</p>
-                <p>{l s='You can also filter orders which overbookings are now available to be resolved.'}  <a href="{$link->getAdminLink('AdminOrders')|escape:'html':'UTF-8'}" class="btn btn-default"><i class="icon-search"></i> {l s='Filter resolvable orders'}</a></p>
+                <p>{l s='You can also filter orders which overbookings are now available to be resolved.'}  <a href="{$link->getAdminLink('AdminOrders')|escape:'html':'UTF-8'}" class="btn btn-default"><i class="icon-search"></i> {l s='Filter orders with resolvable overbookings'}</a></p>
             </div>
             <div class="table-responsive form-group">
                 <table class="table table-striped">
