@@ -84,7 +84,11 @@
 						<td{if isset($order.order_state)} data-value="{$order.id_order_state}"{/if} class="history_state">
 							{if isset($order.order_state)}
 								<span class="label{if isset($order.order_state_color) && Tools::getBrightness($order.order_state_color) > 128} dark{/if}"{if isset($order.order_state_color) && $order.order_state_color} style="background-color:{$order.order_state_color|escape:'html':'UTF-8'}; border-color:{$order.order_state_color|escape:'html':'UTF-8'};"{/if}>
-									{$order.order_state|escape:'html':'UTF-8'}
+                                    {if $order.current_state|in_array:$overbooking_order_states}
+                                        {l s='Order Not Confirmed'}
+                                    {else}
+                                        {$order.order_state|escape:'html':'UTF-8'}
+                                    {/if}
 								</span>
 							{/if}
 						</td>

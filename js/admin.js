@@ -504,6 +504,14 @@ function changeCMSActivationAuthorization()
 		getE('PS_CONDITIONS_CMS_ID').disabled = 'disabled';
 }
 
+function changeOverbookingOrderAction()
+{
+    if (getE('PS_OVERBOOKING_ORDER_ACTION').value == $("input[name='OVERBOOKING_ORDER_CANCEL_ACTION']").val())
+        $('#PS_MAX_OVERBOOKING_PER_HOTEL_PER_DAY').closest('.form-group').hide();
+    else
+        $('#PS_MAX_OVERBOOKING_PER_HOTEL_PER_DAY').closest('.form-group').show();
+}
+
 function disableZipFormat()
 {
 	if ($('#need_zip_code_on').prop('checked') == false)

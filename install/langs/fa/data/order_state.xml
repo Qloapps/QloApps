@@ -33,11 +33,15 @@
         <template/>
     </order_state>
     <order_state id="Overbooking_paid">
-        <name>Overbooking (paid)</name>
+        <name>Overbooking (Paid)</name>
         <template/>
     </order_state>
     <order_state id="Overbooking_unpaid">
-        <name>Overbooking (not paid)</name>
+        <name>Overbooking (Not paid)</name>
+        <template/>
+    </order_state>
+    <order_state id="Overbooking_partial_paid">
+        <name>Overbooking (Partial payment)</name>
         <template/>
     </order_state>
     <order_state id="Partial_payment_accepted">

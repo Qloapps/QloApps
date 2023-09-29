@@ -251,14 +251,28 @@ class AdminOrdersControllerCore extends AdminController
             $this->access_where = ' WHERE hbd.id_hotel IN ('.implode(',', $acsHtls).')';
         }
 
-
         parent::__construct();
+
+        // overbooking success status
+        $this->_conf[51] = $this->l('Overbooking is successfully resolved');
     }
 
     public static function setOrderCurrency($echo, $tr)
     {
         $order = new Order($tr['id_order']);
         return Tools::displayPrice($echo, (int)$order->id_currency);
+    }
+
+    public function initContent()
+    {
+        if (!$this->display) {
+            $objHotelBookingDetail = new HotelBookingDetail();
+            if ($resolvableOverBookings = $objHotelBookingDetail->getOverbookedRooms(0, 0, '', '', 0, 0, 2)) {
+                $this->context->smarty->assign('resolvableOverBookings', $resolvableOverBookings);
+                $this->content = $this->context->smarty->fetch('controllers/orders/_resolvable_overbookings.tpl');
+            }
+        }
+        parent::initContent();
     }
 
     public function renderForm()
@@ -536,33 +550,23 @@ class AdminOrdersControllerCore extends AdminController
         // by webkul for reallocation of rooms
         if (Tools::isSubmit('realloc_allocated_rooms')) {
             if ($this->tabAccess['edit'] === '1') {
-                $order_id = Tools::getValue('id_order');
-                $current_room_id = Tools::getValue('modal_id_room');
-                $current_room = Tools::getValue('modal_curr_room_num');
-                $date_from = Tools::getValue('modal_date_from');
-                $date_to = Tools::getValue('modal_date_to');
-                $realloc_room_id = Tools::getValue('realloc_avail_rooms');
+                $idOrder = Tools::getValue('id_order');
+                $idHtlBookingFrom = Tools::getValue('id_htl_booking');
+                $idRoomToReallocate = Tools::getValue('realloc_avail_rooms');
 
-                if ($realloc_room_id == 0) {
+                if ($idRoomToReallocate == 0) {
                     $this->errors[] = Tools::displayError('Please select a room to swap with this room.');
                 }
-                if ($current_room_id == 0) {
-                    $this->errors[] = Tools::displayError('Cuurent room is missing.');
-                }
-                if ($date_from == 0) {
-                    $this->errors[] = Tools::displayError('Check In date is missing.');
-                }
-                if ($date_to == 0) {
-                    $this->errors[] = Tools::displayError('Check Out date is missing.');
+                if ($idHtlBookingFrom == 0) {
+                    $this->errors[] = Tools::displayError('Current room information is missing.');
                 }
 
                 if (!count($this->errors)) {
                     $objBookingDetail = new HotelBookingDetail();
-                    $room_swapped = $objBookingDetail->reallocateRoomWithAvailableSameRoomType($current_room_id, $date_from, $date_to, $realloc_room_id);
-                    if (!$room_swapped) {
-                        $this->errors[] = Tools::displayError('Some error occured. Please try again.');
+                    if ($objBookingDetail->reallocateBooking($idHtlBookingFrom, $idRoomToReallocate)) {
+                        Tools::redirectAdmin(self::$currentIndex.'&id_order='.(int) $idOrder.'&vieworder&conf=4&token='.$this->token);
                     } else {
-                        Tools::redirectAdmin(self::$currentIndex.'&id_order='.(int) $order_id.'&vieworder&token='.$this->token);
+                        $this->errors[] = Tools::displayError('Some error occured. Please try again.');
                     }
                 }
             } else {
@@ -571,33 +575,23 @@ class AdminOrdersControllerCore extends AdminController
         }
         if (Tools::isSubmit('swap_allocated_rooms')) {
             if ($this->tabAccess['edit'] === '1') {
-                $order_id = Tools::getValue('id_order');
-                $current_room_id = Tools::getValue('modal_id_room');
-                $current_room = Tools::getValue('modal_curr_room_num');
-                $date_from = Tools::getValue('modal_date_from');
-                $date_to = Tools::getValue('modal_date_to');
-                $swapped_room_id = Tools::getValue('swap_avail_rooms');
+                $idOrder = Tools::getValue('id_order');
+                $idHtlBookingFrom = Tools::getValue('id_htl_booking');
+                $idHtlBookingToSwap = Tools::getValue('swap_avail_rooms');
 
-                if ($swapped_room_id == 0) {
-                    $this->errors[] = Tools::displayError('Please select a room to swap with this room.');
+                if (!$idHtlBookingToSwap) {
+                    $this->errors[] = Tools::displayError('Please select a room to swap with this room booking.');
                 }
-                if ($current_room_id == 0) {
-                    $this->errors[] = Tools::displayError('Cuurent room is missing.');
-                }
-                if ($date_from == 0) {
-                    $this->errors[] = Tools::displayError('Check In date is missing.');
-                }
-                if ($date_to == 0) {
-                    $this->errors[] = Tools::displayError('Check Out date is missing.');
+                if (!$idHtlBookingFrom) {
+                    $this->errors[] = Tools::displayError('Current room information is missing.');
                 }
 
                 if (!count($this->errors)) {
                     $objBookingDetail = new HotelBookingDetail();
-                    $room_swapped = $objBookingDetail->swapRoomWithAvailableSameRoomType($current_room_id, $date_from, $date_to, $swapped_room_id);
-                    if (!$room_swapped) {
-                        $this->errors[] = Tools::displayError('Some error occured. Please try again.');
+                    if ($objBookingDetail->swapBooking($idHtlBookingFrom, $idHtlBookingToSwap)) {
+                        Tools::redirectAdmin(self::$currentIndex.'&id_order='.(int)$idOrder.'&vieworder&conf=4&token='.$this->token);
                     } else {
-                        Tools::redirectAdmin(self::$currentIndex.'&id_order='.(int) $order_id.'&vieworder&token='.$this->token);
+                        $this->errors[] = Tools::displayError('Some error occured. Please try again.');
                     }
                 }
             } else {
@@ -1354,7 +1348,16 @@ class AdminOrdersControllerCore extends AdminController
             } else {
                 $this->errors[] = Tools::displayError('You do not have permission to edit this.');
             }
+        } elseif(Tools::getIsset('resolve_overbooking') && Tools::getValue('resolve_overbooking')) {
+            $objHotelBookingDetail = new HotelBookingDetail();
+            // resolve an overbooking manually
+            if ($objHotelBookingDetail->resolveOverbookings(Tools::getValue('resolve_overbooking'))) {
+                Tools::redirectAdmin(self::$currentIndex.'&id_order='.$order->id.'&vieworder&conf=51&token='.$this->token);
+            } else {
+                $this->errors = Tools::displayError('An error occurred while resolving overbooking.');
+            }
         }
+
         parent::postProcess();
     }
 
@@ -1751,8 +1754,13 @@ class AdminOrdersControllerCore extends AdminController
 
         // applicable refund policies
         $applicableRefundPolicies = HotelOrderRefundRules::getApplicableRefundRules($order->id);
+
+        // Overbookings information of the order
+        $orderOverBookings = $objHotelBookingDetail->getOverbookedRooms($order->id, 0, '', '', 0, 0, 1);
+
         $this->tpl_view_vars = array(
             // refund info
+            'orderOverBookings' => $orderOverBookings,
             'refund_allowed' => (int) $order->isReturnable(),
             'applicable_refund_policies' => $applicableRefundPolicies,
             'returns' => OrderReturn::getOrdersReturn($order->id_customer, $order->id),

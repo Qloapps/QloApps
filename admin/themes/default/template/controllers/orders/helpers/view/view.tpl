@@ -104,6 +104,10 @@
 			</div>
 		</div>
 	</div>
+
+    {* Overbookings information of the order *}
+    {include file='controllers/orders/_overbookings.tpl'}
+
 	<div class="row">
 		<div class="col-lg-7">
 			<div class="panel">
@@ -1509,6 +1513,7 @@
 							<input type="hidden" class="form-control modal_date_from" name="modal_date_from">
 							<input type="hidden" class="form-control modal_date_to" name="modal_date_to">
 							<input type="hidden" class="form-control modal_id_room" name="modal_id_room">
+							<input type="hidden" class="form-control modal_id_htl_booking" name="id_htl_booking">
 						</div>
 						<div class="form-group">
 							<label for="realloc_avail_rooms" class="control-label model-label">{l s='Available Rooms To Reallocate:'}</label>
@@ -1549,6 +1554,7 @@
 							<input type="hidden" class="form-control modal_date_to" name="modal_date_to">
 							<input type="hidden" class="form-control modal_id_room" name="modal_id_room">
 							<input type="hidden" class="form-control modal_id_order" name="modal_id_order">
+							<input type="hidden" class="form-control modal_id_htl_booking" name="id_htl_booking">
 						</div>
 						<div class="form-group">
 							<label for="swap_avail_rooms" class="control-label model-label">{l s='Available Rooms To Swap:'}</label>
@@ -1979,6 +1985,7 @@
 
 		$('#mySwappigModal').on('shown.bs.modal', function (e)
 		{
+			$(".modal_id_htl_booking").val(e.relatedTarget.dataset.id_htl_booking);
 			$(".modal_id_order").val(e.relatedTarget.dataset.id_order);
 			$(".modal_date_from").val(e.relatedTarget.dataset.date_from);
 			$(".modal_date_to").val(e.relatedTarget.dataset.date_to);
@@ -1993,7 +2000,8 @@
 
 				html = '<select class="form-control" name="swap_avail_rooms" id="swap_avail_rooms" style="width:195px;">';
 					$.each(json_arr_rm_swp, function(key,val) {
-						html += '<option class="swp_rm_opts" value="'+val.id_room+'" >'+val.room_num+'</option>';
+                        console.log(val);
+						html += '<option class="swp_rm_opts" value="'+val.id_hotel_booking+'" >'+val.room_num+'</option>';
 					});
 				html += '</select>';
 				$(".swap_avail_rooms_container").empty().append(html);

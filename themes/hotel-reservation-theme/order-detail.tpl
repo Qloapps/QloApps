@@ -76,7 +76,15 @@
 				{foreach from=$order_history item=state name="orderStates"}
 					<tr class="{if $smarty.foreach.orderStates.first}first_item{elseif $smarty.foreach.orderStates.last}last_item{/if} {if $smarty.foreach.orderStates.index % 2}alternate_item{else}item{/if}">
 						<td class="step-by-step-date">{dateFormat date=$state.date_add full=0}</td>
-						<td><span{if isset($state.color) && $state.color} style="background-color:{$state.color|escape:'html':'UTF-8'}; border-color:{$state.color|escape:'html':'UTF-8'};"{/if} class="label{if isset($state.color) && Tools::getBrightness($state.color) > 128} dark{/if}">{$state.ostate_name|escape:'html':'UTF-8'}</span></td>
+						<td>
+                            <span{if isset($state.color) && $state.color} style="background-color:{$state.color|escape:'html':'UTF-8'}; border-color:{$state.color|escape:'html':'UTF-8'};"{/if} class="label{if isset($state.color) && Tools::getBrightness($state.color) > 128} dark{/if}">
+                                {if $state.id_order_state|in_array:$overbooking_order_states}
+                                    {l s='Order Not Confirmed'}
+                                {else}
+                                    {$state.ostate_name|escape:'html':'UTF-8'}
+                                {/if}
+                            </span>
+                        </td>
 					</tr>
 				{/foreach}
 				</tbody>

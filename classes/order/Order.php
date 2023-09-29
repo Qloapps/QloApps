@@ -34,6 +34,10 @@ class OrderCore extends ObjectModel
     const ORDER_PAYMENT_TYPE_FULL = 1;
     const ORDER_PAYMENT_TYPE_ADVANCE = 2;
 
+    // actions when overbooking will be created
+    const OVERBOOKING_ORDER_CANCEL_ACTION = 1;
+    const OVERBOOKING_ORDER_NO_ACTION = 2;
+
     /** @var int Delivery address id */
     public $id_address_delivery;
 
