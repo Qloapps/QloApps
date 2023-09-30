@@ -1183,7 +1183,18 @@ class AdminOrdersControllerCore extends AdminController
 
                     // Update order service product prices
                     $objRoomTypeServProdOrderDtl = new RoomTypeServiceProductOrderDetail();
-                    if ($orderServiceProducts = $objRoomTypeServProdOrderDtl->getroomTypeServiceProducts($order->id)) {
+                    if ($orderServiceProducts = $objRoomTypeServProdOrderDtl->getroomTypeServiceProducts(
+                        $order->id,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        null,
+                        null
+                    )) {
                         $fields = array(
                             'unit_price_tax_excl',
                             'unit_price_tax_incl',
