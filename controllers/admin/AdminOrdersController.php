@@ -3251,14 +3251,6 @@ class AdminOrdersControllerCore extends AdminController
         		'error' => Tools::displayError('The OrderDetail object cannot be loaded.')
         	)));
 
-        $product = new Product($order_detail->product_id);
-        if (!Validate::isLoadedObject($product)) {
-            die(json_encode(array(
-                'result' => false,
-                'error' => Tools::displayError('The Room type cannot be loaded.')
-            )));
-        }
-
         $address = new Address(Tools::getValue('id_address'));
         if (!Validate::isLoadedObject($address)) {
             die(json_encode(array(
@@ -3269,14 +3261,6 @@ class AdminOrdersControllerCore extends AdminController
 
         die(json_encode(array(
             'result' => true,
-            'product' => $product,
-            'tax_rate' => $product->getTaxesRate($address),
-            /*Original*/
-            'price_tax_incl' => Product::getPriceStatic($product->id, true, $order_detail->product_attribute_id, 2),
-            'price_tax_excl' => Product::getPriceStatic($product->id, false, $order_detail->product_attribute_id, 2),
-            /*Changed by webkul because attribute_id will always be 0 (No combination)*/
-            // 'price_tax_incl' => Product::getPriceStatic($product->id, true, 0, 2),
-            // 'price_tax_excl' => Product::getPriceStatic($product->id, false, 0, 2),
             'reduction_percent' => $order_detail->reduction_percent
         )));
     }
@@ -3461,26 +3445,46 @@ class AdminOrdersControllerCore extends AdminController
                 $params['id_room'] = $roomInfo['id_room'];
 
                 if ($roomInfo['id_room'] == $id_room && (strtotime($roomInfo['date_from']) == strtotime($old_date_from))) {
-                    $params = array_merge($params, array('date_from' => $new_date_from, 'date_to' => $new_date_to));
-                    $this->createFeaturePrice($params);
+                    // Check if room type is still not deleted
+                    if (Validate::isLoadedObject($objProduct = new Product($roomInfo['id_product']))) {
+                        // If room type is NOT DELETED then use current room type price calculation
+                        $params = array_merge($params, array('date_from' => $new_date_from, 'date_to' => $new_date_to));
+                        $this->createFeaturePrice($params);
 
-                    $roomTotalPrice = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice(
-                        $roomInfo['id_product'],
-                        $new_date_from,
-                        $new_date_to,
-                        0,
-                        Group::getCurrent()->id,
-                        $cart->id,
-                        $cart->id_guest,
-                        $roomInfo['id_room'],
-                        0
-                    );
+                        $roomTotalPrice = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice(
+                            $roomInfo['id_product'],
+                            $new_date_from,
+                            $new_date_to,
+                            0,
+                            Group::getCurrent()->id,
+                            $cart->id,
+                            $cart->id_guest,
+                            $roomInfo['id_room'],
+                            0
+                        );
 
-                    $totalProductPriceAfterTE += (float) $roomTotalPrice['total_price_tax_excl'];
-                    $totalProductPriceAfterTI += (float) $roomTotalPrice['total_price_tax_incl'];
+                        $totalProductPriceAfterTE += (float) $roomTotalPrice['total_price_tax_excl'];
+                        $totalProductPriceAfterTI += (float) $roomTotalPrice['total_price_tax_incl'];
 
-                    $totalRoomPriceAfterTE += (float) $roomTotalPrice['total_price_tax_excl'];
-                    $totalRoomPriceAfterTI += (float) $roomTotalPrice['total_price_tax_incl'];
+                        $totalRoomPriceAfterTE += (float) $roomTotalPrice['total_price_tax_excl'];
+                        $totalRoomPriceAfterTI += (float) $roomTotalPrice['total_price_tax_incl'];
+                    } else {
+                        // If room type is DELETED use order details information for price calculation
+                        $taxCalculator = $order_detail->getTaxCalculator();
+                        // room price with tax
+                        $roomPriceTI = $taxCalculator->addTaxes($room_unit_price);
+
+                        $totalRoomPriceTE = Tools::ps_round(($room_unit_price * $product_quantity), _PS_PRICE_COMPUTE_PRECISION_);
+                        $totalRoomPriceTI = Tools::ps_round(($roomPriceTI * $product_quantity), _PS_PRICE_COMPUTE_PRECISION_);
+
+                        // room price changes
+                        $totalRoomPriceAfterTE += (float) $totalRoomPriceTE;
+                        $totalRoomPriceAfterTI += (float) $totalRoomPriceTI;
+
+                        // Total product price changes
+                        $totalProductPriceAfterTE += (float) $totalRoomPriceTE;
+                        $totalProductPriceAfterTI += (float) $totalRoomPriceTI;
+                    }
                 } else {
                     $totalProductPriceAfterTE += (float) $roomInfo['total_price_tax_excl'];
                     $totalProductPriceAfterTI += (float) $roomInfo['total_price_tax_incl'];
