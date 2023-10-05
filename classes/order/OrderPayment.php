@@ -148,4 +148,15 @@ class OrderPaymentCore extends ObjectModel
 
         return new OrderInvoice((int)$res);
     }
+
+    /**
+     * Provides the cumulative conversion rate for a given order in any currency
+     * @param [string] $order_reference
+     * @param [int] $idCurrency
+     * @return float
+     */
+    public function getCumulativeConversionRate($order_reference, $idCurrency)
+    {
+        return  Db::getInstance()->getValue('SELECT (SUM(`conversion_rate`) / COUNT(*)) FROM `'._DB_PREFIX_.'order_payment` WHERE `order_reference` = \''.pSQL($order_reference).'\' AND `id_currency` = '.(int)$idCurrency);
+    }
 }

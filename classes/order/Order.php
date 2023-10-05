@@ -34,6 +34,10 @@ class OrderCore extends ObjectModel
     const ORDER_PAYMENT_TYPE_FULL = 1;
     const ORDER_PAYMENT_TYPE_ADVANCE = 2;
 
+    //Consts for: In the order list in which currency prices should be displayed
+    const ORDER_LIST_PRICE_DISPLAY_IN_PAYMENT_CURRENCY = 1;
+    const ORDER_LIST_PRICE_DISPLAY_IN_DEFAULT_CURRENCY = 2;
+
     /** @var int Delivery address id */
     public $id_address_delivery;
 
@@ -1834,6 +1838,10 @@ class OrderCore extends ObjectModel
                 $res = $res && $this->addOrderPaymentDetail($order_payment, $amount_paid, $order_invoice);
             }
         }
+
+        // Whenever payment is adding in any order then set a cumulative conversion rate for the payment currency in the order
+        $this->conversion_rate = $order_payment->getCumulativeConversionRate($this->reference, $this->id_currency);
+        $this->save();
 
         return $res;
     }
