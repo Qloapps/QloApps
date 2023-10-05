@@ -1325,5 +1325,6 @@ $(document).on('click', '.btn-edit-guest-info', function(e) {
 $(document).on('keydown', '#new_account_form input', function(e) {
 	if (e.keyCode === 13) {
 		e.preventDefault();
+		$('#new_account_form #opc_account_form:visible button[type="submit"]').click();
 	}
 });
