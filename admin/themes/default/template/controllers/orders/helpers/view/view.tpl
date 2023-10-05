@@ -262,84 +262,80 @@
 						{l s='Booking cancellation requests has raised  from this order. To see booking cancelation requests'} <a target="_blank" href="{$link->getAdminLink('AdminOrderRefundRequests')}&amp;id_order={$order->id}&amp;vieworder_return">{l s='Click here'}</a>.
 					</div>
 				{/if}
-				<div class="row">
-					<div class="panel">
-						<div class="panel-heading order_status_heading">
-							<i class="icon-credit-card"></i>
-							{l s='Rooms Status'}
-						</div>
-						<div class="panel-content">
-							<div class="row">
-								<div class="col-lg-12" id="room_status_info_wrapper">
-									<table class="table table-responsive">
+				<div class="panel">
+					<div class="panel-heading order_status_heading">
+						<i class="icon-credit-card"></i>
+						{l s='Rooms Status'}
+					</div>
+					<div class="panel-content">
+						<div class="row">
+							<div class="col-lg-12" id="room_status_info_wrapper">
+								<table class="table table-responsive">
+									<tr>
+										<th>{l s='Room No.'}</th>
+										<th>{l s='Hotel Name'}</th>
+										<th>{l s='Duration'}</th>
+										<th>{l s='Documents'}</th>
+										<th>{l s='Order Status'}</th>
+									</tr>
+									{if isset($htl_booking_order_data) && $htl_booking_order_data}
+										{foreach from=$htl_booking_order_data item=data}
+											{if !$data.is_refunded}
+												<tr>
+													<td>
+														{$data['room_num']}
+													</td>
+													<td>
+														<a href="{$link->getAdminLink('AdminAddHotel')}&amp;id={$data['id_hotel']}&amp;updatehtl_branch_info" target="_blank">
+															<span>{$data['hotel_name']}</span>
+														</a>
+													</td>
+													<td>
+														{dateFormat date=$data['date_from']} - {dateFormat date=$data['date_to']}
+													</td>
+													<td>
+														<a class="btn btn-default" onclick="BookingDocumentsModal.init({$data.id|intval}, this); return false;">
+															<i class="icon icon-file-text"></i>
+															{l s='Documents'} <span class="badge badge-info count-documents">{$data.num_checkin_documents}</span>
+														</a>
+													</td>
+													<td>
+														<form action="" method="post" class="form-horizontal row room_status_info_form">
+															<div class="col-sm-7">
+																<select name="booking_order_status" class="form-control booking_order_status margin-bottom-5">
+																	{foreach from=$hotel_order_status item=state}
+																		<option value="{$state['id_status']|intval}" {if isset($data.id_status) && $state.id_status == $data.id_status} selected="selected" disabled="disabled"{/if}>{$state.name|escape}</option>
+																	{/foreach}
+																</select>
+
+																{if $data['id_status'] == $hotel_order_status['STATUS_CHECKED_IN']['id_status']}
+																	<p class="text-center"><span class="badge badge-success margin-bottom-5">{l s='Checked in on'} {dateFormat full=1 date=$data['check_in']}</span></p>
+																{elseif $data['id_status'] == $hotel_order_status['STATUS_CHECKED_OUT']['id_status']}
+																	<p class="text-center"><span class="badge badge-success margin-bottom-5">{l s='Checked out on'} {dateFormat  full=1 date=$data['check_out']}</span></p>
+																{/if}
+
+																{* field for the current date *}
+																<input class="room_status_date wk-input-date" type="text" name="status_date" value="{if $data['id_status'] == $hotel_order_status['STATUS_CHECKED_IN']['id_status']}{$data['date_to']|date_format:"%d-%m-%Y"} {$data['check_out_time']}{else}{$data['date_from']|date_format:"%d-%m-%Y"} {$data['check_in_time']}{/if}" readonly/>
+																<input type="hidden" name="id_hotel_booking_detail" value="{$data['id']}" />
+																<input type="hidden" name="date_from" value="{$data['date_from']|date_format:"%Y-%m-%d"}" />
+																<input type="hidden" name="date_to" value="{$data['date_to']|date_format:"%Y-%m-%d"}" />
+															</div>
+															<div class="col-sm-5">
+																<button type="submit" name="submitbookingOrderStatus" class="btn btn-primary">
+																	{l s='Update Status'}
+																</button>
+															</div>
+														</form>
+													</td>
+												</tr>
+											{/if}
+										{/foreach}
+									{else}
 										<tr>
-											<th>{l s='Room No.'}</th>
-											<th>{l s='Hotel Name'}</th>
-											<th>{l s='Duration'}</th>
-											<th>{l s='Documents'}</th>
-											<th>{l s='Order Status'}</th>
+											<td>{l s='No data found.'}</td>
 										</tr>
-										{if isset($htl_booking_order_data) && $htl_booking_order_data}
-											{foreach from=$htl_booking_order_data item=data}
-												{if !$data.is_refunded}
-													<tr>
-														<td>
-															{$data['room_num']}
-														</td>
-														<td>
-															<a href="{$link->getAdminLink('AdminAddHotel')}&amp;id={$data['id_hotel']}&amp;updatehtl_branch_info" target="_blank">
-																<span>{$data['hotel_name']}</span>
-															</a>
-														</td>
-														<td>
-															{dateFormat date=$data['date_from']} - {dateFormat date=$data['date_to']}
-														</td>
-														<td>
-															<a class="btn btn-default" onclick="BookingDocumentsModal.init({$data.id|intval}, this); return false;">
-																<i class="icon icon-file-text"></i>
-																{l s='Documents'} <span class="badge badge-info count-documents">{$data.num_checkin_documents}</span>
-															</a>
-														</td>
-														<td>
-															<form action="" method="post" class="form-horizontal row room_status_info_form">
-																<div class="col-sm-7">
-																	<select name="booking_order_status" class="form-control booking_order_status margin-bottom-5">
-																		{foreach from=$hotel_order_status item=state}
-																			<option value="{$state['id_status']|intval}" {if isset($data.id_status) && $state.id_status == $data.id_status} selected="selected" disabled="disabled"{/if}>{$state.name|escape}</option>
-																		{/foreach}
-																	</select>
-
-																	{if $data['id_status'] == $hotel_order_status['STATUS_CHECKED_IN']['id_status']}
-																		<p class="text-center"><span class="badge badge-success margin-bottom-5">{l s='Checked in on'} {dateFormat date=$data['check_in']}</span></p>
-																	{elseif $data['id_status'] == $hotel_order_status['STATUS_CHECKED_OUT']['id_status']}
-																		<p class="text-center"><span class="badge badge-success margin-bottom-5">{l s='Checked out on'} {dateFormat date=$data['check_out']}</span></p>
-																	{/if}
-
-																	{* field for the current date *}
-																	<input class="room_status_date wk-input-date" type="text" name="status_date" value="{if $data['id_status'] == $hotel_order_status['STATUS_CHECKED_IN']['id_status']}{$data['date_to']|date_format:"%d-%m-%Y"}{else}{$data['date_from']|date_format:"%d-%m-%Y"}{/if}" readonly/>
-
-																	<input type="hidden" name="date_from" value="{$data['date_from']|date_format:"%Y-%m-%d"}" />
-																	<input type="hidden" name="date_to" value="{$data['date_to']|date_format:"%Y-%m-%d"}" />
-																	<input type="hidden" name="id_room" value="{$data['id_room']}" />
-																	<input type="hidden" name="id_order" value="{$order->id}" />
-																</div>
-																<div class="col-sm-5">
-																	<button type="submit" name="submitbookingOrderStatus" class="btn btn-primary">
-																		{l s='Update Status'}
-																	</button>
-																</div>
-															</form>
-														</td>
-													</tr>
-												{/if}
-											{/foreach}
-										{else}
-											<tr>
-												<td>{l s='No data found.'}</td>
-											</tr>
-										{/if}
-									</table>
-								</div>
+									{/if}
+								</table>
 							</div>
 						</div>
 					</div>
@@ -1655,14 +1651,11 @@
 		{* open date picker for the date input of check-in checkout dates *}
 		$(document).on('focus', '.room_status_date', function() {
 			var dateFrom = $(this).closest('.room_status_info_form').find('[name="date_from"]').val();
-			dateFrom = dateFrom.split("-");
-            minDate = new Date($.datepicker.formatDate('yy-mm-dd', new Date(dateFrom[0], dateFrom[1] - 1, dateFrom[2])));
+            minDate = new Date(dateFrom+'T00:00:00');
 
 			var dateTo = $(this).closest('.room_status_info_form').find('[name="date_to"]').val();
-			dateTo = dateTo.split("-");
-            maxDate = new Date($.datepicker.formatDate('yy-mm-dd', new Date(dateTo[0], dateTo[1] - 1, dateTo[2])));
-
-			$(this).datepicker({
+            maxDate = new Date(dateTo+'T23:59:59');
+			$(this).datetimepicker({
 				dateFormat: 'dd-mm-yy',
 				minDate: minDate,
 				maxDate: maxDate,
