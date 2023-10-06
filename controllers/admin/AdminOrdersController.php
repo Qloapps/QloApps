@@ -683,6 +683,28 @@ class AdminOrdersControllerCore extends AdminController
 
         /* Change order status, add a new entry in order history and send an e-mail to the customer if needed */
         elseif (Tools::isSubmit('submitState') && isset($order)) {
+            // $data = array(
+            //     '{total_paid}' => Tools::displayPrice($order->total_paid, (int)$order->id_currency),
+            //     '{total_paid_real}' => Tools::displayPrice($order->total_paid_real, (int)$order->id_currency),
+            //     '{is_advance_payment}' => $order->is_advance_payment,
+            //     '{advance_paid_amount}' => Tools::displayPrice($order->advance_paid_amount, (int)$order->id_currency),
+            // );
+            // if ($idHotel = HotelBookingDetail::getIdHotelByIdOrder($order->id)) {
+            //     $objHotelBranchInformation = new HotelBranchInformation($idHotel, $order->id_lang);
+            //     $fields = array_merge(
+            //         $objHotelBranchInformation->getFields(),
+            //         $objHotelBranchInformation->getFieldsLang()[$order->id_lang],
+            //         $objHotelBranchInformation->getAddress($idHotel, $order->id_lang)
+            //     );
+            //     foreach ($fields as $key => $value) {
+            //         $data['{hotel_'.$key.'}'] = $value;
+            //     }
+            //     $objHotelBookingDetail = new HotelBookingDetail();
+            //     $hotelBookingDetail = $objHotelBookingDetail->getBookingDataByOrderId($order->id);
+            //     $data['{num_rooms}'] = count($hotelBookingDetail);
+
+            // }
+            // ddd($data);
             if ($this->tabAccess['edit'] === '1') {
                 $order_state = new OrderState(Tools::getValue('id_order_state'));
 
