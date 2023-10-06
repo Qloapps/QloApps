@@ -111,6 +111,9 @@ class HotelBranchInformation extends ObjectModel
             'use_global_preparation_time' => array(),
             'preparation_time' => array(),
         ),
+        'hidden_fields' => array (
+            'id_category',
+        ),
         'associations' => array(
             'room_types' => array(
                 'setter' => false,
