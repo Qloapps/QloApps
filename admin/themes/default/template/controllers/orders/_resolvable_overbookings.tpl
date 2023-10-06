@@ -23,9 +23,17 @@
             <i class="icon-refresh"></i> {l s='Resolvable Overbookings'}
         </div>
         <div class="panel-content">
+            {if isset($smarty.get.resolvable_overbooked_orders) && $smarty.get.resolvable_overbooked_orders}
+                <div class="alert alert-warning">
+                    <b>{l s='Orders with resolvable overbookings are filtered.'}  <a href="{$link->getAdminLink('AdminOrders')|escape:'html':'UTF-8'}" class="btn btn-warning"><i class="icon-refresh"></i> {l s='See all orders'}</a></b>
+                </div>
+            {/if}
             <div class="alert alert-info">
                 <p>{l s='Some overbookings are now available to be resolved. You can directly resolve overbookings from below list as per your choice.'}</p>
-                <p>{l s='You can also filter orders which overbookings are now available to be resolved.'}  <a href="{$link->getAdminLink('AdminOrders')|escape:'html':'UTF-8'}" class="btn btn-default"><i class="icon-search"></i> {l s='Filter orders with resolvable overbookings'}</a></p>
+                {if !isset($smarty.get.resolvable_overbooked_orders) || !$smarty.get.resolvable_overbooked_orders}
+                    <br>
+                    <p>{l s='You can also filter orders which overbookings are now available to be resolved.'}  <a href="{$link->getAdminLink('AdminOrders')|escape:'html':'UTF-8'}&amp;resolvable_overbooked_orders=1" class="btn btn-default"><i class="icon-search"></i> {l s='Filter orders with resolvable overbookings'}</a></p>
+                {/if}
             </div>
             <div class="table-responsive form-group">
                 <table class="table table-striped">

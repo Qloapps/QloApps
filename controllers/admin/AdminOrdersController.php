@@ -88,6 +88,22 @@ class AdminOrdersControllerCore extends AdminController
 
         $this->_group = ' GROUP BY hbd.`id_order`';
 
+        // if request for resolvable overbooked orders filter comes the set condition for this
+        if (Tools::getIsset('resolvable_overbooked_orders') && Tools::getValue('resolvable_overbooked_orders')) {
+            $objHotelBookingDetail = new HotelBookingDetail();
+            $resolvableOrders = array();
+            // Overbookings information of the order
+            if ($orderOverBookings = $objHotelBookingDetail->getOverbookedRooms()) {
+                foreach ($orderOverBookings as $overBookedRoom) {
+                    if (!in_array($overBookedRoom['id_order'], $resolvableOrders)) {
+                        $resolvableOrders[$overBookedRoom['id_order']] = $overBookedRoom['id_order'];
+                    }
+                }
+            }
+            $this->_where = ' AND a.`id_order` IN ('.implode(',', $resolvableOrders).')';
+        }
+
+
         $statuses = OrderState::getOrderStates((int)$this->context->language->id);
         foreach ($statuses as $status) {
             $this->statuses_array[$status['id_order_state']] = $status['name'];

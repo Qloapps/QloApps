@@ -30,7 +30,10 @@
 		</td>
 	{/if}
 	<td class="text-center">
-		{$data.room_num}
+		<p>{$data.room_num}</p>
+        {if $data.is_back_order}
+            <span class="overbooked_room">{l s='overbooked'}</span>
+        {/if}
 	</td>
 	<td class="text-center">
 		<img src="{$data.image_link}" title="Room image" />
@@ -263,7 +266,7 @@
 				</button>
 				<ul class="dropdown-menu" role="menu">
 					<li>
-						<a href="#" data-toggle="modal" data-target="#mySwappigModal" data-id_order="{$order->id}" data-room_num='{$data.room_num}' data-date_from='{$data.date_from}' data-date_to='{$data.date_to}' data-id_room='{$data.id_room}' data-cust_name='{$data.alloted_cust_name}' data-cust_email='{$data.alloted_cust_email}' data-avail_rm_swap='{$data.avail_rooms_to_swap|@json_encode}' data-avail_rm_realloc='{$data.avail_rooms_to_realloc|@json_encode}'>
+						<a href="#" data-toggle="modal" data-target="#mySwappigModal" data-id_htl_booking="{$data['id']}" data-id_order="{$order->id}" data-room_num='{$data.room_num}' data-date_from='{$data.date_from}' data-date_to='{$data.date_to}' data-id_room='{$data.id_room}' data-cust_name='{$data.alloted_cust_name}' data-cust_email='{$data.alloted_cust_email}' data-avail_rm_swap='{$data.avail_rooms_to_swap|@json_encode}' data-avail_rm_realloc='{$data.avail_rooms_to_realloc|@json_encode}'>
 							<i class="icon-refresh"></i>
 							{l s='Reallocate Room'}
 						</a>
