@@ -2938,8 +2938,8 @@ class HotelBookingDetail extends ObjectModel
                         }
                     }
 
-                    // if all overbooked rooms are resolved then resolve the overbooking by setting is_back_order to 0
-                    if ($idHotelBooking || (count($resolvableOverbookings) == count($totalOverBookedInOrder))) {
+                    // if request for specific booking Or all overbooked rooms are resolved then resolve the overbooking by setting is_back_order to 0
+                    if ($idHotelBooking || (count($resolvableOverbookings) == $totalOverBookedInOrder)) {
                         foreach ($resolvableOverbookings as $idHtlBookingDtl) {
                             $objBookingDetail = new HotelBookingDetail($idHtlBookingDtl);
                             $objBookingDetail->is_back_order = 0;
@@ -2949,22 +2949,24 @@ class HotelBookingDetail extends ObjectModel
                         }
 
                         // After all overbookings are resolved we can update the status of the order
-                        $objOrder = new Order($idOrder);
-                        $idOrderState = 0;
-                        if ($objOrder->current_state == Configuration::get('PS_OS_OVERBOOKING_PAID')) {
-                            $idOrderState = Configuration::get('PS_OS_PAYMENT_ACCEPTED');
-                        } elseif ($objOrder->current_state == Configuration::get('PS_OS_OVERBOOKING_PARTIAL_PAID')) {
-                            $idOrderState = Configuration::get('PS_OS_PARTIAL_PAYMENT_ACCEPTED');
-                        } elseif ($objOrder->current_state == Configuration::get('PS_OS_OVERBOOKING_UNPAID')) {
-                            $idOrderState = Configuration::get('PS_OS_AWAITING_PAYMENT');
-                        }
+                        if (count($resolvableOverbookings) == $totalOverBookedInOrder) {
+                            $objOrder = new Order($idOrder);
+                            $idOrderState = 0;
+                            if ($objOrder->current_state == Configuration::get('PS_OS_OVERBOOKING_PAID')) {
+                                $idOrderState = Configuration::get('PS_OS_PAYMENT_ACCEPTED');
+                            } elseif ($objOrder->current_state == Configuration::get('PS_OS_OVERBOOKING_PARTIAL_PAID')) {
+                                $idOrderState = Configuration::get('PS_OS_PARTIAL_PAYMENT_ACCEPTED');
+                            } elseif ($objOrder->current_state == Configuration::get('PS_OS_OVERBOOKING_UNPAID')) {
+                                $idOrderState = Configuration::get('PS_OS_AWAITING_PAYMENT');
+                            }
 
-                        // if we have order state to change
-                        if ($idOrderState) {
-                            $objOrderHistory = new OrderHistory();
-                            $objOrderHistory->id_order = (int)$idOrder;
-                            $objOrderHistory->changeIdOrderState((int)$idOrderState, $objOrder, true);
-                            $objOrderHistory->add();
+                            // if we have order state to change
+                            if ($idOrderState) {
+                                $objOrderHistory = new OrderHistory();
+                                $objOrderHistory->id_order = (int)$idOrder;
+                                $objOrderHistory->changeIdOrderState((int)$idOrderState, $objOrder, true);
+                                $objOrderHistory->add();
+                            }
                         }
                     }
                 }
