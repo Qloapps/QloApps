@@ -1201,7 +1201,7 @@ class HotelBranchInformation extends ObjectModel
             $objCountry = new Country();
             $countryName = $objCountry->getNameById($idLang, $this->id_country);
             if ($catCountry = $this->addCategory($countryName, false, $groupIds)) {
-                if ($this->state_id) {
+                if ($this->id_state) {
                     $objState = new State();
                     $stateName = $objState->getNameById($this->id_state);
 
