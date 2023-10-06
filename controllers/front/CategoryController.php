@@ -194,8 +194,6 @@ class CategoryControllerCore extends FrontController
 
                     $roomTypeData['occupancies'] = $occupancy;
                     $roomTypeData['occupancy_adults'] = $roomTypeData['adults']; // only one room by default
-                    $roomTypeData['occupancy_children'] = 0;
-                    $roomTypeData['occupancy_child_ages'] = 0;
                 }
             }
 

@@ -81,8 +81,6 @@
 											<div class="booking_guest_occupancy_conatiner">
 												{assign var=occupancies value=$room_v['occupancies']}
 												{assign var=occupancy_adults value=$room_v['occupancy_adults']}
-												{assign var=occupancy_children value=$room_v['occupancy_children']}
-												{assign var=occupancy_child_ages value=$room_v['occupancy_child_ages']}
 												{include file="./occupancy_field.tpl" room_type_info=$room_v total_available_rooms=$room_v['room_left']}
 											</div>
 										{else}

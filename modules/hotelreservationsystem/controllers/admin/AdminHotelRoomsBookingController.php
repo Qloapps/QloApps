@@ -779,8 +779,6 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
 
                 $booking_data['rm_data'][$key_bk_data]['occupancies'] = $occupancy;
                 $booking_data['rm_data'][$key_bk_data]['occupancy_adults'] = $booking_data['rm_data'][$key_bk_data]['adults']; // only one room by default
-                $booking_data['rm_data'][$key_bk_data]['occupancy_children'] = 0;
-                $booking_data['rm_data'][$key_bk_data]['occupancy_child_ages'] = 0;
 
                 if (isset($value_bk_data['data']['booked']) && $value_bk_data['data']['booked']) {
                     foreach ($value_bk_data['data']['booked'] as $booked_k1 => $booked_v1) {
