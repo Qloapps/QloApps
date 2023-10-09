@@ -315,19 +315,19 @@ class AdminAddHotelController extends ModuleAdminController
             if (!$enableUseGlobalMaxOrderDate) {
                 $maximumBookingDateFormatted = date('Y-m-d', strtotime($maximumBookingDate));
                 if ($maximumBookingDate == '') {
-                    $this->errors[] = Tools::displayError('Maximum Check-out Date to book a room is a required field.');
+                    $this->errors[] = $this->l('Maximum Check-out Date to book a room is a required field.');
                 } elseif (!Validate::isDate($maximumBookingDateFormatted)) {
-                    $this->errors[] = Tools::displayError('Maximum Check-out Date to book a room is invalid.');
+                    $this->errors[] = $this->l('Maximum Check-out Date to book a room is invalid.');
                 } elseif (strtotime($maximumBookingDateFormatted) < strtotime(date('Y-m-d'))) {
-                    $this->errors[] = Tools::displayError('Maximum Check-out Date to book a room can not be a past date. Please use a future date.');
+                    $this->errors[] = $this->l('Maximum Check-out Date to book a room can not be a past date. Please use a future date.');
                 }
             }
 
             if (!$enableUseGlobalPreparationTime) {
                 if ($preparationTime === '') {
-                    $this->errors[] = Tools::displayError('Preparation time is a required field.');
+                    $this->errors[] = $this->l('Preparation time is a required field.');
                 } elseif ($preparationTime !== '0' && !Validate::isUnsignedInt($preparationTime)) {
-                    $this->errors[] = Tools::displayError('Preparation time is invalid.');
+                    $this->errors[] = $this->l('Preparation time is invalid.');
                 }
             }
         }
