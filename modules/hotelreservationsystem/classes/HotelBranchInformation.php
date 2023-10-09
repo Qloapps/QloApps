@@ -49,8 +49,8 @@ class HotelBranchInformation extends ObjectModel
             'check_in' => array('type' => self::TYPE_STRING, 'required' => true),
             'check_out' => array('type' => self::TYPE_STRING, 'required' => true),
             'active' => array('type' => self::TYPE_BOOL, 'validate' => 'isBool'),
-            'latitude' => array('type' => self::TYPE_FLOAT),
-            'longitude' => array('type' => self::TYPE_FLOAT),
+            'latitude' => array('type' => self::TYPE_FLOAT, 'validate' => 'isFloat'),
+            'longitude' => array('type' => self::TYPE_FLOAT, 'validate' => 'isFloat'),
             'map_formated_address' => array('type' => self::TYPE_HTML, 'validate' => 'isCleanHtml'),
             'map_input_text' => array('type' => self::TYPE_STRING, 'validate' => 'isString'),
             'active_refund' => array('type' => self::TYPE_BOOL, 'validate' => 'isBool'),
@@ -1036,7 +1036,23 @@ class HotelBranchInformation extends ObjectModel
                 }
                 return $error_return ? $message : false;
             }
-            if ($this->check_in && $this->check_out && strtotime($this->check_out) > strtotime($this->check_in)) {
+
+            if (!strtotime($this->check_in)) {
+                $message = Tools::displayError('Check In time is invalid.');
+                if ($die) {
+                    throw new PrestaShopException($message);
+                }
+                return $error_return ? $message : false;
+            }
+            if (!strtotime($this->check_out)) {
+                $message = Tools::displayError('Check out time is invalid.');
+                if ($die) {
+                    throw new PrestaShopException($message);
+                }
+                return $error_return ? $message : false;
+            }
+
+            if ($this->check_in && $this->check_out && strtotime($this->check_out) >= strtotime($this->check_in)) {
                 $message = Tools::displayError('Check Out time must be before Check In time.');
                 if ($die) {
                     throw new PrestaShopException($message);
@@ -1058,6 +1074,12 @@ class HotelBranchInformation extends ObjectModel
             }
             if ($this->address == '') {
                 $message = Tools::displayError('Address is required field.');
+                if ($die) {
+                    throw new PrestaShopException($message);
+                }
+                return $error_return ? $message : false;
+            } elseif (!Validate::isAddress($this->address)) {
+                $message = Tools::displayError('Address is invalid.');
                 if ($die) {
                     throw new PrestaShopException($message);
                 }
@@ -1094,7 +1116,11 @@ class HotelBranchInformation extends ObjectModel
                     }
                     /* Check zip code format */
                     if ($objCountry->zip_code_format && !$objCountry->checkZipCode($this->zipcode)) {
-
+                        $message = sprintf(Tools::displayError('The Zip/Postal code you have entered is invalid. It must follow this format: %s'), str_replace('C', $objCountry->iso_code, str_replace('N', '0', str_replace('L', 'A', $objCountry->zip_code_format))));
+                        if ($die) {
+                            throw new PrestaShopException($message);
+                        }
+                        return $error_return ? $message : false;
                     } elseif (empty($this->zipcode) && $objCountry->need_zip_code) {
                         $message = Tools::displayError('A Zip / Postal code is required.');
                         if ($die) {
@@ -1125,6 +1151,22 @@ class HotelBranchInformation extends ObjectModel
                 return $error_return ? $message : false;
             } elseif (!Validate::isCityName($this->city)) {
                 $message = Tools::displayError('Enter a Valid City Name.');
+                if ($die) {
+                    throw new PrestaShopException($message);
+                }
+                return $error_return ? $message : false;
+            }
+
+            if (!Validate::isBool($this->use_global_max_order_date)) {
+                $message = Tools::displayError('invalid value for use_global_max_order_date.');
+                if ($die) {
+                    throw new PrestaShopException($message);
+                }
+                return $error_return ? $message : false;
+            }
+
+            if (!Validate::isBool($this->use_global_preparation_time)) {
+                $message = Tools::displayError('invalid value for use_global_preparation_time.');
                 if ($die) {
                     throw new PrestaShopException($message);
                 }
