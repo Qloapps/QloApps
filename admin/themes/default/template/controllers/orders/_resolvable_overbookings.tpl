@@ -63,7 +63,7 @@
                                     {if isset($data['booked_room_info']) && $data['booked_room_info']}
                                         <span class="badge badge-information">{l s='Already booked'}</span>
                                     {else}
-                                        <a href="{$link->getAdminLink('AdminOrders')|escape:'html':'UTF-8'}&amp;vieworder&amp;id_order={$data['id_order']|escape:'html':'UTF-8'}&amp;resolve_overbooking={$data['id']|escape:'html':'UTF-8'}" class="btn btn-default resolve_overbooking" id_htl_booking="{$data['id']|escape:'html':'UTF-8'}"><i class="icon-refresh"></i> {l s='Resolve'}</a>
+                                        <a href="{$link->getAdminLink('AdminOrders')|escape:'html':'UTF-8'}&amp;resolve_overbooking={$data['id']|escape:'html':'UTF-8'}" class="btn btn-default resolve_overbooking" id_htl_booking="{$data['id']|escape:'html':'UTF-8'}"><i class="icon-refresh"></i> {l s='Resolve'}</a>
                                     {/if}
                                 </td>
                             </tr>

@@ -279,18 +279,6 @@ class AdminOrdersControllerCore extends AdminController
         return Tools::displayPrice($echo, (int)$order->id_currency);
     }
 
-    public function initContent()
-    {
-        if (!$this->display) {
-            $objHotelBookingDetail = new HotelBookingDetail();
-            if ($resolvableOverBookings = $objHotelBookingDetail->getOverbookedRooms(0, 0, '', '', 0, 0, 2)) {
-                $this->context->smarty->assign('resolvableOverBookings', $resolvableOverBookings);
-                $this->content = $this->context->smarty->fetch('controllers/orders/_resolvable_overbookings.tpl');
-            }
-        }
-        parent::initContent();
-    }
-
     public function renderForm()
     {
         if (Context::getContext()->shop->getContext() != Shop::CONTEXT_SHOP && Shop::isFeatureActive()) {
@@ -547,6 +535,13 @@ class AdminOrdersControllerCore extends AdminController
 
     public function renderList()
     {
+        // Show all resolvable overbookings if available
+        $objHotelBookingDetail = new HotelBookingDetail();
+        if ($resolvableOverBookings = $objHotelBookingDetail->getOverbookedRooms(0, 0, '', '', 0, 0, 2)) {
+            $this->context->smarty->assign('resolvableOverBookings', $resolvableOverBookings);
+            $this->content .= $this->context->smarty->fetch('controllers/orders/_resolvable_overbookings.tpl');
+        }
+
         if (Tools::isSubmit('submitBulkupdateOrderStatus'.$this->table)) {
             if (Tools::getIsset('cancel')) {
                 Tools::redirectAdmin(self::$currentIndex.'&token='.$this->token);
@@ -1368,7 +1363,11 @@ class AdminOrdersControllerCore extends AdminController
             $objHotelBookingDetail = new HotelBookingDetail();
             // resolve an overbooking manually
             if ($objHotelBookingDetail->resolveOverbookings(Tools::getValue('resolve_overbooking'))) {
-                Tools::redirectAdmin(self::$currentIndex.'&id_order='.$order->id.'&vieworder&conf=51&token='.$this->token);
+                if (Tools::getValue('id_order')) {
+                    Tools::redirectAdmin(self::$currentIndex.'&id_order='.$order->id.'&vieworder&conf=51&token='.$this->token);
+                } else {
+                    Tools::redirectAdmin(self::$currentIndex.'&conf=51&token='.$this->token);
+                }
             } else {
                 $this->errors = Tools::displayError('An error occurred while resolving overbooking.');
             }
