@@ -70,7 +70,7 @@
 					</div>
 				</div>
                 <div class="col-xs-6 col-lg-3">
-					<div class="stat-box label-tooltip" data-toggle="tooltip" data-original-title="{l s='Revenue Per Available Room (RevPAR) measures how many rooms are being booked, and how much revenue those bookings are generating.' mod='dashperformance'}" data-placement="top" style="background-color: #B6FFB6;">
+					<div class="stat-box label-tooltip" data-toggle="tooltip" data-original-title="{l s='Revenue Per Available Room (RevPAR) is calculated by dividing total rooms revenue by the total number of rooms in the period being measured.' mod='dashperformance'}" data-placement="top" style="background-color: #B6FFB6;">
 						<div class="title-wrapper">
 							<p>{l s='Revenue Per Available Room' mod='dashperformance'}</p>
 						</div>
