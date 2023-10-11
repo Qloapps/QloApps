@@ -135,8 +135,8 @@ class AdminDashboardControllerCore extends AdminController
         }
 
         $forms['net_profit']['fields']['CONF_AVERAGE_PRODUCT_MARGIN'] = array(
-            'title' => $this->l('Average gross margin percentage'),
-            'desc' => $this->l('You should calculate this percentage as follows: ((total sales revenue) - (total operating cost)) / (total sales revenue) * 100. This value is only used to calculate Dashboard approximate gross margin, if you do not specify operating cost for each room type.'),
+            'title' => $this->l('Average gross operating cost percentage'),
+            'desc' => $this->l('This value is only used to calculate Dashboard approximate gross operating cost, if you do not specify operating cost for each room type.'),
             'validation' => 'isPercentage',
             'cast' => 'intval',
             'type' => 'text',

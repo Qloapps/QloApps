@@ -8,73 +8,13 @@ function bar_chart_goals(widget_name, chart_details)
 
 		var chart = nv.models.multiBarChart()
 			.stacked(true)
-			.showControls(false)
-			.tooltipContent(function(key, y, e, graph) {
-				if (graph.value == 0)
-					return '';
+            .forceY([0, 1])
+			.showControls(false);
 
-				if (key == 'sales_real') {
-					var result = '<div class="tooltip-panel"><div class="tooltip-panel-heading">' + graph.series.title + '</div><strong>' + formatCurrency(parseInt(graph.point.sales), currency_format, currency_sign, currency_blank) + '</strong><br />(' + formatCurrency(parseInt(graph.point.goal), currency_format, currency_sign, currency_blank) + ')<br/>';
-					if (graph.point.sales > graph.point.goal)
-						result += '<span class="dash_trend dash_trend_up">+';
-					else
-						result += '<span class="dash_trend dash_trend_down">';
-					result += graph.point.goal_diff + '%</span></div>';
-					return result;
-				} else if (key == 'sales_less') {
-					if (graph.point.sales > 0)
-						return '<div class="tooltip-panel"><div class="tooltip-panel-heading">' + graph.series.title + '</div><strong>' + graph.series.zone_text + '</strong><br /><span class="dash_trend dash_trend_down">' + formatCurrency(parseInt(graph.point.goal_diff), currency_format, currency_sign, currency_blank) + '</span></div>';
-					else
-						return '<div class="tooltip-panel"><div class="tooltip-panel-heading">' + graph.series.title + '</div><strong>' + graph.series.zone_text + '</strong><br />(' + formatCurrency(parseInt(graph.point.goal), currency_format, currency_sign, currency_blank) + ')</div>';
-				} else if (key == 'sales_more')
-					return '<div class="tooltip-panel"><div class="tooltip-panel-heading">' + graph.series.title + '</div><strong>' + graph.series.zone_text + '</strong><br /><span class="dash_trend dash_trend_up">+' + formatCurrency(parseInt(graph.point.goal_diff), currency_format, currency_sign, currency_blank) + '</span></div>';
-				else if (key == 'avg_cart_value_real') {
-					var result = '<div class="tooltip-panel"><div class="tooltip-panel-heading">' + graph.series.title + '</div><strong>' + formatCurrency(parseInt(graph.point.avg_cart_value), currency_format, currency_sign, currency_blank) + '</strong><br />(' + formatCurrency(parseInt(graph.point.goal), currency_format, currency_sign, currency_blank) + ')<br/>';
-					if (graph.point.avg_cart_value > graph.point.goal)
-						result += '<span class="dash_trend dash_trend_up">+';
-					else
-						result += '<span class="dash_trend dash_trend_down">';
-					result += graph.point.goal_diff + '%</span></div>';
-					return result;
-				} else if (key == 'avg_cart_value_less') {
-					if (graph.point.avg_cart_value > 0)
-						return '<div class="tooltip-panel"><div class="tooltip-panel-heading">' + graph.series.title + '</div><strong>' + graph.series.zone_text + '</strong><br /><span class="dash_trend dash_trend_down">' + formatCurrency(parseInt(graph.point.goal_diff), currency_format, currency_sign, currency_blank) + '</span></div>';
-					else
-						return '<div class="tooltip-panel"><div class="tooltip-panel-heading">' + graph.series.title + '</div><strong>' + graph.series.zone_text + '</strong><br />(' + formatCurrency(parseInt(graph.point.goal), currency_format, currency_sign, currency_blank) + ')</div>';
-				} else if (key == 'avg_cart_value_more')
-					return '<div class="tooltip-panel"><div class="tooltip-panel-heading">' + graph.series.title + '</div><strong>' + graph.series.zone_text + '</strong><br /><span class="dash_trend dash_trend_up">+' + formatCurrency(parseInt(graph.point.goal_diff), currency_format, currency_sign, currency_blank) + '</span></div>';
-				else if (key == 'traffic_real') {
-					var result = '<div class="tooltip-panel"><div class="tooltip-panel-heading">' + graph.series.title + '</div><strong>' + graph.point.traffic + ' ' +graph.series.unit_text+'</strong><br />(' + graph.point.goal + ' ' +graph.series.unit_text+')<br/>';
-					if (graph.point.traffic > graph.point.goal)
-						result += '<span class="dash_trend dash_trend_up">+';
-					else
-						result += '<span class="dash_trend dash_trend_down">';
-					result += graph.point.goal_diff + '%</span></div>';
-					return result;
-				} else if (key == 'traffic_less') {
-					if (graph.point.traffic > 0)
-						return '<div class="tooltip-panel"><div class="tooltip-panel-heading">' + graph.series.title + '</div><strong>' + graph.series.zone_text + '</strong><br /><span class="dash_trend dash_trend_down">' + graph.point.goal_diff + ' ' +graph.series.unit_text+'</span></div>';
-					else
-						return '<div class="tooltip-panel"><div class="tooltip-panel-heading">' + graph.series.title + '</div><strong>' + graph.series.zone_text + '</strong><br />(' + graph.point.goal + ' ' +graph.series.unit_text+')</div>';
-				} else if (key == 'traffic_more')
-					return '<div class="tooltip-panel"><div class="tooltip-panel-heading">' + graph.series.title + '</div><strong>' + graph.series.zone_text + '</strong><br /><span class="dash_trend dash_trend_up">+' + graph.point.goal_diff + ' ' +graph.series.unit_text+'</span></div>';
-				else if (key == 'conversion_real') {
-					var result = '<div class="tooltip-panel"><div class="tooltip-panel-heading">' + graph.series.title + '</div><strong>' + graph.point.conversion + '%</strong><br />(' + graph.point.goal + '%)</strong><br/>';
-					if (graph.point.conversion  > graph.point.goal)
-						result += '<span class="dash_trend dash_trend_up">+';
-					else
-						result += '<span class="dash_trend dash_trend_down">';
-					result += graph.point.goal_diff + '%</span></div>';
-					return result;
-				} else if (key == 'conversion_less') {
-					if (graph.point.conversion > 0)
-						return '<div class="tooltip-panel"><div class="tooltip-panel-heading">' + graph.series.title + '</div><strong>' + graph.series.zone_text + '</strong><br /><span class="dash_trend dash_trend_down">' + graph.point.goal_diff + '%</span></div>';
-					else
-						return '<div class="tooltip-panel"><div class="tooltip-panel-heading">' + graph.series.title + '</div><strong>' + graph.series.zone_text + '</strong><br />(' + graph.point.goal + '%)</div>';
-				} else if (key == 'conversion_more')
-					return '<div class="tooltip-panel"><div class="tooltip-panel-heading">' + graph.series.title + '</div><strong>' + graph.series.zone_text + '</strong><br /><span class="dash_trend dash_trend_up">+' + graph.point.goal_diff + '%</span></div>';
-
-			});
+        // create content for the tooltip of chart
+        chart.tooltip.contentGenerator((obj, element) => {
+            return getDashgoalsTooltipContent(obj, chart_details);
+        });
 
 		dashgoals_chart = chart;
 
@@ -86,6 +26,9 @@ function bar_chart_goals(widget_name, chart_details)
 		$('#dash_goals_chart1 .nv-legendWrap').remove();
 
 		nv.utils.windowResize(chart.update);
+
+        // select first chart to set/format values
+        selectDashgoalsChart('sales');
 
 		return chart;
 	});
@@ -103,19 +46,21 @@ function selectDashgoalsChart(type)
 		});
 	}
 
-	dashgoals_chart.yAxis.tickFormat(d3.format('.1f'));
-
 	if (type == 'avg_cart_value' || type == 'sales') {
+        dashgoals_chart.yAxis.tickFormat(d3.format('.2f'));
+
 		dashgoals_chart.yAxis.tickFormat(function(d) {
 			return formatCurrency(parseFloat(d), currency_format, currency_sign, currency_blank);
 		});
-	}
+	}else if (type == 'conversion') {
+        dashgoals_chart.yAxis.tickFormat(d3.format('.2f'));
 
-	if (type == 'conversion') {
 		dashgoals_chart.yAxis.tickFormat(function(d) {
 			return d + ' %';
 		});
-	}
+	}else if (type == 'traffic') {
+    	dashgoals_chart.yAxis.tickFormat(d3.format('d'));
+    }
 
 	dashgoals_toggleDashConfig();
 }
@@ -172,6 +117,52 @@ function dashgoals_changeYear(xward)
 			refreshDashboard('dashgoals', false, dashgoals_year);
 		}
 	});
+}
+
+// Get tooltip content for the dashgoals chart
+function getDashgoalsTooltipContent(graphDataObject)
+{
+    var tooltipLabel = graphDataObject.data.title + ' (' + graphDataObject.value + ')';
+    var tooltipContent = '';
+
+    var goal = graphDataObject.data.goal;
+    var goalDiffrence = graphDataObject.data.goal_diff;
+    var currentValue = graphDataObject.data.value;
+
+    if (graphDataObject.data.value_type == VALUE_TYPE_PRICE) {
+        goal = formatCurrency(parseFloat(graphDataObject.data.goal), currency_format, currency_sign, currency_blank);
+        currentValue = formatCurrency(parseFloat(graphDataObject.data.value), currency_format, currency_sign, currency_blank);
+        goalDiffrence = formatCurrency(parseFloat(graphDataObject.data.goal_diff), currency_format, currency_sign, currency_blank);
+    } else if (graphDataObject.data.value_type == VALUE_TYPE_PERCENT) {
+        goal = graphDataObject.data.goal + ' %';
+        currentValue = graphDataObject.data.value + ' %';
+    }
+
+    tooltipContent += '<p>' + goal_set_txt + ': <b>' + goal + '</b></p>';
+
+    // some values must be displayed for passed months
+    if (graphDataObject.data.is_future_goal == 0) {
+        tooltipContent += '<p>' + graphDataObject.data.title + ': <b>' + currentValue + '</b></p>';;
+
+        tooltipContent += '<p>' + goal_diff_txt + ': <b>';
+        if (graphDataObject.data.complete == 1) {
+            tooltipContent += '<span class="text-success">+ ';
+        } else {
+            tooltipContent += '<span class="text-danger">- ';
+        }
+
+        tooltipContent += goalDiffrence + '</span></b></p>';
+
+        tooltipContent += '<p class="';
+        if (graphDataObject.data.complete == 1) {
+            tooltipContent += 'text-success"><b><i class="icon-circle-arrow-up"> ';
+        } else {
+            tooltipContent += 'text-danger"><b><i class="icon-circle-arrow-down"> ';
+        }
+        tooltipContent += '</i> ' + graphDataObject.data.goal_diff_percent + '%</b></p>';
+    }
+
+    return getTooltipContent(tooltipLabel, tooltipContent, graphDataObject.color);
 }
 
 $(document).ready(function() {

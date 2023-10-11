@@ -111,3 +111,7 @@
 	max-height: 300px;
 	overflow-y: auto;
 }
+
+#dashguestcycle table tbody>tr>td {
+    padding: 8px 7px;
+}
