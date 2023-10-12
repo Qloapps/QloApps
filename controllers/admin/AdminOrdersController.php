@@ -1248,8 +1248,8 @@ class AdminOrdersControllerCore extends AdminController
                         }
 
                         // Update amounts of Order Invoice
-                        $order_invoice->total_discount_tax_excl -= $order_cart_rule->value_tax_excl;
-                        $order_invoice->total_discount_tax_incl -= $order_cart_rule->value;
+                        $order_invoice->total_discount_tax_excl = ($order_invoice->total_discount_tax_excl - $order_cart_rule->value_tax_excl) > 0 ? ($order_invoice->total_discount_tax_excl - $order_cart_rule->value_tax_excl) : 0;
+                        $order_invoice->total_discount_tax_incl = ($order_invoice->total_discount_tax_incl - $order_cart_rule->value) > 0 ? ($order_invoice->total_discount_tax_incl - $order_cart_rule->value) : 0;
 
                         $order_invoice->total_paid_tax_excl += $order_cart_rule->value_tax_excl;
                         $order_invoice->total_paid_tax_incl += $order_cart_rule->value;
@@ -1259,9 +1259,9 @@ class AdminOrdersControllerCore extends AdminController
                     }
 
                     // Update amounts of order
-                    $order->total_discounts -= $order_cart_rule->value;
-                    $order->total_discounts_tax_incl -= $order_cart_rule->value;
-                    $order->total_discounts_tax_excl -= $order_cart_rule->value_tax_excl;
+                    $order->total_discounts = ($order->total_discounts - $order_cart_rule->value) > 0 ? ($order->total_discounts - $order_cart_rule->value) : 0;
+                    $order->total_discounts_tax_incl = ($order->total_discounts_tax_incl - $order_cart_rule->value) > 0 ? ($order->total_discounts_tax_incl - $order_cart_rule->value) : 0;
+                    $order->total_discounts_tax_excl = ($order->total_discounts_tax_excl - $order_cart_rule->value_tax_excl) > 0 ? ($order->total_discounts_tax_excl - $order_cart_rule->value_tax_excl) : 0;
 
                     $order->total_paid += $order_cart_rule->value;
                     $order->total_paid_tax_incl += $order_cart_rule->value;
