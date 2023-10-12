@@ -59,7 +59,7 @@ class HotelBranchInformation extends ObjectModel
 
             //lang fields
             'policies' => array('type' => self::TYPE_HTML, 'validate' => 'isCleanHtml', 'lang' => true),
-            'hotel_name' => array('type' => self::TYPE_STRING, 'lang' => true, 'required' => true),
+            'hotel_name' => array('type' => self::TYPE_STRING, 'lang' => true, 'required' => true, 'validate' => 'isCatalogName'),
             'description' => array('type' => self::TYPE_HTML, 'validate' => 'isCleanHtml', 'lang' => true),
             'short_description' => array('type' => self::TYPE_HTML, 'validate' => 'isCleanHtml', 'lang' => true),
     ), );
