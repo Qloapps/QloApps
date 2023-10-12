@@ -59,7 +59,7 @@ class HotelBranchInformation extends ObjectModel
 
             //lang fields
             'policies' => array('type' => self::TYPE_HTML, 'validate' => 'isCleanHtml', 'lang' => true),
-            'hotel_name' => array('type' => self::TYPE_STRING, 'lang' => true, 'required' => true, 'validate' => 'isCatalogName'),
+            'hotel_name' => array('type' => self::TYPE_STRING, 'lang' => true, 'required' => true, 'validate' => 'isGenericName'),
             'description' => array('type' => self::TYPE_HTML, 'validate' => 'isCleanHtml', 'lang' => true),
             'short_description' => array('type' => self::TYPE_HTML, 'validate' => 'isCleanHtml', 'lang' => true),
     ), );
@@ -985,7 +985,7 @@ class HotelBranchInformation extends ObjectModel
         }
 
         $hotelName = $this->hotel_name[Configuration::get('PS_LANG_DEFAULT')];
-        $hotelName = preg_replace('/[0-9!<>,;?=+()@#"°{}_$%:]*$/u', '', $hotelName);
+        $hotelName = preg_replace('/[0-9!<>,;"?=+()@#°{}_$%:]*/u', '', $hotelName);
 
         $objAddress->id_hotel = $this->id;
         $objAddress->id_country = $this->id_country;
