@@ -1517,7 +1517,7 @@ class AdminOrdersControllerCore extends AdminController
 
             // if the current stock requires a warning
             if ($product['current_stock'] <= 0 && $display_out_of_stock_warning) {
-                $this->displayWarning($this->l('This product is out of stock: ').' '.$product['product_name']);
+                $this->displayWarning($this->l('This booked room type is not found: ').' '.$product['product_name']);
             }
             if ($product['id_warehouse'] != 0) {
                 $warehouse = new Warehouse((int)$product['id_warehouse']);
@@ -2812,8 +2812,9 @@ class AdminOrdersControllerCore extends AdminController
                         $objCartBookingData->children = $room_occupancy['children'];
                         $objCartBookingData->child_ages = $room_occupancy['children'] ? json_encode($room_occupancy['child_ages']) : json_encode(array());
                     } else {
+                        // if room is being booked without occupancy selection the for adults set base occupancy and children will be 0
                         $objCartBookingData->adults = $room_info_by_id_product['adults'];
-                        $objCartBookingData->children = $room_info_by_id_product['children'];
+                        $objCartBookingData->children = 0;
                         $objCartBookingData->child_ages = json_encode(array());
                     }
                     $objCartBookingData->save();
@@ -3250,14 +3251,6 @@ class AdminOrdersControllerCore extends AdminController
         		'error' => Tools::displayError('The OrderDetail object cannot be loaded.')
         	)));
 
-        $product = new Product($order_detail->product_id);
-        if (!Validate::isLoadedObject($product)) {
-            die(json_encode(array(
-                'result' => false,
-                'error' => Tools::displayError('The product object cannot be loaded.')
-            )));
-        }
-
         $address = new Address(Tools::getValue('id_address'));
         if (!Validate::isLoadedObject($address)) {
             die(json_encode(array(
@@ -3268,14 +3261,6 @@ class AdminOrdersControllerCore extends AdminController
 
         die(json_encode(array(
             'result' => true,
-            'product' => $product,
-            'tax_rate' => $product->getTaxesRate($address),
-            /*Original*/
-            'price_tax_incl' => Product::getPriceStatic($product->id, true, $order_detail->product_attribute_id, 2),
-            'price_tax_excl' => Product::getPriceStatic($product->id, false, $order_detail->product_attribute_id, 2),
-            /*Changed by webkul because attribute_id will always be 0 (No combination)*/
-            // 'price_tax_incl' => Product::getPriceStatic($product->id, true, 0, 2),
-            // 'price_tax_excl' => Product::getPriceStatic($product->id, false, 0, 2),
             'reduction_percent' => $order_detail->reduction_percent
         )));
     }
@@ -3335,12 +3320,10 @@ class AdminOrdersControllerCore extends AdminController
         $product_quantity = (int) $obj_booking_detail->getNumberOfDays($new_date_from, $new_date_to);
         $old_product_quantity =  (int) $obj_booking_detail->getNumberOfDays($old_date_from, $old_date_to);
         $qty_diff = $product_quantity - $old_product_quantity;
-        if ($order->with_occupancy) {
-            $occupancy = array_shift(Tools::getValue('occupancy'));
-            $adults = $occupancy['adults'];
-            $children = $occupancy['children'];
-            $child_ages = $occupancy['child_ages'];
-        }
+        $occupancy = array_shift(Tools::getValue('occupancy'));
+        $adults = $occupancy['adults'];
+        $children = $occupancy['children'];
+        $child_ages = $occupancy['child_ages'];
 
         /*By webkul to validate fields before deleting the cart and order data form the tables*/
         if ($id_hotel == '') {
@@ -3401,33 +3384,31 @@ class AdminOrdersControllerCore extends AdminController
         }
 
         // validations if order is with occupancy
-        if ($order->with_occupancy) {
-            if (!isset($adults) || !$adults || !Validate::isUnsignedInt($adults)) {
-                die(json_encode(array(
-                    'result' => false,
-                    'error' => Tools::displayError('Invalid number of adults.'),
-                )));
-            } elseif (!Validate::isUnsignedInt($children)) {
-                die(json_encode(array(
-                    'result' => false,
-                    'error' => Tools::displayError('Invalid number of children.'),
-                )));
-            }
+        if (!isset($adults) || !$adults || !Validate::isUnsignedInt($adults)) {
+            die(json_encode(array(
+                'result' => false,
+                'error' => Tools::displayError('Invalid number of adults.'),
+            )));
+        } elseif (!Validate::isUnsignedInt($children)) {
+            die(json_encode(array(
+                'result' => false,
+                'error' => Tools::displayError('Invalid number of children.'),
+            )));
+        }
 
-            if ($children > 0) {
-                if (!isset($child_ages) || ($children != count($child_ages))) {
-                    die(json_encode(array(
-                        'result' => false,
-                        'error' => Tools::displayError('Please provide all children age.'),
-                    )));
-                } else {
-                    foreach($child_ages as $childAge) {
-                        if (!Validate::isUnsignedInt($childAge)) {
-                            die(json_encode(array(
-                                'result' => false,
-                                'error' => Tools::displayError('Invalid children age.'),
-                            )));
-                        }
+        if ($children > 0) {
+            if (!isset($child_ages) || ($children != count($child_ages))) {
+                die(json_encode(array(
+                    'result' => false,
+                    'error' => Tools::displayError('Please provide all children age.'),
+                )));
+            } else {
+                foreach($child_ages as $childAge) {
+                    if (!Validate::isUnsignedInt($childAge)) {
+                        die(json_encode(array(
+                            'result' => false,
+                            'error' => Tools::displayError('Invalid children age.'),
+                        )));
                     }
                 }
             }
@@ -3464,26 +3445,46 @@ class AdminOrdersControllerCore extends AdminController
                 $params['id_room'] = $roomInfo['id_room'];
 
                 if ($roomInfo['id_room'] == $id_room && (strtotime($roomInfo['date_from']) == strtotime($old_date_from))) {
-                    $params = array_merge($params, array('date_from' => $new_date_from, 'date_to' => $new_date_to));
-                    $this->createFeaturePrice($params);
+                    // Check if room type is still not deleted
+                    if (Validate::isLoadedObject($objProduct = new Product($roomInfo['id_product']))) {
+                        // If room type is NOT DELETED then use current room type price calculation
+                        $params = array_merge($params, array('date_from' => $new_date_from, 'date_to' => $new_date_to));
+                        $this->createFeaturePrice($params);
 
-                    $roomTotalPrice = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice(
-                        $roomInfo['id_product'],
-                        $new_date_from,
-                        $new_date_to,
-                        0,
-                        Group::getCurrent()->id,
-                        $cart->id,
-                        $cart->id_guest,
-                        $roomInfo['id_room'],
-                        0
-                    );
+                        $roomTotalPrice = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice(
+                            $roomInfo['id_product'],
+                            $new_date_from,
+                            $new_date_to,
+                            0,
+                            Group::getCurrent()->id,
+                            $cart->id,
+                            $cart->id_guest,
+                            $roomInfo['id_room'],
+                            0
+                        );
 
-                    $totalProductPriceAfterTE += (float) $roomTotalPrice['total_price_tax_excl'];
-                    $totalProductPriceAfterTI += (float) $roomTotalPrice['total_price_tax_incl'];
+                        $totalProductPriceAfterTE += (float) $roomTotalPrice['total_price_tax_excl'];
+                        $totalProductPriceAfterTI += (float) $roomTotalPrice['total_price_tax_incl'];
 
-                    $totalRoomPriceAfterTE += (float) $roomTotalPrice['total_price_tax_excl'];
-                    $totalRoomPriceAfterTI += (float) $roomTotalPrice['total_price_tax_incl'];
+                        $totalRoomPriceAfterTE += (float) $roomTotalPrice['total_price_tax_excl'];
+                        $totalRoomPriceAfterTI += (float) $roomTotalPrice['total_price_tax_incl'];
+                    } else {
+                        // If room type is DELETED use order details information for price calculation
+                        $taxCalculator = $order_detail->getTaxCalculator();
+                        // room price with tax
+                        $roomPriceTI = $taxCalculator->addTaxes($room_unit_price);
+
+                        $totalRoomPriceTE = Tools::ps_round(($room_unit_price * $product_quantity), _PS_PRICE_COMPUTE_PRECISION_);
+                        $totalRoomPriceTI = Tools::ps_round(($roomPriceTI * $product_quantity), _PS_PRICE_COMPUTE_PRECISION_);
+
+                        // room price changes
+                        $totalRoomPriceAfterTE += (float) $totalRoomPriceTE;
+                        $totalRoomPriceAfterTI += (float) $totalRoomPriceTI;
+
+                        // Total product price changes
+                        $totalProductPriceAfterTE += (float) $totalRoomPriceTE;
+                        $totalProductPriceAfterTI += (float) $totalRoomPriceTI;
+                    }
                 } else {
                     $totalProductPriceAfterTE += (float) $roomInfo['total_price_tax_excl'];
                     $totalProductPriceAfterTI += (float) $roomInfo['total_price_tax_incl'];

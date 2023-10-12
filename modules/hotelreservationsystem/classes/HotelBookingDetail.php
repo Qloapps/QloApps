@@ -2030,13 +2030,16 @@ class HotelBookingDetail extends ObjectModel
             $objHtlBranchInfo = new HotelBranchInformation();
 
             foreach ($order_detail_data as $key => $value) {
-                $product_image_id = Product::getCover($value['id_product']);
-                $link_rewrite = ((new Product((int) $value['id_product'], Configuration::get('PS_LANG_DEFAULT')))->link_rewrite[Configuration::get('PS_LANG_DEFAULT')]);
-
-                if ($product_image_id) {
-                    $order_detail_data[$key]['image_link'] = $context->link->getImageLink($link_rewrite, $product_image_id['id_image'], 'small_default');
+                // Check if product is still available
+                if (Validate::isLoadedObject($objProduct = new Product((int) $value['id_product'], Configuration::get('PS_LANG_DEFAULT')))
+                    && $productCoverImg = Product::getCover($value['id_product'])
+                ) {
+                    $order_detail_data[$key]['image_link'] = $context->link->getImageLink(
+                        $objProduct->link_rewrite[Configuration::get('PS_LANG_DEFAULT')],
+                        $productCoverImg['id_image'], 'small_default'
+                    );
                 } else {
-                    $order_detail_data[$key]['image_link'] = $context->link->getImageLink($link_rewrite, $context->language->iso_code.'-default', 'small_default');
+                    $order_detail_data[$key]['image_link'] = $context->link->getImageLink('', $context->language->iso_code.'-default', 'small_default');
                 }
 
                 $objOrderDetail = new OrderDetail($value['id_order_detail']);
