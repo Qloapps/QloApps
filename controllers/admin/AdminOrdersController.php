@@ -205,8 +205,8 @@ class AdminOrdersControllerCore extends AdminController
                 'title' => $this->l('Payment')
             ),
             'currency' => array(
-                'title' => $this->l('Payment Currency'),
-                'hint' => $this->l('This is the currency in which customer made the payment'),
+                'title' => $this->l('Order Currency'),
+                'hint' => $this->l('This is the currency in which customer created the order.'),
                 'havingFilter' => true,
             ),
             'osname' => array(

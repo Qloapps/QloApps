@@ -62,7 +62,7 @@ class AdminOrderPreferencesControllerCore extends AdminController
         $displayCurrencyOptions = array(
             array(
                 'value' => Order::ORDER_LIST_PRICE_DISPLAY_IN_PAYMENT_CURRENCY,
-                'name' => $this->l('Payment currency')
+                'name' => $this->l('Order currency')
             ),
             array(
                 'value' => Order::ORDER_LIST_PRICE_DISPLAY_IN_DEFAULT_CURRENCY,
@@ -174,6 +174,7 @@ class AdminOrderPreferencesControllerCore extends AdminController
                     'PS_ORDER_LIST_PRICE_DISPLAY_CURRENCY' => array(
                         'title' => $this->l('Display order list prices in'),
                         'hint' => $this->l('Choose the currency in which you want the prices in the order list to be displayed.'),
+                        'desc' => $this->l('\'Order currency\' is the currency in which customer created the order and \'Default currency\' is the currency configured in localization.'),
                         'validation' => 'isInt',
                         'type' => 'select',
                         'cast' => 'intval',
