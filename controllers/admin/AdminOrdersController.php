@@ -264,10 +264,14 @@ class AdminOrdersControllerCore extends AdminController
         parent::__construct();
     }
 
-    public static function setOrderCurrency($echo, $tr)
+    public static function setOrderCurrency($echo, $row)
     {
-        $order = new Order($tr['id_order']);
-        return Tools::displayPrice($echo, (int)$order->id_currency);
+        if (Configuration::get('PS_ORDER_LIST_PRICE_DISPLAY_CURRENCY') == Order::ORDER_LIST_PRICE_DISPLAY_IN_DEFAULT_CURRENCY) {
+            $idCurrency = Configuration::get('PS_CURRENCY_DEFAULT');
+        } else {
+            $idCurrency = $row['id_currency'];
+        }
+        return Tools::displayPrice($echo, (int)$idCurrency);
     }
 
     public function renderForm()

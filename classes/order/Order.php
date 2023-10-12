@@ -1840,7 +1840,9 @@ class OrderCore extends ObjectModel
         }
 
         // Whenever payment is adding in any order then set a cumulative conversion rate for the payment currency in the order
-        $this->conversion_rate = $order_payment->getCumulativeConversionRate($this->reference, $this->id_currency);
+        if ($avgConversionRate = $order_payment->getAverageConversionRate($this->reference, $this->id_currency)) {
+            $this->conversion_rate = $avgConversionRate;
+        }
         $this->save();
 
         return $res;
