@@ -1219,6 +1219,26 @@ function sendBulkAction(form, action)
 	$(form).submit();
 }
 
+function checkIfEmployeeIsLoggedIn() {
+	return new Promise(function (resolve) {
+		$.ajax({
+			url : window.location.pathname,
+			type: 'POST',
+			dataType: 'JSON',
+			data : {
+				ajax : '1',
+				controller : 'AdminLogin',
+				action : 'checkLoginStatus',
+			},
+			success : function(response) {
+				if (response.status) {
+					resolve(response.is_logged_in);
+				}
+			}
+		});
+	});
+}
+
 function openModulesList()
 {
 	if (!modules_list_loaded)
