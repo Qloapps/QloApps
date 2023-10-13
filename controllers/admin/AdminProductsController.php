@@ -144,9 +144,6 @@ class AdminProductsControllerCore extends AdminController
             }
         }
 
-        if (Tools::getValue('reset_filter_category')) {
-            $this->context->cookie->id_category_products_filter = false;
-        }
         if (Shop::isFeatureActive() && $this->context->cookie->id_category_products_filter) {
             $category = new Category((int)$this->context->cookie->id_category_products_filter);
             if (!$category->inShop()) {
@@ -154,22 +151,24 @@ class AdminProductsControllerCore extends AdminController
                 Tools::redirectAdmin($this->context->link->getAdminLink('AdminProducts'));
             }
         }
-        /* Join categories table */
-        if ($id_category = (int)Tools::getValue('productFilter_cl!name')) {
-            $this->_category = new Category((int)$id_category);
-            $_POST['productFilter_cl!name'] = $this->_category->name[$this->context->language->id];
+
+        if ($id_category = (int)Tools::getValue('id_category')) {
+            $_POST['submitFilter'] = '1';
+            $_POST['productFilter_a!id_category_default'] = $id_category;
+        }
+
+        if (($id_category = (int)Tools::getValue('id_category'))
+            || ($id_category = (int) Tools::getValue('productFilter_a!id_category_default'))
+        ) {
+            $this->id_current_category = $id_category;
+            $this->context->cookie->id_category_products_filter = $id_category;
+        } elseif ($id_category = $this->context->cookie->id_category_products_filter) {
+            $this->id_current_category = $id_category;
+        }
+        if ($this->id_current_category) {
+            $this->_category = new Category((int)$this->id_current_category);
         } else {
-            if ($id_category = (int)Tools::getValue('id_category')) {
-                $this->id_current_category = $id_category;
-                $this->context->cookie->id_category_products_filter = $id_category;
-            } elseif ($id_category = $this->context->cookie->id_category_products_filter) {
-                $this->id_current_category = $id_category;
-            }
-            if ($this->id_current_category) {
-                $this->_category = new Category((int)$this->id_current_category);
-            } else {
-                $this->_category = new Category();
-            }
+            $this->_category = new Category();
         }
 
         $join_category = false;
@@ -216,7 +215,6 @@ class AdminProductsControllerCore extends AdminController
 
         $this->_use_found_rows = false;
         $this->_group = ' GROUP BY a.`id_product`';
-        $this->_orderBy = 'a.id_product';
 
         $this->fields_list = array();
         $this->fields_list['id_product'] = array(
@@ -369,13 +367,44 @@ class AdminProductsControllerCore extends AdminController
             'displayed' => false,
         );
 
-        if ($join_category && (int)$this->id_current_category) {
+        $locationsAndHotels = array();
+        $objLocationsCategory = new Category(Configuration::get('PS_LOCATIONS_CATEGORY'), $this->context->language->id);
+        foreach ($objLocationsCategory->getAllChildren() as $objCategory) {
+            $space = str_repeat('&nbsp;', 5 * ($objCategory->level_depth - ($objLocationsCategory->level_depth + 1)));
+            $locationsAndHotels[$objCategory->id_category] = $space.$objCategory->name;
+        }
+        $this->fields_list['id_category_default'] = array(
+            'title' => $this->l('Location/Hotel'),
+            'align' => 'text-center',
+            'type' => 'select',
+            'list' => $locationsAndHotels,
+            'filter_key' => 'a!id_category_default',
+            'displayed' => false,
+        );
+
+        // display Position column only if it is a hotel category
+        if ($join_category
+            && (int) $this->id_current_category
+            && HotelBranchInformation::getHotelIdByIdCategory($this->id_current_category)
+        ) {
             $this->fields_list['position'] = array(
                 'title' => $this->l('Position'),
                 'filter_key' => 'cp!position',
                 'align' => 'center',
                 'position' => 'position'
             );
+        }
+    }
+
+    private function recurseCategory($categories, $current, $id_category)
+    {
+        // echo '<option value="'.$id_category.'"'.(($id_selected == $id_category) ? ' selected="selected"' : '').'>'.
+        // str_repeat('&nbsp;', $current['infos']['level_depth'] * 5).stripslashes($current['infos']['name']).'</option>';
+
+        if (isset($categories[$id_category])) {
+            foreach (array_keys($categories[$id_category]) as $key) {
+                Category::recurseCategory($categories, $categories[$id_category][$key], $key, $id_selected);
+            }
         }
     }
 
@@ -435,6 +464,23 @@ class AdminProductsControllerCore extends AdminController
         } else {
             return '';
         }
+    }
+
+    protected function filterToField($key, $filter)
+    {
+        if ($key == 'a!id_category_default') {
+            return false;
+        }
+
+        return parent::filterToField($key, $filter);
+    }
+
+    public function processResetFilters($list_id = null)
+    {
+        parent::processResetFilters($list_id);
+
+        // reset category filter
+        $this->context->cookie->id_category_products_filter = false;
     }
 
     /**
@@ -712,6 +758,10 @@ class AdminProductsControllerCore extends AdminController
                     ' - '.$this->l('Duplicate');
                 }
             }
+
+            // update `id_category_default`
+            $objHotelBranchInformation = new HotelBranchInformation($id_hotel_new);
+            $product->id_category_default = $objHotelBranchInformation->id_category;
 
             // update lang fields
             foreach (Language::getLanguages(true) as $language) {
@@ -1928,6 +1978,9 @@ class AdminProductsControllerCore extends AdminController
                 }
 
                 if ($object->update()) {
+                    // update position in category
+                    $object->setPositionInCategory(Tools::getValue('category_position'));
+
                     // If the product doesn't exist in the current shop but exists in another shop
                     if (Shop::getContext() == Shop::CONTEXT_SHOP && !$existing_product->isAssociatedToShop($this->context->shop->id)) {
                         $out_of_stock = StockAvailable::outOfStock($existing_product->id, $existing_product->id_shop_default);
@@ -2210,6 +2263,21 @@ class AdminProductsControllerCore extends AdminController
                 }
             }
         }
+
+        // Category Position
+        if (Validate::isLoadedObject($this->object)) {
+            $categoryPositon = Tools::getValue('category_position');
+            if ($categoryPositon < 0) {
+                $this->errors[] = $this->l('Position can not be less than 0.');
+            }
+
+            if (isset($objHotel) && Validate::isLoadedObject($objHotel)) {
+                $maxPosition = Product::getHighestPositionInCategory($objHotel->id_category);
+                if ($categoryPositon > $maxPosition) {
+                    $this->errors[] = sprintf($this->l('Position can not be greater than %d.'), $maxPosition);
+                }
+            }
+        }
     }
 
     /**
@@ -2348,6 +2416,15 @@ class AdminProductsControllerCore extends AdminController
                     );
                 }
                 $this->tpl_form_vars['product_tabs'] = $product_tabs;
+            }
+        } else {
+            // If products from all categories are displayed, we don't want to use sorting by position
+            if (!(int) $this->id_current_category) {
+                $this->_defaultOrderBy = $this->identifier;
+                if ($this->context->cookie->{$this->table.'Orderby'} == 'position') {
+                    unset($this->context->cookie->{$this->table.'Orderby'});
+                    unset($this->context->cookie->{$this->table.'Orderway'});
+                }
             }
         }
 
@@ -4102,7 +4179,8 @@ class AdminProductsControllerCore extends AdminController
             'token' => $this->token,
             'currency' => $currency,
             'link' => $this->context->link,
-            'PS_PRODUCT_SHORT_DESC_LIMIT' => Configuration::get('PS_PRODUCT_SHORT_DESC_LIMIT') ? Configuration::get('PS_PRODUCT_SHORT_DESC_LIMIT') : 400
+            'PS_PRODUCT_SHORT_DESC_LIMIT' => Configuration::get('PS_PRODUCT_SHORT_DESC_LIMIT') ? Configuration::get('PS_PRODUCT_SHORT_DESC_LIMIT') : 400,
+            'category_position' => Tools::getValue('category_position', $product->getPositionInCategory()),
         ));
         $data->assign($this->tpl_form_vars);
 

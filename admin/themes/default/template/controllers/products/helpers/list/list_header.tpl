@@ -113,7 +113,7 @@
 											{/if}
 										{else if $params.type == 'select'}
 											<span data-filter_key="{if isset($params.filter_key)}{$params.filter_key}{else}{$key}{/if}" data-filter_type="{$params.type}">
-												{$params['title']|escape:'html':'UTF-8'}: <span class="filter_value">{$params['list'][$params['value']]|escape:'html':'UTF-8'}</span>
+												{$params['title']|escape:'html':'UTF-8'}: <span class="filter_value">{$params['list'][$params['value']]|replace: '&nbsp;' : ''}</span>
 												<i class="icon-times"></i>
 											</span>
 										{else if $params.type == 'select_multiple_and'}
@@ -251,7 +251,7 @@
 															</select>
 														{/if}
 													{elseif $params.type == 'select_multiple_and'}
-														<select id="filter_input_{$key}" class="filter{if isset($params.align) && $params.align == 'center'}center{/if} select_multiple_and chosen" multiple name="{$list_id}Filter_{$params.filter_key}[]" {if isset($params.width)} style="width:{$params.width}px"{/if}>
+														<select id="filter_input_{$key}" class="filter{if isset($params.align) && $params.align == 'center'}center{/if} select_multiple_and chosen chosen-options-horizontal" multiple name="{$list_id}Filter_{$params.filter_key}[]" {if isset($params.width)} style="width:{$params.width}px"{/if}>
 															{if isset($params.list) && is_array($params.list)}
 																{foreach $params.list AS $option_value => $option_display}
 																	<option value="{$option_value}" {if isset($params.value) && $params.value}{if in_array($option_value, $params.value)} selected="selected"{/if}{/if}>{$option_display}</option>
@@ -259,7 +259,7 @@
 															{/if}
 														</select>
 													{elseif $params.type == 'select_multiple_or'}
-														<select id="filter_input_{$key}" class="filter{if isset($params.align) && $params.align == 'center'}center{/if} select_multiple_or chosen" multiple name="{$list_id}Filter_{$params.filter_key}[]" {if isset($params.width)} style="width:{$params.width}px"{/if}>
+														<select id="filter_input_{$key}" class="filter{if isset($params.align) && $params.align == 'center'}center{/if} select_multiple_or chosen chosen-options-horizontal" multiple name="{$list_id}Filter_{$params.filter_key}[]" {if isset($params.width)} style="width:{$params.width}px"{/if}>
 															{if isset($params.list) && is_array($params.list)}
 																{foreach $params.list AS $option_value => $option_display}
 																	<option value="{$option_value}" {if isset($params.value) && $params.value}{if in_array($option_value, $params.value)} selected="selected"{/if}{/if}>{$option_display}</option>
@@ -373,7 +373,7 @@
 			.list_filters {
 				padding: 0 30px;
 				display: grid;
-				grid-template-columns: repeat(3, 1fr);
+				grid-template-columns: repeat(3, minmax(0, 1fr));
 				gap: 8px 40px;}
 				.list_filters > .row {
 					display: flex;

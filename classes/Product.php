@@ -5342,6 +5342,68 @@ class ProductCore extends ObjectModel
         return $tax_calculator->getTotalRate();
     }
 
+    public function getPositionInCategory()
+    {
+        return Db::getInstance()->getValue(
+            'SELECT position
+            FROM `'._DB_PREFIX_.'category_product`
+            WHERE id_category = '.(int) $this->id_category_default.'
+            AND id_product = '.(int) $this->id
+        );
+    }
+
+    public function setPositionInCategory($position)
+    {
+        if ($position < 0) {
+            die(Tools::displayError('You cannot set a negative position, the minimum for a position is 0.'));
+        }
+
+        $result = Db::getInstance()->executeS(
+            'SELECT `id_product`
+            FROM `'._DB_PREFIX_.'category_product`
+            WHERE `id_category` = '.(int) $this->id_category_default.'
+            ORDER BY `position`'
+        );
+
+        if (($position > 0) && ($position + 1 > count($result))) {
+            die(Tools::displayError('You cannot set a position greater than the total number of room types in the hotel, minus 1 (position numbering starts at 0).'));
+        }
+
+        foreach ($result as &$value) {
+            $value = $value['id_product'];
+        }
+
+        $currentPosition = $this->getPositionInCategory();
+
+        if ($currentPosition && isset($result[$currentPosition])) {
+            $save = $result[$currentPosition];
+            unset($result[$currentPosition]);
+            array_splice($result, (int)$position, 0, $save);
+        }
+
+        $return = true;
+        foreach ($result as $position => $id_product) {
+            $return &= Db::getInstance()->update(
+                'category_product',
+                array('position' => $position),
+                '(`id_category` = '.(int) $this->id_category_default.' AND `id_product` = '.(int) $id_product.')'
+            );
+        }
+
+        return $return;
+    }
+
+    public static function getHighestPositionInCategory($idCategory)
+    {
+        $position = Db::getInstance()->getValue(
+            'SELECT MAX(`position`)
+            FROM `'._DB_PREFIX_.'category_product`
+            WHERE `id_category` = '.(int) $idCategory
+        );
+
+        return (is_numeric($position)) ? $position : -1;
+    }
+
     /**
     * Webservice getter : get product features association
     * @return array
@@ -5590,14 +5652,7 @@ class ProductCore extends ObjectModel
     */
     public function getWsPositionInCategory()
     {
-        $result = Db::getInstance()->executeS('SELECT position
-			FROM `'._DB_PREFIX_.'category_product`
-			WHERE id_category = '.(int)$this->id_category_default.'
-			AND id_product = '.(int)$this->id);
-        if (count($result) > 0) {
-            return $result[0]['position'];
-        }
-        return '';
+        return $this->getPositionInCategory();
     }
 
     /**
