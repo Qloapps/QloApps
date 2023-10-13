@@ -23,7 +23,7 @@ class AdminModulesCatalogControllerCore extends AdminController
 
     public $modules;
 
-    const CATALOG_RECOMMENDATION_CONTENT = '/cache/catalog_recommendation.html';
+    const RECOMMENDATION_CONTENT = '/cache/catalog_recommendation.html';
 
     const ELEMENT_TYPE_MODULE = 1;
     const ELEMENT_TYPE_THEME = 2;
@@ -238,17 +238,6 @@ class AdminModulesCatalogControllerCore extends AdminController
             'imgclass' => 'modules-list',
             'target' => true
         );
-    }
-
-    public function getRecommendationContent()
-    {
-        if (!Tools::isFresh(self::CATALOG_RECOMMENDATION_CONTENT, _TIME_1_DAY_, false)) {
-            @file_put_contents(_PS_ROOT_DIR_.self::CATALOG_RECOMMENDATION_CONTENT, Tools::addonsRequest('catalog-recommendation'));
-        }
-        if (file_exists(_PS_ROOT_DIR_.self::CATALOG_RECOMMENDATION_CONTENT)) {
-            return Tools::file_get_contents(_PS_ROOT_DIR_.self::CATALOG_RECOMMENDATION_CONTENT);
-        }
-        return false;
     }
 
     public function sortList(&$list, $type)

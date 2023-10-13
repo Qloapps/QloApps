@@ -3402,14 +3402,9 @@ exit;
                 $post_data .= '&method=listing&action=install-modules';
                 $post_data .= defined('_PS_HOST_MODE_') ? '-od' : '';
                 break;
-            case 'catalog-recommendation':
-                $protocols[] = 'http';
-                $post_data .= '&method=content&action=catalogRecommendation';
-                $post_data .= defined('_PS_HOST_MODE_') ? '-od' : '';
-                break;
-            case 'dashboard-recommendation':
-                $protocols[] = 'http';
-                $post_data .= '&method=content&action=dashboardRecommendation';
+            case 'recommendation':
+                $post_data .= '&method=recommendation&controller=';
+                $post_data .= (isset($params['controller']) ? $params['controller'] : Context::getContext()->controller->controller_name);
                 $post_data .= defined('_PS_HOST_MODE_') ? '-od' : '';
                 break;
             case 'check-version':
