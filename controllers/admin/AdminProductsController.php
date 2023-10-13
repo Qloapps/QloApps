@@ -396,18 +396,6 @@ class AdminProductsControllerCore extends AdminController
         }
     }
 
-    private function recurseCategory($categories, $current, $id_category)
-    {
-        // echo '<option value="'.$id_category.'"'.(($id_selected == $id_category) ? ' selected="selected"' : '').'>'.
-        // str_repeat('&nbsp;', $current['infos']['level_depth'] * 5).stripslashes($current['infos']['name']).'</option>';
-
-        if (isset($categories[$id_category])) {
-            foreach (array_keys($categories[$id_category]) as $key) {
-                Category::recurseCategory($categories, $categories[$id_category][$key], $key, $id_selected);
-            }
-        }
-    }
-
     public function getHotelName($hotelName, $row)
     {
         if ($hotelName && isset($row['city'])) {
