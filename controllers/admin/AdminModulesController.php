@@ -59,6 +59,8 @@ class AdminModulesControllerCore extends AdminController
     protected $iso_default_country;
     protected $filter_configuration = array();
 
+    protected $uploaded_module_name = '';
+
     /**
      * Admin Modules Controller Constructor
      * Init list modules categories
@@ -443,6 +445,8 @@ class AdminModulesControllerCore extends AdminController
 
         @unlink($file);
         $this->recursiveDeleteOnDisk($tmp_folder);
+
+        $this->uploaded_module_name = $folder;
 
         if ($success && $redirect) {
             Tools::redirectAdmin(self::$currentIndex.'&conf=8&anchor='.ucfirst($folder).'&token='.$this->token);
@@ -1679,9 +1683,9 @@ class AdminModulesControllerCore extends AdminController
         $response = array('success' => false);
         $this->postProcessDownload(false);
         if (!count($this->errors)) {
-            $filename = $_FILES['file']['name'];
-            $filename = explode('.', $filename);
-            if ($module = Module::getInstanceByName($filename[0])) {
+            if ($this->uploaded_module_name
+                && $module = Module::getInstanceByName($this->uploaded_module_name)
+            ) {
                 $response['success'] = true;
                 if (Module::isInstalled($module->name)) {
                     $response['msg'] = $this->l('module already installed, update if available');
