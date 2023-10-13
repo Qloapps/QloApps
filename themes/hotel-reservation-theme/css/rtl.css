@@ -7,4 +7,316 @@
 #page {
   text-align: right !important; }
 
+/* globals - start */
+.owl-stage-outer {
+  direction: rtl !important;
+}
+
+.nav-tabs > li {
+  float: right !important;
+}
+
+.fancybox-close {
+  right: unset;
+  left: -18px;
+}
+
+.radio-inline .checker,
+.checkbox .checker {
+  float: right;
+  margin-left: 5px;
+}
+
+ul.footer_links li {
+  float: right;
+}
+
+ul.footer_links li + li {
+  margin-left: unset;
+  margin-right: 10px;
+}
+
+.icon-chevron-left:before {
+  content: "";
+}
+
+ul.footer_links li .button.button-small span i {
+  margin-right: unset;
+  margin-left: 5px;
+}
+
+.button.button-medium span {
+  padding: 10px 14px 10px 10px;
+}
+
+.button.button-medium span i.right {
+  margin-left: 0;
+  margin-right: 9px;
+}
+
+.button.button-small span i.right {
+  margin-left: 0;
+  margin-right: 5px;
+}
+
+.icon-chevron-left:before {
+  content: "";
+}
+
+.icon-chevron-right:before {
+  content: "";
+}
+
+@media (min-width: 1200px) {
+  #address .form-group.phone-number,
+  #identity .form-group.phone-number,
+  #account-creation_form .form-group.phone-number,
+  #new_account_form .form-group.phone-number,
+  #opc_account_form .form-group.phone-number,
+  #authentication .form-group.phone-number {
+    float: right;
+    margin-right: unset;
+    margin-left: 13px;
+  }
+}
+
+.booking-actions-wrap .btn.pull-right {
+  float: left !important;
+  margin-left: unset;
+  margin-right: 10px;
+}
+
+#search_occupancy_wrapper .occupancy_info_block .row > [class*=col] {
+  float: right !important;
+}
+
+#search_occupancy_wrapper .pull-left {
+  float: right !important;
+}
+
+#search_occupancy_wrapper .pull-right {
+  float: left !important;
+}
+
+#search_occupancy_wrapper .occupancy_info_block .qty_direction {
+  margin-left: unset;
+  margin-right: 3px;
+}
+
+#header .cart_block {
+  right: unset;
+  left: 0;
+}
+
+.cart_block .cart-images {
+  float: right !important;
+}
+
+.cart_block .cart_block_list .remove_link {
+  right: unset;
+  left: 10px;
+}
+
+.cart_block_list table th,
+.cart_block_list table td {
+  text-align: right !important;
+}
+
+.cart_block .cart_block_shipping_cost,
+.cart_block .cart_block_tax_cost,
+.cart_block .cart_block_total,
+.cart_block .cart_block_wrapping_cost,
+.cart_block .cart_block_convenience_fee {
+  float: left !important;
+}
+
+/* filters */
+#filter_results .lf_headingmain_wrapper.pull-left {
+  float: right !important;
+}
+
+#filter_results hr.theme-text-underline {
+  float: right !important;
+}
+
+#filter_results .clear_filter.pull-right {
+  float: left !important;
+}
+
+/* globals - end */
+
+
+#nav-main #currencies-block-top.pull-right,
+#nav-main #languages-block-top.pull-right {
+  float: left !important;
+}
+
+#nav-main .nav-main-item-right:not(:last-of-type) {
+  margin-left: 0;
+  margin-right: 24px;
+}
+
+#nav-main .contact-item:first-of-type {
+  margin-right: 0;
+}
+
+/* room search block - start */
+#search_hotel_block_form .header-rmsearch-input.input-location {
+  padding-right: 35px;
+  padding-left: 0;
+  background-position-x: 95%;
+}
+
+#search_hotel_block_form .header-rmsearch-input.input-hotel {
+  padding-right: 35px;
+  padding-left: 0;
+  background-position-x: calc(100% - 10px), 10px !important;
+}
+
+#search_hotel_block_form .header-rmsearch-input.input-hotel .pull-left {
+  float: right !important;
+}
+
+.header-rmsearch-wrapper .location_search_results_ul li,
+.header-rmsearch-wrapper .hotel_dropdown_ul li {
+  text-align: right;
+}
+
+#search_hotel_block_form .header-rmsearch-input.input-date {
+  padding-right: 35px;
+  padding-left: 0;
+  background-position-x: calc(100% - 10px), 10px !important;
+}
+
+#search_hotel_block_form .header-rmsearch-input.input-occupancy {
+  padding-right: 35px;
+  padding-left: 0;
+  background-position-x: calc(100% - 10px), 10px !important;
+}
+
+#search_hotel_block_form .header-rmsearch-input.input-occupancy .pull-left {
+  float: right !important;
+}
+/* room search block - end */
+
+/* sidebar - start */
+#menu_cont.menu_cont_right {
+  left: 0;
+  right: unset;
+  transform: translate(-295px);
+}
+#menu_cont.menu_cont_left {
+  left: 0;
+  right: unset;
+}
+#menu_cont .close_navbar.pull-right {
+  float: left !important;
+}
+/* sidebar - end */
+
+/* search-results-page - start */
+.cat_cont .room_cont .row [class*=col] {
+  float: right !important;
+}
+
+.cat_cont .room_cont .rm_left  {
+  text-align: left !important;
+}
+
+.cat_cont .room_cont .capa_txt  {
+  padding-left: unset;
+  padding-right: 15px;
+}
+
+.cat_cont .room_cont .rm_price_cont  {
+  text-align: left !important;
+}
+/* search-results-page - end */
+
+
+/* room-type-detail page - start */
+#booking-form #room_date_range,
+#booking-form .input-occupancy {
+  padding-right: 35px;
+  padding-left: 20px;
+  text-align: right;
+  background-position-x: calc(100% - 8px), 8px;
+}
+
+.booking_occupancy_wrapper .row [class*=col] {
+  float: right !important;
+}
+
+.booking_occupancy_wrapper .qty_direction {
+  margin-left: unset;
+  margin-right: 3px;
+}
+
+.booking_occupancy_wrapper .pull-left {
+  float: right !important;
+}
+
+.booking_occupancy_wrapper .pull-right {
+  float: left !important;
+}
+
+#booking-form #booking_action_block [class*="col-"] {
+  float: right;
+}
+
+#service_products_cont .service-product-element > [class*=col] {
+  float: right !important;
+}
+/* room-type-detail page - end */
+
+/* abc - start */
+#layer_cart [class*=layer_cart][class*=col] {
+  float: right !important;
+}
+/* abc - end */
+
+/* my account - start */
+#my-account .addresses-lists > [class*=col] {
+  float: right !important;
+}
+
+#my-account ul.myaccount-link-list li a i {
+  left: unset;
+  right: 0;
+}
+
+#my-account ul.myaccount-link-list li a span {
+  margin-left: unset;
+  margin-right: 52px;
+  border-color: #fff #c8c8c8 #fff #fff;
+}
+
+#identity #center_column form.std .row .col-xs-4,
+#authentication #center_column form.std .row .col-xs-4 {
+  float: right !important;
+}
+/* my account - end */
+
+/* footer - start */
+.footer-section-heading hr {
+  float: right !important;
+}
+
+.footer-payment-block img {
+  margin-right: unset;
+  margin-left: 15px;
+}
+
+.footer-container #footer #social_block ul {
+  float: right !important;
+}
+
+.footer-container #footer #social_block ul li {
+  margin-right: unset;
+  margin-left: 15px;
+}
+/* footer - end */
+
+
+
 /*# sourceMappingURL=rtl.css.map */
