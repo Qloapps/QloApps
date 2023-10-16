@@ -117,6 +117,7 @@ class OrderOpcControllerCore extends ParentOrderController
 
                             $_POST['lastname'] = $_POST['customer_lastname'];
                             $_POST['firstname'] = $_POST['customer_firstname'];
+                            $this->errors = array_merge($this->errors, $this->context->customer->validateController());
                             $this->context->customer->newsletter = (int)Tools::isSubmit('newsletter');
                             $this->context->customer->optin = (int)Tools::isSubmit('optin');
                             $this->context->customer->is_guest = (Tools::isSubmit('is_new_customer') ? !Tools::getValue('is_new_customer', 1) : 0);
@@ -125,6 +126,10 @@ class OrderOpcControllerCore extends ParentOrderController
                                 $objAddress = new Address($idAddressDelivery);
                                 if (Validate::isLoadedObject($objAddress)) {
                                     $phoneMobile = Tools::getValue('phone_mobile');
+
+                                    if (Configuration::get('PS_ONE_PHONE_AT_LEAST') && !$phoneMobile) {
+                                        $this->errors[] = Tools::displayError('Mobile phone number is a required field.', false);
+                                    }
 
                                     if (!Validate::isPhoneNumber($phoneMobile)) {
                                         $this->errors[] = Tools::displayError('Please enter a valid Mobile phone number.', false);
@@ -139,7 +144,6 @@ class OrderOpcControllerCore extends ParentOrderController
                                 }
                             }
 
-                            $this->errors = array_merge($this->errors, $this->context->customer->validateController());
                             $return = array(
                                 'hasError' => !empty($this->errors),
                                 'errors' => $this->errors,
