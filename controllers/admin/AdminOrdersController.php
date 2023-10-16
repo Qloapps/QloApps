@@ -286,7 +286,12 @@ class AdminOrdersControllerCore extends AdminController
             $cart_order_exists = $cart->orderExists();
             if (!$cart_order_exists) {
                 $this->context->cart = $cart;
-                if (!Configuration::get('BACKDATE_ORDER_EMPLOYEES')) {
+                if ($this->context->employee->isSuperAdmin()) {
+                    $backOrderConfigKey = 'PS_BACKDATE_ORDER_SUPERADMIN';
+                } else {
+                    $backOrderConfigKey = 'PS_BACKDATE_ORDER_EMPLOYEES';
+                }
+                if (!Configuration::get($backOrderConfigKey)) {
                     $objHotelCartBookingData = new HotelCartBookingData();
                     $objHotelCartBookingData->removeBackdateRoomsFromCart($this->context->cart->id);
                 }

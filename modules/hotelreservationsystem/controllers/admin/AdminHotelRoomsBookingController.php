@@ -63,8 +63,12 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
         $objCustomer->id_guest = (int) $this->context->cookie->id_guest;
 
         $this->context->customer = $objCustomer;
-
-        if (!Configuration::get('BACKDATE_ORDER_EMPLOYEES')) {
+        if ($this->context->employee->isSuperAdmin()) {
+            $backOrderConfigKey = 'PS_BACKDATE_ORDER_SUPERADMIN';
+        } else {
+            $backOrderConfigKey = 'PS_BACKDATE_ORDER_EMPLOYEES';
+        }
+        if (!Configuration::get($backOrderConfigKey)) {
             $htlCart = new HotelCartBookingData();
             $htlCart->removeBackdateRoomsFromCart($this->context->cart->id);
         }
@@ -97,7 +101,12 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
         } else {
             $date_from = date('Y-m-d');
         }
-        if (!Configuration::get('BACKDATE_ORDER_EMPLOYEES')) {
+        if ($this->context->employee->isSuperAdmin()) {
+            $backOrderConfigKey = 'PS_BACKDATE_ORDER_SUPERADMIN';
+        } else {
+            $backOrderConfigKey = 'PS_BACKDATE_ORDER_EMPLOYEES';
+        }
+        if (!Configuration::get($backOrderConfigKey)) {
             if (strtotime(date('Y-m-d')) > strtotime($date_from)) {
                 $date_from = date('Y-m-d');
             }
@@ -811,6 +820,13 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
         if (Configuration::get('PS_BACKOFFICE_ROOM_BOOKING_TYPE') == HotelBookingDetail::PS_ROOM_UNIT_SELECTION_TYPE_OCCUPANCY) {
             $occupancyRequiredForBooking = true;
         }
+        if ($this->context->employee->isSuperAdmin()) {
+            $backOrderConfigKey = 'PS_BACKDATE_ORDER_SUPERADMIN';
+        } else {
+            $backOrderConfigKey = 'PS_BACKDATE_ORDER_EMPLOYEES';
+        }
+        $PS_BACKDATE_ORDER_ALLOW = (int)Configuration::get($backOrderConfigKey);
+
         $jsVars = array(
             'currency_prefix' => $currency->prefix,
             'currency_suffix' => $currency->suffix,
@@ -852,7 +868,7 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
             'years_txt' => $this->l('years', null, true),
             'all_children_txt' => $this->l('All Children', null, true),
             'invalid_occupancy_txt' => $this->l('Invalid occupancy(adults/children) found.', null, true),
-            'BACKDATE_ORDER_EMPLOYEES' => Configuration::get('BACKDATE_ORDER_EMPLOYEES'),
+            'PS_BACKDATE_ORDER_ALLOW' => $PS_BACKDATE_ORDER_ALLOW,
             // 'check_calender_var' => $check_calender_var,
         );
         if (Configuration::get('PS_BACKOFFICE_SEARCH_TYPE') == HotelBookingDetail::SEARCH_TYPE_OWS ) {

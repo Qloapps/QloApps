@@ -220,7 +220,7 @@ $(document).ready(function() {
         dateFormat: 'dd-mm-yy',
         altFormat: 'yy-mm-dd',
         altField: '#date_from',
-        minDate: BACKDATE_ORDER_EMPLOYEES == 1 ? null : 0,
+        minDate: PS_BACKDATE_ORDER_ALLOW == 1 ? null : 0,
         beforeShowDay: function (date) {
             return highlightDateBorder($("#from_date").val(), date);
         },
@@ -237,7 +237,7 @@ $(document).ready(function() {
         dateFormat: 'dd-mm-yy',
         altFormat: 'yy-mm-dd',
         altField: '#date_to',
-        minDate: BACKDATE_ORDER_EMPLOYEES == 1 ? null : 1,
+        minDate: PS_BACKDATE_ORDER_ALLOW == 1 ? null : 1,
         beforeShowDay: function (date) {
             return highlightDateBorder($("#to_date").val(), date);
         },
