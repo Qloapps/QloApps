@@ -6534,7 +6534,7 @@ table.table_block td {
     transform: scale(0.8, 0.6);}
 
 .input-hotel, .form-control .input-hotel, .input-location, .form-control .input-location {
-  background: url("../img/icon/icon-hotel.svg") no-repeat 10px 50%;
+  background: url("../img/icon/icon-location.svg") no-repeat 10px 50%;
   padding-left: 35px;
   background-color: #FFF;
 }
