@@ -561,23 +561,33 @@ class AdminOrdersControllerCore extends AdminController
         // by webkul for reallocation of rooms
         if (Tools::isSubmit('realloc_allocated_rooms')) {
             if ($this->tabAccess['edit'] === '1') {
-                $idOrder = Tools::getValue('id_order');
-                $idHtlBookingFrom = Tools::getValue('id_htl_booking');
-                $idRoomToReallocate = Tools::getValue('realloc_avail_rooms');
+                $order_id = Tools::getValue('id_order');
+                $current_room_id = Tools::getValue('modal_id_room');
+                $current_room = Tools::getValue('modal_curr_room_num');
+                $date_from = Tools::getValue('modal_date_from');
+                $date_to = Tools::getValue('modal_date_to');
+                $realloc_room_id = Tools::getValue('realloc_avail_rooms');
 
-                if ($idRoomToReallocate == 0) {
+                if ($realloc_room_id == 0) {
                     $this->errors[] = Tools::displayError('Please select a room to swap with this room.');
                 }
-                if ($idHtlBookingFrom == 0) {
-                    $this->errors[] = Tools::displayError('Current room information is missing.');
+                if ($current_room_id == 0) {
+                    $this->errors[] = Tools::displayError('Cuurent room is missing.');
+                }
+                if ($date_from == 0) {
+                    $this->errors[] = Tools::displayError('Check In date is missing.');
+                }
+                if ($date_to == 0) {
+                    $this->errors[] = Tools::displayError('Check Out date is missing.');
                 }
 
                 if (!count($this->errors)) {
                     $objBookingDetail = new HotelBookingDetail();
-                    if ($objBookingDetail->reallocateBooking($idHtlBookingFrom, $idRoomToReallocate)) {
-                        Tools::redirectAdmin(self::$currentIndex.'&id_order='.(int) $idOrder.'&vieworder&conf=4&token='.$this->token);
-                    } else {
+                    $room_swapped = $objBookingDetail->reallocateRoomWithAvailableSameRoomType($current_room_id, $date_from, $date_to, $realloc_room_id);
+                    if (!$room_swapped) {
                         $this->errors[] = Tools::displayError('Some error occured. Please try again.');
+                    } else {
+                        Tools::redirectAdmin(self::$currentIndex.'&id_order='.(int) $order_id.'&vieworder&token='.$this->token);
                     }
                 }
             } else {
@@ -586,23 +596,33 @@ class AdminOrdersControllerCore extends AdminController
         }
         if (Tools::isSubmit('swap_allocated_rooms')) {
             if ($this->tabAccess['edit'] === '1') {
-                $idOrder = Tools::getValue('id_order');
-                $idHtlBookingFrom = Tools::getValue('id_htl_booking');
-                $idHtlBookingToSwap = Tools::getValue('swap_avail_rooms');
+                $order_id = Tools::getValue('id_order');
+                $current_room_id = Tools::getValue('modal_id_room');
+                $current_room = Tools::getValue('modal_curr_room_num');
+                $date_from = Tools::getValue('modal_date_from');
+                $date_to = Tools::getValue('modal_date_to');
+                $swapped_room_id = Tools::getValue('swap_avail_rooms');
 
-                if (!$idHtlBookingToSwap) {
-                    $this->errors[] = Tools::displayError('Please select a room to swap with this room booking.');
+                if ($swapped_room_id == 0) {
+                    $this->errors[] = Tools::displayError('Please select a room to swap with this room.');
                 }
-                if (!$idHtlBookingFrom) {
-                    $this->errors[] = Tools::displayError('Current room information is missing.');
+                if ($current_room_id == 0) {
+                    $this->errors[] = Tools::displayError('Cuurent room is missing.');
+                }
+                if ($date_from == 0) {
+                    $this->errors[] = Tools::displayError('Check In date is missing.');
+                }
+                if ($date_to == 0) {
+                    $this->errors[] = Tools::displayError('Check Out date is missing.');
                 }
 
                 if (!count($this->errors)) {
                     $objBookingDetail = new HotelBookingDetail();
-                    if ($objBookingDetail->swapBooking($idHtlBookingFrom, $idHtlBookingToSwap)) {
-                        Tools::redirectAdmin(self::$currentIndex.'&id_order='.(int)$idOrder.'&vieworder&conf=4&token='.$this->token);
-                    } else {
+                    $room_swapped = $objBookingDetail->swapRoomWithAvailableSameRoomType($current_room_id, $date_from, $date_to, $swapped_room_id);
+                    if (!$room_swapped) {
                         $this->errors[] = Tools::displayError('Some error occured. Please try again.');
+                    } else {
+                        Tools::redirectAdmin(self::$currentIndex.'&id_order='.(int) $order_id.'&vieworder&token='.$this->token);
                     }
                 }
             } else {

@@ -1688,97 +1688,74 @@ class HotelBookingDetail extends ObjectModel
         */
     public function getAvailableRoomsForSwapping($date_from, $date_to, $id_room_type, $hotel_id, $id_room)
     {
-        $sql = 'SELECT `id` as `id_hotel_booking`, `id_room`, `id_product`, `id_hotel`, `room_num`, `comment` AS `room_comment`
-            FROM `'._DB_PREFIX_.'htl_booking_detail`
-            WHERE `id_hotel` = '.(int)$hotel_id.' AND `id_product` = '.(int)$id_room_type.'
-            AND `date_from` = \''.pSQL($date_from).'\' AND `date_to` = \''.pSQL($date_to).'\'
-            AND `id_room`!='.(int)$id_room.' AND `is_refunded` = 0 AND `is_back_order` = 0';
+        $sql = 'SELECT `id` AS `id_room`, `id_product`, `id_hotel`, `room_num`, `comment` AS `room_comment`
+            FROM `'._DB_PREFIX_.'htl_room_information`
+            WHERE `id_hotel`='.(int)$hotel_id.' AND `id_product`='.(int)$id_room_type.'
+            AND (id_status = '. HotelRoomInformation::STATUS_ACTIVE .' or id_status = '. HotelRoomInformation::STATUS_TEMPORARY_INACTIVE .')
+            AND `id` IN (
+                SELECT `id_room` FROM `'._DB_PREFIX_.'htl_booking_detail`
+                WHERE `date_from` = \''.pSQL($date_from).'\' AND `date_to` = \''.pSQL($date_to).'\'
+                AND `id_room`!='.(int)$id_room.' AND `is_refunded`=0 AND `is_back_order`=0
+            )';
 
         return Db::getInstance()->executeS($sql);
     }
 
     /**
-     * @deprecated : use reallocateBooking() instead
      * [reallocateRoomWithAvailableSameRoomType :: To reallocate rooms with available rooms in case of reallocation of the room].
-     * @param [int]  $currentRoomId [id of the room to be reallocated]
-     * @param [date] $dateFrom       [start date of the booking of the room]
-     * @param [date] $dateTo         [end date of the booking of the room]
-     * @param [date] $swappedRoomId [id of the room with which the $current_room_id will be reallocated]
-     * @param [int]  $idOrder [id of the order]
+     * @param [int]  $current_room_id [Id of the room to be reallocated]
+     * @param [date] $date_from       [start date of the booking of the room]
+     * @param [date] $date_to         [end date of the booking of the room]
+     * @param [date] $swapped_room_id [Id of the room with which the $current_room_id will be reallocated]
+     *
      * @return [boolean] [true if rooms successfully reallocated else returns false]
      */
-    public function reallocateRoomWithAvailableSameRoomType($currentRoomId, $dateFrom, $dateTo, $swappedRoomId, $idOrder = 0)
+    public function reallocateRoomWithAvailableSameRoomType($currentRoomId, $dateFrom, $dateTo, $swappedRoomId)
     {
-        $result = false;
-
         $dateFrom = date('Y-m-d H:i:s', strtotime($dateFrom));
         $dateTo = date('Y-m-d H:i:s', strtotime($dateTo));
 
-        if ($idHotelBooking = Db::getInstance()->getValue(
-            'SELECT `id` FROM `'._DB_PREFIX_.'htl_booking_detail`
-            WHERE date_from = \''.pSQL($dateFrom).'\'
-            AND date_to = \''.pSQL($dateTo).'\'
-            AND id_room = '.(int) $currentRoomId.
-            ((int) $idOrder ? ' AND id_order = '.(int) $idOrder : '')
-        )) {
-            $result = $this->reallocateBooking($idHotelBooking, $swappedRoomId);
-        }
+        $idHotelCartBookingData = Db::getInstance()->getValue(
+            'SELECT `id`
+            FROM `'._DB_PREFIX_.'htl_cart_booking_data`
+            WHERE date_from = "'.pSQL($dateFrom).'" AND date_to = "'.pSQL($dateTo).'"
+            AND id_room = '.(int) $currentRoomId
+        );
 
-        return $result;
-    }
+        if ($idHotelCartBookingData) {
+            $objHotelCartBookingData = new HotelCartBookingData($idHotelCartBookingData);
+            if (Validate::isLoadedObject($objHotelCartBookingData)) {
+                $objHotelCartBookingData->id_room = $swappedRoomId;
+                if ($objHotelCartBookingData->save()) {
+                    $objHotelRoomInformation = new HotelRoomInformation($swappedRoomId);
 
-    /**
-     * Reallocate the room in the booking with the available sent room
-     * @param [int] $idHotelBooking : id of the hotel booking which room has to be reallocated
-     * @param [int] $idRoom : id of the room which has to assigned in reallocation
-     * @return boolean
-     */
-    public function reallocateBooking($idHotelBooking, $idRoom)
-    {
-        $result = true;
-        // get the cart booking data for the given booking
-        if (Validate::isLoadedObject($objHotelBooking = new HotelBookingDetail($idHotelBooking))) {
-            $objHotelCartBooking = new HotelCartBookingData();
-            if ($cartBookingInfo = $objHotelCartBooking->getRoomRowByIdProductIdRoomInDateRange(
-                $objHotelBooking->id_cart,
-                $objHotelBooking->id_product,
-                $objHotelBooking->date_from,
-                $objHotelBooking->date_to,
-                $objHotelBooking->id_room
-            )) {
-                // Reallocate the rooms in the room cart booking table
-                if (Validate::isLoadedObject($objHotelCartBooking = new HotelCartBookingData($cartBookingInfo['id']))) {
-                    $objHotelCartBooking->id_room = $idRoom;
-                    $result &= $objHotelCartBooking->save();
+                    $roomBookingData = $this->getRoomBookingData($currentRoomId, $objHotelCartBookingData->id_order, $dateFrom, $dateTo);
+                    $objHotelBookingDetail = new self($roomBookingData['id']);
+                    if (Validate::isLoadedObject($objHotelBookingDetail)) {
+                        $objHotelBookingDetail->id_room = $swappedRoomId;
+                        $objHotelBookingDetail->room_num = $objHotelRoomInformation->room_num;
+                        if ($objHotelBookingDetail->save()) {
+                            Hook::exec(
+                                'actionRoomReAllocateAfter',
+                                array(
+                                    'room_id' => $currentRoomId,
+                                    'realloc_room_id' => $swappedRoomId,
+                                    'date_from' => $dateFrom,
+                                    'date_to' => $dateTo,
+                                )
+                            );
+
+                            return true;
+                        }
+                    }
                 }
             }
-
-            // Reallocate the rooms in the room booking table
-            $objHotelRoomInfo = new HotelRoomInformation($idRoom);
-            $objHotelBooking->id_room = $idRoom;
-            $objHotelBooking->room_num = $objHotelRoomInfo->room_num;
-            // set backorder to 0 as available reallocate rooms will always be free
-            $objHotelBooking->is_back_order = 0;
-            $result &= $objHotelBooking->save();
-
-            if ($result) {
-                Hook::exec(
-                    'actionRoomReallocateAfter',
-                    array(
-                        'id_htl_booking' => $idHotelBooking,
-                        'id_room' => $idRoom
-                    )
-                );
-            }
-        } else {
-            $result = false;
         }
 
-        return $result;
+        return false;
     }
 
     /**
-     * @deprecated : use swapBooking() instead
      * [swapRoomWithAvailableSameRoomType :: To swap rooms with available rooms in case of reallocation of the room].
      * @param [int]  $current_room_id [Id of the room to be swapped]
      * @param [date] $date_from       [start date of the booking of the room]
@@ -1787,107 +1764,70 @@ class HotelBookingDetail extends ObjectModel
      *
      * @return [boolean] [true if rooms successfully swapped else returns false]
      */
-    public function swapRoomWithAvailableSameRoomType($idRoomFrom, $dateFrom, $dateTo, $idRoomTo, $idOrderFrom = 0, $idOrderTo = 0)
+    public function swapRoomWithAvailableSameRoomType($currentRoomId, $dateFrom, $dateTo, $swappedRoomId)
     {
-        $result = false;
-
         $dateFrom = date('Y-m-d H:i:s', strtotime($dateFrom));
         $dateTo = date('Y-m-d H:i:s', strtotime($dateTo));
 
-        // Get the booking details for the given rooms as per given parameters
-        $idHotelBookingFrom = Db::getInstance()->getValue(
-            'SELECT `id` FROM `'._DB_PREFIX_.'htl_booking_detail` WHERE `is_refunded` = 0
-            AND `date_from`=\''.pSQL($dateFrom).'\'
-            AND `date_to`=\''.pSQL($dateTo).'\'
-            AND `id_room`='.(int)$idRoomFrom.
-            ((int) $idOrderFrom ? ' AND id_order = '.(int) $idOrderFrom : '')
+        $idHotelCartBookingData1 = Db::getInstance()->getValue(
+            'SELECT `id` FROM `'._DB_PREFIX_.'htl_cart_booking_data` WHERE `is_refunded` = 0
+            AND `date_from`=\''.pSQL($dateFrom).'\' AND `date_to`=\''.pSQL($dateTo).'\'
+            AND `id_room`='.(int)$swappedRoomId
+        );
+        $idHotelCartBookingData2 = Db::getInstance()->getValue(
+            'SELECT `id` FROM `'._DB_PREFIX_.'htl_cart_booking_data` WHERE `is_refunded` = 0
+            AND `date_from`=\''.pSQL($dateFrom).'\' AND `date_to`=\''.pSQL($dateTo).'\'
+            AND `id_room`='.(int)$currentRoomId
         );
 
-        $idHotelBookingTo = Db::getInstance()->getValue(
+        $idHotelBookingDetail1 = Db::getInstance()->getValue(
             'SELECT `id` FROM `'._DB_PREFIX_.'htl_booking_detail` WHERE `is_refunded` = 0
-            AND `date_from`=\''.pSQL($dateFrom).'\'
-            AND `date_to`=\''.pSQL($dateTo).'\'
-            AND `id_room`='.(int)$idRoomTo.
-            ((int) $idOrderTo ? ' AND id_order = '.(int) $idOrderTo : '')
+            AND `date_from`=\''.pSQL($dateFrom).'\' AND `date_to`=\''.pSQL($dateTo).'\'
+            AND `id_room`='.(int)$swappedRoomId
+        );
+        $idHotelBookingDetail2 = Db::getInstance()->getValue(
+            'SELECT `id` FROM `'._DB_PREFIX_.'htl_booking_detail` WHERE `is_refunded` = 0
+            AND `date_from`=\''.pSQL($dateFrom).'\' AND `date_to`=\''.pSQL($dateTo).'\'
+            AND `id_room`='.(int)$currentRoomId
         );
 
-        if ($idHotelBookingFrom && $idHotelBookingTo) {
-            $result = $this->swapBooking($idHotelBookingFrom, $idHotelBookingTo);
-        }
+        $objHotelCartBookingData1 = new HotelCartBookingData($idHotelCartBookingData1);
+        $objHotelCartBookingData2 = new HotelCartBookingData($idHotelCartBookingData2);
 
-        return $result;
-    }
+        $temp = $objHotelCartBookingData1->id_room;
+        $objHotelCartBookingData1->id_room = $objHotelCartBookingData2->id_room;
+        $objHotelCartBookingData2->id_room = $temp;
 
-    public function swapBooking($idHotelBookingFrom, $idHotelBookingTo)
-    {
-        $result = true;
-        // get the cart booking data for the given booking
-        if (Validate::isLoadedObject($objHotelBookingFrom = new HotelBookingDetail($idHotelBookingFrom))
-            && Validate::isLoadedObject($objHotelBookingTo = new HotelBookingDetail($idHotelBookingTo))
+        $objHotelBookingDetail1 = new HotelBookingDetail($idHotelBookingDetail1);
+        $objHotelBookingDetail2 = new HotelBookingDetail($idHotelBookingDetail2);
+
+        $temp = $objHotelBookingDetail1->id_room;
+        $objHotelBookingDetail1->id_room = $objHotelBookingDetail2->id_room;
+        $objHotelBookingDetail2->id_room = $temp;
+
+        $temp = $objHotelBookingDetail1->room_num;
+        $objHotelBookingDetail1->room_num = $objHotelBookingDetail2->room_num;
+        $objHotelBookingDetail2->room_num = $temp;
+
+        if ($objHotelCartBookingData1->save()
+            && $objHotelCartBookingData2->save()
+            && $objHotelBookingDetail1->save()
+            && $objHotelBookingDetail2->save()
         ) {
-            // Swap the rooms in the room cart booking table
-            $objHotelCartBooking = new HotelCartBookingData();
-            $cartBookingInfoFrom = $objHotelCartBooking->getRoomRowByIdProductIdRoomInDateRange(
-                $objHotelBookingFrom->id_cart,
-                $objHotelBookingFrom->id_product,
-                $objHotelBookingFrom->date_from,
-                $objHotelBookingFrom->date_to,
-                $objHotelBookingFrom->id_room
-            );
-            $cartBookingInfoTo = $objHotelCartBooking->getRoomRowByIdProductIdRoomInDateRange(
-                $objHotelBookingTo->id_cart,
-                $objHotelBookingTo->id_product,
-                $objHotelBookingTo->date_from,
-                $objHotelBookingTo->date_to,
-                $objHotelBookingTo->id_room
+            Hook::exec(
+                'actionRoomSwapAfter',
+                array(
+                    'room_id' => $currentRoomId,
+                    'swapped_room_id' => $swappedRoomId,
+                    'date_from' => $dateFrom,
+                    'date_to' => $dateTo,
+                )
             );
 
-            if ($cartBookingInfoFrom && $cartBookingInfoTo) {
-                if (Validate::isLoadedObject($objHotelCartBookingFrom = new HotelCartBookingData($cartBookingInfoFrom['id']))
-                    && Validate::isLoadedObject($objHotelCartBookingTo = new HotelCartBookingData($cartBookingInfoTo['id']))
-                ) {
-                    $objHotelCartBookingFrom->id_room = $objHotelCartBookingTo->id_room;
-                    $objHotelCartBookingTo->id_room = $objHotelCartBookingFrom->id_room;
-                    $result &= $objHotelCartBookingFrom->save();
-                    $result &= $objHotelCartBookingTo->save();
-                }
-            }
-
-            // Swap the rooms in the room booking table
-            // also transfer the backorder status of the room from which room is being swapped
-            $idRoomFrom = $objHotelBookingFrom->id_room;
-            $roomNumFrom = $objHotelBookingFrom->room_num;
-            $roomFromBackOrder = $objHotelBookingFrom->is_back_order;
-
-            $idRoomTo = $objHotelBookingTo->id_room;
-            $roomNumTo = $objHotelBookingTo->room_num;
-            $roomToBackOrder = $objHotelBookingTo->is_back_order;
-
-            $objHotelBookingFrom->id_room = $idRoomTo;
-            $objHotelBookingFrom->room_num = $roomNumTo;
-            $objHotelBookingFrom->is_back_order = $roomToBackOrder;
-
-            $objHotelBookingTo->id_room = $idRoomFrom;
-            $objHotelBookingTo->room_num = $roomNumFrom;
-            $objHotelBookingTo->is_back_order = $roomFromBackOrder;
-
-            $result &= $objHotelBookingFrom->save();
-            $result &= $objHotelBookingTo->save();
-
-            if ($result) {
-                Hook::exec(
-                    'actionRoomSwapAfter',
-                    array(
-                        'id_htl_booking_from' => $idHotelBookingFrom,
-                        'id_htl_booking_to' => $idHotelBookingTo
-                    )
-                );
-            }
-        } else {
-            $result = false;
+            return true;
         }
 
-        return $result;
+        return false;
     }
 
     /**
