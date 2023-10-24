@@ -432,12 +432,12 @@ product_tabs['ServiceProduct'] = new function(){
 				dragHandle: 'dragHandle',
 				onDragClass: 'myDragClass',
 				onDrop: function (table, row) {
-					id_product = $(row).attr("id_product");
-					id_element = $(row).attr("id_element");
-					id_row = $(row).attr("id");
-					position = $(row).attr("position");
-					// id_slider_image = $(row).attr("id_slider_image");
-					var to_row_index = $('#' + id_row).index();
+					let rowId = $(row).attr('id');
+
+					let idProduct = parseInt($(row).attr('id_product'));
+					let idElement = parseInt($(row).attr('id_element'));
+					let newPosition = parseInt($('#' + rowId).index()) - 1;
+
 					$.ajax({
 						method: 'POST',
 						url: $(row).data('roomtype_url'),
@@ -446,13 +446,10 @@ product_tabs['ServiceProduct'] = new function(){
 						data: {
 							ajax: true,
 							action: 'changeServicePosition',
-							changeServicePosition: "1",
-							id_product: id_product,
-							id_element: id_element,
-							position: position,
-							to_row_index: to_row_index
+							id_product: idProduct,
+							id_element: idElement,
+							new_position: newPosition,
 						},
-
 						success: function (response) {
 							if (response.success) {
 								$($('.hotel-roomtype-link-table tbody')).find('tr').each(function (index, value) {
@@ -479,12 +476,12 @@ product_tabs['ServiceProduct'] = new function(){
 			});
 		}
 
-		$(this).on('click', '.button-edit-price', function(e){
+		$(document).on('click', '.button-edit-price', function(e){
 			e.preventDefault();
 			togglelinkedProductEditForm(this, true);
 		});
 
-		$(this).on('click', '.btn-cancel', function(e){
+		$(document).on('click', '.btn-cancel', function(e){
 			e.preventDefault();
 			togglelinkedProductEditForm(this, false);
 		});
@@ -494,46 +491,6 @@ product_tabs['ServiceProduct'] = new function(){
 			$(triggeredElement).closest('tr').find('.field-edit').toggle(showform);
 			$(triggeredElement).closest('tr').find('.field-view').toggle(!showform);;
 		}
-
-		$(this).on('click', '.btn-save', function(e){
-			e.preventDefault();
-			selectedElement = this;
-			var price = $(this).closest('tr').find('.service-product-price').val();
-			var id_tax_rules_group = $(this).closest('tr').find('.service_product_id_tax_rules_group').val();
-			if (!price) {
-				showErrorMessage();
-				return;
-			}
-			$.ajax({
-				url: $(this).data('roomtype_url'),
-				data: {
-					id_product: id_product,
-					service_product_id : $(this).data('id_product'),
-					price: price,
-					id_tax_rules_group: id_tax_rules_group,
-					action: 'updatedServiceProductPrice',
-					ajax: true
-				},
-				dataType: 'json',
-				success: function(data) {
-					if (data.status == 'ok')
-					{
-						$(selectedElement).closest('tr').find('.service-product-price-text').text(data.price);
-						$(selectedElement).closest('tr').find('.service_product_tax_text').text(data.tax_rules_group_name);
-
-						togglelinkedProductEditForm(selectedElement, false);
-						showSuccessMessage(data.message);
-					}
-					else
-					{
-						showErrorMessage(data.message);
-					}
-				},
-				error : function(data){
-					showErrorMessage(("[TECHNICAL ERROR]"));
-				}
-			});
-		});
 	}
 }
 

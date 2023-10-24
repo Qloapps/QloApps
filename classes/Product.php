@@ -1414,6 +1414,22 @@ class ProductCore extends ObjectModel
         return $result;
     }
 
+    public static function getAllServiceProducts($activeOnly = true, $idLang = null)
+    {
+        if (!$idLang) {
+            $idLang = Context::getContext()->language->id;
+        }
+
+        $sql = 'SELECT p.*, pl.*
+        FROM `'._DB_PREFIX_.'product` p
+        LEFT JOIN `'._DB_PREFIX_.'product_lang` pl ON
+        (pl.`id_product` = p.`id_product` AND pl.`id_lang` = '.(int) $idLang.')
+        WHERE p.`booking_product` = 0'.($activeOnly ? ' AND p.`active` = 1' : '').'
+        ORDER BY p.`id_product`';
+
+        return Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql);
+    }
+
     public function getAvailableServiceProductsCategories($id_lang, $front = false, $active = true, Context $context = null)
     {
         if (!$context) {
