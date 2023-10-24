@@ -216,94 +216,134 @@
 </div>
 <!-- Modal for reallocation of rooms -->
 <div class="modal fade" id="mySwappigModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-    	<ul class="nav nav-tabs" role="tablist">
-		    <li role="presentation" class="active"><a href="#reallocate_room_tab" aria-controls="reallocate" role="tab" data-toggle="tab">{l s='Room Reallocation' mod='hotelreservationsystem'}</a></li>
-		    <li role="presentation"><a href="#swap_room_tab" aria-controls="swap" role="tab" data-toggle="tab">{l s='Swap Room' mod='hotelreservationsystem'}</a></li>
-		 </ul>
-		<div class="tab-content panel active">
-			<div role="tabpanel" class="tab-pane active" id="reallocate_room_tab">
-				<form method="post" action="">
-					<div class="modal-header">
-						<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-						<h4 class="modal-title" id="realloc_myModalLabel">{l s='Reallocate Rooms'}</h4>
-					</div>
-					<div class="modal-body">
-						<div class="form-group">
-							<label for="curr_room_num" class="control-label">{l s='Current Room Number:' mod='hotelreservationsystem'}</label>
-							<input type="text" class="form-control modal_curr_room_num" name="modal_curr_room_num" readonly="true">
-							<input type="hidden" class="form-control modal_date_from" name="modal_date_from">
-							<input type="hidden" class="form-control modal_date_to" name="modal_date_to">
-							<input type="hidden" class="form-control modal_id_room" name="modal_id_room">
-						</div>
-						<div class="form-group">
-							<label for="realloc_avail_rooms" class="control-label">{l s='Available Rooms To Reallocate:' mod='hotelreservationsystem'}</label>
-							<div style="width: 195px;">
-								<select class="form-control" name="realloc_avail_rooms" id="realloc_avail_rooms">
-									<option value="0" selected="selected">{l s='Select Rooms' mod='hotelreservationsystem'}</option>
-								</select>
-								<p class="error_text" id="realloc_sel_rm_err_p"></p>
-							</div>
-						</div>
-						<div class="form-group">
-							<label style="text-decoration:underline;margin-top:5px;" for="message-text" class="col-sm-12 control-label"><i class="icon-info-circle"></i>&nbsp;{l s='Currently Alloted Customer Information:' mod='hotelreservationsystem'}</label>
-							<dl class="well list-detail">
-								<dt>{l s='Name' mod='hotelreservationsystem'}</dt>
-								<dd class="cust_name"></dd><br>
-								<dt>{l s='Email' mod='hotelreservationsystem'}</dt>
-								<dd class="cust_email"></dd><br>
-							</dl>
-						</div>
-					</div>
-					<div class="modal-footer">
-						<button type="button" class="btn btn-default" data-dismiss="modal">{l s="Close" mod="hotelreservationsyatem"}</button>
-						<input type="submit" id="realloc_allocated_rooms" name="realloc_allocated_rooms" class="btn btn-primary" value="Reallocate">
-					</div>
-				</form>
-			</div>
-			<div role="tabpanel" class="tab-pane" id="swap_room_tab">
-				<form method="post" action="">
-					<div class="modal-header">
-						<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-						<h4 class="modal-title" id="swap_myModalLabel">{l s='Swap Rooms' mod='hotelreservationsystem'}</h4>
-					</div>
-					<div class="modal-body">
-						<div class="form-group">
-							<label for="swap_curr_room_num" class="control-label">{l s='Current Room Number:' mod='hotelreservationsystem'}</label>
-							<input type="text" class="form-control modal_curr_room_num" name="modal_curr_room_num" readonly="true">
-							<input type="hidden" class="form-control modal_date_from" name="modal_date_from">
-							<input type="hidden" class="form-control modal_date_to" name="modal_date_to">
-							<input type="hidden" class="form-control modal_id_room" name="modal_id_room">
-						</div>
-						<div class="form-group">
-							<label for="swap_avail_rooms" class="control-label">{l s='Available Rooms To Swap:' mod='hotelreservationsystem'}</label>
-							<div style="width: 195px;">
-								<select class="form-control" name="swap_avail_rooms" id="swap_avail_rooms">
-									<option value="0" selected="selected">{l s='Select Rooms' mod='hotelreservationsystem'}</option>
-								</select>
-								<p class="error_text" id="swap_sel_rm_err_p"></p>
-							</div>
-						</div>
-						<div class="form-group">
-							<label style="text-decoration:underline;margin-top:5px;" for="message-text" class="col-sm-12 control-label"><i class="icon-info-circle"></i>&nbsp;{l s='Currently Alloted Customer Information:' mod='hotelreservationsystem'}</label>
-							<dl class="well list-detail">
-								<dt>{l s='Name' mod='hotelreservationsystem'}</dt>
-								<dd class="cust_name"></dd><br>
-								<dt>{l s='Email' mod='hotelreservationsystem'}</dt>
-								<dd class="cust_email"></dd><br>
-							</dl>
-						</div>
-					</div>
-					<div class="modal-footer">
-						<button type="button" class="btn btn-default" data-dismiss="modal">{l s="Close" mod="hotelreservationsyatem"}</button>
-						<input type="submit" id="swap_allocated_rooms" name="swap_allocated_rooms" class="btn btn-primary" value="Swap">
-					</div>
-				</form>
-			</div>
-		</div>
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <ul class="nav nav-tabs" role="tablist">
+                <li role="presentation" class="active"><a href="#reallocate_room_tab" aria-controls="reallocate" role="tab" data-toggle="tab">{l s='Room Reallocation'}</a></li>
+                <li role="presentation"><a href="#swap_room_tab" aria-controls="swap" role="tab" data-toggle="tab">{l s='Swap Room'}</a></li>
+            </ul>
+            <div class="tab-content active">
+                <div role="tabpanel" class="tab-pane active" id="reallocate_room_tab">
+                    <form method="post" action="">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title" id="realloc_myModalLabel">{l s='Reallocate Rooms'}</h4>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="form-group col-sm-6">
+                                    <label for="curr_room_num" class="control-label model-label">{l s='Current Room Number:'}</label>
+                                    <input type="text" class="form-control modal_curr_room_num" name="modal_curr_room_num" readonly="true">
+                                    <input type="hidden" class="form-control modal_id_htl_booking" name="id_htl_booking">
+                                </div>
+                            </div>
+                            <div class="panel">
+                                <div class="panel-heading"><i class="icon-user"></i> {l s='Currently Alloted Customer'}</div>
+                                <div class="panel-content">
+                                    <div class="form-group">
+                                        <label class="col-sm-3 control-label model-label">{l s='Name'} :</label>
+                                        <div class="dol-sm-9 cust_name"></div>
+                                    </div>
+                                    <div class="">
+                                        <label class="col-sm-3 control-label model-label">{l s='Email'} :</label>
+                                        <div class="dol-sm-9 cust_email"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <hr>
+                            <div class="row">
+                                <div class="form-group col-sm-6">
+                                    <label for="realloc_avail_room_type" class="control-label model-label">{l s='Room Type To Reallocate:'}</label>
+                                    <div class="realloc_avail_room_type_container">
+                                        <select class="form-control" name="realloc_avail_room_type" id="realloc_avail_room_type">
+                                            <option value="0" selected="selected">{l s='Select Room Type'}</option>
+                                        </select>
+                                    </div>
+                                    <p class="error_text" id="realloc_sel_rm_type_err_p"></p>
+                                </div>
+                                <div class="form-group col-sm-6">
+                                    <label for="realloc_avail_rooms" class="control-label model-label">{l s='Room To Reallocate:'}</label>
+                                    <div class="realloc_avail_rooms_container">
+                                        <select class="form-control" name="realloc_avail_rooms" id="realloc_avail_rooms">
+                                            <option value="0" selected="selected">{l s='Select Rooms'}</option>
+                                        </select>
+                                    </div>
+                                    <p class="error_text" id="realloc_sel_rm_err_p"></p>
+                                </div>
+                            </div>
+                            <div class="row" id="reallocation_price_diff_block" style="display:none;">
+                                <div class="form-group col-sm-6">
+                                    <label for="reallocation_price_diff" class="control-label model-label alert-warning">{l s='Price Difference'} *</label>
+                                    <div class="input-group">
+                                        <span class="input-group-addon order_currency_sign"></span>
+                                        <input type="text" name="reallocation_price_diff" id="reallocation_price_diff" value="0" />
+                                        <span class="input-group-addon">{l s='Tax excl.'}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="alert alert-warning col-sm-12 realloc_roomtype_change_message" style="display:none">
+                                    <p>{l s="If room type is changed while room reallocation then all additional facilities and services will be assigned to the selected room of new room type."}</p>
+                                    <p>{l s="If you want to change additional facilities or services, you can update by editing the room after reallocation."}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">{l s="Close" mod="hotelreservationsyatem"}</button>
+                            <input type="submit" id="realloc_allocated_rooms" name="realloc_allocated_rooms" class="btn btn-primary" value="Reallocate">
+                        </div>
+                    </form>
+                </div>
+                <div role="tabpanel" class="tab-pane" id="swap_room_tab">
+                    <form method="post" action="">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title" id="swap_myModalLabel">{l s='Swap Rooms'}</h4>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="form-group col-sm-6">
+                                    <label for="swap_curr_room_num" class="control-label model-label">{l s='Current Room Number:'}</label>
+                                    <input type="text" class="form-control modal_curr_room_num" name="modal_curr_room_num" readonly="true">
+                                    <input type="hidden" class="form-control modal_id_htl_booking" name="id_htl_booking">
+                                </div>
+                            </div>
+                            <div class="panel">
+                                <div class="panel-heading"><i class="icon-user"></i> {l s='Currently Alloted Customer'}</div>
+                                <div class="panel-content">
+                                    <div class="form-group">
+                                        <label class="col-sm-3 control-label model-label">{l s='Name'} :</label>
+                                        <div class="dol-sm-9 cust_name"></div>
+                                    </div>
+                                    <div class="">
+                                        <label class="col-sm-3 control-label model-label">{l s='Email'} :</label>
+                                        <div class="dol-sm-9 cust_email"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <hr>
+                            <div class="row">
+                                <div class="form-group col-sm-6">
+                                    <label for="swap_avail_rooms" class="control-label model-label">{l s='Rooms To Swap:'}</label>
+                                    <div class="swap_avail_rooms_container"></div>
+                                    <p class="error_text" id="swap_sel_rm_err_p"></p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">{l s="Close" mod="hotelreservationsyatem"}</button>
+                            <input type="submit" id="swap_allocated_rooms" name="swap_allocated_rooms" class="btn btn-primary" value="Swap">
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        {* loader before loading data *}
+        <div class="loading_overlay">
+            <img src='{$link->getMediaLink("`$img_dir`admin/ajax-loader.gif")}' class="loading-img"/>
+        </div>
     </div>
-  </div>
 </div>
 <div id="date-stats-tooltop" style="display:none">
 	<div class="tooltip_cont">
