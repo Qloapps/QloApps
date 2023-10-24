@@ -244,41 +244,68 @@ class OrderDetailControllerCore extends FrontController
                     }
                     $res = true;
                     if (!$hasError) {
-                        if ((int)$order->total_paid_real == 0){
+                        // if amount paid is > 0 then create refund request else cancel the booking directly
+                        if ($order->getTotalPaid() > 0) {
+                            $objOrderReturn = new OrderReturn();
+                            $objOrderReturn->id_customer = $order->id_customer;
+                            $objOrderReturn->id_order = $order->id;
+                            $objOrderReturn->state = 0;
+                            $objOrderReturn->by_admin = 0;
+                            $objOrderReturn->question = $refundReason;
+                            $objOrderReturn->save();
+                            if ($objOrderReturn->id) {
+                                foreach ($bookingRefunds as $idHtlBooking) {
+                                    $objHtlBooking = new HotelBookingDetail($idHtlBooking);
+                                    $numDays = $objHtlBooking->getNumberOfDays(
+                                        $objHtlBooking->date_from,
+                                        $objHtlBooking->date_to
+                                    );
+
+                                    $objOrderReturnDetail = new OrderReturnDetail();
+                                    $objOrderReturnDetail->id_order_return = $objOrderReturn->id;
+                                    $objOrderReturnDetail->id_order_detail = $objHtlBooking->id_order_detail;
+                                    $objOrderReturnDetail->product_quantity = $numDays;
+                                    $objOrderReturnDetail->id_htl_booking = $idHtlBooking;
+                                    $objOrderReturnDetail->save();
+                                }
+                            }
+                            // Emails to customer, admin on refund request state change
+                            $objOrderReturn->changeIdOrderReturnState(Configuration::get('PS_ORS_PENDING'));
+                        } else {
+                            // cancel the booking directly
                             foreach ($bookingRefunds as $idHtlBooking) {
                                 $objHtlBooking = new HotelBookingDetail($idHtlBooking);
-                                $objHtlBooking->save();
+                                if (!$objHtlBooking->processRefundInBookingTables()) {
+                                    die(json_encode(array('status' => 0)));
+                                } else {
+                                    // set the message for the cancellation
+                                    $message = $this->l('1 Room from').' '.', '.$objHtlBooking->room_type_name.' '.$this->l('has been cancelled by the hotel.');
+                                    $message .= PHP_EOL.$this->l('Reasonn').': '.$refundReason;
+
+                                    $objHtlBooking->setBookingCancellationMessage($refundReason);
+                                }
+                            }
+
+                            // if all bookings are getting refunded then cancel the order also
+                            if ($order->hasCompletelyRefunded(Order::ORDER_COMPLETE_REFUND_FLAG)) {
+                                $objOrderHistory = new OrderHistory();
+                                $objOrderHistory->id_order = (int)$order->id;
+
+                                $idOrderState = Configuration::get('PS_OS_CANCELED');
+
+                                $useExistingPayment = false;
+                                if (!$order->hasInvoice()) {
+                                    $useExistingPayment = true;
+                                }
+
+                                $objOrderHistory->changeIdOrderState($idOrderState, $order, $useExistingPayment);
+                                $objOrderHistory->addWithemail();
                             }
                         }
-
-                        $objOrderReturn = new OrderReturn();
-                        $objOrderReturn->id_customer = $order->id_customer;
-                        $objOrderReturn->id_order = $order->id;
-                        $objOrderReturn->state = 0;
-                        $objOrderReturn->by_admin = 0;
-                        $objOrderReturn->question = $refundReason;
-                        $objOrderReturn->save();
-                        if ($objOrderReturn->id) {
-                            foreach ($bookingRefunds as $idHtlBooking) {
-                                $objHtlBooking = new HotelBookingDetail($idHtlBooking);
-                                $numDays = $objHtlBooking->getNumberOfDays(
-                                    $objHtlBooking->date_from,
-                                    $objHtlBooking->date_to
-                                );
-
-                                $objOrderReturnDetail = new OrderReturnDetail();
-                                $objOrderReturnDetail->id_order_return = $objOrderReturn->id;
-                                $objOrderReturnDetail->id_order_detail = $objHtlBooking->id_order_detail;
-                                $objOrderReturnDetail->product_quantity = $numDays;
-                                $objOrderReturnDetail->id_htl_booking = $idHtlBooking;
-                                $objOrderReturnDetail->save();
-                            }
-                        }
-                        // Emails to customer, admin on refund request state change
-                        $objOrderReturn->changeIdOrderReturnState(Configuration::get('PS_ORS_PENDING'));
 
                         die(json_encode(array('status' => 1)));
                     }
+
                     die(json_encode(array('status' => 0)));
                 }
             } else {

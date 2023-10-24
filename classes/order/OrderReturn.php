@@ -158,7 +158,8 @@ class OrderReturnCore extends ObjectModel
     public function hasBeenCompleted()
     {
         if (Validate::isLoadedObject($objReturnState = new OrderReturnState($this->state))) {
-            if ($objReturnState->denied || $objReturnState->refunded) {
+            // refund process will be considered as completed when the state is "Refunded"
+            if ($objReturnState->refunded) {
                 return true;
             }
         }
