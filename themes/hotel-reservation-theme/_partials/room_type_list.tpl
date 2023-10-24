@@ -79,6 +79,8 @@
 									{if !isset($restricted_country_mode) && !$PS_CATALOG_MODE && !$order_date_restrict}
 										{if isset($occupancy_required_for_booking) && $occupancy_required_for_booking}
 											<div class="booking_guest_occupancy_conatiner">
+												{assign var=occupancies value=$room_v['occupancies']}
+												{assign var=occupancy_adults value=$room_v['occupancy_adults']}
 												{include file="./occupancy_field.tpl" room_type_info=$room_v total_available_rooms=$room_v['room_left']}
 											</div>
 										{else}
@@ -88,7 +90,7 @@
 											</div>
 										{/if}
 										<div>
-											<a cat_rm_check_in="{$booking_date_from|escape:'htmlall':'UTF-8'}" cat_rm_check_out="{$booking_date_to|escape:'htmlall':'UTF-8'}" href="" rm_product_id="{$room_v['id_product']}" cat_rm_book_nm_days="{$num_days|escape:'htmlall':'UTF-8'}" data-id-product-attribute="0" data-id-product="{$room_v['id_product']|intval}" class="btn btn-default button button-medium ajax_add_to_cart_button"><span>{l s='Book Now'}</span></a>
+											<a cat_rm_check_in="{$booking_date_from|escape:'htmlall':'UTF-8'}" cat_rm_check_out="{$booking_date_to|escape:'htmlall':'UTF-8'}" href="{$link->getPageLink('cart')}?add=1&id_product={$room_v.id_product|intval}{if isset($static_token)}&token={$static_token}&dateFrom={$booking_date_from}&dateTo={$booking_date_to}&occupancy={json_encode(array(array('adults' => $room_v.adults, 'children' => 0, 'child_ages' => array())))|urlencode}{/if}" rm_product_id="{$room_v['id_product']}" cat_rm_book_nm_days="{$num_days|escape:'htmlall':'UTF-8'}" data-id-product-attribute="0" data-id-product="{$room_v['id_product']|intval}" class="btn btn-default button button-medium ajax_add_to_cart_button"><span>{l s='Book Now'}</span></a>
 										</div>
 									{/if}
 								</div>

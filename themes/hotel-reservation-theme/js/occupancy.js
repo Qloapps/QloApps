@@ -186,7 +186,11 @@ $(document).ready(function(){
                 } else {
                     $(occupancy_wrapper).siblings(".booking_guest_occupancy").addClass('error_border');
                 }
-			}
+
+                if (typeof page_name != 'undefined' && page_name == 'category') {
+                    updateAddToCartUrl($(occupancy_wrapper).closest('.room_cont'));
+                }
+            }
         }
     });
 
@@ -342,19 +346,69 @@ function getRoomTypeGuestOccupancyFormated(adults, children, rooms)
 	return guestButtonVal;
 }
 
-
-function resetOccupancyField(booking_occupancy_wrapper)
+function getBookingOccupancyDetails(bookingform)
 {
-	$(booking_occupancy_wrapper).siblings('.booking_guest_occupancy').find('span').text(select_occupancy_txt);
-	$(booking_occupancy_wrapper).find('.booking_occupancy_inner > div').each(function(index, element){
-		let num_adults = $(booking_occupancy_wrapper).find('.base_adult').val();
-		if (index == 0) {
-			$(this).removeClass('selected');
-			$(this).find('.num_adults').val(num_adults).siblings('.occupancy_count').find('span').text(num_adults);
-			$(this).find('.num_children').val(0).siblings('.occupancy_count').find('span').text(0);
-			$(this).find('.children_ages > div').remove();
-		} else {
-			$(element).remove();
-		}
-	});
+    let occupancy;
+    if (occupancy_required_for_booking) {
+        $('.booking_guest_occupancy_conatiner .dropdown').removeClass('open');
+        let selected_occupancy = $(bookingform).find(".occupancy_info_block.selected")
+        if (selected_occupancy.length) {
+            occupancy = [];
+            $(selected_occupancy).each(function(ind, element) {
+                if (parseInt($(element).find('.num_adults').val())) {
+                    let child_ages = [];
+                    $(element).find('.guest_child_age').each(function(index) {
+                        if ($(this).val() > -1) {
+                            child_ages.push($(this).val());
+                        }
+                    });
+                    if ($(element).find('.num_children').val()) {
+                        if (child_ages.length != $(element).find('.num_children').val()) {
+                            $(bookingform).find('.booking_occupancy_wrapper').parent().addClass('open')
+                            occupancy = false;
+                        }
+                    }
+                    occupancy.push({
+                        'adults': $(element).find('.num_adults').val(),
+                        'children': $(element).find('.num_children').val(),
+                        'child_ages': child_ages
+                    });
+                } else {
+                    $(bookingform).find('.booking_occupancy_wrapper').parent().addClass('open')
+                    occupancy = false;
+                }
+            });
+        } else {
+            $(bookingform).find('.booking_occupancy_wrapper').parent().addClass('open')
+            occupancy = false;
+        }
+    } else {
+        occupancy = parseInt($(bookingform).find(".quantity_wanted").val());
+    }
+
+    return occupancy;
+}
+
+function updateAddToCartUrl(roomContainer) {
+    let idProduct = parseInt($(roomContainer).attr('data-id-product'));
+
+    let bookingFormFields = $(roomContainer).find('.booking_room_fields');
+    let addToCartButton = $(bookingFormFields).find('a.ajax_add_to_cart_button');
+
+    let occupancy = JSON.stringify(getBookingOccupancyDetails(bookingFormFields));
+
+    let params = {
+        add: 1,
+        id_product: idProduct,
+        id_customization: 0,
+        token: static_token,
+        dateFrom: $(addToCartButton).attr('cat_rm_check_in'),
+        dateTo: $(addToCartButton).attr('cat_rm_check_out'),
+        occupancy: occupancy,
+    };
+
+    let queryParams = new URLSearchParams(params).toString();
+    let addToCartUrl = cart_controller_url + '?' + queryParams;
+
+    $(addToCartButton).attr('href', addToCartUrl);
 }
