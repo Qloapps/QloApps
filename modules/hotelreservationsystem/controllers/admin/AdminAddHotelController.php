@@ -501,12 +501,20 @@ class AdminAddHotelController extends ModuleAdminController
                     if ($catState) {
                         if ($catCity = $objHotelBranch->addCategory($city, $catState, $groupIds)) {
                             $hotelCatName = $objHotelBranch->hotel_name;
-                            if ($catHotel = $objHotelBranch->addCategory(
-                                $hotelCatName, $catCity, $groupIds, 1, $newIdHotel
-                            )) {
-                                $objHotelBranch = new HotelBranchInformation($newIdHotel);
-                                $objHotelBranch->id_category = $catHotel;
-                                $objHotelBranch->save();
+
+                            // add/update hotel category
+                            if ($objHotelBranch->id_category) {
+                                $objCategory = new Category($objHotelBranch->id_category);
+                                $objCategory->name = $objHotelBranch->hotel_name;
+                                $objCategory->save();
+                            } else {
+                                if ($catHotel = $objHotelBranch->addCategory(
+                                    $hotelCatName, $catCity, $groupIds, 1, $newIdHotel
+                                )) {
+                                    $objHotelBranch = new HotelBranchInformation($newIdHotel);
+                                    $objHotelBranch->id_category = $catHotel;
+                                    $objHotelBranch->save();
+                                }
                             }
                         }
                     }
