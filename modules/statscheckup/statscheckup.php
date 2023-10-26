@@ -699,8 +699,12 @@ class StatsCheckUp extends Module
             WHERE hri.`id_hotel` = hbi.`id`
         ) AS totalRooms
         FROM `'._DB_PREFIX_.'htl_branch_info` hbi
+        INNER JOIN `'._DB_PREFIX_.'htl_access` ha
+        ON (hbi.`id` = ha.`id_hotel`)
         LEFT JOIN `'._DB_PREFIX_.'htl_branch_info_lang` hbil
         ON (hbil.`id` = hbi.`id` AND hbil.`id_lang` = '.(int) $id_lang .')
+        WHERE ha.`id_profile` = '.(int)$this->context->employee->id_profile.' AND ha.`access` = 1
+        GROUP BY (hbi.`id`)
         ORDER BY '.$order_by;
 
         return Db::getInstance()->executeS($sql);
@@ -741,7 +745,10 @@ class StatsCheckUp extends Module
         ON (p.`id_product` = pl.`id_product` AND pl.`id_lang` = '.(int) $id_lang.')
         LEFT JOIN '._DB_PREFIX_.'htl_room_type hrt
         ON (hrt.`id_product` = p.`id_product`)
+        INNER JOIN `'._DB_PREFIX_.'htl_access` ha
+        ON (hrt.`id_hotel` = ha.`id_hotel`)
         WHERE hrt.`id_hotel` = '.(int) $this->id_hotel.'
+        AND ha.`id_profile` = '.(int)$this->context->employee->id_profile.' AND ha.`access` = 1
         ORDER BY '.$order_by;
 
         return Db::getInstance()->executeS($sql);

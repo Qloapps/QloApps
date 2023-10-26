@@ -221,8 +221,11 @@ class StatsBestCategories extends ModuleGrid
             AND hbd.`date_to` > "'.pSQL($date_from).'" AND hbd.`date_from` < "'.pSQL($date_to).'"
         ) AS totalOperatingCost
         FROM `'._DB_PREFIX_.'htl_branch_info` hbi
+        INNER JOIN `'._DB_PREFIX_.'htl_access` ha
+        ON (hbi.`id` = ha.`id_hotel`)
         LEFT JOIN `'._DB_PREFIX_.'htl_branch_info_lang` hbil
         ON (hbil.`id` = hbi.`id` AND hbil.`id_lang` = '.(int)$id_lang .')
+        WHERE ha.`id_profile` = '.(int)$this->context->employee->id_profile.' AND ha.`access` = 1
         GROUP BY (hbi.`id`)';
 
         if (Validate::IsName($this->_sort)) {

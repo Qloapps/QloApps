@@ -114,13 +114,17 @@ class StatsProduct extends ModuleGraph
     {
         $sql = 'SELECT p.`id_product`, p.reference, pl.`name`,
         (SELECT COUNT(hri.`id`) FROM `'._DB_PREFIX_.'htl_room_information` hri WHERE hri.`id_product` = p.`id_product`) AS total_rooms
-        FROM `'._DB_PREFIX_.'product` p';
-        if (Tools::getValue('id_hotel')) {
-            $sql .= ' INNER JOIN `'._DB_PREFIX_.'htl_room_type` hrt ON (hrt.`id_product` = p.`id_product` AND hrt.`id_hotel` = '.(int)Tools::getValue('id_hotel').')';
-        }
-        $sql .= ' LEFT JOIN `'._DB_PREFIX_.'product_lang` pl ON (p.`id_product` = pl.`id_product` AND pl.`id_lang`='.(int)$this->context->language->id.')
+        FROM `'._DB_PREFIX_.'product` p
+        INNER JOIN `'._DB_PREFIX_.'htl_room_type` hrt ON (hrt.`id_product` = p.`id_product`)
+        INNER JOIN `'._DB_PREFIX_.'htl_access` ha ON (hrt.`id_hotel` = ha.`id_hotel`)
+        LEFT JOIN `'._DB_PREFIX_.'product_lang` pl ON (p.`id_product` = pl.`id_product` AND pl.`id_lang`='.(int)$this->context->language->id.')
         WHERE p.`booking_product` = 1
-        ORDER BY pl.`name`';
+        AND ha.`id_profile` = '.(int)$this->context->employee->id_profile.' AND ha.`access` = 1';
+        if (Tools::getValue('id_hotel')) {
+            $sql .= ' AND hrt.`id_hotel` = '.(int)Tools::getValue('id_hotel');
+        }
+
+        $sql .= ' ORDER BY pl.`name`';
 
         return Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql);
     }
@@ -169,104 +173,111 @@ class StatsProduct extends ModuleGraph
 					</ul>
 			</div>';
         if ($id_product = (int)Tools::getValue('id_product')) {
-            if (Tools::getValue('export')) {
-                if (Tools::getValue('exportType') == 1) {
-                    $this->csvExport(array(
-                        'layers' => 2,
-                        'type' => 'line',
-                        'option' => '1-'.$id_product
-                    ));
-                } elseif (Tools::getValue('exportType') == 2) {
-                    $this->csvExport(array(
-                        'type' => 'pie',
-                        'option' => '3-'.$id_product
-                    ));
+            $objRoomType = new HotelRoomType();
+            if ($roomTypeInfo = $objRoomType->getRoomTypeInfoByIdProduct($id_product)) {
+                $objBranchInfo = new HotelBranchInformation();
+                $hotels = $objBranchInfo->getProfileAccessedHotels($this->context->employee->id_profile, 1, 1);
+                if (in_array($roomTypeInfo['id_hotel'], $hotels)) {
+                    if (Tools::getValue('export')) {
+                        if (Tools::getValue('exportType') == 1) {
+                            $this->csvExport(array(
+                                'layers' => 2,
+                                'type' => 'line',
+                                'option' => '1-'.$id_product
+                            ));
+                        } elseif (Tools::getValue('exportType') == 2) {
+                            $this->csvExport(array(
+                                'type' => 'pie',
+                                'option' => '3-'.$id_product
+                            ));
+                        }
+                    }
+                    $product = new Product($id_product, false, $this->context->language->id);
+                    $total_orders = $this->getTotalOrders($product->id);
+                    $total_room_nights = $this->getTotalRoomNights($product->id);
+                    $total_revenue = $this->getTotalRevenue($product->id);
+                    $total_views = $this->getTotalViews($product->id);
+                    $this->html .= '<h4>'.$product->name.' - '.$this->l('Details').'</h4>
+                    <div class="row row-margin-bottom">
+                        <div class="col-lg-12">
+                            <div class="col-lg-8">
+                                '.$this->engine(array(
+                                    'layers' => 2,
+                                    'type' => 'line',
+                                    'option' => '1-'.$id_product,
+                                    'has_label_y' => true,
+                                )).'
+                            </div>
+                            <div class="col-lg-4">
+                                <ul class="list-unstyled">
+                                    <li>'.$this->l('Total orders:').' '.$total_orders.'</li>
+                                    <li>'.$this->l('Total room nights:').' '.$total_room_nights.'</li>
+                                    <li>'.$this->l('Revenue:').' '.Tools::displayprice($total_revenue, $currency).'</li>
+                                    <li>'.$this->l('Total views:').' '.$total_views.'</li>
+                                    <li>'.$this->l('Conversion rate:').' '.sprintf('%0.2f', ($total_views ? $total_orders / $total_views : 0) * 100).'%</li>
+                                </ul>
+                                <a class="btn btn-default export-csv" href="'.Tools::safeOutput($_SERVER['REQUEST_URI']).'&export=1&exportType=1">
+                                    <i class="icon-cloud-download"></i> '.$this->l('CSV Export').'
+                                </a>
+                            </div>
+                        </div>
+                    </div>';
+                    if ($has_attribute = $product->hasAttributes() && $total_orders) {
+                        $this->html .= '
+                        <h3 class="space">'.$this->l('Attribute sales distribution').'</h3>
+                        <center>'.$this->engine(array('type' => 'pie', 'option' => '3-'.$id_product)).'</center><br />
+                        <a href="'.Tools::safeOutput($_SERVER['REQUEST_URI']).'&export=1&exportType=2"><img src="../img/admin/asterisk.gif" alt=""/>'.$this->l('CSV Export').'</a>';
+                    }
+                    if ($total_orders) {
+                        $sales = $this->getSales($id_product);
+                        $this->html .= '
+                        <h4>'.$this->l('Sales').'</h4>
+                        <div style="overflow-y:scroll;height:'.min(400, (count($sales) + 1) * 32).'px">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>
+                                            <span class="title_box  active">'.$this->l('Date').'</span>
+                                        </th>
+                                        <th>
+                                            <span class="title_box  active">'.$this->l('Order').'</span>
+                                        </th>
+                                        <th>
+                                            <span class="title_box  active">'.$this->l('Customer').'</span>
+                                        </th>
+                                        '.($has_attribute ? '<th><span class="title_box  active">'.$this->l('Attribute').'</span></th>' : '').'
+                                        <th>
+                                            <span class="title_box  active">'.$this->l('Room nights booked').'</span>
+                                        </th>
+                                        <th>
+                                            <span class="title_box  active">'.$this->l('Revenue').'</span>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>';
+                        $token_order = Tools::getAdminToken('AdminOrders'.(int)Tab::getIdFromClassName('AdminOrders').(int)$this->context->employee->id);
+                        $token_customer = Tools::getAdminToken('AdminCustomers'.(int)Tab::getIdFromClassName('AdminCustomers').(int)$this->context->employee->id);
+                        foreach ($sales as $sale) {
+                            $this->html .= '
+                                <tr>
+                                    <td>'.Tools::displayDate($sale['date_add'], null, false).'</td>
+                                    <td class="text-left"><a href="?tab=AdminOrders&id_order='.$sale['id_order'].'&vieworder&token='.$token_order.'" target="_blank">#'.(int)$sale['id_order'].'</a></td>
+                                    <td class="text-left"><a href="?tab=AdminCustomers&id_customer='.$sale['id_customer'].'&viewcustomer&token='.$token_customer.'" target="_blank">'.$sale['firstname'].' '.$sale['lastname'].' (#'.(int) $sale['id_customer'].')'.'</a></td>
+                                    '.($has_attribute ? '<td>'.$sale['product_name'].'</td>' : '').'
+                                    <td>'.(int)$sale['total_booked'].'</td>
+                                    <td>'.Tools::displayprice($sale['total'], $currency).'</td>
+                                </tr>';
+                        }
+                        $this->html .= '
+                                </tbody>
+                            </table>
+                        </div>';
+                    }
                 }
-            }
-            $product = new Product($id_product, false, $this->context->language->id);
-            $total_orders = $this->getTotalOrders($product->id);
-            $total_room_nights = $this->getTotalRoomNights($product->id);
-            $total_revenue = $this->getTotalRevenue($product->id);
-            $total_views = $this->getTotalViews($product->id);
-            $this->html .= '<h4>'.$product->name.' - '.$this->l('Details').'</h4>
-			<div class="row row-margin-bottom">
-				<div class="col-lg-12">
-					<div class="col-lg-8">
-						'.$this->engine(array(
-                            'layers' => 2,
-                            'type' => 'line',
-                            'option' => '1-'.$id_product,
-                            'has_label_y' => true,
-                        )).'
-					</div>
-					<div class="col-lg-4">
-						<ul class="list-unstyled">
-							<li>'.$this->l('Total orders:').' '.$total_orders.'</li>
-							<li>'.$this->l('Total room nights:').' '.$total_room_nights.'</li>
-							<li>'.$this->l('Revenue:').' '.Tools::displayprice($total_revenue, $currency).'</li>
-							<li>'.$this->l('Total views:').' '.$total_views.'</li>
-							<li>'.$this->l('Conversion rate:').' '.sprintf('%0.2f', ($total_views ? $total_orders / $total_views : 0) * 100).'%</li>
-						</ul>
-						<a class="btn btn-default export-csv" href="'.Tools::safeOutput($_SERVER['REQUEST_URI']).'&export=1&exportType=1">
-							<i class="icon-cloud-download"></i> '.$this->l('CSV Export').'
-						</a>
-					</div>
-				</div>
-			</div>';
-            if ($has_attribute = $product->hasAttributes() && $total_orders) {
-                $this->html .= '
-				<h3 class="space">'.$this->l('Attribute sales distribution').'</h3>
-				<center>'.$this->engine(array('type' => 'pie', 'option' => '3-'.$id_product)).'</center><br />
-				<a href="'.Tools::safeOutput($_SERVER['REQUEST_URI']).'&export=1&exportType=2"><img src="../img/admin/asterisk.gif" alt=""/>'.$this->l('CSV Export').'</a>';
-            }
-            if ($total_orders) {
-                $sales = $this->getSales($id_product);
-                $this->html .= '
-				<h4>'.$this->l('Sales').'</h4>
-				<div style="overflow-y:scroll;height:'.min(400, (count($sales) + 1) * 32).'px">
-					<table class="table">
-						<thead>
-							<tr>
-								<th>
-									<span class="title_box  active">'.$this->l('Date').'</span>
-								</th>
-								<th>
-									<span class="title_box  active">'.$this->l('Order').'</span>
-								</th>
-								<th>
-									<span class="title_box  active">'.$this->l('Customer').'</span>
-								</th>
-								'.($has_attribute ? '<th><span class="title_box  active">'.$this->l('Attribute').'</span></th>' : '').'
-								<th>
-									<span class="title_box  active">'.$this->l('Room nights booked').'</span>
-								</th>
-								<th>
-									<span class="title_box  active">'.$this->l('Revenue').'</span>
-								</th>
-							</tr>
-						</thead>
-						<tbody>';
-                $token_order = Tools::getAdminToken('AdminOrders'.(int)Tab::getIdFromClassName('AdminOrders').(int)$this->context->employee->id);
-                $token_customer = Tools::getAdminToken('AdminCustomers'.(int)Tab::getIdFromClassName('AdminCustomers').(int)$this->context->employee->id);
-                foreach ($sales as $sale) {
-                    $this->html .= '
-						<tr>
-							<td>'.Tools::displayDate($sale['date_add'], null, false).'</td>
-							<td class="text-left"><a href="?tab=AdminOrders&id_order='.$sale['id_order'].'&vieworder&token='.$token_order.'" target="_blank">#'.(int)$sale['id_order'].'</a></td>
-							<td class="text-left"><a href="?tab=AdminCustomers&id_customer='.$sale['id_customer'].'&viewcustomer&token='.$token_customer.'" target="_blank">'.$sale['firstname'].' '.$sale['lastname'].' (#'.(int) $sale['id_customer'].')'.'</a></td>
-							'.($has_attribute ? '<td>'.$sale['product_name'].'</td>' : '').'
-							<td>'.(int)$sale['total_booked'].'</td>
-							<td>'.Tools::displayprice($sale['total'], $currency).'</td>
-						</tr>';
-                }
-                $this->html .= '
-						</tbody>
-					</table>
-				</div>';
             }
         } else {
             $objBranchInfo = new HotelBranchInformation();
-            $hotels = $objBranchInfo->hotelBranchesInfo((int)$this->context->language->id);
+            $hotels = $objBranchInfo->getProfileAccessedHotels($this->context->employee->id_profile, 1);
             $this->html .= '
 			<form action="#" method="post" id="hotelsForm" class="form-horizontal">
 				<div class="row row-margin-bottom">
@@ -279,7 +290,7 @@ class StatsProduct extends ModuleGraph
 						<select name="id_hotel" onchange="$(\'#hotelsForm\').submit();">
 							<option value="0">'.$this->l('All').'</option>';
             foreach ($hotels as $hotel) {
-                $this->html .= '<option value="'.$hotel['id'].'"'.($id_hotel == $hotel['id'] ? ' selected="selected"' : '').'>'.$hotel['hotel_name'].'</option>';
+                $this->html .= '<option value="'.$hotel['id_hotel'].'"'.($id_hotel == $hotel['id_hotel'] ? ' selected="selected"' : '').'>'.$hotel['hotel_name'].'</option>';
             }
             $this->html .= '
 						</select>

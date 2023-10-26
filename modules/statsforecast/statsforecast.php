@@ -170,7 +170,10 @@ class StatsForecast extends Module
                 WHERE hbd.`id_order` = o.`id_order`
             )) AS totalOperatingCost
             FROM '._DB_PREFIX_.'orders o
+			INNER JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd ON (hbd.`id_order` = o.`id_order`)
+            INNER JOIN `'._DB_PREFIX_.'htl_access` ha ON (hbd.`id_hotel` = ha.`id_hotel`)
             WHERE o.`valid` = 1
+			AND ha.`id_profile` = '.(int)$this->context->employee->id_profile.' AND ha.`access` = 1
             AND o.`invoice_date` BETWEEN '.ModuleGraph::getDateBetween().'
             '.Shop::addSqlRestriction(Shop::SHARE_ORDER, 'o').'
             GROUP BY '.$date_from_ginvoice
@@ -330,33 +333,48 @@ class StatsForecast extends Module
 
         $sql = 'SELECT COUNT(DISTINCT c.`id_cart`)
         FROM '._DB_PREFIX_.'cart c
+		INNER JOIN `'._DB_PREFIX_.'htl_cart_booking_data` hcbd ON (hcbd.`id_cart` = c.`id_cart`)
+		INNER JOIN `'._DB_PREFIX_.'htl_access` ha ON (hcbd.`id_hotel` = ha.`id_hotel`)
         WHERE c.`id_customer` != 0
+		AND ha.`id_profile` = '.(int)$this->context->employee->id_profile.' AND ha.`access` = 1
         AND (c.`date_add` BETWEEN '.ModuleGraph::getDateBetween().' OR c.`date_upd` BETWEEN '.ModuleGraph::getDateBetween().')';
         $carts_registered = Db::getInstance()->getValue($sql);
 
         $sql = 'SELECT COUNT(DISTINCT c.`id_cart`)
         FROM '._DB_PREFIX_.'cart c
+		INNER JOIN `'._DB_PREFIX_.'htl_cart_booking_data` hcbd ON (hcbd.`id_cart` = c.`id_cart`)
+		INNER JOIN `'._DB_PREFIX_.'htl_access` ha ON (hcbd.`id_hotel` = ha.`id_hotel`)
         WHERE c.`id_customer` = 0
+		AND ha.`id_profile` = '.(int)$this->context->employee->id_profile.' AND ha.`access` = 1
         AND (c.`date_add` BETWEEN '.ModuleGraph::getDateBetween().' OR c.`date_upd` BETWEEN '.ModuleGraph::getDateBetween().')';
         $carts_unregistered = Db::getInstance()->getValue($sql);
 
         $sql = 'SELECT COUNT(*)
         FROM '._DB_PREFIX_.'orders o
+		INNER JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd ON (hbd.`id_order` = o.`id_order`)
+		INNER JOIN `'._DB_PREFIX_.'htl_access` ha ON (hbd.`id_hotel` = ha.`id_hotel`)
         WHERE o.`valid` = 1
-        AND o.`date_add` BETWEEN '.ModuleGraph::getDateBetween();
+		AND ha.`id_profile` = '.(int)$this->context->employee->id_profile.' AND ha.`access` = 1
+		AND o.`date_add` BETWEEN '.ModuleGraph::getDateBetween();
         $orders = Db::getInstance()->getValue($sql);
 
         $sql = 'SELECT COUNT(*)
         FROM '._DB_PREFIX_.'orders o
+		INNER JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd ON (hbd.`id_order` = o.`id_order`)
+		INNER JOIN `'._DB_PREFIX_.'htl_access` ha ON (hbd.`id_hotel` = ha.`id_hotel`)
         INNER JOIN '._DB_PREFIX_.'customer c ON c.`id_customer` = o.`id_customer`
         WHERE o.`valid` = 1 AND c.`is_guest` = 0
+		AND ha.`id_profile` = '.(int)$this->context->employee->id_profile.' AND ha.`access` = 1
         AND o.`date_add` BETWEEN '.ModuleGraph::getDateBetween();
         $orders_registered = Db::getInstance()->getValue($sql);
 
         $sql = 'SELECT COUNT(*)
         FROM '._DB_PREFIX_.'orders o
+		INNER JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd ON (hbd.`id_order` = o.`id_order`)
+		INNER JOIN `'._DB_PREFIX_.'htl_access` ha ON (hbd.`id_hotel` = ha.`id_hotel`)
         INNER JOIN '._DB_PREFIX_.'customer c ON c.`id_customer` = o.`id_customer`
         WHERE o.`valid` = 1 AND c.`is_guest` = 1
+		AND ha.`id_profile` = '.(int)$this->context->employee->id_profile.' AND ha.`access` = 1
         AND o.`date_add` BETWEEN '.ModuleGraph::getDateBetween();
         $orders_unregistered = Db::getInstance()->getValue($sql);
 

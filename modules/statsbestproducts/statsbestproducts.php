@@ -209,7 +209,10 @@ class StatsBestProducts extends ModuleGrid
         ON (hrt.`id_product` = p.`id_product`)
         LEFT JOIN `'._DB_PREFIX_.'htl_branch_info_lang` hbil
         ON (hbil.`id` = hrt.`id_hotel` AND hbil.`id_lang` = '.(int) $id_lang .')
-        WHERE p.`booking_product` = 1';
+        INNER JOIN `'._DB_PREFIX_.'htl_access` ha
+        ON (hbil.`id` = ha.`id_hotel`)
+        WHERE p.`booking_product` = 1
+        AND ha.`id_profile` = '.(int)$this->context->employee->id_profile.' AND ha.`access` = 1';
 
         if (Validate::IsName($this->_sort)) {
             $this->query .= ' ORDER BY `'.bqSQL($this->_sort).'`';
