@@ -3601,6 +3601,39 @@ exit;
         return strip_tags(stripslashes($description));
     }
 
+    public static function stripEmojis($string, $trim = true)
+    {
+        // Match Enclosed Alphanumeric Supplement
+        $regexAlphanumeric = '/[\x{1F100}-\x{1F1FF}]/u';
+        $finalString = preg_replace($regexAlphanumeric, '', $string);
+
+        // Match Miscellaneous Symbols and Pictographs
+        $regexSymbols = '/[\x{1F300}-\x{1F5FF}]/u';
+        $finalString = preg_replace($regexSymbols, '', $finalString);
+
+        // Match Emoticons
+        $regexEmoticons = '/[\x{1F600}-\x{1F64F}]/u';
+        $finalString = preg_replace($regexEmoticons, '', $finalString);
+
+        // Match Transport And Map Symbols
+        $regexTransport = '/[\x{1F680}-\x{1F6FF}]/u';
+        $finalString = preg_replace($regexTransport, '', $finalString);
+
+        // Match Supplemental Symbols and Pictographs
+        $regexSupplemental = '/[\x{1F900}-\x{1F9FF}]/u';
+        $finalString = preg_replace($regexSupplemental, '', $finalString);
+
+        // Match Miscellaneous Symbols
+        $regexMisc = '/[\x{2600}-\x{26FF}]/u';
+        $finalString = preg_replace($regexMisc, '', $finalString);
+
+        // Match Dingbats
+        $regexDingbats = '/[\x{2700}-\x{27BF}]/u';
+        $finalString = preg_replace($regexDingbats, '', $finalString);
+
+        return $trim ? trim($finalString) : $finalString;
+    }
+
     public static function purifyHTML($html, $uri_unescape = null, $allow_style = false)
     {
         require_once(_PS_TOOL_DIR_.'htmlpurifier/HTMLPurifier.auto.php');

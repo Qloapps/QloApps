@@ -2146,6 +2146,18 @@ class AdminNormalProductsControllerCore extends AdminController
             }
         }
 
+        // validate if name contains only emojis
+        foreach ($languages as $language) {
+            if ($name = trim(Tools::getValue('name_'.$language['id_lang']))) {
+                if (!Tools::stripEmojis($name)) {
+                    $this->errors[] = sprintf(
+                        $this->l('Service product name in %s contains only emojis. Please add alphabetical characters also.'),
+                        $language['name']
+                    );
+                }
+            }
+        }
+
         // $rootCategory = Category::getRootCategory();
         // $_POST['categoryBox'][] = $rootCategory->id_category;
         // if(!Tools::getValue('id_category_default')) {

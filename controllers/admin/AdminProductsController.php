@@ -2080,6 +2080,18 @@ class AdminProductsControllerCore extends AdminController
             }
         }
 
+        // validate if name contains only emojis
+        foreach ($languages as $language) {
+            if ($name = trim(Tools::getValue('name_'.$language['id_lang']))) {
+                if (!Tools::stripEmojis($name)) {
+                    $this->errors[] = sprintf(
+                        $this->l('Room type name in %s contains only emojis. Please add alphabetical characters also.'),
+                        $language['name']
+                    );
+                }
+            }
+        }
+
         // if (Tools::getValue('is_virtual')) {
             $id_hotel = Tools::getValue('id_hotel');
             if (!$id_hotel || !Validate::isUnsignedInt($id_hotel)) {

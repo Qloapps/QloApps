@@ -231,9 +231,17 @@ class AdminAddHotelController extends ModuleAdminController
         } else {
             foreach ($languages as $lang) {
                 // validate non required fields
-                if (trim(Tools::getValue('hotel_name_'.$lang['id_lang']))) {
-                    if (!Validate::isGenericName(Tools::getValue('hotel_name_'.$lang['id_lang']))) {
+                $hotelName = trim(Tools::getValue('hotel_name_'.$lang['id_lang']));
+                if ($hotelName) {
+                    if (!Validate::isGenericName($hotelName)) {
                         $this->errors[] = $this->l('Invalid Hotel name in ').$lang['name'];
+                    }
+
+                    if (!Tools::stripEmojis($hotelName)) {
+                        $this->errors[] = sprintf(
+                            $this->l('Hotel name in %s contains only emojis. Please add alphabetical characters also.'),
+                            $lang['name']
+                        );
                     }
                 }
                 if ($shortDescription = html_entity_decode(Tools::getValue('short_description_'.$lang['id_lang']))) {
