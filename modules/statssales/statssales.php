@@ -216,14 +216,23 @@ class StatsSales extends ModuleGraph
         list($this->option, $this->id_country, $this->id_hotel) = explode('-', $options);
         switch ($this->option) {
             case 1:
-                $this->_titles['main'] = $this->l('Orders placed');
+                if (Tools::getValue('export')) {
+                    $this->_titles['main'][] = $this->l('Date');
+                }
+                $this->_titles['main'][] = $this->l('Orders placed');
                 break;
             case 2:
+                if (Tools::getValue('export')) {
+                    $this->_titles['main'][] = $this->l('Date');
+                }
                 $currency = new Currency((int)Configuration::get('PS_CURRENCY_DEFAULT'));
-                $this->_titles['main'] = sprintf($this->l('Revenue currency: %s'), $currency->iso_code);
+                $this->_titles['main'][] = sprintf($this->l('Revenue currency: %s'), $currency->iso_code);
                 break;
             case 3:
-                $this->_titles['main'] = $this->l('Percentage of orders per status.');
+                if (Tools::getValue('export')) {
+                    $this->_titles['main'][] = $this->l('Payment method');
+                }
+                $this->_titles['main'][] = $this->l('Percentage of orders per status.');
                 break;
         }
     }

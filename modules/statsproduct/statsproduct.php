@@ -339,8 +339,11 @@ class StatsProduct extends ModuleGraph
         $date_between = $this->getDate();
         switch ($this->option) {
             case 1:
-                $this->_titles['main'][0] = $this->l('Room nights');
-                $this->_titles['main'][1] = $this->l('Views (x100)');
+                if (Tools::getValue('export')) {
+                    $this->_titles['main'][] = $this->l('Date');
+                }
+                $this->_titles['main'][] = $this->l('Room nights');
+                $this->_titles['main'][] = $this->l('Views (x100)');
                 $this->_titles['x'] = $this->l('Date');
                 $this->_titles['y'] = $this->l('Room nights, Views (x100)');
 

@@ -125,10 +125,12 @@ class StatsNewsletter extends ModuleGraph
 
     protected function getData($layers)
     {
-        $this->_titles['main'][0] = $this->l('Customers');
-        $this->_titles['main'][1] = $this->l('Visitors');
-        $this->_titles['main'][2] = $this->l('Newsletter statistics');
-        $this->_titles['main'][3] = $this->l('Both');
+        if (Tools::getValue('export')) {
+            $this->_titles['main'][] = $this->l('Date');
+        }
+        $this->_titles['main'][] = $this->l('Customers');
+        $this->_titles['main'][] = $this->l('Visitors');
+        $this->_titles['main'][] = $this->l('Both');
 
         $this->_query = 'SELECT newsletter_date_add
 				FROM `'._DB_PREFIX_.'customer`
