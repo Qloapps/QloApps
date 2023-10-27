@@ -606,6 +606,16 @@ class StatsForecast extends Module
             $where = ' AND co.id_zone = '.(int)$this->context->cookie->stats_id_zone.' ';
         }
 
+		$idOrders = Db::getInstance()->getValue('
+			SELECT GROUP_CONCAT(DISTINCT o.`id_order`)
+			FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
+			INNER JOIN `'._DB_PREFIX_.'orders` o ON (o.`id_order` = hbd.`id_order`)
+			INNER JOIN `'._DB_PREFIX_.'htl_access` ha ON (hbd.`id_hotel` = ha.`id_hotel`)
+			WHERE  o.valid = 1 AND ha.`id_profile` = '.(int)$this->context->employee->id_profile.'
+			AND ha.`access` = 1 AND o.`invoice_date` BETWEEN '.ModuleGraph::getDateBetween().'
+			'.Shop::addSqlRestriction(Shop::SHARE_ORDER, 'o')
+		);
+
         $lang_values = '';
         $sql = 'SELECT l.id_lang, l.iso_code
 				FROM `'._DB_PREFIX_.'lang` l
@@ -620,34 +630,28 @@ class StatsForecast extends Module
         if ($lang_values) {
             $sql = 'SELECT '.$lang_values.'
 					FROM `'._DB_PREFIX_.'orders` o
-					WHERE o.valid = 1
-					AND o.`invoice_date` BETWEEN '.ModuleGraph::getDateBetween().'
-					'.Shop::addSqlRestriction(Shop::SHARE_ORDER, 'o');
+					WHERE o.`id_order` IN ('.pSQL($idOrders).')';
             $ca['lang'] = Db::getInstance()->getRow($sql);
             arsort($ca['lang']);
         } else {
             $ca['lang'] = array();
         }
 
-        $sql = 'SELECT reference
+        $sql = 'SELECT id_order
 					FROM `'._DB_PREFIX_.'orders` o
 					'.$join.'
-					WHERE o.valid
-					'.$where.'
-					'.Shop::addSqlRestriction(Shop::SHARE_ORDER, 'o').'
-					AND o.invoice_date BETWEEN '.ModuleGraph::getDateBetween().'';
+					WHERE o.`id_order` IN ('.pSQL($idOrders).')
+					'.$where;
         $result = Db::getInstance()->executeS($sql);
         if (count($result)) {
-            $references = array();
+            $orderIdPayment = array();
             foreach ($result as $r) {
-                $references[] = $r['reference'];
+                $orderIdPayment[] = $r['id_order'];
             }
-            $sql = 'SELECT op.payment_method, SUM(op.amount / op.conversion_rate) as total, COUNT(DISTINCT op.order_reference) as nb
+            $sql = 'SELECT op.`payment_method`, SUM(opd.`amount` / op.`conversion_rate`) as total, COUNT(DISTINCT op.order_reference) as nb
 					FROM `'._DB_PREFIX_.'order_payment` op
-					WHERE op.`date_add` BETWEEN '.ModuleGraph::getDateBetween().'
-					AND op.order_reference IN (
-						"'.implode('","', $references).'"
-					)
+					INNER JOIN `'._DB_PREFIX_.'order_payment_detail` opd ON (op.`id_order_payment` = opd.`id_order_payment`)
+					WHERE opd.`id_order` IN ('.implode(',', $orderIdPayment).')
 					GROUP BY op.payment_method
 					ORDER BY total DESC';
             $ca['payment'] = Db::getInstance()->executeS($sql);
@@ -661,6 +665,7 @@ class StatsForecast extends Module
 				LEFT JOIN `'._DB_PREFIX_.'country` c ON c.id_country = a.id_country
 				LEFT JOIN `'._DB_PREFIX_.'zone` z ON z.id_zone = c.id_zone
 				WHERE o.valid = 1
+					'.(isset($idOrders) ? ' AND o.`id_order` IN ('.pSQL($idOrders).')':'').'
 					AND o.`invoice_date` BETWEEN '.ModuleGraph::getDateBetween().'
 					'.Shop::addSqlRestriction(Shop::SHARE_ORDER, 'o').'
 				GROUP BY c.id_zone
@@ -671,10 +676,7 @@ class StatsForecast extends Module
 				FROM `'._DB_PREFIX_.'orders` o
 				LEFT JOIN `'._DB_PREFIX_.'currency` cu ON o.id_currency = cu.id_currency
 				'.$join.'
-				WHERE o.valid = 1
-					AND o.`invoice_date` BETWEEN '.ModuleGraph::getDateBetween().'
-					'.$where.'
-					'.Shop::addSqlRestriction(Shop::SHARE_ORDER, 'o').'
+				WHERE o.`id_order` IN ('.pSQL($idOrders).')
 				GROUP BY o.id_currency
 				ORDER BY total DESC';
         $ca['currencies'] = Db::getInstance()->executeS($sql);
@@ -682,9 +684,7 @@ class StatsForecast extends Module
         $sql = 'SELECT SUM(total_paid_tax_excl / o.conversion_rate) as total,
 			SUM(total_paid_tax_incl / o.conversion_rate) as total_incl, COUNT(*) AS nb
 				FROM `'._DB_PREFIX_.'orders` o
-				WHERE o.valid = 1
-					AND o.`invoice_date` BETWEEN '.ModuleGraph::getDateBetween().'
-					'.Shop::addSqlRestriction(Shop::SHARE_ORDER, 'o');
+				WHERE o.`id_order` IN ('.pSQL($idOrders).')';
         $ca['ventil'] = Db::getInstance()->getRow($sql);
 
         $sql = 'SELECT /*pac.id_attribute,*/ agl.name as gname, al.name as aname, COUNT(*) as total
