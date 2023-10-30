@@ -606,7 +606,7 @@ class StatsForecast extends Module
             $where = ' AND co.id_zone = '.(int)$this->context->cookie->stats_id_zone.' ';
         }
 
-		$idOrders = Db::getInstance()->getValue('
+		if (!$idOrders = Db::getInstance()->getValue('
 			SELECT GROUP_CONCAT(DISTINCT o.`id_order`)
 			FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
 			INNER JOIN `'._DB_PREFIX_.'orders` o ON (o.`id_order` = hbd.`id_order`)
@@ -614,7 +614,9 @@ class StatsForecast extends Module
 			WHERE  o.valid = 1 AND ha.`id_profile` = '.(int)$this->context->employee->id_profile.'
 			AND ha.`access` = 1 AND o.`invoice_date` BETWEEN '.ModuleGraph::getDateBetween().'
 			'.Shop::addSqlRestriction(Shop::SHARE_ORDER, 'o')
-		);
+		)) {
+			$idOrders = 0;
+		}
 
         $lang_values = '';
         $sql = 'SELECT l.id_lang, l.iso_code
