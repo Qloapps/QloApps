@@ -1329,7 +1329,7 @@ class AdminModulesControllerCore extends AdminController
         $helper->color = 'color1';
         $helper->title = $this->l('Installed Modules', null, null, false);
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=installed_modules';
-        $kpis[] = $helper->generate();
+        $kpis[] = $helper;
 
         $helper = new HelperKpi();
         $helper->id = 'box-disabled-modules';
@@ -1337,7 +1337,7 @@ class AdminModulesControllerCore extends AdminController
         $helper->color = 'color2';
         $helper->title = $this->l('Disabled Modules', null, null, false);
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=disabled_modules';
-        $kpis[] = $helper->generate();
+        $kpis[] = $helper;
 
         $helper = new HelperKpi();
         $helper->id = 'box-update-modules';
@@ -1345,7 +1345,7 @@ class AdminModulesControllerCore extends AdminController
         $helper->color = 'color3';
         $helper->title = $this->l('Modules to Update', null, null, false);
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=update_modules';
-        $kpis[] = $helper->generate();
+        $kpis[] = $helper;
 
         $helper = new HelperKpiRow();
         $helper->kpis = $kpis;

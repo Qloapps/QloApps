@@ -1325,7 +1325,7 @@ class AdminTranslationsControllerCore extends AdminController
         $helper->href = $this->context->link->getAdminLink('AdminLanguages');
         $helper->title = $this->l('Enabled Languages', null, null, false);
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=enabled_languages';
-        $kpis[] = $helper->generate();
+        $kpis[] = $helper;
 
         $helper = new HelperKpi();
         $helper->id = 'box-fo-translations';
@@ -1333,7 +1333,7 @@ class AdminTranslationsControllerCore extends AdminController
         $helper->color = 'color3';
         $helper->title = $this->l('Front office Translations', null, null, false);
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=frontoffice_translations';
-        $kpis[] = $helper->generate();
+        $kpis[] = $helper;
 
         $helper = new HelperKpi();
         $helper->id = 'box-bo-translations';
@@ -1345,7 +1345,7 @@ class AdminTranslationsControllerCore extends AdminController
         }
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=backoffice_translations';
         $helper->refresh = (bool)(ConfigurationKPI::get('BACKOFFICE_TRANSLATIONS_EXPIRE') < $time);
-        $kpis[] = $helper->generate();
+        $kpis[] = $helper;
 
         $helper = new HelperKpiRow();
         $helper->kpis = $kpis;

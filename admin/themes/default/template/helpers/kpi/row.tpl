@@ -22,20 +22,42 @@
 *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 *}
-<div class="panel kpi-container">
-	{if $refresh}
-		<div class="kpi-refresh"><button class="close refresh" type="button" onclick="refresh_kpis();"><i class="process-icon-refresh" style="font-size:1em"></i></button></div>
-	{/if}
-	{if ($kpis|count) > 0}
-	<div class="row">
-		{assign var='col' value=(int)(12 / $kpis|count)}
-		{foreach from=$kpis item=i name=kpi}
-			{if $smarty.foreach.kpi.iteration > $col+1}
-				</div>
-				<div class="row">
-			{/if}
-			<div class="col-sm-6 col-lg-{$col}">{$i}</div>
+
+<div class="panel kpi-container{if isset($no_wrapping) && $no_wrapping} no-wrapping{/if}">
+	<div class="kpis-wrap">
+		{foreach from=$kpis item=kpi}
+			<div class="kpi-wrap"{if isset($kpi->visible) && !$kpi->visible}style="display: none;"{/if}>
+				{$kpi->generate()}
+			</div>
 		{/foreach}
 	</div>
-	{/if}
+
+	<div class="actions-wrap">
+		{if $refresh}
+			<button class="btn btn-default" type="button" onclick="refresh_kpis();">
+				<i class="icon-refresh"></i>
+			</button>
+		{/if}
+
+		<div class="dropdown">
+			<button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">
+				<i class="icon-ellipsis-vertical"></i>
+			</button>
+
+			<ul class="dropdown-menu">
+				{foreach from=$kpis item=kpi}
+					<li>
+						<label>
+							<input type="checkbox" class="kpi-display-toggle" data-kpi-id="{$kpi->id}" {if $kpi->visible}checked{/if}>
+							{$kpi->title}
+						</label>
+					</li>
+				{/foreach}
+			</ul>
+		</div>
+
+		<button class="btn btn-default" type="button" onclick="toggleKpiView();">
+			<i class="icon-retweet"></i>
+		</button>
+	</div>
 </div>

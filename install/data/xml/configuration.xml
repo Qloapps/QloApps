@@ -101,6 +101,9 @@
 	<configuration id="PS_NB_DAYS_NEW_PRODUCT" name="PS_NB_DAYS_NEW_PRODUCT">
 		<value>20</value>
 	</configuration>
+	<configuration id="PS_KPI_BEST_SELLING_ROOM_TYPE_NB_DAYS" name="PS_KPI_BEST_SELLING_ROOM_TYPE_NB_DAYS">
+		<value>30</value>
+	</configuration>
 	<configuration id="PS_SSL_ENABLED" name="PS_SSL_ENABLED">
 		<value>0</value>
 	</configuration>
@@ -883,6 +886,18 @@
 	</configuration>
 	<configuration id="PS_CUSTOMER_OPTIN" name="PS_CUSTOMER_OPTIN">
 		<value>1</value>
+	</configuration>
+	<configuration id="PS_KPI_FREQUENT_CUSTOMER_NB_ORDERS" name="PS_KPI_FREQUENT_CUSTOMER_NB_ORDERS">
+		<value>5</value>
+	</configuration>
+	<configuration id="PS_KPI_REVPAC_NB_DAYS" name="PS_KPI_REVPAC_NB_DAYS">
+		<value>30</value>
+	</configuration>
+	<configuration id="PS_KPI_CONVERSION_RATE_NB_DAYS" name="PS_KPI_CONVERSION_RATE_NB_DAYS">
+		<value>30</value>
+	</configuration>
+	<configuration id="PS_KPI_NEW_CUSTOMERS_NB_DAYS" name="PS_KPI_NEW_CUSTOMERS_NB_DAYS">
+		<value>30</value>
 	</configuration>
 	<configuration id="PS_PACK_STOCK_TYPE" name="PS_PACK_STOCK_TYPE">
 		<value>0</value>
