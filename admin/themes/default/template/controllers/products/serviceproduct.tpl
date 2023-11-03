@@ -55,18 +55,22 @@
                                     <div class="help-block">{l s='Default price: %s' sprintf={displayPrice price=$service_product.default_price currency=$currency->id}}
                                 </td>
                                 <td>
-                                    <span class="field-view service_product_tax_text">{if isset($service_product.tax_rules_group_name) && $service_product.tax_rules_group_name}{$service_product.tax_rules_group_name}{else}{$service_product.default_tax_rules_group_name}{/if}</span>
-                                    <div class="field-edit" style="display:none">
-                                        <select class="service_product_id_tax_rules_group">
-                                            <option value="0">{l s='No Tax'}</option>
-                                            {foreach from=$tax_rules_groups item=tax_rules_group}
-                                                <option value="{$tax_rules_group.id_tax_rules_group}" {if $service_product.id_tax_rules_group == $tax_rules_group.id_tax_rules_group}selected="selected"{/if} >
-                                                    {$tax_rules_group['name']|htmlentitiesUTF8}
-                                                </option>
-                                            {/foreach}
-                                        </select>
-                                    </div>
-                                    <div class="help-block">{l s='Default tax rule: %s' sprintf=$service_product.default_tax_rules_group_name}
+                                    {if $service_product.auto_add_to_cart && $service_product.price_addition_type == Product::PRICE_ADDITION_TYPE_WITH_ROOM}
+                                        {l s='-'}
+                                    {else}
+                                        <span class="field-view service_product_tax_text">{if isset($service_product.tax_rules_group_name) && $service_product.tax_rules_group_name}{$service_product.tax_rules_group_name}{else}{$service_product.default_tax_rules_group_name}{/if}</span>
+                                        <div class="field-edit" style="display:none">
+                                            <select class="service_product_id_tax_rules_group">
+                                                <option value="0">{l s='No Tax'}</option>
+                                                {foreach from=$tax_rules_groups item=tax_rules_group}
+                                                    <option value="{$tax_rules_group.id_tax_rules_group}" {if $service_product.id_tax_rules_group == $tax_rules_group.id_tax_rules_group}selected="selected"{/if} >
+                                                        {$tax_rules_group['name']|htmlentitiesUTF8}
+                                                    </option>
+                                                {/foreach}
+                                            </select>
+                                        </div>
+                                        <div class="help-block">{l s='Default tax rule: %s' sprintf=$service_product.default_tax_rules_group_name}
+                                    {/if}
                                 </td>
                                 <td class="text-right">
                                     <a href="#" class="btn btn-default button-edit-price field-view"><i class="icon-pencil"></i></a>

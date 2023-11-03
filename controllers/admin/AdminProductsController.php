@@ -1162,7 +1162,9 @@ class AdminProductsControllerCore extends AdminController
                 }
 
                 $objRoomTypeServiceProductPrice->price = $price;
-                $objRoomTypeServiceProductPrice->id_tax_rules_group = $id_tax_rules_group;
+                if ($id_tax_rules_group) {
+                    $objRoomTypeServiceProductPrice->id_tax_rules_group = $id_tax_rules_group;
+                }
 
                 if (!$objRoomTypeServiceProductPrice->save()) {
                     $error = $this->l('Unable to save price, please try again.');
@@ -2843,6 +2845,7 @@ class AdminProductsControllerCore extends AdminController
                     $serviceProduct['id_product'] = $product->id;
                     $serviceProduct['name'] = $product->name;
                     $serviceProduct['auto_add_to_cart'] = $product->auto_add_to_cart;
+                    $serviceProduct['price_addition_type'] = $product->price_addition_type;
                     $serviceProduct['category'] = $product->category;
                     $serviceProduct['default_price'] = $product->price;
                     $serviceProduct['id_tax_rules_group'] = $product->id_tax_rules_group;

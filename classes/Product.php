@@ -2997,7 +2997,7 @@ class ProductCore extends ObjectModel
     public static function getPriceStatic($id_product, $usetax = true, $id_product_attribute = null, $decimals = 6, $divisor = null,
         $only_reduc = false, $usereduc = true, $quantity = 1, $force_associated_tax = false, $id_customer = null, $id_cart = null,
         $id_address = null, &$specific_price_output = null, $with_ecotax = true, $use_group_reduction = true, Context $context = null,
-        $use_customer_price = true, $id_roomtype = false)
+        $use_customer_price = true, $id_product_roomtype = false)
     {
         if (!$context) {
             $context = Context::getContext();
@@ -3063,9 +3063,9 @@ class ProductCore extends ObjectModel
 
         if (!$id_address) {
             if (!Product::isBookingProduct($id_product)) {
-                if ($id_roomtype) {
+                if ($id_product_roomtype) {
                     // if room type is provided with product then we know that the service product price should be calculated accroding to roomt type
-                    $id_address = Cart::getIdAddressForTaxCalculation($id_roomtype);
+                    $id_address = Cart::getIdAddressForTaxCalculation($id_product_roomtype);
                 }
             } else {
                 $id_address = Cart::getIdAddressForTaxCalculation($id_product);
@@ -3119,7 +3119,7 @@ class ProductCore extends ObjectModel
             $use_customer_price,
             $id_cart,
             $cart_quantity,
-            $id_roomtype
+            $id_product_roomtype
         );
 
         return $return;
@@ -3153,9 +3153,8 @@ class ProductCore extends ObjectModel
      **/
     public static function priceCalculation($id_shop, $id_product, $id_product_attribute, $id_country, $id_state, $zipcode, $id_currency,
         $id_group, $quantity, $use_tax, $decimals, $only_reduc, $use_reduc, $with_ecotax, &$specific_price, $use_group_reduction,
-        $id_customer = 0, $use_customer_price = true, $id_cart = 0, $real_quantity = 0, $id_roomtype = false)
+        $id_customer = 0, $use_customer_price = true, $id_cart = 0, $real_quantity = 0, $id_product_roomtype = false)
     {
-
         static $address = null;
         static $context = null;
 
@@ -3182,7 +3181,7 @@ class ProductCore extends ObjectModel
         $cache_id = (int)$id_product.'-'.(int)$id_shop.'-'.(int)$id_currency.'-'.(int)$id_country.'-'.$id_state.'-'.$zipcode.'-'.(int)$id_group.
             '-'.(int)$quantity.'-'.(int)$id_product_attribute.
             '-'.(int)$with_ecotax.'-'.(int)$id_customer.'-'.(int)$use_group_reduction.'-'.(int)$id_cart.'-'.(int)$real_quantity.
-            '-'.($only_reduc?'1':'0').'-'.($use_reduc?'1':'0').'-'.($use_tax?'1':'0').'-'.(int)$decimals.'-'.($id_roomtype?(int)$id_roomtype:'0');
+            '-'.($only_reduc?'1':'0').'-'.($use_reduc?'1':'0').'-'.($use_tax?'1':'0').'-'.(int)$decimals.'-'.($id_product_roomtype?(int)$id_product_roomtype:'0');
 
         // reference parameter is filled before any returns
         $specific_price = SpecificPrice::getSpecificPrice(
@@ -3246,10 +3245,10 @@ class ProductCore extends ObjectModel
         $result = self::$_pricesLevel2[$cache_id_2][(int)$id_product_attribute];
 
         // get price per room type
-        if ($id_roomtype) {
+        if ($id_product_roomtype) {
             $priceForRoomInfo = RoomTypeServiceProductPrice::getProductRoomTypePriceAndTax(
                 $id_product,
-                $id_roomtype,
+                $id_product_roomtype,
                 RoomTypeServiceProduct::WK_ELEMENT_TYPE_ROOM_TYPE
             );
         }

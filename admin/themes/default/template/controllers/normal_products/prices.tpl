@@ -139,7 +139,7 @@ $(document).ready(function () {
 			</div>
 		</div>
 	</div>
-	<div class="form-group">
+	<div class="form-group" {if $product->auto_add_to_cart && $product->price_addition_type == Product::PRICE_ADDITION_TYPE_WITH_ROOM}style="display:none"{/if}>
 		<div class="col-lg-1"><span class="pull-right">{include file="controllers/products/multishop/checkbox.tpl" field="id_tax_rules_group" type="default"}</span></div>
 		<label class="control-label col-lg-2" for="id_tax_rules_group">
 			{l s='Tax rule:'}
@@ -193,7 +193,7 @@ $(document).ready(function () {
 			<input maxlength="27" id="ecotax" name="ecotax" type="text" value="{$product->ecotax|string_format:$priceDisplayPrecisionFormat}" onkeyup="$('#priceType').val('TI');if (isArrowKey(event))return; calcPriceTE(); this.value = this.value.replace(/,/g, '.'); if (parseInt(this.value) > getE('priceTE').value) this.value = getE('priceTE').value; if (isNaN(this.value)) this.value = 0;" />
 		</div>
 	</div>
-	<div class="form-group" {if !$country_display_tax_label || $tax_exclude_taxe_option}style="display:none;"{/if} >
+	<div class="form-group" {if !$country_display_tax_label || $tax_exclude_taxe_option}style="display:none;"{/if} {if $product->auto_add_to_cart && $product->price_addition_type == Product::PRICE_ADDITION_TYPE_WITH_ROOM}style="display:none"{/if}>
 		<label class="control-label col-lg-3" for="priceTI">{l s='Retail price with tax'}</label>
 		<div class="input-group col-lg-2">
 			<span class="input-group-addon">{$currency->prefix}{$currency->suffix}</span>
