@@ -1,6 +1,6 @@
 .page-head
 	width: 100%
-	height: 100px
+	height: 78px
 	padding: 0
 	margin: 0
 	position: fixed
@@ -14,7 +14,7 @@
 		@include float(left)
 		position: relative
 		margin: 0
-		font: 20pt $font-family-sans-serif
+		font: 14pt $font-family-sans-serif
 		color: #363A41
 		white-space: nowrap
 		@include padding(26px, 0, 0, ($widthSidebarNav+20px))
@@ -48,7 +48,8 @@
 			@include padding(3px, 0, 0, 0)
 			.toolbar_btn
 				position: relative
-				padding: 20px 5px !important
+				padding: 6px 8px !important
+				top: 18px
 				font-size: 12px
 				line-height: 8px
 				color: $main-color
@@ -57,22 +58,31 @@
 				white-space: nowrap
 				overflow: hidden
 				text-overflow: ellipsis
+				border: 1px solid $toolbar-buttons-color
 				@include margin(0, 3px, 2px, 0)
 				@media (max-width: $screen-desktop)
 					width: 46px
 					font-size: 11px
 				i
+					display: inline
 					color: $toolbar-buttons-color
+					font-size: 18px
 					&:hover
 						color: $toolbar-buttons-hover-color
-				div
-					padding-top: 10px
+				span
+					position: relative
+					top: -2px
+					left: 2px
 			.dropdown-toolbar
 				display: none
 				@include float(right)
 				@include border-radius(3px)
 				@media (max-width: $screen-sm)
 					display: block
+
+		#toolbar-nav
+			li + li
+				margin-left: 8px
 	ul.page-breadcrumb
 		position: absolute
 		list-style: none

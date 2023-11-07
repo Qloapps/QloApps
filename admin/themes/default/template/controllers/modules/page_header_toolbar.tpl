@@ -49,7 +49,7 @@
 					<li>
 						<a id="desc-module-update-all" class="toolbar_btn" href="{$currentIndex|escape:'html':'UTF-8'}&amp;token={$token|escape:'html':'UTF-8'}&amp;updateAll=1" title="{l s='Update all'}">
 							<i class="process-icon-refresh"></i>
-							<div>{l s='Update all'}</div>
+							<span>{l s='Update all'}</span>
 						</a>
 					</li>
 				{/if}
@@ -57,28 +57,28 @@
 				<li>
 					<a id="desc-module-check-and-update-all" class="toolbar_btn" href="{$currentIndex|escape:'html':'UTF-8'}&amp;token={$token|escape:'html':'UTF-8'}&amp;check=1" title="{l s='Check for update'}">
 						<i class="process-icon-refresh"></i>
-						<div>{l s='Check for update'}</div>
+						<span>{l s='Check for update'}</span>
 					</a>
 				</li>
 			{/if}
 			<li>
 				<a id="desc-module-catalog" class="toolbar_btn anchor" href="{$link->getAdminLink('AdminModulesCatalog')}" title="{l s='Recommended Modules and Services'}">
 					<i class="process-icon-modules-list"></i>
-					<div>{l s='Recommended Modules and Services'}</div>
+					<span>{l s='Recommended Modules and Services'}</span>
 				</a>
 			</li>
 			{if $add_permission eq '1' && ($context_mode != Context::MODE_HOST)}
 			<li>
 				<a id="desc-module-new" class="toolbar_btn anchor" href="#" onclick="$('#module_install').slideToggle();" title="{l s='Add a new module'}">
 					<i class="process-icon-new"></i>
-					<div>{l s='Add a new module'}</div>
+					<span>{l s='Add a new module'}</span>
 				</a>
 			</li>
 			{else}
 			<li>
 				<a id="desc-module-new" class="toolbar_btn" href="{$link->getAdminLink('AdminModules')}&addnewmodule" title="{l s='Add a new module'}">
 					<i class="process-icon-new"></i>
-					<div>{l s='Add a new module'}</div>
+					<span>{l s='Add a new module'}</span>
 				</a>
 			</li>
 			{/if}

@@ -32,7 +32,7 @@
             <td class="text-left">{$booking_document.title}</td>
             <td class="text-center">{dateFormat date=$booking_document.date_add full=1}</td>
             <td class="text-center">
-                <a class="btn btn-info" href="{$link->getAdminLink('AdminBookingDocument')}&action=getDocument&id_document={$booking_document.id_htl_booking_document}">
+                <a class="btn btn-success" href="{$link->getAdminLink('AdminBookingDocument')}&action=getDocument&id_document={$booking_document.id_htl_booking_document}">
                     <i class="icon icon-cloud-download"></i>
                 </a>
                 <a class="btn btn-danger btn-delete-document" data-id-htl-booking-document="{$booking_document.id_htl_booking_document}">
