@@ -288,6 +288,8 @@ $(document).ready(function(){
 		element.val(elementVal);
 		$(this).closest('.rm_qty_cont').find('.qty_count > span').text(elementVal);
 		$(document).trigger( "QloApps:updateRoomQuantity", [element]);
+
+		updateAddToCartUrl($(this).closest('.room_cont'));
 	});
 
 	// The button to decrement the product value
@@ -302,6 +304,8 @@ $(document).ready(function(){
 		element.val(elementVal);
 		$(this).closest('.rm_qty_cont').find('.qty_count > span').text(elementVal);
 		$(document).trigger( "QloApps:updateRoomQuantity", [element]);
+
+		updateAddToCartUrl($(this).closest('.room_cont'));
 	});
 });
 
@@ -397,17 +401,17 @@ function updateAddToCartUrl(roomContainer) {
 
     let occupancy = JSON.stringify(getBookingOccupancyDetails(bookingFormFields));
 
-    let params = {
-        add: 1,
-        id_product: idProduct,
-        id_customization: 0,
-        token: static_token,
-        dateFrom: $(addToCartButton).attr('cat_rm_check_in'),
-        dateTo: $(addToCartButton).attr('cat_rm_check_out'),
-        occupancy: occupancy,
-    };
+    let dateFrom = $(addToCartButton).attr('cat_rm_check_in');
+    let dateTo = $(addToCartButton).attr('cat_rm_check_out');
 
-    let queryParams = new URLSearchParams(params).toString();
+    let queryParams = 'add=1&id_product=' + idProduct + '&token=' + static_token +
+    '&dateFrom=' + dateFrom + '&dateTo=' + dateTo;
+    if (occupancy_required_for_booking) {
+        queryParams += '&occupancy=' + occupancy;
+    } else {
+        queryParams += '&qty=' + occupancy;
+    }
+
     let addToCartUrl = cart_controller_url + '?' + queryParams;
 
     $(addToCartButton).attr('href', addToCartUrl);
