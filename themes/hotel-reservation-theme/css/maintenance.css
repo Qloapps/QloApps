@@ -131,19 +131,16 @@ button[type='button'].cancel-login {
 
 .header-container {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
   margin-right: auto;
   margin-left: auto;
+  position: relative;
 }
 
-.header-container > div:nth-child(1),
-.header-container > div:nth-child(3) {
-  flex-basis: 25%;
-}
-
-.header-container > div:nth-child(2) {
-  flex-basis: 50%;
+.header-container.multilang .language-selector-wrap {
+  position: absolute;
+  right: 0;
 }
 
 @media (min-width: 768px) {
