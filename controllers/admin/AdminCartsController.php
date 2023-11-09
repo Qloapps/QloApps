@@ -54,7 +54,7 @@ class AdminCartsControllerCore extends AdminController
 		LEFT JOIN `'._DB_PREFIX_.'connections` co ON (a.id_guest = co.id_guest AND TIME_TO_SEC(TIMEDIFF(\''.pSQL(date('Y-m-d H:i:00', time())).'\', co.`date_add`)) < 1800)';
         $this->_group = ' GROUP BY a.`id_cart`';
 
-        if (Tools::getValue('action') == 'filterAbandonedCarts') {
+        if (Tools::getValue('action') == 'filterOnlyAbandonedCarts') {
             $this->_filterHaving = ' AND `ids_order` = 0 AND `time_diff` > 86400';
         }
 
