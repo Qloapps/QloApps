@@ -473,14 +473,14 @@ p.room_cat_data
 }
 
 /* ==== AdminHotelFeaturePricesSettingsController ==== */
-.form-group.room-type-name .help-block {
-    width: max-content;
-}
 .week_days {
     display: none;
 }
-.week_days .checkboxes-wrap .col-sm-1 {
-    width: 14.285714%;
+.week_days .checkboxes-wrap {
+    display: flex;
+}
+.week_days .checkboxes-wrap .day-wrap {
+    min-width: 50px;
 }
 .room_type_search_results_ul {
     padding: 0px;

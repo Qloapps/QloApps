@@ -139,7 +139,7 @@
 				{l s='Special days' mod='hotelreservationsystem'}
 			</label>
 			<div class="col-lg-3 checkboxes-wrap">
-				<div class="col-sm-1">
+				<div class="day-wrap">
 					<input type="checkbox" name="special_days[]" value="mon"
 					{if (isset($smarty.post.special_days) && in_array('mon', $smarty.post.special_days))
 						|| (isset($special_days) && $special_days && in_array('mon', $special_days))}
@@ -147,7 +147,7 @@
 					{/if}/>
 					<p>{l s='Mon' mod='hotelreservationsystem'}</p>
 				</div>
-				<div class="col-sm-1">
+				<div class="day-wrap">
 					<input type="checkbox" name="special_days[]" value="tue"
 					{if (isset($smarty.post.special_days) && in_array('tue', $smarty.post.special_days))
 						|| (isset($special_days) && $special_days && in_array('tue', $special_days))}
@@ -155,7 +155,7 @@
 					{/if}/>
 					<p>{l s='Tue' mod='hotelreservationsystem'}</p>
 				</div>
-				<div class="col-sm-1">
+				<div class="day-wrap">
 					<input type="checkbox" name="special_days[]" value="wed"
 					{if (isset($smarty.post.special_days) && in_array('wed', $smarty.post.special_days))
 						|| (isset($special_days) && $special_days && in_array('wed', $special_days))}
@@ -163,7 +163,7 @@
 					{/if}/>
 					<p>{l s='Wed' mod='hotelreservationsystem'}</p>
 				</div>
-				<div class="col-sm-1">
+				<div class="day-wrap">
 					<input type="checkbox" name="special_days[]" value="thu"
 					{if (isset($smarty.post.special_days) && in_array('thu', $smarty.post.special_days))
 						|| (isset($special_days) && $special_days && in_array('thu', $special_days))}
@@ -171,7 +171,7 @@
 					{/if}/>
 					<p>{l s='Thu' mod='hotelreservationsystem'}</p>
 				</div>
-				<div class="col-sm-1">
+				<div class="day-wrap">
 					<input type="checkbox" name="special_days[]" value="fri"
 					{if (isset($smarty.post.special_days) && in_array('fri', $smarty.post.special_days))
 						|| (isset($special_days) && $special_days && in_array('fri', $special_days))}
@@ -179,7 +179,7 @@
 					{/if}/>
 					<p>{l s='Fri' mod='hotelreservationsystem'}</p>
 				</div>
-				<div class="col-sm-1">
+				<div class="day-wrap">
 					<input type="checkbox" name="special_days[]" value="sat"
 					{if (isset($smarty.post.special_days) && in_array('sat', $smarty.post.special_days))
 						|| (isset($special_days) && $special_days && in_array('sat', $special_days))}
@@ -187,7 +187,7 @@
 					{/if}/>
 					<p>{l s='Sat' mod='hotelreservationsystem'}</p>
 				</div>
-				<div class="col-sm-1">
+				<div class="day-wrap">
 					<input type="checkbox" name="special_days[]" value="sun"
 					{if (isset($smarty.post.special_days) && in_array('sun', $smarty.post.special_days))
 						|| (isset($special_days) && $special_days && in_array('sun', $special_days))}
