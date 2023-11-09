@@ -333,6 +333,9 @@ class AdminCartsControllerCore extends AdminController
             }
             $this->context->cart = new Cart((int)$id_cart);
 
+            CartRule::autoRemoveFromCart($this->context);
+            CartRule::autoAddToCart($this->context);
+
             if (!$this->context->cart->id) {
                 $this->context->cart->recyclable = 0;
                 $this->context->cart->gift = 0;
