@@ -478,6 +478,10 @@ class HotelReservationSystem extends Module
 
     public function hookDisplayBackOfficeHeader()
     {
+        if (Tools::getValue('controllerUri') == 'AdminHotelReservationSystemManagement') {
+            Tools::redirectAdmin($this->context->link->getAdminLink('AdminHotelRoomsBooking'));
+        }
+
         $this->context->controller->addCSS($this->_path.'views/css/admin/css/hotel_admin_tab_logo.css');
     }
 
