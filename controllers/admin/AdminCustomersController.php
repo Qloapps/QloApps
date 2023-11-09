@@ -976,8 +976,8 @@ class AdminCustomersControllerCore extends AdminController
 
         if ($years != '' && $months != '' && $days != '') {
             $object->birthday = (int) $years.'-'.(int) $months.'-'.(int) $days;
-        } elseif ($years == '' && $months == '' && $days == '') {
-            $object->birthday = null;
+        } else {
+            $object->birthday = '0000-00-00';
         }
     }
 
