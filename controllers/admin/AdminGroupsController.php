@@ -126,7 +126,7 @@ class AdminGroupsControllerCore extends AdminController
 
     public function initPageHeaderToolbar()
     {
-        if (empty($this->display) && Configuration::get('PS_GROUP_FEATURE_ACTIVE')) {
+        if (empty($this->display) && Group::isFeatureActive()) {
             $this->page_header_toolbar_btn['new_group'] = array(
                 'href' => self::$currentIndex.'&addgroup&token='.$this->token,
                 'desc' => $this->l('Add new group', null, null, false),
@@ -542,7 +542,7 @@ class AdminGroupsControllerCore extends AdminController
 
     public function renderList()
     {
-        if (!Configuration::get('PS_GROUP_FEATURE_ACTIVE')) {
+        if (!Group::isFeatureActive()) {
             $this->displayWarning(sprintf(
                 $this->l('The feature Customer Groups has been disabled. You can enable it from %s page.'),
                 '<a href="'.$this->context->link->getAdminLink('AdminPerformance').'#fieldset_2_2" target="_blank">'.$this->l('Advanced Parameters > Performance').'</a>'
