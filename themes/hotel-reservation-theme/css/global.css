@@ -6540,6 +6540,7 @@ table.table_block td {
 }
 .input-occupancy, .form-control .input-occupancy {
   text-align: left;
+  overflow: hidden;
 }
 
 .page-product-box {
