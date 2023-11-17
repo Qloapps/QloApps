@@ -90,7 +90,6 @@ class OrderConfirmationControllerCore extends FrontController
 
         $this->context->smarty->assign(array(
             'is_guest' => $this->context->customer->is_guest,
-            'is_free_order' => 1,
             'HOOK_ORDER_CONFIRMATION' => $this->displayOrderConfirmation(),
             'HOOK_PAYMENT_RETURN' => $this->displayPaymentReturn()
         ));
