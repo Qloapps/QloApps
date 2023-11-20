@@ -1231,9 +1231,7 @@ function checkIfEmployeeIsLoggedIn() {
 				action : 'checkLoginStatus',
 			},
 			success : function(response) {
-				if (response.status) {
-					resolve(response.is_logged_in);
-				}
+				resolve(response.is_logged_in);
 			}
 		});
 	});
