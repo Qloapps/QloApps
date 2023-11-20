@@ -22,6 +22,7 @@
 *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 *}
+{if $invoice_address}
 <table id="addresses-tab" cellspacing="0" cellpadding="0">
 	<tr>
 		<!-- <td width="33%"><span class="bold"> </span><br/><br/>
@@ -38,3 +39,4 @@
 		</td>
 	</tr>
 </table>
+{/if}
