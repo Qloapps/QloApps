@@ -8314,10 +8314,8 @@ table.discount i {
   max-width: 824px;
   margin: 100px auto 100px auto;
   text-align: center; }
-  #pagenotfound .pagenotfound .img-404 {
-    padding: 8px 0 27px 0; }
-    #pagenotfound .pagenotfound .img-404 img {
-      max-width: 100%; }
+  #pagenotfound .pagenotfound img {
+    margin: 0 auto; }
   #pagenotfound .pagenotfound h1 {
     font: 600 28px/34px 'Oxygen', serif;
     color: #333;

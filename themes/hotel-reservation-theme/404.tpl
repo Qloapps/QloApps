@@ -23,7 +23,7 @@
 *  International Registered Trademark & Property of PrestaShop SA
 *}
 <div class="pagenotfound">
-	<img src="{$img_dir}404.png">
+	<img class="img-responsive" src="{$img_dir}404.png">
 
 	<h1>{l s='Page not found!!!'}</h1>
 
