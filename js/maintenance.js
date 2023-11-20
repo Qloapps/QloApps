@@ -19,16 +19,17 @@ $(document).ready(function(){
         $("#conf_id_PS_ALLOW_EMP").toggle('slow');
     });
 
-    // manage dropdown
-    $(document).on('click', 'button.dropdown-toggle', function () {
-        $(this).closest('.dropdown').toggleClass('open');
-    });
-
+    // manage dropdowns
     $(document).on('click', function (e) {
-        if ($('.language-selector-wrap .dropdown').hasClass('open')
-            && !$(e.target).closest('.dropdown-toggle').length
-        ) {
-            $('.language-selector-wrap .dropdown').removeClass('open');
+        const closestDropdown = $(e.target).closest('.dropdown');
+
+        if (closestDropdown.length) {
+            if ($(e.target).closest('.dropdown-toggle').length) {
+                $('.dropdown').not(closestDropdown).removeClass('open');
+                closestDropdown.toggleClass('open');
+            }
+        } else {
+            $('.dropdown').removeClass('open');
         }
     });
 });
