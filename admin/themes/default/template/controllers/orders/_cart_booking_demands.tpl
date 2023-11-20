@@ -135,7 +135,7 @@
 																	{if $product.allow_multiple_quantity}
 																		<div class="qty_container">
 																			<input type="number" class="form-control room_type_service_product_qty qty" id="qty_{$product.id_product}" name="service_product_qty_{$product.id_product}" data-id-product="{$product.id_product}" min="1" data-max-quantity="{$product.max_quantity}" value="{if  isset($selectedRoomServiceProduct['selected_service']) && $selectedRoomServiceProduct['selected_service'] && ($product['id_product']|array_key_exists:$selectedRoomServiceProduct['selected_service'])}{$selectedRoomServiceProduct['selected_service'][$product['id_product']]['quantity']}{else}1{/if}">
-																			<p style="display:{if isset($selectedRoomServiceProduct['selected_service']) && $selectedRoomServiceProduct['selected_service'] && ($product['id_product']|array_key_exists:$selectedRoomServiceProduct['selected_service'])}block{else}none{/if}; margin-top: 4px;">
+																			<p style="display:{if isset($selectedRoomServiceProduct['selected_service']) && $selectedRoomServiceProduct['selected_service'] && ($product['id_product']|array_key_exists:$selectedRoomServiceProduct['selected_service']) && $selectedRoomServiceProduct['selected_service'][$product['id_product']]['quantity'] > $product.max_quantity}block{else}none{/if}; margin-top: 4px;">
 																				<span class="label label-warning">{l s='Maximum allowed quantity: %s' sprintf=$product.max_quantity}</span>
 																			</p>
 																		</div>
