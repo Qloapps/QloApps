@@ -29,8 +29,6 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
         $this->context = Context::getContext();
 
         parent::__construct();
-
-        $this->hasBookingProducts = false;
     }
 
     public function initCart()
@@ -88,16 +86,20 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
     {
         parent::initProcess();
 
-        $this->hasBookingProducts = $this->getHasBookingProducts();
+        $objHotelBranchInformation = new HotelBranchInformation();
+        $activeHotels = $objHotelBranchInformation->getAllHotels(true);
 
-        if ($this->hasBookingProducts) {
+        if ($activeHotels) {
             $this->initCart();
         }
     }
 
     public function postProcess()
     {
-        if ($this->hasBookingProducts) {
+        $objHotelBranchInformation = new HotelBranchInformation();
+        $activeHotels = $objHotelBranchInformation->getAllHotels(true);
+
+        if ($activeHotels) {
             if (Tools::getValue('date_from')) {
                 $date_from = Tools::getValue('date_from');
             } else {
@@ -115,8 +117,7 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
             if (Tools::getValue('id_hotel')) {
                 $id_hotel = Tools::getValue('id_hotel');
             } else {
-                $obj_htl_info = new HotelBranchInformation();
-                if ($htl_info = $obj_htl_info->hotelBranchesInfo(false, 1)) {
+                if ($htl_info = $objHotelBranchInformation->hotelBranchesInfo(false, 1)) {
                     // filter hotels as per accessed hotels
                     $htl_info = HotelBranchInformation::filterDataByHotelAccess(
                         $htl_info,
@@ -239,14 +240,6 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
         parent::postprocess();
     }
 
-    public function getHasBookingProducts()
-    {
-        $objHotelBranchInformation = new HotelBranchInformation();
-        $allHotels = $objHotelBranchInformation->getAllHotels(true);
-
-        return is_array($allHotels) && count($allHotels);
-    }
-
     public function initContent()
     {
         // $this->show_toolbar = false;
@@ -298,8 +291,11 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
 
     public function renderView()
     {
-        $this->tpl_view_vars['has_booking_products'] = $this->hasBookingProducts;
-        if ($this->hasBookingProducts) {
+        $objHotelBranchInformation = new HotelBranchInformation();
+        $activeHotels = $objHotelBranchInformation->getAllHotels(true);
+
+        $this->tpl_view_vars['has_active_hotels'] = $activeHotels;
+        if ($activeHotels) {
             $this->tpl_view_vars['id_cart'] = $this->context->cart->id;
             $this->tpl_view_vars['id_guest'] = $this->context->cookie->id_guest;
             $this->initSearchFormData();

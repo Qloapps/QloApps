@@ -1,5 +1,5 @@
 <div class="row">
-	{if isset($has_booking_products) && $has_booking_products && $hotel_list|count > 0}
+	{if isset($has_active_hotels) && $has_active_hotels && $hotel_list|count > 0}
 		<div class="col-sm-4">
 			<div class="panel">
 				<div class="panel-heading">
