@@ -35,6 +35,7 @@ class GraphNvD3 extends ModuleGraphEngine
     private $_values;
     private $_legend;
     private $_titles;
+    private $_formats;
 
     public function __construct($type = null)
     {
@@ -113,6 +114,12 @@ class GraphNvD3 extends ModuleGraphEngine
 					if (jsonData.axisLabels.yAxis != null)
 						chart.yAxis.axisLabel(jsonData.axisLabels.yAxis);
 
+                    if (jsonData.axisFormat.xAxis)
+                        chart.xAxis.tickFormat(d3.format(jsonData.axisFormat.xAxis));
+                    if (jsonData.axisFormat.yAxis)
+                        chart.yAxis.tickFormat(d3.format(jsonData.axisFormat.yAxis));
+
+                        console.log(jsonData.data);
 					d3.select("#nvd3_chart_'.($divid++).' svg")
 						.datum(jsonData.data)
 						.transition().duration(500)
@@ -148,10 +155,16 @@ class GraphNvD3 extends ModuleGraphEngine
         $this->_titles = $titles;
     }
 
+    public function setFormat($_formats)
+    {
+        $this->_formats = $_formats;
+    }
+
     public function draw()
     {
         $array = array(
             'axisLabels' => array('xAxis' => $this->_titles['x'], 'yAxis' => $this->_titles['y']),
+            'axisFormat' => array('xAxis' => $this->_formats['x'], 'yAxis' => $this->_formats['y']),
             'data' => array()
         );
 
