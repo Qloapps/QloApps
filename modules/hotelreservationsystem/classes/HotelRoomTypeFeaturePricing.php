@@ -823,8 +823,8 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
      */
     public function updateGroup($groups)
     {
-        $this->cleanGroups();
         if ($groups && !empty($groups)) {
+            $this->cleanGroups();
             $this->addGroups($groups);
         }
     }
