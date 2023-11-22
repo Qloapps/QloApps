@@ -465,10 +465,10 @@ class CustomerCore extends ObjectModel
         return Cache::retrieve($cache_id);
     }
 
-    public static function getCustomerIdAddress($id_customer)
+    public static function getCustomerIdAddress($id_customer, $use_cache = true)
     {
         $cache_id = 'Customer::getCustomerIdAddress'.(int)$id_customer;
-        if (!Cache::isStored($cache_id)) {
+        if (!$use_cache || !Cache::isStored($cache_id)) {
             $sql = 'SELECT id_address
 					FROM `'._DB_PREFIX_.'address` a
 					WHERE `id_customer` = '.(int)$id_customer.' AND a.`deleted` = 0';
