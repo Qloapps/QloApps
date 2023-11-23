@@ -386,28 +386,8 @@ class AuthControllerCore extends FrontController
         if (Validate::isEmail($email = Tools::getValue('email')) && !empty($email)) {
             if (Customer::customerExists($email)) {
                 $this->errors[] = Tools::displayError('An account using this email address has already been registered.', false);
-            } elseif ($idCustomer = Customer::customerExists($email, true, false)) {
-                $return = array();
-                $objCustomer = new Customer($idCustomer);
-                if (!$objCustomer->active || $objCustomer->deleted) {
-                    $this->errors[] = Tools::displayError('You can not create a booking using this email.', false);
-                }
-
-                if (!count($this->errors)) {
-                    $this->context->updateCustomer($objCustomer, 1);
-                    $this->context->cart->update();
-
-                    $return['isSaved'] = true;
-                    $return['id_customer'] = (int)$this->context->cookie->id_customer;
-                    $return['id_address_delivery'] = $this->context->cart->id_address_delivery;
-                    $return['id_address_invoice'] = $this->context->cart->id_address_invoice;
-                    $return['token'] = Tools::getToken(false);
-                }
-
-                $return['hasError'] = !empty($this->errors);
-                $return['errors'] = $this->errors;
-
-                $this->ajaxDie(json_encode($return));
+            } elseif (Tools::getValue('is_new_customer', 1) && Customer::customerExists($email, false, false)) {
+                $this->errors[] = Tools::displayError('You are already registered as a guest with this email address.').'&nbsp;<button type="submit" class="btn btn-link alert-link btn-transform" name="submitTransformAccount">'.Tools::displayError('Click here').'</button>'.Tools::displayError('').' to generate a password for your account.';
             }
         }
 
@@ -608,8 +588,16 @@ class AuthControllerCore extends FrontController
             }
 
             if (!count($this->errors)) {
-                if (Customer::customerExists(Tools::getValue('email'))) {
-                    $this->errors[] = Tools::displayError('An account using this email address has already been registered. Please enter a valid password or request a new one. ', false);
+                if (!Tools::getValue('is_new_customer', 1)) {
+                    if ($idCustomer = Customer::customerExists(Tools::getValue('email'), true, false)) {
+                        if ($idAddress = Customer::getCustomerIdAddress($idCustomer)) {
+                            $address = new Address($idAddress);
+                        }
+                    }
+                } else {
+                    if (Customer::customerExists(Tools::getValue('email'))) {
+                        $this->errors[] = Tools::displayError('An account using this email address has already been registered. Please enter a valid password or request a new one. ', false);
+                    }
                 }
 
                 $this->processCustomerNewsletter($customer);
@@ -623,11 +611,17 @@ class AuthControllerCore extends FrontController
                     $customer->active = 1;
                     // New Guest customer
                     if (Tools::isSubmit('is_new_customer')) {
-                        $customer->is_guest = !Tools::getValue('is_new_customer', 1);
+                        if ($idCustomer) {
+                            // update guest customer details
+                            $customer = new Customer($idCustomer);
+                            $customer->firstname = Tools::getValue('firstname');
+                            $customer->lastname = Tools::getValue('lastname');
+                        }
+                        $customer->is_guest = 1;
                     } else {
                         $customer->is_guest = 0;
                     }
-                    if (!$customer->add()) {
+                    if (!$customer->save()) {
                         $this->errors[] = Tools::displayError('An error occurred while creating your account.');
                     } else {
                         foreach ($addresses_types as $addresses_type) {
@@ -644,7 +638,7 @@ class AuthControllerCore extends FrontController
                             if ($addresses_type == 'address_invoice') {
                                 $_POST = $post_back;
                             }
-                            if (!count($this->errors) && (Configuration::get('PS_REGISTRATION_PROCESS_TYPE') || $this->ajax || Tools::isSubmit('submitGuestAccount')) && !$$addresses_type->add()) {
+                            if (!count($this->errors) && (Configuration::get('PS_REGISTRATION_PROCESS_TYPE') || $this->ajax || Tools::isSubmit('submitGuestAccount')) && !$$addresses_type->save()) {
                                 $this->errors[] = Tools::displayError('An error occurred while creating your address.');
                             }
                         }
