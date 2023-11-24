@@ -315,7 +315,7 @@ class AdminHotelGeneralSettingsController extends ModuleAdminController
 
             if (!$hotelNameSearchThreshold && $hotelNameSearchThreshold !== '0') {
                 $this->errors[] = $this->l('Hotel name search threshold field is required.');
-            } elseif (!Validate::isUnsignedInt(Tools::getValue('WK_HOTEL_NAME_SEARCH_THRESHOLD'))) {
+            } elseif (!Validate::isUnsignedInt($hotelNameSearchThreshold)) {
                 $this->errors[] = $this->l('Hotel name search threshold field is invalid.');
             }
 

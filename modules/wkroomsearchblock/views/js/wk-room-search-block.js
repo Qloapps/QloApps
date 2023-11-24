@@ -86,9 +86,14 @@ $(document).ready(function() {
             helpers: {
                 overlay: { closeClick: false } //Disable click outside event
             },
+            'beforeShow': function() {
+                $('#date-range-picker-container').closest('.form-group').addClass('xs-calendar');
+            },
             'afterClose': function() {
                 $('.header-rmsearch-container').show();
                 $('#xs_room_search_form').show();
+
+                $('#date-range-picker-container').closest('.form-group').removeClass('xs-calendar');
             },
         });
     });
@@ -250,7 +255,9 @@ $(document).ready(function() {
                 success: function(result) {
                     if (result.status == 'success') {
                         $('#hotel_cat_id').val('');
-                        $('#id_hotel_button').html(result.data);
+                        $('#id_hotel_button').html(result.data_select);
+                        $('.hotel_dropdown_ul').empty();
+                        $('.hotel_dropdown_ul').html(result.data_dropdown);
                         $('#id_hotel_button').trigger('chosen:updated');
 
                         if (focusHotelSelection) {
@@ -312,9 +319,7 @@ $(document).ready(function() {
         }
     });
 
-    $(document).on('change', '#id_hotel_button', function() {
-        let selectedHotel = $(this).find('option:selected');
-
+    function selectHotelFromList(selectedHotel) {
         let max_order_date = $(selectedHotel).attr('data-max_order_date');
         let preparation_time = $(selectedHotel).attr('data-preparation_time')
 
@@ -327,6 +332,14 @@ $(document).ready(function() {
         $('#hotel_cat_name').html($(selectedHotel).html());
 
         BookingSearchManager.activateStep('date_range');
+    }
+
+    $(document).on('change', '#id_hotel_button', function() {
+        selectHotelFromList($(this).find('option:selected'));
+    });
+
+    $(document).on('click', '.hotel_dropdown_ul li', function() {
+        selectHotelFromList($(this));
     });
 
     // If only one hotel then set max order date on date pickers
@@ -612,22 +625,19 @@ $(document).ready(function() {
     });
 
     if (page_name == 'index') {
-        $('#hotel_location, #guest_occupancy').focus(function () {
-            setBookingSearchDropdownPositions();
-            setBookingSearchCalendarPositions();
+        $('#hotel_location, #id_hotel_button, #guest_occupancy').focus(function () {
+            setBookingSearchPositions();
         });
 
         // after chosen has been initialized
         $('select#id_hotel_button').on('chosen:ready', function() {
             $('#id_hotel_button_chosen .chosen-search input').focus(function () {
-                setBookingSearchDropdownPositions();
-                setBookingSearchCalendarPositions();
+                setBookingSearchPositions();
             });
         });
 
         $('#daterange_value').click(function () {
-            setBookingSearchDropdownPositions();
-            setBookingSearchCalendarPositions();
+            setBookingSearchPositions();
         });
     }
 
@@ -681,6 +691,12 @@ $(document).ready(function() {
             $(this).siblings('.chosen-container').find('.chosen-single').removeClass('invisible')
         });
     }
+
+    // if hotel chosen is not intialized use dropdown
+    if ($('select#id_hotel_button').data('chosen') === undefined) {
+        $('#search_hotel_block_form .hotel-select-wrap').addClass('hide');
+        $('#search_hotel_block_form .hotel-dropdown-wrap').removeClass('hide');
+    }
 });
 // function to set occupancy infor in guest occupancy field(search form)
 function setGuestOccupancy()
@@ -715,59 +731,55 @@ function setGuestOccupancy()
     $('#guest_occupancy > span').text(guestButtonVal);
 }
 
-function setBookingSearchDropdownPositions() {
+// position dropdowns and the calendar
+function setBookingSearchPositions() {
+    // calculate available spaces
+    let searchForm = $('#search_hotel_block_form');
+
     let inputFieldsAndDropdowns = [
         { input: $('#hotel_location'), dropdown: $('.location_search_results_ul')},
+        { input: $('#id_hotel_button'), dropdown: $('.hotel_dropdown_ul')},
         { input: $('.hotel-selector-wrap'), dropdown: $('#id_hotel_button_chosen .chosen-drop')},
         { input: $('#guest_occupancy'), dropdown: $('#search_occupancy_wrapper')},
     ];
 
-    let dropdownHeightMax = 0;
-    let spaceTopMax = 0;
-    let spaceBottomMax = 0;
+    let calendarInputField = { input: $('#daterange_value'), calendarContainer: $('#date-range-picker-container')};
 
-    $(inputFieldsAndDropdowns).each(function (i, inputFieldAndDropdown) {
-        // find available space
-        let inputFieldHeight = inputFieldAndDropdown.input.outerHeight();
-        let spaceTop = inputFieldAndDropdown.input.offset().top - $(window).scrollTop();
-        let spaceBottom = $(window).height() - inputFieldHeight - spaceTop;
-        let cssMaxHeight = inputFieldAndDropdown.dropdown.css('max-height') || '292px';
-        let dropdownHeight = parseInt(cssMaxHeight.replace('px', ''));
-        dropdownHeight = Math.max(dropdownHeight || 0, 292); // 292 is height of the calendar
+    let positionClass = 'bottom';
+    if (!searchForm.closest('.fancybox-wrap').length) {
+        let searchFormHeight = searchForm.outerHeight();
+        let spaceTop = searchForm.offset().top - $(window).scrollTop();
+        let spaceBottom = $(window).height() - searchFormHeight - spaceTop;
 
-        dropdownHeightMax = Math.max(dropdownHeightMax, dropdownHeight);
-        spaceTopMax = Math.max(spaceTopMax, spaceTop);
-        spaceBottomMax = Math.max(spaceBottomMax, spaceBottom);
-    });
+        let calendarHeight = 292;
 
-    let dropdownClass = 'bottom';
-    if (spaceBottomMax < dropdownHeightMax && spaceTopMax > spaceBottomMax) {
-        dropdownClass = 'top';
+        // calculate max height for dropdowns
+        let maxHeightNeeded = 0;
+        $(inputFieldsAndDropdowns).each(function (i, inputFieldAndDropdown) {
+            if (!inputFieldAndDropdown.input.length) return false;
+
+            // find needed space height
+            let cssMaxHeight = inputFieldAndDropdown.dropdown.css('max-height') || calendarHeight + 'px';
+            let dropdownHeight = parseInt(cssMaxHeight.replace('px', ''));
+            dropdownHeight = Math.max(dropdownHeight || 0, calendarHeight);
+
+            maxHeightNeeded = Math.max(maxHeightNeeded, dropdownHeight);
+        });
+
+        // manage calendar now
+        maxHeightNeeded = Math.max(maxHeightNeeded, calendarHeight);
+
+        // determine position class
+        if (spaceBottom < maxHeightNeeded && spaceTop > spaceBottom) {
+            positionClass = 'top';
+        }
     }
 
+    // position dropdowns
     $(inputFieldsAndDropdowns).each(function (i, inputFieldAndDropdown) {
-        inputFieldAndDropdown.dropdown.removeClass('top bottom').addClass(dropdownClass);
+        inputFieldAndDropdown.dropdown.removeClass('top bottom').addClass(positionClass);
     });
-}
 
-function setBookingSearchCalendarPositions() {
-    let calendarInputFields = [
-        { input: $('#daterange_value'), calendarContainer: $('#date-range-picker-container')},
-    ];
-
-    $(calendarInputFields).each(function (i, calendarInputField) {
-        // find available space
-        let inputFieldHeight = calendarInputField.input.outerHeight();
-        let spaceTop = calendarInputField.input.offset().top - $(window).scrollTop();
-        let spaceBottom = $(window).height() - inputFieldHeight - spaceTop;
-        let calendarHeight = 292; // 292 is height of the calendar
-
-        let calendarContainerClass = 'bottom';
-        if (spaceBottom < calendarHeight && spaceTop > spaceBottom) {
-            calendarContainerClass = 'top';
-        }
-
-        // position calendar
-        calendarInputField.calendarContainer.removeClass('top bottom').addClass(calendarContainerClass);
-    });
+    // position calendar
+    calendarInputField.calendarContainer.removeClass('top bottom').addClass(positionClass);
 }

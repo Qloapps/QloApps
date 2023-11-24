@@ -57,13 +57,17 @@ class WkRoomSearchBlockAutoCompleteSearchModuleFrontController extends ModuleFro
                 }
 
                 $this->context->smarty->assign(array('hotels_info' => $hotelsInfo));
-                $html = $this->context->smarty->fetch(
-                    $this->module->getTemplatePath('hotel-options.tpl')
+                $html_select = $this->context->smarty->fetch(
+                    $this->module->getTemplatePath('hotel-options-select.tpl')
                 );
 
+                $html_dropdown = $this->context->smarty->fetch(
+                    $this->module->getTemplatePath('hotel-options-dropdown.tpl')
+                );
 
                 $result['status'] = 'success';
-                $result['data'] = $html;
+                $result['data_select'] = $html_select;
+                $result['data_dropdown'] = $html_dropdown;
             } else {
                 $result['status'] = 'failed2';
             }

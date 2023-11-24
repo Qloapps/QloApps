@@ -72,6 +72,12 @@
 #date-range-picker-container.bottom {
   top: 85px;
 }
+.fancybox-wrap #search_hotel_block_form .form-group.xs-calendar {
+  position: relative;
+}
+.fancybox-wrap #search_hotel_block_form #date-range-picker-container {
+  top: 56px;
+}
 /* #search_hotel_block_form {
   display: grid;
   grid-template-columns: 0.8fr repeat(3, 1fr) 0.6fr;
@@ -126,14 +132,16 @@
     color: #333;}
   .header-rmsearch-input:-moz-placeholder {
     /* Firefox 18- */
-    color: #999999;
-    font-weight: 400;}
+    color: #333;
+    font-weight: 400;
+    opacity: 1;}
   .header-rmsearch-input::-moz-placeholder {
     /* Firefox 19+ */
-    color: #999999;
-    font-weight: 400;}
+    color: #333;
+    font-weight: 400;
+    opacity: 1;}
   .header-rmsearch-input:-ms-input-placeholder {
-    color: #999999;
+    color: #333;
     font-weight: 400;}
   .search_block_container .dropdown-toggle {
     background-color: #f2f2f2;

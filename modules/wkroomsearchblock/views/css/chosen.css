@@ -23,7 +23,7 @@
   vertical-align: middle;
   font-size: 14px;
   zoom: 1;
-  display: inline;
+  /* display: inline; */
   -moz-user-select: -moz-none;
   -ms-user-select: none;
   -webkit-user-select: none;
@@ -59,7 +59,7 @@
   overflow: hidden;
   padding-left: 35px;
   height: 100%;
-  border: 1px solid #aaa;
+  border: 1px solid #555555;
   border-radius: 4px;
   background-clip: padding-box;
   box-shadow: 0 0 3px #fff inset, 0 1px 1px rgba(0, 0, 0, 0.1);
@@ -68,6 +68,7 @@
   white-space: nowrap;
   line-height: 24px;
   background: #fff url('../img/icon-hotel.svg') no-repeat 10px 50%;
+  min-height: 55px;
 }
 .chosen-container-single.error_border .chosen-single {
   border: 2px solid red !important;
@@ -457,23 +458,6 @@
   box-shadow: none;
   margin-bottom: -16px;
 }
-
-/* @end */
-/* @group Retina compatibility */
-@media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min-resolution: 144dpi) {
-  .chosen-rtl .chosen-search input[type="text"],
-  .chosen-container-single .chosen-single abbr,
-  .chosen-container-single .chosen-single div b,
-  .chosen-container-single .chosen-search input[type="text"],
-  .chosen-container-multi .chosen-choices .search-choice .search-choice-close,
-  .chosen-container .chosen-results-scroll-down span,
-  .chosen-container .chosen-results-scroll-up span {
-    background-image: url('chosen-sprite@2x.png') !important;
-    background-size: 52px 37px !important;
-    background-repeat: no-repeat !important;
-  }
-}
-/* @end */
 
 /* search results page - start */
 #category .chosen-container-single .chosen-single span {
