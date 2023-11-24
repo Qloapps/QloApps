@@ -101,12 +101,15 @@ class StatsForecast extends Module
         $currency = $this->context->currency;
         $employee = $this->context->employee;
 
-        $from = max(strtotime(_PS_CREATION_DATE_.' 00:00:00'), strtotime($employee->stats_date_from.' 00:00:00'));
-        $to = strtotime($employee->stats_date_to.' 23:59:59');
-        $to2 = min(time(), $to);
-        $interval = ($to - $from) / 60 / 60 / 24;
-        $interval2 = ($to2 - $from) / 60 / 60 / 24;
+        $from = max((_PS_CREATION_DATE_.' 00:00:00'), ($employee->stats_date_from.' 00:00:00'));
+		$to = date('Y-m-d H:i:s', strtotime('+1 day', strtotime($employee->stats_date_to.' 23:59:59')));
+        $to2 = min(date('Y-m-d H:i:s', strtotime('+1 day')), $to);
+		$interval =  HotelHelper::getNumberOfDays($from, $to);
+		$interval2 =  HotelHelper::getNumberOfDays($from, $to2);
         $prop30 = $interval / $interval2;
+		$to = strtotime($to);
+		$to2 = strtotime($to2);
+		$from = strtotime($from);
 
         if ($this->context->cookie->stats_granularity == 7) {
             $interval_avg = $interval2 / 30;
