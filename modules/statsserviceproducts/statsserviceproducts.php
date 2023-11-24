@@ -75,12 +75,6 @@ class statsServiceProducts extends ModuleGrid
 				'align' => 'center'
 			),
 			array(
-				'id' => 'averageQuantitySold',
-				'header' => $this->l('Quantity sold in a day'),
-				'dataIndex' => 'averageQuantitySold',
-				'align' => 'center'
-			),
-			array(
 				'id' => 'active',
 				'header' => $this->l('Active'),
 				'dataIndex' => 'active',
@@ -131,7 +125,6 @@ class statsServiceProducts extends ModuleGrid
 		$this->query = 'SELECT SQL_CALC_FOUND_ROWS p.`id_product`, pl.`name`, p.`active`, p.`auto_add_to_cart`,
             IFNULL(odd.`avgPriceSold`, 0) as avgPriceSold,
             IFNULL(odd.`totalQuantitySold`, 0) as totalQuantitySold,
-            IFNULL(odd.`averageQuantitySold`, 0) as averageQuantitySold,
             IFNULL(odd.`totalPriceSold`, 0) as totalPriceSold
             FROM '._DB_PREFIX_.'product p
             '.Shop::addSqlAssociation('product', 'p').'
@@ -140,7 +133,6 @@ class statsServiceProducts extends ModuleGrid
                 SELECT p.`id_product` as id_product,
                 ROUND(AVG(od.`product_price` / o.`conversion_rate`), 2) as avgPriceSold,
                 IFNULL(SUM(od.`product_quantity`), 0) AS totalQuantitySold,
-                ROUND(IFNULL(IFNULL(SUM(od.`product_quantity`), 0) / (1 + LEAST(TO_DAYS('.$array_date_between[1].'), TO_DAYS(NOW())) - GREATEST(TO_DAYS('.$array_date_between[0].'), TO_DAYS(product_shop.date_add))), 0), 2) as averageQuantitySold,
                 ROUND(IFNULL(SUM((od.product_price * od.product_quantity) / o.conversion_rate), 0), 2) AS totalPriceSold
                 FROM '._DB_PREFIX_.'order_detail od
                 INNER JOIN '._DB_PREFIX_.'product p ON (p.`id_product` = od.`product_id`)
