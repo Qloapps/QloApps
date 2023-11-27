@@ -130,6 +130,12 @@ ul.footer_links li .button.button-small span i {
   float: left !important;
 }
 
+#currencies-block-top .dropdown-menu,
+#languages-block-top .dropdown-menu {
+  left: 0;
+  right: unset;
+}
+
 /* filters */
 #filter_results .lf_headingmain_wrapper.pull-left {
   float: right !important;
@@ -293,6 +299,10 @@ ul.footer_links li .button.button-small span i {
 
 #identity #center_column form.std .row .col-xs-4,
 #authentication #center_column form.std .row .col-xs-4 {
+  float: right !important;
+}
+
+#history .adresses_bloc .address li > [class*=col] {
   float: right !important;
 }
 /* my account - end */
