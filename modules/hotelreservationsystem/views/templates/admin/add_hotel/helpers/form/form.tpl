@@ -34,30 +34,30 @@
 		{/if}
 		{hook h='displayAdminAddHotelFormTop' id_hotel=$hook_arg_id_hotel}
 		{if count($languages) > 1}
-			<div class="col-lg-12">
-				<label class="control-label">{l s='Choose Language' mod='hotelreservationsystem'}</label>
-				<input type="hidden" name="choosedLangId" id="choosedLangId" value="{$currentLang.id_lang}">
-				<button type="button" id="multi_lang_btn" class="btn btn-default dropdown-toggle wk_language_toggle" data-toggle="dropdown">
-					{$currentLang.name}
-					<span class="caret"></span>
-				</button>
-				<ul class="dropdown-menu wk_language_menu" style="left:14%;top:32px;">
-					{foreach from=$languages item=language}
-						<li>
-							<a href="javascript:void(0)" onclick="showLangField('{$language.name}', {$language.id_lang});">
-								{$language.name}
-							</a>
-						</li>
-					{/foreach}
-				</ul>
-				<p class="help-block">{l s='Change language here to update information in multiple languages.' mod='hotelreservationsystem'}</p>
-				<hr>
+			<div class="row">
+				<div class="col-lg-12">
+					<label class="control-label">{l s='Choose Language' mod='hotelreservationsystem'}</label>
+					<input type="hidden" name="choosedLangId" id="choosedLangId" value="{$currentLang.id_lang}">
+					<button type="button" id="multi_lang_btn" class="btn btn-default dropdown-toggle wk_language_toggle" data-toggle="dropdown">
+						{$currentLang.name}
+						<span class="caret"></span>
+					</button>
+					<ul class="dropdown-menu wk_language_menu" style="left:14%;top:32px;">
+						{foreach from=$languages item=language}
+							<li>
+								<a href="javascript:void(0)" onclick="showLangField('{$language.name}', {$language.id_lang});">
+									{$language.name}
+								</a>
+							</li>
+						{/foreach}
+					</ul>
+					<p class="help-block">{l s='Change language here to update information in multiple languages.' mod='hotelreservationsystem'}</p>
+					<hr>
+				</div>
 			</div>
 		{/if}
-
+		{hook h='displayAdminAddHotelFormTabsBefore' id_hotel=$hook_arg_id_hotel}
 		<div class="tabs wk-tabs-panel">
-			{hook h='displayAdminAddHotelFormTabsBefore' id_hotel=$hook_arg_id_hotel}
-
 			<ul class="nav nav-tabs">
 				<li class="active">
 					<a href="#hotel-information" data-toggle="tab">
@@ -380,7 +380,7 @@
 					{hook h='displayAdminAddHotelFormRestrictionsTabAfter' id_hotel=$hook_arg_id_hotel}
 				</div>
 				<div class="tab-pane" id="hotel-refund-policies">
-					{hook h='displayAdminAddHotelFormRefundPoliciesBefore' id_hotel=$hook_arg_id_hotel}
+					{hook h='displayAdminAddHotelFormRefundPoliciesTabBefore' id_hotel=$hook_arg_id_hotel}
 
 					{if isset($hotel_info.id) && $hotel_info.id}
 						<div class="form-group">
@@ -467,7 +467,7 @@
 						</div>
 					{/if}
 
-					{hook h='displayAdminAddHotelFormRefundPoliciesAfter' id_hotel=$hook_arg_id_hotel}
+					{hook h='displayAdminAddHotelFormRefundPoliciesTabAfter' id_hotel=$hook_arg_id_hotel}
 				</div>
 				{hook h='displayAdminAddHotelFormTabContent' id_hotel=$hook_arg_id_hotel}
 			</div>
