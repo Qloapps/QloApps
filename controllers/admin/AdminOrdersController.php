@@ -709,13 +709,15 @@ class AdminOrdersControllerCore extends AdminController
                         && !$order->hasCompletelyRefunded(Order::ORDER_COMPLETE_CANCELLATION_FLAG)
                     ) {
                         $this->errors[] = Tools::displayError('Order status can not be set to Cancelled until all bookings in the order are cancelled.');
-                    } elseif ($current_order_state->id == Configuration::get('PS_OS_ERROR') && !$order_state->id == Configuration::get('PS_OS_ERROR')) {
+                    } elseif ($current_order_state->id == Configuration::get('PS_OS_ERROR') && !($order_state->id == Configuration::get('PS_OS_ERROR'))) {
                         // All rooms must be available before changing status from Payment Error to Other status in which rooms are getting blocked again
                         $objHotelBooking = new HotelBookingDetail();
                         if ($orderBookings = $objHotelBooking->getOrderCurrentDataByOrderId($order->id)) {
                             foreach ($orderBookings as $orderBooking) {
                                 // If booking is refunded then no need to check inventory
-                                if (OrderReturn::getOrdersReturnDetail($order->id, 0, $orderBooking['id']) && $orderBooking['is_refunded']) {
+                                if ((OrderReturn::getOrdersReturnDetail($order->id, 0, $orderBooking['id']) && $orderBooking['is_refunded'])
+                                    || ($orderBooking['is_cancelled'] && $orderBooking['is_refunded'])
+                                ) {
                                     continue;
                                 } else {
                                     // if inventory is available for that booking
@@ -727,26 +729,29 @@ class AdminOrdersControllerCore extends AdminController
                                         'only_search_data' => 1
                                     );
 
-                                    // Check if undo booking cancellation is available for the booking or not
                                     $objHotelBookingDetail = new HotelBookingDetail($orderBooking['id']);
-                                    if ($objHotelBookingDetail->isUndoBookingCancellationAvailable()) {
-                                        if ($searchRoomsInfo = $objHotelBooking->getBookingData($bookingParams)) {
-                                            if (isset($searchRoomsInfo['rm_data'][$orderBooking['id_product']]['data']['available'])
-                                                && $searchRoomsInfo['rm_data'][$orderBooking['id_product']]['data']['available']
-                                            ) {
-                                                $availableRoomsInfo = $searchRoomsInfo['rm_data'][$orderBooking['id_product']]['data']['available'];
-                                                if ($roomIdsAvailable = array_column($availableRoomsInfo, 'id_room')) {
-                                                    // Check If room is still there in the available rooms list
-                                                    if (!in_array($orderBooking['id_room'], $roomIdsAvailable)) {
-                                                        $this->errors[] = Tools::displayError('You can not change the order status as some rooms are not available now in this order. You can reallocate/swap rooms with other rooms to make rooms available and then change the order status.');
+                                    if ($searchRoomsInfo = $objHotelBooking->getBookingData($bookingParams)) {
+                                        if (isset($searchRoomsInfo['rm_data'][$orderBooking['id_product']]['data']['available'])
+                                            && $searchRoomsInfo['rm_data'][$orderBooking['id_product']]['data']['available']
+                                        ) {
+                                            $availableRoomsInfo = $searchRoomsInfo['rm_data'][$orderBooking['id_product']]['data']['available'];
+                                            if ($roomIdsAvailable = array_column($availableRoomsInfo, 'id_room')) {
+                                                // Check If room is still there in the available rooms list
+                                                if (!in_array($orderBooking['id_room'], $roomIdsAvailable)) {
+                                                    $this->errors[] = Tools::displayError('You can not change the order status as some rooms are not available now in this order. You can reallocate/swap rooms with other rooms to make rooms available and then change the order status.');
 
-                                                        break;
-                                                    }
+                                                    break;
+                                                } else {
+                                                    $objHotelBookingDetail->is_refunded = 0;
+                                                    $objHotelBookingDetail->save();
                                                 }
+                                            } else {
+                                                $this->errors[] = Tools::displayError('You can not change the order status as some rooms are not available now in this order. You can reallocate/swap rooms with other rooms to make rooms available and then change the order status.');
+                                                break;
                                             }
                                         }
                                     } else {
-                                        $this->errors[] = Tools::displayError('You can not change the order status as some rooms are not available for undoing booking cancellation.');
+                                        $this->errors[] = Tools::displayError('You can not change the order status as some rooms are not available now in this order. You can reallocate/swap rooms with other rooms to make rooms available and then change the order status.');
 
                                         break;
                                     }
@@ -784,7 +789,7 @@ class AdminOrdersControllerCore extends AdminController
                                 }
                             }
 
-                            Tools::redirectAdmin(self::$currentIndex.'&id_order='.(int)$order->id.'&vieworder&token='.$this->token);
+                            Tools::redirectAdmin(self::$currentIndex.'&id_order='.(int)$order->id.'&conf=5&vieworder&token='.$this->token);
                         }
 
                         $this->errors[] = Tools::displayError('An error occurred while changing order status, or we were unable to send an email to the customer.');

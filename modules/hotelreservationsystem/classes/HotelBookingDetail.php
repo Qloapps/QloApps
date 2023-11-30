@@ -2848,6 +2848,15 @@ class HotelBookingDetail extends ObjectModel
             $objectMessage->id_customer = (int)($this->id_customer);
             $objectMessage->id_order = (int)$this->id_order;
             $objectMessage->private = 1;
+
+            // If cancelled by admin then set the employee id who is doing this cancellation else put 0
+            $context = Context::getContext();
+            if ($byAdmin) {
+                $objectMessage->id_employee = (int)$context->employee->id;
+            } else {
+                $objectMessage->id_employee = 0;
+            }
+
             $objectMessage->add();
 
             // save this message for the customer
@@ -2857,9 +2866,9 @@ class HotelBookingDetail extends ObjectModel
                 $objCustomerThread = new CustomerThread();
                 $objCustomerThread->id_contact = 0;
                 $objCustomerThread->id_customer = (int)$this->id_customer;
-                $objCustomerThread->id_shop = (int)$this->context->shop->id;
+                $objCustomerThread->id_shop = (int)$context->shop->id;
                 $objCustomerThread->id_order = (int)$this->id_order;
-                $objCustomerThread->id_lang = (int)$this->context->language->id;
+                $objCustomerThread->id_lang = (int)$context->language->id;
                 $objCustomerThread->email = $objCustomer->email;
                 $objCustomerThread->status = 'open';
                 $objCustomerThread->token = Tools::passwdGen(12);
@@ -2873,7 +2882,6 @@ class HotelBookingDetail extends ObjectModel
 
             // If cancelled by admin then set the employee id who is doing this cancellation else put 0
             if ($byAdmin) {
-                $context = Context::getContext();
                 $objCustomerMessage->id_employee = (int)$context->employee->id;
             } else {
                 $objCustomerMessage->id_employee = 0;

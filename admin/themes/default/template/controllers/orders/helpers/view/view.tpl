@@ -234,7 +234,7 @@
 						<!-- Change status form -->
                         {* If current state is refunded or cancelled the further order status changes are not allowed *}
                         {if !isset($currentState) || (isset($currentState) && ($currentState->id != Configuration::get('PS_OS_REFUND') && $currentState->id != Configuration::get('PS_OS_CANCELED')))}
-                            <form action="{$currentIndex|escape:'html':'UTF-8'}&amp;vieworder&amp;token={$smarty.get.token}" method="post" class="form-horizontal well hidden-print">
+                            <form action="{$currentIndex|escape:'html':'UTF-8'}&amp;vieworder&amp;id_order={$order->id|intval}&amp;token={$smarty.get.token}" method="post" class="form-horizontal well hidden-print">
                                 <div class="row">
                                     <div class="col-lg-9">
                                         <select id="id_order_state" class="chosen form-control" name="id_order_state">

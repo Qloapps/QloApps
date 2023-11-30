@@ -279,8 +279,8 @@ class OrderDetailControllerCore extends FrontController
                                     die(json_encode(array('status' => 0)));
                                 } else {
                                     // set the message for the cancellation
-                                    $message = $this->l('1 Room from').' '.', '.$objHtlBooking->room_type_name.' '.$this->l('has been cancelled by the hotel.');
-                                    $message .= PHP_EOL.$this->l('Reasonn').': '.$refundReason;
+                                    $message = Tools::displayError('1 Room from').' '.', '.$objHtlBooking->room_type_name.' '.Tools::displayError('has been cancelled by the hotel.');
+                                    $message .= PHP_EOL.Tools::displayError('Reason').': '.$refundReason;
 
                                     $objHtlBooking->setBookingCancellationMessage($refundReason);
                                 }
