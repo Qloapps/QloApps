@@ -4015,8 +4015,9 @@ class AdminControllerCore extends Controller
         if (is_array($this->boxes) && !empty($this->boxes)) {
             foreach ($this->boxes as $id) {
                 /** @var ObjectModel $object */
-                $object = new $this->className((int) $id);
-                $object->active = (int) $status;
+                $object = new $this->className((int)$id);
+                $object->setFieldsToUpdate(array('active' => true));
+                $object->active = (int)$status;
                 $isUpdated = (bool) $object->update();
                 $result &= $isUpdated;
 
