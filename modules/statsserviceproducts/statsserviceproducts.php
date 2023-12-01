@@ -83,7 +83,7 @@ class statsServiceProducts extends ModuleGrid
 		);
 
         $this->displayName = $this->l('Extra services overview');
-        $this->description = $this->l('Show extra services overview based on sales.');
+        $this->description = $this->l('Show room extra services overview based on sales.');
         $this->ps_versions_compliancy = array('min' => '1.6', 'max' => _PS_VERSION_);
     }
 
