@@ -3277,15 +3277,18 @@ class AdminProductsControllerCore extends AdminController
             $objRoomInfo = new HotelRoomInformation((int)$idRoom);
             $objHotelRoomInformation = new HotelRoomInformation();
             if ($objHotelRoomInformation->getFutureBookings($idRoom)) {
-                $this->errors = $this->l('This room cannot be deleted as this room contains future booking.');
+                $this->errors[] = $this->l('This room cannot be deleted as this room contains future booking.');
             }
             if (empty($this->errors)) {
                 if ($objRoomInfo->delete()) {
                     $response['success'] = true;
+                } else {
+                    $this->errors[] = $this->l('Unable to delete room. Please try again!.');
                 }
-            } else {
-                $response['errors'] = $this->errors;
             }
+        }
+        if (!empty($this->errors)) {
+            $response['errors'] = $this->errors;
         }
         die(json_encode($response));
     }
