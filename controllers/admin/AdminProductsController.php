@@ -2772,10 +2772,6 @@ class AdminProductsControllerCore extends AdminController
 
                                 if ($room['id_status'] == HotelRoomInformation::STATUS_TEMPORARY_INACTIVE) {
                                     $disabledDates = $objRoomDisableDates->getRoomDisableDates($room['id']);
-                                    foreach($disabledDates as &$disabledDate) {
-                                        $disabledDate['date_from_formatted'] = Tools::displayDate($disabledDate['date_from']);
-                                        $disabledDate['date_to_formatted'] = Tools::displayDate($disabledDate['date_to']);
-                                    }
                                     $room['disable_dates_json'] = json_encode($disabledDates);
                                 }
                             }

@@ -233,10 +233,9 @@
                 <button type="button" class="close margin-right-10" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
-                <h4 class="modal-title"><i class="icon-calendar"></i>&nbsp; {l s='Room Insights'}</h4>
+                <h4 class="modal-title"><i class="icon-calendar"></i>&nbsp; {l s='Upcoming bookings'}</h4>
             </div>
             <div class="room-booked-dates-table modal-body">
-                <h4>{l s='Room Booked Dates'}</h4>
                 <div class="table-responsive">
                     <table class="table">
                         <thead>
@@ -244,27 +243,6 @@
                                 <th><span>{l s='Order'}</span></th>
                                 <th><span>{l s='Date From'}</span></th>
                                 <th><span>{l s='Date To'}</span></th>
-                            </tr>
-                        </thead>
-                        <tbody></tbody>
-                    </table>
-                </div>
-            </div>
-            <div class="room-disable-dates-table modal-body">
-                <h4>{l s='Room Disabled Dates'}</h4>
-                <div class="table-responsive">
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>
-                                    <span>{l s='Date From'}</span>
-                                </th>
-                                <th>
-                                    <span>{l s='Date To'}</span>
-                                </th>
-                                <th>
-                                    <span>{l s='Reason'}</span>
-                                </th>
                             </tr>
                         </thead>
                         <tbody></tbody>
@@ -459,7 +437,6 @@
             const triggerRoom = $(e.relatedTarget);
             $('#room-dates-modal tbody').html('');
             var bookedDates = JSON.parse($(triggerRoom).closest('tr').find('.booked-dates').val());
-            console.log(bookedDates.length);
             if (bookedDates.length) {
                 if (bookedDates.length) {
                     $('#room-dates-modal .room-booked-dates-table').show();
@@ -475,19 +452,6 @@
                 $('#room-dates-modal .room-booked-dates-table tbody').append(`<tr>
                     <td colspan="3" class="center">{/literal}{l s='No Booking for this room'}{literal}</td>
                 </tr>`);
-            }
-            if ($(triggerRoom).closest('tr').find('.disable_dates_json').val().length) {
-                $('.room-disable-dates-table').show();
-                var disableDates = JSON.parse($(triggerRoom).closest('tr').find('.disable_dates_json').val());
-                $(disableDates).each(function() {
-                    $('#room-dates-modal .room-disable-dates-table tbody').append(`<tr>
-                        <td>${this.date_from_formatted}</td>
-                        <td>${this.date_to_formatted}</td>
-                        <td>${this.reason ? this.reason : '--' }</td>
-                    </tr>`);
-                });
-            } else {
-                $('.room-disable-dates-table').hide();
             }
         });
         {/literal}
