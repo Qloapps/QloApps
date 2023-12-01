@@ -98,6 +98,7 @@
 					selectFirst: false,
 					scroll: false,
 					dataType: "json",
+					cacheLength: 0,
 					formatItem: function(data, i, max, value, term) {
 						return value;
 					},
