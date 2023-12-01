@@ -3253,7 +3253,7 @@ class AdminProductsControllerCore extends AdminController
                 if ($roomInfo['id_status'] == HotelRoomInformation::STATUS_INACTIVE) {
                     $objHotelRoomInformation = new HotelRoomInformation();
                     if (count($objHotelRoomInformation->getFutureBookings($roomInfo['id']))) {
-                        $this->errors[] = sprintf(Tools::displayError('Cannot change room %s status to inactive as it already has some bookings, Please check the bookings and move those bookings to another room if you want to disable this room'), $roomInfo['room_num']);
+                        $this->errors[] = sprintf(Tools::displayError('Cannot change room %s status to inactive as it already has some bookings, Please check the bookings and move those bookings to another room if you want make this room inactive'), $roomInfo['room_num']);
                     }
                 } elseif ($roomInfo['id_status'] == HotelRoomInformation::STATUS_TEMPORARY_INACTIVE) {
                     $disableDates = json_decode($roomInfo['disable_dates_json'], true);
