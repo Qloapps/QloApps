@@ -302,7 +302,7 @@ class AdminHotelFeaturePricesSettingsController extends ModuleAdminController
                     $idFeaturePrice
                 );
             } else {
-                $this->errors[] = $this->l('Please select at least one day for the special day selection.');
+                $this->errors[] = $this->l('Please select at least one day for week days restriction.');
             }
         } else {
             $isPlanTypeExists = $objFeaturePricing->checkRoomTypeFeaturePriceExistance(
@@ -365,7 +365,7 @@ class AdminHotelFeaturePricesSettingsController extends ModuleAdminController
                     $isSpecialDaysExists = 1;
                     if (!isset($specialDays) || !$specialDays) {
                         $isSpecialDaysExists = 0;
-                        $this->errors[] = $this->l('Please select at least one day for the special day selection.');
+                        $this->errors[] = $this->l('Please select at least one day for week days restriction.');
                     }
                 } else {
                     $isSpecialDaysExists = 0;

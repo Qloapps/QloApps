@@ -119,8 +119,8 @@
 
 		<div class="form-group special_days_content" {if isset($objFeaturePrice->date_selection_type) && $objFeaturePrice->date_selection_type == HotelRoomTypeFeaturePricing::DATE_SELECTION_TYPE_SPECIFIC}style="display:none;"{/if}>
 			<label class="control-label col-lg-3">
-				<span class="label-tooltip" data-toggle="tooltip" data-html="true" title="" data-original-title="{l s='If you want to create this Advanced price rule only for some special days of the week of selected date range then you can select select days after checking this option. Otherwise rule will be created for whole selected date range.' mod='hotelreservationsystem'}">
-					{l s='Restrict to Special Days' mod='hotelreservationsystem'}
+				<span class="label-tooltip" data-toggle="tooltip" data-html="true" title="" data-original-title="{l s='Enable this option to restrict this rule to specific week days (for example, weekends) of the selected date range. If disabled, rule will be applicable to all week days.' mod='hotelreservationsystem'}">
+					{l s='Restrict to Week Days' mod='hotelreservationsystem'}
 				</span>
 			</label>
 			<div class="col-lg-9 ">
@@ -136,7 +136,7 @@
 
 		<div class="form-group week_days" {if (isset($smarty.post.is_special_days_exists) && $smarty.post.is_special_days_exists) 	|| (isset($objFeaturePrice->is_special_days_exists) && $objFeaturePrice->is_special_days_exists)}style="display:block;"{/if}>
 			<label for="Price Impact Way" class="control-label col-lg-3">
-				{l s='Special days' mod='hotelreservationsystem'}
+				{l s='Week days' mod='hotelreservationsystem'}
 			</label>
 			<div class="col-lg-3 checkboxes-wrap">
 				<div class="day-wrap">
