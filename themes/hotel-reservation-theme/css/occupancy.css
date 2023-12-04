@@ -60,7 +60,7 @@
       .booking_occupancy_wrapper .add_new_occupancy_btn.disabled:active,
       .booking_occupancy_wrapper .add_new_occupancy_btn.disabled:focus,
       .booking_occupancy_wrapper .add_new_occupancy_btn.disabled:hover {
-        color: #666;
+        color: #333;
         opacity: 0.5;
         cursor: not-allowed;}
       .booking_occupancy_wrapper .occupancy_info_head {
