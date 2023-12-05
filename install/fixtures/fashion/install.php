@@ -36,8 +36,33 @@ class InstallFixturesFashion extends InstallXmlLoader
     {
         if ($identifier == 'John') {
             $data['passwd'] = Tools::encrypt('123456789');
+            $data['last_passwd_gen'] = date('Y-m-d H:i:s');
+            $data['birthday'] = date('Y-m-d', strtotime('-30 years'));
+            $data['newsletter_date_add'] = date('Y-m-d H:i:s');
         }
 
         return $this->createEntity('customer', $identifier, 'Customer', $data, $data_lang);
+    }
+
+    public function createEntityAddress($identifier, array $data, array $data_lang)
+    {
+        if ($identifier == 'My_address') {
+            $idCountry = Configuration::get('PS_COUNTRY_DEFAULT');
+            $data['id_country'] = $idCountry;
+
+            if (Country::containsStates($idCountry)) {
+                if ($states = State::getStatesByIdCountry($idCountry)) {
+                    $data['id_state'] = $states[0]['id_state'];
+                } else {
+                    $data['id_state'] = 0;
+                }
+            }
+
+            if (Country::getNeedZipCode($idCountry)) {
+                $data['postcode'] = Tools::generateRandomZipcode($idCountry);
+            }
+        }
+
+        return $this->createEntity('address', $identifier, 'Address', $data, $data_lang);
     }
 }
