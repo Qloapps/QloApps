@@ -2100,7 +2100,7 @@
 					<div class="col-lg-9">
 						<div class="input-group fixed-width-xl">
 							<span class="input-group-addon">{$currency->sign}</span>
-							<input type="text" class="fixed-width-xl" name="payment_amount" id="payment_amount" value="{0|string_format:"%.`$smarty.const._PS_PRICE_DISPLAY_PRECISION_`f"}" />
+							<input type="text" class="fixed-width-xl" name="payment_amount" id="payment_amount" value="{if isset($smarty.post.payment_amount)}{$smarty.post.payment_amount}{else}{0|string_format:"%.`$smarty.const._PS_PRICE_DISPLAY_PRECISION_`f"}{/if}" />
 						</div>
 					</span>
 					</div>

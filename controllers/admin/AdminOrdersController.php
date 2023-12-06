@@ -275,7 +275,7 @@ class AdminOrdersControllerCore extends AdminController
         if ($id_cart && Validate::isLoadedObject($cart) && !$cart->id_customer) {
             $this->errors[] = $this->l('The cart must have a customer');
         }
-        if (count($this->errors)) {
+        if (count($this->errors) && !Tools::getValue('submitAddorder')) {
             return false;
         }
 
@@ -1010,6 +1010,10 @@ class AdminOrdersControllerCore extends AdminController
                             Tools::redirectAdmin(self::$currentIndex.'&id_order='.$payment_module->currentOrder.'&vieworder'.'&token='.$this->token.'&conf=3');
                         }
                     }
+                } else {
+                    // if errors render add order form
+                    $_GET['addorder'] = '1';
+                    $_GET['cart_id'] = $id_cart;
                 }
             } else {
                 $this->errors[] = Tools::displayError('You do not have permission to add this.');
