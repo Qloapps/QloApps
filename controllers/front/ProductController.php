@@ -28,6 +28,8 @@ class ProductControllerCore extends FrontController
 {
     public $php_self = 'product';
 
+    public $alias = 'room-type';
+
     /** @var Product */
     protected $product;
 

@@ -29,6 +29,8 @@ class CategoryControllerCore extends FrontController
     /** string Internal controller name */
     public $php_self = 'category';
 
+    public $alias = 'hotel';
+
     /** @var Category Current category object */
     protected $category;
 

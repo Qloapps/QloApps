@@ -78,6 +78,9 @@ abstract class ControllerCore
     /** @var string Controller name */
     public $php_self;
 
+    /** @var string Controller alias */
+    public $alias;
+
     /**
      * Check if the controller is available for the current user/visitor
      */
