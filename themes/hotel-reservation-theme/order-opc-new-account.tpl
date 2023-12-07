@@ -103,7 +103,7 @@
 					<input type="text" class="text form-control validate" name="phone_mobile" id="phone_mobile" data-validate="isPhoneNumber" value="{if isset($guestInformations) && isset($guestInformations.phone_mobile) && $guestInformations.phone_mobile}{$guestInformations.phone_mobile}{/if}" />
 				</div>
 			</div>
-			{if $PS_CUSTOMER_ADDRESS_CREATION}
+			{if isset($PS_REGISTRATION_PROCESS_TYPE) && $PS_REGISTRATION_PROCESS_TYPE}
 				<div class="row">
 					<div class="select form-group date-select col-sm-12">
 						<label>{l s='Date of Birth'}</label>

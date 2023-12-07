@@ -2065,9 +2065,6 @@ abstract class ModuleCore
     public static function getPaymentModules()
     {
         $context = Context::getContext();
-        if (Validate::isLoadedObject($context->country)) {
-            $id_country = (int)$context->country->id;
-        }
 
         $use_groups = Group::isFeatureActive();
 
@@ -2097,7 +2094,6 @@ abstract class ModuleCore
 		LEFT JOIN `'._DB_PREFIX_.'hook_module` hm ON hm.`id_module` = m.`id_module`
 		LEFT JOIN `'._DB_PREFIX_.'hook` h ON hm.`id_hook` = h.`id_hook`
 		WHERE h.`name` = \''.pSQL($hook_payment).'\'
-		'.(isset($id_country) && $frontend ? 'AND mc.id_country = '.(int)$id_country : '').'
 		AND (SELECT COUNT(*) FROM '._DB_PREFIX_.'module_shop ms WHERE ms.id_module = m.id_module AND ms.id_shop IN('.implode(', ', $list).')) = '.count($list).'
 		AND hm.id_shop IN('.implode(', ', $list).')
 		'.((count($groups) && $frontend && $use_groups) ? 'AND (mg.`id_group` IN ('.implode(', ', $groups).'))' : '').'

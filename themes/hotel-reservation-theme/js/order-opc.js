@@ -346,7 +346,7 @@ $(document).ready(function()
 						static_token = jsonData.token;
 
 						// It's not a new customer
-						if (PS_CUSTOMER_ADDRESS_CREATION && $('#opc_id_customer').val() !== '0') {
+						if (PS_REGISTRATION_PROCESS_TYPE && $('#opc_id_customer').val() !== '0') {
 							saveAddress('delivery', function() {
 								location.reload();
 							});

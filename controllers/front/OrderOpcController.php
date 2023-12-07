@@ -465,7 +465,7 @@ class OrderOpcControllerCore extends ParentOrderController
                 // 'allDemands' => $allDemands,
                 // 'defaultcurrencySign' => $objCurrency->sign,
                 'THEME_DIR' => _THEME_DIR_,
-                'PS_CUSTOMER_ADDRESS_CREATION' => Configuration::get('PS_CUSTOMER_ADDRESS_CREATION'),
+                'PS_REGISTRATION_PROCESS_TYPE' => Configuration::get('PS_REGISTRATION_PROCESS_TYPE'),
                 'PS_ROOM_PRICE_AUTO_ADD_BREAKDOWN' => Configuration::get('PS_ROOM_PRICE_AUTO_ADD_BREAKDOWN'),
                 'free_shipping' => $free_shipping,
                 'isGuest' => isset($this->context->cookie->is_guest) ? $this->context->cookie->is_guest : 0,
