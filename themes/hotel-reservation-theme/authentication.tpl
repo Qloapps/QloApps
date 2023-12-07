@@ -102,6 +102,7 @@
 							</span>
 						</button>
 					</p>
+					{hook h="displayLoginFormBottom"}
 				</div>
 			</form>
 		</div>
