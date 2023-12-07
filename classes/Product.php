@@ -649,12 +649,12 @@ class ProductCore extends ObjectModel
      * @param int $position
      * return boolean Update result
      */
-    public function updatePosition($way, $position)
+    public function updatePosition($way, $position, $id_category = null)
     {
         if (!$res = Db::getInstance()->executeS('
             SELECT cp.`id_product`, cp.`position`, cp.`id_category`
             FROM `'._DB_PREFIX_.'category_product` cp
-            WHERE cp.`id_category` = '.(int)Tools::getValue('id_category', 1).'
+            WHERE cp.`id_category` = '.(int) ($id_category ? $id_category: Tools::getValue('id_category', 1)).'
             ORDER BY cp.`position` ASC')
             ) {
             return false;

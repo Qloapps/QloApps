@@ -144,14 +144,19 @@ class AdminProductsControllerCore extends AdminController
             }
         }
 
-        if (Shop::isFeatureActive() && $this->context->cookie->id_category_products_filter) {
-            $category = new Category((int)$this->context->cookie->id_category_products_filter);
+        if (Tools::getValue('productFilter_a!id_category_default') === '') {
+            $this->context->cookie->id_category_room_types_filter = false;
+        }
+
+        if (Shop::isFeatureActive() && $this->context->cookie->id_category_room_types_filter) {
+            $category = new Category((int)$this->context->cookie->id_category_room_types_filter);
             if (!$category->inShop()) {
-                $this->context->cookie->id_category_products_filter = false;
+                $this->context->cookie->id_category_room_types_filter = false;
                 Tools::redirectAdmin($this->context->link->getAdminLink('AdminProducts'));
             }
         }
 
+        // to support filter URLs with 'id_category' parameter
         if ($id_category = (int)Tools::getValue('id_category')) {
             $_POST['submitFilter'] = '1';
             $_POST['productFilter_a!id_category_default'] = $id_category;
@@ -161,12 +166,13 @@ class AdminProductsControllerCore extends AdminController
             || ($id_category = (int) Tools::getValue('productFilter_a!id_category_default'))
         ) {
             $this->id_current_category = $id_category;
-            $this->context->cookie->id_category_products_filter = $id_category;
-        } elseif ($id_category = $this->context->cookie->id_category_products_filter) {
+            $this->context->cookie->id_category_room_types_filter = $id_category;
+        } elseif ($id_category = $this->context->cookie->id_category_room_types_filter) {
             $this->id_current_category = $id_category;
         }
         if ($this->id_current_category) {
             $this->_category = new Category((int)$this->id_current_category);
+            $this->position_group_identifier = (int) $this->id_current_category;
         } else {
             $this->_category = new Category();
         }
@@ -213,7 +219,6 @@ class AdminProductsControllerCore extends AdminController
         // show the list of the product according to the booking or service products
         $this->_where .= ' AND a.`booking_product` = 1';
 
-        $this->_use_found_rows = false;
         $this->_group = ' GROUP BY a.`id_product`';
 
         $this->fields_list = array();
@@ -468,7 +473,7 @@ class AdminProductsControllerCore extends AdminController
         parent::processResetFilters($list_id);
 
         // reset category filter
-        $this->context->cookie->id_category_products_filter = false;
+        $this->context->cookie->id_category_room_types_filter = false;
     }
 
     /**
@@ -3530,7 +3535,7 @@ class AdminProductsControllerCore extends AdminController
             $product = $obj;
             // Prepare Categories tree for display in Associations tab
             $root = Category::getRootCategory();
-            $default_category = $this->context->cookie->id_category_products_filter ? $this->context->cookie->id_category_products_filter : Context::getContext()->shop->id_category;
+            $default_category = $this->context->cookie->id_category_room_types_filter ? $this->context->cookie->id_category_room_types_filter : Context::getContext()->shop->id_category;
             if (!$product->id || !$product->isAssociatedToShop()) {
                 $selected_cat = Category::getCategoryInformations(Tools::getValue('categoryBox', array($default_category)), $this->default_form_language);
             } else {
@@ -4694,7 +4699,7 @@ class AdminProductsControllerCore extends AdminController
         if ($this->tabAccess['edit'] === '1') {
             $way = (int)(Tools::getValue('way'));
             $id_product = (int)Tools::getValue('id_product');
-            $id_category = (int)Tools::getValue('id_category');
+            $id_category = (int)Tools::getValue('id_category_hotel');
             $positions = Tools::getValue('product');
             $page = (int)Tools::getValue('page');
             $selected_pagination = (int)Tools::getValue('selected_pagination');
@@ -4709,7 +4714,7 @@ class AdminProductsControllerCore extends AdminController
                         }
 
                         if ($product = new Product((int)$pos[2])) {
-                            if (isset($position) && $product->updatePosition($way, $position)) {
+                            if (isset($position) && $product->updatePosition($way, $position, $id_category)) {
                                 $category = new Category((int)$id_category);
                                 if (Validate::isLoadedObject($category)) {
                                     hook::Exec('categoryUpdate', array('category' => $category));

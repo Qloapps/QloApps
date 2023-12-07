@@ -112,7 +112,7 @@ function initTableDnD(table)
 				else if (tableId == 'product') {
 					params = {
 						action: 'updatePositions',
-						id_category: ids[1],
+						id_category_hotel: ids[1],
 						id_product: ids[2],
 						way: way
 					};
