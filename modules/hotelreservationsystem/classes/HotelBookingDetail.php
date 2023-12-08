@@ -508,6 +508,8 @@ class HotelBookingDetail extends ObjectModel
             $sql = $sql.' UNION '.$sql3;
         }
 
+        $sql .= ' ORDER BY id_room ASC';
+
         $unavailRoomTypes = array();
         if ($unavailRooms = Db::getInstance()->executeS($sql)) {
             foreach ($unavailRooms as $unavailRoomDetail) {
@@ -536,7 +538,8 @@ class HotelBookingDetail extends ObjectModel
             $sql = 'SELECT cbd.`id_product`, cbd.`id_room`, cbd.`id_hotel`, cbd.`booking_type`, cbd.`comment`, rf.`room_num`, cbd.`date_from`, cbd.`date_to`
                 FROM `'._DB_PREFIX_.'htl_cart_booking_data` AS cbd
                 INNER JOIN `'._DB_PREFIX_.'htl_room_information` AS rf ON (rf.`id` = cbd.`id_room`)
-                WHERE cbd.`id_hotel`= '.(int)$idHotel.' AND cbd.`id_cart` = '.(int)$idCart.' AND cbd.`id_guest` ='.(int)$idGuest.' AND cbd.`is_refunded` = 0 AND cbd.`is_back_order` = 0 AND IF('.(int)$idRoomType.' > 0, rf.`id_product` = '.(int)$idRoomType.', 1) AND rf.`id_product` IN ('.$allowedIdRoomTypes.')';
+                WHERE cbd.`id_hotel`= '.(int)$idHotel.' AND cbd.`id_cart` = '.(int)$idCart.' AND cbd.`id_guest` ='.(int)$idGuest.' AND cbd.`is_refunded` = 0 AND cbd.`is_back_order` = 0 AND IF('.(int)$idRoomType.' > 0, rf.`id_product` = '.(int)$idRoomType.', 1) AND rf.`id_product` IN ('.$allowedIdRoomTypes.')
+                ORDER BY cbd.`id_room` ASC';
 
             if ($cartRooms = Db::getInstance()->executeS($sql)) {
                 foreach ($cartRooms as $cartRoomDetail) {
@@ -654,8 +657,8 @@ class HotelBookingDetail extends ObjectModel
         $sql .= ' '.$joinAvailRoomSearch;
         $sql .= ' '.$whereAvailRoomSearch;
         $sql .= ' '.$groupByAvailRoomSearch;
-        $sql .= ' '.$orderByAvailRoomSearch;
-        $sql .= ' '.$orderWayAvailRoomSearch;
+        $sql .= ' '.($orderByAvailRoomSearch ? $orderByAvailRoomSearch : 'ORDER BY ri.`id`');
+        $sql .= ' '.($orderWayAvailRoomSearch ? $orderWayAvailRoomSearch : 'ASC');
 
         $availableRoomTypes = array();
         $unavailableRoomTypes = array();
@@ -930,7 +933,7 @@ class HotelBookingDetail extends ObjectModel
                 (hrdd.`date_from` > \''.pSQL($dateFrom).'\' AND hrdd.`date_from` < \''.pSQL($dateTo).'\' AND hrdd.`date_to` < \''.pSQL($dateTo).'\')
             ) AND IF('.(int)$idRoomType.' > 0, hri.`id_product` = '.(int)$idRoomType.', 1) AND hri.`id_product` IN ('.$allowedIdRoomTypes.')';
 
-        $sql = $sql1.' UNION '.$sql2;
+        $sql = $sql1.' UNION '.$sql2.' ORDER BY id_room ASC';
         $part_arr = Db::getInstance()->executeS($sql);
 
         // Get date wise available rooms
@@ -1224,7 +1227,8 @@ class HotelBookingDetail extends ObjectModel
         $sql = 'SELECT bd.`id_product`, bd.`id_room`, bd.`id_hotel`, bd.`id_customer`, bd.`booking_type`, bd.`id_status` AS booking_status, bd.`comment`, rf.`room_num`, bd.`date_from`, bd.`date_to`
                 FROM `'._DB_PREFIX_.'htl_booking_detail` AS bd
                 INNER JOIN `'._DB_PREFIX_.'htl_room_information` AS rf ON (rf.`id` = bd.`id_room`)
-                WHERE bd.`id_hotel`='.(int)$idHotel.' AND bd.`is_refunded` = 0 AND bd.`is_back_order` = 0 AND IF(bd.`id_status` = '. self::STATUS_CHECKED_OUT .', bd.`date_from` <= \''.pSQL($dateFrom).'\' AND bd.`check_out` >= \''.pSQL($dateTo).'\', bd.`date_from` <= \''.pSQL($dateFrom).'\' AND bd.date_to >= \''.pSQL($dateTo).'\') AND IF('.(int)$idRoomType.' > 0, rf.`id_product` = '.(int)$idRoomType.', 1) AND rf.`id_product` IN ('.$allowedIdRoomTypes.')';
+                WHERE bd.`id_hotel`='.(int)$idHotel.' AND bd.`is_refunded` = 0 AND bd.`is_back_order` = 0 AND IF(bd.`id_status` = '. self::STATUS_CHECKED_OUT .', bd.`date_from` <= \''.pSQL($dateFrom).'\' AND bd.`check_out` >= \''.pSQL($dateTo).'\', bd.`date_from` <= \''.pSQL($dateFrom).'\' AND bd.date_to >= \''.pSQL($dateTo).'\') AND IF('.(int)$idRoomType.' > 0, rf.`id_product` = '.(int)$idRoomType.', 1) AND rf.`id_product` IN ('.$allowedIdRoomTypes.')
+                ORDER BY bd.`id_room` ASC';
 
         $bookedRoomTypes = array();
         if ($booked_rooms = Db::getInstance()->executeS($sql)) {
