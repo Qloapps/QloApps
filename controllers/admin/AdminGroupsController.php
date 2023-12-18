@@ -566,15 +566,6 @@ class AdminGroupsControllerCore extends AdminController
 
     public function renderList()
     {
-        if (!Group::isFeatureActive()) {
-            $this->displayWarning(sprintf(
-                $this->l('The feature Customer Groups has been disabled. You can enable it from %s page.'),
-                '<a href="'.$this->context->link->getAdminLink('AdminPerformance').'#fieldset_2_2" target="_blank">'.$this->l('Advanced Parameters > Performance').'</a>'
-            ));
-
-            return;
-        }
-
         $unidentified = new Group(Configuration::get('PS_UNIDENTIFIED_GROUP'));
         $guest = new Group(Configuration::get('PS_GUEST_GROUP'));
         $default = new Group(Configuration::get('PS_CUSTOMER_GROUP'));
