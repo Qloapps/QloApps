@@ -796,6 +796,7 @@ class CustomerCore extends ObjectModel
         $this->passwd = Tools::encrypt($password);
         $this->cleanGroups();
         $this->addGroups(array(Configuration::get('PS_CUSTOMER_GROUP'))); // add default customer group
+        $this->id_default_group = (int) Configuration::get('PS_CUSTOMER_GROUP');
         if ($this->update()) {
             $vars = array(
                 '{firstname}' => $this->firstname,
