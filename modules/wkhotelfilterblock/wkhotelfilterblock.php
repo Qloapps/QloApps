@@ -153,7 +153,6 @@ class wkhotelfilterblock extends Module
         return array(
             'SHOW_AMENITIES_FILTER' => Configuration::get('SHOW_AMENITIES_FILTER'),
             'SHOW_PRICE_FILTER' => Configuration::get('SHOW_PRICE_FILTER'),
-            'PS_FEATURE_FEATURE_ACTIVE' => Feature::isFeatureActive(),
         );
     }
 }

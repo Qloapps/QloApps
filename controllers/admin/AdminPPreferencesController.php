@@ -400,10 +400,8 @@ class AdminPPreferencesControllerCore extends AdminController
                         'hint' => $this->l('Enable to display Amenities filter.'),
                         'validation' => 'isBool',
                         'cast' => 'intval',
-                        'disabled' => (bool) !Feature::isFeatureActive(),
                         'required' => false,
                         'type' => 'bool',
-                        'desc' => (bool) !Feature::isFeatureActive() ? sprintf($this->l('The feature Features/Amenities has been disabled. You can enable it from %s page.'), '<a href="'.$this->context->link->getAdminLink('AdminPerformance').'#fieldset_2_2" target="_blank">'.$this->l('Advanced Parameters > Performance').'</a>') : '',
                     ),
                     'SHOW_PRICE_FILTER' => array(
                         'title' => $this->l('Show Price filter'),

@@ -148,8 +148,32 @@ class AdminGroupsControllerCore extends AdminController
         parent::initProcess();
     }
 
+    public function initContent()
+    {
+        if (!Group::isFeatureActive()) {
+            parent::initContent();
+
+            $content = $this->displayWarning(sprintf(
+                $this->l('The feature Customer Groups has been disabled. You can enable it from %s page.'),
+                '<a href="'.$this->context->link->getAdminLink('AdminPerformance').'#fieldset_2_2" target="_blank">'.$this->l('Advanced Parameters > Performance').'</a>'
+            ));
+
+            $this->context->smarty->assign(array(
+                'content' => $content,
+            ));
+
+            return;
+        }
+
+        parent::initContent();
+    }
+
     public function postProcess()
     {
+        if (!Group::isFeatureActive()) {
+            return;
+        }
+
         if (isset($_POST['submitResetcustomer_group'])) {
             $this->processResetFilters('customer_group');
         }
@@ -547,6 +571,8 @@ class AdminGroupsControllerCore extends AdminController
                 $this->l('The feature Customer Groups has been disabled. You can enable it from %s page.'),
                 '<a href="'.$this->context->link->getAdminLink('AdminPerformance').'#fieldset_2_2" target="_blank">'.$this->l('Advanced Parameters > Performance').'</a>'
             ));
+
+            return;
         }
 
         $unidentified = new Group(Configuration::get('PS_UNIDENTIFIED_GROUP'));
