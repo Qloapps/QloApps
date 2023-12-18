@@ -323,7 +323,9 @@ class AdminCartsControllerCore extends AdminController
     ##################################################################
     public function ajaxPreProcess()
     {
-        if ($this->tabAccess['edit'] === '1') {
+        if ($this->tabAccess['edit'] === '1'
+            && Tools::getValue('action') != 'updateListVisivility'
+        ) {
             $id_customer = (int)Tools::getValue('id_customer');
             $customer = new Customer((int)$id_customer);
             $this->context->customer = $customer;
