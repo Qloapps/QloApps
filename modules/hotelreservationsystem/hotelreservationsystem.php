@@ -101,6 +101,71 @@ class HotelReservationSystem extends Module
         $this->context->controller->addJS($this->_path.'/views/js/HotelReservationFront.js');
     }
 
+    public function hookActionFrontControllerSetMedia()
+    {
+        $this->context->controller->addCSS($this->getPathUri().'views/css/hook/display-nav.css');
+    }
+
+    public function hookDisplayNav()
+    {
+        $this->smarty->assign(array(
+            'phone' => Configuration::get('QBC_PHONE'),
+            'email' => Configuration::get('QBC_EMAIL'),
+        ));
+
+        return $this->display(__FILE__, 'display-nav.tpl');
+    }
+
+    public function hookDisplayExternalNavigationHook()
+    {
+        $this->smarty->assign(array(
+            'phone' => Configuration::get('QBC_PHONE'),
+            'email' => Configuration::get('QBC_EMAIL'),
+        ));
+
+        return $this->display(__FILE__, 'external-navigation-hook.tpl');
+    }
+
+    public function hookActionAdminHotelGeneralSettingsOptionsModifier($params)
+    {
+        $params['options']['contactdetail']['fields'] = array_merge(
+            $params['options']['contactdetail']['fields'],
+            array(
+                'QBC_PHONE' => array(
+                    'title' => $this->l('Support Phone Number'),
+                    'type' => 'text',
+                    'hint' => $this->l('The phone number used for customer service. It will be shown on navigation bar.'),
+                    'class' => 'fixed-width-xxl',
+                ),
+                'QBC_EMAIL' => array(
+                    'title' => $this->l('Support Email'),
+                    'type' => 'text',
+                    'hint' => $this->l('The email used for customer service. It will be shown on navigation bar.'),
+                    'class' => 'fixed-width-xxl',
+                ),
+            )
+        );
+    }
+
+    public function hookActionAdminHotelGeneralSettingsControllerUpdate_optionsBefore()
+    {
+        $phone = Tools::getValue('QBC_PHONE');
+        $email = Tools::getValue('QBC_EMAIL');
+
+        if ($phone != '' && !Validate::isPhoneNumber($phone)) {
+            $this->context->controller->errors[] = $this->l('Support Phone Number is invalid.');
+        }
+
+        if ($email != '' && !Validate::isEmail($email)) {
+            $this->context->controller->errors[] = $this->l('Support Email is invalid.');
+        }
+
+        if (!count($this->context->controller->errors)) {
+            Configuration::updateValue('QBC_PHONE', $phone);
+            Configuration::updateValue('QBC_EMAIL', $email);
+        }
+    }
+
     public function cartBookingDataForMail($order)
     {
         $result = array();
@@ -635,6 +700,11 @@ class HotelReservationSystem extends Module
                 'actionOrderStatusPostUpdate',
                 'displayLeftColumn',
                 'actionCartSummary',
+                'actionFrontControllerSetMedia',
+                'displayNav',
+                'displayExternalNavigationHook',
+                'actionAdminHotelGeneralSettingsOptionsModifier',
+                'actionAdminHotelGeneralSettingsControllerUpdate_optionsBefore',
             )
         );
     }
@@ -669,7 +739,9 @@ class HotelReservationSystem extends Module
             'WK_ADVANCED_PAYMENT_INC_TAX',
             'WK_GOOGLE_ACTIVE_MAP',
             'WK_MAP_HOTEL_ACTIVE_ONLY',
-            'WK_HOTEL_NAME_ENABLE'
+            'WK_HOTEL_NAME_ENABLE',
+            'QBC_PHONE',
+            'QBC_EMAIL',
         );
         foreach ($configKeys as $key) {
             if (!Configuration::deleteByName($key)) {

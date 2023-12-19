@@ -144,24 +144,23 @@ class AdminHotelGeneralSettingsController extends ModuleAdminController
                 'title' => $this->l('Website Contact Details'),
                 'fields' => array(
                     'WK_HOTEL_GLOBAL_ADDRESS' => array(
-                        'title' => $this->l('Global Address'),
-                        'hint' => $this->l('Hotel global address which you want to show to your customers. It will be
-                        shown at contact us page.'),
+                        'title' => $this->l('Main Branch Address'),
+                        'hint' => $this->l('The address of the main branch. It will be shown on Contact Us page.'),
                         'type' => 'text',
                         'isCleanHtml' => true,
                         'class' => 'fixed-width-xxl',
                     ),
-                    'WK_HOTEL_GLOBAL_CONTACT_EMAIL' => array(
-                        'title' => $this->l('Global Email'),
-                        'hint' => $this->l('Email which you want to show a customer to email you.'),
-                        'type' => 'text',
-                        'class' => 'fixed-width-xxl',
-                    ),
                     'WK_HOTEL_GLOBAL_CONTACT_NUMBER' => array(
-                        'title' => $this->l('Global Contact Number'),
-                        'hint' => $this->l('Phone Number which you want to show a customer to contact you.'),
+                        'title' => $this->l('Main Branch Phone Number'),
+                        'hint' => $this->l('The phone number of the main branch. It will be shown on Contact Us page.'),
                         'type' => 'text',
                         'validation' => 'isPhoneNumber',
+                        'class' => 'fixed-width-xxl',
+                    ),
+                    'WK_HOTEL_GLOBAL_CONTACT_EMAIL' => array(
+                        'title' => $this->l('Main Branch Email'),
+                        'hint' => $this->l('The email address of the main branch. It will be shown on Contact Us page.'),
+                        'type' => 'text',
                         'class' => 'fixed-width-xxl',
                     ),
                 ),
