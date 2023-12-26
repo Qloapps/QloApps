@@ -538,8 +538,7 @@ class HotelBookingDetail extends ObjectModel
             $sql = 'SELECT cbd.`id_product`, cbd.`id_room`, cbd.`id_hotel`, cbd.`booking_type`, cbd.`comment`, rf.`room_num`, cbd.`date_from`, cbd.`date_to`
                 FROM `'._DB_PREFIX_.'htl_cart_booking_data` AS cbd
                 INNER JOIN `'._DB_PREFIX_.'htl_room_information` AS rf ON (rf.`id` = cbd.`id_room`)
-                WHERE cbd.`id_hotel`= '.(int)$idHotel.' AND cbd.`id_cart` = '.(int)$idCart.' AND cbd.`id_guest` ='.(int)$idGuest.' AND cbd.`is_refunded` = 0 AND cbd.`is_back_order` = 0 AND IF('.(int)$idRoomType.' > 0, rf.`id_product` = '.(int)$idRoomType.', 1) AND rf.`id_product` IN ('.$allowedIdRoomTypes.')
-                ORDER BY cbd.`id_room` ASC';
+                WHERE cbd.`id_hotel`= '.(int)$idHotel.' AND cbd.`id_cart` = '.(int)$idCart.' AND cbd.`id_guest` ='.(int)$idGuest.' AND cbd.`is_refunded` = 0 AND cbd.`is_back_order` = 0 AND IF('.(int)$idRoomType.' > 0, rf.`id_product` = '.(int)$idRoomType.', 1) AND rf.`id_product` IN ('.$allowedIdRoomTypes.')';
 
             if ($cartRooms = Db::getInstance()->executeS($sql)) {
                 foreach ($cartRooms as $cartRoomDetail) {
@@ -632,8 +631,8 @@ class HotelBookingDetail extends ObjectModel
         $whereAvailRoomSearch = 'WHERE ri.`id_hotel`='.(int)$idHotel.' AND ri.`id_status` != '. HotelRoomInformation::STATUS_INACTIVE.' AND ri.`id` NOT IN ('.$exclude_ids.') AND IF('.(int)$idRoomType.' > 0, ri.`id_product` = '.(int)$idRoomType.', 1) AND ri.`id_product` IN ('.$allowedIdRoomTypes.')';
 
         $groupByAvailRoomSearch = '';
-        $orderByAvailRoomSearch = '';
-        $orderWayAvailRoomSearch = '';
+        $orderByAvailRoomSearch = 'ORDER BY ri.`id`';
+        $orderWayAvailRoomSearch = 'ASC';
 
         Hook::exec('actionAvailRoomSearchSqlModifier',
             array(
@@ -657,8 +656,8 @@ class HotelBookingDetail extends ObjectModel
         $sql .= ' '.$joinAvailRoomSearch;
         $sql .= ' '.$whereAvailRoomSearch;
         $sql .= ' '.$groupByAvailRoomSearch;
-        $sql .= ' '.($orderByAvailRoomSearch ? $orderByAvailRoomSearch : 'ORDER BY ri.`id`');
-        $sql .= ' '.($orderWayAvailRoomSearch ? $orderWayAvailRoomSearch : 'ASC');
+        $sql .= ' '.$orderByAvailRoomSearch;
+        $sql .= ' '.$orderWayAvailRoomSearch;
 
         $availableRoomTypes = array();
         $unavailableRoomTypes = array();
