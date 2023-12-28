@@ -158,6 +158,23 @@ $(document).ready(function() {
             }).on('datepicker-change', function(event,obj){
                 $('#check_in_time').val($.datepicker.formatDate('yy-mm-dd', obj.date1));
                 $('#check_out_time').val($.datepicker.formatDate('yy-mm-dd', obj.date2));
+                focusNextOnCalendarClose = true;
+            }).on('datepicker-open', function() {
+                $('#daterange_value').addClass('focused').focus();
+            }).on('datepicker-close', function() {
+                $('#daterange_value').removeClass('focused').blur();
+            }).on('datepicker-closed', function() {
+                if (search_auto_focus_next_field && focusNextOnCalendarClose) {
+                    if (is_occupancy_wise_search) {
+                        if ($('#check_in_time').val() != '' && $('#check_out_time').val() != '') {
+                            BookingSearchManager.activateStep('occupancy');
+                        }
+                    } else {
+                        if (BookingSearchManager.allFieldsFilled()) {
+                            BookingSearchManager.activateStep('submit');
+                        }
+                    }
+                }
             });
         } else {
             $('#daterange_value').dateRangePicker({

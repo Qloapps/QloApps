@@ -65,6 +65,9 @@
                 <input type="hidden" id="check_out_time" name="check_out_time" {if isset($search_data)}value="{$search_data['date_to']|escape:'htmlall':'UTF-8'}"{/if}>
                 <div class="form-control header-rmsearch-input input-date" autocomplete="off" id="daterange_value_to" placeholder="{l s='Check-out' mod='wkroomsearchblock'}"><span>{l s='Check-out' mod='wkroomsearchblock'}</span></div>
             </div>
+            {if isset($is_index_page) && $is_index_page}
+                <div id="date-range-picker-container"></div>
+            {/if}
         </div>
     {else}
         <div class="form-group area-{$column_widths['date']}">
