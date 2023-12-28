@@ -197,7 +197,7 @@ class AdminPPreferencesControllerCore extends AdminController
                 ),
                 'submit' => array('title' => $this->l('Save'))
             ),
-            'order_by_pagination' => array(
+            /*'order_by_pagination' => array(
                 'title' =>    $this->l('Pagination'),
                 'fields' =>    array(
                     'PS_PRODUCTS_PER_PAGE' => array(
@@ -241,7 +241,7 @@ class AdminPPreferencesControllerCore extends AdminController
                     )
                 ),
                 'submit' => array('title' => $this->l('Save'))
-            ),
+            ),*/
             'fo_product_page' => array(
                 'title' =>    $this->l('Room type page'),
                 'fields' =>    array(
