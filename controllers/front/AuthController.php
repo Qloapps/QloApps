@@ -294,7 +294,9 @@ class AuthControllerCore extends FrontController
             $this->errors[] = Tools::displayError('Password is required.');
         } elseif (!Validate::isPasswd($passwd)) {
             $this->errors[] = Tools::displayError('Invalid password.');
-        } else {
+        }
+
+        if (!count($this->errors)) {
             $customer = new Customer();
             $authentication = $customer->getByEmail(trim($email), trim($passwd));
             if (isset($authentication->active) && !$authentication->active) {
@@ -321,6 +323,7 @@ class AuthControllerCore extends FrontController
                 }
             }
         }
+
         if ($this->ajax) {
             $return = array(
                 'hasError' => !empty($this->errors),
