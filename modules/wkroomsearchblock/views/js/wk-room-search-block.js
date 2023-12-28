@@ -688,10 +688,12 @@ $(document).ready(function() {
     // handle Tab/Enter keypresses on input fields - start
     $(document).on('keydown', '#hotel_location', function (e) {
         if (e.which == 9) { // Tab key
-            if ($('.location_search_results_ul').is(':visible')) {
-                e.preventDefault();
+            e.preventDefault();
 
+            if ($('.location_search_results_ul').is(':visible')) {
                 $('.location_search_results_ul li:first').focus().click();
+            } else {
+                BookingSearchManager.activateStep('hotel');
             }
         }
     });
