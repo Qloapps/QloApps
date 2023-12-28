@@ -712,10 +712,13 @@ $(document).ready(function() {
             e.preventDefault();
             $('#daterange_value').removeClass('focused').blur();
 
+            if ($('#daterange_value').data('dateRangePicker') != undefined) {
+                $('#daterange_value').data('dateRangePicker').close();
+            }
+
             if (is_occupancy_wise_search) {
                 BookingSearchManager.activateStep('occupancy');
             } else {
-                $('#daterange_value').data('dateRangePicker').close();
                 BookingSearchManager.activateStep('submit');
             }
         }
