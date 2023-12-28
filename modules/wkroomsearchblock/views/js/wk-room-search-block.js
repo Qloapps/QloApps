@@ -275,8 +275,14 @@ $(document).ready(function() {
         }
     });
 
+    // fix for: if user pressed Tab after selecting only one date
+    $('body').on('keydown', function(e) {
+        if (e.which == 9 && $('#date-range-picker-container').is(':visible')) {
+            $('#daterange_value').data('dateRangePicker').close();
+        }
+    });
+
     // set data on clicking the searched location on dropdown
-    var focusHotelSelection = true;
     $(document).on('click', '.location_search_results_ul li', function(e) {
         e.preventDefault();
 
