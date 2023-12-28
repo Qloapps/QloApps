@@ -57,6 +57,10 @@ class WkRoomSearchBlock extends Module
                 $this->context->controller->addCSS($this->_path.'/views/css/wk-global-search.css');
                 $this->context->controller->addJS($this->_path.'/views/js/wk-room-search-block.js');
 
+                $isOccupancyWiseSearch = false;
+                if (Configuration::get('PS_FRONT_SEARCH_TYPE') == HotelBookingDetail::SEARCH_TYPE_OWS) {
+                    $isOccupancyWiseSearch = true;
+                }
                 Media::addJsDef(
                     array (
                         'autocomplete_search_url' => $this->context->link->getModuleLink(
@@ -85,6 +89,8 @@ class WkRoomSearchBlock extends Module
                         'all_children_txt' => $this->l('All Children', false, true),
                         'invalid_occupancy_txt' => $this->l('Invalid occupancy(adults/children) found.', false, true),
                         'hotel_name_has_search' => count($hotelBranchesInfo) >= Configuration::get('WK_HOTEL_NAME_SEARCH_THRESHOLD'),
+                        'search_auto_focus_next_field' => (bool) Configuration::get('WK_SEARCH_AUTO_FOCUS_NEXT_FIELD'),
+                        'is_occupancy_wise_search' => $isOccupancyWiseSearch,
                     )
                 );
             }

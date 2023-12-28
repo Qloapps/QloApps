@@ -200,6 +200,7 @@ class HotelHelper
         Configuration::updateValue('WK_HOTEL_LOCATION_ENABLE', 1);
         Configuration::updateValue('WK_HOTEL_NAME_ENABLE', 1);
         Configuration::updateValue('WK_HOTEL_NAME_SEARCH_THRESHOLD', 5);
+        Configuration::updateValue('WK_SEARCH_AUTO_FOCUS_NEXT_FIELD', 1);
         Configuration::updateValue('WK_ROOM_LEFT_WARNING_NUMBER', 10);
         Configuration::updateValue('WK_HTL_ESTABLISHMENT_YEAR', 2010);
 

@@ -124,6 +124,8 @@
   #search_hotel_block_form .input-date {
     display: grid;
     cursor: text;}
+  #search_hotel_block_form .input-date.focused {
+    border: 2px solid #1292FF; }
   #search_hotel_block_form .input-date span {
     align-self: center;}
     #search_hotel_block_form .input-date span i {

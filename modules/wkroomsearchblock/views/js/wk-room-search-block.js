@@ -45,11 +45,9 @@ const BookingSearchManager = {
             inputHasValue: function () { return false; },
         },
     },
-    activateStep: function (step, force = false) {
+    activateStep: function (step) {
         if (step in this.inputSteps) {
-            if (force || !this.inputSteps[step].inputHasValue()) {
-                this.inputSteps[step].activate();
-            }
+            this.inputSteps[step].activate();
         }
     },
     allFieldsFilled: function () {
@@ -169,9 +167,22 @@ $(document).ready(function() {
             }).on('datepicker-change', function(event,obj){
                 $('#check_in_time').val($.datepicker.formatDate('yy-mm-dd', obj.date1));
                 $('#check_out_time').val($.datepicker.formatDate('yy-mm-dd', obj.date2));
+                focusNextOnCalendarClose = true;
+            }).on('datepicker-open', function() {
+                $('#daterange_value').addClass('focused').focus();
+            }).on('datepicker-close', function() {
+                $('#daterange_value').removeClass('focused').blur();
             }).on('datepicker-closed', function() {
-                if ($('#check_in_time').val() != '' && $('#check_out_time').val() != '') {
-                    BookingSearchManager.activateStep('occupancy');
+                if (search_auto_focus_next_field && focusNextOnCalendarClose) {
+                    if (is_occupancy_wise_search) {
+                        if ($('#check_in_time').val() != '' && $('#check_out_time').val() != '') {
+                            BookingSearchManager.activateStep('occupancy');
+                        }
+                    } else {
+                        if (BookingSearchManager.allFieldsFilled()) {
+                            BookingSearchManager.activateStep('submit');
+                        }
+                    }
                 }
             });
         }
@@ -193,6 +204,10 @@ $(document).ready(function() {
 
     // search location with users searched characters
     $(document).on('keyup', "#hotel_location", function(e) {
+        if (e.which == 13) {
+            return;
+        }
+
         if (($('.location_search_results_ul').is(':visible')) && (e.which == 40 || e.which == 38)) {
             $(this).blur();
             if (e.which == 40) {
@@ -233,45 +248,51 @@ $(document).ready(function() {
         }
     });
 
+    var focusNextOnCalendarClose = true;
+    // check if user clicked outside calendar
+    $('body').on('click', function(e) {
+        if ($('#date-range-picker-container').is(':visible')) {
+            if (!$(e.target).closest('.form-group').find('#date-range-picker-container').length) {
+                focusNextOnCalendarClose = false;
+            }
+        }
+    });
+
     // set data on clicking the searched location on dropdown
     var focusHotelSelection = true;
     $(document).on('click', '.location_search_results_ul li', function(e) {
-        let currentLocationName = $('#hotel_location').val();
-        let currentLocationId = $('#location_category_id').val();
+        e.preventDefault();
 
         $('.location_search_results_ul').empty().hide();
         $('#hotel_location').attr('value', $(this).html());
         $('#location_category_id').val($(this).val());
 
-        // check if current location as same as previous one
-        if (currentLocationName != $(this).html() && currentLocationId != $(this).val()) {
-            $.ajax({
-                url: autocomplete_search_url,
-                data: {
-                    location_category_id: $('#location_category_id').val(),
-                },
-                method: 'POST',
-                dataType: 'json',
-                success: function(result) {
-                    if (result.status == 'success') {
-                        $('#hotel_cat_id').val('');
-                        $('#id_hotel_button').html(result.data_select);
-                        $('.hotel_dropdown_ul').empty();
-                        $('.hotel_dropdown_ul').html(result.data_dropdown);
-                        $('#id_hotel_button').trigger('chosen:updated');
+        // fetch hotels for selected location
+        $.ajax({
+            url: autocomplete_search_url,
+            data: {
+                location_category_id: $('#location_category_id').val(),
+            },
+            method: 'POST',
+            dataType: 'json',
+            success: function(result) {
+                if (result.status == 'success') {
+                    $('#hotel_cat_id').val('');
+                    $('#id_hotel_button').html(result.data_select);
+                    $('.hotel_dropdown_ul').empty();
+                    $('.hotel_dropdown_ul').html(result.data_dropdown);
+                    $('#id_hotel_button').trigger('chosen:updated');
 
-                        if (focusHotelSelection) {
-                            BookingSearchManager.activateStep('hotel');
-                            focusHotelSelection = false;
-                        }
-                    } else {
-                        alert(no_results_found_cond);
+                    if (search_auto_focus_next_field) {
+                        BookingSearchManager.activateStep('hotel');
                     }
+                } else {
+                    alert(no_results_found_cond);
                 }
-            });
-        } else {
-            BookingSearchManager.activateStep('hotel');
-        }
+            }
+        });
+
+        $('#id_hotel_button_chosen .chosen-search input').blur();
     });
 
     // prevents calendar from closing on hotel selection
@@ -331,10 +352,17 @@ $(document).ready(function() {
         $('#hotel_cat_id').val($(selectedHotel).attr('data-hotel-cat-id'));
         $('#hotel_cat_name').html($(selectedHotel).html());
 
-        BookingSearchManager.activateStep('date_range');
+        if (search_auto_focus_next_field) {
+            setTimeout(function () {
+                $('#id_hotel_button').data('chosen').close_field();
+            }, 10);
+
+            BookingSearchManager.activateStep('date_range');
+        }
     }
 
     $(document).on('change', '#id_hotel_button', function() {
+        $('#id_hotel_button_chosen .chosen-search input').blur();
         selectHotelFromList($(this).find('option:selected'));
     });
 
@@ -562,7 +590,9 @@ $(document).ready(function() {
     // toggle occupancy block
     $('#guest_occupancy').on('click', function(e) {
         e.stopPropagation();
-        $('#daterange_value').data('dateRangePicker').close();
+        if ($('#date-range-picker-container').is(':visible')) {
+            $('#daterange_value').data('dateRangePicker').close();
+        }
         $("#search_occupancy_wrapper").toggle();
     });
 
@@ -612,9 +642,6 @@ $(document).ready(function() {
                     if (hasErrors == 0) {
                         $("#search_occupancy_wrapper").hide();
                         $("#search_hotel_block_form #guest_occupancy").removeClass('error_border');
-                        if (BookingSearchManager.allFieldsFilled()) {
-                            BookingSearchManager.activateStep('submit');
-                        }
                     } else {
                         $("#search_hotel_block_form #guest_occupancy").addClass('error_border');
                         return false;
@@ -642,15 +669,20 @@ $(document).ready(function() {
     }
 
     // handle Tab/Enter keypresses on input fields - start
-    $(document).on('keydown', '.location_search_results_ul li', function (e) {
-        if (e.which == 9 || e.which == 13) { // Tab/Enter key
-            if (e.which == 9) {
+    $(document).on('keydown', '#hotel_location', function (e) {
+        if (e.which == 9) { // Tab key
+            if ($('.location_search_results_ul').is(':visible')) {
                 e.preventDefault();
-                $(this).click();
+
+                $('.location_search_results_ul li:first').focus().click();
             }
-            if ($('#id_hotel_button').length) {
-                focusHotelSelection = true;
-            }
+        }
+    });
+
+    $(document).on('keydown', '.location_search_results_ul li', function (e) {
+        if (e.which == 9) { // Tab key
+            e.preventDefault();
+            $(this).click();
         }
     });
 
@@ -665,16 +697,41 @@ $(document).ready(function() {
         }
     });
 
-    $(document).on('keydown', '#guest_occupancy', function (e) {
-        e.preventDefault();
+    $(document).on('keydown', '#id_hotel_button_chosen.chosen-container-active', function (e) {
         if (e.which == 9) { // Tab key
+            e.preventDefault();
+            if ($('#daterange_value').length) {
+                $('#daterange_value').focus();
+                $('#daterange_value').click();
+            }
+        }
+    });
+
+    $(document).on('keydown', '#daterange_value', function (e) {
+        if (e.which == 9) { // Tab key
+            e.preventDefault();
+            $('#daterange_value').removeClass('focused').blur();
+
+            if (is_occupancy_wise_search) {
+                BookingSearchManager.activateStep('occupancy');
+            } else {
+                $('#daterange_value').data('dateRangePicker').close();
+                BookingSearchManager.activateStep('submit');
+            }
+        }
+    });
+
+    $(document).on('keydown', '#guest_occupancy', function (e) {
+        if (e.which == 9) { // Tab key
+            e.preventDefault();
             if ($('#search_occupancy_wrapper').css('display') != 'none') {
                 $('#guest_occupancy').click();
             }
+
             BookingSearchManager.activateStep('submit');
         }
     });
-    // handle Tab keypresses on input fields - end
+    // handle Tab/Enter keypresses on input fields - end
 
     $('select#id_hotel_button').chosen({
         search_contains: true,

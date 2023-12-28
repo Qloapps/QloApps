@@ -81,6 +81,23 @@ class AdminHotelGeneralSettingsController extends ModuleAdminController
                         'hint' => $this->l('This option can be disabled if only one active hotel in the website.
                         In case of more than one active hotel, Hotel Name will always be shown in the search panel.'),
                     ),
+                    'WK_SEARCH_AUTO_FOCUS_NEXT_FIELD' => array(
+                        'title' => $this->l('Focus next field automatically'),
+                        'cast' => 'intval',
+                        'type' => 'bool',
+                        'default' => '0',
+                        'values' => array(
+                            array(
+                                'id' => 'active_on',
+                                'value' => 1,
+                            ),
+                            array(
+                                'id' => 'active_off',
+                                'value' => 0,
+                            ),
+                        ),
+                        'hint' => $this->l('Enable if you want the next booking search field to be focused automatically after setting value for a field.'),
+                    ),
                     'WK_HOTEL_NAME_SEARCH_THRESHOLD' => array(
                         'title' => $this->l('Hotel name search threshold'),
                         'type' => 'text',
