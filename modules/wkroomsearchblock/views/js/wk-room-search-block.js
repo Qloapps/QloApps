@@ -155,10 +155,13 @@ $(document).ready(function() {
                     }
                 },
                 endDate: max_order_date,
+            }).on('datepicker-first-date-selected', function() {
+                calendarFirstDateSelected = true;
             }).on('datepicker-change', function(event,obj){
                 $('#check_in_time').val($.datepicker.formatDate('yy-mm-dd', obj.date1));
                 $('#check_out_time').val($.datepicker.formatDate('yy-mm-dd', obj.date2));
                 focusNextOnCalendarClose = true;
+                calendarFirstDateSelected = false;
             }).on('datepicker-open', function() {
                 $('#daterange_value').addClass('focused').focus();
             }).on('datepicker-close', function() {
@@ -181,14 +184,18 @@ $(document).ready(function() {
                 startDate: $.datepicker.formatDate('dd-mm-yy', new Date()),
                 startDate: start_date,
                 endDate: max_order_date,
+            }).on('datepicker-first-date-selected', function() {
+                calendarFirstDateSelected = true;
             }).on('datepicker-change', function(event,obj){
                 $('#check_in_time').val($.datepicker.formatDate('yy-mm-dd', obj.date1));
                 $('#check_out_time').val($.datepicker.formatDate('yy-mm-dd', obj.date2));
                 focusNextOnCalendarClose = true;
+                calendarFirstDateSelected = false;
             }).on('datepicker-open', function() {
                 $('#daterange_value').addClass('focused').focus();
             }).on('datepicker-close', function() {
                 $('#daterange_value').removeClass('focused').blur();
+                calendarFirstDateSelected = false;
             }).on('datepicker-closed', function() {
                 if (search_auto_focus_next_field && focusNextOnCalendarClose) {
                     if (is_occupancy_wise_search) {
@@ -265,7 +272,7 @@ $(document).ready(function() {
         }
     });
 
-    var focusNextOnCalendarClose = true;
+    var focusNextOnCalendarClose = true, calendarFirstDateSelected = false;;
     // check if user clicked outside calendar
     $('body').on('click', function(e) {
         if ($('#date-range-picker-container').is(':visible')) {
@@ -275,10 +282,22 @@ $(document).ready(function() {
         }
     });
 
-    // fix for: if user pressed Tab after selecting only one date
+    // fix for: if user pressed Tab after selecting only first date
     $('body').on('keydown', function(e) {
-        if (e.which == 9 && $('#date-range-picker-container').is(':visible')) {
+        if (e.which == 9
+            && $('#date-range-picker-container').is(':visible')
+            && calendarFirstDateSelected
+        ) {
+            e.preventDefault();
             $('#daterange_value').data('dateRangePicker').close();
+
+            setTimeout(function () {
+                if (is_occupancy_wise_search) {
+                    BookingSearchManager.activateStep('occupancy');
+                } else {
+                    BookingSearchManager.activateStep('submit');
+                }
+            }, 10);
         }
     });
 
@@ -378,9 +397,8 @@ $(document).ready(function() {
         if (search_auto_focus_next_field) {
             setTimeout(function () {
                 $('#id_hotel_button').data('chosen').close_field();
+                BookingSearchManager.activateStep('date_range');
             }, 10);
-
-            BookingSearchManager.activateStep('date_range');
         }
     }
 
@@ -619,6 +637,54 @@ $(document).ready(function() {
         $("#search_occupancy_wrapper").toggle();
     });
 
+    function validateOccupancies() {
+        let hasErrors = 0;
+
+        let adults = $("#search_occupancy_wrapper").find(".num_adults").map(function(){return $(this).val();}).get();
+        let children = $("#search_occupancy_wrapper").find(".num_children").map(function(){return $(this).val();}).get();
+        let child_ages = $("#search_occupancy_wrapper").find(".guest_child_age").map(function(){return $(this).val();}).get();
+
+        // start validating above values
+        if (!adults.length || (adults.length != children.length)) {
+            hasErrors = 1;
+            showErrorMessage(invalid_occupancy_txt);
+        } else {
+            $("#search_occupancy_wrapper").find('.occupancy_count').removeClass('error_border');
+
+            // validate values of adults and children
+            adults.forEach(function (item, index) {
+                if (isNaN(item) || parseInt(item) < 1) {
+                    hasErrors = 1;
+                    $("#search_occupancy_wrapper .num_adults").eq(index).closest('.occupancy_count_block').find('.occupancy_count').addClass('error_border');
+                }
+                if (isNaN(children[index])) {
+                    hasErrors = 1;
+                    $("#search_occupancy_wrapper .num_children").eq(index).closest('.occupancy_count_block').find('.occupancy_count').addClass('error_border');
+                }
+            });
+
+            // validate values of selected child ages
+            $("#search_occupancy_wrapper").find('.guest_child_age').removeClass('error_border');
+            child_ages.forEach(function (age, index) {
+                age = parseInt(age);
+                if (isNaN(age) || (age < 0) || (age >= parseInt(max_child_age))) {
+                    hasErrors = 1;
+                    $("#search_occupancy_wrapper .guest_child_age").eq(index).addClass('error_border');
+                }
+            });
+        }
+
+        if (hasErrors == 0) {
+            $("#search_occupancy_wrapper").hide();
+            $("#search_hotel_block_form #guest_occupancy").removeClass('error_border');
+        } else {
+            $("#search_hotel_block_form #guest_occupancy").addClass('error_border');
+            return false;
+        }
+
+        return true;
+    }
+
     // close the occupancy block when clink anywhere in the body outside occupancy block
     $('body').on('click', function(e) {
         // @TODO better approach to be found
@@ -626,50 +692,17 @@ $(document).ready(function() {
             if ($('#search_occupancy_wrapper').css('display') !== 'none') {
                 if (!($(e.target).closest("#search_occupancy_wrapper").length)) {
                     // Before closing the occupancy block validate the vaules inside
-                    let hasErrors = 0;
-
-                    let adults = $("#search_occupancy_wrapper").find(".num_adults").map(function(){return $(this).val();}).get();
-                    let children = $("#search_occupancy_wrapper").find(".num_children").map(function(){return $(this).val();}).get();
-                    let child_ages = $("#search_occupancy_wrapper").find(".guest_child_age").map(function(){return $(this).val();}).get();
-
-                    // start validating above values
-                    if (!adults.length || (adults.length != children.length)) {
-                        hasErrors = 1;
-                        showErrorMessage(invalid_occupancy_txt);
-                    } else {
-                        $("#search_occupancy_wrapper").find('.occupancy_count').removeClass('error_border');
-
-                        // validate values of adults and children
-                        adults.forEach(function (item, index) {
-                            if (isNaN(item) || parseInt(item) < 1) {
-                                hasErrors = 1;
-                                $("#search_occupancy_wrapper .num_adults").eq(index).closest('.occupancy_count_block').find('.occupancy_count').addClass('error_border');
-                            }
-                            if (isNaN(children[index])) {
-                                hasErrors = 1;
-                                $("#search_occupancy_wrapper .num_children").eq(index).closest('.occupancy_count_block').find('.occupancy_count').addClass('error_border');
-                            }
-                        });
-
-                        // validate values of selected child ages
-                        $("#search_occupancy_wrapper").find('.guest_child_age').removeClass('error_border');
-                        child_ages.forEach(function (age, index) {
-                            age = parseInt(age);
-                            if (isNaN(age) || (age < 0) || (age >= parseInt(max_child_age))) {
-                                hasErrors = 1;
-                                $("#search_occupancy_wrapper .guest_child_age").eq(index).addClass('error_border');
-                            }
-                        });
-                    }
-
-                    if (hasErrors == 0) {
-                        $("#search_occupancy_wrapper").hide();
-                        $("#search_hotel_block_form #guest_occupancy").removeClass('error_border');
-                    } else {
-                        $("#search_hotel_block_form #guest_occupancy").addClass('error_border');
-                        return false;
-                    }
+                    return validateOccupancies();
                 }
+            }
+        }
+    });
+
+    $('body').on('keydown', function(e) {
+        if (e.which == 9 && $('#search_occupancy_wrapper:visible').length) {
+            e.preventDefault();
+            if (validateOccupancies()) {
+                BookingSearchManager.activateStep('submit');
             }
         }
     });
@@ -728,6 +761,19 @@ $(document).ready(function() {
             if ($('#daterange_value').length) {
                 $('#daterange_value').focus();
                 $('#daterange_value').click();
+            }
+        }
+    });
+
+    $(document).on('keydown', '#id_hotel_button_chosen .chosen-search input', function (e) {
+        if (e.which == 9 && $('#date-range-picker-container').is(':visible')) { // Tab key
+            e.preventDefault();
+            $('#daterange_value').data('dateRangePicker').close();
+
+            if (is_occupancy_wise_search) {
+                BookingSearchManager.activateStep('occupancy');
+            } else {
+                BookingSearchManager.activateStep('submit');
             }
         }
     });
