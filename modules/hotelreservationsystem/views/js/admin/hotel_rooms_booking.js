@@ -869,6 +869,12 @@ $(document).ready(function() {
                         $("#cartModal").html(result.cart_content);
                     }
                     $("#cart_record").html(result.total_products_in_cart);
+
+                    if (parseInt(result.total_products_in_cart) > 0) {
+                        $('#cart_record').closest('button').removeClass('disabled');
+                    } else {
+                        $('#cart_record').closest('button').addClass('disabled');
+                    }
                 }
             }
         });
