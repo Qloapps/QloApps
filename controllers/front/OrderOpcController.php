@@ -137,6 +137,8 @@ class OrderOpcControllerCore extends ParentOrderController
 
                                     if (!count($this->errors)) {
                                         $objAddress->phone_mobile = $phoneMobile;
+                                        $objAddress->firstname = $this->context->customer->firstname;
+                                        $objAddress->lastname = $this->context->customer->lastname;
                                         if (!$objAddress->save()) {
                                             $this->errors[] = Tools::displayError('Something went wrong while saving phone number. Please try again.', false);
                                         }
