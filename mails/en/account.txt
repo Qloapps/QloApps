@@ -9,8 +9,6 @@ Here are your login details:
 
 E-MAIL ADDRESS: {email}
 
-PASSWORD: {passwd} 		 
-
 Important Security Tips:
 
 * Always keep your account details safe.

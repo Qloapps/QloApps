@@ -25,7 +25,7 @@
             </a>
             {foreach $product.images as $image}
                 {if $image['cover'] == 0}
-                    <a href="{$link->getImageLink($product.link_rewrite, $image.id_image, 'large_default')|escape:'html':'UTF-8'}" rel="htl-images{$product['id_product']}" class="fancybox hidden">
+                    <a href="{$link->getImageLink($product.link_rewrite, $image.id_image, 'large_default')|escape:'html':'UTF-8'}" rel="htl-images{$product['id_product']}" class="fancybox hidden"  title="{if !empty($image.legend)}{$image.legend|escape:'html':'UTF-8'}{else}{$product.name|escape:'html':'UTF-8'}{/if}">
                     </a>
                 {/if}
             {/foreach}
