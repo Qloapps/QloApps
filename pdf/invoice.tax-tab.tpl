@@ -39,7 +39,7 @@
 				<th colspan="{$th_rows}" class="header">{l s='Tax Details' pdf='true'}</th>
 			</tr>
 			<tr>
-				<th class="header-left small">{l s='Tax Detail' pdf='true'}</th>
+				<th class="header-left small">{l s='Taxable category' pdf='true'}</th>
 				{if isset($showTaxName) && $showTaxName}
 					<th class="header-left small">{l s='Tax Name' pdf='true'}</th>
 				{/if}
