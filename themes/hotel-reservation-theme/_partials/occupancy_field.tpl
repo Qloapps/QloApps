@@ -63,8 +63,8 @@
                             </div>
                             <div class="form-group col-sm-7 col-xs-6 occupancy_count_block">
                                 <div class="row">
-                                    <label class="col-sm-12 clearfix">{l s='Children'}</label>
-                                    <div class="col-sm-12">
+                                    <label class="col-sm-12">{l s='Children'}</label>
+                                    <div class="col-sm-12 clearfix">
                                         <input type="hidden" class="num_occupancy num_children room_occupancies" name="occupancy[{$key|escape:'htmlall':'UTF-8'}][children]" max="{}" value="{$occupancy['children']|escape:'htmlall':'UTF-8'}">
                                         <div class="occupancy_count pull-left">
                                             <span>{$occupancy['children']|escape:'htmlall':'UTF-8'}</span>
