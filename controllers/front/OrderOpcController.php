@@ -389,16 +389,10 @@ class OrderOpcControllerCore extends ParentOrderController
      */
     public function initContent()
     {
-        // check all service products are available
-        RoomTypeServiceProductCartDetail::validateServiceProductsInCart();
-
-        // check rooms in cart are still available for front office
-        HotelRoomType::validateForRoomTypesShownAtFrontOffice();
+        // validate room types before payment by customer
+        $orderRestrictErr = HotelCartBookingData::validateRoomTypeAvailabilities($this);
 
         parent::initContent();
-
-        // check ORDER RESTRICT condition before payment by the customer
-        $orderRestrictErr = HotelOrderRestrictDate::validateOrderRestrictDateOnPayment($this);
 
         /* id_carrier is not defined in database before choosing a carrier, set it to a default one to match a potential cart _rule */
         if (empty($this->context->cart->id_carrier)) {

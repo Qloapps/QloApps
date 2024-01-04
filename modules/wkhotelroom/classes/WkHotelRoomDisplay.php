@@ -44,13 +44,25 @@ class WkHotelRoomDisplay extends ObjectModel
         );
     }
 
-    public function getHotelRoomDisplayData($active = true)
+    public function getHotelRoomDisplayData($active = true, $checkShowAtFront = true)
     {
-        $sql = 'SELECT * FROM `'._DB_PREFIX_.'htl_room_block_data` WHERE 1';
-        if ($active !== false) {
-            $sql .= ' AND `active` = '.(int)$active;
+        $sql = 'SELECT hrbd.* FROM `'._DB_PREFIX_.'htl_room_block_data` hrbd';
+
+        if ($checkShowAtFront) {
+            $sql .= ' INNER JOIN `'._DB_PREFIX_.'product` p ON (p.`id_product` = hrbd.`id_product`)';
         }
-        $sql .= ' ORDER BY `position`';
+
+        $sql .= ' WHERE 1';
+
+        if ($active) {
+            $sql .= ' AND hrbd.`active` = 1';
+        }
+
+        if ($checkShowAtFront) {
+            $sql .= ' AND p.`show_at_front` = 1';
+        }
+
+        $sql .= ' ORDER BY hrbd.`position`';
 
         $result = DB::getInstance()->executeS($sql);
         if ($result) {

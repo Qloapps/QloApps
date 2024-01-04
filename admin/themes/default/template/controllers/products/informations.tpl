@@ -275,7 +275,7 @@
 
 	<div class="form-group" id="show_at_front_container">
 		<label class="control-label col-lg-3">
-			<span class="label-tooltip" data-toggle="tooltip" title="{l s='Enable if you want this room type to be shown at front office.'}">
+			<span class="label-tooltip" data-toggle="tooltip" title="{l s='Enable if you want this room type to be shown and to be available for booking from front office.'}">
 				{l s='Show at front office'}
 			</span>
 		</label>

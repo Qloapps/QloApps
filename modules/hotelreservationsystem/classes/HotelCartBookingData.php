@@ -889,6 +889,135 @@ class HotelCartBookingData extends ObjectModel
         return true;
     }
 
+    public static function validateRoomTypeAvailabilities(&$controller)
+    {
+        $context = Context::getContext();
+
+        $errors = array();
+
+        // validate service products
+        if ($cartProducts = $context->cart->getProducts()) {
+            $objRoomTypeServiceProductCartDetail = new RoomTypeServiceProductCartDetail();
+            foreach ($cartProducts as $product) {
+                if (!$product['active'] && !$product['booking_product']) {
+                    $serviceProducts = $objRoomTypeServiceProductCartDetail->getServiceProductsInCart($context->cart->id, $product['id_product']);
+                    foreach ($serviceProducts as $serviceProduct) {
+                        $objRoomTypeServiceProductCartDetail->removeServiceProductByIdHtlCartBooking($serviceProduct['htl_cart_booking_id']);
+                    }
+                }
+            }
+        }
+
+        // validate room types if bookable from front office
+        if ($cartProducts = $context->cart->getProducts()) {
+            $objHotelCartBookingData = new HotelCartBookingData();
+            foreach ($cartProducts as $product) {
+                if ($product['booking_product'] && !$product['show_at_front']) {
+                    $objHotelCartBookingData->deleteCartBookingData($context->cart->id, $product['id_product']);
+                }
+            }
+        }
+
+        // validate room types for restriction date
+        $objModule = Module::getInstanceByName('hotelreservationsystem');
+        if ($cartProducts = $context->cart->getProducts()) {
+            $objHotelCartBookingData = new HotelCartBookingData();
+            $objHotelBookingDetail = new HotelBookingDetail();
+
+            foreach ($cartProducts as $product) {
+                if ($product['active']) {
+                    if ($cartBookingData = $objHotelCartBookingData->getOnlyCartBookingData(
+                        $context->cart->id,
+                        $context->cart->id_guest,
+                        $product['id_product']
+                    )) {
+                        $cartData = array();
+                        foreach ($cartBookingData as $bookingData) {
+                            $dateJoin = strtotime($bookingData['date_from']).strtotime($bookingData['date_to']);
+                            $cartData[$dateJoin]['date_from'] = $bookingData['date_from'];
+                            $cartData[$dateJoin]['date_to'] = $bookingData['date_to'];
+                            $cartData[$dateJoin]['id_hotel'] = $bookingData['id_hotel'];
+                            $cartData[$dateJoin]['id_rms'][] = $bookingData['id_room'];
+                        }
+
+                        foreach ($cartData as $roomData) {
+                            if ($maxOrderDate = HotelOrderRestrictDate::getMaxOrderDate($roomData['id_hotel'])) {
+                                if (strtotime('-1 day', strtotime($maxOrderDate)) < strtotime($roomData['date_from'])
+                                    || strtotime($maxOrderDate) < strtotime($roomData['date_to'])
+                                ) {
+                                    $objHotelBranchInformation = new HotelBranchInformation(
+                                        $roomData['id_hotel'],
+                                        $context->language->id
+                                    );
+                                    $errors[] = sprintf(
+                                        'You can not book rooms for hotel \'%s\' after date %s. Please remove rooms from %s - %s to proceed.',
+                                        $objHotelBranchInformation->hotel_name,
+                                        Tools::displayDate($maxOrderDate),
+                                        Tools::displayDate($roomData['date_from']),
+                                        Tools::displayDate($roomData['date_to'])
+                                    );
+                                    $error = true;
+                                }
+                            }
+
+                            $preparationTime = HotelOrderRestrictDate::getPreparationTime($roomData['id_hotel']);
+                            if ($preparationTime !== false) {
+                                $minOrderDate = date('Y-m-d', strtotime('+'. ($preparationTime) .' days'));
+                                if (strtotime($minOrderDate) > strtotime($roomData['date_from'])
+                                    || strtotime($minOrderDate . ' +1 day')> strtotime($roomData['date_to'])
+                                ) {
+                                    $objHotelBranchInformation = new HotelBranchInformation(
+                                        $roomData['id_hotel'],
+                                        $context->language->id
+                                    );
+                                    $errors[] = sprintf(
+                                        'You can not book rooms for hotel \'%s\' before date %s. Please remove rooms from %s - %s to proceed.',
+                                        $objHotelBranchInformation->hotel_name,
+                                        Tools::displayDate($minOrderDate),
+                                        Tools::displayDate($roomData['date_from']),
+                                        Tools::displayDate($roomData['date_to'])
+                                    );
+                                    $error = true;
+                                }
+                            }
+
+                            $bookingParams = array(
+                                'date_from' => $roomData['date_from'],
+                                'date_to' => $roomData['date_to'],
+                                'hotel_id' => $roomData['id_hotel'],
+                                'id_room_type' => $product['id_product'],
+                                'only_search_data' => 1,
+                            );
+                            $bookingSearchData = $objHotelBookingDetail->dataForFrontSearch($bookingParams);
+                            $isRmBooked = 0;
+                            if (count($bookingSearchData['rm_data'][$product['id_product']]['data']['available']) < count($roomData['id_rms'])) {
+                                foreach ($roomData['id_rms'] as $searchRoomData) {
+                                    if($isRmBooked = $objHotelBookingDetail->chechRoomBooked($searchRoomData, $roomData['date_from'], $roomData['date_to'])){
+                                        break;
+                                    }
+                                }
+                                if ($isRmBooked) {
+                                    $errors[] = sprintf($objModule->l('The Room \'%s\' has been booked by another customer from \'%s\' to \'%s\' Please remove rooms from cart to proceed', 'HotelOrderRestrictDate'), $product['name'], date('d-m-Y', strtotime($roomData['date_from'])), date('d-m-Y', strtotime($roomData['date_to'])));
+                                    $error = true;
+                                } else {
+                                    $errors[] = sprintf($objModule->l('The Room \'%s\' is no longer avalable from \'%s\' to \'%s\' Please remove rooms from cart to proceed', 'HotelOrderRestrictDate'), $product['name'], date('d-m-Y', strtotime($roomData['date_from'])), date('d-m-Y', strtotime($roomData['date_to'])));
+                                    $error = true;
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    $error = true;
+                    $errors[] = $objModule->l('You can not book rooms from "', 'HotelOrderRestrictDate'). $product['name'] .$objModule->l('". Please remove rooms from "', 'HotelOrderRestrictDate'). $product['name'] . $objModule->l('" from cart to proceed.', 'HotelOrderRestrictDate');
+                }
+            }
+        }
+
+        $controller->errors = array_merge($controller->errors, $errors);
+
+        return $errors;
+    }
+
     /**
      * [getCartFormatedBookinInfoByIdCart : To get cart booking information with some additional information in a custom famated way].
      * @param [Int] $id_cart [Id of the cart]

@@ -399,19 +399,6 @@ class HotelRoomType extends ObjectModel
         return $taxRate;
     }
 
-    public static function validateForRoomTypesShownAtFrontOffice()
-    {
-        $context = Context::getContext();
-        if ($cartProducts = $context->cart->getProducts()) {
-            foreach ($cartProducts as $product) {
-                if ($product['booking_product'] && !$product['show_at_front']) {
-                    $objHotelCartBookingData = new HotelCartBookingData();
-                    $objHotelCartBookingData->deleteCartBookingData($context->cart->id, $product['id_product']);
-                }
-            }
-        }
-    }
-
     // Webservice funcions
     public function getWsHotelRooms()
     {
