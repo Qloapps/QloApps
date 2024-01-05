@@ -8312,19 +8312,21 @@ table.discount i {
 
 #pagenotfound .pagenotfound {
   max-width: 824px;
-  margin: 100px auto 100px auto;
+  margin: 0px auto;
   text-align: center; }
   #pagenotfound .pagenotfound img {
     margin: 0 auto; }
   #pagenotfound .pagenotfound h1 {
-    font: 600 28px/34px 'Oxygen', serif;
+    font-size: 40px;
+    font-weight: 700;
     color: #333;
     margin-bottom: 7px; }
   #pagenotfound .pagenotfound p {
-    font: 600 16px/20px 'Oxygen', serif;
     color: #555454;
     padding-bottom: 19px;
     margin-top: 30px;
+    font-size: 18px;
+    line-height: 24px;
     margin-bottom: 0; }
   #pagenotfound .pagenotfound .buttons {
     margin-top: 5px; }
@@ -8332,7 +8334,7 @@ table.discount i {
       border: none;
       border-radius: 2px;
       font-size: 14px;
-      padding: 10px 25px;
+      padding: 15px 20px;
       font-weight: 600;
       background-color: #1292FF;
       color: #FFFFFF; }
