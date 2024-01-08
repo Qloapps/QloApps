@@ -305,6 +305,11 @@ class DispatcherCore
                     } else {
                         $controllers = Dispatcher::getControllers(_PS_MODULE_DIR_.$tab->module.'/controllers/admin/');
                         if (!isset($controllers[strtolower($this->controller)])) {
+                            // If this is a parent tab, load the first child
+                            if (Validate::isLoadedObject($tab) && $tab->id_parent == 0 && ($tabs = Tab::getTabs(Context::getContext()->language->id, $tab->id)) && isset($tabs[0])) {
+                                Tools::redirectAdmin(Context::getContext()->link->getAdminLink($tabs[0]['class_name']));
+                            }
+
                             $this->controller = $this->controller_not_found;
                             $controller_class = 'AdminNotFoundController';
                         } else {

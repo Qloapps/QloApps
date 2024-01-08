@@ -884,7 +884,7 @@ class AdminControllerCore extends Controller
                     $key = isset($tmp_tab[1]) ? $tmp_tab[0].'.`'.$tmp_tab[1].'`' : '`'.$tmp_tab[0].'`';
 
                     // as in database 0 means position 1 in the renderlist
-                    if (isset($field['position'])) {
+                    if (isset($field['position']) && Validate::isInt($value)) {
                         $value -= 1;
                     }
 

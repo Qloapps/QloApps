@@ -171,9 +171,36 @@ class AdminSearchControllerCore extends AdminController
         $this->context = Context::getContext();
         if ($this->_list['products'] = Product::searchByName($this->context->language->id, $this->query)) {
             $objRoomType = new HotelRoomType();
+            $objRoomTypeServiceProduct = new RoomTypeServiceProduct();
+            $accessibleHotels = HotelBranchInformation::getProfileAccessedHotels(
+                $this->context->employee->id_profile,
+                1,
+                1
+            );
+
             foreach ($this->_list['products'] as $key => $product) {
-                $roomInfo = $objRoomType->getRoomTypeInfoByIdProduct($product['id_product']);
-                if (!in_array($roomInfo['id_hotel'], HotelBranchInformation::getProfileAccessedHotels($this->context->employee->id_profile, 1, 1))) {
+                $toUnset = false;
+                if ($product['booking_product']) {
+                    $roomInfo = $objRoomType->getRoomTypeInfoByIdProduct($product['id_product']);
+                    if (!in_array($roomInfo['id_hotel'], $accessibleHotels)) {
+                        $toUnset = true;
+                    }
+                } else {
+                    $associations = $objRoomTypeServiceProduct->getAssociatedHotelsAndRoomType($product['id_product']);
+                    // proceed only if access can not be determined from hotels
+                    if (!count(array_intersect($associations['hotels'], $accessibleHotels))) {
+                        $toUnset = true;
+                        foreach ($associations['room_types'] as $idProduct) {
+                            $roomTypeInfo = $objRoomType->getRoomTypeInfoByIdProduct($idProduct);
+                            if (in_array($roomTypeInfo['id_hotel'], $accessibleHotels)) {
+                                $toUnset = false;
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                if ($toUnset) {
                     unset($this->_list['products'][$key]);
                 }
             }
