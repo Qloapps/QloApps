@@ -1187,6 +1187,12 @@
 		}
 		$('#order_message').val(jsonSummary.order_message);
 		$('#payment_amount').siblings('.input-group-addon').html(currency_sign);
+		if (jsonSummary.summary.is_advance_payment_active) {
+			$('#advance_payment_amount').html(formatCurrency(parseFloat(jsonSummary.summary.advance_payment_amount_ti), currency_format, currency_sign, currency_blank));
+			$('#advance_payment_amount_block').show();
+		} else {
+			$('#advance_payment_amount_block').hide();
+		}
 		resetBind();
 	}
 
@@ -1577,6 +1583,13 @@
 			}
 			if ($(this).closest('.room_demand_block').find('.change_room_type_service_product').is(':checked')) {
 				updateServiceProducts($(this).closest('.room_demand_block').find('.change_room_type_service_product'));
+			}
+		});
+
+		$(document).on('change', '#payment_module_name', function() {
+			let paymentType = $(this).find(':selected').attr('data-payment-type');
+			if ($('select#payment_type option[value="' + paymentType + '"]').length) {
+				$('#payment_type').val(paymentType);
 			}
 		});
 
@@ -2087,7 +2100,7 @@
 						<select class="fixed-width-xxl" name="payment_module_name" id="payment_module_name">
 							{if !$PS_CATALOG_MODE}
 							{foreach from=$payment_modules item='module'}
-								<option value="{$module->name}" {if isset($smarty.post.payment_module_name) && $module->name == $smarty.post.payment_module_name}selected="selected"{/if}>{$module->displayName}</option>
+								<option value="{$module->name}" data-payment-type="{$module->payment_type}" {if isset($smarty.post.payment_module_name) && $module->name == $smarty.post.payment_module_name}selected="selected"{/if}>{$module->displayName}</option>
 							{/foreach}
 							{else}
 								<option value="boorder">{l s='Back office order'}</option>
@@ -2096,13 +2109,34 @@
 					</div>
 				</div>
 				<div class="form-group">
+					<label class="control-label col-lg-3">{l s='Payment source'}</label>
+					<div class="col-lg-9">
+						<select class="fixed-width-xxl" name="payment_type" id="payment_type">
+							{foreach from=$payment_types item=payment_type}
+								<option value="{$payment_type.value}" {if isset($smarty.post.payment_type) && $payment_type.value == $smarty.post.payment_type}selected="selected"{/if}>
+									{$payment_type.name}
+								</option>
+							{/foreach}
+						</select>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label col-lg-3">{l s='Transaction ID'}</label>
+					<div class="col-lg-9">
+						<input type="text" class="fixed-width-xxl" name="payment_transaction_id" id="payment_transaction_id" value="{if isset($smarty.post.payment_transaction_id)}{$smarty.post.payment_transaction_id}{/if}" />
+					</div>
+				</div>
+				<div class="form-group">
 					<label class="control-label col-lg-3">{l s='Payment amount'}</label>
 					<div class="col-lg-9">
-						<div class="input-group fixed-width-xl">
+						<div class="input-group">
 							<span class="input-group-addon">{$currency->sign}</span>
 							<input type="text" class="fixed-width-xl" name="payment_amount" id="payment_amount" value="{if isset($smarty.post.payment_amount)}{$smarty.post.payment_amount}{else}{0|string_format:"%.`$smarty.const._PS_PRICE_DISPLAY_PRECISION_`f"}{/if}" />
 						</div>
-					</span>
+						<p class="help-block" id="advance_payment_amount_block" style="display: none;">
+							<span>{l s='Advance payment amount: '}</span>
+							<span id="advance_payment_amount"></span>
+						</p>
 					</div>
 				</div>
 				<div class="form-group">

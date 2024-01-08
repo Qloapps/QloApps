@@ -322,6 +322,13 @@ class AdminOrdersControllerCore extends AdminController
             $payment_modules[] = Module::getInstanceById((int)$p_module['id_module']);
         }
 
+        $paymentTypes = array();
+        foreach ($this->getPaymentsTypes() as $paymentType) {
+            if ($paymentType['value'] != OrderPayment::PAYMENT_TYPE_REMOTE_PAYMENT) {
+                $paymentTypes[] = $paymentType;
+            }
+        }
+
         $occupancyRequiredForBooking = false;
         if (Configuration::get('PS_BACKOFFICE_ROOM_BOOKING_TYPE') == HotelBookingDetail::PS_ROOM_UNIT_SELECTION_TYPE_OCCUPANCY) {
             $occupancyRequiredForBooking = true;
@@ -334,6 +341,7 @@ class AdminOrdersControllerCore extends AdminController
             'currencies' => Currency::getCurrenciesByIdShop(Context::getContext()->shop->id),
             'langs' => Language::getLanguages(true, Context::getContext()->shop->id),
             'payment_modules' => $payment_modules,
+            'payment_types' => $paymentTypes,
             'order_states' => OrderState::getOrderStates((int)Context::getContext()->language->id),
             'defaults_order_state' => $defaults_order_state,
             'show_toolbar' => $this->show_toolbar,
@@ -950,7 +958,20 @@ class AdminOrdersControllerCore extends AdminController
             ($module_name = Tools::getValue('payment_module_name')) &&
             ($id_order_state = Tools::getValue('id_order_state')) && Validate::isModuleName($module_name)) {
             if ($this->tabAccess['edit'] === '1') {
+                $paymentType = Tools::getValue('payment_type');
+                $paymentTransactionId = trim(Tools::getValue('payment_transaction_id'));
                 $paymentAmount = Tools::getValue('payment_amount');
+
+                if (!$paymentType) {
+                    $this->errors[] = Tools::displayError('Please select a Payment source.');
+                } elseif ($paymentType && !Validate::isUnsignedInt($paymentType)) {
+                    $this->errors[] = Tools::displayError('Payment source is invalid. Please select payment source.');
+                }
+
+                if ($paymentTransactionId && !Validate::isString($paymentTransactionId)) {
+                    $this->errors[] = Tools::displayError('Payment amount is invalid. Please enter correct amount.');
+                }
+
                 if ($paymentAmount && !Validate::isPrice($paymentAmount)) { // $paymentAmount = '' means no payment
                     $this->errors[] = Tools::displayError('Payment amount is invalid. Please enter correct amount.');
                 }
@@ -961,6 +982,8 @@ class AdminOrdersControllerCore extends AdminController
                     } else {
                         $payment_module = new BoOrder();
                     }
+
+                    $payment_module->payment_type = $paymentType;
 
                     $cart = new Cart((int)$id_cart);
                     Context::getContext()->currency = new Currency((int)$cart->id_currency);
@@ -981,7 +1004,6 @@ class AdminOrdersControllerCore extends AdminController
                             if (!$objOrderState->is_logable && !$objOrderState->paid) {
                                 $amountPaid = Tools::ps_round($paymentAmount, 6);
                                 $payment_module->hasPartialPayment = true;
-                                $payment_module->payment_type = OrderPayment::PAYMENT_TYPE_PAY_AT_HOTEL;
                             }
                         }
 
@@ -993,7 +1015,7 @@ class AdminOrdersControllerCore extends AdminController
                             $payment_module->displayName,
                             $this->l('Manual order -- Employee:').' '.
                             substr($employee->firstname, 0, 1).'. '.$employee->lastname,
-                            array(),
+                            $paymentTransactionId ? array('transaction_id' => $paymentTransactionId) : array(),
                             null,
                             false,
                             $cart->secure_key
