@@ -22,10 +22,10 @@
 *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 *}
-{capture name=path}<a href="{$link->getPageLink('my-account', true)|escape:'html':'UTF-8'}">{l s='My account'}</a><span class="navigation-pipe">{$navigationPipe}</span><span class="navigation_page">{l s='My vouchers'}</span>{/capture}
+{capture name=path}<a href="{$link->getPageLink('my-account', true)|escape:'html':'UTF-8'}">{l s='My account'}</a><span class="navigation-pipe">{$navigationPipe}</span><span class="navigation_page">{l s='Vouchers'}</span>{/capture}
 
 <h1 class="page-heading">
-	{l s='My vouchers'}
+	{l s='Vouchers'}
 </h1>
 
 {if isset($cart_rules) && $nb_cart_rules}
@@ -98,7 +98,7 @@
 	<li>
 		<a class="btn btn-default button button-small" href="{$link->getPageLink('my-account', true)|escape:'html':'UTF-8'}">
 			<span>
-				<i class="icon-chevron-left"></i> {l s='Back to your account'}
+				<i class="icon-chevron-left"></i> {l s='Back to My account'}
 			</span>
 		</a>
 	</li>
