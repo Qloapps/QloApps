@@ -246,10 +246,19 @@ class OrderOpcControllerCore extends ParentOrderController
                             if (($id_order = $this->_checkFreeOrder()) && $id_order) {
                                 $order = new Order((int)$id_order);
                                 $email = $this->context->customer->email;
+                                $orderConfirmationUrl = $this->context->link->getPageLink('order-confirmation').'?id_cart='.$order->id_cart.'&id_module=-1'.'&id_order='.$id_order.'&key='.$order->secure_key;
                                 if ($this->context->customer->is_guest) {
                                     $this->context->customer->logout();
                                 } // If guest we clear the cookie for security reason
-                                $this->ajaxDie('freeorder:'.$order->reference.':'.$email);
+
+                                $return = array(
+                                    'success' => true,
+                                    'reference' => $order->reference,
+                                    'email' => $email,
+                                    'order_confirmation_url' => $orderConfirmationUrl,
+                                );
+
+                                $this->ajaxDie(json_encode($return));
                             }
                             exit;
                             break;
