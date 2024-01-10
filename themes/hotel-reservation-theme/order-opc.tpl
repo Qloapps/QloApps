@@ -439,7 +439,6 @@
 													<p class="avail_voucher_name">
 														<span class="voucher_name" data-code="{$voucher.code|escape:'html':'UTF-8'}">{$voucher.code|escape:'html':'UTF-8'} - </span>{$voucher.name}
 													</p>
-													<p class="avail_voucher_des">{$voucher['description']}</p>
 													{if not $smarty.foreach.availVoucher.last}
 														<hr class="seperator">
 													{/if}
@@ -462,7 +461,6 @@
 						{addJsDef imgDir=$img_dir}
 						{addJsDef authenticationUrl=$link->getPageLink("authentication", true)|escape:'quotes':'UTF-8'}
 						{addJsDef orderOpcUrl=$link->getPageLink("order-opc", true)|escape:'quotes':'UTF-8'}
-						{addJsDef historyUrl=$link->getPageLink("history", true)|escape:'quotes':'UTF-8'}
 						{addJsDef guestTrackingUrl=$link->getPageLink("guest-tracking", true)|escape:'quotes':'UTF-8'}
 						{addJsDef addressUrl=$link->getPageLink("address", true, NULL, "back={$back_order_page}")|escape:'quotes':'UTF-8'}
 						{addJsDef orderProcess='order-opc'}
