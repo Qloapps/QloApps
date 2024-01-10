@@ -186,14 +186,6 @@ class HotelOrderRefundRules extends ObjectModel
                                 if ($refRule['payment_type'] == HotelOrderRefundRules::WK_REFUND_RULE_PAYMENT_TYPE_PERCENTAGE) {
                                     $bookingCancellationDetail['reduction_type'] = HotelOrderRefundRules::WK_REFUND_RULE_PAYMENT_TYPE_PERCENTAGE;
                                     $bookingCancellationDetail['cancelation_charge'] = $paidAmount * ($refundValue / 100);
-
-                                    if ($defaultCurrency != $orderCurrency) {
-                                        $bookingCancellationDetail['cancelation_charge'] = Tools::convertPriceFull(
-                                            $bookingCancellationDetail['cancelation_charge'],
-                                            $objDefaultCurrency,
-                                            $objOrderCurrency
-                                        );
-                                    }
                                 } else {
                                     $bookingCancellationDetail['reduction_type'] = HotelOrderRefundRules::WK_REFUND_RULE_PAYMENT_TYPE_FIXED;
                                     if ($defaultCurrency != $orderCurrency) {

@@ -630,8 +630,8 @@ function updatePaymentMethodsDisplay()
 
 function updateAddressSelection(is_adv_api)
 {
-	var idAddress_delivery = ($('#opc_id_address_delivery').length == 1 ? $('#opc_id_address_delivery').val() : $('#id_address_delivery').val());
-	var idAddress_invoice = ($('#opc_id_address_invoice').length == 1 ? $('#opc_id_address_invoice').val() : ($('#addressesAreEquals:checked').length == 1 ? idAddress_delivery : ($('#id_address_invoice').length == 1 ? $('#id_address_invoice').val() : idAddress_delivery)));
+	var idAddress_delivery = $('#opc_id_address_delivery').val();
+	var idAddress_invoice = $('#opc_id_address_invoice').val();
 
 	$('#opc_account-overlay').fadeIn('slow');
 	$('#opc_delivery_methods-overlay').fadeIn('slow');
@@ -912,18 +912,17 @@ function confirmFreeOrder()
 		url: orderOpcUrl + '?rand=' + new Date().getTime(),
 		async: true,
 		cache: false,
-		dataType : "html",
+		dataType : 'JSON',
 		data: 'ajax=true&method=makeFreeOrder&token=' + static_token ,
-		success: function(html)
+		success: function(response)
 		{
-			$('#confirmOrder').prop('disabled', false);
-			var array_split = html.split(':');
-			if (array_split[0] == 'freeorder')
-			{
-				if (isGuest)
-					document.location.href = guestTrackingUrl+'?id_order='+encodeURIComponent(array_split[1])+'&email='+encodeURIComponent(array_split[2]);
-				else
-					document.location.href = historyUrl;
+			if (response.success) {
+				$('#confirmOrder').prop('disabled', false);
+				if (isGuest) {
+					document.location.href = guestTrackingUrl+'?id_order='+encodeURIComponent(response.reference)+'&email='+encodeURIComponent(response.email);
+				} else {
+					document.location.href = response.order_confirmation_url;
+				}
 			}
 		},
 		error: function(XMLHttpRequest, textStatus, errorThrown) {

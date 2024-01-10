@@ -966,6 +966,21 @@ class AdminCustomersControllerCore extends AdminController
         return parent::processSave();
     }
 
+    protected function copyFromPost(&$object, $table)
+    {
+        parent::copyFromPost($object, $table);
+
+        $years = Tools::getValue('years');
+        $months = Tools::getValue('months');
+        $days = Tools::getValue('days');
+
+        if ($years != '' && $months != '' && $days != '') {
+            $object->birthday = (int) $years.'-'.(int) $months.'-'.(int) $days;
+        } else {
+            $object->birthday = '0000-00-00';
+        }
+    }
+
     protected function afterDelete($object, $old_id)
     {
         $customer = new Customer($old_id);
