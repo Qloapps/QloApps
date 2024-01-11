@@ -203,6 +203,7 @@
 									</div>
 								</div>
 							</div>
+							{hook h='displayCartProductContentAfter' cart_detail=$data_v key=$rm_k}
 						</div>
 					</div>
 					<hr>
