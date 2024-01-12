@@ -44,8 +44,11 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
             $this->context->cookie->id_cart = (int) $objCart->id;
         } else {
             // use previous cart
-            if (!validate::isLoadedObject($objCart = new Cart($this->context->cookie->id_cart))) {
+            $objCart = new Cart($this->context->cookie->id_cart);
+            $isCartValid = Validate::isLoadedObject($objCart);
+            if (!$isCartValid || ($isCartValid && $objCart->orderExists())) {
                 $objCart = $this->createNewCart();
+                $this->context->cookie->id_cart = (int) $objCart->id;
             }
         }
         $this->context->cart = $objCart;
@@ -418,7 +421,7 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
         $bookingParams['date_from'] = $searchDateFrom;
         $bookingParams['date_to'] = $searchDateTo;
         $bookingParams['hotel_id'] = $searchIdHotel;
-        $bookingParams['room_type'] = $searchIdRoomType;
+        $bookingParams['id_room_type'] = $searchIdRoomType;
         $bookingParams['adults'] = $adults;
         $bookingParams['children'] = $children;
         $bookingParams['num_rooms'] = $num_rooms;
