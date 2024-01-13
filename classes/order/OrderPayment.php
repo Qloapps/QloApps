@@ -157,6 +157,6 @@ class OrderPaymentCore extends ObjectModel
      */
     public function getAverageConversionRate($order_reference, $idCurrency)
     {
-        return  Db::getInstance()->getValue('SELECT (SUM(`conversion_rate`) / COUNT(*)) FROM `'._DB_PREFIX_.'order_payment` WHERE `order_reference` = \''.pSQL($order_reference).'\' AND `id_currency` = '.(int)$idCurrency);
+        return Db::getInstance()->getValue('SELECT (SUM(`amount` * `conversion_rate`) / SUM(`amount`)) FROM `'._DB_PREFIX_.'order_payment` WHERE `order_reference` = \''.pSQL($order_reference).'\' AND `id_currency` = '.(int)$idCurrency);
     }
 }
