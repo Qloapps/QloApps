@@ -106,7 +106,7 @@
 	<li>
 		<a class="btn btn-default button button-small" href="{$link->getPageLink('my-account', true)|escape:'html':'UTF-8'}">
 			<span>
-				<i class="icon-chevron-left"></i> {l s='Back to your account'}
+				<i class="icon-chevron-left"></i> {l s='Back to My account'}
 			</span>
 		</a>
 	</li>

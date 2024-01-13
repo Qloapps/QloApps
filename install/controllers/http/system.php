@@ -137,7 +137,6 @@ class InstallControllerHttpSystem extends InstallControllerHttp
                         'register_globals' => $this->l('PHP register_globals option is enabled'),
                         'gz' => $this->l('GZIP compression is not activated'),
                         'mbstring' => $this->l('Mbstring extension is not enabled'),
-                        'magicquotes' => $this->l('PHP magic quotes option is enabled'),
                         'dom' => $this->l('Dom extension is not loaded'),
                     )
                 ),
