@@ -222,6 +222,7 @@ class AdminOrderPreferencesControllerCore extends AdminController
         $maxGlobalBookingDate = Tools::getValue('MAX_GLOBAL_BOOKING_DATE');
         $globalPreparationTime = Tools::getValue('GLOBAL_PREPARATION_TIME');
         $maxGlobalBookingDateFormatted = date('Y-m-d', strtotime($maxGlobalBookingDate));
+        $_POST['MAX_GLOBAL_BOOKING_DATE'] = $maxGlobalBookingDateFormatted;
 
         if ($maxGlobalBookingDate == '') {
             $this->errors[] = Tools::displayError('Field \'Maximum Global Date to book a room\' can not be empty.');
