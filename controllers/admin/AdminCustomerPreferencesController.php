@@ -100,8 +100,8 @@ class AdminCustomerPreferencesControllerCore extends AdminController
                         'type' => 'bool'
                     ),
                     'PS_CUSTOMER_BIRTHDATE' => array(
-                        'title' => $this->l('Ask for birth date'),
-                        'hint' => $this->l('Display or not the birth date field.'),
+                        'title' => $this->l('Enable date of birth'),
+                        'hint' => $this->l('Display or not the date of birth field.'),
                         'validation' => 'isBool',
                         'cast' => 'intval',
                         'type' => 'bool'
