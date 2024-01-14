@@ -93,7 +93,7 @@ class CookieCore
         $this->_path = str_replace('%7E', '~', $this->_path);
         $this->_domain = $this->getDomain($shared_urls);
         $this->_sameSite = Configuration::get('PS_COOKIE_SAMESITE');
-        $this->_name = 'PrestaShop-'.md5(($this->_standalone ? '' : _PS_VERSION_).$name.$this->_domain);
+        $this->_name = 'QloApps-'.md5(($this->_standalone ? '' : _PS_VERSION_).$name.$this->_domain);
         $this->_allow_writing = true;
         $this->_salt = $this->_standalone ? str_pad('', 8, md5('ps'.__FILE__)) : _COOKIE_IV_;
         if ($this->_standalone) {
