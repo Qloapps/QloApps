@@ -1080,12 +1080,13 @@ class AdminCustomersControllerCore extends AdminController
     public function ajaxProcessSearchCustomers()
     {
         $searches = explode(' ', Tools::getValue('customer_search'));
+        $skip_deleted = Tools::getValue('skip_deleted');
         $customers = array();
         $searches = array_unique($searches);
         foreach ($searches as $search) {
-            if (!empty($search) && $results = Customer::searchByName($search, 50)) {
+            if (!empty($search) && $results = Customer::searchByName($search, 50, $skip_deleted)) {
                 foreach ($results as $result) {
-                    if ($result['active'] && !$result['deleted']) {
+                    if ($result['active']) {
                         $customers[$result['id_customer']] = $result;
                     }
                 }
