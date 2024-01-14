@@ -390,7 +390,7 @@ class OrderOpcControllerCore extends ParentOrderController
     public function initContent()
     {
         // validate room types before payment by customer
-        $orderRestrictErr = HotelCartBookingData::validateRoomTypeAvailabilities($this);
+        $orderRestrictErr = HotelCartBookingData::validateCartBookings();
 
         parent::initContent();
 

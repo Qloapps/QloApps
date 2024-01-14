@@ -86,8 +86,12 @@ class HotelOrderRestrictDate extends ObjectModel
 
     public static function validateOrderRestrictDateOnPayment(&$controller)
     {
-        Tools::displayAsDeprecated();
+        if ($errors = HotelCartBookingData::validateCartBookings()) {
+            $controller->errors = array_merge($controller->errors, $errors);
 
-        return HotelCartBookingData::validateRoomTypeAvailabilities($controller);
+            return true;
+        }
+
+        return false;
     }
 }

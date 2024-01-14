@@ -889,11 +889,21 @@ class HotelCartBookingData extends ObjectModel
         return true;
     }
 
-    public static function validateRoomTypeAvailabilities(&$controller)
+    public static function validateCartBookings()
     {
         $context = Context::getContext();
 
         $errors = array();
+
+        // validate room types if bookable from front office
+        if ($cartProducts = $context->cart->getProducts()) {
+            $objHotelCartBookingData = new HotelCartBookingData();
+            foreach ($cartProducts as $product) {
+                if ($product['booking_product'] && !$product['show_at_front']) {
+                    $objHotelCartBookingData->deleteCartBookingData($context->cart->id, $product['id_product']);
+                }
+            }
+        }
 
         // validate service products
         if ($cartProducts = $context->cart->getProducts()) {
@@ -904,16 +914,6 @@ class HotelCartBookingData extends ObjectModel
                     foreach ($serviceProducts as $serviceProduct) {
                         $objRoomTypeServiceProductCartDetail->removeServiceProductByIdHtlCartBooking($serviceProduct['htl_cart_booking_id']);
                     }
-                }
-            }
-        }
-
-        // validate room types if bookable from front office
-        if ($cartProducts = $context->cart->getProducts()) {
-            $objHotelCartBookingData = new HotelCartBookingData();
-            foreach ($cartProducts as $product) {
-                if ($product['booking_product'] && !$product['show_at_front']) {
-                    $objHotelCartBookingData->deleteCartBookingData($context->cart->id, $product['id_product']);
                 }
             }
         }
@@ -1013,7 +1013,7 @@ class HotelCartBookingData extends ObjectModel
             }
         }
 
-        $controller->errors = array_merge($controller->errors, $errors);
+        $context->controller->errors = array_merge($context->controller->errors, $errors);
 
         return $errors;
     }
