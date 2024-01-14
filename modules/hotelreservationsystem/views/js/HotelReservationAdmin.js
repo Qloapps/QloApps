@@ -69,7 +69,8 @@ var GoogleMapsManager = {
             var that = this;
             that.setDefaultLatLng(function() {
                 that.map = new google.maps.Map($(that.mapDiv).get(0), {
-                    zoom: that.defaultZoom
+                    zoom: that.defaultZoom,
+                    clickableIcons: true,
                 });
                 that.map.setCenter(that.defaultLatLng);
                 if (that.defaultLatLng && that.formattedAddress) {
@@ -80,11 +81,78 @@ var GoogleMapsManager = {
                 // register marker events
                 that.map.addListener('click', function (e) {
                     var latLng = e.latLng;
-                    that.geocoder.geocode({ location: latLng }, function (results, status) {
-                        if (status == google.maps.GeocoderStatus.OK && results[0]) {
-                            that.addMarker(latLng, results[0]);
-                        }
-                    });
+
+                    var isInfoWindowNeeded = true;
+                    // if it is a Place Of Interest (POI), event contains the property 'placeId'
+                    if (Object.hasOwn(e, 'placeId')) {
+                        isInfoWindowNeeded = false;
+
+                        that.geocoder.geocode({ location: latLng }, function (results, status) {
+                            if (status == google.maps.GeocoderStatus.OK && results[0]) {
+                                var request = {
+                                    placeId: e.placeId,
+                                    fields: ['name'],
+                                };
+
+                                that.placesService.getDetails(request, function(place, status) {
+                                    if (status === google.maps.places.PlacesServiceStatus.OK) {
+                                        var content = '<div><h6>' + place.name + '</h6><p>' +
+                                        results[0].formatted_address + '</p></div>';
+
+                                        var callback = function (latLng) {
+                                            that.setFormVars({
+                                                lat: latLng.lat(),
+                                                lng: latLng.lng(),
+                                                formattedAddress: content,
+                                                inputText: $('#pac-input').val(),
+                                            });
+                                        }
+
+                                        that.addMarker(
+                                            latLng,
+                                            results[0],
+                                            null,
+                                            isInfoWindowNeeded,
+                                            callback(latLng)
+                                        );
+                                    }
+                                });
+                            }
+                        });
+                    } else {
+                        that.geocoder.geocode({ location: latLng }, function (results, status) {
+                            if (status == google.maps.GeocoderStatus.OK && results[0]) {
+                                var request = {
+                                    placeId: results[0].place_id,
+                                    fields: ['name'],
+                                };
+
+                                that.placesService.getDetails(request, function(place, status) {
+                                    if (status === google.maps.places.PlacesServiceStatus.OK) {
+                                        var content = '<div><h6>' + place.name + '</h6><p>' +
+                                        results[0].formatted_address + '</p></div>';
+
+                                        var callback = function (latLng) {
+                                            that.setFormVars({
+                                                lat: latLng.lat(),
+                                                lng: latLng.lng(),
+                                                formattedAddress: content,
+                                                inputText: $('#pac-input').val(),
+                                            });
+                                        }
+
+                                        that.addMarker(
+                                            latLng,
+                                            results[0],
+                                            null,
+                                            isInfoWindowNeeded,
+                                            callback(latLng)
+                                        );
+                                    }
+                                });
+                            }
+                        });
+                    }
                 });
                 if(cb && typeof cb === 'function') {
                     cb();
@@ -122,7 +190,7 @@ var GoogleMapsManager = {
                 };
                 that.addMarker(latLng, place);
 
-                var content = '<div><strong>' + place.name + '</strong><br>' + place.formatted_address;
+                var content = '<div><h6>' + place.name + '</h6><p>' + place.formatted_address + '</p></div>';
                 that.setFormVars({
                     lat: latLng.lat,
                     lng: latLng.lng,
@@ -142,7 +210,7 @@ var GoogleMapsManager = {
             }
         });
     },
-    addMarker: function(latLng, address = null, fa = null, cb = null) {
+    addMarker: function(latLng, address = null, fa = null, addInfoWindow = true, cb = null) {
         var that = this;
         that.clearAllMarkers();
         var marker = new google.maps.Marker({
@@ -163,23 +231,36 @@ var GoogleMapsManager = {
             });
         });
 
-        if (address === null && fa) {
-            // open info window
-            that.addInfoWindow(marker, fa);
+        if (addInfoWindow) {
+            if (address === null && fa) {
+                // open info window
+                that.addInfoWindow(marker, fa);
+            } else {
+                var request = {
+                    placeId: address.place_id,
+                    fields: ['name'],
+                };
+
+                that.placesService.getDetails(request, function(place, status) {
+                    if (status === google.maps.places.PlacesServiceStatus.OK) {
+                        // open info window
+                        var content = '<div><h6>' + place.name + '</h6><p>' + address.formatted_address + '</p></div>';
+                        that.addInfoWindow(marker, content);
+
+                        if(cb && typeof cb === 'function') {
+                            cb();
+                        }
+                    }
+                });
+            }
         } else {
-            var request = {
-                placeId: address.place_id,
-                fields: ['name'],
-            };
-            that.placesService.getDetails(request, function(place, status) {
-                if (status === google.maps.places.PlacesServiceStatus.OK) {
-                    // open info window
-                    var content = '<div><strong>' + place.name + '</strong><br>' +
-                    address.formatted_address + '</div>';
-                    that.addInfoWindow(marker, content);
-                }
-            });
+            if(cb && typeof cb === 'function') {
+                cb();
+            }
+
+            return marker;
         }
+
     },
     clearAllMarkers: function() {
         for (var i = 0; i < this.markers.length; i++) {
@@ -190,13 +271,21 @@ var GoogleMapsManager = {
     addInfoWindow: function(marker, content) {
         if (typeof google === 'object') {
             var that = this;
+
             var infoWindow = new google.maps.InfoWindow({
                 content: content,
+                maxWidth: 200,
             });
+
             infoWindow.open({
                 anchor: marker,
                 map: that.map
             });
+
+            google.maps.event.addListener(infoWindow, 'closeclick', function () {
+                that.clearAllMarkers();
+            });
+
             var latLng = marker.getPosition();
             that.setFormVars({
                 lat: latLng.lat(),
@@ -213,6 +302,10 @@ var GoogleMapsManager = {
         $('#googleInputField').val(params.inputText);
     },
 }
+
+$(document).on('click', 'button.gm-ui-hover-effect', function () {
+    GoogleMapsManager.clearAllMarkers();
+});
 
 function initGoogleMaps() {
     if (typeof enabledDisplayMap != 'undefined'
