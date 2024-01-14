@@ -312,7 +312,7 @@ class HotelHelper
             '.Shop::addSqlAssociation('product', 'p').'
             LEFT JOIN `'._DB_PREFIX_.'product_lang` pl ON (p.`id_product` = pl.`id_product` '.
             Shop::addSqlRestrictionOnLang('pl').')
-            WHERE pl.`id_lang` = '.(int)$id_lang.
+            WHERE p.`booking_product` = 1 AND pl.`id_lang` = '.(int)$id_lang.
             ' ORDER BY pl.`name`'.
             ($limit > 0 ? ' LIMIT '.(int)$start.','.(int)$limit : '');
         return Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql);
