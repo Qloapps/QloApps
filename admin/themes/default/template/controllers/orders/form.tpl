@@ -2129,9 +2129,9 @@
 				<div class="form-group">
 					<label class="control-label col-lg-3">{l s='Payment amount'}</label>
 					<div class="col-lg-9">
-						<div class="input-group">
+						<div class="input-group fixed-width-xxl">
 							<span class="input-group-addon">{$currency->sign}</span>
-							<input type="text" class="fixed-width-xl" name="payment_amount" id="payment_amount" value="{if isset($smarty.post.payment_amount)}{$smarty.post.payment_amount}{else}{0|string_format:"%.`$smarty.const._PS_PRICE_DISPLAY_PRECISION_`f"}{/if}" />
+							<input type="text" name="payment_amount" id="payment_amount" value="{if isset($smarty.post.payment_amount)}{$smarty.post.payment_amount}{else}{0|string_format:"%.`$smarty.const._PS_PRICE_DISPLAY_PRECISION_`f"}{/if}" />
 						</div>
 						<p class="help-block" id="advance_payment_amount_block" style="display: none;">
 							<span>{l s='Advance payment amount: '}</span>
