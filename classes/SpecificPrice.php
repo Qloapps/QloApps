@@ -175,6 +175,12 @@ class SpecificPriceCore extends ObjectModel
         $select = '(';
 
         $priority = SpecificPrice::getPriority($id_product);
+        if (!Group::isFeatureActive()) {
+            if (($key = array_search('id_group', $priority)) !== false) {
+                unset($priority[$key]);
+            }
+        }
+
         foreach (array_reverse($priority) as $k => $field) {
             if (!empty($field)) {
                 $select .= ' IF (`'.bqSQL($field).'` = '.(int)$$field.', '.pow(2, $k + 1).', 0) + ';
@@ -353,8 +359,8 @@ class SpecificPriceCore extends ObjectModel
 				WHERE
                 `id_shop` '.self::formatIntInQuery(0, $id_shop).' AND
                 `id_currency` '.self::formatIntInQuery(0, $id_currency).' AND
-                `id_country` '.self::formatIntInQuery(0, $id_country).' AND
-                `id_group` '.self::formatIntInQuery(0, $id_group).' '.$query_extra.'
+                `id_country` '.self::formatIntInQuery(0, $id_country).
+                (Group::isFeatureActive() ? ' AND `id_group` '.self::formatIntInQuery(0, $id_group) : '').' '.$query_extra.'
 				AND IF(`from_quantity` > 1, `from_quantity`, 0) <= ';
 
             $query .= (Configuration::get('PS_QTY_DISCOUNT_ON_COMBINATION') || !$id_cart || !$real_quantity) ? (int)$quantity : max(1, (int)$real_quantity);
