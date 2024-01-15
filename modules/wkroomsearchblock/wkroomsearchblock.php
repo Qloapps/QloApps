@@ -124,7 +124,9 @@ class WkRoomSearchBlock extends Module
     {
         if ('category' == Tools::getValue('controller')) {
             $idCategory = Tools::getValue('id_category');
-            if (Validate::isLoadedObject($objCategory = new Category((int) $idCategory))) {
+            if (Validate::isLoadedObject($objCategory = new Category((int) $idCategory))
+                && HotelBranchInformation::getHotelIdByIdCategory($idCategory)
+            ) {
                 if ($objCategory->hasParent(Configuration::get('PS_LOCATIONS_CATEGORY'))) {
                     $objSearchHelper = new WkRoomSearchHelper();
                     $objSearchHelper->assignSearchPanelVariables();

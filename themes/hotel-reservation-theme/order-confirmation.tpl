@@ -42,6 +42,9 @@
 			<a class="button-exclusive btn btn-default" href="{$link->getPageLink('guest-tracking', true, NULL, "id_order={$reference_order|urlencode}&email={$email|urlencode}")|escape:'html':'UTF-8'}" title="{l s='Follow my order'}"><i class="icon-chevron-left"></i>{l s='Follow my order'}</a>
 		    </p>
 		{else}
+			{if isset($is_free_order) && $is_free_order}
+				<p class="alert alert-success">{l s='Your order on %s is complete.' sprintf=$shop_name}</p><br />
+			{/if}
 			<p><strong>{l s='Order Status :'}</strong> <span>{l s='Confirmed'}</span></p>
 			<p><strong>{l s='Order Reference :'}</strong> <span class="bold">{$order->reference}</span></p>
 			{if $any_back_order}

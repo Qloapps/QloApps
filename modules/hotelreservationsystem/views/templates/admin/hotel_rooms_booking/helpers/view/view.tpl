@@ -188,7 +188,7 @@
 			<div class="panel">
 				<div class="panel-heading">
 					<i class="icon-info"></i> {if !isset($booking_product) || (isset($booking_product) && $booking_product == 1)}{l s='Booking Calender' mod='hotelreservationsystem'}{else}{l s='Service Products' mod='hotelreservationsystem'}{/if }
-					<button type="button" class="btn btn-primary" id="cart_btn" data-toggle="modal" data-target="#cartModal"><i class="icon-shopping-cart"></i> {l s='Cart' mod='hotelreservationsystem'} <span class="badge" id="cart_record">{$total_products_in_cart}</span></button>
+					<button type="button" class="btn btn-primary {if $total_products_in_cart|intval == 0}disabled{/if}" id="cart_btn" data-toggle="modal" data-target="#cartModal"><i class="icon-shopping-cart"></i> {l s='Cart' mod='hotelreservationsystem'} <span class="badge" id="cart_record">{$total_products_in_cart}</span></button>
 				</div>
 				{if !isset($booking_product) || (isset($booking_product) && $booking_product == 1)}
 					<div id='fullcalendar'></div>
