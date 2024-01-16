@@ -1885,7 +1885,7 @@ abstract class ObjectModelCore implements Core_Foundation_Database_EntityInterfa
                 );
             }
 
-            Hook::exec('actionObject'.$class.'GetDefinition', array('definition' => &$definition));
+            Hook::exec('actionObject'.$class.'DefinitionModifier', array('definition' => &$definition));
 
             if ($field) {
                 return isset($definition['fields'][$field]) ? $definition['fields'][$field] : null;
