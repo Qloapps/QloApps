@@ -403,6 +403,16 @@ class AdminEmployeesControllerCore extends AdminController
             'title' => $this->l('Save'),
         );
 
+        $this->fields_form['buttons'] = array(
+            'save-and-stay' => array(
+                'title' => $this->l('Save and stay'),
+                'name' => 'submitAdd'.$this->table.'AndStay',
+                'type' => 'submit',
+                'class' => 'btn btn-default pull-right',
+                'icon' => 'process-icon-save',
+            )
+        );
+
         $this->fields_value['passwd'] = false;
         $this->fields_value['bo_theme_css'] = $obj->bo_theme.'|'.$obj->bo_css;
 

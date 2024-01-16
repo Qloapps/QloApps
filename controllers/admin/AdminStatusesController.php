@@ -238,8 +238,13 @@ class AdminStatusesControllerCore extends AdminController
                     'show_admin_template' => $mailToSuperadmin || $mailToEmployee || $mailToHotelier,
             );
         } else {
+            $name = array();
+            foreach ($this->_languages as $language) {
+                $name[$language['id_lang']] = $this->getFieldValue($order_return_state, 'name', $language['id_lang']);
+            }
+
             $this->fields_value = array(
-                'name' => $this->getFieldValue($order_return_state, 'name'),
+                'name' => $name,
                 'color' => "#ffffff",
             );
         }
@@ -478,7 +483,16 @@ class AdminStatusesControllerCore extends AdminController
                 ),
                 'submit' => array(
                     'title' => $this->l('Save'),
-                )
+                ),
+                'buttons' => array(
+                    'save-and-stay' => array(
+                        'title' => $this->l('Save and stay'),
+                        'name' => 'submitAdd'.$this->table.'AndStay',
+                        'type' => 'submit',
+                        'class' => 'btn btn-default pull-right',
+                        'icon' => 'process-icon-save',
+                    ),
+                ),
             );
             return $this->renderOrderStatusForm();
         } elseif (Tools::isSubmit('updateorder_return_state')
@@ -683,7 +697,16 @@ class AdminStatusesControllerCore extends AdminController
             ),
             'submit' => array(
                 'title' => $this->l('Save'),
-            )
+            ),
+            'buttons' => array(
+                'save-and-stay' => array(
+                    'title' => $this->l('Save and stay'),
+                    'name' => 'submitAdd'.$this->table.'AndStay',
+                    'type' => 'submit',
+                    'class' => 'btn btn-default pull-right',
+                    'icon' => 'process-icon-save',
+                ),
+            ),
         );
 
         return parent::renderForm();
@@ -789,7 +812,11 @@ class AdminStatusesControllerCore extends AdminController
                 if (!$order_return_state->save()) {
                     $this->errors[] = Tools::displayError('An error has occurred: Can\'t save the current order\'s refund status.');
                 } else {
-                    Tools::redirectAdmin(self::$currentIndex.'&conf=4&token='.$this->token);
+                    if (Tools::isSubmit('submitAddorder_return_stateAndStay')) {
+                        Tools::redirectAdmin(self::$currentIndex.'&updateorder_return_state&id_order_return_state='.$id_order_return_state.'&conf=4&token='.$this->token);
+                    } else {
+                        Tools::redirectAdmin(self::$currentIndex.'&conf=4&token='.$this->token);
+                    }
                 }
             }
         }

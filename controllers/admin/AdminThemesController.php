@@ -358,7 +358,16 @@ class AdminThemesControllerCore extends AdminController
             ),
             'submit' => array(
                 'title' => $this->l('Save'),
-            )
+            ),
+            'buttons' => array(
+                'save-and-stay' => array(
+                    'title' => $this->l('Save and stay'),
+                    'name' => 'submitAdd'.$this->table.'AndStay',
+                    'type' => 'submit',
+                    'class' => 'btn btn-default pull-right',
+                    'icon' => 'process-icon-save',
+                ),
+            ),
         );
         // adding a new theme, you can create a directory, and copy from an existing theme
         if ($this->display == 'add' || !Validate::isLoadedObject($this->object)) {
@@ -644,7 +653,12 @@ class AdminThemesControllerCore extends AdminController
                 }
                 $theme->update();
             }
-            Tools::redirectAdmin(Context::getContext()->link->getAdminLink('AdminThemes').'&conf=29');
+
+            if (Tools::isSubmit('submitAdd'.$this->table.'AndStay')) {
+                Tools::redirectAdmin(self::$currentIndex.'&update'.$this->table.'&id_theme='.$theme->id.'&token='.$this->token.'&conf=4');
+            } else {
+                Tools::redirectAdmin(self::$currentIndex.'&token='.$this->token.'&conf=4');
+            }
         }
     }
 
