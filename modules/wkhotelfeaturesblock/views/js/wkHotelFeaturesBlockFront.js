@@ -45,12 +45,6 @@ $(document).ready(function() {
 	}
 });
 
-$(window).load(function() {
-	if ($('.home_amenities_wrapper').length) {
-		setAmenitiesWrapperHeight();
-	}
-});
-
 $(window).resize(function() {
 	if ($('.home_amenities_wrapper').length) {
 		setAmenitiesWrapperHeight();
