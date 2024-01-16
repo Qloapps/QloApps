@@ -295,16 +295,25 @@ class AdminSpecificPriceRuleControllerCore extends AdminController
                 ),
             ),
         );
-        if (($value = $this->getFieldValue($this->object, 'price')) != -1) {
-            $price = number_format($value, 6);
+
+        $price = $this->getFieldValue($this->object, 'price');
+        if ($price != -1 && Validate::isPrice($price)) {
+            $price = number_format($price, 6);
         } else {
             $price = '';
+        }
+
+        $reduction = $this->getFieldValue($this->object, 'reduction');
+        if (Validate::isPrice($reduction)) {
+            $reduction = number_format($reduction, 6);
+        } else {
+            $reduction = 0;
         }
 
         $this->fields_value = array(
             'price' => $price,
             'from_quantity' => (($value = $this->getFieldValue($this->object, 'from_quantity')) ? $value : 1),
-            'reduction' => number_format((($value = $this->getFieldValue($this->object, 'reduction')) ? $value : 0), 6),
+            'reduction' => $reduction,
             'leave_bprice_on' => $price ? 0 : 1,
             'shop_id' => (($value = $this->getFieldValue($this->object, 'id_shop')) ? $value : 1)
         );

@@ -118,6 +118,10 @@ class AdminWebserviceControllerCore extends AdminController
     {
         parent::processUpdateOptions();
         Tools::generateHtaccess();
+
+        if (!count($this->errors)) {
+            Tools::redirectAdmin(self::$currentIndex.'&token='.$this->token.'&conf=6');
+        }
     }
 
     public function renderForm()
