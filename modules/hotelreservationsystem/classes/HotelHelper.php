@@ -305,15 +305,16 @@ class HotelHelper
         return true;
     }
 
-    public static function getPsProducts($id_lang, $start = 0, $limit = 0)
+    public static function getPsProducts($id_lang, $start = 0, $limit = 0, $booking_product = null)
     {
-        $sql = 'SELECT p.`id_product`, pl.`name`
+        $sql = 'SELECT p.`id_product`, pl.`name`, p.`booking_product`
             FROM `'._DB_PREFIX_.'product` p
             '.Shop::addSqlAssociation('product', 'p').'
             LEFT JOIN `'._DB_PREFIX_.'product_lang` pl ON (p.`id_product` = pl.`id_product` '.
             Shop::addSqlRestrictionOnLang('pl').')
-            WHERE p.`booking_product` = 1 AND pl.`id_lang` = '.(int)$id_lang.
-            ' ORDER BY pl.`name`'.
+            WHERE pl.`id_lang` = '.(int)$id_lang.
+            (isset($booking_product) ? ' AND p.`booking_product` = '.(int) $booking_product : '').'
+            ORDER BY pl.`name`'.
             ($limit > 0 ? ' LIMIT '.(int)$start.','.(int)$limit : '');
         return Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql);
     }
