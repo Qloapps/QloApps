@@ -118,8 +118,6 @@ class GraphNvD3 extends ModuleGraphEngine
                         chart.xAxis.tickFormat(d3.format(jsonData.axisFormat.xAxis));
                     if (jsonData.axisFormat.yAxis)
                         chart.yAxis.tickFormat(d3.format(jsonData.axisFormat.yAxis));
-
-                        console.log(jsonData.data);
 					d3.select("#nvd3_chart_'.($divid++).' svg")
 						.datum(jsonData.data)
 						.transition().duration(500)
