@@ -15,6 +15,7 @@
 		position: relative
 		margin: 0
 		font: 14pt $font-family-sans-serif
+		font-weight: bold
 		color: #363A41
 		white-space: nowrap
 		@include padding(26px, 0, 0, ($widthSidebarNav+20px))
@@ -48,7 +49,7 @@
 			@include padding(3px, 0, 0, 0)
 			.toolbar_btn
 				position: relative
-				padding: 6px 8px !important
+				padding: 10px 10px !important
 				top: 18px
 				font-size: 12px
 				line-height: 8px
@@ -59,6 +60,7 @@
 				overflow: hidden
 				text-overflow: ellipsis
 				border: 1px solid $toolbar-buttons-color
+				border-radius: 2px
 				@include margin(0, 3px, 2px, 0)
 				@media (max-width: $screen-desktop)
 					width: 46px
