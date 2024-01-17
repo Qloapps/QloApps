@@ -314,7 +314,7 @@ class StatsPersonalInfos extends ModuleGraph
 						FROM `'._DB_PREFIX_.'customer`
 						WHERE (YEAR(CURDATE()) - YEAR(`birthday`)) - (RIGHT(CURDATE(), 5) < RIGHT(`birthday`, 5)) >= 60
 							'.Shop::addSqlRestriction(Shop::SHARE_CUSTOMER).'
-							AND `birthday` IS NOT NULL AND `birthday` IS NOT "0000-00-00"';
+							AND `birthday` IS NOT NULL AND `birthday` != "0000-00-00"';
                 $result = Db::getInstance(_PS_USE_SQL_SLAVE_)->getRow($sql);
                 if (isset($result['total']) && $result['total']) {
                     $this->_values[] = $result['total'];
