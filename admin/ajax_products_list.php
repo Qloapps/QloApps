@@ -58,6 +58,8 @@ if ($excludeIds && $excludeIds != 'NaN') {
 $excludeVirtuals = (bool)Tools::getValue('excludeVirtuals', true);
 $exclude_packs = (bool)Tools::getValue('exclude_packs', true);
 
+$bookingProduct = (int) Tools::getValue('booking_product');
+
 $context = Context::getContext();
 
 $sql = 'SELECT p.`id_product`, pl.`link_rewrite`, p.`reference`, pl.`name`, image_shop.`id_image` id_image, il.`legend`, p.`cache_default_attribute`
@@ -72,6 +74,7 @@ $sql = 'SELECT p.`id_product`, pl.`link_rewrite`, p.`reference`, pl.`name`, imag
         (!empty($excludePackItself) ? ' AND p.id_product <> '.$excludePackItself.' ' : ' ').
         ($excludeVirtuals ? 'AND NOT EXISTS (SELECT 1 FROM `'._DB_PREFIX_.'product_download` pd WHERE (pd.id_product = p.id_product))' : '').
         ($exclude_packs ? 'AND (p.cache_is_pack IS NULL OR p.cache_is_pack = 0)' : '').
+        ($bookingProduct ? 'AND p.`booking_product` = '.(int) $bookingProduct : '').
         ' GROUP BY p.id_product';
 
 $items = Db::getInstance()->executeS($sql);
