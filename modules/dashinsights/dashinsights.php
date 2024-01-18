@@ -232,7 +232,7 @@ class DashInsights extends Module
                 }
 
                 if (count($idsHotel) > 0) { // display average series only if other hotels are available
-                    $averageRoomNightsData = AdminStatsController::getRoomNightsData($dateFrom, $dateTo, $idsHotel, true, true);
+                    $averageRoomNightsData = AdminStatsController::getRoomNightsData($dateFrom, $dateTo, $idsHotel, true, true, true);
                     $averageSeriesInfo = array(
                         'data' => $averageRoomNightsData,
                         'label' => $this->l('Others Average'),

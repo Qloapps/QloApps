@@ -1322,7 +1322,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
             $cacheKey = 'AdminStats::getRoomsRevenueForDiscreteDates'.'_'.(int) $discreteDate['timestamp_from'].'_'.
             (!is_array($idHotel) ? (int) $idHotel : implode('_', $idHotel));
             if (!Cache::isStored($cacheKey) || !$useCache) {
-                $sql = 'SELECT IFNULL(SUM(hbd.`total_price_tax_excl` / DATEDIFF(hbd.`date_to`, hbd.`date_from`)), 0)
+                $sql = 'SELECT IFNULL(SUM((hbd.`total_price_tax_excl` / o.`conversion_rate`) / DATEDIFF(hbd.`date_to`, hbd.`date_from`)), 0)
                 FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
                 LEFT JOIN `'._DB_PREFIX_.'product` p ON (p.`id_product` = hbd.`id_product`)
                 LEFT JOIN `'._DB_PREFIX_.'orders` o ON (o.`id_order` = hbd.`id_order`)
@@ -1643,7 +1643,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
         return $totalRevenue ? (($directRevenue / $totalRevenue) * 100) : 0;
     }
 
-    public static function getOperatingExpensesForDiscreteDates($dateFrom, $dateTo = null, $idHotel = null, $useCache = true)
+    public static function getOperatingExpensesForDiscreteDates($dateFrom, $dateTo = null, $idHotel = null, $useCache = true, $onlyRooms = 0)
     {
         $dateTo = !$dateTo ? date('Y-m-d', strtotime('+1 day', strtotime($dateFrom))) : $dateTo;
 
@@ -1664,7 +1664,8 @@ class AdminStatsControllerCore extends AdminStatsTabController
             $cacheKey = 'AdminStats::getOperatingExpensesForDiscreteDates'.'_'.(int) $discreteDate['timestamp_from'].'_'.
             (!is_array($idHotel) ? (int) $idHotel : implode('_', $idHotel));
             if (!Cache::isStored($cacheKey) || !$useCache) {
-                $sql = 'SELECT
+                // sql for rooms expenses
+                $roomsSql = 'SELECT
                 IFNULL(SUM(
                     CASE
                         WHEN od.`original_wholesale_price` <> "0.000000"
@@ -1683,8 +1684,36 @@ class AdminStatsControllerCore extends AdminStatsTabController
                 AND hbd.`date_from` < "'.pSQL($discreteDate['date_to']).' 00:00:00" AND hbd.`date_to` > "'.pSQL($discreteDate['date_from']).' 00:00:00"'.
                 (!is_null($idHotel) ? HotelBranchInformation::addHotelRestriction($idHotel, 'hbd') : '');
 
-                $value = Db::getInstance()->getValue($sql);
-                Cache::store($cacheKey, $value);
+                $roomsExpenses = Db::getInstance()->getValue($roomsSql);
+
+                // sql for services expenses
+                $servicesExpenses = 0;
+                if (!$onlyRooms) {
+                    $servicesSql = 'SELECT
+                    IFNULL(SUM(
+                        CASE
+                            WHEN od.`original_wholesale_price` <> "0.000000"
+                            THEN od.`original_wholesale_price`
+                            WHEN p.`wholesale_price` <> "0.000000"
+                            THEN p.`wholesale_price`
+                        END
+                    ), 0)
+                    FROM `'._DB_PREFIX_.'htl_room_type_service_product_order_detail` rtspod
+                    LEFT JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd
+                    ON (rtspod.`id_htl_booking_detail` = hbd.`id`)
+                    LEFT JOIN `'._DB_PREFIX_.'product` p
+                    ON (p.`id_product` = hbd.`id_product`)
+                    LEFT JOIN `'._DB_PREFIX_.'order_detail` od
+                    ON (od.`id_order_detail` = rtspod.`id_order_detail`)
+                    WHERE p.`active` = 1
+                    AND hbd.`is_refunded` = 0
+                    AND hbd.`date_from` < "'.pSQL($discreteDate['date_to']).' 00:00:00" AND hbd.`date_to` > "'.pSQL($discreteDate['date_from']).' 00:00:00"'.
+                    (!is_null($idHotel) ? HotelBranchInformation::addHotelRestriction($idHotel, 'hbd') : '');
+
+                    $servicesExpenses = Db::getInstance()->getValue($servicesSql);
+                }
+
+                Cache::store($cacheKey, ($roomsExpenses + $servicesExpenses));
             }
 
             $result[$discreteDate['timestamp_from']] = Cache::retrieve($cacheKey);
@@ -1736,7 +1765,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
         return $totalProfit ? ($totalProfit / $totalRooms) : 0;
     }
 
-    public static function getRoomNightsData($dateFrom, $dateTo = null, $idHotel = null, $useCache = true, $average = false)
+    public static function getRoomNightsData($dateFrom, $dateTo = null, $idHotel = null, $useCache = true, $average = false, $roundAvg = false)
     {
         $dateTo = !$dateTo ? date('Y-m-d', strtotime('+1 day', strtotime($dateFrom))) : $dateTo;
 
@@ -1776,6 +1805,9 @@ class AdminStatsControllerCore extends AdminStatsTabController
             if ($totalHotels > 1) {
                 foreach ($result as $timestamp => &$value) {
                     $value = $value / $totalHotels;
+                    if ($roundAvg) {
+                        $value = Tools::ps_round($value, 2);
+                    }
                 }
             }
         }
@@ -1805,7 +1837,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
                     SELECT IF(DATEDIFF(hbd.`date_from`, \''.pSQL($dateFrom).'\') < 0, \''.pSQL($dateFrom).'\', hbd.`date_from`) AS date_from_final, IF(DATEDIFF(\''.pSQL($dateTo).'\', hbd.`date_to`) < 0, \''.pSQL($dateToNext).'\', hbd.`date_to`) AS date_to_final
                     FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
                     WHERE hbd.`is_refunded` = 0
-                    AND hbd.`date_from` < \''.pSQL($dateTo).'\' AND hbd.`date_to` > \''.pSQL($dateFrom).'\''.
+                    AND hbd.`date_from` <= \''.pSQL($dateTo).'\' AND hbd.`date_to` > \''.pSQL($dateFrom).'\''.
                     (!is_null($idHotel) ? HotelBranchInformation::addHotelRestriction($idHotel, 'hbd') : '').'
                 ) AS t
             ) AS t1';
