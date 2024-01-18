@@ -20,17 +20,17 @@
 {extends file='helpers/list/list_content.tpl'}
 
 {block name='td_content'}
-    {if isset($tr.$key) && isset($params.position)}
-        {if $order_by == 'position' && $order_way != 'DESC'}
-            <div class="dragGroup">
-                <div class="positions">
-                    {$tr.$key.position + 1}
-                </div>
-            </div>
-        {else}
-            {$tr.$key.position + 1}
-        {/if}
-    {else}
-        {$smarty.block.parent}
-    {/if}
+	{if isset($tr.$key) && isset($params.position)}
+		{if $order_by == 'position' && $order_way != 'DESC'}
+			<div class="dragGroup">
+				<div class="positions">
+					{$tr.$key.position + 1}
+				</div>
+			</div>
+		{else}
+			{$tr.$key.position + 1}
+		{/if}
+	{else}
+		{$smarty.block.parent}
+	{/if}
 {/block}
