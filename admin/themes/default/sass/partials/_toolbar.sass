@@ -41,6 +41,7 @@
 		position: absolute
 		background-color: transparent!important
 		@include right(0)
+		top: 18px
 		@media (max-width: $screen-sm)
 		#toolbar-nav
 			border: none
@@ -50,10 +51,9 @@
 			.toolbar_btn
 				position: relative
 				padding: 10px 10px !important
-				top: 18px
 				font-size: 12px
 				line-height: 8px
-				color: $main-color
+				color: $toolbar-buttons-color
 				text-align: center
 				text-shadow: none
 				white-space: nowrap
@@ -67,7 +67,6 @@
 					font-size: 11px
 				i
 					display: inline
-					color: $toolbar-buttons-color
 					font-size: 18px
 					&:hover
 						color: $toolbar-buttons-hover-color
@@ -75,6 +74,7 @@
 					position: relative
 					top: -2px
 					left: 2px
+					font-weight: 600
 			.dropdown-toolbar
 				display: none
 				@include float(right)
