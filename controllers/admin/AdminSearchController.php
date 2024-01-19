@@ -167,6 +167,8 @@ class AdminSearchControllerCore extends AdminController
             if (!$searchType) {
                 $this->searchAddress();
                 $this->searchHotelFeatures();
+                $this->searchAdditionalFacilities();
+                $this->searchRefundRules();
             }
         }
 
@@ -227,7 +229,6 @@ class AdminSearchControllerCore extends AdminController
     */
     public function searchCustomer()
     {
-
         if ($this->_list['customers'] = Customer::searchByName($this->query)) {
             $this->addHotelRestrictionsToSearchedCustomers('customers');
         }
@@ -321,19 +322,23 @@ class AdminSearchControllerCore extends AdminController
 
     public function searchHotel()
     {
-        $objHotelBranchInformation = new HotelBranchInformation();
-        $this->_list['hotels'] = $objHotelBranchInformation->getAccessibleHotelByName($this->query);
+        if (class_exists('HotelBranchInformation')) {
+            $objHotelBranchInformation = new HotelBranchInformation();
+            $this->_list['hotels'] = $objHotelBranchInformation->getAccessibleHotelByName($this->query);
+        }
     }
 
     public function searchOrderMessages()
     {
-        $objCustomerMessage = new CustomerMessage();
-        if ($this->_list['order_messages'] = $objCustomerMessage->searchCustomerMessage($this->query)) {
-            $accesibleHotels = HotelBranchInformation::getProfileAccessedHotels($this->context->employee->id_profile, 1, 1);
-            foreach ($this->_list['order_messages'] as $key => $msg) {
-                $idHotel = HotelBookingDetail::getIdHotelByIdOrder($msg['id_order']);
-                if (!in_array($idHotel, $accesibleHotels)) {
-                    unset($this->_list['order_messages'][$key]);
+        if (class_exists('CustomerMessage')) {
+            $objCustomerMessage = new CustomerMessage();
+            if ($this->_list['order_messages'] = $objCustomerMessage->searchCustomerMessage($this->query)) {
+                $accesibleHotels = HotelBranchInformation::getProfileAccessedHotels($this->context->employee->id_profile, 1, 1);
+                foreach ($this->_list['order_messages'] as $key => $msg) {
+                    $idHotel = HotelBookingDetail::getIdHotelByIdOrder($msg['id_order']);
+                    if (!in_array($idHotel, $accesibleHotels)) {
+                        unset($this->_list['order_messages'][$key]);
+                    }
                 }
             }
         }
@@ -349,19 +354,65 @@ class AdminSearchControllerCore extends AdminController
 
     public function searchHotelFeatures()
     {
-        $objHotelFeatures = new HotelFeatures();
-        if ($hotelFeatures = $objHotelFeatures->searchHotelFeatureByName($this->query)) {
-            $features = array();
-            foreach ($hotelFeatures as $key => $hotelFeature) {
-                $features[$hotelFeature['id']]['name'] = $hotelFeature['name'];
-                if ($hotelFeature['parent_feature_id']) {
-                    $features[$hotelFeature['id']]['id'] = $hotelFeature['parent_feature_id'];
-                } else {
-                    $features[$hotelFeature['id']]['id'] = $hotelFeature['id'];
+        if (class_exists('HotelFeatures')) {
+            $objHotelFeatures = new HotelFeatures();
+            if ($hotelFeatures = $objHotelFeatures->searchHotelFeatureByName($this->query)) {
+                $features = array();
+                foreach ($hotelFeatures as $key => $hotelFeature) {
+                    $features[$hotelFeature['id']]['name'] = $hotelFeature['name'];
+                    if ($hotelFeature['parent_feature_id']) {
+                        $features[$hotelFeature['id']]['id'] = $hotelFeature['parent_feature_id'];
+                    } else {
+                        $features[$hotelFeature['id']]['id'] = $hotelFeature['id'];
+                    }
                 }
-            }
 
-            $this->_list['hotel_features'] = $features;
+                $this->_list['hotel_features'] = $features;
+            }
+        }
+    }
+
+    public function searchAdditionalFacilities()
+    {
+        if (class_exists('HotelRoomTypeGlobalDemand')) {
+            $objHotelRoomTypeGlobalDemands = new HotelRoomTypeGlobalDemand();
+            if ($globalDemads = $objHotelRoomTypeGlobalDemands->searchRoomTypeDemandsByName($this->query)) {
+                foreach ($globalDemads as $key => $demand) {
+                    if (!(int) $globalDemads[$key]['price']) {
+                        $globalDemads[$key]['price'] = $globalDemads[$key]['option_price'];
+                    }
+
+                    $globalDemads[$key]['per_day_price_calc'] = $this->l('No');
+                    if ($globalDemads[$key]['price_calc_method'] == HotelRoomTypeGlobalDemand::WK_PRICE_CALC_METHOD_EACH_DAY) {
+                        $globalDemads[$key]['per_day_price_calc'] = $this->l('Yes');
+                    }
+                }
+
+                $this->_list['global_demands'] = $globalDemads;
+            }
+        }
+
+    }
+
+    public function searchRefundRules()
+    {
+        if (class_exists('HotelOrderRefundRules')) {
+            $objRefundRule = new HotelOrderRefundRules();
+            if ($refundRules = $objRefundRule->searchOrderRefundRulesByName($this->query)) {
+                foreach ($refundRules as $key => $rule) {
+                    $refundRules[$key]['deduction_type'] = $this->l('Percentage');
+                    if ($rule['payment_type'] == HotelOrderRefundRules::WK_REFUND_RULE_PAYMENT_TYPE_FIXED) {
+                        $refundRules[$key]['deduction_type'] = $this->l('Fixed Amount');
+                        $refundRules[$key]['deduction_value_full_pay'] = Tools::displayPrice($rule['deduction_value_full_pay']);
+                        $refundRules[$key]['deduction_value_adv_pay'] = Tools::displayPrice($rule['deduction_value_adv_pay']);
+                    } else if ($rule['payment_type'] == HotelOrderRefundRules::WK_REFUND_RULE_PAYMENT_TYPE_PERCENTAGE) {
+                        $refundRules[$key]['deduction_value_full_pay'] = $rule['deduction_value_full_pay'].' %';
+                        $refundRules[$key]['deduction_value_adv_pay'] = $rule['deduction_value_adv_pay'].' %';
+                    }
+                }
+
+                $this->_list['refund_rules'] = $refundRules;
+            }
         }
     }
 
@@ -424,6 +475,31 @@ class AdminSearchControllerCore extends AdminController
             'payment' => array( 'title' => $this->l('Payment'), 'width' => 100),
             'osname' => array('title' => $this->l('Status'), 'width' => 280),
             'date_add' => array('title' => $this->l('Date'), 'width' => 130, 'align' => 'right', 'type' => 'datetime'),
+        );
+    }
+
+    protected function initGlobalDemandList()
+    {
+        $this->show_toolbar = false;
+        $this->fields_list['global_demands'] = array(
+            'id_global_demand' => array('title' => $this->l('ID'), 'align' => 'center', 'width' => 25),
+            'name' => array('title' => $this->l('Name')),
+            'option_name' => array('title' => $this->l('Advance Option Name')),
+            'price' => array('title' => $this->l('Price'), 'type' => 'price', 'currency' => true),
+            'per_day_price_calc' => array('title' => $this->l('Per day price calculation'))
+        );
+    }
+
+    protected function initRefundRuleList()
+    {
+        $this->show_toolbar = false;
+        $this->fields_list['refund_rules'] = array(
+            'id_refund_rule' => array('title' => $this->l('ID'), 'align' => 'center', 'width' => 25),
+            'name' => array('title' => $this->l('Name')),
+            'payment_type' => array('title' => $this->l('Payment Type')),
+            'deduction_value_full_pay' => array('title' => $this->l('Full Payment Deduction Percentage/Amount')),
+            'deduction_value_adv_pay' => array('title' => $this->l('Full Payment Deduction Percentage/Amount')),
+            'days' => array('title' => $this->l('Days Before Check-in')),
         );
     }
 
@@ -792,7 +868,7 @@ class AdminSearchControllerCore extends AdminController
                 $this->tpl_view_vars['num_hotel_features'] = count($this->_list['hotel_features']);
                 $this->tpl_view_vars['hotel_features'] = $view;
             }
-            if (isset($this->_list['groups']) && $this->_list['groups']&& count($this->_list['groups'])) {
+            if (isset($this->_list['groups']) && count($this->_list['groups'])) {
                 $view = '';
                 $this->initGroupList();
 
@@ -820,6 +896,49 @@ class AdminSearchControllerCore extends AdminController
 
                 $this->tpl_view_vars['num_groups'] = count($this->_list['groups']);
                 $this->tpl_view_vars['groups'] = $view;
+            }
+
+            if (isset($this->_list['global_demands']) && count($this->_list['global_demands'])) {
+                $view = '';
+                $this->initGlobalDemandList();
+                $helper = new HelperList();
+                $helper->shopLinkType = '';
+                $helper->simple_header = true;
+                $helper->identifier = 'id_global_demand';
+                $helper->actions = array('edit');
+                $helper->show_toolbar = false;
+                $helper->table = 'htl_room_type_global_demand';
+                $helper->currentIndex = $this->context->link->getAdminLink('AdminRoomTypeGlobalDemand', false);
+                $helper->token = Tools::getAdminTokenLite('AdminRoomTypeGlobalDemand');
+
+                if ($this->_list['global_demands']) {
+                    $view = $helper->generateList($this->_list['global_demands'], $this->fields_list['global_demands']);
+                }
+
+                $this->tpl_view_vars['num_global_demands'] = count($this->_list['global_demands']);
+                $this->tpl_view_vars['global_demands'] = $view;
+            }
+
+            if (isset($this->_list['refund_rules']) && count($this->_list['refund_rules'])) {
+                $view = '';
+                $this->initRefundRuleList();
+
+                $helper = new HelperList();
+                $helper->shopLinkType = '';
+                $helper->simple_header = true;
+                $helper->identifier = 'id_refund_rule';
+                $helper->actions = array('edit');
+                $helper->show_toolbar = false;
+                $helper->table = 'htl_order_refund_rules';
+                $helper->currentIndex = $this->context->link->getAdminLink('AdminOrderRefundRules', false);
+                $helper->token = Tools::getAdminTokenLite('AdminOrderRefundRules');
+
+                if ($this->_list['refund_rules']) {
+                    $view = $helper->generateList($this->_list['refund_rules'], $this->fields_list['refund_rules']);
+                }
+
+                $this->tpl_view_vars['num_refund_rules'] = count($this->_list['refund_rules']);
+                $this->tpl_view_vars['refund_rules'] = $view;
             }
 
             if (isset($this->_list['orders']) && count($this->_list['orders'])) {

@@ -140,4 +140,5 @@ class CustomerMessageCore extends ObjectModel
             WHERE `message` LIKE \'%'.$text.'%\''
         );
     }
+
 }

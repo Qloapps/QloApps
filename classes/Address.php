@@ -497,4 +497,5 @@ class AddressCore extends ObjectModel
                 )
         ');
     }
+
 }

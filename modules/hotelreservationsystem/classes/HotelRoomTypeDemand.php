@@ -371,5 +371,25 @@ class HotelRoomTypeDemand extends ObjectModel
             $where
         );
     }
+
+    public function searchRoomTypeDemandsByName($name, $idLang = false)
+    {
+        if (!$idLang) {
+            $idLang = Context::getContext()->language->id;
+        }
+
+        return Db::getInstance()->executeS(
+            'SELECT rtgd.*, rtgdl.*, rtgla.`price` AS `option_price`, rtglal.`name` AS `option_name` FROM `'._DB_PREFIX_.'htl_room_type_global_demand` rtgd
+            LEFT JOIN `'._DB_PREFIX_.'htl_room_type_global_demand_lang` rtgdl
+            ON rtgdl.`id_global_demand` = rtgd.`id_global_demand`
+            LEFT JOIN `'._DB_PREFIX_.'htl_room_type_global_demand_advance_option` rtgla
+                ON rtgla.`id_global_demand` = rtgd.`id_global_demand`
+            LEFT JOIN `'._DB_PREFIX_.'htl_room_type_global_demand_advance_option_lang` rtglal
+            ON (rtglal.`id_option` = rtgla.`id_option` AND rtgdl.`id_lang` = rtglal.`id_lang`)
+            WHERE (rtgdl.`name` LIKE \'%'.pSQL($name).'%\' OR rtglal.`name` LIKE \'%'.pSQL($name).'%\' )
+            AND rtgdl.`id_lang`='.(int)$idLang
+        );
+    }
+
 }
 
