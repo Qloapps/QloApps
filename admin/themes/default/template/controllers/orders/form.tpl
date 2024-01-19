@@ -1386,21 +1386,14 @@
 		});
 		if (addresses.length == 0)
 		{
-			$('#addresses_err').show().html('{l s='You must add at least one address to process the order.'}');
 			$('#address_delivery, #address_invoice').hide();
 			$("#new_address").show();
-
-			//by webkul (if there is no address then order can not be created)
-			$("button[name=\"submitAddOrder\"]").attr("disabled", "disabled");
 		}
 		else
 		{
 			$('#addresses_err').hide();
 			$("#new_address").hide();
 			$('#address_delivery, #address_invoice').show();
-
-			//by webkul
-			$("button[name=\"submitAddOrder\"]").removeAttr("disabled");
 		}
 
 		/*Changed by webkul to make delivery and invoice addresses same*/

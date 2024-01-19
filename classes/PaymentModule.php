@@ -271,14 +271,6 @@ abstract class PaymentModuleCore extends Module
                     $order = new Order();
                     $order->product_list = $package['product_list'];
 
-                    if (Configuration::get('PS_TAX_ADDRESS_TYPE') == 'id_address_delivery') {
-                        $address = new Address((int)$id_address);
-                        $this->context->country = new Country((int)$address->id_country, (int)$this->context->cart->id_lang);
-                        if (!$this->context->country->active) {
-                            throw new PrestaShopException('The delivery address country is not active.');
-                        }
-                    }
-
                     $carrier = null;
                     if (!$this->context->cart->isVirtualCart() && isset($package['id_carrier'])) {
                         $carrier = new Carrier((int)$package['id_carrier'], (int)$this->context->cart->id_lang);

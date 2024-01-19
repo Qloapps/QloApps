@@ -960,39 +960,29 @@ class AdminOrdersControllerCore extends AdminController
                 Context::getContext()->currency = new Currency((int)$cart->id_currency);
                 Context::getContext()->customer = new Customer((int)$cart->id_customer);
 
-                $bad_delivery = false;
-                if (($bad_delivery = (bool)!Address::isCountryActiveById((int)$cart->id_address_delivery))
-                    || !Address::isCountryActiveById((int)$cart->id_address_invoice)) {
-                    if ($bad_delivery) {
-                        $this->errors[] = Tools::displayError('This booking address country is not active.');
-                    } else {
-                        $this->errors[] = Tools::displayError('This invoice address country is not active.');
-                    }
-                } else {
-                    $employee = new Employee((int)Context::getContext()->cookie->id_employee);
-                    $payment_module->validateOrder(
-                        (int)$cart->id,
-                        (int)$id_order_state,
-                        $cart->getOrderTotal(true, Cart::BOTH),
-                        $payment_module->displayName,
-                        $this->l('Manual order -- Employee:').' '.
-                        substr($employee->firstname, 0, 1).'. '.$employee->lastname,
-                        array(),
-                        null,
-                        false,
-                        $cart->secure_key
-                    );
+                $employee = new Employee((int)Context::getContext()->cookie->id_employee);
+                $payment_module->validateOrder(
+                    (int)$cart->id,
+                    (int)$id_order_state,
+                    $cart->getOrderTotal(true, Cart::BOTH),
+                    $payment_module->displayName,
+                    $this->l('Manual order -- Employee:').' '.
+                    substr($employee->firstname, 0, 1).'. '.$employee->lastname,
+                    array(),
+                    null,
+                    false,
+                    $cart->secure_key
+                );
 
-                    if (isset($this->context->cookie->id_cart)) {
-                        unset($this->context->cookie->id_cart);
-                    }
-                    if (isset($this->context->cookie->id_guest)) {
-                        unset($this->context->cookie->id_guest);
-                    }
+                if (isset($this->context->cookie->id_cart)) {
+                    unset($this->context->cookie->id_cart);
+                }
+                if (isset($this->context->cookie->id_guest)) {
+                    unset($this->context->cookie->id_guest);
+                }
 
-                    if ($payment_module->currentOrder) {
-                        Tools::redirectAdmin(self::$currentIndex.'&id_order='.$payment_module->currentOrder.'&vieworder'.'&token='.$this->token.'&conf=3');
-                    }
+                if ($payment_module->currentOrder) {
+                    Tools::redirectAdmin(self::$currentIndex.'&id_order='.$payment_module->currentOrder.'&vieworder'.'&token='.$this->token.'&conf=3');
                 }
             } else {
                 $this->errors[] = Tools::displayError('You do not have permission to add this.');
