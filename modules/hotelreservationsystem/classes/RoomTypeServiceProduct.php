@@ -278,7 +278,7 @@ class RoomTypeServiceProduct extends ObjectModel
             return false;
         }
 
-        $way = ($newPosition >= $movedBlock['position']) ? 0 : 1;
+        $way = ($newPosition >= $movedBlock['position']) ? 1 : 0;
 
         return (Db::getInstance()->execute(
             'UPDATE `'._DB_PREFIX_.'htl_room_type_service_product` rsp
@@ -286,11 +286,11 @@ class RoomTypeServiceProduct extends ObjectModel
             WHERE rsp.`id_element` = '.(int) $idElement.'
             AND rsp.`element_type` = '.(int) $elementType.'
             AND rsp.`position`'.($way ? '> '.
-            (int) $movedBlock['position'].' AND rsp.`position` <= '.(int) $position : '< '.
-            (int) $movedBlock['position'].' AND rsp.`position` >= '.(int) $position)
+            (int) $movedBlock['position'].' AND rsp.`position` <= '.(int) $newPosition : '< '.
+            (int) $movedBlock['position'].' AND rsp.`position` >= '.(int) $newPosition)
         ) && Db::getInstance()->execute(
             'UPDATE `'._DB_PREFIX_.'htl_room_type_service_product` rsp
-            SET rsp.`position` = '.(int) $position.'
+            SET rsp.`position` = '.(int) $newPosition.'
             WHERE rsp.`id_element` = '.(int) $idElement.'
             AND rsp.`element_type` = '.(int) $elementType.'
             AND rsp.`id_product` = '.(int) $movedBlock['id_product']

@@ -3,12 +3,14 @@
 		<input type="hidden" name="submitted_tabs[]" value="ServiceProduct" />
 		<h3 class="tab"> <i class="icon-AdminAdmin"></i> {l s='Service Products'}</h3>
 
-        {if isset($all_service_products) && $all_service_products}
+        {if (isset($associated_service_products) && $associated_service_products) || (isset($unassociated_service_products) && $unassociated_service_products)}
             <div class="from-group table-responsive-row clearfix">
                 <table class="table hotel-roomtype-link-table">
                     <thead>
                         <tr class="nodrag nodrop">
-                            <th class="text-center"></th>
+                            <th class="text-center">
+                                <input type="checkbox" class="bulk-service-products-status">
+                            </th>
                             <th class="col-sm-1">
                                 <span>{l s='ID Product'}</span>
                             </th>
@@ -21,96 +23,106 @@
                             <th>
                                 <span>{l s='Position'}</span>
                             </th>
-                            <th class="">
+                            <th>
                                 <span>{l s='Price'}</span>
                             </th>
-                            <th class="">
+                            <th>
                                 <span>{l s='Tax'}</span>
-                            </th>
-                            <th class="text-right">
-                                <span>{l s='Action'}</span>
                             </th>
                         </tr>
                     </thead>
                     <tbody>
-						{foreach from=$all_service_products key=key item=service_product}
-                            {assign var=inputs_prefix value="service_product_`$service_product.id_product`_"}
+                        {foreach from=$associated_service_products item=service_product}
+                            <tr id='room_type_service_product_{$service_product.id_product|escape:'html':'UTF-8'}' position="{$service_product.association_info.position|escape:'html':'UTF-8'}" id_product='{$service_product.id_product|escape:'html':'UTF-8'}' id_element="{$product->id}" data-roomtype_url="{$link->getAdminLink('AdminProducts', true)|addslashes}">
+                                {assign var=inputs_prefix value="service_product_`$service_product.id_product`_"}
+                                <input type="hidden" name="available_service_products[]" value="{$service_product.id_product}">
 
-                            <input type="hidden" name="available_service_products[]" value="{$service_product.id_product}">
+                                <td class="text-center">
+                                    <input type="checkbox" name="{$inputs_prefix}associated" class="is-associated" checked>
+                                </td>
+                                <td class="col-sm-1">
+                                    {$service_product.id_product|escape:'html':'UTF-8'}
+                                    <a target="blank" href="{$link->getAdminLink('AdminNormalProducts')|escape:'html':'UTF-8'}&amp;id_product={$service_product.id_product|escape:'html':'UTF-8'}&amp;updateproduct">
+                                        <i class="icon-external-link-sign"></i>
+                                    </a>
+                                </td>
+                                <td>{$service_product.name}</td>
+                                <td class="text-center">
+                                    <span {if $service_product.auto_add_to_cart}class="badge badge-success"{/if}>
+                                        {if $service_product.auto_add_to_cart}{l s='Yes'}{else}{l s='No'}{/if}
+                                    </span>
+                                </td>
+                                <td class="pointer dragHandle center positionImage">
+                                    <div class="dragGroup">
+                                        <div class="positions">
+                                            {$service_product.association_info.position + 1}
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="fixed-width-xl">
+                                        <div class="input-group">
+                                            <span class="input-group-addon">{$currency->prefix}{$currency->suffix}</span>
+                                            <input type="text" name="{$inputs_prefix}price" value="{if isset($smarty.post["{$inputs_prefix}price"]) && $smarty.post["{$inputs_prefix}price"]}{$smarty.post["{$inputs_prefix}price"]}{elseif isset($service_product.association_info.custom_price) && $service_product.association_info.custom_price}{$service_product.association_info.custom_price}{/if}" data-id_product="{$service_product.id_product}">
+                                        </div>
+                                    </div>
+                                    <div class="help-block">
+                                        {l s='Default price: %s' sprintf={displayPrice price=$service_product.association_info.default_price currency=$currency->id}}
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="fixed-width-xl">
+                                        <select class="service_product_id_tax_rules_group" name="{$inputs_prefix}id_tax_rules_group">
+                                            <option value="0">{l s='No Tax'}</option>
+                                            {foreach from=$tax_rules_groups item=tax_rules_group}
+                                                <option value="{$tax_rules_group.id_tax_rules_group}" {if $service_product.association_info.id_tax_rules_group == $tax_rules_group.id_tax_rules_group}selected="selected"{/if} >
+                                                    {$tax_rules_group['name']|htmlentitiesUTF8}
+                                                </option>
+                                            {/foreach}
+                                        </select>
+                                    </div>
+                                    <div class="help-block">{l s='Default tax rule: %s' sprintf=$service_product.association_info.default_tax_rules_group_name}</div>
+                                </td>
+                            </tr>
+                        {/foreach}
 
-                            {if isset($service_product.is_associated) && $service_product.is_associated}
-                                <tr id='room_type_service_product_{$service_product.id_product|escape:'html':'UTF-8'}' position="{$service_product.association_info.position|escape:'html':'UTF-8'}" id_product='{$service_product.id_product|escape:'html':'UTF-8'}' id_element="{$product->id}" data-roomtype_url="{$link->getAdminLink('AdminProducts', true)|addslashes}">
-                                    <td class="text-center">
-                                        <input type="checkbox" name="{$inputs_prefix}associated" class="noborder" checked>
-                                    </td>
-                                    <td class="col-sm-1">
-                                        {$service_product.id_product|escape:'html':'UTF-8'}
-                                        <a target="blank" href="{$link->getAdminLink('AdminNormalProducts')|escape:'html':'UTF-8'}&amp;id_product={$service_product.id_product|escape:'html':'UTF-8'}&amp;updateproduct">
-                                            <i class="icon-external-link-sign"></i>
-                                        </a>
-                                    </td>
-                                    <td>{$service_product.name}</td>
-                                    <td class="text-center">
-                                        <span {if $service_product.auto_add_to_cart}class="badge badge-success"{/if}>
-                                            {if $service_product.auto_add_to_cart}{l s='Yes'}{else}{l s='No'}{/if}
-                                        </span>
-                                    </td>
-                                    <td class="pointer dragHandle center positionImage">
-                                        <div class="dragGroup">
-                                            <div class="positions">
-                                                {$service_product.association_info.position + 1}
-                                            </div>
+                        {foreach from=$unassociated_service_products item=service_product}
+                            <tr class="nodrop nodrag">
+                                {assign var=inputs_prefix value="service_product_`$service_product.id_product`_"}
+                                <input type="hidden" name="available_service_products[]" value="{$service_product.id_product}">
+
+                                <td class="text-center">
+                                    <input type="checkbox" name="{$inputs_prefix}associated" class="is-associated" {if isset($smarty.post["{$inputs_prefix}associated"]) && in_array($smarty.post["{$inputs_prefix}associated"], array('on', 'true', '1'))}checked{/if}>
+                                </td>
+                                <td class="col-sm-1">{$service_product.id_product|escape:'html':'UTF-8'} <a target="blank" href="{$link->getAdminLink('AdminNormalProducts')|escape:'html':'UTF-8'}&amp;id_product={$service_product.id_product|escape:'html':'UTF-8'}&amp;updateproduct"><i class="icon-external-link-sign"></i></a></td>
+                                <td>{$service_product.name}</td>
+                                <td class="text-center"><span {if $service_product.auto_add_to_cart}class="badge badge-success"{/if}>{if $service_product.auto_add_to_cart}{l s='Yes'}{else}{l s='No'}{/if}</span></td>
+                                <td>{l s='--'}</td>
+                                <td>
+                                    <div class="fixed-width-xl">
+                                        <div class="input-group">
+                                            <span class="input-group-addon">{$currency->prefix}{$currency->suffix}</span>
+                                            <input type="text" name="{$inputs_prefix}price" data-id_product="{$service_product.id_product|escape:'html':'UTF-8'}" {if isset($smarty.post["{$inputs_prefix}price"]) && $smarty.post["{$inputs_prefix}price"]}value="{$smarty.post["{$inputs_prefix}price"]}"{/if}>
                                         </div>
-                                    </td>
-                                    <td>
-                                        <span class="field-view">{if isset($service_product.association_info.custom_price) && $service_product.association_info.custom_price}{displayPrice price=$service_product.association_info.custom_price currency=$currency->id}{else}{displayPrice price=$service_product.association_info.default_price currency=$currency->id}{/if}</span>
-                                        <div class="field-edit" style="display:none">
-                                            <div class="input-group">
-                                                <input type="text" name="{$inputs_prefix}price" value="{if isset($service_product.association_info.custom_price) && $service_product.association_info.custom_price}{$service_product.association_info.custom_price|escape:'html':'UTF-8'}{else}{$service_product.association_info.default_price|escape:'html':'UTF-8'}{/if}" class="service-product-price" data-id_product="{$service_product.id_product|escape:'html':'UTF-8'}">
-                                                <span class="input-group-addon">{$currency->prefix}{$currency->suffix}</span>
-                                            </div>
-                                        </div>
-                                        <div class="help-block">
-                                            {l s='Default price: %s' sprintf={displayPrice price=$service_product.association_info.default_price currency=$currency->id}}
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <span class="field-view">{if isset($service_product.association_info.tax_rules_group_name) && $service_product.association_info.tax_rules_group_name}{$service_product.association_info.tax_rules_group_name}{else}{$service_product.association_info.default_tax_rules_group_name}{/if}</span>
-                                        <div class="field-edit" style="display:none">
-                                            <select class="service_product_id_tax_rules_group" name="{$inputs_prefix}id_tax_rules_group">
-                                                <option value="0">{l s='No Tax'}</option>
-                                                {foreach from=$tax_rules_groups item=tax_rules_group}
-                                                    <option value="{$tax_rules_group.id_tax_rules_group}" {if $service_product.association_info.id_tax_rules_group == $tax_rules_group.id_tax_rules_group}selected="selected"{/if} >
-                                                        {$tax_rules_group['name']|htmlentitiesUTF8}
-                                                    </option>
-                                                {/foreach}
-                                            </select>
-                                        </div>
-                                        <div class="help-block">{l s='Default tax rule: %s' sprintf=$service_product.association_info.default_tax_rules_group_name}</div>
-                                    </td>
-                                    <td class="text-right">
-                                        <a href="#" class="btn btn-default button-edit-price field-view"><i class="icon-pencil"></i></a>
-                                        <span class="field-edit" style="display:none">
-                                            <a href="#" class="btn btn-default btn-cancel"><i class="icon-times"></i></a>
-                                        </span>
-                                    </td>
-                                </tr>
-                            {else}
-                                <tr>
-                                    <td class="text-center">
-                                        <input type="checkbox" name="{$inputs_prefix}associated" class="noborder">
-                                    </td>
-                                    <td class="col-sm-1">{$service_product.id_product|escape:'html':'UTF-8'} <a target="blank" href="{$link->getAdminLink('AdminNormalProducts')|escape:'html':'UTF-8'}&amp;id_product={$service_product.id_product|escape:'html':'UTF-8'}&amp;updateproduct"><i class="icon-external-link-sign"></i></a></td>
-                                    <td>{$service_product.name}</td>
-                                    <td class="text-center"><span {if $service_product.auto_add_to_cart}class="badge badge-success"{/if}>{if $service_product.auto_add_to_cart}{l s='Yes'}{else}{l s='No'}{/if}</span></td>
-                                    <td>{l s='--'}</td>
-                                    <td>{l s='Default price: %s' sprintf={displayPrice price=$service_product.price currency=$currency->id}}</td>
-                                    <td>{l s='Default tax rule: %s' sprintf=$service_product.tax_rules_group_name}</td>
-                                    <td class="text-right">
-                                        <a href="#" class="btn btn-default button-edit-price disabled"><i class="icon-pencil"></i></a>
-                                    </td>
-                                </tr>
-                            {/if}
+                                    </div>
+                                    <div class="help-block">
+                                        {l s='Default price: %s' sprintf={displayPrice price=$service_product.price currency=$currency->id}}
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="fixed-width-xl">
+                                        <select class="service_product_id_tax_rules_group" name="{$inputs_prefix}id_tax_rules_group">
+                                            <option value="0">{l s='No Tax'}</option>
+                                            {foreach from=$tax_rules_groups item=tax_rules_group}
+                                                <option value="{$tax_rules_group.id_tax_rules_group}" {if isset($smarty.post["{$inputs_prefix}id_tax_rules_group"]) && $tax_rules_group.id_tax_rules_group == $smarty.post["{$inputs_prefix}id_tax_rules_group"]}selected{/if}>
+                                                    {$tax_rules_group['name']|htmlentitiesUTF8}
+                                                </option>
+                                            {/foreach}
+                                        </select>
+                                    </div>
+                                    <div class="help-block">{l s='Default tax rule: %s' sprintf=$service_product.tax_rules_group_name}</div>
+                                </td>
+                            </tr>
                         {/foreach}
                     </tbody>
                 </table>

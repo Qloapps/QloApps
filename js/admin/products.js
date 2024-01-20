@@ -436,7 +436,7 @@ product_tabs['ServiceProduct'] = new function(){
 
 					let idProduct = parseInt($(row).attr('id_product'));
 					let idElement = parseInt($(row).attr('id_element'));
-					let newPosition = parseInt($('#' + rowId).index()) - 1;
+					let newPosition = parseInt($('#' + rowId).index());
 
 					$.ajax({
 						method: 'POST',
@@ -474,22 +474,6 @@ product_tabs['ServiceProduct'] = new function(){
 					"orderable": false,
 				}]
 			});
-		}
-
-		$(document).on('click', '.button-edit-price', function(e){
-			e.preventDefault();
-			togglelinkedProductEditForm(this, true);
-		});
-
-		$(document).on('click', '.btn-cancel', function(e){
-			e.preventDefault();
-			togglelinkedProductEditForm(this, false);
-		});
-
-		function togglelinkedProductEditForm(triggeredElement, showform)
-		{
-			$(triggeredElement).closest('tr').find('.field-edit').toggle(showform);
-			$(triggeredElement).closest('tr').find('.field-view').toggle(!showform);;
 		}
 	}
 }
@@ -886,5 +870,10 @@ $(document).ready(function() {
 
 	$('#modal-duplicate-options .submit-duplicate').on('click', function (e) {
 		$('#modal-duplicate-options form.duplicate-options').submit();
+	});
+
+	$(document).on('click', 'input.bulk-service-products-status', function () {
+		let checked = $('input.bulk-service-products-status').is(':checked');
+		$('table.hotel-roomtype-link-table tr input.is-associated').prop('checked', checked);
 	});
 });

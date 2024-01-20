@@ -1470,23 +1470,25 @@ class ProductCore extends ObjectModel
         return $result;
     }
 
-    public function getServiceProducts($idLang, $front = false, $context = false)
+    public function getServiceProducts($active = null, $serviceProductType = null, $idLang = null, $orderBy = 'pl.name', $orderWay = 'ASC')
     {
-        if (!$context) {
-            $context = Context::getContext();
+        if (!$idLang) {
+            $idLang = Context::getContext()->language->id;
         }
-        $sql = 'SELECT p.*, product_shop.*, pl.*, image_shop.`id_image` id_image, il.`legend` as legend
-		        FROM `'._DB_PREFIX_.'product` p
-				'.Shop::addSqlAssociation('product', 'p').'
-				LEFT JOIN `'._DB_PREFIX_.'product_lang` pl ON (p.`id_product` = pl.`id_product` '.Shop::addSqlRestrictionOnLang('pl').')
-                LEFT JOIN `'._DB_PREFIX_.'image_shop` image_shop
-					ON (image_shop.`id_product` = p.`id_product` AND image_shop.cover=1 AND image_shop.id_shop='.(int)$context->shop->id.')
-				LEFT JOIN `'._DB_PREFIX_.'image_lang` il
-					ON (image_shop.`id_image` = il.`id_image`
-					AND il.`id_lang` = '.(int)$idLang.')';
-        $sql .= 'WHERE pl.`id_lang` = '.(int)$idLang.' AND p.`booking_product` = 0
-                AND p.`service_product_type` = '.Product::SERVICE_PRODUCT_WITHOUT_ROOMTYPE.'
-				ORDER BY pl.`name`';
+
+        $sql = 'SELECT p.*, pl.*, i.`id_image`, il.`legend` AS legend
+        FROM `'._DB_PREFIX_.'product` p
+        LEFT JOIN `'._DB_PREFIX_.'product_lang` pl ON (pl.`id_product` = p.`id_product` AND pl.`id_lang` = '.(int) $idLang.')
+        LEFT JOIN `'._DB_PREFIX_.'image` i ON (i.`id_product` = p.`id_product` AND i.`cover` = 1)
+        LEFT JOIN `'._DB_PREFIX_.'image_lang` il ON (il.`id_image` = i.`id_image` AND il.`id_lang` = '.(int) $idLang.')
+        WHERE p.`booking_product` = 0'.
+        (!is_null($active) ? ' AND p.`active` = '.(int) $active : '').
+        ($serviceProductType ? ' AND p.`service_product_type` = '.(int) $serviceProductType : '');
+
+        if (Validate::isOrderBy($orderBy) && Validate::isOrderBy($orderWay)) {
+            $sql .= ' ORDER BY '.$orderBy.' '.$orderWay;
+        }
+
         return Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql);
     }
 
