@@ -126,6 +126,8 @@ class IdentityControllerCore extends FrontController
      */
     public function initContent()
     {
+        $this->show_breadcrump = true;
+
         parent::initContent();
 
         if ($this->customer->birthday) {
