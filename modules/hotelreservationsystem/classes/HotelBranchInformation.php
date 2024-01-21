@@ -85,8 +85,8 @@ class HotelBranchInformation extends ObjectModel
             'update' => 'updateWs',
         ),
         'fields' => array(
-            'phone' => array(),
-            'address' => array(),
+            'phone' => array('required' => true),
+            'address' => array('required' => true),
             'id_country' => array(
                 'required' => true,
                 'xlink_resource'=> 'countries',
@@ -871,7 +871,7 @@ class HotelBranchInformation extends ObjectModel
     }
 
     // Webservice:: function to prepare id parameter for hotel images in a hotel api
-    public function getWsHotelImages()
+    public function getWsImages()
     {
         $ids = array();
         if ($hotelImages =  Db::getInstance()->executeS('SELECT * FROM `'._DB_PREFIX_.'htl_image` WHERE `id_hotel` = '.(int)$this->id)) {
@@ -1115,14 +1115,14 @@ class HotelBranchInformation extends ObjectModel
                         }
                     }
                     /* Check zip code format */
-                    if ($objCountry->zip_code_format && !$objCountry->checkZipCode($this->zipcode)) {
-                        $message = sprintf(Tools::displayError('The Zip/Postal code you have entered is invalid. It must follow this format: %s'), str_replace('C', $objCountry->iso_code, str_replace('N', '0', str_replace('L', 'A', $objCountry->zip_code_format))));
+                    if (empty($this->zipcode) && $objCountry->need_zip_code) {
+                        $message = Tools::displayError('A Zip / Postal code is required.');
                         if ($die) {
                             throw new PrestaShopException($message);
                         }
                         return $error_return ? $message : false;
-                    } elseif (empty($this->zipcode) && $objCountry->need_zip_code) {
-                        $message = Tools::displayError('A Zip / Postal code is required.');
+                    } elseif ($objCountry->zip_code_format && !$objCountry->checkZipCode($this->zipcode)) {
+                        $message = sprintf(Tools::displayError('The Zip/Postal code you have entered is invalid. It must follow this format: %s'), str_replace('C', $objCountry->iso_code, str_replace('N', '0', str_replace('L', 'A', $objCountry->zip_code_format))));
                         if ($die) {
                             throw new PrestaShopException($message);
                         }
