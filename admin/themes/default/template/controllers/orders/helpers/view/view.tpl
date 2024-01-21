@@ -157,7 +157,8 @@
 					{/if} -->
 					<!-- End -->
 					&nbsp;
-					{if $refund_allowed && !$hasCompletelyRefunded}
+                    <!-- Check if refund is allowed and all bookings are not requested for refund -->
+					{if $refund_allowed && !$completeRefundRequestOrCancel}
 						<a id="desc-order-standard_refund" class="btn btn-default" href="#refundForm">
 							<i class="icon-exchange"></i>
 							{if $order->getTotalPaid()|floatval}
@@ -280,7 +281,7 @@
 											<th>{l s='Hotel Name'}</th>
 											<th>{l s='Duration'}</th>
 											<th>{l s='Documents'}</th>
-											<th>{l s='Order Status'}</th>
+											<th>{l s='Room Status'}</th>
 										</tr>
 										{if isset($htl_booking_order_data) && $htl_booking_order_data}
 											{foreach from=$htl_booking_order_data item=data}
@@ -307,7 +308,7 @@
                                                             <div class="col-sm-7">
                                                                 {if $data.is_refunded || $data.is_cancelled}
                                                                     {if $data['id_status'] == $hotel_order_status['STATUS_ALLOTED']['id_status']}
-                                                                        <p><span class="badge badge-infomation">{l s='Room alloted'}</span></p>
+                                                                        <p><span class="room_status badge badge-infomation">{l s='Room alloted'}</span></p>
                                                                     {/if}
                                                                 {else}
                                                                     <select name="booking_order_status" class="form-control booking_order_status margin-bottom-5">
@@ -318,9 +319,9 @@
                                                                 {/if}
 
                                                                 {if $data['id_status'] == $hotel_order_status['STATUS_CHECKED_IN']['id_status']}
-                                                                    <p><span class="badge badge-success">{l s='Checked in on'} {dateFormat date=$data['check_in']}</span></p>
+                                                                    <p><span class="room_status badge badge-success">{l s='Checked in on'} {dateFormat date=$data['check_in']}</span></p>
                                                                 {elseif $data['id_status'] == $hotel_order_status['STATUS_CHECKED_OUT']['id_status']}
-                                                                    <p><span class="badge badge-success">{l s='Checked out on'} {dateFormat date=$data['check_out']}</span></p>
+                                                                    <p><span class="room_status badge badge-success">{l s='Checked out on'} {dateFormat date=$data['check_out']}</span></p>
                                                                 {/if}
 
                                                                 {* field for the current date *}
@@ -1196,7 +1197,7 @@
 						<input type="hidden" name="TaxMethod" value="1">
 					{/if}
 					{if $can_edit}
-                        {if $refund_allowed && !$hasCompletelyRefunded}
+                        {if $refund_allowed && !$completeRefundRequestOrCancel}
                             <div class="row-margin-bottom row-margin-top standard_refund_fields"  style="display: none;">
                                 <textarea class="cancellation_reason" name="cancellation_reason" placeholder="{l s='Enter reason to cancel bookings'}"></textarea>
                             </div>
@@ -1217,7 +1218,7 @@
 								{l s='Add a new discount'}
 							</button>
 
-							{if $refund_allowed && !$hasCompletelyRefunded}
+							{if $refund_allowed && !$completeRefundRequestOrCancel}
 								<div class="pull-right">
 									<button style="display: none;" type="button" class="btn btn-default standard_refund_fields" id="cancelRefund">
 										{l s='Cancel'}

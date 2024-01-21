@@ -244,6 +244,7 @@ class OrderDetailControllerCore extends FrontController
                     }
                     $res = true;
                     if (!$hasError) {
+                        $hasCancelled = 0;
                         // if amount paid is > 0 then create refund request else cancel the booking directly
                         if ($order->getTotalPaid() > 0) {
                             $objOrderReturn = new OrderReturn();
@@ -272,6 +273,7 @@ class OrderDetailControllerCore extends FrontController
                             // Emails to customer, admin on refund request state change
                             $objOrderReturn->changeIdOrderReturnState(Configuration::get('PS_ORS_PENDING'));
                         } else {
+                            $hasCancelled = 1;
                             // cancel the booking directly
                             foreach ($bookingRefunds as $idHtlBooking) {
                                 $objHtlBooking = new HotelBookingDetail($idHtlBooking);
@@ -286,8 +288,8 @@ class OrderDetailControllerCore extends FrontController
                                 }
                             }
 
-                            // if all bookings are getting refunded then cancel the order also
-                            if ($order->hasCompletelyRefunded(Order::ORDER_COMPLETE_REFUND_FLAG)) {
+                            // if all bookings are getting cancelled then cancel the order also
+                            if ($order->hasCompletelyRefunded(Order::ORDER_COMPLETE_CANCELLATION_FLAG)) {
                                 $objOrderHistory = new OrderHistory();
                                 $objOrderHistory->id_order = (int)$order->id;
 
@@ -303,7 +305,7 @@ class OrderDetailControllerCore extends FrontController
                             }
                         }
 
-                        die(json_encode(array('status' => 1)));
+                        die(json_encode(array('status' => 1, 'has_cancelled' => $hasCancelled)));
                     }
 
                     die(json_encode(array('status' => 0)));
@@ -349,7 +351,6 @@ class OrderDetailControllerCore extends FrontController
                     $objRoomType = new HotelRoomType();
                     $objBookingDemand = new HotelBookingDemands();
                     $objRoomTypeServiceProductOrderDetail = new RoomTypeServiceProductOrderDetail();
-                    $nonRequestedRooms = 1;
                     $anyBackOrder = 0;
                     $processedProducts = array();
                     $cartHotelData = array();
@@ -645,7 +646,6 @@ class OrderDetailControllerCore extends FrontController
                             'order_has_invoice' => $order->hasInvoice(),
                             'cart_htl_data' => $cartHotelData,
                             'cart_service_products' => $cartServiceProducts,
-                            'non_requested_rooms' => $nonRequestedRooms,
                         )
                     );
                 // }
@@ -662,7 +662,7 @@ class OrderDetailControllerCore extends FrontController
                         'refund_allowed' => (int) $order->isReturnable(),
                         'returns' => OrderReturn::getOrdersReturn($order->id_customer, $order->id),
                         'refundReqBookings' => $refundReqBookings,
-                        'hasCompletelyRefunded' => $order->hasCompletelyRefunded(),
+                        'completeRefundRequestOrCancel' => $order->hasCompletelyRefunded(Order::ORDER_COMPLETE_CANCELLATION_OR_REFUND_REQUEST_FLAG),
                         'refundedAmount' => $refundedAmount,
                         'shop_name' => strval(Configuration::get('PS_SHOP_NAME')),
                         'order' => $order,

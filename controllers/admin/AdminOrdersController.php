@@ -956,8 +956,8 @@ class AdminOrdersControllerCore extends AdminController
                             }
                         }
 
-                        // if all bookings are getting refunded then cancel the order also
-                        if ($order->hasCompletelyRefunded(Order::ORDER_COMPLETE_REFUND_FLAG)) {
+                        // if all bookings are getting cancelled then cancel the order also
+                        if ($order->hasCompletelyRefunded(Order::ORDER_COMPLETE_CANCELLATION_FLAG)) {
                             $objOrderHistory = new OrderHistory();
                             $objOrderHistory->id_order = (int)$order->id;
 
@@ -1862,7 +1862,7 @@ class AdminOrdersControllerCore extends AdminController
             'applicable_refund_policies' => $applicableRefundPolicies,
             'returns' => OrderReturn::getOrdersReturn($order->id_customer, $order->id),
             'refundReqBookings' => $refundReqBookings,
-            'hasCompletelyRefunded' => $order->hasCompletelyRefunded(),
+            'completeRefundRequestOrCancel' => $order->hasCompletelyRefunded(Order::ORDER_COMPLETE_CANCELLATION_OR_REFUND_REQUEST_FLAG),
             'allBookingsRefunded' => $order->hasCompletelyRefunded(Order::ORDER_COMPLETE_REFUND_FLAG),
             'allBookingsCancelled' => $order->hasCompletelyRefunded(Order::ORDER_COMPLETE_CANCELLATION_FLAG),
             'refundedAmount' => $refundedAmount,

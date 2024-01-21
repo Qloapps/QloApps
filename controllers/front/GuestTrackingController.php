@@ -205,7 +205,6 @@ class GuestTrackingControllerCore extends FrontController
             $objRoomTypeServiceProductOrderDetail = new RoomTypeServiceProductOrderDetail();
             $objRoomType = new HotelRoomType();
 
-            $nonRequestedRooms = 0;
             $anyBackOrder = 0;
             $processedProducts = array();
             $cartHotelData = array();
@@ -566,7 +565,6 @@ class GuestTrackingControllerCore extends FrontController
                     'back_ord_msg' => Configuration::get('WK_BO_MESSAGE'),
                     'order_has_invoice' => $order->hasInvoice(),
                     'cart_htl_data' => $cartHotelData,
-                    'non_requested_rooms' => $nonRequestedRooms,
                     'customerGuestDetail' => $customerGuestDetail,
                 )
             );

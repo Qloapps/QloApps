@@ -26,7 +26,7 @@
 <tr class="product-line-row" data-id_htl_booking="{$data.id|escape:'html':'UTF-8'}" data-id_room="{$data.id_room}" data-id_product="{$data.id_product}" data-id_hotel="{$data.id_hotel}" data-date_from="{$data.date_from}" data-date_to="{$data.date_to}" data-product_price="{$data.unit_amt_tax_incl}" data-id_order_detail="{$data.id_order_detail}">
 	{if $refund_allowed}
 		<td class="standard_refund_fields" style="display:none">
-			<input type="checkbox" name="id_htl_booking[]" value="{$data.id|escape:'html':'UTF-8'}" {if isset($refundReqBookings) && ($data.id|in_array:$refundReqBookings)}disabled{/if}/>
+			<input type="checkbox" name="id_htl_booking[]" value="{$data.id|escape:'html':'UTF-8'}" {if (isset($refundReqBookings) && ($data.id|in_array:$refundReqBookings)) || $data.is_refunded}disabled{/if}/>
 		</td>
 	{/if}
 	<td class="text-center">

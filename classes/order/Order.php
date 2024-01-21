@@ -36,6 +36,7 @@ class OrderCore extends ObjectModel
 
     const ORDER_COMPLETE_REFUND_FLAG = 1;
     const ORDER_COMPLETE_CANCELLATION_FLAG = 2;
+    const ORDER_COMPLETE_CANCELLATION_OR_REFUND_REQUEST_FLAG = 3;
 
     /** @var int Delivery address id */
     public $id_address_delivery;
@@ -2604,8 +2605,10 @@ class OrderCore extends ObjectModel
 
     /**
      * Function to check if order has been completely refunded
-     * @param integer action: Order::ORDER_COMPLETE_REFUND_FLAG for complete refunded and
-     * Order::ORDER_COMPLETE_CANCELLATION_FLAG for completely cancelled
+     * @param integer action: can have 3 values as below
+     * Order::ORDER_COMPLETE_REFUND_FLAG for complete refunded and
+     * Order::ORDER_COMPLETE_CANCELLATION_FLAG for completely cancelled and
+     * Order::ORDER_COMPLETE_CANCELLATION_OR_REFUND_REQUEST_FLAG for all rooms are either cancelled or requested for refunded
      * @return boolean: true if order has been completely refunded as per requested parameters or false
      */
     public function hasCompletelyRefunded($action = 0)
@@ -2629,6 +2632,16 @@ class OrderCore extends ObjectModel
                 if (count($uniqueRefundedBookings) == 1 && $uniqueRefundedBookings[0] == 1) {
                     return true;
                 }
+            // If action is Order::ORDER_COMPLETE_CANCELLATION_OR_REFUND_REQUEST_FLAG (for cancelled and refund requests) then we will check that all rooms are either cancelled or requested for refund
+            } elseif ($action == Order::ORDER_COMPLETE_CANCELLATION_OR_REFUND_REQUEST_FLAG) {
+                foreach ($orderBookings as $booking) {
+                    if (!$booking['is_refunded']) {
+                        if (!OrderReturn::getOrdersReturnDetail($this->id, 0, $booking['id'])) {
+                            return false;
+                        }
+                    }
+                }
+                return true;
             // Default process to check if order is fully refunded or cancelled or not
             } else {
                 // if is_refunded is 1 means booking either is cancelled or refunded. So check all bookings must have is_refunded = 1

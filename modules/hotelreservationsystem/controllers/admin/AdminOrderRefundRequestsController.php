@@ -359,7 +359,7 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
                             'total_products_tax_incl' => 0,
                         );
 
-                        $objHtlBooking = new HotelBooking($idHtlBooking);
+                        $objHtlBooking = new HotelBookingDetail($idHtlBooking);
                         // perform booking refund processes in the booking tables
                         $objHtlBooking->processRefundInBookingTables();
 
