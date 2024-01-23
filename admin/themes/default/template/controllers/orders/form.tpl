@@ -359,7 +359,8 @@
 					if (data.result)
 					{
 						$('#cart_detail_form').show();//line added by webkul
-						$('#payment_module_name').replaceWith(data.view)
+						$('#payment_method_options').replaceWith(data.view)
+						$('#payment_module_name_display').val('')
 					}
 				}
 			});
@@ -1586,10 +1587,28 @@
 			}
 		});
 
-		$(document).on('change', '#payment_module_name', function() {
-			let paymentType = $(this).find(':selected').attr('data-payment-type');
-			if ($('select#payment_type option[value="' + paymentType + '"]').length) {
-				$('#payment_type').val(paymentType);
+		$(document).on('keyup', '#payment_module_name_display', function() {
+			let paymentMethod = $('#payment_module_name_display').val().trim().toLowerCase();
+
+			let selectedMethod;
+			$('#payment_module_name_list option').each(function (index, element) {
+				if ($(element).attr('data-name').toLowerCase() == paymentMethod
+					|| $(element).val().toLowerCase() == paymentMethod
+				) {
+					selectedMethod = element;
+				}
+			});
+
+			if ($(selectedMethod).length) {
+				$('#payment_module_name').val($(selectedMethod).attr('data-name'));
+
+				// set Payment source
+				let paymentType = $(selectedMethod).attr('data-payment-type');
+				if ($('select#payment_type option[value="' + paymentType + '"]').length) {
+					$('#payment_type').val(paymentType);
+				}
+			} else {
+				$('#payment_module_name').val($('#payment_module_name_display').val());
 			}
 		});
 
@@ -1723,7 +1742,7 @@
 		</div> -->*}<!-- by webkul to hide unnessesary content -->
 	</div>
 
-<form class="form-horizontal" action="{$link->getAdminLink('AdminOrders')|escape:'html':'UTF-8'}&amp;submitAdd{$table|escape:'html':'UTF-8'}=1" method="post" autocomplete="off" style="display:none" id="cart_detail_form">
+<form class="form-horizontal" action="{$link->getAdminLink('AdminOrders')|escape:'html':'UTF-8'}&amp;submitAdd{$table|escape:'html':'UTF-8'}=1" method="post" style="display:none" id="cart_detail_form">
 	<div class="panel" id="products_part" style="display:none;">
 		<div class="panel-heading">
 			<i class="icon-shopping-cart"></i>
@@ -2095,17 +2114,18 @@
 					{/if}
 				</div>
 				<div class="form-group">
-					<label class="control-label col-lg-3">{l s='Payment method'}</label>
+					<label class="control-label col-lg-3 required">{l s='Payment method'}</label>
 					<div class="col-lg-9">
-						<select class="fixed-width-xxl" name="payment_module_name" id="payment_module_name">
-							{if !$PS_CATALOG_MODE}
-							{foreach from=$payment_modules item='module'}
-								<option value="{$module->name}" data-payment-type="{$module->payment_type}" {if isset($smarty.post.payment_module_name) && $module->name == $smarty.post.payment_module_name}selected="selected"{/if}>{$module->displayName}</option>
-							{/foreach}
-							{else}
-								<option value="boorder">{l s='Back office order'}</option>
+						<input name="payment_module_name_display" id="payment_module_name_display" list="payment_module_name_list" class="form-control fixed-width-xxl" {if isset($smarty.post.payment_module_name_display) && $smarty.post.payment_module_name_display}value="{$smarty.post.payment_module_name_display}"{/if}>
+						<input type="hidden" name="payment_module_name" id="payment_module_name" {if isset($smarty.post.payment_module_name) && $smarty.post.payment_module_name}value="{$smarty.post.payment_module_name}"{/if}>
+						<datalist id="payment_module_name_list">
+							{if $PS_CATALOG_MODE}
+								<option value="{l s='Back office order'}" data-name="{l s='Back office order'}" data-payment-type="{OrderPayment::PAYMENT_TYPE_PAY_AT_HOTEL}">
 							{/if}
-						</select>
+							{foreach from=$payment_modules item=payment_module}
+								<option value="{$payment_module->displayName}" data-name="{$payment_module->name}" data-payment-type="{$payment_module->payment_type}">
+							{/foreach}
+						</datalist>
 					</div>
 				</div>
 				<div class="form-group">

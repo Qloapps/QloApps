@@ -954,13 +954,21 @@ class AdminOrdersControllerCore extends AdminController
             } else {
                 $this->errors[] = Tools::displayError('The invoice for edit note was unable to load. ');
             }
-        } elseif (Tools::isSubmit('submitAddOrder') && ($id_cart = Tools::getValue('id_cart')) &&
-            ($module_name = Tools::getValue('payment_module_name')) &&
-            ($id_order_state = Tools::getValue('id_order_state')) && Validate::isModuleName($module_name)) {
+        } elseif (Tools::isSubmit('submitAddOrder')
+            && ($id_cart = Tools::getValue('id_cart'))
+            && ($id_order_state = Tools::getValue('id_order_state'))
+        ) {
             if ($this->tabAccess['edit'] === '1') {
+                $moduleName = trim(Tools::getValue('payment_module_name'));
                 $paymentType = Tools::getValue('payment_type');
                 $paymentTransactionId = trim(Tools::getValue('payment_transaction_id'));
-                $paymentAmount = Tools::getValue('payment_amount');
+                $paymentAmount = trim(Tools::getValue('payment_amount'));
+
+                if (!$moduleName) {
+                    $this->errors[] = Tools::displayError('Please enter Payment method.');
+                } elseif ($moduleName && !((Validate::isModuleName($moduleName) && ($paymentModuleInstance = Module::getInstanceByName($moduleName))) || Validate::isGenericName($moduleName))) {
+                    $this->errors[] = Tools::displayError('Payment method is invalid. Please enter a valid payment method.');
+                }
 
                 if (!$paymentType) {
                     $this->errors[] = Tools::displayError('Please select a Payment source.');
@@ -977,10 +985,11 @@ class AdminOrdersControllerCore extends AdminController
                 }
 
                 if (!count($this->errors)) {
-                    if (!Configuration::get('PS_CATALOG_MODE')) {
-                        $payment_module = Module::getInstanceByName($module_name);
+                    if ($paymentModuleInstance) {
+                        $payment_module = $paymentModuleInstance;
                     } else {
                         $payment_module = new BoOrder();
+                        $payment_module->displayName = $moduleName;
                     }
 
                     $payment_module->payment_type = $paymentType;
@@ -4680,6 +4689,7 @@ class AdminOrdersControllerCore extends AdminController
         }
 
         $this->context->smarty->assign(array(
+            'PS_CATALOG_MODE' => Configuration::get('PS_CATALOG_MODE'),
             'payment_modules' => $payment_modules,
         ));
 
