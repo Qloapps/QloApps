@@ -60,6 +60,9 @@ class AdminReferrersControllerCore extends AdminController
 {
     public function __construct()
     {
+        // redirect to Dashboard for stats related to Referers
+        Tools::redirectAdmin(Context::getContext()->link->getAdminLink('AdminDashboard'));
+
         $this->bootstrap = true;
         $this->table = 'referrer';
         $this->className = 'Referrer';
