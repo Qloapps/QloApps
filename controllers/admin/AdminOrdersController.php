@@ -77,15 +77,14 @@ class AdminOrdersControllerCore extends AdminController
             IF(SUM(hbd.`children`), CONCAT(SUM(hbd.`children`), \' '.$this->l('Children').'\'), \'\')
         ) FROM `'._DB_PREFIX_.'htl_booking_detail` hbd WHERE hbd.`id_order` = a.`id_order`) as total_guests,
         (SELECT SUM(DATEDIFF(hbd.`date_to`, hbd.`date_from`)) FROM `'._DB_PREFIX_.'htl_booking_detail` hbd WHERE hbd.`id_order` = a.`id_order`) as los,
-        hri.`id` AS id_room_information';
+        hbd.`id_room` AS id_room_information';
 
         $this->_join = '
         LEFT JOIN `'._DB_PREFIX_.'customer` c ON (c.`id_customer` = a.`id_customer`)
         LEFT JOIN `'._DB_PREFIX_.'order_state` os ON (os.`id_order_state` = a.`current_state`)
         LEFT JOIN `'._DB_PREFIX_.'order_state_lang` osl ON (os.`id_order_state` = osl.`id_order_state` AND osl.`id_lang` = '.(int) $this->context->language->id.')
         LEFT JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd ON (hbd.`id_order` = a.`id_order`)
-        LEFT JOIN `'._DB_PREFIX_.'htl_branch_info_lang` hbil ON (hbil.`id` = hbd.`id_hotel`)
-        LEFT JOIN `'._DB_PREFIX_.'htl_room_information` hri ON (hri.`id_hotel` = hbd.`id_hotel`)';
+        LEFT JOIN `'._DB_PREFIX_.'htl_branch_info_lang` hbil ON (hbil.`id` = hbd.`id_hotel`)';
 
         $this->_orderBy = 'id_order';
         $this->_orderWay = 'DESC';
@@ -161,7 +160,7 @@ class AdminOrdersControllerCore extends AdminController
             'id_room_information' => array(
                 'title' => $this->l('Rooms'),
                 'type' => 'select',
-                'filter_key' => 'hri!id',
+                'filter_key' => 'hbd!id_room',
                 'list' => $this->roomsArray,
                 'optional' => true,
                 'class' => 'chosen',
