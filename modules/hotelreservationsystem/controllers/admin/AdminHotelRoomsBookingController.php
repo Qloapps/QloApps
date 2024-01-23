@@ -29,6 +29,15 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
         $this->context = Context::getContext();
 
         parent::__construct();
+
+        $objHotelBranchInformation = new HotelBranchInformation();
+        $hotelBranchesInfo = $objHotelBranchInformation->hotelBranchesInfo(false, 1);
+        // filter hotels as per accessed hotels
+        $hotelBranchesInfo = HotelBranchInformation::filterDataByHotelAccess($hotelBranchesInfo, $this->context->employee->id_profile, 1);
+
+        if ($hotelBranchesInfo) {
+            $this->initCart();
+        }
     }
 
     public function initCart()
@@ -82,24 +91,14 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
         return $objCart;
     }
 
-    public function initProcess()
-    {
-        parent::initProcess();
-
-        $objHotelBranchInformation = new HotelBranchInformation();
-        $activeHotels = $objHotelBranchInformation->getAllHotels(true);
-
-        if ($activeHotels) {
-            $this->initCart();
-        }
-    }
-
     public function postProcess()
     {
         $objHotelBranchInformation = new HotelBranchInformation();
-        $activeHotels = $objHotelBranchInformation->getAllHotels(true);
+        $hotelBranchesInfo = $objHotelBranchInformation->hotelBranchesInfo(false, 1);
+        // filter hotels as per accessed hotels
+        $hotelBranchesInfo = HotelBranchInformation::filterDataByHotelAccess($hotelBranchesInfo, $this->context->employee->id_profile, 1);
 
-        if ($activeHotels) {
+        if ($hotelBranchesInfo) {
             if (Tools::getValue('date_from')) {
                 $date_from = Tools::getValue('date_from');
             } else {
@@ -292,14 +291,15 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
     public function renderView()
     {
         $objHotelBranchInformation = new HotelBranchInformation();
-        $activeHotels = $objHotelBranchInformation->getAllHotels(true);
+        $hotelBranchesInfo = $objHotelBranchInformation->hotelBranchesInfo(false, 1);
+        // filter hotels as per accessed hotels
+        $hotelBranchesInfo = HotelBranchInformation::filterDataByHotelAccess($hotelBranchesInfo, $this->context->employee->id_profile, 1);
 
-        $this->tpl_view_vars['has_active_hotels'] = $activeHotels;
-        if ($activeHotels) {
+        if ($hotelBranchesInfo) {
             $this->tpl_view_vars['id_cart'] = $this->context->cart->id;
             $this->tpl_view_vars['id_guest'] = $this->context->cookie->id_guest;
             $this->initSearchFormData();
-            if (count($this->tpl_view_vars['hotel_list'])) {
+            if (count($hotelBranchesInfo)) {
                 if ($this->booking_product) {
                     $this->assignRoomBookingForm();
                 } else {

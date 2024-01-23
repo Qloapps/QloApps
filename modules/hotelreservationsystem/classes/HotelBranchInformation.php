@@ -569,11 +569,9 @@ class HotelBranchInformation extends ObjectModel
 
         return Db::getInstance()->executeS($sql);
     }
-    public function getAllHotels($activeOnly = false)
+    public function getAllHotels()
     {
-        return Db::getInstance()->executeS(
-            'SELECT * FROM `'._DB_PREFIX_.'htl_branch_info` hbi'.($activeOnly ? ' WHERE hbi.`active` = 1' : '')
-        );
+        return Db::getInstance()->executeS('SELECT * FROM `'._DB_PREFIX_.'htl_branch_info`');
     }
 
     //Overrided ObjectModet::update() to update all the dependencies of the hotel
