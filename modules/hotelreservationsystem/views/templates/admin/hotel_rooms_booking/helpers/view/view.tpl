@@ -205,9 +205,16 @@
 			{/if}
 		{/if}
 	{else}
-		<p class="alert alert-warning">
-			{l s='No rooms are currently available for booking.'}
-		</p>
+		<div class="panel">
+			<div class="panel-heading">
+				<i class="icon-warning"></i> {l s='No Hotels'}
+			</div>
+
+			<div class="alert alert-warning">
+				<p>{l s='No active hotels available for booking.'}</p>
+				<p>{l s='You can manage hotels from '} <a href="{$link->getAdminLink('AdminAddHotel')}">{l s='Hotel Reservation System > Manage Hotel'}</a> {l s='page.'}</p>
+			</div>
+		</div>
 	{/if}
 </div>
 
