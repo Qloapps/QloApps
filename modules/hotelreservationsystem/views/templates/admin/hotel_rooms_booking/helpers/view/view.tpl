@@ -1,5 +1,5 @@
 <div class="row">
-	{if $hotel_list|count > 0}
+	{if isset($hotel_list) && is_array($hotel_list) && count($hotel_list)}
 		<div class="col-sm-4">
 			<div class="panel">
 				<div class="panel-heading">
