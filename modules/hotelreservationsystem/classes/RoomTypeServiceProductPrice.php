@@ -68,10 +68,11 @@ class RoomTypeServiceProductPrice extends ObjectModel
         if ($result = Db::getInstance()->getRow('
             SELECT spp.`price`, spp.`id_tax_rules_group`, p.`auto_add_to_cart`, p.`price_addition_type`
             FROM `'._DB_PREFIX_.'product` p
+            LEFT JOIN `'._DB_PREFIX_.'htl_room_type_service_product` sp ON (sp.`id_product` = p.`id_product`)
             LEFT JOIN `'._DB_PREFIX_.'htl_room_type_service_product_price` spp ON (spp.`id_product` = p.`id_product`)
             WHERE p.`id_product`='.(int)$idProduct.
-            ' AND spp.`id_element`='.(int)$idElement.
-            ' AND spp.`element_type`='.(int)$elementType)
+            ' AND sp.`id_element`='.(int)$idElement.
+            ' AND sp.`element_type`='.(int)$elementType)
         ) {
             if ($result['auto_add_to_cart'] && $result['price_addition_type'] == Product::PRICE_ADDITION_TYPE_WITH_ROOM) {
                 // if service is auto add to cart and added in room price, we need to find room type tax rule group
