@@ -528,14 +528,16 @@ class CustomerCore extends ObjectModel
      * @return array|false|mysqli_result|null|PDOStatement|resource Corresponding customers
      * @throws PrestaShopDatabaseException
      */
-    public static function searchByName($query, $limit = null)
+    public static function searchByName($query, $limit = null, $skip_deleted = false)
     {
         $sql_base = 'SELECT *
-				FROM `'._DB_PREFIX_.'customer`';
-        $sql = '('.$sql_base.' WHERE `email` LIKE \'%'.pSQL($query).'%\' '.Shop::addSqlRestriction(Shop::SHARE_CUSTOMER).')';
-        $sql .= ' UNION ('.$sql_base.' WHERE `id_customer` = '.(int)$query.' '.Shop::addSqlRestriction(Shop::SHARE_CUSTOMER).')';
-        $sql .= ' UNION ('.$sql_base.' WHERE `lastname` LIKE \'%'.pSQL($query).'%\' '.Shop::addSqlRestriction(Shop::SHARE_CUSTOMER).')';
-        $sql .= ' UNION ('.$sql_base.' WHERE `firstname` LIKE \'%'.pSQL($query).'%\' '.Shop::addSqlRestriction(Shop::SHARE_CUSTOMER).')';
+        FROM `'._DB_PREFIX_.'customer`';
+        $where_deleted = $skip_deleted ? ' AND `deleted` = 0' : '';
+
+        $sql = '('.$sql_base.' WHERE `email` LIKE \'%'.pSQL($query).'%\' '.$where_deleted.Shop::addSqlRestriction(Shop::SHARE_CUSTOMER).')';
+        $sql .= ' UNION ('.$sql_base.' WHERE `id_customer` = '.(int)$query.' '.$where_deleted.Shop::addSqlRestriction(Shop::SHARE_CUSTOMER).')';
+        $sql .= ' UNION ('.$sql_base.' WHERE `lastname` LIKE \'%'.pSQL($query).'%\' '.$where_deleted.Shop::addSqlRestriction(Shop::SHARE_CUSTOMER).')';
+        $sql .= ' UNION ('.$sql_base.' WHERE `firstname` LIKE \'%'.pSQL($query).'%\' '.$where_deleted.Shop::addSqlRestriction(Shop::SHARE_CUSTOMER).')';
 
         if ($limit) {
             $sql .= ' LIMIT 0, '.(int)$limit;

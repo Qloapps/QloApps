@@ -810,7 +810,9 @@
 				ajax: "1",
 				tab: "AdminCustomers",
 				action: "searchCustomers",
-				customer_search: $('#customer').val()},
+				customer_search: $('#customer').val(),
+				skip_deleted: "1",
+			},
 			success : function(res)
 			{
 				if(res.found)
