@@ -102,6 +102,7 @@ class AuthControllerCore extends FrontController
 
         $newsletter = Configuration::get('PS_CUSTOMER_NWSL') || (Module::isInstalled('blocknewsletter') && Module::getInstanceByName('blocknewsletter')->active);
 
+        $this->context->smarty->assign('birthday', (bool) Configuration::get('PS_CUSTOMER_BIRTHDATE'));
         $this->context->smarty->assign('newsletter', $newsletter);
         $this->context->smarty->assign('optin', (bool)Configuration::get('PS_CUSTOMER_OPTIN'));
 
@@ -466,9 +467,11 @@ class AuthControllerCore extends FrontController
                     $this->processCustomerNewsletter($customer);
 
                     $customer->firstname = Tools::ucwords($customer->firstname);
-                    $customer->birthday = (empty($_POST['years']) ? '' : (int)Tools::getValue('years').'-'.(int)Tools::getValue('months').'-'.(int)Tools::getValue('days'));
-                    if (!Validate::isBirthDate($customer->birthday)) {
-                        $this->errors[] = Tools::displayError('Invalid date of birth.');
+                    if (Configuration::get('PS_CUSTOMER_BIRTHDATE')) {
+                        $customer->birthday = (empty($_POST['years']) ? '' : (int)Tools::getValue('years').'-'.(int)Tools::getValue('months').'-'.(int)Tools::getValue('days'));
+                        if (!Validate::isBirthDate($customer->birthday)) {
+                            $this->errors[] = Tools::displayError('Invalid date of birth.');
+                        }
                     }
 
                     // New Guest customer
@@ -605,9 +608,11 @@ class AuthControllerCore extends FrontController
 
                 $this->processCustomerNewsletter($customer);
 
-                $customer->birthday = (empty($_POST['years']) ? '' : (int)Tools::getValue('years').'-'.(int)Tools::getValue('months').'-'.(int)Tools::getValue('days'));
-                if (!Validate::isBirthDate($customer->birthday)) {
-                    $this->errors[] = Tools::displayError('Invalid date of birth');
+                if (Configuration::get('PS_CUSTOMER_BIRTHDATE')) {
+                    $customer->birthday = (empty($_POST['years']) ? '' : (int)Tools::getValue('years').'-'.(int)Tools::getValue('months').'-'.(int)Tools::getValue('days'));
+                    if (!Validate::isBirthDate($customer->birthday)) {
+                        $this->errors[] = Tools::displayError('Invalid date of birth');
+                    }
                 }
 
                 if (!count($this->errors)) {
