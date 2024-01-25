@@ -98,6 +98,7 @@
 					selectFirst: false,
 					scroll: false,
 					dataType: "json",
+					cacheLength: 0,
 					formatItem: function(data, i, max, value, term) {
 						return value;
 					},
@@ -115,7 +116,8 @@
 						ajax: "1",
 						token: "{getAdminToken tab='AdminCartRules'}",
 						tab: "AdminCartRules",
-						action: "searchCartRuleVouchers"
+						action: "searchCartRuleVouchers",
+						id_customer: function () { return window.id_customer },
 					}
 				}
 			)
