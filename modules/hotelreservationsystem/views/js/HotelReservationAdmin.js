@@ -860,6 +860,13 @@ function showLangField(select_lang_name, id_lang)
 
     $('.all_lang_icon').attr('src', img_dir_l+id_lang+'.jpg');
     $('#choosedLangId').val(id_lang);
+
+    var id_old_language = id_language;
+    id_language = id_lang;
+
+    if (id_old_language != id_lang) {
+        changeEmployeeLanguage();
+    }
 }
 
 /* ----  HotelConfigurationSettingController Admin ---- */
