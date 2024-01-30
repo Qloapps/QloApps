@@ -78,9 +78,9 @@
 												{/if}
 												<div class="cart-info-sec rm_product_info_{$product.id_product}">
 													<span class="product_info_label">{l s='Price' mod='blockcart'}:</span>
-													<span class="price product_info_data" ttl_prod_price={if $priceDisplay == $smarty.const.PS_TAX_EXC}{$product.total}{else}{$product.total_wt}{/if}>
+													<span class="price product_info_data" ttl_prod_price="{$product.bookingData.total_room_type_amount}">
 														{if !isset($product.is_gift) || !$product.is_gift}
-															{if $priceDisplay == $smarty.const.PS_TAX_EXC}{displayWtPrice p="`$product.total`"}{else}{displayWtPrice p="`$product.total_wt`"}{/if}
+															{displayWtPrice p="`$product.bookingData.total_room_type_amount`"}
 															<div id="hookDisplayProductPriceBlock-price">
 																{hook h="displayProductPriceBlock" product=$product type="price" from="blockcart"}
 															</div>
