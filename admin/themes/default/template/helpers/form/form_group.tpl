@@ -34,7 +34,11 @@
 							<input type="checkbox" name="checkme" id="checkme" onclick="checkDelBoxes(this.form, '{$input['name']}[]', this.checked)" />
 						</span>
 					</th>
-					<th class="fixed-width-xs"><span class="title_box">{l s='ID'}</span></th>
+					<th class="fixed-width-xs">
+						<span class="title_box">
+							{if isset($input['groups_id_title']) && $input['groups_id_title']}{$input['groups_id_title']}{else}{l s='ID'}{/if}
+						</span>
+					</th>
 					<th>
 						<span class="title_box">
 							{if isset($input['groups_title']) && $input['groups_title']}{$input['groups_title']}{else}{l s='Group name'}{/if}
