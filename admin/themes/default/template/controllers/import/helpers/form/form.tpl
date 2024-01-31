@@ -171,12 +171,12 @@
 					</div>
 				</div>
 				<div class="form-group" id="csv_file_selected" style="display: none;">
-					<div class="alert alert-success clearfix">
+					<div class="alert alert-success clearfix" style="display:flex; align-items:center;">
 						<input type="hidden" value="{$csv_selected}" name="csv" id="csv_selected_value" />
-						<div class="col-lg-8">
+						<div class="col-xs-8">
 							<span id="csv_selected_filename">{$csv_selected|escape:'html':'UTF-8'}</span>
 						</div>
-						<div class="col-lg-4">
+						<div class="col-xs-4">
 							<div class="btn-group pull-right">
 								<button id="file-remove-button" type="button" class="btn btn-default">
 									<i class="icon-refresh"></i>
@@ -339,7 +339,7 @@
 					{l s='Sample Customers file'}
 				</a>
 				<a class="list-group-item _blank" href="../docs/csv_import/bookings_import.csv">
-					{l s='Sample Orders file'}
+					{l s='Sample Bookings file'}
 				</a>
 				{* <a class="list-group-item _blank" href="../docs/csv_import/addresses_import.csv">
 					{l s='Sample Addresses file'}

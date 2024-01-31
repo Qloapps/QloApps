@@ -430,6 +430,7 @@ abstract class PaymentModuleCore extends Module
                     if ($order_status->logable
                         && number_format($cart_total_paid, _PS_PRICE_COMPUTE_PRECISION_) != number_format($amount_paid, _PS_PRICE_COMPUTE_PRECISION_)
                         && $this->name != 'wsorder'
+                        && $this->name != 'csvbooking'
                     ) {
                         // if customer is paying full payment amount
                         $id_order_state = Configuration::get('PS_OS_ERROR');
