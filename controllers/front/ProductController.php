@@ -327,10 +327,16 @@ class ProductControllerCore extends FrontController
 
                     if (!($date_from = Tools::getValue('date_from'))) {
                         $date_from = date('Y-m-d');
-                        $date_to = date('Y-m-d', strtotime('+1 day', strtotime($date_from)));
+                        // set date to according to los
+                        $objHotelRoomTypeRestrictionDateRange = new HotelRoomTypeRestrictionDateRange();
+                        $los = $objHotelRoomTypeRestrictionDateRange->getRoomTypeLengthOfStay($this->product->id, $date_from);
+                        $date_to = date('Y-m-d', strtotime('+'.$los['min_los'].' day', strtotime($date_from)));
                     }
                     if (!($date_to = Tools::getValue('date_to'))) {
-                        $date_to = date('Y-m-d', strtotime('+1 day', strtotime($date_from)));
+                        // set date to according to los
+                        $objHotelRoomTypeRestrictionDateRange = new HotelRoomTypeRestrictionDateRange();
+                        $los = $objHotelRoomTypeRestrictionDateRange->getRoomTypeLengthOfStay($this->product->id, $date_from);
+                        $date_to = date('Y-m-d', strtotime('+'.$los['min_los'].' day', strtotime($date_from)));
                     }
 
                     $hotel_branch_obj = new HotelBranchInformation($hotel_id);

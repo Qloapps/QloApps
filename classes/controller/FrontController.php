@@ -795,6 +795,9 @@ class FrontControllerCore extends Controller
                         'HOOK_MAINTENANCE' => Hook::exec('displayMaintenance', array()),
                         'allowEmployee' => Configuration::get('PS_ALLOW_EMP'),
                         'maintenance' => $this->context->link->getAdminLink('AdminMaintenance', false),
+                        'languages' => Language::getLanguages(true, $this->context->shop->id),
+                        'lang_iso' => $this->context->language->iso_code,
+                        'link' => $this->context->link,
                     ));
                     // If the controller is a module, then getTemplatePath will try to find the template in the modules, so we need to instanciate a real frontcontroller
                     $front_controller = preg_match('/ModuleFrontController$/', get_class($this)) ? new FrontController() : $this;

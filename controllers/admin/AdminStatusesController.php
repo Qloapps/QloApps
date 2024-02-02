@@ -99,16 +99,6 @@ class AdminStatusesControllerCore extends AdminController
                 'orderby' => false,
                 'class' => 'fixed-width-sm'
             ),
-            'delivery' => array(
-                'title' => $this->l('Delivery'),
-                'align' => 'text-center',
-                'active' => 'delivery',
-                'type' => 'bool',
-                'ajax' => true,
-                'orderby' => false,
-                'class' => 'fixed-width-sm'
-            )
-            ,
             'invoice' => array(
                 'title' => $this->l('Invoice'),
                 'align' => 'text-center',
@@ -412,28 +402,28 @@ class AdminStatusesControllerCore extends AdminController
                             'name' => 'name'
                         ),
                     ),
-                    array(
-                        'type' => 'checkbox',
-                        'name' => 'pdf_delivery',
-                        'values' => array(
-                            'query' => array(
-                                array('id' => 'on',  'name' => $this->l('Attach delivery slip PDF to email.'), 'val' => '1'),
-                                ),
-                            'id' => 'id',
-                            'name' => 'name'
-                        ),
-                    ),
-                    array(
-                        'type' => 'checkbox',
-                        'name' => 'shipped',
-                        'values' => array(
-                            'query' => array(
-                                array('id' => 'on',  'name' => $this->l('Set the order as shipped.'), 'val' => '1'),
-                                ),
-                            'id' => 'id',
-                            'name' => 'name'
-                        )
-                    ),
+                    // array(
+                    //     'type' => 'checkbox',
+                    //     'name' => 'pdf_delivery',
+                    //     'values' => array(
+                    //         'query' => array(
+                    //             array('id' => 'on',  'name' => $this->l('Attach delivery slip PDF to email.'), 'val' => '1'),
+                    //             ),
+                    //         'id' => 'id',
+                    //         'name' => 'name'
+                    //     ),
+                    // ),
+                    // array(
+                    //     'type' => 'checkbox',
+                    //     'name' => 'shipped',
+                    //     'values' => array(
+                    //         'query' => array(
+                    //             array('id' => 'on',  'name' => $this->l('Set the order as shipped.'), 'val' => '1'),
+                    //             ),
+                    //         'id' => 'id',
+                    //         'name' => 'name'
+                    //     )
+                    // ),
                     array(
                         'type' => 'checkbox',
                         'name' => 'paid',
@@ -445,17 +435,17 @@ class AdminStatusesControllerCore extends AdminController
                             'name' => 'name'
                         )
                     ),
-                    array(
-                        'type' => 'checkbox',
-                        'name' => 'delivery',
-                        'values' => array(
-                            'query' => array(
-                                array('id' => 'on', 'name' => $this->l('Show delivery PDF.'), 'val' => '1'),
-                                ),
-                            'id' => 'id',
-                            'name' => 'name'
-                        )
-                    ),
+                    // array(
+                    //     'type' => 'checkbox',
+                    //     'name' => 'delivery',
+                    //     'values' => array(
+                    //         'query' => array(
+                    //             array('id' => 'on', 'name' => $this->l('Show delivery PDF.'), 'val' => '1'),
+                    //             ),
+                    //         'id' => 'id',
+                    //         'name' => 'name'
+                    //     )
+                    // ),
                     array(
                         'type' => 'select_template',
                         'is_customer_template' => 1,
