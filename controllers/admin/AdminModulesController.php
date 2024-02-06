@@ -1377,14 +1377,6 @@ class AdminModulesControllerCore extends AdminController
             'modal_title' => ($this->context->mode == Context::MODE_HOST) ? $this->l('This module cannot be installed') : $this->l('Important Notice'),
             'modal_content' => $modal_content
         );
-
-        // $modal_content = $this->context->smarty->fetch('controllers/modules/modal_not_trusted_country.tpl');
-        // $this->modals[] = array(
-        //     'modal_id' => 'moduleNotTrustedCountry',
-        //     'modal_class' => 'modal-lg',
-        //     'modal_title' => $this->l('This module is Untrusted for your country'),
-        //     'modal_content' => $modal_content
-        // );
     }
 
     public function initContent()
