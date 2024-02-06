@@ -109,8 +109,8 @@ class HotelReservationSystem extends Module
     public function hookDisplayNav()
     {
         $this->smarty->assign(array(
-            'phone' => Configuration::get('QBC_PHONE'),
-            'email' => Configuration::get('QBC_EMAIL'),
+            'phone' => Configuration::get('WK_CUSTOMER_SUPPORT_PHONE_NUMBER'),
+            'email' => Configuration::get('WK_CUSTOMER_SUPPORT_EMAIL'),
         ));
 
         return $this->display(__FILE__, 'display-nav.tpl');
@@ -119,8 +119,8 @@ class HotelReservationSystem extends Module
     public function hookDisplayExternalNavigationHook()
     {
         $this->smarty->assign(array(
-            'phone' => Configuration::get('QBC_PHONE'),
-            'email' => Configuration::get('QBC_EMAIL'),
+            'phone' => Configuration::get('WK_CUSTOMER_SUPPORT_PHONE_NUMBER'),
+            'email' => Configuration::get('WK_CUSTOMER_SUPPORT_EMAIL'),
         ));
 
         return $this->display(__FILE__, 'external-navigation-hook.tpl');
@@ -131,13 +131,13 @@ class HotelReservationSystem extends Module
         $params['options']['contactdetail']['fields'] = array_merge(
             $params['options']['contactdetail']['fields'],
             array(
-                'QBC_PHONE' => array(
+                'WK_CUSTOMER_SUPPORT_PHONE_NUMBER' => array(
                     'title' => $this->l('Support Phone Number'),
                     'type' => 'text',
                     'hint' => $this->l('The phone number used for customer service. It will be shown on navigation bar.'),
                     'class' => 'fixed-width-xxl',
                 ),
-                'QBC_EMAIL' => array(
+                'WK_CUSTOMER_SUPPORT_EMAIL' => array(
                     'title' => $this->l('Support Email'),
                     'type' => 'text',
                     'hint' => $this->l('The email used for customer service. It will be shown on navigation bar.'),
@@ -149,8 +149,8 @@ class HotelReservationSystem extends Module
 
     public function hookActionAdminHotelGeneralSettingsControllerUpdate_optionsBefore()
     {
-        $phone = Tools::getValue('QBC_PHONE');
-        $email = Tools::getValue('QBC_EMAIL');
+        $phone = Tools::getValue('WK_CUSTOMER_SUPPORT_PHONE_NUMBER');
+        $email = Tools::getValue('WK_CUSTOMER_SUPPORT_EMAIL');
 
         if ($phone != '' && !Validate::isPhoneNumber($phone)) {
             $this->context->controller->errors[] = $this->l('Support Phone Number is invalid.');
@@ -161,8 +161,8 @@ class HotelReservationSystem extends Module
         }
 
         if (!count($this->context->controller->errors)) {
-            Configuration::updateValue('QBC_PHONE', $phone);
-            Configuration::updateValue('QBC_EMAIL', $email);
+            Configuration::updateValue('WK_CUSTOMER_SUPPORT_PHONE_NUMBER', $phone);
+            Configuration::updateValue('WK_CUSTOMER_SUPPORT_EMAIL', $email);
         }
     }
 
@@ -740,8 +740,8 @@ class HotelReservationSystem extends Module
             'WK_GOOGLE_ACTIVE_MAP',
             'WK_MAP_HOTEL_ACTIVE_ONLY',
             'WK_HOTEL_NAME_ENABLE',
-            'QBC_PHONE',
-            'QBC_EMAIL',
+            'WK_CUSTOMER_SUPPORT_PHONE_NUMBER',
+            'WK_CUSTOMER_SUPPORT_EMAIL',
         );
         foreach ($configKeys as $key) {
             if (!Configuration::deleteByName($key)) {
