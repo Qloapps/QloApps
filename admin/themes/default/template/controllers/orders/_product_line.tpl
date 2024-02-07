@@ -182,7 +182,7 @@
 	<td class="text-center">
 		<span class="extra_service_show">
 			{convertPriceWithCurrency price=($data['extra_demands_price_te'] + $data['additional_services_price_te'] + $data['convenience_fee_te'] + $data['additional_services_price_auto_add_te']) currency=$currency->id}
-			{if ($data['extra_demands_price_te'] + $data['additional_services_price_te'] + $data['convenience_fee_te'] + $data['additional_services_price_auto_add_te']) > 0}
+			{if $data['extra_demands']|count || $data['additional_services']|count}
 				<a href="#" data-toggle="modal" data-target="#rooms_type_extra_demands" date_from="{$data['date_from']}" date_to="{$data['date_to']}" id_product="{$data['id_product']}" id_room="{$data['id_room']}" id_order="{$order->id}" class="open_room_extra_services" id_htl_booking="{$data['id']}">
 					<i class="icon icon-lg icon-info-circle"></i>
 				</a>

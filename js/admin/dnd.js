@@ -139,7 +139,11 @@ function initTableDnD(table)
 				params['page'] = parseInt($('input[name=page]').val());
 				params['selected_pagination'] = parseInt($('input[name=selected_pagination]').val());
 
-				var data = $.tableDnD.serialize().replace(/table-/g, '');
+				if (tableId == 'tab') {
+					var data = $.tableDnD.serialize().replace(/table-tab/g, 'menu');
+				} else {
+					var data = $.tableDnD.serialize().replace(/table-/g, '');
+				}
 				if ((tableId == 'category') && (data.indexOf('_0&') != -1))
 					data += '&found_first=1';
 				$.ajax({

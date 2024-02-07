@@ -31,7 +31,7 @@ $(document).ready(function(){
             });
             var countRooms = parseInt($(booking_occupancy_wrapper).find('.occupancy_info_block').length);
             if (countRooms < $(booking_occupancy_wrapper).find('.max_avail_type_qty').val()) {
-                $(booking_occupancy_wrapper).find('.add_new_occupancy_btn').show();
+                $(booking_occupancy_wrapper).find('.add_new_occupancy_btn').removeClass('disabled');
             }
             setRoomTypeGuestOccupancy($(booking_occupancy_inner).closest('.booking_occupancy_wrapper'));
         });
@@ -264,7 +264,7 @@ $(document).ready(function(){
             // objDiv.scrollTop = objDiv.scrollHeight;
 			$(booking_occupancy_wrapper).animate({ scrollTop: $(booking_occupancy_wrapper).prop('scrollHeight') }, "slow");
             if (countRooms >= $(booking_occupancy_wrapper).find('.max_avail_type_qty').val()) {
-                $(this).hide();
+                $(this).addClass('disabled');
             }
         }
 
@@ -298,6 +298,14 @@ $(document).ready(function(){
 		element.val(elementVal);
 		$(this).closest('.rm_qty_cont').find('.qty_count > span').text(elementVal);
 		$(document).trigger( "QloApps:updateRoomQuantity", [element]);
+	});
+
+	$(document).on('hover', '.add_new_occupancy_btn', function(e) {
+		if ($(this).hasClass('disabled')) {
+			$(this).attr('title', $(this).attr('data-title-unavailable'));
+		} else {
+			$(this).attr('title', $(this).attr('data-title-available'));
+		}
 	});
 });
 

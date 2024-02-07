@@ -137,7 +137,7 @@
 				{l s='Select Hotel'}
 			</label>
 			<div class="col-sm-5">
-				<select name="id_hotel" id="hotel_place" class="form-control">
+				<select name="id_hotel" id="hotel_place" class="form-control chosen">
 					{foreach from=$htl_info item=htl_dtl}
 						<option value="{$htl_dtl['id']}" >{$htl_dtl['hotel_name']}</option>
 					{/foreach}

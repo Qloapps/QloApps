@@ -795,6 +795,9 @@ class FrontControllerCore extends Controller
                         'HOOK_MAINTENANCE' => Hook::exec('displayMaintenance', array()),
                         'allowEmployee' => Configuration::get('PS_ALLOW_EMP'),
                         'maintenance' => $this->context->link->getAdminLink('AdminMaintenance', false),
+                        'languages' => Language::getLanguages(true, $this->context->shop->id),
+                        'lang_iso' => $this->context->language->iso_code,
+                        'link' => $this->context->link,
                     ));
                     // If the controller is a module, then getTemplatePath will try to find the template in the modules, so we need to instanciate a real frontcontroller
                     $front_controller = preg_match('/ModuleFrontController$/', get_class($this)) ? new FrontController() : $this;
@@ -917,8 +920,16 @@ class FrontControllerCore extends Controller
             }
             $excluded_key = array('isolang', 'id_lang', 'controller', 'fc', 'id_product', 'id_category', 'id_manufacturer', 'id_supplier', 'id_cms');
             foreach ($_GET as $key => $value) {
-                if (!in_array($key, $excluded_key) && Validate::isUrl($key) && Validate::isUrl($value)) {
-                    $params[Tools::safeOutput($key)] = Tools::safeOutput($value);
+                if (!in_array($key, $excluded_key)) {
+                    if (is_array($value)) {
+                        if (Validate::isUrl($key)) {
+                            $params[Tools::safeOutput($key)] = $this->sanitizeQueryOutput($value);
+                        }
+                    } else {
+                        if (Validate::isUrl($key) && Validate::isUrl($value)) {
+                            $params[Tools::safeOutput($key)] = Tools::safeOutput($value);
+                        }
+                    }
                 }
             }
 
@@ -941,6 +952,24 @@ class FrontControllerCore extends Controller
             header('Cache-Control: no-cache');
             Tools::redirectLink($final_url);
         }
+    }
+
+    protected function sanitizeQueryOutput($query)
+    {
+        $params = array();
+        foreach ($query as $key => $value) {
+            if (Validate::isUrl($key)) {
+                if (is_array($value)) {
+                    $params[Tools::safeOutput($key)] = $this->sanitizeQueryOutput($value);
+                } else {
+                    if (Validate::isUrl($value)) {
+                        $params[Tools::safeOutput($key)] = Tools::safeOutput($value);
+                    }
+                }
+            }
+        }
+
+        return $params;
     }
 
     /**
