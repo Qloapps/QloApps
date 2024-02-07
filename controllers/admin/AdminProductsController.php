@@ -200,7 +200,6 @@ class AdminProductsControllerCore extends AdminController
 				LEFT JOIN `'._DB_PREFIX_.'image` i ON (i.`id_image` = image_shop.`id_image`)
 				LEFT JOIN `'._DB_PREFIX_.'product_download` pd ON (pd.`id_product` = a.`id_product` AND pd.`active` = 1)
 				LEFT JOIN `'._DB_PREFIX_.'address` aa ON (aa.`id_hotel` = hb.`id`)
-				LEFT JOIN `'._DB_PREFIX_.'htl_advance_payment` hap ON (hap.`id_product` = a.`id_product`)
 				LEFT JOIN `'._DB_PREFIX_.'feature_product` fp ON (fp.`id_product` = a.`id_product`)
 				LEFT JOIN `'._DB_PREFIX_.'htl_room_type_demand` hrtd ON (hrtd.`id_product` = a.`id_product`)
 				LEFT JOIN `'._DB_PREFIX_.'htl_room_type_service_product` hrtsp ON ((hrtsp.`element_type` = '.(int) RoomTypeServiceProduct::WK_ELEMENT_TYPE_HOTEL.' AND hrtsp.`id_element` = hrt.`id_hotel`) OR (hrtsp.`element_type` = '.(int) RoomTypeServiceProduct::WK_ELEMENT_TYPE_ROOM_TYPE.' AND hrtsp.`id_element` = a.`id_product`))';
@@ -209,7 +208,7 @@ class AdminProductsControllerCore extends AdminController
         $this->_select .= 'hrt.`adults`, hrt.`children`, hrt.`max_guests`, hb.`id` as id_hotel, aa.`city`, hbl.`hotel_name`, ';
         $this->_select .= 'shop.`name` AS `shopname`, a.`id_shop_default`, ';
         $this->_select .= $alias_image.'.`id_image` AS `id_image`, cl.`name` AS `name_category`, '.$alias.'.`price`, 0 AS `price_final`, a.`is_virtual`, pd.`nb_downloadable`, sav.`quantity` AS `sav_quantity`, '.$alias.'.`active`, IF(sav.`quantity`<=0, 1, 0) AS `badge_danger`';
-        $this->_select .= ', hap.`active` AS advance_payment';
+        $this->_select .= ', IFNULL((SELECT hap.`active` FROM `'._DB_PREFIX_.'htl_advance_payment` hap WHERE hap.`id_product` = a.`id_product`), 0) AS advance_payment';
 
         if ($join_category) {
             $this->_join .= ' INNER JOIN `'._DB_PREFIX_.'category_product` cp ON (cp.`id_product` = a.`id_product` AND cp.`id_category` = '.(int)$this->_category->id.') ';
@@ -306,17 +305,18 @@ class AdminProductsControllerCore extends AdminController
             'optional' => true,
         );
 
-        $this->fields_list['advance_payment'] = array(
-            'title' => $this->l('Advance Payment'),
-            'active' => 'advance_payment',
-            'filter_key' => 'hap!active',
-            'align' => 'text-center',
-            'type' => 'select',
-            'list' => array(1 => $this->l('Yes'), 0 => $this->l('No')),
-            'optional' => true,
-            'visible_default' => true,
-            'orderby' => false
-        );
+        if (Configuration::get('WK_ALLOW_ADVANCED_PAYMENT')) {
+            $this->fields_list['advance_payment'] = array(
+                'title' => $this->l('Advance Payment'),
+                'active' => 'advance_payment',
+                'align' => 'text-center',
+                'type' => 'bool',
+                'optional' => true,
+                'havingFilter' => true,
+                'visible_default' => true,
+                'orderby' => false,
+            );
+        }
 
         $taxRulesGroups = array();
         foreach (TaxRulesGroup::getTaxRulesGroups(true) as $taxRulesGroup) {
@@ -344,8 +344,10 @@ class AdminProductsControllerCore extends AdminController
             'displayed' => false,
         );
 
+        $objProduct = new Product();
+        $allServiceProducts = $objProduct->getServiceProducts();
         $serviceProducts = array();
-        foreach (Product::getAllServiceProducts() as $serviceProduct) {
+        foreach ($allServiceProducts as $serviceProduct) {
             $serviceProducts[$serviceProduct['id_product']] = $serviceProduct['name'];
         }
         $this->fields_list['id_service_product'] = array(
@@ -1369,6 +1371,14 @@ class AdminProductsControllerCore extends AdminController
                 $this->errors[] = Tools::displayError('You do not have permission to add this.');
             }
         }
+        // Toggle Advance Payment
+        elseif (Tools::getIsset('advance_payment'.$this->table)) {
+            if ($this->tabAccess['edit'] === '1') {
+                $this->action = 'toggleAdvancePayment';
+            } else {
+                $this->errors[] = Tools::displayError('You do not have permission to edit this.');
+            }
+        }
         // Product images management
         elseif (Tools::getValue('id_image') && Tools::getValue('ajax')) {
             if ($this->tabAccess['edit'] === '1') {
@@ -1919,6 +1929,41 @@ class AdminProductsControllerCore extends AdminController
         }
 
         return $res;
+    }
+
+    public function processToggleAdvancePayment()
+    {
+        if (Configuration::get('WK_ALLOW_ADVANCED_PAYMENT')) {
+            $this->loadObject(true);
+            if (!Validate::isLoadedObject($this->object)) {
+                return false;
+            }
+
+            if (!Product::isBookingProduct($this->object->id)) {
+                return false;
+            }
+
+            $objHotelAdvancedPayment = new HotelAdvancedPayment();
+            $roomTypeAdvancePaymentInfo = $objHotelAdvancedPayment->getIdAdvPaymentByIdProduct($this->object->id);
+            if ($roomTypeAdvancePaymentInfo) {
+                $objHotelAdvancedPayment = new HotelAdvancedPayment($roomTypeAdvancePaymentInfo['id']);
+                $objHotelAdvancedPayment->active = !$objHotelAdvancedPayment->active;
+            } else {
+                $objHotelAdvancedPayment->id_product = $this->object->id;
+                $objHotelAdvancedPayment->payment_type = '';
+                $objHotelAdvancedPayment->value = '';
+                $objHotelAdvancedPayment->id_currency = '';
+                $objHotelAdvancedPayment->tax_include = '';
+                $objHotelAdvancedPayment->calculate_from = 0;
+                $objHotelAdvancedPayment->active = 1;
+            }
+
+            if ($objHotelAdvancedPayment->save()) {
+                Tools::redirectAdmin(self::$currentIndex.'&token='.$this->token.'&conf=4');
+            } else {
+                $this->errors[] = $this->l('Something went wrong while updating Advance payment status.');
+            }
+        }
     }
 
     public function processUpdate()

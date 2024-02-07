@@ -136,6 +136,11 @@
 												</span>
 												<i class="icon-times"></i>
 											</span>
+										{else if $params.type == 'bool' && $key == 'advance_payment'}
+											<span data-filter_key="{if isset($params.filter_key)}{$params.filter_key}{else}{$key}{/if}" data-filter_type="{$params.type}">
+												{$params['title']|escape:'html':'UTF-8'}: <span class="filter_value">{if $params['value'] == 1}{l s='Yes'}{elseif $params['value'] == 0}{l s='No'}{/if}</span>
+												<i class="icon-times"></i>
+											</span>
 										{else}
 											<span data-filter_key="{if isset($params.filter_key)}{$params.filter_key}{else}{$key}{/if}" data-filter_type="{$params.type}">
 												{$params['title']|escape:'html':'UTF-8'}: <span class="filter_value">{$params['value']|escape:'html':'UTF-8'}</span>
@@ -162,7 +167,7 @@
 															<input type="text" class="filter form-control" name="{$list_id}Filter_{if isset($params.filter_key)}{$params.filter_key}{else}{$key}{/if}[1]" placeholder="{l s='To'}" value="{if isset($params.value.1)}{$params.value.1}{/if}">
 														</div>
 													{else if $params.type == 'bool'}
-														<select id="filter_input_{$key}" class="filter fixed-width-sm center" name="{$list_id}Filter_{if isset($params.filter_key)}{$params.filter_key}{else}{$key}{/if}">
+														<select id="filter_input_{$key}" class="filter center" name="{$list_id}Filter_{if isset($params.filter_key)}{$params.filter_key}{else}{$key}{/if}">
 															<option value="">-</option>
 															<option value="1" {if $params.value == 1} selected="selected" {/if}>{l s='Yes'}</option>
 															<option value="0" {if $params.value == 0 && $params.value != ''} selected="selected" {/if}>{l s='No'}</option>
@@ -308,6 +313,8 @@
 					} else if (type == 'range') {
 						$('#list_filters_panel').find('[name*="productFilter_'+$(this).parent().data('filter_key')+'"]').val('');
 					} else if (type == 'select' || type == 'select_multiple_and' || type == 'select_multiple_or') {
+						$('#list_filters_panel').find('select[name*="productFilter_'+$(this).parent().data('filter_key')+'"] option:selected').prop('selected', false);
+					} else if (type == 'bool' && $(this).parent().data('filter_key') == 'advance_payment') {
 						$('#list_filters_panel').find('select[name*="productFilter_'+$(this).parent().data('filter_key')+'"] option:selected').prop('selected', false);
 					} else {
 						$('#list_filters_panel').find('input[name*="productFilter_'+$(this).parent().data('filter_key')+'"]').val('');
