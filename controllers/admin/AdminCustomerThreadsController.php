@@ -535,6 +535,10 @@ class AdminCustomerThreadsControllerCore extends AdminController
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=messages_per_thread';
         $kpis[] = $helper;
 
+        Hook::exec('action'.$this->controller_name.'KPIListingModifier', array(
+            'kpis' => &$kpis,
+        ));
+
         $helper = new HelperKpiRow();
         $helper->kpis = $kpis;
         return $helper->generate();

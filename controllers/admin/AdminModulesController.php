@@ -1347,6 +1347,10 @@ class AdminModulesControllerCore extends AdminController
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=update_modules';
         $kpis[] = $helper;
 
+        Hook::exec('action'.$this->controller_name.'KPIListingModifier', array(
+            'kpis' => &$kpis,
+        ));
+
         $helper = new HelperKpiRow();
         $helper->kpis = $kpis;
         return $helper->generate();

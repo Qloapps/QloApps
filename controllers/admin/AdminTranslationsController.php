@@ -1347,6 +1347,10 @@ class AdminTranslationsControllerCore extends AdminController
         $helper->refresh = (bool)(ConfigurationKPI::get('BACKOFFICE_TRANSLATIONS_EXPIRE') < $time);
         $kpis[] = $helper;
 
+        Hook::exec('action'.$this->controller_name.'KPIListingModifier', array(
+            'kpis' => &$kpis,
+        ));
+
         $helper = new HelperKpiRow();
         $helper->kpis = $kpis;
         return $helper->generate();
