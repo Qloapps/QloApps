@@ -18,7 +18,7 @@
 		font-weight: bold
 		color: #363A41
 		white-space: nowrap
-		@include padding(26px, 0, 0, ($widthSidebarNav+20px))
+		@include padding(31px, 0, 0, ($widthSidebarNav+20px))
 		@media (max-width: $screen-tablet)
 			@include padding(26px, 0, 0, 70px)
 		a
@@ -81,6 +81,10 @@
 				@include border-radius(3px)
 				@media (max-width: $screen-sm)
 					display: block
+					padding: 6px 10px !important
+					margin-right: 10px
+				@media (max-width: $screen-xs)
+					margin-right: 5px
 
 		#toolbar-nav
 			li + li
@@ -90,7 +94,7 @@
 		list-style: none
 		margin: 0
 		padding: 0
-		top: 4px
+		top: 9px
 		height: 20px
 		line-height: 20px
 		color: black
