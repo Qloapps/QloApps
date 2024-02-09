@@ -1135,16 +1135,19 @@ function initRoomEvents()
 		else
 		{
 			$('tr#new_product input, tr#new_product select, tr#new_product button').removeAttr('disabled');
-			if ($('tr#new_product .booking_occupancy').length) {
-				$('tr#new_product .booking_guest_occupancy').removeClass('disabled');
-				setRoomTypeGuestOccupancy($('tr#new_product .booking_occupancy_wrapper'));
-			}
+
 			if (data.room_type_info) {
 				$('tr#new_product .max_adults').val(data.room_type_info.max_adults);
 				$('tr#new_product .max_children').val(data.room_type_info.max_children);
 				$('tr#new_product .max_guests').val(data.room_type_info.max_guests);
+				$('tr#new_product .num_adults').val(data.room_type_info.adults);
 				$('tr#new_product .num_adults').attr('max', data.room_type_info.max_adults);
 				$('tr#new_product .num_children').attr('max', data.room_type_info.max_children);
+			}
+
+			if ($('tr#new_product .booking_occupancy').length) {
+				$('tr#new_product .booking_guest_occupancy').removeClass('disabled');
+				setRoomTypeGuestOccupancy($('tr#new_product .booking_occupancy_wrapper'));
 			}
 
 			// Keep product variable
