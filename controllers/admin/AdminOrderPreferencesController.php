@@ -65,7 +65,7 @@ class AdminOrderPreferencesControllerCore extends AdminController
                 'fields' => array(
                     'MAX_GLOBAL_BOOKING_DATE' => array(
                         'title' => $this->l('Maximum Global Check-out Date to book a room'),
-                        'hint' => $this->l('Maximum date of check-out by which rooms of your hotels can be booked.'),
+                        'hint' => $this->l('Maximum date of check-out for which rooms of your hotels can be booked.'),
                         'type' => 'text',
                         'id' => 'max_global_book_date',
                         'class' => 'fixed-width-xxl readonly',
@@ -154,8 +154,8 @@ class AdminOrderPreferencesControllerCore extends AdminController
                     ),
                     'PS_ROOM_PRICE_AUTO_ADD_BREAKDOWN' => array(
                         'title' => $this->l('Show room price breakdown'),
-                        'hint' => $this->l('Show price breakdown for rooms with auto added services in booking cart rooms list.'),
-                        'desc' => $this->l('This room price breakdown will always be displayed for rooms having cart rules applied to them.'),
+                        'hint' => $this->l('Show price breakdown for rooms with auto added services on checkout page.'),
+                        'desc' => $this->l('This room price breakdown will be shown if cart rule for specific room type is applied on that room.'),
                         'cast' => 'intval',
                         'type' => 'bool'
                     ),
