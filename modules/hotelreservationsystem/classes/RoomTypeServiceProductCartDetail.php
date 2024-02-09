@@ -190,7 +190,7 @@ class RoomTypeServiceProductCartDetail extends ObjectModel
         $sql = 'SELECT rscd.`id_product`, rscd.`quantity`, cbd.`id_cart`, p.`auto_add_to_cart`, p.`allow_multiple_quantity`, cbd.`id` as `htl_cart_booking_id`,
             p.`price_addition_type`, cbd.`id_product` as `room_type_id_product`, pl.`name`, cbd.`date_from`, cbd.`date_to`
             FROM `'._DB_PREFIX_.'htl_cart_booking_data` cbd
-            LEFT JOIN `'._DB_PREFIX_.'htl_room_type_service_product_cart_detail` rscd ON(rscd.`htl_cart_booking_id` = cbd.`id`)
+            INNER JOIN `'._DB_PREFIX_.'htl_room_type_service_product_cart_detail` rscd ON(rscd.`htl_cart_booking_id` = cbd.`id`)
             LEFT JOIN `'._DB_PREFIX_.'product` p ON (p.`id_product` = rscd.`id_product`)
             LEFT JOIN `'._DB_PREFIX_.'product_lang` pl ON (p.`id_product` = pl.`id_product` AND pl.`id_lang` = '.(int)$idLang.')
             WHERE 1';

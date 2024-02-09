@@ -395,7 +395,7 @@ $(document).ready(function () {
 				<div class="col-lg-9">
 					<div class="row">
 					{if !$multi_shop}
-						<input type="hidden" name="sp_id_shop" value="0" />
+						<input type="hidden" name="sp_id_shop" value="1" />
 					{else}
 						<div class="col-lg-3">
 							<select name="sp_id_shop" id="sp_id_shop">

@@ -343,6 +343,7 @@ class StatsProduct extends ModuleGraph
                 $this->_titles['main'][1] = $this->l('Views (x100)');
                 $this->_titles['x'] = $this->l('Date');
                 $this->_titles['y'] = $this->l('Room nights, Views (x100)');
+                $this->_formats['y'] = 'd';
 
                 $this->query[0] = 'SELECT o.`date_add`, SUM(DATEDIFF(hbd.`date_to`, hbd.`date_from`)) AS total
                 FROM `'._DB_PREFIX_.'order_detail` od

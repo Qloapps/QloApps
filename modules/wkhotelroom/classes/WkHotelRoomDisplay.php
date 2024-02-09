@@ -152,7 +152,7 @@ class WkHotelRoomDisplay extends ObjectModel
         // update global configuration values in multilang
         Configuration::updateValue('HOTEL_ROOM_DISPLAY_HEADING', $HOTEL_ROOM_DISPLAY_HEADING);
         Configuration::updateValue('HOTEL_ROOM_DISPLAY_DESCRIPTION', $HOTEL_ROOM_DISPLAY_DESCRIPTION);
-        if ($roomTypes = HotelHelper::getPsProducts(Configuration::get('PS_LANG_DEFAULT'), 0, 5)) {
+        if ($roomTypes = HotelHelper::getPsProducts(Configuration::get('PS_LANG_DEFAULT'), 0, 5, 1)) {
             foreach ($roomTypes as $product) {
                 if (Validate::isLoadedObject($objProduct = new Product($product['id_product']))) {
                     $objRoomBlock = new WkHotelRoomDisplay();

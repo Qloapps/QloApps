@@ -67,20 +67,22 @@
 					<div>{l s='Recommended Modules and Services'}</div>
 				</a>
 			</li>
-			{if $add_permission eq '1' && ($context_mode != Context::MODE_HOST)}
-			<li>
-				<a id="desc-module-new" class="toolbar_btn anchor" href="#" onclick="$('#module_install').slideToggle();" title="{l s='Add a new module'}">
-					<i class="process-icon-new"></i>
-					<div>{l s='Add a new module'}</div>
-				</a>
-			</li>
-			{else}
-			<li>
-				<a id="desc-module-new" class="toolbar_btn" href="{$link->getAdminLink('AdminModules')}&addnewmodule" title="{l s='Add a new module'}">
-					<i class="process-icon-new"></i>
-					<div>{l s='Add a new module'}</div>
-				</a>
-			</li>
+			{if $add_permission eq '1'}
+				{if $context_mode != Context::MODE_HOST}
+					<li>
+						<a id="desc-module-new" class="toolbar_btn anchor" href="#" onclick="$('#module_install').slideToggle();" title="{l s='Add a new module'}">
+							<i class="process-icon-new"></i>
+							<div>{l s='Add a new module'}</div>
+						</a>
+					</li>
+				{else}
+					<li>
+						<a id="desc-module-new" class="toolbar_btn" href="{$link->getAdminLink('AdminModules')}&addnewmodule" title="{l s='Add a new module'}">
+							<i class="process-icon-new"></i>
+							<div>{l s='Add a new module'}</div>
+						</a>
+					</li>
+				{/if}
 			{/if}
 			{if isset($help_link)}
 			{* <li>

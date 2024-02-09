@@ -129,6 +129,7 @@ class StatsNewsletter extends ModuleGraph
         $this->_titles['main'][1] = $this->l('Visitors');
         $this->_titles['main'][2] = $this->l('Newsletter statistics');
         $this->_titles['main'][3] = $this->l('Both');
+        $this->_formats['y'] = 'd';
 
         $this->_query = 'SELECT newsletter_date_add
 				FROM `'._DB_PREFIX_.'customer`

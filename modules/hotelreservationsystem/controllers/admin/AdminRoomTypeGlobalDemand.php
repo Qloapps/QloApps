@@ -151,7 +151,7 @@ class AdminRoomTypeGlobalDemandController extends ModuleAdminController
         $smartyVars = array();
         $objCurrency = new Currency(Configuration::get('PS_CURRENCY_DEFAULT'));
         $smartyVars['defaultcurrencySign'] = $objCurrency->sign;
-        $currentLangId = Configuration::get('PS_LANG_DEFAULT');
+        $currentLangId = $this->default_form_language ? $this->default_form_language : Configuration::get('PS_LANG_DEFAULT');
         $languages = Language::getLanguages(false);
         $smartyVars['languages'] = $languages;
         $currentLang = Language::getLanguage((int) $currentLangId);

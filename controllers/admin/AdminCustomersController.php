@@ -630,6 +630,10 @@ class AdminCustomersControllerCore extends AdminController
                 Tools::getValue('groupBox_'.$group['id_group'], in_array($group['id_group'], $customer_groups_ids));
         }
 
+        if ($back = Tools::getValue('back')) {
+            $this->tpl_form_vars['back_url'] = Tools::htmlentitiesDecodeUTF8(Tools::safeOutput(urldecode($back)));
+        }
+
         return parent::renderForm();
     }
 
@@ -966,6 +970,21 @@ class AdminCustomersControllerCore extends AdminController
         return parent::processSave();
     }
 
+    protected function copyFromPost(&$object, $table)
+    {
+        parent::copyFromPost($object, $table);
+
+        $years = Tools::getValue('years');
+        $months = Tools::getValue('months');
+        $days = Tools::getValue('days');
+
+        if ($years != '' && $months != '' && $days != '') {
+            $object->birthday = (int) $years.'-'.(int) $months.'-'.(int) $days;
+        } else {
+            $object->birthday = '0000-00-00';
+        }
+    }
+
     protected function afterDelete($object, $old_id)
     {
         $customer = new Customer($old_id);
@@ -1080,10 +1099,11 @@ class AdminCustomersControllerCore extends AdminController
     public function ajaxProcessSearchCustomers()
     {
         $searches = explode(' ', Tools::getValue('customer_search'));
+        $skip_deleted = Tools::getValue('skip_deleted');
         $customers = array();
         $searches = array_unique($searches);
         foreach ($searches as $search) {
-            if (!empty($search) && $results = Customer::searchByName($search, 50)) {
+            if (!empty($search) && $results = Customer::searchByName($search, 50, $skip_deleted)) {
                 foreach ($results as $result) {
                     if ($result['active']) {
                         $customers[$result['id_customer']] = $result;
