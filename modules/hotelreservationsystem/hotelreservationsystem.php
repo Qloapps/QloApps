@@ -103,7 +103,12 @@ class HotelReservationSystem extends Module
 
     public function hookActionFrontControllerSetMedia()
     {
-        $this->context->controller->addCSS($this->getPathUri().'views/css/hook/display-nav.css');
+        if (Configuration::get('WK_CUSTOMER_SUPPORT_PHONE_NUMBER') != ''
+            || Configuration::get('WK_CUSTOMER_SUPPORT_EMAIL') != ''
+        ) {
+            $this->context->controller->addCSS($this->getPathUri().'views/css/hook/display-nav.css');
+        }
+
     }
 
     public function hookDisplayNav()
@@ -124,46 +129,6 @@ class HotelReservationSystem extends Module
         ));
 
         return $this->display(__FILE__, 'external-navigation-hook.tpl');
-    }
-
-    public function hookActionAdminHotelGeneralSettingsOptionsModifier($params)
-    {
-        $params['options']['contactdetail']['fields'] = array_merge(
-            $params['options']['contactdetail']['fields'],
-            array(
-                'WK_CUSTOMER_SUPPORT_PHONE_NUMBER' => array(
-                    'title' => $this->l('Support Phone Number'),
-                    'type' => 'text',
-                    'hint' => $this->l('The phone number used for customer service. It will be shown on navigation bar.'),
-                    'class' => 'fixed-width-xxl',
-                ),
-                'WK_CUSTOMER_SUPPORT_EMAIL' => array(
-                    'title' => $this->l('Support Email'),
-                    'type' => 'text',
-                    'hint' => $this->l('The email used for customer service. It will be shown on navigation bar.'),
-                    'class' => 'fixed-width-xxl',
-                ),
-            )
-        );
-    }
-
-    public function hookActionAdminHotelGeneralSettingsControllerUpdate_optionsBefore()
-    {
-        $phone = Tools::getValue('WK_CUSTOMER_SUPPORT_PHONE_NUMBER');
-        $email = Tools::getValue('WK_CUSTOMER_SUPPORT_EMAIL');
-
-        if ($phone != '' && !Validate::isPhoneNumber($phone)) {
-            $this->context->controller->errors[] = $this->l('Support Phone Number is invalid.');
-        }
-
-        if ($email != '' && !Validate::isEmail($email)) {
-            $this->context->controller->errors[] = $this->l('Support Email is invalid.');
-        }
-
-        if (!count($this->context->controller->errors)) {
-            Configuration::updateValue('WK_CUSTOMER_SUPPORT_PHONE_NUMBER', $phone);
-            Configuration::updateValue('WK_CUSTOMER_SUPPORT_EMAIL', $email);
-        }
     }
 
     public function cartBookingDataForMail($order)
@@ -703,8 +668,6 @@ class HotelReservationSystem extends Module
                 'actionFrontControllerSetMedia',
                 'displayNav',
                 'displayExternalNavigationHook',
-                'actionAdminHotelGeneralSettingsOptionsModifier',
-                'actionAdminHotelGeneralSettingsControllerUpdate_optionsBefore',
             )
         );
     }

@@ -149,6 +149,7 @@ class AdminHotelGeneralSettingsController extends ModuleAdminController
                         'type' => 'text',
                         'isCleanHtml' => true,
                         'class' => 'fixed-width-xxl',
+                        'required' => true,
                     ),
                     'WK_HOTEL_GLOBAL_CONTACT_NUMBER' => array(
                         'title' => $this->l('Main Branch Phone Number'),
@@ -156,11 +157,25 @@ class AdminHotelGeneralSettingsController extends ModuleAdminController
                         'type' => 'text',
                         'validation' => 'isPhoneNumber',
                         'class' => 'fixed-width-xxl',
+                        'required' => true,
                     ),
                     'WK_HOTEL_GLOBAL_CONTACT_EMAIL' => array(
                         'title' => $this->l('Main Branch Email'),
                         'hint' => $this->l('The email address of the main branch. It will be shown on Contact Us page.'),
                         'type' => 'text',
+                        'class' => 'fixed-width-xxl',
+                        'required' => true,
+                    ),
+                    'WK_CUSTOMER_SUPPORT_PHONE_NUMBER' => array(
+                        'title' => $this->l('Support Phone Number'),
+                        'type' => 'text',
+                        'hint' => $this->l('The phone number used for customer service. It will be shown on navigation bar.'),
+                        'class' => 'fixed-width-xxl',
+                    ),
+                    'WK_CUSTOMER_SUPPORT_EMAIL' => array(
+                        'title' => $this->l('Support Email'),
+                        'type' => 'text',
+                        'hint' => $this->l('The email used for customer service. It will be shown on navigation bar.'),
                         'class' => 'fixed-width-xxl',
                     ),
                 ),
@@ -383,6 +398,16 @@ class AdminHotelGeneralSettingsController extends ModuleAdminController
                 $this->errors[] = $this->l('Hotel global contact email field is required');
             } elseif (!Validate::isEmail(Tools::getValue('WK_HOTEL_GLOBAL_CONTACT_EMAIL'))) {
                 $this->errors[] = $this->l('Hotel global contact email field is invalid');
+            }
+            if (trim(Tools::getValue('WK_CUSTOMER_SUPPORT_PHONE_NUMBER')) != '') {
+                if (!Validate::isPhoneNumber(trim(Tools::getValue('WK_CUSTOMER_SUPPORT_PHONE_NUMBER')))) {
+                    $this->errors[] = $this->l('Support Phone Number is invalid.');
+                }
+            }
+            if (trim(Tools::getValue('WK_CUSTOMER_SUPPORT_EMAIL')) != '') {
+                if (!Validate::isEmail(trim(Tools::getValue('WK_CUSTOMER_SUPPORT_EMAIL')))) {
+                    $this->errors[] = $this->l('Support Email is invalid.');
+                }
             }
 
             if (!count($this->errors)) {
