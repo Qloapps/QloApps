@@ -375,7 +375,7 @@ class AdminAddHotelController extends ModuleAdminController
 
             // lang fields
             $hotelCatName = array();
-            $linkRewiteArray = array();
+            $linkRewriteArray = array();
             foreach ($languages as $lang) {
                 if (!trim(Tools::getValue('hotel_name_'.$lang['id_lang']))) {
                     $objHotelBranch->hotel_name[$lang['id_lang']] = Tools::getValue(
@@ -388,11 +388,11 @@ class AdminAddHotelController extends ModuleAdminController
                 }
 
                 if (!trim(Tools::getValue('link_rewrite_'.$lang['id_lang']))) {
-                    $linkRewiteArray[$lang['id_lang']] = Tools::getValue(
+                    $linkRewriteArray[$lang['id_lang']] = Tools::getValue(
                         'link_rewrite_'.$defaultLangId
                     );
                 } else {
-                    $linkRewiteArray[$lang['id_lang']] = Tools::getValue(
+                    $linkRewriteArray[$lang['id_lang']] = Tools::getValue(
                         'link_rewrite_'.$lang['id_lang']
                     );
                 }
@@ -531,7 +531,7 @@ class AdminAddHotelController extends ModuleAdminController
                         if ($catCity = $objHotelBranch->addCategory($city, $catState, $groupIds)) {
                             $hotelCatName = $objHotelBranch->hotel_name;
                             if ($catHotel = $objHotelBranch->addCategory(
-                                $hotelCatName, $catCity, $groupIds, 1, $newIdHotel, $linkRewiteArray
+                                $hotelCatName, $catCity, $groupIds, 1, $newIdHotel, $linkRewriteArray
                             )) {
                                 $objHotelBranch = new HotelBranchInformation($newIdHotel);
                                 $objHotelBranch->id_category = $catHotel;
