@@ -140,7 +140,6 @@ class AdminInformationControllerCore extends AdminController
             'upload_max_filesize' => $this->l('In PHP configuration set upload_max_filesize to minimum 16M.'),
             'max_execution_time' => $this->l('In PHP configuration set max_execution_time to minimum 500.'),
             'mbstring' => $this->l('PHP Mbstring extension is not enabled.'),
-            'magicquotes' => $this->l('PHP magic quotes option is enabled.'),
             'dom' => $this->l('PHP DOM extension is not loaded.'),
         );
 

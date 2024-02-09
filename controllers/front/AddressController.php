@@ -221,6 +221,8 @@ class AddressControllerCore extends FrontController
      */
     public function initContent()
     {
+        $this->show_breadcrump = true;
+
         parent::initContent();
 
         $this->assignCountries();
