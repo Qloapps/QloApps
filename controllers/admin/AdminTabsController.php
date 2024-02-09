@@ -340,7 +340,7 @@ class AdminTabsControllerCore extends AdminController
     {
         $way = (int)(Tools::getValue('way'));
         $id_tab = (int)(Tools::getValue('id'));
-        $positions = Tools::getValue('tab');
+        $positions = Tools::getValue('menu');
 
         // when changing positions in a tab sub-list, the first array value is empty and needs to be removed
         if (!$positions[0]) {

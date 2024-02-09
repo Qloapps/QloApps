@@ -46,6 +46,8 @@
 
 							{* Accordian for all blocks *}
 							<div class="accordion" id="oprder-opc-accordion">
+								<input type="hidden" name="opc_id_address_delivery" value="{$cart->id_address_delivery}" id="opc_id_address_delivery" />
+								<input type="hidden" name="opc_id_address_invoice" value="{$cart->id_address_invoice}" id="opc_id_address_invoice" />
 								{if isset($checkout_process_steps) && $checkout_process_steps}
 									{foreach $checkout_process_steps as $step}
 										{if $step->step_key == 'checkout_rooms_summary'}
@@ -437,7 +439,6 @@
 													<p class="avail_voucher_name">
 														<span class="voucher_name" data-code="{$voucher.code|escape:'html':'UTF-8'}">{$voucher.code|escape:'html':'UTF-8'} - </span>{$voucher.name}
 													</p>
-													<p class="avail_voucher_des">{$voucher['description']}</p>
 													{if not $smarty.foreach.availVoucher.last}
 														<hr class="seperator">
 													{/if}
@@ -460,7 +461,6 @@
 						{addJsDef imgDir=$img_dir}
 						{addJsDef authenticationUrl=$link->getPageLink("authentication", true)|escape:'quotes':'UTF-8'}
 						{addJsDef orderOpcUrl=$link->getPageLink("order-opc", true)|escape:'quotes':'UTF-8'}
-						{addJsDef historyUrl=$link->getPageLink("history", true)|escape:'quotes':'UTF-8'}
 						{addJsDef guestTrackingUrl=$link->getPageLink("guest-tracking", true)|escape:'quotes':'UTF-8'}
 						{addJsDef addressUrl=$link->getPageLink("address", true, NULL, "back={$back_order_page}")|escape:'quotes':'UTF-8'}
 						{addJsDef orderProcess='order-opc'}

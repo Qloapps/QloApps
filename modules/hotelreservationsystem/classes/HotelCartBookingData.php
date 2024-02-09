@@ -976,7 +976,14 @@ class HotelCartBookingData extends ObjectModel
                     false
                 );
 
-                $cart_detail_data[$key]['additional_service'] = $objRoomTypeServiceProduct->getServiceProductsData($value['id_product']);
+                $cart_detail_data[$key]['additional_service'] = $objRoomTypeServiceProduct->getServiceProductsData(
+                    $value['id_product'],
+                    1,
+                    0,
+                    false,
+                    2,
+                    null
+                );
                 $cart_detail_data[$key]['selected_services'] = $objRoomTypeServiceProductCartDetail->getRoomServiceProducts(
                     $value['id'],
                     0,
