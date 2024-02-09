@@ -59,10 +59,20 @@ class RoomTypeServiceProduct extends ObjectModel
             $where .= ' AND `id_element` = '.(int) $idElement;
         }
 
-        return Db::getInstance()->delete(
+        $result = Db::getInstance()->delete(
             'htl_room_type_service_product',
             $where
         );
+
+        // Update positions
+        Db::getInstance()->execute('SET @i = -1', false);
+        $result &= Db::getInstance()->execute(
+            'UPDATE `'._DB_PREFIX_.'htl_room_type_service_product`
+            SET `position` = @i:=@i+1
+            ORDER BY `position` ASC'
+        );
+
+        return $result;
     }
 
     public function addRoomProductLink($idProduct, $values, $elementType)

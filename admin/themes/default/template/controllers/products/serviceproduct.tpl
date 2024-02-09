@@ -12,7 +12,7 @@
                                 <input type="checkbox" class="bulk-service-products-status">
                             </th>
                             <th class="col-sm-1">
-                                <span>{l s='ID Product'}</span>
+                                <span>{l s='ID'}</span>
                             </th>
                             <th class="col-sm-2">
                                 <span>{l s='Name'}</span>
