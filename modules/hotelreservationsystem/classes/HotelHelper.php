@@ -713,6 +713,11 @@ class HotelHelper
         return true;
     }
 
+    public static function getRandomZipcodeByForCountry($idCountry)
+    {
+        return Tools::generateRandomZipcode($idCountry);
+    }
+
     /**
      * Get Super Admin Of Prestashop
      * @return int Super Admin Employee ID
