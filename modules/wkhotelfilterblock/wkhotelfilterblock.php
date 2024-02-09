@@ -62,7 +62,7 @@ class wkhotelfilterblock extends Module
         $fields_form['form'] = array(
             'legend' => array(
                 'icon' => 'icon-cog',
-                'title' => $this->l('Search Results Filter Configuration'),
+                'title' => $this->l('Search Results Page Filters'),
             ),
             'input' => array(
                 array(
