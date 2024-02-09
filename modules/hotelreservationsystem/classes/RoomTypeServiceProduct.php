@@ -50,13 +50,16 @@ class RoomTypeServiceProduct extends ObjectModel
     public static function deleteRoomProductLink($idProduct, $elementType = 0, $idElement = 0)
     {
         $where = '`id_product`='.(int)$idProduct;
+        $where2 = '';
 
         if ($elementType) {
             $where .= ' AND `element_type`='.(int)$elementType;
+            $where2 .= ' `element_type`='.(int)$elementType;
         }
 
         if ($idElement) {
             $where .= ' AND `id_element` = '.(int) $idElement;
+            $where2 .= ' AND `id_element` = '.(int) $idElement;
         }
 
         $result = Db::getInstance()->delete(
@@ -69,6 +72,7 @@ class RoomTypeServiceProduct extends ObjectModel
         $result &= Db::getInstance()->execute(
             'UPDATE `'._DB_PREFIX_.'htl_room_type_service_product`
             SET `position` = @i:=@i+1
+            WHERE '.$where2.'
             ORDER BY `position` ASC'
         );
 
