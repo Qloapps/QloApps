@@ -34,13 +34,13 @@
 
 	<div class="actions-wrap">
 		{if $refresh}
-			<button class="btn btn-default" type="button" onclick="refresh_kpis();">
+			<button class="btn btn-default" type="button" onclick="refresh_kpis();" title="{l s='Refresh'}">
 				<i class="icon-refresh"></i>
 			</button>
 		{/if}
 
 		<div class="dropdown">
-			<button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">
+			<button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" title="{l s='Select KPIs'}">
 				<i class="icon-ellipsis-vertical"></i>
 			</button>
 
@@ -56,7 +56,7 @@
 			</ul>
 		</div>
 
-		<button class="btn btn-default" type="button" onclick="toggleKpiView();">
+		<button class="btn btn-default" type="button" onclick="toggleKpiView();" title="{l s='Toggle View'}">
 			<i class="icon-retweet"></i>
 		</button>
 	</div>
