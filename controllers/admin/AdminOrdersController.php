@@ -152,20 +152,22 @@ class AdminOrdersControllerCore extends AdminController
                 'type' => 'select',
                 'filter_key' => 'hbd!id_product',
                 'list' => $this->roomTypesArray,
-                'optional' => true,
+                'optional' => false,
                 'class' => 'chosen',
                 'remove_onchange' => true,
-                'visible_default' => true,
+                'visible_default' => false,
+                'displayed' => false,
             ),
             'id_room_information' => array(
                 'title' => $this->l('Rooms'),
                 'type' => 'select',
                 'filter_key' => 'hbd!id_room',
                 'list' => $this->roomsArray,
-                'optional' => true,
+                'optional' => false,
                 'class' => 'chosen',
                 'remove_onchange' => true,
-                'visible_default' => true,
+                'visible_default' => false,
+                'displayed' => false,
             ),
             'date_from' => array(
                 'title' => $this->l('Check-in'),
@@ -1945,12 +1947,17 @@ class AdminOrdersControllerCore extends AdminController
         }
 
         if (is_array($hotelRoomTypes) && count($hotelRoomTypes)) {
+            $response['has_room_types'] = true;
+
             $this->context->smarty->assign(array(
                 'room_types_info' => $hotelRoomTypes,
             ));
 
             $response['status'] = true;
             $response['html_room_types'] = $this->context->smarty->fetch('controllers/orders/_filter_room_types.tpl');
+        } else {
+            $response['has_room_types'] = false;
+            $response['status'] = true;
         }
 
         $this->ajaxDie(json_encode($response));
@@ -1966,12 +1973,17 @@ class AdminOrdersControllerCore extends AdminController
         $hotelRoomsInfo = HotelRoomInformation::getHotelRoomsInfo($idHotel, $idProduct);
 
         if (is_array($hotelRoomsInfo) && count($hotelRoomsInfo)) {
+            $response['has_hotel_rooms'] = true;
+
             $this->context->smarty->assign(array(
                 'hotel_rooms_info' => $hotelRoomsInfo,
             ));
 
             $response['status'] = true;
             $response['html_hotel_rooms'] = $this->context->smarty->fetch('controllers/orders/_filter_hotel_rooms.tpl');
+        } else {
+            $response['has_hotel_rooms'] = false;
+            $response['status'] = true;
         }
 
         $this->ajaxDie(json_encode($response));

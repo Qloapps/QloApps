@@ -348,7 +348,11 @@
 					dataType: 'JSON',
 					success: function(response) {
 						if (response.status) {
-							$(filterInputRoomTypeName).html(response.html_room_types);
+							if (response.has_room_types) {
+								$(filterInputRoomTypeName).html(response.html_room_types);
+							} else {
+								$(filterInputRoomTypeName).find('option').not(':first').remove();
+							}
 
 							// destroy current chosen and re-initialize
 							$(filterInputRoomTypeName).chosen('destroy');
@@ -381,7 +385,11 @@
 					dataType: 'JSON',
 					success: function(response) {
 						if (response.status) {
-							$(filterInputRoomNumber).html(response.html_hotel_rooms);
+							if (response.has_hotel_rooms) {
+								$(filterInputRoomNumber).html(response.html_hotel_rooms);
+							} else {
+								$(filterInputRoomNumber).find('option').not(':first').remove();
+							}
 
 							// destroy current chosen and re-initialize
 							$(filterInputRoomNumber).chosen('destroy');

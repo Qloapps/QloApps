@@ -20,6 +20,6 @@
 {if is_array($hotel_rooms_info) && count($hotel_rooms_info)}
     <option value="" selected="selected">-</option>
     {foreach from=$hotel_rooms_info item=hotel_room}
-        <option value="{$hotel_room.id_product}">{$hotel_room.room_num}, {$hotel_room.room_type_name}, {$hotel_room.hotel_name}</option>
+        <option value="{$hotel_room.id}">{$hotel_room.room_num}, {$hotel_room.room_type_name}, {$hotel_room.hotel_name}</option>
     {/foreach}
 {/if}
