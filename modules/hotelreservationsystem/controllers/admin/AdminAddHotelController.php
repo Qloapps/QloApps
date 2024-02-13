@@ -112,7 +112,8 @@ class AdminAddHotelController extends ModuleAdminController
         $smartyVars['lang'] = true;
         $smartyVars['iso'] = $this->context->language->iso_code;
         //lang vars
-        $currentLangId = Configuration::get('PS_LANG_DEFAULT');
+
+        $currentLangId = $this->default_form_language ? $this->default_form_language : Configuration::get('PS_LANG_DEFAULT');
         $smartyVars['languages'] = Language::getLanguages(false);
         $smartyVars['currentLang'] = Language::getLanguage((int) $currentLangId);
 
@@ -501,12 +502,20 @@ class AdminAddHotelController extends ModuleAdminController
                     if ($catState) {
                         if ($catCity = $objHotelBranch->addCategory($city, $catState, $groupIds)) {
                             $hotelCatName = $objHotelBranch->hotel_name;
-                            if ($catHotel = $objHotelBranch->addCategory(
-                                $hotelCatName, $catCity, $groupIds, 1, $newIdHotel
-                            )) {
-                                $objHotelBranch = new HotelBranchInformation($newIdHotel);
-                                $objHotelBranch->id_category = $catHotel;
-                                $objHotelBranch->save();
+
+                            // add/update hotel category
+                            if ($objHotelBranch->id_category) {
+                                $objCategory = new Category($objHotelBranch->id_category);
+                                $objCategory->name = $objHotelBranch->hotel_name;
+                                $objCategory->save();
+                            } else {
+                                if ($catHotel = $objHotelBranch->addCategory(
+                                    $hotelCatName, $catCity, $groupIds, 1, $newIdHotel
+                                )) {
+                                    $objHotelBranch = new HotelBranchInformation($newIdHotel);
+                                    $objHotelBranch->id_category = $catHotel;
+                                    $objHotelBranch->save();
+                                }
                             }
                         }
                     }
