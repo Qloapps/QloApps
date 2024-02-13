@@ -1188,7 +1188,7 @@
 		$('#order_message').val(jsonSummary.order_message);
 		$('#payment_amount').siblings('.input-group-addon').html(currency_sign);
 		if (jsonSummary.summary.is_advance_payment_active) {
-			$('#advance_payment_amount').html(formatCurrency(parseFloat(jsonSummary.summary.advance_payment_amount_ti), currency_format, currency_sign, currency_blank));
+			$('#advance_payment_amount').html(formatCurrency(parseFloat(jsonSummary.summary.advance_payment_amount_with_tax), currency_format, currency_sign, currency_blank));
 			$('#advance_payment_amount_block').show();
 		} else {
 			$('#advance_payment_amount_block').hide();
