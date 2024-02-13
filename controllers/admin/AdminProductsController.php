@@ -245,10 +245,21 @@ class AdminProductsControllerCore extends AdminController
                 'filter_key' => 'shop!name',
             );
         } else {
+            $hotels = HotelBranchInformation::getProfileAccessedHotels($this->context->employee->id_profile, 1);
+            foreach ($hotels as $hotel) {
+                $addressInfo = HotelBranchInformation::getAddress($hotel['id_hotel']);
+                $this->hotelsArray[$hotel['id_hotel']] = $hotel['hotel_name'].', '.$addressInfo['city'];
+            }
+
             $this->fields_list['hotel_name'] = array(
                 'title' => $this->l('Hotel'),
-                'filter_key' => 'hbl!hotel_name',
-                'callback' => 'getHotelName',
+                'type' => 'select_multiple_or',
+                'filter_key' => 'hrt!id_hotel',
+                'list' => $this->hotelsArray,
+                'optional' => true,
+                'class' => 'chosen',
+                'remove_onchange' => true,
+                'visible_default' => true,
             );
         }
         $this->fields_list['adults'] = array(
@@ -294,6 +305,7 @@ class AdminProductsControllerCore extends AdminController
             'list' => array(1 => $this->l('Yes'), 0 => $this->l('No')),
             'optional' => true,
             'visible_default' => true,
+            'remove_onchange' => true,
             'orderby' => false
         );
 
@@ -374,18 +386,22 @@ class AdminProductsControllerCore extends AdminController
             'displayed' => false,
         );
 
-        $locationsAndHotels = array();
-        $objLocationsCategory = new Category(Configuration::get('PS_LOCATIONS_CATEGORY'), $this->context->language->id);
-        foreach ($objLocationsCategory->getAllChildren() as $objCategory) {
-            $space = str_repeat('&nbsp;', 5 * ($objCategory->level_depth - ($objLocationsCategory->level_depth + 1)));
-            $locationsAndHotels[$objCategory->id_category] = $space.$objCategory->name;
+        $this->locationsAndHotels = array();
+        $idLocationsCategory = Configuration::get('PS_LOCATIONS_CATEGORY');
+        $this->objLocationsCategory = new Category($idLocationsCategory, $this->context->language->id);
+        $nestedCategories = Category::getNestedCategories($idLocationsCategory);
+        if ($nestedCategories) {
+            foreach ($nestedCategories[$idLocationsCategory]['children'] as $childCategory) {
+                $this->buildCategoryOptions($childCategory);
+            }
         }
         $this->fields_list['id_category_default'] = array(
             'title' => $this->l('Location/Hotel'),
             'align' => 'text-center',
             'type' => 'select',
-            'list' => $locationsAndHotels,
+            'list' => $this->locationsAndHotels,
             'filter_key' => 'a!id_category_default',
+            'remove_onchange' => true,
             'displayed' => false,
         );
 
@@ -403,13 +419,16 @@ class AdminProductsControllerCore extends AdminController
         }
     }
 
-    public function getHotelName($hotelName, $row)
+    private function buildCategoryOptions($category)
     {
-        if ($hotelName && isset($row['city'])) {
-            return $hotelName.' - '.$row['city'];
-        }
+        $space = str_repeat('&nbsp;', 5 * (($category['level_depth'] - $this->objLocationsCategory->level_depth) - 1));
+        $this->locationsAndHotels[$category['id_category']] = $space.$category['name'];
 
-        return '--';
+        if (isset($category['children']) && count($category['children'])) {
+            foreach ($category['children'] as $childCategory) {
+                $this->buildCategoryOptions($childCategory);
+            }
+        }
     }
 
     public static function getQuantities($hotelName, $tr)
