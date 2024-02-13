@@ -962,11 +962,12 @@ class AdminOrdersControllerCore extends AdminController
                 $moduleName = trim(Tools::getValue('payment_module_name'));
                 $paymentType = Tools::getValue('payment_type');
                 $paymentTransactionId = trim(Tools::getValue('payment_transaction_id'));
+                $isFullPayment = Tools::getValue('is_full_payment');
                 $paymentAmount = trim(Tools::getValue('payment_amount'));
 
                 if (!$moduleName) {
                     $this->errors[] = Tools::displayError('Please enter Payment method.');
-                } elseif ($moduleName && !((Validate::isModuleName($moduleName) && ($paymentModuleInstance = Module::getInstanceByName($moduleName))) || Validate::isGenericName($moduleName))) {
+                } elseif ($moduleName && !Validate::isGenericName($moduleName)) {
                     $this->errors[] = Tools::displayError('Payment method is invalid. Please enter a valid payment method.');
                 }
 
@@ -980,18 +981,17 @@ class AdminOrdersControllerCore extends AdminController
                     $this->errors[] = Tools::displayError('Payment amount is invalid. Please enter correct amount.');
                 }
 
-                if ($paymentAmount && !Validate::isPrice($paymentAmount)) { // $paymentAmount = '' means no payment
-                    $this->errors[] = Tools::displayError('Payment amount is invalid. Please enter correct amount.');
+                if (!$isFullPayment) {
+                    if ($paymentAmount == '') {
+                        $this->errors[] = Tools::displayError('Please enter Payment amount.');
+                    } elseif ($paymentAmount && !Validate::isPrice($paymentAmount)) {
+                        $this->errors[] = Tools::displayError('Payment amount is invalid. Please enter correct amount.');
+                    }
                 }
 
                 if (!count($this->errors)) {
-                    if ($paymentModuleInstance) {
-                        $payment_module = $paymentModuleInstance;
-                    } else {
-                        $payment_module = new BoOrder();
-                        $payment_module->displayName = $moduleName;
-                    }
-
+                    $payment_module = new BoOrder();
+                    $payment_module->displayName = $moduleName;
                     $payment_module->payment_type = $paymentType;
 
                     $cart = new Cart((int)$id_cart);
@@ -1000,7 +1000,8 @@ class AdminOrdersControllerCore extends AdminController
 
                     $bad_delivery = false;
                     if (($bad_delivery = (bool)!Address::isCountryActiveById((int)$cart->id_address_delivery))
-                        || !Address::isCountryActiveById((int)$cart->id_address_invoice)) {
+                        || !Address::isCountryActiveById((int)$cart->id_address_invoice)
+                    ) {
                         if ($bad_delivery) {
                             $this->errors[] = Tools::displayError('This booking address country is not active.');
                         } else {
@@ -1008,12 +1009,8 @@ class AdminOrdersControllerCore extends AdminController
                         }
                     } else {
                         $amountPaid = $cart->getOrderTotal(true, Cart::BOTH);
-                        if (((float) $paymentAmount != 0) && Validate::isPrice($paymentAmount)) { // $paymentAmount != {'', '0', '0.00'}
-                            $objOrderState = new OrderState($id_order_state);
-                            if (!$objOrderState->is_logable && !$objOrderState->paid) {
-                                $amountPaid = Tools::ps_round($paymentAmount, 6);
-                                $payment_module->hasPartialPayment = true;
-                            }
+                        if (!$isFullPayment) {
+                            $amountPaid = Tools::ps_round($paymentAmount, 6);
                         }
 
                         $employee = new Employee((int)Context::getContext()->cookie->id_employee);
@@ -1029,6 +1026,39 @@ class AdminOrdersControllerCore extends AdminController
                             false,
                             $cart->secure_key
                         );
+
+                        // add order payment if required
+                        $objOrderState = new OrderState($id_order_state);
+                        if (!$objOrderState->logable && !$objOrderState->paid) {
+                            $objOrder = new Order($payment_module->currentOrder);
+
+                            if ($objOrder->hasInvoice()) {
+                                $invoices = $objOrder->getInvoicesCollection();
+
+                                $dateTimeNow = date('Y-m-d H:i:s');
+                                foreach ($invoices as $invoice) {
+                                    $objOrder->addOrderPayment(
+                                        $amountPaid,
+                                        $payment_module->displayName,
+                                        $paymentTransactionId,
+                                        new Currency($objOrder->id_currency),
+                                        $dateTimeNow,
+                                        $invoice,
+                                        $paymentType
+                                    );
+                                }
+                            } else {
+                                $objOrder->addOrderPayment(
+                                    $amountPaid,
+                                    $payment_module->displayName,
+                                    $paymentTransactionId,
+                                    new Currency($objOrder->id_currency),
+                                    date('Y-m-d H:i:s'),
+                                    null,
+                                    $paymentType
+                                );
+                            }
+                        }
 
                         if (isset($this->context->cookie->id_cart)) {
                             unset($this->context->cookie->id_cart);

@@ -360,7 +360,6 @@
 					{
 						$('#cart_detail_form').show();//line added by webkul
 						$('#payment_method_options').replaceWith(data.view)
-						$('#payment_module_name_display').val('')
 					}
 				}
 			});
@@ -1587,8 +1586,8 @@
 			}
 		});
 
-		$(document).on('keyup', '#payment_module_name_display', function() {
-			let paymentMethod = $('#payment_module_name_display').val().trim().toLowerCase();
+		$(document).on('keyup', '#payment_module_name', function() {
+			let paymentMethod = $('#payment_module_name').val().trim().toLowerCase();
 
 			let selectedMethod;
 			$('#payment_module_name_list option').each(function (index, element) {
@@ -1600,15 +1599,19 @@
 			});
 
 			if ($(selectedMethod).length) {
-				$('#payment_module_name').val($(selectedMethod).attr('data-name'));
-
 				// set Payment source
 				let paymentType = $(selectedMethod).attr('data-payment-type');
 				if ($('select#payment_type option[value="' + paymentType + '"]').length) {
 					$('#payment_type').val(paymentType);
 				}
+			}
+		});
+
+		$(document).on('change', 'input[name="is_full_payment"]', function() {
+			if (parseInt($('input[name="is_full_payment"]:checked').val())) {
+				$('#payment_amount').closest('.form-group').hide(200);
 			} else {
-				$('#payment_module_name').val($('#payment_module_name_display').val());
+				$('#payment_amount').closest('.form-group').show(200);
 			}
 		});
 
@@ -2116,8 +2119,7 @@
 				<div class="form-group">
 					<label class="control-label col-lg-3 required">{l s='Payment method'}</label>
 					<div class="col-lg-9">
-						<input name="payment_module_name_display" id="payment_module_name_display" list="payment_module_name_list" class="form-control fixed-width-xxl" {if isset($smarty.post.payment_module_name_display) && $smarty.post.payment_module_name_display}value="{$smarty.post.payment_module_name_display}"{/if}>
-						<input type="hidden" name="payment_module_name" id="payment_module_name" {if isset($smarty.post.payment_module_name) && $smarty.post.payment_module_name}value="{$smarty.post.payment_module_name}"{/if}>
+						<input name="payment_module_name" id="payment_module_name" list="payment_module_name_list" class="form-control fixed-width-xxl" {if isset($smarty.post.payment_module_name) && $smarty.post.payment_module_name}value="{$smarty.post.payment_module_name}"{/if}>
 						<datalist id="payment_module_name_list">
 							{if $PS_CATALOG_MODE}
 								<option value="{l s='Back office order'}" data-name="{l s='Back office order'}" data-payment-type="{OrderPayment::PAYMENT_TYPE_PAY_AT_HOTEL}">
@@ -2147,6 +2149,18 @@
 					</div>
 				</div>
 				<div class="form-group">
+					<label class="control-label col-lg-3">{l s="Full payment"}</label>
+					<div class="col-lg-9">
+						<span class="switch prestashop-switch fixed-width-lg">
+							<input type="radio" name="is_full_payment" id="is_full_payment_on" value="1" {if (isset($smarty.post.is_full_payment) && $smarty.post.is_full_payment == '1') || !isset($smarty.post.is_full_payment)}checked="checked"{/if}>
+							<label for="is_full_payment_on">{l s="Yes"}</label>
+							<input type="radio" name="is_full_payment" id="is_full_payment_off" value="0" {if isset($smarty.post.is_full_payment) && $smarty.post.is_full_payment == '0'}checked="checked"{/if}>
+							<label for="is_full_payment_off">{l s="No"}</label>
+							<a class="slide-button btn"></a>
+						</span>
+					</div>
+				</div>
+				<div class="form-group" {if (isset($smarty.post.is_full_payment) && $smarty.post.is_full_payment == '1') || !isset($smarty.post.is_full_payment)}style="display: none;"{/if}>
 					<label class="control-label col-lg-3">{l s='Payment amount'}</label>
 					<div class="col-lg-9">
 						<div class="input-group fixed-width-xxl">
