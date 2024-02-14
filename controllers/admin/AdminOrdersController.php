@@ -243,6 +243,7 @@ class AdminOrdersControllerCore extends AdminController
                 'filter_key' => 'a!source',
                 'list' => $this->all_order_sources,
                 'optional' => true,
+                'remove_onchange' => true,
                 'visible_default' => true
             ),
             'osname' => array(
