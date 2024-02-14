@@ -2195,7 +2195,7 @@ class AdminControllerCore extends Controller
         ) {
             $this->page_header_toolbar_btn['modules-list'] = array(
                 'href' => '#',
-                'desc' => $this->l('Recommended Modules and Services')
+                'desc' => $this->l('Recommendations')
             );
         }
     }

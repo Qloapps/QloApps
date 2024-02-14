@@ -64,7 +64,7 @@
 			<li>
 				<a id="desc-module-catalog" class="toolbar_btn anchor" href="{$link->getAdminLink('AdminModulesCatalog')}" title="{l s='Recommended Modules and Services'}">
 					<i class="process-icon-modules-list"></i>
-					<div>{l s='Recommended Modules and Services'}</div>
+					<div>{l s='Recommendations'}</div>
 				</a>
 			</li>
 			{if $add_permission eq '1'}
