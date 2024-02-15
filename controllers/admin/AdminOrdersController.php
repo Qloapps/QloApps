@@ -983,7 +983,7 @@ class AdminOrdersControllerCore extends AdminController
 
                 if (!$isFullPayment) {
                     if ($paymentAmount == '') {
-                        $this->errors[] = Tools::displayError('Please enter Payment amount.');
+                        $this->errors[] = Tools::displayError('Please enter valid Payment amount of the order.');
                     } elseif ($paymentAmount && !Validate::isPrice($paymentAmount)) {
                         $this->errors[] = Tools::displayError('Payment amount is invalid. Please enter correct amount.');
                     }

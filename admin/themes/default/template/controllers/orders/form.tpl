@@ -2158,14 +2158,15 @@
 							<label for="is_full_payment_off">{l s="No"}</label>
 							<a class="slide-button btn"></a>
 						</span>
+						<p class="help-block">{l s='Keep this option enabled for full payment and disable it to take partial payment of the order.'}</p>
 					</div>
 				</div>
 				<div class="form-group" {if (isset($smarty.post.is_full_payment) && $smarty.post.is_full_payment == '1') || !isset($smarty.post.is_full_payment)}style="display: none;"{/if}>
-					<label class="control-label col-lg-3">{l s='Payment amount'}</label>
+					<label class="control-label required col-lg-3">{l s='Payment amount'}</label>
 					<div class="col-lg-9">
 						<div class="input-group fixed-width-xxl">
 							<span class="input-group-addon">{$currency->sign}</span>
-							<input type="text" name="payment_amount" id="payment_amount" value="{if isset($smarty.post.payment_amount)}{$smarty.post.payment_amount}{else}{0|string_format:"%.`$smarty.const._PS_PRICE_DISPLAY_PRECISION_`f"}{/if}" />
+							<input type="text" name="payment_amount" id="payment_amount" value="{if isset($smarty.post.payment_amount)}{$smarty.post.payment_amount}{/if}" />
 						</div>
 						<p class="help-block" id="advance_payment_amount_block" style="display: none;">
 							<span>{l s='Advance payment amount: '}</span>
