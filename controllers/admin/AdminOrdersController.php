@@ -248,7 +248,9 @@ class AdminOrdersControllerCore extends AdminController
             ),
             'osname' => array(
                 'title' => $this->l('Status'),
-                'type' => 'select_multiple_or',
+                'type' => 'select',
+                'multiple' => true,
+                'operator' => 'or',
                 'color' => 'color',
                 'list' => $this->statuses_array,
                 'filter_key' => 'os!id_order_state',
@@ -572,6 +574,8 @@ class AdminOrdersControllerCore extends AdminController
             $this->tpl_list_vars['REQUEST_URI'] = $_SERVER['REQUEST_URI'];
             $this->tpl_list_vars['POST'] = $_POST;
         }
+
+        $this->tpl_list_vars['title'] = $this->l('Orders');
 
         return parent::renderList();
     }
