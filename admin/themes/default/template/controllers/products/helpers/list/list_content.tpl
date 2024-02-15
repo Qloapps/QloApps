@@ -22,11 +22,28 @@
 {block name='td_content'}
 	{if isset($tr.$key) && isset($params.position)}
 		{if $order_by == 'position' && $order_way != 'DESC'}
-			<div class="dragGroup">
-				<div class="positions">
-					{$tr.$key.position + 1}
+			{assign var=filters_has_value_no_location_hotel value=false}
+
+			{foreach $fields_display AS $key => $params}
+				{if $key != 'id_category_default' && (isset($params['value']) && $params['value'] !== false && $params['value'] !== '')}
+					{if is_array($params['value']) && trim(implode('', $params['value'])) == ''}
+						{continue}
+					{/if}
+
+					{assign var=filters_has_value_no_location_hotel value=true}
+					{break}
+				{/if}
+			{/foreach}
+
+			{if !$filters_has_value_no_location_hotel}
+				<div class="dragGroup">
+					<div class="positions">
+						{$tr.$key.position + 1}
+					</div>
 				</div>
-			</div>
+			{else}
+				{$tr.$key.position + 1}
+			{/if}
 		{else}
 			{$tr.$key.position + 1}
 		{/if}

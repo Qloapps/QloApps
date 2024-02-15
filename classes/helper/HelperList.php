@@ -672,18 +672,20 @@ class HelperListCore extends Helper
                     break;
 
                 case 'select':
-                    foreach ($params['list'] as $option_value => $option_display) {
-                        if (isset(Context::getContext()->cookie->{$prefix.$this->list_id.'Filter_'.$params['filter_key']})
-                            && Context::getContext()->cookie->{$prefix.$this->list_id.'Filter_'.$params['filter_key']} == $option_value
-                            && Context::getContext()->cookie->{$prefix.$this->list_id.'Filter_'.$params['filter_key']} != '') {
-                            $this->fields_list[$key]['select'][$option_value]['selected'] = 'selected';
+                    if (isset($params['multiple']) && $params['multiple']) {
+                        if (!isset($params['operator'])) {
+                            $params['operator'] = 'or';
+                        }
+                        $value = json_decode($value, true);
+                    } else {
+                        foreach ($params['list'] as $option_value => $option_display) {
+                            if (isset(Context::getContext()->cookie->{$prefix.$this->list_id.'Filter_'.$params['filter_key']})
+                                && Context::getContext()->cookie->{$prefix.$this->list_id.'Filter_'.$params['filter_key']} == $option_value
+                                && Context::getContext()->cookie->{$prefix.$this->list_id.'Filter_'.$params['filter_key']} != '') {
+                                $this->fields_list[$key]['select'][$option_value]['selected'] = 'selected';
+                            }
                         }
                     }
-                    break;
-
-                case 'select_multiple_and':
-                case 'select_multiple_or':
-                    $value = json_decode($value, true);
                     break;
 
                 case 'text':

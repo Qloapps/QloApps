@@ -253,7 +253,9 @@ class AdminProductsControllerCore extends AdminController
 
             $this->fields_list['hotel_name'] = array(
                 'title' => $this->l('Hotel'),
-                'type' => 'select_multiple_or',
+                'type' => 'select',
+                'multiple' => true,
+                'operator' => 'or',
                 'filter_key' => 'hrt!id_hotel',
                 'list' => $this->hotelsArray,
                 'optional' => true,
@@ -337,7 +339,9 @@ class AdminProductsControllerCore extends AdminController
         $this->fields_list['id_tax_rules_group'] = array(
             'title' => $this->l('Tax Rules'),
             'align' => 'text-center',
-            'type' => 'select_multiple_or',
+            'type' => 'select',
+            'multiple' => true,
+            'operator' => 'or',
             'filter_key' => 'a!id_tax_rules_group',
             'list' => $taxRulesGroups,
             'displayed' => false,
@@ -350,7 +354,9 @@ class AdminProductsControllerCore extends AdminController
         $this->fields_list['id_feature'] = array(
             'title' => $this->l('Features'),
             'align' => 'text-center',
-            'type' => 'select_multiple_and',
+            'type' => 'select',
+            'multiple' => true,
+            'operator' => 'and',
             'filter_key' => 'fp!id_feature',
             'list' => $features,
             'displayed' => false,
@@ -365,7 +371,9 @@ class AdminProductsControllerCore extends AdminController
         $this->fields_list['id_service_product'] = array(
             'title' => $this->l('Service Products'),
             'align' => 'text-center',
-            'type' => 'select_multiple_and',
+            'type' => 'select',
+            'multiple' => true,
+            'operator' => 'and',
             'filter_key' => 'hrtsp!id_product',
             'list' => $serviceProducts,
             'displayed' => false,
@@ -380,7 +388,9 @@ class AdminProductsControllerCore extends AdminController
         $this->fields_list['id_global_demand'] = array(
             'title' => $this->l('Additional Facilities'),
             'align' => 'text-center',
-            'type' => 'select_multiple_and',
+            'type' => 'select',
+            'multiple' => true,
+            'operator' => 'and',
             'filter_key' => 'hrtd!id_global_demand',
             'list' => $additionalFacilities,
             'displayed' => false,
@@ -2557,6 +2567,9 @@ class AdminProductsControllerCore extends AdminController
         $this->addRowAction('preview');
         $this->addRowAction('duplicate');
         $this->addRowAction('delete');
+
+        $this->tpl_list_vars['title'] = $this->l('Room Types');
+
         return parent::renderList();
     }
 

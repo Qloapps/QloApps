@@ -111,32 +111,24 @@
 													<i class="icon-times"></i>
 												</span>
 											{/if}
-										{else if $params.type == 'select'}
-											<span data-filter_key="{if isset($params.filter_key)}{$params.filter_key}{else}{$key}{/if}" data-filter_type="{$params.type}">
-												{$params['title']|escape:'html':'UTF-8'}: <span class="filter_value">{$params['list'][$params['value']]|replace: '&nbsp;' : ''}</span>
-												<i class="icon-times"></i>
-											</span>
-										{else if $params.type == 'select_multiple_and'}
-											<span data-filter_key="{if isset($params.filter_key)}{$params.filter_key}{else}{$key}{/if}" data-filter_type="{$params.type}">
-												{$params['title']|escape:'html':'UTF-8'}:
-												<span class="filter_value">
-													{foreach from=$params.value item=option name=foreachInfo}
-														{$params.list[$option]}{if !$smarty.foreach.foreachInfo.last}, {/if}
-													{/foreach}
+										{elseif $params.type == 'select'}
+											{if isset($params.multiple) && $params.multiple}
+												<span data-filter_key="{if isset($params.filter_key)}{$params.filter_key}{else}{$key}{/if}" data-filter_type="{$params.type}" data-multiple="{$params.multiple|intval}" data-operator="{$params.operator}">
+													{$params['title']|escape:'html':'UTF-8'}:
+													<span class="filter_value">
+														{foreach from=$params.value item=option name=foreachInfo}
+															{$params.list[$option]}{if !$smarty.foreach.foreachInfo.last}{if $params.operator == 'or'} | {else}, {/if}{/if}
+														{/foreach}
+													</span>
+													<i class="icon-times"></i>
 												</span>
-												<i class="icon-times"></i>
-											</span>
-										{else if $params.type == 'select_multiple_or'}
-											<span data-filter_key="{if isset($params.filter_key)}{$params.filter_key}{else}{$key}{/if}" data-filter_type="{$params.type}">
-												{$params['title']|escape:'html':'UTF-8'}:
-												<span class="filter_value">
-													{foreach from=$params.value item=option name=foreachInfo}
-														{$params.list[$option]}{if !$smarty.foreach.foreachInfo.last} | {/if}
-													{/foreach}
+											{else}
+												<span data-filter_key="{if isset($params.filter_key)}{$params.filter_key}{else}{$key}{/if}" data-filter_type="{$params.type}">
+													{$params['title']|escape:'html':'UTF-8'}: <span class="filter_value">{$params['list'][$params['value']]|replace: '&nbsp;' : ''}</span>
+													<i class="icon-times"></i>
 												</span>
-												<i class="icon-times"></i>
-											</span>
-										{else if $params.type == 'bool' && $key == 'advance_payment'}
+											{/if}
+										{elseif $params.type == 'bool' && $key == 'advance_payment'}
 											<span data-filter_key="{if isset($params.filter_key)}{$params.filter_key}{else}{$key}{/if}" data-filter_type="{$params.type}">
 												{$params['title']|escape:'html':'UTF-8'}: <span class="filter_value">{if $params['value'] == 1}{l s='Yes'}{elseif $params['value'] == 0}{l s='No'}{/if}</span>
 												<i class="icon-times"></i>
@@ -245,32 +237,26 @@
 															</script>
 														</div>
 													{elseif $params.type == 'select'}
-														{if isset($params.filter_key)}
-															<select id="filter_input_{$key}" class="filter{if isset($params.align) && $params.align == 'center'}center{/if} {if isset($params.class)}{$params.class}{/if}" {if !isset($params.remove_onchange) || !$params.remove_onchange}onchange="$('#submitFilterButton{$list_id}').focus();$('#submitFilterButton{$list_id}').click();"{/if} name="{$list_id}Filter_{$params.filter_key}" {if isset($params.width)} style="width:{$params.width}px"{/if}>
-																<option value="" {if $params.value == ''} selected="selected" {/if}>-</option>
+														{if isset($params.multiple) && $params.multiple}
+															<select id="filter_input_{$key}" class="filter{if isset($params.align) && $params.align == 'center'}center{/if} select_multiple_{$params.operator} chosen chosen-options-horizontal" multiple name="{$list_id}Filter_{$params.filter_key}[]" {if isset($params.width)} style="width:{$params.width}px"{/if}>
 																{if isset($params.list) && is_array($params.list)}
 																	{foreach $params.list AS $option_value => $option_display}
-																		<option value="{$option_value}" {if (string)$option_display === (string)$params.value ||  (string)$option_value === (string)$params.value} selected="selected"{/if}>{$option_display}</option>
+																		<option value="{$option_value}" {if isset($params.value) && $params.value}{if in_array($option_value, $params.value)} selected="selected"{/if}{/if}>{$option_display}</option>
 																	{/foreach}
 																{/if}
 															</select>
+														{else}
+															{if isset($params.filter_key)}
+																<select id="filter_input_{$key}" class="filter{if isset($params.align) && $params.align == 'center'}center{/if} {if isset($params.class)}{$params.class}{/if}" {if !isset($params.remove_onchange) || !$params.remove_onchange}onchange="$('#submitFilterButton{$list_id}').focus();$('#submitFilterButton{$list_id}').click();"{/if} name="{$list_id}Filter_{$params.filter_key}" {if isset($params.width)} style="width:{$params.width}px"{/if}>
+																	<option value="" {if $params.value == ''} selected="selected" {/if}>-</option>
+																	{if isset($params.list) && is_array($params.list)}
+																		{foreach $params.list AS $option_value => $option_display}
+																			<option value="{$option_value}" {if (string)$option_display === (string)$params.value ||  (string)$option_value === (string)$params.value} selected="selected"{/if}>{$option_display}</option>
+																		{/foreach}
+																	{/if}
+																</select>
+															{/if}
 														{/if}
-													{elseif $params.type == 'select_multiple_and'}
-														<select id="filter_input_{$key}" class="filter{if isset($params.align) && $params.align == 'center'}center{/if} select_multiple_and chosen chosen-options-horizontal" multiple name="{$list_id}Filter_{$params.filter_key}[]" {if isset($params.width)} style="width:{$params.width}px"{/if}>
-															{if isset($params.list) && is_array($params.list)}
-																{foreach $params.list AS $option_value => $option_display}
-																	<option value="{$option_value}" {if isset($params.value) && $params.value}{if in_array($option_value, $params.value)} selected="selected"{/if}{/if}>{$option_display}</option>
-																{/foreach}
-															{/if}
-														</select>
-													{elseif $params.type == 'select_multiple_or'}
-														<select id="filter_input_{$key}" class="filter{if isset($params.align) && $params.align == 'center'}center{/if} select_multiple_or chosen chosen-options-horizontal" multiple name="{$list_id}Filter_{$params.filter_key}[]" {if isset($params.width)} style="width:{$params.width}px"{/if}>
-															{if isset($params.list) && is_array($params.list)}
-																{foreach $params.list AS $option_value => $option_display}
-																	<option value="{$option_value}" {if isset($params.value) && $params.value}{if in_array($option_value, $params.value)} selected="selected"{/if}{/if}>{$option_display}</option>
-																{/foreach}
-															{/if}
-														</select>
 													{else}
 														<input type="text" class="filter" name="{$list_id}Filter_{if isset($params.filter_key)}{$params.filter_key}{else}{$key}{/if}" value="{$params.value|escape:'html':'UTF-8'}" {if isset($params.width) && $params.width != 'auto'} style="width:{$params.width}px"{/if} />
 													{/if}
@@ -312,7 +298,7 @@
 						$('#list_filters_panel').find('[name*="'+$(this).parent().data('filter_key')+'"]').val('');
 					} else if (type == 'range') {
 						$('#list_filters_panel').find('[name*="productFilter_'+$(this).parent().data('filter_key')+'"]').val('');
-					} else if (type == 'select' || type == 'select_multiple_and' || type == 'select_multiple_or') {
+					} else if (type == 'select') {
 						$('#list_filters_panel').find('select[name*="productFilter_'+$(this).parent().data('filter_key')+'"] option:selected').prop('selected', false);
 					} else if (type == 'bool' && $(this).parent().data('filter_key') == 'advance_payment') {
 						$('#list_filters_panel').find('select[name*="productFilter_'+$(this).parent().data('filter_key')+'"] option:selected').prop('selected', false);
@@ -328,6 +314,17 @@
 					});
 
 					form.submit();
+				});
+
+				$('#form-product').submit(function () {
+					let form = $(this);
+					$(form).find('select[multiple]').each(function (i, selectElement) {
+						if ($(selectElement).val() == null) {
+							$(form).append('<input type="hidden" name="' + $(selectElement).attr('name').slice(0, -2) + '" value="">');
+						}
+					});
+
+					return true;
 				});
 			});
 		</script>
