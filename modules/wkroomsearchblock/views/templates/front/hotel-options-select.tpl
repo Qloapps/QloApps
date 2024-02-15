@@ -1,5 +1,5 @@
 {**
- * 2010-2023 Webkul.
+ * 2010-2024 Webkul.
  *
  * NOTICE OF LICENSE
  *
@@ -13,7 +13,7 @@
  * needs please refer to CustomizationPolicy.txt file inside our module for more information.
  *
  * @author Webkul IN
- * @copyright 2010-2023 Webkul IN
+ * @copyright 2010-2024 Webkul IN
  * @license LICENSE.txt
  *}
 
