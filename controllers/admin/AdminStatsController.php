@@ -364,7 +364,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
 		SELECT SUM(IF(c.id_gender IS NOT NULL, 1, 0)) as total, SUM(IF(type = 0, 1, 0)) as male, SUM(IF(type = 1, 1, 0)) as female, SUM(IF(type = 2, 1, 0)) as neutral
 		FROM `'._DB_PREFIX_.'customer` c
 		LEFT JOIN `'._DB_PREFIX_.'gender` g ON c.id_gender = g.id_gender
-		WHERE c.active = 1 '.Shop::addSqlRestriction());
+		WHERE c.active = 1 AND c.deleted = 0 '.Shop::addSqlRestriction());
 
         if (!$row['total']) {
             return false;
@@ -571,6 +571,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
         ON (hrt.`id_product` = p.`id_product`)
         WHERE p.`active` = 1 AND p.`booking_product` = 1'.
         (!is_null($idHotel) ? HotelBranchInformation::addHotelRestriction($idHotel, 'hrt') : '').'
+        HAVING totalRevenue > 0
         ORDER BY totalRevenue DESC';
 
         return Db::getInstance()->getValue($sql);
@@ -595,7 +596,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
         $value = false;
         switch ($kpi) {
             case 'conversion_rate':
-                $nbDaysConversionRate = Configuration::get('PS_KPI_CONVERSION_RATE_NB_DAYS');
+                $nbDaysConversionRate = Validate::isUnsignedInt(Configuration::get('PS_KPI_CONVERSION_RATE_NB_DAYS')) ? Configuration::get('PS_KPI_CONVERSION_RATE_NB_DAYS') : 30;
 
                 $visitors = AdminStatsController::getVisits(
                     true,
@@ -811,7 +812,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
                 break;
 
             case 'best_selling_room_type':
-                $nbDaysBestSelling = Configuration::get('PS_KPI_BEST_SELLING_ROOM_TYPE_NB_DAYS');
+                $nbDaysBestSelling = Validate::isUnsignedInt(Configuration::get('PS_KPI_BEST_SELLING_ROOM_TYPE_NB_DAYS')) ? Configuration::get('PS_KPI_BEST_SELLING_ROOM_TYPE_NB_DAYS') : 30;
 
                 if (!($idProduct = AdminStatsController::getBestSellingRoomType(
                     date('Y-m-d', strtotime('-'.($nbDaysBestSelling + 1).' day')),
@@ -847,8 +848,10 @@ class AdminStatsControllerCore extends AdminStatsTabController
                 break;
 
             case 'total_vacant_rooms':
-                $value = AdminStatsController::getAvailableRoomsForDiscreteDates(date('Y-m-d', strtotime('-1 day')), null, 0);
-                $value = $value[strtotime(date('Y-m-d', strtotime('-1 day')))];
+                $totalAvailableRooms = AdminStatsController::getAvailableRoomsForDiscreteDates(date('Y-m-d'), null, 0);
+                $totalAvailableRooms = $totalAvailableRooms[strtotime(date('Y-m-d'))];
+                $totalOccupiedRooms = AdminStatsController::getTotalOccupiedRooms(0);
+                $value = $totalAvailableRooms - $totalOccupiedRooms;
 
                 break;
 
@@ -858,8 +861,8 @@ class AdminStatsControllerCore extends AdminStatsTabController
                 break;
 
             case 'total_disabled_rooms':
-                $value = AdminStatsController::getDisabledRoomsForDiscreteDates(date('Y-m-d', strtotime('-1 day')), null, 0);
-                $value = $value[strtotime(date('Y-m-d', strtotime('-1 day')))];
+                $value = AdminStatsController::getDisabledRoomsForDiscreteDates(date('Y-m-d'), null, 0);
+                $value = $value[strtotime(date('Y-m-d'))];
 
                 break;
 
@@ -889,12 +892,9 @@ class AdminStatsControllerCore extends AdminStatsTabController
                 break;
 
             case 'total_new_customers':
-                $nbDaysNewCustomers = Configuration::get('PS_KPI_NEW_CUSTOMERS_NB_DAYS');
+                $nbDaysNewCustomers = Validate::isUnsignedInt(Configuration::get('PS_KPI_NEW_CUSTOMERS_NB_DAYS')) ? Configuration::get('PS_KPI_NEW_CUSTOMERS_NB_DAYS') : 30;
 
-                $value = AdminStatsController::getTotalNewCustomers(
-                    date('Y-m-d', strtotime('-'.($nbDaysNewCustomers + 1).' day')),
-                    date('Y-m-d', strtotime('-1 day')),
-                );
+                $value = AdminStatsController::getTotalNewCustomers($nbDaysNewCustomers);
 
                 break;
 
@@ -1213,14 +1213,17 @@ class AdminStatsControllerCore extends AdminStatsTabController
             'SELECT SUM(total_paid_tax_excl - refunded_amount)
             FROM (
                 SELECT o.`total_paid_tax_excl` / o.`conversion_rate` AS total_paid_tax_excl,
-                IFNULL(orr.`refunded_amount`, 0) AS refunded_amount,
+                (
+                    SELECT IFNULL(SUM(orr.`refunded_amount`), 0)
+                    FROM`'._DB_PREFIX_.'order_return` orr
+                    WHERE orr.`id_order` = o.`id_order`
+                ) AS refunded_amount,
                 (
                     SELECT hbd.`id_hotel`
                     FROM`'._DB_PREFIX_.'htl_booking_detail` hbd
                     WHERE hbd.`id_order` = o.`id_order` LIMIT 1
                 ) AS id_hotel
                 FROM `'._DB_PREFIX_.'orders` o
-                LEFT JOIN `' ._DB_PREFIX_.'order_return` orr ON orr.`id_order` = o.`id_order`
                 WHERE o.`valid` = 1 AND o.`invoice_date` BETWEEN "'.pSQL($dateFrom).' 00:00:00" AND "'.pSQL($dateTo).' 23:59:59"
                 HAVING 1 '.HotelBranchInformation::addHotelRestriction($idHotel).'
             ) AS t'
@@ -1706,6 +1709,9 @@ class AdminStatsControllerCore extends AdminStatsTabController
         return $result;
     }
 
+    /**
+     * Returns the number of rooms that have been checked-in.
+     */
     public static function getTotalOccupiedRooms($idHotel = null)
     {
         $sql = 'SELECT COUNT(DISTINCT hbd.`id_room`)
@@ -1724,6 +1730,9 @@ class AdminStatsControllerCore extends AdminStatsTabController
         return $result;
     }
 
+    /**
+     * Returns the number of rooms that have been booked but not checked-in yet.
+     */
     public static function getTotalReservedRooms($idHotel = null)
     {
         $dateToday = date('Y-m-d');
@@ -1799,11 +1808,12 @@ class AdminStatsControllerCore extends AdminStatsTabController
         return $customerRegistrations + $visitorRegistrations;
     }
 
-    public static function getTotalNewCustomers($dateFrom, $dateTo)
+    public static function getTotalNewCustomers($nbDaysNewCustomers)
     {
+        $maxDateAdd = date('Y-m-d H:i:s', strtotime('-'.$nbDaysNewCustomers.' day'));
         $sql = 'SELECT COUNT(c.`id_customer`)
         FROM `'._DB_PREFIX_.'customer` c
-        WHERE c.`date_add` >= "'.pSQL($dateFrom).' 00:00:00" AND c.`date_add` <= "'.pSQL($dateTo).' 23:59:59"';
+        WHERE c.`date_add` >= "'.pSQL($maxDateAdd).'" AND c.`deleted` = 0';
         $result = Db::getInstance()->getValue($sql);
 
         return $result;

@@ -2309,10 +2309,7 @@ class AdminProductsControllerCore extends AdminController
         $helper->icon = 'icon-star';
         $helper->color = 'color1';
         $helper->title = $this->l('Best Selling', null, null, false);
-        $nbDaysBestSelling = 30;
-        if (Configuration::get('PS_KPI_BEST_SELLING_ROOM_TYPE_NB_DAYS') !== false) {
-            $nbDaysBestSelling = Configuration::get('PS_KPI_BEST_SELLING_ROOM_TYPE_NB_DAYS');
-        }
+        $nbDaysBestSelling = Validate::isUnsignedInt(Configuration::get('PS_KPI_BEST_SELLING_ROOM_TYPE_NB_DAYS')) ? Configuration::get('PS_KPI_BEST_SELLING_ROOM_TYPE_NB_DAYS') : 30;
         $helper->subtitle = sprintf($this->l('%d Days', null, null, false), (int) $nbDaysBestSelling);
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=best_selling_room_type';
         $helper->tooltip = $this->l('Displays the best selling room type based on the last 30 days of sales.', null, null, false);

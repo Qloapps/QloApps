@@ -138,7 +138,7 @@ class AdminCustomerPreferencesControllerCore extends AdminController
                     ),
                     'PS_KPI_REVPAC_NB_DAYS' => array(
                         'title' => $this->l('Number of days to use to calculate RevPAC'),
-                        'hint' => $this->l('Set the number of days to use to calculate RevPAC.'),
+                        'hint' => $this->l('Set the number of days to use to calculate Revenue Per Available Customer.'),
                         'validation' => 'isUnsignedInt',
                         'cast' => 'intval',
                         'type' => 'text',
@@ -155,8 +155,8 @@ class AdminCustomerPreferencesControllerCore extends AdminController
                         'class' => 'fixed-width-xl',
                     ),
                     'PS_KPI_NEW_CUSTOMERS_NB_DAYS' => array(
-                        'title' => $this->l('Number of days to use to calculate New Customers'),
-                        'hint' => $this->l('Set the number of days to use to calculate New Customers.'),
+                        'title' => $this->l('Number of days for which a customer is considered \'new\''),
+                        'hint' => $this->l('Set the number of days for which a customer is considered \'new\' after creation date.'),
                         'validation' => 'isUnsignedInt',
                         'cast' => 'intval',
                         'type' => 'text',

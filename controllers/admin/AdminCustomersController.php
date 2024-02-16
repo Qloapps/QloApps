@@ -672,10 +672,7 @@ class AdminCustomersControllerCore extends AdminController
         $helper->icon = 'icon-dollar';
         $helper->color = 'color3';
         $helper->title = $this->l('RevPAC', null, null, false);
-        $nbDaysRevPac = 30;
-        if (Configuration::get('PS_KPI_REVPAC_NB_DAYS') !== false) {
-            $nbDaysRevPac = Configuration::get('PS_KPI_REVPAC_NB_DAYS');
-        }
+        $nbDaysRevPac = Validate::isUnsignedInt(Configuration::get('PS_KPI_REVPAC_NB_DAYS')) ? Configuration::get('PS_KPI_REVPAC_NB_DAYS') : 30;
         $helper->subtitle = sprintf($this->l('%d Days', null, null, false), (int) $nbDaysRevPac);
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=revenue_per_available_customer';
         $helper->tooltip = $this->l('Revenue per Available Customer (RevPAC) in given period of time.', null, null, false);
@@ -696,10 +693,7 @@ class AdminCustomersControllerCore extends AdminController
         $helper->icon = 'icon-refresh';
         $helper->color = 'color1';
         $helper->title = $this->l('Conversion Rate', null, null, false);
-        $nbDaysConversionRate = 30;
-        if (Configuration::get('PS_KPI_CONVERSION_RATE_NB_DAYS') !== false) {
-            $nbDaysConversionRate = Configuration::get('PS_KPI_CONVERSION_RATE_NB_DAYS');
-        }
+        $nbDaysConversionRate = Validate::isUnsignedInt(Configuration::get('PS_KPI_CONVERSION_RATE_NB_DAYS')) ? Configuration::get('PS_KPI_CONVERSION_RATE_NB_DAYS') : 30;
         $helper->subtitle = sprintf($this->l('%d Days', null, null, false), (int) $nbDaysConversionRate);
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=conversion_rate';
         $helper->tooltip = $this->l('The percentage of visitors who created a booking in given period of time.', null, null, false);
@@ -710,10 +704,7 @@ class AdminCustomersControllerCore extends AdminController
         $helper->icon = 'icon-plus-circle';
         $helper->color = 'color4';
         $helper->title = $this->l('New Customers', null, null, false);
-        $nbDaysNewCustomers = 30;
-        if (Configuration::get('PS_KPI_NEW_CUSTOMERS_NB_DAYS') !== false) {
-            $nbDaysNewCustomers = Configuration::get('PS_KPI_NEW_CUSTOMERS_NB_DAYS');
-        }
+        $nbDaysNewCustomers = Validate::isUnsignedInt(Configuration::get('PS_KPI_NEW_CUSTOMERS_NB_DAYS')) ? Configuration::get('PS_KPI_NEW_CUSTOMERS_NB_DAYS') : 30;
         $helper->subtitle = sprintf($this->l('%d Days', null, null, false), (int) $nbDaysNewCustomers);
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=total_new_customers';
         $helper->tooltip = $this->l('The total number of new customers who registered in given period of time.', null, null, false);

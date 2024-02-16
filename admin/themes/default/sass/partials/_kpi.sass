@@ -58,7 +58,14 @@ $kpi-gap: 10px
 			white-space: normal
 			flex-wrap: nowrap
 			.kpi-wrap
-				min-width: 200px
+				@media (min-width: $screen-lg)
+					min-width: 20%
+				@media (max-width: $screen-lg)
+					min-width: 20%
+				@media (max-width: $screen-sm)
+					min-width: 33.33%
+				@media (max-width: $screen-xs)
+					min-width: 50%
 
 @media (max-width: $screen-desktop)
 	&.no-wrapping
