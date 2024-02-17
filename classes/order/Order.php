@@ -1895,18 +1895,18 @@ class OrderCore extends ObjectModel
                 unset($invoices[$key]);
             }
         }
-        $delivery_slips = $this->getDeliverySlipsCollection()->getResults();
-        // @TODO review
-        foreach ($delivery_slips as $key => $delivery) {
-            $delivery->is_delivery = true;
-            $delivery->date_add = $delivery->delivery_date;
-            if (!$invoice->delivery_number) {
-                unset($delivery_slips[$key]);
-            }
-        }
+        // $delivery_slips = $this->getDeliverySlipsCollection()->getResults();
+        // // @TODO review
+        // foreach ($delivery_slips as $key => $delivery) {
+        //     $delivery->is_delivery = true;
+        //     $delivery->date_add = $delivery->delivery_date;
+        //     if (!$invoice->delivery_number) {
+        //         unset($delivery_slips[$key]);
+        //     }
+        // }
         $order_slips = $this->getOrderSlipsCollection()->getResults();
 
-        $documents = array_merge($invoices, $order_slips, $delivery_slips);
+        $documents = array_merge($invoices, $order_slips);
         usort($documents, array('Order', 'sortDocuments'));
 
         return $documents;

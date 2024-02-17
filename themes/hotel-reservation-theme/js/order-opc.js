@@ -1320,3 +1320,10 @@ $(document).on('click', '.btn-edit-guest-info', function(e) {
 	$('#collapse-guest-info .card-body:nth-child(1)').hide();
 	$('#collapse-guest-info .card-body:nth-child(2)').toggleClass('hidden');
 });
+
+$(document).on('keydown', '#new_account_form input', function(e) {
+	if (e.keyCode === 13) {
+		e.preventDefault();
+		$('#new_account_form #opc_account_form:visible button[type="submit"]').click();
+	}
+});

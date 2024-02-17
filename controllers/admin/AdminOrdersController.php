@@ -1718,7 +1718,10 @@ class AdminOrdersControllerCore extends AdminController
                     $value['id_product'],
                     $value['date_from'],
                     $value['date_to'],
-                    $value['id_room']
+                    $value['id_room'],
+                    0,
+                    null,
+                    null
                 );
                 $order_detail_data[$key]['total_room_price_ti'] += $order_detail_data[$key]['additional_services_price_ti'] = $objRoomTypeServiceProductOrderDetail->getroomTypeServiceProducts(
                     $order->id,

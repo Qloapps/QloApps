@@ -180,7 +180,7 @@ class AddressCore extends ObjectModel
     {
         // for customer address we need to check of customer address already exists.
         if ($this->id_customer) {
-            if ($id_address = Customer::getCustomerIdAddress($this->id_customer)) {
+            if ($id_address = Customer::getCustomerIdAddress($this->id_customer, false)) {
                 return false;
             }
         }

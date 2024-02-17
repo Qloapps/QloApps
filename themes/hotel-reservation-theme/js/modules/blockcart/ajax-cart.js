@@ -404,7 +404,7 @@ var ajaxCart = {
                     if (jsonData.avail_rooms == 0) {
                         disableRoomTypeDemands(1);
                     }
-                    BookingForm.refresh();
+                    BookingForm.refresh(true);
                 }
 
                 if (pagename == 'category') {
@@ -422,6 +422,13 @@ var ajaxCart = {
                         $(callerElement).closest(".room_cont").hide();
                     }
                     //$('#quantity_wanted_'+idProduct).val(1);
+
+                    let addRoomButton = $(callerElement).closest('.room_info_cont').find('.booking_guest_occupancy_conatiner .dropdown-menu .add_occupancy_block .add_new_occupancy_btn');
+                    if (jsonData.avail_rooms > 1) {
+                        $(addRoomButton).removeClass('disabled');
+                    } else {
+                        $(addRoomButton).addClass('disabled');
+                    }
                 }
 
 
@@ -664,6 +671,13 @@ var ajaxCart = {
                             $('.room_cont[data-id-product="'+idProduct+'"]').find('.rm_left').hide();
                         }
                     });
+
+                    let addRoomButton = $('.room_cont[data-id-product="'+idProduct+'"]').find('.room_info_cont').find('.booking_guest_occupancy_conatiner .dropdown-menu .add_occupancy_block .add_new_occupancy_btn');
+                    if (jsonData.avail_rooms > 1) {
+                        $(addRoomButton).removeClass('disabled');
+                    } else {
+                        $(addRoomButton).addClass('disabled');
+                    }
                 }
                 if (pagename == 'orderopc') {
                     location.reload();
