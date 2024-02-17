@@ -468,8 +468,8 @@ class AdminStatsControllerCore extends AdminStatsTabController
 				LEFT(`invoice_date`, 10) as date,
 				SUM(od.`product_quantity` * IF(
 					od.`purchase_supplier_price` > 0,
-					od.`purchase_supplier_price` / `conversion_rate`,
-					od.`original_product_price` * '.(int)Configuration::get('CONF_AVERAGE_PRODUCT_MARGIN').' / 100
+					od.`purchase_supplier_price`,
+					(od.`original_product_price` / `conversion_rate`) * '.(int)Configuration::get('CONF_AVERAGE_PRODUCT_MARGIN').' / 100
 				)) as total_purchase_price
 			FROM `'._DB_PREFIX_.'orders` o
 			LEFT JOIN `'._DB_PREFIX_.'order_detail` od ON o.id_order = od.id_order
@@ -487,8 +487,8 @@ class AdminStatsControllerCore extends AdminStatsTabController
             return Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue('
 			SELECT SUM(od.`product_quantity` * IF(
 				od.`purchase_supplier_price` > 0,
-				od.`purchase_supplier_price` / `conversion_rate`,
-				od.`original_product_price` * '.(int)Configuration::get('CONF_AVERAGE_PRODUCT_MARGIN').' / 100
+				od.`purchase_supplier_price`,
+				(od.`original_product_price` / `conversion_rate`) * '.(int)Configuration::get('CONF_AVERAGE_PRODUCT_MARGIN').' / 100
 			)) as total_purchase_price
 			FROM `'._DB_PREFIX_.'orders` o
 			LEFT JOIN `'._DB_PREFIX_.'order_detail` od ON o.id_order = od.id_order
