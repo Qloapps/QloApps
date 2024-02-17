@@ -252,8 +252,6 @@ class AdminOrdersControllerCore extends AdminController
         }
 
         parent::__construct();
-
-        $this->_conf[101] = $this->l('Booking cancellation undo has been done successfully.');
     }
 
     public static function setOrderCurrency($echo, $tr)
@@ -4284,59 +4282,6 @@ class AdminOrdersControllerCore extends AdminController
             'documents_html' => $this->createTemplate('_documents.tpl')->fetch(),
             'shipping_html' => $this->createTemplate('_shipping.tpl')->fetch()
         )));
-    }
-
-    public function ajaxProcessUndoBookingCancellation()
-    {
-        $result = array();
-        $result['success'] = 0;
-        $result['error'] = '';
-
-        $idHotelBooking = Tools::getValue('id_htl_booking');;
-
-        if (Validate::isLoadedObject($objHotelBooking = new HotelBookingDetail($idHotelBooking))) {
-            Hook::exec('actionUndoBookingCancellation', array('id_htl_booking' => $idHotelBooking));
-            // if inventory is available for that booking
-            $bookingParams = array(
-                'date_from' => $objHotelBooking->date_from,
-                'date_to' => $objHotelBooking->date_to,
-                'hotel_id' => $objHotelBooking->id_hotel,
-                'id_room_type' => $objHotelBooking->id_product,
-                'only_search_data' => 1
-            );
-
-            if ($searchRoomsInfo = $objHotelBooking->getBookingData($bookingParams)) {
-                if (isset($searchRoomsInfo['rm_data'][$objHotelBooking->id_product]['data']['available'])
-                    && $searchRoomsInfo['rm_data'][$objHotelBooking->id_product]['data']['available']
-                ) {
-                    $availableRoomsInfo = $searchRoomsInfo['rm_data'][$objHotelBooking->id_product]['data']['available'];
-                    if ($roomIdsAvailable = array_column($availableRoomsInfo, 'id_room')) {
-                        // Check If room is still there in the available rooms list
-                        if (in_array($objHotelBooking->id_room, $roomIdsAvailable)) {
-                            // Undo the cancellation
-                            $objHotelBooking->is_cancelled = 0;
-                            $objHotelBooking->is_refunded = 0;
-                            if ($objHotelBooking->save()) {
-                                $result['success'] = 1;
-                                $result['redirect'] = self::$currentIndex.'&id_order='.(int) $objHotelBooking->id_order.'&vieworder&conf=101&token='.$this->token;
-                            }
-                        } else {
-                            $result['error'] = Tools::displayError('You can not undo the cancellation as this room is not available now.');
-                        }
-                    } else {
-                        $result['error'] = Tools::displayError('You can not undo the cancellation as this room is not available now.');
-                    }
-                } else {
-                    $result['error'] = Tools::displayError('You can not undo the cancellation as this room is not available now.');
-                }
-            } else {
-                $result['error'] = Tools::displayError('Some error occurred while undoing the cancellation.');
-            }
-        } else {
-            $result['error'] = Tools::displayError('Some error occurred while undoing the cancellation.');
-        }
-
-        die(json_encode($result));
     }
 
     public function ajaxProcessDeleteProductLine()

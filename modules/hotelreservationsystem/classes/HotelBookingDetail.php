@@ -2707,20 +2707,6 @@ class HotelBookingDetail extends ObjectModel
         ));
     }
 
-    public function isUndoBookingCancellationAvailable()
-    {
-        if (Validate::isLoadedObject($this)) {
-            $objOrder = new Order($this->id_order);
-            $orderTotalPaid = $objOrder->getTotalPaid();
-            // Undo cancellation is available only if checkout date is not passed and payment is not created for the order and room is cancelled not refunded
-            if ($this->is_cancelled && (strtotime($this->date_to) >= strtotime(date('Y-m-d'))) && $orderTotalPaid <= 0) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
     // process the booking tables changes when a booking refund/cancellation is processed
     public function processRefundInBookingTables()
     {
