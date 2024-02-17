@@ -136,10 +136,7 @@ class StatsBestProducts extends ModuleGrid
         }
 
         $html = '<div class="panel-heading">'.$this->displayName.'</div>';
-        if (!(Module::isEnabled('statsdata') && Configuration::get('PS_STATSDATA_PAGESVIEWS'))) {
-			$link = $this->context->link->getAdminLink('AdminModules').'&configure=statsdata';
-            $html .= '<div class="alert alert-info">'.$this->l('You must enable the "Save global page views" option from ').'<u><a href="'.$link.'" target="_blank">Data mining for statistics</a></u>'.$this->l(' module in order to display the most viewed room types, or use the QloApps Google Analytics module.').'</div>';
-        }
+
         $html .= $this->engine($engine_params).'
 		<a class="btn btn-default export-csv" href="'.Tools::safeOutput($_SERVER['REQUEST_URI'].'&export=1').'">
 			<i class="icon-cloud-download"></i> '.$this->l('CSV Export').'
