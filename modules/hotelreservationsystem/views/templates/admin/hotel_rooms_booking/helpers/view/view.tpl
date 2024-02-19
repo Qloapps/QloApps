@@ -64,7 +64,7 @@
 									<div class="col-sm-8">
 										<div class="dropdown">
 											<button class="booking_guest_occupancy btn btn-default btn-left btn-block input-occupancy" id="search_occupancy" type="button">
-												<span class="">{if (isset($occupancy_adults) && $occupancy_adults)}{$occupancy_adults} {if $occupancy_adults > 1}{l s='Adults'}{else}{l s='Adult'}{/if}, {if isset($occupancy_children) && $occupancy_children}{$occupancy_children} {if $occupancy_children > 1} {l s='Children'}{else}{l s='Child'}{/if}, {/if}{$occupancy|count} {if $occupancy|count > 1}{l s='Rooms'}{else}{l s='Room'}{/if}{else}{l s='1 Adult, 1 Room'}{/if}</span>
+												<span class="">{if (isset($occupancy_adults) && $occupancy_adults)}{$occupancy_adults} {if $occupancy_adults > 1}{l s='Adults' mod='hotelreservationsystem'}{else}{l s='Adult' mod='hotelreservationsystem'}{/if}, {if isset($occupancy_children) && $occupancy_children}{$occupancy_children} {if $occupancy_children > 1} {l s='Children' mod='hotelreservationsystem'}{else}{l s='Child' mod='hotelreservationsystem'}{/if}, {/if}{$occupancy|count} {if $occupancy|count > 1}{l s='Rooms' mod='hotelreservationsystem'}{else}{l s='Room' mod='hotelreservationsystem'}{/if}{else}{l s='1 Adult, 1 Room' mod='hotelreservationsystem'}{/if}</span>
 											</button>
 											<input type="hidden" class="max_avail_type_qty" value="{if isset($total_available_rooms)}	{$total_available_rooms|escape:'html':'UTF-8'}{/if}">
 											<div class="dropdown-menu booking_occupancy_wrapper well well-sm">
@@ -74,30 +74,30 @@
 														<hr class="occupancy-info-separator col-sm-12">
 														{foreach from=$occupancy key=key item=$room_occupancy name=occupancyInfo}
 															<div class="occupancy_info_block" occ_block_index="{$key|escape:'htmlall':'UTF-8'}">
-																<div class="occupancy_info_head col-sm-12"><label class="room_num_wrapper">{l s='Room'} - {$countRoom|escape:'htmlall':'UTF-8'} </label>{if !$smarty.foreach.occupancyInfo.first}<a class="remove-room-link pull-right" href="#">{l s='Remove'}</a>{/if}</div>
+																<div class="occupancy_info_head col-sm-12"><label class="room_num_wrapper">{l s='Room' mod='hotelreservationsystem'} - {$countRoom|escape:'htmlall':'UTF-8'} </label>{if !$smarty.foreach.occupancyInfo.first}<a class="remove-room-link pull-right" href="#">{l s='Remove' mod='hotelreservationsystem'}</a>{/if}</div>
 																<div class="col-sm-12">
 																	<div class="row">
 																		<div class="form-group col-xs-6 occupancy_count_block">
-																			<label>{l s='Adults'}</label>
+																			<label>{l s='Adults' mod='hotelreservationsystem'}</label>
 																			<input type="number" class="form-control num_occupancy num_adults" name="occupancy[{$key|escape:'htmlall':'UTF-8'}][adults]" value="{$room_occupancy['adults']|escape:'htmlall':'UTF-8'}" min="1">
 																		</div>
 																		<div class="form-group col-xs-6 occupancy_count_block">
-																			<label>{l s='Children'} <span class="label-desc-txt"></span></label>
+																			<label>{l s='Children' mod='hotelreservationsystem'} <span class="label-desc-txt"></span></label>
 																			<input type="number" class="form-control num_occupancy num_children" name="occupancy[{$key|escape:'htmlall':'UTF-8'}][children]" value="{$room_occupancy['children']|escape:'htmlall':'UTF-8'}" min="0" {if $max_child_in_room}max="{$max_child_in_room}"{/if}>
-																			({l s='Below'}  {$max_child_age|escape:'htmlall':'UTF-8'} {l s='years'})
+																			({l s='Below'}  {$max_child_age|escape:'htmlall':'UTF-8'} {l s='years' mod='hotelreservationsystem'})
 																		</div>
 																	</div>
 																	<div class="row children_age_info_block" {if !$room_occupancy['children']}style="display:none"{/if}>
 																		<div class="form-group col-sm-12">
-																			<label class="">{l s='All Children'}</label>
+																			<label class="">{l s='All Children' mod='hotelreservationsystem'}</label>
 																			<div class="">
 																				<div class="row children_ages">
 																					{if isset($room_occupancy['child_ages']) && $room_occupancy['child_ages']}
 																						{foreach $room_occupancy['child_ages'] as $childAge}
 																							<div class="form-group col-xs-12 col-sm-12 col-md-6 col-lg-6">
 																								<select class="guest_child_age room_occupancies" name="occupancy[{$key|escape:'htmlall':'UTF-8'}][child_ages][]">
-																									<option value="-1" {if $childAge == -1}selected{/if}>{l s='Select age'}</option>
-																									<option value="0" {if $childAge == 0}selected{/if}>{l s='Under 1'}</option>
+																									<option value="-1" {if $childAge == -1}selected{/if}>{l s='Select age' mod='hotelreservationsystem'}</option>
+																									<option value="0" {if $childAge == 0}selected{/if}>{l s='Under 1' mod='hotelreservationsystem'}</option>
 																									{for $age=1 to ($max_child_age-1)}
 																										<option value="{$age|escape:'htmlall':'UTF-8'}" {if $childAge == $age}selected{/if}>{$age|escape:'htmlall':'UTF-8'}</option>
 																									{/for}
@@ -116,22 +116,22 @@
 														{/foreach}
 													{else}
 														<div class="occupancy_info_block col-sm-12" occ_block_index="0">
-															<div class="occupancy_info_head col-sm-12"><label class="room_num_wrapper">{l s='Room - 1'}</label></div>
+															<div class="occupancy_info_head col-sm-12"><label class="room_num_wrapper">{l s='Room - 1' mod='hotelreservationsystem'}</label></div>
 															<div class="col-sm-12">
 																<div class="row">
 																	<div class="form-group col-xs-6 occupancy_count_block">
-																		<label>{l s='Adults'}</label>
+																		<label>{l s='Adults' mod='hotelreservationsystem'}</label>
 																		<input type="number" class="form-control num_occupancy num_adults" name="occupancy[0][adults]" value="1" min="1">
 																	</div>
 																	<div class="form-group col-xs-6 occupancy_count_block">
-																		<label>{l s='Children'} <span class="label-desc-txt"></span></label>
+																		<label>{l s='Children' mod='hotelreservationsystem'} <span class="label-desc-txt"></span></label>
 																		<input type="number" class="form-control num_occupancy num_children" name="occupancy[0][children]" value="0" min="0" {if $max_child_in_room}max="{$max_child_in_room}"{/if}>
-																		({l s='Below'}  {$max_child_age|escape:'htmlall':'UTF-8'} {l s='years'})
+																		({l s='Below'}  {$max_child_age|escape:'htmlall':'UTF-8'} {l s='years' mod='hotelreservationsystem'})
 																	</div>
 																</div>
 																<div class="row children_age_info_block" style="display:none">
 																	<div class="form-group col-sm-12">
-																		<label class="">{l s='All Children'}</label>
+																		<label class="">{l s='All Children' mod='hotelreservationsystem'}</label>
 																		<div class="">
 																			<div class="row children_ages">
 																			</div>
@@ -144,7 +144,7 @@
 													{/if}
 												</div>
 												<div class="add_occupancy_block col-sm-12">
-													<a class="add_new_occupancy_btn" href="#"><i class="icon-plus"></i> <span>{l s='Add Room'}</span></a>
+													<a class="add_new_occupancy_btn" href="#"><i class="icon-plus"></i> <span>{l s='Add Room' mod='hotelreservationsystem'}</span></a>
 												</div>
 											</div>
 										</div>
@@ -206,7 +206,7 @@
 		{/if}
 	{else}
 		<p class="alert alert-warning">
-			{l s='No hotels available for booking'}
+			{l s='No hotels available for booking' mod='hotelreservationsystem'}
 		</p>
 	{/if}
 </div>
@@ -227,7 +227,7 @@
 				<form method="post" action="">
 					<div class="modal-header">
 						<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-						<h4 class="modal-title" id="realloc_myModalLabel">{l s='Reallocate Rooms'}</h4>
+						<h4 class="modal-title" id="realloc_myModalLabel">{l s='Reallocate Rooms' }</h4>
 					</div>
 					<div class="modal-body">
 						<div class="form-group">
@@ -257,7 +257,7 @@
 						</div>
 					</div>
 					<div class="modal-footer">
-						<button type="button" class="btn btn-default" data-dismiss="modal">{l s="Close" mod="hotelreservationsyatem"}</button>
+						<button type="button" class="btn btn-default" data-dismiss="modal">{l s="Close" mod='hotelreservationsyatem'}</button>
 						<input type="submit" id="realloc_allocated_rooms" name="realloc_allocated_rooms" class="btn btn-primary" value="Reallocate">
 					</div>
 				</form>
@@ -296,7 +296,7 @@
 						</div>
 					</div>
 					<div class="modal-footer">
-						<button type="button" class="btn btn-default" data-dismiss="modal">{l s="Close" mod="hotelreservationsyatem"}</button>
+						<button type="button" class="btn btn-default" data-dismiss="modal">{l s="Close" mod='hotelreservationsyatem'}</button>
 						<input type="submit" id="swap_allocated_rooms" name="swap_allocated_rooms" class="btn btn-primary" value="Swap">
 					</div>
 				</form>

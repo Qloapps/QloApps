@@ -43,12 +43,12 @@
 				<a href="javascript:void(0);" onclick="dashgoals_changeYear('backward');" class="btn btn-default btn-xs"><i class="icon-backward"></i></a>
 				<a href="javascript:void(0);" onclick="dashgoals_changeYear('forward');" class="btn btn-default btn-xs"><i class="icon-forward"></i></a>
 			</span>
-			
+
 			<span class="panel-heading-action">
-				<a class="list-toolbar-btn" href="javascript:void(0);" onclick="toggleDashConfig('dashgoals');" title="{l s="Configure" mod="dashtrends"}">
+				<a class="list-toolbar-btn" href="javascript:void(0);" onclick="toggleDashConfig('dashgoals');" title="{l s="Configure" mod='dashtrends'}">
 					<i class="process-icon-configure"></i>
 				</a>
-				<a class="list-toolbar-btn" href="javascript:void(0);" onclick="refreshDashboard('dashgoals');" title="{l s="Refresh" mod="dashtrends"}">
+				<a class="list-toolbar-btn" href="javascript:void(0);" onclick="refreshDashboard('dashgoals');" title="{l s="Refresh" mod='dashtrends'}">
 					<i class="process-icon-refresh"></i>
 				</a>
 			</span>
@@ -61,30 +61,30 @@
 			<div class="dashgoals row">
 				<div class="col-xs-6 col-sm-3">
 					<label class="btn btn-default label-tooltip" style="background-color:{$colors[0]};"
-						data-toggle="tooltip" data-original-title="{l s="Traffic is the measure of number of visitors on your website over a given time period." mod="dashgoals"}">
+						data-toggle="tooltip" data-original-title="{l s="Traffic is the measure of number of visitors on your website over a given time period." mod='dashgoals'}">
 						<input type="radio" name="options" onchange="selectDashgoalsChart('traffic');"/>
-						{l s="Traffic" mod="dashgoals"}
+						{l s="Traffic" mod='dashgoals'}
 					</label>
 				</div>
 				<div class="col-xs-6 col-sm-3">
 					<label class="btn btn-default label-tooltip" style="background-color:{$colors[1]};"
-						data-toggle="tooltip" data-original-title="{l s="Conversion is the measure of visitors who make a booking on your website over a given time period." mod="dashgoals"}">
+						data-toggle="tooltip" data-original-title="{l s="Conversion is the measure of visitors who make a booking on your website over a given time period." mod='dashgoals'}">
 						<input type="radio" name="options" onchange="selectDashgoalsChart('conversion');"/>
-						{l s="Conversion" mod="dashgoals"}
+						{l s="Conversion" mod='dashgoals'}
 					</label>
 				</div>
 				<div class="col-xs-6 col-sm-3">
 					<label class="btn btn-default label-tooltip" style="background-color:{$colors[2]};"
-						data-toggle="tooltip" data-original-title="{l s="Average Order Value is the average amount spent on each booking over a given time period." mod="dashgoals"}">
+						data-toggle="tooltip" data-original-title="{l s="Average Order Value is the average amount spent on each booking over a given time period." mod='dashgoals'}">
 						<input type="radio" name="options" onchange="selectDashgoalsChart('avg_cart_value');"/>
-						{l s="Avg. Order Value" mod="dashgoals"}
+						{l s="Avg. Order Value" mod='dashgoals'}
 					</label>
 				</div>
 				<div class="col-xs-6 col-sm-3">
 					<label class="btn btn-default label-tooltip" style="background-color:{$colors[3]};"
-						data-toggle="tooltip" data-original-title="{l s="Sales is the measure of total sales on your website over a given time period." mod="dashgoals"}">
+						data-toggle="tooltip" data-original-title="{l s="Sales is the measure of total sales on your website over a given time period." mod='dashgoals'}">
 						<input type="radio" name="options" onchange="selectDashgoalsChart('sales');"/>
-						{l s="Sales" mod="dashgoals"}
+						{l s="Sales" mod='dashgoals'}
 					</label>
 				</div>
 			</div>

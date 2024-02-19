@@ -26,25 +26,25 @@
 <section id="dashactivity" class="widget allow_push">
 	<div class="panel">
 		<div class="panel-heading">
-			<i class="icon-time"></i> {l s="Activity overview" mod="dashactivity"}
+			<i class="icon-time"></i> {l s="Activity overview" mod='dashactivity'}
 			<span class="panel-heading-action">
-				<a class="list-toolbar-btn" href="#" onclick="toggleDashConfig('dashactivity'); return false;" title="{l s="Configure" mod="dashactivity"}">
+				<a class="list-toolbar-btn" href="#" onclick="toggleDashConfig('dashactivity'); return false;" title="{l s="Configure" mod='dashactivity'}">
 					<i class="process-icon-configure"></i>
 				</a>
-				<a class="list-toolbar-btn" href="#" onclick="refreshDashboard('dashactivity'); return false;" title="{l s="Refresh" mod="dashactivity"}">
+				<a class="list-toolbar-btn" href="#" onclick="refreshDashboard('dashactivity'); return false;" title="{l s="Refresh" mod='dashactivity'}">
 					<i class="process-icon-refresh"></i>
 				</a>
 			</span>
 		</div>
 		<section id="dashactivity_config" class="dash_config hide">
-			<header><i class="icon-wrench"></i> {l s="Configuration" mod="dashactivity"}</header>
+			<header><i class="icon-wrench"></i> {l s="Configuration" mod='dashactivity'}</header>
 			{$dashactivity_config_form}
 		</section>
 
 		<section class="activity-section dash-live">
 			<span class="title">
 				<a href="{$link->getAdminLink("AdminStats")|escape:"html":"UTF-8"}&module=statslive" target="_blank">
-					<span>{l s="Online Visitors" mod="dashactivity"}</span>
+					<span>{l s="Online Visitors" mod='dashactivity'}</span>
 				</a>
 			</span>
 			<span class="value">
@@ -52,7 +52,7 @@
 			</span>
 			<div class="sub-title">
 				<small class="text-muted">
-					{l s="in the last %d minutes" sprintf=$DASHACTIVITY_VISITOR_ONLINE|intval mod="dashactivity"}
+					{l s="in the last %d minutes" sprintf=$DASHACTIVITY_VISITOR_ONLINE|intval mod='dashactivity'}
 				</small>
 			</div>
 		</section>
@@ -60,7 +60,7 @@
 		<section class="activity-section dash-live">
 			<span class="title">
 				<a href="{$link->getAdminLink("AdminCarts")|escape:"html":"UTF-8"}" target="_blank">
-					<span>{l s="Active Booking Carts" mod="dashactivity"}</span>
+					<span>{l s="Active Booking Carts" mod='dashactivity'}</span>
 				</a>
 			</span>
 			<span class="value">
@@ -68,20 +68,20 @@
 			</span>
 			<div class="sub-title">
 				<small class="text-muted">
-					{l s="in the last %d minutes" sprintf=$DASHACTIVITY_CART_ACTIVE|intval mod="dashactivity"}
+					{l s="in the last %d minutes" sprintf=$DASHACTIVITY_CART_ACTIVE|intval mod='dashactivity'}
 				</small>
 			</div>
 		</section>
 
 		<section id="dash_pending" class="activity-section">
 			<span class="title">
-				<span>{l s="Currently Pending" mod="dashactivity"}</span>
+				<span>{l s="Currently Pending" mod='dashactivity'}</span>
 			</span>
 			<ul class="stats-list">
 				<li>
 					<span class="item-label">
 						<a href="{$link->getAdminLink("AdminOrders")|escape:"html":"UTF-8"}" target="_blank">
-							<span>{l s="Bookings" mod="dashactivity"}</span>
+							<span>{l s="Bookings" mod='dashactivity'}</span>
 						</a>
 					</span>
 					<span class="item-value">
@@ -91,7 +91,7 @@
 				<li>
 					<span class="item-label">
 						<a href="{$link->getAdminLink("AdminOrderRefundRequests")|escape:"html":"UTF-8"}" target="_blank">
-							<span>{l s="Refunds" mod="dashactivity"}</span>
+							<span>{l s="Refunds" mod='dashactivity'}</span>
 						</a>
 					</span>
 					<span class="item-value">
@@ -101,7 +101,7 @@
 				<li>
 					<span class="item-label">
 						<a href="{$link->getAdminLink("AdminCarts")|escape:"html":"UTF-8"}" target="_blank">
-							<span>{l s="Abandoned Carts" mod="dashactivity"}</span>
+							<span>{l s="Abandoned Carts" mod='dashactivity'}</span>
 						</a>
 					</span>
 					<span class="item-value">
@@ -114,16 +114,16 @@
 
 	<div class="panel">
 		<div class="panel-heading">
-			<i class="icon-time"></i> {l s="Activity overview" mod="dashactivity"}
+			<i class="icon-time"></i> {l s="Activity overview" mod='dashactivity'}
 			<span class="panel-heading-action">
-				<a class="list-toolbar-btn" href="#" onclick="refreshDashboard('dashactivity'); return false;" title="{l s="Refresh" mod="dashactivity"}">
+				<a class="list-toolbar-btn" href="#" onclick="refreshDashboard('dashactivity'); return false;" title="{l s="Refresh" mod='dashactivity'}">
 					<i class="process-icon-refresh"></i>
 				</a>
 			</span>
 		</div>
 		<section id="dash_customers" class="activity-section">
 			<span class="title">
-				<span>{l s="Customers & Newsletters" mod="dashactivity"}</span>
+				<span>{l s="Customers & Newsletters" mod='dashactivity'}</span>
 			</span>
 			<div class="sub-title">
 				<small class="text-muted" id="customers-newsletters-subtitle"></small>
@@ -133,7 +133,7 @@
 				<li>
 					<span class="item-label">
 						<a href="{$link->getAdminLink("AdminCustomers")|escape:"html":"UTF-8"}" target="_blank">
-							<span>{l s="New Customers" mod="dashactivity"}</span>
+							<span>{l s="New Customers" mod='dashactivity'}</span>
 						</a>
 					</span>
 					<span class="item-value">
@@ -144,7 +144,7 @@
 					<span class="item-label">
 						<a href="{$link->getAdminLink("AdminStats")|escape:"html":"UTF-8"}&module=statsnewsletter"
 							target="_blank">
-							<span>{l s="New Subscriptions" mod="dashactivity"}</span>
+							<span>{l s="New Subscriptions" mod='dashactivity'}</span>
 						</a>
 					</span>
 					<span class="item-value">
@@ -155,7 +155,7 @@
 					<span class="item-label">
 						<a href="{$link->getAdminLink("AdminModules")|escape}&configure=blocknewsletter&module_name=blocknewsletter"
 							target="_blank">
-							<span>{l s="Total Subscribers" mod="dashactivity"}</span>
+							<span>{l s="Total Subscribers" mod='dashactivity'}</span>
 						</a>
 					</span>
 					<span class="item-value">
@@ -167,7 +167,7 @@
 
 		<section id="dash_traffic" class="activity-section">
 			<span class="title">
-				<span>{l s="Traffic" mod="dashactivity"}</span>
+				<span>{l s="Traffic" mod='dashactivity'}</span>
 			</span>
 			<div class="sub-title">
 				<small class="text-muted" id="traffic-subtitle"></small>
@@ -177,7 +177,7 @@
 					<span class="item-label">
 						<a href="{$link->getAdminLink("AdminStats")|escape:"html":"UTF-8"}&module=statsforecast"
 							target="_blank">
-							<span>{l s="Visits" mod="dashactivity"}</span>
+							<span>{l s="Visits" mod='dashactivity'}</span>
 						</a>
 					</span>
 					<span class="item-value">
@@ -188,7 +188,7 @@
 					<span class="item-label">
 						<a href="{$link->getAdminLink("AdminStats")|escape:"html":"UTF-8"}&module=statsvisits"
 							target="_blank">
-							<span>{l s="Unique Visitors" mod="dashactivity"}</span>
+							<span>{l s="Unique Visitors" mod='dashactivity'}</span>
 						</a>
 					</span>
 					<span class="item-value">
@@ -197,7 +197,7 @@
 				</li>
 				<li>
 					<span class="item-label heading">
-						<span>{l s="Traffic Sources" mod="dashactivity"}</span>
+						<span>{l s="Traffic Sources" mod='dashactivity'}</span>
 					</span>
 
 					<ul class="data_list_small" id="dash_traffic_source"></ul>

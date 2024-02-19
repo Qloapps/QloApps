@@ -59,6 +59,6 @@
 {addJsDefL name=placeholder_blocknewsletter}{l s='Enter your e-mail' mod='blocknewsletter' js=1}{/addJsDefL}
 {addJsDefL name=email_js_error}{l s='Please Enter Valid E-mail' mod='blocknewsletter' js=1}{/addJsDefL}
 {if isset($msg) && $msg}
-    {addJsDefL name=alert_blocknewsletter}{l s='Newsletter : %1$s' sprintf=$msg js=1 mod="blocknewsletter"}{/addJsDefL}
+    {addJsDefL name=alert_blocknewsletter}{l s='Newsletter : %1$s' sprintf=$msg js=1 mod='blocknewsletter'}{/addJsDefL}
 {/if}
 {/strip}
