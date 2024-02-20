@@ -102,7 +102,7 @@
                                     <div class="fixed-width-xl">
                                         <div class="input-group">
                                             <span class="input-group-addon">{$currency->prefix}{$currency->suffix}</span>
-                                            <input type="text" name="{$inputs_prefix}price" data-id_product="{$service_product.id_product|escape:'html':'UTF-8'}" {if isset($smarty.post["{$inputs_prefix}price"]) && $smarty.post["{$inputs_prefix}price"]}value="{$smarty.post["{$inputs_prefix}price"]}"{/if}>
+                                            <input type="text" name="{$inputs_prefix}price" data-id_product="{$service_product.id_product|escape:'html':'UTF-8'}" value="{if isset($smarty.post["{$inputs_prefix}price"]) && $smarty.post["{$inputs_prefix}price"]}{$smarty.post["{$inputs_prefix}price"]}{else}{$service_product.price}{/if}">
                                         </div>
                                     </div>
                                     <div class="help-block">
@@ -114,7 +114,7 @@
                                         <select class="service_product_id_tax_rules_group" name="{$inputs_prefix}id_tax_rules_group">
                                             <option value="0">{l s='No Tax'}</option>
                                             {foreach from=$tax_rules_groups item=tax_rules_group}
-                                                <option value="{$tax_rules_group.id_tax_rules_group}" {if isset($smarty.post["{$inputs_prefix}id_tax_rules_group"]) && $tax_rules_group.id_tax_rules_group == $smarty.post["{$inputs_prefix}id_tax_rules_group"]}selected{/if}>
+                                                <option value="{$tax_rules_group.id_tax_rules_group}" {if isset($smarty.post["{$inputs_prefix}id_tax_rules_group"])}{if $tax_rules_group.id_tax_rules_group == $smarty.post["{$inputs_prefix}id_tax_rules_group"]}{/if}{elseif $tax_rules_group.id_tax_rules_group == $service_product.id_tax_rules_group}selected{/if}>
                                                     {$tax_rules_group['name']|htmlentitiesUTF8}
                                                 </option>
                                             {/foreach}

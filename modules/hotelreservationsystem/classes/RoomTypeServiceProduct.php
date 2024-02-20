@@ -71,8 +71,8 @@ class RoomTypeServiceProduct extends ObjectModel
         Db::getInstance()->execute('SET @i = -1', false);
         $result &= Db::getInstance()->execute(
             'UPDATE `'._DB_PREFIX_.'htl_room_type_service_product`
-            SET `position` = @i:=@i+1
-            WHERE '.$where2.'
+            SET `position` = @i:=@i+1'.
+            ($where2 ? ' WHERE '.$where2 : '').'
             ORDER BY `position` ASC'
         );
 
