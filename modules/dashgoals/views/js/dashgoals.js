@@ -47,6 +47,12 @@ function selectDashgoalsChart(type)
 	}
 
 	if (type == 'avg_cart_value' || type == 'sales') {
+        // for large values in the Y axis values are gets hidden. So increase the margin left
+        let yAxisValues = dashgoals_chart.yAxis.scale().domain();
+        if (yAxisValues[1] !== 'undefined' && yAxisValues[1] > 999999) {
+            dashgoals_chart.margin().left = 120
+        }
+
         dashgoals_chart.yAxis.tickFormat(d3.format('.2f'));
 
 		dashgoals_chart.yAxis.tickFormat(function(d) {
