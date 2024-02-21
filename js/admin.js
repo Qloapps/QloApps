@@ -1573,6 +1573,13 @@ $(document).on('change', '.kpi-container .kpi-display-toggle', function (e) {
 			is_visible: isVisible,
 		}
 	});
+
+	// at least one KPI must be displayed
+	if ($(kpiCheckbox).closest('.actions-wrap').find('.kpi-display-toggle:checked').length == 1) {
+		$(kpiCheckbox).closest('.actions-wrap').find('.kpi-display-toggle:checked').attr('disabled', true);
+	} else {
+		$(kpiCheckbox).closest('.actions-wrap').find('.kpi-display-toggle').attr('disabled', false);
+	}
 });
 
 // prevent dropdown from closing on clicking its body

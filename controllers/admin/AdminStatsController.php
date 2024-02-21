@@ -662,11 +662,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
                 break;
 
             case 'disabled_room_types':
-                if (AdminStatsController::getTotalRoomTypes()) {
-                    $value = round(100 * AdminStatsController::getDisabledRoomTypes(0) / AdminStatsController::getTotalRoomTypes(0), 2).'%';
-                } else {
-                    $value = '0%';
-                }
+                $value = AdminStatsController::getDisabledRoomTypes(0);
                 ConfigurationKPI::updateValue('DISABLED_ROOM_TYPES', $value);
                 ConfigurationKPI::updateValue('DISABLED_ROOM_TYPES_EXPIRE', strtotime('+2 hour'));
                 break;
@@ -833,12 +829,14 @@ class AdminStatsControllerCore extends AdminStatsTabController
                 break;
 
             case 'total_online_bookable_rooms':
-                $value = AdminStatsController::getTotalRooms(0, 1);
+                $value = AdminStatsController::getAvailableRoomsForDiscreteDates(date('Y-m-d'), null, 0, 1);
+                $value = $value[strtotime(date('Y-m-d'))];
 
                 break;
 
             case 'total_offline_bookable_rooms':
-                $value = AdminStatsController::getTotalRooms(0, 0);
+                $value = AdminStatsController::getAvailableRoomsForDiscreteDates(date('Y-m-d'));
+                $value = $value[strtotime(date('Y-m-d'))];
 
                 break;
 
@@ -1035,14 +1033,13 @@ class AdminStatsControllerCore extends AdminStatsTabController
         );
     }
 
-    public static function getTotalRooms($idHotel = null, $showAtFront = null)
+    public static function getTotalRooms($idHotel = null)
     {
         $sql = 'SELECT COUNT(hri.`id`)
         FROM `'._DB_PREFIX_.'htl_room_information` hri
         INNER JOIN `'._DB_PREFIX_.'product` p
         ON (p.`id_product` = hri.`id_product`)
         WHERE p.`booking_product` = 1 '.
-        (!is_null($showAtFront) ? ' AND p.`show_at_front` = '.(int) $showAtFront : '').
         (!is_null($idHotel) ? HotelBranchInformation::addHotelRestriction($idHotel, 'hri') : '');
 
         return Db::getInstance()->getValue($sql);
@@ -1579,7 +1576,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
     /**
      * total available (unoccupied) for each date
      */
-    public static function getAvailableRoomsForDiscreteDates($dateFrom, $dateTo = null, $idHotel = null, $useCache = true)
+    public static function getAvailableRoomsForDiscreteDates($dateFrom, $dateTo = null, $idHotel = null, $showAtFront = null, $useCache = true)
     {
         $dateTo = !$dateTo ? date('Y-m-d', strtotime('+1 day', strtotime($dateFrom))) : $dateTo;
         $discreteDates = array();
@@ -1597,7 +1594,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
         $result = array();
         foreach ($discreteDates as $discreteDate) {
             $cacheKey = 'AdminStats::getAvailableRoomsForDiscreteDates'.'_'.(int) $discreteDate['timestamp_from'].'_'.
-            (!is_array($idHotel) ? (int) $idHotel : implode('_', $idHotel));
+            (is_null($showAtFront) ? 'null_' : (int) $showAtFront).(!is_array($idHotel) ? (int) $idHotel : implode('_', $idHotel));
             if (!Cache::isStored($cacheKey) || !$useCache) {
                 $sql = 'SELECT (num_total - num_booked - num_inactive - num_temporarily_inactive) AS num_available
                 FROM (
@@ -1607,6 +1604,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
                         LEFT JOIN `'._DB_PREFIX_.'product` p
                         ON (p.`id_product` = hri.`id_product`)
                         WHERE p.`active` = 1'.
+                        (!is_null($showAtFront) ? ' AND p.`show_at_front` = '.(int) $showAtFront : '').
                         (!is_null($idHotel) ? HotelBranchInformation::addHotelRestriction($idHotel, 'hri') : '').'
                     ) AS num_total,
                     (
@@ -1616,7 +1614,8 @@ class AdminStatsControllerCore extends AdminStatsTabController
                         ON (hri.`id` = hbd.`id_room`)
                         LEFT JOIN `'._DB_PREFIX_.'product` p
                         ON (p.`id_product` = hri.`id_product`)
-                        WHERE p.`active` = 1
+                        WHERE p.`active` = 1'.
+                        (!is_null($showAtFront) ? ' AND p.`show_at_front` = '.(int) $showAtFront : '').'
                         AND hbd.`is_refunded` = 0
                         AND hbd.`date_from` < "'.pSQL($discreteDate['date_to']).' 00:00:00" AND hbd.`date_to` > "'.pSQL($discreteDate['date_from']).' 00:00:00"'.
                         (!is_null($idHotel) ? HotelBranchInformation::addHotelRestriction($idHotel, 'hbd') : '').'
@@ -1628,6 +1627,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
                         ON (p.`id_product` = hri.`id_product`)
                         WHERE hri.`id_status` = '.(int) HotelRoomInformation::STATUS_INACTIVE.'
                         AND p.`active` = 1'.
+                        (!is_null($showAtFront) ? ' AND p.`show_at_front` = '.(int) $showAtFront : '').
                         (!is_null($idHotel) ? HotelBranchInformation::addHotelRestriction($idHotel, 'hri') : '').'
                     ) AS num_inactive,
                     (
@@ -1640,6 +1640,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
                         WHERE hri.`id_status` = '.(int) HotelRoomInformation::STATUS_TEMPORARY_INACTIVE.'
                         AND ("'.pSQL($discreteDate['date_from']).'" >= hrdd.`date_from` AND "'.pSQL($discreteDate['date_from']).'" < hrdd.`date_to`)
                         AND p.`active` = 1'.
+                        (!is_null($showAtFront) ? ' AND p.`show_at_front` = '.(int) $showAtFront : '').
                         (!is_null($idHotel) ? HotelBranchInformation::addHotelRestriction($idHotel, 'hri') : '').'
                     ) AS num_temporarily_inactive
                 ) AS t';
@@ -1674,9 +1675,17 @@ class AdminStatsControllerCore extends AdminStatsTabController
             $cacheKey = 'AdminStats::getDisabledRoomsForDiscreteDates'.'_'.(int) $discreteDate['timestamp_from'].'_'.
             (!is_array($idHotel) ? (int) $idHotel : implode('_', $idHotel));
             if (!Cache::isStored($cacheKey) || !$useCache) {
-                $sql = 'SELECT (num_inactive + num_temporarily_inactive) AS num_disabled
+                $sql = 'SELECT (num_room_type_disabled + num_inactive + num_temporarily_inactive) AS num_disabled
                 FROM (
                     SELECT (
+                        SELECT IFNULL(COUNT(hri.`id`), 0)
+                        FROM `'._DB_PREFIX_.'htl_room_information` hri
+                        LEFT JOIN `'._DB_PREFIX_.'product` p
+                        ON (p.`id_product` = hri.`id_product`)
+                        WHERE p.`active` = 0'.
+                        (!is_null($idHotel) ? HotelBranchInformation::addHotelRestriction($idHotel, 'hri') : '').'
+                    ) AS num_room_type_disabled,
+                    (
                         SELECT IFNULL(COUNT(hri.`id`), 0)
                         FROM `'._DB_PREFIX_.'htl_room_information` hri
                         LEFT JOIN `'._DB_PREFIX_.'product` p

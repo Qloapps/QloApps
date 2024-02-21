@@ -48,7 +48,7 @@
 				{foreach from=$kpis item=kpi}
 					<li>
 						<label>
-							<input type="checkbox" class="kpi-display-toggle" data-kpi-id="{$kpi->id}" {if $kpi->visible}checked{/if}>
+							<input type="checkbox" class="kpi-display-toggle" data-kpi-id="{$kpi->id}" {if $kpi->visible}checked {if $count_visible == 1}disabled{/if}{/if}>
 							{$kpi->title}
 						</label>
 					</li>

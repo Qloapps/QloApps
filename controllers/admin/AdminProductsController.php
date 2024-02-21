@@ -2330,6 +2330,7 @@ class AdminProductsControllerCore extends AdminController
         $helper->icon = 'icon-bed';
         $helper->color = 'color3';
         $helper->title = $this->l('Total Rooms', null, null, false);
+        $helper->subtitle = $this->l('Today', null, null, false);
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=total_rooms';
         $helper->tooltip = $this->l('The total number of rooms in all hotels.', null, null, false);
         $kpis[] = $helper;
@@ -2339,8 +2340,9 @@ class AdminProductsControllerCore extends AdminController
         $helper->icon = 'icon-globe';
         $helper->color = 'color4';
         $helper->title = $this->l('Total Online Bookable Rooms', null, null, false);
+        $helper->subtitle = $this->l('Today', null, null, false);
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=total_online_bookable_rooms';
-        $helper->tooltip = $this->l('The total number of rooms that can be booked using website.', null, null, false);
+        $helper->tooltip = $this->l('The total number of rooms that can be booked only using website.', null, null, false);
         $kpis[] = $helper;
 
         $helper = new HelperKpi();
@@ -2348,8 +2350,9 @@ class AdminProductsControllerCore extends AdminController
         $helper->icon = 'icon-building';
         $helper->color = 'color1';
         $helper->title = $this->l('Total Offline Bookable Rooms', null, null, false);
+        $helper->subtitle = $this->l('Today', null, null, false);
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=total_offline_bookable_rooms';
-        $helper->tooltip = $this->l('The number of rooms that can be booked through offline channels (e.g., phone or in-person).', null, null, false);
+        $helper->tooltip = $this->l('The number of rooms that can be booked either through website or offline channels (e.g., phone or in-person).', null, null, false);
         $kpis[] = $helper;
 
         $helper = new HelperKpi();
@@ -2387,6 +2390,7 @@ class AdminProductsControllerCore extends AdminController
         $helper->icon = 'icon-ban';
         $helper->color = 'color2';
         $helper->title = $this->l('Total Disabled Rooms', null, null, false);
+        $helper->subtitle = $this->l('Today', null, null, false);
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=total_disabled_rooms';
         $helper->tooltip = $this->l('The number of rooms that are currently disabled.', null, null, false);
         $kpis[] = $helper;
