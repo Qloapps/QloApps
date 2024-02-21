@@ -47,6 +47,9 @@ class RoomTypeServiceProduct extends ObjectModel
         )
     );
 
+    /**
+     * This method deletes passed associations and cleans positions of remaining associations
+     */
     public static function deleteRoomProductLink($idProduct, $elementType = 0, $idElement = 0)
     {
         $where = '`id_product`='.(int)$idProduct;
@@ -59,6 +62,7 @@ class RoomTypeServiceProduct extends ObjectModel
             $where .= ' AND `id_element` = '.(int) $idElement;
         }
 
+        // Get the list of elements before deleting associations to clean positions of remaining associations
         $elements = Db::getInstance()->executeS(
             'SELECT rsp.`id_element`, rsp.`element_type`
             FROM `'._DB_PREFIX_.'htl_room_type_service_product` rsp
@@ -71,6 +75,7 @@ class RoomTypeServiceProduct extends ObjectModel
             $where
         );
 
+        // Clean positions of remaining associations after deletion
         $result &= self::cleanPositions($elements);
 
         return $result;
