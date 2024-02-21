@@ -1107,10 +1107,11 @@ class AdminProductsControllerCore extends AdminController
         $idProduct = Tools::getValue('id_product');
         if ($idElement && $idProduct) {
             $newPosition = Tools::getValue('new_position');
-            if (RoomTypeServiceProduct::changePositions(
+            if (RoomTypeServiceProduct::updatePosition(
                 $idProduct,
                 $idElement,
-                $newPosition
+                $newPosition,
+                RoomTypeServiceProduct::WK_ELEMENT_TYPE_ROOM_TYPE
             )) {
                 $response['msg'] = $this->l('Positions updated successfully.');
                 $response['success'] = true;

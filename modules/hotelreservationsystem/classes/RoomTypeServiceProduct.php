@@ -50,31 +50,28 @@ class RoomTypeServiceProduct extends ObjectModel
     public static function deleteRoomProductLink($idProduct, $elementType = 0, $idElement = 0)
     {
         $where = '`id_product`='.(int)$idProduct;
-        $where2 = '';
 
         if ($elementType) {
             $where .= ' AND `element_type`='.(int)$elementType;
-            $where2 .= ' `element_type`='.(int)$elementType;
         }
 
         if ($idElement) {
             $where .= ' AND `id_element` = '.(int) $idElement;
-            $where2 .= ' AND `id_element` = '.(int) $idElement;
         }
+
+        $elements = Db::getInstance()->executeS(
+            'SELECT rsp.`id_element`, rsp.`element_type`
+            FROM `'._DB_PREFIX_.'htl_room_type_service_product` rsp
+            WHERE '.$where.'
+            GROUP BY rsp.`element_type`, rsp.`id_element`'
+        );
 
         $result = Db::getInstance()->delete(
             'htl_room_type_service_product',
             $where
         );
 
-        // Update positions
-        Db::getInstance()->execute('SET @i = -1', false);
-        $result &= Db::getInstance()->execute(
-            'UPDATE `'._DB_PREFIX_.'htl_room_type_service_product`
-            SET `position` = @i:=@i+1'.
-            ($where2 ? ' WHERE '.$where2 : '').'
-            ORDER BY `position` ASC'
-        );
+        $result &= self::cleanPositions($elements);
 
         return $result;
     }
@@ -246,14 +243,21 @@ class RoomTypeServiceProduct extends ObjectModel
         return $result + 1;
     }
 
-    public function cleanPositions($idProductRoomType)
+    public static function cleanPositions($elements)
     {
-        Db::getInstance()->execute('SET @i = -1', false);
-        $sql = 'UPDATE `'._DB_PREFIX_.'htl_room_type_service_product` SET `position` = @i:=@i+1
-            WHERE `element_type` = '.self::WK_ELEMENT_TYPE_ROOM_TYPE.' AND `id_element` = '.(int)$idProductRoomType.'
-            ORDER BY `position` ASC';
+        $result = true;
+        foreach ($elements as $element) {
+            Db::getInstance()->execute('SET @i = -1', false);
+            $result &= Db::getInstance()->execute(
+                'UPDATE `'._DB_PREFIX_.'htl_room_type_service_product` rsp
+                SET rsp.`position` = @i:=@i+1
+                WHERE rsp.`element_type` = '.(int) $element['element_type'].'
+                AND rsp.`id_element` = '.(int) $element['id_element'].'
+                ORDER BY rsp.`position` ASC'
+            );
+        }
 
-        return Db::getInstance()->execute($sql);
+        return $result;
     }
 
     /**
@@ -265,11 +269,11 @@ class RoomTypeServiceProduct extends ObjectModel
      * @param int $idPosition
      * @return boolean
      */
-    public static function changePositions(
+    public static function updatePosition(
         $idProduct,
         $idElement,
         $newPosition,
-        $elementType = self::WK_ELEMENT_TYPE_ROOM_TYPE
+        $elementType
     ) {
         if (!$result = Db::getInstance()->executeS(
             'SELECT rsp.`id_product`, rsp.`position`

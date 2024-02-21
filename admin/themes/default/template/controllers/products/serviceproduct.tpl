@@ -63,7 +63,17 @@
                                     <div class="fixed-width-xl">
                                         <div class="input-group">
                                             <span class="input-group-addon">{$currency->prefix}{$currency->suffix}</span>
-                                            <input type="text" name="{$inputs_prefix}price" value="{if isset($smarty.post["{$inputs_prefix}price"]) && $smarty.post["{$inputs_prefix}price"]}{$smarty.post["{$inputs_prefix}price"]}{elseif isset($service_product.association_info.custom_price) && $service_product.association_info.custom_price}{$service_product.association_info.custom_price}{/if}" data-id_product="{$service_product.id_product}">
+                                            {assign var=price_value value=0}
+                                            {if isset($smarty.post["{$inputs_prefix}price"])}
+                                                {assign var=price_value value=$smarty.post["{$inputs_prefix}price"]}
+                                            {else}
+                                                {if isset($service_product.association_info.custom_price)}
+                                                    {assign var=price_value value=$service_product.association_info.custom_price}
+                                                {elseif isset($service_product.association_info.default_price)}
+                                                    {assign var=price_value value=$service_product.association_info.default_price}
+                                                {/if}
+                                            {/if}
+                                            <input type="text" name="{$inputs_prefix}price" value="{$price_value}" data-id_product="{$service_product.id_product}">
                                         </div>
                                     </div>
                                     <div class="help-block">
