@@ -3192,6 +3192,7 @@ class AdminOrdersControllerCore extends AdminController
                 }
 
                 if ($objBookingDetail->save()) {
+                    $this->context->currency = new Currency($order->id_currency);
                     $objRoomTypeServiceProduct = new RoomTypeServiceProduct();
                     $objRoomTypeServiceProductPrice = new RoomTypeServiceProductPrice();
                     $objRoomTypeServiceProductCartDetail = new RoomTypeServiceProductCartDetail();
