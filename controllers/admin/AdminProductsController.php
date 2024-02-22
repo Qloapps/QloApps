@@ -2305,6 +2305,76 @@ class AdminProductsControllerCore extends AdminController
         $kpis = array();
 
         $helper = new HelperKpi();
+        $helper->id = 'box-total-rooms';
+        $helper->icon = 'icon-bed';
+        $helper->color = 'color3';
+        $helper->title = $this->l('Total Rooms', null, null, false);
+        $helper->subtitle = $this->l('Today', null, null, false);
+        $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=total_rooms';
+        $helper->tooltip = $this->l('The total number of rooms in all hotels.', null, null, false);
+        $kpis[] = $helper;
+
+        $helper = new HelperKpi();
+        $helper->id = 'box-occupied-rooms';
+        $helper->icon = 'icon-user';
+        $helper->color = 'color1';
+        $helper->title = $this->l('Occupied Rooms', null, null, false);
+        $helper->subtitle = $this->l('Today', null, null, false);
+        $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=occupied_rooms';
+        $helper->tooltip = $this->l('The current count of rooms that are currently occupied by guests.', null, null, false);
+        $kpis[] = $helper;
+
+        $helper = new HelperKpi();
+        $helper->id = 'box-vacant-rooms';
+        $helper->icon = 'icon-check-empty';
+        $helper->color = 'color3';
+        $helper->title = $this->l('Vacant Rooms', null, null, false);
+        $helper->subtitle = $this->l('Today', null, null, false);
+        $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=vacant_rooms';
+        $helper->tooltip = $this->l('The count of rooms that are currently unoccupied and available for booking.', null, null, false);
+        $kpis[] = $helper;
+
+        $helper = new HelperKpi();
+        $helper->id = 'box-reserved-rooms';
+        $helper->icon = 'icon-calendar';
+        $helper->color = 'color4';
+        $helper->title = $this->l('Booked Rooms', null, null, false);
+        $helper->subtitle = $this->l('Today', null, null, false);
+        $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=booked_rooms';
+        $helper->tooltip = $this->l('The number of rooms that are currently booked but not yet occupied.', null, null, false);
+        $kpis[] = $helper;
+
+        $helper = new HelperKpi();
+        $helper->id = 'box-disabled-rooms';
+        $helper->icon = 'icon-ban';
+        $helper->color = 'color2';
+        $helper->title = $this->l('Disabled Rooms', null, null, false);
+        $helper->subtitle = $this->l('Today', null, null, false);
+        $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=disabled_rooms';
+        $helper->tooltip = $this->l('The number of rooms that are currently disabled.', null, null, false);
+        $kpis[] = $helper;
+
+        $helper = new HelperKpi();
+        $helper->id = 'box-online-bookable-rooms';
+        $helper->icon = 'icon-globe';
+        $helper->color = 'color4';
+        $helper->title = $this->l('Online Bookable Rooms', null, null, false);
+        $helper->subtitle = $this->l('Today', null, null, false);
+        $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=online_bookable_rooms';
+        $helper->tooltip = $this->l('The total number of rooms that can be booked only using website.', null, null, false);
+        $kpis[] = $helper;
+
+        $helper = new HelperKpi();
+        $helper->id = 'box-offline-bookable-rooms';
+        $helper->icon = 'icon-building';
+        $helper->color = 'color1';
+        $helper->title = $this->l('Offline Bookable Rooms', null, null, false);
+        $helper->subtitle = $this->l('Today', null, null, false);
+        $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=offline_bookable_rooms';
+        $helper->tooltip = $this->l('The number of rooms that can be booked either through website or offline channels (e.g., phone or in-person).', null, null, false);
+        $kpis[] = $helper;
+
+        $helper = new HelperKpi();
         $helper->id = 'box-best-selling-room-type';
         $helper->icon = 'icon-star';
         $helper->color = 'color1';
@@ -2316,83 +2386,13 @@ class AdminProductsControllerCore extends AdminController
         $kpis[] = $helper;
 
         $helper = new HelperKpi();
-        $helper->id = 'box-total-disbled-room-types';
+        $helper->id = 'box-disbled-room-types';
         $helper->icon = 'icon-ban';
         $helper->color = 'color2';
         $helper->title = $this->l('Disabled Room Types', null, null, false);
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=disabled_room_types';
         $helper->href = Context::getContext()->link->getAdminLink('AdminProducts').'&productFilter_sa!active=0&submitFilterproduct=1';
         $helper->tooltip = $this->l('The total number of room types that are currently disabled.', null, null, false);
-        $kpis[] = $helper;
-
-        $helper = new HelperKpi();
-        $helper->id = 'box-total-rooms';
-        $helper->icon = 'icon-bed';
-        $helper->color = 'color3';
-        $helper->title = $this->l('Total Rooms', null, null, false);
-        $helper->subtitle = $this->l('Today', null, null, false);
-        $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=total_rooms';
-        $helper->tooltip = $this->l('The total number of rooms in all hotels.', null, null, false);
-        $kpis[] = $helper;
-
-        $helper = new HelperKpi();
-        $helper->id = 'box-total-online-bookable-rooms';
-        $helper->icon = 'icon-globe';
-        $helper->color = 'color4';
-        $helper->title = $this->l('Total Online Bookable Rooms', null, null, false);
-        $helper->subtitle = $this->l('Today', null, null, false);
-        $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=total_online_bookable_rooms';
-        $helper->tooltip = $this->l('The total number of rooms that can be booked only using website.', null, null, false);
-        $kpis[] = $helper;
-
-        $helper = new HelperKpi();
-        $helper->id = 'box-total-offline-bookable-rooms';
-        $helper->icon = 'icon-building';
-        $helper->color = 'color1';
-        $helper->title = $this->l('Total Offline Bookable Rooms', null, null, false);
-        $helper->subtitle = $this->l('Today', null, null, false);
-        $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=total_offline_bookable_rooms';
-        $helper->tooltip = $this->l('The number of rooms that can be booked either through website or offline channels (e.g., phone or in-person).', null, null, false);
-        $kpis[] = $helper;
-
-        $helper = new HelperKpi();
-        $helper->id = 'box-total-occupied-rooms';
-        $helper->icon = 'icon-user';
-        $helper->color = 'color1';
-        $helper->title = $this->l('Total Occupied Rooms', null, null, false);
-        $helper->subtitle = $this->l('Today', null, null, false);
-        $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=total_occupied_rooms';
-        $helper->tooltip = $this->l('The current count of rooms that are currently occupied by guests.', null, null, false);
-        $kpis[] = $helper;
-
-        $helper = new HelperKpi();
-        $helper->id = 'box-total-vacant-rooms';
-        $helper->icon = 'icon-check-empty';
-        $helper->color = 'color3';
-        $helper->title = $this->l('Total Vacant Rooms', null, null, false);
-        $helper->subtitle = $this->l('Today', null, null, false);
-        $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=total_vacant_rooms';
-        $helper->tooltip = $this->l('The count of rooms that are currently unoccupied and available for booking.', null, null, false);
-        $kpis[] = $helper;
-
-        $helper = new HelperKpi();
-        $helper->id = 'box-total-reserved-rooms';
-        $helper->icon = 'icon-calendar';
-        $helper->color = 'color4';
-        $helper->title = $this->l('Total Reserved Rooms', null, null, false);
-        $helper->subtitle = $this->l('Today', null, null, false);
-        $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=total_reserved_rooms';
-        $helper->tooltip = $this->l('The number of rooms that are currently reserved but not yet occupied.', null, null, false);
-        $kpis[] = $helper;
-
-        $helper = new HelperKpi();
-        $helper->id = 'box-total-disabled-rooms';
-        $helper->icon = 'icon-ban';
-        $helper->color = 'color2';
-        $helper->title = $this->l('Total Disabled Rooms', null, null, false);
-        $helper->subtitle = $this->l('Today', null, null, false);
-        $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=total_disabled_rooms';
-        $helper->tooltip = $this->l('The number of rooms that are currently disabled.', null, null, false);
         $kpis[] = $helper;
 
         Hook::exec('action'.$this->controller_name.'KPIListingModifier', array(

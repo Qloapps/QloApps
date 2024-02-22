@@ -1358,6 +1358,7 @@ class AdminOrdersControllerCore extends AdminController
         parent::postProcess();
     }
 
+    // KPIs on listing page
     // public function renderKpis()
     // {
     //     $time = time();
@@ -1409,12 +1410,69 @@ class AdminOrdersControllerCore extends AdminController
     //     return $helper->generate();
     // }
 
+    // KPIs on view page
+    public function renderKpis()
+    {
+        $objOrder = new Order(Tools::getValue('id_order'));
+        if (Validate::isLoadedObject($objOrder)) {
+            $kpis = array();
+
+            $helper = new HelperKpi();
+            $helper->id = 'box-order-date';
+            $helper->icon = 'icon-calendar';
+            $helper->color = 'color3';
+            $helper->title = $this->l('Order Date');
+            $helper->value = Tools::displayDate($objOrder->date_add);
+            $kpis[] = $helper;
+
+            $helper = new HelperKpi();
+            $helper->id = 'box-order-total';
+            $helper->icon = 'icon-money';
+            $helper->color = 'color4';
+            $helper->title = $this->l('Total');
+            $helper->value = Tools::displayPrice($objOrder->total_paid_tax_incl, new Currency($objOrder->id_currency));
+            $kpis[] = $helper;
+
+            $helper = new HelperKpi();
+            $helper->id = 'box-messages';
+            $helper->icon = 'icon-comments';
+            $helper->color = 'color2';
+            $helper->title = $this->l('Messages');
+            $helper->href = $this->context->link->getAdminLink('AdminCustomerThreads').'&id_order='.$objOrder->id;
+            $helper->value = count(CustomerThread::getCustomerMessages($objOrder->id_customer, null, $objOrder->id));
+            $kpis[] = $helper;
+
+            $objHotelBookingDetail = new HotelBookingDetail();
+            $numRooms = count($objHotelBookingDetail->getBookingDataByOrderId($objOrder->id));
+            $helper = new HelperKpi();
+            $helper->id = 'box-total-rooms';
+            $helper->icon = 'icon-home';
+            $helper->color = 'color1';
+            $helper->title = $this->l('Total Rooms');
+            $helper->href = '#start_products';
+            $helper->value = $numRooms;
+            $kpis[] = $helper;
+
+            Hook::exec('action'.$this->controller_name.'KPIListingModifier', array(
+                'kpis' => &$kpis,
+            ));
+
+            $helper = new HelperKpiRow();
+            $helper->kpis = $kpis;
+            $helper->refresh = false;
+
+            return $helper->generate();
+        }
+    }
+
     public function renderView()
     {
         $order = new Order(Tools::getValue('id_order'));
         if (!Validate::isLoadedObject($order)) {
             $this->errors[] = Tools::displayError('The order cannot be found within your database.');
         }
+
+        $this->content .= $this->renderKpis();
 
         $customer = new Customer($order->id_customer);
         $carrier = new Carrier($order->id_carrier);

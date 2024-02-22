@@ -39,6 +39,7 @@ class HelperKpiCore extends Helper
     public $data;
     public $source;
     public $href;
+    public $target;
     public $tooltip;
     public $visible;
 
@@ -57,6 +58,7 @@ class HelperKpiCore extends Helper
             'data' => $this->data,
             'source' => $this->source,
             'href' => $this->href,
+            'target' => $this->target,
             'tooltip' => $this->tooltip,
             'visible' => $this->visible,
         ));

@@ -815,7 +815,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
                     date('Y-m-d', strtotime('-1 day')),
                     0
                 ))) {
-                    $value = $this->l('No room type', null, null, false);
+                    $value = $this->l('--', null, null, false);
                 } else {
                     $objProduct = new Product($idProduct, false, $this->context->language->id);
                     $value = $objProduct->name;
@@ -828,38 +828,38 @@ class AdminStatsControllerCore extends AdminStatsTabController
 
                 break;
 
-            case 'total_online_bookable_rooms':
+            case 'occupied_rooms':
+                $value = AdminStatsController::getOccupiedRooms(0);
+
+                break;
+
+            case 'vacant_rooms':
+                $totalAvailableRooms = AdminStatsController::getAvailableRoomsForDiscreteDates(date('Y-m-d'), null, 0);
+                $totalAvailableRooms = $totalAvailableRooms[strtotime(date('Y-m-d'))];
+                $totalOccupiedRooms = AdminStatsController::getOccupiedRooms(0);
+                $value = $totalAvailableRooms - $totalOccupiedRooms;
+
+                break;
+
+            case 'booked_rooms':
+                $value = AdminStatsController::getBookedRooms(0);
+
+                break;
+
+            case 'disabled_rooms':
+                $value = AdminStatsController::getDisabledRoomsForDiscreteDates(date('Y-m-d'), null, 0);
+                $value = $value[strtotime(date('Y-m-d'))];
+
+                break;
+
+            case 'online_bookable_rooms':
                 $value = AdminStatsController::getAvailableRoomsForDiscreteDates(date('Y-m-d'), null, 0, 1);
                 $value = $value[strtotime(date('Y-m-d'))];
 
                 break;
 
-            case 'total_offline_bookable_rooms':
+            case 'offline_bookable_rooms':
                 $value = AdminStatsController::getAvailableRoomsForDiscreteDates(date('Y-m-d'));
-                $value = $value[strtotime(date('Y-m-d'))];
-
-                break;
-
-            case 'total_occupied_rooms':
-                $value = AdminStatsController::getTotalOccupiedRooms(0);
-
-                break;
-
-            case 'total_vacant_rooms':
-                $totalAvailableRooms = AdminStatsController::getAvailableRoomsForDiscreteDates(date('Y-m-d'), null, 0);
-                $totalAvailableRooms = $totalAvailableRooms[strtotime(date('Y-m-d'))];
-                $totalOccupiedRooms = AdminStatsController::getTotalOccupiedRooms(0);
-                $value = $totalAvailableRooms - $totalOccupiedRooms;
-
-                break;
-
-            case 'total_reserved_rooms':
-                $value = AdminStatsController::getTotalReservedRooms(0);
-
-                break;
-
-            case 'total_disabled_rooms':
-                $value = AdminStatsController::getDisabledRoomsForDiscreteDates(date('Y-m-d'), null, 0);
                 $value = $value[strtotime(date('Y-m-d'))];
 
                 break;
@@ -1721,7 +1721,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
     /**
      * Returns the number of rooms that have been checked-in.
      */
-    public static function getTotalOccupiedRooms($idHotel = null)
+    public static function getOccupiedRooms($idHotel = null)
     {
         $sql = 'SELECT COUNT(DISTINCT hbd.`id_room`)
         FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
@@ -1742,7 +1742,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
     /**
      * Returns the number of rooms that have been booked but not checked-in yet.
      */
-    public static function getTotalReservedRooms($idHotel = null)
+    public static function getBookedRooms($idHotel = null)
     {
         $dateToday = date('Y-m-d');
 

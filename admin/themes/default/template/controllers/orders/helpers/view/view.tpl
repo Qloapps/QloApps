@@ -67,67 +67,6 @@
 	<div>{$hook_invoice}</div>
 	{/if}
 
-	<div class="panel kpi-container">
-		<div class="kpis-wrap">
-			<div class="kpi-wrap">
-				<div class="box-stats color3">
-					<div class="kpi-content">
-						<div class="title-subtitle">
-							<div class="title-container">
-								<span class="title"><i class="icon-calendar-empty"></i> {l s='Date'}</span>
-							</div>
-						</div>
-						<div class="value-container">
-							<span class="value">{dateFormat date=$order->date_add}</span>
-						</div>
-					</div>
-				</div>
-			</div>
-			<div class="kpi-wrap">
-				<div class="box-stats color4">
-					<div class="kpi-content">
-						<div class="title-subtitle">
-							<div class="title-container">
-								<span class="title"><i class="icon-money"></i> {l s='Total'}</span>
-							</div>
-						</div>
-						<div class="value-container">
-							<span class="value">{displayPrice price=$order->total_paid_tax_incl currency=$currency->id}</span>
-						</div>
-					</div>
-				</div>
-			</div>
-			<div class="kpi-wrap">
-				<a href="{$link->getAdminLink('AdminCustomerThreads')|escape:'html':'UTF-8'}&amp;id_order={$order->id|intval}" class="box-stats color2">
-					<div class="kpi-content">
-						<div class="title-subtitle">
-							<div class="title-container">
-								<span class="title"><i class="icon-comments"></i> {l s='Messages'}</span>
-							</div>
-						</div>
-						<div class="value-container">
-							<span class="value">{count($customer_thread_message)}</span>
-						</div>
-						<span class="arrow"><i class="icon-angle-right"></i></span>
-					</div>
-				</a>
-			</div>
-			<div class="kpi-wrap">
-				<a href="#start_products" class="box-stats color1">
-					<div class="kpi-content">
-						<div class="title-subtitle">
-							<div class="title-container">
-								<span class="title"><i class="icon-home"></i> {l s='Total Rooms'}</span>
-							</div>
-						</div>
-						<div class="value-container">
-							<span class="value">{count($order_detail_data)}</span>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
 	<div class="row">
 		<div class="col-lg-7">
 			<div class="panel">

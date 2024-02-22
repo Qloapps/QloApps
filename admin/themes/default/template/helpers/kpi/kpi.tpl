@@ -23,7 +23,7 @@
 *  International Registered Trademark & Property of PrestaShop SA
 *}
 
-<{if isset($href) && $href}a style="display:block" href="{$href|escape:'html':'UTF-8'}"{else}div{/if} id="{$id|escape:'html':'UTF-8'}" data-toggle="tooltip" class="box-stats label-tooltip {$color|escape}" data-original-title="{$tooltip|escape}">
+<{if isset($href) && $href}a style="display:block" href="{$href|escape:'html':'UTF-8'}"{else}div{/if} id="{$id|escape:'html':'UTF-8'}" data-toggle="tooltip" class="box-stats label-tooltip {$color|escape}" data-original-title="{$tooltip|escape}" {if $target}target="_blank"{/if}>
 	<div class="kpi-content">
 		<div class="title-subtitle">
 			<div class="title-container">
@@ -49,7 +49,7 @@
 		<div class="value-container">
 			{if isset($source) && $source}
 				<span class="value skeleton-loading-wave loading-container-bar loading"></span>
-			{elseif isset($value) && $value != ''}
+			{elseif isset($value) && $value !== ''}
 				<span class="value">{$value|escape:'html':'UTF-8'}</span>
 			{/if}
 		</div>
