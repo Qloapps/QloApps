@@ -130,10 +130,6 @@ class StatsBestCategories extends ModuleGrid
 			<div class="panel-heading">
 				<i class="icon-sitemap"></i> '.$this->displayName.'
 			</div>';
-        if (!(Module::isEnabled('statsdata') && Configuration::get('PS_STATSDATA_PAGESVIEWS'))) {
-			$link = $this->context->link->getAdminLink('AdminModules').'&configure=statsdata';
-            $this->html .= '<div class="alert alert-info">'.$this->l('You must enable the "Save global page views" option from ').'<u><a href="'.$link.'" target="_blank">Data mining for statistics</a></u>'.$this->l(' module in order to display the most viewed hotels, or use the QloApps Google Analytics module.').'</div>';
-        }
 
         $this->html .= $this->engine($engine_params).'
             <div class="row form-horizontal">

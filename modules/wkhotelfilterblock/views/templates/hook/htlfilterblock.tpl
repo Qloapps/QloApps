@@ -19,7 +19,7 @@
 
 <div id="filter_results" class="row block">
 	<div class="col-sm-12">
-		{if isset($config) && $config['SHOW_AMENITIES_FILTER']}
+		{if isset($config) && $config['SHOW_AMENITIES_FILTER'] && $all_feat}
 			<div class="row margin-lr-0 layered_filter_cont">
 				<div class="col-sm-12 layered_filter_heading">
 					<div class="row margin-lr-0">
