@@ -302,6 +302,14 @@ class AdminOrdersControllerCore extends AdminController
                     $this->context->smarty->assign('cart_normal_data', $normalCartProduct);
                 }
 
+                $objHotelAdvancedPayment = new HotelAdvancedPayment();
+                $this->context->smarty->assign(array(
+                    'order_total' => $cart->getOrderTotal(true),
+                    'is_advance_payment_active' => $objHotelAdvancedPayment->isAdvancePaymentAvailableForCurrentCart(),
+                    'advance_payment_amount_te' => $cart->getOrderTotal(false, Cart::ADVANCE_PAYMENT),
+                    'advance_payment_amount_ti' => $cart->getOrderTotal(true, Cart::ADVANCE_PAYMENT),
+                ));
+
                 if (empty($cart_detail_data) && empty($normalCartProduct)) {
                     // if no rooms added in the cart and user visits add order page then redirect to BOOK NOW page
                     Tools::redirectAdmin($this->context->link->getAdminLink('AdminHotelRoomsBooking'));
@@ -314,9 +322,6 @@ class AdminOrdersControllerCore extends AdminController
         unset($this->toolbar_btn['save']);
         $this->addJqueryPlugin(array('autocomplete', 'fancybox', 'typewatch'));
 
-        $defaults_order_state = array(
-            'awaiting_payment' => (int)Configuration::get('PS_OS_AWAITING_PAYMENT'),
-            'other' => (int)Configuration::get('PS_OS_PAYMENT_ACCEPTED'));
         $payment_modules = array();
         foreach (PaymentModule::getInstalledPaymentModules() as $p_module) {
             $payment_modules[] = Module::getInstanceById((int)$p_module['id_module']);
@@ -342,8 +347,6 @@ class AdminOrdersControllerCore extends AdminController
             'langs' => Language::getLanguages(true, Context::getContext()->shop->id),
             'payment_modules' => $payment_modules,
             'payment_types' => $paymentTypes,
-            'order_states' => OrderState::getOrderStates((int)Context::getContext()->language->id),
-            'defaults_order_state' => $defaults_order_state,
             'show_toolbar' => $this->show_toolbar,
             'toolbar_btn' => $this->toolbar_btn,
             'toolbar_scroll' => $this->toolbar_scroll,
@@ -954,127 +957,151 @@ class AdminOrdersControllerCore extends AdminController
             } else {
                 $this->errors[] = Tools::displayError('The invoice for edit note was unable to load. ');
             }
-        } elseif (Tools::isSubmit('submitAddOrder')
-            && ($id_cart = Tools::getValue('id_cart'))
-            && ($id_order_state = Tools::getValue('id_order_state'))
-        ) {
+        } elseif (Tools::isSubmit('submitAddOrder') && ($id_cart = Tools::getValue('id_cart'))) {
             if ($this->tabAccess['edit'] === '1') {
-                $moduleName = trim(Tools::getValue('payment_module_name'));
-                $paymentType = Tools::getValue('payment_type');
-                $paymentTransactionId = trim(Tools::getValue('payment_transaction_id'));
-                $isFullPayment = Tools::getValue('is_full_payment');
-                $paymentAmount = trim(Tools::getValue('payment_amount'));
-
-                if (!$moduleName) {
-                    $this->errors[] = Tools::displayError('Please enter Payment method.');
-                } elseif ($moduleName && !Validate::isGenericName($moduleName)) {
-                    $this->errors[] = Tools::displayError('Payment method is invalid. Please enter a valid payment method.');
-                }
-
-                if (!$paymentType) {
-                    $this->errors[] = Tools::displayError('Please select a Payment source.');
-                } elseif ($paymentType && !Validate::isUnsignedInt($paymentType)) {
-                    $this->errors[] = Tools::displayError('Payment source is invalid. Please select payment source.');
-                }
-
-                if ($paymentTransactionId && !Validate::isString($paymentTransactionId)) {
-                    $this->errors[] = Tools::displayError('Payment amount is invalid. Please enter correct amount.');
-                }
-
-                if (!$isFullPayment) {
-                    if ($paymentAmount == '') {
-                        $this->errors[] = Tools::displayError('Please enter valid Payment amount of the order.');
-                    } elseif ($paymentAmount && !Validate::isPrice($paymentAmount)) {
-                        $this->errors[] = Tools::displayError('Payment amount is invalid. Please enter correct amount.');
-                    }
-                }
-
-                if (!count($this->errors)) {
-                    $payment_module = new BoOrder();
-                    $payment_module->displayName = $moduleName;
-                    $payment_module->payment_type = $paymentType;
-
-                    $cart = new Cart((int)$id_cart);
-                    Context::getContext()->currency = new Currency((int)$cart->id_currency);
-                    Context::getContext()->customer = new Customer((int)$cart->id_customer);
-
-                    $bad_delivery = false;
-                    if (($bad_delivery = (bool)!Address::isCountryActiveById((int)$cart->id_address_delivery))
-                        || !Address::isCountryActiveById((int)$cart->id_address_invoice)
-                    ) {
-                        if ($bad_delivery) {
-                            $this->errors[] = Tools::displayError('This booking address country is not active.');
-                        } else {
-                            $this->errors[] = Tools::displayError('This invoice address country is not active.');
-                        }
+                $objCart = new Cart($id_cart);
+                if (Validate::isLoadedObject($objCart)) {
+                    if ($objCart->is_advance_payment) {
+                        $orderTotal = $objCart->getOrderTotal(true, Cart::ADVANCE_PAYMENT);
                     } else {
-                        $amountPaid = $cart->getOrderTotal(true, Cart::BOTH);
+                        $orderTotal = $objCart->getOrderTotal(true, Cart::BOTH);
+                    }
+
+                    // Validate data if required
+                    if ($orderTotal > 0) {
+                        $moduleName = trim(Tools::getValue('payment_module_name'));
+                        $paymentType = Tools::getValue('payment_type');
+                        $paymentTransactionId = trim(Tools::getValue('payment_transaction_id'));
+                        $isFullPayment = Tools::getValue('is_full_payment');
+                        $paymentAmount = trim(Tools::getValue('payment_amount'));
+
                         if (!$isFullPayment) {
-                            $amountPaid = Tools::ps_round($paymentAmount, 6);
-                        }
-
-                        $employee = new Employee((int)Context::getContext()->cookie->id_employee);
-                        $payment_module->validateOrder(
-                            (int)$cart->id,
-                            (int)$id_order_state,
-                            $amountPaid,
-                            $payment_module->displayName,
-                            $this->l('Manual order -- Employee:').' '.
-                            substr($employee->firstname, 0, 1).'. '.$employee->lastname,
-                            $paymentTransactionId ? array('transaction_id' => $paymentTransactionId) : array(),
-                            null,
-                            false,
-                            $cart->secure_key
-                        );
-
-                        // add order payment if required
-                        $objOrderState = new OrderState($id_order_state);
-                        if (!$objOrderState->logable && !$objOrderState->paid) {
-                            $objOrder = new Order($payment_module->currentOrder);
-
-                            if ($objOrder->hasInvoice()) {
-                                $invoices = $objOrder->getInvoicesCollection();
-
-                                $dateTimeNow = date('Y-m-d H:i:s');
-                                foreach ($invoices as $invoice) {
-                                    $objOrder->addOrderPayment(
-                                        $amountPaid,
-                                        $payment_module->displayName,
-                                        $paymentTransactionId,
-                                        new Currency($objOrder->id_currency),
-                                        $dateTimeNow,
-                                        $invoice,
-                                        $paymentType
-                                    );
-                                }
+                            if ($paymentAmount == '') {
+                                $this->errors[] = Tools::displayError('Please enter valid Payment amount of the order.');
+                            } elseif ($paymentAmount && !Validate::isPrice($paymentAmount)) {
+                                $this->errors[] = Tools::displayError('Payment amount is invalid. Please enter correct amount.');
                             } else {
-                                $objOrder->addOrderPayment(
-                                    $amountPaid,
-                                    $payment_module->displayName,
-                                    $paymentTransactionId,
-                                    new Currency($objOrder->id_currency),
-                                    date('Y-m-d H:i:s'),
-                                    null,
-                                    $paymentType
-                                );
+                                $paymentAmount = (float) $paymentAmount;
                             }
                         }
 
-                        if (isset($this->context->cookie->id_cart)) {
-                            unset($this->context->cookie->id_cart);
-                        }
-                        if (isset($this->context->cookie->id_guest)) {
-                            unset($this->context->cookie->id_guest);
+                        if ($paymentAmount >= 0) {
+                            if (!$moduleName) {
+                                $this->errors[] = Tools::displayError('Please enter Payment method.');
+                            } elseif ($moduleName && !Validate::isGenericName($moduleName)) {
+                                $this->errors[] = Tools::displayError('Payment method is invalid. Please enter a valid payment method.');
+                            }
                         }
 
-                        if ($payment_module->currentOrder) {
-                            Tools::redirectAdmin(self::$currentIndex.'&id_order='.$payment_module->currentOrder.'&vieworder'.'&token='.$this->token.'&conf=3');
+                        if ($paymentAmount > 0) {
+                            if (!$paymentType) {
+                                $this->errors[] = Tools::displayError('Please select a Payment source.');
+                            } elseif ($paymentType && !Validate::isUnsignedInt($paymentType)) {
+                                $this->errors[] = Tools::displayError('Payment source is invalid. Please select payment source.');
+                            }
+
+                            if ($paymentTransactionId && !Validate::isString($paymentTransactionId)) {
+                                $this->errors[] = Tools::displayError('Payment amount is invalid. Please enter correct amount.');
+                            }
                         }
                     }
+
+                    if (!count($this->errors)) {
+                        $this->context->currency = new Currency((int) $objCart->id_currency);
+                        $this->context->customer = new Customer((int) $objCart->id_customer);
+
+                        // Set payment module details
+                        $objPaymentModule = new BoOrder();
+                        if ($orderTotal > 0) {
+                            $objPaymentModule->payment_type = $paymentType;
+                            $objPaymentModule->displayName = $moduleName;
+                        } else {
+                            $objPaymentModule->name = 'free_order';
+                            $objPaymentModule->displayName = $this->l('Free order');
+                        }
+
+                        // Set order state
+                        if ($orderTotal > 0) {
+                            if ($isFullPayment) {
+                                $idOrderState = Configuration::get('PS_OS_PAYMENT_ACCEPTED');
+                            } else {
+                                if ($paymentAmount <= 0) {
+                                    $idOrderState = Configuration::get('PS_OS_AWAITING_PAYMENT');
+                                } elseif (($paymentAmount > 0) && ($paymentAmount < $orderTotal)) {
+                                    $idOrderState = Configuration::get('PS_OS_PARTIAL_PAYMENT_ACCEPTED');
+                                } else {
+                                    $idOrderState = Configuration::get('PS_OS_PAYMENT_ACCEPTED');
+                                }
+                            }
+                        } else {
+                            $idOrderState = Configuration::get('PS_OS_PAYMENT_ACCEPTED');
+                        }
+
+                        // Set amount paid
+                        if ($orderTotal > 0) {
+                            if ($isFullPayment) {
+                                $amountPaid = $orderTotal;
+                            } else {
+                                $amountPaid = $paymentAmount;
+                            }
+                        } else {
+                            $amountPaid = 0;
+                        }
+
+                        // Set transaction ID
+                        if ($orderTotal > 0) {
+                            if ($paymentTransactionId) {
+                                $paymentTransactionId = array('transaction_id' => $paymentTransactionId);
+                            } else {
+                                $paymentTransactionId = array();
+                            }
+                        } else {
+                            $paymentTransactionId = null;
+                        }
+
+                        $bad_delivery = false;
+                        if (($bad_delivery = (bool)!Address::isCountryActiveById((int)$objCart->id_address_delivery))
+                            || !Address::isCountryActiveById((int)$objCart->id_address_invoice)
+                        ) {
+                            if ($bad_delivery) {
+                                $this->errors[] = Tools::displayError('This booking address country is not active.');
+                            } else {
+                                $this->errors[] = Tools::displayError('This invoice address country is not active.');
+                            }
+                        } else {
+                            $amountPaid = Tools::ps_round($amountPaid, 6);
+                            $objEmployee = new Employee($this->context->cookie->id_employee);
+
+                            $objPaymentModule->validateOrder(
+                                $objCart->id,
+                                $idOrderState,
+                                $amountPaid,
+                                $objPaymentModule->displayName,
+                                $this->l('Manual order -- Employee:').' '.substr($objEmployee->firstname, 0, 1).'. '.$objEmployee->lastname,
+                                $paymentTransactionId,
+                                null,
+                                false,
+                                $objCart->secure_key
+                            );
+
+                            if (isset($this->context->cookie->id_cart)) {
+                                unset($this->context->cookie->id_cart);
+                            }
+                            if (isset($this->context->cookie->id_guest)) {
+                                unset($this->context->cookie->id_guest);
+                            }
+
+                            if ($objPaymentModule->currentOrder) {
+                                Tools::redirectAdmin(self::$currentIndex.'&id_order='.$objPaymentModule->currentOrder.'&vieworder'.'&token='.$this->token.'&conf=3');
+                            }
+                        }
+                    } else {
+                        // if errors render add order form
+                        $_GET['addorder'] = '1';
+                        $_GET['cart_id'] = $id_cart;
+                    }
                 } else {
-                    // if errors render add order form
-                    $_GET['addorder'] = '1';
-                    $_GET['cart_id'] = $id_cart;
+                    $this->errors[] = Tools::displayError('Cart can not be loaded.');
                 }
             } else {
                 $this->errors[] = Tools::displayError('You do not have permission to add this.');
