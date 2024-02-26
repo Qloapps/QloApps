@@ -3334,6 +3334,9 @@ abstract class ModuleCore
 
         if (!isset($toDelete) || $toDelete) {
             unlink($overrideClassFilePath);
+            if ($classInfo['type'] == self::OVERRIDE_TYPE_MODULE_CONTROLLER) {
+                $this->cleanModulesOverrideDir($overrideClassFilePath);
+            }
         } else {
             file_put_contents($overrideClassFilePath, $code);
         }
@@ -3342,6 +3345,21 @@ abstract class ModuleCore
         Tools::generateIndex();
 
         return true;
+    }
+
+    private function cleanModulesOverrideDir($dir)
+    {
+        if (rtrim($dir, '/') == _PS_ROOT_DIR_.'/override/modules') {
+            return;
+        }
+
+        $files = Tools::scandir($dir, '');
+        $diffResult = array_diff($files, array('.', '..', 'index.php'));
+
+        if (!count($diffResult)) {
+            Tools::deleteDirectory($dir);
+            $this->cleanModulesOverrideDir(dirname($dir));
+        }
     }
 
     /**
