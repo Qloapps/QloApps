@@ -1,0 +1,927 @@
+/**
+ * 2010-2023 Webkul.
+ *
+ * NOTICE OF LICENSE
+ *
+ * All right is reserved,
+ * Please go through LICENSE.txt file inside our module
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade this module to newer
+ * versions in the future. If you wish to customize this module for your
+ * needs please refer to CustomizationPolicy.txt file inside our module for more information.
+ *
+ * @author Webkul IN
+ * @copyright 2010-2023 Webkul IN
+ * @license LICENSE.txt
+ */
+
+/* elements - start */
+.well.well-order-date {
+    background: #2FA368;
+    padding: 16px 15px;
+    border-radius: 4px;
+    color: #FFF;
+    font-size: 16px;
+}
+
+.card {
+    padding: 0;
+    border-radius: 4px;
+    border: 1px solid #E5E5E5;
+    background: #FFF;
+    box-shadow: 0px 1px 6px 0px rgba(0, 0, 0, 0.10);
+    color: #333;
+}
+
+.card .card-header {
+    padding: 10px 15px;
+    margin-bottom: 0;
+    border-bottom: 1px solid #E5E5E5;
+    font-size: 20px;
+    font-weight: bold;
+    line-height: 27px;
+}
+
+.card .card-subheader {
+    margin-bottom: 0;
+    font-size: 14px;
+    font-weight: normal;
+}
+
+.card .card-body {
+    padding: 15px;
+}
+
+.card .card-body .card-title {
+    margin: 0;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.card .card-body .card-subtitle {
+    margin: 0;
+    margin-bottom: 8px;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.card .card-body .card-text {
+    font-size: 14px;
+    line-height: 26px;
+}
+
+.description-list {
+    margin-top: 12px;
+}
+
+.description-list dl {
+    font-size: 16px;
+    margin-bottom: 0;
+}
+
+.description-list dt,
+.description-list dd {
+    margin: 5px 0;
+}
+
+.description-list dd .hotel-email {
+    word-wrap: break-word;
+}
+
+.description-list .label {
+    font-size: 12px;
+}
+
+.hotel-location p.hotel-address {
+    font-size: 16px;
+    line-height: 24px;
+}
+
+.booking-hotel-map-container {
+    height: 200px;
+}
+
+.table.table-summary {
+    margin-bottom: 0;
+    border: none;
+}
+
+.table.table-summary td {
+    border-top: none;
+    font-size: 14px;
+}
+
+.table.table-summary.table-sm td {
+    padding: 6px 0;
+}
+
+.table.table-summary .price {
+    font-size: 14px;
+    color: #333;
+}
+
+.room-details .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.room-details .card-body {
+    padding: 0;
+}
+
+.room-details .booking-room-detail {
+    padding: 20px;
+    position: relative;
+}
+
+.room-details .booking-room-detail:not(:last-of-type) {
+    border-bottom: 1px solid #E5E5E5;
+}
+
+.booking-room-detail .description-list dt {
+    font-weight: 400;
+}
+
+.booking-room-detail .description-list dd {
+    font-weight: 600;
+}
+
+.booking-room-detail .img-room-type {
+    width: 100%;
+    border-radius: 2px;
+}
+
+.booking-room-detail .room-type-name h3 {
+    display: inline-block;
+    margin: 0;
+    font-size: 20px;
+    font-weight: bold;
+    color: #333;
+}
+
+.booking-room-detail .order-price-info {
+    position: relative;
+    top: -1px;
+}
+
+.booking-room-detail .num-refunded-rooms {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+}
+
+.booking-room-detail .num-refunded-rooms .badge {
+    padding: 8px;
+    font-size: 12px;
+    border-radius: 2px;
+}
+
+.booking-room-detail .btn-view-extra-services {
+    color: #167BFF;
+}
+
+@media (min-width: 992px) and (max-width: 1199px) {
+    .booking-room-detail .info-wrap {
+        margin-top: 10px;
+    }
+
+    .booking-room-detail .info-wrap .description-list {
+        margin-top: 10px;
+    }
+}
+
+.order-messages .card-body {
+    padding: 0;
+}
+
+.order-messages .message {
+    padding: 20px;
+}
+
+.order-messages .message.management {
+    margin: 0 20px;
+    border-left: 1px solid #333;
+    background-color: rgba(229, 229, 229, 0.30);
+}
+
+.order-messages .message-content {
+    margin-top: 10px;
+}
+
+.order-messages .message-content br {
+    display: block;
+    content: '';
+    height: 8px;
+}
+
+.add-order-message .dropdown {
+    width: 300px;
+}
+
+.add-order-message .dropdown button {
+    min-width: 300px;
+    text-align: left;
+    font-size: 16px;
+    color: #0006;
+    border: 1px solid #E5E5E5;
+    border-radius: 4px;
+}
+
+.add-order-message .dropdown button::after {
+    content: '\2304';
+    position: absolute;
+    top: -7px;
+    right: 10px;
+    font-size: 28px;
+    font-weight: 100;
+    color: #333;
+}
+
+.add-order-message .dropdown .dropdown-menu {
+    width: 100%;
+    left: 0;
+    right: unset;
+    border-radius: 4px;
+}
+
+.add-order-message .dropdown .dropdown-menu > li > a {
+    padding-top: 4px;
+    padding-bottom: 4px;
+    font-size: 16px;
+}
+
+.add-order-message form textarea {
+    border-radius: 4px;
+    border: 1px solid #E5E5E5;
+    background: #FFF;
+}
+
+.fancybox-wrap.fancybox-order-detail {
+    top: 72px !important;
+}
+
+.fancybox-wrap.fancybox-order-detail .card {
+    width: 650px;
+}
+
+.fancybox-wrap.fancybox-order-detail .fancybox-close {
+    background: none;
+    top: 8px;
+    right: 10px;
+    font-size: 32px;
+}
+
+.fancybox-wrap.fancybox-order-detail .fancybox-close:after {
+    content: '\00D7';
+    color: #333;
+}
+
+.fancybox-wrap.fancybox-order-detail .card-body {
+    padding: 0;
+    max-height: 70vh;
+    overflow: auto;
+}
+
+.fancybox-wrap.fancybox-order-detail .card-body::-webkit-scrollbar {
+    width: 14px;
+}
+
+.fancybox-wrap.fancybox-order-detail .card-body::-webkit-scrollbar-track {
+    background-color: #F1F1F1;
+}
+
+.fancybox-wrap.fancybox-order-detail .card-body::-webkit-scrollbar-thumb {
+    border-radius: 9px;
+    background-color: #C1C1C1;
+    border: 4px solid #F1F1F1;
+}
+
+.fancybox-wrap.fancybox-order-detail .card-body .room-type-wrap {
+    padding: 15px;
+}
+
+.fancybox-wrap.fancybox-order-detail .card-body .room-type-wrap:not(:last-of-type) {
+    border-bottom: 1px solid #E5E5E5;
+}
+
+.fancybox-wrap.fancybox-order-detail .room-type-wrap p a {
+    font-size: 18px;
+    color: #333;
+    font-weight: bold;
+}
+
+.fancybox-wrap.fancybox-order-detail .room-type-wrap .row {
+    margin-left: -5px;
+    margin-right: -5px;
+}
+
+.fancybox-wrap.fancybox-order-detail .room-type-wrap [class*=col] {
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
+.fancybox-wrap.fancybox-order-detail .room-type-wrap .labels {
+    color: #5B5B5B;
+    font-size: 14px;
+    margin-bottom: 10px;
+}
+
+.fancybox-wrap.fancybox-order-detail .room-type-wrap .date-diff {
+    color: #333;
+    font-size: 16px;
+    margin-bottom: 6px;
+}
+
+.fancybox-wrap.fancybox-order-detail .room-type-wrap .date-diff select.form-control {
+    max-width: 150px;
+}
+
+.fancybox-wrap.fancybox-order-detail .card-footer {
+    padding: 10px 15px;
+    border-top: 1px solid #E5E5E5;
+}
+
+.fancybox-wrap.fancybox-order-detail .card-footer .btn {
+    padding: 10px 30px;
+    border-radius: 2px;
+    font-size: 14px;
+    line-height: 22px;
+    font-weight: bold;
+}
+
+.fancybox-wrap.fancybox-order-detail .card-footer .btn:not(:last-of-type) {
+    margin-right: 10px;
+}
+
+.fancybox-wrap.fancybox-order-detail .card-footer .btn:hover {
+    opacity: 0.8;
+}
+
+.fancybox-wrap.fancybox-order-detail .card-footer .btn.btn-primary {
+    border: 1px solid #1292FF;
+    background: #1292FF;
+    color: #FFF;
+}
+
+.fancybox-wrap.fancybox-order-detail .card-footer .btn.btn-secondary {
+    border: 1px solid #E5E5E5;
+    background: #fff;
+    color: #2E2E2E;
+}
+
+.label {
+    color: #333;
+    font-weight: normal;
+    border-radius: 2px;
+}
+
+.alert {
+    border-radius: 4px;
+}
+
+.button.button-medium {
+    padding: 8px 15px;
+    background-color: #379bf0;
+    background-image: none;
+    border-radius: 2px;
+}
+
+.button.button-medium span {
+    padding: 0;
+}
+
+.button.button-medium:hover,
+.button.button-medium:focus,
+.button.button-medium:active {
+    opacity: 0.8;
+}
+
+/* elements - end */
+
+.page-heading.bottom-indent {
+    margin-bottom: 32px;
+}
+
+#order-detail-content table .return_quantity_buttons {
+    margin-top: 3px;
+}
+
+#order-detail-content table .return_quantity_buttons a {
+    display: none;
+    float: left;
+}
+
+#order-detail-content table .return_quantity_buttons a+a {
+    margin-left: 3px;
+}
+
+#order-detail-content table .order_qte_input {
+    display: none;
+    width: 57px;
+    height: 27px;
+    line-height: 27px;
+    padding: 0;
+    text-align: center;
+}
+
+#order-detail-content table label {
+    font-weight: 400;
+}
+
+.wk_booking_details_wrapper table {
+    margin-bottom: 10px !important;
+}
+
+.wk_booking_details_wrapper table .table_body .cart_product img {
+    border-radius: 2px;
+}
+
+.table td.step-by-step-date {
+    width: 105px;
+}
+
+.table tfoot strong {
+    color: #333;
+}
+
+.info-order i {
+    font-size: 20px;
+}
+
+.info-order i.icon-gift {
+    color: #f13340;
+}
+
+.info-order i.icon-repeat {
+    color: #55c65e;
+}
+
+#sendOrderMessage {
+    margin-bottom: 30px;
+}
+
+#sendOrderMessage select.form-control {
+    width: 263px;
+}
+
+/* ----- Order cancellation in order detail page ---- */
+.standard_refund_fields {
+    display: none;
+}
+
+.loading_overlay {
+    display: none;
+    position: fixed;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 100000;
+}
+
+.loading-img {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+}
+
+.refund_reason_head {
+    margin-bottom: 15px;
+    font-size: 22px;
+    color: #414141;
+}
+
+#reasonForRefund {
+    font-size: 14px;
+    color: #777777;
+}
+
+.booking-actions-wrap .btn {
+    font-size: 14px;
+    padding: 8px 20px;
+    font-weight: bold;
+    text-align: center;
+    margin-left: 10px;
+    margin-top: 1px;
+    margin-bottom: 1px;
+    border-radius: 2px;
+}
+
+.reason_submit_wrapper {
+    text-align: center;
+}
+
+/* ----- Order cancellation in order detail page ---- */
+.back_o_msg {
+    color: red;
+    font-size: 14px;
+}
+
+.cust_serv_lnk {
+    text-decoration: underline;
+}
+
+.room_type_old_price {
+    text-decoration: line-through;
+    color: #979797;
+    font-size: 12px;
+}
+
+.cancel_requests_link_wrapper {
+    color: #000;
+    line-height: 18px;
+    font-size: 13px;
+    padding-top: 12px;
+    padding-bottom: 12px;
+}
+
+.cancel_requests_link_wrapper i {
+    font-size: 20px;
+    color: #1292FF;
+    background-color: #E0EEFF;
+    margin-right: 4px;
+    position: relative;
+    top: 2px
+}
+
+.cancel_requests_link_wrapper a {
+    font-weight: bold;
+    font-style: italic;
+    text-decoration: underline;
+    color: #000;
+}
+
+/* refund buttons */
+#order-detail .checkbox {
+    margin-bottom: 15px;
+    line-height: 12px;
+}
+
+#order-detail .booking_refund_fields label {
+    font-size: 14px;
+    color: #333;
+    font-weight: bold;
+    padding-left: 6px;
+}
+
+#order-detail #order_refund_request {
+    background-color: #ff4b4b;
+    border: 1px solid #ff4b4b;
+    color: #FFF;
+}
+
+#order-detail #order_refund_request:focus,
+#order-detail #order_refund_request:hover {
+    opacity: 0.8;
+}
+
+#order-detail #order_refund_request_submit {
+    background-color: #36BA46;
+    border: 1px solid #36BA46;
+    color: #fff;
+    font-weight: bold;
+    text-transform: uppercase;
+    font-size: 14px;
+    padding: 12px 30px;
+}
+
+#order-detail #submit_refund_reason {
+    background-color: #1292FF;
+    border: 1px solid #1292FF;
+    color: #fff;
+    font-weight: bold;
+    text-transform: uppercase;
+    font-size: 14px;
+    padding: 12px 30px;
+}
+
+.refund_request_fields {
+    display: none;
+}
+
+.ui-tooltip.price-tootip {
+    box-shadow: 0 2px 6px 0 rgb(0 0 0 / 20%);
+    background: #FFFFFF;
+    border: unset;
+    color: #333;
+    padding: 2px 10px;
+    max-height: 310px;
+    overflow-y: auto;
+}
+
+.price-info-tooltip-cont {
+    min-width: 180px;
+}
+
+.price-info-tooltip-cont .list-row {
+    display: flex;
+    justify-content: space-between;
+    margin: 5px 0;
+}
+
+.price-info-tooltip-cont .list-row p {
+    margin: 0;
+}
+
+.hotel-details .form-group,
+.guest-details .form-group {
+    margin-bottom: 10px;
+}
+
+.hotel-details .form-group p,
+.guest-details .form-group p {
+    margin: 0;
+    display: inline-block;
+    font-size: 16px;
+    color: #333;
+}
+
+.hotel-details .form-group p:first-child,
+.guest-details .form-group p:first-child {
+    font-weight: bold;
+}
+
+.hotel-details .form-group p:nth-child(2),
+.guest-details .form-group p:nth-child(2) {
+    float: right;
+    max-width: 50%;
+    text-align: right;
+    word-break: break-all;
+}
+
+#create-new-refund-popup .card.cancel-booking .card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#create-new-refund-popup .row.no-gutters [class*="col-"] {
+    padding-right: 0;
+    padding-left: 0;
+}
+
+#create-new-refund-popup .tab-content {
+    margin-top: 0;
+}
+
+/* nav-tabs resets - start */
+#create-new-refund-popup .nav-tabs,
+#create-new-refund-popup .nav-tabs > li,
+#create-new-refund-popup .nav-tabs > li > a {
+    border: none;
+}
+
+#create-new-refund-popup .nav-tabs > li {
+    margin: 0;
+}
+/* nav-tabs resets - end */
+
+/* nav-tabs custom - start */
+#create-new-refund-popup .nav-tabs > li > a {
+    border-right: 1px solid #E5E5E5;
+    color: #333;
+}
+
+#create-new-refund-popup .nav-tabs > li:not(:last-of-type) > a {
+    border-bottom: 1px solid #E5E5E5;
+}
+
+#create-new-refund-popup .nav-tabs > li:last-of-type:first-of-type > a {
+    border-bottom: 1px solid #E5E5E5;
+}
+
+#create-new-refund-popup .nav-tabs li.active a {
+    border-right: none;
+}
+/* nav-tabs custom - end */
+
+#create-new-refund-popup .nav-tabs li.active a::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 2px;
+    height: 100%;
+    background-color: #1292FF;
+}
+
+#create-new-refund-popup .nav-tabs li a .room-type-name {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 2px;
+}
+
+#create-new-refund-popup .tab-content .room-type-summary {
+    padding: 10px 15px;
+    border-bottom: 1px solid #E5E5E5;
+}
+
+#create-new-refund-popup .tab-content .room-type-summary .room-type-name {
+    font-size: 16px;
+    font-weight: bold;
+}
+
+#create-new-refund-popup .tab-content .room-type-summary > [class*=col-xs-] > p {
+    font-size: 10px;
+    margin-bottom: 0px;
+}
+
+#create-new-refund-popup .tab-content .room-details {
+    padding: 10px 15px;
+}
+
+#create-new-refund-popup .tab-content .room-details.cancelled {
+    background-color: #F5F5F5;
+}
+#create-new-refund-popup .tab-content .room-details.cancelled .badge-cancelled {
+    position: absolute;
+    top: -4px;
+    margin-left: 6px;
+    padding: 5px 10px;
+    border-radius: 31px;
+    font-size: 12px;
+    background-color: #FF4B4B;
+}
+
+#create-new-refund-popup .room-details .occupancy-wrap {
+    position: relative;
+}
+
+#create-new-refund-popup .room-details .occupancy-wrap .checkbox {
+    margin: 0;
+}
+
+#create-new-refund-popup .room-details .occupancy-wrap .checker {
+    margin-right: 8px;
+}
+
+#create-new-refund-popup .room-details .checkbox label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+}
+
+#create-new-refund-popup .room-details .checkbox label + span {
+    font-size: 12px;
+}
+
+#create-new-refund-popup .room-details .extra-services-wrap {
+    margin-top: 4px;
+    padding-left: 23px;
+}
+
+#create-new-refund-popup .room-details .extra-services-wrap > div:not(:first-of-type) {
+    margin-top: 4px;
+}
+
+#create-new-refund-popup .services-wrap .service:not(:last-of-type)::after,
+#create-new-refund-popup .facilities-wrap .facility:not(:last-of-type)::after {
+    content: ' | ';
+}
+
+#create-new-refund-popup .card.cancel-booking-preview .card-body {
+    padding: 15px;
+}
+
+#create-new-refund-popup .card.cancel-booking-preview .well {
+    box-shadow: none;
+    background-color: #EEF4FF;
+    border: 1px solid #1292FF;
+    border-radius: 4px;
+    padding: 10px 15px;
+}
+
+#create-new-refund-popup .card.cancel-booking-preview .well p {
+    margin: 0;
+    font-size: 12px;
+    color: #333333
+}
+
+#create-new-refund-popup .card.cancel-booking-preview .form-group .label {
+    padding: 0;
+    margin-bottom: 8px;
+    font-size: 14px;
+}
+
+#create-new-refund-popup .card.cancel-booking-preview .form-group .label sup {
+    color: #FF4B4B;
+}
+
+#create-new-refund-popup .card.cancel-booking-preview .form-group textarea {
+    border: 1px solid #E5E5E5;
+    border-radius: 4px;
+    color: #333;
+}
+
+#create-new-refund-popup .card.cancel-booking-preview .form-group textarea:focus {
+    box-shadow: none;
+}
+
+#create-new-refund-popup .card.cancel-booking-preview .errors .alert-danger {
+    padding: 8px 15px;
+    background-color: #FF4B4B1A;
+    border: 1px solid #FF4B4B;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: normal;
+    color: #FF4B4B;
+    text-shadow: none;
+}
+
+#create-new-refund-popup .card.cancel-booking-preview .errors .alert-danger::before {
+    content: none;
+}
+
+#create-new-refund-popup .card.cancel-booking-preview .errors .alert-danger p {
+    margin: 0;
+    margin-bottom: 2px;
+}
+
+.fancybox-order-detail.feedback {
+    width: 480px !important;
+}
+
+.fancybox-order-detail.feedback .card {
+    width: 480px !important;
+    padding: 25px 25px;
+}
+
+.fancybox-order-detail.feedback i {
+    font-size: 120px;
+}
+
+.fancybox-order-detail.feedback h3 {
+    font-size: 22px;
+}
+
+.fancybox-order-detail.feedback h4 {
+    margin-top: 16px;
+    font-size: 16px;
+    line-height: 24px;
+}
+
+#popup-view-extra-services .nav-tabs {
+    border-bottom: none;
+}
+
+#popup-view-extra-services .nav-tabs > li {
+    width: 50%;
+    text-align: center;
+    margin: 0;
+}
+
+#popup-view-extra-services .nav-tabs > li > a {
+    border: none;
+    margin: 0;
+    font-size: 14px;
+    font-weight: bold;
+    color: #333;
+}
+
+#popup-view-extra-services .nav-tabs > li.active {
+    border-bottom: 1px solid #1292FF;
+}
+
+#popup-view-extra-services .nav-tabs > li.active > a {
+    color: #1292FF;
+}
+
+#popup-view-extra-services .nav-tabs > li:not(.active) {
+    border-bottom: 1px solid #F0F0F0;
+}
+
+#popup-view-extra-services .tab-content {
+    margin-top: 0;
+    padding: 0 15px 15px;
+}
+
+#popup-view-extra-services .tab-content .rooms_extra_demands_text {
+    padding: 10px 0px;
+    border-bottom: 1px solid #F0F0F0;
+    font-size: 12px;
+}
+
+#popup-view-extra-services .tab-content .room_demands:not(:last-of-type) {
+    margin-bottom: 20px;
+}
+
+#popup-view-extra-services .tab-content .demand_header {
+    font-size: 16px;
+    font-weight: bold;
+    line-height: 24px;
+    margin-bottom: 10px;
+}
+
+#popup-view-extra-services .tab-content .room_demand_detail {
+    font-size: 14px;
+    font-weight: 500;
+}
+
+#popup-view-extra-services .tab-content .room_demand_block {
+    display: flex;
+    justify-content: space-between;
+}

@@ -31,10 +31,12 @@
 }
 
 #add-review-popup {
-    width: 650px;
+    width: 600px;
     margin: 0 auto;
-    padding-right: 20px;
-    padding-bottom: 20px;
+}
+
+#add-review-popup .card-body {
+    padding: 15px;
 }
 
 #add-review-popup .form-group {
@@ -43,7 +45,8 @@
 
 #add-review-popup label {
     font-size: 14px;
-    text-transform: uppercase;
+    font-weight: normal;
+    margin-bottom: 6px;
 }
 
 #add-review-popup .form-control {
@@ -51,10 +54,6 @@
     font-size: 14px;
     line-height: 18px;
     border-radius: 4px;
-}
-
-#add-review-popup .hotel-name {
-    font-size: 18px;
 }
 
 #add-review-popup .form-control.description {
@@ -74,28 +73,18 @@
     font-size: 12px;
 }
 
-#add-review-popup .review-actions-wrap .btn-review {
-    font-size: 14px;
-    padding: 12px 30px;
-    font-weight: 600;
-    text-transform: uppercase;
-    text-align: center;
-    margin-left: 10px;
-}
-
-#add-review-popup .review-actions-wrap .btn-review.disabled {
+#add-review-popup .review-actions-wrap .btn.disabled {
     background-color: #1292FF;
     border: 1px solid #1292FF;
 }
 
 #add-review-popup .image-input-btn {
-    width: 100px;
     height: 100px;
     border-radius: 4px;
     border: 1px dashed #999;
-    display: table-cell;
-    vertical-align: middle;
     cursor: pointer;
+    display: flex;
+    align-items: center;
 }
 
 #add-review-popup .image-input-btn .img-camera-plus {
@@ -109,7 +98,8 @@
 }
 
 #add-review-popup .previews-wrap {
-    margin-bottom: 15px;
+    margin-top: 10px;
+    margin-bottom: 20px;
 }
 
 #add-review-popup .previews-wrap span {
@@ -120,9 +110,10 @@
 #add-review-popup .previews-wrap span i {
     position: absolute;
     top: 3px;
-    right: 14px;
-    font-size: 21px;
-    color: #7f7f7f;
+    right: 16px;
+    font-size: 30px;
+    font-weight: 100;
+    color: #fff;
     cursor: pointer;
 }
 
@@ -135,14 +126,6 @@
 }
 
 /* success popup */
-.fancybox-add-review-success {
-    top: 80px !important;
-}
-
-.add-review-success-popup {
-    width: 650px;
-}
-
-.add-review-success-popup i {
-    font-size: 40px;
+.fancybox-order-detail.feedback .add-review-success-popup i.text-info {
+    color: #1292FF;
 }

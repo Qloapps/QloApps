@@ -36,15 +36,9 @@ class HistoryControllerCore extends FrontController
         parent::setMedia();
         $this->addCSS(array(
             _THEME_CSS_DIR_.'history.css',
-            _THEME_CSS_DIR_.'addresses.css'
         ));
-        $this->addJS(array(
-            _THEME_JS_DIR_.'history.js',
-            _THEME_JS_DIR_.'tools.js' // retro compat themes 1.5
-        ));
-        $this->addJqueryPlugin(array('fancybox')); //fancybox not found for some client theme
-        $this->addJqueryPlugin(array('scrollTo', 'footable', 'footable-sort'));
-        $this->addJqueryUI('ui.tooltip', 'base', true);
+
+        $this->addJqueryPlugin(array('footable', 'footable-sort'));
     }
 
     /**

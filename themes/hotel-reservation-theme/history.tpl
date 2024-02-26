@@ -61,7 +61,7 @@
 							{* {if isset($order.invoice) && $order.invoice && isset($order.virtual) && $order.virtual}
 								<img class="icon" src="{$img_dir}icon/download_product.gif"	alt="{l s='Products to download'}" title="{l s='Products to download'}" />
 							{/if} *}
-							<a class="color-myaccount" href="javascript:showOrder(1, {$order.id_order|intval}, '{$link->getPageLink('order-detail', true)|escape:'html':'UTF-8'}');">
+							<a class="color-myaccount" href="{$link->getPageLink('order-detail', true, NULL, "id_order={$order.id_order|intval}")|escape:'html':'UTF-8'}">
 								{Order::getUniqReferenceOf($order.id_order)}
 							</a>
 						</td>
@@ -99,7 +99,7 @@
 							{/if}
 						</td>
 						<td class="history_detail">
-							<a class="btn btn-default button button-small" href="javascript:showOrder(1, {$order.id_order|intval}, '{$link->getPageLink('order-detail', true)|escape:'html':'UTF-8'}');">
+							<a class="btn btn-default button button-small" href="{$link->getPageLink('order-detail', true, NULL, "id_order={$order.id_order|intval}")|escape:'html':'UTF-8'}">
 								<span>
 									{l s='Details'}<i class="icon-chevron-right right"></i>
 								</span>
@@ -137,16 +137,3 @@
 		</a>
 	</li>
 </ul>
-<!-- By webkul added for history controller url on history.js -->
-{strip}
-	{addJsDef historyUrl=$link->getPageLink("orderdetail", true)|escape:'quotes':'UTF-8'}
-	{addJsDefL name=req_sent_msg}{l s='Request Sent..' js=1}{/addJsDefL}
-	{addJsDefL name=wait_stage_msg}{l s='Waiting' js=1}{/addJsDefL}
-	{addJsDefL name=pending_state_msg}{l s='Pending...' js=1}{/addJsDefL}
-	{addJsDefL name=mail_sending_err}{l s='Some error occurred while sending mail to the customer' js=1}{/addJsDefL}
-	{addJsDefL name=refund_request_sending_error}{l s='Some error occurred while processing request for booking cancelation.' js=1}{/addJsDefL}
-	{addJsDefL name=no_bookings_selected}{l s='No rooms selected. Please select at least one room.' js=1}{/addJsDefL}
-	{addJsDefL name=refund_request_success_txt}{l s='Request for booking cancelation is successffully created.' js=1}{/addJsDefL}
-	{addJsDefL name=cancel_req_txt}{l s='Cancel Request' js=1}{/addJsDefL}
-	{addJsDefL name=cancel_booking_txt}{l s='Cancel Bookings' js=1}{/addJsDefL}
-{/strip}

@@ -22,695 +22,737 @@
 *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 *}
+
+{capture name=path}
+    <a href="{$link->getPageLink('my-account', true)|escape:'html':'UTF-8'}">
+        {l s='My account'}
+    </a>
+    <span class="navigation-pipe">
+        {$navigationPipe}
+    </span>
+    <a href="{$link->getPageLink('history', true)|escape:'html':'UTF-8'}">
+        {l s='Bookings'}
+    </a>
+    <span class="navigation-pipe">
+        {$navigationPipe}
+    </span>
+    <span class="navigation_page">
+        {l s='Booking details'}
+    </span>
+{/capture}
+
+<h1 class="page-heading bottom-indent">
+    {l s='Booking Details'}
+</h1>
+
 {if isset($order)}
-	<div class="box box-small clearfix">
-		{if isset($reorderingAllowed) && $reorderingAllowed}
-		<form id="submitReorder" action="{if isset($opc) && $opc}{$link->getPageLink('order-opc', true)}{else}{$link->getPageLink('order', true)}{/if}" method="post" class="submit">
-			<input type="hidden" value="{$order->id}" name="id_order"/>
-			<input type="hidden" value="" name="submitReorder"/>
-
-			{* <a href="#" onclick="$(this).closest('form').submit(); return false;" class="button btn btn-default button-medium pull-right"><span>{l s='Reorder'}<i class="icon-chevron-right right"></i></span></a> --><!-- by webkul not to show reorder tab *}
-		</form>
-		{/if}
-		<p class="dark">
-			<strong>{l s='Order Reference %s - placed on' sprintf=$order->getUniqReference()} {dateFormat date=$order->date_add full=0}</strong>
-		</p>
-	</div>
-	<div class="info-order box">
-		{if $carrier->id}<p><strong class="dark">{l s='Carrier'}</strong> {if $carrier->name == "0"}{$shop_name|escape:'html':'UTF-8'}{else}{$carrier->name|escape:'html':'UTF-8'}{/if}</p>{/if}
-		<p><strong class="dark">{l s='Payment method'}</strong> <span class="color-myaccount">{$order->payment|escape:'html':'UTF-8'}</span></p>
-		{if $invoice AND $invoiceAllowed}
-		<p>
-			<i class="icon-file-text"></i>
-			<a target="_blank" href="{$link->getPageLink('pdf-invoice', true)}?id_order={$order->id|intval}{if $is_guest}&amp;secure_key={$order->secure_key|escape:'html':'UTF-8'}{/if}">{l s='Download your invoice as a PDF file.'}</a>
-		</p>
-		{/if}
-		{if $order->recyclable}
-		<p><i class="icon-repeat"></i>&nbsp;{l s='You have given permission to receive your order in recycled packaging.'}</p>
-		{/if}
-		{if $order->gift}
-			<p><i class="icon-gift"></i>&nbsp;{l s='You have requested gift wrapping for this order.'}</p>
-			<p><strong class="dark">{l s='Message'}</strong> {$order->gift_message|nl2br}</p>
-		{/if}
-	</div>
-
-	{* Advance payment information box *}
-	{if $order->is_advance_payment && $order->advance_paid_amount > 0}
-		<div class="info-order box">
-			<strong><p>{l s='Please pay'} <span class="advance_paid_amount">{displayWtPriceWithCurrency price=$order->advance_paid_amount currency=$currency}</span> {l s='as an Advance Payment amount for the bookings of this order.'}</p></strong>
-			<p class="back_o_msg">** {l s='Please ignore if already paid'}</p>
-		</div>
-	{/if}
-
-	{if count($order_history)}
-		<h1 class="page-heading">{l s='Follow your order\'s status step-by-step'}</h1>
-		<div class="table_block">
-			<table class="detail_step_by_step table table-bordered">
-				<thead>
-					<tr>
-						<th class="first_item">{l s='Date'}</th>
-						<th class="last_item">{l s='Status'}</th>
-					</tr>
-				</thead>
-				<tbody>
-				{foreach from=$order_history item=state name="orderStates"}
-					<tr class="{if $smarty.foreach.orderStates.first}first_item{elseif $smarty.foreach.orderStates.last}last_item{/if} {if $smarty.foreach.orderStates.index % 2}alternate_item{else}item{/if}">
-						<td class="step-by-step-date">{dateFormat date=$state.date_add full=0}</td>
-						<td><span{if isset($state.color) && $state.color} style="background-color:{$state.color|escape:'html':'UTF-8'}; border-color:{$state.color|escape:'html':'UTF-8'};"{/if} class="label{if isset($state.color) && Tools::getBrightness($state.color) > 128} dark{/if}">{$state.ostate_name|escape:'html':'UTF-8'}</span></td>
-					</tr>
-				{/foreach}
-				</tbody>
-			</table>
-		</div>
-	{/if}
-
-	{if isset($followup)}
-		<p class="bold">{l s='Click the following link to track the delivery of your order'}</p>
-		<a href="{$followup|escape:'html':'UTF-8'}">{$followup|escape:'html':'UTF-8'}</a>
-	{/if}
-
-	<div class="adresses_bloc">
-		<div class="row">
-			<div class="col-xs-12 col-sm-12">
-				<ul class="address item {if $order->isVirtual()}full_width{/if} box">
-					<li><h3 class="page-subheading">{l s='Guest Details'}</h3></li>
-					{if $customerGuestDetail}
-						{if isset($customerGuestDetail->firstname) && $customerGuestDetail->firstname}
-							<li class="row"><div class="col-sm-3 col-md-2 col-xs-6">{l s='Name'}</div><div class="col-sm-9 col-xs-6">{$customerGuestDetail->firstname|escape:'html':'UTF-8'} {$customerGuestDetail->lastname|escape:'html':'UTF-8'}</div></li>
-						{/if}
-						{if isset($customerGuestDetail->email) && $customerGuestDetail->email}
-							<li class="row"><div class="col-sm-3 col-md-2 col-xs-6">{l s='Email'}</div><div class="col-sm-9 col-xs-6">{$customerGuestDetail->email|escape:'html':'UTF-8'}</div></li>
-						{/if}
-						{if isset($customerGuestDetail->phone) && $customerGuestDetail->phone}
-							<li class="row"><div class="col-sm-3 col-md-2 col-xs-6">{l s='Mobile Number'}</div><div class="col-sm-9 col-xs-6">{$customerGuestDetail->phone|escape:'html':'UTF-8'}</div></li>
-						{/if}
-					{else}
-						{if isset($address_invoice->firstname) && $address_invoice->firstname}
-							<li class="row"><div class="col-sm-3 col-md-2 col-xs-6">{l s='Name'}</div><div class="col-sm-9 col-xs-6">{$address_invoice->firstname|escape:'html':'UTF-8'} {$address_invoice->lastname|escape:'html':'UTF-8'}</div></li>
-						{/if}
-						{if isset($guestInformations['email']) && $guestInformations['email']}
-							<li class="row"><div class="col-sm-3 col-md-2 col-xs-6">{l s='Email'}</div><div class="col-sm-9 col-xs-6">{$guestInformations['email']|escape:'html':'UTF-8'}</div></li>
-						{/if}
-						{if isset($address_invoice->phone_mobile) && $address_invoice->phone_mobile}
-							<li class="row"><div class="col-sm-3 col-md-2 col-xs-6">{l s='Mobile Number'}</div><div class="col-sm-9 col-xs-6">{$address_invoice->phone_mobile|escape:'html':'UTF-8'}</div></li>
-						{/if}
-						{if isset($address_invoice->phone) && $address_invoice->phone}
-							<li class="row"><div class="col-sm-3 col-md-2 col-xs-6">{l s='Phone Number'}</div><div class="col-sm-9 col-xs-6">{$address_invoice->phone|escape:'html':'UTF-8'}</div></li>
-						{/if}
-					{/if}
-				</ul>
-			</div>
-		</div>
-	</div>
-
-	{$HOOK_ORDERDETAILDISPLAYED}
-	{if !$is_guest}<form action="{$link->getPageLink('order-follow', true)|escape:'html':'UTF-8'}" method="post">{/if}
-
-	{if isset($refundReqBookings) && $refundReqBookings}
-		<div class="alert alert-warning-light cancel_requests_link_wrapper">
-			<i class="icon-info-circle"></i> {l s='You have booking cancelation requests from this order. To see the cancelation request status'} <a target="_blank" href="{$link->getPageLink('order-follow')|escape:'html':'UTF-8'}?id_order={$order->id|escape:'html':'UTF-8'}">{l s='Click Here'}</a>
-		</div>
-	{/if}
-
-	<div class="row booking-actions-wrap">
-		<div class="col-xs-12 col-sm-12">
-			{if $refund_allowed}
-				{if !$hasCompletelyRefunded}
-					<a refund_fields_on="0" id="order_refund_request" class="btn btn-default pull-right" href="#" title="{l s='Proceed to refund'}"><span>{l s='Cancel Bookings'}</span></a>
-				{/if}
-
-				{if isset($id_cms_refund_policy) && $id_cms_refund_policy}<a target="_blank" class="btn btn-default pull-right refund_policy_link" href="{$link->getCMSLink($id_cms_refund_policy)|escape:'html':'UTF-8'}">{l s='Refund Policies'}</a>{/if}
-			{/if}
-			{hook h='displayBookingAction' id_order=$order->id}
-		</div>
-	</div>
-
-	{* Form Refund fields and submit refund *}
-	<form id="order-detail-content">
-
-		<div class="table_block table-responsive wk_booking_details_wrapper">
-			<table class="table table-bordered">
-
-				<tfoot>
-					{assign var=room_price_tax_excl value=$order->getTotalProductsWithoutTaxes(false, true)}
-					{assign var=room_price_tax_incl value=$order->getTotalProductsWithTaxes(false, true)}
-					{* {assign var=service_products_price_tax_excl value=$order->getTotalProductsWithoutTaxes(false, false, Product::SERVICE_PRODUCT_WITHOUT_ROOMTYPE)}
-					{assign var=service_products_price_tax_incl value=$order->getTotalProductsWithTaxes(false, false, Product::SERVICE_PRODUCT_WITHOUT_ROOMTYPE)} *}
-					{assign var=additional_service_price_tax_excl value=($order->getTotalProductsWithoutTaxes(false, false, Product::SERVICE_PRODUCT_WITH_ROOMTYPE) + $total_demands_price_te)}
-					{assign var=additional_service_price_tax_incl value=($order->getTotalProductsWithTaxes(false, false, Product::SERVICE_PRODUCT_WITH_ROOMTYPE) + $total_demands_price_ti)}
-					{if $priceDisplay && $use_tax && $room_price_tax_excl}
-						<tr class="item">
-							{if $refund_allowed}
-								<td class="standard_refund_fields"></td>
-							{/if}
-							<td colspan="4"></td>
-							<td colspan="3">
-								<strong>{l s='Total rooms cost (tax excl.)'}</strong>
-							</td>
-							<td colspan="2" class="text-right">
-								<span class="price">{displayWtPriceWithCurrency price=($room_price_tax_excl + $additional_service_price_tax_excl - $total_convenience_fee_te) currency=$currency}</span>
-							</td>
-						</tr>
-					{else}
-						<tr class="item">
-							{if $refund_allowed}
-								<td class="standard_refund_fields"></td>
-							{/if}
-							<td colspan="4"></td>
-							<td colspan="3">
-								<strong>{l s='Total Rooms Cost'} {if $use_tax}{l s='(tax incl.)'}{/if} </strong>
-							</td>
-							<td colspan="2" class="text-right">
-								<span class="price">{displayWtPriceWithCurrency price=($room_price_tax_incl + $additional_service_price_tax_incl - $total_convenience_fee_ti) currency=$currency}</span>
-							</td>
-						</tr>
-					{/if}
-					{* {if $priceDisplay && $use_tax && $service_products_price_tax_excl}
-						<tr class="item">
-							{if $refund_allowed}
-								<td class="standard_refund_fields"></td>
-							{/if}
-							<td colspan="4"></td>
-							<td colspan="3">
-								<strong>{l s='Total service products cost (tax excl.)'}</strong>
-							</td>
-							<td colspan="2" class="text-right">
-								<span class="price">{displayWtPriceWithCurrency price=$service_products_price_tax_excl currency=$currency}</span>
-							</td>
-						</tr>
-					{/if}
-					{if $service_products_price_tax_incl}
-						<tr class="item">
-							{if $refund_allowed}
-								<td class="standard_refund_fields"></td>
-							{/if}
-							<td colspan="4"></td>
-							<td colspan="3">
-								<strong>{l s='Total service products cost'} {if $use_tax}{l s='(tax incl.)'}{/if} </strong>
-							</td>
-							<td colspan="2" class="text-right">
-								<span class="price">{displayWtPriceWithCurrency price=$service_products_price_tax_incl currency=$currency}</span>
-							</td>
-						</tr>
-					{/if} *}
-					{if $order->total_wrapping > 0}
-						<tr class="item">
-							{if $refund_allowed}
-								<td class="standard_refund_fields"></td>
-							{/if}
-							<td colspan="4"></td>
-							<td colspan="3">
-								<strong>{l s='Total gift wrapping cost'}</strong>
-							</td>
-							<td colspan="2" class="text-right">
-								<span class="price-wrapping">{displayWtPriceWithCurrency price=$order->total_wrapping currency=$currency}</span>
-							</td>
-						</tr>
-					{/if}
-
-					{if $order->total_discounts > 0}
-						<tr class="item">
-							{if $refund_allowed}
-								<td class="standard_refund_fields"></td>
-							{/if}
-							<td colspan="4"></td>
-							<td colspan="3">
-								<strong>{l s='Total Vouchers'}</strong>
-							</td>
-							<td colspan="2" class="text-right">
-								<span class="price-discount">-{displayWtPriceWithCurrency price=$order->total_discounts currency=$currency convert=1}</span>
-							</td>
-						</tr>
-					{/if}
-					{if $priceDisplay && $use_tax && $total_convenience_fee_te}
-						<tr class="item">
-							{if $refund_allowed}
-								<td class="standard_refund_fields"></td>
-							{/if}
-							<td colspan="4"></td>
-							<td colspan="3">
-								<strong>{l s='Total Convenience Fees (tax excl.)'}</strong>
-							</td>
-							<td colspan="2" class="text-right">
-								<span class="price">{displayWtPriceWithCurrency price=$total_convenience_fee_te currency=$currency}</span>
-							</td>
-						</tr>
-					{else if $total_convenience_fee_ti}
-						<tr class="item">
-							{if $refund_allowed}
-								<td class="standard_refund_fields"></td>
-							{/if}
-							<td colspan="4"></td>
-							<td colspan="3">
-								<strong>{l s='Total Convenience Fees (tax incl.)'}</strong>
-							</td>
-							<td colspan="2" class="text-right">
-								<span class="price">{displayWtPriceWithCurrency price=$total_convenience_fee_ti currency=$currency}</span>
-							</td>
-						</tr>
-					{/if}
-
-					<tr class="totalprice item">
-						{if $refund_allowed}
-							<td class="standard_refund_fields"></td>
-						{/if}
-						<td colspan="4"></td>
-						<td colspan="3">
-							<strong>{l s='Total Tax'}</strong>
-						</td>
-						<td colspan="2" class="text-right">
-							<span class="price">{displayWtPriceWithCurrency price=($order->total_paid - $order->total_paid_tax_excl) currency=$currency}</span>
-						</td>
-					</tr>
-					<tr class="totalprice item">
-						{if $refund_allowed}
-							<td class="standard_refund_fields"></td>
-						{/if}
-						<td colspan="4"></td>
-						<td colspan="3">
-							<strong>{l s='Final Order Total'}</strong>
-						</td>
-						<td colspan="2" class="text-right">
-							<span class="price">{displayWtPriceWithCurrency price=$order->total_paid currency=$currency}</span>
-						</td>
-					</tr>
-					{if $order->total_paid_tax_incl > $order->total_paid_real}
-						<tr class="totalprice item">
-							{if $refund_allowed}
-								<td class="standard_refund_fields"></td>
-							{/if}
-							<td colspan="4"></td>
-							<td colspan="3">
-								<strong>{l s='Due Amount'}</strong>
-							</td>
-							<td colspan="2" class="text-right">
-								<span class="price">{displayWtPriceWithCurrency price=($order->total_paid_tax_incl - $order->total_paid_real) currency=$currency}</span>
-							</td>
-						</tr>
-					{/if}
-					{* {if isset($order_adv_dtl) && $order_adv_dtl}
-						<tr class="item">
-							{if $refund_allowed}
-								<td class="standard_refund_fields"></td>
-							{/if}
-							<td colspan="4"></td>
-							<td colspan="3">
-								<strong>{l s='Advance Paid Amount'}</strong>
-							</td>
-							<td colspan="2" class="text-right">
-								<span class="price">{displayWtPriceWithCurrency price=$order_adv_dtl['total_paid_amount'] currency=$currency}</span>
-							</td>
-						</tr>
-						<tr class="item">
-							{if $refund_allowed}
-								<td class="standard_refund_fields"></td>
-							{/if}
-							<td colspan="4"></td>
-							<td colspan="3">
-								<strong>{l s='Total Due'}</strong>
-							</td>
-							<td colspan="2" class="text-right">
-								<span class="price">{displayWtPriceWithCurrency price=($order_adv_dtl['total_order_amount'] - $order_adv_dtl['total_paid_amount']) currency=$currency}</span>
-							</td>
-						</tr>
-					{/if} *}
-
-					{if isset($refundReqBookings) && $refundReqBookings}
-						<tr class="totalprice item">
-							{if $refund_allowed}
-								<td class="standard_refund_fields"></td>
-							{/if}
-							<td colspan="4"></td>
-							<td colspan="3">
-								<strong>*{l s='Refunded Amount'}</strong>
-							</td>
-							<td colspan="2" class="text-right">
-								<span class="price">{displayWtPriceWithCurrency price=$refundedAmount currency=$currency}</span>
-							</td>
-						</tr>
-					{/if}
-				</tfoot>
-
-				{if isset($cart_htl_data) && $cart_htl_data}
-					<thead>
-						<tr>
-							{if $refund_allowed}
-								<th class="standard_refund_fields"></th>
-							{/if}
-							<th class="cart_product">{l s='Room Image'}</th>
-							<th class="cart_description">{l s='Room Description'}</th>
-							<th>{l s='Hotel Name'}</th>
-							<th>{l s='Room Capacity'}</th>
-							<th>{l s='Check-in Date'}</th>
-							<th>{l s='Check-out Date'}</th>
-							<th>{l s='Extra Services'}</th>
-							<th class="cart_total">{l s='Total'}</th>
-						</tr>
-					</thead>
-					<tbody>
-						{foreach from=$cart_htl_data key=data_k item=data_v}
-							{foreach from=$data_v['date_diff'] key=rm_k item=rm_v}
-								<tr class="table_body">
-									{if $refund_allowed}
-										<td class="booking_refund_fields standard_refund_fields">
-											{if isset($rm_v['ids_htl_booking_detail']) && $rm_v['ids_htl_booking_detail']}
-												{foreach $rm_v['ids_htl_booking_detail'] as $key => $id_htl_booking}
-													<div class="checkbox">
-														<label for="bookings_to_refund">
-															<input class="bookings_to_refund" type="checkbox" name="bookings_to_refund[]" value="{$id_htl_booking|escape:'html':'UTF-8'}" {if (isset($refundReqBookings) && ($id_htl_booking|in_array:$refundReqBookings)) || $rm_v['is_refunded']}disabled{/if}/> &nbsp;{l s='Room'}-{$key+1}
-														</label>
-													</div>
-												{/foreach}
-											{/if}
-										</td>
-									{/if}
-									<td class="cart_product">
-										<a href="{$link->getProductLink($data_v['id_product'])|escape:'html':'UTF-8'}">
-											<img src="{$data_v['cover_img']|escape:'html':'UTF-8'}" class="img-responsive"/>
-										</a>
-									</td>
-									<td class="cart_description">
-										<p class="product-name">
-											<a href="{$link->getProductLink($data_v['id_product'])}">
-												{$data_v['name']|escape:'html':'UTF-8'}
-											</a>
-										</p>
-									</td>
-									<td>{$data_v['hotel_name']|escape:'html':'UTF-8'}</td>
-									<td class="text-center">
-										<p>
-											{if $rm_v['adults'] <= 9}0{$rm_v['adults']}{else}{$rm_v['adults']}{/if} {if $rm_v['adults'] > 1}{l s='Adults'}{else}{l s='Adult'}{/if}{if $rm_v['children']}, {if $rm_v['children'] <= 9}0{$rm_v['children']}{else} {$rm_v['children']}{/if} {if $rm_v['children'] > 1}{l s='Children'}{else}{l s='Child'}{/if}{/if}<br>{if $rm_v['num_rm'] <= 9}0{/if}{$rm_v['num_rm']} {if $rm_v['num_rm'] > 1}{l s='Rooms'}{else}{l s='Room'}{/if}
-										</p>
-										{if $rm_v['count_cancelled'] > 0}
-											<span class="badge badge-danger">{$rm_v['count_cancelled']} {l s='Room(s) Cancelled'}</span>
-											<br>
-										{/if}
-										{if $rm_v['count_refunded'] > 0}
-											<span class="badge badge-danger">{$rm_v['count_refunded']} {l s='Room(s) Refunded'}</span>
-										{/if}
-									</td>
-									<td class="text-center">{$rm_v['data_form']|date_format:"%d-%m-%Y"}</td>
-									<td class="text-center">{$rm_v['data_to']|date_format:"%d-%m-%Y"}</td>
-
-									<td>
-										{if (isset($rm_v['extra_demands']) && $rm_v['extra_demands']) || isset($rm_v['additional_services']) && $rm_v['additional_services']}
-											<a data-date_from="{$rm_v['data_form']}" data-date_to="{$rm_v['data_to']}" data-id_product="{$data_v['id_product']}" data-id_order="{$order->id}" data-action="{$link->getPageLink({$page_name})}" class="open_rooms_extra_services_panel" href="#rooms_type_extra_services_form">
-										{/if}
-										{if $group_use_tax}
-											{displayWtPriceWithCurrency price=($rm_v['extra_demands_price_ti'] + $rm_v['additional_services_price_ti'])  currency=$currency}
-										{else}
-											{displayWtPriceWithCurrency price=($rm_v['extra_demands_price_te'] + $rm_v['additional_services_price_te']) currency=$currency}
-										{/if}
-										{if (isset($rm_v['extra_demands']) && $rm_v['extra_demands']) || isset($rm_v['additional_services']) && $rm_v['additional_services']}
-											</a>
-										{/if}
-									</td>
-									<td class="cart_total text-left">
-										{if $group_use_tax}
-											{displayWtPriceWithCurrency price=($rm_v['amount_tax_incl'] + $rm_v['extra_demands_price_ti'] + $rm_v['additional_services_price_ti'] + $rm_v['additional_services_price_auto_add_ti']) currency=$currency}
-										{else}
-											{displayWtPriceWithCurrency price=($rm_v['amount_tax_excl'] + $rm_v['extra_demands_price_te'] + $rm_v['additional_services_price_te'] + $rm_v['additional_services_price_auto_add_te']) currency=$currency}
-										{/if}
-										{if (isset($rm_v['extra_demands']) && $rm_v['extra_demands']) || isset($rm_v['additional_services']) && $rm_v['additional_services']}
-											<span class="order-price-info">
-												<img src="{$img_dir}icon/icon-info.svg" />
-											</span>
-											<div class="price-info-container" style="display:none">
-												<div class="price-info-tooltip-cont">
-													<div class="list-row">
-														<div>
-															<p>{l s='Room cost'} : </p>
-														</div>
-														<div class="text-right">
-															<p>
-																{if $group_use_tax}
-																	{displayWtPriceWithCurrency price=($rm_v['amount_tax_incl'] + $rm_v['additional_services_price_auto_add_ti']) currency=$currency}
-																{else}
-																	{displayWtPriceWithCurrency price=($rm_v['amount_tax_excl'] + $rm_v['additional_services_price_auto_add_te']) currency=$currency}
-																{/if}
-															</p>
-														</div>
-													</div>
-													<div class="list-row">
-														<div>
-															<p>{l s='Service cost'} : </p>
-														</div>
-														<div class="text-right">
-															<p>
-																{if $group_use_tax}
-																	{displayWtPriceWithCurrency price=($rm_v['extra_demands_price_ti'] + $rm_v['additional_services_price_ti'])  currency=$currency}
-																{else}
-																	{displayWtPriceWithCurrency price=($rm_v['extra_demands_price_te'] + $rm_v['additional_services_price_te']) currency=$currency}
-																{/if}
-															</p>
-														</div>
-													</div>
-												</div>
-											</div>
-										{/if}
-									</td>
-								</tr>
-							{/foreach}
-						{/foreach}
-					</tbody>
-				{/if}
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="well well-md well-order-date">
+                {l s='Booking Reference ' sprintf=$order->getUniqReference()}<strong>{$order->getUniqReference()}</strong>{l s=' - placed on'}
+                <span title="{dateFormat date=$order->date_add full=1}">{dateFormat date=$order->date_add}</span>
+            </div>
+        </div>
+    </div>
 
 
-				{if isset($cart_service_products) && $cart_service_products}
-					<thead>
-						<tr>
-							<th colspan="1">{l s='Image'}</th>
-							<th colspan="3">{l s='Name'}</th>
-							<th colspan="2">{l s='Unit Price'}</th>
-							<th colspan="1">{l s='Quantity'}</th>
-							<th colspan="2" class="cart_total">{l s='Total'}</th>
-						</tr>
-					</thead>
-					<tbody>
-						{foreach from=$cart_service_products key=data_k item=data_v}
-							<tr class="table_body">
-								<td class="cart_product">
-									<a href="{$link->getProductLink($data_v['id_product'])}">
-										<img src="{$data_v['cover_img']}" class="img-responsive"/>
-									</a>
-								</td>
-								<td class="cart_product" colspan="3">
-									<p class="product-name">
-										<a href="{$link->getProductLink($data_v['id_product'])}">
-											{$data_v['product_name']}
-										</a>
-									</p>
-								</td>
-								<td class="cart_unit" colspan="2">
-									<p class="text-center">
-										{if $group_use_tax}
-											{displayWtPriceWithCurrency price=$data_v['unit_price_tax_incl'] currency=$currency}
-											{* {displayPrice price=$data_v['unit_price_tax_incl']|floatval|round:2} *}
-										{else}
-											{* {displayPrice price=$data_v['unit_price_tax_excl']|floatval|round:2} *}
-											{displayWtPriceWithCurrency price=$data_v['unit_price_tax_excl'] currency=$currency}
-										{/if}
-									</p>
-								</td>
-								<td>
-									<p class="text-center">
-										{$data_v['product_quantity']}
-									</p>
-								</td>
-								<td colspan="2">
-									<p class="text-left" colspan="2">
-										{if $group_use_tax}
-											{displayWtPriceWithCurrency price=$data_v['total_price_tax_incl'] currency=$currency}
-										{else}
-											{displayWtPriceWithCurrency price=$data_v['total_price_tax_excl'] currency=$currency}
-										{/if}
-									</p>
-								</td>
-							</tr>
-						{/foreach}
-					</tbody>
-				{/if}
-				<tbody>
-					{foreach from=$discounts item=discount}
-						<tr class="item">
-							{if $refund_allowed}
-								<td class="standard_refund_fields"></td>
-							{/if}
-							<td class="text-center">{$discount.name|escape:'html':'UTF-8'}</td>
-							<td class="text-center">{l s='Voucher'} {$discount.name|escape:'html':'UTF-8'}</td>
-							<td class="text-center" colspan="5"><span class="order_qte_span editable">1</span></td>
-							<td class="text-right" colspan="2">{if $discount.value != 0.00}-{/if}{convertPriceWithCurrency price=$discount.value currency=$currency}</td>
-							{* {if $refund_allowed}
-							<td>&nbsp;</td>
-							{/if} *}
-						</tr>
-					{/foreach}
-				</tbody>
-			</table>
-		</div>
+    {$HOOK_ORDERDETAILDISPLAYED}
 
-		{if $refund_allowed && $non_requested_rooms}
-			<div class="alert alert-info-light standard_refund_fields">
-				<i class="icon-info-circle"></i> {l s='Select rooms for which you want to cancel bookings. Additional facilities for cancelled rooms will be cancelled automatically.'}
-			</div>
-			{if !$hasCompletelyRefunded}
-				<div class="row standard_refund_fields">
-					<div class="col-sm-12">
-						<button type="button" id="order_refund_request_submit" class="btn pull-right"><span>{l s='Submit'}</span></button>
-					</div>
-				</div>
-			{/if}
-		{/if}
-	</form>
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card hotel-details">
+                <div class="card-header">
+                    {l s='Hotel Details'}
+                </div>
+                <div class="card-body">
+                    <p class="card-title">
+                        {$obj_hotel_branch_information->hotel_name}
+                    </p>
 
-	{if $any_back_order}
-		{if $shw_bo_msg}
-			<p class="back_o_msg"><strong><sup>*</sup>{l s='Some of your rooms are on back order. Please read the following message for rooms with status on backorder'}</strong></p>
-			<p>
-				-&nbsp;&nbsp;{$back_ord_msg}
-			</p>
-		{/if}
-	{/if}
+                    <div class="description-list">
+                        <dl class="row">
+                            <dt class="col-xs-6 col-sm-3">{l s='Phone Number'}</dt>
+                            <dd class="col-xs-6 col-sm-3">
+                                <a href="tel:{if $hotel_address_info.phone_mobile}{$hotel_address_info.phone_mobile}{else}{$hotel_address_info.phone}{/if}">
+                                    {if $hotel_address_info.phone_mobile}{$hotel_address_info.phone_mobile}{else}{$hotel_address_info.phone}{/if}
+                                </a>
+                            </dd>
 
-	{if !$is_guest}</form>{/if}
-	{assign var='carriers' value=$order->getShipping()}
-	{if $carriers|count > 0 && isset($carriers.0.carrier_name) && $carriers.0.carrier_name}
-		<table class="table table-bordered footab">
-			<thead>
-				<tr>
-					<th class="first_item">{l s='Date'}</th>
-					<th class="item" data-sort-ignore="true">{l s='Carrier'}</th>
-					<th data-hide="phone" class="item">{l s='Weight'}</th>
-					<th data-hide="phone" class="item">{l s='Shipping cost'}</th>
-					<th data-hide="phone" class="last_item" data-sort-ignore="true">{l s='Tracking number'}</th>
-				</tr>
-			</thead>
-			<tbody>
-				{foreach from=$carriers item=line}
-				<tr class="item">
-					<td data-value="{$line.date_add|regex_replace:"/[\-\:\ ]/":""}">{dateFormat date=$line.date_add full=0}</td>
-					<td>{$line.carrier_name}</td>
-					<td data-value="{if $line.weight > 0}{$line.weight|string_format:"%.3f"}{else}0{/if}">{if $line.weight > 0}{$line.weight|string_format:"%.3f"} {Configuration::get('PS_WEIGHT_UNIT')}{else}-{/if}</td>
-					<td data-value="{if $order->getTaxCalculationMethod() == $smarty.const.PS_TAX_INC}{$line.shipping_cost_tax_incl}{else}{$line.shipping_cost_tax_excl}{/if}">{if $order->getTaxCalculationMethod() == $smarty.const.PS_TAX_INC}{displayPrice price=$line.shipping_cost_tax_incl currency=$currency->id}{else}{displayPrice price=$line.shipping_cost_tax_excl currency=$currency->id}{/if}</td>
-					<td>
-						<span class="shipping_number_show">{if $line.tracking_number}{if $line.url && $line.tracking_number}<a href="{$line.url|replace:'@':$line.tracking_number}">{$line.tracking_number}</a>{else}{$line.tracking_number}{/if}{else}-{/if}</span>
-					</td>
-				</tr>
-				{/foreach}
-			</tbody>
-		</table>
-	{/if}
+                            <dt class="col-xs-6 col-sm-3">{l s='Email'}</dt>
+                            <dd class="col-xs-6 col-sm-3">
+                                <a href="mailto:{$obj_hotel_branch_information->email}" class="hotel-email">{$obj_hotel_branch_information->email}</a>
+                            </dd>
 
-	{if !$is_guest}
-		{if count($messages)}
-			<h3 class="page-heading">{l s='Messages'}</h3>
-			<div class="table_block">
-				<table class="detail_step_by_step table table-bordered">
-					<thead>
-						<tr>
-							<th class="first_item" style="width:150px;">{l s='From'}</th>
-							<th class="last_item">{l s='Message'}</th>
-						</tr>
-					</thead>
-					<tbody>
-					{foreach from=$messages item=message name="messageList"}
-						<tr class="{if $smarty.foreach.messageList.first}first_item{elseif $smarty.foreach.messageList.last}last_item{/if} {if $smarty.foreach.messageList.index % 2}alternate_item{else}item{/if}">
-							<td>
-								<strong class="dark">
-									{if isset($message.elastname) && $message.elastname}
-										{$message.efirstname|escape:'html':'UTF-8'} {$message.elastname|escape:'html':'UTF-8'}
-									{elseif $message.clastname}
-										{$message.cfirstname|escape:'html':'UTF-8'} {$message.clastname|escape:'html':'UTF-8'}
-									{else}
-										{$shop_name|escape:'html':'UTF-8'}
-									{/if}
-								</strong>
-								<br />
-								{dateFormat date=$message.date_add full=1}
-							</td>
-							<td>{$message.message|escape:'html':'UTF-8'|nl2br}</td>
-						</tr>
-					{/foreach}
-					</tbody>
-				</table>
-			</div>
-			{/if}
-			{if isset($errors) && $errors}
-				<div class="alert alert-danger">
-					<p>{if $errors|@count > 1}{l s='There are %d errors' sprintf=$errors|@count}{else}{l s='There is %d error' sprintf=$errors|@count}{/if}</p>
-					<ol>
-					{foreach from=$errors key=k item=error}
-						<li>{$error}</li>
-					{/foreach}
-					</ol>
-				</div>
-			{/if}
-			{if isset($message_confirmation) && $message_confirmation}
-			<p class="alert alert-success">
-				{l s='Message successfully sent'}
-			</p>
-			{/if}
-			<form action="{$link->getPageLink('order-detail', true)|escape:'html':'UTF-8'}" method="post" class="std" id="sendOrderMessage">
-				<h3 class="page-heading bottom-indent">{l s='Add a message'}</h3>
-				<p>{l s='If you would like to add a comment about your order, please write it in the field below.'}</p>
-				<p class="form-group">
-				<label for="id_product">{l s='Room Type'}</label>
-					<select name="id_product" class="form-control">
-						<option value="0">{l s='-- Choose --'}</option>
-						{foreach from=$products item=product name=products}
-							{if $product.is_booking_product}
-								<option value="{$product.product_id}">{$product.product_name|escape:'html':'UTF-8'}</option>
-							{/if}
-						{/foreach}
-					</select>
-				</p>
-				<p class="form-group">
-					<textarea class="form-control" cols="67" rows="3" name="msgText"></textarea>
-				</p>
-				<div class="submit">
-					<input type="hidden" name="id_order" value="{$order->id|intval|escape:'html':'UTF-8'}" />
-					<input type="submit" class="unvisible" name="submitMessage" value="{l s='Send'}"/>
-					<button type="submit" name="submitMessage" class="button btn btn-default button-medium"><span>{l s='Send'}<i class="icon-chevron-right right"></i></span></button>
-				</div>
-			</form>
-		{else}
-			<p class="alert alert-info"><i class="icon-info-sign"></i> {l s='You cannot request refund with a guest account'}</p>
-		{/if}
-	{/if}
+                            <dt class="col-xs-6 col-sm-3">{l s='Payment Method'}</dt>
+                            <dd class="col-xs-6 col-sm-3">
+                                {$order->payment|escape:'html':'UTF-8'}
+                                {if $invoice && $invoiceAllowed}
+                                    <a target="_blank" href="{$link->getPageLink('pdf-invoice', true)}?id_order={$order->id|intval}{if $is_guest}&amp;secure_key={$order->secure_key|escape:'html':'UTF-8'}{/if}" title="{l s='Click here to download invoice.'}">
+                                        <i class="icon-file-text"></i> {l s='Invoice'}
+                                    </a>
+                                {/if}
+                            </dd>
+
+                            <dt class="col-xs-6 col-sm-3">{l s='Booking Status'}</dt>
+                            <dd class="col-xs-6 col-sm-3">
+                                <span{if isset($order_history[0].color) && $order_history[0].color} style="background-color:{$order_history[0].color|escape:'html':'UTF-8'}30; border: 1px solid {$order_history[0].color|escape:'html':'UTF-8'};" {/if} class="label">{$order_history[0].ostate_name|escape:'html':'UTF-8'}</span>
+                            </dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card hotel-location visible-xs visible-sm hidden-md hidden-lg">
+                <div class="card-header">
+                    {l s='Hotel Location'}
+                </div>
+                <div class="card-body">
+                    <p class="card-subtitle">
+                        {l s='Address'}
+                    </p>
+
+                    <p class="hotel-address">
+                        {$hotel_address_info['address1']},
+                        {if {$hotel_address_info['address2']}}{$hotel_address_info['address2']},{/if}
+                        {$hotel_address_info['city']},
+                        {if {$hotel_address_info['state']}}{$hotel_address_info['state']},{/if}
+                        {$hotel_address_info['country']}, {$hotel_address_info['postcode']}
+                    </p>
+
+                    {if ($obj_hotel_branch_information->latitude|floatval != 0 && $obj_hotel_branch_information->longitude|floatval != 0)}
+                        <div class="hotel-location-map">
+                            <div class="booking-hotel-map-container"></div>
+                        </div>
+                    {/if}
+                </div>
+            </div>
+
+            {if isset($refundReqBookings) && $refundReqBookings}
+                <div class="alert alert-info-light cancel_requests_link_wrapper">
+                    <i class="icon-info-circle"></i>
+                    {if count($refundReqBookings) <= 1}
+                        <span>{l s='Your cancellation request for 1 room is being processed. To check request status'} <a target="_blank" href="{$link->getPageLink('order-follow')|escape:'html':'UTF-8'}?id_order={$order->id|escape:'html':'UTF-8'}">{l s='click here.'}</a>
+                    {else}
+                        <span>{l s='Your cancellation request for %d rooms is being processed. To check request statuses' sprintf=[count($refundReqBookings)]} <a target="_blank" href="{$link->getPageLink('order-follow')|escape:'html':'UTF-8'}?id_order={$order->id|escape:'html':'UTF-8'}">{l s='click here.'}</a>
+                    {/if}
+                </div>
+            {/if}
+
+            <div class="card room-details">
+                <div class="card-header">
+                    {l s='Room Details'}
+                    <div class="booking-actions-wrap">
+                        <div class="row">
+                            <div class="col-xs-12 clearfix">
+                                {if $refund_allowed}
+                                    {if !$hasCompletelyRefunded}
+                                        <a id="order_refund_request" class="btn btn-default pull-right" href="#" title="{l s='Proceed to refund'}"><span>{l s='Cancel Bookings'}</span></a>
+                                    {/if}
+                                    {if isset($id_cms_refund_policy) && $id_cms_refund_policy}
+                                        <a target="_blank" class="btn btn-default pull-right refund_policy_link" href="{$link->getCMSLink($id_cms_refund_policy)|escape:'html':'UTF-8'}">{l s='Refund Policies'}</a>
+                                    {/if}
+                                {/if}
+                                {hook h='displayBookingAction' id_order=$order->id}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="rooms-list">
+                        {if isset($cart_htl_data) && $cart_htl_data}
+                            {foreach from=$cart_htl_data key=data_k item=data_v}
+                                {foreach from=$data_v['date_diff'] key=rm_k item=rm_v}
+                                    {include file='./_partials/booking-room-detail.tpl'}
+                                {/foreach}
+                            {/foreach}
+                        {else}
+                            {l s='No rooms found.'}
+                        {/if}
+                    </div>
+                </div>
+            </div>
+
+            <div class="card payment-summary visible-xs visible-sm hidden-md hidden-lg">
+                <div class="card-header">
+                    {l s='Payment Summary'}
+                </div>
+                <div class="card-body">
+                    <div class="prices-breakdown-table">
+                        <table class="table table-sm table-responsive table-summary">
+                            <tbody>
+                                {assign var=room_price_tax_excl value=$order->getTotalProductsWithoutTaxes(false, true)}
+                                {assign var=room_price_tax_incl value=$order->getTotalProductsWithTaxes(false, true)}
+                                {assign var=additional_service_price_tax_excl value=($order->getTotalProductsWithoutTaxes(false, false, Product::SERVICE_PRODUCT_WITH_ROOMTYPE) + $total_demands_price_te)}
+                                {assign var=additional_service_price_tax_incl value=($order->getTotalProductsWithTaxes(false, false, Product::SERVICE_PRODUCT_WITH_ROOMTYPE) + $total_demands_price_ti)}
+                                {if $priceDisplay && $use_tax && $room_price_tax_excl}
+                                    <tr>
+                                        <td>{l s='Total rooms cost (tax excl.)'}</td>
+                                        <td class="text-right">
+                                            <span class="price">{displayWtPriceWithCurrency price=($room_price_tax_excl + $additional_service_price_tax_excl - $total_convenience_fee_te) currency=$currency}</span>
+                                        </td>
+                                    </tr>
+                                {else}
+                                    <tr>
+                                        <td>{l s='Total Rooms Cost'} {if $use_tax}{l s='(tax incl.)'}{/if} </td>
+                                        <td class="text-right">
+                                            <span class="price">{displayWtPriceWithCurrency price=($room_price_tax_incl + $additional_service_price_tax_incl - $total_convenience_fee_ti) currency=$currency}</span>
+                                        </td>
+                                    </tr>
+                                {/if}
+
+                                {if $order->total_discounts > 0}
+                                    <tr>
+                                        <td>{l s='Total Vouchers'}</td>
+                                        <td class="text-right">
+                                            <span class="price price-discount">-{displayWtPriceWithCurrency price=$order->total_discounts currency=$currency convert=1}</span>
+                                        </td>
+                                    </tr>
+                                {/if}
+                                {if $priceDisplay && $use_tax && $total_convenience_fee_te}
+                                    <tr>
+                                        <td>{l s='Total Convenience Fees (tax excl.)'}</td>
+                                        <td class="text-right">
+                                            <span class="price">{displayWtPriceWithCurrency price=$total_convenience_fee_te currency=$currency}</span>
+                                        </td>
+                                    </tr>
+                                {else if $total_convenience_fee_ti}
+                                    <tr>
+                                        <td>{l s='Total Convenience Fees (tax incl.)'}</td>
+                                        <td class="text-right">
+                                            <span class="price">{displayWtPriceWithCurrency price=$total_convenience_fee_ti currency=$currency}</span>
+                                        </td>
+                                    </tr>
+                                {/if}
+
+                                <tr class="totalprice item">
+                                    <td>{l s='Total Tax'}</td>
+                                    <td class="text-right">
+                                        <span class="price">{displayWtPriceWithCurrency price=($order->total_paid - $order->total_paid_tax_excl) currency=$currency}</span>
+                                    </td>
+                                </tr>
+                                <tr class="totalprice item">
+                                    <td><strong>{l s='Final Booking Total'}<strong></td>
+                                    <td class="text-right">
+                                        <strong><span class="price">{displayWtPriceWithCurrency price=$order->total_paid currency=$currency}</span></strong>
+                                    </td>
+                                </tr>
+
+                                {if isset($refundReqBookings) && $refundReqBookings}
+                                    <tr class="totalprice item">
+                                        <td>{l s='* Refunded Amount'}</td>
+                                        <td class="text-right">
+                                            <span class="price">{displayWtPriceWithCurrency price=$refundedAmount currency=$currency}</span>
+                                        </td>
+                                    </tr>
+                                {/if}
+
+                                {if $order->total_paid_tax_incl > $order->total_paid_real}
+                                    <tr class="totalprice item">
+                                        <td>{l s='Due Amount'}</td>
+                                        <td class="text-right">
+                                            <span class="price">{displayWtPriceWithCurrency price=($order->total_paid_tax_incl - $order->total_paid_real) currency=$currency}</span>
+                                        </td>
+                                    </tr>
+                                {/if}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card guest-details visible-xs visible-sm hidden-md hidden-lg">
+                <div class="card-header">
+                    {l s='Guest Details'}
+                </div>
+                <div class="card-body">
+                    <div class="guest-details-table">
+                        <table class="table table-sm table-responsive table-summary">
+                            <tbody>
+                                {if $customerGuestDetail}
+                                    {if isset($customerGuestDetail->firstname) && $customerGuestDetail->firstname}
+                                        <tr>
+                                            <td>{l s='Name'}</td>
+                                            <td class="text-right">{$customerGuestDetail->firstname|escape:'html':'UTF-8'} {$customerGuestDetail->lastname|escape:'html':'UTF-8'}</td>
+                                        </tr>
+                                    {/if}
+                                    {if isset($customerGuestDetail->email) && $customerGuestDetail->email}
+                                        <tr>
+                                            <td>{l s='Email'}</td>
+                                            <td class="text-right">{$customerGuestDetail->email|escape:'html':'UTF-8'}</td>
+                                        </tr>
+                                    {/if}
+                                    {if isset($customerGuestDetail->phone) && $customerGuestDetail->phone}
+                                        <tr>
+                                            <td>{l s='Mobile'}</td>
+                                            <td class="text-right">{$customerGuestDetail->phone|escape:'html':'UTF-8'}</td>
+                                        </tr>
+                                    {/if}
+                                {else}
+                                    {if isset($address_invoice->firstname) && $address_invoice->firstname}
+                                        <tr>
+                                            <td>{l s='Name'}</td>
+                                            <td class="text-right">{$address_invoice->firstname|escape:'html':'UTF-8'} {$address_invoice->lastname|escape:'html':'UTF-8'}</td>
+                                        </tr>
+                                    {/if}
+                                    {if isset($guestInformations['email']) && $guestInformations['email']}
+                                        <tr>
+                                            <td>{l s='Email'}</td>
+                                            <td class="text-right">{$guestInformations['email']|escape:'html':'UTF-8'}</td>
+                                        </tr>
+                                    {/if}
+                                    {if isset($address_invoice->phone_mobile) && $address_invoice->phone_mobile}
+                                        <tr>
+                                            <td>{l s='Mobile'}</td>
+                                            <td class="text-right">{$address_invoice->phone_mobile|escape:'html':'UTF-8'}</td>
+                                        </tr>
+                                    {/if}
+                                    {if isset($address_invoice->phone) && $address_invoice->phone}
+                                        <tr>
+                                            <td>{l s='Phone'}</td>
+                                            <td class="text-right">{$address_invoice->phone|escape:'html':'UTF-8'}</td>
+                                        </tr>
+                                    {/if}
+                                {/if}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            {if isset($obj_hotel_branch_information->policies) && $obj_hotel_branch_information->policies}
+                <div class="card hotel-policies">
+                    <div class="card-header">
+                        {l s='Hotel Policies'}
+                    </div>
+                    <div class="card-body">
+                        <div class="card-text">{$obj_hotel_branch_information->policies}</div>
+                    </div>
+                </div>
+            {/if}
+
+            <div class="card order-messages {if $is_guest || !count($messages)}hide{/if}">
+                <div class="card-header">
+                    {l s='Messages'}
+                </div>
+
+                <div class="card-body">
+                    <div class="messages-list card-text">
+                        {foreach from=$messages item=message}
+                            {include file='./_partials/booking-message.tpl'}
+                        {/foreach}
+                    </div>
+                </div>
+            </div>
+
+            <div class="card add-order-message" id="add-order-message">
+                <div class="card-header">
+                    {l s='Add a Message'}
+
+                    <p class="card-subheader text-muted">
+                        {l s='If you would like to add a comment about your booking, please write it in the field below.'}
+                    </p>
+                </div>
+
+                <div class="card-body">
+                    <div class="errors-block" style="display: none;"></div>
+
+                    <form action="{$link->getPageLink('order-detail', true)|escape:'html':'UTF-8'}" method="post" class="std" id="sendOrderMessage">
+                        <div class="form-group select-room-type">
+                            <label for="id_product">{l s='Room Type'}</label>
+
+                            <div class="dropdown">
+                                <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">
+                                    <span>{l s='-- Choose --'}</span>
+                                </button>
+                                <ul class="dropdown-menu">
+                                    {foreach from=$products item=product}
+                                        {if $product.is_booking_product}
+                                            <li><a href="" value="{$product.product_id}">{$product.product_name|escape:'html':'UTF-8'}</a></li>
+                                        {/if}
+                                    {/foreach}
+                                </ul>
+                            </div>
+
+                            <input type="hidden" class="id_product" name="id_product" value="0">
+                        </div>
 
 
-	{* Fancybox for extra demands*}
-	<div style="display:none;" id="rooms_extra_services">
-		{* <div id="rooms_type_extra_demands">
-			<div class="panel">
-				<div class="rooms_extra_demands_head">
-					<h3>{l s='Additional Facilities'}</h3>
-					<p class="rooms_extra_demands_text">{l s='Below are the additional facilities chosen by you in this booking'}</p>
-				</div>
-				<div id="room_type_demands_desc"></div>
-			</div>
-		</div> *}
-	</div>
+                        {* <p class="form-group">
+                            <label for="id_product">{l s='Room Type'}</label>
+                            <select name="id_product" class="form-controll select-room-type">
+                                <option value="0">{l s='-- Choose --'}</option>
+                                {foreach from=$products name=products item=product}
+                                    {if $product.is_booking_product}
+                                        <option value="{$product.product_id}">{$product.product_name|escape:'html':'UTF-8'}</option>
+                                    {/if}
+                                {/foreach}
+                            </select>
+                        </p> *}
+                        <p class="form-group">
+                            <textarea class="form-control" rows="5" name="msgText"></textarea>
+                        </p>
+                        <div class="submit">
+                            <input type="hidden" name="id_order" value="{$order->id|intval|escape:'html':'UTF-8'}" />
+                            <input type="submit" class="unvisible" name="submitMessage" value="{l s='Send'}" />
+                            <button type="submit" name="submitMessage" id="submitMessage" class="button btn button-medium"><span>{l s='Send'}</span></button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card hotel-location hidden-xs hidden-sm visible-md">
+                <div class="card-header">
+                    {l s='Hotel Location'}
+                </div>
+                <div class="card-body">
+                    <p class="card-subtitle">
+                        {l s='Address'}
+                    </p>
 
-	{* Fancybox *}
-	<div style="display: none;" id="reason_fancybox_content">
-		<div id="htlRefundReasonForm">
-			<h2 class="refund_reason_head">
-				{l s='Mention a reason for cancelation'}
-			</h2>
-			<div class="refundReasonFormContent">
-				<input type="hidden" id="bookings_to_refund">
-				<textarea class="form-control reasonForRefund" rows="4" name="reasonForRefund" placeholder="{l s='Type here....'}"></textarea>
-				<div>
-					<p class="required required_err" style="color:#AA1F00; display:none"><sup>*</sup> {l s='Required field'}</p><br>
-					<p class="reason_submit_wrapper">
-						<button  name="submit_refund_reason" type="button" id="submit_refund_reason" class="btn"  data-id_order="{$order->id|intval|escape:'html':'UTF-8'}"><span>{l s='Submit'}</span></button>
-					</p>
-				</div>
-			</div>
-		</div>
-	</div>
+                    <p class="hotel-address">
+                        {$hotel_address_info['address1']},
+                        {if {$hotel_address_info['address2']}}{$hotel_address_info['address2']},{/if}
+                        {$hotel_address_info['city']},
+                        {if {$hotel_address_info['state']}}{$hotel_address_info['state']},{/if}
+                        {$hotel_address_info['country']}, {$hotel_address_info['postcode']}
+                    </p>
 
-	<div class="loading_overlay">
-		<img src="{$THEME_DIR}img/ajax-loader.gif" class="loading-img"/>
-	</div>
+                    {if ($obj_hotel_branch_information->latitude|floatval != 0 && $obj_hotel_branch_information->longitude|floatval != 0)}
+                        <div class="hotel-location-map">
+                            <div class="booking-hotel-map-container"></div>
+                        </div>
+                    {/if}
+                </div>
+            </div>
+
+            <div class="card payment-summary hidden-xs hidden-sm visible-md">
+                <div class="card-header">
+                    {l s='Payment Summary'}
+                </div>
+                <div class="card-body">
+                    <div class="prices-breakdown-table">
+                        <table class="table table-sm table-responsive table-summary">
+                            <tbody>
+                                {assign var=room_price_tax_excl value=$order->getTotalProductsWithoutTaxes(false, true)}
+                                {assign var=room_price_tax_incl value=$order->getTotalProductsWithTaxes(false, true)}
+                                {assign var=additional_service_price_tax_excl value=($order->getTotalProductsWithoutTaxes(false, false, Product::SERVICE_PRODUCT_WITH_ROOMTYPE) + $total_demands_price_te)}
+                                {assign var=additional_service_price_tax_incl value=($order->getTotalProductsWithTaxes(false, false, Product::SERVICE_PRODUCT_WITH_ROOMTYPE) + $total_demands_price_ti)}
+                                {if $priceDisplay && $use_tax && $room_price_tax_excl}
+                                    <tr>
+                                        <td>{l s='Total rooms cost (tax excl.)'}</td>
+                                        <td class="text-right">
+                                            <span class="price">{displayWtPriceWithCurrency price=($room_price_tax_excl + $additional_service_price_tax_excl - $total_convenience_fee_te) currency=$currency}</span>
+                                        </td>
+                                    </tr>
+                                {else}
+                                    <tr>
+                                        <td>{l s='Total Rooms Cost'} {if $use_tax}{l s='(tax incl.)'}{/if} </td>
+                                        <td class="text-right">
+                                            <span class="price">{displayWtPriceWithCurrency price=($room_price_tax_incl + $additional_service_price_tax_incl - $total_convenience_fee_ti) currency=$currency}</span>
+                                        </td>
+                                    </tr>
+                                {/if}
+
+                                {if $order->total_discounts > 0}
+                                    <tr>
+                                        <td>{l s='Total Vouchers'}</td>
+                                        <td class="text-right">
+                                            <span class="price price-discount">-{displayWtPriceWithCurrency price=$order->total_discounts currency=$currency convert=1}</span>
+                                        </td>
+                                    </tr>
+                                {/if}
+                                {if $priceDisplay && $use_tax && $total_convenience_fee_te}
+                                    <tr>
+                                        <td>{l s='Total Convenience Fees (tax excl.)'}</td>
+                                        <td class="text-right">
+                                            <span class="price">{displayWtPriceWithCurrency price=$total_convenience_fee_te currency=$currency}</span>
+                                        </td>
+                                    </tr>
+                                {else if $total_convenience_fee_ti}
+                                    <tr>
+                                        <td>{l s='Total Convenience Fees (tax incl.)'}</td>
+                                        <td class="text-right">
+                                            <span class="price">{displayWtPriceWithCurrency price=$total_convenience_fee_ti currency=$currency}</span>
+                                        </td>
+                                    </tr>
+                                {/if}
+
+                                <tr class="totalprice item">
+                                    <td>{l s='Total Tax'}</td>
+                                    <td class="text-right">
+                                        <span class="price">{displayWtPriceWithCurrency price=($order->total_paid - $order->total_paid_tax_excl) currency=$currency}</span>
+                                    </td>
+                                </tr>
+                                <tr class="totalprice item">
+                                    <td><strong>{l s='Final Booking Total'}<strong></td>
+                                    <td class="text-right">
+                                        <strong><span class="price">{displayWtPriceWithCurrency price=$order->total_paid currency=$currency}</span></strong>
+                                    </td>
+                                </tr>
+
+                                {if isset($refundReqBookings) && $refundReqBookings}
+                                    <tr class="totalprice item">
+                                        <td>{l s='* Refunded Amount'}</td>
+                                        <td class="text-right">
+                                            <span class="price">{displayWtPriceWithCurrency price=$refundedAmount currency=$currency}</span>
+                                        </td>
+                                    </tr>
+                                {/if}
+
+                                {if $order->total_paid_tax_incl > $order->total_paid_real}
+                                    <tr class="totalprice item">
+                                        <td>{l s='Due Amount'}</td>
+                                        <td class="text-right">
+                                            <span class="price">{displayWtPriceWithCurrency price=($order->total_paid_tax_incl - $order->total_paid_real) currency=$currency}</span>
+                                        </td>
+                                    </tr>
+                                {/if}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card guest-details hidden-xs hidden-sm visible-md">
+                <div class="card-header">
+                    {l s='Guest Details'}
+                </div>
+                <div class="card-body">
+                    <div class="guest-details-table">
+                        <table class="table table-sm table-responsive table-summary">
+                            <tbody>
+                                {if $customerGuestDetail}
+                                    {if isset($customerGuestDetail->firstname) && $customerGuestDetail->firstname}
+                                        <tr>
+                                            <td>{l s='Name'}</td>
+                                            <td class="text-right">{$customerGuestDetail->firstname|escape:'html':'UTF-8'} {$customerGuestDetail->lastname|escape:'html':'UTF-8'}</td>
+                                        </tr>
+                                    {/if}
+                                    {if isset($customerGuestDetail->email) && $customerGuestDetail->email}
+                                        <tr>
+                                            <td>{l s='Email'}</td>
+                                            <td class="text-right">{$customerGuestDetail->email|escape:'html':'UTF-8'}</td>
+                                        </tr>
+                                    {/if}
+                                    {if isset($customerGuestDetail->phone) && $customerGuestDetail->phone}
+                                        <tr>
+                                            <td>{l s='Mobile'}</td>
+                                            <td class="text-right">{$customerGuestDetail->phone|escape:'html':'UTF-8'}</td>
+                                        </tr>
+                                    {/if}
+                                {else}
+                                    {if isset($address_invoice->firstname) && $address_invoice->firstname}
+                                        <tr>
+                                            <td>{l s='Name'}</td>
+                                            <td class="text-right">{$address_invoice->firstname|escape:'html':'UTF-8'} {$address_invoice->lastname|escape:'html':'UTF-8'}</td>
+                                        </tr>
+                                    {/if}
+                                    {if isset($guestInformations['email']) && $guestInformations['email']}
+                                        <tr>
+                                            <td>{l s='Email'}</td>
+                                            <td class="text-right">{$guestInformations['email']|escape:'html':'UTF-8'}</td>
+                                        </tr>
+                                    {/if}
+                                    {if isset($address_invoice->phone_mobile) && $address_invoice->phone_mobile}
+                                        <tr>
+                                            <td>{l s='Mobile'}</td>
+                                            <td class="text-right">{$address_invoice->phone_mobile|escape:'html':'UTF-8'}</td>
+                                        </tr>
+                                    {/if}
+                                    {if isset($address_invoice->phone) && $address_invoice->phone}
+                                        <tr>
+                                            <td>{l s='Phone'}</td>
+                                            <td class="text-right">{$address_invoice->phone|escape:'html':'UTF-8'}</td>
+                                        </tr>
+                                    {/if}
+                                {/if}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{/if}
+
+{if $refund_allowed}
+    <div style="display: none;">
+        <div id="create-new-refund-popup">
+            <form id="form-cancel-booking">
+                <input type="hidden" name="id_order" value="{$order->id}">
+                <div class="card cancel-booking">
+                    <div class="card-header">
+                        {l s='Cancel Bookings'}
+                    </div>
+                    <div class="card-body">
+                        <div class="errors" style="display: none;"></div>
+
+                        <div class="col-xs-12">
+                            <div class="row no-gutters">
+                                <div class="col-xs-4">
+                                    <ul class="nav nav-tabs nav-stacked">
+                                        {assign var='flag_is_first_iteration' value=true}
+                                        {foreach from=$cart_htl_data key=data_k item=data_v}
+                                            {foreach from=$data_v['date_diff'] key=rm_k item=rm_v}
+                                                <li class="{if $flag_is_first_iteration}active{/if}">
+                                                    <a href="#room-info-tab-{$data_v.id_product}-{$rm_k}" class="" data-toggle="tab">
+                                                        <div class="room-type-name">{$data_v.name}</div>
+                                                        <div class="duration">{dateFormat date=$rm_v.data_form} - {dateFormat date=$rm_v.data_to}</div>
+                                                    </a>
+                                                </li>
+                                                {if $flag_is_first_iteration}{assign var='flag_is_first_iteration' value=false}{/if}
+                                            {/foreach}
+                                        {/foreach}
+                                    </ul>
+                                </div>
+                                <div class="col-xs-8">
+                                    <div class="tab-content clearfix">
+                                        {assign var='flag_is_first_iteration' value=true}
+                                        {foreach from=$cart_htl_data key=data_k item=data_v}
+                                            {foreach from=$data_v['date_diff'] key=rm_k item=rm_v}
+                                                <div id="room-info-tab-{$data_v.id_product}-{$rm_k}" class="tab-pane {if $flag_is_first_iteration}active{/if}">
+                                                    <div class="room-type-summary clearfix">
+                                                        <p class="room-type-name">{$data_v.name}</p>
+                                                        <div class="col-xs-3">
+                                                            <p>{l s='Total Rooms'}</p>
+                                                            {$rm_v.num_rm|string_format:'%02d'}
+                                                        </div>
+                                                        <div class="col-xs-3">
+                                                            <p>{l s='Cancelled Rooms'}</p>
+                                                            {($rm_v.count_cancelled + $rm_v.count_refunded)|string_format:'%02d'}
+                                                        </div>
+                                                    </div>
+                                                    <div class="rooms-summary">
+                                                        {foreach from=$rm_v['hotel_booking_details'] item=$hotel_booking_detail name=foreachRefundRooms}
+                                                            {assign var=is_room_cancelled value=(isset($refundReqBookings) && in_array($hotel_booking_detail.id_htl_booking, $refundReqBookings))}
+                                                            <div class="room-details {if $is_room_cancelled}cancelled{/if} clearfix">
+                                                                <div class="occupancy-wrap">
+                                                                    <div class="checkbox">
+                                                                        <label for="bookings_to_refund_{$hotel_booking_detail.id_htl_booking}">
+                                                                            <input type="checkbox" class="bookings_to_refund" id="bookings_to_refund_{$hotel_booking_detail.id_htl_booking}" name="bookings_to_refund[]" value="{$hotel_booking_detail.id_htl_booking|escape:'html':'UTF-8'}" {if $is_room_cancelled}disabled{/if}/>
+                                                                            {l s='Room'} - {$smarty.foreach.foreachRefundRooms.iteration|string_format:'%02d'}
+                                                                        </label>
+                                                                        <span>({$hotel_booking_detail.adults|string_format:'%02d'} {if $hotel_booking_detail.adults > 1}{l s='Adults'}{else}{l s='Adult'}{/if}{if $hotel_booking_detail.children > 0}{l s=', '}{$hotel_booking_detail.children|string_format:'%02d'} {if $hotel_booking_detail.children > 1}{l s='Children'}{else}{l s='Child'}{/if}{/if})</span>
+                                                                        {if $hotel_booking_detail.is_refunded || $hotel_booking_detail.is_cancelled}<span class="badge badge-danger badge-cancelled">{l s='Cancelled'}</span>{/if}
+                                                                    </div>
+                                                                </div>
+                                                                {assign var='has_services' value=(isset($rm_v.additional_services) && isset($rm_v.additional_services[$hotel_booking_detail.id_room]) && isset($rm_v.additional_services[$hotel_booking_detail.id_room]['additional_services']))}
+                                                                {assign var='has_facilities' value=(isset($rm_v.extra_demands) && isset($rm_v.extra_demands[$hotel_booking_detail.id_room]) && isset($rm_v.extra_demands[$hotel_booking_detail.id_room]['extra_demands']))}
+                                                                {if $has_services || $has_facilities}
+                                                                    <div class="extra-services-wrap clearfix">
+                                                                        {if $has_services}
+                                                                            <div class="services-wrap clearfix">
+                                                                                <div class="col-xs-3">
+                                                                                    <strong>{l s='Services'}</strong>
+                                                                                </div>
+                                                                                <div class="col-xs-9">
+                                                                                    {foreach from=$rm_v.additional_services[$hotel_booking_detail.id_room]['additional_services'] item=service}
+                                                                                        <span class="service">{$service.name}</span>
+                                                                                    {/foreach}
+                                                                                </div>
+                                                                            </div>
+                                                                        {/if}
+                                                                        {if $has_facilities}
+                                                                            <div class="facilities-wrap clearfix">
+                                                                                <div class="col-xs-3">
+                                                                                    <strong>{l s='Facilities'}</strong>
+                                                                                </div>
+                                                                                <div class="col-xs-9">
+                                                                                    {foreach from=$rm_v.extra_demands[$hotel_booking_detail.id_room]['extra_demands'] item=facility}
+                                                                                        <span class="facility">{$facility.name}</span>
+                                                                                    {/foreach}
+                                                                                </div>
+                                                                            </div>
+                                                                        {/if}
+                                                                    </div>
+                                                                {else}
+                                                                    <div class="extra-services-wrap clearfix">
+                                                                        <p class="">{l s='No extra services added for this room.'}</p>
+                                                                    </div>
+                                                                {/if}
+                                                            </div>
+                                                        {/foreach}
+                                                    </div>
+                                                </div>
+                                                {if $flag_is_first_iteration}{assign var='flag_is_first_iteration' value=false}{/if}
+                                            {/foreach}
+                                        {/foreach}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <div class="selected-rooms-wrap">
+                            {l s='Selected Rooms: '}<span class="num-selected-rooms">{l s='00'}</span>
+                        </div>
+                        <div class="actions-wrap">
+                            <button class="btn btn-secondary btn-cancel">
+                                {l s='Cancel'}
+                            </button>
+                            <button class="btn btn-primary btn-next">
+                                {l s='Next'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card cancel-booking-preview" style="display:none;">
+                    <div class="card-header">
+                        {l s='Cancellation Reason'}
+                    </div>
+                    <div class="card-body">
+                        <div class="errors" style="display: none;"></div>
+
+                        <div class="well well-sm">
+                            <p class="text">{l s='Total Rooms to Cancel:'} <span class="count-total-rooms">{l s='00'}</span></p>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="label">{l s='Mention reason for cancellation'}<sup>{l s='*'}</sup></label>
+                            <textarea class="form-control cancellation_reason" name="cancellation_reason" rows="4" placeholder="{l s='Type here...'}"></textarea>
+                        </div>
+                    </div>
+                    <div class="card-footer clearfix">
+                        <div class="pull-right">
+                            <button class="btn btn-secondary btn-back">
+                                {l s='Back'}
+                            </button>
+                            <button class="btn btn-primary btn-submit">
+                                {l s='Submit'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="popup-cancellation-submit-success" class="popup-cancellation-submit-success" style="display: none;">
+        <div class="card">
+            <div class="text-center">
+                <div><i class="icon icon-check-circle text-success"></i></div>
+                <h3><b>{l s='Request submitted successfully'}</b></h3>
+                <h4>{l s='Your cancellation request has been submitted successfully. Go to Booking Refund Requests page for further updates.'}</h4>
+            </div>
+        </div>
+    </div>
+{/if}
+
+<div id="popup-view-extra-services" class="popup-view-extra-services" style="display: none;"></div>
+
+{strip}
+    {addJsDef historyUrl=$link->getPageLink('orderdetail', true)|escape:'quotes':'UTF-8'}
+    {addJsDefL name=req_sent_msg}{l s='Request Sent..' js=1}{/addJsDefL}
+    {addJsDefL name=wait_stage_msg}{l s='Waiting' js=1}{/addJsDefL}
+    {addJsDefL name=pending_state_msg}{l s='Pending...' js=1}{/addJsDefL}
+    {addJsDefL name=mail_sending_err}{l s='Some error occurred while sending mail to the customer' js=1}{/addJsDefL}
+    {addJsDefL name=refund_request_sending_error}{l s='Some error occurred while processing request for booking cancellation.' js=1}{/addJsDefL}
+    {addJsDefL name=no_bookings_selected}{l s='Please select at least one room to proceed for cancellatioon.' js=1}{/addJsDefL}
+    {addJsDefL name=refund_request_success_txt}{l s='Request for booking cancellation is successffully created.' js=1}{/addJsDefL}
+    {addJsDefL name=order_message_choose_txt}{l s='-- Choose --' js=1}{/addJsDefL}
+    {addJsDefL name=order_message_success_txt}{l s='Order message sent successfully.' js=1}{/addJsDefL}
+    {addJsDefL name=cancel_req_txt}{l s='Cancel Request' js=1}{/addJsDefL}
+    {addJsDefL name=cancel_booking_txt}{l s='Cancel Bookings' js=1}{/addJsDefL}
+{/strip}
