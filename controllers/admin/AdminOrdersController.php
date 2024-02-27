@@ -1459,7 +1459,6 @@ class AdminOrdersControllerCore extends AdminController
 
             $helper = new HelperKpiRow();
             $helper->kpis = $kpis;
-            $helper->refresh = false;
 
             return $helper->generate();
         }
