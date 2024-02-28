@@ -96,6 +96,12 @@
     <keywords/>
     <url_rewrite>bestel-overzicht</url_rewrite>
   </meta>
+  <meta id="order-detail" id_shop="1">
+    <title>Boekingsdetails</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>boekingsdetails</url_rewrite>
+  </meta>
   <meta id='identity' id_shop='1'>
     <title>Identiteit</title>
     <description/>
