@@ -122,6 +122,11 @@ class AdminOrdersControllerCore extends AdminController
             $this->roomsArray[$hotelRoom['id']] = $hotelRoom['room_num'].', '.$hotelRoom['room_type_name'].', '.$hotelRoom['hotel_name'];
         }
 
+        $orderCurrencies = Db::getInstance()->executeS('SELECT DISTINCT(`id_currency`) FROM `'._DB_PREFIX_.'orders`');
+        foreach ($orderCurrencies as $orderCurrency) {
+            $this->orderCurrenciesArray[$orderCurrency['id_currency']] = Currency::getCurrencyInstance($orderCurrency['id_currency'])->name;
+        }
+
         $this->fields_list = array(
             'id_order' => array(
                 'title' => $this->l('ID'),
@@ -215,15 +220,6 @@ class AdminOrdersControllerCore extends AdminController
         }
 
         $this->fields_list = array_merge($this->fields_list, array(
-            'total_paid_tax_incl' => array(
-                'title' => $this->l('Order Total'),
-                'align' => 'text-right',
-                'type' => 'range',
-                'validation' => 'isFloat',
-                'currency' => true,
-                'callback' => 'setOrderCurrency',
-                'badge_success' => true,
-            ),
             'amount_due' => array(
                 'title' => $this->l('Due Amount'),
                 'align' => 'text-right',
@@ -235,6 +231,25 @@ class AdminOrdersControllerCore extends AdminController
                 'badge_success' => true,
                 'optional' => true,
                 'visible_default' => true
+            ),
+            'id_currency' => array(
+                'title' => $this->l('Order Currency'),
+                'align' => 'text-center',
+                'type' => 'select',
+                'multiple' => true,
+                'operator' => 'or',
+                'filter_key' => 'a!id_currency',
+                'list' => $this->orderCurrenciesArray,
+                'displayed' => false,
+            ),
+            'total_paid_tax_incl' => array(
+                'title' => $this->l('Order Total'),
+                'align' => 'text-right',
+                'type' => 'range',
+                'validation' => 'isFloat',
+                'currency' => true,
+                'callback' => 'setOrderCurrency',
+                'badge_success' => true,
             ),
             'payment' => array(
                 'title' => $this->l('Payment')
