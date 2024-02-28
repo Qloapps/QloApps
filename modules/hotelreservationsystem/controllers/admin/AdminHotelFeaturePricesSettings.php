@@ -197,7 +197,7 @@ class AdminHotelFeaturePricesSettingsController extends ModuleAdminController
         $currencySign = $objCurrency->sign;
         $dateFrom = date('d-m-Y');
         $dateTo = date('d-m-Y', strtotime($dateFrom) + 86400);
-        $currentLangId = Configuration::get('PS_LANG_DEFAULT');
+        $currentLangId = $this->default_form_language ? $this->default_form_language : Configuration::get('PS_LANG_DEFAULT');
 
         $smartyVars['languages'] = Language::getLanguages(false);
         $smartyVars['currentLang'] = Language::getLanguage((int) $currentLangId);
