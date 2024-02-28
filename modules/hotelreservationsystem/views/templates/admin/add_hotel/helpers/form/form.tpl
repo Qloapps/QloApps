@@ -292,7 +292,7 @@
 								{l s='Upload images' mod='hotelreservationsystem'}&nbsp;:&nbsp;&nbsp;
 							</label>
 							<div class="col-sm-5">
-								<input class="form-control-static" type="file" id="hotel_images" name="hotel_images[]" multiple>
+								<input class="form-control-static" type="file" accept="image/gif, image/jpg, image/jpeg, image/png" id="hotel_images" name="hotel_images[]" multiple>
 							</div>
 						</div>
 						<hr>
@@ -483,6 +483,9 @@
 
 {block name=script}
 <script type="text/javascript">
+	var id_language = {$defaultFormLanguage|intval};
+	allowEmployeeFormLang = {$allowEmployeeFormLang|intval};
+
 	// for tiny mce setup
 	var iso = "{$iso|escape:'htmlall':'UTF-8'}";
 	var pathCSS = "{$smarty.const._THEME_CSS_DIR_|escape:'htmlall':'UTF-8'}";

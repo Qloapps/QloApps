@@ -99,6 +99,13 @@ class AdminCustomerPreferencesControllerCore extends AdminController
                         'cast' => 'intval',
                         'type' => 'bool'
                     ),
+                    'PS_CUSTOMER_BIRTHDATE' => array(
+                        'title' => $this->l('Enable date of birth'),
+                        'hint' => $this->l('Display or not the date of birth field.'),
+                        'validation' => 'isBool',
+                        'cast' => 'intval',
+                        'type' => 'bool'
+                    ),
                     'PS_CUSTOMER_OPTIN' => array(
                         'title' => $this->l('Enable opt-in'),
                         'hint' => $this->l('Display or not the opt-in tick box, to receive offers from your hotel partners.'),

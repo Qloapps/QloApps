@@ -53,12 +53,14 @@ class IdentityControllerCore extends FrontController
 
             $email = trim(Tools::getValue('email'));
 
-            if (Tools::getValue('months') != '' && Tools::getValue('days') != '' && Tools::getValue('years') != '') {
-                $this->customer->birthday = (int)Tools::getValue('years').'-'.(int)Tools::getValue('months').'-'.(int)Tools::getValue('days');
-            } elseif (Tools::getValue('months') == '' && Tools::getValue('days') == '' && Tools::getValue('years') == '') {
-                $this->customer->birthday = null;
-            } else {
-                $this->errors[] = Tools::displayError('Invalid date of birth.');
+            if (Configuration::get('PS_CUSTOMER_BIRTHDATE')) {
+                if (Tools::getValue('months') != '' && Tools::getValue('days') != '' && Tools::getValue('years') != '') {
+                    $this->customer->birthday = (int)Tools::getValue('years').'-'.(int)Tools::getValue('months').'-'.(int)Tools::getValue('days');
+                } elseif (Tools::getValue('months') == '' && Tools::getValue('days') == '' && Tools::getValue('years') == '') {
+                    $this->customer->birthday = null;
+                } else {
+                    $this->errors[] = Tools::displayError('Invalid date of birth.');
+                }
             }
 
             if (Tools::getIsset('old_passwd')) {
@@ -126,6 +128,8 @@ class IdentityControllerCore extends FrontController
      */
     public function initContent()
     {
+        $this->show_breadcrump = true;
+
         parent::initContent();
 
         if ($this->customer->birthday) {
@@ -151,6 +155,7 @@ class IdentityControllerCore extends FrontController
             'HOOK_CUSTOMER_IDENTITY_FORM' => Hook::exec('displayCustomerIdentityForm'),
         ));
 
+        $this->context->smarty->assign('birthday', (bool) Configuration::get('PS_CUSTOMER_BIRTHDATE'));
         $this->context->smarty->assign('optin', (bool)Configuration::get('PS_CUSTOMER_OPTIN'));
 
         $this->context->smarty->assign('field_required', $this->context->customer->validateFieldsRequiredDatabase());
