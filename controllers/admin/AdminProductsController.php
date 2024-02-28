@@ -88,7 +88,6 @@ class AdminProductsControllerCore extends AdminController
         parent::__construct();
 
         $this->imageType = 'jpg';
-        $this->_defaultOrderBy = 'position';
         $this->max_file_size = (int)(Configuration::get('PS_LIMIT_UPLOAD_FILE_VALUE') * 1000000);
         $this->max_image_size = (int)Configuration::get('PS_PRODUCT_PICTURE_MAX_SIZE');
         $this->allow_export = true;
@@ -270,7 +269,7 @@ class AdminProductsControllerCore extends AdminController
             'type' => 'range',
             'align' => 'center',
         );
-        $this->fields_list['child'] = array(
+        $this->fields_list['children'] = array(
             'title' => $this->l('Children'),
             'filter_key' => 'hrt!children',
             'type' => 'range',
@@ -286,8 +285,10 @@ class AdminProductsControllerCore extends AdminController
         $this->fields_list['price'] = array(
             'title' => $this->l('Base Price'),
             'type' => 'range',
+            'validation' => 'isFloat',
             'align' => 'text-left',
-            'filter_key' => 'a!price'
+            'filter_key' => 'a!price',
+            'callback' => 'displayBasePrice',
         );
         $this->fields_list['price_final'] = array(
             'title' => $this->l('Final price'),
@@ -420,6 +421,9 @@ class AdminProductsControllerCore extends AdminController
             && (int) $this->id_current_category
             && HotelBranchInformation::getHotelIdByIdCategory($this->id_current_category)
         ) {
+            $this->_orderBy = 'position';
+            $this->_orderWay = 'ASC';
+
             $this->fields_list['position'] = array(
                 'title' => $this->l('Position'),
                 'filter_key' => 'cp!position',
@@ -439,6 +443,11 @@ class AdminProductsControllerCore extends AdminController
                 $this->buildCategoryOptions($childCategory);
             }
         }
+    }
+
+    public static function displayBasePrice($basePrice, $tr)
+    {
+        return Tools::displayPrice($basePrice, (int) Configuration::get('PS_CURRENCY_DEFAULT'));
     }
 
     public static function getQuantities($hotelName, $tr)

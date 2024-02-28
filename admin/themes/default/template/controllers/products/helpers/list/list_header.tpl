@@ -97,15 +97,15 @@
 										{elseif $params.type == 'range' && $params.value|is_array}
 											{assign var="filter_value" value=''}
 											{foreach $params.value as $value}
-												{if ($value|is_string && !empty($value))}
-													{if empty($filter_value)}
+												{if (isset($value) && ($value !== '' || $value === 0))}
+													{if !(isset($filter_value) && ($filter_value !== '' || $filter_value === 0))}
 														{assign var="filter_value" value=$value}
 													{else}
 														{assign var="filter_value" value="`$filter_value` - `$value`"}
 													{/if}
 												{/if}
 											{/foreach}
-											{if !empty($filter_value)}
+											{if (isset($filter_value) && ($filter_value !== '' || $filter_value === 0))}
 												<span data-filter_key="{if isset($params.filter_key)}{$params.filter_key}{else}{$key}{/if}" data-filter_type="{$params.type}">
 													{$params['title']|escape:'html':'UTF-8'}: <span class="filter_value">{$filter_value|escape:'html':'UTF-8'}</span>
 													<i class="icon-times"></i>
