@@ -660,13 +660,24 @@ class HelperListCore extends Helper
                         $value = json_decode($value, true);
                     }
 
-                    if (isset($value[0]) && !Validate::isUnsignedInt($value[0])) {
+                    // set validation type
+                    if (isset($params['validation']) && $params['validation'] && method_exists('Validate', $params['validation'])) {
+                        $validation = $params['validation'];
+                    } else {
+                        $validation = 'isUnsignedInt';
+                    }
+
+                    $hasValueFrom = isset($value[0]) && ($value[0] !== '' || $value[0] === 0);
+                    if ($hasValueFrom && !Validate::$validation($value[0])) {
                         $value[0] = '';
                     }
-                    if (isset($value[1]) && !Validate::isUnsignedInt($value[1])) {
+
+                    $hasValueTo = isset($value[1]) && ($value[1] !== '' || $value[1] === 0);
+                    if ($hasValueTo && !Validate::$validation($value[1])) {
                         $value[1] = '';
                     }
-                    if (isset($value[0]) && isset($value[1]) && $value[0] > $value[1]) {
+
+                    if ($hasValueFrom && $hasValueTo && $value[0] > $value[1]) {
                         $value[1] = '';
                     }
                     break;

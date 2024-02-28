@@ -905,18 +905,25 @@ class AdminControllerCore extends Controller
                                 $sql_filter .= ' AND '.pSQL($key).' IN ('.pSQL(implode(',', $value)).')';
                             }
                         } elseif ($type == 'range') {
-                            if (isset($value[0]) && !empty($value[0])) {
-                                if (!Validate::isUnsignedInt($value[0])) {
+                            // set validation type
+                            if (isset($field['validation']) && $field['validation'] && method_exists('Validate', $field['validation'])) {
+                                $validation = $field['validation'];
+                            } else {
+                                $validation = 'isUnsignedInt';
+                            }
+
+                            if (isset($value[0]) && ($value[0] !== '' || $value[0] === 0)) {
+                                if (!Validate::$validation($value[0])) {
                                     $this->errors[] = Tools::displayError('The \'From\' value is invalid');
                                 } else {
                                     $sql_filter .= ' AND '.pSQL($key).' >= '.pSQL($value[0]);
                                 }
                             }
-                            if (isset($value[1]) && !empty($value[1])) {
-                                if (!Validate::isUnsignedInt($value[1])) {
-                                    $this->errors[] = Tools::displayError('The \'From\' value is invalid');
-                                } elseif (isset($value[0]) && !empty($value[0]) && $value[0] > $value[1]) {
-                                    $this->errors[] = Tools::displayError('The \'To\' value cannot be less than from value');
+                            if (isset($value[1]) && ($value[1] !== '' || $value[1] === 0)) {
+                                if (!Validate::$validation($value[1])) {
+                                    $this->errors[] = Tools::displayError('The \'To\' value is invalid');
+                                } elseif ((isset($value[0]) && ($value[0] !== '' || $value[0] === 0)) && $value[0] > $value[1]) {
+                                    $this->errors[] = Tools::displayError('The \'To\' value cannot be less than \'From\' value');
                                 } else {
                                     $sql_filter .= ' AND '.pSQL($key).' <= '.pSQL($value[1]);
                                 }
@@ -934,7 +941,7 @@ class AdminControllerCore extends Controller
                                 if (!Validate::isDate($value[1])) {
                                     $this->errors[] = Tools::displayError('The \'To\' date format is invalid (YYYY-MM-DD)');
                                 } elseif (isset($value[0]) && !empty($value[0]) && strtotime($value[0]) > strtotime($value[1])) {
-                                    $this->errors[] = Tools::displayError('The \'To\' date cannot be before than from date');
+                                    $this->errors[] = Tools::displayError('The \'To\' date cannot be earlier than \'From\' date');
                                 } else {
                                     $sql_filter .= ' AND '.pSQL($key).' <= \''.pSQL(Tools::dateTo($value[1])).'\'';
                                 }
