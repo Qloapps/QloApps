@@ -33,6 +33,7 @@ class AdminNewsletterController extends ModuleAdminController
         parent::__construct();
 
         $this->addRowAction('viewCustomer');
+        $this->addRowAction('delete');
 
         $genderList = array();
         $genders = Gender::getGenders($this->context->language->id);
@@ -103,14 +104,6 @@ class AdminNewsletterController extends ModuleAdminController
         $this->list_no_link = true;
 
         $this->bulk_actions = array(
-            'enableSelection' => array(
-                'text' => $this->l('Enable selection'),
-                'icon' => 'icon-power-off text-success'
-            ),
-            'disableSelection' => array(
-                'text' => $this->l('Disable selection'),
-                'icon' => 'icon-power-off text-danger'
-            ),
             'divider' => array(
                 'text' => 'divider'
             ),
@@ -122,6 +115,7 @@ class AdminNewsletterController extends ModuleAdminController
         );
 
         $this->_conf[101] = $this->l('The customer has been unsubscribed from newsletter successfully.');
+        $this->_conf[102] = $this->l('The selection has been unsubscribed from newsletter successfully.');
     }
 
     public function displayEnableLink($token, $id, $value, $active, $id_category = null, $id_product = null)
@@ -143,18 +137,22 @@ class AdminNewsletterController extends ModuleAdminController
 
     public function displayViewCustomerLink($token = null, $id, $name = null)
     {
-        $tpl = $this->context->smarty->createTemplate(
-            $this->module->getTemplatePath(
-                '/views/templates/admin/'.$this->tpl_folder.'/helpers/list/view-customer-link.tpl'
-            )
-        );
+        if (Customer::customerIdExistsStatic($id)) {
+            $tpl = $this->context->smarty->createTemplate(
+                $this->module->getTemplatePath(
+                    '/views/templates/admin/'.$this->tpl_folder.'/helpers/list/view-customer-link.tpl'
+                )
+            );
 
-        $tpl->assign(array(
-            'id_merged' => $id,
-            'disabled' => !Validate::isUnsignedInt($id),
-        ));
+            $tpl->assign(array(
+                'id_merged' => $id,
+                'disabled' => !Validate::isUnsignedInt($id),
+            ));
 
-        return $tpl->fetch();
+            return $tpl->fetch();
+        } else {
+            $this->addRowActionSkipList('viewCustomer', $id);
+        }
     }
 
     public function initToolbar()
@@ -194,12 +192,6 @@ class AdminNewsletterController extends ModuleAdminController
                 'title' => $this->l('Configuration'),
                 'icon' => 'icon-cogs',
                 'fields' => array(
-                    'PS_CUSTOMER_NWSL' => array(
-                        'type' => 'bool',
-                        'title' => $this->l('Enable newsletter registration'),
-                        'validation' => 'isBool',
-                        'cast' => 'intval',
-                    ),
                     'NW_VERIFICATION_EMAIL' => array(
                         'type' => 'bool',
                         'title' => $this->l('Would you like to send a verification email after subscription?'),
@@ -306,7 +298,6 @@ class AdminNewsletterController extends ModuleAdminController
             }
 
             if (!count($this->errors)) {
-                Configuration::updateValue('PS_CUSTOMER_NWSL', Tools::getValue('PS_CUSTOMER_NWSL'));
                 Configuration::updateValue('NW_VERIFICATION_EMAIL', Tools::getValue('NW_VERIFICATION_EMAIL'));
                 Configuration::updateValue('NW_CONFIRMATION_EMAIL', Tools::getValue('NW_CONFIRMATION_EMAIL'));
                 Configuration::updateValue('NW_VOUCHER_CODE', $voucherCode);
@@ -350,28 +341,83 @@ class AdminNewsletterController extends ModuleAdminController
         parent::postProcess();
     }
 
+    private function unsubscribeNewsletter($idMerged)
+    {
+        $result = false;
+        $email = '';
+        if (preg_match('/(^N)/', $idMerged)) {
+            $idMerged = (int) substr($idMerged, 1);
+            $email = Db::getInstance()->getValue(
+                'SELECT n.`email`
+                FROM `'._DB_PREFIX_.'newsletter` n
+                WHERE n.`id` = '.(int) $idMerged
+            );
+        } else {
+            $objCustomer = new Customer($idMerged);
+            if (Validate::isLoadedObject($objCustomer)) {
+                $email = $objCustomer->email;
+            } else {
+                $this->errors[] = $this->l('Customer object can not be loaded.');
+            }
+        }
+
+        if ($email && !count($this->errors)) {
+            $registrationStatus = $this->module->isNewsletterRegistered($email);
+
+            if ($registrationStatus < 1) {
+                $this->errors[] = $this->l('This email address is not registered.');
+            }
+
+            if (!($result = $this->module->unregister($email, $registrationStatus))) {
+                $this->errors[] = $this->l('An error occurred while attempting to unsubscribe.');
+            }
+        }
+
+        return $result;
+    }
+
     public function processUnsubscribeNewsletter()
     {
         $idMerged = Tools::getValue('id_merged');
 
-        $result = false;
-        if (preg_match('/(^N)/', $idMerged)) {
-            $idMerged = (int) substr($idMerged, 1);
-            $result = $res = Db::getInstance()->update(
-                'newsletter',
-                array('active' => 0),
-                'id = '.(int) $idMerged
-            );
-        } else {
-            $objCustomer = new Customer($idMerged);
-            $objCustomer->newsletter = 0;
-            $result = $objCustomer->update();
-        }
-
-        if ($result) {
+        if ($this->unsubscribeNewsletter($idMerged)) {
             Tools::redirectAdmin(self::$currentIndex.'&token='.$this->token.'&conf=101');
         } else {
-            $this->errors[] = $this->l('Newsletter subscription failed. Please try again.');
+            $this->errors[] = $this->l('Newsletter unsubscription failed. Please try again.');
+        }
+    }
+
+    public function processDelete()
+    {
+        $idMerged = Tools::getValue('id_merged');
+
+        if ($this->unsubscribeNewsletter($idMerged)) {
+            Tools::redirectAdmin(self::$currentIndex.'&token='.$this->token.'&conf=101');
+        } else {
+            $this->errors[] = $this->l('Newsletter unsubscription failed. Please try again.');
+        }
+    }
+
+    public function processBulkDelete()
+    {
+        $result = true;
+        if (is_array($this->boxes) && !empty($this->boxes)) {
+            foreach ($this->boxes as $idMerged) {
+                $deleteOk = $this->unsubscribeNewsletter($idMerged);
+                $result &= $deleteOk;
+
+                if (!$deleteOk) {
+                    $this->errors[] = sprintf($this->l('Can\'t delete #%d'), $idMerged);
+                }
+            }
+
+            if ($result) {
+                Tools::redirectAdmin(self::$currentIndex.'&token='.$this->token.'&conf=2');
+            } else {
+                $this->errors[] = $this->l('Something went wrong. Please try again.');
+            }
+        } else {
+            $this->errors[] = $this->l('You must select at least one element to delete.');
         }
     }
 

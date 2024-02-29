@@ -176,7 +176,7 @@ class Blocknewsletter extends Module
      *                1 = registered in block
      *                2 = registered in customer
      */
-    protected function isNewsletterRegistered($customer_email)
+    public function isNewsletterRegistered($customer_email)
     {
         $sql = 'SELECT `email`
 				FROM '._DB_PREFIX_.'newsletter
@@ -355,13 +355,13 @@ class Blocknewsletter extends Module
         return false;
     }
 
-    protected function unregister($email, $register_status)
+    public function unregister($email, $register_status)
     {
         if ($register_status == self::GUEST_REGISTERED) {
-            $sql = 'DELETE FROM '._DB_PREFIX_.'newsletter WHERE `email` = \''.pSQL($_POST['email']).'\' AND id_shop = '.
+            $sql = 'DELETE FROM '._DB_PREFIX_.'newsletter WHERE `email` = \''.pSQL($email).'\' AND id_shop = '.
             $this->context->shop->id;
         } elseif ($register_status == self::CUSTOMER_REGISTERED) {
-            $sql = 'UPDATE '._DB_PREFIX_.'customer SET `newsletter` = 0 WHERE `email` = \''.pSQL($_POST['email']).
+            $sql = 'UPDATE '._DB_PREFIX_.'customer SET `newsletter` = 0 WHERE `email` = \''.pSQL($email).
             '\' AND id_shop = '.$this->context->shop->id;
         }
 
@@ -495,6 +495,7 @@ class Blocknewsletter extends Module
      */
     public function confirmEmail($token)
     {
+        $errors = array();
         $activated = false;
 
         if ($email = $this->getGuestEmailByToken($token)) {
@@ -504,18 +505,20 @@ class Blocknewsletter extends Module
         }
 
         if (!$activated) {
-            return $this->l('This email is already registered and/or invalid.');
+            $errors[] = $this->l('This email is already registered and/or invalid.');
         }
 
-        if ($discount = Configuration::get('NW_VOUCHER_CODE')) {
-            $this->sendVoucher($email, $discount);
+        if (!count($errors)) {
+            if ($discount = Configuration::get('NW_VOUCHER_CODE')) {
+                $this->sendVoucher($email, $discount);
+            }
+
+            if (Configuration::get('NW_CONFIRMATION_EMAIL')) {
+                $this->sendConfirmationEmail($email);
+            }
         }
 
-        if (Configuration::get('NW_CONFIRMATION_EMAIL')) {
-            $this->sendConfirmationEmail($email);
-        }
-
-        return $this->l('Thank you for subscribing to our newsletter.');
+        return $errors;
     }
 
     /**

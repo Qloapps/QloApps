@@ -1,4 +1,5 @@
-{*
+<?php
+/*
 * 2007-2015 PrestaShop
 *
 * NOTICE OF LICENSE
@@ -21,22 +22,14 @@
 *  @copyright  2007-2015 PrestaShop SA
 *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
-*}
+*/
 
-{include file="$tpl_dir./errors.tpl"}
+header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
+header("Last-Modified: ".gmdate("D, d M Y H:i:s")." GMT");
 
-{if !count($errors)}
-    <p class="alert alert-success">
-        {l s='Thank you for subscribing to our newsletter.' mod='blocknewsletter'}
-    </p>
+header("Cache-Control: no-store, no-cache, must-revalidate");
+header("Cache-Control: post-check=0, pre-check=0", false);
+header("Pragma: no-cache");
 
-    <p class="msg-redirect">
-        {l s='You will be redirected to home page in ' mod='blocknewsletter'}
-        <span class="countdown-seconds">{l s='5' mod='blocknewsletter'}</span>
-        {l s='seconds.' mod='blocknewsletter'}
-    </p>
-
-    <a href="{$link->getPageLink('index')}" class="btn btn-primary btn-homepage">
-        <span>{l s='Home Page' mod='blocknewsletter'}</span>
-    </a>
-{/if}
+header("Location: ../");
+exit;
