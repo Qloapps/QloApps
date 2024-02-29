@@ -268,7 +268,7 @@ $(document).ready(function() {
             && e.target.id != 'hotel_location'
         ) {
             $('.location_search_results_ul').hide();
-            $('#hotel_location').val(hotel_location_txt);
+            $('#hotel_location').attr('placeholder', hotel_location_txt);
         }
     });
 
