@@ -1543,12 +1543,12 @@ function initRoomEvents()
     {
     	showOtherMonths: true,
         dateFormat: 'dd-mm-yy',
-        onSelect: function(selectedDate) {
-            var date_format = selectedDate.split("-");
-            var selectedDate = new Date($.datepicker.formatDate('yy-mm-dd', new Date(date_format[2], date_format[1] - 1, date_format[0])));
-            selectedDate.setDate(selectedDate.getDate() - 1);
-            $(".add_room_date_from").datepicker("option", "maxDate", selectedDate);
-        }
+        // onSelect: function(selectedDate) {
+        //     var date_format = selectedDate.split("-");
+        //     var selectedDate = new Date($.datepicker.formatDate('yy-mm-dd', new Date(date_format[2], date_format[1] - 1, date_format[0])));
+        //     selectedDate.setDate(selectedDate.getDate() - 1);
+        //     $(".add_room_date_from").datepicker("option", "maxDate", selectedDate);
+        // }
     });
 
 	$(".edit_product_date_from").datepicker(

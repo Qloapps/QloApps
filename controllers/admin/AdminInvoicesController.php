@@ -157,7 +157,7 @@ class AdminInvoicesControllerCore extends AdminController
 
         $this->fields_value = array(
             'date_from' => date('Y-m-d'),
-            'date_to' => date('Y-m-d')
+            'date_to' => date('Y-m-d', strtotime('+ 1 day'))
         );
 
         $this->table = 'invoice_date';
@@ -324,4 +324,11 @@ class AdminInvoicesControllerCore extends AdminController
 
         return $templates;
     }
+
+    public function setMedia()
+    {
+        parent::setMedia();
+        $this->addJS(_PS_JS_DIR_.'admin/invoices.js');
+    }
+
 }

@@ -156,7 +156,7 @@ class AdminSlipControllerCore extends AdminController
 
         $this->fields_value = array(
             'date_from' => date('Y-m-d'),
-            'date_to' => date('Y-m-d')
+            'date_to' => date('Y-m-d', strtotime('+ 1 day'))
         );
 
         $this->show_toolbar = false;
@@ -295,4 +295,11 @@ class AdminSlipControllerCore extends AdminController
 
         return '--';
     }
+
+    public function setMedia()
+    {
+        parent::setMedia();
+        $this->addJS(_PS_JS_DIR_.'admin/slips.js');
+    }
+
 }
