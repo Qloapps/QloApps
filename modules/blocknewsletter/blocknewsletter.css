@@ -130,6 +130,24 @@
    color: #bfbfbf;  
 }
 
+#blocknewsletter .message-block .alert {
+  position: relative;
+}
+
+#blocknewsletter .message-block .alert.alert-dismissable .close {
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: 5px 10px;
+  opacity: 0.5;
+  color: #000;
+  text-shadow: none;
+}
+
+#blocknewsletter .message-block .alert.alert-dismissable .close:hover {
+  color: #000;
+}
+
 #blocknewsletter .loader {
     margin-left: 10px;
     position: relative;

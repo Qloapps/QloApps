@@ -2941,7 +2941,6 @@ a.thumbnail:focus {
   color: #777777; }
 
 .alert {
-  position: relative;
   padding: 15px;
   margin-bottom: 18px;
   border: 1px solid transparent;
@@ -2960,15 +2959,10 @@ a.thumbnail:focus {
 .alert-dismissable {
   padding-right: 35px; }
   .alert-dismissable .close {
-    position: absolute;
-    top: 0;
-    right: 0;
-    padding: 5px 10px;
-    opacity: 0.5;
-    color: #000;
-    text-shadow: none; }
-  .alert-dismissable .close:hover {
-    color: #000; }
+    position: relative;
+    top: -2px;
+    right: -21px;
+    color: inherit; }
 
 .alert-success {
   background-color: #55c65e;

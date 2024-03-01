@@ -113,7 +113,7 @@ class Blocknewsletter extends Module
 
     public function install()
     {
-        if (!parent::install() || !$this->registerHooks() || !$this->installModuleTabs()) {
+        if (!parent::install() || !$this->registerHooks() || !$this->callInstallTab()) {
             return false;
         }
         Configuration::updateValue('NW_SALT', Tools::passwdGen(16));
@@ -132,7 +132,7 @@ class Blocknewsletter extends Module
         );
     }
 
-    public function installModuleTabs()
+    public function callInstallTab()
     {
         $result = $this->installTab('AdminParentNewsletter', 'Newsletter', false, true);
         $result &= $this->installTab('AdminNewsletter', 'Configuration', 'AdminParentNewsletter', true);
@@ -676,7 +676,7 @@ class Blocknewsletter extends Module
     {
         if (!parent::uninstall()
             || ($keep && !Db::getInstance()->execute('DROP TABLE IF EXISTS '._DB_PREFIX_.'newsletter'))
-            || !$this->uninstallModuleTabs()
+            || !$this->uninstallTab()
         ) {
             return false;
         }
@@ -684,7 +684,7 @@ class Blocknewsletter extends Module
         return true;
     }
 
-    public function uninstallModuleTabs()
+    public function uninstallTab()
     {
         $moduleTabs = Tab::getCollectionFromModule($this->name);
         if (!empty($moduleTabs)) {
