@@ -3205,6 +3205,14 @@ class AdminProductsControllerCore extends AdminController
                                     $objHotelRoomDisableDates->reason = $disableDate['reason'];
                                     $objHotelRoomDisableDates->add();
                                 }
+
+                                Hook::exec(
+                                    'actionRoomDisableDatesAddAfter',
+                                    array(
+                                        'room_info' => $roomInfo,
+                                        'disable_dates' => $disableDates
+                                    )
+                                );
                             }
                         }
                     }
