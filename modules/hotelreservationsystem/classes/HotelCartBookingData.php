@@ -1011,6 +1011,32 @@ class HotelCartBookingData extends ObjectModel
                     false,
                     1
                 );
+                $cart_detail_data[$key]['additional_services_auto_add_with_room_price'] = $objRoomTypeServiceProductCartDetail->getServiceProductsTotalInCart(
+                    $id_cart,
+                    0,
+                    0,
+                    $value['id_product'],
+                    $value['date_from'],
+                    $value['date_to'],
+                    $value['id'],
+                    false,
+                    1,
+                    null,
+                    Product::PRICE_ADDITION_TYPE_WITH_ROOM
+                );
+                $cart_detail_data[$key]['additional_services_auto_add_independent_price'] = $objRoomTypeServiceProductCartDetail->getServiceProductsTotalInCart(
+                    $id_cart,
+                    0,
+                    0,
+                    $value['id_product'],
+                    $value['date_from'],
+                    $value['date_to'],
+                    $value['id'],
+                    false,
+                    1,
+                    null,
+                    Product::PRICE_ADDITION_TYPE_INDEPENDENT
+                );
                 // By webkul New way to calculate product prices with feature Prices
                 $roomTypeDateRangePrice = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice(
                     $value['id_product'],
