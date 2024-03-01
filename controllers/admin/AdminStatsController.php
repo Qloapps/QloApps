@@ -1748,14 +1748,9 @@ class AdminStatsControllerCore extends AdminStatsTabController
 
         $sql = 'SELECT COUNT(DISTINCT hbd.`id_room`)
         FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
-        LEFT JOIN `'._DB_PREFIX_.'htl_room_information` hri
-        ON (hri.`id` = hbd.`id_room`)
-        LEFT JOIN `'._DB_PREFIX_.'product` p
-        ON (p.`id_product` = hri.`id_product`)
-        WHERE p.`active` = 1
-        AND hbd.`is_refunded` = 0
+        WHERE hbd.`is_refunded` = 0
         AND hbd.`is_cancelled` = 0
-        AND hbd.`id_status` != '.(int) HotelBookingDetail::STATUS_CHECKED_IN.'
+        AND hbd.`id_status` = '.(int) HotelBookingDetail::STATUS_ALLOTED.'
         AND hbd.`date_from` = "'.pSQL($dateToday).' 00:00:00"'.
         (!is_null($idHotel) ? HotelBranchInformation::addHotelRestriction($idHotel, 'hbd') : '');
         $result = Db::getInstance()->getValue($sql);
