@@ -30,6 +30,22 @@ class AdminSearchControllerCore extends AdminController
     {
         $this->bootstrap = true;
         parent::__construct();
+        $this->controllers = array(
+            'AdminProducts' => 1,
+            'AdminCategories' => 1,
+            'AdminFeatures' => 1,
+            'AdminOrders' => 1,
+            'AdminOrderRefundRules' => 1,
+            'AdminRoomTypeGlobalDemand' => 1,
+            'AdminGroups' => 1,
+            'AdminHotelFeatures' => 1,
+            'AdminCustomers' => 1,
+            'AdminAddHotel' => 1,
+            'AdminNormalProducts' => 1,
+            'AdminAddresses' => 1,
+            'AdminCustomerThreads' => 1,
+            'AdminModules' => 1
+        );
     }
 
     public function postProcess()
@@ -39,6 +55,10 @@ class AdminSearchControllerCore extends AdminController
         $searchType = (int)Tools::getValue('bo_search_type');
         /* Handle empty search field */
         if (!empty($this->query)) {
+            if ($this->context->employee->id_profile != _PS_ADMIN_PROFILE_) {
+                $this->setControllerAccesses();
+            }
+
             if (!$searchType && strlen($this->query) > 1) {
                 $this->searchFeatures();
             }
@@ -76,6 +96,10 @@ class AdminSearchControllerCore extends AdminController
 
                 if ($searchType == 6) {
                     $this->searchIP();
+                }
+
+                if (isset($this->_list['customers']) && is_array($this->_list['customers']) && count($this->_list['customers'])) {
+                    $this->addHotelRestrictionsToSearchedCustomers('customers');
                 }
             }
 
@@ -175,6 +199,21 @@ class AdminSearchControllerCore extends AdminController
         $this->display = 'view';
     }
 
+    public function setControllerAccesses()
+    {
+        $sql = 'SELECT a.`view`, t.`class_name` FROM `'._DB_PREFIX_.'access` a
+            LEFT JOIN `'._DB_PREFIX_.'tab` t ON (t.`id_tab` = a.`id_tab`)
+            WHERE t.`class_name` IN ("'.implode('", "', array_keys($this->controllers)).'")
+            AND a.`id_profile` = '.(int) $this->context->employee->id_profile.'
+        ';
+
+        if ($tabs = Db::getInstance()->executeS($sql)) {
+            foreach ($tabs as $tab) {
+                $this->controllers[$tab['class_name']] = $tab['view'];
+            }
+        }
+    }
+
     public function searchIP()
     {
         if (!ip2long(trim($this->query))) {
@@ -191,7 +230,10 @@ class AdminSearchControllerCore extends AdminController
     */
     public function searchCatalog()
     {
-        if ($this->_list['products'] = Product::searchByName($this->context->language->id, $this->query)) {
+        if (isset($this->controllers['AdminProducts'])
+            && $this->controllers['AdminProducts']
+            && ($this->_list['products'] = Product::searchByName($this->context->language->id, $this->query))
+        ) {
             $objRoomType = new HotelRoomType();
             $accessableHotels = HotelBranchInformation::getProfileAccessedHotels($this->context->employee->id_profile, 1, 1);
             $objRoomTypeServiceProduct = new RoomTypeServiceProduct();
@@ -218,8 +260,13 @@ class AdminSearchControllerCore extends AdminController
             }
         }
 
-        $this->_list['categories'] = Category::searchByName($this->context->language->id, $this->query);
-        $this->_list['catalog_features'] = Feature::searchByName($this->query, $this->context->language->id);
+        if (isset($this->controllers['AdminCategories']) && $this->controllers['AdminCategories']) {
+            $this->_list['categories'] = Category::searchByName($this->context->language->id, $this->query);
+        }
+
+        if (isset($this->controllers['AdminFeatures']) && $this->controllers['AdminFeatures']) {
+            $this->_list['catalog_features'] = Feature::searchByName($this->query, $this->context->language->id);
+        }
     }
 
     /**
@@ -229,34 +276,41 @@ class AdminSearchControllerCore extends AdminController
     */
     public function searchCustomer()
     {
-        if ($this->_list['customers'] = Customer::searchByName($this->query)) {
-            $this->addHotelRestrictionsToSearchedCustomers('customers');
+
+        if (isset($this->controllers['AdminCustomers'])
+            && $this->controllers['AdminCustomers']
+        ) {
+            $this->_list['customers'] = Customer::searchByName($this->query);
         }
 
         $objGroup = new Group();
-        $this->_list['groups'] = $objGroup->getRelatedGroups($this->query);
+        if (isset($this->controllers['AdminGroups']) && $this->controllers['AdminGroups']) {
+            $this->_list['groups'] = $objGroup->getRelatedGroups($this->query);
+        }
     }
 
     public function searchModule()
     {
-        $this->_list['modules'] = array();
-        $all_modules = Module::getModulesOnDisk(true, true, Context::getContext()->employee->id);
-        foreach ($all_modules as $module) {
-            if (stripos($module->name, $this->query) !== false || stripos($module->displayName, $this->query) !== false || stripos($module->description, $this->query) !== false) {
-                $module->linkto = 'index.php?tab=AdminModules&tab_module='.$module->tab.'&module_name='.$module->name.'&anchor='.ucfirst($module->name).'&token='.Tools::getAdminTokenLite('AdminModules');
-                $this->_list['modules'][] = $module;
+        if (isset($this->controllers['AdminModules']) && $this->controllers['AdminModules']) {
+            $this->_list['modules'] = array();
+            $all_modules = Module::getModulesOnDisk(true, true, Context::getContext()->employee->id);
+            foreach ($all_modules as $module) {
+                if (stripos($module->name, $this->query) !== false || stripos($module->displayName, $this->query) !== false || stripos($module->description, $this->query) !== false) {
+                    $module->linkto = 'index.php?tab=AdminModules&tab_module='.$module->tab.'&module_name='.$module->name.'&anchor='.ucfirst($module->name).'&token='.Tools::getAdminTokenLite('AdminModules');
+                    $this->_list['modules'][] = $module;
+                }
             }
-        }
 
-        if (!is_numeric(trim($this->query)) && !Validate::isEmail($this->query)) {
-            $iso_lang = Tools::strtolower(Context::getContext()->language->iso_code);
-            $iso_country = Tools::strtolower(Country::getIsoById(Configuration::get('PS_COUNTRY_DEFAULT')));
-            if (($json_content = Tools::file_get_contents('https://api-addons.prestashop.com/'._PS_VERSION_.'/search/'.urlencode($this->query).'/'.$iso_country.'/'.$iso_lang.'/')) != false) {
-                $results = json_decode($json_content, true);
-                if (isset($results['id'])) {
-                    $this->_list['addons']  = array($results);
-                } else {
-                    $this->_list['addons']  =  $results;
+            if (!is_numeric(trim($this->query)) && !Validate::isEmail($this->query)) {
+                $iso_lang = Tools::strtolower(Context::getContext()->language->iso_code);
+                $iso_country = Tools::strtolower(Country::getIsoById(Configuration::get('PS_COUNTRY_DEFAULT')));
+                if (($json_content = Tools::file_get_contents('https://api-addons.prestashop.com/'._PS_VERSION_.'/search/'.urlencode($this->query).'/'.$iso_country.'/'.$iso_lang.'/')) != false) {
+                    $results = json_decode($json_content, true);
+                    if (isset($results['id'])) {
+                        $this->_list['addons']  = array($results);
+                    } else {
+                        $this->_list['addons']  =  $results;
+                    }
                 }
             }
         }
@@ -323,21 +377,28 @@ class AdminSearchControllerCore extends AdminController
     public function searchHotel()
     {
         if (class_exists('HotelBranchInformation')) {
-            $objHotelBranchInformation = new HotelBranchInformation();
-            $this->_list['hotels'] = $objHotelBranchInformation->getAccessibleHotelByName($this->query);
+            if (isset($this->controllers['AdminAddHotel']) && $this->controllers['AdminAddHotel']) {
+                $objHotelBranchInformation = new HotelBranchInformation();
+                $this->_list['hotels'] = $objHotelBranchInformation->getAccessibleHotelByName($this->query);
+            }
         }
     }
 
     public function searchOrderMessages()
     {
         if (class_exists('CustomerMessage')) {
-            $objCustomerMessage = new CustomerMessage();
-            if ($this->_list['order_messages'] = $objCustomerMessage->searchCustomerMessage($this->query)) {
-                $accesibleHotels = HotelBranchInformation::getProfileAccessedHotels($this->context->employee->id_profile, 1, 1);
-                foreach ($this->_list['order_messages'] as $key => $msg) {
-                    $idHotel = HotelBookingDetail::getIdHotelByIdOrder($msg['id_order']);
-                    if (!in_array($idHotel, $accesibleHotels)) {
-                        unset($this->_list['order_messages'][$key]);
+            if (isset($this->controllers['AdminCustomerThreads']) && $this->controllers['AdminCustomerThreads']) {
+                $objCustomerMessage = new CustomerMessage();
+                if ($this->_list['order_messages'] = $objCustomerMessage->searchCustomerMessage($this->query)) {
+                    $accesibleHotels = HotelBranchInformation::getProfileAccessedHotels($this->context->employee->id_profile, 1, 1);
+                    foreach ($this->_list['order_messages'] as $key => $msg) {
+                        if ($msg['id_order']) {
+                            // To set set restriction on the messages belonging to an order. While the other messages will be show to all
+                            $idHotel = HotelBookingDetail::getIdHotelByIdOrder($msg['id_order']);
+                            if (!in_array($idHotel, $accesibleHotels)) {
+                                unset($this->_list['order_messages'][$key]);
+                            }
+                        }
                     }
                 }
             }
@@ -346,28 +407,32 @@ class AdminSearchControllerCore extends AdminController
 
     public function searchAddress()
     {
-        $objAddress = new Address();
-        if ($this->_list['customer_address'] = $objAddress->getCustomersAddresses($this->query)) {
-            $this->addHotelRestrictionsToSearchedCustomers('customer_address');
+        if (isset($this->controllers['AdminAddresses']) && $this->controllers['AdminAddresses']) {
+            $objAddress = new Address();
+            if ($this->_list['customer_address'] = $objAddress->getCustomersAddresses($this->query)) {
+                $this->addHotelRestrictionsToSearchedCustomers('customer_address');
+            }
         }
     }
 
     public function searchHotelFeatures()
     {
         if (class_exists('HotelFeatures')) {
-            $objHotelFeatures = new HotelFeatures();
-            if ($hotelFeatures = $objHotelFeatures->searchHotelFeatureByName($this->query)) {
-                $features = array();
-                foreach ($hotelFeatures as $key => $hotelFeature) {
-                    $features[$hotelFeature['id']]['name'] = $hotelFeature['name'];
-                    if ($hotelFeature['parent_feature_id']) {
-                        $features[$hotelFeature['id']]['id'] = $hotelFeature['parent_feature_id'];
-                    } else {
-                        $features[$hotelFeature['id']]['id'] = $hotelFeature['id'];
+            if (isset($this->controllers['AdminHotelFeatures']) && $this->controllers['AdminHotelFeatures']) {
+                $objHotelFeatures = new HotelFeatures();
+                if ($hotelFeatures = $objHotelFeatures->searchHotelFeatureByName($this->query)) {
+                    $features = array();
+                    foreach ($hotelFeatures as $key => $hotelFeature) {
+                        $features[$hotelFeature['id']]['name'] = $hotelFeature['name'];
+                        if ($hotelFeature['parent_feature_id']) {
+                            $features[$hotelFeature['id']]['id'] = $hotelFeature['parent_feature_id'];
+                        } else {
+                            $features[$hotelFeature['id']]['id'] = $hotelFeature['id'];
+                        }
                     }
-                }
 
-                $this->_list['hotel_features'] = $features;
+                    $this->_list['hotel_features'] = $features;
+                }
             }
         }
     }
@@ -375,43 +440,46 @@ class AdminSearchControllerCore extends AdminController
     public function searchAdditionalFacilities()
     {
         if (class_exists('HotelRoomTypeGlobalDemand')) {
-            $objHotelRoomTypeGlobalDemands = new HotelRoomTypeGlobalDemand();
-            if ($globalDemads = $objHotelRoomTypeGlobalDemands->searchRoomTypeDemandsByName($this->query)) {
-                foreach ($globalDemads as $key => $demand) {
-                    if (!(int) $globalDemads[$key]['price']) {
-                        $globalDemads[$key]['price'] = $globalDemads[$key]['option_price'];
+            if (isset($this->controllers['AdminRoomTypeGlobalDemand']) && $this->controllers['AdminRoomTypeGlobalDemand']) {
+                $objHotelRoomTypeGlobalDemands = new HotelRoomTypeGlobalDemand();
+                if ($globalDemads = $objHotelRoomTypeGlobalDemands->searchRoomTypeDemandsByName($this->query)) {
+                    foreach ($globalDemads as $key => $demand) {
+                        if (!(int) $globalDemads[$key]['price']) {
+                            $globalDemads[$key]['price'] = $globalDemads[$key]['option_price'];
+                        }
+
+                        $globalDemads[$key]['per_day_price_calc'] = $this->l('No');
+                        if ($globalDemads[$key]['price_calc_method'] == HotelRoomTypeGlobalDemand::WK_PRICE_CALC_METHOD_EACH_DAY) {
+                            $globalDemads[$key]['per_day_price_calc'] = $this->l('Yes');
+                        }
                     }
 
-                    $globalDemads[$key]['per_day_price_calc'] = $this->l('No');
-                    if ($globalDemads[$key]['price_calc_method'] == HotelRoomTypeGlobalDemand::WK_PRICE_CALC_METHOD_EACH_DAY) {
-                        $globalDemads[$key]['per_day_price_calc'] = $this->l('Yes');
-                    }
+                    $this->_list['global_demands'] = $globalDemads;
                 }
-
-                $this->_list['global_demands'] = $globalDemads;
             }
         }
-
     }
 
     public function searchRefundRules()
     {
         if (class_exists('HotelOrderRefundRules')) {
-            $objRefundRule = new HotelOrderRefundRules();
-            if ($refundRules = $objRefundRule->searchOrderRefundRulesByName($this->query)) {
-                foreach ($refundRules as $key => $rule) {
-                    $refundRules[$key]['deduction_type'] = $this->l('Percentage');
-                    if ($rule['payment_type'] == HotelOrderRefundRules::WK_REFUND_RULE_PAYMENT_TYPE_FIXED) {
-                        $refundRules[$key]['deduction_type'] = $this->l('Fixed Amount');
-                        $refundRules[$key]['deduction_value_full_pay'] = Tools::displayPrice($rule['deduction_value_full_pay']);
-                        $refundRules[$key]['deduction_value_adv_pay'] = Tools::displayPrice($rule['deduction_value_adv_pay']);
-                    } else if ($rule['payment_type'] == HotelOrderRefundRules::WK_REFUND_RULE_PAYMENT_TYPE_PERCENTAGE) {
-                        $refundRules[$key]['deduction_value_full_pay'] = $rule['deduction_value_full_pay'].' %';
-                        $refundRules[$key]['deduction_value_adv_pay'] = $rule['deduction_value_adv_pay'].' %';
+            if (isset($this->controllers['AdminOrderRefundRulesController']) && $this->controllers['AdminOrderRefundRulesController']) {
+                $objRefundRule = new HotelOrderRefundRules();
+                if ($refundRules = $objRefundRule->searchOrderRefundRulesByName($this->query)) {
+                    foreach ($refundRules as $key => $rule) {
+                        $refundRules[$key]['deduction_type'] = $this->l('Percentage');
+                        if ($rule['payment_type'] == HotelOrderRefundRules::WK_REFUND_RULE_PAYMENT_TYPE_FIXED) {
+                            $refundRules[$key]['deduction_type'] = $this->l('Fixed Amount');
+                            $refundRules[$key]['deduction_value_full_pay'] = Tools::displayPrice($rule['deduction_value_full_pay']);
+                            $refundRules[$key]['deduction_value_adv_pay'] = Tools::displayPrice($rule['deduction_value_adv_pay']);
+                        } else if ($rule['payment_type'] == HotelOrderRefundRules::WK_REFUND_RULE_PAYMENT_TYPE_PERCENTAGE) {
+                            $refundRules[$key]['deduction_value_full_pay'] = $rule['deduction_value_full_pay'].' %';
+                            $refundRules[$key]['deduction_value_adv_pay'] = $rule['deduction_value_adv_pay'].' %';
+                        }
                     }
-                }
 
-                $this->_list['refund_rules'] = $refundRules;
+                    $this->_list['refund_rules'] = $refundRules;
+                }
             }
         }
     }
@@ -660,7 +728,6 @@ class AdminSearchControllerCore extends AdminController
                 $helper->show_toolbar = false;
                 $helper->table = 'product';
                 $helper->currentIndex = $this->context->link->getAdminLink('AdminProducts', false);
-
                 $query = trim(Tools::getValue('bo_query'));
                 $searchType = (int)Tools::getValue('bo_search_type');
 
