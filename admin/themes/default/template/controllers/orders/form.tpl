@@ -675,21 +675,14 @@
 
 		$('#payment_amount').val(jsonSummary.summary.total_price);
 		if (jsonSummary.summary.is_advance_payment_active) {
-			$('#advance_payment_amount').html(formatCurrency(parseFloat(jsonSummary.summary.advance_payment_amount_ti), currency_format, currency_sign, currency_blank));
+			$('#advance_payment_amount').html(formatCurrency(parseFloat(jsonSummary.summary.advance_payment_amount_with_tax), currency_format, currency_sign, currency_blank));
 			$('#advance_payment_amount_block').show();
 		} else {
 			$('#advance_payment_amount_block').hide();
 		}
 
 		// toggle payment fields
-		let isFreeOrder = false;
-		if (jsonSummary.summary.is_advance_payment_active && jsonSummary.summary.advance_payment_amount_with_tax == 0) {
-			isFreeOrder = true;
-		} else if (jsonSummary.summary.total_price == 0) {
-			isFreeOrder = true;
-		}
-
-		if (isFreeOrder) {
+		if (jsonSummary.summary.total_price == 0) { // if free order
 			$('#send_email_to_customer, [name="is_full_payment"], #payment_amount, #payment_type, #payment_module_name, #payment_transaction_id').closest('.form-group').hide(200);
 		} else {
 			$('#send_email_to_customer, [name="is_full_payment"], #payment_amount, #payment_type, #payment_module_name, #payment_transaction_id').closest('.form-group').show(200);
@@ -1199,12 +1192,21 @@
 		}
 		$('#order_message').val(jsonSummary.order_message);
 		$('#payment_amount').siblings('.input-group-addon').html(currency_sign);
+		$('#payment_amount').val(jsonSummary.summary.total_price);
 		if (jsonSummary.summary.is_advance_payment_active) {
 			$('#advance_payment_amount').html(formatCurrency(parseFloat(jsonSummary.summary.advance_payment_amount_with_tax), currency_format, currency_sign, currency_blank));
 			$('#advance_payment_amount_block').show();
 		} else {
 			$('#advance_payment_amount_block').hide();
 		}
+
+		// toggle payment fields
+		if (jsonSummary.summary.total_price == 0) { // if free order
+			$('#send_email_to_customer, [name="is_full_payment"], #payment_amount, #payment_type, #payment_module_name, #payment_transaction_id').closest('.form-group').hide(200);
+		} else {
+			$('#send_email_to_customer, [name="is_full_payment"], #payment_amount, #payment_type, #payment_module_name, #payment_transaction_id').closest('.form-group').show(200);
+		}
+
 		resetBind();
 	}
 
@@ -1622,12 +1624,20 @@
 		$(document).on('change', 'input[name="is_full_payment"]', function() {
 			if (parseInt($('input[name="is_full_payment"]:checked').val())) {
 				$('#payment_amount').attr('disabled', true);
+
+				$('#payment_type, #payment_transaction_id').closest('.form-group').show(200);
 			} else {
 				$('#payment_amount').attr('disabled', false);
+
+				managePaymentOptions();
 			}
 		});
 
 		$(document).on('keyup', '#payment_amount', function() {
+			managePaymentOptions();
+		});
+
+		function managePaymentOptions() {
 			let paymentAmount = parseFloat($('#payment_amount').val().trim());
 
 			if (paymentAmount != 0) {
@@ -1635,7 +1645,7 @@
 			} else {
 				$('#payment_type, #payment_transaction_id').closest('.form-group').hide(200);
 			}
-		});
+		}
 
 		function updateServiceProducts(element)
 		{
@@ -2161,11 +2171,11 @@
 					<div class="col-lg-9">
 						<div class="input-group fixed-width-xxl">
 							<span class="input-group-addon">{$currency->sign}</span>
-							<input type="text" name="payment_amount" id="payment_amount" value="{if isset($smarty.post.payment_amount)}{$smarty.post.payment_amount}{elseif $is_full_payment}{$order_total}{/if}" {if $is_full_payment}disabled{/if} />
+							<input type="text" name="payment_amount" id="payment_amount" value="{if isset($smarty.post.payment_amount)}{$smarty.post.payment_amount|escape:'html':'UTF-8'}{elseif $is_full_payment}{$order_total}{/if}" {if $is_full_payment}disabled{/if} />
 						</div>
 						<p class="help-block" id="advance_payment_amount_block" {if isset($is_advance_payment_active) && $is_advance_payment_active}style="display: block;"{else}style="display: none;"{/if}>
 							<span>{l s='Advance payment amount: '}</span>
-							<span id="advance_payment_amount">{displayPrice price=$advance_payment_amount_ti currency=$currency->id}</span>
+							<span id="advance_payment_amount">{displayPrice price=$advance_payment_amount_with_tax currency=$currency->id}</span>
 						</p>
 					</div>
 				</div>
@@ -2184,7 +2194,7 @@
 				<div class="form-group" {if $order_total <= 0}style="display: none;"{/if}>
 					<label class="control-label col-lg-3 required">{l s='Payment method'}</label>
 					<div class="col-lg-9">
-						<input name="payment_module_name" id="payment_module_name" list="payment_module_name_list" class="form-control fixed-width-xxl" {if isset($smarty.post.payment_module_name) && $smarty.post.payment_module_name}value="{$smarty.post.payment_module_name}"{/if}>
+						<input name="payment_module_name" id="payment_module_name" list="payment_module_name_list" class="form-control fixed-width-xxl" {if isset($smarty.post.payment_module_name) && $smarty.post.payment_module_name}value="{$smarty.post.payment_module_name|escape:'html':'UTF-8'}"{/if}>
 						<datalist id="payment_module_name_list">
 							{if $PS_CATALOG_MODE}
 								<option value="{l s='Back office order'}" data-name="{l s='Back office order'}" data-payment-type="{OrderPayment::PAYMENT_TYPE_PAY_AT_HOTEL}">
@@ -2193,6 +2203,7 @@
 								<option value="{$payment_module->displayName}" data-name="{$payment_module->name}" data-payment-type="{$payment_module->payment_type}">
 							{/foreach}
 						</datalist>
+						<p class="help-block">{l s='Select or type the payment method using which booking will be created.'}</p>
 					</div>
 				</div>
 				<div class="form-group" {if $order_total <= 0}style="display: none;"{/if}>

@@ -280,8 +280,10 @@ class AdminOrdersControllerCore extends AdminController
         }
 
         // check page is whether ad new order page or order detail page
-        if (isset($_GET['addorder'])) {
-            $id_cart = Tools::getValue('cart_id');//get cart id from url
+        if ((Tools::isSubmit('addorder') && ($id_cart = Tools::getValue('cart_id')))
+            || (Tools::isSubmit('submitAddOrder') && ($id_cart = Tools::getValue('id_cart')))
+        ) {
+            // set smarty variables if new order creation process has errors
             $cart = new Cart($id_cart);
             $cart_order_exists = $cart->orderExists();
             if (!$cart_order_exists) {
@@ -306,8 +308,8 @@ class AdminOrdersControllerCore extends AdminController
                 $this->context->smarty->assign(array(
                     'order_total' => $cart->getOrderTotal(true),
                     'is_advance_payment_active' => $objHotelAdvancedPayment->isAdvancePaymentAvailableForCurrentCart(),
-                    'advance_payment_amount_te' => $cart->getOrderTotal(false, Cart::ADVANCE_PAYMENT),
-                    'advance_payment_amount_ti' => $cart->getOrderTotal(true, Cart::ADVANCE_PAYMENT),
+                    'advance_payment_amount_without_tax' => $cart->getOrderTotal(false, Cart::ADVANCE_PAYMENT),
+                    'advance_payment_amount_with_tax' => $cart->getOrderTotal(true, Cart::ADVANCE_PAYMENT),
                 ));
 
                 if (empty($cart_detail_data) && empty($normalCartProduct)) {
