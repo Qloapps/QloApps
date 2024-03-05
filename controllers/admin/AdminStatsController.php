@@ -859,7 +859,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
                 break;
 
             case 'offline_bookable_rooms':
-                $value = AdminStatsController::getAvailableRoomsForDiscreteDates(date('Y-m-d'));
+                $value = AdminStatsController::getAvailableRoomsForDiscreteDates(date('Y-m-d'), null, 0);
                 $value = $value[strtotime(date('Y-m-d'))];
 
                 break;
