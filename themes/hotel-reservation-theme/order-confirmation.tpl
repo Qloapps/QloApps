@@ -299,7 +299,7 @@
 									<strong>{l s='Total extra services cost'} {if $use_tax}{l s='(tax incl.)'}{/if}</strong>
 								</td>
 								<td colspan="2">
-									<span>{displayWtPriceWithCurrency price=$orderTotalInfo['total_services_ti'] currency=$currency convert=1}</span>
+									<span>{displayWtPriceWithCurrency price=$orderTotalInfo['total_services_ti'] currency=$objCurrency convert=1}</span>
 								</td>
 							</tr>
 						{/if} *}
@@ -322,9 +322,9 @@
 								</td>
 								<td colspan="2">
 									{if $priceDisplay && $use_tax}
-										<span class="price-discount">{displayWtPriceWithCurrency price=($orderTotalInfo['total_discounts_te'] * -1) currency=$currency convert=1}</span>
+										<span class="price-discount">{displayWtPriceWithCurrency price=($orderTotalInfo['total_discounts_te'] * -1) currency=$objCurrency convert=1}</span>
 									{else}
-										<span class="price-discount">{displayWtPriceWithCurrency price=($orderTotalInfo['total_discounts'] * -1) currency=$currency convert=1}</span>
+										<span class="price-discount">{displayWtPriceWithCurrency price=($orderTotalInfo['total_discounts'] * -1) currency=$objCurrency convert=1}</span>
 									{/if}
 								</td>
 							</tr>
@@ -356,7 +356,7 @@
 								<strong>{l s='Total Tax'}</strong>
 							</td>
 							<td colspan="2">
-								<span class="price-discount">{displayWtPriceWithCurrency price=$orderTotalInfo['total_tax'] currency=$currency convert=1}</span>
+								<span class="price-discount">{displayWtPriceWithCurrency price=$orderTotalInfo['total_tax'] currency=$objCurrency convert=1}</span>
 							</td>
 						</tr>
 						<tr class="totalprice item">
