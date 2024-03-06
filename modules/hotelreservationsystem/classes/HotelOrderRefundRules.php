@@ -267,4 +267,21 @@ class HotelOrderRefundRules extends ObjectModel
         return array();
 
     }
+
+    public function searchOrderRefundRulesByName($name, $idLang = false)
+    {
+
+        if (!$idLang) {
+            $idLang = Context::getContext()->language->id;
+        }
+
+        return Db::getInstance()->executeS(
+            'SELECT horr.*, horrl.* FROM `'._DB_PREFIX_.'htl_order_refund_rules` horr
+            LEFT JOIN `'._DB_PREFIX_.'htl_order_refund_rules_lang` horrl
+            ON horrl.`id_refund_rule` = horr.`id_refund_rule`
+            WHERE (horrl.`name` LIKE \'%'.pSQL($name).'%\' OR horrl.`description` LIKE \'%'.pSQL($name).'%\')
+            AND `id_lang`='.(int)$idLang
+        );
+    }
+
 }

@@ -482,4 +482,20 @@ class AddressCore extends ObjectModel
         }
         return array();
     }
+
+    public function getCustomersAddresses($text)
+    {
+        return Db::getInstance()->executeS(
+            'SELECT * FROM `'._DB_PREFIX_.'address`
+            WHERE id_customer > 0 AND
+                (address1 LIKE \'%'.$text.'%\' OR
+                    postcode LIKE \'%'.$text.'%\' OR
+                    city LIKE \'%'.$text.'%\' OR
+                    phone LIKE \'%'.$text.'%\' OR
+                    company LIKE \'%'.$text.'%\' OR
+                    alias LIKE \'%'.$text.'%\'
+                )
+        ');
+    }
+
 }

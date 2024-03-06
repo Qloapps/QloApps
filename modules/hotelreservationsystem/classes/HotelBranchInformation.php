@@ -1027,4 +1027,22 @@ class HotelBranchInformation extends ObjectModel
 
         return false;
     }
+
+    public function getAccessibleHotelByName($name)
+    {
+        $context = Context::getContext();
+        $idLang = $context->language->id;
+        $sql = ' SELECT a.`id`, a.`active`, hbl.`hotel_name`, aa.`city`, s.`name` as `state_name`, cl.`name` as `country_name`
+            FROM `'._DB_PREFIX_.'htl_branch_info` a
+            LEFT JOIN  `'._DB_PREFIX_.'htl_branch_info_lang` hbl ON hbl.`id` = a.`id` AND hbl.`id_lang` = '.(int)$idLang.'
+            LEFT JOIN  `'._DB_PREFIX_.'address` aa ON aa.`id_hotel` = a.`id`
+            LEFT JOIN `'._DB_PREFIX_.'state` s ON s.`id_state` = aa.`id_state`
+            LEFT JOIN `'._DB_PREFIX_.'country_lang` cl ON cl.`id_country` = aa.`id_country` AND cl.`id_lang` = hbl.`id_lang`
+            LEFT JOIN `'._DB_PREFIX_.'htl_access` ha ON a.`id` = ha.`id_hotel`
+            WHERE hbl.`hotel_name` LIKE \'%'.pSQL($name).'%\'
+            AND ha.`access`=1 AND ha.`id_profile` = '.(int)$context->employee->id_profile;
+
+        return Db::getInstance()->executeS($sql);
+    }
+
 }
