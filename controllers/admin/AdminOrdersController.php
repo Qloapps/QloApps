@@ -5073,57 +5073,71 @@ class AdminOrdersControllerCore extends AdminController
                         $roomInfo = $objHotelRoomType->getRoomTypeInfoByIdProduct($objHotelBookingDetail->id_product);
                         $totalPriceChangeTaxExcl = 0;
                         $totalPriceChangeTaxIncl = 0;
+                        $unitPriceTaxIncl = 0;
+                        $unitPriceTaxExcl = 0;
                         foreach ($productList as &$product) {
-                            $totalPriceChangeTaxExcl += $totalPriceTaxExcl = $objRoomTypeServiceProductPrice->getServicePrice(
-                                (int)$product['id_product'],
-                                $roomInfo['id'],
-                                $product['cart_quantity'],
-                                $objHotelBookingDetail->date_from,
-                                $objHotelBookingDetail->date_to,
-                                false
-                            );
-                            $totalPriceChangeTaxIncl += $totalPriceTaxIncl = $objRoomTypeServiceProductPrice->getServicePrice(
-                                (int)$product['id_product'],
-                                $roomInfo['id'],
-                                $product['cart_quantity'],
-                                $objHotelBookingDetail->date_from,
-                                $objHotelBookingDetail->date_to,
-                                true
-                            );
-                            $unitPriceTaxExcl = $objRoomTypeServiceProductPrice->getServicePrice(
-                                (int)$product['id_product'],
-                                $roomInfo['id'],
-                                1,
-                                $objHotelBookingDetail->date_from,
-                                $objHotelBookingDetail->date_to,
-                                false
-                            );
-                            $unitPriceTaxIncl = $objRoomTypeServiceProductPrice->getServicePrice(
-                                (int)$product['id_product'],
-                                $roomInfo['id'],
-                                1,
-                                $objHotelBookingDetail->date_from,
-                                $objHotelBookingDetail->date_to,
-                                true
-                            );
-                            switch (Configuration::get('PS_ROUND_TYPE')) {
-                                case Order::ROUND_TOTAL:
-                                    $product['total'] = $totalPriceTaxExcl;
-                                    $product['total_wt'] = $totalPriceTaxIncl;
-                                    break;
-                                case Order::ROUND_LINE:
-                                    $product['total'] = Tools::ps_round($totalPriceTaxExcl, _PS_PRICE_COMPUTE_PRECISION_);
-                                    $product['total_wt'] = Tools::ps_round($totalPriceTaxIncl, _PS_PRICE_COMPUTE_PRECISION_);
-                                    break;
+                            // This is used to get the actual quanity of the service as it is calculated incorrectly if the service is per night
+                            if ($id_room_type_service_product_cart_detail = $objRoomTypeServiceProductCartDetail->alreadyExists(
+                                $service['id'],
+                                $cart->id,
+                                $roomHtlCartInfo['id'])
+                            ) {
+                                $objRoomTypeServiceProductCartDetail = new RoomTypeServiceProductCartDetail((int) $id_room_type_service_product_cart_detail);
+                                $product['cart_quantity'] = $objRoomTypeServiceProductCartDetail->quantity;
+                                $totalPriceChangeTaxExcl += $totalPriceTaxExcl = $objRoomTypeServiceProductPrice->getServicePrice(
+                                    (int)$product['id_product'],
+                                    $roomInfo['id'],
+                                    $product['cart_quantity'],
+                                    $objHotelBookingDetail->date_from,
+                                    $objHotelBookingDetail->date_to,
+                                    false
+                                );
+                                $totalPriceChangeTaxIncl += $totalPriceTaxIncl = $objRoomTypeServiceProductPrice->getServicePrice(
+                                    (int)$product['id_product'],
+                                    $roomInfo['id'],
+                                    $product['cart_quantity'],
+                                    $objHotelBookingDetail->date_from,
+                                    $objHotelBookingDetail->date_to,
+                                    true
+                                );
+                                $numDays = 1;
+                                if (Product::getProductPriceCalculation($product['id_product']) == Product::PRICE_CALCULATION_METHOD_PER_DAY) {
+                                    $numDays = HotelHelper::getNumberOfDays($objHotelBookingDetail->date_from, $objHotelBookingDetail->date_to);
+                                }
 
-                                case Order::ROUND_ITEM:
-                                default:
-                                    $product['total'] = Tools::ps_round($totalPriceTaxExcl, _PS_PRICE_COMPUTE_PRECISION_) * (int)$product['cart_quantity'];
-                                    $product['total_wt'] = Tools::ps_round($totalPriceTaxIncl, _PS_PRICE_COMPUTE_PRECISION_) * (int)$product['cart_quantity'];
-                                    break;
+                                $unitPriceTaxExcl = $objRoomTypeServiceProductPrice->getServicePrice(
+                                    (int)$product['id_product'],
+                                    $roomInfo['id'],
+                                    1,
+                                    $objHotelBookingDetail->date_from,
+                                    $objHotelBookingDetail->date_to,
+                                    false
+                                )/ $numDays;
+                                $unitPriceTaxIncl = $objRoomTypeServiceProductPrice->getServicePrice(
+                                    (int)$product['id_product'],
+                                    $roomInfo['id'],
+                                    1,
+                                    $objHotelBookingDetail->date_from,
+                                    $objHotelBookingDetail->date_to,
+                                    true
+                                )/ $numDays;
+                                switch (Configuration::get('PS_ROUND_TYPE')) {
+                                    case Order::ROUND_TOTAL:
+                                        $product['total'] = $totalPriceTaxExcl;
+                                        $product['total_wt'] = $totalPriceTaxIncl;
+                                        break;
+                                    case Order::ROUND_LINE:
+                                        $product['total'] = Tools::ps_round($totalPriceTaxExcl, _PS_PRICE_COMPUTE_PRECISION_);
+                                        $product['total_wt'] = Tools::ps_round($totalPriceTaxIncl, _PS_PRICE_COMPUTE_PRECISION_);
+                                        break;
+
+                                    case Order::ROUND_ITEM:
+                                    default:
+                                        $product['total'] = Tools::ps_round($totalPriceTaxExcl, _PS_PRICE_COMPUTE_PRECISION_);
+                                        $product['total_wt'] = Tools::ps_round($totalPriceTaxIncl, _PS_PRICE_COMPUTE_PRECISION_);
+                                        break;
+                                }
                             }
-
-
                         }
 
                         $order_detail = new OrderDetail();
