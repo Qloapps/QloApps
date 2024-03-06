@@ -462,7 +462,7 @@ class OrderDetailControllerCore extends FrontController
 
                 unset($carrier, $addressInvoice, $addressDelivery);
             } else {
-                $this->errors[] = Tools::displayError('This order cannot be found.');
+                $this->errors[] = Tools::displayError('The booking cannot be found.');
             }
             unset($order);
         }

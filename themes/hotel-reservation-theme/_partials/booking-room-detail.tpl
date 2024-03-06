@@ -33,82 +33,84 @@
                 </div>
                 <div class="col-xs-12">
                     <div class="description-list">
-                        <dl class="row">
-                            <dt class="col-xs-6 col-sm-3">{l s='Check-in'}</dt>
-                            <dd class="col-xs-6 col-sm-3">{$rm_v.data_form|date_format:'D'}, {dateFormat date=$rm_v.data_form}</dd>
+                        <dl class="">
+                            <div class="row">
+                                <dt class="col-xs-6 col-sm-3">{l s='Check-in'}</dt>
+                                <dd class="col-xs-6 col-sm-3">{$rm_v.data_form|date_format:'D'}, {dateFormat date=$rm_v.data_form}</dd>
+                                <dt class="col-xs-6 col-sm-3">{l s='Check-out'}</dt>
+                                <dd class="col-xs-6 col-sm-3">{$rm_v.data_to|date_format:'D'}, {dateFormat date=$rm_v.data_form}</dd>
+                            </div>
 
-                            <dt class="col-xs-6 col-sm-3">{l s='Check-out'}</dt>
-                            <dd class="col-xs-6 col-sm-3">{$rm_v.data_to|date_format:'D'}, {dateFormat date=$rm_v.data_form}</dd>
+                            <div class="row">
+                                <dt class="col-xs-6 col-sm-3">{l s='Guests'}</dt>
+                                <dd class="col-xs-6 col-sm-3">
+                                    {$rm_v.adults|string_format:'%02d'} {if $rm_v.adults > 1}{l s='Adults'}{else}{l s='Adult'}{/if}{if $rm_v.children}, {$rm_v.children|string_format:'%02d'} {if $rm_v.children > 1}{l s='Children'}{else}{l s='Child'}{/if}{/if}
+                                </dd>
+                                <dt class="col-xs-6 col-sm-3">{l s='Rooms'}</dt>
+                                <dd class="col-xs-6 col-sm-3">{$rm_v.num_rm|string_format:'%02d'}</dd>
+                            </div>
 
-                            <dt class="col-xs-6 col-sm-3">{l s='Room Capacity'}</dt>
-                            <dd class="col-xs-6 col-sm-3">
-                                {$rm_v.adults|string_format:'%02d'} {if $rm_v.adults > 1}{l s='Adults'}{else}{l s='Adult'}{/if}{if $rm_v.children}, {$rm_v.children|string_format:'%02d'} {if $rm_v.children > 1}{l s='Children'}{else}{l s='Child'}{/if}{/if}
-                            </dd>
-
-                            <dt class="col-xs-6 col-sm-3">{l s='Room(s)'}</dt>
-                            <dd class="col-xs-6 col-sm-3">{$rm_v.num_rm|string_format:'%02d'}</dd>
-
-                            <dt class="col-xs-6 col-sm-3">{l s='Extra Services'}</dt>
-                            <dd class="col-xs-6 col-sm-3">
-                                {if (isset($rm_v.extra_demands) && $rm_v.extra_demands) || isset($rm_v.additional_services) && $rm_v.additional_services}
-                                    <a data-date_from="{$rm_v.data_form}" data-date_to="{$rm_v.data_to}" data-id_product="{$data_v.id_product}" data-id_order="{$order->id}" data-action="{$link->getPageLink({$page_name})}" class="btn-view-extra-services" href="#rooms_type_extra_services_form">
+                            <div class="row">
+                                <dt class="col-xs-6 col-sm-3">{l s='Extra Services'}</dt>
+                                <dd class="col-xs-6 col-sm-3">
+                                    {if (isset($rm_v.extra_demands) && $rm_v.extra_demands) || isset($rm_v.additional_services) && $rm_v.additional_services}
+                                        <a data-date_from="{$rm_v.data_form}" data-date_to="{$rm_v.data_to}" data-id_product="{$data_v.id_product}" data-id_order="{$order->id}" data-action="{$link->getPageLink({$page_name})}" class="btn-view-extra-services" href="#rooms_type_extra_services_form">
+                                        {/if}
+                                        {if $group_use_tax}
+                                            {displayWtPriceWithCurrency price=($rm_v.extra_demands_price_ti + $rm_v.additional_services_price_ti)  currency=$currency}
+                                        {else}
+                                            {displayWtPriceWithCurrency price=($rm_v.extra_demands_price_te + $rm_v.additional_services_price_te) currency=$currency}
+                                        {/if}
+                                        {if (isset($rm_v.extra_demands) && $rm_v.extra_demands) || isset($rm_v.additional_services) && $rm_v.additional_services}
+                                        </a>
                                     {/if}
+                                </dd>
+                                <dt class="col-xs-6 col-sm-3">{l s='Total'}</dt>
+                                <dd class="col-xs-6 col-sm-3">
                                     {if $group_use_tax}
-                                        {displayWtPriceWithCurrency price=($rm_v.extra_demands_price_ti + $rm_v.additional_services_price_ti)  currency=$currency}
+                                        {displayWtPriceWithCurrency price=($rm_v.amount_tax_incl + $rm_v.extra_demands_price_ti + $rm_v.additional_services_price_ti + $rm_v.additional_services_price_auto_add_ti) currency=$currency}
                                     {else}
-                                        {displayWtPriceWithCurrency price=($rm_v.extra_demands_price_te + $rm_v.additional_services_price_te) currency=$currency}
+                                        {displayWtPriceWithCurrency price=($rm_v.amount_tax_excl + $rm_v.extra_demands_price_te + $rm_v.additional_services_price_te + $rm_v.additional_services_price_auto_add_te) currency=$currency}
                                     {/if}
                                     {if (isset($rm_v.extra_demands) && $rm_v.extra_demands) || isset($rm_v.additional_services) && $rm_v.additional_services}
-                                    </a>
-                                {/if}
-                            </dd>
-
-                            <dt class="col-xs-6 col-sm-3">{l s='Total'}</dt>
-                            <dd class="col-xs-6 col-sm-3">
-                                {if $group_use_tax}
-                                    {displayWtPriceWithCurrency price=($rm_v.amount_tax_incl + $rm_v.extra_demands_price_ti + $rm_v.additional_services_price_ti + $rm_v.additional_services_price_auto_add_ti) currency=$currency}
-                                {else}
-                                    {displayWtPriceWithCurrency price=($rm_v.amount_tax_excl + $rm_v.extra_demands_price_te + $rm_v.additional_services_price_te + $rm_v.additional_services_price_auto_add_te) currency=$currency}
-                                {/if}
-
-                                {if (isset($rm_v.extra_demands) && $rm_v.extra_demands) || isset($rm_v.additional_services) && $rm_v.additional_services}
-                                    <span class="order-price-info">
-                                        <img src="{$img_dir}icon/icon-info.svg" />
-                                    </span>
-                                    <div class="price-info-container" style="display: none;">
-                                        <div class="price-info-tooltip-cont">
-                                            <div class="list-row">
-                                                <div>
-                                                    <p>{l s='Room(s) cost:'}</p>
+                                        <span class="order-price-info">
+                                            <img src="{$img_dir}icon/icon-info.svg" />
+                                        </span>
+                                        <div class="price-info-container" style="display: none;">
+                                            <div class="price-info-tooltip-cont">
+                                                <div class="list-row">
+                                                    <div>
+                                                        <p>{l s='Room(s) cost:'}</p>
+                                                    </div>
+                                                    <div class="text-right">
+                                                        <p>
+                                                            {if $group_use_tax}
+                                                                {displayWtPriceWithCurrency price=($rm_v.amount_tax_incl + $rm_v.additional_services_price_auto_add_ti) currency=$currency}
+                                                            {else}
+                                                                {displayWtPriceWithCurrency price=($rm_v.amount_tax_excl + $rm_v.additional_services_price_auto_add_te) currency=$currency}
+                                                            {/if}
+                                                        </p>
+                                                    </div>
                                                 </div>
-                                                <div class="text-right">
-                                                    <p>
-                                                        {if $group_use_tax}
-                                                            {displayWtPriceWithCurrency price=($rm_v.amount_tax_incl + $rm_v.additional_services_price_auto_add_ti) currency=$currency}
-                                                        {else}
-                                                            {displayWtPriceWithCurrency price=($rm_v.amount_tax_excl + $rm_v.additional_services_price_auto_add_te) currency=$currency}
-                                                        {/if}
-                                                    </p>
-                                                </div>
-                                            </div>
-                                            <div class="list-row">
-                                                <div>
-                                                    <p>{l s='Service(s) cost:'}</p>
-                                                </div>
-                                                <div class="text-right">
-                                                    <p>
-                                                        {if $group_use_tax}
-                                                            {displayWtPriceWithCurrency price=($rm_v.extra_demands_price_ti + $rm_v.additional_services_price_ti)  currency=$currency}
-                                                        {else}
-                                                            {displayWtPriceWithCurrency price=($rm_v.extra_demands_price_te + $rm_v.additional_services_price_te) currency=$currency}
-                                                        {/if}
-                                                    </p>
+                                                <div class="list-row">
+                                                    <div>
+                                                        <p>{l s='Service(s) cost:'}</p>
+                                                    </div>
+                                                    <div class="text-right">
+                                                        <p>
+                                                            {if $group_use_tax}
+                                                                {displayWtPriceWithCurrency price=($rm_v.extra_demands_price_ti + $rm_v.additional_services_price_ti)  currency=$currency}
+                                                            {else}
+                                                                {displayWtPriceWithCurrency price=($rm_v.extra_demands_price_te + $rm_v.additional_services_price_te) currency=$currency}
+                                                            {/if}
+                                                        </p>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
-                                {/if}
-                            </dd>
+                                    {/if}
+                                </dd>
+                            </div>
                         </dl>
                     </div>
                 </div>

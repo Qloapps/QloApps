@@ -259,12 +259,17 @@
     background: #FFF;
 }
 
+.fancybox-overlay {
+    background: rgba(0, 0, 0, 0.8) !important;
+}
+
 .fancybox-wrap.fancybox-order-detail {
     top: 72px !important;
 }
 
 .fancybox-wrap.fancybox-order-detail .card {
     width: 650px;
+    margin-bottom: 0;
 }
 
 .fancybox-wrap.fancybox-order-detail .fancybox-close {
@@ -924,4 +929,8 @@
 #popup-view-extra-services .tab-content .room_demand_block {
     display: flex;
     justify-content: space-between;
+}
+
+#popup-view-extra-services .tab-content .room_demand_block:not(:last-of-type) {
+    margin-bottom: 6px;
 }
