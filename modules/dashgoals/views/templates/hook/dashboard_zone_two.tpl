@@ -57,6 +57,7 @@
 		<section class="loading text-center">
 			<div class="alert alert-info text-left">
 				<p>{l s='Set your targets by clicking the configuration button at right position of the header in this section.' mod='dashgoals'}</p>
+				<p><b>{l s='Note' mod='dashgoals'}:</b> {l s='Targets will be set and data will be displayed for all the hotels.' mod='dashgoals'}</p>
 			</div>
 			<div class="dashgoals row">
                 <div class="col-xs-6 col-sm-3">
