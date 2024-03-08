@@ -3655,6 +3655,20 @@ class AdminOrdersControllerCore extends AdminController
 
         // get extra demands of the room before changing in the booking table
         $objBookingDemand = new HotelBookingDemands();
+        $objRoomTypeServiceProductOrderDetail = new RoomTypeServiceProductOrderDetail();
+        $orderServiceProducts = $objRoomTypeServiceProductOrderDetail->getroomTypeServiceProducts(
+            $id_order,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            null,
+            null
+        );
+
         $extraDemands = $objBookingDemand->getRoomTypeBookingExtraDemands(
             $id_order,
             0,
@@ -3717,6 +3731,57 @@ class AdminOrdersControllerCore extends AdminController
                 }
                 // change order total save
                 $objOrder->save();
+            }
+
+            if (isset($orderServiceProducts)
+                && is_array($orderServiceProducts)
+                && count($orderServiceProducts)
+            ) {
+                $objRoomTypeServiceProductPrice = new RoomTypeServiceProductPrice();
+                foreach ($orderServiceProducts as $orderServiceProduct) {
+                    if (isset($orderServiceProduct['additional_services'])
+                        && is_array($orderServiceProduct['additional_services'])
+                        && count($orderServiceProduct['additional_services'])
+                    ) {
+                        foreach ($orderServiceProduct['additional_services'] as $serviceProduct) {
+                            if (Product::getProductPriceCalculation($serviceProduct['id_product']) == Product::PRICE_CALCULATION_METHOD_PER_DAY) {
+                                $numDays = HotelHelper::getNumberOfDays($new_date_from, $new_date_to);
+                                $objRoomTypeServiceProductOrderDetail = new RoomTypeServiceProductOrderDetail((int) $serviceProduct['id_room_type_service_product_order_detail']);
+                                $totalPriceTaxExcl = $objRoomTypeServiceProductPrice->getServicePrice(
+                                    (int) $serviceProduct['id_product'],
+                                    $orderServiceProduct['id_room'],
+                                    $objRoomTypeServiceProductOrderDetail->quantity,
+                                    $new_date_from,
+                                    $new_date_to,
+                                    false
+                                );
+                                $totalPriceTaxIncl = $objRoomTypeServiceProductPrice->getServicePrice(
+                                    (int) $serviceProduct['id_product'],
+                                    $orderServiceProduct['id_room'],
+                                    $objRoomTypeServiceProductOrderDetail->quantity,
+                                    $new_date_from,
+                                    $new_date_to,
+                                    true
+                                );
+                                $unitPriceTaxExcl = $totalPriceTaxExcl / ($numDays * $objRoomTypeServiceProductOrderDetail->quantity);
+                                $unitPriceTaxIncl = $totalPriceTaxIncl / ($numDays * $objRoomTypeServiceProductOrderDetail->quantity);
+                                $objRoomTypeServiceProductOrderDetail->unit_price_tax_excl = $unitPriceTaxExcl;
+                                $objRoomTypeServiceProductOrderDetail->unit_price_tax_incl = $unitPriceTaxIncl;
+                                $objRoomTypeServiceProductOrderDetail->total_price_tax_excl = $totalPriceTaxExcl;
+                                $objRoomTypeServiceProductOrderDetail->total_price_tax_incl = $totalPriceTaxIncl;
+                                $objRoomTypeServiceProductOrderDetail->save();
+
+                                $objOrderDetail = new OrderDetail((int) $serviceProduct['id_order_detail']);
+                                $objOrderDetail->unit_price_tax_excl = $unitPriceTaxExcl;
+                                $objOrderDetail->unit_price_tax_incl = $unitPriceTaxIncl;
+                                $objOrderDetail->total_price_tax_excl = $totalPriceTaxExcl;
+                                $objOrderDetail->total_price_tax_incl = $totalPriceTaxIncl;
+                                $objOrderDetail->save();
+
+                            }
+                        }
+                    }
+                }
             }
         }
 
@@ -4888,46 +4953,57 @@ class AdminOrdersControllerCore extends AdminController
         $quantity = Tools::getValue('qty');
 
         if (Validate::isLoadedObject($objRoomTypeServiceProductOrderDetail = new RoomTypeServiceProductOrderDetail($id_room_type_service_product_order_detail))) {
-            $objOrderDetail = new OrderDetail($objRoomTypeServiceProductOrderDetail->id_order_detail);
-            if ($objOrderDetail->product_allow_multiple_quantity) {
-                if (!Validate::isUnsignedInt($quantity)) {
-                    $response['hasError'] = true;
-                    $response['errors'] = $this->l('Invalid quantity provided');
-                } else {
-                    $objRoomTypeServiceProductOrderDetail->quantity = $quantity;
-                    $oldPriceTaxExcl = $objRoomTypeServiceProductOrderDetail->total_price_tax_excl;
-                    $oldPriceTaxIncl = $objRoomTypeServiceProductOrderDetail->total_price_tax_incl;
-                    $objRoomTypeServiceProductOrderDetail->total_price_tax_excl = $objRoomTypeServiceProductOrderDetail->unit_price_tax_excl * $quantity;
-                    $objRoomTypeServiceProductOrderDetail->total_price_tax_incl = $objRoomTypeServiceProductOrderDetail->unit_price_tax_incl * $quantity;
-                    $res = true;
-                    if ($res &= $objRoomTypeServiceProductOrderDetail->save()) {
-                        $order = new Order($objRoomTypeServiceProductOrderDetail->id_order);
-                        $priceDiffTaxExcl = $objRoomTypeServiceProductOrderDetail->total_price_tax_excl - $oldPriceTaxExcl;
-                        $priceDiffTaxIncl = $objRoomTypeServiceProductOrderDetail->total_price_tax_incl - $oldPriceTaxIncl;
-
-                        $objOrderDetail->product_quantity = $quantity;
-                        $objOrderDetail->total_price_tax_excl += $priceDiffTaxExcl;
-                        $objOrderDetail->total_price_tax_incl += $priceDiffTaxIncl;
-
-                        $res &= $objOrderDetail->updateTaxAmount($order);
-
-                        $res &= $objOrderDetail->update();
-
-                        $order->total_paid_tax_excl += $priceDiffTaxExcl;
-                        $order->total_paid_tax_incl += $priceDiffTaxIncl;
-                        $order->total_paid += $priceDiffTaxIncl;
-
-                        $res &= $order->update();
-                    }
+            if (Validate::isLoadedObject($objHotelBookingDetail = new HotelBookingDetail((int) $objRoomTypeServiceProductOrderDetail->id_htl_booking_detail))) {
+                $numDays = 1;
+                if (Product::getProductPriceCalculation($objRoomTypeServiceProductOrderDetail->id_product) == Product::PRICE_CALCULATION_METHOD_PER_DAY) {
+                    $numDays = HotelHelper::getNumberOfDays($objHotelBookingDetail->date_from, $objHotelBookingDetail->date_to);
                 }
-                if (!$res) {
+
+                $objOrderDetail = new OrderDetail($objRoomTypeServiceProductOrderDetail->id_order_detail);
+                if ($objOrderDetail->product_allow_multiple_quantity) {
+                    if (!Validate::isUnsignedInt($quantity)) {
+                        $response['hasError'] = true;
+                        $response['errors'] = $this->l('Invalid quantity provided');
+                    } else {
+                        $objRoomTypeServiceProductOrderDetail->quantity = $quantity;
+                        $oldPriceTaxExcl = $objRoomTypeServiceProductOrderDetail->total_price_tax_excl;
+                        $oldPriceTaxIncl = $objRoomTypeServiceProductOrderDetail->total_price_tax_incl;
+                        $objRoomTypeServiceProductOrderDetail->total_price_tax_excl = $objRoomTypeServiceProductOrderDetail->unit_price_tax_excl * $quantity * $numDays;
+                        $objRoomTypeServiceProductOrderDetail->total_price_tax_incl = $objRoomTypeServiceProductOrderDetail->unit_price_tax_incl * $quantity * $numDays;
+                        $res = true;
+                        if ($res &= $objRoomTypeServiceProductOrderDetail->save()) {
+                            $order = new Order($objRoomTypeServiceProductOrderDetail->id_order);
+                            $priceDiffTaxExcl = $objRoomTypeServiceProductOrderDetail->total_price_tax_excl - $oldPriceTaxExcl;
+                            $priceDiffTaxIncl = $objRoomTypeServiceProductOrderDetail->total_price_tax_incl - $oldPriceTaxIncl;
+
+                            $objOrderDetail->product_quantity = $quantity;
+                            $objOrderDetail->total_price_tax_excl += $priceDiffTaxExcl;
+                            $objOrderDetail->total_price_tax_incl += $priceDiffTaxIncl;
+
+                            $res &= $objOrderDetail->updateTaxAmount($order);
+
+                            $res &= $objOrderDetail->update();
+
+                            $order->total_paid_tax_excl += $priceDiffTaxExcl;
+                            $order->total_paid_tax_incl += $priceDiffTaxIncl;
+                            $order->total_paid += $priceDiffTaxIncl;
+
+                            $res &= $order->update();
+                        }
+                    }
+                    if (!$res) {
+                        $response['hasError'] = true;
+                        $response['errors'] = $this->l('Error while updating service, please try refresing the page');
+                    }
+                } else {
                     $response['hasError'] = true;
-                    $response['errors'] = $this->l('Error while updating service, please try refresing the page');
+                    $response['errors'] = $this->l('cannot order multiple quanitity for this service');
                 }
             } else {
                 $response['hasError'] = true;
-                $response['errors'] = $this->l('cannot order multiple quanitity for this service');
+                $response['errors'] = $this->l('Additional service not found');
             }
+
             $objHotelBookingDetail = new HotelBookingDetail($objRoomTypeServiceProductOrderDetail->id_htl_booking_detail);
             $response['service_panel']= $servicesBlock = $this->processRenderServicesPanel(
                 $objOrderDetail->id_order,
