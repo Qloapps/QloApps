@@ -101,7 +101,7 @@ class AdminProductsControllerCore extends AdminController
             'ServiceProduct' => $this->l('Service Products'),
             // 'Associations' => $this->l('Associations'),
             'Features' => $this->l('Features'),
-            'Configuration' => $this->l('Configuration'),
+            'Configuration' => $this->l('Rooms'),
             'Occupancy' => $this->l('Occupancy'),
             'LengthOfStay' => $this->l('Length of Stay'),
             'AdditionalFacilities' => $this->l('Additional Facilities'),

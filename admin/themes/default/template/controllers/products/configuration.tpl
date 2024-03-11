@@ -20,7 +20,7 @@
 {if isset($product->id)}
 	<div id="product-configuration" class="panel product-tab">
 		<input type="hidden" name="submitted_tabs[]" value="Configuration" />
-		<h3 class="tab"> <i class="icon-AdminAdmin"></i> {l s='Configuration'}</h3>
+		<h3 class="tab"> <i class="icon-AdminAdmin"></i> {l s='Rooms'}</h3>
 
 		<input type="hidden" id="checkConfSubmit" value="0" name="checkConfSubmit">
 
