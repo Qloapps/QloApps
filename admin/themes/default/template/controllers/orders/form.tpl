@@ -2163,7 +2163,7 @@
 							<label for="is_full_payment_off">{l s="No"}</label>
 							<a class="slide-button btn"></a>
 						</span>
-						<p class="help-block">{l s='Keep this option enabled for full payment and disable it to take partial payment of the order.'}</p>
+						<p class="help-block">{l s='Keep this option enabled for full payment and disable it to take partial payment of the booking.'}</p>
 					</div>
 				</div>
 				<div class="form-group" {if $order_total <= 0}style="display: none;"{/if}>
@@ -2203,7 +2203,7 @@
 								<option value="{$payment_module->displayName}" data-name="{$payment_module->name}" data-payment-type="{$payment_module->payment_type}">
 							{/foreach}
 						</datalist>
-						<p class="help-block">{l s='Select or type the payment method using which booking will be created.'}</p>
+						<p class="help-block">{l s='Select or type the payment method using which payment for booking will be made.'}</p>
 					</div>
 				</div>
 				<div class="form-group" {if $order_total <= 0}style="display: none;"{/if}>

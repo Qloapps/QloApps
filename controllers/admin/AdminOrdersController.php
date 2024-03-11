@@ -963,10 +963,9 @@ class AdminOrdersControllerCore extends AdminController
             if ($this->tabAccess['edit'] === '1') {
                 $objCart = new Cart($id_cart);
                 if (Validate::isLoadedObject($objCart)) {
+                    $orderTotal = $objCart->getOrderTotal(true, Cart::BOTH);
                     if ($objCart->is_advance_payment) {
-                        $orderTotal = $objCart->getOrderTotal(true, Cart::ADVANCE_PAYMENT);
-                    } else {
-                        $orderTotal = $objCart->getOrderTotal(true, Cart::BOTH);
+                        $advancePaymentAmount = $objCart->getOrderTotal(true, Cart::ADVANCE_PAYMENT);
                     }
 
                     // Validate data if required
@@ -1014,51 +1013,50 @@ class AdminOrdersControllerCore extends AdminController
 
                         // Set payment module details
                         $objPaymentModule = new BoOrder();
+                        $objPaymentModule->displayName = $moduleName;
+
                         if ($orderTotal > 0) {
                             $objPaymentModule->payment_type = $paymentType;
-                            $objPaymentModule->displayName = $moduleName;
-                        } else {
-                            $objPaymentModule->name = 'free_order';
-                            $objPaymentModule->displayName = $this->l('Free order');
-                        }
 
-                        // Set order state
-                        if ($orderTotal > 0) {
+                            // Set order state
                             if ($isFullPayment) {
                                 $idOrderState = Configuration::get('PS_OS_PAYMENT_ACCEPTED');
                             } else {
                                 if ($paymentAmount <= 0) {
                                     $idOrderState = Configuration::get('PS_OS_AWAITING_PAYMENT');
-                                } elseif (($paymentAmount > 0) && ($paymentAmount < $orderTotal)) {
-                                    $idOrderState = Configuration::get('PS_OS_PARTIAL_PAYMENT_ACCEPTED');
-                                } else {
+                                } elseif (($paymentAmount >= $orderTotal)) {
                                     $idOrderState = Configuration::get('PS_OS_PAYMENT_ACCEPTED');
+                                } else {
+                                    $idOrderState = Configuration::get('PS_OS_PARTIAL_PAYMENT_ACCEPTED');
                                 }
                             }
-                        } else {
-                            $idOrderState = Configuration::get('PS_OS_PAYMENT_ACCEPTED');
-                        }
 
-                        // Set amount paid
-                        if ($orderTotal > 0) {
-                            if ($isFullPayment) {
-                                $amountPaid = $orderTotal;
-                            } else {
-                                $amountPaid = $paymentAmount;
-                            }
+                            // Set amount paid
+                            $amountPaid = $isFullPayment ? $orderTotal : $paymentAmount;
+
+                            // Set transaction ID
+                            $extraVars = $paymentTransactionId ? array('transaction_id' => $paymentTransactionId) : array();
                         } else {
+                            // Set order state
+                            if ($objCart->is_advance_payment) {
+                                if ($advancePaymentAmount <= $orderTotal) {
+                                    $idOrderState = Configuration::get('PS_OS_PARTIAL_PAYMENT_ACCEPTED');
+                                } else {
+                                    $objPaymentModule->name = 'free_order';
+                                    $objPaymentModule->displayName = $this->l('Free order');
+                                    $idOrderState = Configuration::get('PS_OS_PAYMENT_ACCEPTED');
+                                }
+                            } else {
+                                $objPaymentModule->name = 'free_order';
+                                $objPaymentModule->displayName = $this->l('Free order');
+                                $idOrderState = Configuration::get('PS_OS_PAYMENT_ACCEPTED');
+                            }
+
+                            // Set amount paid
                             $amountPaid = 0;
-                        }
 
-                        // Set transaction ID
-                        if ($orderTotal > 0) {
-                            if ($paymentTransactionId) {
-                                $paymentTransactionId = array('transaction_id' => $paymentTransactionId);
-                            } else {
-                                $paymentTransactionId = array();
-                            }
-                        } else {
-                            $paymentTransactionId = null;
+                            // Set transaction ID
+                            $extraVars = null;
                         }
 
                         $bad_delivery = false;
@@ -1080,7 +1078,7 @@ class AdminOrdersControllerCore extends AdminController
                                 $amountPaid,
                                 $objPaymentModule->displayName,
                                 $this->l('Manual order -- Employee:').' '.substr($objEmployee->firstname, 0, 1).'. '.$objEmployee->lastname,
-                                $paymentTransactionId,
+                                $extraVars,
                                 null,
                                 false,
                                 $objCart->secure_key
