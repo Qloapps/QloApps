@@ -328,7 +328,7 @@ class RoomTypeServiceProductCartDetail extends ObjectModel
             cbd.`id_product` as `room_type_id_product`, cbd.`adults`, cbd.`children`, cbd.`date_from`, cbd.`date_to`';
         if (!$getTotalPrice) {
             $sql .= ', pl.`name`, cbd.`id_guest`, cbd.`id_customer`, p.`auto_add_to_cart`, p.`price_addition_type`,
-                cbd.`id_hotel`, cbd.`id_room`, cbd.`date_from`, cbd.`date_to`, cbd.`is_refunded`';
+                p.`price_calculation_method`, cbd.`id_hotel`, cbd.`id_room`, cbd.`date_from`, cbd.`date_to`, cbd.`is_refunded`';
         }
         $sql .= ' FROM `'._DB_PREFIX_.'htl_cart_booking_data` cbd
             LEFT JOIN `'._DB_PREFIX_.'htl_room_type_service_product_cart_detail` rscd
@@ -401,6 +401,7 @@ class RoomTypeServiceProductCartDetail extends ObjectModel
                                 'quantity' => $product['quantity'],
                                 'auto_add_to_cart' => $product['auto_add_to_cart'],
                                 'price_addition_type' => $product['price_addition_type'],
+                                'price_calculation_method' => $product['price_calculation_method'],
                                 'unit_price_tax_excl' => $objRoomTypeServiceProductPrice->getServicePrice(
                                     (int)$product['id_product'],
                                     (int)$product['room_type_id_product'],
@@ -472,6 +473,7 @@ class RoomTypeServiceProductCartDetail extends ObjectModel
                             $selectedServiceProducts[$product['htl_cart_booking_id']]['quantity'] = $product['quantity'];
                             $selectedServiceProducts[$product['htl_cart_booking_id']]['auto_add_to_cart'] = $product['auto_add_to_cart'];
                             $selectedServiceProducts[$product['htl_cart_booking_id']]['price_addition_type'] = $product['price_addition_type'];
+                            $selectedServiceProducts[$product['htl_cart_booking_id']]['price_calculation_method'] = $product['price_calculation_method'];
                             $selectedServiceProducts[$product['htl_cart_booking_id']]['unit_price_tax_excl'] = $objRoomTypeServiceProductPrice->getServicePrice(
                                 (int)$product['id_product'],
                                 (int)$product['room_type_id_product'],
@@ -499,6 +501,7 @@ class RoomTypeServiceProductCartDetail extends ObjectModel
                                 'quantity' => $product['quantity'],
                                 'auto_add_to_cart' => $product['auto_add_to_cart'],
                                 'price_addition_type' => $product['price_addition_type'],
+                                'price_calculation_method' => $product['price_calculation_method'],
                                 'unit_price_tax_excl' => $objRoomTypeServiceProductPrice->getServicePrice(
                                     (int)$product['id_product'],
                                     (int)$product['room_type_id_product'],
