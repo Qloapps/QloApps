@@ -1746,6 +1746,10 @@ class AdminNormalProductsControllerCore extends AdminController
 
         $this->object = new $this->className();
         $this->_removeTaxFromEcotax();
+        if (Tools::getValue('auto_add_to_cart')) {
+            $_POST['allow_multiple_quantity'] = 0;
+        }
+
         $this->copyFromPost($this->object, $this->table);
         $this->object->service_product_type = Product::SERVICE_PRODUCT_WITH_ROOMTYPE;
 
@@ -1884,6 +1888,9 @@ class AdminNormalProductsControllerCore extends AdminController
             /** @var Product $object */
             $object = new $this->className((int)$id);
             $this->object = $object;
+            if (Tools::getValue('auto_add_to_cart')) {
+                $_POST['allow_multiple_quantity'] = 0;
+            }
 
             if (Validate::isLoadedObject($object)) {
                 $this->_removeTaxFromEcotax();
