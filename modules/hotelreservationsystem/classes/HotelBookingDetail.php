@@ -1947,29 +1947,6 @@ class HotelBookingDetail extends ObjectModel
                     $newTotalPriceTI = $unitRoomPriceTI * $newNumDays;
                 }
 
-                // calculate `total_paid_amount`
-                $totalPaidAmount = 0;
-                $isAdvancePayment = Db::getInstance()->getValue(
-                    'SELECT o.`is_advance_payment`
-                    FROM `'._DB_PREFIX_.'orders` o
-                    WHERE o.`id_order` = '.(int) $idOrder
-                );
-
-                if ($isAdvancePayment) {
-                    $objHotelAdvancedPayment = new HotelAdvancedPayment();
-                    $productAdvancePayment = $objHotelAdvancedPayment->getIdAdvPaymentByIdProduct($objHotelBookingDetail->id_product);
-
-                    if (!$productAdvancePayment || (isset($productAdvancePayment['payment_type']) && $productAdvancePayment['payment_type'])) {
-                        $totalPaidAmount = $objHotelAdvancedPayment->getRoomMinAdvPaymentAmount(
-                            $objHotelBookingDetail->id_product,
-                            $newDateFrom,
-                            $newDateTo
-                        );
-                    }
-                } else {
-                    $totalPaidAmount = $newTotalPriceTI;
-                }
-
                 // update $objHotelCartBookingData
                 $objHotelCartBookingData->date_from = $newDateFrom;
                 $objHotelCartBookingData->date_to = $newDateTo;
@@ -1983,7 +1960,6 @@ class HotelBookingDetail extends ObjectModel
                 $objHotelBookingDetail->date_to = $newDateTo;
                 $objHotelBookingDetail->total_price_tax_excl = Tools::ps_round($newTotalPriceTE, 6);
                 $objHotelBookingDetail->total_price_tax_incl = Tools::ps_round($newTotalPriceTI, 6);
-                $objHotelBookingDetail->total_paid_amount = Tools::ps_round($totalPaidAmount, 6);
                 $objHotelBookingDetail->adults = $occupancy['adults'];
                 $objHotelBookingDetail->children = $occupancy['children'];
                 $objHotelBookingDetail->child_ages = json_encode($occupancy['child_ages']);

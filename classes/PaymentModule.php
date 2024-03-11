@@ -862,7 +862,11 @@ abstract class PaymentModuleCore extends Module
                                         $objBookingDetail->total_paid_amount = $objAdvancedPayment->getRoomMinAdvPaymentAmount(
                                             $idProduct,
                                             $objCartBookingData->date_from,
-                                            $objCartBookingData->date_to
+                                            $objCartBookingData->date_to,
+                                            1,
+                                            $objCartBookingData->id_room,
+                                            $objCartBookingData->id_cart,
+                                            $objCartBookingData->id_guest
                                         );
                                     }
                                 }
@@ -1596,13 +1600,6 @@ abstract class PaymentModuleCore extends Module
                                 $cart_htl_data[$type_key]['date_diff'][$date_join]['adults'] += $data_v['adults'];
                                 $cart_htl_data[$type_key]['date_diff'][$date_join]['children'] += $data_v['children'];
 
-
-
-
-                                $roomTypeDateRangePrice = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice($type_value['id_product'], $data_v['date_from'], $data_v['date_to']);
-
-
-                                $cart_htl_data[$type_key]['date_diff'][$date_join]['amount'] = $roomTypeDateRangePrice['total_price_tax_incl']*$vart_quant;
                                 // extra demands prices
                                 $cart_htl_data[$type_key]['date_diff'][$date_join]['extra_demands'] = $objBookingDemand->getRoomTypeBookingExtraDemands(
                                     $order->id,
