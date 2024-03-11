@@ -126,6 +126,10 @@ class StatsBestVouchers extends ModuleGrid
 				LEFT JOIN '._DB_PREFIX_.'orders o ON o.id_order = ocr.id_order
 				LEFT JOIN '._DB_PREFIX_.'cart_rule cr ON cr.id_cart_rule = ocr.id_cart_rule
 				WHERE o.valid = 1
+                AND o.`id_order` IN (
+                    SELECT id_order FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
+                    INNER JOIN `'._DB_PREFIX_.'htl_access` ha ON (hbd.`id_hotel` = ha.`id_hotel`)
+                    WHERE ha.`id_profile` = '.(int)$this->context->employee->id_profile.' AND ha.`access` = 1)
 					'.Shop::addSqlRestriction(Shop::SHARE_ORDER, 'o').'
 					AND o.invoice_date BETWEEN '.$this->getDate().'
 				GROUP BY ocr.id_cart_rule';

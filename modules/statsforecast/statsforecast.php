@@ -151,31 +151,32 @@ class StatsForecast extends Module
             'SELECT
             '.$date_from_ginvoice.' AS fix_date,
             '.($this->context->cookie->stats_granularity == 42 ? $date_to_ginvoice : '').'
-            COUNT(o.`id_order`) AS countOrders,
+            COUNT(DISTINCT(o.`id_order`)) AS countOrders,
             SUM((SELECT IFNULL(SUM(DATEDIFF(hbd.`date_to`, hbd.`date_from`)), 0) FROM `'._DB_PREFIX_.'htl_booking_detail` hbd WHERE o.`id_order` = hbd.`id_order`)) AS totalRoomsBooked,
-            SUM(o.`total_paid_tax_excl` / o.`conversion_rate`) AS totalSales,
+			SUM(o.`total_paid_tax_excl` / o.`conversion_rate`) AS totalSales,
             SUM((
-                SELECT SUM(ROUND(DATEDIFF(hbd.`date_to`, hbd.`date_from`) * (
+                SELECT SUM(ROUND(IFNULL(DATEDIFF(hbd.`date_to`, hbd.`date_from`), 1) * (
                     CASE
                         WHEN od.`original_wholesale_price` <> "0.000000" THEN od.`original_wholesale_price`
                         WHEN p.`wholesale_price` <> "0.000000" THEN p.`wholesale_price`
                         ELSE 0
                     END
                 ), 2))
-                FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
+                FROM `'._DB_PREFIX_.'order_detail` od
                 LEFT JOIN `'._DB_PREFIX_.'product` p
-                ON (p.`id_product` = hbd.`id_product`)
-                LEFT JOIN `'._DB_PREFIX_.'order_detail` od
-                ON (od.`id_order_detail` = hbd.`id_order_detail`)
-                WHERE hbd.`id_order` = o.`id_order`
+                ON (p.`id_product` = od.`product_id`)
+				LEFT JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd
+                ON (hbd.`id_product` = od.`product_id` AND hbd.`id_order` = od.`id_order`)
+                WHERE od.`id_order` = o.`id_order`
             )) AS totalOperatingCost
             FROM '._DB_PREFIX_.'orders o
-			INNER JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd ON (hbd.`id_order` = o.`id_order`)
-            INNER JOIN `'._DB_PREFIX_.'htl_access` ha ON (hbd.`id_hotel` = ha.`id_hotel`)
-            WHERE o.`valid` = 1
-			AND ha.`id_profile` = '.(int)$this->context->employee->id_profile.' AND ha.`access` = 1
-            AND o.`invoice_date` BETWEEN '.ModuleGraph::getDateBetween().'
-            '.Shop::addSqlRestriction(Shop::SHARE_ORDER, 'o').'
+            WHERE o.id_order IN (
+				SELECT DISTINCT(hbd.`id_order`) FROM '._DB_PREFIX_.'orders o
+				INNER JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd ON (hbd.`id_order` = o.`id_order`)
+				INNER JOIN `'._DB_PREFIX_.'htl_access` ha ON (hbd.`id_hotel` = ha.`id_hotel`)
+				WHERE o.`valid` = 1 AND ha.`id_profile` = '.(int)$this->context->employee->id_profile.' AND ha.`access` = 1
+				AND o.`invoice_date` BETWEEN '.ModuleGraph::getDateBetween().'
+			)'.Shop::addSqlRestriction(Shop::SHARE_ORDER, 'o').'
             GROUP BY '.$date_from_ginvoice
         );
 
@@ -349,7 +350,7 @@ class StatsForecast extends Module
         AND (c.`date_add` BETWEEN '.ModuleGraph::getDateBetween().' OR c.`date_upd` BETWEEN '.ModuleGraph::getDateBetween().')';
         $carts_unregistered = Db::getInstance()->getValue($sql);
 
-        $sql = 'SELECT COUNT(*)
+        $sql = 'SELECT COUNT(DISTINCT(o.`id_order`))
         FROM '._DB_PREFIX_.'orders o
 		INNER JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd ON (hbd.`id_order` = o.`id_order`)
 		INNER JOIN `'._DB_PREFIX_.'htl_access` ha ON (hbd.`id_hotel` = ha.`id_hotel`)
@@ -358,7 +359,7 @@ class StatsForecast extends Module
 		AND o.`date_add` BETWEEN '.ModuleGraph::getDateBetween();
         $orders = Db::getInstance()->getValue($sql);
 
-        $sql = 'SELECT COUNT(*)
+        $sql = 'SELECT COUNT(DISTINCT(o.`id_order`))
         FROM '._DB_PREFIX_.'orders o
 		INNER JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd ON (hbd.`id_order` = o.`id_order`)
 		INNER JOIN `'._DB_PREFIX_.'htl_access` ha ON (hbd.`id_hotel` = ha.`id_hotel`)
@@ -368,7 +369,7 @@ class StatsForecast extends Module
         AND o.`date_add` BETWEEN '.ModuleGraph::getDateBetween();
         $orders_registered = Db::getInstance()->getValue($sql);
 
-        $sql = 'SELECT COUNT(*)
+        $sql = 'SELECT COUNT(DISTINCT(o.`id_order`))
         FROM '._DB_PREFIX_.'orders o
 		INNER JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd ON (hbd.`id_order` = o.`id_order`)
 		INNER JOIN `'._DB_PREFIX_.'htl_access` ha ON (hbd.`id_hotel` = ha.`id_hotel`)

@@ -94,9 +94,12 @@ class StatsRegistrations extends ModuleGraph
     {
         $sql = 'SELECT COUNT(DISTINCT o.`id_customer`) as buyers
 				FROM `'._DB_PREFIX_.'orders` o
+                INNER JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd ON (hbd.`id_order` = o.`id_order`)
+                INNER JOIN `'._DB_PREFIX_.'htl_access` ha ON (hbd.`id_hotel` = ha.`id_hotel`)
 				LEFT JOIN `'._DB_PREFIX_.'guest` g ON o.id_customer = g.id_customer
 				LEFT JOIN `'._DB_PREFIX_.'connections` c ON c.id_guest = g.id_guest
-				WHERE o.`date_add` BETWEEN '.ModuleGraph::getDateBetween().'
+				WHERE ha.`id_profile` = '.(int)$this->context->employee->id_profile.' AND ha.`access` = 1
+                    AND o.`date_add` BETWEEN '.ModuleGraph::getDateBetween().'
 					'.Shop::addSqlRestriction(Shop::SHARE_ORDER, 'o').'
 					AND o.valid = 1
 					AND ABS(TIMEDIFF(o.date_add, c.date_add)+0) < 120000';
