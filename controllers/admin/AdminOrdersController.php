@@ -3737,6 +3737,7 @@ class AdminOrdersControllerCore extends AdminController
                 && is_array($orderServiceProducts)
                 && count($orderServiceProducts)
             ) {
+                $objOrder = new Order((int) $id_order);
                 $objRoomTypeServiceProductPrice = new RoomTypeServiceProductPrice();
                 foreach ($orderServiceProducts as $orderServiceProduct) {
                     if (isset($orderServiceProduct['additional_services'])
@@ -3765,6 +3766,16 @@ class AdminOrdersControllerCore extends AdminController
                                 );
                                 $unitPriceTaxExcl = $totalPriceTaxExcl / ($numDays * $objRoomTypeServiceProductOrderDetail->quantity);
                                 $unitPriceTaxIncl = $totalPriceTaxIncl / ($numDays * $objRoomTypeServiceProductOrderDetail->quantity);
+
+                                $objOrder->total_paid_tax_excl -= $objRoomTypeServiceProductOrderDetail->total_price_tax_excl;
+                                $objOrder->total_paid_tax_incl -= $objRoomTypeServiceProductOrderDetail->total_price_tax_incl;
+                                $objOrder->total_paid -= $objRoomTypeServiceProductOrderDetail->total_price_tax_incl;
+
+                                // change order total
+                                $objOrder->total_paid_tax_excl += $totalPriceTaxExcl;
+                                $objOrder->total_paid_tax_incl += $totalPriceTaxIncl;
+                                $objOrder->total_paid += $totalPriceTaxIncl;
+
                                 $objRoomTypeServiceProductOrderDetail->unit_price_tax_excl = $unitPriceTaxExcl;
                                 $objRoomTypeServiceProductOrderDetail->unit_price_tax_incl = $unitPriceTaxIncl;
                                 $objRoomTypeServiceProductOrderDetail->total_price_tax_excl = $totalPriceTaxExcl;
@@ -3777,11 +3788,12 @@ class AdminOrdersControllerCore extends AdminController
                                 $objOrderDetail->total_price_tax_excl = $totalPriceTaxExcl;
                                 $objOrderDetail->total_price_tax_incl = $totalPriceTaxIncl;
                                 $objOrderDetail->save();
-
                             }
                         }
                     }
                 }
+
+                $objOrder->save();
             }
         }
 
