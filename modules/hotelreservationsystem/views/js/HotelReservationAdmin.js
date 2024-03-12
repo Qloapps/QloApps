@@ -309,8 +309,9 @@ $(document).on('click', 'button.gm-ui-hover-effect', function () {
 
 function initGoogleMaps() {
     if (typeof enabledDisplayMap != 'undefined'
-        && typeof google === 'object'
         && $('#googleMapContainer').length
+        && typeof google == 'object'
+        && typeof google.maps == 'object'
     ) {
         GoogleMapsManager.init($('#map'));
         GoogleMapsManager.initMap();

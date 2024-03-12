@@ -66,11 +66,27 @@ class ProductControllerCore extends FrontController
             $this->addJqueryPlugin('jqzoom');
         }
 
-        if (($PS_API_KEY = Configuration::get('PS_API_KEY')) && Configuration::get('WK_GOOGLE_ACTIVE_MAP')) {
-            $this->addJS(
-                'https://maps.googleapis.com/maps/api/js?key='.$PS_API_KEY.'&libraries=places&language='.
-                $this->context->language->iso_code.'&region='.$this->context->country->iso_code
-            );
+        if (($PS_API_KEY = Configuration::get('PS_API_KEY'))) {
+            $objHotelRoomType = new HotelRoomType();
+            $roomTypeInfo = $objHotelRoomType->getRoomTypeInfoByIdProduct($this->product->id);
+            if ($roomTypeInfo) {
+                $objHotelBranchInformation = new HotelBranchInformation($roomTypeInfo['id_hotel']);
+                if (floatval($objHotelBranchInformation->latitude) != 0
+                    && floatval($objHotelBranchInformation->longitude) != 0
+                ) {
+                    Media::addJsDef(array(
+                        'hotel_location' => array(
+                            'latitude' => $objHotelBranchInformation->latitude,
+                            'longitude' => $objHotelBranchInformation->longitude,
+                        )
+                    ));
+
+                    $this->addJS(
+                        'https://maps.googleapis.com/maps/api/js?key='.$PS_API_KEY.'&libraries=places&language='.
+                        $this->context->language->iso_code.'&region='.$this->context->country->iso_code
+                    );
+                }
+            }
         }
     }
 
@@ -374,13 +390,6 @@ class ProductControllerCore extends FrontController
                             }
                         }
                     }
-
-                    Media::addJsDef(array(
-                        'hotel_loc' => array(
-                            'latitude' => $hotel_branch_obj->latitude,
-                            'longitude' => $hotel_branch_obj->longitude,
-                        )
-                    ));
 
                     $this->context->smarty->assign(
                         array(
