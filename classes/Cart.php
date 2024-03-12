@@ -1797,8 +1797,8 @@ class CartCore extends ObjectModel
                     (int)$product['id_product'],
                     isset($product['id_hotel']) ? $product['id_hotel'] : 0,
                     0,
-                    0,
-                    0,
+                    isset($product['date_from']) ? $product['date_from'] : 0,
+                    isset($product['date_to']) ? $product['date_to'] : 0,
                     0,
                     $with_taxes,
                     null
