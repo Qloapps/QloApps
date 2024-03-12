@@ -92,7 +92,7 @@ class AdminPdfControllerCore extends AdminController
 
     public function processGenerateInvoicesPDF()
     {
-        $order_invoice_collection = OrderInvoice::getByDateInterval(Tools::getValue('date_from'), Tools::getValue('date_to'));
+        $order_invoice_collection = OrderInvoice::getByDateInterval(Tools::getValue('date_from'), Tools::getValue('date_to'), $this->context->employee->id_profile);
 
         if (!count($order_invoice_collection)) {
             die(Tools::displayError('No invoice was found.'));
@@ -105,7 +105,7 @@ class AdminPdfControllerCore extends AdminController
     {
         $order_invoice_collection = array();
         foreach (explode('-', Tools::getValue('id_order_state')) as $id_order_state) {
-            if (is_array($order_invoices = OrderInvoice::getByStatus((int)$id_order_state))) {
+            if (is_array($order_invoices = OrderInvoice::getByStatus((int)$id_order_state, $this->context->employee->id_profile))) {
                 $order_invoice_collection = array_merge($order_invoices, $order_invoice_collection);
             }
         }

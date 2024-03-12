@@ -881,19 +881,27 @@ class OrderInvoiceCore extends ObjectModel
      * @param $date_to
      * @return array collection of OrderInvoice
      */
-    public static function getByDateInterval($date_from, $date_to)
+    public static function getByDateInterval($date_from, $date_to, $idProfile = false)
     {
-        $order_invoice_list = Db::getInstance()->executeS('
+        $sql ='
 			SELECT oi.*
 			FROM `'._DB_PREFIX_.'order_invoice` oi
-			LEFT JOIN `'._DB_PREFIX_.'orders` o ON (o.`id_order` = oi.`id_order`)
-			WHERE DATE_ADD(oi.date_add, INTERVAL -1 DAY) <= \''.pSQL($date_to).'\'
+			LEFT JOIN `'._DB_PREFIX_.'orders` o ON (o.`id_order` = oi.`id_order`)';
+        if ($idProfile) {
+            $sql .= ' INNER JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd ON (oi.id_order = hbd.id_order)
+            INNER JOIN `'._DB_PREFIX_.'htl_access` ha ON (hbd.`id_hotel` = ha.`id_hotel`)';
+        }
+		$sql .= ' WHERE DATE_ADD(oi.date_add, INTERVAL -1 DAY) <= \''.pSQL($date_to).'\'
 			AND oi.date_add >= \''.pSQL($date_from).'\'
 			'.Shop::addSqlRestriction(Shop::SHARE_ORDER, 'o').'
-			AND oi.number > 0
-			ORDER BY oi.date_add ASC
-		');
+			AND oi.number > 0';
+        if ($idProfile) {
+            $sql .= ' AND ha.`id_profile` = '.(int)$idProfile.' AND ha.`access` = 1';
+        }
+		$sql .= ' ORDER BY oi.date_add ASC';
 
+
+        $order_invoice_list =  Db::getInstance()->executeS($sql);
         return ObjectModel::hydrateCollection('OrderInvoice', $order_invoice_list);
     }
 
@@ -902,17 +910,24 @@ class OrderInvoiceCore extends ObjectModel
      * @param $id_order_state
      * @return array collection of OrderInvoice
      */
-    public static function getByStatus($id_order_state)
+    public static function getByStatus($id_order_state, $idProfile = false)
     {
-        $order_invoice_list = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS('
-			SELECT oi.*
+        $sql = '
+            SELECT oi.*
 			FROM `'._DB_PREFIX_.'order_invoice` oi
-			LEFT JOIN `'._DB_PREFIX_.'orders` o ON (o.`id_order` = oi.`id_order`)
-			WHERE '.(int)$id_order_state.' = o.current_state
+			LEFT JOIN `'._DB_PREFIX_.'orders` o ON (o.`id_order` = oi.`id_order`)';
+        if ($idProfile) {
+            $sql .= ' INNER JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd ON (oi.id_order = hbd.id_order)
+            INNER JOIN `'._DB_PREFIX_.'htl_access` ha ON (hbd.`id_hotel` = ha.`id_hotel`)';
+        }
+		$sql .= ' WHERE '.(int)$id_order_state.' = o.current_state
 			'.Shop::addSqlRestriction(Shop::SHARE_ORDER, 'o').'
-			AND oi.number > 0
-			ORDER BY oi.`date_add` ASC
-		');
+			AND oi.number > 0';
+        if ($idProfile) {
+            $sql .= ' AND ha.`id_profile` = '.(int)$idProfile.' AND ha.`access` = 1';
+        }
+		$sql .= ' ORDER BY oi.`date_add` ASC';
+        $order_invoice_list = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql);
 
         return ObjectModel::hydrateCollection('OrderInvoice', $order_invoice_list);
     }
