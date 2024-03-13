@@ -1758,6 +1758,13 @@ class AdminOrdersControllerCore extends AdminController
         // hotel booking statuses
         $htlOrderStatus = HotelBookingDetail::getAllHotelOrderStatus();
 
+        if ($this->context->employee->isSuperAdmin()) {
+            $backOrderConfigKey = 'PS_BACKDATE_ORDER_SUPERADMIN';
+        } else {
+            $backOrderConfigKey = 'PS_BACKDATE_ORDER_EMPLOYEES';
+        }
+        $allowBackdateOrder = Configuration::get($backOrderConfigKey);
+
         // applicable refund policies
         $applicableRefundPolicies = HotelOrderRefundRules::getApplicableRefundRules($order->id);
         $this->tpl_view_vars = array(
@@ -1784,6 +1791,7 @@ class AdminOrdersControllerCore extends AdminController
             'order' => $order,
             'cart' => new Cart($order->id_cart),
             'customer' => $customer,
+            'allowBackdateOrder' => $allowBackdateOrder,
             'gender' => $gender,
             'customerGuestDetail' => $customerGuestDetail,
             'genders' => Gender::getGenders(),

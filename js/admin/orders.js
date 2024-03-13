@@ -1561,6 +1561,14 @@ function initRoomEvents()
 				selectedDate.setDate(selectedDate.getDate() + 1);
 				$(".edit_product_date_to").datepicker("option", "minDate", selectedDate);
 			},
+			beforeShow : function () {
+				if(allowBackdateOrder) {
+					var minDate = null;
+				} else {
+					var minDate = new Date(Math.min($.datepicker.parseDate('dd-mm-yy', $(this).data('min_date')), new Date()));
+				}
+				$(this).datepicker("option", "minDate", minDate);
+			}
 		});
 
 		$(".edit_product_date_to").datepicker(
@@ -1572,6 +1580,14 @@ function initRoomEvents()
 				var selectedDate = new Date($.datepicker.formatDate('yy-mm-dd', new Date(date_format[2], date_format[1] - 1, date_format[0])));
 				selectedDate.setDate(selectedDate.getDate() - 1);
 				$(".edit_product_date_from").datepicker("option", "maxDate", selectedDate);
+			},
+			beforeShow : function () {
+				if(allowBackdateOrder) {
+					var minDate = null;
+				} else {
+					var minDate = new Date(Math.min($.datepicker.parseDate('dd-mm-yy', $(this).data('min_date')), new Date()));
+				}
+				$(this).datepicker("option", "minDate", minDate);
 			}
 		});
 	/*End*/

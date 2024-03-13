@@ -48,6 +48,7 @@
 	var txt_confirm = "{l s='Are you sure?' js=1}";
 	var statesShipped = new Array();
 	var has_voucher = {if count($discounts)}1{else}0{/if};
+	var allowBackdateOrder = {if $allowBackdateOrder}{$allowBackdateOrder}{else}false{/if};
 	{foreach from=$states item=state}
 		{if (isset($currentState->shipped) && !$currentState->shipped && $state['shipped'])}
 			statesShipped.push({$state['id_order_state']});
