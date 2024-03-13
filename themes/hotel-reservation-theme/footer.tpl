@@ -28,6 +28,7 @@
 						<div id="right_column" class="col-xs-12 col-sm-{$right_column_size|intval} column">{$HOOK_RIGHT_COLUMN}</div>
 					{/if}
 					</div><!-- .row -->
+					{hook h='displayCenterColumnBottom'}
 				</div><!-- #columns -->
 			</div><!-- .columns-container -->
 			{if isset($HOOK_FOOTER)}
