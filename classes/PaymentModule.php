@@ -277,7 +277,7 @@ abstract class PaymentModuleCore extends Module
                     if (Configuration::get('PS_TAX_ADDRESS_TYPE') == 'id_address_delivery') {
                         $address = new Address((int)$id_address);
                         $this->context->country = new Country((int)$address->id_country, (int)$this->context->cart->id_lang);
-                        if (!$this->context->country->active) {
+                        if (!$this->context->country->active && $this->name != 'wsorder') {
                             throw new PrestaShopException('The delivery address country is not active.');
                         }
                     }
@@ -468,7 +468,7 @@ abstract class PaymentModuleCore extends Module
                 $this->context->country = $context_country;
             }
 
-            if (!$this->context->country->active) {
+            if (!$this->context->country->active && $this->name != 'wsorder') {
                 PrestaShopLogger::addLog('PaymentModule::validateOrder - Country is not active', 3, null, 'Cart', (int)$id_cart, true);
                 throw new PrestaShopException('The order address country is not active.');
             }
