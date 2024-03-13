@@ -29,8 +29,6 @@
  */
 class BlocknewsletterVerificationModuleFrontController extends ModuleFrontController
 {
-	private $message = '';
-
 	/**
 	 * @see FrontController::postProcess()
 	 */
@@ -47,6 +45,9 @@ class BlocknewsletterVerificationModuleFrontController extends ModuleFrontContro
 	 */
 	public function initContent()
 	{
+		$this->display_column_left = false;
+		$this->display_column_right = false;
+
 		parent::initContent();
 
 		$this->setTemplate('verification_execution.tpl');
