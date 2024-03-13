@@ -1382,15 +1382,16 @@ class AdminImportControllerCore extends AdminController
                 $res = false;
                 if ($field_error === true && $lang_field_error === true) {
                     if ($hotelExists) {
-                        $objHotelBranch->save();
+                        $res = $objHotelBranch->save();
                     } else {
                         if ($force_ids) {
                             $objHotelBranch->force_id = $info['id'];
-                            $objHotelBranch->add();
+                            $res = $objHotelBranch->add();
                         } else {
-                            $objHotelBranch->add();
+                            $res = $objHotelBranch->add();
                         }
                     }
+
                     $categsBeforeUpd = $objHotelBranch->getAllHotelCategories();
                     if ($newIdHotel = $objHotelBranch->id) {
                         if ($primaryHotelId = Configuration::get('WK_PRIMARY_HOTEL')) {
@@ -1460,7 +1461,7 @@ class AdminImportControllerCore extends AdminController
                             }
                         }
 
-                        if ($objHotelBranch->image) {
+                        if (isset($objHotelBranch->image) && $objHotelBranch->image) {
                             //add new hotel images!!!
                             $hotel_has_images = (bool) $objHotelImage->getImagesByHotelId($objHotelBranch->id);
                             foreach ($objHotelBranch->image as $key => $url) {
@@ -3514,8 +3515,9 @@ class AdminImportControllerCore extends AdminController
             $customer_groups[] = (int)$customer->id_default_group;
             $customer_groups = array_flip(array_flip($customer_groups));
             $res = false;
-            if (($field_error = $customer->validateFields(UNFRIENDLY_ERROR, true)) === true &&
-                ($lang_field_error = $customer->validateFieldsLang(UNFRIENDLY_ERROR, true)) === true) {
+            if (($field_error = $customer->validateFields(UNFRIENDLY_ERROR, true)) === true
+                && ($lang_field_error = $customer->validateFieldsLang(UNFRIENDLY_ERROR, true)) === true
+            ) {
                 $res = true;
                 foreach ($customers_shop as $id_shop => $id_group) {
                     $customer->force_id = (bool)$force_ids;
