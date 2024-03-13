@@ -139,6 +139,15 @@ $(document).ready(function () {
 			</div>
 		</div>
 	</div>
+	{if $product->auto_add_to_cart && $product->price_addition_type == Product::PRICE_ADDITION_TYPE_WITH_ROOM}
+		<div class="form-group">
+			<div class="col-lg-9 col-lg-offset-3">
+				<div class="alert alert-info">
+					{l s='This current service price is added to room price so room type tax rule will be applied on this service product'}
+				</div>
+			</div>
+		</div>
+	{/if}
 	<div class="form-group" {if $product->auto_add_to_cart && $product->price_addition_type == Product::PRICE_ADDITION_TYPE_WITH_ROOM}style="display:none"{/if}>
 		<div class="col-lg-1"><span class="pull-right">{include file="controllers/products/multishop/checkbox.tpl" field="id_tax_rules_group" type="default"}</span></div>
 		<label class="control-label col-lg-2" for="id_tax_rules_group">
