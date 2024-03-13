@@ -870,6 +870,25 @@ class AdminCustomersControllerCore extends AdminController
 
     public function processDelete()
     {
+        // If customer is going to be deleted permanently then if customer has orders the change this customer as an anonymous customer
+        if (Validate::isLoadedObject($objCustomer = $this->loadObject())) {
+            if ($this->delete_mode == 'real' && Order::getCustomerOrders($objCustomer->id, true)) {
+                $objCustomer->email = 'anonymous'.'-'.$objCustomer->id.'@'.Tools::getShopDomain();
+                $objCustomer->deleted = 1;
+                if (!$objCustomer->update()) {
+                    $this->errors[] = Tools::displayError('Some error ocurred while deleting the Customer');
+                    return;
+                }
+
+                $this->redirect_after = self::$currentIndex.'&conf=1&token='.$this->token;
+
+                return;
+            }
+        } else {
+            $this->errors[] = Tools::displayError('Customer not found.');
+            return;
+        }
+
         $this->_setDeletedMode();
         parent::processDelete();
     }
@@ -888,6 +907,44 @@ class AdminCustomersControllerCore extends AdminController
 
     protected function processBulkDelete()
     {
+        // If customer is going to be deleted permanently then if customer has orders the change this customer as an anonymous customer
+        if ($this->delete_mode == 'real') {
+            if (is_array($this->boxes) && !empty($this->boxes)) {
+                foreach ($this->boxes as $key => $idCustomer) {
+                    if (Validate::isLoadedObject($objCustomer = new Customer($idCustomer))) {
+                        // check if customer has orders for email change else customer will be deleted
+                        if (Order::getCustomerOrders($objCustomer->id, true)) {
+                            $objCustomer->email = 'anonymous'.'-'.$objCustomer->id.'@'.Tools::getShopDomain();
+                            $objCustomer->deleted = 1;
+                            if ($objCustomer->update()) {
+                                // unset the customer which is processed
+                                // not processed customers will be deleted with default process if no errors are there
+                                unset($this->boxes[$key]);
+                            } else {
+                                $this->errors[] = Tools::displayError('Some error ocurred while deleting the Customer with id').': '.$idCustomer;
+                            }
+                        }
+                    } else {
+                        $this->errors[] = Tools::displayError('Customer id').': '.$idCustomer.' '.Tools::displayError('not found.');
+                    }
+                }
+
+                // if all the customers are process above then redirect with success
+                if (!count($this->boxes)) {
+                    $this->redirect_after = self::$currentIndex.'&conf=1&token='.$this->token;
+                    return;
+                }
+            } else {
+                $this->errors[] = Tools::displayError('Customers not found.');
+                return;
+            }
+
+            // if errors are there then do not proceed for default process
+            if (count($this->errors)) {
+                return;
+            }
+        }
+
         $this->_setDeletedMode();
         parent::processBulkDelete();
     }
