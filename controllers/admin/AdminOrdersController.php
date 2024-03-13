@@ -732,10 +732,15 @@ class AdminOrdersControllerCore extends AdminController
         elseif (Tools::isSubmit('submitMessage') && isset($order)) {
             if ($this->tabAccess['edit'] === '1') {
                 $customer = new Customer(Tools::getValue('id_customer'));
+                $message = Tools::getValue('message');
                 if (!Validate::isLoadedObject($customer)) {
                     $this->errors[] = Tools::displayError('The customer is invalid.');
-                } elseif (!Tools::getValue('message')) {
+                } elseif (!$message) {
                     $this->errors[] = Tools::displayError('The message cannot be blank.');
+                } elseif (!$message) {
+                    $this->errors[] = Tools::displayError('The message cannot be blank.');
+                } elseif (!Validate::isCleanHtml($message)) {
+                    $this->errors[] = Tools::displayError('The message is invalid.');
                 } else {
                     /* Get message rules and and check fields validity */
                     $rules = call_user_func(array('Message', 'getValidationRules'), 'Message');
@@ -780,7 +785,7 @@ class AdminOrdersControllerCore extends AdminController
                         $customer_message = new CustomerMessage();
                         $customer_message->id_customer_thread = $customer_thread->id;
                         $customer_message->id_employee = (int)$this->context->employee->id;
-                        $customer_message->message = Tools::getValue('message');
+                        $customer_message->message = $message;
                         $customer_message->private = Tools::getValue('visibility');
 
                         if (!$customer_message->add()) {
