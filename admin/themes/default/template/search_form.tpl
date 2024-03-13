@@ -43,6 +43,11 @@
 							<i class="icon-book"></i> {l s='Catalog'}
 						</a>
 					</li>
+					<li class="search-modules search-option">
+						<a href="#" data-value="8" data-placeholder="{l s='Hotel'}" data-icon="icon-AdminHotelReservationSystemManagement">
+							<i class="icon-building"></i> {l s='Hotel'}
+						</a>
+					</li>
 					<li class="search-customers-name search-option">
 						<a href="#" data-value="2" data-placeholder="{l s='Email, name...'}" data-icon="icon-group">
 							<i class="icon-group"></i> {l s='Customers'} {l s='by name'}
