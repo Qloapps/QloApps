@@ -130,16 +130,17 @@ class statsServiceProducts extends ModuleGrid
             '.Shop::addSqlAssociation('product', 'p').'
             LEFT JOIN '._DB_PREFIX_.'product_lang pl ON (p.id_product = pl.id_product AND pl.id_lang = '.(int)$this->getLang().' '.Shop::addSqlRestrictionOnLang('pl').')
             LEFT JOIN (
-                SELECT p.`id_product` as id_product,
-                ROUND(AVG(od.`product_price` / o.`conversion_rate`), 2) as avgPriceSold,
-                IFNULL(SUM(od.`product_quantity`), 0) AS totalQuantitySold,
-                ROUND(IFNULL(SUM((od.product_price * od.product_quantity) / o.conversion_rate), 0), 2) AS totalPriceSold
-                FROM '._DB_PREFIX_.'order_detail od
-                INNER JOIN '._DB_PREFIX_.'product p ON (p.`id_product` = od.`product_id`)
-                '.Shop::addSqlAssociation('product', 'p').'
-                LEFT JOIN '._DB_PREFIX_.'orders o ON (od.id_order = o.id_order)
+                SELECT spod.`id_product` as id_product,
+                ROUND(IFNULL(SUM(spod.`total_price_tax_excl` / o.conversion_rate), 0), 2) / SUM(spod.`quantity`) as avgPriceSold,
+                IFNULL(SUM(spod.`quantity`), 0) AS totalQuantitySold,
+                ROUND(IFNULL(SUM(spod.`total_price_tax_excl` / o.conversion_rate), 0), 2) AS totalPriceSold
+                FROM '._DB_PREFIX_.'htl_room_type_service_product_order_detail spod
+                INNER JOIN '._DB_PREFIX_.'orders o ON (spod.id_order = o.id_order)
+                INNER JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd ON (spod.`id_htl_booking_detail` = hbd.`id`)
+                INNER JOIN `'._DB_PREFIX_.'htl_access` ha ON (hbd.`id_hotel` = ha.`id_hotel`)
                 WHERE o.valid = 1 AND o.invoice_date BETWEEN '.$date_between.'
-                GROUP BY od.`product_id`
+                AND ha.`id_profile` = '.(int)$this->context->employee->id_profile.' AND ha.`access` = 1
+                GROUP BY spod.`id_product`
             ) odd ON (odd.`id_product` = p.`id_product`)
             WHERE p.`booking_product` = 0 AND p.`active` = 1
             GROUP BY p.id_product';
