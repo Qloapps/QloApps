@@ -32,7 +32,7 @@ $(document).ready(function() {
 
             if (dateFrom >= dateTo) {
                 let objDateToMin = $.datepicker.parseDate('yy-mm-dd', dateFrom);
-                objDateToMin.setDate(objDateToMin.getDate() + 1);
+                objDateToMin.setDate(objDateToMin.getDate());
 
                 $('#date_to').datepicker('option', 'minDate', objDateToMin);
             }
@@ -47,7 +47,7 @@ $(document).ready(function() {
 
             if (typeof dateFrom != 'undefined' && dateFrom != '') {
                 let objDateToMin = $.datepicker.parseDate('yy-mm-dd', dateFrom);
-                objDateToMin.setDate(objDateToMin.getDate() + 1);
+                objDateToMin.setDate(objDateToMin.getDate());
 
                 $('#date_to').datepicker('option', 'minDate', objDateToMin);
             }

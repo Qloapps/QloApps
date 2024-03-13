@@ -156,7 +156,7 @@ class AdminSlipControllerCore extends AdminController
 
         $this->fields_value = array(
             'date_from' => date('Y-m-d'),
-            'date_to' => date('Y-m-d', strtotime('+ 1 day'))
+            'date_to' => date('Y-m-d')
         );
 
         $this->show_toolbar = false;
