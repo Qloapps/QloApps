@@ -18,8 +18,8 @@ Hotel Email: {hotel_email}
 
 {extra_mail_content_txt}
 
-You can review your cancelation request from the
-"Booking refund request" [/{refund_requests_url}] section of your customer account by
+You can review your order and download your invoice from the
+"Order history" [/{history_url}] section of your customer account by
 clicking "My account" [/{my_account_url}] on our website.
 
 If you have a guest account, you can follow your order via the
