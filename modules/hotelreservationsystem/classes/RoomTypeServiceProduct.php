@@ -47,7 +47,10 @@ class RoomTypeServiceProduct extends ObjectModel
         )
     );
 
-    public static function deleteRoomProductLink($idProduct, $elementType = 0)
+    /**
+     * This method deletes passed associations and cleans positions of remaining associations
+     */
+    public static function deleteRoomProductLink($idProduct, $elementType = 0, $idElement = 0)
     {
         $where = '`id_product`='.(int)$idProduct;
 
@@ -55,10 +58,27 @@ class RoomTypeServiceProduct extends ObjectModel
             $where .= ' AND `element_type`='.(int)$elementType;
         }
 
-        return Db::getInstance()->delete(
+        if ($idElement) {
+            $where .= ' AND `id_element` = '.(int) $idElement;
+        }
+
+        // Get the list of elements before deleting associations to clean positions of remaining associations
+        $elements = Db::getInstance()->executeS(
+            'SELECT rsp.`id_element`, rsp.`element_type`
+            FROM `'._DB_PREFIX_.'htl_room_type_service_product` rsp
+            WHERE '.$where.'
+            GROUP BY rsp.`element_type`, rsp.`id_element`'
+        );
+
+        $result = Db::getInstance()->delete(
             'htl_room_type_service_product',
             $where
         );
+
+        // Clean positions of remaining associations after deletion
+        $result &= self::cleanPositions($elements);
+
+        return $result;
     }
 
     public function addRoomProductLink($idProduct, $values, $elementType)
@@ -71,7 +91,7 @@ class RoomTypeServiceProduct extends ObjectModel
         foreach($values as $value) {
             $rowData[] = array(
                 'id_product' => $idProduct,
-                'position' => self::getHigherPosition(),
+                'position' => self::getHigherPosition($value, $elementType),
                 'id_element' => $value,
                 'element_type' => $elementType
             );
@@ -216,23 +236,33 @@ class RoomTypeServiceProduct extends ObjectModel
         return $serviceProductsCategories;
     }
 
-    public static function getHigherPosition()
+    public static function getHigherPosition($idElement, $elementType)
     {
         $position = DB::getInstance()->getValue(
-            'SELECT MAX(`position`) FROM `'._DB_PREFIX_.'htl_room_type_service_product`'
+            'SELECT MAX(rsp.`position`)
+            FROM `'._DB_PREFIX_.'htl_room_type_service_product` AS rsp
+            WHERE rsp.`id_element` = '.(int) $idElement.'
+            AND rsp.`element_type` = '.(int) $elementType
         );
         $result = (is_numeric($position)) ? $position : -1;
         return $result + 1;
     }
 
-    public function cleanPositions($idProductRoomType)
+    public static function cleanPositions($elements)
     {
-        Db::getInstance()->execute('SET @i = -1', false);
-        $sql = 'UPDATE `'._DB_PREFIX_.'htl_room_type_service_product` SET `position` = @i:=@i+1
-            WHERE `element_type` = '.self::WK_ELEMENT_TYPE_ROOM_TYPE.' AND `id_element` = '.(int)$idProductRoomType.'
-            ORDER BY `position` ASC';
+        $result = true;
+        foreach ($elements as $element) {
+            Db::getInstance()->execute('SET @i = -1', false);
+            $result &= Db::getInstance()->execute(
+                'UPDATE `'._DB_PREFIX_.'htl_room_type_service_product` rsp
+                SET rsp.`position` = @i:=@i+1
+                WHERE rsp.`element_type` = '.(int) $element['element_type'].'
+                AND rsp.`id_element` = '.(int) $element['id_element'].'
+                ORDER BY rsp.`position` ASC'
+            );
+        }
 
-        return Db::getInstance()->execute($sql);
+        return $result;
     }
 
     /**
@@ -244,22 +274,49 @@ class RoomTypeServiceProduct extends ObjectModel
      * @param int $idPosition
      * @return boolean
      */
-    public static function changePositions($idProduct, $idElement, $toRowIndex, $idPosition)
-    {
-        if ($toRowIndex >= $idPosition) {
-            Db::getInstance()->execute('UPDATE `'._DB_PREFIX_.'htl_room_type_service_product` SET `position` = position -1
-            WHERE  `id_product` != '.(int) $idProduct.' AND `id_element` ='.(int) $idElement .' AND `element_type` = '.self::WK_ELEMENT_TYPE_ROOM_TYPE.'
-            AND `position`  <= '.(int) ($toRowIndex). ' AND `position` >= ' .(int) $idPosition);
-
-            return Db::getInstance()->execute('UPDATE `'._DB_PREFIX_.'htl_room_type_service_product` SET `position` = '.(int) ($toRowIndex).'
-            WHERE  `id_product` = '.(int) $idProduct.' AND `id_element` ='.(int) $idElement .' AND `element_type` = '.self::WK_ELEMENT_TYPE_ROOM_TYPE);
-        } elseif ($toRowIndex < $idPosition) {
-            Db::getInstance()->execute('UPDATE `'._DB_PREFIX_.'htl_room_type_service_product` SET `position` = position +1
-            WHERE  `id_product` != '.(int) $idProduct.' AND `id_element` ='.(int) $idElement .' AND `element_type` = '.self::WK_ELEMENT_TYPE_ROOM_TYPE.'
-            AND `position`  >= '. (int) $toRowIndex. ' AND `position` <= ' .(int) $idPosition);
-
-            return Db::getInstance()->execute('UPDATE `'._DB_PREFIX_.'htl_room_type_service_product` SET `position` = '.$toRowIndex.'
-            WHERE  `id_product` = '.(int) $idProduct.' AND `id_element` ='.(int) $idElement .' AND `element_type` = '.self::WK_ELEMENT_TYPE_ROOM_TYPE);
+    public static function updatePosition(
+        $idProduct,
+        $idElement,
+        $newPosition,
+        $elementType
+    ) {
+        if (!$result = Db::getInstance()->executeS(
+            'SELECT rsp.`id_product`, rsp.`position`
+            FROM `'._DB_PREFIX_.'htl_room_type_service_product` rsp
+            WHERE rsp.`id_element` = '.(int) $idElement.'
+            AND rsp.`element_type` = '.(int) $elementType.'
+            ORDER BY rsp.`position` ASC'
+        )) {
+            return false;
         }
+
+        $movedBlock = false;
+        foreach ($result as $block) {
+            if ((int) $block['id_product'] == (int) $idProduct) {
+                $movedBlock = $block;
+            }
+        }
+
+        if ($movedBlock === false) {
+            return false;
+        }
+
+        $way = ($newPosition >= $movedBlock['position']) ? 1 : 0;
+
+        return (Db::getInstance()->execute(
+            'UPDATE `'._DB_PREFIX_.'htl_room_type_service_product` rsp
+            SET rsp.`position` = `position` '.($way ? '- 1' : '+ 1').'
+            WHERE rsp.`id_element` = '.(int) $idElement.'
+            AND rsp.`element_type` = '.(int) $elementType.'
+            AND rsp.`position`'.($way ? '> '.
+            (int) $movedBlock['position'].' AND rsp.`position` <= '.(int) $newPosition : '< '.
+            (int) $movedBlock['position'].' AND rsp.`position` >= '.(int) $newPosition)
+        ) && Db::getInstance()->execute(
+            'UPDATE `'._DB_PREFIX_.'htl_room_type_service_product` rsp
+            SET rsp.`position` = '.(int) $newPosition.'
+            WHERE rsp.`id_element` = '.(int) $idElement.'
+            AND rsp.`element_type` = '.(int) $elementType.'
+            AND rsp.`id_product` = '.(int) $movedBlock['id_product']
+        ));
     }
 }
