@@ -113,13 +113,14 @@ class StatsProduct extends ModuleGraph
     private function getProducts()
     {
         $sql = 'SELECT p.`id_product`, p.reference, pl.`name`,
-        (SELECT COUNT(hri.`id`) FROM `'._DB_PREFIX_.'htl_room_information` hri WHERE hri.`id_product` = p.`id_product`) AS total_rooms
-        FROM `'._DB_PREFIX_.'product` p
-        INNER JOIN `'._DB_PREFIX_.'htl_room_type` hrt ON (hrt.`id_product` = p.`id_product`)
-        INNER JOIN `'._DB_PREFIX_.'htl_access` ha ON (hrt.`id_hotel` = ha.`id_hotel`)
-        LEFT JOIN `'._DB_PREFIX_.'product_lang` pl ON (p.`id_product` = pl.`id_product` AND pl.`id_lang`='.(int)$this->context->language->id.')
+        (SELECT COUNT(hri.`id`)
+            FROM `'._DB_PREFIX_.'htl_room_information` hri WHERE hri.`id_product` = p.`id_product`) AS total_rooms
+            FROM `'._DB_PREFIX_.'product` p
+            INNER JOIN `'._DB_PREFIX_.'htl_room_type` hrt ON (hrt.`id_product` = p.`id_product`)
+            LEFT JOIN `'._DB_PREFIX_.'product_lang` pl ON (p.`id_product` = pl.`id_product` AND pl.`id_lang`='.(int)$this->context->language->id.'
+        )
         WHERE p.`booking_product` = 1
-        AND ha.`id_profile` = '.(int)$this->context->employee->id_profile.' AND ha.`access` = 1';
+        '.HotelBranchInformation::addHotelRestriction(false, 'hrt');
         if (Tools::getValue('id_hotel')) {
             $sql .= ' AND hrt.`id_hotel` = '.(int)Tools::getValue('id_hotel');
         }

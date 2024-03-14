@@ -161,15 +161,14 @@ class StatsBestCustomers extends ModuleGrid
 				AND o.valid
                 AND o.`id_order` IN (
                     SELECT id_order FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
-                    INNER JOIN `'._DB_PREFIX_.'htl_access` ha ON (hbd.`id_hotel` = ha.`id_hotel`)
-                    WHERE ha.`id_profile` = '.(int)$this->context->employee->id_profile.' AND ha.`access` = 1)
+                    WHERE 1 '.HotelBranchInformation::addHotelRestriction(false, 'hbd').'
+                    )
 			), 0) as totalMoneySpent,
 			IFNULL((
 				SELECT COUNT(DISTINCT(hbd.id_order))
 				FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
-                INNER JOIN `'._DB_PREFIX_.'htl_access` ha ON (hbd.`id_hotel` = ha.`id_hotel`)
                 INNER JOIN `'._DB_PREFIX_.'orders` o ON (hbd.`id_order` = o.`id_order`)
-				WHERE ha.`id_profile` = '.(int)$this->context->employee->id_profile.' AND ha.`access` = 1
+				WHERE 1 '.HotelBranchInformation::addHotelRestriction(false, 'hbd').'
                 AND hbd.`id_customer` = c.`id_customer`
 				AND o.`invoice_date` BETWEEN '.$this->getDate().'
 				AND o.valid

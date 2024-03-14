@@ -62,10 +62,9 @@ class StatsCatalog extends Module
         IFNULL(SUM(p.`price`) / COUNT(p.`price`), 0) AS average_price
         FROM `'._DB_PREFIX_.'product` p
         INNER JOIN `'._DB_PREFIX_.'htl_room_type` hrt ON (hrt.`id_product` = p.`id_product`)
-        INNER JOIN `'._DB_PREFIX_.'htl_access` ha ON (hrt.`id_hotel` = ha.`id_hotel`)
         '.$this->join.'
         WHERE p.`active` = 1
-        AND ha.`id_profile` = '.(int)$this->context->employee->id_profile.' AND ha.`access` = 1
+        '.HotelBranchInformation::addHotelRestriction(false, 'hrt').'
         '.$this->where;
         if ($this->id_hotel) {
             $sql .= ' AND hrt.`id_hotel` = '.(int)$this->id_hotel;
@@ -82,10 +81,9 @@ class StatsCatalog extends Module
         LEFT JOIN `'._DB_PREFIX_.'page_type` pt ON (pt.`id_page_type` = p.`id_page_type`)
         LEFT JOIN `'._DB_PREFIX_.'category` cl ON (cl.`id_category` = p.`id_object`)
         LEFT JOIN `'._DB_PREFIX_.'htl_branch_info` hbi ON (hbi.`id_category` = cl.`id_category`)
-        INNER JOIN `'._DB_PREFIX_.'htl_access` ha ON (hbi.`id` = ha.`id_hotel`)
         '.$this->join.'
         WHERE pt.`name` = "'.pSQL('category').'"
-        AND ha.`id_profile` = '.(int)$this->context->employee->id_profile.' AND ha.`access` = 1
+        '.HotelBranchInformation::addHotelRestriction(false, 'hbi', 'id').'
         '.$this->where;
 
         if ($this->id_hotel) {
@@ -105,10 +103,9 @@ class StatsCatalog extends Module
 		LEFT JOIN `'._DB_PREFIX_.'page` pa ON p.`id_product` = pa.`id_object`
 		LEFT JOIN `'._DB_PREFIX_.'page_type` pt ON (pt.`id_page_type` = pa.`id_page_type` AND pt.`name` IN ("product.php", "product"))
 		LEFT JOIN `'._DB_PREFIX_.'page_viewed` pv ON pv.`id_page` = pa.`id_page`
-        INNER JOIN `'._DB_PREFIX_.'htl_access` ha ON (hrt.`id_hotel` = ha.`id_hotel`)
 		'.$this->join.'
 		WHERE product_shop.`active` = 1
-        AND ha.`id_profile` = '.(int)$this->context->employee->id_profile.' AND ha.`access` = 1
+        '.HotelBranchInformation::addHotelRestriction(false, 'hrt').'
 		'.$this->where;
 
         if ($this->id_hotel) {
@@ -126,12 +123,11 @@ class StatsCatalog extends Module
 		LEFT JOIN `'._DB_PREFIX_.'page_type` pt ON pt.`id_page_type` = pa.`id_page_type`
 		LEFT JOIN `'._DB_PREFIX_.'product` p ON p.`id_product` = pa.`id_object`
 		INNER JOIN `'._DB_PREFIX_.'htl_room_type` hrt ON (p.`id_product` = hrt.`id_product`)
-        INNER JOIN `'._DB_PREFIX_.'htl_access` ha ON (hrt.`id_hotel` = ha.`id_hotel`)
 		'.Shop::addSqlAssociation('product', 'p').'
 		'.$this->join.'
 		WHERE pt.`name` IN ("product.php", "product")
-        AND ha.`id_profile` = '.(int)$this->context->employee->id_profile.' AND ha.`access` = 1
 		AND product_shop.`active` = 1
+        '.HotelBranchInformation::addHotelRestriction(false, 'hrt').'
 		'.$this->where;
 
         if ($this->id_hotel) {
@@ -162,9 +158,7 @@ class StatsCatalog extends Module
                     WHERE hrt.`id_hotel` = hbi.`id`
                 ) AS room_type_images
                 FROM `'._DB_PREFIX_.'htl_branch_info` hbi
-                INNER JOIN `'._DB_PREFIX_.'htl_access` ha
-                ON (hbi.`id` = ha.`id_hotel`)
-                WHERE ha.`id_profile` = '.(int)$this->context->employee->id_profile.' AND ha.`access` = 1
+                WHERE 1 '.HotelBranchInformation::addHotelRestriction(false, 'hbi', 'id').'
             ) AS t
             '.($this->id_hotel ? ' WHERE t.`id` = '.(int) $this->id_hotel : '')
         );
@@ -175,8 +169,7 @@ class StatsCatalog extends Module
         return Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue(
             'SELECT IFNULL(SUM(DATEDIFF(hbd.`date_to`, hbd.`date_from`)), 0)
             FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
-            INNER JOIN `'._DB_PREFIX_.'htl_access` ha ON (hbd.`id_hotel` = ha.`id_hotel`)
-            WHERE ha.`id_profile` = '.(int)$this->context->employee->id_profile.' AND ha.`access` = 1
+            WHERE 1 '.HotelBranchInformation::addHotelRestriction(false, 'hbd').'
             '.($this->id_hotel ? ' AND hbd.`id_hotel` = '.(int) $this->id_hotel : '')
         );
     }
@@ -188,11 +181,10 @@ class StatsCatalog extends Module
 				LEFT JOIN `'._DB_PREFIX_.'order_detail` od ON o.`id_order` = od.`id_order`
 				LEFT JOIN `'._DB_PREFIX_.'product` p ON p.`id_product` = od.`product_id`
 				INNER JOIN `'._DB_PREFIX_.'htl_room_type` hrt ON (p.`id_product` = hrt.`id_product`)
-                INNER JOIN `'._DB_PREFIX_.'htl_access` ha ON (hrt.`id_hotel` = ha.`id_hotel`)
 				'.Shop::addSqlAssociation('product', 'p').'
 				'.$this->join.'
 				WHERE o.valid = 1
-                    AND ha.`id_profile` = '.(int)$this->context->employee->id_profile.' AND ha.`access` = 1
+                    '.HotelBranchInformation::addHotelRestriction(false, 'hrt').'
 					'.$this->where.'
 					AND product_shop.`active` = 1';
         if ($this->id_hotel) {
@@ -210,13 +202,12 @@ class StatsCatalog extends Module
 				FROM `'._DB_PREFIX_.'product` p
 				'.Shop::addSqlAssociation('product', 'p').'
 				INNER JOIN `'._DB_PREFIX_.'htl_room_type` hrt ON (p.`id_product` = hrt.`id_product`)
-                INNER JOIN `'._DB_PREFIX_.'htl_access` ha ON (hrt.`id_hotel` = ha.`id_hotel`)
 				LEFT JOIN `'._DB_PREFIX_.'product_lang` pl
 					ON (pl.`id_product` = p.`id_product` AND pl.id_lang = '.(int)$id_lang.Shop::addSqlRestrictionOnLang('pl').')
 				'.$this->join.'
 				WHERE product_shop.`active` = 1
-                    AND ha.`id_profile` = '.(int)$this->context->employee->id_profile.' AND ha.`access` = 1
 					'.(count($precalc2) ? 'AND p.`id_product` NOT IN ('.implode(',', $precalc2).')' : '').'
+                    '.HotelBranchInformation::addHotelRestriction(false, 'hrt').'
 					'.$this->where;
         if ($this->id_hotel) {
             $sql .= ' AND hrt.`id_hotel` = '.(int)$this->id_hotel;

@@ -196,10 +196,9 @@ class StatsSales extends ModuleGraph
             SELECT o.`id_order`, (o.`total_paid_real` / o.`conversion_rate`) AS total_paid_real, hbd.`id_hotel`
             FROM `'._DB_PREFIX_.'orders` o
             INNER JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd ON (hbd.`id_order` = o.`id_order`)
-            INNER JOIN `'._DB_PREFIX_.'htl_access` ha ON (hbd.`id_hotel` = ha.`id_hotel`)
             '.((int)Tools::getValue('id_country') ? 'LEFT JOIN `'._DB_PREFIX_.'address` a ON o.`id_address_delivery` = a.`id_address`' : '').'
             WHERE o.`valid` = 1
-            AND ha.`id_profile` = '.(int)$this->context->employee->id_profile.' AND ha.`access` = 1
+            '.HotelBranchInformation::addHotelRestriction(false, 'hbd').'
             '.Shop::addSqlRestriction(Shop::SHARE_ORDER, 'o').'
             '.((int)Tools::getValue('id_country') ? ' AND a.`id_country` = '.(int)Tools::getValue('id_country') : '').'
             AND o.`invoice_date` BETWEEN '.ModuleGraph::getDateBetween().'
@@ -242,10 +241,9 @@ class StatsSales extends ModuleGraph
         ) AS id_hotel
         FROM `'._DB_PREFIX_.'orders` o
         INNER JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd ON (hbd.`id_order` = o.`id_order`)
-        INNER JOIN `'._DB_PREFIX_.'htl_access` ha ON (hbd.`id_hotel` = ha.`id_hotel`)
         '.((int)$this->id_country ? 'LEFT JOIN `'._DB_PREFIX_.'address` a ON o.`id_address_delivery` = a.`id_address`' : '').'
         WHERE o.`valid` = 1
-        AND ha.`id_profile` = '.(int)$this->context->employee->id_profile.' AND ha.`access` = 1
+        '.HotelBranchInformation::addHotelRestriction(false, 'hbd').'
         '.Shop::addSqlRestriction(Shop::SHARE_ORDER, 'o').'
         '.((int)$this->id_country ? ' AND a.`id_country` = '.(int)$this->id_country : '').'
         AND o.`invoice_date` BETWEEN';
@@ -322,7 +320,6 @@ class StatsSales extends ModuleGraph
             LEFT JOIN `'._DB_PREFIX_.'order_history` oh ON os.`id_order_state` = oh.`id_order_state`
             LEFT JOIN `'._DB_PREFIX_.'orders` o ON o.`id_order` = oh.`id_order`
             INNER JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd ON (hbd.`id_order` = o.`id_order`)
-            INNER JOIN `'._DB_PREFIX_.'htl_access` ha ON (hbd.`id_hotel` = ha.`id_hotel`)
             '.((int)$this->id_country ? 'LEFT JOIN `'._DB_PREFIX_.'address` a ON o.id_address_delivery = a.id_address' : '').'
             WHERE oh.`id_order_history` = (
                 SELECT ios.`id_order_history`
@@ -331,7 +328,7 @@ class StatsSales extends ModuleGraph
                 ORDER BY ios.`date_add` DESC, oh.`id_order_history` DESC
                 LIMIT 1
             )
-            AND ha.`id_profile` = '.(int)$this->context->employee->id_profile.' AND ha.`access` = 1
+            '.HotelBranchInformation::addHotelRestriction(false, 'hbd').'
             '.((int)$this->id_country ? 'AND a.id_country = '.(int)$this->id_country : '').'
             AND o.`date_add` BETWEEN '.ModuleGraph::getDateBetween().'
             GROUP BY o.`id_order`
