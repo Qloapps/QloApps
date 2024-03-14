@@ -887,9 +887,11 @@ class OrderInvoiceCore extends ObjectModel
 			SELECT oi.*
 			FROM `'._DB_PREFIX_.'order_invoice` oi
 			LEFT JOIN `'._DB_PREFIX_.'orders` o ON (o.`id_order` = oi.`id_order`)
+            INNER JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd ON (oi.id_order = hbd.id_order)
 			WHERE DATE_ADD(oi.date_add, INTERVAL -1 DAY) <= \''.pSQL($date_to).'\'
 			AND oi.date_add >= \''.pSQL($date_from).'\'
-			'.Shop::addSqlRestriction(Shop::SHARE_ORDER, 'o').'
+			'.Shop::addSqlRestriction(Shop::SHARE_ORDER, 'o')
+            .HotelBranchInformation::addHotelRestriction(false, 'hbd').'
 			AND oi.number > 0
 			ORDER BY oi.date_add ASC
 		');
@@ -908,8 +910,10 @@ class OrderInvoiceCore extends ObjectModel
 			SELECT oi.*
 			FROM `'._DB_PREFIX_.'order_invoice` oi
 			LEFT JOIN `'._DB_PREFIX_.'orders` o ON (o.`id_order` = oi.`id_order`)
+            INNER JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd ON (oi.id_order = hbd.id_order)
 			WHERE '.(int)$id_order_state.' = o.current_state
-			'.Shop::addSqlRestriction(Shop::SHARE_ORDER, 'o').'
+			'.Shop::addSqlRestriction(Shop::SHARE_ORDER, 'o')
+            .HotelBranchInformation::addHotelRestriction(false, 'hbd').'
 			AND oi.number > 0
 			ORDER BY oi.`date_add` ASC
 		');
