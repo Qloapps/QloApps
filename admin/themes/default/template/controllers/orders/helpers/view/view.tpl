@@ -1755,6 +1755,17 @@
 			$('#room_extra_demand_content #back_to_service_btn').hide();
 		});
 
+		$(document).on('change', '#rooms_type_extra_demands .room_ordered_services .qty', function(e) {
+			let quantityInputField = this;
+			let maximumQuantity = parseInt($(quantityInputField).attr('data-max-quantity'));
+			let currentQuantity = parseInt($(quantityInputField).val());
+			if (currentQuantity > maximumQuantity) {
+				$(quantityInputField).siblings('p').show();
+			} else {
+				$(quantityInputField).siblings('p').hide();
+			}
+		});
+
 		$(document).on('focusout', '#rooms_type_extra_demands .room_ordered_services .qty', function(e) {
 			var qty_wntd = $(this).val();
 			if (qty_wntd == '' || !$.isNumeric(qty_wntd) || qty_wntd < 1) {
