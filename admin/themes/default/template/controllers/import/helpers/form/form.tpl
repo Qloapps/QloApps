@@ -65,12 +65,6 @@
 						<li>{l s='Note that the Category import does not support having two categories with the same name.'}</li>
 					</ul>
 				</div>
-				<div class="alert alert-warning import_orders_details">
-					<ul>
-						<li>{l s='Note that the bookings import with active mail feature will make the import process very slow.'}</li>
-						<li>{l s='You can disable the mail feature from Advanced Parameters > E-mail'}</li>
-					</ul>
-				</div>
 				<div class="alert alert-warning import_supply_orders_details">
 					<p>{l s='Importing Supply Order Details will reset your history of ordered products, if there are any.'}</p>
 				</div>
@@ -525,12 +519,6 @@
 				$(".import_products_categories").hide();
 			}
 
-			if ($("#entity > option:selected").val() == 5) {
-				$(".import_orders_details").show();
-			}
-			else {
-				$(".import_orders_details").hide();
-			}
 			if ($("#entity > option:selected").val() == 0 || $("#entity > option:selected").val() == 1 ||
 				$("#entity > option:selected").val() == 5 || $("#entity > option:selected").val() == 6) {
 					$("#regenerate").closest('.form-group').show();

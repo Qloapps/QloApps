@@ -1334,7 +1334,7 @@ class AdminImportControllerCore extends AdminController
             }
 
             $info = AdminImportController::getMaskedRow($line);
-            $has_required_fields = $this->checkRequiredFields($info);
+            $has_required_fields = $this->checkRequiredFields($info, 'hote_name');
             if ($has_required_fields) {
                 $hotelExists = false;
                 if (isset($info['id']) && Validate::isLoadedObject(new HotelBranchInformation((int) $info['id']))) {
@@ -1532,7 +1532,8 @@ class AdminImportControllerCore extends AdminController
                         }
 
                         $objHotelOrderRestrictDate = new HotelOrderRestrictDate();
-                        if ($restrictDateInfo = HotelOrderRestrictDate::getDataByHotelId($newIdHotel)) {
+                        $restrictDateInfo = HotelOrderRestrictDate::getDataByHotelId($newIdHotel);
+                        if ($restrictDateInfo) {
                             $objHotelOrderRestrictDate = new HotelOrderRestrictDate($restrictDateInfo['id']);
                         } else {
                             $objHotelOrderRestrictDate = new HotelOrderRestrictDate();
@@ -1988,7 +1989,7 @@ class AdminImportControllerCore extends AdminController
                                 if ($idRoomTypeServiceProduct = $objRoomTypeServiceProduct->isRoomTypeLinkedWithProduct(
                                     $product->id,
                                     $id_service_product)
-                                ) {
+                                ){
                                     $objOlderRTserviceProduct = new RoomTypeServiceProduct($idRoomTypeServiceProduct);
                                     $objOlderRTserviceProduct->delete();
                                 }
@@ -2113,9 +2114,17 @@ class AdminImportControllerCore extends AdminController
             $field_error = $objHotelRoomInfo->validateFields(UNFRIENDLY_ERROR, true);
             $lang_field_error = $objHotelRoomInfo->validateFieldsLang(UNFRIENDLY_ERROR, true);
             $res = false;
-            $has_required_fields = $this->checkRequiredFields($info);
+            $has_required_fields = $this->checkRequiredFields($info, 'room_num');
             if ($has_required_fields) {
-                if (Validate::isLoadedObject($objProduct = new Product((int) $info['id_product']))
+                if ($objHotelRoomInfo->id_status == HotelRoomInformation::STATUS_TEMPORARY_INACTIVE
+                    && (!isset($objHotelRoomInfo->dates) || !$objHotelRoomInfo->dates)
+                ) {
+                    $this->errors[] = sprintf(
+                        Tools::displayError('%1$s (ID: %2$s) cannot be saved due to missing disable dates.'),
+                        (isset($info['room_num']) && !empty($info['room_num']))? Tools::safeOutput($info['room_num']) : 'No Name',
+                        (isset($info['id']) && !empty($info['id']))? Tools::safeOutput($info['id']) : 'No ID'
+                    );
+                } else if (Validate::isLoadedObject($objProduct = new Product((int) $info['id_product']))
                     && Product::isBookingProduct($objProduct->id)
                 ) {
                     if ($field_error === true && $lang_field_error === true) {
@@ -2746,7 +2755,7 @@ class AdminImportControllerCore extends AdminController
             $singleRow = (object) array();
             $info = AdminImportController::getMaskedRow($line);
             AdminImportController::arrayWalk($info, array('AdminImportController', 'fillInfo'), $singleRow);
-            $has_required_fields = $this->checkRequiredFields($info);
+            $has_required_fields = $this->checkRequiredFields($info, 'id_order');
             if ($has_required_fields) {
                 $idHotel = 0;
                 $objCustomer = new Customer($info['id_customer']);
@@ -2789,184 +2798,195 @@ class AdminImportControllerCore extends AdminController
             }
         }
 
+
         foreach ($ordersRow as $orderRefKey => $orderRow) {
             $idCustomer = $orderInfo[$orderRefKey]['id_customer'];
-            $objCustomer = new Customer((int)$idCustomer);
-            $idGuest = Guest::getFromCustomer($objCustomer->id);
-            $id_order_state = (int) $orderInfo[$orderRefKey]['id_order_status'];
-            $objCartBooking = new HotelCartBookingData();
-            $this->context->cart = new Cart();
-            $this->context->customer = $objCustomer;
-            $this->context->cart->id_customer = $idCustomer;
-            $this->context->cart->id_guest = $idGuest;
-            if (Validate::isLoadedObject($this->context->cart) && $this->context->cart->OrderExists()) {
-                continue;
-            }
+            $objCustomer = new Customer((int) $idCustomer);
+            if (!$objCustomer->is_guest) {
+                $idGuest = Guest::getFromCustomer($objCustomer->id);
+                $id_order_state = (int) $orderInfo[$orderRefKey]['id_order_status'];
+                $objCartBooking = new HotelCartBookingData();
+                $this->context->cart = new Cart();
+                $this->context->customer = $objCustomer;
+                $this->context->cart->id_customer = $idCustomer;
+                $this->context->cart->id_guest = $idGuest;
+                if (Validate::isLoadedObject($this->context->cart) && $this->context->cart->OrderExists()) {
+                    continue;
+                }
 
-            if (!$this->context->cart->secure_key) {
-                $this->context->cart->secure_key = $this->context->customer->secure_key;
-            }
+                if (!$this->context->cart->secure_key) {
+                    $this->context->cart->secure_key = $this->context->customer->secure_key;
+                }
 
-            if (!$this->context->cart->id_shop) {
-                $this->context->cart->id_shop = Configuration::get('PS_SHOP_DEFAULT');
-            }
+                if (!$this->context->cart->id_shop) {
+                    $this->context->cart->id_shop = Configuration::get('PS_SHOP_DEFAULT');
+                }
 
-            if (!$this->context->cart->id_lang) {
-                $this->context->cart->id_lang = Configuration::get('PS_LANG_DEFAULT');
-            }
+                if (!$this->context->cart->id_lang) {
+                    $this->context->cart->id_lang = Configuration::get('PS_LANG_DEFAULT');
+                }
 
-            if (!$this->context->cart->id_currency) {
-                $this->context->cart->id_currency = Configuration::get('PS_CURRENCY_DEFAULT');
-            }
+                if (!$this->context->cart->id_currency) {
+                    $this->context->cart->id_currency = Configuration::get('PS_CURRENCY_DEFAULT');
+                }
 
-            if ($addresses = $objCustomer->getAddresses((int)$this->context->cart->id_lang)){
-                $objCountry = new Country($addresses[0]['id_country'], $this->context->language->id);
-                $objHotelBookingDetails = new HotelBookingDetail();
-                $amount = 0;
-                $due_amount = 0;
-                if ($objCountry->active) {
-                    if (!$this->context->cart->id_address_invoice && isset($addresses[0])) {
-                        $this->context->cart->id_address_invoice = (int)$addresses[0]['id_address'];
-                    }
+                if ($addresses = $objCustomer->getAddresses((int)$this->context->cart->id_lang)){
+                    $objCountry = new Country($addresses[0]['id_country'], $this->context->language->id);
+                    $objHotelBookingDetails = new HotelBookingDetail();
+                    $amount = 0;
+                    $due_amount = 0;
+                    if ($objCountry->active) {
+                        if (!$this->context->cart->id_address_invoice && isset($addresses[0])) {
+                            $this->context->cart->id_address_invoice = (int)$addresses[0]['id_address'];
+                        }
 
-                    if (!$this->context->cart->id_address_delivery && isset($addresses[0])) {
-                        $this->context->cart->id_address_delivery = $addresses[0]['id_address'];
-                    }
+                        if (!$this->context->cart->id_address_delivery && isset($addresses[0])) {
+                            $this->context->cart->id_address_delivery = $addresses[0]['id_address'];
+                        }
 
-                    $this->context->cart->setNoMultishipping();
-                    $this->context->cart->save();
-                    $occupancy = $featurePrices = array();
-                    foreach ($orderRow as $idHotel => $orderByHotel) {
-                        foreach($orderByHotel as $key => $orderProduct) {
-                            $date_from = $orderProduct['duration_dates'][0];
-                            $date_to  = $orderProduct['duration_dates'][1];
-                            $bookingParams = array(
-                                'date_from' => $date_from,
-                                'date_to' => $date_to,
-                                'hotel_id' => $idHotel,
-                                'id_room_type' => $orderProduct['id_product'],
-                                'only_search_data' => 1,
-                            );
-                            $due_amount += isset($orderProduct['due_amount']) ? $orderProduct['due_amount'] : 0;
-                            $data = $objHotelBookingDetails->getBookingData($bookingParams);
-                            if ($data['stats']['num_avail'] >= $orderProduct['num_rooms']) {
-                                for ($i = 0; $i < $orderProduct['num_rooms']; $i++) {
-                                    $occupancy[$i]['adults'] = $orderProduct['adults'];
-                                    $occupancy[$i]['children'] = 0;
-                                }
-
-                                $serviceProduct = array();
-                                $globalDemand = array();
-                                if (isset($orderProduct['id_service_products']) && count($orderProduct['id_service_products'])) {
-                                    foreach ($orderProduct['id_service_products'] as $serviceProdKey =>  $serviceProd) {
-                                        $objServiceProduct = new Product($serviceProd);
-                                        if (Validate::isLoadedObject($objServiceProduct)) {
-                                            $serviceProduct[$serviceProdKey]['id_product'] = $serviceProd;
-                                            $serviceProduct[$serviceProdKey]['quantity'] = 1;
-                                        }
-                                    }
-                                }
-
-                                if (isset($orderProduct['id_additional_facilities']) && count($orderProduct['id_additional_facilities'])) {
-                                    foreach ($orderProduct['id_additional_facilities'] as $globalDemandKey =>  $idGlobalDemand) {
-                                        $objGlobalDemand = new HotelRoomTypeGlobalDemand($idGlobalDemand, $this->context->language->id);
-                                        if (Validate::isLoadedObject($objGlobalDemand)) {
-                                            $globalDemand[$globalDemandKey]['id_global_demand'] = $idGlobalDemand;
-                                            $globalDemand[$globalDemandKey]['id_option'] = 0;
-                                        }
-                                    }
-                                }
-
-                                $globalDemand = json_encode($globalDemand);
-                                $objCartBooking->updateCartBooking(
-                                    $orderProduct['id_product'],
-                                    $occupancy,
-                                    'up',
-                                    $idHotel,
-                                    0,
-                                    date('Y-m-d', strtotime($date_from)),
-                                    date('Y-m-d', strtotime($date_to)),
-                                    $globalDemand,
-                                    $serviceProduct,
-                                    $this->context->cart->id,
-                                    $this->context->cart->id_guest
+                        $this->context->cart->setNoMultishipping();
+                        $this->context->cart->save();
+                        $occupancy = $featurePrices = array();
+                        foreach ($orderRow as $idHotel => $orderByHotel) {
+                            foreach($orderByHotel as $key => $orderProduct) {
+                                $date_from = $orderProduct['duration_dates'][0];
+                                $date_to  = $orderProduct['duration_dates'][1];
+                                $bookingParams = array(
+                                    'date_from' => $date_from,
+                                    'date_to' => $date_to,
+                                    'hotel_id' => $idHotel,
+                                    'id_room_type' => $orderProduct['id_product'],
+                                    'only_search_data' => 1,
                                 );
-                                $objHotelCartBookingData = new HotelCartBookingData();
-                                if ($idRooms = $objHotelCartBookingData->getCustomerIdRoomsByIdCartIdProduct(
-                                    $this->context->cart->id,
-                                    $orderProduct['id_product'],
-                                    date('Y-m-d', strtotime($date_from)),
-                                    date('Y-m-d', strtotime($date_to))
-                                )) {
-                                    $productPriceTI = Product::getPriceStatic((int) $orderProduct['id_product'], true);
-                                    $productPriceTE = Product::getPriceStatic((int) $orderProduct['id_product'], false);
-                                    if ($productPriceTE) {
-                                        $taxRate = (($productPriceTI-$productPriceTE)/$productPriceTE)*100;
-                                    } else {
-                                        $taxRate = 0;
+                                $due_amount += isset($orderProduct['due_amount']) ? $orderProduct['due_amount'] : 0;
+                                $data = $objHotelBookingDetails->getBookingData($bookingParams);
+                                if ($data['stats']['num_avail'] >= $orderProduct['num_rooms']) {
+                                    for ($i = 0; $i < $orderProduct['num_rooms']; $i++) {
+                                        $occupancy[$i]['adults'] = $orderProduct['adults'];
+                                        $occupancy[$i]['children'] = 0;
                                     }
 
-                                    $taxRateM =  $taxRate/100;
-                                    if (isset($orderProduct['amount'])) {
-                                        $orderProduct['amount'] = (float)$orderProduct['amount']/(1+$taxRateM);
-                                        foreach ($idRooms as $idRoom) {
-                                            $hrt_feature_price = new HotelRoomTypeFeaturePricing();
-                                            $hrt_feature_price->id_product = (int) $orderProduct['id_product'];
-                                            $hrt_feature_price->id_cart = (int) $this->context->cart->id;
-                                            $hrt_feature_price->id_guest = (int) $this->context->cart->id_guest;
-                                            foreach(Language::getLanguages(true) as $lang) {
-                                                $hrt_feature_price->feature_price_name[$lang['id_lang']] = 'csvprice';
+                                    $serviceProduct = array();
+                                    $globalDemand = array();
+                                    if (isset($orderProduct['id_service_products']) && count($orderProduct['id_service_products'])) {
+                                        foreach ($orderProduct['id_service_products'] as $serviceProdKey =>  $serviceProd) {
+                                            $objServiceProduct = new Product($serviceProd);
+                                            if (Validate::isLoadedObject($objServiceProduct)) {
+                                                $serviceProduct[$serviceProdKey]['id_product'] = $serviceProd;
+                                                $serviceProduct[$serviceProdKey]['quantity'] = 1;
                                             }
+                                        }
+                                    }
 
-                                            $hrt_feature_price->date_selection_type = HotelRoomTypeFeaturePricing::DATE_SELECTION_TYPE_RANGE;
-                                            $hrt_feature_price->date_from = date('Y-m-d', strtotime($date_from));
-                                            $hrt_feature_price->date_to = date('Y-m-d', strtotime($date_to));
-                                            $hrt_feature_price->is_special_days_exists = 0;
-                                            $hrt_feature_price->id_room = $idRoom['id_room'];
-                                            $hrt_feature_price->special_days = json_encode(false);
-                                            $hrt_feature_price->impact_way = HotelRoomTypeFeaturePricing::IMPACT_WAY_FIX_PRICE;
-                                            $hrt_feature_price->impact_type = HotelRoomTypeFeaturePricing::IMPACT_TYPE_FIXED_PRICE;
-                                            $hrt_feature_price->impact_value = $orderProduct['amount'];
-                                            $hrt_feature_price->active = 1;
-                                            $hrt_feature_price->groupBox = array_column(Group::getGroups($this->context->language->id), 'id_group');
-                                            $hrt_feature_price->add();
-                                            $featurePrices[] = $hrt_feature_price->id;
+                                    if (isset($orderProduct['id_additional_facilities']) && count($orderProduct['id_additional_facilities'])) {
+                                        foreach ($orderProduct['id_additional_facilities'] as $globalDemandKey =>  $idGlobalDemand) {
+                                            $objGlobalDemand = new HotelRoomTypeGlobalDemand($idGlobalDemand, $this->context->language->id);
+                                            if (Validate::isLoadedObject($objGlobalDemand)) {
+                                                $globalDemand[$globalDemandKey]['id_global_demand'] = $idGlobalDemand;
+                                                $globalDemand[$globalDemandKey]['id_option'] = 0;
+                                            }
+                                        }
+                                    }
+
+                                    $globalDemand = json_encode($globalDemand);
+                                    $objCartBooking->updateCartBooking(
+                                        $orderProduct['id_product'],
+                                        $occupancy,
+                                        'up',
+                                        $idHotel,
+                                        0,
+                                        date('Y-m-d', strtotime($date_from)),
+                                        date('Y-m-d', strtotime($date_to)),
+                                        $globalDemand,
+                                        $serviceProduct,
+                                        $this->context->cart->id,
+                                        $this->context->cart->id_guest
+                                    );
+                                    $objHotelCartBookingData = new HotelCartBookingData();
+                                    if ($idRooms = $objHotelCartBookingData->getCustomerIdRoomsByIdCartIdProduct(
+                                        $this->context->cart->id,
+                                        $orderProduct['id_product'],
+                                        date('Y-m-d', strtotime($date_from)),
+                                        date('Y-m-d', strtotime($date_to))
+                                    )) {
+                                        $productPriceTI = Product::getPriceStatic((int) $orderProduct['id_product'], true);
+                                        $productPriceTE = Product::getPriceStatic((int) $orderProduct['id_product'], false);
+                                        if ($productPriceTE) {
+                                            $taxRate = (($productPriceTI-$productPriceTE)/$productPriceTE)*100;
+                                        } else {
+                                            $taxRate = 0;
+                                        }
+
+                                        $taxRateM =  $taxRate/100;
+                                        if (isset($orderProduct['amount'])) {
+                                            $orderProduct['amount'] = (float)$orderProduct['amount']/(1+$taxRateM);
+                                            foreach ($idRooms as $idRoom) {
+                                                $hrt_feature_price = new HotelRoomTypeFeaturePricing();
+                                                $hrt_feature_price->id_product = (int) $orderProduct['id_product'];
+                                                $hrt_feature_price->id_cart = (int) $this->context->cart->id;
+                                                $hrt_feature_price->id_guest = (int) $this->context->cart->id_guest;
+                                                foreach(Language::getLanguages(true) as $lang) {
+                                                    $hrt_feature_price->feature_price_name[$lang['id_lang']] = 'csvprice';
+                                                }
+
+                                                $hrt_feature_price->date_selection_type = HotelRoomTypeFeaturePricing::DATE_SELECTION_TYPE_RANGE;
+                                                $hrt_feature_price->date_from = date('Y-m-d', strtotime($date_from));
+                                                $hrt_feature_price->date_to = date('Y-m-d', strtotime($date_to));
+                                                $hrt_feature_price->is_special_days_exists = 0;
+                                                $hrt_feature_price->id_room = $idRoom['id_room'];
+                                                $hrt_feature_price->special_days = json_encode(false);
+                                                $hrt_feature_price->impact_way = HotelRoomTypeFeaturePricing::IMPACT_WAY_FIX_PRICE;
+                                                $hrt_feature_price->impact_type = HotelRoomTypeFeaturePricing::IMPACT_TYPE_FIXED_PRICE;
+                                                $hrt_feature_price->impact_value = $orderProduct['amount'];
+                                                $hrt_feature_price->active = 1;
+                                                $hrt_feature_price->groupBox = array_column(Group::getGroups($this->context->language->id), 'id_group');
+                                                $hrt_feature_price->add();
+                                                $featurePrices[] = $hrt_feature_price->id;
+                                            }
                                         }
                                     }
                                 }
                             }
                         }
-                    }
 
-                    $amount = $this->context->cart->getOrderTotal(true);
-                    $amount = $amount - $due_amount;
-                    if ($this->context->cart->getProducts()) {
-                        $objPayment = new CsvBooking();
-                        if (!$objPayment->validateOrder(
-                            (int) $this->context->cart->id,
-                            $id_order_state,
-                            $amount,
-                            $this->l('CSV Import -- Admin'),
-                            null,
-                            array(),
-                            (int) $orderInfo[$orderRefKey]['id_currency'],
-                            false,
-                            $objCustomer->secure_key
-                        )) {
-                            $this->errors[] = $this->l('Failed to create order for order reference '.$orderRefKey);
-                        }
+                        $amount = $this->context->cart->getOrderTotal(true);
+                        $amount = $amount - $due_amount;
+                        if ($this->context->cart->getProducts()) {
+                            $objPayment = new CsvBooking();
+                            if (!$objPayment->validateOrder(
+                                (int) $this->context->cart->id,
+                                $id_order_state,
+                                $amount,
+                                $this->l('CSV Import -- Admin'),
+                                null,
+                                array(),
+                                (int) $orderInfo[$orderRefKey]['id_currency'],
+                                false,
+                                $objCustomer->secure_key
+                            )) {
+                                $this->errors[] = $this->l('Failed to create order for order reference '.$orderRefKey);
+                            }
 
-                        foreach ($featurePrices as $idPrice) {
-                            $featue_price = new HotelRoomTypeFeaturePricing($idPrice);
-                            $featue_price->delete();
+                            foreach ($featurePrices as $idPrice) {
+                                $featue_price = new HotelRoomTypeFeaturePricing($idPrice);
+                                $featue_price->delete();
+                            }
                         }
+                    } else {
+                        $this->warnings[] = $this->l('Order creation for the ').$objCountry->name.
+                        $this->l(' is currently unavailable. Please activate the country to enable order creation.');
                     }
                 } else {
-                    $this->warnings[] = $this->l('Order creation for the ').$objCountry->name.
-                    $this->l(' is currently unavailable. Please activate the country to enable order creation.');
+                    $this->warnings[] = sprintf(
+                        Tools::displayError('No address found for the customer ID: %1$s'),
+                        (isset($objCustomer->id) && !empty($objCustomer->id))? $objCustomer->id : 'null'
+                    );
                 }
             } else {
-                $this->warnings[] = $this->l('No address found for the ID customer');
+                $this->warnings[] = sprintf(
+                    Tools::displayError('You cannot upload booking for guest account. (Customer ID: %1$s)'),
+                    (isset($objCustomer->id) && !empty($objCustomer->id))? $objCustomer->id : 'null'
+                );
             }
         }
 
@@ -3458,7 +3478,7 @@ class AdminImportControllerCore extends AdminController
             }
 
             $info = AdminImportController::getMaskedRow($line);
-            $has_required_fields = $this->checkRequiredFields($info);
+            $has_required_fields = $this->checkRequiredFields($info, 'firstname');
             if ($has_required_fields) {
                 AdminImportController::setDefaultValues($info);
                 $customerExists = false;
@@ -4782,19 +4802,22 @@ class AdminImportControllerCore extends AdminController
             .DIRECTORY_SEPARATOR.$file;
     }
 
-    public function checkRequiredFields($fields = array())
+    public function checkRequiredFields($fields = array(), $nameKey = 'name')
     {
         $res = true;
         if (is_array($this->required_fields) && count($this->required_fields)) {
             $res = false;
             if (is_array($fields) && count($fields)) {
+                $res = true;
                 foreach ($this->required_fields as $field) {
                     if (!isset($fields[$field])
                         || empty($fields[$field])
                     ) {
                         $this->errors[] = sprintf(
-                            $this->available_fields[$field]['label'].$this->l(' is invalid for (ID: %1$s)'),
-                            (isset($info['id']) && !empty($info['id']))? $info['id'] : 'null'
+                            Tools::displayError('%1$s (ID: %2$s) cannot be saved ').
+                            $this->available_fields[$field]['label'].$this->l(' is invalid.'),
+                            (isset($fields['room_num']) && !empty($fields[$nameKey]))? Tools::safeOutput($fields[$nameKey]) : 'No Name',
+                            (isset($fields['id']) && !empty($fields['id']))? Tools::safeOutput($fields['id']) : 'No ID'
                         );
 
                         $res = false;

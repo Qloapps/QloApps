@@ -394,8 +394,10 @@ class OrderHistoryCore extends ObjectModel
             return false;
         }
 
-        if (!$this->sendEmail($order, $template_vars)) {
-            return false;
+        if (Tools::getValue('controller') != 'AdminImport') {
+            if (!$this->sendEmail($order, $template_vars)) {
+                return false;
+            }
         }
 
         return true;
