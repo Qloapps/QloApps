@@ -1236,25 +1236,27 @@ abstract class PaymentModuleCore extends Module
                         }
                         if (Configuration::get('PS_ORDER_CONF_MAIL_TO_SUPERADMIN')){
                             // send superadmin information
-                            if (Validate::isLoadedObject($superAdmin = new Employee(_PS_ADMIN_PROFILE_))) {
-                                if (Validate::isEmail($superAdmin->email)) {
-                                    $data['{customer_name}'] = $this->context->customer->firstname.' '.$this->context->customer->lastname;
-                                    $data['{customer_email}'] = $this->context->customer->email;
-                                    $data['{firstname}'] = $superAdmin->firstname;
-                                    $data['{lastname}'] = $superAdmin->lastname;
-                                    $data['{email}'] = $superAdmin->email;
-                                    Mail::Send(
-                                        (int)$order->id_lang,
-                                        'order_conf_admin',
-                                        Mail::l('Order confirmation', (int)$order->id_lang),
-                                        $data,
-                                        $superAdmin->email,
-                                        $superAdmin->firstname.' '.$superAdmin->lastname,
-                                        null,
-                                        null,
-                                        $file_attachement,
-                                        null, _PS_MAIL_DIR_, false, (int)$order->id_shop
-                                    );
+                            if ($superAdminEmployees = Employee::getEmployeesByProfile(_PS_ADMIN_PROFILE_, true)) {
+                                foreach ($superAdminEmployees as $superAdminEmployee) {
+                                    if (Validate::isEmail($superAdminEmployee['email'])) {
+                                        $data['{customer_name}'] = $this->context->customer->firstname.' '.$this->context->customer->lastname;
+                                        $data['{customer_email}'] = $this->context->customer->email;
+                                        $data['{firstname}'] = $superAdminEmployee['firstname'];
+                                        $data['{lastname}'] = $superAdminEmployee['lastname'];
+                                        $data['{email}'] = $superAdminEmployee['email'];
+                                        Mail::Send(
+                                            (int)$order->id_lang,
+                                            'order_conf_admin',
+                                            Mail::l('Order confirmation', (int)$order->id_lang),
+                                            $data,
+                                            $superAdminEmployee['email'],
+                                            $superAdminEmployee['firstname'].' '.$superAdminEmployee['lastname'],
+                                            null,
+                                            null,
+                                            $file_attachement,
+                                            null, _PS_MAIL_DIR_, false, (int)$order->id_shop
+                                        );
+                                    }
                                 }
                             }
                         }
@@ -1288,7 +1290,7 @@ abstract class PaymentModuleCore extends Module
                                     $data['{customer_name}'] = $this->context->customer->firstname.' '.$this->context->customer->lastname;
                                     $data['{customer_email}'] = $this->context->customer->email;
                                     foreach ($htlAccesses as $access) {
-                                        if ($access['id_profile'] != _PS_ADMIN_PROFILE_) {
+                                        if ($access['access'] && $access['id_profile'] != _PS_ADMIN_PROFILE_) {
                                             if ($htlEmployees = Employee::getEmployeesByProfile($access['id_profile'])) {
                                                 foreach ($htlEmployees as $empl) {
                                                     if (Validate::isEmail($empl['email'])) {
