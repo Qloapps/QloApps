@@ -397,6 +397,14 @@ class AdminControllerCore extends Controller
 
     /** @var int level for permissions View/read */
     const LEVEL_VIEW = 1;
+    const QLO_SEARCH_TYPE_CATELOG = 1;
+    const QLO_SEARCH_TYPE_CUSTOMER_BY_NAME = 2;
+    const QLO_SEARCH_TYPE_ORDER = 3;
+    const QLO_SEARCH_TYPE_INVOICE = 4;
+    const QLO_SEARCH_TYPE_CART = 5;
+    const QLO_SEARCH_TYPE_CUSTOMER_BY_IP = 6;
+    const QLO_SEARCH_TYPE_MODULE = 7;
+    const QLO_SEARCH_TYPE_HOTEL = 8;
 
     public function __construct()
     {
@@ -2030,6 +2038,14 @@ class AdminControllerCore extends Controller
                 'employee' => $this->context->employee,
                 'search_type' => Tools::getValue('bo_search_type'),
                 'bo_query' => Tools::safeOutput(Tools::stripslashes(Tools::getValue('bo_query'))),
+                'QLO_SEARCH_TYPE_CATELOG' => self::QLO_SEARCH_TYPE_CATELOG,
+                'QLO_SEARCH_TYPE_CUSTOMER_BY_NAME' => self::QLO_SEARCH_TYPE_CUSTOMER_BY_NAME,
+                'QLO_SEARCH_TYPE_CUSTOMER_BY_IP' => self::QLO_SEARCH_TYPE_CUSTOMER_BY_IP,
+                'QLO_SEARCH_TYPE_ORDER' => self::QLO_SEARCH_TYPE_ORDER,
+                'QLO_SEARCH_TYPE_INVOICE' => self::QLO_SEARCH_TYPE_INVOICE,
+                'QLO_SEARCH_TYPE_CART' => self::QLO_SEARCH_TYPE_CART,
+                'QLO_SEARCH_TYPE_MODULE' => self::QLO_SEARCH_TYPE_MODULE,
+                'QLO_SEARCH_TYPE_HOTEL' => self::QLO_SEARCH_TYPE_HOTEL,
                 'quick_access' => $quick_access,
                 'multi_shop' => Shop::isFeatureActive(),
                 'shop_list' => $helperShop->getRenderedShopList(),

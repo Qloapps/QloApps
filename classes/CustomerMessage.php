@@ -128,17 +128,17 @@ class CustomerMessageCore extends ObjectModel
         );
     }
 
-    public function searchCustomerMessage($text)
+    public function searchByName($query)
     {
-        return Db::getInstance()->executeS(
-            'SELECT cm.*, ct.*, CONCAT(c.firstname, \' \', c.lastname) customer_name
+        return Db::getInstance()->executeS('
+            SELECT cm.*, ct.*, CONCAT(c.`firstname`, \' \', c.`lastname`) `customer_name`
             FROM `'._DB_PREFIX_.'customer_message` cm
             LEFT JOIN '._DB_PREFIX_.'customer_thread ct
-            ON (ct.id_customer_thread = cm.id_customer_thread)
+                ON (ct.`id_customer_thread` = cm.`id_customer_thread`)
             LEFT JOIN '._DB_PREFIX_.'customer c
-            ON (IFNULL(ct.id_customer, ct.email) = IFNULL(c.id_customer, c.email))
-            WHERE `message` LIKE \'%'.$text.'%\''
-        );
+                ON (IFNULL(ct.`id_customer`, ct.`email`) = IFNULL(c.`id_customer`, c.`email`))
+            WHERE `message` LIKE \'%'.$query.'%\'
+        ');
     }
 
 }

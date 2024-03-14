@@ -268,9 +268,8 @@ class HotelOrderRefundRules extends ObjectModel
 
     }
 
-    public function searchOrderRefundRulesByName($name, $idLang = false)
+    public function searchByName($query, $idLang = false)
     {
-
         if (!$idLang) {
             $idLang = Context::getContext()->language->id;
         }
@@ -279,8 +278,11 @@ class HotelOrderRefundRules extends ObjectModel
             'SELECT horr.*, horrl.* FROM `'._DB_PREFIX_.'htl_order_refund_rules` horr
             LEFT JOIN `'._DB_PREFIX_.'htl_order_refund_rules_lang` horrl
             ON horrl.`id_refund_rule` = horr.`id_refund_rule`
-            WHERE (horrl.`name` LIKE \'%'.pSQL($name).'%\' OR horrl.`description` LIKE \'%'.pSQL($name).'%\')
-            AND `id_lang`='.(int)$idLang
+            WHERE (
+                horrl.`name` LIKE \'%'.pSQL($query).'%\' OR
+                horrl.`description` LIKE \'%'.pSQL($query).'%\'
+            )
+            AND horrl.`id_lang`='.(int) $idLang
         );
     }
 

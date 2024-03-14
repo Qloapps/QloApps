@@ -30,7 +30,7 @@ class AdminSearchControllerCore extends AdminController
     {
         $this->bootstrap = true;
         parent::__construct();
-        $this->controllers = array(
+        $this->controllerAccess = array(
             'AdminProducts' => 1,
             'AdminCategories' => 1,
             'AdminFeatures' => 1,
@@ -64,9 +64,9 @@ class AdminSearchControllerCore extends AdminController
             }
 
             /* Product research */
-            if (!$searchType || $searchType == 1) {
+            if (!$searchType || $searchType == self::QLO_SEARCH_TYPE_CATELOG) {
                 /* Handle product ID */
-                if ($searchType == 1 && (int)$this->query && Validate::isUnsignedInt((int)$this->query)) {
+                if ($searchType == self::QLO_SEARCH_TYPE_CATELOG && (int)$this->query && Validate::isUnsignedInt((int)$this->query)) {
                     if (($product = new Product($this->query)) && Validate::isLoadedObject($product)) {
                         if ($product->booking_product) {
                             Tools::redirectAdmin('index.php?tab=AdminProducts&id_product='.(int)($product->id).'&updateproduct&token='.Tools::getAdminTokenLite('AdminProducts'));
@@ -81,8 +81,8 @@ class AdminSearchControllerCore extends AdminController
             }
 
             /* Customer */
-            if (!$searchType || $searchType == 2 || $searchType == 6) {
-                if (!$searchType || $searchType == 2) {
+            if (!$searchType || $searchType == self::QLO_SEARCH_TYPE_CUSTOMER_BY_NAME || $searchType == self::QLO_SEARCH_TYPE_CUSTOMER_BY_IP) {
+                if (!$searchType || $searchType == self::QLO_SEARCH_TYPE_CUSTOMER_BY_NAME) {
                     /* Handle customer ID */
                     if ($searchType && (int)$this->query && Validate::isUnsignedInt((int)$this->query)) {
                         if (($customer = new Customer($this->query)) && Validate::isLoadedObject($customer)) {
@@ -94,7 +94,7 @@ class AdminSearchControllerCore extends AdminController
                     $this->searchCustomer();
                 }
 
-                if ($searchType == 6) {
+                if ($searchType == self::QLO_SEARCH_TYPE_CUSTOMER_BY_IP) {
                     $this->searchIP();
                 }
 
@@ -104,9 +104,9 @@ class AdminSearchControllerCore extends AdminController
             }
 
             /* Order */
-            if (!$searchType || $searchType == 3) {
+            if (!$searchType || $searchType == self::QLO_SEARCH_TYPE_ORDER) {
                 if (Validate::isUnsignedInt(trim($this->query)) && (int)$this->query && ($order = new Order((int)$this->query)) && Validate::isLoadedObject($order)) {
-                    if ($searchType == 3) {
+                    if ($searchType == self::QLO_SEARCH_TYPE_ORDER) {
                         Tools::redirectAdmin('index.php?tab=AdminOrders&id_order='.(int)$order->id.'&vieworder'.'&token='.Tools::getAdminTokenLite('AdminOrders'));
                     } else {
                         $row = get_object_vars($order);
@@ -124,7 +124,7 @@ class AdminSearchControllerCore extends AdminController
                 } else {
                     $orders = Order::getByReference($this->query);
                     $nb_orders = count($orders);
-                    if ($nb_orders == 1 && $searchType == 3) {
+                    if ($nb_orders == 1 && $searchType == self::QLO_SEARCH_TYPE_ORDER) {
                         Tools::redirectAdmin('index.php?tab=AdminOrders&id_order='.(int)$orders[0]->id.'&vieworder'.'&token='.Tools::getAdminTokenLite('AdminOrders'));
                     } elseif ($nb_orders) {
                         $this->_list['orders'] = array();
@@ -148,7 +148,7 @@ class AdminSearchControllerCore extends AdminController
             }
 
             /* Invoices */
-            if ($searchType == 4) {
+            if ($searchType == self::QLO_SEARCH_TYPE_INVOICE) {
                 if (Validate::isOrderInvoiceNumber($this->query) && ($invoice = OrderInvoice::getInvoiceByNumber($this->query))) {
                     Tools::redirectAdmin($this->context->link->getAdminLink('AdminPdf').'&submitAction=generateInvoicePDF&id_order='.(int)($invoice->id_order));
                 }
@@ -156,7 +156,7 @@ class AdminSearchControllerCore extends AdminController
             }
 
             /* Cart */
-            if ($searchType == 5) {
+            if ($searchType == self::QLO_SEARCH_TYPE_CART) {
                 if ((int)$this->query && Validate::isUnsignedInt((int)$this->query) && ($cart = new Cart($this->query)) && Validate::isLoadedObject($cart)) {
                     Tools::redirectAdmin('index.php?tab=AdminCarts&id_cart='.(int)($cart->id).'&viewcart'.'&token='.Tools::getAdminToken('AdminCarts'.(int)(Tab::getIdFromClassName('AdminCarts')).(int)$this->context->employee->id));
                 }
@@ -166,9 +166,9 @@ class AdminSearchControllerCore extends AdminController
             // 6 - but it is included in the customer block
 
             /* Module search */
-            if (!$searchType || $searchType == 7) {
+            if (!$searchType || $searchType == self::QLO_SEARCH_TYPE_MODULE) {
                 /* Handle module name */
-                if ($searchType == 7 && Validate::isModuleName($this->query) and ($module = Module::getInstanceByName($this->query)) && Validate::isLoadedObject($module)) {
+                if ($searchType == self::QLO_SEARCH_TYPE_MODULE && Validate::isModuleName($this->query) and ($module = Module::getInstanceByName($this->query)) && Validate::isLoadedObject($module)) {
                     Tools::redirectAdmin('index.php?tab=AdminModules&tab_module='.$module->tab.'&module_name='.$module->name.'&anchor='.ucfirst($module->name).'&token='.Tools::getAdminTokenLite('AdminModules'));
                 }
 
@@ -176,8 +176,8 @@ class AdminSearchControllerCore extends AdminController
                 $this->searchModule();
             }
 
-            if (!$searchType || $searchType == 8) {
-                if ($searchType == 8 && (int)$this->query && Validate::isUnsignedInt((int)$this->query)) {
+            if (!$searchType || $searchType == self::QLO_SEARCH_TYPE_HOTEL) {
+                if ($searchType == self::QLO_SEARCH_TYPE_HOTEL && (int)$this->query && Validate::isUnsignedInt((int)$this->query)) {
                     if (($objHotelBranchInfo = new HotelBranchInformation((int) $this->query))
                         && Validate::isLoadedObject($objHotelBranchInfo)
                     ) {
@@ -203,13 +203,13 @@ class AdminSearchControllerCore extends AdminController
     {
         $sql = 'SELECT a.`view`, t.`class_name` FROM `'._DB_PREFIX_.'access` a
             LEFT JOIN `'._DB_PREFIX_.'tab` t ON (t.`id_tab` = a.`id_tab`)
-            WHERE t.`class_name` IN ("'.implode('", "', array_keys($this->controllers)).'")
+            WHERE t.`class_name` IN ("'.implode('", "', array_keys($this->controllerAccess)).'")
             AND a.`id_profile` = '.(int) $this->context->employee->id_profile.'
         ';
 
         if ($tabs = Db::getInstance()->executeS($sql)) {
             foreach ($tabs as $tab) {
-                $this->controllers[$tab['class_name']] = $tab['view'];
+                $this->controllerAccess[$tab['class_name']] = $tab['view'];
             }
         }
     }
@@ -230,8 +230,10 @@ class AdminSearchControllerCore extends AdminController
     */
     public function searchCatalog()
     {
-        if (isset($this->controllers['AdminProducts'])
-            && $this->controllers['AdminProducts']
+        if (((isset($this->controllerAccess['AdminProducts'])
+                && $this->controllerAccess['AdminProducts'])
+            || (isset($this->controllerAccess['AdminNormalProducts'])
+                    && $this->controllerAccess['AdminNormalProducts']))
             && ($this->_list['products'] = Product::searchByName($this->context->language->id, $this->query))
         ) {
             $objRoomType = new HotelRoomType();
@@ -258,13 +260,25 @@ class AdminSearchControllerCore extends AdminController
                     unset($this->_list['products'][$key]);
                 }
             }
+
+            if (isset($this->controllerAccess['AdminProducts'])
+                && $this->controllerAccess['AdminProducts']
+            ) {
+                unset($this->_list['products']);
+            }
+
+            if (isset($this->controllerAccess['AdminNormalProducts'])
+                && $this->controllerAccess['AdminNormalProducts']
+            ) {
+                unset($this->_list['service_products']);
+            }
         }
 
-        if (isset($this->controllers['AdminCategories']) && $this->controllers['AdminCategories']) {
+        if (isset($this->controllerAccess['AdminCategories']) && $this->controllerAccess['AdminCategories']) {
             $this->_list['categories'] = Category::searchByName($this->context->language->id, $this->query);
         }
 
-        if (isset($this->controllers['AdminFeatures']) && $this->controllers['AdminFeatures']) {
+        if (isset($this->controllerAccess['AdminFeatures']) && $this->controllerAccess['AdminFeatures']) {
             $this->_list['catalog_features'] = Feature::searchByName($this->query, $this->context->language->id);
         }
     }
@@ -276,22 +290,21 @@ class AdminSearchControllerCore extends AdminController
     */
     public function searchCustomer()
     {
-
-        if (isset($this->controllers['AdminCustomers'])
-            && $this->controllers['AdminCustomers']
+        if (isset($this->controllerAccess['AdminCustomers'])
+            && $this->controllerAccess['AdminCustomers']
         ) {
             $this->_list['customers'] = Customer::searchByName($this->query);
         }
 
         $objGroup = new Group();
-        if (isset($this->controllers['AdminGroups']) && $this->controllers['AdminGroups']) {
-            $this->_list['groups'] = $objGroup->getRelatedGroups($this->query);
+        if (isset($this->controllerAccess['AdminGroups']) && $this->controllerAccess['AdminGroups']) {
+            $this->_list['groups'] = $objGroup->searchGroupByName($this->query);
         }
     }
 
     public function searchModule()
     {
-        if (isset($this->controllers['AdminModules']) && $this->controllers['AdminModules']) {
+        if (isset($this->controllerAccess['AdminModules']) && $this->controllerAccess['AdminModules']) {
             $this->_list['modules'] = array();
             $all_modules = Module::getModulesOnDisk(true, true, Context::getContext()->employee->id);
             foreach ($all_modules as $module) {
@@ -377,9 +390,13 @@ class AdminSearchControllerCore extends AdminController
     public function searchHotel()
     {
         if (class_exists('HotelBranchInformation')) {
-            if (isset($this->controllers['AdminAddHotel']) && $this->controllers['AdminAddHotel']) {
+            if (isset($this->controllerAccess['AdminAddHotel']) && $this->controllerAccess['AdminAddHotel']) {
                 $objHotelBranchInformation = new HotelBranchInformation();
-                $this->_list['hotels'] = $objHotelBranchInformation->getAccessibleHotelByName($this->query);
+                $this->_list['hotels'] = $objHotelBranchInformation->searchByName(
+                    $this->query,
+                    $this->context->employee->id_profile,
+                    $this->context->language->id
+                );
             }
         }
     }
@@ -387,12 +404,14 @@ class AdminSearchControllerCore extends AdminController
     public function searchOrderMessages()
     {
         if (class_exists('CustomerMessage')) {
-            if (isset($this->controllers['AdminCustomerThreads']) && $this->controllers['AdminCustomerThreads']) {
+            if (isset($this->controllerAccess['AdminCustomerThreads']) && $this->controllerAccess['AdminCustomerThreads']) {
                 $objCustomerMessage = new CustomerMessage();
-                if ($this->_list['order_messages'] = $objCustomerMessage->searchCustomerMessage($this->query)) {
+                if ($this->_list['order_messages'] = $objCustomerMessage->searchByName($this->query)) {
                     $accesibleHotels = HotelBranchInformation::getProfileAccessedHotels($this->context->employee->id_profile, 1, 1);
                     foreach ($this->_list['order_messages'] as $key => $msg) {
-                        if ($msg['id_order']) {
+                        if (isset($msg['id_order'])
+                            && $msg['id_order']
+                        ) {
                             // To set set restriction on the messages belonging to an order. While the other messages will be show to all
                             $idHotel = HotelBookingDetail::getIdHotelByIdOrder($msg['id_order']);
                             if (!in_array($idHotel, $accesibleHotels)) {
@@ -407,9 +426,11 @@ class AdminSearchControllerCore extends AdminController
 
     public function searchAddress()
     {
-        if (isset($this->controllers['AdminAddresses']) && $this->controllers['AdminAddresses']) {
+        if (isset($this->controllerAccess['AdminAddresses'])
+            && $this->controllerAccess['AdminAddresses']
+        ) {
             $objAddress = new Address();
-            if ($this->_list['customer_address'] = $objAddress->getCustomersAddresses($this->query)) {
+            if ($this->_list['customer_address'] = $objAddress->searchByName($this->query)) {
                 $this->addHotelRestrictionsToSearchedCustomers('customer_address');
             }
         }
@@ -418,9 +439,9 @@ class AdminSearchControllerCore extends AdminController
     public function searchHotelFeatures()
     {
         if (class_exists('HotelFeatures')) {
-            if (isset($this->controllers['AdminHotelFeatures']) && $this->controllers['AdminHotelFeatures']) {
+            if (isset($this->controllerAccess['AdminHotelFeatures']) && $this->controllerAccess['AdminHotelFeatures']) {
                 $objHotelFeatures = new HotelFeatures();
-                if ($hotelFeatures = $objHotelFeatures->searchHotelFeatureByName($this->query)) {
+                if ($hotelFeatures = $objHotelFeatures->searchByName($this->query, $this->context->language->id)) {
                     $features = array();
                     foreach ($hotelFeatures as $key => $hotelFeature) {
                         $features[$hotelFeature['id']]['name'] = $hotelFeature['name'];
@@ -440,9 +461,9 @@ class AdminSearchControllerCore extends AdminController
     public function searchAdditionalFacilities()
     {
         if (class_exists('HotelRoomTypeGlobalDemand')) {
-            if (isset($this->controllers['AdminRoomTypeGlobalDemand']) && $this->controllers['AdminRoomTypeGlobalDemand']) {
+            if (isset($this->controllerAccess['AdminRoomTypeGlobalDemand']) && $this->controllerAccess['AdminRoomTypeGlobalDemand']) {
                 $objHotelRoomTypeGlobalDemands = new HotelRoomTypeGlobalDemand();
-                if ($globalDemads = $objHotelRoomTypeGlobalDemands->searchRoomTypeDemandsByName($this->query)) {
+                if ($globalDemads = $objHotelRoomTypeGlobalDemands->searchByName($this->query, $this->context->language->id)) {
                     foreach ($globalDemads as $key => $demand) {
                         if (!(int) $globalDemads[$key]['price']) {
                             $globalDemads[$key]['price'] = $globalDemads[$key]['option_price'];
@@ -463,9 +484,9 @@ class AdminSearchControllerCore extends AdminController
     public function searchRefundRules()
     {
         if (class_exists('HotelOrderRefundRules')) {
-            if (isset($this->controllers['AdminOrderRefundRulesController']) && $this->controllers['AdminOrderRefundRulesController']) {
+            if (isset($this->controllerAccess['AdminOrderRefundRulesController']) && $this->controllerAccess['AdminOrderRefundRulesController']) {
                 $objRefundRule = new HotelOrderRefundRules();
-                if ($refundRules = $objRefundRule->searchOrderRefundRulesByName($this->query)) {
+                if ($refundRules = $objRefundRule->searchByName($this->query, $this->context->language->id)) {
                     foreach ($refundRules as $key => $rule) {
                         $refundRules[$key]['deduction_type'] = $this->l('Percentage');
                         if ($rule['payment_type'] == HotelOrderRefundRules::WK_REFUND_RULE_PAYMENT_TYPE_FIXED) {
@@ -662,6 +683,8 @@ class AdminSearchControllerCore extends AdminController
             'lastname' => array('title' => $this->l('Last Name'), 'align' => 'right'),
             'address1' => array('title' => $this->l('Address'), 'align' => 'right'),
             'postcode' => array('title' => $this->l('Zip/Postal Code'), 'align' => 'right'),
+            'country_name' => array('title' => $this->l('Country'), 'align' => 'right'),
+            'state_name' => array('title' => $this->l('State'), 'align' => 'right'),
             'city' => array('title' => $this->l('City'), 'width' => 70)
         );
     }

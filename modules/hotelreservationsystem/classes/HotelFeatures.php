@@ -208,9 +208,8 @@ class HotelFeatures extends ObjectModel
         return Db::getInstance()->update('htl_features', $update_params, 'id='.(int) $parent_feature_id);
     }
 
-    public function searchHotelFeatureByName($name, $idLang = false)
+    public function searchByName($query, $idLang = false)
     {
-
         if (!$idLang) {
             $idLang = Context::getContext()->language->id;
         }
@@ -219,9 +218,8 @@ class HotelFeatures extends ObjectModel
             'SELECT hf.*, hfl.* FROM `'._DB_PREFIX_.'htl_features` hf
             LEFT JOIN `'._DB_PREFIX_.'htl_features_lang` hfl
             ON hfl.`id` = hf.`id`
-            WHERE hfl.`name` LIKE \'%'.pSQL($name).'%\'
-            AND `id_lang`='.(int)$idLang
+            WHERE hfl.`name` LIKE \'%'.pSQL($query).'%\'
+            AND hfl.`id_lang`='.(int) $idLang
         );
     }
-
 }
