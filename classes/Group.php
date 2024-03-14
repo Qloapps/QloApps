@@ -373,7 +373,7 @@ class GroupCore extends ObjectModel
 		');
     }
 
-    public function searchGroupByName($query)
+    public function searchGroupsByName($query)
     {
         return Db::getInstance()->executeS('
 			SELECT g.*, gl.*

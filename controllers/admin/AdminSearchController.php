@@ -298,7 +298,7 @@ class AdminSearchControllerCore extends AdminController
 
         $objGroup = new Group();
         if (isset($this->controllerAccess['AdminGroups']) && $this->controllerAccess['AdminGroups']) {
-            $this->_list['groups'] = $objGroup->searchGroupByName($this->query);
+            $this->_list['groups'] = $objGroup->searchGroupsByName($this->query);
         }
     }
 
