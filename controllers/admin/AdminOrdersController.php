@@ -1686,7 +1686,6 @@ class AdminOrdersControllerCore extends AdminController
         //by webkul to get data to show hotel rooms order data on order detail page
 
         $cart_id = Cart::getCartIdByOrderId(Tools::getValue('id_order'));
-        $order_detail_data = array();
         $cart_detail_data_obj = new HotelCartBookingData();
         $objBookingDetail = new HotelBookingDetail();
         $objRoomTypeServiceProductOrderDetail = new RoomTypeServiceProductOrderDetail();
@@ -1697,6 +1696,7 @@ class AdminOrdersControllerCore extends AdminController
         $totalConvenienceFeeTI = 0;
         $totalDemandsPriceTE = 0;
         $totalDemandsPriceTI = 0;
+
         if ($order_detail_data = $objBookingDetail->getOrderFormatedBookinInfoByIdOrder($order->id)) {
             $objBookingDemand = new HotelBookingDemands();
             $objHotelRoomType = new HotelRoomType();
@@ -1858,6 +1858,8 @@ class AdminOrdersControllerCore extends AdminController
                 $order_detail_data[$key]['room_type_info'] = $objHotelRoomType->getRoomTypeInfoByIdProduct($value['id_product']);
                 $order_detail_data[$key]['total_room_tax'] = $order_detail_data[$key]['total_room_price_ti'] - $order_detail_data[$key]['total_room_price_te'];
             }
+        } else {
+            $order_detail_data = array();
         }
 
         $objOrderReturn = new OrderReturn();
