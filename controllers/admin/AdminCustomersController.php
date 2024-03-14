@@ -597,6 +597,18 @@ class AdminCustomersControllerCore extends AdminController
             'title' => $this->l('Save'),
         );
 
+        if (!Tools::getValue('liteDisplaying')) {
+            $this->fields_form['buttons'] = array(
+                'save-and-stay' => array(
+                    'title' => $this->l('Save and stay'),
+                    'name' => 'submitAdd'.$this->table.'AndStay',
+                    'type' => 'submit',
+                    'class' => 'btn btn-default pull-right',
+                    'icon' => 'process-icon-save',
+                )
+            );
+        }
+
         $birthday = explode('-', $this->getFieldValue($obj, 'birthday'));
         
         $this->fields_value = array(

@@ -177,6 +177,18 @@ class AdminAddressesControllerCore extends AdminController
             )
         );
 
+        if (!Tools::getValue('liteDisplaying')) {
+            $this->fields_form['buttons'] = array(
+                'save-and-stay' => array(
+                    'title' => $this->l('Save and stay'),
+                    'name' => 'submitAdd'.$this->table.'AndStay',
+                    'type' => 'submit',
+                    'class' => 'btn btn-default pull-right',
+                    'icon' => 'process-icon-save',
+                )
+            );
+        }
+
         $this->fields_value['address_type'] = (int)Tools::getValue('address_type', 1);
 
         $id_customer = (int)Tools::getValue('id_customer');

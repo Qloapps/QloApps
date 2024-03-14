@@ -358,6 +358,9 @@
 							<i class="process-icon-cancel"></i>{l s='Cancel' mod='hotelreservationsystem'}
 						</a>
 						<button type="submit" name="submitRefundReqBookings" class="btn btn-default pull-right">
+							<i class="process-icon-save"></i> {l s='Save' mod='hotelreservationsystem'}
+						</button>
+						<button type="submit" name="submitRefundReqBookingsAndStay" class="btn btn-default pull-right">
 							<i class="process-icon-save"></i> {l s='Save and stay' mod='hotelreservationsystem'}
 						</button>
 					</div>
