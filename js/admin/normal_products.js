@@ -499,7 +499,25 @@ product_tabs['Informations'] = new function(){
 					$("#allow_multiple_quantity_container").show('fast');
 				}
 			}
+			toggleAutoAddWithRoomNotice();
 		});
+
+		$('#price_addition_type').on('change', function () {
+			toggleAutoAddWithRoomNotice();
+		});
+
+		function toggleAutoAddWithRoomNotice()
+		{
+			if ($('#auto_add_to_cart_on').prop('checked')
+				&& $('#price_addition_type').val() == price_addition_type_with_room
+			) {
+				$('.hide_on_auto_add_Withroom').hide();
+				$('.show_on_auto_add_Withroom').show();
+			} else {
+				$('.hide_on_auto_add_Withroom').show();
+				$('.show_on_auto_add_Withroom').hide();
+			}
+		}
 	}
 
 	this.bindTagImage = function (){
