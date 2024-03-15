@@ -866,7 +866,11 @@ abstract class PaymentModuleCore extends Module
                                         $objBookingDetail->total_paid_amount = $objAdvancedPayment->getRoomMinAdvPaymentAmount(
                                             $idProduct,
                                             $objCartBookingData->date_from,
-                                            $objCartBookingData->date_to
+                                            $objCartBookingData->date_to,
+                                            1,
+                                            $objCartBookingData->id_room,
+                                            $objCartBookingData->id_cart,
+                                            $objCartBookingData->id_guest
                                         );
                                     }
                                 }
