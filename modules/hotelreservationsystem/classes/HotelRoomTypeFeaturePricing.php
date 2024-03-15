@@ -189,13 +189,13 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
         if ($type == 'specific_date') {
             return Db::getInstance()->getRow(
                 'SELECT * FROM `'._DB_PREFIX_.'htl_room_type_feature_pricing`
-                WHERE `id_product`='.(int) $id_product.'
+                WHERE `id_product`='.(int) $id_product.' AND `active`=1
                 AND `date_selection_type` = '.(int) self::DATE_SELECTION_TYPE_SPECIFIC.'
                 AND `date_from` = \''.pSQL($date_from).'\'
                 AND `id_feature_price`!='.(int) $id_feature_price
             );
         } elseif ($type == 'special_day') {
-            $featurePrice = Db::getInstance()->getRow(
+            $featurePrices = Db::getInstance()->executeS(
                 'SELECT * FROM `'._DB_PREFIX_.'htl_room_type_feature_pricing`
                 WHERE `id_product`='.(int) $id_product.'
                 AND `is_special_days_exists`=1 AND `active`=1
@@ -203,19 +203,21 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
                 AND `date_to` > \''.pSQL($date_from).'\'
                 AND `id_feature_price`!='.(int) $id_feature_price
             );
-            if ($featurePrice) {
-                $specialDays = json_decode($featurePrice['special_days']);
-                $currentSpecialDays = json_decode($current_Special_days);
-                $commonValues = array_intersect($specialDays, $currentSpecialDays);
-                if ($commonValues) {
-                    return $featurePrice;
+            if ($featurePrices) {
+                foreach ($featurePrices as $featurePrice) {
+                    $specialDays = json_decode($featurePrice['special_days']);
+                    $currentSpecialDays = json_decode($current_Special_days);
+                    $commonValues = array_intersect($specialDays, $currentSpecialDays);
+                    if ($commonValues) {
+                        return $featurePrice;
+                    }
                 }
             }
             return false;
         } elseif ($type == 'date_range') {
             return Db::getInstance()->getRow(
                 'SELECT * FROM `'._DB_PREFIX_.'htl_room_type_feature_pricing`
-                WHERE `id_product`='.(int) $id_product.'
+                WHERE `id_product`='.(int) $id_product.' AND `active`=1
                 AND `date_selection_type` = '.(int) self::DATE_SELECTION_TYPE_RANGE.'
                 AND `is_special_days_exists`=0
                 AND `date_from` <= \''.pSQL($date_to).'\'
