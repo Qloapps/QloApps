@@ -110,7 +110,6 @@ class OrderConfirmationControllerCore extends FrontController
         /*By webkul to show order details properly on order history page*/
         if (Module::isInstalled('hotelreservationsystem')) {
             require_once _PS_MODULE_DIR_.'hotelreservationsystem/define.php';
-            $non_requested_rooms = 0;
             $any_back_order = 0;
             $processed_product = array();
             $orderTotalInfo = array();
@@ -186,12 +185,6 @@ class OrderConfirmationControllerCore extends FrontController
                                     /*Product price when order was created*/
                                     $order_details_obj = new OrderDetail($data_v['id_order_detail']);
                                     $cart_htl_data[$type_key]['name'] = $order_details_obj->product_name;
-                                    // $ord_refnd_info = $obj_ord_ref_info->getOderRefundInfoByIdOrderIdProductByDate($this->id_order, $type_value['product_id'], $data_v['date_from'], $data_v['date_to']);
-                                    // if ($ord_refnd_info) {
-                                    //     $stage_name = $obj_refund_stages->getNameById($ord_refnd_info['refund_stage_id']);
-                                    // } else {
-                                        //     $non_requested_rooms = 1;
-                                        // }
                                     $stage_name = '';
                                     if (isset($cart_htl_data[$type_key]['date_diff'][$date_join])) {
                                         $cart_htl_data[$type_key]['date_diff'][$date_join]['num_rm'] += 1;
@@ -403,7 +396,6 @@ class OrderConfirmationControllerCore extends FrontController
             }
 
             $this->context->smarty->assign('orderTotalInfo', $orderTotalInfo);
-            $this->context->smarty->assign('non_requested_rooms', $non_requested_rooms);
             $this->context->smarty->assign('orders_has_invoice', $orders_has_invoice);
         }
 

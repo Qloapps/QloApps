@@ -251,7 +251,6 @@ class AdminOrdersControllerCore extends AdminController
             $this->access_where = ' WHERE hbd.id_hotel IN ('.implode(',', $acsHtls).')';
         }
 
-
         parent::__construct();
     }
 
@@ -695,7 +694,79 @@ class AdminOrdersControllerCore extends AdminController
                     $this->errors[] = Tools::displayError('The new order status is invalid.');
                 } else {
                     $current_order_state = $order->getCurrentOrderState();
-                    if ($current_order_state->id != $order_state->id) {
+
+                    if ($current_order_state->id == Configuration::get('PS_OS_REFUND')) {
+                        $this->errors[] = Tools::displayError('Order status can not be changed once order status is set to Refunded.');
+                    } elseif ($current_order_state->id == Configuration::get('PS_OS_CANCELED')) {
+                        $this->errors[] = Tools::displayError('Order status can not be changed once order status is set to Cancelled.');
+                    } elseif (in_array($order_state->id, array (Configuration::get('PS_OS_OVERBOOKING_PAID'), Configuration::get('PS_OS_OVERBOOKING_UNPAID'), Configuration::get('PS_OS_OVERBOOKING_PARTIAL_PAID')))) {
+                        $objHotelBooking = new HotelBookingDetail();
+                        if (!$objHotelBooking->getOverbookedRooms($order->id)) {
+                            $this->errors[] = Tools::displayError('Order status can not be changed to any overbooking status as there are no overbooked rooms in the order.');
+                        }
+                    } elseif ($order_state->id == Configuration::get('PS_OS_REFUND')
+                        && !$order->hasCompletelyRefunded(Order::ORDER_COMPLETE_REFUND_FLAG)
+                    ) {
+                        $this->errors[] = Tools::displayError('Order status can not be set to Refunded until all bookings in the order are completely refunded.');
+                    } elseif ($order_state->id == Configuration::get('PS_OS_CANCELED')
+                        && !$order->hasCompletelyRefunded(Order::ORDER_COMPLETE_CANCELLATION_FLAG)
+                    ) {
+                        $this->errors[] = Tools::displayError('Order status can not be set to Cancelled until all bookings in the order are cancelled.');
+                    } elseif ($current_order_state->id == Configuration::get('PS_OS_ERROR') && !($order_state->id == Configuration::get('PS_OS_ERROR'))) {
+                        // All rooms must be available before changing status from Payment Error to Other status in which rooms are getting blocked again
+                        $objHotelBooking = new HotelBookingDetail();
+                        if ($orderBookings = $objHotelBooking->getOrderCurrentDataByOrderId($order->id)) {
+                            foreach ($orderBookings as $orderBooking) {
+                                // If booking is refunded then no need to check inventory
+                                if ((OrderReturn::getOrdersReturnDetail($order->id, 0, $orderBooking['id']) && $orderBooking['is_refunded'])
+                                    || ($orderBooking['is_cancelled'] && $orderBooking['is_refunded'])
+                                ) {
+                                    continue;
+                                } else {
+                                    // if inventory is available for that booking
+                                    $bookingParams = array(
+                                        'date_from' => $orderBooking['date_from'],
+                                        'date_to' => $orderBooking['date_to'],
+                                        'hotel_id' => $orderBooking['id_hotel'],
+                                        'id_room_type' => $orderBooking['id_product'],
+                                        'only_search_data' => 1
+                                    );
+
+                                    $objHotelBookingDetail = new HotelBookingDetail($orderBooking['id']);
+                                    if ($searchRoomsInfo = $objHotelBooking->getBookingData($bookingParams)) {
+                                        if (isset($searchRoomsInfo['rm_data'][$orderBooking['id_product']]['data']['available'])
+                                            && $searchRoomsInfo['rm_data'][$orderBooking['id_product']]['data']['available']
+                                        ) {
+                                            $availableRoomsInfo = $searchRoomsInfo['rm_data'][$orderBooking['id_product']]['data']['available'];
+                                            if ($roomIdsAvailable = array_column($availableRoomsInfo, 'id_room')) {
+                                                // Check If room is still there in the available rooms list
+                                                if (!in_array($orderBooking['id_room'], $roomIdsAvailable)) {
+                                                    $this->errors[] = Tools::displayError('You can not change the order status as some rooms are not available now in this order. You can reallocate/swap rooms with other rooms to make rooms available and then change the order status.');
+
+                                                    break;
+                                                } else {
+                                                    $objHotelBookingDetail->is_refunded = 0;
+                                                    $objHotelBookingDetail->save();
+                                                }
+                                            } else {
+                                                $this->errors[] = Tools::displayError('You can not change the order status as some rooms are not available now in this order. You can reallocate/swap rooms with other rooms to make rooms available and then change the order status.');
+                                                break;
+                                            }
+                                        }
+                                    } else {
+                                        $this->errors[] = Tools::displayError('You can not change the order status as some rooms are not available now in this order. You can reallocate/swap rooms with other rooms to make rooms available and then change the order status.');
+
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    } elseif ($current_order_state->id == $order_state->id) {
+                        $this->errors[] = Tools::displayError('The order has already been assigned this status.');
+                    }
+
+                    // If no errors then we change the order status
+                    if (!count($this->errors)) {
                         // Create new OrderHistory
                         $history = new OrderHistory();
                         $history->id_order = $order->id;
@@ -721,11 +792,10 @@ class AdminOrdersControllerCore extends AdminController
                                 }
                             }
 
-                            Tools::redirectAdmin(self::$currentIndex.'&id_order='.(int)$order->id.'&vieworder&token='.$this->token);
+                            Tools::redirectAdmin(self::$currentIndex.'&id_order='.(int)$order->id.'&conf=5&vieworder&token='.$this->token);
                         }
+
                         $this->errors[] = Tools::displayError('An error occurred while changing order status, or we were unable to send an email to the customer.');
-                    } else {
-                        $this->errors[] = Tools::displayError('The order has already been assigned this status.');
                     }
                 }
             } else {
@@ -856,26 +926,58 @@ class AdminOrdersControllerCore extends AdminController
                 }
 
                 if (!count($this->errors)) {
-                    $objOrderReturn = new OrderReturn();
-                    $objOrderReturn->id_customer = $order->id_customer;
-                    $objOrderReturn->id_order = $order->id;
-                    $objOrderReturn->state = Configuration::get('PS_ORS_PENDING');
-                    $objOrderReturn->by_admin = 1;
-                    $objOrderReturn->question = $refundReason;
-                    $objOrderReturn->save();
-                    if ($objOrderReturn->id) {
+                    // if amount paid is > 0 then create refund request else cancel the booking directly
+                    if ($order->getTotalPaid() > 0) {
+                        $objOrderReturn = new OrderReturn();
+                        $objOrderReturn->id_customer = $order->id_customer;
+                        $objOrderReturn->id_order = $order->id;
+                        $objOrderReturn->state = Configuration::get('PS_ORS_PENDING');
+                        $objOrderReturn->by_admin = 1;
+                        $objOrderReturn->question = $refundReason;
+                        $objOrderReturn->save();
+                        if ($objOrderReturn->id) {
+                            foreach ($bookings as $idHtlBooking) {
+                                $objHtlBooking = new HotelBookingDetail($idHtlBooking);
+                                $numDays = $objHtlBooking->getNumberOfDays(
+                                    $objHtlBooking->date_from,
+                                    $objHtlBooking->date_to
+                                );
+                                $objOrderReturnDetail = new OrderReturnDetail();
+                                $objOrderReturnDetail->id_order_return = $objOrderReturn->id;
+                                $objOrderReturnDetail->id_order_detail = $objHtlBooking->id_order_detail;
+                                $objOrderReturnDetail->product_quantity = $numDays;
+                                $objOrderReturnDetail->id_htl_booking = $idHtlBooking;
+                                $objOrderReturnDetail->save();
+                            }
+                        }
+                    } else {
+                        // cancel the booking directly
                         foreach ($bookings as $idHtlBooking) {
                             $objHtlBooking = new HotelBookingDetail($idHtlBooking);
-                            $numDays = $objHtlBooking->getNumberOfDays(
-                                $objHtlBooking->date_from,
-                                $objHtlBooking->date_to
-                            );
-                            $objOrderReturnDetail = new OrderReturnDetail();
-                            $objOrderReturnDetail->id_order_return = $objOrderReturn->id;
-                            $objOrderReturnDetail->id_order_detail = $objHtlBooking->id_order_detail;
-                            $objOrderReturnDetail->product_quantity = $numDays;
-                            $objOrderReturnDetail->id_htl_booking = $idHtlBooking;
-                            $objOrderReturnDetail->save();
+                            if (!$objHtlBooking->processRefundInBookingTables()) {
+                                $this->errors[] = Tools::displayError('An error occurred while cancelling the booking.');
+                            } else {
+                                // set the message for the cancellation
+                                $message = $this->l('Room').': '.$objHtlBooking->room_num.', '.$objHtlBooking->room_type_name.' '.$this->l('has been cancelled by the hotel.');
+                                $message .= PHP_EOL.$this->l('Reasonn').': '.$refundReason;
+                                $objHtlBooking->setBookingCancellationMessage($message, 1);
+                            }
+                        }
+
+                        // if all bookings are getting cancelled then cancel the order also
+                        if ($order->hasCompletelyRefunded(Order::ORDER_COMPLETE_CANCELLATION_FLAG)) {
+                            $objOrderHistory = new OrderHistory();
+                            $objOrderHistory->id_order = (int)$order->id;
+
+                            $idOrderState = Configuration::get('PS_OS_CANCELED');
+
+                            $useExistingPayment = false;
+                            if (!$order->hasInvoice()) {
+                                $useExistingPayment = true;
+                            }
+
+                            $objOrderHistory->changeIdOrderState($idOrderState, $order, $useExistingPayment);
+                            $objOrderHistory->addWithemail();
                         }
                     }
                 }
@@ -1883,13 +1985,16 @@ class AdminOrdersControllerCore extends AdminController
 
         // applicable refund policies
         $applicableRefundPolicies = HotelOrderRefundRules::getApplicableRefundRules($order->id);
+
         $this->tpl_view_vars = array(
             // refund info
             'refund_allowed' => (int) $order->isReturnable(),
             'applicable_refund_policies' => $applicableRefundPolicies,
             'returns' => OrderReturn::getOrdersReturn($order->id_customer, $order->id),
             'refundReqBookings' => $refundReqBookings,
-            'hasCompletelyRefunded' => $order->hasCompletelyRefunded(),
+            'completeRefundRequestOrCancel' => $order->hasCompletelyRefunded(Order::ORDER_COMPLETE_CANCELLATION_OR_REFUND_REQUEST_FLAG),
+            'allBookingsRefunded' => $order->hasCompletelyRefunded(Order::ORDER_COMPLETE_REFUND_FLAG),
+            'allBookingsCancelled' => $order->hasCompletelyRefunded(Order::ORDER_COMPLETE_CANCELLATION_FLAG),
             'refundedAmount' => $refundedAmount,
             'totalDemandsPriceTI' => $totalDemandsPriceTI,
             'totalDemandsPriceTE' => $totalDemandsPriceTE,

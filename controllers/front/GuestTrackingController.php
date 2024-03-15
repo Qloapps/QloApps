@@ -205,7 +205,6 @@ class GuestTrackingControllerCore extends FrontController
             $objRoomTypeServiceProductOrderDetail = new RoomTypeServiceProductOrderDetail();
             $objRoomType = new HotelRoomType();
 
-            $nonRequestedRooms = 0;
             $anyBackOrder = 0;
 
             foreach ($order_list as &$order) {
@@ -570,7 +569,6 @@ class GuestTrackingControllerCore extends FrontController
                 //end
 
                 Hook::exec('actionOrderDetail', array('carrier' => $order->carrier, 'order' => $order));
-
             }
         }
 

@@ -2709,4 +2709,185 @@ class HotelBookingDetail extends ObjectModel
             Configuration::get('PS_OS_ERROR'),
         ));
     }
+
+    // process the booking tables changes when a booking refund/cancellation is processed
+    public function processRefundInBookingTables()
+    {
+        if (Validate::isLoadedObject($this)) {
+            $reduction_amount = array(
+                'total_price_tax_excl' => 0,
+                'total_price_tax_incl' => 0,
+                'total_products_tax_excl' => 0,
+                'total_products_tax_incl' => 0,
+            );
+            $objOrder = new Order($this->id_order);
+            $orderTotalPaid = $objOrder->getTotalPaid();
+
+            // things to do if order is not paid
+            if ((float) $orderTotalPaid <= 0) {
+                $objHotelBookingDemands = new HotelBookingDemands();
+                $objRoomTypeServiceProductOrderDetail = new RoomTypeServiceProductOrderDetail();
+
+                $reduction_amount['total_price_tax_excl'] = Tools::ps_round((float) $this->total_price_tax_excl, 6);
+                $reduction_amount['total_products_tax_excl'] = Tools::ps_round((float) $this->total_price_tax_excl, 6);
+                $reduction_amount['total_price_tax_incl'] = Tools::ps_round((float) $this->total_price_tax_incl, 6);
+                $reduction_amount['total_products_tax_incl'] = Tools::ps_round((float) $this->total_price_tax_incl, 6);
+
+                // reduce facilities amount from order and services_detail
+                if ($roomDemands = $objHotelBookingDemands->getRoomTypeBookingExtraDemands(
+                    $this->id_order,
+                    $this->id_product,
+                    $this->id_room,
+                    $this->date_from,
+                    $this->date_to,
+                    0
+                )) {
+                    foreach ($roomDemands as $roomDemand) {
+                        $objHotelBookingDemands = new HotelBookingDemands($roomDemand['id_booking_demand']);
+                        $reduction_amount['total_price_tax_excl'] += Tools::ps_round((float) $objHotelBookingDemands->total_price_tax_excl, 6);
+                        $reduction_amount['total_price_tax_incl'] += Tools::ps_round((float) $objHotelBookingDemands->total_price_tax_incl, 6);
+                        $objHotelBookingDemands->total_price_tax_excl = 0;
+                        $objHotelBookingDemands->total_price_tax_incl = 0;
+                        $objHotelBookingDemands->save();
+                    }
+                }
+
+                // reduce services amount from order and services_detail
+                if ($roomServices = $objRoomTypeServiceProductOrderDetail->getSelectedServicesForRoom(
+                    $this->id
+                )) {
+                    foreach ($roomServices['additional_services'] as $roomService) {
+                        $objRoomTypeServiceProductOrderDetail = new RoomTypeServiceProductOrderDetail(
+                            $roomService['id_room_type_service_product_order_detail']
+                        );
+                        $reduction_amount['total_price_tax_excl'] += Tools::ps_round((float) $objRoomTypeServiceProductOrderDetail->total_price_tax_excl, 6);
+                        $reduction_amount['total_products_tax_excl'] += Tools::ps_round((float) $objRoomTypeServiceProductOrderDetail->total_price_tax_excl, 6);
+                        $reduction_amount['total_price_tax_incl'] += Tools::ps_round((float) $objRoomTypeServiceProductOrderDetail->total_price_tax_incl, 6);
+                        $reduction_amount['total_products_tax_incl'] += Tools::ps_round((float) $objRoomTypeServiceProductOrderDetail->total_price_tax_incl, 6);
+
+                        if (Validate::isLoadedObject($objOrderDetail = new OrderDetail($objRoomTypeServiceProductOrderDetail->id_order_detail))) {
+                            $objOrderDetail->product_quantity_refunded += $objRoomTypeServiceProductOrderDetail->quantity;
+                            if ($objOrderDetail->product_quantity_refunded > $objOrderDetail->product_quantity) {
+                                $objOrderDetail->product_quantity_refunded = $objOrderDetail->product_quantity;
+                            }
+
+                            $objOrderDetail->total_price_tax_excl -= Tools::ps_round((float) $objRoomTypeServiceProductOrderDetail->total_price_tax_excl, 6);
+                            $objOrderDetail->total_price_tax_incl -= Tools::ps_round((float) $objRoomTypeServiceProductOrderDetail->total_price_tax_incl, 6);
+
+                            $objOrderDetail->save();
+                        }
+
+                        $objRoomTypeServiceProductOrderDetail->total_price_tax_excl = 0;
+                        $objRoomTypeServiceProductOrderDetail->total_price_tax_incl = 0;
+                        $objRoomTypeServiceProductOrderDetail->save();
+                    }
+                }
+            }
+
+            // enter refunded quantity in the order detail table
+            $idOrderDetail = $this->id_order_detail;
+            if (Validate::isLoadedObject($objOrderDetail = new OrderDetail($idOrderDetail))) {
+                $numDays = $this->getNumberOfDays(
+                    $this->date_from,
+                    $this->date_to
+                );
+
+                $objOrderDetail->product_quantity_refunded += $numDays;
+                if ($objOrderDetail->product_quantity_refunded > $objOrderDetail->product_quantity) {
+                    $objOrderDetail->product_quantity_refunded = $objOrderDetail->product_quantity;
+                }
+
+                if ((float) $orderTotalPaid <= 0) {
+                    // reduce room amount from order and order detail
+                    $objOrderDetail->total_price_tax_incl -= Tools::ps_round((float) $this->total_price_tax_incl, 6);
+                    $objOrderDetail->total_price_tax_excl -= Tools::ps_round((float) $this->total_price_tax_excl, 6);
+                    if (Validate::isLoadedObject($objOrder = new Order($this->id_order))) {
+                        $objOrder->total_paid -= $reduction_amount['total_price_tax_incl'];
+                        $objOrder->total_paid_tax_excl -= Tools::ps_round((float) $reduction_amount['total_price_tax_excl'], 6);
+                        $objOrder->total_paid_tax_incl -= Tools::ps_round((float) $reduction_amount['total_price_tax_incl'], 6);
+                        $objOrder->total_products -= Tools::ps_round((float) $reduction_amount['total_products_tax_excl'], 6);
+                        $objOrder->total_products_wt -= Tools::ps_round((float) $reduction_amount['total_products_tax_incl'], 6);
+                        $objOrder->save();
+                    }
+                }
+
+                $objOrderDetail->save();
+            }
+
+            // as refund is completed then set the booking as refunded
+            $this->is_refunded = 1;
+            if ((float) $orderTotalPaid <= 0) {
+                // Reduce room amount from htl_booking_detail
+                $this->is_cancelled = 1;
+                $this->total_price_tax_excl = 0;
+                $this->total_price_tax_incl = 0;
+            }
+
+            $this->save();
+
+            return true;
+        }
+
+        return false;
+    }
+
+    public function setBookingCancellationMessage($message, $byAdmin = 0)
+    {
+        if (Validate::isLoadedObject($this)) {
+            // First save the message for the admin for the refund
+            $objectMessage = new Message();
+            $objectMessage->message = $message;
+            $objectMessage->id_cart = (int)$this->id_cart;
+            $objectMessage->id_customer = (int)($this->id_customer);
+            $objectMessage->id_order = (int)$this->id_order;
+            $objectMessage->private = 1;
+
+            // If cancelled by admin then set the employee id who is doing this cancellation else put 0
+            $context = Context::getContext();
+            if ($byAdmin) {
+                $objectMessage->id_employee = (int)$context->employee->id;
+            } else {
+                $objectMessage->id_employee = 0;
+            }
+
+            $objectMessage->add();
+
+            // save this message for the customer
+            $objCustomer = new Customer($this->id_customer);
+            $idCustomerThread = CustomerThread::getIdCustomerThreadByEmailAndIdOrder($objCustomer->email, $this->id_order);
+            if (!$idCustomerThread) {
+                $objCustomerThread = new CustomerThread();
+                $objCustomerThread->id_contact = 0;
+                $objCustomerThread->id_customer = (int)$this->id_customer;
+                $objCustomerThread->id_shop = (int)$context->shop->id;
+                $objCustomerThread->id_order = (int)$this->id_order;
+                $objCustomerThread->id_lang = (int)$context->language->id;
+                $objCustomerThread->email = $objCustomer->email;
+                $objCustomerThread->status = 'open';
+                $objCustomerThread->token = Tools::passwdGen(12);
+                $objCustomerThread->add();
+            } else {
+                $objCustomerThread = new CustomerThread((int)$idCustomerThread);
+            }
+
+            $objCustomerMessage = new CustomerMessage();
+            $objCustomerMessage->id_customer_thread = $objCustomerThread->id;
+
+            // If cancelled by admin then set the employee id who is doing this cancellation else put 0
+            if ($byAdmin) {
+                $objCustomerMessage->id_employee = (int)$context->employee->id;
+            } else {
+                $objCustomerMessage->id_employee = 0;
+            }
+
+            $objCustomerMessage->message = $message;
+            $objCustomerMessage->private = 0;
+
+            $objCustomerMessage->add();
+
+            return true;
+        }
+
+        return false;
+    }
 }

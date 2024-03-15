@@ -1008,11 +1008,9 @@ abstract class PaymentModuleCore extends Module
                     // Set the order status
                     $new_history = new OrderHistory();
                     $new_history->id_order = (int)$order->id;
-                    if ($order_status->logable && $order->is_advance_payment && $order->advance_paid_amount < $order->total_paid_tax_incl) {
-                        $new_history->changeIdOrderState((int)Configuration::get('PS_OS_PARTIAL_PAYMENT_ACCEPTED'), $order, true);
-                    } else {
-                        $new_history->changeIdOrderState((int)$id_order_state, $order, true);
-                    }
+
+                    $new_history->changeIdOrderState((int)$id_order_state, $order, true);
+
                     $new_history->addWithemail(true, $extra_vars);
 
                     // Switch to back order if needed

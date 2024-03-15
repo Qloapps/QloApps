@@ -2387,7 +2387,6 @@ class CartCore extends ObjectModel
                                         $array[$selectedProduct['id_hotel']] = array(
                                             'quantity' => $selectedProduct['quantity'],
                                             'id_hotel' => $selectedProduct['id_hotel'],
-                                            'unit_price_tax_incl' => $selectedProduct['unit_price_tax_incl'],
                                             'total_price_tax_excl' => $selectedProduct['total_price_tax_excl'],
                                             'total_price_tax_incl' => $selectedProduct['total_price_tax_incl'],
                                         );
@@ -2397,7 +2396,8 @@ class CartCore extends ObjectModel
                                     $product['cart_quantity'] = $selectedProduct['quantity'];
                                     $product['total'] = $selectedProduct['total_price_tax_excl'];
                                     $product['total_wt'] = $selectedProduct['total_price_tax_incl'];
-                                    $product['price_wt'] = $selectedProduct['unit_price_tax_incl'];
+                                    $product['price_wt'] = $selectedProduct['total_price_tax_incl'] / $product['cart_quantity'];
+                                    $product['price'] = $selectedProduct['total_price_tax_excl'] / $product['cart_quantity'];
                                     $product['id_hotel'] = $selectedProduct['id_hotel'];
                                     $orderPackage[$id_address][$selectedProduct['id_hotel']]['product_list'][] = $product;
                                     if (!isset($orderPackage[$id_address][$selectedProduct['id_hotel']]['id_hotel'])) {
@@ -2431,6 +2431,7 @@ class CartCore extends ObjectModel
                                     $unitPriceWt = $objHotelServiceProductCartDetail->getHotelProductUnitPrice($this->id, $product['id_product'], $hotelProduct['id_hotel'], true);
                                     $serviceProduct['total'] = $unitPrice * $hotelProduct['quantity'];
                                     $serviceProduct['total_wt'] = $unitPriceWt * $hotelProduct['quantity'];
+                                    $serviceProduct['price'] = $unitPrice;
                                     $serviceProduct['price_wt'] = $unitPriceWt;
                                     // if (!empty($hotelProducts['products'])) {
                                     //     foreach($hotelProducts['products'] as $hotelProduct) {
