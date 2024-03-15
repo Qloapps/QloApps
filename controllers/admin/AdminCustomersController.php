@@ -630,6 +630,10 @@ class AdminCustomersControllerCore extends AdminController
                 Tools::getValue('groupBox_'.$group['id_group'], in_array($group['id_group'], $customer_groups_ids));
         }
 
+        if ($back = Tools::getValue('back')) {
+            $this->tpl_form_vars['back_url'] = Tools::htmlentitiesDecodeUTF8(Tools::safeOutput(urldecode($back)));
+        }
+
         return parent::renderForm();
     }
 
@@ -866,6 +870,25 @@ class AdminCustomersControllerCore extends AdminController
 
     public function processDelete()
     {
+        // If customer is going to be deleted permanently then if customer has orders the change this customer as an anonymous customer
+        if (Validate::isLoadedObject($objCustomer = $this->loadObject())) {
+            if ($this->delete_mode == 'real' && Order::getCustomerOrders($objCustomer->id, true)) {
+                $objCustomer->email = 'anonymous'.'-'.$objCustomer->id.'@'.Tools::getShopDomain();
+                $objCustomer->deleted = 1;
+                if (!$objCustomer->update()) {
+                    $this->errors[] = Tools::displayError('Some error ocurred while deleting the Customer');
+                    return;
+                }
+
+                $this->redirect_after = self::$currentIndex.'&conf=1&token='.$this->token;
+
+                return;
+            }
+        } else {
+            $this->errors[] = Tools::displayError('Customer not found.');
+            return;
+        }
+
         $this->_setDeletedMode();
         parent::processDelete();
     }
@@ -884,6 +907,44 @@ class AdminCustomersControllerCore extends AdminController
 
     protected function processBulkDelete()
     {
+        // If customer is going to be deleted permanently then if customer has orders the change this customer as an anonymous customer
+        if ($this->delete_mode == 'real') {
+            if (is_array($this->boxes) && !empty($this->boxes)) {
+                foreach ($this->boxes as $key => $idCustomer) {
+                    if (Validate::isLoadedObject($objCustomer = new Customer($idCustomer))) {
+                        // check if customer has orders for email change else customer will be deleted
+                        if (Order::getCustomerOrders($objCustomer->id, true)) {
+                            $objCustomer->email = 'anonymous'.'-'.$objCustomer->id.'@'.Tools::getShopDomain();
+                            $objCustomer->deleted = 1;
+                            if ($objCustomer->update()) {
+                                // unset the customer which is processed
+                                // not processed customers will be deleted with default process if no errors are there
+                                unset($this->boxes[$key]);
+                            } else {
+                                $this->errors[] = Tools::displayError('Some error ocurred while deleting the Customer with id').': '.$idCustomer;
+                            }
+                        }
+                    } else {
+                        $this->errors[] = Tools::displayError('Customer id').': '.$idCustomer.' '.Tools::displayError('not found.');
+                    }
+                }
+
+                // if all the customers are process above then redirect with success
+                if (!count($this->boxes)) {
+                    $this->redirect_after = self::$currentIndex.'&conf=1&token='.$this->token;
+                    return;
+                }
+            } else {
+                $this->errors[] = Tools::displayError('Customers not found.');
+                return;
+            }
+
+            // if errors are there then do not proceed for default process
+            if (count($this->errors)) {
+                return;
+            }
+        }
+
         $this->_setDeletedMode();
         parent::processBulkDelete();
     }
@@ -964,6 +1025,21 @@ class AdminCustomersControllerCore extends AdminController
         $this->errors = array_merge($this->errors, $customer->validateFieldsRequiredDatabase());
         
         return parent::processSave();
+    }
+
+    protected function copyFromPost(&$object, $table)
+    {
+        parent::copyFromPost($object, $table);
+
+        $years = Tools::getValue('years');
+        $months = Tools::getValue('months');
+        $days = Tools::getValue('days');
+
+        if ($years != '' && $months != '' && $days != '') {
+            $object->birthday = (int) $years.'-'.(int) $months.'-'.(int) $days;
+        } else {
+            $object->birthday = '0000-00-00';
+        }
     }
 
     protected function afterDelete($object, $old_id)
@@ -1080,10 +1156,11 @@ class AdminCustomersControllerCore extends AdminController
     public function ajaxProcessSearchCustomers()
     {
         $searches = explode(' ', Tools::getValue('customer_search'));
+        $skip_deleted = Tools::getValue('skip_deleted');
         $customers = array();
         $searches = array_unique($searches);
         foreach ($searches as $search) {
-            if (!empty($search) && $results = Customer::searchByName($search, 50)) {
+            if (!empty($search) && $results = Customer::searchByName($search, 50, $skip_deleted)) {
                 foreach ($results as $result) {
                     if ($result['active']) {
                         $customers[$result['id_customer']] = $result;

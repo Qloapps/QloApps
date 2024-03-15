@@ -626,17 +626,17 @@ abstract class PaymentModuleCore extends Module
                         // THEN
                         //	The voucher is cloned with a new value corresponding to the remainder
                         $reduction_amount_converted = $cart_rule['obj']->reduction_amount;
-                        if ((int) $cart_rule['obj']->reduction_currency !== (int) $cart->id_currency) {
+                        if ((int) $cart_rule['obj']->reduction_currency !== (int) $this->context->cart->id_currency) {
                             $reduction_amount_converted = Tools::convertPriceFull(
                                 $cart_rule['obj']->reduction_amount,
                                 new Currency($cart_rule['obj']->reduction_currency),
-                                new Currency($cart->id_currency)
+                                new Currency($this->context->cart->id_currency)
                             );
                         }
                         if ($cart_rule['obj']->reduction_tax) {
-                            $remaining_amount = $reduction_amount_converted - $values['tax_incl'];
+                            $remaining_amount = $values['tax_incl'] - $order->total_products_wt;
                         } else {
-                            $remaining_amount = $reduction_amount_converted - $values['tax_excl'];
+                            $remaining_amount = $values['tax_excl'] - $order->total_products;
                         }
                         if ($remaining_amount > 0 && $cart_rule['obj']->partial_use == 1 && $reduction_amount_converted > 0) {
                             // Create a new voucher from the original
@@ -900,7 +900,6 @@ abstract class PaymentModuleCore extends Module
                                             $objBookingDemand->tax_computation_method = (int)$taxCalc->computation_method;
                                             if ($objBookingDemand->save()) {
                                                 $objBookingDemand->tax_calculator = $taxCalc;
-                                                $objBookingDemand->id_global_demand = $idGlobalDemand;
                                                 // Now save tax details of the extra demand
                                                 $objBookingDemand->setBookingDemandTaxDetails();
                                             }

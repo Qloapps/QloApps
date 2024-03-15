@@ -114,6 +114,11 @@ class Smarty_Internal_Method_ClearCompiledTemplate
                         $unlink = true;
                     }
                 }
+
+                if (substr($_filepath, -9) == 'index.php') {
+                    $unlink = false;
+                }
+
                 if ($unlink && is_file($_filepath) && @unlink($_filepath)) {
                     $_count++;
                     if (function_exists('opcache_invalidate')

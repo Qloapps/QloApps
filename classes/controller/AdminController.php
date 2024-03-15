@@ -881,7 +881,7 @@ class AdminControllerCore extends Controller
                     $key = isset($tmp_tab[1]) ? $tmp_tab[0].'.`'.$tmp_tab[1].'`' : '`'.$tmp_tab[0].'`';
 
                     // as in database 0 means position 1 in the renderlist
-                    if (isset($field['position'])) {
+                    if (isset($field['position']) && Validate::isInt($value)) {
                         $value -= 1;
                     }
 
@@ -4018,9 +4018,23 @@ class AdminControllerCore extends Controller
                 $object = new $this->className((int)$id);
                 $object->setFieldsToUpdate(array('active' => true));
                 $object->active = (int)$status;
-                $result &= $object->update();
+                $isUpdated = (bool) $object->update();
+                $result &= $isUpdated;
+
+                if (!$isUpdated) {
+                    $this->errors[] = sprintf($this->l('Can\'t update #%d status.'), (int) $id);
+                }
             }
+
+            if ($result) {
+                $this->redirect_after = self::$currentIndex.'&conf=5&token='.$this->token;
+            } else {
+                $this->errors[] = $this->l('An error occurred while updating the status.');
+            }
+        } else {
+            $this->errors[] = $this->l('You must select at least one item to perform a bulk action.');
         }
+
         return $result;
     }
 
