@@ -24,9 +24,6 @@
 *}
 
 <datalist id="payment_module_name_list">
-    {if $PS_CATALOG_MODE}
-        <option value="{l s='Back office order'}" data-name="{l s='Back office order'}" data-payment-type="{OrderPayment::PAYMENT_TYPE_PAY_AT_HOTEL}">
-    {/if}
     {foreach from=$payment_modules item=payment_module}
         <option value="{$payment_module->displayName}" data-name="{$payment_module->name}" data-payment-type="{$payment_module->payment_type}">
     {/foreach}

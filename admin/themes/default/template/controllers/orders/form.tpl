@@ -2196,9 +2196,6 @@
 					<div class="col-lg-9">
 						<input name="payment_module_name" id="payment_module_name" list="payment_module_name_list" class="form-control fixed-width-xxl" {if isset($smarty.post.payment_module_name) && $smarty.post.payment_module_name}value="{$smarty.post.payment_module_name|escape:'html':'UTF-8'}"{/if}>
 						<datalist id="payment_module_name_list">
-							{if $PS_CATALOG_MODE}
-								<option value="{l s='Back office order'}" data-name="{l s='Back office order'}" data-payment-type="{OrderPayment::PAYMENT_TYPE_PAY_AT_HOTEL}">
-							{/if}
 							{foreach from=$payment_modules item=payment_module}
 								<option value="{$payment_module->displayName}" data-name="{$payment_module->name}" data-payment-type="{$payment_module->payment_type}">
 							{/foreach}
