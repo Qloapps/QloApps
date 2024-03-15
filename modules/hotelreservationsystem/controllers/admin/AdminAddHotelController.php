@@ -180,7 +180,7 @@ class AdminAddHotelController extends ModuleAdminController
         }
 
         $smartyVars['state_var'] = $stateOptions;
-        $smartyVars['enabledDisplayMap'] =  Configuration::get('WK_GOOGLE_ACTIVE_MAP');
+        $smartyVars['enabledDisplayMap'] = Configuration::get('PS_API_KEY') && Configuration::get('WK_GOOGLE_ACTIVE_MAP');
         $smartyVars['ps_img_dir'] = _PS_IMG_.'l/';
 
         $this->context->smarty->assign($smartyVars);
