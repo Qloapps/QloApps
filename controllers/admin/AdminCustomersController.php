@@ -39,8 +39,8 @@ class AdminCustomersControllerCore extends AdminController
     public function __construct()
     {
         $this->bootstrap = true;
-        $this->required_database = true;
-        $this->required_fields = array('newsletter','optin');
+        // $this->required_database = true;
+        // $this->required_fields = array('newsletter','optin');
         $this->table = 'customer';
         $this->className = 'Customer';
         $this->lang = false;
@@ -458,8 +458,9 @@ class AdminCustomersControllerCore extends AdminController
                             'label' => $this->l('Disabled')
                         )
                     ),
-                    'disabled' =>  (bool)!Configuration::get('PS_CUSTOMER_NWSL'),
-                    'hint' => $this->l('This customer will receive your newsletter via email.')
+                    'disabled' => (bool)!Configuration::get('PS_CUSTOMER_NWSL'),
+                    'hint' => $this->l('This customer will receive your newsletter via email.'),
+                    'desc' => (bool)!Configuration::get('PS_CUSTOMER_NWSL') ? sprintf($this->l('This field is disabled as option \'Enable newsletter registration\' is disabled. You can change it from %sPreferences > Customers%s page.'), '<a href="'.$this->context->link->getAdminLink('AdminCustomerPreferences').'" target="_blank">', '</a>') : '',
                 ),
                 array(
                     'type' => 'switch',
