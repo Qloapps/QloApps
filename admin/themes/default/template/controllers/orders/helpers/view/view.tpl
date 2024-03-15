@@ -157,7 +157,8 @@
 					{/if} -->
 					<!-- End -->
 					&nbsp;
-					{if $refund_allowed && !$hasCompletelyRefunded}
+                    <!-- Check if refund is allowed and all bookings are not requested for refund -->
+					{if $refund_allowed && !$completeRefundRequestOrCancel}
 						<a id="desc-order-standard_refund" class="btn btn-default" href="#refundForm">
 							<i class="icon-exchange"></i>
 							{if $order->getTotalPaid()|floatval}
@@ -232,23 +233,26 @@
 							</table>
 						</div>
 						<!-- Change status form -->
-						<form action="{$currentIndex|escape:'html':'UTF-8'}&amp;vieworder&amp;token={$smarty.get.token}" method="post" class="form-horizontal well hidden-print">
-							<div class="row">
-								<div class="col-lg-9">
-									<select id="id_order_state" class="chosen form-control" name="id_order_state">
-										{foreach from=$states item=state}
-											<option value="{$state['id_order_state']|intval}"{if isset($currentState) && $state['id_order_state'] == $currentState->id} selected="selected" disabled="disabled"{/if}>{$state['name']|escape}</option>
-										{/foreach}
-									</select>
-									<input type="hidden" name="id_order" value="{$order->id}" />
-								</div>
-								<div class="col-lg-3">
-									<button type="submit" name="submitState" class="btn btn-primary">
-										{l s='Update status'}
-									</button>
-								</div>
-							</div>
-						</form>
+                        {* If current state is refunded or cancelled the further order status changes are not allowed *}
+                        {if !isset($currentState) || (isset($currentState) && ($currentState->id != Configuration::get('PS_OS_REFUND') && $currentState->id != Configuration::get('PS_OS_CANCELED')))}
+                            <form action="{$currentIndex|escape:'html':'UTF-8'}&amp;vieworder&amp;id_order={$order->id|intval}&amp;token={$smarty.get.token}" method="post" class="form-horizontal well hidden-print">
+                                <div class="row">
+                                    <div class="col-lg-9">
+                                        <select id="id_order_state" class="chosen form-control" name="id_order_state">
+                                            {foreach from=$states item=state}
+                                                <option value="{$state['id_order_state']|intval}"{if isset($currentState) && $state['id_order_state'] == $currentState->id} selected="selected" disabled="disabled"{elseif ($state['id_order_state'] == Configuration::get('PS_OS_REFUND') && !$allBookingsRefunded)} disabled="disabled"{elseif ($state['id_order_state'] == Configuration::get('PS_OS_CANCELED') && !$allBookingsCancelled)} disabled="disabled"{elseif ($state['id_order_state'] == Configuration::get('PS_OS_OVERBOOKING_PAID') || $state['id_order_state'] == Configuration::get('PS_OS_OVERBOOKING_UNPAID') || $state['id_order_state'] == Configuration::get('PS_OS_OVERBOOKING_PARTIAL_PAID')) && (!isset($orderOverBookings) || !$orderOverBookings)} disabled="disabled"{/if}>{$state['name']|escape}</option>
+                                            {/foreach}
+                                        </select>
+                                        <input type="hidden" name="id_order" value="{$order->id}" />
+                                    </div>
+                                    <div class="col-lg-3">
+                                        <button type="submit" name="submitState" class="btn btn-primary">
+                                            {l s='Update status'}
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        {/if}
 					</div>
 					<!-- Tab documents -->
 					<div class="tab-pane" id="documents">
@@ -277,61 +281,69 @@
 											<th>{l s='Hotel Name'}</th>
 											<th>{l s='Duration'}</th>
 											<th>{l s='Documents'}</th>
-											<th>{l s='Order Status'}</th>
+											<th>{l s='Room Status'}</th>
 										</tr>
 										{if isset($htl_booking_order_data) && $htl_booking_order_data}
 											{foreach from=$htl_booking_order_data item=data}
-												{if !$data.is_refunded}
-													<tr>
-														<td>
-															{$data['room_num']}
-														</td>
-														<td>
-															<a href="{$link->getAdminLink('AdminAddHotel')}&amp;id={$data['id_hotel']}&amp;updatehtl_branch_info" target="_blank">
-																<span>{$data['hotel_name']}</span>
-															</a>
-														</td>
-														<td>
-															{dateFormat date=$data['date_from']} - {dateFormat date=$data['date_to']}
-														</td>
-														<td>
-															<a class="btn btn-default" onclick="BookingDocumentsModal.init({$data.id|intval}, this); return false;">
-																<i class="icon icon-file-text"></i>
-																{l s='Documents'} <span class="badge badge-info count-documents">{$data.num_checkin_documents}</span>
-															</a>
-														</td>
-														<td>
-															<form action="" method="post" class="form-horizontal row room_status_info_form">
-																<div class="col-sm-7">
-																	<select name="booking_order_status" class="form-control booking_order_status margin-bottom-5">
-																		{foreach from=$hotel_order_status item=state}
-																			<option value="{$state['id_status']|intval}" {if isset($data.id_status) && $state.id_status == $data.id_status} selected="selected" disabled="disabled"{/if}>{$state.name|escape}</option>
-																		{/foreach}
-																	</select>
+                                                <tr>
+                                                    <td>
+                                                        {$data['room_num']}
+                                                    </td>
+                                                    <td>
+                                                        <a href="{$link->getAdminLink('AdminAddHotel')}&amp;id={$data['id_hotel']}&amp;updatehtl_branch_info" target="_blank">
+                                                            <span>{$data['hotel_name']}</span>
+                                                        </a>
+                                                    </td>
+                                                    <td>
+                                                        {dateFormat date=$data['date_from']} - {dateFormat date=$data['date_to']}
+                                                    </td>
+                                                    <td>
+                                                        <a class="btn btn-default" onclick="BookingDocumentsModal.init({$data.id|intval}, this); return false;">
+                                                            <i class="icon icon-file-text"></i>
+                                                            {l s='Documents'} <span class="badge badge-info count-documents">{$data.num_checkin_documents}</span>
+                                                        </a>
+                                                    </td>
+                                                    <td>
+                                                        <form action="" method="post" class="form-horizontal row room_status_info_form">
+                                                            <div class="col-sm-7">
+                                                                {if $data.is_refunded || $data.is_cancelled}
+                                                                    {if $data['id_status'] == $hotel_order_status['STATUS_ALLOTED']['id_status']}
+                                                                        <p><span class="room_status badge badge-infomation">{l s='Room alloted'}</span></p>
+                                                                    {/if}
+                                                                {else}
+                                                                    <select name="booking_order_status" class="form-control booking_order_status margin-bottom-5">
+                                                                        {foreach from=$hotel_order_status item=state}
+                                                                            <option value="{$state['id_status']|intval}" {if isset($data.id_status) && $state.id_status == $data.id_status} selected="selected" disabled="disabled"{/if}>{$state.name|escape}</option>
+                                                                        {/foreach}
+                                                                    </select>
+                                                                {/if}
 
-																	{if $data['id_status'] == $hotel_order_status['STATUS_CHECKED_IN']['id_status']}
-																		<p class="text-center"><span class="badge badge-success margin-bottom-5">{l s='Checked in on'} {dateFormat date=$data['check_in']}</span></p>
-																	{elseif $data['id_status'] == $hotel_order_status['STATUS_CHECKED_OUT']['id_status']}
-																		<p class="text-center"><span class="badge badge-success margin-bottom-5">{l s='Checked out on'} {dateFormat date=$data['check_out']}</span></p>
-																	{/if}
+                                                                {if $data['id_status'] == $hotel_order_status['STATUS_CHECKED_IN']['id_status']}
+                                                                    <p><span class="room_status badge badge-success">{l s='Checked in on'} {dateFormat date=$data['check_in']}</span></p>
+                                                                {elseif $data['id_status'] == $hotel_order_status['STATUS_CHECKED_OUT']['id_status']}
+                                                                    <p><span class="room_status badge badge-success">{l s='Checked out on'} {dateFormat date=$data['check_out']}</span></p>
+                                                                {/if}
 
-																	{* field for the current date *}
-																	<input class="room_status_date wk-input-date" type="text" name="status_date" value="{if $data['id_status'] == $hotel_order_status['STATUS_CHECKED_IN']['id_status']}{$data['date_to']|date_format:"%d-%m-%Y"}{else}{$data['date_from']|date_format:"%d-%m-%Y"}{/if}" readonly/>
+                                                                {* field for the current date *}
+                                                                <input class="room_status_date wk-input-date" type="text" name="status_date" value="{if $data['id_status'] == $hotel_order_status['STATUS_CHECKED_IN']['id_status']}{$data['date_to']|date_format:"%d-%m-%Y"}{else}{$data['date_from']|date_format:"%d-%m-%Y"}{/if}" readonly/>
 
-																	<input type="hidden" name="date_from" value="{$data['date_from']|date_format:"%Y-%m-%d"}" />
-																	<input type="hidden" name="date_to" value="{$data['date_to']|date_format:"%Y-%m-%d"}" />
-																	<input type="hidden" name="id_room" value="{$data['id_room']}" />
-																	<input type="hidden" name="id_order" value="{$order->id}" />
-																</div>
-																<div class="col-sm-5">
-																	<button type="submit" name="submitbookingOrderStatus" class="btn btn-primary">
-																		{l s='Update Status'}
-																	</button>
-																</div>
-															</form>
-														</td>
-													</tr>
-												{/if}
+                                                                <input type="hidden" name="date_from" value="{$data['date_from']|date_format:"%Y-%m-%d"}" />
+                                                                <input type="hidden" name="date_to" value="{$data['date_to']|date_format:"%Y-%m-%d"}" />
+                                                                <input type="hidden" name="id_room" value="{$data['id_room']}" />
+                                                                <input type="hidden" name="id_order" value="{$order->id}" />
+                                                            </div>
+                                                            <div class="col-sm-5 text-right">
+                                                                {if $data.is_refunded || $data.is_cancelled}
+                                                                    <span class="badge badge-danger">{if $data.is_cancelled}{l s='Cancelled'}{else}{l s='Refunded'}{/if}</span>
+                                                                {else}
+                                                                    <button type="submit" name="submitbookingOrderStatus" class="btn btn-primary">
+                                                                        {l s='Update Status'}
+                                                                    </button>
+                                                                {/if}
+                                                            </div>
+                                                        </form>
+                                                    </td>
+                                                </tr>
 											{/foreach}
 										{else}
 											<tr>
@@ -1187,9 +1199,11 @@
 						<input type="hidden" name="TaxMethod" value="1">
 					{/if}
 					{if $can_edit}
-						<div class="row-margin-bottom row-margin-top standard_refund_fields"  style="display: none;">
-							<textarea class="cancellation_reason" name="cancellation_reason" placeholder="{l s='Enter reason to cancel bookings'}"></textarea>
-						</div>
+                        {if $refund_allowed && !$completeRefundRequestOrCancel}
+                            <div class="row-margin-bottom row-margin-top standard_refund_fields"  style="display: none;">
+                                <textarea class="cancellation_reason" name="cancellation_reason" placeholder="{l s='Enter reason to cancel bookings'}"></textarea>
+                            </div>
+                        {/if}
 						<div class="row-margin-bottom row-margin-top order_action">
 							{if !$order->hasBeenDelivered()}
 								{* <button type="button" id="add_product" class="btn btn-default">
@@ -1206,7 +1220,7 @@
 								{l s='Add a new discount'}
 							</button>
 
-							{if $refund_allowed && !$hasCompletelyRefunded}
+							{if $refund_allowed && !$completeRefundRequestOrCancel}
 								<div class="pull-right">
 									<button style="display: none;" type="button" class="btn btn-default standard_refund_fields" id="cancelRefund">
 										{l s='Cancel'}
@@ -1396,16 +1410,14 @@
 											</tr>
 										{/if}
 
-										{if $order->total_paid_tax_incl > $order->total_paid_real}
-											<tr>
-												<td class="text-right"><strong>{l s='Due Amount'}</strong></td>
-												<td class="amount text-right nowrap">
-													<strong>
-														{displayPrice currency=$order->id_currency price=($order->total_paid_tax_incl - $order->total_paid_real)}
-													</strong>
-												</td>
-											</tr>
-										{/if}
+                                        <tr>
+                                            <td class="text-right"><strong>{l s='Due Amount'}</strong></td>
+                                            <td class="amount text-right nowrap">
+                                                <strong>
+                                                    {displayPrice currency=$order->id_currency price=($order->total_paid_tax_incl - $order->total_paid_real)}
+                                                </strong>
+                                            </td>
+                                        </tr>
 									</table>
 								</div>
 							</div>
@@ -1679,6 +1691,7 @@
 	{addJsDefL name='select_room_txt'}{l s='Select room' js=1}{/addJsDefL}
 	{addJsDef max_child_age=$max_child_age|escape:'quotes':'UTF-8'}
 	{addJsDef max_child_in_room=$max_child_in_room|escape:'quotes':'UTF-8'}
+    {addJsDefL name='undo_cancellation_success'}{l s='Booking cancellation undo process is done successfully.' js=1}{/addJsDefL}
 {/strip}
 
 {* Apply javascript for the page *}
@@ -1705,12 +1718,10 @@
 		{* open date picker for the date input of check-in checkout dates *}
 		$(document).on('focus', '.room_status_date', function() {
 			var dateFrom = $(this).closest('.room_status_info_form').find('[name="date_from"]').val();
-			dateFrom = dateFrom.split("-");
-            minDate = new Date($.datepicker.formatDate('yy-mm-dd', new Date(dateFrom[0], dateFrom[1] - 1, dateFrom[2])));
+            minDate = $.datepicker.parseDate('yy-mm-dd', dateFrom);
 
 			var dateTo = $(this).closest('.room_status_info_form').find('[name="date_to"]').val();
-			dateTo = dateTo.split("-");
-            maxDate = new Date($.datepicker.formatDate('yy-mm-dd', new Date(dateTo[0], dateTo[1] - 1, dateTo[2])));
+            maxDate = $.datepicker.parseDate('yy-mm-dd', dateTo);
 
 			$(this).datepicker({
 				dateFormat: 'dd-mm-yy',

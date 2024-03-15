@@ -708,7 +708,9 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
                 array(),
                 array(),
                 $id_cart,
-                $id_guest
+                $id_guest,
+                $booking_type,
+                $comment
             )) {
                 $response['success'] = true;
                 $response['data']['id_cart_book_data'] = $idHotelCartBooking;
