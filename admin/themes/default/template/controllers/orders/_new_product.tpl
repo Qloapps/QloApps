@@ -87,10 +87,11 @@
 										</div>
 										<div class="form-group col-xs-6 occupancy_count_block">
 											<label>{l s='Child'} <span class="label-desc-txt"></span></label>
-											<input type="number" class="form-control num_occupancy num_children" name="occupancy[0][children]" value="0" min="0" {if $max_child_in_room}max="{$max_child_in_room}"{/if}>
+											<input type="number" class="form-control num_occupancy num_children" name="occupancy[0][children]" value="0" min="0">
 											({l s='Below'}  {$max_child_age|escape:'htmlall':'UTF-8'} {l s='years'})
 										</div>
 									</div>
+									<p style="display:none;"><span class="text-danger occupancy-input-errors"></span></p>
 									<div class="row children_age_info_block" style="display:none">
 										<div class="form-group col-sm-12">
 											<label class="">{l s='All Children'}</label>

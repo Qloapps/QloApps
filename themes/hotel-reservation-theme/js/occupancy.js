@@ -81,12 +81,12 @@ $(document).ready(function(){
             } else {
                 if (elementVal >= max_child_in_room) {
                     if (elementVal == 0) {
-                        showOccupancyError(no_children_allowed_txt, $(this).closest(".booking_occupancy_wrapper"));
+                        showOccupancyError(no_children_allowed_txt, $(this).closest(".occupancy_info_block"));
                     } else {
-                        showOccupancyError(max_children_txt, $(this).closest(".booking_occupancy_wrapper"));
+                        showOccupancyError(max_children_txt, $(this).closest(".occupancy_info_block"));
                     }
                 } else {
-                    showOccupancyError(max_occupancy_reached_txt, $(this).closest(".booking_occupancy_wrapper"));
+                    showOccupancyError(max_occupancy_reached_txt, $(this).closest(".occupancy_info_block"));
                 }
             }
         } else {
@@ -99,9 +99,9 @@ $(document).ready(function(){
 				$(this).closest('.occupancy_count_block').find('.occupancy_count > span').text(elementVal + 1);
             } else {
                 if (elementVal >= max_adults_in_room) {
-                    showOccupancyError(max_adults_txt, $(this).closest(".booking_occupancy_wrapper"));
+                    showOccupancyError(max_adults_txt, $(this).closest(".occupancy_info_block"));
                 } else {
-                    showOccupancyError(max_occupancy_reached_txt, $(this).closest(".booking_occupancy_wrapper"));
+                    showOccupancyError(max_occupancy_reached_txt, $(this).closest(".occupancy_info_block"));
                 }
 			}
         }
@@ -110,9 +110,9 @@ $(document).ready(function(){
 
     var errorMsgTime;
     $('.occupancy-input-errors').parent().hide();
-    function showOccupancyError(msg, booking_occupancy_wrapper)
+    function showOccupancyError(msg, occupancy_info_block)
     {
-        var errorMsgBlock = $(booking_occupancy_wrapper).find('.occupancy-input-errors')
+        var errorMsgBlock = $(occupancy_info_block).find('.occupancy-input-errors')
         $(errorMsgBlock).html(msg).parent().show('fast');
         clearTimeout(errorMsgTime);
         errorMsgTime = setTimeout(function() {
@@ -276,6 +276,7 @@ $(document).ready(function(){
                         occupancy_block += '</div>';
                     occupancy_block += '</div>';
                 occupancy_block += '</div>';
+                occupancy_block += '<p style="display:none;"><span class="text-danger occupancy-input-errors"></span></p>';
                 occupancy_block += '<div class="form-group row children_age_info_block">';
                     occupancy_block += '<label class="col-sm-12">' + all_children_txt + '</label>';
                     occupancy_block += '<div class="col-sm-12">';

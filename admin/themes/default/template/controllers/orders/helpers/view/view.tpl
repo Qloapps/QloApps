@@ -1626,6 +1626,10 @@
 	{addJsDefL name='below_txt'}{l s='Below' js=1}{/addJsDefL}
 	{addJsDefL name='years_txt'}{l s='years' js=1}{/addJsDefL}
 	{addJsDefL name='all_children_txt'}{l s='All Children' js=1}{/addJsDefL}
+	{addJsDefL name='max_occupancy_reached_txt'}{l s='Maximum room occupancy reached' js=1}{/addJsDefL}
+	{addJsDefL name='max_adults_txt'}{l s='Maximum adult occupancy reached' js=1}{/addJsDefL}
+	{addJsDefL name='max_children_txt'}{l s='Maximum children occupancy reached' js=1}{/addJsDefL}
+	{addJsDefL name='no_children_allowed_txt'}{l s='Only adults can be accommodated' js=1}{/addJsDefL}
 	{addJsDefL name='invalid_occupancy_txt'}{l s='Invalid occupancy(adults/children) found.' js=1}{/addJsDefL}
 	{addJsDef max_child_age=$max_child_age|escape:'quotes':'UTF-8'}
 	{addJsDef max_child_in_room=$max_child_in_room|escape:'quotes':'UTF-8'}
