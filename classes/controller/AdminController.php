@@ -407,6 +407,9 @@ class AdminControllerCore extends Controller
 
         $this->controller_type = 'admin';
         $this->controller_name = get_class($this);
+        if (strpos($this->controller_name, 'ControllerOverride')) {
+            $this->controller_name = substr($this->controller_name, 0, -18);
+        }
         if (strpos($this->controller_name, 'Controller')) {
             $this->controller_name = substr($this->controller_name, 0, -10);
         }
