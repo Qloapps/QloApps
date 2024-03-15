@@ -633,7 +633,6 @@ class HTMLTemplateInvoiceCore extends HTMLTemplate
             'tax_excluded_display' => $tax_excluded_display,
             'display_product_images' => $display_product_images,
             'layout' => $layout,
-            'tax_tab' => $this->getTaxTabContent(),
             'customer' => $customer,
             'footer' => $footer,
             'ps_price_compute_precision' => _PS_PRICE_COMPUTE_PRECISION_,

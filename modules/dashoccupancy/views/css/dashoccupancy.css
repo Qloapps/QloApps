@@ -69,6 +69,10 @@
 	text-align: center;
 }
 
-.nv-label text {
-	fill: #fff !important;
+#dashoccupancy .label-tooltip {
+    color: #00aff0;
+    cursor: pointer;
+}
+#dashoccupancy .tooltip {
+    text-transform: none;
 }

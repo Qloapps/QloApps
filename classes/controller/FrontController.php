@@ -221,6 +221,7 @@ class FrontControllerCore extends Controller
             'js_dir' => _THEME_JS_DIR_,
             'base_dir' => __PS_BASE_URI__,
             'language_code'       => $this->context->language->language_code ? $this->context->language->language_code : $this->context->language->iso_code,
+            'language_is_rtl' => $this->context->language->is_rtl,
         ]);
 
         /* get page name to display it in body id */

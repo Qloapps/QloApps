@@ -279,7 +279,12 @@ class DispatcherCore
                     $controllers = Dispatcher::getControllers(_PS_MODULE_DIR_.$module_name.'/controllers/front/');
                     if (isset($controllers[strtolower($this->controller)])) {
                         include_once(_PS_MODULE_DIR_.$module_name.'/controllers/front/'.$this->controller.'.php');
-                        $controller_class = $module_name.$this->controller.'ModuleFrontController';
+                        if (file_exists(_PS_OVERRIDE_DIR_.'modules/'.$module_name.'/controllers/front/'.$this->controller.'.php')) {
+                            include_once(_PS_OVERRIDE_DIR_.'modules/'.$module_name.'/controllers/front/'.$this->controller.'.php');
+                            $controller_class = $module_name.$this->controller.'ModuleFrontControllerOverride';
+                        } else {
+                            $controller_class = $module_name.$this->controller.'ModuleFrontController';
+                        }
                     }
                 }
                 $params_hook_action_dispatcher = array('controller_type' => self::FC_FRONT, 'controller_class' => $controller_class, 'is_module' => 1);
@@ -310,7 +315,12 @@ class DispatcherCore
                         } else {
                             // Controllers in modules can be named AdminXXX.php or AdminXXXController.php
                             include_once(_PS_MODULE_DIR_.$tab->module.'/controllers/admin/'.$controllers[strtolower($this->controller)].'.php');
-                            $controller_class = $controllers[strtolower($this->controller)].(strpos($controllers[strtolower($this->controller)], 'Controller') ? '' : 'Controller');
+                            if (file_exists(_PS_OVERRIDE_DIR_ . 'modules/' . $tab->module . '/controllers/admin/' . $controllers[strtolower($this->controller)] . '.php')) {
+                                include_once(_PS_OVERRIDE_DIR_ . 'modules/' . $tab->module . '/controllers/admin/' . $controllers[strtolower($this->controller)] . '.php');
+                                $controller_class = $controllers[strtolower($this->controller)] . (strpos($controllers[strtolower($this->controller)], 'Controller') ? 'Override' : 'ControllerOverride');
+                            } else {
+                                $controller_class = $controllers[strtolower($this->controller)] . (strpos($controllers[strtolower($this->controller)], 'Controller') ? '' : 'Controller');
+                            }
                         }
                     }
                     $params_hook_action_dispatcher = array('controller_type' => self::FC_ADMIN, 'controller_class' => $controller_class, 'is_module' => 1);

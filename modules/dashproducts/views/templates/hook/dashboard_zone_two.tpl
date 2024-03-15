@@ -74,8 +74,7 @@
 				</div>
 				<div class="tab-pane" id="dash_best_sellers">
 					<h3>
-						{l s="Top %d room types" sprintf=$DASHPRODUCT_NBR_SHOW_BEST_SELLER|intval mod="dashproducts"}
-						<span>{l s="From" mod="dashproducts"} {$date_from} {l s="to" mod="dashproducts"} {$date_to}</span>
+						{l s="Top %d room types" sprintf=$DASHPRODUCT_NBR_SHOW_BEST_SELLER|intval mod="dashproducts"} (<span>{l s="From" mod="dashproducts"} {$date_from} {l s="to" mod="dashproducts"} {$date_to}</span>)
 					</h3>
 					<div class="table-responsive">
 						<table class="table data_table" id="table_best_sellers">
@@ -86,8 +85,7 @@
 				</div>
 				<div class="tab-pane" id="dash_most_viewed">
 					<h3>
-						{l s="Most Viewed" mod="dashproducts"}
-						<span>{l s="From" mod="dashproducts"} {$date_from} {l s="to" mod="dashproducts"} {$date_to}</span>
+						{l s="Most viewed room types" mod="dashproducts"} (<span>{l s="From" mod="dashproducts"} {$date_from} {l s="to" mod="dashproducts"} {$date_to}</span>)
 					</h3>
 					<div class="table-responsive">
 						<table class="table data_table" id="table_most_viewed">
@@ -98,9 +96,9 @@
 				</div>
 				<div class="tab-pane" id="dash_top_search">
 					<h3>
-						{l s="Top %d most searched hotels" sprintf=$DASHPRODUCT_NBR_SHOW_TOP_SEARCH|intval mod="dashproducts"}
-						<span>{l s="From" mod="dashproducts"} {$date_from} {l s="to" mod="dashproducts"} {$date_to}</span>
+						{l s="Top %d most searched hotels" sprintf=$DASHPRODUCT_NBR_SHOW_TOP_SEARCH|intval mod="dashproducts"} (<span>{l s="From" mod="dashproducts"} {$date_from} {l s="to" mod="dashproducts"} {$date_to}</span>)
 					</h3>
+                    <div class="alert alert-info">{l s="Top searched hotel list is independent of hotel selection at the top. It will always display top searched hotels among all hotels." mod="dashproducts"}</div>
 					<div class="table-responsive">
 						<table class="table data_table" id="table_top_10_most_search">
 							<thead></thead>

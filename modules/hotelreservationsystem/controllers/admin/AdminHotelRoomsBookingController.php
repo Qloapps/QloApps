@@ -689,7 +689,9 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
                 array(),
                 array(),
                 $id_cart,
-                $id_guest
+                $id_guest,
+                $booking_type,
+                $comment
             )) {
                 $response['success'] = true;
                 $response['data']['id_cart_book_data'] = $idHotelCartBooking;
@@ -728,7 +730,7 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
     public function assignServiceProductsForm()
     {
         $objProduct = new Product();
-        $serviceProducts = $objProduct->getServiceProducts($this->context->language->id);
+        $serviceProducts = $objProduct->getServiceProducts(null, Product::SERVICE_PRODUCT_WITHOUT_ROOMTYPE);
         $hotelAddressInfo = HotelBranchInformation::getAddress($this->id_hotel);
         $serviceProducts = Product::getProductsProperties($this->context->language->id, $serviceProducts);
         $this->context->smarty->assign(array(

@@ -423,13 +423,10 @@ class OrderOpcControllerCore extends ParentOrderController
      */
     public function initContent()
     {
-        // check all service products are available
-        RoomTypeServiceProductCartDetail::validateServiceProductsInCart();
+        // validate room types before payment by customer
+        $orderRestrictErr = HotelCartBookingData::validateCartBookings();
 
         parent::initContent();
-
-        // check ORDER RESTRICT condition before payment by the customer
-        $orderRestrictErr = HotelOrderRestrictDate::validateOrderRestrictDateOnPayment($this);
 
         /* id_carrier is not defined in database before choosing a carrier, set it to a default one to match a potential cart _rule */
         if (empty($this->context->cart->id_carrier)) {
@@ -553,7 +550,7 @@ class OrderOpcControllerCore extends ParentOrderController
         }
         Tools::safePostVars();
 
-        $newsletter = Configuration::get('PS_CUSTOMER_NWSL') || (Module::isInstalled('blocknewsletter') && Module::getInstanceByName('blocknewsletter')->active);
+        $newsletter = Module::isInstalled('blocknewsletter') && Module::getInstanceByName('blocknewsletter')->active && Configuration::get('PS_CUSTOMER_NWSL');
         $this->context->smarty->assign('birthday', (bool) Configuration::get('PS_CUSTOMER_BIRTHDATE'));
         $this->context->smarty->assign('newsletter', $newsletter);
         $this->context->smarty->assign('optin', (bool)Configuration::get('PS_CUSTOMER_OPTIN'));

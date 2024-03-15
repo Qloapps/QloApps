@@ -85,9 +85,45 @@
 				<td style="padding:7px 0">
 					<font size="2" face="Open-sans, sans-serif" color="#555454">
 						<p data-html-only="1" style="border-bottom:1px solid #D6D4D4;margin:3px 0 7px;text-transform:uppercase;font-weight:500;font-size:18px;padding-bottom:10px">
-							Order {order_name}&nbsp;-&nbsp;Order canceled						</p>
-						<span style="color:#777">
-							Your order with the reference <span style="color:#333"><strong>{order_name}</strong></span> from <span style="color:#333"><strong>{shop_name}</strong></span> has been canceled.						</span>
+							Order canceled&nbsp;-&nbsp;<a href="{history_url}" style="color:#337ff1">{order_name}</a>
+						</p>
+						<span style="color:#777">Your order with the reference <span style="color:#333"><strong>{order_name}</strong></span> from <span style="color:#333"><strong>{shop_name}</strong></span> has been canceled.</span>
+					</font>
+				</td>
+				<td width="10" style="padding:7px 0">&nbsp;</td>
+			</tr>
+		</table>
+	</td>
+</tr>
+<tr>
+	<td class="space_footer" style="padding:0!important">&nbsp;</td>
+</tr>
+<tr>
+	<td class="box" style="border:1px solid #D6D4D4;background-color:#f8f8f8;padding:7px 0">
+		<table class="table" style="width:100%">
+			<tr>
+				<td width="10" style="padding:7px 0">&nbsp;</td>
+				<td style="padding:7px 0">
+					<font size="2" face="Open-sans, sans-serif" color="#555454">
+						<p data-html-only="1" style="margin:3px 0 0px;font-weight:500;font-size:18px;padding-bottom: 10px;">
+							Here are your order details:
+						</p>
+						<p style="margin:3px 0 0px;">
+							<span style="color:#333"><strong>Order reference:</strong></span> {order_name}<br />
+							<span style="color:#333"><strong>Order total:</strong></span> {total_paid}<br />
+							<span style="color:#333"><strong>Total Rooms:</strong></span> {num_rooms}<br />
+						</p>
+					</font>
+					<br/>
+					<font size="2" face="Open-sans, sans-serif" color="#555454">
+						<p data-html-only="1" style="margin:3px 0 0px;font-weight:500;font-size:18px;padding-bottom: 10px;">
+							Hotel details:
+						</p>
+						<p style="margin:3px 0 0px;">
+							<span style="color:#333"><strong>Hotel Name:</strong></span> {hotel_hotel_name}<br />
+							<span style="color:#333"><strong>Hotel Phone:</strong></span> {hotel_phone}<br />
+							<span style="color:#333"><strong>Hotel Email:</strong></span> {hotel_email}<br />
+						</p>
 					</font>
 				</td>
 				<td width="10" style="padding:7px 0">&nbsp;</td>
