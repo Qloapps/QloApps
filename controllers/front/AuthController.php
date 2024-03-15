@@ -628,7 +628,7 @@ class AuthControllerCore extends FrontController
                     $customer->active = 1;
                     // New Guest customer
                     if (Tools::isSubmit('is_new_customer')) {
-                        if ($idCustomer) {
+                        if (isset($idCustomer) && $idCustomer) {
                             // update guest customer details
                             $customer = new Customer($idCustomer);
                             $customer->firstname = Tools::getValue('firstname');
