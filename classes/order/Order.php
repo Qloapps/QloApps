@@ -2541,12 +2541,12 @@ class OrderCore extends ObjectModel
             $order_ecotax_tax = Tools::ps_round($order_ecotax_tax, _PS_PRICE_COMPUTE_PRECISION_, $this->round_mode);
 
             $tax_rounding_error = $expected_total_tax - $actual_total_tax - $order_ecotax_tax;
-            if ($tax_rounding_error !== 0) {
+            if ($tax_rounding_error != 0) {
                 Tools::spreadAmount($tax_rounding_error, _PS_PRICE_COMPUTE_PRECISION_, $order_detail_tax_rows, 'total_amount');
             }
 
             $base_rounding_error = $expected_total_base - $actual_total_base;
-            if ($base_rounding_error !== 0) {
+            if ($base_rounding_error != 0) {
                 Tools::spreadAmount($base_rounding_error, _PS_PRICE_COMPUTE_PRECISION_, $order_detail_tax_rows, 'total_tax_base');
             }
         }
