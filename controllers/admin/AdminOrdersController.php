@@ -3661,9 +3661,9 @@ class AdminOrdersControllerCore extends AdminController
             0,
             0,
             0,
-            0,
-            0,
-            0,
+            $old_date_from,
+            $old_date_to,
+            $id_room,
             0,
             null,
             null
@@ -3748,24 +3748,11 @@ class AdminOrdersControllerCore extends AdminController
                             if (Product::getProductPriceCalculation($serviceProduct['id_product']) == Product::PRICE_CALCULATION_METHOD_PER_DAY) {
                                 $numDays = HotelHelper::getNumberOfDays($new_date_from, $new_date_to);
                                 $objRoomTypeServiceProductOrderDetail = new RoomTypeServiceProductOrderDetail((int) $serviceProduct['id_room_type_service_product_order_detail']);
-                                $totalPriceTaxExcl = $objRoomTypeServiceProductPrice->getServicePrice(
-                                    (int) $serviceProduct['id_product'],
-                                    $orderServiceProduct['id_room'],
-                                    $objRoomTypeServiceProductOrderDetail->quantity,
-                                    $new_date_from,
-                                    $new_date_to,
-                                    false
-                                );
-                                $totalPriceTaxIncl = $objRoomTypeServiceProductPrice->getServicePrice(
-                                    (int) $serviceProduct['id_product'],
-                                    $orderServiceProduct['id_room'],
-                                    $objRoomTypeServiceProductOrderDetail->quantity,
-                                    $new_date_from,
-                                    $new_date_to,
-                                    true
-                                );
-                                $unitPriceTaxExcl = $totalPriceTaxExcl / ($numDays * $objRoomTypeServiceProductOrderDetail->quantity);
-                                $unitPriceTaxIncl = $totalPriceTaxIncl / ($numDays * $objRoomTypeServiceProductOrderDetail->quantity);
+                                $unitPriceTaxExcl = $objRoomTypeServiceProductOrderDetail->unit_price_tax_excl;
+                                $unitPriceTaxIncl = $objRoomTypeServiceProductOrderDetail->unit_price_tax_incl;
+
+                                $totalPriceTaxExcl =  $numDays * $objRoomTypeServiceProductOrderDetail->quantity * $unitPriceTaxExcl;                                $unitPriceTaxIncl = $objRoomTypeServiceProductOrderDetail->unit_price_tax_incl;
+                                $totalPriceTaxIncl = $numDays * $objRoomTypeServiceProductOrderDetail->quantity * $unitPriceTaxIncl;
 
                                 $objOrder->total_paid_tax_excl -= $objRoomTypeServiceProductOrderDetail->total_price_tax_excl;
                                 $objOrder->total_paid_tax_incl -= $objRoomTypeServiceProductOrderDetail->total_price_tax_incl;
@@ -3776,18 +3763,20 @@ class AdminOrdersControllerCore extends AdminController
                                 $objOrder->total_paid_tax_incl += $totalPriceTaxIncl;
                                 $objOrder->total_paid += $totalPriceTaxIncl;
 
+                                $objOrderDetail = new OrderDetail((int) $serviceProduct['id_order_detail']);
+                                $objOrderDetail->total_price_tax_excl -= $objRoomTypeServiceProductOrderDetail->total_price_tax_excl;
+                                $objOrderDetail->total_price_tax_incl -= $objRoomTypeServiceProductOrderDetail->total_price_tax_incl;
+
+                                $objOrderDetail->total_price_tax_excl += $totalPriceTaxExcl;
+                                $objOrderDetail->total_price_tax_incl += $totalPriceTaxIncl;
+                                $objOrderDetail->save();
+
                                 $objRoomTypeServiceProductOrderDetail->unit_price_tax_excl = $unitPriceTaxExcl;
                                 $objRoomTypeServiceProductOrderDetail->unit_price_tax_incl = $unitPriceTaxIncl;
                                 $objRoomTypeServiceProductOrderDetail->total_price_tax_excl = $totalPriceTaxExcl;
                                 $objRoomTypeServiceProductOrderDetail->total_price_tax_incl = $totalPriceTaxIncl;
                                 $objRoomTypeServiceProductOrderDetail->save();
 
-                                $objOrderDetail = new OrderDetail((int) $serviceProduct['id_order_detail']);
-                                $objOrderDetail->unit_price_tax_excl = $unitPriceTaxExcl;
-                                $objOrderDetail->unit_price_tax_incl = $unitPriceTaxIncl;
-                                $objOrderDetail->total_price_tax_excl = $totalPriceTaxExcl;
-                                $objOrderDetail->total_price_tax_incl = $totalPriceTaxIncl;
-                                $objOrderDetail->save();
                             }
                         }
                     }
