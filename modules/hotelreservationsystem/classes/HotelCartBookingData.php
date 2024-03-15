@@ -1236,6 +1236,7 @@ class HotelCartBookingData extends ObjectModel
                         $cartHotelData[$prodKey]['name'] = $objProduct->name;
                         $cartHotelData[$prodKey]['unit_price'] = $unitPrice;
                         $cartHotelData[$prodKey]['unit_price_without_reduction'] = $unitPriceWithoutReduction;
+                        $cartHotelData[$prodKey]['total_room_type_amount'] = 0;
 
                         // get cover image link
                         $coverImageArr = $objProduct->getCover($product['id_product']);
@@ -1433,6 +1434,7 @@ class HotelCartBookingData extends ObjectModel
                                 $cartHotelData[$prodKey]['date_diff'][$dateJoin]['feature_price_diff'] = $feature_price_diff;
                             }
 
+                            $cartHotelData[$prodKey]['total_room_type_amount'] = array_sum(array_column($cartHotelData[$prodKey]['date_diff'], 'amount'));
                             $cartHotelData[$prodKey]['total_num_rooms'] = array_sum(array_column($cartHotelData[$prodKey]['date_diff'], 'num_rm'));
                         }
                     }

@@ -701,21 +701,11 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
                     $priceWithFeatureTI = 0;
                     $priceWithFeatureTE = 0;
                 }
-                if ($quantity) {
-                    $totalPrice['total_price_tax_incl'] += $priceWithFeatureTI * $quantity;
-                    $totalPrice['total_price_tax_excl'] += $priceWithFeatureTE * $quantity;
-                } else {
-                    $totalPrice['total_price_tax_incl'] += $priceWithFeatureTI;
-                    $totalPrice['total_price_tax_excl'] += $priceWithFeatureTE;
-                }
+                $totalPrice['total_price_tax_incl'] += $priceWithFeatureTI;
+                $totalPrice['total_price_tax_excl'] += $priceWithFeatureTE;
             } else {
-                if ($quantity) {
-                    $totalPrice['total_price_tax_incl'] += $productPriceTI * $quantity;
-                    $totalPrice['total_price_tax_excl'] += $productPriceTE * $quantity;
-                } else {
-                    $totalPrice['total_price_tax_incl'] += $productPriceTI;
-                    $totalPrice['total_price_tax_excl'] += $productPriceTE;
-                }
+                $totalPrice['total_price_tax_incl'] += $productPriceTI;
+                $totalPrice['total_price_tax_excl'] += $productPriceTE;
             }
         }
         if ($with_auto_room_services) {
@@ -729,7 +719,11 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
                     $totalPrice['total_price_tax_excl'] += $service['price'];
                 }
             }
-         }
+        }
+        if ($quantity) {
+            $totalPrice['total_price_tax_incl'] = $totalPrice['total_price_tax_incl'] * $quantity;
+            $totalPrice['total_price_tax_excl'] = $totalPrice['total_price_tax_excl'] * $quantity;
+        }
         return $totalPrice;
     }
 
