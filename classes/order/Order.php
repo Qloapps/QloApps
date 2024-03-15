@@ -1862,7 +1862,10 @@ class OrderCore extends ObjectModel
             if ($payment->id_currency == $this->id_currency) {
                 $this->total_paid_real += $order_payment_detail->amount;
             } else {
-                $this->total_paid_real += Tools::ps_round(Tools::convertPrice($order_payment_detail->amount, $payment->id_currency, false), 2);
+                $this->total_paid_real += Tools::ps_round(
+                    Tools::convertPriceFull($order_payment_detail->amount, new Currency($payment->id_currency), new Currency($this->id_currency)),
+                    6
+                );
             }
 
             if (!validate::isPrice($this->total_paid_real)) {
@@ -1901,18 +1904,18 @@ class OrderCore extends ObjectModel
                 unset($invoices[$key]);
             }
         }
-        $delivery_slips = $this->getDeliverySlipsCollection()->getResults();
-        // @TODO review
-        foreach ($delivery_slips as $key => $delivery) {
-            $delivery->is_delivery = true;
-            $delivery->date_add = $delivery->delivery_date;
-            if (!$invoice->delivery_number) {
-                unset($delivery_slips[$key]);
-            }
-        }
+        // $delivery_slips = $this->getDeliverySlipsCollection()->getResults();
+        // // @TODO review
+        // foreach ($delivery_slips as $key => $delivery) {
+        //     $delivery->is_delivery = true;
+        //     $delivery->date_add = $delivery->delivery_date;
+        //     if (!$invoice->delivery_number) {
+        //         unset($delivery_slips[$key]);
+        //     }
+        // }
         $order_slips = $this->getOrderSlipsCollection()->getResults();
 
-        $documents = array_merge($invoices, $order_slips, $delivery_slips);
+        $documents = array_merge($invoices, $order_slips);
         usort($documents, array('Order', 'sortDocuments'));
 
         return $documents;

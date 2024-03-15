@@ -145,7 +145,12 @@ class SpecificPriceCore extends ObjectModel
 			FROM `'._DB_PREFIX_.'specific_price`
 			WHERE 1 '.self::filterOutField('id_product', $id_product).
             ($id_product_attribute ? ' AND id_product_attribute = '.(int) $id_product_attribute : '').'
-			AND id_cart = '.(int) $id_cart
+			AND id_cart = '.(int) $id_cart.'
+            GROUP BY
+                case when id_specific_price_rule <> 0
+                    then id_specific_price_rule
+                    else id_specific_price
+                end'
         );
     }
 

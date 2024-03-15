@@ -115,9 +115,15 @@
 
 						});
 					{/if}
-					$('.process-icon-modules-list').parent('a').unbind().bind('click', function (){
-						$('#modules_list_container').modal('show');
-						openModulesList();
+					$('.process-icon-modules-list').parent('a').unbind().bind('click', async function (){
+						let loggedIn = await checkIfEmployeeIsLoggedIn();
+
+						if (loggedIn) {
+							$('#modules_list_container').modal('show');
+							openModulesList();
+						} else {
+							window.location = window.location.pathname;
+						}
 					});
 				//]]>
 				</script>

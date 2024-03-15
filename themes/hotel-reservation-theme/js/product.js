@@ -1434,7 +1434,7 @@ var BookingForm = {
 
         return data;
     },
-    refresh: function() {
+    refresh: function(resetOccupancy = false) {
         BookingForm.currentRequest = $.ajax({
             url: product_controller_url,
             type: 'POST',
@@ -1456,6 +1456,15 @@ var BookingForm = {
                 if (response.status == true) {
                     $('.booking-form').replaceWith(response.html_booking_form);
                     BookingForm.init();
+
+                    if (resetOccupancy) {
+                        BookingForm.resetOccupancy();
+                    }
+                }
+            },
+            error: function(jqXHR) {
+                if (jqXHR.readyState == 0) {
+                    showErrorMessage(no_internet_txt);
                 }
             },
             complete: function() {
@@ -1464,6 +1473,9 @@ var BookingForm = {
             }
         });
     },
+    resetOccupancy: function () {
+        resetOccupancyField($('.booking-form .booking_occupancy_wrapper'));
+    }
 }
 
 function loadHotelImagesByPage(page = 1) {

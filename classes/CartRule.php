@@ -421,7 +421,7 @@ class CartRuleCore extends ObjectModel
      * @param $name
      * @return bool
      */
-    public static function cartRuleExists($name)
+    public static function cartRuleExists($code, $id_customer = 0)
     {
         if (!CartRule::isFeatureActive()) {
             return false;
@@ -430,7 +430,8 @@ class CartRuleCore extends ObjectModel
         return (bool)Db::getInstance()->getValue('
 		SELECT `id_cart_rule`
 		FROM `'._DB_PREFIX_.'cart_rule`
-		WHERE `code` = \''.pSQL($name).'\'');
+		WHERE `code` = \''.pSQL($code).'\''.
+        ($id_customer ? 'AND `id_customer` = '.(int) $id_customer : ''));
     }
 
     /**
@@ -601,7 +602,7 @@ class CartRuleCore extends ObjectModel
 
         // Check if the cart rule is only usable by a specific customer, and if the current customer is the right one
         if ($this->id_customer && $context->cart->id_customer != $this->id_customer) {
-            if (!Context::getContext()->customer->isLogged()) {
+            if (!defined('_PS_ADMIN_DIR_') && !Context::getContext()->customer->isLogged()) {
                 return (!$display_error) ? false : (Tools::displayError('You cannot use this voucher').' - '.Tools::displayError('Please log in first'));
             }
             return (!$display_error) ? false : Tools::displayError('You cannot use this voucher');
@@ -1466,15 +1467,16 @@ class CartRuleCore extends ObjectModel
      * @param $id_lang
      * @return array
      */
-    public static function getCartsRuleByCode($name, $id_lang, $extended = false)
+    public static function getCartsRuleByCode($name, $id_lang, $extended = false, $id_customer = 0)
     {
         $sql_base = 'SELECT cr.*, crl.*
-						FROM '._DB_PREFIX_.'cart_rule cr
-						LEFT JOIN '._DB_PREFIX_.'cart_rule_lang crl ON (cr.id_cart_rule = crl.id_cart_rule AND crl.id_lang = '.(int)$id_lang.')';
+        FROM '._DB_PREFIX_.'cart_rule cr
+        LEFT JOIN '._DB_PREFIX_.'cart_rule_lang crl ON (cr.id_cart_rule = crl.id_cart_rule AND crl.id_lang = '.(int)$id_lang.')
+        WHERE 1'.($id_customer ? ' AND (cr.`id_customer` = 0 OR cr.`id_customer` = '.(int) $id_customer.')' : '');
         if ($extended) {
-            return Db::getInstance()->executeS('('.$sql_base.' WHERE code LIKE \'%'.pSQL($name).'%\') UNION ('.$sql_base.' WHERE name LIKE \'%'.pSQL($name).'%\')');
+            return Db::getInstance()->executeS('('.$sql_base.' AND code LIKE \'%'.pSQL($name).'%\') UNION ('.$sql_base.' AND name LIKE \'%'.pSQL($name).'%\')');
         } else {
-            return Db::getInstance()->executeS($sql_base.' WHERE code LIKE \'%'.pSQL($name).'%\'');
+            return Db::getInstance()->executeS($sql_base.' AND code LIKE \'%'.pSQL($name).'%\'');
         }
     }
 }
