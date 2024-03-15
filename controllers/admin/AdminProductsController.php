@@ -1106,90 +1106,17 @@ class AdminProductsControllerCore extends AdminController
         $idElement = Tools::getValue('id_element');
         $idProduct = Tools::getValue('id_product');
         if ($idElement && $idProduct) {
-            $position = Tools::getValue('position');
-            $toRowIndex = Tools::getValue('to_row_index');
-            if (RoomTypeServiceProduct:: changePositions($idProduct, $idElement, $toRowIndex, $position)) {
-                $response['msg'] = $this->l('Updated Successfully');
+            $newPosition = Tools::getValue('new_position');
+            if (RoomTypeServiceProduct::updatePosition(
+                $idProduct,
+                $idElement,
+                $newPosition,
+                RoomTypeServiceProduct::WK_ELEMENT_TYPE_ROOM_TYPE
+            )) {
+                $response['msg'] = $this->l('Positions updated successfully.');
                 $response['success'] = true;
             }
         }
-        die(json_encode($response));
-    }
-
-    public function ajaxProcessUpdatedServiceProductPrice()
-    {
-        $response = array();
-        if ($this->tabAccess['edit'] === '1') {
-            // process price update
-            $idProduct = Tools::getValue('id_product');
-            $idServiceProduct = Tools::getValue('service_product_id');
-            $price = Tools::getValue('price');
-            $id_tax_rules_group = Tools::getValue('id_tax_rules_group');
-
-            if (!$idProduct) {
-                $error = $this->l('Invalid room type.');
-            } else {
-                $objRoomType = new HotelRoomType();
-                if (!Product::isBookingProduct($idProduct)) {
-                    $error = $this->l('Room Type details not found. Save room type details before updating price.');
-                }
-            }
-            if (!$idServiceProduct) {
-                $error = $this->l('Service Product not found.');
-            }
-
-            if (!$price) {
-                $error = $this->l('Service product price must not be empty');
-            } elseif (!Validate::isPrice($price)) {
-                $error = $this->l('Service product price is invalid');
-            }
-
-            if (!isset($error)) {
-                $objRoomTypeServiceProductPrice = new RoomTypeServiceProductPrice();
-                $priceExists = $objRoomTypeServiceProductPrice->getProductRoomTypeLinkPriceInfo(
-                    $idServiceProduct,
-                    $idProduct,
-                    RoomTypeServiceProduct::WK_ELEMENT_TYPE_ROOM_TYPE
-                );
-
-                if ($priceExists) {
-                    $objRoomTypeServiceProductPrice = new RoomTypeServiceProductPrice($priceExists['id_room_type_service_product_price']);
-                } else {
-                    $objRoomTypeServiceProductPrice = new RoomTypeServiceProductPrice();
-                    $objRoomTypeServiceProductPrice->id_product = $idServiceProduct;
-                    $objRoomTypeServiceProductPrice->id_element = $idProduct;
-                    $objRoomTypeServiceProductPrice->element_type = RoomTypeServiceProduct::WK_ELEMENT_TYPE_ROOM_TYPE;
-                }
-
-                $objRoomTypeServiceProductPrice->price = $price;
-                $objRoomTypeServiceProductPrice->id_tax_rules_group = $id_tax_rules_group;
-
-                if (!$objRoomTypeServiceProductPrice->save()) {
-                    $error = $this->l('Unable to save price, please try again.');
-                } else {
-                    $response['price'] = Tools::DisplayPrice($price);
-                    if (Validate::isLoadedObject($objTaxRuleGroup = new TaxRulesGroup(
-                        $objRoomTypeServiceProductPrice->id_tax_rules_group,
-                        $this->context->language->id
-                    ))) {
-                        $response['tax_rules_group_name'] = $objTaxRuleGroup->name;
-                    } else {
-                        $response['tax_rules_group_name'] = $this->l('No tax');
-                    }
-                }
-            }
-        } else {
-            $error = Tools::displayError('You do not have permission to edit this.');
-        }
-
-        if (isset($error)) {
-            $response['status'] = 'error';
-            $response['message'] = $error;
-        } else {
-            $response['status'] = 'ok';
-            $response['message'] = $this->l('Price Updated Successfully');
-        }
-
         die(json_encode($response));
     }
 
@@ -1884,6 +1811,9 @@ class AdminProductsControllerCore extends AdminController
                         }
                         if ($this->isTabSubmitted('Occupancy')) {
                             $this->processOccupancy();
+                        }
+                        if ($this->isTabSubmitted('ServiceProduct')) {
+                            $this->processServiceProduct();
                         }
                         if ($this->isTabSubmitted('LengthOfStay')) {
                             $this->processLengthOfStay();
@@ -2796,7 +2726,6 @@ class AdminProductsControllerCore extends AdminController
     {
         $data = $this->createTemplate($this->tpl_form);
         if ($obj->id) {
-
             $address = new Address();
             $address->id_country = (int)$this->context->country->id;
             $tax_rules_groups = TaxRulesGroup::getTaxRulesGroups(true);
@@ -2828,53 +2757,89 @@ class AdminProductsControllerCore extends AdminController
 
             $objRoomType = new HotelRoomType();
             if ($hotelRoomType = $objRoomType->getRoomTypeInfoByIdProduct($obj->id)) {
+                $allServiceProducts = $obj->getServiceProducts();
+
                 $objRoomTypeServiceProduct = new RoomTypeServiceProduct();
                 $objRoomTypeServiceProductPrice = new RoomTypeServiceProductPrice();
-                $serviceProducts = $objRoomTypeServiceProduct->getProductsForRoomType(
-                    $obj->id
-                );
-                foreach ($serviceProducts as &$serviceProduct) {
-                    $product = new Product($serviceProduct['id_product'], false, $this->context->language->id);
-                    $serviceProductPriceInfo = $objRoomTypeServiceProductPrice->getProductRoomTypeLinkPriceInfo(
-                        $product->id,
-                        $obj->id,
-                        RoomTypeServiceProduct::WK_ELEMENT_TYPE_ROOM_TYPE
-                    );
-                    $serviceProduct['id_product'] = $product->id;
-                    $serviceProduct['name'] = $product->name;
-                    $serviceProduct['auto_add_to_cart'] = $product->auto_add_to_cart;
-                    $serviceProduct['category'] = $product->category;
-                    $serviceProduct['default_price'] = $product->price;
-                    $serviceProduct['id_tax_rules_group'] = $product->id_tax_rules_group;
-                    if ($serviceProductPriceInfo) {
-                        $serviceProduct['custom_price'] = $serviceProductPriceInfo['price'];
-                        $serviceProduct['id_tax_rules_group'] = $serviceProductPriceInfo['id_tax_rules_group'];
-                        if ($serviceProductPriceInfo['id_tax_rules_group'] == 0) {
-                            $serviceProduct['tax_rules_group_name'] = 'No tax';
+
+                // change index of array to id_product for faster access
+                $tmpServiceProducts = $objRoomTypeServiceProduct->getProductsForRoomType($obj->id);
+                $roomTypeServiceProducts = array();
+                foreach ($tmpServiceProducts as $serviceProduct) {
+                    $roomTypeServiceProducts[$serviceProduct['id_product']] = $serviceProduct;
+                }
+
+                // classify all service products into associated and unassociated groups
+                $associatedServiceProducts = array();
+                $unassociatedServiceProducts = array();
+                $idsRoomTypeServiceProduct = array_column($roomTypeServiceProducts, 'id_product');
+                foreach ($allServiceProducts as &$serviceProduct) {
+                    if (in_array($serviceProduct['id_product'], $idsRoomTypeServiceProduct)) {
+                        $associationInfo = array();
+
+                        $objProduct = new Product($serviceProduct['id_product'], false, $this->context->language->id);
+                        $serviceProductPriceInfo = $objRoomTypeServiceProductPrice->getProductRoomTypeLinkPriceInfo(
+                            $objProduct->id,
+                            $obj->id,
+                            RoomTypeServiceProduct::WK_ELEMENT_TYPE_ROOM_TYPE
+                        );
+
+                        $associationInfo['id_room_type_service_product'] = $roomTypeServiceProducts[$serviceProduct['id_product']]['id_room_type_service_product'];
+                        $associationInfo['position'] = $roomTypeServiceProducts[$serviceProduct['id_product']]['position'];
+                        $associationInfo['id_product'] = $objProduct->id;
+                        $associationInfo['name'] = $objProduct->name;
+                        $associationInfo['auto_add_to_cart'] = $objProduct->auto_add_to_cart;
+                        $associationInfo['category'] = $objProduct->category;
+                        $associationInfo['default_price'] = $objProduct->price;
+                        $associationInfo['id_tax_rules_group'] = $objProduct->id_tax_rules_group;
+
+                        // assign custom price only if it is saved for service product
+                        if ($serviceProductPriceInfo) {
+                            $associationInfo['custom_price'] = $serviceProductPriceInfo['price'];
+                            $associationInfo['id_tax_rules_group'] = $serviceProductPriceInfo['id_tax_rules_group'];
+                            if ($serviceProductPriceInfo['id_tax_rules_group'] == 0) {
+                                $associationInfo['tax_rules_group_name'] = $this->l('No tax');
+                            } else {
+                                $objTaxRuleGroup = new TaxRulesGroup(
+                                    $serviceProductPriceInfo['id_tax_rules_group'],
+                                    $this->context->language->id
+                                );
+                                $associationInfo['tax_rules_group_name'] = $objTaxRuleGroup->name;
+                            }
+                            $associationInfo['id_room_type_service_product_price'] = $serviceProductPriceInfo['id_room_type_service_product_price'];
+                        }
+
+                        if ($objProduct->id_tax_rules_group == 0) {
+                            $associationInfo['default_tax_rules_group_name'] = $this->l('No tax');
                         } else {
                             $objTaxRuleGroup = new TaxRulesGroup(
-                                $serviceProductPriceInfo['id_tax_rules_group'],
+                                $objProduct->id_tax_rules_group,
                                 $this->context->language->id
                             );
-                            $serviceProduct['tax_rules_group_name'] = $objTaxRuleGroup->name;
+                            $associationInfo['default_tax_rules_group_name'] = $objTaxRuleGroup->name;
                         }
-                        $serviceProduct['id_room_type_service_product_price'] = $serviceProductPriceInfo['id_room_type_service_product_price'];
-                    }
 
-                    if ($product->id_tax_rules_group == 0) {
-                        $serviceProduct['default_tax_rules_group_name'] = 'No tax';
+                        $serviceProduct['is_associated'] = true;
+                        $serviceProduct['association_info'] = $associationInfo;
+
+                        $associatedServiceProducts[$associationInfo['position']] = $serviceProduct;
                     } else {
-                        $objTaxRuleGroup = new TaxRulesGroup(
-                            $product->id_tax_rules_group,
-                            $this->context->language->id
-                        );
-                        $serviceProduct['default_tax_rules_group_name'] = $objTaxRuleGroup->name;
+                        $serviceProduct['is_associated'] = false;
+
+                        $objTaxRulesGroup = new TaxRulesGroup($serviceProduct['id_tax_rules_group'], $this->context->language->id);
+                        $serviceProduct['tax_rules_group_name'] = $objTaxRulesGroup->name;
+
+                        $unassociatedServiceProducts[] = $serviceProduct;
                     }
                 }
+
+                ksort($associatedServiceProducts);
+
                 $data->assign(array(
                     'product' => $obj,
                     'currency' => $this->context->currency,
-                    'service_products' => $serviceProducts,
+                    'associated_service_products' => $associatedServiceProducts,
+                    'unassociated_service_products' => $unassociatedServiceProducts,
                     'tax_rules_groups' => $tax_rules_groups,
                     'taxesRatesByGroup' => $tax_rates,
                 ));
@@ -2884,6 +2849,115 @@ class AdminProductsControllerCore extends AdminController
         }
 
         $this->tpl_form_vars['custom_form'] = $data->fetch();
+    }
+
+    public function processServiceProduct()
+    {
+        $idProduct = Tools::getValue('id_product');
+
+        if (!$idProduct || !Validate::isUnsignedInt($idProduct) || !Product::isBookingProduct($idProduct)) {
+            $this->errors[] = $this->l('Something went wrong while saving service products.');
+        }
+
+        if (Validate::isLoadedObject($objProduct = new Product($idProduct))) {
+            // validate submitted details
+            $availableServiceProducts = Tools::getValue('available_service_products');
+            $objServiceProducts = array();
+            foreach ($availableServiceProducts as $idServiceProduct) {
+                $prefix = 'service_product_'.$idServiceProduct.'_';
+
+                $isAssociated = in_array(Tools::getValue($prefix.'associated'), array('on', 'true', '1'));
+                $price = Tools::getValue($prefix.'price');
+                $idTaxRulesGroup = Tools::getValue($prefix.'id_tax_rules_group');
+
+                if ($isAssociated) {
+                    $objServiceProduct = new Product($idServiceProduct, false, $this->context->language->id);
+                    if (Validate::isLoadedObject($objServiceProduct)) {
+                        // cache for faster access in next foreach loop
+                        $objServiceProducts[$idServiceProduct] = $objServiceProduct;
+
+                        if (!$price) {
+                            $this->errors[] = sprintf($this->l('Price for service product \'%s\' is empty.'), $objServiceProduct->name);
+                        } elseif (!Validate::isPrice($price)) {
+                            $this->errors[] = sprintf($this->l('Price for service product \'%s\' is invalid.'), $objServiceProduct->name);
+                        }
+                    } else{
+                        $this->errors[] = sprintf($this->l('Service product #%s is not available.'), $idServiceProduct);
+                    }
+                }
+            }
+
+            if (!count($this->errors)) {
+                // save submitted details
+                foreach ($availableServiceProducts as $idServiceProduct) {
+                    $prefix = 'service_product_'.$idServiceProduct.'_';
+
+                    $isAssociated = in_array(Tools::getValue($prefix.'associated'), array('on', 'true', '1'));
+                    $price = Tools::getValue($prefix.'price');
+                    $idTaxRulesGroup = Tools::getValue($prefix.'id_tax_rules_group');
+
+                    if ($isAssociated) {
+                        $objRoomTypeServiceProduct = new RoomTypeServiceProduct();
+
+                        // if already associated
+                        if ($objRoomTypeServiceProduct->isRoomTypeLinkedWithProduct($idProduct, $idServiceProduct)) {
+                            $objRoomTypeServiceProductPrice = new RoomTypeServiceProductPrice();
+                            $priceInfo = $objRoomTypeServiceProductPrice->getProductRoomTypeLinkPriceInfo(
+                                $idServiceProduct,
+                                $idProduct,
+                                RoomTypeServiceProduct::WK_ELEMENT_TYPE_ROOM_TYPE
+                            );
+
+                            $objRoomTypeServiceProductPrice = null;
+                            if ($priceInfo) {
+                                $objRoomTypeServiceProductPrice = new RoomTypeServiceProductPrice($priceInfo['id_room_type_service_product_price']);
+                            } else {
+                                $objRoomTypeServiceProductPrice = new RoomTypeServiceProductPrice();
+                                $objRoomTypeServiceProductPrice->id_product = $idServiceProduct;
+                                $objRoomTypeServiceProductPrice->id_element = $idProduct;
+                                $objRoomTypeServiceProductPrice->element_type = RoomTypeServiceProduct::WK_ELEMENT_TYPE_ROOM_TYPE;
+                            }
+
+                            $objRoomTypeServiceProductPrice->price = $price;
+                            $objRoomTypeServiceProductPrice->id_tax_rules_group = $idTaxRulesGroup;
+
+                            $objRoomTypeServiceProductPrice->save();
+                        } else {
+                            // create new association
+                            $objRoomTypeServiceProduct = new RoomTypeServiceProduct();
+                            $objRoomTypeServiceProduct->addRoomProductLink(
+                                $idServiceProduct,
+                                $idProduct,
+                                RoomTypeServiceProduct::WK_ELEMENT_TYPE_ROOM_TYPE
+                            );
+
+                            $objRoomTypeServiceProductPrice = new RoomTypeServiceProductPrice();
+                            $objRoomTypeServiceProductPrice->id_product = $idServiceProduct;
+                            $objRoomTypeServiceProductPrice->id_element = $idProduct;
+                            $objRoomTypeServiceProductPrice->element_type = RoomTypeServiceProduct::WK_ELEMENT_TYPE_ROOM_TYPE;
+                            $objRoomTypeServiceProductPrice->price = $price;
+                            $objRoomTypeServiceProductPrice->id_tax_rules_group = $idTaxRulesGroup;
+                            $objRoomTypeServiceProductPrice->save();
+                        }
+                    } else {
+                        // remove association
+                        RoomTypeServiceProduct::deleteRoomProductLink(
+                            $idServiceProduct,
+                            RoomTypeServiceProduct::WK_ELEMENT_TYPE_ROOM_TYPE,
+                            $idProduct
+                        );
+
+                        RoomTypeServiceProductPrice::deleteRoomProductPrices(
+                            $idServiceProduct,
+                            RoomTypeServiceProduct::WK_ELEMENT_TYPE_ROOM_TYPE,
+                            $idProduct
+                        );
+                    }
+                }
+            }
+        } else {
+            $this->errors[] = $this->l('Please save room type details before saving service products.');
+        }
     }
 
     // send information for the occupancy tab
