@@ -659,7 +659,6 @@ class InstallModelInstall extends InstallAbstractModel
                 'bankwire',
                 'cheque',
                 'blockmyaccount',
-                'qloblockcontact',
                 'blockcurrencies',
                 'blocklanguages',
                 'qlohotelreview',

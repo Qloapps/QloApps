@@ -234,10 +234,10 @@ $(document).ready(function() {
             return highlightDateBorder($("#from_date").val(), date);
         },
         onSelect: function(selectedDate) {
-            var date_format = selectedDate.split("-");
-            var selectedDate = new Date($.datepicker.formatDate('yy-mm-dd', new Date(date_format[2], date_format[1] - 1, date_format[0])));
-            selectedDate.setDate(selectedDate.getDate() + 1);
-            $("#to_date").datepicker("option", "minDate", selectedDate);
+            let objDateToMin = $.datepicker.parseDate('dd-mm-yy', selectedDate);
+            objDateToMin.setDate(objDateToMin.getDate() + 1);
+
+            $('#to_date').datepicker('option', 'minDate', objDateToMin);
         },
     });
 
@@ -411,7 +411,7 @@ $(document).ready(function() {
         var date_to = $(this).attr('data-date-to');
 
         var sub_key = $(this).attr('data-sub-key');
-        var booking_type = $("input[name='bk_type_" + id_room + "_" + sub_key + "']:checked").val();
+        var booking_type = $(this).closest('tr').find("input.par_bk_type:checked").val();
         var comment = $("#comment_" + id_room + "_" + sub_key).val();
         var btn = $(this);
         $(this).closest('tr').find('.booking_occupancy_wrapper').parent().removeClass('open');
@@ -923,27 +923,24 @@ $(document).ready(function() {
 	};
     initBookingList();
     function initBookingList() {
-        $('.avai_comment, .par_comment').hide();
+        $('.booking_type_comment').hide();
         $('.avai_bk_type').on('change', function() {
-            var id_room = $(this).attr('data-id-room');
             var booking_type = $(this).val();
 
             if (booking_type == allotmentTypes.auto) {
-                $('#comment_'+id_room).hide().val('');
+                $(this).closest('td').find('.booking_type_comment').hide().val('');
             } else if (booking_type == allotmentTypes.manual) {
-                $('#comment_'+id_room).show();
+                $(this).closest('td').find('.booking_type_comment').show();
             }
         });
 
         $('.par_bk_type').on('change', function() {
-            var id_room = $(this).attr('data-id-room');
-            var sub_key = $(this).attr('data-sub-key');
             var booking_type = $(this).val();
 
             if (booking_type == allotmentTypes.auto) {
-                $('#comment_'+id_room+'_'+sub_key).hide().val('');
+                $(this).closest('td').find('.booking_type_comment').hide().val('');
             } else if (booking_type == allotmentTypes.manual) {
-                $('#comment_'+id_room+'_'+sub_key).show();
+                $(this).closest('td').find('.booking_type_comment').show();
             }
         });
     }
@@ -951,18 +948,8 @@ $(document).ready(function() {
     function highlightDateBorder(elementVal, date)
     {
         if (elementVal) {
-            var currentDate = date.getDate();
-            var currentMonth = date.getMonth()+1;
-            if (currentMonth < 10) {
-                currentMonth = '0' + currentMonth;
-            }
-            if (currentDate < 10) {
-                currentDate = '0' + currentDate;
-            }
-            dmy = date.getFullYear() + "-" + currentMonth + "-" + currentDate;
-            var date_format = elementVal.split("-");
-            var check_in_time = (date_format[2]) + '-' + (date_format[1]) + '-' + (date_format[0]);
-            if (dmy == check_in_time) {
+            let selectedDate = $.datepicker.formatDate('dd-mm-yy', date);
+            if (selectedDate == elementVal) {
                 return [true, "selectedCheckedDate", "Check-In date"];
             } else {
                 return [true, ""];

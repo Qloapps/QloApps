@@ -194,6 +194,15 @@ class AdminPPreferencesControllerCore extends AdminController
                         'required' => false,
                         'type' => 'bool'
                     ),
+                    'WK_ROOM_LEFT_WARNING_NUMBER' => array(
+                        'title' => $this->l('Display remaining Number of rooms when the rooms are lower than or equal to'),
+                        'hint' => $this->l('Mention the minimum quantity of rooms after which alert message of remaining rooms will get displayed to users.'),
+                        'validation' => 'isInt',
+                        'cast' => 'intval',
+                        'type' => 'text',
+                        'class' => 'fixed-width-xxl',
+                        'visibility' => Shop::CONTEXT_ALL,
+                    ),
                 ),
                 'submit' => array('title' => $this->l('Save'))
             ),
@@ -391,29 +400,6 @@ class AdminPPreferencesControllerCore extends AdminController
             //     'bottom' => '<script type="text/javascript">stockManagementActivationAuthorization();advancedStockManagementActivationAuthorization();</script>',
             //     'submit' => array('title' => $this->l('Save'))
             // ),
-            'fo_search_filters' => array(
-                'title' => $this->l('Search Results Page Filters'),
-                'icon' => 'icon-search',
-                'fields' => array(
-                    'SHOW_AMENITIES_FILTER' => array(
-                        'title' => $this->l('Show Amenities filter'),
-                        'hint' => $this->l('Enable to display Amenities filter.'),
-                        'validation' => 'isBool',
-                        'cast' => 'intval',
-                        'required' => false,
-                        'type' => 'bool',
-                    ),
-                    'SHOW_PRICE_FILTER' => array(
-                        'title' => $this->l('Show Price filter'),
-                        'hint' => $this->l('Enable to display Price filter.'),
-                        'validation' => 'isBool',
-                        'cast' => 'intval',
-                        'required' => false,
-                        'type' => 'bool',
-                    ),
-                ),
-                'submit' => array('title' => $this->l('Save'))
-            ),
         );
     }
 

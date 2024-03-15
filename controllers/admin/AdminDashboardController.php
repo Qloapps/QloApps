@@ -386,7 +386,16 @@ class AdminDashboardControllerCore extends AdminController
             'extra' => Tools::getValue('extra')
         );
 
-        die(json_encode(Hook::exec('dashboardData', $params, $id_module, true, true, (int)Tools::getValue('dashboard_use_push'))));
+        // code to be added.
+        $data = Hook::exec('dashboardData', $params, $id_module, true, true, (int)Tools::getValue('dashboard_use_push'));
+        Hook::exec('actionDashboardDataModifier', array(
+            'data' => &$data,
+            'params' => $params,
+            'id_module' => $id_module,
+            'dashboard_use_push' => (int)Tools::getValue('dashboard_use_push')
+        ));
+
+        $this->ajaxDie(json_encode($data));
     }
 
     public function ajaxProcessSetSimulationMode()

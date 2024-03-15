@@ -35,6 +35,11 @@ class Blocknewsletter extends Module
     const GUEST_REGISTERED = 1;
     const CUSTOMER_REGISTERED = 2;
 
+    const EXPORT_ALL_SUBSCRIBERS = 1;
+    const EXPORT_SUBSCRIBERS_WITH_ACCOUNT = 2;
+    const EXPORT_SUBSCRIBERS_WITHOUT_ACCOUNT = 3;
+    const EXPORT_NON_SUBSCRIBERS = 4;
+
     public function __construct()
     {
         $this->name = 'blocknewsletter';
@@ -50,6 +55,7 @@ class Blocknewsletter extends Module
         $this->description = $this->l('Adds a block for newsletter subscription.');
         $this->confirmUninstall = $this->l('Are you sure that you want to delete all of your contacts?');
         $this->ps_versions_compliancy = array('min' => '1.6', 'max' => _PS_VERSION_);
+        $this->secure_key = Tools::encrypt($this->name);
 
         $this->version = '2.2.2';
         $this->author = 'PrestaShop';
@@ -63,9 +69,9 @@ class Blocknewsletter extends Module
             )
         );
 
-        $this->_searched_email = null;
-
         $this->_html = '';
+
+        $this->hookPrepared = false;
     }
 
     public function registerHooks()
@@ -107,7 +113,7 @@ class Blocknewsletter extends Module
 
     public function install()
     {
-        if (!parent::install() || !$this->registerHooks()) {
+        if (!parent::install() || !$this->registerHooks() || !$this->callInstallTab()) {
             return false;
         }
         Configuration::updateValue('NW_SALT', Tools::passwdGen(16));
@@ -126,206 +132,38 @@ class Blocknewsletter extends Module
         );
     }
 
-    public function uninstall()
+    public function callInstallTab()
     {
-        Db::getInstance()->execute('DROP TABLE '._DB_PREFIX_.'newsletter');
-        return parent::uninstall();
+        $result = $this->installTab('AdminParentNewsletter', 'Newsletter', false, true);
+        $result &= $this->installTab('AdminNewsletter', 'Configuration', 'AdminParentNewsletter', true);
+
+        return $result;
+    }
+
+    public function installTab($className, $tabName, $tabParentName = false, $hidden = false)
+    {
+        $tab = new Tab();
+        $tab->active = 1;
+        $tab->class_name = $className;
+        $tab->name = array();
+        foreach (Language::getLanguages(false) as $lang) {
+            $tab->name[$lang['id_lang']] = $tabName;
+        }
+        if ($tabParentName) {
+            $tab->id_parent = (int) Tab::getIdFromClassName($tabParentName);
+        } elseif ($hidden) {
+            $tab->id_parent = -1;
+        } else {
+            $tab->id_parent = 0;
+        }
+        $tab->module = $this->name;
+
+        return $tab->add();
     }
 
     public function getContent()
     {
-        if (Tools::isSubmit('submitUpdate')) {
-            Configuration::updateValue('NW_CONFIRMATION_EMAIL', (bool)Tools::getValue('NW_CONFIRMATION_EMAIL'));
-            Configuration::updateValue('NW_VERIFICATION_EMAIL', (bool)Tools::getValue('NW_VERIFICATION_EMAIL'));
-
-            $voucher = Tools::getValue('NW_VOUCHER_CODE');
-            if ($voucher && !Validate::isDiscountName($voucher)) {
-                $this->_html .= $this->displayError($this->l('The voucher code is invalid.'));
-            } else {
-                Configuration::updateValue('NW_VOUCHER_CODE', pSQL($voucher));
-                $this->_html .= $this->displayConfirmation($this->l('Settings updated'));
-            }
-        } elseif (Tools::isSubmit('subscribedmerged')) {
-            $id = Tools::getValue('id');
-
-            if (preg_match('/(^N)/', $id)) {
-                $id = (int)substr($id, 1);
-                $sql = 'UPDATE '._DB_PREFIX_.'newsletter SET active = 0 WHERE id = '.$id;
-                Db::getInstance()->execute($sql);
-            } else {
-                $c = new Customer((int)$id);
-                $c->newsletter = (int)!$c->newsletter;
-                $c->update();
-            }
-            Tools::redirectAdmin(
-                $this->context->link->getAdminLink('AdminModules', false).'&configure='.$this->name.'&conf=4&token='.
-                Tools::getAdminTokenLite('AdminModules')
-            );
-        } elseif (Tools::isSubmit('exportSubscribers')) {
-            $header = array('id', 'shop_name', 'gender', 'lastname', 'firstname', 'email', 'subscribed', 'subscribed_on'); // TODO
-            $array_to_export = array_merge(array($header), $this->getSubscribers());
-
-            $file_name = time().'.csv';
-            $fd = fopen($this->getLocalPath().$file_name, 'w+');
-            foreach ($array_to_export as $tab) {
-                $line = implode(';', $tab);
-                $line .= "\n";
-                fwrite($fd, $line, 4096);
-            }
-            fclose($fd);
-            Tools::redirect(_PS_BASE_URL_.__PS_BASE_URI__.'modules/'.$this->name.'/'.$file_name);
-        } elseif (Tools::isSubmit('exportOnlyBlockNews')) {
-            $array_to_export = $this->getBlockNewsletterSubscriber();
-
-            $file_name = time().'.csv';
-            $fd = fopen($this->getLocalPath().$file_name, 'w+');
-            foreach ($array_to_export as $tab) {
-                $line = implode(';', $tab);
-                $line .= "\n";
-                fwrite($fd, $line, 4096);
-            }
-            fclose($fd);
-            Tools::redirect(_PS_BASE_URL_.__PS_BASE_URI__.'modules/'.$this->name.'/'.$file_name);
-        } elseif (Tools::isSubmit('searchEmail')) {
-            $this->_searched_email = Tools::getValue('searched_email');
-        }
-
-        $this->_html .= $this->renderForm();
-        $this->_html .= $this->renderSearchForm();
-        $this->_html .= $this->renderList();
-
-        $this->_html .= '<div class="panel"><a href="'.$this->context->link->getAdminLink('AdminModules', false).
-        '&exportSubscribers&configure='.$this->name.'&token='.Tools::getAdminTokenLite('AdminModules').
-        '"><button class="btn btn-default btn-lg"><span class="icon icon-share"></span> '.$this->l('Export as CSV').
-        '</button></a></div>';
-
-        $this->_html .= $this->renderExportForm();
-
-        return $this->_html;
-    }
-
-    public function renderList()
-    {
-        $fields_list = array(
-
-            'id' => array(
-                'title' => $this->l('ID'),
-                'search' => false,
-            ),
-            'shop_name' => array(
-                'title' => $this->l('Shop'),
-                'search' => false,
-            ),
-            'gender' => array(
-                'title' => $this->l('Gender'),
-                'search' => false,
-            ),
-            'lastname' => array(
-                'title' => $this->l('Lastname'),
-                'search' => false,
-            ),
-            'firstname' => array(
-                'title' => $this->l('Firstname'),
-                'search' => false,
-            ),
-            'email' => array(
-                'title' => $this->l('Email'),
-                'search' => false,
-            ),
-            'subscribed' => array(
-                'title' => $this->l('Subscribed'),
-                'type' => 'bool',
-                'active' => 'subscribed',
-                'search' => false,
-            ),
-            'newsletter_date_add' => array(
-                'title' => $this->l('Subscribed on'),
-                'type' => 'date',
-                'search' => false,
-            )
-        );
-
-        if (!Configuration::get('PS_MULTISHOP_FEATURE_ACTIVE')) {
-            unset($fields_list['shop_name']);
-        }
-
-        $helper_list = new HelperList();
-        $helper_list->module = $this;
-        $helper_list->title = $this->l('Newsletter registrations');
-        $helper_list->shopLinkType = '';
-        $helper_list->no_link = true;
-        $helper_list->show_toolbar = true;
-        $helper_list->simple_header = false;
-        $helper_list->identifier = 'id';
-        $helper_list->table = 'merged';
-        $helper_list->currentIndex = $this->context->link->getAdminLink('AdminModules', false).'&configure='.$this->name;
-        $helper_list->token = Tools::getAdminTokenLite('AdminModules');
-        $helper_list->actions = array('viewCustomer');
-        $helper_list->toolbar_btn['export'] = array(
-            'href' => $helper_list->currentIndex.'&exportSubscribers&token='.$helper_list->token,
-            'desc' => $this->l('Export')
-        );
-
-        /* Before 1.6.0.7 displayEnableLink() could not be overridden in Module class
-           we declare another row action instead 			*/
-        if (version_compare(_PS_VERSION_, '1.6.0.7', '<')) {
-            unset($fields_list['subscribed']);
-            $helper_list->actions = array_merge($helper_list->actions, array('unsubscribe'));
-        }
-
-        // This is needed for displayEnableLink to avoid code duplication
-        $this->_helperlist = $helper_list;
-
-        /* Retrieve list data */
-        $subscribers = $this->getSubscribers();
-        $helper_list->listTotal = count($subscribers);
-
-        /* Paginate the result */
-        $page = ($page = Tools::getValue('submitFilter'.$helper_list->table)) ? $page : 1;
-        $pagination = ($pagination = Tools::getValue($helper_list->table.'_pagination')) ? $pagination : 50;
-        $subscribers = $this->paginateSubscribers($subscribers, $page, $pagination);
-
-        return $helper_list->generateList($subscribers, $fields_list);
-    }
-
-    public function displayViewCustomerLink($token = null, $id, $name = null)
-    {
-        $this->smarty->assign(
-            array(
-                'href' => 'index.php?controller=AdminCustomers&id_customer='.(int)$id.'&updatecustomer&token='.
-                Tools::getAdminTokenLite('AdminCustomers'),
-                'action' => $this->l('View'),
-                'disable' => !((int)$id > 0),
-            )
-        );
-        return $this->display(__FILE__, 'views/templates/admin/list_action_viewcustomer.tpl');
-    }
-
-    public function displayEnableLink($token, $id, $value, $active, $id_category = null, $id_product = null, $ajax = false)
-    {
-        $this->smarty->assign(
-            array(
-                'ajax' => $ajax,
-                'enabled' => (bool)$value,
-                'url_enable' => $this->_helperlist->currentIndex.'&'.$this->_helperlist->identifier.'='.$id.'&'.$active.
-                $this->_helperlist->table.($ajax ? '&action='.$active.$this->_helperlist->table.'&ajax='.
-                (int)$ajax : '').((int)$id_category && (int)$id_product ? '&id_category='.(int)$id_category : '').
-                '&token='.$token
-            )
-        );
-        return $this->display(__FILE__, 'views/templates/admin/list_action_enable.tpl');
-    }
-
-    public function displayUnsubscribeLink($token = null, $id, $name = null)
-    {
-        $this->smarty->assign(
-            array(
-                'href' => $this->_helperlist->currentIndex.'&subscribedcustomer&'.$this->_helperlist->identifier.'='.
-                $id.'&token='.$token,
-                'action' => $this->l('Unsubscribe'),
-            )
-        );
-        return $this->display(__FILE__, 'views/templates/admin/list_action_unsubscribe.tpl');
+        Tools::redirectAdmin($this->context->link->getAdminLink('AdminNewsletter'));
     }
 
     /**
@@ -338,7 +176,7 @@ class Blocknewsletter extends Module
      *                1 = registered in block
      *                2 = registered in customer
      */
-    protected function isNewsletterRegistered($customer_email)
+    public function isNewsletterRegistered($customer_email)
     {
         $sql = 'SELECT `email`
 				FROM '._DB_PREFIX_.'newsletter
@@ -368,14 +206,14 @@ class Blocknewsletter extends Module
     /**
      * Register in block newsletter
      */
-    protected function newsletterRegistration()
+    public function newsletterRegistration()
     {
         if (empty($_POST['email']) || !Validate::isEmail($_POST['email'])) {
             return $this->error = $this->l('Invalid email address.');
         }
 
         /* Unsubscription */
-        elseif ($_POST['action'] == '1') {
+        elseif ($_POST['newsletter_action'] == '1') {
             $register_status = $this->isNewsletterRegistered($_POST['email']);
 
             if ($register_status < 1) {
@@ -389,7 +227,7 @@ class Blocknewsletter extends Module
             return $this->valid = $this->l('Unsubscription successful.');
         }
         /* Subscription */
-        elseif ($_POST['action'] == '0') {
+        elseif ($_POST['newsletter_action'] == '0') {
             $register_status = $this->isNewsletterRegistered($_POST['email']);
             if ($register_status > 0) {
                 return $this->error = $this->l('This email address is already registered.');
@@ -429,47 +267,55 @@ class Blocknewsletter extends Module
         }
     }
 
-    public function getSubscribers()
+    public function getExportCsvHeader()
     {
-        $dbquery = new DbQuery();
-        $dbquery->select('c.`id_customer` AS `id`, s.`name` AS `shop_name`, gl.`name` AS `gender`, c.`lastname`, c.`firstname`, c.`email`, c.`newsletter` AS `subscribed`, c.`newsletter_date_add`');
-        $dbquery->from('customer', 'c');
-        $dbquery->leftJoin('shop', 's', 's.id_shop = c.id_shop');
-        $dbquery->leftJoin('gender', 'g', 'g.id_gender = c.id_gender');
-        $dbquery->leftJoin(
-            'gender_lang', 'gl', 'g.id_gender = gl.id_gender AND gl.id_lang = '.(int)$this->context->employee->id_lang
+        return array(
+            $this->l('ID'),
+            $this->l('Social Title'),
+            $this->l('Email'),
+            $this->l('First Name'),
+            $this->l('Last Name'),
+            $this->l('Subscribed'),
+            $this->l('Date Added'),
         );
-        $dbquery->where('c.`newsletter` = 1');
-        if ($this->_searched_email) {
-            $dbquery->where('c.`email` LIKE \'%'.pSQL($this->_searched_email).'%\' ');
-        }
-
-        $customers = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($dbquery->build());
-
-        $dbquery = new DbQuery();
-        $dbquery->select(
-            'CONCAT(\'N\', n.`id`) AS `id`, s.`name` AS `shop_name`, NULL AS `gender`, NULL AS `lastname`, NULL
-			AS `firstname`, n.`email`, n.`active` AS `subscribed`, n.`newsletter_date_add`'
-        );
-        $dbquery->from('newsletter', 'n');
-        $dbquery->leftJoin('shop', 's', 's.id_shop = n.id_shop');
-        $dbquery->where('n.`active` = 1');
-        if ($this->_searched_email) {
-            $dbquery->where('n.`email` LIKE \'%'.pSQL($this->_searched_email).'%\' ');
-        }
-
-        $non_customers = Db::getInstance()->executeS($dbquery->build());
-
-        $subscribers = array_merge($customers, $non_customers);
-
-        return $subscribers;
     }
 
-    public function paginateSubscribers($subscribers, $page = 1, $pagination = 50)
+    public function getSubscribers($subscribersType)
     {
-        if (count($subscribers) > $pagination) {
-            $subscribers = array_slice($subscribers, $pagination * ($page - 1), $pagination);
+        $subscribers = array();
+
+        if (in_array(
+            $subscribersType,
+            array(
+                self::EXPORT_ALL_SUBSCRIBERS,
+                self::EXPORT_SUBSCRIBERS_WITH_ACCOUNT,
+                self::EXPORT_NON_SUBSCRIBERS,
+            )
+        )) {
+            $sqlCustomer = 'SELECT c.`id_customer` AS id, gl.`name` AS gender, c.`email`, c.`firstname`, c.`lastname`,
+            c.`newsletter` AS subscribed, c.`newsletter_date_add`
+            FROM `'._DB_PREFIX_.'customer` c
+            LEFT JOIN '._DB_PREFIX_.'gender_lang gl ON (gl.`id_gender` = c.`id_gender` AND gl.`id_lang` = '.(int) $this->context->language->id.')
+            WHERE c.`newsletter` = '.($subscribersType == self::EXPORT_NON_SUBSCRIBERS ? '0' : '1');
+
+            $subscribers = array_merge($subscribers, Db::getInstance()->executeS($sqlCustomer));
         }
+
+        if (in_array(
+            $subscribersType,
+            array(
+                self::EXPORT_ALL_SUBSCRIBERS,
+                self::EXPORT_SUBSCRIBERS_WITHOUT_ACCOUNT,
+                self::EXPORT_NON_SUBSCRIBERS,
+            )
+        )) {
+            $sqlNewsletter = 'SELECT CONCAT(\'N\', n.`id`) AS id, NULL AS id_gender, n.`email`, NULL AS firstname,
+            NULL AS lastname, n.`active` AS subscribed, n.`newsletter_date_add`
+            FROM `'._DB_PREFIX_.'newsletter` n WHERE n.`active` = '.($subscribersType == self::EXPORT_NON_SUBSCRIBERS ? '0' : '1');
+
+            $subscribers = array_merge($subscribers, Db::getInstance()->executeS($sqlNewsletter));
+        }
+
         return $subscribers;
     }
 
@@ -509,13 +355,13 @@ class Blocknewsletter extends Module
         return false;
     }
 
-    protected function unregister($email, $register_status)
+    public function unregister($email, $register_status)
     {
         if ($register_status == self::GUEST_REGISTERED) {
-            $sql = 'DELETE FROM '._DB_PREFIX_.'newsletter WHERE `email` = \''.pSQL($_POST['email']).'\' AND id_shop = '.
+            $sql = 'DELETE FROM '._DB_PREFIX_.'newsletter WHERE `email` = \''.pSQL($email).'\' AND id_shop = '.
             $this->context->shop->id;
         } elseif ($register_status == self::CUSTOMER_REGISTERED) {
-            $sql = 'UPDATE '._DB_PREFIX_.'customer SET `newsletter` = 0 WHERE `email` = \''.pSQL($_POST['email']).
+            $sql = 'UPDATE '._DB_PREFIX_.'customer SET `newsletter` = 0 WHERE `email` = \''.pSQL($email).
             '\' AND id_shop = '.$this->context->shop->id;
         }
 
@@ -649,6 +495,7 @@ class Blocknewsletter extends Module
      */
     public function confirmEmail($token)
     {
+        $errors = array();
         $activated = false;
 
         if ($email = $this->getGuestEmailByToken($token)) {
@@ -658,18 +505,20 @@ class Blocknewsletter extends Module
         }
 
         if (!$activated) {
-            return $this->l('This email is already registered and/or invalid.');
+            $errors[] = $this->l('This email is already registered and/or invalid.');
         }
 
-        if ($discount = Configuration::get('NW_VOUCHER_CODE')) {
-            $this->sendVoucher($email, $discount);
+        if (!count($errors)) {
+            if ($discount = Configuration::get('NW_VOUCHER_CODE')) {
+                $this->sendVoucher($email, $discount);
+            }
+
+            if (Configuration::get('NW_CONFIRMATION_EMAIL')) {
+                $this->sendConfirmationEmail($email);
+            }
         }
 
-        if (Configuration::get('NW_CONFIRMATION_EMAIL')) {
-            $this->sendConfirmationEmail($email);
-        }
-
-        return $this->l('Thank you for subscribing to our newsletter.');
+        return $errors;
     }
 
     /**
@@ -744,38 +593,25 @@ class Blocknewsletter extends Module
 
     protected function _prepareHook($params)
     {
-        if (Tools::isSubmit('submitNewsletter')) {
-            $this->newsletterRegistration();
-            if ($this->error) {
-                $this->smarty->assign(
-                    array(
-                        'color' => 'red',
-                        'msg' => $this->error,
-                        'nw_value' => isset($_POST['email']) ? pSQL($_POST['email']) : false,
-                        'nw_error' => true,
-                        'action' => $_POST['action']
-                    )
-                );
-            } elseif ($this->valid) {
-                $this->smarty->assign(
-                    array(
-                        'color' => 'green',
-                        'msg' => $this->valid,
-                        'nw_error' => false
-                    )
-                );
-            }
+        if (!$this->hookPrepared) {
+            $this->context->smarty->assign(array(
+                'csrf_token' => $this->secure_key,
+            ));
+
+            Media::addJsDef(array(
+                'url_newsletter_subscription' => $this->context->link->getModuleLink($this->name, 'subscription'),
+            ));
+
+            $this->hookPrepared = true;
         }
-        $this->smarty->assign('this_path', $this->_path);
     }
 
     public function hookDisplayLeftColumn($params)
     {
-        if (!isset($this->prepared) || !$this->prepared) {
-            $this->_prepareHook($params);
-        }
-        $this->prepared = true;
+        $this->_prepareHook($params);
+
         $this->smarty->assign(array('id_module' => $this->id));
+
         return $this->display(__FILE__, 'blocknewsletter.tpl');
     }
 
@@ -824,179 +660,39 @@ class Blocknewsletter extends Module
         return true;
     }
 
-    public function renderForm()
+    public function reset()
     {
-        $fields_form = array(
-            'form' => array(
-                'legend' => array(
-                    'title' => $this->l('Settings'),
-                    'icon' => 'icon-cogs'
-                ),
-                'input' => array(
-                    array(
-                        'type' => 'switch',
-                        'label' => $this->l('Would you like to send a verification email after subscription?'),
-                        'name' => 'NW_VERIFICATION_EMAIL',
-                        'values' => array(
-                            array(
-                                'id' => 'active_on',
-                                'value' => 1,
-                                'label' => $this->l('Yes')
-                            ),
-                            array(
-                                'id' => 'active_off',
-                                'value' => 0,
-                                'label' => $this->l('No')
-                            )
-                        ),
-                    ),
-                    array(
-                        'type' => 'switch',
-                        'label' => $this->l('Would you like to send a confirmation email after subscription?'),
-                        'name' => 'NW_CONFIRMATION_EMAIL',
-                        'values' => array(
-                            array(
-                                'id' => 'active_on',
-                                'value' => 1,
-                                'label' => $this->l('Yes')
-                            ),
-                            array(
-                                'id' => 'active_off',
-                                'value' => 0,
-                                'label' => $this->l('No')
-                            )
-                        ),
-                    ),
-                    array(
-                        'type' => 'text',
-                        'label' => $this->l('Welcome voucher code'),
-                        'name' => 'NW_VOUCHER_CODE',
-                        'class' => 'fixed-width-md',
-                        'desc' => $this->l('Leave blank to disable by default.')
-                    ),
-                ),
-                'submit' => array(
-                    'title' => $this->l('Save'),
-                )
-            ),
-        );
-
-        $helper = new HelperForm();
-        $helper->show_toolbar = false;
-        $helper->table = $this->table;
-        $lang = new Language((int)Configuration::get('PS_LANG_DEFAULT'));
-        $helper->default_form_language = $lang->id;
-        $helper->allow_employee_form_lang = Configuration::get('PS_BO_ALLOW_EMPLOYEE_FORM_LANG') ? Configuration::get('PS_BO_ALLOW_EMPLOYEE_FORM_LANG') : 0;
-        $helper->identifier = $this->identifier;
-        $helper->submit_action = 'submitUpdate';
-        $helper->currentIndex = $this->context->link->getAdminLink('AdminModules', false).'&configure='.$this->name.'&tab_module='.$this->tab.'&module_name='.$this->name;
-        $helper->token = Tools::getAdminTokenLite('AdminModules');
-        $helper->tpl_vars = array(
-            'fields_value' => $this->getConfigFieldsValues(),
-            'languages' => $this->context->controller->getLanguages(),
-            'id_language' => $this->context->language->id
-        );
-
-        return $helper->generateForm(array($fields_form));
-    }
-
-    public function renderExportForm()
-    {
-        $fields_form = array(
-            'form' => array(
-                'legend' => array(
-                    'title' => $this->l('Export Newsletter Subscribers'),
-                    'icon' => 'icon-envelope'
-                ),
-                'description' => $this->l('Generate a .CSV file based on Newsletter subscribers data. Only subscribers without an account on your website will be exported.'),
-                'submit' => array(
-                    'title' => $this->l('Export .CSV file'),
-                    'class' => 'btn btn-default pull-right',
-                    'name' => 'submitExportmodule',
-                    )
-                ),
-            );
-
-        $helper = new HelperForm();
-        $helper->table = $this->table;
-        $lang = new Language((int)Configuration::get('PS_LANG_DEFAULT'));
-        $helper->default_form_language = $lang->id;
-        $helper->allow_employee_form_lang = Configuration::get('PS_BO_ALLOW_EMPLOYEE_FORM_LANG') ? Configuration::get('PS_BO_ALLOW_EMPLOYEE_FORM_LANG') : 0;
-        $helper->identifier = $this->identifier;
-        $helper->submit_action = 'exportOnlyBlockNews';
-        $helper->currentIndex = $this->context->link->getAdminLink('AdminModules', false).'&configure='.$this->name.'&tab_module='.$this->tab.'&module_name='.$this->name;
-        $helper->token = Tools::getAdminTokenLite('AdminModules');
-        $helper->tpl_vars = array(
-                'fields_value' => $this->getConfigFieldsValues(),
-                'languages' => $this->context->controller->getLanguages(),
-                'id_language' => $this->context->language->id
-            );
-        return $helper->generateForm(array($fields_form));
-    }
-
-    public function renderSearchForm()
-    {
-        $fields_form = array(
-            'form' => array(
-                'legend' => array(
-                    'title' => $this->l('Search for addresses'),
-                    'icon' => 'icon-search'
-                ),
-                'input' => array(
-                    array(
-                        'type' => 'text',
-                        'label' => $this->l('Email address to search'),
-                        'name' => 'searched_email',
-                        'class' => 'fixed-width-xxl',
-                        'desc' => $this->l('Example: contact@qloapps.com or @qloapps.com')
-                    ),
-                ),
-                'submit' => array(
-                    'title' => $this->l('Search'),
-                    'icon' => 'process-icon-refresh',
-                )
-            ),
-        );
-
-        $helper = new HelperForm();
-        $helper->table = $this->table;
-        $helper->identifier = $this->identifier;
-        $helper->submit_action = 'searchEmail';
-        $helper->currentIndex = $this->context->link->getAdminLink('AdminModules', false).'&configure='.$this->name.'&tab_module='.$this->tab.'&module_name='.$this->name;
-        $helper->token = Tools::getAdminTokenLite('AdminModules');
-        $helper->tpl_vars = array(
-            'fields_value' => array('searched_email' => $this->_searched_email),
-            'languages' => $this->context->controller->getLanguages(),
-            'id_language' => $this->context->language->id
-        );
-
-        return $helper->generateForm(array($fields_form));
-    }
-
-    public function getConfigFieldsValues()
-    {
-        return array(
-            'NW_VERIFICATION_EMAIL' => Tools::getValue('NW_VERIFICATION_EMAIL', Configuration::get('NW_VERIFICATION_EMAIL')),
-            'NW_CONFIRMATION_EMAIL' => Tools::getValue('NW_CONFIRMATION_EMAIL', Configuration::get('NW_CONFIRMATION_EMAIL')),
-            'NW_VOUCHER_CODE' => Tools::getValue('NW_VOUCHER_CODE', Configuration::get('NW_VOUCHER_CODE')),
-        );
-    }
-
-    public function getBlockNewsletterSubscriber()
-    {
-        $rq_sql = 'SELECT `id`, `email`, `newsletter_date_add`, `ip_registration_newsletter`
-			FROM `'._DB_PREFIX_.'newsletter`
-			WHERE `active` = 1';
-
-        if (Context::getContext()->cookie->shopContext) {
-            $rq_sql .= ' AND `id_shop` = '.(int)Context::getContext()->shop->id;
+        if (!$this->uninstall(false)) {
+            return false;
+        }
+        if (!$this->install(false)) {
+            return false;
         }
 
-        $rq = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($rq_sql);
+        return true;
+    }
 
-        $header = array('id_customer', 'email', 'newsletter_date_add', 'ip_address', 'http_referer');
-        $result = (is_array($rq) ? array_merge(array($header), $rq) : $header);
+    public function uninstall($keep = true)
+    {
+        if (!parent::uninstall()
+            || ($keep && !Db::getInstance()->execute('DROP TABLE IF EXISTS '._DB_PREFIX_.'newsletter'))
+            || !$this->uninstallTab()
+        ) {
+            return false;
+        }
 
-        return $result;
+        return true;
+    }
+
+    public function uninstallTab()
+    {
+        $moduleTabs = Tab::getCollectionFromModule($this->name);
+        if (!empty($moduleTabs)) {
+            foreach ($moduleTabs as $moduleTab) {
+                $moduleTab->delete();
+            }
+        }
+
+        return true;
     }
 }

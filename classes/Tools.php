@@ -3023,6 +3023,8 @@ exit;
         $smarty = Context::getContext()->smarty;
         Tools::clearCache($smarty);
         Tools::clearCompile($smarty);
+        @copy(_PS_CACHE_DIR_.'smarty/index.php', _PS_CACHE_DIR_.'smarty/cache/index.php');
+        @copy(_PS_CACHE_DIR_.'smarty/index.php', _PS_CACHE_DIR_.'smarty/compile/index.php');
     }
 
     public static function clearColorListCache($id_product = false)
