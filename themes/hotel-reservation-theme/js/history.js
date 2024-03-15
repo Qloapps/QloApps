@@ -276,7 +276,12 @@ $(document).ready(function(){
 			        success:function(data) {
 			        	if (data.status == '1') {
 							$(".roomRequestForRefund").parent().html('<p>'+req_sent_msg+'</p>');
-							showSuccessMessage(refund_request_success_txt);
+
+                            if (data.has_cancelled == 1) {
+                                showSuccessMessage(cancellation_success_txt);
+                            } else {
+                                showSuccessMessage(refund_request_success_txt);
+                            }
 
 							$('.bookings_to_refund:checked').prop('disabled', true);
 

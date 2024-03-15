@@ -10,7 +10,7 @@ return array(
     'tutorial' => 'https://www.youtube.com/watch?v=BWoifR8INCE',
     'tailored_help' => 'https://webkul.uvdesk.com/',
     'contact' => 'https://qloapps.com/contact/',
-    'services' => 'https://qloapps.com/services/?support',
+    'services' => 'https://qloapps.com/contact/',
     'install_help' => 'https://qloapps.com/install-qloapps/',
   ),
   'translations' =>

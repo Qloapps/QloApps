@@ -25,15 +25,20 @@
 
 <!-- Block Newsletter module-->
 <div class="row">
-    <section class="col-xs-12 col-sm-12">
+    <section class="col-xs-12 col-sm-12" id="blocknewsletter">
         <div class="row margin-lr-0 footer-section-heading">
             <p>{l s='GET NOTIFICATIONS' mod='blocknewsletter'}</p>
             <hr/>
         </div>
         <div class="row margin-lr-0">
-            <form action="{$link->getPageLink('index', null, null, null, false, null, true)|escape:'html':'UTF-8'}" method="post">
-                <div class="form-group{if isset($msg) && $msg } {if $nw_error}form-error{else}form-ok{/if}{/if}" >
-                    <input class="inputNew form-control grey newsletter-input" id="newsletter-input" type="text" name="email" size="18" value="{if isset($msg) && $msg}{$msg}{elseif isset($value) && $value}{$value}{else}{l s='Enter your e-mail' mod='blocknewsletter'}{/if}" />
+            <form action="{$link->getModuleLink('newsletter', 'subscription')|escape:'html':'UTF-8'}" method="post">
+                <div class="form-group">
+                    <input type="hidden" name="ajax" value="1" />
+                    <input type="hidden" name="action" value="SubscribeNewsletter" />
+                    <input type="hidden" name="token" value="{$csrf_token}" />
+                    <input type="hidden" name="newsletter_action" value="0" />
+                    <input type="text" class="inputNew form-control newsletter-input" id="newsletter-input" name="email" placeholder="{l s='Your email address' mod='blocknewsletter'}" />
+                    <div class="message-block" style="display: none;"></div>
                     {* Hook added for GDPR *}
                     {if isset($id_module)}
                         {hook h='displayGDPRConsent' id_module=$id_module}
@@ -41,24 +46,14 @@
                     <button type="submit" name="submitNewsletter" class="btn button button-medium newsletter-btn">
                         <span>{l s='Subscribe' mod='blocknewsletter'}</span>
                     </button>
-                    <input type="hidden" name="action" value="0" />
+                    <span class="loader loading" style="display: none;"></span>
                 </div>
             </form>
         </div>
         {hook h="displayBlockNewsletterBottom" from='blocknewsletter'}
     </section>
 </div>
+
+{addJsDefL name=no_internet_txt}{l s='No internet. Please try later.' mod='blocknewsletter' js=1}{/addJsDefL}
+
 <!-- /Block Newsletter module-->
-{strip}
-{if isset($msg) && $msg}
-{addJsDef msg_newsl=$msg|@addcslashes:'\''}
-{/if}
-{if isset($nw_error)}
-{addJsDef nw_error=$nw_error}
-{/if}
-{addJsDefL name=placeholder_blocknewsletter}{l s='Enter your e-mail' mod='blocknewsletter' js=1}{/addJsDefL}
-{addJsDefL name=email_js_error}{l s='Please Enter Valid E-mail' mod='blocknewsletter' js=1}{/addJsDefL}
-{if isset($msg) && $msg}
-    {addJsDefL name=alert_blocknewsletter}{l s='Newsletter : %1$s' sprintf=$msg js=1 mod='blocknewsletter'}{/addJsDefL}
-{/if}
-{/strip}

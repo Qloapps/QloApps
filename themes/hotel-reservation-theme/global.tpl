@@ -44,6 +44,7 @@
 	{addJsDef id_lang=$cookie->id_lang|intval}
 {/if}
 {addJsDef lang_iso=$lang_iso}
+{addJsDef language_is_rtl=$language_is_rtl|boolval}
 {addJsDefL name=FancyboxI18nClose}{l s='Close'}{/addJsDefL}
 {addJsDefL name=FancyboxI18nNext}{l s='Next'}{/addJsDefL}
 {addJsDefL name=FancyboxI18nPrev}{l s='Previous'}{/addJsDefL}

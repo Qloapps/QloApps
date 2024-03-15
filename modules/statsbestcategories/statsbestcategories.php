@@ -219,6 +219,7 @@ class StatsBestCategories extends ModuleGrid
         FROM `'._DB_PREFIX_.'htl_branch_info` hbi
         LEFT JOIN `'._DB_PREFIX_.'htl_branch_info_lang` hbil
         ON (hbil.`id` = hbi.`id` AND hbil.`id_lang` = '.(int)$id_lang .')
+        WHERE 1 '.HotelBranchInformation::addHotelRestriction(false, 'hbi', 'id').'
         GROUP BY (hbi.`id`)';
 
         if (Validate::IsName($this->_sort)) {

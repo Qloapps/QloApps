@@ -39,8 +39,8 @@ class AdminCustomersControllerCore extends AdminController
     public function __construct()
     {
         $this->bootstrap = true;
-        $this->required_database = true;
-        $this->required_fields = array('newsletter','optin');
+        // $this->required_database = true;
+        // $this->required_fields = array('newsletter','optin');
         $this->table = 'customer';
         $this->className = 'Customer';
         $this->lang = false;
@@ -152,16 +152,6 @@ class AdminCustomersControllerCore extends AdminController
 
         $this->shopLinkType = 'shop';
         $this->shopShareDatas = Shop::SHARE_CUSTOMER;
-
-
-        // START send access query information to the admin controller
-        $this->access_select = ' SELECT a.`id_customer` FROM '._DB_PREFIX_.'customer a';
-        $this->access_join = ' INNER JOIN '._DB_PREFIX_.'orders ord ON (a.id_customer = ord.id_customer)';
-        $this->access_join .= ' INNER JOIN '._DB_PREFIX_.'htl_booking_detail hbd ON (hbd.id_order = ord.id_order)';
-        if ($acsHtls = HotelBranchInformation::getProfileAccessedHotels($this->context->employee->id_profile, 1, 1)) {
-            $this->access_where = ' WHERE hbd.id_hotel IN ('.implode(',', $acsHtls).')';
-        }
-
         parent::__construct();
 
         $this->_select = '
@@ -458,8 +448,9 @@ class AdminCustomersControllerCore extends AdminController
                             'label' => $this->l('Disabled')
                         )
                     ),
-                    'disabled' =>  (bool)!Configuration::get('PS_CUSTOMER_NWSL'),
-                    'hint' => $this->l('This customer will receive your newsletter via email.')
+                    'disabled' => (bool)!Configuration::get('PS_CUSTOMER_NWSL'),
+                    'hint' => $this->l('This customer will receive your newsletter via email.'),
+                    'desc' => (bool)!Configuration::get('PS_CUSTOMER_NWSL') ? sprintf($this->l('This field is disabled as option \'Enable newsletter registration\' is disabled. You can change it from %sPreferences > Customers%s page.'), '<a href="'.$this->context->link->getAdminLink('AdminCustomerPreferences').'" target="_blank">', '</a>') : '',
                 ),
                 array(
                     'type' => 'switch',
