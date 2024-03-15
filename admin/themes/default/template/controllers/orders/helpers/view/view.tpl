@@ -356,121 +356,123 @@
 				</script>
 				<hr />
 				<!-- Tab nav -->
-				<ul class="nav nav-tabs" id="myTab" style="display:none"><!-- by webkul -->
-					{$HOOK_TAB_SHIP}
-					<li class="active">
-						<a href="#shipping">
-							<i class="icon-truck "></i>
-							{l s='Shipping'} <span class="badge">{$order->getShipping()|@count}</span>
-						</a>
-					</li>
-					<li>
-						<a href="#returns">
-							<i class="icon-undo"></i>
-							{l s='Merchandise Returns'} <span class="badge">{$order->getReturn()|@count}</span>
-						</a>
-					</li>
-				</ul>
-				<!-- Tab content -->
-				<div class="tab-content panel" style="display:none"><!-- by webkul -->
-				{$HOOK_CONTENT_SHIP}
-					<!-- Tab shipping -->
-					<div class="tab-pane active" id="shipping">
-						<h4 class="visible-print">{l s='Shipping'} <span class="badge">({$order->getShipping()|@count})</span></h4>
-						<!-- Shipping block -->
-						{if !$order->isVirtual()}
-						<div class="form-horizontal">
-							{if $order->gift_message}
-							<div class="form-group">
-								<label class="control-label col-lg-3">{l s='Message'}</label>
-								<div class="col-lg-9">
-									<p class="form-control-static">{$order->gift_message|nl2br}</p>
-								</div>
-							</div>
-							{/if}
-							{include file='controllers/orders/_shipping.tpl'}
-							{if $carrierModuleCall}
-								{$carrierModuleCall}
-							{/if}
-							<hr />
-							{if $order->recyclable}
-								<span class="label label-success"><i class="icon-check"></i> {l s='Recycled packaging'}</span>
-							{else}
-								<span class="label label-inactive"><i class="icon-remove"></i> {l s='Recycled packaging'}</span>
-							{/if}
+				{* <!-- commented by qlo -->
+                    <ul class="nav nav-tabs" id="myTab" style="display:none">
+                        {$HOOK_TAB_SHIP}
+                        <li class="active">
+                            <a href="#shipping">
+                                <i class="icon-truck "></i>
+                                {l s='Shipping'} <span class="badge">{$order->getShipping()|@count}</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#returns">
+                                <i class="icon-undo"></i>
+                                {l s='Merchandise Returns'} <span class="badge">{$order->getReturn()|@count}</span>
+                            </a>
+                        </li>
+                    </ul>
+                    <!-- Tab content -->
+                    <div class="tab-content panel" style="display:none">
+                        {$HOOK_CONTENT_SHIP}
+                        <!-- Tab shipping -->
+                        <div class="tab-pane active" id="shipping">
+                            <h4 class="visible-print">{l s='Shipping'} <span class="badge">({$order->getShipping()|@count})</span></h4>
+                            <!-- Shipping block -->
+                            {if !$order->isVirtual()}
+                            <div class="form-horizontal">
+                                {if $order->gift_message}
+                                <div class="form-group">
+                                    <label class="control-label col-lg-3">{l s='Message'}</label>
+                                    <div class="col-lg-9">
+                                        <p class="form-control-static">{$order->gift_message|nl2br}</p>
+                                    </div>
+                                </div>
+                                {/if}
+                                {include file='controllers/orders/_shipping.tpl'}
+                                {if $carrierModuleCall}
+                                    {$carrierModuleCall}
+                                {/if}
+                                <hr />
+                                {if $order->recyclable}
+                                    <span class="label label-success"><i class="icon-check"></i> {l s='Recycled packaging'}</span>
+                                {else}
+                                    <span class="label label-inactive"><i class="icon-remove"></i> {l s='Recycled packaging'}</span>
+                                {/if}
 
-							{if $order->gift}
-								<span class="label label-success"><i class="icon-check"></i> {l s='Gift wrapping'}</span>
-							{else}
-								<span class="label label-inactive"><i class="icon-remove"></i> {l s='Gift wrapping'}</span>
-							{/if}
-						</div>
-						{/if}
-					</div>
-					<!-- Tab returns -->
-					<div class="tab-pane" id="returns">
-						<h4 class="visible-print">{l s='Merchandise Returns'} <span class="badge">({$order->getReturn()|@count})</span></h4>
-						{if !$order->isVirtual()}
-						<!-- Return block -->
-							{if $order->getReturn()|count > 0}
-							<div class="table-responsive">
-								<table class="table">
-									<thead>
-										<tr>
-											<th><span class="title_box ">{l s='Date'}</span></th>
-											<th><span class="title_box ">{l s='Type'}</span></th>
-											<th><span class="title_box ">{l s='Carrier'}</span></th>
-											<th><span class="title_box ">{l s='Tracking number'}</span></th>
-										</tr>
-									</thead>
-									<tbody>
-										{foreach from=$order->getReturn() item=line}
-										<tr>
-											<td>{$line.date_add}</td>
-											<td>{l s=$line.type}</td>
-											<td>{$line.state_name}</td>
-											<td class="actions">
-												<span class="shipping_number_show">{if isset($line.url) && isset($line.tracking_number)}<a href="{$line.url|replace:'@':$line.tracking_number|escape:'html':'UTF-8'}">{$line.tracking_number}</a>{elseif isset($line.tracking_number)}{$line.tracking_number}{/if}</span>
-												{if $line.can_edit}
-												<form method="post" action="{$link->getAdminLink('AdminOrders')|escape:'html':'UTF-8'}&amp;vieworder&amp;id_order={$order->id|intval}&amp;id_order_invoice={if $line.id_order_invoice}{$line.id_order_invoice|intval}{else}0{/if}&amp;id_carrier={if $line.id_carrier}{$line.id_carrier|escape:'html':'UTF-8'}{else}0{/if}">
-													<span class="shipping_number_edit" style="display:none;">
-														<button type="button" name="tracking_number">
-															{$line.tracking_number|htmlentities}
-														</button>
-														<button type="submit" class="btn btn-default" name="submitShippingNumber">
-															{l s='Update'}
-														</button>
-													</span>
-													<button href="#" class="edit_shipping_number_link">
-														<i class="icon-pencil"></i>
-														{l s='Edit'}
-													</button>
-													<button href="#" class="cancel_shipping_number_link" style="display: none;">
-														<i class="icon-remove"></i>
-														{l s='Cancel'}
-													</button>
-												</form>
-												{/if}
-											</td>
-										</tr>
-										{/foreach}
-									</tbody>
-								</table>
-							</div>
-							{else}
-							<div class="list-empty hidden-print">
-								<div class="list-empty-msg">
-									<i class="icon-warning-sign list-empty-icon"></i>
-									{l s='No merchandise returned yet'}
-								</div>
-							</div>
-							{/if}
-							{if $carrierModuleCall}
-								{$carrierModuleCall}
-							{/if}
-						{/if}
-					</div>
-				</div>
+                                {if $order->gift}
+                                    <span class="label label-success"><i class="icon-check"></i> {l s='Gift wrapping'}</span>
+                                {else}
+                                    <span class="label label-inactive"><i class="icon-remove"></i> {l s='Gift wrapping'}</span>
+                                {/if}
+                            </div>
+                            {/if}
+                        </div>
+                        <!-- Tab returns -->
+                        <div class="tab-pane" id="returns">
+                            <h4 class="visible-print">{l s='Merchandise Returns'} <span class="badge">({$order->getReturn()|@count})</span></h4>
+                            {if !$order->isVirtual()}
+                            <!-- Return block -->
+                                {if $order->getReturn()|count > 0}
+                                <div class="table-responsive">
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th><span class="title_box ">{l s='Date'}</span></th>
+                                                <th><span class="title_box ">{l s='Type'}</span></th>
+                                                <th><span class="title_box ">{l s='Carrier'}</span></th>
+                                                <th><span class="title_box ">{l s='Tracking number'}</span></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {foreach from=$order->getReturn() item=line}
+                                            <tr>
+                                                <td>{$line.date_add}</td>
+                                                <td>{l s=$line.type}</td>
+                                                <td>{$line.state_name}</td>
+                                                <td class="actions">
+                                                    <span class="shipping_number_show">{if isset($line.url) && isset($line.tracking_number)}<a href="{$line.url|replace:'@':$line.tracking_number|escape:'html':'UTF-8'}">{$line.tracking_number}</a>{elseif isset($line.tracking_number)}{$line.tracking_number}{/if}</span>
+                                                    {if $line.can_edit}
+                                                    <form method="post" action="{$link->getAdminLink('AdminOrders')|escape:'html':'UTF-8'}&amp;vieworder&amp;id_order={$order->id|intval}&amp;id_order_invoice={if $line.id_order_invoice}{$line.id_order_invoice|intval}{else}0{/if}&amp;id_carrier={if $line.id_carrier}{$line.id_carrier|escape:'html':'UTF-8'}{else}0{/if}">
+                                                        <span class="shipping_number_edit" style="display:none;">
+                                                            <button type="button" name="tracking_number">
+                                                                {$line.tracking_number|htmlentities}
+                                                            </button>
+                                                            <button type="submit" class="btn btn-default" name="submitShippingNumber">
+                                                                {l s='Update'}
+                                                            </button>
+                                                        </span>
+                                                        <button href="#" class="edit_shipping_number_link">
+                                                            <i class="icon-pencil"></i>
+                                                            {l s='Edit'}
+                                                        </button>
+                                                        <button href="#" class="cancel_shipping_number_link" style="display: none;">
+                                                            <i class="icon-remove"></i>
+                                                            {l s='Cancel'}
+                                                        </button>
+                                                    </form>
+                                                    {/if}
+                                                </td>
+                                            </tr>
+                                            {/foreach}
+                                        </tbody>
+                                    </table>
+                                </div>
+                                {else}
+                                <div class="list-empty hidden-print">
+                                    <div class="list-empty-msg">
+                                        <i class="icon-warning-sign list-empty-icon"></i>
+                                        {l s='No merchandise returned yet'}
+                                    </div>
+                                </div>
+                                {/if}
+                                {if $carrierModuleCall}
+                                    {$carrierModuleCall}
+                                {/if}
+                            {/if}
+                        </div>
+                    </div>
+                *}
 				<script>
 					$('#myTab a').click(function (e) {
 						e.preventDefault()
@@ -1167,7 +1169,7 @@
 				<div class="panel" id="refundForm">
 					<div class="panel-heading">
 						<i class="icon-shopping-cart"></i>
-						{l s='Order Detail'} <span class="badge">{$order_detail_data|@count}</span>
+						{l s='Rooms Detail'} <span class="badge">{$order_detail_data|@count}</span>
 						{* by webkul products changes as rooms *}
 					</div>
 					{* by webkul this code is added for showing rooms information on the order detail page *}
@@ -1755,6 +1757,17 @@
 			$('#rooms_extra_demands .room_services_container').hide();
 			$('#room_extra_demand_content #save_service_service').hide();
 			$('#room_extra_demand_content #back_to_service_btn').hide();
+		});
+
+		$(document).on('change', '#rooms_type_extra_demands .room_ordered_services .qty', function(e) {
+			let quantityInputField = this;
+			let maximumQuantity = parseInt($(quantityInputField).attr('data-max-quantity'));
+			let currentQuantity = parseInt($(quantityInputField).val());
+			if (currentQuantity > maximumQuantity) {
+				$(quantityInputField).siblings('p').show();
+			} else {
+				$(quantityInputField).siblings('p').hide();
+			}
 		});
 
 		$(document).on('focusout', '#rooms_type_extra_demands .room_ordered_services .qty', function(e) {

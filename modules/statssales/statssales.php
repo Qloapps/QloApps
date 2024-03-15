@@ -234,6 +234,10 @@ class StatsSales extends ModuleGraph
             return $this->getOrderStatusesData();
         }
 
+        if ($this->option == 1) {
+            $this->_formats['y'] = 'd';
+        }
+
         $this->query = 'SELECT o.`invoice_date`, ROUND(o.`total_paid_real` / o.`conversion_rate`, 2) as total_paid_real,
         (
             SELECT hbd.`id_hotel`

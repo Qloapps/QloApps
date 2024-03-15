@@ -404,7 +404,7 @@ var ajaxCart = {
                     if (jsonData.avail_rooms == 0) {
                         disableRoomTypeDemands(1);
                     }
-                    BookingForm.refresh();
+                    BookingForm.refresh(true);
                 }
 
                 if (pagename == 'category') {
@@ -422,6 +422,13 @@ var ajaxCart = {
                         $(callerElement).closest(".room_cont").hide();
                     }
                     //$('#quantity_wanted_'+idProduct).val(1);
+
+                    let addRoomButton = $(callerElement).closest('.room_info_cont').find('.booking_guest_occupancy_conatiner .dropdown-menu .add_occupancy_block .add_new_occupancy_btn');
+                    if (jsonData.avail_rooms > 1) {
+                        $(addRoomButton).removeClass('disabled');
+                    } else {
+                        $(addRoomButton).addClass('disabled');
+                    }
                 }
 
 
@@ -478,23 +485,27 @@ var ajaxCart = {
 
             },
             error: function(XMLHttpRequest, textStatus, errorThrown) {
-                var error = "Impossible to add the room to the cart.<br/>textStatus: '" + textStatus + "'<br/>errorThrown: '" + errorThrown + "'<br/>responseText:<br/>" + XMLHttpRequest.responseText;
-                if (!!$.prototype.fancybox)
-                    $.fancybox.open([{
-                        type: 'inline',
-                        autoScale: true,
-                        minHeight: 30,
-                        content: '<p class="fancybox-error">' + error + '</p>'
-                    }], {
-                        padding: 0
-                    });
-                else
-                    alert(error);
-                //reactive the button when adding has finished
-                if (addedFromProductPage)
-                    $('#add_to_cart button').removeProp('disabled').removeClass('disabled');
-                else
-                    $(callerElement).removeProp('disabled');
+                if (XMLHttpRequest.readyState == 0) {
+                    showErrorMessage(no_internet_txt);
+                } else {
+                    var error = "Impossible to add the room to the cart.<br/>textStatus: '" + textStatus + "'<br/>errorThrown: '" + errorThrown + "'<br/>responseText:<br/>" + XMLHttpRequest.responseText;
+                    if (!!$.prototype.fancybox)
+                        $.fancybox.open([{
+                            type: 'inline',
+                            autoScale: true,
+                            minHeight: 30,
+                            content: '<p class="fancybox-error">' + error + '</p>'
+                        }], {
+                            padding: 0
+                        });
+                    else
+                        alert(error);
+                    //reactive the button when adding has finished
+                    if (addedFromProductPage)
+                        $('#add_to_cart button').removeProp('disabled').removeClass('disabled');
+                    else
+                        $(callerElement).removeProp('disabled');
+                }
             }
         });
     },
@@ -612,23 +623,27 @@ var ajaxCart = {
 
             },
             error: function(XMLHttpRequest, textStatus, errorThrown) {
-                var error = "Impossible to add the room to the cart.<br/>textStatus: '" + textStatus + "'<br/>errorThrown: '" + errorThrown + "'<br/>responseText:<br/>" + XMLHttpRequest.responseText;
-                if (!!$.prototype.fancybox)
-                    $.fancybox.open([{
-                        type: 'inline',
-                        autoScale: true,
-                        minHeight: 30,
-                        content: '<p class="fancybox-error">' + error + '</p>'
-                    }], {
-                        padding: 0
-                    });
-                else
-                    alert(error);
-                //reactive the button when adding has finished
-                if (addedFromProductPage)
-                    $('#add_to_cart button').removeProp('disabled').removeClass('disabled');
-                else
-                    $(callerElement).removeProp('disabled');
+                if (XMLHttpRequest.readyState == 0) {
+                    showErrorMessage(no_internet_txt);
+                } else {
+                    var error = "Impossible to add the room to the cart.<br/>textStatus: '" + textStatus + "'<br/>errorThrown: '" + errorThrown + "'<br/>responseText:<br/>" + XMLHttpRequest.responseText;
+                    if (!!$.prototype.fancybox)
+                        $.fancybox.open([{
+                            type: 'inline',
+                            autoScale: true,
+                            minHeight: 30,
+                            content: '<p class="fancybox-error">' + error + '</p>'
+                        }], {
+                            padding: 0
+                        });
+                    else
+                        alert(error);
+                    //reactive the button when adding has finished
+                    if (addedFromProductPage)
+                        $('#add_to_cart button').removeProp('disabled').removeClass('disabled');
+                    else
+                        $(callerElement).removeProp('disabled');
+                }
             }
         });
     },
@@ -664,6 +679,13 @@ var ajaxCart = {
                             $('.room_cont[data-id-product="'+idProduct+'"]').find('.rm_left').hide();
                         }
                     });
+
+                    let addRoomButton = $('.room_cont[data-id-product="'+idProduct+'"]').find('.room_info_cont').find('.booking_guest_occupancy_conatiner .dropdown-menu .add_occupancy_block .add_new_occupancy_btn');
+                    if (jsonData.avail_rooms > 1) {
+                        $(addRoomButton).removeClass('disabled');
+                    } else {
+                        $(addRoomButton).addClass('disabled');
+                    }
                 }
                 if (pagename == 'orderopc') {
                     location.reload();
@@ -675,19 +697,23 @@ var ajaxCart = {
                     deleteProductFromSummary(idProduct + '_' + idCombination + '_' + customizationId + '_' + idAddressDelivery);
                 }*/
             },
-            error: function() {
-                var error = 'ERROR: unable to delete the product';
-                if (!!$.prototype.fancybox) {
-                    $.fancybox.open([{
-                        type: 'inline',
-                        autoScale: true,
-                        minHeight: 30,
-                        content: error
-                    }], {
-                        padding: 0
-                    });
-                } else
-                    alert(error);
+            error: function(jqXHR) {
+                if (jqXHR.readyState == 0) {
+                    showErrorMessage(no_internet_txt);
+                } else {
+                    var error = 'ERROR: unable to delete the product';
+                    if (!!$.prototype.fancybox) {
+                        $.fancybox.open([{
+                            type: 'inline',
+                            autoScale: true,
+                            minHeight: 30,
+                            content: error
+                        }], {
+                            padding: 0
+                        });
+                    } else
+                        alert(error);
+                }
             }
         });
     },
