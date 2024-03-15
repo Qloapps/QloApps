@@ -101,6 +101,8 @@
 								</td>
 								<td class="col-sm-1 center">
 									{if isset($room_info['id'])}
+                                        <input type="hidden" class="booked-dates" name="{$var_name_room_info|cat:'[booked_dates]'}" value="{$room_info['booked_dates']|escape:'html':'UTF-8'}">
+                                        <a href="#" class="view_htl_room btn btn-default" data-toggle="modal" data-target="#room-dates-modal" data-id-room="{$room_info['id']}"><i class="icon-info"></i></a>
 										<a href="#" class="rm_htl_room btn btn-default" data-id-htl-info="{$room_info['id']}"><i class="icon-trash"></i></a>
 										<input type="hidden" name="{$var_name_room_info|cat:'[id]'}" value="{$room_info['id']}">
 									{else}
@@ -223,6 +225,36 @@
 	</div>
 </div>
 {*END*}
+
+<div class="modal fade" id="room-dates-modal" tabindex="-1" role="dialog" aria-labelledby="">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close margin-right-10" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title"><i class="icon-calendar"></i>&nbsp; {l s='Upcoming bookings'}</h4>
+            </div>
+            <div class="room-booked-dates-table modal-body">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th><span>{l s='Order'}</span></th>
+                                <th><span>{l s='Date From'}</span></th>
+                                <th><span>{l s='Date To'}</span></th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal" aria-label="Close">{l s='Done'}</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <style>
 	.deactiveDatesModal {
@@ -400,6 +432,30 @@
             });
         });
 
+        {literal}
+        $('#room-dates-modal').on('show.bs.modal', function(e) {
+            const triggerRoom = $(e.relatedTarget);
+            $('#room-dates-modal tbody').html('');
+            var bookedDates = JSON.parse($(triggerRoom).closest('tr').find('.booked-dates').val());
+            if (bookedDates.length) {
+                if (bookedDates.length) {
+                    $('#room-dates-modal .room-booked-dates-table').show();
+                    $(bookedDates).each(function() {
+                        $('#room-dates-modal .room-booked-dates-table tbody').append(`<tr>
+                            <td><a href="{/literal}{$link->getAdminLink('AdminOrders')|escape:'html':'UTF-8'}{literal}&vieworder&id_order=${this.id_order}" target="_blank">#${this.id_order}</a></td>
+                            <td>${this.date_from_formatted}</td>
+                            <td>${this.date_to_formatted}</td>
+                        </tr>`);
+                    });
+                }
+            } else {
+                $('#room-dates-modal .room-booked-dates-table tbody').append(`<tr>
+                    <td colspan="3" class="center">{/literal}{l s='No Booking for this room'}{literal}</td>
+                </tr>`);
+            }
+        });
+        {/literal}
+
         // Add new room detail
         $('#add-more-rooms-button').on('click',function() {
             var lengthRooms = parseInt($('.room_data_values').length);
@@ -444,18 +500,19 @@
             $.ajax({
                 url: prod_link,
                 type: 'POST',
-                dataType: 'text',
+                dataType: 'JSON',
                 data: {
                     ajax:true,
                     action:'deleteHotelRoom',
                     id: id_htl_info,
                 },
-                success: function (result) {
-                    if (parseInt(result) == 1) {
+                success: function (response) {
+                    if (response.success) {
                         showSuccessMessage("{l s='Removed successfully'}");
                         $current.closest(".room_data_values").remove();
                     } else {
-                        showErrorMessage("{l s='Some error occurred'}");
+                        if (response.errors)
+                        showErrorMessage(response.errors);
                     }
                 },
                 error: function(XMLHttpRequest, textStatus, errorThrown) {

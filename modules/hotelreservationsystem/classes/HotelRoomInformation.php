@@ -270,7 +270,12 @@ class HotelRoomInformation extends ObjectModel
 
     public function getRoomTypeBookedRoomsForDateRange($id_hotel, $id_product, $date_from, $date_to)
     {
-        return Db::getInstance()->executeS('SELECT * FROM `'._DB_PREFIX_.'htl_booking_detail` where `date_from`< \''.pSQL($date_to).'\' AND `date_to`>\''.$date_from.'\' AND `id_product`='.(int) $id_product.' AND `id_hotel`='.(int) $id_hotel);
+        return Db::getInstance()->executeS('SELECT * FROM `'._DB_PREFIX_.'htl_booking_detail` where `date_from`< \''.pSQL($date_to).'\' AND `date_to`>\''.pSQL($date_from).'\' AND `id_product`='.(int) $id_product.' AND `id_hotel`='.(int) $id_hotel);
+    }
+
+    public function getFutureBookings($idRoom)
+    {
+        return Db::getInstance()->executeS('SELECT `id`, `id_order`, `date_from`, `date_to` FROM `'._DB_PREFIX_.'htl_booking_detail` where `date_to` > \''.pSQL(date('Y-m-d')).'\' AND `is_refunded` = 0 AND `id_room`='.(int) $idRoom);
     }
 
     // Webservice :: webservice add function

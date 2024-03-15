@@ -2904,6 +2904,13 @@ class AdminProductsControllerCore extends AdminController
                         $hotelRoomInfo = $objRoomInfo->getHotelRoomInfo($obj->id, $hotelRoomType['id_hotel']);
                         if ($hotelRoomInfo) {
                             foreach ($hotelRoomInfo as &$room) {
+                                $bookedDates = $objRoomInfo->getFutureBookings($room['id']);
+                                foreach($bookedDates as &$bookedDate) {
+                                    $bookedDate['date_from_formatted'] = Tools::displayDate($bookedDate['date_from']);
+                                    $bookedDate['date_to_formatted'] = Tools::displayDate($bookedDate['date_to']);
+                                }
+                                $room['booked_dates'] = json_encode($bookedDates);
+
                                 if ($room['id_status'] == HotelRoomInformation::STATUS_TEMPORARY_INACTIVE) {
                                     $disabledDates = $objRoomDisableDates->getRoomDisableDates($room['id']);
                                     $room['disable_dates_json'] = json_encode($disabledDates);
@@ -3536,10 +3543,15 @@ class AdminProductsControllerCore extends AdminController
                     $this->errors[] = sprintf(Tools::displayError('Invalid floor for room %s.'), $roomIndex);
                 }
 
-                if ($roomInfo['id_status'] == HotelRoomInformation::STATUS_TEMPORARY_INACTIVE) {
+                if ($roomInfo['id_status'] == HotelRoomInformation::STATUS_INACTIVE) {
+                    $objHotelRoomInformation = new HotelRoomInformation();
+                    if (count($objHotelRoomInformation->getFutureBookings($roomInfo['id']))) {
+                        $this->errors[] = sprintf(Tools::displayError('Cannot change room %s status to inactive as it already has some bookings, Please check the bookings and move those bookings to another room if you want make this room inactive'), $roomInfo['room_num']);
+                    }
+                } elseif ($roomInfo['id_status'] == HotelRoomInformation::STATUS_TEMPORARY_INACTIVE) {
                     $disableDates = json_decode($roomInfo['disable_dates_json'], true);
                     if ($roomInfo['disable_dates_json'] !== 0) {
-                        $this->validateDisableDateRanges($disableDates, $roomIndex, $roomInfo['id']);
+                        $this->validateDisableDateRanges($disableDates, $roomInfo['room_num'], $roomInfo['id']);
                     }
                 }
             }
@@ -3550,14 +3562,28 @@ class AdminProductsControllerCore extends AdminController
 
     public function ajaxProcessDeleteHotelRoom()
     {
+        $response = array(
+            'success' => false
+        );
         if ($this->tabAccess['edit'] == 1) {
             $idRoom = Tools::getValue('id');
             $objRoomInfo = new HotelRoomInformation((int)$idRoom);
-            if ($objRoomInfo->delete()) {
-                die('1');
+            $objHotelRoomInformation = new HotelRoomInformation();
+            if ($objHotelRoomInformation->getFutureBookings($idRoom)) {
+                $this->errors[] = $this->l('This room cannot be deleted as this room contains future booking.');
+            }
+            if (empty($this->errors)) {
+                if ($objRoomInfo->delete()) {
+                    $response['success'] = true;
+                } else {
+                    $this->errors[] = $this->l('Unable to delete room. Please try again!.');
+                }
             }
         }
-        die('0');
+        if (!empty($this->errors)) {
+            $response['errors'] = $this->errors;
+        }
+        die(json_encode($response));
     }
 
     public function initFormAdditionalFacilities($obj)
