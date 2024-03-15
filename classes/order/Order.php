@@ -1856,7 +1856,10 @@ class OrderCore extends ObjectModel
             if ($payment->id_currency == $this->id_currency) {
                 $this->total_paid_real += $order_payment_detail->amount;
             } else {
-                $this->total_paid_real += Tools::ps_round(Tools::convertPrice($order_payment_detail->amount, $payment->id_currency, false), 2);
+                $this->total_paid_real += Tools::ps_round(
+                    Tools::convertPriceFull($order_payment_detail->amount, new Currency($payment->id_currency), new Currency($this->id_currency)),
+                    6
+                );
             }
 
             if (!validate::isPrice($this->total_paid_real)) {

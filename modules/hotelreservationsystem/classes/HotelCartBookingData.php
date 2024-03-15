@@ -486,8 +486,9 @@ class HotelCartBookingData extends ObjectModel
                         $obj_htl_cart_booking_data->children = $room_occupancy['children'];
                         $obj_htl_cart_booking_data->child_ages = $room_occupancy['children'] ? json_encode($room_occupancy['child_ages']) : json_encode(array());
                     } else {
+                        // if room is being booked without occupancy selection the for adults set base occupancy and children will be 0
                         $obj_htl_cart_booking_data->adults = $roomTypeInfo['adults'];
-                        $obj_htl_cart_booking_data->children = $roomTypeInfo['children'];
+                        $obj_htl_cart_booking_data->children = 0;
                         $obj_htl_cart_booking_data->child_ages = json_encode(array());
                     }
                     if ($res &= $obj_htl_cart_booking_data->save()) {

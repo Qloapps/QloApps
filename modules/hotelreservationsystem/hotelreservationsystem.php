@@ -550,9 +550,9 @@ class HotelReservationSystem extends Module
         );
 
         // Controllers without tabs
-        $this->installTab('AdminHotelGeneralSettings', 'Hotel General configuration', false, false);
-        $this->installTab('AdminHotelFeaturePricesSettings', 'Advanced Price Rules', false, false);
-        $this->installTab('AdminRoomTypeGlobalDemand', 'Additional Demand Configuration', false, false);
+        $this->installTab('AdminHotelGeneralSettings', 'Hotel General Configuration', 'AdminHotelConfigurationSetting', false);
+        $this->installTab('AdminHotelFeaturePricesSettings', 'Advanced Price Rules', 'AdminHotelConfigurationSetting', false);
+        $this->installTab('AdminRoomTypeGlobalDemand', 'Additional Demand Configuration', 'AdminHotelConfigurationSetting', false);
         $this->installTab('AdminAssignHotelFeatures', 'Assign Hotel Features', false, false);
         $this->installTab('AdminBookingDocument', 'Booking Documents', false, false);
 

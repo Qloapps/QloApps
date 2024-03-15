@@ -438,6 +438,7 @@
 {addJsDefL name=duration_txt}{l s='Duration' mod='blockcart' js=1}{/addJsDefL}
 {addJsDefL name=capacity_txt}{l s='Capacity' mod='blockcart' js=1}{/addJsDefL}
 {addJsDefL name=remove_rm_title}{l s='Remove this room from my cart' mod='blockcart' js=1}{/addJsDefL}
+{addJsDefL name=no_internet_txt}{l s='No internet. Please check your internet connection.' mod='blockcart' js=1}{/addJsDefL}
 
 {addJsDef rm_avail_process_lnk = $link->getModuleLink('blockcart', 'checkroomavailabilityajaxprocess')}
 {addJsDef pagename = $current_page}

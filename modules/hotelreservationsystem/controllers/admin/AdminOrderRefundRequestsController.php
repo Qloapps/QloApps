@@ -271,7 +271,7 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
         }
 
         /*If Admin update the status of the order cancellation request*/
-        if (Tools::isSubmit('submitRefundReqBookings')) {
+        if (Tools::isSubmit('submitRefundReqBookings') || Tools::isSubmit('submitRefundReqBookingsAndStay')) {
             $idOrderReturn = Tools::getValue('id_order_return');
             $idsReturnDetail = Tools::getValue('id_order_return_detail');
             if (Validate::isLoadedObject($objOrderReturn = new OrderReturn($idOrderReturn))) {
@@ -543,10 +543,18 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
                     } elseif ($objRefundState->refunded) {
                         $confirmation = 102;
                     }
-                    Tools::redirectAdmin(
-                        self::$currentIndex.'&conf='.$confirmation.'&id_order_return='.$idOrderReturn.
-                        '&vieworder_return&token='.$this->token
-                    );
+
+                    if (Tools::isSubmit('submitRefundReqBookingsAndStay')) {
+                        Tools::redirectAdmin(
+                            self::$currentIndex.'&conf='.$confirmation.'&id_order_return='.$idOrderReturn.
+                            '&vieworder_return&token='.$this->token
+                        );
+                    } else {
+                        Tools::redirectAdmin(
+                            self::$currentIndex.'&conf='.$confirmation.'&id_order='.$objOrder->id.
+                            '&id_order_return='.$idOrderReturn.'&vieworder_return&token='.$this->token
+                        );
+                    }
                 }
 
             }

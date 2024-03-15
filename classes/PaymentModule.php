@@ -277,7 +277,7 @@ abstract class PaymentModuleCore extends Module
                     if (Configuration::get('PS_TAX_ADDRESS_TYPE') == 'id_address_delivery') {
                         $address = new Address((int)$id_address);
                         $this->context->country = new Country((int)$address->id_country, (int)$this->context->cart->id_lang);
-                        if (!$this->context->country->active) {
+                        if (!$this->context->country->active && $this->name != 'wsorder') {
                             throw new PrestaShopException('The delivery address country is not active.');
                         }
                     }
@@ -468,7 +468,7 @@ abstract class PaymentModuleCore extends Module
                 $this->context->country = $context_country;
             }
 
-            if (!$this->context->country->active) {
+            if (!$this->context->country->active && $this->name != 'wsorder') {
                 PrestaShopLogger::addLog('PaymentModule::validateOrder - Country is not active', 3, null, 'Cart', (int)$id_cart, true);
                 throw new PrestaShopException('The order address country is not active.');
             }
@@ -664,9 +664,13 @@ abstract class PaymentModuleCore extends Module
                             unset($voucher->id);
 
                             // Set a new voucher code
+                            // For a customer, applying voucher ABCD will create partial vouchers ABCD-2, ABCD-3 and so on, and
+                            // applying voucher ABCD-2 will create vouchers ABCD-2-2, ABCD-2-3 and so on
                             $voucher->code = empty($voucher->code) ? substr(md5($order->id.'-'.$order->id_customer.'-'.$cart_rule['obj']->id), 0, 16) : $voucher->code.'-2';
-                            if (preg_match('/\-([0-9]{1,2})\-([0-9]{1,2})$/', $voucher->code, $matches) && $matches[1] == $matches[2]) {
-                                $voucher->code = preg_replace('/'.$matches[0].'$/', '-'.(intval($matches[1]) + 1), $voucher->code);
+                            while (CartRule::cartRuleExists($voucher->code, $order->id_customer)) {
+                                if (preg_match('/\-([0-9]{1,2})$/', $voucher->code, $matches)) {
+                                    $voucher->code = preg_replace('/'.$matches[1].'$/', (intval($matches[1]) + 1), $voucher->code);
+                                }
                             }
 
                             // Set the new voucher value
@@ -920,7 +924,6 @@ abstract class PaymentModuleCore extends Module
                                             $objBookingDemand->tax_computation_method = (int)$taxCalc->computation_method;
                                             if ($objBookingDemand->save()) {
                                                 $objBookingDemand->tax_calculator = $taxCalc;
-                                                $objBookingDemand->id_global_demand = $idGlobalDemand;
                                                 // Now save tax details of the extra demand
                                                 $objBookingDemand->setBookingDemandTaxDetails();
                                             }
@@ -1235,25 +1238,27 @@ abstract class PaymentModuleCore extends Module
                         }
                         if (Configuration::get('PS_ORDER_CONF_MAIL_TO_SUPERADMIN')){
                             // send superadmin information
-                            if (Validate::isLoadedObject($superAdmin = new Employee(_PS_ADMIN_PROFILE_))) {
-                                if (Validate::isEmail($superAdmin->email)) {
-                                    $data['{customer_name}'] = $this->context->customer->firstname.' '.$this->context->customer->lastname;
-                                    $data['{customer_email}'] = $this->context->customer->email;
-                                    $data['{firstname}'] = $superAdmin->firstname;
-                                    $data['{lastname}'] = $superAdmin->lastname;
-                                    $data['{email}'] = $superAdmin->email;
-                                    Mail::Send(
-                                        (int)$order->id_lang,
-                                        'order_conf_admin',
-                                        Mail::l('Order confirmation', (int)$order->id_lang),
-                                        $data,
-                                        $superAdmin->email,
-                                        $superAdmin->firstname.' '.$superAdmin->lastname,
-                                        null,
-                                        null,
-                                        $file_attachement,
-                                        null, _PS_MAIL_DIR_, false, (int)$order->id_shop
-                                    );
+                            if ($superAdminEmployees = Employee::getEmployeesByProfile(_PS_ADMIN_PROFILE_, true)) {
+                                foreach ($superAdminEmployees as $superAdminEmployee) {
+                                    if (Validate::isEmail($superAdminEmployee['email'])) {
+                                        $data['{customer_name}'] = $this->context->customer->firstname.' '.$this->context->customer->lastname;
+                                        $data['{customer_email}'] = $this->context->customer->email;
+                                        $data['{firstname}'] = $superAdminEmployee['firstname'];
+                                        $data['{lastname}'] = $superAdminEmployee['lastname'];
+                                        $data['{email}'] = $superAdminEmployee['email'];
+                                        Mail::Send(
+                                            (int)$order->id_lang,
+                                            'order_conf_admin',
+                                            Mail::l('Order confirmation', (int)$order->id_lang),
+                                            $data,
+                                            $superAdminEmployee['email'],
+                                            $superAdminEmployee['firstname'].' '.$superAdminEmployee['lastname'],
+                                            null,
+                                            null,
+                                            $file_attachement,
+                                            null, _PS_MAIL_DIR_, false, (int)$order->id_shop
+                                        );
+                                    }
                                 }
                             }
                         }
@@ -1287,7 +1292,7 @@ abstract class PaymentModuleCore extends Module
                                     $data['{customer_name}'] = $this->context->customer->firstname.' '.$this->context->customer->lastname;
                                     $data['{customer_email}'] = $this->context->customer->email;
                                     foreach ($htlAccesses as $access) {
-                                        if ($access['id_profile'] != _PS_ADMIN_PROFILE_) {
+                                        if ($access['access'] && $access['id_profile'] != _PS_ADMIN_PROFILE_) {
                                             if ($htlEmployees = Employee::getEmployeesByProfile($access['id_profile'])) {
                                                 foreach ($htlEmployees as $empl) {
                                                     if (Validate::isEmail($empl['email'])) {
