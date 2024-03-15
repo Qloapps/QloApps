@@ -108,12 +108,14 @@
 											{$data_v['name']}
 										</a>
 										<a class="btn btn-default pull-right product-xs-remove" href="{$rm_v['link']}"><i class="icon-trash"></i></a>
+										{hook h='displayCartRoomTypeNameAfter' id_product=$data_v['id_product']}
 									</p>
 									{if isset($data_v['hotel_info']['location'])}
 										<p class="hotel-location">
 											<i class="icon-map-marker"></i> &nbsp;{$data_v['hotel_info']['location']}
 										</p>
 									{/if}
+									{hook h='displayCartRoomTypeInfo' id_product=$data_v['id_product']}
 								</div>
 							</div>
 							{if isset($data_v['hotel_info']['room_features'])}
