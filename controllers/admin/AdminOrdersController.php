@@ -61,11 +61,14 @@ class AdminOrdersControllerCore extends AdminController
         $this->context = Context::getContext();
 
         $this->_select = '
-        (a.total_paid - a.total_paid_real) AS `amount_due`, a.source AS order_source,
+        IF('.((Configuration::get('PS_ORDER_LIST_PRICE_DISPLAY_CURRENCY') == Order::ORDER_LIST_PRICE_DISPLAY_IN_DEFAULT_CURRENCY)? 1 : 0).', (a.total_paid_tax_incl / a.conversion_rate), total_paid_tax_incl) AS total_paid_tax_incl,
+        IF('.((Configuration::get('PS_ORDER_LIST_PRICE_DISPLAY_CURRENCY') == Order::ORDER_LIST_PRICE_DISPLAY_IN_DEFAULT_CURRENCY)? 1 : 0).', ((a.total_paid - a.total_paid_real) / a.conversion_rate), (a.total_paid - a.total_paid_real)) AS amount_due,
+        a.source AS order_source,
         a.id_currency,
         a.id_order AS id_pdf,
         CONCAT(c.`firstname`, \' \', c.`lastname`) AS `customer`,
         osl.`name` AS `osname`, os.`color`,
+        cu.iso_code AS currency,
         IF((SELECT so.id_order FROM `'._DB_PREFIX_.'orders` so WHERE so.id_customer = a.id_customer AND so.id_order < a.id_order LIMIT 1) > 0, 0, 1) as new,
         IF(a.valid, 1, 0) badge_success,
         hbil.`hotel_name`,
@@ -81,6 +84,7 @@ class AdminOrdersControllerCore extends AdminController
 
         $this->_join = '
         LEFT JOIN `'._DB_PREFIX_.'customer` c ON (c.`id_customer` = a.`id_customer`)
+        LEFT JOIN `'._DB_PREFIX_.'currency` cu ON (cu.`id_currency` = a.`id_currency`)
         LEFT JOIN `'._DB_PREFIX_.'order_state` os ON (os.`id_order_state` = a.`current_state`)
         LEFT JOIN `'._DB_PREFIX_.'order_state_lang` osl ON (os.`id_order_state` = osl.`id_order_state` AND osl.`id_lang` = '.(int) $this->context->language->id.')
         LEFT JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd ON (hbd.`id_order` = a.`id_order`)
@@ -254,6 +258,11 @@ class AdminOrdersControllerCore extends AdminController
             'payment' => array(
                 'title' => $this->l('Payment')
             ),
+            'currency' => array(
+                'title' => $this->l('Order Currency'),
+                'hint' => $this->l('This is the currency in which customer created the order.'),
+                'havingFilter' => true,
+            ),
             'order_source' => array(
                 'title' => $this->l('Order Source'),
                 'type' => 'select',
@@ -321,10 +330,14 @@ class AdminOrdersControllerCore extends AdminController
         $this->_conf[53] = $this->l('Room in the booking is successfully swapped');
     }
 
-    public static function setOrderCurrency($echo, $tr)
+    public static function setOrderCurrency($echo, $row)
     {
-        $order = new Order($tr['id_order']);
-        return Tools::displayPrice($echo, (int)$order->id_currency);
+        if (Configuration::get('PS_ORDER_LIST_PRICE_DISPLAY_CURRENCY') == Order::ORDER_LIST_PRICE_DISPLAY_IN_DEFAULT_CURRENCY) {
+            $idCurrency = Configuration::get('PS_CURRENCY_DEFAULT');
+        } else {
+            $idCurrency = $row['id_currency'];
+        }
+        return Tools::displayPrice($echo, (int)$idCurrency);
     }
 
     public function renderForm()
