@@ -360,7 +360,7 @@ class HotelHelper
         $objAddress->city = 'Demo City';
         $objAddress->id_state = $state_id;
         $objAddress->id_country = $def_cont_id;
-        $objAddress->postcode = self::getRandomZipcodeByForCountry($def_cont_id);
+        $objAddress->postcode = Tools::generateRandomZipcode($def_cont_id);
         $objAddress->address1 = 'Monticello Dr, Montgomery, AL 36117, USA';
         $objAddress->alias = 'The Hotel Prime';
         $objAddress->lastname = 'The Hotel Prime';
@@ -884,22 +884,7 @@ class HotelHelper
 
     public static function getRandomZipcodeByForCountry($idCountry)
     {
-        $randZipCode = '';
-        $alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-        if (Validate::isLoadedObject($objCountry = new Country($idCountry))) {
-            if ($objCountry->need_zip_code) {
-                if ($randZipCode = $objCountry->zip_code_format) {
-                    $randZipCode = str_replace('N', mt_rand(0, 9), $randZipCode);
-                    $randZipCode = str_replace('L', $alphabet[mt_rand(0, Tools::strlen($alphabet) - 1)], $randZipCode);
-                    $randZipCode = str_replace('C', $objCountry->iso_code, $randZipCode);
-                } else {
-                    for ($i = 0; $i < 5; ++$i) {
-                        $randZipCode .= mt_rand(0, 9);
-                    }
-                }
-            }
-        }
-        return $randZipCode;
+        return Tools::generateRandomZipcode($idCountry);
     }
 
     /**
