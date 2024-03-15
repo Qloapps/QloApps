@@ -328,3 +328,10 @@
 	{addJsDef defaultcurrency_sign = $defaultcurrency_sign mod='hotelreservationsystem'}
 	{addJsDef booking_date_from = $date_from mod='hotelreservationsystem'}
 {/strip}
+
+{block name=script}
+	<script type="text/javascript">
+		var id_language = {$defaultFormLanguage|intval};
+		allowEmployeeFormLang = {$allowEmployeeFormLang|intval};
+	</script>
+{/block}

@@ -115,7 +115,6 @@ class ConfigurationTestCore
             'register_globals' => false,
             'gz' => false,
             'mbstring' => false,
-            'magicquotes' => false,
             'dom' => false,
         );
     }
@@ -179,11 +178,6 @@ class ConfigurationTestCore
     public static function test_simplexml()
     {
         return extension_loaded('simplexml');
-    }
-
-    public static function test_magicquotes()
-    {
-        return function_exists('get_magic_quotes_gpc') ? !get_magic_quotes_gpc() : true;
     }
 
     public static function test_upload()

@@ -173,6 +173,31 @@ class AdminHotelFeaturePricesSettingsController extends ModuleAdminController
         return $this->context->smarty->fetch(_PS_MODULE_DIR_.$tpl_path);
     }
 
+    public function processStatus()
+    {
+        $objFeaturePricing = $this->loadObject();
+        if (!$objFeaturePricing->active) {
+            if ($this->validateExistingFeaturePrice(
+                $objFeaturePricing->date_selection_type,
+                $objFeaturePricing->id_product,
+                $objFeaturePricing->date_from,
+                $objFeaturePricing->date_to,
+                $objFeaturePricing->id,
+                $objFeaturePricing->is_special_days_exists,
+                $objFeaturePricing->special_days
+
+
+            )) {
+                $this->errors[] = $this->l('An advanced price rule already exists in which some dates are common with this
+                plan. Please select a different date range.');
+                return ;
+            }
+       }
+
+        return parent::processStatus();
+
+    }
+
     public function initToolbar()
     {
         parent::initToolbar();
@@ -197,7 +222,7 @@ class AdminHotelFeaturePricesSettingsController extends ModuleAdminController
         $currencySign = $objCurrency->sign;
         $dateFrom = date('d-m-Y');
         $dateTo = date('d-m-Y', strtotime($dateFrom) + 86400);
-        $currentLangId = Configuration::get('PS_LANG_DEFAULT');
+        $currentLangId = $this->default_form_language ? $this->default_form_language : Configuration::get('PS_LANG_DEFAULT');
 
         $smartyVars['languages'] = Language::getLanguages(false);
         $smartyVars['currentLang'] = Language::getLanguage((int) $currentLangId);
@@ -253,6 +278,46 @@ class AdminHotelFeaturePricesSettingsController extends ModuleAdminController
         }
     }
 
+    public function validateExistingFeaturePrice(
+        $dateSelectionType,
+        $roomTypeId,
+        $dateFrom,
+        $dateTo,
+        $idFeaturePrice,
+        $isSpecialDaysExists = false,
+        $jsonSpecialDays = "false"
+    ) {
+        $objFeaturePricing = new HotelRoomTypeFeaturePricing();
+        if ($dateSelectionType == HotelRoomTypeFeaturePricing::DATE_SELECTION_TYPE_SPECIFIC) {
+            return $objFeaturePricing->checkRoomTypeFeaturePriceExistance(
+                $roomTypeId,
+                $dateFrom,
+                $dateTo,
+                'specific_date',
+                false,
+                $idFeaturePrice
+            );
+        } elseif (isset($isSpecialDaysExists) && $isSpecialDaysExists && $jsonSpecialDays != "false") {
+            return $objFeaturePricing->checkRoomTypeFeaturePriceExistance(
+                $roomTypeId,
+                $dateFrom,
+                $dateTo,
+                'special_day',
+                $jsonSpecialDays,
+                $idFeaturePrice
+            );
+        } else {
+            return $objFeaturePricing->checkRoomTypeFeaturePriceExistance(
+                $roomTypeId,
+                $dateFrom,
+                $dateTo,
+                'date_range',
+                false,
+                $idFeaturePrice
+            );
+        }
+    }
+
     public function processSave()
     {
         $idFeaturePrice = Tools::getValue('id_feature_price');
@@ -281,40 +346,26 @@ class AdminHotelFeaturePricesSettingsController extends ModuleAdminController
 
         $languages = Language::getLanguages(false);
         $objDefaultLang = new language($defaultLangId);
-        $isPlanTypeExists = 0;
+
         if ($dateSelectionType == HotelRoomTypeFeaturePricing::DATE_SELECTION_TYPE_SPECIFIC) {
-            $isPlanTypeExists = $objFeaturePricing->checkRoomTypeFeaturePriceExistance(
-                $roomTypeId,
-                $specificDate,
-                date('Y-m-d', strtotime("+1 day", strtotime($specificDate))),
-                'specific_date',
-                false,
-                $idFeaturePrice
-            );
-        } elseif ($isSpecialDaysExists) {
-            if ($jsonSpecialDays != "false") {
-                $isPlanTypeExists = $objFeaturePricing->checkRoomTypeFeaturePriceExistance(
-                    $roomTypeId,
-                    $dateFrom,
-                    $dateTo,
-                    'special_day',
-                    $jsonSpecialDays,
-                    $idFeaturePrice
-                );
-            } else {
-                $this->errors[] = $this->l('Please select at least one day for week days restriction.');
-            }
+            $dateFrom = $specificDate;
+            $dateTo = date('Y-m-d', strtotime("+1 day", strtotime($specificDate)));
+        }
+
+        $isPlanTypeExists = 0;
+        if ($isSpecialDaysExists && $jsonSpecialDays == 'false') {
+            $this->errors[] = $this->l('Please select at least one day for the special day selection.');
         } else {
-            $isPlanTypeExists = $objFeaturePricing->checkRoomTypeFeaturePriceExistance(
+            $isPlanTypeExists = $this->validateExistingFeaturePrice(
+                $dateSelectionType,
                 $roomTypeId,
                 $dateFrom,
                 $dateTo,
-                'date_range',
-                false,
-                $idFeaturePrice
+                $idFeaturePrice,
+                $isSpecialDaysExists,
+                $jsonSpecialDays
             );
         }
-
         if ($isPlanTypeExists) {
             $this->errors[] = $this->l('An advanced price rule already exists in which some dates are common with this
             plan. Please select a different date range.');
@@ -406,14 +457,8 @@ class AdminHotelFeaturePricesSettingsController extends ModuleAdminController
                     }
                 }
                 $objFeaturePricing->date_selection_type = $dateSelectionType;
-
-                if ($dateSelectionType == HotelRoomTypeFeaturePricing::DATE_SELECTION_TYPE_RANGE) {
-                    $objFeaturePricing->date_from = $dateFrom;
-                    $objFeaturePricing->date_to = $dateTo;
-                } else {
-                    $objFeaturePricing->date_from = $specificDate;
-                    $objFeaturePricing->date_to = date('Y-m-d', strtotime($specificDate) + 86400);
-                }
+                $objFeaturePricing->date_from = $dateFrom;
+                $objFeaturePricing->date_to = $dateTo;
                 $objFeaturePricing->impact_way = $priceImpactWay;
                 $objFeaturePricing->is_special_days_exists = $isSpecialDaysExists;
                 $objFeaturePricing->special_days = $jsonSpecialDays;

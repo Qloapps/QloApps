@@ -77,13 +77,42 @@
 	<a href="<?php echo $this->getServicesLink() ?>" target="blank" class="wk-service-link">
 		<div class="wk-service-link-block">
 			<p class="wk-service-link-header">
-				<img src="theme/img/icon-support.png" />
+				<img src="theme/img/icon-services.png" />
 			</p>
 			<p class="wk-service-link-content">
-				<span class="head">Need Help?</span>
-				<p class="wk-service-link-content">
-					Click here to explore QloApps services
-				</p>
+				<span class="head"><?php echo $this->l('Need Help?') ?></span>
+			</p>
+			<p class="wk-service-link-content">
+				<?php echo $this->l('Click here to Contact us') ?>
+			</p>
+		</div>
+	</a>
+	<a href="<?php echo $this->getInstallationGuideLink() ?>" target="blank" class="wk-service-link">
+		<div class="wk-service-link-block">
+			<p class="wk-service-link-header">
+				<img src="theme/img/icon-installation-guide.png" />
+			</p>
+			<p class="wk-service-link-content">
+				<span class="head"><?php echo $this->l('Installation') ?></span>
+			</p>
+			<p class="wk-service-link-content">
+				<?php echo $this->l('See our Installation guide') ?>
+			</p>
+		</div>
+	</a>
+	<a href="<?php echo $this->getTutorialsLink() ?>" target="blank" class="wk-service-link">
+		<div class="wk-service-link-block">
+			<p class="wk-service-link-header">
+				<img src="theme/img/icon-tutorials.png" />
+			</p>
+			<div class="wk-service-link-highlight">
+				<img src="theme/img/icon-bulb.png" />
+			</div>
+			<p class="wk-service-link-content">
+				<span class="head"><?php echo $this->l('Tutorials') ?></span>
+			</p>
+			<p class="wk-service-link-content">
+				<?php echo $this->l('See our QloApps tutorials') ?>
 			</p>
 		</div>
 	</a>
