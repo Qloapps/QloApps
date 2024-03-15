@@ -88,7 +88,6 @@ class AdminProductsControllerCore extends AdminController
         parent::__construct();
 
         $this->imageType = 'jpg';
-        $this->_defaultOrderBy = 'position';
         $this->max_file_size = (int)(Configuration::get('PS_LIMIT_UPLOAD_FILE_VALUE') * 1000000);
         $this->max_image_size = (int)Configuration::get('PS_PRODUCT_PICTURE_MAX_SIZE');
         $this->allow_export = true;
@@ -144,32 +143,37 @@ class AdminProductsControllerCore extends AdminController
             }
         }
 
-        if (Tools::getValue('reset_filter_category')) {
-            $this->context->cookie->id_category_products_filter = false;
+        if (Tools::getValue('productFilter_a!id_category_default') === '') {
+            $this->context->cookie->id_category_room_types_filter = false;
         }
-        if (Shop::isFeatureActive() && $this->context->cookie->id_category_products_filter) {
-            $category = new Category((int)$this->context->cookie->id_category_products_filter);
+
+        if (Shop::isFeatureActive() && $this->context->cookie->id_category_room_types_filter) {
+            $category = new Category((int)$this->context->cookie->id_category_room_types_filter);
             if (!$category->inShop()) {
-                $this->context->cookie->id_category_products_filter = false;
+                $this->context->cookie->id_category_room_types_filter = false;
                 Tools::redirectAdmin($this->context->link->getAdminLink('AdminProducts'));
             }
         }
-        /* Join categories table */
-        if ($id_category = (int)Tools::getValue('productFilter_cl!name')) {
-            $this->_category = new Category((int)$id_category);
-            $_POST['productFilter_cl!name'] = $this->_category->name[$this->context->language->id];
+
+        // to support filter URLs with 'id_category' parameter
+        if ($id_category = (int)Tools::getValue('id_category')) {
+            $_POST['submitFilter'] = '1';
+            $_POST['productFilter_a!id_category_default'] = $id_category;
+        }
+
+        if (($id_category = (int)Tools::getValue('id_category'))
+            || ($id_category = (int) Tools::getValue('productFilter_a!id_category_default'))
+        ) {
+            $this->id_current_category = $id_category;
+            $this->context->cookie->id_category_room_types_filter = $id_category;
+        } elseif ($id_category = $this->context->cookie->id_category_room_types_filter) {
+            $this->id_current_category = $id_category;
+        }
+        if ($this->id_current_category) {
+            $this->_category = new Category((int)$this->id_current_category);
+            $this->position_group_identifier = (int) $this->id_current_category;
         } else {
-            if ($id_category = (int)Tools::getValue('id_category')) {
-                $this->id_current_category = $id_category;
-                $this->context->cookie->id_category_products_filter = $id_category;
-            } elseif ($id_category = $this->context->cookie->id_category_products_filter) {
-                $this->id_current_category = $id_category;
-            }
-            if ($this->id_current_category) {
-                $this->_category = new Category((int)$this->id_current_category);
-            } else {
-                $this->_category = new Category();
-            }
+            $this->_category = new Category();
         }
 
         $join_category = false;
@@ -194,12 +198,16 @@ class AdminProductsControllerCore extends AdminController
 				LEFT JOIN `'._DB_PREFIX_.'image_shop` image_shop ON (image_shop.`id_product` = a.`id_product` AND image_shop.`cover` = 1 AND image_shop.id_shop = '.$id_shop.')
 				LEFT JOIN `'._DB_PREFIX_.'image` i ON (i.`id_image` = image_shop.`id_image`)
 				LEFT JOIN `'._DB_PREFIX_.'product_download` pd ON (pd.`id_product` = a.`id_product` AND pd.`active` = 1)
-				LEFT JOIN `'._DB_PREFIX_.'address` aa ON (aa.`id_hotel` = hb.`id`)';
+				LEFT JOIN `'._DB_PREFIX_.'address` aa ON (aa.`id_hotel` = hb.`id`)
+				LEFT JOIN `'._DB_PREFIX_.'feature_product` fp ON (fp.`id_product` = a.`id_product`)
+				LEFT JOIN `'._DB_PREFIX_.'htl_room_type_demand` hrtd ON (hrtd.`id_product` = a.`id_product`)
+				LEFT JOIN `'._DB_PREFIX_.'htl_room_type_service_product` hrtsp ON ((hrtsp.`element_type` = '.(int) RoomTypeServiceProduct::WK_ELEMENT_TYPE_HOTEL.' AND hrtsp.`id_element` = hrt.`id_hotel`) OR (hrtsp.`element_type` = '.(int) RoomTypeServiceProduct::WK_ELEMENT_TYPE_ROOM_TYPE.' AND hrtsp.`id_element` = a.`id_product`))';
 
         $this->_select .= ' (SELECT COUNT(hri.`id`) FROM `'._DB_PREFIX_.'htl_room_information` hri WHERE hri.`id_product` = a.`id_product`) as num_rooms, ';
-        $this->_select .= 'hrt.`adults`, hrt.`children`, hb.`id` as id_hotel, aa.`city`, hbl.`hotel_name`, ';
+        $this->_select .= 'hrt.`adults`, hrt.`children`, hrt.`max_guests`, hb.`id` as id_hotel, aa.`city`, hbl.`hotel_name`, ';
         $this->_select .= 'shop.`name` AS `shopname`, a.`id_shop_default`, ';
         $this->_select .= $alias_image.'.`id_image` AS `id_image`, cl.`name` AS `name_category`, '.$alias.'.`price`, 0 AS `price_final`, a.`is_virtual`, pd.`nb_downloadable`, sav.`quantity` AS `sav_quantity`, '.$alias.'.`active`, IF(sav.`quantity`<=0, 1, 0) AS `badge_danger`';
+        $this->_select .= ', IFNULL((SELECT hap.`active` FROM `'._DB_PREFIX_.'htl_advance_payment` hap WHERE hap.`id_product` = a.`id_product`), 0) AS advance_payment';
 
         if ($join_category) {
             $this->_join .= ' INNER JOIN `'._DB_PREFIX_.'category_product` cp ON (cp.`id_product` = a.`id_product` AND cp.`id_category` = '.(int)$this->_category->id.') ';
@@ -209,8 +217,7 @@ class AdminProductsControllerCore extends AdminController
         // show the list of the product according to the booking or service products
         $this->_where .= ' AND a.`booking_product` = 1';
 
-        $this->_use_found_rows = false;
-        $this->_group = '';
+        $this->_group = ' GROUP BY a.`id_product`';
 
         $this->fields_list = array();
         $this->fields_list['id_product'] = array(
@@ -237,33 +244,51 @@ class AdminProductsControllerCore extends AdminController
                 'filter_key' => 'shop!name',
             );
         } else {
+            $hotels = HotelBranchInformation::getProfileAccessedHotels($this->context->employee->id_profile, 1);
+            foreach ($hotels as $hotel) {
+                $addressInfo = HotelBranchInformation::getAddress($hotel['id_hotel']);
+                $this->hotelsArray[$hotel['id_hotel']] = $hotel['hotel_name'].', '.$addressInfo['city'];
+            }
+
             $this->fields_list['hotel_name'] = array(
                 'title' => $this->l('Hotel'),
-                'filter_key' => 'hbl!hotel_name',
-                'callback' => 'getHotelName',
+                'type' => 'select',
+                'multiple' => true,
+                'operator' => 'or',
+                'filter_key' => 'hrt!id_hotel',
+                'list' => $this->hotelsArray,
+                'optional' => true,
+                'class' => 'chosen',
+                'remove_onchange' => true,
+                'visible_default' => true,
             );
         }
         $this->fields_list['adults'] = array(
             'title' => $this->l('Adults'),
             'filter_key' => 'hrt!adults',
+            'type' => 'range',
             'align' => 'center',
         );
-        $this->fields_list['child'] = array(
+        $this->fields_list['children'] = array(
             'title' => $this->l('Children'),
             'filter_key' => 'hrt!children',
+            'type' => 'range',
             'align' => 'center',
         );
         // use it for total rooms
         $this->fields_list['num_rooms'] = array(
             'title' => $this->l('Total Rooms'),
             'align' => 'center',
+            'type' => 'range',
             'havingFilter' => true,
         );
         $this->fields_list['price'] = array(
-            'title' => $this->l('Base price'),
-            'type' => 'price',
+            'title' => $this->l('Base Price'),
+            'type' => 'range',
+            'validation' => 'isFloat',
             'align' => 'text-left',
-            'filter_key' => 'a!price'
+            'filter_key' => 'a!price',
+            'callback' => 'displayBasePrice',
         );
         $this->fields_list['price_final'] = array(
             'title' => $this->l('Final price'),
@@ -279,12 +304,126 @@ class AdminProductsControllerCore extends AdminController
             'active' => 'status',
             'filter_key' => $alias.'!active',
             'align' => 'text-center',
-            'type' => 'bool',
-            'class' => 'fixed-width-sm',
+            'type' => 'select',
+            'list' => array(1 => $this->l('Yes'), 0 => $this->l('No')),
+            'optional' => true,
+            'visible_default' => true,
+            'remove_onchange' => true,
             'orderby' => false
         );
 
-        if ($join_category && (int)$this->id_current_category) {
+        $this->fields_list['max_guests'] = array(
+            'title' => $this->l('Maximum Occupancy'),
+            'filter_key' => 'hrt!max_guests',
+            'type' => 'range',
+            'align' => 'center',
+            'optional' => true,
+        );
+
+        if (Configuration::get('WK_ALLOW_ADVANCED_PAYMENT')) {
+            $this->fields_list['advance_payment'] = array(
+                'title' => $this->l('Advance Payment'),
+                'active' => 'advance_payment',
+                'align' => 'text-center',
+                'type' => 'bool',
+                'optional' => true,
+                'havingFilter' => true,
+                'visible_default' => true,
+                'orderby' => false,
+            );
+        }
+
+        $taxRulesGroups = array();
+        foreach (TaxRulesGroup::getTaxRulesGroups(true) as $taxRulesGroup) {
+            $taxRulesGroups[$taxRulesGroup['id_tax_rules_group']] = $taxRulesGroup['name'];
+        }
+        $this->fields_list['id_tax_rules_group'] = array(
+            'title' => $this->l('Tax Rules'),
+            'align' => 'text-center',
+            'type' => 'select',
+            'multiple' => true,
+            'operator' => 'or',
+            'filter_key' => 'a!id_tax_rules_group',
+            'list' => $taxRulesGroups,
+            'displayed' => false,
+        );
+
+        $features = array();
+        foreach (Feature::getFeatures($this->context->language->id) as $feature) {
+            $features[$feature['id_feature']] = $feature['name'];
+        }
+        $this->fields_list['id_feature'] = array(
+            'title' => $this->l('Features'),
+            'align' => 'text-center',
+            'type' => 'select',
+            'multiple' => true,
+            'operator' => 'and',
+            'filter_key' => 'fp!id_feature',
+            'list' => $features,
+            'displayed' => false,
+        );
+
+        $objProduct = new Product();
+        $allServiceProducts = $objProduct->getServiceProducts();
+        $serviceProducts = array();
+        foreach ($allServiceProducts as $serviceProduct) {
+            $serviceProducts[$serviceProduct['id_product']] = $serviceProduct['name'];
+        }
+        $this->fields_list['id_service_product'] = array(
+            'title' => $this->l('Service Products'),
+            'align' => 'text-center',
+            'type' => 'select',
+            'multiple' => true,
+            'operator' => 'and',
+            'filter_key' => 'hrtsp!id_product',
+            'list' => $serviceProducts,
+            'displayed' => false,
+        );
+
+        $additionalFacilities = array();
+        $objHotelRoomTypeGlobalDemand = new HotelRoomTypeGlobalDemand();
+        $demands = $objHotelRoomTypeGlobalDemand->getAllDemands();
+        foreach ($demands as $demand) {
+            $additionalFacilities[$demand['id_global_demand']] = $demand['name'];
+        }
+        $this->fields_list['id_global_demand'] = array(
+            'title' => $this->l('Additional Facilities'),
+            'align' => 'text-center',
+            'type' => 'select',
+            'multiple' => true,
+            'operator' => 'and',
+            'filter_key' => 'hrtd!id_global_demand',
+            'list' => $additionalFacilities,
+            'displayed' => false,
+        );
+
+        $this->locationsAndHotels = array();
+        $idLocationsCategory = Configuration::get('PS_LOCATIONS_CATEGORY');
+        $this->objLocationsCategory = new Category($idLocationsCategory, $this->context->language->id);
+        $nestedCategories = Category::getNestedCategories($idLocationsCategory);
+        if ($nestedCategories) {
+            foreach ($nestedCategories[$idLocationsCategory]['children'] as $childCategory) {
+                $this->buildCategoryOptions($childCategory);
+            }
+        }
+        $this->fields_list['id_category_default'] = array(
+            'title' => $this->l('Location/Hotel'),
+            'align' => 'text-center',
+            'type' => 'select',
+            'list' => $this->locationsAndHotels,
+            'filter_key' => 'a!id_category_default',
+            'remove_onchange' => true,
+            'displayed' => false,
+        );
+
+        // display Position column only if it is a hotel category
+        if ($join_category
+            && (int) $this->id_current_category
+            && HotelBranchInformation::getHotelIdByIdCategory($this->id_current_category)
+        ) {
+            $this->_orderBy = 'position';
+            $this->_orderWay = 'ASC';
+
             $this->fields_list['position'] = array(
                 'title' => $this->l('Position'),
                 'filter_key' => 'cp!position',
@@ -294,13 +433,21 @@ class AdminProductsControllerCore extends AdminController
         }
     }
 
-    public function getHotelName($hotelName, $row)
+    private function buildCategoryOptions($category)
     {
-        if ($hotelName && isset($row['city'])) {
-            return $hotelName.' - '.$row['city'];
-        }
+        $space = str_repeat('&nbsp;', 5 * (($category['level_depth'] - $this->objLocationsCategory->level_depth) - 1));
+        $this->locationsAndHotels[$category['id_category']] = $space.$category['name'];
 
-        return '--';
+        if (isset($category['children']) && count($category['children'])) {
+            foreach ($category['children'] as $childCategory) {
+                $this->buildCategoryOptions($childCategory);
+            }
+        }
+    }
+
+    public static function displayBasePrice($basePrice, $tr)
+    {
+        return Tools::displayPrice($basePrice, (int) Configuration::get('PS_CURRENCY_DEFAULT'));
     }
 
     public static function getQuantities($hotelName, $tr)
@@ -350,6 +497,23 @@ class AdminProductsControllerCore extends AdminController
         } else {
             return '';
         }
+    }
+
+    protected function filterToField($key, $filter)
+    {
+        if ($key == 'a!id_category_default') {
+            return false;
+        }
+
+        return parent::filterToField($key, $filter);
+    }
+
+    public function processResetFilters($list_id = null)
+    {
+        parent::processResetFilters($list_id);
+
+        // reset category filter
+        $this->context->cookie->id_category_room_types_filter = false;
     }
 
     /**
@@ -627,6 +791,10 @@ class AdminProductsControllerCore extends AdminController
                     ' - '.$this->l('Duplicate');
                 }
             }
+
+            // update `id_category_default`
+            $objHotelBranchInformation = new HotelBranchInformation($id_hotel_new);
+            $product->id_category_default = $objHotelBranchInformation->id_category;
 
             // update lang fields
             foreach (Language::getLanguages(true) as $language) {
@@ -1166,6 +1334,14 @@ class AdminProductsControllerCore extends AdminController
                 $this->action = 'duplicate';
             } else {
                 $this->errors[] = Tools::displayError('You do not have permission to add this.');
+            }
+        }
+        // Toggle Advance Payment
+        elseif (Tools::getIsset('advance_payment'.$this->table)) {
+            if ($this->tabAccess['edit'] === '1') {
+                $this->action = 'toggleAdvancePayment';
+            } else {
+                $this->errors[] = Tools::displayError('You do not have permission to edit this.');
             }
         }
         // Product images management
@@ -1720,6 +1896,41 @@ class AdminProductsControllerCore extends AdminController
         return $res;
     }
 
+    public function processToggleAdvancePayment()
+    {
+        if (Configuration::get('WK_ALLOW_ADVANCED_PAYMENT')) {
+            $this->loadObject(true);
+            if (!Validate::isLoadedObject($this->object)) {
+                return false;
+            }
+
+            if (!Product::isBookingProduct($this->object->id)) {
+                return false;
+            }
+
+            $objHotelAdvancedPayment = new HotelAdvancedPayment();
+            $roomTypeAdvancePaymentInfo = $objHotelAdvancedPayment->getIdAdvPaymentByIdProduct($this->object->id);
+            if ($roomTypeAdvancePaymentInfo) {
+                $objHotelAdvancedPayment = new HotelAdvancedPayment($roomTypeAdvancePaymentInfo['id']);
+                $objHotelAdvancedPayment->active = !$objHotelAdvancedPayment->active;
+            } else {
+                $objHotelAdvancedPayment->id_product = $this->object->id;
+                $objHotelAdvancedPayment->payment_type = '';
+                $objHotelAdvancedPayment->value = '';
+                $objHotelAdvancedPayment->id_currency = '';
+                $objHotelAdvancedPayment->tax_include = '';
+                $objHotelAdvancedPayment->calculate_from = 0;
+                $objHotelAdvancedPayment->active = 1;
+            }
+
+            if ($objHotelAdvancedPayment->save()) {
+                Tools::redirectAdmin(self::$currentIndex.'&token='.$this->token.'&conf=4');
+            } else {
+                $this->errors[] = $this->l('Something went wrong while updating Advance payment status.');
+            }
+        }
+    }
+
     public function processUpdate()
     {
         $existing_product = $this->object;
@@ -1770,6 +1981,9 @@ class AdminProductsControllerCore extends AdminController
                 }
 
                 if ($object->update()) {
+                    // update position in category
+                    $object->setPositionInCategory(Tools::getValue('category_position'));
+
                     // If the product doesn't exist in the current shop but exists in another shop
                     if (Shop::getContext() == Shop::CONTEXT_SHOP && !$existing_product->isAssociatedToShop($this->context->shop->id)) {
                         $out_of_stock = StockAvailable::outOfStock($existing_product->id, $existing_product->id_shop_default);
@@ -2055,6 +2269,21 @@ class AdminProductsControllerCore extends AdminController
                 }
             }
         }
+
+        // Category Position
+        if (Validate::isLoadedObject($this->object)) {
+            $categoryPositon = Tools::getValue('category_position');
+            if ($categoryPositon < 0) {
+                $this->errors[] = $this->l('Position can not be less than 0.');
+            }
+
+            if (isset($objHotel) && Validate::isLoadedObject($objHotel)) {
+                $maxPosition = Product::getHighestPositionInCategory($objHotel->id_category);
+                if ($categoryPositon > $maxPosition) {
+                    $this->errors[] = sprintf($this->l('Position can not be greater than %d.'), $maxPosition);
+                }
+            }
+        }
     }
 
     /**
@@ -2195,35 +2424,14 @@ class AdminProductsControllerCore extends AdminController
                 $this->tpl_form_vars['product_tabs'] = $product_tabs;
             }
         } else {
-            if ($id_category = (int)$this->id_current_category) {
-                self::$currentIndex .= '&id_category='.(int)$this->id_current_category;
-            }
-
             // If products from all categories are displayed, we don't want to use sorting by position
-            if (!$id_category) {
+            if (!(int) $this->id_current_category) {
                 $this->_defaultOrderBy = $this->identifier;
                 if ($this->context->cookie->{$this->table.'Orderby'} == 'position') {
                     unset($this->context->cookie->{$this->table.'Orderby'});
                     unset($this->context->cookie->{$this->table.'Orderway'});
                 }
             }
-            if (!$id_category) {
-                $id_category = Configuration::get('PS_ROOT_CATEGORY');
-            }
-            $this->tpl_list_vars['is_category_filter'] = (bool)$this->id_current_category;
-
-            // Generate category selection tree
-            $catFilter = $this->l('Filter by Places');
-            $tree = new HelperTreeCategories('categories-tree', $catFilter);
-            $tree->setAttribute('is_category_filter', (bool)$this->id_current_category)
-                ->setAttribute('base_url', preg_replace('#&id_category=[0-9]*#', '', self::$currentIndex).'&token='.$this->token)
-                ->setInputName('id-category')
-                ->setRootCategory((int)Configuration::get('PS_LOCATIONS_CATEGORY'))
-                ->setSelectedCategories(array((int)$id_category));
-            $this->tpl_list_vars['category_tree'] = $tree->render();
-
-            // used to build the new url when changing category
-            $this->tpl_list_vars['base_url'] = preg_replace('#&id_category=[0-9]*#', '', self::$currentIndex).'&token='.$this->token;
         }
 
         parent::initContent();
@@ -2298,6 +2506,9 @@ class AdminProductsControllerCore extends AdminController
         $this->addRowAction('preview');
         $this->addRowAction('duplicate');
         $this->addRowAction('delete');
+
+        $this->tpl_list_vars['title'] = $this->l('Room Types');
+
         return parent::renderList();
     }
 
@@ -3492,7 +3703,7 @@ class AdminProductsControllerCore extends AdminController
             $product = $obj;
             // Prepare Categories tree for display in Associations tab
             $root = Category::getRootCategory();
-            $default_category = $this->context->cookie->id_category_products_filter ? $this->context->cookie->id_category_products_filter : Context::getContext()->shop->id_category;
+            $default_category = $this->context->cookie->id_category_room_types_filter ? $this->context->cookie->id_category_room_types_filter : Context::getContext()->shop->id_category;
             if (!$product->id || !$product->isAssociatedToShop()) {
                 $selected_cat = Category::getCategoryInformations(Tools::getValue('categoryBox', array($default_category)), $this->default_form_language);
             } else {
@@ -4129,7 +4340,8 @@ class AdminProductsControllerCore extends AdminController
             'token' => $this->token,
             'currency' => $currency,
             'link' => $this->context->link,
-            'PS_PRODUCT_SHORT_DESC_LIMIT' => Configuration::get('PS_PRODUCT_SHORT_DESC_LIMIT') ? Configuration::get('PS_PRODUCT_SHORT_DESC_LIMIT') : 400
+            'PS_PRODUCT_SHORT_DESC_LIMIT' => Configuration::get('PS_PRODUCT_SHORT_DESC_LIMIT') ? Configuration::get('PS_PRODUCT_SHORT_DESC_LIMIT') : 400,
+            'category_position' => Tools::getValue('category_position', $product->getPositionInCategory()),
         ));
         $data->assign($this->tpl_form_vars);
 
@@ -4655,7 +4867,7 @@ class AdminProductsControllerCore extends AdminController
         if ($this->tabAccess['edit'] === '1') {
             $way = (int)(Tools::getValue('way'));
             $id_product = (int)Tools::getValue('id_product');
-            $id_category = (int)Tools::getValue('id_category');
+            $id_category = (int)Tools::getValue('id_category_hotel');
             $positions = Tools::getValue('product');
             $page = (int)Tools::getValue('page');
             $selected_pagination = (int)Tools::getValue('selected_pagination');
@@ -4670,7 +4882,7 @@ class AdminProductsControllerCore extends AdminController
                         }
 
                         if ($product = new Product((int)$pos[2])) {
-                            if (isset($position) && $product->updatePosition($way, $position)) {
+                            if (isset($position) && $product->updatePosition($way, $position, $id_category)) {
                                 $category = new Category((int)$id_category);
                                 if (Validate::isLoadedObject($category)) {
                                     hook::Exec('categoryUpdate', array('category' => $category));

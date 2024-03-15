@@ -422,6 +422,27 @@
 	</div>
 	{/if}
 
+	{if isset($product->id) && $product->id}
+		<div class="form-group">
+			<label class="control-label col-lg-3" id="category_position" for="category_position">
+				<span class="label-tooltip" data-toggle="tooltip" title="{l s='Set position of the room type when hotel search results are displayed.'}">
+					{l s='Position'}
+				</span>
+			</label>
+			<div class="col-lg-9">
+				<input type="text" id="category_position" class="form-control fixed-width-lg" name="category_position" value="{$category_position}" />
+				<p class="help-block">{l s='Please note that position numbering starts from 0. A position of 0 means room type will be displayed at the topmost.'}</p>
+			</div>
+		</div>
+	{/if}
+
+	{if isset($product->id) && $product->id}
+		<div class="alert alert-info">
+			{l s='You can change positions of room types of this hotel from '}
+			<a href="{$link->getAdminLink('AdminProducts')}&id_category={$htl_full_info['id_category']}">{l s='here.'}</a>
+		</div>
+	{/if}
+
 	{* <div class="form-group">
 		<label class="control-label col-lg-3" for="tags_{$id_lang}">
 			<span class="label-tooltip" data-toggle="tooltip"

@@ -276,13 +276,21 @@ class HotelRoomType extends ObjectModel
     /**
      * @param [int] $roomTypesList: string of idRoomTypes seperated by ","
      */
-    public function getRoomTypeDetailByRoomTypeIds($roomTypesList)
+    public function getRoomTypeDetailByRoomTypeIds($roomTypesList, $position = true)
     {
-        $sql = 'SELECT COUNT(hri.`id`) AS `numberOfRooms`, hrt.`id_product`, `adults`, `children`, `max_adults`, `max_children`, `max_guests`
-                FROM `'._DB_PREFIX_.'htl_room_type` AS `hrt`
-                INNER JOIN `'._DB_PREFIX_.'htl_room_information` AS `hri` ON (hri.`id_product` = hrt.`id_product`)
-                WHERE hrt.`id_product` IN ('.$roomTypesList.')
-                GROUP BY hrt.`id_product`';
+        $sql = 'SELECT COUNT(hri.`id`) AS `numberOfRooms`, hrt.`id_product`, `adults`, `children`, `max_adults`, `max_children`, `max_guests`'.
+        ($position ? ', cp.`position`' : '').'
+        FROM `'._DB_PREFIX_.'htl_room_type` AS `hrt`
+        INNER JOIN `'._DB_PREFIX_.'htl_room_information` AS `hri` ON (hri.`id_product` = hrt.`id_product`)';
+
+        if ($position) {
+            $sql .= ' INNER JOIN `'._DB_PREFIX_.'htl_branch_info` hbi ON (hbi.`id` = hrt.`id_hotel`)
+            INNER JOIN `'._DB_PREFIX_.'category_product` cp ON cp.`id_category` = hbi.`id_category` AND cp.`id_product` = hrt.`id_product`';
+        }
+
+        $sql .= 'WHERE hrt.`id_product` IN ('.$roomTypesList.')
+        GROUP BY hrt.`id_product`'.
+        ($position ? ' ORDER BY cp.`position`' : '');
 
         return Db::getInstance()->executeS($sql);
     }
