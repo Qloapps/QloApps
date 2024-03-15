@@ -354,7 +354,7 @@ class AdminHotelFeaturePricesSettingsController extends ModuleAdminController
 
         $isPlanTypeExists = 0;
         if ($isSpecialDaysExists && $jsonSpecialDays == 'false') {
-            $this->errors[] = $this->l('Please select at least one day for the special day selection.');
+            $this->errors[] = $this->l('Please select at least one day for week days restriction.');
         } else {
             $isPlanTypeExists = $this->validateExistingFeaturePrice(
                 $dateSelectionType,
