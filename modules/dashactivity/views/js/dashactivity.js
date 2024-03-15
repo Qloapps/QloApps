@@ -31,10 +31,18 @@ function pie_chart_trends(widget_name, chart_details)
 			.y(function(d) { return d.y })
 			.color(d3.scale.category10().range())
 			.valueFormat(d3.format(".0f"))
-			.donut(true)
-			.showLabels(false)
-			.showLegend(false)
-			.donutRatio(0.4);
+			.showLabels(true)
+            .showLegend(false)
+            .labelThreshold(.01)
+            .labelType('percent')
+            .donut(true)
+            .donutRatio(0.35);
+
+        // create content for the tooltip of chart
+        chart.tooltip.contentGenerator((obj, element) => {
+            var tooltipContent = '<p><b>' + obj.data.y + '</b> (' + obj.data.percent + '%)</p>';
+            return getTooltipContent(obj.data.key, tooltipContent, obj.color);
+        });
 
 		d3.select("#dash_traffic_chart2 svg")
 			.datum(chart_details.data)

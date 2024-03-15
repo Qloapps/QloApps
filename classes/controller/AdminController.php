@@ -881,7 +881,7 @@ class AdminControllerCore extends Controller
                     $key = isset($tmp_tab[1]) ? $tmp_tab[0].'.`'.$tmp_tab[1].'`' : '`'.$tmp_tab[0].'`';
 
                     // as in database 0 means position 1 in the renderlist
-                    if (isset($field['position'])) {
+                    if (isset($field['position']) && Validate::isInt($value)) {
                         $value -= 1;
                     }
 
@@ -2171,6 +2171,8 @@ class AdminControllerCore extends Controller
      */
     protected function initTabModuleList()
     {
+        $this->tab_modules_list = Tab::getTabModulesList($this->id);
+
         if (is_array($this->tab_modules_list['default_list']) && count($this->tab_modules_list['default_list'])) {
             $this->filter_modules_list = $this->tab_modules_list['default_list'];
         } elseif (is_array($this->tab_modules_list['slider_list']) && count($this->tab_modules_list['slider_list'])) {
@@ -2343,16 +2345,6 @@ class AdminControllerCore extends Controller
 
         //Force override translation key
         Context::getContext()->override_controller_name_for_translations = 'AdminModules';
-
-        $this->modals[] = array(
-            'modal_id' => 'modal_addons_connect',
-            'modal_class' => 'modal-md',
-            'modal_title' => '<i class="icon-puzzle-piece"></i> <a target="_blank" href="http://addons.prestashop.com/'
-            .'?utm_source=back-office&utm_medium=modules'
-            .'&utm_campaign=back-office-'.Tools::strtoupper($this->context->language->iso_code)
-            .'&utm_content='.(defined('_PS_HOST_MODE_') ? 'cloud' : 'download').'">PrestaShop Addons</a>',
-            'modal_content' => $this->context->smarty->fetch('controllers/modules/login_addons.tpl'),
-        );
 
         //After override translation, remove it
         Context::getContext()->override_controller_name_for_translations = null;
@@ -4018,9 +4010,23 @@ class AdminControllerCore extends Controller
                 $object = new $this->className((int)$id);
                 $object->setFieldsToUpdate(array('active' => true));
                 $object->active = (int)$status;
-                $result &= $object->update();
+                $isUpdated = (bool) $object->update();
+                $result &= $isUpdated;
+
+                if (!$isUpdated) {
+                    $this->errors[] = sprintf($this->l('Can\'t update #%d status.'), (int) $id);
+                }
             }
+
+            if ($result) {
+                $this->redirect_after = self::$currentIndex.'&conf=5&token='.$this->token;
+            } else {
+                $this->errors[] = $this->l('An error occurred while updating the status.');
+            }
+        } else {
+            $this->errors[] = $this->l('You must select at least one item to perform a bulk action.');
         }
+
         return $result;
     }
 

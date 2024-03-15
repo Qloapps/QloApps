@@ -47,8 +47,11 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
             $this->context->cookie->id_cart = (int) $objCart->id;
         } else {
             // use previous cart
-            if (!validate::isLoadedObject($objCart = new Cart($this->context->cookie->id_cart))) {
+            $objCart = new Cart($this->context->cookie->id_cart);
+            $isCartValid = Validate::isLoadedObject($objCart);
+            if (!$isCartValid || ($isCartValid && $objCart->orderExists())) {
                 $objCart = $this->createNewCart();
+                $this->context->cookie->id_cart = (int) $objCart->id;
             }
         }
         $this->context->cart = $objCart;
@@ -437,7 +440,7 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
         $bookingParams['date_from'] = $searchDateFrom;
         $bookingParams['date_to'] = $searchDateTo;
         $bookingParams['hotel_id'] = $searchIdHotel;
-        $bookingParams['room_type'] = $searchIdRoomType;
+        $bookingParams['id_room_type'] = $searchIdRoomType;
         $bookingParams['adults'] = $adults;
         $bookingParams['children'] = $children;
         $bookingParams['num_rooms'] = $num_rooms;
@@ -744,7 +747,7 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
     public function assignServiceProductsForm()
     {
         $objProduct = new Product();
-        $serviceProducts = $objProduct->getServiceProducts($this->context->language->id);
+        $serviceProducts = $objProduct->getServiceProducts(null, Product::SERVICE_PRODUCT_WITHOUT_ROOMTYPE);
         $hotelAddressInfo = HotelBranchInformation::getAddress($this->id_hotel);
         $serviceProducts = Product::getProductsProperties($this->context->language->id, $serviceProducts);
         $this->context->smarty->assign(array(

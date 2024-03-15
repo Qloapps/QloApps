@@ -17,26 +17,6 @@
 * @license LICENSE.txt
 */
 
-/* scrollbar design - start */
-#dashguestcycle.dashboard-top ::-webkit-scrollbar {
-	height: 12px;
-	margin-bottom: 5px;
-}
-
-#dashguestcycle.dashboard-top ::-webkit-scrollbar-track {
-	background-color: #DDD;
-	margin: 0 6px;
-	border-radius: 10px;
-}
-
-#dashguestcycle.dashboard-top ::-webkit-scrollbar-thumb {
-	background-color: #BBB;
-	border-radius: 10px;
-	margin-bottom: 5px;
-
-}
-/* scrollbar design - end */
-
 #dashguestcycle {
 	padding-bottom: 5px;
 }
@@ -110,4 +90,8 @@
 #dashguestcycle .tab-content {
 	max-height: 300px;
 	overflow-y: auto;
+}
+
+#dashguestcycle table tbody>tr>td {
+    padding: 8px 7px;
 }

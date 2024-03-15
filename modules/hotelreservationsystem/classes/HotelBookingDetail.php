@@ -508,6 +508,8 @@ class HotelBookingDetail extends ObjectModel
             $sql = $sql.' UNION '.$sql3;
         }
 
+        $sql .= ' ORDER BY id_room ASC';
+
         $unavailRoomTypes = array();
         if ($unavailRooms = Db::getInstance()->executeS($sql)) {
             foreach ($unavailRooms as $unavailRoomDetail) {
@@ -629,8 +631,8 @@ class HotelBookingDetail extends ObjectModel
         $whereAvailRoomSearch = 'WHERE ri.`id_hotel`='.(int)$idHotel.' AND ri.`id_status` != '. HotelRoomInformation::STATUS_INACTIVE.' AND ri.`id` NOT IN ('.$exclude_ids.') AND IF('.(int)$idRoomType.' > 0, ri.`id_product` = '.(int)$idRoomType.', 1) AND ri.`id_product` IN ('.$allowedIdRoomTypes.')';
 
         $groupByAvailRoomSearch = '';
-        $orderByAvailRoomSearch = '';
-        $orderWayAvailRoomSearch = '';
+        $orderByAvailRoomSearch = 'ORDER BY ri.`id`';
+        $orderWayAvailRoomSearch = 'ASC';
 
         Hook::exec('actionAvailRoomSearchSqlModifier',
             array(
@@ -930,7 +932,7 @@ class HotelBookingDetail extends ObjectModel
                 (hrdd.`date_from` > \''.pSQL($dateFrom).'\' AND hrdd.`date_from` < \''.pSQL($dateTo).'\' AND hrdd.`date_to` < \''.pSQL($dateTo).'\')
             ) AND IF('.(int)$idRoomType.' > 0, hri.`id_product` = '.(int)$idRoomType.', 1) AND hri.`id_product` IN ('.$allowedIdRoomTypes.')';
 
-        $sql = $sql1.' UNION '.$sql2;
+        $sql = $sql1.' UNION '.$sql2.' ORDER BY id_room ASC';
         $part_arr = Db::getInstance()->executeS($sql);
 
         // Get date wise available rooms
@@ -1224,7 +1226,8 @@ class HotelBookingDetail extends ObjectModel
         $sql = 'SELECT bd.`id`, bd.`id_product`, bd.`id_room`, bd.`id_hotel`, bd.`id_customer`, bd.`booking_type`, bd.`id_status` AS booking_status, bd.`comment`, rf.`room_num`, bd.`date_from`, bd.`date_to`
                 FROM `'._DB_PREFIX_.'htl_booking_detail` AS bd
                 INNER JOIN `'._DB_PREFIX_.'htl_room_information` AS rf ON (rf.`id` = bd.`id_room`)
-                WHERE bd.`id_hotel`='.(int)$idHotel.' AND bd.`is_refunded` = 0 AND bd.`is_back_order` = 0 AND IF(bd.`id_status` = '. self::STATUS_CHECKED_OUT .', bd.`date_from` <= \''.pSQL($dateFrom).'\' AND bd.`check_out` >= \''.pSQL($dateTo).'\', bd.`date_from` <= \''.pSQL($dateFrom).'\' AND bd.date_to >= \''.pSQL($dateTo).'\') AND IF('.(int)$idRoomType.' > 0, rf.`id_product` = '.(int)$idRoomType.', 1) AND rf.`id_product` IN ('.$allowedIdRoomTypes.')';
+                WHERE bd.`id_hotel`='.(int)$idHotel.' AND bd.`is_refunded` = 0 AND bd.`is_back_order` = 0 AND IF(bd.`id_status` = '. self::STATUS_CHECKED_OUT .', bd.`date_from` <= \''.pSQL($dateFrom).'\' AND bd.`check_out` >= \''.pSQL($dateTo).'\', bd.`date_from` <= \''.pSQL($dateFrom).'\' AND bd.date_to >= \''.pSQL($dateTo).'\') AND IF('.(int)$idRoomType.' > 0, rf.`id_product` = '.(int)$idRoomType.', 1) AND rf.`id_product` IN ('.$allowedIdRoomTypes.')
+                ORDER BY bd.`id_room` ASC';
 
         $bookedRoomTypes = array();
         if ($booked_rooms = Db::getInstance()->executeS($sql)) {
@@ -2157,14 +2160,17 @@ class HotelBookingDetail extends ObjectModel
             $objHtlBranchInfo = new HotelBranchInformation();
 
             foreach ($order_detail_data as $key => $value) {
-                $product_image_id = Product::getCover($value['id_product']);
-                $link_rewrite = ((new Product((int) $value['id_product'], Configuration::get('PS_LANG_DEFAULT')))->link_rewrite[Configuration::get('PS_LANG_DEFAULT')]);
-
                 $order_detail_data[$key]['room_type'] = $value['room_type_name'];
-                if ($product_image_id) {
-                    $order_detail_data[$key]['image_link'] = $context->link->getImageLink($link_rewrite, $product_image_id['id_image'], 'small_default');
+                // Check if product is still available
+                if (Validate::isLoadedObject($objProduct = new Product((int) $value['id_product'], Configuration::get('PS_LANG_DEFAULT')))
+                    && $productCoverImg = Product::getCover($value['id_product'])
+                ) {
+                    $order_detail_data[$key]['image_link'] = $context->link->getImageLink(
+                        $objProduct->link_rewrite[Configuration::get('PS_LANG_DEFAULT')],
+                        $productCoverImg['id_image'], 'small_default'
+                    );
                 } else {
-                    $order_detail_data[$key]['image_link'] = $context->link->getImageLink($link_rewrite, $context->language->iso_code.'-default', 'small_default');
+                    $order_detail_data[$key]['image_link'] = $context->link->getImageLink('', $context->language->iso_code.'-default', 'small_default');
                 }
 
                 $objOrderDetail = new OrderDetail($value['id_order_detail']);
