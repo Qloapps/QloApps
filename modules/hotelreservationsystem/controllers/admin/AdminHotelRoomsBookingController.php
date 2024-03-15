@@ -374,10 +374,8 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
         $objHotelServiceProductCartDetail = new HotelServiceProductCartDetail();
 
         if ($cartProducts = $this->context->cart->getProducts()) {
-            if ($cart_bdata = $objHotelCartBookingData->getCartBookingDetailsByIdCartIdGuest(
-                $this->context->cart->id,
-                $this->context->cookie->id_guest,
-                $this->context->employee->id_lang
+            if ($cart_bdata = $objHotelCartBookingData->getCartFormatedBookinInfoByIdCart(
+                $this->context->cart->id
             )) {
                 $smartyVars['cart_bdata'] = $cart_bdata;
             }
@@ -390,7 +388,9 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
         $smartyVars['rms_in_cart'] = $objHotelCartBookingData->getCountRoomsInCart($this->id_cart, $this->id_guest);
         $smartyVars['products_in_cart'] = $products_in_cart;
         $smartyVars['total_products_in_cart'] = (int)$rms_in_cart + (int)$products_in_cart;
-        $smartyVars['cart_tamount'] = $this->context->cart->getOrderTotal();
+        $cartAmountTotal = $this->context->cart->getOrderTotal(false);
+        $cartAmountConvenienceFee  = $this->context->cart->getOrderTotal(false, cart::ONLY_CONVENIENCE_FEE);
+        $smartyVars['cart_tamount'] = $cartAmountTotal - $cartAmountConvenienceFee;
 
         $this->context->smarty->assign($smartyVars);
     }
