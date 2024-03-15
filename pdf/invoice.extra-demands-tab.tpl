@@ -140,7 +140,7 @@
 											{$service['name']}
 										</td>
 										<td class="center">
-											{$service['product_tax_label']}
+											{if $service['product_tax_label']}{$service['product_tax_label']}{else}{l s='No tax' pdf='true'}{/if}
 										</td>
 										<td class="center">
 											{if $service['allow_multiple_quantity']}
