@@ -137,7 +137,7 @@
 				{l s='Select Hotel'}
 			</label>
 			<div class="col-sm-5">
-				<select name="id_hotel" id="hotel_place" class="form-control">
+				<select name="id_hotel" id="hotel_place" class="form-control chosen">
 					{foreach from=$htl_info item=htl_dtl}
 						<option value="{$htl_dtl['id']}" >{$htl_dtl['hotel_name']}</option>
 					{/foreach}
@@ -270,6 +270,27 @@
 				<option value="search" {if $product->visibility == 'search'}selected="selected"{/if} >{l s='Search only'}</option>
 				<option value="none" {if $product->visibility == 'none'}selected="selected"{/if}>{l s='Nowhere'}</option>
 			</select>
+		</div>
+	</div>
+
+	<div class="form-group" id="show_at_front_container">
+		<label class="control-label col-lg-3">
+			<span class="label-tooltip" data-toggle="tooltip" title="{l s='Enable if you want this room type to be shown and to be available for booking from front office.'}">
+				{l s='Show at front office'}
+			</span>
+		</label>
+		<div class="col-lg-3">
+			<span class="switch prestashop-switch fixed-width-lg">
+				<input type="radio" name="show_at_front" id="show_at_front_on" value="1" {if $product->show_at_front || !$product->isAssociatedToShop()}checked="checked"{/if}/>
+				<label for="show_at_front_on" class="radioCheck">
+					{l s='Yes'}
+				</label>
+				<input type="radio" name="show_at_front" id="show_at_front_off" value="0" {if !$product->show_at_front && $product->isAssociatedToShop()}checked="checked"{/if}/>
+				<label for="show_at_front_off" class="radioCheck">
+					{l s='No'}
+				</label>
+				<a class="slide-button btn"></a>
+			</span>
 		</div>
 	</div>
 
@@ -420,6 +441,27 @@
 			<p class="help-block"></p>
 		</div>
 	</div>
+	{/if}
+
+	{if isset($product->id) && $product->id}
+		<div class="form-group">
+			<label class="control-label col-lg-3" id="category_position" for="category_position">
+				<span class="label-tooltip" data-toggle="tooltip" title="{l s='Set position of the room type when hotel search results are displayed.'}">
+					{l s='Position'}
+				</span>
+			</label>
+			<div class="col-lg-9">
+				<input type="text" id="category_position" class="form-control fixed-width-lg" name="category_position" value="{$category_position}" />
+				<p class="help-block">{l s='Please note that position numbering starts from 0. A position of 0 means room type will be displayed at the topmost.'}</p>
+			</div>
+		</div>
+	{/if}
+
+	{if isset($product->id) && $product->id}
+		<div class="alert alert-info">
+			{l s='You can change positions of room types of this hotel from '}
+			<a href="{$link->getAdminLink('AdminProducts')}&id_category={$htl_full_info['id_category']}">{l s='here.'}</a>
+		</div>
 	{/if}
 
 	{* <div class="form-group">

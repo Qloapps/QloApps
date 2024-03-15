@@ -31,7 +31,7 @@
 /* end */
 #dashactivity .activity-section {
 	position: relative;
-	padding-bottom: 2px;
+	padding-bottom: 10px;
 	margin-bottom: 15px;
 	border-bottom: 2px solid #D3D8DB;
 }
@@ -39,7 +39,7 @@
 #dashactivity .title span {
 	margin-bottom: 4px;
 	font-weight: bold;
-	font-size: 18px;
+	font-size: 16px;
 	color: #555555;
 }
 
@@ -81,7 +81,7 @@
 
 #dashactivity .stats-list .item-label span {
 	margin-bottom: 4px;
-	font-size: 16px;
+	font-size: 14px;
 	color: #555555;
 }
 
@@ -98,7 +98,7 @@
 
 #dashactivity .stats-list .item-value span {
 	font-weight: bold;
-	font-size: 18px;
+	font-size: 16px;
 	text-align: right;
 	color: #555555;
 }

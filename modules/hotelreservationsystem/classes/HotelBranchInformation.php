@@ -44,24 +44,37 @@ class HotelBranchInformation extends ObjectModel
         'multilang' => true,
         'fields' => array(
             'id_category' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
-            'email' => array('type' => self::TYPE_STRING,'validate' => 'isEmail', 'size' => 255),
-            'rating' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
-            'check_in' => array('type' => self::TYPE_STRING),
-            'check_out' => array('type' => self::TYPE_STRING),
+            'email' => array('type' => self::TYPE_STRING,'validate' => 'isEmail', 'size' => 255, 'required' => true),
+            'rating' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId', 'required' => true),
+            'check_in' => array('type' => self::TYPE_STRING, 'required' => true),
+            'check_out' => array('type' => self::TYPE_STRING, 'required' => true),
             'active' => array('type' => self::TYPE_BOOL, 'validate' => 'isBool'),
-            'latitude' => array('type' => self::TYPE_FLOAT),
-            'longitude' => array('type' => self::TYPE_FLOAT),
+            'latitude' => array('type' => self::TYPE_FLOAT, 'validate' => 'isFloat'),
+            'longitude' => array('type' => self::TYPE_FLOAT, 'validate' => 'isFloat'),
             'map_formated_address' => array('type' => self::TYPE_HTML, 'validate' => 'isCleanHtml'),
             'map_input_text' => array('type' => self::TYPE_STRING, 'validate' => 'isString'),
             'active_refund' => array('type' => self::TYPE_BOOL, 'validate' => 'isBool'),
             'date_add' => array('type' => self::TYPE_DATE, 'validate' => 'isDate', 'copy_post' => false),
             'date_upd' => array('type' => self::TYPE_DATE, 'validate' => 'isDate', 'copy_post' => false),
+
             //lang fields
             'policies' => array('type' => self::TYPE_HTML, 'validate' => 'isCleanHtml', 'lang' => true),
-            'hotel_name' => array('type' => self::TYPE_STRING, 'lang' => true),
+            'hotel_name' => array('type' => self::TYPE_STRING, 'lang' => true, 'required' => true, 'validate' => 'isGenericName'),
             'description' => array('type' => self::TYPE_HTML, 'validate' => 'isCleanHtml', 'lang' => true),
             'short_description' => array('type' => self::TYPE_HTML, 'validate' => 'isCleanHtml', 'lang' => true),
     ), );
+
+    // Webservice fields
+    public $id_country;
+    public $id_state;
+    public $city;
+    public $zipcode;
+    public $address;
+    public $phone;
+    public $use_global_max_order_date;
+    public $max_order_date;
+    public $use_global_preparation_time;
+    public $preparation_time;
 
     protected $webserviceParameters = array(
         'objectsNodeName' => 'hotels',
@@ -71,28 +84,43 @@ class HotelBranchInformation extends ObjectModel
             'delete' => 'deleteWs',
             'update' => 'updateWs',
         ),
-
         'fields' => array(
+            'phone' => array('required' => true),
+            'address' => array('required' => true),
+            'id_country' => array(
+                'required' => true,
+                'xlink_resource'=> 'countries',
+            ),
+            'id_state' => array(
+                'xlink_resource'=> 'states',
+            ),
+            'city' => array(
+                'required' => true,
+            ),
+            'zipcode' => array(),
             'id_default_image' => array(
                 'getter' => 'getCoverWs',
+                'setter' => 'setCoverWs',
                 'xlink_resource' => array(
-                    'resourceName' => 'hotel_images',
+                    'resourceName' => 'images',
+                    'subResourceName' => 'hotels'
                 )
             ),
-            'max_order_date' => array(
-                'getter' => 'getWsMaxOrderDate',
-                'setter' => 'setWsMaxOrderDate',
-            ),
+            'use_global_max_order_date' => array(),
+            'max_order_date' => array(),
+            'use_global_preparation_time' => array(),
+            'preparation_time' => array(),
         ),
-
+        'hidden_fields' => array (
+            'id_category',
+        ),
         'associations' => array(
             'room_types' => array(
                 'setter' => false,
                 'resource' => 'room_types',
                 'fields' => array('id' => array())
             ),
-            'hotel_images' => array(
-                'setter' => false,
+            'images' => array(
                 'resource' => 'image',
                 'fields' => array('id' => array())
             ),
@@ -111,6 +139,25 @@ class HotelBranchInformation extends ObjectModel
     {
         $this->moduleInstance = Module::getInstanceByName('hotelreservationsystem');
         parent::__construct($id, $id_lang, $id_shop);
+
+        $this->use_global_max_order_date = $this->max_order_date = $this->use_global_preparation_time = $this->preparation_time = $this->id_country = $this->id_state = $this->city = $this->zipcode = $this->address = $this->phone = null;
+        if ($id) {
+            if ($hotelAddress = $this->getAddress($id)) {
+                $this->id_country = $hotelAddress['id_country'];
+                $this->id_state = $hotelAddress['id_state'];
+                $this->city = $hotelAddress['city'];
+                $this->zipcode = $hotelAddress['postcode'];
+                $this->address = $hotelAddress['address1'];
+                $this->phone = $hotelAddress['phone'];
+            }
+
+            if ($hotelRestrictions = HotelOrderRestrictDate::getDataByHotelId($id)) {
+                $this->use_global_max_order_date = $hotelRestrictions['use_global_max_order_date'];
+                $this->max_order_date = $hotelRestrictions['max_order_date'];
+                $this->use_global_preparation_time = $hotelRestrictions['use_global_preparation_time'];
+                $this->preparation_time = $hotelRestrictions['preparation_time'];
+            }
+        }
     }
 
     public function add($autodate = true, $null_values = false)
@@ -136,10 +183,10 @@ class HotelBranchInformation extends ObjectModel
 
         /* Query definition */
         $query = 'REPLACE INTO `'._DB_PREFIX_.'htl_access` (`id_profile`, `id_hotel`, `access`)';
-        $query .= ' VALUES '.'('.(int) _PS_ADMIN_PROFILE_.', '.(int)$idHotel.', 1)';
+        $query .= ' VALUES '.'(1, '.(int)$idHotel.', 1)';
         /* Profile selection */
-        $profiles = Db::getInstance()->executeS('SELECT `id_profile` FROM '._DB_PREFIX_.'profile WHERE `id_profile` != '.(int) _PS_ADMIN_PROFILE_);
-        if ($profiles) {
+        $profiles = Db::getInstance()->executeS('SELECT `id_profile` FROM '._DB_PREFIX_.'profile WHERE `id_profile` != 1');
+        if (!$profiles || empty($profiles)) {
             foreach ($profiles as $profile) {
                 $access = 0;
                 if (isset($context->employee->id_profile)) {
@@ -814,7 +861,7 @@ class HotelBranchInformation extends ObjectModel
     {
         if ($result = HotelImage::getCover($this->id)) {
             // we are sending id_hotel/id_image as per the url set for the hotel images
-            return $result['id_hotel'].'/'.$result['id'];
+            return $result['id'];
         }
         return false;
     }
@@ -825,24 +872,26 @@ class HotelBranchInformation extends ObjectModel
     */
     public function setCoverWs($id_image)
     {
-        // first unset the cover
-        Db::getInstance()->execute('UPDATE `'._DB_PREFIX_.'htl_image` SET `cover` = NULL
-			WHERE `id_hotel` = '.(int)$this->id);
+        if ($id_image) {
+            // first unset the cover
+            Db::getInstance()->execute('UPDATE `'._DB_PREFIX_.'htl_image` SET `cover` = NULL
+                WHERE `id_hotel` = '.(int)$this->id);
 
-        // set the sent id of the image to the cover of the hotel
-        Db::getInstance()->execute('UPDATE `'._DB_PREFIX_.'htl_image` SET `cover` = 1 WHERE `id_image` = '.(int)$id_image);
+            // set the sent id of the image to the cover of the hotel
+            Db::getInstance()->execute('UPDATE `'._DB_PREFIX_.'htl_image` SET `cover` = 1 WHERE `id` = '.(int)$id_image.' AND `id_hotel` = '.(int)$this->id);
+        }
 
         return true;
     }
 
     // Webservice:: function to prepare id parameter for hotel images in a hotel api
-    public function getWsHotelImages()
+    public function getWsImages()
     {
         $ids = array();
         if ($hotelImages =  Db::getInstance()->executeS('SELECT * FROM `'._DB_PREFIX_.'htl_image` WHERE `id_hotel` = '.(int)$this->id)) {
             foreach ($hotelImages as $key => $image) {
                 // we are sending id_hotel/id_image as per the url set for the hotel images
-                $ids[$key]['id'] = $image['id_hotel'].'/'.$image['id'];
+                $ids[$key]['id'] = $image['id'];
             }
         }
         return $ids;
@@ -866,7 +915,7 @@ class HotelBranchInformation extends ObjectModel
         );
 
         foreach ($branchFeatures as $feature) {
-            Db::getInstance()->execute('INSERT INTO `'._DB_PREFIX_.'htl_branch_features` (`id_hotel`, `feature_id`) VALUES ('.(int)$this->id.', '.(int)$feature['id'].')');
+            Db::getInstance()->execute('INSERT INTO `'._DB_PREFIX_.'htl_branch_features` (`id_hotel`, `feature_id`, `date_add`, `date_upd`) VALUES ('.(int)$this->id.', '.(int)$feature['id'].', NOW(), NOW())');
         }
 
         return true;
@@ -889,7 +938,7 @@ class HotelBranchInformation extends ObjectModel
         );
 
         foreach ($refundRules as $rule) {
-            Db::getInstance()->execute('INSERT INTO `'._DB_PREFIX_.'htl_branch_refund_rules` (`id_hotel`, `id_refund_rule`) VALUES ('.(int)$this->id.', '.(int)$rule['id'].')');
+            Db::getInstance()->execute('INSERT INTO `'._DB_PREFIX_.'htl_branch_refund_rules` (`id_hotel`, `id_refund_rule`, `date_add`, `date_upd`) VALUES ('.(int)$this->id.', '.(int)$rule['id'].', NOW(), NOW())');
         }
 
         return true;
@@ -903,49 +952,22 @@ class HotelBranchInformation extends ObjectModel
         );
     }
 
-    // Webservice :: get max order date of the hotel
-    public function getWsMaxOrderDate()
-    {
-        return Db::getInstance()->getValue(
-            'SELECT `max_order_date` FROM `'._DB_PREFIX_.'htl_order_restrict_date` WHERE `id_hotel` = '.(int)$this->id.' ORDER BY `id` ASC'
-        );
-    }
-
-    // Webservice :: set max order date of the hotel
-    public function setWsMaxOrderDate($maxOrderDate)
-    {
-        if ($this->id) {
-            // delete previous
-            Db::getInstance()->execute('
-                DELETE FROM `'._DB_PREFIX_.'htl_order_restrict_date`
-                WHERE `id_hotel` = '.(int)$this->id
-            );
-
-            // set max_order_date for the hotel from request
-            return Db::getInstance()->execute('INSERT INTO `'._DB_PREFIX_.'htl_order_restrict_date` (`id_hotel`, `max_order_date`) VALUES ('.(int)$this->id.', \''.pSQL($maxOrderDate).'\')');
-        }
-    }
-
     // Webservice :: function will run when hotel added from API
     public function addWs($autodate = true, $null_values = false)
     {
         if ($this->add($autodate, $null_values)) {
+            // Set hotel address
+            $this->setWsHotelAddress();
+
+            // set hotel restrictions
+            $this->setWsHotelRestrictions();
+
             // set categories of the hotel
             $this->setWsHotelCategories();
 
-            $postData = trim(file_get_contents('php://input'));
-            libxml_use_internal_errors(true);
-            $xml = simplexml_load_string(utf8_decode($postData));
-
-            $hotelData = json_decode(json_encode($xml));
-            if (isset($hotelData->hotel->max_order_date)) {
-                if ($maxOrderDate = $hotelData->hotel->max_order_date) {
-                    $this->setWsMaxOrderDate($maxOrderDate);
-                }
-            }
-
             return true;
         }
+
         return false;
     }
 
@@ -953,23 +975,259 @@ class HotelBranchInformation extends ObjectModel
     public function updateWs($null_values = false)
     {
         if ($this->update($null_values)) {
+            // Set hotel address
+            $this->setWsHotelAddress();
+
+            // set hotel restrictions
+            $this->setWsHotelRestrictions();
+
             // set categories of the hotel
             $this->setWsHotelCategories();
 
-            $postData = trim(file_get_contents('php://input'));
-            libxml_use_internal_errors(true);
-            $xml = simplexml_load_string(utf8_decode($postData));
+            return true;
+        }
 
-            $hotelData = json_decode(json_encode($xml));
-            if (isset($hotelData->hotel->max_order_date)) {
-                if ($maxOrderDate = $hotelData->hotel->max_order_date) {
-                    $this->setWsMaxOrderDate($maxOrderDate);
+        return false;
+    }
+
+    public function setWsHotelAddress()
+    {
+        if ($idHotelAddress = $this->getHotelIdAddress()) {
+            $objAddress = new Address($idHotelAddress);
+        } else {
+            $objAddress = new Address();
+        }
+
+        $hotelName = $this->hotel_name[Configuration::get('PS_LANG_DEFAULT')];
+        $hotelName = preg_replace('/[0-9!<>,;"?=+()@#°{}_$%:]*/u', '', $hotelName);
+
+        $objAddress->id_hotel = $this->id;
+        $objAddress->id_country = $this->id_country;
+        $objAddress->id_state = $this->id_state;
+        $objAddress->city = $this->city;
+        $objAddress->postcode = $this->zipcode;
+        $objAddress->lastname = $hotelName;
+        $objAddress->firstname = $hotelName;
+        $objAddress->alias = $hotelName;
+        $objAddress->address1 = $this->address;
+        $objAddress->phone = $this->phone;
+
+        return $objAddress->save();
+    }
+
+    public function setWsHotelRestrictions()
+    {
+        if ($this->id) {
+            // save maximum booking date and preparation time
+            if ($restrictDateInfo = HotelOrderRestrictDate::getDataByHotelId($this->id)) {
+                $objHotelRestrictDate = new HotelOrderRestrictDate($restrictDateInfo['id']);
+            } else {
+                $objHotelRestrictDate = new HotelOrderRestrictDate();
+            }
+
+            $objHotelRestrictDate->id_hotel = $this->id;
+            $objHotelRestrictDate->use_global_max_order_date = $this->use_global_max_order_date;
+            if (!$this->use_global_max_order_date) {
+                $objHotelRestrictDate->max_order_date = $this->max_order_date;
+            }
+            $objHotelRestrictDate->use_global_preparation_time = $this->use_global_preparation_time;
+            if (!$this->use_global_preparation_time) {
+                $objHotelRestrictDate->preparation_time = $this->preparation_time;
+            }
+
+            return $objHotelRestrictDate->save();
+        }
+    }
+
+    public function validateFields($die = true, $error_return = false)
+    {
+        // set additional hotel address and restriction fields validations here
+        if (isset($this->webservice_validation) && $this->webservice_validation) {
+            if ($this->rating < 1 || $this->rating > 5) {
+                $message = Tools::displayError('Rating must be between 1 and 5.');
+                if ($die) {
+                    throw new PrestaShopException($message);
+                }
+                return $error_return ? $message : false;
+            }
+
+            if (!strtotime($this->check_in)) {
+                $message = Tools::displayError('Check In time is invalid.');
+                if ($die) {
+                    throw new PrestaShopException($message);
+                }
+                return $error_return ? $message : false;
+            }
+            if (!strtotime($this->check_out)) {
+                $message = Tools::displayError('Check out time is invalid.');
+                if ($die) {
+                    throw new PrestaShopException($message);
+                }
+                return $error_return ? $message : false;
+            }
+
+            if ($this->check_in && $this->check_out && strtotime($this->check_out) >= strtotime($this->check_in)) {
+                $message = Tools::displayError('Check Out time must be before Check In time.');
+                if ($die) {
+                    throw new PrestaShopException($message);
+                }
+                return $error_return ? $message : false;
+            }
+            if (!$this->phone) {
+                $message = Tools::displayError('Phone number is required field.');
+                if ($die) {
+                    throw new PrestaShopException($message);
+                }
+                return $error_return ? $message : false;
+            } elseif (!Validate::isPhoneNumber($this->phone)) {
+                $message = Tools::displayError('Please enter a valid phone number.');
+                if ($die) {
+                    throw new PrestaShopException($message);
+                }
+                return $error_return ? $message : false;
+            }
+            if ($this->address == '') {
+                $message = Tools::displayError('Address is required field.');
+                if ($die) {
+                    throw new PrestaShopException($message);
+                }
+                return $error_return ? $message : false;
+            } elseif (!Validate::isAddress($this->address)) {
+                $message = Tools::displayError('Address is invalid.');
+                if ($die) {
+                    throw new PrestaShopException($message);
+                }
+                return $error_return ? $message : false;
+            }
+
+            if (!$this->id_country) {
+                $message = Tools::displayError('Country is required field.');
+                if ($die) {
+                    throw new PrestaShopException($message);
+                }
+                return $error_return ? $message : false;
+            } else {
+                if (Validate::isLoadedObject($objCountry = new Country($this->id_country))) {
+                    $statesbycountry = State::getStatesByIdCountry($this->id_country);
+                    /*If selected country has states only the validate state field*/
+                    if ($this->id_state) {
+                        $objState = new State($this->id_state);
+                        if ($objState->id_country != $this->id_country) {
+                            $message = Tools::displayError('State is invalid.');
+                            if ($die) {
+                                throw new PrestaShopException($message);
+                            }
+                            return $error_return ? $message : false;
+                        }
+                    } else {
+                        if ($statesbycountry) {
+                            $message = Tools::displayError('State is required field.');
+                            if ($die) {
+                                throw new PrestaShopException($message);
+                            }
+                            return $error_return ? $message : false;
+                        }
+                    }
+                    /* Check zip code format */
+                    if (empty($this->zipcode) && $objCountry->need_zip_code) {
+                        $message = Tools::displayError('A Zip / Postal code is required.');
+                        if ($die) {
+                            throw new PrestaShopException($message);
+                        }
+                        return $error_return ? $message : false;
+                    } elseif ($objCountry->zip_code_format && !$objCountry->checkZipCode($this->zipcode)) {
+                        $message = sprintf(Tools::displayError('The Zip/Postal code you have entered is invalid. It must follow this format: %s'), str_replace('C', $objCountry->iso_code, str_replace('N', '0', str_replace('L', 'A', $objCountry->zip_code_format))));
+                        if ($die) {
+                            throw new PrestaShopException($message);
+                        }
+                        return $error_return ? $message : false;
+                    } elseif ($this->zipcode && !Validate::isPostCode($this->zipcode)) {
+                        $message = Tools::displayError('The Zip / Postal code is invalid.');
+                        if ($die) {
+                            throw new PrestaShopException($message);
+                        }
+                        return $error_return ? $message : false;
+                    }
+                } else {
+                    $message = Tools::displayError('country is invalid.');
+                    if ($die) {
+                        throw new PrestaShopException($message);
+                    }
+                    return $error_return ? $message : false;
                 }
             }
 
-            return true;
+            if ($this->city == '') {
+                $message = Tools::displayError('City is required field.');
+                if ($die) {
+                    throw new PrestaShopException($message);
+                }
+                return $error_return ? $message : false;
+            } elseif (!Validate::isCityName($this->city)) {
+                $message = Tools::displayError('Enter a Valid City Name.');
+                if ($die) {
+                    throw new PrestaShopException($message);
+                }
+                return $error_return ? $message : false;
+            }
+
+            if (!Validate::isBool($this->use_global_max_order_date)) {
+                $message = Tools::displayError('invalid value for use_global_max_order_date.');
+                if ($die) {
+                    throw new PrestaShopException($message);
+                }
+                return $error_return ? $message : false;
+            }
+
+            if (!Validate::isBool($this->use_global_preparation_time)) {
+                $message = Tools::displayError('invalid value for use_global_preparation_time.');
+                if ($die) {
+                    throw new PrestaShopException($message);
+                }
+                return $error_return ? $message : false;
+            }
+
+            if (!$this->use_global_max_order_date) {
+                $maxOrderDateFormatted = date('Y-m-d', strtotime($this->max_order_date));
+                if ($this->max_order_date == '') {
+                    $message = Tools::displayError('Maximum date to book a room is required.');
+                    if ($die) {
+                        throw new PrestaShopException($message);
+                    }
+                    return $error_return ? $message : false;
+                } elseif (!Validate::isDate($this->max_order_date)) {
+                    $message = Tools::displayError('Maximum date to book a room is invalid.');
+                    if ($die) {
+                        throw new PrestaShopException($message);
+                    }
+                    return $error_return ? $message : false;
+                } elseif (strtotime($maxOrderDateFormatted) < strtotime(date('Y-m-d'))) {
+                    $message = Tools::displayError('Maximum Global Date to book a room can not be a past date. Please use a future date.');
+                    if ($die) {
+                        throw new PrestaShopException($message);
+                    }
+                    return $error_return ? $message : false;
+                }
+            }
+
+            if (!$this->use_global_preparation_time) {
+                if ($this->preparation_time === '') {
+                    $message = Tools::displayError('Preparation time is a required.');
+                    if ($die) {
+                        throw new PrestaShopException($message);
+                    }
+                    return $error_return ? $message : false;
+                } elseif ($this->preparation_time !== '0' && !Validate::isUnsignedInt($this->preparation_time)) {
+                    $message = Tools::displayError('Preparation time is invalid.');
+                    if ($die) {
+                        throw new PrestaShopException($message);
+                    }
+                    return $error_return ? $message : false;
+                }
+            }
         }
-        return false;
+
+        return parent::validateFields($die, $error_return);
     }
 
     // Webservice :: function will run when hotel deleted from API
@@ -997,18 +1255,19 @@ class HotelBranchInformation extends ObjectModel
                 }
             }
             $objCountry = new Country();
-            $countryName = $objCountry->getNameById($idLang, $this->country_id);
+            $countryName = $objCountry->getNameById($idLang, $this->id_country);
             if ($catCountry = $this->addCategory($countryName, false, $groupIds)) {
-                if ($this->state_id) {
+                if ($this->id_state) {
                     $objState = new State();
-                    $stateName = $objState->getNameById($this->state_id);
+                    $stateName = $objState->getNameById($this->id_state);
+
                     $catState = $this->addCategory($stateName, $catCountry, $groupIds);
                 } else {
                     $catState = $this->addCategory($this->city, $catCountry, $groupIds);
                 }
                 if ($catState) {
                     if ($catCity = $this->addCategory($this->city, $catState, $groupIds)) {
-                        $hotelCatName = $this->hotel_name;
+                        $hotelCatName = $this->hotel_name[Configuration::get('PS_LANG_DEFAULT')];
                         if ($catHotel = $this->addCategory(
                             $hotelCatName, $catCity, $groupIds, 1, $this->id
                         )) {
@@ -1041,4 +1300,24 @@ class HotelBranchInformation extends ObjectModel
 
         return false;
     }
+
+    public function searchByName($query, $idEmployeeProfile, $idLang = false)
+    {
+        if (!$idLang) {
+            $idLang = Context::getContext()->language->id;
+        }
+
+        $sql = 'SELECT a.`id`, a.`active`, hbl.`hotel_name`, aa.`city`, s.`name` AS `state_name`, cl.`name` AS `country_name`
+            FROM `'._DB_PREFIX_.'htl_branch_info` a
+            LEFT JOIN  `'._DB_PREFIX_.'htl_branch_info_lang` hbl ON hbl.`id` = a.`id` AND hbl.`id_lang` = '.(int)$idLang.'
+            LEFT JOIN  `'._DB_PREFIX_.'address` aa ON aa.`id_hotel` = a.`id`
+            LEFT JOIN `'._DB_PREFIX_.'state` s ON s.`id_state` = aa.`id_state`
+            LEFT JOIN `'._DB_PREFIX_.'country_lang` cl ON cl.`id_country` = aa.`id_country` AND cl.`id_lang` = hbl.`id_lang`
+            LEFT JOIN `'._DB_PREFIX_.'htl_access` ha ON a.`id` = ha.`id_hotel`
+            WHERE hbl.`hotel_name` LIKE \'%'.pSQL($query).'%\'
+            AND ha.`access`= 1 AND ha.`id_profile` = '.(int) $idEmployeeProfile;
+
+        return Db::getInstance()->executeS($sql);
+    }
+
 }

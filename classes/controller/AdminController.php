@@ -397,6 +397,14 @@ class AdminControllerCore extends Controller
 
     /** @var int level for permissions View/read */
     const LEVEL_VIEW = 1;
+    const QLO_SEARCH_TYPE_CATELOG = 1;
+    const QLO_SEARCH_TYPE_CUSTOMER_BY_NAME = 2;
+    const QLO_SEARCH_TYPE_ORDER = 3;
+    const QLO_SEARCH_TYPE_INVOICE = 4;
+    const QLO_SEARCH_TYPE_CART = 5;
+    const QLO_SEARCH_TYPE_CUSTOMER_BY_IP = 6;
+    const QLO_SEARCH_TYPE_MODULE = 7;
+    const QLO_SEARCH_TYPE_HOTEL = 8;
 
     public function __construct()
     {
@@ -407,6 +415,9 @@ class AdminControllerCore extends Controller
 
         $this->controller_type = 'admin';
         $this->controller_name = get_class($this);
+        if (strpos($this->controller_name, 'ControllerOverride')) {
+            $this->controller_name = substr($this->controller_name, 0, -18);
+        }
         if (strpos($this->controller_name, 'Controller')) {
             $this->controller_name = substr($this->controller_name, 0, -10);
         }
@@ -875,13 +886,15 @@ class AdminControllerCore extends Controller
 
                 if ($field = $this->filterToField($key, $filter)) {
                     $type = (array_key_exists('filter_type', $field) ? $field['filter_type'] : (array_key_exists('type', $field) ? $field['type'] : false));
-                    if (($type == 'date' || $type == 'datetime' || $type == 'range') && is_string($value)) {
+                    if ((($type == 'date' || $type == 'datetime' || $type == 'range') || ($type == 'select' && (isset($field['multiple']) && $field['multiple'])))
+                        && is_string($value)
+                    ) {
                         $value = json_decode($value, true);
                     }
                     $key = isset($tmp_tab[1]) ? $tmp_tab[0].'.`'.$tmp_tab[1].'`' : '`'.$tmp_tab[0].'`';
 
                     // as in database 0 means position 1 in the renderlist
-                    if (isset($field['position'])) {
+                    if (isset($field['position']) && Validate::isInt($value)) {
                         $value -= 1;
                     }
 
@@ -893,21 +906,35 @@ class AdminControllerCore extends Controller
                     } else {
                         $sql_filter = & $this->_filter;
                     }
-                    /* Only for date filtering (from, to) */
+
                     if (is_array($value)) {
-                        if ($type == 'range') {
-                            if (isset($value[0]) && !empty($value[0])) {
-                                if (!Validate::isUnsignedInt($value[0])) {
+                        if ($type == 'select' && (isset($field['multiple']) && $field['multiple']) && isset($field['operator'])) {
+                            if ($field['operator'] == 'and') {
+                                $sql_filter .= ' AND '.pSQL($key).' IN ('.pSQL(implode(',', $value)).')';
+                                $this->_filterHaving .= ' AND COUNT(DISTINCT '.pSQL($key).') = '.(int) count($value);
+                            } elseif ($field['operator'] == 'or') {
+                                $sql_filter .= ' AND '.pSQL($key).' IN ('.pSQL(implode(',', $value)).')';
+                            }
+                        } elseif ($type == 'range') {
+                            // set validation type
+                            if (isset($field['validation']) && $field['validation'] && method_exists('Validate', $field['validation'])) {
+                                $validation = $field['validation'];
+                            } else {
+                                $validation = 'isUnsignedInt';
+                            }
+
+                            if (isset($value[0]) && ($value[0] !== '' || $value[0] === 0)) {
+                                if (!Validate::$validation($value[0])) {
                                     $this->errors[] = Tools::displayError('The \'From\' value is invalid');
                                 } else {
                                     $sql_filter .= ' AND '.pSQL($key).' >= '.pSQL($value[0]);
                                 }
                             }
-                            if (isset($value[1]) && !empty($value[1])) {
-                                if (!Validate::isUnsignedInt($value[1])) {
-                                    $this->errors[] = Tools::displayError('The \'From\' value is invalid');
-                                } elseif (isset($value[0]) && !empty($value[0]) && $value[0] > $value[1]) {
-                                    $this->errors[] = Tools::displayError('The \'To\' value cannot be less than from value');
+                            if (isset($value[1]) && ($value[1] !== '' || $value[1] === 0)) {
+                                if (!Validate::$validation($value[1])) {
+                                    $this->errors[] = Tools::displayError('The \'To\' value is invalid');
+                                } elseif ((isset($value[0]) && ($value[0] !== '' || $value[0] === 0)) && $value[0] > $value[1]) {
+                                    $this->errors[] = Tools::displayError('The \'To\' value cannot be less than \'From\' value');
                                 } else {
                                     $sql_filter .= ' AND '.pSQL($key).' <= '.pSQL($value[1]);
                                 }
@@ -925,7 +952,7 @@ class AdminControllerCore extends Controller
                                 if (!Validate::isDate($value[1])) {
                                     $this->errors[] = Tools::displayError('The \'To\' date format is invalid (YYYY-MM-DD)');
                                 } elseif (isset($value[0]) && !empty($value[0]) && strtotime($value[0]) > strtotime($value[1])) {
-                                    $this->errors[] = Tools::displayError('The \'To\' date cannot be before than from date');
+                                    $this->errors[] = Tools::displayError('The \'To\' date cannot be earlier than \'From\' date');
                                 } else {
                                     $sql_filter .= ' AND '.pSQL($key).' <= \''.pSQL(Tools::dateTo($value[1])).'\'';
                                 }
@@ -2030,6 +2057,14 @@ class AdminControllerCore extends Controller
                 'employee' => $this->context->employee,
                 'search_type' => Tools::getValue('bo_search_type'),
                 'bo_query' => Tools::safeOutput(Tools::stripslashes(Tools::getValue('bo_query'))),
+                'QLO_SEARCH_TYPE_CATELOG' => self::QLO_SEARCH_TYPE_CATELOG,
+                'QLO_SEARCH_TYPE_CUSTOMER_BY_NAME' => self::QLO_SEARCH_TYPE_CUSTOMER_BY_NAME,
+                'QLO_SEARCH_TYPE_CUSTOMER_BY_IP' => self::QLO_SEARCH_TYPE_CUSTOMER_BY_IP,
+                'QLO_SEARCH_TYPE_ORDER' => self::QLO_SEARCH_TYPE_ORDER,
+                'QLO_SEARCH_TYPE_INVOICE' => self::QLO_SEARCH_TYPE_INVOICE,
+                'QLO_SEARCH_TYPE_CART' => self::QLO_SEARCH_TYPE_CART,
+                'QLO_SEARCH_TYPE_MODULE' => self::QLO_SEARCH_TYPE_MODULE,
+                'QLO_SEARCH_TYPE_HOTEL' => self::QLO_SEARCH_TYPE_HOTEL,
                 'quick_access' => $quick_access,
                 'multi_shop' => Shop::isFeatureActive(),
                 'shop_list' => $helperShop->getRenderedShopList(),
@@ -2171,6 +2206,8 @@ class AdminControllerCore extends Controller
      */
     protected function initTabModuleList()
     {
+        $this->tab_modules_list = Tab::getTabModulesList($this->id);
+
         if (is_array($this->tab_modules_list['default_list']) && count($this->tab_modules_list['default_list'])) {
             $this->filter_modules_list = $this->tab_modules_list['default_list'];
         } elseif (is_array($this->tab_modules_list['slider_list']) && count($this->tab_modules_list['slider_list'])) {
@@ -2343,16 +2380,6 @@ class AdminControllerCore extends Controller
 
         //Force override translation key
         Context::getContext()->override_controller_name_for_translations = 'AdminModules';
-
-        $this->modals[] = array(
-            'modal_id' => 'modal_addons_connect',
-            'modal_class' => 'modal-md',
-            'modal_title' => '<i class="icon-puzzle-piece"></i> <a target="_blank" href="http://addons.prestashop.com/'
-            .'?utm_source=back-office&utm_medium=modules'
-            .'&utm_campaign=back-office-'.Tools::strtoupper($this->context->language->iso_code)
-            .'&utm_content='.(defined('_PS_HOST_MODE_') ? 'cloud' : 'download').'">PrestaShop Addons</a>',
-            'modal_content' => $this->context->smarty->fetch('controllers/modules/login_addons.tpl'),
-        );
 
         //After override translation, remove it
         Context::getContext()->override_controller_name_for_translations = null;
@@ -4018,9 +4045,23 @@ class AdminControllerCore extends Controller
                 $object = new $this->className((int)$id);
                 $object->setFieldsToUpdate(array('active' => true));
                 $object->active = (int)$status;
-                $result &= $object->update();
+                $isUpdated = (bool) $object->update();
+                $result &= $isUpdated;
+
+                if (!$isUpdated) {
+                    $this->errors[] = sprintf($this->l('Can\'t update #%d status.'), (int) $id);
+                }
             }
+
+            if ($result) {
+                $this->redirect_after = self::$currentIndex.'&conf=5&token='.$this->token;
+            } else {
+                $this->errors[] = $this->l('An error occurred while updating the status.');
+            }
+        } else {
+            $this->errors[] = $this->l('You must select at least one item to perform a bulk action.');
         }
+
         return $result;
     }
 

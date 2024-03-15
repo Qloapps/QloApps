@@ -353,10 +353,8 @@ class HTMLTemplateInvoiceCore extends HTMLTemplate
                         } else {
                             $order_bk_data = $obj_htl_bk_dtl->getOnlyOrderBookingData($this->order->id, $customer->id_guest, $type_value['product_id']);
                         }
-                        $rm_dtl = $obj_rm_type->getRoomTypeInfoByIdProduct($type_value['product_id']);
 
                         $cart_htl_data[$type_key]['id_product'] = $type_value['product_id'];
-                        $cart_htl_data[$type_key]['hotel_name']    = $rm_dtl['hotel_name'];
                         $objBookingDemand = new HotelBookingDemands();
                         foreach ($order_bk_data as $data_k => $data_v) {
                             $date_join = strtotime($data_v['date_from']).strtotime($data_v['date_to']);
@@ -368,6 +366,7 @@ class HTMLTemplateInvoiceCore extends HTMLTemplate
                             $unit_price_tax_excl = $order_details_obj->unit_price_tax_excl;
                             $unit_price_tax_incl = $order_details_obj->unit_price_tax_incl;
 
+                            $cart_htl_data[$type_key]['hotel_name'] = $data_v['hotel_name'];
                             $cart_htl_data[$type_key]['name'] = $order_details_obj->product_name;
                             $cart_htl_data[$type_key]['unit_price_tax_excl'] = $unit_price_tax_excl;
                             $cart_htl_data[$type_key]['unit_price_tax_incl'] = $unit_price_tax_incl;
@@ -634,7 +633,6 @@ class HTMLTemplateInvoiceCore extends HTMLTemplate
             'tax_excluded_display' => $tax_excluded_display,
             'display_product_images' => $display_product_images,
             'layout' => $layout,
-            'tax_tab' => $this->getTaxTabContent(),
             'customer' => $customer,
             'footer' => $footer,
             'ps_price_compute_precision' => _PS_PRICE_COMPUTE_PRECISION_,
