@@ -218,6 +218,9 @@
 	<configuration id="PS_CONDITIONS_CMS_ID" name="PS_CONDITIONS_CMS_ID">
 		<value>3</value>
 	</configuration>
+	<configuration id="PS_ORDER_LIST_PRICE_DISPLAY_CURRENCY" name="PS_ORDER_LIST_PRICE_DISPLAY_CURRENCY">
+		<value>1</value>
+	</configuration>
 	<configuration id="TRACKING_DIRECT_TRAFFIC" name="TRACKING_DIRECT_TRAFFIC">
 		<value>0</value>
 	</configuration>

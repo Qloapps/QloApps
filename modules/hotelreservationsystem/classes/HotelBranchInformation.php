@@ -1286,4 +1286,24 @@ class HotelBranchInformation extends ObjectModel
 
         return false;
     }
+
+    public function searchByName($query, $idEmployeeProfile, $idLang = false)
+    {
+        if (!$idLang) {
+            $idLang = Context::getContext()->language->id;
+        }
+
+        $sql = 'SELECT a.`id`, a.`active`, hbl.`hotel_name`, aa.`city`, s.`name` AS `state_name`, cl.`name` AS `country_name`
+            FROM `'._DB_PREFIX_.'htl_branch_info` a
+            LEFT JOIN  `'._DB_PREFIX_.'htl_branch_info_lang` hbl ON hbl.`id` = a.`id` AND hbl.`id_lang` = '.(int)$idLang.'
+            LEFT JOIN  `'._DB_PREFIX_.'address` aa ON aa.`id_hotel` = a.`id`
+            LEFT JOIN `'._DB_PREFIX_.'state` s ON s.`id_state` = aa.`id_state`
+            LEFT JOIN `'._DB_PREFIX_.'country_lang` cl ON cl.`id_country` = aa.`id_country` AND cl.`id_lang` = hbl.`id_lang`
+            LEFT JOIN `'._DB_PREFIX_.'htl_access` ha ON a.`id` = ha.`id_hotel`
+            WHERE hbl.`hotel_name` LIKE \'%'.pSQL($query).'%\'
+            AND ha.`access`= 1 AND ha.`id_profile` = '.(int) $idEmployeeProfile;
+
+        return Db::getInstance()->executeS($sql);
+    }
+
 }

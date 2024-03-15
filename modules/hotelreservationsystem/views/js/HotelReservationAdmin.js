@@ -705,12 +705,6 @@ $(document).ready(function() {
         //for calender Css
         beforeShowDay: function (date) {
             return highlightDateBorder($("#feature_plan_date_to").val(), date);
-        },
-        onSelect: function(selectedDate) {
-            let objDateFromMax = $.datepicker.parseDate('dd-mm-yy', selectedDate);
-            objDateFromMax.setDate(objDateFromMax.getDate() - 1);
-
-            $('#feature_plan_date_from').datepicker('option', 'maxDate', objDateFromMax);
         }
     });
 

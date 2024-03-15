@@ -61,11 +61,14 @@ class AdminOrdersControllerCore extends AdminController
         $this->context = Context::getContext();
 
         $this->_select = '
-        (a.total_paid - a.total_paid_real) AS `amount_due`, a.source AS order_source,
+        IF('.((Configuration::get('PS_ORDER_LIST_PRICE_DISPLAY_CURRENCY') == Order::ORDER_LIST_PRICE_DISPLAY_IN_DEFAULT_CURRENCY)? 1 : 0).', (a.total_paid_tax_incl / a.conversion_rate), total_paid_tax_incl) AS total_paid_tax_incl,
+        IF('.((Configuration::get('PS_ORDER_LIST_PRICE_DISPLAY_CURRENCY') == Order::ORDER_LIST_PRICE_DISPLAY_IN_DEFAULT_CURRENCY)? 1 : 0).', ((a.total_paid - a.total_paid_real) / a.conversion_rate), (a.total_paid - a.total_paid_real)) AS amount_due,
+        a.source AS order_source,
         a.id_currency,
         a.id_order AS id_pdf,
         CONCAT(c.`firstname`, \' \', c.`lastname`) AS `customer`,
         osl.`name` AS `osname`, os.`color`,
+        cu.iso_code AS currency,
         IF((SELECT so.id_order FROM `'._DB_PREFIX_.'orders` so WHERE so.id_customer = a.id_customer AND so.id_order < a.id_order LIMIT 1) > 0, 0, 1) as new,
         IF(a.valid, 1, 0) badge_success,
         hbil.`hotel_name`,
@@ -81,6 +84,7 @@ class AdminOrdersControllerCore extends AdminController
 
         $this->_join = '
         LEFT JOIN `'._DB_PREFIX_.'customer` c ON (c.`id_customer` = a.`id_customer`)
+        LEFT JOIN `'._DB_PREFIX_.'currency` cu ON (cu.`id_currency` = a.`id_currency`)
         LEFT JOIN `'._DB_PREFIX_.'order_state` os ON (os.`id_order_state` = a.`current_state`)
         LEFT JOIN `'._DB_PREFIX_.'order_state_lang` osl ON (os.`id_order_state` = osl.`id_order_state` AND osl.`id_lang` = '.(int) $this->context->language->id.')
         LEFT JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd ON (hbd.`id_order` = a.`id_order`)
@@ -254,6 +258,11 @@ class AdminOrdersControllerCore extends AdminController
             'payment' => array(
                 'title' => $this->l('Payment')
             ),
+            'currency' => array(
+                'title' => $this->l('Order Currency'),
+                'hint' => $this->l('This is the currency in which customer created the order.'),
+                'havingFilter' => true,
+            ),
             'order_source' => array(
                 'title' => $this->l('Order Source'),
                 'type' => 'select',
@@ -316,12 +325,19 @@ class AdminOrdersControllerCore extends AdminController
         }
 
         parent::__construct();
+
+        $this->_conf[52] = $this->l('Room in the booking is successfully reallocated');
+        $this->_conf[53] = $this->l('Room in the booking is successfully swapped');
     }
 
-    public static function setOrderCurrency($echo, $tr)
+    public static function setOrderCurrency($echo, $row)
     {
-        $order = new Order($tr['id_order']);
-        return Tools::displayPrice($echo, (int)$order->id_currency);
+        if (Configuration::get('PS_ORDER_LIST_PRICE_DISPLAY_CURRENCY') == Order::ORDER_LIST_PRICE_DISPLAY_IN_DEFAULT_CURRENCY) {
+            $idCurrency = Configuration::get('PS_CURRENCY_DEFAULT');
+        } else {
+            $idCurrency = $row['id_currency'];
+        }
+        return Tools::displayPrice($echo, (int)$idCurrency);
     }
 
     public function renderForm()
@@ -603,75 +619,94 @@ class AdminOrdersControllerCore extends AdminController
 
     public function postProcess()
     {
-        // by webkul for reallocation of rooms
+        // Process reallocation of rooms
         if (Tools::isSubmit('realloc_allocated_rooms')) {
             if ($this->tabAccess['edit'] === '1') {
-                $order_id = Tools::getValue('id_order');
-                $current_room_id = Tools::getValue('modal_id_room');
-                $current_room = Tools::getValue('modal_curr_room_num');
-                $date_from = Tools::getValue('modal_date_from');
-                $date_to = Tools::getValue('modal_date_to');
-                $realloc_room_id = Tools::getValue('realloc_avail_rooms');
+                $idOrder = Tools::getValue('id_order');
+                $idHtlBookingFrom = Tools::getValue('id_htl_booking');
+                $idNewRoomType = Tools::getValue('realloc_avail_room_type');
+                $idRoomToReallocate = Tools::getValue('realloc_avail_rooms');
+                $priceDiff = Tools::getValue('reallocation_price_diff');
 
-                if ($realloc_room_id == 0) {
-                    $this->errors[] = Tools::displayError('Please select a room to swap with this room.');
-                }
-                if ($current_room_id == 0) {
-                    $this->errors[] = Tools::displayError('Cuurent room is missing.');
-                }
-                if ($date_from == 0) {
-                    $this->errors[] = Tools::displayError('Check In date is missing.');
-                }
-                if ($date_to == 0) {
-                    $this->errors[] = Tools::displayError('Check Out date is missing.');
+                $objBookingDetail = new HotelBookingDetail();
+                if ($idRoomToReallocate) {
+                    // check if room is from selected room type
+                    if (Validate::isLoadedObject($objRoomInfo = new HotelRoomInformation($idRoomToReallocate))) {
+                        if ($objRoomInfo->id_product != $idNewRoomType) {
+                            $this->errors[] = $this->l('Invalid room selected for reallocation.');
+                        } elseif (!Validate::isLoadedObject($objHotelBooking = new HotelBookingDetail($idHtlBookingFrom))) {
+                            $this->errors[] = $this->l('Invalid booking found for reallocation.');
+                        } elseif (!$availableRooms = $objBookingDetail->getAvailableRoomsForReallocation(
+                            $objHotelBooking->date_from,
+                            $objHotelBooking->date_to,
+                            $idNewRoomType,
+                            $objHotelBooking->id_hotel
+                        )) {
+                            $this->errors[] = $this->l('Selected room is not available for reallocation.');
+                        } elseif (!in_array($idRoomToReallocate, array_column($availableRooms, 'id_room'))) {
+                            $this->errors[] = $this->l('Selected room is not available for reallocation.');
+                        } elseif (!Validate::isFloat($priceDiff)) {
+                            $this->errors[] = $this->l('Invalid price difference of the room types.');
+                        }
+                    } else {
+                        $this->errors[] = $this->l('Selected room is not available for reallocation.');
+                    }
+                } else {
+                    $this->errors[] = $this->l('Please select a room to reallocate with this room.');
                 }
 
                 if (!count($this->errors)) {
-                    $objBookingDetail = new HotelBookingDetail();
-                    $room_swapped = $objBookingDetail->reallocateRoomWithAvailableSameRoomType($current_room_id, $date_from, $date_to, $realloc_room_id);
-                    if (!$room_swapped) {
-                        $this->errors[] = Tools::displayError('Some error occured. Please try again.');
+                    // Finally, reallocate the room
+                    if ($objBookingDetail->reallocateBooking($idHtlBookingFrom, $idRoomToReallocate, $priceDiff)) {
+                        Tools::redirectAdmin(self::$currentIndex.'&id_order='.(int) $idOrder.'&vieworder&conf=52&token='.$this->token);
                     } else {
-                        Tools::redirectAdmin(self::$currentIndex.'&id_order='.(int) $order_id.'&vieworder&token='.$this->token);
+                        $this->errors[] = $this->l('Some error occured. Please try again.');
                     }
                 }
             } else {
-                $this->errors[] = Tools::displayError('You do not have permission to edit this.');
+                $this->errors[] = $this->l('You do not have permission to edit this.');
             }
         }
+
+        // Process swap of rooms
         if (Tools::isSubmit('swap_allocated_rooms')) {
             if ($this->tabAccess['edit'] === '1') {
-                $order_id = Tools::getValue('id_order');
-                $current_room_id = Tools::getValue('modal_id_room');
-                $current_room = Tools::getValue('modal_curr_room_num');
-                $date_from = Tools::getValue('modal_date_from');
-                $date_to = Tools::getValue('modal_date_to');
-                $swapped_room_id = Tools::getValue('swap_avail_rooms');
+                $idOrder = Tools::getValue('id_order');
+                $idHtlBookingFrom = Tools::getValue('id_htl_booking');
+                $idHtlBookingToSwap = Tools::getValue('swap_avail_rooms');
 
-                if ($swapped_room_id == 0) {
-                    $this->errors[] = Tools::displayError('Please select a room to swap with this room.');
-                }
-                if ($current_room_id == 0) {
-                    $this->errors[] = Tools::displayError('Cuurent room is missing.');
-                }
-                if ($date_from == 0) {
-                    $this->errors[] = Tools::displayError('Check In date is missing.');
-                }
-                if ($date_to == 0) {
-                    $this->errors[] = Tools::displayError('Check Out date is missing.');
+                if (!Validate::isLoadedObject($objHotelBooking = new HotelBookingDetail($idHtlBookingFrom))) {
+                    $this->errors[] = $this->l('Selected room is not available to swap.');
+                } else {
+                    if (!Validate::isLoadedObject($objHotelBookingTo = new HotelBookingDetail($idHtlBookingToSwap))) {
+                        $this->errors[] = $this->l('Please select a room to swap with this room booking.');
+                    } else {
+                        if ($availableRooms = $objHotelBooking->getAvailableRoomsForSwapping(
+                            $objHotelBooking->date_from,
+                            $objHotelBooking->date_to,
+                            $objHotelBooking->id_product,
+                            $objHotelBooking->id_hotel,
+                            $objHotelBooking->id_room
+                        )) {
+                            if (!in_array($idHtlBookingToSwap, array_column($availableRooms, 'id_hotel_booking'))) {
+                                $this->errors[] = $this->l('Selected room is not available to swap.');
+                            }
+                        } else {
+                            $this->errors[] = $this->l('Selected room is not available to swap.');
+                        }
+                    }
                 }
 
                 if (!count($this->errors)) {
                     $objBookingDetail = new HotelBookingDetail();
-                    $room_swapped = $objBookingDetail->swapRoomWithAvailableSameRoomType($current_room_id, $date_from, $date_to, $swapped_room_id);
-                    if (!$room_swapped) {
-                        $this->errors[] = Tools::displayError('Some error occured. Please try again.');
+                    if ($objBookingDetail->swapBooking($idHtlBookingFrom, $idHtlBookingToSwap)) {
+                        Tools::redirectAdmin(self::$currentIndex.'&id_order='.(int)$idOrder.'&vieworder&conf=53&token='.$this->token);
                     } else {
-                        Tools::redirectAdmin(self::$currentIndex.'&id_order='.(int) $order_id.'&vieworder&token='.$this->token);
+                        $this->errors[] = $this->l('Some error occured. Please try again.');
                     }
                 }
             } else {
-                $this->errors[] = Tools::displayError('You do not have permission to edit this.');
+                $this->errors[] = $this->l('You do not have permission to edit this.');
             }
         }
         // To update order status when admin changes from order detail page
@@ -2012,7 +2047,7 @@ class AdminOrdersControllerCore extends AdminController
                     $order_detail_data[$key]['alloted_cust_email'] = $this->l('No customer name found');
                 }
 
-                $order_detail_data[$key]['avail_rooms_to_realloc'] = $objBookingDetail->getAvailableRoomsForReallocation($value['date_from'], $value['date_to'], $value['id_product'], $value['id_hotel']);
+                $order_detail_data[$key]['avail_room_types_to_realloc'] = $objBookingDetail->getAvailableRoomsForReallocation($value['date_from'], $value['date_to'], 0, $value['id_hotel'], 1);
                 $order_detail_data[$key]['avail_rooms_to_swap'] = $objBookingDetail->getAvailableRoomsForSwapping($value['date_from'], $value['date_to'], $value['id_product'], $value['id_hotel'], $value['id_room']);
 
                 /*Product price when order was created*/
@@ -5593,8 +5628,6 @@ class AdminOrdersControllerCore extends AdminController
                                     $product['total_wt'] = Tools::ps_round($totalPriceTaxIncl, _PS_PRICE_COMPUTE_PRECISION_) * (int)$product['cart_quantity'];
                                     break;
                             }
-
-
                         }
 
                         $order_detail = new OrderDetail();
@@ -5969,5 +6002,44 @@ class AdminOrdersControllerCore extends AdminController
                 $this->errors[] = Tools::displayError('Invalid booking information. Please try again.');
             }
         }
+    }
+
+    // ajax request to get room type upgrade/degrade changes information to reallocate
+    public function ajaxProcessChangeRoomTypeToReallocate()
+    {
+        $result = array();
+        $result['success'] = 0;
+        $result['has_price_changes'] = 0;
+        $result['has_room_type_change'] = 0;
+
+        $idHotelBooking = Tools::getValue('id_htl_booking');
+        $idNewRoomType = Tools::getValue('id_new_room_type');
+
+        // if room type id is present in the ajax request or not
+        if ($idNewRoomType) {
+            // validate the booking is valid or not
+            if (Validate::isLoadedObject($objHotelBooking = new HotelBookingDetail($idHotelBooking))) {
+                $result['success'] = 1;
+                // if room is changing in the reallocation
+                if ($objHotelBooking->id_product != $idNewRoomType) {
+                    $result['has_room_type_change'] = 1;
+                    $newRoomTotalPrice = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice(
+                        $idNewRoomType,
+                        $objHotelBooking->date_from,
+                        $objHotelBooking->date_to
+                    );
+                    if ($objHotelBooking->total_price_tax_excl != $newRoomTotalPrice['total_price_tax_excl']) {
+                        $result['has_price_changes'] = 1;
+                        $result['price_diff'] = $newRoomTotalPrice['total_price_tax_excl'] - $objHotelBooking->total_price_tax_excl;
+                    }
+                }
+            } else {
+                $result['error'] = $this->l('Invalid booking information. Please try again.');
+            }
+        } else {
+            $result['error'] = $this->l('Selected room type not found. Please try again.');
+        }
+
+        $this->ajaxDie(json_encode($result));
     }
 }

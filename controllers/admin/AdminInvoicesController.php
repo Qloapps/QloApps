@@ -326,4 +326,11 @@ class AdminInvoicesControllerCore extends AdminController
 
         return $templates;
     }
+
+    public function setMedia()
+    {
+        parent::setMedia();
+        $this->addJS(_PS_JS_DIR_.'admin/invoices.js');
+    }
+
 }
