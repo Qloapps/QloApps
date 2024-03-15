@@ -409,6 +409,7 @@ class OrderConfirmationControllerCore extends FrontController
                 'shw_bo_msg' => $shw_bo_msg,
                 'back_ord_msg' => $bo_msg,
                 'order' => $order,
+                'objOrderCurrency' => (new Currency($order->id_currency)),
                 'use_tax' => Configuration::get('PS_TAX'),
                 'group_use_tax' => (Group::getPriceDisplayMethod($customer->id_default_group) == PS_TAX_INC),
             )
