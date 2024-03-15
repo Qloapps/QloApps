@@ -135,8 +135,8 @@ class AdminDashboardControllerCore extends AdminController
         }
 
         $forms['net_profit']['fields']['CONF_AVERAGE_PRODUCT_MARGIN'] = array(
-            'title' => $this->l('Average gross margin percentage'),
-            'desc' => $this->l('You should calculate this percentage as follows: ((total sales revenue) - (total operating cost)) / (total sales revenue) * 100. This value is only used to calculate Dashboard approximate gross margin, if you do not specify operating cost for each room type.'),
+            'title' => $this->l('Average gross operating cost percentage'),
+            'desc' => $this->l('This value is only used to calculate Dashboard approximate gross operating cost, if you do not specify operating cost for each room type.'),
             'validation' => 'isPercentage',
             'cast' => 'intval',
             'type' => 'text',
@@ -386,7 +386,16 @@ class AdminDashboardControllerCore extends AdminController
             'extra' => Tools::getValue('extra')
         );
 
-        die(json_encode(Hook::exec('dashboardData', $params, $id_module, true, true, (int)Tools::getValue('dashboard_use_push'))));
+        // code to be added.
+        $data = Hook::exec('dashboardData', $params, $id_module, true, true, (int)Tools::getValue('dashboard_use_push'));
+        Hook::exec('actionDashboardDataModifier', array(
+            'data' => &$data,
+            'params' => $params,
+            'id_module' => $id_module,
+            'dashboard_use_push' => (int)Tools::getValue('dashboard_use_push')
+        ));
+
+        $this->ajaxDie(json_encode($data));
     }
 
     public function ajaxProcessSetSimulationMode()

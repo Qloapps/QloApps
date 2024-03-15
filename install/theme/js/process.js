@@ -202,6 +202,7 @@ function install_success()
 	$('.installing').html(install_is_done);
 	is_installing = false;
 	$('#install_process_form').slideUp();
+	$('#info-boxes-wrap').slideUp();
 	$('#install_process_success').slideDown();
 	$('.stepList li:last-child').addClass('ok');
 	if (typeof psuser_assistance != 'undefined')

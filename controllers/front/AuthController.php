@@ -113,6 +113,9 @@ class AuthControllerCore extends FrontController
             $back .= (strpos($back, '?') !== false ? '&' : '?').'key='.$key;
         }
 
+        // sanitize backurl for XSS protection
+        $back = filter_var($back, FILTER_SANITIZE_URL);
+
         if ($back == Tools::secureReferrer(Tools::getValue('back'))) {
             $this->context->smarty->assign('back', html_entity_decode($back));
         } else {
@@ -174,9 +177,15 @@ class AuthControllerCore extends FrontController
                 'errors' => $this->errors,
                 'hasAjaxExtraData' => !empty($this->ajaxExtraData),
                 'ajaxExtraData' => $this->ajaxExtraData,
-                'page' => $this->context->smarty->fetch($this->template),
                 'token' => Tools::getToken(false)
             );
+
+            // send page html only if no errors in the form and we have to open registration form
+            // It also prevents opening html in the response in case of an error for XSS protection
+            if (empty($this->errors)) {
+                $return['page'] = $this->context->smarty->fetch($this->template);
+            }
+
             $this->ajaxDie(json_encode($return));
         }
     }
@@ -619,7 +628,7 @@ class AuthControllerCore extends FrontController
                     $customer->active = 1;
                     // New Guest customer
                     if (Tools::isSubmit('is_new_customer')) {
-                        if ($idCustomer) {
+                        if (isset($idCustomer) && $idCustomer) {
                             // update guest customer details
                             $customer = new Customer($idCustomer);
                             $customer->firstname = Tools::getValue('firstname');
@@ -758,6 +767,8 @@ class AuthControllerCore extends FrontController
             unset($_POST['email_create']);
         } elseif ($id_customer = Customer::customerExists($email, true, false)) {
             $this->informations[] = Tools::displayError('You are already registered as a guest with this email address.').'&nbsp;<button type="submit" class="btn btn-link alert-link btn-transform" name="submitTransformAccount">'.Tools::displayError('Click here').'</button>'.Tools::displayError('').' to generate a password for your account.';
+        } elseif (Tools::getValue('back') && !Validate::isUrl(Tools::getValue('back'))) {
+            $this->errors[] = Tools::displayError('back url is invalid.');
         } else {
             $this->create_account = true;
             $this->context->smarty->assign('email_create', Tools::safeOutput($email));

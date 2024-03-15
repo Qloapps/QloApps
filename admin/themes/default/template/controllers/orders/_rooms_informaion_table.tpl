@@ -21,7 +21,7 @@
                         <th class="text-center"><span class="title_box">{l s='Refunded amount'}</span></th>
                     {/if}
                     {if ($can_edit && !$order->hasBeenDelivered())}
-                    <th class="text-center fixed-width-lg"><span class="title_box">{l s='Edit Order'}</th>
+                        <th class="text-center fixed-width-lg"><span class="title_box">{l s='Edit Order'}</th>
                     {/if}
                 </tr>
             </thead>
@@ -32,9 +32,14 @@
                     {include file='controllers/orders/_product_line.tpl'}
                 {/foreach}
             {else}
-                {* <tr>
-                    <td>{l s='No Data Found.'}</td>
-                </tr> *}
+                <tr>
+                    <td class="list-empty" colspan="14">
+                        <div class="list-empty-msg">
+                            <i class="icon-warning-sign list-empty-icon"></i>
+                            {l s='No rooms found'}
+                        </div>
+                    </td>
+                </tr>
             {/if}
             {* Include product line partial *}
             {include file='controllers/orders/_new_product.tpl'}

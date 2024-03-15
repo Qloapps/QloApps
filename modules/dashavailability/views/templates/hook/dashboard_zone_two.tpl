@@ -21,9 +21,9 @@
 	<section id="dashavailability" class="panel widget allow_push">
 		<header class="panel-heading">
 			<i class="icon-bar-chart"></i>
-			{l s="Availability" mod="dashavailability"}
+			{l s="Availability" mod='dashavailability'}
 			<span class="panel-heading-action">
-			<a class="list-toolbar-btn" href="javascript:void(0);" title="Refresh" onclick="refreshAvailabilityBarData();" title="{l s="Refresh" mod="dashavailability"}">
+			<a class="list-toolbar-btn" href="javascript:void(0);" title="Refresh" onclick="refreshAvailabilityBarData();" title="{l s="Refresh" mod='dashavailability'}">
 					<i class="process-icon-refresh"></i>
 				</a>
 			</span>
@@ -35,7 +35,7 @@
 						onclick="availDatePicker()">
 							<i class="icon-calendar-empty"></i>
 							<span class="hidden-xs bar-date">
-								{l s="From" mod="dashavailability"}
+								{l s="From" mod='dashavailability'}
 								<strong>{$dateFromBar|escape:'htmlall':'UTF-8'}</strong>
 							</span>
 							<i class="icon-caret-down"></i>
@@ -45,17 +45,17 @@
 				</div>
 				<div class="col-xs-2 col-md-2  col-lg-2 pull-left">
 					<button id='avail_bar_day_5' class="avail-bar-btn bar-btn-active" data-days="5">
-						{l s="5 Days" mod="dashavailability"}
+						{l s="5 Days" mod='dashavailability'}
 					</button>
 				</div>
 				<div class="col-xs-2 col-md-2  col-lg-2 pull-left">
 					<button id='avail_bar_day_15' class="avail-bar-btn" data-days="15)">
-						{l s="15 Days" mod="dashavailability"}
+						{l s="15 Days" mod='dashavailability'}
 					</button>
 				</div>
 				<div class="col-xs-2 col-md-2  col-lg-2 pull-left">
 					<button id='avail_bar_day_30' class="avail-bar-btn" data-days="30)">
-						{l s="30 Days" mod="dashavailability"}
+						{l s="30 Days" mod='dashavailability'}
 					</button>
 				</div>
 		</div>

@@ -78,9 +78,9 @@
 												{/if}
 												<div class="cart-info-sec rm_product_info_{$product.id_product}">
 													<span class="product_info_label">{l s='Price' mod='blockcart'}:</span>
-													<span class="price product_info_data" ttl_prod_price={if $priceDisplay == $smarty.const.PS_TAX_EXC}{$product.total}{else}{$product.total_wt}{/if}>
+													<span class="price product_info_data" ttl_prod_price="{$product.bookingData.total_room_type_amount}">
 														{if !isset($product.is_gift) || !$product.is_gift}
-															{if $priceDisplay == $smarty.const.PS_TAX_EXC}{displayWtPrice p="`$product.total`"}{else}{displayWtPrice p="`$product.total_wt`"}{/if}
+															{displayWtPrice p="`$product.bookingData.total_room_type_amount`"}
 															<div id="hookDisplayProductPriceBlock-price">
 																{hook h="displayProductPriceBlock" product=$product type="price" from="blockcart"}
 															</div>
@@ -438,6 +438,7 @@
 {addJsDefL name=duration_txt}{l s='Duration' mod='blockcart' js=1}{/addJsDefL}
 {addJsDefL name=capacity_txt}{l s='Capacity' mod='blockcart' js=1}{/addJsDefL}
 {addJsDefL name=remove_rm_title}{l s='Remove this room from my cart' mod='blockcart' js=1}{/addJsDefL}
+{addJsDefL name=no_internet_txt}{l s='No internet. Please check your internet connection.' mod='blockcart' js=1}{/addJsDefL}
 
 {addJsDef rm_avail_process_lnk = $link->getModuleLink('blockcart', 'checkroomavailabilityajaxprocess')}
 {addJsDef pagename = $current_page}
