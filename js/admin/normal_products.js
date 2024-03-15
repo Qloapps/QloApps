@@ -442,10 +442,8 @@ product_tabs['Informations'] = new function(){
 		$('input[name=available_for_order]').on('change', function(e) {
 			if ($(this).val() == 1) {
 				$('#show_price_container').hide('fast');
-				$('#allow_multiple_quantity_container').show('fast');
 			} else {
 				$('#show_price_container').show('fast');
-				$('#allow_multiple_quantity_container').hide('fast');
 			}
 		});
 
@@ -495,8 +493,9 @@ product_tabs['Informations'] = new function(){
 				if ($('input[name=available_for_order]:checked').val() == 0) {
 					$('#show_price_container').show('fast');
 				}
-				if ($('input[name=available_for_order]:checked').val() == 1) {
-					$("#allow_multiple_quantity_container").show('fast');
+				$("#allow_multiple_quantity_container").show('fast');
+				if ($('input[name=allow_multiple_quantity]:checked').val() == 1) {
+					$('#max_quantity_container').show('fast');
 				}
 			}
 		});

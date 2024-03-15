@@ -32,6 +32,24 @@ var admin = '<?php echo(file_exists('../admin-dev') ? '../admin-dev' : '../admin
 	</div>
 </div>
 
+<div id="info-boxes-wrap">
+	<div class="info-boxes">
+		<div class="info-box" onclick="window.open('https://store.webkul.com/Qloapps.html')">
+			<img src="theme/img/suggested-modules.png" />
+			<h3><?php echo $this->l('Suggested Modules'); ?></h3>
+			<p class="description"><?php echo $this->l('Find just the right features on QloApps Addons to make your hospitality business a success.') ?></p>
+			<a target="_blank"><span><?php echo $this->l('Discover All Modules') ?></span></a>
+		</div>
+
+		<div class="info-box" onclick="window.open('https://store.webkul.com/Qloapps/responsive.html');">
+			<img src="theme/img/suggested-themes.png" />
+			<h3><?php echo $this->l('Suggested Themes'); ?></h3>
+			<p class="description"><?php echo $this->l('Create a design that suits your hotel and your customers, with a ready-to-use template theme.') ?></p>
+			<a target="_blank"><span><?php echo $this->l('Discover All Themes') ?></span></a>
+		</div>
+	</div>
+</div>
+
 <div id="install_process_success">
 	<div class="clearfix">
 		<h2><?php echo $this->l('Your installation is finished!'); ?></h2>
@@ -62,21 +80,34 @@ var admin = '<?php echo(file_exists('../admin-dev') ? '../admin-dev' : '../admin
 			<a href="<?php echo 'https://qloapps.com/install-qloapps/#section-11' ?>" target="_blank"><img src="theme/img/help.png" /></a>
 		</h3>
 
-		<div id="boBlock" class="blockInfoEnd clearfix" onclick="window.open(admin)">
-			<img src="theme/img/visu_boBlock.png" alt="" />
-			<h3><?php echo $this->l('Back Office'); ?></h3>
-			<p class="description"><?php echo $this->l('Manage your website using your Back Office. Manage your orders and customers, add modules, change themes, etc.') ?></p>
-			<p>
-				<a class="BO" target="_blank"><span><?php echo $this->l('Manage your website') ?></span></a>
-			</p>
-		</div>
-		<div id="foBlock" class="blockInfoEnd last clearfix" onclick="window.open('../')" />
-			<img src="theme/img/visu_foBlock.png" alt="" />
-			<h3><?php echo $this->l('Front Office'); ?></h3>
-			<p class="description"><?php echo $this->l('Discover your website as your future customers will see it!') ?></p>
-			<p>
-				<a class="FO" target="_blank"><span><?php echo $this->l('Discover your website') ?></span></a>
-			</p>
+		<div class="info-boxes">
+			<div class="info-box" onclick="window.open(admin);">
+				<img src="theme/img/visu_boBlock.png" />
+				<h3><?php echo $this->l('Back Office'); ?></h3>
+				<p class="description"><?php echo $this->l('Manage your website using your Back Office. Manage your orders and customers, add modules, change themes, etc.') ?></p>
+				<a target="_blank"><span><?php echo $this->l('Manage Your Website') ?></span></a>
+			</div>
+
+			<div class="info-box" onclick="window.open('../');">
+				<img src="theme/img/visu_foBlock.png" />
+				<h3><?php echo $this->l('Front Office'); ?></h3>
+				<p class="description"><?php echo $this->l('Discover your website as your future customers will see it!') ?></p>
+				<a target="_blank"><span><?php echo $this->l('Discover Your Website') ?></span></a>
+			</div>
+
+			<div class="info-box" onclick="window.open('https://store.webkul.com/Qloapps.html')">
+				<img src="theme/img/suggested-modules.png" />
+				<h3><?php echo $this->l('Suggested Modules'); ?></h3>
+				<p class="description"><?php echo $this->l('Find just the right features on QloApps Addons to make your hospitality business a success.') ?></p>
+				<a target="_blank"><span><?php echo $this->l('Discover All Modules') ?></span></a>
+			</div>
+
+			<div class="info-box" onclick="window.open('https://store.webkul.com/Qloapps/responsive.html');">
+				<img src="theme/img/suggested-themes.png" />
+				<h3><?php echo $this->l('Suggested Themes'); ?></h3>
+				<p class="description"><?php echo $this->l('Create a design that suits your hotel and your customers, with a ready-to-use template theme.') ?></p>
+				<a target="_blank"><span><?php echo $this->l('Discover All Themes') ?></span></a>
+			</div>
 		</div>
 	</div>
 

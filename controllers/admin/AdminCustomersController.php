@@ -39,8 +39,8 @@ class AdminCustomersControllerCore extends AdminController
     public function __construct()
     {
         $this->bootstrap = true;
-        $this->required_database = true;
-        $this->required_fields = array('newsletter','optin');
+        // $this->required_database = true;
+        // $this->required_fields = array('newsletter','optin');
         $this->table = 'customer';
         $this->className = 'Customer';
         $this->lang = false;
@@ -152,16 +152,6 @@ class AdminCustomersControllerCore extends AdminController
 
         $this->shopLinkType = 'shop';
         $this->shopShareDatas = Shop::SHARE_CUSTOMER;
-
-
-        // START send access query information to the admin controller
-        $this->access_select = ' SELECT a.`id_customer` FROM '._DB_PREFIX_.'customer a';
-        $this->access_join = ' INNER JOIN '._DB_PREFIX_.'orders ord ON (a.id_customer = ord.id_customer)';
-        $this->access_join .= ' INNER JOIN '._DB_PREFIX_.'htl_booking_detail hbd ON (hbd.id_order = ord.id_order)';
-        if ($acsHtls = HotelBranchInformation::getProfileAccessedHotels($this->context->employee->id_profile, 1, 1)) {
-            $this->access_where = ' WHERE hbd.id_hotel IN ('.implode(',', $acsHtls).')';
-        }
-
         parent::__construct();
 
         $this->_select = '
@@ -458,8 +448,9 @@ class AdminCustomersControllerCore extends AdminController
                             'label' => $this->l('Disabled')
                         )
                     ),
-                    'disabled' =>  (bool)!Configuration::get('PS_CUSTOMER_NWSL'),
-                    'hint' => $this->l('This customer will receive your newsletter via email.')
+                    'disabled' => (bool)!Configuration::get('PS_CUSTOMER_NWSL'),
+                    'hint' => $this->l('This customer will receive your newsletter via email.'),
+                    'desc' => (bool)!Configuration::get('PS_CUSTOMER_NWSL') ? sprintf($this->l('This field is disabled as option \'Enable newsletter registration\' is disabled. You can change it from %sPreferences > Customers%s page.'), '<a href="'.$this->context->link->getAdminLink('AdminCustomerPreferences').'" target="_blank">', '</a>') : '',
                 ),
                 array(
                     'type' => 'switch',
@@ -596,6 +587,18 @@ class AdminCustomersControllerCore extends AdminController
         $this->fields_form['submit'] = array(
             'title' => $this->l('Save'),
         );
+
+        if (!Tools::getValue('liteDisplaying')) {
+            $this->fields_form['buttons'] = array(
+                'save-and-stay' => array(
+                    'title' => $this->l('Save and stay'),
+                    'name' => 'submitAdd'.$this->table.'AndStay',
+                    'type' => 'submit',
+                    'class' => 'btn btn-default pull-right',
+                    'icon' => 'process-icon-save',
+                )
+            );
+        }
 
         $birthday = explode('-', $this->getFieldValue($obj, 'birthday'));
         
@@ -870,6 +873,25 @@ class AdminCustomersControllerCore extends AdminController
 
     public function processDelete()
     {
+        // If customer is going to be deleted permanently then if customer has orders the change this customer as an anonymous customer
+        if (Validate::isLoadedObject($objCustomer = $this->loadObject())) {
+            if ($this->delete_mode == 'real' && Order::getCustomerOrders($objCustomer->id, true)) {
+                $objCustomer->email = 'anonymous'.'-'.$objCustomer->id.'@'.Tools::getShopDomain();
+                $objCustomer->deleted = 1;
+                if (!$objCustomer->update()) {
+                    $this->errors[] = Tools::displayError('Some error ocurred while deleting the Customer');
+                    return;
+                }
+
+                $this->redirect_after = self::$currentIndex.'&conf=1&token='.$this->token;
+
+                return;
+            }
+        } else {
+            $this->errors[] = Tools::displayError('Customer not found.');
+            return;
+        }
+
         $this->_setDeletedMode();
         parent::processDelete();
     }
@@ -888,6 +910,44 @@ class AdminCustomersControllerCore extends AdminController
 
     protected function processBulkDelete()
     {
+        // If customer is going to be deleted permanently then if customer has orders the change this customer as an anonymous customer
+        if ($this->delete_mode == 'real') {
+            if (is_array($this->boxes) && !empty($this->boxes)) {
+                foreach ($this->boxes as $key => $idCustomer) {
+                    if (Validate::isLoadedObject($objCustomer = new Customer($idCustomer))) {
+                        // check if customer has orders for email change else customer will be deleted
+                        if (Order::getCustomerOrders($objCustomer->id, true)) {
+                            $objCustomer->email = 'anonymous'.'-'.$objCustomer->id.'@'.Tools::getShopDomain();
+                            $objCustomer->deleted = 1;
+                            if ($objCustomer->update()) {
+                                // unset the customer which is processed
+                                // not processed customers will be deleted with default process if no errors are there
+                                unset($this->boxes[$key]);
+                            } else {
+                                $this->errors[] = Tools::displayError('Some error ocurred while deleting the Customer with id').': '.$idCustomer;
+                            }
+                        }
+                    } else {
+                        $this->errors[] = Tools::displayError('Customer id').': '.$idCustomer.' '.Tools::displayError('not found.');
+                    }
+                }
+
+                // if all the customers are process above then redirect with success
+                if (!count($this->boxes)) {
+                    $this->redirect_after = self::$currentIndex.'&conf=1&token='.$this->token;
+                    return;
+                }
+            } else {
+                $this->errors[] = Tools::displayError('Customers not found.');
+                return;
+            }
+
+            // if errors are there then do not proceed for default process
+            if (count($this->errors)) {
+                return;
+            }
+        }
+
         $this->_setDeletedMode();
         parent::processBulkDelete();
     }

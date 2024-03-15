@@ -277,7 +277,7 @@ abstract class PaymentModuleCore extends Module
                     if (Configuration::get('PS_TAX_ADDRESS_TYPE') == 'id_address_delivery') {
                         $address = new Address((int)$id_address);
                         $this->context->country = new Country((int)$address->id_country, (int)$this->context->cart->id_lang);
-                        if (!$this->context->country->active) {
+                        if (!$this->context->country->active && $this->name != 'wsorder') {
                             throw new PrestaShopException('The delivery address country is not active.');
                         }
                     }
@@ -468,7 +468,7 @@ abstract class PaymentModuleCore extends Module
                 $this->context->country = $context_country;
             }
 
-            if (!$this->context->country->active) {
+            if (!$this->context->country->active && $this->name != 'wsorder') {
                 PrestaShopLogger::addLog('PaymentModule::validateOrder - Country is not active', 3, null, 'Cart', (int)$id_cart, true);
                 throw new PrestaShopException('The order address country is not active.');
             }
@@ -664,9 +664,13 @@ abstract class PaymentModuleCore extends Module
                             unset($voucher->id);
 
                             // Set a new voucher code
+                            // For a customer, applying voucher ABCD will create partial vouchers ABCD-2, ABCD-3 and so on, and
+                            // applying voucher ABCD-2 will create vouchers ABCD-2-2, ABCD-2-3 and so on
                             $voucher->code = empty($voucher->code) ? substr(md5($order->id.'-'.$order->id_customer.'-'.$cart_rule['obj']->id), 0, 16) : $voucher->code.'-2';
-                            if (preg_match('/\-([0-9]{1,2})\-([0-9]{1,2})$/', $voucher->code, $matches) && $matches[1] == $matches[2]) {
-                                $voucher->code = preg_replace('/'.$matches[0].'$/', '-'.(intval($matches[1]) + 1), $voucher->code);
+                            while (CartRule::cartRuleExists($voucher->code, $order->id_customer)) {
+                                if (preg_match('/\-([0-9]{1,2})$/', $voucher->code, $matches)) {
+                                    $voucher->code = preg_replace('/'.$matches[1].'$/', (intval($matches[1]) + 1), $voucher->code);
+                                }
                             }
 
                             // Set the new voucher value
@@ -862,7 +866,11 @@ abstract class PaymentModuleCore extends Module
                                         $objBookingDetail->total_paid_amount = $objAdvancedPayment->getRoomMinAdvPaymentAmount(
                                             $idProduct,
                                             $objCartBookingData->date_from,
-                                            $objCartBookingData->date_to
+                                            $objCartBookingData->date_to,
+                                            1,
+                                            $objCartBookingData->id_room,
+                                            $objCartBookingData->id_cart,
+                                            $objCartBookingData->id_guest
                                         );
                                     }
                                 }
@@ -920,7 +928,6 @@ abstract class PaymentModuleCore extends Module
                                             $objBookingDemand->tax_computation_method = (int)$taxCalc->computation_method;
                                             if ($objBookingDemand->save()) {
                                                 $objBookingDemand->tax_calculator = $taxCalc;
-                                                $objBookingDemand->id_global_demand = $idGlobalDemand;
                                                 // Now save tax details of the extra demand
                                                 $objBookingDemand->setBookingDemandTaxDetails();
                                             }
@@ -1005,11 +1012,9 @@ abstract class PaymentModuleCore extends Module
                     // Set the order status
                     $new_history = new OrderHistory();
                     $new_history->id_order = (int)$order->id;
-                    if ($order_status->logable && $order->is_advance_payment && $order->advance_paid_amount < $order->total_paid_tax_incl) {
-                        $new_history->changeIdOrderState((int)Configuration::get('PS_OS_PARTIAL_PAYMENT'), $order, true);
-                    } else {
-                        $new_history->changeIdOrderState((int)$id_order_state, $order, true);
-                    }
+
+                    $new_history->changeIdOrderState((int)$id_order_state, $order, true);
+
                     $new_history->addWithemail(true, $extra_vars);
 
                     // Switch to back order if needed
@@ -1044,47 +1049,19 @@ abstract class PaymentModuleCore extends Module
                         $normal_products_data_txt = $this->getEmailTemplateContent('hotel-service-product-data-text.tpl', Mail::TYPE_TEXT, $orderServiceProducts);
 
                         // total room price
-                        $room_price_tax_excl = $order->getTotalProductsWithoutTaxes(false, true);
-                        $room_price_tax_incl = $order->getTotalProductsWithTaxes(false, true);
-                        $room_tax = ($order->getTotalProductsWithTaxes(false, true) - $order->getTotalProductsWithoutTaxes(false, true));
+                        $room_price_tax_excl = $order->getTotalProductsWithoutTaxes(false, true) + $order->getTotalProductsWithoutTaxes(false, false, Product::SERVICE_PRODUCT_WITH_ROOMTYPE, 1, Product::PRICE_ADDITION_TYPE_WITH_ROOM);
+                        $room_price_tax_incl = $order->getTotalProductsWithTaxes(false, true) + $order->getTotalProductsWithTaxes(false, false, Product::SERVICE_PRODUCT_WITH_ROOMTYPE, 1, Product::PRICE_ADDITION_TYPE_WITH_ROOM);
+                        $room_tax = ($room_price_tax_incl - $room_price_tax_excl);
 
                         // extra services
-                        $additional_service_price_tax_excl = ($order->getTotalProductsWithoutTaxes(false, false, Product::SERVICE_PRODUCT_WITH_ROOMTYPE) + $cart_booking_data['total_extra_demands_te']);
-                        $additional_service_price_tax_incl = ($order->getTotalProductsWithTaxes(false, false, Product::SERVICE_PRODUCT_WITH_ROOMTYPE) + $cart_booking_data['total_extra_demands_ti']);
-                        $additional_service_tax = (($order->getTotalProductsWithTaxes(false, false, Product::SERVICE_PRODUCT_WITH_ROOMTYPE) + $cart_booking_data['total_extra_demands_ti']) - ($order->getTotalProductsWithoutTaxes(false, false, Product::SERVICE_PRODUCT_WITH_ROOMTYPE) + $cart_booking_data['total_extra_demands_te']));
+                        $additional_service_price_tax_excl = ($order->getTotalProductsWithoutTaxes(false, false, Product::SERVICE_PRODUCT_WITH_ROOMTYPE, 0) + $cart_booking_data['total_extra_demands_te']);
+                        $additional_service_price_tax_incl = ($order->getTotalProductsWithTaxes(false, false, Product::SERVICE_PRODUCT_WITH_ROOMTYPE, 0) + $cart_booking_data['total_extra_demands_ti']);
+                        $additional_service_tax = ($additional_service_price_tax_incl - $additional_service_price_tax_excl);
+
 
                         // convenience fee price
-                        $objRoomTypeServiceProductOrderDetail = new RoomTypeServiceProductOrderDetail();
-                        $total_convenience_fee_ti = $objRoomTypeServiceProductOrderDetail->getroomTypeServiceProducts(
-                            $order->id,
-                            0,
-                            0,
-                            0,
-                            0,
-                            0,
-                            0,
-                            1,
-                            1,
-                            1,
-                            Product::PRICE_ADDITION_TYPE_INDEPENDENT
-                        );
-                        $total_convenience_fee_te = $objRoomTypeServiceProductOrderDetail->getroomTypeServiceProducts(
-                            $order->id,
-                            0,
-                            0,
-                            0,
-                            0,
-                            0,
-                            0,
-                            1,
-                            0,
-                            1,
-                            Product::PRICE_ADDITION_TYPE_INDEPENDENT
-                        );
-                        $additional_service_price_tax_excl = $additional_service_price_tax_excl - $total_convenience_fee_te;
-                        $additional_service_price_tax_incl = $additional_service_price_tax_incl - $total_convenience_fee_ti;
-                        $room_price_tax_excl = $room_price_tax_excl + $additional_service_price_tax_excl;
-                        $room_price_tax_incl = $room_price_tax_incl + $additional_service_price_tax_incl;
+                        $total_convenience_fee_ti = $order->getTotalProductsWithTaxes(false, false, Product::SERVICE_PRODUCT_WITH_ROOMTYPE, 1, Product::PRICE_ADDITION_TYPE_INDEPENDENT);
+                        $total_convenience_fee_te = $order->getTotalProductsWithoutTaxes(false, false, Product::SERVICE_PRODUCT_WITH_ROOMTYPE, 1, Product::PRICE_ADDITION_TYPE_INDEPENDENT);
 
                         // service products
                         // $service_products_price_tax_excl = $order->getTotalProductsWithoutTaxes(false, false, Product::SERVICE_PRODUCT_WITHOUT_ROOMTYPE);
@@ -1237,25 +1214,27 @@ abstract class PaymentModuleCore extends Module
                         }
                         if (Configuration::get('PS_ORDER_CONF_MAIL_TO_SUPERADMIN')){
                             // send superadmin information
-                            if (Validate::isLoadedObject($superAdmin = new Employee(_PS_ADMIN_PROFILE_))) {
-                                if (Validate::isEmail($superAdmin->email)) {
-                                    $data['{customer_name}'] = $this->context->customer->firstname.' '.$this->context->customer->lastname;
-                                    $data['{customer_email}'] = $this->context->customer->email;
-                                    $data['{firstname}'] = $superAdmin->firstname;
-                                    $data['{lastname}'] = $superAdmin->lastname;
-                                    $data['{email}'] = $superAdmin->email;
-                                    Mail::Send(
-                                        (int)$order->id_lang,
-                                        'order_conf_admin',
-                                        Mail::l('Order confirmation', (int)$order->id_lang),
-                                        $data,
-                                        $superAdmin->email,
-                                        $superAdmin->firstname.' '.$superAdmin->lastname,
-                                        null,
-                                        null,
-                                        $file_attachement,
-                                        null, _PS_MAIL_DIR_, false, (int)$order->id_shop
-                                    );
+                            if ($superAdminEmployees = Employee::getEmployeesByProfile(_PS_ADMIN_PROFILE_, true)) {
+                                foreach ($superAdminEmployees as $superAdminEmployee) {
+                                    if (Validate::isEmail($superAdminEmployee['email'])) {
+                                        $data['{customer_name}'] = $this->context->customer->firstname.' '.$this->context->customer->lastname;
+                                        $data['{customer_email}'] = $this->context->customer->email;
+                                        $data['{firstname}'] = $superAdminEmployee['firstname'];
+                                        $data['{lastname}'] = $superAdminEmployee['lastname'];
+                                        $data['{email}'] = $superAdminEmployee['email'];
+                                        Mail::Send(
+                                            (int)$order->id_lang,
+                                            'order_conf_admin',
+                                            Mail::l('Order confirmation', (int)$order->id_lang),
+                                            $data,
+                                            $superAdminEmployee['email'],
+                                            $superAdminEmployee['firstname'].' '.$superAdminEmployee['lastname'],
+                                            null,
+                                            null,
+                                            $file_attachement,
+                                            null, _PS_MAIL_DIR_, false, (int)$order->id_shop
+                                        );
+                                    }
                                 }
                             }
                         }
@@ -1289,7 +1268,7 @@ abstract class PaymentModuleCore extends Module
                                     $data['{customer_name}'] = $this->context->customer->firstname.' '.$this->context->customer->lastname;
                                     $data['{customer_email}'] = $this->context->customer->email;
                                     foreach ($htlAccesses as $access) {
-                                        if ($access['id_profile'] != _PS_ADMIN_PROFILE_) {
+                                        if ($access['access'] && $access['id_profile'] != _PS_ADMIN_PROFILE_) {
                                             if ($htlEmployees = Employee::getEmployeesByProfile($access['id_profile'])) {
                                                 foreach ($htlEmployees as $empl) {
                                                     if (Validate::isEmail($empl['email'])) {
@@ -1659,8 +1638,11 @@ abstract class PaymentModuleCore extends Module
                                 );
 
                                 $cart_htl_data[$type_key]['date_diff'][$date_join]['paid_unit_price_tax_incl'] = $data_v['total_price_tax_incl']/$num_days;
-                                $cart_htl_data[$type_key]['date_diff'][$date_join]['avg_paid_unit_price_tax_incl'] += ($cart_htl_data[$type_key]['date_diff'][$date_join]['paid_unit_price_tax_incl'] + $cart_htl_data[$type_key]['date_diff'][$date_join]['additional_services_price_auto_add_te']);
+                                $cart_htl_data[$type_key]['date_diff'][$date_join]['paid_unit_price_tax_excl'] = $data_v['total_price_tax_excl']/$num_days;
+                                $cart_htl_data[$type_key]['date_diff'][$date_join]['avg_paid_unit_price_tax_incl'] += ($cart_htl_data[$type_key]['date_diff'][$date_join]['paid_unit_price_tax_incl'] + $cart_htl_data[$type_key]['date_diff'][$date_join]['additional_services_price_auto_add_ti']);
+                                $cart_htl_data[$type_key]['date_diff'][$date_join]['avg_paid_unit_price_tax_excl'] += ($cart_htl_data[$type_key]['date_diff'][$date_join]['paid_unit_price_tax_excl'] + $cart_htl_data[$type_key]['date_diff'][$date_join]['additional_services_price_auto_add_te']);
                                 $cart_htl_data[$type_key]['date_diff'][$date_join]['amount_tax_incl'] += ($data_v['total_price_tax_incl'] + $cart_htl_data[$type_key]['date_diff'][$date_join]['additional_services_price_auto_add_te']);
+                                $cart_htl_data[$type_key]['date_diff'][$date_join]['amount_tax_excl'] += ($data_v['total_price_tax_excl'] + $cart_htl_data[$type_key]['date_diff'][$date_join]['additional_services_price_auto_add_te']);
                             } else {
                                 $num_days = $obj_htl_bk_dtl->getNumberOfDays($data_v['date_from'], $data_v['date_to']);
 
@@ -1762,8 +1744,11 @@ abstract class PaymentModuleCore extends Module
                                 );
 
                                 $cart_htl_data[$type_key]['date_diff'][$date_join]['paid_unit_price_tax_incl'] = $data_v['total_price_tax_incl']/$num_days;
-                                $cart_htl_data[$type_key]['date_diff'][$date_join]['avg_paid_unit_price_tax_incl'] = ($cart_htl_data[$type_key]['date_diff'][$date_join]['paid_unit_price_tax_incl'] + $cart_htl_data[$type_key]['date_diff'][$date_join]['additional_services_price_auto_add_te']);
-                                $cart_htl_data[$type_key]['date_diff'][$date_join]['amount_tax_incl'] = ($data_v['total_price_tax_incl'] + $cart_htl_data[$type_key]['date_diff'][$date_join]['additional_services_price_auto_add_te']);
+                                $cart_htl_data[$type_key]['date_diff'][$date_join]['paid_unit_price_tax_excl'] = $data_v['total_price_tax_excl']/$num_days;
+                                $cart_htl_data[$type_key]['date_diff'][$date_join]['avg_paid_unit_price_tax_incl'] = ($cart_htl_data[$type_key]['date_diff'][$date_join]['paid_unit_price_tax_incl'] + $cart_htl_data[$type_key]['date_diff'][$date_join]['additional_services_price_auto_add_ti']);
+                                $cart_htl_data[$type_key]['date_diff'][$date_join]['avg_paid_unit_price_tax_excl'] = ($cart_htl_data[$type_key]['date_diff'][$date_join]['paid_unit_price_tax_excl'] + $cart_htl_data[$type_key]['date_diff'][$date_join]['additional_services_price_auto_add_te']);
+                                $cart_htl_data[$type_key]['date_diff'][$date_join]['amount_tax_incl'] = ($data_v['total_price_tax_incl'] + $cart_htl_data[$type_key]['date_diff'][$date_join]['additional_services_price_auto_add_ti']);
+                                $cart_htl_data[$type_key]['date_diff'][$date_join]['amount_tax_excl'] = ($data_v['total_price_tax_excl'] + $cart_htl_data[$type_key]['date_diff'][$date_join]['additional_services_price_auto_add_te']);
 
                                 $result['total_extra_demands_te'] += $cart_htl_data[$type_key]['date_diff'][$date_join]['extra_demands_price_te'];
                                 $result['total_extra_demands_ti'] += $cart_htl_data[$type_key]['date_diff'][$date_join]['extra_demands_price_ti'];
@@ -1771,10 +1756,10 @@ abstract class PaymentModuleCore extends Module
                                 $result['total_additional_services_ti'] += $cart_htl_data[$type_key]['date_diff'][$date_join]['additional_services_price_ti'];
                             }
                         }
-                    }
-                    // calculate averages now
-                    foreach ($cart_htl_data[$type_key]['date_diff'] as $key => &$value) {
-                        $value['avg_paid_unit_price_tax_incl'] = Tools::ps_round($value['avg_paid_unit_price_tax_incl'] / $value['num_rm'], 6);
+                        // calculate averages now
+                        foreach ($cart_htl_data[$type_key]['date_diff'] as $key => &$value) {
+                            $value['avg_paid_unit_price_tax_incl'] = Tools::ps_round($value['avg_paid_unit_price_tax_incl'] / $value['num_rm'], 6);
+                        }
                     }
                 }
             }

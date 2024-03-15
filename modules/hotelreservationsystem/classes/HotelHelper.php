@@ -208,6 +208,8 @@ class HotelHelper
         );
         Configuration::updateValue('WK_HOTEL_GLOBAL_CONTACT_NUMBER', '0987654321');
         Configuration::updateValue('WK_HOTEL_GLOBAL_CONTACT_EMAIL', 'hotelprime@htl.com');
+        Configuration::updateValue('WK_CUSTOMER_SUPPORT_PHONE_NUMBER', '0987654321');
+        Configuration::updateValue('WK_CUSTOMER_SUPPORT_EMAIL', 'hotelprime@htl.com');
 
         Configuration::updateValue('WK_TITLE_HEADER_BLOCK', $home_banner_default_title);
         Configuration::updateValue('WK_CONTENT_HEADER_BLOCK', $home_banner_default_content);
@@ -358,7 +360,7 @@ class HotelHelper
         $objAddress->city = 'Demo City';
         $objAddress->id_state = $state_id;
         $objAddress->id_country = $def_cont_id;
-        $objAddress->postcode = self::getRandomZipcodeByForCountry($def_cont_id);
+        $objAddress->postcode = Tools::generateRandomZipcode($def_cont_id);
         $objAddress->address1 = 'Monticello Dr, Montgomery, AL 36117, USA';
         $objAddress->alias = 'The Hotel Prime';
         $objAddress->lastname = 'The Hotel Prime';
@@ -443,6 +445,7 @@ class HotelHelper
             $product->active = 1;
             $product->quantity = 999999999;
             $product->booking_product = true;
+            $product->show_at_front = 1;
             $product->is_virtual = 1;
             $product->indexed = 1;
             $product->save();
@@ -881,22 +884,7 @@ class HotelHelper
 
     public static function getRandomZipcodeByForCountry($idCountry)
     {
-        $randZipCode = '';
-        $alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-        if (Validate::isLoadedObject($objCountry = new Country($idCountry))) {
-            if ($objCountry->need_zip_code) {
-                if ($randZipCode = $objCountry->zip_code_format) {
-                    $randZipCode = str_replace('N', mt_rand(0, 9), $randZipCode);
-                    $randZipCode = str_replace('L', $alphabet[mt_rand(0, Tools::strlen($alphabet) - 1)], $randZipCode);
-                    $randZipCode = str_replace('C', $objCountry->iso_code, $randZipCode);
-                } else {
-                    for ($i = 0; $i < 5; ++$i) {
-                        $randZipCode .= mt_rand(0, 9);
-                    }
-                }
-            }
-        }
-        return $randZipCode;
+        return Tools::generateRandomZipcode($idCountry);
     }
 
     /**
