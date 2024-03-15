@@ -152,16 +152,6 @@ class AdminCustomersControllerCore extends AdminController
 
         $this->shopLinkType = 'shop';
         $this->shopShareDatas = Shop::SHARE_CUSTOMER;
-
-
-        // START send access query information to the admin controller
-        $this->access_select = ' SELECT a.`id_customer` FROM '._DB_PREFIX_.'customer a';
-        $this->access_join = ' INNER JOIN '._DB_PREFIX_.'orders ord ON (a.id_customer = ord.id_customer)';
-        $this->access_join .= ' INNER JOIN '._DB_PREFIX_.'htl_booking_detail hbd ON (hbd.id_order = ord.id_order)';
-        if ($acsHtls = HotelBranchInformation::getProfileAccessedHotels($this->context->employee->id_profile, 1, 1)) {
-            $this->access_where = ' WHERE hbd.id_hotel IN ('.implode(',', $acsHtls).')';
-        }
-
         parent::__construct();
 
         $this->_select = '
