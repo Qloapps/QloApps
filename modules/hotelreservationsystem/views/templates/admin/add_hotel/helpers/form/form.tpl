@@ -528,7 +528,7 @@
 <script type="text/javascript">
 	var id_language = {$defaultFormLanguage|intval};
 	allowEmployeeFormLang = {$allowEmployeeFormLang|intval};
-  var ps_force_friendly_product = false;
+	var ps_force_friendly_product = false;
 
 	// for tiny mce setup
 	var iso = "{$iso|escape:'htmlall':'UTF-8'}";
