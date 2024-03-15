@@ -532,7 +532,7 @@ class CartCore extends ObjectModel
         $sql = new DbQuery();
 
         // Build SELECT
-        $sql->select('cp.`id_product_attribute`, cp.`id_product`, cp.`quantity` AS cart_quantity, cp.id_shop, pl.`name`, p.`is_virtual`, p.`booking_product`, p.`service_product_type`,  p.`auto_add_to_cart`, p.`price_addition_type`, product_shop.`allow_multiple_quantity`, product_shop.`price_calculation_method`,
+        $sql->select('cp.`id_product_attribute`, cp.`id_product`, cp.`quantity` AS cart_quantity, cp.id_shop, pl.`name`, p.`is_virtual`, p.`booking_product`, p.`service_product_type`,  p.`auto_add_to_cart`, p.`price_addition_type`, p.`show_at_front`, product_shop.`allow_multiple_quantity`, product_shop.`price_calculation_method`,
 						pl.`description_short`, pl.`available_now`, pl.`available_later`, product_shop.`id_category_default`, p.`id_supplier`,
 						p.`id_manufacturer`, product_shop.`on_sale`, product_shop.`ecotax`, product_shop.`additional_shipping_cost`,
 						product_shop.`available_for_order`, product_shop.`price`, product_shop.`active`, product_shop.`unity`, product_shop.`unit_price_ratio`,
@@ -781,8 +781,8 @@ class CartCore extends ObjectModel
 
                         case Order::ROUND_ITEM:
                         default:
-                            $row['total'] = Tools::ps_round($totalPriceByProductTaxExcl, _PS_PRICE_COMPUTE_PRECISION_) * (int)$row['cart_quantity'];
-                            $row['total_wt'] = Tools::ps_round($totalPriceByProductTaxIncl, _PS_PRICE_COMPUTE_PRECISION_) * (int)$row['cart_quantity'];
+                            $row['total'] = Tools::ps_round($totalPriceByProductTaxExcl, _PS_PRICE_COMPUTE_PRECISION_);
+                            $row['total_wt'] = Tools::ps_round($totalPriceByProductTaxIncl, _PS_PRICE_COMPUTE_PRECISION_);
                             break;
                     }
                 }
@@ -804,8 +804,8 @@ class CartCore extends ObjectModel
 
                     case Order::ROUND_ITEM:
                     default:
-                        $row['total'] = Tools::ps_round($totalPriceByProductTaxExcl, _PS_PRICE_COMPUTE_PRECISION_) * (int)$row['cart_quantity'];
-                        $row['total_wt'] = Tools::ps_round($totalPriceByProductTaxIncl, _PS_PRICE_COMPUTE_PRECISION_) * (int)$row['cart_quantity'];
+                        $row['total'] = Tools::ps_round($totalPriceByProductTaxExcl, _PS_PRICE_COMPUTE_PRECISION_);
+                        $row['total_wt'] = Tools::ps_round($totalPriceByProductTaxIncl, _PS_PRICE_COMPUTE_PRECISION_);
                         break;
                 }
             } else {
@@ -2387,7 +2387,6 @@ class CartCore extends ObjectModel
                                         $array[$selectedProduct['id_hotel']] = array(
                                             'quantity' => $selectedProduct['quantity'],
                                             'id_hotel' => $selectedProduct['id_hotel'],
-                                            'unit_price_tax_incl' => $selectedProduct['unit_price_tax_incl'],
                                             'total_price_tax_excl' => $selectedProduct['total_price_tax_excl'],
                                             'total_price_tax_incl' => $selectedProduct['total_price_tax_incl'],
                                         );
@@ -2397,7 +2396,8 @@ class CartCore extends ObjectModel
                                     $product['cart_quantity'] = $selectedProduct['quantity'];
                                     $product['total'] = $selectedProduct['total_price_tax_excl'];
                                     $product['total_wt'] = $selectedProduct['total_price_tax_incl'];
-                                    $product['price_wt'] = $selectedProduct['unit_price_tax_incl'];
+                                    $product['price_wt'] = $selectedProduct['total_price_tax_incl'] / $product['cart_quantity'];
+                                    $product['price'] = $selectedProduct['total_price_tax_excl'] / $product['cart_quantity'];
                                     $product['id_hotel'] = $selectedProduct['id_hotel'];
                                     $orderPackage[$id_address][$selectedProduct['id_hotel']]['product_list'][] = $product;
                                     if (!isset($orderPackage[$id_address][$selectedProduct['id_hotel']]['id_hotel'])) {
@@ -2431,6 +2431,7 @@ class CartCore extends ObjectModel
                                     $unitPriceWt = $objHotelServiceProductCartDetail->getHotelProductUnitPrice($this->id, $product['id_product'], $hotelProduct['id_hotel'], true);
                                     $serviceProduct['total'] = $unitPrice * $hotelProduct['quantity'];
                                     $serviceProduct['total_wt'] = $unitPriceWt * $hotelProduct['quantity'];
+                                    $serviceProduct['price'] = $unitPrice;
                                     $serviceProduct['price_wt'] = $unitPriceWt;
                                     // if (!empty($hotelProducts['products'])) {
                                     //     foreach($hotelProducts['products'] as $hotelProduct) {

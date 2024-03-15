@@ -57,6 +57,14 @@
 					<input type="hidden" name="id_order_return" value="{$orderReturnInfo['id']|escape:'html':'UTF-8'}">
 
 					<div class="form-wrapper">
+                        <div class="form-group row">
+							<div class="col-sm-3">
+								<strong>{l s='Order Id' mod='hotelreservationsystem'} :</strong>
+							</div>
+							<div class="col-sm-9">
+                                <a href="{$link->getAdminLink('AdminOrders')|escape:'html':'UTF-8'}&amp;vieworder&amp;id_order={$orderInfo['id']|escape:'html':'UTF-8'}">#{$orderInfo['id']|escape:'html':'UTF-8'}</a>
+							</div>
+						</div>
 						<div class="form-group row">
 							<div class="col-sm-3">
 								<strong>{l s='Total order amount' mod='hotelreservationsystem'} :</strong>
@@ -358,6 +366,9 @@
 							<i class="process-icon-cancel"></i>{l s='Cancel' mod='hotelreservationsystem'}
 						</a>
 						<button type="submit" name="submitRefundReqBookings" class="btn btn-default pull-right">
+							<i class="process-icon-save"></i> {l s='Save' mod='hotelreservationsystem'}
+						</button>
+						<button type="submit" name="submitRefundReqBookingsAndStay" class="btn btn-default pull-right">
 							<i class="process-icon-save"></i> {l s='Save and stay' mod='hotelreservationsystem'}
 						</button>
 					</div>

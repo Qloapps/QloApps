@@ -157,7 +157,8 @@
 					{/if} -->
 					<!-- End -->
 					&nbsp;
-					{if $refund_allowed && !$hasCompletelyRefunded}
+                    <!-- Check if refund is allowed and all bookings are not requested for refund -->
+					{if $refund_allowed && !$completeRefundRequestOrCancel}
 						<a id="desc-order-standard_refund" class="btn btn-default" href="#refundForm">
 							<i class="icon-exchange"></i>
 							{if $order->getTotalPaid()|floatval}
@@ -232,23 +233,26 @@
 							</table>
 						</div>
 						<!-- Change status form -->
-						<form action="{$currentIndex|escape:'html':'UTF-8'}&amp;vieworder&amp;token={$smarty.get.token}" method="post" class="form-horizontal well hidden-print">
-							<div class="row">
-								<div class="col-lg-9">
-									<select id="id_order_state" class="chosen form-control" name="id_order_state">
-										{foreach from=$states item=state}
-											<option value="{$state['id_order_state']|intval}"{if isset($currentState) && $state['id_order_state'] == $currentState->id} selected="selected" disabled="disabled"{/if}>{$state['name']|escape}</option>
-										{/foreach}
-									</select>
-									<input type="hidden" name="id_order" value="{$order->id}" />
-								</div>
-								<div class="col-lg-3">
-									<button type="submit" name="submitState" class="btn btn-primary">
-										{l s='Update status'}
-									</button>
-								</div>
-							</div>
-						</form>
+                        {* If current state is refunded or cancelled the further order status changes are not allowed *}
+                        {if !isset($currentState) || (isset($currentState) && ($currentState->id != Configuration::get('PS_OS_REFUND') && $currentState->id != Configuration::get('PS_OS_CANCELED')))}
+                            <form action="{$currentIndex|escape:'html':'UTF-8'}&amp;vieworder&amp;id_order={$order->id|intval}&amp;token={$smarty.get.token}" method="post" class="form-horizontal well hidden-print">
+                                <div class="row">
+                                    <div class="col-lg-9">
+                                        <select id="id_order_state" class="chosen form-control" name="id_order_state">
+                                            {foreach from=$states item=state}
+                                                <option value="{$state['id_order_state']|intval}"{if isset($currentState) && $state['id_order_state'] == $currentState->id} selected="selected" disabled="disabled"{elseif ($state['id_order_state'] == Configuration::get('PS_OS_REFUND') && !$allBookingsRefunded)} disabled="disabled"{elseif ($state['id_order_state'] == Configuration::get('PS_OS_CANCELED') && !$allBookingsCancelled)} disabled="disabled"{elseif ($state['id_order_state'] == Configuration::get('PS_OS_OVERBOOKING_PAID') || $state['id_order_state'] == Configuration::get('PS_OS_OVERBOOKING_UNPAID') || $state['id_order_state'] == Configuration::get('PS_OS_OVERBOOKING_PARTIAL_PAID')) && (!isset($orderOverBookings) || !$orderOverBookings)} disabled="disabled"{/if}>{$state['name']|escape}</option>
+                                            {/foreach}
+                                        </select>
+                                        <input type="hidden" name="id_order" value="{$order->id}" />
+                                    </div>
+                                    <div class="col-lg-3">
+                                        <button type="submit" name="submitState" class="btn btn-primary">
+                                            {l s='Update status'}
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        {/if}
 					</div>
 					<!-- Tab documents -->
 					<div class="tab-pane" id="documents">
@@ -277,61 +281,69 @@
 											<th>{l s='Hotel Name'}</th>
 											<th>{l s='Duration'}</th>
 											<th>{l s='Documents'}</th>
-											<th>{l s='Order Status'}</th>
+											<th>{l s='Room Status'}</th>
 										</tr>
 										{if isset($htl_booking_order_data) && $htl_booking_order_data}
 											{foreach from=$htl_booking_order_data item=data}
-												{if !$data.is_refunded}
-													<tr>
-														<td>
-															{$data['room_num']}
-														</td>
-														<td>
-															<a href="{$link->getAdminLink('AdminAddHotel')}&amp;id={$data['id_hotel']}&amp;updatehtl_branch_info" target="_blank">
-																<span>{$data['hotel_name']}</span>
-															</a>
-														</td>
-														<td>
-															{dateFormat date=$data['date_from']} - {dateFormat date=$data['date_to']}
-														</td>
-														<td>
-															<a class="btn btn-default" onclick="BookingDocumentsModal.init({$data.id|intval}, this); return false;">
-																<i class="icon icon-file-text"></i>
-																{l s='Documents'} <span class="badge badge-info count-documents">{$data.num_checkin_documents}</span>
-															</a>
-														</td>
-														<td>
-															<form action="" method="post" class="form-horizontal row room_status_info_form">
-																<div class="col-sm-7">
-																	<select name="booking_order_status" class="form-control booking_order_status margin-bottom-5">
-																		{foreach from=$hotel_order_status item=state}
-																			<option value="{$state['id_status']|intval}" {if isset($data.id_status) && $state.id_status == $data.id_status} selected="selected" disabled="disabled"{/if}>{$state.name|escape}</option>
-																		{/foreach}
-																	</select>
+                                                <tr>
+                                                    <td>
+                                                        {$data['room_num']}
+                                                    </td>
+                                                    <td>
+                                                        <a href="{$link->getAdminLink('AdminAddHotel')}&amp;id={$data['id_hotel']}&amp;updatehtl_branch_info" target="_blank">
+                                                            <span>{$data['hotel_name']}</span>
+                                                        </a>
+                                                    </td>
+                                                    <td>
+                                                        {dateFormat date=$data['date_from']} - {dateFormat date=$data['date_to']}
+                                                    </td>
+                                                    <td>
+                                                        <a class="btn btn-default" onclick="BookingDocumentsModal.init({$data.id|intval}, this); return false;">
+                                                            <i class="icon icon-file-text"></i>
+                                                            {l s='Documents'} <span class="badge badge-info count-documents">{$data.num_checkin_documents}</span>
+                                                        </a>
+                                                    </td>
+                                                    <td>
+                                                        <form action="" method="post" class="form-horizontal row room_status_info_form">
+                                                            <div class="col-sm-7">
+                                                                {if $data.is_refunded || $data.is_cancelled}
+                                                                    {if $data['id_status'] == $hotel_order_status['STATUS_ALLOTED']['id_status']}
+                                                                        <p><span class="room_status badge badge-infomation">{l s='Room alloted'}</span></p>
+                                                                    {/if}
+                                                                {else}
+                                                                    <select name="booking_order_status" class="form-control booking_order_status margin-bottom-5">
+                                                                        {foreach from=$hotel_order_status item=state}
+                                                                            <option value="{$state['id_status']|intval}" {if isset($data.id_status) && $state.id_status == $data.id_status} selected="selected" disabled="disabled"{/if}>{$state.name|escape}</option>
+                                                                        {/foreach}
+                                                                    </select>
+                                                                {/if}
 
-																	{if $data['id_status'] == $hotel_order_status['STATUS_CHECKED_IN']['id_status']}
-																		<p class="text-center"><span class="badge badge-success margin-bottom-5">{l s='Checked in on'} {dateFormat date=$data['check_in']}</span></p>
-																	{elseif $data['id_status'] == $hotel_order_status['STATUS_CHECKED_OUT']['id_status']}
-																		<p class="text-center"><span class="badge badge-success margin-bottom-5">{l s='Checked out on'} {dateFormat date=$data['check_out']}</span></p>
-																	{/if}
+                                                                {if $data['id_status'] == $hotel_order_status['STATUS_CHECKED_IN']['id_status']}
+                                                                    <p><span class="room_status badge badge-success">{l s='Checked in on'} {dateFormat date=$data['check_in']}</span></p>
+                                                                {elseif $data['id_status'] == $hotel_order_status['STATUS_CHECKED_OUT']['id_status']}
+                                                                    <p><span class="room_status badge badge-success">{l s='Checked out on'} {dateFormat date=$data['check_out']}</span></p>
+                                                                {/if}
 
-																	{* field for the current date *}
-																	<input class="room_status_date wk-input-date" type="text" name="status_date" value="{if $data['id_status'] == $hotel_order_status['STATUS_CHECKED_IN']['id_status']}{$data['date_to']|date_format:"%d-%m-%Y"}{else}{$data['date_from']|date_format:"%d-%m-%Y"}{/if}" readonly/>
+                                                                {* field for the current date *}
+                                                                <input class="room_status_date wk-input-date" type="text" name="status_date" value="{if $data['id_status'] == $hotel_order_status['STATUS_CHECKED_IN']['id_status']}{$data['date_to']|date_format:"%d-%m-%Y"}{else}{$data['date_from']|date_format:"%d-%m-%Y"}{/if}" readonly/>
 
-																	<input type="hidden" name="date_from" value="{$data['date_from']|date_format:"%Y-%m-%d"}" />
-																	<input type="hidden" name="date_to" value="{$data['date_to']|date_format:"%Y-%m-%d"}" />
-																	<input type="hidden" name="id_room" value="{$data['id_room']}" />
-																	<input type="hidden" name="id_order" value="{$order->id}" />
-																</div>
-																<div class="col-sm-5">
-																	<button type="submit" name="submitbookingOrderStatus" class="btn btn-primary">
-																		{l s='Update Status'}
-																	</button>
-																</div>
-															</form>
-														</td>
-													</tr>
-												{/if}
+                                                                <input type="hidden" name="date_from" value="{$data['date_from']|date_format:"%Y-%m-%d"}" />
+                                                                <input type="hidden" name="date_to" value="{$data['date_to']|date_format:"%Y-%m-%d"}" />
+                                                                <input type="hidden" name="id_room" value="{$data['id_room']}" />
+                                                                <input type="hidden" name="id_order" value="{$order->id}" />
+                                                            </div>
+                                                            <div class="col-sm-5 text-right">
+                                                                {if $data.is_refunded || $data.is_cancelled}
+                                                                    <span class="badge badge-danger">{if $data.is_cancelled}{l s='Cancelled'}{else}{l s='Refunded'}{/if}</span>
+                                                                {else}
+                                                                    <button type="submit" name="submitbookingOrderStatus" class="btn btn-primary">
+                                                                        {l s='Update Status'}
+                                                                    </button>
+                                                                {/if}
+                                                            </div>
+                                                        </form>
+                                                    </td>
+                                                </tr>
 											{/foreach}
 										{else}
 											<tr>
@@ -352,121 +364,123 @@
 				</script>
 				<hr />
 				<!-- Tab nav -->
-				<ul class="nav nav-tabs" id="myTab" style="display:none"><!-- by webkul -->
-					{$HOOK_TAB_SHIP}
-					<li class="active">
-						<a href="#shipping">
-							<i class="icon-truck "></i>
-							{l s='Shipping'} <span class="badge">{$order->getShipping()|@count}</span>
-						</a>
-					</li>
-					<li>
-						<a href="#returns">
-							<i class="icon-undo"></i>
-							{l s='Merchandise Returns'} <span class="badge">{$order->getReturn()|@count}</span>
-						</a>
-					</li>
-				</ul>
-				<!-- Tab content -->
-				<div class="tab-content panel" style="display:none"><!-- by webkul -->
-				{$HOOK_CONTENT_SHIP}
-					<!-- Tab shipping -->
-					<div class="tab-pane active" id="shipping">
-						<h4 class="visible-print">{l s='Shipping'} <span class="badge">({$order->getShipping()|@count})</span></h4>
-						<!-- Shipping block -->
-						{if !$order->isVirtual()}
-						<div class="form-horizontal">
-							{if $order->gift_message}
-							<div class="form-group">
-								<label class="control-label col-lg-3">{l s='Message'}</label>
-								<div class="col-lg-9">
-									<p class="form-control-static">{$order->gift_message|nl2br}</p>
-								</div>
-							</div>
-							{/if}
-							{include file='controllers/orders/_shipping.tpl'}
-							{if $carrierModuleCall}
-								{$carrierModuleCall}
-							{/if}
-							<hr />
-							{if $order->recyclable}
-								<span class="label label-success"><i class="icon-check"></i> {l s='Recycled packaging'}</span>
-							{else}
-								<span class="label label-inactive"><i class="icon-remove"></i> {l s='Recycled packaging'}</span>
-							{/if}
+				{* <!-- commented by qlo -->
+                    <ul class="nav nav-tabs" id="myTab" style="display:none">
+                        {$HOOK_TAB_SHIP}
+                        <li class="active">
+                            <a href="#shipping">
+                                <i class="icon-truck "></i>
+                                {l s='Shipping'} <span class="badge">{$order->getShipping()|@count}</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#returns">
+                                <i class="icon-undo"></i>
+                                {l s='Merchandise Returns'} <span class="badge">{$order->getReturn()|@count}</span>
+                            </a>
+                        </li>
+                    </ul>
+                    <!-- Tab content -->
+                    <div class="tab-content panel" style="display:none">
+                        {$HOOK_CONTENT_SHIP}
+                        <!-- Tab shipping -->
+                        <div class="tab-pane active" id="shipping">
+                            <h4 class="visible-print">{l s='Shipping'} <span class="badge">({$order->getShipping()|@count})</span></h4>
+                            <!-- Shipping block -->
+                            {if !$order->isVirtual()}
+                            <div class="form-horizontal">
+                                {if $order->gift_message}
+                                <div class="form-group">
+                                    <label class="control-label col-lg-3">{l s='Message'}</label>
+                                    <div class="col-lg-9">
+                                        <p class="form-control-static">{$order->gift_message|nl2br}</p>
+                                    </div>
+                                </div>
+                                {/if}
+                                {include file='controllers/orders/_shipping.tpl'}
+                                {if $carrierModuleCall}
+                                    {$carrierModuleCall}
+                                {/if}
+                                <hr />
+                                {if $order->recyclable}
+                                    <span class="label label-success"><i class="icon-check"></i> {l s='Recycled packaging'}</span>
+                                {else}
+                                    <span class="label label-inactive"><i class="icon-remove"></i> {l s='Recycled packaging'}</span>
+                                {/if}
 
-							{if $order->gift}
-								<span class="label label-success"><i class="icon-check"></i> {l s='Gift wrapping'}</span>
-							{else}
-								<span class="label label-inactive"><i class="icon-remove"></i> {l s='Gift wrapping'}</span>
-							{/if}
-						</div>
-						{/if}
-					</div>
-					<!-- Tab returns -->
-					<div class="tab-pane" id="returns">
-						<h4 class="visible-print">{l s='Merchandise Returns'} <span class="badge">({$order->getReturn()|@count})</span></h4>
-						{if !$order->isVirtual()}
-						<!-- Return block -->
-							{if $order->getReturn()|count > 0}
-							<div class="table-responsive">
-								<table class="table">
-									<thead>
-										<tr>
-											<th><span class="title_box ">{l s='Date'}</span></th>
-											<th><span class="title_box ">{l s='Type'}</span></th>
-											<th><span class="title_box ">{l s='Carrier'}</span></th>
-											<th><span class="title_box ">{l s='Tracking number'}</span></th>
-										</tr>
-									</thead>
-									<tbody>
-										{foreach from=$order->getReturn() item=line}
-										<tr>
-											<td>{$line.date_add}</td>
-											<td>{l s=$line.type}</td>
-											<td>{$line.state_name}</td>
-											<td class="actions">
-												<span class="shipping_number_show">{if isset($line.url) && isset($line.tracking_number)}<a href="{$line.url|replace:'@':$line.tracking_number|escape:'html':'UTF-8'}">{$line.tracking_number}</a>{elseif isset($line.tracking_number)}{$line.tracking_number}{/if}</span>
-												{if $line.can_edit}
-												<form method="post" action="{$link->getAdminLink('AdminOrders')|escape:'html':'UTF-8'}&amp;vieworder&amp;id_order={$order->id|intval}&amp;id_order_invoice={if $line.id_order_invoice}{$line.id_order_invoice|intval}{else}0{/if}&amp;id_carrier={if $line.id_carrier}{$line.id_carrier|escape:'html':'UTF-8'}{else}0{/if}">
-													<span class="shipping_number_edit" style="display:none;">
-														<button type="button" name="tracking_number">
-															{$line.tracking_number|htmlentities}
-														</button>
-														<button type="submit" class="btn btn-default" name="submitShippingNumber">
-															{l s='Update'}
-														</button>
-													</span>
-													<button href="#" class="edit_shipping_number_link">
-														<i class="icon-pencil"></i>
-														{l s='Edit'}
-													</button>
-													<button href="#" class="cancel_shipping_number_link" style="display: none;">
-														<i class="icon-remove"></i>
-														{l s='Cancel'}
-													</button>
-												</form>
-												{/if}
-											</td>
-										</tr>
-										{/foreach}
-									</tbody>
-								</table>
-							</div>
-							{else}
-							<div class="list-empty hidden-print">
-								<div class="list-empty-msg">
-									<i class="icon-warning-sign list-empty-icon"></i>
-									{l s='No merchandise returned yet'}
-								</div>
-							</div>
-							{/if}
-							{if $carrierModuleCall}
-								{$carrierModuleCall}
-							{/if}
-						{/if}
-					</div>
-				</div>
+                                {if $order->gift}
+                                    <span class="label label-success"><i class="icon-check"></i> {l s='Gift wrapping'}</span>
+                                {else}
+                                    <span class="label label-inactive"><i class="icon-remove"></i> {l s='Gift wrapping'}</span>
+                                {/if}
+                            </div>
+                            {/if}
+                        </div>
+                        <!-- Tab returns -->
+                        <div class="tab-pane" id="returns">
+                            <h4 class="visible-print">{l s='Merchandise Returns'} <span class="badge">({$order->getReturn()|@count})</span></h4>
+                            {if !$order->isVirtual()}
+                            <!-- Return block -->
+                                {if $order->getReturn()|count > 0}
+                                <div class="table-responsive">
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th><span class="title_box ">{l s='Date'}</span></th>
+                                                <th><span class="title_box ">{l s='Type'}</span></th>
+                                                <th><span class="title_box ">{l s='Carrier'}</span></th>
+                                                <th><span class="title_box ">{l s='Tracking number'}</span></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {foreach from=$order->getReturn() item=line}
+                                            <tr>
+                                                <td>{$line.date_add}</td>
+                                                <td>{l s=$line.type}</td>
+                                                <td>{$line.state_name}</td>
+                                                <td class="actions">
+                                                    <span class="shipping_number_show">{if isset($line.url) && isset($line.tracking_number)}<a href="{$line.url|replace:'@':$line.tracking_number|escape:'html':'UTF-8'}">{$line.tracking_number}</a>{elseif isset($line.tracking_number)}{$line.tracking_number}{/if}</span>
+                                                    {if $line.can_edit}
+                                                    <form method="post" action="{$link->getAdminLink('AdminOrders')|escape:'html':'UTF-8'}&amp;vieworder&amp;id_order={$order->id|intval}&amp;id_order_invoice={if $line.id_order_invoice}{$line.id_order_invoice|intval}{else}0{/if}&amp;id_carrier={if $line.id_carrier}{$line.id_carrier|escape:'html':'UTF-8'}{else}0{/if}">
+                                                        <span class="shipping_number_edit" style="display:none;">
+                                                            <button type="button" name="tracking_number">
+                                                                {$line.tracking_number|htmlentities}
+                                                            </button>
+                                                            <button type="submit" class="btn btn-default" name="submitShippingNumber">
+                                                                {l s='Update'}
+                                                            </button>
+                                                        </span>
+                                                        <button href="#" class="edit_shipping_number_link">
+                                                            <i class="icon-pencil"></i>
+                                                            {l s='Edit'}
+                                                        </button>
+                                                        <button href="#" class="cancel_shipping_number_link" style="display: none;">
+                                                            <i class="icon-remove"></i>
+                                                            {l s='Cancel'}
+                                                        </button>
+                                                    </form>
+                                                    {/if}
+                                                </td>
+                                            </tr>
+                                            {/foreach}
+                                        </tbody>
+                                    </table>
+                                </div>
+                                {else}
+                                <div class="list-empty hidden-print">
+                                    <div class="list-empty-msg">
+                                        <i class="icon-warning-sign list-empty-icon"></i>
+                                        {l s='No merchandise returned yet'}
+                                    </div>
+                                </div>
+                                {/if}
+                                {if $carrierModuleCall}
+                                    {$carrierModuleCall}
+                                {/if}
+                            {/if}
+                        </div>
+                    </div>
+                *}
 				<script>
 					$('#myTab a').click(function (e) {
 						e.preventDefault()
@@ -1163,7 +1177,7 @@
 				<div class="panel" id="refundForm">
 					<div class="panel-heading">
 						<i class="icon-shopping-cart"></i>
-						{l s='Order Detail'} <span class="badge">{$order_detail_data|@count}</span>
+						{l s='Rooms Detail'} <span class="badge">{$order_detail_data|@count}</span>
 						{* by webkul products changes as rooms *}
 					</div>
 					{* by webkul this code is added for showing rooms information on the order detail page *}
@@ -1185,9 +1199,11 @@
 						<input type="hidden" name="TaxMethod" value="1">
 					{/if}
 					{if $can_edit}
-						<div class="row-margin-bottom row-margin-top standard_refund_fields"  style="display: none;">
-							<textarea class="cancellation_reason" name="cancellation_reason" placeholder="{l s='Enter reason to cancel bookings'}"></textarea>
-						</div>
+                        {if $refund_allowed && !$completeRefundRequestOrCancel}
+                            <div class="row-margin-bottom row-margin-top standard_refund_fields"  style="display: none;">
+                                <textarea class="cancellation_reason" name="cancellation_reason" placeholder="{l s='Enter reason to cancel bookings'}"></textarea>
+                            </div>
+                        {/if}
 						<div class="row-margin-bottom row-margin-top order_action">
 							{if !$order->hasBeenDelivered()}
 								{* <button type="button" id="add_product" class="btn btn-default">
@@ -1204,7 +1220,7 @@
 								{l s='Add a new discount'}
 							</button>
 
-							{if $refund_allowed && !$hasCompletelyRefunded}
+							{if $refund_allowed && !$completeRefundRequestOrCancel}
 								<div class="pull-right">
 									<button style="display: none;" type="button" class="btn btn-default standard_refund_fields" id="cancelRefund">
 										{l s='Cancel'}
@@ -1394,16 +1410,14 @@
 											</tr>
 										{/if}
 
-										{if $order->total_paid_tax_incl > $order->total_paid_real}
-											<tr>
-												<td class="text-right"><strong>{l s='Due Amount'}</strong></td>
-												<td class="amount text-right nowrap">
-													<strong>
-														{displayPrice currency=$order->id_currency price=($order->total_paid_tax_incl - $order->total_paid_real)}
-													</strong>
-												</td>
-											</tr>
-										{/if}
+                                        <tr>
+                                            <td class="text-right"><strong>{l s='Due Amount'}</strong></td>
+                                            <td class="amount text-right nowrap">
+                                                <strong>
+                                                    {displayPrice currency=$order->id_currency price=($order->total_paid_tax_incl - $order->total_paid_real)}
+                                                </strong>
+                                            </td>
+                                        </tr>
 									</table>
 								</div>
 							</div>
@@ -1629,6 +1643,7 @@
 	{addJsDefL name='invalid_occupancy_txt'}{l s='Invalid occupancy(adults/children) found.' js=1}{/addJsDefL}
 	{addJsDef max_child_age=$max_child_age|escape:'quotes':'UTF-8'}
 	{addJsDef max_child_in_room=$max_child_in_room|escape:'quotes':'UTF-8'}
+    {addJsDefL name='undo_cancellation_success'}{l s='Booking cancellation undo process is done successfully.' js=1}{/addJsDefL}
 {/strip}
 
 {* Apply javascript for the page *}
@@ -1655,12 +1670,10 @@
 		{* open date picker for the date input of check-in checkout dates *}
 		$(document).on('focus', '.room_status_date', function() {
 			var dateFrom = $(this).closest('.room_status_info_form').find('[name="date_from"]').val();
-			dateFrom = dateFrom.split("-");
-            minDate = new Date($.datepicker.formatDate('yy-mm-dd', new Date(dateFrom[0], dateFrom[1] - 1, dateFrom[2])));
+            minDate = $.datepicker.parseDate('yy-mm-dd', dateFrom);
 
 			var dateTo = $(this).closest('.room_status_info_form').find('[name="date_to"]').val();
-			dateTo = dateTo.split("-");
-            maxDate = new Date($.datepicker.formatDate('yy-mm-dd', new Date(dateTo[0], dateTo[1] - 1, dateTo[2])));
+            maxDate = $.datepicker.parseDate('yy-mm-dd', dateTo);
 
 			$(this).datepicker({
 				dateFormat: 'dd-mm-yy',
@@ -1751,6 +1764,17 @@
 			$('#rooms_extra_demands .room_services_container').hide();
 			$('#room_extra_demand_content #save_service_service').hide();
 			$('#room_extra_demand_content #back_to_service_btn').hide();
+		});
+
+		$(document).on('change', '#rooms_type_extra_demands .room_ordered_services .qty', function(e) {
+			let quantityInputField = this;
+			let maximumQuantity = parseInt($(quantityInputField).attr('data-max-quantity'));
+			let currentQuantity = parseInt($(quantityInputField).val());
+			if (currentQuantity > maximumQuantity) {
+				$(quantityInputField).siblings('p').show();
+			} else {
+				$(quantityInputField).siblings('p').hide();
+			}
 		});
 
 		$(document).on('focusout', '#rooms_type_extra_demands .room_ordered_services .qty', function(e) {

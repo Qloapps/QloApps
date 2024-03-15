@@ -1746,6 +1746,10 @@ class AdminNormalProductsControllerCore extends AdminController
 
         $this->object = new $this->className();
         $this->_removeTaxFromEcotax();
+        if (Tools::getValue('auto_add_to_cart')) {
+            $_POST['allow_multiple_quantity'] = 0;
+        }
+
         $this->copyFromPost($this->object, $this->table);
         $this->object->service_product_type = Product::SERVICE_PRODUCT_WITH_ROOMTYPE;
 
@@ -1884,6 +1888,9 @@ class AdminNormalProductsControllerCore extends AdminController
             /** @var Product $object */
             $object = new $this->className((int)$id);
             $this->object = $object;
+            if (Tools::getValue('auto_add_to_cart')) {
+                $_POST['allow_multiple_quantity'] = 0;
+            }
 
             if (Validate::isLoadedObject($object)) {
                 $this->_removeTaxFromEcotax();
@@ -2791,16 +2798,51 @@ class AdminNormalProductsControllerCore extends AdminController
     public function updateLinkedHotelsAndRooms($product)
     {
         if (Validate::isLoadedObject($product)) {
-            RoomTypeServiceProduct::deleteRoomProductLink($product->id);
-
+            $objRoomTypeServiceProduct = new RoomTypeServiceProduct();
+            $associatedRoomTypes = $objRoomTypeServiceProduct->getAssociatedHotelsAndRoomType($product->id)['room_types'];
             if (Product::SERVICE_PRODUCT_WITH_ROOMTYPE == $product->service_product_type) {
-                $objRoomTypeServiceProduct = new RoomTypeServiceProduct();
-                // add product link for room types
-                if ($selectedRoomTypes = Tools::getValue('roomTypeBox')) {
+                $selectedRoomTypes = Tools::getValue('roomTypeBox');
+
+                // Generate list of new associations
+                $newRoomTypes = array();
+                foreach ($selectedRoomTypes as $selectedRoomType) {
+                    if (!in_array($selectedRoomType, $associatedRoomTypes)) {
+                        $newRoomTypes[] = $selectedRoomType;
+                    }
+                }
+
+                // Generate list of associations to remove
+                $removedRoomTypes = array();
+                foreach ($associatedRoomTypes as $associatedRoomType) {
+                    if (!in_array($associatedRoomType, $selectedRoomTypes)) {
+                        $removedRoomTypes[] = $associatedRoomType;
+                    }
+                }
+
+                // Remove associations
+                foreach ($removedRoomTypes as $removedRoomType) {
+                    RoomTypeServiceProduct::deleteRoomProductLink(
+                        $product->id,
+                        RoomTypeServiceProduct::WK_ELEMENT_TYPE_ROOM_TYPE,
+                        $removedRoomType
+                    );
+                }
+
+                // Save new associations
+                if ($newRoomTypes) {
                     $objRoomTypeServiceProduct->addRoomProductLink(
                         $product->id,
-                        $selectedRoomTypes,
+                        $newRoomTypes,
                         RoomTypeServiceProduct::WK_ELEMENT_TYPE_ROOM_TYPE
+                    );
+                }
+            } else {
+                // Remove associations
+                foreach ($associatedRoomTypes as $associatedRoomType) {
+                    RoomTypeServiceProduct::deleteRoomProductLink(
+                        $product->id,
+                        RoomTypeServiceProduct::WK_ELEMENT_TYPE_ROOM_TYPE,
+                        $associatedRoomType
                     );
                 }
             }

@@ -426,7 +426,7 @@
 															let dateFrom = $('#local_{$params.id_date}_0').val().trim();
 															let dateTo = $('#local_{$params.id_date}_1').val().trim();
 
-															if (dateFrom >= dateTo) {
+															if ((dateFrom && dateTo) && (dateFrom >= dateTo)) {
 																let objDateToMin = $.datepicker.parseDate('yy-mm-dd', dateFrom);
 																objDateToMin.setDate(objDateToMin.getDate());
 
