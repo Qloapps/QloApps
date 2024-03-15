@@ -1670,12 +1670,10 @@
 		{* open date picker for the date input of check-in checkout dates *}
 		$(document).on('focus', '.room_status_date', function() {
 			var dateFrom = $(this).closest('.room_status_info_form').find('[name="date_from"]').val();
-			dateFrom = dateFrom.split("-");
-            minDate = new Date($.datepicker.formatDate('yy-mm-dd', new Date(dateFrom[0], dateFrom[1] - 1, dateFrom[2])));
+            minDate = $.datepicker.parseDate('yy-mm-dd', dateFrom);
 
 			var dateTo = $(this).closest('.room_status_info_form').find('[name="date_to"]').val();
-			dateTo = dateTo.split("-");
-            maxDate = new Date($.datepicker.formatDate('yy-mm-dd', new Date(dateTo[0], dateTo[1] - 1, dateTo[2])));
+            maxDate = $.datepicker.parseDate('yy-mm-dd', dateTo);
 
 			$(this).datepicker({
 				dateFormat: 'dd-mm-yy',
