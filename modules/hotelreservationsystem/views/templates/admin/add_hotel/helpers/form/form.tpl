@@ -101,9 +101,9 @@
 						<div class="col-lg-9 ">
 							<span class="switch prestashop-switch fixed-width-lg">
 								<input type="radio" {if isset($edit) && $hotel_info.active==1} checked="checked" {else}checked="checked"{/if} value="1" id="ENABLE_HOTEL_on" name="ENABLE_HOTEL">
-								<label for="ENABLE_HOTEL_on">{l s='Yes'}</label>
+								<label for="ENABLE_HOTEL_on">{l s='Yes' mod='hotelreservationsystem'}</label>
 								<input {if isset($edit) && $hotel_info.active==0} checked="checked" {/if} type="radio" value="0" id="ENABLE_HOTEL_off" name="ENABLE_HOTEL">
-								<label for="ENABLE_HOTEL_off">{l s='No'}</label>
+								<label for="ENABLE_HOTEL_off">{l s='No' mod='hotelreservationsystem'}</label>
 								<a class="slide-button btn"></a>
 							</span>
 						</div>
@@ -186,11 +186,11 @@
 						</div>
 					</div>
 					<div class="form-group">
-						<label class="control-label col-sm-3 required" for="hotel_country">{l s='Rating :'}</label>
+						<label class="control-label col-sm-3 required" for="hotel_country">{l s='Rating :' mod='hotelreservationsystem'}</label>
 						<div class="col-sm-6">
 							<div style="width: 195px;">
 								<select class="form-control" name="hotel_rating" id="hotel_rating" value="">
-									<option value="">{l s='No star'}</option>
+									<option value="">{l s='No star' mod='hotelreservationsystem'}</option>
 									<option value="1" {if (isset($smarty.post.hotel_rating) && $smarty.post.hotel_rating == '1') || isset($edit) && $hotel_info['rating'] == '1'}selected{/if}>*</option>
 									<option value="2" {if (isset($smarty.post.hotel_rating) && $smarty.post.hotel_rating == '2') || isset($edit) && $hotel_info['rating'] == '2'}selected{/if}>**</option>
 									<option value="3" {if (isset($smarty.post.hotel_rating) && $smarty.post.hotel_rating == '3') || isset($edit) && $hotel_info['rating'] == '3'}selected{/if}>***</option>
@@ -331,9 +331,9 @@
 							<div class="col-lg-6">
 								<span class="switch prestashop-switch fixed-width-lg">
 									<input type="radio" {if isset($edit) && isset($order_restrict_date_info.use_global_max_order_date) && $order_restrict_date_info.use_global_max_order_date} checked="checked" {else} checked="checked" {/if} value="1" id="enable_use_global_max_order_date_on" name="enable_use_global_max_order_date">
-									<label for="enable_use_global_max_order_date_on">{l s='Yes'}</label>
+									<label for="enable_use_global_max_order_date_on">{l s='Yes' mod='hotelreservationsystem'}</label>
 									<input {if isset($edit) && isset($order_restrict_date_info.use_global_max_order_date) && !$order_restrict_date_info.use_global_max_order_date} checked="checked" {/if} type="radio" value="0" id="enable_use_global_max_order_date_off" name="enable_use_global_max_order_date">
-									<label for="enable_use_global_max_order_date_off">{l s='No'}</label>
+									<label for="enable_use_global_max_order_date_off">{l s='No' mod='hotelreservationsystem'}</label>
 									<a class="slide-button btn"></a>
 								</span>
 							</div>
@@ -351,9 +351,9 @@
 							<div class="col-lg-6">
 								<span class="switch prestashop-switch fixed-width-lg">
 									<input type="radio" {if isset($edit) && isset($order_restrict_date_info.use_global_preparation_time) && $order_restrict_date_info.use_global_preparation_time} checked="checked" {else} checked="checked" {/if} value="1" id="enable_use_global_preparation_time_on" name="enable_use_global_preparation_time">
-									<label for="enable_use_global_preparation_time_on">{l s='Yes'}</label>
+									<label for="enable_use_global_preparation_time_on">{l s='Yes' mod='hotelreservationsystem'}</label>
 									<input {if isset($edit) && isset($order_restrict_date_info.use_global_preparation_time) && !$order_restrict_date_info.use_global_preparation_time} checked="checked" {/if} type="radio" value="0" id="enable_use_global_preparation_time_off" name="enable_use_global_preparation_time">
-									<label for="enable_use_global_preparation_time_off">{l s='No'}</label>
+									<label for="enable_use_global_preparation_time_off">{l s='No' mod='hotelreservationsystem'}</label>
 									<a class="slide-button btn"></a>
 								</span>
 							</div>
@@ -453,7 +453,7 @@
 								</div>
 							{else}
 								<div class="alert alert-warning">
-									{l s='No refund rules are created yet.' mod='hotelreservationsystem'} {l s='You can create refund rules by visiting '} <a target="_blank" href="{$link->getAdminLink('AdminOrderRefundRules')}">{l s='create refund rules'}</a>
+									{l s='No refund rules are created yet.' mod='hotelreservationsystem'} {l s='You can create refund rules by visiting ' mod='hotelreservationsystem'} <a target="_blank" href="{$link->getAdminLink('AdminOrderRefundRules')}">{l s='create refund rules' mod='hotelreservationsystem'}</a>
 								</div>
 							{/if}
 						</div>

@@ -11,8 +11,8 @@
                     {* room type occupancy Details *}
                     <div>
                         <div class="form-group">
-                            <b>{l s='Room Occupancy'}:</b>&nbsp;&nbsp;&nbsp;
-                            <span>{l s='Maximum adults'} : {$book_v['room_type_info']['max_adults']}</span>&nbsp;&nbsp;&nbsp;<span>{l s='Maximum children'} : {$book_v['room_type_info']['max_children']}</span>&nbsp;&nbsp;&nbsp;<span>{l s='Maximum guests'} : {$book_v['room_type_info']['max_guests']}</span>
+                            <b>{l s='Room Occupancy' mod='hotelreservationsystem'}:</b>&nbsp;&nbsp;&nbsp;
+                            <span>{l s='Maximum adults' mod='hotelreservationsystem'} : {$book_v['room_type_info']['max_adults']}</span>&nbsp;&nbsp;&nbsp;<span>{l s='Maximum children' mod='hotelreservationsystem'} : {$book_v['room_type_info']['max_children']}</span>&nbsp;&nbsp;&nbsp;<span>{l s='Maximum guests' mod='hotelreservationsystem'} : {$book_v['room_type_info']['max_guests']}</span>
                         </div>
                     </div>
                     <ul class="nav nav-tabs">
@@ -56,7 +56,7 @@
                                                     <td class="booking_occupancy">
                                                         <div class="dropdown">
                                                             <button class="btn btn-default btn-left btn-block booking_guest_occupancy input-occupancy" type="button">
-                                                                <span>{l s='Select occupancy'}</span>
+                                                                <span>{l s='Select occupancy' mod='hotelreservationsystem'}</span>
                                                             </button>
                                                             <div class="dropdown-menu booking_occupancy_wrapper well well-sm">
                                                                 <input type="hidden" class="max_adults" value="{if isset($book_v)}{$book_v['max_adults']|escape:'html':'UTF-8'}{/if}">
@@ -64,22 +64,22 @@
                                                                 <input type="hidden" class="max_guests" value="{if isset($book_v)}{$book_v['max_guests']|escape:'html':'UTF-8'}{/if}">
                                                                 <div class="booking_occupancy_inner row">
                                                                     <div class="occupancy_info_block col-sm-12" occ_block_index="0">
-                                                                        <div class="occupancy_info_head col-sm-12"><label class="room_num_wrapper">{l s='Room - 1'}</label></div>
+                                                                        <div class="occupancy_info_head col-sm-12"><label class="room_num_wrapper">{l s='Room - 1' mod='hotelreservationsystem'}</label></div>
                                                                         <div class="col-sm-12">
                                                                             <div class="row">
                                                                                 <div class="form-group col-xs-6 occupancy_count_block">
-                                                                                    <label>{l s='Adults'}</label>
+                                                                                    <label>{l s='Adults' mod='hotelreservationsystem'}</label>
                                                                                     <input type="number" class="form-control num_occupancy num_adults" name="occupancy[0][adults]" value="1" min="1"  max="{if isset($book_v)}{$book_v['max_adults']|escape:'html':'UTF-8'}{/if}">
                                                                                 </div>
                                                                                 <div class="form-group col-xs-6 occupancy_count_block">
-                                                                                    <label>{l s='Children'} <span class="label-desc-txt"></span></label>
+                                                                                    <label>{l s='Children' mod='hotelreservationsystem'} <span class="label-desc-txt"></span></label>
                                                                                     <input type="number" class="form-control num_occupancy num_children" name="occupancy[0][children]" value="0" min="0" max="{if isset($book_v)}{$book_v['max_children']|escape:'html':'UTF-8'}{else}{$max_child_in_room}{/if}">
-                                                                                    ({l s='Below'}  {$max_child_age|escape:'htmlall':'UTF-8'} {l s='years'})
+                                                                                    ({l s='Below' mod='hotelreservationsystem'}  {$max_child_age|escape:'htmlall':'UTF-8'} {l s='years' mod='hotelreservationsystem'})
                                                                                 </div>
                                                                             </div>
                                                                             <div class="row children_age_info_block" style="display:none">
                                                                                 <div class="form-group col-sm-12">
-                                                                                    <label class="">{l s='All Children'}</label>
+                                                                                    <label class="">{l s='All Children' mod='hotelreservationsystem'}</label>
                                                                                     <div class="">
                                                                                         <div class="row children_ages">
                                                                                         </div>
@@ -143,7 +143,7 @@
                                                         <td class="booking_occupancy">
                                                             <div class="dropdown">
                                                                 <button class="btn btn-default btn-left btn-block booking_guest_occupancy input-occupancy" type="button">
-                                                                    <span>{l s='Select occupancy'}</span>
+                                                                    <span>{l s='Select occupancy' mod='hotelreservationsystem'}</span>
                                                                 </button>
                                                                 <div class="dropdown-menu booking_occupancy_wrapper well well-sm">
                                                                     <input type="hidden" class="max_adults" value="{if isset($book_v)}{$book_v['max_adults']|escape:'html':'UTF-8'}{/if}">
@@ -151,22 +151,22 @@
                                                                     <input type="hidden" class="max_guests" value="{if isset($book_v)}{$book_v['max_guests']|escape:'html':'UTF-8'}{/if}">
                                                                     <div class="booking_occupancy_inner row">
                                                                         <div class="occupancy_info_block col-sm-12" occ_block_index="0">
-                                                                            <div class="occupancy_info_head col-sm-12"><label class="room_num_wrapper">{l s='Room - 1'}</label></div>
+                                                                            <div class="occupancy_info_head col-sm-12"><label class="room_num_wrapper">{l s='Room - 1' mod='hotelreservationsystem'}</label></div>
                                                                             <div class="col-sm-12">
                                                                                 <div class="row">
                                                                                     <div class="form-group col-xs-6 occupancy_count_block">
-                                                                                        <label>{l s='Adults'}</label>
+                                                                                        <label>{l s='Adults' mod='hotelreservationsystem'}</label>
                                                                                         <input type="number" class="form-control num_occupancy num_adults" name="occupancy[0][adults]" value="1" min="1"  max="{if isset($book_v)}{$book_v['max_adults']|escape:'html':'UTF-8'}{/if}">
                                                                                     </div>
                                                                                     <div class="form-group col-xs-6 occupancy_count_block">
-                                                                                        <label>{l s='Children'} <span class="label-desc-txt"></span></label>
+                                                                                        <label>{l s='Children' mod='hotelreservationsystem'} <span class="label-desc-txt"></span></label>
                                                                                         <input type="number" class="form-control num_occupancy num_children" name="occupancy[0][children]" value="0" min="0" max="{if isset($book_v)}{$book_v['max_children']|escape:'html':'UTF-8'}{else}{$max_child_in_room}{/if}">
-                                                                                        ({l s='Below'}  {$max_child_age|escape:'htmlall':'UTF-8'} {l s='years'})
+                                                                                        ({l s='Below'}  {$max_child_age|escape:'htmlall':'UTF-8'} {l s='years' mod='hotelreservationsystem'})
                                                                                     </div>
                                                                                 </div>
                                                                                 <div class="row children_age_info_block" style="display:none">
                                                                                     <div class="form-group col-sm-12">
-                                                                                        <label class="">{l s='All Children'}</label>
+                                                                                        <label class="">{l s='All Children' mod='hotelreservationsystem'}</label>
                                                                                         <div class="">
                                                                                             <div class="row children_ages">
                                                                                             </div>
