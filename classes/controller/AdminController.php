@@ -941,7 +941,7 @@ class AdminControllerCore extends Controller
                                 if (!Validate::isDate($value[1])) {
                                     $this->errors[] = Tools::displayError('The \'To\' date format is invalid (YYYY-MM-DD)');
                                 } elseif (isset($value[0]) && !empty($value[0]) && strtotime($value[0]) > strtotime($value[1])) {
-                                    $this->errors[] = Tools::displayError('The \'To\' date cannot be before than from date');
+                                    $this->errors[] = Tools::displayError('The \'To\' date cannot be earlier than \'From\' date');
                                 } else {
                                     $sql_filter .= ' AND '.pSQL($key).' <= \''.pSQL(Tools::dateTo($value[1])).'\'';
                                 }

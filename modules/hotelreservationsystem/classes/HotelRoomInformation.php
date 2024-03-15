@@ -224,6 +224,27 @@ class HotelRoomInformation extends ObjectModel
         }
     }
 
+    public static function getHotelRoomsInfo($idHotel = null, $idProduct = null, $idLang = null)
+    {
+        if (!$idLang) {
+            $idLang = Context::getContext()->language->id;
+        }
+
+        $sql = 'SELECT hri.*, hri.`id_product`, hri.`id_hotel`, hrt.`adults`, hrt.`children`, hrt.`max_adults`,
+        hrt.`max_children`, hrt.`max_guests`, hrt.`min_los`, hrt.`max_los`, pl.`name` AS room_type_name, hbil.`hotel_name` AS hotel_name
+        FROM `'._DB_PREFIX_.'htl_room_information` hri
+        INNER JOIN `'._DB_PREFIX_.'htl_room_type` hrt ON (hrt.`id_product` = hri.`id_product`)
+        INNER JOIN `'._DB_PREFIX_.'htl_branch_info` hbi ON (hbi.`id` = hri.`id_hotel`)
+        INNER JOIN `'._DB_PREFIX_.'htl_branch_info_lang` hbil ON (hbil.`id` = hri.`id_hotel` AND hbil.`id_lang` = '.(int) $idLang.')
+        INNER JOIN `'._DB_PREFIX_.'product` p ON (p.`id_product` = hri.`id_product`)
+        INNER JOIN `'._DB_PREFIX_.'product_lang` pl ON (pl.`id_product` = p.`id_product` AND pl.`id_lang` = '.(int) $idLang.')
+        WHERE 1 '.($idHotel ? ' AND hri.`id_hotel` = '.(int) $idHotel : '').
+        ($idProduct ? ' AND hri.`id_product` = '.(int) $idProduct : '').'
+        ORDER BY hri.`id_product`, hri.`id`';
+
+        return Db::getInstance()->executeS($sql);
+    }
+
     /**
      * Deprecated
      * [deleteHotelRoomInfoById :: To delete room information which id is passed]
