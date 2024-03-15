@@ -3027,6 +3027,7 @@ class AdminOrdersControllerCore extends AdminController
         /*By Webkul to make entries in HotelCartBookingData */
         $hotel_room_info_arr = $hotel_room_data['rm_data'][$idProduct]['data']['available'];
         $chkQty = 0;
+        $objRoomTypeServiceProductCartDetail = new RoomTypeServiceProductCartDetail();
         if ($hotel_room_info_arr) {
             foreach ($hotel_room_info_arr as $key => $room_info) {
                 if ($chkQty < $req_rm) {
@@ -3054,7 +3055,18 @@ class AdminOrdersControllerCore extends AdminController
                         $objCartBookingData->children = 0;
                         $objCartBookingData->child_ages = json_encode(array());
                     }
-                    $objCartBookingData->save();
+                    if ($objCartBookingData->save()
+                        && $services = RoomTypeServiceProduct::getAutoAddServices($room_info['id_product'])
+                    ) {
+                        foreach($services as $service) {
+                            $objRoomTypeServiceProductCartDetail->addServiceProductInCart(
+                                $service['id_product'],
+                                1,
+                                $this->context->cart->id,
+                                $objCartBookingData->id
+                            );
+                        }
+                    }
                     ++$chkQty;
 
                     // create feature price if needed
@@ -3071,6 +3083,7 @@ class AdminOrdersControllerCore extends AdminController
         /*END*/
         // always add taxes even if there are not displayed to the customer
         $use_taxes = true;
+        $this->context->currency = new Currency($order->id_currency);
 
         $initial_product_price_tax_incl = Product::getPriceStatic(
             $product->id,
@@ -3092,7 +3105,7 @@ class AdminOrdersControllerCore extends AdminController
             $specific_price = new SpecificPrice();
             $specific_price->id_shop = 0;
             $specific_price->id_shop_group = 0;
-            $specific_price->id_currency = 0;
+            $specific_price->id_currency = $order->id_currency;
             $specific_price->id_country = 0;
             $specific_price->id_group = 0;
             $specific_price->id_customer = $order->id_customer;
@@ -3342,7 +3355,7 @@ class AdminOrdersControllerCore extends AdminController
         /*By Webkul Entry into table HotelbookingDetail*/
         $objRoomType = new HotelRoomType();
         $objBookingDetail = new HotelBookingDetail();
-        $inserted_id_order_detail = $objBookingDetail->getLastInsertedIdOrderDetail($order->id);
+        $inserted_id_order_detail = $objBookingDetail->getLastInsertedRoomIdOrderDetail($order->id);
         $idLang = (int)$this->context->cart->id_lang;
         $objCartBookingData = new HotelCartBookingData();
         if ($cartBookingData = $objCartBookingData->getOnlyCartBookingData(
@@ -3414,7 +3427,69 @@ class AdminOrdersControllerCore extends AdminController
                     $objBookingDetail->child_ages = $objCartBookingData->child_ages;
                 }
 
-                $objBookingDetail->save();
+                if ($objBookingDetail->save()) {
+                    $objRoomTypeServiceProduct = new RoomTypeServiceProduct();
+                    $objRoomTypeServiceProductPrice = new RoomTypeServiceProductPrice();
+                    $objRoomTypeServiceProductCartDetail = new RoomTypeServiceProductCartDetail();
+                    if ($services = $objRoomTypeServiceProductCartDetail->getRoomServiceProducts($objCartBookingData->id, 0, null, 1)) {
+                        foreach ($services as $service) {
+                            $insertedServiceProductIdOrderDetail = $objBookingDetail->getLastInsertedServiceIdOrderDetail($order->id, $service['id_product']);
+                            $numDays = 1;
+                            if (Product::getProductPriceCalculation($service['id_product']) == Product::PRICE_CALCULATION_METHOD_PER_DAY) {
+                                $numDays = HotelHelper::getNumberOfDays($objBookingDetail->date_from, $objBookingDetail->date_to);
+                            }
+
+                            $totalPriceTaxExcl = $objRoomTypeServiceProductPrice->getServicePrice(
+                                (int) $service['id_product'],
+                                $roomTypeInfo['id'],
+                                1,
+                                $objBookingDetail->date_from,
+                                $objBookingDetail->date_to,
+                                false
+                            );
+                            $totalPriceTaxIncl = $objRoomTypeServiceProductPrice->getServicePrice(
+                                (int)$service['id_product'],
+                                $roomTypeInfo['id'],
+                                1,
+                                $objBookingDetail->date_from,
+                                $objBookingDetail->date_to,
+                                true
+                            );
+                            $unitPriceTaxExcl = $totalPriceTaxExcl / $numDays;
+                            $unitPriceTaxIncl = $totalPriceTaxIncl / $numDays;
+                            switch (Configuration::get('PS_ROUND_TYPE')) {
+                                case Order::ROUND_TOTAL:
+                                    $service['total'] = $totalPriceTaxExcl;
+                                    $service['total_wt'] = $totalPriceTaxIncl;
+                                    break;
+                                case Order::ROUND_LINE:
+                                    $service['total'] = Tools::ps_round($totalPriceTaxExcl, _PS_PRICE_COMPUTE_PRECISION_);
+                                    $service['total_wt'] = Tools::ps_round($totalPriceTaxIncl, _PS_PRICE_COMPUTE_PRECISION_);
+                                    break;
+
+                                case Order::ROUND_ITEM:
+                                default:
+                                    $service['total'] = Tools::ps_round($totalPriceTaxExcl, _PS_PRICE_COMPUTE_PRECISION_);
+                                    $service['total_wt'] = Tools::ps_round($totalPriceTaxIncl, _PS_PRICE_COMPUTE_PRECISION_);
+                                    break;
+                            }
+
+                            $objRoomTypeServiceProductOrderDetail = new RoomTypeServiceProductOrderDetail();
+                            $objRoomTypeServiceProductOrderDetail->id_product = $service['id_product'];
+                            $objRoomTypeServiceProductOrderDetail->id_order = $objBookingDetail->id_order;
+                            $objRoomTypeServiceProductOrderDetail->id_order_detail = $insertedServiceProductIdOrderDetail;
+                            $objRoomTypeServiceProductOrderDetail->id_cart = $cart->id;
+                            $objRoomTypeServiceProductOrderDetail->id_htl_booking_detail = $objBookingDetail->id;
+                            $objRoomTypeServiceProductOrderDetail->unit_price_tax_excl = $unitPriceTaxExcl;
+                            $objRoomTypeServiceProductOrderDetail->unit_price_tax_incl = $unitPriceTaxIncl;
+                            $objRoomTypeServiceProductOrderDetail->total_price_tax_excl = $totalPriceTaxExcl;
+                            $objRoomTypeServiceProductOrderDetail->total_price_tax_incl = $totalPriceTaxIncl;
+                            $objRoomTypeServiceProductOrderDetail->name = $service['name'];
+                            $objRoomTypeServiceProductOrderDetail->quantity = 1;
+                            $objRoomTypeServiceProductOrderDetail->save();
+                        }
+                    }
+                }
             }
         }
 
@@ -3432,6 +3507,7 @@ class AdminOrdersControllerCore extends AdminController
             'refresh' => $refresh
         )));
     }
+
 
     /**
      * This function is called when order is changed (Add/Edit/Delete room on order)

@@ -2086,6 +2086,20 @@ class HotelBookingDetail extends ObjectModel
         );
     }
 
+    public function getLastInsertedRoomIdOrderDetail($id_order)
+    {
+        return Db::getInstance()->getValue(
+            'SELECT MAX(`id_order_detail`) FROM `'._DB_PREFIX_.'order_detail` WHERE `is_booking_product` = 1 AND `id_order`='.(int)$id_order
+        );
+    }
+
+    public function getLastInsertedServiceIdOrderDetail($id_order, $id_product)
+    {
+        return Db::getInstance()->getValue(
+            'SELECT MAX(`id_order_detail`) FROM `'._DB_PREFIX_.'order_detail` WHERE `is_booking_product` = 0 AND `product_id`='.(int) $id_product.' AND `id_order`='.(int)$id_order
+        );
+    }
+
     /**
      * [getOnlyOrderBookingData description].
      * @param [type] $id_order    [description]
