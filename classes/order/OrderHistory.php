@@ -440,10 +440,28 @@ class OrderHistoryCore extends ObjectModel
                 '{firstname}' => $result['firstname'],
                 '{id_order}' => (int)$this->id_order,
                 '{order_name}' => $order->getUniqReference(),
+                '{total_paid_real}' => Tools::displayPrice($order->total_paid_real, (int)$order->id_currency),
+                '{is_advance_payment}' => $order->is_advance_payment,
+                '{advance_paid_amount}' => Tools::displayPrice($order->advance_paid_amount, (int)$order->id_currency),
                 '{extra_mail_content_html}' => '',
                 '{extra_mail_content_txt}' => '',
                 '{payment_method}' => '',
             );
+
+            if ($idHotel = HotelBookingDetail::getIdHotelByIdOrder($order->id)) {
+                $objHotelBranchInformation = new HotelBranchInformation($idHotel, $order->id_lang);
+                $fields = array_merge(
+                    $objHotelBranchInformation->getFields(),
+                    $objHotelBranchInformation->getFieldsLang()[$order->id_lang],
+                    $objHotelBranchInformation->getAddress($idHotel, $order->id_lang)
+                );
+                foreach ($fields as $key => $value) {
+                    $data['{hotel_'.$key.'}'] = $value;
+                }
+                $objHotelBookingDetail = new HotelBookingDetail();
+                $hotelBookingDetail = $objHotelBookingDetail->getBookingDataByOrderId($order->id);
+                $data['{num_rooms}'] = count($hotelBookingDetail);
+            }
 
             if ($result['module_name']) {
                 if (Validate::isLoadedObject($module = Module::getInstanceByName($result['module_name']))) {
