@@ -445,6 +445,7 @@ class HotelHelper
             $product->active = 1;
             $product->quantity = 999999999;
             $product->booking_product = true;
+            $product->show_at_front = 1;
             $product->is_virtual = 1;
             $product->indexed = 1;
             $product->save();
