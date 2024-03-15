@@ -40,13 +40,16 @@
 					{if isset($extraDemands) && $extraDemands}
 						{foreach $extraDemands as $roomDemand}
 							{foreach $roomDemand['extra_demands'] as $demand}
-								<tr>
+								<tr data-id_booking_demand="{$demand['id_booking_demand']}">
 									<td>{$demand['name']}</td>
 									<td>
-										{displayPrice price=$demand['unit_price_tax_excl'] currency=$orderCurrency}
-										{if $demand['price_calc_method'] == HotelRoomTypeGlobalDemand::WK_PRICE_CALC_METHOD_EACH_DAY}
-											{l s='/ night'}
-										{/if}
+										<div class="input-group">
+											<span class="input-group-addon">{$currencySign}</span>
+											<input type="text" class="form-control unit_price" value="{Tools::ps_round($demand['unit_price_tax_excl'], 2)}">
+											{if $demand['price_calc_method'] == HotelRoomTypeGlobalDemand::WK_PRICE_CALC_METHOD_EACH_DAY}
+												<span class="input-group-addon">{l s='/ night'}</span>
+											{/if}
+										</div>
 									</td>
 									<td>{displayPrice price=$demand['total_price_tax_excl'] currency=$orderCurrency}</td>
 									<td><a class="btn btn-danger pull-right del-order-room-demand" href="#" id_booking_demand="{$demand['id_booking_demand']}"><i class="icon-trash"></i></a></td>
@@ -74,7 +77,7 @@
 								<th></th>
 								<th>{l s='Name'}</th>
 								<th>{l s='Option'}</th>
-								<th class="text-right">{l s='Price'}</th>
+								<th class="text-right">{l s='Unit Price'}</th>
 							</tr>
 						</thead>
 						<tbody>
@@ -103,12 +106,21 @@
 										{/if}
 									</td>
 									<td class="text-right">
-										<span class="extra_demand_option_price">
-											{if isset($selected_adv_option) && isset($demand['adv_option'][$selected_adv_option]['price_tax_excl'])}{convertPrice price = $demand['adv_option'][$selected_adv_option]['price_tax_excl']|escape:'html':'UTF-8'}{else if isset($demand['adv_option']) && $demand['adv_option']}{convertPrice price = $demand['adv_option'][$demand['adv_option']|@key]['price_tax_excl']}{else}{convertPrice price = $demand['price_tax_excl']|escape:'html':'UTF-8'}{/if}
-										</span>
-										{if $demand['price_calc_method'] == HotelRoomTypeGlobalDemand::WK_PRICE_CALC_METHOD_EACH_DAY}
-											{l s='/ night'}
-										{/if}
+
+										<div class="input-group">
+											<span class="input-group-addon">{$currencySign}</span>
+											{if isset($selected_adv_option) && isset($demand['adv_option'][$selected_adv_option]['price_tax_excl'])}
+												{assign  var=demand_price value=$demand['adv_option'][$selected_adv_option]['price_tax_excl']}
+											{else if isset($demand['adv_option']) && $demand['adv_option']}
+												{assign  var=demand_price value=$demand['adv_option'][$demand['adv_option']|@key]['price_tax_excl']}
+											{else}
+												{assign  var=demand_price value=$demand['price_tax_excl']}
+											{/if}
+											<input type="text" class="form-control unit_price" value="{Tools::ps_round($demand_price, 2)}" data-id-product="{$product['id_product']}">
+											{if $demand['price_calc_method'] == HotelRoomTypeGlobalDemand::WK_PRICE_CALC_METHOD_EACH_DAY}
+												<span class="input-group-addon">{l s='/ night'}</span>
+											{/if}
+										</div>
 									</td>
 								</tr>
 							{/foreach}
