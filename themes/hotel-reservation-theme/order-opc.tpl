@@ -315,6 +315,8 @@
 										</span>
 									</p>
 								{/if}
+								{hook h="displayCartTotalPriceLabel" type='before_tax'}
+
 								<p class="cart_total_tax">
 									<span>{l s='Total tax'}</span>
 									<span class="cart_total_values">{displayPrice price=($total_tax)}</span>
