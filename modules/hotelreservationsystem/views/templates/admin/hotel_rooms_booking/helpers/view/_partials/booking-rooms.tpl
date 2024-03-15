@@ -50,7 +50,7 @@
                                                             <span>{$allotment_type.name|escape:'htmlall':'UTF-8'}</span>
                                                         </label>
                                                     {/foreach}
-                                                    <input type="text" id="comment_{$avai_v['id_room']|escape:'htmlall':'UTF-8'}" class="form-control avai_comment" placeholder="{l s='Allotment message' mod='hotelreservationsystem'}">
+                                                    <input type="text" id="comment_{$avai_v['id_room']|escape:'htmlall':'UTF-8'}" class="form-control booking_type_comment" placeholder="{l s='Allotment message' mod='hotelreservationsystem'}">
                                                 </td>
                                                 {if $occupancy_required_for_booking}
                                                     <td class="booking_occupancy">
@@ -133,11 +133,11 @@
                                                     <td>
                                                         {foreach $allotment_types as $allotment_type}
                                                             <label class="control-label">
-                                                                <input type="radio" value="{$allotment_type.id_allotment|intval}" class="par_bk_type" name="bk_type_{$sub_part_v['id_room']|escape:'htmlall':'UTF-8'}_{$sub_part_k|escape:'htmlall':'UTF-8'}" data-id-room="{$sub_part_v['id_room']|escape:'htmlall':'UTF-8'}" data-sub-key="{$sub_part_k|escape:'htmlall':'UTF-8'}" {if $allotment_type@first}checked="checked"{/if}>
+                                                                <input type="radio" value="{$allotment_type.id_allotment|intval}" class="par_bk_type" name="bk_type_{$part_k|escape:'htmlall':'UTF-8'}_{$sub_part_k|escape:'htmlall':'UTF-8'}" data-id-room="{$sub_part_v['id_room']|escape:'htmlall':'UTF-8'}" data-sub-key="{$sub_part_k|escape:'htmlall':'UTF-8'}" {if $allotment_type@first}checked="checked"{/if}>
                                                                 <span>{$allotment_type.name|escape:'htmlall':'UTF-8'}</span>
                                                             </label>
                                                         {/foreach}
-                                                        <input type="text" id="comment_{$sub_part_v['id_room']|escape:'htmlall':'UTF-8'}_{$sub_part_k|escape:'htmlall':'UTF-8'}" class="form-control par_comment" placeholder="{l s='Allotment message' mod='hotelreservationsystem'}">
+                                                        <input type="text" id="comment_{$sub_part_v['id_room']|escape:'htmlall':'UTF-8'}_{$sub_part_k|escape:'htmlall':'UTF-8'}" class="form-control booking_type_comment" placeholder="{l s='Allotment message' mod='hotelreservationsystem'}">
                                                     </td>
                                                     {if $occupancy_required_for_booking}
                                                         <td class="booking_occupancy">

@@ -411,7 +411,7 @@ $(document).ready(function() {
         var date_to = $(this).attr('data-date-to');
 
         var sub_key = $(this).attr('data-sub-key');
-        var booking_type = $("input[name='bk_type_" + id_room + "_" + sub_key + "']:checked").val();
+        var booking_type = $(this).closest('tr').find("input.par_bk_type:checked").val();
         var comment = $("#comment_" + id_room + "_" + sub_key).val();
         var btn = $(this);
         $(this).closest('tr').find('.booking_occupancy_wrapper').parent().removeClass('open');
@@ -923,27 +923,24 @@ $(document).ready(function() {
 	};
     initBookingList();
     function initBookingList() {
-        $('.avai_comment, .par_comment').hide();
+        $('.booking_type_comment').hide();
         $('.avai_bk_type').on('change', function() {
-            var id_room = $(this).attr('data-id-room');
             var booking_type = $(this).val();
 
             if (booking_type == allotmentTypes.auto) {
-                $('#comment_'+id_room).hide().val('');
+                $(this).closest('td').find('.booking_type_comment').hide().val('');
             } else if (booking_type == allotmentTypes.manual) {
-                $('#comment_'+id_room).show();
+                $(this).closest('td').find('.booking_type_comment').show();
             }
         });
 
         $('.par_bk_type').on('change', function() {
-            var id_room = $(this).attr('data-id-room');
-            var sub_key = $(this).attr('data-sub-key');
             var booking_type = $(this).val();
 
             if (booking_type == allotmentTypes.auto) {
-                $('#comment_'+id_room+'_'+sub_key).hide().val('');
+                $(this).closest('td').find('.booking_type_comment').hide().val('');
             } else if (booking_type == allotmentTypes.manual) {
-                $('#comment_'+id_room+'_'+sub_key).show();
+                $(this).closest('td').find('.booking_type_comment').show();
             }
         });
     }
