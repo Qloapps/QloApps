@@ -1509,13 +1509,7 @@ function initRoomEvents()
     $(".add_room_date_to").datepicker(
     {
     	showOtherMonths: true,
-        dateFormat: 'dd-mm-yy',
-        onSelect: function(selectedDate) {
-            let objDateFromMax = $.datepicker.parseDate('dd-mm-yy', selectedDate);
-            objDateFromMax.setDate(objDateFromMax.getDate() - 1);
-
-            $('.add_room_date_from').datepicker('option', 'maxDate', objDateFromMax);
-        }
+        dateFormat: 'dd-mm-yy'
     });
 
 	$(".edit_product_date_from").datepicker(
@@ -1533,13 +1527,7 @@ function initRoomEvents()
 		$(".edit_product_date_to").datepicker(
 		{
 			showOtherMonths: true,
-			dateFormat: 'dd-mm-yy',
-			onSelect: function(selectedDate) {
-				let objDateFromMax = $.datepicker.parseDate('dd-mm-yy', selectedDate);
-				objDateFromMax.setDate(objDateFromMax.getDate() - 1);
-
-				$('.edit_product_date_from').datepicker('option', 'maxDate', objDateFromMax);
-			}
+			dateFormat: 'dd-mm-yy'
 		});
 	/*End*/
 

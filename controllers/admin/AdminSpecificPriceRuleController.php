@@ -374,6 +374,12 @@ class AdminSpecificPriceRuleControllerCore extends AdminController
     public function postProcess()
     {
         Tools::clearSmartyCache();
+        if (Tools::isSubmit('submitAdd'.$this->table)) {
+            if (strtotime(Tools::getValue('from')) > strtotime(Tools::getValue('to'))) {
+                $this->errors[] = Tools::displayError('The price rule cannot end before it begins.');
+            }
+        }
+
         return parent::postProcess();
     }
 }
