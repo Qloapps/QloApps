@@ -80,6 +80,39 @@ class ToolsCore
         return $result;
     }
 
+    public static function generateRandomZipcode($idCountry)
+    {
+        $randomZipCode = '';
+        $alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        $alphabetLength = Tools::strlen($alphabet);
+        if (Validate::isLoadedObject($objCountry = new Country($idCountry))
+            && $objCountry->need_zip_code
+        ) {
+            if ($zipCodeFormat = $objCountry->zip_code_format) {
+                for ($i = 0; $i < Tools::strlen($zipCodeFormat); $i++) {
+                    $formatCharacter = $zipCodeFormat[$i];
+                    if (in_array($formatCharacter, array('N', 'L', 'C'))) {
+                        if ($formatCharacter == 'N') {
+                            $randomZipCode .= mt_rand(0, 9);
+                        } elseif ($formatCharacter == 'L') {
+                            $randomZipCode .= $alphabet[mt_rand(0, $alphabetLength - 1)];
+                        } elseif ($formatCharacter == 'C') {
+                            $randomZipCode .= $objCountry->iso_code;
+                        }
+                    } else {
+                        $randomZipCode .= $formatCharacter;
+                    }
+                }
+            } else {
+                for ($i = 1; $i <= 5; $i++) {
+                    $randomZipCode .= mt_rand(0, 9);
+                }
+            }
+        }
+
+        return $randomZipCode;
+    }
+
     /**
      * Random bytes generator
      *
@@ -3023,6 +3056,8 @@ exit;
         $smarty = Context::getContext()->smarty;
         Tools::clearCache($smarty);
         Tools::clearCompile($smarty);
+        @copy(_PS_CACHE_DIR_.'smarty/index.php', _PS_CACHE_DIR_.'smarty/cache/index.php');
+        @copy(_PS_CACHE_DIR_.'smarty/index.php', _PS_CACHE_DIR_.'smarty/compile/index.php');
     }
 
     public static function clearColorListCache($id_product = false)
@@ -3603,6 +3638,8 @@ exit;
 
     public static function purifyHTML($html, $uri_unescape = null, $allow_style = false)
     {
+        require_once(_PS_TOOL_DIR_.'htmlpurifier/HTMLPurifier.auto.php');
+
         static $use_html_purifier = null;
         static $purifier = null;
 

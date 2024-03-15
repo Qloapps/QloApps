@@ -573,49 +573,64 @@ ul#optional {
 color: #385E0B;
 }
 
-.blockInfoEnd {
-	float:left;
-	margin:34px 20px 22px 0;
-	padding:10px;
-	width:292px;
-	border:1px solid #ccc;
-	-moz-border-radius: 3px;
-	-webkit-border-radius:3px;
-	border-radius: 3px;
-    cursor: pointer;
+/* INFO-BOX - start */
+.info-boxes {
+	margin: 25px 0;
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: space-between;
 }
-.blockInfoEnd.last {margin-right:0;}
-	.blockInfoEnd p {
-		font:italic 11px/14px Georgia, Arial, Sans-serif;
-		color:#666;
+
+.info-box {
+	display: flex;
+	flex-direction: column;
+	width: 291px;
+	padding: 10px;
+	margin-bottom: 15px;
+	border: 1px solid #ccc;
+	border-radius: 4px;
+	cursor: pointer;
 }
-	.blockInfoEnd p.description {
-		min-height:93px;
+
+.info-box img {
+	display: block;
+	width: 100%;
+	height: 160px;
+	object-fit: cover;
+	margin-bottom: 16px;
 }
-	.blockInfoEnd img {
-	float:left;
-		margin:0 10px 5px 0;
+
+.info-box h3 {
+	font-size: 16px;
+	padding: 0;
+	margin-bottom: 10px;
 }
-	.blockInfoEnd a.BO,
-	.blockInfoEnd a.FO {
-		float:right;
-		padding:0 10px 0 10px;
-		height:33px;
-		line-height:33px;
-		color:#fff;
-		background-color:#00aff0;
-		border:1px solid transparent;
-		-moz-border-radius: 3px;
-		-webkit-border-radius:3px;
-		border-radius: 3px;
+
+.info-box .description {
+	font-size: 13px;
+	padding: 0;
+	margin-bottom: 10px;
 }
-		.blockInfoEnd a.BO span ,
-		.blockInfoEnd a.FO span {
-			display:inline-block;
-			height:33px;
-			line-height:33px;
-			color:#fff;
-		}
+
+.info-box a {
+	padding: 8px 10px;
+	color:#fff;
+	background-color:#1292ff;
+	border: 1px solid transparent;
+	border-radius: 2px;
+	align-self: start;
+	margin-top: auto;
+}
+
+.info-box a:hover {
+	opacity: 0.8;
+}
+
+.info-box a span {
+	display: inline-block;
+	color:#fff;
+}
+/* INFO-BOX - end */
 
 #prestastore,
 #prestastore_update {
@@ -1283,12 +1298,12 @@ a.wk-service-link {
 	color: #555;
 }
 .wk-service-link-block {
-	margin: 30px 50px 0px 10px;
-	border: 1px solid #ccc;
+	position: relative;
+	margin: 15px 50px 0px 10px;
+	border: 1px solid #e5e5e5;
+	border-radius: 4px;
 	text-align: center;
-	padding: 10px;
-}
-.wk-service-link-content {
+	padding: 5px;
 }
 .wk-service-link-content .head {
 	font-size: 14px;
@@ -1297,4 +1312,14 @@ a.wk-service-link {
 .wk-service-link-block p {
 	margin-bottom: 8px;
 	padding-bottom: 0px!important;
+}
+
+.wk-service-link-block .wk-service-link-header img {
+	max-height: 56px;
+}
+
+.wk-service-link-block .wk-service-link-highlight {
+	position: absolute;
+	top: 10px;
+	right: 10px;
 }

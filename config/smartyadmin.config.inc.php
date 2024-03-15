@@ -68,7 +68,8 @@ function smartyTranslate($params, $smarty)
     }
 
     // If the tpl is used by a Helper
-    if (strpos($filename, 'helpers') === 0) {
+    $className = isset(Context::getContext()->controller->controller_name) ? Tools::toUnderscoreCase(substr(Context::getContext()->controller->controller_name, 5)) : '';
+    if (strpos($filename, 'helpers') === 0 && $className && strpos($smarty->source->name, '/template/controllers/'.$className.'/') === false) {
         $class = 'Helper';
     }
     // If the tpl is used by a Controller

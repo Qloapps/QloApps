@@ -268,6 +268,11 @@ $min-height: 850px
 			width: 200px
 			@include margin-right(5px)
 			@include float(right)
+			.clear_search
+				position: absolute
+				top: 6px
+				z-index: 10
+				@include right(8px)
 		li.maintab, li.subtab
 			height: 28px
 			padding: 0

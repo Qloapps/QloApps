@@ -133,3 +133,10 @@
 	{addJsDefL name=chld_ftr_text_err}{l s='Enter child feature name.' js=1 mod='hotelreservationsystem'}{/addJsDefL}
 	{addJsDefL name=pos_numeric_err}{l s='Position should be numeric.' js=1 mod='hotelreservationsystem'}{/addJsDefL}
 {/strip}
+
+{block name=script}
+	<script type="text/javascript">
+		var id_language = {$defaultFormLanguage|intval};
+		allowEmployeeFormLang = {$allowEmployeeFormLang|intval};
+	</script>
+{/block}

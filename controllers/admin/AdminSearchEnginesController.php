@@ -31,6 +31,9 @@ class AdminSearchEnginesControllerCore extends AdminController
 {
     public function __construct()
     {
+        // redirect to Dashboard for stats related to Search Engines
+        Tools::redirectAdmin(Context::getContext()->link->getAdminLink('AdminDashboard'));
+
         $this->bootstrap = true;
         $this->table = 'search_engine';
         $this->className = 'SearchEngine';
