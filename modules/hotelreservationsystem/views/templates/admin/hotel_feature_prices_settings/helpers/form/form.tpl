@@ -136,7 +136,7 @@
 
 		<div class="form-group week_days" {if (isset($smarty.post.is_special_days_exists) && $smarty.post.is_special_days_exists) 	|| (isset($objFeaturePrice->is_special_days_exists) && $objFeaturePrice->is_special_days_exists)}style="display:block;"{/if}>
 			<label for="Price Impact Way" class="control-label col-lg-3">
-				{l s='Week days' mod='hotelreservationsystem'}
+				{l s='Select Week Days' mod='hotelreservationsystem'}
 			</label>
 			<div class="col-lg-3 checkboxes-wrap">
 				<div class="day-wrap">
