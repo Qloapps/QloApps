@@ -17,9 +17,9 @@
 * @license LICENSE.txt
 *}
 
-{if $email || $phone}
+{if ($email != '') || ($phone != '')}
     <ul class="nav nav-pills nav-stacked visible-xs wk-nav-style">
-        {if $email}
+        {if $email != ''}
             <li>
                 <a href="mailto:{$email}">
                     <i class="icon-envelope-o"></i>
@@ -27,7 +27,7 @@
                 </a>
             </li>
         {/if}
-        {if $phone}
+        {if $phone != ''}
             <li>
                 <a href="tel:{$phone}">
                     <i class="icon-phone"></i>
