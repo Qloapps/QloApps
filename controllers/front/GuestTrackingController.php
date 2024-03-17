@@ -557,6 +557,9 @@ class GuestTrackingControllerCore extends FrontController
                 $objHotelBranchInformation = new HotelBranchInformation($idHotel, $this->context->language->id);
                 $hotelAddressInfo = HotelBranchInformation::getAddress($idHotel);
 
+                $objHotelBranchRefundRules = new HotelBranchRefundRules();
+                $hotelRefundRules = $objHotelBranchRefundRules->getHotelRefundRules($idHotel, 0, 1);
+
                 // set order specific values
                 $order->total_convenience_fee_ti = $total_convenience_fee_ti;
                 $order->total_convenience_fee_te = $total_convenience_fee_te;
@@ -571,6 +574,7 @@ class GuestTrackingControllerCore extends FrontController
                 $order->customerGuestDetail = $customerGuestDetail;
                 $order->obj_hotel_branch_information = $objHotelBranchInformation;
                 $order->hotel_address_info = $hotelAddressInfo;
+                $order->hotel_refund_rules = $hotelRefundRules;
                 //end
 
                 Hook::exec('actionOrderDetail', array('carrier' => $order->carrier, 'order' => $order));

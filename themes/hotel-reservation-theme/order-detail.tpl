@@ -599,6 +599,14 @@
         </div>
     </div>
 
+    {if $is_guest}
+        <div class="row">
+            <div class="col-sm-12">
+                <p class="alert alert-info"><i class="icon-info-sign"></i> {l s='You cannot request refund with a guest account.'}</p>
+            </div>
+        </div>
+    {/if}
+
     {if isset($refund_allowed) && $refund_allowed}
         <div style="display: none;">
             <div id="create-new-refund-popup">
