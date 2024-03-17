@@ -32,10 +32,10 @@
 		</a>
 	{/if}
 	{* Generate HTML code for printing Delivery Icon with link *}
-	{if $order->delivery_number}
+	{* {if $order->delivery_number}
 		<a class="btn btn-default _blank" href="{$link->getAdminLink('AdminPdf')|escape:'html':'UTF-8'}&amp;submitAction=generateDeliverySlipPDF&amp;id_order={$order->id}">
 			<i class="icon-truck"></i>
 		</a>
-	{/if}
+	{/if} *}
 	</span>
 </span>

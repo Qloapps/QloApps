@@ -48,9 +48,9 @@
 											<div class="col-xs-6">
 												<span class="pull-right">
 													{if $useTax}
-														{displayPrice price="{$demand['total_price_tax_incl']|escape:'html':'UTF-8'}"}
+														{displayPrice price="{$demand['total_price_tax_incl']|escape:'html':'UTF-8'}" currency=$objOrder->id_currency}
 													{else}
-														{displayPrice price="{$demand['total_price_tax_excl']|escape:'html':'UTF-8'}"}
+														{displayPrice price="{$demand['total_price_tax_excl']|escape:'html':'UTF-8'}" currency=$objOrder->id_currency}
 													{/if}
 												</span>
 											</div>
@@ -90,9 +90,9 @@
 											<div class="col-xs-6">
 												<span class="pull-right">
 													{if $useTax}
-														{displayPrice price=$additionalService['total_price_tax_incl']|escape:'html':'UTF-8'}
+														{displayPrice price=$additionalService['total_price_tax_incl']|escape:'html':'UTF-8' currency=$objOrder->id_currency}
 													{else}
-														{displayPrice price=$additionalService['total_price_tax_excl']|escape:'html':'UTF-8'}
+														{displayPrice price=$additionalService['total_price_tax_excl']|escape:'html':'UTF-8' currency=$objOrder->id_currency}
 													{/if}
 												</span>
 											</div>

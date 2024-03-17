@@ -49,12 +49,16 @@ class RoomTypeServiceProductPrice extends ObjectModel
         )
     );
 
-    public static function deleteRoomProductPrices($idProduct, $elementType = 0)
+    public static function deleteRoomProductPrices($idProduct, $elementType = 0, $idElement = 0)
     {
         $where = '`id_product`='.(int)$idProduct;
 
         if ($elementType) {
             $where .= ' AND `element_type`='.(int)$elementType;
+        }
+
+        if ($idElement) {
+            $where .= ' AND `id_element` = '.(int) $idElement;
         }
 
         return Db::getInstance()->delete(
