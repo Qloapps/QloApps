@@ -1905,6 +1905,12 @@ class AdminNormalProductsControllerCore extends AdminController
                 // set product visibility to none for current flow.
                 $object->visibility = 'none';
 
+                // if service is auto_added and price addition is in room price, then the tax rule is applied of room price.
+                // so setting tax rule as no tax for now
+                if ($object->auto_add_to_cart && $object->price_addition_type == Product::PRICE_ADDITION_TYPE_WITH_ROOM) {
+                    $object->id_tax_rules_group = 0;
+                }
+
                 // Duplicate combinations if not associated to shop
                 if ($this->context->shop->getContext() == Shop::CONTEXT_SHOP && !$object->isAssociatedToShop()) {
                     $is_associated_to_shop = false;

@@ -104,7 +104,7 @@ abstract class ModuleGraphCore extends Module
                             $this->_values[$j][$i] = 0;
                         }
                     }
-                    $this->_legend[$i] = ($i % 2) ? '' : sprintf('%02d', $i);
+                    $this->_legend[$i] = sprintf('%02d', $i);
                 }
             }
             if (is_callable(array($this, 'setMonthValues'))) {
@@ -197,15 +197,15 @@ abstract class ModuleGraphCore extends Module
         if (count($this->_legend)) {
             $total = 0;
             if ($datas['type'] == 'pie') {
-                foreach ($this->_legend as $key => $legend) {
+                // foreach ($this->_legend as $key => $legend) {
                     for ($i = 0, $total_main = (is_array($this->_titles['main']) ? count($this->_values) : 1); $i < $total_main; ++$i) {
-                        $total += (is_array($this->_values[$i])  ? $this->_values[$i][$key] : $this->_values[$key]);
+                        $total += (is_array($this->_values[$i])  ? $this->_values[$i][$key] : $this->_values[$i]);
                     }
-                }
+                // }
             }
             foreach ($this->_legend as $key => $legend) {
                 $this->_csv .= $legend.';';
-                for ($i = 0, $total_main = (is_array($this->_titles['main']) ? count($this->_values) : 1); $i < $total_main; ++$i) {
+                for ($i = 0, $total_main = (is_array($this->_titles['main']) ? (count($this->_titles['main']) - 1) : 1); $i < $total_main; ++$i) {
                     if (!isset($this->_values[$i]) || !is_array($this->_values[$i])) {
                         if (isset($this->_values[$key])) {
                             // We don't want strings to be divided. Example: product name
