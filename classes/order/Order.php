@@ -34,6 +34,10 @@ class OrderCore extends ObjectModel
     const ORDER_PAYMENT_TYPE_FULL = 1;
     const ORDER_PAYMENT_TYPE_ADVANCE = 2;
 
+    //Consts for: In the order list in which currency prices should be displayed
+    const ORDER_LIST_PRICE_DISPLAY_IN_PAYMENT_CURRENCY = 1;
+    const ORDER_LIST_PRICE_DISPLAY_IN_DEFAULT_CURRENCY = 2;
+
     const ORDER_COMPLETE_REFUND_FLAG = 1;
     const ORDER_COMPLETE_CANCELLATION_FLAG = 2;
     const ORDER_COMPLETE_CANCELLATION_OR_REFUND_REQUEST_FLAG = 3;
@@ -1819,7 +1823,11 @@ class OrderCore extends ObjectModel
         $order_payment->order_reference = $this->reference;
         $order_payment->id_currency = ($currency ? $currency->id : $this->id_currency);
         // we kept the currency rate for historization reasons
-        $order_payment->conversion_rate = ($currency ? $currency->conversion_rate : 1);
+        $order_payment->conversion_rate = (
+            $currency ?
+            $currency->conversion_rate :
+            (new Currency($this->id_currency))->getConversationRate()
+        );
         // if payment_method is define, we used this
         $order_payment->payment_method = ($payment_method ? $payment_method : $this->payment);
         $order_payment->payment_type = ($payment_type ? $payment_type : $this->payment_type);
@@ -1838,6 +1846,12 @@ class OrderCore extends ObjectModel
                 $res = $res && $this->addOrderPaymentDetail($order_payment, $amount_paid, $order_invoice);
             }
         }
+
+        // Whenever payment is adding in any order then set a cumulative conversion rate for the payment currency in the order
+        if ($avgConversionRate = $order_payment->getAverageConversionRate($this->reference, $this->id_currency)) {
+            $this->conversion_rate = $avgConversionRate;
+        }
+        $this->save();
 
         return $res;
     }

@@ -27,7 +27,7 @@
 						<div class="badge-strip" style="background-color: #266FFE;"></div>
 						<div class="badge-content-wrapper">
 							<div class="title-wrapper">
-								<p class="text-center">{l s="Arrivals" mod="dashguestcycle"}</p>
+								<p class="text-center">{l s="Arrivals" mod='dashguestcycle'}</p>
 							</div>
 							<div class="value-wrapper">
 								<p class="text-center">
@@ -42,7 +42,7 @@
 						<div class="badge-strip" style="background-color: #72C3F0;"></div>
 						<div class="badge-content-wrapper">
 							<div class="title-wrapper">
-								<p class="text-center">{l s="Departures" mod="dashguestcycle"}</p>
+								<p class="text-center">{l s="Departures" mod='dashguestcycle'}</p>
 							</div>
 							<div class="value-wrapper">
 								<p class="text-center">
@@ -57,7 +57,7 @@
 						<div class="badge-strip" style="background-color: #56CE56;"></div>
 						<div class="badge-content-wrapper">
 							<div class="title-wrapper">
-								<p class="text-center">{l s="New Bookings" mod="dashguestcycle"}</p>
+								<p class="text-center">{l s="New Bookings" mod='dashguestcycle'}</p>
 							</div>
 							<div class="value-wrapper">
 								<p class="text-center">
@@ -72,7 +72,7 @@
 						<div class="badge-strip" style="background-color: #FFC148;"></div>
 						<div class="badge-content-wrapper">
 							<div class="title-wrapper">
-								<p class="text-center">{l s="Stay Overs" mod="dashguestcycle"}</p>
+								<p class="text-center">{l s="Stay Overs" mod='dashguestcycle'}</p>
 							</div>
 							<div class="value-wrapper">
 								<p class="text-center">
@@ -88,7 +88,7 @@
 						<div class="badge-content-wrapper">
 							<div class="title-wrapper">
 								<p class="text-center">
-									{l s="Guest Messages" mod="dashguestcycle"}
+									{l s="Guest Messages" mod='dashguestcycle'}
 								</p>
 							</div>
 							<div class="value-wrapper">
@@ -105,7 +105,7 @@
 						<div class="badge-content-wrapper">
 							<div class="title-wrapper">
 								<p class="text-center">
-									{l s="Cancelled Bookings" mod="dashguestcycle"}
+									{l s="Cancelled Bookings" mod='dashguestcycle'}
 								</p>
 							</div>
 							<div class="value-wrapper">
@@ -122,7 +122,7 @@
 						<div class="badge-content-wrapper">
 							<div class="title-wrapper">
 								<p class="text-center">
-									{l s="Guests (Adults/Children)" mod="dashguestcycle"}
+									{l s="Guests (Adults/Children)" mod='dashguestcycle'}
 								</p>
 							</div>
 							<div class="value-wrapper">

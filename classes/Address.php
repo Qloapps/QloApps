@@ -482,4 +482,32 @@ class AddressCore extends ObjectModel
         }
         return array();
     }
+
+    public function searchByName($query, $idLang = false)
+    {
+        if (!$idLang) {
+            $idLang = Context::getContext()->language->id;
+        }
+
+        return Db::getInstance()->executeS(
+            'SELECT  a.`id_address`, a.`firstname`, a.`lastname`, a.`address1`, a.`postcode`, a.`city`,
+            cl.`name` AS `country_name`, s.`name` AS `state_name`
+            FROM `'._DB_PREFIX_.'address` a
+            LEFT JOIN `'._DB_PREFIX_.'country_lang` cl
+            ON cl.`id_country` = a.`id_country`
+            LEFT JOIN `'._DB_PREFIX_.'state` s
+            ON s.`id_country` = cl.`id_country`
+            WHERE id_customer > 0 AND
+                (a.`address1` LIKE \'%'.$query.'%\' OR
+                    a.`postcode` LIKE \'%'.$query.'%\' OR
+                    a.`city` LIKE \'%'.$query.'%\' OR
+                    a.`phone` LIKE \'%'.$query.'%\' OR
+                    a.`company` LIKE \'%'.$query.'%\' OR
+                    a.`alias` LIKE \'%'.$query.'%\' OR
+                    s.`name` LIKE \'%'.$query.'%\' OR
+                    cl.`name` LIKE \'%'.$query.'%\'
+                )
+        ');
+    }
+
 }

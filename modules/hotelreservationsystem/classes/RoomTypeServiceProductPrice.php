@@ -69,12 +69,24 @@ class RoomTypeServiceProductPrice extends ObjectModel
 
     public static function getProductRoomTypePriceAndTax($idProduct, $idElement, $elementType)
     {
-        return Db::getInstance()->getRow(
-            'SELECT `price`, `id_tax_rules_group` FROM `'._DB_PREFIX_.'htl_room_type_service_product_price`
-            WHERE `id_product`='.(int)$idProduct.
-            ' AND `id_element`='.(int)$idElement.
-            ' AND `element_type`='.(int)$elementType
-        );
+        if ($result = Db::getInstance()->getRow('
+            SELECT spp.`price`, spp.`id_tax_rules_group`, p.`auto_add_to_cart`, p.`price_addition_type`
+            FROM `'._DB_PREFIX_.'product` p
+            LEFT JOIN `'._DB_PREFIX_.'htl_room_type_service_product` sp ON (sp.`id_product` = p.`id_product`)
+            LEFT JOIN `'._DB_PREFIX_.'htl_room_type_service_product_price` spp ON (spp.`id_product` = p.`id_product`)
+            WHERE p.`id_product`='.(int)$idProduct.
+            ' AND sp.`id_element`='.(int)$idElement.
+            ' AND sp.`element_type`='.(int)$elementType)
+        ) {
+            if ($result['auto_add_to_cart'] && $result['price_addition_type'] == Product::PRICE_ADDITION_TYPE_WITH_ROOM) {
+                // if service is auto add to cart and added in room price, we need to find room type tax rule group
+                if ($elementType == RoomTypeServiceProduct::WK_ELEMENT_TYPE_ROOM_TYPE) {
+                    $result['id_tax_rules_group'] = Product::getIdTaxRulesGroupByIdProduct((int)$idElement);
+                }
+            }
+        }
+
+        return $result;
     }
 
     public function getProductRoomTypeLinkPriceInfo($idProduct, $idElement, $elementType)

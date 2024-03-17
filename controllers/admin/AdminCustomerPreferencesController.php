@@ -120,13 +120,6 @@ class AdminCustomerPreferencesControllerCore extends AdminController
                         'cast' => 'intval',
                         'type' => 'bool'
                     ),
-                    'PS_CUSTOMER_ADDRESS_CREATION' => array(
-                        'title' => $this->l('Address creation during checkout'),
-                        'hint' => $this->l('If disabled, Address form will not appear to user during checkout process. So by default hotel address, which rooms guest has in his cart will be considered as user address. Else user has to fill adress details.'),
-                        'validation' => 'isBool',
-                        'cast' => 'intval',
-                        'type' => 'bool'
-                    ),
                 ),
                 'submit' => array('title' => $this->l('Save')),
             ),

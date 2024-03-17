@@ -82,6 +82,9 @@
 			var with_room_type = {Product::SERVICE_PRODUCT_WITH_ROOMTYPE|intval};
 			var without_room_type = {Product::SERVICE_PRODUCT_WITHOUT_ROOMTYPE|intval};
 
+			var price_addition_type_with_room = {Product::PRICE_ADDITION_TYPE_WITH_ROOM|intval};
+			var price_addition_type_independent = {Product::PRICE_ADDITION_TYPE_INDEPENDENT|intval};
+
 
 			var has_combinations = {$has_combinations|intval};
 

@@ -81,17 +81,21 @@
                                     </div>
                                 </td>
                                 <td>
-                                    <div class="fixed-width-xl">
-                                        <select class="service_product_id_tax_rules_group" name="{$inputs_prefix}id_tax_rules_group">
-                                            <option value="0">{l s='No Tax'}</option>
-                                            {foreach from=$tax_rules_groups item=tax_rules_group}
-                                                <option value="{$tax_rules_group.id_tax_rules_group}" {if $service_product.association_info.id_tax_rules_group == $tax_rules_group.id_tax_rules_group}selected="selected"{/if} >
-                                                    {$tax_rules_group['name']|htmlentitiesUTF8}
-                                                </option>
-                                            {/foreach}
-                                        </select>
-                                    </div>
-                                    <div class="help-block">{l s='Default tax rule: %s' sprintf=$service_product.association_info.default_tax_rules_group_name}</div>
+                                    {if $service_product.association_info.auto_add_to_cart && $service_product.association_info.price_addition_type == Product::PRICE_ADDITION_TYPE_WITH_ROOM}
+                                        {l s='-'}
+                                    {else}
+                                        <div class="fixed-width-xl">
+                                            <select class="service_product_id_tax_rules_group" name="{$inputs_prefix}id_tax_rules_group">
+                                                <option value="0">{l s='No Tax'}</option>
+                                                {foreach from=$tax_rules_groups item=tax_rules_group}
+                                                    <option value="{$tax_rules_group.id_tax_rules_group}" {if $service_product.association_info.id_tax_rules_group == $tax_rules_group.id_tax_rules_group}selected="selected"{/if} >
+                                                        {$tax_rules_group['name']|htmlentitiesUTF8}
+                                                    </option>
+                                                {/foreach}
+                                            </select>
+                                        </div>
+                                        <div class="help-block">{l s='Default tax rule: %s' sprintf=$service_product.association_info.default_tax_rules_group_name}</div>
+                                    {/if}
                                 </td>
                             </tr>
                         {/foreach}

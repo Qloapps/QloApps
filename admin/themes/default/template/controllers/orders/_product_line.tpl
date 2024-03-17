@@ -62,7 +62,7 @@
 					<div class="fixed-width-xl room_check_in_div">
 						<div class="input-group">
 							<div class="input-group-addon">{l s='Check In'}</div>
-							<input type="text" class="form-control edit_product_date_from" name="edit_product[date_from]" value="{$data.date_from|date_format:"%d-%m-%Y"}"/>
+							<input type="text" class="form-control edit_product_date_from" name="edit_product[date_from]" value="{$data.date_from|date_format:"%d-%m-%Y"}" data-min_date="{$data.date_from|date_format:"%d-%m-%Y"}"/>
 							<div class="input-group-addon"><i class="icon-calendar"></i></div>
 						</div>
 					</div>
@@ -70,7 +70,7 @@
 					<div class="fixed-width-xl room_check_out_div">
 						<div class="input-group">
 							<div class="input-group-addon">{l s='Check Out'}</div>
-							<input type="text" class="form-control edit_product_date_to" name="edit_product[date_to]" value="{$data.date_to|date_format:"%d-%m-%Y"}"/>
+							<input type="text" class="form-control edit_product_date_to" name="edit_product[date_to]" value="{$data.date_to|date_format:"%d-%m-%Y"}" data-min_date="{$data.date_from|date_format:"%d-%m-%Y"}"/>
 							<div class="input-group-addon"><i class="icon-calendar"></i></div>
 						</div>
 					</div>
@@ -124,6 +124,7 @@
                                     </div>
                                 </div>
                             </div>
+							<p style="display:none;"><span class="text-danger occupancy-input-errors"></span></p>
                             <div class="row children_age_info_block" {if !isset($data['child_ages']) || !$data['child_ages']}style="display:none"{/if}>
                                 <div class="col-sm-12 form-group">
                                     <label class="col-sm-12">{l s='All Children'}</label>
@@ -259,7 +260,7 @@
 				</button>
 				<ul class="dropdown-menu" role="menu">
 					<li>
-						<a href="#" data-toggle="modal" data-target="#mySwappigModal" data-id_order="{$order->id}" data-room_num='{$data.room_num}' data-date_from='{$data.date_from}' data-date_to='{$data.date_to}' data-id_room='{$data.id_room}' data-cust_name='{$data.alloted_cust_name}' data-cust_email='{$data.alloted_cust_email}' data-avail_rm_swap='{$data.avail_rooms_to_swap|@json_encode}' data-avail_rm_realloc='{$data.avail_rooms_to_realloc|@json_encode}'>
+						<a href="#" id="reallocate_room_{$data['id']}" data-room_type_name="{$data['room_type_name']}" data-toggle="modal" data-target="#mySwappigModal" data-id_htl_booking="{$data['id']}" data-room_num='{$data.room_num}' data-id_room_type='{$data.id_product}' data-cust_name='{$data.alloted_cust_name}' data-cust_email='{$data.alloted_cust_email}' data-avail_rm_swap='{$data.avail_rooms_to_swap|@json_encode}' data-avail_realloc_room_types='{$data.avail_room_types_to_realloc|@json_encode}'>
 							<i class="icon-refresh"></i>
 							{l s='Reallocate/Swap Room'}
 						</a>

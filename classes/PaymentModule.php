@@ -181,9 +181,6 @@ abstract class PaymentModuleCore extends Module
         ShopUrl::resetMainDomainCache();
         $id_currency = $currency_special ? (int)$currency_special : (int)$this->context->cart->id_currency;
         $this->context->currency = new Currency((int)$id_currency, null, (int)$this->context->shop->id);
-        if (Configuration::get('PS_TAX_ADDRESS_TYPE') == 'id_address_delivery') {
-            $context_country = $this->context->country;
-        }
 
         $order_status = new OrderState((int)$id_order_state, (int)$this->context->language->id);
         if (!Validate::isLoadedObject($order_status)) {
@@ -273,14 +270,6 @@ abstract class PaymentModuleCore extends Module
                     /** @var Order $order */
                     $order = new Order();
                     $order->product_list = $package['product_list'];
-
-                    if (Configuration::get('PS_TAX_ADDRESS_TYPE') == 'id_address_delivery') {
-                        $address = new Address((int)$id_address);
-                        $this->context->country = new Country((int)$address->id_country, (int)$this->context->cart->id_lang);
-                        if (!$this->context->country->active && $this->name != 'wsorder') {
-                            throw new PrestaShopException('The delivery address country is not active.');
-                        }
-                    }
 
                     $carrier = null;
                     if (!$this->context->cart->isVirtualCart() && isset($package['id_carrier'])) {
@@ -463,15 +452,6 @@ abstract class PaymentModuleCore extends Module
                 }
             }
 
-            // The country can only change if the address used for the calculation is the delivery address, and if multi-shipping is activated
-            if (Configuration::get('PS_TAX_ADDRESS_TYPE') == 'id_address_delivery') {
-                $this->context->country = $context_country;
-            }
-
-            if (!$this->context->country->active && $this->name != 'wsorder') {
-                PrestaShopLogger::addLog('PaymentModule::validateOrder - Country is not active', 3, null, 'Cart', (int)$id_cart, true);
-                throw new PrestaShopException('The order address country is not active.');
-            }
 
             if (self::DEBUG_MODE) {
                 PrestaShopLogger::addLog('PaymentModule::validateOrder - Payment is about to be added', 1, null, 'Cart', (int)$id_cart, true);
@@ -866,7 +846,11 @@ abstract class PaymentModuleCore extends Module
                                         $objBookingDetail->total_paid_amount = $objAdvancedPayment->getRoomMinAdvPaymentAmount(
                                             $idProduct,
                                             $objCartBookingData->date_from,
-                                            $objCartBookingData->date_to
+                                            $objCartBookingData->date_to,
+                                            1,
+                                            $objCartBookingData->id_room,
+                                            $objCartBookingData->id_cart,
+                                            $objCartBookingData->id_guest
                                         );
                                     }
                                 }

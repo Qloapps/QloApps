@@ -58,6 +58,18 @@ class AdminOrderPreferencesControllerCore extends AdminController
             )
         );
 
+        // Options to display currency in order list
+        $displayCurrencyOptions = array(
+            array(
+                'value' => Order::ORDER_LIST_PRICE_DISPLAY_IN_PAYMENT_CURRENCY,
+                'name' => $this->l('Order currency')
+            ),
+            array(
+                'value' => Order::ORDER_LIST_PRICE_DISPLAY_IN_DEFAULT_CURRENCY,
+                'name' => $this->l('Default currency')
+            )
+        );
+
         $this->fields_options = array(
             'order_restrict' => array(
                 'title' => $this->l('Order Restrict'),
@@ -77,6 +89,16 @@ class AdminOrderPreferencesControllerCore extends AdminController
                         'type' => 'text',
                         'class' => 'fixed-width-xl',
                         'suffix' => $this->l('day(s)'),
+                    ),
+                    'PS_BACKDATE_ORDER_SUPERADMIN' => array(
+                        'title' => $this->l('Allow backdate order from Back-office for super-admin'),
+                        'hint' => $this->l('Allow superadmin to create bookings for backdate'),
+                        'type' => 'bool',
+                    ),
+                    'PS_BACKDATE_ORDER_EMPLOYEES' => array(
+                        'title' => $this->l('Allow backdate order from Back-office for employees'),
+                        'hint' => $this->l('Allow employees to create bookings for backdate'),
+                        'type' => 'bool',
                     ),
                 ),
                 'submit' => array(
@@ -158,6 +180,16 @@ class AdminOrderPreferencesControllerCore extends AdminController
                         'desc' => $this->l('This breakdown is always visible on room that have cart rule applied for that specific room.'),
                         'cast' => 'intval',
                         'type' => 'bool'
+                    ),
+                    'PS_ORDER_LIST_PRICE_DISPLAY_CURRENCY' => array(
+                        'title' => $this->l('Display order list prices in'),
+                        'hint' => $this->l('Choose the currency in which you want the prices in the order list to be displayed.'),
+                        'desc' => $this->l('\'Order currency\' is the currency in which customer created the order and \'Default currency\' is the currency configured in localization.'),
+                        'validation' => 'isInt',
+                        'type' => 'select',
+                        'cast' => 'intval',
+                        'list' => $displayCurrencyOptions,
+                        'identifier' => 'value',
                     ),
                 ),
                 'submit' => array('title' => $this->l('Save'))
