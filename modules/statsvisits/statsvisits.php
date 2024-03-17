@@ -160,6 +160,7 @@ class StatsVisits extends ModuleGraph
     protected function getData($layers)
     {
         $this->setDateGraph($layers, true);
+        $this->_formats['y'] = 'd';
     }
 
     protected function setAllTimeValues($layers)

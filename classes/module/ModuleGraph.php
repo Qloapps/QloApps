@@ -37,6 +37,8 @@ abstract class ModuleGraphCore extends Module
     /**@var array string graph titles */
     protected $_titles = array('main' => null, 'x' => null, 'y' => null);
 
+    protected $_formats = array('x' => null, 'y' => null);
+
     /** @var ModuleGraphEngine graph engine */
     protected $_render;
 
@@ -258,6 +260,7 @@ abstract class ModuleGraphCore extends Module
         $this->_render->setSize($width, $height);
         $this->_render->setLegend($this->_legend);
         $this->_render->setTitles($this->_titles);
+        $this->_render->setFormat($this->_formats);
     }
 
     public function draw()

@@ -649,12 +649,12 @@ class ProductCore extends ObjectModel
      * @param int $position
      * return boolean Update result
      */
-    public function updatePosition($way, $position)
+    public function updatePosition($way, $position, $id_category = null)
     {
         if (!$res = Db::getInstance()->executeS('
             SELECT cp.`id_product`, cp.`position`, cp.`id_category`
             FROM `'._DB_PREFIX_.'category_product` cp
-            WHERE cp.`id_category` = '.(int)Tools::getValue('id_category', 1).'
+            WHERE cp.`id_category` = '.(int) ($id_category ? $id_category: Tools::getValue('id_category', 1)).'
             ORDER BY cp.`position` ASC')
             ) {
             return false;
@@ -1454,23 +1454,25 @@ class ProductCore extends ObjectModel
         return $result;
     }
 
-    public function getServiceProducts($idLang, $front = false, $context = false)
+    public function getServiceProducts($active = null, $serviceProductType = null, $idLang = null, $orderBy = 'pl.name', $orderWay = 'ASC')
     {
-        if (!$context) {
-            $context = Context::getContext();
+        if (!$idLang) {
+            $idLang = Context::getContext()->language->id;
         }
-        $sql = 'SELECT p.*, product_shop.*, pl.*, image_shop.`id_image` id_image, il.`legend` as legend
-		        FROM `'._DB_PREFIX_.'product` p
-				'.Shop::addSqlAssociation('product', 'p').'
-				LEFT JOIN `'._DB_PREFIX_.'product_lang` pl ON (p.`id_product` = pl.`id_product` '.Shop::addSqlRestrictionOnLang('pl').')
-                LEFT JOIN `'._DB_PREFIX_.'image_shop` image_shop
-					ON (image_shop.`id_product` = p.`id_product` AND image_shop.cover=1 AND image_shop.id_shop='.(int)$context->shop->id.')
-				LEFT JOIN `'._DB_PREFIX_.'image_lang` il
-					ON (image_shop.`id_image` = il.`id_image`
-					AND il.`id_lang` = '.(int)$idLang.')';
-        $sql .= 'WHERE pl.`id_lang` = '.(int)$idLang.' AND p.`booking_product` = 0
-                AND p.`service_product_type` = '.Product::SERVICE_PRODUCT_WITHOUT_ROOMTYPE.'
-				ORDER BY pl.`name`';
+
+        $sql = 'SELECT p.*, pl.*, i.`id_image`, il.`legend` AS legend
+        FROM `'._DB_PREFIX_.'product` p
+        LEFT JOIN `'._DB_PREFIX_.'product_lang` pl ON (pl.`id_product` = p.`id_product` AND pl.`id_lang` = '.(int) $idLang.')
+        LEFT JOIN `'._DB_PREFIX_.'image` i ON (i.`id_product` = p.`id_product` AND i.`cover` = 1)
+        LEFT JOIN `'._DB_PREFIX_.'image_lang` il ON (il.`id_image` = i.`id_image` AND il.`id_lang` = '.(int) $idLang.')
+        WHERE p.`booking_product` = 0'.
+        (!is_null($active) ? ' AND p.`active` = '.(int) $active : '').
+        ($serviceProductType ? ' AND p.`service_product_type` = '.(int) $serviceProductType : '');
+
+        if (Validate::isOrderBy($orderBy) && Validate::isOrderBy($orderWay)) {
+            $sql .= ' ORDER BY '.$orderBy.' '.$orderWay;
+        }
+
         return Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql);
     }
 
@@ -3479,9 +3481,18 @@ class ProductCore extends ObjectModel
         );
     }
 
-    public function getPriceWithoutReduct($notax = false, $id_product_attribute = false, $decimals = 6)
+    public function getPriceWithoutReduct($notax = false, $id_product_attribute = false, $decimals = 6, $with_auto_add_services = 0)
     {
-        return Product::getPriceStatic((int)$this->id, !$notax, $id_product_attribute, $decimals, null, false, false);
+        $price = Product::getPriceStatic((int)$this->id, !$notax, $id_product_attribute, $decimals, null, false, false);
+        if ($with_auto_add_services) {
+            if ($services = RoomTypeServiceProduct::getAutoAddServices((int) $this->id, null, null, Product::PRICE_ADDITION_TYPE_WITH_ROOM, !$notax)) {
+                foreach($services as $service) {
+                    $price += $service['price'];
+                }
+            }
+        }
+
+        return $price;
     }
 
     /**
@@ -5326,6 +5337,68 @@ class ProductCore extends ObjectModel
         return $tax_calculator->getTotalRate();
     }
 
+    public function getPositionInCategory()
+    {
+        return Db::getInstance()->getValue(
+            'SELECT position
+            FROM `'._DB_PREFIX_.'category_product`
+            WHERE id_category = '.(int) $this->id_category_default.'
+            AND id_product = '.(int) $this->id
+        );
+    }
+
+    public function setPositionInCategory($position)
+    {
+        if ($position < 0) {
+            die(Tools::displayError('You cannot set a negative position, the minimum for a position is 0.'));
+        }
+
+        $result = Db::getInstance()->executeS(
+            'SELECT `id_product`
+            FROM `'._DB_PREFIX_.'category_product`
+            WHERE `id_category` = '.(int) $this->id_category_default.'
+            ORDER BY `position`'
+        );
+
+        if (($position > 0) && ($position + 1 > count($result))) {
+            die(Tools::displayError('You cannot set a position greater than the total number of room types in the hotel, minus 1 (position numbering starts at 0).'));
+        }
+
+        foreach ($result as &$value) {
+            $value = $value['id_product'];
+        }
+
+        $currentPosition = $this->getPositionInCategory();
+
+        if ($currentPosition && isset($result[$currentPosition])) {
+            $save = $result[$currentPosition];
+            unset($result[$currentPosition]);
+            array_splice($result, (int)$position, 0, $save);
+        }
+
+        $return = true;
+        foreach ($result as $position => $id_product) {
+            $return &= Db::getInstance()->update(
+                'category_product',
+                array('position' => $position),
+                '(`id_category` = '.(int) $this->id_category_default.' AND `id_product` = '.(int) $id_product.')'
+            );
+        }
+
+        return $return;
+    }
+
+    public static function getHighestPositionInCategory($idCategory)
+    {
+        $position = Db::getInstance()->getValue(
+            'SELECT MAX(`position`)
+            FROM `'._DB_PREFIX_.'category_product`
+            WHERE `id_category` = '.(int) $idCategory
+        );
+
+        return (is_numeric($position)) ? $position : -1;
+    }
+
     /**
     * Webservice getter : get product features association
     * @return array
@@ -5574,14 +5647,7 @@ class ProductCore extends ObjectModel
     */
     public function getWsPositionInCategory()
     {
-        $result = Db::getInstance()->executeS('SELECT position
-			FROM `'._DB_PREFIX_.'category_product`
-			WHERE id_category = '.(int)$this->id_category_default.'
-			AND id_product = '.(int)$this->id);
-        if (count($result) > 0) {
-            return $result[0]['position'];
-        }
-        return '';
+        return $this->getPositionInCategory();
     }
 
     /**

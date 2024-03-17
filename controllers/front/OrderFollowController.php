@@ -37,8 +37,9 @@ class OrderFollowControllerCore extends FrontController
      */
     public function initContent()
     {
-        parent::initContent();
         $this->show_breadcrump = true;
+
+        parent::initContent();
         if (isset($this->context->customer->id) && $this->context->customer->id) {
             $ordersReturns = OrderReturn::getOrdersReturn($this->context->customer->id, Tools::getValue('id_order'));
             $this->context->smarty->assign('ordersReturns', $ordersReturns);

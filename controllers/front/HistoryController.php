@@ -53,6 +53,8 @@ class HistoryControllerCore extends FrontController
      */
     public function initContent()
     {
+        $this->show_breadcrump = true;
+
         parent::initContent();
         if ($orders = Order::getCustomerOrders($this->context->customer->id)) {
             foreach ($orders as &$order) {
