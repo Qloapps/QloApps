@@ -281,6 +281,25 @@ function saveDashConfig(widget_name) {
     });
 }
 
+// This function is used to generate the tooltip content on the dashboard different sections
+function getTooltipContent(title, content = '', color = '') {
+    var tooltipContent = '';
+    tooltipContent += '<div class="dashboard-chart-tooltip">';
+        tooltipContent += '<label>';
+        if (color) {
+            tooltipContent += '<span class="tooltip-data-color"';
+            tooltipContent += ' style="background:' + color + '"';
+            tooltipContent += '">' + '</span> ';
+        }
+        tooltipContent += title + '</label>';
+        tooltipContent += '<div class="tooltip-content">';
+            tooltipContent += content;
+        tooltipContent += '</div>';
+    tooltipContent += '</div>';
+
+    return tooltipContent;
+}
+
 $(document).ready(function() {
     $('#calendar_form input[type="submit"]').on('click', function(elt) {
         elt.preventDefault();

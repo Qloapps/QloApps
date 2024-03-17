@@ -235,7 +235,7 @@ class AdminModulesCatalogControllerCore extends AdminController
         $this->page_header_toolbar_btn['addons'] = array(
             'href' => 'https://qloapps.com/addons/',
             'desc' => $this->l('Explore all Addons'),
-            'imgclass' => 'modules-list',
+            'imgclass' => 'puzzle-piece',
             'target' => true
         );
     }

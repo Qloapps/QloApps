@@ -112,7 +112,7 @@ function initTableDnD(table)
 				else if (tableId == 'product') {
 					params = {
 						action: 'updatePositions',
-						id_category: ids[1],
+						id_category_hotel: ids[1],
 						id_product: ids[2],
 						way: way
 					};
@@ -139,7 +139,11 @@ function initTableDnD(table)
 				params['page'] = parseInt($('input[name=page]').val());
 				params['selected_pagination'] = parseInt($('input[name=selected_pagination]').val());
 
-				var data = $.tableDnD.serialize().replace(/table-/g, '');
+				if (tableId == 'tab') {
+					var data = $.tableDnD.serialize().replace(/table-tab/g, 'menu');
+				} else {
+					var data = $.tableDnD.serialize().replace(/table-/g, '');
+				}
 				if ((tableId == 'category') && (data.indexOf('_0&') != -1))
 					data += '&found_first=1';
 				$.ajax({

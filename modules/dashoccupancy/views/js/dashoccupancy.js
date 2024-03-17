@@ -31,6 +31,12 @@ function pie_chart_occupancy(widget_name, chart_details) {
             .donutRatio(0.35)
             .color(['#A569DF', '#56CE56', '#FF655C']);
 
+        // create content for the tooltip of chart
+        chart.tooltip.contentGenerator((obj, element) => {
+            var tooltipContent = '<p><b>' + obj.data.value + '</b> (' + obj.data.percent + '%)<p>';
+            return getTooltipContent(obj.data.label, tooltipContent, obj.color);
+        });
+
         d3.select('#availablePieChart svg')
             .datum(chart_details.data)
             .transition().duration(350)
@@ -46,12 +52,20 @@ $(document).ready(function() {
         start = Date.parseDate($('#date-start').val(), 'Y-m-d');
         end = Date.parseDate($('#date-end').val(), 'Y-m-d');
 
+        if (end.getDate() == start.getDate()) {
+            end.setDate(end.getDate() + 1);
+        }
+
         $('#dashoccupancy_date_range').html(sprintf(date_subtitle, start.format(date_format), end.format(date_format)));
     });
 
     $('#date-end').change(function() {
         start = Date.parseDate($('#date-start').val(), 'Y-m-d');
         end = Date.parseDate($('#date-end').val(), 'Y-m-d');
+
+        if (end.getDate() == start.getDate()) {
+            end.setDate(end.getDate() + 1);
+        }
 
         $('#dashoccupancy_date_range').html(sprintf(date_subtitle, start.format(date_format), end.format(date_format)));
     });

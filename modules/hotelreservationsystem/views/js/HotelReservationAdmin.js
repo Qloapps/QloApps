@@ -309,8 +309,9 @@ $(document).on('click', 'button.gm-ui-hover-effect', function () {
 
 function initGoogleMaps() {
     if (typeof enabledDisplayMap != 'undefined'
-        && typeof google === 'object'
         && $('#googleMapContainer').length
+        && typeof google == 'object'
+        && typeof google.maps == 'object'
     ) {
         GoogleMapsManager.init($('#map'));
         GoogleMapsManager.initMap();
@@ -672,10 +673,10 @@ $(document).ready(function() {
 	          return highlightDateBorder($("#feature_plan_date_from").val(), date);
 	      },
 	      onSelect: function(selectedDate) {
-	          var date_format = selectedDate.split("-");
-	          var selectedDate = new Date(date_format[2], date_format[1] - 1, date_format[0]);
-	          selectedDate.setDate(selectedDate.getDate() + 1);
-	          $("#feature_plan_date_to").datepicker("option", "minDate", selectedDate);
+            let objDateToMin = $.datepicker.parseDate('dd-mm-yy', selectedDate);
+            objDateToMin.setDate(objDateToMin.getDate() + 1);
+
+            $('#feature_plan_date_to').datepicker('option', 'minDate', objDateToMin);
 	      },
     });
 
@@ -688,47 +689,30 @@ $(document).ready(function() {
     $("#feature_plan_date_to").datepicker({
         showOtherMonths: true,
         dateFormat: 'dd-mm-yy',
-        beforeShow: function (input, instance) {
-            var date_to = $('#feature_plan_date_from').val();
-            if (typeof date_to != 'undefined' && date_to != '') {
-                var date_format = date_to.split("-");
-                var selectedDate = new Date($.datepicker.formatDate('yy-mm-dd', new Date(date_format[2], date_format[1] - 1, date_format[0])));
-                selectedDate.setDate(selectedDate.getDate()+1);
-                $("#feature_plan_date_to").datepicker("option", "minDate", selectedDate);
+        beforeShow: function () {
+            let dateFrom = $('#feature_plan_date_from').val();
+
+            let objDateToMin = null;
+            if (typeof dateFrom != 'undefined' && dateFrom != '') {
+                objDateToMin = $.datepicker.parseDate('dd-mm-yy', dateFrom);
             } else {
-                var date_format = new Date();
-                var selectedDate = new Date($.datepicker.formatDate('yy-mm-dd', new Date()));
-                selectedDate.setDate(selectedDate.getDate()+1);
-                $("#feature_plan_date_to").datepicker("option", "minDate", selectedDate);
+                objDateToMin = new Date();
             }
+
+            objDateToMin.setDate(objDateToMin.getDate() + 1);
+            $('#feature_plan_date_to').datepicker('option', 'minDate', objDateToMin);
         },
         //for calender Css
         beforeShowDay: function (date) {
             return highlightDateBorder($("#feature_plan_date_to").val(), date);
-        },
-        onSelect: function(selectedDate) {
-            var date_format = selectedDate.split("-");
-            var selectedDate = new Date(date_format[2], date_format[1] - 1, date_format[0]);
-            selectedDate.setDate(selectedDate.getDate() - 1);
-            $("#feature_plan_date_from").datepicker("option", "maxDate", selectedDate);
         }
     });
 
     function highlightDateBorder(elementVal, date)
     {
         if (elementVal) {
-            var currentDate = date.getDate();
-            var currentMonth = date.getMonth()+1;
-            if (currentMonth < 10) {
-                currentMonth = '0' + currentMonth;
-            }
-            if (currentDate < 10) {
-                currentDate = '0' + currentDate;
-            }
-            dmy = date.getFullYear() + "-" + currentMonth + "-" + currentDate;
-            var date_format = elementVal.split("-");
-            var check_in_time = (date_format[2]) + '-' + (date_format[1]) + '-' + (date_format[0]);
-            if (dmy == check_in_time) {
+            let selectedDate = $.datepicker.formatDate('dd-mm-yy', date);
+            if (selectedDate == elementVal) {
                 return [true, "selectedCheckedDate", "Check-In date"];
             } else {
                 return [true, ""];
@@ -860,6 +844,13 @@ function showLangField(select_lang_name, id_lang)
 
     $('.all_lang_icon').attr('src', img_dir_l+id_lang+'.jpg');
     $('#choosedLangId').val(id_lang);
+
+    var id_old_language = id_language;
+    id_language = id_lang;
+
+    if (id_old_language != id_lang) {
+        changeEmployeeLanguage();
+    }
 }
 
 /* ----  HotelConfigurationSettingController Admin ---- */

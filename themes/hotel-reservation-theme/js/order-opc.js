@@ -346,7 +346,7 @@ $(document).ready(function()
 						static_token = jsonData.token;
 
 						// It's not a new customer
-						if (PS_CUSTOMER_ADDRESS_CREATION && $('#opc_id_customer').val() !== '0') {
+						if (PS_REGISTRATION_PROCESS_TYPE && $('#opc_id_customer').val() !== '0') {
 							saveAddress('delivery', function() {
 								location.reload();
 							});
@@ -1319,4 +1319,11 @@ $(document).on('click', '.btn-edit-guest-info', function(e) {
 	e.preventDefault();
 	$('#collapse-guest-info .card-body:nth-child(1)').hide();
 	$('#collapse-guest-info .card-body:nth-child(2)').toggleClass('hidden');
+});
+
+$(document).on('keydown', '#new_account_form input', function(e) {
+	if (e.keyCode === 13) {
+		e.preventDefault();
+		$('#new_account_form #opc_account_form:visible button[type="submit"]').click();
+	}
 });

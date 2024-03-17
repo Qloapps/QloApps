@@ -42,12 +42,117 @@ class wkhotelfilterblock extends Module
         $this->ps_versions_compliancy = array('min' => '1.6', 'max' => _PS_VERSION_);
     }
 
+    public function getContent()
+    {
+        $this->html = '';
+        if (Tools::isSubmit('btnConfigSubmit')) {
+            $this->postProcess();
+        } else {
+            $this->html .= '<br />';
+        }
+
+        $this->html .= $this->renderForm();
+
+        return $this->html;
+    }
+
+    public function renderForm()
+    {
+        $fields_form = array();
+        $fields_form['form'] = array(
+            'legend' => array(
+                'icon' => 'icon-cog',
+                'title' => $this->l('Search Results Page Filters'),
+            ),
+            'input' => array(
+                array(
+                    'type' => 'switch',
+                    'label' => $this->l('Show Amenities filter'),
+                    'name' => 'SHOW_AMENITIES_FILTER',
+                    'is_bool' => true,
+                    'values' => array(
+                        array(
+                            'id' => 'active_on',
+                            'value' => 1,
+                        ),
+                        array(
+                            'id' => 'active_off',
+                            'value' => 0,
+                        ),
+                    ),
+                    'hint' => $this->l('Enable to display Amenities filter.'),
+                ),
+                array(
+                    'type' => 'switch',
+                    'label' => $this->l('Show Price filter'),
+                    'name' => 'SHOW_PRICE_FILTER',
+                    'is_bool' => true,
+                    'values' => array(
+                        array(
+                            'id' => 'active_on',
+                            'value' => 1,
+                        ),
+                        array(
+                            'id' => 'active_off',
+                            'value' => 0,
+                        ),
+                    ),
+                    'hint' => $this->l('Enable to display Price filter.'),
+                ),
+            ),
+            'submit' => array(
+                'title' => $this->l('Save'),
+                'name' => 'submit_conf_filter',
+            ),
+        );
+
+        $helper = new HelperForm();
+        $helper->show_toolbar = false;
+        $helper->table = $this->table;
+        $lang = new Language((int) Configuration::get('PS_LANG_DEFAULT'));
+        $helper->default_form_language = $lang->id;
+        $this->fields_form = array();
+        $helper->identifier = $this->identifier;
+        $helper->submit_action = 'btnConfigSubmit';
+        $helper->currentIndex = $this->context->link->getAdminLink('AdminModules', false).
+        '&configure='.$this->name.'&module_name='.$this->name;
+        $helper->token = Tools::getAdminTokenLite('AdminModules');
+
+        $helper->tpl_vars = array(
+            'fields_value' => $this->getConfigFieldsValues(),
+            'languages' => $this->context->controller->getLanguages(),
+            'id_language' => $this->context->language->id,
+        );
+
+        return $helper->generateForm(array($fields_form));
+    }
+
+    public function postProcess()
+    {
+        if (Tools::isSubmit('btnConfigSubmit')) {
+            Configuration::updateValue(
+                'SHOW_AMENITIES_FILTER',
+                Tools::getValue('SHOW_AMENITIES_FILTER')
+            );
+            Configuration::updateValue('SHOW_PRICE_FILTER', Tools::getValue('SHOW_PRICE_FILTER'));
+
+            // redirect after saving the configuration
+            Tools::redirectAdmin(
+                $this->context->link->getAdminLink('AdminModules').'&configure='.$this->name.'&tab_module='.$this->tab.
+                '&module_name='.$this->name.'&conf=4'
+            );
+        }
+    }
+
     public function install()
     {
         if (!parent::install()
             || !$this->registerHook('header')
             || !$this->registerHook('addOtherModuleSetting')
-            || !$this->registerHook('displayLeftColumn')) {
+            || !$this->registerHook('displayLeftColumn')
+            || !Configuration::updateValue('SHOW_AMENITIES_FILTER', 1)
+            || !Configuration::updateValue('SHOW_PRICE_FILTER', 1)
+        ) {
             return false;
         }
 
@@ -154,5 +259,17 @@ class wkhotelfilterblock extends Module
             'SHOW_AMENITIES_FILTER' => Configuration::get('SHOW_AMENITIES_FILTER'),
             'SHOW_PRICE_FILTER' => Configuration::get('SHOW_PRICE_FILTER'),
         );
+    }
+
+    public function uninstall()
+    {
+        if (!parent::uninstall()
+            || !Configuration::deleteByName('SHOW_AMENITIES_FILTER')
+            || !Configuration::deleteByName('SHOW_PRICE_FILTER')
+        ) {
+            return false;
+        }
+
+        return true;
     }
 }

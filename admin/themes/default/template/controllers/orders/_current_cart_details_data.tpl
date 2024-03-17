@@ -46,7 +46,7 @@
 						{assign var=curr_id value=$cart->id_currency|intval}
 						{foreach from=$cart_detail_data item=data}
 							<tr  data-id-booking-data="{$data.id}" data-id-product="{$data.id_product}" data-id-room="{$data.id_room}" data-date-from="{$data.date_from}" data-date-to="{$data.date_to}" >
-								<td>{$data.room_num|escape:'html':'UTF-8'}</td>
+								<td>{$data.room_num|escape:'html':'UTF-8'} {hook h='displayRoomNumAfter' data=$data type='adminOrder'}</td>
 								<td><img src="{$data.image_link|escape:'html':'UTF-8'}" title="Room image" /></td>
 								<td>
 									<p>{$data.room_type|escape:'html':'UTF-8'}</p>
@@ -71,17 +71,18 @@
 															<div class="col-xs-6 occupancy_count_block">
 																<div class="col-sm-12">
 																	<label>{l s='Adults'}</label>
-																	<input type="number" class="form-control num_occupancy num_adults" name="occupancy[0][adults]" value="{$data['adults']}" min="1" max="{$data['room_type_info']['max_adults']|escape:'html':'UTF-8'}">
+																	<input type="number" class="form-control num_occupancy num_adults" name="occupancy[0][adults]" value="{$data['adults']}" min="1">
 																</div>
 															</div>
 															<div class="col-xs-6 occupancy_count_block">
 																<div class="col-sm-12">
 																	<label>{l s='Children'} <span class="label-desc-txt"></span></label>
-																	<input type="number" class="form-control num_occupancy num_children" name="occupancy[0][children]" value="{$data['children']}" min="0" max="{$data['room_type_info']['max_children']|escape:'html':'UTF-8'}">
+																	<input type="number" class="form-control num_occupancy num_children" name="occupancy[0][children]" value="{$data['children']}" min="0">
 																	({l s='Below'}  {$max_child_age|escape:'htmlall':'UTF-8'} {l s='years'})
 																</div>
 															</div>
 														</div>
+														<p style="display:none;"><span class="text-danger occupancy-input-errors"></span></p>
 														<div class="row children_age_info_block" {if !isset($data['child_ages']) || !$data['child_ages']}style="display:none"{/if}>
 															<div class="col-sm-12">
 																<label class="col-sm-12">{l s='All Children'}</label>

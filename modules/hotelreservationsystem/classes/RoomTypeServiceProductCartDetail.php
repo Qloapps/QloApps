@@ -64,14 +64,13 @@ class RoomTypeServiceProductCartDetail extends ObjectModel
         }
 
         if ($updateQty = $quantity - $objRoomTypeServiceProductCartDetail->quantity) {
+            $way = $updateQty > 0 ? 'up' : 'down';
+            $objRoomTypeServiceProductCartDetail->quantity += $updateQty;
             if (Product::getProductPriceCalculation($idProduct) == Product::PRICE_CALCULATION_METHOD_PER_DAY) {
                 $objHotelCartBookingData = new HotelCartBookingData($idHtlCartData);
                 $numdays = HotelHelper::getNumberOfDays($objHotelCartBookingData->date_from, $objHotelCartBookingData->date_to);
                 $updateQty *= $numdays;
-
             }
-            $way = $updateQty > 0 ? 'up' : 'down';
-            $objRoomTypeServiceProductCartDetail->quantity = $quantity;
             if ($objRoomTypeServiceProductCartDetail->save()) {
                 $objCart = new Cart($idCart);
                 return $objCart->updateQty((int)abs($updateQty), $idProduct, null, false, $way);
@@ -86,16 +85,45 @@ class RoomTypeServiceProductCartDetail extends ObjectModel
     public function removeServiceProductByIdHtlCartBooking($htlCartBookingId)
     {
         if ($stadardProductsData = Db::getInstance()->executeS(
-            'SELECT * FROM `'._DB_PREFIX_.'htl_room_type_service_product_cart_detail`
-            WHERE `htl_cart_booking_id` = '.(int)$htlCartBookingId
+            'SELECT * FROM `' . _DB_PREFIX_ . 'htl_room_type_service_product_cart_detail`
+            WHERE `htl_cart_booking_id` = ' . (int)$htlCartBookingId
         )) {
             foreach ($stadardProductsData as $product) {
                 if (Validate::isLoadedObject(
                     $objRoomTypeServiceProductCartDetail = new RoomTypeServiceProductCartDetail($product['id_room_type_service_product_cart_detail'])
                 )) {
+                    $updateQty = $product['quantity'];
+                    if (Product::getProductPriceCalculation($product['id_product']) == Product::PRICE_CALCULATION_METHOD_PER_DAY) {
+                        $objHotelCartBookingData = new HotelCartBookingData($idHtlCartData);
+                        $numdays = HotelHelper::getNumberOfDays($objHotelCartBookingData->date_from, $objHotelCartBookingData->date_to);
+                        $updateQty *= $numdays;
+                    }
                     if ($objRoomTypeServiceProductCartDetail->delete()) {
                         $objCart = new Cart($product['id_cart']);
-                        $objCart->updateQty((int)($product['quantity']), $product['id_product'], null, false, 'down');
+                        if (isset(Context::getContext()->controller->controller_type)) {
+                            $controllerType = Context::getContext()->controller->controller_type;
+                        } else {
+                            $controllerType = 'front';
+                        }
+                        if ($controllerType == 'admin' || $controllerType == 'moduleadmin') {
+                            if ($cartQty = Cart::getProductQtyInCart($product['id_cart'], $product['id_product'])) {
+                                if ($product['quantity'] < $cartQty) {
+                                    Db::getInstance()->update(
+                                        'cart_product',
+                                        array('quantity' => (int)($cartQty - $product['quantity'])),
+                                        '`id_product` = '.(int)$product['id_product'].' AND `id_cart` = '.(int)$product['id_cart']
+                                    );
+                                } else {
+                                    //if room type has no qty remaining in cart then delete row
+                                    Db::getInstance()->delete(
+                                        'cart_product',
+                                        '`id_product` = '.(int)$product['id_product'].' AND `id_cart` = '.(int)$product['id_cart']
+                                    );
+                                }
+                            }
+                        } else {
+                            $objCart->updateQty((int)($updateQty), $product['id_product'], null, false, 'down');
+                        }
                     }
                 }
             }
@@ -190,7 +218,7 @@ class RoomTypeServiceProductCartDetail extends ObjectModel
         $sql = 'SELECT rscd.`id_product`, rscd.`quantity`, cbd.`id_cart`, p.`auto_add_to_cart`, p.`allow_multiple_quantity`, cbd.`id` as `htl_cart_booking_id`,
             p.`price_addition_type`, cbd.`id_product` as `room_type_id_product`, pl.`name`, cbd.`date_from`, cbd.`date_to`
             FROM `'._DB_PREFIX_.'htl_cart_booking_data` cbd
-            LEFT JOIN `'._DB_PREFIX_.'htl_room_type_service_product_cart_detail` rscd ON(rscd.`htl_cart_booking_id` = cbd.`id`)
+            INNER JOIN `'._DB_PREFIX_.'htl_room_type_service_product_cart_detail` rscd ON(rscd.`htl_cart_booking_id` = cbd.`id`)
             LEFT JOIN `'._DB_PREFIX_.'product` p ON (p.`id_product` = rscd.`id_product`)
             LEFT JOIN `'._DB_PREFIX_.'product_lang` pl ON (p.`id_product` = pl.`id_product` AND pl.`id_lang` = '.(int)$idLang.')
             WHERE 1';

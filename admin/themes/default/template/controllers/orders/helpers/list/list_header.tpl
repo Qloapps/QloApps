@@ -122,25 +122,37 @@
 										{if ($params.type == 'date' || $params.type == 'datetime' || $params.type == 'range') && $params.value|is_array}
 											{assign var="filter_value" value=''}
 											{foreach $params.value as $value}
-												{if ($value|is_string && !empty($value))}
-													{if empty($filter_value)}
+												{if (isset($value) && ($value !== '' || $value === 0))}
+													{if !(isset($filter_value) && ($filter_value !== '' || $filter_value === 0))}
 														{assign var="filter_value" value=$value}
 													{else}
 														{assign var="filter_value" value="`$filter_value` - `$value`"}
 													{/if}
 												{/if}
 											{/foreach}
-											{if !empty($filter_value)}
+											{if (isset($filter_value) && ($filter_value !== '' || $filter_value === 0))}
 												<span data-filter_key="{if isset($params.name_date)}{$params.name_date}{else}{$key}{/if}" data-filter_type="{$params.type}">
 													{$params['title']|escape:'html':'UTF-8'}: <span class="filter_value">{$filter_value|escape:'html':'UTF-8'}</span>
 													<i class="icon-times"></i>
 												</span>
 											{/if}
-										{else if $params.type == 'select'}
-											<span data-filter_key="{if isset($params.filter_key)}{$params.filter_key}{else}{$key}{/if}" data-filter_type="{$params.type}">
-												{$params['title']|escape:'html':'UTF-8'}: <span class="filter_value">{$params['list'][$params['value']]|escape:'html':'UTF-8'}</span>
-												<i class="icon-times"></i>
-											</span>
+										{elseif $params.type == 'select'}
+											{if isset($params.multiple) && $params.multiple}
+												<span data-filter_key="{if isset($params.filter_key)}{$params.filter_key}{else}{$key}{/if}" data-filter_type="{$params.type}" data-multiple="{$params.multiple|intval}" data-operator="{$params.operator}">
+													{$params['title']|escape:'html':'UTF-8'}:
+													<span class="filter_value">
+														{foreach from=$params.value item=option name=foreachInfo}
+															{$params.list[$option]}{if !$smarty.foreach.foreachInfo.last}{if $params.operator == 'or'} | {else}, {/if}{/if}
+														{/foreach}
+													</span>
+													<i class="icon-times"></i>
+												</span>
+											{else}
+												<span data-filter_key="{if isset($params.filter_key)}{$params.filter_key}{else}{$key}{/if}" data-filter_type="{$params.type}">
+													{$params['title']|escape:'html':'UTF-8'}: <span class="filter_value">{$params['list'][$params['value']]|replace: '&nbsp;' : ''}</span>
+													<i class="icon-times"></i>
+												</span>
+											{/if}
 										{else}
 											<span data-filter_key="{if isset($params.filter_key)}{$params.filter_key}{else}{$key}{/if}" data-filter_type="{$params.type}">
 												{$params['title']|escape:'html':'UTF-8'}: <span class="filter_value">{$params['value']|escape:'html':'UTF-8'}</span>
@@ -166,7 +178,7 @@
 															<input type="text" class="filter form-control" name="{$list_id}Filter_{if isset($params.filter_key)}{$params.filter_key}{else}{$key}{/if}[0]" placeholder="{l s='From'}" value="{if isset($params.value.0)}{$params.value.0}{/if}">
 															<input type="text" class="filter form-control" name="{$list_id}Filter_{if isset($params.filter_key)}{$params.filter_key}{else}{$key}{/if}[1]" placeholder="{l s='To'}" value="{if isset($params.value.1)}{$params.value.1}{/if}">
 														</div>
-													{else if $params.type == 'bool'}
+													{elseif $params.type == 'bool'}
 														<select id="filter_input_{$key}" class="filter fixed-width-sm center" name="{$list_id}Filter_{if isset($params.filter_key)}{$params.filter_key}{else}{$key}{/if}">
 															<option value="">-</option>
 															<option value="1" {if $params.value == 1} selected="selected" {/if}>{l s='Yes'}</option>
@@ -205,21 +217,13 @@
 																		prevText: '',
 																		nextText: '',
 																		dateFormat: 'yy-mm-dd',
-																		beforeShow: function() {
-																			let dateTo = $('#local_{$params.id_date}_1').val().trim();
-																			if (typeof dateTo != 'undefined' && dateTo != '') {
-																				let objDateToMax = $.datepicker.parseDate('yy-mm-dd', dateTo);
-																				objDateToMax.setDate(objDateToMax.getDate() - 1);
-																				$('#local_{$params.id_date}_0').datepicker('option', 'maxDate', objDateToMax);
-																			}
-																		},
 																		onClose: function() {
 																			let dateFrom = $('#local_{$params.id_date}_0').val().trim();
 																			let dateTo = $('#local_{$params.id_date}_1').val().trim();
 
-																			if (dateFrom >= dateTo) {
+																			if ((dateFrom && dateTo) && (dateFrom >= dateTo)) {
 																				let objDateToMin = $.datepicker.parseDate('yy-mm-dd', dateFrom);
-																				objDateToMin.setDate(objDateToMin.getDate() + 1);
+																				objDateToMin.setDate(objDateToMin.getDate());
 
 																				$('#local_{$params.id_date}_1').datepicker('option', 'minDate', objDateToMin);
 																			}
@@ -235,7 +239,7 @@
 
 																			if (typeof dateFrom != 'undefined' && dateFrom != '') {
 																				let objDateToMin = $.datepicker.parseDate('yy-mm-dd', dateFrom);
-																				objDateToMin.setDate(objDateToMin.getDate() + 1);
+																				objDateToMin.setDate(objDateToMin.getDate());
 
 																				$('#local_{$params.id_date}_1').datepicker('option', 'minDate', objDateToMin);
 																			}
@@ -245,18 +249,28 @@
 															</script>
 														</div>
 													{elseif $params.type == 'select'}
-														{if isset($params.filter_key)}
-															<select id="filter_input_{$key}" class="filter{if isset($params.align) && $params.align == 'center'}center{/if}" onchange="$('#submitFilterButton{$list_id}').focus();$('#submitFilterButton{$list_id}').click();" name="{$list_id}Filter_{$params.filter_key}" {if isset($params.width)} style="width:{$params.width}px"{/if}>
-																<option value="" {if $params.value == ''} selected="selected" {/if}>-</option>
+														{if isset($params.multiple) && $params.multiple}
+															<select id="filter_input_{$key}" class="filter{if isset($params.align) && $params.align == 'center'}center{/if} select_multiple_{$params.operator} chosen chosen-options-horizontal" multiple name="{$list_id}Filter_{$params.filter_key}[]" {if isset($params.width)} style="width:{$params.width}px"{/if}>
 																{if isset($params.list) && is_array($params.list)}
 																	{foreach $params.list AS $option_value => $option_display}
-																		<option value="{$option_value}" {if (string)$option_display === (string)$params.value ||  (string)$option_value === (string)$params.value} selected="selected"{/if}>{$option_display}</option>
+																		<option value="{$option_value}" {if isset($params.value) && $params.value}{if in_array($option_value, $params.value)} selected="selected"{/if}{/if}>{$option_display}</option>
 																	{/foreach}
 																{/if}
 															</select>
+														{else}
+															{if isset($params.filter_key)}
+																<select id="filter_input_{$key}" class="filter{if isset($params.align) && $params.align == 'center'}center{/if} {if isset($params.class)}{$params.class}{/if}" {if !isset($params.remove_onchange) || !$params.remove_onchange}onchange="$('#submitFilterButton{$list_id}').focus();$('#submitFilterButton{$list_id}').click();"{/if} name="{$list_id}Filter_{$params.filter_key}" {if isset($params.width)} style="width:{$params.width}px"{/if}>
+																	<option value="" {if $params.value == ''} selected="selected" {/if}>-</option>
+																	{if isset($params.list) && is_array($params.list)}
+																		{foreach $params.list AS $option_value => $option_display}
+																			<option value="{$option_value}" {if (string)$option_display === (string)$params.value ||  (string)$option_value === (string)$params.value} selected="selected"{/if}>{$option_display}</option>
+																		{/foreach}
+																	{/if}
+																</select>
+															{/if}
 														{/if}
 													{else}
-														<input type="text" class="filter" name="{$list_id}Filter_{if isset($params.filter_key)}{$params.filter_key}{else}{$key}{/if}" value="{$params.value|escape:'html':'UTF-8'}" {if isset($params.width) && $params.width != 'auto'} style="width:{$params.width}px"{/if} />
+														<input type="text" id="filter_input_{$key}" class="filter" name="{$list_id}Filter_{if isset($params.filter_key)}{$params.filter_key}{else}{$key}{/if}" value="{$params.value|escape:'html':'UTF-8'}" {if isset($params.width) && $params.width != 'auto'} style="width:{$params.width}px"{/if} />
 													{/if}
 												</div>
 											</div>
@@ -297,12 +311,112 @@
 					} else if (type == 'range') {
 						$('#list_filters_panel').find('[name*="orderFilter_'+$(this).parent().data('filter_key')+'"]').val('');
 					} else if (type == 'select') {
-						$('#list_filters_panel').find('select[name="orderFilter_'+$(this).parent().data('filter_key')+'"] option:selected').prop("selected", false);
+						$('#list_filters_panel').find('select[name*="orderFilter_'+$(this).parent().data('filter_key')+'"] option:selected').prop('selected', false);
 					} else {
 						$('#list_filters_panel').find('input[name="orderFilter_'+$(this).parent().data('filter_key')+'"]').val('');
 					}
+
+					// set post data for empty multi-select filters
+					$(form).find('select[multiple]').each(function (i, selectElement) {
+						if ($(selectElement).find('option:selected').length == 0) {
+							$(form).append('<input type="hidden" name="' + $(selectElement).attr('name').slice(0, -2) + '" value="">');
+						}
+					});
+
 					form.submit();
 				});
+
+				$('#form-order').submit(function () {
+					let form = $(this);
+					$(form).find('select[multiple]').each(function (i, selectElement) {
+						if ($(selectElement).val() == null) {
+							$(form).append('<input type="hidden" name="' + $(selectElement).attr('name').slice(0, -2) + '" value="">');
+						}
+					});
+
+					return true;
+				});
+			});
+
+			function updateRoomTypeFilter() {
+				let filterInputHotelName = $('#filter_input_hotel_name');
+				let filterInputRoomTypeName = $('#filter_input_room_type_name');
+
+				let idHotel = parseInt($(filterInputHotelName).val() || '0');
+
+				$.ajax({
+					url: currentIndex + '&token=' + token,
+					data: {
+						ajax: true,
+						action: 'GetHotelRoomTypes',
+						id_hotel: idHotel,
+					},
+					type: 'POST',
+					dataType: 'JSON',
+					success: function(response) {
+						if (response.status) {
+							if (response.has_room_types) {
+								$(filterInputRoomTypeName).html(response.html_room_types);
+							} else {
+								$(filterInputRoomTypeName).find('option').not(':first').remove();
+							}
+
+							// destroy current chosen and re-initialize
+							$(filterInputRoomTypeName).chosen('destroy');
+							$(filterInputRoomTypeName).chosen({
+								disable_search_threshold: 5,
+								search_contains: true,
+							});
+						}
+					},
+				});
+			}
+
+			function updateHotelRoomsFilter(useRoomType = true) {
+				let filterInputHotelName = $('#filter_input_hotel_name');
+				let filterInputRoomTypeName = $('#filter_input_room_type_name');
+				let filterInputRoomNumber = $('#filter_input_id_room_information');
+
+				let idHotel = parseInt($(filterInputHotelName).val() || '0');
+				let idProduct = parseInt($(filterInputRoomTypeName).val() || '0');
+
+				$.ajax({
+					url: currentIndex + '&token=' + token,
+					data: {
+						ajax: true,
+						action: 'GetHotelRooms',
+						id_hotel: idHotel,
+						id_product: useRoomType ? idProduct : 0,
+					},
+					type: 'POST',
+					dataType: 'JSON',
+					success: function(response) {
+						if (response.status) {
+							if (response.has_hotel_rooms) {
+								$(filterInputRoomNumber).html(response.html_hotel_rooms);
+							} else {
+								$(filterInputRoomNumber).find('option').not(':first').remove();
+							}
+
+							// destroy current chosen and re-initialize
+							$(filterInputRoomNumber).chosen('destroy');
+							$(filterInputRoomNumber).chosen({
+								disable_search_threshold: 5,
+								search_contains: true,
+							});
+						}
+					},
+				});
+			}
+
+			// manage Hotel and Room type filter inputs
+			$(document).on('change', '#filter_input_hotel_name', function () {
+				updateRoomTypeFilter();
+				updateHotelRoomsFilter(false);
+			});
+
+			$(document).on('change', '#filter_input_room_type_name', function () {
+				updateHotelRoomsFilter();
 			});
 		</script>
 		<style>
@@ -354,7 +468,7 @@
 			.list_filters {
 				padding: 0 30px;
 				display: grid;
-				grid-template-columns: repeat(3, 1fr);
+				grid-template-columns: repeat(3, minmax(0, 1fr));;
 				gap: 8px 40px;}
 				.list_filters > .row {
 					display: flex;

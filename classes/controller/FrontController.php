@@ -221,6 +221,7 @@ class FrontControllerCore extends Controller
             'js_dir' => _THEME_JS_DIR_,
             'base_dir' => __PS_BASE_URI__,
             'language_code'       => $this->context->language->language_code ? $this->context->language->language_code : $this->context->language->iso_code,
+            'language_is_rtl' => $this->context->language->is_rtl,
         ]);
 
         /* get page name to display it in body id */
@@ -416,11 +417,12 @@ class FrontControllerCore extends Controller
 
         $display_tax_label = $this->context->country->display_tax_label;
         if (isset($cart->{Configuration::get('PS_TAX_ADDRESS_TYPE')}) && $cart->{Configuration::get('PS_TAX_ADDRESS_TYPE')}) {
-            $infos = Address::getCountryAndState((int)$cart->{Configuration::get('PS_TAX_ADDRESS_TYPE')});
-            $country = new Country((int)$infos['id_country']);
-            $this->context->country = $country;
-            if (Validate::isLoadedObject($country)) {
-                $display_tax_label = $country->display_tax_label;
+            if ($infos = Address::getCountryAndState((int)$cart->{Configuration::get('PS_TAX_ADDRESS_TYPE')})) {
+                $country = new Country((int)$infos['id_country']);
+                $this->context->country = $country;
+                if (Validate::isLoadedObject($country)) {
+                    $display_tax_label = $country->display_tax_label;
+                }
             }
         }
 
@@ -795,6 +797,9 @@ class FrontControllerCore extends Controller
                         'HOOK_MAINTENANCE' => Hook::exec('displayMaintenance', array()),
                         'allowEmployee' => Configuration::get('PS_ALLOW_EMP'),
                         'maintenance' => $this->context->link->getAdminLink('AdminMaintenance', false),
+                        'languages' => Language::getLanguages(true, $this->context->shop->id),
+                        'lang_iso' => $this->context->language->iso_code,
+                        'link' => $this->context->link,
                     ));
                     // If the controller is a module, then getTemplatePath will try to find the template in the modules, so we need to instanciate a real frontcontroller
                     $front_controller = preg_match('/ModuleFrontController$/', get_class($this)) ? new FrontController() : $this;

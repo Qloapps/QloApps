@@ -63,8 +63,8 @@
                             </div>
                             <div class="form-group col-sm-7 col-xs-6 occupancy_count_block">
                                 <div class="row">
-                                    <label class="col-sm-12 clearfix">{l s='Children'}</label>
-                                    <div class="col-sm-12">
+                                    <label class="col-sm-12">{l s='Children'}</label>
+                                    <div class="col-sm-12 clearfix">
                                         <input type="hidden" class="num_occupancy num_children room_occupancies" name="occupancy[{$key|escape:'htmlall':'UTF-8'}][children]" max="{}" value="{$occupancy['children']|escape:'htmlall':'UTF-8'}">
                                         <div class="occupancy_count pull-left">
                                             <span>{$occupancy['children']|escape:'htmlall':'UTF-8'}</span>
@@ -84,6 +84,7 @@
                                 </div>
                             </div>
                         </div>
+                        <p style="display:none;"><span class="text-danger occupancy-input-errors"></span></p>
                         <div class="form-group row children_age_info_block" {if isset($occupancy['child_ages']) && $occupancy['child_ages']}style="display:block;"{/if}>
                             <label class="col-sm-12">{l s='All Children'}</label>
                             <div class="col-sm-12">
@@ -162,6 +163,7 @@
                             </div>
                         </div>
                     </div>
+                    <p style="display:none;"><span class="text-danger occupancy-input-errors"></span></p>
                     <div class="form-group row children_age_info_block">
                         <label class="col-sm-12">{l s='All Children'}</label>
                         <div class="col-sm-12">
@@ -174,7 +176,10 @@
             {/if}
         </div>
         <div class="add_occupancy_block">
-            <a class="add_new_occupancy_btn" href="#"><i class="icon-plus"></i> <span>{l s='Add Room'}</span></a>
+            <a class="add_new_occupancy_btn{if isset($occupancies) && $occupancies && isset($total_available_rooms) && $total_available_rooms <= count($occupancies)} disabled{/if}" data-title-available="{l s='Click to add more rooms.'}" data-title-unavailable="{l s='No more rooms available.'}" href="#">
+                <i class="icon-plus"></i>
+                <span>{l s='Add Room'}</span>
+            </a>
         </div>
     </div>
 </div>
