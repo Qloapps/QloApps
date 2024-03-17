@@ -112,7 +112,8 @@ class AdminAddHotelController extends ModuleAdminController
         $smartyVars['lang'] = true;
         $smartyVars['iso'] = $this->context->language->iso_code;
         //lang vars
-        $currentLangId = Configuration::get('PS_LANG_DEFAULT');
+
+        $currentLangId = $this->default_form_language ? $this->default_form_language : Configuration::get('PS_LANG_DEFAULT');
         $smartyVars['languages'] = Language::getLanguages(false);
         $smartyVars['currentLang'] = Language::getLanguage((int) $currentLangId);
 
@@ -124,22 +125,15 @@ class AdminAddHotelController extends ModuleAdminController
         $country = $this->context->country;
         $smartyVars['defaultCountry'] = $country->name[Configuration::get('PS_LANG_DEFAULT')];
 
+        $idCountry = null;
         if ($this->display == 'edit') {
             $idHotel = Tools::getValue('id');
             $hotelBranchInfo = new HotelBranchInformation($idHotel);
 
             $addressInfo = HotelBranchInformation::getAddress($idHotel);
-            $statesbycountry = State::getStatesByIdCountry($addressInfo['id_country']);
+            $idCountry = Tools::getValue('hotel_country', $addressInfo['id_country']);
 
-            $states = array();
-            if ($statesbycountry) {
-                foreach ($statesbycountry as $key => $value) {
-                    $states[$key]['id'] = $value['id_state'];
-                    $states[$key]['name'] = $value['name'];
-                }
-            }
             $smartyVars['edit'] =  1;
-            $smartyVars['state_var'] = $states;
             $smartyVars['address_info'] = $addressInfo;
             $smartyVars['hotel_info'] = (array) $hotelBranchInfo;
             //Hotel Images
@@ -175,7 +169,18 @@ class AdminAddHotelController extends ModuleAdminController
             $smartyVars['order_restrict_date_info'] = $restrictDateInfo;
         }
 
-        $smartyVars['enabledDisplayMap'] =  Configuration::get('WK_GOOGLE_ACTIVE_MAP');
+        // manage state option
+        if ($this->display == 'add') {
+            $idCountry = Tools::getValue('hotel_country');
+        }
+
+        $stateOptions = null;
+        if ($idCountry) {
+            $stateOptions = State::getStatesByIdCountry($idCountry);
+        }
+
+        $smartyVars['state_var'] = $stateOptions;
+        $smartyVars['enabledDisplayMap'] = Configuration::get('PS_API_KEY') && Configuration::get('WK_GOOGLE_ACTIVE_MAP');
         $smartyVars['ps_img_dir'] = _PS_IMG_.'l/';
 
         $this->context->smarty->assign($smartyVars);
@@ -497,12 +502,20 @@ class AdminAddHotelController extends ModuleAdminController
                     if ($catState) {
                         if ($catCity = $objHotelBranch->addCategory($city, $catState, $groupIds)) {
                             $hotelCatName = $objHotelBranch->hotel_name;
-                            if ($catHotel = $objHotelBranch->addCategory(
-                                $hotelCatName, $catCity, $groupIds, 1, $newIdHotel
-                            )) {
-                                $objHotelBranch = new HotelBranchInformation($newIdHotel);
-                                $objHotelBranch->id_category = $catHotel;
-                                $objHotelBranch->save();
+
+                            // add/update hotel category
+                            if ($objHotelBranch->id_category) {
+                                $objCategory = new Category($objHotelBranch->id_category);
+                                $objCategory->name = $objHotelBranch->hotel_name;
+                                $objCategory->save();
+                            } else {
+                                if ($catHotel = $objHotelBranch->addCategory(
+                                    $hotelCatName, $catCity, $groupIds, 1, $newIdHotel
+                                )) {
+                                    $objHotelBranch = new HotelBranchInformation($newIdHotel);
+                                    $objHotelBranch->id_category = $catHotel;
+                                    $objHotelBranch->save();
+                                }
                             }
                         }
                     }
@@ -600,16 +613,15 @@ class AdminAddHotelController extends ModuleAdminController
 
     public function ajaxProcessStateByCountryId()
     {
-        $states = array();
+        $response = array('status' => false, 'states' => array());
         if ($idCountry = Tools::getValue('id_country')) {
-            if ($statesbycountry = State::getStatesByIdCountry($idCountry)) {
-                foreach ($statesbycountry as $key => $value) {
-                    $states[$key]['id'] = $value['id_state'];
-                    $states[$key]['name'] = $value['name'];
-                }
+            if ($states = State::getStatesByIdCountry($idCountry)) {
+                $response['status'] = true;
+                $response['states'] = $states;
             }
         }
-        die(json_encode($states));
+
+        $this->ajaxDie(json_encode($response));
     }
 
     public function ajaxProcessUploadHotelImages()

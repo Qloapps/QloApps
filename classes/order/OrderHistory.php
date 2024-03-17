@@ -313,7 +313,6 @@ class OrderHistoryCore extends ObjectModel
 
         // set orders as paid
         if ($new_os->paid == 1) {
-            $invoices = $order->getInvoicesCollection();
             if ($order->total_paid != 0) {
                 // if order is created by API then create a direct object instead of creating an object from module
                 if ($order->module == 'wsorder') {
@@ -323,22 +322,43 @@ class OrderHistoryCore extends ObjectModel
                 }
             }
 
-            foreach ($invoices as $invoice) {
-                /** @var OrderInvoice $invoice */
-                $rest_paid = $invoice->getRestPaid();
+            // if order has invoices then create payment entry for all the invoices
+            if ($invoices = $order->getInvoicesCollection()->getResults()) {
+                foreach ($invoices as $invoice) {
+                    /** @var OrderInvoice $invoice */
+                    $rest_paid = $invoice->getRestPaid();
+                    if ($rest_paid > 0) {
+                        if ($order->total_paid != 0) {
+                            $payment_method = $payment_method->displayName;
+                        } else {
+                            $payment_method = null;
+                        }
+                        $order->addOrderPayment(
+                            $rest_paid,
+                            $payment_method,
+                            null,
+                            null,
+                            null,
+                            $invoice
+                        );
+                    }
+                }
+            } else {
+                $rest_paid = $order->total_paid_tax_incl - $order->total_paid_real;
                 if ($rest_paid > 0) {
                     if ($order->total_paid != 0) {
                         $payment_method = $payment_method->displayName;
                     } else {
                         $payment_method = null;
                     }
+
                     $order->addOrderPayment(
                         $rest_paid,
                         $payment_method,
                         null,
                         null,
                         null,
-                        $invoice
+                        null
                     );
                 }
             }
@@ -420,10 +440,28 @@ class OrderHistoryCore extends ObjectModel
                 '{firstname}' => $result['firstname'],
                 '{id_order}' => (int)$this->id_order,
                 '{order_name}' => $order->getUniqReference(),
+                '{total_paid_real}' => Tools::displayPrice($order->total_paid_real, (int)$order->id_currency),
+                '{is_advance_payment}' => $order->is_advance_payment,
+                '{advance_paid_amount}' => Tools::displayPrice($order->advance_paid_amount, (int)$order->id_currency),
                 '{extra_mail_content_html}' => '',
                 '{extra_mail_content_txt}' => '',
                 '{payment_method}' => '',
             );
+
+            if ($idHotel = HotelBookingDetail::getIdHotelByIdOrder($order->id)) {
+                $objHotelBranchInformation = new HotelBranchInformation($idHotel, $order->id_lang);
+                $fields = array_merge(
+                    $objHotelBranchInformation->getFields(),
+                    $objHotelBranchInformation->getFieldsLang()[$order->id_lang],
+                    $objHotelBranchInformation->getAddress($idHotel, $order->id_lang)
+                );
+                foreach ($fields as $key => $value) {
+                    $data['{hotel_'.$key.'}'] = $value;
+                }
+                $objHotelBookingDetail = new HotelBookingDetail();
+                $hotelBookingDetail = $objHotelBookingDetail->getBookingDataByOrderId($order->id);
+                $data['{num_rooms}'] = count($hotelBookingDetail);
+            }
 
             if ($result['module_name']) {
                 if (Validate::isLoadedObject($module = Module::getInstanceByName($result['module_name']))) {

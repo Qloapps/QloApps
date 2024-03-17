@@ -521,6 +521,7 @@ class WebserviceSpecificManagementImagesCore implements WebserviceSpecificManage
                 $ids[] = $image['id_hotel'];
             }
             $ids = array_unique($ids, SORT_NUMERIC);
+            asort($ids);
             foreach ($ids as $id) {
                 $this->output .= $this->objOutput->getObjectRender()->renderNodeHeader('image', array(), array('id' => $id, 'xlink_resource'=>$this->wsObject->wsUrl.'images/'.'hotels'.'/'.$id), false);
             }

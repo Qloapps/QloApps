@@ -465,10 +465,10 @@ class CustomerCore extends ObjectModel
         return Cache::retrieve($cache_id);
     }
 
-    public static function getCustomerIdAddress($id_customer)
+    public static function getCustomerIdAddress($id_customer, $use_cache = true)
     {
         $cache_id = 'Customer::getCustomerIdAddress'.(int)$id_customer;
-        if (!Cache::isStored($cache_id)) {
+        if (!$use_cache || !Cache::isStored($cache_id)) {
             $sql = 'SELECT id_address
 					FROM `'._DB_PREFIX_.'address` a
 					WHERE `id_customer` = '.(int)$id_customer.' AND a.`deleted` = 0';
@@ -528,14 +528,16 @@ class CustomerCore extends ObjectModel
      * @return array|false|mysqli_result|null|PDOStatement|resource Corresponding customers
      * @throws PrestaShopDatabaseException
      */
-    public static function searchByName($query, $limit = null)
+    public static function searchByName($query, $limit = null, $skip_deleted = false)
     {
         $sql_base = 'SELECT *
-				FROM `'._DB_PREFIX_.'customer`';
-        $sql = '('.$sql_base.' WHERE `email` LIKE \'%'.pSQL($query).'%\' '.Shop::addSqlRestriction(Shop::SHARE_CUSTOMER).')';
-        $sql .= ' UNION ('.$sql_base.' WHERE `id_customer` = '.(int)$query.' '.Shop::addSqlRestriction(Shop::SHARE_CUSTOMER).')';
-        $sql .= ' UNION ('.$sql_base.' WHERE `lastname` LIKE \'%'.pSQL($query).'%\' '.Shop::addSqlRestriction(Shop::SHARE_CUSTOMER).')';
-        $sql .= ' UNION ('.$sql_base.' WHERE `firstname` LIKE \'%'.pSQL($query).'%\' '.Shop::addSqlRestriction(Shop::SHARE_CUSTOMER).')';
+        FROM `'._DB_PREFIX_.'customer`';
+        $where_deleted = $skip_deleted ? ' AND `deleted` = 0' : '';
+
+        $sql = '('.$sql_base.' WHERE `email` LIKE \'%'.pSQL($query).'%\' '.$where_deleted.Shop::addSqlRestriction(Shop::SHARE_CUSTOMER).')';
+        $sql .= ' UNION ('.$sql_base.' WHERE `id_customer` = '.(int)$query.' '.$where_deleted.Shop::addSqlRestriction(Shop::SHARE_CUSTOMER).')';
+        $sql .= ' UNION ('.$sql_base.' WHERE `lastname` LIKE \'%'.pSQL($query).'%\' '.$where_deleted.Shop::addSqlRestriction(Shop::SHARE_CUSTOMER).')';
+        $sql .= ' UNION ('.$sql_base.' WHERE `firstname` LIKE \'%'.pSQL($query).'%\' '.$where_deleted.Shop::addSqlRestriction(Shop::SHARE_CUSTOMER).')';
 
         if ($limit) {
             $sql .= ' LIMIT 0, '.(int)$limit;
@@ -796,6 +798,7 @@ class CustomerCore extends ObjectModel
         $this->passwd = Tools::encrypt($password);
         $this->cleanGroups();
         $this->addGroups(array(Configuration::get('PS_CUSTOMER_GROUP'))); // add default customer group
+        $this->id_default_group = (int) Configuration::get('PS_CUSTOMER_GROUP');
         if ($this->update()) {
             $vars = array(
                 '{firstname}' => $this->firstname,

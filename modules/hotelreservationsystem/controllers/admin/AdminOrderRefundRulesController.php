@@ -152,7 +152,7 @@ class AdminOrderRefundRulesController extends ModuleAdminController
         }
 
         //lang vars
-        $currentLangId = Configuration::get('PS_LANG_DEFAULT');
+        $currentLangId = $this->default_form_language ? $this->default_form_language : Configuration::get('PS_LANG_DEFAULT');
         $smartyVars['languages'] = Language::getLanguages(false);
         $smartyVars['currentLang'] = Language::getLanguage((int) $currentLangId);
 
@@ -213,10 +213,10 @@ class AdminOrderRefundRulesController extends ModuleAdminController
         if ($paymentType == '') {
             $this->errors[] = $this->l('Invalid payment type.');
         }
-        if (!$fullPayAmount) {
+        if (!$fullPayAmount && floatval($fullPayAmount) != 0) {
             $this->errors[] = $this->l('Enter deduction value for full payment.');
         }
-        if (!$advPayAmount) {
+        if (!$advPayAmount && floatval($advPayAmount) != 0) {
             $this->errors[] = $this->l('Enter deduction value for advance payment.');
         }
 
@@ -244,14 +244,6 @@ class AdminOrderRefundRulesController extends ModuleAdminController
             $this->errors[] = $this->l('Enter number of days before check-in date for this rule to be applicable.');
         } else if (!Validate::isUnsignedInt($cancelationDays)) {
             $this->errors[] = $this->l('Enter valid number of days.');
-        } else if ($objRefundRule->checkIfRuleExistsByCancelationdays($cancelationDays)) {
-            if ($idRefundRule) {
-                if ($objRefundRule->days != $cancelationDays) {
-                    $this->errors[] = $this->l('Refund rule for ').$cancelationDays.$this->l(' days already exists.');
-                }
-            } else {
-                $this->errors[] = $this->l('Refund rule for ').$cancelationDays.$this->l(' days already exists.');
-            }
         }
 
         if (!count($this->errors)) {
