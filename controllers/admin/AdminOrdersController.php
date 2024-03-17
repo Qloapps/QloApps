@@ -365,6 +365,15 @@ class AdminOrdersControllerCore extends AdminController
             $cart_order_exists = $cart->orderExists();
             if (!$cart_order_exists) {
                 $this->context->cart = $cart;
+                if ($this->context->employee->isSuperAdmin()) {
+                    $backOrderConfigKey = 'PS_BACKDATE_ORDER_SUPERADMIN';
+                } else {
+                    $backOrderConfigKey = 'PS_BACKDATE_ORDER_EMPLOYEES';
+                }
+                if (!Configuration::get($backOrderConfigKey)) {
+                    $objHotelCartBookingData = new HotelCartBookingData();
+                    $objHotelCartBookingData->removeBackdateRoomsFromCart($this->context->cart->id);
+                }
                 $this->context->currency = new Currency((int)$cart->id_currency);
                 $cart_detail_data = array();
                 $cart_detail_data_obj = new HotelCartBookingData();
@@ -1173,15 +1182,23 @@ class AdminOrdersControllerCore extends AdminController
                 Context::getContext()->currency = new Currency((int)$cart->id_currency);
                 Context::getContext()->customer = new Customer((int)$cart->id_customer);
 
-                $bad_delivery = false;
-                if (($bad_delivery = (bool)!Address::isCountryActiveById((int)$cart->id_address_delivery))
-                    || !Address::isCountryActiveById((int)$cart->id_address_invoice)) {
-                    if ($bad_delivery) {
-                        $this->errors[] = Tools::displayError('This booking address country is not active.');
-                    } else {
-                        $this->errors[] = Tools::displayError('This invoice address country is not active.');
-                    }
+                if ($this->context->employee->isSuperAdmin()) {
+                    $backOrderConfigKey = 'PS_BACKDATE_ORDER_SUPERADMIN';
                 } else {
+                    $backOrderConfigKey = 'PS_BACKDATE_ORDER_EMPLOYEES';
+                }
+                if (!Configuration::get($backOrderConfigKey)) {
+                    $objCartBookingData = new HotelCartBookingData();
+                    if ($cartBookingData = $objCartBookingData->getCartCurrentDataByCartId($cart->id)) {
+                        foreach ($cartBookingData as $cartRoom) {
+                            if (strtotime($cartRoom['date_from']) < strtotime(date('Y-m-d'))) {
+                                $this->errors[] = Tools::displayError('You cannot book rooms before today date.');
+                            }
+                        }
+                    }
+                }
+
+                if (empty($this->errors)) {
                     $employee = new Employee((int)Context::getContext()->cookie->id_employee);
                     $payment_module->validateOrder(
                         (int)$cart->id,
@@ -2084,6 +2101,13 @@ class AdminOrdersControllerCore extends AdminController
         // hotel booking statuses
         $htlOrderStatus = HotelBookingDetail::getAllHotelOrderStatus();
 
+        if ($this->context->employee->isSuperAdmin()) {
+            $backOrderConfigKey = 'PS_BACKDATE_ORDER_SUPERADMIN';
+        } else {
+            $backOrderConfigKey = 'PS_BACKDATE_ORDER_EMPLOYEES';
+        }
+        $allowBackdateOrder = Configuration::get($backOrderConfigKey);
+
         // applicable refund policies
         $applicableRefundPolicies = HotelOrderRefundRules::getApplicableRefundRules($order->id);
 
@@ -2113,6 +2137,7 @@ class AdminOrdersControllerCore extends AdminController
             'order' => $order,
             'cart' => new Cart($order->id_cart),
             'customer' => $customer,
+            'allowBackdateOrder' => $allowBackdateOrder,
             'gender' => $gender,
             'customerGuestDetail' => $customerGuestDetail,
             'genders' => Gender::getGenders(),
@@ -3051,12 +3076,21 @@ class AdminOrdersControllerCore extends AdminController
                 'result' => false,
                 'error' => Tools::displayError('Please Enter a valid Check out Date.'),
             )));
-        } elseif ($date_from < $curr_date) {
-            die(json_encode(array(
-                'result' => false,
-                'error' => Tools::displayError('Check In date should not be date before current date.'),
-            )));
-        } elseif ($date_to <= $date_from) {
+        }
+        if ($this->context->employee->isSuperAdmin()) {
+            $backOrderConfigKey = 'PS_BACKDATE_ORDER_SUPERADMIN';
+        } else {
+            $backOrderConfigKey = 'PS_BACKDATE_ORDER_EMPLOYEES';
+        }
+        if (!Configuration::get($backOrderConfigKey)) {
+            if ($date_from < $curr_date) {
+                die(json_encode(array(
+                    'result' => false,
+                    'error' => Tools::displayError('Check In date should not be date before current date.'),
+                )));
+            }
+        }
+        if ($date_to <= $date_from) {
             die(json_encode(array(
                 'result' => false,
                 'error' => Tools::displayError('Check out Date Should be after Check In date.'),
@@ -4147,6 +4181,20 @@ class AdminOrdersControllerCore extends AdminController
 
         // get extra demands of the room before changing in the booking table
         $objBookingDemand = new HotelBookingDemands();
+        $objRoomTypeServiceProductOrderDetail = new RoomTypeServiceProductOrderDetail();
+        $orderServiceProducts = $objRoomTypeServiceProductOrderDetail->getroomTypeServiceProducts(
+            $id_order,
+            0,
+            0,
+            0,
+            $old_date_from,
+            $old_date_to,
+            $id_room,
+            0,
+            null,
+            null
+        );
+
         $extraDemands = $objBookingDemand->getRoomTypeBookingExtraDemands(
             $id_order,
             0,
@@ -4208,6 +4256,61 @@ class AdminOrdersControllerCore extends AdminController
                     }
                 }
                 // change order total save
+                $objOrder->save();
+            }
+
+            if (isset($orderServiceProducts)
+                && is_array($orderServiceProducts)
+                && count($orderServiceProducts)
+            ) {
+                $objOrder = new Order((int) $id_order);
+                foreach ($orderServiceProducts as $orderServiceProduct) {
+                    if (isset($orderServiceProduct['additional_services'])
+                        && is_array($orderServiceProduct['additional_services'])
+                        && count($orderServiceProduct['additional_services'])
+                    ) {
+                        foreach ($orderServiceProduct['additional_services'] as $serviceProduct) {
+                            if (Product::getProductPriceCalculation($serviceProduct['id_product']) == Product::PRICE_CALCULATION_METHOD_PER_DAY) {
+                                $newNumDays = HotelHelper::getNumberOfDays($new_date_from, $new_date_to);
+                                $objRoomTypeServiceProductOrderDetail = new RoomTypeServiceProductOrderDetail((int) $serviceProduct['id_room_type_service_product_order_detail']);
+                                $unitPriceTaxExcl = $objRoomTypeServiceProductOrderDetail->unit_price_tax_excl;
+                                $unitPriceTaxIncl = $objRoomTypeServiceProductOrderDetail->unit_price_tax_incl;
+
+                                $newTotalPriceTaxExcl =  $newNumDays * $objRoomTypeServiceProductOrderDetail->quantity * $unitPriceTaxExcl;                                $unitPriceTaxIncl = $objRoomTypeServiceProductOrderDetail->unit_price_tax_incl;
+                                $newTotalPriceTaxIncl = $newNumDays * $objRoomTypeServiceProductOrderDetail->quantity * $unitPriceTaxIncl;
+
+                                $objOrder->total_paid_tax_excl -= $objRoomTypeServiceProductOrderDetail->total_price_tax_excl;
+                                $objOrder->total_paid_tax_incl -= $objRoomTypeServiceProductOrderDetail->total_price_tax_incl;
+                                $objOrder->total_paid -= $objRoomTypeServiceProductOrderDetail->total_price_tax_incl;
+
+                                // change order total
+                                $objOrder->total_paid_tax_excl += $newTotalPriceTaxExcl;
+                                $objOrder->total_paid_tax_incl += $newTotalPriceTaxIncl;
+                                $objOrder->total_paid += $newTotalPriceTaxIncl;
+
+                                $objOrderDetail = new OrderDetail((int) $serviceProduct['id_order_detail']);
+                                $objOrderDetail->total_price_tax_excl -= $objRoomTypeServiceProductOrderDetail->total_price_tax_excl;
+                                $objOrderDetail->total_price_tax_incl -= $objRoomTypeServiceProductOrderDetail->total_price_tax_incl;
+                                $objOrderDetail->total_price_tax_excl += $newTotalPriceTaxExcl;
+                                $objOrderDetail->total_price_tax_incl += $newTotalPriceTaxIncl;
+
+                                $oldNumDays = HotelHelper::getNumberOfDays($old_date_from, $old_date_to);
+                                $oldProductQuantity = $objRoomTypeServiceProductOrderDetail->quantity * $oldNumDays;
+                                $newProductQuantity = $objRoomTypeServiceProductOrderDetail->quantity * $newNumDays;
+                                $objOrderDetail->product_quantity += ($newProductQuantity - $oldProductQuantity);
+                                $objOrderDetail->save();
+
+                                $objRoomTypeServiceProductOrderDetail->unit_price_tax_excl = $unitPriceTaxExcl;
+                                $objRoomTypeServiceProductOrderDetail->unit_price_tax_incl = $unitPriceTaxIncl;
+                                $objRoomTypeServiceProductOrderDetail->total_price_tax_excl = $newTotalPriceTaxExcl;
+                                $objRoomTypeServiceProductOrderDetail->total_price_tax_incl = $newTotalPriceTaxIncl;
+                                $objRoomTypeServiceProductOrderDetail->save();
+
+                            }
+                        }
+                    }
+                }
+
                 $objOrder->save();
             }
         }
@@ -4823,12 +4926,22 @@ class AdminOrdersControllerCore extends AdminController
                 'result' => false,
                 'error' => Tools::displayError('Please Enter a valid Check out Date.'),
             )));
-        } elseif ($new_date_from < $curr_date) {
-            die(json_encode(array(
-                'result' => false,
-                'error' => Tools::displayError('Check In date should not be after current date.'),
-            )));
-        } elseif ($new_date_to <= $new_date_from) {
+        }
+        if ($this->context->employee->isSuperAdmin()) {
+            $backOrderConfigKey = 'PS_BACKDATE_ORDER_SUPERADMIN';
+        } else {
+            $backOrderConfigKey = 'PS_BACKDATE_ORDER_EMPLOYEES';
+        }
+        if (!Configuration::get($backOrderConfigKey)) {
+            $compareDate = min(date('Y-m-d'), $old_date_from);
+            if ($new_date_from < $compareDate) {
+                die(json_encode(array(
+                    'result' => false,
+                    'error' => sprintf(Tools::displayError('Check In date should not be date before %s.'),$compareDate)
+                )));
+            }
+        }
+        if ($new_date_to <= $new_date_from) {
             die(json_encode(array(
                 'result' => false,
                 'error' => Tools::displayError('Check out Date Should be after Check In date.'),
@@ -5390,46 +5503,58 @@ class AdminOrdersControllerCore extends AdminController
         $quantity = Tools::getValue('qty');
 
         if (Validate::isLoadedObject($objRoomTypeServiceProductOrderDetail = new RoomTypeServiceProductOrderDetail($id_room_type_service_product_order_detail))) {
-            $objOrderDetail = new OrderDetail($objRoomTypeServiceProductOrderDetail->id_order_detail);
-            if ($objOrderDetail->product_allow_multiple_quantity) {
-                if (!Validate::isUnsignedInt($quantity)) {
-                    $response['hasError'] = true;
-                    $response['errors'] = $this->l('Invalid quantity provided');
-                } else {
-                    $objRoomTypeServiceProductOrderDetail->quantity = $quantity;
-                    $oldPriceTaxExcl = $objRoomTypeServiceProductOrderDetail->total_price_tax_excl;
-                    $oldPriceTaxIncl = $objRoomTypeServiceProductOrderDetail->total_price_tax_incl;
-                    $objRoomTypeServiceProductOrderDetail->total_price_tax_excl = $objRoomTypeServiceProductOrderDetail->unit_price_tax_excl * $quantity;
-                    $objRoomTypeServiceProductOrderDetail->total_price_tax_incl = $objRoomTypeServiceProductOrderDetail->unit_price_tax_incl * $quantity;
-                    $res = true;
-                    if ($res &= $objRoomTypeServiceProductOrderDetail->save()) {
-                        $order = new Order($objRoomTypeServiceProductOrderDetail->id_order);
-                        $priceDiffTaxExcl = $objRoomTypeServiceProductOrderDetail->total_price_tax_excl - $oldPriceTaxExcl;
-                        $priceDiffTaxIncl = $objRoomTypeServiceProductOrderDetail->total_price_tax_incl - $oldPriceTaxIncl;
-
-                        $objOrderDetail->product_quantity = $quantity;
-                        $objOrderDetail->total_price_tax_excl += $priceDiffTaxExcl;
-                        $objOrderDetail->total_price_tax_incl += $priceDiffTaxIncl;
-
-                        $res &= $objOrderDetail->updateTaxAmount($order);
-
-                        $res &= $objOrderDetail->update();
-
-                        $order->total_paid_tax_excl += $priceDiffTaxExcl;
-                        $order->total_paid_tax_incl += $priceDiffTaxIncl;
-                        $order->total_paid += $priceDiffTaxIncl;
-
-                        $res &= $order->update();
-                    }
+            if (Validate::isLoadedObject($objHotelBookingDetail = new HotelBookingDetail((int) $objRoomTypeServiceProductOrderDetail->id_htl_booking_detail))) {
+                $numDays = 1;
+                if (Product::getProductPriceCalculation($objRoomTypeServiceProductOrderDetail->id_product) == Product::PRICE_CALCULATION_METHOD_PER_DAY) {
+                    $numDays = HotelHelper::getNumberOfDays($objHotelBookingDetail->date_from, $objHotelBookingDetail->date_to);
                 }
-                if (!$res) {
+
+                $objOrderDetail = new OrderDetail($objRoomTypeServiceProductOrderDetail->id_order_detail);
+                if ($objOrderDetail->product_allow_multiple_quantity) {
+                    if (!Validate::isUnsignedInt($quantity)) {
+                        $response['hasError'] = true;
+                        $response['errors'] = $this->l('Invalid quantity provided');
+                    } else {
+                        $oldQuantity = $objRoomTypeServiceProductOrderDetail->quantity;
+                        $objRoomTypeServiceProductOrderDetail->quantity = $quantity;
+                        $oldPriceTaxExcl = $objRoomTypeServiceProductOrderDetail->total_price_tax_excl;
+                        $oldPriceTaxIncl = $objRoomTypeServiceProductOrderDetail->total_price_tax_incl;
+                        $objRoomTypeServiceProductOrderDetail->total_price_tax_excl = $objRoomTypeServiceProductOrderDetail->unit_price_tax_excl * $quantity * $numDays;
+                        $objRoomTypeServiceProductOrderDetail->total_price_tax_incl = $objRoomTypeServiceProductOrderDetail->unit_price_tax_incl * $quantity * $numDays;
+                        $res = true;
+                        if ($res &= $objRoomTypeServiceProductOrderDetail->save()) {
+                            $order = new Order($objRoomTypeServiceProductOrderDetail->id_order);
+                            $priceDiffTaxExcl = $objRoomTypeServiceProductOrderDetail->total_price_tax_excl - $oldPriceTaxExcl;
+                            $priceDiffTaxIncl = $objRoomTypeServiceProductOrderDetail->total_price_tax_incl - $oldPriceTaxIncl;
+
+                            $objOrderDetail->product_quantity += (($quantity - $oldQuantity) * $numDays);
+                            $objOrderDetail->total_price_tax_excl += $priceDiffTaxExcl;
+                            $objOrderDetail->total_price_tax_incl += $priceDiffTaxIncl;
+
+                            $res &= $objOrderDetail->updateTaxAmount($order);
+
+                            $res &= $objOrderDetail->update();
+
+                            $order->total_paid_tax_excl += $priceDiffTaxExcl;
+                            $order->total_paid_tax_incl += $priceDiffTaxIncl;
+                            $order->total_paid += $priceDiffTaxIncl;
+
+                            $res &= $order->update();
+                        }
+                    }
+                    if (!$res) {
+                        $response['hasError'] = true;
+                        $response['errors'] = $this->l('Error while updating service, please try refresing the page');
+                    }
+                } else {
                     $response['hasError'] = true;
-                    $response['errors'] = $this->l('Error while updating service, please try refresing the page');
+                    $response['errors'] = $this->l('cannot order multiple quanitity for this service');
                 }
             } else {
                 $response['hasError'] = true;
-                $response['errors'] = $this->l('cannot order multiple quanitity for this service');
+                $response['errors'] = $this->l('Additional service not found');
             }
+
             $objHotelBookingDetail = new HotelBookingDetail($objRoomTypeServiceProductOrderDetail->id_htl_booking_detail);
             $response['service_panel']= $servicesBlock = $this->processRenderServicesPanel(
                 $objOrderDetail->id_order,
@@ -5579,54 +5704,70 @@ class AdminOrdersControllerCore extends AdminController
                         $roomInfo = $objHotelRoomType->getRoomTypeInfoByIdProduct($objHotelBookingDetail->id_product);
                         $totalPriceChangeTaxExcl = 0;
                         $totalPriceChangeTaxIncl = 0;
+                        $unitPriceTaxIncl = 0;
+                        $unitPriceTaxExcl = 0;
                         foreach ($productList as &$product) {
-                            $totalPriceChangeTaxExcl += $totalPriceTaxExcl = $objRoomTypeServiceProductPrice->getServicePrice(
-                                (int)$product['id_product'],
-                                $roomInfo['id'],
-                                $product['cart_quantity'],
-                                $objHotelBookingDetail->date_from,
-                                $objHotelBookingDetail->date_to,
-                                false
-                            );
-                            $totalPriceChangeTaxIncl += $totalPriceTaxIncl = $objRoomTypeServiceProductPrice->getServicePrice(
-                                (int)$product['id_product'],
-                                $roomInfo['id'],
-                                $product['cart_quantity'],
-                                $objHotelBookingDetail->date_from,
-                                $objHotelBookingDetail->date_to,
-                                true
-                            );
-                            $unitPriceTaxExcl = $objRoomTypeServiceProductPrice->getServicePrice(
-                                (int)$product['id_product'],
-                                $roomInfo['id'],
-                                1,
-                                $objHotelBookingDetail->date_from,
-                                $objHotelBookingDetail->date_to,
-                                false
-                            );
-                            $unitPriceTaxIncl = $objRoomTypeServiceProductPrice->getServicePrice(
-                                (int)$product['id_product'],
-                                $roomInfo['id'],
-                                1,
-                                $objHotelBookingDetail->date_from,
-                                $objHotelBookingDetail->date_to,
-                                true
-                            );
-                            switch (Configuration::get('PS_ROUND_TYPE')) {
-                                case Order::ROUND_TOTAL:
-                                    $product['total'] = $totalPriceTaxExcl;
-                                    $product['total_wt'] = $totalPriceTaxIncl;
-                                    break;
-                                case Order::ROUND_LINE:
-                                    $product['total'] = Tools::ps_round($totalPriceTaxExcl, _PS_PRICE_COMPUTE_PRECISION_);
-                                    $product['total_wt'] = Tools::ps_round($totalPriceTaxIncl, _PS_PRICE_COMPUTE_PRECISION_);
-                                    break;
+                            // This is used to get the actual quanity of the service as it is calculated incorrectly if the service is per night
+                            if ($id_room_type_service_product_cart_detail = $objRoomTypeServiceProductCartDetail->alreadyExists(
+                                $service['id'],
+                                $cart->id,
+                                $roomHtlCartInfo['id'])
+                            ) {
+                                $objRoomTypeServiceProductCartDetail = new RoomTypeServiceProductCartDetail((int) $id_room_type_service_product_cart_detail);
+                                $totalPriceChangeTaxExcl += $totalPriceTaxExcl = $objRoomTypeServiceProductPrice->getServicePrice(
+                                    (int)$product['id_product'],
+                                    $roomInfo['id'],
+                                    $objRoomTypeServiceProductCartDetail->quantity,
+                                    $objHotelBookingDetail->date_from,
+                                    $objHotelBookingDetail->date_to,
+                                    false
+                                );
+                                $totalPriceChangeTaxIncl += $totalPriceTaxIncl = $objRoomTypeServiceProductPrice->getServicePrice(
+                                    (int)$product['id_product'],
+                                    $roomInfo['id'],
+                                    $objRoomTypeServiceProductCartDetail->quantity,
+                                    $objHotelBookingDetail->date_from,
+                                    $objHotelBookingDetail->date_to,
+                                    true
+                                );
+                                $numDays = 1;
+                                if (Product::getProductPriceCalculation($product['id_product']) == Product::PRICE_CALCULATION_METHOD_PER_DAY) {
+                                    $numDays = HotelHelper::getNumberOfDays($objHotelBookingDetail->date_from, $objHotelBookingDetail->date_to);
+                                }
+                                $product['cart_quantity'] = $objRoomTypeServiceProductCartDetail->quantity * $numDays;
 
-                                case Order::ROUND_ITEM:
-                                default:
-                                    $product['total'] = Tools::ps_round($totalPriceTaxExcl, _PS_PRICE_COMPUTE_PRECISION_) * (int)$product['cart_quantity'];
-                                    $product['total_wt'] = Tools::ps_round($totalPriceTaxIncl, _PS_PRICE_COMPUTE_PRECISION_) * (int)$product['cart_quantity'];
-                                    break;
+                                $unitPriceTaxExcl = $objRoomTypeServiceProductPrice->getServicePrice(
+                                    (int)$product['id_product'],
+                                    $roomInfo['id'],
+                                    1,
+                                    $objHotelBookingDetail->date_from,
+                                    $objHotelBookingDetail->date_to,
+                                    false
+                                )/ $numDays;
+                                $unitPriceTaxIncl = $objRoomTypeServiceProductPrice->getServicePrice(
+                                    (int)$product['id_product'],
+                                    $roomInfo['id'],
+                                    1,
+                                    $objHotelBookingDetail->date_from,
+                                    $objHotelBookingDetail->date_to,
+                                    true
+                                )/ $numDays;
+                                switch (Configuration::get('PS_ROUND_TYPE')) {
+                                    case Order::ROUND_TOTAL:
+                                        $product['total'] = $totalPriceTaxExcl;
+                                        $product['total_wt'] = $totalPriceTaxIncl;
+                                        break;
+                                    case Order::ROUND_LINE:
+                                        $product['total'] = Tools::ps_round($totalPriceTaxExcl, _PS_PRICE_COMPUTE_PRECISION_);
+                                        $product['total_wt'] = Tools::ps_round($totalPriceTaxIncl, _PS_PRICE_COMPUTE_PRECISION_);
+                                        break;
+
+                                    case Order::ROUND_ITEM:
+                                    default:
+                                        $product['total'] = Tools::ps_round($totalPriceTaxExcl, _PS_PRICE_COMPUTE_PRECISION_);
+                                        $product['total_wt'] = Tools::ps_round($totalPriceTaxIncl, _PS_PRICE_COMPUTE_PRECISION_);
+                                        break;
+                                }
                             }
                         }
 
@@ -5644,7 +5785,7 @@ class AdminOrdersControllerCore extends AdminController
                         $objRoomTypeServiceProductOrderDetail->total_price_tax_excl = $totalPriceTaxExcl;
                         $objRoomTypeServiceProductOrderDetail->total_price_tax_incl = $totalPriceTaxIncl;
                         $objRoomTypeServiceProductOrderDetail->name = $product['name'];
-                        $objRoomTypeServiceProductOrderDetail->quantity = $product['cart_quantity'];
+                        $objRoomTypeServiceProductOrderDetail->quantity = $objRoomTypeServiceProductCartDetail->quantity;
                         $objRoomTypeServiceProductOrderDetail->save();
 
                         // update totals amount of order
@@ -5910,97 +6051,69 @@ class AdminOrdersControllerCore extends AdminController
     // To change the status of the room
     public function changeRoomStatus()
     {
-        $idRoom = (int) Tools::getValue('id_room');
-        $idOrder = (int) Tools::getValue('id_order');
-        $dateFrom = Tools::getValue('date_from');
-        $dateTo = Tools::getValue('date_to');
-        $newStatus = (int) Tools::getValue('booking_order_status');
+        $idHotelBookingDetail = (int) Tools::getValue('id_hotel_booking_detail');
+        if (Validate::isLoadedObject($objHotelBookingDetail = new HotelBookingDetail($idHotelBookingDetail))) {
+            $newStatus = (int) Tools::getValue('booking_order_status');
+            // date choosen for the status change
+            if ($statusDate = Tools::getValue('status_date')) {
+                $statusDate = date('Y-m-d H:i:s', strtotime($statusDate));
+            }
 
-        // date choosen for the status change
-        if ($statusDate = Tools::getValue('status_date')) {
-            $statusDate = date('Y-m-d', strtotime($statusDate));
-        }
-        // Lets validate the fields
-        if (!$idRoom) {
-            $this->errors[] = Tools::displayError('Room information not found.');
-        }
-        if (!$idOrder) {
-            $this->errors[] = Tools::displayError('Order information not found.');
-        }
-        if (!$dateFrom
-            || !$dateTo
-            || !Validate::isDate($dateFrom)
-            || !Validate::isDate($dateTo)
-        ) {
-            $this->errors[] = Tools::displayError('Invalid dates found.');
-        }
-
-        if (!$newStatus) {
-            $this->errors[] = Tools::displayError('Invalid booking status found.');
-        } elseif (
-            $newStatus == HotelBookingDetail::STATUS_CHECKED_IN
-            || $newStatus == HotelBookingDetail::STATUS_CHECKED_OUT
-        ) {
-            if (!$statusDate || !Validate::isDate($statusDate)) {
-                $this->errors[] = Tools::displayError('Invalid dates found.');
-            } elseif ((strtotime($statusDate) < strtotime($dateFrom))
-                || (strtotime($statusDate) > strtotime($dateTo))
+            $dateFrom = date('Y-m-d H:i:s', strtotime(date('Y-m-d', strtotime($objHotelBookingDetail->date_from))));
+            $dateTo = date('Y-m-d H:i:s', strtotime(date('Y-m-d', strtotime($objHotelBookingDetail->date_to)).' 23:59:59'));
+            if (!$newStatus) {
+                $this->errors[] = Tools::displayError('Invalid booking status found.');
+            } elseif ($newStatus == HotelBookingDetail::STATUS_CHECKED_IN
+                || $newStatus == HotelBookingDetail::STATUS_CHECKED_OUT
             ) {
-                $this->errors[] = Tools::displayError('Invalid dates found.');
-            }
-        }
-
-        if (!count($this->errors)) {
-            $objBookingDetail = new HotelBookingDetail();
-            if ($roomBookingInfo = $objBookingDetail->getRoomBookingData($idRoom, $idOrder, $dateFrom, $dateTo)) {
-                //  if admin choose Check-Out status
-                if ($newStatus == HotelBookingDetail::STATUS_CHECKED_OUT
-                    && $roomBookingInfo['check_in'] ==  '0000-00-00 00:00:00'
+                if (!$statusDate || !Validate::isDate($statusDate)) {
+                    $this->errors[] = Tools::displayError('Invalid dates found.');
+                } elseif ((strtotime($statusDate) < strtotime($dateFrom))
+                    || (strtotime($statusDate) > strtotime($dateTo))
                 ) {
-                    $this->errors[] = Tools::displayError('Room status must be set to Check-In before setting the room status to Check-Out.');
-                } elseif ($newStatus == HotelBookingDetail::STATUS_CHECKED_OUT
-                    && $roomBookingInfo['check_in'] !=  '0000-00-00 00:00:00'
-                    && strtotime($roomBookingInfo['check_in']) >= strtotime($statusDate)
-                ) {
-                    $this->errors[] = Tools::displayError('Check-Out date can not be before Check-In date').
-                    '('.date('d-m-Y', strtotime($roomBookingInfo['check_in'])).')';
-                } elseif ($newStatus == HotelBookingDetail::STATUS_CHECKED_IN && $roomBookingInfo['check_out'] ==  '0000-00-00 00:00:00'
-                    && strtotime($roomBookingInfo['check_in']) >= strtotime($dateTo)
-                ) {
-                    $this->errors[] = Tools::displayError('Check-In date can not be after Check-Out date').
-                    '('.date('d-m-Y', strtotime($roomBookingInfo['date_to'])).')';
-                } elseif ($newStatus == HotelBookingDetail::STATUS_CHECKED_IN && $roomBookingInfo['check_out'] !=  '0000-00-00 00:00:00'
-                    && strtotime($roomBookingInfo['check_out']) <= strtotime($statusDate)
-                ) {
-                    $this->errors[] = Tools::displayError('Check-In date can not be after Check-Out date').
-                    '('.date('d-m-Y', strtotime($roomBookingInfo['check_out'])).')';
-                } else {
-                    if ($objBookingDetail->updateBookingOrderStatusByOrderId(
-                        $idOrder,
-                        $newStatus,
-                        $idRoom,
-                        $dateFrom,
-                        $dateTo,
-                        $statusDate
-                    )) {
-                        Hook::exec(
-                            'actionRoomBookingStatusUpdateAfter',
-                            array(
-                                'id_order' => $idOrder,
-                                'id_room' => $idRoom,
-                                'date_from' => $dateFrom,
-                                'date_to' => $dateTo
-                            )
-                        );
-
-                        Tools::redirectAdmin(self::$currentIndex.'&id_order='.(int) $idOrder.'&vieworder&token='.$this->token.'&conf=4');
-                    } else {
-                        $this->errors[] = Tools::displayError('Some error occurred. Please try again.');
-                    }
+                    $this->errors[] = Tools::displayError('Date should be between booking from date and to date.');
                 }
-            } else {
-                $this->errors[] = Tools::displayError('Invalid booking information. Please try again.');
             }
+            if ($newStatus == HotelBookingDetail::STATUS_CHECKED_OUT) {
+                if ($objHotelBookingDetail->check_in ==  '0000-00-00 00:00:00') {
+                    $this->errors[] = Tools::displayError('Room status must be set to Check-In before setting the room status to Check-Out.');
+                } elseif (strtotime($objHotelBookingDetail->check_in) > strtotime($statusDate)) {
+                    $this->errors[] = sprintf(
+                        Tools::displayError('Check-Out date can not be before Check-In date (%s)'),
+                        date('d-m-Y', strtotime($objHotelBookingDetail->check_in))
+                    );
+                }
+            }
+
+            if (empty($this->errors)) {
+                $objHotelBookingDetail->id_status = $newStatus;
+                if ($newStatus == HotelBookingDetail::STATUS_CHECKED_IN) {
+                    $objHotelBookingDetail->check_in = $statusDate;
+                } elseif ($newStatus == HotelBookingDetail::STATUS_CHECKED_OUT) {
+                    $objHotelBookingDetail->check_out = $statusDate;
+                } else {
+                    $objHotelBookingDetail->check_in = '';
+                    $objHotelBookingDetail->check_out = '';
+                }
+                if ($objHotelBookingDetail->save()) {
+                    Hook::exec(
+                        'actionRoomBookingStatusUpdateAfter',
+                        array(
+                            'id_hotel_booking_detail' => $objHotelBookingDetail->id,
+                            'id_order' => $objHotelBookingDetail->id_order,
+                            'id_room' => $objHotelBookingDetail->id_room,
+                            'date_from' => $objHotelBookingDetail->date_from,
+                            'date_to' => $objHotelBookingDetail->date_to
+                        )
+                    );
+
+                    Tools::redirectAdmin(self::$currentIndex.'&id_order='.(int) $objHotelBookingDetail->id_order.'&vieworder&token='.$this->token.'&conf=4');
+                } else {
+                    $this->errors[] = Tools::displayError('Some error occurred. Please try again.');
+                }
+            }
+        } else {
+            $this->errors[] = Tools::displayError('Invalid booking information. Please try again.');
         }
     }
 
