@@ -151,6 +151,7 @@
 	{addJsDefL name=refund_request_sending_error}{l s='Some error occurred while processing request for booking cancelation.' js=1}{/addJsDefL}
 	{addJsDefL name=no_bookings_selected}{l s='No rooms selected. Please select at least one room.' js=1}{/addJsDefL}
 	{addJsDefL name=refund_request_success_txt}{l s='Request for booking cancelation is successffully created.' js=1}{/addJsDefL}
+	{addJsDefL name=cancellation_success_txt}{l s='Your booking is successffully cancelled.' js=1}{/addJsDefL}
 	{addJsDefL name=cancel_req_txt}{l s='Cancel Request' js=1}{/addJsDefL}
 	{addJsDefL name=cancel_booking_txt}{l s='Cancel Bookings' js=1}{/addJsDefL}
 {/strip}

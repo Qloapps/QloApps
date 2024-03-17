@@ -764,7 +764,11 @@ $(document).ready(function()
 
 
 	$('select.chosen').each(function(k, item){
-		$(item).chosen({disable_search_threshold: 5, search_contains: true});
+		$(item).chosen({
+			disable_search_threshold: 5,
+			search_contains: true,
+			inherit_select_classes: true,
+		});
 	});
 	// Apply chosen() when modal is loaded
 	$(document).on('shown.bs.modal', function (e) {

@@ -23,10 +23,10 @@
 *  International Registered Trademark & Property of PrestaShop SA
 *}
 
-<tr class="product-line-row" data-id_room="{$data.id_room}" data-id_product="{$data.id_product}" data-id_hotel="{$data.id_hotel}" data-date_from="{$data.date_from}" data-date_to="{$data.date_to}" data-product_price="{$data.unit_amt_tax_incl}" data-id_order_detail="{$data.id_order_detail}">
+<tr class="product-line-row" data-id_htl_booking="{$data.id|escape:'html':'UTF-8'}" data-id_room="{$data.id_room}" data-id_product="{$data.id_product}" data-id_hotel="{$data.id_hotel}" data-date_from="{$data.date_from}" data-date_to="{$data.date_to}" data-product_price="{$data.unit_amt_tax_incl}" data-id_order_detail="{$data.id_order_detail}">
 	{if $refund_allowed}
 		<td class="standard_refund_fields" style="display:none">
-			<input type="checkbox" name="id_htl_booking[]" value="{$data.id|escape:'html':'UTF-8'}" {if isset($refundReqBookings) && ($data.id|in_array:$refundReqBookings)}disabled{/if}/>
+			<input type="checkbox" name="id_htl_booking[]" value="{$data.id|escape:'html':'UTF-8'}" {if (isset($refundReqBookings) && ($data.id|in_array:$refundReqBookings)) || $data.is_refunded}disabled{/if}/>
 		</td>
 	{/if}
 	<td class="text-center">
@@ -127,6 +127,7 @@
                                     </div>
                                 </div>
                             </div>
+							<p style="display:none;"><span class="text-danger occupancy-input-errors"></span></p>
                             <div class="row children_age_info_block" {if !isset($data['child_ages']) || !$data['child_ages']}style="display:none"{/if}>
                                 <div class="col-sm-12 form-group">
                                     <label class="col-sm-12">{l s='All Children'}</label>
@@ -262,9 +263,9 @@
 				</button>
 				<ul class="dropdown-menu" role="menu">
 					<li>
-                        <a href="#" data-toggle="modal" data-target="#mySwappigModal" data-id_order="{$order->id}" data-room_num='{$data.room_num}' data-date_from='{$data.date_from}' data-date_to='{$data.date_to}' data-id_room='{$data.id_room}' data-cust_name='{$data.alloted_cust_name}' data-cust_email='{$data.alloted_cust_email}' data-avail_rm_swap='{$data.avail_rooms_to_swap|@json_encode}' data-avail_rm_realloc='{$data.avail_rooms_to_realloc|@json_encode}'>
+						<a href="#" id="reallocate_room_{$data['id']}" data-room_type_name="{$data['room_type_name']}" data-toggle="modal" data-target="#mySwappigModal" data-id_htl_booking="{$data['id']}" data-room_num='{$data.room_num}' data-id_room_type='{$data.id_product}' data-cust_name='{$data.alloted_cust_name}' data-cust_email='{$data.alloted_cust_email}' data-avail_rm_swap='{$data.avail_rooms_to_swap|@json_encode}' data-avail_realloc_room_types='{$data.avail_room_types_to_realloc|@json_encode}'>
 							<i class="icon-refresh"></i>
-							{l s='Reallocate Room'}
+							{l s='Reallocate/Swap Room'}
 						</a>
 					</li>
 					<li>

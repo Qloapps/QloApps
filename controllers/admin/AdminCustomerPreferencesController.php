@@ -115,14 +115,7 @@ class AdminCustomerPreferencesControllerCore extends AdminController
                     ),
                     'PS_CUSTOMER_OPTIN' => array(
                         'title' => $this->l('Enable opt-in'),
-                        'hint' => $this->l('Display or not the opt-in tick box, to receive offers from the store\'s partners.'),
-                        'validation' => 'isBool',
-                        'cast' => 'intval',
-                        'type' => 'bool'
-                    ),
-                    'PS_CUSTOMER_ADDRESS_CREATION' => array(
-                        'title' => $this->l('Address creation during checkout'),
-                        'hint' => $this->l('If disabled, Address form will not appear to user during checkout process. So by default hotel address, which rooms guest has in his cart will be considered as user address. Else user has to fill adress details.'),
+                        'hint' => $this->l('Display or not the opt-in tick box, to receive offers from your hotel partners.'),
                         'validation' => 'isBool',
                         'cast' => 'intval',
                         'type' => 'bool'

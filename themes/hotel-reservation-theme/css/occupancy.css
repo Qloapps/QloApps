@@ -30,6 +30,8 @@
       margin-top: 15px;
       margin-right: -20px;
         margin-left: -20px;}
+    .booking_occupancy_wrapper .occupancy-input-errors {
+      font-weight: 700;}
     .booking_occupancy_wrapper .children_age_info_block {
       display: none;}
     .booking_occupancy_wrapper .children_age_info_block label {

@@ -1746,6 +1746,10 @@ class AdminNormalProductsControllerCore extends AdminController
 
         $this->object = new $this->className();
         $this->_removeTaxFromEcotax();
+        if (Tools::getValue('auto_add_to_cart')) {
+            $_POST['allow_multiple_quantity'] = 0;
+        }
+
         $this->copyFromPost($this->object, $this->table);
         $this->object->service_product_type = Product::SERVICE_PRODUCT_WITH_ROOMTYPE;
 
@@ -1884,6 +1888,9 @@ class AdminNormalProductsControllerCore extends AdminController
             /** @var Product $object */
             $object = new $this->className((int)$id);
             $this->object = $object;
+            if (Tools::getValue('auto_add_to_cart')) {
+                $_POST['allow_multiple_quantity'] = 0;
+            }
 
             if (Validate::isLoadedObject($object)) {
                 $this->_removeTaxFromEcotax();
@@ -1897,6 +1904,12 @@ class AdminNormalProductsControllerCore extends AdminController
 
                 // set product visibility to none for current flow.
                 $object->visibility = 'none';
+
+                // if service is auto_added and price addition is in room price, then the tax rule is applied of room price.
+                // so setting tax rule as no tax for now
+                if ($object->auto_add_to_cart && $object->price_addition_type == Product::PRICE_ADDITION_TYPE_WITH_ROOM) {
+                    $object->id_tax_rules_group = 0;
+                }
 
                 // Duplicate combinations if not associated to shop
                 if ($this->context->shop->getContext() == Shop::CONTEXT_SHOP && !$object->isAssociatedToShop()) {

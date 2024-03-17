@@ -108,43 +108,160 @@ $(function() {
 	</div>
 	{/if}
 
+	{if isset($num_hotels) && $num_hotels}
+		<div class="panel">
+			<h3>
+				{if $num_hotels == 1}
+					{l s='1 Hotel'}
+				{else}
+					{l s='%d Hotels' sprintf=$num_hotels}
+				{/if}
+			</h3>
+			{$hotels}
+		</div>
+	{/if}
+
+	{if isset($num_hotel_features) && $num_hotel_features}
+		<div class="panel">
+			<h3>
+				{if $num_hotel_features == 1}
+					{l s='1 hotel feature'}
+				{else}
+					{l s='%d hotel features' sprintf=$num_hotel_features}
+				{/if}
+			</h3>
+			{$hotel_features}
+		</div>
+	{/if}
+
 	{if isset($num_products) && $num_products}
-	<div class="panel">
-		<h3>
-			{if $num_products == 1}
-				{l s='1 product'}
-			{else}
-				{l s='%d products' sprintf=$num_products}
-			{/if}
-		</h3>
-		{$products}
-	</div>
+		<div class="panel">
+			<h3>
+				{if $num_products == 1}
+					{l s='1 room type'}
+				{else}
+					{l s='%d room types' sprintf=$num_products}
+				{/if}
+			</h3>
+			{$products}
+		</div>
+	{/if}
+
+	{if isset($num_catalog_features) && $num_catalog_features}
+		<div class="panel">
+			<h3>
+				{if $num_catalog_features == 1}
+					{l s='1 feature'}
+				{else}
+					{l s='%d features' sprintf=$num_catalog_features}
+				{/if}
+			</h3>
+			{$catalog_features}
+		</div>
+	{/if}
+
+	{if isset($num_service_products) && $num_service_products}
+		<div class="panel">
+			<h3>
+				{if $num_service_products == 1}
+					{l s='1 service product'}
+				{else}
+					{l s='%d service products' sprintf=$num_service_products}
+				{/if}
+			</h3>
+			{$service_products}
+		</div>
+	{/if}
+
+	{if isset($num_global_demands) && $num_global_demands}
+		<div class="panel">
+			<h3>
+				{if $num_global_demands == 1}
+					{l s='1 global demand'}
+				{else}
+					{l s='%d global demands' sprintf=$num_global_demands}
+				{/if}
+			</h3>
+			{$global_demands}
+		</div>
+	{/if}
+
+	{if isset($num_refund_rules) && $num_refund_rules}
+		<div class="panel">
+			<h3>
+				{if $num_refund_rules == 1}
+					{l s='1 refund rule'}
+				{else}
+					{l s='%d refund rules' sprintf=$num_refund_rules}
+				{/if}
+			</h3>
+			{$refund_rules}
+		</div>
 	{/if}
 
 	{if isset($num_customers) && $num_customers}
-	<div class="panel">
-		<h3>
-			{if $num_customers == 1}
-				{l s='1 customer'}
-			{else}
-				{l s='%d customers' sprintf=$num_customers}
-			{/if}
-		</h3>
-		{$customers}
-	</div>
+		<div class="panel">
+			<h3>
+				{if $num_customers == 1}
+					{l s='1 customer'}
+				{else}
+					{l s='%d customers' sprintf=$num_customers}
+				{/if}
+			</h3>
+			{$customers}
+		</div>
+	{/if}
+
+	{if isset($num_groups) && $num_groups}
+		<div class="panel">
+			<h3>
+				{if $num_groups == 1}
+					{l s='1 group'}
+				{else}
+					{l s='%d groups' sprintf=$num_groups}
+				{/if}
+			</h3>
+			{$groups}
+		</div>
+	{/if}
+
+	{if isset($num_customer_address) && $num_customer_address}
+		<div class="panel">
+			<h3>
+				{if $num_customer_address == 1}
+					{l s='1 customer address'}
+				{else}
+					{l s='%d customer addresses' sprintf=$num_customer_address}
+				{/if}
+			</h3>
+			{$customer_address}
+		</div>
+	{/if}
+
+	{if isset($num_order_messages) && $num_order_messages}
+		<div class="panel">
+			<h3>
+				{if $num_order_messages == 1}
+					{l s='1 customer service message'}
+				{else}
+					{l s='%d customer service messages' sprintf=$num_order_messages}
+				{/if}
+			</h3>
+			{$order_messages}
+		</div>
 	{/if}
 
 	{if isset($num_orders) && $num_orders}
-	<div class="panel">
-		<h3>
-			{if $num_orders == 1}
-				{l s='1 order'}
-			{else}
-				{l s='%d orders' sprintf=$num_orders}
-			{/if}
-		</h3>
-		{$orders}
-	</div>
+		<div class="panel">
+			<h3>
+				{if $num_orders == 1}
+					{l s='1 order'}
+				{else}
+					{l s='%d orders' sprintf=$num_orders}
+				{/if}
+			</h3>
+			{$orders}
+		</div>
 	{/if}
 
 	{if isset($addons) && $addons}

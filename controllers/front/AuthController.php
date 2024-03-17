@@ -411,7 +411,10 @@ class AuthControllerCore extends FrontController
             $firstnameAddress = Tools::getValue('firstname');
             $_POST['lastname'] = Tools::getValue('customer_lastname', $lastnameAddress);
             $_POST['firstname'] = Tools::getValue('customer_firstname', $firstnameAddress);
-            $addresses_types = array('address');
+            $addresses_types = [];
+            if (Configuration::get('PS_REGISTRATION_PROCESS_TYPE')) {
+                $addresses_types[] = 'address';
+            }
 
             if (!Configuration::get('PS_ORDER_PROCESS_TYPE') && Configuration::get('PS_GUEST_CHECKOUT_ENABLED') && Tools::getValue('invoice_address')) {
                 $addresses_types[] = 'address_invoice';
@@ -435,36 +438,6 @@ class AuthControllerCore extends FrontController
                 $this->errors[] = Tools::displayError('You must register at least one phone number.');
             }
 
-            // if PS_CUSTOMER_ADDRESS_CREATION is disabled And customer has no addresses then create customer address
-            // with the details of first hotel which rooms he has in cart
-            if (!Configuration::get('PS_CUSTOMER_ADDRESS_CREATION')
-                && isset($this->context->cart->id)
-                && $this->context->cart->id
-            ) {
-                if (Module::isInstalled('hotelreservationsystem')) {
-                    include_once _PS_MODULE_DIR_.'hotelreservationsystem/define.php';
-                    $objHtlCart = new HotelCartBookingData();
-                    if ($htlCartInfo = $objHtlCart->getCartCurrentDataByCartId($this->context->cart->id)) {
-                        if (isset($htlCartInfo[0]['id_hotel']) && ($idHotel = $htlCartInfo[0]['id_hotel'])) {
-                            if ($address_info = HotelBranchInformation::getAddress($idHotel)) {
-                                $_POST['lastname'] = Tools::getValue('customer_lastname');
-                                $_POST['firstname'] = Tools::getValue('customer_firstname');
-                                $_POST['address1'] = $address_info['address1'];
-                                $_POST['city'] = $address_info['city'];
-                                $_POST['postcode'] = $address_info['postcode'];
-                                $_POST['alias'] = 'My address';
-                                $_POST['id_country'] = $address_info['id_country'];
-                                $_POST['id_state'] = $address_info['id_state'];
-                                $_POST['auto_generated'] = true;
-                                // if form is shorter then address name will be customer name
-                                $lastnameAddress = $_POST['lastname'];
-                                $firstnameAddress = $_POST['firstname'];
-                            }
-                        }
-                    }
-                }
-            }
-            // End
             $this->errors = array_unique(array_merge($this->errors, $customer->validateController()));
 
             // Check the requires fields which are settings in the BO
@@ -576,7 +549,7 @@ class AuthControllerCore extends FrontController
                     }
 
                     if ($country->need_identification_number) {
-                        if (!Configuration::get('PS_CUSTOMER_ADDRESS_CREATION')) {
+                        if (!Configuration::get('PS_REGISTRATION_PROCESS_TYPE')) {
                             $$addresses_type->dni = null;
                         } elseif (!Tools::getValue('dni') || !Validate::isDniLite(Tools::getValue('dni'))) {
                             $this->errors[] = Tools::displayError('The identification number is incorrect or has already been used.');
@@ -628,7 +601,7 @@ class AuthControllerCore extends FrontController
                     $customer->active = 1;
                     // New Guest customer
                     if (Tools::isSubmit('is_new_customer')) {
-                        if ($idCustomer) {
+                        if (isset($idCustomer) && $idCustomer) {
                             // update guest customer details
                             $customer = new Customer($idCustomer);
                             $customer->firstname = Tools::getValue('firstname');

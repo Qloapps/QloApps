@@ -649,12 +649,12 @@ class ProductCore extends ObjectModel
      * @param int $position
      * return boolean Update result
      */
-    public function updatePosition($way, $position)
+    public function updatePosition($way, $position, $id_category = null)
     {
         if (!$res = Db::getInstance()->executeS('
             SELECT cp.`id_product`, cp.`position`, cp.`id_category`
             FROM `'._DB_PREFIX_.'category_product` cp
-            WHERE cp.`id_category` = '.(int)Tools::getValue('id_category', 1).'
+            WHERE cp.`id_category` = '.(int) ($id_category ? $id_category: Tools::getValue('id_category', 1)).'
             ORDER BY cp.`position` ASC')
             ) {
             return false;
@@ -2999,7 +2999,7 @@ class ProductCore extends ObjectModel
     public static function getPriceStatic($id_product, $usetax = true, $id_product_attribute = null, $decimals = 6, $divisor = null,
         $only_reduc = false, $usereduc = true, $quantity = 1, $force_associated_tax = false, $id_customer = null, $id_cart = null,
         $id_address = null, &$specific_price_output = null, $with_ecotax = true, $use_group_reduction = true, Context $context = null,
-        $use_customer_price = true, $id_roomtype = false)
+        $use_customer_price = true, $id_product_roomtype = false)
     {
         if (!$context) {
             $context = Context::getContext();
@@ -3065,9 +3065,9 @@ class ProductCore extends ObjectModel
 
         if (!$id_address) {
             if (!Product::isBookingProduct($id_product)) {
-                if ($id_roomtype) {
+                if ($id_product_roomtype) {
                     // if room type is provided with product then we know that the service product price should be calculated accroding to roomt type
-                    $id_address = Cart::getIdAddressForTaxCalculation($id_roomtype);
+                    $id_address = Cart::getIdAddressForTaxCalculation($id_product_roomtype);
                 }
             } else {
                 $id_address = Cart::getIdAddressForTaxCalculation($id_product);
@@ -3121,7 +3121,7 @@ class ProductCore extends ObjectModel
             $use_customer_price,
             $id_cart,
             $cart_quantity,
-            $id_roomtype
+            $id_product_roomtype
         );
 
         return $return;
@@ -3155,9 +3155,8 @@ class ProductCore extends ObjectModel
      **/
     public static function priceCalculation($id_shop, $id_product, $id_product_attribute, $id_country, $id_state, $zipcode, $id_currency,
         $id_group, $quantity, $use_tax, $decimals, $only_reduc, $use_reduc, $with_ecotax, &$specific_price, $use_group_reduction,
-        $id_customer = 0, $use_customer_price = true, $id_cart = 0, $real_quantity = 0, $id_roomtype = false)
+        $id_customer = 0, $use_customer_price = true, $id_cart = 0, $real_quantity = 0, $id_product_roomtype = false)
     {
-
         static $address = null;
         static $context = null;
 
@@ -3184,7 +3183,7 @@ class ProductCore extends ObjectModel
         $cache_id = (int)$id_product.'-'.(int)$id_shop.'-'.(int)$id_currency.'-'.(int)$id_country.'-'.$id_state.'-'.$zipcode.'-'.(int)$id_group.
             '-'.(int)$quantity.'-'.(int)$id_product_attribute.
             '-'.(int)$with_ecotax.'-'.(int)$id_customer.'-'.(int)$use_group_reduction.'-'.(int)$id_cart.'-'.(int)$real_quantity.
-            '-'.($only_reduc?'1':'0').'-'.($use_reduc?'1':'0').'-'.($use_tax?'1':'0').'-'.(int)$decimals.'-'.($id_roomtype?(int)$id_roomtype:'0');
+            '-'.($only_reduc?'1':'0').'-'.($use_reduc?'1':'0').'-'.($use_tax?'1':'0').'-'.(int)$decimals.'-'.($id_product_roomtype?(int)$id_product_roomtype:'0');
 
         // reference parameter is filled before any returns
         $specific_price = SpecificPrice::getSpecificPrice(
@@ -3248,10 +3247,10 @@ class ProductCore extends ObjectModel
         $result = self::$_pricesLevel2[$cache_id_2][(int)$id_product_attribute];
 
         // get price per room type
-        if ($id_roomtype) {
+        if ($id_product_roomtype) {
             $priceForRoomInfo = RoomTypeServiceProductPrice::getProductRoomTypePriceAndTax(
                 $id_product,
-                $id_roomtype,
+                $id_product_roomtype,
                 RoomTypeServiceProduct::WK_ELEMENT_TYPE_ROOM_TYPE
             );
         }
@@ -3481,9 +3480,18 @@ class ProductCore extends ObjectModel
         );
     }
 
-    public function getPriceWithoutReduct($notax = false, $id_product_attribute = false, $decimals = 6)
+    public function getPriceWithoutReduct($notax = false, $id_product_attribute = false, $decimals = 6, $with_auto_add_services = 0)
     {
-        return Product::getPriceStatic((int)$this->id, !$notax, $id_product_attribute, $decimals, null, false, false);
+        $price = Product::getPriceStatic((int)$this->id, !$notax, $id_product_attribute, $decimals, null, false, false);
+        if ($with_auto_add_services) {
+            if ($services = RoomTypeServiceProduct::getAutoAddServices((int) $this->id, null, null, Product::PRICE_ADDITION_TYPE_WITH_ROOM, !$notax)) {
+                foreach($services as $service) {
+                    $price += $service['price'];
+                }
+            }
+        }
+
+        return $price;
     }
 
     /**
@@ -5328,6 +5336,68 @@ class ProductCore extends ObjectModel
         return $tax_calculator->getTotalRate();
     }
 
+    public function getPositionInCategory()
+    {
+        return Db::getInstance()->getValue(
+            'SELECT position
+            FROM `'._DB_PREFIX_.'category_product`
+            WHERE id_category = '.(int) $this->id_category_default.'
+            AND id_product = '.(int) $this->id
+        );
+    }
+
+    public function setPositionInCategory($position)
+    {
+        if ($position < 0) {
+            die(Tools::displayError('You cannot set a negative position, the minimum for a position is 0.'));
+        }
+
+        $result = Db::getInstance()->executeS(
+            'SELECT `id_product`
+            FROM `'._DB_PREFIX_.'category_product`
+            WHERE `id_category` = '.(int) $this->id_category_default.'
+            ORDER BY `position`'
+        );
+
+        if (($position > 0) && ($position + 1 > count($result))) {
+            die(Tools::displayError('You cannot set a position greater than the total number of room types in the hotel, minus 1 (position numbering starts at 0).'));
+        }
+
+        foreach ($result as &$value) {
+            $value = $value['id_product'];
+        }
+
+        $currentPosition = $this->getPositionInCategory();
+
+        if ($currentPosition && isset($result[$currentPosition])) {
+            $save = $result[$currentPosition];
+            unset($result[$currentPosition]);
+            array_splice($result, (int)$position, 0, $save);
+        }
+
+        $return = true;
+        foreach ($result as $position => $id_product) {
+            $return &= Db::getInstance()->update(
+                'category_product',
+                array('position' => $position),
+                '(`id_category` = '.(int) $this->id_category_default.' AND `id_product` = '.(int) $id_product.')'
+            );
+        }
+
+        return $return;
+    }
+
+    public static function getHighestPositionInCategory($idCategory)
+    {
+        $position = Db::getInstance()->getValue(
+            'SELECT MAX(`position`)
+            FROM `'._DB_PREFIX_.'category_product`
+            WHERE `id_category` = '.(int) $idCategory
+        );
+
+        return (is_numeric($position)) ? $position : -1;
+    }
+
     /**
     * Webservice getter : get product features association
     * @return array
@@ -5576,14 +5646,7 @@ class ProductCore extends ObjectModel
     */
     public function getWsPositionInCategory()
     {
-        $result = Db::getInstance()->executeS('SELECT position
-			FROM `'._DB_PREFIX_.'category_product`
-			WHERE id_category = '.(int)$this->id_category_default.'
-			AND id_product = '.(int)$this->id);
-        if (count($result) > 0) {
-            return $result[0]['position'];
-        }
-        return '';
+        return $this->getPositionInCategory();
     }
 
     /**

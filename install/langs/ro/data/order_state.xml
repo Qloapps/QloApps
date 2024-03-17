@@ -5,7 +5,7 @@
     <template>awaiting_payment</template>
   </order_state>
   <order_state id="Payment_accepted">
-    <name>Plată acceptată</name>
+    <name>Plata completă primită</name>
     <template>payment_accepted</template>
   </order_state>
   <order_state id="Processing_in_progress">

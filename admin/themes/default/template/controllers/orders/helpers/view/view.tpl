@@ -161,7 +161,8 @@
 					{/if} -->
 					<!-- End -->
 					&nbsp;
-					{if $refund_allowed && !$hasCompletelyRefunded}
+                    <!-- Check if refund is allowed and all bookings are not requested for refund -->
+					{if $refund_allowed && !$completeRefundRequestOrCancel}
 						<a id="desc-order-standard_refund" class="btn btn-default" href="#refundForm">
 							<i class="icon-exchange"></i>
 							{if $order->getTotalPaid()|floatval}
@@ -236,23 +237,26 @@
 							</table>
 						</div>
 						<!-- Change status form -->
-						<form action="{$currentIndex|escape:'html':'UTF-8'}&amp;vieworder&amp;token={$smarty.get.token}" method="post" class="form-horizontal well hidden-print">
-							<div class="row">
-								<div class="col-lg-9">
-									<select id="id_order_state" class="chosen form-control" name="id_order_state">
-										{foreach from=$states item=state}
-											<option value="{$state['id_order_state']|intval}"{if isset($currentState) && $state['id_order_state'] == $currentState->id} selected="selected" disabled="disabled"{/if}>{$state['name']|escape}</option>
-										{/foreach}
-									</select>
-									<input type="hidden" name="id_order" value="{$order->id}" />
-								</div>
-								<div class="col-lg-3">
-									<button type="submit" name="submitState" class="btn btn-primary">
-										{l s='Update status'}
-									</button>
-								</div>
-							</div>
-						</form>
+                        {* If current state is refunded or cancelled the further order status changes are not allowed *}
+                        {if !isset($currentState) || (isset($currentState) && ($currentState->id != Configuration::get('PS_OS_REFUND') && $currentState->id != Configuration::get('PS_OS_CANCELED')))}
+                            <form action="{$currentIndex|escape:'html':'UTF-8'}&amp;vieworder&amp;id_order={$order->id|intval}&amp;token={$smarty.get.token}" method="post" class="form-horizontal well hidden-print">
+                                <div class="row">
+                                    <div class="col-lg-9">
+                                        <select id="id_order_state" class="chosen form-control" name="id_order_state">
+                                            {foreach from=$states item=state}
+                                                <option value="{$state['id_order_state']|intval}"{if isset($currentState) && $state['id_order_state'] == $currentState->id} selected="selected" disabled="disabled"{elseif ($state['id_order_state'] == Configuration::get('PS_OS_REFUND') && !$allBookingsRefunded)} disabled="disabled"{elseif ($state['id_order_state'] == Configuration::get('PS_OS_CANCELED') && !$allBookingsCancelled)} disabled="disabled"{elseif ($state['id_order_state'] == Configuration::get('PS_OS_OVERBOOKING_PAID') || $state['id_order_state'] == Configuration::get('PS_OS_OVERBOOKING_UNPAID') || $state['id_order_state'] == Configuration::get('PS_OS_OVERBOOKING_PARTIAL_PAID')) && (!isset($orderOverBookings) || !$orderOverBookings)} disabled="disabled"{/if}>{$state['name']|escape}</option>
+                                            {/foreach}
+                                        </select>
+                                        <input type="hidden" name="id_order" value="{$order->id}" />
+                                    </div>
+                                    <div class="col-lg-3">
+                                        <button type="submit" name="submitState" class="btn btn-primary">
+                                            {l s='Update status'}
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        {/if}
 					</div>
 					<!-- Tab documents -->
 					<div class="tab-pane" id="documents">
@@ -281,61 +285,69 @@
 											<th>{l s='Hotel Name'}</th>
 											<th>{l s='Duration'}</th>
 											<th>{l s='Documents'}</th>
-											<th>{l s='Order Status'}</th>
+											<th>{l s='Room Status'}</th>
 										</tr>
 										{if isset($htl_booking_order_data) && $htl_booking_order_data}
 											{foreach from=$htl_booking_order_data item=data}
-												{if !$data.is_refunded}
-													<tr>
-														<td>
-															{$data['room_num']}
-														</td>
-														<td>
-															<a href="{$link->getAdminLink('AdminAddHotel')}&amp;id={$data['id_hotel']}&amp;updatehtl_branch_info" target="_blank">
-																<span>{$data['hotel_name']}</span>
-															</a>
-														</td>
-														<td>
-															{dateFormat date=$data['date_from']} - {dateFormat date=$data['date_to']}
-														</td>
-														<td>
-															<a class="btn btn-default" onclick="BookingDocumentsModal.init({$data.id|intval}, this); return false;">
-																<i class="icon icon-file-text"></i>
-																{l s='Documents'} <span class="badge badge-info count-documents">{$data.num_checkin_documents}</span>
-															</a>
-														</td>
-														<td>
-															<form action="" method="post" class="form-horizontal row room_status_info_form">
-																<div class="col-sm-7">
-																	<select name="booking_order_status" class="form-control booking_order_status margin-bottom-5">
-																		{foreach from=$hotel_order_status item=state}
-																			<option value="{$state['id_status']|intval}" {if isset($data.id_status) && $state.id_status == $data.id_status} selected="selected" disabled="disabled"{/if}>{$state.name|escape}</option>
-																		{/foreach}
-																	</select>
+                                                <tr>
+                                                    <td>
+                                                        {$data['room_num']}
+                                                    </td>
+                                                    <td>
+                                                        <a href="{$link->getAdminLink('AdminAddHotel')}&amp;id={$data['id_hotel']}&amp;updatehtl_branch_info" target="_blank">
+                                                            <span>{$data['hotel_name']}</span>
+                                                        </a>
+                                                    </td>
+                                                    <td>
+                                                        {dateFormat date=$data['date_from']} - {dateFormat date=$data['date_to']}
+                                                    </td>
+                                                    <td>
+                                                        <a class="btn btn-default" onclick="BookingDocumentsModal.init({$data.id|intval}, this); return false;">
+                                                            <i class="icon icon-file-text"></i>
+                                                            {l s='Documents'} <span class="badge badge-info count-documents">{$data.num_checkin_documents}</span>
+                                                        </a>
+                                                    </td>
+                                                    <td>
+                                                        <form action="" method="post" class="form-horizontal row room_status_info_form">
+                                                            <div class="col-sm-7">
+                                                                {if $data.is_refunded || $data.is_cancelled}
+                                                                    {if $data['id_status'] == $hotel_order_status['STATUS_ALLOTED']['id_status']}
+                                                                        <p><span class="room_status badge badge-infomation">{l s='Room alloted'}</span></p>
+                                                                    {/if}
+                                                                {else}
+                                                                    <select name="booking_order_status" class="form-control booking_order_status margin-bottom-5">
+                                                                        {foreach from=$hotel_order_status item=state}
+                                                                            <option value="{$state['id_status']|intval}" {if isset($data.id_status) && $state.id_status == $data.id_status} selected="selected" disabled="disabled"{/if}>{$state.name|escape}</option>
+                                                                        {/foreach}
+                                                                    </select>
+                                                                {/if}
 
-																	{if $data['id_status'] == $hotel_order_status['STATUS_CHECKED_IN']['id_status']}
-																		<p class="text-center"><span class="badge badge-success margin-bottom-5">{l s='Checked in on'} {dateFormat date=$data['check_in']}</span></p>
-																	{elseif $data['id_status'] == $hotel_order_status['STATUS_CHECKED_OUT']['id_status']}
-																		<p class="text-center"><span class="badge badge-success margin-bottom-5">{l s='Checked out on'} {dateFormat date=$data['check_out']}</span></p>
-																	{/if}
+                                                                {if $data['id_status'] == $hotel_order_status['STATUS_CHECKED_IN']['id_status']}
+                                                                    <p><span class="room_status badge badge-success">{l s='Checked in on'} {dateFormat date=$data['check_in']}</span></p>
+                                                                {elseif $data['id_status'] == $hotel_order_status['STATUS_CHECKED_OUT']['id_status']}
+                                                                    <p><span class="room_status badge badge-success">{l s='Checked out on'} {dateFormat date=$data['check_out']}</span></p>
+                                                                {/if}
 
-																	{* field for the current date *}
-																	<input class="room_status_date wk-input-date" type="text" name="status_date" value="{if $data['id_status'] == $hotel_order_status['STATUS_CHECKED_IN']['id_status']}{$data['date_to']|date_format:"%d-%m-%Y"}{else}{$data['date_from']|date_format:"%d-%m-%Y"}{/if}" readonly/>
-
-																	<input type="hidden" name="date_from" value="{$data['date_from']|date_format:"%Y-%m-%d"}" />
-																	<input type="hidden" name="date_to" value="{$data['date_to']|date_format:"%Y-%m-%d"}" />
-																	<input type="hidden" name="id_room" value="{$data['id_room']}" />
-																	<input type="hidden" name="id_order" value="{$order->id}" />
-																</div>
-																<div class="col-sm-5">
-																	<button type="submit" name="submitbookingOrderStatus" class="btn btn-primary">
-																		{l s='Update Status'}
-																	</button>
-																</div>
-															</form>
-														</td>
-													</tr>
-												{/if}
+                                                                {* field for the current date *}
+                                                                <input class="room_status_date wk-input-date" type="text" name="status_date" value="{if $data['id_status'] == $hotel_order_status['STATUS_CHECKED_IN']['id_status']}{$data['date_to']|date_format:"%d-%m-%Y"} {$data['check_out_time']}{else}{$data['date_from']|date_format:"%d-%m-%Y"} {$data['check_in_time']}{/if}" readonly/>
+																<input type="hidden" name="id_hotel_booking_detail" value="{$data['id']}" />
+                                                                <input type="hidden" name="date_from" value="{$data['date_from']|date_format:"%Y-%m-%d"}" />
+                                                                <input type="hidden" name="date_to" value="{$data['date_to']|date_format:"%Y-%m-%d"}" />
+                                                                <input type="hidden" name="id_room" value="{$data['id_room']}" />
+                                                                <input type="hidden" name="id_order" value="{$order->id}" />
+                                                            </div>
+                                                            <div class="col-sm-5 text-right">
+                                                                {if $data.is_refunded || $data.is_cancelled}
+                                                                    <span class="badge badge-danger">{if $data.is_cancelled}{l s='Cancelled'}{else}{l s='Refunded'}{/if}</span>
+                                                                {else}
+                                                                    <button type="submit" name="submitbookingOrderStatus" class="btn btn-primary">
+                                                                        {l s='Update Status'}
+                                                                    </button>
+                                                                {/if}
+                                                            </div>
+                                                        </form>
+                                                    </td>
+                                                </tr>
 											{/foreach}
 										{else}
 											<tr>
@@ -1191,9 +1203,11 @@
 						<input type="hidden" name="TaxMethod" value="1">
 					{/if}
 					{if $can_edit}
-						<div class="row-margin-bottom row-margin-top standard_refund_fields"  style="display: none;">
-							<textarea class="cancellation_reason" name="cancellation_reason" placeholder="{l s='Enter reason to cancel bookings'}"></textarea>
-						</div>
+                        {if $refund_allowed && !$completeRefundRequestOrCancel}
+                            <div class="row-margin-bottom row-margin-top standard_refund_fields"  style="display: none;">
+                                <textarea class="cancellation_reason" name="cancellation_reason" placeholder="{l s='Enter reason to cancel bookings'}"></textarea>
+                            </div>
+                        {/if}
 						<div class="row-margin-bottom row-margin-top order_action">
 							{if !$order->hasBeenDelivered()}
 								{* <button type="button" id="add_product" class="btn btn-default">
@@ -1210,7 +1224,7 @@
 								{l s='Add a new discount'}
 							</button>
 
-							{if $refund_allowed && !$hasCompletelyRefunded}
+							{if $refund_allowed && !$completeRefundRequestOrCancel}
 								<div class="pull-right">
 									<button style="display: none;" type="button" class="btn btn-default standard_refund_fields" id="cancelRefund">
 										{l s='Cancel'}
@@ -1400,16 +1414,14 @@
 											</tr>
 										{/if}
 
-										{if $order->total_paid_tax_incl > $order->total_paid_real}
-											<tr>
-												<td class="text-right"><strong>{l s='Due Amount'}</strong></td>
-												<td class="amount text-right nowrap">
-													<strong>
-														{displayPrice currency=$order->id_currency price=($order->total_paid_tax_incl - $order->total_paid_real)}
-													</strong>
-												</td>
-											</tr>
-										{/if}
+                                        <tr>
+                                            <td class="text-right"><strong>{l s='Due Amount'}</strong></td>
+                                            <td class="amount text-right nowrap">
+                                                <strong>
+                                                    {displayPrice currency=$order->id_currency price=($order->total_paid_tax_incl - $order->total_paid_real)}
+                                                </strong>
+                                            </td>
+                                        </tr>
 									</table>
 								</div>
 							</div>
@@ -1501,7 +1513,7 @@
 		    <li role="presentation" class="active"><a href="#reallocate_room_tab" aria-controls="reallocate" role="tab" data-toggle="tab">{l s='Room Reallocation'}</a></li>
 		    <li role="presentation"><a href="#swap_room_tab" aria-controls="swap" role="tab" data-toggle="tab">{l s='Swap Room'}</a></li>
 		 </ul>
-		<div class="tab-content panel active">
+		<div class="tab-content active">
 			<div role="tabpanel" class="tab-pane active" id="reallocate_room_tab">
 				<form method="post" action="{$link->getAdminLink('AdminOrders')|escape:'html':'UTF-8'}&amp;vieworder&amp;id_order={$order->id|intval}">
 					<div class="modal-header">
@@ -1509,31 +1521,63 @@
 						<h4 class="modal-title" id="realloc_myModalLabel">{l s='Reallocate Rooms'}</h4>
 					</div>
 					<div class="modal-body">
-						<div class="form-group">
-							<label for="curr_room_num" class="control-label model-label">{l s='Current Room Number:'}</label>
-							<input type="text" class="form-control modal_curr_room_num" name="modal_curr_room_num" readonly="true">
-							<input type="hidden" class="form-control modal_date_from" name="modal_date_from">
-							<input type="hidden" class="form-control modal_date_to" name="modal_date_to">
-							<input type="hidden" class="form-control modal_id_room" name="modal_id_room">
-						</div>
-						<div class="form-group">
-							<label for="realloc_avail_rooms" class="control-label model-label">{l s='Available Rooms To Reallocate:'}</label>
-							<div class="realloc_avail_rooms_container" style="width: 195px;">
-								<select class="form-control" name="realloc_avail_rooms" id="realloc_avail_rooms">
-									<option value="0" selected="selected">{l s='Select Rooms'}</option>
-								</select>
-							</div>
-							<p class="error_text" id="realloc_sel_rm_err_p"></p>
-						</div>
-						<div class="form-group">
-							<label style="text-decoration:underline;margin-top:5px;" for="message-text" class="col-sm-12 control-label model-label"><i class="icon-info-circle"></i>&nbsp;{l s='Currently Alloted Customer Information:'}</label>
-							<dl class="well list-detail">
-								<dt>{l s='Name'}</dt>
-								<dd class="cust_name"></dd><br>
-								<dt>{l s='Email'}</dt>
-								<dd class="cust_email"></dd><br>
-							</dl>
-						</div>
+                        <div class="row">
+                            <div class="form-group col-sm-6">
+                                <label for="curr_room_num" class="control-label model-label">{l s='Current Room Number:'}</label>
+                                <input type="text" class="form-control modal_curr_room_num" name="modal_curr_room_num" readonly="true">
+                                <input type="hidden" class="form-control modal_id_htl_booking" name="id_htl_booking">
+                            </div>
+                        </div>
+                        <div class="panel">
+                            <div class="panel-heading"><i class="icon-user"></i> {l s='Currently Alloted Customer'}</div>
+                            <div class="panel-content">
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label model-label">{l s='Name'} :</label>
+                                    <div class="dol-sm-9 cust_name"></div>
+                                </div>
+                                <div class="">
+                                    <label class="col-sm-3 control-label model-label">{l s='Email'} :</label>
+                                    <div class="dol-sm-9 cust_email"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="form-group col-sm-6">
+                                <label for="realloc_avail_room_type" class="control-label model-label">{l s='Room Type To Reallocate:'}</label>
+                                <div class="realloc_avail_room_type_container">
+                                    <select class="form-control" name="realloc_avail_room_type" id="realloc_avail_room_type">
+                                        <option value="0" selected="selected">{l s='Select Room Type'}</option>
+                                    </select>
+                                </div>
+                                <p class="error_text" id="realloc_sel_rm_type_err_p"></p>
+                            </div>
+                            <div class="form-group col-sm-6">
+                                <label for="realloc_avail_rooms" class="control-label model-label">{l s='Room To Reallocate:'}</label>
+                                <div class="realloc_avail_rooms_container">
+                                    <select class="form-control" name="realloc_avail_rooms" id="realloc_avail_rooms">
+                                        <option value="0" selected="selected">{l s='Select Rooms'}</option>
+                                    </select>
+                                </div>
+                                <p class="error_text" id="realloc_sel_rm_err_p"></p>
+                            </div>
+                        </div>
+                        <div class="row" id="reallocation_price_diff_block" style="display:none;">
+                            <div class="form-group col-sm-6">
+                                <label for="reallocation_price_diff" class="control-label model-label alert-warning">{l s='Price Difference'} *</label>
+                                <div class="input-group">
+                                    <span class="input-group-addon">{$currency->prefix}{$currency->suffix}</span>
+                                    <input type="text" name="reallocation_price_diff" id="reallocation_price_diff" value="0" />
+                                    <span class="input-group-addon">{l s='Tax excl.'}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="alert alert-warning col-sm-12 realloc_roomtype_change_message" style="display:none">
+                                <p>{l s="If room type is changed while room reallocation then all additional facilities and services will be assigned to the selected room of new room type."}</p>
+                                <p>{l s="If you want to change additional facilities or services, you can update by editing the room after reallocation."}</p>
+                            </div>
+                        </div>
 					</div>
 					<div class="modal-footer">
 						<button type="button" class="btn btn-default" data-dismiss="modal">{l s="Close" mod="hotelreservationsyatem"}</button>
@@ -1548,29 +1592,35 @@
 						<h4 class="modal-title" id="swap_myModalLabel">{l s='Swap Rooms'}</h4>
 					</div>
 					<div class="modal-body">
-						<div class="form-group">
-							<label for="swap_curr_room_num" class="control-label model-label">{l s='Current Room Number:'}</label>
-							<input type="text" class="form-control modal_curr_room_num" name="modal_curr_room_num" readonly="true">
-							<input type="hidden" class="form-control modal_date_from" name="modal_date_from">
-							<input type="hidden" class="form-control modal_date_to" name="modal_date_to">
-							<input type="hidden" class="form-control modal_id_room" name="modal_id_room">
-							<input type="hidden" class="form-control modal_id_order" name="modal_id_order">
+						<div class="row">
+                            <div class="form-group col-sm-6">
+                                <label for="swap_curr_room_num" class="control-label model-label">{l s='Current Room Number:'}</label>
+                                <input type="text" class="form-control modal_curr_room_num" name="modal_curr_room_num" readonly="true">
+                                <input type="hidden" class="form-control modal_id_htl_booking" name="id_htl_booking">
+                            </div>
 						</div>
-						<div class="form-group">
-							<label for="swap_avail_rooms" class="control-label model-label">{l s='Available Rooms To Swap:'}</label>
-							<div class="swap_avail_rooms_container"></div>
-							<p class="error_text" id="swap_sel_rm_err_p"></p>
-						</div>
-						<div class="form-group">
-							<label style="text-decoration:underline;margin-top:5px;" for="message-text" class="col-sm-12 control-label model-label"><i class="icon-info-circle"></i>&nbsp;{l s='Currently Alloted Customer Information:'}</label>
-							<dl class="well list-detail">
-								<dt>{l s='Name'}</dt>
-								<dd class="cust_name"></dd><br>
-								<dt>{l s='Email'}</dt>
-								<dd class="cust_email"></dd><br>
-							</dl>
-						</div>
-					</div>
+                        <div class="panel">
+                            <div class="panel-heading"><i class="icon-user"></i> {l s='Currently Alloted Customer'}</div>
+                            <div class="panel-content">
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label model-label">{l s='Name'} :</label>
+                                    <div class="dol-sm-9 cust_name"></div>
+                                </div>
+                                <div class="">
+                                    <label class="col-sm-3 control-label model-label">{l s='Email'} :</label>
+                                    <div class="dol-sm-9 cust_email"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="form-group col-sm-6">
+                                <label for="swap_avail_rooms" class="control-label model-label">{l s='Rooms To Swap:'}</label>
+                                <div class="swap_avail_rooms_container"></div>
+                                <p class="error_text" id="swap_sel_rm_err_p"></p>
+                            </div>
+					    </div>
+                    </div>
 					<div class="modal-footer">
 						<button type="button" class="btn btn-default" data-dismiss="modal">{l s="Close" mod="hotelreservationsyatem"}</button>
 						<input type="submit" id="swap_allocated_rooms" name="swap_allocated_rooms" class="btn btn-primary" value="Swap">
@@ -1579,6 +1629,11 @@
 			</div>
 		</div>
     </div>
+
+    {* loader before loading data *}
+    <div class="loading_overlay">
+		<img src='{$link->getMediaLink("`$img_dir`admin/ajax-loader.gif")}' class="loading-img"/>
+	</div>
   </div>
 </div>
 
@@ -1612,7 +1667,11 @@
 
 
 {strip}
-	{addJsDefL name=no_rm_avail_txt}{l s='No rooms available.' js=1}{/addJsDefL}
+	{addJsDefL name=no_rm_avail_txt}{l s='No room available.' js=1}{/addJsDefL}
+	{addJsDefL name=no_realloc_rm_avail_txt}{l s='No room available for reallocation.' js=1}{/addJsDefL}
+	{addJsDefL name=no_realloc_rm_type_avail_txt}{l s='No room type available for reallocation.' js=1}{/addJsDefL}
+	{addJsDefL name=no_swap_rm_avail_txt}{l s='No room available for swap.' js=1}{/addJsDefL}
+	{addJsDefL name=slct_rm_type_err}{l s='Please select a room type first.' js=1}{/addJsDefL}
 	{addJsDefL name=slct_rm_err}{l s='Please select a room first.' js=1}{/addJsDefL}
 	{addJsDefL name=txtExtraDemandSucc}{l s='Updated Successfully' js=1}{/addJsDefL}
 	{addJsDefL name=atleastSelectTxt}{l s='Select at least one facility to update.' js=1}{/addJsDefL}
@@ -1632,9 +1691,15 @@
 	{addJsDefL name='below_txt'}{l s='Below' js=1}{/addJsDefL}
 	{addJsDefL name='years_txt'}{l s='years' js=1}{/addJsDefL}
 	{addJsDefL name='all_children_txt'}{l s='All Children' js=1}{/addJsDefL}
+	{addJsDefL name='max_occupancy_reached_txt'}{l s='Maximum room occupancy reached' js=1}{/addJsDefL}
+	{addJsDefL name='max_adults_txt'}{l s='Maximum adult occupancy reached' js=1}{/addJsDefL}
+	{addJsDefL name='max_children_txt'}{l s='Maximum children occupancy reached' js=1}{/addJsDefL}
+	{addJsDefL name='no_children_allowed_txt'}{l s='Only adults can be accommodated' js=1}{/addJsDefL}
 	{addJsDefL name='invalid_occupancy_txt'}{l s='Invalid occupancy(adults/children) found.' js=1}{/addJsDefL}
+	{addJsDefL name='select_room_txt'}{l s='Select room' js=1}{/addJsDefL}
 	{addJsDef max_child_age=$max_child_age|escape:'quotes':'UTF-8'}
 	{addJsDef max_child_in_room=$max_child_in_room|escape:'quotes':'UTF-8'}
+    {addJsDefL name='undo_cancellation_success'}{l s='Booking cancellation undo process is done successfully.' js=1}{/addJsDefL}
 {/strip}
 
 {* Apply javascript for the page *}
@@ -1661,14 +1726,11 @@
 		{* open date picker for the date input of check-in checkout dates *}
 		$(document).on('focus', '.room_status_date', function() {
 			var dateFrom = $(this).closest('.room_status_info_form').find('[name="date_from"]').val();
-			dateFrom = dateFrom.split("-");
-            minDate = new Date($.datepicker.formatDate('yy-mm-dd', new Date(dateFrom[0], dateFrom[1] - 1, dateFrom[2])));
+            minDate = new Date(dateFrom+'T00:00:00');
 
 			var dateTo = $(this).closest('.room_status_info_form').find('[name="date_to"]').val();
-			dateTo = dateTo.split("-");
-            maxDate = new Date($.datepicker.formatDate('yy-mm-dd', new Date(dateTo[0], dateTo[1] - 1, dateTo[2])));
-
-			$(this).datepicker({
+            maxDate = new Date(dateTo+'T23:59:59');
+			$(this).datetimepicker({
 				dateFormat: 'dd-mm-yy',
 				minDate: minDate,
 				maxDate: maxDate,
@@ -1784,41 +1846,6 @@
 				$(this).val(1);
 			}
 		});
-
-		function updateAdditionalServices(element)
-		{
-			var id_room_type_service_product_order_detail = $(element).data('id_room_type_service_product_order_detail');
-			var qty = $(element).val();
-			if ($.isNumeric(qty)) {
-				$.ajax({
-					type: 'POST',
-					headers: {
-						"cache-control": "no-cache"
-					},
-					url: "{$link->getAdminLink('AdminOrders')|addslashes}",
-					dataType: 'JSON',
-					cache: false,
-					data: {
-						id_room_type_service_product_order_detail: id_room_type_service_product_order_detail,
-						qty: qty,
-						action: 'updateRoomAdditionalServices',
-						ajax: true
-					},
-					success: function(jsonData) {
-						if (!jsonData.hasError) {
-							if (jsonData.service_panel) {
-								$('#room_type_service_product_desc').replaceWith(jsonData.service_panel);
-							}
-							showSuccessMessage(txtExtraDemandSucc);
-						} else {
-							showErrorMessage(jsonData.errors);
-
-						}
-					}
-				});
-			}
-
-		}
 
 		$(document).on('submit', '#add_room_services_form', function(e) {
 			e.preventDefault();
@@ -1983,65 +2010,153 @@
 
 		$('#mySwappigModal').on('hidden.bs.modal', function (e)
 		{
-			$(".modal_id_order").val('');
-			$(".modal_date_from").val('');
-			$(".modal_date_to").val('');
-			$(".modal_id_room").val('');
+                       $(".modal_id_htl_booking").val('');
 			$(".modal_curr_room_num").val('');
 			$(".cust_name").text('');
 			$(".cust_email").text('');
 			$(".swp_rm_opts").remove();
+			$(".realloc_rm_type_opts").remove();
 			$(".realloc_rm_opts").remove();
 		});
 
 		$('#mySwappigModal').on('shown.bs.modal', function (e)
 		{
-			$(".modal_id_order").val(e.relatedTarget.dataset.id_order);
-			$(".modal_date_from").val(e.relatedTarget.dataset.date_from);
-			$(".modal_date_to").val(e.relatedTarget.dataset.date_to);
-			$(".modal_id_room").val(e.relatedTarget.dataset.id_room);
-			$(".modal_curr_room_num").val(e.relatedTarget.dataset.room_num);
+            $(".loading_overlay").show();
+
+            $(".modal_id_htl_booking").val(e.relatedTarget.dataset.id_htl_booking);
+			$(".modal_curr_room_num").val(e.relatedTarget.dataset.room_num + ', ' + e.relatedTarget.dataset.room_type_name);
 			$(".cust_name").text(e.relatedTarget.dataset.cust_name);
 			$(".cust_email").text(e.relatedTarget.dataset.cust_email);
 
-			// For Rooms Swapping
-			if (e.relatedTarget.dataset.avail_rm_swap != 'false') {
-				var json_arr_rm_swp = JSON.parse(e.relatedTarget.dataset.avail_rm_swap);
+            // reset price difference fields
+            $("#reallocation_price_diff").val(0);
+            $("#reallocation_price_diff_block").hide();
+            $(".realloc_roomtype_change_message").hide();
 
-				html = '<select class="form-control" name="swap_avail_rooms" id="swap_avail_rooms" style="width:195px;">';
+			// For Rooms Swapping
+            var json_arr_rm_swp = JSON.parse(e.relatedTarget.dataset.avail_rm_swap);
+			if (e.relatedTarget.dataset.avail_rm_swap != 'false' && json_arr_rm_swp.length != 0) {
+				html = '<select class="form-control" name="swap_avail_rooms" id="swap_avail_rooms">';
 					$.each(json_arr_rm_swp, function(key,val) {
-                        html += '<option class="swp_rm_opts" value="'+val.id_room+'" >'+val.room_num+'</option>';
+						html += '<option class="swp_rm_opts" value="'+val.id_hotel_booking+'" >'+val.room_num+'</option>';
 					});
 				html += '</select>';
+
+                $("#swap_allocated_rooms").removeAttr('disabled');
 				$(".swap_avail_rooms_container").empty().append(html);
 			} else {
-				$(".swap_avail_rooms_container").empty().text(no_rm_avail_txt);
+				$(".swap_avail_rooms_container").empty().text(no_swap_rm_avail_txt).addClass('text-danger');
+				$("#swap_allocated_rooms").attr('disabled', 'disabled');
 			}
 
 			// For Rooms Reallocation
-			if (e.relatedTarget.dataset.avail_rm_realloc != 'false') {
-				var json_arr_rm_realloc = JSON.parse(e.relatedTarget.dataset.avail_rm_realloc);
-
-				html = '<select class="form-control" name="realloc_avail_rooms" id="realloc_avail_rooms" style="width:195px;">';
-					$.each(json_arr_rm_realloc, function(key,val) {
-						html += '<option class="realloc_rm_opts" value="'+val.id_room+'" >'+val.room_num+'</option>';
+            var json_arr_realloc_room_types = JSON.parse(e.relatedTarget.dataset.avail_realloc_room_types);
+			if (e.relatedTarget.dataset.avail_realloc_room_types != 'false' && json_arr_realloc_room_types.length != 0) {
+                var idCurrentRoomType = e.relatedTarget.dataset.id_room_type;
+				var roomsTypesHtml = '<select data-id_htl_booking="' + e.relatedTarget.dataset.id_htl_booking + '" class="form-control" name="realloc_avail_room_type" id="realloc_avail_room_type">';
+					$.each(json_arr_realloc_room_types, function(key, room_type) {
+                        roomsTypesHtml += "<option rooms_available='" + JSON.stringify(room_type.rooms) + "' class='realloc_rm_type_opts' value='" + room_type.id_product + "'";
+                        if (idCurrentRoomType == room_type.id_product) {
+                            roomsTypesHtml += ' selected="selected"';
+                        }
+                        roomsTypesHtml += '>' + room_type.room_type_name + '</option>';
 					});
-				html += '</select>';
-				$(".realloc_avail_rooms_container").empty().append(html);
+				    roomsTypesHtml += '</select>';
+
+                setRoomsForReallocation(json_arr_realloc_room_types[idCurrentRoomType]['rooms']);
+
+                $("#realloc_allocated_rooms").removeAttr('disabled');
+				$(".realloc_avail_room_type_container").empty().append(roomsTypesHtml);
 			} else {
-				$(".realloc_avail_rooms_container").empty().text(no_rm_avail_txt);
+                $(".realloc_avail_rooms_container").empty().text(no_realloc_rm_avail_txt).addClass('text-danger');
+                $(".realloc_avail_room_type_container").empty().text(no_realloc_rm_type_avail_txt).addClass('text-danger');
+				$("#realloc_allocated_rooms").attr('disabled', 'disabled');
 			}
+
+            $(".loading_overlay").hide();
 		});
+
+        // change room type for reallocation
+        $(document).on("change", "#realloc_avail_room_type", function(e) {
+            $(".loading_overlay").show();
+
+            var idHotelBooking = $(this).data('id_htl_booking');
+            $("#reallocation_price_diff").val(0);
+            $("#reallocation_price_diff_block").hide();
+            if (parseInt(idHotelBooking) > 0) {
+                var optionSelected = $(this).find('option:selected');
+                var roomsAvailable = JSON.parse(optionSelected.attr('rooms_available'));
+
+                // set the rooms of the selceted room type
+                setRoomsForReallocation(roomsAvailable);
+
+                // send an ajax for fetching if price has changes in the new room type seleceted
+                $.ajax({
+                    type: 'POST',
+                    headers: {
+                        "cache-control": "no-cache"
+                    },
+                    url: "{$link->getAdminLink('AdminOrders')|addslashes}",
+                    dataType: 'JSON',
+                    cache: false,
+                    data: {
+                        id_htl_booking: idHotelBooking,
+                        id_new_room_type: $(this).val(),
+                        action: 'changeRoomTypeToReallocate',
+                        ajax: true
+                    },
+                    success: function(result) {
+                        if (result.success == 1) {
+                            // has room type changed for reallocation
+                            if (result.has_room_type_change == 1) {
+                                $(".realloc_roomtype_change_message").show();
+                                // has room type price changed for reallocation
+                                if (result.has_price_changes == 1) {
+                                    $("#reallocation_price_diff").val(result.price_diff);
+                                    $("#reallocation_price_diff_block").show();
+                                }
+                            } else {
+                                $(".realloc_roomtype_change_message").hide();
+                            }
+                            $('#room_type_change_info').empty();
+                            if (result.is_changes_present == 1) {
+                            }
+                        } else if (typeof(result.error) != 'undefinded' && result.error) {
+                            showErrorMessage(result.error);
+                        } else {
+                            showErrorMessage(txtSomeErr);
+                        }
+
+                        $(".loading_overlay").hide();
+                    },
+                    error: function(XMLHttpRequest, textStatus, errorThrown) {
+                        $(".loading_overlay").hide();
+						showErrorMessage(txtSomeErr);
+					}
+                });
+            } else {
+                $(".loading_overlay").hide();
+                showErrorMessage(txtSomeErr);
+                return false;
+            }
+        });
 
 		/*For reallocating rooms in the modal*/
 		$("#realloc_allocated_rooms").on('click', function(e){
 			$(".error_text").text('');
 			var room_to_reallocate = $('#realloc_avail_rooms').val();
+            var room_type_to_reallocate = $('#realloc_avail_room_type').val();
+
+            if (typeof room_type_to_reallocate == 'undefined' || room_type_to_reallocate == 0) {
+				$("#realloc_sel_rm_type_err_p").text(slct_rm_type_err);
+				return false;
+			}
 			if (typeof room_to_reallocate == 'undefined' || room_to_reallocate == 0) {
 				$("#realloc_sel_rm_err_p").text(slct_rm_err);
 				return false;
 			}
 		});
+
 		/*For swaping rooms in the modal*/
 		$("#swap_allocated_rooms").on('click', function(e){
 			$(".error_text").text('');
@@ -2051,8 +2166,6 @@
 				return false;
 			}
 		});
-
-		/*END*/
 
 		// for updating customer guest details
 		$('#edit_guest_details').on('click', function(e) {
@@ -2121,6 +2234,57 @@
 			timeFormat: 'hh:mm:ss',
 		});
 	});
+
+    function updateAdditionalServices(element)
+    {
+        var id_room_type_service_product_order_detail = $(element).data('id_room_type_service_product_order_detail');
+        var qty = $(element).val();
+        if ($.isNumeric(qty)) {
+            $.ajax({
+                type: 'POST',
+                headers: {
+                    "cache-control": "no-cache"
+                },
+                url: "{$link->getAdminLink('AdminOrders')|addslashes}",
+                dataType: 'JSON',
+                cache: false,
+                data: {
+                    id_room_type_service_product_order_detail: id_room_type_service_product_order_detail,
+                    qty: qty,
+                    action: 'updateRoomAdditionalServices',
+                    ajax: true
+                },
+                success: function(jsonData) {
+                    if (!jsonData.hasError) {
+                        if (jsonData.service_panel) {
+                            $('#room_type_service_product_desc').replaceWith(jsonData.service_panel);
+                        }
+                        showSuccessMessage(txtExtraDemandSucc);
+                    } else {
+                        showErrorMessage(jsonData.errors);
+
+                    }
+                }
+            });
+        }
+
+    }
+
+    function setRoomsForReallocation(roomsAvailable)
+    {
+        if (typeof(roomsAvailable) != 'undefined' && roomsAvailable.length) {
+            var roomsHtml = '<select class="form-control" name="realloc_avail_rooms" id="realloc_avail_rooms">';
+                roomsHtml += '<option class="realloc_rm_opts" value="0">---- ' + select_room_txt + ' ----</option>';
+                $.each(roomsAvailable, function(key, roomInfo) {
+                    roomsHtml += '<option class="realloc_rm_opts" value="' + roomInfo.id_room + '">' + roomInfo.room_num + '</option>';
+                });
+            roomsHtml += '</select>';
+
+            $(".realloc_avail_rooms_container").empty().append(roomsHtml);
+        } else {
+            $(".realloc_avail_rooms_container").empty().text(no_realloc_rm_avail_txt);
+        }
+    }
 </script>
 
 {/block}

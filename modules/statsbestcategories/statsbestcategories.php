@@ -191,7 +191,7 @@ class StatsBestCategories extends ModuleGrid
             AND hbd.`date_to` > "'.pSQL($date_from).'" AND hbd.`date_from` < "'.pSQL($date_to).'"
         ) AS totalOrders,
         (
-            SELECT IFNULL(SUM(ROUND((DATEDIFF(LEAST(hbd.`date_to`, "'.pSQL($date_to).'"), GREATEST(hbd.`date_from`, "'.pSQL($date_from).'")) / DATEDIFF(hbd.`date_to`, hbd.`date_from`)) * hbd.`total_price_tax_excl`, 2)), 0)
+            SELECT IFNULL(SUM(ROUND((DATEDIFF(LEAST(hbd.`date_to`, "'.pSQL($date_to).'"), GREATEST(hbd.`date_from`, "'.pSQL($date_from).'")) / DATEDIFF(hbd.`date_to`, hbd.`date_from`)) * (hbd.`total_price_tax_excl` / o.`conversion_rate`), 2)), 0)
             FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
             LEFT JOIN `'._DB_PREFIX_.'orders` o
             ON (o.`id_order` = hbd.`id_order`)
@@ -219,6 +219,7 @@ class StatsBestCategories extends ModuleGrid
         FROM `'._DB_PREFIX_.'htl_branch_info` hbi
         LEFT JOIN `'._DB_PREFIX_.'htl_branch_info_lang` hbil
         ON (hbil.`id` = hbi.`id` AND hbil.`id_lang` = '.(int)$id_lang .')
+        WHERE 1 '.HotelBranchInformation::addHotelRestriction(false, 'hbi', 'id').'
         GROUP BY (hbi.`id`)';
 
         if (Validate::IsName($this->_sort)) {

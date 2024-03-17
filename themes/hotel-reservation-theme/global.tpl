@@ -44,6 +44,7 @@
 	{addJsDef id_lang=$cookie->id_lang|intval}
 {/if}
 {addJsDef lang_iso=$lang_iso}
+{addJsDef language_is_rtl=$language_is_rtl|boolval}
 {addJsDefL name=FancyboxI18nClose}{l s='Close'}{/addJsDefL}
 {addJsDefL name=FancyboxI18nNext}{l s='Next'}{/addJsDefL}
 {addJsDefL name=FancyboxI18nPrev}{l s='Previous'}{/addJsDefL}
@@ -61,6 +62,10 @@
 {addJsDef max_child_age=$max_child_age}
 {addJsDef max_child_in_room=$max_child_in_room}
 
+{addJsDefL name='max_occupancy_reached_txt'}{l s='Maximum room occupancy reached' js=1}{/addJsDefL}
+{addJsDefL name='max_adults_txt'}{l s='Maximum adult occupancy reached' js=1}{/addJsDefL}
+{addJsDefL name='max_children_txt'}{l s='Maximum children occupancy reached' js=1}{/addJsDefL}
+{addJsDefL name='no_children_allowed_txt'}{l s='Only adults can be accommodated' js=1}{/addJsDefL}
 {addJsDefL name='select_occupancy_txt'}{l s='Select Occupancy' js=1}{/addJsDefL}
 {addJsDefL name='select_age_txt'}{l s='Select age' js=1}{/addJsDefL}
 {addJsDefL name='under_1_age'}{l s='Under 1' js=1}{/addJsDefL}

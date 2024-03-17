@@ -422,21 +422,13 @@
 														prevText: '',
 														nextText: '',
 														dateFormat: 'yy-mm-dd',
-														beforeShow: function() {
-															let dateTo = $('#local_{$params.id_date}_1').val().trim();
-															if (typeof dateTo != 'undefined' && dateTo != '') {
-																let objDateToMax = $.datepicker.parseDate('yy-mm-dd', dateTo);
-																objDateToMax.setDate(objDateToMax.getDate() - 1);
-																$('#local_{$params.id_date}_0').datepicker('option', 'maxDate', objDateToMax);
-															}
-														},
 														onClose: function() {
 															let dateFrom = $('#local_{$params.id_date}_0').val().trim();
 															let dateTo = $('#local_{$params.id_date}_1').val().trim();
 
-															if (dateFrom >= dateTo) {
+															if ((dateFrom && dateTo) && (dateFrom >= dateTo)) {
 																let objDateToMin = $.datepicker.parseDate('yy-mm-dd', dateFrom);
-																objDateToMin.setDate(objDateToMin.getDate() + 1);
+																objDateToMin.setDate(objDateToMin.getDate());
 
 																$('#local_{$params.id_date}_1').datepicker('option', 'minDate', objDateToMin);
 															}
@@ -452,7 +444,7 @@
 
 															if (typeof dateFrom != 'undefined' && dateFrom != '') {
 																let objDateToMin = $.datepicker.parseDate('yy-mm-dd', dateFrom);
-																objDateToMin.setDate(objDateToMin.getDate() + 1);
+																objDateToMin.setDate(objDateToMin.getDate());
 
 																$('#local_{$params.id_date}_1').datepicker('option', 'minDate', objDateToMin);
 															}

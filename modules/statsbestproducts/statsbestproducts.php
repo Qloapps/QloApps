@@ -176,7 +176,7 @@ class StatsBestProducts extends ModuleGrid
             AND hbd.`date_to` > "'.pSQL($date_from).'" AND hbd.`date_from` < "'.pSQL($date_to).'"
         ) AS sellingPrice,
         (
-            SELECT IFNULL(SUM(ROUND((DATEDIFF(LEAST(hbd.`date_to`, "'.pSQL($date_to).'"), GREATEST(hbd.`date_from`, "'.pSQL($date_from).'")) / DATEDIFF(hbd.`date_to`, hbd.`date_from`)) * hbd.`total_price_tax_excl`, 2)), 0)
+            SELECT IFNULL(SUM(ROUND((DATEDIFF(LEAST(hbd.`date_to`, "'.pSQL($date_to).'"), GREATEST(hbd.`date_from`, "'.pSQL($date_from).'")) / DATEDIFF(hbd.`date_to`, hbd.`date_from`)) * (hbd.`total_price_tax_excl` / o.`conversion_rate`) , 2)), 0)
             FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
             LEFT JOIN `'._DB_PREFIX_.'orders` o
             ON (o.`id_order` = hbd.`id_order`)
@@ -206,7 +206,8 @@ class StatsBestProducts extends ModuleGrid
         ON (hrt.`id_product` = p.`id_product`)
         LEFT JOIN `'._DB_PREFIX_.'htl_branch_info_lang` hbil
         ON (hbil.`id` = hrt.`id_hotel` AND hbil.`id_lang` = '.(int) $id_lang .')
-        WHERE p.`booking_product` = 1';
+        WHERE p.`booking_product` = 1
+        '.HotelBranchInformation::addHotelRestriction(false, 'hbil', 'id');
 
         if (Validate::IsName($this->_sort)) {
             $this->query .= ' ORDER BY `'.bqSQL($this->_sort).'`';
