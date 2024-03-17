@@ -140,9 +140,24 @@ class Dashactivity extends Module
                     'dash_trends_chart1' => array(
                         'chart_type' => 'pie_chart_trends',
                         'data' => array(
-                            array('key' => 'qloapps.com', 'y' => round($visits / 2), 'color' => self::$colors[0]),
-                            array('key' => 'google.com', 'y' => round($visits / 3), 'color' => self::$colors[1]),
-                            array('key' => 'Direct Traffic', 'y' => round($visits / 4), 'color' => self::$colors[2])
+                            array(
+                                'key' => 'qloapps.com',
+                                'y' => round($visits / 2),
+                                'color' => self::$colors[0],
+                                'percent' => ($visits / 2) ? (Tools::ps_round((100 / 2), 2)) : 0,
+                            ),
+                            array(
+                                'key' => 'google.com',
+                                'y' => round($visits / 3),
+                                'color' => self::$colors[1],
+                                'percent' => ($visits / 3) ? (Tools::ps_round((100 / 3), 2)) : 0,
+                            ),
+                            array(
+                                'key' => 'Direct Traffic',
+                                'y' => round($visits / 4),
+                                'color' => self::$colors[2],
+                                'percent' => ($visits / 4) ? (Tools::ps_round((100 / 4), 2)) : 0,
+                            )
                         )
                     )
                 )
@@ -195,29 +210,37 @@ class Dashactivity extends Module
         Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql);
         $online_visitor = Db::getInstance()->NumRows();
 
+        // Pending bookings will be those bookings which are not paid yet and not in Canceled|Refunded|Payment error state.
         $pending_orders = Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue('
-			SELECT COUNT(*)
+			SELECT COUNT(DISTINCT o.`id_order`)
 			FROM `'._DB_PREFIX_.'orders` o
-			LEFT JOIN `'._DB_PREFIX_.'order_state` os ON (o.current_state = os.id_order_state)
             LEFT JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd ON (hbd.`id_order` = o.`id_order`)
-			WHERE os.paid = 1 AND os.shipped = 0
-			'.Shop::addSqlRestriction(Shop::SHARE_ORDER).
+			LEFT JOIN `'._DB_PREFIX_.'order_state` os ON (o.`current_state` = os.`id_order_state`)
+			WHERE os.`paid` = 0
+            AND o.`current_state` NOT IN ('.implode(',', array(
+                Configuration::get('PS_OS_CANCELED'),
+                Configuration::get('PS_OS_REFUND'),
+                Configuration::get('PS_OS_ERROR')
+            )).')'.Shop::addSqlRestriction(Shop::SHARE_ORDER).
             (!is_null($params['id_hotel']) ? HotelBranchInformation::addHotelRestriction($params['id_hotel'], 'hbd') : '')
         );
 
+        // Abandoned cart are which are added to the cart between Min and Max hours conditions
         $abandoned_cart = Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue('
 			SELECT COUNT(*)
 			FROM `'._DB_PREFIX_.'cart`
-			WHERE `date_upd` BETWEEN "'.pSQL(date('Y-m-d H:i:s', strtotime('-'.(int)Configuration::get('DASHACTIVITY_CART_ABANDONED_MAX').' MIN'))).'" AND "'.pSQL(date('Y-m-d H:i:s', strtotime('-'.(int)Configuration::get('DASHACTIVITY_CART_ABANDONED_MIN').' MIN'))).'"
+			WHERE `date_upd` BETWEEN "'.pSQL(date('Y-m-d H:i:s', strtotime('-'.(int)Configuration::get('DASHACTIVITY_CART_ABANDONED_MAX').' HOUR'))).'" AND "'.pSQL(date('Y-m-d H:i:s', strtotime('-'.(int)Configuration::get('DASHACTIVITY_CART_ABANDONED_MIN').' HOUR'))).'"
 			AND id_cart NOT IN (SELECT id_cart FROM `'._DB_PREFIX_.'orders`)
 			'.Shop::addSqlRestriction(Shop::SHARE_ORDER)
         );
 
+        // pending refunds are the refunds requests which are not denied or refunded yet
         $return_exchanges = Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue('
 			SELECT COUNT(*)
 			FROM `'._DB_PREFIX_.'orders` o
 			LEFT JOIN `'._DB_PREFIX_.'order_return` or2 ON o.id_order = or2.id_order
-			WHERE or2.`date_add` BETWEEN "'.pSQL($params['date_from']).'" AND "'.pSQL($params['date_to']).'"
+            LEFT JOIN `'._DB_PREFIX_.'order_return_state` ors ON (or2.state = ors.id_order_return_state)
+			WHERE (ors.`denied` = 0 AND ors.`refunded` = 0)
 			'.Shop::addSqlRestriction(Shop::SHARE_ORDER, 'o')
         );
 
@@ -253,6 +276,7 @@ class Dashactivity extends Module
 			AND newsletter = 1
 			'.Shop::addSqlRestriction(Shop::SHARE_ORDER)
         );
+
         $total_suscribers = Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue('
 			SELECT COUNT(*)
 			FROM `'._DB_PREFIX_.'customer`
@@ -308,8 +332,15 @@ class Dashactivity extends Module
         $referers = $this->getReferer($date_from, $date_to);
         $return = array('chart_type' => 'pie_chart_trends', 'data' => array());
         $i = 0;
+
+        $totalTraffic = array_sum(array_values($referers));
         foreach ($referers as $referer_name => $n) {
-            $return['data'][] = array('key' => $referer_name, 'y' => $n, 'color' => self::$colors[$i++]);
+            $return['data'][] = array(
+                'key' => $referer_name,
+                'y' => $n,
+                'color' => self::$colors[$i++],
+                'percent' => $n ? (Tools::ps_round($n / $totalTraffic * 100, 2)) : 0,
+            );
         }
 
         return $return;
@@ -437,7 +468,7 @@ class Dashactivity extends Module
         );
         $fields_form['form']['input'][] = array(
             'label' => $this->l('Abandoned cart (max)'),
-            'hint' => $this->l('How long (in hours) after the last action a cart is no longer to be considered as abandoned (default: 24 hrs).'),
+            'hint' => $this->l('How long (in hours) after the last action a cart is no longer to be considered as abandoned (default: 48 hrs).'),
             'name' => 'DASHACTIVITY_CART_ABANDONED_MAX',
             'type' => 'text',
             'suffix' => $this->l('hrs'),
@@ -460,6 +491,38 @@ class Dashactivity extends Module
         );
 
         return $helper->generateForm(array($fields_form));
+    }
+
+    // Validation of the configuration form
+    public function validateDashConfig($configs)
+    {
+        $errors = [];
+
+        if (!Validate::isUnsignedInt($configs['DASHACTIVITY_CART_ACTIVE'])
+            || !$configs['DASHACTIVITY_CART_ACTIVE']
+        ) {
+            $errors[] = $this->l('Active cart must be a positive integer.');
+        }
+
+        if (!Validate::isUnsignedInt($configs['DASHACTIVITY_VISITOR_ONLINE'])
+            || !$configs['DASHACTIVITY_VISITOR_ONLINE']
+        ) {
+            $errors[] = $this->l('Online visitor must be a positive integer.');
+        }
+
+        if (!Validate::isUnsignedFloat($configs['DASHACTIVITY_CART_ABANDONED_MIN'])
+            || !$configs['DASHACTIVITY_CART_ABANDONED_MIN']
+        ) {
+            $errors[] = $this->l('Minimum abandoned cart must be valid hours.');
+        }
+
+        if (!Validate::isUnsignedFloat($configs['DASHACTIVITY_CART_ABANDONED_MAX'])
+            || !$configs['DASHACTIVITY_CART_ABANDONED_MAX']
+        ) {
+            $errors[] = $this->l('Maximum abandoned cart must be valid hours.');
+        }
+
+        return $errors;
     }
 
     public function getConfigFieldsValues()

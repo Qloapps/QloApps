@@ -34,6 +34,14 @@ class OrderCore extends ObjectModel
     const ORDER_PAYMENT_TYPE_FULL = 1;
     const ORDER_PAYMENT_TYPE_ADVANCE = 2;
 
+    //Consts for: In the order list in which currency prices should be displayed
+    const ORDER_LIST_PRICE_DISPLAY_IN_PAYMENT_CURRENCY = 1;
+    const ORDER_LIST_PRICE_DISPLAY_IN_DEFAULT_CURRENCY = 2;
+
+    const ORDER_COMPLETE_REFUND_FLAG = 1;
+    const ORDER_COMPLETE_CANCELLATION_FLAG = 2;
+    const ORDER_COMPLETE_CANCELLATION_OR_REFUND_REQUEST_FLAG = 3;
+
     /** @var int Delivery address id */
     public $id_address_delivery;
 
@@ -1835,6 +1843,12 @@ class OrderCore extends ObjectModel
             }
         }
 
+        // Whenever payment is adding in any order then set a cumulative conversion rate for the payment currency in the order
+        if ($avgConversionRate = $order_payment->getAverageConversionRate($this->reference, $this->id_currency)) {
+            $this->conversion_rate = $avgConversionRate;
+        }
+        $this->save();
+
         return $res;
     }
 
@@ -1852,7 +1866,10 @@ class OrderCore extends ObjectModel
             if ($payment->id_currency == $this->id_currency) {
                 $this->total_paid_real += $order_payment_detail->amount;
             } else {
-                $this->total_paid_real += Tools::ps_round(Tools::convertPrice($order_payment_detail->amount, $payment->id_currency, false), 2);
+                $this->total_paid_real += Tools::ps_round(
+                    Tools::convertPriceFull($order_payment_detail->amount, new Currency($payment->id_currency), new Currency($this->id_currency)),
+                    6
+                );
             }
 
             if (!validate::isPrice($this->total_paid_real)) {
@@ -2534,12 +2551,12 @@ class OrderCore extends ObjectModel
             $order_ecotax_tax = Tools::ps_round($order_ecotax_tax, _PS_PRICE_COMPUTE_PRECISION_, $this->round_mode);
 
             $tax_rounding_error = $expected_total_tax - $actual_total_tax - $order_ecotax_tax;
-            if ($tax_rounding_error !== 0) {
+            if ($tax_rounding_error != 0) {
                 Tools::spreadAmount($tax_rounding_error, _PS_PRICE_COMPUTE_PRECISION_, $order_detail_tax_rows, 'total_amount');
             }
 
             $base_rounding_error = $expected_total_base - $actual_total_base;
-            if ($base_rounding_error !== 0) {
+            if ($base_rounding_error != 0) {
                 Tools::spreadAmount($base_rounding_error, _PS_PRICE_COMPUTE_PRECISION_, $order_detail_tax_rows, 'total_tax_base');
             }
         }
@@ -2599,51 +2616,53 @@ class OrderCore extends ObjectModel
         return Db::getInstance()->executeS('SELECT  * FROM '._DB_PREFIX_.'orders WHERE id_cart = '.(int)$id_cart);
     }
 
-    // Order is considered as refunded if all bookings are requested for refund and all are with refunded status
-    // $refundFlag [ORDER_RETURN_STATE_FLAG_REFUNDED || ORDER_RETURN_STATE_FLAG_DENIED]
-    public function hasCompletelyRefunded($refundFlag = 0)
+    /**
+     * Function to check if order has been completely refunded
+     * @param integer action: can have 3 values as below
+     * Order::ORDER_COMPLETE_REFUND_FLAG for complete refunded and
+     * Order::ORDER_COMPLETE_CANCELLATION_FLAG for completely cancelled and
+     * Order::ORDER_COMPLETE_CANCELLATION_OR_REFUND_REQUEST_FLAG for all rooms are either cancelled or requested for refunded
+     * @return boolean: true if order has been completely refunded as per requested parameters or false
+     */
+    public function hasCompletelyRefunded($action = 0)
     {
         $objHotelBooking = new HotelBookingdetail();
-        if ($refundBookings = OrderReturn::getOrdersReturnDetail($this->id)) {
-            if ($orderBookings = $objHotelBooking->getOrderCurrentDataByOrderId($this->id)) {
-                if (count($refundBookings) == count($orderBookings)) {
-                    if ($refundFlag) {
-                        foreach ($refundBookings as $refundRow) {
-                            if (Validate::isLoadedObject(
-                                $objReturnState = new OrderReturnState($refundRow['state']
-                            ))) {
-                                if ($refundFlag == OrderReturnState::ORDER_RETURN_STATE_FLAG_REFUNDED
-                                    && !$objReturnState->refunded
-                                ) {
-                                    return false;
-                                }
-                                if ($refundFlag == OrderReturnState::ORDER_RETURN_STATE_FLAG_DENIED
-                                    && !$objReturnState->denied
-                                ) {
-                                    return false;
-                                }
-                            }
+        if ($orderBookings = $objHotelBooking->getOrderCurrentDataByOrderId($this->id)) {
+            // If action is Order::ORDER_COMPLETE_REFUND_FLAG (for refunded) then we will check
+            // that all rooms must be refunded and at least one booking is not cancelled
+            if ($action == Order::ORDER_COMPLETE_REFUND_FLAG) {
+                $uniqueRefundedBookings = array_unique(array_column($orderBookings, 'is_refunded'));
+                if (count($uniqueRefundedBookings) == 1 && $uniqueRefundedBookings[0] == 1) {
+                    foreach ($orderBookings as $booking) {
+                        if ($booking['is_cancelled'] == 0) {
+                            return true;
                         }
                     }
+                }
+            // If action is Order::ORDER_COMPLETE_CANCELLATION_FLAG (for cancelled) then we will check that all rooms must be cancelled
+            } elseif ($action == Order::ORDER_COMPLETE_CANCELLATION_FLAG) {
+                $uniqueRefundedBookings = array_unique(array_column($orderBookings, 'is_cancelled'));
+                if (count($uniqueRefundedBookings) == 1 && $uniqueRefundedBookings[0] == 1) {
+                    return true;
+                }
+            // If action is Order::ORDER_COMPLETE_CANCELLATION_OR_REFUND_REQUEST_FLAG (for cancelled and refund requests) then we will check that all rooms are either cancelled or requested for refund
+            } elseif ($action == Order::ORDER_COMPLETE_CANCELLATION_OR_REFUND_REQUEST_FLAG) {
+                foreach ($orderBookings as $booking) {
+                    if (!$booking['is_refunded']) {
+                        if (!OrderReturn::getOrdersReturnDetail($this->id, 0, $booking['id'])) {
+                            return false;
+                        }
+                    }
+                }
+                return true;
+            // Default process to check if order is fully refunded or cancelled or not
+            } else {
+                // if is_refunded is 1 means booking either is cancelled or refunded. So check all bookings must have is_refunded = 1
+                $uniqueRefundedBookings = array_unique(array_column($orderBookings, 'is_refunded'));
+                if (count($uniqueRefundedBookings) == 1 && $uniqueRefundedBookings[0] == 1) {
                     return true;
                 }
             }
-        } elseif ($orderBookings = $objHotelBooking->getOrderCurrentDataByOrderId($this->id)) {
-            if (count(array_unique(array_column($orderBookings, 'is_cancelled'))) === 1
-                && array_unique(array_column($orderBookings, 'is_cancelled'))[0] != 0
-            ) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    // Order is considered as denied if all bookings are requested for refund and all are with denied status
-    public function orderRefundHasBeenDenied()
-    {
-        if (OrderReturn::getOrdersReturn($this->id_customer, $this->id)) {
-
         }
 
         return false;

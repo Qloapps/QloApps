@@ -756,7 +756,11 @@ $(document).ready(function()
 
 
 	$('select.chosen').each(function(k, item){
-		$(item).chosen({disable_search_threshold: 5, search_contains: true});
+		$(item).chosen({
+			disable_search_threshold: 5,
+			search_contains: true,
+			inherit_select_classes: true,
+		});
 	});
 	// Apply chosen() when modal is loaded
 	$(document).on('shown.bs.modal', function (e) {
@@ -1217,6 +1221,24 @@ function sendBulkAction(form, action)
 		$(form).attr('action', form_action.splice(form_action.lastIndexOf('&'), 0, '&' + action));
 
 	$(form).submit();
+}
+
+function checkIfEmployeeIsLoggedIn() {
+	return new Promise(function (resolve) {
+		$.ajax({
+			url : window.location.pathname,
+			type: 'POST',
+			dataType: 'JSON',
+			data : {
+				ajax : '1',
+				controller : 'AdminLogin',
+				action : 'checkLoginStatus',
+			},
+			success : function(response) {
+				resolve(response.is_logged_in);
+			}
+		});
+	});
 }
 
 function openModulesList()

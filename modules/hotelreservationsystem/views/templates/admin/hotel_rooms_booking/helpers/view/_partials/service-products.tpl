@@ -34,6 +34,6 @@
     </div>
 {else}
     <div class="col-sm-12">
-        <p class="alert alert-warning">	{l s="No service products found." mod="hotelreservationsystem"}</p>
+        <p class="alert alert-warning">	{l s="No service products found." mod='hotelreservationsystem'}</p>
     </div>
 {/if}

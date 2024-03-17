@@ -32,13 +32,13 @@
         <section>
             <div class="row">
                 <div class="col-md-12 col-lg-6">
-                    <p class="chart-label">{l s='Room Nights'}</p>
+                    <p class="chart-label">{l s='Room Nights' mod='dashinsights'}</p>
                     <div class="chart with-transitions insight-chart-wrap" id="dashinsights_room_nights">
                         <svg></svg>
                     </div>
                 </div>
                 <div class="col-md-12 col-lg-6">
-                    <p class="chart-label">{l s='Days of the Week'}</p>
+                    <p class="chart-label">{l s='Days of the Week' mod='dashinsights'}</p>
                     <div class="chart with-transitions insight-chart-wrap" id="dashinsights_days_of_the_week">
                         <svg></svg>
                     </div>

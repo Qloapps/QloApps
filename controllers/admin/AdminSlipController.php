@@ -295,4 +295,11 @@ class AdminSlipControllerCore extends AdminController
 
         return '--';
     }
+
+    public function setMedia()
+    {
+        parent::setMedia();
+        $this->addJS(_PS_JS_DIR_.'admin/slips.js');
+    }
+
 }

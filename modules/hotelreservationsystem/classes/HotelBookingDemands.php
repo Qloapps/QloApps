@@ -175,10 +175,9 @@ class HotelBookingDemands extends ObjectModel
         return new TaxCalculator($taxes, $computationMethod);
     }
 
-    public function setBookingDemandTaxDetails()
+    public function setBookingDemandTaxDetails($replace = 0)
     {
-        $idBookingDemand = $this->id;
-        if ($idBookingDemand && Validate::isLoadedObject($objBkDemand = new HotelBookingDemands($idBookingDemand))) {
+        if ($this->id) {
             if ($taxCalculator = $this->tax_calculator) {
                 if (!($taxCalculator instanceof TaxCalculator)) {
                     return false;
@@ -187,12 +186,11 @@ class HotelBookingDemands extends ObjectModel
                     return true;
                 }
                 $values = '';
-                $objGlobalDemand = new HotelRoomTypeGlobalDemand($this->id_global_demand);
-                $priceTaxExcl = $objBkDemand->unit_price_tax_excl;
+                $priceTaxExcl = $this->unit_price_tax_excl;
                 foreach ($taxCalculator->getTaxesAmount($priceTaxExcl) as $idTax => $amount) {
                     $quantity = 1;
-                    if ($objGlobalDemand->price_calc_method == HotelRoomTypeGlobalDemand::WK_PRICE_CALC_METHOD_EACH_DAY) {
-                        $objBkDetail = new HotelBookingDetail($objBkDemand->id_htl_booking);
+                    if ($this->price_calc_method == HotelRoomTypeGlobalDemand::WK_PRICE_CALC_METHOD_EACH_DAY) {
+                        $objBkDetail = new HotelBookingDetail($this->id_htl_booking);
                         $quantity = $objBkDetail->getNumberOfDays($objBkDetail->date_from, $objBkDetail->date_to);
                     }
                     switch (Configuration::get('PS_ROUND_TYPE')) {
@@ -212,9 +210,15 @@ class HotelBookingDemands extends ObjectModel
                             $totalAmount = $unitAmount * $quantity;
                             break;
                     }
-                    $values .= '('.(int)$idBookingDemand.','.(int)$idTax.','.(float)$unitAmount.','.
+                    $values .= '('.(int)$this->id.','.(int)$idTax.','.(float)$unitAmount.','.
                     (float)$totalAmount.'),';
                 }
+
+                // if delete previous details and save new details
+                if ($replace) {
+                    Db::getInstance()->execute('DELETE FROM `'._DB_PREFIX_.'htl_booking_demands_tax` WHERE id_booking_demand='.(int)$this->id);
+                }
+
                 $values = rtrim($values, ',');
                 $sql = 'INSERT INTO `'._DB_PREFIX_.'htl_booking_demands_tax`
                 (id_booking_demand, id_tax, unit_amount, total_amount)

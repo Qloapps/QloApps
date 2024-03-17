@@ -120,25 +120,8 @@ ul#optional li.fail{
 	margin-right:190px;
 	margin-left: auto;
 }
-.blockInfoEnd{
-	float:right;
-	margin:34px 0 22px 20px;
-}
-.blockInfoEnd.last{
-	margin-left:0;
-	margin-right: auto;
-}
-.blockInfoEnd img{
-	float:right;
-	margin:0 0 5px 10px;
-}
-.blockInfoEnd a.FO{
-	float:left;
-	padding:0 10px 0 0;
-}
-.blockInfoEnd a.FO span{
-	padding:0 0 0 32px;
-	background:#00aff0;
+.info-boxes {
+	flex-direction: row-reverse;
 }
 ul#optional_update li.fail{
 	background:#f8f8f8 url(img/pict_error.png) no-repeat 0 8px;
