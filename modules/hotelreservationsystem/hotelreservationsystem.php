@@ -101,6 +101,36 @@ class HotelReservationSystem extends Module
         $this->context->controller->addJS($this->_path.'/views/js/HotelReservationFront.js');
     }
 
+    public function hookActionFrontControllerSetMedia()
+    {
+        if (Configuration::get('WK_CUSTOMER_SUPPORT_PHONE_NUMBER') != ''
+            || Configuration::get('WK_CUSTOMER_SUPPORT_EMAIL') != ''
+        ) {
+            $this->context->controller->addCSS($this->getPathUri().'views/css/hook/display-nav.css');
+        }
+
+    }
+
+    public function hookDisplayNav()
+    {
+        $this->smarty->assign(array(
+            'phone' => Configuration::get('WK_CUSTOMER_SUPPORT_PHONE_NUMBER'),
+            'email' => Configuration::get('WK_CUSTOMER_SUPPORT_EMAIL'),
+        ));
+
+        return $this->display(__FILE__, 'display-nav.tpl');
+    }
+
+    public function hookDisplayExternalNavigationHook()
+    {
+        $this->smarty->assign(array(
+            'phone' => Configuration::get('WK_CUSTOMER_SUPPORT_PHONE_NUMBER'),
+            'email' => Configuration::get('WK_CUSTOMER_SUPPORT_EMAIL'),
+        ));
+
+        return $this->display(__FILE__, 'external-navigation-hook.tpl');
+    }
+
     public function cartBookingDataForMail($order)
     {
         $result = array();
@@ -550,9 +580,9 @@ class HotelReservationSystem extends Module
         );
 
         // Controllers without tabs
-        $this->installTab('AdminHotelGeneralSettings', 'Hotel General configuration', false, false);
-        $this->installTab('AdminHotelFeaturePricesSettings', 'Advanced Price Rules', false, false);
-        $this->installTab('AdminRoomTypeGlobalDemand', 'Additional Demand Configuration', false, false);
+        $this->installTab('AdminHotelGeneralSettings', 'Hotel General Configuration', 'AdminHotelConfigurationSetting', false);
+        $this->installTab('AdminHotelFeaturePricesSettings', 'Advanced Price Rules', 'AdminHotelConfigurationSetting', false);
+        $this->installTab('AdminRoomTypeGlobalDemand', 'Additional Demand Configuration', 'AdminHotelConfigurationSetting', false);
         $this->installTab('AdminAssignHotelFeatures', 'Assign Hotel Features', false, false);
         $this->installTab('AdminBookingDocument', 'Booking Documents', false, false);
 
@@ -635,6 +665,9 @@ class HotelReservationSystem extends Module
                 'actionOrderStatusPostUpdate',
                 'displayLeftColumn',
                 'actionCartSummary',
+                'actionFrontControllerSetMedia',
+                'displayNav',
+                'displayExternalNavigationHook',
             )
         );
     }
@@ -669,7 +702,9 @@ class HotelReservationSystem extends Module
             'WK_ADVANCED_PAYMENT_INC_TAX',
             'WK_GOOGLE_ACTIVE_MAP',
             'WK_MAP_HOTEL_ACTIVE_ONLY',
-            'WK_HOTEL_NAME_ENABLE'
+            'WK_HOTEL_NAME_ENABLE',
+            'WK_CUSTOMER_SUPPORT_PHONE_NUMBER',
+            'WK_CUSTOMER_SUPPORT_EMAIL',
         );
         foreach ($configKeys as $key) {
             if (!Configuration::deleteByName($key)) {

@@ -98,6 +98,7 @@
 					selectFirst: false,
 					scroll: false,
 					dataType: "json",
+					cacheLength: 0,
 					formatItem: function(data, i, max, value, term) {
 						return value;
 					},
@@ -115,7 +116,8 @@
 						ajax: "1",
 						token: "{getAdminToken tab='AdminCartRules'}",
 						tab: "AdminCartRules",
-						action: "searchCartRuleVouchers"
+						action: "searchCartRuleVouchers",
+						id_customer: function () { return window.id_customer },
 					}
 				}
 			)
@@ -843,7 +845,9 @@
 				ajax: "1",
 				tab: "AdminCustomers",
 				action: "searchCustomers",
-				customer_search: $('#customer').val()},
+				customer_search: $('#customer').val(),
+				skip_deleted: "1",
+			},
 			success : function(res)
 			{
 				if(res.found)
@@ -1611,6 +1615,17 @@
 			}
 			if ($(this).closest('.room_demand_block').find('.change_room_type_service_product').is(':checked')) {
 				updateServiceProducts($(this).closest('.room_demand_block').find('.change_room_type_service_product'));
+			}
+		});
+
+		$(document).on('change', '.room_type_service_product_qty', function(e) {
+			let quantityInputField = this;
+			let maximumQuantity = parseInt($(quantityInputField).attr('data-max-quantity'));
+			let currentQuantity = parseInt($(quantityInputField).val());
+			if (currentQuantity > maximumQuantity) {
+				$(quantityInputField).siblings('p').show();
+			} else {
+				$(quantityInputField).siblings('p').hide();
 			}
 		});
 

@@ -72,9 +72,11 @@
 								{* Block for booking products *}
 								{if isset($id_hotel) && $id_hotel}&nbsp;-&nbsp;{$hotel_name}{/if}
 							</span>
+							{hook h='displayRoomTypeDetailRoomTypeNameBlock' id_product=$product->id}
 						</div>
 						{hook h='displayRoomTypeDetailRoomTypeNameAfter' id_product=$product->id}
 					</div>
+					{hook h='displayRoomTypeDetailRoomTypeImageBlockBefore' id_product=$product->id}
 					<!-- product img-->
 					<div class="row">
 

@@ -1,1 +1,0 @@
-## QloApps Contact Block v1.0.0

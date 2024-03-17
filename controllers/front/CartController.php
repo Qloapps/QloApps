@@ -319,29 +319,41 @@ class CartControllerCore extends FrontController
                     $serviceProducts = json_decode(Tools::getValue('serviceProducts'),true);
 
                     // valdiate occupancy if providede
-                    if ($operator == 'up') {
-                        if ($occupancyRequiredForBooking) {
-                            foreach($occupancy as $key => $roomOccupancy) {
-                                if (!isset($roomOccupancy['adults']) || !$roomOccupancy['adults'] || !Validate::isUnsignedInt($roomOccupancy['adults'])) {
-                                    $this->errors[] = sprintf(Tools::displayError('Invalid number of adults for Room %s.'), ($key + 1));
+                    if ($operator == 'up' && $occupancyRequiredForBooking) {
+                        foreach($occupancy as $key => $roomOccupancy) {
+                            if (!isset($roomOccupancy['adults']) || !$roomOccupancy['adults'] || !Validate::isUnsignedInt($roomOccupancy['adults'])) {
+                                $this->errors[] = sprintf(Tools::displayError('Invalid number of adults for Room %s.'), ($key + 1));
+                            }
+                            if (isset($roomOccupancy['children'])) {
+                                if (!Validate::isUnsignedInt($roomOccupancy['children'])) {
+                                    $this->errors[] = sprintf(Tools::displayError('Invalid number of children for Room %s.'), ($key + 1));
                                 }
-                                if (isset($roomOccupancy['children'])) {
-                                    if (!Validate::isUnsignedInt($roomOccupancy['children'])) {
-                                        $this->errors[] = sprintf(Tools::displayError('Invalid number of children for Room %s.'), ($key + 1));
-                                    }
-                                    if ($roomOccupancy['children'] > 0) {
-                                        if (!isset($roomOccupancy['child_ages']) || ($roomOccupancy['children'] != count($roomOccupancy['child_ages'])) || !is_array($roomOccupancy['child_ages'])) {
-                                            $this->errors[] = sprintf(Tools::displayError('Please provide all children age for Room %s.'), ($key + 1));
-                                        } else {
-                                            if (is_array($roomOccupancy['child_ages'])) {
-                                                foreach($roomOccupancy['child_ages'] as $childAge) {
-                                                    if (!Validate::isUnsignedInt($childAge)) {
-                                                        $this->errors[] = sprintf(Tools::displayError('Invalid children age for Room %s.'), ($key + 1));
-                                                    }
+                                if ($roomOccupancy['children'] > 0) {
+                                    if (!isset($roomOccupancy['child_ages']) || ($roomOccupancy['children'] != count($roomOccupancy['child_ages'])) || !is_array($roomOccupancy['child_ages'])) {
+                                        $this->errors[] = sprintf(Tools::displayError('Please provide all children age for Room %s.'), ($key + 1));
+                                    } else {
+                                        if (is_array($roomOccupancy['child_ages'])) {
+                                            foreach($roomOccupancy['child_ages'] as $childAge) {
+                                                if (!Validate::isUnsignedInt($childAge)) {
+                                                    $this->errors[] = sprintf(Tools::displayError('Invalid children age for Room %s.'), ($key + 1));
                                                 }
                                             }
                                         }
                                     }
+                                }
+                            }
+                        }
+
+                        if (!count($this->errors)) {
+                            foreach($occupancy as $key => $roomOccupancy) {
+                                if ($roomOccupancy['adults'] > $roomTypeInfo['max_adults']) {
+                                    $this->errors[] = sprintf(Tools::displayError('Room %s cannot have adults more than %s adults'), $key + 1, $roomTypeInfo['max_adults']);
+                                }
+                                if ($roomOccupancy['children'] > $roomTypeInfo['max_children']) {
+                                    $this->errors[] = sprintf(Tools::displayError('Room %s cannot have children more than %s children'), $key + 1, $roomTypeInfo['max_children']);
+                                }
+                                if ($roomOccupancy['adults'] + $roomOccupancy['children'] > $roomTypeInfo['max_guests']) {
+                                    $this->errors[] = sprintf(Tools::displayError('Room %s cannot have total guests more than %s'), $key + 1, $roomTypeInfo['max_guests']);
                                 }
                             }
                         }
@@ -359,19 +371,6 @@ class CartControllerCore extends FrontController
                             ) {
                                 $maxOrdDate = date('d-m-Y', strtotime($maxOrdDate));
                                 $this->errors[] = Tools::displayError('You can\'t book room after date '.$maxOrdDate);
-                            }
-                        }
-                        if ($occupancyRequiredForBooking) {
-                            foreach($occupancy as $key => $roomOccupancy) {
-                                if ($roomOccupancy['adults'] > $roomTypeInfo['max_adults']) {
-                                    $this->errors[] = sprintf(Tools::displayError('Room %s cannot have adults more than %s adults'), $key + 1, $roomTypeInfo['max_adults']);
-                                }
-                                if ($roomOccupancy['children'] > $roomTypeInfo['max_children']) {
-                                    $this->errors[] = sprintf(Tools::displayError('Room %s cannot have children more than %s children'), $key + 1, $roomTypeInfo['max_children']);
-                                }
-                                if ($roomOccupancy['adults'] + $roomOccupancy['children'] > $roomTypeInfo['max_guests']) {
-                                    $this->errors[] = sprintf(Tools::displayError('Room %s cannot have total guests more than %s'), $key + 1, $roomTypeInfo['max_guests']);
-                                }
                             }
                         }
                         if (!$this->errors) {

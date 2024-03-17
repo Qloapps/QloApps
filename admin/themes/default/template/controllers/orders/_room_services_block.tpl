@@ -53,10 +53,13 @@
 										<span class="badge badge-info label">{l s='Convenience fee'}</span>
 									{/if}
 								</td>
-								<td>
+								<td class="col-sm-4">
 									{if $service['allow_multiple_quantity']}
 										<div class="qty_container">
-											<input type="number" class="form-control qty" min="1" data-id_room_type_service_product_order_detail="{$service['id_room_type_service_product_order_detail']}" data-id_product="{$service['id_product']|escape:'html':'UTF-8'}" value="{$service['quantity']|escape:'html':'UTF-8'}">
+											<input type="number" class="form-control qty" min="1" data-max-quantity="{$service['max_quantity']}" data-id_room_type_service_product_order_detail="{$service['id_room_type_service_product_order_detail']}" data-id_product="{$service['id_product']|escape:'html':'UTF-8'}" value="{$service['quantity']|escape:'html':'UTF-8'}">
+											<p style="display:{if $service['quantity'] > $service['max_quantity']}block{else}none{/if}; margin-top: 4px;">
+												<span class="label label-warning">{l s='Maximum allowed quantity: %s' sprintf=$service['max_quantity']}</span>
+											</p>
 										</div>
 									{else}
 										--

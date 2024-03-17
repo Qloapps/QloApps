@@ -196,13 +196,14 @@ class RoomTypeServiceProductOrderDetail extends ObjectModel
 
         $sql = 'SELECT rsod.*';
         if (!$getTotalPrice) {
-            $sql .= ', hbd.`id_product` as `room_type_id_product`, hbd.`id_room`, od.`product_allow_multiple_quantity`,
+            $sql .= ', hbd.`id_product` as `room_type_id_product`, hbd.`id_room`, od.`product_allow_multiple_quantity`, p.`max_quantity`,
                 od.`product_auto_add`, od.`product_price_calculation_method`, od.`product_price_addition_type`';
         }
         $sql .= ' FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
             INNER JOIN `'._DB_PREFIX_.'htl_room_type_service_product_order_detail` rsod ON(rsod.`id_htl_booking_detail` = hbd.`id`)';
 
         $sql .= ' LEFT JOIN `'._DB_PREFIX_.'order_detail` od ON(od.`id_order_detail` = rsod.`id_order_detail`)';
+        $sql .= ' INNER JOIN `'._DB_PREFIX_.'product` p ON (p.`id_product` = rsod.`id_product`)';
 
         $sql .= ' WHERE hbd.`id` = '.(int)$idHotelBookingDetail;
 
@@ -229,6 +230,7 @@ class RoomTypeServiceProductOrderDetail extends ObjectModel
                             'name' => $product['name'],
                             'quantity' => $product['quantity'],
                             'allow_multiple_quantity' => $product['product_allow_multiple_quantity'],
+                            'max_quantity' => $product['max_quantity'],
                             'product_auto_add' => $product['product_auto_add'],
                             'product_price_addition_type' => $product['product_price_addition_type'],
                             'product_price_calculation_method' => $product['product_price_calculation_method'],
@@ -253,6 +255,7 @@ class RoomTypeServiceProductOrderDetail extends ObjectModel
                                 'name' => $product['name'],
                                 'quantity' => $product['quantity'],
                                 'allow_multiple_quantity' => $product['product_allow_multiple_quantity'],
+                                'max_quantity' => $product['max_quantity'],
                                 'product_auto_add' => $product['product_auto_add'],
                                 'product_price_addition_type' => $product['product_price_addition_type'],
                                 'product_price_calculation_method' => $product['product_price_calculation_method'],
