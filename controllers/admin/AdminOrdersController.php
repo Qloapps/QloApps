@@ -5997,97 +5997,69 @@ class AdminOrdersControllerCore extends AdminController
     // To change the status of the room
     public function changeRoomStatus()
     {
-        $idRoom = (int) Tools::getValue('id_room');
-        $idOrder = (int) Tools::getValue('id_order');
-        $dateFrom = Tools::getValue('date_from');
-        $dateTo = Tools::getValue('date_to');
-        $newStatus = (int) Tools::getValue('booking_order_status');
+        $idHotelBookingDetail = (int) Tools::getValue('id_hotel_booking_detail');
+        if (Validate::isLoadedObject($objHotelBookingDetail = new HotelBookingDetail($idHotelBookingDetail))) {
+            $newStatus = (int) Tools::getValue('booking_order_status');
+            // date choosen for the status change
+            if ($statusDate = Tools::getValue('status_date')) {
+                $statusDate = date('Y-m-d H:i:s', strtotime($statusDate));
+            }
 
-        // date choosen for the status change
-        if ($statusDate = Tools::getValue('status_date')) {
-            $statusDate = date('Y-m-d', strtotime($statusDate));
-        }
-        // Lets validate the fields
-        if (!$idRoom) {
-            $this->errors[] = Tools::displayError('Room information not found.');
-        }
-        if (!$idOrder) {
-            $this->errors[] = Tools::displayError('Order information not found.');
-        }
-        if (!$dateFrom
-            || !$dateTo
-            || !Validate::isDate($dateFrom)
-            || !Validate::isDate($dateTo)
-        ) {
-            $this->errors[] = Tools::displayError('Invalid dates found.');
-        }
-
-        if (!$newStatus) {
-            $this->errors[] = Tools::displayError('Invalid booking status found.');
-        } elseif (
-            $newStatus == HotelBookingDetail::STATUS_CHECKED_IN
-            || $newStatus == HotelBookingDetail::STATUS_CHECKED_OUT
-        ) {
-            if (!$statusDate || !Validate::isDate($statusDate)) {
-                $this->errors[] = Tools::displayError('Invalid dates found.');
-            } elseif ((strtotime($statusDate) < strtotime($dateFrom))
-                || (strtotime($statusDate) > strtotime($dateTo))
+            $dateFrom = date('Y-m-d H:i:s', strtotime(date('Y-m-d', strtotime($objHotelBookingDetail->date_from))));
+            $dateTo = date('Y-m-d H:i:s', strtotime(date('Y-m-d', strtotime($objHotelBookingDetail->date_to)).' 23:59:59'));
+            if (!$newStatus) {
+                $this->errors[] = Tools::displayError('Invalid booking status found.');
+            } elseif ($newStatus == HotelBookingDetail::STATUS_CHECKED_IN
+                || $newStatus == HotelBookingDetail::STATUS_CHECKED_OUT
             ) {
-                $this->errors[] = Tools::displayError('Invalid dates found.');
-            }
-        }
-
-        if (!count($this->errors)) {
-            $objBookingDetail = new HotelBookingDetail();
-            if ($roomBookingInfo = $objBookingDetail->getRoomBookingData($idRoom, $idOrder, $dateFrom, $dateTo)) {
-                //  if admin choose Check-Out status
-                if ($newStatus == HotelBookingDetail::STATUS_CHECKED_OUT
-                    && $roomBookingInfo['check_in'] ==  '0000-00-00 00:00:00'
+                if (!$statusDate || !Validate::isDate($statusDate)) {
+                    $this->errors[] = Tools::displayError('Invalid dates found.');
+                } elseif ((strtotime($statusDate) < strtotime($dateFrom))
+                    || (strtotime($statusDate) > strtotime($dateTo))
                 ) {
-                    $this->errors[] = Tools::displayError('Room status must be set to Check-In before setting the room status to Check-Out.');
-                } elseif ($newStatus == HotelBookingDetail::STATUS_CHECKED_OUT
-                    && $roomBookingInfo['check_in'] !=  '0000-00-00 00:00:00'
-                    && strtotime($roomBookingInfo['check_in']) >= strtotime($statusDate)
-                ) {
-                    $this->errors[] = Tools::displayError('Check-Out date can not be before Check-In date').
-                    '('.date('d-m-Y', strtotime($roomBookingInfo['check_in'])).')';
-                } elseif ($newStatus == HotelBookingDetail::STATUS_CHECKED_IN && $roomBookingInfo['check_out'] ==  '0000-00-00 00:00:00'
-                    && strtotime($roomBookingInfo['check_in']) >= strtotime($dateTo)
-                ) {
-                    $this->errors[] = Tools::displayError('Check-In date can not be after Check-Out date').
-                    '('.date('d-m-Y', strtotime($roomBookingInfo['date_to'])).')';
-                } elseif ($newStatus == HotelBookingDetail::STATUS_CHECKED_IN && $roomBookingInfo['check_out'] !=  '0000-00-00 00:00:00'
-                    && strtotime($roomBookingInfo['check_out']) <= strtotime($statusDate)
-                ) {
-                    $this->errors[] = Tools::displayError('Check-In date can not be after Check-Out date').
-                    '('.date('d-m-Y', strtotime($roomBookingInfo['check_out'])).')';
-                } else {
-                    if ($objBookingDetail->updateBookingOrderStatusByOrderId(
-                        $idOrder,
-                        $newStatus,
-                        $idRoom,
-                        $dateFrom,
-                        $dateTo,
-                        $statusDate
-                    )) {
-                        Hook::exec(
-                            'actionRoomBookingStatusUpdateAfter',
-                            array(
-                                'id_order' => $idOrder,
-                                'id_room' => $idRoom,
-                                'date_from' => $dateFrom,
-                                'date_to' => $dateTo
-                            )
-                        );
-
-                        Tools::redirectAdmin(self::$currentIndex.'&id_order='.(int) $idOrder.'&vieworder&token='.$this->token.'&conf=4');
-                    } else {
-                        $this->errors[] = Tools::displayError('Some error occurred. Please try again.');
-                    }
+                    $this->errors[] = Tools::displayError('Date should be between booking from date and to date.');
                 }
-            } else {
-                $this->errors[] = Tools::displayError('Invalid booking information. Please try again.');
             }
+            if ($newStatus == HotelBookingDetail::STATUS_CHECKED_OUT) {
+                if ($objHotelBookingDetail->check_in ==  '0000-00-00 00:00:00') {
+                    $this->errors[] = Tools::displayError('Room status must be set to Check-In before setting the room status to Check-Out.');
+                } elseif (strtotime($objHotelBookingDetail->check_in) > strtotime($statusDate)) {
+                    $this->errors[] = sprintf(
+                        Tools::displayError('Check-Out date can not be before Check-In date (%s)'),
+                        date('d-m-Y', strtotime($objHotelBookingDetail->check_in))
+                    );
+                }
+            }
+
+            if (empty($this->errors)) {
+                $objHotelBookingDetail->id_status = $newStatus;
+                if ($newStatus == HotelBookingDetail::STATUS_CHECKED_IN) {
+                    $objHotelBookingDetail->check_in = $statusDate;
+                } elseif ($newStatus == HotelBookingDetail::STATUS_CHECKED_OUT) {
+                    $objHotelBookingDetail->check_out = $statusDate;
+                } else {
+                    $objHotelBookingDetail->check_in = '';
+                    $objHotelBookingDetail->check_out = '';
+                }
+                if ($objHotelBookingDetail->save()) {
+                    Hook::exec(
+                        'actionRoomBookingStatusUpdateAfter',
+                        array(
+                            'id_hotel_booking_detail' => $objHotelBookingDetail->id,
+                            'id_order' => $objHotelBookingDetail->id_order,
+                            'id_room' => $objHotelBookingDetail->id_room,
+                            'date_from' => $objHotelBookingDetail->date_from,
+                            'date_to' => $objHotelBookingDetail->date_to
+                        )
+                    );
+
+                    Tools::redirectAdmin(self::$currentIndex.'&id_order='.(int) $objHotelBookingDetail->id_order.'&vieworder&token='.$this->token.'&conf=4');
+                } else {
+                    $this->errors[] = Tools::displayError('Some error occurred. Please try again.');
+                }
+            }
+        } else {
+            $this->errors[] = Tools::displayError('Invalid booking information. Please try again.');
         }
     }
 

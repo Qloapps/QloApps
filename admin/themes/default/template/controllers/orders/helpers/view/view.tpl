@@ -325,8 +325,8 @@
                                                                 {/if}
 
                                                                 {* field for the current date *}
-                                                                <input class="room_status_date wk-input-date" type="text" name="status_date" value="{if $data['id_status'] == $hotel_order_status['STATUS_CHECKED_IN']['id_status']}{$data['date_to']|date_format:"%d-%m-%Y"}{else}{$data['date_from']|date_format:"%d-%m-%Y"}{/if}" readonly/>
-
+                                                                <input class="room_status_date wk-input-date" type="text" name="status_date" value="{if $data['id_status'] == $hotel_order_status['STATUS_CHECKED_IN']['id_status']}{$data['date_to']|date_format:"%d-%m-%Y"} {$data['check_out_time']}{else}{$data['date_from']|date_format:"%d-%m-%Y"} {$data['check_in_time']}{/if}" readonly/>
+																<input type="hidden" name="id_hotel_booking_detail" value="{$data['id']}" />
                                                                 <input type="hidden" name="date_from" value="{$data['date_from']|date_format:"%Y-%m-%d"}" />
                                                                 <input type="hidden" name="date_to" value="{$data['date_to']|date_format:"%Y-%m-%d"}" />
                                                                 <input type="hidden" name="id_room" value="{$data['id_room']}" />
@@ -1722,12 +1722,11 @@
 		{* open date picker for the date input of check-in checkout dates *}
 		$(document).on('focus', '.room_status_date', function() {
 			var dateFrom = $(this).closest('.room_status_info_form').find('[name="date_from"]').val();
-            minDate = $.datepicker.parseDate('yy-mm-dd', dateFrom);
+            minDate = new Date(dateFrom+'T00:00:00');
 
 			var dateTo = $(this).closest('.room_status_info_form').find('[name="date_to"]').val();
-            maxDate = $.datepicker.parseDate('yy-mm-dd', dateTo);
-
-			$(this).datepicker({
+            maxDate = new Date(dateTo+'T23:59:59');
+			$(this).datetimepicker({
 				dateFormat: 'dd-mm-yy',
 				minDate: minDate,
 				maxDate: maxDate,
