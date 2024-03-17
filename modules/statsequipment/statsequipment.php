@@ -179,7 +179,10 @@ class StatsEquipment extends ModuleGraph
     {
         switch ($option) {
             case 'wb':
-                $this->_titles['main'] = $this->l('Web browser used');
+                $this->_titles['main'][] = $this->l('Web browser used');
+                if (Tools::getValue('export')) {
+                    $this->_titles['main'][] = '';
+                }
                 $this->query = 'SELECT wb.`name`, COUNT(g.`id_web_browser`) AS total
 						FROM `'._DB_PREFIX_.'web_browser` wb
 						LEFT JOIN `'._DB_PREFIX_.'guest` g ON g.`id_web_browser` = wb.`id_web_browser`
@@ -191,7 +194,10 @@ class StatsEquipment extends ModuleGraph
                 break;
 
             case 'os':
-                $this->_titles['main'] = $this->l('Operating system used');
+                $this->_titles['main'][] = $this->l('Operating system used');
+                if (Tools::getValue('export')) {
+                    $this->_titles['main'][] = '';
+                }
                 $this->query = 'SELECT os.`name`, COUNT(g.`id_operating_system`) AS total
 						FROM `'._DB_PREFIX_.'operating_system` os
 						LEFT JOIN `'._DB_PREFIX_.'guest` g ON g.`id_operating_system` = os.`id_operating_system`
