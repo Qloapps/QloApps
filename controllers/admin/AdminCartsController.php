@@ -289,11 +289,12 @@ class AdminCartsControllerCore extends AdminController
         $cartHtlData = array();
         $objHotelCartBookingData = new HotelCartBookingData();
         $objHotelRoomType = new HotelRoomType();
-        $cartHtlData = $objHotelCartBookingData->getCartFormatedBookinInfoByIdCart((int) $cart->id);
-        if ($cartHtlData) {
+        if ($cartHtlData = $objHotelCartBookingData->getCartFormatedBookinInfoByIdCart((int) $cart->id)) {
             foreach ($cartHtlData as $key => $value) {
                 $cartHtlData[$key]['room_type_info'] = $objHotelRoomType->getRoomTypeInfoByIdProduct($value['id_product']);
             }
+        } else {
+            $cartHtlData = array();
         }
         //end
         $this->tpl_view_vars = array(
