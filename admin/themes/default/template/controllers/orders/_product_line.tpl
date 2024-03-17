@@ -124,6 +124,7 @@
                                     </div>
                                 </div>
                             </div>
+							<p style="display:none;"><span class="text-danger occupancy-input-errors"></span></p>
                             <div class="row children_age_info_block" {if !isset($data['child_ages']) || !$data['child_ages']}style="display:none"{/if}>
                                 <div class="col-sm-12 form-group">
                                     <label class="col-sm-12">{l s='All Children'}</label>
