@@ -22,4 +22,21 @@
 *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 *}
-{$message}
+
+{include file="$tpl_dir./errors.tpl"}
+
+{if !count($errors)}
+    <p class="alert alert-success">
+        {l s='Thank you for subscribing to our newsletter.' mod='blocknewsletter'}
+    </p>
+
+    <p class="msg-redirect">
+        {l s='You will be redirected to home page in ' mod='blocknewsletter'}
+        <span class="countdown-seconds">{l s='5' mod='blocknewsletter'}</span>
+        {l s='seconds.' mod='blocknewsletter'}
+    </p>
+
+    <a href="{$link->getPageLink('index')}" class="btn btn-primary btn-homepage">
+        <span>{l s='Home Page' mod='blocknewsletter'}</span>
+    </a>
+{/if}

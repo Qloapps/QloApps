@@ -221,10 +221,12 @@ class ContactControllerCore extends FrontController
         $this->addJS(_PS_JS_DIR_.'validate.js');
 
         // GOOGLE MAP
-        $language = $this->context->language;
-        $country = $this->context->country;
-        $PS_API_KEY = Configuration::get('PS_API_KEY');
-        $this->addJs("https://maps.googleapis.com/maps/api/js?key=$PS_API_KEY&libraries=places&language=$language->iso_code&region=$country->iso_code");
+        if (($PS_API_KEY = Configuration::get('PS_API_KEY')) && Configuration::get('WK_GOOGLE_ACTIVE_MAP')) {
+            $this->addJS(
+                'https://maps.googleapis.com/maps/api/js?key='.$PS_API_KEY.
+                '&libraries=places&language='.$this->context->language->iso_code.'&region='.$this->context->country->iso_code
+            );
+        }
     }
 
     /**
@@ -303,7 +305,7 @@ class ContactControllerCore extends FrontController
         );
 
         //By webkul to send hotels Map Informations for google Map.
-        if (Configuration::get('WK_GOOGLE_ACTIVE_MAP')) {
+        if (Configuration::get('PS_API_KEY') && Configuration::get('WK_GOOGLE_ACTIVE_MAP')) {
             $hotelLocationArray = $objHotelInfo->getMapFormatHotelsInfo(Configuration::get('WK_MAP_HOTEL_ACTIVE_ONLY'));
             if ($hotelLocationArray) {
                 $this->context->smarty->assign('hotelLocationArray', json_encode($hotelLocationArray));

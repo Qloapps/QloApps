@@ -136,10 +136,7 @@ class StatsBestProducts extends ModuleGrid
         }
 
         $html = '<div class="panel-heading">'.$this->displayName.'</div>';
-        if (!(Module::isEnabled('statsdata') && Configuration::get('PS_STATSDATA_PAGESVIEWS'))) {
-			$link = $this->context->link->getAdminLink('AdminModules').'&configure=statsdata';
-            $html .= '<div class="alert alert-info">'.$this->l('You must enable the "Save global page views" option from ').'<u><a href="'.$link.'" target="_blank">Data mining for statistics</a></u>'.$this->l(' module in order to display the most viewed room types, or use the QloApps Google Analytics module.').'</div>';
-        }
+
         $html .= $this->engine($engine_params).'
 		<a class="btn btn-default export-csv" href="'.Tools::safeOutput($_SERVER['REQUEST_URI'].'&export=1').'">
 			<i class="icon-cloud-download"></i> '.$this->l('CSV Export').'
@@ -209,7 +206,8 @@ class StatsBestProducts extends ModuleGrid
         ON (hrt.`id_product` = p.`id_product`)
         LEFT JOIN `'._DB_PREFIX_.'htl_branch_info_lang` hbil
         ON (hbil.`id` = hrt.`id_hotel` AND hbil.`id_lang` = '.(int) $id_lang .')
-        WHERE p.`booking_product` = 1';
+        WHERE p.`booking_product` = 1
+        '.HotelBranchInformation::addHotelRestriction(false, 'hbil', 'id');
 
         if (Validate::IsName($this->_sort)) {
             $this->query .= ' ORDER BY `'.bqSQL($this->_sort).'`';

@@ -53,8 +53,8 @@
 				</dl>
 			</div>
 			<div class="col-md-4 col-xs-6">
-				<dl class="label-tooltip" onclick="selectDashtrendsChart(this, 'orders');" data-toggle="tooltip" data-placement="top" data-original-title="{l s='Total number of bookings received within the date range that are considered validated.' mod='dashtrends'}" data-placement="bottom" style='background-color: #56CE56;'>
-					<dt>{l s='Bookings' mod='dashtrends'}</dt>
+				<dl class="label-tooltip" onclick="selectDashtrendsChart(this, 'orders');" data-toggle="tooltip" data-placement="top" data-original-title="{l s='Total number of orders received within the date range that are considered validated.' mod='dashtrends'}" data-placement="bottom" style='background-color: #56CE56;'>
+					<dt>{l s='Orders' mod='dashtrends'}</dt>
 					<dd class="data_value size_l"><span id="orders_score"></span></dd>
 				</dl>
 			</div>
@@ -85,11 +85,6 @@
 		</section>
 		<div id="dash_trends_chart1" class="chart with-transitions">
 			<svg></svg>
-		</div>
-		<div class="col-sm-12 ">
-			<p id="no-chart-info" class="alert alert-info no-chart-info">
-				{l s='The graph is unavailable when selecting this date range. Select another date range for the graph.' mod='dashtrends'}
-			</p>
 		</div>
 		<div class='clearfix'></div>
 	</section>

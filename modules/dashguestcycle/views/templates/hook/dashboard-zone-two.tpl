@@ -51,7 +51,7 @@
                 </li>
                 <li>
                     <a href="#dgc_current_new_bookings" data-toggle="tab">
-                        <span>{l s='Bookings' mod='dashguestcycle'}</span>
+                        <span>{l s='New Bookings' mod='dashguestcycle'}</span>
                         <span class="label label-info" id="dgc_count_new_bookings">0</span>
                     </a>
                 </li>
@@ -61,6 +61,7 @@
                         <span class="label label-info" id="dgc_count_cancellations">0</span>
                     </a>
                 </li>
+                {hook h='displayDashGuestCycleTab'}
             </ul>
 
             <div class="tab-content panel panel-sm">
@@ -94,6 +95,7 @@
                         <tbody></tbody>
                     </table>
                 </div>
+                {hook h='displayDashGuestCycleTabContent'}
             </div>
         </section>
     </section>
