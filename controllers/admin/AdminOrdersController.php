@@ -96,6 +96,22 @@ class AdminOrdersControllerCore extends AdminController
 
         $this->_group = ' GROUP BY hbd.`id_order`';
 
+        // if request for resolvable overbooked orders filter comes the set condition for this
+        if (Tools::getIsset('resolvable_overbooked_orders') && Tools::getValue('resolvable_overbooked_orders')) {
+            $objHotelBookingDetail = new HotelBookingDetail();
+            $resolvableOrders = array();
+            // Overbookings information of the order
+            if ($orderOverBookings = $objHotelBookingDetail->getOverbookedRooms()) {
+                foreach ($orderOverBookings as $overBookedRoom) {
+                    if (!in_array($overBookedRoom['id_order'], $resolvableOrders)) {
+                        $resolvableOrders[$overBookedRoom['id_order']] = $overBookedRoom['id_order'];
+                    }
+                }
+            }
+            $this->_where = ' AND a.`id_order` IN ('.implode(',', $resolvableOrders).')';
+        }
+
+
         $statuses = OrderState::getOrderStates((int)$this->context->language->id);
         foreach ($statuses as $status) {
             $this->statuses_array[$status['id_order_state']] = $status['name'];
@@ -326,6 +342,8 @@ class AdminOrdersControllerCore extends AdminController
 
         parent::__construct();
 
+        // overbooking success status
+        $this->_conf[51] = $this->l('Overbooking is successfully resolved');
         $this->_conf[52] = $this->l('Room in the booking is successfully reallocated');
         $this->_conf[53] = $this->l('Room in the booking is successfully swapped');
     }
@@ -610,6 +628,13 @@ class AdminOrdersControllerCore extends AdminController
 
     public function renderList()
     {
+        // Show all resolvable overbookings if available
+        $objHotelBookingDetail = new HotelBookingDetail();
+        if ($resolvableOverBookings = $objHotelBookingDetail->getOverbookedRooms(0, 0, '', '', 0, 0, 2)) {
+            $this->context->smarty->assign('resolvableOverBookings', $resolvableOverBookings);
+            $this->content .= $this->context->smarty->fetch('controllers/orders/_resolvable_overbookings.tpl');
+        }
+
         if (Tools::isSubmit('submitBulkupdateOrderStatus'.$this->table)) {
             if (Tools::getIsset('cancel')) {
                 Tools::redirectAdmin(self::$currentIndex.'&token='.$this->token);
@@ -1701,7 +1726,20 @@ class AdminOrdersControllerCore extends AdminController
             } else {
                 $this->errors[] = Tools::displayError('You do not have permission to edit this.');
             }
+        } elseif(Tools::getIsset('resolve_overbooking') && Tools::getValue('resolve_overbooking')) {
+            $objHotelBookingDetail = new HotelBookingDetail();
+            // resolve an overbooking manually
+            if ($objHotelBookingDetail->resolveOverbookings(Tools::getValue('resolve_overbooking'))) {
+                if (Tools::getValue('id_order')) {
+                    Tools::redirectAdmin(self::$currentIndex.'&id_order='.$order->id.'&vieworder&conf=51&token='.$this->token);
+                } else {
+                    Tools::redirectAdmin(self::$currentIndex.'&conf=51&token='.$this->token);
+                }
+            } else {
+                $this->errors = Tools::displayError('An error occurred while resolving overbooking.');
+            }
         }
+
         parent::postProcess();
     }
 
@@ -2168,8 +2206,12 @@ class AdminOrdersControllerCore extends AdminController
         // applicable refund policies
         $applicableRefundPolicies = HotelOrderRefundRules::getApplicableRefundRules($order->id);
 
+        // Overbookings information of the order
+        $orderOverBookings = $objHotelBookingDetail->getOverbookedRooms($order->id, 0, '', '', 0, 0, 1);
+
         $this->tpl_view_vars = array(
             // refund info
+            'orderOverBookings' => $orderOverBookings,
             'refund_allowed' => (int) $order->isReturnable(),
             'applicable_refund_policies' => $applicableRefundPolicies,
             'returns' => OrderReturn::getOrdersReturn($order->id_customer, $order->id),

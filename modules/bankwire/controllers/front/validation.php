@@ -55,9 +55,8 @@ class BankwireValidationModuleFrontController extends ModuleFrontController
 		// Check Order restrict condition before Payment by the customer
 		if (Module::isInstalled('hotelreservationsystem') && Module::isEnabled('hotelreservationsystem')) {
             require_once _PS_MODULE_DIR_.'hotelreservationsystem/define.php';
-            $order_restrict_error = HotelOrderRestrictDate::validateOrderRestrictDateOnPayment($this);
-            if ($order_restrict_error) {
-                die($this->errors);
+            if (HotelOrderRestrictDate::validateOrderRestrictDateOnPayment($this)) {
+                Tools::redirect('index.php?controller=order-opc');
             }
         }
 

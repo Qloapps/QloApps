@@ -58,6 +58,18 @@ class AdminOrderPreferencesControllerCore extends AdminController
             )
         );
 
+        // actions when overbooking will be created
+        $overbookingAction = array(
+            array(
+                'value' => Order::OVERBOOKING_ORDER_CANCEL_ACTION,
+                'name' => $this->l('Cancel the booking')
+            ),
+            array(
+                'value' => Order::OVERBOOKING_ORDER_NO_ACTION,
+                'name' => $this->l('Take the overbooking')
+            )
+        );
+
         // Options to display currency in order list
         $displayCurrencyOptions = array(
             array(
@@ -195,33 +207,83 @@ class AdminOrderPreferencesControllerCore extends AdminController
                 'submit' => array('title' => $this->l('Save'))
             ),
             'email' => array(
-                'title' =>    $this->l('Email'),
+                'title' =>    $this->l('Order Confirmation / Overbooking Email'),
                 'icon' =>    'icon-cogs',
                 'fields' =>    array(
                     'PS_ORDER_CONF_MAIL_TO_CUSTOMER' => array(
-                        'title' => $this->l('Order confirmation mail to customer'),
-                        'hint' => $this->l('Enable, if you want to send order confirmation email to the customer.'),
+                        'title' => $this->l('Send email to customer'),
+                        'hint' => $this->l('Enable, if you want to send order confirmation or overbooking or overbooking email to the customer.'),
                         'validation' => 'isBool',
                         'cast' => 'intval',
                         'type' => 'bool'
                     ),
                     'PS_ORDER_CONF_MAIL_TO_SUPERADMIN' => array(
-                        'title' => $this->l('Order confirmation mail to super admin'),
-                        'hint' => $this->l('Enable, if you want to send order confirmation email to the super admin.'),
+                        'title' => $this->l('Send email to super admin'),
+                        'hint' => $this->l('Enable, if you want to send order confirmation or overbooking email to the super admin.'),
                         'validation' => 'isBool',
                         'cast' => 'intval',
                         'type' => 'bool'
                     ),
                     'PS_ORDER_CONF_MAIL_TO_HOTEL_MANAGER' => array(
-                        'title' => $this->l('Order confirmation mail to hotelier'),
-                        'hint' => $this->l('Enable, if you want to send order confirmation email to the hotelier. Mail will be sent to the email saved while creating the hotel.'),
+                        'title' => $this->l('Send email to hotelier'),
+                        'hint' => $this->l('Enable, if you want to send order confirmation or overbooking email to the hotelier. Mail will be sent to the email saved while creating the hotel.'),
                         'validation' => 'isBool',
                         'cast' => 'intval',
                         'type' => 'bool'
                     ),
                     'PS_ORDER_CONF_MAIL_TO_EMPLOYEE' => array(
-                        'title' => $this->l('Order confirmation mail to employees'),
-                        'hint' => $this->l('Enable, if you want to send order confirmation email to employees having permission to manage the hotel.'),
+                        'title' => $this->l('Send email to employees'),
+                        'hint' => $this->l('Enable, if you want to send order confirmation or overbooking email to employees having permission to manage the hotel.'),
+                        'validation' => 'isBool',
+                        'cast' => 'intval',
+                        'type' => 'bool'
+                    ),
+                ),
+                'submit' => array('title' => $this->l('Save'))
+            ),
+            'overbooking' => array(
+                'title' => $this->l('Overbooking'),
+                'icon' => 'icon-cogs',
+                'fields' => array(
+                    'PS_OVERBOOKING_ORDER_ACTION' => array(
+                        'title' => $this->l('Overbooking order action'),
+                        'hint' => $this->l('Please choose the action to take when overbooking is created in any order.'),
+                        'validation' => 'isInt',
+                        'type' => 'select',
+                        'cast' => 'intval',
+                        'validation' => 'isInt',
+                        'list' => $overbookingAction,
+                        'identifier' => 'value',
+                        'js' => "changeOverbookingOrderAction()"
+                    ),
+                    'PS_MAX_OVERBOOKING_PER_HOTEL_PER_DAY' => array(
+                        'title' => $this->l('Maximun hotel overbookings per date'),
+                        'hint' => $this->l('Enter the maximum number of the overbookings on any date can be created for a hotel.(Set 0 for no limit)'),
+                        'desc' => $this->l('When maximun number of the overbookings on any date in the booking duration is reached, then the new overbooking order will be cancelled.(Set 0 for no limit)'),
+                        'validation' => 'isInt',
+                        'type' => 'text',
+                        'class' => 'fixed-width-xxl',
+                        'validation' => 'isInt',
+                        'id' => 'PS_MAX_OVERBOOKING_PER_HOTEL_PER_DAY',
+                    ),
+                    'OVERBOOKING_ORDER_CANCEL_ACTION' => array(
+                        'title' => $this->l('Overbooking order cancel action value'),
+                        'type' => 'hidden',
+                        'value' => Order::OVERBOOKING_ORDER_CANCEL_ACTION,
+                        'auto_value' => false,
+                    ),
+                    'OVERBOOKING_ORDER_NO_ACTION' => array(
+                        'title' => $this->l('Overbooking order no action value'),
+                        'validation' => 'isInt',
+                        'cast' => 'intval',
+                        'type' => 'hidden',
+                        'value' => Order::OVERBOOKING_ORDER_NO_ACTION,
+                        'auto_value' => false
+                    ),
+                    'PS_OVERBOOKING_AUTO_RESOLVE' => array(
+                        'title' => $this->l('Resolve overbooking automatically'),
+                        'hint' => $this->l('Enable, if you want to resolve overbooking automatically when rooms are available to be replaced with overbooked rooms.'),
+                        'desc' => $this->l('If enabled, the overbookings in the order will be resolved automatically when rooms are available to be replaced with all overbooked rooms in the order.'),
                         'validation' => 'isBool',
                         'cast' => 'intval',
                         'type' => 'bool'

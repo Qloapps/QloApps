@@ -335,6 +335,12 @@
 	<configuration id="PS_GUEST_CHECKOUT_ENABLED" name="PS_GUEST_CHECKOUT_ENABLED">
 		<value>0</value>
 	</configuration>
+    <configuration id="PS_OVERBOOKING_ORDER_ACTION" name="PS_OVERBOOKING_ORDER_ACTION">
+		<value>1</value>
+	</configuration>
+    <configuration id="PS_MAX_OVERBOOKING_PER_HOTEL_PER_DAY" name="PS_MAX_OVERBOOKING_PER_HOTEL_PER_DAY">
+		<value>0</value>
+	</configuration>
 	<configuration id="PS_ORDER_CONF_MAIL_TO_CUSTOMER" name="PS_ORDER_CONF_MAIL_TO_CUSTOMER">
 		<value>1</value>
 	</configuration>
@@ -433,6 +439,9 @@
 	</configuration>
 	<configuration id="PS_OS_OVERBOOKING_UNPAID" name="PS_OS_OVERBOOKING_UNPAID">
 		<value>11</value>
+	</configuration>
+    <configuration id="PS_OS_OVERBOOKING_PARTIAL_PAID" name="PS_OS_OVERBOOKING_PARTIAL_PAID">
+		<value>12</value>
 	</configuration>
 	<!-- <configuration id="PS_OS_AWAITING_PARTIAL_PAYMENT" name="PS_OS_AWAITING_PARTIAL_PAYMENT">
 		<value>13</value>

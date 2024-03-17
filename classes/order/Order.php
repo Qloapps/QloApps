@@ -34,6 +34,10 @@ class OrderCore extends ObjectModel
     const ORDER_PAYMENT_TYPE_FULL = 1;
     const ORDER_PAYMENT_TYPE_ADVANCE = 2;
 
+    // actions when overbooking will be created
+    const OVERBOOKING_ORDER_CANCEL_ACTION = 1;
+    const OVERBOOKING_ORDER_NO_ACTION = 2;
+
     //Consts for: In the order list in which currency prices should be displayed
     const ORDER_LIST_PRICE_DISPLAY_IN_PAYMENT_CURRENCY = 1;
     const ORDER_LIST_PRICE_DISPLAY_IN_DEFAULT_CURRENCY = 2;

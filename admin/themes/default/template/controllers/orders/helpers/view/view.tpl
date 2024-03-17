@@ -68,6 +68,9 @@
 	<div>{$hook_invoice}</div>
 	{/if}
 
+  {* Overbookings information of the order *}
+  {include file='controllers/orders/_overbookings.tpl'}
+
 	<div class="row">
 		<div class="col-lg-7">
 			<div class="panel">
