@@ -211,7 +211,9 @@ abstract class ObjectModelCore implements Core_Foundation_Database_EntityInterfa
                 throw new PrestaShopException('Identifier or table format not valid for class '.$class_name);
             }
 
-            ObjectModel::$loaded_classes[$class_name] = get_object_vars($this);
+            $objProperties = get_object_vars($this);
+            Hook::exec('actionObject'.$class_name.'PropertiesModifier', array('obj_properties' => &$objProperties));
+            ObjectModel::$loaded_classes[$class_name] = $objProperties;
         } else {
             foreach (ObjectModel::$loaded_classes[$class_name] as $key => $value) {
                 $this->{$key} = $value;
@@ -1884,6 +1886,8 @@ abstract class ObjectModelCore implements Core_Foundation_Database_EntityInterfa
                     'foreign_field' => $definition['primary'],
                 );
             }
+
+            Hook::exec('actionObject'.$class.'DefinitionModifier', array('definition' => &$definition));
 
             if ($field) {
                 return isset($definition['fields'][$field]) ? $definition['fields'][$field] : null;

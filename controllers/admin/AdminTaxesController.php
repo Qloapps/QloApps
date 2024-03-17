@@ -233,7 +233,16 @@ class AdminTaxesControllerCore extends AdminController
             ),
             'submit' => array(
                 'title' => $this->l('Save')
-            )
+            ),
+            'buttons' => array(
+                'save-and-stay' => array(
+                    'title' => $this->l('Save and stay'),
+                    'name' => 'submitAdd'.$this->table.'AndStay',
+                    'type' => 'submit',
+                    'class' => 'btn btn-default pull-right',
+                    'icon' => 'process-icon-save',
+                ),
+            ),
         );
 
         return parent::renderForm();
@@ -258,7 +267,11 @@ class AdminTaxesControllerCore extends AdminController
                         if (!$result) {
                             $this->errors[] = Tools::displayError('An error occurred while updating an object.').' <b>'.$this->table.'</b>';
                         } elseif ($this->postImage($object->id)) {
-                            Tools::redirectAdmin(self::$currentIndex.'&id_'.$this->table.'='.$object->id.'&conf=4'.'&token='.$this->token);
+                            if (Tools::isSubmit('submitAdd'.$this->table.'AndStay')) {
+                                Tools::redirectAdmin(self::$currentIndex.'&update'.$this->table.'&id_'.$this->table.'='.$object->id.'&conf=4'.'&token='.$this->token);
+                            } else {
+                                Tools::redirectAdmin(self::$currentIndex.'&conf=4&token='.$this->token);
+                            }
                         }
                     } else {
                         $this->errors[] = Tools::displayError('An error occurred while updating an object.').' <b>'.$this->table.'</b> '.Tools::displayError('(cannot load object)');
@@ -272,10 +285,17 @@ class AdminTaxesControllerCore extends AdminController
                     $this->copyFromPost($object, $this->table);
                     if (!$object->add()) {
                         $this->errors[] = Tools::displayError('An error occurred while creating an object.').' <b>'.$this->table.'</b>';
-                    } elseif (($_POST['id_'.$this->table] = $object->id /* voluntary */) && $this->postImage($object->id) && $this->_redirect) {
+                    } elseif ($this->postImage($object->id)) {
+                        if (Tools::isSubmit('submitAdd'.$this->table.'AndStay')) {
+                            Tools::redirectAdmin(self::$currentIndex.'&update'.$this->table.'&id_'.$this->table.'='.$object->id.'&conf=3'.'&token='.$this->token);
+                        } else {
+                            Tools::redirectAdmin(self::$currentIndex.'&conf=3&token='.$this->token);
+                        }
                         Tools::redirectAdmin(self::$currentIndex.'&id_'.$this->table.'='.$object->id.'&conf=3'.'&token='.$this->token);
                     }
                 }
+            } else {
+                $this->display = 'add';
             }
         } else {
             parent::postProcess();

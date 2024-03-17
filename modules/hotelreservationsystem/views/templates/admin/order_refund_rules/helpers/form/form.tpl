@@ -73,14 +73,14 @@
 
 		<div class="form-group">
 			<label for="refund_payment_type" class="required control-label col-lg-3">
-				<span title="" data-toggle="tooltip" class="label-tooltip" data-original-title='{l s="Select type of deduction (percentage or fixed amount)." mod="hotelreservationsyatem"}'>{l s="Select deduction type" mod="hotelreservationsystem"}</span>
+				<span title="" data-toggle="tooltip" class="label-tooltip" data-original-title='{l s="Select type of deduction (percentage or fixed amount)." mod='hotelreservationsystem'}'>{l s="Select deduction type" mod='hotelreservationsystem'}</span>
 			</label>
 			<div class="col-lg-8">
 				<div class="row">
 					<div class="col-lg-3">
 						<select id="refund_payment_type" name="refund_payment_type">
-							<option {if isset($edit)} {if $refund_rules_info['payment_type'] == $WK_REFUND_RULE_PAYMENT_TYPE_PERCENTAGE}selected{/if}{/if} value="{$WK_REFUND_RULE_PAYMENT_TYPE_PERCENTAGE|escape:'htmlall':'UTF-8'}">{l s="Percentage" mod="hotelreservationsystem"}</option>
-							<option value="{$WK_REFUND_RULE_PAYMENT_TYPE_FIXED|escape:'htmlall':'UTF-8'}" {if isset($edit)} {if $refund_rules_info['payment_type'] == $WK_REFUND_RULE_PAYMENT_TYPE_FIXED}selected{/if}{/if}>{l s="Fixed amount" mod="hotelreservationsystem"}</option>
+							<option {if isset($edit)} {if $refund_rules_info['payment_type'] == $WK_REFUND_RULE_PAYMENT_TYPE_PERCENTAGE}selected{/if}{/if} value="{$WK_REFUND_RULE_PAYMENT_TYPE_PERCENTAGE|escape:'htmlall':'UTF-8'}">{l s="Percentage" mod='hotelreservationsystem'}</option>
+							<option value="{$WK_REFUND_RULE_PAYMENT_TYPE_FIXED|escape:'htmlall':'UTF-8'}" {if isset($edit)} {if $refund_rules_info['payment_type'] == $WK_REFUND_RULE_PAYMENT_TYPE_FIXED}selected{/if}{/if}>{l s="Fixed amount" mod='hotelreservationsystem'}</option>
 						</select>
 					</div>
 				</div>
@@ -89,7 +89,7 @@
 
 		<div class="form-group">
 			<label for="deduction_value_adv_pay" class="required control-label col-lg-3">
-				<span title="" data-toggle="tooltip" class="label-tooltip" data-original-title='{l s="Enter deduction value (percentage or fixed amount) from the total amount, which will be deducted as cancellation charges for advance payment." mod="hotelreservationsyatem"}'>{l s='Deduction value for advance payment' mod="hotelreservationsyatem"}</span>
+				<span title="" data-toggle="tooltip" class="label-tooltip" data-original-title='{l s="Enter deduction value (percentage or fixed amount) from the total amount, which will be deducted as cancellation charges for advance payment." mod='hotelreservationsystem'}'>{l s='Deduction value for advance payment' mod='hotelreservationsystem'}</span>
 			</label>
 			<div class="col-lg-2">
 				<div class="input-group">
@@ -101,7 +101,7 @@
 
 		<div class="form-group">
 			<label for="deduction_value_full_pay" class="required control-label col-lg-3">
-				<span title="" data-toggle="tooltip" class="label-tooltip" data-original-title='{l s="Enter deduction value (percentage or fixed amount) from the total amount, which will be deducted as cancellation charges for full payment." mod="hotelreservationsyatem"}'>{l s='Deduction value for full payment' mod="hotelreservationsyatem"}</span>
+				<span title="" data-toggle="tooltip" class="label-tooltip" data-original-title='{l s="Enter deduction value (percentage or fixed amount) from the total amount, which will be deducted as cancellation charges for full payment." mod='hotelreservationsystem'}'>{l s='Deduction value for full payment' mod='hotelreservationsystem'}</span>
 			</label>
 			<div class="col-lg-2">
 				<div class="input-group">
@@ -113,7 +113,7 @@
 
 		<div class="form-group">
 			<label for="cancelation_days" class="required control-label col-lg-3">
-				<span title="" data-toggle="tooltip" class="label-tooltip" data-original-title='{l s="Enter number of days before check-in date for this rule to be applicable." mod="hotelreservationsyatem"}'>{l s='Days before check-in' mod="hotelreservationsyatem"}</span>
+				<span title="" data-toggle="tooltip" class="label-tooltip" data-original-title='{l s="Enter number of days before check-in date for this rule to be applicable." mod='hotelreservationsystem'}'>{l s='Days before check-in' mod='hotelreservationsystem'}</span>
 			</label>
 			<div class="col-lg-2">
 				<input class="form-control" type="text" id="cancelation_days" name="cancelation_days" {if isset($edit)} {if isset($refund_rules_info['days'])}style = "display:block;" value="{$refund_rules_info['days']}" {/if}{/if}>
@@ -133,3 +133,10 @@
 		</div>
 	</form>
 </div>
+
+{block name=script}
+	<script type="text/javascript">
+		var id_language = {$defaultFormLanguage|intval};
+		allowEmployeeFormLang = {$allowEmployeeFormLang|intval};
+	</script>
+{/block}

@@ -208,6 +208,8 @@ class HotelHelper
         );
         Configuration::updateValue('WK_HOTEL_GLOBAL_CONTACT_NUMBER', '0987654321');
         Configuration::updateValue('WK_HOTEL_GLOBAL_CONTACT_EMAIL', 'hotelprime@htl.com');
+        Configuration::updateValue('WK_CUSTOMER_SUPPORT_PHONE_NUMBER', '0987654321');
+        Configuration::updateValue('WK_CUSTOMER_SUPPORT_EMAIL', 'hotelprime@htl.com');
 
         Configuration::updateValue('WK_TITLE_HEADER_BLOCK', $home_banner_default_title);
         Configuration::updateValue('WK_CONTENT_HEADER_BLOCK', $home_banner_default_content);
@@ -305,15 +307,16 @@ class HotelHelper
         return true;
     }
 
-    public static function getPsProducts($id_lang, $start = 0, $limit = 0)
+    public static function getPsProducts($id_lang, $start = 0, $limit = 0, $booking_product = null)
     {
-        $sql = 'SELECT p.`id_product`, pl.`name`
+        $sql = 'SELECT p.`id_product`, pl.`name`, p.`booking_product`
             FROM `'._DB_PREFIX_.'product` p
             '.Shop::addSqlAssociation('product', 'p').'
             LEFT JOIN `'._DB_PREFIX_.'product_lang` pl ON (p.`id_product` = pl.`id_product` '.
             Shop::addSqlRestrictionOnLang('pl').')
             WHERE pl.`id_lang` = '.(int)$id_lang.
-            ' ORDER BY pl.`name`'.
+            (isset($booking_product) ? ' AND p.`booking_product` = '.(int) $booking_product : '').'
+            ORDER BY pl.`name`'.
             ($limit > 0 ? ' LIMIT '.(int)$start.','.(int)$limit : '');
         return Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql);
     }
@@ -357,7 +360,7 @@ class HotelHelper
         $objAddress->city = 'Demo City';
         $objAddress->id_state = $state_id;
         $objAddress->id_country = $def_cont_id;
-        $objAddress->postcode = self::getRandomZipcodeByForCountry($def_cont_id);
+        $objAddress->postcode = Tools::generateRandomZipcode($def_cont_id);
         $objAddress->address1 = 'Monticello Dr, Montgomery, AL 36117, USA';
         $objAddress->alias = 'The Hotel Prime';
         $objAddress->lastname = 'The Hotel Prime';
@@ -434,7 +437,7 @@ class HotelHelper
                 $product->description_short[$lang['id_lang']] = 'Fashion axe kogi yuccie, ramps shabby chic direct
                 trade before they sold out distillery bicycle rights. Slow-carb +1 quinoa VHS. +1 brunch trust fund,
                 meggings chartreuse sustainable everyday carry tumblr hoodie tacos tilde ramps post-ironic fixie.';
-                $product->link_rewrite[$lang['id_lang']] = Tools::link_rewrite('Super Delux Rooms');
+                $product->link_rewrite[$lang['id_lang']] = Tools::link_rewrite($value_prod);
             }
             $product->id_shop_default = Context::getContext()->shop->id;
             $product->id_category_default = 2;
@@ -442,6 +445,7 @@ class HotelHelper
             $product->active = 1;
             $product->quantity = 999999999;
             $product->booking_product = true;
+            $product->show_at_front = 1;
             $product->is_virtual = 1;
             $product->indexed = 1;
             $product->save();
@@ -515,7 +519,7 @@ class HotelHelper
                 $htl_room_info_obj = new HotelRoomInformation();
                 $htl_room_info_obj->id_product = $product_id;
                 $htl_room_info_obj->id_hotel = $id_hotel;
-                $htl_room_info_obj->room_num = 'A-10'.$k;
+                $htl_room_info_obj->room_num = $value_prod[0].'R-10'.$k;
                 $htl_room_info_obj->id_status = 1;
                 $htl_room_info_obj->floor = 'First';
                 $htl_room_info_obj->save();
@@ -541,6 +545,170 @@ class HotelHelper
 
             // save advance payment information
             $this->saveAdvancedPaymentInfo($product_id);
+        }
+    }
+
+    public function saveDummyServiceProductsAndRelatedInfo()
+    {
+        $idCategoryServices = (int) Configuration::get('PS_SERVICE_CATEGORY');
+        $idsGroup = array_column(Group::getGroups(Context::getContext()->language->id), 'id_group');
+
+        // create service categories
+        $categories = array(
+            'meals' => array(
+                'name' => 'Meals',
+                'id_category' => 'to_be_set_below',
+            ),
+            'transfers' => array(
+                'name' => 'Transfers',
+                'id_category' => 'to_be_set_below',
+            )
+        );
+
+        foreach ($categories as &$category) {
+            $idCategory = $this->addCategory($category['name'], $idCategoryServices, $idsGroup);
+            $category['id_category'] = $idCategory;
+        }
+
+        // create service products
+        $serviceProducts = array(
+            array(
+                'name' => 'Room Maintenance Fees',
+                'id_category_default' => $idCategoryServices,
+                'description' => 'Ensure a comfortable stay with our room maintenance service, keeping your accommodation pristine and hassle-free throughout your visit.',
+                'price' => '250',
+                'auto_add_to_cart' => 1,
+                'show_at_front' => 0,
+                'price_addition_type' => Product::PRICE_ADDITION_TYPE_WITH_ROOM,
+            ),
+            array(
+                'name' => 'Internet Handling Charges',
+                'id_category_default' => $idCategoryServices,
+                'description' => 'Navigate our website effortlessly with seamless handling, ensuring reliable, high-speed access for an enjoyable browsing experience throughout your online journey.',
+                'price' => '250',
+                'auto_add_to_cart' => 1,
+                'show_at_front' => 0,
+                'price_addition_type' => Product::PRICE_ADDITION_TYPE_INDEPENDENT,
+            ),
+            array(
+                'name' => 'Airport Shuttle',
+                'id_category_default' => $categories['transfers']['id_category'],
+                'description' => 'Experience convenience from touchdown to check-in with our efficient airport shuttle service, whisking you to your accommodation with ease and comfort.',
+                'price' => '50',
+                'auto_add_to_cart' => 0,
+                'show_at_front' => 1,
+                'price_addition_type' => Product::PRICE_ADDITION_TYPE_WITH_ROOM,
+            ),
+            array(
+                'name' => 'Cab on Demand',
+                'id_category_default' => $categories['transfers']['id_category'],
+                'description' => 'Explore the city conveniently with our cab-on-demand service, giving you the freedom to travel and discover local attractions at your own pace.',
+                'price' => '200',
+                'auto_add_to_cart' => 0,
+                'show_at_front' => 1,
+            ),
+            array(
+                'name' => 'Breakfast',
+                'id_category_default' => $categories['meals']['id_category'],
+                'description' => 'Start your day right with a delicious and hearty breakfast, thoughtfully prepared to fuel your adventures and make your mornings exceptional.',
+                'price' => '350',
+                'auto_add_to_cart' => 0,
+                'show_at_front' => 1,
+            ),
+            array(
+                'name' => 'Dinner',
+                'id_category_default' => $categories['meals']['id_category'],
+                'description' => 'Wind down in the evening with a delectable dinner spread, offering a culinary journey that delights your taste buds and completes your day with satisfaction.',
+                'price' => '450',
+                'auto_add_to_cart' => 0,
+                'show_at_front' => 1,
+            ),
+        );
+
+        foreach ($serviceProducts as $serviceProduct) {
+            $objProduct = new Product();
+            $objProduct->name = array();
+            $objProduct->description = array();
+            $objProduct->description_short = array();
+            $objProduct->link_rewrite = array();
+
+            // copy lang values
+            foreach (Language::getLanguages(true) as $language) {
+                $objProduct->name[$language['id_lang']] = $serviceProduct['name'];
+                $objProduct->description[$language['id_lang']] = $serviceProduct['description'];
+                $objProduct->description_short[$language['id_lang']] = $serviceProduct['description'];
+                $objProduct->link_rewrite[$language['id_lang']] = Tools::link_rewrite($serviceProduct['name']);
+            }
+
+            $objProduct->id_shop_default = Context::getContext()->shop->id;
+            $objProduct->id_category_default = $serviceProduct['id_category_default'];
+            $objProduct->price = $serviceProduct['price'];
+            $objProduct->active = 1;
+            $objProduct->quantity = 999999999;
+            $objProduct->booking_product = 0;
+            $objProduct->service_product_type = Product::SERVICE_PRODUCT_WITH_ROOMTYPE;
+            $objProduct->auto_add_to_cart = $serviceProduct['auto_add_to_cart'];
+            $objProduct->show_at_front = $serviceProduct['show_at_front'];
+            $objProduct->available_for_order = 1;
+            if ($serviceProduct['auto_add_to_cart']) {
+                $objProduct->price_addition_type = $serviceProduct['price_addition_type'];
+            }
+            $objProduct->is_virtual = 1;
+            $objProduct->indexed = 1;
+            $objProduct->save();
+            $idProduct = $objProduct->id;
+
+            // add to applicable categories
+            $objCategory = new Category($serviceProduct['id_category_default']);
+            if ($categories = $objCategory->getParentsCategories()) {
+                $idsCategory = array();
+                foreach ($categories as $category) {
+                    $idsCategory[] = $category['id_category'];
+                }
+                $objProduct->addToCategories($idsCategory);
+            }
+
+            Search::indexation(Tools::link_rewrite($serviceProduct['name']), $idProduct);
+
+            StockAvailable::updateQuantity($idProduct, null, 999999999);
+
+            // save service product images
+            $imagesBasePath = _PS_MODULE_DIR_.'hotelreservationsystem/views/img/prod_imgs/'.$idProduct.'/';
+            $imagesTypes = ImageType::getImagesTypes('products');
+            if (is_dir($imagesBasePath) && $opendir = opendir($imagesBasePath)) {
+                while (($image = readdir($opendir)) !== false) {
+                    $sourceImagePath = $imagesBasePath.$image;
+
+                    if (ImageManager::isRealImage($sourceImagePath)
+                        && ImageManager::isCorrectImageFileExt($sourceImagePath)
+                    ) {
+                        $objImage = new Image();
+                        $objImage->id_product = $idProduct;
+                        $objImage->position = Image::getHighestPosition($idProduct) + 1;
+                        $objImage->cover = 1;
+                        $objImage->add();
+                        $destinationPath = $objImage->getPathForCreation();
+                        foreach ($imagesTypes as $imageType) {
+                            ImageManager::resize(
+                                $sourceImagePath,
+                                $destinationPath.'-'.$imageType['name'].'.jpg',
+                                $imageType['width'],
+                                $imageType['height']
+                            );
+                        }
+                        ImageManager::resize($sourceImagePath, $destinationPath.'.jpg');
+                    }
+                }
+                closedir($opendir);
+            }
+
+            // link to all demo room types
+            $objRoomTypeServiceProduct = new RoomTypeServiceProduct();
+            $objRoomTypeServiceProduct->addRoomProductLink(
+                $idProduct,
+                array(1, 2, 3, 4),
+                RoomTypeServiceProduct::WK_ELEMENT_TYPE_ROOM_TYPE
+            );
         }
     }
 
@@ -584,6 +752,7 @@ class HotelHelper
         $this->saveDummyHotelImages($htl_id);
         $this->saveDummyHotelFeatures($htl_id);
         $this->saveDummyProductsAndRelatedInfo($htl_id);
+        $this->saveDummyServiceProductsAndRelatedInfo();
 
         return true;
     }
@@ -715,22 +884,7 @@ class HotelHelper
 
     public static function getRandomZipcodeByForCountry($idCountry)
     {
-        $randZipCode = '';
-        $alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-        if (Validate::isLoadedObject($objCountry = new Country($idCountry))) {
-            if ($objCountry->need_zip_code) {
-                if ($randZipCode = $objCountry->zip_code_format) {
-                    $randZipCode = str_replace('N', mt_rand(0, 9), $randZipCode);
-                    $randZipCode = str_replace('L', $alphabet[mt_rand(0, Tools::strlen($alphabet) - 1)], $randZipCode);
-                    $randZipCode = str_replace('C', $objCountry->iso_code, $randZipCode);
-                } else {
-                    for ($i = 0; $i < 5; ++$i) {
-                        $randZipCode .= mt_rand(0, 9);
-                    }
-                }
-            }
-        }
-        return $randZipCode;
+        return Tools::generateRandomZipcode($idCountry);
     }
 
     /**

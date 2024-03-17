@@ -20,10 +20,10 @@
 <section id="dashinsights" class="widget allow_push">
     <div class="panel">
         <div class="panel-heading">
-            <i class="icon-area-chart"></i> {l s="Insights" mod="dashinsights"}
+            <i class="icon-area-chart"></i> {l s="Insights" mod='dashinsights'}
             <span><small class="text-muted" id="dashinsights_heading_zone_one"></small></span>
             <span class="panel-heading-action">
-                <a class="list-toolbar-btn" href="#" onclick="refreshDashboard('dashinsights'); return false;" title="{l s="Refresh" mod="dashinsights"}">
+                <a class="list-toolbar-btn" href="#" onclick="refreshDashboard('dashinsights'); return false;" title="{l s="Refresh" mod='dashinsights'}">
                     <i class="process-icon-refresh"></i>
                 </a>
             </span>
@@ -31,7 +31,7 @@
 
         <div class="row">
             <div class="col-sm-12">
-                <p class="chart-label">{l s='Length of Stay (%)'}</p>
+                <p class="chart-label">{l s='Length of Stay (%)' mod='dashinsights'}</p>
                 <div class="chart with-transitions insight-chart-wrap" id="dashinsights_length_of_stay">
                     <svg></svg>
                 </div>
