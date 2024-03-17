@@ -66,38 +66,41 @@
                     {l s='Hotel Details'}
                 </div>
                 <div class="card-body">
-                    <p class="card-title">
-                        {$obj_hotel_branch_information->hotel_name}
-                    </p>
-
                     <div class="description-list">
-                        <dl class="row">
-                            <dt class="col-xs-6 col-sm-3">{l s='Phone Number'}</dt>
-                            <dd class="col-xs-6 col-sm-3">
-                                <a href="tel:{if $hotel_address_info.phone_mobile}{$hotel_address_info.phone_mobile}{else}{$hotel_address_info.phone}{/if}">
-                                    {if $hotel_address_info.phone_mobile}{$hotel_address_info.phone_mobile}{else}{$hotel_address_info.phone}{/if}
-                                </a>
-                            </dd>
-
-                            <dt class="col-xs-6 col-sm-3">{l s='Email'}</dt>
-                            <dd class="col-xs-6 col-sm-3">
-                                <a href="mailto:{$obj_hotel_branch_information->email}" class="hotel-email">{$obj_hotel_branch_information->email}</a>
-                            </dd>
-
-                            <dt class="col-xs-6 col-sm-3">{l s='Payment Method'}</dt>
-                            <dd class="col-xs-6 col-sm-3">
-                                {$order->payment|escape:'html':'UTF-8'}
-                                {if $invoice && $invoiceAllowed}
-                                    <a target="_blank" href="{$link->getPageLink('pdf-invoice', true)}?id_order={$order->id|intval}{if $is_guest}&amp;secure_key={$order->secure_key|escape:'html':'UTF-8'}{/if}" title="{l s='Click here to download invoice.'}">
-                                        <i class="icon-file-text"></i> {l s='Invoice'}
+                        <dl class="">
+                            <div class="row">
+                                <dt class="col-xs-6 col-sm-3">{l s='Hotel Name'}</dt>
+                                <dd class="col-xs-6 col-sm-3">{$obj_hotel_branch_information->hotel_name}</dd>
+                                <dt class="col-xs-6 col-sm-3">{l s='Phone Number'}</dt>
+                                <dd class="col-xs-6 col-sm-3">
+                                    <a href="tel:{if $hotel_address_info.phone_mobile}{$hotel_address_info.phone_mobile}{else}{$hotel_address_info.phone}{/if}">
+                                        {if $hotel_address_info.phone_mobile}{$hotel_address_info.phone_mobile}{else}{$hotel_address_info.phone}{/if}
                                     </a>
-                                {/if}
-                            </dd>
+                                </dd>
+                            </div>
 
-                            <dt class="col-xs-6 col-sm-3">{l s='Booking Status'}</dt>
-                            <dd class="col-xs-6 col-sm-3">
-                                <span{if isset($order_history[0].color) && $order_history[0].color} style="background-color:{$order_history[0].color|escape:'html':'UTF-8'}30; border: 1px solid {$order_history[0].color|escape:'html':'UTF-8'};" {/if} class="label">{$order_history[0].ostate_name|escape:'html':'UTF-8'}</span>
-                            </dd>
+                            <div class="row">
+                                <dt class="col-xs-6 col-sm-3">{l s='Email'}</dt>
+                                <dd class="col-xs-6 col-sm-3">
+                                    <a href="mailto:{$obj_hotel_branch_information->email}" class="hotel-email">{$obj_hotel_branch_information->email}</a>
+                                </dd>
+                                <dt class="col-xs-6 col-sm-3">{l s='Payment Method'}</dt>
+                                <dd class="col-xs-6 col-sm-3">
+                                    {$order->payment|escape:'html':'UTF-8'}
+                                    {if $invoice && $invoiceAllowed}
+                                        <a target="_blank" href="{$link->getPageLink('pdf-invoice', true)}?id_order={$order->id|intval}{if $is_guest}&amp;secure_key={$order->secure_key|escape:'html':'UTF-8'}{/if}" title="{l s='Click here to download invoice.'}">
+                                            <i class="icon-file-text"></i> {l s='Invoice'}
+                                        </a>
+                                    {/if}
+                                </dd>
+                            </div>
+
+                            <div class="row">
+                                <dt class="col-xs-6 col-sm-3">{l s='Booking Status'}</dt>
+                                <dd class="col-xs-6 col-sm-3">
+                                    <span{if isset($order_history[0].color) && $order_history[0].color} style="background-color:{$order_history[0].color|escape:'html':'UTF-8'}30; border: 1px solid {$order_history[0].color|escape:'html':'UTF-8'};" {/if} class="label">{$order_history[0].ostate_name|escape:'html':'UTF-8'}</span>
+                                </dd>
+                            </div>
                         </dl>
                     </div>
                 </div>
@@ -139,7 +142,7 @@
                 </div>
             {/if}
 
-            <div class="card room-details">
+            <div class="card room-details card-toolbar">
                 <div class="card-header">
                     {l s='Room Details'}
                     <div class="booking-actions-wrap">
@@ -320,13 +323,44 @@
                 </div>
             </div>
 
-            {if isset($obj_hotel_branch_information->policies) && $obj_hotel_branch_information->policies}
-                <div class="card hotel-policies">
+            {assign var=has_general_hotel_policies value=(isset($obj_hotel_branch_information->policies) && $obj_hotel_branch_information->policies)}
+            {assign var=has_refund_hotel_policies value=($obj_hotel_branch_information->isRefundable() && $hotel_refund_rules)}
+            {if $has_general_hotel_policies || $has_refund_hotel_policies}
+                <div class="card hotel-policies card-tabs">
                     <div class="card-header">
-                        {l s='Hotel Policies'}
+                        <ul class="nav nav-tabs">
+                            {if $has_general_hotel_policies}
+                                <li class="active">
+                                    <a href="#tab-hotel-policies-general" data-toggle="tab">{l s='Hotel Policies'}</a>
+                                </li>
+                            {/if}
+                            {if $has_refund_hotel_policies}
+                                <li {if !$has_general_hotel_policies}class="active"{/if}>
+                                    <a href="#tab-hotel-policies-refund" data-toggle="tab">{l s='Refund Policies'}</a>
+                                </li>
+                            {/if}
+                        </ul>
                     </div>
                     <div class="card-body">
-                        <div class="card-text">{$obj_hotel_branch_information->policies}</div>
+                        <div class="tab-content">
+                            {if $has_general_hotel_policies}
+                                <div id="tab-hotel-policies-general" class="tab-pane active">
+                                    <div class="card-text">{$obj_hotel_branch_information->policies}</div>
+                                </div>
+                            {/if}
+                            {if $has_refund_hotel_policies}
+                                <div id="tab-hotel-policies-refund" class="tab-pane{if !$has_general_hotel_policies}active{/if}">
+                                    <div class="refund-policies-list">
+                                        {foreach from=$hotel_refund_rules item=hotel_refund_rule name=foreach_refund_rules}
+                                            <div class="refund-policy">
+                                                <p class="refund-rule-name">{l s='%s. ' sprintf=[$smarty.foreach.foreach_refund_rules.iteration]}{$hotel_refund_rule.name|escape:'html':'UTF-8'}</p>
+                                                <div class="card-text refund-rule-description">{$hotel_refund_rule.description|escape:'html':'UTF-8'}</div>
+                                            </div>
+                                        {/foreach}
+                                    </div>
+                                </div>
+                            {/if}
+                        </div>
                     </div>
                 </div>
             {/if}
@@ -377,8 +411,8 @@
                             <input type="hidden" class="id_product" name="id_product" value="0">
                         </div>
 
-                        <p class="form-group">
-                            <textarea class="form-control" rows="5" name="msgText"></textarea>
+                        <p class="form-group textarea">
+                            <textarea class="form-control" rows="3" name="msgText"></textarea>
                         </p>
 
                         <div class="submit">

@@ -22,12 +22,10 @@
         <div class="row">
             <div class="col-sm-6">
                 <strong>
-                    {if isset($message.elastname) && $message.elastname}
-                        {$message.efirstname|escape:'html':'UTF-8'} {$message.elastname|escape:'html':'UTF-8'}
-                    {elseif $message.clastname}
-                        {$message.cfirstname|escape:'html':'UTF-8'} {$message.clastname|escape:'html':'UTF-8'}
+                    {if $message.id_employee}
+                        {$obj_hotel_branch_information->hotel_name|escape:'html':'UTF-8'}
                     {else}
-                        {$shop_name|escape:'html':'UTF-8'}
+                        {$message.cfirstname|escape:'html':'UTF-8'} {$message.clastname|escape:'html':'UTF-8'}
                     {/if}
                 </strong>
             </div>

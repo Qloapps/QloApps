@@ -386,6 +386,10 @@ class OrderDetailControllerCore extends FrontController
                     $idHotel = HotelBookingDetail::getIdHotelByIdOrder($order->id);
                     $objHotelBranchInformation = new HotelBranchInformation($idHotel, $this->context->language->id);
                     $hotelAddressInfo = HotelBranchInformation::getAddress($idHotel);
+
+                    $objHotelBranchRefundRules = new HotelBranchRefundRules();
+                    $hotelRefundRules = $objHotelBranchRefundRules->getHotelRefundRules($idHotel, 0, 1);
+
                     $this->context->smarty->assign(
                         array(
                             'id_cms_refund_policy' => Configuration::get('WK_GLOBAL_REFUND_POLICY_CMS'),
@@ -403,6 +407,7 @@ class OrderDetailControllerCore extends FrontController
                             'non_requested_rooms' => $nonRequestedRooms,
                             'obj_hotel_branch_information' => $objHotelBranchInformation,
                             'hotel_address_info' => $hotelAddressInfo,
+                            'hotel_refund_rules' => $hotelRefundRules,
                         )
                     );
                 // }
