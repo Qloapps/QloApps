@@ -53,7 +53,7 @@
 										<span class="badge badge-info label">{l s='Convenience fee'}</span>
 									{/if}
 								</td>
-								<td class="col-sm-4">
+								<td>
 									{if $service['allow_multiple_quantity']}
 										<div class="qty_container">
 											<input type="number" class="form-control qty" min="1" data-id_product="{$service['id_product']|escape:'html':'UTF-8'}" value="{$service['quantity']|escape:'html':'UTF-8'}">

@@ -5375,16 +5375,17 @@ class AdminOrdersControllerCore extends AdminController
                 $response['errors'] = $this->l('Invalid quantity provided');
             }
 
-            if (!$unitPrice || !ValidateCore::isPrice($unitPrice)) {
+            if (!ValidateCore::isPrice($unitPrice)) {
                 $response['hasError'] = true;
                 $response['errors'] = $this->l('Invalid unit price');
             }
             $objHotelBookingDetail = new HotelBookingDetail($objRoomTypeServiceProductOrderDetail->id_htl_booking_detail);
+            $res = true;
             if (!$response['hasError']) {
                 $oldPriceTaxExcl = $objRoomTypeServiceProductOrderDetail->unit_price_tax_excl;
                 $oldPriceTaxIncl = $objRoomTypeServiceProductOrderDetail->unit_price_tax_incl;
                 $oldQuantity = $objRoomTypeServiceProductOrderDetail->quantity;
-                if ($oldPriceTaxExcl) {
+                if ($oldPriceTaxExcl > 0) {
                     $oldTaxMultiplier = $oldPriceTaxIncl / $oldPriceTaxExcl;
                 } else {
                     $oldTaxMultiplier = 1;
@@ -5403,7 +5404,6 @@ class AdminOrdersControllerCore extends AdminController
                 }
                 $objRoomTypeServiceProductOrderDetail->total_price_tax_excl = $objRoomTypeServiceProductOrderDetail->unit_price_tax_excl * $quantity;
                 $objRoomTypeServiceProductOrderDetail->total_price_tax_incl = $objRoomTypeServiceProductOrderDetail->unit_price_tax_incl * $quantity;
-                $res = true;
                 if ($res &= $objRoomTypeServiceProductOrderDetail->save()) {
                     $order = new Order($objRoomTypeServiceProductOrderDetail->id_order);
                     $priceDiffTaxExcl = $objRoomTypeServiceProductOrderDetail->total_price_tax_excl - $oldPriceTaxExcl;
@@ -5532,7 +5532,7 @@ class AdminOrdersControllerCore extends AdminController
                         } else {
                             $qty[$service] = 1;
                         }
-                        if (!$price[$service] || !ValidateCore::isPrice($price[$service])) {
+                        if (!ValidateCore::isPrice($price[$service])) {
                             $response['hasError'] = true;
                             $response['errors'][] = sprintf($this->l('Invalid unit price for %s.'), $objProduct->name);
                         }
@@ -5773,7 +5773,7 @@ class AdminOrdersControllerCore extends AdminController
                     $objHtlBkDtl = new HotelBookingDetail();
                     $objRoomDemandPrice = new HotelRoomTypeDemandPrice();
                     foreach ($roomDemands as $demand) {
-                        if (!$demand['unit_price'] || !ValidateCore::isPrice($demand['unit_price'])) {
+                        if (!ValidateCore::isPrice($demand['unit_price'])) {
                             $objGlobalDemand = new HotelRoomTypeGlobalDemand($demand['id_global_demand'], $idLang);
                             $response['hasError'] = true;
                             $response['errors'][] = sprintf($this->l('Invalid unit price for %s.'), $objGlobalDemand->name);
@@ -5878,7 +5878,7 @@ class AdminOrdersControllerCore extends AdminController
                 }
                 $oldPriceTaxExcl = $objBookingDemand->unit_price_tax_excl;
                 $oldPriceTaxIncl = $objBookingDemand->unit_price_tax_incl;
-                if ($oldPriceTaxExcl) {
+                if ($oldPriceTaxExcl > 0) {
                     $oldTaxMultiplier = $oldPriceTaxIncl / $oldPriceTaxExcl;
                 } else {
                     $oldTaxMultiplier = 1;
