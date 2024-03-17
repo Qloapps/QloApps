@@ -31,12 +31,12 @@
         {$navigationPipe}
     </span>
     <span class="navigation_page">
-        {l s='Your personal information'}
+        {l s='Personal information'}
     </span>
 {/capture}
 <div class="box">
     <h1 class="page-subheading">
-        {l s='Your personal information'}
+        {l s='Personal information'}
     </h1>
 
     {include file="$tpl_dir./errors.tpl"}
@@ -84,51 +84,53 @@
                     </label>
                     <input class="is_required validate form-control" data-validate="isEmail" type="email" name="email" id="email" value="{$smarty.post.email}" />
                 </div>
-                <div class="form-group">
-                    <label>
-                        {l s='Date of Birth'}
-                    </label>
-                    <div class="row">
-                        <div class="col-xs-4">
-                            <select name="days" id="days" class="form-control">
-                                <option value="">-</option>
-                                {foreach from=$days item=v}
-                                    <option value="{$v}" {if ($sl_day == $v)}selected="selected"{/if}>{$v}&nbsp;&nbsp;</option>
-                                {/foreach}
-                            </select>
-                        </div>
-                        <div class="col-xs-4">
-							{*
-								{l s='January'}
-								{l s='February'}
-								{l s='March'}
-								{l s='April'}
-								{l s='May'}
-								{l s='June'}
-								{l s='July'}
-								{l s='August'}
-								{l s='September'}
-								{l s='October'}
-								{l s='November'}
-								{l s='December'}
-							*}
-                            <select id="months" name="months" class="form-control">
-                                <option value="">-</option>
-                                {foreach from=$months key=k item=v}
-                                    <option value="{$k}" {if ($sl_month == $k)}selected="selected"{/if}>{l s=$v}&nbsp;</option>
-                                {/foreach}
-                            </select>
-                        </div>
-                        <div class="col-xs-4">
-                            <select id="years" name="years" class="form-control">
-                                <option value="">-</option>
-                                {foreach from=$years item=v}
-                                    <option value="{$v}" {if ($sl_year == $v)}selected="selected"{/if}>{$v}&nbsp;&nbsp;</option>
-                                {/foreach}
-                            </select>
+                {if isset($birthday) && $birthday}
+                    <div class="form-group">
+                        <label>
+                            {l s='Date of Birth'}
+                        </label>
+                        <div class="row">
+                            <div class="col-xs-4">
+                                <select name="days" id="days" class="form-control">
+                                    <option value="">-</option>
+                                    {foreach from=$days item=v}
+                                        <option value="{$v}" {if ($sl_day == $v)}selected="selected"{/if}>{$v}&nbsp;&nbsp;</option>
+                                    {/foreach}
+                                </select>
+                            </div>
+                            <div class="col-xs-4">
+                                {*
+                                    {l s='January'}
+                                    {l s='February'}
+                                    {l s='March'}
+                                    {l s='April'}
+                                    {l s='May'}
+                                    {l s='June'}
+                                    {l s='July'}
+                                    {l s='August'}
+                                    {l s='September'}
+                                    {l s='October'}
+                                    {l s='November'}
+                                    {l s='December'}
+                                *}
+                                <select id="months" name="months" class="form-control">
+                                    <option value="">-</option>
+                                    {foreach from=$months key=k item=v}
+                                        <option value="{$k}" {if ($sl_month == $k)}selected="selected"{/if}>{l s=$v}&nbsp;</option>
+                                    {/foreach}
+                                </select>
+                            </div>
+                            <div class="col-xs-4">
+                                <select id="years" name="years" class="form-control">
+                                    <option value="">-</option>
+                                    {foreach from=$years item=v}
+                                        <option value="{$v}" {if ($sl_year == $v)}selected="selected"{/if}>{$v}&nbsp;&nbsp;</option>
+                                    {/foreach}
+                                </select>
+                            </div>
                         </div>
                     </div>
-                </div>
+                {/if}
                 <div class="required form-group">
                     <label for="old_passwd" class="required">
                         {l s='Current Password'}
@@ -206,7 +208,7 @@
 	<li>
         <a class="btn btn-default button button-small" href="{$link->getPageLink('my-account', true)}">
             <span>
-                <i class="icon-chevron-left"></i>{l s='Back to your account'}
+                <i class="icon-chevron-left"></i>{l s='Back to My account'}
             </span>
         </a>
     </li>

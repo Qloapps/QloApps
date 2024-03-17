@@ -93,7 +93,7 @@ class DashGuestCycle extends Module
             $dataValue['dgc_total_arrivals'] = sprintf('%02d', $arrivalsData['total_arrivals']);
             $dataValue['dgc_departed'] = sprintf('%02d', $departuresData['departed']);
             $dataValue['dgc_total_departures'] = sprintf('%02d', $departuresData['total_departures']);
-            $dataValue['dgc_new_bookings'] = sprintf('%02d', AdminStatsController::getBookingsByDate($dateToday, $params['id_hotel']));
+            $dataValue['dgc_new_bookings'] = sprintf('%02d', count(AdminStatsController::getNewBookingsInfoByDate($dateToday, $params['id_hotel'])));
             $dataValue['dgc_stay_overs'] = sprintf('%02d', AdminStatsController::getStayOversByDate($dateToday, $params['id_hotel']));
             $dataValue['dgc_new_messages'] = sprintf('%02d', CustomerMessage::getMessagesByDate($dateToday));
             $dataValue['dgc_cancelled_bookings'] = sprintf('%02d', AdminStatsController::getCancelledBookingsByDate($dateToday, $params['id_hotel']));
@@ -365,7 +365,7 @@ class DashGuestCycle extends Module
                 'class' => 'text-right',
             );
             $tr[] = array(
-                'value' => $newBookingInfo['state_name'],
+                'value' => '<span class="label color_field" style="background-color:'.$newBookingInfo['state_color'].'">'.$newBookingInfo['state_name'].'</span>',
                 'class' => 'text-left',
             );
 

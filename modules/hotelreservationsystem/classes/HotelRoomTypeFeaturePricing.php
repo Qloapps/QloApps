@@ -189,13 +189,13 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
         if ($type == 'specific_date') {
             return Db::getInstance()->getRow(
                 'SELECT * FROM `'._DB_PREFIX_.'htl_room_type_feature_pricing`
-                WHERE `id_product`='.(int) $id_product.'
+                WHERE `id_product`='.(int) $id_product.' AND `active`=1
                 AND `date_selection_type` = '.(int) self::DATE_SELECTION_TYPE_SPECIFIC.'
                 AND `date_from` = \''.pSQL($date_from).'\'
                 AND `id_feature_price`!='.(int) $id_feature_price
             );
         } elseif ($type == 'special_day') {
-            $featurePrice = Db::getInstance()->getRow(
+            $featurePrices = Db::getInstance()->executeS(
                 'SELECT * FROM `'._DB_PREFIX_.'htl_room_type_feature_pricing`
                 WHERE `id_product`='.(int) $id_product.'
                 AND `is_special_days_exists`=1 AND `active`=1
@@ -203,19 +203,21 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
                 AND `date_to` > \''.pSQL($date_from).'\'
                 AND `id_feature_price`!='.(int) $id_feature_price
             );
-            if ($featurePrice) {
-                $specialDays = json_decode($featurePrice['special_days']);
-                $currentSpecialDays = json_decode($current_Special_days);
-                $commonValues = array_intersect($specialDays, $currentSpecialDays);
-                if ($commonValues) {
-                    return $featurePrice;
+            if ($featurePrices) {
+                foreach ($featurePrices as $featurePrice) {
+                    $specialDays = json_decode($featurePrice['special_days']);
+                    $currentSpecialDays = json_decode($current_Special_days);
+                    $commonValues = array_intersect($specialDays, $currentSpecialDays);
+                    if ($commonValues) {
+                        return $featurePrice;
+                    }
                 }
             }
             return false;
         } elseif ($type == 'date_range') {
             return Db::getInstance()->getRow(
                 'SELECT * FROM `'._DB_PREFIX_.'htl_room_type_feature_pricing`
-                WHERE `id_product`='.(int) $id_product.'
+                WHERE `id_product`='.(int) $id_product.' AND `active`=1
                 AND `date_selection_type` = '.(int) self::DATE_SELECTION_TYPE_RANGE.'
                 AND `is_special_days_exists`=0
                 AND `date_from` <= \''.pSQL($date_to).'\'
@@ -260,7 +262,6 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
         $hotelRoomType = new HotelRoomType();
         $context = Context::getContext();
         $roomTypeRatesAndInventory = array();
-        $hotelCartBookingData = new HotelCartBookingData();
         $objBookingDetail = new HotelBookingDetail();
         $incr = 0;
         $date_from = date('Y-m-d', strtotime($date_from));
@@ -283,7 +284,7 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
                     $totalAvailableRooms = 0;
                 }
 
-                $roomTypePrice = $hotelCartBookingData->getRoomTypeTotalPrice($id_product, $currentDate, $nextDayDate);
+                $roomTypePrice = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice($id_product, $currentDate, $nextDayDate);
                 $roomTypeRatesAndInventory[$incr]['date'] = $currentDate;
                 $roomTypeRatesAndInventory[$incr]['room_types'][0]['id'] = $id_product;
                 $roomTypeRatesAndInventory[$incr]['room_types'][0]['rates'] = $roomTypePrice;
@@ -293,7 +294,7 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
                 if ($hotelRoomTypes) {
                     $roomTypeRatesAndInventory[$incr]['date'] = $currentDate;
                     foreach ($hotelRoomTypes as $key => $product) {
-                        $roomTypePrice = $hotelCartBookingData->getRoomTypeTotalPrice(
+                        $roomTypePrice = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice(
                             $product['id_product'],
                             $currentDate,
                             $nextDayDate
@@ -702,35 +703,45 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
                     $priceWithFeatureTI = 0;
                     $priceWithFeatureTE = 0;
                 }
-                if ($quantity) {
-                    $totalPrice['total_price_tax_incl'] += $priceWithFeatureTI * $quantity;
-                    $totalPrice['total_price_tax_excl'] += $priceWithFeatureTE * $quantity;
-                } else {
-                    $totalPrice['total_price_tax_incl'] += $priceWithFeatureTI;
-                    $totalPrice['total_price_tax_excl'] += $priceWithFeatureTE;
-                }
+                $totalPrice['total_price_tax_incl'] += $priceWithFeatureTI;
+                $totalPrice['total_price_tax_excl'] += $priceWithFeatureTE;
             } else {
-                if ($quantity) {
-                    $totalPrice['total_price_tax_incl'] += $productPriceTI * $quantity;
-                    $totalPrice['total_price_tax_excl'] += $productPriceTE * $quantity;
-                } else {
-                    $totalPrice['total_price_tax_incl'] += $productPriceTI;
-                    $totalPrice['total_price_tax_excl'] += $productPriceTE;
-                }
+                $totalPrice['total_price_tax_incl'] += $productPriceTI;
+                $totalPrice['total_price_tax_excl'] += $productPriceTE;
             }
         }
         if ($with_auto_room_services) {
-            if ($servicesWithTax = RoomTypeServiceProduct::getAutoAddServices($id_product, $date_from, $date_to, Product::PRICE_ADDITION_TYPE_WITH_ROOM, true)) {
+            if ($servicesWithTax = RoomTypeServiceProduct::getAutoAddServices(
+                $id_product,
+                $date_from,
+                $date_to,
+                Product::PRICE_ADDITION_TYPE_WITH_ROOM,
+                true,
+                $id_cart,
+                $id_guest
+            )) {
                 foreach($servicesWithTax as $service) {
                     $totalPrice['total_price_tax_incl'] += $service['price'];
                 }
             }
-            if ($servicesWithoutTax = RoomTypeServiceProduct::getAutoAddServices($id_product, $date_from, $date_to, Product::PRICE_ADDITION_TYPE_WITH_ROOM, false)) {
+            if ($servicesWithoutTax = RoomTypeServiceProduct::getAutoAddServices(
+                $id_product,
+                $date_from,
+                $date_to,
+                Product::PRICE_ADDITION_TYPE_WITH_ROOM,
+                false,
+                $id_cart,
+                $id_guest
+            )) {
                 foreach($servicesWithoutTax as $service) {
                     $totalPrice['total_price_tax_excl'] += $service['price'];
                 }
             }
-         }
+        }
+        if ($quantity) {
+            $totalPrice['total_price_tax_incl'] = $totalPrice['total_price_tax_incl'] * $quantity;
+            $totalPrice['total_price_tax_excl'] = $totalPrice['total_price_tax_excl'] * $quantity;
+        }
         return $totalPrice;
     }
 
