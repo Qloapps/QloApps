@@ -3738,7 +3738,6 @@ class AdminOrdersControllerCore extends AdminController
                 && count($orderServiceProducts)
             ) {
                 $objOrder = new Order((int) $id_order);
-                $objRoomTypeServiceProductPrice = new RoomTypeServiceProductPrice();
                 foreach ($orderServiceProducts as $orderServiceProduct) {
                     if (isset($orderServiceProduct['additional_services'])
                         && is_array($orderServiceProduct['additional_services'])
@@ -3746,35 +3745,39 @@ class AdminOrdersControllerCore extends AdminController
                     ) {
                         foreach ($orderServiceProduct['additional_services'] as $serviceProduct) {
                             if (Product::getProductPriceCalculation($serviceProduct['id_product']) == Product::PRICE_CALCULATION_METHOD_PER_DAY) {
-                                $numDays = HotelHelper::getNumberOfDays($new_date_from, $new_date_to);
+                                $newNumDays = HotelHelper::getNumberOfDays($new_date_from, $new_date_to);
                                 $objRoomTypeServiceProductOrderDetail = new RoomTypeServiceProductOrderDetail((int) $serviceProduct['id_room_type_service_product_order_detail']);
                                 $unitPriceTaxExcl = $objRoomTypeServiceProductOrderDetail->unit_price_tax_excl;
                                 $unitPriceTaxIncl = $objRoomTypeServiceProductOrderDetail->unit_price_tax_incl;
 
-                                $totalPriceTaxExcl =  $numDays * $objRoomTypeServiceProductOrderDetail->quantity * $unitPriceTaxExcl;                                $unitPriceTaxIncl = $objRoomTypeServiceProductOrderDetail->unit_price_tax_incl;
-                                $totalPriceTaxIncl = $numDays * $objRoomTypeServiceProductOrderDetail->quantity * $unitPriceTaxIncl;
+                                $newTotalPriceTaxExcl =  $newNumDays * $objRoomTypeServiceProductOrderDetail->quantity * $unitPriceTaxExcl;                                $unitPriceTaxIncl = $objRoomTypeServiceProductOrderDetail->unit_price_tax_incl;
+                                $newTotalPriceTaxIncl = $newNumDays * $objRoomTypeServiceProductOrderDetail->quantity * $unitPriceTaxIncl;
 
                                 $objOrder->total_paid_tax_excl -= $objRoomTypeServiceProductOrderDetail->total_price_tax_excl;
                                 $objOrder->total_paid_tax_incl -= $objRoomTypeServiceProductOrderDetail->total_price_tax_incl;
                                 $objOrder->total_paid -= $objRoomTypeServiceProductOrderDetail->total_price_tax_incl;
 
                                 // change order total
-                                $objOrder->total_paid_tax_excl += $totalPriceTaxExcl;
-                                $objOrder->total_paid_tax_incl += $totalPriceTaxIncl;
-                                $objOrder->total_paid += $totalPriceTaxIncl;
+                                $objOrder->total_paid_tax_excl += $newTotalPriceTaxExcl;
+                                $objOrder->total_paid_tax_incl += $newTotalPriceTaxIncl;
+                                $objOrder->total_paid += $newTotalPriceTaxIncl;
 
                                 $objOrderDetail = new OrderDetail((int) $serviceProduct['id_order_detail']);
                                 $objOrderDetail->total_price_tax_excl -= $objRoomTypeServiceProductOrderDetail->total_price_tax_excl;
                                 $objOrderDetail->total_price_tax_incl -= $objRoomTypeServiceProductOrderDetail->total_price_tax_incl;
+                                $objOrderDetail->total_price_tax_excl += $newTotalPriceTaxExcl;
+                                $objOrderDetail->total_price_tax_incl += $newTotalPriceTaxIncl;
 
-                                $objOrderDetail->total_price_tax_excl += $totalPriceTaxExcl;
-                                $objOrderDetail->total_price_tax_incl += $totalPriceTaxIncl;
+                                $oldNumDays = HotelHelper::getNumberOfDays($old_date_from, $old_date_to);
+                                $oldProductQuantity = $objRoomTypeServiceProductOrderDetail->quantity * $oldNumDays;
+                                $newProductQuantity = $objRoomTypeServiceProductOrderDetail->quantity * $newNumDays;
+                                $objOrderDetail->product_quantity += ($newProductQuantity - $oldProductQuantity);
                                 $objOrderDetail->save();
 
                                 $objRoomTypeServiceProductOrderDetail->unit_price_tax_excl = $unitPriceTaxExcl;
                                 $objRoomTypeServiceProductOrderDetail->unit_price_tax_incl = $unitPriceTaxIncl;
-                                $objRoomTypeServiceProductOrderDetail->total_price_tax_excl = $totalPriceTaxExcl;
-                                $objRoomTypeServiceProductOrderDetail->total_price_tax_incl = $totalPriceTaxIncl;
+                                $objRoomTypeServiceProductOrderDetail->total_price_tax_excl = $newTotalPriceTaxExcl;
+                                $objRoomTypeServiceProductOrderDetail->total_price_tax_incl = $newTotalPriceTaxIncl;
                                 $objRoomTypeServiceProductOrderDetail->save();
 
                             }
@@ -4966,6 +4969,7 @@ class AdminOrdersControllerCore extends AdminController
                         $response['hasError'] = true;
                         $response['errors'] = $this->l('Invalid quantity provided');
                     } else {
+                        $oldQuantity = $objRoomTypeServiceProductOrderDetail->quantity;
                         $objRoomTypeServiceProductOrderDetail->quantity = $quantity;
                         $oldPriceTaxExcl = $objRoomTypeServiceProductOrderDetail->total_price_tax_excl;
                         $oldPriceTaxIncl = $objRoomTypeServiceProductOrderDetail->total_price_tax_incl;
@@ -4977,7 +4981,7 @@ class AdminOrdersControllerCore extends AdminController
                             $priceDiffTaxExcl = $objRoomTypeServiceProductOrderDetail->total_price_tax_excl - $oldPriceTaxExcl;
                             $priceDiffTaxIncl = $objRoomTypeServiceProductOrderDetail->total_price_tax_incl - $oldPriceTaxIncl;
 
-                            $objOrderDetail->product_quantity = $quantity;
+                            $objOrderDetail->product_quantity += (($quantity - $oldQuantity) * $numDays);
                             $objOrderDetail->total_price_tax_excl += $priceDiffTaxExcl;
                             $objOrderDetail->total_price_tax_incl += $priceDiffTaxIncl;
 
@@ -5160,11 +5164,10 @@ class AdminOrdersControllerCore extends AdminController
                                 $roomHtlCartInfo['id'])
                             ) {
                                 $objRoomTypeServiceProductCartDetail = new RoomTypeServiceProductCartDetail((int) $id_room_type_service_product_cart_detail);
-                                $product['cart_quantity'] = $objRoomTypeServiceProductCartDetail->quantity;
                                 $totalPriceChangeTaxExcl += $totalPriceTaxExcl = $objRoomTypeServiceProductPrice->getServicePrice(
                                     (int)$product['id_product'],
                                     $roomInfo['id'],
-                                    $product['cart_quantity'],
+                                    $objRoomTypeServiceProductCartDetail->quantity,
                                     $objHotelBookingDetail->date_from,
                                     $objHotelBookingDetail->date_to,
                                     false
@@ -5172,7 +5175,7 @@ class AdminOrdersControllerCore extends AdminController
                                 $totalPriceChangeTaxIncl += $totalPriceTaxIncl = $objRoomTypeServiceProductPrice->getServicePrice(
                                     (int)$product['id_product'],
                                     $roomInfo['id'],
-                                    $product['cart_quantity'],
+                                    $objRoomTypeServiceProductCartDetail->quantity,
                                     $objHotelBookingDetail->date_from,
                                     $objHotelBookingDetail->date_to,
                                     true
@@ -5181,6 +5184,7 @@ class AdminOrdersControllerCore extends AdminController
                                 if (Product::getProductPriceCalculation($product['id_product']) == Product::PRICE_CALCULATION_METHOD_PER_DAY) {
                                     $numDays = HotelHelper::getNumberOfDays($objHotelBookingDetail->date_from, $objHotelBookingDetail->date_to);
                                 }
+                                $product['cart_quantity'] = $objRoomTypeServiceProductCartDetail->quantity * $numDays;
 
                                 $unitPriceTaxExcl = $objRoomTypeServiceProductPrice->getServicePrice(
                                     (int)$product['id_product'],
@@ -5231,7 +5235,7 @@ class AdminOrdersControllerCore extends AdminController
                         $objRoomTypeServiceProductOrderDetail->total_price_tax_excl = $totalPriceTaxExcl;
                         $objRoomTypeServiceProductOrderDetail->total_price_tax_incl = $totalPriceTaxIncl;
                         $objRoomTypeServiceProductOrderDetail->name = $product['name'];
-                        $objRoomTypeServiceProductOrderDetail->quantity = $product['cart_quantity'];
+                        $objRoomTypeServiceProductOrderDetail->quantity = $objRoomTypeServiceProductCartDetail->quantity;
                         $objRoomTypeServiceProductOrderDetail->save();
 
                         // update totals amount of order
