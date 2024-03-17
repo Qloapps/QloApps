@@ -105,6 +105,10 @@
 			</div>
 		</div>
 	</div>
+
+    {* Overbookings information of the order *}
+    {include file='controllers/orders/_overbookings.tpl'}
+
 	<div class="row">
 		<div class="col-lg-7">
 			<div class="panel">

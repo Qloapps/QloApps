@@ -30,7 +30,10 @@
 		</td>
 	{/if}
 	<td class="text-center">
-		{$data.room_num}
+		<p>{$data.room_num}</p>
+        {if $data.is_back_order}
+            <span class="overbooked_room">{l s='overbooked'}</span>
+        {/if}
 	</td>
 	<td class="text-center">
 		<img src="{$data.image_link}" title="Room image" />

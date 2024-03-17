@@ -1844,6 +1844,11 @@ $(document).on('click', '#booking-documents-modal .documents-list .btn-delete-do
 	}
 });
 
+$(document).on('click', '.reallocate_overbooking', function(e) {
+    e.preventDefault();
+    $('#reallocate_room_' + $(this).attr('id_htl_booking')).trigger('click');
+});
+
 const BookingDocumentsModal = {
 	init: function(idHtlBooking, $this) {
 		BookingDocumentsModal.currentTr = $this;
