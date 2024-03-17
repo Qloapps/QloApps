@@ -361,4 +361,18 @@ class FeatureCore extends ObjectModel
     {
         return $this->id;
     }
+
+    public static function searchByName($name, $idLang = false)
+    {
+        if (!$idLang) {
+            $idLang = Context::getContext()->language->id;
+        }
+
+        return Db::getInstance()->executeS('
+            SELECT *
+            FROM '._DB_PREFIX_.'feature_lang
+            WHERE `name` LIKE \'%'.pSQL($name).'%\'
+            AND `id_lang`='.(int)$idLang
+        );
+    }
 }

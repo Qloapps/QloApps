@@ -472,6 +472,22 @@ p.room_cat_data
     border-color: #4d90fe;
 }
 
+.gm-style-iw-d h6 {
+    font-family: unset;
+    font-size: 14px;
+    color: #333;
+    font-weight: 500;
+    margin: 0;
+}
+
+.gm-style-iw-d p {
+    font-family: unset;
+    font-size: 13px;
+    color: #333;
+    font-weight: 400;
+    margin: 0;
+}
+
 /* ==== AdminHotelFeaturePricesSettingsController ==== */
 .week_days {
     display: none;

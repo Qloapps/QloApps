@@ -262,6 +262,16 @@ class AdminLanguagesControllerCore extends AdminController
             'title' => $this->l('Save'),
         );
 
+        $this->fields_form['buttons'] = array(
+            'save-and-stay' => array(
+                'title' => $this->l('Save and stay'),
+                'name' => 'submitAdd'.$this->table.'AndStay',
+                'type' => 'submit',
+                'class' => 'btn btn-default pull-right',
+                'icon' => 'process-icon-save',
+            ),
+        );
+
         /** @var Language $obj */
         if (!($obj = $this->loadObject(true))) {
             return;

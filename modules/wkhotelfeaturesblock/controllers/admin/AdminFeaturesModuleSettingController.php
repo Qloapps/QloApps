@@ -224,7 +224,17 @@ class AdminFeaturesModuleSettingController extends ModuleAdminController
             ),
             'submit' => array(
                 'title' => $this->l('Save')
-            ));
+            ),
+            'buttons' => array(
+                'save-and-stay' => array(
+                    'title' => $this->l('Save and stay'),
+                    'name' => 'submitAdd'.$this->table.'AndStay',
+                    'type' => 'submit',
+                    'class' => 'btn btn-default pull-right',
+                    'icon' => 'process-icon-save',
+                ),
+            ),
+        );
 
         return parent::renderForm();
     }
@@ -318,10 +328,18 @@ class AdminFeaturesModuleSettingController extends ModuleAdminController
                 );
             }
 
-            if ($hotelAmenityId) {
-                Tools::redirectAdmin(self::$currentIndex.'&conf=4&token='.$this->token);
+            if (Tools::isSubmit('submitAdd'.$this->table.'AndStay')) {
+                if ($hotelAmenityId) {
+                    Tools::redirectAdmin(self::$currentIndex.'&id_features_block='.(int) $hotelAmenityId.'&update'.$this->table.'&conf=4&token='.$this->token);
+                } else {
+                    Tools::redirectAdmin(self::$currentIndex.'&id_features_block='.(int) $objFeatureData->id.'&update'.$this->table.'&conf=3&token='.$this->token);
+                }
             } else {
-                Tools::redirectAdmin(self::$currentIndex.'&conf=3&token='.$this->token);
+                if ($hotelAmenityId) {
+                    Tools::redirectAdmin(self::$currentIndex.'&conf=4&token='.$this->token);
+                } else {
+                    Tools::redirectAdmin(self::$currentIndex.'&conf=3&token='.$this->token);
+                }
             }
         } else {
             if ($hotelAmenityId) {
