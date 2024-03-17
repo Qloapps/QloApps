@@ -3050,6 +3050,7 @@ class AdminProductsControllerCore extends AdminController
                         $associationInfo['id_product'] = $objProduct->id;
                         $associationInfo['name'] = $objProduct->name;
                         $associationInfo['auto_add_to_cart'] = $objProduct->auto_add_to_cart;
+                        $associationInfo['price_addition_type'] = $objProduct->price_addition_type;
                         $associationInfo['category'] = $objProduct->category;
                         $associationInfo['default_price'] = $objProduct->price;
                         $associationInfo['id_tax_rules_group'] = $objProduct->id_tax_rules_group;
@@ -3180,7 +3181,9 @@ class AdminProductsControllerCore extends AdminController
                             }
 
                             $objRoomTypeServiceProductPrice->price = $price;
-                            $objRoomTypeServiceProductPrice->id_tax_rules_group = $idTaxRulesGroup;
+                            if ($idTaxRulesGroup) {
+                                $objRoomTypeServiceProductPrice->id_tax_rules_group = $idTaxRulesGroup;
+                            }
 
                             $objRoomTypeServiceProductPrice->save();
                         } else {
