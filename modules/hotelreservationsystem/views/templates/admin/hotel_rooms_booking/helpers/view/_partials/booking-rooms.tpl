@@ -69,14 +69,15 @@
                                                                             <div class="row">
                                                                                 <div class="form-group col-xs-6 occupancy_count_block">
                                                                                     <label>{l s='Adults' mod='hotelreservationsystem'}</label>
-                                                                                    <input type="number" class="form-control num_occupancy num_adults" name="occupancy[0][adults]" value="1" min="1"  max="{if isset($book_v)}{$book_v['max_adults']|escape:'html':'UTF-8'}{/if}">
+                                                                                    <input type="number" class="form-control num_occupancy num_adults" name="occupancy[0][adults]" value="1" min="1"  data-max="{if isset($book_v)}{$book_v['max_adults']|escape:'html':'UTF-8'}{/if}">
                                                                                 </div>
                                                                                 <div class="form-group col-xs-6 occupancy_count_block">
                                                                                     <label>{l s='Children' mod='hotelreservationsystem'} <span class="label-desc-txt"></span></label>
-                                                                                    <input type="number" class="form-control num_occupancy num_children" name="occupancy[0][children]" value="0" min="0" max="{if isset($book_v)}{$book_v['max_children']|escape:'html':'UTF-8'}{else}{$max_child_in_room}{/if}">
+                                                                                    <input type="number" class="form-control num_occupancy num_children" name="occupancy[0][children]" value="0" min="0" data-max="{if isset($book_v)}{$book_v['max_children']|escape:'html':'UTF-8'}{else}{$max_child_in_room}{/if}">
                                                                                     ({l s='Below' mod='hotelreservationsystem'}  {$max_child_age|escape:'htmlall':'UTF-8'} {l s='years' mod='hotelreservationsystem'})
                                                                                 </div>
                                                                             </div>
+                                                                            <p style="display:none;"><span class="text-danger occupancy-input-errors"></span></p>
                                                                             <div class="row children_age_info_block" style="display:none">
                                                                                 <div class="form-group col-sm-12">
                                                                                     <label class="">{l s='All Children' mod='hotelreservationsystem'}</label>
@@ -156,14 +157,15 @@
                                                                                 <div class="row">
                                                                                     <div class="form-group col-xs-6 occupancy_count_block">
                                                                                         <label>{l s='Adults' mod='hotelreservationsystem'}</label>
-                                                                                        <input type="number" class="form-control num_occupancy num_adults" name="occupancy[0][adults]" value="1" min="1"  max="{if isset($book_v)}{$book_v['max_adults']|escape:'html':'UTF-8'}{/if}">
+                                                                                        <input type="number" class="form-control num_occupancy num_adults" name="occupancy[0][adults]" value="1" min="1"  data-max="{if isset($book_v)}{$book_v['max_adults']|escape:'html':'UTF-8'}{/if}">
                                                                                     </div>
                                                                                     <div class="form-group col-xs-6 occupancy_count_block">
                                                                                         <label>{l s='Children' mod='hotelreservationsystem'} <span class="label-desc-txt"></span></label>
-                                                                                        <input type="number" class="form-control num_occupancy num_children" name="occupancy[0][children]" value="0" min="0" max="{if isset($book_v)}{$book_v['max_children']|escape:'html':'UTF-8'}{else}{$max_child_in_room}{/if}">
+                                                                                        <input type="number" class="form-control num_occupancy num_children" name="occupancy[0][children]" value="0" min="0" data-max="{if isset($book_v)}{$book_v['max_children']|escape:'html':'UTF-8'}{else}{$max_child_in_room}{/if}">
                                                                                         ({l s='Below'}  {$max_child_age|escape:'htmlall':'UTF-8'} {l s='years' mod='hotelreservationsystem'})
                                                                                     </div>
                                                                                 </div>
+                                                                                <p style="display:none;"><span class="text-danger occupancy-input-errors"></span></p>
                                                                                 <div class="row children_age_info_block" style="display:none">
                                                                                     <div class="form-group col-sm-12">
                                                                                         <label class="">{l s='All Children' mod='hotelreservationsystem'}</label>
