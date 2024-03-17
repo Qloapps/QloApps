@@ -106,7 +106,7 @@
                     </div>
                 </div>
             </div>
-            {if $PS_CUSTOMER_ADDRESS_CREATION}
+		    {if isset($PS_REGISTRATION_PROCESS_TYPE) && $PS_REGISTRATION_PROCESS_TYPE}
                 <div class="row">
                     <div class="select form-group date-select col-sm-12">
                         <label>{l s='Date of Birth'}</label>
@@ -316,5 +316,5 @@
     {if isset($countries)}
         {addJsDef countries=$countries}
     {/if}
-    {addJsDef PS_CUSTOMER_ADDRESS_CREATION=$PS_CUSTOMER_ADDRESS_CREATION|intval}
+    {addJsDef PS_REGISTRATION_PROCESS_TYPE=$PS_REGISTRATION_PROCESS_TYPE|intval}
 {/strip}
