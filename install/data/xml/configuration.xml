@@ -905,5 +905,11 @@
 	<configuration id="PS_SERVICE_PRODUCT_CATEGORY_FILTER" name="PS_SERVICE_PRODUCT_CATEGORY_FILTER">
       <value>1</value>
     </configuration>
+	<configuration id="PS_BACKDATE_ORDER_SUPERADMIN" name="PS_BACKDATE_ORDER_SUPERADMIN">
+      <value>1</value>
+    </configuration>
+	<configuration id="PS_BACKDATE_ORDER_EMPLOYEES" name="PS_BACKDATE_ORDER_EMPLOYEES">
+      <value>0</value>
+    </configuration>
   </entities>
 </entity_configuration>

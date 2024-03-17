@@ -62,7 +62,7 @@
 					<div class="fixed-width-xl room_check_in_div">
 						<div class="input-group">
 							<div class="input-group-addon">{l s='Check In'}</div>
-							<input type="text" class="form-control edit_product_date_from" name="edit_product[date_from]" value="{$data.date_from|date_format:"%d-%m-%Y"}"/>
+							<input type="text" class="form-control edit_product_date_from" name="edit_product[date_from]" value="{$data.date_from|date_format:"%d-%m-%Y"}" data-min_date="{$data.date_from|date_format:"%d-%m-%Y"}"/>
 							<div class="input-group-addon"><i class="icon-calendar"></i></div>
 						</div>
 					</div>
@@ -70,7 +70,7 @@
 					<div class="fixed-width-xl room_check_out_div">
 						<div class="input-group">
 							<div class="input-group-addon">{l s='Check Out'}</div>
-							<input type="text" class="form-control edit_product_date_to" name="edit_product[date_to]" value="{$data.date_to|date_format:"%d-%m-%Y"}"/>
+							<input type="text" class="form-control edit_product_date_to" name="edit_product[date_to]" value="{$data.date_to|date_format:"%d-%m-%Y"}" data-min_date="{$data.date_from|date_format:"%d-%m-%Y"}"/>
 							<div class="input-group-addon"><i class="icon-calendar"></i></div>
 						</div>
 					</div>

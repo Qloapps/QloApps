@@ -230,6 +230,7 @@ $(document).ready(function() {
         dateFormat: 'dd-mm-yy',
         altFormat: 'yy-mm-dd',
         altField: '#date_from',
+        minDate: PS_BACKDATE_ORDER_ALLOW == 1 ? null : 0,
         beforeShowDay: function (date) {
             return highlightDateBorder($("#from_date").val(), date);
         },
@@ -246,6 +247,11 @@ $(document).ready(function() {
         dateFormat: 'dd-mm-yy',
         altFormat: 'yy-mm-dd',
         altField: '#date_to',
+        beforeShow: function () {
+            from_date = $.datepicker.parseDate('dd-mm-yy', $("#from_date").val());
+            from_date.setDate(from_date.getDate() + 1);
+            $("#to_date").datepicker("option", "minDate", from_date);
+        },
         beforeShowDay: function (date) {
             return highlightDateBorder($("#to_date").val(), date);
         },

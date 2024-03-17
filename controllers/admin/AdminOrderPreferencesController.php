@@ -90,6 +90,16 @@ class AdminOrderPreferencesControllerCore extends AdminController
                         'class' => 'fixed-width-xl',
                         'suffix' => $this->l('day(s)'),
                     ),
+                    'PS_BACKDATE_ORDER_SUPERADMIN' => array(
+                        'title' => $this->l('Allow backdate order from Back-office for super-admin'),
+                        'hint' => $this->l('Allow superadmin to create bookings for backdate'),
+                        'type' => 'bool',
+                    ),
+                    'PS_BACKDATE_ORDER_EMPLOYEES' => array(
+                        'title' => $this->l('Allow backdate order from Back-office for employees'),
+                        'hint' => $this->l('Allow employees to create bookings for backdate'),
+                        'type' => 'bool',
+                    ),
                 ),
                 'submit' => array(
                     'title' => $this->l('Save'),

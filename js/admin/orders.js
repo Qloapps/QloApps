@@ -1563,12 +1563,25 @@ function initRoomEvents()
 
             $('.add_room_date_to').datepicker('option', 'minDate', objDateToMin);
         },
+		beforeShow : function () {
+			if(allowBackdateOrder) {
+				var minDate = null;
+			} else {
+				var minDate = new Date();
+			}
+			$(this).datepicker("option", "minDate", minDate);
+		}
     });
 
     $(".add_room_date_to").datepicker(
     {
     	showOtherMonths: true,
-        dateFormat: 'dd-mm-yy'
+        dateFormat: 'dd-mm-yy',
+		beforeShow : function () {
+			var date_from = $.datepicker.parseDate('dd-mm-yy', $(this).closest('.bookingDuration').find('.add_room_date_from').val());
+			date_from.setDate(date_from.getDate() + 1);
+			$(this).datepicker("option", "minDate", date_from);
+		}
     });
 
 	$(".edit_product_date_from").datepicker(
@@ -1581,12 +1594,25 @@ function initRoomEvents()
 
 				$('.edit_product_date_to').datepicker('option', 'minDate', objDateToMin);
 			},
+			beforeShow : function () {
+				if(allowBackdateOrder) {
+					var minDate = null;
+				} else {
+					var minDate = new Date(Math.min($.datepicker.parseDate('dd-mm-yy', $(this).data('min_date')), new Date()));
+				}
+				$(this).datepicker("option", "minDate", minDate);
+			}
 		});
 
 		$(".edit_product_date_to").datepicker(
 		{
 			showOtherMonths: true,
-			dateFormat: 'dd-mm-yy'
+			dateFormat: 'dd-mm-yy',
+			beforeShow : function () {
+				var date_from = $.datepicker.parseDate('dd-mm-yy', $(this).closest('.form-group').find('.edit_product_date_from').val());
+				date_from.setDate(date_from.getDate() + 1);
+				$(this).datepicker("option", "minDate", date_from);
+			}
 		});
 	/*End*/
 

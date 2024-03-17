@@ -100,7 +100,30 @@ class RoomTypeServiceProductCartDetail extends ObjectModel
                     }
                     if ($objRoomTypeServiceProductCartDetail->delete()) {
                         $objCart = new Cart($product['id_cart']);
-                        $objCart->updateQty((int)($updateQty), $product['id_product'], null, false, 'down');
+                        if (isset(Context::getContext()->controller->controller_type)) {
+                            $controllerType = Context::getContext()->controller->controller_type;
+                        } else {
+                            $controllerType = 'front';
+                        }
+                        if ($controllerType == 'admin' || $controllerType == 'moduleadmin') {
+                            if ($cartQty = Cart::getProductQtyInCart($product['id_cart'], $product['id_product'])) {
+                                if ($product['quantity'] < $cartQty) {
+                                    Db::getInstance()->update(
+                                        'cart_product',
+                                        array('quantity' => (int)($cartQty - $product['quantity'])),
+                                        '`id_product` = '.(int)$product['id_product'].' AND `id_cart` = '.(int)$product['id_cart']
+                                    );
+                                } else {
+                                    //if room type has no qty remaining in cart then delete row
+                                    Db::getInstance()->delete(
+                                        'cart_product',
+                                        '`id_product` = '.(int)$product['id_product'].' AND `id_cart` = '.(int)$product['id_cart']
+                                    );
+                                }
+                            }
+                        } else {
+                            $objCart->updateQty((int)($updateQty), $product['id_product'], null, false, 'down');
+                        }
                     }
                 }
             }
