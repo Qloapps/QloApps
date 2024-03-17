@@ -105,7 +105,19 @@ class AdminCmsCategoriesControllerCore extends AdminController
             $object = parent::postProcess();
             $this->updateAssoShop((int)Tools::getValue('id_cms_category'));
             if ($object !== false) {
-                Tools::redirectAdmin(self::$currentIndex.'&conf=3&id_cms_category='.(int)$object->id.'&token='.Tools::getValue('token'));
+                if (Tools::isSubmit('submitAdd'.$this->table.'AndStay')) {
+                    if ($this->id_object) {
+                        Tools::redirectAdmin(self::$currentIndex.'&update'.$this->table.'&conf=4&id_cms_category='.(int)$object->id.'&token='.Tools::getValue('token'));
+                    } else {
+                        Tools::redirectAdmin(self::$currentIndex.'&update'.$this->table.'&conf=3&id_cms_category='.(int)$object->id.'&token='.Tools::getValue('token'));
+                    }
+                } else {
+                    if ($this->id_object) {
+                        Tools::redirectAdmin(self::$currentIndex.'&conf=4&id_cms_category='.(int)$object->id.'&token='.Tools::getValue('token'));
+                    } else {
+                        Tools::redirectAdmin(self::$currentIndex.'&conf=3&id_cms_category='.(int)$object->id.'&token='.Tools::getValue('token'));
+                    }
+                }
             }
             return $object;
         }
@@ -289,7 +301,16 @@ class AdminCmsCategoriesControllerCore extends AdminController
             ),
             'submit' => array(
                 'title' => $this->l('Save'),
-            )
+            ),
+            'buttons' => array(
+                'save-and-stay' => array(
+                    'title' => $this->l('Save and stay'),
+                    'name' => 'submitAdd'.$this->table.'AndStay',
+                    'type' => 'submit',
+                    'class' => 'btn btn-default pull-right',
+                    'icon' => 'process-icon-save',
+                ),
+            ),
         );
 
         if (Shop::isFeatureActive()) {

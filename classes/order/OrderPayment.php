@@ -148,4 +148,15 @@ class OrderPaymentCore extends ObjectModel
 
         return new OrderInvoice((int)$res);
     }
+
+    /**
+     * Provides the average conversion rate for a given order in any currency
+     * @param [string] $order_reference
+     * @param [int] $idCurrency
+     * @return float
+     */
+    public function getAverageConversionRate($order_reference, $idCurrency)
+    {
+        return Db::getInstance()->getValue('SELECT (SUM(`amount` * `conversion_rate`) / SUM(`amount`)) FROM `'._DB_PREFIX_.'order_payment` WHERE `order_reference` = \''.pSQL($order_reference).'\' AND `id_currency` = '.(int)$idCurrency);
+    }
 }

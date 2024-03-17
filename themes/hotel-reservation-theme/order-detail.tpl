@@ -149,7 +149,7 @@
                         <div class="row">
                             <div class="col-xs-12 clearfix">
                                 {if $refund_allowed}
-                                    {if !$hasCompletelyRefunded}
+                                    {if !$completeRefundRequestOrCancel}
                                         <a id="order_refund_request" class="btn btn-default pull-right" href="#" title="{l s='Proceed to refund'}"><span>{l s='Cancel Bookings'}</span></a>
                                     {/if}
                                     {if isset($id_cms_refund_policy) && $id_cms_refund_policy}

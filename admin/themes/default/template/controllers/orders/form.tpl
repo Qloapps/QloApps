@@ -1583,6 +1583,17 @@
 			}
 		});
 
+		$(document).on('change', '.room_type_service_product_qty', function(e) {
+			let quantityInputField = this;
+			let maximumQuantity = parseInt($(quantityInputField).attr('data-max-quantity'));
+			let currentQuantity = parseInt($(quantityInputField).val());
+			if (currentQuantity > maximumQuantity) {
+				$(quantityInputField).siblings('p').show();
+			} else {
+				$(quantityInputField).siblings('p').hide();
+			}
+		});
+
 		function updateServiceProducts(element)
 		{
 			var operator = $(element).is(':checked') ? 'up' : 'down';

@@ -20,10 +20,8 @@
 <section id="dashoccupancy" class="panel widget allow_push">
 	<header class="panel-heading">
 		<i class="icon-bar-chart"></i>
-		<span>
-			{l s='Occupancy' mod='dashoccupancy'}
-			&nbsp;<small class='text-muted' id='dashoccupancy_date_range'></small>
-		</span>
+		<span>{l s='Occupancy' mod='dashoccupancy'}&nbsp;<small class='text-muted' id='dashoccupancy_date_range'></small></span>
+        &nbsp;<i class="icon-info-circle label-tooltip" data-toggle="tooltip" data-original-title="{l s='Occupancy information will be displayed by considering the selected date range as Check-in and Check-out dates.' mod='dashoccupancy'}"></i>
 		<span class="panel-heading-action">
 			<a class="list-toolbar-btn" href="javascript:void(0);" title="Refresh" onclick="refreshDashboard('dashoccupancy'); return false;">
 				<i class="process-icon-refresh"></i>

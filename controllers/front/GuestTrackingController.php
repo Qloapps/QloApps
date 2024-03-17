@@ -203,7 +203,6 @@ class GuestTrackingControllerCore extends FrontController
             $objRoomTypeServiceProductOrderDetail = new RoomTypeServiceProductOrderDetail();
             $objRoomType = new HotelRoomType();
 
-            $nonRequestedRooms = 0;
             $anyBackOrder = 0;
 
             foreach ($order_list as &$order) {
