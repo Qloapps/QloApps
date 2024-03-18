@@ -1834,11 +1834,11 @@
 		});
 
 		$(document).on('focusout', '#rooms_type_extra_demands .room_ordered_services .qty', function(e) {
-			var qty_wntd = $(this).val();
-			if (qty_wntd == '' || !$.isNumeric(qty_wntd) || qty_wntd < 1) {
-				$(this).val(1);
-			}
-			updateAdditionalServices($(this));
+			updateAdditionalServices($(this).closest('tr'));
+		});
+
+		$(document).on('focusout', '#rooms_type_extra_demands .room_ordered_services .unit_price', function(e) {
+			updateAdditionalServices($(this).closest('tr'));
 		});
 
 		$(document).on('focusout', '#rooms_type_extra_demands #add_room_services_form .qty', function(e) {
@@ -1847,6 +1847,52 @@
 				$(this).val(1);
 			}
 		});
+
+		function updateAdditionalServices(element)
+		{
+			var id_room_type_service_product_order_detail = $(element).data('id_room_type_service_product_order_detail');
+			if ($(element).find('.qty').length) {
+				var qty = $(element).find('.qty').val();
+				if (qty == '' || !$.isNumeric(qty) || qty < 1) {
+					$(element).find('.qty').val(1);
+					qty = 1;
+				}
+			} else {
+				var qty = 1;
+			}
+
+			var unit_price = $(element).find('.unit_price').val();
+			if ($.isNumeric(qty)) {
+				$.ajax({
+					type: 'POST',
+					headers: {
+						"cache-control": "no-cache"
+					},
+					url: "{$link->getAdminLink('AdminOrders')|addslashes}",
+					dataType: 'JSON',
+					cache: false,
+					data: {
+						id_room_type_service_product_order_detail: id_room_type_service_product_order_detail,
+						qty: qty,
+						unit_price: unit_price,
+						action: 'updateRoomAdditionalServices',
+						ajax: true
+					},
+					success: function(jsonData) {
+						if (!jsonData.hasError) {
+							if (jsonData.service_panel) {
+								$('#room_type_service_product_desc').replaceWith(jsonData.service_panel);
+							}
+							showSuccessMessage(txtExtraDemandSucc);
+						} else {
+							showErrorMessage(jsonData.errors);
+
+						}
+					}
+				});
+			}
+
+		}
 
 		$(document).on('submit', '#add_room_services_form', function(e) {
 			e.preventDefault();
@@ -1889,7 +1935,8 @@
 				$(this).closest('#room_extra_demand_content').find('input:checkbox.id_room_type_demand:checked').each(function () {
 					roomDemands.push({
 						'id_global_demand':$(this).val(),
-						'id_option': $(this).closest('.room_demand_block').find('.id_option').val()
+						'id_option': $(this).closest('.room_demand_block').find('.id_option').val(),
+						'unit_price': $(this).closest('.room_demand_block').find('.unit_price').val()
 					});
 				});
 
@@ -1905,15 +1952,17 @@
 						data: {
 							id_htl_booking: idHtlBooking,
 							room_demands: JSON.stringify(roomDemands),
-							action: 'EditRoomExtraDemands',
+							action: 'addRoomExtraDemands',
 							ajax: true
 						},
 						success: function(jsonData) {
-							if (jsonData.success) {
+							if (!jsonData.hasError) {
 								showSuccessMessage(txtExtraDemandSucc);
 								if (jsonData.facilities_panel) {
 									$('#room_type_demands_desc').replaceWith(jsonData.facilities_panel);
 								}
+							} else if (jsonData.errors) {
+								showErrorMessage(jsonData.errors);
 							} else {
 								showErrorMessage(txtSomeErr);
 							}
@@ -1924,6 +1973,44 @@
 				}
 			}
 		});
+
+		{* edit room extra demand*}
+		$(document).on('focusout', '#rooms_type_extra_demands .room_ordered_demands .unit_price', function(e) {
+			updateRoomDemand($(this).closest('tr'));
+		});
+
+		function updateRoomDemand(element)
+		{
+			var id_booking_demand = $(element).data('id_booking_demand');
+			var unit_price = $(element).find('.unit_price').val();
+				$.ajax({
+					type: 'POST',
+					headers: {
+						"cache-control": "no-cache"
+					},
+					url: "{$link->getAdminLink('AdminOrders')|addslashes}",
+					dataType: 'JSON',
+					cache: false,
+					data: {
+						id_booking_demand: id_booking_demand,
+						unit_price: unit_price,
+						action: 'updateRoomExtraDemands',
+						ajax: true
+					},
+					success: function(jsonData) {
+						if (!jsonData.hasError) {
+							if (jsonData.facilities_panel) {
+								$('#room_type_demands_desc').replaceWith(jsonData.facilities_panel);
+							}
+							showSuccessMessage(txtExtraDemandSucc);
+						} else {
+							showErrorMessage(jsonData.errors);
+
+						}
+					}
+				});
+
+		}
 
 		{* Delete ordered room booking demand *}
 		$(document).on('click', '.del-order-room-demand', function(e) {
@@ -2005,8 +2092,8 @@
 			var option_selected = $(this).find('option:selected');
 			var extra_demand_price = option_selected.attr("optionPrice")
 			extra_demand_price = parseFloat(extra_demand_price);
-			extra_demand_price = formatCurrency(extra_demand_price, currency_format, currency_sign, currency_blank);
-			$(this).closest('.room_demand_block').find('.extra_demand_option_price').text(extra_demand_price);
+			// extra_demand_price = formatCurrency(extra_demand_price, currency_format, currency_sign, currency_blank);
+			$(this).closest('.room_demand_block').find('.unit_price').val(extra_demand_price);
 		});
 
 		$('#mySwappigModal').on('hidden.bs.modal', function (e)
