@@ -68,46 +68,8 @@
 	<div>{$hook_invoice}</div>
 	{/if}
 
-	<div class="panel kpi-container">
-		<div class="row">
-			<div class="col-xs-6 col-sm-3 box-stats color3" >
-				<div class="kpi-content">
-					<i class="icon-calendar-empty"></i>
-					<span class="title">{l s='Date'}</span>
-					<span class="value">{dateFormat date=$order->date_add full=false}</span>
-				</div>
-			</div>
-			<div class="col-xs-6 col-sm-3 box-stats color4" >
-				<div class="kpi-content">
-					<i class="icon-money"></i>
-					<span class="title">{l s='Total'}</span>
-					<span class="value">{displayPrice price=$order->total_paid_tax_incl currency=$currency->id}</span>
-				</div>
-			</div>
-			<div class="col-xs-6 col-sm-3 box-stats color2" >
-				<div class="kpi-content">
-					<i class="icon-comments"></i>
-					<span class="title">{l s='Messages'}</span>
-					<span class="value"><a href="{$link->getAdminLink('AdminCustomerThreads')|escape:'html':'UTF-8'}&amp;id_order={$order->id|intval}">{sizeof($customer_thread_message)}</a></span>
-				</div>
-			</div>
-			<div class="col-xs-6 col-sm-3 box-stats color1" >
-				<a href="#start_products">
-					<div class="kpi-content">
-						<i class="icon icon-home"></i>
-						<!-- Original -->
-						<!-- <span class="title">{l s='Total'}</span>
-						<span class="value">{sizeof($products)}</span> -->
-						<span class="title">{l s='Total Rooms'}</span>
-						<span class="value">{$order_detail_data|@count}</span>
-					</div>
-				</a>
-			</div>
-		</div>
-	</div>
-
-    {* Overbookings information of the order *}
-    {include file='controllers/orders/_overbookings.tpl'}
+  {* Overbookings information of the order *}
+  {include file='controllers/orders/_overbookings.tpl'}
 
 	<div class="row">
 		<div class="col-lg-7">

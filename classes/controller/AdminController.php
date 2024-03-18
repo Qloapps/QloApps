@@ -990,6 +990,18 @@ class AdminControllerCore extends Controller
         return true;
     }
 
+    protected function ajaxProcessChangeKpiVisibility()
+    {
+        $cookieKey = 'kpi_visibility_'.$this->context->controller->className.'_'.Tools::getValue('kpi_id');
+        $this->context->cookie->$cookieKey = (int) Tools::getValue('is_visible');
+    }
+
+    protected function ajaxProcessSaveKpiView()
+    {
+        $cookieKey = 'kpi_wrapping_'.$this->context->controller->className;
+        $this->context->cookie->$cookieKey = (int) Tools::getValue('no_wrapping');
+    }
+
     /**
      * @TODO uses redirectAdmin only if !$this->ajax
      * @return bool
