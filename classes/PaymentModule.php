@@ -761,15 +761,16 @@ abstract class PaymentModuleCore extends Module
 
                     // update order in htl tables
                     $objRoomType = new HotelRoomType();
-
                     $objAdvancedPayment = new HotelAdvancedPayment();
-
+                    $objCartBookingData = new HotelCartBookingData();
+                    $objBookingDetail = new HotelBookingDetail();
                     $vatAddress = new Address((int)$order->id_address_tax);
 
                     $idLang = (int)$this->context->cart->id_lang;
                     $normalProducts = array();
+                    // variable to check max overbookings are created in the room in any date of the booking duration
+                    $maxOverbookingCount = 0;
                     foreach ($order->product_list as $product) {
-                        $objCartBookingData = new HotelCartBookingData();
                         $idProduct = $product['id_product'];
                         $cartBookingData = $objCartBookingData->getOnlyCartBookingData($this->context->cart->id, $this->context->cart->id_guest, $idProduct);
                         if ($cartBookingData) {
@@ -777,8 +778,67 @@ abstract class PaymentModuleCore extends Module
                                 $objCartBookingData = new HotelCartBookingData($bookingInfo['id']);
                                 $objCartBookingData->id_order = $order->id;
                                 $objCartBookingData->id_customer = $this->context->customer->id;
+
+                                // check if still room available for this booking or not
+                                $isRoomOverBooked = 1;
+
+                                // get all the available rooms right now
+                                $bookingParams = array(
+                                    'date_from' => $objCartBookingData->date_from,
+                                    'date_to' => $objCartBookingData->date_to,
+                                    'hotel_id' => $objCartBookingData->id_hotel,
+                                    'id_room_type' => $idProduct,
+                                    'only_search_data' => 1
+                                );
+
+                                if ($searchRoomsInfo = $objBookingDetail->getBookingData($bookingParams)) {
+                                    if (isset($searchRoomsInfo['rm_data'][$idProduct]['data']['available'])
+                                        && $searchRoomsInfo['rm_data'][$idProduct]['data']['available']
+                                    ) {
+                                        $availableRoomsInfo = $searchRoomsInfo['rm_data'][$idProduct]['data']['available'];
+                                        if ($roomIdsAvailable = array_column($availableRoomsInfo, 'id_room')) {
+                                            // If room is still there in the available rooms list then it is not in back order
+                                            if (in_array($objCartBookingData->id_room, $roomIdsAvailable)) {
+                                                $isRoomOverBooked = 0;
+                                            } else {
+                                                $isRoomOverBooked = 1;
+                                                foreach ($roomIdsAvailable as $idRoom) {
+                                                    if ($idRoom != $objCartBookingData->id_room) {
+                                                        $objCartBookingData->id_room = $idRoom;
+                                                        $isRoomOverBooked = 0;
+                                                        break;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+
+                                // if room is not available right now the set it to back order
+                                if ($isRoomOverBooked) {
+                                    $objCartBookingData->is_back_order = 1;
+
+                                    // max overbookings in a room datewise breakup. So that we can know no. of overbookings in every date
+                                    if ($roomOverBookings = $objBookingDetail->getOverbookedRooms(
+                                        0,
+                                        $objCartBookingData->id_hotel,
+                                        $objCartBookingData->date_from,
+                                        $objCartBookingData->date_to,
+                                        0,
+                                        1
+                                    )) {
+                                        // check in the bokking duration what is the max overbookings in ay date in the date range
+                                        // replace $maxOverbookingCount with $maxOverbookingsInDate if it is greater
+                                        if ($maxOverbookingCount < $roomOverBookings) {
+                                            $maxOverbookingCount = $roomOverBookings;
+                                        }
+                                    }
+                                } else {
+                                    $objCartBookingData->is_back_order = 0;
+                                }
                                 $objCartBookingData->save();
 
+                                // Lets set data to the hotel booking detail table
                                 $objBookingDetail = new HotelBookingDetail();
                                 $id_order_detail = $objBookingDetail->getPsOrderDetailIdByIdProduct($idProduct, $order->id);
                                 $objBookingDetail->id_product = $idProduct;
@@ -790,12 +850,9 @@ abstract class PaymentModuleCore extends Module
                                 $objBookingDetail->id_customer = $this->context->customer->id;
                                 $objBookingDetail->booking_type = $objCartBookingData->booking_type;
                                 $objBookingDetail->id_status = 1;
+                                $objBookingDetail->is_back_order = $objCartBookingData->is_back_order;
                                 $objBookingDetail->comment = $objCartBookingData->comment;
 
-                                // For Back Order(Because of cart lock)
-                                if ($objCartBookingData->is_back_order) {
-                                    $objBookingDetail->is_back_order = 1;
-                                }
                                 $total_price = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice(
                                     $idProduct,
                                     $objCartBookingData->date_from,
@@ -999,10 +1056,39 @@ abstract class PaymentModuleCore extends Module
                     $new_history->addWithemail(true, $extra_vars);
 
                     // Switch to back order if needed
-                    if (Configuration::get('PS_STOCK_MANAGEMENT') && ($order_detail->getStockState() || $order_detail->product_quantity_in_stock <= 0)) {
+                    $objHotelBookingDetail = new HotelBookingDetail();
+                    if ($objHotelBookingDetail->getOverbookedRooms($order->id)) {
+                        $cancelOrder = 0;
+                        // Take overbooking action as per order->overbooking Preferences else set order for cancellation
+                        if (Configuration::get('PS_OVERBOOKING_ORDER_ACTION') == Order::OVERBOOKING_ORDER_CANCEL_ACTION) {
+                            $cancelOrder = 1;
+                        } else {
+                            // check conditions for maximun overbookings allowed for the hotel else set order for cancellation
+                            $maxAllowedOverbookings = Configuration::get('PS_MAX_OVERBOOKING_PER_HOTEL_PER_DAY');
+                            // >= condition applied because equal case means already overbooked rooms limit exceeded before this booking
+                            if ($maxAllowedOverbookings && ($maxOverbookingCount >= $maxAllowedOverbookings)) {
+                                $cancelOrder = 1;
+                            }
+                        }
+
+                        // set order status after all conditions checks
+                        if ($cancelOrder) {
+                            $id_order_state = Configuration::get('PS_OS_CANCELED');
+                        } else {
+                            if ($order->valid) {
+                                if ($order->is_advance_payment && $order->advance_paid_amount < $order->total_paid_tax_incl) {
+                                    $id_order_state = Configuration::get('PS_OS_OVERBOOKING_PARTIAL_PAID');
+                                } else {
+                                    $id_order_state = Configuration::get('PS_OS_OVERBOOKING_PAID');
+                                }
+                            } else {
+                                $id_order_state = Configuration::get('PS_OS_OVERBOOKING_UNPAID');
+                            }
+                        }
+
                         $history = new OrderHistory();
                         $history->id_order = (int)$order->id;
-                        $history->changeIdOrderState(Configuration::get($order->valid ? 'PS_OS_OUTOFSTOCK_PAID' : 'PS_OS_OUTOFSTOCK_UNPAID'), $order, true);
+                        $history->changeIdOrderState($id_order_state, $order, true);
                         $history->addWithemail();
                     }
 
@@ -1148,8 +1234,21 @@ abstract class PaymentModuleCore extends Module
                             PrestaShopLogger::addLog('PaymentModule::validateOrder - Mail is about to be sent', 1, null, 'Cart', (int)$id_cart, true);
                         }
 
-                        // Send order confirmation mails to the reciepients according to the order mail configuration
+                        $orderStatusObj = new OrderState((int)$id_order_state, (int)$this->context->language->id);
+                        $data['{order_status}'] = $orderStatusObj->name;
+                        $data['{order_status_color}'] = $orderStatusObj->color;
+                        // Send order confirmation/overbooking mails to the reciepients according to the order mail configuration
+                        $overBookingStates = OrderState::getOverBookingStates();
+                        $isOverBookingStatus = in_array($id_order_state, $overBookingStates);
                         if (Configuration::get('PS_ORDER_CONF_MAIL_TO_CUSTOMER')){
+                            // If order currenct state is overbooking, the send overbooking email or send order confirmation email
+                            if ($isOverBookingStatus) {
+                                $subject = Mail::l('Order Not Confirmed', (int)$order->id_lang);
+                                $template = 'overbooking';
+                            } else {
+                                $subject = Mail::l('Order confirmation', (int)$order->id_lang);
+                                $template = 'order_conf';
+                            }
                             if (Validate::isEmail($this->context->customer->email)) {
                                 // send customer information
                                 $data['{firstname}'] = $this->context->customer->firstname;
@@ -1157,8 +1256,8 @@ abstract class PaymentModuleCore extends Module
                                 $data['{email}'] = $this->context->customer->email;
                                 Mail::Send(
                                     (int)$order->id_lang,
-                                    'order_conf',
-                                    Mail::l('Order confirmation', (int)$order->id_lang),
+                                    $template,
+                                    $subject,
                                     $data,
                                     $this->context->customer->email,
                                     $this->context->customer->firstname.' '.$this->context->customer->lastname,
@@ -1179,8 +1278,8 @@ abstract class PaymentModuleCore extends Module
                                         $data['{email}'] = $objOrderCustomerGuestDetail->email;
                                         Mail::Send(
                                             (int)$order->id_lang,
-                                            'order_conf',
-                                            Mail::l('Order confirmation', (int)$order->id_lang),
+                                            $template,
+                                            $subject,
                                             $data,
                                             $objOrderCustomerGuestDetail->email,
                                             $objOrderCustomerGuestDetail->firstname.' '.$objOrderCustomerGuestDetail->lastname,
@@ -1194,8 +1293,17 @@ abstract class PaymentModuleCore extends Module
                             }
                         }
                         if (Configuration::get('PS_ORDER_CONF_MAIL_TO_SUPERADMIN')){
-                            // send superadmin information
+                            // get superadmin employees
                             if ($superAdminEmployees = Employee::getEmployeesByProfile(_PS_ADMIN_PROFILE_, true)) {
+                                // If order currenct state is overbooking, the send overbooking email or send order confirmation email
+                                if ($isOverBookingStatus) {
+                                    $subject = Mail::l('Order Not Confirmed', (int)$order->id_lang);
+                                    $template = 'overbooking_admin';
+                                } else {
+                                    $subject = Mail::l('Order confirmation', (int)$order->id_lang);
+                                    $template = 'order_conf_admin';
+                                }
+
                                 foreach ($superAdminEmployees as $superAdminEmployee) {
                                     if (Validate::isEmail($superAdminEmployee['email'])) {
                                         $data['{customer_name}'] = $this->context->customer->firstname.' '.$this->context->customer->lastname;
@@ -1205,8 +1313,8 @@ abstract class PaymentModuleCore extends Module
                                         $data['{email}'] = $superAdminEmployee['email'];
                                         Mail::Send(
                                             (int)$order->id_lang,
-                                            'order_conf_admin',
-                                            Mail::l('Order confirmation', (int)$order->id_lang),
+                                            $template,
+                                            $subject,
                                             $data,
                                             $superAdminEmployee['email'],
                                             $superAdminEmployee['firstname'].' '.$superAdminEmployee['lastname'],
@@ -1223,6 +1331,14 @@ abstract class PaymentModuleCore extends Module
                             && Validate::isLoadedObject($objHotel = new HotelBranchInformation($idHotel))
                         ) {
                             if (Configuration::get('PS_ORDER_CONF_MAIL_TO_HOTEL_MANAGER')){
+                                // If order currenct state is overbooking, the send overbooking email or send order confirmation email
+                                if ($isOverBookingStatus) {
+                                    $subject = Mail::l('Order Not Confirmed', (int)$order->id_lang);
+                                    $template = 'overbooking_admin';
+                                } else {
+                                    $subject = Mail::l('Order confirmation', (int)$order->id_lang);
+                                    $template = 'order_conf_admin';
+                                }
                                 // send hotel information
                                 $data['{firstname}'] = '';
                                 $data['{lastname}'] = '';
@@ -1232,8 +1348,8 @@ abstract class PaymentModuleCore extends Module
                                 if (Validate::isEmail($objHotel->email)) {
                                     Mail::Send(
                                         (int)$order->id_lang,
-                                        'order_conf_admin',
-                                        Mail::l('Order confirmation', (int)$order->id_lang),
+                                        $template,
+                                        $subject,
                                         $data,
                                         $objHotel->email,
                                         null,
@@ -1248,6 +1364,16 @@ abstract class PaymentModuleCore extends Module
                                 if ($htlAccesses = $objHotel->getHotelAccess($idHotel)) {
                                     $data['{customer_name}'] = $this->context->customer->firstname.' '.$this->context->customer->lastname;
                                     $data['{customer_email}'] = $this->context->customer->email;
+
+                                    // If order currenct state is overbooking, the send overbooking email or send order confirmation email
+                                    if ($isOverBookingStatus) {
+                                        $subject = Mail::l('Order Not Confirmed', (int)$order->id_lang);
+                                        $template = 'overbooking_admin';
+                                    } else {
+                                        $subject = Mail::l('Order confirmation', (int)$order->id_lang);
+                                        $template = 'order_conf_admin';
+                                    }
+
                                     foreach ($htlAccesses as $access) {
                                         if ($access['access'] && $access['id_profile'] != _PS_ADMIN_PROFILE_) {
                                             if ($htlEmployees = Employee::getEmployeesByProfile($access['id_profile'])) {
@@ -1259,8 +1385,8 @@ abstract class PaymentModuleCore extends Module
                                                         $data['{email}'] = $empl['email'];
                                                         Mail::Send(
                                                             (int)$order->id_lang,
-                                                            'order_conf_admin',
-                                                            Mail::l('Order confirmation', (int)$order->id_lang),
+                                                            $template,
+                                                            $subject,
                                                             $data,
                                                             $empl['email'],
                                                             $empl['firstname'].' '.$empl['lastname'],
@@ -1278,7 +1404,6 @@ abstract class PaymentModuleCore extends Module
                             }
                         }
                     }
-
                     // updates stock in shops
                     if (Configuration::get('PS_ADVANCED_STOCK_MANAGEMENT')) {
                         $product_list = $order->getProducts();

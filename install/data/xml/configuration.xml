@@ -95,6 +95,9 @@
 	<configuration id="PS_NB_DAYS_NEW_PRODUCT" name="PS_NB_DAYS_NEW_PRODUCT">
 		<value>20</value>
 	</configuration>
+	<configuration id="PS_KPI_BEST_SELLING_ROOM_TYPE_NB_DAYS" name="PS_KPI_BEST_SELLING_ROOM_TYPE_NB_DAYS">
+		<value>30</value>
+	</configuration>
 	<configuration id="PS_SSL_ENABLED" name="PS_SSL_ENABLED">
 		<value>0</value>
 	</configuration>
@@ -332,6 +335,12 @@
 	<configuration id="PS_GUEST_CHECKOUT_ENABLED" name="PS_GUEST_CHECKOUT_ENABLED">
 		<value>0</value>
 	</configuration>
+    <configuration id="PS_OVERBOOKING_ORDER_ACTION" name="PS_OVERBOOKING_ORDER_ACTION">
+		<value>1</value>
+	</configuration>
+    <configuration id="PS_MAX_OVERBOOKING_PER_HOTEL_PER_DAY" name="PS_MAX_OVERBOOKING_PER_HOTEL_PER_DAY">
+		<value>0</value>
+	</configuration>
 	<configuration id="PS_ORDER_CONF_MAIL_TO_CUSTOMER" name="PS_ORDER_CONF_MAIL_TO_CUSTOMER">
 		<value>1</value>
 	</configuration>
@@ -430,6 +439,9 @@
 	</configuration>
 	<configuration id="PS_OS_OVERBOOKING_UNPAID" name="PS_OS_OVERBOOKING_UNPAID">
 		<value>11</value>
+	</configuration>
+    <configuration id="PS_OS_OVERBOOKING_PARTIAL_PAID" name="PS_OS_OVERBOOKING_PARTIAL_PAID">
+		<value>12</value>
 	</configuration>
 	<!-- <configuration id="PS_OS_AWAITING_PARTIAL_PAYMENT" name="PS_OS_AWAITING_PARTIAL_PAYMENT">
 		<value>13</value>
@@ -883,6 +895,18 @@
 	</configuration>
 	<configuration id="PS_CUSTOMER_OPTIN" name="PS_CUSTOMER_OPTIN">
 		<value>1</value>
+	</configuration>
+	<configuration id="PS_KPI_FREQUENT_CUSTOMER_NB_ORDERS" name="PS_KPI_FREQUENT_CUSTOMER_NB_ORDERS">
+		<value>5</value>
+	</configuration>
+	<configuration id="PS_KPI_REVPAC_NB_DAYS" name="PS_KPI_REVPAC_NB_DAYS">
+		<value>30</value>
+	</configuration>
+	<configuration id="PS_KPI_CONVERSION_RATE_NB_DAYS" name="PS_KPI_CONVERSION_RATE_NB_DAYS">
+		<value>30</value>
+	</configuration>
+	<configuration id="PS_KPI_NEW_CUSTOMERS_NB_DAYS" name="PS_KPI_NEW_CUSTOMERS_NB_DAYS">
+		<value>30</value>
 	</configuration>
 	<configuration id="PS_PACK_STOCK_TYPE" name="PS_PACK_STOCK_TYPE">
 		<value>0</value>

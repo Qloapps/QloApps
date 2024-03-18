@@ -168,6 +168,23 @@ class HotelBookingDetail extends ObjectModel
         parent::__construct($id);
     }
 
+    public function update($null_values = false)
+    {
+        $result = parent::update($null_values);
+
+        // if automatic overbooking resolution is enabled
+        if (Configuration::get('PS_OVERBOOKING_AUTO_RESOLVE')) {
+            // if room is getting free and this room is not already in back order then resolve the overbookings for this free room
+            // $this->is_cancelled == 1 is not checked because currently we always set is_refunded to 1 when room is free
+            // $this->is_back_order == 0 is checked because $this->is_back_order == 1 is used as room is free
+            if ($this->is_refunded == 1 && $this->is_back_order == 0) {
+                $this->resolveOverBookings();
+            }
+        }
+
+        return $result;
+    }
+
     public function getBookingDataParams($params)
     {
         if (!isset($params['id_room_type'])) {
@@ -1956,6 +1973,7 @@ class HotelBookingDetail extends ObjectModel
     {
         $table = 'htl_booking_detail';
         $data = array('is_refunded' => (int) $is_refunded);
+
         if ($id_rooms) {
             foreach ($id_rooms as $key_rm => $val_rm) {
                 $where = 'id_order='.(int)$id_order.' AND id_room = '.(int)$val_rm['id_room'].' AND `date_from`= \''.
@@ -1963,8 +1981,15 @@ class HotelBookingDetail extends ObjectModel
                 $result = Db::getInstance()->update($table, $data, $where);
             }
         } else {
-            return Db::getInstance()->update($table, $data, 'id_order='.(int)$id_order);
+            $result = Db::getInstance()->update($table, $data, 'id_order='.(int)$id_order);
         }
+
+        // if automatic overbooking resolution is enabled
+        if ($result && Configuration::get('PS_OVERBOOKING_AUTO_RESOLVE') && $is_refunded) {
+            // if room is getting free and this room is not already in back order then resolve the overbookings for this free room
+            $this->resolveOverBookings();
+        }
+
         return $result;
     }
 
@@ -3006,5 +3031,192 @@ class HotelBookingDetail extends ObjectModel
         }
 
         return false;
+    }
+
+    /**
+     * Get overbooked rooms in the order|hotel
+     * @param [int] $idOrder : id of the order
+     * @param [int] $idHotel : id of the hotel
+     * @param [string] $dateFrom
+     * @param [string] $dateTo
+     * @param [int] $datewiseBreakup : send 1 to get overbooked rooms in datewise breakup
+     * @param [int] $roomCount : send 1 to get the count of the rooms overbooked only
+     * @param [int] $bookedRoomFlag : send 0 for no action | send 1 to get booked room info | send 2 to get overbooked rooms which are free
+     *
+     * @return array | integer : array of overbooked rooms | count of overbooked rooms
+     */
+    public function getOverbookedRooms(
+        $idOrder = 0,
+        $idHotel = 0,
+        $dateFrom = '',
+        $dateTo = '',
+        $datewiseBreakup = 0,
+        $roomCount = 0,
+        $bookedRoomInfoFlag = 0
+    ) {
+        $result = array();
+
+        $sql = 'SELECT';
+        if ($roomCount) {
+            $sql .= ' COUNT(*)';
+        } else {
+            $sql .= ' *';
+        }
+
+        $sql .= ' FROM `'._DB_PREFIX_.'htl_booking_detail` WHERE `is_back_order` = 1 AND `is_refunded` = 0 AND `is_cancelled` = 0';
+
+        if ($idOrder) {
+            $sql .= ' AND `id_order` = '.(int) $idOrder;
+        }
+        if ($idHotel) {
+            $sql .= ' AND `id_hotel` = '.(int) $idHotel;
+        }
+
+        if ($datewiseBreakup && $dateFrom && $dateTo) {
+            for ($currentDate = $dateFrom; $currentDate < $dateTo; $currentDate = date('Y-m-d', strtotime('+1 day', strtotime($currentDate)))) {
+                $dateSql = $sql . ' AND `date_from` <= \''.pSQL($currentDate).'\' AND `date_to` > \''.pSQL($currentDate).'\'';
+
+                if ($roomCount) {
+                    $result[$currentDate] = Db::getInstance()->getValue($dateSql);
+                } else {
+                    $result[$currentDate] = Db::getInstance()->executeS($dateSql);
+                }
+            }
+        } else {
+            if ($dateFrom && $dateTo) {
+                $sql .= ' AND `date_from` < \''.pSQL($dateTo).'\' AND `date_to` > \''.pSQL($dateFrom).'\'';
+            }
+
+            if ($roomCount) {
+                $result = Db::getInstance()->getValue($sql);
+            } else {
+                $result = Db::getInstance()->executeS($sql);
+            }
+        }
+
+        if ($bookedRoomInfoFlag && !$roomCount && $result) {
+            $link = new Link();
+            foreach ($result as $key => $bookingInfo) {
+                $result[$key]['booked_room_info'] = $this->chechRoomBooked($bookingInfo['id_room'], $bookingInfo['date_from'], $bookingInfo['date_to']);
+                $result[$key]['orders_filter_link'] = $link->getAdminLink('AdminOrders');
+
+                // if need only rooms which are available to resolve overbooking the unset booked rooms
+                if ($bookedRoomInfoFlag == 2 && $result[$key]['booked_room_info']) {
+                    unset($result[$key]);
+                }
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * Get all the orders which are in overbooking
+     * @param integer $onlyFutureDates : for orders which bookings dates are in future
+     * @return array
+     */
+    public function getOverBookedOrders($onlyFutureDates = 0)
+    {
+        $sql = 'SELECT DISTINCT `id_order` FROM `'._DB_PREFIX_.'htl_booking_detail` WHERE `is_back_order` = 1 AND `is_refunded` = 0 AND `is_cancelled` = 0';
+
+        if ($onlyFutureDates) {
+            $sql .= ' AND `date_to` > \''.pSQL(date('Y-m-d')).'\'';
+        }
+        $sql .= ' ORDER BY `id_order` ASC';
+
+        $result = Db::getInstance()->executeS($sql);
+
+        return array_column($result, 'id_order');
+    }
+
+    // Resolve overbookings by checking current available rooms
+    // Overbookings resolution will only be done if all overbookings are getting resolved in the order
+    public function resolveOverBookings($idHotelBooking = 0)
+    {
+        $result = false;
+
+        $overBookedOrders = array();
+        if ($idHotelBooking) {
+            if (Validate::isLoadedObject($objHtlBookingDetail = new HotelBookingDetail($idHotelBooking))) {
+                $overBookedOrders = array($objHtlBookingDetail->id_order);
+            }
+        } else {
+            $overBookedOrders = $this->getOverBookedOrders(1);
+        }
+
+        if ($overBookedOrders) {
+            foreach ($overBookedOrders as $idOrder) {
+                // get all overbooked rooms in the order so that we can decide status of the order after overbooking resolved
+                $overBookedRooms = $this->getOverbookedRooms($idOrder);
+                $totalOverBookedInOrder = count($overBookedRooms);
+
+                // if request for specific booking resolve
+                if ($idHotelBooking) {
+                    $overBookedRooms = array((array)($objHtlBookingDetail));
+                }
+
+                if ($overBookedRooms) {
+                    $resolvableOverbookings = array();
+                    foreach($overBookedRooms as $roomBooking) {
+                        $params = array(
+                            'idHotel' => $roomBooking['id_hotel'],
+                            'dateFrom' => $roomBooking['date_from'],
+                            'dateTo' => $roomBooking['date_to'],
+                            'idRoomType' => $roomBooking['id_product'],
+                            'searchOccupancy' => 0,
+                            'allowedIdRoomTypes' => implode(",", array($roomBooking['id_product']))
+                        );
+
+                        if ($availableRooms = $this->getSearchAvailableRooms($params)) {
+                            if (isset($availableRooms['availableRoomTypes']['roomTypes'][$roomBooking['id_product']]['rooms'])
+                                && $availableRooms['availableRoomTypes']['roomTypes'][$roomBooking['id_product']]['rooms']
+                            ) {
+                                $availableRoomsInfo = $availableRooms['availableRoomTypes']['roomTypes'][$roomBooking['id_product']]['rooms'];
+                                if ($roomIdsAvailable = array_column($availableRoomsInfo, 'id_room')) {
+                                    // If room is still there in the available rooms list then we can resolve its overbooking
+                                    if (in_array($roomBooking['id_room'], $roomIdsAvailable)) {
+                                        $resolvableOverbookings[] = $roomBooking['id'];
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    // if request for specific booking Or all overbooked rooms are resolved then resolve the overbooking by setting is_back_order to 0
+                    if ($idHotelBooking || (count($resolvableOverbookings) == $totalOverBookedInOrder)) {
+                        foreach ($resolvableOverbookings as $idHtlBookingDtl) {
+                            $objBookingDetail = new HotelBookingDetail($idHtlBookingDtl);
+                            $objBookingDetail->is_back_order = 0;
+                            $objBookingDetail->update();
+
+                            $result = true;
+                        }
+
+                        // After all overbookings are resolved we can update the status of the order
+                        if (count($resolvableOverbookings) == $totalOverBookedInOrder) {
+                            $objOrder = new Order($idOrder);
+                            $idOrderState = 0;
+                            if ($objOrder->current_state == Configuration::get('PS_OS_OVERBOOKING_PAID')) {
+                                $idOrderState = Configuration::get('PS_OS_PAYMENT_ACCEPTED');
+                            } elseif ($objOrder->current_state == Configuration::get('PS_OS_OVERBOOKING_PARTIAL_PAID')) {
+                                $idOrderState = Configuration::get('PS_OS_PARTIAL_PAYMENT_ACCEPTED');
+                            } elseif ($objOrder->current_state == Configuration::get('PS_OS_OVERBOOKING_UNPAID')) {
+                                $idOrderState = Configuration::get('PS_OS_AWAITING_PAYMENT');
+                            }
+
+                            // if we have order state to change
+                            if ($idOrderState) {
+                                $objOrderHistory = new OrderHistory();
+                                $objOrderHistory->id_order = (int)$idOrder;
+                                $objOrderHistory->changeIdOrderState((int)$idOrderState, $objOrder, true);
+                                $objOrderHistory->add();
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return $result;
     }
 }

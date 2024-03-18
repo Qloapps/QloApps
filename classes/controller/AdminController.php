@@ -760,7 +760,7 @@ class AdminControllerCore extends Controller
             }
 
             if (count($filters)) {
-                return sprintf($this->l('filter by %s'), implode(', ', $filters));
+                return sprintf($this->l('Filter by %s'), implode(', ', $filters));
             }
         }
     }
@@ -988,6 +988,18 @@ class AdminControllerCore extends Controller
         $this->context->cookie->$controller = json_encode($listFieldsVisibility);
 
         return true;
+    }
+
+    protected function ajaxProcessChangeKpiVisibility()
+    {
+        $cookieKey = 'kpi_visibility_'.$this->context->controller->className.'_'.Tools::getValue('kpi_id');
+        $this->context->cookie->$cookieKey = (int) Tools::getValue('is_visible');
+    }
+
+    protected function ajaxProcessSaveKpiView()
+    {
+        $cookieKey = 'kpi_wrapping_'.$this->context->controller->className;
+        $this->context->cookie->$cookieKey = (int) Tools::getValue('no_wrapping');
     }
 
     /**
@@ -2232,7 +2244,7 @@ class AdminControllerCore extends Controller
         ) {
             $this->page_header_toolbar_btn['modules-list'] = array(
                 'href' => '#',
-                'desc' => $this->l('Recommended Modules and Services')
+                'desc' => $this->l('Recommendations')
             );
         }
     }

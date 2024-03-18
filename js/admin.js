@@ -504,6 +504,14 @@ function changeCMSActivationAuthorization()
 		getE('PS_CONDITIONS_CMS_ID').disabled = 'disabled';
 }
 
+function changeOverbookingOrderAction()
+{
+    if (getE('PS_OVERBOOKING_ORDER_ACTION').value == $("input[name='OVERBOOKING_ORDER_CANCEL_ACTION']").val())
+        $('#PS_MAX_OVERBOOKING_PER_HOTEL_PER_DAY').closest('.form-group').hide();
+    else
+        $('#PS_MAX_OVERBOOKING_PER_HOTEL_PER_DAY').closest('.form-group').show();
+}
+
 function disableZipFormat()
 {
 	if ($('#need_zip_code_on').prop('checked') == false)
@@ -1569,6 +1577,61 @@ function refresh_kpis()
 			if (typeof window[functionName] === 'function') {
 				window[functionName]();
 			}
+		}
+	});
+}
+
+$(document).on('change', '.kpi-container .kpi-display-toggle', function (e) {
+	let kpiCheckbox = $(this);
+	let isVisible = parseInt(kpiCheckbox.is(':checked') & 1);
+
+	// hide or show the KPI
+	$('#' + kpiCheckbox.attr('data-kpi-id')).parent().toggle(isVisible);
+
+	// save visibility state to cookie
+	$.ajax({
+		type: 'POST',
+		headers: { 'cache-control': 'no-cache' },
+		url: window.location,
+		cache: false,
+		dataType: 'json',
+		data: {
+			ajax: 1,
+			controller: help_class_name,
+			action: 'changeKpiVisibility',
+			kpi_id: kpiCheckbox.attr('data-kpi-id'),
+			is_visible: isVisible,
+		}
+	});
+
+	// at least one KPI must be displayed
+	if ($(kpiCheckbox).closest('.actions-wrap').find('.kpi-display-toggle:checked').length == 1) {
+		$(kpiCheckbox).closest('.actions-wrap').find('.kpi-display-toggle:checked').attr('disabled', true);
+	} else {
+		$(kpiCheckbox).closest('.actions-wrap').find('.kpi-display-toggle').attr('disabled', false);
+	}
+});
+
+// prevent dropdown from closing on clicking its body
+$(document).on('click', '.kpi-container .dropdown-menu', function (e) {
+	e.stopPropagation();
+});
+
+function toggleKpiView() {
+	$('.kpi-container').toggleClass('no-wrapping'); // default view is to wrap KPIs
+
+	// save view to cookie
+	$.ajax({
+		type: 'POST',
+		headers: { 'cache-control': 'no-cache' },
+		url: window.location,
+		cache: false,
+		dataType: 'json',
+		data: {
+			ajax: 1,
+			controller: help_class_name,
+			action: 'saveKpiView',
+			no_wrapping: parseInt($('.kpi-container').hasClass('no-wrapping') & 1),
 		}
 	});
 }
