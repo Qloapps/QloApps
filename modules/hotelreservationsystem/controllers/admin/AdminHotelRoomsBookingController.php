@@ -32,29 +32,23 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
 
         $this->_conf[52] = $this->l('Room in the booking is successfully reallocated');
         $this->_conf[53] = $this->l('Room in the booking is successfully swapped');
-
-        $this->initCart();
     }
 
-    public function initCart()
+    public function init()
     {
-        if (!isset($this->context->cookie->id_guest)) {
-            Guest::setNewGuest($this->context->cookie);
-        }
+        parent::init();
 
-        if (!isset($this->context->cookie->id_cart)) {
-            $objCart = $this->createNewCart();
-            $this->context->cookie->id_cart = (int) $objCart->id;
-        } else {
-            // use previous cart
+        if (isset($this->context->cookie->id_cart)) {
             $objCart = new Cart($this->context->cookie->id_cart);
-            $isCartValid = Validate::isLoadedObject($objCart);
-            if (!$isCartValid || ($isCartValid && $objCart->orderExists())) {
-                $objCart = $this->createNewCart();
-                $this->context->cookie->id_cart = (int) $objCart->id;
+            if (Validate::isLoadedObject($objCart) && !$objCart->orderExists()) {
+                $this->context->cart = $objCart;
+            } else {
+                $this->context->cookie->id_cart = 0; // remove invalid id_cart
+                $this->context->cart = new Cart();
             }
+        } else {
+            $this->context->cart = new Cart();
         }
-        $this->context->cart = $objCart;
 
         $objCustomer = new Customer();
         $objCustomer->id_gender = 0;
@@ -82,82 +76,100 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
 
     protected function createNewCart()
     {
-        // create a new cart
-        $objCart = new Cart();
-        $objCart->recyclable = 0;
-        $objCart->gift = 0;
-        $objCart->id_shop = (int) $this->context->shop->id;
-        $objCart->id_lang = (($id_lang = (int) Tools::getValue('id_lang')) ? $id_lang : (int) Configuration::get('PS_LANG_DEFAULT'));
-        $objCart->id_currency = (($id_currency = (int) Tools::getValue('id_currency')) ? $id_currency : (int) Configuration::get('PS_CURRENCY_DEFAULT'));
-        $objCart->id_address_delivery = 0;
-        $objCart->id_address_invoice = 0;
-        $objCart->id_currency = (int) Configuration::get('PS_CURRENCY_DEFAULT');
-        $objCart->id_guest = (int) $this->context->cookie->id_guest;
-        $objCart->setNoMultishipping();
+        // Create a new guest first if needed
+        if (!isset($this->context->cookie->id_guest)) {
+            Guest::setNewGuest($this->context->cookie);
+        }
 
-        $objCart->save();
-        return $objCart;
+        $this->context->cart = new Cart();
+        $this->context->cart->gift = 0;
+        $this->context->cart->id_shop = (int) $this->context->shop->id;
+        $this->context->cart->id_lang = (($id_lang = (int) Tools::getValue('id_lang')) ? $id_lang : (int) Configuration::get('PS_LANG_DEFAULT'));
+        $this->context->cart->id_currency = (($id_currency = (int) Tools::getValue('id_currency')) ? $id_currency : (int) Configuration::get('PS_CURRENCY_DEFAULT'));
+        $this->context->cart->id_address_delivery = 0;
+        $this->context->cart->id_address_invoice = 0;
+        $this->context->cart->id_currency = (int) Configuration::get('PS_CURRENCY_DEFAULT');
+        $this->context->cart->id_guest = (int) $this->context->cookie->id_guest;
+        $this->context->cart->setNoMultishipping();
+        $this->context->cart->save();
+
+        $this->context->cookie->id_cart = (int) $this->context->cart->id;
     }
-
 
     public function postProcess()
     {
-        if (Tools::getValue('date_from')) {
-            $date_from = Tools::getValue('date_from');
-        } else {
-            $date_from = date('Y-m-d');
-        }
-        if ($this->context->employee->isSuperAdmin()) {
-            $backOrderConfigKey = 'PS_BACKDATE_ORDER_SUPERADMIN';
-        } else {
-            $backOrderConfigKey = 'PS_BACKDATE_ORDER_EMPLOYEES';
-        }
-        if (!Configuration::get($backOrderConfigKey)) {
-            if (strtotime(date('Y-m-d')) > strtotime($date_from)) {
+        $objHotelBranchInformation = new HotelBranchInformation();
+        $hotelBranchesInfo = $objHotelBranchInformation->hotelBranchesInfo(false, 1);
+        // filter hotels as per accessed hotels
+        $hotelBranchesInfo = HotelBranchInformation::filterDataByHotelAccess($hotelBranchesInfo, $this->context->employee->id_profile, 1);
+
+        if ($hotelBranchesInfo) {
+            if (Tools::getValue('date_from')) {
+                $date_from = Tools::getValue('date_from');
+            } else {
                 $date_from = date('Y-m-d');
             }
-        }
-        if (Tools::getValue('date_to')) {
-            $date_to = Tools::getValue('date_to');
-        } else {
-            $date_to = date('Y-m-d');
-        }
-        if (strtotime($date_from) >= strtotime($date_to)) {
-            $date_to = date('Y-m-d', strtotime('+1 day', strtotime($date_to)));
-        }
-
-        if (Tools::getValue('id_hotel')) {
-            $id_hotel = Tools::getValue('id_hotel');
-        } else {
-            $obj_htl_info = new HotelBranchInformation();
-            if ($htl_info = $obj_htl_info->hotelBranchesInfo(false, 1)) {
-                // filter hotels as per accessed hotels
-                $htl_info = HotelBranchInformation::filterDataByHotelAccess(
-                    $htl_info,
-                    $this->context->employee->id_profile,
-                    1
-                );
-                $id_hotel = reset($htl_info)['id'];
+            if ($this->context->employee->isSuperAdmin()) {
+                $backOrderConfigKey = 'PS_BACKDATE_ORDER_SUPERADMIN';
             } else {
-                $id_hotel = 0;
+                $backOrderConfigKey = 'PS_BACKDATE_ORDER_EMPLOYEES';
             }
-        }
+            if (!Configuration::get($backOrderConfigKey)) {
+                if (strtotime(date('Y-m-d')) > strtotime($date_from)) {
+                    $date_from = date('Y-m-d');
+                }
+            }
+            if (Tools::getValue('date_to')) {
+                $date_to = Tools::getValue('date_to');
+            } else {
+                $date_to = date('Y-m-d');
+                if (strtotime($date_from) >= strtotime($date_to)) {
+                    $date_to = date('Y-m-d', strtotime('+1 day', strtotime($date_to)));
+                }
+            }
 
-        if (Tools::getValue('id_room_type')) {
-            $id_room_type = Tools::getValue('id_room_type');
-        } else {
-            $id_room_type = 0;
-        }
+            if (Tools::getValue('id_hotel')) {
+                $id_hotel = Tools::getValue('id_hotel');
+            } else {
+                if ($htl_info = $objHotelBranchInformation->hotelBranchesInfo(false, 1)) {
+                    // filter hotels as per accessed hotels
+                    $htl_info = HotelBranchInformation::filterDataByHotelAccess(
+                        $htl_info,
+                        $this->context->employee->id_profile,
+                        1
+                    );
+                    $id_hotel = reset($htl_info)['id'];
+                } else {
+                    $id_hotel = 0;
+                }
+            }
 
-        $occupancy = Tools::getValue('occupancy');
-        if (!Validate::isOccupancy($occupancy)) {
-            $occupancy = array();
-        }
+            if (Tools::getValue('id_room_type')) {
+                $id_room_type = Tools::getValue('id_room_type');
+            } else {
+                $id_room_type = 0;
+            }
 
-        // $booking_product = 1;
-        // if (Tools::getisset('booking_product')) {
-        //     $booking_product = Tools::getValue('booking_product');
-        // }
+            $occupancy = Tools::getValue('occupancy');
+            if (!Validate::isOccupancy($occupancy)) {
+                $occupancy = array();
+            }
+
+            // $booking_product = 1;
+            // if (Tools::getisset('booking_product')) {
+            //     $booking_product = Tools::getValue('booking_product');
+            // }
+
+            $this->id_cart = (int) $this->context->cart->id;
+            $this->id_guest = (int) $this->context->cookie->id_guest;
+            $this->id_hotel = $id_hotel;
+            $this->id_room_type = $id_room_type;
+            $this->date_from = $date_from;
+            $this->date_to = $date_to;
+            // $this->booking_product = $booking_product;
+            $this->booking_product = 1;
+            $this->occupancy = $occupancy;
+        }
 
         if (Tools::isSubmit('search_hotel_list')) {
             $urlData = array (
@@ -254,28 +266,15 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
             }
         }
 
-        $this->id_cart = $this->context->cart->id;
-        $this->id_guest = $this->context->cookie->id_guest;
-        $this->id_hotel = $id_hotel;
-        $this->id_room_type = $id_room_type;
-        $this->date_from = $date_from;
-        $this->date_to = $date_to;
-        // $this->booking_product = $booking_product;
-        $this->booking_product = 1;
-        $this->occupancy = $occupancy;
-
         parent::postprocess();
     }
 
     public function initContent()
     {
-        // $this->show_toolbar = false;
         $this->toolbar_title = $this->l('Book Now');
         $this->display = 'view';
 
         parent::initContent();
-        // $this->content = $this->renderView();
-        // $this->context->smarty->assign('content', $this->content);
     }
 
     public function initSearchFormData()
@@ -318,19 +317,24 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
 
     public function renderView()
     {
-        $this->tpl_view_vars = array(
-            'id_cart' => $this->context->cart->id,
-            'id_guest' => $this->context->cookie->id_guest,
-        );
-        $this->initSearchFormData();
-        if (count($this->tpl_view_vars['hotel_list'])) {
-            if ($this->booking_product) {
-                $this->assignRoomBookingForm();
-            } else {
-                $this->assignServiceProductsForm();
-            }
+        $objHotelBranchInformation = new HotelBranchInformation();
+        $hotelBranchesInfo = $objHotelBranchInformation->hotelBranchesInfo(false, 1);
+        // filter hotels as per accessed hotels
+        $hotelBranchesInfo = HotelBranchInformation::filterDataByHotelAccess($hotelBranchesInfo, $this->context->employee->id_profile, 1);
 
-            $this->initCartData();
+        if ($hotelBranchesInfo) {
+            $this->tpl_view_vars['id_cart'] = (int) $this->context->cart->id;
+            $this->tpl_view_vars['id_guest'] = (int) $this->context->cookie->id_guest;
+            $this->initSearchFormData();
+            if (count($hotelBranchesInfo)) {
+                if ($this->booking_product) {
+                    $this->assignRoomBookingForm();
+                } else {
+                    $this->assignServiceProductsForm();
+                }
+
+                $this->initCartData();
+            }
         }
 
         return parent::renderView();
@@ -701,6 +705,11 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
             $direction = 'up';
         } else {
             $direction = 'down';
+        }
+
+        // Create new cart if needed
+        if (!Validate::isLoadedObject($this->context->cart) && $direction == 'up') {
+            $this->createNewCart();
         }
 
         $id_cart = $this->context->cart->id;
