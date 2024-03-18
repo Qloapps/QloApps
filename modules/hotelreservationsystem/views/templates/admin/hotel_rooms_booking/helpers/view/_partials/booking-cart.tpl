@@ -28,7 +28,7 @@
 											<td class="text-center">{$cart_data['room_type']|escape:'htmlall':'UTF-8'}</td>
 											<td class="text-center">{dateFormat date=$cart_data['date_from']} - {dateFormat date=$cart_data['date_to']}</td>
 											<td class="text-center">{convertPrice price=($cart_data['amt_with_qty'] + $cart_data['additional_services_auto_add_with_room_price'] + $cart_data['additional_service_price'] + $cart_data['demand_price'])}</td>
-											<td class="text-center"><button class="btn btn-default ajax_cart_delete_data" data-id-product="{$cart_data['id_product']|escape:'htmlall':'UTF-8'}" data-id-hotel="{$cart_data['id_hotel']|escape:'htmlall':'UTF-8'}" data-id-cart="{$cart_data['id_cart']|escape:'htmlall':'UTF-8'}" data-id-cart-book-data="{$cart_data['id_cart_book_data']|escape:'htmlall':'UTF-8'}" data-date-from="{$cart_data['date_from']|escape:'htmlall':'UTF-8'}" data-date-to="{$cart_data['date_to']|escape:'htmlall':'UTF-8'}"><i class='icon-trash'></i></button></td>
+											<td class="text-center"><button class="btn btn-default ajax_cart_delete_data" data-id-product="{$cart_data['id_product']|escape:'htmlall':'UTF-8'}" data-id-hotel="{$cart_data['id_hotel']|escape:'htmlall':'UTF-8'}" data-id-cart="{$cart_data['id_cart']|escape:'htmlall':'UTF-8'}" data-id-cart-book-data="{$cart_data['id']|escape:'htmlall':'UTF-8'}" data-date-from="{$cart_data['date_from']|escape:'htmlall':'UTF-8'}" data-date-to="{$cart_data['date_to']|escape:'htmlall':'UTF-8'}"><i class='icon-trash'></i></button></td>
 										</tr>
 									{/foreach}
 								{/if}
