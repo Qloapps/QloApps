@@ -45,6 +45,12 @@ class StatsLive extends Module
         $this->displayName = $this->l('Visitors online');
         $this->description = $this->l('Adds a list of customers and visitors who are currently online to the Stats dashboard.');
         $this->ps_versions_compliancy = array('min' => '1.6', 'max' => '1.7.0.99');
+		$this->page_map = array(
+			'index' => 'home',
+			'category' => 'hotel',
+			'product' => 'room-type',
+			'orderopc' => 'checkout'
+		);
     }
 
     public function install()
@@ -89,6 +95,7 @@ class StatsLive extends Module
 					ORDER BY u.firstname, u.lastname';
         }
         $results = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql);
+		$this->updatePageName($results);
 
         return array($results, Db::getInstance()->NumRows());
     }
@@ -130,9 +137,21 @@ class StatsLive extends Module
         }
 
         $results = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql);
+		$this->updatePageName($results);
 
         return array($results, Db::getInstance()->NumRows());
     }
+
+	public function updatePageName(&$result)
+	{
+		if (count($result)) {
+			foreach ($result as &$customer) {
+				if (isset($this->page_map[$customer['page']])) {
+					$customer['page'] = $this->page_map[$customer['page']];
+				}
+			}
+		}
+	}
 
     public function hookAdminStatsModules($params)
     {
