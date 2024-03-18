@@ -478,9 +478,6 @@ var ajaxCart = {
                     else
                         $(callerElement).removeProp('disabled');
                 }
-                if (!addedFromProductPage) {
-                    resetOccupancyField($(callerElement).closest('.booking_room_fields').find('.booking_occupancy_wrapper'));
-                }
                 emptyCustomizations();
 
             },

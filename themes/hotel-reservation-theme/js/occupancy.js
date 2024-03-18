@@ -380,19 +380,3 @@ function getRoomTypeGuestOccupancyFormated(adults, children, rooms)
 	return guestButtonVal;
 }
 
-
-function resetOccupancyField(booking_occupancy_wrapper)
-{
-	$(booking_occupancy_wrapper).siblings('.booking_guest_occupancy').find('span').text(select_occupancy_txt);
-	$(booking_occupancy_wrapper).find('.booking_occupancy_inner > div').each(function(index, element){
-		let num_adults = $(booking_occupancy_wrapper).find('.base_adult').val();
-		if (index == 0) {
-			$(this).removeClass('selected');
-			$(this).find('.num_adults').val(num_adults).siblings('.occupancy_count').find('span').text(num_adults);
-			$(this).find('.num_children').val(0).siblings('.occupancy_count').find('span').text(0);
-			$(this).find('.children_ages > div').remove();
-		} else {
-			$(element).remove();
-		}
-	});
-}
