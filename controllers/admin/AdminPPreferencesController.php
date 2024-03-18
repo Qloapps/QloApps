@@ -321,7 +321,8 @@ class AdminPPreferencesControllerCore extends AdminController
                     ),
 
                     'PS_SERVICE_PRODUCT_CATEGORY_FILTER' => array(
-                        'title' => $this->l('Show category filter for service products'),
+                        'title' => $this->l('Display services by category'),
+                        'hint' => $this->l('If enabled, services will be grouped and displayed as per their default category. Else all services will be displayed together.'),
                         'validation' => 'isBool',
                         'cast' => 'intval',
                         'required' => false,

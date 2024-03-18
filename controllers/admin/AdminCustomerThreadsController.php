@@ -725,7 +725,7 @@ class AdminCustomerThreadsControllerCore extends AdminController
                 $content .= $this->l('Message to: ').' <span class="badge">'.(!$message['id_employee'] ? $message['subject'] : $message['customer_name']).'</span><br/>';
             }
             if (Validate::isLoadedObject($product)) {
-                $content .= '<br/>'.$this->l('Product: ').'<span class="label label-info">'.$product->name.'</span><br/><br/>';
+                $content .= '<br/>'.$this->l('Room type: ').'<span class="label label-info">'.$product->name.'</span><br/><br/>';
             }
             $content .= Tools::safeOutput($message['message']);
 
