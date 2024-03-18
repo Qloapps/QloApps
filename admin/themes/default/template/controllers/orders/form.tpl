@@ -712,11 +712,11 @@
 	}
 
 	function updateCartSummaryData(summaryData) {
-		$('#total_rooms').html(formatCurrency(parseFloat(jsonSummary.summary.total_rooms + jsonSummary.summary.total_extra_demands + jsonSummary.summary.total_additional_services + jsonSummary.summary.total_additional_services_auto_add), currency_format, currency_sign, currency_blank));
+		$('#total_rooms').html(formatCurrency(parseFloat(summaryData.summary.total_rooms + summaryData.summary.total_extra_demands + summaryData.summary.total_additional_services + summaryData.summary.total_additional_services_auto_add), currency_format, currency_sign, currency_blank));
 		$('#total_vouchers').html(formatCurrency(parseFloat(summaryData.summary.total_discounts_tax_exc), currency_format, currency_sign, currency_blank));
-		$('#total_convenience_fees').html(formatCurrency(parseFloat(jsonSummary.summary.convenience_fee), currency_format, currency_sign, currency_blank));
-		$('#total_without_taxes').html(formatCurrency(parseFloat(jsonSummary.summary.total_price_without_tax - jsonSummary.summary.convenience_fee), currency_format, currency_sign, currency_blank));
-		// $('#total_service_products').html(formatCurrency(parseFloat(jsonSummary.summary.total_service_products), currency_format, currency_sign, currency_blank));
+		$('#total_convenience_fees').html(formatCurrency(parseFloat(summaryData.summary.convenience_fee), currency_format, currency_sign, currency_blank));
+		$('#total_without_taxes').html(formatCurrency(parseFloat(summaryData.summary.total_price_without_tax - summaryData.summary.convenience_fee), currency_format, currency_sign, currency_blank));
+		// $('#total_service_products').html(formatCurrency(parseFloat(summaryData.summary.total_service_products), currency_format, currency_sign, currency_blank));
 		$('#total_taxes').html(formatCurrency(parseFloat(summaryData.summary.total_tax), currency_format, currency_sign, currency_blank));
 		$('#total_with_taxes').html(formatCurrency(parseFloat(summaryData.summary.total_price), currency_format, currency_sign, currency_blank));
 	}

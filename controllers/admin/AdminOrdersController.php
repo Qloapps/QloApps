@@ -3338,6 +3338,37 @@ class AdminOrdersControllerCore extends AdminController
         $this->context->cart = $cart;
         $this->context->customer = new Customer($order->id_customer);
 
+        // always add taxes even if not displayed to the customer
+        $use_taxes = true;
+        $this->context->currency = new Currency($order->id_currency);
+
+        $initial_product_price_tax_incl = Product::getPriceStatic(
+            $product->id,
+            $use_taxes,
+            isset($combination) ? $combination->id : null,
+            2,
+            null,
+            false,
+            true,
+            1,
+            false,
+            $order->id_customer,
+            $cart->id,
+            $order->id_address_tax
+        );
+
+        // create feature price if needed
+        $createFeaturePrice = $product_informations['product_price_tax_incl'] != $initial_product_price_tax_incl;
+        $featurePriceParams = array();
+        if ($createFeaturePrice) {
+            $featurePriceParams = array(
+                'id_cart' => $this->context->cart->id,
+                'id_guest' => $this->context->cookie->id_guest,
+                'price' => $product_informations['product_price_tax_excl'],
+                'id_product' => $product->id,
+            );
+        }
+
         /*By Webkul to make entries in HotelCartBookingData */
         $hotel_room_info_arr = $hotel_room_data['rm_data'][$idProduct]['data']['available'];
         $chkQty = 0;
@@ -3395,49 +3426,6 @@ class AdminOrdersControllerCore extends AdminController
             }
         }
         /*END*/
-        // always add taxes even if there are not displayed to the customer
-        $use_taxes = true;
-        $this->context->currency = new Currency($order->id_currency);
-
-        $initial_product_price_tax_incl = Product::getPriceStatic(
-            $product->id,
-            $use_taxes,
-            isset($combination) ? $combination->id : null,
-            2,
-            null,
-            false,
-            true,
-            1,
-            false,
-            $order->id_customer,
-            $cart->id,
-            $order->id_address_tax
-        );
-
-        // Creating specific price if needed
-        if ($product_informations['product_price_tax_incl'] != $initial_product_price_tax_incl) {
-            $specific_price = new SpecificPrice();
-            $specific_price->id_shop = 0;
-            $specific_price->id_shop_group = 0;
-            $specific_price->id_currency = $order->id_currency;
-            $specific_price->id_country = 0;
-            $specific_price->id_group = 0;
-            $specific_price->id_customer = $order->id_customer;
-            $specific_price->id_product = $product->id;
-            if (isset($combination)) {
-                $specific_price->id_product_attribute = $combination->id;
-            } else {
-                $specific_price->id_product_attribute = 0;
-            }
-            $specific_price->price = $product_informations['product_price_tax_excl'];
-            $specific_price->from_quantity = 1;
-            $specific_price->reduction = 0;
-            $specific_price->reduction_type = 'amount';
-            $specific_price->reduction_tax = 0;
-            $specific_price->from = '0000-00-00 00:00:00';
-            $specific_price->to = '0000-00-00 00:00:00';
-            $specific_price->add();
-        }
 
         // Add product to cart
         $update_quantity = $cart->updateQty(
@@ -3808,7 +3796,8 @@ class AdminOrdersControllerCore extends AdminController
         }
 
         // delete cart feature prices after room addition success
-        HotelRoomTypeFeaturePricing::deleteByIdCart($cart->id);
+        HotelRoomTypeFeaturePricing::deleteByIdCart($this->context->cart->id);
+
         die(json_encode(array(
             'result' => true,
             //'view' => $this->createTemplate('_product_line.tpl')->fetch(),
