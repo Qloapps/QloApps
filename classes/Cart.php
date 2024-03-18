@@ -2362,8 +2362,39 @@ class CartCore extends ObjectModel
                         )) {
                             $productInfo = $objRoomType->getRoomTypeInfoByIdProduct($product['id_product']);
                             $idHotel = $productInfo['id_hotel'] ? $productInfo['id_hotel'] : 0;
+                            $cartRoomInfo = array();
                             foreach ($roomsBookingDetails as $roomBooking) {
                                 $dateJoinKey = $idHotel.'-'.strtotime($roomBooking['date_from']).strtotime($roomBooking['date_to']);
+                                $roomTotalPrice = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice(
+                                    $product['id_product'],
+                                    $roomBooking['date_from'],
+                                    $roomBooking['date_to'],
+                                    0,
+                                    Group::getCurrent()->id,
+                                    $this->id,
+                                    $this->id_guest,
+                                    0,
+                                    0
+                                );
+                                $newQty = HotelHelper::getNumberOfDays(
+                                    $roomBooking['date_from'],
+                                    $roomBooking['date_to']
+                                );
+                                if (isset($cartRoomInfo[$dateJoinKey])) {
+                                    $cartRoomInfo[$dateJoinKey]['cart_quantity'] += $newQty;
+                                    $cartRoomInfo[$dateJoinKey]['total_price_tax_incl'] += $roomTotalPrice['total_price_tax_incl'];
+                                    $cartRoomInfo[$dateJoinKey]['total_price_tax_excl'] += $roomTotalPrice['total_price_tax_excl'];
+                                } else {
+                                    $cartRoomInfo[$dateJoinKey] = array(
+                                        'cart_quantity' => $newQty,
+                                        'total_price_tax_incl' => $roomTotalPrice['total_price_tax_incl'],
+                                        'total_price_tax_excl' => $roomTotalPrice['total_price_tax_excl'],
+                                        'date_from' => $roomBooking['date_from'],
+                                        'date_to' => $roomBooking['date_to'],
+                                    );
+                                }
+                            }
+                            foreach ($cartRoomInfo as $dateJoinKey => $cartRoom) {
                                 if (!isset($orderPackage[$id_address][$dateJoinKey])) {
                                     $orderPackage[$id_address][$dateJoinKey]['product_list'] = array();
 
@@ -2388,26 +2419,13 @@ class CartCore extends ObjectModel
                                         }
                                     }
                                 }
-                                $product['cart_quantity'] = HotelHelper::getNumberOfDays(
-                                    $roomBooking['date_from'],
-                                    $roomBooking['date_to']
-                                );
-                                $product['date_from'] = $roomBooking['date_from'];
-                                $product['date_to'] = $roomBooking['date_to'];
-
-                                $roomTotalPrice = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice(
-                                    $product['id_product'],
-                                    $roomBooking['date_from'],
-                                    $roomBooking['date_to'],
-                                    0,
-                                    Group::getCurrent()->id,
-                                    $this->id,
-                                    $this->id_guest,
-                                    0,
-                                    0
-                                );
-                                $product['total_wt'] = $roomTotalPrice['total_price_tax_incl'];
-                                $product['total'] = $roomTotalPrice['total_price_tax_excl'];
+                                $product['date_from'] = $cartRoom['date_from'];
+                                $product['date_to'] = $cartRoom['date_to'];
+                                $product['total_wt'] = $cartRoom['total_price_tax_incl'];
+                                $product['total'] = $cartRoom['total_price_tax_excl'];
+                                $product['cart_quantity'] = $cartRoom['cart_quantity'];
+                                $product['price_wt'] = $cartRoom['total_price_tax_incl'] / $cartRoom['cart_quantity'];
+                                $product['price'] = $cartRoom['total_price_tax_excl'] / $cartRoom['cart_quantity'];
                                 $orderPackage[$id_address][$dateJoinKey]['product_list'][] = $product;
                             }
                         }
