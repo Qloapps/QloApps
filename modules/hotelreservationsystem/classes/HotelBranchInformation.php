@@ -653,7 +653,7 @@ class HotelBranchInformation extends ObjectModel
         return $return;
     }
 
-    public function addCategory($name, $parent_cat = false, $group_ids, $ishotel = false, $idHotel = false)
+    public function addCategory($name, $parent_cat = false, $group_ids, $ishotel = false, $idHotel = false, $link_rewrite = false)
     {
         $context = Context::getContext();
         if (!$parent_cat) {
@@ -669,6 +669,15 @@ class HotelBranchInformation extends ObjectModel
             $catName,
             $parent_cat
         )) {
+            if (is_array($link_rewrite)) {
+                $objCategory = new Category($categoryExists['id_category']);
+
+                foreach (Language::getLanguages() as $lang) {
+                    $objCategory->link_rewrite[$lang['id_lang']] = $link_rewrite[$lang['id_lang']];
+                }
+
+                $objCategory->save();
+            }
             return $categoryExists['id_category'];
         } else {
             $category = new Category();
@@ -682,7 +691,12 @@ class HotelBranchInformation extends ObjectModel
                 $category->description[$lang['id_lang']] = $this->moduleInstance->l(
                     'Hotel Branch Category', 'HotelBranchInformation'
                 );
-                $category->link_rewrite[$lang['id_lang']] = Tools::link_rewrite($catName);
+
+                if (is_array($link_rewrite)) {
+                    $category->link_rewrite[$lang['id_lang']] = $link_rewrite[$lang['id_lang']];
+                } else {
+                    $category->link_rewrite[$lang['id_lang']] = Tools::link_rewrite($catName);
+                }
             }
             $category->id_parent = $parent_cat;
             $category->groupBox = $group_ids;
