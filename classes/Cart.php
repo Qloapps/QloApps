@@ -3812,6 +3812,8 @@ class CartCore extends ObjectModel
             }
         }
 
+        $objHotelAdvancedPayment = new HotelAdvancedPayment();
+
         $summary = array(
             'delivery' => $delivery,
             'delivery_state' => State::getNameById($delivery->id_state),
@@ -3846,6 +3848,9 @@ class CartCore extends ObjectModel
             'total_price' => $base_total_tax_inc,
             'total_tax' => $total_tax,
             'total_price_without_tax' => $base_total_tax_exc,
+            'is_advance_payment_active' => $objHotelAdvancedPayment->isAdvancePaymentAvailableForCurrentCart(),
+            'advance_payment_amount_without_tax' => $this->getOrderTotal(false, Cart::ADVANCE_PAYMENT),
+            'advance_payment_amount_with_tax' => $this->getOrderTotal(true, Cart::ADVANCE_PAYMENT),
             'discounted_products' => $discountedProducts,
             'is_multi_address_delivery' => $this->isMultiAddressDelivery() || ((int)Tools::getValue('multi-shipping') == 1),
             'free_ship' =>!$total_shipping && !count($this->getDeliveryAddressesWithoutCarriers(true, $errors)),

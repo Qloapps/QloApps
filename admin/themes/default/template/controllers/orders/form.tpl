@@ -38,7 +38,6 @@
 	var id_lang = '';
 	//var txt_show_carts = '{l s='Show carts and orders for this customer.' js=1}';
 	//var txt_hide_carts = '{l s='Hide carts and orders for this customer.' js=1}';
-	var defaults_order_state = new Array();
 	var customization_errors = false;
 	var pic_dir = '{$pic_dir}';
 	var currency_format = 5;
@@ -46,9 +45,6 @@
 	var currency_blank = false;
 	var priceDisplayPrecision = {$smarty.const._PS_PRICE_DISPLAY_PRECISION_|intval};
 
-	{foreach from=$defaults_order_state key='module' item='id_order_state'}
-		defaults_order_state['{$module}'] = '{$id_order_state}';
-	{/foreach}
 	$(document).ready(function() {
 
 		$('#customer').typeWatch({
@@ -62,12 +58,6 @@
 			highlight: true,
 			wait: 750,
 			callback: function(){ searchProducts(); }
-		});
-		$('#payment_module_name').change(function() {
-			var id_order_state = defaults_order_state[this.value];
-			if (typeof(id_order_state) == 'undefined')
-				id_order_state = defaults_order_state['other'];
-			$('#id_order_state').val(id_order_state);
 		});
 		$("#id_address_delivery").change(function() {
 			updateAddresses();
@@ -361,7 +351,7 @@
 					if (data.result)
 					{
 						$('#cart_detail_form').show();//line added by webkul
-						$('#payment_module_name').replaceWith(data.view)
+						$('#payment_method_options').replaceWith(data.view)
 					}
 				}
 			});
@@ -711,14 +701,29 @@
 		$(cart_row).find('.cart_line_total_price').html(data.total_price);
 	}
 
-	function updateCartSummaryData(summaryData) {
-		$('#total_rooms').html(formatCurrency(parseFloat(summaryData.summary.total_rooms + summaryData.summary.total_extra_demands + summaryData.summary.total_additional_services + summaryData.summary.total_additional_services_auto_add), currency_format, currency_sign, currency_blank));
-		$('#total_vouchers').html(formatCurrency(parseFloat(summaryData.summary.total_discounts_tax_exc), currency_format, currency_sign, currency_blank));
-		$('#total_convenience_fees').html(formatCurrency(parseFloat(summaryData.summary.convenience_fee), currency_format, currency_sign, currency_blank));
-		$('#total_without_taxes').html(formatCurrency(parseFloat(summaryData.summary.total_price_without_tax - summaryData.summary.convenience_fee), currency_format, currency_sign, currency_blank));
-		// $('#total_service_products').html(formatCurrency(parseFloat(summaryData.summary.total_service_products), currency_format, currency_sign, currency_blank));
-		$('#total_taxes').html(formatCurrency(parseFloat(summaryData.summary.total_tax), currency_format, currency_sign, currency_blank));
-		$('#total_with_taxes').html(formatCurrency(parseFloat(summaryData.summary.total_price), currency_format, currency_sign, currency_blank));
+	function updateCartSummaryData(jsonSummary) {
+		$('#total_rooms').html(formatCurrency(parseFloat(jsonSummary.summary.total_rooms + jsonSummary.summary.total_extra_demands + jsonSummary.summary.total_additional_services + jsonSummary.summary.total_additional_services_auto_add), currency_format, currency_sign, currency_blank));
+		$('#total_vouchers').html(formatCurrency(parseFloat(jsonSummary.summary.total_discounts_tax_exc), currency_format, currency_sign, currency_blank));
+		$('#total_convenience_fees').html(formatCurrency(parseFloat(jsonSummary.summary.convenience_fee), currency_format, currency_sign, currency_blank));
+		$('#total_without_taxes').html(formatCurrency(parseFloat(jsonSummary.summary.total_price_without_tax - jsonSummary.summary.convenience_fee), currency_format, currency_sign, currency_blank));
+		// $('#total_service_products').html(formatCurrency(parseFloat(jsonSummary.summary.total_service_products), currency_format, currency_sign, currency_blank));
+		$('#total_taxes').html(formatCurrency(parseFloat(jsonSummary.summary.total_tax), currency_format, currency_sign, currency_blank));
+		$('#total_with_taxes').html(formatCurrency(parseFloat(jsonSummary.summary.total_price), currency_format, currency_sign, currency_blank));
+
+		$('#payment_amount').val(jsonSummary.summary.total_price);
+		if (jsonSummary.summary.is_advance_payment_active) {
+			$('#advance_payment_amount').html(formatCurrency(parseFloat(jsonSummary.summary.advance_payment_amount_with_tax), currency_format, currency_sign, currency_blank));
+			$('#advance_payment_amount_block').show();
+		} else {
+			$('#advance_payment_amount_block').hide();
+		}
+
+		// toggle payment fields
+		if (jsonSummary.summary.total_price == 0) { // if free order
+			$('#send_email_to_customer, [name="is_full_payment"], #payment_amount, #payment_type, #payment_module_name, #payment_transaction_id').closest('.form-group').hide(200);
+		} else {
+			$('#send_email_to_customer, [name="is_full_payment"], #payment_amount, #payment_type, #payment_module_name, #payment_transaction_id').closest('.form-group').show(200);
+		}
 	}
 
 	function displayQtyInStock(id)
@@ -1225,6 +1230,22 @@
 			$('#go_order_process').hide();
 		}
 		$('#order_message').val(jsonSummary.order_message);
+		$('#payment_amount').siblings('.input-group-addon').html(currency_sign);
+		$('#payment_amount').val(jsonSummary.summary.total_price);
+		if (jsonSummary.summary.is_advance_payment_active) {
+			$('#advance_payment_amount').html(formatCurrency(parseFloat(jsonSummary.summary.advance_payment_amount_with_tax), currency_format, currency_sign, currency_blank));
+			$('#advance_payment_amount_block').show();
+		} else {
+			$('#advance_payment_amount_block').hide();
+		}
+
+		// toggle payment fields
+		if (jsonSummary.summary.total_price == 0) { // if free order
+			$('#send_email_to_customer, [name="is_full_payment"], #payment_amount, #payment_type, #payment_module_name, #payment_transaction_id').closest('.form-group').hide(200);
+		} else {
+			$('#send_email_to_customer, [name="is_full_payment"], #payment_amount, #payment_type, #payment_module_name, #payment_transaction_id').closest('.form-group').show(200);
+		}
+
 		resetBind();
 	}
 
@@ -1611,6 +1632,53 @@
 			}
 		});
 
+		$(document).on('keyup', '#payment_module_name', function() {
+			let paymentMethod = $('#payment_module_name').val().trim().toLowerCase();
+
+			let selectedMethod;
+			$('#payment_module_name_list option').each(function (index, element) {
+				if ($(element).attr('data-name').toLowerCase() == paymentMethod
+					|| $(element).val().toLowerCase() == paymentMethod
+				) {
+					selectedMethod = element;
+				}
+			});
+
+			if ($(selectedMethod).length) {
+				// set Payment source
+				let paymentType = $(selectedMethod).attr('data-payment-type');
+				if ($('select#payment_type option[value="' + paymentType + '"]').length) {
+					$('#payment_type').val(paymentType);
+				}
+			}
+		});
+
+		$(document).on('change', 'input[name="is_full_payment"]', function() {
+			if (parseInt($('input[name="is_full_payment"]:checked').val())) {
+				$('#payment_amount').attr('disabled', true);
+
+				$('#payment_type, #payment_transaction_id').closest('.form-group').show(200);
+			} else {
+				$('#payment_amount').attr('disabled', false);
+
+				managePaymentOptions();
+			}
+		});
+
+		$(document).on('keyup', '#payment_amount', function() {
+			managePaymentOptions();
+		});
+
+		function managePaymentOptions() {
+			let paymentAmount = parseFloat($('#payment_amount').val().trim());
+
+			if (paymentAmount != 0) {
+				$('#payment_type, #payment_transaction_id').closest('.form-group').show(200);
+			} else {
+				$('#payment_type, #payment_transaction_id').closest('.form-group').hide(200);
+			}
+		}
+
 		$(document).on('change', '.room_type_service_product_qty', function(e) {
 			let quantityInputField = this;
 			let maximumQuantity = parseInt($(quantityInputField).attr('data-max-quantity'));
@@ -1752,7 +1820,7 @@
 		</div> -->*}<!-- by webkul to hide unnessesary content -->
 	</div>
 
-<form class="form-horizontal" action="{$link->getAdminLink('AdminOrders')|escape:'html':'UTF-8'}&amp;submitAdd{$table|escape:'html':'UTF-8'}=1" method="post" autocomplete="off" style="display:none" id="cart_detail_form">
+<form class="form-horizontal" action="{$link->getAdminLink('AdminOrders')|escape:'html':'UTF-8'}&amp;submitAdd{$table|escape:'html':'UTF-8'}=1" method="post" style="display:none" id="cart_detail_form">
 	<div class="panel" id="products_part" style="display:none;">
 		<div class="panel-heading">
 			<i class="icon-shopping-cart"></i>
@@ -2109,7 +2177,7 @@
 						<textarea name="order_message" id="order_message" rows="3" cols="45"></textarea>
 					</div>
 				</div>
-				<div class="form-group">
+				<div class="form-group" {if $order_total <= 0}style="display: none;"{/if}>
 					{if !$PS_CATALOG_MODE}
 					<div class="col-lg-9 col-lg-offset-3">
 						<a href="javascript:void(0);" id="send_email_to_customer" class="btn btn-default">
@@ -2123,28 +2191,65 @@
 					</div>
 					{/if}
 				</div>
-				<div class="form-group">
-					<label class="control-label col-lg-3">{l s='Payment'}</label>
+				{if isset($smarty.post.is_full_payment)}
+					{assign var=is_full_payment value=((bool) $smarty.post.is_full_payment)}
+				{else}
+					{assign var=is_full_payment value=true}
+				{/if}
+				<div class="form-group" {if $order_total <= 0}style="display: none;"{/if}>
+					<label class="control-label col-lg-3">{l s="Full payment"}</label>
 					<div class="col-lg-9">
-						<select name="payment_module_name" id="payment_module_name">
-							{if !$PS_CATALOG_MODE}
-							{foreach from=$payment_modules item='module'}
-								<option value="{$module->name}" {if isset($smarty.post.payment_module_name) && $module->name == $smarty.post.payment_module_name}selected="selected"{/if}>{$module->displayName}</option>
+						<span class="switch prestashop-switch fixed-width-lg">
+							<input type="radio" name="is_full_payment" id="is_full_payment_on" value="1" {if $is_full_payment}checked="checked"{/if}>
+							<label for="is_full_payment_on">{l s="Yes"}</label>
+							<input type="radio" name="is_full_payment" id="is_full_payment_off" value="0" {if !$is_full_payment}checked="checked"{/if}>
+							<label for="is_full_payment_off">{l s="No"}</label>
+							<a class="slide-button btn"></a>
+						</span>
+						<p class="help-block">{l s='Keep this option enabled for full payment and disable it to take partial payment of the booking.'}</p>
+					</div>
+				</div>
+				<div class="form-group" {if $order_total <= 0}style="display: none;"{/if}>
+					<label class="control-label required col-lg-3">{l s='Payment amount'}</label>
+					<div class="col-lg-9">
+						<div class="input-group fixed-width-xxl">
+							<span class="input-group-addon">{$currency->sign}</span>
+							<input type="text" name="payment_amount" id="payment_amount" value="{if isset($smarty.post.payment_amount)}{$smarty.post.payment_amount|escape:'html':'UTF-8'}{elseif $is_full_payment}{$order_total}{/if}" {if $is_full_payment}disabled{/if} />
+						</div>
+						<p class="help-block" id="advance_payment_amount_block" {if isset($is_advance_payment_active) && $is_advance_payment_active}style="display: block;"{else}style="display: none;"{/if}>
+							<span>{l s='Advance payment amount: '}</span>
+							<span id="advance_payment_amount">{displayPrice price=$advance_payment_amount_with_tax currency=$currency->id}</span>
+						</p>
+					</div>
+				</div>
+				<div class="form-group" {if $order_total <= 0}style="display: none;"{/if}>
+					<label class="control-label col-lg-3">{l s='Payment source'}</label>
+					<div class="col-lg-9">
+						<select class="fixed-width-xxl" name="payment_type" id="payment_type">
+							{foreach from=$payment_types item=payment_type}
+								<option value="{$payment_type.value}" {if isset($smarty.post.payment_type) && $payment_type.value == $smarty.post.payment_type}selected="selected"{/if}>
+									{$payment_type.name}
+								</option>
 							{/foreach}
-							{else}
-								<option value="boorder">{l s='Back office order'}</option>
-							{/if}
 						</select>
 					</div>
 				</div>
-				<div class="form-group">
-					<label class="control-label col-lg-3">{l s='Order status'}</label>
+				<div class="form-group" {if $order_total <= 0}style="display: none;"{/if}>
+					<label class="control-label col-lg-3 required">{l s='Payment method'}</label>
 					<div class="col-lg-9">
-						<select name="id_order_state" id="id_order_state">
-							{foreach from=$order_states item='order_state'}
-								<option value="{$order_state.id_order_state}" {if isset($smarty.post.id_order_state) && $order_state.id_order_state == $smarty.post.id_order_state}selected="selected"{/if}>{$order_state.name}</option>
+						<input name="payment_module_name" id="payment_module_name" list="payment_module_name_list" class="form-control fixed-width-xxl" {if isset($smarty.post.payment_module_name) && $smarty.post.payment_module_name}value="{$smarty.post.payment_module_name|escape:'html':'UTF-8'}"{/if}>
+						<datalist id="payment_module_name_list">
+							{foreach from=$payment_modules item=payment_module}
+								<option value="{$payment_module->displayName}" data-name="{$payment_module->name}" data-payment-type="{$payment_module->payment_type}">
 							{/foreach}
-						</select>
+						</datalist>
+						<p class="help-block">{l s='Select or type the payment method using which payment for booking will be made.'}</p>
+					</div>
+				</div>
+				<div class="form-group" {if $order_total <= 0}style="display: none;"{/if}>
+					<label class="control-label col-lg-3">{l s='Transaction ID'}</label>
+					<div class="col-lg-9">
+						<input type="text" class="fixed-width-xxl" name="payment_transaction_id" id="payment_transaction_id" value="{if isset($smarty.post.payment_transaction_id)}{$smarty.post.payment_transaction_id}{/if}" />
 					</div>
 				</div>
 				<div class="form-group">

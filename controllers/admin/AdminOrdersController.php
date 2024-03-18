@@ -372,13 +372,15 @@ class AdminOrdersControllerCore extends AdminController
         if ($id_cart && Validate::isLoadedObject($cart) && !$cart->id_customer) {
             $this->errors[] = $this->l('The cart must have a customer');
         }
-        if (count($this->errors)) {
+        if (count($this->errors) && !Tools::getValue('submitAddorder')) {
             return false;
         }
 
         // check page is whether ad new order page or order detail page
-        if (isset($_GET['addorder'])) {
-            $id_cart = Tools::getValue('cart_id');//get cart id from url
+        if ((Tools::isSubmit('addorder') && ($id_cart = Tools::getValue('cart_id')))
+            || (Tools::isSubmit('submitAddOrder') && ($id_cart = Tools::getValue('id_cart')))
+        ) {
+            // set smarty variables if new order creation process has errors
             $cart = new Cart($id_cart);
             $cart_order_exists = $cart->orderExists();
             if (!$cart_order_exists) {
@@ -408,6 +410,14 @@ class AdminOrdersControllerCore extends AdminController
                     $this->context->smarty->assign('cart_normal_data', $normalCartProduct);
                 }
 
+                $objHotelAdvancedPayment = new HotelAdvancedPayment();
+                $this->context->smarty->assign(array(
+                    'order_total' => $cart->getOrderTotal(true),
+                    'is_advance_payment_active' => $objHotelAdvancedPayment->isAdvancePaymentAvailableForCurrentCart(),
+                    'advance_payment_amount_without_tax' => $cart->getOrderTotal(false, Cart::ADVANCE_PAYMENT),
+                    'advance_payment_amount_with_tax' => $cart->getOrderTotal(true, Cart::ADVANCE_PAYMENT),
+                ));
+
                 if (empty($cart_detail_data) && empty($normalCartProduct)) {
                     // if no rooms added in the cart and user visits add order page then redirect to BOOK NOW page
                     Tools::redirectAdmin($this->context->link->getAdminLink('AdminHotelRoomsBooking'));
@@ -420,12 +430,16 @@ class AdminOrdersControllerCore extends AdminController
         unset($this->toolbar_btn['save']);
         $this->addJqueryPlugin(array('autocomplete', 'fancybox', 'typewatch'));
 
-        $defaults_order_state = array(
-            'awaiting_payment' => (int)Configuration::get('PS_OS_AWAITING_PAYMENT'),
-            'other' => (int)Configuration::get('PS_OS_PAYMENT_ACCEPTED'));
         $payment_modules = array();
         foreach (PaymentModule::getInstalledPaymentModules() as $p_module) {
             $payment_modules[] = Module::getInstanceById((int)$p_module['id_module']);
+        }
+
+        $paymentTypes = array();
+        foreach ($this->getPaymentsTypes() as $paymentType) {
+            if ($paymentType['value'] != OrderPayment::PAYMENT_TYPE_REMOTE_PAYMENT) {
+                $paymentTypes[] = $paymentType;
+            }
         }
 
         $occupancyRequiredForBooking = false;
@@ -440,8 +454,7 @@ class AdminOrdersControllerCore extends AdminController
             'currencies' => Currency::getCurrenciesByIdShop(Context::getContext()->shop->id),
             'langs' => Language::getLanguages(true, Context::getContext()->shop->id),
             'payment_modules' => $payment_modules,
-            'order_states' => OrderState::getOrderStates((int)Context::getContext()->language->id),
-            'defaults_order_state' => $defaults_order_state,
+            'payment_types' => $paymentTypes,
             'show_toolbar' => $this->show_toolbar,
             'toolbar_btn' => $this->toolbar_btn,
             'toolbar_scroll' => $this->toolbar_scroll,
@@ -1193,61 +1206,166 @@ class AdminOrdersControllerCore extends AdminController
             } else {
                 $this->errors[] = Tools::displayError('The invoice for edit note was unable to load. ');
             }
-        } elseif (Tools::isSubmit('submitAddOrder') && ($id_cart = Tools::getValue('id_cart')) &&
-            ($module_name = Tools::getValue('payment_module_name')) &&
-            ($id_order_state = Tools::getValue('id_order_state')) && Validate::isModuleName($module_name)) {
+        } elseif (Tools::isSubmit('submitAddOrder') && ($id_cart = Tools::getValue('id_cart'))) {
             if ($this->tabAccess['edit'] === '1') {
-                if (!Configuration::get('PS_CATALOG_MODE')) {
-                    $payment_module = Module::getInstanceByName($module_name);
-                } else {
-                    $payment_module = new BoOrder();
-                }
+                $objCart = new Cart($id_cart);
+                if (Validate::isLoadedObject($objCart)) {
+                    $orderTotal = $objCart->getOrderTotal(true, Cart::BOTH);
+                    if ($objCart->is_advance_payment) {
+                        $advancePaymentAmount = $objCart->getOrderTotal(true, Cart::ADVANCE_PAYMENT);
+                    }
 
-                $cart = new Cart((int)$id_cart);
-                Context::getContext()->currency = new Currency((int)$cart->id_currency);
-                Context::getContext()->customer = new Customer((int)$cart->id_customer);
+                    // Validate data if required
+                    if ($orderTotal > 0) {
+                        $moduleName = trim(Tools::getValue('payment_module_name'));
+                        $paymentType = Tools::getValue('payment_type');
+                        $paymentTransactionId = trim(Tools::getValue('payment_transaction_id'));
+                        $isFullPayment = Tools::getValue('is_full_payment');
+                        $paymentAmount = trim(Tools::getValue('payment_amount'));
 
-                if ($this->context->employee->isSuperAdmin()) {
-                    $backOrderConfigKey = 'PS_BACKDATE_ORDER_SUPERADMIN';
-                } else {
-                    $backOrderConfigKey = 'PS_BACKDATE_ORDER_EMPLOYEES';
-                }
-                if (!Configuration::get($backOrderConfigKey)) {
-                    $objCartBookingData = new HotelCartBookingData();
-                    if ($cartBookingData = $objCartBookingData->getCartCurrentDataByCartId($cart->id)) {
-                        foreach ($cartBookingData as $cartRoom) {
-                            if (strtotime($cartRoom['date_from']) < strtotime(date('Y-m-d'))) {
-                                $this->errors[] = Tools::displayError('You cannot book rooms before today date.');
+                        if (!$isFullPayment) {
+                            if ($paymentAmount == '') {
+                                $this->errors[] = Tools::displayError('Please enter valid Payment amount of the order.');
+                            } elseif ($paymentAmount && !Validate::isPrice($paymentAmount)) {
+                                $this->errors[] = Tools::displayError('Payment amount is invalid. Please enter correct amount.');
+                            } else {
+                                $paymentAmount = (float) $paymentAmount;
+                            }
+                        }
+
+                        if ($paymentAmount >= 0) {
+                            if (!$moduleName) {
+                                $this->errors[] = Tools::displayError('Please enter Payment method.');
+                            } elseif ($moduleName && !Validate::isGenericName($moduleName)) {
+                                $this->errors[] = Tools::displayError('Payment method is invalid. Please enter a valid payment method.');
+                            }
+                        }
+
+                        if ($paymentAmount > 0) {
+                            if (!$paymentType) {
+                                $this->errors[] = Tools::displayError('Please select a Payment source.');
+                            } elseif ($paymentType && !Validate::isUnsignedInt($paymentType)) {
+                                $this->errors[] = Tools::displayError('Payment source is invalid. Please select payment source.');
+                            }
+
+                            if ($paymentTransactionId && !Validate::isString($paymentTransactionId)) {
+                                $this->errors[] = Tools::displayError('Payment amount is invalid. Please enter correct amount.');
                             }
                         }
                     }
-                }
 
-                if (empty($this->errors)) {
-                    $employee = new Employee((int)Context::getContext()->cookie->id_employee);
-                    $payment_module->validateOrder(
-                        (int)$cart->id,
-                        (int)$id_order_state,
-                        $cart->getOrderTotal(true, Cart::BOTH),
-                        $payment_module->displayName,
-                        $this->l('Manual order -- Employee:').' '.
-                        substr($employee->firstname, 0, 1).'. '.$employee->lastname,
-                        array(),
-                        null,
-                        false,
-                        $cart->secure_key
-                    );
-
-                    if (isset($this->context->cookie->id_cart)) {
-                        unset($this->context->cookie->id_cart);
+                    // Validate if booking dates are allowed
+                    if ($this->context->employee->isSuperAdmin()) {
+                        $backOrderConfigKey = 'PS_BACKDATE_ORDER_SUPERADMIN';
+                    } else {
+                        $backOrderConfigKey = 'PS_BACKDATE_ORDER_EMPLOYEES';
                     }
-                    if (isset($this->context->cookie->id_guest)) {
-                        unset($this->context->cookie->id_guest);
+                    if (!Configuration::get($backOrderConfigKey)) {
+                        $objCartBookingData = new HotelCartBookingData();
+                        if ($cartBookingData = $objCartBookingData->getCartCurrentDataByCartId($cart->id)) {
+                            foreach ($cartBookingData as $cartRoom) {
+                                if (strtotime($cartRoom['date_from']) < strtotime(date('Y-m-d'))) {
+                                    $this->errors[] = Tools::displayError('You cannot book rooms before today date.');
+                                }
+                            }
+                        }
                     }
 
-                    if ($payment_module->currentOrder) {
-                        Tools::redirectAdmin(self::$currentIndex.'&id_order='.$payment_module->currentOrder.'&vieworder'.'&token='.$this->token.'&conf=3');
+                    if (!count($this->errors)) {
+                        $this->context->currency = new Currency((int) $objCart->id_currency);
+                        $this->context->customer = new Customer((int) $objCart->id_customer);
+
+                        // Set payment module details
+                        $objPaymentModule = new BoOrder();
+                        $objPaymentModule->displayName = $moduleName;
+
+                        if ($orderTotal > 0) {
+                            $objPaymentModule->payment_type = $paymentType;
+
+                            // Set order state
+                            if ($isFullPayment) {
+                                $idOrderState = Configuration::get('PS_OS_PAYMENT_ACCEPTED');
+                            } else {
+                                if ($paymentAmount <= 0) {
+                                    $idOrderState = Configuration::get('PS_OS_AWAITING_PAYMENT');
+                                } elseif (($paymentAmount >= $orderTotal)) {
+                                    $idOrderState = Configuration::get('PS_OS_PAYMENT_ACCEPTED');
+                                } else {
+                                    $idOrderState = Configuration::get('PS_OS_PARTIAL_PAYMENT_ACCEPTED');
+                                }
+                            }
+
+                            // Set amount paid
+                            $amountPaid = $isFullPayment ? $orderTotal : $paymentAmount;
+
+                            // Set transaction ID
+                            $extraVars = $paymentTransactionId ? array('transaction_id' => $paymentTransactionId) : array();
+                        } else {
+                            // Set order state
+                            if ($objCart->is_advance_payment) {
+                                if ($advancePaymentAmount <= $orderTotal) {
+                                    $idOrderState = Configuration::get('PS_OS_PARTIAL_PAYMENT_ACCEPTED');
+                                } else {
+                                    $objPaymentModule->name = 'free_order';
+                                    $objPaymentModule->displayName = $this->l('Free order');
+                                    $idOrderState = Configuration::get('PS_OS_PAYMENT_ACCEPTED');
+                                }
+                            } else {
+                                $objPaymentModule->name = 'free_order';
+                                $objPaymentModule->displayName = $this->l('Free order');
+                                $idOrderState = Configuration::get('PS_OS_PAYMENT_ACCEPTED');
+                            }
+
+                            // Set amount paid
+                            $amountPaid = 0;
+
+                            // Set transaction ID
+                            $extraVars = null;
+                        }
+
+                        $bad_delivery = false;
+                        if (($bad_delivery = (bool)!Address::isCountryActiveById((int)$objCart->id_address_delivery))
+                            || !Address::isCountryActiveById((int)$objCart->id_address_invoice)
+                        ) {
+                            if ($bad_delivery) {
+                                $this->errors[] = Tools::displayError('This booking address country is not active.');
+                            } else {
+                                $this->errors[] = Tools::displayError('This invoice address country is not active.');
+                            }
+                        } else {
+                            $amountPaid = Tools::ps_round($amountPaid, 6);
+                            $objEmployee = new Employee($this->context->cookie->id_employee);
+
+                            $objPaymentModule->validateOrder(
+                                $objCart->id,
+                                $idOrderState,
+                                $amountPaid,
+                                $objPaymentModule->displayName,
+                                $this->l('Manual order -- Employee:').' '.substr($objEmployee->firstname, 0, 1).'. '.$objEmployee->lastname,
+                                $extraVars,
+                                null,
+                                false,
+                                $objCart->secure_key
+                            );
+
+                            if (isset($this->context->cookie->id_cart)) {
+                                unset($this->context->cookie->id_cart);
+                            }
+                            if (isset($this->context->cookie->id_guest)) {
+                                unset($this->context->cookie->id_guest);
+                            }
+
+                            if ($objPaymentModule->currentOrder) {
+                                Tools::redirectAdmin(self::$currentIndex.'&id_order='.$objPaymentModule->currentOrder.'&vieworder'.'&token='.$this->token.'&conf=3');
+                            }
+                        }
+                    } else {
+                        // if errors render add order form
+                        $_GET['addorder'] = '1';
+                        $_GET['cart_id'] = $id_cart;
                     }
+                } else {
+                    $this->errors[] = Tools::displayError('Cart can not be loaded.');
                 }
             } else {
                 $this->errors[] = Tools::displayError('You do not have permission to add this.');
