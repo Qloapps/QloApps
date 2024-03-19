@@ -2337,7 +2337,6 @@ class AdminStatsControllerCore extends AdminStatsTabController
         return Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue($sql);
     }
 
-    // This function is used to calculate the average number of guests per booking
     /**
      * This function is used to calculate the average number of guests per booking
      * @param string $dateFrom : Date from in date range of booking creation
