@@ -172,7 +172,10 @@ class StatsRegistrations extends ModuleGraph
 			WHERE 1
 				'.Shop::addSqlRestriction(Shop::SHARE_CUSTOMER).'
 				AND `date_add` BETWEEN';
-        $this->_titles['main'] = $this->l('Number of customer registrations');
+        if (Tools::getValue('export')) {
+            $this->_titles['main'][] = $this->l('Date');
+        }
+        $this->_titles['main'][] = $this->l('Number of customer registrations');
         $this->_formats['y'] = 'd';
         $this->setDateGraph($layers, true);
     }

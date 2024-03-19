@@ -98,7 +98,13 @@
                             <div class="row">
                                 <dt class="col-xs-6 col-sm-3">{l s='Booking Status'}</dt>
                                 <dd class="col-xs-6 col-sm-3">
-                                    <span{if isset($order_history[0].color) && $order_history[0].color} style="background-color:{$order_history[0].color|escape:'html':'UTF-8'}30; border: 1px solid {$order_history[0].color|escape:'html':'UTF-8'};" {/if} class="label">{$order_history[0].ostate_name|escape:'html':'UTF-8'}</span>
+                                    <span{if isset($order_history[0].color) && $order_history[0].color} style="background-color:{$order_history[0].color|escape:'html':'UTF-8'}30; border: 1px solid {$order_history[0].color|escape:'html':'UTF-8'};" {/if} class="label">
+                                        {if $order_history[0].id_order_state|in_array:$overbooking_order_states}
+                                            {l s='Order Not Confirmed'}
+                                        {else}
+                                            {$order_history[0].ostate_name|escape:'html':'UTF-8'}
+                                        {/if}
+                                    </span>
                                 </dd>
                             </div>
                         </dl>

@@ -30,7 +30,10 @@
 		</td>
 	{/if}
 	<td class="text-center">
-		{$data.room_num}
+		<p>{$data.room_num}</p>
+        {if $data.is_back_order}
+            <span class="overbooked_room">{l s='overbooked'}</span>
+        {/if}
 	</td>
 	<td class="text-center">
 		<img src="{$data.image_link}" title="Room image" />
@@ -62,7 +65,7 @@
 					<div class="fixed-width-xl room_check_in_div">
 						<div class="input-group">
 							<div class="input-group-addon">{l s='Check In'}</div>
-							<input type="text" class="form-control edit_product_date_from" name="edit_product[date_from]" value="{$data.date_from|date_format:"%d-%m-%Y"}"/>
+							<input type="text" class="form-control edit_product_date_from" name="edit_product[date_from]" value="{$data.date_from|date_format:"%d-%m-%Y"}" data-min_date="{$data.date_from|date_format:"%d-%m-%Y"}"/>
 							<div class="input-group-addon"><i class="icon-calendar"></i></div>
 						</div>
 					</div>
@@ -70,7 +73,7 @@
 					<div class="fixed-width-xl room_check_out_div">
 						<div class="input-group">
 							<div class="input-group-addon">{l s='Check Out'}</div>
-							<input type="text" class="form-control edit_product_date_to" name="edit_product[date_to]" value="{$data.date_to|date_format:"%d-%m-%Y"}"/>
+							<input type="text" class="form-control edit_product_date_to" name="edit_product[date_to]" value="{$data.date_to|date_format:"%d-%m-%Y"}" data-min_date="{$data.date_from|date_format:"%d-%m-%Y"}"/>
 							<div class="input-group-addon"><i class="icon-calendar"></i></div>
 						</div>
 					</div>
@@ -124,6 +127,7 @@
                                     </div>
                                 </div>
                             </div>
+							<p style="display:none;"><span class="text-danger occupancy-input-errors"></span></p>
                             <div class="row children_age_info_block" {if !isset($data['child_ages']) || !$data['child_ages']}style="display:none"{/if}>
                                 <div class="col-sm-12 form-group">
                                     <label class="col-sm-12">{l s='All Children'}</label>

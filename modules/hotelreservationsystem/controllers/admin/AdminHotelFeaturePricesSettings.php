@@ -353,8 +353,8 @@ class AdminHotelFeaturePricesSettingsController extends ModuleAdminController
         }
 
         $isPlanTypeExists = 0;
-        if (isset($isSpecialDaysExists) && $isSpecialDaysExists == 'on' && $jsonSpecialDays == "false") {
-            $this->errors[] = $this->l('Please select at least one day for the special day selection.');
+        if ($isSpecialDaysExists && $jsonSpecialDays == 'false') {
+            $this->errors[] = $this->l('Please select at least one day for week days restriction.');
         } else {
             $isPlanTypeExists = $this->validateExistingFeaturePrice(
                 $dateSelectionType,
@@ -412,14 +412,10 @@ class AdminHotelFeaturePricesSettingsController extends ModuleAdminController
                 if ($dateTo < $dateFrom) {
                     $this->errors[] = $this->l('Date To must be a date after Date From.');
                 }
-                if (isset($isSpecialDaysExists) && $isSpecialDaysExists == 'on') {
-                    $isSpecialDaysExists = 1;
+                if ($isSpecialDaysExists) {
                     if (!isset($specialDays) || !$specialDays) {
-                        $isSpecialDaysExists = 0;
-                        $this->errors[] = $this->l('Please select at least one day for the special day selection.');
+                        $this->errors[] = $this->l('Please select at least one day for week days restriction.');
                     }
-                } else {
-                    $isSpecialDaysExists = 0;
                 }
             } else {
                 if ($specificDate == '') {

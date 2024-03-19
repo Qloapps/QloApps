@@ -426,6 +426,14 @@ class ProductControllerCore extends FrontController
                     $occupancy_value = array();
                     if (Configuration::get('PS_FRONT_ROOM_UNIT_SELECTION_TYPE') == HotelBookingDetail::PS_ROOM_UNIT_SELECTION_TYPE_QUANTITY) {
                         $occupancy_value = 1;
+                    } else {
+                        $occupancy_value = array(
+                            array(
+                                'adults' => $room_info_by_product_id['adults'],
+                                'children' => 0,
+                                'child_ages' => array(),
+                            ),
+                        );
                     }
                     $this->assignBookingFormVars($this->product->id, $date_from, $date_to, $occupancy_value);
                     $this->assignServiceProductVars();
@@ -620,7 +628,7 @@ class ProductControllerCore extends FrontController
         }
 
         $totalAvailableRooms = 0;
-        if ($hotelRoomData = $objBookingDetail->DataForFrontSearch($bookingParams)) {
+        if ($hotelRoomData = $objBookingDetail->dataForFrontSearch($bookingParams)) {
             $totalAvailableRooms = $hotelRoomData['stats']['num_avail'];
             $quantity = ($quantity > $totalAvailableRooms) ? $totalAvailableRooms : $quantity;
         }
@@ -743,7 +751,7 @@ class ProductControllerCore extends FrontController
         // calculate total price
         $totalPrice = $totalRoomPrice + $demandsPrice;
         // send occupancy information searched by the user
-        if ($this->ajax && $occupancy && is_array($occupancy)) {
+        if ($occupancy && is_array($occupancy)) {
             $smartyVars['occupancies'] = $occupancy;
             $smartyVars['occupancy_adults'] = array_sum(array_column($occupancy, 'adults'));
             $smartyVars['occupancy_children'] = array_sum(array_column($occupancy, 'children'));

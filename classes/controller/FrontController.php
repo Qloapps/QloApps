@@ -417,11 +417,12 @@ class FrontControllerCore extends Controller
 
         $display_tax_label = $this->context->country->display_tax_label;
         if (isset($cart->{Configuration::get('PS_TAX_ADDRESS_TYPE')}) && $cart->{Configuration::get('PS_TAX_ADDRESS_TYPE')}) {
-            $infos = Address::getCountryAndState((int)$cart->{Configuration::get('PS_TAX_ADDRESS_TYPE')});
-            $country = new Country((int)$infos['id_country']);
-            $this->context->country = $country;
-            if (Validate::isLoadedObject($country)) {
-                $display_tax_label = $country->display_tax_label;
+            if ($infos = Address::getCountryAndState((int)$cart->{Configuration::get('PS_TAX_ADDRESS_TYPE')})) {
+                $country = new Country((int)$infos['id_country']);
+                $this->context->country = $country;
+                if (Validate::isLoadedObject($country)) {
+                    $display_tax_label = $country->display_tax_label;
+                }
             }
         }
 
@@ -1134,9 +1135,7 @@ class FrontControllerCore extends Controller
      */
     public function initHeader()
     {
-        /** @see P3P Policies (http://www.w3.org/TR/2002/REC-P3P-20020416/#compact_policies) */
-        header('P3P: CP="IDC DSP COR CURa ADMa OUR IND PHY ONL COM STA"');
-        header('Powered-By: PrestaShop');
+        header('Powered-By: QloApps');
 
         // Hooks are voluntary out the initialize array (need those variables already assigned)
         $this->context->smarty->assign(array(

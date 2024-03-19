@@ -78,6 +78,16 @@ $(document).ready(function(){
 
                 // set input field value
                 $(this).closest('.occupancy_count_block').find('.occupancy_count > span').text(elementVal + 1);
+            } else {
+                if (elementVal >= max_child_in_room) {
+                    if (elementVal == 0) {
+                        showOccupancyError(no_children_allowed_txt, $(this).closest(".occupancy_info_block"));
+                    } else {
+                        showOccupancyError(max_children_txt, $(this).closest(".occupancy_info_block"));
+                    }
+                } else {
+                    showOccupancyError(max_occupancy_reached_txt, $(this).closest(".occupancy_info_block"));
+                }
             }
         } else {
 			let max_adults_in_room;
@@ -87,10 +97,29 @@ $(document).ready(function(){
 			if (elementVal < max_adults_in_room && elementVal < max_allowed_for_current) {
 				element.val(elementVal + 1);
 				$(this).closest('.occupancy_count_block').find('.occupancy_count > span').text(elementVal + 1);
+            } else {
+                if (elementVal >= max_adults_in_room) {
+                    showOccupancyError(max_adults_txt, $(this).closest(".occupancy_info_block"));
+                } else {
+                    showOccupancyError(max_occupancy_reached_txt, $(this).closest(".occupancy_info_block"));
+                }
 			}
         }
         setRoomTypeGuestOccupancy($(this).closest('.booking_occupancy_wrapper'));
     });
+
+    var errorMsgTime;
+    $('.occupancy-input-errors').parent().hide();
+    function showOccupancyError(msg, occupancy_info_block)
+    {
+        var errorMsgBlock = $(occupancy_info_block).find('.occupancy-input-errors')
+        $(errorMsgBlock).html(msg).parent().show('fast');
+        clearTimeout(errorMsgTime);
+        errorMsgTime = setTimeout(function() {
+            $(errorMsgBlock).parent().hide('fast');
+        }, 1000);
+
+    }
 
 	$(document).on('click', '.booking_occupancy_wrapper .occupancy_quantity_down', function(e) {
         e.preventDefault();
@@ -247,6 +276,7 @@ $(document).ready(function(){
                         occupancy_block += '</div>';
                     occupancy_block += '</div>';
                 occupancy_block += '</div>';
+                occupancy_block += '<p style="display:none;"><span class="text-danger occupancy-input-errors"></span></p>';
                 occupancy_block += '<div class="form-group row children_age_info_block">';
                     occupancy_block += '<label class="col-sm-12">' + all_children_txt + '</label>';
                     occupancy_block += '<div class="col-sm-12">';
@@ -350,19 +380,3 @@ function getRoomTypeGuestOccupancyFormated(adults, children, rooms)
 	return guestButtonVal;
 }
 
-
-function resetOccupancyField(booking_occupancy_wrapper)
-{
-	$(booking_occupancy_wrapper).siblings('.booking_guest_occupancy').find('span').text(select_occupancy_txt);
-	$(booking_occupancy_wrapper).find('.booking_occupancy_inner > div').each(function(index, element){
-		let num_adults = $(booking_occupancy_wrapper).find('.base_adult').val();
-		if (index == 0) {
-			$(this).removeClass('selected');
-			$(this).find('.num_adults').val(num_adults).siblings('.occupancy_count').find('span').text(num_adults);
-			$(this).find('.num_children').val(0).siblings('.occupancy_count').find('span').text(0);
-			$(this).find('.children_ages > div').remove();
-		} else {
-			$(element).remove();
-		}
-	});
-}

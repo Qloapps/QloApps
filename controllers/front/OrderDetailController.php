@@ -435,6 +435,7 @@ class OrderDetailControllerCore extends FrontController
                         'invoice' => (OrderState::invoiceAvailable($id_order_state) && count($order->getInvoicesCollection())),
                         'logable' => (bool) $order_status->logable,
                         'order_history' => $order->getHistory($this->context->language->id, false, true),
+                        'overbooking_order_states' => OrderState::getOverBookingStates(),
                         'products' => $products,
                         'discounts' => $order->getCartRules(),
                         'carrier' => $carrier,

@@ -31,8 +31,8 @@
 				<thead>
 					<tr>
 						<th>{l s='Name'}</th>
-						<th></th>
-						<th class="fixed-width-md">{l s='Quantity'}</th>
+						<th class="fixed-width-sm"></th>
+						<th class="fixed-width-sm">{l s='Quantity'}</th>
 						<th>{l s='Unit Price'}</th>
 						<th>{l s='Total Price'}</th>
 						<th class="text-right">{l s='Action'}</th>
@@ -41,7 +41,7 @@
 				<tbody>
 					{if isset($additionalServices) && $additionalServices}
 						{foreach $additionalServices['additional_services'] as $service}
-							<tr class="room_demand_block">
+							<tr class="room_demand_block" data-id_room_type_service_product_order_detail="{$service['id_room_type_service_product_order_detail']}">
 								<td>
 									<div>{$service['name']|escape:'html':'UTF-8'}</div>
 								</td>
@@ -53,10 +53,10 @@
 										<span class="badge badge-info label">{l s='Convenience fee'}</span>
 									{/if}
 								</td>
-								<td class="col-sm-4">
+								<td>
 									{if $service['allow_multiple_quantity']}
 										<div class="qty_container">
-											<input type="number" class="form-control qty" min="1" data-max-quantity="{$service['max_quantity']}" data-id_room_type_service_product_order_detail="{$service['id_room_type_service_product_order_detail']}" data-id_product="{$service['id_product']|escape:'html':'UTF-8'}" value="{$service['quantity']|escape:'html':'UTF-8'}">
+											<input type="number" class="form-control qty" min="1" data-id_product="{$service['id_product']|escape:'html':'UTF-8'}" value="{$service['quantity']|escape:'html':'UTF-8'}">
 											<p style="display:{if $service['quantity'] > $service['max_quantity']}block{else}none{/if}; margin-top: 4px;">
 												<span class="label label-warning">{l s='Maximum allowed quantity: %s' sprintf=$service['max_quantity']}</span>
 											</p>
@@ -66,10 +66,16 @@
 									{/if}
 								</td>
 								<td>
-									{displayPrice price=$service['unit_price_tax_excl'] currency=$orderCurrency}
-									{if $service['product_price_calculation_method'] == Product::PRICE_CALCULATION_METHOD_PER_DAY}
+									<div class="input-group">
+										<span class="input-group-addon">{$currencySign}</span>
+										<input type="text" class="form-control unit_price" value="{Tools::ps_round($service['unit_price_tax_excl'], 2)}" data-id-product="{$product['id_product']}">
+										{if Product::PRICE_CALCULATION_METHOD_PER_DAY == $service.product_price_calculation_method}
+											<span class="input-group-addon">{l s='/ night'}</span>
+										{/if}
+									</div>
+									{* {if $service['product_price_calculation_method'] == Product::PRICE_CALCULATION_METHOD_PER_DAY}
 										{l s='/ night'}
-									{/if}
+									{/if} *}
 								</td>
 								<td>{displayPrice price=$service['total_price_tax_excl']|escape:'html':'UTF-8' currency=$orderCurrency}</td>
 								<td><a class="btn btn-danger pull-right del_room_additional_service" data-id_room_type_service_product_order_detail="{$service['id_room_type_service_product_order_detail']}" href="#"><i class="icon-trash"></i></a></td>
@@ -93,9 +99,9 @@
 							<tr>
 								<th></th>
 								<th>{l s='Name'}</th>
-								<th></th>
-								<th class="fixed-width-md">{l s='Quantity'}</th>
-								<th class="text-right">{l s='Price'}</th>
+								<th class="fixed-width-sm"> </th>
+								<th class="fixed-width-sm">{l s='Quantity'}</th>
+								<th>{l s='Unit Price'}</th>
 							</tr>
 						</thead>
 						<tbody>
@@ -125,10 +131,13 @@
 										{/if}
 									</td>
 									<td class="text-right">
-										{convertPrice price=$product['price_tax_exc']}
-										{if $product['price_calculation_method'] == Product::PRICE_CALCULATION_METHOD_PER_DAY}
-											{l s='/ night'}
-										{/if}
+										<div class="input-group">
+											<span class="input-group-addon">{$currencySign}</span>
+											<input type="text" class="form-control unit_price" name="service_price[{$product['id_product']|escape:'html':'UTF-8'}]" value="{$product['price_tax_exc']}" data-id-product="{$product.id_product}">
+											{if Product::PRICE_CALCULATION_METHOD_PER_DAY == $product['price_calculation_method']}
+												<span class="input-group-addon">{l s='/ night'}</span>
+											{/if}
+										</div>
 									</td>
 								</tr>
 							{/foreach}

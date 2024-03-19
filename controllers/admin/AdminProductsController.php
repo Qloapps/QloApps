@@ -2442,61 +2442,104 @@ class AdminProductsControllerCore extends AdminController
         $time = time();
         $kpis = array();
 
-        // if (Configuration::get('PS_STOCK_MANAGEMENT')) {
-        //     $helper = new HelperKpi();
-        //     $helper->id = 'box-products-stock';
-        //     $helper->icon = 'icon-archive';
-        //     $helper->color = 'color1';
-        //     $helper->title = $this->l('Out of stock items', null, null, false);
-        //     if (ConfigurationKPI::get('PERCENT_PRODUCT_OUT_OF_STOCK') !== false) {
-        //         $helper->value = ConfigurationKPI::get('PERCENT_PRODUCT_OUT_OF_STOCK');
-        //     }
-        //     $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=percent_product_out_of_stock';
-        //     $helper->tooltip = $this->l('X% of your room types for sale are out of stock.', null, null, false);
-        //     $helper->refresh = (bool)(ConfigurationKPI::get('PERCENT_PRODUCT_OUT_OF_STOCK_EXPIRE') < $time);
-        //     $helper->href = Context::getContext()->link->getAdminLink('AdminProducts').'&productFilter_sav!quantity=0&productFilter_active=1&submitFilterproduct=1';
-        //     $kpis[] = $helper->generate();
-        // }
-
         $helper = new HelperKpi();
-        $helper->id = 'box-avg-gross-margin';
-        $helper->icon = 'icon-tags';
-        $helper->color = 'color2';
-        $helper->title = $this->l('Average Gross Margin %', null, null, false);
-        $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=product_avg_gross_margin';
-        $helper->tooltip = $this->l('Gross margin expressed in percentage assesses how cost-effectively you sell your room types / products. Out of $100, you will retain $X to cover profit and expenses.', null, null, false);
-        $kpis[] = $helper->generate();
-
-        $helper = new HelperKpi();
-        $helper->id = 'box-8020-sales-catalog';
-        $helper->icon = 'icon-beaker';
+        $helper->id = 'box-total-rooms';
+        $helper->icon = 'icon-bed';
         $helper->color = 'color3';
-        $helper->title = $this->l('Purchased References', null, null, false);
-        $helper->subtitle = $this->l('30 days', null, null, false);
-        $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=8020_sales_catalog';
-        $helper->tooltip = $this->l('X% of your references have been purchased for the past 30 days.', null, null, false);
-        if (Module::isInstalled('statsbestproducts')) {
-            $helper->href = Context::getContext()->link->getAdminLink('AdminStats').'&module=statsbestproducts&datepickerFrom='.date('Y-m-d', strtotime('-30 days')).'&datepickerTo='.date('Y-m-d');
-        }
-        $kpis[] = $helper->generate();
+        $helper->title = $this->l('Total Rooms', null, null, false);
+        $helper->subtitle = $this->l('Today', null, null, false);
+        $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=total_rooms';
+        $helper->tooltip = $this->l('The total number of rooms in all hotels.', null, null, false);
+        $kpis[] = $helper;
 
         $helper = new HelperKpi();
-        $helper->id = 'box-disabled-products';
-        $helper->icon = 'icon-off';
+        $helper->id = 'box-occupied-rooms';
+        $helper->icon = 'icon-user';
+        $helper->color = 'color1';
+        $helper->title = $this->l('Occupied Rooms', null, null, false);
+        $helper->subtitle = $this->l('Today', null, null, false);
+        $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=occupied_rooms';
+        $helper->tooltip = $this->l('The current count of rooms that are currently occupied by guests.', null, null, false);
+        $kpis[] = $helper;
+
+        $helper = new HelperKpi();
+        $helper->id = 'box-vacant-rooms';
+        $helper->icon = 'icon-check-empty';
+        $helper->color = 'color3';
+        $helper->title = $this->l('Vacant Rooms', null, null, false);
+        $helper->subtitle = $this->l('Today', null, null, false);
+        $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=vacant_rooms';
+        $helper->tooltip = $this->l('The count of rooms that are currently unoccupied and available for booking.', null, null, false);
+        $kpis[] = $helper;
+
+        $helper = new HelperKpi();
+        $helper->id = 'box-reserved-rooms';
+        $helper->icon = 'icon-calendar';
         $helper->color = 'color4';
-        $helper->href = $this->context->link->getAdminLink('AdminProducts');
+        $helper->title = $this->l('Booked Rooms', null, null, false);
+        $helper->subtitle = $this->l('Today', null, null, false);
+        $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=booked_rooms';
+        $helper->tooltip = $this->l('The number of rooms that are currently booked but not yet occupied.', null, null, false);
+        $kpis[] = $helper;
+
+        $helper = new HelperKpi();
+        $helper->id = 'box-disabled-rooms';
+        $helper->icon = 'icon-ban';
+        $helper->color = 'color2';
+        $helper->title = $this->l('Disabled Rooms', null, null, false);
+        $helper->subtitle = $this->l('Today', null, null, false);
+        $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=disabled_rooms';
+        $helper->tooltip = $this->l('The number of rooms that are currently disabled.', null, null, false);
+        $kpis[] = $helper;
+
+        $helper = new HelperKpi();
+        $helper->id = 'box-online-bookable-rooms';
+        $helper->icon = 'icon-globe';
+        $helper->color = 'color4';
+        $helper->title = $this->l('Online Bookable Rooms', null, null, false);
+        $helper->subtitle = $this->l('Today', null, null, false);
+        $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=online_bookable_rooms';
+        $helper->tooltip = $this->l('The total number of rooms that can be booked only using website.', null, null, false);
+        $kpis[] = $helper;
+
+        $helper = new HelperKpi();
+        $helper->id = 'box-offline-bookable-rooms';
+        $helper->icon = 'icon-building';
+        $helper->color = 'color1';
+        $helper->title = $this->l('Offline Bookable Rooms', null, null, false);
+        $helper->subtitle = $this->l('Today', null, null, false);
+        $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=offline_bookable_rooms';
+        $helper->tooltip = $this->l('The number of rooms that can be booked either through website or offline channels (e.g., phone or in-person).', null, null, false);
+        $kpis[] = $helper;
+
+        $helper = new HelperKpi();
+        $helper->id = 'box-best-selling-room-type';
+        $helper->icon = 'icon-star';
+        $helper->color = 'color1';
+        $helper->title = $this->l('Best Selling', null, null, false);
+        $nbDaysBestSelling = Validate::isUnsignedInt(Configuration::get('PS_KPI_BEST_SELLING_ROOM_TYPE_NB_DAYS')) ? Configuration::get('PS_KPI_BEST_SELLING_ROOM_TYPE_NB_DAYS') : 30;
+        $helper->subtitle = sprintf($this->l('%d Days', null, null, false), (int) $nbDaysBestSelling);
+        $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=best_selling_room_type';
+        $helper->tooltip = $this->l('Displays the best selling room type based on the last 30 days of sales.', null, null, false);
+        $kpis[] = $helper;
+
+        $helper = new HelperKpi();
+        $helper->id = 'box-disbled-room-types';
+        $helper->icon = 'icon-ban';
+        $helper->color = 'color2';
         $helper->title = $this->l('Disabled Room Types', null, null, false);
-        if (ConfigurationKPI::get('DISABLED_ROOM_TYPES') !== false) {
-            $helper->value = ConfigurationKPI::get('DISABLED_ROOM_TYPES');
-        }
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=disabled_room_types';
-        $helper->refresh = (bool)(ConfigurationKPI::get('DISABLED_ROOM_TYPES_EXPIRE') < $time);
-        $helper->tooltip = $this->l('X% of your room types are disabled and not visible to your customers', null, null, false);
         $helper->href = Context::getContext()->link->getAdminLink('AdminProducts').'&productFilter_sa!active=0&submitFilterproduct=1';
-        $kpis[] = $helper->generate();
+        $helper->tooltip = $this->l('The total number of room types that are currently disabled.', null, null, false);
+        $kpis[] = $helper;
+
+        Hook::exec('action'.$this->controller_name.'KPIListingModifier', array(
+            'kpis' => &$kpis,
+        ));
 
         $helper = new HelperKpiRow();
         $helper->kpis = $kpis;
+
         return $helper->generate();
     }
 
@@ -3007,6 +3050,7 @@ class AdminProductsControllerCore extends AdminController
                         $associationInfo['id_product'] = $objProduct->id;
                         $associationInfo['name'] = $objProduct->name;
                         $associationInfo['auto_add_to_cart'] = $objProduct->auto_add_to_cart;
+                        $associationInfo['price_addition_type'] = $objProduct->price_addition_type;
                         $associationInfo['category'] = $objProduct->category;
                         $associationInfo['default_price'] = $objProduct->price;
                         $associationInfo['id_tax_rules_group'] = $objProduct->id_tax_rules_group;
@@ -3137,7 +3181,9 @@ class AdminProductsControllerCore extends AdminController
                             }
 
                             $objRoomTypeServiceProductPrice->price = $price;
-                            $objRoomTypeServiceProductPrice->id_tax_rules_group = $idTaxRulesGroup;
+                            if ($idTaxRulesGroup) {
+                                $objRoomTypeServiceProductPrice->id_tax_rules_group = $idTaxRulesGroup;
+                            }
 
                             $objRoomTypeServiceProductPrice->save();
                         } else {
