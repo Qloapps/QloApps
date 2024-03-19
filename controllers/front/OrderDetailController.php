@@ -403,7 +403,6 @@ class OrderDetailControllerCore extends FrontController
                             'order_has_invoice' => $order->hasInvoice(),
                             'cart_htl_data' => $cartHotelData,
                             'cart_service_products' => $cartServiceProducts,
-                            'non_requested_rooms' => $nonRequestedRooms,
                             'obj_hotel_branch_information' => $objHotelBranchInformation,
                             'hotel_address_info' => $hotelAddressInfo,
                             'hotel_refund_rules' => $hotelRefundRules,
@@ -585,14 +584,6 @@ class OrderDetailControllerCore extends FrontController
                     $objOrderReturn->by_admin = 0;
                     $objOrderReturn->question = $cancellationReason;
                     $objOrderReturn->save();
-
-                    $objOrderReturn = new OrderReturn();
-                    $objOrderReturn->id_customer = $objOrder->id_customer;
-                    $objOrderReturn->id_order = $objOrder->id;
-                    $objOrderReturn->state = 0;
-                    $objOrderReturn->by_admin = 0;
-                    $objOrderReturn->question = $cancellationReason;
-                    $objOrderReturn->save();
                     if ($objOrderReturn->id) {
                         foreach ($idsHtlBooking as $idHtlBooking) {
                             $objHotelBookingDetail = new HotelBookingDetail($idHtlBooking);
@@ -644,6 +635,8 @@ class OrderDetailControllerCore extends FrontController
 
                         $objOrderHistory->changeIdOrderState($idOrderState, $objOrder, $useExistingPayment);
                         $objOrderHistory->addWithemail();
+
+                        $response['order_cancelled'] = true;
                     }
                 }
             }

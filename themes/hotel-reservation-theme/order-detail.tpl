@@ -365,64 +365,68 @@
                 </div>
             {/if}
 
-            <div class="card order-messages {if $is_guest || !count($messages)}hide{/if}">
-                <div class="card-header">
-                    {l s='Messages'}
-                </div>
+            {if !$is_guest}
+                <div class="card order-messages {if !count($messages)}hide{/if}">
+                    <div class="card-header">
+                        {l s='Messages'}
+                    </div>
 
-                <div class="card-body">
-                    <div class="messages-list card-text">
-                        {foreach from=$messages item=message}
-                            {include file='./_partials/booking-message.tpl'}
-                        {/foreach}
+                    <div class="card-body">
+                        <div class="messages-list card-text">
+                            {foreach from=$messages item=message}
+                                {include file='./_partials/booking-message.tpl'}
+                            {/foreach}
+                        </div>
                     </div>
                 </div>
-            </div>
+            {/if}
 
-            <div class="card add-order-message" id="add-order-message">
-                <div class="card-header">
-                    {l s='Add a Message'}
+            {if !$is_guest}
+                <div class="card add-order-message" id="add-order-message">
+                    <div class="card-header">
+                        {l s='Add a Message'}
 
-                    <p class="card-subheader text-muted">
-                        {l s='If you would like to add a comment about your booking, please write it in the field below.'}
-                    </p>
-                </div>
+                        <p class="card-subheader text-muted">
+                            {l s='If you would like to add a comment about your booking, please write it in the field below.'}
+                        </p>
+                    </div>
 
-                <div class="card-body">
-                    <div class="errors-block" style="display: none;"></div>
+                    <div class="card-body">
+                        <div class="errors-block" style="display: none;"></div>
 
-                    <form action="{$link->getPageLink('order-detail', true)|escape:'html':'UTF-8'}" method="post" class="std" id="sendOrderMessage">
-                        <div class="form-group select-room-type">
-                            <label for="id_product">{l s='Room Type'}</label>
+                        <form action="{$link->getPageLink('order-detail', true)|escape:'html':'UTF-8'}" method="post" class="std" id="sendOrderMessage">
+                            <div class="form-group select-room-type">
+                                <label for="id_product">{l s='Room Type'}</label>
 
-                            <div class="dropdown">
-                                <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">
-                                    <span>{l s='-- Choose --'}</span>
-                                </button>
-                                <ul class="dropdown-menu">
-                                    {foreach from=$products item=product}
-                                        {if $product.is_booking_product}
-                                            <li><a href="" value="{$product.product_id}">{$product.product_name|escape:'html':'UTF-8'}</a></li>
-                                        {/if}
-                                    {/foreach}
-                                </ul>
+                                <div class="dropdown">
+                                    <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">
+                                        <span>{l s='-- Choose --'}</span>
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        {foreach from=$products item=product}
+                                            {if $product.is_booking_product}
+                                                <li><a href="" value="{$product.product_id}">{$product.product_name|escape:'html':'UTF-8'}</a></li>
+                                            {/if}
+                                        {/foreach}
+                                    </ul>
+                                </div>
+
+                                <input type="hidden" class="id_product" name="id_product" value="0">
                             </div>
 
-                            <input type="hidden" class="id_product" name="id_product" value="0">
-                        </div>
+                            <p class="form-group textarea">
+                                <textarea class="form-control" rows="3" name="msgText"></textarea>
+                            </p>
 
-                        <p class="form-group textarea">
-                            <textarea class="form-control" rows="3" name="msgText"></textarea>
-                        </p>
-
-                        <div class="submit">
-                            <input type="hidden" name="id_order" value="{$order->id|intval|escape:'html':'UTF-8'}" />
-                            <input type="submit" class="unvisible" name="submitMessage" value="{l s='Send'}" />
-                            <button type="submit" name="submitMessage" id="submitMessage" class="button btn button-medium"><span>{l s='Send'}</span></button>
-                        </div>
-                    </form>
+                            <div class="submit">
+                                <input type="hidden" name="id_order" value="{$order->id|intval|escape:'html':'UTF-8'}" />
+                                <input type="submit" class="unvisible" name="submitMessage" value="{l s='Send'}" />
+                                <button type="submit" name="submitMessage" id="submitMessage" class="button btn button-medium"><span>{l s='Send'}</span></button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
-            </div>
+            {/if}
         </div>
         <div class="col-md-4">
             <div class="card hotel-location hidden-xs hidden-sm visible-md">
@@ -766,6 +770,16 @@
                     <div><i class="icon icon-check-circle text-success"></i></div>
                     <h3><b>{l s='Request submitted successfully'}</b></h3>
                     <h4>{l s='Your cancellation request has been submitted successfully. Go to Booking Refund Requests page for further updates.'}</h4>
+                </div>
+            </div>
+        </div>
+
+        <div id="popup-cancellation-order-cancel-success" class="popup-cancellation-submit-success" style="display: none;">
+            <div class="card">
+                <div class="text-center">
+                    <div><i class="icon icon-check-circle text-success"></i></div>
+                    <h3><b>{l s='Booking cancelled successfully'}</b></h3>
+                    <h4>{l s='Your booking has been cancelled successfully.'}</h4>
                 </div>
             </div>
         </div>

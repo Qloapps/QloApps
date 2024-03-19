@@ -569,7 +569,6 @@ class GuestTrackingControllerCore extends FrontController
                 $order->back_ord_msg = Configuration::get('WK_BO_MESSAGE');
                 $order->order_has_invoice = $order->hasInvoice();
                 $order->cart_htl_data = $cartHotelData;
-                $order->non_requested_rooms = $nonRequestedRooms;
                 $order->customerGuestDetail = $customerGuestDetail;
                 $order->obj_hotel_branch_information = $objHotelBranchInformation;
                 $order->hotel_address_info = $hotelAddressInfo;

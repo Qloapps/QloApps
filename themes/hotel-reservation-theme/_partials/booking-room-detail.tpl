@@ -38,7 +38,7 @@
                                 <dt class="col-xs-6 col-sm-3">{l s='Check-in'}</dt>
                                 <dd class="col-xs-6 col-sm-3">{$rm_v.data_form|date_format:'D'}, {dateFormat date=$rm_v.data_form}</dd>
                                 <dt class="col-xs-6 col-sm-3">{l s='Check-out'}</dt>
-                                <dd class="col-xs-6 col-sm-3">{$rm_v.data_to|date_format:'D'}, {dateFormat date=$rm_v.data_form}</dd>
+                                <dd class="col-xs-6 col-sm-3">{$rm_v.data_to|date_format:'D'}, {dateFormat date=$rm_v.data_to}</dd>
                             </div>
 
                             <div class="row">

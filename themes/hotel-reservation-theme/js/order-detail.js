@@ -172,7 +172,11 @@ const BookingRefundManager = {
                     BookingRefundManager.showGeneralErrors(response.errors_html);
                 } else {
                     BookingRefundManager.close();
-                    BookingRefundManager.showSuccessMessage();
+                    if (typeof response.order_cancelled != 'undefined' && response.order_cancelled) {
+                        BookingRefundManager.showOrderCancelSuccessMessage();
+                    } else {
+                        BookingRefundManager.showRefundRequestSuccessMessage();
+                    }
                     BookingRefundManager.reset();
                 }
             },
@@ -191,6 +195,13 @@ const BookingRefundManager = {
 
         $('#form-cancel-booking .cancel-booking').show();
         $('#form-cancel-booking .cancel-booking-preview').hide();
+
+        // disable next button if all rooms were selected cancelled
+        let countRooms = $('#form-cancel-booking input.bookings_to_refund').length;
+        let countDisabled = $('#form-cancel-booking input.bookings_to_refund:disabled').length;
+        if (countRooms == countDisabled) {
+            BookingRefundManager.disableNextButton();
+        }
     },
     updateSelectedRooms: function() {
         let countSelected = $('#form-cancel-booking input.bookings_to_refund:not(:disabled):checked').length;
@@ -207,15 +218,25 @@ const BookingRefundManager = {
             $('.fancybox-wrap.fancybox-order-detail .cancel-booking-preview .errors').html('');
         });
     },
+    disableNextButton: function() {
+        $('#form-cancel-booking .btn-next').addClass('disabled');
+    },
     enableSubmitButton: function() {
         $('#form-cancel-booking .btn-submit').removeClass('disabled');
     },
     disableSubmitButton: function() {
         $('#form-cancel-booking .btn-submit').addClass('disabled');
     },
-    showSuccessMessage: function() {
+    showRefundRequestSuccessMessage: function() {
         $.fancybox.open({
             href: '#popup-cancellation-submit-success',
+            wrapCSS: 'fancybox-order-detail feedback',
+            padding: 0,
+        });
+    },
+    showOrderCancelSuccessMessage: function() {
+        $.fancybox.open({
+            href: '#popup-cancellation-order-cancel-success',
             wrapCSS: 'fancybox-order-detail feedback',
             padding: 0,
         });
