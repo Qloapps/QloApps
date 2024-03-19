@@ -47,6 +47,8 @@ class AdminOrdersControllerCore extends AdminController
     protected $hotelsArray = array();
     protected $roomTypesArray = array();
     protected $roomsArray = array();
+    protected $orderCurrenciesArray = array();
+
 
     public function __construct()
     {
