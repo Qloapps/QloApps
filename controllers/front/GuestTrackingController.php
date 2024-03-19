@@ -214,6 +214,7 @@ class GuestTrackingControllerCore extends FrontController
                 $order->id_order_state = (int)$order->getCurrentState();
                 $order->invoice = (OrderState::invoiceAvailable((int)$order->id_order_state) && $order->invoice_number);
                 $order->order_history = $order->getHistory((int)$this->context->language->id, false, true);
+                $order->overbooking_order_states = OrderState::getOverBookingStates();
                 $order->carrier = new Carrier((int)$order->id_carrier, (int)$order->id_lang);
                 $order->address_invoice = new Address((int)$order->id_address_invoice);
                 $order->address_delivery = new Address((int)$order->id_address_delivery);

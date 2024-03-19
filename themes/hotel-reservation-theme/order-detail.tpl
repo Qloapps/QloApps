@@ -611,7 +611,7 @@
 
     {if $is_guest}
         <div class="row">
-            <div class="col-sm-12">
+            <div class="col-sm-8">
                 <p class="alert alert-info"><i class="icon-info-sign"></i> {l s='You cannot request refund with a guest account.'}</p>
             </div>
         </div>

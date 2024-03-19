@@ -37,6 +37,36 @@
     margin-bottom: 30px;
 }
 
+.alert {
+    font-size: 14px;
+    border: none;
+}
+
+.alert.alert-info {
+    background: #E0EEFF;
+    color: #000;
+}
+
+.alert.alert-info i {
+    margin-right: 2px;
+    font-size: 17px;
+    color: #1292FF;
+    position: relative;
+    top: 2px;
+}
+
+.alert.alert-success {
+    background: #DDF3DF;
+    color: #333;
+    text-shadow: none;
+}
+
+.alert.alert-success:before {
+    margin-right: 2px;
+    font-size: 17px;
+    color: #55C55F;
+}
+
 .card {
     padding: 0;
     border-radius: 4px;
@@ -110,7 +140,6 @@
 .card.card-tabs .tab-content {
     margin-top: 0;
 }
-
 /* card-tabs - end */
 
 .description-list {
@@ -142,10 +171,11 @@
 .hotel-location p.hotel-address {
     font-size: 16px;
     line-height: 24px;
-    margin-bottom: 20px;
+    margin: 0;
 }
 
 .hotel-location .hotel-location-map {
+    margin-top: 20px;
     border-radius: 4px;
 }
 
@@ -1020,3 +1050,44 @@
 #popup-view-extra-services .tab-content .room_demand_block:not(:last-of-type) {
     margin-bottom: 6px;
 }
+
+/* Guest Tracking page styles - start */
+.transform-account .card-text p {
+    margin: 0;
+    padding: 0;
+    font-size: 16px;
+}
+
+.transform-account .password {
+    margin-top: 20px;
+}
+
+.transform-account .form-group label {
+    font-size: 16px;
+    margin-bottom: 10px;
+}
+
+.transform-account .form-group input {
+    max-width: 350px;
+    width: 350px;
+    padding: 20px 10px;
+    border: 1px solid #E5E5E5;
+    border-radius: 4px;
+    box-shadow: none;
+}
+
+.transform-account .btn-submit {
+    margin-top: 5px;
+    padding: 6px 20px;
+}
+
+.transform-account .btn-submit span {
+    font-size: 14px;
+    font-weight: bold;
+}
+.alert-transformed a {
+    color: #333;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+/* Guest Tracking page styles - end */
