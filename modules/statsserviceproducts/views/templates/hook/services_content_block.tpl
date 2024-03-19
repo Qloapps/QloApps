@@ -17,8 +17,20 @@
  * @license LICENSE.txt
  *}
 
-<div class="panel-heading">{$module_name}</div>
-{$grid_table}
-<a class="btn btn-default export-csv" href="{$export_link}">
-    <i class="icon-cloud-download"></i> {l s='CSV Export' mod='statsserviceproducts'}
-</a>
+    <div class="panel-heading">
+        <i class="icon-money"></i> {l s='Services' mod='statsserviceproducts'}
+    </div>
+    {$grid_table_services}
+    <a class="btn btn-default export-csv" href="{$export_link_services}">
+        <i class="icon-cloud-download"></i> {l s='CSV Export' mod='statsserviceproducts'}
+    </a>
+</div>
+<div class="panel">
+    <div class="panel-heading">
+        <i class="icon-money"></i> {l s='Facilities' mod='statsserviceproducts'}
+    </div>
+
+    {$grid_table_facilities}
+    <a class="btn btn-default export-csv" href="{$export_link_facilities}">
+        <i class="icon-cloud-download"></i> {l s='CSV Export' mod='statsserviceproducts'}
+    </a>

@@ -39,48 +39,7 @@ class statsServiceProducts extends ModuleGrid
 
         parent::__construct();
 
-        $this->default_sort_column = 'totalPriceSold';
-        $this->default_sort_direction = 'DESC';
         $this->paging_message = sprintf($this->l('Displaying %1$s of %2$s'), '{0} - {1}', '{2}');
-
-        $this->columns = array(
-			array(
-				'id' => 'name',
-				'header' => $this->l('Name'),
-				'dataIndex' => 'name',
-				'align' => 'left'
-			),
-            array(
-				'id' => 'auto_add_to_cart',
-				'header' => $this->l('Auto add to cart'),
-				'dataIndex' => 'auto_add_to_cart',
-				'align' => 'center'
-			),
-			array(
-				'id' => 'totalQuantitySold',
-				'header' => $this->l('Quantity sold'),
-				'dataIndex' => 'totalQuantitySold',
-				'align' => 'center'
-			),
-			array(
-				'id' => 'avgPriceSold',
-				'header' => $this->l('Average Price'),
-				'dataIndex' => 'avgPriceSold',
-				'align' => 'center'
-			),
-			array(
-				'id' => 'totalPriceSold',
-				'header' => $this->l('Sales'),
-				'dataIndex' => 'totalPriceSold',
-				'align' => 'center'
-			),
-			array(
-				'id' => 'active',
-				'header' => $this->l('Active'),
-				'dataIndex' => 'active',
-				'align' => 'center'
-			)
-		);
 
         $this->displayName = $this->l('Extra services overview');
         $this->description = $this->l('Show room extra services overview based on sales.');
@@ -94,89 +53,249 @@ class statsServiceProducts extends ModuleGrid
 
     public function hookAdminStatsModules($params)
     {
-        $engine_params = array(
-            'id' => 'id_product',
-            'title' => $this->displayName,
-            'columns' => $this->columns,
-            'defaultSortColumn' => $this->default_sort_column,
-            'defaultSortDirection' => $this->default_sort_direction,
-            'pagingMessage' => $this->paging_message
-        );
+        $engine_params_services = $this->getServicesParams();
+        $engine_params_facilities = $this->getFacilitiesParams();
 
         if (Tools::getValue('export')) {
-            $this->csvExport($engine_params);
+            if (Tools::getValue('option') == 'services') {
+                $this->csvExport($engine_params_services);
+            } else if (Tools::getValue('option') == 'facilities') {
+                $this->csvExport($engine_params_facilities);
+            }
         }
 
         $this->context->smarty->assign(array(
             'module_name' => $this->displayName,
-            'grid_table' => $this->engine($engine_params),
-            'export_link' => Tools::safeOutput($_SERVER['REQUEST_URI']).'&export=1',
+            'grid_table_services' => $this->engine($engine_params_services),
+            'grid_table_facilities' => $this->engine($engine_params_facilities),
+            'export_link_services' => Tools::safeOutput($_SERVER['REQUEST_URI']).'&export=1&option=services',
+            'export_link_facilities' => Tools::safeOutput($_SERVER['REQUEST_URI']).'&export=1&option=facilities',
         ));
 
         return $this->display(__FILE__, 'services_content_block.tpl');
     }
 
+    public function getServicesParams()
+    {
+        return array(
+            'title' => $this->l('Services'),
+            'columns' => array(
+                array(
+                    'id' => 'display_name',
+                    'header' => $this->l('Name'),
+                    'dataIndex' => 'display_name',
+                    'align' => 'left'
+                ),
+                array(
+                    'id' => 'auto_add_to_cart',
+                    'header' => $this->l('Auto add to cart'),
+                    'dataIndex' => 'auto_add_to_cart',
+                    'align' => 'center'
+                ),
+                array(
+                    'id' => 'totalQuantitySold',
+                    'header' => $this->l('Quantity sold'),
+                    'dataIndex' => 'totalQuantitySold',
+                    'align' => 'center'
+                ),
+                array(
+                    'id' => 'avgPriceSold',
+                    'header' => $this->l('Average Price'),
+                    'dataIndex' => 'avgPriceSold',
+                    'align' => 'center'
+                ),
+                array(
+                    'id' => 'totalPriceSold',
+                    'header' => $this->l('Sales'),
+                    'dataIndex' => 'totalPriceSold',
+                    'align' => 'center'
+                ),
+                array(
+                    'id' => 'active',
+                    'header' => $this->l('Active'),
+                    'dataIndex' => 'active',
+                    'align' => 'center'
+                )
+            ),
+            'defaultSortColumn' => 'totalPriceSold',
+            'defaultSortDirection' => 'DESC',
+            'pagingMessage' => $this->paging_message,
+            'option' => 'services'
+        );
+    }
+
+    public function getFacilitiesParams()
+    {
+        return array(
+            'title' => $this->l('Facilities'),
+            'columns' => array(
+                array(
+                    'id' => 'display_name',
+                    'header' => $this->l('Name'),
+                    'dataIndex' => 'display_name',
+                    'align' => 'left'
+                ),
+                array(
+                    'id' => 'totalQuantitySold',
+                    'header' => $this->l('Quantity sold'),
+                    'dataIndex' => 'totalQuantitySold',
+                    'align' => 'center'
+                ),
+                array(
+                    'id' => 'avgPriceSold',
+                    'header' => $this->l('Average Price'),
+                    'dataIndex' => 'avgPriceSold',
+                    'align' => 'center'
+                ),
+                array(
+                    'id' => 'totalPriceSold',
+                    'header' => $this->l('Sales'),
+                    'dataIndex' => 'totalPriceSold',
+                    'align' => 'center'
+                ),
+            ),
+            'defaultSortColumn' => 'totalPriceSold',
+            'defaultSortDirection' => 'DESC',
+            'pagingMessage' => $this->paging_message,
+            'option' => 'facilities'
+        );
+    }
+
+    public function setOption($option)
+    {
+		$date_between = $this->getDate();
+        switch($option) {
+            case 'services' :
+                $this->setQueryForServices($date_between);
+                break;
+            case 'facilities' :
+                $this->setQueryForFacilities($date_between);
+                break;
+        }
+    }
+
+    public function setQueryForServices($date_between)
+    {
+        $this->query = '(SELECT IFNULL(pl.`name`, od.`product_name`) as `display_name`, p.`active`, p.`auto_add_to_cart`,
+            ROUND(IFNULL(SUM(spod.`total_price_tax_excl` / o.`conversion_rate`), 0), 2) / SUM(spod.`quantity`) AS avgPriceSold,
+            IFNULL(SUM(spod.`quantity`), 0) AS totalQuantitySold,
+            ROUND(IFNULL(SUM(spod.`total_price_tax_excl` / o.`conversion_rate`), 0), 2) AS totalPriceSold
+            FROM '._DB_PREFIX_.'htl_room_type_service_product_order_detail spod
+            LEFT JOIN  '._DB_PREFIX_.'product p
+            ON (spod.`id_product` = p.`id_product`)
+            LEFT JOIN '._DB_PREFIX_.'product_lang pl ON (p.id_product = pl.id_product AND pl.id_lang = '.(int)$this->getLang().')
+            INNER JOIN '._DB_PREFIX_.'orders o ON (spod.id_order = o.id_order)
+            INNER JOIN '._DB_PREFIX_.'order_detail od ON (od.id_order = o.id_order)
+            INNER JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd ON (spod.`id_htl_booking_detail` = hbd.`id`)
+            WHERE o.valid = 1 AND o.invoice_date BETWEEN '.$date_between.'
+            '.HotelBranchInformation::addHotelRestriction(false, 'hbd').'
+            AND od.`is_booking_product` = 0
+            GROUP BY spod.id_product)
+            UNION
+            (SELECT pl.`name` as `display_name`, p.`active`, p.`auto_add_to_cart`,
+            0 AS avgPriceSold,
+            0 AS totalQuantitySold,
+            0 AS totalPriceSold
+            FROM '._DB_PREFIX_.'product p
+            LEFT JOIN '._DB_PREFIX_.'product_lang pl
+            ON (p.`id_product` = pl.`id_product` AND pl.`id_lang` = '.(int)$this->getLang().')
+            WHERE p.`id_product` NOT IN (
+                SELECT DISTINCT(spod.`id_product`)
+                FROM '._DB_PREFIX_.'htl_room_type_service_product_order_detail spod
+                INNER JOIN '._DB_PREFIX_.'orders o ON (spod.id_order = o.id_order)
+                INNER JOIN '._DB_PREFIX_.'order_detail od ON (od.id_order = o.id_order)
+                INNER JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd ON (spod.`id_htl_booking_detail` = hbd.`id`)
+                WHERE o.valid = 1 AND o.invoice_date BETWEEN '.$date_between.'
+                '.HotelBranchInformation::addHotelRestriction(false, 'hbd').'
+                AND od.`is_booking_product` = 0
+            )
+            AND p.`booking_product` = 0)';
+
+        $this->_totalCount = Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue(
+            'SELECT COUNT(p.`id_product`) FROM '._DB_PREFIX_.'product p WHERE p.`booking_product` = 0 AND p.`active` = 1'
+        );
+
+        $this->option = 'services';
+    }
+
+    public function setQueryForFacilities($date_between)
+    {
+        $this->query = '(SELECT bd.`name` as `display_name`,
+            ROUND(IFNULL(SUM(bd.`total_price_tax_excl` / o.`conversion_rate`), 0), 2) / COUNT(bd.`id_booking_demand`) as avgPriceSold,
+            IFNULL(COUNT(bd.`id_booking_demand`), 0) AS totalQuantitySold,
+            ROUND(IFNULL(SUM(bd.`total_price_tax_excl` / o.`conversion_rate`), 0), 2) AS totalPriceSold
+            FROM '._DB_PREFIX_.'htl_booking_demands bd
+            INNER JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd ON (bd.`id_htl_booking` = hbd.`id`)
+            INNER JOIN '._DB_PREFIX_.'orders o ON (hbd.id_order = o.id_order)
+            WHERE o.valid = 1 AND o.invoice_date BETWEEN '.$date_between.'
+            '.HotelBranchInformation::addHotelRestriction(false, 'hbd').'
+            GROUP BY bd.`name`)
+            UNION
+            (SELECT IFNULL(gdaol.`name`, gdl.`name`) as `display_name`,
+            0 as avgPriceSold,
+            0 AS totalQuantitySold,
+            0 AS totalPriceSold
+            FROM '._DB_PREFIX_.'htl_room_type_global_demand gd
+            LEFT JOIN '._DB_PREFIX_.'htl_room_type_global_demand_lang gdl
+            ON (gd.id_global_demand = gdl.id_global_demand AND gdl.id_lang = '.(int)$this->getLang().')
+            LEFT JOIN `'._DB_PREFIX_.'htl_room_type_global_demand_advance_option` gdao
+            ON (gd.id_global_demand = gdao.id_global_demand)
+            LEFT JOIN `'._DB_PREFIX_.'htl_room_type_global_demand_advance_option_lang` gdaol
+            ON (gdao.id_option = gdaol.id_option AND gdaol.id_lang = '.(int)$this->getLang().')
+            WHERE 1
+            GROUP BY gdaol.`name`, gdl.`name`
+            HAVING `display_name` NOT IN (SELECT bd.`name`  FROM '._DB_PREFIX_.'htl_booking_demands bd
+            INNER JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd ON (bd.`id_htl_booking` = hbd.`id`)
+            INNER JOIN '._DB_PREFIX_.'orders o ON (hbd.id_order = o.id_order)
+            WHERE o.valid = 1 AND o.invoice_date BETWEEN '.$date_between.'
+            '.HotelBranchInformation::addHotelRestriction(false, 'hbd').' ))';
+
+        $this->_totalCount = Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue(
+            'SELECT COUNT(`id_global_demand`) FROM '._DB_PREFIX_.'htl_room_type_global_demand'
+        );
+
+        $this->option = 'facilities';
+    }
+
     public function getData()
     {
         $currency = new Currency(Configuration::get('PS_CURRENCY_DEFAULT'));
-		$date_between = $this->getDate();
-		$array_date_between = explode(' AND ', $date_between);
-
-		$this->query = 'SELECT SQL_CALC_FOUND_ROWS p.`id_product`, pl.`name`, p.`active`, p.`auto_add_to_cart`,
-            IFNULL(odd.`avgPriceSold`, 0) as avgPriceSold,
-            IFNULL(odd.`totalQuantitySold`, 0) as totalQuantitySold,
-            IFNULL(odd.`totalPriceSold`, 0) as totalPriceSold
-            FROM '._DB_PREFIX_.'product p
-            '.Shop::addSqlAssociation('product', 'p').'
-            LEFT JOIN '._DB_PREFIX_.'product_lang pl ON (p.id_product = pl.id_product AND pl.id_lang = '.(int)$this->getLang().' '.Shop::addSqlRestrictionOnLang('pl').')
-            LEFT JOIN (
-                SELECT spod.`id_product` as id_product,
-                ROUND(IFNULL(SUM(spod.`total_price_tax_excl` / o.conversion_rate), 0), 2) / SUM(spod.`quantity`) as avgPriceSold,
-                IFNULL(SUM(spod.`quantity`), 0) AS totalQuantitySold,
-                ROUND(IFNULL(SUM(spod.`total_price_tax_excl` / o.conversion_rate), 0), 2) AS totalPriceSold
-                FROM '._DB_PREFIX_.'htl_room_type_service_product_order_detail spod
-                INNER JOIN '._DB_PREFIX_.'orders o ON (spod.id_order = o.id_order)
-                INNER JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd ON (spod.`id_htl_booking_detail` = hbd.`id`)
-                INNER JOIN `'._DB_PREFIX_.'htl_access` ha ON (hbd.`id_hotel` = ha.`id_hotel`)
-                WHERE o.valid = 1 AND o.invoice_date BETWEEN '.$date_between.'
-                AND ha.`id_profile` = '.(int)$this->context->employee->id_profile.' AND ha.`access` = 1
-                GROUP BY spod.`id_product`
-            ) odd ON (odd.`id_product` = p.`id_product`)
-            WHERE p.`booking_product` = 0 AND p.`active` = 1
-            GROUP BY p.id_product';
-
         if (Validate::IsName($this->_sort))
 		{
 			$this->query .= ' ORDER BY `'.bqSQL($this->_sort).'`';
 			if (isset($this->_direction) && Validate::isSortDirection($this->_direction))
 				$this->query .= ' '.$this->_direction;
 		}
-		$this->_totalCount = Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue(
-            'SELECT COUNT(p.`id_product`) FROM '._DB_PREFIX_.'product p WHERE p.`booking_product` = 0 AND p.`active` = 1'
-        );
 
-		if (($this->_start === 0 || Validate::IsUnsignedInt($this->_start)) && Validate::IsUnsignedInt($this->_limit))
+        if (($this->_start === 0 || Validate::IsUnsignedInt($this->_start)) && Validate::IsUnsignedInt($this->_limit))
 			$this->query .= ' LIMIT '.(int)$this->_start.', '.(int)$this->_limit;
 
 		$values = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($this->query);
-		foreach ($values as &$value)
-		{
+        foreach ($values as &$value)
+        {
             if (!Tools::getValue('export')) {
-                if ($value['active']) {
-                    $value['active'] = '<span class="badge badge-success">'.$this->l('Yes').'</span>';
-                } else {
-                    $value['active'] = '<span class="badge badge-danger">'.$this->l('No').'</span>';
+                if ('services' == $this->option) {
+                    if (is_null($value['active'])) {
+                        $value['active'] = '<span class="badge badge-warning">'.$this->l('Deleted').'</span>';
+                    } else if (!$value['active']) {
+                        $value['active'] = '<span class="badge badge-danger">'.$this->l('No').'</span>';
+                    } else {
+                        $value['active'] = '<span class="badge badge-success">'.$this->l('Yes').'</span>';
+                    }
+                    if (is_null($value['auto_add_to_cart'])) {
+                        $value['auto_add_to_cart'] = '<span class="badge badge-warning">'.$this->l('Deleted').'</span>';
+                    } else if (!$value['auto_add_to_cart']) {
+                        $value['auto_add_to_cart'] = '<span class="badge badge-danger">'.$this->l('No').'</span>';
+                    } else {
+
+                        $value['auto_add_to_cart'] = '<span class="badge badge-success">'.$this->l('Yes').'</span>';
+                    }
                 }
-                if ($value['auto_add_to_cart']) {
-                    $value['auto_add_to_cart'] = '<span class="badge badge-success">'.$this->l('Yes').'</span>';
-                } else {
-                    $value['auto_add_to_cart'] = '<span class="badge badge-danger">'.$this->l('No').'</span>';
-                }
+            	$value['avgPriceSold'] = Tools::displayPrice($value['avgPriceSold'], $currency);
+            	$value['totalPriceSold'] = Tools::displayPrice($value['totalPriceSold'], $currency);
             }
-			$value['avgPriceSold'] = Tools::displayPrice($value['avgPriceSold'], $currency);
-			$value['totalPriceSold'] = Tools::displayPrice($value['totalPriceSold'], $currency);
-		}
-		unset($value);
+            unset($value);
+        }
 
 		$this->_values = $values;
     }

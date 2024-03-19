@@ -58,6 +58,8 @@ class GridHtml extends ModuleGridEngine
 
 	public static function hookGridEngine($params, $grider)
 	{
+        static $divid = 1;
+
 		$objModule = Module::getInstanceByName('gridhtml');
 		self::$_columns = $params['columns'];
 		if (!isset($params['emptyMsg']))
@@ -71,7 +73,7 @@ class GridHtml extends ModuleGridEngine
         }
 
 		$html = '
-		<table class="table" id="grid_1">
+		<table class="table" id="grid_'.$divid.'">
 			<thead>
 				<tr>';
 		foreach ($params['columns'] as $column)
@@ -82,21 +84,21 @@ class GridHtml extends ModuleGridEngine
 			<tfoot><tr><th colspan="'.count($params['columns']).'"></th></tr></tfoot>
 		</table>
 		<script type="text/javascript">
-			function getGridData(url)
+			function getGridData'.$divid.'(url)
 			{
-				$("#grid_1 tbody").html("<tr><td style=\"text-align:center\" colspan=\"" + '.count($params['columns']).' + "\"><img src=\"../img/loadingAnimation.gif\" /></td></tr>");
+				$("#grid_'.$divid.' tbody").html("<tr><td style=\"text-align:center\" colspan=\"" + '.count($params['columns']).' + "\"><img src=\"../img/loadingAnimation.gif\" /></td></tr>");
 				$.get(url, "", function(json) {
-					$("#grid_1 tbody").html("");
+					$("#grid_'.$divid.' tbody").html("");
 					var array = $.parseJSON(json);
-					$("#grid_1 tfoot tr th").html("'.addslashes($params['pagingMessage']).'");
-					$("#grid_1 tfoot tr th").html($("#grid_1 tfoot tr th").html().replace("{0}", array["from"]));
-					$("#grid_1 tfoot tr th").html($("#grid_1 tfoot tr th").html().replace("{1}", array["to"]));
-					$("#grid_1 tfoot tr th").html($("#grid_1 tfoot tr th").html().replace("{2}", array["total"]));
+					$("#grid_'.$divid.' tfoot tr th").html("'.addslashes($params['pagingMessage']).'");
+					$("#grid_'.$divid.' tfoot tr th").html($("#grid_'.$divid.' tfoot tr th").html().replace("{0}", array["from"]));
+					$("#grid_'.$divid.' tfoot tr th").html($("#grid_'.$divid.' tfoot tr th").html().replace("{1}", array["to"]));
+					$("#grid_'.$divid.' tfoot tr th").html($("#grid_'.$divid.' tfoot tr th").html().replace("{2}", array["total"]));
 
 					if (array["from"] > 1)
-						$("#grid_1 tfoot tr th").html($("#grid_1 tfoot tr th").html() + " &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a style=\\"cursor:pointer;text-decoration:none\\" onclick=\\"gridPrevPage(\'"+ url +"\');\\">&lt;&lt;</a>");
+						$("#grid_'.$divid.' tfoot tr th").html($("#grid_'.$divid.' tfoot tr th").html() + " &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a style=\\"cursor:pointer;text-decoration:none\\" onclick=\\"gridPrevPage(\'"+ url +"\');\\">&lt;&lt;</a>");
 					if (array["to"] < array["total"])
-						$("#grid_1 tfoot tr th").html($("#grid_1 tfoot tr th").html() + " | <a style=\\"cursor:pointer;text-decoration:none\\" onclick=\\"gridNextPage(\'"+ url +"\');\\">&gt;&gt;</a>");
+						$("#grid_'.$divid.' tfoot tr th").html($("#grid_'.$divid.' tfoot tr th").html() + " | <a style=\\"cursor:pointer;text-decoration:none\\" onclick=\\"gridNextPage(\'"+ url +"\');\\">&gt;&gt;</a>");
 					var values = array["values"];
 					if (values.length > 0)
 						$.each(values, function(index, row){
@@ -107,10 +109,10 @@ class GridHtml extends ModuleGridEngine
 				$params['defaultSortColumn'] = false;
 			if (!isset($params['defaultSortDirection']))
 				$params['defaultSortDirection'] = false;
-			$html .= '		$("#grid_1 tbody").append(newLine);
+			$html .= '		$("#grid_'.$divid.' tbody").append(newLine);
 						});
 					else
-						$("#grid_1 tbody").append("<tr><td class=\"center\" colspan=\"" + '.count($params['columns']).' + "\">'.$params['emptyMsg'].'</td></tr>");
+						$("#grid_'.$divid.' tbody").append("<tr><td class=\"center\" colspan=\"" + '.count($params['columns']).' + "\">'.$params['emptyMsg'].'</td></tr>");
 				});
 			}
 
@@ -142,8 +144,9 @@ class GridHtml extends ModuleGridEngine
 				getGridData(url);
 			}
 
-			$(document).ready(function(){getGridData("'.$grider.'&sort='.urlencode($params['defaultSortColumn']).'&dir='.urlencode($params['defaultSortDirection']).$customParams.'");});
+			$(document).ready(function(){getGridData'.$divid.'("'.$grider.'&sort='.urlencode($params['defaultSortColumn']).'&dir='.urlencode($params['defaultSortDirection']).$customParams.'");});
 		</script>';
+		$divid++;
 		return $html;
 	}
 
