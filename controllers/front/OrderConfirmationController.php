@@ -154,9 +154,6 @@ class OrderConfirmationControllerCore extends FrontController
 
                     if (!empty($orderProducts)) {
                         foreach ($orderProducts as $type_key => $type_value) {
-                            if (in_array($type_value['product_id'], $processed_product)) {
-                                continue;
-                            }
                             $processed_product[] = $type_value['product_id'];
 
                             $product = new Product($type_value['product_id'], false, $this->context->language->id);
@@ -365,13 +362,6 @@ class OrderConfirmationControllerCore extends FrontController
 
                             }
                         }
-
-                        if (!empty($cart_htl_data)) {
-                            $this->context->smarty->assign('cart_htl_data', $cart_htl_data);
-                        }
-                        if (!empty($cart_service_products)) {
-                            $this->context->smarty->assign('cart_service_products', $cart_service_products);
-                        }
                     }
                     if (!$objCartOrder->hasInvoice()) {
                         $orders_has_invoice = 0;
@@ -393,6 +383,13 @@ class OrderConfirmationControllerCore extends FrontController
                     $orderTotalInfo['total_paid'] += $objCartOrder->total_paid;
                     $orderTotalInfo['total_paid_real'] += $objCartOrder->total_paid_real;
                 }
+            }
+
+            if (!empty($cart_htl_data)) {
+                $this->context->smarty->assign('cart_htl_data', $cart_htl_data);
+            }
+            if (!empty($cart_service_products)) {
+                $this->context->smarty->assign('cart_service_products', $cart_service_products);
             }
 
             $this->context->smarty->assign('orderTotalInfo', $orderTotalInfo);
