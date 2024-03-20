@@ -442,10 +442,8 @@ product_tabs['Informations'] = new function(){
 		$('input[name=available_for_order]').on('change', function(e) {
 			if ($(this).val() == 1) {
 				$('#show_price_container').hide('fast');
-				$('#allow_multiple_quantity_container').show('fast');
 			} else {
 				$('#show_price_container').show('fast');
-				$('#allow_multiple_quantity_container').hide('fast');
 			}
 		});
 
@@ -495,11 +493,30 @@ product_tabs['Informations'] = new function(){
 				if ($('input[name=available_for_order]:checked').val() == 0) {
 					$('#show_price_container').show('fast');
 				}
-				if ($('input[name=available_for_order]:checked').val() == 1) {
-					$("#allow_multiple_quantity_container").show('fast');
+				$("#allow_multiple_quantity_container").show('fast');
+				if ($('input[name=allow_multiple_quantity]:checked').val() == 1) {
+					$('#max_quantity_container').show('fast');
 				}
 			}
+			toggleAutoAddWithRoomNotice();
 		});
+
+		$('#price_addition_type').on('change', function () {
+			toggleAutoAddWithRoomNotice();
+		});
+
+		function toggleAutoAddWithRoomNotice()
+		{
+			if ($('#auto_add_to_cart_on').prop('checked')
+				&& $('#price_addition_type').val() == price_addition_type_with_room
+			) {
+				$('.hide_on_auto_add_Withroom').hide();
+				$('.show_on_auto_add_Withroom').show();
+			} else {
+				$('.hide_on_auto_add_Withroom').show();
+				$('.show_on_auto_add_Withroom').hide();
+			}
+		}
 	}
 
 	this.bindTagImage = function (){

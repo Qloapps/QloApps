@@ -158,7 +158,8 @@ class OrderReturnCore extends ObjectModel
     public function hasBeenCompleted()
     {
         if (Validate::isLoadedObject($objReturnState = new OrderReturnState($this->state))) {
-            if ($objReturnState->denied || $objReturnState->refunded) {
+            // refund process will be considered as completed when the state is "Refunded"
+            if ($objReturnState->refunded) {
                 return true;
             }
         }
@@ -510,29 +511,31 @@ class OrderReturnCore extends ObjectModel
 
                         // send mail to the super admin
                         if ($objOrderReturnState->send_email_to_superadmin) {
-                            // send superadmin information
-                            if (Validate::isLoadedObject($superAdmin = new Employee(_PS_ADMIN_PROFILE_))) {
-                                if (Validate::isEmail($superAdmin->email)) {
-                                    $data['{customer_name}'] = $objCustomer->firstname.' '.$objCustomer->lastname;
-                                    $data['{customer_email}'] = $objCustomer->email;
-                                    $data['{firstname}'] = $superAdmin->firstname;
-                                    $data['{lastname}'] = $superAdmin->lastname;
+                            // Get all the employees with super admin profile
+                            if ($superAdminEmployees = Employee::getEmployeesByProfile(_PS_ADMIN_PROFILE_, true)) {
+                                foreach ($superAdminEmployees as $superAdminEmployee) {
+                                    if (Validate::isEmail($superAdminEmployee['email'])) {
+                                        $data['{customer_name}'] = $objCustomer->firstname.' '.$objCustomer->lastname;
+                                        $data['{customer_email}'] = $objCustomer->email;
+                                        $data['{firstname}'] = $superAdminEmployee['firstname'];
+                                        $data['{lastname}'] = $superAdminEmployee['lastname'];
 
-                                    Mail::Send(
-                                        (int)$idLang,
-                                        $objOrderReturnState->admin_template,
-                                        $objOrderReturnState->name,
-                                        $data,
-                                        $superAdmin->email,
-                                        $superAdmin->firstname.' '.$superAdmin->lastname,
-                                        null,
-                                        null,
-                                        null,
-                                        null,
-                                        _PS_MAIL_DIR_,
-                                        false,
-                                        (int)$objOrder->id_shop
-                                    );
+                                        Mail::Send(
+                                            (int)$idLang,
+                                            $objOrderReturnState->admin_template,
+                                            $objOrderReturnState->name,
+                                            $data,
+                                            $superAdminEmployee['email'],
+                                            $superAdminEmployee['firstname'].' '.$superAdminEmployee['lastname'],
+                                            null,
+                                            null,
+                                            null,
+                                            null,
+                                            _PS_MAIL_DIR_,
+                                            false,
+                                            (int)$objOrder->id_shop
+                                        );
+                                    }
                                 }
                             }
                         }
@@ -570,7 +573,7 @@ class OrderReturnCore extends ObjectModel
                                     $data['{customer_name}'] = $objCustomer->firstname.' '.$objCustomer->lastname;
                                     $data['{customer_email}'] = $objCustomer->email;
                                     foreach ($htlAccesses as $access) {
-                                        if ($access['id_profile'] != _PS_ADMIN_PROFILE_) {
+                                        if ($access['access'] && $access['id_profile'] != _PS_ADMIN_PROFILE_) {
                                             if ($htlEmployees = Employee::getEmployeesByProfile($access['id_profile'])) {
                                                 foreach ($htlEmployees as $empl) {
                                                     if (Validate::isEmail($empl['email'])) {

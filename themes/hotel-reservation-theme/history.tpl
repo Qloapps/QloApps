@@ -27,10 +27,10 @@
 		{l s='My account'}
 	</a>
 	<span class="navigation-pipe">{$navigationPipe}</span>
-	<span class="navigation_page">{l s='Order history'}</span>
+	<span class="navigation_page">{l s='Bookings'}</span>
 {/capture}
 {include file="$tpl_dir./errors.tpl"}
-<h1 class="page-heading bottom-indent">{l s='Order history'}</h1>
+<h1 class="page-heading bottom-indent">{l s='Bookings'}</h1>
 <p class="info-title">{l s='Here are the orders you\'ve placed since your account was created.'}</p>
 {if $slowValidation}
 	<p class="alert alert-warning">{l s='If you have just placed an order, it may take a few minutes for it to be validated. Please refresh this page if your order is missing.'}</p>
@@ -84,7 +84,11 @@
 						<td{if isset($order.order_state)} data-value="{$order.id_order_state}"{/if} class="history_state">
 							{if isset($order.order_state)}
 								<span class="label{if isset($order.order_state_color) && Tools::getBrightness($order.order_state_color) > 128} dark{/if}"{if isset($order.order_state_color) && $order.order_state_color} style="background-color:{$order.order_state_color|escape:'html':'UTF-8'}; border-color:{$order.order_state_color|escape:'html':'UTF-8'};"{/if}>
-									{$order.order_state|escape:'html':'UTF-8'}
+                                    {if $order.current_state|in_array:$overbooking_order_states}
+                                        {l s='Order Not Confirmed'}
+                                    {else}
+                                        {$order.order_state|escape:'html':'UTF-8'}
+                                    {/if}
 								</span>
 							{/if}
 						</td>
@@ -127,7 +131,7 @@
 	<li>
 		<a class="btn btn-default button button-small" href="{$link->getPageLink('my-account', true)|escape:'html':'UTF-8'}">
 			<span>
-				<i class="icon-chevron-left"></i> {l s='Back to Your Account'}
+				<i class="icon-chevron-left"></i> {l s='Back to My account'}
 			</span>
 		</a>
 	</li>
@@ -147,6 +151,7 @@
 	{addJsDefL name=refund_request_sending_error}{l s='Some error occurred while processing request for booking cancelation.' js=1}{/addJsDefL}
 	{addJsDefL name=no_bookings_selected}{l s='No rooms selected. Please select at least one room.' js=1}{/addJsDefL}
 	{addJsDefL name=refund_request_success_txt}{l s='Request for booking cancelation is successffully created.' js=1}{/addJsDefL}
+	{addJsDefL name=cancellation_success_txt}{l s='Your booking is successffully cancelled.' js=1}{/addJsDefL}
 	{addJsDefL name=cancel_req_txt}{l s='Cancel Request' js=1}{/addJsDefL}
 	{addJsDefL name=cancel_booking_txt}{l s='Cancel Bookings' js=1}{/addJsDefL}
 {/strip}

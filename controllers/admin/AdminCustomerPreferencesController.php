@@ -90,11 +90,19 @@ class AdminCustomerPreferencesControllerCore extends AdminController
                         'cast' => 'intval',
                         'size' => 5,
                         'type' => 'text',
-                        'suffix' => $this->l('minutes')
+                        'suffix' => $this->l('minutes'),
+                        'class' => 'fixed-width-xl',
                     ),
                     'PS_B2B_ENABLE' => array(
                         'title' => $this->l('Enable B2B mode'),
                         'hint' => $this->l('Activate or deactivate B2B mode. When this option is enabled, B2B features will be made available.'),
+                        'validation' => 'isBool',
+                        'cast' => 'intval',
+                        'type' => 'bool'
+                    ),
+                    'PS_CUSTOMER_BIRTHDATE' => array(
+                        'title' => $this->l('Enable date of birth'),
+                        'hint' => $this->l('Display or not the date of birth field.'),
                         'validation' => 'isBool',
                         'cast' => 'intval',
                         'type' => 'bool'
@@ -108,7 +116,7 @@ class AdminCustomerPreferencesControllerCore extends AdminController
                     ),
                     'PS_CUSTOMER_OPTIN' => array(
                         'title' => $this->l('Enable opt-in'),
-                        'hint' => $this->l('Display or not the opt-in tick box, to receive offers from the store\'s partners.'),
+                        'hint' => $this->l('Display or not the opt-in tick box, to receive offers from your hotel partners.'),
                         'validation' => 'isBool',
                         'cast' => 'intval',
                         'type' => 'bool'
@@ -119,6 +127,41 @@ class AdminCustomerPreferencesControllerCore extends AdminController
                         'validation' => 'isBool',
                         'cast' => 'intval',
                         'type' => 'bool'
+                    ),
+                    'PS_KPI_FREQUENT_CUSTOMER_NB_ORDERS' => array(
+                        'title' => $this->l('Number of orders to use to calculate frequent customers'),
+                        'hint' => $this->l('Set the number of orders to use to calculate frequent customers.'),
+                        'validation' => 'isUnsignedInt',
+                        'cast' => 'intval',
+                        'type' => 'text',
+                        'class' => 'fixed-width-xxl',
+                    ),
+                    'PS_KPI_REVPAC_NB_DAYS' => array(
+                        'title' => $this->l('Number of days to use to calculate RevPAC'),
+                        'hint' => $this->l('Set the number of days to use to calculate Revenue Per Available Customer.'),
+                        'validation' => 'isUnsignedInt',
+                        'cast' => 'intval',
+                        'type' => 'text',
+                        'suffix' => $this->l('days'),
+                        'class' => 'fixed-width-xl',
+                    ),
+                    'PS_KPI_CONVERSION_RATE_NB_DAYS' => array(
+                        'title' => $this->l('Number of days to use to calculate Conversion Rate'),
+                        'hint' => $this->l('Set the number of days to use to calculate Conversion Rate.'),
+                        'validation' => 'isUnsignedInt',
+                        'cast' => 'intval',
+                        'type' => 'text',
+                        'suffix' => $this->l('days'),
+                        'class' => 'fixed-width-xl',
+                    ),
+                    'PS_KPI_NEW_CUSTOMERS_NB_DAYS' => array(
+                        'title' => $this->l('Number of days for which a customer is considered \'new\''),
+                        'hint' => $this->l('Set the number of days for which a customer is considered \'new\' after creation date.'),
+                        'validation' => 'isUnsignedInt',
+                        'cast' => 'intval',
+                        'type' => 'text',
+                        'suffix' => $this->l('days'),
+                        'class' => 'fixed-width-xl',
                     ),
                 ),
                 'submit' => array('title' => $this->l('Save')),

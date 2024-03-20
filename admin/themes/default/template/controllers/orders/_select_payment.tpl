@@ -22,12 +22,9 @@
 *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 *}
-<select name="payment_module_name" id="payment_module_name">
-  {if !$PS_CATALOG_MODE}
-    {foreach from=$payment_modules item='module'}
-      <option value="{$module->name}" {if isset($smarty.post.payment_module_name) && $module->name == $smarty.post.payment_module_name}selected="selected"{/if}>{$module->displayName}</option>
+
+<datalist id="payment_module_name_list">
+    {foreach from=$payment_modules item=payment_module}
+        <option value="{$payment_module->displayName}" data-name="{$payment_module->name}" data-payment-type="{$payment_module->payment_type}">
     {/foreach}
-  {else}
-      <option value="{l s='Back office order'}">{l s='Back office order'}</option>
-  {/if}
-</select>
+</datalist>

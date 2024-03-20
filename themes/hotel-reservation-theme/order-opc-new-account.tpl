@@ -103,39 +103,40 @@
 					<input type="text" class="text form-control validate" name="phone_mobile" id="phone_mobile" data-validate="isPhoneNumber" value="{if isset($guestInformations) && isset($guestInformations.phone_mobile) && $guestInformations.phone_mobile}{$guestInformations.phone_mobile}{/if}" />
 				</div>
 			</div>
-			{if $PS_CUSTOMER_ADDRESS_CREATION}
-				<div class="row">
-					<div class="select form-group date-select col-sm-12">
-						<label>{l s='Date of Birth'}</label>
-						<div class="row">
-							<div class="col-xs-4">
-								<select id="days" name="days">
-									<option value="">-</option>
-									{foreach from=$days item=day}
-									<option value="{$day|escape:'html':'UTF-8'}" {if isset($guestInformations) && isset($guestInformations.sl_day) && ($guestInformations.sl_day == $day)} selected="selected"{/if}>{$day|escape:'html':'UTF-8'}&nbsp;&nbsp;</option>
-									{/foreach}
-								</select>
-							</div>
-							<div class="col-xs-4">
-								<select id="months" name="months">
-									<option value="">-</option>
-									{foreach from=$months key=k item=month}
-									<option value="{$k|escape:'html':'UTF-8'}" {if isset($guestInformations) && isset($guestInformations.sl_month) && ($guestInformations.sl_month == $k)} selected="selected"{/if}>{l s=$month}&nbsp;</option>
-									{/foreach}
-								</select>
-							</div>
-							<div class="col-xs-4">
-								<select id="years" name="years">
-									<option value="">-</option>
-									{foreach from=$years item=year}
-									<option value="{$year|escape:'html':'UTF-8'}" {if isset($guestInformations) && isset($guestInformations.sl_year) && ($guestInformations.sl_year == $year)} selected="selected"{/if}>{$year|escape:'html':'UTF-8'}&nbsp;&nbsp;</option>
-									{/foreach}
-								</select>
+			{if isset($PS_REGISTRATION_PROCESS_TYPE) && $PS_REGISTRATION_PROCESS_TYPE}
+				{if isset($birthday) && $birthday}
+					<div class="row">
+						<div class="select form-group date-select col-sm-12">
+							<label>{l s='Date of Birth'}</label>
+							<div class="row">
+								<div class="col-xs-4">
+									<select id="days" name="days">
+										<option value="">-</option>
+										{foreach from=$days item=day}
+										<option value="{$day|escape:'html':'UTF-8'}" {if isset($guestInformations) && isset($guestInformations.sl_day) && ($guestInformations.sl_day == $day)} selected="selected"{/if}>{$day|escape:'html':'UTF-8'}&nbsp;&nbsp;</option>
+										{/foreach}
+									</select>
+								</div>
+								<div class="col-xs-4">
+									<select id="months" name="months">
+										<option value="">-</option>
+										{foreach from=$months key=k item=month}
+										<option value="{$k|escape:'html':'UTF-8'}" {if isset($guestInformations) && isset($guestInformations.sl_month) && ($guestInformations.sl_month == $k)} selected="selected"{/if}>{l s=$month}&nbsp;</option>
+										{/foreach}
+									</select>
+								</div>
+								<div class="col-xs-4">
+									<select id="years" name="years">
+										<option value="">-</option>
+										{foreach from=$years item=year}
+										<option value="{$year|escape:'html':'UTF-8'}" {if isset($guestInformations) && isset($guestInformations.sl_year) && ($guestInformations.sl_year == $year)} selected="selected"{/if}>{$year|escape:'html':'UTF-8'}&nbsp;&nbsp;</option>
+										{/foreach}
+									</select>
+								</div>
 							</div>
 						</div>
 					</div>
-				</div>
-
+				{/if}
 				{if isset($newsletter) && $newsletter}
 					<div class="checkbox">
 						<label for="newsletter">

@@ -66,7 +66,8 @@ class AdminPPreferencesControllerCore extends AdminController
                         'hint' => $this->l('The counting of days starts from room type creation date.'),
                         'validation' => 'isUnsignedInt',
                         'cast' => 'intval',
-                        'type' => 'text'
+                        'type' => 'text',
+                        'class' => 'fixed-width-xxl',
                     ),
                     /*'PS_CART_REDIRECT' => array(
                         'title' => $this->l('Redirect after adding product to cart'),
@@ -88,6 +89,7 @@ class AdminPPreferencesControllerCore extends AdminController
                         'cast' => 'intval',
                         'type' => 'text',
                         'suffix' => $this->l('characters'),
+                        'class' => 'fixed-width-xl',
                     ),
                     /*'PS_QTY_DISCOUNT_ON_COMBINATION' => array(
                         'title' => $this->l('Quantity discounts based on'),
@@ -109,7 +111,16 @@ class AdminPPreferencesControllerCore extends AdminController
                         'cast' => 'intval',
                         'required' => false,
                         'type' => 'bool'
-                    )
+                    ),
+                    'PS_KPI_BEST_SELLING_ROOM_TYPE_NB_DAYS' => array(
+                        'title' => $this->l('Number of days to use to calculate best selling room type'),
+                        'hint' => $this->l('Set the number of days to use to calculate best selling room type.'),
+                        'validation' => 'isUnsignedInt',
+                        'cast' => 'intval',
+                        'type' => 'text',
+                        'suffix' => $this->l('days'),
+                        'class' => 'fixed-width-xl',
+                    ),
                 ),
                 'submit' => array('title' => $this->l('Save'))
             ),
@@ -194,10 +205,19 @@ class AdminPPreferencesControllerCore extends AdminController
                         'required' => false,
                         'type' => 'bool'
                     ),
+                    'WK_ROOM_LEFT_WARNING_NUMBER' => array(
+                        'title' => $this->l('Display remaining Number of rooms when the rooms are lower than or equal to'),
+                        'hint' => $this->l('Mention the minimum quantity of rooms after which alert message of remaining rooms will get displayed to users.'),
+                        'validation' => 'isInt',
+                        'cast' => 'intval',
+                        'type' => 'text',
+                        'class' => 'fixed-width-xxl',
+                        'visibility' => Shop::CONTEXT_ALL,
+                    ),
                 ),
                 'submit' => array('title' => $this->l('Save'))
             ),
-            'order_by_pagination' => array(
+            /*'order_by_pagination' => array(
                 'title' =>    $this->l('Pagination'),
                 'fields' =>    array(
                     'PS_PRODUCTS_PER_PAGE' => array(
@@ -205,7 +225,8 @@ class AdminPPreferencesControllerCore extends AdminController
                         'hint' => $this->l('Number of room types displayed per page. Default is 10.'),
                         'validation' => 'isUnsignedInt',
                         'cast' => 'intval',
-                        'type' => 'text'
+                        'type' => 'text',
+                        'class' => 'fixed-width-xxl',
                     ),
                     'PS_PRODUCTS_ORDER_BY' => array(
                         'title' => $this->l('Default order by'),
@@ -241,7 +262,7 @@ class AdminPPreferencesControllerCore extends AdminController
                     )
                 ),
                 'submit' => array('title' => $this->l('Save'))
-            ),
+            ),*/
             'fo_product_page' => array(
                 'title' =>    $this->l('Room type page'),
                 'fields' =>    array(
@@ -300,7 +321,8 @@ class AdminPPreferencesControllerCore extends AdminController
                     ),
 
                     'PS_SERVICE_PRODUCT_CATEGORY_FILTER' => array(
-                        'title' => $this->l('Show category filter for service products'),
+                        'title' => $this->l('Display services by category'),
+                        'hint' => $this->l('If enabled, services will be grouped and displayed as per their default category. Else all services will be displayed together.'),
                         'validation' => 'isBool',
                         'cast' => 'intval',
                         'required' => false,
@@ -312,7 +334,8 @@ class AdminPPreferencesControllerCore extends AdminController
                         'hint' => $this->l('Number of hotel images displayed per page. Default is 9.'),
                         'validation' => 'isUnsignedInt',
                         'cast' => 'intval',
-                        'type' => 'text'
+                        'type' => 'text',
+                        'class' => 'fixed-width-xxl',
                     ),
                 ),
                 'submit' => array('title' => $this->l('Save'))
@@ -391,29 +414,6 @@ class AdminPPreferencesControllerCore extends AdminController
             //     'bottom' => '<script type="text/javascript">stockManagementActivationAuthorization();advancedStockManagementActivationAuthorization();</script>',
             //     'submit' => array('title' => $this->l('Save'))
             // ),
-            'fo_search_filters' => array(
-                'title' => $this->l('Search Results Page Filters'),
-                'icon' => 'icon-search',
-                'fields' => array(
-                    'SHOW_AMENITIES_FILTER' => array(
-                        'title' => $this->l('Show Amenities filter'),
-                        'hint' => $this->l('Enable to display Amenities filter.'),
-                        'validation' => 'isBool',
-                        'cast' => 'intval',
-                        'required' => false,
-                        'type' => 'bool',
-                    ),
-                    'SHOW_PRICE_FILTER' => array(
-                        'title' => $this->l('Show Price filter'),
-                        'hint' => $this->l('Enable to display Price filter.'),
-                        'validation' => 'isBool',
-                        'cast' => 'intval',
-                        'required' => false,
-                        'type' => 'bool',
-                    ),
-                ),
-                'submit' => array('title' => $this->l('Save'))
-            ),
         );
     }
 

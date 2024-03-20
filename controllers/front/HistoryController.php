@@ -53,6 +53,8 @@ class HistoryControllerCore extends FrontController
      */
     public function initContent()
     {
+        $this->show_breadcrump = true;
+
         parent::initContent();
         if ($orders = Order::getCustomerOrders($this->context->customer->id)) {
             foreach ($orders as &$order) {
@@ -64,6 +66,7 @@ class HistoryControllerCore extends FrontController
         }
         $this->context->smarty->assign(array(
             'orders' => $orders,
+            'overbooking_order_states' => OrderState::getOverBookingStates(),
             'invoiceAllowed' => (int)Configuration::get('PS_INVOICE'),
             'reorderingAllowed' => !(bool)Configuration::get('PS_DISALLOW_HISTORY_REORDERING'),
             'slowValidation' => Tools::isSubmit('slowvalidation')

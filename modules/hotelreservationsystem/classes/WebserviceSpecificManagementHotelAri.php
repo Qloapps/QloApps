@@ -500,20 +500,45 @@ class WebserviceSpecificManagementHotelAri extends ObjectModel implements Webser
                         } elseif ($key == 'partially_available') {
                             $nodeRoomAvailability = 'partial_available';
                         }
+
                         $this->output .= $this->objOutput->getObjectRender()->renderNodeHeader($nodeRoomAvailability, array());
-                        if ($roomsInfo) {
-                            foreach ($roomsInfo as $roomInfo) {
-                                $this->output .= $this->objOutput->getObjectRender()->renderNodeHeader('room', array(), array('id' => $roomInfo['id_room']));
+                        if ($key == 'partially_available') {
+                            foreach ($roomsInfo as $dateIndex => $partialRoomsInfo) {
+                                if (isset($partialRoomsInfo['rooms']) && $partialRoomsInfo['rooms']) {
+                                    $this->output .= $this->objOutput->getObjectRender()->renderNodeHeader('rooms', array(), array('date_from' => $partialRoomsInfo['date_from'], 'date_to' => $partialRoomsInfo['date_to']));
 
-                                $field = array('sqlId' => 'id_room', 'value' => $roomInfo['id_room']);
-                                $this->output .= $this->objOutput->getObjectRender()->renderField($field);
+                                    foreach ($partialRoomsInfo['rooms'] as $roomInfo) {
+                                        $roomDetail = array();
+                                        $this->output .= $this->objOutput->getObjectRender()->renderNodeHeader('room', array(), array('id' => $roomInfo['id_room']));
 
-                                $field = array('sqlId' => 'room_number', 'value' => $roomInfo['room_num']);
-                                $this->output .= $this->objOutput->getObjectRender()->renderField($field);
+                                        $field = array('sqlId' => 'id_room', 'value' => $roomInfo['id_room']);
+                                        $this->output .= $this->objOutput->getObjectRender()->renderField($field);
 
-                                $this->output .= $this->objOutput->getObjectRender()->renderNodeFooter('room', array());
+                                        $field = array('sqlId' => 'room_number', 'value' => $roomInfo['room_num']);
+                                        $this->output .= $this->objOutput->getObjectRender()->renderField($field);
+
+                                        $this->output .= $this->objOutput->getObjectRender()->renderNodeFooter('room', array());
+                                    }
+
+                                    $this->output .= $this->objOutput->getObjectRender()->renderNodeFooter('rooms', array());
+                                }
+                            }
+                        } else {
+                            if ($roomsInfo) {
+                                foreach ($roomsInfo as $roomInfo) {
+                                    $this->output .= $this->objOutput->getObjectRender()->renderNodeHeader('room', array(), array('id' => $roomInfo['id_room']));
+
+                                    $field = array('sqlId' => 'id_room', 'value' => $roomInfo['id_room']);
+                                    $this->output .= $this->objOutput->getObjectRender()->renderField($field);
+
+                                    $field = array('sqlId' => 'room_number', 'value' => $roomInfo['room_num']);
+                                    $this->output .= $this->objOutput->getObjectRender()->renderField($field);
+
+                                    $this->output .= $this->objOutput->getObjectRender()->renderNodeFooter('room', array());
+                                }
                             }
                         }
+
                         $this->output .= $this->objOutput->getObjectRender()->renderNodeFooter($nodeRoomAvailability, array());
                     }
 
@@ -604,6 +629,10 @@ class WebserviceSpecificManagementHotelAri extends ObjectModel implements Webser
                         'value' => $objRoomType->name[$idLang]
                     );
                 }
+                // if only one lang than do not set name as array and set only value of the room
+                if (count($ariFormatted['hotel_ari']['room_types'][$roomTypeIndex]['name']) == 1) {
+                    $ariFormatted['hotel_ari']['room_types'][$roomTypeIndex]['name'] = $ariFormatted['hotel_ari']['room_types'][$roomTypeIndex]['name'][0]['value'];
+                }
 
                 // rooms info of the room type
                 if (isset($roomTypeInfo['data']) && $roomTypeInfo['data']) {
@@ -620,12 +649,32 @@ class WebserviceSpecificManagementHotelAri extends ObjectModel implements Webser
                         } elseif ($key == 'partially_available') {
                             $keyRoomAvailability = 'partially_available';
                         }
+
                         if ($roomsInfo) {
-                            foreach ($roomsInfo as $roomIndex => $roomInfo) {
-                                $roomsAriInfo[$roomIndex]['id_room'] = $roomInfo['id_room'];
-                                $roomsAriInfo[$roomIndex]['room_number'] = $roomInfo['room_num'];
+                            if ($key == 'partially_available') {
+                                foreach ($roomsInfo as $dateIndex => $partialRoomsInfo) {
+                                    if (isset($partialRoomsInfo['rooms']) && $partialRoomsInfo['rooms']) {
+                                        $roomsAriInfo[$dateIndex]['date_from'] = $partialRoomsInfo['date_from'];
+                                        $roomsAriInfo[$dateIndex]['date_to'] = $partialRoomsInfo['date_to'];
+
+                                        $roomsAriInfo[$dateIndex]['rooms'] = array();
+                                        foreach ($partialRoomsInfo['rooms'] as $roomInfo) {
+                                            $roomDetail = array();
+                                            $roomDetail['id_room'] = $roomInfo['id_room'];
+                                            $roomDetail['room_number'] = $roomInfo['room_num'];
+
+                                            $roomsAriInfo[$dateIndex]['rooms'][] = $roomDetail;
+                                        }
+                                    }
+                                }
+                            } else {
+                                foreach ($roomsInfo as $roomIndex => $roomInfo) {
+                                    $roomsAriInfo[$roomIndex]['id_room'] = $roomInfo['id_room'];
+                                    $roomsAriInfo[$roomIndex]['room_number'] = $roomInfo['room_num'];
+                                }
                             }
                         }
+
                         $ariFormatted['hotel_ari']['room_types'][$roomTypeIndex]['rooms'][$keyRoomAvailability] = array_values($roomsAriInfo);
                     }
                 }

@@ -181,7 +181,21 @@ class CategoryControllerCore extends FrontController
 
             $booking_data = $objBookingDetail->dataForFrontSearch($bookingParams);
 
+            // set default occupancies in required format
+            if (isset($booking_data['rm_data']) && $booking_data['rm_data']) {
+                foreach ($booking_data['rm_data'] as &$roomTypeData) {
+                    $occupancy = array(
+                        array(
+                            'adults' => $roomTypeData['adults'],
+                            'children' => 0,
+                            'child_ages' => array(),
+                        ),
+                    );
 
+                    $roomTypeData['occupancies'] = $occupancy;
+                    $roomTypeData['occupancy_adults'] = $roomTypeData['adults']; // only one room by default
+                }
+            }
 
             $obj_booking_detail = new HotelBookingDetail();
             $num_days = $obj_booking_detail->getNumberOfDays($date_from, $date_to);
@@ -211,7 +225,7 @@ class CategoryControllerCore extends FrontController
                 'order_date_restrict' => $order_date_restrict
             ));
         } else {
-            Tools::redirect($this->context->link->getPageLink('index'));
+            Tools::redirect($this->context->link->getPageLink('pagenotfound'));
         }
 
         $feat_img_dir = _PS_IMG_.'rf/';

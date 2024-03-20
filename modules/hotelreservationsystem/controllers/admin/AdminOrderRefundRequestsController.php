@@ -80,7 +80,7 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
         $this->identifier = 'id_order_return';
 
         // START send access query information to the admin controller
-        $this->access_select = ' SELECT a.`id` FROM '._DB_PREFIX_.'order_return a';
+        $this->access_select = ' SELECT a.`id_order_return` FROM '._DB_PREFIX_.'order_return a';
         $this->access_join = ' INNER JOIN '._DB_PREFIX_.'htl_booking_detail hbd ON (hbd.id_order = a.id_order)';
         if ($acsHtls = HotelBranchInformation::getProfileAccessedHotels($this->context->employee->id_profile, 1, 1)) {
             $this->access_where = ' WHERE hbd.id_hotel IN ('.implode(',', $acsHtls).')';
@@ -271,7 +271,7 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
         }
 
         /*If Admin update the status of the order cancellation request*/
-        if (Tools::isSubmit('submitRefundReqBookings')) {
+        if (Tools::isSubmit('submitRefundReqBookings') || Tools::isSubmit('submitRefundReqBookingsAndStay')) {
             $idOrderReturn = Tools::getValue('id_order_return');
             $idsReturnDetail = Tools::getValue('id_order_return_detail');
             if (Validate::isLoadedObject($objOrderReturn = new OrderReturn($idOrderReturn))) {
@@ -292,27 +292,46 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
                                 } else {
                                     $this->errors[] = $this->l('Invalid refund amount(s) entered.');
                                 }
-                            } else {
-                                $this->errors[] = $this->l('Select at least one booking for refund.');
-                            }
 
-                            if (Tools::isSubmit('refundTransactionAmount')) {
-                                $paymentMode = Tools::getValue('payment_method');
-                                if (!$paymentMode) {
-                                    $paymentMode = Tools::getValue('other_payment_mode');
-                                    if (!$paymentMode) {
-                                        $this->errors[] = $this->l('Please enter the payment mode of the refund transaction.');
-                                    } elseif (!Validate::isGenericName($paymentMode)) {
-                                        $this->errors[] = $this->l('Invalid payment mode entered.');
+                                // If there are no errors in the refund amounts the check validations depends on refund amount
+                                if (!count($this->errors)) {
+                                    $totalRefundAmount = array_sum($refundedAmounts);
+                                    if (Tools::isSubmit('generateCreditSlip')) {
+                                        if ($totalRefundAmount <= 0) {
+                                            $this->errors[] = $this->l('Invalid refund amount(s) for generating credit slip.');
+                                        }
+                                    }
+                                    if (Tools::isSubmit('generateDiscount')) {
+                                        if ($totalRefundAmount <= 0) {
+                                            $this->errors[] = $this->l('Invalid refund amount(s) for generating voucher.');
+                                        }
+                                    }
+
+                                    if (Tools::isSubmit('refundTransactionAmount')) {
+                                        if ($totalRefundAmount <= 0) {
+                                            $this->errors[] = $this->l('Invalid refund amount(s) for entering refund transaction details.');
+                                        } else {
+                                            $paymentMode = Tools::getValue('payment_method');
+                                            if (!$paymentMode) {
+                                                $paymentMode = Tools::getValue('other_payment_mode');
+                                                if (!$paymentMode) {
+                                                    $this->errors[] = $this->l('Please enter the payment mode of the refund transaction.');
+                                                } elseif (!Validate::isGenericName($paymentMode)) {
+                                                    $this->errors[] = $this->l('Invalid payment mode entered.');
+                                                }
+                                            }
+
+                                            $idTransaction = Tools::getValue('id_transaction');
+                                            if (!$idTransaction) {
+                                                $this->errors[] = $this->l('Please enter the transaction id of the refund transaction.');
+                                            } elseif (!Validate::isGenericName($idTransaction)) {
+                                                $this->errors[] = $this->l('Invalid transaction id entered.');
+                                            }
+                                        }
                                     }
                                 }
-
-                                $idTransaction = Tools::getValue('id_transaction');
-                                if (!$idTransaction) {
-                                    $this->errors[] = $this->l('Please enter the transaction id of the refund transaction.');
-                                } elseif (!Validate::isGenericName($idTransaction)) {
-                                    $this->errors[] = $this->l('Invalid transaction id entered.');
-                                }
+                            } else {
+                                $this->errors[] = $this->l('Select at least one booking for refund.');
                             }
                         }
                     }
@@ -320,149 +339,60 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
                     $this->errors[] = $this->l('Invalid refund state.');
                 }
             } else {
-                $this->errors[] = $this->l('Invalid refund info.');
+                $this->errors[] = $this->l('Invalid refund information found.');
             }
 
             if (!count($this->errors)) {
                 $bookingList = array();
                 $totalRefundedAmount = 0;
 
-                if ($objRefundState->refunded || $objRefundState->denied) {
-                    $objHotelBookingDemands = new HotelBookingDemands();
-                    $objRoomTypeServiceProductOrderDetail = new RoomTypeServiceProductOrderDetail();
+                // If refund is completed then work on the booking list
+                if ($objRefundState->refunded) {
                     foreach ($idsReturnDetail as $idRetDetail) {
                         $objOrderReturnDetail = new OrderReturnDetail($idRetDetail);
-
                         // set booking as refunded if return state is refunded/denied
                         $idHtlBooking = $objOrderReturnDetail->id_htl_booking;
-                        $numDays = 1;
-                        $idOrderDetail = 0;
                         $reduction_amount = array(
                             'total_price_tax_excl' => 0,
                             'total_price_tax_incl' => 0,
                             'total_products_tax_excl' => 0,
                             'total_products_tax_incl' => 0,
                         );
-                        if (Validate::isLoadedObject($objHtlBooking = new HotelBookingDetail($idHtlBooking))) {
-                            $objHtlBooking->is_refunded = 1;
+
+                        $objHtlBooking = new HotelBookingDetail($idHtlBooking);
+                        // perform booking refund processes in the booking tables
+                        $objHtlBooking->processRefundInBookingTables();
+
+                        // save individual booking amount for every booking refund
+                        $refundedAmount = $refundedAmounts[$idRetDetail];
+                        $objOrderReturnDetail->refunded_amount = $refundedAmount;
+                        $objOrderReturnDetail->save();
+
+                        // sum the refund amount for total order refund amount
+                        $totalRefundedAmount += $refundedAmount;
+
+                        if (Tools::isSubmit('generateCreditSlip')) {
                             $numDays = $objHtlBooking->getNumberOfDays(
                                 $objHtlBooking->date_from,
                                 $objHtlBooking->date_to
                             );
 
-                            if ((float) $orderTotalPaid <= 0) {
-                                $reduction_amount['total_price_tax_excl'] = $objHtlBooking->total_price_tax_excl;
-                                $reduction_amount['total_products_tax_excl'] = $objHtlBooking->total_price_tax_excl;
-                                $reduction_amount['total_price_tax_incl'] = $objHtlBooking->total_price_tax_incl;
-                                $reduction_amount['total_products_tax_incl'] = $objHtlBooking->total_price_tax_incl;
-                                // reduce facilities amount from order and services_detail
-                                if ($roomDemands = $objHotelBookingDemands->getRoomTypeBookingExtraDemands(
-                                    $objHtlBooking->id_order,
-                                    $objHtlBooking->id_product,
-                                    $objHtlBooking->id_room,
-                                    $objHtlBooking->date_from,
-                                    $objHtlBooking->date_to,
-                                    0
-                                )) {
-                                    foreach ($roomDemands as $roomDemand) {
-                                        $objHotelBookingDemands = new HotelBookingDemands($roomDemand['id_booking_demand']);
-                                        $reduction_amount['total_price_tax_excl'] += $objHotelBookingDemands->total_price_tax_excl;
-                                        $reduction_amount['total_price_tax_incl'] += $objHotelBookingDemands->total_price_tax_incl;
-                                        $objHotelBookingDemands->total_price_tax_excl = 0;
-                                        $objHotelBookingDemands->total_price_tax_incl = 0;
-                                        $objHotelBookingDemands->save();
-                                    }
-                                }
-
-                                // reduce services amount from order and services_detail
-                                if ($roomServices = $objRoomTypeServiceProductOrderDetail->getSelectedServicesForRoom(
-                                    $objHtlBooking->id
-                                )) {
-                                    foreach ($roomServices['additional_services'] as $roomService) {
-                                        $objRoomTypeServiceProductOrderDetail = new RoomTypeServiceProductOrderDetail(
-                                            $roomService['id_room_type_service_product_order_detail']
-                                        );
-                                        $reduction_amount['total_price_tax_excl'] += $objRoomTypeServiceProductOrderDetail->total_price_tax_excl;
-                                        $reduction_amount['total_products_tax_excl'] += $objRoomTypeServiceProductOrderDetail->total_price_tax_excl;
-                                        $reduction_amount['total_price_tax_incl'] += $objRoomTypeServiceProductOrderDetail->total_price_tax_incl;
-                                        $reduction_amount['total_products_tax_incl'] += $objRoomTypeServiceProductOrderDetail->total_price_tax_incl;
-
-                                        if (Validate::isLoadedObject($objOrderDetail = new OrderDetail($objRoomTypeServiceProductOrderDetail->id_order_detail))) {
-                                            $objOrderDetail->product_quantity_refunded += $objRoomTypeServiceProductOrderDetail->quantity;
-                                            if ($objOrderDetail->product_quantity_refunded > $objOrderDetail->product_quantity) {
-                                                $objOrderDetail->product_quantity_refunded = $objOrderDetail->product_quantity;
-                                            }
-
-                                            $objOrderDetail->total_price_tax_excl -= $objRoomTypeServiceProductOrderDetail->total_price_tax_excl;
-                                            $objOrderDetail->total_price_tax_incl -= $objRoomTypeServiceProductOrderDetail->total_price_tax_incl;
-                                            $objOrderDetail->save();
-                                        }
-
-                                        $objRoomTypeServiceProductOrderDetail->total_price_tax_excl = 0;
-                                        $objRoomTypeServiceProductOrderDetail->total_price_tax_incl = 0;
-                                        $objRoomTypeServiceProductOrderDetail->save();
-                                    }
-                                }
-
-                            }
-
-                            // enter refunded quantity in the order detail table
+                            $objHtlBooking = new HotelBookingDetail($idHtlBooking);
                             $idOrderDetail = $objHtlBooking->id_order_detail;
-                            if (Validate::isLoadedObject($objOrderDetail = new OrderDetail($idOrderDetail))) {
-                                $objOrderDetail->product_quantity_refunded += $numDays;
-                                if ($objOrderDetail->product_quantity_refunded > $objOrderDetail->product_quantity) {
-                                    $objOrderDetail->product_quantity_refunded = $objOrderDetail->product_quantity;
-                                }
 
-                                if ((float) $orderTotalPaid <= 0) {
-                                    // reduce room amount from order and order detail
-                                    $objOrderDetail->total_price_tax_incl -= $objHtlBooking->total_price_tax_incl;
-                                    $objOrderDetail->total_price_tax_excl -= $objHtlBooking->total_price_tax_excl;
-                                    if (Validate::isLoadedObject($objOrder = new Order($objHtlBooking->id_order))) {
-                                        $objOrder->total_paid -= $reduction_amount['total_price_tax_incl'];
-                                        $objOrder->total_paid_tax_excl -= $reduction_amount['total_price_tax_excl'];
-                                        $objOrder->total_paid_tax_incl -= $reduction_amount['total_price_tax_incl'];
-                                        $objOrder->total_products -= $reduction_amount['total_products_tax_excl'];
-                                        $objOrder->total_products_wt -= $reduction_amount['total_products_tax_incl'];
-                                        $objOrder->save();
-                                    }
-                                }
-                                $objOrderDetail->save();
-                            }
-                            if ((float) $orderTotalPaid <= 0) {
-                                // reduce room amount from htl_booking_detail
-                                $objHtlBooking->is_cancelled = 1;
-                                $objHtlBooking->total_price_tax_excl = 0;
-                                $objHtlBooking->total_price_tax_incl = 0;
-                            }
-                            $objHtlBooking->save();
+                            $bookingList[$idHtlBooking] = array(
+                                'id_htl_booking' => $idHtlBooking,
+                                'id_order_detail' => $idOrderDetail,
+                                'quantity' => $numDays,
+                                'num_days' => $numDays,
+                                'unit_price' => $refundedAmount / $numDays,
+                                'amount' => $refundedAmount,
+                            );
                         }
-
-                        // save individual booking amount for every booking refund
-                        if ($objRefundState->refunded) {
-                            $refundedAmount = $refundedAmounts[$idRetDetail];
-                            $objOrderReturnDetail->refunded_amount = $refundedAmount;
-                            $objOrderReturnDetail->save();
-
-                            // sum the refund amount for total order refund amount
-                            $totalRefundedAmount += $refundedAmount;
-
-                            if (Tools::isSubmit('generateCreditSlip')) {
-                                $bookingList[$idHtlBooking] = array(
-                                    'id_htl_booking' => $idHtlBooking,
-                                    'id_order_detail' => $idOrderDetail,
-                                    'quantity' => $numDays,
-                                    'num_days' => $numDays,
-                                    'unit_price' => $refundedAmount / $numDays,
-                                    'amount' => $refundedAmount,
-                                );
-                            }
-                        }
-
                     }
 
                     // if bookings are refunded then set the payment information
-                    if ($objRefundState->refunded && (float) $orderTotalPaid > 0) {
+                    if ((float) $orderTotalPaid > 0) {
                         if (Tools::isSubmit('refundTransactionAmount')) {
                             $objOrderReturn->payment_mode = $paymentMode;
                             $objOrderReturn->id_transaction = $idTransaction;
@@ -480,18 +410,20 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
                     // change state of the order refund
                     $objOrderReturn->changeIdOrderReturnState($idRefundState);
 
+                    // change state of the order to refunded if all the room bookings in the order are completely refunded
                     if ($objRefundState->refunded) {
-                        // check if order is paid the set status of the order to refunded
-                        $objOrderHistory = new OrderHistory();
-                        $objOrderHistory->id_order = (int)$objOrder->id;
+                        $idOrderState = 0;
+                        if ($objOrder->hasCompletelyRefunded(Order::ORDER_COMPLETE_REFUND_FLAG)) {
+                            $idOrderState = Configuration::get('PS_OS_REFUND');
+                        } elseif ($objOrder->hasCompletelyRefunded(Order::ORDER_COMPLETE_REFUND_FLAG)) {
+                            $idOrderState = Configuration::get('PS_OS_CANCELED');
+                        }
 
-                        if ($objOrder->hasCompletelyRefunded(OrderReturnState::ORDER_RETURN_STATE_FLAG_REFUNDED)) {
-                            $idOrderState = null;
-                            if ((float) $orderTotalPaid) {
-                                $idOrderState = Configuration::get('PS_OS_REFUND');
-                            } else {
-                                $idOrderState = Configuration::get('PS_OS_CANCELED');
-                            }
+                        // If order is completely refunded or cancelled then change the order state
+                        if ($idOrderState) {
+                            // check if order is paid the set status of the order to refunded
+                            $objOrderHistory = new OrderHistory();
+                            $objOrderHistory->id_order = (int)$objOrder->id;
 
                             $useExistingPayment = false;
                             if (!$objOrder->hasInvoice()) {
@@ -611,10 +543,18 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
                     } elseif ($objRefundState->refunded) {
                         $confirmation = 102;
                     }
-                    Tools::redirectAdmin(
-                        self::$currentIndex.'&conf='.$confirmation.'&id_order_return='.$idOrderReturn.
-                        '&vieworder_return&token='.$this->token
-                    );
+
+                    if (Tools::isSubmit('submitRefundReqBookingsAndStay')) {
+                        Tools::redirectAdmin(
+                            self::$currentIndex.'&conf='.$confirmation.'&id_order_return='.$idOrderReturn.
+                            '&vieworder_return&token='.$this->token
+                        );
+                    } else {
+                        Tools::redirectAdmin(
+                            self::$currentIndex.'&conf='.$confirmation.'&id_order='.$objOrder->id.
+                            '&id_order_return='.$idOrderReturn.'&vieworder_return&token='.$this->token
+                        );
+                    }
                 }
 
             }
