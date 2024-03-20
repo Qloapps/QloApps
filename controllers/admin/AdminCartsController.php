@@ -161,13 +161,15 @@ class AdminCartsControllerCore extends AdminController
         $time = time();
         $kpis = array();
 
+        $daysForConversionRate = Configuration::get('PS_KPI_CONVERSION_RATE_NB_DAYS');
+
         $helper = new HelperKpi();
         $helper->id = 'box-conversion-rate';
         $helper->icon = 'icon-sort-by-attributes-alt';
         //$helper->chart = true;
         $helper->color = 'color1';
         $helper->title = $this->l('Conversion Rate', null, null, false);
-        $helper->subtitle = $this->l('30 days', null, null, false);
+        $helper->subtitle = $daysForConversionRate.' '.$this->l('days', null, null, false);
         if (ConfigurationKPI::get('CONVERSION_RATE_CHART') !== false) {
             $helper->data = ConfigurationKPI::get('CONVERSION_RATE_CHART');
         }
@@ -186,21 +188,23 @@ class AdminCartsControllerCore extends AdminController
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=abandoned_cart';
         $kpis[] = $helper;
 
+        $daysForAvgOrderVal = Configuration::get('PS_ORDER_KPI_AVG_ORDER_VALUE_NB_DAYS');
         $helper = new HelperKpi();
         $helper->id = 'box-average-order';
         $helper->icon = 'icon-money';
         $helper->color = 'color3';
         $helper->title = $this->l('Average Order Value', null, null, false);
-        $helper->subtitle = $this->l('30 days', null, null, false);
+        $helper->subtitle = $daysForAvgOrderVal.' '.$this->l('days', null, null, false);
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=average_order_value';
         $kpis[] = $helper;
 
+        $daysForProfitPerVisitor = Configuration::get('PS_ORDER_KPI_PER_VISITOR_PROFIT_NB_DAYS');
         $helper = new HelperKpi();
         $helper->id = 'box-net-profit-visitor';
         $helper->icon = 'icon-user';
         $helper->color = 'color4';
         $helper->title = $this->l('Net Profit per Visitor', null, null, false);
-        $helper->subtitle = $this->l('30 days', null, null, false);
+        $helper->subtitle = $daysForProfitPerVisitor.' '.$this->l('days', null, null, false);
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=netprofit_visit';
         $kpis[] = $helper;
 

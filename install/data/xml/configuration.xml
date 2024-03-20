@@ -905,6 +905,12 @@
 	<configuration id="PS_KPI_CONVERSION_RATE_NB_DAYS" name="PS_KPI_CONVERSION_RATE_NB_DAYS">
 		<value>30</value>
 	</configuration>
+    <configuration id="PS_ORDER_KPI_AVG_ORDER_VALUE_NB_DAYS" name="PS_ORDER_KPI_AVG_ORDER_VALUE_NB_DAYS">
+		<value>30</value>
+	</configuration>
+    <configuration id="PS_ORDER_KPI_PER_VISITOR_PROFIT_NB_DAYS" name="PS_ORDER_KPI_PER_VISITOR_PROFIT_NB_DAYS">
+		<value>30</value>
+	</configuration>
 	<configuration id="PS_KPI_NEW_CUSTOMERS_NB_DAYS" name="PS_KPI_NEW_CUSTOMERS_NB_DAYS">
 		<value>30</value>
 	</configuration>
