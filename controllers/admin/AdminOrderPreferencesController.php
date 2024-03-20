@@ -203,6 +203,22 @@ class AdminOrderPreferencesControllerCore extends AdminController
                         'list' => $displayCurrencyOptions,
                         'identifier' => 'value',
                     ),
+                    'PS_ORDER_KPI_AVG_ORDER_VALUE_NB_DAYS' => array(
+                        'title' => $this->l('Days for Average Order Value KPI'),
+                        'hint' => $this->l('Set for last how many days, the \'Average order value\' in the KPI to be calculated.'),
+                        'type' => 'text',
+                        'validation' => 'isUnsignedInt',
+                        'class' => 'fixed-width-xl',
+                        'suffix' => $this->l('day(s)'),
+                    ),
+                    'PS_ORDER_KPI_PER_VISITOR_PROFIT_NB_DAYS' => array(
+                        'title' => $this->l('Days for Net Profit Per Visitor KPI'),
+                        'hint' => $this->l('Set for last how many days, the \'Net Profit per Visitor\' in the KPI to be calculated.'),
+                        'type' => 'text',
+                        'validation' => 'isUnsignedInt',
+                        'class' => 'fixed-width-xl',
+                        'suffix' => $this->l('day(s)'),
+                    ),
                 ),
                 'submit' => array('title' => $this->l('Save'))
             ),

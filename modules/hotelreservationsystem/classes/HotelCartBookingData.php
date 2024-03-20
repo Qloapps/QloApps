@@ -1298,9 +1298,15 @@ class HotelCartBookingData extends ObjectModel
      *
      * @return [array/false] [returns all entries if data found else return false]
      */
-    public function getCartInfoIdCartIdProduct($id_cart, $id_product)
+    public function getCartInfoIdCartIdProduct($id_cart, $id_product, $date_from = false, $date_to = false)
     {
-        return Db::getInstance()->executeS('SELECT * FROM `'._DB_PREFIX_.'htl_cart_booking_data` WHERE `id_cart`='.(int) $id_cart.' AND `id_product`='.(int) $id_product);
+        $sql = 'SELECT *
+            FROM `'._DB_PREFIX_.'htl_cart_booking_data`
+            WHERE `id_cart`='.(int) $id_cart.' AND `id_product`='.(int) $id_product;
+        if ($date_from && $date_to) {
+            $sql .= ' AND `date_from` = \''.pSQL($date_from).'\' AND `date_to` = \''.pSQL($date_to).'\'';
+        }
+        return Db::getInstance()->executeS($sql);
     }
 
     /**
