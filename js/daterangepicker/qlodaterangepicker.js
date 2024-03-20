@@ -31,7 +31,8 @@
                 minDays: 2,
                 startOfWeek: 'monday',
                 hoveringTooltip: false,
-                container: '#page',
+                container: page_name == 'index' ? '#date-range-picker-container' : '#page',
+                inline: page_name == 'index',
                 customArrowPrevSymbol: '<i class="icon icon-angle-left"></i>',
                 customArrowNextSymbol: '<i class="icon icon-angle-right"></i>',
                 getValue: function()

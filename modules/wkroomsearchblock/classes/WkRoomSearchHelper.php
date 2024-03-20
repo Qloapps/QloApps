@@ -226,6 +226,7 @@ class WkRoomSearchHelper
         $smartyVars['hotels_info'] = $hotelsInfo;
         $smartyVars['show_hotel_name'] = Configuration::get('WK_HOTEL_NAME_ENABLE');
         $smartyVars['max_child_age'] = Configuration::get('WK_GLOBAL_CHILD_MAX_AGE');
+        $smartyVars['hotel_name_search_threshold'] = (int) Configuration::get('WK_HOTEL_NAME_SEARCH_THRESHOLD');
 
         $maxOrderDate = HotelOrderRestrictDate::getMaxOrderDate($idHotel);
         $smartyVars['max_order_date'] = date('Y-m-d', strtotime($maxOrderDate));
