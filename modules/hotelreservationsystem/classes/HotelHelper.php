@@ -619,7 +619,7 @@ class HotelHelper
                 'price' => '350',
                 'auto_add_to_cart' => 0,
                 'show_at_front' => 1,
-                'price_calculation_method' => Product::PRICE_CALCULATION_METHOD_PER_BOOKING,
+                'price_calculation_method' => Product::PRICE_CALCULATION_METHOD_PER_DAY,
                 'price_addition_type' => Product::PRICE_ADDITION_TYPE_WITH_ROOM,
             ),
             array(
@@ -629,7 +629,7 @@ class HotelHelper
                 'price' => '450',
                 'auto_add_to_cart' => 0,
                 'show_at_front' => 1,
-                'price_calculation_method' => Product::PRICE_CALCULATION_METHOD_PER_BOOKING,
+                'price_calculation_method' => Product::PRICE_CALCULATION_METHOD_PER_DAY,
                 'price_addition_type' => Product::PRICE_ADDITION_TYPE_WITH_ROOM,
             ),
         );
