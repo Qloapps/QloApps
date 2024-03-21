@@ -47,6 +47,8 @@ class AdminOrdersControllerCore extends AdminController
     protected $hotelsArray = array();
     protected $roomTypesArray = array();
     protected $roomsArray = array();
+    protected $orderCurrenciesArray = array();
+
 
     public function __construct()
     {
@@ -89,6 +91,18 @@ class AdminOrdersControllerCore extends AdminController
         LEFT JOIN `'._DB_PREFIX_.'order_state_lang` osl ON (os.`id_order_state` = osl.`id_order_state` AND osl.`id_lang` = '.(int) $this->context->language->id.')
         LEFT JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd ON (hbd.`id_order` = a.`id_order`)
         LEFT JOIN `'._DB_PREFIX_.'htl_branch_info_lang` hbil ON (hbil.`id` = hbd.`id_hotel`)';
+
+        // Filters for KPIs because unable to filter orders by defult filters
+        if (Tools::getValue('orders_arrival_today')) {
+            $this->_where .= ' AND hbd.`is_refunded` = 0 AND hbd.`date_from` = \''.pSQL(date('Y-m-d')).' 00:00:00\' AND hbd.`id_status` != '.
+            (int) HotelBookingDetail::STATUS_CHECKED_IN.' AND hbd.`id_status` != '.(int) HotelBookingDetail::STATUS_CHECKED_OUT;
+        } elseif (Tools::getValue('orders_departures_today')) {
+            $this->_where .= ' AND hbd.`is_refunded` = 0 AND hbd.`date_to` = \''.pSQL(date('Y-m-d')).' 00:00:00\' AND hbd.`id_status` = '.
+            (int) HotelBookingDetail::STATUS_CHECKED_IN;
+        } elseif (Tools::getValue('orders_stay_over')) {
+            $this->_where .= ' AND hbd.`is_refunded` = 0 AND hbd.`is_back_order` = 0 AND hbd.`id_status` = '.(int) HotelBookingDetail::STATUS_CHECKED_IN.'
+            AND hbd.`date_to` > \''.pSQL(date('Y-m-d')).' 00:00:00\'';
+        }
 
         $this->_orderBy = 'id_order';
         $this->_orderWay = 'DESC';
@@ -1861,65 +1875,12 @@ class AdminOrdersControllerCore extends AdminController
         parent::postProcess();
     }
 
-    // KPIs on listing page
-    // public function renderKpis()
-    // {
-    //     $time = time();
-    //     $kpis = array();
-
-    //     $helper = new HelperKpi();
-    //     $helper->id = 'box-conversion-rate';
-    //     $helper->icon = 'icon-sort-by-attributes-alt';
-    //     //$helper->chart = true;
-    //     $helper->color = 'color1';
-    //     $helper->title = $this->l('Conversion Rate', null, null, false);
-    //     $helper->subtitle = $this->l('30 days', null, null, false);
-    //     if (ConfigurationKPI::get('CONVERSION_RATE_CHART') !== false) {
-    //         $helper->data = ConfigurationKPI::get('CONVERSION_RATE_CHART');
-    //     }
-    //     $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=conversion_rate';
-    //     $kpis[] = $helper->generate();
-
-    //     $helper = new HelperKpi();
-    //     $helper->id = 'box-carts';
-    //     $helper->icon = 'icon-shopping-cart';
-    //     $helper->color = 'color2';
-    //     $helper->title = $this->l('Abandoned Carts', null, null, false);
-    //     $helper->subtitle = $this->l('Today', null, null, false);
-    //     $helper->href = $this->context->link->getAdminLink('AdminCarts').'&action=filterOnlyAbandonedCarts';
-    //     $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=abandoned_cart';
-    //     $kpis[] = $helper->generate();
-
-    //     $helper = new HelperKpi();
-    //     $helper->id = 'box-average-order';
-    //     $helper->icon = 'icon-money';
-    //     $helper->color = 'color3';
-    //     $helper->title = $this->l('Average Order Value', null, null, false);
-    //     $helper->subtitle = $this->l('30 days', null, null, false);
-    //     $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=average_order_value';
-    //     $kpis[] = $helper->generate();
-
-    //     $helper = new HelperKpi();
-    //     $helper->id = 'box-net-profit-visit';
-    //     $helper->icon = 'icon-user';
-    //     $helper->color = 'color4';
-    //     $helper->title = $this->l('Net Profit per Visit', null, null, false);
-    //     $helper->subtitle = $this->l('30 days', null, null, false);
-    //     $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=netprofit_visit';
-    //     $kpis[] = $helper->generate();
-
-    //     $helper = new HelperKpiRow();
-    //     $helper->kpis = $kpis;
-    //     return $helper->generate();
-    // }
-
     // KPIs on view page
     public function renderKpis()
     {
+        $kpis = array();
         $objOrder = new Order(Tools::getValue('id_order'));
         if (Validate::isLoadedObject($objOrder)) {
-            $kpis = array();
-
             $helper = new HelperKpi();
             $helper->id = 'box-order-date';
             $helper->icon = 'icon-calendar';
@@ -1959,12 +1920,123 @@ class AdminOrdersControllerCore extends AdminController
             Hook::exec('action'.$this->controller_name.'KPIListingModifier', array(
                 'kpis' => &$kpis,
             ));
+        } else {
+            $time = time();
+            $kpis = array();
 
-            $helper = new HelperKpiRow();
-            $helper->kpis = $kpis;
+            $helper = new HelperKpi();
+            $helper->id = 'box-total-sales';
+            $helper->icon = 'icon-money';
+            $helper->color = 'color4';
+            $helper->title = $this->l('Total Sales', null, null, false);
+            $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=total_sales';
+            $helper->tooltip = $this->l('Total sales/revenue of all the orders created.', null, null, false);
+            $kpis[] = $helper;
 
-            return $helper->generate();
+            $helper = new HelperKpi();
+            $helper->id = 'box-total-due-amount';
+            $helper->icon = 'icon-money';
+            $helper->color = 'color2';
+            $helper->title = $this->l('Total Due Amount', null, null, false);
+            $helper->href = $this->context->link->getAdminLink('AdminOrders').'&submitResetorder=1&due_amount_orders=1';
+            $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=total_due_amount';
+            $helper->tooltip = $this->l('Total due amount of all the orders created.', null, null, false);
+            $kpis[] = $helper;
+
+            $arivalDate = date('Y-m-d');
+            $helper = new HelperKpi();
+            $helper->id = 'box-today-arrivals';
+            $helper->icon = 'icon-user';
+            $helper->color = 'color1';
+            $helper->title = $this->l('Arrivals', null, null, false);
+            $helper->subtitle = $this->l('Today', null, null, false);
+            $helper->href = $this->context->link->getAdminLink('AdminOrders').'&orders_arrival_today=1';
+            $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=today_arrivals';
+            $helper->tooltip = $this->l('Total number of arrivals for today.', null, null, false);
+            $kpis[] = $helper;
+
+            $departureDate = date('Y-m-d');
+            $helper = new HelperKpi();
+            $helper->id = 'box-today-departures';
+            $helper->icon = 'icon-user';
+            $helper->color = 'color2';
+            $helper->title = $this->l('Departures', null, null, false);
+            $helper->subtitle = $this->l('Today', null, null, false);
+            $helper->href = $this->context->link->getAdminLink('AdminOrders').'&orders_departures_today=1';
+            $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=today_departures';
+            $helper->tooltip = $this->l('Total number of departures for today.', null, null, false);
+            $kpis[] = $helper;
+
+            $dateFrom = date('Y-m-d');
+            $dateTo = date('Y-m-d', strtotime('+1 day'));
+            $helper = new HelperKpi();
+            $helper->id = 'box-today-stay-over';
+            $helper->icon = 'icon-user';
+            $helper->color = 'color4';
+            $helper->title = $this->l('Stay Overs', null, null, false);
+            $helper->subtitle = $this->l('Today', null, null, false);
+            $helper->href = $this->context->link->getAdminLink('AdminOrders').'&orders_stay_over=1';
+            $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=today_stay_over';
+            $helper->tooltip = $this->l('Total number of stay overs for today.', null, null, false);
+            $kpis[] = $helper;
+
+            $helper = new HelperKpi();
+            $helper->id = 'box-carts';
+            $helper->icon = 'icon-shopping-cart';
+            $helper->color = 'color2';
+            $helper->title = $this->l('Abandoned Carts', null, null, false);
+            $dateFrom = date(Context::getContext()->language->date_format_lite, strtotime('-2 day'));
+            $dateTo = date(Context::getContext()->language->date_format_lite, strtotime('-1 day'));
+            $helper->subtitle = sprintf($this->l('From %s to %s', null, null, false), $dateFrom, $dateTo);
+            $helper->href = $this->context->link->getAdminLink('AdminCarts').'&action=filterOnlyAbandonedCarts';
+            $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=abandoned_cart';
+            $helper->tooltip = $this->l('Total number of abandoned carts  in given period of time.', null, null, false);
+            $kpis[] = $helper;
+
+            $daysForConversionRate = Configuration::get('PS_KPI_CONVERSION_RATE_NB_DAYS');
+            $helper = new HelperKpi();
+            $helper->id = 'box-conversion-rate';
+            $helper->icon = 'icon-sort-by-attributes-alt';
+            $helper->color = 'color1';
+            $helper->title = $this->l('Conversion Rate', null, null, false);
+            $helper->subtitle = $daysForConversionRate.' '.$this->l('days', null, null, false);
+            $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=conversion_rate';
+            $helper->tooltip = $this->l('Percentage of visits that resulted in an order/booking in given period of time.', null, null, false);
+            $kpis[] = $helper;
+
+            $daysForAvgOrderVal = Configuration::get('PS_ORDER_KPI_AVG_ORDER_VALUE_NB_DAYS');
+            $helper = new HelperKpi();
+            $helper->id = 'box-average-order';
+            $helper->icon = 'icon-money';
+            $helper->color = 'color3';
+            $helper->title = $this->l('Average Order Value', null, null, false);
+            $helper->subtitle = $daysForAvgOrderVal.' '.$this->l('days', null, null, false);
+            $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=average_order_value';
+            $helper->tooltip = $this->l('Total average order value without tax in given period of time.', null, null, false);
+            $kpis[] = $helper;
+
+            $helper = new HelperKpi();
+            $helper->id = 'box-average-lead-time';
+            $helper->icon = 'icon-time';
+            $helper->color = 'color4';
+            $helper->title = $this->l('Average Lead Time', null, null, false);
+            $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=average_lead_time';
+            $helper->tooltip = $this->l('Average number of days between the time guests book their rooms and the time guest schedule to arrive at the hotel.', null, null, false);
+            $kpis[] = $helper;
+
+            $helper = new HelperKpi();
+            $helper->id = 'box-average-guest-in-booking';
+            $helper->icon = 'icon-users';
+            $helper->color = 'color3';
+            $helper->title = $this->l('Average Guest Per Booking', null, null, false);
+            $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=average_guest_in_booking';
+            $helper->tooltip = $this->l('Average number of guests per booking.', null, null, false);
+            $kpis[] = $helper;
         }
+
+        $helper = new HelperKpiRow();
+        $helper->kpis = $kpis;
+        return $helper->generate();
     }
 
     public function renderView()

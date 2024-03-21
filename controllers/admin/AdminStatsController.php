@@ -224,27 +224,33 @@ class AdminStatsControllerCore extends AdminStatsTabController
         if ($granularity == 'day') {
             $sales = array();
             $result = Db::getInstance(_PS_USE_SQL_SLAVE_)->ExecuteS(
-                'SELECT LEFT(`invoice_date`, 10) AS date, SUM(total_paid_tax_excl / o.`conversion_rate`) AS sales
+                'SELECT LEFT(`invoice_date`, 10) AS date, SUM(total_paid_tax_excl / o.conversion_rate) AS sales,
+                (
+                    SELECT hbd.`id_hotel`
+                    FROM`'._DB_PREFIX_.'htl_booking_detail` hbd
+                    WHERE hbd.`id_order` = o.`id_order` LIMIT 1
+                ) AS id_hotel
                 FROM `'._DB_PREFIX_.'orders` o
                 LEFT JOIN `'._DB_PREFIX_.'order_state` os ON o.current_state = os.id_order_state
-                WHERE `invoice_date` BETWEEN "'.pSQL($date_from).' 00:00:00" AND "'.pSQL($date_to).' 23:59:59" AND os.logable = 1'.
-                ((int) $id_hotel ? ' AND o.`id_order` IN (SELECT id_order FROM `'._DB_PREFIX_.'htl_booking_detail` WHERE id_hotel = '.(int)$id_hotel.')'  : '').'
-                GROUP BY LEFT(`invoice_date`, 10)'
+                WHERE os.logable = 1'. (($date_from && $date_to) ? ' AND `invoice_date` BETWEEN "'.pSQL($date_from).' 00:00:00" AND "'.pSQL($date_to).' 23:59:59"' : '').' GROUP BY LEFT(`invoice_date`, 10) HAVING 1 '.HotelBranchInformation::addHotelRestriction($id_hotel)
             );
 
             foreach ($result as $row) {
                 $sales[strtotime($row['date'])] = $row['sales'];
             }
-
             return $sales;
         } elseif ($granularity == 'month') {
             $sales = array();
             $result = Db::getInstance(_PS_USE_SQL_SLAVE_)->ExecuteS(
-                'SELECT LEFT(`invoice_date`, 7) AS date, SUM(total_paid_tax_excl / o.`conversion_rate`) AS sales
+                'SELECT LEFT(`invoice_date`, 7) AS date, SUM(total_paid_tax_excl / o.conversion_rate) AS sales,
+                (
+                    SELECT hbd.`id_hotel`
+                    FROM`'._DB_PREFIX_.'htl_booking_detail` hbd
+                    WHERE hbd.`id_order` = o.`id_order` LIMIT 1
+                ) AS id_hotel
                 FROM `'._DB_PREFIX_.'orders` o
                 LEFT JOIN `'._DB_PREFIX_.'order_state` os ON o.current_state = os.id_order_state
-                WHERE `invoice_date` BETWEEN "'.pSQL($date_from).' 00:00:00" AND "'.pSQL($date_to).' 23:59:59" AND os.logable = 1'.
-                ((int) $id_hotel ? ' AND o.`id_order` IN (SELECT id_order FROM `'._DB_PREFIX_.'htl_booking_detail` WHERE id_hotel = '.(int)$id_hotel.')'  : '').' GROUP BY LEFT(`invoice_date`, 7)'
+                WHERE os.logable = 1'. (($date_from && $date_to) ? ' AND `invoice_date` BETWEEN "'.pSQL($date_from).' 00:00:00" AND "'.pSQL($date_to).' 23:59:59"' : '').' GROUP BY LEFT(`invoice_date`, 7) HAVING 1 '.HotelBranchInformation::addHotelRestriction($id_hotel)
             );
 
             foreach ($result as $row) {
@@ -254,11 +260,15 @@ class AdminStatsControllerCore extends AdminStatsTabController
             return $sales;
         } else {
             return Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue(
-                'SELECT SUM(total_paid_tax_excl / o.`conversion_rate`)
+                'SELECT SUM(total_paid_tax_excl / o.conversion_rate),
+                (
+                    SELECT hbd.`id_hotel`
+                    FROM`'._DB_PREFIX_.'htl_booking_detail` hbd
+                    WHERE hbd.`id_order` = o.`id_order` LIMIT 1
+                ) AS id_hotel
                 FROM `'._DB_PREFIX_.'orders` o
                 LEFT JOIN `'._DB_PREFIX_.'order_state` os ON o.current_state = os.id_order_state
-                WHERE `invoice_date` BETWEEN "'.pSQL($date_from).' 00:00:00" AND "'.pSQL($date_to).' 23:59:59" AND os.logable = 1'.
-                ((int) $id_hotel ? ' AND o.`id_order` IN (SELECT id_order FROM `'._DB_PREFIX_.'htl_booking_detail` WHERE id_hotel = '.(int)$id_hotel.')'  : '')
+                WHERE os.logable = 1'. (($date_from && $date_to) ? ' AND `invoice_date` BETWEEN "'.pSQL($date_from).' 00:00:00" AND "'.pSQL($date_to).' 23:59:59"' : '').' HAVING 1 '.HotelBranchInformation::addHotelRestriction($id_hotel)
             );
         }
     }
@@ -467,13 +477,17 @@ class AdminStatsControllerCore extends AdminStatsTabController
 					od.`purchase_supplier_price` > 0,
 					od.`purchase_supplier_price`,
 					(od.`original_product_price` / `conversion_rate`) * '.(int)Configuration::get('CONF_AVERAGE_PRODUCT_MARGIN').' / 100
-				)) as total_purchase_price
+				)) as total_purchase_price,
+                (
+                    SELECT hbd.`id_hotel`
+                    FROM`'._DB_PREFIX_.'htl_booking_detail` hbd
+                    WHERE hbd.`id_order` = o.`id_order` LIMIT 1
+                ) AS id_hotel
 			FROM `'._DB_PREFIX_.'orders` o
 			LEFT JOIN `'._DB_PREFIX_.'order_detail` od ON o.id_order = od.id_order
 			LEFT JOIN `'._DB_PREFIX_.'order_state` os ON o.current_state = os.id_order_state
-			WHERE `invoice_date` BETWEEN "'.pSQL($date_from).' 00:00:00" AND "'.pSQL($date_to).' 23:59:59" AND os.logable = 1'.
-            ((int) $id_hotel ? ' AND o.`id_order` IN (SELECT id_order FROM `'._DB_PREFIX_.'htl_booking_detail` WHERE id_hotel = '.(int)$id_hotel.')'  : '').Shop::addSqlRestriction(false, 'o').'
-			GROUP BY LEFT(`invoice_date`, 10)');
+			WHERE `invoice_date` BETWEEN "'.pSQL($date_from).' 00:00:00" AND "'.pSQL($date_to).' 23:59:59" AND os.logable = 1'.'
+			GROUP BY LEFT(`invoice_date`, 10) HAVING 1 '.HotelBranchInformation::addHotelRestriction($id_hotel));
 
             foreach ($result as $row) {
                 $purchases[strtotime($row['date'])] = $row['total_purchase_price'];
@@ -481,17 +495,22 @@ class AdminStatsControllerCore extends AdminStatsTabController
 
             return $purchases;
         } else {
-            return Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue('
-			SELECT SUM(od.`product_quantity` * IF(
-				od.`purchase_supplier_price` > 0,
-				od.`purchase_supplier_price`,
-				(od.`original_product_price` / `conversion_rate`) * '.(int)Configuration::get('CONF_AVERAGE_PRODUCT_MARGIN').' / 100
-			)) as total_purchase_price
-			FROM `'._DB_PREFIX_.'orders` o
-			LEFT JOIN `'._DB_PREFIX_.'order_detail` od ON o.id_order = od.id_order
-			LEFT JOIN `'._DB_PREFIX_.'order_state` os ON o.current_state = os.id_order_state
-			WHERE `invoice_date` BETWEEN "'.pSQL($date_from).' 00:00:00" AND "'.pSQL($date_to).' 23:59:59" AND os.logable = 1'.
-            ((int) $id_hotel ? ' AND o.`id_order` IN (SELECT id_order FROM `'._DB_PREFIX_.'htl_booking_detail` WHERE id_hotel = '.(int)$id_hotel.')'  : '').Shop::addSqlRestriction(false, 'o'));
+            return Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue(
+                'SELECT SUM(od.`product_quantity` * IF(
+                    od.`purchase_supplier_price` > 0,
+                    od.`purchase_supplier_price`,
+                    (od.`original_product_price` / `conversion_rate`) * '.(int)Configuration::get('CONF_AVERAGE_PRODUCT_MARGIN').' / 100
+                )),
+                (
+                    SELECT hbd.`id_hotel`
+                    FROM`'._DB_PREFIX_.'htl_booking_detail` hbd
+                    WHERE hbd.`id_order` = o.`id_order` LIMIT 1
+                ) AS id_hotel
+                FROM `'._DB_PREFIX_.'orders` o
+                LEFT JOIN `'._DB_PREFIX_.'order_detail` od ON o.id_order = od.id_order
+                LEFT JOIN `'._DB_PREFIX_.'order_state` os ON o.current_state = os.id_order_state
+                WHERE `invoice_date` BETWEEN "'.pSQL($date_from).' 00:00:00" AND "'.pSQL($date_to).' 23:59:59" AND os.logable = 1 HAVING 1 '.HotelBranchInformation::addHotelRestriction($id_hotel)
+            );
         }
     }
 
@@ -505,15 +524,19 @@ class AdminStatsControllerCore extends AdminStatsTabController
             total_paid_tax_incl / o.conversion_rate as total_paid_tax_incl,
 			total_shipping_tax_excl / o.conversion_rate as total_shipping_tax_excl,
 			o.module,
-			hbd.id_country,
+			ad.id_country,
 			o.id_currency,
-			c.id_reference as carrier_reference
+			c.id_reference as carrier_reference,
+            (
+                SELECT hbd.`id_hotel`
+                FROM`'._DB_PREFIX_.'htl_booking_detail` hbd
+                WHERE hbd.`id_order` = o.`id_order` LIMIT 1
+            ) AS id_hotel
 		FROM `'._DB_PREFIX_.'orders` o
-		LEFT JOIN `'._DB_PREFIX_.'address` hbd ON o.id_address_delivery = hbd.id_address
+		LEFT JOIN `'._DB_PREFIX_.'address` ad ON o.id_address_delivery = ad.id_address
 		LEFT JOIN `'._DB_PREFIX_.'carrier` c ON o.id_carrier = c.id_carrier
 		LEFT JOIN `'._DB_PREFIX_.'order_state` os ON o.current_state = os.id_order_state
-		WHERE `invoice_date` BETWEEN "'.pSQL($date_from).' 00:00:00" AND "'.pSQL($date_to).' 23:59:59" AND os.logable = 1'.
-        ((int) $id_hotel ? ' AND o.`id_order` IN (SELECT id_order FROM `'._DB_PREFIX_.'htl_booking_detail` WHERE id_hotel = '.(int)$id_hotel.')'  : '').Shop::addSqlRestriction(false, 'o'));
+		WHERE `invoice_date` BETWEEN "'.pSQL($date_from).' 00:00:00" AND "'.pSQL($date_to).' 23:59:59" AND os.logable = 1 HAVING 1'.HotelBranchInformation::addHotelRestriction($id_hotel));
 
         foreach ($orders as $order) {
             // Add flat fees for this order
@@ -590,7 +613,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
                 $visitors = AdminStatsController::getVisits(
                     true,
                     date('Y-m-d', strtotime('-'.($nbDaysConversionRate + 1).' day')),
-                    date('Y-m-d', strtotime('-1 day')),
+                    date('Y-m-d', strtotime('+1 day')),
                     false /*'day'*/
                 );
 
@@ -750,20 +773,28 @@ class AdminStatsControllerCore extends AdminStatsTabController
                 break;
 
             case 'average_order_value':
+                $daysForAvgOrderVal = Configuration::get('PS_ORDER_KPI_AVG_ORDER_VALUE_NB_DAYS');
+
                 $row = Db::getInstance(_PS_USE_SQL_SLAVE_)->getRow('
                 SELECT
                     COUNT(o.`id_order`) as orders,
-                    SUM(o.`total_paid_tax_excl` / o.`conversion_rate`) as total_paid_tax_excl
+                    SUM(o.`total_paid_tax_excl` / o.`conversion_rate`) as total_paid_tax_excl,
+                    (
+                        SELECT hbd.`id_hotel`
+                        FROM`'._DB_PREFIX_.'htl_booking_detail` hbd
+                        WHERE hbd.`id_order` = o.`id_order` LIMIT 1
+                    ) AS id_hotel
                 FROM `'._DB_PREFIX_.'orders` o
                 LEFT JOIN `'._DB_PREFIX_.'order_state` os ON os.`id_order_state` = o.`current_state`
-                WHERE o.`invoice_date` BETWEEN "'.pSQL(date('Y-m-d', strtotime('-31 day'))).' 00:00:00" AND "'.pSQL(date('Y-m-d', strtotime('-1 day'))).' 23:59:59" AND os.`logable` = 1
-                '.Shop::addSqlRestriction());
+                WHERE o.`invoice_date` BETWEEN "'.pSQL(date('Y-m-d', strtotime('-'.($daysForAvgOrderVal + 1).' day'))).' 00:00:00" AND "'.pSQL(date('Y-m-d', strtotime('-1 day'))).' 23:59:59" AND os.`logable` = 1 HAVING 1 '.HotelBranchInformation::addHotelRestriction(false));
+                $value = Tools::displayPrice($row['orders'] ? $row['total_paid_tax_excl'] / $row['orders'] : 0, $currency).' ('.$this->l('tax excl.').')';
 
-                $value = Tools::displayPrice($row['orders'] ? $row['total_paid_tax_excl'] / $row['orders'] : 0, $currency);
                 break;
 
             case 'netprofit_visit':
-                $date_from = date('Y-m-d', strtotime('-31 day'));
+                $daysForProfitPerVisitor = Configuration::get('PS_ORDER_KPI_PER_VISITOR_PROFIT_NB_DAYS');
+
+                $date_from = date('Y-m-d', strtotime('-'.($daysForProfitPerVisitor + 1).' day'));
                 $date_to = date('Y-m-d', strtotime('-1 day'));
 
                 $total_visitors = AdminStatsController::getVisits(false, $date_from, $date_to);
@@ -890,7 +921,50 @@ class AdminStatsControllerCore extends AdminStatsTabController
                 $value = AdminStatsController::getTotalBannedCustomers();
 
                 break;
-
+            case 'total_sales':
+                $totalSales = AdminStatsController::getTotalSales('', '', false, false, 1);
+                if ($totalSales > 0) {
+                    $value = Tools::displayPrice($totalSales, $currency);
+                } else {
+                    $value = Tools::displayPrice(0, $currency);
+                }
+                break;
+            case 'today_arrivals':
+                $dateToday = date('Y-m-d');
+                $value = 0;
+                if ($arrivalsData = AdminStatsController::getArrivalsByDate($dateToday)) {
+                    $value = $arrivalsData['total_arrivals'];
+                }
+                break;
+            case 'today_departures':
+                $dateToday = date('Y-m-d');
+                $value = 0;
+                if ($departureData = AdminStatsController::getDeparturesByDate($dateToday)) {
+                    $value = $departureData['total_departures'];
+                }
+                break;
+            case 'today_stay_over':
+                $dateToday = date('Y-m-d');
+                $value = AdminStatsController::getStayOversByDate($dateToday);
+                break;
+            case 'total_due_amount':
+                $dateToday = date('Y-m-d');
+                $dueAmount = AdminStatsController::getTotalDueAmount('', '', false, 1);
+                if ($dueAmount > 0) {
+                    $value = Tools::displayPrice($dueAmount, $currency);
+                } else {
+                    $value = Tools::displayPrice(0, $currency);
+                }
+                break;
+            case 'average_lead_time':
+                $dateToday = date('Y-m-d');
+                $value = Tools::ps_round(AdminStatsController::getAverageLeadTime(), 2);
+                break;
+            case 'average_guest_in_booking':
+                $dateToday = date('Y-m-d');
+                $value = AdminStatsController::getAverageGuestsPerBooking();
+                $value = Tools::ps_round($value['avg_adults'], 2).''.$this->l('Adults').', '.Tools::ps_round($value['avg_children'], 2).''.$this->l('Children');
+                break;
             default:
                 $value = false;
         }
@@ -2265,5 +2339,57 @@ class AdminStatsControllerCore extends AdminStatsTabController
         }
 
         return $result;
+    }
+
+    // Get to totalo due amount in the orders
+    public static function getTotalDueAmount($dateFrom = '', $dateTo = '', $idHotel = false, $useTax = 0)
+    {
+        $objHotelBooking = new HotelBookingDetail();
+        $invalidOrderStates = $objHotelBooking->getOrderStatusToFreeBookedRoom();
+
+        $sql = 'SELECT (' . ($useTax ? 'SUM(o.`total_paid_tax_incl` / o.`conversion_rate`)' : 'SUM(o.`total_paid_tax_excl` / o.`conversion_rate`)') . ' - SUM(o.`total_paid_real` / o.`conversion_rate`)),
+        (
+            SELECT hbd.`id_hotel`
+            FROM`'._DB_PREFIX_.'htl_booking_detail` hbd
+            WHERE hbd.`id_order` = o.`id_order` LIMIT 1
+        ) AS id_hotel
+        FROM `'._DB_PREFIX_.'orders` o
+        LEFT JOIN `'._DB_PREFIX_.'order_state` os ON o.current_state = os.id_order_state
+        WHERE 1 ' . ($invalidOrderStates ? ' AND o.`current_state` NOT IN ('.implode(',', $invalidOrderStates).')' : '') . (($dateFrom && $dateTo) ? ' AND o.`date_add` BETWEEN "'.pSQL($dateFrom).' 00:00:00" AND "'.pSQL($dateTo).' 23:59:59"' : '').' HAVING 1 '.HotelBranchInformation::addHotelRestriction($idHotel);
+
+        return Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue($sql);
+    }
+
+    // Booking or Reservation Lead Time is the period of time (most typically measured in calendar days) between when a guest makes the reservation and the actual check-in/arrival date.
+    public static function getAverageLeadTime($dateFrom = '', $dateTo = '', $idHotel = false)
+    {
+        $sql = 'SELECT (SUM(DATEDIFF(hbd.`date_from`, hbd.`date_add`)) / COUNT(hbd.`id`)) FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
+        WHERE hbd.`is_refunded` = 0 AND hbd.`is_back_order` = 0'
+        .(($dateFrom && $dateTo) ? ' AND hbd.`date_add` BETWEEN "'.pSQL($dateFrom).' 00:00:00" AND "'.pSQL($dateTo).' 23:59:59"' : '')
+        .HotelBranchInformation::addHotelRestriction($idHotel, 'hbd');
+
+        return Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue($sql);
+    }
+
+    // This function is used to calculate the average number of guests per booking
+    /**
+     * This function is used to calculate the average number of guests per booking
+     * @param string $dateFrom : Date from in date range of booking creation
+     * @param string $dateTo : Date to in date range of booking creation
+     * @param boolean $idHotel:  : Send id hotel if want to get for specific hotel
+     * @return array: of avg_adults and avg_children
+     */
+    public static function getAverageGuestsPerBooking($dateFrom = '', $dateTo = '', $idHotel = false)
+    {
+        $sql = 'SELECT (SUM(hbd.`adults`) / COUNT(hbd.`id`)) as avg_adults, (SUM(hbd.`children`) / COUNT(hbd.`id`)) as avg_children FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
+        WHERE hbd.`is_refunded` = 0 AND hbd.`is_back_order` = 0'
+        .(($dateFrom && $dateTo) ? ' AND hbd.`date_add` BETWEEN "'.pSQL($dateFrom).' 00:00:00" AND "'.pSQL($dateTo).' 23:59:59"' : '')
+        .HotelBranchInformation::addHotelRestriction($idHotel, 'hbd');
+
+        if ($result = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql)) {
+            return $result[0];
+        } else {
+            return array ('avg_adults' => 0, 'avg_children' => 0);
+        }
     }
 }
