@@ -27,7 +27,7 @@
 class AdminDashboardControllerCore extends AdminController
 {
 
-    const RECOMMENDATION_CONTENT = '/cache/dashboard_recommendation.html';
+    const RECOMMENDATION_CONTENT_FILE_PATH = '/cache/dashboard_recommendation.html';
 
     public function __construct()
     {

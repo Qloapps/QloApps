@@ -23,7 +23,7 @@ class AdminModulesCatalogControllerCore extends AdminController
 
     public $modules;
 
-    const RECOMMENDATION_CONTENT = '/cache/catalog_recommendation.html';
+    const RECOMMENDATION_CONTENT_FILE_PATH = '/cache/catalog_recommendation.html';
 
     const ELEMENT_TYPE_MODULE = 1;
     const ELEMENT_TYPE_THEME = 2;

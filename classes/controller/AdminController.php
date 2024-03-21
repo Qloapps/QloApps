@@ -399,7 +399,7 @@ class AdminControllerCore extends Controller
     const LEVEL_VIEW = 1;
 
     /** @var string path for recomendation content */
-    const RECOMMENDATION_CONTENT = '';
+    const RECOMMENDATION_CONTENT_FILE_PATH = '';
 
     public function __construct()
     {
@@ -3967,9 +3967,9 @@ class AdminControllerCore extends Controller
         if ($recommendationContent = $this->updateRecommendationContent()) {
             $content['cache'] = false;
         }
-        if (!isset($this->context->cookie->{$this->controller_name.'_closed'}) || !$this->context->cookie->{$this->controller_name.'_closed'}) {
-            if (file_exists(_PS_ROOT_DIR_.$this->context->controller->getRecommendationFilePath())) {
-                $content['success'] = true;
+        if (file_exists(_PS_ROOT_DIR_.$this->context->controller->getRecommendationFilePath())) {
+            $content['success'] = true;
+            if (!isset($this->context->cookie->{$this->controller_name.'_closed'}) || !$this->context->cookie->{$this->controller_name.'_closed'}) {
                 $content['html'] = file_get_contents(_PS_ROOT_DIR_.$this->context->controller->getRecommendationFilePath());
             }
         }
@@ -3985,10 +3985,11 @@ class AdminControllerCore extends Controller
                 array('controller' => $this->context->controller->controller_name)
             )) {
                 $recommendationContent = json_decode($recommendationContent, true);
-                if (isset($this->context->cookie->{$this->context->controller->controller_name.'_key'})) {
-                    if ($this->context->cookie->{$this->context->controller->controller_name.'_key'} != $recommendationContent['key']) {
-                        unset($this->context->cookie->{$this->context->controller->controller_name.'_closed'});
-                    }
+                if (!isset($this->context->cookie->{$this->context->controller->controller_name.'_key'})) {
+                    $this->context->cookie->{$this->context->controller->controller_name.'_key'} = '';
+                }
+                if ($this->context->cookie->{$this->context->controller->controller_name.'_key'} != $recommendationContent['key']) {
+                    unset($this->context->cookie->{$this->context->controller->controller_name.'_closed'});
                 }
                 $this->context->cookie->{$this->context->controller->controller_name.'_key'} = $recommendationContent['key'];
                 if (isset($recommendationContent['success']) && $recommendationContent['success']) {
@@ -4018,7 +4019,7 @@ class AdminControllerCore extends Controller
 
     public function getRecommendationFilePath()
     {
-        return static::RECOMMENDATION_CONTENT;
+        return static::RECOMMENDATION_CONTENT_FILE_PATH;
     }
 
     /**
