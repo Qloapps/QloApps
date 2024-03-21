@@ -1,0 +1,51 @@
+Message from {shop_name}
+Hi {firstname} {lastname},
+
+New Bookings created on {shop_name}!
+Bookings in this order have Overbookings !!
+This order is not confirmed yet. Please check the order details to resolve overbookings.
+
+Customer details
+Name: {customer_name}
+Email: {customer_email}
+
+Order details
+Order: {order_name} Placed on {date}
+Payment: {payment}
+Status: {order_status}
+
+Room Image
+Room Description
+Hotel
+Room Capcity
+Unit Price
+Rooms Qty
+Check-in Date
+Check-out Date
+Total
+
+{cart_booking_data_text}
+
+{extra_demands_details_text}
+
+{discounts}
+
+Total Rooms Cost
+{total_products}
+
+Total Extra Services Cost
+{total_extra_demands_te}
+
+Discounts
+{total_discounts}
+
+Total Rooms Tax
+{total_tax_paid}
+
+Extra Services Tax
+{extra_demands_tax}
+
+Final Booking Amount
+{total_paid}
+
+{shop_name} powered by Webkul&trade;

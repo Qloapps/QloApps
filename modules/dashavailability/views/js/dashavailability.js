@@ -30,15 +30,47 @@ function line_chart_availability(widget_name, chart_details) {
             .margin({
                 left: 30,
                 right: 30,
-            });
+            }
+        );
 
-        chart.xAxis.tickFormat(function(d) {
+        chart.xAxis
+        .tickFormat(function(d) {
             date = new Date(d * 1000);
             return date.format(chart_details['date_format']);
+        })
+        // through this function we are also fixing the x axis date and values alignment issue
+        .tickValues(function(values) {
+            var indexInterval = Math.floor(values[0].values.length / 10);
+
+            var dates = [];
+            for (var i = 0; i < 10; i++) {
+                if (values[0].values[(indexInterval+1) * i]) {
+                    dates.push(values[0].values[(indexInterval+1) * i]);
+                }
+            }
+            var dates =  dates.map(function(v) {
+                return v[0]
+            });
+
+            return dates;
         });
 
         chart.yAxis.tickFormat(function(d) {
             return Number.isInteger(d) ? d : '';
+        });
+
+        // create content for the tooltip of chart
+        chart.interactiveLayer.tooltip.contentGenerator((obj, element) => {
+            if (typeof obj.series[0] !== 'undefined') {
+                var date = new Date(obj.value * 1000);
+                date = date.format(chart_details['date_format']);
+
+                tooltipContent = '';
+                tooltipContent += '<p>' + date_txt + ': <b>' + date + '</b></p>';
+                tooltipContent += '<p>' + avail_rooms_txt + ': <b>' + obj.series[0].value + '</b></p>';
+            }
+
+            return getTooltipContent(obj.series[0].key, tooltipContent, obj.series[0].color);
         });
 
         chart.legend.updateState(false);

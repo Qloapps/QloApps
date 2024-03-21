@@ -39,36 +39,41 @@
 					</li>
 					<li class="divider"></li>
 					<li class="search-book search-option">
-						<a href="#" data-value="1" data-placeholder="{l s='Product name, SKU, reference...'}" data-icon="icon-book">
+						<a href="#" data-value="{$QLO_SEARCH_TYPE_CATELOG}" data-placeholder="{l s='Room Types, Service products...'}" data-icon="icon-book">
 							<i class="icon-book"></i> {l s='Catalog'}
 						</a>
 					</li>
+					<li class="search-modules search-option">
+						<a href="#" data-value="{$QLO_SEARCH_TYPE_HOTEL}" data-placeholder="{l s='Hotel'}" data-icon="icon-AdminHotelReservationSystemManagement">
+							<i class="icon-building"></i> {l s='Hotel'}
+						</a>
+					</li>
 					<li class="search-customers-name search-option">
-						<a href="#" data-value="2" data-placeholder="{l s='Email, name...'}" data-icon="icon-group">
+						<a href="#" data-value="{$QLO_SEARCH_TYPE_CUSTOMER_BY_NAME}" data-placeholder="{l s='Email, name...'}" data-icon="icon-group">
 							<i class="icon-group"></i> {l s='Customers'} {l s='by name'}
 						</a>
 					</li>
 					<li class="search-customers-addresses search-option">
-						<a href="#" data-value="6" data-placeholder="{l s='123.45.67.89'}" data-icon="icon-desktop">
+						<a href="#" data-value="{$QLO_SEARCH_TYPE_CUSTOMER_BY_IP}" data-placeholder="{l s='123.45.67.89'}" data-icon="icon-desktop">
 							<i class="icon-desktop"></i> {l s='Customers'} {l s='by ip address'}</a>
 					</li>
 					<li class="search-orders search-option">
-						<a href="#" data-value="3" data-placeholder="{l s='Order ID'}" data-icon="icon-credit-card">
+						<a href="#" data-value="{$QLO_SEARCH_TYPE_ORDER}" data-placeholder="{l s='Order ID'}" data-icon="icon-credit-card">
 							<i class="icon-credit-card"></i> {l s='Orders'}
 						</a>
 					</li>
 					<li class="search-invoices search-option">
-						<a href="#" data-value="4" data-placeholder="{l s='Invoice Number'}" data-icon="icon-book">
+						<a href="#" data-value="{$QLO_SEARCH_TYPE_INVOICE}" data-placeholder="{l s='Invoice Number'}" data-icon="icon-book">
 							<i class="icon-book"></i> {l s='Invoices'}
 						</a>
 					</li>
 					<li class="search-carts search-option">
-						<a href="#" data-value="5" data-placeholder="{l s='Cart ID'}" data-icon="icon-shopping-cart">
+						<a href="#" data-value="{$QLO_SEARCH_TYPE_CART}" data-placeholder="{l s='Cart ID'}" data-icon="icon-shopping-cart">
 							<i class="icon-shopping-cart"></i> {l s='Carts'}
 						</a>
 					</li>
 					<li class="search-modules search-option">
-						<a href="#" data-value="7" data-placeholder="{l s='Module name'}" data-icon="icon-puzzle-piece">
+						<a href="#" data-value="{$QLO_SEARCH_TYPE_MODULE}" data-placeholder="{l s='Module name'}" data-icon="icon-puzzle-piece">
 							<i class="icon-puzzle-piece"></i> {l s='Modules'}
 						</a>
 					</li>

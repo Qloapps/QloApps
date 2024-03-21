@@ -24,7 +24,7 @@
             <i class="icon-user"></i> {l s='Room Type Additional Facilities'}
         </div>
         <div class="alert alert-info">
-            {l s='To create new Additional facilities'} <a target="_blank" href="{$link->getAdminLink('AdminRoomTypeGlobalDemand')}">{l s='click here.'}</a>
+            {l s='To create new additional facilities please visit'} <a target="_blank" href="{$link->getAdminLink('AdminRoomTypeGlobalDemand')}">{l s='Additional facilities'}</a> {l s='page.'}
         </div>
         {if isset($allDemands) && $allDemands}
 
@@ -147,10 +147,6 @@
                     <i class="process-icon-loading"></i>
                         {l s='Save and stay'}
                 </button>
-            </div>
-        {else}
-            <div class="alert alert-warning">
-                {l s='No additional facilities created yet. To create please visit'} <a target="_blank" href="{$link->getAdminLink('AdminRoomTypeGlobalDemand')}">{l s='Additional facilities'}</a> {l s='page'}.
             </div>
         {/if}
     </div>

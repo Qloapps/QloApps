@@ -225,7 +225,7 @@ class CategoryControllerCore extends FrontController
                 'order_date_restrict' => $order_date_restrict
             ));
         } else {
-            Tools::redirect($this->context->link->getPageLink('index'));
+            Tools::redirect($this->context->link->getPageLink('pagenotfound'));
         }
 
         $feat_img_dir = _PS_IMG_.'rf/';

@@ -399,56 +399,54 @@ class ParentOrderControllerCore extends FrontController
             Tools::redirect('');
         } elseif (!Customer::getAddressesTotalById($this->context->customer->id)) {
             $multi = (int)Tools::getValue('multi-shipping');
-            Tools::redirect('index.php?controller=address&back='.urlencode('order.php?step=1'.($multi ? '&multi-shipping='.$multi : '')));
         }
 
         $customer = $this->context->customer;
         if (Validate::isLoadedObject($customer)) {
             /* Getting customer addresses */
-            $customerAddresses = $customer->getAddresses($this->context->language->id);
+            if ($customerAddresses = $customer->getAddresses($this->context->language->id)) {
+                // Getting a list of formated address fields with associated values
+                $formatedAddressFieldsValuesList = array();
 
-            // Getting a list of formated address fields with associated values
-            $formatedAddressFieldsValuesList = array();
+                foreach ($customerAddresses as $i => $address) {
+                    if (!Address::isCountryActiveById((int)$address['id_address'])) {
+                        unset($customerAddresses[$i]);
+                    }
+                    $tmpAddress = new Address($address['id_address']);
+                    $formatedAddressFieldsValuesList[$address['id_address']]['ordered_fields'] = AddressFormat::getOrderedAddressFields($address['id_country']);
+                    $formatedAddressFieldsValuesList[$address['id_address']]['formated_fields_values'] = AddressFormat::getFormattedAddressFieldsValues(
+                        $tmpAddress,
+                        $formatedAddressFieldsValuesList[$address['id_address']]['ordered_fields']);
 
-            foreach ($customerAddresses as $i => $address) {
-                if (!Address::isCountryActiveById((int)$address['id_address'])) {
-                    unset($customerAddresses[$i]);
+                    unset($tmpAddress);
                 }
-                $tmpAddress = new Address($address['id_address']);
-                $formatedAddressFieldsValuesList[$address['id_address']]['ordered_fields'] = AddressFormat::getOrderedAddressFields($address['id_country']);
-                $formatedAddressFieldsValuesList[$address['id_address']]['formated_fields_values'] = AddressFormat::getFormattedAddressFieldsValues(
-                    $tmpAddress,
-                    $formatedAddressFieldsValuesList[$address['id_address']]['ordered_fields']);
 
-                unset($tmpAddress);
-            }
+                $customerAddresses = array_values($customerAddresses);
 
-            $customerAddresses = array_values($customerAddresses);
+                if (!count($customerAddresses) && !Tools::isSubmit('ajax')) {
+                    $bad_delivery = false;
+                    if (($bad_delivery = (bool)!Address::isCountryActiveById((int)$this->context->cart->id_address_delivery)) || !Address::isCountryActiveById((int)$this->context->cart->id_address_invoice)) {
+                        $params = array();
+                        if ($this->step) {
+                            $params['step'] = (int)$this->step;
+                        }
+                        if ($multi = (int)Tools::getValue('multi-shipping')) {
+                            $params['multi-shipping'] = $multi;
+                        }
+                        $back_url = $this->context->link->getPageLink('order', true, (int)$this->context->language->id, $params);
 
-            if (!count($customerAddresses) && !Tools::isSubmit('ajax')) {
-                $bad_delivery = false;
-                if (($bad_delivery = (bool)!Address::isCountryActiveById((int)$this->context->cart->id_address_delivery)) || !Address::isCountryActiveById((int)$this->context->cart->id_address_invoice)) {
-                    $params = array();
-                    if ($this->step) {
-                        $params['step'] = (int)$this->step;
+                        $params = array('back' => $back_url, 'id_address' => ($bad_delivery ? (int)$this->context->cart->id_address_delivery : (int)$this->context->cart->id_address_invoice));
+                        if ($multi) {
+                            $params['multi-shipping'] = $multi;
+                        }
+
                     }
-                    if ($multi = (int)Tools::getValue('multi-shipping')) {
-                        $params['multi-shipping'] = $multi;
-                    }
-                    $back_url = $this->context->link->getPageLink('order', true, (int)$this->context->language->id, $params);
-
-                    $params = array('back' => $back_url, 'id_address' => ($bad_delivery ? (int)$this->context->cart->id_address_delivery : (int)$this->context->cart->id_address_invoice));
-                    if ($multi) {
-                        $params['multi-shipping'] = $multi;
-                    }
-
-                    Tools::redirect($this->context->link->getPageLink('address', true, (int)$this->context->language->id, $params));
                 }
+                $this->context->smarty->assign(array(
+                    'addresses' => $customerAddresses,
+                    'formatedAddressFieldsValuesList' => $formatedAddressFieldsValuesList)
+                );
             }
-            $this->context->smarty->assign(array(
-                'addresses' => $customerAddresses,
-                'formatedAddressFieldsValuesList' => $formatedAddressFieldsValuesList)
-            );
 
             /* Setting default addresses for cart */
             if (count($customerAddresses)) {

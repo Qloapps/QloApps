@@ -26,6 +26,7 @@
 {extends file="helpers/view/view.tpl"}
 
 {block name="override_tpl"}
+	{include file="./translation_inputs_update.tpl"}
 	{if $mod_security_warning}
 	<div class="alert alert-warning">
 		{l s='Apache mod_security is activated on your server. This could result in some Bad Request errors'}

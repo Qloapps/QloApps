@@ -1099,7 +1099,11 @@ $(document).ready(function() {
         e.preventDefault();
 	});
 
-    if (typeof google === 'object') {
+    if (typeof hotel_location == 'object'
+        && $('#room_type_map_tab .map-wrap').length
+        && typeof google == 'object'
+        && typeof google.maps == 'object'
+    ) {
         initMap();
     }
 
@@ -1300,8 +1304,8 @@ function initMap() {
     });
 
     const hotelLatLng = {
-        lat: Number(hotel_loc.latitude),
-        lng: Number(hotel_loc.longitude),
+        lat: Number(hotel_location.latitude),
+        lng: Number(hotel_location.longitude),
     };
 
     map.setCenter(hotelLatLng);
@@ -1443,7 +1447,7 @@ var BookingForm = {
 
         return data;
     },
-    refresh: function() {
+    refresh: function(resetOccupancy = false) {
         BookingForm.currentRequest = $.ajax({
             url: product_controller_url,
             type: 'POST',
@@ -1465,6 +1469,15 @@ var BookingForm = {
                 if (response.status == true) {
                     $('.booking-form').replaceWith(response.html_booking_form);
                     BookingForm.init();
+
+                    if (resetOccupancy) {
+                        BookingForm.resetOccupancy();
+                    }
+                }
+            },
+            error: function(jqXHR) {
+                if (jqXHR.readyState == 0) {
+                    showErrorMessage(no_internet_txt);
                 }
             },
             complete: function() {
@@ -1473,6 +1486,9 @@ var BookingForm = {
             }
         });
     },
+    resetOccupancy: function () {
+        resetOccupancyField($('.booking-form .booking_occupancy_wrapper'));
+    }
 }
 
 function loadHotelImagesByPage(page = 1) {

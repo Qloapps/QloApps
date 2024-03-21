@@ -65,6 +65,10 @@ class Dashtrends extends Module
     public function hookActionAdminControllerSetMedia()
     {
         if (get_class($this->context->controller) == 'AdminDashboardController') {
+            Media::addJsDef(array(
+                'date_txt' => $this->l('Date'),
+            ));
+
             $this->context->controller->addJs($this->_path.'views/js/'.$this->name.'.js');
             $this->context->controller->addCSS($this->_path.'views/css/'.$this->name.'.css');
         }
@@ -106,10 +110,10 @@ class Dashtrends extends Module
             }
         } else {
             $tmp_data['visits'] = AdminStatsController::getVisits(false, $date_from, $date_to, 'day');
-            $tmp_data['orders'] = AdminStatsController::getOrders($date_from, $date_to, 'day', $params['id_hotel']);
-            $tmp_data['total_paid_tax_excl'] = AdminStatsController::getTotalSales($date_from, $date_to, 'day', $params['id_hotel']);
-            $tmp_data['total_purchases'] = AdminStatsController::getPurchases($date_from, $date_to, 'day', $params['id_hotel']);
-            $tmp_data['total_expenses'] = AdminStatsController::getExpenses($date_from, $date_to, 'day', $params['id_hotel']);
+            $tmp_data['orders'] = AdminStatsController::getOrders($date_from, $date_to, 'day', $id_hotel);
+            $tmp_data['total_paid_tax_excl'] = AdminStatsController::getTotalSales($date_from, $date_to, 'day', $id_hotel);
+            $tmp_data['total_purchases'] = AdminStatsController::getPurchases($date_from, $date_to, 'day', $id_hotel);
+            $tmp_data['total_expenses'] = AdminStatsController::getExpenses($date_from, $date_to, 'day', $id_hotel);
         }
 
         return $tmp_data;
@@ -143,8 +147,7 @@ class Dashtrends extends Module
             $refined_data['orders'][$date] = isset($gross_data['orders'][$date]) ? $gross_data['orders'][$date] : 0;
             $refined_data['average_cart_value'][$date] = $refined_data['orders'][$date] ? $refined_data['sales'][$date] / $refined_data['orders'][$date] : 0;
             $refined_data['visits'][$date] = isset($gross_data['visits'][$date]) ? $gross_data['visits'][$date] : 0;
-            $refined_data['conversion_rate'][$date] = $refined_data['visits'][$date] ? $refined_data['orders'][$date] / $refined_data['visits'][$date] : 0;
-
+            $refined_data['conversion_rate'][$date] = $refined_data['visits'][$date] ? ($refined_data['orders'][$date] / $refined_data['visits'][$date] * 100) : 0;
             $refined_data['net_profits'][$date] += (isset($gross_data['total_paid_tax_excl'][$date]) ? $gross_data['total_paid_tax_excl'][$date] : 0);
             $refined_data['net_profits'][$date] -= (isset($gross_data['total_purchases'][$date]) ? $gross_data['total_purchases'][$date] : 0);
             $refined_data['net_profits'][$date] -= (isset($gross_data['total_expenses'][$date]) ? $gross_data['total_expenses'][$date] : 0);
@@ -311,7 +314,7 @@ class Dashtrends extends Module
 
         $charts = array(
             'sales' => $this->l('Sales'),
-            'orders' => $this->l('Bookings'),
+            'orders' => $this->l('Orders'),
             'average_cart_value' => $this->l('Average Order Value'),
             'visits' => $this->l('Visits'),
             'conversion_rate' => $this->l('Conversion Rate'),

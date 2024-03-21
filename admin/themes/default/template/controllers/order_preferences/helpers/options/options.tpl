@@ -24,4 +24,9 @@
 *}
 {extends file="helpers/options/options.tpl"}
 
-{block name="after"}<script type="text/javascript">changeCMSActivationAuthorization();</script>{/block}
+{block name="after"}
+<script type="text/javascript">
+    changeCMSActivationAuthorization();
+    changeOverbookingOrderAction();
+</script>
+{/block}

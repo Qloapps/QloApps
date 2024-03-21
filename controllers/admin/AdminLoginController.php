@@ -45,6 +45,17 @@ class AdminLoginControllerCore extends AdminController
         }
     }
 
+    public function init()
+    {
+        parent::init();
+
+        if ($this->ajax && Tools::getValue('action') == 'checkLoginStatus') {
+            $this->ajaxDie(json_encode(array(
+                'is_logged_in' => $this->context->employee->isLoggedBack(),
+            )));
+        }
+    }
+
     public function setMedia()
     {
         $this->addJquery();

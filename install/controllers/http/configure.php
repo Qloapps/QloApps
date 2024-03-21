@@ -277,11 +277,12 @@ class InstallControllerHttpConfigure extends InstallControllerHttp
         $this->list_countries = array();
         $countries = $this->language->getCountries();
         $top_countries = array(
-            'fr', 'es', 'us',
-            'gb', 'it', 'de',
-            'nl', 'pl', 'id',
-            'be', 'br', 'se',
-            'ca', 'ru', 'cn',
+            'in', 'fr', 'es',
+            'us', 'gb', 'it',
+            'de', 'nl', 'pl',
+            'id', 'be', 'br',
+            'se', 'ca', 'ru',
+            'cn',
         );
 
         foreach ($top_countries as $iso) {
