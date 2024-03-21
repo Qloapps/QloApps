@@ -5173,13 +5173,14 @@ class AdminOrdersControllerCore extends AdminController
         $new_date_to = trim(date('Y-m-d', strtotime($product_informations['date_to'])));
         $obj_booking_detail = new HotelBookingDetail();
         $product_quantity = (int) $obj_booking_detail->getNumberOfDays($new_date_from, $new_date_to);
+        $id_room = Tools::getValue('id_room');
 
         if (trim(Tools::getValue('id_hotel')) == '') {
             die(json_encode(array(
                 'result' => false,
                 'error' => Tools::displayError('Hotel Id is mising.'),
             )));
-        } elseif (trim(Tools::getValue('id_room')) == '') {
+        } elseif (trim($id_room) == '') {
             die(json_encode(array(
                 'result' => false,
                 'error' => Tools::displayError('Room Id is missing.'),
@@ -5235,7 +5236,20 @@ class AdminOrdersControllerCore extends AdminController
         if ($rooms_booked) {
             die(json_encode(array(
                 'result' => false,
-                'error' => Tools::displayError('This Room Unavailable For Selected Duration.'),
+                'error' => Tools::displayError('This Room is Unavailable For Selected Duration.'),
+            )));
+        }
+
+        $objHotelRoomDisableDates = new HotelRoomDisableDates();
+        $params = array(
+            'id_room' => $id_room,
+            'date_from' => $new_date_from,
+            'date_to' => $new_date_to
+        );
+        if ($objHotelRoomDisableDates->checkIfRoomAlreadyDisabledInDateRange($params)) {
+            die(json_encode(array(
+                'result' => false,
+                'error' => Tools::displayError('This Room is Disabled in Selected Duration.'),
             )));
         }
     }

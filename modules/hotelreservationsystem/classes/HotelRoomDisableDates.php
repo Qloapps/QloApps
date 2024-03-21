@@ -118,4 +118,17 @@ class HotelRoomDisableDates extends ObjectModel
 
         return Db::getInstance()->delete('htl_room_disable_dates', '`id_room_type`='.(int)$idRoomType);
     }
+
+    public function checkIfRoomAlreadyDisabledInDateRange($params)
+    {
+        return Db::getInstance()->getValue('
+            SELECT `id` FROM `'._DB_PREFIX_.'htl_room_disable_dates`
+            WHERE `id_room` = '.(int)$params['id_room'].'
+            AND (
+                `date_from` BETWEEN  \''.pSQL($params['date_from']).'\' AND \''.pSQL($params['date_to']).'\'
+                OR `date_to` BETWEEN  \''.pSQL($params['date_from']).'\' AND \''.pSQL($params['date_to']).'\'
+            )'
+        );
+    }
+
 }
