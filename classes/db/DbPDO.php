@@ -103,7 +103,7 @@ class DbPDOCore extends Db
         }
 
         // UTF-8 support
-        if ($this->link->exec('SET NAMES \'utf8\'') === false) {
+        if ($this->link->exec('SET NAMES \'utf8mb4\'') === false) {
             throw new PrestaShopException('PrestaShop Fatal error: no utf-8 support. Please check your server configuration.');
         }
 

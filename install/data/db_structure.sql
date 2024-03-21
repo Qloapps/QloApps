@@ -26,10 +26,10 @@ CREATE TABLE `PREFIX_address` (
   `id_supplier` int(10) unsigned NOT NULL DEFAULT '0',
   `id_warehouse` int(10) unsigned NOT NULL DEFAULT '0',
   `id_hotel` int(10) unsigned NOT NULL DEFAULT '0',
-  `alias` varchar(32) NOT NULL,
+  `alias` varchar(32) CHARACTER SET utf8mb4,
   `company` varchar(255) DEFAULT NULL,
-  `lastname` varchar(32) NOT NULL,
-  `firstname` varchar(32) NOT NULL,
+  `lastname` varchar(32) CHARACTER SET utf8mb4 NOT NULL,
+  `firstname` varchar(32) CHARACTER SET utf8mb4 NOT NULL,
   `address1` varchar(128) NOT NULL,
   `address2` varchar(128) DEFAULT NULL,
   `postcode` varchar(12) DEFAULT NULL,
@@ -209,7 +209,7 @@ CREATE TABLE `PREFIX_cart_rule` (
 	`id_customer` int unsigned NOT NULL DEFAULT '0',
 	`date_from` datetime NOT NULL,
 	`date_to` datetime NOT NULL,
-	`description` text,
+	`description` text CHARACTER SET utf8mb4,
 	`quantity` int(10) unsigned NOT NULL DEFAULT '0',
 	`quantity_per_user` int(10) unsigned NOT NULL DEFAULT '0',
 	`priority` int(10) unsigned NOT NULL DEFAULT 1,
@@ -247,7 +247,7 @@ CREATE TABLE `PREFIX_cart_rule` (
 CREATE TABLE `PREFIX_cart_rule_lang` (
 	`id_cart_rule` int(10) unsigned NOT NULL,
 	`id_lang` int(10) unsigned NOT NULL,
-	`name` varchar(254) NOT NULL,
+	`name` varchar(254) CHARACTER SET utf8mb4 NOT NULL,
 	PRIMARY KEY (`id_cart_rule`, `id_lang`)
 ) ENGINE=ENGINE_TYPE DEFAULT CHARSET=utf8 COLLATION;
 
@@ -356,12 +356,12 @@ CREATE TABLE `PREFIX_category_lang` (
   `id_category` int(10) unsigned NOT NULL,
   `id_shop` INT( 11 ) UNSIGNED NOT NULL DEFAULT '1',
   `id_lang` int(10) unsigned NOT NULL,
-  `name` varchar(128) NOT NULL,
-  `description` text,
+  `name` varchar(128) CHARACTER SET utf8mb4 NOT NULL,
+  `description` text CHARACTER SET utf8mb4,
   `link_rewrite` varchar(128) NOT NULL,
-  `meta_title` varchar(128) DEFAULT NULL,
+  `meta_title` varchar(128) CHARACTER SET utf8mb4 DEFAULT NULL,
   `meta_keywords` varchar(255) DEFAULT NULL,
-  `meta_description` varchar(255) DEFAULT NULL,
+  `meta_description` varchar(255) CHARACTER SET utf8mb4 DEFAULT NULL,
   PRIMARY KEY (`id_category`,`id_shop`, `id_lang`),
   KEY `category_name` (`name`)
 ) ENGINE=ENGINE_TYPE DEFAULT CHARSET=utf8 COLLATION;
@@ -388,10 +388,10 @@ CREATE TABLE `PREFIX_cms_lang` (
   `id_cms` int(10) unsigned NOT NULL,
   `id_lang` int(10) unsigned NOT NULL,
   `id_shop` int(10) unsigned NOT NULL DEFAULT '1',
-  `meta_title` varchar(128) NOT NULL,
-  `meta_description` varchar(255) DEFAULT NULL,
+  `meta_title` varchar(128) CHARACTER SET utf8mb4 NOT NULL,
+  `meta_description` varchar(255) CHARACTER SET utf8mb4 DEFAULT NULL,
   `meta_keywords` varchar(255) DEFAULT NULL,
-  `content` longtext,
+  `content` longtext CHARACTER SET utf8mb4,
   `link_rewrite` varchar(128) NOT NULL,
   PRIMARY KEY (`id_cms`, `id_shop`, `id_lang`)
 ) ENGINE=ENGINE_TYPE DEFAULT CHARSET=utf8 COLLATION;
@@ -412,12 +412,12 @@ CREATE TABLE `PREFIX_cms_category_lang` (
   `id_cms_category` int(10) unsigned NOT NULL,
   `id_lang` int(10) unsigned NOT NULL,
   `id_shop` int(10) unsigned NOT NULL DEFAULT '1',
-  `name` varchar(128) NOT NULL,
-  `description` text,
+  `name` varchar(128) CHARACTER SET utf8mb4 NOT NULL,
+  `description` text CHARACTER SET utf8mb4,
   `link_rewrite` varchar(128) NOT NULL,
-  `meta_title` varchar(128) DEFAULT NULL,
+  `meta_title` varchar(128) CHARACTER SET utf8mb4 DEFAULT NULL,
   `meta_keywords` varchar(255) DEFAULT NULL,
-  `meta_description` varchar(255) DEFAULT NULL,
+  `meta_description` varchar(255) CHARACTER SET utf8mb4 DEFAULT NULL,
   PRIMARY KEY (`id_cms_category`, `id_shop`, `id_lang`),
   KEY `category_name` (`name`)
 ) ENGINE=ENGINE_TYPE DEFAULT CHARSET=utf8 COLLATION;
@@ -448,7 +448,7 @@ CREATE TABLE `PREFIX_configuration` (
   `id_shop_group` INT(11) UNSIGNED DEFAULT NULL,
   `id_shop` INT(11) UNSIGNED DEFAULT NULL,
   `name` varchar(254) NOT NULL,
-  `value` text,
+  `value` text CHARACTER SET utf8mb4,
   `date_add` datetime NOT NULL,
   `date_upd` datetime NOT NULL,
   PRIMARY KEY (`id_configuration`),
@@ -460,7 +460,7 @@ CREATE TABLE `PREFIX_configuration` (
 CREATE TABLE `PREFIX_configuration_lang` (
   `id_configuration` int(10) unsigned NOT NULL,
   `id_lang` int(10) unsigned NOT NULL,
-  `value` text,
+  `value` text CHARACTER SET utf8mb4,
   `date_upd` datetime DEFAULT NULL,
   PRIMARY KEY (`id_configuration`,`id_lang`)
 ) ENGINE=ENGINE_TYPE DEFAULT CHARSET=utf8 COLLATION;
@@ -535,8 +535,8 @@ CREATE TABLE `PREFIX_contact` (
 CREATE TABLE `PREFIX_contact_lang` (
   `id_contact` int(10) unsigned NOT NULL,
   `id_lang` int(10) unsigned NOT NULL,
-  `name` varchar(32) NOT NULL,
-  `description` text,
+  `name` varchar(32) CHARACTER SET utf8mb4 NOT NULL,
+  `description` text CHARACTER SET utf8mb4,
   PRIMARY KEY (`id_contact`,`id_lang`)
 ) ENGINE=ENGINE_TYPE DEFAULT CHARSET=utf8 COLLATION;
 
@@ -811,7 +811,7 @@ CREATE TABLE `PREFIX_feature` (
 CREATE TABLE `PREFIX_feature_lang` (
   `id_feature` int(10) unsigned NOT NULL,
   `id_lang` int(10) unsigned NOT NULL,
-  `name` varchar(128) DEFAULT NULL,
+  `name` varchar(128) CHARACTER SET utf8mb4 DEFAULT NULL,
   PRIMARY KEY (`id_feature`,`id_lang`),
   KEY (`id_lang`,`name`)
 ) ENGINE=ENGINE_TYPE DEFAULT CHARSET=utf8 COLLATION;
@@ -867,7 +867,7 @@ CREATE TABLE `PREFIX_group` (
 CREATE TABLE `PREFIX_group_lang` (
   `id_group` int(10) unsigned NOT NULL,
   `id_lang` int(10) unsigned NOT NULL,
-  `name` varchar(32) NOT NULL,
+  `name` varchar(32) CHARACTER SET utf8mb4 NOT NULL,
   PRIMARY KEY (`id_group`,`id_lang`)
 ) ENGINE=ENGINE_TYPE DEFAULT CHARSET=utf8 COLLATION;
 
@@ -1059,10 +1059,10 @@ CREATE TABLE `PREFIX_meta` (
 
 CREATE TABLE `PREFIX_meta_lang` (
   `id_meta` int(10) unsigned NOT NULL,
-   `id_shop` INT(11) UNSIGNED NOT NULL DEFAULT '1',
+  `id_shop` INT(11) UNSIGNED NOT NULL DEFAULT '1',
   `id_lang` int(10) unsigned NOT NULL,
-  `title` varchar(128) DEFAULT NULL,
-  `description` varchar(255) DEFAULT NULL,
+  `title` varchar(128) CHARACTER SET utf8mb4 DEFAULT NULL,
+  `description` varchar(255) CHARACTER SET utf8mb4 DEFAULT NULL,
   `keywords` varchar(255) DEFAULT NULL,
   `url_rewrite` varchar(254) NOT NULL,
   PRIMARY KEY (`id_meta`, `id_shop`, `id_lang`),
@@ -1236,7 +1236,7 @@ CREATE TABLE `PREFIX_order_detail` (
   `id_shop` int(11) unsigned NOT NULL,
   `product_id` int(10) unsigned NOT NULL,
   `product_attribute_id` int(10) unsigned DEFAULT NULL,
-  `product_name` varchar(255) NOT NULL,
+  `product_name` varchar(255) CHARACTER SET utf8mb4 NOT NULL,
   `product_quantity` int(10) unsigned NOT NULL DEFAULT '0',
   `product_quantity_in_stock` int(10) NOT NULL DEFAULT '0',
   `product_quantity_refunded` int(10) unsigned NOT NULL DEFAULT '0',
@@ -1292,7 +1292,7 @@ CREATE TABLE `PREFIX_order_cart_rule` (
   `id_order` int(10) unsigned NOT NULL,
   `id_cart_rule` int(10) unsigned NOT NULL,
   `id_order_invoice` int(10) unsigned DEFAULT '0',
-  `name` varchar(254) NOT NULL,
+  `name` varchar(254) CHARACTER SET utf8mb4 NOT NULL,
   `value` decimal(17,2) NOT NULL DEFAULT '0.00',
   `value_tax_excl` decimal(17,2) NOT NULL DEFAULT '0.00',
   `free_shipping` tinyint(1) NOT NULL DEFAULT '0',
@@ -1689,13 +1689,13 @@ CREATE TABLE `PREFIX_product_lang` (
   `id_product` int(10) unsigned NOT NULL,
   `id_shop` INT( 11 ) UNSIGNED NOT NULL DEFAULT '1',
   `id_lang` int(10) unsigned NOT NULL,
-  `description` text,
-  `description_short` text,
+  `description` text CHARACTER SET utf8mb4,
+  `description_short` text CHARACTER SET utf8mb4,
   `link_rewrite` varchar(128) NOT NULL,
-  `meta_description` varchar(255) DEFAULT NULL,
+  `meta_description` varchar(255) CHARACTER SET utf8mb4 DEFAULT NULL,
   `meta_keywords` varchar(255) DEFAULT NULL,
-  `meta_title` varchar(128) DEFAULT NULL,
-  `name` varchar(128) NOT NULL,
+  `meta_title` varchar(128) CHARACTER SET utf8mb4 DEFAULT NULL,
+  `name` varchar(128) CHARACTER SET utf8mb4 NOT NULL,
   `available_now` varchar(255) DEFAULT NULL,
   `available_later` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id_product`, `id_shop` , `id_lang`),

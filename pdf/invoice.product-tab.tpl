@@ -59,12 +59,12 @@
 							{/if}
 							<td class="product center">
 								<p class="product-name">
-									{$data_v['name']}
+									{Tools::stripEmojis($data_v['name'])}
 								</p>
 							</td>
 							<td class="product center">
 								<p>
-									{$data_v['hotel_name']}
+									{Tools::stripEmojis($data_v['hotel_name'])}
 								</p>
 							</td>
 							<td class="product center">

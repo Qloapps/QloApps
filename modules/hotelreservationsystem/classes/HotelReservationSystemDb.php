@@ -73,10 +73,10 @@ class HotelReservationSystemDb
             "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."htl_branch_info_lang` (
                 `id` int(10) unsigned NOT NULL,
                 `id_lang` int(10) unsigned NOT NULL,
-                `hotel_name` varchar(255) DEFAULT NULL,
-                `short_description` text,
-                `description` text,
-                `policies` text,
+                `hotel_name` varchar(255) CHARACTER SET utf8mb4 DEFAULT NULL,
+                `short_description` text CHARACTER SET utf8mb4,
+                `description` text CHARACTER SET utf8mb4,
+                `policies` text CHARACTER SET utf8mb4,
                 PRIMARY KEY (`id`, `id_lang`)
             ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8;",
 
@@ -109,7 +109,7 @@ class HotelReservationSystemDb
             "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."htl_features_lang` (
                 `id` int(10) unsigned NOT NULL,
                 `id_lang` int(10) unsigned NOT NULL,
-                `name` varchar(255) NOT NULL,
+                `name` varchar(255) CHARACTER SET utf8mb4 NOT NULL,
                 PRIMARY KEY (`id`, `id_lang`)
             ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8;",
 
@@ -159,8 +159,8 @@ class HotelReservationSystemDb
                 `total_price_tax_incl` decimal(20,6) NOT NULL,
                 `total_paid_amount` decimal(20,6) NOT NULL DEFAULT '0.000000',
                 `is_back_order` tinyint(4) NOT NULL,
-                `hotel_name` varchar(255) DEFAULT NULL,
-                `room_type_name` varchar(255) DEFAULT NULL,
+                `hotel_name` varchar(255) CHARACTER SET utf8mb4 DEFAULT NULL,
+                `room_type_name` varchar(255) CHARACTER SET utf8mb4 DEFAULT NULL,
                 `city` varchar(255) NOT NULL,
                 `state` varchar(255) DEFAULT NULL,
                 `country` varchar(255) DEFAULT NULL,
@@ -194,7 +194,7 @@ class HotelReservationSystemDb
             "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."htl_booking_demands` (
                 `id_booking_demand` int(11) NOT NULL AUTO_INCREMENT,
                 `id_htl_booking` int(11) NOT NULL,
-                `name` varchar(255) character set utf8 NOT NULL,
+                `name` varchar(255) CHARACTER SET utf8mb4 NOT NULL,
                 `unit_price_tax_excl` decimal(20,6) NOT NULL DEFAULT '0.000000',
                 `unit_price_tax_incl` decimal(20,6) NOT NULL DEFAULT '0.000000',
                 `total_price_tax_excl` decimal(20,6) NOT NULL DEFAULT '0.000000',
@@ -211,7 +211,7 @@ class HotelReservationSystemDb
                 `id_booking_demand` int(11) NOT NULL AUTO_INCREMENT,
                 `id_tax` int(11) NOT NULL,
                 `unit_amount` DECIMAL(16, 6) NOT NULL DEFAULT '0.00',
-                  `total_amount` DECIMAL(16, 6) NOT NULL DEFAULT '0.00',
+                `total_amount` DECIMAL(16, 6) NOT NULL DEFAULT '0.00',
                 PRIMARY KEY (`id_booking_demand`, `id_tax`)
             ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;",
 
@@ -249,8 +249,8 @@ class HotelReservationSystemDb
             "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."htl_order_refund_rules_lang` (
                 `id_refund_rule` int(10) unsigned NOT NULL,
                 `id_lang` int(10) unsigned NOT NULL,
-                `name` varchar(255) DEFAULT NULL,
-                `description` text,
+                `name` varchar(255) CHARACTER SET utf8mb4 DEFAULT NULL,
+                `description` text CHARACTER SET utf8mb4,
                 PRIMARY KEY (`id_refund_rule`, `id_lang`)
             ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8;",
 
@@ -299,7 +299,7 @@ class HotelReservationSystemDb
             "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."htl_room_type_feature_pricing_lang` (
                 `id_feature_price` int(10) unsigned NOT NULL,
                 `id_lang` int(10) unsigned NOT NULL,
-                `feature_price_name` varchar(255) character set utf8 NOT NULL,
+                `feature_price_name` varchar(255) CHARACTER SET utf8mb4 NOT NULL,
                 PRIMARY KEY (`id_feature_price`, `id_lang`)
             ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8;",
 
@@ -322,7 +322,7 @@ class HotelReservationSystemDb
             "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."htl_room_type_global_demand_lang` (
                 `id_global_demand` int(10) unsigned NOT NULL,
                 `id_lang` int(10) unsigned NOT NULL,
-                `name` varchar(255) character set utf8 NOT NULL,
+                `name` varchar(255) CHARACTER SET utf8mb4 NOT NULL,
                 PRIMARY KEY (`id_global_demand`, `id_lang`)
             ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8;",
 
@@ -338,7 +338,7 @@ class HotelReservationSystemDb
             "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."htl_room_type_global_demand_advance_option_lang` (
                 `id_option` int(10) unsigned NOT NULL,
                 `id_lang` int(10) unsigned NOT NULL,
-                `name` varchar(255) character set utf8 NOT NULL,
+                `name` varchar(255) CHARACTER SET utf8mb4 NOT NULL,
                 PRIMARY KEY (`id_option`, `id_lang`)
             ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8;",
 
@@ -414,7 +414,7 @@ class HotelReservationSystemDb
                 `unit_price_tax_incl` decimal(20,6) NOT NULL,
                 `total_price_tax_excl` decimal(20,6) NOT NULL,
                 `total_price_tax_incl` decimal(20,6) NOT NULL,
-                `name` varchar(255) DEFAULT NULL,
+                `name` varchar(255) CHARACTER SET utf8mb4 DEFAULT NULL,
                 `quantity` INT(11) UNSIGNED NOT NULL,
                 `auto_added` tinyint(1) unsigned NOT NULL,
                 `date_add` datetime NOT NULL,

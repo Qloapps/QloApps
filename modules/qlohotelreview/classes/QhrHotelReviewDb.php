@@ -42,8 +42,8 @@ class QhrHotelReviewDb
                 `id_hotel` INT(10) NOT NULL,
                 `id_order` INT(10) NOT NULL,
                 `rating` FLOAT UNSIGNED NOT NULL,
-                `subject` VARCHAR(255) NOT NULL,
-                `description` TEXT NOT NULL,
+                `subject` VARCHAR(255) CHARACTER SET utf8mb4 NOT NULL,
+                `description` TEXT CHARACTER SET utf8mb4 NOT NULL,
                 `status_abusive` TINYINT(1) DEFAULT 0,
                 `status` TINYINT(1) DEFAULT 0,
                 `date_add` DATETIME NOT NULL,
@@ -62,7 +62,7 @@ class QhrHotelReviewDb
             "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."qhr_category_lang` (
                 `id_category` INT(10) NOT NULL,
                 `id_lang` INT(10) NOT NULL,
-                `name` VARCHAR(255) NOT NULL,
+                `name` VARCHAR(255) CHARACTER SET utf8mb4 NOT NULL,
                 PRIMARY KEY (`id_category`, `id_lang`)
             ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8",
 
@@ -89,7 +89,7 @@ class QhrHotelReviewDb
                 `id_review_reply` INT(10) NOT NULL AUTO_INCREMENT,
                 `id_hotel_review` INT(10) NOT NULL,
                 `id_employee` INT(10) NOT NULL DEFAULT 0,
-                `message` TEXT NOT NULL,
+                `message` TEXT CHARACTER SET utf8mb4 NOT NULL,
                 `date_add` DATETIME NOT NULL,
                 PRIMARY KEY (`id_review_reply`)
             ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8",
