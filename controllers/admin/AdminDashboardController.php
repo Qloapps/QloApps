@@ -27,7 +27,7 @@
 class AdminDashboardControllerCore extends AdminController
 {
 
-    const DASHBOARD_RECOMMENDATION_CONTENT = '/cache/dashboard_recommendation.html';
+    const RECOMMENDATION_CONTENT_FILE_PATH = '/cache/dashboard_recommendation.html';
 
     public function __construct()
     {
@@ -501,16 +501,5 @@ class AdminDashboardControllerCore extends AdminController
         }
 
         die(json_encode($return));
-    }
-
-    public function getRecommendationContent()
-    {
-        if (!Tools::isFresh(self::DASHBOARD_RECOMMENDATION_CONTENT, _TIME_1_DAY_, false)) {
-            @file_put_contents(_PS_ROOT_DIR_.self::DASHBOARD_RECOMMENDATION_CONTENT, Tools::addonsRequest('dashboard-recommendation'));
-        }
-        if (file_exists(_PS_ROOT_DIR_.self::DASHBOARD_RECOMMENDATION_CONTENT)) {
-            return Tools::file_get_contents(_PS_ROOT_DIR_.self::DASHBOARD_RECOMMENDATION_CONTENT);
-        }
-        return false;
     }
 }
