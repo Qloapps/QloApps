@@ -92,40 +92,37 @@
 
             <div class="card payment-details visible-xs visible-sm hidden-md hidden-lg">
                 <div class="card-header">
-                    {l s='Payment'}
+                    {l s='Payment Details'}
                 </div>
                 <div class="card-body">
-                    <div class="payment-details-table">
-                        <table class="table table-sm table-responsive table-summary">
-                            <tbody>
-                                <tr>
-                                    <td>{l s='Payment Method'}</td>
-                                    <td class="text-right payment-method">
-                                        {if $invoice && $invoiceAllowed}
-                                            <span class="icon-pdf"></span>
-                                            <a target="_blank" href="{$link->getPageLink('pdf-invoice', true)}?id_order={$order->id|intval}{if $is_guest}&amp;secure_key={$order->secure_key|escape:'html':'UTF-8'}{/if}" title="{l s='Click here to download invoice.'}">
-                                                <span>{$order->payment|escape:'html':'UTF-8'}</span>
-                                            </a>
-                                        {else}
-                                            {$order->payment|escape:'html':'UTF-8'}
-                                        {/if}
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>{l s='Status'}</td>
-                                    <td class="text-right status">
-                                        <span{if isset($order_history[0].color) && $order_history[0].color} style="background-color:{$order_history[0].color|escape:'html':'UTF-8'}30; border: 1px solid {$order_history[0].color|escape:'html':'UTF-8'};" {/if} class="label">
-                                            {if $order_history[0].id_order_state|in_array:$overbooking_order_states}
-                                                {l s='Order Not Confirmed'}
-                                            {else}
-                                                {$order_history[0].ostate_name|escape:'html':'UTF-8'}
-                                            {/if}
-                                        </span>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+                    <div class="detail-row">
+                        <div class=" title">{l s='Payment Method'}</div>
+                        <div class=" value payment-method">
+                            {if $invoice && $invoiceAllowed}
+                                <span class="icon-pdf"></span>
+                                <a target="_blank" href="{$link->getPageLink('pdf-invoice', true)}?id_order={$order->id|intval}{if $is_guest}&amp;secure_key={$order->secure_key|escape:'html':'UTF-8'}{/if}" title="{l s='Click here to download invoice.'}">
+                                    <span>{$order->payment|escape:'html':'UTF-8'}</span>
+                                </a>
+                            {else}
+                                {$order->payment|escape:'html':'UTF-8'}
+                            {/if}
+                        </div>
                     </div>
+
+                    <div class="detail-row">
+                        <div class="pull-left title">{l s='Status'}</div>
+                        <div class="pull-right value status">
+                            <span{if isset($order_history[0].color) && $order_history[0].color} style="background-color:{$order_history[0].color|escape:'html':'UTF-8'}30; border: 1px solid {$order_history[0].color|escape:'html':'UTF-8'};" {/if} class="label">
+                                {if $order_history[0].id_order_state|in_array:$overbooking_order_states}
+                                    {l s='Order Not Confirmed'}
+                                {else}
+                                    {$order_history[0].ostate_name|escape:'html':'UTF-8'}
+                                {/if}
+                            </span>
+                        </div>
+                    </div>
+
+                    {hook h='displayOrderDetailPaymentDetailsRow' id_order=$order->id}
                 </div>
             </div>
 
@@ -151,6 +148,8 @@
                             <div class="booking-hotel-map-container"></div>
                         </div>
                     {/if}
+
+                    {hook h='displayOrderDetailHotelLocationAfter' id_order=$order->id}
                 </div>
             </div>
 
@@ -196,6 +195,7 @@
                         {else}
                             {l s='No rooms found.'}
                         {/if}
+                        {hook h='displayOrderDetailRoomDetailsRoomAfter' id_order=$order->id}
                     </div>
                 </div>
             </div>
@@ -282,9 +282,13 @@
                                         </td>
                                     </tr>
                                 {/if}
+
+                                {hook h='displayOrderDetailPaymentSummaryRow' id_order=$order->id}
                             </tbody>
                         </table>
                     </div>
+
+                    {hook h='displayOrderDetailPaymentSummaryAfter' id_order=$order->id}
                 </div>
             </div>
 
@@ -341,9 +345,13 @@
                                         </tr>
                                     {/if}
                                 {/if}
+
+                                {hook h='displayOrderDetailGuestDetailsRow' id_order=$order->id}
                             </tbody>
                         </table>
                     </div>
+
+                    {hook h='displayOrderDetailGuestDetailsAfter' id_order=$order->id}
                 </div>
             </div>
 
@@ -407,6 +415,8 @@
                 </div>
             {/if}
 
+            {hook h='displayOrderDetailMessagesBefore' id_order=$order->id}
+
             {if !$is_guest}
                 <div class="card add-order-message" id="add-order-message">
                     <div class="card-header">
@@ -455,40 +465,37 @@
 
             <div class="card payment-details hidden-xs hidden-sm visible-md">
                 <div class="card-header">
-                    {l s='Payment'}
+                    {l s='Payment Details'}
                 </div>
                 <div class="card-body">
-                    <div class="payment-details-table">
-                        <table class="table table-sm table-responsive table-summary">
-                            <tbody>
-                                <tr>
-                                    <td>{l s='Payment Method'}</td>
-                                    <td class="text-right payment-method">
-                                        {if $invoice && $invoiceAllowed}
-                                            <span class="icon-pdf"></span>
-                                            <a target="_blank" href="{$link->getPageLink('pdf-invoice', true)}?id_order={$order->id|intval}{if $is_guest}&amp;secure_key={$order->secure_key|escape:'html':'UTF-8'}{/if}" title="{l s='Click here to download invoice.'}">
-                                                <span>{$order->payment|escape:'html':'UTF-8'}</span>
-                                            </a>
-                                        {else}
-                                            {$order->payment|escape:'html':'UTF-8'}
-                                        {/if}
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>{l s='Status'}</td>
-                                    <td class="text-right status">
-                                        <span{if isset($order_history[0].color) && $order_history[0].color} style="background-color:{$order_history[0].color|escape:'html':'UTF-8'}30; border: 1px solid {$order_history[0].color|escape:'html':'UTF-8'};" {/if} class="label">
-                                            {if $order_history[0].id_order_state|in_array:$overbooking_order_states}
-                                                {l s='Order Not Confirmed'}
-                                            {else}
-                                                {$order_history[0].ostate_name|escape:'html':'UTF-8'}
-                                            {/if}
-                                        </span>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+                    <div class="detail-row">
+                        <div class=" title">{l s='Payment Method'}</div>
+                        <div class=" value payment-method">
+                            {if $invoice && $invoiceAllowed}
+                                <span class="icon-pdf"></span>
+                                <a target="_blank" href="{$link->getPageLink('pdf-invoice', true)}?id_order={$order->id|intval}{if $is_guest}&amp;secure_key={$order->secure_key|escape:'html':'UTF-8'}{/if}" title="{l s='Click here to download invoice.'}">
+                                    <span>{$order->payment|escape:'html':'UTF-8'}</span>
+                                </a>
+                            {else}
+                                {$order->payment|escape:'html':'UTF-8'}
+                            {/if}
+                        </div>
                     </div>
+
+                    <div class="detail-row">
+                        <div class="pull-left title">{l s='Status'}</div>
+                        <div class="pull-right value status">
+                            <span{if isset($order_history[0].color) && $order_history[0].color} style="background-color:{$order_history[0].color|escape:'html':'UTF-8'}30; border: 1px solid {$order_history[0].color|escape:'html':'UTF-8'};" {/if} class="label">
+                                {if $order_history[0].id_order_state|in_array:$overbooking_order_states}
+                                    {l s='Order Not Confirmed'}
+                                {else}
+                                    {$order_history[0].ostate_name|escape:'html':'UTF-8'}
+                                {/if}
+                            </span>
+                        </div>
+                    </div>
+
+                    {hook h='displayOrderDetailPaymentDetailsRow' id_order=$order->id}
                 </div>
             </div>
 
@@ -514,6 +521,8 @@
                             <div class="booking-hotel-map-container"></div>
                         </div>
                     {/if}
+
+                    {hook h='displayOrderDetailHotelLocationAfter' id_order=$order->id}
                 </div>
             </div>
 
@@ -599,9 +608,13 @@
                                         </td>
                                     </tr>
                                 {/if}
+
+                                {hook h='displayOrderDetailPaymentSummaryRow' id_order=$order->id}
                             </tbody>
                         </table>
                     </div>
+
+                    {hook h='displayOrderDetailPaymentSummaryAfter' id_order=$order->id}
                 </div>
             </div>
 
@@ -658,9 +671,13 @@
                                         </tr>
                                     {/if}
                                 {/if}
+
+                                {hook h='displayOrderDetailGuestDetailsRow' id_order=$order->id}
                             </tbody>
                         </table>
                     </div>
+
+                    {hook h='displayOrderDetailGuestDetailsAfter' id_order=$order->id}
                 </div>
             </div>
 

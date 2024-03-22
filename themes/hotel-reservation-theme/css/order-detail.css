@@ -34,6 +34,7 @@
     border-radius: 4px;
     color: #FFF;
     font-size: 18px;
+    line-height: 27px;
     margin-bottom: 30px;
 }
 
@@ -172,32 +173,41 @@
     margin-top: 0;
 }
 
-.payment-details .table-summary td:first-child {
+.payment-details .detail-row {
+    font-size: 16px;
+    line-height: 22px;
+    margin-top: 7px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.payment-details .detail-row .title {
     font-weight: bold;
 }
 
-.payment-details .table-summary .payment-method .icon-pdf {
+.payment-details .detail-row .payment-method .icon-pdf {
     width: 24px;
     height: 24px;
     background-image: url('../img/icon/pdf.png');
 }
 
-.payment-details .table-summary .payment-method a {
+.payment-details .detail-row .payment-method a {
     color: #333;
     font-weight: bold;
     position: relative;
     top: -6px;
 }
 
-.payment-details .table-summary .payment-method span {
+.payment-details .detail-row .payment-method span {
     text-decoration: underline;
 }
 
-.payment-details .table-summary .status {
+.payment-details .detail-row .status {
     font-size: 12px;
 }
 
-.payment-details .table-summary .status span {
+.payment-details .detail-row .status span {
     line-height: 16px;
 }
 
@@ -251,7 +261,7 @@
 }
 
 .room-details .booking-room-detail {
-    padding: 20px;
+    padding: 18px;
     position: relative;
 }
 
@@ -857,7 +867,7 @@
 }
 
 #create-new-refund-popup .tab-content .room-details {
-    padding: 10px 15px;
+    padding: 13px 15px 10px;
 }
 
 #create-new-refund-popup .tab-content .room-details.cancelled {

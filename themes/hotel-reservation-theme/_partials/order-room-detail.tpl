@@ -35,13 +35,13 @@
                     <div class="description-list">
                         <dl class="">
                             <div class="row">
-                                <div class="col-xs-6">
+                                <div class="col-xs-12 col-md-6">
                                     <div class="row">
                                         <dt class="col-xs-5">{l s='Check-in'}</dt>
                                         <dd class="col-xs-7">{$rm_v.data_form|date_format:'D'}, {dateFormat date=$rm_v.data_form}</dd>
                                     </div>
                                 </div>
-                                <div class="col-xs-6">
+                                <div class="col-xs-12 col-md-6">
                                     <div class="row">
                                         <dt class="col-xs-5">{l s='Check-out'}</dt>
                                         <dd class="col-xs-7">{$rm_v.data_to|date_format:'D'}, {dateFormat date=$rm_v.data_to}</dd>
@@ -50,13 +50,13 @@
                             </div>
 
                             <div class="row">
-                                <div class="col-xs-6">
+                                <div class="col-xs-12 col-md-6">
                                     <div class="row">
                                         <dt class="col-xs-5">{l s='Rooms'}</dt>
                                         <dd class="col-xs-7">{$rm_v.num_rm|string_format:'%02d'}</dd>
                                     </div>
                                 </div>
-                                <div class="col-xs-6">
+                                <div class="col-xs-12 col-md-6">
                                     <div class="row">
                                         <dt class="col-xs-5">{l s='Guests'}</dt>
                                         <dd class="col-xs-7">
@@ -67,7 +67,7 @@
                             </div>
 
                             <div class="row">
-                                <div class="col-xs-6">
+                                <div class="col-xs-12 col-md-6">
                                     <div class="row">
                                         <dt class="col-xs-5">{l s='Extra Services'}</dt>
                                         <dd class="col-xs-7">
@@ -85,7 +85,7 @@
                                         </dd>
                                     </div>
                                 </div>
-                                <div class="col-xs-6">
+                                <div class="col-xs-12 col-md-6">
                                     <div class="row">
                                         <dt class="col-xs-5">{l s='Total Price'}</dt>
                                         <dd class="col-xs-7">
