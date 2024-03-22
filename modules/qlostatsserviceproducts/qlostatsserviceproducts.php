@@ -1,28 +1,28 @@
 <?php
 /**
- * 2010-2023 Webkul.
- *
- * NOTICE OF LICENSE
- *
- * All right is reserved,
- * Please go through LICENSE.txt file inside our module
- *
- * DISCLAIMER
- *
- * Do not edit or add to this file if you wish to upgrade this module to newer
- * versions in the future. If you wish to customize this module for your
- * needs please refer to CustomizationPolicy.txt file inside our module for more information.
- *
- * @author Webkul IN
- * @copyright 2010-2023 Webkul IN
- * @license LICENSE.txt
- */
+* Since 2010 Webkul.
+*
+* NOTICE OF LICENSE
+*
+* All right is reserved,
+* Please go through this link for complete license : https://store.webkul.com/license.html
+*
+* DISCLAIMER
+*
+* Do not edit or add to this file if you wish to upgrade this module to newer
+* versions in the future. If you wish to customize this module for your
+* needs please refer to https://store.webkul.com/customisation-guidelines/ for more information.
+*
+*  @author    Webkul IN <support@webkul.com>
+*  @copyright Since 2010 Webkul IN
+*  @license   https://store.webkul.com/license.html
+*/
 
 if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-class statsServiceProducts extends ModuleGrid
+class QloStatsServiceProducts extends ModuleGrid
 {
     private $query = null;
     private $columns = null;
@@ -31,7 +31,7 @@ class statsServiceProducts extends ModuleGrid
 
     public function __construct()
     {
-        $this->name = 'statsserviceproducts';
+        $this->name = 'qlostatsserviceproducts';
         $this->tab = 'analytics_stats';
         $this->version = '1.0.0';
         $this->author = 'Webkul';
@@ -53,21 +53,21 @@ class statsServiceProducts extends ModuleGrid
 
     public function hookAdminStatsModules($params)
     {
-        $engine_params_services = $this->getServicesParams();
-        $engine_params_facilities = $this->getFacilitiesParams();
+        $engineParamsServices = $this->getServicesParams();
+        $engineParamsFacilities = $this->getFacilitiesParams();
 
         if (Tools::getValue('export')) {
             if (Tools::getValue('option') == 'services') {
-                $this->csvExport($engine_params_services);
+                $this->csvExport($engineParamsServices);
             } else if (Tools::getValue('option') == 'facilities') {
-                $this->csvExport($engine_params_facilities);
+                $this->csvExport($engineParamsFacilities);
             }
         }
 
         $this->context->smarty->assign(array(
             'module_name' => $this->displayName,
-            'grid_table_services' => $this->engine($engine_params_services),
-            'grid_table_facilities' => $this->engine($engine_params_facilities),
+            'grid_table_services' => $this->engine($engineParamsServices),
+            'grid_table_facilities' => $this->engine($engineParamsFacilities),
             'export_link_services' => Tools::safeOutput($_SERVER['REQUEST_URI']).'&export=1&option=services',
             'export_link_facilities' => Tools::safeOutput($_SERVER['REQUEST_URI']).'&export=1&option=facilities',
         ));
@@ -90,31 +90,31 @@ class statsServiceProducts extends ModuleGrid
                     'id' => 'auto_add_to_cart',
                     'header' => $this->l('Auto add to cart'),
                     'dataIndex' => 'auto_add_to_cart',
-                    'align' => 'center'
+                    'align' => 'left'
                 ),
                 array(
                     'id' => 'totalQuantitySold',
                     'header' => $this->l('Quantity sold'),
                     'dataIndex' => 'totalQuantitySold',
-                    'align' => 'center'
+                    'align' => 'left'
                 ),
                 array(
                     'id' => 'avgPriceSold',
                     'header' => $this->l('Average Price'),
                     'dataIndex' => 'avgPriceSold',
-                    'align' => 'center'
+                    'align' => 'left'
                 ),
                 array(
                     'id' => 'totalPriceSold',
                     'header' => $this->l('Sales'),
                     'dataIndex' => 'totalPriceSold',
-                    'align' => 'center'
+                    'align' => 'left'
                 ),
                 array(
                     'id' => 'active',
-                    'header' => $this->l('Active'),
+                    'header' => $this->l('Status'),
                     'dataIndex' => 'active',
-                    'align' => 'center'
+                    'align' => 'left'
                 )
             ),
             'defaultSortColumn' => 'totalPriceSold',
@@ -139,19 +139,19 @@ class statsServiceProducts extends ModuleGrid
                     'id' => 'totalQuantitySold',
                     'header' => $this->l('Quantity sold'),
                     'dataIndex' => 'totalQuantitySold',
-                    'align' => 'center'
+                    'align' => 'left'
                 ),
                 array(
                     'id' => 'avgPriceSold',
                     'header' => $this->l('Average Price'),
                     'dataIndex' => 'avgPriceSold',
-                    'align' => 'center'
+                    'align' => 'left'
                 ),
                 array(
                     'id' => 'totalPriceSold',
                     'header' => $this->l('Sales'),
                     'dataIndex' => 'totalPriceSold',
-                    'align' => 'center'
+                    'align' => 'left'
                 ),
             ),
             'defaultSortColumn' => 'totalPriceSold',
@@ -163,36 +163,46 @@ class statsServiceProducts extends ModuleGrid
 
     public function setOption($option)
     {
-		$date_between = $this->getDate();
+		$dateBetween = $this->getDate();
         switch($option) {
             case 'services' :
-                $this->setQueryForServices($date_between);
+                $this->setQueryForServices($dateBetween);
                 break;
             case 'facilities' :
-                $this->setQueryForFacilities($date_between);
+                $this->setQueryForFacilities($dateBetween);
                 break;
         }
     }
 
-    public function setQueryForServices($date_between)
+    public function setQueryForServices($dateBetween)
     {
-        $this->query = '(SELECT IFNULL(pl.`name`, od.`product_name`) as `display_name`, p.`active`, p.`auto_add_to_cart`,
-            ROUND(IFNULL(SUM(spod.`total_price_tax_excl` / o.`conversion_rate`), 0), 2) / SUM(spod.`quantity`) AS avgPriceSold,
-            IFNULL(SUM(spod.`quantity`), 0) AS totalQuantitySold,
+        $this->query = '(SELECT IFNULL(pl.`name`, od.`product_name`) as `display_name`, p.`active`, od.`product_auto_add` as auto_add_to_cart, od.`product_price_addition_type` as price_addition_type,
+            ROUND(IFNULL(SUM(spod.`total_price_tax_excl` / o.`conversion_rate`), 0), 2) / SUM(
+                IF(od.`product_price_calculation_method` = '.(int)Product::PRICE_CALCULATION_METHOD_PER_DAY.',
+                    DATEDIFF(hbd.`date_to`, hbd.`date_from`) * spod.`quantity`,
+                    spod.`quantity`
+                )
+            ) AS avgPriceSold,
+            IFNULL(SUM(
+                IF(od.`product_price_calculation_method` = '.(int)Product::PRICE_CALCULATION_METHOD_PER_DAY.',
+                    DATEDIFF(hbd.`date_to`, hbd.`date_from`) * spod.`quantity`,
+                    spod.`quantity`
+                )
+            ), 0) AS totalQuantitySold,
             ROUND(IFNULL(SUM(spod.`total_price_tax_excl` / o.`conversion_rate`), 0), 2) AS totalPriceSold
             FROM '._DB_PREFIX_.'htl_room_type_service_product_order_detail spod
             LEFT JOIN  '._DB_PREFIX_.'product p
             ON (spod.`id_product` = p.`id_product`)
             LEFT JOIN '._DB_PREFIX_.'product_lang pl ON (p.id_product = pl.id_product AND pl.id_lang = '.(int)$this->getLang().')
             INNER JOIN '._DB_PREFIX_.'orders o ON (spod.id_order = o.id_order)
-            INNER JOIN '._DB_PREFIX_.'order_detail od ON (od.id_order = o.id_order)
+            INNER JOIN '._DB_PREFIX_.'order_detail od ON (spod.`id_product` = od.`product_id` AND od.id_order = o.id_order)
             INNER JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd ON (spod.`id_htl_booking_detail` = hbd.`id`)
-            WHERE o.valid = 1 AND o.invoice_date BETWEEN '.$date_between.'
+            WHERE o.valid = 1 AND o.invoice_date BETWEEN '.$dateBetween.'
             '.HotelBranchInformation::addHotelRestriction(false, 'hbd').'
             AND od.`is_booking_product` = 0
-            GROUP BY spod.id_product)
+            GROUP BY spod.id_product, od.product_auto_add)
             UNION
-            (SELECT pl.`name` as `display_name`, p.`active`, p.`auto_add_to_cart`,
+            (SELECT pl.`name` as `display_name`, p.`active`, p.`auto_add_to_cart`, p.`price_addition_type`,
             0 AS avgPriceSold,
             0 AS totalQuantitySold,
             0 AS totalPriceSold
@@ -205,7 +215,7 @@ class statsServiceProducts extends ModuleGrid
                 INNER JOIN '._DB_PREFIX_.'orders o ON (spod.id_order = o.id_order)
                 INNER JOIN '._DB_PREFIX_.'order_detail od ON (od.id_order = o.id_order)
                 INNER JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd ON (spod.`id_htl_booking_detail` = hbd.`id`)
-                WHERE o.valid = 1 AND o.invoice_date BETWEEN '.$date_between.'
+                WHERE o.valid = 1 AND o.invoice_date BETWEEN '.$dateBetween.'
                 '.HotelBranchInformation::addHotelRestriction(false, 'hbd').'
                 AND od.`is_booking_product` = 0
             )
@@ -218,7 +228,7 @@ class statsServiceProducts extends ModuleGrid
         $this->option = 'services';
     }
 
-    public function setQueryForFacilities($date_between)
+    public function setQueryForFacilities($dateBetween)
     {
         $this->query = '(SELECT bd.`name` as `display_name`,
             ROUND(IFNULL(SUM(bd.`total_price_tax_excl` / o.`conversion_rate`), 0), 2) / COUNT(bd.`id_booking_demand`) as avgPriceSold,
@@ -227,7 +237,7 @@ class statsServiceProducts extends ModuleGrid
             FROM '._DB_PREFIX_.'htl_booking_demands bd
             INNER JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd ON (bd.`id_htl_booking` = hbd.`id`)
             INNER JOIN '._DB_PREFIX_.'orders o ON (hbd.id_order = o.id_order)
-            WHERE o.valid = 1 AND o.invoice_date BETWEEN '.$date_between.'
+            WHERE o.valid = 1 AND o.invoice_date BETWEEN '.$dateBetween.'
             '.HotelBranchInformation::addHotelRestriction(false, 'hbd').'
             GROUP BY bd.`name`)
             UNION
@@ -247,7 +257,7 @@ class statsServiceProducts extends ModuleGrid
             HAVING `display_name` NOT IN (SELECT bd.`name`  FROM '._DB_PREFIX_.'htl_booking_demands bd
             INNER JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd ON (bd.`id_htl_booking` = hbd.`id`)
             INNER JOIN '._DB_PREFIX_.'orders o ON (hbd.id_order = o.id_order)
-            WHERE o.valid = 1 AND o.invoice_date BETWEEN '.$date_between.'
+            WHERE o.valid = 1 AND o.invoice_date BETWEEN '.$dateBetween.'
             '.HotelBranchInformation::addHotelRestriction(false, 'hbd').' ))';
 
         $this->_totalCount = Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue(
@@ -278,17 +288,20 @@ class statsServiceProducts extends ModuleGrid
                     if (is_null($value['active'])) {
                         $value['active'] = '<span class="badge badge-warning">'.$this->l('Deleted').'</span>';
                     } else if (!$value['active']) {
-                        $value['active'] = '<span class="badge badge-danger">'.$this->l('No').'</span>';
+                        $value['active'] = '<span class="badge badge-danger">'.$this->l('Inactive').'</span>';
                     } else {
-                        $value['active'] = '<span class="badge badge-success">'.$this->l('Yes').'</span>';
+                        $value['active'] = '<span class="badge badge-success">'.$this->l('Active').'</span>';
                     }
-                    if (is_null($value['auto_add_to_cart'])) {
-                        $value['auto_add_to_cart'] = '<span class="badge badge-warning">'.$this->l('Deleted').'</span>';
-                    } else if (!$value['auto_add_to_cart']) {
-                        $value['auto_add_to_cart'] = '<span class="badge badge-danger">'.$this->l('No').'</span>';
+                    if ($value['auto_add_to_cart']) {
+                        $value['auto_add_to_cart'] = '<span class="badge badge-success">'.$this->l('Yes');
+                        $value['auto_add_to_cart'] .= '</span>';
+                        if ($value['price_addition_type'] == ProductCore::PRICE_ADDITION_TYPE_WITH_ROOM) {
+                            $value['auto_add_to_cart'] .= ' <span class="badge badge-info">'.$this->l('Auto added').'</span>';
+                        } else {
+                            $value['auto_add_to_cart'] .= ' <span class="badge badge-info">'.$this->l('Convenience fee').'</span>';
+                        }
                     } else {
-
-                        $value['auto_add_to_cart'] = '<span class="badge badge-success">'.$this->l('Yes').'</span>';
+                        $value['auto_add_to_cart'] = '<span class="badge badge-danger">'.$this->l('No').'</span>';
                     }
                 }
             	$value['avgPriceSold'] = Tools::displayPrice($value['avgPriceSold'], $currency);

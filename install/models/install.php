@@ -698,7 +698,7 @@ class InstallModelInstall extends InstallAbstractModel
                 'statsbestvouchers',
                 'statsbestcustomers',
                 'statsequipment',
-                'statsserviceproducts',
+                'qlostatsserviceproducts',
                 'blockcart',
                 'blockuserinfo',
                 'qlochannelmanagerconnector',
