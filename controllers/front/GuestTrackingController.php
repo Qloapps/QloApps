@@ -151,7 +151,7 @@ class GuestTrackingControllerCore extends FrontController
                     'additionalServices' => $additionalServices,
                 ));
             }
-            $response['extra_demands'] = $this->context->smarty->fetch(_PS_THEME_DIR_.'_partials/order_booking_demands.tpl');
+            $response['extra_demands'] = $this->context->smarty->fetch(_PS_THEME_DIR_.'_partials/order-extra-services.tpl');
         }
 
         $this->ajaxDie(json_encode($response));

@@ -525,7 +525,7 @@ class OrderDetailControllerCore extends FrontController
                     'objOrder' => new Order($idOrder)
                 )
             );
-            $response['extra_demands'] = $this->context->smarty->fetch(_PS_THEME_DIR_.'_partials/order_booking_demands.tpl');
+            $response['extra_demands'] = $this->context->smarty->fetch(_PS_THEME_DIR_.'_partials/order-extra-services.tpl');
         }
 
         $this->ajaxDie(json_encode($response));
@@ -747,7 +747,7 @@ class OrderDetailControllerCore extends FrontController
 
                 $message = CustomerMessage::getMessagesByOrderId($order->id, false)[0];
                 $this->context->smarty->assign(array('message' => $message));
-                $response['message_html'] = $this->context->smarty->fetch(_PS_THEME_DIR_.'_partials/booking-message.tpl');
+                $response['message_html'] = $this->context->smarty->fetch(_PS_THEME_DIR_.'_partials/order-message.tpl');
             } else {
                 $this->errors[] = Tools::displayError('Order not found');
             }

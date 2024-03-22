@@ -490,8 +490,28 @@ class HotelReservationSystem extends Module
         }
     }
 
+    // public function hookDisplayOrderDetailTopLeft($params) { return 'hookDisplayOrderDetailTopLeft'; }
+    // public function hookDisplayOrderDetailHotelDetailsAfter($params) { return 'hookDisplayOrderDetailHotelDetailsAfter'; }
+    // public function hookDisplayOrderDetailRoomDetailsBefore($params) { return 'hookDisplayOrderDetailRoomDetailsBefore'; }
+    // public function hookDisplayOrderDetailPoliciesTab($params) { return 'hookDisplayOrderDetailPoliciesTab'; }
+    // public function hookDisplayOrderDetailPoliciesTabContent($params) { return 'hookDisplayOrderDetailPoliciesTabContent'; }
+    // public function hookDisplayOrderDetailBottomLeft($params) { return 'hookDisplayOrderDetailBottomLeft'; }
+    // public function hookDisplayOrderDetailTopRight($params) { return 'hookDisplayOrderDetailTopRight'; }
+    // public function hookDisplayOrderDetailBottomRight($params) { return 'hookDisplayOrderDetailBottomRight'; }
+
     public function hookDisplayBackOfficeHeader()
     {
+        // $this->registerHook(array(
+        //     'displayOrderDetailTopLeft',
+        //     'displayOrderDetailHotelDetailsAfter',
+        //     'displayOrderDetailRoomDetailsBefore',
+        //     'displayOrderDetailPoliciesTab',
+        //     'displayOrderDetailPoliciesTabContent',
+        //     'displayOrderDetailBottomLeft',
+        //     'displayOrderDetailTopRight',
+        //     'displayOrderDetailBottomRight',
+        // ));
+        // ddd(1);
         $this->context->controller->addCSS($this->_path.'views/css/admin/css/hotel_admin_tab_logo.css');
     }
 

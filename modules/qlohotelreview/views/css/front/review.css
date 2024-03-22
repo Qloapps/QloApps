@@ -36,28 +36,17 @@
 }
 
 #add-review-popup .card-body {
-    padding: 15px;
+    padding: 18px 15px;
 }
 
 #add-review-popup .form-group {
-    margin-bottom: 20px;
+    margin-bottom: 30px;
 }
 
 #add-review-popup label {
     font-size: 14px;
     font-weight: normal;
-    margin-bottom: 6px;
-}
-
-#add-review-popup .form-control {
-    padding: 18px 10px;
-    font-size: 14px;
-    line-height: 18px;
-    border-radius: 4px;
-}
-
-#add-review-popup .form-control.description {
-    padding: 10px 10px;
+    margin-bottom: 14px;
 }
 
 #add-review-popup .review-error {

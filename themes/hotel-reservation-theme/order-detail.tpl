@@ -61,6 +61,8 @@
 
     <div class="row">
         <div class="col-md-8">
+            {hook h='displayOrderDetailTopLeft' id_order=$order->id}
+
             <div class="card hotel-details">
                 <div class="card-header">
                     {l s='Hotel Details'}
@@ -77,37 +79,52 @@
                                         {if $hotel_address_info.phone_mobile}{$hotel_address_info.phone_mobile}{else}{$hotel_address_info.phone}{/if}
                                     </a>
                                 </dd>
-                            </div>
-
-                            <div class="row">
                                 <dt class="col-xs-6 col-sm-3">{l s='Email'}</dt>
                                 <dd class="col-xs-6 col-sm-3">
                                     <a href="mailto:{$obj_hotel_branch_information->email}" class="hotel-email">{$obj_hotel_branch_information->email}</a>
                                 </dd>
-                                <dt class="col-xs-6 col-sm-3">{l s='Payment Method'}</dt>
-                                <dd class="col-xs-6 col-sm-3">
-                                    {$order->payment|escape:'html':'UTF-8'}
-                                    {if $invoice && $invoiceAllowed}
-                                        <a target="_blank" href="{$link->getPageLink('pdf-invoice', true)}?id_order={$order->id|intval}{if $is_guest}&amp;secure_key={$order->secure_key|escape:'html':'UTF-8'}{/if}" title="{l s='Click here to download invoice.'}">
-                                            <i class="icon-file-text"></i> {l s='Invoice'}
-                                        </a>
-                                    {/if}
-                                </dd>
-                            </div>
-
-                            <div class="row">
-                                <dt class="col-xs-6 col-sm-3">{l s='Booking Status'}</dt>
-                                <dd class="col-xs-6 col-sm-3">
-                                    <span{if isset($order_history[0].color) && $order_history[0].color} style="background-color:{$order_history[0].color|escape:'html':'UTF-8'}30; border: 1px solid {$order_history[0].color|escape:'html':'UTF-8'};" {/if} class="label">
-                                        {if $order_history[0].id_order_state|in_array:$overbooking_order_states}
-                                            {l s='Order Not Confirmed'}
-                                        {else}
-                                            {$order_history[0].ostate_name|escape:'html':'UTF-8'}
-                                        {/if}
-                                    </span>
-                                </dd>
+                                {hook h='displayOrderDetailHotelDetailsAfter' id_order=$order->id}
                             </div>
                         </dl>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card payment-details visible-xs visible-sm hidden-md hidden-lg">
+                <div class="card-header">
+                    {l s='Payment'}
+                </div>
+                <div class="card-body">
+                    <div class="payment-details-table">
+                        <table class="table table-sm table-responsive table-summary">
+                            <tbody>
+                                <tr>
+                                    <td>{l s='Payment Method'}</td>
+                                    <td class="text-right payment-method">
+                                        {if $invoice && $invoiceAllowed}
+                                            <span class="icon-pdf"></span>
+                                            <a target="_blank" href="{$link->getPageLink('pdf-invoice', true)}?id_order={$order->id|intval}{if $is_guest}&amp;secure_key={$order->secure_key|escape:'html':'UTF-8'}{/if}" title="{l s='Click here to download invoice.'}">
+                                                <span>{$order->payment|escape:'html':'UTF-8'}</span>
+                                            </a>
+                                        {else}
+                                            {$order->payment|escape:'html':'UTF-8'}
+                                        {/if}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>{l s='Status'}</td>
+                                    <td class="text-right status">
+                                        <span{if isset($order_history[0].color) && $order_history[0].color} style="background-color:{$order_history[0].color|escape:'html':'UTF-8'}30; border: 1px solid {$order_history[0].color|escape:'html':'UTF-8'};" {/if} class="label">
+                                            {if $order_history[0].id_order_state|in_array:$overbooking_order_states}
+                                                {l s='Order Not Confirmed'}
+                                            {else}
+                                                {$order_history[0].ostate_name|escape:'html':'UTF-8'}
+                                            {/if}
+                                        </span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
@@ -148,6 +165,7 @@
                 </div>
             {/if}
 
+            {hook h='displayOrderDetailRoomDetailsBefore' id_order=$order->id}
             <div class="card room-details card-toolbar">
                 <div class="card-header">
                     {l s='Room Details'}
@@ -172,7 +190,7 @@
                         {if isset($cart_htl_data) && $cart_htl_data}
                             {foreach from=$cart_htl_data key=data_k item=data_v}
                                 {foreach from=$data_v['date_diff'] key=rm_k item=rm_v}
-                                    {include file='./_partials/booking-room-detail.tpl'}
+                                    {include file='./_partials/order-room-detail.tpl'}
                                 {/foreach}
                             {/foreach}
                         {else}
@@ -345,6 +363,7 @@
                                     <a href="#tab-hotel-policies-refund" data-toggle="tab">{l s='Refund Policies'}</a>
                                 </li>
                             {/if}
+                            {hook h='displayOrderDetailPoliciesTab' id_order=$order->id}
                         </ul>
                     </div>
                     <div class="card-body">
@@ -366,6 +385,7 @@
                                     </div>
                                 </div>
                             {/if}
+                            {hook h='displayOrderDetailPoliciesTabContent' id_order=$order->id}
                         </div>
                     </div>
                 </div>
@@ -380,7 +400,7 @@
                     <div class="card-body">
                         <div class="messages-list card-text">
                             {foreach from=$messages item=message}
-                                {include file='./_partials/booking-message.tpl'}
+                                {include file='./_partials/order-message.tpl'}
                             {/foreach}
                         </div>
                     </div>
@@ -404,20 +424,14 @@
                             <div class="form-group select-room-type">
                                 <label for="id_product">{l s='Room Type'}</label>
 
-                                <div class="dropdown">
-                                    <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">
-                                        <span>{l s='-- Choose --'}</span>
-                                    </button>
-                                    <ul class="dropdown-menu">
-                                        {foreach from=$products item=product}
-                                            {if $product.is_booking_product}
-                                                <li><a href="" value="{$product.product_id}">{$product.product_name|escape:'html':'UTF-8'}</a></li>
-                                            {/if}
-                                        {/foreach}
-                                    </ul>
-                                </div>
-
-                                <input type="hidden" class="id_product" name="id_product" value="0">
+                                <select name="id_product" class="form-control">
+                                    <option value="0">{l s='-- Choose --'}</option>
+                                    {foreach from=$products item=product}
+                                        {if $product.is_booking_product}
+                                            <option value="{$product.product_id}">{$product.product_name|escape:'html':'UTF-8'}</option>
+                                        {/if}
+                                    {/foreach}
+                                </select>
                             </div>
 
                             <p class="form-group textarea">
@@ -433,8 +447,51 @@
                     </div>
                 </div>
             {/if}
+
+            {hook h='displayOrderDetailBottomLeft' id_order=$order->id}
         </div>
         <div class="col-md-4">
+            {hook h='displayOrderDetailTopRight' id_order=$order->id}
+
+            <div class="card payment-details hidden-xs hidden-sm visible-md">
+                <div class="card-header">
+                    {l s='Payment'}
+                </div>
+                <div class="card-body">
+                    <div class="payment-details-table">
+                        <table class="table table-sm table-responsive table-summary">
+                            <tbody>
+                                <tr>
+                                    <td>{l s='Payment Method'}</td>
+                                    <td class="text-right payment-method">
+                                        {if $invoice && $invoiceAllowed}
+                                            <span class="icon-pdf"></span>
+                                            <a target="_blank" href="{$link->getPageLink('pdf-invoice', true)}?id_order={$order->id|intval}{if $is_guest}&amp;secure_key={$order->secure_key|escape:'html':'UTF-8'}{/if}" title="{l s='Click here to download invoice.'}">
+                                                <span>{$order->payment|escape:'html':'UTF-8'}</span>
+                                            </a>
+                                        {else}
+                                            {$order->payment|escape:'html':'UTF-8'}
+                                        {/if}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>{l s='Status'}</td>
+                                    <td class="text-right status">
+                                        <span{if isset($order_history[0].color) && $order_history[0].color} style="background-color:{$order_history[0].color|escape:'html':'UTF-8'}30; border: 1px solid {$order_history[0].color|escape:'html':'UTF-8'};" {/if} class="label">
+                                            {if $order_history[0].id_order_state|in_array:$overbooking_order_states}
+                                                {l s='Order Not Confirmed'}
+                                            {else}
+                                                {$order_history[0].ostate_name|escape:'html':'UTF-8'}
+                                            {/if}
+                                        </span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
             <div class="card hotel-location hidden-xs hidden-sm visible-md">
                 <div class="card-header">
                     {l s='Hotel Location'}
@@ -606,6 +663,8 @@
                     </div>
                 </div>
             </div>
+
+            {hook h='displayOrderDetailBottomRight' id_order=$order->id}
         </div>
     </div>
 
@@ -657,11 +716,11 @@
                                                             <p class="room-type-name">{$data_v.name}</p>
                                                             <div class="col-xs-3">
                                                                 <p>{l s='Total Rooms'}</p>
-                                                                {$rm_v.num_rm|string_format:'%02d'}
+                                                                <strong>{$rm_v.num_rm|string_format:'%02d'}</strong>
                                                             </div>
                                                             <div class="col-xs-3">
                                                                 <p>{l s='Cancelled Rooms'}</p>
-                                                                {($rm_v.count_cancelled + $rm_v.count_refunded)|string_format:'%02d'}
+                                                                <strong>{($rm_v.count_cancelled + $rm_v.count_refunded)|string_format:'%02d'}</strong>
                                                             </div>
                                                         </div>
                                                         <div class="rooms-summary">
@@ -709,7 +768,7 @@
                                                                         </div>
                                                                     {else}
                                                                         <div class="extra-services-wrap clearfix">
-                                                                            <p class="">{l s='No extra services added for this room.'}</p>
+                                                                            <p class="text-muted">{l s='No extra services added for this room.'}</p>
                                                                         </div>
                                                                     {/if}
                                                                 </div>

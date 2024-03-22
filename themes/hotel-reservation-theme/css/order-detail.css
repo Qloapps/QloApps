@@ -123,7 +123,7 @@
 }
 
 .card.card-tabs .nav-tabs li > a {
-    padding: 0 20px;
+    padding: 0 18px;
     border: none;
     color: #333;
 }
@@ -156,6 +156,10 @@
     margin: 7px 0;
 }
 
+.description-list dd a {
+    color: #333;
+}
+
 .description-list dd .hotel-email {
     word-wrap: break-word;
 }
@@ -166,6 +170,35 @@
 
 .card-body > .description-list {
     margin-top: 0;
+}
+
+.payment-details .table-summary td:first-child {
+    font-weight: bold;
+}
+
+.payment-details .table-summary .payment-method .icon-pdf {
+    width: 24px;
+    height: 24px;
+    background-image: url('../img/icon/pdf.png');
+}
+
+.payment-details .table-summary .payment-method a {
+    color: #333;
+    font-weight: bold;
+    position: relative;
+    top: -6px;
+}
+
+.payment-details .table-summary .payment-method span {
+    text-decoration: underline;
+}
+
+.payment-details .table-summary .status {
+    font-size: 12px;
+}
+
+.payment-details .table-summary .status span {
+    line-height: 16px;
 }
 
 .hotel-location p.hotel-address {
@@ -208,6 +241,11 @@
     align-items: center;
 }
 
+.room-details .card-header .booking-actions-wrap .col-xs-12 {
+    display: flex;
+    flex-wrap: wrap;
+}
+
 .room-details .card-body {
     padding: 0;
 }
@@ -219,6 +257,24 @@
 
 .room-details .booking-room-detail:not(:last-of-type) {
     border-bottom: 1px solid #E5E5E5;
+}
+
+@media (max-width: 576px) {
+    .room-details .card-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .room-details .card-header .booking-actions-wrap {
+        margin-top: 10px;
+        margin-left: -10px;
+    }
+}
+
+@media (min-width: 768px) and (max-width: 1200px) {
+    .room-details .card-header .booking-actions-wrap .col-xs-12 {
+        flex-wrap: nowrap;
+    }
 }
 
 .booking-room-detail .description-list dt {
@@ -264,14 +320,8 @@
     color: #167BFF;
 }
 
-@media (min-width: 992px) and (max-width: 1199px) {
-    .booking-room-detail .info-wrap {
-        margin-top: 10px;
-    }
-
-    .booking-room-detail .info-wrap .description-list {
-        margin-top: 10px;
-    }
+.hotel-policies .card-header {
+    padding: 14px 0;
 }
 
 .hotel-policies .refund-policies-list .refund-policy:not(:last-of-type) {
@@ -297,7 +347,7 @@
 }
 
 .order-messages .message.management {
-    padding: 20px 0 20px 20px;
+    padding: 20px;
     border-left: 1px solid #333;
     background-color: rgba(229, 229, 229, 0.30);
 }
@@ -315,55 +365,6 @@
 .add-order-message .select-room-type label {
     font-size: 16px;
     margin-bottom: 10px;
-}
-
-.add-order-message .dropdown {
-    width: 350px;
-}
-
-.add-order-message .dropdown button {
-    min-width: 350px;
-    padding: 12px 15px;
-    text-align: left;
-    font-size: 16px;
-    color: #000a;
-    border: 1px solid #E5E5E5;
-    border-radius: 4px;
-}
-
-.add-order-message .dropdown button::after {
-    content: '\2304';
-    position: absolute;
-    top: -2px;
-    right: 10px;
-    font-size: 28px;
-    font-weight: 100;
-    color: #333;
-}
-
-.add-order-message .dropdown .dropdown-menu {
-    width: 100%;
-    left: 0;
-    right: unset;
-    border-radius: 4px;
-}
-
-.add-order-message .dropdown .dropdown-menu > li > a {
-    padding-top: 10px;
-    padding-bottom: 10px;
-    font-size: 16px;
-}
-
-.add-order-message form .form-group.textarea {
-    margin-bottom: 20px;
-}
-
-.add-order-message form textarea {
-    padding: 10px;
-    font-size: 14px;
-    border-radius: 4px;
-    border: 1px solid #E5E5E5;
-    background: #FFF;
 }
 
 .add-order-message form #submitMessage {
@@ -774,6 +775,10 @@
     word-break: break-all;
 }
 
+.guest-details .table-summary.table-sm td:nth-child(2) {
+    font-weight: bold;
+}
+
 #create-new-refund-popup .card.cancel-booking .card-footer {
     display: flex;
     justify-content: space-between;
@@ -787,6 +792,7 @@
 
 #create-new-refund-popup .tab-content {
     margin-top: 0;
+    border-left: 1px solid #E5E5E5;
 }
 
 /* nav-tabs resets - start */
@@ -798,16 +804,15 @@
 
 #create-new-refund-popup .nav-tabs > li {
     margin: 0;
+    z-index: 1;
 }
 /* nav-tabs resets - end */
 
 /* nav-tabs custom - start */
 #create-new-refund-popup .nav-tabs > li > a {
-    border-right: 1px solid #E5E5E5;
     color: #333;
-}
-
-#create-new-refund-popup .nav-tabs > li:not(:last-of-type) > a {
+    padding: 10px 18px;
+    margin-right: -1px;
     border-bottom: 1px solid #E5E5E5;
 }
 
@@ -893,6 +898,7 @@
 #create-new-refund-popup .room-details .extra-services-wrap {
     margin-top: 4px;
     padding-left: 23px;
+    font-size: 10px;
 }
 
 #create-new-refund-popup .room-details .extra-services-wrap > div:not(:first-of-type) {
@@ -930,16 +936,6 @@
 
 #create-new-refund-popup .card.cancel-booking-preview .form-group .label sup {
     color: #FF4B4B;
-}
-
-#create-new-refund-popup .card.cancel-booking-preview .form-group textarea {
-    border: 1px solid #E5E5E5;
-    border-radius: 4px;
-    color: #333;
-}
-
-#create-new-refund-popup .card.cancel-booking-preview .form-group textarea:focus {
-    box-shadow: none;
 }
 
 #create-new-refund-popup .card.cancel-booking-preview .errors .alert-danger {
@@ -981,7 +977,7 @@
 
 .fancybox-order-detail.feedback h4 {
     margin-top: 16px;
-    font-size: 16px;
+    font-size: 14px;
     line-height: 24px;
 }
 
@@ -1017,17 +1013,22 @@
 
 #popup-view-extra-services .tab-content {
     margin-top: 0;
-    padding: 0 15px 15px;
+    padding-bottom: 15px;
+}
+
+#popup-view-extra-services .tab-content .rooms_extra_demands_head {
+    padding: 10px 18px;
+    border-bottom: 1px solid #F0F0F0;
 }
 
 #popup-view-extra-services .tab-content .rooms_extra_demands_text {
-    padding: 10px 0px;
-    border-bottom: 1px solid #F0F0F0;
     font-size: 12px;
+    margin-bottom: 0;
 }
 
-#popup-view-extra-services .tab-content .room_demands:not(:last-of-type) {
-    margin-bottom: 20px;
+#popup-view-extra-services .tab-content .room_demands {
+    padding: 0 18px;
+    margin-top: 20px;
 }
 
 #popup-view-extra-services .tab-content .demand_header {
@@ -1048,7 +1049,7 @@
 }
 
 #popup-view-extra-services .tab-content .room_demand_block:not(:last-of-type) {
-    margin-bottom: 6px;
+    margin-bottom: 12px;
 }
 
 /* Guest Tracking page styles - start */

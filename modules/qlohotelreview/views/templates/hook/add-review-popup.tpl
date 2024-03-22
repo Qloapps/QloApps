@@ -70,9 +70,9 @@
 
                 <div class="form-group">
                     <label>
-                        {l s='Sumup your review' mod='qlohotelreview'}
+                        {l s='Sum up your review' mod='qlohotelreview'}
                     </label>
-                    <input class="form-control" type="text" name="subject" />
+                    <input class="form-control" type="text" name="subject" placeholder="{l s='Type here...' mod='qlohotelreview'}"/>
                     <p class="review-error subject"></p>
                 </div>
 
@@ -80,7 +80,7 @@
                     <label>
                         {l s='Write in detail' mod='qlohotelreview'}
                     </label>
-                    <textarea class="form-control description" type="text" rows="5" name="description"></textarea>
+                    <textarea class="form-control description" type="text" rows="5" name="description" placeholder="{l s='Type here...' mod='qlohotelreview'}"></textarea>
                     <p class="review-error description"></p>
                 </div>
             </div>
