@@ -292,32 +292,63 @@ class AdminTranslationsControllerCore extends AdminController
             }
         }
 
-        if ($fd = fopen($file_path, 'w')) {
-            // Get value of button save and stay
-            $save_and_stay = Tools::isSubmit('submitTranslations'.$type.'AndStay');
+        // Get value of button save and stay
+        $save_and_stay = Tools::isSubmit('submitTranslations'.$type.'AndStay');
 
-            // Get language
-            $lang = strtolower(Tools::getValue('lang'));
+        // Get language
+        $lang = strtolower(Tools::getValue('lang'));
 
-            // Unset all POST which are not translations
-            unset(
-                $_POST['submitTranslations'.$type],
-                $_POST['submitTranslations'.$type.'AndStay'],
-                $_POST['lang'],
-                $_POST['token'],
-                $_POST['theme'],
-                $_POST['type']
-            );
+        // Unset all POST which are not translations
+        unset(
+            $_POST['submitTranslations'.$type],
+            $_POST['submitTranslations'.$type.'AndStay'],
+            $_POST['lang'],
+            $_POST['token'],
+            $_POST['theme'],
+            $_POST['type']
+        );
 
-            // Get all POST which aren't empty
-            $to_insert = array();
-            foreach ($_POST as $key => $value) {
-                if (!empty($value)) {
-                    $to_insert[$key] = $value;
+        // Get all POST which aren't empty
+        $to_update = array();
+        $keysToUpdate = array();
+        foreach ($_POST as $key => $value) {
+            $keysToUpdate[] = $key;
+            $to_update[$key] = $value;
+        }
+        include_once($file_path);
+        switch($this->type_selected) {
+            case 'front':
+                $to_insert = $GLOBALS['_LANG'];
+                break;
+            case 'back':
+                $to_insert = $GLOBALS['_LANGADM'];
+                break;
+            case 'errors':
+                $to_insert = $GLOBALS['_ERRORS'];
+                break;
+            case 'fields':
+                $to_insert = $GLOBALS['_FIELDS'];
+                break;
+            case 'pdf':
+                $to_insert = $GLOBALS['_LANGPDF'];
+                break;
+
+        }
+        foreach ($to_insert as $key => $value) {
+            if (in_array($key, $keysToUpdate)) {
+                if ($to_update[$key]) {
+                    $to_insert[$key] = $to_update[$key];
+                } else {
+                    unset($to_insert[$key]);
                 }
+                unset($to_update[$key]);
             }
+        }
+        foreach ($to_update as $key => $value) {
+            $to_insert[$key] = $value;
+        }
 
-            // translations array is ordered by key (easy merge)
+        if ($fd = fopen($file_path, 'w')) {
             ksort($to_insert);
             $tab = $translation_informations['var'];
             fwrite($fd, "<?php\n\nglobal \$".$tab.";\n\$".$tab." = array();\n");
@@ -929,9 +960,12 @@ class AdminTranslationsControllerCore extends AdminController
         static $cache_file = array();
         static $str_write = '';
         static $array_check_duplicate = array();
+        static $module_existing_translations = array();
 
         // Set file_name in static var, this allow to open and wright the file just one time
         if (!isset($cache_file[$theme_name.'-'.$file_name])) {
+            require $file_name;
+            $module_existing_translations = $_MODULE;
             $str_write = '';
             $cache_file[$theme_name.'-'.$file_name] = true;
             if (!Tools::file_exists_cache(dirname($file_name))) {
@@ -984,6 +1018,13 @@ class AdminTranslationsControllerCore extends AdminController
                         $this->total_expression++;
                     }
                 }
+                foreach ($module_existing_translations as $key => $value) {
+                    if (!in_array('\''.$key.'\'', $array_check_duplicate)) {
+                        $str_write .= '$_MODULE[\''.$key.'\'] = \''.pSQL(str_replace(array("\r\n", "\r", "\n"), ' ', $value)).'\';'."\n";
+
+                    }
+                }
+
             }
         }
 
@@ -1325,7 +1366,7 @@ class AdminTranslationsControllerCore extends AdminController
         $helper->href = $this->context->link->getAdminLink('AdminLanguages');
         $helper->title = $this->l('Enabled Languages', null, null, false);
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=enabled_languages';
-        $kpis[] = $helper->generate();
+        $kpis[] = $helper;
 
         $helper = new HelperKpi();
         $helper->id = 'box-fo-translations';
@@ -1333,7 +1374,7 @@ class AdminTranslationsControllerCore extends AdminController
         $helper->color = 'color3';
         $helper->title = $this->l('Front office Translations', null, null, false);
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=frontoffice_translations';
-        $kpis[] = $helper->generate();
+        $kpis[] = $helper;
 
         $helper = new HelperKpi();
         $helper->id = 'box-bo-translations';
@@ -1345,7 +1386,11 @@ class AdminTranslationsControllerCore extends AdminController
         }
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=backoffice_translations';
         $helper->refresh = (bool)(ConfigurationKPI::get('BACKOFFICE_TRANSLATIONS_EXPIRE') < $time);
-        $kpis[] = $helper->generate();
+        $kpis[] = $helper;
+
+        Hook::exec('action'.$this->controller_name.'KPIListingModifier', array(
+            'kpis' => &$kpis,
+        ));
 
         $helper = new HelperKpiRow();
         $helper->kpis = $kpis;

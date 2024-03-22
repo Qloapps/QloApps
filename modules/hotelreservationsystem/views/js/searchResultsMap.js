@@ -23,7 +23,7 @@ function initMap() {
         lng: Number(hotel_location.longitude),
     };
 
-    const map = new google.maps.Map($($('#search-results-wrap .map-wrap')).get(0), {
+    const map = new google.maps.Map($('#search-results-wrap .map-wrap').get(0), {
         zoom: 10,
         center: hotelLocation,
         disableDefaultUI: true,
@@ -49,7 +49,11 @@ function initMap() {
 }
 
 $(document).ready(function() {
-    if (typeof google == 'object' && typeof hotel_location == 'object') {
+    if (typeof hotel_location == 'object'
+        && $('#search-results-wrap .map-wrap').length
+        && typeof google == 'object'
+        && typeof google.maps == 'object'
+    ) {
         initMap();
     }
 });

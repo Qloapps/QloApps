@@ -76,7 +76,15 @@
 				{foreach from=$order_history item=state name="orderStates"}
 					<tr class="{if $smarty.foreach.orderStates.first}first_item{elseif $smarty.foreach.orderStates.last}last_item{/if} {if $smarty.foreach.orderStates.index % 2}alternate_item{else}item{/if}">
 						<td class="step-by-step-date">{dateFormat date=$state.date_add full=0}</td>
-						<td><span{if isset($state.color) && $state.color} style="background-color:{$state.color|escape:'html':'UTF-8'}; border-color:{$state.color|escape:'html':'UTF-8'};"{/if} class="label{if isset($state.color) && Tools::getBrightness($state.color) > 128} dark{/if}">{$state.ostate_name|escape:'html':'UTF-8'}</span></td>
+						<td>
+                            <span{if isset($state.color) && $state.color} style="background-color:{$state.color|escape:'html':'UTF-8'}; border-color:{$state.color|escape:'html':'UTF-8'};"{/if} class="label{if isset($state.color) && Tools::getBrightness($state.color) > 128} dark{/if}">
+                                {if $state.id_order_state|in_array:$overbooking_order_states}
+                                    {l s='Order Not Confirmed'}
+                                {else}
+                                    {$state.ostate_name|escape:'html':'UTF-8'}
+                                {/if}
+                            </span>
+                        </td>
 					</tr>
 				{/foreach}
 				</tbody>
@@ -135,7 +143,7 @@
 	<div class="row booking-actions-wrap">
 		<div class="col-xs-12 col-sm-12">
 			{if $refund_allowed}
-				{if !$hasCompletelyRefunded}
+				{if !$completeRefundRequestOrCancel}
 					<a refund_fields_on="0" id="order_refund_request" class="btn btn-default pull-right" href="#" title="{l s='Proceed to refund'}"><span>{l s='Cancel Bookings'}</span></a>
 				{/if}
 
@@ -549,17 +557,15 @@
 			</table>
 		</div>
 
-		{if $refund_allowed && $non_requested_rooms}
+		{if $refund_allowed && !$completeRefundRequestOrCancel}
 			<div class="alert alert-info-light standard_refund_fields">
-				<i class="icon-info-circle"></i> {l s='Select rooms for which you want to cancel bookings. Additional facilities for cancelled rooms will be cancelled automatically.'}
+				<i class="icon-info-circle"></i> {l s='Select rooms for which you want to cancel bookings. Services for cancelled rooms will be cancelled automatically.'}
 			</div>
-			{if !$hasCompletelyRefunded}
-				<div class="row standard_refund_fields">
-					<div class="col-sm-12">
-						<button type="button" id="order_refund_request_submit" class="btn pull-right"><span>{l s='Submit'}</span></button>
-					</div>
-				</div>
-			{/if}
+            <div class="row standard_refund_fields">
+                <div class="col-sm-12">
+                    <button type="button" id="order_refund_request_submit" class="btn pull-right"><span>{l s='Submit'}</span></button>
+                </div>
+            </div>
 		{/if}
 	</form>
 

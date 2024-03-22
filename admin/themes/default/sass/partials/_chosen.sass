@@ -200,6 +200,8 @@ $chosen-sprite-path: '../img/chosen-sprite.png'
 		input
 			position: absolute
 			@include left(-9000px)
+		&:before
+			visibility: hidden
 
 .chosen-container-multi
 	.chosen-choices
@@ -227,6 +229,7 @@ $chosen-sprite-path: '../img/chosen-sprite.png'
 				border: 0 !important
 				color: $gray
 				height: $chosen-multi-height - 8px
+				width: 100% !important
 				margin: 0
 				padding: 4px
 				outline: 0
@@ -295,6 +298,15 @@ $chosen-sprite-path: '../img/chosen-sprite.png'
 		.search-field input
 			color: #111 !important
 
+.chosen-container-multi.chosen-options-horizontal .chosen-choices
+	max-height: 55px !important
+	white-space: nowrap
+	overflow-x: auto
+
+.chosen-container-multi.chosen-options-horizontal .chosen-choices li
+	float: none
+	display: inline-block
+
 .chosen-disabled
 	cursor: default
 	opacity: 0.5 !important
@@ -342,3 +354,6 @@ $chosen-sprite-path: '../img/chosen-sprite.png'
 		background: url($chosen-sprite-path) no-repeat -28px -20px, $chosen-background
 		direction: rtl
 		padding: 4px 5px 4px 20px
+
+#list_filters_panel .chosen-container
+	width: 100% !important

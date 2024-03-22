@@ -1,0 +1,60 @@
+Message from {shop_name}
+Hi {firstname} {lastname},
+Thank you for selecting our hotel!
+Bookings in this order are Not Confirmed yet !!
+We are sorry for your inconvenience. Please contact hotel to get final confirmation for your bookings.
+
+Order details
+Order: {order_name} Placed on {date}
+Payment: {payment}
+Status: {order_status}
+
+Room Image
+Room Description
+Hotel
+Room Capcity
+Unit Price
+Rooms Qty
+Check-in Date
+Check-out Date
+Total
+
+{cart_booking_data_text}
+
+{extra_demands_details_text}
+
+{discounts}
+
+Total Rooms Cost
+{total_products}
+
+Total Extra Services Cost
+{total_extra_demands_te}
+
+Discounts
+{total_discounts}
+
+Total Rooms Tax
+{total_tax_paid}
+
+Extra Services Tax
+{extra_demands_tax}
+
+Final Booking Amount
+{total_paid}
+
+Customer address
+{invoice_block_html}
+
+You can review your order and download your invoice from the
+"Order history" [{history_url}] section of your
+customer account by clicking "My account"
+[{my_account_url}] on our shop.
+
+If you have a guest account, you can follow your order via the
+"Guest Tracking"
+[{guest_tracking_url}?id_order={order_name}] section
+on our shop.
+
+{shop_name} [{shop_url}] powered by
+Webkul(tm) [https://webkul.com]

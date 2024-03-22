@@ -276,13 +276,21 @@ class HotelRoomType extends ObjectModel
     /**
      * @param [int] $roomTypesList: string of idRoomTypes seperated by ","
      */
-    public function getRoomTypeDetailByRoomTypeIds($roomTypesList)
+    public function getRoomTypeDetailByRoomTypeIds($roomTypesList, $position = true)
     {
-        $sql = 'SELECT COUNT(hri.`id`) AS `numberOfRooms`, hrt.`id_product`, `adults`, `children`, `max_adults`, `max_children`, `max_guests`
-                FROM `'._DB_PREFIX_.'htl_room_type` AS `hrt`
-                INNER JOIN `'._DB_PREFIX_.'htl_room_information` AS `hri` ON (hri.`id_product` = hrt.`id_product`)
-                WHERE hrt.`id_product` IN ('.$roomTypesList.')
-                GROUP BY hrt.`id_product`';
+        $sql = 'SELECT COUNT(hri.`id`) AS `numberOfRooms`, hrt.`id_product`, `adults`, `children`, `max_adults`, `max_children`, `max_guests`'.
+        ($position ? ', cp.`position`' : '').'
+        FROM `'._DB_PREFIX_.'htl_room_type` AS `hrt`
+        INNER JOIN `'._DB_PREFIX_.'htl_room_information` AS `hri` ON (hri.`id_product` = hrt.`id_product`)';
+
+        if ($position) {
+            $sql .= ' INNER JOIN `'._DB_PREFIX_.'htl_branch_info` hbi ON (hbi.`id` = hrt.`id_hotel`)
+            INNER JOIN `'._DB_PREFIX_.'category_product` cp ON cp.`id_category` = hbi.`id_category` AND cp.`id_product` = hrt.`id_product`';
+        }
+
+        $sql .= 'WHERE hrt.`id_product` IN ('.$roomTypesList.')
+        GROUP BY hrt.`id_product`'.
+        ($position ? ' ORDER BY cp.`position`' : '');
 
         return Db::getInstance()->executeS($sql);
     }
@@ -314,15 +322,19 @@ class HotelRoomType extends ObjectModel
      *
      * @return [array|false] [If data found returns array containing information of the room types else returns false ]
      */
-    public function getIdProductByHotelId($idHotel, $idRoomType = 0, $onlyActiveProd = 0, $onlyActiveHotel = 0)
+    public function getIdProductByHotelId($idHotel, $idRoomType = 0, $onlyActiveProd = 0, $onlyActiveHotel = 0, $checkShowAtFront = null)
     {
+        if (is_null($checkShowAtFront)) {
+            $checkShowAtFront = isset(Context::getContext()->employee->id) ? 0 : 1;
+        }
+
         $sql = 'SELECT DISTINCT hrt.`id_product`, hrt.`adults`, hrt.`children`, hrt.`id`
                 FROM `'._DB_PREFIX_.'htl_room_type` AS hrt ';
 
         if ($onlyActiveHotel) {
             $sql .= 'INNER JOIN `'._DB_PREFIX_.'htl_branch_info` AS hti ON (hti.id = hrt.id_hotel AND hti.active = 1)';
         }
-        if ($onlyActiveProd) {
+        if ($onlyActiveProd || $checkShowAtFront) {
             $sql .= 'INNER JOIN `'._DB_PREFIX_.'product` AS pp ON (hrt.id_product = pp.id_product AND pp.active = 1)';
         }
         $sql .= 'WHERE hrt.`id_hotel`='. (int)$idHotel;
@@ -330,6 +342,10 @@ class HotelRoomType extends ObjectModel
         if ($idRoomType) {
             $sql .= ' AND hrt.`id_product` = '. (int)$idRoomType;
         }
+        if ($checkShowAtFront) {
+            $sql .= ' AND pp.`show_at_front` = 1';
+        }
+
         return Db::getInstance()->executeS($sql);
     }
 

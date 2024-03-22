@@ -66,11 +66,27 @@ class ProductControllerCore extends FrontController
             $this->addJqueryPlugin('jqzoom');
         }
 
-        if (($PS_API_KEY = Configuration::get('PS_API_KEY')) && Configuration::get('WK_GOOGLE_ACTIVE_MAP')) {
-            $this->addJS(
-                'https://maps.googleapis.com/maps/api/js?key='.$PS_API_KEY.'&libraries=places&language='.
-                $this->context->language->iso_code.'&region='.$this->context->country->iso_code
-            );
+        if (($PS_API_KEY = Configuration::get('PS_API_KEY'))) {
+            $objHotelRoomType = new HotelRoomType();
+            $roomTypeInfo = $objHotelRoomType->getRoomTypeInfoByIdProduct($this->product->id);
+            if ($roomTypeInfo) {
+                $objHotelBranchInformation = new HotelBranchInformation($roomTypeInfo['id_hotel']);
+                if (floatval($objHotelBranchInformation->latitude) != 0
+                    && floatval($objHotelBranchInformation->longitude) != 0
+                ) {
+                    Media::addJsDef(array(
+                        'hotel_location' => array(
+                            'latitude' => $objHotelBranchInformation->latitude,
+                            'longitude' => $objHotelBranchInformation->longitude,
+                        )
+                    ));
+
+                    $this->addJS(
+                        'https://maps.googleapis.com/maps/api/js?key='.$PS_API_KEY.'&libraries=places&language='.
+                        $this->context->language->iso_code.'&region='.$this->context->country->iso_code
+                    );
+                }
+            }
         }
     }
 
@@ -112,7 +128,7 @@ class ProductControllerCore extends FrontController
             $this->product = new Product($id_product, true, $this->context->language->id, $this->context->shop->id);
         }
 
-        if (!$this->product->booking_product) {
+        if (!$this->product->booking_product || ($this->product->booking_product && !$this->product->show_at_front)) {
             Tools::redirect($this->context->link->getPageLink('pagenotfound'));
         }
 
@@ -327,10 +343,16 @@ class ProductControllerCore extends FrontController
 
                     if (!($date_from = Tools::getValue('date_from'))) {
                         $date_from = date('Y-m-d');
-                        $date_to = date('Y-m-d', strtotime('+1 day', strtotime($date_from)));
+                        // set date to according to los
+                        $objHotelRoomTypeRestrictionDateRange = new HotelRoomTypeRestrictionDateRange();
+                        $los = $objHotelRoomTypeRestrictionDateRange->getRoomTypeLengthOfStay($this->product->id, $date_from);
+                        $date_to = date('Y-m-d', strtotime('+'.$los['min_los'].' day', strtotime($date_from)));
                     }
                     if (!($date_to = Tools::getValue('date_to'))) {
-                        $date_to = date('Y-m-d', strtotime('+1 day', strtotime($date_from)));
+                        // set date to according to los
+                        $objHotelRoomTypeRestrictionDateRange = new HotelRoomTypeRestrictionDateRange();
+                        $los = $objHotelRoomTypeRestrictionDateRange->getRoomTypeLengthOfStay($this->product->id, $date_from);
+                        $date_to = date('Y-m-d', strtotime('+'.$los['min_los'].' day', strtotime($date_from)));
                     }
 
                     $hotel_branch_obj = new HotelBranchInformation($hotel_id);
@@ -369,13 +391,6 @@ class ProductControllerCore extends FrontController
                         }
                     }
 
-                    Media::addJsDef(array(
-                        'hotel_loc' => array(
-                            'latitude' => $hotel_branch_obj->latitude,
-                            'longitude' => $hotel_branch_obj->longitude,
-                        )
-                    ));
-
                     $this->context->smarty->assign(
                         array(
                             'id_hotel' => $hotel_id,
@@ -411,6 +426,14 @@ class ProductControllerCore extends FrontController
                     $occupancy_value = array();
                     if (Configuration::get('PS_FRONT_ROOM_UNIT_SELECTION_TYPE') == HotelBookingDetail::PS_ROOM_UNIT_SELECTION_TYPE_QUANTITY) {
                         $occupancy_value = 1;
+                    } else {
+                        $occupancy_value = array(
+                            array(
+                                'adults' => $room_info_by_product_id['adults'],
+                                'children' => 0,
+                                'child_ages' => array(),
+                            ),
+                        );
                     }
                     $this->assignBookingFormVars($this->product->id, $date_from, $date_to, $occupancy_value);
                     $this->assignServiceProductVars();
@@ -605,7 +628,7 @@ class ProductControllerCore extends FrontController
         }
 
         $totalAvailableRooms = 0;
-        if ($hotelRoomData = $objBookingDetail->DataForFrontSearch($bookingParams)) {
+        if ($hotelRoomData = $objBookingDetail->dataForFrontSearch($bookingParams)) {
             $totalAvailableRooms = $hotelRoomData['stats']['num_avail'];
             $quantity = ($quantity > $totalAvailableRooms) ? $totalAvailableRooms : $quantity;
         }
@@ -728,7 +751,7 @@ class ProductControllerCore extends FrontController
         // calculate total price
         $totalPrice = $totalRoomPrice + $demandsPrice;
         // send occupancy information searched by the user
-        if ($this->ajax && $occupancy && is_array($occupancy)) {
+        if ($occupancy && is_array($occupancy)) {
             $smartyVars['occupancies'] = $occupancy;
             $smartyVars['occupancy_adults'] = array_sum(array_column($occupancy, 'adults'));
             $smartyVars['occupancy_children'] = array_sum(array_column($occupancy, 'children'));

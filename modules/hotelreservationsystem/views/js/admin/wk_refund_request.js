@@ -18,6 +18,10 @@
 */
 
 $(document).ready(function() {
+    // manage refund options checkboxes as per the refund paramenters
+    if ($('#order_return_form .table input[name^="refund_amounts"]').length) {
+        manageRefundOptions();
+    }
 
     // initialize tootip for room price
     if ($('#rooms_refund_info .price_info').length) {
@@ -91,32 +95,38 @@ $(document).ready(function() {
 	});
 
     $(document).on('keyup', '#order_return_form .table input[name^="refund_amounts"]', function() {
-        let refundAmountInputs = $('#order_return_form .table input[name^="refund_amounts"]');
+        manageRefundOptions();
+    });
+});
 
-        let disableRefundOptions = false;
+// This function manages (Enable/disable) the refund options check-boxes according to the refund parameters like refund amount
+function manageRefundOptions()
+{
+    let refundAmountInputs = $('#order_return_form .table input[name^="refund_amounts"]');
+
+    let disableRefundOptions = false;
+    $(refundAmountInputs).each(function(index, element) {
+        let val = parseFloat($(element).val().trim());
+        if (isNaN(val)) { // if at least one amount input is empty
+            disableRefundOptions = true;
+            return;
+        }
+    });
+
+    if (!disableRefundOptions) {
+        let hasAllZero = true;
         $(refundAmountInputs).each(function(index, element) {
             let val = parseFloat($(element).val().trim());
-            if (isNaN(val)) { // if at least one amount input is empty
-                disableRefundOptions = true;
+            if (val != 0) {
+                hasAllZero = false;
                 return;
             }
         });
 
-        if (!disableRefundOptions) {
-            let hasAllZero = true;
-            $(refundAmountInputs).each(function(index, element) {
-                let val = parseFloat($(element).val().trim());
-                if (val != 0) {
-                    hasAllZero = false;
-                    return;
-                }
-            });
-
-            if (hasAllZero) { // if all amount inputs are 0
-                disableRefundOptions = true;
-            }
+        if (hasAllZero) { // if all amount inputs are 0
+            disableRefundOptions = true;
         }
+    }
 
-        $('#generateCreditSlip, #refundTransactionAmount, #generateDiscount').attr('disabled', disableRefundOptions);
-    });
-});
+    $('#generateCreditSlip, #refundTransactionAmount, #generateDiscount').attr('disabled', disableRefundOptions);
+}

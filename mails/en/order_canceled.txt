@@ -6,6 +6,16 @@ Hi {firstname} {lastname},
 Your order with the reference {order_name} from {shop_name} has
 been canceled.
 
+Here are your order details:
+Order reference: {order_name}
+Order total: {total_paid}
+Total Rooms: {num_rooms}
+
+Hotel details:
+Hotel Name: {hotel_hotel_name}
+Hotel Phone: {hotel_phone}
+Hotel Email: {hotel_email}
+
 {extra_mail_content_txt}
 
 You can review your order and download your invoice from the
