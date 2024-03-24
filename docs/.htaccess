@@ -1,1 +1,13 @@
-Deny from ALL
+<IfVersion < 2.4>
+    Order deny,allow
+    Deny from all
+</IfVersion>
+<IfVersion >= 2.4>
+    <IfModule !mod_access_compat.c>
+        Require all denied
+    </IfModule>
+    <IfModule mod_access_compat.c>
+        Order deny,allow
+        Deny from all
+    </IfModule>
+</IfVersion>

@@ -1,5 +1,22 @@
-Order deny,allow
-Deny from all
-<FilesMatch "\.(html|txt)$">
-Allow from all
-</FilesMatch>
+<IfVersion < 2.4>
+  Order deny,allow
+  Deny from all
+  <FilesMatch "\.(html|txt)$">
+    Allow from all
+  </FilesMatch>
+</IfVersion>
+<IfVersion >= 2.4>
+  <IfModule !mod_access_compat.c>
+    Require all denied
+    <FilesMatch "\.(html|txt)$">
+      Require all granted
+    </FilesMatch>
+  </IfModule>
+  <IfModule mod_access_compat.c>
+      Order deny,allow
+      Deny from all
+    <FilesMatch "\.(html|txt)$">
+      Allow from all
+    </FilesMatch>
+  </IfModule>
+</IfVersion>

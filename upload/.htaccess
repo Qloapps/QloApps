@@ -1,7 +1,10 @@
 <IfModule mod_mime.c>
-	RemoveHandler .php .phtml .php3 .php4 .php5
-	RemoveType .php .phtml .php3 .php4 .php5
+	RemoveHandler .php .phtml .php7 .php8
+	RemoveType .php .phtml .php7 .php8
 </IfModule>
-<IfModule mod_php5.c>
+<IfModule mod_php.c>
+	php_flag engine off
+</IfModule>
+<IfModule mod_php7.c>
 	php_flag engine off
 </IfModule>

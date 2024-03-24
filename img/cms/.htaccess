@@ -1,8 +1,36 @@
 <IfModule mod_php5.c>
 	php_flag engine off
 </IfModule>
-deny from all
+<IfModule mod_php7.c>
+	php_flag engine off
+</IfModule>
+
+<IfVersion < 2.4>
+    Order deny,allow
+    Deny from all
+</IfVersion>
+<IfVersion >= 2.4>
+    <IfModule !mod_access_compat.c>
+        Require all denied
+    </IfModule>
+    <IfModule mod_access_compat.c>
+        Order deny,allow
+        Deny from all
+    </IfModule>
+</IfVersion>
+
 <Files ~ "(?i)^.*\.(jpg|jpeg|gif|png|bmp|tiff|svg|pdf|mov|mpeg|mp4|avi|mpg|wma|flv|webm)$">
-	order deny,allow
-	allow from all
+    <IfVersion < 2.4>
+        Order allow,deny
+        Allow from all
+    </IfVersion>
+    <IfVersion >= 2.4>
+        <IfModule !mod_access_compat.c>
+            Require all granted
+        </IfModule>
+        <IfModule mod_access_compat.c>
+            Order allow,deny
+            Allow from all
+        </IfModule>
+    </IfVersion>
 </Files>
