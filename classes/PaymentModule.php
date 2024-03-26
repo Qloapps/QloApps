@@ -772,9 +772,8 @@ abstract class PaymentModuleCore extends Module
                     $maxOverbookingCount = 0;
                     foreach ($order->product_list as $product) {
                         $idProduct = $product['id_product'];
-                        if ($product['booking_product']
-                            && $cartBookingData = $objCartBookingData->getCartInfoIdCartIdProduct($this->context->cart->id, $idProduct, $product['date_from'], $product['date_to'])
-                        ) {
+                        $cartBookingData = $objCartBookingData->getOnlyCartBookingData($this->context->cart->id, $this->context->cart->id_guest, $idProduct);
+                        if ($cartBookingData) {
                             foreach ($cartBookingData as $bookingInfo) {
                                 $objCartBookingData = new HotelCartBookingData($bookingInfo['id']);
                                 $objCartBookingData->id_order = $order->id;
@@ -987,8 +986,8 @@ abstract class PaymentModuleCore extends Module
                                 $product['id_product'],
                                 isset($product['id_hotel']) ? $product['id_hotel'] : 0,
                                 0,
-                                $product['date_from'],
-                                $product['date_to'],
+                                0,
+                                0,
                                 0,
                                 0,
                                 null,
