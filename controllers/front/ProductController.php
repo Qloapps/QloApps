@@ -773,6 +773,7 @@ class ProductControllerCore extends FrontController
         $smartyVars['demands_price_per_room'] = $demandsPricePerRoom;
         $smartyVars['demands_price'] = $demandsPrice;
         $smartyVars['total_price'] = $totalPrice;
+        $smartyVars['static_token'] = Tools::getToken(false);
         $this->context->smarty->assign($smartyVars);
         return true;
     }

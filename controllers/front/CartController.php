@@ -290,7 +290,12 @@ class CartControllerCore extends FrontController
             }
 
             if ($occupancyRequiredForBooking && $operator == 'up') {
-                if ($occupancy = json_decode(Tools::getValue('occupancy'), true)) {
+                $occupancy = Tools::getValue('occupancy');
+                if (Validate::isString($occupancy)) { // if occupancy is json encoded
+                    $occupancy = json_decode($occupancy, true);
+                }
+
+                if ($occupancy) {
                     $this->qty = count($occupancy);
                 } else {
                     $this->errors[] = Tools::displayError('Invalid occupnacy.');

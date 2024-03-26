@@ -268,6 +268,15 @@ $(document).on('click', 'button[name=saveCustomization]', function(e) {
     saveCustomization();
 });
 
+$(document).on('submit', '#booking-form', function() {
+    let form = $('#booking-form');
+
+    $(form).find('input[name="roomDemands"]').val(JSON.stringify(getRoomsExtraDemands()));
+    $(form).find('input[name="serviceProducts"]').val(JSON.stringify(getRoomsServiceProducts()));
+
+    return true;
+});
+
 if (typeof ad !== 'undefined' && ad && typeof adtoken !== 'undefined' && adtoken) {
     $(document).on('click', 'a#publish_button', function(e) {
         e.preventDefault();
@@ -1567,4 +1576,54 @@ function getBookingOccupancy()
     }
 
     return occupancy;
+}
+
+function disableRoomTypeDemands(show) {
+    if (show) {
+        $('.room_demands_container_overlay').show();
+        $('.room_demands_container').find('input:checkbox.id_room_type_demand').prop('checked', false);
+        $('.room_demands_container').find('input:checkbox.id_room_type_demand').attr('disabled', 'disabled');
+    } else {
+        $('.room_demands_container_overlay').hide();
+        $('.room_demands_container').find('input:checkbox.id_room_type_demand').removeAttr('disabled');
+        $('.room_demands_container').find('.checker').removeClass('disabled');
+    }
+}
+
+function disableRoomTypeServices(disable) {
+    if (disable) {
+        $('#service_products_cont').find('button.add_roomtype_product').attr('disabled', 'disabled');
+        $('#service_products_cont').find('.qty_container .qty_direction a').attr('disabled', 'disabled');
+    } else {
+        $('#service_products_cont').find('button.add_roomtype_product').removeAttr('disabled');
+        $('#service_products_cont').find('.qty_container .qty_direction a').removeAttr('disabled');
+    }
+}
+
+function getRoomsExtraDemands()
+{
+    var roomDemands = [];
+
+    $('input:checkbox.id_room_type_demand:checked').each(function () {
+        roomDemands.push({
+            'id_global_demand':$(this).val(),
+            'id_option': $(this).closest('.room_demand_block').find('.id_option').val()
+        });
+    });
+
+    return roomDemands;
+}
+
+function getRoomsServiceProducts()
+{
+    var serviceProducts = [];
+
+    $('#additional_products input.service_product').each(function () {
+        serviceProducts.push({
+            'id_product': $(this).data('id_product'),
+            'quantity':$(this).val(),
+        });
+    });
+
+    return serviceProducts;
 }
