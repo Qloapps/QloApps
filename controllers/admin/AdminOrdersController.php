@@ -4046,14 +4046,6 @@ class AdminOrdersControllerCore extends AdminController
         		'error' => Tools::displayError('The OrderDetail object cannot be loaded.')
         	)));
 
-        $address = new Address(Tools::getValue('id_address'));
-        if (!Validate::isLoadedObject($address)) {
-            die(json_encode(array(
-                'result' => false,
-                'error' => Tools::displayError('The address object cannot be loaded.')
-            )));
-        }
-
         die(json_encode(array(
             'result' => true,
             'reduction_percent' => $order_detail->reduction_percent
