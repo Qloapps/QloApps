@@ -176,7 +176,9 @@ class QloStatsServiceProducts extends ModuleGrid
 
     public function setQueryForServices($dateBetween)
     {
-        $this->query = '(SELECT IFNULL(pl.`name`, od.`product_name`) as `display_name`, p.`active`, od.`product_auto_add` as auto_add_to_cart, od.`product_price_addition_type` as price_addition_type,
+        $this->query = '(SELECT od.`product_name` as `display_name`, p.`active`,
+            od.`product_auto_add` as auto_add_to_cart,
+            od.`product_price_addition_type` as price_addition_type,
             ROUND(IFNULL(SUM(spod.`total_price_tax_excl` / o.`conversion_rate`), 0), 2) / SUM(
                 IF(od.`product_price_calculation_method` = '.(int)Product::PRICE_CALCULATION_METHOD_PER_DAY.',
                     DATEDIFF(hbd.`date_to`, hbd.`date_from`) * spod.`quantity`,
@@ -193,14 +195,18 @@ class QloStatsServiceProducts extends ModuleGrid
             FROM '._DB_PREFIX_.'htl_room_type_service_product_order_detail spod
             LEFT JOIN  '._DB_PREFIX_.'product p
             ON (spod.`id_product` = p.`id_product`)
-            LEFT JOIN '._DB_PREFIX_.'product_lang pl ON (p.id_product = pl.id_product AND pl.id_lang = '.(int)$this->getLang().')
-            INNER JOIN '._DB_PREFIX_.'orders o ON (spod.id_order = o.id_order)
-            INNER JOIN '._DB_PREFIX_.'order_detail od ON (spod.`id_product` = od.`product_id` AND od.id_order = o.id_order)
-            INNER JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd ON (spod.`id_htl_booking_detail` = hbd.`id`)
+            LEFT JOIN '._DB_PREFIX_.'product_lang pl
+            ON (p.id_product = pl.id_product AND pl.id_lang = '.(int)$this->getLang().')
+            INNER JOIN '._DB_PREFIX_.'orders o
+            ON (spod.id_order = o.id_order)
+            INNER JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd
+            ON (spod.`id_htl_booking_detail` = hbd.`id`)
+            INNER JOIN '._DB_PREFIX_.'order_detail od
+            ON (spod.`id_order_detail` = od.`id_order_detail`)
             WHERE o.valid = 1 AND o.invoice_date BETWEEN '.$dateBetween.'
             '.HotelBranchInformation::addHotelRestriction(false, 'hbd').'
             AND od.`is_booking_product` = 0
-            GROUP BY spod.id_product, od.product_auto_add)
+            GROUP BY spod.id_product, od.`product_auto_add`, od.`product_price_addition_type`)
             UNION
             (SELECT pl.`name` as `display_name`, p.`active`, p.`auto_add_to_cart`, p.`price_addition_type`,
             0 AS avgPriceSold,
@@ -215,6 +221,8 @@ class QloStatsServiceProducts extends ModuleGrid
                 INNER JOIN '._DB_PREFIX_.'orders o ON (spod.id_order = o.id_order)
                 INNER JOIN '._DB_PREFIX_.'order_detail od ON (od.id_order = o.id_order)
                 INNER JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd ON (spod.`id_htl_booking_detail` = hbd.`id`)
+                INNER JOIN `'._DB_PREFIX_.'product`
+                ON (od.`product_id` = p.`id_product` AND od.`product_auto_add` = p.`auto_add_to_cart` AND od.`product_price_addition_type` = p.`price_addition_type`)
                 WHERE o.valid = 1 AND o.invoice_date BETWEEN '.$dateBetween.'
                 '.HotelBranchInformation::addHotelRestriction(false, 'hbd').'
                 AND od.`is_booking_product` = 0
@@ -231,8 +239,18 @@ class QloStatsServiceProducts extends ModuleGrid
     public function setQueryForFacilities($dateBetween)
     {
         $this->query = '(SELECT bd.`name` as `display_name`,
-            ROUND(IFNULL(SUM(bd.`total_price_tax_excl` / o.`conversion_rate`), 0), 2) / COUNT(bd.`id_booking_demand`) as avgPriceSold,
-            IFNULL(COUNT(bd.`id_booking_demand`), 0) AS totalQuantitySold,
+            ROUND(IFNULL(SUM(bd.`total_price_tax_excl` / o.`conversion_rate`), 0), 2) / SUM(
+                IF(bd.`price_calc_method` = '.(int)HotelRoomTypeGlobalDemand::WK_PRICE_CALC_METHOD_EACH_DAY.',
+                    DATEDIFF(hbd.`date_to`, hbd.`date_from`) * 1,
+                    1
+                )
+            ) as avgPriceSold,
+            IFNULL(SUM(
+                IF(bd.`price_calc_method` = '.(int)HotelRoomTypeGlobalDemand::WK_PRICE_CALC_METHOD_EACH_DAY.',
+                    DATEDIFF(hbd.`date_to`, hbd.`date_from`) * 1,
+                    1
+                )
+            ), 0) AS totalQuantitySold,
             ROUND(IFNULL(SUM(bd.`total_price_tax_excl` / o.`conversion_rate`), 0), 2) AS totalPriceSold
             FROM '._DB_PREFIX_.'htl_booking_demands bd
             INNER JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd ON (bd.`id_htl_booking` = hbd.`id`)
