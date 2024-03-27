@@ -153,47 +153,47 @@
 										</li>
 									{/foreach}
 								</ul>
-							{/if}
-							<script type="text/javascript">
-								$(document).ready(function(){
-									updateListVisibility();
-									$('#optional-list-toggle').on('click', function(e) {
-										e.stopPropagation();
-									})
-									$('input[name="list_fields_visibility"]').on('change', function(){
+								<script type="text/javascript">
+									$(document).ready(function(){
 										updateListVisibility();
-									})
-								});
-								function updateListVisibility() {
-									var list_fields_visibility = [];
-									$('input[name="list_fields_visibility"]:checked').each(function(i, field){
-										list_fields_visibility.push($(field).val());
+										$('#optional-list-toggle').on('click', function(e) {
+											e.stopPropagation();
+										})
+										$('input[name="list_fields_visibility"]').on('change', function(){
+											updateListVisibility();
+										})
 									});
-									const table = $('table.table.{$table}');
-									$(table).find('.field_optional').hide();
-									$(table).find('.field_optional').each(function(i, val) {
-										if (list_fields_visibility.includes($(this).data('key'))) {
-											$(this).show();
-										}
-									});
+									function updateListVisibility() {
+										var list_fields_visibility = [];
+										$('input[name="list_fields_visibility"]:checked').each(function(i, field){
+											list_fields_visibility.push($(field).val());
+										});
+										const table = $('table.table.{$table}');
+										$(table).find('.field_optional').hide();
+										$(table).find('.field_optional').each(function(i, val) {
+											if (list_fields_visibility.includes($(this).data('key'))) {
+												$(this).show();
+											}
+										});
 
-									$.ajax({
-										type: 'POST',
-										headers: { "cache-control": "no-cache" },
-										url: '{$action}',
-										data: {
-											ajax: 1,
-											action: 'updateListVisivility',
-											list_fields_visibility: list_fields_visibility
-										},
-										cache: false,
-										dataType: 'json',
-										success: function(data) {
+										$.ajax({
+											type: 'POST',
+											headers: { "cache-control": "no-cache" },
+											url: '{$action}',
+											data: {
+												ajax: 1,
+												action: 'updateListVisivility',
+												list_fields_visibility: list_fields_visibility
+											},
+											cache: false,
+											dataType: 'json',
+											success: function(data) {
 
-										}
-									});
-								}
-							</script>
+											}
+										});
+									}
+								</script>
+							{/if}
 							<a class="list-toolbar-btn" href="javascript:location.reload();">
 								<span title="" data-toggle="tooltip" class="label-tooltip" data-original-title="{l s='Refresh list'}" data-html="true" data-placement="top">
 									<i class="process-icon-refresh"></i>
