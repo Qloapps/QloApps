@@ -297,7 +297,7 @@
 				{/if}
 
 				<ul id="header_employee_box">
-					{if $upgrade_info->update_available > 0}
+					{if isset($upgrade_info->update_available) && $upgrade_info->update_available > 0}
 						<li class="hidden-md hidden-sm hidden-xs"><a href="{$upgrade_info->upgrade_url}">{l s='QloApps Update Availabe:'} {$upgrade_info->latest_availabe}</a></li>
 					{/if}
 					<li class="hidden-sm hidden-xs">
