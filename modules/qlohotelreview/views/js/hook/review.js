@@ -21,14 +21,14 @@ var QhrReviewForm = {
     init: function(idOrder, idHotel, hotelName) {
         $('#add-review-form').find('[name="id_order"]').val(idOrder);
         $('#add-review-form').find('[name="id_hotel"]').val(idHotel);
-        $('#add-review-form').find('.hotel-name').html(hotelName);
+        $('#add-review-popup').find('.hotel-name').html(hotelName);
         QhrReviewImages.init();
     },
     show: function() {
         $.fancybox.open({
             href: '#add-review-popup',
-            wrapCSS: 'fancybox-add-review',
-            padding: 20,
+            wrapCSS: 'fancybox-add-review fancybox-order-detail',
+            padding: 0,
         });
     },
     close: function() {
@@ -95,8 +95,8 @@ var QhrReviewForm = {
 
         $.fancybox.open({
             href: href,
-            wrapCSS: 'fancybox-add-review-success',
-            padding: 20,
+            wrapCSS: 'fancybox-order-detail feedback',
+            padding: 0,
         });
     },
     reset: function() {
@@ -139,7 +139,7 @@ var QhrReviewImages = {
     addFileToPreview: function(file, iInput, iFile) {
         var reader = new FileReader();
         reader.onload = function (e) {
-            $('.previews-wrap').append('<span><img data-i-input="'+iInput+'" data-i-file="'+iFile+'" src="'+e.target.result+'" class="img-preview"><i class="icon icon-times-circle-o"></i></span>');
+            $('.previews-wrap').append('<span><img data-i-input="'+iInput+'" data-i-file="'+iFile+'" src="'+e.target.result+'" class="img-preview"><i>×</i></span>');
         };
         reader.readAsDataURL(file);
     },
@@ -249,10 +249,6 @@ $(document).on('change', 'input.input-images', function(e) {
 });
 
 $(document).ready(function () {
-    if (typeof qlo_hotel_review_js_vars === 'object' && qlo_hotel_review_js_vars.id_order) {
-        showOrder(1, qlo_hotel_review_js_vars.id_order, qlo_hotel_review_js_vars.link);
-    }
-
     // init raty
     if (typeof qlo_hotel_review_js_vars === 'object' && qlo_hotel_review_js_vars.raty_img_path) {
         initRaty(qlo_hotel_review_js_vars.raty_img_path);

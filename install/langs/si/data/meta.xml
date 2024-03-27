@@ -96,6 +96,12 @@
     <keywords/>
     <url_rewrite>order-history</url_rewrite>
   </meta>
+  <meta id="order-detail" id_shop="1">
+    <title>ගිතේරිම් විස්තර</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>githerims-wisthara</url_rewrite>
+  </meta>
   <meta id="identity" id_shop="1">
     <title>Identity</title>
     <description/>

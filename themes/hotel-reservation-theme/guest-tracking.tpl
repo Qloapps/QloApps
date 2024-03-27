@@ -32,6 +32,7 @@
 		{assign var=order_state value=$order->getCurrentState()}
 		{assign var=invoice value=$order->invoice}
 		{assign var=order_history value=$order->order_history}
+		{assign var=overbooking_order_states value=$order->overbooking_order_states}
 		{assign var=carrier value=$order->carrier}
 		{assign var=address_invoice value=$order->address_invoice}
 		{assign var=address_delivery value=$order->address_delivery}
@@ -55,8 +56,10 @@
 		{assign var=back_ord_msg value=$order->back_ord_msg}
 		{assign var=order_has_invoice value=$order->order_has_invoice}
 		{assign var=cart_htl_data value=$order->cart_htl_data}
-		{assign var=non_requested_rooms value=$order->non_requested_rooms}
 		{assign var=customerGuestDetail value=$order->customerGuestDetail}
+		{assign var=obj_hotel_branch_information value=$order->obj_hotel_branch_information}
+		{assign var=hotel_address_info value=$order->hotel_address_info}
+		{assign var=hotel_refund_rules value=$order->hotel_refund_rules}
 
 		{if isset($order->total_old)}
 			{assign var=total_old value=$order->total_old}
@@ -72,41 +75,47 @@
 		</div>
 	{/foreach}
 
-	<h2 id="guestToCustomer" class="page-heading">{l s='For more advantages...'}</h2>
+    <div class="row">
+        <div class="col-md-8">
+            {if isset($transformSuccess)}
+                <p class="alert alert-success alert-transformed">{l s='Your guest account has been successfully transformed into a customer account. You can now log in as a registered user. '} <a href="{$link->getPageLink('authentication', true)|escape:'html':'UTF-8'}">{l s='Log in now.'}</a></p>
+            {else}
+                <div class="card transform-account">
+                    <div class="card-header">
+                        {l s='For More Advantages'}
+                    </div>
+                    <div class="card-body">
+                        <form method="post" action="{$action|escape:'html':'UTF-8'}#guestToCustomer" class="std">
+                            {include file="$tpl_dir./errors.tpl"}
 
-	{include file="$tpl_dir./errors.tpl"}
+                            <p class="card-subtitle">
+                                {l s='Transform your guest account into a customer account and enjoy:'}
+                            </p>
 
-	{if isset($transformSuccess)}
-		<p class="alert alert-success">{l s='Your guest account has been successfully transformed into a customer account. You can now log in as a registered user. '} <a href="{$link->getPageLink('authentication', true)|escape:'html':'UTF-8'}">{l s='Log in now.'}</a></p>
-	{else}
-		<form method="post" action="{$action|escape:'html':'UTF-8'}#guestToCustomer" class="std">
-			<fieldset class="description_box box">
+                            <div class="card-text">
+                                <p>{l s='- Personalized and secure access.'}</p>
+                                <p>{l s='- Fast and easy checkout'}</p>
+                                <p>{l s='- Easier refund process'}</p>
+                            </div>
 
-                <p><strong class="dark">{l s='Transform your guest account into a customer account and enjoy:'}</strong></p>
-				<ul>
-					<li> - {l s='Personalized and secure access'}</li>
-					<li> - {l s='Fast and easy checkout'}</li>
-					<li> - {l s='Easier refund process'}</li>
-				</ul>
-                <div class="row">
-                	<div class="col-xs-12 col-sm-5 col-md-4 col-lg-3">
-                        <div class="text form-group">
-                            <label><strong class="dark">{l s='Set your password:'}</strong></label>
-                            <input type="password" name="password" class="form-control" />
-                        </div>
+                            <div class="form-group password">
+                                <label>{l s='Set your password:'}</label>
+                                <input type="password" name="password" class="form-control" />
+                            </div>
+
+                            <input type="hidden" name="id_order" value="{if isset($order->id)}{$order->id}{else}{if isset($smarty.get.id_order)}{$smarty.get.id_order|escape:'html':'UTF-8'}{else}{if isset($smarty.post.id_order)}{$smarty.post.id_order|escape:'html':'UTF-8'}{/if}{/if}{/if}" />
+                            <input type="hidden" name="order_reference" value="{if isset($smarty.get.order_reference)}{$smarty.get.order_reference|escape:'html':'UTF-8'}{else}{if isset($smarty.post.order_reference)}{$smarty.post.order_reference|escape:'html':'UTF-8'}{/if}{/if}" />
+                            <input type="hidden" name="email" value="{if isset($smarty.get.email)}{$smarty.get.email|escape:'html':'UTF-8'}{else}{if isset($smarty.post.email)}{$smarty.post.email|escape:'html':'UTF-8'}{/if}{/if}" />
+
+                            <button type="submit" name="submitTransformGuestToCustomer" class="button button-medium btn btn-submit">
+                                <span>{l s='Send'}</span>
+                            </button>
+                        </form>
                     </div>
                 </div>
-
-				<input type="hidden" name="id_order" value="{if isset($order->id)}{$order->id}{else}{if isset($smarty.get.id_order)}{$smarty.get.id_order|escape:'html':'UTF-8'}{else}{if isset($smarty.post.id_order)}{$smarty.post.id_order|escape:'html':'UTF-8'}{/if}{/if}{/if}" />
-				<input type="hidden" name="order_reference" value="{if isset($smarty.get.order_reference)}{$smarty.get.order_reference|escape:'html':'UTF-8'}{else}{if isset($smarty.post.order_reference)}{$smarty.post.order_reference|escape:'html':'UTF-8'}{/if}{/if}" />
-				<input type="hidden" name="email" value="{if isset($smarty.get.email)}{$smarty.get.email|escape:'html':'UTF-8'}{else}{if isset($smarty.post.email)}{$smarty.post.email|escape:'html':'UTF-8'}{/if}{/if}" />
-
-				<p>
-                    <button type="submit" name="submitTransformGuestToCustomer" class="button button-medium btn btn-default"><span>{l s='Send'}<i class="icon-chevron-right right"></i></span></button>
-                </p>
-			</fieldset>
-		</form>
-	{/if}
+            {/if}
+        </div>
+    </div>
 {else}
 	{include file="$tpl_dir./errors.tpl"}
 	{if isset($show_login_link) && $show_login_link}

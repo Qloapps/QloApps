@@ -96,6 +96,12 @@
     <keywords/>
     <url_rewrite>istoric-comenzi</url_rewrite>
   </meta>
+  <meta id="order-detail" id_shop="1">
+    <title>Detalii rezervare</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>detalii-rezervare</url_rewrite>
+  </meta>
   <meta id="identity" id_shop="1">
     <title>Identitate</title>
     <description/>

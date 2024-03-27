@@ -96,6 +96,12 @@
     <keywords/>
     <url_rewrite>order-history</url_rewrite>
   </meta>
+  <meta id="order-detail" id_shop="1">
+    <title>বুকিং বিবরণ</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>booking-biborn</url_rewrite>
+  </meta>
   <meta id='identity' id_shop='1'>
     <title>পরিচয় </title>
     <description/>

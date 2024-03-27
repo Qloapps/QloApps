@@ -96,6 +96,12 @@
     <keywords/>
     <url_rewrite>order-history</url_rewrite>
   </meta>
+  <meta id="order-detail" id_shop="1">
+    <title>預訂明細</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>yùdìng-míngxi</url_rewrite>
+  </meta>
   <meta id="identity" id_shop="1">
     <title>識別</title>
     <description/>
