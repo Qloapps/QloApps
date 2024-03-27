@@ -58,6 +58,46 @@
 							{/foreach}
 							{assign var="fields_optional" value=array()}
 						</ul>
+						<script type="text/javascript">
+							$(document).ready(function(){
+								updateListVisibility();
+								$('#optional-list-toggle').on('click', function(e) {
+									e.stopPropagation();
+								})
+								$('input[name="list_fields_visibility"]').on('change', function(){
+									updateListVisibility();
+								})
+							});
+							function updateListVisibility() {
+								var list_fields_visibility = [];
+								$('input[name="list_fields_visibility"]:checked').each(function(i, field){
+									list_fields_visibility.push($(field).val());
+								});
+								const table = $('table.table.{$table}');
+								$(table).find('.field_optional').hide();
+								$(table).find('.field_optional').each(function(i, val) {
+									if (list_fields_visibility.includes($(this).data('key'))) {
+										$(this).show();
+									}
+								});
+
+								$.ajax({
+									type: 'POST',
+									headers: { "cache-control": "no-cache" },
+									url: '{$action}',
+									data: {
+										ajax: 1,
+										action: 'updateListVisivility',
+										list_fields_visibility: list_fields_visibility
+									},
+									cache: false,
+									dataType: 'json',
+									success: function(data) {
+
+									}
+								});
+							}
+						</script>
 					</div>
 				</div>
 				<div class="col-xs-3 col-xs-offset-5 col-sm-2 col-sm-offset-7 col-md-1 col-md-offset-9">
