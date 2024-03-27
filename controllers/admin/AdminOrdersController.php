@@ -5188,22 +5188,22 @@ class AdminOrdersControllerCore extends AdminController
         } elseif (trim(date('Y-m-d', strtotime($product_informations['date_from']))) == '') {
             die(json_encode(array(
                 'result' => false,
-                'error' => Tools::displayError('Please Enter Check In Date.'),
+                'error' => Tools::displayError('Please enter check-in date.'),
             )));
         } elseif (!Validate::isDateFormat($new_date_from)) {
             die(json_encode(array(
                 'result' => false,
-                'error' => Tools::displayError('Please Enter a Valid Check In Date.'),
+                'error' => Tools::displayError('Please enter a valid check-in date.'),
             )));
         } elseif ($new_date_to == '') {
             die(json_encode(array(
                 'result' => false,
-                'error' => Tools::displayError('Please Enter Check Out Date.'),
+                'error' => Tools::displayError('Please enter check-out date.'),
             )));
         } elseif (!Validate::isDateFormat($new_date_to)) {
             die(json_encode(array(
                 'result' => false,
-                'error' => Tools::displayError('Please Enter a valid Check out Date.'),
+                'error' => Tools::displayError('Please enter a valid check-out date.'),
             )));
         }
         if ($this->context->employee->isSuperAdmin()) {
@@ -5216,14 +5216,14 @@ class AdminOrdersControllerCore extends AdminController
             if ($new_date_from < $compareDate) {
                 die(json_encode(array(
                     'result' => false,
-                    'error' => sprintf(Tools::displayError('Check In date should not be date before %s.'),$compareDate)
+                    'error' => sprintf(Tools::displayError('Check-in date should not be date before %s.'),$compareDate)
                 )));
             }
         }
         if ($new_date_to <= $new_date_from) {
             die(json_encode(array(
                 'result' => false,
-                'error' => Tools::displayError('Check out Date Should be after Check In date.'),
+                'error' => Tools::displayError('Check-out date should be after check-in date.'),
             )));
         } elseif (!Validate::isUnsignedInt($product_quantity)) {
             die(json_encode(array(
@@ -5236,7 +5236,7 @@ class AdminOrdersControllerCore extends AdminController
         if ($rooms_booked) {
             die(json_encode(array(
                 'result' => false,
-                'error' => Tools::displayError('This Room is Unavailable For Selected Duration.'),
+                'error' => Tools::displayError('This room is unavailable for selected duration.'),
             )));
         }
 
@@ -5246,10 +5246,10 @@ class AdminOrdersControllerCore extends AdminController
             'date_from' => $new_date_from,
             'date_to' => $new_date_to
         );
-        if ($objHotelRoomDisableDates->checkIfRoomAlreadyDisabledInDateRange($params)) {
+        if ($objHotelRoomDisableDates->checkIfRoomAlreadyDisabled($params)) {
             die(json_encode(array(
                 'result' => false,
-                'error' => Tools::displayError('This Room is Disabled in Selected Duration.'),
+                'error' => Tools::displayError('This room is disabled in selected duration.'),
             )));
         }
     }
