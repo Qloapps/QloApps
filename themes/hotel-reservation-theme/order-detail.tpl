@@ -68,25 +68,29 @@
                     {l s='Hotel Details'}
                 </div>
                 <div class="card-body">
-                    <div class="description-list">
-                        <dl class="">
-                            <div class="row">
-                                <dt class="col-xs-6 col-sm-3">{l s='Hotel Name'}</dt>
-                                <dd class="col-xs-6 col-sm-3">{$obj_hotel_branch_information->hotel_name}</dd>
-                                <dt class="col-xs-6 col-sm-3">{l s='Phone Number'}</dt>
-                                <dd class="col-xs-6 col-sm-3">
-                                    <a href="tel:{if $hotel_address_info.phone_mobile}{$hotel_address_info.phone_mobile}{else}{$hotel_address_info.phone}{/if}">
-                                        {if $hotel_address_info.phone_mobile}{$hotel_address_info.phone_mobile}{else}{$hotel_address_info.phone}{/if}
-                                    </a>
-                                </dd>
-                                <dt class="col-xs-6 col-sm-3">{l s='Email'}</dt>
-                                <dd class="col-xs-6 col-sm-3">
-                                    <a href="mailto:{$obj_hotel_branch_information->email}" class="hotel-email">{$obj_hotel_branch_information->email}</a>
-                                </dd>
-                                {hook h='displayOrderDetailHotelDetailsAfter' id_order=$order->id}
-                            </div>
-                        </dl>
-                    </div>
+                    {if Validate::isLoadedObject($obj_hotel_branch_information)}
+                        <div class="description-list">
+                            <dl class="">
+                                <div class="row">
+                                    <dt class="col-xs-6 col-sm-3">{l s='Hotel Name'}</dt>
+                                    <dd class="col-xs-6 col-sm-3">{$obj_hotel_branch_information->hotel_name}</dd>
+                                    <dt class="col-xs-6 col-sm-3">{l s='Phone Number'}</dt>
+                                    <dd class="col-xs-6 col-sm-3">
+                                        <a href="tel:{if $hotel_address_info.phone_mobile}{$hotel_address_info.phone_mobile}{else}{$hotel_address_info.phone}{/if}">
+                                            {if $hotel_address_info.phone_mobile}{$hotel_address_info.phone_mobile}{else}{$hotel_address_info.phone}{/if}
+                                        </a>
+                                    </dd>
+                                    <dt class="col-xs-6 col-sm-3">{l s='Email'}</dt>
+                                    <dd class="col-xs-6 col-sm-3">
+                                        <a href="mailto:{$obj_hotel_branch_information->email}" class="hotel-email">{$obj_hotel_branch_information->email}</a>
+                                    </dd>
+                                    {hook h='displayOrderDetailHotelDetailsAfter' id_order=$order->id}
+                                </div>
+                            </dl>
+                        </div>
+                    {else}
+                        <div class="card-text">{l s='Hotel details not available.'}</div>
+                    {/if}
                 </div>
             </div>
 
@@ -135,13 +139,17 @@
                         {l s='Address'}
                     </p>
 
-                    <p class="hotel-address">
-                        {$hotel_address_info['address1']},
-                        {if {$hotel_address_info['address2']}}{$hotel_address_info['address2']},{/if}
-                        {$hotel_address_info['city']},
-                        {if {$hotel_address_info['state']}}{$hotel_address_info['state']},{/if}
-                        {$hotel_address_info['country']}, {$hotel_address_info['postcode']}
-                    </p>
+                    {if isset($hotel_address_info) && $hotel_address_info}
+                        <p class="hotel-address">
+                            {$hotel_address_info['address1']},
+                            {if {$hotel_address_info['address2']}}{$hotel_address_info['address2']},{/if}
+                            {$hotel_address_info['city']},
+                            {if {$hotel_address_info['state']}}{$hotel_address_info['state']},{/if}
+                            {$hotel_address_info['country']}, {$hotel_address_info['postcode']}
+                        </p>
+                    {else}
+                        <div class="card-text">{l s='Hotel location not available.'}</div>
+                    {/if}
 
                     {if ($obj_hotel_branch_information->latitude|floatval != 0 && $obj_hotel_branch_information->longitude|floatval != 0)}
                         <div class="hotel-location-map">
@@ -185,18 +193,19 @@
                     </div>
                 </div>
                 <div class="card-body">
-                    <div class="rooms-list">
-                        {if isset($cart_htl_data) && $cart_htl_data}
+                    {if isset($cart_htl_data) && $cart_htl_data}
+                        <div class="rooms-list">
                             {foreach from=$cart_htl_data key=data_k item=data_v}
                                 {foreach from=$data_v['date_diff'] key=rm_k item=rm_v}
                                     {include file='./_partials/order-room-detail.tpl'}
                                 {/foreach}
                             {/foreach}
-                        {else}
-                            {l s='No rooms found.'}
-                        {/if}
-                        {hook h='displayOrderDetailRoomDetailsRoomAfter' id_order=$order->id}
-                    </div>
+
+                            {hook h='displayOrderDetailRoomDetailsRoomsAfter' id_order=$order->id}
+                        </div>
+                    {else}
+                        <div class="no-rooms card-text">{l s='Room details not available.'}</div>
+                    {/if}
                 </div>
             </div>
 
@@ -320,24 +329,29 @@
                                         </tr>
                                     {/if}
                                 {else}
-                                    {if isset($address_invoice->firstname) && $address_invoice->firstname}
-                                        <tr>
-                                            <td>{l s='Name'}</td>
-                                            <td class="text-right">{$address_invoice->firstname|escape:'html':'UTF-8'} {$address_invoice->lastname|escape:'html':'UTF-8'}</td>
-                                        </tr>
-                                    {/if}
-                                    {if isset($guestInformations['email']) && $guestInformations['email']}
-                                        <tr>
-                                            <td>{l s='Email'}</td>
-                                            <td class="text-right">{$guestInformations['email']|escape:'html':'UTF-8'}</td>
-                                        </tr>
-                                    {/if}
+                                    <tr>
+                                        <td>{l s='Name'}</td>
+                                        <td class="text-right">
+                                            {if isset($address_invoice->firstname) && $address_invoice->firstname}
+                                                {$address_invoice->firstname|escape:'html':'UTF-8'} {$address_invoice->lastname|escape:'html':'UTF-8'}
+                                            {elseif isset($guestInformations['firstname']) && $guestInformations['firstname']}
+                                                {$guestInformations['firstname']|escape:'html':'UTF-8'} {$guestInformations['lastname']|escape:'html':'UTF-8'}
+                                            {/if}
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <td>{l s='Email'}</td>
+                                        <td class="text-right">{$guestInformations['email']|escape:'html':'UTF-8'}</td>
+                                    </tr>
+
                                     {if isset($address_invoice->phone_mobile) && $address_invoice->phone_mobile}
                                         <tr>
                                             <td>{l s='Mobile'}</td>
                                             <td class="text-right">{$address_invoice->phone_mobile|escape:'html':'UTF-8'}</td>
                                         </tr>
                                     {/if}
+
                                     {if isset($address_invoice->phone) && $address_invoice->phone}
                                         <tr>
                                             <td>{l s='Phone'}</td>
@@ -508,13 +522,17 @@
                         {l s='Address'}
                     </p>
 
-                    <p class="hotel-address">
-                        {$hotel_address_info['address1']},
-                        {if {$hotel_address_info['address2']}}{$hotel_address_info['address2']},{/if}
-                        {$hotel_address_info['city']},
-                        {if {$hotel_address_info['state']}}{$hotel_address_info['state']},{/if}
-                        {$hotel_address_info['country']}, {$hotel_address_info['postcode']}
-                    </p>
+                    {if isset($hotel_address_info) && $hotel_address_info}
+                        <p class="hotel-address">
+                            {$hotel_address_info['address1']},
+                            {if {$hotel_address_info['address2']}}{$hotel_address_info['address2']},{/if}
+                            {$hotel_address_info['city']},
+                            {if {$hotel_address_info['state']}}{$hotel_address_info['state']},{/if}
+                            {$hotel_address_info['country']}, {$hotel_address_info['postcode']}
+                        </p>
+                    {else}
+                        <div class="card-text">{l s='Hotel location not available.'}</div>
+                    {/if}
 
                     {if ($obj_hotel_branch_information->latitude|floatval != 0 && $obj_hotel_branch_information->longitude|floatval != 0)}
                         <div class="hotel-location-map">
@@ -646,24 +664,29 @@
                                         </tr>
                                     {/if}
                                 {else}
-                                    {if isset($address_invoice->firstname) && $address_invoice->firstname}
-                                        <tr>
-                                            <td>{l s='Name'}</td>
-                                            <td class="text-right">{$address_invoice->firstname|escape:'html':'UTF-8'} {$address_invoice->lastname|escape:'html':'UTF-8'}</td>
-                                        </tr>
-                                    {/if}
-                                    {if isset($guestInformations['email']) && $guestInformations['email']}
-                                        <tr>
-                                            <td>{l s='Email'}</td>
-                                            <td class="text-right">{$guestInformations['email']|escape:'html':'UTF-8'}</td>
-                                        </tr>
-                                    {/if}
+                                    <tr>
+                                        <td>{l s='Name'}</td>
+                                        <td class="text-right">
+                                            {if isset($address_invoice->firstname) && $address_invoice->firstname}
+                                                {$address_invoice->firstname|escape:'html':'UTF-8'} {$address_invoice->lastname|escape:'html':'UTF-8'}
+                                            {elseif isset($guestInformations['firstname']) && $guestInformations['firstname']}
+                                                {$guestInformations['firstname']|escape:'html':'UTF-8'} {$guestInformations['lastname']|escape:'html':'UTF-8'}
+                                            {/if}
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <td>{l s='Email'}</td>
+                                        <td class="text-right">{$guestInformations['email']|escape:'html':'UTF-8'}</td>
+                                    </tr>
+
                                     {if isset($address_invoice->phone_mobile) && $address_invoice->phone_mobile}
                                         <tr>
                                             <td>{l s='Mobile'}</td>
                                             <td class="text-right">{$address_invoice->phone_mobile|escape:'html':'UTF-8'}</td>
                                         </tr>
                                     {/if}
+
                                     {if isset($address_invoice->phone) && $address_invoice->phone}
                                         <tr>
                                             <td>{l s='Phone'}</td>

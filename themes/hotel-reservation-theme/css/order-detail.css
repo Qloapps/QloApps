@@ -260,6 +260,10 @@
     padding: 0;
 }
 
+.room-details .card-body .no-rooms {
+    padding: 18px;
+}
+
 .room-details .booking-room-detail {
     padding: 18px;
     position: relative;
@@ -401,8 +405,8 @@
 
 .fancybox-wrap.fancybox-order-detail .fancybox-close {
     background: none;
-    top: 8px;
-    right: 10px;
+    top: 12px;
+    right: 12px;
     font-size: 32px;
 }
 
@@ -472,7 +476,7 @@
 }
 
 .fancybox-wrap.fancybox-order-detail .card-footer {
-    padding: 10px 15px;
+    padding: 10px 18px;
     border-top: 1px solid #E5E5E5;
 }
 
@@ -800,11 +804,6 @@
     padding-left: 0;
 }
 
-#create-new-refund-popup .tab-content {
-    margin-top: 0;
-    border-left: 1px solid #E5E5E5;
-}
-
 /* nav-tabs resets - start */
 #create-new-refund-popup .nav-tabs,
 #create-new-refund-popup .nav-tabs > li,
@@ -819,11 +818,20 @@
 /* nav-tabs resets - end */
 
 /* nav-tabs custom - start */
+#create-new-refund-popup .nav-tabs {
+    border-right: 1px solid #E5E5E5;
+    margin-right: -1px;
+}
+
 #create-new-refund-popup .nav-tabs > li > a {
     color: #333;
-    padding: 10px 18px;
+    padding: 10px 18px !important;
     margin-right: -1px;
     border-bottom: 1px solid #E5E5E5;
+}
+
+#create-new-refund-popup .nav-tabs > li:last-of-type {
+    margin-bottom: -1px;
 }
 
 #create-new-refund-popup .nav-tabs > li:last-of-type:first-of-type > a {
@@ -832,6 +840,11 @@
 
 #create-new-refund-popup .nav-tabs li.active a {
     border-right: none;
+}
+
+#create-new-refund-popup .tab-content {
+    margin-top: 0;
+    border-left: 1px solid #E5E5E5;
 }
 /* nav-tabs custom - end */
 
@@ -921,7 +934,7 @@
 }
 
 #create-new-refund-popup .card.cancel-booking-preview .card-body {
-    padding: 15px;
+    padding: 18px;
 }
 
 #create-new-refund-popup .card.cancel-booking-preview .well {
@@ -1080,11 +1093,6 @@
 
 .transform-account .form-group input {
     max-width: 350px;
-    width: 350px;
-    padding: 20px 10px;
-    border: 1px solid #E5E5E5;
-    border-radius: 4px;
-    box-shadow: none;
 }
 
 .transform-account .btn-submit {
