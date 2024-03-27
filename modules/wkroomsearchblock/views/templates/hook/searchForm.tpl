@@ -112,6 +112,8 @@
                                                 <p class="label-desc-txt">({l s='Below' mod='wkroomsearchblock'}  {$max_child_age|escape:'htmlall':'UTF-8'} {l s='years' mod='wkroomsearchblock'})</p>
                                             </div>
                                         </div>
+                                        <p style="display:none;"><span class="text-danger occupancy-input-errors"></span></p>
+
                                         <div class="row">
                                             <div class="form-group children_age_info_block col-sm-12" {if isset($occupancy['child_ages']) && $occupancy['child_ages']}style="display:block;"{/if}>
                                                 <label>{l s='All Children' mod='wkroomsearchblock'}</label>
@@ -186,6 +188,7 @@
                                             <p class="label-desc-txt">({l s='Below' mod='wkroomsearchblock'}  {$max_child_age|escape:'htmlall':'UTF-8'} {l s='years' mod='wkroomsearchblock'})</p>
                                         </div>
                                     </div>
+                                    <p style="display:none;"><span class="text-danger occupancy-input-errors"></span></p>
                                     <div class="row">
                                         <div class="form-group children_age_info_block col-sm-12">
                                             <label>{l s='All Children' mod='wkroomsearchblock'}</label>

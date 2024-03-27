@@ -54,7 +54,7 @@
 							<div class="alert alert-warning">
 							{if $controller_name == 'AdminPayment'}
 							{l s='It seems there are no recommended payment solutions for your country.'}<br />
-							<a class="_blank" href="https://www.prestashop.com/en/contact-us">{l s='Do you think there should be one? Let us know!'}</a>
+							<a class="_blank" href="https://qloapps.com/contact/">{l s='Do you think there should be one? Let us know!'}</a>
 							{else}{l s='No modules available in this section.'}{/if}</div>
 						</td>
 					</tr>

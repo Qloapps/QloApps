@@ -4,10 +4,20 @@
 #customization_list
 	border: 0px
 
+.booking_occupancy_edit, .booking_occupancy
+	.occupancy-info-separator
+		margin-top: 0px
+		margin-bottom: 10px
+	.close_occupancy
+		text-decoration: underline
+
 .booking_occupancy
 	.booking_occupancy_wrapper
 		max-height: 250px
 		overflow-x: auto
+	label.room_num_wrapper
+		text-decoration: underline
+		margin-bottom: 10px
 
 #booking-documents-modal
 	.documents-list
@@ -16,3 +26,29 @@
 				img
 					max-height: 55px
 					max-width: 55px
+.loading_overlay
+	display: none
+	position: fixed
+	left: 0
+	top: 0
+	height: 100%
+	width: 100%
+	background-color: rgba(0, 0, 0, 0.5)
+	z-index: 100000
+	.loading-img
+		position: absolute
+		top: 50%
+		left: 0
+		right: 0
+		margin: 0 auto
+
+#customer_cart_details .overbooked_room
+	background-color: #FF69B4
+	color: #FFF
+	padding: 2px 5px
+	border-radius: 2px
+	font-weight: 600
+
+.room_status_info_form
+	.room_status
+		white-space: normal

@@ -161,18 +161,20 @@ class AdminCartsControllerCore extends AdminController
         $time = time();
         $kpis = array();
 
+        $daysForConversionRate = Configuration::get('PS_KPI_CONVERSION_RATE_NB_DAYS');
+
         $helper = new HelperKpi();
         $helper->id = 'box-conversion-rate';
         $helper->icon = 'icon-sort-by-attributes-alt';
         //$helper->chart = true;
         $helper->color = 'color1';
         $helper->title = $this->l('Conversion Rate', null, null, false);
-        $helper->subtitle = $this->l('30 days', null, null, false);
+        $helper->subtitle = $daysForConversionRate.' '.$this->l('days', null, null, false);
         if (ConfigurationKPI::get('CONVERSION_RATE_CHART') !== false) {
             $helper->data = ConfigurationKPI::get('CONVERSION_RATE_CHART');
         }
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=conversion_rate';
-        $kpis[] = $helper->generate();
+        $kpis[] = $helper;
 
         $helper = new HelperKpi();
         $helper->id = 'box-carts';
@@ -184,25 +186,31 @@ class AdminCartsControllerCore extends AdminController
         $helper->subtitle = sprintf($this->l('From %s to %s', null, null, false), $date_from, $date_to);
         $helper->href = $this->context->link->getAdminLink('AdminCarts').'&action=filterOnlyAbandonedCarts';
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=abandoned_cart';
-        $kpis[] = $helper->generate();
+        $kpis[] = $helper;
 
+        $daysForAvgOrderVal = Configuration::get('PS_ORDER_KPI_AVG_ORDER_VALUE_NB_DAYS');
         $helper = new HelperKpi();
         $helper->id = 'box-average-order';
         $helper->icon = 'icon-money';
         $helper->color = 'color3';
         $helper->title = $this->l('Average Order Value', null, null, false);
-        $helper->subtitle = $this->l('30 days', null, null, false);
+        $helper->subtitle = $daysForAvgOrderVal.' '.$this->l('days', null, null, false);
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=average_order_value';
-        $kpis[] = $helper->generate();
+        $kpis[] = $helper;
 
+        $daysForProfitPerVisitor = Configuration::get('PS_ORDER_KPI_PER_VISITOR_PROFIT_NB_DAYS');
         $helper = new HelperKpi();
         $helper->id = 'box-net-profit-visitor';
         $helper->icon = 'icon-user';
         $helper->color = 'color4';
         $helper->title = $this->l('Net Profit per Visitor', null, null, false);
-        $helper->subtitle = $this->l('30 days', null, null, false);
+        $helper->subtitle = $daysForProfitPerVisitor.' '.$this->l('days', null, null, false);
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=netprofit_visit';
-        $kpis[] = $helper->generate();
+        $kpis[] = $helper;
+
+        Hook::exec('action'.$this->controller_name.'KPIListingModifier', array(
+            'kpis' => &$kpis,
+        ));
 
         $helper = new HelperKpiRow();
         $helper->kpis = $kpis;
@@ -289,11 +297,12 @@ class AdminCartsControllerCore extends AdminController
         $cartHtlData = array();
         $objHotelCartBookingData = new HotelCartBookingData();
         $objHotelRoomType = new HotelRoomType();
-        $cartHtlData = $objHotelCartBookingData->getCartFormatedBookinInfoByIdCart((int) $cart->id);
-        if ($cartHtlData) {
+        if ($cartHtlData = $objHotelCartBookingData->getCartFormatedBookinInfoByIdCart((int) $cart->id)) {
             foreach ($cartHtlData as $key => $value) {
                 $cartHtlData[$key]['room_type_info'] = $objHotelRoomType->getRoomTypeInfoByIdProduct($value['id_product']);
             }
+        } else {
+            $cartHtlData = array();
         }
         //end
         $this->tpl_view_vars = array(
@@ -332,6 +341,9 @@ class AdminCartsControllerCore extends AdminController
                 $id_cart = $customer->getLastCart(false);
             }
             $this->context->cart = new Cart((int)$id_cart);
+
+            CartRule::autoRemoveFromCart($this->context);
+            CartRule::autoAddToCart($this->context);
 
             if (!$this->context->cart->id) {
                 $this->context->cart->recyclable = 0;

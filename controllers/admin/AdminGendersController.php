@@ -173,7 +173,16 @@ class AdminGendersControllerCore extends AdminController
             ),
             'submit' => array(
                 'title' => $this->l('Save'),
-            )
+            ),
+            'buttons' => array(
+                'save-and-stay' => array(
+                    'title' => $this->l('Save and stay'),
+                    'name' => 'submitAdd'.$this->table.'AndStay',
+                    'type' => 'submit',
+                    'class' => 'btn btn-default pull-right',
+                    'icon' => 'process-icon-save',
+                ),
+            ),
         );
 
         /** @var Gender $obj */

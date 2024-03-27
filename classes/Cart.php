@@ -532,7 +532,7 @@ class CartCore extends ObjectModel
         $sql = new DbQuery();
 
         // Build SELECT
-        $sql->select('cp.`id_product_attribute`, cp.`id_product`, cp.`quantity` AS cart_quantity, cp.id_shop, pl.`name`, p.`is_virtual`, p.`booking_product`, p.`service_product_type`,  p.`auto_add_to_cart`, p.`price_addition_type`, product_shop.`allow_multiple_quantity`, product_shop.`price_calculation_method`,
+        $sql->select('cp.`id_product_attribute`, cp.`id_product`, cp.`quantity` AS cart_quantity, cp.id_shop, pl.`name`, p.`is_virtual`, p.`booking_product`, p.`service_product_type`,  p.`auto_add_to_cart`, p.`price_addition_type`, p.`show_at_front`, product_shop.`allow_multiple_quantity`, product_shop.`price_calculation_method`,
 						pl.`description_short`, pl.`available_now`, pl.`available_later`, product_shop.`id_category_default`, p.`id_supplier`,
 						p.`id_manufacturer`, product_shop.`on_sale`, product_shop.`ecotax`, product_shop.`additional_shipping_cost`,
 						product_shop.`available_for_order`, product_shop.`price`, product_shop.`active`, product_shop.`unity`, product_shop.`unit_price_ratio`,
@@ -781,8 +781,8 @@ class CartCore extends ObjectModel
 
                         case Order::ROUND_ITEM:
                         default:
-                            $row['total'] = Tools::ps_round($totalPriceByProductTaxExcl, _PS_PRICE_COMPUTE_PRECISION_) * (int)$row['cart_quantity'];
-                            $row['total_wt'] = Tools::ps_round($totalPriceByProductTaxIncl, _PS_PRICE_COMPUTE_PRECISION_) * (int)$row['cart_quantity'];
+                            $row['total'] = Tools::ps_round($totalPriceByProductTaxExcl, _PS_PRICE_COMPUTE_PRECISION_);
+                            $row['total_wt'] = Tools::ps_round($totalPriceByProductTaxIncl, _PS_PRICE_COMPUTE_PRECISION_);
                             break;
                     }
                 }
@@ -804,8 +804,8 @@ class CartCore extends ObjectModel
 
                     case Order::ROUND_ITEM:
                     default:
-                        $row['total'] = Tools::ps_round($totalPriceByProductTaxExcl, _PS_PRICE_COMPUTE_PRECISION_) * (int)$row['cart_quantity'];
-                        $row['total_wt'] = Tools::ps_round($totalPriceByProductTaxIncl, _PS_PRICE_COMPUTE_PRECISION_) * (int)$row['cart_quantity'];
+                        $row['total'] = Tools::ps_round($totalPriceByProductTaxExcl, _PS_PRICE_COMPUTE_PRECISION_);
+                        $row['total_wt'] = Tools::ps_round($totalPriceByProductTaxIncl, _PS_PRICE_COMPUTE_PRECISION_);
                         break;
                 }
             } else {
@@ -1797,13 +1797,18 @@ class CartCore extends ObjectModel
                     (int)$product['id_product'],
                     isset($product['id_hotel']) ? $product['id_hotel'] : 0,
                     0,
-                    0,
-                    0,
+                    isset($product['date_from']) ? $product['date_from'] : 0,
+                    isset($product['date_to']) ? $product['date_to'] : 0,
                     0,
                     $with_taxes,
                     null
                 );
-            } else if ($roomTypesByIdProduct = $objCartBookingData->getCartInfoIdCartIdProduct($this->id, $product['id_product'])) {
+            } else if ($roomTypesByIdProduct = $objCartBookingData->getCartInfoIdCartIdProduct(
+                $this->id,
+                $product['id_product'],
+                isset($product['date_from']) ? $product['date_from'] : 0,
+                isset($product['date_to']) ? $product['date_to'] : 0,
+            )) {
                 // by webkul to calculate rates of the product from hotelreservation syatem tables with feature prices....
                 $totalPriceByProduct = 0;
                 $priceDisplay = Group::getPriceDisplayMethod(Group::getCurrent()->id);
@@ -2350,28 +2355,78 @@ class CartCore extends ObjectModel
             foreach ($packages as $id_package => $package) {
                 foreach ($package['product_list'] as $product) {
                     if ($product['booking_product']) {
-                        $productInfo = $objRoomType->getRoomTypeInfoByIdProduct($product['id_product']);
-                        $idHotel = $productInfo['id_hotel'] ? $productInfo['id_hotel'] : 0;
+                        if ($roomsBookingDetails = $objHtlCartBookingData->getOnlyCartBookingData(
+                            $this->id,
+                            $this->id_guest,
+                            $product['id_product']
+                        )) {
+                            $productInfo = $objRoomType->getRoomTypeInfoByIdProduct($product['id_product']);
+                            $idHotel = $productInfo['id_hotel'] ? $productInfo['id_hotel'] : 0;
+                            $cartRoomInfo = array();
+                            foreach ($roomsBookingDetails as $roomBooking) {
+                                $dateJoinKey = $idHotel.'-'.strtotime($roomBooking['date_from']).strtotime($roomBooking['date_to']);
+                                $roomTotalPrice = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice(
+                                    $product['id_product'],
+                                    $roomBooking['date_from'],
+                                    $roomBooking['date_to'],
+                                    0,
+                                    Group::getCurrent()->id,
+                                    $this->id,
+                                    $this->id_guest,
+                                    0,
+                                    0
+                                );
+                                $newQty = HotelHelper::getNumberOfDays(
+                                    $roomBooking['date_from'],
+                                    $roomBooking['date_to']
+                                );
+                                if (isset($cartRoomInfo[$dateJoinKey])) {
+                                    $cartRoomInfo[$dateJoinKey]['cart_quantity'] += $newQty;
+                                    $cartRoomInfo[$dateJoinKey]['total_price_tax_incl'] += $roomTotalPrice['total_price_tax_incl'];
+                                    $cartRoomInfo[$dateJoinKey]['total_price_tax_excl'] += $roomTotalPrice['total_price_tax_excl'];
+                                } else {
+                                    $cartRoomInfo[$dateJoinKey] = array(
+                                        'cart_quantity' => $newQty,
+                                        'total_price_tax_incl' => $roomTotalPrice['total_price_tax_incl'],
+                                        'total_price_tax_excl' => $roomTotalPrice['total_price_tax_excl'],
+                                        'date_from' => $roomBooking['date_from'],
+                                        'date_to' => $roomBooking['date_to'],
+                                    );
+                                }
+                            }
+                            foreach ($cartRoomInfo as $dateJoinKey => $cartRoom) {
+                                if (!isset($orderPackage[$id_address][$dateJoinKey])) {
+                                    $orderPackage[$id_address][$dateJoinKey]['product_list'] = array();
 
-                        $orderPackage[$id_address][$idHotel]['product_list'][] = $product;
-                        $orderPackage[$id_address][$idHotel]['id_hotel'] = $idHotel;
-                        if (!isset($orderPackage[$id_address][$idHotel]['id_hotel'])) {
-                            $orderPackage[$id_address][$idHotel]['id_hotel'] = $productInfo['id_hotel'];
-                        }
-                        if (!isset($orderPackage[$id_address][$idHotel]['carrier_list'])) {
-                            $orderPackage[$id_address][$idHotel]['carrier_list'] = $product['carrier_list'];
-                        } else {
-                            $orderPackage[$id_address][$idHotel]['carrier_list'] = array_intersect($orderPackage[$id_address][$idHotel]['carrier_list'], $product['carrier_list']);
-                        }
-                        if (!isset($orderPackage[$id_address][$idHotel]['warehouse_list'])) {
-                            $orderPackage[$id_address][$idHotel]['warehouse_list'] = $package['warehouse_list'];
-                        }
-                        if (!isset($orderPackage[$id_address][$idHotel]['id_warehouse'])) {
-                            $orderPackage[$id_address][$idHotel]['id_warehouse'] = $package['id_warehouse'];
-                        }
-                        if (isset($package['id_carrier'])) {
-                            if (!isset($orderPackage[$id_address][$idHotel]['id_carrier'])) {
-                                $orderPackage[$id_address][$idHotel]['id_carrier'] = $package['id_carrier'];
+                                    $orderPackage[$id_address][$dateJoinKey]['id_hotel'] = $idHotel;
+                                    if (!isset($orderPackage[$id_address][$dateJoinKey]['id_hotel'])) {
+                                        $orderPackage[$id_address][$dateJoinKey]['id_hotel'] = $productInfo['id_hotel'];
+                                    }
+                                    if (!isset($orderPackage[$id_address][$dateJoinKey]['carrier_list'])) {
+                                        $orderPackage[$id_address][$dateJoinKey]['carrier_list'] = $product['carrier_list'];
+                                    } else {
+                                        $orderPackage[$id_address][$dateJoinKey]['carrier_list'] = array_intersect($orderPackage[$id_address][$dateJoinKey]['carrier_list'], $product['carrier_list']);
+                                    }
+                                    if (!isset($orderPackage[$id_address][$dateJoinKey]['warehouse_list'])) {
+                                        $orderPackage[$id_address][$dateJoinKey]['warehouse_list'] = $package['warehouse_list'];
+                                    }
+                                    if (!isset($orderPackage[$id_address][$dateJoinKey]['id_warehouse'])) {
+                                        $orderPackage[$id_address][$dateJoinKey]['id_warehouse'] = $package['id_warehouse'];
+                                    }
+                                    if (isset($package['id_carrier'])) {
+                                        if (!isset($orderPackage[$id_address][$dateJoinKey]['id_carrier'])) {
+                                            $orderPackage[$id_address][$dateJoinKey]['id_carrier'] = $package['id_carrier'];
+                                        }
+                                    }
+                                }
+                                $product['date_from'] = $cartRoom['date_from'];
+                                $product['date_to'] = $cartRoom['date_to'];
+                                $product['total_wt'] = $cartRoom['total_price_tax_incl'];
+                                $product['total'] = $cartRoom['total_price_tax_excl'];
+                                $product['cart_quantity'] = $cartRoom['cart_quantity'];
+                                $product['price_wt'] = $cartRoom['total_price_tax_incl'] / $cartRoom['cart_quantity'];
+                                $product['price'] = $cartRoom['total_price_tax_excl'] / $cartRoom['cart_quantity'];
+                                $orderPackage[$id_address][$dateJoinKey]['product_list'][] = $product;
                             }
                         }
                     } else {
@@ -2379,44 +2434,59 @@ class CartCore extends ObjectModel
                             if ($selectedServiceProducts = $objRoomTypeServiceProductCartDetail->getServiceProductsInCart($this->id, $product['id_product'], 0, 0, 0, 0, 0, 0, null, null)) {
                                 $array = array();
                                 foreach($selectedServiceProducts as $selectedProduct) {
-                                    if (isset($array[$selectedProduct['id_hotel']])) {
-                                        $array[$selectedProduct['id_hotel']]['quantity'] += $selectedProduct['quantity'];
-                                        $array[$selectedProduct['id_hotel']]['total_price_tax_excl'] += $selectedProduct['total_price_tax_excl'];
-                                        $array[$selectedProduct['id_hotel']]['total_price_tax_incl'] += $selectedProduct['total_price_tax_incl'];
+                                    $dateJoinKey = $selectedProduct['id_hotel'].'-'.strtotime($selectedProduct['date_from']).strtotime($selectedProduct['date_to']);
+                                    if (isset($array[$dateJoinKey])) {
+                                        $array[$dateJoinKey]['total_price_tax_excl'] += $selectedProduct['total_price_tax_excl'];
+                                        $array[$dateJoinKey]['total_price_tax_incl'] += $selectedProduct['total_price_tax_incl'];
                                     } else {
-                                        $array[$selectedProduct['id_hotel']] = array(
-                                            'quantity' => $selectedProduct['quantity'],
+                                        $array[$dateJoinKey] = array(
                                             'id_hotel' => $selectedProduct['id_hotel'],
-                                            'unit_price_tax_incl' => $selectedProduct['unit_price_tax_incl'],
+                                            'quantity' => 0,
+                                            'date_from' => $selectedProduct['date_from'],
+                                            'date_to' => $selectedProduct['date_to'],
                                             'total_price_tax_excl' => $selectedProduct['total_price_tax_excl'],
                                             'total_price_tax_incl' => $selectedProduct['total_price_tax_incl'],
                                         );
                                     }
+                                    if (Product::PRICE_CALCULATION_METHOD_PER_DAY == $selectedProduct['price_calculation_method']) {
+                                        $numDays = HotelHelper::getNumberOfDays(
+                                            $selectedProduct['date_from'],
+                                            $selectedProduct['date_to']
+                                        );
+                                        $array[$dateJoinKey]['quantity'] += ($selectedProduct['quantity'] * $numDays);
+                                    } else {
+                                        $array[$dateJoinKey]['quantity'] += $selectedProduct['quantity'];
+
+                                    }
                                 }
-                                foreach($array as $selectedProduct) {
+
+                                foreach($array as $dateJoinKey => $selectedProduct) {
                                     $product['cart_quantity'] = $selectedProduct['quantity'];
                                     $product['total'] = $selectedProduct['total_price_tax_excl'];
                                     $product['total_wt'] = $selectedProduct['total_price_tax_incl'];
-                                    $product['price_wt'] = $selectedProduct['unit_price_tax_incl'];
+                                    $product['price_wt'] = $selectedProduct['total_price_tax_incl'] / $product['cart_quantity'];
+                                    $product['price'] = $selectedProduct['total_price_tax_excl'] / $product['cart_quantity'];
                                     $product['id_hotel'] = $selectedProduct['id_hotel'];
-                                    $orderPackage[$id_address][$selectedProduct['id_hotel']]['product_list'][] = $product;
-                                    if (!isset($orderPackage[$id_address][$selectedProduct['id_hotel']]['id_hotel'])) {
-                                        $orderPackage[$id_address][$selectedProduct['id_hotel']]['id_hotel'] = $selectedProduct['id_hotel'];
+                                    $product['date_from'] = $selectedProduct['date_from'];
+                                    $product['date_to'] = $selectedProduct['date_to'];
+                                    $orderPackage[$id_address][$dateJoinKey]['product_list'][] = $product;
+                                    if (!isset($orderPackage[$id_address][$dateJoinKey]['id_hotel'])) {
+                                        $orderPackage[$id_address][$dateJoinKey]['id_hotel'] = $selectedProduct['id_hotel'];
                                     }
-                                    if (!isset($orderPackage[$id_address][$selectedProduct['id_hotel']]['carrier_list'])) {
-                                        $orderPackage[$id_address][$selectedProduct['id_hotel']]['carrier_list'] = $product['carrier_list'];
+                                    if (!isset($orderPackage[$id_address][$dateJoinKey]['carrier_list'])) {
+                                        $orderPackage[$id_address][$dateJoinKey]['carrier_list'] = $product['carrier_list'];
                                     } else {
-                                        $orderPackage[$id_address][$selectedProduct['id_hotel']]['carrier_list'] = array_intersect($orderPackage[$id_address][$selectedProduct['id_hotel']]['carrier_list'], $product['carrier_list']);
+                                        $orderPackage[$id_address][$dateJoinKey]['carrier_list'] = array_intersect($orderPackage[$id_address][$dateJoinKey]['carrier_list'], $product['carrier_list']);
                                     }
-                                    if (!isset($orderPackage[$id_address][$selectedProduct['id_hotel']]['warehouse_list'])) {
-                                        $orderPackage[$id_address][$selectedProduct['id_hotel']]['warehouse_list'] = $package['warehouse_list'];
+                                    if (!isset($orderPackage[$id_address][$dateJoinKey]['warehouse_list'])) {
+                                        $orderPackage[$id_address][$dateJoinKey]['warehouse_list'] = $package['warehouse_list'];
                                     }
-                                    if (!isset($orderPackage[$id_address][$selectedProduct['id_hotel']]['id_warehouse'])) {
-                                        $orderPackage[$id_address][$selectedProduct['id_hotel']]['id_warehouse'] = $package['id_warehouse'];
+                                    if (!isset($orderPackage[$id_address][$dateJoinKey]['id_warehouse'])) {
+                                        $orderPackage[$id_address][$dateJoinKey]['id_warehouse'] = $package['id_warehouse'];
                                     }
                                     if (isset($package['id_carrier'])) {
-                                        if (!isset($orderPackage[$id_address][$selectedProduct['id_hotel']]['id_carrier'])) {
-                                            $orderPackage[$id_address][$selectedProduct['id_hotel']]['id_carrier'] = $package['id_carrier'];
+                                        if (!isset($orderPackage[$id_address][$dateJoinKey]['id_carrier'])) {
+                                            $orderPackage[$id_address][$dateJoinKey]['id_carrier'] = $package['id_carrier'];
                                         }
                                     }
                                 }
@@ -2431,6 +2501,7 @@ class CartCore extends ObjectModel
                                     $unitPriceWt = $objHotelServiceProductCartDetail->getHotelProductUnitPrice($this->id, $product['id_product'], $hotelProduct['id_hotel'], true);
                                     $serviceProduct['total'] = $unitPrice * $hotelProduct['quantity'];
                                     $serviceProduct['total_wt'] = $unitPriceWt * $hotelProduct['quantity'];
+                                    $serviceProduct['price'] = $unitPrice;
                                     $serviceProduct['price_wt'] = $unitPriceWt;
                                     // if (!empty($hotelProducts['products'])) {
                                     //     foreach($hotelProducts['products'] as $hotelProduct) {
@@ -2454,28 +2525,28 @@ class CartCore extends ObjectModel
             }
         }
 
-        $hotelWisePackageList = array();
+        $hotelAndDateWisePackageList = array();
         $numHotels = 0;
 
 
         if (!empty($serviceProducts)) {
             foreach ($serviceProducts as $id_address =>  $packagesByHotels) {
                 foreach ($packagesByHotels as $packageByHotel) {
-                    $hotelWisePackageList[$id_address][] = $packageByHotel;
+                    $hotelAndDateWisePackageList[$id_address][] = $packageByHotel;
                 }
             }
         }
         foreach ($orderPackage as $id_address => $packageByAddress) {
             $numHotels += count($packageByAddress);
             foreach ($packageByAddress as $id_package => $package) {
-                $hotelWisePackageList[$id_address][] = $package;
+                $hotelAndDateWisePackageList[$id_address][] = $package;
             }
         }
         // add sevice products as new package if there are multiple hotels in cart
         // if ($numHotels > 1 || count($serviceProducts) > 1) {
         //     foreach ($serviceProducts as $productsByAddress) {
         //         if (isset($orderPackage[$id_address])) {
-        //             $hotelWisePackageList[$id_address][] = array(
+        //             $hotelAndDateWisePackageList[$id_address][] = array(
         //                 'product_list' => $productsByAddress['products'],
         //                 'carrier_list' => $productsByAddress['carrier_list'],
         //                 'warehouse_list' =>  $productsByAddress['warehouse_list'],
@@ -2488,13 +2559,13 @@ class CartCore extends ObjectModel
         // } else if (!empty($serviceProducts)) {
         //     $serviceProductsIdAddress = array_keys($serviceProducts)[0];
         //     $productsByAddress = array_shift($serviceProducts);
-        //     if (isset($hotelWisePackageList[$serviceProductsIdAddress])) {
-        //         $hotelWisePackageList[$serviceProductsIdAddress][0]['product_list'] = array_merge(
-        //             $hotelWisePackageList[$serviceProductsIdAddress][0]['product_list'],
+        //     if (isset($hotelAndDateWisePackageList[$serviceProductsIdAddress])) {
+        //         $hotelAndDateWisePackageList[$serviceProductsIdAddress][0]['product_list'] = array_merge(
+        //             $hotelAndDateWisePackageList[$serviceProductsIdAddress][0]['product_list'],
         //             $productsByAddress['products']
         //         );
         //     } else {
-        //         $hotelWisePackageList[$id_address][] = array(
+        //         $hotelAndDateWisePackageList[$id_address][] = array(
         //             'product_list' => $productsByAddress['products'],
         //             'carrier_list' => $productsByAddress['carrier_list'],
         //             'warehouse_list' =>  $productsByAddress['warehouse_list'],
@@ -2504,7 +2575,7 @@ class CartCore extends ObjectModel
         //         );
         //     }
         // }
-        $final_package_list = $hotelWisePackageList;
+        $final_package_list = $hotelAndDateWisePackageList;
         // END $package_list hotel wise
         $cache[$cache_key] = $final_package_list;
         return $final_package_list;
@@ -3811,6 +3882,8 @@ class CartCore extends ObjectModel
             }
         }
 
+        $objHotelAdvancedPayment = new HotelAdvancedPayment();
+
         $summary = array(
             'delivery' => $delivery,
             'delivery_state' => State::getNameById($delivery->id_state),
@@ -3845,6 +3918,9 @@ class CartCore extends ObjectModel
             'total_price' => $base_total_tax_inc,
             'total_tax' => $total_tax,
             'total_price_without_tax' => $base_total_tax_exc,
+            'is_advance_payment_active' => $objHotelAdvancedPayment->isAdvancePaymentAvailableForCurrentCart(),
+            'advance_payment_amount_without_tax' => $this->getOrderTotal(false, Cart::ADVANCE_PAYMENT),
+            'advance_payment_amount_with_tax' => $this->getOrderTotal(true, Cart::ADVANCE_PAYMENT),
             'discounted_products' => $discountedProducts,
             'is_multi_address_delivery' => $this->isMultiAddressDelivery() || ((int)Tools::getValue('multi-shipping') == 1),
             'free_ship' =>!$total_shipping && !count($this->getDeliveryAddressesWithoutCarriers(true, $errors)),

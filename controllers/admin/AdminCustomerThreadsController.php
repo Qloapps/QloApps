@@ -62,6 +62,15 @@ class AdminCustomerThreadsControllerCore extends AdminController
             $status_array[$k] = $v['alt'];
         }
 
+        // START send access query information to the admin controller
+        $this->access_select = ' SELECT a.`id_customer_thread` FROM '._DB_PREFIX_.'customer_thread a';
+        $this->access_join = ' LEFT JOIN '._DB_PREFIX_.'orders ord ON (a.id_order = ord.id_order)';
+        $this->access_join .= ' LEFT JOIN '._DB_PREFIX_.'htl_booking_detail hbd ON (hbd.id_order = ord.id_order)';
+        $this->access_where = ' WHERE 1 ';
+        if ($acsHtls = HotelBranchInformation::getProfileAccessedHotels($this->context->employee->id_profile, 1, 1)) {
+            $this->access_where .= ' AND IF(a.`id_order`, hbd.`id_hotel` IN ('.implode(',', $acsHtls).'), 1)';
+        }
+
         $this->fields_list = array(
             'id_customer_thread' => array(
                 'title' => $this->l('ID'),
@@ -515,7 +524,7 @@ class AdminCustomerThreadsControllerCore extends AdminController
         $helper->color = 'color1';
         $helper->title = $this->l('Pending Discussion Threads', null, null, false);
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=pending_messages';
-        $kpis[] = $helper->generate();
+        $kpis[] = $helper;
 
         $helper = new HelperKpi();
         $helper->id = 'box-age';
@@ -524,7 +533,7 @@ class AdminCustomerThreadsControllerCore extends AdminController
         $helper->title = $this->l('Average Response Time', null, null, false);
         $helper->subtitle = $this->l('30 days', null, null, false);
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=avg_msg_response_time';
-        $kpis[] = $helper->generate();
+        $kpis[] = $helper;
 
         $helper = new HelperKpi();
         $helper->id = 'box-messages-per-thread';
@@ -533,7 +542,11 @@ class AdminCustomerThreadsControllerCore extends AdminController
         $helper->title = $this->l('Messages per Thread', null, null, false);
         $helper->subtitle = $this->l('30 day', null, null, false);
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=messages_per_thread';
-        $kpis[] = $helper->generate();
+        $kpis[] = $helper;
+
+        Hook::exec('action'.$this->controller_name.'KPIListingModifier', array(
+            'kpis' => &$kpis,
+        ));
 
         $helper = new HelperKpiRow();
         $helper->kpis = $kpis;
@@ -712,7 +725,7 @@ class AdminCustomerThreadsControllerCore extends AdminController
                 $content .= $this->l('Message to: ').' <span class="badge">'.(!$message['id_employee'] ? $message['subject'] : $message['customer_name']).'</span><br/>';
             }
             if (Validate::isLoadedObject($product)) {
-                $content .= '<br/>'.$this->l('Product: ').'<span class="label label-info">'.$product->name.'</span><br/><br/>';
+                $content .= '<br/>'.$this->l('Room type: ').'<span class="label label-info">'.$product->name.'</span><br/><br/>';
             }
             $content .= Tools::safeOutput($message['message']);
 

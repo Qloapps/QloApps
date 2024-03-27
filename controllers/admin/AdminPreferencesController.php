@@ -95,8 +95,8 @@ class AdminPreferencesControllerCore extends AdminController
             $fields = array(
                 'PS_SSL_ENABLED' => array(
                     'title' => $this->l('Enable SSL'),
-                    'desc' => $this->l('If you own an SSL certificate for your shop\'s domain name, you can activate SSL encryption (https://) for customer account identification and order processing.'),
-                    'hint' => $this->l('If you want to enable SSL on all the pages of your shop, activate the "Enable on all the pages" option below.'),
+                    'desc' => $this->l('If you own an SSL certificate for your website\'s domain name, you can activate SSL encryption (https://) for customer account identification and order processing.'),
+                    'hint' => $this->l('If you want to enable SSL on all the pages of your website, activate the "Enable on all the pages" option below.'),
                     'validation' => 'isBool',
                     'cast' => 'intval',
                     'type' => 'bool',
@@ -106,7 +106,7 @@ class AdminPreferencesControllerCore extends AdminController
 
             $fields['PS_SSL_ENABLED_EVERYWHERE'] = array(
                 'title' => $this->l('Enable SSL on all pages'),
-                'desc' => $this->l('When enabled, all the pages of your shop will be SSL-secured.'),
+                'desc' => $this->l('When enabled, all the pages of your website will be SSL-secured.'),
                 'validation' => 'isBool',
                 'cast' => 'intval',
                 'type' => 'bool',
@@ -221,7 +221,7 @@ class AdminPreferencesControllerCore extends AdminController
             if (!Tools::usingSecureMode() && !Configuration::get('PS_SSL_ENABLED')) {
                 $fields['PS_SSL_ENABLED']['type'] = 'disabled';
                 $fields['PS_SSL_ENABLED']['disabled'] = '<a class="btn btn-link" href="https://'.Tools::getShopDomainSsl().Tools::safeOutput($_SERVER['REQUEST_URI']).'">'.
-                    $this->l('Please click here to check if your shop supports HTTPS.').'</a>';
+                    $this->l('Please click here to check if your website supports HTTPS.').'</a>';
             }
 
             $this->fields_options = array(

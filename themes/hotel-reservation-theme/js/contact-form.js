@@ -50,7 +50,11 @@ $(document).ready(function() {
     showProductSelect($('select[name=id_order]').attr('value'));
 
     //By Webkul JS for Map locations of the hotels on google Map
-    if (hotelLocationArray) {
+    if (typeof hotelLocationArray != 'undefined'
+        && $('#map').length
+        && typeof google == 'object'
+        && typeof google.maps == 'object'
+    ) {
         initMap();
     }
 });

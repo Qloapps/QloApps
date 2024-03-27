@@ -29,14 +29,15 @@
  */
 class BlocknewsletterVerificationModuleFrontController extends ModuleFrontController
 {
-	private $message = '';
-
 	/**
 	 * @see FrontController::postProcess()
 	 */
 	public function postProcess()
 	{
-		$this->message = $this->module->confirmEmail(Tools::getValue('token'));
+		$this->errors = array_merge(
+			$this->errors,
+			$this->module->confirmEmail(Tools::getValue('token'))
+		);
 	}
 
 	/**
@@ -44,9 +45,23 @@ class BlocknewsletterVerificationModuleFrontController extends ModuleFrontContro
 	 */
 	public function initContent()
 	{
+		$this->display_column_left = false;
+		$this->display_column_right = false;
+
 		parent::initContent();
 
-		$this->context->smarty->assign('message', $this->message);
 		$this->setTemplate('verification_execution.tpl');
+	}
+
+	public function setMedia()
+	{
+		parent::setMedia();
+
+		$this->addCSS($this->module->getPathUri().'views/css/front/verification.css');
+		$this->addJS($this->module->getPathUri().'views/js/front/verification.js');
+
+		Media::addJsDef(array(
+			'homepage_url' => $this->context->link->getPageLink('index'),
+		));
 	}
 }

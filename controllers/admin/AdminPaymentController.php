@@ -205,13 +205,13 @@ class AdminPaymentControllerCore extends AdminController
                           'identifier' => 'id_group',
                           'icon' => 'icon-group',
                     ),
-                    array('items' =>Country::getCountries($this->context->language->id),
-                          'title' => $this->l('Country restrictions'),
-                          'desc' => $this->l('Please mark each checkbox for the country, or countries, in which you want the payment module(s) to be available.'),
-                          'name_id' => 'country',
-                          'identifier' => 'id_country',
-                          'icon' => 'icon-globe',
-                    )
+                    // array('items' =>Country::getCountries($this->context->language->id),
+                    //       'title' => $this->l('Country restrictions'),
+                    //       'desc' => $this->l('Please mark each checkbox for the country, or countries, in which you want the payment module(s) to be available.'),
+                    //       'name_id' => 'country',
+                    //       'identifier' => 'id_country',
+                    //       'icon' => 'icon-globe',
+                    // )
                 );
 
         foreach ($lists as $key_list => $list) {
@@ -243,13 +243,13 @@ class AdminPaymentControllerCore extends AdminController
                     }
 
                     // If is a country list and the country is limited, remove it from list
-                    if ($name_id == 'country'
-                        && isset($module->limited_countries)
-                        && !empty($module->limited_countries)
-                        && is_array($module->limited_countries)
-                        && !(in_array(strtoupper($item['iso_code']), array_map('strtoupper', $module->limited_countries)))) {
-                        $list['items'][$key_item]['check_list'][$key_module] = null;
-                    }
+                    // if ($name_id == 'country'
+                    //     && isset($module->limited_countries)
+                    //     && !empty($module->limited_countries)
+                    //     && is_array($module->limited_countries)
+                    //     && !(in_array(strtoupper($item['iso_code']), array_map('strtoupper', $module->limited_countries)))) {
+                    //     $list['items'][$key_item]['check_list'][$key_module] = null;
+                    // }
                 }
             }
             // update list

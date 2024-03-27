@@ -82,7 +82,8 @@ class StatsSales extends ModuleGraph
         }
 
         $objHotelBranchInformation = new HotelBranchInformation();
-        $hotelsInfo = $objHotelBranchInformation->hotelsNameAndId();
+        $hotelsInfo = $objHotelBranchInformation->getProfileAccessedHotels($this->context->employee->id_profile, 1);
+
         $this->html = '
 			<div class="panel-heading">
 				'.$this->displayName.'
@@ -109,7 +110,7 @@ class StatsSales extends ModuleGraph
                         <select name="id_hotel">
                             <option value="0"'.((!Tools::getValue('id_order_state')) ? ' selected="selected"' : '').'>'.$this->l('All hotels').'</option>';
         foreach ($hotelsInfo as $hotel) {
-            $this->html .= '<option value="'.$hotel['id'].'"'.(($hotel['id'] == Tools::getValue('id_hotel')) ? ' selected="selected"' : '').'>'.$hotel['hotel_name'].'</option>';
+            $this->html .= '<option value="'.$hotel['id_hotel'].'"'.(($hotel['id_hotel'] == Tools::getValue('id_hotel')) ? ' selected="selected"' : '').'>'.$hotel['hotel_name'].'</option>';
         }
         $this->html .= '</select>
                     </div>';
@@ -192,19 +193,16 @@ class StatsSales extends ModuleGraph
     {
         $sql = 'SELECT COUNT(id_order) AS orderCount, ROUND(SUM(total_paid_real), 2) AS orderSum
         FROM (
-            SELECT o.`id_order`, (o.`total_paid_real` / o.`conversion_rate`) AS total_paid_real,
-            (
-                SELECT hbd.`id_hotel`
-                FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
-                WHERE hbd.`id_order` = o.`id_order`
-                LIMIT 1
-            ) AS id_hotel
+            SELECT o.`id_order`, (o.`total_paid_real` / o.`conversion_rate`) AS total_paid_real, hbd.`id_hotel`
             FROM `'._DB_PREFIX_.'orders` o
+            INNER JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd ON (hbd.`id_order` = o.`id_order`)
             '.((int)Tools::getValue('id_country') ? 'LEFT JOIN `'._DB_PREFIX_.'address` a ON o.`id_address_delivery` = a.`id_address`' : '').'
             WHERE o.`valid` = 1
+            '.HotelBranchInformation::addHotelRestriction(false, 'hbd').'
             '.Shop::addSqlRestriction(Shop::SHARE_ORDER, 'o').'
             '.((int)Tools::getValue('id_country') ? ' AND a.`id_country` = '.(int)Tools::getValue('id_country') : '').'
             AND o.`invoice_date` BETWEEN '.ModuleGraph::getDateBetween().'
+            GROUP BY o.`id_order`
         ) AS t
         '.((int)Tools::getValue('id_hotel') ? ' WHERE id_hotel = '.(int)Tools::getValue('id_hotel') : '');
 
@@ -216,14 +214,23 @@ class StatsSales extends ModuleGraph
         list($this->option, $this->id_country, $this->id_hotel) = explode('-', $options);
         switch ($this->option) {
             case 1:
-                $this->_titles['main'] = $this->l('Orders placed');
+                if (Tools::getValue('export')) {
+                    $this->_titles['main'][] = $this->l('Date');
+                }
+                $this->_titles['main'][] = $this->l('Orders placed');
                 break;
             case 2:
+                if (Tools::getValue('export')) {
+                    $this->_titles['main'][] = $this->l('Date');
+                }
                 $currency = new Currency((int)Configuration::get('PS_CURRENCY_DEFAULT'));
-                $this->_titles['main'] = sprintf($this->l('Revenue currency: %s'), $currency->iso_code);
+                $this->_titles['main'][] = sprintf($this->l('Revenue currency: %s'), $currency->iso_code);
                 break;
             case 3:
-                $this->_titles['main'] = $this->l('Percentage of orders per status.');
+                if (Tools::getValue('export')) {
+                    $this->_titles['main'][] = $this->l('Payment method');
+                }
+                $this->_titles['main'][] = $this->l('Percentage of orders per status.');
                 break;
         }
     }
@@ -234,6 +241,10 @@ class StatsSales extends ModuleGraph
             return $this->getOrderStatusesData();
         }
 
+        if ($this->option == 1) {
+            $this->_formats['y'] = 'd';
+        }
+
         $this->query = 'SELECT o.`invoice_date`, ROUND(o.`total_paid_real` / o.`conversion_rate`, 2) as total_paid_real,
         (
             SELECT hbd.`id_hotel`
@@ -242,8 +253,10 @@ class StatsSales extends ModuleGraph
             LIMIT 1
         ) AS id_hotel
         FROM `'._DB_PREFIX_.'orders` o
+        INNER JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd ON (hbd.`id_order` = o.`id_order`)
         '.((int)$this->id_country ? 'LEFT JOIN `'._DB_PREFIX_.'address` a ON o.`id_address_delivery` = a.`id_address`' : '').'
         WHERE o.`valid` = 1
+        '.HotelBranchInformation::addHotelRestriction(false, 'hbd').'
         '.Shop::addSqlRestriction(Shop::SHARE_ORDER, 'o').'
         '.((int)$this->id_country ? ' AND a.`id_country` = '.(int)$this->id_country : '').'
         AND o.`invoice_date` BETWEEN';
@@ -319,6 +332,7 @@ class StatsSales extends ModuleGraph
             LEFT JOIN `'._DB_PREFIX_.'order_state_lang` osl ON (os.`id_order_state` = osl.`id_order_state` AND osl.`id_lang` = '.(int)$this->getLang().')
             LEFT JOIN `'._DB_PREFIX_.'order_history` oh ON os.`id_order_state` = oh.`id_order_state`
             LEFT JOIN `'._DB_PREFIX_.'orders` o ON o.`id_order` = oh.`id_order`
+            INNER JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd ON (hbd.`id_order` = o.`id_order`)
             '.((int)$this->id_country ? 'LEFT JOIN `'._DB_PREFIX_.'address` a ON o.id_address_delivery = a.id_address' : '').'
             WHERE oh.`id_order_history` = (
                 SELECT ios.`id_order_history`
@@ -327,8 +341,10 @@ class StatsSales extends ModuleGraph
                 ORDER BY ios.`date_add` DESC, oh.`id_order_history` DESC
                 LIMIT 1
             )
+            '.HotelBranchInformation::addHotelRestriction(false, 'hbd').'
             '.((int)$this->id_country ? 'AND a.id_country = '.(int)$this->id_country : '').'
             AND o.`date_add` BETWEEN '.ModuleGraph::getDateBetween().'
+            GROUP BY o.`id_order`
         ) AS t
         '.(((int) $this->id_hotel) ? ' WHERE id_hotel = '.(int) $this->id_hotel : '').'
         GROUP BY t.`id_order_state`';

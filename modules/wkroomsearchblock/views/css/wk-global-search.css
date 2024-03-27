@@ -273,6 +273,8 @@
           font-weight: 400;}
           #search_occupancy_wrapper .occupancy_info_block .qty_direction .occupancy_quantity_down {
             margin-top: 3px;}
+          #search_occupancy_wrapper .occupancy-input-errors {
+            font-weight: 700;}
 
   #search_occupancy_wrapper .children_ages {
     display: grid;

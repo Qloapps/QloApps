@@ -45,9 +45,34 @@
 
 <body>
 	<div id="maintenance">
-		<div class="logo">
-			<img src="{$logo_url}" {if $logo_image_width}width="{$logo_image_width}" {/if}
-				{if $logo_image_height}height="{$logo_image_height}" {/if} alt="logo" />
+		<div class="header-container{if count($languages) > 1} multilang{/if}">
+			<div class="logo-container">
+				<img src="{$logo_url}" alt="logo" />
+			</div>
+			{if count($languages) > 1}
+				<div class="language-selector-wrap">
+					<div class="dropdown">
+						{foreach from=$languages item=language}
+							{if $language.iso_code == $lang_iso}
+								<button class="dropdown-toggle" type="button" data-toggle="dropdown">
+									{$language.name|regex_replace:'/\s\(.*\)$/':''}
+									<span class="caret"></span>
+								</button>
+							{/if}
+						{/foreach}
+
+						<ul class="dropdown-menu">
+							{foreach from=$languages item=language}
+								<li {if $language.iso_code == $lang_iso}class="disabled"{/if}>
+									<a href="{$link->getLanguageLink($language.id_lang)|escape:'html':'UTF-8'}" title="{$language.name}">
+										<span>{$language.name|regex_replace:'/\s\(.*\)$/':''}</span>
+									</a>
+								</li>
+							{/foreach}
+						</ul>
+					</div>
+				</div>
+			{/if}
 		</div>
 		<div class="margin-l-r">
 			{if isset($errors) && $errors}
