@@ -237,18 +237,18 @@ class AdminSearchControllerCore extends AdminController
             && ($this->_list['products'] = Product::searchByName($this->context->language->id, $this->query))
         ) {
             $objRoomType = new HotelRoomType();
-            $accessableHotels = HotelBranchInformation::getProfileAccessedHotels($this->context->employee->id_profile, 1, 1);
+            $accessibleHotels = HotelBranchInformation::getProfileAccessedHotels($this->context->employee->id_profile, 1, 1);
             $objRoomTypeServiceProduct = new RoomTypeServiceProduct();
             foreach ($this->_list['products'] as $key => $product) {
                 if ($roomInfo = $objRoomType->getRoomTypeInfoByIdProduct($product['id_product'])) {
-                    if (!in_array($roomInfo['id_hotel'], $accessableHotels)) {
+                    if (!in_array($roomInfo['id_hotel'], $accessibleHotels)) {
                         unset($this->_list['products'][$key]);
                     }
                 } else if ($associatedData = $objRoomTypeServiceProduct->getAssociatedHotelsAndRoomType($product['id_product'])) {
                     $count = 0;
                     foreach ($associatedData['room_types'] as $id_room_type) {
                         $objRoomType = new HotelRoomType($id_room_type);
-                        if (in_array($objRoomType->id_hotel, $accessableHotels)) {
+                        if (in_array($objRoomType->id_hotel, $accessibleHotels)) {
                             $count += 1;
                         }
                     }
@@ -261,14 +261,14 @@ class AdminSearchControllerCore extends AdminController
                 }
             }
 
-            if (isset($this->controllerAccess['AdminProducts'])
-                && $this->controllerAccess['AdminProducts']
+            if (!isset($this->controllerAccess['AdminProducts'])
+                || !$this->controllerAccess['AdminProducts']
             ) {
                 unset($this->_list['products']);
             }
 
-            if (isset($this->controllerAccess['AdminNormalProducts'])
-                && $this->controllerAccess['AdminNormalProducts']
+            if (!isset($this->controllerAccess['AdminNormalProducts'])
+                || !$this->controllerAccess['AdminNormalProducts']
             ) {
                 unset($this->_list['service_products']);
             }
