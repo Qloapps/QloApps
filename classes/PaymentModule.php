@@ -420,6 +420,7 @@ abstract class PaymentModuleCore extends Module
                         && number_format($cart_total_paid, _PS_PRICE_COMPUTE_PRECISION_) != number_format($amount_paid, _PS_PRICE_COMPUTE_PRECISION_)
                         && $this->name != 'wsorder'
                         && $this->name != 'bo_order'
+                        && $this->name != 'csvbooking'
                     ) {
                         // if customer is paying full payment amount
                         $id_order_state = Configuration::get('PS_OS_ERROR');
@@ -693,15 +694,17 @@ abstract class PaymentModuleCore extends Module
                                     '{id_order}' => $order->reference,
                                     '{order_name}' => $order->getUniqReference()
                                 );
-                                Mail::Send(
-                                    (int)$order->id_lang,
-                                    'voucher',
-                                    sprintf(Mail::l('New voucher for your order %s', (int)$order->id_lang), $order->reference),
-                                    $params,
-                                    $this->context->customer->email,
-                                    $this->context->customer->firstname.' '.$this->context->customer->lastname,
-                                    null, null, null, null, _PS_MAIL_DIR_, false, (int)$order->id_shop
-                                );
+                                if ($this->name != 'csvbooking') {
+                                    Mail::Send(
+                                        (int)$order->id_lang,
+                                        'voucher',
+                                        sprintf(Mail::l('New voucher for your order %s', (int)$order->id_lang), $order->reference),
+                                        $params,
+                                        $this->context->customer->email,
+                                        $this->context->customer->firstname.' '.$this->context->customer->lastname,
+                                        null, null, null, null, _PS_MAIL_DIR_, false, (int)$order->id_shop
+                                    );
+                                }
                             }
                         }
 
@@ -1099,7 +1102,7 @@ abstract class PaymentModuleCore extends Module
                     $order = new Order((int)$order->id);
 
                     // Send an e-mail to customer (one order = one email)
-                    if ($id_order_state != Configuration::get('PS_OS_ERROR') && $id_order_state != Configuration::get('PS_OS_CANCELED') && $this->context->customer->id) {
+                    if ($id_order_state != Configuration::get('PS_OS_ERROR') && $id_order_state != Configuration::get('PS_OS_CANCELED') && $this->context->customer->id && $this->name != 'csvbooking') {
                         $invoice = new Address($order->id_address_invoice);
                         $delivery = new Address($order->id_address_delivery);
                         $delivery_state = $delivery->id_state ? new State($delivery->id_state) : false;
