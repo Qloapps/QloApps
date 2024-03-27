@@ -836,7 +836,6 @@ class HotelBranchInformation extends ObjectModel
         if ($roomTypes = $objHotelRoomType->getRoomTypeByHotelId($this->id, Context::getContext()->language->id)) {
             foreach ($roomTypes as $roomType) {
                 $objProduct = new Product($roomType['id_product']);
-                $productCategories = $objProduct->getCategories();
                 $objProduct->updateCategories($hotelCategories);
             }
         }
