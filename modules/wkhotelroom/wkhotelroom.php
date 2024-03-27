@@ -97,7 +97,15 @@ class WkHotelRoom extends Module
             )
         );
 
+        Media::addJsDef(
+            array(
+                'readMoreText' => $this->l('Read More.', null, true),
+                'readLessText' => $this->l('Read Less.', null, true)
+            )
+        );
+
         $this->context->controller->addCSS($this->_path.'/views/css/WkHotelRoomBlockFront.css');
+        $this->context->controller->addJs($this->_path.'/views/js/WkHotelRoomBlockFront.js');
 
         return $this->display(__FILE__, 'hotelRoomDisplayBlock.tpl');
     }
@@ -220,7 +228,7 @@ class WkHotelRoom extends Module
         }
         return true;
     }
-    
+
     public function deleteConfigKeys()
     {
         $configVars = array(

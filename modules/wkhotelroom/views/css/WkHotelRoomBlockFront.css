@@ -17,18 +17,50 @@
 *  @license   https://store.webkul.com/license.html
 */
 
-.hotelRoomDescContainer{
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-	background-color: rgba(255, 255, 255, 0.85);
-    margin-left: 15px;
-    margin-right: 15px;
-    padding: 20px;
-    z-index: 10;
+.htlRoomTypeDescTextContainer {
+    overflow: hidden;
+    max-height: 65px;
 }
+.read-extra-text{
+    cursor: pointer;
+    font-weight: 400;
+}
+.htlRoomTypeDescTextContainer p{
+    margin: 0px;
+}
+@media (min-width: 530px) {
+    .hotelRoomDescContainer{
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background-color: rgba(255, 255, 255, 0.8);
+        margin-left: 10px;
+        margin-right: 10px;
+        padding: 20px;
+        z-index: 10;
+    }
+    .htlRoomTypePriceText{
+        float :right;
+    }
+}
+@media (max-width: 530px) {
+    .hotelRoomDescContainer{
+        padding: 10px;
+    }
+    .wk_roomType_price_type{
+        font-size: 16px;
+        font-weight: 400;
+    }
+    .htlRoomTypeNameText {
+        width: 100%;
+    }
 
+    .room_type_old_price {
+        width: 100%;
+        display: block;
+    }
+}
 .htlRoomTypeNameText, .htlRoomTypePriceText {
 	font-size: 18px;
 	color: #222222;
@@ -40,23 +72,20 @@
 	color: #555555;
 	font-weight: 300;
 	line-height: 21px;
+    margin-bottom: 9px;
 }
-.htlRoomTypeBookNow {
-	font-size: 15px!important;
-	color: #333333!important;
-	font-weight: 400!important;
-	background: transparent!important;
-    border: 1px solid #333333!important;
-    padding: 10px 30px!important;
+a.htlRoomTypeBookNow {
+	font-size: 15px;
+	color: #333333;
+	font-weight: 400;
+	background: transparent;
+    border: 1px solid #333333;
+    padding: 10px 30px;
     text-transform: capitalize;
 }
 
 .btn.htlRoomTypeBookNow:hover{
 	border: 1px solid #333333;
-}
-
-.htlRoomTypeDescText {
-    padding-bottom: 9px;
 }
 
 .room_type_old_price {
