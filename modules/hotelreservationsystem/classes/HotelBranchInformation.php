@@ -825,6 +825,23 @@ class HotelBranchInformation extends ObjectModel
         return true;
     }
 
+    public function updateRoomTypeCategories()
+    {
+        if (!Validate::isLoadedObject($this)) {
+            return false;
+        }
+
+        $hotelCategories = $this->getAllHotelCategories();
+        $objHotelRoomType = new HotelRoomType();
+        if ($roomTypes = $objHotelRoomType->getRoomTypeByHotelId($this->id, Context::getContext()->language->id)) {
+            foreach ($roomTypes as $roomType) {
+                $objProduct = new Product($roomType['id_product']);
+                $productCategories = $objProduct->getCategories();
+                $objProduct->updateCategories($hotelCategories);
+            }
+        }
+    }
+
     public function isRefundable()
     {
         return (Configuration::get('WK_ORDER_REFUND_ALLOWED') && $this->active_refund);
