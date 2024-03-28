@@ -191,6 +191,84 @@ body.display-modal
 		margin: 15px 0 0!important
 		height: 40px!important
 
+//list header
+.list_action_wrapper
+	margin-bottom: 15px
+	.list_availibility_container
+		position: relative
+		.dropdown-menu
+			right: 0
+			padding: 8px 12px
+			label
+				font-weight: 400
+	#selected_filter_container
+		background-color: #fff
+		padding: 8px 20px
+		border: solid 1px #d3d8db
+		border-radius: 5px 5px 0 0
+		font-size: 14px
+		min-height: 52px
+		margin-top: 15px
+		.selected_filters > span
+			font-size: 12px
+			padding: 6px 10px
+			display: inline-block
+			background: #F5F8F9
+			border: 1px solid #A0D0EB
+			border-radius: 3px
+			&+ span
+				margin-left: 12px
+			.filter_value
+				font-weight: 700
+			i
+				cursor: pointer
+
+	#list_filters_panel
+		margin-top: 15px
+		margin-bottom: 0
+	#selected_filter_container + #list_filters_panel
+		margin-top: 0
+	#selected_filter_container + div.panel
+		border-top: transparent
+		border-radius: 0 0 5px 5px
+	.list_filters
+		padding: 0 30px
+		display: grid
+		grid-template-columns: repeat(3, minmax(0, 1fr))
+		gap: 8px 40px
+		&>.row
+			display: flex
+			align-items: center
+		.date_range, .input_range
+			display: flex
+			justify-content: space-between
+			gap: 15px
+		.date_range .input-group:first-child
+			margin-bottom: 0
+		label
+			text-align: right
+			font-weight: 400
+		.actions
+			grid-column-start: 1
+			grid-column-end: 4
+	@media (max-width: $screen-desktop)
+		.list_filters
+			grid-template-columns: repeat(2, 1fr)
+			.actions
+				grid-column-start: 1
+				grid-column-end: 3
+
+	@media (max-width: $screen-tablet)
+		.list_filters
+			grid-template-columns: repeat(1, 1fr)
+			.actions
+				grid-column-start: 1
+				grid-column-end: 2
+			label
+				text-align: left
+
+
+
 //help containers
 #main.helpOpen
 	width: 70%

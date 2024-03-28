@@ -71,7 +71,14 @@ class AdminCustomersControllerCore extends AdminController
             $titles_array[$gender->id_gender] = $gender->name;
         }
 
+        $groups_array = array();
+        $groups = Group::getGroups(Context::getContext()->language->id);
+        foreach ($groups as $group) {
+            $groups_array[$group['id_group']] = $group['name'];
+        }
+
         $this->_join = 'LEFT JOIN '._DB_PREFIX_.'gender_lang gl ON (a.id_gender = gl.id_gender AND gl.id_lang = '.(int)$this->context->language->id.')';
+        $this->_join .= ' LEFT JOIN '._DB_PREFIX_.'group_lang grl ON (a.id_default_group = grl.id_group AND grl.id_lang = '.(int)$this->context->language->id.')';
         $this->_use_found_rows = false;
         $this->fields_list = array(
             'id_customer' => array(
@@ -107,9 +114,25 @@ class AdminCustomersControllerCore extends AdminController
         }
 
         $this->fields_list = array_merge($this->fields_list, array(
+            'default_group_name' => array(
+                'title' => $this->l('Default Group'),
+                'optional' => true,
+                'type' => 'select',
+                'list' => $groups_array,
+                'filter_key' => 'a!id_default_group',
+            ),
+            'total_orders' => array(
+                'title' => $this->l('Number of orders'),
+                'optional' => true,
+                'visible_default' => true,
+                'havingFilter' => true,
+                'order_key' => 'total_orders'
+            ),
             'total_spent' => array(
                 'title' => $this->l('Sales'),
                 'type' => 'price',
+                'optional' => true,
+                'visible_default' => true,
                 'search' => false,
                 'havingFilter' => true,
                 'align' => 'text-right',
@@ -155,13 +178,19 @@ class AdminCustomersControllerCore extends AdminController
         parent::__construct();
 
         $this->_select = '
-        a.date_add, gl.name as title, (
+        a.date_add, gl.name as title, grl.name as default_group_name, (
             SELECT SUM(total_paid_real / conversion_rate)
             FROM '._DB_PREFIX_.'orders o
             WHERE o.id_customer = a.id_customer
             '.Shop::addSqlRestriction(Shop::SHARE_ORDER, 'o').'
             AND o.valid = 1
         ) as total_spent, (
+            SELECT COUNT(o.`id_order`)
+            FROM '._DB_PREFIX_.'orders o
+            WHERE o.id_customer = a.id_customer
+            '.Shop::addSqlRestriction(Shop::SHARE_ORDER, 'o').'
+            AND o.valid = 1
+        ) as total_orders, (
             SELECT c.date_add FROM '._DB_PREFIX_.'guest g
             LEFT JOIN '._DB_PREFIX_.'connections c ON c.id_guest = g.id_guest
             WHERE g.id_customer = a.id_customer
@@ -325,6 +354,8 @@ class AdminCustomersControllerCore extends AdminController
                 'POST' => $_POST
             );
         }
+
+        $this->_use_new_header_filters = true;
 
         return parent::renderList();
     }
@@ -601,7 +632,7 @@ class AdminCustomersControllerCore extends AdminController
         }
 
         $birthday = explode('-', $this->getFieldValue($obj, 'birthday'));
-        
+
         $this->fields_value = array(
             'years' => Tools::getValue('years', $this->getFieldValue($obj, 'birthday') ? $birthday[0] : 0),
             'months' => Tools::getValue('months', $this->getFieldValue($obj, 'birthday') ? $birthday[1] : 0),
@@ -1062,7 +1093,7 @@ class AdminCustomersControllerCore extends AdminController
         $days = Tools::getValue('days');
         $months = Tools::getValue('months');
         $years = Tools::getValue('years');
-        
+
         if ($days || $months || $years) {
             if (!$days) {
                 $this->errors[] = Tools::displayError("Please select a valid date of birthday");
@@ -1074,10 +1105,10 @@ class AdminCustomersControllerCore extends AdminController
                 $this->errors[] = Tools::displayError("Please select a valid month of birthday");
             }
         }
-        
+
         $customer = new Customer();
         $this->errors = array_merge($this->errors, $customer->validateFieldsRequiredDatabase());
-        
+
         return parent::processSave();
     }
 

@@ -38,6 +38,8 @@ class HelperListCore extends Helper
     /** @var array WHERE clause determined by filter fields */
     protected $_filter;
 
+    public $_use_new_header_filters = false;
+
     /** @var array Number of results in list per page (used in select field) */
     public $_pagination = array(20, 50, 100, 300, 1000);
 
@@ -742,6 +744,7 @@ class HelperListCore extends Helper
         Context::getContext()->smarty->assign(array(
             'page' => $page,
             'simple_header' => $this->simple_header,
+            'use_new_header_filters' => $this->_use_new_header_filters,
             'total_pages' => $total_pages,
             'selected_pagination' => $selected_pagination,
             'pagination' => $this->_pagination,
