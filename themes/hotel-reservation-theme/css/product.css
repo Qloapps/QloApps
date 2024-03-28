@@ -1528,7 +1528,7 @@ ul.service-product-nav > li:hover {
 .service_product_action_block {
     display: flex;
     justify-content: space-between;
-    align-items: end;
+    align-items: center;
     flex-wrap: wrap;
 }
 .service-product-element .service-product-img {
@@ -1542,6 +1542,14 @@ ul.service-product-nav > li:hover {
 .service-product-element .service-product-short-desc {
   font-size: 14px;
   line-height: 22px;
+}
+.service-product-max-quantity-info, .service-product-selected-quantity-info {
+  display: block;
+  font-size: 12px;
+  line-height: 22px;
+  font-style: italic;
+  color: #959595;
+  font-weight: 400;
 }
 .service-product-element .service-product-price {
   font-weight: 600;

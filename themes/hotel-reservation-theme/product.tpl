@@ -785,7 +785,10 @@
 	{addJsDefL name=wrong_qty_cond}{l s='you are trying for a invalid quantity.' js=1}{/addJsDefL}
 	{addJsDefL name=select_txt}{l s='Select' js=1}{/addJsDefL}
 	{addJsDefL name=remove_txt}{l s='Remove' js=1}{/addJsDefL}
-    {addJsDefL name=cart_extra_service_add}{l s='Service is added to cart' js=1}{/addJsDefL}
+    {addJsDefL name=cart_extra_service_add}{l s='Service added' js=1}{/addJsDefL}
+	{addJsDefL name=unselect_txt}{l s='UnSelect' js=1}{/addJsDefL}
+    {addJsDefL name=cart_extra_service_remove}{l s='Service removed' js=1}{/addJsDefL}
+    {addJsDefL name=cart_extra_service_update}{l s='Service updated' js=1}{/addJsDefL}
 
 	{/strip}
 {/if}
