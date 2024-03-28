@@ -38,14 +38,8 @@ function setAmenitiesDescContHeight() {
 		$(this).css('height', amenityDescParentHeight);
 	});
 }
-
-$(document).ready(function() {
-	if ($('.homeAmenitiesBlock').length) {
-		setAmenitiesDescContHeight();
-	}
-});
-
-$(window).resize(function() {
+function setAmenitiesContainerProperties()
+{
 	if ($('.home_amenities_wrapper').length) {
 		setAmenitiesWrapperHeight();
 	}
@@ -54,4 +48,11 @@ $(window).resize(function() {
 		$('.amenity_desc_cont').css('height', 0);
 		setAmenitiesDescContHeight();
 	}
+}
+
+$(document).ready(function() {
+	setAmenitiesContainerProperties();
+});
+$(window).resize(function() {
+	setAmenitiesContainerProperties();
 });
