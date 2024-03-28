@@ -160,6 +160,62 @@ $(document).ready(function(){
         }
     });
 
+    $(document).on('click', '.booking_occupancy_wrapper .select_occupancy_btn', function(e) {
+        e.preventDefault();
+        if ($('.booking_occupancy_wrapper:visible').length) {
+			var occupancy_wrapper = $('.booking_occupancy_wrapper:visible');
+			$(occupancy_wrapper).find(".occupancy_info_block").addClass('selected');
+			setRoomTypeGuestOccupancy(occupancy_wrapper);
+
+            let hasErrors = 0;
+
+            let adults = $(occupancy_wrapper).find(".num_adults").map(function(){return $(this).val();}).get();
+            let children = $(occupancy_wrapper).find(".num_children").map(function(){return $(this).val();}).get();
+            let child_ages = $(occupancy_wrapper).find(".guest_child_age").map(function(){return $(this).val();}).get();
+
+            // start validating above values
+            if (!adults.length || (adults.length != children.length)) {
+                hasErrors = 1;
+                showErrorMessage(invalid_occupancy_txt);
+            } else {
+                $(occupancy_wrapper).find('.occupancy_count').removeClass('error_border');
+
+                // validate values of adults and children
+                adults.forEach(function (item, index) {
+                    if (isNaN(item) || parseInt(item) < 1) {
+                        hasErrors = 1;
+                        $(occupancy_wrapper).find(".num_adults").eq(index).closest('.occupancy_count_block').find('.occupancy_count').addClass('error_border');
+                    }
+                    if (isNaN(children[index])) {
+                        hasErrors = 1;
+                        $(occupancy_wrapper).find(".num_children").eq(index).closest('.occupancy_count_block').find('.occupancy_count').addClass('error_border');
+                    }
+                });
+
+                // validate values of selected child ages
+                $(occupancy_wrapper).find('.guest_child_age').removeClass('error_border');
+                child_ages.forEach(function (age, index) {
+                    age = parseInt(age);
+                    if (isNaN(age) || (age < 0) || (age >= parseInt(max_child_age))) {
+                        hasErrors = 1;
+                        $(occupancy_wrapper).find(".guest_child_age").eq(index).addClass('error_border');
+                    }
+                });
+            }
+            if (hasErrors == 0) {
+                if (!($(e.target).closest(".ajax_add_to_cart_button").length
+                    || $(e.target).closest(".exclusive.book_now_submit").length
+                )) {
+                    $(occupancy_wrapper).parent().removeClass('open');
+                    $(occupancy_wrapper).siblings(".booking_guest_occupancy").removeClass('error_border');
+                    $(document).trigger( "QloApps:updateRoomOccupancy", [occupancy_wrapper]);
+                }
+            } else {
+                $(occupancy_wrapper).siblings(".booking_guest_occupancy").addClass('error_border');
+            }
+        }
+    });
+
 	$(document).on('click', function(e) {
         if ($('.booking_occupancy_wrapper:visible').length) {
 			var occupancy_wrapper = $('.booking_occupancy_wrapper:visible');

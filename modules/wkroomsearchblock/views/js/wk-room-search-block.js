@@ -569,6 +569,57 @@ $(document).ready(function() {
             }
         }
     });
+    $(document).on('click', '#search_occupancy_wrapper .select_occupancy_btn', function(e) {
+        e.preventDefault();
+        if ($('#search_occupancy_wrapper').length) {
+            if ($('#search_occupancy_wrapper').css('display') !== 'none') {
+                // Before closing the occupancy block validate the vaules inside
+                let hasErrors = 0;
+
+                let adults = $("#search_occupancy_wrapper").find(".num_adults").map(function(){return $(this).val();}).get();
+                let children = $("#search_occupancy_wrapper").find(".num_children").map(function(){return $(this).val();}).get();
+                let child_ages = $("#search_occupancy_wrapper").find(".guest_child_age").map(function(){return $(this).val();}).get();
+
+                // start validating above values
+                if (!adults.length || (adults.length != children.length)) {
+                    hasErrors = 1;
+                    showErrorMessage(invalid_occupancy_txt);
+                } else {
+                    $("#search_occupancy_wrapper").find('.occupancy_count').removeClass('error_border');
+
+                    // validate values of adults and children
+                    adults.forEach(function (item, index) {
+                        if (isNaN(item) || parseInt(item) < 1) {
+                            hasErrors = 1;
+                            $("#search_occupancy_wrapper .num_adults").eq(index).closest('.occupancy_count_block').find('.occupancy_count').addClass('error_border');
+                        }
+                        if (isNaN(children[index])) {
+                            hasErrors = 1;
+                            $("#search_occupancy_wrapper .num_children").eq(index).closest('.occupancy_count_block').find('.occupancy_count').addClass('error_border');
+                        }
+                    });
+
+                    // validate values of selected child ages
+                    $("#search_occupancy_wrapper").find('.guest_child_age').removeClass('error_border');
+                    child_ages.forEach(function (age, index) {
+                        age = parseInt(age);
+                        if (isNaN(age) || (age < 0) || (age >= parseInt(max_child_age))) {
+                            hasErrors = 1;
+                            $("#search_occupancy_wrapper .guest_child_age").eq(index).addClass('error_border');
+                        }
+                    });
+                }
+
+                if (hasErrors == 0) {
+                    $("#search_occupancy_wrapper").hide();
+                    $("#search_hotel_block_form #guest_occupancy").removeClass('error_border');
+                } else {
+                    $("#search_hotel_block_form #guest_occupancy").addClass('error_border');
+                    return false;
+                }
+            }
+        }
+    });
 });
 // function to set occupancy infor in guest occupancy field(search form)
 function setGuestOccupancy()
