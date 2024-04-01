@@ -1,5 +1,5 @@
 {*
-* 2010-2023 Webkul.
+* Since 2010 Webkul.
 *
 * NOTICE OF LICENSE
 *
@@ -13,7 +13,7 @@
 * needs please refer to https://store.webkul.com/customisation-guidelines/ for more information.
 *
 *  @author    Webkul IN <support@webkul.com>
-*  @copyright 2010-2023 Webkul IN
+*  @copyright Since 2010 Webkul IN
 *  @license   https://store.webkul.com/license.html
 *}
 
@@ -27,7 +27,7 @@
 
 		{* Already selected room services *}
 		<div class="col-sm-12 room_ordered_services table-responsive">
-			<table class="table">
+			<table class="table table-striped">
 				<thead>
 					<tr>
 						<th>{l s='Name'}</th>
@@ -148,7 +148,7 @@
 				{/if}
 			</div>
 			<input type="hidden" name="id_booking_detail" value="{$id_booking_detail}">
-			<button type="submit" id="save_service_service" class="btn btn-success pull-right"><i class="icon-save"></i> {l s='Save'}</button>
+			<button type="submit" id="save_service_service" class="btn btn-success pull-right"><i class="icon-save"></i> {l s='Update services'}</button>
 		</form>
 
 	{elseif isset($additionalServices) && $additionalServices}

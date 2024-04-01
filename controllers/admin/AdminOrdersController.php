@@ -487,55 +487,35 @@ class AdminOrdersControllerCore extends AdminController
         if ($this->display == 'view') {
             /** @var Order $order */
             $order = $this->loadObject();
-            $customer = $this->context->customer;
-
-            if (!Validate::isLoadedObject($order)) {
-                Tools::redirectAdmin($this->context->link->getAdminLink('AdminOrders'));
-            }
-
-            if ($idHotel = HotelBookingDetail::getIdHotelByIdOrder($order->id)) {
-                $objHotelBranchInformation = new HotelBranchInformation($idHotel, $this->context->language->id);
-                $this->toolbar_title[] = sprintf($this->l('Order %1$s - %2$s'), $order->reference, $objHotelBranchInformation->hotel_name);
-            } else {
-                $this->toolbar_title[] = sprintf($this->l('Order %1$s'), $order->reference);
-            }
-            $this->addMetaTitle($this->toolbar_title[count($this->toolbar_title) - 1]);
-
-            if ($order->hasBeenShipped()) {
-                $type = $this->l('Return products');
-            } elseif ($order->hasBeenPaid()) {
-                $type = $this->l('Standard refund');
-            } else {
-                $type = $this->l('Cancel products');
-            }
-
-            if (!$order->hasBeenShipped() && !$this->lite_display) {
-                $this->toolbar_btn['new'] = array(
-                    'short' => 'Create',
-                    'href' => '#',
-                    'desc' => $this->l('Add a product'),
-                    'class' => 'add_product'
+            if (Configuration::get('PS_INVOICE') && $order->hasInvoice() && !$this->lite_display) {
+                $this->toolbar_btn['file'] = array(
+                    'short' => $this->l('Invoice'),
+                    'href' => $this->context->link->getAdminLink('AdminPdf').'&submitAction=generateInvoicePDF&id_order='.$order->id,
+                    'desc' => $this->l('View invoice'),
+                    'class' => 'icon-file-text',
+                    'target' => true,
                 );
             }
 
-            if (Configuration::get('PS_ORDER_RETURN') && !$this->lite_display) {
-                $this->toolbar_btn['standard_refund'] = array(
-                    'short' => 'Create',
-                    'href' => '',
-                    'desc' => $type,
-                    'class' => 'process-icon-standardRefund'
-                );
-            }
+            $this->toolbar_btn['print'] = array(
+                'short' => $this->l('Print'),
+                'href' => 'javascript:window.print()',
+                'desc' => $this->l('Print order'),
+                'class' => 'icon-print',
+            );
 
-            if ($order->hasInvoice() && !$this->lite_display) {
-                $this->toolbar_btn['partial_refund'] = array(
-                    'short' => 'Create',
-                    'href' => '',
-                    'desc' => $this->l('Partial refund'),
-                    'class' => 'process-icon-partialRefund'
+            if (((int) $order->isReturnable()) && !$order->hasCompletelyRefunded(Order::ORDER_COMPLETE_CANCELLATION_OR_REFUND_REQUEST_FLAG)) {
+                $this->toolbar_btn['cancel'] = array(
+                    'short' => ((float) $order->getTotalPaid()) ? $this->l('Refund') : $this->l('Cancel'),
+                    'href' => '#refundForm',
+                    'id' => 'desc-order-standard_refund',
+                    'desc' => ((float) $order->getTotalPaid()) ? $this->l('Initiate refund') : $this->l('Cancel bookings'),
+                    'class' => 'icon-exchange',
+                    'target' => true,
                 );
             }
         }
+
         $res = parent::initToolbar();
         if (Context::getContext()->shop->getContext() != Shop::CONTEXT_SHOP && isset($this->toolbar_btn['new']) && Shop::isFeatureActive()) {
             unset($this->toolbar_btn['new']);
@@ -543,10 +523,472 @@ class AdminOrdersControllerCore extends AdminController
         return $res;
     }
 
-    public function initModal()
+    public function ajaxProcessInitBookingDocumentsModal()
     {
-        parent::initModal();
-        $this->modals[] = $this->getBookingDocumentsModal();
+        $response['hasError'] = 1;
+        if (Validate::isLoadedObject($objOrder = new Order(Tools::getValue('id_order')))) {
+            // set modal details
+            $modal = array(
+                'modal_id' => 'booking-documents-modal',
+                'modal_class' => 'modal-md order_detail_modal',
+                'modal_title' => '<i class="icon icon-file-text"></i> &nbsp'.$this->l('Documents'),
+                'modal_content' => $this->context->smarty->fetch('controllers/orders/modals/_booking_documents.tpl'),
+                'modal_actions' => array(
+                    array(
+                        'type' => 'button',
+                        'value' => 'submitDocument',
+                        'class' => 'btn-primary pull-right submitDocument',
+                        'label' => '<i class="icon-cloud-upload"></i> '.$this->l('Upload'),
+                    ),
+                ),
+            );
+
+            $this->context->smarty->assign($modal);
+            $response['hasError'] = 0;
+            $response['modalHtml'] = $this->context->smarty->fetch('modal.tpl');
+        }
+
+        die(Tools::jsonEncode($response));
+    }
+
+    public function ajaxProcessInitOrderDocumentNoteModal()
+    {
+        // set modal details
+        $response['hasError'] = 1;
+        if (Validate::isLoadedObject($objOrder = new Order(Tools::getValue('id_order')))) {
+            $this->context->smarty->assign(
+                array(
+                    'current_index' => self::$currentIndex,
+                    'order' => $objOrder,
+                )
+            );
+
+            $modal = array(
+                'modal_id' => 'document-note-modal',
+                'modal_class' => 'order_detail_modal',
+                'modal_title' => '<i class="icon icon-file"></i> &nbsp'.$this->l('Note'),
+                'modal_content' => $this->context->smarty->fetch('controllers/orders/modals/_document_note.tpl'),
+                'modal_actions' => array(
+                    array(
+                        'type' => 'button',
+                        'value' => 'submitDocumentNote',
+                        'class' => 'submitDocumentNote btn-primary pull-right',
+                        'label' => '<i class="icon-file"></i> '.$this->l('Save Note'),
+                    ),
+                ),
+            );
+
+            $this->context->smarty->assign($modal);
+            $response['hasError'] = 0;
+            $response['modalHtml'] = $this->context->smarty->fetch('modal.tpl');
+        }
+
+        die(Tools::jsonEncode($response));
+    }
+
+    public function ajaxProcessInitVoucherModal()
+    {
+        // set modal details
+        $response['hasError'] = 1;
+        if (Validate::isLoadedObject($objOrder = new Order(Tools::getValue('id_order')))) {
+            $this->context->smarty->assign(
+                array(
+                    'current_index' => self::$currentIndex,
+                    'order' => $objOrder,
+                    'currency' => new Currency($objOrder->id_currency),
+                    'invoices_collection' => $objOrder->getInvoicesCollection(),
+                )
+            );
+
+            $modal = array(
+                'modal_id' => 'voucher-modal',
+                'modal_class' => 'order_detail_modal',
+                'modal_title' => '<i class="icon icon-tag"></i> &nbsp'.$this->l('Voucher'),
+                'modal_content' => $this->context->smarty->fetch('controllers/orders/modals/_discount_form.tpl'),
+                'modal_actions' => array(
+                    array(
+                        'type' => 'button',
+                        'value' => 'submitVoucher',
+                        'class' => 'submitVoucher btn-primary pull-right',
+                        'label' => '<i class="icon-tag"></i> '.$this->l('Add Voucher'),
+                    ),
+                ),
+            );
+
+            $this->context->smarty->assign($modal);
+            $response['hasError'] = 0;
+            $response['modalHtml'] = $this->context->smarty->fetch('modal.tpl');
+        }
+
+        die(Tools::jsonEncode($response));
+    }
+
+    public function ajaxProcessInitOrderPaymentModal()
+    {
+        // set modal details
+        $response['hasError'] = 1;
+        if (Validate::isLoadedObject($objOrder = new Order(Tools::getValue('id_order')))) {
+            $payment_methods = array();
+            foreach (PaymentModule::getInstalledPaymentModules() as $payment) {
+                $module = Module::getInstanceByName($payment['name']);
+                if (Validate::isLoadedObject($module) && $module->active) {
+                    $payment_methods[] = $module->displayName;
+                }
+            }
+            $this->context->smarty->assign(
+                array(
+                    'current_index' => self::$currentIndex,
+                    'order' => $objOrder,
+                    'currencies' => Currency::getCurrenciesByIdShop($objOrder->id_shop),
+                    'payment_methods' => $payment_methods,
+                    'payment_types' => $this->getPaymentsTypes(),
+                    'invoices_collection' => $objOrder->getInvoicesCollection(),
+                )
+            );
+            $modal = array(
+                'modal_id' => 'order-payment-modal',
+                'modal_class' => 'order_detail_modal',
+                'modal_title' => '<i class="icon icon-credit-card"></i> &nbsp'.$this->l('Order Payment'),
+                'modal_content' => $this->context->smarty->fetch('controllers/orders/modals/_order_payment_form.tpl'),
+                'modal_actions' => array(
+                    array(
+                        'type' => 'button',
+                        'value' => 'submitOrderPayment',
+                        'class' => 'submitOrderPayment btn-primary pull-right',
+                        'label' => '<i class="icon-credit-card"></i> '.$this->l('Add Payment'),
+                    ),
+                ),
+            );
+
+            $this->context->smarty->assign($modal);
+            $response['hasError'] = 0;
+            $response['modalHtml'] = $this->context->smarty->fetch('modal.tpl');
+        }
+
+        die(Tools::jsonEncode($response));
+    }
+
+    public function ajaxProcessInitTravellerModal()
+    {
+        // set modal details
+        $response['hasError'] = 1;
+        if (Validate::isLoadedObject($objOrder = new Order(Tools::getValue('id_order')))) {
+            // get details if booking is done for some other guest
+            $customerGuestDetail = false;
+            if ($id_customer_guest_detail = OrderCustomerGuestDetail::isCustomerGuestBooking($objOrder->id)) {
+                $customerGuestDetail = new OrderCustomerGuestDetail($id_customer_guest_detail);
+                $customerGuestDetail->gender = new Gender($customerGuestDetail->id_gender, $this->context->language->id);
+            }
+
+            if ($customerGuestDetail) {
+                $this->context->smarty->assign(
+                    array(
+                        'genders' => Gender::getGenders(),
+                        'customerGuestDetail' => $customerGuestDetail,
+                    )
+                );
+                $modal = array(
+                    'modal_id' => 'traveller-modal',
+                    'modal_class' => 'order_detail_modal',
+                    'modal_title' => '<i class="icon icon-user"></i> &nbsp'.$this->l('Traveller'),
+                    'modal_content' => $this->context->smarty->fetch('controllers/orders/modals/_traveller_form.tpl'),
+                    'modal_actions' => array(
+                        array(
+                            'type' => 'button',
+                            'value' => 'submitTravellerInfo',
+                            'class' => 'submitTravellerInfo btn-primary pull-right',
+                            'label' => '<i class="icon-user"></i> '.$this->l('Save Traveller'),
+                        ),
+                    ),
+                );
+
+                $this->context->smarty->assign($modal);
+                $response['hasError'] = 0;
+                $response['modalHtml'] = $this->context->smarty->fetch('modal.tpl');
+            }
+        }
+
+        die(Tools::jsonEncode($response));
+    }
+
+    public function ajaxProcessInitOrderPaymentDetailModal()
+    {
+        // set modal details
+        $response['hasError'] = 1;
+        if (Validate::isLoadedObject($objOrder = new Order(Tools::getValue('id_order')))) {
+            $modal = array(
+                'modal_id' => 'payment-detail-modal',
+                'modal_class' => 'order_detail_modal',
+                'modal_title' => '<i class="icon icon-credit-card"></i> &nbsp'.$this->l('Payment Detail'),
+                'modal_content' => $this->context->smarty->fetch('controllers/orders/modals/_order_payment_detail.tpl'),
+                'modal_actions' => array(),
+            );
+
+            $this->context->smarty->assign($modal);
+            $response['hasError'] = 0;
+            $response['modalHtml'] = $this->context->smarty->fetch('modal.tpl');
+        }
+
+        die(Tools::jsonEncode($response));
+    }
+
+    public function ajaxProcessInitRoomStatusModal()
+    {
+        // set modal details
+        $response['hasError'] = 1;
+        if (Validate::isLoadedObject($objOrder = new Order(Tools::getValue('id_order')))) {
+            $htlOrderStatus = HotelBookingDetail::getAllHotelOrderStatus();
+            $this->context->smarty->assign(
+                array(
+                    'order' => $objOrder,
+                    'current_index' => self::$currentIndex,
+                    'hotel_order_status' => $htlOrderStatus,
+                )
+            );
+            $modal = array(
+                'modal_id' => 'room-status-modal',
+                'modal_class' => 'order_detail_modal',
+                'modal_title' => '<i class="icon-bed"></i> &nbsp'.$this->l('Guest CheckIn - Checkout'),
+                'modal_content' => $this->context->smarty->fetch('controllers/orders/modals/_room_status_form.tpl'),
+                'modal_actions' => array(
+                    array(
+                        'type' => 'button',
+                        'value' => 'submitRoomStatus',
+                        'class' => 'submitRoomStatus btn-primary pull-right',
+                        'label' => '<i class="icon-bed"></i> '.$this->l('Update Status'),
+                    ),
+                ),
+            );
+
+            $this->context->smarty->assign($modal);
+
+            $response['hasError'] = 0;
+            $response['STATUS_ALLOTED'] = HotelBookingDetail::STATUS_ALLOTED;
+            $response['STATUS_CHECKED_IN'] = HotelBookingDetail::STATUS_CHECKED_IN;
+            $response['STATUS_CHECKED_OUT'] = HotelBookingDetail::STATUS_CHECKED_OUT;
+            $response['modalHtml'] = $this->context->smarty->fetch('modal.tpl');
+        }
+
+        die(Tools::jsonEncode($response));
+    }
+
+    public function ajaxProcessInitRoomReallocationModal()
+    {
+        // set modal details
+        $response['hasError'] = 1;
+        if (Validate::isLoadedObject($objOrder = new Order(Tools::getValue('id_order')))) {
+            $htlOrderStatus = HotelBookingDetail::getAllHotelOrderStatus();
+            $this->context->smarty->assign(
+                array(
+                    'loaderImg' => $this->context->link->getMediaLink(_PS_IMG_.'admin/ajax-loader.gif'),
+                    'order' => $objOrder,
+                    'currency' => new Currency($objOrder->id_currency),
+                    'current_index' => self::$currentIndex,
+                )
+            );
+            $modal = array(
+                'modal_id' => 'room-reallocation-modal',
+                'modal_class' => 'modal-md order_detail_modal',
+                'modal_title' => '<i class="icon icon-refresh"></i> &nbsp'.$this->l('Room Reallocation / Swap'),
+                'modal_content' => $this->context->smarty->fetch('controllers/orders/modals/_room_reallocation.tpl'),
+                'modal_actions' => null,
+            );
+
+            $this->context->smarty->assign($modal);
+            $response['hasError'] = 0;
+            $response['modalHtml'] = $this->context->smarty->fetch('modal.tpl');
+        }
+
+        die(Tools::jsonEncode($response));
+    }
+
+    public function ajaxProcessInitAddRoomBookingModal()
+    {
+        // set modal details
+        $response['hasError'] = 1;
+        if (Validate::isLoadedObject($objOrder = new Order(Tools::getValue('id_order')))) {
+            $this->context->smarty->assign(
+                array(
+                    'order' => $objOrder,
+                    'currency' => new Currency($objOrder->id_currency),
+                    'max_child_age' => Configuration::get('WK_GLOBAL_CHILD_MAX_AGE'),
+                )
+            );
+            $modal = array(
+                'modal_id' => 'add-room-booking-modal',
+                'modal_class' => 'modal-md order_detail_modal',
+                'modal_title' => '<i class="icon icon-bed"></i> &nbsp'.$this->l('Add Room'),
+                'modal_content' => $this->context->smarty->fetch('controllers/orders/modals/_add_room_booking.tpl'),
+                'modal_actions' => array(
+                    array(
+                        'type' => 'button',
+                        'value' => 'submitAddRoom',
+                        'class' => 'submitAddRoom btn-primary pull-right',
+                        'label' => '<i class="icon-bed"></i> '.$this->l('Add Room'),
+                    ),
+                ),
+            );
+
+            $this->context->smarty->assign($modal);
+            $response['hasError'] = 0;
+            $response['modalHtml'] = $this->context->smarty->fetch('modal.tpl');
+        }
+
+        die(Tools::jsonEncode($response));
+    }
+
+    public function ajaxProcessInitEditRoomBookingModal()
+    {
+        // set modal details
+        $response['hasError'] = 1;
+        if (Validate::isLoadedObject($objOrder = new Order(Tools::getValue('id_order')))
+            && ($idProduct = Tools::getValue('id_product'))
+            && ($idOrder = Tools::getValue('id_order'))
+            && ($idRoom = Tools::getValue('id_room'))
+            && ($dateFrom = Tools::getValue('date_from'))
+            && ($dateTo = Tools::getValue('date_to'))
+        ) {
+            $productLineData = json_decode(Tools::getValue('product_line_data'), true);
+
+            $smartyVars = array(
+                    'order' => $objOrder,
+                    'data' => $productLineData,
+                    'currency' => new Currency($objOrder->id_currency),
+                    'max_child_age' => Configuration::get('WK_GLOBAL_CHILD_MAX_AGE'),
+                    'orderEdit' => 1,
+            );
+
+            $objCurrency = new Currency($objOrder->id_currency);
+            $smartyVars['orderCurrency'] = $objOrder->id_currency;
+            $smartyVars['currencySign'] = $objCurrency->sign;
+            $smartyVars['link'] = $this->context->link;
+
+            $objBookingDemand = new HotelBookingDetail();
+            $htlBookingDetail = $objBookingDemand->getRowByIdOrderIdProductInDateRange(
+                $idOrder,
+                $idProduct,
+                $dateFrom,
+                $dateTo,
+                $idRoom
+            );
+
+            $smartyVars['id_booking_detail'] = $htlBookingDetail['id'];
+
+            $objBookingDemand = new HotelBookingDemands();
+
+            // set context currency So that we can get prices in the order currency
+            $this->context->currency = $objCurrency;
+
+            if ($extraDemands = $objBookingDemand->getRoomTypeBookingExtraDemands(
+                $idOrder,
+                $idProduct,
+                $idRoom,
+                $dateFrom,
+                $dateTo
+            )) {
+                $smartyVars['extraDemands'] = $extraDemands;
+            }
+
+            // get room type additional demands
+            $objRoomDemands = new HotelRoomTypeDemand();
+            if ($roomTypeDemands = $objRoomDemands->getRoomTypeDemands($idProduct)) {
+                foreach ($roomTypeDemands as &$demand) {
+                    // if demand has advance options then set demand price as first advance option price.
+                    if (isset($demand['adv_option']) && $demand['adv_option']) {
+                        $demand['price'] = current($demand['adv_option'])['price'];
+                    }
+                }
+                $smartyVars['roomTypeDemands'] = $roomTypeDemands;
+            }
+
+            $objRoomTypeServiceProductOrderDetail = new RoomTypeServiceProductOrderDetail();
+            if ($additionalServices = $objRoomTypeServiceProductOrderDetail->getSelectedServicesForRoom(
+                $htlBookingDetail['id']
+            )) {
+                $smartyVars['additionalServices'] = $additionalServices;
+            }
+
+            // get room type additional demands
+            $objRoomTypeServiceProduct = new RoomTypeServiceProduct();
+            if ($roomTypeServiceProducts = $objRoomTypeServiceProduct->getServiceProductsData($idProduct, 1, 0, false, 2, null)) {
+                if ($additionalServices) {
+                    foreach ($roomTypeServiceProducts as $key => $product) {
+                        if (in_array($product['id_product'], array_column($additionalServices['additional_services'], 'id_product'))) {
+                            unset($roomTypeServiceProducts[$key]);
+                        }
+                    }
+                }
+                $smartyVars['roomTypeServiceProducts'] = $roomTypeServiceProducts;
+            }
+
+            $this->context->smarty->assign($smartyVars);
+
+            $modal = array(
+                'modal_id' => 'edit-room-booking-modal',
+                'modal_class' => 'modal-lg order_detail_modal',
+                'modal_title' => '<i class="icon icon-bed"></i> &nbsp'.$this->l('Edit Room'),
+                'modal_content' => $this->context->smarty->fetch('controllers/orders/modals/_edit_room_booking.tpl'),
+                'modal_actions' => array(
+                    array(
+                        'type' => 'button',
+                        'value' => 'submitRoomChange',
+                        'class' => 'submitRoomChange btn-primary pull-right',
+                        'label' => '<i class="icon-bed"></i> '.$this->l('Update'),
+                    ),
+                ),
+            );
+
+            $this->context->smarty->assign($modal);
+            $response['hasError'] = 0;
+            $response['modalHtml'] = $this->context->smarty->fetch('modal.tpl');
+        }
+
+        die(Tools::jsonEncode($response));
+    }
+
+    public function ajaxProcessInitCancelRoomBookingModal()
+    {
+        $response['hasError'] = 1;
+        if (Validate::isLoadedObject($objOrder = new Order(Tools::getValue('id_order')))) {
+            // get booking information by order
+            $objBookingDetail = new HotelBookingDetail();
+            $objOrderReturn = new OrderReturn();
+            $refundReqBookings = $objOrderReturn->getOrderRefundRequestedBookings($objOrder->id, 0, 1);
+            if ($bookingOrderInfo = $objBookingDetail->getBookingDataByOrderId($objOrder->id)) {
+                foreach($bookingOrderInfo as $key => $booking) {
+                    if ((in_array($booking['id'], $refundReqBookings)) || $booking['is_refunded']) {
+                        unset($bookingOrderInfo[$key]);
+                    }
+                }
+            }
+            $this->context->smarty->assign(
+                array(
+                    'order' => $objOrder,
+                    'current_index' => self::$currentIndex,
+                    'bookingOrderInfo' => $bookingOrderInfo,
+                )
+            );
+            $modal = array(
+                'modal_id' => 'cancel-room-booking-modal',
+                'modal_class' => 'modal-md order_detail_modal',
+                'modal_title' => '<i class="icon icon-exchange"></i> &nbsp'.$this->l('Cancel Bookings'),
+                'modal_content' => $this->context->smarty->fetch('controllers/orders/modals/_cancel_room_bookings.tpl'),
+                'modal_actions' => array(
+                    array(
+                        'type' => 'button',
+                        'value' => 'submitCancelBooking',
+                        'class' => 'submitCancelBooking btn-primary pull-right',
+                        'label' => '<i class="icon-exchange"></i> '.$this->l('Cancel Bookings'),
+                    ),
+                ),
+            );
+
+            $this->context->smarty->assign($modal);
+            $response['hasError'] = 0;
+            $response['modalHtml'] = $this->context->smarty->fetch('modal.tpl');
+        }
+
+        die(Tools::jsonEncode($response));
     }
 
     public function setMedia()
@@ -1023,7 +1465,7 @@ class AdminOrdersControllerCore extends AdminController
                         $customer_message->id_customer_thread = $customer_thread->id;
                         $customer_message->id_employee = (int)$this->context->employee->id;
                         $customer_message->message = $message;
-                        $customer_message->private = Tools::getValue('visibility');
+                        $customer_message->private = !Tools::getValue('visibility');
 
                         if (!$customer_message->add()) {
                             $this->errors[] = Tools::displayError('An error occurred while saving the message.');
@@ -2079,7 +2521,12 @@ class AdminOrdersControllerCore extends AdminController
             }
         }
 
-        $this->toolbar_title = sprintf($this->l('Order #%1$d (%2$s) - %3$s %4$s'), $order->id, $order->reference, $customer->firstname, $customer->lastname);
+        if ($idHotel = HotelBookingDetail::getIdHotelByIdOrder($order->id)) {
+            $objHotelBranchInformation = new HotelBranchInformation($idHotel, $this->context->language->id);
+            $this->toolbar_title = sprintf($this->l('Order %1$s - %2$s'), $order->reference, $objHotelBranchInformation->hotel_name);
+        } else {
+            $this->toolbar_title = sprintf($this->l('Order %1$s'), $order->reference);
+        }
         if (Shop::isFeatureActive()) {
             $shop = new Shop((int)$order->id_shop);
             $this->toolbar_title .= ' - '.sprintf($this->l('Shop: %s'), $shop->name);
@@ -2496,26 +2943,15 @@ class AdminOrdersControllerCore extends AdminController
                 'customer' => $customer)
             ),
             'isCancelledRoom' => $isCancelledRoom,
+            'orderDocuments' => $order->getDocuments(),
+            'ROOM_STATUS_ALLOTED' => HotelBookingDetail::STATUS_ALLOTED,
+            'ROOM_STATUS_CHECKED_IN' => HotelBookingDetail::STATUS_CHECKED_IN,
+            'ROOM_STATUS_CHECKED_OUT' => HotelBookingDetail::STATUS_CHECKED_OUT,
         );
 
         return parent::renderView();
     }
 
-    public function getBookingDocumentsModal()
-    {
-        $modalContent = $this->context->smarty->fetch('controllers/orders/_booking_documents_modal.tpl');
-
-        // set modal details
-        $modal = array(
-            'modal_id' => 'booking-documents-modal',
-            'modal_class' => 'modal-md',
-            'modal_title' => $this->l('Documents'),
-            'modal_content' => $modalContent,
-            'modal_actions' => array(), // required to show Close button
-        );
-
-        return $modal;
-    }
 
     public function ajaxProcessGetHotelRoomTypes()
     {
@@ -2712,7 +3148,8 @@ class AdminOrdersControllerCore extends AdminController
                         if ($objCustomerGuestDetail->save()) {
                             $response['success'] = true;
                             $gender = new Gender($objCustomerGuestDetail->id_gender, $this->context->language->id);
-                            $response['data']['guest_name'] = $gender->name.' '.$objCustomerGuestDetail->firstname.' '.$objCustomerGuestDetail->lastname ;
+                            $response['data']['gender_name'] = $gender->name;
+                            $response['data']['guest_name'] = $objCustomerGuestDetail->firstname.' '.$objCustomerGuestDetail->lastname ;
                             $response['data']['guest_email'] = $objCustomerGuestDetail->email;
                             $response['data']['guest_phone'] = $objCustomerGuestDetail->phone;
                             $response['msg'] = $this->l('Guest details are updated.');
@@ -3311,7 +3748,6 @@ class AdminOrdersControllerCore extends AdminController
             'invoices' => $invoice_array,
             'documents_html' => $this->createTemplate('_documents.tpl')->fetch(),
             'shipping_html' => $this->createTemplate('_shipping.tpl')->fetch(),
-            'discount_form_html' => $this->createTemplate('_discount_form.tpl')->fetch(),
             'refresh' => $refresh
         )));
     }
@@ -3430,6 +3866,17 @@ class AdminOrdersControllerCore extends AdminController
             )));
         }
 
+        if (!Validate::isPrice($product_informations['product_price_tax_incl'])) {
+            die(json_encode(array(
+                'result' => false,
+                'error' => Tools::displayError('Please enter a valid tax included price.'),
+            )));
+        } elseif (!Validate::isPrice($product_informations['product_price_tax_excl'])) {
+            die(json_encode(array(
+                'result' => false,
+                'error' => Tools::displayError('Please enter a valid tax excluded price.'),
+            )));
+        }
 
         if ($order->with_occupancy) {
             $req_rm = count($occupancy);
@@ -3996,7 +4443,6 @@ class AdminOrdersControllerCore extends AdminController
             'invoices' => $invoice_array,
             'documents_html' => $this->createTemplate('_documents.tpl')->fetch(),
             'shipping_html' => $this->createTemplate('_shipping.tpl')->fetch(),
-            'discount_form_html' => $this->createTemplate('_discount_form.tpl')->fetch(),
             'refresh' => $refresh
         )));
     }
@@ -5585,6 +6031,7 @@ class AdminOrdersControllerCore extends AdminController
     // To show rooms extra demands in the modal box in order details view page
     public function ajaxProcessGetRoomTypeBookingDemands()
     {
+        $orderEdit = Tools::getValue('orderEdit');
         if (($idProduct = Tools::getValue('id_product'))
             && ($idOrder = Tools::getValue('id_order'))
             && ($idRoom = Tools::getValue('id_room'))
@@ -5624,23 +6071,6 @@ class AdminOrdersControllerCore extends AdminController
                 $smartyVars['extraDemands'] = $extraDemands;
             }
 
-            // if admin is editing order
-            if ($orderEdit = Tools::getValue('orderEdit')) {
-                $smartyVars['orderEdit'] = $orderEdit;
-
-                // get room type additional demands
-                $objRoomDemands = new HotelRoomTypeDemand();
-                if ($roomTypeDemands = $objRoomDemands->getRoomTypeDemands($idProduct)) {
-                    foreach ($roomTypeDemands as &$demand) {
-                        // if demand has advance options then set demand price as first advance option price.
-                        if (isset($demand['adv_option']) && $demand['adv_option']) {
-                            $demand['price'] = current($demand['adv_option'])['price'];
-                        }
-                    }
-                    $smartyVars['roomTypeDemands'] = $roomTypeDemands;
-                }
-            }
-
             $objRoomTypeServiceProductOrderDetail = new RoomTypeServiceProductOrderDetail();
             if ($additionalServices = $objRoomTypeServiceProductOrderDetail->getSelectedServicesForRoom(
                 $htlBookingDetail['id']
@@ -5648,29 +6078,27 @@ class AdminOrdersControllerCore extends AdminController
                 $smartyVars['additionalServices'] = $additionalServices;
             }
 
-            if ($orderEdit = Tools::getValue('orderEdit')) {
-                $smartyVars['orderEdit'] = $orderEdit;
+            $smartyVars['orderEdit'] = $orderEdit;
 
-                // get room type additional demands
-                $objRoomTypeServiceProduct = new RoomTypeServiceProduct();
-                if ($roomTypeServiceProducts = $objRoomTypeServiceProduct->getServiceProductsData($idProduct, 1, 0, false, 2, null)) {
-                    if ($additionalServices) {
-                        foreach ($roomTypeServiceProducts as $key => $product) {
-                            if (in_array($product['id_product'], array_column($additionalServices['additional_services'], 'id_product'))) {
-                                unset($roomTypeServiceProducts[$key]);
-                            }
-                        }
-                    }
-                    $smartyVars['roomTypeServiceProducts'] = $roomTypeServiceProducts;
-                }
-            }
             $this->context->smarty->assign($smartyVars);
+
+            $modal = array(
+                'modal_id' => 'room-extra-demands',
+                'modal_class' => 'modal-md order_detail_modal',
+                'modal_title' => '<i class="icon icon-file-text"></i> &nbsp'.$this->l('Extra Services'),
+                'modal_content' => $this->context->smarty->fetch('controllers/orders/modals/_extra_services.tpl'),
+            );
+
+            $this->context->smarty->assign($modal);
+
+            $response['modalHtml'] = $this->context->smarty->fetch('modal.tpl');
+            $response['hasError'] = 0;
+        } else {
+            $response['hasError'] = 1;
         }
 
-        $extraDemandsTpl = $this->context->smarty->fetch(
-            _PS_ADMIN_DIR_.'/themes/default/template/controllers/orders/_room_extra_services_modal.tpl'
-        );
-        die($extraDemandsTpl);
+        $response = Tools::jsonEncode($response);
+        die($response);
     }
 
     public function processRenderServicesPanel($idOrder, $idProduct, $dateFrom, $dateTo, $idRoom, $orderEdit)
@@ -5720,7 +6148,7 @@ class AdminOrdersControllerCore extends AdminController
         $this->context->smarty->assign($smartyVars);
 
         $servicesTpl = $this->context->smarty->fetch(
-            _PS_ADMIN_DIR_.'/themes/default/template/controllers/orders/_room_services_block.tpl'
+            _PS_ADMIN_DIR_.'/themes/default/template/controllers/orders/modals/_extra_services_service_products.tpl'
         );
         return $servicesTpl;
     }
@@ -5779,7 +6207,7 @@ class AdminOrdersControllerCore extends AdminController
         $this->context->smarty->assign($smartyVars);
 
         $servicesTpl = $this->context->smarty->fetch(
-            _PS_ADMIN_DIR_.'/themes/default/template/controllers/orders/_room_facilities_block.tpl'
+            _PS_ADMIN_DIR_.'/themes/default/template/controllers/orders/modals/_extra_services_facilities.tpl'
         );
         return $servicesTpl;
     }
