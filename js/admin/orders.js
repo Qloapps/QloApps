@@ -1537,6 +1537,11 @@ $(document).ready(function() {
         });
     });
 
+    // Empty extra-services-container when room-extra-demands modal is closed
+    $(document).on('hidden.bs.modal', '#room-extra-demands', function(){
+        $("#room-extra-demands .extra-services-container").empty();
+    });
+
     $(document).on('click', '.reallocate_overbooking', function(e) {
         e.preventDefault();
         $('#reallocate_room_' + $(this).attr('id_htl_booking')).trigger('click');
