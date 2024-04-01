@@ -32,7 +32,7 @@
 					<tr>
 						<th>{l s='Name'}</th>
 						<th class="fixed-width-sm"></th>
-						<th class="fixed-width-sm">{l s='Quantity'}</th>
+						<th class="fixed-width-sm text-center">{l s='Quantity'}</th>
 						<th>{l s='Unit Price'}</th>
 						<th>{l s='Total Price'}</th>
 						<th class="text-right">{l s='Action'}</th>
@@ -45,7 +45,7 @@
 								<td>
 									<div>{$service['name']|escape:'html':'UTF-8'}</div>
 								</td>
-								<td class="text-center">
+								<td>
 									{if $service['product_auto_add'] && $service['product_price_addition_type'] == Product::PRICE_ADDITION_TYPE_WITH_ROOM}
 										<span class="badge badge-info label">{l s='Auto added'}</span><br>
 									{/if}
@@ -53,7 +53,7 @@
 										<span class="badge badge-info label">{l s='Convenience fee'}</span>
 									{/if}
 								</td>
-								<td>
+								<td class="text-center">
 									{if $service['allow_multiple_quantity']}
 										<div class="qty_container">
 											<input type="number" class="form-control qty" min="1" data-id_product="{$service['id_product']|escape:'html':'UTF-8'}" value="{$service['quantity']|escape:'html':'UTF-8'}">
@@ -78,7 +78,7 @@
 									{/if} *}
 								</td>
 								<td>{displayPrice price=$service['total_price_tax_excl']|escape:'html':'UTF-8' currency=$orderCurrency}</td>
-								<td><a class="btn btn-danger pull-right del_room_additional_service" data-id_room_type_service_product_order_detail="{$service['id_room_type_service_product_order_detail']}" href="#"><i class="icon-trash"></i></a></td>
+								<td class="text-right"><a class="btn btn-danger pull-right del_room_additional_service" data-id_room_type_service_product_order_detail="{$service['id_room_type_service_product_order_detail']}" href="#"><i class="icon-trash"></i></a></td>
 							</tr>
 						{/foreach}
 					{else}
@@ -100,7 +100,7 @@
 								<th></th>
 								<th>{l s='Name'}</th>
 								<th class="fixed-width-sm"> </th>
-								<th class="fixed-width-sm">{l s='Quantity'}</th>
+								<th class="fixed-width-sm text-center">{l s='Quantity'}</th>
 								<th>{l s='Unit Price'}</th>
 							</tr>
 						</thead>
@@ -121,7 +121,7 @@
 											<span class="badge badge-info label">{l s='Convenience fee'}</span>
 										{/if}
 									</td>
-									<td>
+									<td class="text-center">
 										{if $product['allow_multiple_quantity']}
 											<div class="qty_container">
 												<input type="number" class="form-control qty" min="1" id="qty_{$product['id_product']|escape:'html':'UTF-8'}" name="service_qty[{$product['id_product']|escape:'html':'UTF-8'}]" data-id-product="{$product.id_product|escape:'html':'UTF-8'}" value="1">
@@ -160,7 +160,7 @@
 					<th>{l s='Name'}</th>
 					<th></th>
 					<th>{l s='Unit Price'}</th>
-					<th class="text-right">{l s='Total Price'}</th>
+					<th>{l s='Total Price'}</th>
 				</tr>
 			</thead>
 			</tbody>
@@ -170,7 +170,7 @@
 							{$service['id_product']|escape:'html':'UTF-8'} <a target="blank" href="{$link->getAdminLink('AdminNormalProducts')|escape:'html':'UTF-8'}&amp;id_product={$service['id_product']|escape:'html':'UTF-8'}&amp;updateproduct"><i class="icon-external-link-sign"></i></a>
 						</td>
 						<td>{$service['name']|escape:'html':'UTF-8'}</td>
-						<td class="text-center">
+						<td>
 							{if $service['product_auto_add'] && $service['product_price_addition_type'] == Product::PRICE_ADDITION_TYPE_INDEPENDENT}
 								<span class="badge badge-info label">{l s='Convenience fee'}</span>
 							{/if}
@@ -184,7 +184,7 @@
 								{l s='/ night'}
 							{/if}
 						</td>
-						<td class="text-right">
+						<td>
 							{displayPrice price=$service['total_price_tax_excl'] currency=$orderCurrency}
 						</td>
 					</tr>

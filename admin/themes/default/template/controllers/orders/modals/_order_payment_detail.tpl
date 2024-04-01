@@ -48,7 +48,7 @@
             <div class="text-bold" id="invoice_number"></div>
         </div>
     </div>
-    <div class="form-group row">
+    {* <div class="form-group row">
         <div class="col-sm-6">
             <label class="control-label">{l s='Card Number'}</label>
             <div class="text-bold" id="card_number"></div>
@@ -67,5 +67,5 @@
             <label class="control-label">{l s='Card Holder'}</label>
             <div class="text-bold" id="card_holder"></div>
         </div>
-    </div>
+    </div> *}
 </div>

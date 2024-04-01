@@ -20,10 +20,10 @@
 <div class="modal-body">
     <ul class="nav nav-tabs" role="tablist">
         <li role="presentation" class="active">
-            <a class="order_detail_link" href="#reallocate_room_tab" aria-controls="reallocate" role="tab" data-toggle="tab">{l s='Room Reallocation'}</a>
+            <a  href="#reallocate_room_tab" aria-controls="reallocate" role="tab" data-toggle="tab">{l s='Room Reallocation'}</a>
         </li>
         <li role="presentation">
-            <a class="order_detail_link" href="#swap_room_tab" aria-controls="swap" role="tab" data-toggle="tab">{l s='Swap Room'}</a>
+            <a  href="#swap_room_tab" aria-controls="swap" role="tab" data-toggle="tab">{l s='Swap Room'}</a>
         </li>
     </ul>
     <div class="tab-content order-panel active">

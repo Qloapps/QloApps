@@ -33,7 +33,7 @@
 	<td><img src="{$data.image_link}" title="Room image" class="img-thumbnail"/></td>
 	<td><p>{$data.room_type}</p></td>
 	<td>
-		<a class="order_detail_link" href="{$link->getAdminLink('AdminAddHotel')}&amp;id={$data['id_hotel']}&amp;updatehtl_branch_info" target="_blank">
+		<a  href="{$link->getAdminLink('AdminAddHotel')}&amp;id={$data['id_hotel']}&amp;updatehtl_branch_info" target="_blank">
 			<span>{$data['hotel_name']}</span>
 		</a>
 	</td>
@@ -65,7 +65,7 @@
 	<td>
 		{if $data['children']}
 			<div class="dropdown booking_occupancy_show">
-				<a class="order_detail_link" data-toggle="dropdown">
+				<a  data-toggle="dropdown">
 					<span>{if $data['adults']}{$data['adults']}{/if} {if $data['adults'] > 1}{l s='Adults'}{else}{l s='Adult'}{/if}{if {$data['children']}}, {$data['children']} {if $data['children'] > 1}{l s='Children'}{else}{l s='Child'}{/if}{/if}</span>
 				</a>
 				<div class="dropdown-menu well well-sm">
@@ -158,13 +158,13 @@
 		<span class="extra_service_show">
 			{convertPriceWithCurrency price=($data['extra_demands_price_te'] + $data['additional_services_price_te'] + $data['convenience_fee_te'] + $data['additional_services_price_auto_add_te']) currency=$currency->id}
 			{if $data['extra_demands']|count || $data['additional_services']|count}
-				<a class="order_detail_link open_room_extra_services" href="#" date_from="{$data['date_from']}" date_to="{$data['date_to']}" id_product="{$data['id_product']}" id_room="{$data['id_room']}" id_order="{$order->id}" id_htl_booking="{$data['id']}">
+				<a class="open_room_extra_services" href="#" date_from="{$data['date_from']}" date_to="{$data['date_to']}" id_product="{$data['id_product']}" id_room="{$data['id_room']}" id_order="{$order->id}" id_htl_booking="{$data['id']}">
 					<i class="icon icon-lg icon-info-circle"></i>
 				</a>
 			{/if}
 		</span>
 		<span class="extra_service_edit" style="display: none;">
-			<a class="order_detail_link open_room_extra_services" href="#" date_from="{$data['date_from']}" date_to="{$data['date_to']}" id_product="{$data['id_product']}" id_room="{$data['id_room']}" id_order="{$order->id}" id_htl_booking="{$data['id']}">
+			<a class="open_room_extra_services" href="#" date_from="{$data['date_from']}" date_to="{$data['date_to']}" id_product="{$data['id_product']}" id_room="{$data['id_room']}" id_order="{$order->id}" id_htl_booking="{$data['id']}">
 				{convertPriceWithCurrency price=($data['extra_demands_price_te'] + $data['additional_services_price_te'] + $data['convenience_fee_te'] + $data['additional_services_price_auto_add_te']) currency=$currency->id}
 			</a>
 		</span>
@@ -228,12 +228,12 @@
 		</td>
 		<td class="product_action">
 			<div class="actions-row">
-				<a href="#" class="order_detail_link edit_room_change_link" data-product_line_data="{$data|json_encode|escape}">
+				<a href="#" class="edit_room_change_link" data-product_line_data="{$data|json_encode|escape}">
 					<i class="icon-pencil"></i>
 					{l s='Edit'}
 				</a>
 				<div class="dropdown pull-right">
-					<a type="button" class="dropdown-toggle order_detail_link" data-toggle="dropdown" style="padding: 0 8px; margin-left: -15px;">
+					<a type="button" class="dropdown-toggle" data-toggle="dropdown" style="padding: 0 8px; margin-left: -15px;">
 						<i class="icon-ellipsis-v"></i>
 					</a>
 					<ul class="dropdown-menu" role="menu">

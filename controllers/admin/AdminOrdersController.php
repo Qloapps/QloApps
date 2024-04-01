@@ -6267,8 +6267,8 @@ class AdminOrdersControllerCore extends AdminController
                     $objOrderDetail->product_quantity += $quantityDiff;
                     $objOrderDetail->total_price_tax_excl += $priceDiffTaxExcl;
                     $objOrderDetail->total_price_tax_incl += $priceDiffTaxIncl;
-                    $objOrderDetail->unit_price_tax_excl = ($objOrderDetail->total_price_tax_excl / $objOrderDetail->product_quantity);
-                    $objOrderDetail->unit_price_tax_incl = ($objOrderDetail->total_price_tax_incl / $objOrderDetail->product_quantity);
+                    $objOrderDetail->unit_price_tax_excl = Tools::ps_round(($objOrderDetail->total_price_tax_excl / $objOrderDetail->product_quantity), 6);
+                    $objOrderDetail->unit_price_tax_incl = Tools::ps_round(($objOrderDetail->total_price_tax_incl / $objOrderDetail->product_quantity), 6);
                     $res &= $objOrderDetail->updateTaxAmount($order);
 
                     $res &= $objOrderDetail->update();

@@ -29,7 +29,7 @@
                             <th><span class="title_box">{l s='Room Type'}</span></th>
                             <th><span class="title_box">{l s='Hotel Name'}</span></th>
                             <th><span class="title_box">{l s='Duration'}</span></th>
-                            <th class="text-center fixed-width-lg"><span class="title_box">{l s='Occupancy'}</span></th>
+                            <th class="fixed-width-lg"><span class="title_box">{l s='Occupancy'}</span></th>
                             <th><span class="title_box">{l s='Room Price (Tax excl.)'}</span></th>
                             <th><span class="title_box">{l s='Extra Services/Fee (Tax excl.)'}</span></th>
                             <th><span class="title_box">{l s='Total Tax'}</span></th>

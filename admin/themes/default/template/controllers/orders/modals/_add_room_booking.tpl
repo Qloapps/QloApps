@@ -29,7 +29,7 @@
                 </div>
             </div>
         </div>
-        <div class="add_room_fields" style="display:none;">
+        <div class="add_room_fields bookingDuration" style="display:none;">
             <div class="row form-group">
                 <div class="col-sm-6 room_check_in_div">
                     <label class="control-label">{l s='Check-In'}</label>

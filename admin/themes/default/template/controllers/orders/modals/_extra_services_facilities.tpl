@@ -52,7 +52,7 @@
 										</div>
 									</td>
 									<td>{displayPrice price=$demand['total_price_tax_excl'] currency=$orderCurrency}</td>
-									<td><a class="btn btn-danger pull-right del-order-room-demand" href="#" id_booking_demand="{$demand['id_booking_demand']}"><i class="icon-trash"></i></a></td>
+									<td class="text-right"><a class="btn btn-danger pull-right del-order-room-demand" href="#" id_booking_demand="{$demand['id_booking_demand']}"><i class="icon-trash"></i></a></td>
 								</tr>
 							{/foreach}
 						{/foreach}
@@ -77,7 +77,7 @@
 								<th></th>
 								<th>{l s='Name'}</th>
 								<th>{l s='Option'}</th>
-								<th class="text-right">{l s='Unit Price'}</th>
+								<th>{l s='Unit Price'}</th>
 							</tr>
 						</thead>
 						<tbody>
@@ -105,8 +105,7 @@
 											<input type="hidden" class="id_option" value="0" />
 										{/if}
 									</td>
-									<td class="text-right">
-
+									<td>
 										<div class="input-group">
 											<span class="input-group-addon">{$currencySign}</span>
 											{if isset($selected_adv_option) && isset($demand['adv_option'][$selected_adv_option]['price_tax_excl'])}
@@ -139,7 +138,7 @@
                     <tr>
                         <th>{l s='Name'}</th>
                         <th>{l s='Unit Price'}</th>
-                        <th class="text-right">{l s='Total Price'}</th>
+                        <th>{l s='Total Price'}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -154,7 +153,7 @@
                                             {l s='/ night'}
                                         {/if}
                                     </td>
-                                    <td class="text-right">{displayPrice price=$demand['total_price_tax_excl'] currency=$orderCurrency}</td>
+                                    <td>{displayPrice price=$demand['total_price_tax_excl'] currency=$orderCurrency}</td>
                                 </tr>
                             {/foreach}
                         {/foreach}

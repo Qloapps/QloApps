@@ -1660,11 +1660,9 @@ $(document).ready(function() {
     // open date picker for the date input of check-in checkout dates
     $(document).on('focus', '.room_status_date', function() {
         var dateFrom = $(this).closest('.room_status_info_form').find('[name="date_from"]').val();
-        dateFrom = dateFrom.split("-");
         minDate = new Date(dateFrom+'T00:00:00');
 
         var dateTo = $(this).closest('.room_status_info_form').find('[name="date_to"]').val();
-        dateTo = dateTo.split("-");
         maxDate = new Date(dateTo+'T23:59:59');
 
         $(this).datetimepicker({
@@ -2449,6 +2447,7 @@ const AddRoomBookingModal = {
                                 $('#new_product').find("input.add_room_date_to").val(date_out);
                                 //End
 
+                                // initialize datepickers
                                 AddRoomBookingModal.initDatePickers();
 
                                 addRoomRefreshTotal();
@@ -2484,12 +2483,14 @@ const AddRoomBookingModal = {
             }
         });
 
-        $('.add_room_date_to').datepicker({
+        $(".add_room_date_to").datepicker(
+        {
             showOtherMonths: true,
             dateFormat: 'dd-mm-yy',
             beforeShow : function () {
                 var date_from = $.datepicker.parseDate('dd-mm-yy', $(this).closest('.bookingDuration').find('.add_room_date_from').val());
                 date_from.setDate(date_from.getDate() + 1);
+
                 $(this).datepicker("option", "minDate", date_from);
             }
         });
@@ -2541,43 +2542,46 @@ const EditRoomBookingModal = {
                     $('#edit_product .edit_product_date_to_actual').attr('value', jsonProductLineData.date_to);
                     $('#edit_product .room_unit_price').val(parseFloat(jsonProductLineData.paid_unit_price_tax_excl));
 
-                    //@todo: Putting below datepicker js outside this not working
-                    $('#edit_product .edit_product_date_from').datepicker({
-                        showOtherMonths: true,
-                        dateFormat: 'dd-mm-yy',
-                        altField: '#edit_product .edit_product_date_from_actual',
-                        onSelect: function(selectedDate) {
-                            let objDateToMin = $.datepicker.parseDate('dd-mm-yy', selectedDate);
-                            objDateToMin.setDate(objDateToMin.getDate() + 1);
-
-                            $('#edit_product .edit_product_date_to').datepicker('option', 'minDate', objDateToMin);
-                        },
-                        beforeShow : function () {
-                            if(allowBackdateOrder) {
-                                var minDate = null;
-                            } else {
-                                var minDate = new Date(Math.min($.datepicker.parseDate('dd-mm-yy', $(this).data('min_date')), new Date()));
-                            }
-                            $(this).datepicker("option", "minDate", minDate);
-                        }
-                    });
-
-                    $('#edit_product .edit_product_date_to').datepicker({
-                        showOtherMonths: true,
-                        dateFormat: 'dd-mm-yy',
-                        altField: '#edit_product .edit_product_date_to_actual',
-                        beforeShow : function () {
-                            var date_from = $.datepicker.parseDate('dd-mm-yy', $(this).closest('.form-group').find('.edit_product_date_from').val());
-                            date_from.setDate(date_from.getDate() + 1);
-                            $(this).datepicker("option", "minDate", date_from);
-                        }
-                    });
+                    // initialize datepickers
+                    EditRoomBookingModal.initDatePickers();
 
                     $('#edit_product .extra-services-container #id_htl_booking').val(jsonProductLineData.id);
                     $('#edit-room-booking-modal').modal('show');
                 } else {
                     showErrorMessage(txtSomeErr);
                 }
+            }
+        });
+    },
+    initDatePickers: function() {
+        $('#edit_product .edit_product_date_from').datepicker({
+            showOtherMonths: true,
+            dateFormat: 'dd-mm-yy',
+            altField: '#edit_product .edit_product_date_from_actual',
+            onSelect: function(selectedDate) {
+                let objDateToMin = $.datepicker.parseDate('dd-mm-yy', selectedDate);
+                objDateToMin.setDate(objDateToMin.getDate() + 1);
+
+                $('#edit_product .edit_product_date_to').datepicker('option', 'minDate', objDateToMin);
+            },
+            beforeShow : function () {
+                if(allowBackdateOrder) {
+                    var minDate = null;
+                } else {
+                    var minDate = new Date(Math.min($.datepicker.parseDate('dd-mm-yy', $(this).data('min_date')), new Date()));
+                }
+                $(this).datepicker("option", "minDate", minDate);
+            }
+        });
+
+        $('#edit_product .edit_product_date_to').datepicker({
+            showOtherMonths: true,
+            dateFormat: 'dd-mm-yy',
+            altField: '#edit_product .edit_product_date_to_actual',
+            beforeShow : function () {
+                var date_from = $.datepicker.parseDate('dd-mm-yy', $(this).closest('.form-group').find('.edit_product_date_from').val());
+                date_from.setDate(date_from.getDate() + 1);
+                $(this).datepicker("option", "minDate", date_from);
             }
         });
     }

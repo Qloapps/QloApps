@@ -117,7 +117,7 @@
                                                         {$data['room_type_name']}
                                                     </td>
                                                     <td>
-                                                        <a class="order_detail_link" href="{$link->getAdminLink('AdminAddHotel')}&amp;id={$data['id_hotel']}&amp;updatehtl_branch_info" target="_blank">
+                                                        <a  href="{$link->getAdminLink('AdminAddHotel')}&amp;id={$data['id_hotel']}&amp;updatehtl_branch_info" target="_blank">
                                                             <span>{$data['hotel_name']}</span>
                                                         </a>
                                                     </td>
@@ -125,7 +125,7 @@
                                                         {dateFormat date=$data['date_from']} - {dateFormat date=$data['date_to']}
                                                     </td>
                                                     <td>
-                                                        <a href="#" class="text-bold order_detail_link" onclick="BookingDocumentsModal.init({$data.id|intval}, this); return false;">
+                                                        <a href="#" class="text-bold" onclick="BookingDocumentsModal.init({$data.id|intval}, this); return false;">
                                                             {if $data.num_checkin_documents > 0}{$data.num_checkin_documents}{else}{l s='Upload'}{/if} {l s='Documents'}
                                                         </a>
                                                     </td>
@@ -138,12 +138,12 @@
                                                             <span class="text-success room_status">{l s='Checked out on'} {dateFormat date=$data['check_out']}</span>
                                                         {/if}
                                                     </td>
-                                                    <td>
+                                                    <td class="text-center">
                                                         {if $data.is_refunded || $data.is_cancelled}
                                                             <span class="badge badge-danger">{if $data.is_cancelled}{l s='Cancelled'}{else}{l s='Refunded'}{/if}</span>
                                                         {else}
-                                                            <a class="open_room_status_form order_detail_link" href="#" data-id_hotel_booking_detail="{$data['id']}" data-id_order="{$data['id_order']}" data-id_status="{$data['id_status']}" data-id_room="{$data['id_room']}" data-date_from="{$data['date_from']|date_format:"%Y-%m-%d"}" data-date_to="{$data['date_to']|date_format:"%Y-%m-%d"}" data-check_in_time="{$data['check_in_time']}" data-check_out_time="{$data['check_out_time']}">
-                                                                {l s='Edit Status'}
+                                                            <a class="open_room_status_form" href="#" data-id_hotel_booking_detail="{$data['id']}" data-id_order="{$data['id_order']}" data-id_status="{$data['id_status']}" data-id_room="{$data['id_room']}" data-date_from="{$data['date_from']|date_format:"%Y-%m-%d"}" data-date_to="{$data['date_to']|date_format:"%Y-%m-%d"}" data-check_in_time="{$data['check_in_time']}" data-check_out_time="{$data['check_out_time']}">
+                                                                <i class="icon-pencil"></i>
                                                             </a>
                                                         {/if}
                                                     </td>
@@ -186,13 +186,13 @@
                     <ul class="nav nav-tabs" id="tabOrder">
                         {$HOOK_TAB_ORDER}
                         <li class="active">
-                            <a class="order_detail_link" href="#status">
+                            <a  href="#status">
                                 <i class="icon-time"></i>
                                 {l s='Status'} <span class="badge">{$history|@count}</span>
                             </a>
                         </li>
                         <li>
-                            <a class="order_detail_link" href="#documents">
+                            <a  href="#documents">
                                 <i class="icon-file-text"></i>
                                 {l s='Documents'} <span class="badge">{$order->getDocuments()|@count}</span>
                             </a>
@@ -217,7 +217,7 @@
                                                     <td style="border-width: 1px 0px 1px 0px; border-color: {$row['color']}; border-style: solid">{dateFormat date=$row['date_add'] full=true}</td>
                                                     <td style="border-width: 1px 1px 1px 0px; border-color: {$row['color']}; border-style: solid" class="text-right">
                                                         {if $row['send_email']|intval}
-                                                            <a class="order_detail_link" href="{$link->getAdminLink('AdminOrders')|escape:'html':'UTF-8'}&amp;vieworder&amp;id_order={$order->id|intval}&amp;sendStateEmail={$row['id_order_state']|intval}&amp;id_order_history={$row['id_order_history']|intval}" title="{l s='Resend this email to the customer'}">
+                                                            <a  href="{$link->getAdminLink('AdminOrders')|escape:'html':'UTF-8'}&amp;vieworder&amp;id_order={$order->id|intval}&amp;sendStateEmail={$row['id_order_state']|intval}&amp;id_order_history={$row['id_order_history']|intval}" title="{l s='Resend this email to the customer'}">
                                                                 <i class="icon-mail-reply"></i>
                                                                 {l s='Resend email'}
                                                             </a>
@@ -232,7 +232,7 @@
                                                     <td>{dateFormat date=$row['date_add'] full=true}</td>
                                                     <td class="text-right">
                                                         {if $row['send_email']|intval}
-                                                            <a class="order_detail_link" href="{$link->getAdminLink('AdminOrders')|escape:'html':'UTF-8'}&amp;vieworder&amp;id_order={$order->id|intval}&amp;sendStateEmail={$row['id_order_state']|intval}&amp;id_order_history={$row['id_order_history']|intval}" title="{l s='Resend this email to the customer'}">
+                                                            <a  href="{$link->getAdminLink('AdminOrders')|escape:'html':'UTF-8'}&amp;vieworder&amp;id_order={$order->id|intval}&amp;sendStateEmail={$row['id_order_state']|intval}&amp;id_order_history={$row['id_order_history']|intval}" title="{l s='Resend this email to the customer'}">
                                                                 <i class="icon-mail-reply"></i>
                                                                 {l s='Resend email'}
                                                             </a>
@@ -453,7 +453,7 @@
                                             <td>{displayPrice price=$payment['real_paid_amount'] currency=$payment['id_currency']}</td>
                                             <td>{if isset($payment['invoice_number'])}{$payment['invoice_number']}{else}--{/if}</td>
                                             <td class="actions">
-                                                <a class="order_detail_link open_payment_information" href="#" data-card_number="{if $payment['card_number']}{$payment['card_number']}{else}{l s='Not defined'}{/if}"  data-card_brand="{if $payment['card_brand']}{$payment['card_brand']}{else}{l s='Not defined'}{/if}"  data-card_expiration="{if $payment['card_expiration']}{$payment['card_expiration']}{else}{l s='Not defined'}{/if}"  data-card_holder="{if $payment['card_holder']}{$payment['card_holder']}{else}{l s='Not defined'}{/if}" data-payment_date="{if $payment['date_add']}{$payment['date_add']}{else}{l s='Not defined'}{/if}" data-payment_method="{if $payment['payment_method']}{$payment['payment_method']}{else}{l s='Not defined'}{/if}" data-payment_source="{if $payment_types[$payment['payment_type']]['name']}{$payment_types[$payment['payment_type']]['name']}{else}{l s='Not defined'}{/if}" data-transaction_id="{if $payment['transaction_id']}{$payment['transaction_id']}{else}{l s='Not defined'}{/if}" data-amount="{if $payment['amount'] > 0}{displayPrice currency={$payment['id_currency']} price={$payment['amount']}}{else}{l s='Not defined'}{/if}" data-invoice_number="{if isset($payment['invoice_number']) && $payment['invoice_number']}{$payment['invoice_number']}{else}{l s='Not defined'}{/if}">{l s='Details'}</a>
+                                                <a class="open_payment_information" href="#" data-card_number="{if $payment['card_number']}{$payment['card_number']}{else}{l s='Not defined'}{/if}"  data-card_brand="{if $payment['card_brand']}{$payment['card_brand']}{else}{l s='Not defined'}{/if}"  data-card_expiration="{if $payment['card_expiration']}{$payment['card_expiration']}{else}{l s='Not defined'}{/if}"  data-card_holder="{if $payment['card_holder']}{$payment['card_holder']}{else}{l s='Not defined'}{/if}" data-payment_date="{if $payment['date_add']}{$payment['date_add']}{else}{l s='Not defined'}{/if}" data-payment_method="{if $payment['payment_method']}{$payment['payment_method']}{else}{l s='Not defined'}{/if}" data-payment_source="{if $payment_types[$payment['payment_type']]['name']}{$payment_types[$payment['payment_type']]['name']}{else}{l s='Not defined'}{/if}" data-transaction_id="{if $payment['transaction_id']}{$payment['transaction_id']}{else}{l s='Not defined'}{/if}" data-amount="{if $payment['amount'] > 0}{displayPrice currency={$payment['id_currency']} price={$payment['amount']}}{else}{l s='Not defined'}{/if}" data-invoice_number="{if isset($payment['invoice_number']) && $payment['invoice_number']}{$payment['invoice_number']}{else}{l s='Not defined'}{/if}">{l s='Details'}</a>
                                             </td>
                                         </tr>
                                     {foreachelse}
@@ -511,26 +511,22 @@
                             {/if}
                         </div>
                         <div class="panel-content form-horizontal" id="customer-guest-details">
-                            <div class="form-group">
-                                <div class="col-sm-6">
-                                    <label class="control-label">{l s='Gender'}</label>
-                                    <div class="gender_name">{$customerGuestDetail->gender->name}</div>
-                                </div>
-                                <div class="col-sm-6">
-                                    <label class="control-label">{l s='Name'}</label>
-                                    <div class="guest_name">{$customerGuestDetail->firstname} {$customerGuestDetail->lastname}</div>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <div class="col-sm-6">
-                                    <label class="control-label">{l s='Email'}</label>
-                                    <div class="guest_email"><a class="order_detail_link" href="mailto:{$customerGuestDetail->email}"><i class="icon-envelope-o"></i> {$customerGuestDetail->email}</a></div>
-                                </div>
-                                <div class="col-sm-6">
-                                    <label class="control-label">{l s='Phone'}</label>
-                                    <div class="guest_phone"><a class="order_detail_link" href="tel:{$customerGuestDetail->phone}"><i class="icon-phone"></i> {$customerGuestDetail->phone}</a></div>
-                                </div>
-                            </div>
+                            <dl class="list-detail col-sm-6">
+                                <label class="label-title">{l s='Gender'}</label>
+                                <dd class="gender_name">{$customerGuestDetail->gender->name}</dd>
+                            </dl>
+                            <dl class="list-detail col-sm-6">
+                                <label class="label-title">{l s='Name'}</label>
+                                <dd class="guest_name">{$customerGuestDetail->firstname} {$customerGuestDetail->lastname}</dd>
+                            </dl>
+                            <dl class="list-detail col-sm-6">
+                                <label class="label-title">{l s='Email'}</label>
+                                <dd class="guest_email"><a  href="mailto:{$customerGuestDetail->email}"><i class="icon-envelope-o"></i> {$customerGuestDetail->email}</a></dd>
+                            </dl>
+                            <dl class="list-detail col-sm-6">
+                                <label class="label-title">{l s='Phone'}</label>
+                                <dd class="guest_phone"><a  href="tel:{$customerGuestDetail->phone}"><i class="icon-phone"></i> {$customerGuestDetail->phone}</a></dd>
+                            </dl>
                         </div>
                     </div>
                 {/if}
@@ -550,9 +546,9 @@
                                         <dl class="list-detail col-sm-12">
                                             <label class="label-title">{l s='Guest info'}</label>
 
-                                            <dd><i class="icon-envelope"></i>  &nbsp;<b><a class="order_detail_link" href="mailto:{$customer->email}">{$customer->email}</a></b></dd>
+                                            <dd><i class="icon-envelope"></i>  &nbsp;<b><a  href="mailto:{$customer->email}">{$customer->email}</a></b></dd>
                                             {if $addresses.invoice->phone_mobile || $addresses.invoice->phone}
-                                                <dd><i class="icon-phone"></i>  &nbsp;<b><a class="order_detail_link" href="tel:{if $addresses.invoice->phone_mobile}{$addresses.invoice->phone_mobile}{else}{$addresses.invoice->phone}{/if}">{if $addresses.invoice->phone_mobile}{$addresses.invoice->phone_mobile}{else}{$addresses.invoice->phone}{/if}</a></b></dd>
+                                                <dd><i class="icon-phone"></i>  &nbsp;<b><a  href="tel:{if $addresses.invoice->phone_mobile}{$addresses.invoice->phone_mobile}{else}{$addresses.invoice->phone}{/if}">{if $addresses.invoice->phone_mobile}{$addresses.invoice->phone_mobile}{else}{$addresses.invoice->phone}{/if}</a></b></dd>
                                             {/if}
                                         </dl>
 
@@ -570,10 +566,10 @@
                                     <dl class="list-detail col-sm-6">
                                         <label class="label-title">{l s='Customer'}</label>
 
-                                        <dd><i class="icon-user"></i> &nbsp;<b><a class="order_detail_link" href="?tab=AdminCustomers&amp;id_customer={$customer->id}&amp;viewcustomer&amp;token={getAdminToken tab='AdminCustomers'}">{$customer->firstname} {$customer->lastname}</a></b></dd>
-                                        <dd><i class="icon-envelope"></i>  &nbsp;<b><a class="order_detail_link" href="mailto:{$customer->email}">{$customer->email}</a></b></dd>
+                                        <dd><i class="icon-user"></i> &nbsp;<b><a  href="?tab=AdminCustomers&amp;id_customer={$customer->id}&amp;viewcustomer&amp;token={getAdminToken tab='AdminCustomers'}">{$customer->firstname} {$customer->lastname}</a></b></dd>
+                                        <dd><i class="icon-envelope"></i>  &nbsp;<b><a  href="mailto:{$customer->email}">{$customer->email}</a></b></dd>
                                         {if $addresses.invoice->phone_mobile || $addresses.invoice->phone}
-                                            <dd><i class="icon-phone"></i>  &nbsp;<b><a class="order_detail_link" href="tel:{if $addresses.invoice->phone_mobile}{$addresses.invoice->phone_mobile}{else}{$addresses.invoice->phone}{/if}">{if $addresses.invoice->phone_mobile}{$addresses.invoice->phone_mobile}{else}{$addresses.invoice->phone}{/if}</a></b></dd>
+                                            <dd><i class="icon-phone"></i>  &nbsp;<b><a  href="tel:{if $addresses.invoice->phone_mobile}{$addresses.invoice->phone_mobile}{else}{$addresses.invoice->phone}{/if}">{if $addresses.invoice->phone_mobile}{$addresses.invoice->phone_mobile}{else}{$addresses.invoice->phone}{/if}</a></b></dd>
                                         {/if}
                                     </dl>
                                     <dl class="list-detail col-sm-6">
@@ -809,7 +805,7 @@
                                         {foreach from=$returns item=return_info}
                                             <tr>
                                                 <td>
-                                                    <a class="order_detail_link" href="{$link->getAdminLink('AdminOrderRefundRequests')}&vieworder_return&id_order_return={$return_info.id_order_return}" target="_blank">#{$return_info.id_order_return}</a>
+                                                    <a  href="{$link->getAdminLink('AdminOrderRefundRequests')}&vieworder_return&id_order_return={$return_info.id_order_return}" target="_blank">#{$return_info.id_order_return}</a>
                                                 </td>
                                                 <td>
                                                     {$return_info.total_rooms|escape:'html':'UTF-8'}
@@ -847,7 +843,7 @@
                             <ul>
                                 {foreach from=$applicable_refund_policies item=$applicable_refund_policy}
                                     <li class="form-group">
-                                        <a class="order_detail_link" href="{$link->getAdminLink('AdminOrderRefundRules')|escape:'html':'UTF-8'}&id_refund_rule={$applicable_refund_policy.id_refund_rule}&updatehtl_order_refund_rules" target="_blank">
+                                        <a  href="{$link->getAdminLink('AdminOrderRefundRules')|escape:'html':'UTF-8'}&id_refund_rule={$applicable_refund_policy.id_refund_rule}&updatehtl_order_refund_rules" target="_blank">
                                             {$applicable_refund_policy.name|escape:'html':'UTF-8'} &nbsp;<i class="icon icon-external-link-square"></i>
                                         </a>
                                     </li>
@@ -1072,7 +1068,7 @@
                                                 </td>
                                                 {if $can_edit}
                                                     <td>
-                                                        <a class="order_detail_link" href="{$current_index}&amp;submitDeleteVoucher&amp;id_order_cart_rule={$discount['id_order_cart_rule']}&amp;id_order={$order->id}&amp;token={$smarty.get.token|escape:'html':'UTF-8'}">{l s='Delete'}</a>
+                                                        <a  href="{$current_index}&amp;submitDeleteVoucher&amp;id_order_cart_rule={$discount['id_order_cart_rule']}&amp;id_order={$order->id}&amp;token={$smarty.get.token|escape:'html':'UTF-8'}">{l s='Delete'}</a>
                                                     </td>
                                                 {/if}
                                             </tr>
@@ -1119,7 +1115,7 @@
                                         {foreach $order->getBrother() as $brother_order}
                                         <tr>
                                             <td>
-                                                <a class="order_detail_link" href="{$current_index}&amp;vieworder&amp;id_order={$brother_order->id}&amp;token={$smarty.get.token|escape:'html':'UTF-8'}">#{$brother_order->id}</a>
+                                                <a  href="{$current_index}&amp;vieworder&amp;id_order={$brother_order->id}&amp;token={$smarty.get.token|escape:'html':'UTF-8'}">#{$brother_order->id}</a>
                                             </td>
                                             <td>
                                                 {$brother_order->getCurrentOrderState()->name[$current_id_lang]}
@@ -1128,7 +1124,7 @@
                                                 {displayPrice price=$brother_order->total_paid_tax_incl currency=$currency->id}
                                             </td>
                                             <td>
-                                                <a class="order_detail_link" href="{$current_index}&amp;vieworder&amp;id_order={$brother_order->id}&amp;token={$smarty.get.token|escape:'html':'UTF-8'}">
+                                                <a  href="{$current_index}&amp;vieworder&amp;id_order={$brother_order->id}&amp;token={$smarty.get.token|escape:'html':'UTF-8'}">
                                                     <i class="icon-eye-open"></i>
                                                     {l s='See the order'}
                                                 </a>
@@ -1169,7 +1165,7 @@
                                         </select>
                                     </p>
                                     <div>
-                                        <a class="order_detail_link" href="{$link->getAdminLink('AdminOrderMessage')|escape:'html':'UTF-8'}">
+                                        <a  href="{$link->getAdminLink('AdminOrderMessage')|escape:'html':'UTF-8'}">
                                             {l s='Configure predefined messages'}
                                             <i class="icon-external-link"></i>
                                         </a>
@@ -1212,7 +1208,7 @@
                         <ul {if sizeof($sources) > 3}style="height: 200px; overflow-y: scroll;"{/if}>
                         {foreach from=$sources item=source}
                             <li class="form-group">
-                                {l s='From'} {if $source['http_referer'] != ''}<a class="order_detail_link" href="{$source['http_referer']}">{parse_url($source['http_referer'], $smarty.const.PHP_URL_HOST)|regex_replace:'/^www./':''}</a>{else}-{/if} {l s='To'} <a class="order_detail_link" href="http://{$source['request_uri']}">{$source['request_uri']|truncate:100:'...'}</a> <br />
+                                {l s='From'} {if $source['http_referer'] != ''}<a  href="{$source['http_referer']}">{parse_url($source['http_referer'], $smarty.const.PHP_URL_HOST)|regex_replace:'/^www./':''}</a>{else}-{/if} {l s='To'} <a  href="http://{$source['request_uri']}">{$source['request_uri']|truncate:100:'...'}</a> <br />
                                 {if $source['keywords']}<b>{l s='Keywords'}</b>: {$source['keywords']}<br />{/if}
                                 {dateFormat date=$source['date_add'] full=true}<br />
                             </li>
