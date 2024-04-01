@@ -89,6 +89,7 @@ class StatsLive extends Module
 					ORDER BY u.firstname, u.lastname';
         }
         $results = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql);
+		$this->updatePageTypeAlias($results);
 
         return array($results, Db::getInstance()->NumRows());
     }
@@ -130,9 +131,19 @@ class StatsLive extends Module
         }
 
         $results = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql);
+		$this->updatePageTypeAlias($results);
 
         return array($results, Db::getInstance()->NumRows());
     }
+
+	public function updatePageTypeAlias(&$result)
+	{
+		if (count($result)) {
+			foreach ($result as &$customer) {
+				$customer['page'] = Page::getPageTypeAlias($customer['page']);
+			}
+		}
+	}
 
     public function hookAdminStatsModules($params)
     {
