@@ -767,7 +767,6 @@ $(document).ready(function()
 		$(item).chosen({
 			disable_search_threshold: 5,
 			search_contains: true,
-			inherit_select_classes: true,
 		});
 	});
 	// Apply chosen() when modal is loaded
