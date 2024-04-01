@@ -143,12 +143,13 @@
 							{/foreach}
 						</tbody>
 					</table>
+
+                    <button type="submit" id="save_service_service" class="btn btn-success pull-right"><i class="icon-save"></i> {l s='Update services'}</button>
 				{else}
 					<i class="icon-warning"></i> {l s='No services available to add to this room.'}
 				{/if}
 			</div>
 			<input type="hidden" name="id_booking_detail" value="{$id_booking_detail}">
-			<button type="submit" id="save_service_service" class="btn btn-success pull-right"><i class="icon-save"></i> {l s='Update services'}</button>
 		</form>
 
 	{elseif isset($additionalServices) && $additionalServices}
