@@ -63,7 +63,7 @@
                     {if $order->with_occupancy}
                         <div class="booking_occupancy_edit">
                             <div class="dropdown">
-                                <button class="booking_guest_occupancy btn btn-default btn-left btn-block input-occupancy" type="button">
+                                <button class="form-control booking_guest_occupancy btn btn-default btn-left btn-block input-occupancy" type="button">
                                     <span>
                                         {if $data['adults']}{$data['adults']}{/if} {if $data['adults'] > 1}{l s='Adults'}{else}{l s='Adult'}{/if}{if {$data['children']}}, {$data['children']} {if $data['children'] > 1}{l s='Children'}{else}{l s='Child'}{/if}{/if}
                                     </span>
@@ -112,7 +112,6 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            <hr class="occupancy-info-separator">
                                         </div>
                                     </div>
                                 </div>
