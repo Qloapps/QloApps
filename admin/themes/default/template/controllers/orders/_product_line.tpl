@@ -31,12 +31,9 @@
         {/if}
     </td>
 	<td><img src="{$data.image_link}" title="{l s='Room image'}"></td>
-	<td><p>{$data.room_type}</p></td>
 	<td>
-		<a  href="{$link->getAdminLink('AdminAddHotel')}&amp;id={$data['id_hotel']}&amp;updatehtl_branch_info" target="_blank">
-			<span>{$data['hotel_name']}</span>
-		</a>
-	</td>
+        <p><a href="{$link->getAdminLink('AdminProducts')|escape:'html':'UTF-8'}&amp;id_product={$data.id_product}&amp;updateproduct" target="_blank"><span>{$data.room_type}</span></a></p>
+    </td>
 	<td>
 		<span class="booking_duration_show">{dateFormat date=$data.date_from} - {dateFormat date=$data.date_to}</span>
 
@@ -209,6 +206,8 @@
 		<td>
 			{if isset($data.refund_info) && $data.refund_info}
 				{convertPriceWithCurrency price=$data.refund_info.refunded_amount currency=$currency->id}
+            {else}
+				--
 			{/if}
 		</td>
 	{/if}
@@ -227,7 +226,7 @@
 		{/if}
 		</td>
 		<td class="product_action">
-            <div class="btn-group pull-right">
+            <div class="btn-group">
 				<button href="#" class="btn btn-default edit_room_change_link" data-product_line_data="{$data|json_encode|escape}">
 					<i class="icon-pencil"></i>
 					{l s='Edit'}

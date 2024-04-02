@@ -487,6 +487,17 @@ class AdminOrdersControllerCore extends AdminController
         if ($this->display == 'view') {
             /** @var Order $order */
             $order = $this->loadObject();
+
+            // hotel link in header
+            if ($idHotel = HotelBookingDetail::getIdHotelByIdOrder($order->id)) {
+                $this->toolbar_btn['hotel'] = array(
+                    'href' => $this->context->link->getAdminLink('AdminAddHotel').'&id='.$idHotel.'&updatehtl_branch_info',
+                    'desc' => $this->l('View Hotel'),
+                    'class' => 'icon-building',
+                    'target' => true,
+                );
+            }
+
             if (Configuration::get('PS_INVOICE') && $order->hasInvoice() && !$this->lite_display) {
                 $this->toolbar_btn['file'] = array(
                     'short' => $this->l('Invoice'),

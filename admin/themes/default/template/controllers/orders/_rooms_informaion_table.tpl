@@ -27,7 +27,6 @@
                             <th><span class="title_box">{l s='Room No.'}</span></th>
                             <th><span class="title_box">{l s='Image'}</th>
                             <th><span class="title_box">{l s='Room Type'}</span></th>
-                            <th><span class="title_box">{l s='Hotel Name'}</span></th>
                             <th><span class="title_box">{l s='Duration'}</span></th>
                             <th class="fixed-width-lg"><span class="title_box">{l s='Occupancy'}</span></th>
                             <th><span class="title_box">{l s='Room Price (Tax excl.)'}</span></th>
@@ -35,11 +34,11 @@
                             <th><span class="title_box">{l s='Total Tax'}</span></th>
                             <th><span class="title_box">{l s='Total Price (Tax incl.)'}</span></th>
                             {if (isset($refundReqBookings) && $refundReqBookings) || (isset($isCancelledRoom) && $isCancelledRoom)}
-                                <th><span class="title_box">{l s='Refund/Cancellation Status'}</span></th>
+                                <th><span class="title_box">{l s='Refund/Cancel Status'}</span></th>
                                 <th><span class="title_box">{l s='Refunded amount'}</span></th>
                             {/if}
                             {if ($can_edit && !$order->hasBeenDelivered())}
-                            <th class="fixed-width-xs"><span class="title_box">{l s='Actions'}</th>
+                            <th class="fixed-width-md"><span class="title_box">{l s='Actions'}</th>
                             {/if}
                         </tr>
                     </thead>

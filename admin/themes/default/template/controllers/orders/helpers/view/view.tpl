@@ -99,7 +99,6 @@
                                         <tr>
                                             <th>{l s='Room No.'}</th>
                                             <th>{l s='Room Type'}</th>
-                                            <th>{l s='Hotel Name'}</th>
                                             <th>{l s='Duration'}</th>
                                             <th>{l s='Documents'}</th>
                                             <th>{l s='Room Status'}</th>
@@ -114,12 +113,7 @@
                                                         {$data['room_num']}
                                                     </td>
                                                     <td>
-                                                        {$data['room_type_name']}
-                                                    </td>
-                                                    <td>
-                                                        <a  href="{$link->getAdminLink('AdminAddHotel')}&amp;id={$data['id_hotel']}&amp;updatehtl_branch_info" target="_blank">
-                                                            <span>{$data['hotel_name']}</span>
-                                                        </a>
+                                                        <a href="{$link->getAdminLink('AdminProducts')|escape:'html':'UTF-8'}&amp;id_product={$data['id_product']}&amp;updateproduct" target="_blank">{$data['room_type_name']|escape:'html':'UTF-8'}</a>
                                                     </td>
                                                     <td>
                                                         {dateFormat date=$data['date_from']} - {dateFormat date=$data['date_to']}
