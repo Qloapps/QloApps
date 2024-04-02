@@ -17,7 +17,7 @@
 *  @license   https://store.webkul.com/license.html
 *}
 
-<div id="room_type_service_product_desc" class="tab-pane {if isset($show_active) && $show_active}active{/if}">
+<div id="room_type_service_product_desc" class="tab-pane {if isset($show_active) && $show_active}active{/if} extra-services-container">
 	{if isset($orderEdit) && $orderEdit}
 
 		<p class="col-sm-12 facility_nav_btn">
@@ -144,7 +144,9 @@
 						</tbody>
 					</table>
 
-                    <button type="submit" id="save_service_service" class="btn btn-success pull-right"><i class="icon-save"></i> {l s='Update services'}</button>
+                    <div class="modal-footer">
+                        <button type="submit" id="save_service_service" class="btn btn-primary"><i class="icon icon-save"></i> &nbsp;{l s="Update Services"}</button>
+                    </div>
 				{else}
 					<i class="icon-warning"></i> {l s='No services available to add to this room.'}
 				{/if}

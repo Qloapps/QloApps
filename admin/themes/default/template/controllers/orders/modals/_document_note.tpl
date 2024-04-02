@@ -26,4 +26,10 @@
         </div>
         <button class="btn btn-default" type="submit" name="submitEditNote" style="display:none" id="submitEditNote"></button>
     </form>
+
+    {if isset($loaderImg) && $loaderImg}
+        <div class="loading_overlay">
+            <img src='{$loaderImg}' class="loading-img"/>
+        </div>
+    {/if}
 </div>

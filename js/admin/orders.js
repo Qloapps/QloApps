@@ -1087,6 +1087,7 @@ function initRoomEvents()
 				if ($('select#add_product_product_invoice').val() == 0)
 					query += '&'+$('tr#new_invoice select, tr#new_invoice input').serialize();
 
+                $(".loading_overlay").show();
 				var ajax_query = $.ajax({
 					type: 'POST',
 					url: admin_order_tab_link,
@@ -1124,6 +1125,7 @@ function initRoomEvents()
 					complete: function() {
                         $('.submitAddRoom').removeAttr('disabled');
 						$('#submitAddProduct').removeAttr('disabled');
+                        $(".loading_overlay").hide();
 					}
 				});
 				ajaxQueries.push(ajax_query);
@@ -1313,6 +1315,7 @@ $(document).ready(function() {
         form_data.append('ajax', true);
         form_data.append('action', 'addRoomAdditionalServices');
 
+        $(".loading_overlay").show();
         $.ajax({
             type: 'POST',
             headers: {
@@ -1334,6 +1337,9 @@ $(document).ready(function() {
                     showErrorMessage(jsonData.errors);
 
                 }
+            },
+            complete: function() {
+                $(".loading_overlay").hide();
             }
         });
     });
@@ -1355,6 +1361,7 @@ $(document).ready(function() {
             });
 
             if (roomDemands.length) {
+                $(".loading_overlay").show();
                 $.ajax({
                     type: 'POST',
                     headers: {
@@ -1380,6 +1387,9 @@ $(document).ready(function() {
                         } else {
                             showErrorMessage(txtSomeErr);
                         }
+                    },
+                    complete: function() {
+                        $(".loading_overlay").hide();
                     }
                 });
             } else {
@@ -1400,6 +1410,7 @@ $(document).ready(function() {
             var idBookingDemand = $(this).attr('id_booking_demand');
             $currentItem = $(this);
             if (idBookingDemand) {
+                $(".loading_overlay").show();
                 $.ajax({
                     type: 'POST',
                     headers: {
@@ -1422,6 +1433,9 @@ $(document).ready(function() {
                         } else {
                             showErrorMessage(txtSomeErr);
                         }
+                    },
+                    complete: function() {
+                        $(".loading_overlay").hide();
                     }
                 });
             } else {
@@ -1436,6 +1450,7 @@ $(document).ready(function() {
             var idServiceProductOrderDetail = $(this).data('id_room_type_service_product_order_detail');
             $currentItem = $(this);
             if (idServiceProductOrderDetail) {
+                $(".loading_overlay").show();
                 $.ajax({
                     type: 'POST',
                     headers: {
@@ -1459,6 +1474,9 @@ $(document).ready(function() {
                             showErrorMessage(jsonData.errors);
 
                         }
+                    },
+                    complete: function() {
+                        $(".loading_overlay").hide();
                     }
                 });
             } else {
@@ -1508,6 +1526,8 @@ $(document).ready(function() {
         var idHtlBooking = $(this).attr('id_htl_booking');
         var orderEdit = 0;
 
+        $(".loading_overlay").show();
+
         $.ajax({
             type: 'POST',
             headers: {
@@ -1534,6 +1554,9 @@ $(document).ready(function() {
                     $('#room-extra-demands').modal('show');
                 }
             },
+            complete: function() {
+                $(".loading_overlay").hide();
+            }
         });
     });
 
@@ -1697,12 +1720,16 @@ $(document).ready(function() {
     });
 
     /*For reallocating rooms in the modal*/
-    $(document).on('click', '#realloc_allocated_rooms', function(){
-        RoomReallocationModal.reallocate();
+    $(document).on('click', '#realloc_allocated_rooms', function(e){
+        if (RoomReallocationModal.reallocate() == false) {
+            return false;
+        }
     });
     /*For swaping rooms in the modal*/
     $(document).on('click', '#swap_allocated_rooms', function(){
-        RoomReallocationModal.swap();
+        if (RoomReallocationModal.swap() == false) {
+            return false;
+        }
     });
 
     // change room type for reallocation
@@ -1744,13 +1771,13 @@ $(document).ready(function() {
     });
 
     // submit room edit
-    $(document).on('click', '.submitRoomChange', function(e) {
+    $(document).on('click', '#submitRoomChange', function(e) {
         e.preventDefault();
 
         if (confirm(txt_confirm)) {
             let query = 'ajax=1&token='+token+'&action=editRoomOnOrder&'+
             $('#edit_product').find('input, select').serialize();
-
+            $(".loading_overlay").show();
             $.ajax({
                 type: 'POST',
                 url: admin_order_tab_link,
@@ -1764,6 +1791,9 @@ $(document).ready(function() {
                     } else {
                         jAlert(data.error);
                     }
+                },
+                complete : function(data) {
+                    $(".loading_overlay").hide();
                 }
             });
         }
@@ -1798,8 +1828,10 @@ $(document).ready(function() {
     // ======================================
 });
 
+// Modal object to handle booking documents processes
 const BookingDocumentsModal = {
     init: function(idHtlBooking, $this) {
+        $(".loading_overlay").show();
         $.ajax({
             type: 'POST',
             headers: {
@@ -1821,6 +1853,9 @@ const BookingDocumentsModal = {
                 } else {
                     showErrorMessage(txtSomeErr);
                 }
+            },
+            complete: function() {
+                $(".loading_overlay").hide();
             }
         });
 
@@ -1836,6 +1871,7 @@ const BookingDocumentsModal = {
             id_htl_booking: parseInt(idHtlBooking),
         };
 
+        $(".loading_overlay").show();
         $.ajax({
             url: admin_order_tab_link,
             data: data,
@@ -1846,6 +1882,9 @@ const BookingDocumentsModal = {
                     BookingDocumentsModal.setBodyHtml(response.html);
                 }
             },
+            complete: function() {
+                $(".loading_overlay").hide();
+            }
         });
 
         $('#booking-documents-modal').modal('show');
@@ -1868,6 +1907,7 @@ const BookingDocumentsModal = {
             let formData = new FormData($('form#form-add-new-document').get(0));
             formData.append('ajax', true);
             formData.append('action', 'uploadBookingDocument');
+            $(".loading_overlay").show();
             $.ajax({
                 url: admin_order_tab_link,
                 data: formData,
@@ -1887,6 +1927,9 @@ const BookingDocumentsModal = {
                         BookingDocumentsModal.showErrors(jsonResponse.errors);
                     }
                 },
+                complete: function() {
+                    $(".loading_overlay").hide();
+                }
             });
         });
     },
@@ -1899,6 +1942,7 @@ const BookingDocumentsModal = {
             id_htl_booking_document: idHtlBookingDocument,
         };
 
+        $(".loading_overlay").show();
         $.ajax({
             url: admin_order_tab_link,
             data: data,
@@ -1911,6 +1955,9 @@ const BookingDocumentsModal = {
                     showSuccessMessage(txt_booking_document_delete_success);
                 }
             },
+            complete: function() {
+                $(".loading_overlay").hide();
+            }
         });
     },
     showErrors: function(errors) {
@@ -1936,6 +1983,7 @@ const BookingDocumentsModal = {
     },
 }
 
+// Modal object to handle booking documents form
 const BookingDocumentsForm = {
     init: function() {
         BookingDocumentsForm.inputHtml = '<input type="file" accept="image/*, .pdf" class="input-booking-document hidden" name="booking_document">';
@@ -1965,8 +2013,10 @@ const BookingDocumentsForm = {
     },
 }
 
+// Modal object to handle Voucher/Discount processes
 const VoucherModal = {
     show: function() {
+        $(".loading_overlay").show();
         $.ajax({
             type: 'POST',
             headers: {
@@ -1983,6 +2033,9 @@ const VoucherModal = {
                 } else {
                     showErrorMessage(txtSomeErr);
                 }
+            },
+            complete: function() {
+                $(".loading_overlay").hide();
             }
         });
     },
@@ -1994,8 +2047,10 @@ const VoucherModal = {
     }
 };
 
+// Modal object to handle Add order payment processes
 const OrderPaymentModal = {
     show: function() {
+        $(".loading_overlay").show();
         $.ajax({
             type: 'POST',
             headers: {
@@ -2012,6 +2067,9 @@ const OrderPaymentModal = {
                 } else {
                     showErrorMessage(txtSomeErr);
                 }
+            },
+            complete: function() {
+                $(".loading_overlay").hide();
             }
         });
     },
@@ -2023,8 +2081,10 @@ const OrderPaymentModal = {
     }
 };
 
+// Modal object to handle show order payment processes
 const OrderPaymentDetailModal = {
     show: function(paymentObj) {
+        $(".loading_overlay").show();
         $.ajax({
             type: 'POST',
             headers: {
@@ -2053,6 +2113,9 @@ const OrderPaymentDetailModal = {
                 } else {
                     showErrorMessage(txtSomeErr);
                 }
+            },
+            complete: function() {
+                $(".loading_overlay").hide();
             }
         });
     },
@@ -2061,8 +2124,10 @@ const OrderPaymentDetailModal = {
     },
 };
 
+// Modal object to handle document note processes in order status section
 const DocumentNoteModal = {
     show: function(documentObj) {
+        $(".loading_overlay").show();
         $.ajax({
             type: 'POST',
             headers: {
@@ -2081,6 +2146,9 @@ const DocumentNoteModal = {
                 } else {
                     showErrorMessage(txtSomeErr);
                 }
+            },
+            complete: function() {
+                $(".loading_overlay").hide();
             }
         });
     },
@@ -2092,8 +2160,10 @@ const DocumentNoteModal = {
     }
 };
 
+// Modal object to handle traveller info processes
 const TravellerModal = {
     show: function() {
+        $(".loading_overlay").show();
         $.ajax({
             type: 'POST',
             headers: {
@@ -2110,6 +2180,9 @@ const TravellerModal = {
                 } else {
                     showErrorMessage(txtSomeErr);
                 }
+            },
+            complete: function() {
+                $(".loading_overlay").hide();
             }
         });
     },
@@ -2117,6 +2190,7 @@ const TravellerModal = {
         $('#traveller-modal').modal('hide');
     },
     submit: function() {
+        $(".loading_overlay").show();
         $.ajax({
             type: 'POST',
             headers: {
@@ -2144,18 +2218,21 @@ const TravellerModal = {
                     if (result.data.guest_phone) {
                         $('#customer-guest-details .guest_phone a').attr('href', 'tel'+result.data.guest_phone).html('<i class="icon-phone"></i> ' + result.data.guest_phone);
                     }
-
-                    TravellerModal.hide();
                 } else if (result.errors) {
                     showErrorMessage(result.errors);
                 }
+            },
+            complete: function() {
+                $(".loading_overlay").hide();
             }
         });
     }
 };
 
+// Modal object to handle room status processes
 const RoomStatusModal = {
     show: function(roomObj) {
+        $(".loading_overlay").show();
         $.ajax({
             type: 'POST',
             headers: {
@@ -2188,6 +2265,9 @@ const RoomStatusModal = {
                 } else if (result.errors) {
                     showErrorMessage();
                 }
+            },
+            complete: function() {
+                $(".loading_overlay").hide();
             }
         });
     },
@@ -2199,6 +2279,7 @@ const RoomStatusModal = {
     }
 };
 
+// Modal object to handle room reallocation processes
 const RoomReallocationModal = {
     show: function(roomObj) {
         $(".loading_overlay").show();
@@ -2236,7 +2317,8 @@ const RoomReallocationModal = {
                         html += '</select>';
                         $(".swap_avail_rooms_container").empty().append(html);
                     } else {
-                        $(".swap_avail_rooms_container").empty().text(no_swap_rm_avail_txt).addClass('text-danger');;
+                        $(".swap_avail_rooms_container").empty().text(no_swap_rm_avail_txt).addClass('text-danger');
+                        $("#swap_room_tab .modal-footer").hide();
                     }
 
                     // For Rooms Reallocation
@@ -2259,13 +2341,15 @@ const RoomReallocationModal = {
                     } else {
                         $(".realloc_avail_rooms_container").empty().text(no_realloc_rm_avail_txt).addClass('text-danger');
                         $(".realloc_avail_room_type_container").empty().text(no_realloc_rm_type_avail_txt).addClass('text-danger');
+                        $("#reallocate_room_tab .modal-footer").hide();
                     }
 
                     $('#room-reallocation-modal').modal('show');
                 } else {
                     showErrorMessage(txtSomeErr);
                 }
-
+            },
+            complete: function() {
                 $(".loading_overlay").hide();
             }
         });
@@ -2277,8 +2361,10 @@ const RoomReallocationModal = {
             $("#swap_sel_rm_err_p").text(slct_rm_err);
             return false;
         }
+
+        return true;
     },
-    reallocate: function() {
+    reallocate: function(reallocateBtnObj) {
         $(".error_text").text('');
         var room_to_reallocate = $('#realloc_avail_rooms').val();
         var room_type_to_reallocate = $('#realloc_avail_room_type').val();
@@ -2292,6 +2378,8 @@ const RoomReallocationModal = {
             $("#realloc_sel_rm_err_p").text(slct_rm_err);
             return false;
         }
+
+        return true;
     },
     changeRoomType: function(roomTypeObj) {
         $(".loading_overlay").show();
@@ -2341,12 +2429,12 @@ const RoomReallocationModal = {
                     } else {
                         showErrorMessage(txtSomeErr);
                     }
-
-                    $(".loading_overlay").hide();
                 },
                 error: function(XMLHttpRequest, textStatus, errorThrown) {
-                    $(".loading_overlay").hide();
                     showErrorMessage(txtSomeErr);
+                },
+                complete: function() {
+                    $(".loading_overlay").hide();
                 }
             });
         } else {
@@ -2362,8 +2450,10 @@ const RoomReallocationModal = {
     }
 };
 
+// Modal object to handle adding rooms to order processes
 const AddRoomBookingModal = {
     show: function() {
+        $(".loading_overlay").show();
         $.ajax({
             type: 'POST',
             headers: {
@@ -2460,6 +2550,9 @@ const AddRoomBookingModal = {
                 } else {
                     showErrorMessage(txtSomeErr);
                 }
+            },
+            complete: function() {
+                $(".loading_overlay").hide();
             }
         });
     },
@@ -2503,6 +2596,7 @@ const AddRoomBookingModal = {
     }
 };
 
+// Modal object to handle editing rooms and services in order processes
 const EditRoomBookingModal = {
     show: function(btnEdit) {
         const productLineData = $(btnEdit).attr('data-product_line_data');
@@ -2520,6 +2614,7 @@ const EditRoomBookingModal = {
             orderEdit: 1,
         };
 
+        $(".loading_overlay").show();
         $.ajax({
             type: 'POST',
             headers: {
@@ -2550,6 +2645,9 @@ const EditRoomBookingModal = {
                 } else {
                     showErrorMessage(txtSomeErr);
                 }
+            },
+            complete: function() {
+                $(".loading_overlay").hide();
             }
         });
     },
@@ -2587,8 +2685,10 @@ const EditRoomBookingModal = {
     }
 };
 
+// Modal object to handle cancel rooms in order processes
 const CancelRoomBookingModal = {
     show: function() {
+        $(".loading_overlay").show();
         $.ajax({
             type: 'POST',
             headers: {
@@ -2607,6 +2707,9 @@ const CancelRoomBookingModal = {
                 } else {
                     showErrorMessage(txtSomeErr);
                 }
+            },
+            complete: function() {
+                $(".loading_overlay").hide();
             }
         });
     },
@@ -2633,6 +2736,7 @@ function updateAdditionalServices(element)
 
     var unit_price = $(element).find('.unit_price').val();
     if ($.isNumeric(qty)) {
+        $(".loading_overlay").show();
         $.ajax({
             type: 'POST',
             headers: {
@@ -2658,6 +2762,9 @@ function updateAdditionalServices(element)
                     showErrorMessage(jsonData.errors);
 
                 }
+            },
+            complete: function() {
+                $(".loading_overlay").hide();
             }
         });
     }
@@ -2668,6 +2775,7 @@ function updateRoomDemand(element)
 {
     var id_booking_demand = $(element).data('id_booking_demand');
     var unit_price = $(element).find('.unit_price').val();
+    $(".loading_overlay").show();
     $.ajax({
         type: 'POST',
         headers: {
@@ -2692,6 +2800,9 @@ function updateRoomDemand(element)
                 showErrorMessage(jsonData.errors);
 
             }
+        },
+        complete: function() {
+            $(".loading_overlay").hide();
         }
     });
 }

@@ -780,7 +780,6 @@ class AdminOrdersControllerCore extends AdminController
             $htlOrderStatus = HotelBookingDetail::getAllHotelOrderStatus();
             $this->context->smarty->assign(
                 array(
-                    'loaderImg' => $this->context->link->getMediaLink(_PS_IMG_.'admin/ajax-loader.gif'),
                     'order' => $objOrder,
                     'currency' => new Currency($objOrder->id_currency),
                     'current_index' => self::$currentIndex,
@@ -928,14 +927,6 @@ class AdminOrdersControllerCore extends AdminController
                 'modal_class' => 'modal-lg order_detail_modal',
                 'modal_title' => '<i class="icon icon-bed"></i> &nbsp'.$this->l('Edit Room'),
                 'modal_content' => $this->context->smarty->fetch('controllers/orders/modals/_edit_room_booking.tpl'),
-                'modal_actions' => array(
-                    array(
-                        'type' => 'button',
-                        'value' => 'submitRoomChange',
-                        'class' => 'submitRoomChange btn-primary pull-right',
-                        'label' => '<i class="icon-bed"></i> '.$this->l('Update'),
-                    ),
-                ),
             );
 
             $this->context->smarty->assign($modal);
@@ -2313,6 +2304,9 @@ class AdminOrdersControllerCore extends AdminController
                 $this->errors = Tools::displayError('An error occurred while resolving overbooking.');
             }
         }
+
+        // Sending loader image for the modals to be used for all the modals ajax processes
+        $this->context->smarty->assign('loaderImg', $this->context->link->getMediaLink(_PS_IMG_.'admin/ajax-loader.gif'));
 
         parent::postProcess();
     }
@@ -6148,7 +6142,7 @@ class AdminOrdersControllerCore extends AdminController
         $this->context->smarty->assign($smartyVars);
 
         $servicesTpl = $this->context->smarty->fetch(
-            _PS_ADMIN_DIR_.'/themes/default/template/controllers/orders/modals/_extra_services_service_products.tpl'
+            _PS_ADMIN_DIR_.'/themes/default/template/controllers/orders/modals/_extra_services_service_products_tab_content.tpl'
         );
         return $servicesTpl;
     }
@@ -6204,10 +6198,12 @@ class AdminOrdersControllerCore extends AdminController
                 $smartyVars['roomTypeDemands'] = $roomTypeDemands;
             }
         }
+
+        $smartyVars['show_active'] = true;
         $this->context->smarty->assign($smartyVars);
 
         $servicesTpl = $this->context->smarty->fetch(
-            _PS_ADMIN_DIR_.'/themes/default/template/controllers/orders/modals/_extra_services_facilities.tpl'
+            _PS_ADMIN_DIR_.'/themes/default/template/controllers/orders/modals/_extra_services_facilities_tab_content.tpl'
         );
         return $servicesTpl;
     }

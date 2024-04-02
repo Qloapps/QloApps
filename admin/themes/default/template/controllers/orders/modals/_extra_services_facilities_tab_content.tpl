@@ -17,7 +17,7 @@
 *  @license   https://store.webkul.com/license.html
 *}
 
-<div id="room_type_demands_desc" class="tab-pane active">
+<div id="room_type_demands_desc" class="tab-pane {if (isset($show_active) && $show_active) || (!isset($orderEdit) || !$orderEdit)}active{/if} extra-services-container">
 	<input type="hidden" value="{$id_booking_detail}" id="id_htl_booking">
 	{if isset($orderEdit) && $orderEdit}
 		<p class="col-sm-12 facility_nav_btn">
@@ -125,14 +125,17 @@
 							{/foreach}
 						</tbody>
 					</table>
+
+                    <div class="modal-footer">
+                        <button type="button" id="save_room_demands" class="btn btn-primary"><i class="icon icon-save"></i> &nbsp;{l s="Update Facilities"}</button>
+                    </div>
 				{else}
-					<i class="icon-warning"></i> {l s='No facilities available for this room.'}
+                    <i class="icon-warning"></i> {l s='No facilities available for this room.'}
 				{/if}
 			</div>
-			<button type="button" id="save_room_demands" class="btn btn-success pull-right"><i class="icon-save"></i> {l s='Update facilities'}</button>
 		</div>
 	{else}
-        <div class="row room_demand_detail">
+        <div class="room_demand_detail">
             <table class="table">
                 <thead>
                     <tr>

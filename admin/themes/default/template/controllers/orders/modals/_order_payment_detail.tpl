@@ -21,51 +21,57 @@
     <div class="form-group row">
         <div class="col-sm-6">
             <label class="control-label">{l s='Payment Date'}</label>
-            <div class="text-bold" id="payment_date"></div>
+            <b><div id="payment_date"></div></b>
         </div>
         <div class="col-sm-6">
             <label class="control-label">{l s='Payment Method'}</label>
-            <div class="text-bold" id="payment_method"></div>
+            <b><div id="payment_method"></div></b>
         </div>
     </div>
     <div class="form-group row">
         <div class="col-sm-6">
             <label class="control-label">{l s='Payment Source'}</label>
-            <div class="text-bold" id="payment_source"></div>
+            <b><div id="payment_source"></div></b>
         </div>
         <div class="col-sm-6">
             <label class="control-label">{l s='Transaction Id'}</label>
-            <div class="text-bold" id="transaction_id"></div>
+            <b><div id="transaction_id"></div></b>
         </div>
     </div>
     <div class="form-group row">
         <div class="col-sm-6">
             <label class="control-label">{l s='Amount'}</label>
-            <div class="text-bold" id="amount"></div>
+            <b><div id="amount"></div></b>
         </div>
         <div class="col-sm-6">
             <label class="control-label">{l s='Invoice'}</label>
-            <div class="text-bold" id="invoice_number"></div>
+            <b><div id="invoice_number"></div></b>
         </div>
     </div>
     {* <div class="form-group row">
         <div class="col-sm-6">
             <label class="control-label">{l s='Card Number'}</label>
-            <div class="text-bold" id="card_number"></div>
+            <b><div id="card_number"></div></b>
         </div>
         <div class="col-sm-6">
             <label class="control-label">{l s='Card Brand'}</label>
-            <div class="text-bold" id="card_brand"></div>
+            <b><div id="card_brand"></div></b>
         </div>
     </div>
     <div class="form-group row">
         <div class="col-sm-6">
             <label class="control-label">{l s='Card Expiration'}</label>
-            <div class="text-bold" id="card_expiration"></div>
+            <b><div id="card_expiration"></div></b>
         </div>
         <div class="col-sm-6">
             <label class="control-label">{l s='Card Holder'}</label>
-            <div class="text-bold" id="card_holder"></div>
+            <b><div id="card_holder"></div></b>
         </div>
     </div> *}
+
+    {if isset($loaderImg) && $loaderImg}
+        <div class="loading_overlay">
+            <img src='{$loaderImg}' class="loading-img"/>
+        </div>
+    {/if}
 </div>

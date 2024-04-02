@@ -30,7 +30,7 @@
             <span class="overbooked_room">{l s='overbooked'}</span>
         {/if}
     </td>
-	<td><img src="{$data.image_link}" title="Room image" class="img-thumbnail"/></td>
+	<td><img src="{$data.image_link}" title="{l s='Room image'}"></td>
 	<td><p>{$data.room_type}</p></td>
 	<td>
 		<a  href="{$link->getAdminLink('AdminAddHotel')}&amp;id={$data['id_hotel']}&amp;updatehtl_branch_info" target="_blank">
@@ -227,30 +227,28 @@
 		{/if}
 		</td>
 		<td class="product_action">
-			<div class="actions-row">
-				<a href="#" class="edit_room_change_link" data-product_line_data="{$data|json_encode|escape}">
+            <div class="btn-group pull-right">
+				<button href="#" class="btn btn-default edit_room_change_link" data-product_line_data="{$data|json_encode|escape}">
 					<i class="icon-pencil"></i>
 					{l s='Edit'}
-				</a>
-				<div class="dropdown pull-right">
-					<a type="button" class="dropdown-toggle" data-toggle="dropdown" style="padding: 0 8px; margin-left: -15px;">
-						<i class="icon-ellipsis-v"></i>
-					</a>
-					<ul class="dropdown-menu" role="menu">
-						<li>
-							<a href="#" class="room_reallocate_swap" id="reallocate_room_{$data['id']}" data-room_type_name="{$data['room_type_name']}" data-toggle="modal" data-target="#mySwappigModal" data-id_htl_booking="{$data['id']}" data-room_num='{$data.room_num}' data-id_room_type='{$data.id_product}' data-cust_name='{$data.alloted_cust_name}' data-cust_email='{$data.alloted_cust_email}' data-avail_rm_swap='{$data.avail_rooms_to_swap|@json_encode}' data-avail_realloc_room_types='{$data.avail_room_types_to_realloc|@json_encode}'>
-                                <i class="icon-refresh"></i>
-                                {l s='Reallocate/Swap Room'}
-                            </a>
-						</li>
-						<li>
-							<a href="#" class="delete_room_line">
-								<i class="icon-trash"></i>
-								{l s='Delete'}
-							</a>
-						</li>
-					</ul>
-				</div>
+				</button>
+                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+					<span class="caret"></span>
+				</button>
+                <ul class="dropdown-menu" role="menu">
+                    <li>
+                        <a href="#" class="room_reallocate_swap" id="reallocate_room_{$data['id']}" data-room_type_name="{$data['room_type_name']}" data-toggle="modal" data-target="#mySwappigModal" data-id_htl_booking="{$data['id']}" data-room_num='{$data.room_num}' data-id_room_type='{$data.id_product}' data-cust_name='{$data.alloted_cust_name}' data-cust_email='{$data.alloted_cust_email}' data-avail_rm_swap='{$data.avail_rooms_to_swap|@json_encode}' data-avail_realloc_room_types='{$data.avail_room_types_to_realloc|@json_encode}'>
+                            <i class="icon-refresh"></i>
+                            {l s='Reallocate/Swap Room'}
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="delete_room_line">
+                            <i class="icon-trash"></i>
+                            {l s='Delete'}
+                        </a>
+                    </li>
+                </ul>
 			</div>
 		</td>
 	{/if}

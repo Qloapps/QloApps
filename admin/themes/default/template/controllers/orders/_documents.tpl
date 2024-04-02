@@ -88,7 +88,7 @@
                         </td>
                         <td class="document_action">
                             {if get_class($document) eq 'OrderInvoice'}
-                                <a href="#" class="add_document_note" data-id_order_invoice="{$document->id}" data-edit_note="{$document->note|escape:'html':'UTF-8'}" title="{if $document->note eq ''}{l s='Add note'}{else}{l s='Edit note'}{/if}">
+                                <a href="#" class="btn btn-default add_document_note" data-id_order_invoice="{$document->id}" data-edit_note="{$document->note|escape:'html':'UTF-8'}" title="{if $document->note eq ''}{l s='Add note'}{else}{l s='Edit note'}{/if}">
                                     {if $document->note eq ''}
                                         <i class="icon-file-alt"></i> &nbsp;{l s='Add note'}
                                     {else}
@@ -96,7 +96,7 @@
                                     {/if}
                                 </a>
                                 {if $document->getRestPaid()}
-                                    <a href="#form_add_payment_panel" class="js-set-payment anchor pull-right" data-amount="{$document->getRestPaid()}" data-id-invoice="{$document->id}" title="{l s='Set payment form'}">
+                                    <a href="#form_add_payment_panel" class="btn btn-default js-set-payment anchor pull-right" data-amount="{$document->getRestPaid()}" data-id-invoice="{$document->id}" title="{l s='Set payment form'}">
                                         <i class="icon-money"></i> &nbsp;{l s='Enter payment'}
                                     </a>
                                 {/if}

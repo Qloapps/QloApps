@@ -87,7 +87,7 @@
 
         <div class="row">
             <div class="col-lg-7">
-                <div class="panel order-panel">
+                <div class="panel">
                     <div class="panel-heading order_status_heading">
                         <i class="icon-bed"></i> &nbsp;{l s='Rooms Status'}
                     </div>
@@ -125,7 +125,7 @@
                                                         {dateFormat date=$data['date_from']} - {dateFormat date=$data['date_to']}
                                                     </td>
                                                     <td>
-                                                        <a href="#" class="text-bold" onclick="BookingDocumentsModal.init({$data.id|intval}, this); return false;">
+                                                        <a href="#" onclick="BookingDocumentsModal.init({$data.id|intval}, this); return false;">
                                                             {if $data.num_checkin_documents > 0}{$data.num_checkin_documents}{else}{l s='Upload'}{/if} {l s='Documents'}
                                                         </a>
                                                     </td>
@@ -142,7 +142,7 @@
                                                         {if $data.is_refunded || $data.is_cancelled}
                                                             <span class="badge badge-danger">{if $data.is_cancelled}{l s='Cancelled'}{else}{l s='Refunded'}{/if}</span>
                                                         {else}
-                                                            <a class="open_room_status_form" href="#" data-id_hotel_booking_detail="{$data['id']}" data-id_order="{$data['id_order']}" data-id_status="{$data['id_status']}" data-id_room="{$data['id_room']}" data-date_from="{$data['date_from']|date_format:"%Y-%m-%d"}" data-date_to="{$data['date_to']|date_format:"%Y-%m-%d"}" data-check_in_time="{$data['check_in_time']}" data-check_out_time="{$data['check_out_time']}">
+                                                            <a class="open_room_status_form btn btn-default" href="#" data-id_hotel_booking_detail="{$data['id']}" data-id_order="{$data['id_order']}" data-id_status="{$data['id_status']}" data-id_room="{$data['id_room']}" data-date_from="{$data['date_from']|date_format:"%Y-%m-%d"}" data-date_to="{$data['date_to']|date_format:"%Y-%m-%d"}" data-check_in_time="{$data['check_in_time']}" data-check_out_time="{$data['check_out_time']}">
                                                                 <i class="icon-pencil"></i>
                                                             </a>
                                                         {/if}
@@ -166,7 +166,7 @@
                     </div>
                 </div>
 
-                <div class="panel order-panel">
+                <div class="panel">
                     <div class="panel-heading">
                         <i class="icon-file"></i> &nbsp;{l s='Order'}
                         <span class="badge">{$order->reference}</span>
@@ -211,13 +211,13 @@
                                         {foreach from=$history item=row key=key}
                                             {if ($key == 0)}
                                                 <tr>
-                                                    <td style="border-width: 1px 0px 1px 1px; border-color: {$row['color']}; border-style: solid"><img src="{$link->getMediaLink("`$img_dir`os/`$row['id_order_state']|intval`.gif")}" width="16" height="16" alt="{$row['ostate_name']|stripslashes}" /></td> {* by webkul to get media link *}
-                                                    <td style="border-width: 1px 0px 1px 0px; border-color: {$row['color']}; border-style: solid">{$row['ostate_name']|stripslashes}</td>
-                                                    <td style="border-width: 1px 0px 1px 0px; border-color: {$row['color']}; border-style: solid">{if $row['employee_lastname']}{$row['employee_firstname']|stripslashes} {$row['employee_lastname']|stripslashes}{/if}</td>
-                                                    <td style="border-width: 1px 0px 1px 0px; border-color: {$row['color']}; border-style: solid">{dateFormat date=$row['date_add'] full=true}</td>
-                                                    <td style="border-width: 1px 1px 1px 0px; border-color: {$row['color']}; border-style: solid" class="text-right">
+                                                    <td style="background-color:{$row['color']}"><img src="{$link->getMediaLink("`$img_dir`os/`$row['id_order_state']|intval`.gif")}" width="16" height="16" alt="{$row['ostate_name']|stripslashes}" /></td> {* by webkul to get media link *}
+                                                    <td style="background-color:{$row['color']};color:{$row['text-color']}">{$row['ostate_name']|stripslashes}</td>
+                                                    <td style="background-color:{$row['color']};color:{$row['text-color']}">{if $row['employee_lastname']}{$row['employee_firstname']|stripslashes} {$row['employee_lastname']|stripslashes}{/if}</td>
+                                                    <td style="background-color:{$row['color']};color:{$row['text-color']}">{dateFormat date=$row['date_add'] full=true}</td>
+                                                    <td style="background-color:{$row['color']};color:{$row['text-color']}" class="text-right">
                                                         {if $row['send_email']|intval}
-                                                            <a  href="{$link->getAdminLink('AdminOrders')|escape:'html':'UTF-8'}&amp;vieworder&amp;id_order={$order->id|intval}&amp;sendStateEmail={$row['id_order_state']|intval}&amp;id_order_history={$row['id_order_history']|intval}" title="{l s='Resend this email to the customer'}">
+                                                            <a class="btn btn-default" href="{$link->getAdminLink('AdminOrders')|escape:'html':'UTF-8'}&amp;vieworder&amp;id_order={$order->id|intval}&amp;sendStateEmail={$row['id_order_state']|intval}&amp;id_order_history={$row['id_order_history']|intval}" title="{l s='Resend this email to the customer'}">
                                                                 <i class="icon-mail-reply"></i>
                                                                 {l s='Resend email'}
                                                             </a>
@@ -405,7 +405,7 @@
                     </script>
                 </div>
                 <!-- Payments block -->
-                <div id="form_add_payment_panel" class="panel order-panel">
+                <div id="form_add_payment_panel" class="panel">
                     <div class="panel-heading">
                         <i class="icon-credit-card"></i> &nbsp;{l s="Payment"} <span class="badge">{$order->getOrderPayments()|@count}</span>
                     </div>
@@ -453,7 +453,7 @@
                                             <td>{displayPrice price=$payment['real_paid_amount'] currency=$payment['id_currency']}</td>
                                             <td>{if isset($payment['invoice_number'])}{$payment['invoice_number']}{else}--{/if}</td>
                                             <td class="actions">
-                                                <a class="open_payment_information" href="#" data-card_number="{if $payment['card_number']}{$payment['card_number']}{else}{l s='Not defined'}{/if}"  data-card_brand="{if $payment['card_brand']}{$payment['card_brand']}{else}{l s='Not defined'}{/if}"  data-card_expiration="{if $payment['card_expiration']}{$payment['card_expiration']}{else}{l s='Not defined'}{/if}"  data-card_holder="{if $payment['card_holder']}{$payment['card_holder']}{else}{l s='Not defined'}{/if}" data-payment_date="{if $payment['date_add']}{$payment['date_add']}{else}{l s='Not defined'}{/if}" data-payment_method="{if $payment['payment_method']}{$payment['payment_method']}{else}{l s='Not defined'}{/if}" data-payment_source="{if $payment_types[$payment['payment_type']]['name']}{$payment_types[$payment['payment_type']]['name']}{else}{l s='Not defined'}{/if}" data-transaction_id="{if $payment['transaction_id']}{$payment['transaction_id']}{else}{l s='Not defined'}{/if}" data-amount="{if $payment['amount'] > 0}{displayPrice currency={$payment['id_currency']} price={$payment['amount']}}{else}{l s='Not defined'}{/if}" data-invoice_number="{if isset($payment['invoice_number']) && $payment['invoice_number']}{$payment['invoice_number']}{else}{l s='Not defined'}{/if}">{l s='Details'}</a>
+                                                <a class="open_payment_information btn btn-default" href="#" data-card_number="{if $payment['card_number']}{$payment['card_number']}{else}{l s='Not defined'}{/if}"  data-card_brand="{if $payment['card_brand']}{$payment['card_brand']}{else}{l s='Not defined'}{/if}"  data-card_expiration="{if $payment['card_expiration']}{$payment['card_expiration']}{else}{l s='Not defined'}{/if}"  data-card_holder="{if $payment['card_holder']}{$payment['card_holder']}{else}{l s='Not defined'}{/if}" data-payment_date="{if $payment['date_add']}{$payment['date_add']}{else}{l s='Not defined'}{/if}" data-payment_method="{if $payment['payment_method']}{$payment['payment_method']}{else}{l s='Not defined'}{/if}" data-payment_source="{if $payment_types[$payment['payment_type']]['name']}{$payment_types[$payment['payment_type']]['name']}{else}{l s='Not defined'}{/if}" data-transaction_id="{if $payment['transaction_id']}{$payment['transaction_id']}{else}{l s='Not defined'}{/if}" data-amount="{if $payment['amount'] > 0}{displayPrice currency={$payment['id_currency']} price={$payment['amount']}}{else}{l s='Not defined'}{/if}" data-invoice_number="{if isset($payment['invoice_number']) && $payment['invoice_number']}{$payment['invoice_number']}{else}{l s='Not defined'}{/if}"><i class="icon-search"></i> {l s='Details'}</a>
                                             </td>
                                         </tr>
                                     {foreachelse}
@@ -501,7 +501,7 @@
             <div class="col-lg-5">
                 {* Traveller information *}
                 {if $customerGuestDetail}
-                    <div class="panel order-panel">
+                    <div class="panel">
                         <div class="panel-heading">
                             <i class="icon icon-user"></i> &nbsp;{l s='Traveller detail'}
                              {if $can_edit}
@@ -510,33 +510,35 @@
                                 </button>
                             {/if}
                         </div>
-                        <div class="panel-content form-horizontal" id="customer-guest-details">
-                            <dl class="list-detail col-sm-6">
-                                <label class="label-title">{l s='Gender'}</label>
-                                <dd class="gender_name">{$customerGuestDetail->gender->name}</dd>
-                            </dl>
-                            <dl class="list-detail col-sm-6">
-                                <label class="label-title">{l s='Name'}</label>
-                                <dd class="guest_name">{$customerGuestDetail->firstname} {$customerGuestDetail->lastname}</dd>
-                            </dl>
-                            <dl class="list-detail col-sm-6">
-                                <label class="label-title">{l s='Email'}</label>
-                                <dd class="guest_email"><a  href="mailto:{$customerGuestDetail->email}"><i class="icon-envelope-o"></i> {$customerGuestDetail->email}</a></dd>
-                            </dl>
-                            <dl class="list-detail col-sm-6">
-                                <label class="label-title">{l s='Phone'}</label>
-                                <dd class="guest_phone"><a  href="tel:{$customerGuestDetail->phone}"><i class="icon-phone"></i> {$customerGuestDetail->phone}</a></dd>
-                            </dl>
+                        <div class="row">
+                            <div class="col-xs-12" id="customer-guest-details">
+                                <dl class="list-detail col-sm-6">
+                                    <label class="label-title">{l s='Gender'}</label>
+                                    <dd class="gender_name">{$customerGuestDetail->gender->name}</dd>
+                                </dl>
+                                <dl class="list-detail col-sm-6">
+                                    <label class="label-title">{l s='Name'}</label>
+                                    <dd class="guest_name">{$customerGuestDetail->firstname} {$customerGuestDetail->lastname}</dd>
+                                </dl>
+                                <dl class="list-detail col-sm-6">
+                                    <label class="label-title">{l s='Email'}</label>
+                                    <dd class="guest_email"><a  href="mailto:{$customerGuestDetail->email}"><i class="icon-envelope-o"></i> {$customerGuestDetail->email}</a></dd>
+                                </dl>
+                                <dl class="list-detail col-sm-6">
+                                    <label class="label-title">{l s='Phone'}</label>
+                                    <dd class="guest_phone"><a  href="tel:{$customerGuestDetail->phone}"><i class="icon-phone"></i> {$customerGuestDetail->phone}</a></dd>
+                                </dl>
+                            </div>
                         </div>
                     </div>
                 {/if}
 
                 <!-- Customer informations -->
-                <div class="panel order-panel panel-customer">
+                <div class="panel panel-customer">
                     {if $customer->id}
                         <div class="panel-heading">
                             <i class="icon-user"></i> &nbsp;{l s='Customer'} <span class="badge">{l s='#'}{$customer->id}</span>
-                            <a href="?tab=AdminCustomers&amp;id_customer={$customer->id}&amp;viewcustomer&amp;token={getAdminToken tab='AdminCustomers'}" class="pull-right">{l s='Customer Full Details'}</a>
+                            <a href="?tab=AdminCustomers&amp;id_customer={$customer->id}&amp;viewcustomer&amp;token={getAdminToken tab='AdminCustomers'}" class="pull-right">{l s='View customer details'}</a>
                         </div>
                         <div class="row">
                             <div class="col-xs-12 customer_info">
@@ -753,7 +755,7 @@
 
                 {* Order Internal notes *}
                 {if (sizeof($messages))}
-                    <div class="panel order-panel">
+                    <div class="panel">
                         <div class="panel-heading">
                             <i class="icon-undo"></i> &nbsp;{l s='Order Notes'}
                         </div>
@@ -785,7 +787,7 @@
                     </div>
                 {/if}
 
-                <div class="panel order-panel">
+                <div class="panel">
                     <div class="panel-heading">
                         <i class="icon-undo"></i> &nbsp;{l s='Refund Requests'}
                     </div>
@@ -834,7 +836,7 @@
                         {/if}
                     </div>
                 </div>
-                <div class="panel order-panel">
+                <div class="panel">
                     <div class="panel-heading">
                         <i class="icon-remove-sign"></i> &nbsp;{l s='Cancellation Policies'}
                     </div>
@@ -870,13 +872,12 @@
                     <div style="display: none">
                         <input type="hidden" value="{$order->getWarehouseList()|implode}" id="warehouse_list" />
                     </div>
-                    <div class="panel order-panel" id="refundForm">
+                    <div class="panel" id="refundForm">
                         <div class="panel-heading">
                             <i class="icon-bed"></i> &nbsp;{l s='Rooms Booking Detail'} <span class="badge">{$order_detail_data|@count}</span>
                             {if !$order->hasBeenDelivered()}
                                 <button type="button" id="add_room" class="btn btn-primary pull-right">
-                                    <i class="icon-plus-sign"></i>
-                                    {l s='Add Rooms In Order'}
+                                    <i class="icon-plus-sign"></i> {l s='Add Rooms'}
                                 </button>
                             {/if}
                         </div>
@@ -897,7 +898,7 @@
 
         <div class="row">
             <div class="col-lg-4 col-sm-6 col-xs-12 pull-right">
-                <div class="panel order-panel panel-total">
+                <div class="panel panel-total">
                     <div class="table-responsive">
                         <table class="table">
                             {* Assign order price *}
@@ -1030,7 +1031,7 @@
 
             {* Discount block *}
             <div class="col-lg-4 col-sm-6 col-xs-12 pull-right">
-                <div class="panel order-panel panel-vouchers">
+                <div class="panel panel-vouchers">
                     <div class="panel-heading">
                         <span><i class="icon-tag"></i> &nbsp;{l s='Voucher'}</span>
                         {if $can_edit}
@@ -1070,7 +1071,7 @@
                                                 </td>
                                                 {if $can_edit}
                                                     <td class="text-center">
-                                                        <a href="{$current_index}&amp;submitDeleteVoucher&amp;id_order_cart_rule={$discount['id_order_cart_rule']}&amp;id_order={$order->id}&amp;token={$smarty.get.token|escape:'html':'UTF-8'}"><i class="icon-trash"></i></a>
+                                                        <a class="btn btn-default" href="{$current_index}&amp;submitDeleteVoucher&amp;id_order_cart_rule={$discount['id_order_cart_rule']}&amp;id_order={$order->id}&amp;token={$smarty.get.token|escape:'html':'UTF-8'}"><i class="icon-trash"></i></a>
                                                     </td>
                                                 {/if}
                                             </tr>
@@ -1093,7 +1094,7 @@
             <!-- linked orders block -->
             {if count($order->getBrother()) > 0}
                 <div class="col-lg-4 col-sm-6 col-xs-12 pull-right">
-                    <div class="panel order-panel">
+                    <div class="panel">
                         <div class="panel-heading">
                             <i class="icon-link"></i> &nbsp;{l s='Linked orders'}
                         </div>
@@ -1143,7 +1144,7 @@
             {/if}
 
             <div class="col-lg-4 col-sm-6 col-xs-12">
-                <div class="panel order-panel">
+                <div class="panel">
                     <div class="panel-heading">
                         <i class="icon-envelope"></i> &nbsp;{l s='Messages'} <span class="badge">{sizeof($customer_thread_message)}</span>
                         <a href="{$link->getAdminLink('AdminCustomerThreads')|escape:'html':'UTF-8'}&amp;id_order={$order->id|intval}" class="pull-right">{l s='Show all messages'}</a>
@@ -1199,7 +1200,7 @@
             <!-- Sources block -->
             {if (sizeof($sources))}
                 <div class="col-lg-4 col-sm-6 col-xs-12">
-                    <div class="panel order-panel">
+                    <div class="panel">
                         <div class="panel-heading">
                             <i class="icon-globe"></i> &nbsp;{l s='Sources'} <span class="badge">{$sources|@count}</span>
                         </div>
@@ -1215,13 +1216,6 @@
                     </div>
                 </div>
             {/if}
-        </div>
-    </div>
-
-    {* MOdal for extra demands *}
-    <div class="modal" tabindex="-1" role="dialog" id="rooms_type_extra_demands">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content" id="room_extra_demand_content"></div>
         </div>
     </div>
 

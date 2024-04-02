@@ -81,7 +81,7 @@
                                         <input type="hidden" class="max_adults" value="">
                                         <input type="hidden" class="max_children" value="">
                                         <input type="hidden" class="max_guests" value="">
-                                        <div class="occupancy_info_block col-sm-12" occ_block_index="0">
+                                        <div class="occupancy_info_block row" occ_block_index="0">
                                             <div class="occupancy_info_head col-sm-12"><label class="room_num_wrapper">{l s='Room - 1'}</label></div>
                                             <div class="col-sm-12">
                                                 <div class="row">
@@ -143,4 +143,10 @@
         </div>
         <button type="button" class="btn btn-default" id="submitAddProduct" disabled="disabled" style="display:none;"></button>
     </div>
+
+    {if isset($loaderImg) && $loaderImg}
+        <div class="loading_overlay">
+            <img src='{$loaderImg}' class="loading-img"/>
+        </div>
+    {/if}
 </div>

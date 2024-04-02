@@ -45,4 +45,10 @@
 
         <button class="btn btn-primary" type="submit" name="submitbookingOrderStatus" style="display:none" id="submitbookingOrderStatus"></button>
     </form>
+
+    {if isset($loaderImg) && $loaderImg}
+        <div class="loading_overlay">
+            <img src='{$loaderImg}' class="loading-img"/>
+        </div>
+    {/if}
 </div>

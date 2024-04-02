@@ -48,4 +48,10 @@
             </div>
         </div>
     </form>
+
+    {if isset($loaderImg) && $loaderImg}
+        <div class="loading_overlay">
+            <img src='{$loaderImg}' class="loading-img"/>
+        </div>
+    {/if}
 </div>

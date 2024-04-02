@@ -83,4 +83,10 @@
         {/if}
         <button class="btn btn-default" type="submit" name="submitNewVoucher" style="display:none" id="submitNewVoucher"></button>
     </form>
+
+    {if isset($loaderImg) && $loaderImg}
+        <div class="loading_overlay">
+            <img src='{$loaderImg}' class="loading-img"/>
+        </div>
+    {/if}
 </div>

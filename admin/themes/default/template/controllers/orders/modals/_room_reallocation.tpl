@@ -26,7 +26,7 @@
             <a  href="#swap_room_tab" aria-controls="swap" role="tab" data-toggle="tab">{l s='Swap Room'}</a>
         </li>
     </ul>
-    <div class="tab-content order-panel active">
+    <div class="tab-content active">
         <div role="tabpanel" class="tab-pane active" id="reallocate_room_tab">
             <div class="row">
                 <dl class="list-detail col-sm-6">
@@ -123,10 +123,12 @@
                 </div>
             </form>
         </div>
+    </div>
 
-        {* loader before loading data *}
+    {* If you want to show loader in your modals the send loaderImage from postProcess() method *}
+    {if isset($loaderImg) && $loaderImg}
         <div class="loading_overlay">
             <img src='{$loaderImg}' class="loading-img"/>
         </div>
-    </div>
+    {/if}
 </div>
