@@ -1466,10 +1466,12 @@ var BookingForm = {
                     }
                 }
             },
-            complete: function(jqXHR, textStatus) {
-                if (textStatus == 'error') {
+            error: function() {
+                if (!onlineFlag) {
                     showErrorMessage(no_internet_txt);
                 }
+            },
+            complete: function() {
                 $('.book_now_submit').prop('disabled', false).find('span:not(#booking_action_loader)').show();
                 $('#booking_action_block').find('#booking_action_loader').removeClass('active');
             }
