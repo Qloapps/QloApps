@@ -1027,6 +1027,8 @@
                     </div>
                 </div>
             </div>
+
+            {* Discount block *}
             <div class="col-lg-4 col-sm-6 col-xs-12 pull-right">
                 <div class="panel order-panel panel-vouchers">
                     <div class="panel-heading">
@@ -1050,7 +1052,7 @@
                                                 <span class="title_box ">{l s='Value'}</span>
                                             </th>
                                             {if $can_edit}
-                                                <th>
+                                                <th class="text-center">
                                                     <span class="title_box ">{l s='Delete'}</span>
                                                 </th>
                                             {/if}
@@ -1067,8 +1069,8 @@
                                                 {displayPrice price=$discount['value'] currency=$currency->id}
                                                 </td>
                                                 {if $can_edit}
-                                                    <td>
-                                                        <a  href="{$current_index}&amp;submitDeleteVoucher&amp;id_order_cart_rule={$discount['id_order_cart_rule']}&amp;id_order={$order->id}&amp;token={$smarty.get.token|escape:'html':'UTF-8'}">{l s='Delete'}</a>
+                                                    <td class="text-center">
+                                                        <a href="{$current_index}&amp;submitDeleteVoucher&amp;id_order_cart_rule={$discount['id_order_cart_rule']}&amp;id_order={$order->id}&amp;token={$smarty.get.token|escape:'html':'UTF-8'}"><i class="icon-trash"></i></a>
                                                     </td>
                                                 {/if}
                                             </tr>
@@ -1087,14 +1089,15 @@
                     </div>
                 </div>
             </div>
-            <div class="col-lg-4 col-sm-6 col-xs-12 pull-right">
-                <!-- linked orders block -->
-                <div class="panel order-panel">
-                    <div class="panel-heading">
-                        <i class="icon-link"></i> &nbsp;{l s='Linked orders'}
-                    </div>
-                    <div class="panel-content">
-                        {if count($order->getBrother()) > 0}
+
+            <!-- linked orders block -->
+            {if count($order->getBrother()) > 0}
+                <div class="col-lg-4 col-sm-6 col-xs-12 pull-right">
+                    <div class="panel order-panel">
+                        <div class="panel-heading">
+                            <i class="icon-link"></i> &nbsp;{l s='Linked orders'}
+                        </div>
+                        <div class="panel-content">
                             <div class="table-responsive">
                                 <table class="table">
                                     <thead>
@@ -1134,17 +1137,11 @@
                                     </tbody>
                                 </table>
                             </div>
-                        {else}
-                            <div class="list-empty">
-                                <div class="list-empty-msg">
-                                    <i class="icon-warning-sign list-empty-icon"></i>
-                                    {l s='No linked orders available.'}
-                                </div>
-                            </div>
-                        {/if}
+                        </div>
                     </div>
                 </div>
-            </div>
+            {/if}
+
             <div class="col-lg-4 col-sm-6 col-xs-12">
                 <div class="panel order-panel">
                     <div class="panel-heading">
@@ -1198,9 +1195,10 @@
                     </div>
                 </div>
             </div>
-            <div class="col-lg-4 col-sm-6 col-xs-12">
-                <!-- Sources block -->
-                {if !(sizeof($sources))}
+
+            <!-- Sources block -->
+            {if (sizeof($sources))}
+                <div class="col-lg-4 col-sm-6 col-xs-12">
                     <div class="panel order-panel">
                         <div class="panel-heading">
                             <i class="icon-globe"></i> &nbsp;{l s='Sources'} <span class="badge">{$sources|@count}</span>
@@ -1215,8 +1213,8 @@
                         {/foreach}
                         </ul>
                     </div>
-                {/if}
-            </div>
+                </div>
+            {/if}
         </div>
     </div>
 
