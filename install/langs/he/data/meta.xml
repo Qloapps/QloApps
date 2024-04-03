@@ -96,6 +96,12 @@
     <keywords/>
     <url_rewrite>הסטוריית-הזמנות</url_rewrite>
   </meta>
+  <meta id="order-detail" id_shop="1">
+    <title>פרטי ההזמנה</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>partei-hahazmana</url_rewrite>
+  </meta>
   <meta id="identity" id_shop="1">
     <title>זהות</title>
     <description/>

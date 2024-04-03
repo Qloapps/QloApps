@@ -105,6 +105,63 @@ class GuestTrackingControllerCore extends FrontController
         }
     }
 
+    public function displayAjaxGetRoomTypeBookingDemands()
+    {
+        $response = array('extra_demands' => false);
+
+        if (($idProduct = Tools::getValue('id_product'))
+            && ($idOrder = Tools::getValue('id_order'))
+            && ($dateFrom = Tools::getValue('date_from'))
+            && ($dateTo = Tools::getValue('date_to'))
+        ) {
+            $objHotelBookingDemands = new HotelBookingDemands();
+            $useTax = 0;
+            if (Group::getPriceDisplayMethod($this->context->customer->id_default_group) == PS_TAX_INC) {
+                $useTax = 1;
+            }
+            if ($extraDemands = $objHotelBookingDemands->getRoomTypeBookingExtraDemands(
+                $idOrder,
+                $idProduct,
+                0,
+                $dateFrom,
+                $dateTo,
+                1,
+                0,
+                $useTax
+            )) {
+                $this->context->smarty->assign(array(
+                    'useTax' => $useTax,
+                    'extraDemands' => $extraDemands,
+                ));
+            }
+            $objRoomTypeServiceProductOrderDetail = new RoomTypeServiceProductOrderDetail();
+            if ($additionalServices = $objRoomTypeServiceProductOrderDetail->getroomTypeServiceProducts(
+                $idOrder,
+                0,
+                0,
+                $idProduct,
+                $dateFrom,
+                $dateTo,
+                0,
+                0,
+                $useTax
+            )) {
+                $this->context->smarty->assign(array(
+                    'useTax' => $useTax,
+                    'additionalServices' => $additionalServices,
+                ));
+            }
+
+            $this->context->smarty->assign(array(
+                'objOrder' => new Order($idOrder),
+            ));
+
+            $response['extra_demands'] = $this->context->smarty->fetch(_PS_THEME_DIR_.'_partials/order-extra-services.tpl');
+        }
+
+        $this->ajaxDie(json_encode($response));
+    }
+
     /**
      * Assign template vars related to page content
      * @see FrontController::initContent()
@@ -112,60 +169,6 @@ class GuestTrackingControllerCore extends FrontController
     public function initContent()
     {
         parent::initContent();
-
-        $method = Tools::getValue('method');
-        if ($method == 'getRoomTypeBookingDemands') {
-            $response = array('reload' => false);
-            $extraDemandsTpl = '';
-            if (($idProduct = Tools::getValue('id_product'))
-                && ($idOrder = Tools::getValue('id_order'))
-                && ($dateFrom = Tools::getValue('date_from'))
-                && ($dateTo = Tools::getValue('date_to'))
-            ) {
-                $objBookingDemand = new HotelBookingDemands();
-                $customer = new Customer((int)$order->id_customer);
-                $useTax = 0;
-                if (Group::getPriceDisplayMethod($customer->id_default_group) == PS_TAX_INC) {
-                    $useTax = 1;
-                }
-                if ($extraDemands = $objBookingDemand->getRoomTypeBookingExtraDemands(
-                    $idOrder,
-                    $idProduct,
-                    0,
-                    $dateFrom,
-                    $dateTo,
-                    1,
-                    0,
-                    $useTax
-                )) {
-                    $this->context->smarty->assign(
-                        array(
-                            'useTax' => $useTax,
-                            'extraDemands' => $extraDemands,
-                        )
-                    );
-                }
-                $objRoomTypeServiceProductOrderDetail = new RoomTypeServiceProductOrderDetail();
-                if ($additionalServices = $objRoomTypeServiceProductOrderDetail->getroomTypeServiceProducts(
-                    $idOrder,
-                    0,
-                    0,
-                    $idProduct,
-                    $dateFrom,
-                    $dateTo,
-                    0,
-                    0,
-                    $useTax
-                )) {
-                    $this->context->smarty->assign(array(
-                        'useTax' => $useTax,
-                        'additionalServices' => $additionalServices,
-                    ));
-                }
-                $response['extra_demands'] = $this->context->smarty->fetch(_PS_THEME_DIR_.'_partials/order_booking_demands.tpl');
-            }
-            $this->ajaxDie(json_encode($response));
-        }
 
         /* Handle brute force attacks */
         if (count($this->errors)) {
@@ -216,6 +219,7 @@ class GuestTrackingControllerCore extends FrontController
                 $order->id_order_state = (int)$order->getCurrentState();
                 $order->invoice = (OrderState::invoiceAvailable((int)$order->id_order_state) && $order->invoice_number);
                 $order->order_history = $order->getHistory((int)$this->context->language->id, false, true);
+                $order->overbooking_order_states = OrderState::getOverBookingStates();
                 $order->carrier = new Carrier((int)$order->id_carrier, (int)$order->id_lang);
                 $order->address_invoice = new Address((int)$order->id_address_invoice);
                 $order->address_delivery = new Address((int)$order->id_address_delivery);
@@ -554,6 +558,13 @@ class GuestTrackingControllerCore extends FrontController
                     $customerGuestDetail = new OrderCustomerGuestDetail($id_customer_guest_detail);
                 }
 
+                $idHotel = HotelBookingDetail::getIdHotelByIdOrder($order->id);
+                $objHotelBranchInformation = new HotelBranchInformation($idHotel, $this->context->language->id);
+                $hotelAddressInfo = HotelBranchInformation::getAddress($idHotel);
+
+                $objHotelBranchRefundRules = new HotelBranchRefundRules();
+                $hotelRefundRules = $objHotelBranchRefundRules->getHotelRefundRules($idHotel, 0, 1);
+
                 // set order specific values
                 $order->total_convenience_fee_ti = $total_convenience_fee_ti;
                 $order->total_convenience_fee_te = $total_convenience_fee_te;
@@ -564,11 +575,14 @@ class GuestTrackingControllerCore extends FrontController
                 $order->back_ord_msg = Configuration::get('WK_BO_MESSAGE');
                 $order->order_has_invoice = $order->hasInvoice();
                 $order->cart_htl_data = $cartHotelData;
-                $order->non_requested_rooms = $nonRequestedRooms;
                 $order->customerGuestDetail = $customerGuestDetail;
+                $order->obj_hotel_branch_information = $objHotelBranchInformation;
+                $order->hotel_address_info = $hotelAddressInfo;
+                $order->hotel_refund_rules = $hotelRefundRules;
                 //end
 
                 Hook::exec('actionOrderDetail', array('carrier' => $order->carrier, 'order' => $order));
+
             }
         }
 
@@ -596,9 +610,48 @@ class GuestTrackingControllerCore extends FrontController
             )
         );
 
-        $this->addJS(_THEME_JS_DIR_.'history.js');
-        $this->addCSS(_THEME_CSS_DIR_.'history.css');
-        $this->addCSS(_THEME_CSS_DIR_.'addresses.css');
+        if (Tools::getValue('ajax') != 'true') {
+            $this->addCSS(_THEME_CSS_DIR_.'order-detail.css');
+
+            $this->addJS(array(
+                _THEME_JS_DIR_.'order-detail.js',
+                _THEME_JS_DIR_.'tools.js',
+            ));
+
+            $this->addJqueryPlugin(array('fancybox', 'scrollTo', 'footable', 'footable-sort'));
+            $this->addJqueryUI(array('ui.tooltip'), 'base', true);
+
+            // load Google Maps library if configured
+            if (!count($this->errors)) {
+                $ordersCollection = Order::getByReference(Tools::getValue('order_reference'));
+                if ($objOrder = $ordersCollection->getFirst()) {
+                    if ($idHotel = HotelBookingDetail::getIdHotelByIdOrder($objOrder->id)) {
+                        $objHotelBranchInformation = new HotelBranchInformation($idHotel, $this->context->language->id);
+                        if (Validate::isLoadedObject($objHotelBranchInformation)) {
+                            if ($apiKey = Configuration::get('PS_API_KEY')) {
+                                if (floatval($objHotelBranchInformation->latitude) != 0
+                                    && floatval($objHotelBranchInformation->longitude) != 0
+                                ) {
+                                    Media::addJsDef(array(
+                                        'hotel_location' => array(
+                                            'latitude' => $objHotelBranchInformation->latitude,
+                                            'longitude' => $objHotelBranchInformation->longitude,
+                                            'map_input_text' => $objHotelBranchInformation->map_input_text,
+                                        ),
+                                        'hotel_name' => $objHotelBranchInformation->hotel_name,
+                                    ));
+
+                                    $this->addJS(
+                                        'https://maps.googleapis.com/maps/api/js?key='.$apiKey.'&libraries=places&language='.
+                                        $this->context->language->iso_code.'&region='.$this->context->country->iso_code
+                                    );
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
     protected function processAddressFormat(Address $delivery, Address $invoice)

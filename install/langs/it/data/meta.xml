@@ -96,6 +96,12 @@
     <keywords/>
     <url_rewrite>cronologia-ordini</url_rewrite>
   </meta>
+  <meta id="order-detail" id_shop="1">
+    <title>Dettaglio prenotazione</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>dettaglio-prenotazione</url_rewrite>
+  </meta>
   <meta id='identity' id_shop='1'>
     <title>Identità</title>
     <description/>
