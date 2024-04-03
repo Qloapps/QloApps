@@ -333,9 +333,9 @@ class AdminCartsControllerCore extends AdminController
     public function ajaxPreProcess()
     {
         if ($this->tabAccess['edit'] === '1') {
-            // prevent cart creation when kip visibility is updated.
+            // prevent cart creation when kpi visibility or kpi view is updated.
             // @todo: move the below cart creation process required function.
-            if ('changeKpiVisibility' == Tools::getValue('action')) {
+            if (in_array(Tools::getValue('action'), array('changeKpiVisibility', 'saveKpiView'))) {
                 return;
             }
             $id_customer = (int)Tools::getValue('id_customer');
@@ -625,7 +625,6 @@ class AdminCartsControllerCore extends AdminController
     public function ajaxProcessDuplicateOrder()
     {
         if ($this->tabAccess['edit'] === '1') {
-
             $errors = array();
             if (!$id_order = Tools::getValue('id_order')) {
                 $errors[] = Tools::displayError('Invalid order');
