@@ -568,7 +568,7 @@ class HotelHelper
                 'id_category' => 'to_be_set_below',
             ),
             'charges' => array(
-                'name' => 'Supplementary charges',
+                'name' => 'Operational charges',
                 'id_category' => 'to_be_set_below',
             ),
         );
