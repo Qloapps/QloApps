@@ -6533,8 +6533,8 @@ table.table_block td {
   .input-date span i, .form-control .input-date span i {
     transform: scale(0.8, 0.6);}
 
-.input-hotel, .form-control .input-hotel, .input-location, .form-control .input-location {
-  background: url("../img/icon/icon-location.svg") no-repeat 10px 50%;
+.input-location, .form-control .input-location {
+  background: url("../img/icon/icon-location.svg") no-repeat 6px 50%;
   padding-left: 35px;
   background-color: #FFF;
 }

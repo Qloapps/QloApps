@@ -22,9 +22,10 @@ class WkRoomSearchBlockAutoCompleteSearchModuleFrontController extends ModuleFro
 {
     public function initContent()
     {
-        $result = array();
         $this->display_column_left = false;
         $this->display_column_right = false;
+
+        $result = array('status' => false);
         $search_data = Tools::getValue('to_search_data');
         $location_category_id = Tools::getValue('location_category_id');
         $obj_htl_info = new HotelBranchInformation();
@@ -35,7 +36,7 @@ class WkRoomSearchBlockAutoCompleteSearchModuleFrontController extends ModuleFro
                 $html = $this->context->smarty->fetch(
                     $this->module->getTemplatePath('location-options.tpl')
                 );
-                $result['status'] = 'success';
+                $result['status'] = true;
                 $result['data'] = $html;
             }
         } elseif (isset($location_category_id) && $location_category_id) {
@@ -57,23 +58,15 @@ class WkRoomSearchBlockAutoCompleteSearchModuleFrontController extends ModuleFro
                 }
 
                 $this->context->smarty->assign(array('hotels_info' => $hotelsInfo));
-                $html_select = $this->context->smarty->fetch(
-                    $this->module->getTemplatePath('hotel-options-select.tpl')
+                $html = $this->context->smarty->fetch(
+                    $this->module->getTemplatePath('hotel-options.tpl')
                 );
 
-                $html_dropdown = $this->context->smarty->fetch(
-                    $this->module->getTemplatePath('hotel-options-dropdown.tpl')
-                );
-
-                $result['status'] = 'success';
-                $result['data_select'] = $html_select;
-                $result['data_dropdown'] = $html_dropdown;
-            } else {
-                $result['status'] = 'failed2';
+                $result['status'] = true;
+                $result['html_hotel_options'] = $html;
             }
-        } else {
-            $result['status'] = 'failed3';
         }
-        die(json_encode($result));
+
+        $this->ajaxDie(json_encode($result));
     }
 }
