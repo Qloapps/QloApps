@@ -675,7 +675,7 @@ class AdminOrdersControllerCore extends AdminController
 
         $this->tpl_list_vars['title'] = $this->l('Orders');
 
-        $this->_use_new_header_filters = true;
+        $this->_use_new_list_header_design = true;
 
         return parent::renderList();
     }

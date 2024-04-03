@@ -189,7 +189,7 @@
 		</script>
 	{/if}
 	{block name="updatelist"}
-		{if $use_new_header_filters}
+		{if $use_new_list_header_design}
 			<div class="list_action_wrapper">
 				<div class="row">
 					{if $fields_optional|count}
@@ -436,7 +436,7 @@
 								</a>
 							{/if}
 						{/foreach}
-							{if $fields_optional|count && !$use_new_header_filters}
+							{if $fields_optional|count && !$use_new_list_header_design}
 								<a class="list-toolbar-btn dropdown-toggle" data-toggle="dropdown" data-target="#dropdown-option-toggle">
 									<span title="" data-toggle="tooltip" class="label-tooltip" data-original-title="{l s='Toggle list'}" data-html="true" data-placement="top">
 									<i class="process-icon-cogs"></i>
@@ -622,7 +622,7 @@
 				</tr>
 			{/block}
 			{block name="tableFilter"}
-				{if !$simple_header && $show_filters && !$use_new_header_filters}
+				{if !$simple_header && $show_filters && !$use_new_list_header_design}
 					<tr class="nodrag nodrop filter {if $row_hover}row_hover{/if}">
 						{if $has_bulk_actions}
 							<th class="text-center">

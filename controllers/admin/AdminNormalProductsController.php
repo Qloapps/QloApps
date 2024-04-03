@@ -2516,7 +2516,7 @@ class AdminNormalProductsControllerCore extends AdminController
         $this->addRowAction('duplicate');
         $this->addRowAction('delete');
 
-        $this->_use_new_header_filters = true;
+        $this->_use_new_list_header_design = true;
 
         return parent::renderList();
     }
