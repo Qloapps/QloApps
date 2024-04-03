@@ -259,7 +259,6 @@ class AdminProductsControllerCore extends AdminController
                 'list' => $this->hotelsArray,
                 'optional' => true,
                 'class' => 'chosen',
-                'remove_onchange' => true,
                 'visible_default' => true,
             );
         }
@@ -308,7 +307,6 @@ class AdminProductsControllerCore extends AdminController
             'list' => array(1 => $this->l('Yes'), 0 => $this->l('No')),
             'optional' => true,
             'visible_default' => true,
-            'remove_onchange' => true,
             'orderby' => false
         );
 
@@ -412,7 +410,6 @@ class AdminProductsControllerCore extends AdminController
             'type' => 'select',
             'list' => $this->locationsAndHotels,
             'filter_key' => 'a!id_category_default',
-            'remove_onchange' => true,
             'displayed' => false,
         );
 

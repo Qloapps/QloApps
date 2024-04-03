@@ -183,7 +183,6 @@ class AdminOrdersControllerCore extends AdminController
                 'list' => $this->hotelsArray,
                 'optional' => true,
                 'class' => 'chosen',
-                'remove_onchange' => true,
                 'visible_default' => true
             ),
             'room_type_name' => array(
@@ -193,7 +192,6 @@ class AdminOrdersControllerCore extends AdminController
                 'list' => $this->roomTypesArray,
                 'optional' => false,
                 'class' => 'chosen',
-                'remove_onchange' => true,
                 'visible_default' => false,
                 'displayed' => false,
             ),
@@ -204,7 +202,6 @@ class AdminOrdersControllerCore extends AdminController
                 'list' => $this->roomsArray,
                 'optional' => false,
                 'class' => 'chosen',
-                'remove_onchange' => true,
                 'visible_default' => false,
                 'displayed' => false,
             ),
@@ -299,7 +296,6 @@ class AdminOrdersControllerCore extends AdminController
                 'filter_key' => 'a!source',
                 'list' => $this->all_order_sources,
                 'optional' => true,
-                'remove_onchange' => true,
                 'visible_default' => true
             ),
             'osname' => array(
