@@ -238,6 +238,9 @@ class CategoryControllerCore extends FrontController
             'ratting_img' => $ratting_img,
         ));
 
+        Media::addJsDef(array(
+            'cart_controller_url' => $this->context->link->getPageLink('cart'),
+        ));
 
 
         /*if (isset($this->context->cookie->id_compare))

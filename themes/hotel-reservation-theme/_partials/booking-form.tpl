@@ -19,7 +19,15 @@
 
 <div class="booking-form card">
     <div class="booking_room_fields">
-        <form id="booking-form" action="" method="post">
+        <form id="booking-form" action="{$link->getPageLink('cart')|escape:'html':'UTF-8'}" method="post">
+            <p class="hidden">
+                <input type="hidden" name="token" value="{$static_token}" />
+                <input type="hidden" name="id_product" value="{$product->id|intval}" id="product_page_product_id" />
+                <input type="hidden" name="add" value="1" />
+                <input type="hidden" name="roomDemands" value="" />
+                <input type="hidden" name="serviceProducts" value="" />
+            </p>
+
             {if isset($id_hotel) && $id_hotel}
                 <div class="form-group htl_location_block">
                     <label for="" class="control-label">{l s='Hotel Location'}</label>
@@ -34,8 +42,8 @@
                             <div class="form-group col-sm-12">
                                 <label class="control-label">{l s='Check In - Check Out'}</label>
                                 <div class="form-control input-date" id="room_date_range"  autocomplete="off" placeholder="{l s='Check-in - Check-out'}"><span>{l s='Check-in'} &nbsp;<i class="icon icon-minus"></i>&nbsp; {l s='Check-out'}</span></div>
-                                <input type="hidden" class="input-date" name="room_check_in" id="room_check_in" value="{if isset($date_from)}{$date_from}{/if}" />
-                                <input type="hidden" class="input-date" name="room_check_out" id="room_check_out" value="{if isset($date_to)}{$date_to}{/if}" />
+                                <input type="hidden" class="input-date" name="dateFrom" id="room_check_in" value="{if isset($date_from)}{$date_from}{/if}" />
+                                <input type="hidden" class="input-date" name="dateTo" id="room_check_out" value="{if isset($date_to)}{$date_to}{/if}" />
                             </div>
                         </div>
                         {if $total_available_rooms > 0}
