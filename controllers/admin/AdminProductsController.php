@@ -245,9 +245,10 @@ class AdminProductsControllerCore extends AdminController
             );
         } else {
             $hotels = HotelBranchInformation::getProfileAccessedHotels($this->context->employee->id_profile, 1);
+            $hotelsArray = array();
             foreach ($hotels as $hotel) {
                 $addressInfo = HotelBranchInformation::getAddress($hotel['id_hotel']);
-                $this->hotelsArray[$hotel['id_hotel']] = $hotel['hotel_name'].', '.$addressInfo['city'];
+                $hotelsArray[$hotel['id_hotel']] = $hotel['hotel_name'].', '.$addressInfo['city'];
             }
 
             $this->fields_list['hotel_name'] = array(
@@ -256,7 +257,7 @@ class AdminProductsControllerCore extends AdminController
                 'multiple' => true,
                 'operator' => 'or',
                 'filter_key' => 'hrt!id_hotel',
-                'list' => $this->hotelsArray,
+                'list' => $hotelsArray,
                 'optional' => true,
                 'class' => 'chosen',
                 'remove_onchange' => true,
@@ -401,7 +402,10 @@ class AdminProductsControllerCore extends AdminController
         $idLocationsCategory = Configuration::get('PS_LOCATIONS_CATEGORY');
         $this->objLocationsCategory = new Category($idLocationsCategory, $this->context->language->id);
         $nestedCategories = Category::getNestedCategories($idLocationsCategory);
-        if ($nestedCategories) {
+        if (isset($nestedCategories[$idLocationsCategory]['children'])
+            && is_array($nestedCategories[$idLocationsCategory]['children'])
+            && count($nestedCategories[$idLocationsCategory]['children'])
+        ) {
             foreach ($nestedCategories[$idLocationsCategory]['children'] as $childCategory) {
                 $this->buildCategoryOptions($childCategory);
             }
@@ -617,7 +621,7 @@ class AdminProductsControllerCore extends AdminController
                 // convert price with the currency from context
                 $this->_list[$i]['price'] = Tools::convertPrice($this->_list[$i]['price'], $this->context->currency, true, $this->context);
                 $this->_list[$i]['price_tmp'] = Product::getPriceStatic($this->_list[$i]['id_product'], true, null,
-                    (int)Configuration::get('PS_PRICE_DISPLAY_PRECISION'), null, false, true, 1, true, null, null, null, $nothing, true, true,
+                    (int)Configuration::get('PS_PRICE_DISPLAY_PRECISION'), null, false, true, 1, true, null, null, null, null, true, true,
                     $context);
             }
         }
