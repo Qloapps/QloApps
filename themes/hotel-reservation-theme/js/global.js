@@ -24,6 +24,7 @@
 */
 //global variables
 var responsiveflag = false;
+var onlineFlag = true;
 
 
 
@@ -493,3 +494,11 @@ function showErrorMessage(msg) {
 function showNoticeMessage(msg) {
 	$.growl.notice({ title: "", message:msg});
 }
+
+window.addEventListener('online', function () {
+	onlineFlag = true;
+});
+
+window.addEventListener('offline', function () {
+	onlineFlag = false;
+});

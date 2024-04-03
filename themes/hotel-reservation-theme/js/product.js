@@ -1466,8 +1466,8 @@ var BookingForm = {
                     }
                 }
             },
-            error: function(jqXHR) {
-                if (jqXHR.readyState == 0) {
+            error: function() {
+                if (!onlineFlag) {
                     showErrorMessage(no_internet_txt);
                 }
             },
