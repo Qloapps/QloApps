@@ -122,6 +122,7 @@ class GuestTrackingControllerCore extends FrontController
                 && ($dateFrom = Tools::getValue('date_from'))
                 && ($dateTo = Tools::getValue('date_to'))
             ) {
+                $order = new Order((int) $idOrder);
                 $objBookingDemand = new HotelBookingDemands();
                 $customer = new Customer((int)$order->id_customer);
                 $useTax = 0;
@@ -162,6 +163,11 @@ class GuestTrackingControllerCore extends FrontController
                         'additionalServices' => $additionalServices,
                     ));
                 }
+                $this->context->smarty->assign(
+                    array(
+                        'objOrder' => $order
+                    )
+                );
                 $response['extra_demands'] = $this->context->smarty->fetch(_PS_THEME_DIR_.'_partials/order_booking_demands.tpl');
             }
             $this->ajaxDie(json_encode($response));
@@ -205,6 +211,7 @@ class GuestTrackingControllerCore extends FrontController
             $objRoomTypeServiceProductOrderDetail = new RoomTypeServiceProductOrderDetail();
             $objRoomType = new HotelRoomType();
 
+            $nonRequestedRooms = 0;
             $anyBackOrder = 0;
 
             foreach ($order_list as &$order) {
@@ -575,6 +582,7 @@ class GuestTrackingControllerCore extends FrontController
         $this->context->smarty->assign(array(
             'shop_name' => Configuration::get('PS_SHOP_NAME'),
             'order_collection' => $order_list,
+            'overbooking_order_states' => OrderState::getOverBookingStates(),
             'refund_allowed' => false,
             'invoiceAllowed' => (int)Configuration::get('PS_INVOICE'),
             'is_guest' => true,
