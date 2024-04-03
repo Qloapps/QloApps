@@ -520,11 +520,11 @@ class OrderDetailControllerCore extends FrontController
                     'additionalServices' => $additionalServices,
                 ));
             }
-            $this->context->smarty->assign(
-                array(
-                    'objOrder' => new Order($idOrder)
-                )
-            );
+
+            $this->context->smarty->assign(array(
+                'objOrder' => new Order($idOrder),
+            ));
+
             $response['extra_demands'] = $this->context->smarty->fetch(_PS_THEME_DIR_.'_partials/order-extra-services.tpl');
         }
 
