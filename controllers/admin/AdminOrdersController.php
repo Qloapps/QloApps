@@ -1781,41 +1781,30 @@ class AdminOrdersControllerCore extends AdminController
                             $extraVars = null;
                         }
 
-                        $bad_delivery = false;
-                        if (($bad_delivery = (bool)!Address::isCountryActiveById((int)$objCart->id_address_delivery))
-                            || !Address::isCountryActiveById((int)$objCart->id_address_invoice)
-                        ) {
-                            if ($bad_delivery) {
-                                $this->errors[] = Tools::displayError('This booking address country is not active.');
-                            } else {
-                                $this->errors[] = Tools::displayError('This invoice address country is not active.');
-                            }
-                        } else {
-                            $amountPaid = Tools::ps_round($amountPaid, 6);
-                            $objEmployee = new Employee($this->context->cookie->id_employee);
+                        $amountPaid = Tools::ps_round($amountPaid, 6);
+                        $objEmployee = new Employee($this->context->cookie->id_employee);
 
-                            $objPaymentModule->validateOrder(
-                                $objCart->id,
-                                $idOrderState,
-                                $amountPaid,
-                                $objPaymentModule->displayName,
-                                $this->l('Manual order -- Employee:').' '.substr($objEmployee->firstname, 0, 1).'. '.$objEmployee->lastname,
-                                $extraVars,
-                                null,
-                                false,
-                                $objCart->secure_key
-                            );
+                        $objPaymentModule->validateOrder(
+                            $objCart->id,
+                            $idOrderState,
+                            $amountPaid,
+                            $objPaymentModule->displayName,
+                            $this->l('Manual order -- Employee:').' '.substr($objEmployee->firstname, 0, 1).'. '.$objEmployee->lastname,
+                            $extraVars,
+                            null,
+                            false,
+                            $objCart->secure_key
+                        );
 
-                            if (isset($this->context->cookie->id_cart)) {
-                                unset($this->context->cookie->id_cart);
-                            }
-                            if (isset($this->context->cookie->id_guest)) {
-                                unset($this->context->cookie->id_guest);
-                            }
+                        if (isset($this->context->cookie->id_cart)) {
+                            unset($this->context->cookie->id_cart);
+                        }
+                        if (isset($this->context->cookie->id_guest)) {
+                            unset($this->context->cookie->id_guest);
+                        }
 
-                            if ($objPaymentModule->currentOrder) {
-                                Tools::redirectAdmin(self::$currentIndex.'&id_order='.$objPaymentModule->currentOrder.'&vieworder'.'&token='.$this->token.'&conf=3');
-                            }
+                        if ($objPaymentModule->currentOrder) {
+                            Tools::redirectAdmin(self::$currentIndex.'&id_order='.$objPaymentModule->currentOrder.'&vieworder'.'&token='.$this->token.'&conf=3');
                         }
                     } else {
                         // if errors render add order form
@@ -4507,14 +4496,6 @@ class AdminOrdersControllerCore extends AdminController
         		'result' => false,
         		'error' => Tools::displayError('The OrderDetail object cannot be loaded.')
         	)));
-
-        $address = new Address(Tools::getValue('id_address'));
-        if (!Validate::isLoadedObject($address)) {
-            die(json_encode(array(
-                'result' => false,
-                'error' => Tools::displayError('The address object cannot be loaded.')
-            )));
-        }
 
         die(json_encode(array(
             'result' => true,
