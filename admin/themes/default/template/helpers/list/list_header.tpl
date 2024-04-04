@@ -376,7 +376,7 @@
 																</select>
 															{else}
 																{if isset($params.filter_key)}
-																	<select id="filter_input_{$key}" class="filter{if isset($params.align) && $params.align == 'center'}center{/if} {if isset($params.class)}{$params.class}{/if}" {if isset($params.add_onchange) && $params.add_onchange}onchange="$('#submitFilterButton{$list_id}').focus();$('#submitFilterButton{$list_id}').click();"{/if} name="{$list_id}Filter_{$params.filter_key}" {if isset($params.width)} style="width:{$params.width}px"{/if}>
+																	<select id="filter_input_{$key}" class="filter{if isset($params.align) && $params.align == 'center'}center{/if} {if isset($params.class)}{$params.class}{/if}" name="{$list_id}Filter_{$params.filter_key}" {if isset($params.width)} style="width:{$params.width}px"{/if}>
 																		<option value="" {if $params.value == ''} selected="selected" {/if}>-</option>
 																		{if isset($params.list) && is_array($params.list)}
 																			{foreach $params.list AS $option_value => $option_display}
@@ -713,7 +713,7 @@
 										</div>
 									{elseif $params.type == 'select'}
 										{if isset($params.filter_key)}
-											<select class="filter{if isset($params.align) && $params.align == 'center'}center{/if}" {if isset($params.add_onchange) && $params.add_onchange}onchange="$('#submitFilterButton{$list_id}').focus();$('#submitFilterButton{$list_id}').click();"{/if} name="{$list_id}Filter_{$params.filter_key}" {if isset($params.width)} style="width:{$params.width}px"{/if}>
+											<select class="filter{if isset($params.align) && $params.align == 'center'}center{/if}" name="{$list_id}Filter_{$params.filter_key}" {if isset($params.width)} style="width:{$params.width}px"{/if}>
 												<option value="" {if $params.value == ''} selected="selected" {/if}>-</option>
 												{if isset($params.list) && is_array($params.list)}
 													{foreach $params.list AS $option_value => $option_display}
