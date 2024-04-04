@@ -38,21 +38,24 @@ function setAmenitiesDescContHeight() {
 		$(this).css('height', amenityDescParentHeight);
 	});
 }
-function setAmenitiesContainerProperties()
-{
+
+$(document).ready(function() {
+	if ($('.homeAmenitiesBlock').length) {
+		setAmenitiesDescContHeight();
+	}
+
 	if ($('.home_amenities_wrapper').length) {
 		setAmenitiesWrapperHeight();
 	}
+});
 
+$(window).resize(function() {
 	if ($('.homeAmenitiesBlock').length) {
 		$('.amenity_desc_cont').css('height', 0);
 		setAmenitiesDescContHeight();
 	}
-}
 
-$(document).ready(function() {
-	setAmenitiesContainerProperties();
-});
-$(window).resize(function() {
-	setAmenitiesContainerProperties();
+	if ($('.home_amenities_wrapper').length) {
+		setAmenitiesWrapperHeight();
+	}
 });
