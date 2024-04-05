@@ -355,7 +355,7 @@ class AdminCustomersControllerCore extends AdminController
             );
         }
 
-        $this->_use_new_list_header_design = true;
+        $this->_new_list_header_design = true;
 
         return parent::renderList();
     }

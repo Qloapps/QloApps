@@ -2549,7 +2549,7 @@ class AdminProductsControllerCore extends AdminController
 
         $this->tpl_list_vars['title'] = $this->l('Room Types');
 
-        $this->_use_new_list_header_design = true;
+        $this->_new_list_header_design = true;
 
         return parent::renderList();
     }
