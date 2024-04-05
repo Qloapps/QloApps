@@ -68,7 +68,7 @@
 		{if $order->with_occupancy}
 			<div class="booking_occupancy">
 				<div class="dropdown">
-					<button class="booking_guest_occupancy btn btn-default btn-left btn-block input-occupancy disabled" type="button">
+					<button class="booking_guest_occupancy form-control btn btn-default btn-left btn-block input-occupancy disabled" type="button">
 						<span>{l s='Select occupancy'}</span>
 					</button>
 					<input type="hidden" class="max_avail_type_qty" value="">

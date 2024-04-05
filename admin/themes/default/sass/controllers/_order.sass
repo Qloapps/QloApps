@@ -14,18 +14,43 @@
 .booking_occupancy
 	.booking_occupancy_wrapper
 		max-height: 250px
+		width: 100%
 		overflow-x: auto
 	label.room_num_wrapper
 		text-decoration: underline
 		margin-bottom: 10px
 
 #booking-documents-modal
-	.documents-list
-		table
-			tbody
-				img
-					max-height: 55px
-					max-width: 55px
+	.documents-list table tbody img
+		max-width: 55px
+
+.toolbar_order_status_badge
+	font-size: 12px
+.error_text
+	color: red
+.room_type_old_price
+	text-decoration: line-through
+	color: #979797
+	font-size: 12px
+.wk-input-date
+	cursor: text
+	background-color: #F5F8F9
+#room_status_info_wrapper .margin-bottom-5
+	margin-bottom: 5px
+#room_status_info_wrapper .room_status_date
+	display: none
+
+#order_detail_view .panel .panel-heading
+	height: auto
+	padding: 5px 5px 3px 5px
+	a
+		text-transform: none
+.modal-body .modal-footer
+	padding: 15px 0px 0px 0px
+.modal-body .tab-content
+	padding: 15px
+	border: 1px solid #ddd
+
 .loading_overlay
 	display: none
 	position: fixed

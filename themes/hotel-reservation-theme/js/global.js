@@ -24,6 +24,7 @@
 */
 //global variables
 var responsiveflag = false;
+var onlineFlag = true;
 
 
 
@@ -115,7 +116,6 @@ $(document).ready(function(){
 	});
 
 	$(document).on('click', '.open_rooms_extra_services_panel', function() {
-		console.log('dasdasd');
 		var idProduct = $(this).data('id_product');
 		var idOrder = $(this).data('id_order');
 		var dateFrom = $(this).data('date_from');
@@ -494,3 +494,11 @@ function showErrorMessage(msg) {
 function showNoticeMessage(msg) {
 	$.growl.notice({ title: "", message:msg});
 }
+
+window.addEventListener('online', function () {
+	onlineFlag = true;
+});
+
+window.addEventListener('offline', function () {
+	onlineFlag = false;
+});
