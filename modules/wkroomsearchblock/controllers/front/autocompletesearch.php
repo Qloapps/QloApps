@@ -46,9 +46,10 @@ class WkRoomSearchBlockAutoCompleteSearchModuleFrontController extends ModuleFro
                 foreach ($cat_ids as $value) {
                     if ($hotel_info = $obj_htl_info->hotelBranchInfoByCategoryId($value['id_category'])) {
                         $maxOrderDate = HotelOrderRestrictDate::getMaxOrderDate($hotel_info['id']);
+                        $preparationTime = (int) HotelOrderRestrictDate::getPreparationTime($hotel_info['id']);
                         $maxOrderDate = date('Y-m-d', strtotime($maxOrderDate));
                         $html .= '<li tabindex="-1" class="search_result_li" data-id-hotel="'.$hotel_info['id'].'" data-hotel-cat-id="'.
-                        $hotel_info['id_category'].'" data-max_order_date="'.$maxOrderDate.'">'.
+                        $hotel_info['id_category'].'" data-max_order_date="'.$maxOrderDate.'" data-preparation_time="'.$preparationTime.'">'.
                         $hotel_info['hotel_name'].'</li>';
                     }
                 }

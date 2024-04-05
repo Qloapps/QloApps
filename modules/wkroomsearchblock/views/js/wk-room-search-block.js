@@ -62,6 +62,14 @@ $(document).ready(function() {
         if (preparation_time) {
             start_date.setDate(start_date.getDate() + parseInt(preparation_time));
             start_date.setHours(0, 0, 0, 0);
+            let selecteDateFrom = new Date(Date.parse(dateFrom));
+            let selecteDateTo = new Date(Date.parse(dateTo));
+            if (selecteDateFrom < start_date
+                || selecteDateTo < start_date
+            ) {
+                $('#check_in_time').val('');
+                $('#check_out_time').val('');
+            }
         }
 
         if (max_order_date) {
@@ -203,6 +211,11 @@ $(document).ready(function() {
                     $('#hotel_cat_name').html('Select Hotel');
                     $('.hotel_dropdown_ul').empty();
                     $('.hotel_dropdown_ul').html(result.data);
+                    // Resetting the data from previously selected hotel
+                    $('#preparation_time').val(0);
+                    var max_order_date = $('#max_order_date').val();
+                    var preparation_time = 0;
+                    createDateRangePicker(max_order_date, preparation_time, $('#check_in_time').val(), $('#check_out_time').val());
                 } else {
                     alert(no_results_found_cond);
                 }

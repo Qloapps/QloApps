@@ -341,8 +341,13 @@ class ProductControllerCore extends FrontController
                     $date_from = Tools::getValue('date_from');
                     $date_to = Tools::getValue('date_to');
 
+                    $preparationTime = (int) HotelOrderRestrictDate::getPreparationTime($hotel_id);
                     if (!($date_from = Tools::getValue('date_from'))) {
                         $date_from = date('Y-m-d');
+                        if ($preparationTime) {
+                            $date_from = date('Y-m-d', strtotime('+ '.$preparationTime.' day'));
+                        }
+
                         // set date to according to los
                         $objHotelRoomTypeRestrictionDateRange = new HotelRoomTypeRestrictionDateRange();
                         $los = $objHotelRoomTypeRestrictionDateRange->getRoomTypeLengthOfStay($this->product->id, $date_from);
@@ -368,9 +373,6 @@ class ProductControllerCore extends FrontController
                         }
                     }
                     /*End*/
-                    // booking preparation time
-                    $preparationTime = (int) HotelOrderRestrictDate::getPreparationTime($hotel_id);
-
                     $objHotelImage = new HotelImage();
                     $hotelImageLink = null;
                     if ($coverImage = HotelImage::getCover($hotel_id)) {
