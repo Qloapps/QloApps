@@ -75,8 +75,8 @@
 				$('#submitFilter{$list_id}').val(1);
 			});
 
-			if ($("table .datepicker").length > 0) {
-				$("table .datepicker").datepicker({
+			if ($("form .datepicker").length > 0) {
+				$("form .datepicker").datepicker({
 					prevText: '',
 					nextText: '',
 					altFormat: 'yy-mm-dd'
@@ -121,7 +121,305 @@
 	<input type="hidden" name="page" value="{$page|intval}"/>
 	<input type="hidden" name="selected_pagination" value="{$selected_pagination|intval}"/>
 	{block name="override_form_extra"}{/block}
-		<div class="panel col-lg-12">
+	{if !$simple_header && $show_filters}
+		<script>
+			$(document).ready(function(){
+				$('#selected_filter_container .selected_filters span i').on('click', function() {
+					let form = $(this).closest('form');
+					let type = $(this).parent().data('filter_type');
+					$(this).parent().remove();
+					if (type == 'date' || type == 'datetime') {
+						$(form).find('#list_filters_panel [name*="'+$(this).parent().data('filter_key')+'"]').val('');
+					} else if (type == 'range') {
+						$(form).find('#list_filters_panel [name*="{$list_id}Filter_'+$(this).parent().data('filter_key')+'"]').val('');
+					} else if (type == 'select' || type == 'bool') {
+						$(form).find('#list_filters_panel select[name*="{$list_id}Filter_'+$(this).parent().data('filter_key')+'"] option:selected').prop('selected', false);
+					} else {
+						$(form).find('#list_filters_panel input[name="{$list_id}Filter_'+$(this).parent().data('filter_key')+'"]').val('');
+					}
+
+					// set post data for empty multi-select filters
+					$(form).find('select[multiple]').each(function (i, selectElement) {
+						if ($(selectElement).find('option:selected').length == 0) {
+							$(form).append('<input type="hidden" name="' + $(selectElement).attr('name').slice(0, -2) + '" value="">');
+						}
+					});
+
+					form.submit();
+				});
+				{if $fields_optional|count}
+					toggleVisibleColumns($('#form-{$list_id}'));
+				{/if}
+				$('#optional-list-toggle').on('click', function(e) {
+					e.stopPropagation();
+				})
+				$('#form-{$list_id} input[name="list_fields_visibility"]').on('change', function(){
+					toggleVisibleColumns($('#form-{$list_id}'));
+				})
+			});
+
+			function toggleVisibleColumns(form) {
+				var list_fields_visibility = [];
+				$(form).find('input[name="list_fields_visibility"]:checked').each(function(i, field){
+					list_fields_visibility.push($(field).val());
+				});
+
+				$(form).find('table.table .field_optional').hide();
+				$(form).find('table.table .field_optional').each(function(i, val) {
+					if (list_fields_visibility.includes($(this).data('key'))) {
+						$(this).show();
+					}
+				});
+				updateListVisibility(list_fields_visibility)
+			}
+			function updateListVisibility(list_fields_visibility) {
+				$.ajax({
+					type: 'POST',
+					headers: { "cache-control": "no-cache" },
+					url: '{$action}',
+					data: {
+						ajax: 1,
+						action: 'updateListVisivility',
+						list_fields_visibility: list_fields_visibility
+					},
+					cache: false,
+					dataType: 'json'
+				});
+			}
+		</script>
+	{/if}
+	{block name="updatelist"}
+		{if $new_list_header_design}
+			<div class="list_action_wrapper">
+				<div class="row">
+					{if $fields_optional|count}
+						<div class="col-xs-4 col-sm-3 col-md-2">
+							<div class="list_availibility_container">
+								<button type="button" class="btn btn-default btn-left btn-block dropdown-toggle" data-toggle="dropdown">
+									<span>{l s='Available Fields'}
+									<i class="icon-caret-down pull-right"></i>
+								</button>
+								<ul id="optional-list-toggle" class="dropdown-menu">
+									{foreach $fields_optional as $key => $field}
+										<li>
+											<label>
+												<input type="checkbox" name="list_fields_visibility" value="{$key}" {if isset($field['selected']) && $field['selected']}checked="checked"{/if}>
+												{$field['title']}
+											</label>
+										</li>
+									{/foreach}
+								</ul>
+							</div>
+						</div>
+					{/if}
+					{if !$simple_header && $show_filters}
+						<div class="col-xs-3 col-xs-offset-{if $fields_optional|count}}5{else}9{/if} col-sm-2 col-sm-offset-{if $fields_optional|count}}7{else}10{/if} col-md-1 col-md-offset-{if $fields_optional|count}9{else}11{/if}">
+							<div class="list_filter_container">
+								<button type="button" class="btn btn-default btn-block" data-toggle="collapse" data-target="#list_filters_panel">
+									<i class="icon-sliders"></i>
+									<span>{l s='Filters'}
+								</button>
+							</div>
+						</div>
+					{/if}
+				</div>
+				<div class="row">
+					<div class="col-sm-12">
+						{if $filters_has_value}
+							<div id="selected_filter_container">
+								{l s='Filters: '}
+								<span class="selected_filters">
+									{foreach $fields_display AS $key => $params}
+										{if (!isset($params.search) || $params.search) && $params.value != ''}
+											{if ($params.type == 'date' || $params.type == 'datetime' || $params.type == 'range') && $params.value|is_array}
+												{assign var="filter_value" value=''}
+												{foreach $params.value as $value}
+													{if (isset($value) && ($value !== '' || $value === 0))}
+														{if !(isset($filter_value) && ($filter_value !== '' || $filter_value === 0))}
+															{assign var="filter_value" value=$value}
+														{else}
+															{assign var="filter_value" value="`$filter_value` - `$value`"}
+														{/if}
+													{/if}
+												{/foreach}
+												{if (isset($filter_value) && ($filter_value !== '' || $filter_value === 0))}
+													<span data-filter_key="{if isset($params.name_date)}{$params.name_date}{else}{$key}{/if}" data-filter_type="{$params.type}">
+														{$params['title']|escape:'html':'UTF-8'}: <span class="filter_value">{$filter_value|escape:'html':'UTF-8'}</span>
+														<i class="icon-times"></i>
+													</span>
+												{/if}
+											{elseif $params.type == 'select'}
+												{if isset($params.multiple) && $params.multiple}
+													<span data-filter_key="{if isset($params.filter_key)}{$params.filter_key}{else}{$key}{/if}" data-filter_type="{$params.type}" data-multiple="{$params.multiple|intval}" data-operator="{$params.operator}">
+														{$params['title']|escape:'html':'UTF-8'}:
+														<span class="filter_value">
+															{foreach from=$params.value item=option name=foreachInfo}
+																{$params.list[$option]}{if !$smarty.foreach.foreachInfo.last}{if $params.operator == 'or'} | {else}, {/if}{/if}
+															{/foreach}
+														</span>
+														<i class="icon-times"></i>
+													</span>
+												{else}
+													<span data-filter_key="{if isset($params.filter_key)}{$params.filter_key}{else}{$key}{/if}" data-filter_type="{$params.type}">
+														{$params['title']|escape:'html':'UTF-8'}: <span class="filter_value">{$params['list'][$params['value']]|replace: '&nbsp;' : ''}</span>
+														<i class="icon-times"></i>
+													</span>
+												{/if}
+											{elseif $params.type == 'bool'}
+												<span data-filter_key="{if isset($params.filter_key)}{$params.filter_key}{else}{$key}{/if}" data-filter_type="{$params.type}">
+													{$params['title']|escape:'html':'UTF-8'}: <span class="filter_value">{if $params['value'] == 1}{l s='Yes'}{else}{l s='No'}{/if}</span>
+													<i class="icon-times"></i>
+												</span>
+											{else}
+												<span data-filter_key="{if isset($params.filter_key)}{$params.filter_key}{else}{$key}{/if}" data-filter_type="{$params.type}">
+													{$params['title']|escape:'html':'UTF-8'}: <span class="filter_value">{$params['value']|escape:'html':'UTF-8'}</span>
+													<i class="icon-times"></i>
+												</span>
+											{/if}
+										{/if}
+									{/foreach}
+								</span>
+							</div>
+						{/if}
+						<div class="panel collapse" id="list_filters_panel">
+							<div class="row">
+								<div class="col-sm-12">
+									<div class="list_filters">
+										{foreach $fields_display AS $key => $params}
+											{if !isset($params.search) || $params.search}
+												<div class="row">
+													<label class="col-xs-3" for="filter_input_{$key}">{$params['title']|escape:'html':'UTF-8'}</label>
+													<div class="col-xs-9">
+														{if $params.type == 'range'}
+															<div class="input_range">
+																<input type="text" class="filter form-control" name="{$list_id}Filter_{if isset($params.filter_key)}{$params.filter_key}{else}{$key}{/if}[0]" placeholder="{l s='From'}" value="{if isset($params.value.0)}{$params.value.0}{/if}">
+																<input type="text" class="filter form-control" name="{$list_id}Filter_{if isset($params.filter_key)}{$params.filter_key}{else}{$key}{/if}[1]" placeholder="{l s='To'}" value="{if isset($params.value.1)}{$params.value.1}{/if}">
+															</div>
+														{elseif $params.type == 'bool'}
+															<select id="filter_input_{$key}" class="filter center" name="{$list_id}Filter_{if isset($params.filter_key)}{$params.filter_key}{else}{$key}{/if}">
+																<option value="">-</option>
+																<option value="1" {if $params.value == 1} selected="selected" {/if}>{l s='Yes'}</option>
+																<option value="0" {if $params.value == 0 && $params.value != ''} selected="selected" {/if}>{l s='No'}</option>
+															</select>
+														{elseif $params.type == 'date' || $params.type == 'datetime'}
+															<div class="date_range">
+																<div class="input-group center">
+																	<input type="text" class="filter datepicker date-input form-control" id="local_{$params.id_date}_0" name="local_{$params.name_date}[0]"  placeholder="{l s='From'}" autocomplete="off"/>
+																	<input type="hidden" id="{$params.id_date}_0" name="{$params.name_date}[0]" value="{if isset($params.value.0)}{$params.value.0}{/if}">
+																	<span class="input-group-addon">
+																		<i class="icon-calendar"></i>
+																	</span>
+																</div>
+																<div class="input-group center">
+																	<input type="text" class="filter datepicker date-input form-control" id="local_{$params.id_date}_1" name="local_{$params.name_date}[1]"  placeholder="{l s='To'}"  autocomplete="off"/>
+																	<input type="hidden" id="{$params.id_date}_1" name="{$params.name_date}[1]" value="{if isset($params.value.1)}{$params.value.1}{/if}">
+																	<span class="input-group-addon">
+																		<i class="icon-calendar"></i>
+																	</span>
+																</div>
+																<script>
+																	$(function() {
+																		var dateStart = parseDate($("#{$params.id_date}_0").val());
+																		var dateEnd = parseDate($("#{$params.id_date}_1").val());
+																		$("#local_{$params.id_date}_0").datepicker("option", "altField", "#{$params.id_date}_0");
+																		$("#local_{$params.id_date}_1").datepicker("option", "altField", "#{$params.id_date}_1");
+																		if (dateStart !== null){
+																			$("#local_{$params.id_date}_0").datepicker("setDate", dateStart);
+																		}
+																		if (dateEnd !== null){
+																			$("#local_{$params.id_date}_1").datepicker("setDate", dateEnd);
+																		}
+
+																		$('#local_{$params.id_date}_0').datepicker('option', {
+																			prevText: '',
+																			nextText: '',
+																			dateFormat: 'yy-mm-dd',
+																			onClose: function() {
+																				let dateFrom = $('#local_{$params.id_date}_0').val().trim();
+																				let dateTo = $('#local_{$params.id_date}_1').val().trim();
+
+																				if ((dateFrom && dateTo) && (dateFrom >= dateTo)) {
+																					let objDateToMin = $.datepicker.parseDate('yy-mm-dd', dateFrom);
+																					objDateToMin.setDate(objDateToMin.getDate());
+
+																					$('#local_{$params.id_date}_1').datepicker('option', 'minDate', objDateToMin);
+																				}
+																			},
+																		});
+
+																		$('#local_{$params.id_date}_1').datepicker('option', {
+																			prevText: '',
+																			nextText: '',
+																			dateFormat: 'yy-mm-dd',
+																			beforeShow: function() {
+																				let dateFrom = $('#local_{$params.id_date}_0').val().trim();
+
+																				if (typeof dateFrom != 'undefined' && dateFrom != '') {
+																					let objDateToMin = $.datepicker.parseDate('yy-mm-dd', dateFrom);
+																					objDateToMin.setDate(objDateToMin.getDate());
+
+																					$('#local_{$params.id_date}_1').datepicker('option', 'minDate', objDateToMin);
+																				}
+																			},
+																		});
+																	});
+																</script>
+															</div>
+														{elseif $params.type == 'select'}
+															{if isset($params.multiple) && $params.multiple}
+																<select id="filter_input_{$key}" class="filter{if isset($params.align) && $params.align == 'center'}center{/if} select_multiple_{$params.operator} chosen" multiple name="{$list_id}Filter_{$params.filter_key}[]" {if isset($params.width)} style="width:{$params.width}px"{/if}>
+																	{if isset($params.list) && is_array($params.list)}
+																		{foreach $params.list AS $option_value => $option_display}
+																			<option value="{$option_value}" {if isset($params.value) && $params.value}{if in_array($option_value, $params.value)} selected="selected"{/if}{/if}>{$option_display}</option>
+																		{/foreach}
+																	{/if}
+																</select>
+															{else}
+																{if isset($params.filter_key)}
+																	<select id="filter_input_{$key}" class="filter{if isset($params.align) && $params.align == 'center'}center{/if} {if isset($params.class)}{$params.class}{/if}" name="{$list_id}Filter_{$params.filter_key}" {if isset($params.width)} style="width:{$params.width}px"{/if}>
+																		<option value="" {if $params.value == ''} selected="selected" {/if}>-</option>
+																		{if isset($params.list) && is_array($params.list)}
+																			{foreach $params.list AS $option_value => $option_display}
+																				<option value="{$option_value}" {if (string)$option_display === (string)$params.value ||  (string)$option_value === (string)$params.value} selected="selected"{/if}>{$option_display}</option>
+																			{/foreach}
+																		{/if}
+																	</select>
+																{/if}
+															{/if}
+														{else}
+															<input type="text" id="filter_input_{$key}" class="filter" name="{$list_id}Filter_{if isset($params.filter_key)}{$params.filter_key}{else}{$key}{/if}" value="{$params.value|escape:'html':'UTF-8'}" {if isset($params.width) && $params.width != 'auto'} style="width:{$params.width}px"{/if} />
+														{/if}
+													</div>
+												</div>
+											{/if}
+										{/foreach}
+										{if $has_actions || $show_filters}
+											<div class="actions">
+												<hr>
+												{if $show_filters}
+												<span class="pull-right">
+													<button type="submit" id="submitFilterButton{$list_id}" name="submitFilter" class="btn btn-default" data-list-id="{$list_id}">
+														<i class="icon-search"></i> {l s='Search'}
+													</button>
+													{if $filters_has_value}
+														<button type="submit" name="submitReset{$list_id}" class="btn btn-warning">
+															<i class="icon-eraser"></i> {l s='Reset'}
+														</button>
+													{/if}
+												</span>
+												{/if}
+											</div>
+										{/if}
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		{/if}
+	{/block}
+	<div class="panel col-lg-12">
 		{block name="panel_heading"}
 			<div class="panel-heading">
 				{if isset($icon)}<i class="{$icon}"></i> {/if}{if is_array($title)}{$title|end}{else}{$title}{/if}
@@ -138,7 +436,7 @@
 								</a>
 							{/if}
 						{/foreach}
-							{if $fields_optional|count}
+							{if $fields_optional|count && !$new_list_header_design}
 								<a class="list-toolbar-btn dropdown-toggle" data-toggle="dropdown" data-target="#dropdown-option-toggle">
 									<span title="" data-toggle="tooltip" class="label-tooltip" data-original-title="{l s='Toggle list'}" data-html="true" data-placement="top">
 									<i class="process-icon-cogs"></i>
@@ -154,46 +452,6 @@
 									{/foreach}
 								</ul>
 							{/if}
-							<script type="text/javascript">
-								$(document).ready(function(){
-									updateListVisibility();
-									$('#optional-list-toggle').on('click', function(e) {
-										e.stopPropagation();
-									})
-									$('input[name="list_fields_visibility"]').on('change', function(){
-										updateListVisibility();
-									})
-								});
-								function updateListVisibility() {
-									var list_fields_visibility = [];
-									$('input[name="list_fields_visibility"]:checked').each(function(i, field){
-										list_fields_visibility.push($(field).val());
-									});
-									const table = $('table.table.{$table}');
-									$(table).find('.field_optional').hide();
-									$(table).find('.field_optional').each(function(i, val) {
-										if (list_fields_visibility.includes($(this).data('key'))) {
-											$(this).show();
-										}
-									});
-
-									$.ajax({
-										type: 'POST',
-										headers: { "cache-control": "no-cache" },
-										url: '{$action}',
-										data: {
-											ajax: 1,
-											action: 'updateListVisivility',
-											list_fields_visibility: list_fields_visibility
-										},
-										cache: false,
-										dataType: 'json',
-										success: function(data) {
-
-										}
-									});
-								}
-							</script>
 							<a class="list-toolbar-btn" href="javascript:location.reload();">
 								<span title="" data-toggle="tooltip" class="label-tooltip" data-original-title="{l s='Refresh list'}" data-html="true" data-placement="top">
 									<i class="process-icon-refresh"></i>
@@ -364,7 +622,7 @@
 				</tr>
 			{/block}
 			{block name="tableFilter"}
-				{if !$simple_header && $show_filters}
+				{if !$simple_header && $show_filters && !$new_list_header_design}
 					<tr class="nodrag nodrop filter {if $row_hover}row_hover{/if}">
 						{if $has_bulk_actions}
 							<th class="text-center">
@@ -455,7 +713,7 @@
 										</div>
 									{elseif $params.type == 'select'}
 										{if isset($params.filter_key)}
-											<select class="filter{if isset($params.align) && $params.align == 'center'}center{/if}" onchange="$('#submitFilterButton{$list_id}').focus();$('#submitFilterButton{$list_id}').click();" name="{$list_id}Filter_{$params.filter_key}" {if isset($params.width)} style="width:{$params.width}px"{/if}>
+											<select class="filter{if isset($params.align) && $params.align == 'center'}center{/if}" name="{$list_id}Filter_{$params.filter_key}" {if isset($params.width)} style="width:{$params.width}px"{/if}>
 												<option value="" {if $params.value == ''} selected="selected" {/if}>-</option>
 												{if isset($params.list) && is_array($params.list)}
 													{foreach $params.list AS $option_value => $option_display}

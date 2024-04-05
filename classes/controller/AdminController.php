@@ -197,6 +197,9 @@ class AdminControllerCore extends Controller
     /** @var string */
     protected $_filterHaving;
 
+    /** @var string */
+    protected $_new_list_header_design = false;
+
     /** @var array Temporary SQL table WHERE clause determined by filter fields */
     protected $_tmpTableFilter = '';
 
@@ -2511,6 +2514,7 @@ class AdminControllerCore extends Controller
         }
 
         $this->setHelperDisplay($helper);
+        $helper->_new_list_header_design = $this->_new_list_header_design;
         $helper->_default_pagination = $this->_default_pagination;
         $helper->_pagination = $this->_pagination;
         $helper->tpl_vars = $this->getTemplateListVars();
