@@ -447,6 +447,16 @@ $(document).ready(function() {
 
                 // set input field value
                 $(this).closest('.occupancy_count_block').find('.occupancy_count > span').text(elementVal);
+            } else {
+                if (elementVal >= max_child_in_room) {
+                    if (elementVal == 0) {
+                        showOccupancyError(no_children_allowed_txt, $(this).closest(".occupancy_info_block"));
+                    } else {
+                        showOccupancyError(max_children_txt, $(this).closest(".occupancy_info_block"));
+                    }
+                } else {
+                    showOccupancyError(max_occupancy_reached_txt, $(this).closest(".occupancy_info_block"));
+                }
             }
         } else {
             element.val(elementVal);
@@ -457,6 +467,18 @@ $(document).ready(function() {
 
         setGuestOccupancy();
     });
+
+    var errorMsgTime;
+    function showOccupancyError(msg, occupancy_info_block)
+    {
+        var errorMsgBlock = $(occupancy_info_block).find('.occupancy-input-errors')
+        $(errorMsgBlock).html(msg).parent().show('fast');
+        clearTimeout(errorMsgTime);
+        errorMsgTime = setTimeout(function() {
+            $(errorMsgBlock).parent().hide('fast');
+        }, 1000);
+
+    }
 
     $(document).on('click', '#search_occupancy_wrapper .occupancy_quantity_down', function(e) {
         e.preventDefault();

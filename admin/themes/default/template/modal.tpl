@@ -27,7 +27,7 @@
 		<div class="modal-content">
 			{if isset($modal_title)}
 			<div class="modal-header">
-				<button type="button" class="close" data-dismiss="modal">&times;</button>
+				<button type="button" class="close" data-dismiss="modal"><i class="icon-remove-sign"></i></button>
 				<h4 class="modal-title">{$modal_title}</h4>
 			</div>
 			{/if}
@@ -36,7 +36,7 @@
 
 			{if isset($modal_actions)}
 			<div class="modal-footer">
-				<button type="button" class="btn btn-default" data-dismiss="modal">{l s='Close'}</button>
+				<button type="button" class="btn btn-default btn-close" data-dismiss="modal">{l s='Close'}</button>
 				{foreach $modal_actions as $action}
 					{if $action.type == 'link'}
 						<a href="{$action.href}" class="btn {$action.class}">{$action.label}</a>

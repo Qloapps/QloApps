@@ -482,7 +482,7 @@ class HotelReservationSystemDb
             ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8;",
 
             "INSERT INTO `"._DB_PREFIX_."htl_settings_link_lang` (`id_settings_link`, `id_lang`, `name`, `hint`)
-            SELECT 1, `id_lang`, 'General Settings', 'Configure Your hotel general gettings using this option.'
+            SELECT 1, `id_lang`, 'General Settings', 'Configure Your hotel general settings using this option.'
             FROM `"._DB_PREFIX_."lang`
             ORDER BY `id_lang`;",
 

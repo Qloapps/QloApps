@@ -9,8 +9,6 @@ Here are your login details:
 
 E-MAIL ADDRESS: {email}
 
-PASSWORD: {passwd} 		 
-
 Important Security Tips:
 
 * Always keep your account details safe.
@@ -22,7 +20,7 @@ Important Security Tips:
 * Should you suspect someone is using your account illegally, please
 notify us immediately.
 
-You can now place orders on our shop: {shop_name} [/{shop_url}] 
+You can now place orders on our website: {shop_name} [/{shop_url}] 
 
 {shop_name} [/{shop_url}] powered by Webkul(tm)
 [https://webkul.com] 

@@ -22,14 +22,24 @@
 *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 *}
-{capture name=path}{l s='Your address'}{/capture}
+{capture name=path}
+	<a href="{$link->getPageLink('my-account', true)|escape:'html':'UTF-8'}">
+		{l s='My account'}
+	</a>
+	<span class="navigation-pipe">
+		{$navigationPipe}
+	</span>
+	<span class="navigation_page">
+		{l s='Address'}
+	</span>
+{/capture}
 	{if isset($smarty.get.updated) && $smarty.get.updated}
 		<p class="alert alert-success">
 			{l s='Your address has been successfully updated.'}
 		</p>
 	{/if}
 <div class="box">
-	<h1 class="page-subheading">{l s='Your address'}</h1>
+	<h1 class="page-subheading">{l s='Address'}</h1>
 	<p class="info-title">
 		{if isset($id_address) && (isset($smarty.post.alias) || isset($address->alias))}
 			{l s='Modify address'}
@@ -215,7 +225,7 @@
 <ul class="footer_links clearfix">
 	<li>
 		<a class="btn btn-defaul button button-small" href="{$link->getPageLink('my-account', true)|escape:'html':'UTF-8'}">
-			<span><i class="icon-chevron-left"></i> {l s='Back to your account'}</span>
+			<span><i class="icon-chevron-left"></i> {l s='Back to My account'}</span>
 		</a>
 	</li>
 </ul>

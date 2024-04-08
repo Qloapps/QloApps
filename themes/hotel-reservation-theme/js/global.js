@@ -24,6 +24,7 @@
 */
 //global variables
 var responsiveflag = false;
+var onlineFlag = true;
 
 
 
@@ -115,7 +116,6 @@ $(document).ready(function(){
 	});
 
 	$(document).on('click', '.open_rooms_extra_services_panel', function() {
-		console.log('dasdasd');
 		var idProduct = $(this).data('id_product');
 		var idOrder = $(this).data('id_order');
 		var dateFrom = $(this).data('date_from');
@@ -495,37 +495,10 @@ function showNoticeMessage(msg) {
 	$.growl.notice({ title: "", message:msg});
 }
 
+window.addEventListener('online', function () {
+	onlineFlag = true;
+});
 
-// highlight dates of the selected date range
-function highlightSelectedDateRange(date, checkIn, checkOut)
-{
-    if (checkIn || checkOut) {
-        // Lets make the date in the required format
-        var currentDate = date.getDate();
-        var currentMonth = date.getMonth()+1;
-        if (currentMonth < 10) {
-            currentMonth = '0' + currentMonth;
-        }
-        if (currentDate < 10) {
-            currentDate = '0' + currentDate;
-        }
-        dmy = date.getFullYear() + "-" + currentMonth + "-" + currentDate;
-
-        if (checkIn) {
-            checkIn = checkIn.split("-");
-            checkIn = (checkIn[2]) + '-' + (checkIn[1]) + '-' + (checkIn[0]);
-        }
-        if (checkOut) {
-            checkOut = checkOut.split("-");
-            checkOut = (checkOut[2]) + '-' + (checkOut[1]) + '-' + (checkOut[0]);
-        }
-
-        if (dmy == checkIn || dmy == checkOut) {
-            return [true, 'selectedCheckedDate', ''];
-        } else if ((checkIn && checkOut) && (dmy >= checkIn && dmy <= checkOut)) {
-            return [true, 'in-select-date-range', ''];
-        }
-    }
-
-    return [true, ''];
-}
+window.addEventListener('offline', function () {
+	onlineFlag = false;
+});

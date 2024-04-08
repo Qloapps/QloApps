@@ -54,20 +54,20 @@ class AdminCountriesControllerCore extends AdminController
             'dir' => 'st'
         );
 
-        $this->fields_options = array(
-            'general' => array(
-                'title' =>    $this->l('Country options'),
-                'fields' =>    array(
-                    'PS_RESTRICT_DELIVERED_COUNTRIES' => array(
-                        'title' => $this->l('Restrict country selections in front office to those covered by active carriers'),
-                        'cast' => 'intval',
-                        'type' => 'bool',
-                        'default' => '0'
-                    )
-                ),
-                'submit' => array('title' => $this->l('Save'))
-            )
-        );
+        // $this->fields_options = array(
+        //     'general' => array(
+        //         'title' =>    $this->l('Country options'),
+        //         'fields' =>    array(
+        //             'PS_RESTRICT_DELIVERED_COUNTRIES' => array(
+        //                 'title' => $this->l('Restrict country selections in front office to those covered by active carriers'),
+        //                 'cast' => 'intval',
+        //                 'type' => 'bool',
+        //                 'default' => '0'
+        //             )
+        //         ),
+        //         'submit' => array('title' => $this->l('Save'))
+        //     )
+        // );
 
         $zones_array = array();
         $this->zones = Zone::getZones();
@@ -366,6 +366,16 @@ class AdminCountriesControllerCore extends AdminController
 
         $this->fields_form['submit'] = array(
             'title' => $this->l('Save')
+        );
+
+        $this->fields_form['buttons'] = array(
+            'save-and-stay' => array(
+                'title' => $this->l('Save and stay'),
+                'name' => 'submitAdd'.$this->table.'AndStay',
+                'type' => 'submit',
+                'class' => 'btn btn-default pull-right',
+                'icon' => 'process-icon-save',
+            )
         );
 
         return parent::renderForm();

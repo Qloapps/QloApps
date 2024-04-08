@@ -186,14 +186,6 @@ class HotelOrderRefundRules extends ObjectModel
                                 if ($refRule['payment_type'] == HotelOrderRefundRules::WK_REFUND_RULE_PAYMENT_TYPE_PERCENTAGE) {
                                     $bookingCancellationDetail['reduction_type'] = HotelOrderRefundRules::WK_REFUND_RULE_PAYMENT_TYPE_PERCENTAGE;
                                     $bookingCancellationDetail['cancelation_charge'] = $paidAmount * ($refundValue / 100);
-
-                                    if ($defaultCurrency != $orderCurrency) {
-                                        $bookingCancellationDetail['cancelation_charge'] = Tools::convertPriceFull(
-                                            $bookingCancellationDetail['cancelation_charge'],
-                                            $objDefaultCurrency,
-                                            $objOrderCurrency
-                                        );
-                                    }
                                 } else {
                                     $bookingCancellationDetail['reduction_type'] = HotelOrderRefundRules::WK_REFUND_RULE_PAYMENT_TYPE_FIXED;
                                     if ($defaultCurrency != $orderCurrency) {
@@ -275,4 +267,23 @@ class HotelOrderRefundRules extends ObjectModel
         return array();
 
     }
+
+    public function searchByName($query, $idLang = false)
+    {
+        if (!$idLang) {
+            $idLang = Context::getContext()->language->id;
+        }
+
+        return Db::getInstance()->executeS(
+            'SELECT horr.*, horrl.* FROM `'._DB_PREFIX_.'htl_order_refund_rules` horr
+            LEFT JOIN `'._DB_PREFIX_.'htl_order_refund_rules_lang` horrl
+            ON horrl.`id_refund_rule` = horr.`id_refund_rule`
+            WHERE (
+                horrl.`name` LIKE \'%'.pSQL($query).'%\' OR
+                horrl.`description` LIKE \'%'.pSQL($query).'%\'
+            )
+            AND horrl.`id_lang`='.(int) $idLang
+        );
+    }
+
 }

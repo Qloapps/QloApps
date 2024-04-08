@@ -65,7 +65,7 @@ class WkHotelRoom extends Module
                         ImageType::getFormatedName('large')
                     );
                 }
-                $productPriceWithoutReduction = $product->getPriceWithoutReduct(!$useTax);
+                $productPriceWithoutReduction = $product->getPriceWithoutReduct(!$useTax, false, 6, 1);
                 $product_price = Product::getPriceStatic($idProduct, $useTax);
                 $htlRoom['image'] = $prodImg;
                 $htlRoom['description'] = $product->description_short;

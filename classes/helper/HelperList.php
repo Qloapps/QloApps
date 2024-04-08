@@ -38,6 +38,8 @@ class HelperListCore extends Helper
     /** @var array WHERE clause determined by filter fields */
     protected $_filter;
 
+    public $_new_list_header_design = false;
+
     /** @var array Number of results in list per page (used in select field) */
     public $_pagination = array(20, 50, 100, 300, 1000);
 
@@ -660,23 +662,41 @@ class HelperListCore extends Helper
                         $value = json_decode($value, true);
                     }
 
-                    if (isset($value[0]) && !Validate::isUnsignedInt($value[0])) {
+                    // set validation type
+                    if (isset($params['validation']) && $params['validation'] && method_exists('Validate', $params['validation'])) {
+                        $validation = $params['validation'];
+                    } else {
+                        $validation = 'isUnsignedInt';
+                    }
+
+                    $hasValueFrom = isset($value[0]) && ($value[0] !== '' || $value[0] === 0);
+                    if ($hasValueFrom && !Validate::$validation($value[0])) {
                         $value[0] = '';
                     }
-                    if (isset($value[1]) && !Validate::isUnsignedInt($value[1])) {
+
+                    $hasValueTo = isset($value[1]) && ($value[1] !== '' || $value[1] === 0);
+                    if ($hasValueTo && !Validate::$validation($value[1])) {
                         $value[1] = '';
                     }
-                    if (isset($value[0]) && isset($value[1]) && $value[0] > $value[1]) {
+
+                    if ($hasValueFrom && $hasValueTo && $value[0] > $value[1]) {
                         $value[1] = '';
                     }
                     break;
 
                 case 'select':
-                    foreach ($params['list'] as $option_value => $option_display) {
-                        if (isset(Context::getContext()->cookie->{$prefix.$this->list_id.'Filter_'.$params['filter_key']})
-                            && Context::getContext()->cookie->{$prefix.$this->list_id.'Filter_'.$params['filter_key']} == $option_value
-                            && Context::getContext()->cookie->{$prefix.$this->list_id.'Filter_'.$params['filter_key']} != '') {
-                            $this->fields_list[$key]['select'][$option_value]['selected'] = 'selected';
+                    if (isset($params['multiple']) && $params['multiple']) {
+                        if (!isset($params['operator'])) {
+                            $params['operator'] = 'or';
+                        }
+                        $value = json_decode($value, true);
+                    } else {
+                        foreach ($params['list'] as $option_value => $option_display) {
+                            if (isset(Context::getContext()->cookie->{$prefix.$this->list_id.'Filter_'.$params['filter_key']})
+                                && Context::getContext()->cookie->{$prefix.$this->list_id.'Filter_'.$params['filter_key']} == $option_value
+                                && Context::getContext()->cookie->{$prefix.$this->list_id.'Filter_'.$params['filter_key']} != '') {
+                                $this->fields_list[$key]['select'][$option_value]['selected'] = 'selected';
+                            }
                         }
                     }
                     break;
@@ -724,6 +744,7 @@ class HelperListCore extends Helper
         Context::getContext()->smarty->assign(array(
             'page' => $page,
             'simple_header' => $this->simple_header,
+            'new_list_header_design' => $this->_new_list_header_design,
             'total_pages' => $total_pages,
             'selected_pagination' => $selected_pagination,
             'pagination' => $this->_pagination,

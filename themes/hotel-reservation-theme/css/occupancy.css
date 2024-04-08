@@ -30,6 +30,8 @@
       margin-top: 15px;
       margin-right: -20px;
         margin-left: -20px;}
+    .booking_occupancy_wrapper .occupancy-input-errors {
+      font-weight: 700;}
     .booking_occupancy_wrapper .children_age_info_block {
       display: none;}
     .booking_occupancy_wrapper .children_age_info_block label {
@@ -56,6 +58,13 @@
         .booking_occupancy_wrapper .add_new_occupancy_btn:active, .booking_occupancy_wrapper .add_new_occupancy_btn:focus, .booking_occupancy_wrapper .add_new_occupancy_btn:hover {
           text-decoration: none;
           color: #0000FF;}
+      .booking_occupancy_wrapper .add_new_occupancy_btn.disabled,
+      .booking_occupancy_wrapper .add_new_occupancy_btn.disabled:active,
+      .booking_occupancy_wrapper .add_new_occupancy_btn.disabled:focus,
+      .booking_occupancy_wrapper .add_new_occupancy_btn.disabled:hover {
+        color: #333;
+        opacity: 0.5;
+        cursor: not-allowed;}
       .booking_occupancy_wrapper .occupancy_info_head {
         font-size: 14px;
         color: #333333;

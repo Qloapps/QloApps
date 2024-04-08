@@ -23,11 +23,10 @@
     <field name="active"/>
   </fields>
   <entities>
-    <address id="Mon_adresse" id_country="FR" id_state="" id_customer="John" id_manufacturer="" id_supplier="" id_warehouse="0" alias="Mon adresse" lastname="DOE" firstname="John" postcode="75002" phone="0102030405" phone_mobile="" vat_number="" dni="" active="1">
-      <company>My Company</company>
+    <address id="My_address" id_country="FR" id_state="" id_customer="John" id_manufacturer="" id_supplier="" id_warehouse="0" alias="My Address" lastname="Doe" firstname="John" postcode="75002" phone="0102030405" phone_mobile="" vat_number="" dni="" active="1">
       <address1>16, Main street</address1>
       <address2>2nd floor</address2>
-      <city>Paris </city>
+      <city>Demo City</city>
       <other/>
     </address>
   </entities>
