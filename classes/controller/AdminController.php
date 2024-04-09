@@ -409,6 +409,9 @@ class AdminControllerCore extends Controller
     const QLO_SEARCH_TYPE_MODULE = 7;
     const QLO_SEARCH_TYPE_HOTEL = 8;
 
+    /** @var string path for recomendation content */
+    const RECOMMENDATION_CONTENT_FILE_PATH = '';
+
     public function __construct()
     {
         global $timer_start;
@@ -3989,17 +3992,65 @@ class AdminControllerCore extends Controller
     public function ajaxProcessGetRecommendationContent()
     {
         $response = array('success' => false);
-        if (isset($this->context->cookie->{$this->controller_name.'_closed'}) && $this->context->cookie->{$this->controller_name.'_closed'}) {
-            $response['success'] = true;
-        } else {
-            if (method_exists($this, 'getRecommendationContent')) {
-                if ($content = $this->getRecommendationContent()) {
-                    $response['success'] = true;
-                    $response['content'] = $content;
+        if ($this->context->controller->getRecommendationFilePath()) {
+            $response = $this->getRecommendationContent();
+        }
+        $this->context->cookie->write();
+        $this->ajaxDie(json_encode($response));
+    }
+
+    public function getRecommendationContent()
+    {
+        $content = array(
+            'success' => false,
+            'cache' => true,
+            'html' => ''
+        );
+
+        if ($recommendationContent = $this->updateRecommendationContent()) {
+            $content['cache'] = false;
+        }
+        if (file_exists(_PS_ROOT_DIR_.$this->context->controller->getRecommendationFilePath())) {
+            $content['success'] = true;
+            if (!isset($this->context->cookie->{$this->controller_name.'_closed'}) || !$this->context->cookie->{$this->controller_name.'_closed'}) {
+                $content['html'] = file_get_contents(_PS_ROOT_DIR_.$this->context->controller->getRecommendationFilePath());
+            }
+        }
+
+        return $content;
+    }
+
+    public function updateRecommendationContent()
+    {
+        if (!Tools::isFresh($this->context->controller->getRecommendationFilePath(), _TIME_1_DAY_, false)) {
+            if ($recommendationContent =  Tools::addonsRequest(
+                'recommendation',
+                array('controller' => $this->context->controller->controller_name)
+            )) {
+                $recommendationContent = json_decode($recommendationContent, true);
+                if (!isset($this->context->cookie->{$this->context->controller->controller_name.'_key'})) {
+                    $this->context->cookie->{$this->context->controller->controller_name.'_key'} = '';
+                }
+                if ($this->context->cookie->{$this->context->controller->controller_name.'_key'} != $recommendationContent['key']) {
+                    unset($this->context->cookie->{$this->context->controller->controller_name.'_closed'});
+                }
+                $this->context->cookie->{$this->context->controller->controller_name.'_key'} = $recommendationContent['key'];
+                if (isset($recommendationContent['success']) && $recommendationContent['success']) {
+                    @file_put_contents(
+                        _PS_ROOT_DIR_.$this->context->controller->getRecommendationFilePath(),
+                        $recommendationContent['html']
+                    );
+                } elseif (file_exists(_PS_ROOT_DIR_.$this->context->controller->getRecommendationFilePath())) {
+                    unlink(_PS_ROOT_DIR_.$this->context->controller->getRecommendationFilePath());
+                }
+                return $recommendationContent;
+            } else {
+                if (file_exists(_PS_ROOT_DIR_.$this->context->controller->getRecommendationFilePath())) {
+                    unlink(_PS_ROOT_DIR_.$this->context->controller->getRecommendationFilePath());
                 }
             }
         }
-        $this->ajaxDie(json_encode($response));
+        return false;
     }
 
     public function ajaxProcessRecommendationClosed()
@@ -4007,6 +4058,11 @@ class AdminControllerCore extends Controller
         $this->context->cookie->{Tools::getValue('tab').'_closed'} = true;
         $response = array('success' => true);
         $this->ajaxDie(json_encode($response));
+    }
+
+    public function getRecommendationFilePath()
+    {
+        return static::RECOMMENDATION_CONTENT_FILE_PATH;
     }
 
     /**
