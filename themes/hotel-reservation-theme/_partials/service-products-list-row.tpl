@@ -45,7 +45,7 @@
                     {if !$PS_CATALOG_MODE && !$order_date_restrict && ($product.show_price && !isset($restricted_country_mode))}
                         <span class="service-product-price">
                             {if !$priceDisplay}{convertPrice price=$product.price_tax_incl}{else}{convertPrice price=$product.price_tax_exc}{/if}{if $product.price_calculation_method == Product::PRICE_CALCULATION_METHOD_PER_DAY}<span class="price-label">{l s='/Night'}</span>{/if}
-                            {if $product.allow_multiple_quantity && $product.available_for_order}
+                            {if $product.allow_multiple_quantity && $product.available_for_order && $product.max_quantity > 0}
                                 <span class="service-product-max-quantity-info">
                                     {l s='Maximum '} {$product.max_quantity}    {l s='quantity can be added'}.
                                 </span>

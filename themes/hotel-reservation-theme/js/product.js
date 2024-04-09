@@ -1205,93 +1205,43 @@ $(document).ready(function() {
             ajax_check_var.abort();
         }
     }
-
-    $(document).on('click', '.remove_roomtype_product', function(){
-        showSuccessMessage(cart_extra_service_remove);
-        var id_product = $(this).data('id-product');
-        $(document).find('input#service_product_'+ id_product).remove();
-        BookingForm.refresh();
-        $(this).closest('.service_product_action_block').find('input.service_product_qty').val(1);
-        $(this).closest('.service_product_action_block').find('.qty_count span').text(1);
-    });
 });
-
 function addProductToRoomType(that) {
     var id_product = $(that).data('id-product');
     var qty = $('input#service_product_qty_'+id_product).val();
     if (typeof(qty) == 'undefined') {
         qty = 1;
     }
-    var added_service_product = [];
-    $('#additional_products input.service_product').each(function () {
-        added_service_product.push({
-            'id_product': $(this).data('id_product'),
-            'quantity':$(this).val(),
-        });
-    });
-    $.ajax({
-        type: 'POST',
-        headers: {
-            "cache-control": "no-cache"
-        },
-        url: product_controller_url,
-        dataType: 'JSON',
-        cache: false,
-        data: {
-            date_from: $('#room_check_in').val(),
-            date_to: $('#room_check_out').val(),
-            qty: qty,
-            id_product: $('#product_page_product_id').val(),
-            service_product: id_product,
-            added_service_product: added_service_product,
-            action: 'checkServiceProductWithRoomType',
-            ajax: true,
-            token: static_token
-        },
-        success: function(result) {
-            if (result.success) {
-                if (result.add) {
-                    if ($('input#service_product_'+ id_product).length) {
-                        var prevQty = $('input#service_product_'+ id_product).val();
-                        if (parseInt(prevQty) > 0) {
-                            qty = parseInt(qty) + parseInt(prevQty);
-                        }
-                        $('input#service_product_'+ id_product).val(qty);
-                    } else {
-                        $('<input type="hidden">').attr({
-                            id: 'service_product_'+ id_product,
-                            name: 'service_product['+ id_product +'][]',
-                            class: 'service_product',
-                            'data-id_product': id_product,
-                            value: qty
-                        }).appendTo('#additional_products');
-                    }
-                }
-                // reset input
-                if (result.add) {
-                    showSuccessMessage(cart_extra_service_add);
-                } else {
-                    showErrorMessage(result.msg);
-                }
-                BookingForm.refresh();
-            } else {
-                if (result.error) {
-                    showErrorMessage(result.error);
-                }
-            }
-        },
-        error: function(jqXHR, textStatus, errorThrown)
-        {
-            if ((textStatus != 'error' || errorThrown != '') && textStatus != 'abort')
-                showErrorMessage(textStatus + ': ' + errorThrown);
-        }
+    $(that).prop('disabled', true);
+
+    if ($('#additional_products input#service_product_'+ id_product).length) {
+        $('input#service_product_'+ id_product).val(qty);
+    } else {
+        $('<input type="hidden">').attr({
+            id: 'service_product_'+ id_product,
+            name: 'service_product['+ id_product +'][]',
+            class: 'service_product',
+            'data-id_product': id_product,
+            value: qty
+        }).appendTo('#additional_products');
+    }
+    BookingForm.refresh().then(function (res) {
+        $(that).text(unselect_txt).removeClass('btn-success').removeClass('add_roomtype_product').addClass('btn-danger').addClass('remove_roomtype_product');
+        showSuccessMessage(cart_extra_service_add);
+        $(that).prop('disabled', false);
     });
 }
 
 function removeRoomtypeProduct(that) {
-    var id_product = $(that).data('id_product');
+    var id_product = $(that).data('id-product');
     $(document).find('input#service_product_'+ id_product).remove();
-    BookingForm.refresh();
+    $('.selected_room_type_product_'+ id_product).text(select_txt).removeClass('btn-danger').removeClass('remove_roomtype_product').addClass('btn-success').addClass('add_roomtype_product');
+    $('.selected_room_type_product_'+ id_product).closest('.service_product_action_block').find('input.service_product_qty').val(1);
+    $('.selected_room_type_product_'+ id_product).closest('.service_product_action_block').find('.qty_count span').text(1);
+    $(that).prop('disabled', true);
+    BookingForm.refresh().then(function (res) {
+        showSuccessMessage(cart_extra_service_remove);
+    });
 }
 
 function updateServiceQuantity(that) {
@@ -1385,8 +1335,6 @@ var BookingForm = {
             disableRoomTypeDemands(0);
             disableRoomTypeServices(0);
         }
-
-        updateSelectedServices();
     },
     initDatepicker: function(max_order_date, preparation_time, dateFrom, dateTo) {
         let start_date = new Date();
@@ -1506,31 +1454,6 @@ var BookingForm = {
     },
     resetOccupancy: function () {
         resetOccupancyField($('.booking-form .booking_occupancy_wrapper'));
-    }
-}
-
-function updateSelectedServices()
-{
-    var room_service_products = getRoomsServiceProducts();
-    $('.btn-service-product').text(select_txt);
-    $('.btn-service-product').addClass('btn-success');
-    $('.btn-service-product').addClass('add_roomtype_product');
-    $('.btn-service-product').removeClass('btn-danger');
-    $('.btn-service-product').removeClass('remove_roomtype_product');
-    if (room_service_products.length) {
-        $(room_service_products).each(function(index, value) {
-            var element = '.selected_room_type_product_'+value['id_product'];
-            if ($(element).parent().find('.service_product_qty').length) {
-                $('#service_product_qty_'+value['id_product']).val(value.quantity);
-                $(element).parent().find('.qty_count span').text(value.quantity)
-            }
-
-            $(element).text(unselect_txt);
-            $(element).removeClass('btn-success');
-            $(element).removeClass('add_roomtype_product');
-            $(element).addClass('btn-danger');
-            $(element).addClass('remove_roomtype_product');
-        });
     }
 }
 
