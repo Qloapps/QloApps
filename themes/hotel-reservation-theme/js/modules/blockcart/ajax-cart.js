@@ -1277,10 +1277,10 @@ function disableRoomTypeDemands(show) {
 
 function disableRoomTypeServices(disable) {
     if (disable) {
-        $('#service_products_cont').find('button.add_roomtype_product').attr('disabled', 'disabled');
+        $('#service_products_cont').find('button.select_room_service').attr('disabled', 'disabled');
         $('#service_products_cont').find('.qty_container .qty_direction a').attr('disabled', 'disabled');
     } else {
-        $('#service_products_cont').find('button.add_roomtype_product').removeAttr('disabled');
+        $('#service_products_cont').find('button.select_room_service').removeAttr('disabled');
         $('#service_products_cont').find('.qty_container .qty_direction a').removeAttr('disabled');
     }
 }

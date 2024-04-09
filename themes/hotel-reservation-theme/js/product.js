@@ -1226,21 +1226,20 @@ function addProductToRoomType(that) {
         }).appendTo('#additional_products');
     }
     BookingForm.refresh().then(function (res) {
-        $(that).text(unselect_txt).removeClass('btn-success').removeClass('add_roomtype_product').addClass('btn-danger').addClass('remove_roomtype_product');
-        showSuccessMessage(cart_extra_service_add);
-        $(that).prop('disabled', false);
+        $(that).text(unselect_txt).removeClass('btn-success').removeClass('add_roomtype_product').addClass('btn-danger').addClass('remove_roomtype_product').prop('disabled', false);
+        showSuccessMessage(service_added_txt);
     });
 }
 
 function removeRoomtypeProduct(that) {
     var id_product = $(that).data('id-product');
     $(document).find('input#service_product_'+ id_product).remove();
-    $('.selected_room_type_product_'+ id_product).text(select_txt).removeClass('btn-danger').removeClass('remove_roomtype_product').addClass('btn-success').addClass('add_roomtype_product');
-    $('.selected_room_type_product_'+ id_product).closest('.service_product_action_block').find('input.service_product_qty').val(1);
-    $('.selected_room_type_product_'+ id_product).closest('.service_product_action_block').find('.qty_count span').text(1);
+    $('.select_room_service_'+ id_product).closest('.service_product_action_block').find('input.service_product_qty').val(1);
+    $('.select_room_service_'+ id_product).closest('.service_product_action_block').find('.qty_count span').text(1);
     $(that).prop('disabled', true);
     BookingForm.refresh().then(function (res) {
-        showSuccessMessage(cart_extra_service_remove);
+        $('.select_room_service_'+ id_product).text(select_txt).removeClass('btn-danger').removeClass('remove_roomtype_product').addClass('btn-success').addClass('add_roomtype_product').prop('disabled', false);
+        showSuccessMessage(service_removed_txt);
     });
 }
 
@@ -1253,7 +1252,7 @@ function updateServiceQuantity(that) {
         if (newQuantity != oldQuantity) {
             $('#service_product_'+id_product).val(newQuantity);
             BookingForm.refresh().then(function (res) {
-                showSuccessMessage(cart_extra_service_update);
+                showSuccessMessage(service_updated_txt);
             });
         }
     }
