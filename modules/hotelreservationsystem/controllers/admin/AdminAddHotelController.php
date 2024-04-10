@@ -329,6 +329,38 @@ class AdminAddHotelController extends ModuleAdminController
             $this->errors[] = $this->l('Enter a Valid City Name.');
         }
 
+        $validationRules = Address::getValidationRules('Address');
+
+        foreach ($validationRules['size'] as $field => $maxSize) {
+            if ('phone' == $field && Tools::strlen($phone) > $maxSize) {
+                $this->errors[] = sprintf(
+                    Tools::displayError('The Hotel phone number is too long (%1$d chars max).'),
+                    $maxSize
+                );
+            } else if ('address1' == $field && Tools::strlen($address) > $maxSize) {
+                $this->errors[] = sprintf(
+                    Tools::displayError('The Hotel address is too long (%1$d chars max).'),
+                    $maxSize
+                );
+            }  else if ('city' == $field && Tools::strlen($city) > $maxSize) {
+                $this->errors[] = sprintf(
+                    Tools::displayError('The Hotel city name is too long (%1$d chars max).'),
+                    $maxSize
+                );
+            } else if ('postcode' == $field && Tools::strlen($zipcode) > $maxSize) {
+                $this->errors[] = sprintf(
+                    Tools::displayError('The Hotel zip code is too long (%1$d chars max).'),
+                    $maxSize
+                );
+            } else if ($value = Tools::getValue($field) && Tools::strlen($value) > $maxSize) {
+                $this->errors[] = sprintf(
+                    Tools::displayError('The Hotel %1$s field is too long (%2$d chars max).'),
+                    $field,
+                    $maxSize
+                );
+            }
+        }
+
         if ($idHotel) {
             if (!$enableUseGlobalMaxOrderDate) {
                 $maximumBookingDateFormatted = date('Y-m-d', strtotime($maximumBookingDate));
@@ -479,10 +511,10 @@ class AdminAddHotelController extends ModuleAdminController
                 $objAddress->city = $city;
                 $objAddress->postcode = $zipcode;
                 $hotelName = $objHotelBranch->hotel_name[$defaultLangId];
-                $objAddress->alias = $hotelName;
+                $objAddress->alias = substr($hotelName, 0, 32);
                 $hotelName = preg_replace('/[0-9!<>,;?=+()@#"°{}_$%:]*$/u', '', $hotelName);
-                $objAddress->lastname = $hotelName;
-                $objAddress->firstname = $hotelName;
+                $objAddress->firstname = substr($hotelName, 0, 32);
+                $objAddress->lastname = substr($hotelName, 32, 32);
                 $objAddress->address1 = $address;
                 $objAddress->phone = $phone;
 
