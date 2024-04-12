@@ -513,8 +513,13 @@ class AdminAddHotelController extends ModuleAdminController
                 $hotelName = $objHotelBranch->hotel_name[$defaultLangId];
                 $objAddress->alias = substr($hotelName, 0, 32);
                 $hotelName = preg_replace('/[0-9!<>,;?=+()@#"°{}_$%:]*$/u', '', $hotelName);
-                $objAddress->firstname = substr($hotelName, 0, 32);
-                $objAddress->lastname = substr($hotelName, 32, 32);
+                if (Tools::strlen($hotelName) > 32) {
+                    $objAddress->firstname = substr($hotelName, 0, 32);
+                    $objAddress->lastname = substr($hotelName, 32, 32);
+                } else {
+                    $objAddress->firstname = $hotelName;
+                    $objAddress->lastname = $hotelName;
+                }
                 $objAddress->address1 = $address;
                 $objAddress->phone = $phone;
 
