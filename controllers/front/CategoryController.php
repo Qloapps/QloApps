@@ -336,6 +336,22 @@ class CategoryControllerCore extends FrontController
             $booking_data = $objBookingDetail->dataForFrontSearch($bookingParams);
             // reset array keys from 0
             $booking_data['rm_data'] = array_values($booking_data['rm_data']);
+
+            if (isset($booking_data['rm_data']) && $booking_data['rm_data']) {
+                foreach ($booking_data['rm_data'] as &$roomTypeData) {
+                    $occupancy = array(
+                        array(
+                            'adults' => $roomTypeData['adults'],
+                            'children' => 0,
+                            'child_ages' => array(),
+                        ),
+                    );
+
+                    $roomTypeData['occupancies'] = $occupancy;
+                    $roomTypeData['occupancy_adults'] = $roomTypeData['adults']; // only one room by default
+                }
+            }
+
             if ($sort_by && $sort_value) {
                 $indi_arr = array();
 
