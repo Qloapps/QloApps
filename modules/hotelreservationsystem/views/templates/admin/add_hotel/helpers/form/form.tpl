@@ -357,6 +357,7 @@
 									<label for="enable_use_global_max_order_date_off">{l s='No' mod='hotelreservationsystem'}</label>
 									<a class="slide-button btn"></a>
 								</span>
+								<div class="help-block">{l s='Global max order date:' mod='hotelreservationsystem'} {dateFormat date=$MAX_GLOBAL_BOOKING_DATE}</div>
 							</div>
 						</div>
 						<div class="form-group" {if isset($smarty.post.enable_use_global_max_order_date)}{if !$smarty.post.enable_use_global_max_order_date}style="display:block;"{else}style="display:none;"{/if}{elseif isset($order_restrict_date_info.use_global_max_order_date) && !$order_restrict_date_info.use_global_max_order_date}style="display:block;" {else} style="display:none;" {/if}>
@@ -377,6 +378,7 @@
 									<label for="enable_use_global_preparation_time_off">{l s='No' mod='hotelreservationsystem'}</label>
 									<a class="slide-button btn"></a>
 								</span>
+								<div class="help-block">{l s='Global preparation time :' mod='hotelreservationsystem'} {$GLOBAL_PREPARATION_TIME}</div>
 							</div>
 						</div>
 						<div class="form-group" {if isset($smarty.post.enable_use_global_preparation_time)}{if !$smarty.post.enable_use_global_preparation_time}style="display:block;"{else}style="display:none;"{/if}{elseif isset($order_restrict_date_info.use_global_preparation_time) && !$order_restrict_date_info.use_global_preparation_time}style="display:block;" {else} style="display:none;" {/if}>
