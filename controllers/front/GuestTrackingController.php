@@ -95,8 +95,13 @@ class GuestTrackingControllerCore extends FrontController
                     } elseif (!Tools::getValue('password')) {
                         $this->errors[] = Tools::displayError('Invalid password.');
                     } elseif (!$customer->transformToCustomer($this->context->language->id, Tools::getValue('password'))) {
-                        // @todo clarify error message
-                        $this->errors[] = Tools::displayError('An error occurred while transforming a guest into a registered customer.');
+                        if (!$customer->isGuest()) {
+                            $this->errors[] = Tools::displayError('This account is already registered as a customer.');
+                        }else if (!Validate::isPasswd(Tools::getValue('password'))) {
+                            $this->errors[] = Tools::displayError('Invalid password.');
+                        } else {
+                            $this->errors[] = Tools::displayError('An error occurred while transforming a guest into a registered customer.');
+                        }
                     } else {
                         $this->context->smarty->assign('transformSuccess', true);
                     }

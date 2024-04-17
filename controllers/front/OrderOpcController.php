@@ -176,7 +176,13 @@ class OrderOpcControllerCore extends ParentOrderController
                                 if ($customer->transformToCustomer($this->context->language->id, $passwd)) {
                                     $this->context->updateCustomer($customer);
                                 } else {
-                                    $this->errors[] = Tools::displayError('An error occurred while transforming your account into a registered customer.');
+                                    if (!$customer->isGuest()) {
+                                        $this->errors[] = Tools::displayError('This account is already registered as a customer.');
+                                    }else if (!Validate::isPasswd($passwd)) {
+                                        $this->errors[] = Tools::displayError('Invalid password.');
+                                    } else {
+                                        $this->errors[] = Tools::displayError('An error occurred while transforming your account into a registered customer.');
+                                    }
                                 }
                             }
 
