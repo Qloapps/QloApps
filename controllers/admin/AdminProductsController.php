@@ -1089,16 +1089,18 @@ class AdminProductsControllerCore extends AdminController
             }
 
             $id_product = Tools::getValue('id_product');
-
             $id_adv_pmt = Tools::getValue('id_adv_pmt');
             if ($id_adv_pmt) {
                 $obj_adv_pmt = new HotelAdvancedPayment($id_adv_pmt);
             } else {
                 $obj_adv_pmt = new HotelAdvancedPayment();
+                if ($id_adv_pmt = $obj_adv_pmt->getIdAdvPaymentByIdProduct($id_product)) {
+                    // To prevent duplication from two separate tabs
+                    $obj_adv_pmt = new HotelAdvancedPayment($id_adv_pmt);
+                }
             }
 
             $adv_payment_active = Tools::getValue('adv_payment_active');
-
             $obj_adv_pmt->id_product = $id_product;
             $obj_adv_pmt->active = $adv_payment_active;
 
