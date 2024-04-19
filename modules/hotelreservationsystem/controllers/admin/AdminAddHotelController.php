@@ -521,10 +521,7 @@ class AdminAddHotelController extends ModuleAdminController
                     // Slicing and removing the extra spaces after slicing
                     $addressFirstName = trim(substr($hotelName, 0, 32));
                     // To remove the excess space from last name
-                    if ($addressLastName = trim(substr($hotelName, 32, -1))) {
-                        // Slicing and removing the extra spaces after slicing
-                        $addressLastName = trim(substr($addressLastName, 0, 32));
-                    } else {
+                    if (!$addressLastName = trim(substr($hotelName, 32, 32))) {
                         // since the last name can also be an empty space we will then use first name as last name
                         $addressLastName = $addressFirstName;
                     }
