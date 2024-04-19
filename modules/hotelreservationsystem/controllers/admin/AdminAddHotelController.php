@@ -329,8 +329,9 @@ class AdminAddHotelController extends ModuleAdminController
             $this->errors[] = $this->l('Enter a valid city name.');
         }
 
-        $validationRules = Address::getValidationRules('Address');
-        foreach ($validationRules['size'] as $field => $maxSize) {
+        //Since the address for the hotel is saved in the address table. We are validating the hotel address here manually.
+        $addressValidation = Address::getValidationRules('Address');
+        foreach ($addressValidation['size'] as $field => $maxSize) {
             if ('phone' == $field && Tools::strlen($phone) > $maxSize) {
                 $this->errors[] = sprintf(
                     Tools::displayError('The Hotel phone number is too long (%1$d chars max).'),
@@ -351,7 +352,7 @@ class AdminAddHotelController extends ModuleAdminController
                     Tools::displayError('The Hotel zip code is too long (%1$d chars max).'),
                     $maxSize
                 );
-            } else if ($value = Tools::getValue($field) && Tools::strlen($value) > $maxSize) {
+            } else if (($value = Tools::getValue($field)) && Tools::strlen($value) > $maxSize) {
                 $this->errors[] = sprintf(
                     Tools::displayError('The Hotel %1$s field is too long (%2$d chars max).'),
                     $field,
@@ -409,13 +410,13 @@ class AdminAddHotelController extends ModuleAdminController
             $linkRewriteArray = array();
             foreach ($languages as $lang) {
                 if (!trim(Tools::getValue('hotel_name_'.$lang['id_lang']))) {
-                    $objHotelBranch->hotel_name[$lang['id_lang']] = Tools::getValue(
+                    $objHotelBranch->hotel_name[$lang['id_lang']] = trim(Tools::getValue(
                         'hotel_name_'.$defaultLangId
-                    );
+                    ));
                 } else {
-                    $objHotelBranch->hotel_name[$lang['id_lang']] = Tools::getValue(
+                    $objHotelBranch->hotel_name[$lang['id_lang']] = trim(Tools::getValue(
                         'hotel_name_'.$lang['id_lang']
-                    );
+                    ));
                 }
 
                 if (!trim(Tools::getValue('link_rewrite_'.$lang['id_lang']))) {
@@ -512,15 +513,25 @@ class AdminAddHotelController extends ModuleAdminController
                 $objAddress->postcode = $zipcode;
                 $hotelName = $objHotelBranch->hotel_name[$defaultLangId];
                 $objAddress->alias = trim(substr($hotelName, 0, 32));
-                $hotelName = preg_replace('/[0-9!<>,;?=+()@#"°{}_$%:]*$/u', '', $hotelName);
+                $hotelName = trim(preg_replace('/[0-9!<>,;?=+()@#"°{}_$%:]*$/u', '', $hotelName));
+                $addressFirstName = $hotelName;
+                $addressLastName = $hotelName;
+                // If hotel name is length is greater than 32 then we split it into two
                 if (Tools::strlen($hotelName) > 32) {
-                    $objAddress->firstname = trim(substr($hotelName, 0, 32));
-                    $objAddress->lastname = trim(substr($hotelName, 32, 32));
-                } else {
-                    $objAddress->firstname = $hotelName;
-                    $objAddress->lastname = $hotelName;
+                    // Slicing and removing the extra spaces after slicing
+                    $addressFirstName = trim(substr($hotelName, 0, 32));
+                    // To remove the excess space from last name
+                    if ($addressLastName = trim(substr($hotelName, 32, -1))) {
+                        // Slicing and removing the extra spaces after slicing
+                        $addressLastName = trim(substr($addressLastName, 0, 32));
+                    } else {
+                        // since the last name can also be an empty space we will then use first name as last name
+                        $addressLastName = $addressFirstName;
+                    }
                 }
 
+                $objAddress->firstname = $addressFirstName;
+                $objAddress->lastname = $addressLastName;
                 $objAddress->address1 = $address;
                 $objAddress->phone = $phone;
                 $objAddress->save();
