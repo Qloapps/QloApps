@@ -326,11 +326,10 @@ class AdminAddHotelController extends ModuleAdminController
         if ($city == '') {
             $this->errors[] = $this->l('City is required field.');
         } elseif (!Validate::isCityName($city)) {
-            $this->errors[] = $this->l('Enter a Valid City Name.');
+            $this->errors[] = $this->l('Enter a valid city name.');
         }
 
         $validationRules = Address::getValidationRules('Address');
-
         foreach ($validationRules['size'] as $field => $maxSize) {
             if ('phone' == $field && Tools::strlen($phone) > $maxSize) {
                 $this->errors[] = sprintf(
@@ -501,28 +500,29 @@ class AdminAddHotelController extends ModuleAdminController
                 }
                 // getHotel address
                 if ($idHotelAddress = $objHotelBranch->getHotelIdAddress()) {
-                $objAddress = new Address($idHotelAddress);
+                    $objAddress = new Address($idHotelAddress);
                 } else {
                     $objAddress = new Address();
                 }
+
                 $objAddress->id_hotel = $newIdHotel;
                 $objAddress->id_country = $country;
                 $objAddress->id_state = $state;
                 $objAddress->city = $city;
                 $objAddress->postcode = $zipcode;
                 $hotelName = $objHotelBranch->hotel_name[$defaultLangId];
-                $objAddress->alias = substr($hotelName, 0, 32);
+                $objAddress->alias = trim(substr($hotelName, 0, 32));
                 $hotelName = preg_replace('/[0-9!<>,;?=+()@#"°{}_$%:]*$/u', '', $hotelName);
                 if (Tools::strlen($hotelName) > 32) {
-                    $objAddress->firstname = substr($hotelName, 0, 32);
-                    $objAddress->lastname = substr($hotelName, 32, 32);
+                    $objAddress->firstname = trim(substr($hotelName, 0, 32));
+                    $objAddress->lastname = trim(substr($hotelName, 32, 32));
                 } else {
                     $objAddress->firstname = $hotelName;
                     $objAddress->lastname = $hotelName;
                 }
+
                 $objAddress->address1 = $address;
                 $objAddress->phone = $phone;
-
                 $objAddress->save();
 
                 // Save refund rules of the hotels
