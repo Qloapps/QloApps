@@ -73,7 +73,11 @@ class RoomTypeServiceProductPrice extends ObjectModel
             SELECT spp.`price`, spp.`id_tax_rules_group`, p.`auto_add_to_cart`, p.`price_addition_type`
             FROM `'._DB_PREFIX_.'product` p
             LEFT JOIN `'._DB_PREFIX_.'htl_room_type_service_product` sp ON (sp.`id_product` = p.`id_product`)
-            LEFT JOIN `'._DB_PREFIX_.'htl_room_type_service_product_price` spp ON (spp.`id_product` = p.`id_product`)
+            LEFT JOIN `'._DB_PREFIX_.'htl_room_type_service_product_price` spp
+            ON (spp.`id_product` = p.`id_product`
+                AND sp.`id_element` = spp.`id_element`
+                AND sp.`element_type` = spp.`element_type`
+            )
             WHERE p.`id_product`='.(int)$idProduct.
             ' AND sp.`id_element`='.(int)$idElement.
             ' AND sp.`element_type`='.(int)$elementType)
