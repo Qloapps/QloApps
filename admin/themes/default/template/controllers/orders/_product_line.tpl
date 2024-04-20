@@ -70,7 +70,11 @@
 					{if isset($data['child_ages']) && $data['child_ages']}
 						{foreach $data['child_ages'] as $childAge}
 							<p class="">
-								{l s='Child %s : %s years' sprintf=[$childAge@iteration, $childAge]}
+                                {if $childAge == 0}
+                                    {l s='Child : Under 1'}
+                                {else}
+								    {l s='Child %s : %s years' sprintf=[$childAge@iteration, $childAge]}
+                                {/if}
 							</p>
 						{/foreach}
 					{/if}
