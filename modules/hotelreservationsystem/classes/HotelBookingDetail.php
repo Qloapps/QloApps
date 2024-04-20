@@ -3100,15 +3100,19 @@ class HotelBookingDetail extends ObjectModel
             }
         }
 
-        if ($bookedRoomInfoFlag && !$roomCount && $result) {
+        if (!$roomCount && $result) {
             $link = new Link();
             foreach ($result as $key => $bookingInfo) {
-                $result[$key]['booked_room_info'] = $this->chechRoomBooked($bookingInfo['id_room'], $bookingInfo['date_from'], $bookingInfo['date_to']);
-                $result[$key]['orders_filter_link'] = $link->getAdminLink('AdminOrders');
+                $result[$key]['child_ages'] = json_decode($bookingInfo['child_ages'], true);
 
-                // if need only rooms which are available to resolve overbooking the unset booked rooms
-                if ($bookedRoomInfoFlag == 2 && $result[$key]['booked_room_info']) {
-                    unset($result[$key]);
+                if ($bookedRoomInfoFlag) {
+                    $result[$key]['booked_room_info'] = $this->chechRoomBooked($bookingInfo['id_room'], $bookingInfo['date_from'], $bookingInfo['date_to']);
+                    $result[$key]['orders_filter_link'] = $link->getAdminLink('AdminOrders');
+
+                    // if need only rooms which are available to resolve overbooking the unset booked rooms
+                    if ($bookedRoomInfoFlag == 2 && $result[$key]['booked_room_info']) {
+                        unset($result[$key]);
+                    }
                 }
             }
         }

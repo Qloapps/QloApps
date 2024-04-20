@@ -73,9 +73,9 @@
                                 {if $childAge == 0}
                                     {l s='Child : Under 1'}
                                 {else}
-								    {l s='Child %s : %s years' sprintf=[$childAge@iteration, $childAge]}
+                                    {l s='Child %s : %s years' sprintf=[$childAge@iteration, $childAge]}
                                 {/if}
-							</p>
+                            </p>
 						{/foreach}
 					{/if}
 				</div>
