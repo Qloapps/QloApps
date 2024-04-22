@@ -988,7 +988,7 @@ class HotelCartBookingData extends ObjectModel
                                     $errors[] = sprintf(
                                         'You can not book rooms for hotel \'%s\' after date %s. Please remove rooms from %s - %s to proceed.',
                                         $objHotelBranchInformation->hotel_name,
-                                        Tools::displayDate($maxOrderDate),
+                                        Tools::displayDate(date('Y-m-d', strtotime($maxOrderDate))),
                                         Tools::displayDate($roomData['date_from']),
                                         Tools::displayDate($roomData['date_to'])
                                     );
