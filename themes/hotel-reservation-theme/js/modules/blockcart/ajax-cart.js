@@ -429,6 +429,11 @@ var ajaxCart = {
                     } else {
                         $(addRoomButton).addClass('disabled');
                     }
+
+                    //resetting the occupancy for room type in the category page.
+                    if (occupancy.length > jsonData.avail_rooms) {
+                        resetOccupancyField($(callerElement).closest('.booking_room_fields').find('.booking_occupancy_wrapper'));
+                    }
                 }
 
 
