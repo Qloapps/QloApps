@@ -928,8 +928,8 @@ class HotelCartBookingData extends ObjectModel
     public static function validateCartBookings()
     {
         $context = Context::getContext();
-
         $errors = array();
+        $objModule = Module::getInstanceByName('hotelreservationsystem');
 
         // validate room types if bookable from front office
         if ($cartProducts = $context->cart->getProducts()) {
@@ -939,6 +939,9 @@ class HotelCartBookingData extends ObjectModel
                     $objHotelCartBookingData->deleteCartBookingData($context->cart->id, $product['id_product']);
                 }
             }
+        } else {
+            $error = true;
+            $errors[] = $objModule->l('No booking found in the cart.', 'HotelOrderRestrictDate');
         }
 
         // validate service products
@@ -955,7 +958,6 @@ class HotelCartBookingData extends ObjectModel
         }
 
         // validate room types for restriction date
-        $objModule = Module::getInstanceByName('hotelreservationsystem');
         if ($cartProducts = $context->cart->getProducts()) {
             $objHotelCartBookingData = new HotelCartBookingData();
             $objHotelBookingDetail = new HotelBookingDetail();

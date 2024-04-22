@@ -1666,6 +1666,9 @@ class AdminOrdersControllerCore extends AdminController
             if ($this->tabAccess['edit'] === '1') {
                 $objCart = new Cart($id_cart);
                 if (Validate::isLoadedObject($objCart)) {
+                    $this->context->cart = $objCart;
+
+                    $this->errors = HotelCartBookingData::validateCartBookings();
                     $orderTotal = $objCart->getOrderTotal(true, Cart::BOTH);
                     if ($objCart->is_advance_payment) {
                         $advancePaymentAmount = $objCart->getOrderTotal(true, Cart::ADVANCE_PAYMENT);
