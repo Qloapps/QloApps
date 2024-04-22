@@ -3178,12 +3178,8 @@ class AdminProductsControllerCore extends AdminController
                                 $objRoomTypeServiceProductPrice->id_element = $idProduct;
                                 $objRoomTypeServiceProductPrice->element_type = RoomTypeServiceProduct::WK_ELEMENT_TYPE_ROOM_TYPE;
                             }
-
                             $objRoomTypeServiceProductPrice->price = $price;
-                            if ($idTaxRulesGroup) {
-                                $objRoomTypeServiceProductPrice->id_tax_rules_group = $idTaxRulesGroup;
-                            }
-
+                            $objRoomTypeServiceProductPrice->id_tax_rules_group = $idTaxRulesGroup;
                             $objRoomTypeServiceProductPrice->save();
                         } else {
                             // create new association
