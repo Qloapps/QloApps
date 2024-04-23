@@ -5364,8 +5364,8 @@ class AdminOrdersControllerCore extends AdminController
         } else {
             // Calculate differences of price (Before / After)
 
-            $order_detail->total_price_tax_incl -= $diff_products_tax_incl;
-            $order_detail->total_price_tax_excl -= $diff_products_tax_excl;
+            $order_detail->total_price_tax_incl -= Tools::ps_round($diff_products_tax_incl, 6);
+            $order_detail->total_price_tax_excl -= Tools::ps_round($diff_products_tax_excl, 6);
 
             $old_quantity = $order_detail->product_quantity;
 
@@ -5384,8 +5384,8 @@ class AdminOrdersControllerCore extends AdminController
             if ($service['quantity'] >= $serviceOrderDetail->product_quantity) {
                 $serviceOrderDetail->delete();
             } else {
-                $order_detail->total_price_tax_incl -= $service['total_price_tax_incl'];
-                $order_detail->total_price_tax_excl -= $service['total_price_tax_excl'];
+                $order_detail->total_price_tax_incl -= Tools::ps_round($service['total_price_tax_incl'], 6);
+                $order_detail->total_price_tax_excl -= Tools::ps_round($service['total_price_tax_excl'], 6);
 
                 $serviceOldQuantity = $serviceOrderDetail->product_quantity;
                 $serviceOrderDetail->product_quantity = $serviceOldQuantity - $service['quantity'];
@@ -5403,20 +5403,37 @@ class AdminOrdersControllerCore extends AdminController
         if ($order_detail->id_order_invoice != 0) {
             // values changes as values are calculated accoding to the quantity of the product by webkul
             $order_invoice = new OrderInvoice($order_detail->id_order_invoice);
-            $order_invoice->total_paid_tax_excl -= ($diff_products_tax_excl + $roomExtraDemandTE + $additionlServicesTE);
-            $order_invoice->total_paid_tax_incl -= ($diff_products_tax_incl + $roomExtraDemandTI + $additionlServicesTI);
-            $order_invoice->total_products -= $diff_products_tax_excl;
-            $order_invoice->total_products_wt -= $diff_products_tax_incl;
+            $order_invoice->total_paid_tax_excl -= Tools::ps_round(($diff_products_tax_excl + $roomExtraDemandTE + $additionlServicesTE), 6);
+            $order_invoice->total_paid_tax_excl = $order_invoice->total_paid_tax_excl > 0 ? $order_invoice->total_paid_tax_excl : 0;
+
+            $order_invoice->total_paid_tax_incl -= Tools::ps_round(($diff_products_tax_incl + $roomExtraDemandTI + $additionlServicesTI), 6);
+            $order_invoice->total_paid_tax_incl = $order_invoice->total_paid_tax_incl > 0 ? $order_invoice->total_paid_tax_incl : 0;
+
+            $order_invoice->total_products -= Tools::ps_round($diff_products_tax_excl, 6);
+            $order_invoice->total_products = $order_invoice->total_products > 0 ? $order_invoice->total_products : 0;
+
+            $order_invoice->total_products_wt -= Tools::ps_round($diff_products_tax_incl, 6);
+            $order_invoice->total_products_wt = $order_invoice->total_products_wt > 0 ? $order_invoice->total_products_wt : 0;
+
             $res &= $order_invoice->update();
         }
 
         // Update Order
         // values changes as values are calculated accoding to the quantity of the product by webkul
-        $order->total_paid -= ($diff_products_tax_incl + $roomExtraDemandTI + $additionlServicesTI);
-        $order->total_paid_tax_incl -= ($diff_products_tax_incl + $roomExtraDemandTI + $additionlServicesTI);
-        $order->total_paid_tax_excl -= ($diff_products_tax_excl + $roomExtraDemandTE + $additionlServicesTE);
-        $order->total_products -= ($diff_products_tax_excl + $additionlServicesTE);
-        $order->total_products_wt -= ($diff_products_tax_incl + $additionlServicesTI);
+        $order->total_paid -= Tools::ps_round(($diff_products_tax_incl + $roomExtraDemandTI + $additionlServicesTI), 6);
+        $order->total_paid = $order->total_paid > 0 ? $order->total_paid : 0;
+
+        $order->total_paid_tax_incl -= Tools::ps_round(($diff_products_tax_incl + $roomExtraDemandTI + $additionlServicesTI), 6);
+        $order->total_paid_tax_incl = $order->total_paid_tax_incl > 0 ? $order->total_paid_tax_incl : 0;
+
+        $order->total_paid_tax_excl -= Tools::ps_round(($diff_products_tax_excl + $roomExtraDemandTE + $additionlServicesTE), 6);
+        $order->total_paid_tax_excl = $order->total_paid_tax_excl > 0 ? $order->total_paid_tax_excl : 0;
+
+        $order->total_products -= Tools::ps_round(($diff_products_tax_excl + $additionlServicesTE), 6);
+        $order->total_products = $order->total_products > 0 ? $order->total_products : 0;
+
+        $order->total_products_wt -= Tools::ps_round(($diff_products_tax_incl + $additionlServicesTI), 6);
+        $order->total_products_wt = $order->total_products_wt > 0 ? $order->total_products_wt : 0;
 
         $res &= $order->update();
 
