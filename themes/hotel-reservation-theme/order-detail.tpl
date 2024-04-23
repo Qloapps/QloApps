@@ -765,7 +765,7 @@
                                                         </div>
                                                         <div class="rooms-summary">
                                                             {foreach from=$rm_v['hotel_booking_details'] item=$hotel_booking_detail name=foreachRefundRooms}
-                                                                {assign var=is_room_cancelled value=(isset($refundReqBookings) && in_array($hotel_booking_detail.id_htl_booking, $refundReqBookings))}
+                                                                {assign var=is_room_cancelled value=((isset($refundReqBookings) && in_array($hotel_booking_detail.id_htl_booking, $refundReqBookings)) || ($hotel_booking_detail.is_refunded || $hotel_booking_detail.is_cancelled))}
                                                                 <div class="room-details {if $is_room_cancelled}cancelled{/if} clearfix">
                                                                     <div class="occupancy-wrap">
                                                                         <div class="checkbox">

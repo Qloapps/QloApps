@@ -561,7 +561,9 @@ class OrderDetailControllerCore extends FrontController
                         break;
                     }
 
-                    if (OrderReturn::getOrdersReturnDetail($objOrder->id, 0, $idHtlBooking)) {
+                    if (($objHotelBookingDetail->is_cancelled || $objHotelBookingDetail->is_refunded)
+                        || (OrderReturn::getOrdersReturnDetail($objOrder->id, 0, $idHtlBooking))
+                    ) {
                         $this->errors[] = Tools::displayError('Some selected rooms have already been requested for cancellation.');
                         break;
                     }
