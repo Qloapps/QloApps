@@ -63,14 +63,18 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
         $objCustomer->id_guest = (int) $this->context->cookie->id_guest;
 
         $this->context->customer = $objCustomer;
-        if ($this->context->employee->isSuperAdmin()) {
-            $backOrderConfigKey = 'PS_BACKDATE_ORDER_SUPERADMIN';
-        } else {
-            $backOrderConfigKey = 'PS_BACKDATE_ORDER_EMPLOYEES';
-        }
-        if (!Configuration::get($backOrderConfigKey)) {
-            $htlCart = new HotelCartBookingData();
-            $htlCart->removeBackdateRoomsFromCart($this->context->cart->id);
+
+        // if cart is created and back-date is not allowed the delete back-date order bookings
+        if (Validate::isLoadedObject($this->context->cart)) {
+            if ($this->context->employee->isSuperAdmin()) {
+                $backOrderConfigKey = 'PS_BACKDATE_ORDER_SUPERADMIN';
+            } else {
+                $backOrderConfigKey = 'PS_BACKDATE_ORDER_EMPLOYEES';
+            }
+            if (!Configuration::get($backOrderConfigKey)) {
+                $htlCart = new HotelCartBookingData();
+                $htlCart->removeBackdateRoomsFromCart($this->context->cart->id);
+            }
         }
     }
 
