@@ -1648,16 +1648,20 @@ class AdminOrdersControllerCore extends AdminController
         } elseif (Tools::isSubmit('submitEditNote')) {
             $note = Tools::getValue('note');
             $order_invoice = new OrderInvoice((int)Tools::getValue('id_order_invoice'));
-            if (Validate::isLoadedObject($order_invoice) && Validate::isCleanHtml($note)) {
-                if ($this->tabAccess['edit'] === '1') {
-                    $order_invoice->note = $note;
-                    if ($order_invoice->save()) {
-                        Tools::redirectAdmin(self::$currentIndex.'&id_order='.$order_invoice->id_order.'&vieworder&conf=4&token='.$this->token);
+            if (Validate::isLoadedObject($order_invoice)) {
+                if (Validate::isCleanHtml($note)) {
+                    if ($this->tabAccess['edit'] === '1') {
+                        $order_invoice->note = $note;
+                        if ($order_invoice->save()) {
+                            Tools::redirectAdmin(self::$currentIndex.'&id_order='.$order_invoice->id_order.'&vieworder&conf=4&token='.$this->token);
+                        } else {
+                            $this->errors[] = Tools::displayError('The invoice note was not saved.');
+                        }
                     } else {
-                        $this->errors[] = Tools::displayError('The invoice note was not saved.');
+                        $this->errors[] = Tools::displayError('You do not have permission to edit this.');
                     }
                 } else {
-                    $this->errors[] = Tools::displayError('You do not have permission to edit this.');
+                    $this->errors[] = Tools::displayError('Invaid note found.');
                 }
             } else {
                 $this->errors[] = Tools::displayError('The invoice for edit note was unable to load. ');
