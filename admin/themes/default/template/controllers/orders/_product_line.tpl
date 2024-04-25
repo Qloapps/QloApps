@@ -71,7 +71,7 @@
 						{foreach $data['child_ages'] as $childAge}
 							<p class="">
                                 {if $childAge == 0}
-                                    {l s='Child : Under 1'}
+                                    {l s='Child %s : Under 1'  sprintf=[$childAge@iteration]}
                                 {else}
                                     {l s='Child %s : %s years' sprintf=[$childAge@iteration, $childAge]}
                                 {/if}
