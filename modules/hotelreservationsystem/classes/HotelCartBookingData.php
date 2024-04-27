@@ -925,26 +925,34 @@ class HotelCartBookingData extends ObjectModel
         return true;
     }
 
+    // validate cart data if not available then remove from cart
     public static function validateCartBookings()
     {
         $context = Context::getContext();
         $errors = array();
         $objModule = Module::getInstanceByName('hotelreservationsystem');
 
+        // For admin cart validations use this variable
+        $forAdminCart = 0;
+        if (isset($context->employee->id)) {
+            $forAdminCart = 1;
+        }
+
         // validate room types if bookable from front office
         if ($cartProducts = $context->cart->getProducts()) {
-            $objHotelCartBookingData = new HotelCartBookingData();
-            foreach ($cartProducts as $product) {
-                if ($product['booking_product'] && !$product['show_at_front']) {
-                    $objHotelCartBookingData->deleteCartBookingData($context->cart->id, $product['id_product']);
+            if (!$forAdminCart) {
+                $objHotelCartBookingData = new HotelCartBookingData();
+                foreach ($cartProducts as $product) {
+                    if ($product['booking_product'] && !$product['show_at_front']) {
+                        $objHotelCartBookingData->deleteCartBookingData($context->cart->id, $product['id_product']);
+                    }
                 }
             }
         } else {
-            $error = true;
             $errors[] = $objModule->l('No booking found in the cart.', 'HotelOrderRestrictDate');
         }
 
-        // validate service products
+        // validate service products if not active not then remove from cart
         if ($cartProducts = $context->cart->getProducts()) {
             $objRoomTypeServiceProductCartDetail = new RoomTypeServiceProductCartDetail();
             foreach ($cartProducts as $product) {
@@ -954,6 +962,19 @@ class HotelCartBookingData extends ObjectModel
                         $objRoomTypeServiceProductCartDetail->removeServiceProductByIdHtlCartBooking($serviceProduct['htl_cart_booking_id']);
                     }
                 }
+            }
+        }
+
+        // for admin/employee remove bookings of the back dates from cart if not allowed
+        if ($forAdminCart) {
+            if ($context->employee->isSuperAdmin()) {
+                $backOrderConfigKey = 'PS_BACKDATE_ORDER_SUPERADMIN';
+            } else {
+                $backOrderConfigKey = 'PS_BACKDATE_ORDER_EMPLOYEES';
+            }
+            if (!Configuration::get($backOrderConfigKey)) {
+                $objHotelCartBookingData = new HotelCartBookingData();
+                $objHotelCartBookingData->removeBackdateRoomsFromCart($context->cart->id);
             }
         }
 
@@ -979,43 +1000,43 @@ class HotelCartBookingData extends ObjectModel
                         }
 
                         foreach ($cartData as $roomData) {
-                            if ($maxOrderDate = HotelOrderRestrictDate::getMaxOrderDate($roomData['id_hotel'])) {
-                                if (strtotime('-1 day', strtotime($maxOrderDate)) < strtotime($roomData['date_from'])
-                                    || strtotime($maxOrderDate) < strtotime($roomData['date_to'])
-                                ) {
-                                    $objHotelBranchInformation = new HotelBranchInformation(
-                                        $roomData['id_hotel'],
-                                        $context->language->id
-                                    );
-                                    $errors[] = sprintf(
-                                        'You can not book rooms for hotel \'%s\' after date %s. Please remove rooms from %s - %s to proceed.',
-                                        $objHotelBranchInformation->hotel_name,
-                                        Tools::displayDate($maxOrderDate),
-                                        Tools::displayDate($roomData['date_from']),
-                                        Tools::displayDate($roomData['date_to'])
-                                    );
-                                    $error = true;
+                            if (!$forAdminCart) {
+                                if ($maxOrderDate = HotelOrderRestrictDate::getMaxOrderDate($roomData['id_hotel'])) {
+                                    if (strtotime('-1 day', strtotime($maxOrderDate)) < strtotime($roomData['date_from'])
+                                        || strtotime($maxOrderDate) < strtotime($roomData['date_to'])
+                                    ) {
+                                        $objHotelBranchInformation = new HotelBranchInformation(
+                                            $roomData['id_hotel'],
+                                            $context->language->id
+                                        );
+                                        $errors[] = sprintf(
+                                            'You can not book rooms for hotel \'%s\' after date %s. Please remove rooms from %s - %s to proceed.',
+                                            $objHotelBranchInformation->hotel_name,
+                                            Tools::displayDate($maxOrderDate),
+                                            Tools::displayDate($roomData['date_from']),
+                                            Tools::displayDate($roomData['date_to'])
+                                        );
+                                    }
                                 }
-                            }
 
-                            $preparationTime = HotelOrderRestrictDate::getPreparationTime($roomData['id_hotel']);
-                            if ($preparationTime !== false) {
-                                $minOrderDate = date('Y-m-d', strtotime('+'. ($preparationTime) .' days'));
-                                if (strtotime($minOrderDate) > strtotime($roomData['date_from'])
-                                    || strtotime($minOrderDate . ' +1 day')> strtotime($roomData['date_to'])
-                                ) {
-                                    $objHotelBranchInformation = new HotelBranchInformation(
-                                        $roomData['id_hotel'],
-                                        $context->language->id
-                                    );
-                                    $errors[] = sprintf(
-                                        'You can not book rooms for hotel \'%s\' before date %s. Please remove rooms from %s - %s to proceed.',
-                                        $objHotelBranchInformation->hotel_name,
-                                        Tools::displayDate($minOrderDate),
-                                        Tools::displayDate($roomData['date_from']),
-                                        Tools::displayDate($roomData['date_to'])
-                                    );
-                                    $error = true;
+                                $preparationTime = HotelOrderRestrictDate::getPreparationTime($roomData['id_hotel']);
+                                if ($preparationTime !== false) {
+                                    $minOrderDate = date('Y-m-d', strtotime('+'. ($preparationTime) .' days'));
+                                    if (strtotime($minOrderDate) > strtotime($roomData['date_from'])
+                                        || strtotime($minOrderDate . ' +1 day')> strtotime($roomData['date_to'])
+                                    ) {
+                                        $objHotelBranchInformation = new HotelBranchInformation(
+                                            $roomData['id_hotel'],
+                                            $context->language->id
+                                        );
+                                        $errors[] = sprintf(
+                                            'You can not book rooms for hotel \'%s\' before date %s. Please remove rooms from %s - %s to proceed.',
+                                            $objHotelBranchInformation->hotel_name,
+                                            Tools::displayDate($minOrderDate),
+                                            Tools::displayDate($roomData['date_from']),
+                                            Tools::displayDate($roomData['date_to'])
+                                        );
+                                    }
                                 }
                             }
 
@@ -1027,31 +1048,26 @@ class HotelCartBookingData extends ObjectModel
                                 'only_search_data' => 1,
                             );
                             $bookingSearchData = $objHotelBookingDetail->dataForFrontSearch($bookingParams);
-                            $isRmBooked = 0;
+                            $isRoomBooked = 0;
                             if (count($bookingSearchData['rm_data'][$product['id_product']]['data']['available']) < count($roomData['id_rms'])) {
                                 foreach ($roomData['id_rms'] as $searchRoomData) {
-                                    if($isRmBooked = $objHotelBookingDetail->chechRoomBooked($searchRoomData, $roomData['date_from'], $roomData['date_to'])){
+                                    if($isRoomBooked = $objHotelBookingDetail->chechRoomBooked($searchRoomData, $roomData['date_from'], $roomData['date_to'])){
                                         break;
                                     }
                                 }
-                                if ($isRmBooked) {
+                                if ($isRoomBooked) {
                                     $errors[] = sprintf($objModule->l('The Room \'%s\' has been booked by another customer from \'%s\' to \'%s\' Please remove rooms from cart to proceed', 'HotelOrderRestrictDate'), $product['name'], date('d-m-Y', strtotime($roomData['date_from'])), date('d-m-Y', strtotime($roomData['date_to'])));
-                                    $error = true;
                                 } else {
                                     $errors[] = sprintf($objModule->l('The Room \'%s\' is no longer avalable from \'%s\' to \'%s\' Please remove rooms from cart to proceed', 'HotelOrderRestrictDate'), $product['name'], date('d-m-Y', strtotime($roomData['date_from'])), date('d-m-Y', strtotime($roomData['date_to'])));
-                                    $error = true;
                                 }
                             }
                         }
                     }
                 } else {
-                    $error = true;
                     $errors[] = $objModule->l('You can not book rooms from "', 'HotelOrderRestrictDate'). $product['name'] .$objModule->l('". Please remove rooms from "', 'HotelOrderRestrictDate'). $product['name'] . $objModule->l('" from cart to proceed.', 'HotelOrderRestrictDate');
                 }
             }
         }
-
-        $context->controller->errors = array_merge($context->controller->errors, $errors);
 
         return $errors;
     }
