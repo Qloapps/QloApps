@@ -375,9 +375,7 @@ class AdminOrdersControllerCore extends AdminController
         }
 
         // check page is new order creation page and cart id is set
-        if ((Tools::isSubmit('addorder') && ($id_cart = Tools::getValue('cart_id')))
-            || (Tools::isSubmit('submitAddOrder') && ($id_cart = Tools::getValue('id_cart')))
-        ) {
+        if (Tools::isSubmit('addorder') && ($id_cart = Tools::getValue('cart_id'))) {
             // set smarty variables if new order creation process has errors
             $cart = new Cart($id_cart);
             $cart_order_exists = $cart->orderExists();
@@ -456,7 +454,6 @@ class AdminOrdersControllerCore extends AdminController
         $this->addJqueryPlugin(array('autocomplete', 'fancybox', 'typewatch'));
 
         $this->context->smarty->assign(array(
-            'hasCartErrors' => count($this->errors) ? 1 : 0,
             'recyclable_pack' => (int)Configuration::get('PS_RECYCLABLE_PACK'),
             'gift_wrapping' => (int)Configuration::get('PS_GIFT_WRAPPING'),
             'show_toolbar' => $this->show_toolbar,
@@ -1677,7 +1674,7 @@ class AdminOrdersControllerCore extends AdminController
                             if ($paymentAmount == '') {
                                 $this->errors[] = Tools::displayError('Please enter valid Payment amount of the order.');
                             } elseif ($paymentAmount && !Validate::isPrice($paymentAmount)) {
-                                $this->errors[] = Tools::displayError('Payment amount is invalid. Please enter correct amount.');
+                                $this->errors[] = Tools::displayError('Payment amount is invalid. Please enter valid amount.');
                             } else {
                                 $paymentAmount = (float) $paymentAmount;
                             }
@@ -1781,10 +1778,6 @@ class AdminOrdersControllerCore extends AdminController
                         if ($objPaymentModule->currentOrder) {
                             Tools::redirectAdmin(self::$currentIndex.'&id_order='.$objPaymentModule->currentOrder.'&vieworder'.'&token='.$this->token.'&conf=3');
                         }
-                    } else {
-                        // if errors render add order form
-                        $_GET['addorder'] = '1';
-                        $_GET['cart_id'] = $id_cart;
                     }
                 } else {
                     $this->errors[] = Tools::displayError('Cart can not be loaded.');
