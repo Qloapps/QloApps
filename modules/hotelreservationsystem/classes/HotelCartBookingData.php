@@ -248,7 +248,7 @@ class HotelCartBookingData extends ObjectModel
      */
     public function getCartCurrentDataByCartId($cart_id)
     {
-        $result = Db::getInstance()->executeS('SELECT * FROM `'._DB_PREFIX_.'htl_cart_booking_data` WHERE `id_cart`='.$cart_id);
+        $result = Db::getInstance()->executeS('SELECT * FROM `'._DB_PREFIX_.'htl_cart_booking_data` WHERE `id_cart`='.(int)$cart_id);
         if ($result) {
             return $result;
         } else {
