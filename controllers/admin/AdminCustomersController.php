@@ -860,6 +860,7 @@ class AdminCustomersControllerCore extends AdminController
 				FROM '._DB_PREFIX_.'cart_product cp
 				JOIN '._DB_PREFIX_.'cart c ON (c.id_cart = cp.id_cart)
 				JOIN '._DB_PREFIX_.'product p ON (cp.id_product = p.id_product)
+                AND p.booking_product=1
 				WHERE c.id_customer = '.(int)$customer->id.'
 					AND NOT EXISTS (
 							SELECT 1
