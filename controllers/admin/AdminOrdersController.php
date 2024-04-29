@@ -183,7 +183,6 @@ class AdminOrdersControllerCore extends AdminController
                 'list' => $this->hotelsArray,
                 'optional' => true,
                 'class' => 'chosen',
-                'remove_onchange' => true,
                 'visible_default' => true
             ),
             'room_type_name' => array(
@@ -193,7 +192,6 @@ class AdminOrdersControllerCore extends AdminController
                 'list' => $this->roomTypesArray,
                 'optional' => false,
                 'class' => 'chosen',
-                'remove_onchange' => true,
                 'visible_default' => false,
                 'displayed' => false,
             ),
@@ -204,7 +202,6 @@ class AdminOrdersControllerCore extends AdminController
                 'list' => $this->roomsArray,
                 'optional' => false,
                 'class' => 'chosen',
-                'remove_onchange' => true,
                 'visible_default' => false,
                 'displayed' => false,
             ),
@@ -299,7 +296,6 @@ class AdminOrdersControllerCore extends AdminController
                 'filter_key' => 'a!source',
                 'list' => $this->all_order_sources,
                 'optional' => true,
-                'remove_onchange' => true,
                 'visible_default' => true
             ),
             'osname' => array(
@@ -1119,6 +1115,8 @@ class AdminOrdersControllerCore extends AdminController
 
         $this->tpl_list_vars['title'] = $this->l('Orders');
 
+        $this->_new_list_header_design = true;
+
         return parent::renderList();
     }
 
@@ -1781,41 +1779,30 @@ class AdminOrdersControllerCore extends AdminController
                             $extraVars = null;
                         }
 
-                        $bad_delivery = false;
-                        if (($bad_delivery = (bool)!Address::isCountryActiveById((int)$objCart->id_address_delivery))
-                            || !Address::isCountryActiveById((int)$objCart->id_address_invoice)
-                        ) {
-                            if ($bad_delivery) {
-                                $this->errors[] = Tools::displayError('This booking address country is not active.');
-                            } else {
-                                $this->errors[] = Tools::displayError('This invoice address country is not active.');
-                            }
-                        } else {
-                            $amountPaid = Tools::ps_round($amountPaid, 6);
-                            $objEmployee = new Employee($this->context->cookie->id_employee);
+                        $amountPaid = Tools::ps_round($amountPaid, 6);
+                        $objEmployee = new Employee($this->context->cookie->id_employee);
 
-                            $objPaymentModule->validateOrder(
-                                $objCart->id,
-                                $idOrderState,
-                                $amountPaid,
-                                $objPaymentModule->displayName,
-                                $this->l('Manual order -- Employee:').' '.substr($objEmployee->firstname, 0, 1).'. '.$objEmployee->lastname,
-                                $extraVars,
-                                null,
-                                false,
-                                $objCart->secure_key
-                            );
+                        $objPaymentModule->validateOrder(
+                            $objCart->id,
+                            $idOrderState,
+                            $amountPaid,
+                            $objPaymentModule->displayName,
+                            $this->l('Manual order -- Employee:').' '.substr($objEmployee->firstname, 0, 1).'. '.$objEmployee->lastname,
+                            $extraVars,
+                            null,
+                            false,
+                            $objCart->secure_key
+                        );
 
-                            if (isset($this->context->cookie->id_cart)) {
-                                unset($this->context->cookie->id_cart);
-                            }
-                            if (isset($this->context->cookie->id_guest)) {
-                                unset($this->context->cookie->id_guest);
-                            }
+                        if (isset($this->context->cookie->id_cart)) {
+                            unset($this->context->cookie->id_cart);
+                        }
+                        if (isset($this->context->cookie->id_guest)) {
+                            unset($this->context->cookie->id_guest);
+                        }
 
-                            if ($objPaymentModule->currentOrder) {
-                                Tools::redirectAdmin(self::$currentIndex.'&id_order='.$objPaymentModule->currentOrder.'&vieworder'.'&token='.$this->token.'&conf=3');
-                            }
+                        if ($objPaymentModule->currentOrder) {
+                            Tools::redirectAdmin(self::$currentIndex.'&id_order='.$objPaymentModule->currentOrder.'&vieworder'.'&token='.$this->token.'&conf=3');
                         }
                     } else {
                         // if errors render add order form
@@ -4508,14 +4495,6 @@ class AdminOrdersControllerCore extends AdminController
         		'error' => Tools::displayError('The OrderDetail object cannot be loaded.')
         	)));
 
-        $address = new Address(Tools::getValue('id_address'));
-        if (!Validate::isLoadedObject($address)) {
-            die(json_encode(array(
-                'result' => false,
-                'error' => Tools::displayError('The address object cannot be loaded.')
-            )));
-        }
-
         die(json_encode(array(
             'result' => true,
             'reduction_percent' => $order_detail->reduction_percent
@@ -5624,13 +5603,14 @@ class AdminOrdersControllerCore extends AdminController
         $new_date_to = trim(date('Y-m-d', strtotime($product_informations['date_to'])));
         $obj_booking_detail = new HotelBookingDetail();
         $product_quantity = (int) $obj_booking_detail->getNumberOfDays($new_date_from, $new_date_to);
+        $id_room = Tools::getValue('id_room');
 
         if (trim(Tools::getValue('id_hotel')) == '') {
             die(json_encode(array(
                 'result' => false,
                 'error' => Tools::displayError('Hotel Id is mising.'),
             )));
-        } elseif (trim(Tools::getValue('id_room')) == '') {
+        } elseif (trim($id_room) == '') {
             die(json_encode(array(
                 'result' => false,
                 'error' => Tools::displayError('Room Id is missing.'),
@@ -5638,22 +5618,22 @@ class AdminOrdersControllerCore extends AdminController
         } elseif (trim(date('Y-m-d', strtotime($product_informations['date_from']))) == '') {
             die(json_encode(array(
                 'result' => false,
-                'error' => Tools::displayError('Please Enter Check In Date.'),
+                'error' => Tools::displayError('Please enter check-in date.'),
             )));
         } elseif (!Validate::isDateFormat($new_date_from)) {
             die(json_encode(array(
                 'result' => false,
-                'error' => Tools::displayError('Please Enter a Valid Check In Date.'),
+                'error' => Tools::displayError('Please enter a valid check-in date.'),
             )));
         } elseif ($new_date_to == '') {
             die(json_encode(array(
                 'result' => false,
-                'error' => Tools::displayError('Please Enter Check Out Date.'),
+                'error' => Tools::displayError('Please enter check-out date.'),
             )));
         } elseif (!Validate::isDateFormat($new_date_to)) {
             die(json_encode(array(
                 'result' => false,
-                'error' => Tools::displayError('Please Enter a valid Check out Date.'),
+                'error' => Tools::displayError('Please enter a valid check-out date.'),
             )));
         }
         if ($this->context->employee->isSuperAdmin()) {
@@ -5666,14 +5646,14 @@ class AdminOrdersControllerCore extends AdminController
             if ($new_date_from < $compareDate) {
                 die(json_encode(array(
                     'result' => false,
-                    'error' => sprintf(Tools::displayError('Check In date should not be date before %s.'),$compareDate)
+                    'error' => sprintf(Tools::displayError('Check-in date should not be date before %s.'),$compareDate)
                 )));
             }
         }
         if ($new_date_to <= $new_date_from) {
             die(json_encode(array(
                 'result' => false,
-                'error' => Tools::displayError('Check out Date Should be after Check In date.'),
+                'error' => Tools::displayError('Check-out date should be after check-in date.'),
             )));
         } elseif (!Validate::isUnsignedInt($product_quantity)) {
             die(json_encode(array(
@@ -5686,7 +5666,20 @@ class AdminOrdersControllerCore extends AdminController
         if ($rooms_booked) {
             die(json_encode(array(
                 'result' => false,
-                'error' => Tools::displayError('This Room Unavailable For Selected Duration.'),
+                'error' => Tools::displayError('This room is unavailable for selected duration.'),
+            )));
+        }
+
+        $objHotelRoomDisableDates = new HotelRoomDisableDates();
+        $params = array(
+            'id_room' => $id_room,
+            'date_from' => $new_date_from,
+            'date_to' => $new_date_to
+        );
+        if ($objHotelRoomDisableDates->checkIfRoomAlreadyDisabled($params)) {
+            die(json_encode(array(
+                'result' => false,
+                'error' => Tools::displayError('This room is disabled in selected duration.'),
             )));
         }
     }

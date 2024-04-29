@@ -534,7 +534,9 @@ class AdminAddHotelController extends ModuleAdminController
                             if ($objHotelBranch->id_category) {
                                 $objCategory = new Category($objHotelBranch->id_category);
                                 $objCategory->name = $objHotelBranch->hotel_name;
+                                $objCategory->id_parent = $catCity;
                                 $objCategory->save();
+                                Category::regenerateEntireNtree();
                             } else {
                                 if ($catHotel = $objHotelBranch->addCategory(
                                     $hotelCatName, $catCity, $groupIds, 1, $newIdHotel, $linkRewriteArray
@@ -565,6 +567,9 @@ class AdminAddHotelController extends ModuleAdminController
                     }
                 }
             }
+
+            // update room types association after category update
+            $objHotelBranch->updateRoomTypeCategories();
 
             if ($idHotel) {
                 // save maximum booking date and preparation time

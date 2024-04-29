@@ -168,6 +168,15 @@ class AdminNormalProductsControllerCore extends AdminController
             $join_category = true;
         }
 
+        $priceAdditionType = array(
+            Product::PRICE_ADDITION_TYPE_WITH_ROOM => $this->l('Add price in room price'),
+            Product::PRICE_ADDITION_TYPE_INDEPENDENT => $this->l('Convenience Fee')
+        );
+        $priceCalculationMethod = array(
+            Product::PRICE_CALCULATION_METHOD_PER_BOOKING => $this->l('Add price once for the booking range'),
+            Product::PRICE_CALCULATION_METHOD_PER_DAY => $this->l('Add price for each day of booking')
+        );
+
         $this->_join .= '
 		LEFT JOIN `'._DB_PREFIX_.'stock_available` sav ON (sav.`id_product` = a.`id_product` AND sav.`id_product_attribute` = 0
 		'.StockAvailable::addSqlShopRestriction(null, null, 'sav').') ';
@@ -188,7 +197,7 @@ class AdminNormalProductsControllerCore extends AdminController
                 LEFT JOIN `'._DB_PREFIX_.'htl_room_type_service_product` rsp ON (rsp.`id_product` = a.`id_product`)
 				LEFT JOIN `'._DB_PREFIX_.'address` aa ON (aa.`id_hotel` = hb.`id`)';
 
-        $this->_select .= ' IF(a.`auto_add_to_cart`, "'.$this->l('Yes').'", "'.$this->l('No').'") as auto_added, IF(a.`auto_add_to_cart`, 1, 0) as badge_success, (SELECT COUNT(hri.`id`) FROM `'._DB_PREFIX_.'htl_room_information` hri WHERE hri.`id_product` = a.`id_product`) as num_rooms, ';
+        $this->_select .= ' IF(a.`auto_add_to_cart`, "'.$this->l('Yes').'", "'.$this->l('No').'") as auto_added, IF(a.`auto_add_to_cart`, 1, 0) as badge_success, IF(a.`show_at_front`, "'.$this->l('Yes').'", "'.$this->l('No').'") as show_at_front_txt, IF(a.`price_calculation_method` = '.(int)Product::PRICE_CALCULATION_METHOD_PER_DAY.', "'.$this->l('Per Day').'", "'.$this->l('Per Booking').'") as price_calculation_method_txt, (SELECT COUNT(hri.`id`) FROM `'._DB_PREFIX_.'htl_room_information` hri WHERE hri.`id_product` = a.`id_product`) as num_rooms, ';
         $this->_select .= ' COUNT(rsp.`id_product`) as products_associated, hrt.`adults`, hrt.`children`, hb.`id` as id_hotel, aa.`city`, hbl.`hotel_name`, ';
         $this->_select .= 'shop.`name` AS `shopname`, a.`id_shop_default`, ';
         $this->_select .= $alias_image.'.`id_image` AS `id_image`, cl.`name` AS `name_category`, '.$alias.'.`price`, 0 AS `price_final`, a.`is_virtual`, pd.`nb_downloadable`, sav.`quantity` AS `sav_quantity`, '.$alias.'.`active`, IF(sav.`quantity`<=0, 1, 0) AS `badge_danger`';
@@ -227,13 +236,61 @@ class AdminNormalProductsControllerCore extends AdminController
             'title' => $this->l('Associated Rooms types'),
             'class' => 'fixed-width-sm',
             'havingFilter' => true,
+            'optional' => true,
+            'visible_default' => true,
         );
         $this->fields_list['auto_added'] = array(
             'title' => $this->l('Auto Added'),
             'filter_key' => 'a!auto_add_to_cart',
             'align' => 'text-center',
             'type' => 'bool',
+            'optional' => true,
+            'visible_default' => true,
             'badge_success' => true
+        );
+        $this->fields_list['show_at_front_txt'] = array(
+            'title' => $this->l('Show at Front'),
+            'filter_key' => 'a!show_at_front',
+            'align' => 'text-center',
+            'type' => 'bool',
+            'optional' => true,
+        );
+        $this->fields_list['available_for_order'] = array(
+            'displayed' => false,
+            'title' => $this->l('Available for order'),
+            'filter_key' => 'a!available_for_order',
+            'type' => 'bool',
+        );
+        $this->fields_list['price_addition_type'] = array(
+            'displayed' => false,
+            'title' => $this->l('Price display preference'),
+            'filter_key' => 'a!price_addition_type',
+            'type' => 'select',
+            'list' => $priceAdditionType,
+        );
+        $this->fields_list['price_calculation_method_txt'] = array(
+            'title' => $this->l('Price calculation method'),
+            'filter_key' => 'a!price_calculation_method',
+            'type' => 'select',
+            'list' => $priceCalculationMethod,
+            'visible_default' => true,
+            'optional' => true,
+        );
+        $this->servicesCategory = array();
+        $idServiceCategory = Configuration::get('PS_SERVICE_CATEGORY');
+        $this->objLocationsCategory = new Category($idServiceCategory, $this->context->language->id);
+        $nestedCategories = Category::getNestedCategories($idServiceCategory);
+        if ($nestedCategories) {
+            foreach ($nestedCategories[$idServiceCategory]['children'] as $childCategory) {
+                $this->buildCategoryOptions($childCategory);
+            }
+        }
+        $this->fields_list['name_category'] = array(
+            'title' => $this->l('Default Category'),
+            'type' => 'select',
+            'list' => $this->servicesCategory,
+            'filter_key' => 'a!id_category_default',
+            'optional' => true,
         );
         // $serviceProductType = array(
         //     Product::SERVICE_PRODUCT_WITH_ROOMTYPE => $this->l('Bought with room type'),
@@ -285,6 +342,18 @@ class AdminNormalProductsControllerCore extends AdminController
                 'align' => 'center',
                 'position' => 'position'
             );
+        }
+    }
+
+    private function buildCategoryOptions($category)
+    {
+        $space = str_repeat('&nbsp;', 5 * (($category['level_depth'] - $this->objLocationsCategory->level_depth) - 1));
+        $this->servicesCategory[$category['id_category']] = $space.$category['name'];
+
+        if (isset($category['children']) && count($category['children'])) {
+            foreach ($category['children'] as $childCategory) {
+                $this->buildCategoryOptions($childCategory);
+            }
         }
     }
 
@@ -2446,6 +2515,9 @@ class AdminNormalProductsControllerCore extends AdminController
         $this->addRowAction('edit');
         $this->addRowAction('duplicate');
         $this->addRowAction('delete');
+
+        $this->_new_list_header_design = true;
+
         return parent::renderList();
     }
 
