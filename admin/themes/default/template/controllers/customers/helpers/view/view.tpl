@@ -277,7 +277,6 @@
 							<tr>
 								<th><span class="title_box ">{l s='ID'}</span></th>
 								<th><span class="title_box ">{l s='Date'}</span></th>
-								<th><span class="title_box ">{l s='Carrier'}</span></th>
 								<th><span class="title_box ">{l s='Total'}</span></th>
 							</tr>
 						</thead>
@@ -290,7 +289,6 @@
 										{dateFormat date=$cart['date_upd'] full=0}
 									</a>
 								</td>
-								<td>{$cart['name']}</td>
 								<td>{$cart['total_price']}</td>
 							</tr>
 						{/foreach}
