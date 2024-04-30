@@ -165,7 +165,10 @@ class AdminCustomerThreadsControllerCore extends AdminController
                             'lang' => true
                         )
                 ),
-                'submit' => array('title' => $this->l('Save'))
+                'submit' => array(
+                    'title' => $this->l('Save'),
+                    'name' => 'submitOptionsCustomerService'
+                )
             ),
             'general' => array(
                 'title' =>    $this->l('Customer service options'),
@@ -232,7 +235,10 @@ class AdminCustomerThreadsControllerCore extends AdminController
                         'hint' => $this->l('Do not use start-TLS to encrypt the session, even with servers that support it.'),
                     ),
                 ),
-                'submit' => array('title' => $this->l('Save')),
+                'submit' => array(
+                    'title' => $this->l('Save'),
+                    'name' => 'submitOptionsIMAPConfig'
+                ),
             ),
         );
 
@@ -312,6 +318,17 @@ class AdminCustomerThreadsControllerCore extends AdminController
 
     public function postProcess()
     {
+        // using this to separate the saving process for the both option fields
+        $fields = $this->fields_options;
+        if (Tools::isSubmit('submitOptionsCustomerService')) {
+            unset($this->fields_options['general']);
+            $this->processUpdateOptions();
+        } else if (Tools::isSubmit('submitOptionsIMAPConfig')) {
+            unset($this->fields_options['contact']);
+            $this->processUpdateOptions();
+        }
+
+        $this->fields_options = $fields;
         if ($id_customer_thread = (int)Tools::getValue('id_customer_thread')) {
             if (($id_contact = (int)Tools::getValue('id_contact'))) {
                 Db::getInstance()->execute('
