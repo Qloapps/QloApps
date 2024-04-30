@@ -3672,6 +3672,7 @@ class AdminProductsControllerCore extends AdminController
     public function processAdditionalFacilities()
     {
         if ($idProduct = Tools::getValue('id_product')) {
+            $errors = array();
             $objRoomTypeDemand = new HotelRoomTypeDemand();
             $objRoomTypeDemandPrice = new HotelRoomTypeDemandPrice();
             // first delete all the previously saved prices and demands of this room type
@@ -3699,7 +3700,7 @@ class AdminProductsControllerCore extends AdminController
                                 $objRoomTypeDemandPrice->save();
                             }
                         } else {
-                            $this->errors[] = Tools::displayError('Invalid demand price of facility.').
+                            $errors[] = Tools::displayError('Invalid demand price of facility.').
                             ' : '.$objGlobalDemand->name[$this->context->language->id];
                         }
                         if ($advOptions = $objAdvOption->getGlobalDemandAdvanceOptions($idGlobalDemand)) {
@@ -3716,15 +3717,16 @@ class AdminProductsControllerCore extends AdminController
                                             $objRoomTypeDemandPrice->save();
                                         }
                                     } else {
-                                        $this->errors[] = Tools::displayError('Invalid price of advanced option: ').$objAdvOption->name[$this->context->language->id];
+                                        $errors[] = Tools::displayError('Invalid price of advanced option: ').$objAdvOption->name[$this->context->language->id];
                                     }
                                 }
                             }
                         }
                     }
                 }
-                if (count($this->errors)) {
+                if (count($errors)) {
                     $this->warnings[] = Tools::displayError('Invalid price values are not saved. Please correct them and save again.');
+                    $this->errors = array_merge($this->errors, $errors);
                 }
 
                 $objCartBookingData = new HotelCartBookingData();
