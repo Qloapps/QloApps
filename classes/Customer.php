@@ -717,7 +717,7 @@ class CustomerCore extends ObjectModel
         return Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS('
 		SELECT * FROM `'._DB_PREFIX_.'orders` o
 		LEFT JOIN `'._DB_PREFIX_.'order_detail` od ON o.id_order = od.id_order
-		WHERE o.valid = 1 AND o.`id_customer` = '.(int)$this->id);
+        WHERE od.`product_auto_add`= 0 AND o.valid = 1 AND o.`id_customer` = '.(int)$this->id);
     }
 
     public static function getDefaultGroupId($id_customer)
