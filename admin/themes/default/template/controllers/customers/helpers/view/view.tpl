@@ -187,13 +187,15 @@
 					{assign var=count_ko value=count($orders_ko)}
 					<div class="panel">
 						<div class="row">
-							<div class="col-lg-6">
+							<div class="col-lg-3">
 								<i class="icon-ok-circle icon-big"></i>
 								{l s='Valid orders:'}
 								<span class="label label-success">{$count_ok}</span>
-								{l s='for a total amount of %s' sprintf=$total_ok}
 							</div>
-							<div class="col-lg-6">
+							<div class="col-lg-5">
+								{l s=' Total amount recived: %s' sprintf=$total_ok}
+							</div>
+							<div class="col-lg-4">
 								<i class="icon-exclamation-sign icon-big"></i>
 								{l s='Invalid orders:'}
 								<span class="label label-danger">{$count_ko}</span>
