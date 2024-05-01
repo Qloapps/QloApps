@@ -54,10 +54,6 @@ class AdminCartsControllerCore extends AdminController
 		LEFT JOIN `'._DB_PREFIX_.'connections` co ON (a.id_guest = co.id_guest AND TIME_TO_SEC(TIMEDIFF(\''.pSQL(date('Y-m-d H:i:00', time())).'\', co.`date_add`)) < 1800)';
         $this->_group = ' GROUP BY a.`id_cart`';
 
-        if (Tools::getValue('action') == 'filterOnlyAbandonedCarts') {
-            $this->_filterHaving = ' AND `ids_order` = 0 AND `time_diff` > 86400';
-        }
-
         $this->fields_list = array(
             'id_cart' => array(
                 'title' => $this->l('ID'),
@@ -117,8 +113,18 @@ class AdminCartsControllerCore extends AdminController
         }
 
         parent::__construct();
-
         $this->list_no_link = true;
+        if (Tools::getValue('action') == 'filterOnlyAbandonedCarts') {
+            // Resetting the previously selected filters if selected from the KPI
+            $this->processResetFilters();
+            $dateFrom = date('Y-m-d', strtotime('-2 day'));
+            $dateTo = date('Y-m-d', strtotime('-1 day'));
+            $orderFilterValue = 'Abandoned';
+            $_POST[$this->table.'Filter_'.$this->fields_list['date_add']['filter_key']] = '["'.$dateFrom.'", "'.$dateTo.'"]';
+            $_POST[$this->table.'Filter_filter_ids_order'] = $orderFilterValue;
+            $_POST['submitFilter'.$this->table] = true;
+        }
+
     }
 
     public function getOrderColumn($idsOrder, $tr)
