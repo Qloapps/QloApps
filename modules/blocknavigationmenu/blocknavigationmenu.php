@@ -103,6 +103,45 @@ class blocknavigationmenu extends Module
         }
     }
 
+    public function hookActionObjectCMSUpdateAfter($params)
+    {
+        $id_cms = $params['object']->id;
+        // Disabling all the related navigation links to disabled CMS page
+        if (!$params['object']->active) {
+            $this->disableRelatedLinks($id_cms);
+        }
+    }
+
+    public function hookActionObjectCMSDeleteAfter($params)
+    {
+        $id_cms = $params['object']->id;
+        // Disabling all the related navigation links to deleted CMS page
+        $this->deleteRelatedLinks($id_cms);
+    }
+
+    public function disableRelatedLinks($id_cms)
+    {
+        $objCustomNavigationLink = new WkCustomNavigationLink();
+        if ($navLinks = $objCustomNavigationLink->getRelatedNavLinksByIdCMS($id_cms)) {
+            foreach ($navLinks as $navLink) {
+                $objCustomNavigationLink = new WkCustomNavigationLink((int) $navLink['id_navigation_link']);
+                $objCustomNavigationLink->active = 0;
+                $objCustomNavigationLink->save();
+            }
+        }
+    }
+
+    public function deleteRelatedLinks($id_cms)
+    {
+        $objCustomNavigationLink = new WkCustomNavigationLink();
+        if ($navLinks = $objCustomNavigationLink->getRelatedNavLinksByIdCMS($id_cms)) {
+            foreach ($navLinks as $navLink) {
+                $objCustomNavigationLink = new WkCustomNavigationLink((int) $navLink['id_navigation_link']);
+                $objCustomNavigationLink->delete();
+            }
+        }
+    }
+
     public function install()
     {
         $objModuleDb = new WkBlockNavigationMenuDb();
@@ -125,6 +164,8 @@ class blocknavigationmenu extends Module
             array (
                 'footer',
                 'actionObjectLanguageAddAfter',
+                'actionObjectCMSUpdateAfter',
+                'actionObjectCMSDeleteAfter',
                 'displayDefaultNavigationHook',
                 'displayNavigationHook',
                 'top',

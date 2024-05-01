@@ -179,6 +179,16 @@ class AdminCustomNavigationLinkSettingController extends ModuleAdminController
         if (Validate::isLoadedObject($objNavigationLink)) {
             $smartyVars['navigationLinkInfo'] = (array) $objNavigationLink;
             $smartyVars['edit'] = 1;
+            if (!$objNavigationLink->is_custom_link
+                && Validate::isLoadedObject($objCMS = new CMS($objNavigationLink->id_cms))
+            ) {
+                $smartyVars['id_cms_category'] = $objCMS->id_cms_category;
+                if (empty($this->errors)
+                    && !$objCMS->active
+                ) {
+                    $this->warnings[] = $this->l('To enable this link you need to enable the related CMS page first');
+                }
+            }
         }
         // send theme's front pages
         $themePages = array();
@@ -196,7 +206,31 @@ class AdminCustomNavigationLinkSettingController extends ModuleAdminController
         $smartyVars['themePages'] = $themePages;
         $smartyVars['languages'] = Language::getLanguages(false);
         $smartyVars['currentLang'] = Language::getLanguage((int) Configuration::get('PS_LANG_DEFAULT'));
-        $smartyVars['cmsPages'] = CMS::getCMSPages($smartyVars['currentLang'], 1);
+        $categoryWiseCmsPages = array();
+        if ($cmsPages = CMS::getCMSPages($smartyVars['currentLang'], null, false)) {
+            foreach ($cmsPages as $page) {
+                $cmsPage['id_cms'] = $page['id_cms'];
+                $cmsPage['meta_title'] = $page['meta_title'];
+                $categoryWiseCmsPages[$page['id_cms_category']][] = $cmsPage;
+            }
+        }
+
+        if ($cmsCategories = CMSCategory::getCategories($this->context->language->id, false, false)) {
+            foreach ($cmsCategories as $cmsCatKey => $cmsCategory) {
+                if (!isset($categoryWiseCmsPages[$cmsCategory['id_cms_category']])) {
+                    unset($cmsCategories[$cmsCatKey]);
+                }
+            }
+        }
+
+        Media::addJsDef(
+            array(
+                'catFormatCmsPages' => json_encode($categoryWiseCmsPages)
+            )
+        );
+
+        $smartyVars['cmsPages'] = $cmsPages;
+        $smartyVars['categories'] = $cmsCategories;
         $this->context->smarty->assign($smartyVars);
         $this->fields_form = array(
             'submit' => array(
@@ -261,6 +295,10 @@ class AdminCustomNavigationLinkSettingController extends ModuleAdminController
             }
             if ($isCmsPage) {
                 $objCustomNavigationLink->id_cms = $idCms;
+                $objCMS = new CMS((int) $idCms);
+                if (!$objCMS->active) {
+                    $active = $objCMS->active;
+                }
             } else {
                 $objCustomNavigationLink->id_cms = 0;
                 foreach ($languages as $language) {
@@ -379,6 +417,24 @@ class AdminCustomNavigationLinkSettingController extends ModuleAdminController
                 break;
             }
         }
+    }
+
+    public function processStatus()
+    {
+        if (Validate::isLoadedObject($this->loadObject())
+            && !$this->object->is_custom_link //Check for CMS related navigation link
+        ) {
+            $objCMS = new CMS($this->object->id_cms);
+            if (!$objCMS->active) {
+                $this->errors[] = $this->l('Please activate the relate CMS page to activate this link');
+            }
+        }
+
+        if (empty($this->errors)) {
+            return parent::processStatus();
+        }
+
+        return $this->object;
     }
 
     public function setMedia()

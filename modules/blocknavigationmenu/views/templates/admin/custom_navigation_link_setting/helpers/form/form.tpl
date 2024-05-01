@@ -52,6 +52,24 @@
 			</div>
 			{* Feilds of cms page *}
 			<div id="cms_block_content" class="{if isset($smarty.post.is_cms_block_link)}{if !$smarty.post.is_cms_block_link}hidden{/if}{elseif !isset($navigationLinkInfo['id_cms']) || !$navigationLinkInfo['id_cms']}hidden{/if}">
+				<div class="form-group">
+					<div id="selected_parent_category">
+						<label class="control-label col-lg-3">
+							<span title="" data-toggle="tooltip" class="label-tooltip" data-original-title="{l s='Select CMS category to display related CMS pages' mod='blocknavigationmenu'}" data-html="true">
+								{l s='Select CMS category' mod='blocknavigationmenu'}
+							</span>
+						</label>
+						<div class="col-lg-9">
+							<select class="form-control fixed-width-xxl " name="id_cms_category" id="id_cms_category">
+								{if isset($categories) && count($categories)}
+									{foreach $categories as $category}
+										<option value="{$category.id_cms_category}" {if isset($smarty.post.id_cms_category)}{if ($smarty.post.id_cms_category == $category.id_cms_category)}selected="selected"{/if}{else if isset($id_cms_category) && ($id_cms_category == $category.id_cms_category)}selected="selected"{/if}>{$category.name|escape:'htmlall':'UTF-8'}</option>
+									{/foreach}
+								{/if}
+							</select>
+						</div>
+					</div>
+				</div>
 				{*Display CMS Pages*}
 				{if isset($cmsPages)}
 					<div class="form-group">
@@ -62,7 +80,7 @@
 							</span>
 						</label>
 						<div class="col-lg-9">
-							<table class="table table-bordered" style="width:40%;">
+							<table class="table table-bordered cms_pages" style="width:40%;">
 								<thead>
 									<tr>
 										<th class="fixed-width-xs">

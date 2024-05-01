@@ -237,4 +237,13 @@ class WkCustomNavigationLink extends ObjectModel
         $objCustomNavigationLink->save();
         return true;
     }
+
+    public function getRelatedNavLinksByIdCMS($idCMS)
+    {
+        return Db::getInstance()->executeS('
+            SELECT * FROM `'._DB_PREFIX_.'htl_custom_navigation_link`
+            WHERE `id_cms`='.(int) $idCMS
+        );
+    }
+
 }

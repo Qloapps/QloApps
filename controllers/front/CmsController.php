@@ -79,8 +79,7 @@ class CmsControllerCore extends FrontController
         } elseif (Validate::isLoadedObject($this->cms_category) && $this->cms_category->active && $this->cms_category->isAssociatedToShop()) {
             $this->assignCase = 2;
         } else {
-            header('HTTP/1.1 404 Not Found');
-            header('Status: 404 Not Found');
+            Tools::redirect($this->context->link->getPageLink('pagenotfound'));
         }
     }
 
@@ -134,6 +133,8 @@ class CmsControllerCore extends FrontController
                 'path' => ($this->cms_category->id !== 1) ? Tools::getPath($this->cms_category->id, $this->cms_category->name, false, 'CMS') : '',
                 'body_classes' => array($this->php_self.'-'.$this->cms_category->id, $this->php_self.'-'.$this->cms_category->link_rewrite)
             ));
+        } else {
+            Tools::redirect($this->context->link->getPageLink('pagenotfound'));
         }
 
         $this->setTemplate(_PS_THEME_DIR_.'cms.tpl');
