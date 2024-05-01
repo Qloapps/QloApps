@@ -196,7 +196,7 @@ class ContactControllerCore extends FrontController
                     }
 
                     if (!empty($contact->email)) {
-                        if (!Mail::Send($this->context->language->id, 'contact', Mail::l('Message from contact form').' [no_sync]',
+                        if (!Mail::Send($this->context->language->id, 'contact', Mail::l('Message from contact form'),
                             $var_list, $contact->email, $contact->name, null, null,
                                     $file_attachment, null,    _PS_MAIL_DIR_, false, null, null, $from)) {
                             $this->errors[] = Tools::displayError('An error occurred while sending the message.');
