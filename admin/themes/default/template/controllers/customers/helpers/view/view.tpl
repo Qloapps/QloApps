@@ -203,65 +203,90 @@
 						</div>
 					</div>
 
-					{if $count_ok}
-						<table class="table">
-							<thead>
-								<tr>
-									<th class="center"><span class="title_box ">{l s='ID'}</span></th>
-									<th><span class="title_box">{l s='Date'}</span></th>
-									<th><span class="title_box">{l s='Payment'}</span></th>
-									<th><span class="title_box">{l s='Status'}</span></th>
-									<th><span class="title_box">{l s='Products'}</span></th>
-									<th><span class="title_box ">{l s='Total spent'}</span></th>
-									<th></th>
-								</tr>
-							</thead>
-							<tbody>
-							{foreach $orders_ok AS $key => $order}
-								<tr onclick="document.location = '?tab=AdminOrders&amp;id_order={$order['id_order']|intval}&amp;vieworder&amp;token={getAdminToken tab='AdminOrders'}'">
-									<td>{$order['id_order']}</td>
-									<td>{dateFormat date=$order['date_add'] full=0}</td>
-									<td>{$order['payment']}</td>
-									<td>{$order['order_state']}</td>
-									<td>{$order['nb_products']}</td>
-									<td>{$order['total_paid_real']}</td>
-									<td>
-										<a class="btn btn-default" href="?tab=AdminOrders&amp;id_order={$order['id_order']|intval}&amp;vieworder&amp;token={getAdminToken tab='AdminOrders'}">
-											<i class='icon-search'></i> {l s='View'}
-										</a>
-									</td>
-								</tr>
-							{/foreach}
-							</tbody>
-						</table>
+					{if $count_ok || $count_ko}
+						<div class="nav nav-tabs">
+							<ul class="nav nav-tabs">
+								{if $count_ok}
+									<li class="active">
+										<a data-toggle="tab" class="idTabHrefShort" href="#valid_orders"> {l s='Valid orders'}</a>
+									</li>
+								{/if}
+								{if $count_ko}
+									<li {if !$count_ok}class="active"{/if}>
+										<a data-toggle="tab" class="idTabHrefShort" href="#invalid_orders"> {l s='Invalid orders'}</a>
+									</li>
+								{/if}
+							</ul>
+							<div class="tab-content panel">
+								{if $count_ok}
+									<table class="table tab-pane active" id="valid_orders">
+										<thead>
+											<tr>
+												<th class="center"><span class="title_box ">{l s='ID'}</span></th>
+												<th><span class="title_box">{l s='Date'}</span></th>
+												<th><span class="title_box">{l s='Payment'}</span></th>
+												<th><span class="title_box">{l s='Status'}</span></th>
+												<th><span class="title_box">{l s='Products'}</span></th>
+												<th><span class="title_box ">{l s='Total spent'}</span></th>
+												<th></th>
+											</tr>
+										</thead>
+										<tbody>
+										{foreach $orders_ok AS $key => $order}
+											<tr onclick="document.location = '?tab=AdminOrders&amp;id_order={$order['id_order']|intval}&amp;vieworder&amp;token={getAdminToken tab='AdminOrders'}'">
+												<td>{$order['id_order']}</td>
+												<td>{dateFormat date=$order['date_add'] full=0}</td>
+												<td>{$order['payment']}</td>
+												<td>{$order['order_state']}</td>
+												<td>{$order['nb_products']}</td>
+												<td>{$order['total_paid_real']}</td>
+												<td>
+													<a class="btn btn-default" href="?tab=AdminOrders&amp;id_order={$order['id_order']|intval}&amp;vieworder&amp;token={getAdminToken tab='AdminOrders'}">
+														<i class='icon-search'></i> {l s='View'}
+													</a>
+												</td>
+											</tr>
+										{/foreach}
+										</tbody>
+									</table>
+								{/if}
+
+								{if $count_ko}
+									<table class="table tab-pane{if !$count_ok}active"{/if} id="invalid_orders">
+										<thead>
+											<tr>
+												<th><span class="title_box ">{l s='ID'}</span></th>
+												<th><span class="title_box ">{l s='Date'}</span></th>
+												<th><span class="title_box ">{l s='Payment'}</span></th>
+												<th><span class="title_box ">{l s='Status'}</span></th>
+												<th><span class="title_box ">{l s='Products'}</span></th>
+												<th><span class="title_box ">{l s='Total spent'}</span></th>
+												<th></th>
+											</tr>
+										</thead>
+										<tbody>
+											{foreach $orders_ko AS $key => $order}
+											<tr onclick="document.location = '?tab=AdminOrders&amp;id_order={$order['id_order']|intval}&amp;vieworder&amp;token={getAdminToken tab='AdminOrders'}'">
+												<td>{$order['id_order']}</td>
+												<td>{dateFormat date=$order['date_add'] full=0}</a></td>
+												<td>{$order['payment']}</td>
+												<td>{$order['order_state']}</td>
+												<td>{$order['nb_products']}</td>
+												<td>{$order['total_paid_real']}</td>
+												<td>
+													<a class="btn btn-default" href="?tab=AdminOrders&amp;id_order={$order['id_order']|intval}&amp;vieworder&amp;token={getAdminToken tab='AdminOrders'}">
+														<i class='icon-search'></i> {l s='View'}
+													</a>
+												</td>
+											</tr>
+											{/foreach}
+										</tbody>
+									</table>
+								{/if}
+							</div>
+						</div>
 					{/if}
 
-					{if $count_ko}
-						<table class="table">
-							<thead>
-								<tr>
-									<th><span class="title_box ">{l s='ID'}</span></th>
-									<th><span class="title_box ">{l s='Date'}</span></th>
-									<th><span class="title_box ">{l s='Payment'}</span></th>
-									<th><span class="title_box ">{l s='Status'}</span></th>
-									<th><span class="title_box ">{l s='Products'}</span></th>
-									<th><span class="title_box ">{l s='Total spent'}</span></th>
-								</tr>
-							</thead>
-							<tbody>
-								{foreach $orders_ko AS $key => $order}
-								<tr onclick="document.location = '?tab=AdminOrders&amp;id_order={$order['id_order']|intval}&amp;vieworder&amp;token={getAdminToken tab='AdminOrders'}'">
-									<td>{$order['id_order']}</td>
-									<td><a href="?tab=AdminOrders&amp;id_order={$order['id_order']}&amp;vieworder&amp;token={getAdminToken tab='AdminOrders'}">{dateFormat date=$order['date_add'] full=0}</a></td>
-									<td>{$order['payment']}</td>
-									<td>{$order['order_state']}</td>
-									<td>{$order['nb_products']}</td>
-									<td>{$order['total_paid_real']}</td>
-								</tr>
-								{/foreach}
-							</tbody>
-						</table>
-					{/if}
 				{else}
 				<p class="text-muted text-center">
 					{l s='%1$s %2$s has not placed any orders yet' sprintf=[$customer->firstname, $customer->lastname]}
@@ -305,7 +330,7 @@
 			{if $products AND count($products)}
 			<div class="panel">
 				<div class="panel-heading">
-					<i class="icon-archive"></i> {l s='Purchased products'} <span class="badge">{count($products)}</span>
+					<i class="icon-archive"></i> {l s='Room types and services'} <span class="badge">{count($products)}</span>
 				</div>
 				<table class="table">
 					<thead>
