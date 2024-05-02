@@ -461,7 +461,7 @@ class StatsForecast extends Module
 							<td class="text-left">'.(int)$payment['nb'].'</td>
 							<td class="text-left">'.Tools::displayPrice($payment['total'], $currency).'</td>
 							<td class="text-left">'.sprintf('%0.2f', ($ca['ventil']['nb'] ? ($payment['nb'] / $ca['ventil']['nb']) * 100 : 0)).'%</td>
-							<td class="text-left">'.sprintf('%0.2f', ($ca['ventil']['nb'] ? ($payment['total'] / $ca['ventil']['total_incl']) * 100 : 0)).'%</td>
+							<td class="text-left">'.sprintf('%0.2f', ($ca['ventil']['total_incl'] > 0 ? ($payment['total'] / $ca['ventil']['total_incl']) * 100 : 0)).'%</td>
 							<td class="text-left">'.Tools::displayPrice($payment['total'] / (int)$payment['nb'], $currency).'</td>
 						</tr>';
 			}
@@ -492,7 +492,7 @@ class StatsForecast extends Module
 						<tr>
 							<td class="text-left">'.$ophone.'</td>
 							<td class="text-left">'.Tools::displayPrice($amount, $currency).'</td>
-							<td class="text-left">'.sprintf('%0.2f', ($ca['ventil']['total'] ? ($amount / $ca['ventil']['total']) * 100 : 0)).'%</td>
+							<td class="text-left">'.sprintf('%0.2f', ($ca['ventil']['total'] > 0 ? ($amount / $ca['ventil']['total']) * 100 : 0)).'%</td>
 						</tr>';
 			}
 		} else {
@@ -526,7 +526,7 @@ class StatsForecast extends Module
 							<td class="text-left">'.(int)($zone['nb']).'</td>
 							<td class="text-left">'.Tools::displayPrice($zone['total'], $currency).'</td>
 							<td class="text-left">'.sprintf('%0.2f', $ca['ventil']['nb'] ? ($zone['nb'] / $ca['ventil']['nb']) * 100 : 0).'%</td>
-							<td class="text-left">'.sprintf('%0.2f', $ca['ventil']['total'] ? ($zone['total'] / $ca['ventil']['total']) * 100 : 0).'%</td>
+							<td class="text-left">'.sprintf('%0.2f', $ca['ventil']['total'] > 0 ? ($zone['total'] / $ca['ventil']['total']) * 100 : 0).'%</td>
 						</tr>';
 			}
 		} else {
@@ -577,7 +577,7 @@ class StatsForecast extends Module
 								<td class="text-left">'.(int)($currency_row['nb']).'</td>
 								<td class="text-left">'.Tools::displayPrice($currency_row['total'], $currency).'</td>
 								<td class="text-left">'.sprintf('%0.2f', $ca['ventil']['nb'] ? ($currency_row['nb'] / $ca['ventil']['nb']) * 100 : 0).'%</td>
-								<td class="text-left">'.sprintf('%0.2f', $ca['ventil']['total'] ? ($currency_row['total'] / $ca['ventil']['total']) * 100 : 0).'%</td>
+								<td class="text-left">'.sprintf('%0.2f', $ca['ventil']['total'] > 0 ? ($currency_row['total'] / $ca['ventil']['total']) * 100 : 0).'%</td>
 							</tr>';
 			}
 		} else {
