@@ -183,7 +183,7 @@ class AdminAddHotelController extends ModuleAdminController
         $smartyVars['state_var'] = $stateOptions;
         $smartyVars['enabledDisplayMap'] = Configuration::get('PS_API_KEY') && Configuration::get('WK_GOOGLE_ACTIVE_MAP');
         $smartyVars['ps_img_dir'] = _PS_IMG_.'l/';
-        $smartyVars['MAX_GLOBAL_BOOKING_DATE'] = date('Y-m-d', strtotime(Configuration::get('MAX_GLOBAL_BOOKING_DATE')));
+        $smartyVars['MAX_GLOBAL_BOOKING_DATE'] = (Configuration::get('MAX_GLOBAL_BOOKING_DATE'));
         $smartyVars['GLOBAL_PREPARATION_TIME'] = Configuration::get('GLOBAL_PREPARATION_TIME');
 
         $this->context->smarty->assign($smartyVars);
@@ -471,7 +471,7 @@ class AdminAddHotelController extends ModuleAdminController
                 }
                 // getHotel address
                 if ($idHotelAddress = $objHotelBranch->getHotelIdAddress()) {
-                $objAddress = new Address($idHotelAddress);
+                    $objAddress = new Address($idHotelAddress);
                 } else {
                     $objAddress = new Address();
                 }
