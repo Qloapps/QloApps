@@ -210,7 +210,7 @@ abstract class ModuleGraphCore extends Module
                         if (isset($this->_values[$key])) {
                             // We don't want strings to be divided. Example: product name
                             if (is_numeric($this->_values[$key])) {
-                                $this->_csv .= $this->_values[$key] / (($datas['type'] == 'pie') ? $total : 1);
+                                $this->_csv .= $this->_values[$key] * 100 / (($datas['type'] == 'pie') ? $total : 1) . '%';
                             } else {
                                 $this->_csv .= $this->_values[$key];
                             }
@@ -220,7 +220,7 @@ abstract class ModuleGraphCore extends Module
                     } else {
                         // We don't want strings to be divided. Example: product name
                         if (is_numeric($this->_values[$i][$key])) {
-                            $this->_csv .= $this->_values[$i][$key] / (($datas['type'] == 'pie') ? $total : 1);
+                            $this->_csv .= $this->_values[$i][$key] * 100 / (($datas['type'] == 'pie') ? $total : 1) . '%';
                         } else {
                             $this->_csv .= $this->_values[$i][$key];
                         }
