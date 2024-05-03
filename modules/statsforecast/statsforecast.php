@@ -677,6 +677,7 @@ class StatsForecast extends Module
 				LEFT JOIN `'._DB_PREFIX_.'currency` cu ON o.id_currency = cu.id_currency
 				'.$join.'
 				WHERE o.`id_order` IN ('.pSQL($idOrders).')
+				'.$where.'
 				GROUP BY o.id_currency
 				ORDER BY total DESC';
         $ca['currencies'] = Db::getInstance()->executeS($sql);
