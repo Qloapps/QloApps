@@ -473,6 +473,11 @@ class LinkCore
             $id_lang = (int)Context::getContext()->language->id;
         }
 
+        // Initialize $request to an empty array if it's null
+        if ($request === null) {
+            $request = [];
+        }
+
         //need to be unset because getModuleLink need those params when rewrite is enable
         if (is_array($request)) {
             if (isset($request['module'])) {
