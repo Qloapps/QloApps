@@ -252,7 +252,7 @@
 								{/if}
 
 								{if $count_ko}
-									<table class="table tab-pane{if !$count_ok}active"{/if} id="invalid_orders">
+									<table class="table tab-pane{if !$count_ok}active{/if}" id="invalid_orders">
 										<thead>
 											<tr>
 												<th><span class="title_box ">{l s='ID'}</span></th>
