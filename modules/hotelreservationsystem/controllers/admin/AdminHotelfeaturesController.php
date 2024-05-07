@@ -150,18 +150,6 @@ class AdminHotelFeaturesController extends ModuleAdminController
                 $this->errors[] = $this->l('Please add atleast one Child features.');
             }
 
-            foreach ($languages as $lang) {
-                if (!trim(Tools::getValue('parent_ftr_name_'.$lang['id_lang']))) {
-                    $objHotelFeatures->name[$lang['id_lang']] = Tools::getValue(
-                        'parent_ftr_name_'.$defaultLangId
-                    );
-                } else {
-                    $objHotelFeatures->name[$lang['id_lang']] = Tools::getValue(
-                        'parent_ftr_name_'.$lang['id_lang']
-                    );
-                }
-            }
-
             if (!count($this->errors)) {
                 if (isset($parentFeatureId) && $parentFeatureId) {
                     $objHotelFeatures = new HotelFeatures($parentFeatureId);
