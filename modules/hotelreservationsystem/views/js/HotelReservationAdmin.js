@@ -464,11 +464,12 @@ $(document).ready(function() {
                 },
                 method: 'POST',
                 success: function(data) {
-                    if (data == 'success') {
+                    var response =  JSON.parse(data);
+                    if (response.status) {
                         alert(success_delete_msg);
                         $('#grand_feature_div_' + ftr_id).remove();
                     } else {
-                        alert(error_delete_msg);
+                        alert(response.msg);
                     }
                 },
                 error: function(XMLHttpRequest, textStatus, errorThrown) {
