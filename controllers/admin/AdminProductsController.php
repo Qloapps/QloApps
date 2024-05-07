@@ -468,6 +468,12 @@ class AdminProductsControllerCore extends AdminController
             $bo_theme = 'default';
         }
 
+        Media::addJsDef(
+            array(
+                'tb_pathToImage' => '../img/loadingAnimation.gif'
+            )
+        );
+
         $this->addJs(__PS_BASE_URI__.$this->admin_webpath.'/themes/'.$bo_theme.'/js/jquery.iframe-transport.js');
         $this->addJs(__PS_BASE_URI__.$this->admin_webpath.'/themes/'.$bo_theme.'/js/jquery.fileupload.js');
         $this->addJs(__PS_BASE_URI__.$this->admin_webpath.'/themes/'.$bo_theme.'/js/jquery.fileupload-process.js');

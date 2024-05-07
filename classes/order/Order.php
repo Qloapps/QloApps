@@ -1804,7 +1804,7 @@ class OrderCore extends ObjectModel
             SELECT opd.`amount` as `real_paid_amount`, opd.*, op.*
             FROM `'._DB_PREFIX_.'order_payment_detail` opd
             INNER JOIN `'._DB_PREFIX_.'order_payment` op ON (opd.`id_order_payment` = op.`id_order_payment`)
-            WHERE `id_order` = '.$this->id
+            WHERE `id_order` = '.(int) $this->id
         );
     }
 

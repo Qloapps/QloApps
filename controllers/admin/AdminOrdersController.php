@@ -482,8 +482,7 @@ class AdminOrdersControllerCore extends AdminController
     {
         if ($this->display == 'view') {
             /** @var Order $order */
-            $order = $this->loadObject();
-
+            $order = new Order(Tools::getValue($this->identifier));
             // hotel link in header
             if ($idHotel = HotelBookingDetail::getIdHotelByIdOrder($order->id)) {
                 $this->toolbar_btn['hotel'] = array(
@@ -997,7 +996,9 @@ class AdminOrdersControllerCore extends AdminController
         $this->addJS(_PS_JS_DIR_.'vendor/d3.v3.min.js');
 
         if ($this->tabAccess['edit'] == 1 && $this->display == 'view') {
-            $this->addJS(_PS_JS_DIR_.'admin/orders.js');
+            if ($this->loadObject(true)) {
+                $this->addJS(_PS_JS_DIR_.'admin/orders.js');
+            }
             // $this->addJS(_PS_JS_DIR_.'admin/orders-product-event.js');
             // $this->addJS(_PS_JS_DIR_.'admin/orders-room-event.js');
             $this->addJS(_PS_JS_DIR_.'tools.js');
@@ -2477,11 +2478,10 @@ class AdminOrdersControllerCore extends AdminController
     {
         $order = new Order(Tools::getValue('id_order'));
         if (!Validate::isLoadedObject($order)) {
-            $this->errors[] = Tools::displayError('The order cannot be found within your database.');
+            return false;
         }
 
         $this->content .= $this->renderKpis();
-
         $customer = new Customer($order->id_customer);
         $carrier = new Carrier($order->id_carrier);
         $products = $this->getProducts($order);
