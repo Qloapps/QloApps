@@ -190,6 +190,7 @@ class StatsRegistrations extends ModuleGraph
 
     protected function setYearValues($layers)
     {
+        $this->_titles['x'][] = $this->l('Month');
         $result = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($this->query.$this->getDate());
         foreach ($result as $row) {
             $mounth = (int)substr($row['date_add'], 5, 2);
@@ -202,6 +203,7 @@ class StatsRegistrations extends ModuleGraph
 
     protected function setMonthValues($layers)
     {
+        $this->_titles['x'][] = $this->l('Date');
         $result = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($this->query.$this->getDate());
         foreach ($result as $row) {
             $this->_values[(int)Tools::substr($row['date_add'], 8, 2)]++;
@@ -210,6 +212,7 @@ class StatsRegistrations extends ModuleGraph
 
     protected function setDayValues($layers)
     {
+        $this->_titles['x'][] = $this->l('Time');
         $result = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($this->query.$this->getDate());
         foreach ($result as $row) {
             $this->_values[(int)Tools::substr($row['date_add'], 11, 2)]++;
