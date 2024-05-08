@@ -32,27 +32,31 @@ $(document).ready(function() {
                 var word = $(this).val();
                 var d = new Date();
                 var n = d.getTime();
-                trigger_ajax = $.ajax({
-                    url: "ajax_products_list.php",
-                    dataType: 'json',
-                    data: {
-                        q: word,
-                        _: n,
-                        booking_product: '1',
-                    },
-                    success: function(result) {
-                        if (result) {
-                            var html = '';
-                            $.each(result, function(key, value) {
-                                html += '<li class="suggestion_li"><a class="suggestion_a text-capitalize" data-primary="' + value.id + '" data-secondary="' + value.name + '">' + value.name + '</a></li>';
-                            });
-                            suggestion_ul.html(html).show();
-                        } else {
-                            suggestion_ul.empty().hide();
-                            suggestion_ul.siblings("input#id_product").val(null);
+                var id_hotel = parseInt($('#id_hotel').val());
+                if (!isNaN(id_hotel)) {
+                    trigger_ajax = $.ajax({
+                        url: "ajax_products_list.php",
+                        dataType: 'json',
+                        data: {
+                            q: word,
+                            _: n,
+                            booking_product: '1',
+                            id_hotel: id_hotel
+                        },
+                        success: function(result) {
+                            if (result) {
+                                var html = '';
+                                $.each(result, function(key, value) {
+                                    html += '<li class="suggestion_li"><a class="suggestion_a text-capitalize" data-primary="' + value.id + '" data-secondary="' + value.name + '">' + value.id+ '. '+ value.name + '</a></li>';
+                                });
+                                suggestion_ul.html(html).show();
+                            } else {
+                                suggestion_ul.empty().hide();
+                                suggestion_ul.siblings("input#id_product").val(null);
+                            }
                         }
-                    }
-                });
+                    });
+                }
             }
         }
     });
@@ -72,5 +76,10 @@ $(document).ready(function() {
         if ($('ul.prod_suggest_ul').is(':visible')) {
             $('ul.prod_suggest_ul').empty().hide();
         }
+    });
+    $(document).on('change', '#id_hotel', function () {
+        // resetting the fields on hotel change
+        $('#id_product').val('');
+        $('#productName').val('');
     });
 });

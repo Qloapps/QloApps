@@ -29,11 +29,20 @@ class AdminHotelRoomModuleSettingController extends ModuleAdminController
         $this->bootstrap = true;
         $this->context = Context::getContext();
 
+        $this->_select = ' pl.`name`, hbil.`hotel_name` ';
+
+        $this->_join .= ' LEFT JOIN `'._DB_PREFIX_.'product_lang` pl
+            ON (pl.`id_product` = a.`id_product` AND pl.id_lang = '.(int) $this->context->language->id.')';
+        $this->_join .= ' LEFT JOIN `'._DB_PREFIX_.'htl_room_type` hrt
+            ON (hrt.`id_product` = a.`id_product`)';
+        $this->_join .= ' LEFT JOIN `'._DB_PREFIX_.'htl_branch_info_lang` hbil
+            ON (hrt.`id_hotel` = hbil.`id` AND hbil.`id_lang` = pl.`id_lang`)';
+
         $this->fields_options = array(
             'global' => array(
-                'title' =>    $this->l('Hotel Room Display Setting'),
-                'icon' =>   'icon-cogs',
-                'fields' =>    array(
+                'title' => $this->l('Hotel Room Display Setting'),
+                'icon' => 'icon-cogs',
+                'fields' => array(
                     'HOTEL_ROOM_DISPLAY_HEADING' => array(
                         'title' => $this->l('Hotel Room Block Title'),
                         'type' => 'textLang',
@@ -73,6 +82,16 @@ class AdminHotelRoomModuleSettingController extends ModuleAdminController
                 'search' => false,
                 'callback' => 'getProductImage',
             ),
+            'hotel_name' => array(
+                'title' => $this->l('Hotel'),
+                'align' => 'center',
+                'orderby' => false,
+            ),
+            'name' => array(
+                'title' => $this->l('Room Type'),
+                'align' => 'center',
+                'orderby' => false,
+            ),
             'active' => array(
                 'title' => $this->l('Active'),
                 'align' => 'center',
@@ -109,6 +128,27 @@ class AdminHotelRoomModuleSettingController extends ModuleAdminController
         $this->identifier = 'id_room_block';
 
         parent::__construct();
+        $this->hotelList = HotelBranchInformation::getProfileAccessedHotels(
+            $this->context->employee->id_profile,
+            1
+        );
+        $objHotelRoomType = new HotelRoomType();
+        if ($this->loadObject(true)
+            && $this->object->id
+            && ($roomInfo = $objHotelRoomType->getRoomTypeInfoByIdProduct((int) $this->object->id_product))
+        ) {
+            $hasHotelAccess = false;
+            foreach ($this->hotelList as $hotel) {
+                if ($hotel['id_hotel'] == $roomInfo['id_hotel']) {
+                    $hasHotelAccess = true;
+                }
+            }
+
+            if (!$hasHotelAccess) {
+                $this->tabAccess['edit'] = 0;
+                $this->tabAccess['view'] = 0;
+            }
+        }
     }
 
     public function getProductImage($idProduct)
@@ -152,29 +192,33 @@ class AdminHotelRoomModuleSettingController extends ModuleAdminController
 
     public function renderForm()
     {
-        if (!($obj = $this->loadObject(true))) {
+        if (!($this->loadObject(true))) {
             return;
         }
 
-        $productName = $idProduct = false;
-
-        if ($this->display == 'edit') {
-            $objRoomBlock = new WkHotelRoomDisplay($obj->id);
-            $idProduct = $objRoomBlock->id_product;
+        $productName = false;
+        if ($idProduct = $this->object->id_product) {
             $product = new Product($idProduct, false, Configuration::get('PS_LANG_DEFAULT'));
             $productName = $product->name;
+            $objHotelRoomType = new HotelRoomType();
+            if ($roomInfo = $objHotelRoomType->getRoomTypeInfoByIdProduct((int) $product->id)) {
+                $this->fields_value['id_hotel'] = $roomInfo['id_hotel'];
+            }
         }
 
         $this->context->smarty->assign(
             array(
                 'productName' => $productName,
-                'idProduct' => $idProduct,
+                'idProduct' => $idProduct
             )
         );
         $html = $this->context->smarty->fetch(
             _PS_MODULE_DIR_.$this->module->name.
             '/views/templates/admin/hotel_room/product_search_block.tpl'
         );
+        if (empty($this->hotelList)) {
+            $this->warnings[] = $this->l('You do not have access to any hotel to search for the room types.');
+        }
 
         $this->fields_form = array(
             'legend' => array(
@@ -182,6 +226,19 @@ class AdminHotelRoomModuleSettingController extends ModuleAdminController
                 'icon' => 'icon-globe'
             ),
             'input' => array(
+                array(
+                    'type' => 'select',
+                    'label' => $this->l('Select hotel'),
+                    'name' => 'id_hotel',
+                    'required' => true,
+                    'class' => 'chosen',
+                    'options' => array(
+                        'query' => $this->hotelList,
+                        'id' => 'id_hotel',
+                        'name' => 'hotel_name'
+                    ),
+                    'hint' => $this->l('Select the hotel.'),
+                ),
                 array(
                     'label' => $this->l('Search Room Type'),
                     'type' => 'html',
