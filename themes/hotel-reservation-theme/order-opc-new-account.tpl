@@ -25,6 +25,7 @@
 						<input class="form-control validate" type="password" id="login_passwd" name="login_passwd" data-validate="isPasswd" />
 					</div>
 				</div>
+				{hook h="displayTurnstileOnPaymentLoginAtCheckout"}
 				<a href="{$link->getPageLink('password', true)|escape:'html':'UTF-8'}" class="lost_password pull-right">{l s='Forgot your password?'}</a>
 				<div style="clear:both"></div>
 				<p class="submit">
@@ -387,6 +388,7 @@
 				<input type="hidden" name="alias_invoice" id="alias_invoice" value="{l s='My Invoice address'}" />
 			</div> *}
 			{$HOOK_CREATE_ACCOUNT_FORM}
+			{hook h="displayTurnstileOnPaymentSignUpAtCheckout"}
 			<div class="submit opc-add-save clearfix">
 				<button type="submit" name="submitAccount" id="submitAccount" class="btn btn-default button button-medium pull-right"><span>{l s='Save'}<i class="icon-chevron-right right"></i></span></button>
 			</div>

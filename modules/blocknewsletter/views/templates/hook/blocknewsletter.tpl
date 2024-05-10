@@ -43,6 +43,7 @@
                     {if isset($id_module)}
                         {hook h='displayGDPRConsent' id_module=$id_module}
                     {/if}
+                    {hook h='displayTurnstileNewsletter'}
                     <button type="submit" name="submitNewsletter" class="btn button button-medium newsletter-btn">
                         <span>{l s='Subscribe' mod='blocknewsletter'}</span>
                     </button>

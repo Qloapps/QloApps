@@ -195,6 +195,7 @@
                 {if isset($HOOK_CUSTOMER_IDENTITY_FORM)}
 			{$HOOK_CUSTOMER_IDENTITY_FORM}
 		{/if}
+        {hook h="displayTurnstileOnIdentityForm"}
                 <div class="form-group">
                     <button type="submit" name="submitIdentity" class="btn btn-default button button-medium">
                         <span>{l s='Save'}<i class="icon-chevron-right right"></i></span>

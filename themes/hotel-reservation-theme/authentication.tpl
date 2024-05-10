@@ -93,6 +93,7 @@
 						<input class="is_required validate account_input form-control" type="password" data-validate="isPasswd" id="passwd" name="passwd" value="" />
 					</div>
 					<p class="lost_password form-group"><a href="{$link->getPageLink('password')|escape:'html':'UTF-8'}" title="{l s='Recover your forgotten password'}" rel="nofollow">{l s='Forgot your password?'}</a></p>
+					{hook h='displayCustomerLoginForm'}
 					<p class="submit">
 						{if isset($back)}<input type="hidden" class="hidden" name="back" value="{$back|escape:'html':'UTF-8'}" />{/if}
 						<button type="submit" id="SubmitLogin" name="SubmitLogin" class="btn button button-medium">
@@ -666,6 +667,7 @@
 			</div>
 		{/if}
 		{$HOOK_CREATE_ACCOUNT_FORM}
+		{hook h="displayTurnstileOnCustomerRegistrationPage"}
 		<div class="submit clearfix">
 			<input type="hidden" name="email_create" value="1" />
 			<input type="hidden" name="is_new_customer" value="1" />
