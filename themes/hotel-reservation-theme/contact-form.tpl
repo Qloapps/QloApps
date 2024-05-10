@@ -184,7 +184,7 @@
 							<div class="col-xs-8">
 								<p class="hotel-name"><span>{$hotel['hotel_name']}</span></p>
 								<p class="hotel-branch-info-value">{$hotel['address']}, {$hotel['city']}, {if {$hotel['state_name']}}{$hotel['state_name']},{/if} {$hotel['country_name']}, {$hotel['postcode']}</p>
-								{if $hotel['latitude'] != 0 || $hotel['longitude'] != 0}
+								{if ($hotel['latitude'] != 0 || $hotel['longitude'] != 0) && $viewOnMap}
 									<p class="hotel-branch-info-value">
 										<a class="btn htl-map-direction-btn" href="http://maps.google.com/maps?daddr=({$hotel['latitude']},{$hotel['longitude']})" target="_blank">
 											<span class="">{l s='View on map'}</span>
