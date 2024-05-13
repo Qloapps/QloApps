@@ -68,12 +68,15 @@ class NotificationCore
     {
         switch ($type) {
             case 'order':
+                $acsHtls = HotelBranchInformation::getProfileAccessedHotels(Context::getContext()->employee->id_profile, 1, 1);
                 $sql = '
 					SELECT SQL_CALC_FOUND_ROWS o.`id_order`, o.`id_customer`, o.`total_paid`, o.`id_currency`, o.`date_upd`, c.`firstname`, c.`lastname`
 					FROM `'._DB_PREFIX_.'orders` as o
 					LEFT JOIN `'._DB_PREFIX_.'customer` as c ON (c.`id_customer` = o.`id_customer`)
-					WHERE `id_order` > '.(int)$id_last_element.
-                    Shop::addSqlRestriction(false, 'o').'
+                    LEFT JOIN '._DB_PREFIX_.'htl_booking_detail hbd ON (hbd.id_order = o.id_order)
+					WHERE o.`id_order` > '.(int)$id_last_element.
+                    Shop::addSqlRestriction(false, 'o').
+                    ($acsHtls ? ' AND hbd.`id_hotel` IN ('.implode(',', $acsHtls).') ' : ' AND 0 ').'
 					ORDER BY `id_order` DESC
 					LIMIT 5';
                 break;
