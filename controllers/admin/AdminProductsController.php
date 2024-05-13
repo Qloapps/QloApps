@@ -1094,9 +1094,9 @@ class AdminProductsControllerCore extends AdminController
                 $obj_adv_pmt = new HotelAdvancedPayment($id_adv_pmt);
             } else {
                 $obj_adv_pmt = new HotelAdvancedPayment();
-                if ($id_adv_pmt = $obj_adv_pmt->getIdAdvPaymentByIdProduct($id_product)) {
+                if ($adv_pmt_info = $obj_adv_pmt->getIdAdvPaymentByIdProduct($id_product)) {
                     // To prevent duplication from two separate tabs
-                    $obj_adv_pmt = new HotelAdvancedPayment($id_adv_pmt);
+                    $obj_adv_pmt = new HotelAdvancedPayment((int) $adv_pmt_info['id']);
                 }
             }
 
