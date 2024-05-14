@@ -596,3 +596,7 @@ body.adminhotelroomsbooking .ui-tooltip {
     padding: 10px;
     box-shadow: 0px 0px 15px 0px #00000026;
 }
+#hotel-features-tree {
+    max-height: 350px;
+    overflow-y: auto;
+}

@@ -41,11 +41,6 @@ class AdminHotelFeaturesController extends ModuleAdminController
             'desc' => $this->l('Add new Features'),
             'imgclass' => 'new'
         );
-
-        $this->page_header_toolbar_btn['new'] = array(
-            'href' => $this->context->link->getAdminLink('AdminAssignHotelFeatures'),
-            'desc' => $this->l('Assign Features To Hotel'),
-        );
     }
 
     public function renderView()
@@ -148,18 +143,6 @@ class AdminHotelFeaturesController extends ModuleAdminController
                 }
             } else {
                 $this->errors[] = $this->l('Please add atleast one Child features.');
-            }
-
-            foreach ($languages as $lang) {
-                if (!trim(Tools::getValue('parent_ftr_name_'.$lang['id_lang']))) {
-                    $objHotelFeatures->name[$lang['id_lang']] = Tools::getValue(
-                        'parent_ftr_name_'.$defaultLangId
-                    );
-                } else {
-                    $objHotelFeatures->name[$lang['id_lang']] = Tools::getValue(
-                        'parent_ftr_name_'.$lang['id_lang']
-                    );
-                }
             }
 
             if (!count($this->errors)) {
