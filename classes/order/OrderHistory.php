@@ -449,7 +449,7 @@ class OrderHistoryCore extends ObjectModel
             );
 
             if ($idHotel = HotelBookingDetail::getIdHotelByIdOrder($order->id)) {
-                $objHotelBranchInformation = new HotelBranchInformation($idHotel, $order->id_lang);
+                $objHotelBranchInformation = new HotelBranchInformation($idHotel);
                 $fields = array_merge(
                     $objHotelBranchInformation->getFields(),
                     $objHotelBranchInformation->getFieldsLang()[$order->id_lang],
