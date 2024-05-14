@@ -88,7 +88,7 @@
 
 			<div class="col-lg-4">
 				<input type="hidden" name="id_customer" value="{$fields_value[$input.name]}" />
-				<input type="email" id="email" name="email" value="{$fields_value[$input.name]|escape:'html':'UTF-8'}"/>
+				<input type="email" id="email" name="email" value="{if isset($fields_value['email'])}{$fields_value['email']|escape:'html':'UTF-8'}{/if}"/>
 			</div>
 		{/if}
 	{else}

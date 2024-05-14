@@ -190,10 +190,10 @@ class AdminAddressesControllerCore extends AdminController
             $token_customer = Tools::getAdminToken('AdminCustomers'.(int)(Tab::getIdFromClassName('AdminCustomers')).(int)$this->context->employee->id);
         }
 
+        $this->fields_value['email'] = Tools::getValue('email');
         $this->tpl_form_vars = array(
-            'customer' => isset($customer) ? $customer : null,
-            'tokenCustomer' => isset($token_customer) ? $token_customer : null,
-            'back_url' => urldecode(Tools::getValue('back'))
+            'customer' => (isset($customer) && $this->object->id) ? $customer : null,
+            'tokenCustomer' => isset($token_customer) ? $token_customer : null
         );
 
         // Order address fields depending on country format
