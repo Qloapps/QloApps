@@ -245,6 +245,7 @@ class AdminProductsControllerCore extends AdminController
             );
         } else {
             $hotels = HotelBranchInformation::getProfileAccessedHotels($this->context->employee->id_profile, 1);
+            $this->hotelsArray = array();
             foreach ($hotels as $hotel) {
                 $addressInfo = HotelBranchInformation::getAddress($hotel['id_hotel']);
                 $this->hotelsArray[$hotel['id_hotel']] = $hotel['hotel_name'].', '.$addressInfo['city'];
@@ -399,7 +400,7 @@ class AdminProductsControllerCore extends AdminController
         $idLocationsCategory = Configuration::get('PS_LOCATIONS_CATEGORY');
         $this->objLocationsCategory = new Category($idLocationsCategory, $this->context->language->id);
         $nestedCategories = Category::getNestedCategories($idLocationsCategory);
-        if ($nestedCategories) {
+        if (isset($nestedCategories[$idLocationsCategory]['children']) && $nestedCategories[$idLocationsCategory]['children']) {
             foreach ($nestedCategories[$idLocationsCategory]['children'] as $childCategory) {
                 $this->buildCategoryOptions($childCategory);
             }
