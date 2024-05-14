@@ -122,6 +122,10 @@ class ProductControllerCore extends FrontController
             Tools::redirect($this->context->link->getPageLink('pagenotfound'));
         }
 
+        if ($dateTo != '' && $dateFrom != '' && $dateFromTimestamp >= $dateToTimestamp) {
+            Tools::redirect($this->context->link->getPageLink('pagenotfound'));
+        }
+
         parent::init();
 
         if ($id_product = (int) Tools::getValue('id_product')) {

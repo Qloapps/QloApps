@@ -114,6 +114,10 @@ class CategoryControllerCore extends FrontController
             Tools::redirect($this->context->link->getPageLink('pagenotfound'));
         }
 
+        if ($dateTo != '' && $dateFrom != '' && $dateFromTimestamp >= $dateToTimestamp) {
+            Tools::redirect($this->context->link->getPageLink('pagenotfound'));
+        }
+
         // Instantiate category
         $this->category = new Category($id_category, $this->context->language->id);
 
