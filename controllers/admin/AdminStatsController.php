@@ -850,15 +850,16 @@ class AdminStatsControllerCore extends AdminStatsTabController
                 break;
 
             case 'occupied_rooms':
-                $value = AdminStatsController::getOccupiedRooms(0);
+                $value = AdminStatsController::getCurrentlyOccupiedRooms(0);
 
                 break;
 
             case 'vacant_rooms':
-                $totalAvailableRooms = AdminStatsController::getAvailableRoomsForDiscreteDates(date('Y-m-d'), null, 0);
-                $totalAvailableRooms = $totalAvailableRooms[strtotime(date('Y-m-d'))];
-                $totalOccupiedRooms = AdminStatsController::getOccupiedRooms(0);
-                $value = $totalAvailableRooms - $totalOccupiedRooms;
+                $totalUnAvailRooms = AdminStatsController::getDisabledRoomsForDiscreteDates(date('Y-m-d'), null, 0);
+                $totalUnAvailRooms = $totalUnAvailRooms[strtotime(date('Y-m-d'))];
+                $totalRooms = AdminStatsController::getTotalRooms(0);
+                $totalOccupiedRooms = AdminStatsController::getCurrentlyOccupiedRooms(0);
+                $value = $totalRooms - ($totalUnAvailRooms + $totalOccupiedRooms);
 
                 break;
 
@@ -1808,6 +1809,24 @@ class AdminStatsControllerCore extends AdminStatsTabController
         $result = Db::getInstance()->getValue($sql);
 
         return $result;
+    }
+
+    public static function getCurrentlyOccupiedRooms($idHotel = null)
+    {
+        $sql = 'SELECT COUNT(DISTINCT hbd.`id_room`)
+        FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
+        LEFT JOIN `'._DB_PREFIX_.'htl_room_information` hri
+        ON (hri.`id` = hbd.`id_room`)
+        LEFT JOIN `'._DB_PREFIX_.'product` p
+        ON (p.`id_product` = hri.`id_product`)
+        WHERE p.`active` = 1
+        AND hbd.`is_refunded` = 0
+        AND hbd.`is_cancelled` = 0
+        AND ("'.pSQL(date('Y-m-d')).'" BETWEEN hbd.`date_from` AND hbd.`date_to`)
+        AND hbd.`id_status` = '.(int) HotelBookingDetail::STATUS_CHECKED_IN.
+        (!is_null($idHotel) ? HotelBranchInformation::addHotelRestriction($idHotel, 'hbd') : '');
+
+        return Db::getInstance()->getValue($sql);
     }
 
     /**
