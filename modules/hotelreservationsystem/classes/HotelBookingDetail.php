@@ -385,6 +385,7 @@ class HotelBookingDetail extends ObjectModel
                     $partiallyAvailRoomTypes = $partiallyAvailRoomTypes['partiallyAvailRooms'];
                 }
 
+                // Now we will formate the data after geting search result according to search type
                 $roomTypesDetail = $objRoomType->getRoomTypeDetailByRoomTypeIds($allowedIdRoomTypes);
                 if ($roomTypesDetail) {
                     // Formate data for response
@@ -503,15 +504,12 @@ class HotelBookingDetail extends ObjectModel
         $sql1 = 'SELECT `id` AS `id_room`, `id_product`, `id_hotel`, `room_num`, `comment` AS `room_comment`
                 FROM `'._DB_PREFIX_.'htl_room_information`
                 WHERE `id_hotel`='.(int)$idHotel.' AND `id_status` = '. HotelRoomInformation::STATUS_INACTIVE.' AND IF('.(int)$idRoomType.' > 0, `id_product` = '.(int)$idRoomType.', 1) AND `id_product` IN ('.$allowedIdRoomTypes.')';
-        // if ($idRoomType) {
-        //     $sql1 .= ' AND `id_product` ='.(int)$idRoomType;
-        // }
 
         // check room is temperory inactive
         $sql2 = 'SELECT hri.`id` AS `id_room`, hri.`id_product`, hri.`id_hotel`, hri.`room_num`, hri.`comment` AS `room_comment`
                 FROM `'._DB_PREFIX_.'htl_room_information` AS hri
                 INNER JOIN `'._DB_PREFIX_.'htl_room_disable_dates` AS hrdd ON (hrdd.`id_room_type` = hri.`id_product` AND hrdd.	id_room = hri.`id`)
-                WHERE hri.`id_hotel`='.$idHotel.' AND hri.`id_status` = '. HotelRoomInformation::STATUS_TEMPORARY_INACTIVE .' AND hrdd.`date_from` < \''.pSql($dateTo).'\' AND hrdd.`date_to` > \''.pSql($dateFrom).'\' AND IF('.(int)$idRoomType.' > 0, hri.`id_product` = '.(int)$idRoomType.', 1) AND hri.`id_product` IN ('.$allowedIdRoomTypes.')';
+                WHERE hri.`id_hotel`='.$idHotel.' AND hri.`id_status` = '. HotelRoomInformation::STATUS_TEMPORARY_INACTIVE .' AND hrdd.`date_from` <= \''.pSql($dateFrom).'\' AND hrdd.`date_to` >= \''.pSql($dateTo).'\' AND IF('.(int)$idRoomType.' > 0, hri.`id_product` = '.(int)$idRoomType.', 1) AND hri.`id_product` IN ('.$allowedIdRoomTypes.')';
 
         $sql = $sql1.' UNION '.$sql2;
 
@@ -566,6 +564,7 @@ class HotelBookingDetail extends ObjectModel
 
         return $cartRoomTypes;
     }
+
 
     /**
      * $params = array(
@@ -906,7 +905,6 @@ class HotelBookingDetail extends ObjectModel
         );
     }
 
-
     /**
      * $params = array(
      *      'idHotel' => ...,
@@ -1096,7 +1094,7 @@ class HotelBookingDetail extends ObjectModel
             }
             unset($datetimeObj);
 
-            // If all dates rae covered
+            // If all dates are covered
             if (!$datesToCover) {
                 // array in ascending order of dates
                 ksort($dateWiseRoomTypes);
@@ -1106,19 +1104,28 @@ class HotelBookingDetail extends ObjectModel
                 if (!empty($idCart) && !empty($idGuest)) {
                     $sql = 'SELECT `id_product`, `id_room`, `date_from`
                         FROM `'._DB_PREFIX_.'htl_cart_booking_data`
-                        WHERE `id_hotel` = '.(int)$idHotel.' AND `id_cart` = '.(int)$idCart.' AND `id_guest` = '.(int)$idGuest.' AND `is_refunded` = 0 AND  `is_back_order` = 0 AND IF('.(int)$idRoomType.' > 0, `id_product` = '.(int)$idRoomType.', 1) AND `id_product` IN ('.$allowedIdRoomTypes.')';
+                        WHERE `id_hotel` = '.(int)$idHotel.' AND `id_cart` = '.(int)$idCart.' AND `id_guest` = '.(int)$idGuest.' AND `is_refunded` = 0 AND  `is_back_order` = 0 AND IF('.(int)$idRoomType.' > 0, `id_product` = '.(int)$idRoomType.', 1) AND `id_product` IN ('.$allowedIdRoomTypes.') AND (';
 
                     $datetimeObj = new DateTime();
+                    $countIteration = 0;
                     foreach ($timeStampWiseRooms as $timeStamp => $roomList) {
+                        $countIteration++;
+
                         $datetimeObj->setTimestamp($timeStamp);
                         $partialDateFrom = $datetimeObj->format('Y-m-d H:i:s');
 
                         $datetimeObj->modify('+1 day');
                         $partialDateTo = $datetimeObj->format('Y-m-d H:i:s');
 
-                        $sql .= ' AND (`date_from` = \''.pSQL($partialDateFrom).'\' AND `date_to` = \''.pSQL($partialDateTo).'\' AND `id_room` IN ('.implode(",", $roomList).'))';
+                        $sql .= '(`date_from` = \''.pSQL($partialDateFrom).'\' AND `date_to` = \''.pSQL($partialDateTo).'\' AND `id_room` IN ('.implode(",", $roomList).'))';
+
+                        if (count($timeStampWiseRooms) > $countIteration) {
+                            $sql .= ' OR ';
+                        }
                     }
-                    unset($datetimeObj);
+                    $sql .= ')';
+
+                    unset($datetimeObj, $countIteration);
 
                     $partiallyAvailCartRooms = Db::getInstance()->executeS($sql);
                     if ($partiallyAvailCartRooms) {
@@ -1215,9 +1222,8 @@ class HotelBookingDetail extends ObjectModel
                 $partiallyAvailRooms = array();
                 $dateWiseRoomTypes = array();
             }
-            unset($datesToCover);
-            unset($timeStampWiseRooms);
-            unset($partiallyAvailRooms);
+
+            unset($datesToCover, $timeStampWiseRooms, $partiallyAvailRooms);
         }
 
         return array(
