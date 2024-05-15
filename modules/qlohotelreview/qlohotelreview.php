@@ -72,6 +72,7 @@ class QloHotelReview extends Module
                 'displayBookingAction',
                 'displayBackOfficeHeader',
                 'displayAdminAfterHeader',
+                'actionCleanData',
             )
         );
     }
@@ -276,6 +277,13 @@ class QloHotelReview extends Module
             'show_load_more_btn' => $hasNextPage,
         ));
         return $this->display(__FILE__, 'product-tab-content.tpl');
+    }
+
+    public function hookActionCleanData($params)
+    {
+        if ($params['method'] == 'truncateCatalog' || $params['method'] ==  'truncateSales') {
+            QhrHotelReviewDb::truncateUserData();
+        }
     }
 
     public function installModuleTabs()

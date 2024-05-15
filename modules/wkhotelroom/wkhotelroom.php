@@ -141,6 +141,13 @@ class WkHotelRoom extends Module
         }
     }
 
+    public function hookActionCleanData($params)
+    {
+        if ($params['method'] == 'truncateCatalog') {
+            WkHotelRoomDb::truncateTables();
+        }
+    }
+
     public function callInstallTab()
     {
         //Controllers which are to be used in this modules but we have not to create tab for those controllers...
@@ -198,7 +205,8 @@ class WkHotelRoom extends Module
                 'actionProductDelete',
                 'displayFooterExploreSectionHook',
                 'actionProductSave',
-                'actionObjectLanguageAddAfter'
+                'actionObjectLanguageAddAfter',
+                'actionCleanData',
             )
         );
     }
@@ -220,7 +228,7 @@ class WkHotelRoom extends Module
         }
         return true;
     }
-    
+
     public function deleteConfigKeys()
     {
         $configVars = array(
