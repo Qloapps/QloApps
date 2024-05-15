@@ -1661,7 +1661,7 @@ class AdminOrdersControllerCore extends AdminController
                         $this->errors[] = Tools::displayError('You do not have permission to edit this.');
                     }
                 } else {
-                    $this->errors[] = Tools::displayError('Invaid note found.');
+                    $this->errors[] = Tools::displayError('Invalid note found.');
                 }
             } else {
                 $this->errors[] = Tools::displayError('The invoice for edit note was unable to load. ');
