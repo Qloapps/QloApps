@@ -96,6 +96,12 @@
     <keywords/>
     <url_rewrite>riwayat-pembelian</url_rewrite>
   </meta>
+  <meta id="order-detail" id_shop="1">
+    <title>Detail Pemesanan</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>detail-pemesanan</url_rewrite>
+  </meta>
   <meta id='identity' id_shop='1'>
     <title>Identitas</title>
     <description/>

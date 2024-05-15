@@ -42,8 +42,8 @@ $(document).on('click', '#blocknewsletter .newsletter-btn', function (e) {
             let messageBlock = $('#blocknewsletter .message-block');
             $(messageBlock).html(response.message_html).stop(true, true).fadeIn('fast');
         },
-        error: function (jqXHR) {
-            if (jqXHR.readyState == 0) {
+        error: function () {
+            if (!onlineFlag) {
                 showErrorMessage(no_internet_txt);
             }
         },

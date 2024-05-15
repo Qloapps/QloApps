@@ -96,6 +96,12 @@
     <keywords/>
     <url_rewrite>historique-commandes</url_rewrite>
   </meta>
+  <meta id="order-detail" id_shop="1">
+    <title>Détail de la réservation</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>detail-de-la-reservation</url_rewrite>
+  </meta>
   <meta id='identity' id_shop='1'>
     <title>Identité</title>
     <description/>
