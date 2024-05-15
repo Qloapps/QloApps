@@ -68,6 +68,10 @@
 			<page>history</page>
 			<configurable>1</configurable>
 		</meta>
+		<meta id="order-detail">
+			<page>order-detail</page>
+			<configurable>1</configurable>
+		</meta>
 		<meta id="identity">
 			<page>identity</page>
 			<configurable>1</configurable>

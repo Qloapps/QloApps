@@ -482,7 +482,7 @@ var ajaxCart = {
 
             },
             error: function(XMLHttpRequest, textStatus, errorThrown) {
-                if (XMLHttpRequest.readyState == 0) {
+                if (!onlineFlag) {
                     showErrorMessage(no_internet_txt);
                 } else {
                     var error = "Impossible to add the room to the cart.<br/>textStatus: '" + textStatus + "'<br/>errorThrown: '" + errorThrown + "'<br/>responseText:<br/>" + XMLHttpRequest.responseText;
@@ -620,7 +620,7 @@ var ajaxCart = {
 
             },
             error: function(XMLHttpRequest, textStatus, errorThrown) {
-                if (XMLHttpRequest.readyState == 0) {
+                if (!onlineFlag) {
                     showErrorMessage(no_internet_txt);
                 } else {
                     var error = "Impossible to add the room to the cart.<br/>textStatus: '" + textStatus + "'<br/>errorThrown: '" + errorThrown + "'<br/>responseText:<br/>" + XMLHttpRequest.responseText;
@@ -694,8 +694,8 @@ var ajaxCart = {
                     deleteProductFromSummary(idProduct + '_' + idCombination + '_' + customizationId + '_' + idAddressDelivery);
                 }*/
             },
-            error: function(jqXHR) {
-                if (jqXHR.readyState == 0) {
+            error: function() {
+                if (!onlineFlag) {
                     showErrorMessage(no_internet_txt);
                 } else {
                     var error = 'ERROR: unable to delete the product';
@@ -1277,10 +1277,10 @@ function disableRoomTypeDemands(show) {
 
 function disableRoomTypeServices(disable) {
     if (disable) {
-        $('#service_products_cont').find('button.add_roomtype_product').attr('disabled', 'disabled');
+        $('#service_products_cont').find('button.select_room_service').attr('disabled', 'disabled');
         $('#service_products_cont').find('.qty_container .qty_direction a').attr('disabled', 'disabled');
     } else {
-        $('#service_products_cont').find('button.add_roomtype_product').removeAttr('disabled');
+        $('#service_products_cont').find('button.select_room_service').removeAttr('disabled');
         $('#service_products_cont').find('.qty_container .qty_direction a').removeAttr('disabled');
     }
 }
