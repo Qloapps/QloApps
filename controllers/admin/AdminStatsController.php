@@ -81,7 +81,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
     public static function getAbandonedCarts($date_from, $date_to)
     {
         return Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue('
-		SELECT COUNT(DISTINCT id_guest)
+		SELECT COUNT(DISTINCT id_cart)
 		FROM `'._DB_PREFIX_.'cart`
 		WHERE `date_add` BETWEEN "'.pSQL($date_from).'" AND "'.pSQL($date_to).'"
 		AND NOT EXISTS (SELECT 1 FROM `'._DB_PREFIX_.'orders` WHERE `'._DB_PREFIX_.'orders`.id_cart = `'._DB_PREFIX_.'cart`.id_cart)
@@ -638,7 +638,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
                 break;
 
             case 'abandoned_cart':
-                $value = AdminStatsController::getAbandonedCarts(date('Y-m-d H:i:s', strtotime('-2 day')), date('Y-m-d H:i:s', strtotime('-1 day')));
+                $value = AdminStatsController::getAbandonedCarts(date('Y-m-d', strtotime('-2 day')).' 0:0:0', date('Y-m-d', strtotime('-1 day')).' 23:59:59');
                 break;
 
             case 'installed_modules':
