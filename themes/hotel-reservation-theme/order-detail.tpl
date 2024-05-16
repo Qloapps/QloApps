@@ -777,7 +777,10 @@
                                                                             {if $hotel_booking_detail.is_refunded || $hotel_booking_detail.is_cancelled}<span class="badge badge-danger badge-cancelled">{l s='Cancelled'}</span>{/if}
                                                                         </div>
                                                                     </div>
-                                                                    {assign var='has_services' value=(isset($rm_v.additional_services) && isset($rm_v.additional_services[$hotel_booking_detail.id_room]) && isset($rm_v.additional_services[$hotel_booking_detail.id_room]['additional_services']))}
+
+                                                                    {* Services are indexed with id_htl_booking *}
+                                                                    {assign var='has_services' value=(isset($rm_v.additional_services) && isset($rm_v.additional_services[$hotel_booking_detail.id_htl_booking]) && isset($rm_v.additional_services[$hotel_booking_detail.id_htl_booking]['additional_services']))}
+                                                                    {* Additional Facilities are indexed with id_room *}
                                                                     {assign var='has_facilities' value=(isset($rm_v.extra_demands) && isset($rm_v.extra_demands[$hotel_booking_detail.id_room]) && isset($rm_v.extra_demands[$hotel_booking_detail.id_room]['extra_demands']))}
                                                                     {if $has_services || $has_facilities}
                                                                         <div class="extra-services-wrap clearfix">
@@ -787,7 +790,7 @@
                                                                                         <strong>{l s='Services'}</strong>
                                                                                     </div>
                                                                                     <div class="col-xs-9">
-                                                                                        {foreach from=$rm_v.additional_services[$hotel_booking_detail.id_room]['additional_services'] item=service}
+                                                                                        {foreach from=$rm_v.additional_services[$hotel_booking_detail.id_htl_booking]['additional_services'] item=service}
                                                                                             <span class="service">{$service.name}</span>
                                                                                         {/foreach}
                                                                                     </div>
