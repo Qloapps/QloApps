@@ -318,10 +318,21 @@ class AdminProductsControllerCore extends AdminController
             'optional' => true,
         );
 
+        $this->fields_list['show_at_front'] = array(
+            'title' => $this->l('Show at front'),
+            'align' => 'text-center',
+            'type' => 'bool',
+            'active' => 'show_at_front',
+            'optional' => true,
+            'havingFilter' => true,
+            'visible_default' => true,
+            'orderby' => false,
+        );
+
         if (Configuration::get('WK_ALLOW_ADVANCED_PAYMENT')) {
             $this->fields_list['advance_payment'] = array(
                 'title' => $this->l('Advance Payment'),
-                'active' => 'advance_payment',
+                'callback' => 'getAdvancePaymentBadge',
                 'align' => 'text-center',
                 'type' => 'bool',
                 'optional' => true,
@@ -330,6 +341,17 @@ class AdminProductsControllerCore extends AdminController
                 'orderby' => false,
             );
         }
+
+        $this->statusBadge = array(
+            0 => array(
+                'badge' => 'badge-danger',
+                'text' => $this->l('No')
+            ),
+            1 => array(
+                'badge' => 'badge-success',
+                'text' => $this->l('Yes')
+            )
+        );
 
         $taxRulesGroups = array();
         foreach (TaxRulesGroup::getTaxRulesGroups(true) as $taxRulesGroup) {
@@ -429,6 +451,12 @@ class AdminProductsControllerCore extends AdminController
             );
         }
     }
+
+    public function getAdvancePaymentBadge($val, $row)
+    {
+        return '<span class="badge '.$this->statusBadge[(int)$val]['badge'].'" >'.$this->statusBadge[(int)$val]['text'].'</a>';
+    }
+
 
     private function buildCategoryOptions($category)
     {
@@ -1335,10 +1363,10 @@ class AdminProductsControllerCore extends AdminController
                 $this->errors[] = Tools::displayError('You do not have permission to add this.');
             }
         }
-        // Toggle Advance Payment
-        elseif (Tools::getIsset('advance_payment'.$this->table)) {
+        // Toggle Show at front
+        elseif (Tools::getIsset('show_at_front'.$this->table)) {
             if ($this->tabAccess['edit'] === '1') {
-                $this->action = 'toggleAdvancePayment';
+                $this->action = 'toggleShowAtFront';
             } else {
                 $this->errors[] = Tools::displayError('You do not have permission to edit this.');
             }
@@ -1895,38 +1923,21 @@ class AdminProductsControllerCore extends AdminController
         return $res;
     }
 
-    public function processToggleAdvancePayment()
+    public function processToggleShowAtFront()
     {
-        if (Configuration::get('WK_ALLOW_ADVANCED_PAYMENT')) {
-            $this->loadObject(true);
-            if (!Validate::isLoadedObject($this->object)) {
-                return false;
-            }
+        if (!$this->loadObject()) {
+            return false;
+        }
 
-            if (!Product::isBookingProduct($this->object->id)) {
-                return false;
-            }
+        if (!Product::isBookingProduct($this->object->id)) {
+            return false;
+        }
 
-            $objHotelAdvancedPayment = new HotelAdvancedPayment();
-            $roomTypeAdvancePaymentInfo = $objHotelAdvancedPayment->getIdAdvPaymentByIdProduct($this->object->id);
-            if ($roomTypeAdvancePaymentInfo) {
-                $objHotelAdvancedPayment = new HotelAdvancedPayment($roomTypeAdvancePaymentInfo['id']);
-                $objHotelAdvancedPayment->active = !$objHotelAdvancedPayment->active;
-            } else {
-                $objHotelAdvancedPayment->id_product = $this->object->id;
-                $objHotelAdvancedPayment->payment_type = '';
-                $objHotelAdvancedPayment->value = '';
-                $objHotelAdvancedPayment->id_currency = '';
-                $objHotelAdvancedPayment->tax_include = '';
-                $objHotelAdvancedPayment->calculate_from = 0;
-                $objHotelAdvancedPayment->active = 1;
-            }
-
-            if ($objHotelAdvancedPayment->save()) {
-                Tools::redirectAdmin(self::$currentIndex.'&token='.$this->token.'&conf=4');
-            } else {
-                $this->errors[] = $this->l('Something went wrong while updating Advance payment status.');
-            }
+        $this->object->show_at_front = !$this->object->show_at_front;
+        if ($this->object->save()) {
+            Tools::redirectAdmin(self::$currentIndex.'&token='.$this->token.'&conf=4');
+        } else {
+            $this->errors[] = $this->l('Something error occurred.');
         }
     }
 
