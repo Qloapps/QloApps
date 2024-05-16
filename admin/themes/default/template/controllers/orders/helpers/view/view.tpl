@@ -1065,7 +1065,7 @@
                                                 </td>
                                                 {if $can_edit}
                                                     <td class="text-center">
-                                                        <a class="btn btn-default" href="{$current_index}&amp;submitDeleteVoucher&amp;id_order_cart_rule={$discount['id_order_cart_rule']}&amp;id_order={$order->id}&amp;token={$smarty.get.token|escape:'html':'UTF-8'}"><i class="icon-trash"></i></a>
+                                                        <a class="btn btn-default delete-voucher" href="{$current_index}&amp;submitDeleteVoucher&amp;id_order_cart_rule={$discount['id_order_cart_rule']}&amp;id_order={$order->id}&amp;token={$smarty.get.token|escape:'html':'UTF-8'}"><i class="icon-trash"></i></a>
                                                     </td>
                                                 {/if}
                                             </tr>
