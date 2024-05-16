@@ -55,6 +55,12 @@
 						</div>
 					</div>
 					<div class="row">
+						<label class="control-label col-lg-3">{l s='Phone'}</label>
+						<div class="col-lg-9">
+							<p class="form-control-static">{$customer->phone}</p>
+						</div>
+					</div>
+					<div class="row">
 						<label class="control-label col-lg-3">{l s='Age'}</label>
 						<div class="col-lg-9">
 							<p class="form-control-static">

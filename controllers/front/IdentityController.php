@@ -82,6 +82,16 @@ class IdentityControllerCore extends FrontController
                 $this->errors = array_merge($this->errors, $this->customer->validateController());
             }
 
+            $phone = Tools::getValue('phone');
+            if (Configuration::get('PS_ONE_PHONE_AT_LEAST')) {
+                if ($phone == '') {
+                    $this->errors[] = Tools::displayError('Phone number is required.');
+                }
+            }
+            if ($phone && !Validate::isPhoneNumber($phone)) {
+                $this->errors[] = Tools::displayError('Invaid phone number.');
+            }
+
             if (!count($this->errors)) {
                 $this->customer->id_default_group = (int)$prev_id_default_group;
                 $this->customer->firstname = Tools::ucwords($this->customer->firstname);
@@ -109,6 +119,7 @@ class IdentityControllerCore extends FrontController
                     $this->context->cookie->passwd = $this->customer->passwd;
                 }
                 if ($this->customer->update()) {
+                    CartCustomerGuestDetail::updateCustomerPhoneNumber($this->customer->email, $phone);
                     $this->context->cookie->customer_lastname = $this->customer->lastname;
                     $this->context->cookie->customer_firstname = $this->customer->firstname;
                     $this->context->smarty->assign('confirmation', 1);
@@ -118,6 +129,7 @@ class IdentityControllerCore extends FrontController
             }
         } else {
             $_POST = array_map('stripslashes', $this->customer->getFields());
+            $_POST['phone'] = $this->customer->phone;
         }
 
         return $this->customer;

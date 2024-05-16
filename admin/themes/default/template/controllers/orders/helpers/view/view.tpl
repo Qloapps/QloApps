@@ -541,13 +541,12 @@
                                     {if (!Customer::customerExists($customer->email))}
                                         <dl class="list-detail col-sm-12">
                                             <label class="label-title">{l s='Guest info'}</label>
-
+                                            <dd><i class="icon-user"></i> &nbsp;<b><a  href="?tab=AdminCustomers&amp;id_customer={$customer->id}&amp;viewcustomer&amp;token={getAdminToken tab='AdminCustomers'}">{$customer->firstname} {$customer->lastname}</a></b></dd>
                                             <dd><i class="icon-envelope"></i>  &nbsp;<b><a  href="mailto:{$customer->email}">{$customer->email}</a></b></dd>
-                                            {if $addresses.invoice->phone_mobile || $addresses.invoice->phone}
-                                                <dd><i class="icon-phone"></i>  &nbsp;<b><a  href="tel:{if $addresses.invoice->phone_mobile}{$addresses.invoice->phone_mobile}{else}{$addresses.invoice->phone}{/if}">{if $addresses.invoice->phone_mobile}{$addresses.invoice->phone_mobile}{else}{$addresses.invoice->phone}{/if}</a></b></dd>
+                                            {if $customer->phone}
+                                                <dd><i class="icon-phone"></i>  &nbsp;<b><a  href="tel:{$customer->phone}">{$customer->phone}</a></b></dd>
                                             {/if}
                                         </dl>
-
                                         <form method="post" action="index.php?tab=AdminCustomers&amp;id_customer={$customer->id}&amp;id_order={$order->id|intval}&amp;token={getAdminToken tab='AdminCustomers'}">
                                             <input type="hidden" name="id_lang" value="{$order->id_lang}" />
                                             <input class="btn btn-primary" type="submit" name="submitGuestToCustomer" value="{l s='Transform this guest into a customer'}" />
@@ -564,8 +563,8 @@
 
                                         <dd><i class="icon-user"></i> &nbsp;<b><a  href="?tab=AdminCustomers&amp;id_customer={$customer->id}&amp;viewcustomer&amp;token={getAdminToken tab='AdminCustomers'}">{$customer->firstname} {$customer->lastname}</a></b></dd>
                                         <dd><i class="icon-envelope"></i>  &nbsp;<b><a  href="mailto:{$customer->email}">{$customer->email}</a></b></dd>
-                                        {if $addresses.invoice->phone_mobile || $addresses.invoice->phone}
-                                            <dd><i class="icon-phone"></i>  &nbsp;<b><a  href="tel:{if $addresses.invoice->phone_mobile}{$addresses.invoice->phone_mobile}{else}{$addresses.invoice->phone}{/if}">{if $addresses.invoice->phone_mobile}{$addresses.invoice->phone_mobile}{else}{$addresses.invoice->phone}{/if}</a></b></dd>
+                                        {if $customer->phone}
+                                            <dd><i class="icon-phone"></i>  &nbsp;<b><a  href="tel:{$customer->phone}">{$customer->phone}</a></b></dd>
                                         {/if}
                                     </dl>
                                     <dl class="list-detail col-sm-6">

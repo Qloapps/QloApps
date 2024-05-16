@@ -135,6 +135,8 @@ class CustomerCore extends ObjectModel
 
     public $groupBox;
 
+    public $phone;
+
     protected $webserviceParameters = array(
         'fields' => array(
             'id_default_group' => array('xlink_resource' => 'groups'),
@@ -199,6 +201,10 @@ class CustomerCore extends ObjectModel
     {
         $this->id_default_group = (int)Configuration::get('PS_CUSTOMER_GROUP');
         parent::__construct($id);
+
+        if ($this->email) {
+            $this->phone = CartCustomerGuestDetail::getCustomerPhone($this->email);
+        }
     }
 
     public function add($autodate = true, $null_values = true)

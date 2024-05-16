@@ -345,6 +345,11 @@
                                         <td class="text-right">{$guestInformations['email']|escape:'html':'UTF-8'}</td>
                                     </tr>
 
+                                    <tr>
+                                        <td>{l s='Phone'}</td>
+                                        <td class="text-right">{$guestInformations['phone']|escape:'html':'UTF-8'} </td>
+                                    </tr>
+
                                     {if isset($address_invoice->phone_mobile) && $address_invoice->phone_mobile}
                                         <tr>
                                             <td>{l s='Mobile'}</td>
@@ -678,6 +683,11 @@
                                     <tr>
                                         <td>{l s='Email'}</td>
                                         <td class="text-right">{$guestInformations['email']|escape:'html':'UTF-8'}</td>
+                                    </tr>
+
+                                    <tr>
+                                        <td>{l s='Phone'}</td>
+                                        <td class="text-right">{$guestInformations['phone']|escape:'html':'UTF-8'} </td>
                                     </tr>
 
                                     {if isset($address_invoice->phone_mobile) && $address_invoice->phone_mobile}

@@ -421,6 +421,15 @@ class AdminCustomersControllerCore extends AdminController
                     'autocomplete' => false
                 ),
                 array(
+                    'type' => 'text',
+                    'prefix' => '<i class="icon-phone"></i>',
+                    'label' => $this->l('Phone'),
+                    'name' => 'phone',
+                    'col' => '4',
+                    'required' => true,
+                    'autocomplete' => false
+                ),
+                array(
                     'type' => 'password',
                     'label' => $this->l('Password'),
                     'name' => 'passwd',
@@ -1054,6 +1063,7 @@ class AdminCustomersControllerCore extends AdminController
             $this->errors[] = Tools::displayError('Password can not be empty.');
             $this->display = 'edit';
         } elseif ($customer = parent::processAdd()) {
+            CartCustomerGuestDetail::updateCustomerPhoneNumber($customer->email, Tools::getValue('phone'));
             $this->context->smarty->assign('new_customer', $customer);
             return $customer;
         }
@@ -1076,7 +1086,10 @@ class AdminCustomersControllerCore extends AdminController
                 }
             }
 
-            return parent::processUpdate();
+            if ($res = parent::processUpdate()) {
+                CartCustomerGuestDetail::updateCustomerPhoneNumber($this->object->email, Tools::getValue('phone'));
+                return $res;
+            }
         } else {
             $this->errors[] = Tools::displayError('An error occurred while loading the object.').'
 				<b>'.$this->table.'</b> '.Tools::displayError('(cannot load object)');
@@ -1105,6 +1118,17 @@ class AdminCustomersControllerCore extends AdminController
                 $this->errors[] = Tools::displayError("Please select a valid month of birthday");
             }
         }
+
+        $phone = Tools::getValue('phone');
+        if (Configuration::get('PS_ONE_PHONE_AT_LEAST')) {
+            if ($phone == '') {
+                $this->errors[] = Tools::displayError('Phone number is required.');
+            }
+        }
+        if ($phone && !Validate::isPhoneNumber($phone)) {
+            $this->errors[] = Tools::displayError('Invaid phone number.');
+        }
+
 
         $customer = new Customer();
         $this->errors = array_merge($this->errors, $customer->validateFieldsRequiredDatabase());
