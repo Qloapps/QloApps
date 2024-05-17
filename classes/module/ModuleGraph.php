@@ -77,6 +77,7 @@ abstract class ModuleGraphCore extends Module
             if (is_callable(array($this, 'setDayValues'))) {
                 $this->setDayValues($layers);
             }
+            $this->_titles['x'][] = $this->l('Time');
         }
         // If the granularity is inferior to 1 month
         // @TODO : change to manage 28 to 31 days
@@ -110,6 +111,7 @@ abstract class ModuleGraphCore extends Module
             if (is_callable(array($this, 'setMonthValues'))) {
                 $this->setMonthValues($layers);
             }
+            $this->_titles['x'][] = $this->l('Date');
         }
         // If the granularity is less than 1 year
         elseif (strtotime('-1 year', strtotime($this->_employee->stats_date_to)) < strtotime($this->_employee->stats_date_from)) {
@@ -141,6 +143,7 @@ abstract class ModuleGraphCore extends Module
             if (is_callable(array($this, 'setYearValues'))) {
                 $this->setYearValues($layers);
             }
+            $this->_titles['x'][] = $this->l('Month');
         }
         // If the granularity is greater than 1 year
         else {
@@ -163,6 +166,7 @@ abstract class ModuleGraphCore extends Module
             if (is_callable(array($this, 'setAllTimeValues'))) {
                 $this->setAllTimeValues($layers);
             }
+            $this->_titles['x'][] = $this->l('Year');
         }
     }
 
