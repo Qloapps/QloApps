@@ -165,7 +165,7 @@ class StatsBestCategories extends ModuleGrid
             SELECT IFNULL(SUM(DATEDIFF(LEAST(hbd.`date_to`, "'.pSQL($date_to).'"), GREATEST(hbd.`date_from`, "'.pSQL($date_from).'"))), 0)
             FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
             LEFT JOIN `'._DB_PREFIX_.'orders` o ON (o.`id_order` = hbd.`id_order`)
-            WHERE hbd.`id_hotel` = hbi.`id` AND o.`valid` = 1
+            WHERE hbd.`id_hotel` = hbi.`id` AND o.`valid` = 1 AND is_refunded = 0
             AND hbd.`date_to` > "'.pSQL($date_from).'" AND hbd.`date_from` < "'.pSQL($date_to).'"
         ) AS totalRoomsBooked,
         (
