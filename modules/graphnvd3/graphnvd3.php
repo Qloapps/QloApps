@@ -91,7 +91,7 @@ class GraphNvD3 extends ModuleGraphEngine
                     .x(function(d) { return d.label; })
                     .y(function(d) { return d.value; })
                     .showLabels(true)
-                    .showLegend(false)'
+                    .labelType("percent")'
         );
 
         return '
