@@ -147,47 +147,51 @@
 
 					form.submit();
 				});
-				{if $fields_optional|count}
-					toggleVisibleColumns($('#form-{$list_id}'));
-				{/if}
-				$('#optional-list-toggle').on('click', function(e) {
-					e.stopPropagation();
-				})
-				$('#form-{$list_id} input[name="list_fields_visibility"]').on('change', function(){
-					toggleVisibleColumns($('#form-{$list_id}'));
-				})
 			});
-
-			function toggleVisibleColumns(form) {
-				var list_fields_visibility = [];
-				$(form).find('input[name="list_fields_visibility"]:checked').each(function(i, field){
-					list_fields_visibility.push($(field).val());
-				});
-
-				$(form).find('table.table .field_optional').hide();
-				$(form).find('table.table .field_optional').each(function(i, val) {
-					if (list_fields_visibility.includes($(this).data('key'))) {
-						$(this).show();
-					}
-				});
-				updateListVisibility(list_fields_visibility)
-			}
-			function updateListVisibility(list_fields_visibility) {
-				$.ajax({
-					type: 'POST',
-					headers: { "cache-control": "no-cache" },
-					url: '{$action}',
-					data: {
-						ajax: 1,
-						action: 'updateListVisivility',
-						list_fields_visibility: list_fields_visibility
-					},
-					cache: false,
-					dataType: 'json'
-				});
-			}
 		</script>
 	{/if}
+	<script>
+		$(document).ready(function(){
+			{if $fields_optional|count}
+				toggleVisibleColumns($('#form-{$list_id}'));
+			{/if}
+			$('#optional-list-toggle').on('click', function(e) {
+				e.stopPropagation();
+			})
+			$('#form-{$list_id} input[name="list_fields_visibility"]').on('change', function(){
+				toggleVisibleColumns($('#form-{$list_id}'));
+			})
+		});
+
+		function toggleVisibleColumns(form) {
+			var list_fields_visibility = [];
+			$(form).find('input[name="list_fields_visibility"]:checked').each(function(i, field){
+				list_fields_visibility.push($(field).val());
+			});
+
+			$(form).find('table.table .field_optional').hide();
+			$(form).find('table.table .field_optional').each(function(i, val) {
+				if (list_fields_visibility.includes($(this).data('key'))) {
+					$(this).show();
+				}
+			});
+			updateListVisibility(list_fields_visibility)
+		}
+		function updateListVisibility(list_fields_visibility) {
+			$.ajax({
+				type: 'POST',
+				headers: { "cache-control": "no-cache" },
+				url: '{$action}',
+				data: {
+					ajax: 1,
+					action: 'updateListVisivility',
+					list_fields_visibility: list_fields_visibility
+				},
+				cache: false,
+				dataType: 'json'
+			});
+		}
+	</script>
 	{block name="updatelist"}
 		{if $new_list_header_design}
 			<div class="list_action_wrapper">
