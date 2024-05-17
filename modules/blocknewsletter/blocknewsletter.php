@@ -84,9 +84,21 @@ class Blocknewsletter extends Module
                 'actionCustomerAccountAdd',
                 'registerGDPRConsent',
                 'actionExportGDPRData',
-                'actionDeleteGDPRCustomer'
+                'actionDeleteGDPRCustomer',
+                'actionObjectCustomerUpdateAfter'
             )
         );
+    }
+
+    public function hookActionObjectCustomerUpdateAfter($params)
+    {
+        $objCustomer = $params['object'];
+        if ($objCustomer->deleted
+            && ($register_status = $this->isNewsletterRegistered($objCustomer->email))
+            && $register_status > 0
+        ) {
+            $this->unregister($objCustomer->email, $register_status);
+        }
     }
 
     public function hookActionExportGDPRData($customer)
