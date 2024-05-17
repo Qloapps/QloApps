@@ -42,21 +42,25 @@
         </div>
     {/if}
     {if isset($multiple_dates_input) && $multiple_dates_input}
-        <div class="grid area-{$column_widths['date']}" id="daterange_value">
-            <div class="form-group">
-                <input type="hidden" id="check_in_time" name="check_in_time" {if isset($search_data)}value="{$search_data['date_from']|escape:'htmlall':'UTF-8'}"{/if}>
-                <div class="form-control header-rmsearch-input input-date" autocomplete="off" id="daterange_value_from" placeholder="{l s='Check-in' mod='wkroomsearchblock'}"><span>{l s='Check-in' mod='wkroomsearchblock'}</span></div>
-            </div>
-            <div class="form-group">
-                <input type="hidden" id="check_out_time" name="check_out_time" {if isset($search_data)}value="{$search_data['date_to']|escape:'htmlall':'UTF-8'}"{/if}>
-                <div class="form-control header-rmsearch-input input-date" autocomplete="off" id="daterange_value_to" placeholder="{l s='Check-out' mod='wkroomsearchblock'}"><span>{l s='Check-out' mod='wkroomsearchblock'}</span></div>
+        <div id="dateranges_container" class="grid area-{$column_widths['date']}">
+            <div class="grid area-{$column_widths['date']}" id="daterange_value">
+                <div class="form-group">
+                    <input type="hidden" id="check_in_time" name="check_in_time" {if isset($search_data)}value="{$search_data['date_from']|escape:'htmlall':'UTF-8'}"{/if}>
+                    <div class="form-control header-rmsearch-input input-date" autocomplete="off" id="daterange_value_from" placeholder="{l s='Check-in' mod='wkroomsearchblock'}"><span>{l s='Check-in' mod='wkroomsearchblock'}</span></div>
+                </div>
+                <div class="form-group">
+                    <input type="hidden" id="check_out_time" name="check_out_time" {if isset($search_data)}value="{$search_data['date_to']|escape:'htmlall':'UTF-8'}"{/if}>
+                    <div class="form-control header-rmsearch-input input-date" autocomplete="off" id="daterange_value_to" placeholder="{l s='Check-out' mod='wkroomsearchblock'}"><span>{l s='Check-out' mod='wkroomsearchblock'}</span></div>
+                </div>
             </div>
         </div>
     {else}
         <div class="form-group area-{$column_widths['date']}">
-            <input type="hidden" id="check_in_time" name="check_in_time" {if isset($search_data)}value="{$search_data['date_from']|escape:'htmlall':'UTF-8'}"{/if}>
-            <input type="hidden" id="check_out_time" name="check_out_time" {if isset($search_data)}value="{$search_data['date_to']|escape:'htmlall':'UTF-8'}"{/if}>
-            <div class="form-control header-rmsearch-input input-date" id="daterange_value"  autocomplete="off" placeholder="{l s='Check-in - Check-out' mod='wkroomsearchblock'}"><span>{l s='Check-in' mod='wkroomsearchblock'} &nbsp;<i class="icon icon-minus"></i>&nbsp; {l s='Check-out' mod='wkroomsearchblock'}</span></div>
+            <div id="daterange_container">
+                <input type="hidden" id="check_in_time" name="check_in_time" {if isset($search_data)}value="{$search_data['date_from']|escape:'htmlall':'UTF-8'}"{/if}>
+                <input type="hidden" id="check_out_time" name="check_out_time" {if isset($search_data)}value="{$search_data['date_to']|escape:'htmlall':'UTF-8'}"{/if}>
+                <div class="form-control header-rmsearch-input input-date" id="daterange_value"  autocomplete="off" placeholder="{l s='Check-in - Check-out' mod='wkroomsearchblock'}"><span>{l s='Check-in' mod='wkroomsearchblock'} &nbsp;<i class="icon icon-minus"></i>&nbsp; {l s='Check-out' mod='wkroomsearchblock'}</span></div>
+            </div>
         </div>
     {/if}
 

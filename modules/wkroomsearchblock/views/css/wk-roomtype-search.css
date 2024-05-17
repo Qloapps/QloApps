@@ -17,6 +17,19 @@
 *  @license   https://store.webkul.com/license.html
 */
 
+#daterange_container > .date-picker-wrapper{
+  top: 59px;
+}
+@media (min-width: 768px) {
+  #dateranges_container > .date-picker-wrapper{
+    top: 59px;
+  }
+}
+@media (max-width: 767px) {
+  #dateranges_container > .date-picker-wrapper{
+    top: 130px;
+  }
+}
 .header-rmsearch-wrapper {
   display: none;
   border-radius: 0px;

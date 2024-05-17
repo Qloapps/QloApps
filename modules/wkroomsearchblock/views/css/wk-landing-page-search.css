@@ -76,6 +76,19 @@
     height: unset;
     min-height: 45px;
   }
+  #daterange_container > .date-picker-wrapper{
+    top: 59px;
+  }
+  @media (min-width: 768px) {
+    #dateranges_container > .date-picker-wrapper{
+      top: 59px;
+    }
+  }
+  @media (max-width: 767px) {
+    #dateranges_container > .date-picker-wrapper{
+      top: 130px;
+    }
+  }
 /* .fancybox-inner #search_hotel_block_form {
   grid-template-columns: 1fr;
 } */

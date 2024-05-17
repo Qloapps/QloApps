@@ -58,10 +58,12 @@
 #search_hotel_block_form .area-16 {
   grid-column-end: span 16;
 }
-#daterange_value.grid {
-  display: grid;
-  column-gap: 5px;
-  grid-template-columns: repeat(2, 1fr);
+@media (min-width: 768px) {
+    #daterange_value.grid {
+    display: grid;
+    column-gap: 5px;
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 /* #search_hotel_block_form {
   display: grid;
@@ -88,6 +90,13 @@
     grid-template-columns: 1fr;
   }
 } */
+#daterange_container, #dateranges_container {
+  position: relative;
+}
+#daterange_container > .date-picker-wrapper, #dateranges_container > .date-picker-wrapper{
+  position: absolute;
+  display: block;
+}
 #search_hotel_block_form .header-rmsearch-input {
   border-radius: 4px;
   border: none;

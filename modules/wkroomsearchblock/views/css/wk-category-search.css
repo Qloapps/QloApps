@@ -17,6 +17,12 @@
 *  @license   https://store.webkul.com/license.html
 */
 
+#daterange_container > .date-picker-wrapper{
+  top: 49px;
+}
+#dateranges_container > .date-picker-wrapper {
+  top: 110px;
+}
 .header-rmsearch-wrapper {
   background: #1A4060;
   box-shadow: 0 2px 6px 0 rgba(0,0,0,0.16);

@@ -93,6 +93,8 @@ $(document).ready(function() {
             $('#daterange_value').dateRangePicker({
                 startDate: $.datepicker.formatDate('dd-mm-yy', new Date()),
                 separator : ' to ',
+                inline: true,
+                container: $('#dateranges_container'),
                 setValue: function(s,s1,s2)
                 {
                     if (s1) {
@@ -120,6 +122,8 @@ $(document).ready(function() {
                 startDate: $.datepicker.formatDate('dd-mm-yy', new Date()),
                 startDate: start_date,
                 endDate: max_order_date,
+                inline: true,
+                container: $('#daterange_container'),
             }).on('datepicker-change', function(event,obj){
                 $('#check_in_time').val($.datepicker.formatDate('yy-mm-dd', obj.date1));
                 $('#check_out_time').val($.datepicker.formatDate('yy-mm-dd', obj.date2));
@@ -174,13 +178,7 @@ $(document).ready(function() {
 
     // if user clicks anywhere and location/hotel li is visible the select first li as selection
     $('body').on('click', function(e) {
-        if ($('.location_search_results_ul').is(':visible') && e.target.className != "search_result_li" && e.target.id != "hotel_location") {
-            $('.location_search_results_ul .search_result_li:first').click();
-        }
-
-        if ($('.hotel_dropdown_ul').is(':visible') && e.target.className != "search_result_li" && e.target.id != "hotel_location") {
-            $('.hotel_dropdown_ul .search_result_li:first').click();
-        }
+        selectSearchResultListOption(e)
     });
 
     // set data on clicking the searched location on dropdown
@@ -512,8 +510,20 @@ $(document).ready(function() {
     // toggle occupancy block
     $('#guest_occupancy').on('click', function(e) {
         e.stopPropagation();
+        selectSearchResultListOption(e);
         $("#search_occupancy_wrapper").toggle();
     });
+
+    function selectSearchResultListOption(e)
+    {
+        if ($('.location_search_results_ul').is(':visible') && e.target.className != "search_result_li" && e.target.id != "hotel_location") {
+            $('.location_search_results_ul .search_result_li:first').click();
+        }
+
+        if ($('.hotel_dropdown_ul').is(':visible') && e.target.className != "search_result_li" && e.target.id != "hotel_location") {
+            $('.hotel_dropdown_ul .search_result_li:first').click();
+        }
+    }
 
     // close the occupancy block when clink anywhere in the body outside occupancy block
     $('body').on('click', function(e) {
