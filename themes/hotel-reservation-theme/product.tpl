@@ -71,6 +71,7 @@
 							<span>{$product->name}
 								{* Block for booking products *}
 								{if isset($id_hotel) && $id_hotel}&nbsp;-&nbsp;{$hotel_name}{/if}
+								{if isset($hotel_rating) && $hotel_rating}<span id="hotel_rating">{for $i=0; $i < $hotel_rating; $i++}<i class="icon-star"></i>{/for}</span>{/if}
 							</span>
 							{hook h='displayRoomTypeDetailRoomTypeNameBlock' id_product=$product->id}
 						</div>

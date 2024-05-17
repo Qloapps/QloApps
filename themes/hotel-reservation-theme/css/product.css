@@ -1718,3 +1718,8 @@ ul.service-product-nav > li:hover {
 
 #room_info_hotel_images .skeleton-loading-wrap .loading-container-box {
   height: 200px; }
+  #hotel_rating {
+    font-size: 16px;
+    display: inline-block;
+    color: #3e3d3d;
+  }
