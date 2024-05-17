@@ -82,13 +82,13 @@ class AdminHotelRoomModuleSettingController extends ModuleAdminController
                 'search' => false,
                 'callback' => 'getProductImage',
             ),
-            'hotel_name' => array(
-                'title' => $this->l('Hotel'),
+            'name' => array(
+                'title' => $this->l('Room Type'),
                 'align' => 'center',
                 'orderby' => false,
             ),
-            'name' => array(
-                'title' => $this->l('Room Type'),
+            'hotel_name' => array(
+                'title' => $this->l('Hotel'),
                 'align' => 'center',
                 'orderby' => false,
             ),
@@ -128,25 +128,17 @@ class AdminHotelRoomModuleSettingController extends ModuleAdminController
         $this->identifier = 'id_room_block';
 
         parent::__construct();
-        $this->hotelList = HotelBranchInformation::getProfileAccessedHotels(
-            $this->context->employee->id_profile,
-            1
-        );
-        $objHotelRoomType = new HotelRoomType();
-        if ($this->loadObject(true)
-            && $this->object->id
-            && ($roomInfo = $objHotelRoomType->getRoomTypeInfoByIdProduct((int) $this->object->id_product))
-        ) {
-            $hasHotelAccess = false;
-            foreach ($this->hotelList as $hotel) {
-                if ($hotel['id_hotel'] == $roomInfo['id_hotel']) {
-                    $hasHotelAccess = true;
+        if ($this->hotelList = HotelBranchInformation::getProfileAccessedHotels($this->context->employee->id_profile, 1)) {
+            $objHotelRoomType = new HotelRoomType();
+            if ($this->loadObject(true)
+                && $this->object->id
+                && ($roomTypeInfo = $objHotelRoomType->getRoomTypeInfoByIdProduct((int) $this->object->id_product))
+            ) {
+                $idsHotel = array_column($this->hotelList, 'id_hotel');
+                if (!in_array($roomTypeInfo['id_hotel'], $idsHotel)) {
+                    $this->tabAccess['edit'] = 0;
+                    $this->tabAccess['view'] = 0;
                 }
-            }
-
-            if (!$hasHotelAccess) {
-                $this->tabAccess['edit'] = 0;
-                $this->tabAccess['view'] = 0;
             }
         }
     }
@@ -194,6 +186,9 @@ class AdminHotelRoomModuleSettingController extends ModuleAdminController
     {
         if (!($this->loadObject(true))) {
             return;
+        } else if (empty($this->hotelList)) {
+            $this->warnings[] = $this->l('No hotel found to create new hotel room block.');
+            return;
         }
 
         $productName = false;
@@ -216,9 +211,6 @@ class AdminHotelRoomModuleSettingController extends ModuleAdminController
             _PS_MODULE_DIR_.$this->module->name.
             '/views/templates/admin/hotel_room/product_search_block.tpl'
         );
-        if (empty($this->hotelList)) {
-            $this->warnings[] = $this->l('You do not have access to any hotel to search for the room types.');
-        }
 
         $this->fields_form = array(
             'legend' => array(
@@ -237,7 +229,7 @@ class AdminHotelRoomModuleSettingController extends ModuleAdminController
                         'id' => 'id_hotel',
                         'name' => 'hotel_name'
                     ),
-                    'hint' => $this->l('Select the hotel.'),
+                    'hint' => $this->l('Select the hotel to search for the room types.'),
                 ),
                 array(
                     'label' => $this->l('Search Room Type'),
@@ -441,7 +433,7 @@ class AdminHotelRoomModuleSettingController extends ModuleAdminController
             if (isset($pos[2]) && (int) $pos[2] === $idRoomBlock) {
                 if ($objRoomBlock = new WkHotelRoomDisplay((int) $pos[2])) {
                     if (isset($position)
-                        && $objRoomBlock->updatePosition($way, $position, $idRoomBlock)
+                        && $objRoomBlock->updatePosition($way, $position)
                     ) {
                         echo 'ok position '.(int) $position.' for hotel room block '.(int) $pos[1].'\r\n';
                     } else {

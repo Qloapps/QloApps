@@ -47,7 +47,7 @@ $(document).ready(function() {
                             if (result) {
                                 var html = '';
                                 $.each(result, function(key, value) {
-                                    html += '<li class="suggestion_li"><a class="suggestion_a text-capitalize" data-primary="' + value.id + '" data-secondary="' + value.name + '">' + value.id+ '. '+ value.name + '</a></li>';
+                                    html += '<li class="suggestion_li"><a class="suggestion_a text-capitalize" data-primary="' + value.id + '" data-secondary="' + value.name + '">'+value.name+' (#'+value.id+')</a></li>';
                                 });
                                 suggestion_ul.html(html).show();
                             } else {
