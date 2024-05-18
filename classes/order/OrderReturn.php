@@ -449,8 +449,8 @@ class OrderReturnCore extends ObjectModel
                         '{order_reference}' => $objOrder->reference,
                         '{order_date}' => date('Y-m-d h:i:s', strtotime($objOrder->date_add)),
                         '{refunded_amount}' => Tools::displayPrice($this->refunded_amount, new Currency($objOrder->id_currency)),
-                        '{payment_mode}' => $this->payment_mode,
-                        '{id_transaction}' => $this->id_transaction,
+                        '{payment_mode}' => $this->payment_mode ? $this->payment_mode : '--',
+                        '{id_transaction}' => $this->id_transaction ? $this->id_transaction : '--',
                     );
 
                     // if mail is true for the customer then send mail to customer with selected template
