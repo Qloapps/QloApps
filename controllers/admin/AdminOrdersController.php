@@ -2247,12 +2247,12 @@ class AdminOrdersControllerCore extends AdminController
                             $order_cart_rule->free_shipping = $cart_rule['free_shipping'];
                             $res &= $order_cart_rule->add();
 
-                            $order->total_discounts += $order_cart_rule->value;
-                            $order->total_discounts_tax_incl += $order_cart_rule->value;
-                            $order->total_discounts_tax_excl += $order_cart_rule->value_tax_excl;
-                            $order->total_paid -= $order_cart_rule->value;
-                            $order->total_paid_tax_incl -= $order_cart_rule->value;
-                            $order->total_paid_tax_excl -= $order_cart_rule->value_tax_excl;
+                            $order->total_discounts = Tools::ps_round($order->total_discounts + $order_cart_rule->value, 6);
+                            $order->total_discounts_tax_incl = Tools::ps_round($order->total_discounts_tax_incl + $order_cart_rule->value, 6);
+                            $order->total_discounts_tax_excl = Tools::ps_round($order->total_discounts_tax_excl + $order_cart_rule->value_tax_excl, 6);
+                            $order->total_paid = Tools::ps_round($order->total_paid - $order_cart_rule->value, 6);
+                            $order->total_paid_tax_incl = Tools::ps_round($order->total_paid_tax_incl - $order_cart_rule->value, 6);
+                            $order->total_paid_tax_excl = Tools::ps_round($order->total_paid_tax_excl - $order_cart_rule->value_tax_excl, 6);
                         }
 
                         // Update Order
