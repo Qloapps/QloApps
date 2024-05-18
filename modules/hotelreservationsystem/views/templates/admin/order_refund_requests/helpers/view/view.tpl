@@ -131,7 +131,7 @@
 											{if !$isRefundCompleted}
 												<th>{l s='Rooms cancelation charges' mod='hotelreservationsystem'}</th>
 											{/if}
-											{if $orderTotalPaid|floatval}
+											{if $hasOrderDiscountOrPayment}
 												<th>{l s='Refund amount' mod='hotelreservationsystem'}</th>
 											{/if}
 										</tr>
@@ -184,7 +184,7 @@
 														{/if}
 													</td>
 												{/if}
-												{if $orderTotalPaid|floatval}
+												{if $hasOrderDiscountOrPayment}
 													<td>
 														<div class="input-group">
 															{if $isRefundCompleted}
@@ -279,7 +279,7 @@
 							</div>
 
 							{* Fields to submit refund information *}
-							{if $orderTotalPaid|floatval}
+							{if $hasOrderDiscountOrPayment}
 								<div class="refunded_state_fields" style="display:none;">
 									<div class="form-group">
 										<div class="col-sm-3">

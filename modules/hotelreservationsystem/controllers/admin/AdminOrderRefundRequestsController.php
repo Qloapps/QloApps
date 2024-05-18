@@ -237,9 +237,13 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
                 }
             }
 
+            $orderTotalPaid = $objOrder->getTotalPaid();
+            $orderDiscounts = $objOrder->getCartRules();
+            $hasOrderDiscountOrPayment = ((float)$orderTotalPaid > 0 || $orderDiscounts) ? true : false;
             $this->context->smarty->assign(
                 array (
-                    'orderTotalPaid' => $objOrder->getTotalPaid(),
+                    'hasOrderDiscountOrPayment' => $hasOrderDiscountOrPayment,
+                    'orderTotalPaid' => $orderTotalPaid,
                     'customer_name' => $objCustomer->firstname.' '.$objCustomer->lastname,
                     'customer_email' => $objCustomer->email,
                     'orderReturnInfo' => (array)$objOrderReturn,
@@ -277,11 +281,14 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
             if (Validate::isLoadedObject($objOrderReturn = new OrderReturn($idOrderReturn))) {
                 $objOrder = new Order($objOrderReturn->id_order);
                 $orderTotalPaid = $objOrder->getTotalPaid();
+                $orderDiscounts = $objOrder->getCartRules();
+                $hasOrderDiscountOrPayment = ((float)$orderTotalPaid > 0 || $orderDiscounts) ? true : false;
+
                 $idRefundState = Tools::getValue('id_refund_state');
                 if (Validate::isLoadedObject($objRefundState = new OrderReturnState($idRefundState))) {
                     if ($objRefundState->refunded) {
                         $refundedAmounts = Tools::getValue('refund_amounts');
-                        if ((float) $orderTotalPaid > 0) {
+                        if ($hasOrderDiscountOrPayment) {
                             if ($idsReturnDetail && count($idsReturnDetail)) {
                                 if ($refundedAmounts) {
                                     foreach ($idsReturnDetail as $idRetDetail) {
@@ -392,7 +399,7 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
                     }
 
                     // if bookings are refunded then set the payment information
-                    if ((float) $orderTotalPaid > 0) {
+                    if ($hasOrderDiscountOrPayment) {
                         if (Tools::isSubmit('refundTransactionAmount')) {
                             $objOrderReturn->payment_mode = $paymentMode;
                             $objOrderReturn->id_transaction = $idTransaction;
@@ -415,7 +422,7 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
                         $idOrderState = 0;
                         if ($objOrder->hasCompletelyRefunded(Order::ORDER_COMPLETE_REFUND_FLAG)) {
                             $idOrderState = Configuration::get('PS_OS_REFUND');
-                        } elseif ($objOrder->hasCompletelyRefunded(Order::ORDER_COMPLETE_REFUND_FLAG)) {
+                        } elseif ($objOrder->hasCompletelyRefunded(Order::ORDER_COMPLETE_CANCELLATION_FLAG)) {
                             $idOrderState = Configuration::get('PS_OS_CANCELED');
                         }
 
