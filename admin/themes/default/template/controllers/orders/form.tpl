@@ -1170,7 +1170,6 @@
 		currency_format = jsonSummary.currency.format;
 		currency_sign = jsonSummary.currency.sign;
 		currency_blank = jsonSummary.currency.blank;
-		priceDisplayPrecision = jsonSummary.currency.decimals ? 2 : 0;
 
 		updateCartProducts(jsonSummary.summary.products, jsonSummary.summary.gift_products, jsonSummary.cart.id_address_delivery);
 		updateCartVouchers(jsonSummary.summary.discounts);
