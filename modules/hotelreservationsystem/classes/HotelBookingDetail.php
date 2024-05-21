@@ -1788,6 +1788,7 @@ class HotelBookingDetail extends ObjectModel
                 // change product name in order detail table
                 $objOrderDetail = new OrderDetail((int) $objHotelBooking->id_order_detail);
                 $objOrderDetail->product_name = $objProduct->name;
+                $objOrderDetail->product_id = $idNewRoomType;
 
                 // manage the prices in the order tables for the price diffrence
                 if ($priceDiffTaxExcl != 0) {
