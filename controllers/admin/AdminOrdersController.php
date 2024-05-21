@@ -482,44 +482,44 @@ class AdminOrdersControllerCore extends AdminController
     {
         if ($this->display == 'view') {
             /** @var Order $order */
-            $order = $this->loadObject();
+            if (Validate::isLoadedObject($order = $this->loadObject())) {
+                // hotel link in header
+                if ($idHotel = HotelBookingDetail::getIdHotelByIdOrder($order->id)) {
+                    $this->toolbar_btn['hotel'] = array(
+                        'href' => $this->context->link->getAdminLink('AdminAddHotel').'&id='.$idHotel.'&updatehtl_branch_info',
+                        'desc' => $this->l('View Hotel'),
+                        'class' => 'icon-building',
+                        'target' => true,
+                    );
+                }
 
-            // hotel link in header
-            if ($idHotel = HotelBookingDetail::getIdHotelByIdOrder($order->id)) {
-                $this->toolbar_btn['hotel'] = array(
-                    'href' => $this->context->link->getAdminLink('AdminAddHotel').'&id='.$idHotel.'&updatehtl_branch_info',
-                    'desc' => $this->l('View Hotel'),
-                    'class' => 'icon-building',
-                    'target' => true,
+                if (Configuration::get('PS_INVOICE') && $order->hasInvoice() && !$this->lite_display) {
+                    $this->toolbar_btn['file'] = array(
+                        'short' => $this->l('Invoice'),
+                        'href' => $this->context->link->getAdminLink('AdminPdf').'&submitAction=generateInvoicePDF&id_order='.$order->id,
+                        'desc' => $this->l('View invoice'),
+                        'class' => 'icon-file-text',
+                        'target' => true,
+                    );
+                }
+
+                $this->toolbar_btn['print'] = array(
+                    'short' => $this->l('Print'),
+                    'href' => 'javascript:window.print()',
+                    'desc' => $this->l('Print order'),
+                    'class' => 'icon-print',
                 );
-            }
 
-            if (Configuration::get('PS_INVOICE') && $order->hasInvoice() && !$this->lite_display) {
-                $this->toolbar_btn['file'] = array(
-                    'short' => $this->l('Invoice'),
-                    'href' => $this->context->link->getAdminLink('AdminPdf').'&submitAction=generateInvoicePDF&id_order='.$order->id,
-                    'desc' => $this->l('View invoice'),
-                    'class' => 'icon-file-text',
-                    'target' => true,
-                );
-            }
-
-            $this->toolbar_btn['print'] = array(
-                'short' => $this->l('Print'),
-                'href' => 'javascript:window.print()',
-                'desc' => $this->l('Print order'),
-                'class' => 'icon-print',
-            );
-
-            if (((int) $order->isReturnable()) && !$order->hasCompletelyRefunded(Order::ORDER_COMPLETE_CANCELLATION_OR_REFUND_REQUEST_FLAG)) {
-                $this->toolbar_btn['cancel'] = array(
-                    'short' => ((float) $order->getTotalPaid()) ? $this->l('Refund') : $this->l('Cancel'),
-                    'href' => '#refundForm',
-                    'id' => 'desc-order-standard_refund',
-                    'desc' => ((float) $order->getTotalPaid()) ? $this->l('Initiate refund') : $this->l('Cancel bookings'),
-                    'class' => 'icon-exchange',
-                    'target' => true,
-                );
+                if (((int) $order->isReturnable()) && !$order->hasCompletelyRefunded(Order::ORDER_COMPLETE_CANCELLATION_OR_REFUND_REQUEST_FLAG)) {
+                    $this->toolbar_btn['cancel'] = array(
+                        'short' => ((float) $order->getTotalPaid()) ? $this->l('Refund') : $this->l('Cancel'),
+                        'href' => '#refundForm',
+                        'id' => 'desc-order-standard_refund',
+                        'desc' => ((float) $order->getTotalPaid()) ? $this->l('Initiate refund') : $this->l('Cancel bookings'),
+                        'class' => 'icon-exchange',
+                        'target' => true,
+                    );
+                }
             }
         }
 
@@ -2478,9 +2478,8 @@ class AdminOrdersControllerCore extends AdminController
 
     public function renderView()
     {
-        $order = new Order(Tools::getValue('id_order'));
-        if (!Validate::isLoadedObject($order)) {
-            $this->errors[] = Tools::displayError('The order cannot be found within your database.');
+        if (!Validate::isLoadedObject($order = new Order(Tools::getValue('id_order')))) {
+            return;
         }
 
         $this->content .= $this->renderKpis();
