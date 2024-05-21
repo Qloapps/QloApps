@@ -1797,7 +1797,10 @@ class HotelBookingDetail extends ObjectModel
 
                     // set price changes in htl_booking_detail table
                     $objHotelBooking->total_price_tax_excl += (float)$priceDiffTaxExcl;
+                    $objHotelBooking->total_price_tax_excl = $objHotelBooking->total_price_tax_excl > 0 ? $objHotelBooking->total_price_tax_excl : 0;
+
                     $objHotelBooking->total_price_tax_incl += (float)$priceDiffTaxIncl;
+                    $objHotelBooking->total_price_tax_incl = $objHotelBooking->total_price_tax_incl > 0 ? $objHotelBooking->total_price_tax_incl : 0;
 
                     // set price changes in order_detail table
                     $roomTypeTotalPrice = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice(
@@ -1813,15 +1816,28 @@ class HotelBookingDetail extends ObjectModel
                     );
 
                     $objOrderDetail->total_price_tax_excl += (float)$priceDiffTaxExcl;
+                    $objOrderDetail->total_price_tax_excl = $objOrderDetail->total_price_tax_excl > 0 ? $objOrderDetail->total_price_tax_excl : 0;
+
                     $objOrderDetail->total_price_tax_incl += (float)$priceDiffTaxIncl;
+                    $objOrderDetail->total_price_tax_incl = $objOrderDetail->total_price_tax_incl > 0 ? $objOrderDetail->total_price_tax_incl : 0;
 
                     // set price changes in orders table
                     $objOrder = new Order($objOrderDetail->id_order);
                     $objOrder->total_products += (float)$priceDiffTaxExcl;
+                    $objOrder->total_products = $objOrder->total_products > 0 ? $objOrder->total_products : 0;
+
                     $objOrder->total_products_wt += (float)$priceDiffTaxIncl;
+                    $objOrder->total_products_wt = $objOrder->total_products_wt > 0 ? $objOrder->total_products_wt : 0;
+
                     $objOrder->total_paid += (float)$priceDiffTaxIncl;
+                    $objOrder->total_paid = $objOrder->total_paid > 0 ? $objOrder->total_paid : 0;
+
                     $objOrder->total_paid_tax_excl += (float)$priceDiffTaxExcl;
+                    $objOrder->total_paid_tax_excl = $objOrder->total_paid_tax_excl > 0 ? $objOrder->total_paid_tax_excl : 0;
+
                     $objOrder->total_paid_tax_incl += (float)$priceDiffTaxIncl;
+                    $objOrder->total_paid_tax_incl = $objOrder->total_paid_tax_incl > 0 ? $objOrder->total_paid_tax_incl : 0;
+
 
                     $result &= $objOrder->update();
 
