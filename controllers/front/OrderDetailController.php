@@ -202,8 +202,7 @@ class OrderDetailControllerCore extends FrontController
                                     $cartHotelData[$type_key]['date_diff'][$date_join]['hotel_booking_details'][$data_v['id']]['child_ages'] = $data_v['child_ages'];
                                     $cartHotelData[$type_key]['date_diff'][$date_join]['hotel_booking_details'][$data_v['id']]['is_refunded'] = $data_v['is_refunded'];
                                     $cartHotelData[$type_key]['date_diff'][$date_join]['hotel_booking_details'][$data_v['id']]['is_cancelled'] = $data_v['is_cancelled'];
-                                    $cartHotelData[$type_key]['date_diff'][$date_join]['hotel_booking_details'][$data_v['id']]['check_in'] = $data_v['check_in'];
-                                    $cartHotelData[$type_key]['date_diff'][$date_join]['hotel_booking_details'][$data_v['id']]['check_out'] = $data_v['check_out'];
+                                    $cartHotelData[$type_key]['date_diff'][$date_join]['hotel_booking_details'][$data_v['id']]['id_status'] = $data_v['id_status'];
 
                                     $cartHotelData[$type_key]['date_diff'][$date_join]['is_refunded'] = $data_v['is_refunded'];
 
@@ -425,7 +424,7 @@ class OrderDetailControllerCore extends FrontController
                         'refund_allowed' => (int) $order->isReturnable(),
                         'returns' => OrderReturn::getOrdersReturn($order->id_customer, $order->id),
                         'refundReqBookings' => $refundReqBookings,
-                        'completeRefundRequestOrCancel' => $order->hasCompletelyRefunded(Order::ORDER_COMPLETE_CANCELLATION_OR_REFUND_REQUEST_FLAG),
+                        'completeRefundRequestOrCancel' => $order->hasCompletelyRefunded(0, 1),
                         'refundedAmount' => $refundedAmount,
                         'shop_name' => strval(Configuration::get('PS_SHOP_NAME')),
                         'order' => $order,
@@ -457,6 +456,9 @@ class OrderDetailControllerCore extends FrontController
                         'use_tax' => Configuration::get('PS_TAX'),
                         'group_use_tax' => (Group::getPriceDisplayMethod($customer->id_default_group) == PS_TAX_INC),
                         'reorderingAllowed' => !(bool) Configuration::get('PS_DISALLOW_HISTORY_REORDERING'),
+                        'ROOM_STATUS_ALLOTED' => HotelBookingDetail::STATUS_ALLOTED,
+                        'ROOM_STATUS_CHECKED_IN' => HotelBookingDetail::STATUS_CHECKED_IN,
+                        'ROOM_STATUS_CHECKED_OUT' => HotelBookingDetail::STATUS_CHECKED_OUT,
                     )
                 );
 
@@ -563,9 +565,9 @@ class OrderDetailControllerCore extends FrontController
                         break;
                     }
 
-                    // the room has already been checked in will not be able to be cancelled by the customer
-                    if ($objHotelBookingDetail->check_in != '0000-00-00 00:00:00') {
-                        $this->errors[] = Tools::displayError('Some selected rooms have already been checked in.');
+                    // the room has already been checked in/checked out, room will not be able to be cancelled by the customer
+                    if ($objHotelBookingDetail->id_status != HotelBookingDetail::STATUS_ALLOTED) {
+                        $this->errors[] = Tools::displayError('Some selected rooms have already been checked in/checked out.');
                         break;
                     }
 
