@@ -4766,47 +4766,47 @@ class AdminOrdersControllerCore extends AdminController
             if ($order_detail->id_order_invoice != $order_invoice->id) {
                 $old_order_invoice = new OrderInvoice($order_detail->id_order_invoice);
                 // We remove cost of products
-                $old_order_invoice->total_products -= $order_detail->total_price_tax_excl;
-                $old_order_invoice->total_products_wt -= $order_detail->total_price_tax_incl;
+                $old_order_invoice->total_products -= Tools::ps_round($order_detail->total_price_tax_excl, 6);
+                $old_order_invoice->total_products_wt -= Tools::ps_round($order_detail->total_price_tax_incl, 6);
 
-                $old_order_invoice->total_paid_tax_excl -= $order_detail->total_price_tax_excl;
-                $old_order_invoice->total_paid_tax_incl -= $order_detail->total_price_tax_incl;
+                $old_order_invoice->total_paid_tax_excl -= Tools::ps_round($order_detail->total_price_tax_excl, 6);
+                $old_order_invoice->total_paid_tax_incl -= Tools::ps_round($order_detail->total_price_tax_incl, 6);
 
                 $res &= $old_order_invoice->update();
 
-                $order_invoice->total_products += $order_detail->total_price_tax_excl;
-                $order_invoice->total_products_wt += $order_detail->total_price_tax_incl;
+                $order_invoice->total_products += Tools::ps_round($order_detail->total_price_tax_excl, 6);
+                $order_invoice->total_products_wt += Tools::ps_round($order_detail->total_price_tax_incl, 6);
 
-                $order_invoice->total_paid_tax_excl += $order_detail->total_price_tax_excl;
-                $order_invoice->total_paid_tax_incl += $order_detail->total_price_tax_incl;
+                $order_invoice->total_paid_tax_excl += Tools::ps_round($order_detail->total_price_tax_excl, 6);
+                $order_invoice->total_paid_tax_incl += Tools::ps_round($order_detail->total_price_tax_incl, 6);
 
                 $order_detail->id_order_invoice = $order_invoice->id;
             }
         }
 
         if ($diff_price_tax_incl != 0 && $diff_price_tax_excl != 0) {
-            $order_detail->unit_price_tax_excl = $product_price_tax_excl;
-            $order_detail->unit_price_tax_incl = $product_price_tax_incl;
+            $order_detail->unit_price_tax_excl = Tools::ps_round($product_price_tax_excl, 6);
+            $order_detail->unit_price_tax_incl = Tools::ps_round($product_price_tax_incl, 6);
 
-            $order_detail->total_price_tax_incl += (float)$diff_price_tax_incl;
-            $order_detail->total_price_tax_excl += (float)$diff_price_tax_excl;
+            $order_detail->total_price_tax_incl += Tools::ps_round((float)$diff_price_tax_incl, 6);
+            $order_detail->total_price_tax_excl += Tools::ps_round((float)$diff_price_tax_excl, 6);
 
             if (isset($order_invoice)) {
                 // Apply changes on OrderInvoice
-                $order_invoice->total_products += (float)$diff_price_tax_excl;
-                $order_invoice->total_products_wt += (float)$diff_price_tax_incl;
+                $order_invoice->total_products += Tools::ps_round((float)$diff_price_tax_excl, 6);
+                $order_invoice->total_products_wt += Tools::ps_round((float)$diff_price_tax_incl, 6);
 
-                $order_invoice->total_paid_tax_excl += (float)$diff_price_tax_excl;
-                $order_invoice->total_paid_tax_incl += (float)$diff_price_tax_incl;
+                $order_invoice->total_paid_tax_excl += Tools::ps_round((float)$diff_price_tax_excl, 6);
+                $order_invoice->total_paid_tax_incl += Tools::ps_round((float)$diff_price_tax_incl, 6);
             }
 
             // Apply changes on Order
             $order = new Order($order_detail->id_order);
-            $order->total_products += (float)$diff_price_tax_excl;
-            $order->total_products_wt += (float)$diff_price_tax_incl;
-            $order->total_paid += (float)$diff_price_tax_incl;
-            $order->total_paid_tax_excl += (float)$diff_price_tax_excl;
-            $order->total_paid_tax_incl += (float)$diff_price_tax_incl;
+            $order->total_products += Tools::ps_round((float)$diff_price_tax_excl, 6);
+            $order->total_products_wt += Tools::ps_round((float)$diff_price_tax_incl, 6);
+            $order->total_paid += Tools::ps_round((float)$diff_price_tax_incl, 6);
+            $order->total_paid_tax_excl += Tools::ps_round((float)$diff_price_tax_excl, 6);
+            $order->total_paid_tax_incl += Tools::ps_round((float)$diff_price_tax_incl, 6);
 
             $res &= $order->update();
         }
