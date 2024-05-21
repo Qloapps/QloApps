@@ -2335,9 +2335,19 @@ const RoomReallocationModal = {
                             });
                             roomsTypesHtml += '</select>';
 
-                        setRoomsForReallocation(json_arr_realloc_room_types[idCurrentRoomType]['rooms']);
+                            $(".realloc_avail_room_type_container").empty().append(roomsTypesHtml);
 
-                        $(".realloc_avail_room_type_container").empty().append(roomsTypesHtml);
+                        // if rooms are available for reallocation for the current room type then only select that room type
+                        if (typeof json_arr_realloc_room_types[idCurrentRoomType] !==  'undefined') {
+                            $('#realloc_avail_room_type option[value='+idCurrentRoomType+']').prop('selected', true);
+                            setRoomsForReallocation(json_arr_realloc_room_types[idCurrentRoomType]['rooms']);
+
+                        // if rooms are not available for reallocation for the current room type
+                        // then select first room type in available room types and also price difference data
+                        } else if (idFirstRoomType = Object.keys(json_arr_realloc_room_types)[0]) {
+                            $('#realloc_avail_room_type option[value='+idFirstRoomType+']').prop('selected', true);
+                            RoomReallocationModal.changeRoomType($("#realloc_avail_room_type"));
+                        }
                     } else {
                         $(".realloc_avail_rooms_container").empty().text(no_realloc_rm_avail_txt).addClass('text-danger');
                         $(".realloc_avail_room_type_container").empty().text(no_realloc_rm_type_avail_txt).addClass('text-danger');
