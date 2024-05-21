@@ -75,7 +75,8 @@ class NotificationCore
                     LEFT JOIN '._DB_PREFIX_.'htl_booking_detail hbd ON (hbd.id_order = o.id_order)
 					WHERE o.`id_order` > '.(int)$id_last_element.
                     Shop::addSqlRestriction(false, 'o'). HotelBranchInformation::addHotelRestriction(false, 'hbd').'
-					ORDER BY `id_order` DESC
+                    GROUP BY o.`id_order`
+					ORDER BY o.`id_order` DESC
 					LIMIT 5';
                 break;
 
