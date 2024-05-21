@@ -292,10 +292,10 @@ class AdminHotelFeaturesController extends ModuleAdminController
             if ($objHotelFeatures->deleteHotelFeatures($idFeature)) {
                 $response['status'] = true;
             } else {
-                $response['msg'] = $this->l('Some error occurred while deleting feature. Please try again.', null, true);
+                $response['msg'] = $this->l('Some error occurred while deleting feature. Please try again.');
             }
         } else {
-            $response['msg'] = $this->l('You do not have the permission to delete this.', null, true);
+            $response['msg'] = $this->l('You do not have the permission to delete this.');
         }
 
         $this->ajaxDie(json_encode($response));

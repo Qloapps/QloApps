@@ -463,8 +463,8 @@ $(document).ready(function() {
                     action: 'deleteFeature',
                 },
                 method: 'POST',
-                success: function(data) {
-                    var response =  JSON.parse(data);
+                dataType: 'json',
+                success: function(response) {
                     if (response.status) {
                         alert(success_delete_msg);
                         $('#grand_feature_div_' + ftr_id).remove();
