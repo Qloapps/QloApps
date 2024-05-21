@@ -6996,14 +6996,23 @@ class AdminOrdersControllerCore extends AdminController
                 // if room is changing in the reallocation
                 if ($objHotelBooking->id_product != $idNewRoomType) {
                     $result['has_room_type_change'] = 1;
+                    // set context currency So that we can get prices in the order currency
+                    $objOrder = new Order($objHotelBooking->id_order);
+                    $this->context->currency = new Currency($objOrder->id_currency);
                     $newRoomTotalPrice = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice(
                         $idNewRoomType,
                         $objHotelBooking->date_from,
-                        $objHotelBooking->date_to
+                        $objHotelBooking->date_to,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0
                     );
                     if ($objHotelBooking->total_price_tax_excl != $newRoomTotalPrice['total_price_tax_excl']) {
                         $result['has_price_changes'] = 1;
-                        $result['price_diff'] = $newRoomTotalPrice['total_price_tax_excl'] - $objHotelBooking->total_price_tax_excl;
+                        $result['price_diff'] = Tools::ps_round(($newRoomTotalPrice['total_price_tax_excl'] - $objHotelBooking->total_price_tax_excl), 6);
                     }
                 }
             } else {
