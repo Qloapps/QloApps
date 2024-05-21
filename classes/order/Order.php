@@ -2675,7 +2675,10 @@ class OrderCore extends ObjectModel
                     return true;
                 } elseif ($includeCheckIn) {
                     foreach ($orderBookings as $booking) {
-                        if ($booking['is_refunded'] == 0 && $booking['id_status'] == HotelBookingDetail::STATUS_ALLOTED) {
+                        if ($booking['is_refunded'] == 0
+                            && !OrderReturn::getOrdersReturnDetail($this->id, 0, $booking['id'])
+                            && $booking['id_status'] == HotelBookingDetail::STATUS_ALLOTED
+                        ) {
                             return false;
                         }
                     }
