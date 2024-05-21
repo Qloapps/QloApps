@@ -366,6 +366,15 @@ class AdminNormalProductsControllerCore extends AdminController
         return '--';
     }
 
+    public function getHotelName($hotelName, $row)
+    {
+        if ($hotelName && isset($row['city'])) {
+            return $hotelName.' - '.$row['city'];
+        }
+
+        return '--';
+    }
+
     public static function getQuantities($hotelName, $tr)
     {
         if ((int)$tr['is_virtual'] == 1 && $tr['nb_downloadable'] == 0) {
@@ -3520,6 +3529,15 @@ class AdminNormalProductsControllerCore extends AdminController
         ));
         $data->assign($this->tpl_form_vars);
 
+        $objRoomType = new HotelRoomType();
+        $objHotelInfo = new HotelBranchInformation();
+        $data->assign('htl_info', $objHotelInfo->hotelsNameAndId());
+        if ($hotelRoomType = $objRoomType->getRoomTypeInfoByIdProduct($product->id)) {
+            $data->assign('htl_room_type', $hotelRoomType);
+            $hotelFullInfo = $objHotelInfo->hotelBranchInfoById($hotelRoomType['id_hotel']);
+            $data->assign('htl_full_info', $hotelFullInfo);
+        }
+
         $this->tpl_form_vars['product'] = $product;
         $this->tpl_form_vars['custom_form'] = $data->fetch();
     }
@@ -4091,6 +4109,19 @@ class AdminNormalProductsControllerCore extends AdminController
                 }
             }
         }
+    }
+
+    public function ajaxProcessGetIdHotelByIdProduct()
+    {
+        $response = array('status' => 'failed');
+        $idProduct = Tools::getValue('id_product');
+        $objHotelRoomType = new HotelRoomType();
+        $roomTypeInfo = $objHotelRoomType->getRoomTypeInfoByIdProduct($idProduct);
+        if ($roomTypeInfo) {
+            $response['status'] = 'success';
+            $response['id_hotel'] = (int)$roomTypeInfo['id_hotel'];
+        }
+        die(json_encode($response));
     }
 
     public function processImageLegends()
