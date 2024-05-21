@@ -79,6 +79,9 @@ class AdminCustomersControllerCore extends AdminController
 
         $this->_join = 'LEFT JOIN '._DB_PREFIX_.'gender_lang gl ON (a.id_gender = gl.id_gender AND gl.id_lang = '.(int)$this->context->language->id.')';
         $this->_join .= ' LEFT JOIN '._DB_PREFIX_.'group_lang grl ON (a.id_default_group = grl.id_group AND grl.id_lang = '.(int)$this->context->language->id.')';
+        $this->_join .= ' LEFT JOIN '._DB_PREFIX_.'orders o ON (a.id_customer = o.id_customer)';
+        $this->_group = 'GROUP BY a.`id_customer`';
+
         $this->_use_found_rows = false;
         $this->fields_list = array(
             'id_customer' => array(
@@ -123,6 +126,7 @@ class AdminCustomersControllerCore extends AdminController
             ),
             'total_orders' => array(
                 'title' => $this->l('Number of orders'),
+                'type' => 'range',
                 'optional' => true,
                 'visible_default' => true,
                 'havingFilter' => true,
@@ -170,6 +174,12 @@ class AdminCustomersControllerCore extends AdminController
                 'type' => 'datetime',
                 'search' => false,
                 'havingFilter' => true
+            ),
+            'order_date' => array(
+                'title' => $this->l('Order date'),
+                'type' => 'date',
+                'filter_key' => 'o!date_add',
+                'displayed' => false
             )
         ));
 
@@ -178,19 +188,8 @@ class AdminCustomersControllerCore extends AdminController
         parent::__construct();
 
         $this->_select = '
-        a.date_add, gl.name as title, grl.name as default_group_name, (
-            SELECT SUM(total_paid_real / conversion_rate)
-            FROM '._DB_PREFIX_.'orders o
-            WHERE o.id_customer = a.id_customer
-            '.Shop::addSqlRestriction(Shop::SHARE_ORDER, 'o').'
-            AND o.valid = 1
-        ) as total_spent, (
-            SELECT COUNT(o.`id_order`)
-            FROM '._DB_PREFIX_.'orders o
-            WHERE o.id_customer = a.id_customer
-            '.Shop::addSqlRestriction(Shop::SHARE_ORDER, 'o').'
-            AND o.valid = 1
-        ) as total_orders, (
+        a.date_add, gl.name as title, grl.name as default_group_name, COUNT(o.`id_order`) as total_orders,
+        o.`date_add` as order_date, SUM(total_paid_real / conversion_rate) as total_spent, (
             SELECT c.date_add FROM '._DB_PREFIX_.'guest g
             LEFT JOIN '._DB_PREFIX_.'connections c ON c.id_guest = g.id_guest
             WHERE g.id_customer = a.id_customer
@@ -214,6 +213,12 @@ class AdminCustomersControllerCore extends AdminController
     public function postProcess()
     {
         if (!$this->can_add_customer && $this->display == 'add') {
+            $this->redirect_after = $this->context->link->getAdminLink('AdminCustomers');
+        }
+
+        if (Tools::getValue('frequent_customers')) {
+            $this->context->cookie->{'customerscustomerFilter_total_orders'} = json_encode(array(Configuration::get('PS_KPI_FREQUENT_CUSTOMER_NB_ORDERS'), ''));
+            $this->context->cookie->{'customerscustomerFilter_o!date_add'} = json_encode(array(date('Y-m-d', strtotime('-365 day')), date('Y-m-d')));
             $this->redirect_after = $this->context->link->getAdminLink('AdminCustomers');
         }
 
@@ -696,7 +701,8 @@ class AdminCustomersControllerCore extends AdminController
         $helper->icon = 'icon-star';
         $helper->color = 'color2';
         $helper->title = $this->l('Total Frequent Customers', null, null, false);
-        $helper->subtitle = $this->l('All Time', null, null, false);
+        $helper->subtitle = $this->l('1 year', null, null, false);
+        $helper->href = $this->context->link->getAdminLink('AdminCustomers').'&frequent_customers=1';
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=total_frequent_customers';
         $helper->tooltip = $this->l('The total number of frequent customers in given period of time.', null, null, false);
         $kpis[] = $helper;
