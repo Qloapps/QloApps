@@ -523,15 +523,12 @@ function initProductEvents()
                 $(this).val(max_child_in_room);
                 if (elementVal == 1) {
                     showOccupancyError(no_children_allowed_txt, $(this).closest(".occupancy_info_block"));
-                    haserror = true;
                 } else {
                     showOccupancyError(max_children_txt, $(this).closest(".occupancy_info_block"));
-                    haserror = true;
                 }
             } else if (elementVal > max_allowed_for_current)  {
                 $(this).val(max_allowed_for_current);
                 showOccupancyError(max_occupancy_reached_txt, $(this).closest(".occupancy_info_block"));
-                haserror = true;
             }
         } else {
             max_adults_in_room = $(this).closest(".booking_occupancy_wrapper").find('.max_adults').val();
