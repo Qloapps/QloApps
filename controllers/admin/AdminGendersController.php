@@ -204,6 +204,31 @@ class AdminGendersControllerCore extends AdminController
         return $this->fields_list['type']['list'][$value];
     }
 
+    public function postProcess()
+    {
+        if (Tools::isSubmit('submitAdd'.$this->table) || Tools::isSubmit('submitAdd'.$this->table.'AndStay')) {
+            $languages = Language::getLanguages(false);
+            $defaultLangId = Configuration::get('PS_LANG_DEFAULT');
+            $objDefaultLanguage = Language::getLanguage((int) $defaultLangId);
+
+            if ($defaultLangTitle = Tools::getValue('name_'.$defaultLangId)) {
+                if (!trim($defaultLangTitle)) {
+                    $this->errors[] = $this->l('Social title is required at least in ').$objDefaultLanguage['name'];
+                } else {
+                    foreach ($languages as $lang) {
+                        if (trim(Tools::getValue('name_'.$lang['id_lang']))) {
+                            if (!Validate::isGenericName(Tools::getValue('name_'.$lang['id_lang']))) {
+                                $this->errors[] = $this->l('Invalid social title in ').$lang['name'];
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        parent::postProcess();
+    }
+
     protected function postImage($id)
     {
         if (isset($this->fieldImageSettings['name']) && isset($this->fieldImageSettings['dir'])) {
