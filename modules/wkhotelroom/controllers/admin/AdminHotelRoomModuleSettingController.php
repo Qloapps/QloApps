@@ -140,6 +140,11 @@ class AdminHotelRoomModuleSettingController extends ModuleAdminController
                     $this->tabAccess['view'] = 0;
                 }
             }
+        } else {
+            if ($this->loadObject(true) && $this->object->id) {
+                $this->tabAccess['view'] =0;
+                $this->tabAccess['edit'] =0;
+            }
         }
     }
 
@@ -186,7 +191,7 @@ class AdminHotelRoomModuleSettingController extends ModuleAdminController
     {
         if (!($this->loadObject(true))) {
             return;
-        } else if (empty($this->hotelList)) {
+        } else if (!$this->object->id && empty($this->hotelList)) {
             $this->warnings[] = $this->l('No hotel found to create new hotel room block.');
             return;
         }
