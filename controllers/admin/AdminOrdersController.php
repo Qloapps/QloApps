@@ -1623,6 +1623,9 @@ class AdminOrdersControllerCore extends AdminController
                     $this->errors[] = Tools::displayError('The date is invalid');
                 } elseif (!Validate::isUnsignedInt($payment_type)) {
                     $this->errors[] = Tools::displayError('Payment source is invalid');
+                // Amount cannot be less than paid amount by guest in negative price
+                } elseif ($amount < 0 && ($order->total_paid_real + $amount) < 0) {
+                    $this->errors[] = sprintf(Tools::displayError('Amount cannot be less than -%s'), Tools::displayPrice($order->total_paid_real, new Currency($order->id_currency)));
                 } else {
                     if (!$order->addOrderPayment(
                         $amount,
