@@ -451,6 +451,7 @@
 								</div>
 							{/if}
 							{* End Voucher Block *}
+							{hook h='displayCartRightColumn'}
 						</div>
 					{else}
 						{capture name=path}{l s='Your booking cart'}{/capture}

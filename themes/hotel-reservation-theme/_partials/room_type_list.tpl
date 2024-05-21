@@ -17,6 +17,7 @@
 * @license LICENSE.txt
 *}
 
+{hook h='displayRoomTypeListBefore'}
 {if isset($booking_data['rm_data']) && $booking_data['rm_data']}
 	{foreach from=$booking_data['rm_data'] key=room_k item=room_v}
 		<div class="col-sm-12 room_cont" data-id-product="{$room_v['id_product']|escape:'htmlall':'UTF-8'}">
