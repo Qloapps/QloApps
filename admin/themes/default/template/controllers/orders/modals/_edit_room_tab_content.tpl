@@ -50,7 +50,7 @@
 
         <div class="row form-group">
             <div class="col-sm-6">
-                <label class="control-label">{l s='Price (Tax excl.)'}</label>
+                <label class="control-label">{l s='Price (tax excl.)'}</label>
                 <div class="input-group">
                     {if $currency->format % 2}<div class="input-group-addon">{$currency->sign}</div>{/if}
                     <input class="form-control room_unit_price" type="text" name="room_unit_price" value=""/>
