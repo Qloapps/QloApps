@@ -102,19 +102,7 @@ class CategoryControllerCore extends FrontController
         $dateFrom = Tools::getValue('date_from');
         $dateTo = Tools::getValue('date_to');
 
-        $currentTimestamp = strtotime(date('Y-m-d'));
-        $dateFromTimestamp = strtotime($dateFrom);
-        $dateToTimestamp = strtotime($dateTo);
-
-        if ($dateFrom != '' && ($dateFromTimestamp === false || ($dateFromTimestamp < $currentTimestamp))) {
-            Tools::redirect($this->context->link->getPageLink('pagenotfound'));
-        }
-
-        if ($dateTo != '' && ($dateToTimestamp === false || ($dateToTimestamp < $currentTimestamp))) {
-            Tools::redirect($this->context->link->getPageLink('pagenotfound'));
-        }
-
-        if ($dateTo != '' && $dateFrom != '' && $dateFromTimestamp >= $dateToTimestamp) {
+        if (!HotelHelper::validateDateRange($dateFrom, $dateTo)) {
             Tools::redirect($this->context->link->getPageLink('pagenotfound'));
         }
 

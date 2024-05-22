@@ -929,4 +929,21 @@ class HotelHelper
 
         return $daysDifference;
     }
+
+    public static function validateDateRange($dateFrom, $dateTo)
+    {
+        $currentTimestamp = strtotime(date('Y-m-d'));
+        $dateFromTimestamp = strtotime($dateFrom);
+        $dateToTimestamp = strtotime($dateTo);
+        $isValid = true;
+        if ($dateFrom != '' && ($dateFromTimestamp === false || ($dateFromTimestamp < $currentTimestamp))) {
+            $isValid = false;
+        } else if ($dateTo != '' && ($dateToTimestamp === false || ($dateToTimestamp < $currentTimestamp))) {
+            $isValid = false;
+        } else if ($dateTo != '' && $dateFrom != '' && $dateFromTimestamp >= $dateToTimestamp) {
+            $isValid = false;
+        }
+
+        return $isValid;
+    }
 }
