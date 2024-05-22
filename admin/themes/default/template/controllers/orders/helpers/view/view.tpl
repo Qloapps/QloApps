@@ -869,7 +869,7 @@
                     <div class="panel" id="refundForm">
                         <div class="panel-heading">
                             <i class="icon-bed"></i> &nbsp;{l s='Rooms Booking Detail'} <span class="badge">{$order_detail_data|@count}</span>
-                            {if !$order->hasBeenDelivered()}
+                            {if !$order->hasBeenDelivered() && $currentState->id != Configuration::get('PS_OS_REFUND') && $currentState->id != Configuration::get('PS_OS_CANCELED')}
                                 <button type="button" id="add_room" class="btn btn-primary pull-right">
                                     <i class="icon-plus-sign"></i> {l s='Add Rooms'}
                                 </button>
