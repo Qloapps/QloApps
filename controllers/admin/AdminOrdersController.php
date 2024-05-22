@@ -470,44 +470,44 @@ class AdminOrdersControllerCore extends AdminController
     {
         if ($this->display == 'view') {
             /** @var Order $order */
-            $order = $this->loadObject();
+            if (Validate::isLoadedObject($order = $this->loadObject())) {
+                // hotel link in header
+                if ($idHotel = HotelBookingDetail::getIdHotelByIdOrder($order->id)) {
+                    $this->toolbar_btn['hotel'] = array(
+                        'href' => $this->context->link->getAdminLink('AdminAddHotel').'&id='.$idHotel.'&updatehtl_branch_info',
+                        'desc' => $this->l('View Hotel'),
+                        'class' => 'icon-building',
+                        'target' => true,
+                    );
+                }
 
-            // hotel link in header
-            if ($idHotel = HotelBookingDetail::getIdHotelByIdOrder($order->id)) {
-                $this->toolbar_btn['hotel'] = array(
-                    'href' => $this->context->link->getAdminLink('AdminAddHotel').'&id='.$idHotel.'&updatehtl_branch_info',
-                    'desc' => $this->l('View Hotel'),
-                    'class' => 'icon-building',
-                    'target' => true,
+                if (Configuration::get('PS_INVOICE') && $order->hasInvoice() && !$this->lite_display) {
+                    $this->toolbar_btn['file'] = array(
+                        'short' => $this->l('Invoice'),
+                        'href' => $this->context->link->getAdminLink('AdminPdf').'&submitAction=generateInvoicePDF&id_order='.$order->id,
+                        'desc' => $this->l('View invoice'),
+                        'class' => 'icon-file-text',
+                        'target' => true,
+                    );
+                }
+
+                $this->toolbar_btn['print'] = array(
+                    'short' => $this->l('Print'),
+                    'href' => 'javascript:window.print()',
+                    'desc' => $this->l('Print order'),
+                    'class' => 'icon-print',
                 );
-            }
 
-            if (Configuration::get('PS_INVOICE') && $order->hasInvoice() && !$this->lite_display) {
-                $this->toolbar_btn['file'] = array(
-                    'short' => $this->l('Invoice'),
-                    'href' => $this->context->link->getAdminLink('AdminPdf').'&submitAction=generateInvoicePDF&id_order='.$order->id,
-                    'desc' => $this->l('View invoice'),
-                    'class' => 'icon-file-text',
-                    'target' => true,
-                );
-            }
-
-            $this->toolbar_btn['print'] = array(
-                'short' => $this->l('Print'),
-                'href' => 'javascript:window.print()',
-                'desc' => $this->l('Print order'),
-                'class' => 'icon-print',
-            );
-
-            if (((int) $order->isReturnable()) && !$order->hasCompletelyRefunded(Order::ORDER_COMPLETE_CANCELLATION_OR_REFUND_REQUEST_FLAG)) {
-                $this->toolbar_btn['cancel'] = array(
-                    'short' => ((float) $order->getTotalPaid()) ? $this->l('Refund') : $this->l('Cancel'),
-                    'href' => '#refundForm',
-                    'id' => 'desc-order-standard_refund',
-                    'desc' => ((float) $order->getTotalPaid()) ? $this->l('Initiate refund') : $this->l('Cancel bookings'),
-                    'class' => 'icon-exchange',
-                    'target' => true,
-                );
+                if (((int) $order->isReturnable()) && !$order->hasCompletelyRefunded(Order::ORDER_COMPLETE_CANCELLATION_OR_REFUND_REQUEST_FLAG)) {
+                    $this->toolbar_btn['cancel'] = array(
+                        'short' => ((float) $order->getTotalPaid()) ? $this->l('Refund') : $this->l('Cancel'),
+                        'href' => '#refundForm',
+                        'id' => 'desc-order-standard_refund',
+                        'desc' => ((float) $order->getTotalPaid()) ? $this->l('Initiate refund') : $this->l('Cancel bookings'),
+                        'class' => 'icon-exchange',
+                        'target' => true,
+                    );
+                }
             }
         }
 
@@ -1611,6 +1611,9 @@ class AdminOrdersControllerCore extends AdminController
                     $this->errors[] = Tools::displayError('The date is invalid');
                 } elseif (!Validate::isUnsignedInt($payment_type)) {
                     $this->errors[] = Tools::displayError('Payment source is invalid');
+                // Amount cannot be less than paid amount by guest in negative price
+                } elseif ($amount < 0 && ($order->total_paid_real + $amount) < 0) {
+                    $this->errors[] = sprintf(Tools::displayError('Amount cannot be less than -%s'), Tools::displayPrice($order->total_paid_real, new Currency($order->id_currency)));
                 } else {
                     if (!$order->addOrderPayment(
                         $amount,
@@ -1636,16 +1639,20 @@ class AdminOrdersControllerCore extends AdminController
         } elseif (Tools::isSubmit('submitEditNote')) {
             $note = Tools::getValue('note');
             $order_invoice = new OrderInvoice((int)Tools::getValue('id_order_invoice'));
-            if (Validate::isLoadedObject($order_invoice) && Validate::isCleanHtml($note)) {
-                if ($this->tabAccess['edit'] === '1') {
-                    $order_invoice->note = $note;
-                    if ($order_invoice->save()) {
-                        Tools::redirectAdmin(self::$currentIndex.'&id_order='.$order_invoice->id_order.'&vieworder&conf=4&token='.$this->token);
+            if (Validate::isLoadedObject($order_invoice)) {
+                if (Validate::isCleanHtml($note)) {
+                    if ($this->tabAccess['edit'] === '1') {
+                        $order_invoice->note = $note;
+                        if ($order_invoice->save()) {
+                            Tools::redirectAdmin(self::$currentIndex.'&id_order='.$order_invoice->id_order.'&vieworder&conf=4&token='.$this->token);
+                        } else {
+                            $this->errors[] = Tools::displayError('The invoice note was not saved.');
+                        }
                     } else {
-                        $this->errors[] = Tools::displayError('The invoice note was not saved.');
+                        $this->errors[] = Tools::displayError('You do not have permission to edit this.');
                     }
                 } else {
-                    $this->errors[] = Tools::displayError('You do not have permission to edit this.');
+                    $this->errors[] = Tools::displayError('Invalid note found.');
                 }
             } else {
                 $this->errors[] = Tools::displayError('The invoice for edit note was unable to load. ');
@@ -2445,9 +2452,8 @@ class AdminOrdersControllerCore extends AdminController
 
     public function renderView()
     {
-        $order = new Order(Tools::getValue('id_order'));
-        if (!Validate::isLoadedObject($order)) {
-            $this->errors[] = Tools::displayError('The order cannot be found within your database.');
+        if (!Validate::isLoadedObject($order = new Order(Tools::getValue('id_order')))) {
+            return;
         }
 
         $this->content .= $this->renderKpis();
@@ -4730,47 +4736,47 @@ class AdminOrdersControllerCore extends AdminController
             if ($order_detail->id_order_invoice != $order_invoice->id) {
                 $old_order_invoice = new OrderInvoice($order_detail->id_order_invoice);
                 // We remove cost of products
-                $old_order_invoice->total_products -= $order_detail->total_price_tax_excl;
-                $old_order_invoice->total_products_wt -= $order_detail->total_price_tax_incl;
+                $old_order_invoice->total_products -= Tools::ps_round($order_detail->total_price_tax_excl, 6);
+                $old_order_invoice->total_products_wt -= Tools::ps_round($order_detail->total_price_tax_incl, 6);
 
-                $old_order_invoice->total_paid_tax_excl -= $order_detail->total_price_tax_excl;
-                $old_order_invoice->total_paid_tax_incl -= $order_detail->total_price_tax_incl;
+                $old_order_invoice->total_paid_tax_excl -= Tools::ps_round($order_detail->total_price_tax_excl, 6);
+                $old_order_invoice->total_paid_tax_incl -= Tools::ps_round($order_detail->total_price_tax_incl, 6);
 
                 $res &= $old_order_invoice->update();
 
-                $order_invoice->total_products += $order_detail->total_price_tax_excl;
-                $order_invoice->total_products_wt += $order_detail->total_price_tax_incl;
+                $order_invoice->total_products += Tools::ps_round($order_detail->total_price_tax_excl, 6);
+                $order_invoice->total_products_wt += Tools::ps_round($order_detail->total_price_tax_incl, 6);
 
-                $order_invoice->total_paid_tax_excl += $order_detail->total_price_tax_excl;
-                $order_invoice->total_paid_tax_incl += $order_detail->total_price_tax_incl;
+                $order_invoice->total_paid_tax_excl += Tools::ps_round($order_detail->total_price_tax_excl, 6);
+                $order_invoice->total_paid_tax_incl += Tools::ps_round($order_detail->total_price_tax_incl, 6);
 
                 $order_detail->id_order_invoice = $order_invoice->id;
             }
         }
 
         if ($diff_price_tax_incl != 0 && $diff_price_tax_excl != 0) {
-            $order_detail->unit_price_tax_excl = $product_price_tax_excl;
-            $order_detail->unit_price_tax_incl = $product_price_tax_incl;
+            $order_detail->unit_price_tax_excl = Tools::ps_round($product_price_tax_excl, 6);
+            $order_detail->unit_price_tax_incl = Tools::ps_round($product_price_tax_incl, 6);
 
-            $order_detail->total_price_tax_incl += (float)$diff_price_tax_incl;
-            $order_detail->total_price_tax_excl += (float)$diff_price_tax_excl;
+            $order_detail->total_price_tax_incl += Tools::ps_round((float)$diff_price_tax_incl, 6);
+            $order_detail->total_price_tax_excl += Tools::ps_round((float)$diff_price_tax_excl, 6);
 
             if (isset($order_invoice)) {
                 // Apply changes on OrderInvoice
-                $order_invoice->total_products += (float)$diff_price_tax_excl;
-                $order_invoice->total_products_wt += (float)$diff_price_tax_incl;
+                $order_invoice->total_products += Tools::ps_round((float)$diff_price_tax_excl, 6);
+                $order_invoice->total_products_wt += Tools::ps_round((float)$diff_price_tax_incl, 6);
 
-                $order_invoice->total_paid_tax_excl += (float)$diff_price_tax_excl;
-                $order_invoice->total_paid_tax_incl += (float)$diff_price_tax_incl;
+                $order_invoice->total_paid_tax_excl += Tools::ps_round((float)$diff_price_tax_excl, 6);
+                $order_invoice->total_paid_tax_incl += Tools::ps_round((float)$diff_price_tax_incl, 6);
             }
 
             // Apply changes on Order
             $order = new Order($order_detail->id_order);
-            $order->total_products += (float)$diff_price_tax_excl;
-            $order->total_products_wt += (float)$diff_price_tax_incl;
-            $order->total_paid += (float)$diff_price_tax_incl;
-            $order->total_paid_tax_excl += (float)$diff_price_tax_excl;
-            $order->total_paid_tax_incl += (float)$diff_price_tax_incl;
+            $order->total_products += Tools::ps_round((float)$diff_price_tax_excl, 6);
+            $order->total_products_wt += Tools::ps_round((float)$diff_price_tax_incl, 6);
+            $order->total_paid += Tools::ps_round((float)$diff_price_tax_incl, 6);
+            $order->total_paid_tax_excl += Tools::ps_round((float)$diff_price_tax_excl, 6);
+            $order->total_paid_tax_incl += Tools::ps_round((float)$diff_price_tax_incl, 6);
 
             $res &= $order->update();
         }
@@ -5334,8 +5340,8 @@ class AdminOrdersControllerCore extends AdminController
         } else {
             // Calculate differences of price (Before / After)
 
-            $order_detail->total_price_tax_incl -= $diff_products_tax_incl;
-            $order_detail->total_price_tax_excl -= $diff_products_tax_excl;
+            $order_detail->total_price_tax_incl -= Tools::ps_round($diff_products_tax_incl, 6);
+            $order_detail->total_price_tax_excl -= Tools::ps_round($diff_products_tax_excl, 6);
 
             $old_quantity = $order_detail->product_quantity;
 
@@ -5354,8 +5360,8 @@ class AdminOrdersControllerCore extends AdminController
             if ($service['quantity'] >= $serviceOrderDetail->product_quantity) {
                 $serviceOrderDetail->delete();
             } else {
-                $order_detail->total_price_tax_incl -= $service['total_price_tax_incl'];
-                $order_detail->total_price_tax_excl -= $service['total_price_tax_excl'];
+                $order_detail->total_price_tax_incl -= Tools::ps_round($service['total_price_tax_incl'], 6);
+                $order_detail->total_price_tax_excl -= Tools::ps_round($service['total_price_tax_excl'], 6);
 
                 $serviceOldQuantity = $serviceOrderDetail->product_quantity;
                 $serviceOrderDetail->product_quantity = $serviceOldQuantity - $service['quantity'];
@@ -5373,20 +5379,37 @@ class AdminOrdersControllerCore extends AdminController
         if ($order_detail->id_order_invoice != 0) {
             // values changes as values are calculated accoding to the quantity of the product by webkul
             $order_invoice = new OrderInvoice($order_detail->id_order_invoice);
-            $order_invoice->total_paid_tax_excl -= ($diff_products_tax_excl + $roomExtraDemandTE + $additionlServicesTE);
-            $order_invoice->total_paid_tax_incl -= ($diff_products_tax_incl + $roomExtraDemandTI + $additionlServicesTI);
-            $order_invoice->total_products -= $diff_products_tax_excl;
-            $order_invoice->total_products_wt -= $diff_products_tax_incl;
+            $order_invoice->total_paid_tax_excl -= Tools::ps_round(($diff_products_tax_excl + $roomExtraDemandTE + $additionlServicesTE), 6);
+            $order_invoice->total_paid_tax_excl = $order_invoice->total_paid_tax_excl > 0 ? $order_invoice->total_paid_tax_excl : 0;
+
+            $order_invoice->total_paid_tax_incl -= Tools::ps_round(($diff_products_tax_incl + $roomExtraDemandTI + $additionlServicesTI), 6);
+            $order_invoice->total_paid_tax_incl = $order_invoice->total_paid_tax_incl > 0 ? $order_invoice->total_paid_tax_incl : 0;
+
+            $order_invoice->total_products -= Tools::ps_round($diff_products_tax_excl, 6);
+            $order_invoice->total_products = $order_invoice->total_products > 0 ? $order_invoice->total_products : 0;
+
+            $order_invoice->total_products_wt -= Tools::ps_round($diff_products_tax_incl, 6);
+            $order_invoice->total_products_wt = $order_invoice->total_products_wt > 0 ? $order_invoice->total_products_wt : 0;
+
             $res &= $order_invoice->update();
         }
 
         // Update Order
         // values changes as values are calculated accoding to the quantity of the product by webkul
-        $order->total_paid -= ($diff_products_tax_incl + $roomExtraDemandTI + $additionlServicesTI);
-        $order->total_paid_tax_incl -= ($diff_products_tax_incl + $roomExtraDemandTI + $additionlServicesTI);
-        $order->total_paid_tax_excl -= ($diff_products_tax_excl + $roomExtraDemandTE + $additionlServicesTE);
-        $order->total_products -= ($diff_products_tax_excl + $additionlServicesTE);
-        $order->total_products_wt -= ($diff_products_tax_incl + $additionlServicesTI);
+        $order->total_paid -= Tools::ps_round(($diff_products_tax_incl + $roomExtraDemandTI + $additionlServicesTI), 6);
+        $order->total_paid = $order->total_paid > 0 ? $order->total_paid : 0;
+
+        $order->total_paid_tax_incl -= Tools::ps_round(($diff_products_tax_incl + $roomExtraDemandTI + $additionlServicesTI), 6);
+        $order->total_paid_tax_incl = $order->total_paid_tax_incl > 0 ? $order->total_paid_tax_incl : 0;
+
+        $order->total_paid_tax_excl -= Tools::ps_round(($diff_products_tax_excl + $roomExtraDemandTE + $additionlServicesTE), 6);
+        $order->total_paid_tax_excl = $order->total_paid_tax_excl > 0 ? $order->total_paid_tax_excl : 0;
+
+        $order->total_products -= Tools::ps_round(($diff_products_tax_excl + $additionlServicesTE), 6);
+        $order->total_products = $order->total_products > 0 ? $order->total_products : 0;
+
+        $order->total_products_wt -= Tools::ps_round(($diff_products_tax_incl + $additionlServicesTI), 6);
+        $order->total_products_wt = $order->total_products_wt > 0 ? $order->total_products_wt : 0;
 
         $res &= $order->update();
 
