@@ -270,6 +270,11 @@ class QloCleaner extends Module
                     }
                 }
 
+                Image::deleteAllImages(_PS_HOTEL_IMG_DIR_);
+                if (!file_exists(_PS_HOTEL_IMG_DIR_)) {
+                    mkdir(_PS_HOTEL_IMG_DIR_);
+                }
+
                 // Delete qlo modules's images
                 QcCleanerHelper::deleteFolderImages(
                     _PS_MODULE_DIR_.'wkabouthotelblock/views/img/hotel_interior/'
