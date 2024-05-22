@@ -28,9 +28,9 @@
 {block name=pageTitle}
     <h2 class="order_page_title page-title">
         {if is_array($title)}{$title|end|strip_tags}{else}{$title|strip_tags}{/if}
-        {if $currentState == Configuration::get('PS_OS_REFUND')}
+        {if $currentState->id == Configuration::get('PS_OS_REFUND')}
             <span class="toolbar_order_status_badge badge badge-danger">{l s='Refunded'}</span>
-        {elseif $currentState == Configuration::get('PS_OS_CANCELED')}
+        {elseif $currentState->id == Configuration::get('PS_OS_CANCELED')}
             <span class="toolbar_order_status_badge badge badge-danger">{l s='Cancelled'}</span>
         {else}
             <span class="toolbar_order_status_badge badge badge-success">{l s='Booked'}</span>
