@@ -127,9 +127,9 @@
                                                         {if $data['id_status'] == $hotel_order_status['STATUS_ALLOTED']['id_status']}
                                                             {l s='Alloted'}
                                                         {elseif $data['id_status'] == $hotel_order_status['STATUS_CHECKED_IN']['id_status']}
-                                                            <span class="text-danger room_status">{l s='Checked in on'} {dateFormat date=$data['check_in']}</span>
+                                                            <span class="text-danger room_status">{l s='Checked in on'} {dateFormat date=$data['check_in'] full=1}</span>
                                                         {elseif $data['id_status'] == $hotel_order_status['STATUS_CHECKED_OUT']['id_status']}
-                                                            <span class="text-success room_status">{l s='Checked out on'} {dateFormat date=$data['check_out']}</span>
+                                                            <span class="text-success room_status">{l s='Checked out on'} {dateFormat date=$data['check_out'] full=1}</span>
                                                         {/if}
                                                     </td>
                                                     <td class="text-center">
