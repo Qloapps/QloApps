@@ -42,13 +42,11 @@ class AdminCartsControllerCore extends AdminController
         $this->allow_export = true;
         $this->_orderWay = 'DESC';
         $this->context = Context::getContext();
-        $abandonedCartText = $this->l('Abandoned cart');
-
         $this->_select = 'CONCAT(c.`firstname`, \' \', c.`lastname`) `customer`, a.id_cart total,
         TIME_TO_SEC(TIMEDIFF(\''.pSQL(date('Y-m-d H:i:00', time())).'\', a.`date_add`)) AS `time_diff`,
 
         IFNULL(GROUP_CONCAT(DISTINCT o.`id_order`), 0) AS `ids_order`,
-        IF (IFNULL(o.id_order, \''.$this->l('Non ordered cart').'\') = \''.$this->l('Non ordered cart').'\', IF(TIME_TO_SEC(TIMEDIFF(\''.pSQL(date('Y-m-d H:i:00', time())).'\', a.`date_add`)) > 86400, \''.$abandonedCartText.'\', \''.$this->l('Non ordered cart').'\'), GROUP_CONCAT(DISTINCT o.`id_order`)) AS filter_ids_order,
+        IF (IFNULL(o.id_order, \''.$this->l('Non ordered cart').'\') = \''.$this->l('Non ordered cart').'\', IF(TIME_TO_SEC(TIMEDIFF(\''.pSQL(date('Y-m-d H:i:00', time())).'\', a.`date_add`)) > '._TIME_1_DAY_.', \''.$this->l('Abandoned cart').'\', \''.$this->l('Non ordered cart').'\'), GROUP_CONCAT(DISTINCT o.`id_order`)) AS filter_ids_order,
 		IF(o.id_order, 1, 0) badge_success, IF(o.id_order, 0, 1) badge_danger, IF(co.id_guest, 1, 0) id_guest';
         $this->_join = 'LEFT JOIN '._DB_PREFIX_.'customer c ON (c.id_customer = a.id_customer)
 		LEFT JOIN '._DB_PREFIX_.'currency cu ON (cu.id_currency = a.id_currency)
@@ -116,16 +114,20 @@ class AdminCartsControllerCore extends AdminController
 
         parent::__construct();
         $this->list_no_link = true;
+    }
+
+    public function postProcess()
+    {
         if (Tools::getValue('action') == 'filterOnlyAbandonedCarts') {
-            // Resetting the previously selected filters if selected from the KPI
-            $this->processResetFilters();
+            $prefix = $this->getCookieFilterPrefix();
             $dateFrom = date('Y-m-d', strtotime('-2 day'));
             $dateTo = date('Y-m-d', strtotime('-1 day'));
-            $_POST[$this->table.'Filter_'.$this->fields_list['date_add']['filter_key']] = '["'.$dateFrom.'", "'.$dateTo.'"]';
-            $_POST[$this->table.'Filter_filter_ids_order'] = $abandonedCartText;
-            $_POST['submitFilter'.$this->table] = true;
+            $this->context->cookie->{$prefix.$this->table.'Filter_'.$this->fields_list['date_add']['filter_key']} = json_encode(array($dateFrom, $dateTo));
+            $this->context->cookie->{$prefix.$this->table.'Filter_filter_ids_order'} = $this->l('Abandoned cart');
+            $this->redirect_after = $this->context->link->getAdminLink('AdminCarts');
         }
 
+        parent::postProcess();
     }
 
     public function getOrderColumn($idsOrder, $tr)
