@@ -48,17 +48,15 @@
 	}
 
 	{if isset($use_checkbox) && $use_checkbox == true}
-		function checkAllAssociatedCategories($tree)
+		function checkAllAssociatedHotels($tree)
 		{
 			$tree.find(':input[type=checkbox]').each(function(){
 				$(this).prop('checked', true);
-
-				addDefaultCategory($(this));
 				$(this).parent().addClass('tree-selected');
 			});
 		}
 
-		function uncheckAllAssociatedCategories($tree)
+		function uncheckAllAssociatedHotels($tree)
 		{
 			$tree.find(':input[type=checkbox]').each(function(){
 				$(this).prop('checked', false);

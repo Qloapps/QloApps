@@ -526,7 +526,7 @@ class AdminNormalProductsControllerCore extends AdminController
                 // convert price with the currency from context
                 $this->_list[$i]['price'] = Tools::convertPrice($this->_list[$i]['price'], $this->context->currency, true, $this->context);
                 $this->_list[$i]['price_tmp'] = Product::getPriceStatic($this->_list[$i]['id_product'], true, null,
-                    (int)Configuration::get('PS_PRICE_DISPLAY_PRECISION'), null, false, true, 1, true, null, null, null, $nothing, true, true,
+                    (int)Configuration::get('PS_PRICE_DISPLAY_PRECISION'), null, false, true, 1, true, null, null, null, null, true, true,
                     $context);
             }
         }
@@ -2994,7 +2994,7 @@ class AdminNormalProductsControllerCore extends AdminController
                 ->setUseSearch(false)
                 ->setFullTree(0)
                 ->setSelectedCategories($categories)
-                ->setUseBulkActions(false);
+                ->setUseBulkActions(true);
 
             $data->assign(array('default_category' => $default_category,
                         'selected_cat_ids' => implode(',', array_keys($selected_cat)),
@@ -3510,7 +3510,7 @@ class AdminNormalProductsControllerCore extends AdminController
             ->setRoomsOnly(false)
             ->setSelectedHotels($selectedElements['hotels'])
             ->setSelectedRoomTypes($selectedElements['room_types'])
-            ->setUseBulkActions(false)
+            ->setUseBulkActions(true)
             ->setAccessedHotels(HotelBranchInformation::getProfileAccessedHotels($this->context->employee->id_profile, 1, 0));
 
         $data->assign('hotel_tree', $tree->render());
