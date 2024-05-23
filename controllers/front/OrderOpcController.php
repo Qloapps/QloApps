@@ -494,7 +494,7 @@ class OrderOpcControllerCore extends ParentOrderController
         // $objCurrency = new Currency(Configuration::get('PS_CURRENCY_DEFAULT'));
         $this->context->smarty->assign(
             array(
-                'orderRestrictErr' => count($this->errors) ? 0 : 1,
+                'orderRestrictErr' => count($this->errors) ? 1 : 0,
                 // 'allDemands' => $allDemands,
                 // 'defaultcurrencySign' => $objCurrency->sign,
                 'THEME_DIR' => _THEME_DIR_,
