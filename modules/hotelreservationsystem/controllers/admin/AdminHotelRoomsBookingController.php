@@ -64,6 +64,8 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
         $objCustomer->deleted = 0;
         $objCustomer->logged = 0;
         $objCustomer->id_guest = (int) $this->context->cookie->id_guest;
+
+        $this->context->customer = $objCustomer;
     }
 
     protected function createNewCart()
