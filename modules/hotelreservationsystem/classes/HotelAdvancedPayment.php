@@ -68,7 +68,7 @@ class HotelAdvancedPayment extends ObjectModel
      */
     public function getIdAdvPaymentByIdProduct($id_product)
     {
-        $result = Db::getInstance()->getRow("SELECT * FROM `"._DB_PREFIX_."htl_advance_payment` WHERE `id_product`=".$id_product);
+        $result = Db::getInstance()->getRow("SELECT * FROM `"._DB_PREFIX_."htl_advance_payment` WHERE `id_product`=".(int) $id_product);
 
         if ($result) {
             return $result;
