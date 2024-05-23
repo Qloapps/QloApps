@@ -23,28 +23,8 @@
 *  International Registered Trademark & Property of PrestaShop SA
 *}
 
-{if isset($confirmation)}
+{if isset($smarty.get.confirm)}
 	<p class="alert alert-success">{l s='Your message has been successfully sent to our team.'}</p>
-	<ul class="footer_links clearfix">
-		<li>
-			<a class="btn btn-default button button-small" href="{if isset($force_ssl) && $force_ssl}{$base_dir_ssl}{else}{$base_dir}{/if}">
-				<span>
-					<i class="icon-chevron-left"></i>{l s='Home'}
-				</span>
-			</a>
-		</li>
-	</ul>
-{elseif isset($alreadySent)}
-	<p class="alert alert-warning">{l s='Your message has already been sent.'}</p>
-	<ul class="footer_links clearfix">
-		<li>
-			<a class="btn btn-default button button-small" href="{if isset($force_ssl) && $force_ssl}{$base_dir_ssl}{else}{$base_dir}{/if}">
-				<span>
-					<i class="icon-chevron-left"></i>{l s='Home'}
-				</span>
-			</a>
-		</li>
-	</ul>
 {/if}
 {include file="$tpl_dir./errors.tpl"}
 <div class="margin-top-50 htl-contact-page">
@@ -84,7 +64,7 @@
 			</div>
 		{/if}
 		<div class="col-sm-6 {if !(isset($gblHtlAddress) && $gblHtlAddress) && !(isset($gblHtlPhone) && $gblHtlPhone) && !(isset($gblHtlEmail) && $gblHtlEmail)} col-sm-offset-3 {/if}">
-			<form action="{$request_uri}" method="post" class="contact-form-box" enctype="multipart/form-data">
+			<form action="{$link->getPageLink('contact')}" method="post" class="contact-form-box" enctype="multipart/form-data">
 				{if isset($customerThread.id_contact) && $customerThread.id_contact && $contacts|count}
 					{assign var=flag value=true}
 					{foreach from=$contacts item=contact}

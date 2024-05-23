@@ -115,7 +115,8 @@ class ContactControllerCore extends FrontController
 					WHERE cc.id_customer_thread = '.(int)$id_customer_thread.' AND cc.id_shop = '.(int)$this->context->shop->id.'
 					ORDER BY cm.date_add DESC');
                 if ($old_message == $message) {
-                    $this->context->smarty->assign('alreadySent', 1);
+                    $this->errors[] = Tools::displayError('Your message has already been sent.');
+                    $_POST = array();
                     $contact->email = '';
                     $contact->customer_service = 0;
                 } else {
@@ -195,11 +196,23 @@ class ContactControllerCore extends FrontController
                         }
 
                         if (!empty($contact->email)) {
-                            if (!Mail::Send($this->context->language->id, 'contact', Mail::l('Message from contact form').' [no_sync]',
-                                $var_list, $contact->email, $contact->name, null, null,
-                                        $file_attachment, null,    _PS_MAIL_DIR_, false, null, null, $from)) {
-                                $this->errors[] = Tools::displayError('An error occurred while sending the message.');
-                            }
+                            Mail::Send(
+                                $this->context->language->id,
+                                'contact',
+                                Mail::l('Message from contact form').' [no_sync]',
+                                $var_list,
+                                $contact->email,
+                                $contact->name,
+                                null,
+                                null,
+                                $file_attachment,
+                                null,
+                                _PS_MAIL_DIR_,
+                                false,
+                                null,
+                                null,
+                                $from
+                            );
                         }
                     }
 
@@ -313,9 +326,6 @@ class ContactControllerCore extends FrontController
         }
         //End
 
-        if (Tools::getValue('confirm')) {
-            $this->context->smarty->assign('confirmation', 1);
-        }
         $this->setTemplate(_PS_THEME_DIR_.'contact-form.tpl');
     }
 
