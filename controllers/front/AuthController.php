@@ -617,7 +617,6 @@ class AuthControllerCore extends FrontController
                     if (!$customer->save()) {
                         $this->errors[] = Tools::displayError('An error occurred while creating your account.');
                     } else {
-                        ddd('dasdasda');
                         // save customer phone number in cart_customer_guest_detail
                         $phone = Tools::getValue('phone_mobile');
                         CartCustomerGuestDetail::updateCustomerPhoneNumber($customer->email, $phone);

@@ -22,7 +22,6 @@
 *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 *}
-{if $invoice_address}
 <table id="addresses-tab" cellspacing="0" cellpadding="0">
 	<tr>
 		<!-- <td width="33%"><span class="bold"> </span><br/><br/>
@@ -34,9 +33,16 @@
 		</td> -->
 		<td width="33%"></td>
 		<td  width="33%"></td>
-		<td width="33%"><span class="bold">{l s='Customer Address' pdf='true'}</span><br/><br/>
+		<td width="33%">
+			{if $invoice_address}
+				<span class="bold">{l s='Customer Address' pdf='true'}</span><br/><br/>
 				{$invoice_address}
+			{else}
+				<span class="bold">{l s='Customer Detail' pdf='true'}</span><br/><br/>
+				{$customer->firstname} {$customer->lastname}
+				<br>
+				{$customer->phone}
+			{/if}
 		</td>
 	</tr>
 </table>
-{/if}
