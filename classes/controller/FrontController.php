@@ -776,6 +776,7 @@ class FrontControllerCore extends Controller
         }
 
         if (Tools::isSubmit('SubmitLogin')
+            && !Configuration::get('PS_SHOP_ENABLE')
             && Configuration::get('PS_ALLOW_EMP')
             && !Context::getContext()->cookie->enable_maintenance_view
         ) {
@@ -812,24 +813,31 @@ class FrontControllerCore extends Controller
 
     protected function processLogin($email, $passwd)
     {
-        $result = false;
+        $remoteIpAddress = Tools::getRemoteAddr();
         $objMaintenanceAccess = new MaintenanceAccess();
+        $attemptsCount = $objMaintenanceAccess->getAttemptsCount($email, $remoteIpAddress); // does not include the current one
+        $maxAttempts = Configuration::get('PS_ALLOW_EMP_MAX_ATTEMPTS');
 
-        /* Check fields validity */
         if (empty($email)) {
-            $this->errors[] = Tools::displayError('Email is empty.');
+            $this->errors[] = Tools::displayError('The Email address field is blank.');
         } elseif (!Validate::isEmail($email)) {
             $this->errors[] = Tools::displayError('Invalid email address.');
         }
 
         if (empty($passwd)) {
-            $this->errors[] = Tools::displayError('The password field is blank.');
+            $this->errors[] = Tools::displayError('The Password field is blank.');
         } elseif (!Validate::isPasswd($passwd)) {
             $this->errors[] = Tools::displayError('Invalid password.');
         }
 
-        if ($objMaintenanceAccess->checkLimit($email)) {
-            $this->errors[] =Tools::displayError('You have exceeded the limit of login attempts, please try after some time');
+        if (!count($this->errors)) {
+            if ($attemptsCount >= $maxAttempts) {
+                if ($lastAttempt = $objMaintenanceAccess->getLastAttempt($email, $remoteIpAddress)) {
+                    $minutes = round((time() - strtotime($lastAttempt['date_add'])) / 60);
+
+                    $this->errors[] = Tools::displayError(sprintf('You have exceeded the limit of login attempts, please try after %d minutes.', MaintenanceAccess::LOGIN_ATTEMPTS_WINDOW - $minutes));
+                }
+            }
         }
 
         if (!count($this->errors)) {
@@ -837,6 +845,7 @@ class FrontControllerCore extends Controller
             $this->context->employee = new Employee();
             $is_employee_loaded = $this->context->employee->getByEmail($email, $passwd);
             $employee_associated_shop = $this->context->employee->getAssociatedShops();
+
             if (!$is_employee_loaded) {
                 $this->errors[] = Tools::displayError('The Employee does not exist, or the password provided is incorrect.');
                 $this->context->employee->logout();
@@ -847,21 +856,40 @@ class FrontControllerCore extends Controller
                 // Update cookie
                 $cookie = Context::getContext()->cookie;
                 $cookie->enable_maintenance_view = $this->context->employee->id;
-                $cookie->remote_addr = ip2long(Tools::getRemoteAddr());
+                $cookie->remote_addr = ip2long($remoteIpAddress);
                 $cookie->write();
+
+                // Reset attempts count on successful login
+                $objMaintenanceAccess->removeFailedAttempts($email, $remoteIpAddress);
             }
+
             if (count($this->errors)) {
-                $this->context->smarty->assign('errors', $this->errors);
+                $objMaintenanceAccess = new MaintenanceAccess();
                 $objMaintenanceAccess->email = $email;
-                $objMaintenanceAccess->ip_address = Tools::getRemoteAddr();
+                $objMaintenanceAccess->ip_address = $remoteIpAddress;
                 $objMaintenanceAccess->save();
+
+                if ($attemptsCount < $maxAttempts) {
+                    $attemptsLeft = $maxAttempts - $attemptsCount - 1;
+
+                    if ($attemptsLeft > 0) {
+                        if ($attemptsLeft > 1) {
+                            $this->errors[] = Tools::displayError(sprintf('%d attempts left.', ($maxAttempts - $attemptsCount - 1)));
+                        } else {
+                            $this->errors[] = Tools::displayError(sprintf('%d attempt left.', ($maxAttempts - $attemptsCount - 1)));
+                        }
+                    } else {
+                        $this->errors[] = Tools::displayError(sprintf('You have reached the limit of login attempts, please try after %d minutes.', MaintenanceAccess::LOGIN_ATTEMPTS_WINDOW));
+                    }
+                }
+
+                $this->context->smarty->assign('errors', $this->errors);
             } else {
                 Tools::redirect('index.php');
             }
         } else {
             $this->context->smarty->assign('errors', $this->errors);
         }
-        return $result;
     }
 
     /**

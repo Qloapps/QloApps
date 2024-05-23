@@ -19,23 +19,15 @@
 *  @license   https://store.webkul.com/license.html
 */
 
-class MaintenanceAccessCore  extends ObjectModel
+class MaintenanceAccessCore extends ObjectModel
 {
-
     public $id_maintenance_access;
     public $ip_address;
     public $email;
     public $date_add;
-    const USERNAME_ATTEMPTS_PER_QUARTER_HOUR = 3;
-    const IP_ATTEMPTS_QUARTER_HOUR = 12;
-    const USERNAME_ATTEMPTS_PER_HOUR = 6;
-    const IP_ATTEMPTS_PER_HOUR = 24;
-    const QUARTER_HOUR = 60*15;
-    const HOUR = 60*60;
 
-    /**
-     * @see ObjectModel::$definition
-     */
+    const LOGIN_ATTEMPTS_WINDOW = 30; /* in minutes */
+
     public static $definition = array(
         'table' => 'maintenance_access',
         'primary' => 'id_maintenance_access',
@@ -46,51 +38,32 @@ class MaintenanceAccessCore  extends ObjectModel
         ),
     );
 
-    public function cleanData()
+    public function removeFailedAttempts($email, $ipAddress)
     {
-        $time = (time() - (self::HOUR*2));
         Db::getInstance()->execute(
-            'DELETE FROM `' . _DB_PREFIX_ .'maintenance_access`
-			WHERE `date_add`  < "' . pSQL(date("Y-m-d H:i:s", $time)) . '"'
+            'DELETE FROM `' . _DB_PREFIX_ .'maintenance_access` ma
+            WHERE (ma.`email` = "'.$email.'" OR ma.`ip_address` = "'.$ipAddress.'")
+            AND ma.`date_add` > "'.date('Y-m-d H:i:s', strtotime('-'.MaintenanceAccess::LOGIN_ATTEMPTS_WINDOW.' minutes')).'"'
         );
     }
 
-    public function getUserFailedCount($time, $email=false, $ip_address=false, $attempts)
+    public function getAttemptsCount($email, $ipAddress)
     {
-        $sql = "SELECT COUNT(`id_maintenance_access`) FROM `". _DB_PREFIX_ ."maintenance_access` WHERE `date_add`  > '"
-        . pSQL(date('Y-m-d H:i:s', $time)) ."'";
-
-        if ($email) {
-            $sql .= " AND  `email` = '".pSQL($email)."'";
-        }
-
-        if ($ip_address) {
-            $sql .= " AND  `ip_address` = '".pSQL($ip_address)."'";
-        }
-
-        return Db::getInstance()->getValue($sql) >= $attempts;
+        return Db::getInstance()->getValue(
+            'SELECT COUNT(ma.`id_maintenance_access`)
+            FROM `'._DB_PREFIX_.'maintenance_access` ma
+            WHERE (ma.`email` = "'.$email.'" OR ma.`ip_address` = "'.$ipAddress.'")
+            AND ma.`date_add` > "'.date('Y-m-d H:i:s', strtotime('-'.MaintenanceAccess::LOGIN_ATTEMPTS_WINDOW.' minutes')).'"'
+        );
     }
 
-    public function checkLimit($email)
+    public function getLastAttempt($email, $ipAddress)
     {
-        $has_error = false;
-        $minutes_ago = time() - self::QUARTER_HOUR;
-        $hours_ago = time() - self::HOUR;
-        $ip_address = Tools::getRemoteAddr();
-
-        $has_error |= $this->getUserFailedCount(
-                $minutes_ago, $email, false, self::USERNAME_ATTEMPTS_PER_QUARTER_HOUR
-            )? true : $has_error;
-        $has_error |= $this->getUserFailedCount(
-                $minutes_ago, false, $ip_address, self::IP_ATTEMPTS_QUARTER_HOUR
-            )? true : $has_error;
-        $has_error |= $this->getUserFailedCount(
-                $hours_ago, $email, false, self::USERNAME_ATTEMPTS_PER_HOUR
-            )? true : $has_error;
-        $has_error |= $this->getUserFailedCount(
-                $hours_ago, false, $ip_address, self::IP_ATTEMPTS_PER_HOUR
-            )? true : $has_error;
-
-        return $has_error;
+        return Db::getInstance()->getRow(
+            'SELECT *
+            FROM `'._DB_PREFIX_.'maintenance_access` ma
+            WHERE (ma.`email` = "'.$email.'" OR ma.`ip_address` = "'.$ipAddress.'")
+            ORDER BY ma.`date_add` DESC'
+        );
     }
 }
