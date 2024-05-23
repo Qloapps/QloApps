@@ -1140,7 +1140,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
             ON (p.`id_product` = hri.`id_product`)
             WHERE p.`active` = 1
             AND hbd.`is_refunded` = 0
-            AND hbd.`date_from` < "'.pSQL($dateTo).' 00:00:00" AND hbd.`date_to` > "'.pSQL($dateFrom).' 00:00:00"'.
+            AND IF(hbd.`id_status` = '. HotelBookingDetail::STATUS_CHECKED_OUT .', hbd.`date_from` < DATE_FORMAT(hbd.`check_out`,  "%Y-%m-%d") AND hbd.`date_from` < \''.pSQL($dateTo).'\' AND DATE_FORMAT(hbd.`check_out`,  "%Y-%m-%d") > \''.pSQL($dateFrom).'\', hbd.`date_from` < \''.pSQL($dateTo).'\' AND hbd.`date_to` > \''.pSQL($dateFrom).'\')'.
             HotelBranchInformation::addHotelRestriction($idsHotel, 'hbd')
         );
 
