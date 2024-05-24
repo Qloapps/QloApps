@@ -119,11 +119,20 @@ class AdminCartsControllerCore extends AdminController
     public function postProcess()
     {
         if (Tools::getValue('action') == 'filterOnlyAbandonedCarts') {
+            $this->processResetFilters();
+            $this->context->cookie->{'submitFilter'.$this->table} = true;
             $prefix = $this->getCookieFilterPrefix();
-            $dateFrom = date('Y-m-d', strtotime('-2 day'));
-            $dateTo = date('Y-m-d', strtotime('-1 day'));
-            $this->context->cookie->{$prefix.$this->table.'Filter_'.$this->fields_list['date_add']['filter_key']} = json_encode(array($dateFrom, $dateTo));
             $this->context->cookie->{$prefix.$this->table.'Filter_filter_ids_order'} = $this->l('Abandoned cart');
+            if (($dateFrom = Tools::getValue('date_from'))
+                && ($dateTo = Tools::getValue('date_to'))
+                && strtotime($dateTo) >= strtotime($dateFrom)
+            ) {
+                //Updating the date format of the filter dates to the required format.
+                $dateFrom = date('Y-m-d', strtotime($dateFrom));
+                $dateTo = date('Y-m-d', strtotime($dateTo));
+                $this->context->cookie->{$prefix.$this->table.'Filter_'.$this->fields_list['date_add']['filter_key']} = json_encode(array($dateFrom, $dateTo));
+            }
+
             $this->redirect_after = $this->context->link->getAdminLink('AdminCarts');
         }
 
@@ -138,7 +147,7 @@ class AdminCartsControllerCore extends AdminController
             $smartyVars['type'] = 'orders';
             $smartyVars['ids_order'] = $idsOrder;
         } else {
-            if ($tr['time_diff'] > 86400) {
+            if ($tr['time_diff'] > _TIME_1_DAY_) {
                 $smartyVars['type'] = 'abandoned';
             } else {
                 $smartyVars['type'] = 'non_orderd';
@@ -193,7 +202,7 @@ class AdminCartsControllerCore extends AdminController
         $date_from = date(Context::getContext()->language->date_format_lite, strtotime('-2 day'));
         $date_to = date(Context::getContext()->language->date_format_lite, strtotime('-1 day'));
         $helper->subtitle = sprintf($this->l('From %s to %s', null, null, false), $date_from, $date_to);
-        $helper->href = $this->context->link->getAdminLink('AdminCarts').'&action=filterOnlyAbandonedCarts';
+        $helper->href = $this->context->link->getAdminLink('AdminCarts').'&action=filterOnlyAbandonedCarts&date_from='.$date_from.'&date_to='.$date_to;
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=abandoned_cart';
         $kpis[] = $helper;
 
