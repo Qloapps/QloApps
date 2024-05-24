@@ -841,13 +841,13 @@ class AdminControllerCore extends Controller
         $this->ensureListIdDefinition();
 
         $prefix = $this->getCookieFilterPrefix();
-
+        $filters = array();
         if (isset($this->list_id)) {
             foreach ($_POST as $key => $value) {
                 if ($value === '') {
                     unset($this->context->cookie->{$prefix.$key});
                 } elseif (stripos($key, $this->list_id.'Filter_') === 0) {
-                    $this->context->cookie->{$prefix.$key} = !is_array($value) ? $value : json_encode($value);
+                    $filters[$prefix.$key] = !is_array($value) ? $value : json_encode($value);
                 } elseif (stripos($key, 'submitFilter') === 0) {
                     $this->context->cookie->$key = !is_array($value) ? $value : json_encode($value);
                 }
@@ -855,7 +855,7 @@ class AdminControllerCore extends Controller
 
             foreach ($_GET as $key => $value) {
                 if (stripos($key, $this->list_id.'Filter_') === 0) {
-                    $this->context->cookie->{$prefix.$key} = !is_array($value) ? $value : json_encode($value);
+                    $filters[$prefix.$key] = !is_array($value) ? $value : json_encode($value);
                 } elseif (stripos($key, 'submitFilter') === 0) {
                     $this->context->cookie->$key = !is_array($value) ? $value : json_encode($value);
                 }
@@ -863,65 +863,36 @@ class AdminControllerCore extends Controller
                     if ($value === '' || $value == $this->_defaultOrderBy) {
                         unset($this->context->cookie->{$prefix.$key});
                     } else {
-                        $this->context->cookie->{$prefix.$key} = $value;
+                        $filters[$prefix.$key] = $value;
                     }
                 } elseif (stripos($key, $this->list_id.'Orderway') === 0 && Validate::isOrderWay($value)) {
                     if ($value === '' || $value == $this->_defaultOrderWay) {
                         unset($this->context->cookie->{$prefix.$key});
                     } else {
-                        $this->context->cookie->{$prefix.$key} = $value;
+                        $filters[$prefix.$key] = $value;
                     }
                 }
             }
         }
 
-        $filters = $this->context->cookie->getFamily($prefix.$this->list_id.'Filter_');
-        $definition = false;
-        if (isset($this->className) && $this->className) {
-            $definition = ObjectModel::getDefinition($this->className);
+        if (empty($filters)) {
+            $filters = $this->context->cookie->getFamily($prefix.$this->list_id.'Filter_');
         }
 
         foreach ($filters as $key => $value) {
-            /* Extracting filters from $_POST on key filter_ */
-            if ($value != null && !strncmp($key, $prefix.$this->list_id.'Filter_', 7 + Tools::strlen($prefix.$this->list_id))) {
-                $key_org = $key;
-                $key = Tools::substr($key, 7 + Tools::strlen($prefix.$this->list_id));
-                /* Table alias could be specified using a ! eg. alias!field */
-                $tmp_tab = explode('!', $key);
-                $filter = count($tmp_tab) > 1 ? $tmp_tab[1] : $tmp_tab[0];
-
-                if ($field = $this->filterToField($key, $filter)) {
-                    $type = (array_key_exists('filter_type', $field) ? $field['filter_type'] : (array_key_exists('type', $field) ? $field['type'] : false));
-                    if ((($type == 'date' || $type == 'datetime' || $type == 'range') || ($type == 'select' && (isset($field['multiple']) && $field['multiple'])))
-                        && is_string($value)
-                    ) {
-                        $value = json_decode($value, true);
+            $key_org = $key;
+            $key = Tools::substr($key, 7 + Tools::strlen($prefix.$this->list_id));
+            /* Table alias could be specified using a ! eg. alias!field */
+            $tmp_tab = explode('!', $key);
+            $filter = count($tmp_tab) > 1 ? $tmp_tab[1] : $tmp_tab[0];
+            if ($field = $this->filterToField($key, $filter)) {
+                $type = (array_key_exists('filter_type', $field) ? $field['filter_type'] : (array_key_exists('type', $field) ? $field['type'] : false));
+                if (($type == 'date' || $type == 'datetime' || $type == 'range')) {
+                    if (is_string($value)) {
+                        $filter_value = json_decode($value, true);
                     }
-                    $key = isset($tmp_tab[1]) ? $tmp_tab[0].'.`'.$tmp_tab[1].'`' : '`'.$tmp_tab[0].'`';
-
-                    // as in database 0 means position 1 in the renderlist
-                    if (isset($field['position']) && Validate::isInt($value)) {
-                        $value -= 1;
-                    }
-
-                    // Assignment by reference
-                    if (array_key_exists('tmpTableFilter', $field)) {
-                        $sql_filter = & $this->_tmpTableFilter;
-                    } elseif (array_key_exists('havingFilter', $field)) {
-                        $sql_filter = & $this->_filterHaving;
-                    } else {
-                        $sql_filter = & $this->_filter;
-                    }
-
-                    if (is_array($value)) {
-                        if ($type == 'select' && (isset($field['multiple']) && $field['multiple']) && isset($field['operator'])) {
-                            if ($field['operator'] == 'and') {
-                                $sql_filter .= ' AND '.pSQL($key).' IN ('.pSQL(implode(',', $value)).')';
-                                $this->_filterHaving .= ' AND COUNT(DISTINCT '.pSQL($key).') = '.(int) count($value);
-                            } elseif ($field['operator'] == 'or') {
-                                $sql_filter .= ' AND '.pSQL($key).' IN ('.pSQL(implode(',', $value)).')';
-                            }
-                        } elseif ($type == 'range') {
+                    if (is_array($filter_value)) {
+                        if ($type == 'range') {
                             // set validation type
                             if (isset($field['validation']) && $field['validation'] && method_exists('Validate', $field['validation'])) {
                                 $validation = $field['validation'];
@@ -929,57 +900,122 @@ class AdminControllerCore extends Controller
                                 $validation = 'isUnsignedInt';
                             }
 
-                            if (isset($value[0]) && ($value[0] !== '' || $value[0] === 0)) {
-                                if (!Validate::$validation($value[0])) {
-                                    $this->errors[] = Tools::displayError('The \'From\' value is invalid');
-                                } else {
-                                    $sql_filter .= ' AND '.pSQL($key).' >= '.pSQL($value[0]);
+                            if (isset($filter_value[0]) && ($filter_value[0] !== '' || $filter_value[0] === 0)) {
+                                if (!Validate::$validation($filter_value[0])) {
+                                    $this->errors[] = sprintf(Tools::displayError('The %s field \'From\' value is invalid'), $field['title']);
                                 }
                             }
-                            if (isset($value[1]) && ($value[1] !== '' || $value[1] === 0)) {
-                                if (!Validate::$validation($value[1])) {
-                                    $this->errors[] = Tools::displayError('The \'To\' value is invalid');
-                                } elseif ((isset($value[0]) && ($value[0] !== '' || $value[0] === 0)) && $value[0] > $value[1]) {
-                                    $this->errors[] = Tools::displayError('The \'To\' value cannot be less than \'From\' value');
-                                } else {
-                                    $sql_filter .= ' AND '.pSQL($key).' <= '.pSQL($value[1]);
+                            if (isset($filter_value[1]) && ($filter_value[1] !== '' || $filter_value[1] === 0)) {
+                                if (!Validate::$validation($filter_value[1])) {
+                                    $this->errors[] = sprintf(Tools::displayError('The %s field \'To\' value is invalid'), $field['title']);
+                                } elseif ((isset($filter_value[0]) && ($filter_value[0] !== '' || $filter_value[0] === 0)) && $filter_value[0] > $filter_value[1]) {
+                                    $this->errors[] = sprintf(Tools::displayError('The %s field \'To\' value cannot be less than \'From\' value'), $field['title']);
                                 }
                             }
                         } else {
-                            if (isset($value[0]) && !empty($value[0])) {
-                                if (!Validate::isDate($value[0])) {
-                                    $this->errors[] = Tools::displayError('The \'From\' date format is invalid (YYYY-MM-DD)');
-                                } else {
-                                    $sql_filter .= ' AND '.pSQL($key).' >= \''.pSQL(Tools::dateFrom($value[0])).'\'';
+                            if (isset($filter_value[0]) && !empty($filter_value[0])) {
+                                if (!Validate::isDate($filter_value[0])) {
+                                    $this->errors[] = sprintf(Tools::displayError('The %s field \'From\' date format is invalid (YYYY-MM-DD)'), $field['title']);
                                 }
                             }
 
-                            if (isset($value[1]) && !empty($value[1])) {
-                                if (!Validate::isDate($value[1])) {
-                                    $this->errors[] = Tools::displayError('The \'To\' date format is invalid (YYYY-MM-DD)');
-                                } elseif (isset($value[0]) && !empty($value[0]) && strtotime($value[0]) > strtotime($value[1])) {
-                                    $this->errors[] = Tools::displayError('The \'To\' date cannot be earlier than \'From\' date');
-                                } else {
-                                    $sql_filter .= ' AND '.pSQL($key).' <= \''.pSQL(Tools::dateTo($value[1])).'\'';
+                            if (isset($filter_value[1]) && !empty($filter_value[1])) {
+                                if (!Validate::isDate($filter_value[1])) {
+                                    $this->errors[] = sprintf(Tools::displayError('The %s field \'To\' date format is invalid (YYYY-MM-DD)'), $field['title']);
+                                } elseif (isset($filter_value[0]) && !empty($filter_value[0]) && strtotime($filter_value[0]) > strtotime($filter_value[1])) {
+                                    $this->errors[] = sprintf(Tools::displayError('The %s field \'To\' date cannot be earlier than \'From\' date'), $field['title']);
                                 }
                             }
                         }
-                    } else {
-                        $sql_filter .= ' AND ';
-                        $check_key = ($key == $this->identifier || $key == '`'.$this->identifier.'`');
-                        $alias = ($definition && !empty($definition['fields'][$filter]['shop'])) ? 'sa' : 'a';
+                    }
+                }
+            }
+        }
 
-                        if ($type == 'int' || $type == 'bool') {
-                            $sql_filter .= (($check_key || $key == '`active`') ?  $alias.'.' : '').pSQL($key).' = '.(int)$value.' ';
-                        } elseif ($type == 'decimal') {
-                            $sql_filter .= ($check_key ?  $alias.'.' : '').pSQL($key).' = '.(float)$value.' ';
-                        } elseif ($type == 'select') {
-                            $sql_filter .= ($check_key ?  $alias.'.' : '').pSQL($key).' = \''.pSQL($value).'\' ';
-                        } elseif ($type == 'price') {
-                            $value = (float)str_replace(',', '.', $value);
-                            $sql_filter .= ($check_key ?  $alias.'.' : '').pSQL($key).' = '.pSQL(trim($value)).' ';
+        if (empty($this->errors)) {
+            if ($filters) {
+                foreach ($filters as $key => $value) {
+                    $this->context->cookie->$key = $value;
+                }
+            }
+            $definition = false;
+            if (isset($this->className) && $this->className) {
+                $definition = ObjectModel::getDefinition($this->className);
+            }
+
+            foreach ($filters as $key => $value) {
+                /* Extracting filters from $_POST on key filter_ */
+                if ($value != null && !strncmp($key, $prefix.$this->list_id.'Filter_', 7 + Tools::strlen($prefix.$this->list_id))) {
+                    $key_org = $key;
+                    $key = Tools::substr($key, 7 + Tools::strlen($prefix.$this->list_id));
+                    /* Table alias could be specified using a ! eg. alias!field */
+                    $tmp_tab = explode('!', $key);
+                    $filter = count($tmp_tab) > 1 ? $tmp_tab[1] : $tmp_tab[0];
+
+                    if ($field = $this->filterToField($key, $filter)) {
+                        $type = (array_key_exists('filter_type', $field) ? $field['filter_type'] : (array_key_exists('type', $field) ? $field['type'] : false));
+                        if ((($type == 'date' || $type == 'datetime' || $type == 'range') || ($type == 'select' && (isset($field['multiple']) && $field['multiple'])))
+                            && is_string($value)
+                        ) {
+                            $value = json_decode($value, true);
+                        }
+                        $key = isset($tmp_tab[1]) ? $tmp_tab[0].'.`'.$tmp_tab[1].'`' : '`'.$tmp_tab[0].'`';
+
+                        // as in database 0 means position 1 in the renderlist
+                        if (isset($field['position']) && Validate::isInt($value)) {
+                            $value -= 1;
+                        }
+
+                        // Assignment by reference
+                        if (array_key_exists('tmpTableFilter', $field)) {
+                            $sql_filter = & $this->_tmpTableFilter;
+                        } elseif (array_key_exists('havingFilter', $field)) {
+                            $sql_filter = & $this->_filterHaving;
                         } else {
-                            $sql_filter .= ($check_key ?  $alias.'.' : '').pSQL($key).' LIKE \'%'.pSQL(trim($value)).'%\' ';
+                            $sql_filter = & $this->_filter;
+                        }
+
+                        if (is_array($value)) {
+                            if ($type == 'select' && (isset($field['multiple']) && $field['multiple']) && isset($field['operator'])) {
+                                if ($field['operator'] == 'and') {
+                                    $sql_filter .= ' AND '.pSQL($key).' IN ('.pSQL(implode(',', $value)).')';
+                                    $this->_filterHaving .= ' AND COUNT(DISTINCT '.pSQL($key).') = '.(int) count($value);
+                                } elseif ($field['operator'] == 'or') {
+                                    $sql_filter .= ' AND '.pSQL($key).' IN ('.pSQL(implode(',', $value)).')';
+                                }
+                            } elseif ($type == 'range') {
+
+                                if (isset($value[0]) && ($value[0] !== '' || $value[0] === 0)) {
+                                    $sql_filter .= ' AND '.pSQL($key).' >= '.pSQL($value[0]);
+                                }
+                                if (isset($value[1]) && ($value[1] !== '' || $value[1] === 0)) {
+                                    $sql_filter .= ' AND '.pSQL($key).' <= '.pSQL($value[1]);
+                                }
+                            } else {
+                                if (isset($value[0]) && !empty($value[0])) {
+                                    $sql_filter .= ' AND '.pSQL($key).' >= \''.pSQL(Tools::dateFrom($value[0])).'\'';
+                                }
+                                if (isset($value[1]) && !empty($value[1])) {
+                                    $sql_filter .= ' AND '.pSQL($key).' <= \''.pSQL(Tools::dateTo($value[1])).'\'';
+                                }
+                            }
+                        } else {
+                            $sql_filter .= ' AND ';
+                            $check_key = ($key == $this->identifier || $key == '`'.$this->identifier.'`');
+                            $alias = ($definition && !empty($definition['fields'][$filter]['shop'])) ? 'sa' : 'a';
+
+                            if ($type == 'int' || $type == 'bool') {
+                                $sql_filter .= (($check_key || $key == '`active`') ?  $alias.'.' : '').pSQL($key).' = '.(int)$value.' ';
+                            } elseif ($type == 'decimal') {
+                                $sql_filter .= ($check_key ?  $alias.'.' : '').pSQL($key).' = '.(float)$value.' ';
+                            } elseif ($type == 'select') {
+                                $sql_filter .= ($check_key ?  $alias.'.' : '').pSQL($key).' = \''.pSQL($value).'\' ';
+                            } elseif ($type == 'price') {
+                                $value = (float)str_replace(',', '.', $value);
+                                $sql_filter .= ($check_key ?  $alias.'.' : '').pSQL($key).' = '.pSQL(trim($value)).' ';
+                            } else {
+                                $sql_filter .= ($check_key ?  $alias.'.' : '').pSQL($key).' LIKE \'%'.pSQL(trim($value)).'%\' ';
+                            }
                         }
                     }
                 }
@@ -1042,7 +1078,7 @@ class AdminControllerCore extends Controller
                 if ($this->filter && $this->action != 'reset_filters') {
                     $this->processFilter();
                 }
-                if (isset($_POST) && count($_POST) && (int)Tools::getValue('submitFilter'.$this->list_id) || Tools::isSubmit('submitReset'.$this->list_id)) {
+                if (empty($this->errors) && isset($_POST) && count($_POST) && (int)Tools::getValue('submitFilter'.$this->list_id) || Tools::isSubmit('submitReset'.$this->list_id)) {
                     $this->setRedirectAfter(self::$currentIndex.'&token='.$this->token.(Tools::isSubmit('submitFilter'.$this->list_id) ? '&submitFilter'.$this->list_id.'='.(int)Tools::getValue('submitFilter'.$this->list_id) : '').(isset($_GET['id_'.$this->list_id]) ? '&id_'.$this->list_id.'='.(int)$_GET['id_'.$this->list_id] : ''));
                 }
 
