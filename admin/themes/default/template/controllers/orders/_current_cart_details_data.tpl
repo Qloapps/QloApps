@@ -118,7 +118,7 @@
 										{assign var=shown_room_type_price value=$data.product_price_tax_excl}
 									{/if}
 									<div class="input-group">
-										<input type="text" class="room_unit_price" value="{$shown_room_type_price|escape:'html':'UTF-8'}">
+										<input type="text" class="room_unit_price" value="{$shown_room_type_price|round:6|escape:'html':'UTF-8'}">
 										<span class="input-group-addon">{$currency->prefix}{$currency->suffix}</span>
 									</div>
 								</td>

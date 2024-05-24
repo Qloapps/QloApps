@@ -666,6 +666,8 @@
 				tab: "AdminCarts",
 				action: "updateProductPrice",
 				params: params,
+				id_cart: id_cart,
+				id_customer: id_customer
 			},
 			success : function(response) {
 				updateCartLine(response.curr_booking_info, cart_row);
