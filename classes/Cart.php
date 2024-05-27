@@ -2407,7 +2407,8 @@ class CartCore extends ObjectModel
                                     $product['cart_quantity'] = $selectedProduct['quantity'];
                                     $product['total'] = $selectedProduct['total_price_tax_excl'];
                                     $product['total_wt'] = $selectedProduct['total_price_tax_incl'];
-                                    $product['price_wt'] = $selectedProduct['unit_price_tax_incl'];
+                                    $product['price_wt'] = $selectedProduct['total_price_tax_incl'] / $product['cart_quantity'];
+                                    $product['price'] = $selectedProduct['total_price_tax_excl'] / $product['cart_quantity'];
                                     $product['id_hotel'] = $selectedProduct['id_hotel'];
                                     $orderPackage[$id_address][$selectedProduct['id_hotel']]['product_list'][] = $product;
                                     if (!isset($orderPackage[$id_address][$selectedProduct['id_hotel']]['id_hotel'])) {
