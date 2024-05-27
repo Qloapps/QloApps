@@ -150,18 +150,6 @@ class AdminHotelFeaturesController extends ModuleAdminController
                 $this->errors[] = $this->l('Please add atleast one Child features.');
             }
 
-            foreach ($languages as $lang) {
-                if (!trim(Tools::getValue('parent_ftr_name_'.$lang['id_lang']))) {
-                    $objHotelFeatures->name[$lang['id_lang']] = Tools::getValue(
-                        'parent_ftr_name_'.$defaultLangId
-                    );
-                } else {
-                    $objHotelFeatures->name[$lang['id_lang']] = Tools::getValue(
-                        'parent_ftr_name_'.$lang['id_lang']
-                    );
-                }
-            }
-
             if (!count($this->errors)) {
                 if (isset($parentFeatureId) && $parentFeatureId) {
                     $objHotelFeatures = new HotelFeatures($parentFeatureId);
@@ -297,13 +285,20 @@ class AdminHotelFeaturesController extends ModuleAdminController
 
     public function ajaxProcessDeleteFeature()
     {
-        $idFeature = Tools::getValue('feature_id');
-        $objHotelFeatures = new HotelFeatures();
-        if ($objHotelFeatures->deleteHotelFeatures($idFeature)) {
-            die('success');
+        $response = array('status' => false);
+        if ($this->tabAccess['delete']) {
+            $idFeature = Tools::getValue('feature_id');
+            $objHotelFeatures = new HotelFeatures();
+            if ($objHotelFeatures->deleteHotelFeatures($idFeature)) {
+                $response['status'] = true;
+            } else {
+                $response['msg'] = $this->l('Some error occurred while deleting feature. Please try again.');
+            }
         } else {
-            echo 0;
+            $response['msg'] = $this->l('You do not have the permission to delete this.');
         }
+
+        $this->ajaxDie(json_encode($response));
     }
 
     public function setMedia()

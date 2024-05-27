@@ -463,12 +463,13 @@ $(document).ready(function() {
                     action: 'deleteFeature',
                 },
                 method: 'POST',
-                success: function(data) {
-                    if (data == 'success') {
+                dataType: 'json',
+                success: function(response) {
+                    if (response.status) {
                         alert(success_delete_msg);
                         $('#grand_feature_div_' + ftr_id).remove();
                     } else {
-                        alert(error_delete_msg);
+                        alert(response.msg);
                     }
                 },
                 error: function(XMLHttpRequest, textStatus, errorThrown) {
