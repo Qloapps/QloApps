@@ -22,7 +22,7 @@ function line_chart_dashinsights(widget_name, chart_details) {
     nv.addGraph(function () {
         var chart = nv.models.lineChart()
             .x(function (d) { return (d !== undefined ? d[0] : 0); })
-            .y(function (d) { return (d !== undefined ? d[1] : 0); })
+            .y(function (d) { return (d !== undefined ? parseInt(d[1]) : 0); })
             .forceY([0, 1])
             .margin({
                 left: 40,
