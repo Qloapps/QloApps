@@ -336,7 +336,6 @@ class AdminOrderPreferencesControllerCore extends AdminController
 
         // To prevent this from saving in the configuration table
         unset($_POST['max_global_booking_date_formatted']);
-        // To prevent the saving of the wrong
         $_POST['MAX_GLOBAL_BOOKING_DATE'] = date('Y-m-d', strtotime(Tools::getValue('MAX_GLOBAL_BOOKING_DATE')));
         $maxGlobalBookingDate = Tools::getValue('MAX_GLOBAL_BOOKING_DATE');
         $globalPreparationTime = Tools::getValue('GLOBAL_PREPARATION_TIME');
