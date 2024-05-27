@@ -87,6 +87,9 @@ class HotelReservationSystem extends Module
 
     public function hookActionFrontControllerSetMedia()
     {
+        Media::addJsDef(array(
+            'PS_STORES_ICON' => $this->context->link->getMediaLink(_PS_IMG_.Configuration::get('PS_STORES_ICON'))
+        ));
         if (Configuration::get('WK_CUSTOMER_SUPPORT_PHONE_NUMBER') != ''
             || Configuration::get('WK_CUSTOMER_SUPPORT_EMAIL') != ''
         ) {
@@ -492,6 +495,10 @@ class HotelReservationSystem extends Module
 
     public function hookDisplayBackOfficeHeader()
     {
+        Media::addJsDef(array(
+            'PS_STORES_ICON' => $this->context->link->getMediaLink(_PS_IMG_.Configuration::get('PS_STORES_ICON'))
+        ));
+
         $this->context->controller->addCSS($this->_path.'views/css/admin/css/hotel_admin_tab_logo.css');
     }
 

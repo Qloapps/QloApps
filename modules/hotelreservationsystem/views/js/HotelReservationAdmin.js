@@ -217,6 +217,7 @@ var GoogleMapsManager = {
             position: latLng,
             map: that.map,
             draggable: true,
+            icon: PS_STORES_ICON
         });
         that.markers.push(marker);
         marker.addListener('dragend', function(e) {
