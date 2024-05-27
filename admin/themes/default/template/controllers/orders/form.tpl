@@ -139,6 +139,7 @@
 		$('body').on('click', '.delete_hotel_cart_data', function(){
 			if (confirm("{l s='Are you sure?'}"))
         	{
+                var idCart = $(this).data('id_cart');
 				$.ajax({
 					type:"POST",
 					url: "{$link->getAdminLink('AdminOrders')|addslashes}",
@@ -147,7 +148,7 @@
 						action: "deleteRoomProcess",
 						del_id: $(this).data('id'),
 						id_product: $(this).data('id_product'),
-						id_cart: $(this).data('id_cart'),
+						id_cart: idCart,
 						id_room: $(this).data('id_room'),
 						date_from: $(this).data('date_from'),
 						date_to: $(this).data('date_to'),
@@ -159,7 +160,7 @@
 						{
 							showSuccessMessage("{l s='Remove successful'}");
 							if (data.cart_rooms)
-								location.reload();
+								window.location.href = "{$link->getAdminLink('AdminOrders',true)}" + '&addorder&cart_id=' + idCart;
 							else
 								window.location.href = "{$link->getAdminLink('AdminHotelRoomsBooking',true)}";
 						}
