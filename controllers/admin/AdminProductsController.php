@@ -1089,16 +1089,18 @@ class AdminProductsControllerCore extends AdminController
             }
 
             $id_product = Tools::getValue('id_product');
-
             $id_adv_pmt = Tools::getValue('id_adv_pmt');
             if ($id_adv_pmt) {
                 $obj_adv_pmt = new HotelAdvancedPayment($id_adv_pmt);
             } else {
                 $obj_adv_pmt = new HotelAdvancedPayment();
+                if ($adv_pmt_info = $obj_adv_pmt->getIdAdvPaymentByIdProduct($id_product)) {
+                    // To prevent duplication from two separate tabs
+                    $obj_adv_pmt = new HotelAdvancedPayment((int) $adv_pmt_info['id']);
+                }
             }
 
             $adv_payment_active = Tools::getValue('adv_payment_active');
-
             $obj_adv_pmt->id_product = $id_product;
             $obj_adv_pmt->active = $adv_payment_active;
 
@@ -3178,12 +3180,8 @@ class AdminProductsControllerCore extends AdminController
                                 $objRoomTypeServiceProductPrice->id_element = $idProduct;
                                 $objRoomTypeServiceProductPrice->element_type = RoomTypeServiceProduct::WK_ELEMENT_TYPE_ROOM_TYPE;
                             }
-
                             $objRoomTypeServiceProductPrice->price = $price;
-                            if ($idTaxRulesGroup) {
-                                $objRoomTypeServiceProductPrice->id_tax_rules_group = $idTaxRulesGroup;
-                            }
-
+                            $objRoomTypeServiceProductPrice->id_tax_rules_group = $idTaxRulesGroup;
                             $objRoomTypeServiceProductPrice->save();
                         } else {
                             // create new association
@@ -3912,7 +3910,7 @@ class AdminProductsControllerCore extends AdminController
         } else {
             $address->id_country = (int)$address_infos['id_country'];
             $address->id_state = (int)$address_infos['id_state'];
-            $address->zipcode = $address_infos['postcode'];
+            $address->postcode = $address_infos['postcode'];
         }
 
         $tax_rules_groups = TaxRulesGroup::getTaxRulesGroups(true);
