@@ -1232,7 +1232,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
         return $averageDailyRates;
     }
 
-    // Average Daily Rate is the average income per paid occupied room in a given time period
+    // Average Daily Rate is the average income per occupied room in a given time period
     public static function getAverageDailyRate($dateFrom, $dateTo, $idHotel = null)
     {
         $roomsRevenueByDates = self::getRoomsRevenueForDiscreteDates($dateFrom, $dateTo, $idHotel);

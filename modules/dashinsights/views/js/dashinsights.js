@@ -21,7 +21,6 @@ function line_chart_dashinsights(widget_name, chart_details) {
     $('#dashinsights_room_nights svg').html('');
     nv.addGraph(function () {
         var chart = nv.models.lineChart()
-            .useInteractiveGuideline(true)
             .x(function (d) { return (d !== undefined ? d[0] : 0); })
             .y(function (d) { return (d !== undefined ? d[1] : 0); })
             .forceY([0, 1])
@@ -32,7 +31,7 @@ function line_chart_dashinsights(widget_name, chart_details) {
 
         chart.yAxis.scale().domain([0, 1]);
         // create content for the tooltip of chart
-        chart.interactiveLayer.tooltip.contentGenerator((obj, element) => {
+        chart.tooltip.contentGenerator((obj, element) => {
             var totalNightsBooked = 0;
             var tooltipContent = '';
 
