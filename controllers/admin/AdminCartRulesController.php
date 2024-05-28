@@ -411,7 +411,7 @@ class AdminCartRulesControllerCore extends AdminController
                             $ruleGroupId,
                             $ruleId,
                             Tools::getValue('product_rule_'.$ruleGroupId.'_'.$ruleId.'_type'),
-                            Tools::getValue('product_rule_select_'.$ruleGroupId.'_'.$ruleId)
+                            Tools::getValue('product_rule_select_'.$ruleGroupId.'_'.$ruleId, array())
                         );
                     }
                 }
