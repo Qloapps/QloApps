@@ -84,9 +84,20 @@ class Blocknewsletter extends Module
                 'actionCustomerAccountAdd',
                 'registerGDPRConsent',
                 'actionExportGDPRData',
+                'actionValidateCartRule',
                 'actionDeleteGDPRCustomer'
             )
         );
+    }
+
+    public function hookActionValidateCartRule($params)
+    {
+        if (($code = Configuration::get('NW_VOUCHER_CODE'))
+            && ($code == $params['code'])
+            && (!$this->context->customer->id || $this->context->customer->isGuest())
+        ) {
+            $this->context->controller->errors[] = $this->l('You are not allowed to use this coupon');
+        }
     }
 
     public function hookActionExportGDPRData($customer)
