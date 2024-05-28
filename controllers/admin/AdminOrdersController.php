@@ -102,6 +102,12 @@ class AdminOrdersControllerCore extends AdminController
         } elseif (Tools::getValue('orders_stay_over')) {
             $this->_where .= ' AND hbd.`is_refunded` = 0 AND hbd.`is_back_order` = 0 AND hbd.`id_status` = '.(int) HotelBookingDetail::STATUS_CHECKED_IN.'
             AND hbd.`date_to` > \''.pSQL(date('Y-m-d')).' 00:00:00\'';
+        } elseif (Tools::getValue('orders_not_paid')) {
+            $this->_where .= ' AND os.`paid` = 0 AND a.`current_state` NOT IN ('.implode(',', array(
+                Configuration::get('PS_OS_CANCELED'),
+                Configuration::get('PS_OS_REFUND'),
+                Configuration::get('PS_OS_ERROR')
+            )).')';
         }
 
         $this->_orderBy = 'id_order';
