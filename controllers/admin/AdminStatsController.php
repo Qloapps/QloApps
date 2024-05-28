@@ -1885,7 +1885,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
 
     public static function getTotalNewCustomers($nbDaysNewCustomers)
     {
-        $maxDateAdd = date('Y-m-d H:i:s', strtotime('-'.$nbDaysNewCustomers.' day'));
+        $maxDateAdd = date('Y-m-d', strtotime('-'.$nbDaysNewCustomers.' day'));
         $sql = 'SELECT COUNT(c.`id_customer`)
         FROM `'._DB_PREFIX_.'customer` c
         WHERE c.`date_add` >= "'.pSQL($maxDateAdd).'" AND c.`deleted` = 0';
