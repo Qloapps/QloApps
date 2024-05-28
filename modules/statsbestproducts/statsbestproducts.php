@@ -96,7 +96,7 @@ class StatsBestProducts extends ModuleGrid
             ),
             array(
                 'id' => 'availableRooms',
-                'header' => $this->l('Available rooms'),
+                'header' => $this->l('Room nights available'),
                 'dataIndex' => 'availableRooms',
                 'tooltip' => $this->l('The room nights available for booking for the room type.'),
                 'align' => 'center',
@@ -168,7 +168,10 @@ class StatsBestProducts extends ModuleGrid
             AND hbd.`date_to` > "'.pSQL($date_from).'" AND hbd.`date_from` < "'.pSQL($date_to).'"
         ) AS totalRoomsBooked,
         (
-            SELECT IFNULL(AVG(hbd.`total_price_tax_excl` / o.`conversion_rate`), 0)
+            SELECT IFNULL(ROUND(
+                SUM(hbd.`total_price_tax_excl` * DATEDIFF(LEAST(hbd.`date_to`, "'.pSQL($date_to).'"), GREATEST(hbd.`date_from`, "'.pSQL($date_from).'")) / (o.`conversion_rate` * DATEDIFF(hbd.`date_to`, hbd.`date_from`))) / SUM(DATEDIFF(LEAST(hbd.`date_to`, "'.pSQL($date_to).'"), GREATEST(hbd.`date_from`, "'.pSQL($date_from).'"))),
+                2
+            ), 0)
             FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
             LEFT JOIN `'._DB_PREFIX_.'orders` o
             ON (o.`id_order` = hbd.`id_order`)
@@ -176,7 +179,10 @@ class StatsBestProducts extends ModuleGrid
             AND hbd.`date_to` > "'.pSQL($date_from).'" AND hbd.`date_from` < "'.pSQL($date_to).'"
         ) AS sellingPrice,
         (
-            SELECT IFNULL(SUM(ROUND((DATEDIFF(LEAST(hbd.`date_to`, "'.pSQL($date_to).'"), GREATEST(hbd.`date_from`, "'.pSQL($date_from).'")) / DATEDIFF(hbd.`date_to`, hbd.`date_from`)) * (hbd.`total_price_tax_excl` / o.`conversion_rate`) , 2)), 0)
+            SELECT IFNULL(ROUND(
+                SUM(hbd.`total_price_tax_excl` * DATEDIFF(LEAST(hbd.`date_to`, "'.pSQL($date_to).'"), GREATEST(hbd.`date_from`, "'.pSQL($date_from).'")) / (o.`conversion_rate` * DATEDIFF(hbd.`date_to`, hbd.`date_from`))),
+                2
+            ), 0)
             FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
             LEFT JOIN `'._DB_PREFIX_.'orders` o
             ON (o.`id_order` = hbd.`id_order`)
