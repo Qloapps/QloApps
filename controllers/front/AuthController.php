@@ -438,6 +438,12 @@ class AuthControllerCore extends FrontController
                 $this->errors[] = Tools::displayError('You must register at least one phone number.');
             }
 
+            if (!Tools::getValue('is_new_customer', 1)) {
+                if ($idCustomer = Customer::customerExists(Tools::getValue('email'), true, false)) {
+                    $customer = new Customer($idCustomer);
+                }
+            }
+
             $this->errors = array_unique(array_merge($this->errors, $customer->validateController()));
 
             // Check the requires fields which are settings in the BO
@@ -601,13 +607,7 @@ class AuthControllerCore extends FrontController
                     $customer->active = 1;
                     // New Guest customer
                     if (Tools::isSubmit('is_new_customer')) {
-                        if (isset($idCustomer) && $idCustomer) {
-                            // update guest customer details
-                            $customer = new Customer($idCustomer);
-                            $customer->firstname = Tools::getValue('customer_firstname');
-                            $customer->lastname = Tools::getValue('customer_lastname');
-                        }
-                        $customer->is_guest = 1;
+                        $customer->is_guest = !Tools::getValue('is_new_customer', 1);
                     } else {
                         $customer->is_guest = 0;
                     }
