@@ -38,11 +38,6 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
         $this->_orderWay = 'DESC';
         $this->_group = 'GROUP BY ord.`id_order`';
 
-        // filter pending refund requests
-        if (Tools::getValue('action') == 'filterPendingRequests') {
-            $this->_filterHaving = ' AND `total_pending_requests` > 0';
-        }
-
         $orderStatuses = OrderState::getOrderStates($this->context->language->id);
         $ordStatuses = array();
         foreach ($orderStatuses as $status) {
@@ -78,6 +73,7 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
             'total_pending_requests' => array(
                 'title' => $this->l('Pending Requests'),
                 'align' => 'center',
+                'type' => 'range',
                 'havingFilter' => true,
             ),
         );

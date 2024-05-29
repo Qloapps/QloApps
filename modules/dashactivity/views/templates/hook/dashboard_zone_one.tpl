@@ -89,7 +89,7 @@
             </li>
             <li>
                 <span class="item-label">
-                    <a href="{$link->getAdminLink("AdminOrderRefundRequests")|escape:"html":"UTF-8"}&amp;action=filterPendingRequests" target="_blank">
+                    <a href="{$link->getAdminLink("AdminOrderRefundRequests")|escape:"html":"UTF-8"}&amp;&submitFilterorder_return=1&amp;order_returnFilter_total_pending_requests[0]=1" target="_blank">
                         <span>{l s="Refunds" mod='dashactivity'}</span>
                     </a>
                 </span>
