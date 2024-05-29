@@ -170,6 +170,11 @@ class AdminCustomersControllerCore extends AdminController
                 'type' => 'datetime',
                 'search' => false,
                 'havingFilter' => true
+            ),
+            'deleted' => array(
+                'title' => $this->l('Banned'),
+                'type' => 'bool',
+                'displayed' => false,
             )
         ));
 
@@ -217,14 +222,14 @@ class AdminCustomersControllerCore extends AdminController
             $this->redirect_after = $this->context->link->getAdminLink('AdminCustomers');
         }
 
-        if (Tools::getValue('action') == 'filterOnlyNewCustomer') {
+        $prefix = $this->getCookieFilterPrefix();
+        if (Tools::getValue('filterOnlyNewCustomer')) {
             if (($dateFrom = Tools::getValue('date_from'))
                 && ($dateTo = Tools::getValue('date_to'))
                 && strtotime($dateTo) >= strtotime($dateFrom)
             ) {
                 $this->processResetFilters();
                 $this->context->cookie->{'submitFilter'.$this->table} = true;
-                $prefix = $this->getCookieFilterPrefix();
                 //Updating the date format of the filter dates to the desired format.
                 $dateFrom = date('Y-m-d', strtotime($dateFrom));
                 $dateTo = date('Y-m-d', strtotime($dateTo));
@@ -235,6 +240,10 @@ class AdminCustomersControllerCore extends AdminController
         }
 
         parent::postProcess();
+        $filters = $this->context->cookie->getFamily($prefix.$this->table.'Filter_');
+        if (isset($filters[$prefix.$this->table.'Filter_deleted']) && $filters[$prefix.$this->table.'Filter_deleted'] == 1) {
+            $this->deleted = false;
+        }
     }
 
     public function initContent()
