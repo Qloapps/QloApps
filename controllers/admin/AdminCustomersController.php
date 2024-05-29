@@ -1049,6 +1049,9 @@ class AdminCustomersControllerCore extends AdminController
             $this->errors[] = Tools::displayError('An account already exists for this email address:').' '.$customer_email;
             $this->display = 'edit';
             return $customer;
+        } elseif (trim(Customer::customerExists($customer_email, false, true))) {
+            $this->errors[] = Tools::displayError('The email is already associated with a banned account. Please use a different one.');
+            $this->display = 'edit';
         } elseif (trim(Tools::getValue('passwd')) == '') {
             $this->validateRules();
             $this->errors[] = Tools::displayError('Password can not be empty.');
@@ -1287,6 +1290,45 @@ class AdminCustomersControllerCore extends AdminController
                 die('error:update');
             }
             die('ok');
+        }
+    }
+
+    public function ajaxProcessVerifyCustomerEmail()
+    {
+        $response = array(
+            'status' => true
+        );
+        if ($email = Tools::getValue('email')) {
+            $newIdCustomer = Tools::getValue('id_customer', 0);
+            $oldIdCustomer = Customer::customerExists($email, true, false);
+            if ($oldIdCustomer) { // means that the account exists.
+                $objCustomer = Customer::getByEmail($email, null, false);
+                if (!$objCustomer // means that the customer was deleted
+                    && $oldIdCustomer != $newIdCustomer // the admin is trying to update another account in case the new id is not zero
+                ) {
+                    $response['status'] = false;
+                    $response['msg'] = Tools::displayError('The email is already associated with a banned account. Please use a different one.');
+                }
+            }
+        }
+
+        $this->ajaxDie(json_encode($response));
+    }
+
+    public function setMedia()
+    {
+        parent::setMedia();
+        if ($this->loadObject(true)
+            && ($this->display == 'edit' || $this->display == 'add')
+        ) {
+            $idCustomer = $this->object->id ? $this->object->id : 0;
+            Media::addJSDef(
+                array(
+                    'customer_controller_url' => self::$currentIndex.'&token='.$this->token,
+                    'id_customer' => $idCustomer
+                )
+            );
+            $this->addJS(_PS_JS_DIR_.'admin/customers.js');
         }
     }
 }
