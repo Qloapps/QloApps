@@ -70,6 +70,21 @@ $(document).ready(function() {
         }
     });
 
+    $('#voucher_expiry').datepicker({
+        dateFormat: 'dd-mm-yy',
+        altFormat: 'yy-mm-dd',
+        altField: '#voucher_expiry_date',
+        minDate: 0,
+    });
+
+    $(document).on('change', '#generateDiscount', function() {
+		if ($(this).is(':checked')) {
+			$(".generate_discount_fields").show(200);
+		} else {
+            $(".generate_discount_fields").hide(200);
+        }
+    });
+
     $('#id_refund_state').on('change', function() {
         if ($("#id_refund_state option:selected").attr('refunded') == 1) {
             $(".refunded_state_fields").show(200);
