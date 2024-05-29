@@ -209,7 +209,7 @@ class OrderReturnCore extends ObjectModel
                         $bookingRow['total_price_tax_incl'] = Tools::ps_round($bookingRow['total_price_tax_incl'], _PS_PRICE_DISPLAY_PRECISION_);
                     }
                     if ($objOrder->total_paid_real > 0) {
-                        $bookingRow['room_paid_amount'] = ($objOrder->total_paid_real*$bookingRow['total_price_tax_incl'])/$objOrder->total_paid_tax_incl;
+                        $bookingRow['room_paid_amount'] = ($objOrder->total_paid_real*$bookingRow['total_price_tax_incl'])/ ($objOrder->total_paid_tax_incl + $objOrder->total_discounts_tax_incl);
                     }
                 }
                 $roomSelectedDemands = $objBookingDemands->getRoomTypeBookingExtraDemands(
@@ -227,7 +227,7 @@ class OrderReturnCore extends ObjectModel
                                 $demand['total_price_tax_incl'] = Tools::ps_round($demand['total_price_tax_incl'], _PS_PRICE_DISPLAY_PRECISION_);
                             }
                             if ($objOrder->total_paid_real > 0) {
-                                $bookingRow['extra_service_total_paid_amount'] += ($objOrder->total_paid_real*$demand['total_price_tax_incl'])/$objOrder->total_paid_tax_incl;
+                                $bookingRow['extra_service_total_paid_amount'] += ($objOrder->total_paid_real*$demand['total_price_tax_incl'])/($objOrder->total_paid_tax_incl + $objOrder->total_discounts_tax_incl);
                             }
                             $bookingRow['extra_service_total_price_tax_incl'] += $demand['total_price_tax_incl'];
                         }
@@ -244,7 +244,7 @@ class OrderReturnCore extends ObjectModel
                                     $service['total_price_tax_incl'] = Tools::ps_round($service['total_price_tax_incl'], _PS_PRICE_DISPLAY_PRECISION_);
                                 }
                                 if ($objOrder->total_paid_real > 0) {
-                                    $bookingRow['extra_service_total_paid_amount'] += ($objOrder->total_paid_real*$service['total_price_tax_incl'])/$objOrder->total_paid_tax_incl;
+                                    $bookingRow['extra_service_total_paid_amount'] += ($objOrder->total_paid_real*$service['total_price_tax_incl'])/($objOrder->total_paid_tax_incl + $objOrder->total_discounts_tax_incl);
                                 }
                                 $bookingRow['extra_service_total_price_tax_incl'] += $service['total_price_tax_incl'];
                             }
