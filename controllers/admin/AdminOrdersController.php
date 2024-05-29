@@ -2325,7 +2325,7 @@ class AdminOrdersControllerCore extends AdminController
             $helper = new HelperKpi();
             $helper->id = 'box-order-date';
             $helper->icon = 'icon-calendar';
-            $helper->color = 'color3';
+            $helper->color = 'color1';
             $helper->title = $this->l('Order Date');
             $helper->value = Tools::displayDate($objOrder->date_add);
             $kpis[] = $helper;
@@ -2333,9 +2333,35 @@ class AdminOrdersControllerCore extends AdminController
             $helper = new HelperKpi();
             $helper->id = 'box-order-total';
             $helper->icon = 'icon-money';
-            $helper->color = 'color4';
+            $helper->color = 'color3';
             $helper->title = $this->l('Total');
             $helper->value = Tools::displayPrice($objOrder->total_paid_tax_incl, new Currency($objOrder->id_currency));
+            $kpis[] = $helper;
+
+            $helper = new HelperKpi();
+            $helper->id = 'box-total-paid';
+            $helper->icon = 'icon-money';
+            $helper->color = 'color4';
+            $helper->title = $this->l('Total Paid');
+            $helper->value = Tools::displayPrice($objOrder->total_paid_real, new Currency($objOrder->id_currency));
+            $kpis[] = $helper;
+
+            $helper = new HelperKpi();
+            $helper->id = 'box-total-due';
+            $helper->icon = 'icon-money';
+            $helper->color = 'color2';
+            $helper->title = $this->l('Total Due');
+            $helper->value = Tools::displayPrice(($objOrder->total_paid_tax_incl - $objOrder->total_paid_real), new Currency($objOrder->id_currency));
+            $kpis[] = $helper;
+
+            $orderHistory = array_reverse($objOrder->getHistory($this->context->language->id));
+            $helper = new HelperKpi();
+            $helper->id = 'box-order-source';
+            $helper->icon = 'icon-globe';
+            $helper->color = 'color1';
+            $helper->title = $this->l('Order Source');
+            $helper->subtitle = $orderHistory[0]['id_employee'] ? $this->l('Back office') : $this->l('Front office');
+            $helper->value = $objOrder->source;
             $kpis[] = $helper;
 
             $helper = new HelperKpi();
@@ -2358,9 +2384,23 @@ class AdminOrdersControllerCore extends AdminController
             $helper->value = $numRooms;
             $kpis[] = $helper;
 
-            Hook::exec('action'.$this->controller_name.'KPIListingModifier', array(
-                'kpis' => &$kpis,
-            ));
+            $helper = new HelperKpi();
+            $helper->id = 'box-payment-type';
+            $helper->icon = 'icon-home';
+            $helper->color = 'color3';
+            $helper->title = $this->l('Payment Type');
+            $helper->value = $objOrder->is_advance_payment ? $this->l('Partial Payment') : $this->l('Full Payment');
+            $kpis[] = $helper;
+
+            if ($objOrder->is_advance_payment) {
+                $helper = new HelperKpi();
+                $helper->id = 'box-partial-payment-amount';
+                $helper->icon = 'icon-money';
+                $helper->color = 'color4';
+                $helper->title = $this->l('Partial Payment Amount');
+                $helper->value = Tools::displayPrice($objOrder->advance_paid_amount, new Currency($objOrder->id_currency));
+                $kpis[] = $helper;
+            }
         } else {
             $time = time();
             $kpis = array();
@@ -2474,6 +2514,10 @@ class AdminOrdersControllerCore extends AdminController
             $helper->tooltip = $this->l('Average number of guests per booking.', null, null, false);
             $kpis[] = $helper;
         }
+
+        Hook::exec('action'.$this->controller_name.'KPIListingModifier', array(
+            'kpis' => &$kpis,
+        ));
 
         $helper = new HelperKpiRow();
         $helper->kpis = $kpis;
