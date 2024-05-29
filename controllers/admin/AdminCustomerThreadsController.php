@@ -656,13 +656,8 @@ class AdminCustomerThreadsControllerCore extends AdminController
                 $total_ok = 0;
                 $orders_ok = array();
                 foreach ($orders as $key => $order) {
-                    if ($order['valid']
-                        || strtotime($order['order_last_date']) >= strtotime(date('Y-m-d'))
-                    ) {
+                    if ($order['valid']) {
                         $orders_ok[] = $order;
-                    }
-
-                    if ($order['total_paid_real']) {
                         $total_ok += $order['total_paid_real']/$order['conversion_rate'];
                     }
 

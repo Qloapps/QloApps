@@ -829,14 +829,9 @@ class AdminCustomersControllerCore extends AdminController
                 $order['order_state'] = $this->l('There is no status defined for this order.');
             }
 
-            if ($order['total_paid_real_not_formated']) {
-                $total_ok += $order['total_paid_real_not_formated']/$order['conversion_rate'];
-            }
-
-            if ($order['valid']
-                || strtotime($order['order_last_date']) >= strtotime(date('Y-m-d'))
-            ) {
+            if ($order['valid']) {
                 $orders_ok[] = $order;
+                $total_ok += $order['total_paid_real_not_formated']/$order['conversion_rate'];
             } else {
                 $orders_ko[] = $order;
             }
@@ -867,7 +862,6 @@ class AdminCustomersControllerCore extends AdminController
 				JOIN '._DB_PREFIX_.'product p ON (cp.id_product = p.id_product)
                 AND p.booking_product=1
 				WHERE c.id_customer = '.(int)$customer->id.'
-                AND p.booking_product = 1
 					AND NOT EXISTS (
 							SELECT 1
 							FROM '._DB_PREFIX_.'orders o
