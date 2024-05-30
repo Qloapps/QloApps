@@ -173,7 +173,7 @@
             {/if}
 
             {hook h='displayOrderDetailRoomDetailsBefore' id_order=$order->id}
-            <div class="card room-details card-toolbar">
+            <div class="card room-details">
                 <div class="card-header">
                     {l s='Room Details'}
                     <div class="booking-actions-wrap">
