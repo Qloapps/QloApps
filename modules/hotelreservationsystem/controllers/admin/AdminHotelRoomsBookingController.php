@@ -42,6 +42,9 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
             $objCart = new Cart($this->context->cookie->id_cart);
             if (Validate::isLoadedObject($objCart) && !$objCart->orderExists()) {
                 $this->context->cart = $objCart;
+
+                // validate cart for removing invalid data from cart
+                HotelCartBookingData::validateCartBookings();
             } else {
                 $this->context->cookie->id_cart = 0; // remove invalid id_cart
                 $this->context->cart = new Cart();
@@ -63,15 +66,6 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
         $objCustomer->id_guest = (int) $this->context->cookie->id_guest;
 
         $this->context->customer = $objCustomer;
-        if ($this->context->employee->isSuperAdmin()) {
-            $backOrderConfigKey = 'PS_BACKDATE_ORDER_SUPERADMIN';
-        } else {
-            $backOrderConfigKey = 'PS_BACKDATE_ORDER_EMPLOYEES';
-        }
-        if (!Configuration::get($backOrderConfigKey)) {
-            $htlCart = new HotelCartBookingData();
-            $htlCart->removeBackdateRoomsFromCart($this->context->cart->id);
-        }
     }
 
     protected function createNewCart()

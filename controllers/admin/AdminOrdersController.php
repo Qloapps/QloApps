@@ -374,36 +374,17 @@ class AdminOrdersControllerCore extends AdminController
             $this->errors[] = $this->l('You have to select a shop before creating new orders.');
         }
 
-        $id_cart = (int)Tools::getValue('id_cart');
-        $cart = new Cart((int)$id_cart);
-        if ($id_cart && !Validate::isLoadedObject($cart)) {
-            $this->errors[] = $this->l('This cart does not exists');
-        }
-        if ($id_cart && Validate::isLoadedObject($cart) && !$cart->id_customer) {
-            $this->errors[] = $this->l('The cart must have a customer');
-        }
-        if (count($this->errors) && !Tools::getValue('submitAddorder')) {
-            return false;
-        }
-
-        // check page is whether ad new order page or order detail page
-        if ((Tools::isSubmit('addorder') && ($id_cart = Tools::getValue('cart_id')))
-            || (Tools::isSubmit('submitAddOrder') && ($id_cart = Tools::getValue('id_cart')))
-        ) {
+        // check page is new order creation page and cart id is set
+        if (Tools::isSubmit('addorder') && ($id_cart = Tools::getValue('cart_id'))) {
             // set smarty variables if new order creation process has errors
             $cart = new Cart($id_cart);
             $cart_order_exists = $cart->orderExists();
             if (!$cart_order_exists) {
                 $this->context->cart = $cart;
-                if ($this->context->employee->isSuperAdmin()) {
-                    $backOrderConfigKey = 'PS_BACKDATE_ORDER_SUPERADMIN';
-                } else {
-                    $backOrderConfigKey = 'PS_BACKDATE_ORDER_EMPLOYEES';
-                }
-                if (!Configuration::get($backOrderConfigKey)) {
-                    $objHotelCartBookingData = new HotelCartBookingData();
-                    $objHotelCartBookingData->removeBackdateRoomsFromCart($this->context->cart->id);
-                }
+
+                // validate cart for removing invalid data from cart before new order creation
+                $this->errors = array_merge($this->errors, HotelCartBookingData::validateCartBookings());
+
                 $this->context->currency = new Currency((int)$cart->id_currency);
                 $cart_detail_data = array();
                 $cart_detail_data_obj = new HotelCartBookingData();
@@ -420,61 +401,68 @@ class AdminOrdersControllerCore extends AdminController
                     $this->context->smarty->assign('cart_normal_data', $normalCartProduct);
                 }
 
+                if (empty($cart_detail_data) && empty($normalCartProduct)) {
+                    // if no rooms added in the cart and user visits add order page then redirect to BOOK NOW page
+                    Tools::redirectAdmin($this->context->link->getAdminLink('AdminHotelRoomsBooking'));
+                }
+
+                $payment_modules = array();
+                foreach (PaymentModule::getInstalledPaymentModules() as $p_module) {
+                    $payment_modules[] = Module::getInstanceById((int)$p_module['id_module']);
+                }
+
+                $paymentTypes = array();
+                foreach ($this->getPaymentsTypes() as $paymentType) {
+                    if ($paymentType['value'] != OrderPayment::PAYMENT_TYPE_REMOTE_PAYMENT) {
+                        $paymentTypes[] = $paymentType;
+                    }
+                }
+
+                $occupancyRequiredForBooking = false;
+                if (Configuration::get('PS_BACKOFFICE_ROOM_BOOKING_TYPE') == HotelBookingDetail::PS_ROOM_UNIT_SELECTION_TYPE_OCCUPANCY) {
+                    $occupancyRequiredForBooking = true;
+                }
+
                 $objHotelAdvancedPayment = new HotelAdvancedPayment();
                 $this->context->smarty->assign(array(
                     'order_total' => $cart->getOrderTotal(true),
                     'is_advance_payment_active' => $objHotelAdvancedPayment->isAdvancePaymentAvailableForCurrentCart(),
                     'advance_payment_amount_without_tax' => $cart->getOrderTotal(false, Cart::ADVANCE_PAYMENT),
                     'advance_payment_amount_with_tax' => $cart->getOrderTotal(true, Cart::ADVANCE_PAYMENT),
+                    'cart' => $cart,
+                    'currencies' => Currency::getCurrenciesByIdShop(Context::getContext()->shop->id),
+                    'langs' => Language::getLanguages(true, Context::getContext()->shop->id),
+                    'payment_modules' => $payment_modules,
+                    'payment_types' => $paymentTypes,
+                    'currency' => new Currency((int)$cart->id_currency),
+                    'max_child_in_room' => Configuration::get('WK_GLOBAL_MAX_CHILD_IN_ROOM'),
+                    'max_child_age' => Configuration::get('WK_GLOBAL_CHILD_MAX_AGE'),
+                    'occupancy_required_for_booking' => $occupancyRequiredForBooking,
                 ));
 
-                if (empty($cart_detail_data) && empty($normalCartProduct)) {
-                    // if no rooms added in the cart and user visits add order page then redirect to BOOK NOW page
-                    Tools::redirectAdmin($this->context->link->getAdminLink('AdminHotelRoomsBooking'));
-                }
+            } else {
+                Tools::redirectAdmin($this->context->link->getAdminLink('AdminHotelRoomsBooking'));
             }
             $this->context->smarty->assign('is_order_created', $cart_order_exists);
+        } else {
+            Tools::redirectAdmin($this->context->link->getAdminLink('AdminHotelRoomsBooking'));
         }
+
         //end
         parent::renderForm();
         unset($this->toolbar_btn['save']);
         $this->addJqueryPlugin(array('autocomplete', 'fancybox', 'typewatch'));
 
-        $payment_modules = array();
-        foreach (PaymentModule::getInstalledPaymentModules() as $p_module) {
-            $payment_modules[] = Module::getInstanceById((int)$p_module['id_module']);
-        }
-
-        $paymentTypes = array();
-        foreach ($this->getPaymentsTypes() as $paymentType) {
-            if ($paymentType['value'] != OrderPayment::PAYMENT_TYPE_REMOTE_PAYMENT) {
-                $paymentTypes[] = $paymentType;
-            }
-        }
-
-        $occupancyRequiredForBooking = false;
-        if (Configuration::get('PS_BACKOFFICE_ROOM_BOOKING_TYPE') == HotelBookingDetail::PS_ROOM_UNIT_SELECTION_TYPE_OCCUPANCY) {
-            $occupancyRequiredForBooking = true;
-        }
-
         $this->context->smarty->assign(array(
             'recyclable_pack' => (int)Configuration::get('PS_RECYCLABLE_PACK'),
             'gift_wrapping' => (int)Configuration::get('PS_GIFT_WRAPPING'),
-            'cart' => $cart,
-            'currencies' => Currency::getCurrenciesByIdShop(Context::getContext()->shop->id),
-            'langs' => Language::getLanguages(true, Context::getContext()->shop->id),
-            'payment_modules' => $payment_modules,
-            'payment_types' => $paymentTypes,
             'show_toolbar' => $this->show_toolbar,
             'toolbar_btn' => $this->toolbar_btn,
             'toolbar_scroll' => $this->toolbar_scroll,
             'PS_CATALOG_MODE' => Configuration::get('PS_CATALOG_MODE'),
             'title' => array($this->l('Orders'), $this->l('Create order')),
-            'currency' => new Currency((int)$cart->id_currency),
-            'max_child_in_room' => Configuration::get('WK_GLOBAL_MAX_CHILD_IN_ROOM'),
-            'max_child_age' => Configuration::get('WK_GLOBAL_CHILD_MAX_AGE'),
-            'occupancy_required_for_booking' => $occupancyRequiredForBooking,
         ));
+
         $this->content .= $this->createTemplate('form.tpl')->fetch();
     }
 
@@ -1624,9 +1612,21 @@ class AdminOrdersControllerCore extends AdminController
                 } elseif (!Validate::isUnsignedInt($payment_type)) {
                     $this->errors[] = Tools::displayError('Payment source is invalid');
                 // Amount cannot be less than paid amount by guest in negative price
-                } elseif ($amount < 0 && ($order->total_paid_real + $amount) < 0) {
-                    $this->errors[] = sprintf(Tools::displayError('Amount cannot be less than -%s'), Tools::displayPrice($order->total_paid_real, new Currency($order->id_currency)));
-                } else {
+                } elseif ($amount < 0) {
+                    if ($currency->id == $order->id_currency) {
+                        if (($order->total_paid_real + $amount) < 0) {
+                            $this->errors[] = sprintf(Tools::displayError('Amount cannot be less than -%s'), Tools::displayPrice($order->total_paid_real, new Currency($order->id_currency)));
+                        }
+                    } else {
+                        $convertedAmount = Tools::ps_round(Tools::convertPriceFull($amount, $currency, new Currency($order->id_currency)), 6);
+                        $convertedPaidAmount = Tools::ps_round(Tools::convertPriceFull($order->total_paid_real, new Currency($order->id_currency), $currency), 6);
+                        if (($order->total_paid_real + $convertedAmount) < 0) {
+                            $this->errors[] = sprintf(Tools::displayError('Amount cannot be less than -%s (-%s)'), Tools::displayPrice($convertedPaidAmount, $currency), Tools::displayPrice($order->total_paid_real, new Currency($order->id_currency)));
+                        }
+                    }
+                }
+
+                if (!count($this->errors)) {
                     if (!$order->addOrderPayment(
                         $amount,
                         Tools::getValue('payment_method'),
@@ -1673,6 +1673,9 @@ class AdminOrdersControllerCore extends AdminController
             if ($this->tabAccess['edit'] === '1') {
                 $objCart = new Cart($id_cart);
                 if (Validate::isLoadedObject($objCart)) {
+                    $this->context->cart = $objCart;
+
+                    $this->errors = HotelCartBookingData::validateCartBookings();
                     $orderTotal = $objCart->getOrderTotal(true, Cart::BOTH);
                     if ($objCart->is_advance_payment) {
                         $advancePaymentAmount = $objCart->getOrderTotal(true, Cart::ADVANCE_PAYMENT);
@@ -1690,7 +1693,7 @@ class AdminOrdersControllerCore extends AdminController
                             if ($paymentAmount == '') {
                                 $this->errors[] = Tools::displayError('Please enter valid Payment amount of the order.');
                             } elseif ($paymentAmount && !Validate::isPrice($paymentAmount)) {
-                                $this->errors[] = Tools::displayError('Payment amount is invalid. Please enter correct amount.');
+                                $this->errors[] = Tools::displayError('Payment amount is invalid. Please enter valid amount.');
                             } else {
                                 $paymentAmount = (float) $paymentAmount;
                             }
@@ -1713,23 +1716,6 @@ class AdminOrdersControllerCore extends AdminController
 
                             if ($paymentTransactionId && !Validate::isString($paymentTransactionId)) {
                                 $this->errors[] = Tools::displayError('Payment amount is invalid. Please enter correct amount.');
-                            }
-                        }
-                    }
-
-                    // Validate if booking dates are allowed
-                    if ($this->context->employee->isSuperAdmin()) {
-                        $backOrderConfigKey = 'PS_BACKDATE_ORDER_SUPERADMIN';
-                    } else {
-                        $backOrderConfigKey = 'PS_BACKDATE_ORDER_EMPLOYEES';
-                    }
-                    if (!Configuration::get($backOrderConfigKey)) {
-                        $objCartBookingData = new HotelCartBookingData();
-                        if ($cartBookingData = $objCartBookingData->getCartCurrentDataByCartId($cart->id)) {
-                            foreach ($cartBookingData as $cartRoom) {
-                                if (strtotime($cartRoom['date_from']) < strtotime(date('Y-m-d'))) {
-                                    $this->errors[] = Tools::displayError('You cannot book rooms before today date.');
-                                }
                             }
                         }
                     }
@@ -1811,10 +1797,6 @@ class AdminOrdersControllerCore extends AdminController
                         if ($objPaymentModule->currentOrder) {
                             Tools::redirectAdmin(self::$currentIndex.'&id_order='.$objPaymentModule->currentOrder.'&vieworder'.'&token='.$this->token.'&conf=3');
                         }
-                    } else {
-                        // if errors render add order form
-                        $_GET['addorder'] = '1';
-                        $_GET['cart_id'] = $id_cart;
                     }
                 } else {
                     $this->errors[] = Tools::displayError('Cart can not be loaded.');
@@ -2217,59 +2199,61 @@ class AdminOrdersControllerCore extends AdminController
                             $this->errors[] = Tools::displayError('The discount type is invalid.');
                     }
 
-                    $res = true;
-                    foreach ($cart_rules as &$cart_rule) {
-                        $cartRuleObj = new CartRule();
-                        $cartRuleObj->date_from = date('Y-m-d H:i:s', strtotime('-1 hour', strtotime($order->date_add)));
-                        $cartRuleObj->date_to = date('Y-m-d H:i:s', strtotime('+1 hour'));
-                        $cartRuleObj->name[Configuration::get('PS_LANG_DEFAULT')] = Tools::getValue('discount_name');
-                        $cartRuleObj->quantity = 0;
-                        $cartRuleObj->quantity_per_user = 1;
-                        if (Tools::getValue('discount_type') == 1) {
-                            $cartRuleObj->reduction_percent = $discount_value;
-                        } elseif (Tools::getValue('discount_type') == 2) {
-                            $cartRuleObj->reduction_amount = $cart_rule['value_tax_excl'];
-                        } elseif (Tools::getValue('discount_type') == 3) {
-                            $cartRuleObj->free_shipping = 1;
+                    if (!count($this->errors)) {
+                        $res = true;
+                        foreach ($cart_rules as &$cart_rule) {
+                            $cartRuleObj = new CartRule();
+                            $cartRuleObj->date_from = date('Y-m-d H:i:s', strtotime('-1 hour', strtotime($order->date_add)));
+                            $cartRuleObj->date_to = date('Y-m-d H:i:s', strtotime('+1 hour'));
+                            $cartRuleObj->name[Configuration::get('PS_LANG_DEFAULT')] = Tools::getValue('discount_name');
+                            $cartRuleObj->quantity = 0;
+                            $cartRuleObj->quantity_per_user = 1;
+                            if (Tools::getValue('discount_type') == 1) {
+                                $cartRuleObj->reduction_percent = $discount_value;
+                            } elseif (Tools::getValue('discount_type') == 2) {
+                                $cartRuleObj->reduction_amount = $cart_rule['value_tax_excl'];
+                            } elseif (Tools::getValue('discount_type') == 3) {
+                                $cartRuleObj->free_shipping = 1;
+                            }
+                            $cartRuleObj->active = 0;
+                            if ($res = $cartRuleObj->add()) {
+                                $cart_rule['id'] = $cartRuleObj->id;
+                                $cart_rule['free_shipping'] = $cartRuleObj->free_shipping;
+                            } else {
+                                break;
+                            }
                         }
-                        $cartRuleObj->active = 0;
-                        if ($res = $cartRuleObj->add()) {
-                            $cart_rule['id'] = $cartRuleObj->id;
-                            $cart_rule['free_shipping'] = $cartRuleObj->free_shipping;
+
+                        if ($res) {
+                            foreach ($cart_rules as $id_order_invoice => $cart_rule) {
+                                // Create OrderCartRule
+                                $order_cart_rule = new OrderCartRule();
+                                $order_cart_rule->id_order = $order->id;
+                                $order_cart_rule->id_cart_rule = $cart_rule['id'];
+                                $order_cart_rule->id_order_invoice = $id_order_invoice;
+                                $order_cart_rule->name = Tools::getValue('discount_name');
+                                $order_cart_rule->value = $cart_rule['value_tax_incl'];
+                                $order_cart_rule->value_tax_excl = $cart_rule['value_tax_excl'];
+                                $order_cart_rule->free_shipping = $cart_rule['free_shipping'];
+                                $res &= $order_cart_rule->add();
+
+                                $order->total_discounts = Tools::ps_round($order->total_discounts + $order_cart_rule->value, 6);
+                                $order->total_discounts_tax_incl = Tools::ps_round($order->total_discounts_tax_incl + $order_cart_rule->value, 6);
+                                $order->total_discounts_tax_excl = Tools::ps_round($order->total_discounts_tax_excl + $order_cart_rule->value_tax_excl, 6);
+                                $order->total_paid = Tools::ps_round($order->total_paid - $order_cart_rule->value, 6);
+                                $order->total_paid_tax_incl = Tools::ps_round($order->total_paid_tax_incl - $order_cart_rule->value, 6);
+                                $order->total_paid_tax_excl = Tools::ps_round($order->total_paid_tax_excl - $order_cart_rule->value_tax_excl, 6);
+                            }
+
+                            // Update Order
+                            $res &= $order->update();
+                        }
+
+                        if ($res) {
+                            Tools::redirectAdmin(self::$currentIndex.'&id_order='.$order->id.'&vieworder&conf=4&token='.$this->token);
                         } else {
-                            break;
+                            $this->errors[] = Tools::displayError('An error occurred during the OrderCartRule creation');
                         }
-                    }
-
-                    if ($res) {
-                        foreach ($cart_rules as $id_order_invoice => $cart_rule) {
-                            // Create OrderCartRule
-                            $order_cart_rule = new OrderCartRule();
-                            $order_cart_rule->id_order = $order->id;
-                            $order_cart_rule->id_cart_rule = $cart_rule['id'];
-                            $order_cart_rule->id_order_invoice = $id_order_invoice;
-                            $order_cart_rule->name = Tools::getValue('discount_name');
-                            $order_cart_rule->value = $cart_rule['value_tax_incl'];
-                            $order_cart_rule->value_tax_excl = $cart_rule['value_tax_excl'];
-                            $order_cart_rule->free_shipping = $cart_rule['free_shipping'];
-                            $res &= $order_cart_rule->add();
-
-                            $order->total_discounts += $order_cart_rule->value;
-                            $order->total_discounts_tax_incl += $order_cart_rule->value;
-                            $order->total_discounts_tax_excl += $order_cart_rule->value_tax_excl;
-                            $order->total_paid -= $order_cart_rule->value;
-                            $order->total_paid_tax_incl -= $order_cart_rule->value;
-                            $order->total_paid_tax_excl -= $order_cart_rule->value_tax_excl;
-                        }
-
-                        // Update Order
-                        $res &= $order->update();
-                    }
-
-                    if ($res) {
-                        Tools::redirectAdmin(self::$currentIndex.'&id_order='.$order->id.'&vieworder&conf=4&token='.$this->token);
-                    } else {
-                        $this->errors[] = Tools::displayError('An error occurred during the OrderCartRule creation');
                     }
                 }
             } else {
@@ -2429,7 +2413,7 @@ class AdminOrdersControllerCore extends AdminController
             $dateFrom = date(Context::getContext()->language->date_format_lite, strtotime('-2 day'));
             $dateTo = date(Context::getContext()->language->date_format_lite, strtotime('-1 day'));
             $helper->subtitle = sprintf($this->l('From %s to %s', null, null, false), $dateFrom, $dateTo);
-            $helper->href = $this->context->link->getAdminLink('AdminCarts').'&action=filterOnlyAbandonedCarts';
+            $helper->href = $this->context->link->getAdminLink('AdminCarts').'&action=filterOnlyAbandonedCarts&date_from='.$dateFrom.'&date_to='.$dateTo;
             $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=abandoned_cart';
             $helper->tooltip = $this->l('Total number of abandoned carts  in given period of time.', null, null, false);
             $kpis[] = $helper;
