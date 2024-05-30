@@ -92,7 +92,7 @@ class AdminCartsControllerCore extends AdminController
                 'type' => 'bool',
                 'havingFilter' => true,
                 'class' => 'fixed-width-xs',
-                'icon' => array(0 => 'icon-', 1 => 'icon-user')
+                'callback' => 'getOnlineStatus',
             )
         );
         $this->shopLinkType = 'shop';
@@ -159,6 +159,11 @@ class AdminCartsControllerCore extends AdminController
         $tpl->assign($smartyVars);
 
         return $tpl->fetch();
+    }
+
+    public function getOnlineStatus($status)
+    {
+        return $status ? $this->l('Yes') : $this->l('No');
     }
 
     public function initPageHeaderToolbar()
