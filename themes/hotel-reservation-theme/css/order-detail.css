@@ -86,10 +86,6 @@
     line-height: 27px;
 }
 
-.card.card-toolbar .card-header {
-    padding: 8px 18px;
-}
-
 .card .card-subheader {
     margin-bottom: 0;
     font-size: 14px;
@@ -211,6 +207,10 @@
     line-height: 16px;
 }
 
+.payment-details .detail-row .status .processing {
+    font-size: 16px;
+}
+
 .hotel-location p.hotel-address {
     font-size: 16px;
     line-height: 24px;
@@ -249,6 +249,10 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+}
+
+.room-details .card-header .booking-actions-wrap {
+    margin: -6px 0;
 }
 
 .room-details .card-header .booking-actions-wrap .col-xs-12 {

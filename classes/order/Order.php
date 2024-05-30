@@ -797,8 +797,9 @@ class OrderCore extends ObjectModel
 
     public function getTaxesAverageUsed()
     {
-        // @todo should use order table to get tax average
-        return Cart::getTaxesAverageUsed((int)$this->id_cart);
+        $cart = new Cart((int) $this->id_cart);
+
+        return $cart->getAverageProductsTaxRate() * 100;
     }
 
     /**
