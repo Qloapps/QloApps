@@ -25,6 +25,7 @@
 
         <div class="alert alert-info">
             {l s='Below, enter the base occupancy of this room type.'}
+            <p><b>{l s='Note'}</b>: {l s='Minimum 1 adult is madatory in the base occupancy of the room type'}</p>
         </div>
 
 		<div class="form-group">
