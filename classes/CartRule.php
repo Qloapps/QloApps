@@ -1154,6 +1154,18 @@ class CartRuleCore extends ObjectModel
                             $previous_reduction_amount = $prorata * $previous_reduction_amount * (1 + $cart_average_vat_rate);
                         }
 
+                        // First we convert the voucher value to the default currency
+                        $previousCartRuleCurrency = new Currency($this->reduction_currency);
+
+                        if ($previous_reduction_amount == 0 || $previousCartRuleCurrency->conversion_rate == 0) {
+                            $previous_reduction_amount = 0;
+                        } else {
+                            $previous_reduction_amount /= $previousCartRuleCurrency->conversion_rate;
+                        }
+
+                        // Then we convert the voucher value in the default currency into the cart currency
+                        $previous_reduction_amount *= $context->currency->conversion_rate;
+                        $previous_reduction_amount = Tools::ps_round($previous_reduction_amount, _PS_PRICE_COMPUTE_PRECISION_);
                         $current_cart_amount = max($current_cart_amount - (float)$previous_reduction_amount, 0);
                     }
 
