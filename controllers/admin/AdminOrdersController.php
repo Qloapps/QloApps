@@ -945,7 +945,10 @@ class AdminOrdersControllerCore extends AdminController
             $refundReqBookings = $objOrderReturn->getOrderRefundRequestedBookings($objOrder->id, 0, 1);
             if ($bookingOrderInfo = $objBookingDetail->getBookingDataByOrderId($objOrder->id)) {
                 foreach($bookingOrderInfo as $key => $booking) {
-                    if ((in_array($booking['id'], $refundReqBookings)) || $booking['is_refunded']) {
+                    if ((in_array($booking['id'], $refundReqBookings))
+                        || $booking['is_refunded']
+                        || $booking['id_status'] != HotelBookingDetail::STATUS_ALLOTED
+                    ) {
                         unset($bookingOrderInfo[$key]);
                     }
                 }
@@ -2822,7 +2825,6 @@ class AdminOrdersControllerCore extends AdminController
 
         $objHotelBookingDetail = new HotelBookingDetail();
         $htlBookingDetail = $objHotelBookingDetail->getOrderCurrentDataByOrderId($order->id);
-        $isCancelledRoom = in_array(1, array_column($htlBookingDetail, 'is_cancelled'));
 
         // hotel booking statuses
         $htlOrderStatus = HotelBookingDetail::getAllHotelOrderStatus();
@@ -2936,7 +2938,6 @@ class AdminOrdersControllerCore extends AdminController
                 'products' => $products,
                 'customer' => $customer)
             ),
-            'isCancelledRoom' => $isCancelledRoom,
             'orderDocuments' => $order->getDocuments(),
             'ROOM_STATUS_ALLOTED' => HotelBookingDetail::STATUS_ALLOTED,
             'ROOM_STATUS_CHECKED_IN' => HotelBookingDetail::STATUS_CHECKED_IN,

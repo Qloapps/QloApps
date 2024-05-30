@@ -102,7 +102,7 @@
                                             <th>{l s='Duration'}</th>
                                             <th>{l s='Documents'}</th>
                                             <th>{l s='Room Status'}</th>
-                                            <th>{l s='Action'}</th>
+                                            <th class="text-center">{l s='Action'}</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -133,7 +133,7 @@
                                                         {/if}
                                                     </td>
                                                     <td class="text-center">
-                                                        {if $data.is_refunded || $data.is_cancelled}
+                                                        {if isset($refundReqBookings) && $refundReqBookings && $data.id|in_array:$refundReqBookings && $data.is_refunded}
                                                             <span class="badge badge-danger">{if $data.is_cancelled}{l s='Cancelled'}{else}{l s='Refunded'}{/if}</span>
                                                         {else}
                                                             <a class="open_room_status_form btn btn-default" href="#" data-id_hotel_booking_detail="{$data['id']}" data-id_order="{$data['id_order']}" data-id_status="{$data['id_status']}" data-id_room="{$data['id_room']}" data-date_from="{$data['date_from']|date_format:"%Y-%m-%d"}" data-date_to="{$data['date_to']|date_format:"%Y-%m-%d"}" data-check_in_time="{$data['check_in_time']}" data-check_out_time="{$data['check_out_time']}">
