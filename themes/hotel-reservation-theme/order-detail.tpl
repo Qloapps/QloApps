@@ -116,13 +116,17 @@
                     <div class="detail-row">
                         <div class="pull-left title">{l s='Status'}</div>
                         <div class="pull-right value status">
-                            <span{if isset($order_history[0].color) && $order_history[0].color} style="background-color:{$order_history[0].color|escape:'html':'UTF-8'}30; border: 1px solid {$order_history[0].color|escape:'html':'UTF-8'};" {/if} class="label">
-                                {if $order_history[0].id_order_state|in_array:$overbooking_order_states}
-                                    {l s='Order Not Confirmed'}
-                                {else}
-                                    {$order_history[0].ostate_name|escape:'html':'UTF-8'}
-                                {/if}
-                            </span>
+                            {if isset($order_history[0]) && $order_history[0]}
+                                <span{if isset($order_history[0].color) && $order_history[0].color} style="background-color:{$order_history[0].color|escape:'html':'UTF-8'}30; border: 1px solid {$order_history[0].color|escape:'html':'UTF-8'};" {/if} class="label">
+                                    {if $order_history[0].id_order_state|in_array:$overbooking_order_states}
+                                        {l s='Order Not Confirmed'}
+                                    {else}
+                                        {$order_history[0].ostate_name|escape:'html':'UTF-8'}
+                                    {/if}
+                                </span>
+                            {else}
+                                <span class="processing">{l s='Processing'}</span>
+                            {/if}
                         </div>
                     </div>
 
@@ -499,13 +503,17 @@
                     <div class="detail-row">
                         <div class="pull-left title">{l s='Status'}</div>
                         <div class="pull-right value status">
-                            <span{if isset($order_history[0].color) && $order_history[0].color} style="background-color:{$order_history[0].color|escape:'html':'UTF-8'}30; border: 1px solid {$order_history[0].color|escape:'html':'UTF-8'};" {/if} class="label">
-                                {if $order_history[0].id_order_state|in_array:$overbooking_order_states}
-                                    {l s='Order Not Confirmed'}
-                                {else}
-                                    {$order_history[0].ostate_name|escape:'html':'UTF-8'}
-                                {/if}
-                            </span>
+                            {if isset($order_history[0]) && $order_history[0]}
+                                <span{if isset($order_history[0].color) && $order_history[0].color} style="background-color:{$order_history[0].color|escape:'html':'UTF-8'}30; border: 1px solid {$order_history[0].color|escape:'html':'UTF-8'};" {/if} class="label">
+                                    {if $order_history[0].id_order_state|in_array:$overbooking_order_states}
+                                        {l s='Order Not Confirmed'}
+                                    {else}
+                                        {$order_history[0].ostate_name|escape:'html':'UTF-8'}
+                                    {/if}
+                                </span>
+                            {else}
+                                <span class="processing">{l s='Processing'}</span>
+                            {/if}
                         </div>
                     </div>
 
