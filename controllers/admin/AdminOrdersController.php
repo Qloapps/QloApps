@@ -1612,9 +1612,21 @@ class AdminOrdersControllerCore extends AdminController
                 } elseif (!Validate::isUnsignedInt($payment_type)) {
                     $this->errors[] = Tools::displayError('Payment source is invalid');
                 // Amount cannot be less than paid amount by guest in negative price
-                } elseif ($amount < 0 && ($order->total_paid_real + $amount) < 0) {
-                    $this->errors[] = sprintf(Tools::displayError('Amount cannot be less than -%s'), Tools::displayPrice($order->total_paid_real, new Currency($order->id_currency)));
-                } else {
+                } elseif ($amount < 0) {
+                    if ($currency->id == $order->id_currency) {
+                        if (($order->total_paid_real + $amount) < 0) {
+                            $this->errors[] = sprintf(Tools::displayError('Amount cannot be less than -%s'), Tools::displayPrice($order->total_paid_real, new Currency($order->id_currency)));
+                        }
+                    } else {
+                        $convertedAmount = Tools::ps_round(Tools::convertPriceFull($amount, $currency, new Currency($order->id_currency)), 6);
+                        $convertedPaidAmount = Tools::ps_round(Tools::convertPriceFull($order->total_paid_real, new Currency($order->id_currency), $currency), 6);
+                        if (($order->total_paid_real + $convertedAmount) < 0) {
+                            $this->errors[] = sprintf(Tools::displayError('Amount cannot be less than -%s (-%s)'), Tools::displayPrice($convertedPaidAmount, $currency), Tools::displayPrice($order->total_paid_real, new Currency($order->id_currency)));
+                        }
+                    }
+                }
+
+                if (!count($this->errors)) {
                     if (!$order->addOrderPayment(
                         $amount,
                         Tools::getValue('payment_method'),
