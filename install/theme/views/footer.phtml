@@ -1,20 +1,20 @@
 	</div><!-- div id="sheet_step" -->
-</div><!-- div id="sheets" -->
-
-<div id="buttons">
-	<?php if (!$this->isLastStep()): ?>
-		<?php if ($this->next_button): ?>
-			<input id="btNext" class="button little" type="submit" name="submitNext" value="<?php echo $this->l('Next') ?>" />
-		<?php else: ?>
-			<input id="btNext" class="button little disabled" type="submit" name="submitNext" value="<?php echo $this->l('Next') ?>" disabled="disabled" />
+	<div id="buttons" class="clearfix">
+		<?php if (!$this->isLastStep()): ?>
+			<?php if ($this->next_button): ?>
+				<input id="btNext" class="button little" type="submit" name="submitNext" value="<?php echo $this->l('Next') ?>" />
+			<?php else: ?>
+				<input id="btNext" class="button little disabled" type="submit" name="submitNext" value="<?php echo $this->l('Next') ?>" disabled="disabled" />
+			<?php endif; ?>
 		<?php endif; ?>
-	<?php endif; ?>
 
-	<?php if (!$this->isFirstStep() && $this->previous_button): ?>
-		<input id="btBack" class="button little" type="submit" name="submitPrevious" value="<?php echo $this->l('Back') ?>" />
-	<?php endif; ?>
-</div>
+		<?php if (!$this->isFirstStep() && $this->previous_button): ?>
+			<input id="btBack" class="button little" type="submit" name="submitPrevious" value="<?php echo $this->l('Back') ?>" />
+		<?php endif; ?>
+	</div>
+</div><!-- div id="sheets" -->
 </form>
+
 <div id="phone_help">
 	<?php echo sprintf($this->l('If you need some assistance, you can <a href="%1$s" onclick="return !window.open(this.href);">get tailored help</a> from our support team. <a href="%2$s" onclick="return !window.open(this.href);">The official documentation</a> is also here to guide you.'), $this->getTailoredHelp(), $this->getDocumentationLink()) ?>
 </div>
