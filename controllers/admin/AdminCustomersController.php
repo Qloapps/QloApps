@@ -167,6 +167,7 @@ class AdminCustomersControllerCore extends AdminController
             'date_add' => array(
                 'title' => $this->l('Registration'),
                 'type' => 'date',
+                'filter_key' => 'a!date_add',
                 'align' => 'text-right'
             ),
             'connect' => array(
@@ -213,12 +214,6 @@ class AdminCustomersControllerCore extends AdminController
     public function postProcess()
     {
         if (!$this->can_add_customer && $this->display == 'add') {
-            $this->redirect_after = $this->context->link->getAdminLink('AdminCustomers');
-        }
-
-        if (Tools::getValue('frequent_customers')) {
-            $this->context->cookie->{'customerscustomerFilter_total_orders'} = json_encode(array(Configuration::get('PS_KPI_FREQUENT_CUSTOMER_NB_ORDERS'), ''));
-            $this->context->cookie->{'customerscustomerFilter_o!date_add'} = json_encode(array(date('Y-m-d', strtotime('-365 day')), date('Y-m-d')));
             $this->redirect_after = $this->context->link->getAdminLink('AdminCustomers');
         }
 
@@ -702,7 +697,7 @@ class AdminCustomersControllerCore extends AdminController
         $helper->color = 'color2';
         $helper->title = $this->l('Total Frequent Customers', null, null, false);
         $helper->subtitle = $this->l('1 year', null, null, false);
-        $helper->href = $this->context->link->getAdminLink('AdminCustomers').'&frequent_customers=1';
+        $helper->href = $this->context->link->getAdminLink('AdminCustomers').'&submitFiltercustomer=1&customerFilter_total_orders%5B0%5D='.Configuration::get('PS_KPI_FREQUENT_CUSTOMER_NB_ORDERS').'&customerFilter_o%21date_add%5B0%5D='.date('Y-m-d', strtotime('-365 day')).'&customerFilter_o%21date_add%5B1%5D='.date('Y-m-d');
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=total_frequent_customers';
         $helper->tooltip = $this->l('The total number of frequent customers in given period of time.', null, null, false);
         $kpis[] = $helper;

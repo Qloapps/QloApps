@@ -1845,7 +1845,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
                 WHERE hbd.`id_order` = o.`id_order` LIMIT 1
             ) AS id_hotel
             FROM `'._DB_PREFIX_.'orders` o
-            WHERE o.`valid` = 1 AND o.`invoice_date` BETWEEN "'.pSQL($dateFrom).' 00:00:00" AND "'.pSQL($dateTo).' 23:59:59"
+            WHERE o.`valid` = 1 AND o.`invoice_add` BETWEEN "'.pSQL($dateFrom).' 00:00:00" AND "'.pSQL($dateTo).' 23:59:59"
             GROUP BY o.`id_customer`
             HAVING 1 '.(!is_null($idHotel) ? HotelBranchInformation::addHotelRestriction($idHotel) : '').'
         ) AS t
