@@ -3077,7 +3077,7 @@ class AdminNormalProductsControllerCore extends AdminController
         } else {
             $address->id_country = (int)$address_infos['id_country'];
             $address->id_state = (int)$address_infos['id_state'];
-            $address->zipcode = $address_infos['postcode'];
+            $address->postcode = $address_infos['postcode'];
         }
         $tax_rules_groups = TaxRulesGroup::getTaxRulesGroups(true);
         $tax_rates = array(
