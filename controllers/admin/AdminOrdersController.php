@@ -779,6 +779,30 @@ class AdminOrdersControllerCore extends AdminController
         die(Tools::jsonEncode($response));
     }
 
+    public function ajaxProcessInitRoomAllotmentCommentModal()
+    {
+        $response['hasError'] = 1;
+        if (Validate::isLoadedObject($objBookingDetail = new HotelBookingDetail(Tools::getValue('id_hotel_booking')))) {
+            if ($objBookingDetail->booking_type == HotelBookingDetail::ALLOTMENT_MANUAL) {
+                // get booking information by order
+                $this->context->smarty->assign('comment', $objBookingDetail->comment);
+                $modal = array(
+                    'modal_id' => 'room-allotment-comment-modal',
+                    'modal_class' => 'modal-md order_detail_modal',
+                    'modal_title' => '<i class="icon icon-comment"></i> &nbsp'.$this->l('Room Manual Allotment Comment'),
+                    'modal_content' => $this->context->smarty->fetch('controllers/orders/modals/_room_allotment_comment.tpl'),
+                    'modal_actions' => array(),
+                );
+
+                $this->context->smarty->assign($modal);
+                $response['hasError'] = 0;
+                $response['modalHtml'] = $this->context->smarty->fetch('modal.tpl');
+            }
+        }
+
+        die(Tools::jsonEncode($response));
+    }
+
     public function ajaxProcessInitRoomReallocationModal()
     {
         // set modal details

@@ -125,7 +125,7 @@
                                                     </td>
                                                     <td>
                                                         {if $data['id_status'] == $hotel_order_status['STATUS_ALLOTED']['id_status']}
-                                                            {l s='Alloted'}
+                                                            {l s='Alloted'} {if $data['booking_type'] == HotelBookingDetail::ALLOTMENT_MANUAL}({l s='Manually'}){/if}
                                                         {elseif $data['id_status'] == $hotel_order_status['STATUS_CHECKED_IN']['id_status']}
                                                             <span class="text-danger room_status">{l s='Checked in on'} {dateFormat date=$data['check_in'] full=1}</span>
                                                         {elseif $data['id_status'] == $hotel_order_status['STATUS_CHECKED_OUT']['id_status']}
@@ -139,6 +139,10 @@
                                                             <a class="open_room_status_form btn btn-default" href="#" data-id_hotel_booking_detail="{$data['id']}" data-id_order="{$data['id_order']}" data-id_status="{$data['id_status']}" data-id_room="{$data['id_room']}" data-date_from="{$data['date_from']|date_format:"%Y-%m-%d"}" data-date_to="{$data['date_to']|date_format:"%Y-%m-%d"}" data-check_in_time="{$data['check_in_time']}" data-check_out_time="{$data['check_out_time']}">
                                                                 <i class="icon-pencil"></i>
                                                             </a>
+                                                        {/if}
+
+                                                        {if $data['booking_type'] == HotelBookingDetail::ALLOTMENT_MANUAL && $data['comment'] != ''}
+                                                            <a class="manual_allotment_comment btn btn-default" href="#" data-id_hotel_booking_detail="{$data['id']}"><i class="icon-comment"></i></a>
                                                         {/if}
                                                     </td>
                                                 </tr>

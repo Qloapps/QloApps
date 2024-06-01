@@ -1705,6 +1705,18 @@ $(document).ready(function() {
     // End: RoomStatusModal: Processes
     // ======================================
 
+
+    // Start: RoomAllotmentCommentModal: Processes
+    $(document).on('click', '.manual_allotment_comment', function(e){
+        e.preventDefault();
+
+        RoomAllotmentCommentModal.show(this);
+    });
+    // End: RoomAllotmentCommentModal: Processes
+    // ======================================
+
+
+
     // Start: RoomReallocationModal: Processes
     // For processing room reallocation and swapping
     $(document).on('click', '.room_reallocate_swap', function(e) {
@@ -2715,6 +2727,40 @@ const CancelRoomBookingModal = {
     },
     submit: function() {
         $('#initiateRefund').click();
+    }
+};
+
+// Modal object to handle comment on rooms for manual cancellation
+const RoomAllotmentCommentModal = {
+    show: function(element) {
+        $(".loading_overlay").show();
+        let idHtlBooking = parseInt($(element).attr('data-id_hotel_booking_detail'));
+        $.ajax({
+            type: 'POST',
+            headers: {
+                "cache-control": "no-cache"
+            },
+            url: admin_order_tab_link,
+            dataType: 'JSON',
+            cache: false,
+            data: 'ajax=true&id_hotel_booking='+idHtlBooking+'&action=initRoomAllotmentCommentModal',
+            success: function(result) {
+                if (result.hasError == 0 && result.modalHtml) {
+                    $('#footer').next('.bootstrap').append(result.modalHtml);
+
+                    $('#room-allotment-comment-modal').modal('show');
+
+                } else {
+                    showErrorMessage(txtSomeErr);
+                }
+            },
+            complete: function() {
+                $(".loading_overlay").hide();
+            }
+        });
+    },
+    close: function() {
+        $('#room-allotment-comment-modal').modal('hide');
     }
 };
 
