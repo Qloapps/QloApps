@@ -785,7 +785,7 @@
                     </div>
                 {/if}
 
-                <div class="panel">
+                <div class="panel panel-refund-request">
                     <div class="panel-heading">
                         <i class="icon-undo"></i> &nbsp;{l s='Refund Requests'}
                     </div>
@@ -816,7 +816,7 @@
                                                 <td>
                                                     <span class="badge" style="background-color:{$return_info.state_color}">{$return_info.state_name}</span>
                                                     {if $return_info.refunded_amount > 0}
-                                                        &nbsp;<span class="badge badge-success">{displayPrice price=$return_info.refunded_amount currency=$currency->id}</span>
+                                                        &nbsp;<span class="badge badge-success refunded_amount">{displayPrice price=$return_info.refunded_amount currency=$currency->id}</span>
                                                     {/if}
                                                 </td>
                                             </tr>
