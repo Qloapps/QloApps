@@ -262,15 +262,15 @@ class AdminStatsControllerCore extends AdminStatsTabController
             return $sales;
         } else {
             return Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue(
-                'SELECT SUM(total_paid_tax_excl / o.conversion_rate),
-                (
-                    SELECT hbd.`id_hotel`
-                    FROM`'._DB_PREFIX_.'htl_booking_detail` hbd
-                    WHERE hbd.`id_order` = o.`id_order` LIMIT 1
-                ) AS id_hotel
+                'SELECT SUM(total_paid_tax_excl / o.`conversion_rate`), t.`id_hotel`
                 FROM `'._DB_PREFIX_.'orders` o
                 LEFT JOIN `'._DB_PREFIX_.'order_state` os ON o.current_state = os.id_order_state
-                WHERE os.logable = 1'. (($date_from && $date_to) ? ' AND `invoice_date` BETWEEN "'.pSQL($date_from).' 00:00:00" AND "'.pSQL($date_to).' 23:59:59"' : '').' HAVING 1 '.HotelBranchInformation::addHotelRestriction($id_hotel)
+                LEFT JOIN (
+                    SELECT hbd.`id_hotel` as id_hotel, hbd.`id_order` as id_order
+                    FROM`'._DB_PREFIX_.'htl_booking_detail` hbd
+                    GROUP BY hbd.`id_order`
+                ) t ON (t.`id_order` = o.`id_order`)
+                WHERE os.logable = 1'. (($date_from && $date_to) ? ' AND `invoice_date` BETWEEN "'.pSQL($date_from).' 00:00:00" AND "'.pSQL($date_to).' 23:59:59"' : '').HotelBranchInformation::addHotelRestriction($id_hotel)
             );
         }
     }
@@ -287,7 +287,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
         if (!$distinct_products) {
             return '0%';
         }
-        return round(100 * $distinct_products / AdminStatsController::getTotalRoomTypes()).'%';
+        return round(100 * $distinct_products / AdminStatsControllerCore::getTotalRoomTypes()).'%';
     }
 
     public static function getOrders($date_from, $date_to, $granularity = false, $id_hotel = false)
@@ -402,7 +402,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
 
     public static function getMainCountry($date_from, $date_to)
     {
-        $total_orders = AdminStatsController::getOrders($date_from, $date_to);
+        $total_orders = AdminStatsControllerCore::getOrders($date_from, $date_to);
         if (!$total_orders) {
             return false;
         }
@@ -593,7 +593,8 @@ class AdminStatsControllerCore extends AdminStatsTabController
 
     public function displayAjaxGetKpi()
     {
-        $value = $this->getLatestKpiValue(Tools::getValue('kpi'));
+        ddd(Tools::getValue('id_hotels'));
+        $value = $this->getLatestKpiValue(Tools::getValue('kpi'), Tools::getValue('id_hotels'));
         if ($value !== false) {
             $array = array('value' => $value);
             if (isset($data)) {
@@ -604,7 +605,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
         die(json_encode(array('has_errors' => true)));
     }
 
-    public function getLatestKpiValue($kpi)
+    public function getLatestKpiValue($kpi, $idHotels)
     {
         $currency = new Currency(Configuration::get('PS_CURRENCY_DEFAULT'));
         $value = false;
@@ -612,17 +613,18 @@ class AdminStatsControllerCore extends AdminStatsTabController
             case 'conversion_rate':
                 $nbDaysConversionRate = Validate::isUnsignedInt(Configuration::get('PS_KPI_CONVERSION_RATE_NB_DAYS')) ? Configuration::get('PS_KPI_CONVERSION_RATE_NB_DAYS') : 30;
 
-                $visitors = AdminStatsController::getVisits(
+                $visitors = AdminStatsControllerCore::getVisits(
                     true,
                     date('Y-m-d', strtotime('-'.($nbDaysConversionRate + 1).' day')),
                     date('Y-m-d', strtotime('+1 day')),
                     false /*'day'*/
                 );
 
-                $orders = AdminStatsController::getOrders(
+                $orders = AdminStatsControllerCore::getOrders(
                     date('Y-m-d', strtotime('-'.($nbDaysConversionRate + 1).' day')),
                     date('Y-m-d', strtotime('-1 day')),
-                    false /*'day'*/
+                    false /*'day'*/,
+                    $idHotels
                 );
 
                 $visits_sum = $visitors; //array_sum($visitors);
@@ -640,7 +642,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
                 break;
 
             case 'abandoned_cart':
-                $value = AdminStatsController::getAbandonedCarts(
+                $value = AdminStatsControllerCore::getAbandonedCarts(
                     date('Y-m-d', strtotime('-2 day')).' 0:0:0',
                     date('Y-m-d', strtotime('-1 day')).' 23:59:59',
                     _TIME_1_DAY_
@@ -648,62 +650,62 @@ class AdminStatsControllerCore extends AdminStatsTabController
                 break;
 
             case 'installed_modules':
-                $value = AdminStatsController::getInstalledModules();
+                $value = AdminStatsControllerCore::getInstalledModules();
                 break;
 
             case 'disabled_modules':
-                $value = AdminStatsController::getDisabledModules();
+                $value = AdminStatsControllerCore::getDisabledModules();
                 break;
 
             case 'update_modules':
-                $value = AdminStatsController::getModulesToUpdate();
+                $value = AdminStatsControllerCore::getModulesToUpdate();
                 break;
 
             case 'percent_product_stock':
-                $value = AdminStatsController::getPercentProductStock();
+                $value = AdminStatsControllerCore::getPercentProductStock();
                 ConfigurationKPI::updateValue('PERCENT_PRODUCT_STOCK', $value);
                 ConfigurationKPI::updateValue('PERCENT_PRODUCT_STOCK_EXPIRE', strtotime('+4 hour'));
                 break;
 
             case 'percent_product_out_of_stock':
-                $value = AdminStatsController::getPercentProductOutOfStock();
+                $value = AdminStatsControllerCore::getPercentProductOutOfStock();
                 ConfigurationKPI::updateValue('PERCENT_PRODUCT_OUT_OF_STOCK', $value);
                 ConfigurationKPI::updateValue('PERCENT_PRODUCT_OUT_OF_STOCK_EXPIRE', strtotime('+4 hour'));
                 break;
 
             case 'product_avg_gross_margin':
-                $value = AdminStatsController::getProductAverageGrossMargin();
+                $value = AdminStatsControllerCore::getProductAverageGrossMargin();
                 break;
 
             case 'disabled_categories':
-                $value = AdminStatsController::getDisabledCategories();
+                $value = AdminStatsControllerCore::getDisabledCategories();
                 break;
 
             case 'disabled_room_types':
-                $value = AdminStatsController::getDisabledRoomTypes(0);
+                $value = AdminStatsControllerCore::getDisabledRoomTypes($idHotels);
                 ConfigurationKPI::updateValue('DISABLED_ROOM_TYPES', $value);
                 ConfigurationKPI::updateValue('DISABLED_ROOM_TYPES_EXPIRE', strtotime('+2 hour'));
                 break;
 
             case 'disabled_products':
-                if (AdminStatsController::getTotalProducts()) {
-                    $value = round(100 * AdminStatsController::getDisabledProducts() / AdminStatsController::getTotalProducts(), 2).'%';
+                if (AdminStatsControllerCore::getTotalProducts()) {
+                    $value = round(100 * AdminStatsControllerCore::getDisabledProducts() / AdminStatsControllerCore::getTotalProducts(), 2).'%';
                 } else {
                     $value = '0%';
                 }
                 break;
 
             case '8020_sales_catalog':
-                $value = AdminStatsController::get8020SalesCatalog(date('Y-m-d', strtotime('-30 days')), date('Y-m-d'));
+                $value = AdminStatsControllerCore::get8020SalesCatalog(date('Y-m-d', strtotime('-30 days')), date('Y-m-d'));
                 $value = sprintf($this->l('%d%% of your Catalog'), $value);
                 break;
 
             case 'empty_categories':
-                $value = AdminStatsController::getEmptyCategories();
+                $value = AdminStatsControllerCore::getEmptyCategories();
                 break;
 
             case 'customer_main_gender':
-                $value = AdminStatsController::getCustomerMainGender();
+                $value = AdminStatsControllerCore::getCustomerMainGender();
 
                 if ($value === false) {
                     $value = $this->l('No customers', null, null, false);
@@ -718,11 +720,11 @@ class AdminStatsControllerCore extends AdminStatsTabController
                 break;
 
             case 'pending_messages':
-                $value = (int)AdminStatsController::getPendingMessages();
+                $value = (int)AdminStatsControllerCore::getPendingMessages();
                 break;
 
             case 'avg_msg_response_time':
-                $value = AdminStatsController::getAverageMessageResponseTime(date('Y-m-d', strtotime('-31 day')), date('Y-m-d', strtotime('-1 day')), true);
+                $value = AdminStatsControllerCore::getAverageMessageResponseTime(date('Y-m-d', strtotime('-31 day')), date('Y-m-d', strtotime('-1 day')), true);
 
                 if ($value <= 0) {
                     $value = '--';
@@ -736,7 +738,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
                 break;
 
             case 'messages_per_thread':
-                $value = round(AdminStatsController::getMessagesPerThread(date('Y-m-d', strtotime('-31 day')), date('Y-m-d', strtotime('-1 day'))), 1);
+                $value = round(AdminStatsControllerCore::getMessagesPerThread(date('Y-m-d', strtotime('-31 day')), date('Y-m-d', strtotime('-1 day'))), 1);
                 break;
 
             case 'enabled_languages':
@@ -752,7 +754,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
                 break;
 
             case 'main_country':
-                if (!($row = AdminStatsController::getMainCountry(date('Y-m-d', strtotime('-30 day')), date('Y-m-d')))) {
+                if (!($row = AdminStatsControllerCore::getMainCountry(date('Y-m-d', strtotime('-30 day')), date('Y-m-d')))) {
                     $value = $this->l('No orders', null, null, false);
                 } else {
                     $country = new Country($row['id_country'], $this->context->language->id);
@@ -803,10 +805,10 @@ class AdminStatsControllerCore extends AdminStatsTabController
                 $date_from = date('Y-m-d', strtotime('-'.($daysForProfitPerVisitor + 1).' day'));
                 $date_to = date('Y-m-d', strtotime('-1 day'));
 
-                $total_visitors = AdminStatsController::getVisits(false, $date_from, $date_to);
-                $net_profits = AdminStatsController::getTotalSales($date_from, $date_to);
-                $net_profits -= AdminStatsController::getExpenses($date_from, $date_to);
-                $net_profits -= AdminStatsController::getPurchases($date_from, $date_to);
+                $total_visitors = AdminStatsControllerCore::getVisits(false, $date_from, $date_to);
+                $net_profits = AdminStatsControllerCore::getTotalSales($date_from, $date_to, false, $idHotels);
+                $net_profits -= AdminStatsControllerCore::getExpenses($date_from, $date_to, false, $idHotels);
+                $net_profits -= AdminStatsControllerCore::getPurchases($date_from, $date_to, false, $idHotels);
 
                 if ($total_visitors) {
                     $value = Tools::displayPrice($net_profits / $total_visitors, $currency);
@@ -819,13 +821,13 @@ class AdminStatsControllerCore extends AdminStatsTabController
                 break;
 
             case 'products_per_category':
-                $products = AdminStatsController::getTotalProducts();
-                $categories = AdminStatsController::getTotalCategories();
+                $products = AdminStatsControllerCore::getTotalProducts();
+                $categories = AdminStatsControllerCore::getTotalCategories();
                 $value = round($products / $categories);
                 break;
 
             case 'top_category':
-                if (!($id_category = AdminStatsController::getBestCategory(date('Y-m-d', strtotime('-1 month')), date('Y-m-d', strtotime('+1 month'))))) {
+                if (!($id_category = AdminStatsControllerCore::getBestCategory(date('Y-m-d', strtotime('-1 month')), date('Y-m-d', strtotime('+1 month'))))) {
                     $value = $this->l('No category', null, null, false);
                 } else {
                     $category = new Category($id_category, $this->context->language->id);
@@ -837,10 +839,10 @@ class AdminStatsControllerCore extends AdminStatsTabController
             case 'best_selling_room_type':
                 $nbDaysBestSelling = Validate::isUnsignedInt(Configuration::get('PS_KPI_BEST_SELLING_ROOM_TYPE_NB_DAYS')) ? Configuration::get('PS_KPI_BEST_SELLING_ROOM_TYPE_NB_DAYS') : 30;
 
-                if (!($idProduct = AdminStatsController::getBestSellingRoomType(
+                if (!($idProduct = AdminStatsControllerCore::getBestSellingRoomType(
                     date('Y-m-d', strtotime('-'.($nbDaysBestSelling + 1).' day')),
                     date('Y-m-d', strtotime('-1 day')),
-                    0
+                    $idHotels
                 ))) {
                     $value = $this->l('--', null, null, false);
                 } else {
@@ -851,42 +853,42 @@ class AdminStatsControllerCore extends AdminStatsTabController
                 break;
 
             case 'total_rooms':
-                $value = AdminStatsController::getTotalRooms(0);
+                $value = AdminStatsControllerCore::getTotalRooms($idHotels);
 
                 break;
 
             case 'occupied_rooms':
-                $value = AdminStatsController::getOccupiedRooms(0);
+                $value = AdminStatsControllerCore::getOccupiedRooms($idHotels);
 
                 break;
 
             case 'vacant_rooms':
-                $totalAvailableRooms = AdminStatsController::getAvailableRoomsForDiscreteDates(date('Y-m-d'), null, 0);
+                $totalAvailableRooms = AdminStatsControllerCore::getAvailableRoomsForDiscreteDates(date('Y-m-d'), null, $idHotels);
                 $totalAvailableRooms = $totalAvailableRooms[strtotime(date('Y-m-d'))];
-                $totalOccupiedRooms = AdminStatsController::getOccupiedRooms(0);
+                $totalOccupiedRooms = AdminStatsControllerCore::getOccupiedRooms($idHotels);
                 $value = $totalAvailableRooms - $totalOccupiedRooms;
 
                 break;
 
             case 'booked_rooms':
-                $value = AdminStatsController::getBookedRooms(0);
+                $value = AdminStatsControllerCore::getBookedRooms($idHotels);
 
                 break;
 
             case 'disabled_rooms':
-                $value = AdminStatsController::getDisabledRoomsForDiscreteDates(date('Y-m-d'), null, 0);
+                $value = AdminStatsControllerCore::getDisabledRoomsForDiscreteDates(date('Y-m-d'), null, $idHotels);
                 $value = $value[strtotime(date('Y-m-d'))];
 
                 break;
 
             case 'online_bookable_rooms':
-                $value = AdminStatsController::getAvailableRoomsForDiscreteDates(date('Y-m-d'), null, 0, 1);
+                $value = AdminStatsControllerCore::getAvailableRoomsForDiscreteDates(date('Y-m-d'), null, $idHotels, 1);
                 $value = $value[strtotime(date('Y-m-d'))];
 
                 break;
 
             case 'offline_bookable_rooms':
-                $value = AdminStatsController::getAvailableRoomsForDiscreteDates(date('Y-m-d'), null, 0);
+                $value = AdminStatsControllerCore::getAvailableRoomsForDiscreteDates(date('Y-m-d'), null, $idHotels);
                 $value = $value[strtotime(date('Y-m-d'))];
 
                 break;
@@ -894,17 +896,17 @@ class AdminStatsControllerCore extends AdminStatsTabController
             case 'total_frequent_customers':
                 $nbOrdersFrequentCustomers = Configuration::get('PS_KPI_FREQUENT_CUSTOMER_NB_ORDERS');
 
-                $value = AdminStatsController::getTotalFrequentCustomers($nbOrdersFrequentCustomers, 0);
+                $value = AdminStatsControllerCore::getTotalFrequentCustomers($nbOrdersFrequentCustomers, $idHotels);
 
                 break;
 
             case 'revenue_per_available_customer':
                 $nbDaysRevPac = Configuration::get('PS_KPI_REVPAC_NB_DAYS');
 
-                $value = AdminStatsController::getRevenuePerAvailableCustomer(
+                $value = AdminStatsControllerCore::getRevenuePerAvailableCustomer(
                     date('Y-m-d', strtotime('-'.($nbDaysRevPac + 1).' day')),
                     date('Y-m-d', strtotime('-1 day')),
-                    0
+                    $idHotels
                 );
 
                 $value = Tools::displayPrice($value, $currency);
@@ -912,23 +914,23 @@ class AdminStatsControllerCore extends AdminStatsTabController
                 break;
 
             case 'total_newsletter_registrations':
-                $value = AdminStatsController::getTotalNewsletterRegistrations();
+                $value = AdminStatsControllerCore::getTotalNewsletterRegistrations();
 
                 break;
 
             case 'total_new_customers':
                 $nbDaysNewCustomers = Validate::isUnsignedInt(Configuration::get('PS_KPI_NEW_CUSTOMERS_NB_DAYS')) ? Configuration::get('PS_KPI_NEW_CUSTOMERS_NB_DAYS') : 30;
 
-                $value = AdminStatsController::getTotalNewCustomers($nbDaysNewCustomers);
+                $value = AdminStatsControllerCore::getTotalNewCustomers($nbDaysNewCustomers);
 
                 break;
 
             case 'total_banned_customers':
-                $value = AdminStatsController::getTotalBannedCustomers();
+                $value = AdminStatsControllerCore::getTotalBannedCustomers();
 
                 break;
             case 'total_sales':
-                $totalSales = AdminStatsController::getTotalSales('', '', false, false, 1);
+                $totalSales = AdminStatsController::getTotalSales('', '', false, $idHotels);
                 if ($totalSales > 0) {
                     $value = Tools::displayPrice($totalSales, $currency);
                 } else {
@@ -938,24 +940,24 @@ class AdminStatsControllerCore extends AdminStatsTabController
             case 'today_arrivals':
                 $dateToday = date('Y-m-d');
                 $value = 0;
-                if ($arrivalsData = AdminStatsController::getArrivalsByDate($dateToday)) {
+                if ($arrivalsData = AdminStatsControllerCore::getArrivalsByDate($dateToday, $idHotels)) {
                     $value = $arrivalsData['total_arrivals'];
                 }
                 break;
             case 'today_departures':
                 $dateToday = date('Y-m-d');
                 $value = 0;
-                if ($departureData = AdminStatsController::getDeparturesByDate($dateToday)) {
+                if ($departureData = AdminStatsControllerCore::getDeparturesByDate($dateToday, $idHotels)) {
                     $value = $departureData['total_departures'];
                 }
                 break;
             case 'today_stay_over':
                 $dateToday = date('Y-m-d');
-                $value = AdminStatsController::getStayOversByDate($dateToday);
+                $value = AdminStatsControllerCore::getStayOversByDate($dateToday, $idHotels);
                 break;
             case 'total_due_amount':
                 $dateToday = date('Y-m-d');
-                $dueAmount = AdminStatsController::getTotalDueAmount('', '', false, 1);
+                $dueAmount = AdminStatsControllerCore::getTotalDueAmount('', '', $idHotels, 1);
                 if ($dueAmount > 0) {
                     $value = Tools::displayPrice($dueAmount, $currency);
                 } else {
@@ -964,11 +966,11 @@ class AdminStatsControllerCore extends AdminStatsTabController
                 break;
             case 'average_lead_time':
                 $dateToday = date('Y-m-d');
-                $value = Tools::ps_round(AdminStatsController::getAverageLeadTime(), 2);
+                $value = Tools::ps_round(AdminStatsControllerCore::getAverageLeadTime('', '', $idHotels), 2);
                 break;
             case 'average_guest_in_booking':
                 $dateToday = date('Y-m-d');
-                $value = AdminStatsController::getAverageGuestsPerBooking();
+                $value = AdminStatsControllerCore::getAverageGuestsPerBooking('', '', $idHotels);
                 $value = Tools::ps_round($value['avg_adults'], 2).''.$this->l('Adults').', '.Tools::ps_round($value['avg_children'], 2).''.$this->l('Children');
                 break;
             default:

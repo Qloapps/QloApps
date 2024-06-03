@@ -2312,7 +2312,7 @@ class AdminOrdersControllerCore extends AdminController
             $helper->color = 'color3';
             $helper->title = $this->l('Order Date');
             $helper->value = Tools::displayDate($objOrder->date_add);
-            $kpis[] = $helper;
+            $this->kpis[] = $helper;
 
             $helper = new HelperKpi();
             $helper->id = 'box-order-total';
@@ -2320,7 +2320,7 @@ class AdminOrdersControllerCore extends AdminController
             $helper->color = 'color4';
             $helper->title = $this->l('Total');
             $helper->value = Tools::displayPrice($objOrder->total_paid_tax_incl, new Currency($objOrder->id_currency));
-            $kpis[] = $helper;
+            $this->kpis[] = $helper;
 
             $helper = new HelperKpi();
             $helper->id = 'box-messages';
@@ -2329,7 +2329,7 @@ class AdminOrdersControllerCore extends AdminController
             $helper->title = $this->l('Messages');
             $helper->href = $this->context->link->getAdminLink('AdminCustomerThreads').'&id_order='.$objOrder->id;
             $helper->value = count(CustomerThread::getCustomerMessages($objOrder->id_customer, null, $objOrder->id));
-            $kpis[] = $helper;
+            $this->kpis[] = $helper;
 
             $objHotelBookingDetail = new HotelBookingDetail();
             $numRooms = count($objHotelBookingDetail->getBookingDataByOrderId($objOrder->id));
@@ -2340,11 +2340,7 @@ class AdminOrdersControllerCore extends AdminController
             $helper->title = $this->l('Total Rooms');
             $helper->href = '#start_products';
             $helper->value = $numRooms;
-            $kpis[] = $helper;
-
-            Hook::exec('action'.$this->controller_name.'KPIListingModifier', array(
-                'kpis' => &$kpis,
-            ));
+            $this->kpis[] = $helper;
         } else {
             $time = time();
             $kpis = array();
@@ -2356,7 +2352,7 @@ class AdminOrdersControllerCore extends AdminController
             $helper->title = $this->l('Total Sales', null, null, false);
             $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=total_sales';
             $helper->tooltip = $this->l('Total sales/revenue of all the orders created.', null, null, false);
-            $kpis[] = $helper;
+            $this->kpis[] = $helper;
 
             $helper = new HelperKpi();
             $helper->id = 'box-total-due-amount';
@@ -2366,7 +2362,7 @@ class AdminOrdersControllerCore extends AdminController
             $helper->href = $this->context->link->getAdminLink('AdminOrders').'&submitResetorder=1&due_amount_orders=1';
             $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=total_due_amount';
             $helper->tooltip = $this->l('Total due amount of all the orders created.', null, null, false);
-            $kpis[] = $helper;
+            $this->kpis[] = $helper;
 
             $arivalDate = date('Y-m-d');
             $helper = new HelperKpi();
@@ -2378,7 +2374,7 @@ class AdminOrdersControllerCore extends AdminController
             $helper->href = $this->context->link->getAdminLink('AdminOrders').'&orders_arrival_today=1';
             $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=today_arrivals';
             $helper->tooltip = $this->l('Total number of arrivals for today.', null, null, false);
-            $kpis[] = $helper;
+            $this->kpis[] = $helper;
 
             $departureDate = date('Y-m-d');
             $helper = new HelperKpi();
@@ -2390,7 +2386,7 @@ class AdminOrdersControllerCore extends AdminController
             $helper->href = $this->context->link->getAdminLink('AdminOrders').'&orders_departures_today=1';
             $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=today_departures';
             $helper->tooltip = $this->l('Total number of departures for today.', null, null, false);
-            $kpis[] = $helper;
+            $this->kpis[] = $helper;
 
             $dateFrom = date('Y-m-d');
             $dateTo = date('Y-m-d', strtotime('+1 day'));
@@ -2403,7 +2399,7 @@ class AdminOrdersControllerCore extends AdminController
             $helper->href = $this->context->link->getAdminLink('AdminOrders').'&orders_stay_over=1';
             $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=today_stay_over';
             $helper->tooltip = $this->l('Total number of stay overs for today.', null, null, false);
-            $kpis[] = $helper;
+            $this->kpis[] = $helper;
 
             $helper = new HelperKpi();
             $helper->id = 'box-carts';
@@ -2416,7 +2412,7 @@ class AdminOrdersControllerCore extends AdminController
             $helper->href = $this->context->link->getAdminLink('AdminCarts').'&action=filterOnlyAbandonedCarts&date_from='.$dateFrom.'&date_to='.$dateTo;
             $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=abandoned_cart';
             $helper->tooltip = $this->l('Total number of abandoned carts  in given period of time.', null, null, false);
-            $kpis[] = $helper;
+            $this->kpis[] = $helper;
 
             $daysForConversionRate = Configuration::get('PS_KPI_CONVERSION_RATE_NB_DAYS');
             $helper = new HelperKpi();
@@ -2427,7 +2423,7 @@ class AdminOrdersControllerCore extends AdminController
             $helper->subtitle = $daysForConversionRate.' '.$this->l('days', null, null, false);
             $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=conversion_rate';
             $helper->tooltip = $this->l('Percentage of visits that resulted in an order/booking in given period of time.', null, null, false);
-            $kpis[] = $helper;
+            $this->kpis[] = $helper;
 
             $daysForAvgOrderVal = Configuration::get('PS_ORDER_KPI_AVG_ORDER_VALUE_NB_DAYS');
             $helper = new HelperKpi();
@@ -2438,7 +2434,7 @@ class AdminOrdersControllerCore extends AdminController
             $helper->subtitle = $daysForAvgOrderVal.' '.$this->l('days', null, null, false);
             $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=average_order_value';
             $helper->tooltip = $this->l('Total average order value without tax in given period of time.', null, null, false);
-            $kpis[] = $helper;
+            $this->kpis[] = $helper;
 
             $helper = new HelperKpi();
             $helper->id = 'box-average-lead-time';
@@ -2447,7 +2443,7 @@ class AdminOrdersControllerCore extends AdminController
             $helper->title = $this->l('Average Lead Time', null, null, false);
             $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=average_lead_time';
             $helper->tooltip = $this->l('Average number of days between the time guests book their rooms and the time guest schedule to arrive at the hotel.', null, null, false);
-            $kpis[] = $helper;
+            $this->kpis[] = $helper;
 
             $helper = new HelperKpi();
             $helper->id = 'box-average-guest-in-booking';
@@ -2456,12 +2452,10 @@ class AdminOrdersControllerCore extends AdminController
             $helper->title = $this->l('Average Guest Per Booking', null, null, false);
             $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=average_guest_in_booking';
             $helper->tooltip = $this->l('Average number of guests per booking.', null, null, false);
-            $kpis[] = $helper;
+            $this->kpis[] = $helper;
         }
 
-        $helper = new HelperKpiRow();
-        $helper->kpis = $kpis;
-        return $helper->generate();
+        return parent::renderKpis();
     }
 
     public function renderView()

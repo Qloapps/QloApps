@@ -689,7 +689,7 @@ class AdminCustomersControllerCore extends AdminController
         $helper->subtitle = $this->l('All Time', null, null, false);
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=orders_per_customer';
         $helper->tooltip = $this->l('The average number of orders placed per customer in given period of time.', null, null, false);
-        $kpis[] = $helper;
+        $this->kpis[] = $helper;
 
         $helper = new HelperKpi();
         $helper->id = 'box-total-frequent-customers';
@@ -699,7 +699,7 @@ class AdminCustomersControllerCore extends AdminController
         $helper->subtitle = $this->l('All Time', null, null, false);
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=total_frequent_customers';
         $helper->tooltip = $this->l('The total number of frequent customers in given period of time.', null, null, false);
-        $kpis[] = $helper;
+        $this->kpis[] = $helper;
 
         $helper = new HelperKpi();
         $helper->id = 'box-revenue-per-available-customer';
@@ -710,7 +710,7 @@ class AdminCustomersControllerCore extends AdminController
         $helper->subtitle = sprintf($this->l('%d Days', null, null, false), (int) $nbDaysRevPac);
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=revenue_per_available_customer';
         $helper->tooltip = $this->l('Revenue per Available Customer (RevPAC) in given period of time.', null, null, false);
-        $kpis[] = $helper;
+        $this->kpis[] = $helper;
 
         $helper = new HelperKpi();
         $helper->id = 'box-total-newsletter-registrations';
@@ -720,7 +720,7 @@ class AdminCustomersControllerCore extends AdminController
         $helper->subtitle = $this->l('All Time', null, null, false);
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=total_newsletter_registrations';
         $helper->tooltip = $this->l('The total number of newsletter registrations in given period of time.', null, null, false);
-        $kpis[] = $helper;
+        $this->kpis[] = $helper;
 
         $helper = new HelperKpi();
         $helper->id = 'box-conversion-rate';
@@ -731,7 +731,7 @@ class AdminCustomersControllerCore extends AdminController
         $helper->subtitle = sprintf($this->l('%d Days', null, null, false), (int) $nbDaysConversionRate);
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=conversion_rate';
         $helper->tooltip = $this->l('The percentage of visitors who created a booking in given period of time.', null, null, false);
-        $kpis[] = $helper;
+        $this->kpis[] = $helper;
 
         $helper = new HelperKpi();
         $helper->id = 'box-total-new-customers';
@@ -742,7 +742,7 @@ class AdminCustomersControllerCore extends AdminController
         $helper->subtitle = sprintf($this->l('%d Days', null, null, false), (int) $nbDaysNewCustomers);
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=total_new_customers';
         $helper->tooltip = $this->l('The total number of new customers who registered in given period of time.', null, null, false);
-        $kpis[] = $helper;
+        $this->kpis[] = $helper;
 
         $helper = new HelperKpi();
         $helper->id = 'box-total-banned-customers';
@@ -752,7 +752,7 @@ class AdminCustomersControllerCore extends AdminController
         $helper->subtitle = $this->l('All Time', null, null, false);
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=total_banned_customers';
         $helper->tooltip = $this->l('The total number of banned customers.', null, null, false);
-        $kpis[] = $helper;
+        $this->kpis[] = $helper;
 
         $helper = new HelperKpi();
         $helper->id = 'box-gender';
@@ -762,15 +762,9 @@ class AdminCustomersControllerCore extends AdminController
         $helper->subtitle = $this->l('All Time', null, null, false);
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=customer_main_gender';
         $helper->tooltip = $this->l('The main gender from all the customers.', null, null, false);
-        $kpis[] = $helper;
+        $this->kpis[] = $helper;
 
-        Hook::exec('action'.$this->controller_name.'KPIListingModifier', array(
-            'kpis' => &$kpis,
-        ));
-
-        $helper = new HelperKpiRow();
-        $helper->kpis = $kpis;
-        return $helper->generate();
+        return parent::renderKpis();
     }
 
     public function renderView()

@@ -852,11 +852,19 @@ class HotelBranchInformation extends ObjectModel
             $idProfile = Context::getContext()->employee->id_profile;
         }
 
+        $accessedIds = self::getProfileAccessedHotels($idProfile, 1, 1);
         if (!$idsHotel) {
-            $idsHotel = self::getProfileAccessedHotels($idProfile, 1, 1);
+            $idsHotel = $accessedIds;
         } else {
-            $idsHotel = array($idsHotel);
+            if (!is_array($idsHotel)) {
+                $idsHotel = array($idsHotel);
+            }
+            // check if passed hotel id's are available for current employee
+            $idsHotel = array_filter($idsHotel, function ($idHotel) use($accessedIds)  {
+                return in_array($idHotel, $accessedIds);
+            });
         }
+
         $restriction = ' AND ';
         if (count($idsHotel)) {
             if ($alias) {
@@ -866,7 +874,7 @@ class HotelBranchInformation extends ObjectModel
             $identifier = "`$identifier`";
             $restriction .= $alias.$identifier.' IN ('.implode(', ', $idsHotel).') ';
         } else {
-            $restriction .= 1;
+            $restriction .= 0;
         }
 
         return $restriction;
