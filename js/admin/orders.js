@@ -306,10 +306,16 @@ function init()
 		e.preventDefault();
 	});
 
+    // voucher modal show and close
 	$('#add_voucher').unbind('click').click(function(e) {
 		e.preventDefault();
 		VoucherModal.show();
 	});
+
+    $(document).on('hidden.bs.modal', '#voucher-modal', function(){
+        $('#voucher-modal').remove();
+    });
+    // End: voucher modal show and close
 
 	$(document).on('change','#discount_type', function(e) {
 		// Percent type
@@ -342,10 +348,17 @@ function init()
 			$('select[name=discount_invoice]').attr('disabled', false);
 	});
 
+    // payment information modal show and close
 	$('.open_payment_information').unbind('click').click(function(e) {
 		e.preventDefault();
 		OrderPaymentDetailModal.show($(this));
 	});
+
+    $(document).on('hidden.bs.modal', '#payment-detail-modal', function(){
+        $('#payment-detail-modal').remove();
+    });
+    // End: payment information modal show and close
+
 
 	initRoomEvents();
 	initProductEvents();
@@ -1168,15 +1181,21 @@ function initRoomEvents()
 		e.preventDefault();
 	});
 
+    // order-payment-modal hide and show
 	$('#add_new_payment').on('click', function(e) {
 		e.preventDefault();
 		OrderPaymentModal.show();
 	});
 
+    $(document).on('hidden.bs.modal', '#order-payment-modal', function(){
+        $('#order-payment-modal').remove();
+    });
+
 	$('#cancle_add_payment').on('click', function(e) {
 		e.preventDefault();
 		OrderPaymentModal.hide();
 	});
+    // end order-payment-modal hide and show
 }
 function addRoomRefreshTotal() {
 	var quantity = parseInt($('#add_product_product_quantity').val());
@@ -1644,6 +1663,10 @@ $(document).ready(function() {
         DocumentNoteModal.show($(this));
     });
 
+    $(document).on('hidden.bs.modal', '#document-note-modal', function(){
+        $('#document-note-modal').remove();
+    });
+
     $(document).on('click', '.submitDocumentNote', function(e) {
         e.preventDefault();
         DocumentNoteModal.submit();
@@ -1656,6 +1679,10 @@ $(document).ready(function() {
     $(document).on('click', '#edit_guest_details', function(e) {
         e.preventDefault();
         TravellerModal.show();
+    });
+
+    $(document).on('hidden.bs.modal', '#traveller-modal', function(){
+        $('#traveller-modal').remove();
     });
 
     $(document).on('click', '.submitTravellerInfo', function(e) {
@@ -1698,6 +1725,10 @@ $(document).ready(function() {
         RoomStatusModal.show($(this));
     });
 
+    $(document).on('hidden.bs.modal', '#room-status-modal', function(){
+        $('#room-status-modal').remove();
+    });
+
     $(document).on('click', '.submitRoomStatus', function(e) {
         e.preventDefault();
         RoomStatusModal.submit();
@@ -1712,10 +1743,12 @@ $(document).ready(function() {
 
         RoomAllotmentCommentModal.show(this);
     });
+
+    $(document).on('hidden.bs.modal', '#room-allotment-comment-modal', function(){
+        $('#room-allotment-comment-modal').remove();
+    });
     // End: RoomAllotmentCommentModal: Processes
     // ======================================
-
-
 
     // Start: RoomReallocationModal: Processes
     // For processing room reallocation and swapping
@@ -1820,6 +1853,10 @@ $(document).ready(function() {
     $(document).on('click', '#page-header-desc-order-cancel', function(e) {
         e.preventDefault();
         CancelRoomBookingModal.show();
+    });
+
+    $(document).on('hidden.bs.modal', '#cancel-room-booking-modal', function(){
+        $('#cancel-room-booking-modal').remove();
     });
 
     $(document).on('click', '.submitCancelBooking', function(e) {
@@ -2304,17 +2341,24 @@ const RoomReallocationModal = {
             success: function(result) {
                 if (result.hasError == 0 && result.modalHtml) {
                     $('#footer').next('.bootstrap').append(result.modalHtml);
-
                     $(".modal_id_htl_booking").val(roomObj.data('id_htl_booking'));
                     $("input.modal_curr_room_num").val(roomObj.data('room_num'));
                     $("span.modal_curr_room_num").text(roomObj.data('room_num') + ', ' + roomObj.data('room_type_name'));
                     $(".cust_name").text(roomObj.data('cust_name'));
                     $(".cust_email").text(roomObj.data('cust_email'));
+                    $(".modal_curr_allotent_type").text(roomObj.data('allotment_type_label'));
 
                     // reset price difference fields
                     $("#reallocation_price_diff").val(0);
                     $("#reallocation_price_diff_block").hide();
                     $(".realloc_roomtype_change_message").hide();
+
+                    if (roomObj.data('allotment_type') == ALLOTMENT_MANUAL) {
+                        $(".allotment_comment_block .modal_curr_allotment_comment").text(roomObj.data('comment'));
+                        $(".allotment_comment_block").show();
+                    } else {
+                        $(".allotment_comment_block").hide();
+                    }
 
                     // For Rooms Swapping
                     var json_arr_rm_swp = roomObj.data('avail_rm_swap');

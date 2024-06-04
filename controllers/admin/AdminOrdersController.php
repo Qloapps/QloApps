@@ -2950,9 +2950,9 @@ class AdminOrdersControllerCore extends AdminController
             ),
             'isCancelledRoom' => $isCancelledRoom,
             'orderDocuments' => $order->getDocuments(),
-            'ROOM_STATUS_ALLOTED' => HotelBookingDetail::STATUS_ALLOTED,
             'ROOM_STATUS_CHECKED_IN' => HotelBookingDetail::STATUS_CHECKED_IN,
             'ROOM_STATUS_CHECKED_OUT' => HotelBookingDetail::STATUS_CHECKED_OUT,
+            'ALLOTMENT_MANUAL' => HotelBookingDetail::ALLOTMENT_MANUAL,
         );
 
         return parent::renderView();
