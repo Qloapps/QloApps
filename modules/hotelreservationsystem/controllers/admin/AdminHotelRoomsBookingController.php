@@ -412,8 +412,11 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
         $smartyVars['products_in_cart'] = $products_in_cart;
         $smartyVars['total_products_in_cart'] = (int)$rms_in_cart + (int)$products_in_cart;
         $cartAmountTotal = $this->context->cart->getOrderTotal(false);
+        $cartRoomsAmount  = $this->context->cart->getOrderTotal(false, cart::ONLY_ROOMS) + $this->context->cart->getOrderTotal(false, cart::ONLY_ROOM_SERVICES_WITHOUT_CONVENIENCE_FEE);
         $cartAmountConvenienceFee  = $this->context->cart->getOrderTotal(false, cart::ONLY_CONVENIENCE_FEE);
-        $smartyVars['cart_tamount'] = $cartAmountTotal - $cartAmountConvenienceFee;
+        $smartyVars['cart_rooms_amount'] = $cartRoomsAmount;
+        $smartyVars['cart_amount_convenience_fee'] = $cartAmountConvenienceFee;
+        $smartyVars['cart_tamount'] = $cartAmountTotal;
 
         $this->context->smarty->assign($smartyVars);
     }

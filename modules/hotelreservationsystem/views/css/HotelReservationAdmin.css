@@ -261,6 +261,10 @@ p.room_cat_data
     font-weight: 600;
     font-size: 13px!important;
 }
+.cart_amt_div .table tbody>tr>td, .cart_amt_div .table tbody>tr>th {
+    border: none;
+    padding: 2px 8px;
+}
 
 .margin-div
 {
@@ -323,7 +327,6 @@ p.room_cat_data
 .cart_table_container
 {
     max-height: 393px;
-    min-height: 150px;
     overflow-y: auto;
 }
 
