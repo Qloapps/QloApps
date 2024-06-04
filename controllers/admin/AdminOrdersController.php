@@ -2027,6 +2027,41 @@ class AdminOrdersControllerCore extends AdminController
                         }
                     }
 
+                    // update Order refund prices (order_return and order_return_detail)
+                    if ($orderReturns = OrderReturn::getOrdersReturn($order->id_customer, $order->id)) {
+                        $fields = array(
+                            'refunded_amount',
+                        );
+                        foreach ($orderReturns as $orderReturn) {
+                            $objOrderReturn = new OrderReturn($orderReturn['id_order_return']);
+                            foreach ($fields as $field) {
+                                $objOrderReturn->{$field} = Tools::convertPriceFull(
+                                    $objOrderReturn->{$field},
+                                    $old_currency,
+                                    $currency
+                                );
+                            }
+                            $objOrderReturn->update();
+                        }
+                    }
+
+                    if ($orderReturnDetails = OrderReturn::getOrdersReturnDetail($order->id)) {
+                        $fields = array(
+                            'refunded_amount',
+                        );
+                        foreach ($orderReturnDetails as $orderReturnDetail) {
+                            $objOrderReturnDetail = new OrderReturnDetail($orderReturnDetail['id_order_return_detail']);
+                            foreach ($fields as $field) {
+                                $objOrderReturnDetail->{$field} = Tools::convertPriceFull(
+                                    $objOrderReturnDetail->{$field},
+                                    $old_currency,
+                                    $currency
+                                );
+                            }
+                            $objOrderReturnDetail->update();
+                        }
+                    }
+
                     // If everything is updated, then redirect to view order with success message
                     Tools::redirectAdmin(self::$currentIndex.'&id_order='.$order->id.'&vieworder&conf=4&token='.$this->token);
                 } else {
