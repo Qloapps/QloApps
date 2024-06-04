@@ -83,15 +83,15 @@ class AdminMaintenanceControllerCore extends AdminController
         if (Tools::isSubmit('submitOptionsconfiguration')) {
             $shopEnable = Tools::getValue('PS_SHOP_ENABLE');
             $allowEmp = Tools::getValue('PS_ALLOW_EMP');
-            $allowEmpMaxTries = trim(Tools::getValue('PS_ALLOW_EMP_MAX_ATTEMPTS'));
+            $allowEmpMaxAttempts = trim(Tools::getValue('PS_ALLOW_EMP_MAX_ATTEMPTS'));
             $maintenanceIp = trim(Tools::getValue('PS_MAINTENANCE_IP'));
 
             // validations
             if (!$shopEnable && $allowEmp) {
-                if (!$allowEmpMaxTries) {
-                    $this->errors[] = $this->l('Maximum Tries is a required field.');
-                } elseif (!Validate::isUnsignedInt($allowEmpMaxTries)) {
-                    $this->errors[] = $this->l('Maximum Tries is invalid.');
+                if ($allowEmpMaxAttempts === '') {
+                    $this->errors[] = $this->l('Maximum Login Attempts is a required field.');
+                } elseif ($allowEmpMaxAttempts === '0' || !Validate::isUnsignedInt($allowEmpMaxAttempts)) {
+                    $this->errors[] = $this->l('Maximum Login Attempts is invalid.');
                 }
             }
 
@@ -104,7 +104,7 @@ class AdminMaintenanceControllerCore extends AdminController
                     Configuration::updateValue('PS_ALLOW_EMP', $allowEmp);
 
                     if ($allowEmp) {
-                        Configuration::updateValue('PS_ALLOW_EMP_MAX_ATTEMPTS', $allowEmpMaxTries);
+                        Configuration::updateValue('PS_ALLOW_EMP_MAX_ATTEMPTS', $allowEmpMaxAttempts);
                     }
                 }
 

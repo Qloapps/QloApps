@@ -42,12 +42,11 @@ class MaintenanceAccessCore extends ObjectModel
     {
         Db::getInstance()->execute(
             'DELETE FROM `' . _DB_PREFIX_ .'maintenance_access` ma
-            WHERE (ma.`email` = "'.$email.'" OR ma.`ip_address` = "'.$ipAddress.'")
-            AND ma.`date_add` > "'.date('Y-m-d H:i:s', strtotime('-'.MaintenanceAccess::LOGIN_ATTEMPTS_WINDOW.' minutes')).'"'
+            WHERE (ma.`email` = "'.$email.'" OR ma.`ip_address` = "'.$ipAddress.'")'
         );
     }
 
-    public function getAttemptsCount($email, $ipAddress)
+    public function getFailedAttemptsCount($email, $ipAddress)
     {
         return Db::getInstance()->getValue(
             'SELECT COUNT(ma.`id_maintenance_access`)
