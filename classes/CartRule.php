@@ -294,6 +294,13 @@ class CartRuleCore extends ObjectModel
             return array();
         }
 
+        // Remove cart rule that does not match the id_customer
+        foreach ($result as $key => $cart_rule) {
+            if ($cart_rule['id_customer'] && $cart_rule['id_customer'] != $id_customer) {
+                unset($result[$key]);
+            }
+        }
+
         // Remove cart rule that does not match the customer groups
         $customerGroups = Customer::getGroupsStatic($id_customer);
 
