@@ -157,7 +157,6 @@ class HotelOrderRefundRules extends ObjectModel
                         1,
                         1
                     );
-                    $paidAmount = $objHtlBooking->total_paid_amount + $totalDemandsPrice + $totalServicesPrice;
 
                     if ($refundRules = $objHtlRefundRules->getHotelRefundRules($objHtlBooking->id_hotel, 0, 1)) {
                         $orderCurrency = $objOrder->id_currency;
@@ -185,7 +184,7 @@ class HotelOrderRefundRules extends ObjectModel
 
                                 if ($refRule['payment_type'] == HotelOrderRefundRules::WK_REFUND_RULE_PAYMENT_TYPE_PERCENTAGE) {
                                     $bookingCancellationDetail['reduction_type'] = HotelOrderRefundRules::WK_REFUND_RULE_PAYMENT_TYPE_PERCENTAGE;
-                                    $bookingCancellationDetail['cancelation_charge'] = $paidAmount * ($refundValue / 100);
+                                    $bookingCancellationDetail['cancelation_charge'] = ($objHtlBooking->total_price_tax_incl + $totalDemandsPrice + $totalServicesPrice) * ($refundValue / 100);
                                 } else {
                                     $bookingCancellationDetail['reduction_type'] = HotelOrderRefundRules::WK_REFUND_RULE_PAYMENT_TYPE_FIXED;
                                     if ($defaultCurrency != $orderCurrency) {
@@ -196,11 +195,6 @@ class HotelOrderRefundRules extends ObjectModel
                                         );
                                     } else {
                                         $bookingCancellationDetail['cancelation_charge'] = $refundValue;
-                                    }
-
-                                    // if deduction amount is more than the order total cost
-                                    if ($bookingCancellationDetail['cancelation_charge'] > $paidAmount) {
-                                        $bookingCancellationDetail['cancelation_charge'] = $paidAmount;
                                     }
                                 }
 
