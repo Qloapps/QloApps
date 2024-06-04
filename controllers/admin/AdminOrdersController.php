@@ -2334,7 +2334,7 @@ class AdminOrdersControllerCore extends AdminController
             $helper->id = 'box-order-total';
             $helper->icon = 'icon-money';
             $helper->color = 'color3';
-            $helper->title = $this->l('Total');
+            $helper->title = $this->l('Bookings Total');
             $helper->value = Tools::displayPrice($objOrder->total_paid_tax_incl, new Currency($objOrder->id_currency));
             $kpis[] = $helper;
 
@@ -2399,6 +2399,18 @@ class AdminOrdersControllerCore extends AdminController
                 $helper->color = 'color4';
                 $helper->title = $this->l('Partial Payment Amount');
                 $helper->value = Tools::displayPrice($objOrder->advance_paid_amount, new Currency($objOrder->id_currency));
+                $kpis[] = $helper;
+            }
+
+            $objOrderReturn = new OrderReturn();
+            if ($refundReqBookings = $objOrderReturn->getOrderRefundRequestedBookings($objOrder->id, 0, 1)) {
+                $refundedAmount = $objOrderReturn->getRefundedAmount($objOrder->id);
+                $helper = new HelperKpi();
+                $helper->id = 'box-payment-type';
+                $helper->icon = 'icon-money';
+                $helper->color = 'color3';
+                $helper->title = $this->l('Refunded Amount');
+                $helper->value = Tools::displayPrice($refundedAmount, new Currency($objOrder->id_currency));
                 $kpis[] = $helper;
             }
         } else {
