@@ -32,10 +32,11 @@
             <div class="col-sm-3">
                 <div class="filter_dw_cont">
                     <button class="btn btn-default dropdown-toggle" type="button" id="price_ftr" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        <span class="pull-left sort_btn_span" data-sort-by="0" data-sort-value="0" data-sort-for="{l s='Price'}">{l s='Price'}</span>
+                        <span class="pull-left sort_btn_span" data-sort-by="0" data-sort-value="0" data-sort-for="{l s='Recommended'}">{l s='Recommended'}</span>
                         <span class="caret pull-right margin-top-7"></span>
                     </button>
                     <ul class="dropdown-menu" aria-labelledby="price_ftr">
+                        <li><a href="#" class="sort_result" data-sort-by="0" data-value="0">{l s='Recommended'}</a></li>
                         <li><a href="#" class="sort_result" data-sort-by="2" data-value="1">{l s='Price : Lowest First'}</a></li>
                         <li><a href="#" class="sort_result" data-sort-by="2" data-value="2">{l s='Price : Highest first '}</a></li>
                     </ul>
