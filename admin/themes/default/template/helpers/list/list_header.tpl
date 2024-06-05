@@ -167,7 +167,7 @@
 				$(form).find('table.table .field_optional').hide();
 				$(form).find('table.table .field_optional').each(function(i, val) {
 					if (list_fields_visibility.includes($(this).data('key'))) {
-						$(this).show();
+						$(this).css('display', '');
 					}
 				});
 				updateListVisibility(list_fields_visibility)
