@@ -62,7 +62,7 @@ class AdminMaintenanceControllerCore extends AdminController
                         'cast' => 'intval',
                         'type' => 'text',
                         'class' => 'fixed-width-xl',
-                        'desc' => $this->l('Set the number of maximum login attempts allowed in 30 minutes.'),
+                        'desc' => sprintf($this->l('Set the number of maximum login attempts allowed in %d minutes.'), MaintenanceAccess::LOGIN_ATTEMPTS_WINDOW),
                         'form_group_class' => ((Tools::getValue('PS_SHOP_ENABLE', Configuration::get('PS_SHOP_ENABLE'))) || !(Tools::getValue('PS_ALLOW_EMP', Configuration::get('PS_ALLOW_EMP')))) ? ' collapse' : '',
                     ),
                     'PS_MAINTENANCE_IP' => array(

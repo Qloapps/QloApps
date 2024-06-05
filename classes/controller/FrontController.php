@@ -820,9 +820,14 @@ class FrontControllerCore extends Controller
 
         if ($attemptsCount >= $maxAttempts) {
             if ($lastAttempt = $objMaintenanceAccess->getLastAttempt($email, $remoteIpAddress)) {
-                $minutesElapsed = round((time() - strtotime($lastAttempt['date_add'])) / 60);
+                $minutesElapsed = (int) ((time() - strtotime($lastAttempt['date_add'])) / 60);
+                $minutesLeft = MaintenanceAccess::LOGIN_ATTEMPTS_WINDOW - $minutesElapsed;
 
-                $this->errors[] = Tools::displayError(sprintf('You have reached the limit of login attempts, please try after %d minutes.', MaintenanceAccess::LOGIN_ATTEMPTS_WINDOW - $minutesElapsed));
+                if ($minutesLeft > 1) {
+                    $this->errors[] = Tools::displayError(sprintf('You have reached the limit of login attempts, please try after %d minutes.', $minutesLeft));
+                } else {
+                    $this->errors[] = Tools::displayError(sprintf('You have reached the limit of login attempts, please try after 1 minute.', $minutesLeft));
+                }
             }
         }
 
