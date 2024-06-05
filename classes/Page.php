@@ -128,4 +128,20 @@ class PageCore extends ObjectModel
             ));
         }
     }
+
+    public static function getPageTypeAlias($pageName)
+    {
+        $pageTypeAlias = array(
+			'index' => 'home',
+			'category' => 'hotel',
+			'product' => 'room-type',
+			'orderopc' => 'checkout'
+		);
+
+        if (isset($pageTypeAlias[$pageName])) {
+            return $pageTypeAlias[$pageName];
+        } else {
+            return $pageName;
+        }
+    }
 }

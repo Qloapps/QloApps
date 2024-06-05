@@ -42,21 +42,17 @@ class AdminCartsControllerCore extends AdminController
         $this->allow_export = true;
         $this->_orderWay = 'DESC';
         $this->context = Context::getContext();
-
         $this->_select = 'CONCAT(c.`firstname`, \' \', c.`lastname`) `customer`, a.id_cart total,
         TIME_TO_SEC(TIMEDIFF(\''.pSQL(date('Y-m-d H:i:00', time())).'\', a.`date_add`)) AS `time_diff`,
-        IFNULL(GROUP_CONCAT(o.`id_order`), 0) AS `ids_order`,
-        IF (IFNULL(o.id_order, \''.$this->l('Non ordered cart').'\') = \''.$this->l('Non ordered cart').'\', IF(TIME_TO_SEC(TIMEDIFF(\''.pSQL(date('Y-m-d H:i:00', time())).'\', a.`date_add`)) > 86400, \''.$this->l('Abandoned cart').'\', \''.$this->l('Non ordered cart').'\'), GROUP_CONCAT(o.`id_order`)) AS filter_ids_order,
+
+        IFNULL(GROUP_CONCAT(DISTINCT o.`id_order`), 0) AS `ids_order`,
+        IF (IFNULL(o.id_order, \''.$this->l('Non ordered cart').'\') = \''.$this->l('Non ordered cart').'\', IF(TIME_TO_SEC(TIMEDIFF(\''.pSQL(date('Y-m-d H:i:00', time())).'\', a.`date_add`)) > '._TIME_1_DAY_.', \''.$this->l('Abandoned cart').'\', \''.$this->l('Non ordered cart').'\'), GROUP_CONCAT(DISTINCT o.`id_order`)) AS filter_ids_order,
 		IF(o.id_order, 1, 0) badge_success, IF(o.id_order, 0, 1) badge_danger, IF(co.id_guest, 1, 0) id_guest';
         $this->_join = 'LEFT JOIN '._DB_PREFIX_.'customer c ON (c.id_customer = a.id_customer)
 		LEFT JOIN '._DB_PREFIX_.'currency cu ON (cu.id_currency = a.id_currency)
 		LEFT JOIN '._DB_PREFIX_.'orders o ON (o.id_cart = a.id_cart)
 		LEFT JOIN `'._DB_PREFIX_.'connections` co ON (a.id_guest = co.id_guest AND TIME_TO_SEC(TIMEDIFF(\''.pSQL(date('Y-m-d H:i:00', time())).'\', co.`date_add`)) < 1800)';
         $this->_group = ' GROUP BY a.`id_cart`';
-
-        if (Tools::getValue('action') == 'filterOnlyAbandonedCarts') {
-            $this->_filterHaving = ' AND `ids_order` = 0 AND `time_diff` > 86400';
-        }
 
         $this->fields_list = array(
             'id_cart' => array(
@@ -96,7 +92,7 @@ class AdminCartsControllerCore extends AdminController
                 'type' => 'bool',
                 'havingFilter' => true,
                 'class' => 'fixed-width-xs',
-                'icon' => array(0 => 'icon-', 1 => 'icon-user')
+                'callback' => 'getOnlineStatus',
             )
         );
         $this->shopLinkType = 'shop';
@@ -117,8 +113,30 @@ class AdminCartsControllerCore extends AdminController
         }
 
         parent::__construct();
-
         $this->list_no_link = true;
+    }
+
+    public function postProcess()
+    {
+        if (Tools::getValue('action') == 'filterOnlyAbandonedCarts') {
+            $this->processResetFilters();
+            $this->context->cookie->{'submitFilter'.$this->table} = true;
+            $prefix = $this->getCookieFilterPrefix();
+            $this->context->cookie->{$prefix.$this->table.'Filter_filter_ids_order'} = $this->l('Abandoned cart');
+            if (($dateFrom = Tools::getValue('date_from'))
+                && ($dateTo = Tools::getValue('date_to'))
+                && strtotime($dateTo) >= strtotime($dateFrom)
+            ) {
+                //Updating the date format of the filter dates to the required format.
+                $dateFrom = date('Y-m-d', strtotime($dateFrom));
+                $dateTo = date('Y-m-d', strtotime($dateTo));
+                $this->context->cookie->{$prefix.$this->table.'Filter_'.$this->fields_list['date_add']['filter_key']} = json_encode(array($dateFrom, $dateTo));
+            }
+
+            $this->redirect_after = $this->context->link->getAdminLink('AdminCarts');
+        }
+
+        parent::postProcess();
     }
 
     public function getOrderColumn($idsOrder, $tr)
@@ -129,7 +147,7 @@ class AdminCartsControllerCore extends AdminController
             $smartyVars['type'] = 'orders';
             $smartyVars['ids_order'] = $idsOrder;
         } else {
-            if ($tr['time_diff'] > 86400) {
+            if ($tr['time_diff'] > _TIME_1_DAY_) {
                 $smartyVars['type'] = 'abandoned';
             } else {
                 $smartyVars['type'] = 'non_orderd';
@@ -141,6 +159,11 @@ class AdminCartsControllerCore extends AdminController
         $tpl->assign($smartyVars);
 
         return $tpl->fetch();
+    }
+
+    public function getOnlineStatus($status)
+    {
+        return $status ? $this->l('Yes') : $this->l('No');
     }
 
     public function initPageHeaderToolbar()
@@ -161,13 +184,15 @@ class AdminCartsControllerCore extends AdminController
         $time = time();
         $kpis = array();
 
+        $daysForConversionRate = Configuration::get('PS_KPI_CONVERSION_RATE_NB_DAYS');
+
         $helper = new HelperKpi();
         $helper->id = 'box-conversion-rate';
         $helper->icon = 'icon-sort-by-attributes-alt';
         //$helper->chart = true;
         $helper->color = 'color1';
         $helper->title = $this->l('Conversion Rate', null, null, false);
-        $helper->subtitle = $this->l('30 days', null, null, false);
+        $helper->subtitle = $daysForConversionRate.' '.$this->l('days', null, null, false);
         if (ConfigurationKPI::get('CONVERSION_RATE_CHART') !== false) {
             $helper->data = ConfigurationKPI::get('CONVERSION_RATE_CHART');
         }
@@ -182,25 +207,27 @@ class AdminCartsControllerCore extends AdminController
         $date_from = date(Context::getContext()->language->date_format_lite, strtotime('-2 day'));
         $date_to = date(Context::getContext()->language->date_format_lite, strtotime('-1 day'));
         $helper->subtitle = sprintf($this->l('From %s to %s', null, null, false), $date_from, $date_to);
-        $helper->href = $this->context->link->getAdminLink('AdminCarts').'&action=filterOnlyAbandonedCarts';
+        $helper->href = $this->context->link->getAdminLink('AdminCarts').'&action=filterOnlyAbandonedCarts&date_from='.$date_from.'&date_to='.$date_to;
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=abandoned_cart';
         $kpis[] = $helper;
 
+        $daysForAvgOrderVal = Configuration::get('PS_ORDER_KPI_AVG_ORDER_VALUE_NB_DAYS');
         $helper = new HelperKpi();
         $helper->id = 'box-average-order';
         $helper->icon = 'icon-money';
         $helper->color = 'color3';
         $helper->title = $this->l('Average Order Value', null, null, false);
-        $helper->subtitle = $this->l('30 days', null, null, false);
+        $helper->subtitle = $daysForAvgOrderVal.' '.$this->l('days', null, null, false);
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=average_order_value';
         $kpis[] = $helper;
 
+        $daysForProfitPerVisitor = Configuration::get('PS_ORDER_KPI_PER_VISITOR_PROFIT_NB_DAYS');
         $helper = new HelperKpi();
         $helper->id = 'box-net-profit-visitor';
         $helper->icon = 'icon-user';
         $helper->color = 'color4';
         $helper->title = $this->l('Net Profit per Visitor', null, null, false);
-        $helper->subtitle = $this->l('30 days', null, null, false);
+        $helper->subtitle = $daysForProfitPerVisitor.' '.$this->l('days', null, null, false);
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=netprofit_visit';
         $kpis[] = $helper;
 
@@ -329,6 +356,11 @@ class AdminCartsControllerCore extends AdminController
     public function ajaxPreProcess()
     {
         if ($this->tabAccess['edit'] === '1') {
+            // prevent cart creation when kpi visibility or kpi view is updated.
+            // @todo: move the below cart creation process required function.
+            if (in_array(Tools::getValue('action'), array('changeKpiVisibility', 'saveKpiView'))) {
+                return;
+            }
             $id_customer = (int)Tools::getValue('id_customer');
             $customer = new Customer((int)$id_customer);
             $this->context->customer = $customer;

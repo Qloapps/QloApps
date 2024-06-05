@@ -80,7 +80,13 @@ class CacheMemcacheCore extends Cache
         if (!$this->is_connected) {
             return false;
         }
-        return $this->memcache->set($key, $value, 0, $ttl);
+        $result = $this->memcache->set($key, $value, 0, $ttl);
+
+        if ($result === false) {
+            $this->setAdjustTableCacheSize(true);
+        }
+
+        return $result;
     }
 
     /**

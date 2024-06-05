@@ -159,11 +159,13 @@ class WkRoomSearchHelper
                         $searchedData['location'] = $objLocationCategory->name;
                     } else {
                         $locationCategoryId = $objCategory->id_parent;
-                        $searchedData['location'] = $searchedData['htl_dtl']['city'];
-                        if (isset($searchedData['htl_dtl']['state_name'])) {
-                            $searchedData['location'] .= ', '.$searchedData['htl_dtl']['state_name'];
+                        if ($searchedData['htl_dtl']) {
+                            $searchedData['location'] = $searchedData['htl_dtl']['city'];
+                            if (isset($searchedData['htl_dtl']['state_name'])) {
+                                $searchedData['location'] .= ', '.$searchedData['htl_dtl']['state_name'];
+                            }
+                            $searchedData['location'] .= ', '.$searchedData['htl_dtl']['country_name'];
                         }
-                        $searchedData['location'] .= ', '.$searchedData['htl_dtl']['country_name'];
                     }
                     $searchedData['location_category_id'] = $locationCategoryId;
 

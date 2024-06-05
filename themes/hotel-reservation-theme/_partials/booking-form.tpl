@@ -87,7 +87,7 @@
                                                                         </div>
                                                                         <div class="text-right">
                                                                             <p>{displayPrice price=$product['price']}</p>
-                                                                            <a class="btn btn-sm btn-default remove_roomtype_product" data-id_product="{$product['id_product']}"><i class="icon-trash"></i></a>
+                                                                            <a class="btn btn-sm btn-default remove_roomtype_product" data-id-product="{$product['id_product']}"><i class="icon-trash"></i></a>
                                                                         </div>
                                                                     </div>
                                                                 {/foreach}

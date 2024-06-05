@@ -339,7 +339,7 @@ class InstallModelInstall extends InstallAbstractModel
             if (InstallSession::getInstance()->safe_mode) {
                 Language::checkAndAddLanguage($iso, false, true, $params_lang);
             } else {
-                Language::downloadAndInstallLanguagePack($iso, _PS_INSTALL_VERSION_, $params_lang);
+                Language::downloadAndInstallLanguagePack($iso, _QLO_INSTALL_VERSION_, $params_lang);
             }
 
             Language::loadLanguages();
@@ -697,6 +697,7 @@ class InstallModelInstall extends InstallAbstractModel
                 'statsbestvouchers',
                 'statsbestcustomers',
                 'statsequipment',
+                'qlostatsserviceproducts',
                 'blockcart',
                 'blockuserinfo',
                 'qlochannelmanagerconnector',

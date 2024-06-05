@@ -557,14 +557,22 @@ class HotelHelper
 
         // create service categories
         $categories = array(
-            'meals' => array(
-                'name' => 'Meals',
+            'restaurant' => array(
+                'name' => 'Restaurant',
                 'id_category' => 'to_be_set_below',
             ),
             'transfers' => array(
                 'name' => 'Transfers',
                 'id_category' => 'to_be_set_below',
-            )
+            ),
+            'activities' => array(
+                'name' => 'Activities',
+                'id_category' => 'to_be_set_below',
+            ),
+            'charges' => array(
+                'name' => 'Operational charges',
+                'id_category' => 'to_be_set_below',
+            ),
         );
 
         foreach ($categories as &$category) {
@@ -576,20 +584,22 @@ class HotelHelper
         $serviceProducts = array(
             array(
                 'name' => 'Room Maintenance Fees',
-                'id_category_default' => $idCategoryServices,
+                'id_category_default' => $categories['charges']['id_category'],
                 'description' => 'Ensure a comfortable stay with our room maintenance service, keeping your accommodation pristine and hassle-free throughout your visit.',
                 'price' => '250',
                 'auto_add_to_cart' => 1,
                 'show_at_front' => 0,
+                'price_calculation_method' => Product::PRICE_CALCULATION_METHOD_PER_DAY,
                 'price_addition_type' => Product::PRICE_ADDITION_TYPE_WITH_ROOM,
             ),
             array(
                 'name' => 'Internet Handling Charges',
-                'id_category_default' => $idCategoryServices,
+                'id_category_default' => $categories['charges']['id_category'],
                 'description' => 'Navigate our website effortlessly with seamless handling, ensuring reliable, high-speed access for an enjoyable browsing experience throughout your online journey.',
                 'price' => '250',
                 'auto_add_to_cart' => 1,
                 'show_at_front' => 0,
+                'price_calculation_method' => Product::PRICE_CALCULATION_METHOD_PER_BOOKING,
                 'price_addition_type' => Product::PRICE_ADDITION_TYPE_INDEPENDENT,
             ),
             array(
@@ -599,6 +609,7 @@ class HotelHelper
                 'price' => '50',
                 'auto_add_to_cart' => 0,
                 'show_at_front' => 1,
+                'price_calculation_method' => Product::PRICE_CALCULATION_METHOD_PER_BOOKING,
                 'price_addition_type' => Product::PRICE_ADDITION_TYPE_WITH_ROOM,
             ),
             array(
@@ -608,22 +619,28 @@ class HotelHelper
                 'price' => '200',
                 'auto_add_to_cart' => 0,
                 'show_at_front' => 1,
+                'price_calculation_method' => Product::PRICE_CALCULATION_METHOD_PER_BOOKING,
+                'price_addition_type' => Product::PRICE_ADDITION_TYPE_WITH_ROOM,
             ),
             array(
                 'name' => 'Breakfast',
-                'id_category_default' => $categories['meals']['id_category'],
+                'id_category_default' => $categories['restaurant']['id_category'],
                 'description' => 'Start your day right with a delicious and hearty breakfast, thoughtfully prepared to fuel your adventures and make your mornings exceptional.',
                 'price' => '350',
                 'auto_add_to_cart' => 0,
                 'show_at_front' => 1,
+                'price_calculation_method' => Product::PRICE_CALCULATION_METHOD_PER_DAY,
+                'price_addition_type' => Product::PRICE_ADDITION_TYPE_WITH_ROOM,
             ),
             array(
                 'name' => 'Dinner',
-                'id_category_default' => $categories['meals']['id_category'],
+                'id_category_default' => $categories['restaurant']['id_category'],
                 'description' => 'Wind down in the evening with a delectable dinner spread, offering a culinary journey that delights your taste buds and completes your day with satisfaction.',
                 'price' => '450',
                 'auto_add_to_cart' => 0,
                 'show_at_front' => 1,
+                'price_calculation_method' => Product::PRICE_CALCULATION_METHOD_PER_DAY,
+                'price_addition_type' => Product::PRICE_ADDITION_TYPE_WITH_ROOM,
             ),
         );
 
@@ -652,9 +669,8 @@ class HotelHelper
             $objProduct->auto_add_to_cart = $serviceProduct['auto_add_to_cart'];
             $objProduct->show_at_front = $serviceProduct['show_at_front'];
             $objProduct->available_for_order = 1;
-            if ($serviceProduct['auto_add_to_cart']) {
-                $objProduct->price_addition_type = $serviceProduct['price_addition_type'];
-            }
+            $objProduct->price_addition_type = $serviceProduct['price_addition_type'];
+            $objProduct->price_calculation_method = $serviceProduct['price_calculation_method'];
             $objProduct->is_virtual = 1;
             $objProduct->indexed = 1;
             $objProduct->save();

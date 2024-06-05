@@ -767,7 +767,6 @@ $(document).ready(function()
 		$(item).chosen({
 			disable_search_threshold: 5,
 			search_contains: true,
-			inherit_select_classes: true,
 		});
 	});
 	// Apply chosen() when modal is loaded
@@ -1701,9 +1700,9 @@ function loadRecommendation()
 			token: token
 		},
 		success: function(res) {
-			if (res.success && res.content && res.content.trim()) {
+			if (res.success && res.html && res.html.trim()) {
 				$('#recommendation-wrapper-skeleton').fadeIn('slow');
-				$('#recommendation-wrapper').html(res.content);
+				$('#recommendation-wrapper').html(res.html);
 				let images = $('#recommendation-wrapper img');
 				let loaded = 0;
 				let total = $(images).length;

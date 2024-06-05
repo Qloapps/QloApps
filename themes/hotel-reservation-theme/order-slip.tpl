@@ -62,7 +62,7 @@
 							</span>
 						</td>
 						<td class="history_method">
-							<a class="color-myaccount" href="javascript:showOrder(1, {$slip.id_order|intval}, '{$link->getPageLink('order-detail')|escape:'html':'UTF-8'}');">
+							<a class="color-myaccount" href="{$link->getPageLink('order-detail', true, NULL, "id_order={$slip.id_order|intval}")|escape:'html':'UTF-8'}" target="_blank">
 								#{$slip.id_order|string_format:"%06d"}
 							</a>
 						</td>
