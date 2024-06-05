@@ -53,7 +53,7 @@
 						{/if}
 						{if $discountDetail.reduction_amount > 0}
 							{if $discountDetail.reduction_percent > 0} + {/if}
-							{convertPrice price=$discountDetail.reduction_amount} ({if $discountDetail.reduction_tax == 1}{l s='Tax included'}{else}{l s='Tax excluded'}{/if})
+							{displayPrice price=$discountDetail.reduction_amount currency=$discountDetail.reduction_currency} ({if $discountDetail.reduction_tax == 1}{l s='Tax included'}{else}{l s='Tax excluded'}{/if})
 						{/if}
 						{if $discountDetail.free_shipping}
 							{if $discountDetail.reduction_percent > 0 || $discountDetail.reduction_amount > 0} + {/if}
@@ -73,7 +73,7 @@
 						{if $discountDetail.minimal == 0}
 							{l s='None'}
 						{else}
-							{convertPrice price=$discountDetail.minimal} ({if $discountDetail.minimum_amount_tax == 1}{l s='Tax included'}{else}{l s='Tax excluded'}{/if})
+							{displayPrice price=$discountDetail.minimal currency=$discountDetail.reduction_currency} ({if $discountDetail.minimum_amount_tax == 1}{l s='Tax included'}{else}{l s='Tax excluded'}{/if})
 						{/if}
 					</td>
 					<td class="discount_cumulative">

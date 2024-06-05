@@ -42,6 +42,9 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
             $objCart = new Cart($this->context->cookie->id_cart);
             if (Validate::isLoadedObject($objCart) && !$objCart->orderExists()) {
                 $this->context->cart = $objCart;
+
+                // validate cart for removing invalid data from cart
+                HotelCartBookingData::validateCartBookings();
             } else {
                 $this->context->cookie->id_cart = 0; // remove invalid id_cart
                 $this->context->cart = new Cart();
@@ -63,15 +66,6 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
         $objCustomer->id_guest = (int) $this->context->cookie->id_guest;
 
         $this->context->customer = $objCustomer;
-        if ($this->context->employee->isSuperAdmin()) {
-            $backOrderConfigKey = 'PS_BACKDATE_ORDER_SUPERADMIN';
-        } else {
-            $backOrderConfigKey = 'PS_BACKDATE_ORDER_EMPLOYEES';
-        }
-        if (!Configuration::get($backOrderConfigKey)) {
-            $htlCart = new HotelCartBookingData();
-            $htlCart->removeBackdateRoomsFromCart($this->context->cart->id);
-        }
     }
 
     protected function createNewCart()
@@ -819,19 +813,6 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
             $objHotelRoomType = new HotelRoomType();
             foreach ($booking_data['rm_data'] as $key_bk_data => $value_bk_data) {
                 $booking_data['rm_data'][$key_bk_data]['room_type_info'] = $objHotelRoomType->getRoomTypeInfoByIdProduct($value_bk_data['id_product']);
-
-                // set default occupancies in required format
-                $occupancy = array(
-                    array(
-                        'adults' => $value_bk_data['adults'],
-                        'children' => 0,
-                        'child_ages' => array(),
-                    ),
-                );
-
-                $booking_data['rm_data'][$key_bk_data]['occupancies'] = $occupancy;
-                $booking_data['rm_data'][$key_bk_data]['occupancy_adults'] = $booking_data['rm_data'][$key_bk_data]['adults']; // only one room by default
-
                 if (isset($value_bk_data['data']['booked']) && $value_bk_data['data']['booked']) {
                     foreach ($value_bk_data['data']['booked'] as $booked_k1 => $booked_v1) {
                         if (isset($booked_v1['detail']) && $booked_v1['detail']) {
