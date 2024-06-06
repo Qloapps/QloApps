@@ -630,11 +630,23 @@ class AdminOrdersControllerCore extends AdminController
                     $payment_methods[] = $module->displayName;
                 }
             }
+
+            // Set the order currency at first element of currencies
+            if ($currencies = Currency::getCurrenciesByIdShop($objOrder->id_shop)) {
+                foreach ($currencies as $key => $currency) {
+                    if ($currency['id_currency'] == $objOrder->id_currency) {
+                        unset($currencies[$key]);
+                        array_unshift($currencies, $currency);
+                        break;
+                    }
+                }
+            }
+
             $this->context->smarty->assign(
                 array(
                     'current_index' => self::$currentIndex,
                     'order' => $objOrder,
-                    'currencies' => Currency::getCurrenciesByIdShop($objOrder->id_shop),
+                    'currencies' => $currencies,
                     'payment_methods' => $payment_methods,
                     'payment_types' => $this->getPaymentsTypes(),
                     'invoices_collection' => $objOrder->getInvoicesCollection(),
