@@ -2515,13 +2515,6 @@ const AddRoomBookingModal = {
                                     $('#new_product .booking_guest_occupancy').removeClass('disabled');
                                     setRoomTypeGuestOccupancy($('#new_product .booking_occupancy_wrapper'));
                                 }
-                                if (data.room_type_info) {
-                                    $('#new_product .max_adults').val(data.room_type_info.max_adults);
-                                    $('#new_product .max_children').val(data.room_type_info.max_children);
-                                    $('#new_product .max_guests').val(data.room_type_info.max_guests);
-                                    $('#new_product .num_adults').attr('max', data.room_type_info.max_adults);
-                                    $('#new_product .num_children').attr('max', data.room_type_info.max_children);
-                                }
 
                                 // Keep product variable
                                 current_product = data;
