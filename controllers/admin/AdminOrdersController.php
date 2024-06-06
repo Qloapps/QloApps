@@ -2019,7 +2019,7 @@ class AdminOrdersControllerCore extends AdminController
                     switch (Tools::getValue('discount_type')) {
                         // Percent type
                         case 1:
-                            if ($discount_value < 100) {
+                            if ($discount_value <= 100) {
                                 if (isset($order_invoice)) {
                                     $cart_rules[$order_invoice->id]['value_tax_incl'] = Tools::ps_round($order_invoice->total_paid_tax_incl * $discount_value / 100, 2);
                                     $cart_rules[$order_invoice->id]['value_tax_excl'] = Tools::ps_round($order_invoice->total_paid_tax_excl * $discount_value / 100, 2);
