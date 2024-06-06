@@ -1040,28 +1040,13 @@ class AdminOrdersControllerCore extends AdminController
                         if (!Validate::isLoadedObject($order)) {
                             $this->errors[] = sprintf(Tools::displayError('Order #%d cannot be loaded'), $id_order);
                         } else {
-                            $current_order_state = $order->getCurrentOrderState();
-                            if ($current_order_state->id == $order_state->id) {
-                                $this->errors[] = $this->displayWarning(sprintf('Order #%d has already been assigned this status.', $id_order));
-                            } else {
-                                $history = new OrderHistory();
-                                $history->id_order = $order->id;
-                                $history->id_employee = (int)$this->context->employee->id;
-
-                                $use_existings_payment = !$order->hasInvoice();
-                                $history->changeIdOrderState((int)$order_state->id, $order, $use_existings_payment);
-
-                                $carrier = new Carrier($order->id_carrier, $order->id_lang);
-                                $templateVars = array();
-
-                                if ($history->addWithemail(true, $templateVars)) {
-                                    if (Configuration::get('PS_ADVANCED_STOCK_MANAGEMENT')) {
-                                        foreach ($order->getProducts() as $product) {
-                                            if (StockAvailable::dependsOnStock($product['product_id'])) {
-                                                StockAvailable::synchronize($product['product_id'], (int)$product['id_shop']);
-                                            }
-                                        }
-                                    }
+                            $result = $order->changeOrderStatus();
+                            if (!$result['status']) {
+                                if (isset($result['has_mail_error']) && $result['has_mail_error']) {
+                                    $this->errors[] = sprintf(
+                                        Tools::displayError('Unable to send email to the customer while changing order status for order #%d.'),
+                                        $id_order
+                                    );
                                 } else {
                                     $this->errors[] = sprintf(Tools::displayError('Cannot change status for order #%d.'), $id_order);
                                 }
@@ -1070,6 +1055,7 @@ class AdminOrdersControllerCore extends AdminController
                     }
                 }
             }
+
             if (!count($this->errors)) {
                 Tools::redirectAdmin(self::$currentIndex.'&conf=4&token='.$this->token);
             }
@@ -1275,115 +1261,11 @@ class AdminOrdersControllerCore extends AdminController
         /* Change order status, add a new entry in order history and send an e-mail to the customer if needed */
         elseif (Tools::isSubmit('submitState') && isset($order)) {
             if ($this->tabAccess['edit'] === '1') {
-                $order_state = new OrderState(Tools::getValue('id_order_state'));
-
-                if (!Validate::isLoadedObject($order_state)) {
-                    $this->errors[] = Tools::displayError('The new order status is invalid.');
+                $result = $order->changeOrderStatus();
+                if ($result['status']) {
+                    Tools::redirectAdmin(self::$currentIndex.'&id_order='.(int)$order->id.'&conf=5&vieworder&token='.$this->token);
                 } else {
-                    $current_order_state = $order->getCurrentOrderState();
-
-                    if ($current_order_state->id == Configuration::get('PS_OS_REFUND')) {
-                        $this->errors[] = Tools::displayError('Order status can not be changed once order status is set to Refunded.');
-                    } elseif ($current_order_state->id == Configuration::get('PS_OS_CANCELED')) {
-                        $this->errors[] = Tools::displayError('Order status can not be changed once order status is set to Cancelled.');
-                    } elseif (in_array($order_state->id, array (Configuration::get('PS_OS_OVERBOOKING_PAID'), Configuration::get('PS_OS_OVERBOOKING_UNPAID'), Configuration::get('PS_OS_OVERBOOKING_PARTIAL_PAID')))) {
-                        $objHotelBooking = new HotelBookingDetail();
-                        if (!$objHotelBooking->getOverbookedRooms($order->id)) {
-                            $this->errors[] = Tools::displayError('Order status can not be changed to any overbooking status as there are no overbooked rooms in the order.');
-                        }
-                    } elseif ($order_state->id == Configuration::get('PS_OS_REFUND')
-                        && !$order->hasCompletelyRefunded(Order::ORDER_COMPLETE_REFUND_FLAG)
-                    ) {
-                        $this->errors[] = Tools::displayError('Order status can not be set to Refunded until all bookings in the order are completely refunded.');
-                    } elseif ($order_state->id == Configuration::get('PS_OS_CANCELED')
-                        && !$order->hasCompletelyRefunded(Order::ORDER_COMPLETE_CANCELLATION_FLAG)
-                    ) {
-                        $this->errors[] = Tools::displayError('Order status can not be set to Cancelled until all bookings in the order are cancelled.');
-                    } elseif ($current_order_state->id == Configuration::get('PS_OS_ERROR') && !($order_state->id == Configuration::get('PS_OS_ERROR'))) {
-                        // All rooms must be available before changing status from Payment Error to Other status in which rooms are getting blocked again
-                        $objHotelBooking = new HotelBookingDetail();
-                        if ($orderBookings = $objHotelBooking->getOrderCurrentDataByOrderId($order->id)) {
-                            foreach ($orderBookings as $orderBooking) {
-                                // If booking is refunded then no need to check inventory
-                                if ((OrderReturn::getOrdersReturnDetail($order->id, 0, $orderBooking['id']) && $orderBooking['is_refunded'])
-                                    || ($orderBooking['is_cancelled'] && $orderBooking['is_refunded'])
-                                ) {
-                                    continue;
-                                } else {
-                                    // if inventory is available for that booking
-                                    $bookingParams = array(
-                                        'date_from' => $orderBooking['date_from'],
-                                        'date_to' => $orderBooking['date_to'],
-                                        'hotel_id' => $orderBooking['id_hotel'],
-                                        'id_room_type' => $orderBooking['id_product'],
-                                        'only_search_data' => 1
-                                    );
-
-                                    $objHotelBookingDetail = new HotelBookingDetail($orderBooking['id']);
-                                    if ($searchRoomsInfo = $objHotelBooking->getBookingData($bookingParams)) {
-                                        if (isset($searchRoomsInfo['rm_data'][$orderBooking['id_product']]['data']['available'])
-                                            && $searchRoomsInfo['rm_data'][$orderBooking['id_product']]['data']['available']
-                                        ) {
-                                            $availableRoomsInfo = $searchRoomsInfo['rm_data'][$orderBooking['id_product']]['data']['available'];
-                                            if ($roomIdsAvailable = array_column($availableRoomsInfo, 'id_room')) {
-                                                // Check If room is still there in the available rooms list
-                                                if (!in_array($orderBooking['id_room'], $roomIdsAvailable)) {
-                                                    $this->errors[] = Tools::displayError('You can not change the order status as some rooms are not available now in this order. You can reallocate/swap rooms with other rooms to make rooms available and then change the order status.');
-
-                                                    break;
-                                                } else {
-                                                    $objHotelBookingDetail->is_refunded = 0;
-                                                    $objHotelBookingDetail->save();
-                                                }
-                                            } else {
-                                                $this->errors[] = Tools::displayError('You can not change the order status as some rooms are not available now in this order. You can reallocate/swap rooms with other rooms to make rooms available and then change the order status.');
-                                                break;
-                                            }
-                                        }
-                                    } else {
-                                        $this->errors[] = Tools::displayError('You can not change the order status as some rooms are not available now in this order. You can reallocate/swap rooms with other rooms to make rooms available and then change the order status.');
-
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-                    } elseif ($current_order_state->id == $order_state->id) {
-                        $this->errors[] = Tools::displayError('The order has already been assigned this status.');
-                    }
-
-                    // If no errors then we change the order status
-                    if (!count($this->errors)) {
-                        // Create new OrderHistory
-                        $history = new OrderHistory();
-                        $history->id_order = $order->id;
-                        $history->id_employee = (int)$this->context->employee->id;
-
-                        $use_existings_payment = false;
-                        if (!$order->hasInvoice()) {
-                            $use_existings_payment = true;
-                        }
-                        $history->changeIdOrderState((int)$order_state->id, $order, $use_existings_payment);
-
-                        $carrier = new Carrier($order->id_carrier, $order->id_lang);
-                        $templateVars = array();
-
-                        // Save all changes
-                        if ($history->addWithemail(true, $templateVars)) {
-                            // synchronizes quantities if needed..
-                            if (Configuration::get('PS_ADVANCED_STOCK_MANAGEMENT')) {
-                                foreach ($order->getProducts() as $product) {
-                                    if (StockAvailable::dependsOnStock($product['product_id'])) {
-                                        StockAvailable::synchronize($product['product_id'], (int)$product['id_shop']);
-                                    }
-                                }
-                            }
-
-                            Tools::redirectAdmin(self::$currentIndex.'&id_order='.(int)$order->id.'&conf=5&vieworder&token='.$this->token);
-                        }
-
-                        $this->errors[] = Tools::displayError('An error occurred while changing order status, or we were unable to send an email to the customer.');
-                    }
+                    $this->errors = array_merge($this->errors, $result['errors']);
                 }
             } else {
                 $this->errors[] = Tools::displayError('You do not have permission to edit this.');
