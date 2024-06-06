@@ -910,6 +910,10 @@ class AdminOrdersControllerCore extends AdminController
                 $smartyVars['roomTypeServiceProducts'] = $roomTypeServiceProducts;
             }
 
+            $objOrderReturn = new OrderReturn();
+            $refundReqBookings = $objOrderReturn->getOrderRefundRequestedBookings($objOrder->id, 0, 1);
+            $smartyVars['refundReqBookings'] = $refundReqBookings;
+
             $this->context->smarty->assign($smartyVars);
 
             $modal = array(
@@ -4463,103 +4467,6 @@ class AdminOrdersControllerCore extends AdminController
         $children = $occupancy['children'];
         $child_ages = $occupancy['child_ages'];
 
-        /*By webkul to validate fields before deleting the cart and order data form the tables*/
-        if ($id_hotel == '') {
-            die(json_encode(array(
-                'result' => false,
-                'error' => Tools::displayError('Hotel Id is mising.'),
-            )));
-        } elseif ($id_room == '') {
-            die(json_encode(array(
-                'result' => false,
-                'error' => Tools::displayError('Room Id is missing.'),
-            )));
-        } elseif ($new_date_from == '') {
-            die(json_encode(array(
-                'result' => false,
-                'error' => Tools::displayError('Please Enter Check In Date.'),
-            )));
-        } elseif (!Validate::isDateFormat($new_date_from)) {
-            die(json_encode(array(
-                'result' => false,
-                'error' => Tools::displayError('Please Enter a Valid Check In Date.'),
-            )));
-        } elseif ($new_date_to == '') {
-            die(json_encode(array(
-                'result' => false,
-                'error' => Tools::displayError('Please Enter Check Out Date.'),
-            )));
-        } elseif (!Validate::isDateFormat($new_date_to)) {
-            die(json_encode(array(
-                'result' => false,
-                'error' => Tools::displayError('Please Enter a valid Check out Date.'),
-            )));
-        } elseif ($new_date_from < $curr_date) {
-            die(json_encode(array(
-                'result' => false,
-                'error' => Tools::displayError('Check In date should not be after current date.'),
-            )));
-        } elseif ($new_date_to <= $new_date_from) {
-            die(json_encode(array(
-                'result' => false,
-                'error' => Tools::displayError('Check out Date Should be after Check In date.'),
-            )));
-        } elseif ($room_unit_price == '') {
-            die(json_encode(array(
-                'result' => false,
-                'error' => Tools::displayError('Please enter unit price.'),
-            )));
-        } elseif (!Validate::isPrice($room_unit_price)) {
-            die(json_encode(array(
-                'result' => false,
-                'error' => Tools::displayError('Please enter a valid unit price.'),
-            )));
-        } elseif (!Validate::isUnsignedInt($product_quantity)) {
-            die(json_encode(array(
-                'result' => false,
-                'error' => Tools::displayError('Invalid quantity.'),
-            )));
-        }
-
-        // validations if order is with occupancy
-        if (!isset($adults) || !$adults || !Validate::isUnsignedInt($adults)) {
-            die(json_encode(array(
-                'result' => false,
-                'error' => Tools::displayError('Invalid number of adults.'),
-            )));
-        } elseif (!Validate::isUnsignedInt($children)) {
-            die(json_encode(array(
-                'result' => false,
-                'error' => Tools::displayError('Invalid number of children.'),
-            )));
-        }
-
-        if ($children > 0) {
-            if (!isset($child_ages) || ($children != count($child_ages))) {
-                die(json_encode(array(
-                    'result' => false,
-                    'error' => Tools::displayError('Please provide all children age.'),
-                )));
-            } else {
-                foreach($child_ages as $childAge) {
-                    if (!Validate::isUnsignedInt($childAge)) {
-                        die(json_encode(array(
-                            'result' => false,
-                            'error' => Tools::displayError('Invalid children age.'),
-                        )));
-                    }
-                }
-            }
-        }
-
-        $rooms_booked = $obj_booking_detail->getRoomBookinInformationForDateRangeByOrder($id_room, $old_date_from, $old_date_to, $new_date_from, $new_date_to);
-        if ($rooms_booked) {
-            die(json_encode(array(
-                'result' => false,
-                'error' => Tools::displayError('This Room Unavailable For Selected Duration.'),
-            )));
-        }
-
         // By webkul to calculate rates of the product from hotelreservationsystem tables with feature prices....
         // add feature price for updated price
 
@@ -5505,8 +5412,48 @@ class AdminOrdersControllerCore extends AdminController
     {
         $this->doEditValidation($order_detail, $order, $order_invoice);
 
+        $id_hotel_booking = Tools::getValue('id_booking_detail');
         $product_price_tax_incl = str_replace(',', '.', Tools::getValue('product_price_tax_incl'));
         $product_price_tax_excl = str_replace(',', '.', Tools::getValue('product_price_tax_excl'));
+        $product_informations = $_POST['edit_product'];
+        $new_date_from = trim(date('Y-m-d', strtotime($product_informations['date_from'])));
+        $new_date_to = trim(date('Y-m-d', strtotime($product_informations['date_to'])));
+        $old_date_from = date('Y-m-d', strtotime(trim(Tools::getValue('date_from'))));
+        $old_date_to = date('Y-m-d', strtotime(trim(Tools::getValue('date_to'))));
+        $id_hotel = trim(Tools::getValue('id_hotel'));
+        $id_room = trim(Tools::getValue('id_room'));
+        $id_product = trim(Tools::getValue('id_product'));
+        $room_unit_price = trim(Tools::getValue('room_unit_price'));
+        $obj_booking_detail = new HotelBookingDetail();
+        $product_quantity = (int) $obj_booking_detail->getNumberOfDays($new_date_from, $new_date_to);
+        $old_product_quantity =  (int) $obj_booking_detail->getNumberOfDays($old_date_from, $old_date_to);
+        $qty_diff = $product_quantity - $old_product_quantity;
+        $occupancy = array_shift(Tools::getValue('occupancy'));
+        $adults = $occupancy['adults'];
+        $children = $occupancy['children'];
+        $child_ages = $occupancy['child_ages'];
+
+        // If order is refunded, the validate changes which are not allowed
+        $objOrderReturn = new OrderReturn();
+        $refundReqBookings = $objOrderReturn->getOrderRefundRequestedBookings($order->id, 0, 1);
+        if ($refundReqBookings && (in_array($id_hotel_booking, $refundReqBookings))) {
+            $objBookingDetail = new HotelBookingDetail($id_hotel_booking);
+            // If order is cancelled, we can't edit order
+            if ($objBookingDetail->is_refunded && $objBookingDetail->is_cancelled) {
+                die(json_encode(array(
+                    'result' => false,
+                    'error' => Tools::displayError('Booking cannot be edited if booking is cancelled.'),
+                )));
+            // If order is refunded, we can't edit dates
+            } elseif ($objBookingDetail->is_refunded
+                && (strtotime($old_date_from) != strtotime($new_date_from) || strtotime($old_date_to) != strtotime($new_date_to))
+            ) {
+                die(json_encode(array(
+                    'result' => false,
+                    'error' => Tools::displayError('Check-In/Check-Out dates cannot be changed if booking is refunded.'),
+                )));
+            }
+        }
 
         if (!Validate::isPrice($product_price_tax_incl) || !Validate::isPrice($product_price_tax_excl)) {
             die(json_encode(array(
@@ -5515,46 +5462,89 @@ class AdminOrdersControllerCore extends AdminController
             )));
         }
 
-        $product_informations = Tools::getValue('edit_product');
-        $old_date_from = date('Y-m-d', strtotime(trim(Tools::getValue('date_from'))));
-        $old_date_to = date('Y-m-d', strtotime(trim(Tools::getValue('date_to'))));
-        $new_date_from = trim(date('Y-m-d', strtotime($product_informations['date_from'])));
-        $new_date_to = trim(date('Y-m-d', strtotime($product_informations['date_to'])));
-        $obj_booking_detail = new HotelBookingDetail();
-        $product_quantity = (int) $obj_booking_detail->getNumberOfDays($new_date_from, $new_date_to);
-        $id_room = Tools::getValue('id_room');
-
-        if (trim(Tools::getValue('id_hotel')) == '') {
+        if ($id_hotel == '') {
             die(json_encode(array(
                 'result' => false,
                 'error' => Tools::displayError('Hotel Id is mising.'),
             )));
-        } elseif (trim($id_room) == '') {
+        } elseif ($id_room == '') {
             die(json_encode(array(
                 'result' => false,
                 'error' => Tools::displayError('Room Id is missing.'),
             )));
-        } elseif (trim(date('Y-m-d', strtotime($product_informations['date_from']))) == '') {
+        } elseif ($new_date_from == '') {
             die(json_encode(array(
                 'result' => false,
-                'error' => Tools::displayError('Please enter check-in date.'),
+                'error' => Tools::displayError('Please enter Check-In date.'),
             )));
         } elseif (!Validate::isDateFormat($new_date_from)) {
             die(json_encode(array(
                 'result' => false,
-                'error' => Tools::displayError('Please enter a valid check-in date.'),
+                'error' => Tools::displayError('Please enter a valid Check-In date.'),
             )));
         } elseif ($new_date_to == '') {
             die(json_encode(array(
                 'result' => false,
-                'error' => Tools::displayError('Please enter check-out date.'),
+                'error' => Tools::displayError('Please enter Check-Out date.'),
             )));
         } elseif (!Validate::isDateFormat($new_date_to)) {
             die(json_encode(array(
                 'result' => false,
-                'error' => Tools::displayError('Please enter a valid check-out date.'),
+                'error' => Tools::displayError('Please enter a valid Check-out date.'),
+            )));
+        } elseif ($new_date_to <= $new_date_from) {
+            die(json_encode(array(
+                'result' => false,
+                'error' => Tools::displayError('Check-out date should be after Check-In date.'),
+            )));
+        } elseif ($room_unit_price == '') {
+            die(json_encode(array(
+                'result' => false,
+                'error' => Tools::displayError('Please enter unit price.'),
+            )));
+        } elseif (!Validate::isPrice($room_unit_price)) {
+            die(json_encode(array(
+                'result' => false,
+                'error' => Tools::displayError('Please enter a valid unit price.'),
+            )));
+        } elseif (!Validate::isUnsignedInt($product_quantity)) {
+            die(json_encode(array(
+                'result' => false,
+                'error' => Tools::displayError('Invalid quantity.'),
             )));
         }
+
+        // validations if order is with occupancy
+        if (!isset($adults) || !$adults || !Validate::isUnsignedInt($adults)) {
+            die(json_encode(array(
+                'result' => false,
+                'error' => Tools::displayError('Invalid number of adults.'),
+            )));
+        } elseif (!Validate::isUnsignedInt($children)) {
+            die(json_encode(array(
+                'result' => false,
+                'error' => Tools::displayError('Invalid number of children.'),
+            )));
+        }
+
+        if ($children > 0) {
+            if (!isset($child_ages) || ($children != count($child_ages))) {
+                die(json_encode(array(
+                    'result' => false,
+                    'error' => Tools::displayError('Please provide all children age.'),
+                )));
+            } else {
+                foreach($child_ages as $childAge) {
+                    if (!Validate::isUnsignedInt($childAge)) {
+                        die(json_encode(array(
+                            'result' => false,
+                            'error' => Tools::displayError('Invalid children age.'),
+                        )));
+                    }
+                }
+            }
+        }
+
         if ($this->context->employee->isSuperAdmin()) {
             $backOrderConfigKey = 'PS_BACKDATE_ORDER_SUPERADMIN';
         } else {
@@ -5565,24 +5555,18 @@ class AdminOrdersControllerCore extends AdminController
             if ($new_date_from < $compareDate) {
                 die(json_encode(array(
                     'result' => false,
-                    'error' => sprintf(Tools::displayError('Check-in date should not be date before %s.'),$compareDate)
+                    'error' => sprintf(Tools::displayError('Check-In date should not be date before %s.'),$compareDate)
                 )));
             }
         }
-        if ($new_date_to <= $new_date_from) {
-            die(json_encode(array(
-                'result' => false,
-                'error' => Tools::displayError('Check-out date should be after check-in date.'),
-            )));
-        } elseif (!Validate::isUnsignedInt($product_quantity)) {
-            die(json_encode(array(
-                'result' => false,
-                'error' => Tools::displayError('Invalid quantity.'),
-            )));
-        }
 
-        $rooms_booked = $obj_booking_detail->getRoomBookinInformationForDateRangeByOrder($id_room, $old_date_from, $old_date_to, $new_date_from, $new_date_to);
-        if ($rooms_booked) {
+        if ($rooms_booked = $obj_booking_detail->getRoomBookinInformationForDateRangeByOrder(
+            $id_room,
+            $old_date_from,
+            $old_date_to,
+            $new_date_from,
+            $new_date_to
+        )) {
             die(json_encode(array(
                 'result' => false,
                 'error' => Tools::displayError('This room is unavailable for selected duration.'),
