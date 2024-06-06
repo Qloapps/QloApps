@@ -828,7 +828,7 @@ class FrontControllerCore extends Controller
                         if ($minutesLeft > 1) {
                             $this->errors[] = Tools::displayError(sprintf('You have reached the limit of login attempts, please try after %d minutes.', $minutesLeft));
                         } elseif ($minutesLeft == 1) {
-                            $this->errors[] = Tools::displayError(sprintf('You have reached the limit of login attempts, please try after 1 minute.', $minutesLeft));
+                            $this->errors[] = Tools::displayError(sprintf('You have reached the limit of login attempts, please try after %d minute.', $minutesLeft));
                         }
                     }
                 }
@@ -887,7 +887,11 @@ class FrontControllerCore extends Controller
                                     $this->errors[] = Tools::displayError(sprintf('%d attempt left.', ($maxAttempts - $attemptsCount - 1)));
                                 }
                             } else {
-                                $this->errors[] = Tools::displayError(sprintf('You have reached the limit of login attempts, please try after %d minutes.', MaintenanceAccess::LOGIN_ATTEMPTS_WINDOW));
+                                if (MaintenanceAccess::LOGIN_ATTEMPTS_WINDOW > 1) {
+                                    $this->errors[] = Tools::displayError(sprintf('You have reached the limit of login attempts, please try after %d minutes.', MaintenanceAccess::LOGIN_ATTEMPTS_WINDOW));
+                                } else {
+                                    $this->errors[] = Tools::displayError(sprintf('You have reached the limit of login attempts, please try after %d minute.', MaintenanceAccess::LOGIN_ATTEMPTS_WINDOW));
+                                }
                             }
                         }
                     }
