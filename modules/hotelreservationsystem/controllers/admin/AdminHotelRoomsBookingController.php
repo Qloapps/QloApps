@@ -813,19 +813,6 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
             $objHotelRoomType = new HotelRoomType();
             foreach ($booking_data['rm_data'] as $key_bk_data => $value_bk_data) {
                 $booking_data['rm_data'][$key_bk_data]['room_type_info'] = $objHotelRoomType->getRoomTypeInfoByIdProduct($value_bk_data['id_product']);
-
-                // set default occupancies in required format
-                $occupancy = array(
-                    array(
-                        'adults' => $value_bk_data['adults'],
-                        'children' => 0,
-                        'child_ages' => array(),
-                    ),
-                );
-
-                $booking_data['rm_data'][$key_bk_data]['occupancies'] = $occupancy;
-                $booking_data['rm_data'][$key_bk_data]['occupancy_adults'] = $booking_data['rm_data'][$key_bk_data]['adults']; // only one room by default
-
                 if (isset($value_bk_data['data']['booked']) && $value_bk_data['data']['booked']) {
                     foreach ($value_bk_data['data']['booked'] as $booked_k1 => $booked_v1) {
                         if (isset($booked_v1['detail']) && $booked_v1['detail']) {
