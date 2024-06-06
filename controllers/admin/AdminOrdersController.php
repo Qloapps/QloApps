@@ -5371,20 +5371,23 @@ class AdminOrdersControllerCore extends AdminController
         // update order detail for selected aditional services
         foreach ($selectedAdditonalServices['additional_services'] as $service) {
             $serviceOrderDetail = new OrderDetail($service['id_order_detail']);
-            if ($service['quantity'] >= $serviceOrderDetail->product_quantity) {
+
+            $cart_quantity = $service['quantity'];
+            if ($service['product_price_calculation_method'] == Product::PRICE_CALCULATION_METHOD_PER_DAY) {
+                $cart_quantity = $cart_quantity * $product_quantity;
+            }
+            if ($cart_quantity >= $serviceOrderDetail->product_quantity) {
                 $serviceOrderDetail->delete();
             } else {
-                $order_detail->total_price_tax_incl -= Tools::ps_round($service['total_price_tax_incl'], 6);
-                $order_detail->total_price_tax_excl -= Tools::ps_round($service['total_price_tax_excl'], 6);
-
-                $serviceOldQuantity = $serviceOrderDetail->product_quantity;
-                $serviceOrderDetail->product_quantity = $serviceOldQuantity - $service['quantity'];
+                $serviceOrderDetail->total_price_tax_incl -= Tools::ps_round($service['total_price_tax_incl'], 6);
+                $serviceOrderDetail->total_price_tax_excl -= Tools::ps_round($service['total_price_tax_excl'], 6);
+                $serviceOrderDetail->product_quantity -= $cart_quantity;
 
                 // update taxes
-                $res &= $order_detail->updateTaxAmount($order);
+                $res &= $serviceOrderDetail->updateTaxAmount($order);
 
                 // Save order detail
-                $res &= $order_detail->update();
+                $res &= $serviceOrderDetail->update();
             }
         }
         /*End*/
