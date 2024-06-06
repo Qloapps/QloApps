@@ -2191,6 +2191,7 @@ const TravellerModal = {
     },
     submit: function() {
         $(".loading_overlay").show();
+        TravellerModal.hideErrors();
         $.ajax({
             type: 'POST',
             headers: {
@@ -2201,7 +2202,9 @@ const TravellerModal = {
             cache: false,
             data: $('#customer-guest-details-form').serialize()+'&ajax=true&id_order='+id_order+'&action=updateGuestDetails',
             success: function(result) {
-                if (result.success) {
+                if (result.hasError == true) {
+                    TravellerModal.showErrors(result.errorsHtml);
+                } else {
                     if (result.msg) {
                         showSuccessMessage(result.msg);
                     }
@@ -2218,14 +2221,20 @@ const TravellerModal = {
                     if (result.data.guest_phone) {
                         $('#customer-guest-details .guest_phone a').attr('href', 'tel'+result.data.guest_phone).html('<i class="icon-phone"></i> ' + result.data.guest_phone);
                     }
-                } else if (result.errors) {
-                    showErrorMessage(result.errors);
                 }
             },
             complete: function() {
                 $(".loading_overlay").hide();
             }
         });
+    },
+    showErrors: function(errorsHtml) {
+        $('#traveller-modal .errors-wrap').html(errorsHtml);
+        $('#traveller-modal .errors-wrap').show(200);
+    },
+    hideErrors: function(cb) {
+        $('#traveller-modal .errors-wrap').hide(200);
+        $('#traveller-modal .errors-wrap').html('');
     }
 };
 
