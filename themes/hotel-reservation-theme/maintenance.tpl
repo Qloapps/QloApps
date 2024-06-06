@@ -39,7 +39,7 @@
 	<link rel="shortcut icon" href="{$favicon_url}">
 	<link href="{$css_dir}maintenance.css" rel="stylesheet">
 	<script src="{$base_dir}js/jquery/jquery-1.11.0.min.js"></script>
-	<script src="{$base_dir}js/maintenance.js"></script>
+	<script src="{$js_dir}maintenance.js"></script>
 	<link href='//fonts.googleapis.com/css?family=Open+Sans:600' rel='stylesheet'>
 </head>
 

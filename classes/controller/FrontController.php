@@ -814,19 +814,23 @@ class FrontControllerCore extends Controller
     protected function processLogin($email, $passwd)
     {
         $remoteIpAddress = Tools::getRemoteAddr();
-        $objMaintenanceAccess = new MaintenanceAccess();
-        $attemptsCount = $objMaintenanceAccess->getFailedAttemptsCount($email, $remoteIpAddress); // does not include the current one
         $maxAttempts = Configuration::get('PS_ALLOW_EMP_MAX_ATTEMPTS');
 
-        if ($attemptsCount >= $maxAttempts) {
-            if ($lastAttempt = $objMaintenanceAccess->getLastAttempt($email, $remoteIpAddress)) {
-                $minutesElapsed = (int) ((time() - strtotime($lastAttempt['date_add'])) / 60);
-                $minutesLeft = MaintenanceAccess::LOGIN_ATTEMPTS_WINDOW - $minutesElapsed;
+        if ($maxAttempts) {
+            $objMaintenanceAccess = new MaintenanceAccess();
+            $attemptsCount = $objMaintenanceAccess->getFailedAttemptsCount($email, $remoteIpAddress); // does not include the current one
+            if ($attemptsCount >= $maxAttempts) {
+                if ($lastAttempt = $objMaintenanceAccess->getLastAttempt($email, $remoteIpAddress)) {
+                    $minutesElapsed = (int) ((time() - strtotime($lastAttempt['date_add'])) / 60);
 
-                if ($minutesLeft > 1) {
-                    $this->errors[] = Tools::displayError(sprintf('You have reached the limit of login attempts, please try after %d minutes.', $minutesLeft));
-                } else {
-                    $this->errors[] = Tools::displayError(sprintf('You have reached the limit of login attempts, please try after 1 minute.', $minutesLeft));
+                    if ($minutesElapsed <= MaintenanceAccess::LOGIN_ATTEMPTS_WINDOW) {
+                        $minutesLeft = MaintenanceAccess::LOGIN_ATTEMPTS_WINDOW - $minutesElapsed;
+                        if ($minutesLeft > 1) {
+                            $this->errors[] = Tools::displayError(sprintf('You have reached the limit of login attempts, please try after %d minutes.', $minutesLeft));
+                        } elseif ($minutesLeft == 1) {
+                            $this->errors[] = Tools::displayError(sprintf('You have reached the limit of login attempts, please try after 1 minute.', $minutesLeft));
+                        }
+                    }
                 }
             }
         }
@@ -863,28 +867,28 @@ class FrontControllerCore extends Controller
                     $cookie->enable_maintenance_view = $this->context->employee->id;
                     $cookie->remote_addr = ip2long($remoteIpAddress);
                     $cookie->write();
-
-                    // Reset attempts count on successful login
-                    $objMaintenanceAccess->removeFailedAttempts($email, $remoteIpAddress);
                 }
 
                 if (count($this->errors)) {
-                    $objMaintenanceAccess = new MaintenanceAccess();
-                    $objMaintenanceAccess->email = $email;
-                    $objMaintenanceAccess->ip_address = $remoteIpAddress;
-                    $objMaintenanceAccess->save();
+                    // Save only if attempts limit is set
+                    if ($maxAttempts) {
+                        $objMaintenanceAccess = new MaintenanceAccess();
+                        $objMaintenanceAccess->email = $email;
+                        $objMaintenanceAccess->ip_address = $remoteIpAddress;
+                        $objMaintenanceAccess->save();
 
-                    if ($attemptsCount < $maxAttempts) {
-                        $attemptsLeft = $maxAttempts - $attemptsCount - 1;
+                        if ($attemptsCount < $maxAttempts) {
+                            $attemptsLeft = $maxAttempts - $attemptsCount - 1;
 
-                        if ($attemptsLeft > 0) {
-                            if ($attemptsLeft > 1) {
-                                $this->errors[] = Tools::displayError(sprintf('%d attempts left.', ($maxAttempts - $attemptsCount - 1)));
+                            if ($attemptsLeft > 0) {
+                                if ($attemptsLeft > 1) {
+                                    $this->errors[] = Tools::displayError(sprintf('%d attempts left.', ($maxAttempts - $attemptsCount - 1)));
+                                } else {
+                                    $this->errors[] = Tools::displayError(sprintf('%d attempt left.', ($maxAttempts - $attemptsCount - 1)));
+                                }
                             } else {
-                                $this->errors[] = Tools::displayError(sprintf('%d attempt left.', ($maxAttempts - $attemptsCount - 1)));
+                                $this->errors[] = Tools::displayError(sprintf('You have reached the limit of login attempts, please try after %d minutes.', MaintenanceAccess::LOGIN_ATTEMPTS_WINDOW));
                             }
-                        } else {
-                            $this->errors[] = Tools::displayError(sprintf('You have reached the limit of login attempts, please try after %d minutes.', MaintenanceAccess::LOGIN_ATTEMPTS_WINDOW));
                         }
                     }
 

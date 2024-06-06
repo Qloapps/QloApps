@@ -62,7 +62,7 @@ class AdminMaintenanceControllerCore extends AdminController
                         'cast' => 'intval',
                         'type' => 'text',
                         'class' => 'fixed-width-xl',
-                        'desc' => sprintf($this->l('Set the number of maximum login attempts allowed in %d minutes.'), MaintenanceAccess::LOGIN_ATTEMPTS_WINDOW),
+                        'desc' => sprintf($this->l('Set the number of maximum login attempts allowed in %d minutes. Set to 0 to disable this feature.'), MaintenanceAccess::LOGIN_ATTEMPTS_WINDOW),
                         'form_group_class' => ((Tools::getValue('PS_SHOP_ENABLE', Configuration::get('PS_SHOP_ENABLE'))) || !(Tools::getValue('PS_ALLOW_EMP', Configuration::get('PS_ALLOW_EMP')))) ? ' collapse' : '',
                     ),
                     'PS_MAINTENANCE_IP' => array(
@@ -88,10 +88,10 @@ class AdminMaintenanceControllerCore extends AdminController
 
             // validations
             if (!$shopEnable && $allowEmp) {
-                if ($allowEmpMaxAttempts === '') {
+                if ($allowEmpMaxAttempts == '') {
                     $this->errors[] = $this->l('Maximum Login Attempts is a required field.');
-                } elseif ($allowEmpMaxAttempts === '0' || !Validate::isUnsignedInt($allowEmpMaxAttempts)) {
-                    $this->errors[] = $this->l('Maximum Login Attempts is invalid.');
+                } elseif (!Validate::isUnsignedInt($allowEmpMaxAttempts)) {
+                    $this->errors[] = $this->l('Maximum Login Attempts is invalid. Please enter a value greater than or equal to 0.');
                 }
             }
 
@@ -116,6 +116,6 @@ class AdminMaintenanceControllerCore extends AdminController
     public function setMedia()
     {
         parent::setMedia();
-        $this->addJS(_PS_JS_DIR_.'maintenance.js');
+        $this->addJS(_PS_JS_DIR_.'/admin/maintenance.js');
     }
 }

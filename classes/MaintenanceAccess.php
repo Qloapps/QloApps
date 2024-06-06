@@ -38,22 +38,22 @@ class MaintenanceAccessCore extends ObjectModel
         ),
     );
 
-    public function removeFailedAttempts($email, $ipAddress)
-    {
-        Db::getInstance()->execute(
-            'DELETE FROM `' . _DB_PREFIX_ .'maintenance_access` ma
-            WHERE (ma.`email` = "'.$email.'" OR ma.`ip_address` = "'.$ipAddress.'")'
-        );
-    }
-
     public function getFailedAttemptsCount($email, $ipAddress)
     {
-        return Db::getInstance()->getValue(
-            'SELECT COUNT(ma.`id_maintenance_access`)
-            FROM `'._DB_PREFIX_.'maintenance_access` ma
-            WHERE (ma.`email` = "'.$email.'" OR ma.`ip_address` = "'.$ipAddress.'")
-            AND ma.`date_add` > "'.date('Y-m-d H:i:s', strtotime('-'.MaintenanceAccess::LOGIN_ATTEMPTS_WINDOW.' minutes')).'"'
-        );
+        $sql = 'SELECT COUNT(ma.`id_maintenance_access`)
+        FROM `'._DB_PREFIX_.'maintenance_access` ma
+        WHERE (ma.`email` = "'.pSQL($email).'" OR ma.`ip_address` = "'.pSQL($ipAddress).'")
+        AND TIMESTAMPDIFF(
+            MINUTE,
+            ma.`date_add`,
+            (
+                SELECT MAX(ma.`date_add`)
+                FROM `'._DB_PREFIX_.'maintenance_access` ma
+                WHERE (ma.`email` = "'.pSQL($email).'" OR ma.`ip_address` = "'.pSQL($ipAddress).'")
+            )
+        ) <= '.(int) MaintenanceAccess::LOGIN_ATTEMPTS_WINDOW;
+
+        return Db::getInstance()->getValue($sql);
     }
 
     public function getLastAttempt($email, $ipAddress)
@@ -61,7 +61,7 @@ class MaintenanceAccessCore extends ObjectModel
         return Db::getInstance()->getRow(
             'SELECT *
             FROM `'._DB_PREFIX_.'maintenance_access` ma
-            WHERE (ma.`email` = "'.$email.'" OR ma.`ip_address` = "'.$ipAddress.'")
+            WHERE (ma.`email` = "'.pSQL($email).'" OR ma.`ip_address` = "'.pSQL($ipAddress).'")
             ORDER BY ma.`date_add` DESC'
         );
     }

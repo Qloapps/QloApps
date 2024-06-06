@@ -40,26 +40,4 @@ $(document).ready(function() {
     $(document).on('change', '[name="PS_ALLOW_EMP"]', function () {
         manageFieldMaximumAttempts(parseInt($('[name="PS_ALLOW_EMP"]:checked').val()));
     });
-
-    $('.clicker.blue').on('click', function() {
-        $('.login-form-wrap').toggle(200);
-    });
-
-    $('#cancelLogin').on('click', function() {
-        $('.login-form-wrap').hide(200);
-    });
-
-    // manage dropdowns
-    $(document).on('click', function (e) {
-        const closestDropdown = $(e.target).closest('.dropdown');
-
-        if (closestDropdown.length) {
-            if ($(e.target).closest('.dropdown-toggle').length) {
-                $('.dropdown').not(closestDropdown).removeClass('open');
-                closestDropdown.toggleClass('open');
-            }
-        } else {
-            $('.dropdown').removeClass('open');
-        }
-    });
 });
