@@ -33,17 +33,25 @@
             <div class="col-sm-6 room_check_in_div">
                 <label class="control-label">{l s='Check-In'}</label>
                 <div class="input-group">
-                    <input type="text" class="form-control edit_product_date_from" readonly/>
                     <input type="hidden" class="edit_product_date_from_actual" name="edit_product[date_from]"/>
-                    <div class="input-group-addon"><i class="icon-calendar"></i></div>
+                    {if isset($refundReqBookings) && $refundReqBookings && $data.id|in_array:$refundReqBookings && $data.is_refunded}
+                        {dateFormat date=$data.date_from}
+                    {else}
+                        <input type="text" class="form-control edit_product_date_from" readonly/>
+                        <div class="input-group-addon"><i class="icon-calendar"></i></div>
+                    {/if}
                 </div>
             </div>
             <div class="col-sm-6 room_check_out_div">
                 <label class="control-label">{l s='Check-Out'}</label>
                 <div class="input-group">
-                    <input type="text" class="form-control edit_product_date_to" readonly/>
                     <input type="hidden" class="edit_product_date_to_actual" name="edit_product[date_to]"/>
-                    <div class="input-group-addon"><i class="icon-calendar"></i></div>
+                    {if isset($refundReqBookings) && $refundReqBookings && $data.id|in_array:$refundReqBookings && $data.is_refunded}
+                        {dateFormat date=$data.date_to}
+                    {else}
+                        <input type="text" class="form-control edit_product_date_to" readonly/>
+                        <div class="input-group-addon"><i class="icon-calendar"></i></div>
+                    {/if}
                 </div>
             </div>
         </div>
