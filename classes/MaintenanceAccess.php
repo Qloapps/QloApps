@@ -38,6 +38,14 @@ class MaintenanceAccessCore extends ObjectModel
         ),
     );
 
+    public function removeFailedAttempts($email, $ipAddress)
+    {
+        Db::getInstance()->execute(
+            'DELETE FROM `' . _DB_PREFIX_ .'maintenance_access` ma
+            WHERE (ma.`email` = "'.pSQL($email).'" AND ma.`ip_address` = "'.pSQL($ipAddress).'")'
+        );
+    }
+
     public function getFailedAttemptsCount($email, $ipAddress)
     {
         $sql = 'SELECT COUNT(ma.`id_maintenance_access`)

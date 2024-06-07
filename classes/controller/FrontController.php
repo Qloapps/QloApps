@@ -867,6 +867,9 @@ class FrontControllerCore extends Controller
                     $cookie->enable_maintenance_view = $this->context->employee->id;
                     $cookie->remote_addr = ip2long($remoteIpAddress);
                     $cookie->write();
+
+                    // Reset attempts count on successful login
+                    $objMaintenanceAccess->removeFailedAttempts($email, $remoteIpAddress);
                 }
 
                 if (count($this->errors)) {
