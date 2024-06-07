@@ -84,7 +84,9 @@ class Blocknewsletter extends Module
                 'actionCustomerAccountAdd',
                 'registerGDPRConsent',
                 'actionExportGDPRData',
-                'actionDeleteGDPRCustomer'
+                'actionDeleteGDPRCustomer',
+                'actionCartRulesAvailable',
+                'actionCheckCartRuleValid',
             )
         );
     }
@@ -108,6 +110,36 @@ class Blocknewsletter extends Module
                 return json_encode(true);
             }
             return json_encode($this->l('Newsletter block : Unable to delete customer using email.'));
+        }
+    }
+
+    public function hookActionCartRulesAvailable($params)
+    {
+        foreach($params['result'] as $key => $cartRule) {
+            if ($cartRule['code'] == Configuration::get('NW_VOUCHER_CODE')) {
+                if ($params['id_customer']) {
+                    if (count(OrderCore::getCustomerOrders($params['id_customer']))) {
+                        // remove welcome voucher
+                        unset($params['result'][$key]);
+                    }
+                } else {
+                    // remove welcome voucher
+                    unset($params['result'][$key]);
+                }
+            }
+        }
+    }
+
+    public function hookActionCheckCartRuleValid($params)
+    {
+        if ($params['cartRule']->code == Configuration::get('NW_VOUCHER_CODE')) {
+            if ($params['id_customer']) {
+                if (count(OrderCore::getCustomerOrders($params['id_customer']))) {
+                    return $this->l('This voucher is not available for this booking.');
+                }
+            } else {
+                return $this->l('This voucher is not available for this booking.');
+            }
         }
     }
 

@@ -407,6 +407,8 @@ class CartRuleCore extends ObjectModel
         }
         unset($cart_rule);
 
+        Hook::exec('actionCartRulesAvailable', array('result' => &$result, 'id_customer' => (int)$id_customer));
+
         return $result;
     }
 
@@ -683,6 +685,10 @@ class CartRuleCore extends ObjectModel
                     }
                 }
             }
+        }
+
+        if ($errors = Hook::exec('actionCheckCartRuleValid', array('cartRule' => $this))) {
+            return (!$display_error) ? false : Tools::displayError($errors);
         }
 
         if (!$nb_products) {
