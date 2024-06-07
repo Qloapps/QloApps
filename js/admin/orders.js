@@ -1802,6 +1802,10 @@ $(document).ready(function() {
             $('.submitAddRoom').attr('disabled', true);
         }
     });
+
+    $(document).on('hidden.bs.modal', '#add-room-booking-modal', function(){
+        $('#add-room-booking-modal').remove();
+    });
     // End: AddRoomBookingModal: Processes
     // ======================================
 
