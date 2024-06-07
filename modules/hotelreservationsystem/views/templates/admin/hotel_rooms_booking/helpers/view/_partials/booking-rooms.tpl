@@ -50,7 +50,7 @@
                                                             <span>{$allotment_type.name|escape:'htmlall':'UTF-8'}</span>
                                                         </label>
                                                     {/foreach}
-                                                    <input type="text" id="comment_{$avai_v['id_room']|escape:'htmlall':'UTF-8'}" class="form-control booking_type_comment" placeholder="{l s='Allotment message' mod='hotelreservationsystem'}">
+                                                    <input type="text" id="comment_{$avai_v['id_room']|escape:'htmlall':'UTF-8'}" name="comment_{$avai_v['id_room']|escape:'htmlall':'UTF-8'}" class="form-control booking_type_comment" placeholder="{l s='Allotment message' mod='hotelreservationsystem'}">
                                                 </td>
                                                 {if $occupancy_required_for_booking}
                                                     <td class="booking_occupancy">
@@ -138,7 +138,7 @@
                                                                 <span>{$allotment_type.name|escape:'htmlall':'UTF-8'}</span>
                                                             </label>
                                                         {/foreach}
-                                                        <input type="text" id="comment_{$sub_part_v['id_room']|escape:'htmlall':'UTF-8'}_{$sub_part_k|escape:'htmlall':'UTF-8'}" class="form-control booking_type_comment" placeholder="{l s='Allotment message' mod='hotelreservationsystem'}">
+                                                        <input type="text" id="comment_{$sub_part_v['id_room']|escape:'htmlall':'UTF-8'}_{$sub_part_k|escape:'htmlall':'UTF-8'}" name="comment_{$sub_part_v['id_room']|escape:'htmlall':'UTF-8'}_{$sub_part_k|escape:'htmlall':'UTF-8'}" class="form-control booking_type_comment" placeholder="{l s='Allotment message' mod='hotelreservationsystem'}">
                                                     </td>
                                                     {if $occupancy_required_for_booking}
                                                         <td class="booking_occupancy">
