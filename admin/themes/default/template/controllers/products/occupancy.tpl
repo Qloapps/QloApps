@@ -36,7 +36,7 @@
                 </span>
 			</label>
 			<div class="col-sm-3">
-				<input id="base_adults" type="text" name="base_adults" class="form-control" value="{if isset($roomTypeInfo)}{$roomTypeInfo['adults']|escape:'htmlall':'UTF-8'}{else}2{/if}">
+				<input id="base_adults" type="text" name="base_adults" class="form-control" value="{if isset($smarty.post.base_adults)}{$smarty.post.base_adults|escape:'html':'UTF-8'}{elseif isset($roomTypeInfo['adults'])}{$roomTypeInfo['adults']|escape:'html':'UTF-8'}{else}2{/if}">
 			</div>
 		</div>
 		<div class="form-group">
@@ -47,7 +47,7 @@
                 </span>
 			</label>
 			<div class="col-sm-3">
-				<input id="base_children" type="text" name="base_children" class="form-control" {if isset($roomTypeInfo)}value="{$roomTypeInfo['children']|escape:'htmlall':'UTF-8'}"{/if}>
+				<input id="base_children" type="text" name="base_children" class="form-control" value="{if isset($smarty.post.base_children)}{$smarty.post.base_children|escape:'html':'UTF-8'}{elseif isset($roomTypeInfo['children'])}{$roomTypeInfo['children']|escape:'html':'UTF-8'}{else}0{/if}">
 			</div>
 		</div>
         <input id="is_occupancy_submit" type="hidden" name="is_occupancy_submit" class="form-control" value="0">
@@ -68,7 +68,7 @@
                 </span>
 			</label>
 			<div class="col-sm-3">
-				<input id="max_adults" type="text" name="max_adults" class="form-control" {if isset($roomTypeInfo)}value="{$roomTypeInfo['max_adults']|escape:'htmlall':'UTF-8'}"{/if}>
+				<input id="max_adults" type="text" name="max_adults" class="form-control" value="{if isset($smarty.post.max_adults)}{$smarty.post.max_adults|escape:'html':'UTF-8'}{elseif isset($roomTypeInfo['max_adults'])}{$roomTypeInfo['max_adults']|escape:'html':'UTF-8'}{/if}">
 			</div>
 		</div>
         <div class="form-group">
@@ -79,7 +79,7 @@
                 </span>
 			</label>
 			<div class="col-sm-3">
-				<input id="max_children" type="text" name="max_children" class="form-control" {if isset($roomTypeInfo)}value="{$roomTypeInfo['max_children']|escape:'htmlall':'UTF-8'}"{/if}>
+				<input id="max_children" type="text" name="max_children" class="form-control" value="{if isset($smarty.post.max_children)}{$smarty.post.max_children|escape:'html':'UTF-8'}{elseif isset($roomTypeInfo['max_children'])}{$roomTypeInfo['max_children']|escape:'html':'UTF-8'}{/if}">
 			</div>
 		</div>
         <div class="form-group">
@@ -90,7 +90,7 @@
                 </span>
 			</label>
 			<div class="col-sm-3">
-				<input id="max_guests" type="text" name="max_guests" class="form-control" {if isset($roomTypeInfo)}value="{$roomTypeInfo['max_guests']|escape:'htmlall':'UTF-8'}"{/if}>
+				<input id="max_guests" type="text" name="max_guests" class="form-control" value="{if isset($smarty.post.max_guests)}{$smarty.post.max_guests|escape:'html':'UTF-8'}{elseif isset($roomTypeInfo['max_guests'])}{$roomTypeInfo['max_guests']|escape:'html':'UTF-8'}{/if}">
 			</div>
 		</div>
 
