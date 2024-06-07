@@ -50,8 +50,9 @@ class MaintenanceAccessCore extends ObjectModel
                 SELECT MAX(ma.`date_add`)
                 FROM `'._DB_PREFIX_.'maintenance_access` ma
                 WHERE (ma.`email` = "'.pSQL($email).'" OR ma.`ip_address` = "'.pSQL($ipAddress).'")
+                AND TIMESTAMPDIFF(MINUTE, ma.`date_add`, NOW()) < '.(int) MaintenanceAccess::LOGIN_ATTEMPTS_WINDOW.'
             )
-        ) <= '.(int) MaintenanceAccess::LOGIN_ATTEMPTS_WINDOW;
+        ) < '.(int) MaintenanceAccess::LOGIN_ATTEMPTS_WINDOW;
 
         return Db::getInstance()->getValue($sql);
     }
