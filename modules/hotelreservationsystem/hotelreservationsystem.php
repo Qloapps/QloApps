@@ -484,11 +484,11 @@ class HotelReservationSystem extends Module
 
         // Make rooms available for booking if order status is cancelled, refunded or error
         if (in_array($params['newOrderStatus']->id, $objHtlBkDtl->getOrderStatusToFreeBookedRoom())) {
-            $isCancalled = 0;
+            $isCancelled = 0;
             if ($params['newOrderStatus']->id == Configuration::get('PS_OS_CANCELED')) {
-                $isCancalled = 1;
+                $isCancelled = 1;
             }
-            if (!$objHtlBkDtl->updateOrderRefundStatus($params['id_order'], false, false, array(), 1, $isCancalled)) {
+            if (!$objHtlBkDtl->updateOrderRefundStatus($params['id_order'], false, false, array(), 1, $isCancelled)) {
                 $this->context->controller->errors[] = $this->l('Error while making booked rooms available, attached with this order. Please try again !!');
             }
         }
