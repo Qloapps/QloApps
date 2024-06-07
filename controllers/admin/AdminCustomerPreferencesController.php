@@ -182,9 +182,11 @@ class AdminCustomerPreferencesControllerCore extends AdminController
         if (Tools::isSubmit('submitCustomerKpiConfig')) {
             unset($this->fields_options['general']);
             $this->processUpdateOptions();
+            $this->redirect_after = self::$currentIndex.'&token='.$this->token.'&conf=6';
         } else if (Tools::isSubmit('submitCustomerGeneralConfig')) {
             unset($this->fields_options['customer_kpi']);
             $this->processUpdateOptions();
+            $this->redirect_after = self::$currentIndex.'&token='.$this->token.'&conf=6';
         }
 
         $this->fields_options = $fields;
