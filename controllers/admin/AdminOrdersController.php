@@ -376,11 +376,11 @@ class AdminOrdersControllerCore extends AdminController
             $cart_order_exists = $cart->orderExists();
             if (!$cart_order_exists) {
                 $this->context->cart = $cart;
+                $this->context->currency = new Currency((int)$cart->id_currency);
 
                 // validate cart for removing invalid data from cart before new order creation
                 $this->errors = array_merge($this->errors, HotelCartBookingData::validateCartBookings());
 
-                $this->context->currency = new Currency((int)$cart->id_currency);
                 $cart_detail_data = array();
                 $cart_detail_data_obj = new HotelCartBookingData();
                 $objHotelServiceProductCartDetail = new HotelServiceProductCartDetail();
@@ -1555,6 +1555,7 @@ class AdminOrdersControllerCore extends AdminController
                 $objCart = new Cart($id_cart);
                 if (Validate::isLoadedObject($objCart)) {
                     $this->context->cart = $objCart;
+                    $this->context->currency = new Currency((int)$objCart->id_currency);
 
                     $this->errors = HotelCartBookingData::validateCartBookings();
                     $orderTotal = $objCart->getOrderTotal(true, Cart::BOTH);
