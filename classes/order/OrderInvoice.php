@@ -413,7 +413,7 @@ class OrderInvoiceCore extends ObjectModel
         // 	- 'total_price_tax_excl'
         // 	- 'total_amount'
         $breakdown = array();
-        $order_detail = $order->getOrderDetailList();
+        $order_detail = $this->getProducts();
         $order_detail = array_filter($order_detail, function($v) {
             return ($v['is_booking_product']
                 || ($v['product_auto_add']
@@ -482,7 +482,7 @@ class OrderInvoiceCore extends ObjectModel
         // 	- 'total_price_tax_excl'
         // 	- 'total_amount'
         $breakdown = array();
-        $order_detail = $order->getOrderDetailList();
+        $order_detail = $this->getProducts();
         $order_detail = array_filter($order_detail, function($v) {
             return (!$v['is_booking_product'] && !$v['product_auto_add'] && $v['product_service_type'] == Product::SERVICE_PRODUCT_WITH_ROOMTYPE);
         });
@@ -546,7 +546,7 @@ class OrderInvoiceCore extends ObjectModel
         // 	- 'total_price_tax_excl'
         // 	- 'total_amount'
         $breakdown = array();
-        $order_detail = $order->getOrderDetailList();
+        $order_detail = $this->getProducts();
         $order_detail = array_filter($order_detail, function($v) {
             return (!$v['is_booking_product']
                 && $v['product_auto_add']
@@ -616,7 +616,7 @@ class OrderInvoiceCore extends ObjectModel
         // 	- 'total_price_tax_excl'
         // 	- 'total_amount'
         $breakdown = array();
-        $order_detail = $order->getOrderDetailList();
+        $order_detail = $this->getProducts();
         $order_detail = array_filter($order_detail, function($v) {
             return (!$v['is_booking_product'] && $v['product_service_type'] == Product::SERVICE_PRODUCT_WITHOUT_ROOMTYPE);
         });
@@ -674,8 +674,10 @@ class OrderInvoiceCore extends ObjectModel
             $order = $this->getOrder();
         }
         $breakdown = array();
+        $order_details = $this->getProducts();
         $objBookingDemand = new HotelBookingDemands();
-        $details = $objBookingDemand->getExtraDemandsTaxesDetails($order->id);
+        $order_details = array_column($order_details, 'id_order_detail');
+        $details = $objBookingDemand->getExtraDemandsTaxesDetails($order->id, $order_details);
         if (!$this->useOneAfterAnotherTaxComputationMethod()) {
             $grouped_details = array();
             foreach ($details as $row) {
