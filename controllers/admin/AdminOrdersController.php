@@ -943,16 +943,8 @@ class AdminOrdersControllerCore extends AdminController
             $objBookingDetail = new HotelBookingDetail();
             $objOrderReturn = new OrderReturn();
             $refundReqBookings = $objOrderReturn->getOrderRefundRequestedBookings($objOrder->id, 0, 1);
-            if ($bookingOrderInfo = $objBookingDetail->getBookingDataByOrderId($objOrder->id)) {
-                foreach($bookingOrderInfo as $key => $booking) {
-                    if ((in_array($booking['id'], $refundReqBookings))
-                        || $booking['is_refunded']
-                        || $booking['id_status'] != HotelBookingDetail::STATUS_ALLOTED
-                    ) {
-                        unset($bookingOrderInfo[$key]);
-                    }
-                }
-            }
+            $bookingOrderInfo = $objBookingDetail->getBookingDataByOrderId($objOrder->id);
+
             $this->context->smarty->assign(
                 array(
                     'order' => $objOrder,
