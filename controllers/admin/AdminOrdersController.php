@@ -943,7 +943,13 @@ class AdminOrdersControllerCore extends AdminController
             $objBookingDetail = new HotelBookingDetail();
             $objOrderReturn = new OrderReturn();
             $refundReqBookings = $objOrderReturn->getOrderRefundRequestedBookings($objOrder->id, 0, 1);
-            $bookingOrderInfo = $objBookingDetail->getBookingDataByOrderId($objOrder->id);
+            if ($bookingOrderInfo = $objBookingDetail->getBookingDataByOrderId($objOrder->id)) {
+                foreach($bookingOrderInfo as $key => $booking) {
+                    if ((in_array($booking['id'], $refundReqBookings)) || $booking['is_refunded']) {
+                        unset($bookingOrderInfo[$key]);
+                    }
+                }
+            }
 
             $this->context->smarty->assign(
                 array(
