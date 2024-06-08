@@ -1015,7 +1015,7 @@ class OrderInvoiceCore extends ObjectModel
             $payments = OrderPaymentDetail::getByInvoiceId($this->id);
             foreach ($payments as $payment) {
                 /** @var OrderPayment $payment */
-                $amount += $payment['amount'];
+                $amount += ($payment['amount'] / $payment['conversion_rate']);
             }
             Cache::store($cache_id, $amount);
             return $amount;

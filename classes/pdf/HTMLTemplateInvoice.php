@@ -650,6 +650,8 @@ class HTMLTemplateInvoiceCore extends HTMLTemplate
         $footer['additional_service_price_tax_incl'] = $this->order->getTotalProductsWithTaxes(false, false, Product::SERVICE_PRODUCT_WITH_ROOMTYPE, 0, null, $idsOrderDetail) + $totalDemandsPriceTI;
         $footer['total_convenience_fee_te'] = $this->order->getTotalProductsWithoutTaxes(false, false, Product::SERVICE_PRODUCT_WITH_ROOMTYPE, 1, Product::PRICE_ADDITION_TYPE_INDEPENDENT, $idsOrderDetail);
         $footer['total_convenience_fee_ti'] = $this->order->getTotalProductsWithTaxes(false, false, Product::SERVICE_PRODUCT_WITH_ROOMTYPE, 1, Product::PRICE_ADDITION_TYPE_INDEPENDENT, $idsOrderDetail);
+        $footer['total_paid_real'] = $this->order_invoice->getTotalPaid();
+
         $data = array(
             'cart_htl_data' => $cart_htl_data,
             'service_product_data' => $service_product_data,
