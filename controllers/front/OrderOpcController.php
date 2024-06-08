@@ -426,7 +426,7 @@ class OrderOpcControllerCore extends ParentOrderController
     public function initContent()
     {
         // validate room types before payment by customer
-        $orderRestrictErr = HotelCartBookingData::validateCartBookings();
+        $this->errors = HotelCartBookingData::validateCartBookings();
 
         parent::initContent();
 
@@ -494,7 +494,7 @@ class OrderOpcControllerCore extends ParentOrderController
         // $objCurrency = new Currency(Configuration::get('PS_CURRENCY_DEFAULT'));
         $this->context->smarty->assign(
             array(
-                'orderRestrictErr' => $orderRestrictErr,
+                'orderRestrictErr' => count($this->errors) ? 1 : 0,
                 // 'allDemands' => $allDemands,
                 // 'defaultcurrencySign' => $objCurrency->sign,
                 'THEME_DIR' => _THEME_DIR_,
