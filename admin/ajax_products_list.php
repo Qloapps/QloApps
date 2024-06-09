@@ -60,22 +60,39 @@ $exclude_packs = (bool)Tools::getValue('exclude_packs', true);
 
 $bookingProduct = (int) Tools::getValue('booking_product');
 
+$idHotel = (int) Tools::getValue('id_hotel');
+
 $context = Context::getContext();
 
-$sql = 'SELECT p.`id_product`, pl.`link_rewrite`, p.`reference`, pl.`name`, image_shop.`id_image` id_image, il.`legend`, p.`cache_default_attribute`
-		FROM `'._DB_PREFIX_.'product` p
-		'.Shop::addSqlAssociation('product', 'p').'
-		LEFT JOIN `'._DB_PREFIX_.'product_lang` pl ON (pl.id_product = p.id_product AND pl.id_lang = '.(int)$context->language->id.Shop::addSqlRestrictionOnLang('pl').')
+$sqlSelect = 'SELECT p.`id_product`, pl.`link_rewrite`, p.`reference`, pl.`name`, image_shop.`id_image` id_image, il.`legend`, p.`cache_default_attribute`';
+
+$sqlFrom = ' FROM `'._DB_PREFIX_.'product` p '.Shop::addSqlAssociation('product', 'p');
+
+$sqlJoin ='	LEFT JOIN `'._DB_PREFIX_.'product_lang` pl ON (pl.`id_product` = p.`id_product` AND pl.`id_lang` = '.(int) $context->language->id.Shop::addSqlRestrictionOnLang('pl').')
 		LEFT JOIN `'._DB_PREFIX_.'image_shop` image_shop
-			ON (image_shop.`id_product` = p.`id_product` AND image_shop.cover=1 AND image_shop.id_shop='.(int)$context->shop->id.')
-		LEFT JOIN `'._DB_PREFIX_.'image_lang` il ON (image_shop.`id_image` = il.`id_image` AND il.`id_lang` = '.(int)$context->language->id.')
-		WHERE (pl.name LIKE \'%'.pSQL($query).'%\' OR p.reference LIKE \'%'.pSQL($query).'%\')'.
+			ON (image_shop.`id_product` = p.`id_product` AND image_shop.`cover`=1 AND image_shop.`id_shop`='.(int) $context->shop->id.')
+		LEFT JOIN `'._DB_PREFIX_.'image_lang` il ON (image_shop.`id_image` = il.`id_image` AND il.`id_lang` = '.(int) $context->language->id.')';
+
+$sqlWhere =	' WHERE (pl.name LIKE \'%'.pSQL($query).'%\' OR p.reference LIKE \'%'.pSQL($query).'%\')'.
         (!empty($excludeIds) ? ' AND p.id_product NOT IN ('.$excludeIds.') ' : ' ').
         (!empty($excludePackItself) ? ' AND p.id_product <> '.$excludePackItself.' ' : ' ').
         ($excludeVirtuals ? 'AND NOT EXISTS (SELECT 1 FROM `'._DB_PREFIX_.'product_download` pd WHERE (pd.id_product = p.id_product))' : '').
         ($exclude_packs ? 'AND (p.cache_is_pack IS NULL OR p.cache_is_pack = 0)' : '').
-        ($bookingProduct ? 'AND p.`booking_product` = '.(int) $bookingProduct : '').
-        ' GROUP BY p.id_product';
+        ($bookingProduct ? 'AND p.`booking_product` = '.(int) $bookingProduct : '');
+
+$sqlGroupBy = ' GROUP BY p.id_product';
+
+if ($idHotel && $bookingProduct) {
+    // To get hotel info for the booking product only
+    $sqlSelect .= ', hbil.`hotel_name`, hbil.`id` AS id_hotel ';
+    $sqlJoin .= '  LEFT JOIN `'._DB_PREFIX_.'htl_room_type` hrt
+            ON hrt.`id_product` = p.`id_product`
+            LEFT JOIN `'._DB_PREFIX_.'htl_branch_info_lang` hbil
+            ON  pl.`id_lang` = hbil.`id_lang` AND hbil.`id` = hrt.`id_hotel`';
+    $sqlWhere .= ' AND hbil.`id`='.(int) $idHotel ;
+}
+
+$sql = $sqlSelect.' '.$sqlFrom.' '.$sqlJoin.' '.$sqlWhere.' '.$sqlGroupBy;
 
 $items = Db::getInstance()->executeS($sql);
 
