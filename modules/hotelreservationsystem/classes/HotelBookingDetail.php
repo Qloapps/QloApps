@@ -2196,7 +2196,7 @@ class HotelBookingDetail extends ObjectModel
                 $order_detail_data[$key]['child_ages'] = json_decode($value['child_ages']);
 
                 // Check if this booking as any refund history then enter refund data
-                if ($refundInfo = OrderReturnCore::getOrdersReturnDetail($id_order, 0, $value['id'])) {
+                if ($refundInfo = OrderReturn::getOrdersReturnDetail($id_order, 0, $value['id'])) {
                     $order_detail_data[$key]['refund_info'] = reset($refundInfo);
                 }
             }

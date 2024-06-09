@@ -208,7 +208,7 @@
             {/if}
 		</td>
 		<td>
-			{if isset($data.refund_info) && $data.refund_info}
+			{if $data.is_refunded && isset($data.refund_info) && $data.refund_info}
 				{convertPriceWithCurrency price=$data.refund_info.refunded_amount currency=$currency->id}
             {else}
 				--

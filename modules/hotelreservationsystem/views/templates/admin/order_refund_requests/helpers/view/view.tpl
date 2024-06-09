@@ -188,7 +188,12 @@
 													<td>
 														<div class="input-group">
 															{if $isRefundCompleted}
-																{displayPrice price=$booking['refunded_amount'] currency=$orderCurrency['id']}
+                                                                {* used id_customization to check if in this request which bookings are refunded or not*}
+                                                                {if $booking['is_refunded'] && $booking['id_customization']}
+																    {displayPrice price=$booking['refunded_amount'] currency=$orderCurrency['id']}
+                                                                {else}
+                                                                    {l s='Not refunded' mod='hotelreservationsystem'}
+                                                                {/if}
 															{else}
 																<span class="input-group-addon">{$orderCurrency['sign']|escape:'html':'UTF-8'}</span>
 																<input placeholder="" type="text" name="refund_amounts[{$booking['id_order_return_detail']|escape:'html':'UTF-8'}]" value="{if ($booking['room_paid_amount'] + $booking['extra_service_total_paid_amount'] - $booking['cancelation_charge']) > 0}{Tools::ps_round(($booking['room_paid_amount'] + $booking['extra_service_total_paid_amount'] - $booking['cancelation_charge']), 2)}{else}0{/if}">

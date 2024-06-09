@@ -373,6 +373,8 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
                         // save individual booking amount for every booking refund
                         $refundedAmount = $refundedAmounts[$idRetDetail];
                         $objOrderReturnDetail->refunded_amount = $refundedAmount;
+                        // set the id_customization to check if in this request which bookings are refunded or not for future
+                        $objOrderReturnDetail->id_customization = 1;
                         $objOrderReturnDetail->save();
 
                         // sum the refund amount for total order refund amount

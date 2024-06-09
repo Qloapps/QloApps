@@ -942,7 +942,7 @@ class AdminOrdersControllerCore extends AdminController
             // get booking information by order
             $objBookingDetail = new HotelBookingDetail();
             $objOrderReturn = new OrderReturn();
-            $refundReqBookings = $objOrderReturn->getOrderRefundRequestedBookings($objOrder->id, 0, 1);
+            $refundReqBookings = $objOrderReturn->getOrderRefundRequestedBookings($objOrder->id, 0, 1, 0, 1);
             if ($bookingOrderInfo = $objBookingDetail->getBookingDataByOrderId($objOrder->id)) {
                 foreach($bookingOrderInfo as $key => $booking) {
                     if ((in_array($booking['id'], $refundReqBookings)) || $booking['is_refunded']) {
@@ -1314,7 +1314,9 @@ class AdminOrdersControllerCore extends AdminController
                         if ($orderBookings = $objHotelBooking->getOrderCurrentDataByOrderId($order->id)) {
                             foreach ($orderBookings as $orderBooking) {
                                 // If booking is refunded then no need to check inventory
-                                if ((OrderReturn::getOrdersReturnDetail($order->id, 0, $orderBooking['id']) && $orderBooking['is_refunded'])
+                                $bookingRefundDetail = OrderReturn::getOrdersReturnDetail($order->id, 0, $orderBooking['id']);
+                                $bookingRefundDetail = reset($bookingRefundDetail);
+                                if (($bookingRefundDetail && $bookingRefundDetail['refunded'] && $orderBooking['is_refunded'])
                                     || ($orderBooking['is_cancelled'] && $orderBooking['is_refunded'])
                                 ) {
                                     continue;
@@ -1498,19 +1500,22 @@ class AdminOrdersControllerCore extends AdminController
                     }
                 }
             } else {
-                $this->errors[] = Tools::displayError('You do not have permission to delete this.');
+                $this->errors[] = Tools::displayError('You do not have permission to edit this.');
             }
         }
 
         /* booking refunds from order */
         elseif (Tools::isSubmit('initiateRefund') && isset($order)) {
-            if ($this->tabAccess['delete'] === '1') {
+            if ($this->tabAccess['edit'] === '1') {
                 $bookings = Tools::getValue('id_htl_booking');
                 if ($bookings && count($bookings)) {
                     foreach ($bookings as $idHtlBooking) {
-                        if (OrderReturn::getOrdersReturnDetail($order->id, 0, $idHtlBooking)) {
-                            $this->errors[] = Tools::displayError('Wrong bookings found for booking cancelation.');
-                            break;
+                        if ($bookingRefundDetail = OrderReturn::getOrdersReturnDetail($order->id, 0, $idHtlBooking)) {
+                            $bookingRefundDetail = reset($bookingRefundDetail);
+                            if (!$bookingRefundDetail['refunded']) {
+                                $this->errors[] = Tools::displayError('Wrong bookings found for booking cancelation.');
+                                break;
+                            }
                         }
                     }
                 } else {
@@ -1592,7 +1597,7 @@ class AdminOrdersControllerCore extends AdminController
                     Tools::redirectAdmin(self::$currentIndex.'&id_order='.$order->id.'&vieworder&conf=3&token='.$this->token);
                 }
             } else {
-                $this->errors[] = Tools::displayError('You do not have permission to delete this.');
+                $this->errors[] = Tools::displayError('You do not have permission to edit this.');
             }
         } elseif (Tools::isSubmit('messageReaded')) {
             Message::markAsReaded(Tools::getValue('messageReaded'), $this->context->employee->id);
@@ -2811,7 +2816,7 @@ class AdminOrdersControllerCore extends AdminController
 
         $objOrderReturn = new OrderReturn();
         $refundedAmount = 0;
-        if ($refundReqBookings = $objOrderReturn->getOrderRefundRequestedBookings($order->id, 0, 1)) {
+        if ($refundReqBookings = $objOrderReturn->getOrderRefundRequestedBookings($order->id, 0, 1, 0, 1)) {
             $refundedAmount = $objOrderReturn->getRefundedAmount($order->id);
         }
 

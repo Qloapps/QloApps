@@ -2661,11 +2661,18 @@ class OrderCore extends ObjectModel
             } elseif ($action == Order::ORDER_COMPLETE_CANCELLATION_OR_REFUND_REQUEST_FLAG) {
                 foreach ($orderBookings as $booking) {
                     if (!$booking['is_refunded']) {
-                        if (!OrderReturn::getOrdersReturnDetail($this->id, 0, $booking['id'])) {
+                        // If booking refund request is created and request is completed but booking is not refunded then return false
+                        if ($bookingRefundDetail = OrderReturn::getOrdersReturnDetail($this->id, 0, $booking['id'])) {
+                            $bookingRefundDetail = reset($bookingRefundDetail);
+                            if ($bookingRefundDetail['refunded']) {
+                                return false;
+                            }
+                        } else {
                             return false;
                         }
                     }
                 }
+
                 return true;
             // Default process to check if order is fully refunded or cancelled or not
             } else {

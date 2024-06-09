@@ -33,6 +33,10 @@ class OrderReturnDetailCore extends ObjectModel
     public $id_customization;
     public $product_quantity;
 
+    const REFUND_REQUEST_STATUS_LATEST = 1;
+    const REFUND_REQUEST_STATUS_PENDING = 2;
+    const REFUND_REQUEST_STATUS_COMPLETED = 3;
+
     /**
      * @see ObjectModel::$definition
      */
