@@ -1,0 +1,51 @@
+<?xml version="1.0"?>
+<entity_order_state>
+  <order_state id="Awaiting_payment">
+    <name>Warten auf Zahlung</name>
+    <template>awaiting_payment</template>
+  </order_state>
+  <order_state id="Payment_accepted">
+    <name>Vollständige Zahlung erhalten</name>
+    <template>payment_accepted</template>
+  </order_state>
+  <order_state id="Processing_in_progress">
+    <name>Bestellung in Bearbeitung</name>
+    <template>processing</template>
+  </order_state>
+  <order_state id="Canceled">
+    <name>Bestellung storniert</name>
+    <template>order_canceled</template>
+  </order_state>
+  <order_state id="Refund">
+    <name>Zahlung erstattet</name>
+    <template>refund</template>
+  </order_state>
+  <order_state id="Payment_error">
+    <name>Fehler bei der Bezahlung</name>
+    <template>payment_error</template>
+  </order_state>
+  <order_state id="Payment_remotely_accepted">
+    <name>Zahlung ausserhalb von PrestaShop eingegangen</name>
+    <template>payment_accepted</template>
+  </order_state>
+  <order_state id="Awaiting_remote_payment">
+    <name>Awaiting remote payment</name>
+    <template/>
+  </order_state>
+  <order_state id="Overbooking_paid">
+    <name>Overbooking (Paid)</name>
+    <template/>
+  </order_state>
+  <order_state id="Overbooking_unpaid">
+    <name>Overbooking (Not paid)</name>
+    <template/>
+  </order_state>
+  <order_state id="Overbooking_partial_paid">
+    <name>Overbooking (Partial payment)</name>
+    <template/>
+  </order_state>
+  <order_state id="Partial_payment_accepted">
+    <name>Teilzahlung erhalten</name>
+    <template>partial_payment_accepted</template>
+  </order_state>
+</entity_order_state>

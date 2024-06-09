@@ -1,0 +1,51 @@
+<?xml version="1.0"?>
+<entity_order_state>
+  <order_state id="Awaiting_payment">
+    <name>Đang chờ thanh toán</name>
+    <template>awaiting_payment</template>
+  </order_state>
+  <order_state id="Payment_accepted">
+    <name>Đã nhận được thanh toán đầy đủ</name>
+    <template>payment_accepted</template>
+  </order_state>
+  <order_state id="Processing_in_progress">
+    <name>Chuẩn bị trong tiến trình</name>
+    <template>processing</template>
+  </order_state>
+  <order_state id="Canceled">
+    <name>Hủy</name>
+    <template>order_canceled</template>
+  </order_state>
+  <order_state id="Refund">
+    <name>Hoàn trả</name>
+    <template>refund</template>
+  </order_state>
+  <order_state id="Payment_error">
+    <name>Lỗi thanh toán</name>
+    <template>payment_error</template>
+  </order_state>
+  <order_state id="Payment_remotely_accepted">
+    <name>Remote payment accepted</name>
+    <template>payment_accepted</template>
+  </order_state>
+  <order_state id="Awaiting_remote_payment">
+    <name>Awaiting remote payment</name>
+    <template/>
+  </order_state>
+  <order_state id="Overbooking_paid">
+    <name>Overbooking (Paid)</name>
+    <template/>
+  </order_state>
+  <order_state id="Overbooking_unpaid">
+    <name>Overbooking (Not paid)</name>
+    <template/>
+  </order_state>
+  <order_state id="Overbooking_partial_paid">
+    <name>Overbooking (Partial payment)</name>
+    <template/>
+  </order_state>
+  <order_state id="Partial_payment_accepted">
+    <name>Đã nhận được một phần thanh toán</name>
+    <template>partial_payment_accepted</template>
+  </order_state>
+</entity_order_state>

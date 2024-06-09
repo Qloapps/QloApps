@@ -2708,4 +2708,136 @@ class OrderCore extends ObjectModel
     {
         $this->transaction_id = $transactionId;
     }
+
+    /**
+     * Validate and change order status
+     * @return array of status, errors, has_mail_error(if order status is changes but mail error occurs while sending mail)
+     */
+    public function ChangeOrderStatus()
+    {
+        $result = array();
+        $result['status'] = false;
+        $result['has_mail_error'] = false;
+        $result['errors'] = array();
+        $objNewOrderState = new OrderState(Tools::getValue('id_order_state'));
+        if (!Validate::isLoadedObject($objNewOrderState)) {
+            $result['errors'][] = Tools::displayError('The new order status is invalid.');
+        } else {
+            $objHotelBooking = new HotelBookingDetail();
+            $objCurrentOrderState = $this->getCurrentOrderState();
+
+            if ($objCurrentOrderState->id == Configuration::get('PS_OS_REFUND')) {
+                $result['errors'][] = Tools::displayError('Order status can not be changed once order status is set to Refunded.');
+            } elseif ($objCurrentOrderState->id == Configuration::get('PS_OS_CANCELED')) {
+                $result['errors'][] = Tools::displayError('Order status can not be changed once order status is set to Cancelled.');
+            } elseif (in_array($objNewOrderState->id, array (Configuration::get('PS_OS_OVERBOOKING_PAID'), Configuration::get('PS_OS_OVERBOOKING_UNPAID'), Configuration::get('PS_OS_OVERBOOKING_PARTIAL_PAID')))) {
+                if (!$objHotelBooking->getOverbookedRooms($this->id)) {
+                    $result['errors'][] = Tools::displayError('Order status can not be changed to any overbooking status as there are no overbooked rooms in the order.');
+                }
+            } elseif ($objNewOrderState->id == Configuration::get('PS_OS_REFUND')
+                && !$this->hasCompletelyRefunded(Order::ORDER_COMPLETE_REFUND_FLAG)
+            ) {
+                $result['errors'][] = Tools::displayError('Order status can not be set to Refunded until all bookings in the order are completely refunded.');
+            } elseif ($objNewOrderState->id == Configuration::get('PS_OS_CANCELED')
+                && !$this->hasCompletelyRefunded(Order::ORDER_COMPLETE_CANCELLATION_FLAG)
+            ) {
+                $result['errors'][] = Tools::displayError('Order status can not be set to Cancelled until all bookings in the order are cancelled.');
+            } elseif ($objCurrentOrderState->id == Configuration::get('PS_OS_ERROR') && !($objNewOrderState->id == Configuration::get('PS_OS_ERROR'))) {
+                // All rooms must be available before changing status from Payment Error to Other status in which rooms are getting blocked again
+                if ($orderBookings = $objHotelBooking->getOrderCurrentDataByOrderId($this->id)) {
+                    foreach ($orderBookings as $orderBooking) {
+                        // If booking is refunded then no need to check inventory
+                        if ($bookingRefundDetail = OrderReturn::getOrdersReturnDetail($this->id, 0, $orderBooking['id'])) {
+                            $bookingRefundDetail = reset($bookingRefundDetail);
+                        }
+                        if (($bookingRefundDetail && $bookingRefundDetail['refunded'] && $orderBooking['is_refunded'])
+                            || ($orderBooking['is_cancelled'] && $orderBooking['is_refunded'])
+                        ) {
+                            continue;
+                        } else {
+                            // if inventory is available for that booking
+                            $bookingParams = array(
+                                'date_from' => $orderBooking['date_from'],
+                                'date_to' => $orderBooking['date_to'],
+                                'hotel_id' => $orderBooking['id_hotel'],
+                                'id_room_type' => $orderBooking['id_product'],
+                                'only_search_data' => 1
+                            );
+
+                            $objHotelBookingDetail = new HotelBookingDetail($orderBooking['id']);
+                            if ($searchRoomsInfo = $objHotelBooking->getBookingData($bookingParams)) {
+                                if (isset($searchRoomsInfo['rm_data'][$orderBooking['id_product']]['data']['available'])
+                                    && $searchRoomsInfo['rm_data'][$orderBooking['id_product']]['data']['available']
+                                ) {
+                                    $availableRoomsInfo = $searchRoomsInfo['rm_data'][$orderBooking['id_product']]['data']['available'];
+                                    if ($roomIdsAvailable = array_column($availableRoomsInfo, 'id_room')) {
+                                        // Check If room is still there in the available rooms list
+                                        if (!in_array($orderBooking['id_room'], $roomIdsAvailable)) {
+                                            $result['errors'][] = Tools::displayError('You can not change the order status as some rooms are not available now in this order. You can reallocate/swap rooms with other rooms to make rooms available and then change the order status.');
+
+                                            break;
+                                        } else {
+                                            $objHotelBookingDetail->is_refunded = 0;
+                                            $objHotelBookingDetail->save();
+                                        }
+                                    } else {
+                                        $result['errors'][] = Tools::displayError('You can not change the order status as some rooms are not available now in this order. You can reallocate/swap rooms with other rooms to make rooms available and then change the order status.');
+                                        break;
+                                    }
+                                }
+                            } else {
+                                $result['errors'][] = Tools::displayError('You can not change the order status as some rooms are not available now in this order. You can reallocate/swap rooms with other rooms to make rooms available and then change the order status.');
+
+                                break;
+                            }
+                        }
+                    }
+                }
+            } elseif ($objCurrentOrderState->id == $objNewOrderState->id) {
+                $result['errors'][] = Tools::displayError('The order has already been assigned this status.');
+            }
+        }
+
+        if (!count($result['errors'])) {
+            // Create new OrderHistory
+            $context = Context::getContext();
+            $history = new OrderHistory();
+            $history->id_order = $this->id;
+            $history->id_employee = (int)$context->employee->id;
+
+            $useExistingsPayment = false;
+            if (!$this->hasInvoice()) {
+                $useExistingsPayment = true;
+            }
+            $history->changeIdOrderState((int)$objNewOrderState->id, $this, $useExistingsPayment);
+
+            // Save all changes
+            $templateVars = array();
+            if ($history->add(true)) {
+                if (!$history->sendEmail($this, $templateVars)) {
+                    // if an error occurred while sending an email the set has_mail_error to true
+                    $result['has_mail_error'] = true;
+                    $result['errors'][] = Tools::displayError('We were unable to send an email to the customer while changing order status.');
+                }
+
+                // synchronizes quantities if needed..
+                if (Configuration::get('PS_ADVANCED_STOCK_MANAGEMENT')) {
+                    foreach ($this->getProducts() as $product) {
+                        if (StockAvailable::dependsOnStock($product['product_id'])) {
+                            StockAvailable::synchronize($product['product_id'], (int)$product['id_shop']);
+                        }
+                    }
+                }
+            } else {
+                $result['errors'][] = Tools::displayError('An error occurred while changing order status.');
+            }
+        }
+
+        // if no errors then return status true
+        if (!count($result['errors'])) {
+            $result['status'] = true;
+        }
+
+        return $result;
+    }
 }

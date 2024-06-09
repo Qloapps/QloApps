@@ -1,0 +1,51 @@
+<?xml version="1.0"?>
+<entity_order_state>
+  <order_state id="Awaiting_payment">
+    <name>În așteptarea plății</name>
+    <template>awaiting_payment</template>
+  </order_state>
+  <order_state id="Payment_accepted">
+    <name>Plata completă primită</name>
+    <template>payment_accepted</template>
+  </order_state>
+  <order_state id="Processing_in_progress">
+    <name>În procesare</name>
+    <template>processing</template>
+  </order_state>
+  <order_state id="Canceled">
+    <name>Anulată</name>
+    <template>order_canceled</template>
+  </order_state>
+  <order_state id="Refund">
+    <name>Rambursată</name>
+    <template>refund</template>
+  </order_state>
+  <order_state id="Payment_error">
+    <name>Eroare de plată</name>
+    <template>payment_error</template>
+  </order_state>
+  <order_state id="Payment_remotely_accepted">
+    <name>Plata de la distanță acceptată</name>
+    <template>payment_accepted</template>
+  </order_state>
+  <order_state id="Awaiting_remote_payment">
+    <name>Awaiting remote payment</name>
+    <template/>
+  </order_state>
+  <order_state id="Overbooking_paid">
+    <name>Overbooking (Paid)</name>
+    <template/>
+  </order_state>
+  <order_state id="Overbooking_unpaid">
+    <name>Overbooking (Not paid)</name>
+    <template/>
+  </order_state>
+  <order_state id="Overbooking_partial_paid">
+    <name>Overbooking (Partial payment)</name>
+    <template/>
+  </order_state>
+  <order_state id="Partial_payment_accepted">
+    <name>Plata parțială primită</name>
+    <template>partial_payment_accepted</template>
+  </order_state>
+</entity_order_state>
