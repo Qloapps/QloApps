@@ -1253,7 +1253,8 @@ Quick View Styles
 
 .room_type_old_price {
   text-decoration: line-through;
-  color:#979797;
+  color:#FF4B4B;
+  display: block;
   font-size:15px;}
   #center_column .button-medium {
     background-color: #1292FF;

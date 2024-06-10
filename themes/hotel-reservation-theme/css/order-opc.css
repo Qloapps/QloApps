@@ -167,7 +167,8 @@
 }
 #order-opc .room_type_old_price {
 	text-decoration: line-through;
-	color:#979797;
+	color:#FF4B4B;
+	display: block;
 	font-size:12px;
 }
 #order-opc .block-small-header {

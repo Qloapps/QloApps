@@ -150,6 +150,11 @@
 											<div class="price_block">
 												<p class="total_price">
 													<span>
+														{if $rm_v['amount'] && $rm_v['total_price_without_discount'] > $rm_v['amount']}
+															<span class="room_type_old_price">
+																{displayPrice price=$rm_v['total_price_without_discount']|floatval}
+															</span>
+														{/if}
 														{displayPrice price=($rm_v['amount'])}
 													</span>
 													{if (($rm_v['amount'] - $rm_v['amount_without_auto_add']) > 0) && (in_array($data_v['id_product'], $discounted_products) || $PS_ROOM_PRICE_AUTO_ADD_BREAKDOWN)}
@@ -196,6 +201,11 @@
 									<div class="total_price_block pull-right">
 										<p class="total_price">
 											<span>
+												{if $rm_v['amount'] + $rm_v['demand_price'] && $rm_v['total_price_without_discount'] + $rm_v['demand_price'] > $rm_v['amount'] + $rm_v['demand_price']}
+													<span class="room_type_old_price">
+														{displayPrice price=($rm_v['total_price_without_discount']+$rm_v['demand_price'])|floatval}
+													</span>
+												{/if}
 												{displayPrice price=($rm_v['amount']+$rm_v['demand_price'])}
 											</span>
 										</p>
