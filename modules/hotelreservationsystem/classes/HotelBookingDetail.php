@@ -2197,7 +2197,19 @@ class HotelBookingDetail extends ObjectModel
 
                 // Check if this booking as any refund history then enter refund data
                 if ($refundInfo = OrderReturnCore::getOrdersReturnDetail($id_order, 0, $value['id'])) {
-                    $order_detail_data[$key]['refund_info'] = reset($refundInfo);
+                    $refundInfo = array_reverse($refundInfo);
+                    foreach ($refundInfo as $refund) {
+                        if ($order_detail_data[$key]['is_refunded'] && $refund['refunded']) {
+                            $order_detail_data[$key]['refund_info'] = $refund;
+                            break;
+                        } elseif (!$order_detail_data[$key]['is_refunded'] && $refund['denied']) {
+                            $order_detail_data[$key]['refund_info'] = $refund;
+                            break;
+                        } elseif (!$refund['denied'] && !$refund['refunded']) {
+                            $order_detail_data[$key]['refund_info'] = $refund;
+                            break;
+                        }
+                    }
                 }
             }
             return $order_detail_data;

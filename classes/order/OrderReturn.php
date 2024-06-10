@@ -179,7 +179,7 @@ class OrderReturnCore extends ObjectModel
 
     public function getOrderRefundRequestedBookings($idOrder, $idOrderReturn = 0, $onlyBookingIds = 0, $customerView = 0)
     {
-        $sql = 'SELECT hbd.*, ord.* FROM `'._DB_PREFIX_.'order_return` orr';
+        $sql = 'SELECT hbd.*, ord.*, orr.`state` as `id_return_state` FROM `'._DB_PREFIX_.'order_return` orr';
         $sql .= ' LEFT JOIN `'._DB_PREFIX_.'order_return_detail` ord ON (orr.`id_order_return` = ord.`id_order_return`)';
         $sql .= ' LEFT JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd ON (hbd.`id` = ord.`id_htl_booking`)';
         $sql .= ' WHERE orr.`id_order` = '.(int)$idOrder;

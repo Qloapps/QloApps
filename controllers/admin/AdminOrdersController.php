@@ -493,7 +493,7 @@ class AdminOrdersControllerCore extends AdminController
                     'class' => 'icon-print',
                 );
 
-                if (((int) $order->isReturnable()) && !$order->hasCompletelyRefunded(Order::ORDER_COMPLETE_CANCELLATION_OR_REFUND_REQUEST_FLAG)) {
+                if (((int) $order->isReturnable()) && !$order->hasCompletelyRefunded(Order::ORDER_COMPLETE_REFUND_FLAG)) {
                     $this->toolbar_btn['cancel'] = array(
                         'short' => ((float) $order->getTotalPaid()) ? $this->l('Refund') : $this->l('Cancel'),
                         'href' => '#refundForm',
@@ -938,10 +938,18 @@ class AdminOrdersControllerCore extends AdminController
             // get booking information by order
             $objBookingDetail = new HotelBookingDetail();
             $objOrderReturn = new OrderReturn();
-            $refundReqBookings = $objOrderReturn->getOrderRefundRequestedBookings($objOrder->id, 0, 1);
+            $refundReqBookings = $objOrderReturn->getOrderRefundRequestedBookings($objOrder->id, 0);
+            $pendingRequests = array();
+            foreach ($refundReqBookings as $refundBooking) {
+                $objOrderReturnState = new OrderReturnStateCore($refundBooking['id_return_state']);
+                if (!$objOrderReturnState->refunded && !$objOrderReturnState->denied) {
+                    $pendingRequests[] = $refundBooking['id_htl_booking'];
+                }
+            }
+
             if ($bookingOrderInfo = $objBookingDetail->getBookingDataByOrderId($objOrder->id)) {
                 foreach($bookingOrderInfo as $key => $booking) {
-                    if ((in_array($booking['id'], $refundReqBookings)) || $booking['is_refunded']) {
+                    if ($booking['is_refunded'] || (in_array($booking['id'], $pendingRequests))) {
                         unset($bookingOrderInfo[$key]);
                     }
                 }
@@ -1385,8 +1393,10 @@ class AdminOrdersControllerCore extends AdminController
                 $bookings = Tools::getValue('id_htl_booking');
                 if ($bookings && count($bookings)) {
                     foreach ($bookings as $idHtlBooking) {
-                        if (OrderReturn::getOrdersReturnDetail($order->id, 0, $idHtlBooking)) {
-                            $this->errors[] = Tools::displayError('Wrong bookings found for booking cancelation.');
+                        if ($return = OrderReturn::getOrdersReturnDetail($order->id, 0, $idHtlBooking)) {
+                            if ($return['refunded']) {
+                                $this->errors[] = Tools::displayError('Wrong bookings found for booking cancelation.');
+                            }
                             break;
                         }
                     }
