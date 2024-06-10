@@ -1099,7 +1099,7 @@ function initRoomEvents()
 						{
 							if (data.refresh)
 							{
-								location.reload();
+                                window.location.href = admin_order_tab_link + '&conf=3&vieworder&id_order=' + id_order;
 								return;
 							}
 							go = false;
@@ -1111,8 +1111,7 @@ function initRoomEvents()
 
 							// Initialize all events
 							init();
-							//Added by webkul
-							location.reload();
+							window.location.href = admin_order_tab_link + '&conf=3&vieworder&id_order=' + id_order;
 							//End
 							// $('.partial_refund_fields').hide();
 						}
@@ -1162,7 +1161,8 @@ function initRoomEvents()
 					updateAmounts(data.order);
 					updateInvoice(data.invoices);
 					updateDocuments(data.documents_html);
-					location.reload();
+
+					window.location.href = admin_order_tab_link + '&conf=1&vieworder&id_order=' + data.order.id;
 				}
 				else
 					jAlert(data.error);
@@ -1787,7 +1787,7 @@ $(document).ready(function() {
                 success : function(data) {
                     if (data.result) {
                         init();
-                        location.reload();
+                        window.location.href = admin_order_tab_link + '&conf=4&vieworder&id_order=' + data.order.id;
                     } else {
                         jAlert(data.error);
                     }

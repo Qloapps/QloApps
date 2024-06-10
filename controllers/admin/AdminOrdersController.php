@@ -3953,7 +3953,7 @@ class AdminOrdersControllerCore extends AdminController
                     if ($createFeaturePrice) {
                         $featurePriceParams['id_room'] = $room_info['id_room'];
                         $featurePriceParams = array_merge($featurePriceParams, array('date_from' => $date_from, 'date_to' => $date_to));
-                        $this->createFeaturePrice($featurePriceParams);
+                        HotelRoomTypeFeaturePricing::createAutoFeaturePrice($featurePriceParams);
                     }
                 } else {
                     break;
@@ -4407,32 +4407,6 @@ class AdminOrdersControllerCore extends AdminController
         )));
     }
 
-    protected function createFeaturePrice($params)
-    {
-        $feature_price_name = array();
-        foreach (Language::getIDs(true) as $id_lang) {
-            $feature_price_name[$id_lang] = 'Auto-generated';
-        }
-
-        $hrt_feature_price = new HotelRoomTypeFeaturePricing();
-        $hrt_feature_price->id_product = (int) $params['id_product'];
-        $hrt_feature_price->id_cart = (int) $params['id_cart'];
-        $hrt_feature_price->id_guest = (int) $params['id_guest'];
-        $hrt_feature_price->id_room = (int) $params['id_room'];
-        $hrt_feature_price->feature_price_name = $feature_price_name;
-        $hrt_feature_price->date_selection_type = HotelRoomTypeFeaturePricing::DATE_SELECTION_TYPE_RANGE;
-        $hrt_feature_price->date_from = date('Y-m-d', strtotime($params['date_from']));
-        $hrt_feature_price->date_to = date('Y-m-d', strtotime($params['date_to']));
-        $hrt_feature_price->is_special_days_exists = 0;
-        $hrt_feature_price->special_days = json_encode(false);
-        $hrt_feature_price->impact_way = HotelRoomTypeFeaturePricing::IMPACT_WAY_FIX_PRICE;
-        $hrt_feature_price->impact_type = HotelRoomTypeFeaturePricing::IMPACT_TYPE_FIXED_PRICE;
-        $hrt_feature_price->impact_value = $params['price'];
-        $hrt_feature_price->active = 1;
-        $hrt_feature_price->groupBox = array_column(Group::getGroups($this->context->language->id), 'id_group');
-        $hrt_feature_price->add();
-    }
-
     public function ajaxProcessEditRoomOnOrder()
     {
         // Return value
@@ -4494,7 +4468,7 @@ class AdminOrdersControllerCore extends AdminController
                     if (Validate::isLoadedObject($objProduct = new Product($roomInfo['id_product']))) {
                         // If room type is NOT DELETED then use current room type price calculation
                         $params = array_merge($params, array('date_from' => $new_date_from, 'date_to' => $new_date_to));
-                        $this->createFeaturePrice($params);
+                        HotelRoomTypeFeaturePricing::createAutoFeaturePrice($params);
 
                         $roomTotalPrice = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice(
                             $roomInfo['id_product'],
@@ -5247,7 +5221,7 @@ class AdminOrdersControllerCore extends AdminController
         $res &= $order->update();
 
         // Reinject quantity in stock
-        $this->reinjectQuantity($order_detail, $order_detail->product_quantity, $delete);
+        $order_detail->reinjectQuantity($order_detail, $order_detail->product_quantity, $delete);
 
         // Update weight SUM
         $order_carrier = new OrderCarrier((int) $order->getIdOrderCarrier());
@@ -5337,7 +5311,7 @@ class AdminOrdersControllerCore extends AdminController
         $res &= $order->update();
 
         // Reinject quantity in stock
-        $this->reinjectQuantity($order_detail, $order_detail->product_quantity, true);
+        $order_detail->reinjectQuantity($order_detail, $order_detail->product_quantity, true);
 
         // Update weight SUM
         $order_carrier = new OrderCarrier((int)$order->getIdOrderCarrier());
@@ -5735,101 +5709,6 @@ class AdminOrdersControllerCore extends AdminController
                 'name' => $this->l('Remote payment')
             ),
         );
-    }
-
-    /**
-     * @param OrderDetail $order_detail
-     * @param int $qty_cancel_product
-     * @param bool $delete
-     */
-    protected function reinjectQuantity($order_detail, $qty_cancel_product, $delete = false)
-    {
-        // Reinject product
-        $reinjectable_quantity = (int)$order_detail->product_quantity - (int)$order_detail->product_quantity_reinjected;
-        $quantity_to_reinject = $qty_cancel_product > $reinjectable_quantity ? $reinjectable_quantity : $qty_cancel_product;
-        // @since 1.5.0 : Advanced Stock Management
-        $product_to_inject = new Product($order_detail->product_id, false, (int)$this->context->language->id, (int)$order_detail->id_shop);
-
-        $product = new Product($order_detail->product_id, false, (int)$this->context->language->id, (int)$order_detail->id_shop);
-
-        if (Configuration::get('PS_ADVANCED_STOCK_MANAGEMENT') && $product->advanced_stock_management && $order_detail->id_warehouse != 0) {
-            $manager = StockManagerFactory::getManager();
-            $movements = StockMvt::getNegativeStockMvts(
-                $order_detail->id_order,
-                $order_detail->product_id,
-                $order_detail->product_attribute_id,
-                $quantity_to_reinject
-            );
-            $left_to_reinject = $quantity_to_reinject;
-            foreach ($movements as $movement) {
-                if ($left_to_reinject > $movement['physical_quantity']) {
-                    $quantity_to_reinject = $movement['physical_quantity'];
-                }
-
-                $left_to_reinject -= $quantity_to_reinject;
-                if (Pack::isPack((int)$product->id)) {
-                    // Gets items
-                    if ($product->pack_stock_type == 1 || $product->pack_stock_type == 2 || ($product->pack_stock_type == 3 && Configuration::get('PS_PACK_STOCK_TYPE') > 0)) {
-                        $products_pack = Pack::getItems((int)$product->id, (int)Configuration::get('PS_LANG_DEFAULT'));
-                        // Foreach item
-                        foreach ($products_pack as $product_pack) {
-                            if ($product_pack->advanced_stock_management == 1) {
-                                $manager->addProduct(
-                                    $product_pack->id,
-                                    $product_pack->id_pack_product_attribute,
-                                    new Warehouse($movement['id_warehouse']),
-                                    $product_pack->pack_quantity * $quantity_to_reinject,
-                                    null,
-                                    $movement['price_te'],
-                                    true
-                                );
-                            }
-                        }
-                    }
-                    if ($product->pack_stock_type == 0 || $product->pack_stock_type == 2 ||
-                            ($product->pack_stock_type == 3 && (Configuration::get('PS_PACK_STOCK_TYPE') == 0 || Configuration::get('PS_PACK_STOCK_TYPE') == 2))) {
-                        $manager->addProduct(
-                            $order_detail->product_id,
-                            $order_detail->product_attribute_id,
-                            new Warehouse($movement['id_warehouse']),
-                            $quantity_to_reinject,
-                            null,
-                            $movement['price_te'],
-                            true
-                        );
-                    }
-                } else {
-                    $manager->addProduct(
-                        $order_detail->product_id,
-                        $order_detail->product_attribute_id,
-                        new Warehouse($movement['id_warehouse']),
-                        $quantity_to_reinject,
-                        null,
-                        $movement['price_te'],
-                        true
-                    );
-                }
-            }
-
-            $id_product = $order_detail->product_id;
-            if ($delete) {
-                $order_detail->delete();
-            }
-            StockAvailable::synchronize($id_product);
-        } elseif ($order_detail->id_warehouse == 0) {
-            StockAvailable::updateQuantity(
-                $order_detail->product_id,
-                $order_detail->product_attribute_id,
-                $quantity_to_reinject,
-                $order_detail->id_shop
-            );
-
-            if ($delete) {
-                $order_detail->delete();
-            }
-        } else {
-            $this->errors[] = Tools::displayError('This product cannot be re-stocked.');
-        }
     }
 
     /**
