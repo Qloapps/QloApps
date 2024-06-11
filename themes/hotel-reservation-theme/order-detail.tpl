@@ -116,13 +116,17 @@
                     <div class="detail-row">
                         <div class="pull-left title">{l s='Status'}</div>
                         <div class="pull-right value status">
-                            <span{if isset($order_history[0].color) && $order_history[0].color} style="background-color:{$order_history[0].color|escape:'html':'UTF-8'}30; border: 1px solid {$order_history[0].color|escape:'html':'UTF-8'};" {/if} class="label">
-                                {if $order_history[0].id_order_state|in_array:$overbooking_order_states}
-                                    {l s='Order Not Confirmed'}
-                                {else}
-                                    {$order_history[0].ostate_name|escape:'html':'UTF-8'}
-                                {/if}
-                            </span>
+                            {if isset($order_history[0]) && $order_history[0]}
+                                <span{if isset($order_history[0].color) && $order_history[0].color} style="background-color:{$order_history[0].color|escape:'html':'UTF-8'}30; border: 1px solid {$order_history[0].color|escape:'html':'UTF-8'};" {/if} class="label">
+                                    {if $order_history[0].id_order_state|in_array:$overbooking_order_states}
+                                        {l s='Order Not Confirmed'}
+                                    {else}
+                                        {$order_history[0].ostate_name|escape:'html':'UTF-8'}
+                                    {/if}
+                                </span>
+                            {else}
+                                <span class="processing">{l s='Processing'}</span>
+                            {/if}
                         </div>
                     </div>
 
@@ -173,7 +177,7 @@
             {/if}
 
             {hook h='displayOrderDetailRoomDetailsBefore' id_order=$order->id}
-            <div class="card room-details card-toolbar">
+            <div class="card room-details">
                 <div class="card-header">
                     {l s='Room Details'}
                     <div class="booking-actions-wrap">
@@ -499,13 +503,17 @@
                     <div class="detail-row">
                         <div class="pull-left title">{l s='Status'}</div>
                         <div class="pull-right value status">
-                            <span{if isset($order_history[0].color) && $order_history[0].color} style="background-color:{$order_history[0].color|escape:'html':'UTF-8'}30; border: 1px solid {$order_history[0].color|escape:'html':'UTF-8'};" {/if} class="label">
-                                {if $order_history[0].id_order_state|in_array:$overbooking_order_states}
-                                    {l s='Order Not Confirmed'}
-                                {else}
-                                    {$order_history[0].ostate_name|escape:'html':'UTF-8'}
-                                {/if}
-                            </span>
+                            {if isset($order_history[0]) && $order_history[0]}
+                                <span{if isset($order_history[0].color) && $order_history[0].color} style="background-color:{$order_history[0].color|escape:'html':'UTF-8'}30; border: 1px solid {$order_history[0].color|escape:'html':'UTF-8'};" {/if} class="label">
+                                    {if $order_history[0].id_order_state|in_array:$overbooking_order_states}
+                                        {l s='Order Not Confirmed'}
+                                    {else}
+                                        {$order_history[0].ostate_name|escape:'html':'UTF-8'}
+                                    {/if}
+                                </span>
+                            {else}
+                                <span class="processing">{l s='Processing'}</span>
+                            {/if}
                         </div>
                     </div>
 
@@ -777,7 +785,10 @@
                                                                             {if $hotel_booking_detail.is_refunded || $hotel_booking_detail.is_cancelled}<span class="badge badge-danger badge-cancelled">{l s='Cancelled'}</span>{/if}
                                                                         </div>
                                                                     </div>
-                                                                    {assign var='has_services' value=(isset($rm_v.additional_services) && isset($rm_v.additional_services[$hotel_booking_detail.id_room]) && isset($rm_v.additional_services[$hotel_booking_detail.id_room]['additional_services']))}
+
+                                                                    {* Services are indexed with id_htl_booking *}
+                                                                    {assign var='has_services' value=(isset($rm_v.additional_services) && isset($rm_v.additional_services[$hotel_booking_detail.id_htl_booking]) && isset($rm_v.additional_services[$hotel_booking_detail.id_htl_booking]['additional_services']))}
+                                                                    {* Additional Facilities are indexed with id_room *}
                                                                     {assign var='has_facilities' value=(isset($rm_v.extra_demands) && isset($rm_v.extra_demands[$hotel_booking_detail.id_room]) && isset($rm_v.extra_demands[$hotel_booking_detail.id_room]['extra_demands']))}
                                                                     {if $has_services || $has_facilities}
                                                                         <div class="extra-services-wrap clearfix">
@@ -787,7 +798,7 @@
                                                                                         <strong>{l s='Services'}</strong>
                                                                                     </div>
                                                                                     <div class="col-xs-9">
-                                                                                        {foreach from=$rm_v.additional_services[$hotel_booking_detail.id_room]['additional_services'] item=service}
+                                                                                        {foreach from=$rm_v.additional_services[$hotel_booking_detail.id_htl_booking]['additional_services'] item=service}
                                                                                             <span class="service">{$service.name}</span>
                                                                                         {/foreach}
                                                                                     </div>
