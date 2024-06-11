@@ -427,14 +427,27 @@ class ProductControllerCore extends FrontController
                     if (Configuration::get('PS_FRONT_ROOM_UNIT_SELECTION_TYPE') == HotelBookingDetail::PS_ROOM_UNIT_SELECTION_TYPE_QUANTITY) {
                         $occupancy_value = 1;
                     } else {
-                        $occupancy_value = array(
-                            array(
-                                'adults' => $room_info_by_product_id['adults'],
-                                'children' => 0,
-                                'child_ages' => array(),
-                            ),
-                        );
+                        $useDefaultOccupancy = true;
+                        // if coming from hotel page do not set occupancy, otherwise set base adult occupancy
+                        if (isset($_SERVER['HTTP_REFERER']) && $_SERVER['HTTP_REFERER'] == Tools::secureReferrer($_SERVER['HTTP_REFERER'])) { // Assure us the previous page was one of the site
+                            $idCategoryHotel = $hotel_branch_obj->id_category;
+                            $categoryPageLink = $this->context->link->getCategoryLink($idCategoryHotel);
+                            if (Tools::strpos($_SERVER['HTTP_REFERER'], $categoryPageLink) === 0) {
+                                $useDefaultOccupancy = false;
+                            }
+                        }
+
+                        if ($useDefaultOccupancy) {
+                            $occupancy_value = array(
+                                array(
+                                    'adults' => $room_info_by_product_id['adults'],
+                                    'children' => 0,
+                                    'child_ages' => array(),
+                                ),
+                            );
+                        }
                     }
+
                     $this->assignBookingFormVars($this->product->id, $date_from, $date_to, $occupancy_value);
                     $this->assignServiceProductVars();
 

@@ -493,7 +493,7 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
                         $cartrule->date_from = date('Y-m-d H:i:s', $now);
                         $cartrule->date_to = date('Y-m-d H:i:s', $now + (3600 * 24 * 365.25)); /* 1 year */
                         $cartrule->active = 1;
-
+                        $cartrule->highlight = 1;
                         $cartrule->reduction_amount = $totalRefundedAmount;
                         $cartrule->reduction_tax = true;
                         $cartrule->minimum_amount_currency = $objOrder->id_currency;

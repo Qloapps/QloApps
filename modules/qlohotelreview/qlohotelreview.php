@@ -187,13 +187,14 @@ class QloHotelReview extends Module
         if (QhrHotelReviewHelper::getIsReviewable($idOrder)
             && !QhrHotelReview::getByIdOrder($idOrder)
         ) {
-            $hotel = QhrHotelReviewHelper::getHotelByOrder($idOrder);
-            $this->smarty->assign(array(
-                'id_order' => (int) $idOrder,
-                'id_hotel' => $hotel['id_hotel'],
-                'hotel_name' => $hotel['hotel_name'],
-            ));
-            return $this->display(__FILE__, 'booking-action.tpl');
+            if ($hotel = QhrHotelReviewHelper::getHotelByOrder($idOrder)) {
+                $this->smarty->assign(array(
+                    'id_order' => (int) $idOrder,
+                    'id_hotel' => $hotel['id_hotel'],
+                    'hotel_name' => $hotel['hotel_name'],
+                ));
+                return $this->display(__FILE__, 'booking-action.tpl');
+            }
         }
     }
 
