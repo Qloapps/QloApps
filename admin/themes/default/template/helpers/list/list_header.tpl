@@ -557,10 +557,11 @@
 	<style>
 	@media (max-width: 992px) {
 		{foreach from=$fields_display item=param name=params}
-			{if isset($params.displayed) && $params.displayed === false}{continue}{/if}
-			.table-responsive-row td:nth-of-type({math equation="x+y" x=$smarty.foreach.params.index y=$y}):before {
+			{if isset($param.displayed) && $param.displayed === false}{continue}{/if}
+			.table-responsive-row td:nth-of-type({$y}):before {
 				content: "{$param.title}";
 			}
+            {assign var=y value=$y+1}
 		{/foreach}
 	}
 	</style>

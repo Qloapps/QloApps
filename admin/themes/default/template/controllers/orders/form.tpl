@@ -139,6 +139,7 @@
 		$('body').on('click', '.delete_hotel_cart_data', function(){
 			if (confirm("{l s='Are you sure?'}"))
         	{
+                var idCart = $(this).data('id_cart');
 				$.ajax({
 					type:"POST",
 					url: "{$link->getAdminLink('AdminOrders')|addslashes}",
@@ -147,7 +148,7 @@
 						action: "deleteRoomProcess",
 						del_id: $(this).data('id'),
 						id_product: $(this).data('id_product'),
-						id_cart: $(this).data('id_cart'),
+						id_cart: idCart,
 						id_room: $(this).data('id_room'),
 						date_from: $(this).data('date_from'),
 						date_to: $(this).data('date_to'),
@@ -159,7 +160,7 @@
 						{
 							showSuccessMessage("{l s='Remove successful'}");
 							if (data.cart_rooms)
-								location.reload();
+								window.location.href = "{$link->getAdminLink('AdminOrders',true)}" + '&addorder&cart_id=' + idCart;
 							else
 								window.location.href = "{$link->getAdminLink('AdminHotelRoomsBooking',true)}";
 						}
@@ -1731,539 +1732,540 @@
 
 <div class="leadin">{block name="leadin"}{/block}</div>
 {include file='controllers/orders/_current_cart_details_data.tpl'}
-	<div class="panel form-horizontal" id="customer_part" {if isset($is_order_created) && $is_order_created}style="display:none;"{/if}>
-		<div class="panel-heading">
-			<i class="icon-user"></i>
-			{l s='Customer'}
-		</div>
-		<div id="search-customer-form-group" class="form-group">
-			<label class="control-label col-lg-3">
-				<span title="" data-toggle="tooltip" class="label-tooltip" data-original-title="{l s='Search for an existing customer by typing the first letters of his/her name.'}">
-					{l s='Search for a customer'}
-				</span>
-			</label>
-			<div class="col-lg-9">
-				<div class="row">
-					<div class="col-lg-6">
-						<div class="input-group">
-							<input type="text" id="customer" value="" />
-							<span class="input-group-addon">
-								<i class="icon-search"></i>
-							</span>
-						</div>
-					</div>
-					<div class="col-lg-6">
-						<span class="form-control-static">{l s='Or'}&nbsp;</span>
-						<a class="fancybox_customer btn btn-default" href="{$link->getAdminLink('AdminCustomers')|escape:'html':'UTF-8'}&amp;addcustomer&amp;liteDisplaying=1&amp;submitFormAjax=1#">
-							<i class="icon-plus-sign-alt"></i>
-							{l s='Add new customer'}
-						</a>
-					</div>
-				</div>
-			</div>
-		</div>
-		<div class="row">
-			<div id="customers"></div>
-		</div>
-		{*<div id="carts">
-			<button type="button" id="show_old_carts" class="btn btn-default pull-right" data-toggle="collapse" data-target="#old_carts_orders">
-				<i class="icon-caret-down"></i>
-			</button>
+    {* If cart has errors the do not allow to proceed with this cart *}
+    <div class="panel form-horizontal" id="customer_part" {if isset($is_order_created) && $is_order_created}style="display:none;"{/if}>
+        <div class="panel-heading">
+            <i class="icon-user"></i>
+            {l s='Customer'}
+        </div>
+        <div id="search-customer-form-group" class="form-group">
+            <label class="control-label col-lg-3">
+                <span title="" data-toggle="tooltip" class="label-tooltip" data-original-title="{l s='Search for an existing customer by typing the first letters of his/her name.'}">
+                    {l s='Search for a customer'}
+                </span>
+            </label>
+            <div class="col-lg-9">
+                <div class="row">
+                    <div class="col-lg-6">
+                        <div class="input-group">
+                            <input type="text" id="customer" value="" />
+                            <span class="input-group-addon">
+                                <i class="icon-search"></i>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <span class="form-control-static">{l s='Or'}&nbsp;</span>
+                        <a class="fancybox_customer btn btn-default" href="{$link->getAdminLink('AdminCustomers')|escape:'html':'UTF-8'}&amp;addcustomer&amp;liteDisplaying=1&amp;submitFormAjax=1#">
+                            <i class="icon-plus-sign-alt"></i>
+                            {l s='Add new customer'}
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div id="customers"></div>
+        </div>
+        {*<div id="carts">
+            <button type="button" id="show_old_carts" class="btn btn-default pull-right" data-toggle="collapse" data-target="#old_carts_orders">
+                <i class="icon-caret-down"></i>
+            </button>
 
-			<ul id="old_carts_orders_navtab" class="nav nav-tabs">
-				<li class="active">
-					<a href="#nonOrderedCarts" data-toggle="tab">
-						<i class="icon-shopping-cart"></i>
-						{l s='Carts'}
-					</a>
-				</li>
-				<li>
-					<a href="#lastOrders" data-toggle="tab">
-						<i class="icon-credit-card"></i>
-						{l s='Orders'}
-					</a>
-				</li>
-			</ul>
-			<div id="old_carts_orders" class="tab-content panel collapse in">
-				<div id="nonOrderedCarts" class="tab-pane active">
-					<table class="table">
-						<thead>
-							<tr>
-								<th><span class="title_box">{l s='ID'}</span></th>
-								<th><span class="title_box">{l s='Date'}</span></th>
-								<th><span class="title_box">{l s='Total'}</span></th>
-								<th></th>
-							</tr>
-						</thead>
-						<tbody>
-						</tbody>
-					</table>
-				</div>
-				<div id="lastOrders" class="tab-pane">
-					<table class="table">
-						<thead>
-							<tr>
-								<th><span class="title_box">{l s='ID'}</span></th>
-								<th><span class="title_box">{l s='Date'}</span></th>
-								<th><span class="title_box">{l s='Products'}</span></th>
-								<th><span class="title_box">{l s='Total paid'}</span></th>
-								<th><span class="title_box">{l s='Payment'}</span></th>
-								<th><span class="title_box">{l s='Status'}</span></th>
-								<th></th>
-							</tr>
-						</thead>
-						<tbody>
-						</tbody>
-					</table>
-				</div>
-			</div>
-		</div> -->*}<!-- by webkul to hide unnessesary content -->
-	</div>
+            <ul id="old_carts_orders_navtab" class="nav nav-tabs">
+                <li class="active">
+                    <a href="#nonOrderedCarts" data-toggle="tab">
+                        <i class="icon-shopping-cart"></i>
+                        {l s='Carts'}
+                    </a>
+                </li>
+                <li>
+                    <a href="#lastOrders" data-toggle="tab">
+                        <i class="icon-credit-card"></i>
+                        {l s='Orders'}
+                    </a>
+                </li>
+            </ul>
+            <div id="old_carts_orders" class="tab-content panel collapse in">
+                <div id="nonOrderedCarts" class="tab-pane active">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th><span class="title_box">{l s='ID'}</span></th>
+                                <th><span class="title_box">{l s='Date'}</span></th>
+                                <th><span class="title_box">{l s='Total'}</span></th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+                <div id="lastOrders" class="tab-pane">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th><span class="title_box">{l s='ID'}</span></th>
+                                <th><span class="title_box">{l s='Date'}</span></th>
+                                <th><span class="title_box">{l s='Products'}</span></th>
+                                <th><span class="title_box">{l s='Total paid'}</span></th>
+                                <th><span class="title_box">{l s='Payment'}</span></th>
+                                <th><span class="title_box">{l s='Status'}</span></th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div> -->*}<!-- by webkul to hide unnessesary content -->
+    </div>
 
-<form class="form-horizontal" action="{$link->getAdminLink('AdminOrders')|escape:'html':'UTF-8'}&amp;submitAdd{$table|escape:'html':'UTF-8'}=1" method="post" style="display:none" id="cart_detail_form">
-	<div class="panel" id="products_part" style="display:none;">
-		<div class="panel-heading">
-			<i class="icon-shopping-cart"></i>
-			{l s='Cart'}
-		</div>
-		<div class="form-group">
-			<input type="hidden" value="{$cart->id}" id="id_cart" name="id_cart" />
-		</div>
-		{*<div class="form-group">
-			<label class="control-label col-lg-3">
-				<span title="" data-toggle="tooltip" class="label-tooltip" data-original-title="{l s='Search for an existing product by typing the first letters of its name.'}">
-					{l s='Search for a product'}
-				</span>
-			</label>
-			<div class="col-lg-9">
-				<input type="hidden" value="{$cart->id}" id="id_cart" name="id_cart" />
-				<div class="input-group">
-					<input type="text" id="product" value="" />
-					<span class="input-group-addon">
-						<i class="icon-search"></i>
-					</span>
-				</div>
-			</div>
-		</div>
+    <form class="form-horizontal" action="{$link->getAdminLink('AdminOrders')|escape:'html':'UTF-8'}&amp;addorder=1&amp;cart_id={$cart->id}" method="post" style="display:none" id="cart_detail_form">
+        <div class="panel" id="products_part" style="display:none;">
+            <div class="panel-heading">
+                <i class="icon-shopping-cart"></i>
+                {l s='Cart'}
+            </div>
+            <div class="form-group">
+                <input type="hidden" value="{$cart->id}" id="id_cart" name="id_cart" />
+            </div>
+            {*<div class="form-group">
+                <label class="control-label col-lg-3">
+                    <span title="" data-toggle="tooltip" class="label-tooltip" data-original-title="{l s='Search for an existing product by typing the first letters of its name.'}">
+                        {l s='Search for a product'}
+                    </span>
+                </label>
+                <div class="col-lg-9">
+                    <input type="hidden" value="{$cart->id}" id="id_cart" name="id_cart" />
+                    <div class="input-group">
+                        <input type="text" id="product" value="" />
+                        <span class="input-group-addon">
+                            <i class="icon-search"></i>
+                        </span>
+                    </div>
+                </div>
+            </div>
 
-		<div id="products_found">
-			<hr/>
-			<div id="product_list" class="form-group"></div>
-			<div id="attributes_list" class="form-group"></div> -->
-			<!-- @TODO: please be kind refacto -->
-			<div class="form-group">
-				<div class="col-lg-9 col-lg-offset-3">
-					<iframe id="customization_list" seamless>
-						<html>
-						<head>
-							{if isset($css_files_orders)}
-								{foreach from=$css_files_orders key=css_uri item=media}
-									<link href="{$css_uri}" rel="stylesheet" type="text/css" media="{$media}" />
-								{/foreach}
-							{/if}
-						</head>
-						<body>
-						</body>
-						</html>
-					</iframe>
-				</div>
-			</div>
-			<div class="form-group">
-				<label class="control-label col-lg-3" for="qty">{l s='Quantity'}</label>
-				<div class="col-lg-9">
-					<input type="text" name="qty" id="qty" class="form-control fixed-width-sm" value="1" />
-					<p class="help-block">{l s='In stock'} <span id="qty_in_stock"></span></p>
-				</div>
-			</div>
+            <div id="products_found">
+                <hr/>
+                <div id="product_list" class="form-group"></div>
+                <div id="attributes_list" class="form-group"></div> -->
+                <!-- @TODO: please be kind refacto -->
+                <div class="form-group">
+                    <div class="col-lg-9 col-lg-offset-3">
+                        <iframe id="customization_list" seamless>
+                            <html>
+                            <head>
+                                {if isset($css_files_orders)}
+                                    {foreach from=$css_files_orders key=css_uri item=media}
+                                        <link href="{$css_uri}" rel="stylesheet" type="text/css" media="{$media}" />
+                                    {/foreach}
+                                {/if}
+                            </head>
+                            <body>
+                            </body>
+                            </html>
+                        </iframe>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-lg-3" for="qty">{l s='Quantity'}</label>
+                    <div class="col-lg-9">
+                        <input type="text" name="qty" id="qty" class="form-control fixed-width-sm" value="1" />
+                        <p class="help-block">{l s='In stock'} <span id="qty_in_stock"></span></p>
+                    </div>
+                </div>
 
-			<div class="form-group">
-				<div class="col-lg-9 col-lg-offset-3">
-					<button type="button" class="btn btn-default" id="submitAddProduct" />
-					<i class="icon-ok text-success"></i>
-					{l s='Add to cart'}
-				</div>
-			</div>
-		</div>
+                <div class="form-group">
+                    <div class="col-lg-9 col-lg-offset-3">
+                        <button type="button" class="btn btn-default" id="submitAddProduct" />
+                        <i class="icon-ok text-success"></i>
+                        {l s='Add to cart'}
+                    </div>
+                </div>
+            </div>
 
-		<div id="products_err" class="hide alert alert-danger"></div>
+            <div id="products_err" class="hide alert alert-danger"></div>
 
-		<hr/>
+            <hr/>
 
-		<div class="row">
-			<div class="col-lg-12">
-				<table class="table" id="customer_cart">
-					<thead>
-						<tr>
-							<th><span class="title_box">{l s='Product'}</span></th>
-							<th><span class="title_box">{l s='Description'}</span></th>
-							<th><span class="title_box">{l s='Reference'}</span></th>
-							<th><span class="title_box">{l s='Unit price'}</span></th>
-							<th><span class="title_box">{l s='Quantity'}</span></th>
-							<th><span class="title_box">{l s='Price'}</span></th>
-						</tr>
-					</thead>
-					<tbody>
-					</tbody>
-				</table>
-			</div>
-		</div>
+            <div class="row">
+                <div class="col-lg-12">
+                    <table class="table" id="customer_cart">
+                        <thead>
+                            <tr>
+                                <th><span class="title_box">{l s='Product'}</span></th>
+                                <th><span class="title_box">{l s='Description'}</span></th>
+                                <th><span class="title_box">{l s='Reference'}</span></th>
+                                <th><span class="title_box">{l s='Unit price'}</span></th>
+                                <th><span class="title_box">{l s='Quantity'}</span></th>
+                                <th><span class="title_box">{l s='Price'}</span></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
 
-		<div class="form-group">
-			<div class="col-lg-9 col-lg-offset-3">
-				<div class="alert alert-warning">{l s='The prices are without taxes.'}</div>
-			</div>
-		</div> *}<!-- by webkul to hide unnessesary content -->
+            <div class="form-group">
+                <div class="col-lg-9 col-lg-offset-3">
+                    <div class="alert alert-warning">{l s='The prices are without taxes.'}</div>
+                </div>
+            </div> *}<!-- by webkul to hide unnessesary content -->
 
 
-		<div class="form-group">
-			<label class="control-label col-lg-3" for="id_currency">
-				{l s='Currency'}
-			</label>
-			<script type="text/javascript">
-				{foreach from=$currencies item='currency'}
-					currencies['{$currency.id_currency}'] = '{$currency.sign}';
-				{/foreach}
-			</script>
-			<div class="col-lg-9">
-				<select id="id_currency" name="id_currency">
-					{foreach from=$currencies item='currency'}
-						<option rel="{$currency.iso_code}" value="{$currency.id_currency}">{$currency.name}</option>
-					{/foreach}
-				</select>
-			</div>
-		</div>
-		<div class="form-group">
-			<label class="control-label col-lg-3" for="id_lang">
-				{l s='Language'}
-			</label>
-			<div class="col-lg-9">
-				<select id="id_lang" name="id_lang">
-					{foreach from=$langs item='lang'}
-						<option value="{$lang.id_lang}">{$lang.name}</option>
-					{/foreach}
-				</select>
-			</div>
-		</div>
-	</div>
+            <div class="form-group">
+                <label class="control-label col-lg-3" for="id_currency">
+                    {l s='Currency'}
+                </label>
+                <script type="text/javascript">
+                    {foreach from=$currencies item='currency'}
+                        currencies['{$currency.id_currency}'] = '{$currency.sign}';
+                    {/foreach}
+                </script>
+                <div class="col-lg-9">
+                    <select id="id_currency" name="id_currency">
+                        {foreach from=$currencies item='currency'}
+                            <option rel="{$currency.iso_code}" value="{$currency.id_currency}">{$currency.name}</option>
+                        {/foreach}
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label col-lg-3" for="id_lang">
+                    {l s='Language'}
+                </label>
+                <div class="col-lg-9">
+                    <select id="id_lang" name="id_lang">
+                        {foreach from=$langs item='lang'}
+                            <option value="{$lang.id_lang}">{$lang.name}</option>
+                        {/foreach}
+                    </select>
+                </div>
+            </div>
+        </div>
 
-	<div class="panel" id="vouchers_part" style="display:none;">
-		<div class="panel-heading">
-			<i class="icon-ticket"></i>
-			{l s='Vouchers'}
-		</div>
-		<div class="form-group">
-			<label class="control-label col-lg-3">
-				{l s='Search for a voucher'}
-			</label>
-			<div class="col-lg-9">
-				<div class="row">
-					<div class="col-lg-6">
-						<div class="input-group">
-							<input type="text" id="voucher" value="" />
-							<div class="input-group-addon">
-								<i class="icon-search"></i>
-							</div>
-						</div>
-					</div>
-					<div class="col-lg-6">
-						<span class="form-control-static">{l s='Or'}&nbsp;</span>
-						<a class="fancybox btn btn-default" href="{$link->getAdminLink('AdminCartRules')|escape:'html':'UTF-8'}&amp;addcart_rule&amp;liteDisplaying=1&amp;submitFormAjax=1#">
-							<i class="icon-plus-sign-alt"></i>
-							{l s='Add new voucher'}
-						</a>
-					</div>
-				</div>
-			</div>
-		</div>
-		<div class="row">
-			<table class="table" id="voucher_list">
-				<thead>
-					<tr>
-						<th><span class="title_box">{l s='Name'}</span></th>
-						<th><span class="title_box">{l s='Description'}</span></th>
-						<th><span class="title_box">{l s='Value'}</span></th>
-						<th></th>
-					</tr>
-				</thead>
-				<tbody>
-				</tbody>
-			</table>
-		</div>
-		<div id="vouchers_err" class="alert alert-warning" style="display:none;"></div>
-	</div>
+        <div class="panel" id="vouchers_part" style="display:none;">
+            <div class="panel-heading">
+                <i class="icon-ticket"></i>
+                {l s='Vouchers'}
+            </div>
+            <div class="form-group">
+                <label class="control-label col-lg-3">
+                    {l s='Search for a voucher'}
+                </label>
+                <div class="col-lg-9">
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="input-group">
+                                <input type="text" id="voucher" value="" />
+                                <div class="input-group-addon">
+                                    <i class="icon-search"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <span class="form-control-static">{l s='Or'}&nbsp;</span>
+                            <a class="fancybox btn btn-default" href="{$link->getAdminLink('AdminCartRules')|escape:'html':'UTF-8'}&amp;addcart_rule&amp;liteDisplaying=1&amp;submitFormAjax=1#">
+                                <i class="icon-plus-sign-alt"></i>
+                                {l s='Add new voucher'}
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <table class="table" id="voucher_list">
+                    <thead>
+                        <tr>
+                            <th><span class="title_box">{l s='Name'}</span></th>
+                            <th><span class="title_box">{l s='Description'}</span></th>
+                            <th><span class="title_box">{l s='Value'}</span></th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+            <div id="vouchers_err" class="alert alert-warning" style="display:none;"></div>
+        </div>
 
-	<div class="panel" id="address_part" style="">
-		<div class="panel-heading">
-			<i class="icon-envelope"></i>
-			{l s='Addresses'}
-		</div>
-		<div id="addresses_err" class="alert alert-warning" style="display:none;"></div>
+        <div class="panel" id="address_part" style="">
+            <div class="panel-heading">
+                <i class="icon-envelope"></i>
+                {l s='Addresses'}
+            </div>
+            <div id="addresses_err" class="alert alert-warning" style="display:none;"></div>
 
-		<div class="row">
-			<div id="address_delivery" class="col-xs-6 col-sm-6">
-				<h4>
-					<i class="icon-map-marker"></i>
-					{l s='Customer Address'}
-				</h4>
-				<div class="row-margin-bottom">
-					<select id="id_address_delivery" name="id_address_delivery"></select>
-				</div>
-				<div class="well">
-					<a href="" id="edit_delivery_address" class="btn btn-default pull-right fancybox"><i class="icon-pencil"></i> {l s='Edit'}</a>
-					<div id="address_delivery_detail"></div>
-				</div>
-			</div>
-			<div id="address_invoice" class="col-lg-6 hidden">
-				<h4>
-					<i class="icon-file-text"></i>
-					{l s='Invoice'}
-				</h4>
-				<div class="row-margin-bottom">
-					<select id="id_address_invoice" name="id_address_invoice"></select>
-				</div>
-				<div class="well">
-					<a href="" id="edit_invoice_address" class="btn btn-default pull-right fancybox"><i class="icon-pencil"></i> {l s='Edit'}</a>
-					<div id="address_invoice_detail"></div>
-				</div>
-			</div>
-		</div>
-		<div class="row">
-			<div class="col-lg-12">
-				<a class="fancybox btn btn-default" id="new_address" href="{$link->getAdminLink('AdminAddresses')|escape:'html':'UTF-8'}&amp;addaddress&amp;id_customer=42&amp;liteDisplaying=1&amp;submitFormAjax=1#">
-					<i class="icon-plus-sign-alt"></i>
-					{l s='Add a new address'}
-				</a>
-			</div>
-		</div>
-	</div>
-	<div class="panel" id="carriers_part" style="display:none;">
-		<div class="panel-heading">
-			<i class="icon-truck"></i>
-			{l s='Shipping'}
-		</div>
-		<div id="carriers_err" style="display:none;" class="alert alert-warning"></div>
-		<div id="carrier_form">
-			<div class="form-group">
-				<label class="control-label col-lg-3">
-					{l s='Delivery option'}
-				</label>
-				<div class="col-lg-9">
-					<select name="delivery_option" id="delivery_option">
-					</select>
-				</div>
-			</div>
-			<div class="form-group">
-				<label class="control-label col-lg-3" for="shipping_price">
-					{l s='Shipping price (Tax incl.)'}
-				</label>
-				<div class="col-lg-9">
-					<p id="shipping_price" class="form-control-static" name="shipping_price"></p>
-				</div>
-			</div>
-			<div class="form-group">
-				<label class="control-label col-lg-3" for="free_shipping">
-					{l s='Free shipping'}
-				</label>
-				<div class="input-group col-lg-9 fixed-width-lg">
-					<span class="switch prestashop-switch">
-						<input type="radio" name="free_shipping" id="free_shipping" value="1">
-						<label for="free_shipping" class="radioCheck">
-							{l s='yes'}
-						</label>
-						<input type="radio" name="free_shipping" id="free_shipping_off" value="0" checked="checked">
-						<label for="free_shipping_off" class="radioCheck">
-							{l s='No'}
-						</label>
-						<a class="slide-button btn"></a>
-					</span>
-				</div>
-			</div>
+            <div class="row">
+                <div id="address_delivery" class="col-xs-6 col-sm-6">
+                    <h4>
+                        <i class="icon-map-marker"></i>
+                        {l s='Customer Address'}
+                    </h4>
+                    <div class="row-margin-bottom">
+                        <select id="id_address_delivery" name="id_address_delivery"></select>
+                    </div>
+                    <div class="well">
+                        <a href="" id="edit_delivery_address" class="btn btn-default pull-right fancybox"><i class="icon-pencil"></i> {l s='Edit'}</a>
+                        <div id="address_delivery_detail"></div>
+                    </div>
+                </div>
+                <div id="address_invoice" class="col-lg-6 hidden">
+                    <h4>
+                        <i class="icon-file-text"></i>
+                        {l s='Invoice'}
+                    </h4>
+                    <div class="row-margin-bottom">
+                        <select id="id_address_invoice" name="id_address_invoice"></select>
+                    </div>
+                    <div class="well">
+                        <a href="" id="edit_invoice_address" class="btn btn-default pull-right fancybox"><i class="icon-pencil"></i> {l s='Edit'}</a>
+                        <div id="address_invoice_detail"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-12">
+                    <a class="fancybox btn btn-default" id="new_address" href="{$link->getAdminLink('AdminAddresses')|escape:'html':'UTF-8'}&amp;addaddress&amp;id_customer=42&amp;liteDisplaying=1&amp;submitFormAjax=1#">
+                        <i class="icon-plus-sign-alt"></i>
+                        {l s='Add a new address'}
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="panel" id="carriers_part" style="display:none;">
+            <div class="panel-heading">
+                <i class="icon-truck"></i>
+                {l s='Shipping'}
+            </div>
+            <div id="carriers_err" style="display:none;" class="alert alert-warning"></div>
+            <div id="carrier_form">
+                <div class="form-group">
+                    <label class="control-label col-lg-3">
+                        {l s='Delivery option'}
+                    </label>
+                    <div class="col-lg-9">
+                        <select name="delivery_option" id="delivery_option">
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-lg-3" for="shipping_price">
+                        {l s='Shipping price (Tax incl.)'}
+                    </label>
+                    <div class="col-lg-9">
+                        <p id="shipping_price" class="form-control-static" name="shipping_price"></p>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-lg-3" for="free_shipping">
+                        {l s='Free shipping'}
+                    </label>
+                    <div class="input-group col-lg-9 fixed-width-lg">
+                        <span class="switch prestashop-switch">
+                            <input type="radio" name="free_shipping" id="free_shipping" value="1">
+                            <label for="free_shipping" class="radioCheck">
+                                {l s='yes'}
+                            </label>
+                            <input type="radio" name="free_shipping" id="free_shipping_off" value="0" checked="checked">
+                            <label for="free_shipping_off" class="radioCheck">
+                                {l s='No'}
+                            </label>
+                            <a class="slide-button btn"></a>
+                        </span>
+                    </div>
+                </div>
 
-			{if $recyclable_pack}
-			<div class="form-group">
-				<div class="checkbox col-lg-9 col-offset-3">
-					<label for="carrier_recycled_package">
-						<input type="checkbox" name="carrier_recycled_package" value="1" id="carrier_recycled_package" />
-						{l s='Recycled package'}
-					</label>
-				</div>
-			</div>
-			{/if}
+                {if $recyclable_pack}
+                <div class="form-group">
+                    <div class="checkbox col-lg-9 col-offset-3">
+                        <label for="carrier_recycled_package">
+                            <input type="checkbox" name="carrier_recycled_package" value="1" id="carrier_recycled_package" />
+                            {l s='Recycled package'}
+                        </label>
+                    </div>
+                </div>
+                {/if}
 
-			{if $gift_wrapping}
-			<div class="form-group">
-				<div class="checkbox col-lg-9 col-offset-3">
-					<label for="order_gift">
-						<input type="checkbox" name="order_gift" id="order_gift" value="1" />
-						{l s='Gift'}
-					</label>
-				</div>
-			</div>
-			<div class="form-group">
-				<label class="control-label col-lg-3" for="gift_message">{l s='Gift message'}</label>
-				<div class="col-lg-9">
-					<textarea id="gift_message" class="form-control" cols="40" rows="4"></textarea>
-				</div>
-			</div>
-			{/if}
-		</div>
-	</div>
-	<div class="panel" id="summary_part" style="display:none;">
-		<div class="panel-heading">
-			<i class="icon-align-justify"></i>
-			{l s='Summary'}
-		</div>
+                {if $gift_wrapping}
+                <div class="form-group">
+                    <div class="checkbox col-lg-9 col-offset-3">
+                        <label for="order_gift">
+                            <input type="checkbox" name="order_gift" id="order_gift" value="1" />
+                            {l s='Gift'}
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-lg-3" for="gift_message">{l s='Gift message'}</label>
+                    <div class="col-lg-9">
+                        <textarea id="gift_message" class="form-control" cols="40" rows="4"></textarea>
+                    </div>
+                </div>
+                {/if}
+            </div>
+        </div>
+        <div class="panel" id="summary_part" style="display:none;">
+            <div class="panel-heading">
+                <i class="icon-align-justify"></i>
+                {l s='Summary'}
+            </div>
 
-		<div id="send_email_feedback" class="hide alert"></div>
+            <div id="send_email_feedback" class="hide alert"></div>
 
-		<div id="cart_summary" class="panel row-margin-bottom text-center">
-			<div class="row">
-				<div class="col-lg-2">
-					<div class="data-focus">
-						<span>{l s='Total rooms (Tax excl.)'}</span><br/>
-						<span id="total_rooms" class="size_l text-success"></span>
-					</div>
-				</div>
-				{* <div class="col-lg-2">
-					<div class="data-focus">
-						<span>{l s='Total extra services (Tax excl.)'}</span><br/>
-						<span id="total_extra_services" class="size_l text-success"></span>
-					</div>
-				</div> *}
-				{* <div class="col-lg-2">
-					<div class="data-focus">
-						<span>{l s='Total Total service products (Tax excl.)'}</span><br/>
-						<span id="total_service_products" class="size_l text-success"></span>
-					</div>
-				</div> *}
-				<div class="col-lg-2">
-					<div class="data-focus">
-						<span>{l s='Total vouchers (Tax excl.)'}</span><br/>
-						<span id="total_vouchers" class="size_l text-danger"></span>
-					</div>
-				</div>
-				<div class="col-lg-2">
-					<div class="data-focus">
-						<span>{l s='Total (Tax excl.)'}</span><br/>
-						<span id="total_without_taxes" class="size_l"></span>
-					</div>
-				</div>
-				<div class="col-lg-2">
-					<div class="data-focus">
-						<span>{l s='Convenience fees (Tax excl.)'}</span><br/>
-						<span id="total_convenience_fees" class="size_l"></span>
-					</div>
-				</div>
-				<div class="col-lg-2">
-					<div class="data-focus">
-						<span>{l s='Total taxes'}</span><br/>
-						<span id="total_taxes" class="size_l"></span>
-					</div>
-				</div>
-				<div class="col-lg-2">
-					<div class="data-focus data-focus-primary">
-						<span>{l s='Total (Tax incl.)'}</span><br/>
-						<span id="total_with_taxes" class="size_l"></span>
-					</div>
-				</div>
-			</div>
-		</div>
+            <div id="cart_summary" class="panel row-margin-bottom text-center">
+                <div class="row">
+                    <div class="col-lg-2">
+                        <div class="data-focus">
+                            <span>{l s='Total rooms (Tax excl.)'}</span><br/>
+                            <span id="total_rooms" class="size_l text-success"></span>
+                        </div>
+                    </div>
+                    {* <div class="col-lg-2">
+                        <div class="data-focus">
+                            <span>{l s='Total extra services (Tax excl.)'}</span><br/>
+                            <span id="total_extra_services" class="size_l text-success"></span>
+                        </div>
+                    </div> *}
+                    {* <div class="col-lg-2">
+                        <div class="data-focus">
+                            <span>{l s='Total Total service products (Tax excl.)'}</span><br/>
+                            <span id="total_service_products" class="size_l text-success"></span>
+                        </div>
+                    </div> *}
+                    <div class="col-lg-2">
+                        <div class="data-focus">
+                            <span>{l s='Total vouchers (Tax excl.)'}</span><br/>
+                            <span id="total_vouchers" class="size_l text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="col-lg-2">
+                        <div class="data-focus">
+                            <span>{l s='Total (Tax excl.)'}</span><br/>
+                            <span id="total_without_taxes" class="size_l"></span>
+                        </div>
+                    </div>
+                    <div class="col-lg-2">
+                        <div class="data-focus">
+                            <span>{l s='Convenience fees (Tax excl.)'}</span><br/>
+                            <span id="total_convenience_fees" class="size_l"></span>
+                        </div>
+                    </div>
+                    <div class="col-lg-2">
+                        <div class="data-focus">
+                            <span>{l s='Total taxes'}</span><br/>
+                            <span id="total_taxes" class="size_l"></span>
+                        </div>
+                    </div>
+                    <div class="col-lg-2">
+                        <div class="data-focus data-focus-primary">
+                            <span>{l s='Total (Tax incl.)'}</span><br/>
+                            <span id="total_with_taxes" class="size_l"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-		<div class="row">
-			<div class="order_message_right col-lg-12">
-				<div class="form-group">
-					<label class="control-label col-lg-3" for="order_message">{l s='Order message'}</label>
-					<div class="col-lg-6">
-						<textarea name="order_message" id="order_message" rows="3" cols="45"></textarea>
-					</div>
-				</div>
-				<div class="form-group" {if $order_total <= 0}style="display: none;"{/if}>
-					{if !$PS_CATALOG_MODE}
-					<div class="col-lg-9 col-lg-offset-3">
-						<a href="javascript:void(0);" id="send_email_to_customer" class="btn btn-default">
-							<i class="icon-credit-card"></i>
-							{l s='Send an email to the customer with the link to process the payment.'}
-						</a>
-						<a id="go_order_process" href="" class="btn btn-link _blank">
-							{l s='Go on payment page to process the payment.'}
-							<i class="icon-external-link"></i>
-						</a>
-					</div>
-					{/if}
-				</div>
-				{if isset($smarty.post.is_full_payment)}
-					{assign var=is_full_payment value=((bool) $smarty.post.is_full_payment)}
-				{else}
-					{assign var=is_full_payment value=true}
-				{/if}
-				<div class="form-group" {if $order_total <= 0}style="display: none;"{/if}>
-					<label class="control-label col-lg-3">{l s="Full payment"}</label>
-					<div class="col-lg-9">
-						<span class="switch prestashop-switch fixed-width-lg">
-							<input type="radio" name="is_full_payment" id="is_full_payment_on" value="1" {if $is_full_payment}checked="checked"{/if}>
-							<label for="is_full_payment_on">{l s="Yes"}</label>
-							<input type="radio" name="is_full_payment" id="is_full_payment_off" value="0" {if !$is_full_payment}checked="checked"{/if}>
-							<label for="is_full_payment_off">{l s="No"}</label>
-							<a class="slide-button btn"></a>
-						</span>
-						<p class="help-block">{l s='Keep this option enabled for full payment and disable it to take partial payment of the booking.'}</p>
-					</div>
-				</div>
-				<div class="form-group" {if $order_total <= 0}style="display: none;"{/if}>
-					<label class="control-label required col-lg-3">{l s='Payment amount'}</label>
-					<div class="col-lg-9">
-						<div class="input-group fixed-width-xxl">
-							<span class="input-group-addon">{$currency->sign}</span>
-							<input type="text" name="payment_amount" id="payment_amount" value="{if isset($smarty.post.payment_amount)}{$smarty.post.payment_amount|escape:'html':'UTF-8'}{elseif $is_full_payment}{$order_total}{/if}" {if $is_full_payment}disabled{/if} />
-						</div>
-						<p class="help-block" id="advance_payment_amount_block" {if isset($is_advance_payment_active) && $is_advance_payment_active}style="display: block;"{else}style="display: none;"{/if}>
-							<span>{l s='Advance payment amount: '}</span>
-							<span id="advance_payment_amount">{displayPrice price=$advance_payment_amount_with_tax currency=$currency->id}</span>
-						</p>
-					</div>
-				</div>
-				<div class="form-group" {if $order_total <= 0}style="display: none;"{/if}>
-					<label class="control-label col-lg-3">{l s='Payment source'}</label>
-					<div class="col-lg-9">
-						<select class="fixed-width-xxl" name="payment_type" id="payment_type">
-							{foreach from=$payment_types item=payment_type}
-								<option value="{$payment_type.value}" {if isset($smarty.post.payment_type) && $payment_type.value == $smarty.post.payment_type}selected="selected"{/if}>
-									{$payment_type.name}
-								</option>
-							{/foreach}
-						</select>
-					</div>
-				</div>
-				<div class="form-group" {if $order_total <= 0}style="display: none;"{/if}>
-					<label class="control-label col-lg-3 required">{l s='Payment method'}</label>
-					<div class="col-lg-9">
-						<input name="payment_module_name" id="payment_module_name" list="payment_module_name_list" class="form-control fixed-width-xxl" {if isset($smarty.post.payment_module_name) && $smarty.post.payment_module_name}value="{$smarty.post.payment_module_name|escape:'html':'UTF-8'}"{/if}>
-						<datalist id="payment_module_name_list">
-							{foreach from=$payment_modules item=payment_module}
-								<option value="{$payment_module->displayName}" data-name="{$payment_module->name}" data-payment-type="{$payment_module->payment_type}">
-							{/foreach}
-						</datalist>
-						<p class="help-block">{l s='Select or type the payment method using which payment for booking will be made.'}</p>
-					</div>
-				</div>
-				<div class="form-group" {if $order_total <= 0}style="display: none;"{/if}>
-					<label class="control-label col-lg-3">{l s='Transaction ID'}</label>
-					<div class="col-lg-9">
-						<input type="text" class="fixed-width-xxl" name="payment_transaction_id" id="payment_transaction_id" value="{if isset($smarty.post.payment_transaction_id)}{$smarty.post.payment_transaction_id}{/if}" />
-					</div>
-				</div>
-				<div class="form-group">
-					<div class="col-lg-9 col-lg-offset-3">
-						<button type="submit" name="submitAddOrder" class="btn btn-default" />
-							<i class="icon-check"></i>
-							{l s='Create the order'}
-						</button>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-</form>
+            <div class="row">
+                <div class="order_message_right col-lg-12">
+                    <div class="form-group">
+                        <label class="control-label col-lg-3" for="order_message">{l s='Order message'}</label>
+                        <div class="col-lg-6">
+                            <textarea name="order_message" id="order_message" rows="3" cols="45"></textarea>
+                        </div>
+                    </div>
+                    <div class="form-group" {if $order_total <= 0}style="display: none;"{/if}>
+                        {if !$PS_CATALOG_MODE}
+                        <div class="col-lg-9 col-lg-offset-3">
+                            <a href="javascript:void(0);" id="send_email_to_customer" class="btn btn-default">
+                                <i class="icon-credit-card"></i>
+                                {l s='Send an email to the customer with the link to process the payment.'}
+                            </a>
+                            <a id="go_order_process" href="" class="btn btn-link _blank">
+                                {l s='Go on payment page to process the payment.'}
+                                <i class="icon-external-link"></i>
+                            </a>
+                        </div>
+                        {/if}
+                    </div>
+                    {if isset($smarty.post.is_full_payment)}
+                        {assign var=is_full_payment value=((bool) $smarty.post.is_full_payment)}
+                    {else}
+                        {assign var=is_full_payment value=true}
+                    {/if}
+                    <div class="form-group" {if $order_total <= 0}style="display: none;"{/if}>
+                        <label class="control-label col-lg-3">{l s="Full payment"}</label>
+                        <div class="col-lg-9">
+                            <span class="switch prestashop-switch fixed-width-lg">
+                                <input type="radio" name="is_full_payment" id="is_full_payment_on" value="1" {if $is_full_payment}checked="checked"{/if}>
+                                <label for="is_full_payment_on">{l s="Yes"}</label>
+                                <input type="radio" name="is_full_payment" id="is_full_payment_off" value="0" {if !$is_full_payment}checked="checked"{/if}>
+                                <label for="is_full_payment_off">{l s="No"}</label>
+                                <a class="slide-button btn"></a>
+                            </span>
+                            <p class="help-block">{l s='Keep this option enabled for full payment and disable it to take partial payment of the booking.'}</p>
+                        </div>
+                    </div>
+                    <div class="form-group" {if $order_total <= 0}style="display: none;"{/if}>
+                        <label class="control-label required col-lg-3">{l s='Payment amount'}</label>
+                        <div class="col-lg-9">
+                            <div class="input-group fixed-width-xxl">
+                                <span class="input-group-addon">{$currency->sign}</span>
+                                <input type="text" name="payment_amount" id="payment_amount" value="{if isset($smarty.post.payment_amount)}{$smarty.post.payment_amount|escape:'html':'UTF-8'}{elseif $is_full_payment}{$order_total}{/if}" {if $is_full_payment}disabled{/if} />
+                            </div>
+                            <p class="help-block" id="advance_payment_amount_block" {if isset($is_advance_payment_active) && $is_advance_payment_active}style="display: block;"{else}style="display: none;"{/if}>
+                                <span>{l s='Advance payment amount: '}</span>
+                                <span id="advance_payment_amount">{displayPrice price=$advance_payment_amount_with_tax currency=$currency->id}</span>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="form-group" {if $order_total <= 0}style="display: none;"{/if}>
+                        <label class="control-label col-lg-3">{l s='Payment source'}</label>
+                        <div class="col-lg-9">
+                            <select class="fixed-width-xxl" name="payment_type" id="payment_type">
+                                {foreach from=$payment_types item=payment_type}
+                                    <option value="{$payment_type.value}" {if isset($smarty.post.payment_type) && $payment_type.value == $smarty.post.payment_type}selected="selected"{/if}>
+                                        {$payment_type.name}
+                                    </option>
+                                {/foreach}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group" {if $order_total <= 0}style="display: none;"{/if}>
+                        <label class="control-label col-lg-3 required">{l s='Payment method'}</label>
+                        <div class="col-lg-9">
+                            <input name="payment_module_name" id="payment_module_name" list="payment_module_name_list" class="form-control fixed-width-xxl" {if isset($smarty.post.payment_module_name) && $smarty.post.payment_module_name}value="{$smarty.post.payment_module_name|escape:'html':'UTF-8'}"{/if}>
+                            <datalist id="payment_module_name_list">
+                                {foreach from=$payment_modules item=payment_module}
+                                    <option value="{$payment_module->displayName}" data-name="{$payment_module->name}" data-payment-type="{$payment_module->payment_type}">
+                                {/foreach}
+                            </datalist>
+                            <p class="help-block">{l s='Select or type the payment method using which payment for booking will be made.'}</p>
+                        </div>
+                    </div>
+                    <div class="form-group" {if $order_total <= 0}style="display: none;"{/if}>
+                        <label class="control-label col-lg-3">{l s='Transaction ID'}</label>
+                        <div class="col-lg-9">
+                            <input type="text" class="fixed-width-xxl" name="payment_transaction_id" id="payment_transaction_id" value="{if isset($smarty.post.payment_transaction_id)}{$smarty.post.payment_transaction_id}{/if}" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-lg-9 col-lg-offset-3">
+                            <button type="submit" name="submitAddOrder" class="btn btn-default" />
+                                <i class="icon-check"></i>
+                                {l s='Create the order'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
 {strip}
 	{addJsDef max_child_age=$max_child_age}
 	{addJsDef max_child_in_room=$max_child_in_room}

@@ -46,6 +46,6 @@
   </order_state>
   <order_state id="Partial_payment_accepted">
     <name>Teilzahlung erhalten</name>
-    <template>payment_accepted</template>
+    <template>partial_payment_accepted</template>
   </order_state>
 </entity_order_state>
