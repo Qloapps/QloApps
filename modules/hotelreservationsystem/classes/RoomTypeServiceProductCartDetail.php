@@ -94,7 +94,7 @@ class RoomTypeServiceProductCartDetail extends ObjectModel
                 )) {
                     $updateQty = $product['quantity'];
                     if (Product::getProductPriceCalculation($product['id_product']) == Product::PRICE_CALCULATION_METHOD_PER_DAY) {
-                        $objHotelCartBookingData = new HotelCartBookingData($idHtlCartData);
+                        $objHotelCartBookingData = new HotelCartBookingData($htlCartBookingId);
                         $numdays = HotelHelper::getNumberOfDays($objHotelCartBookingData->date_from, $objHotelCartBookingData->date_to);
                         $updateQty *= $numdays;
                     }
