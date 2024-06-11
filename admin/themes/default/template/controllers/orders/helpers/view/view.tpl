@@ -924,7 +924,7 @@
                             {assign var=additional_service_price_tax_incl value=($order->getTotalProductsWithTaxes(false, false, Product::SERVICE_PRODUCT_WITH_ROOMTYPE) + $totalDemandsPriceTI)}
                             {if $room_price_tax_excl}
                                 <tr id="total_products">
-                                    <td class="text-right">{l s='Total Rooms Cost (tax excl.)'}</td>
+                                    <td class="text-right">{l s='Total Rooms Cost (Tax excl.)'}</td>
                                     <td class="amount text-right nowrap">
                                         {displayPrice price=$room_price_tax_excl currency=$currency->id}
                                     </td>
@@ -933,34 +933,16 @@
                             {/if}
                             {if isset($additional_service_price_tax_excl) && $additional_service_price_tax_excl > 0}
                                 <tr id="total_products">
-                                    <td class="text-right">{l s='Total Extra services (tax excl.)'}</td>
+                                    <td class="text-right">{l s='Total Extra services (Tax excl.)'}</td>
                                     <td class="amount text-right nowrap">
                                         {displayPrice price=($additional_service_price_tax_excl - $totalConvenienceFeeTE) currency=$currency->id}
                                     </td>
                                     <td class="partial_refund_fields current-edit" style="display:none;"></td>
                                 </tr>
                             {/if}
-                            {* {if $room_price_tax_excl}
-                                <tr id="total_tax_order">
-                                    <td class="text-right"><strong>{l s='Total Rooms Tax'}</strong></td>
-                                    <td class="text-right nowrap">
-                                        <strong>{displayPrice price=($room_price_tax_incl - $room_price_tax_excl) currency=$currency->id}</strong>
-                                    </td>
-                                    <td class="partial_refund_fields current-edit" style="display:none;"></td>
-                                </tr>
-                            {/if}
-                            {if isset($additional_service_price_tax_excl) && $additional_service_price_tax_excl > 0}
-                                <tr id="total_tax_order">
-                                    <td class="text-right"><strong>{l s='Extra services Tax'}</strong></td>
-                                    <td class="text-right nowrap">
-                                        <strong>{displayPrice price=($additional_service_price_tax_incl - $additional_service_price_tax_excl) currency=$currency->id}</strong>
-                                    </td>
-                                    <td class="partial_refund_fields current-edit" style="display:none;"></td>
-                                </tr>
-                            {/if} *}
                             {if $service_products_price_tax_excl}
                                 <tr id="total_products">
-                                    <td class="text-right">{l s='Total service products cost (tax excl.)'}</td>
+                                    <td class="text-right">{l s='Total service products cost (Tax excl.)'}</td>
                                     <td class="amount text-right nowrap">
                                         {displayPrice price=$service_products_price_tax_excl currency=$currency->id}
                                     </td>
@@ -968,10 +950,64 @@
                                 </tr>
                             {/if}
 
+                            {if isset($totalConvenienceFeeTE) && $totalConvenienceFeeTE > 0}
+                                <tr id="total_products">
+                                    <td class="text-right">{l s='Convenience Fee (Tax excl.)'}</td>
+                                    <td class="amount text-right nowrap">
+                                        {displayPrice price=$totalConvenienceFeeTE currency=$currency->id}
+                                    </td>
+                                    <td class="partial_refund_fields current-edit" style="display:none;"></td>
+                                </tr>
+                            {/if}
+
+                            {if $room_price_tax_excl}
+                                <tr id="total_tax_order">
+                                    <td class="text-right">{l s='Total Rooms Tax'}</td>
+                                    <td class="text-right nowrap">
+                                        {displayPrice price=($room_price_tax_incl - $room_price_tax_excl) currency=$currency->id}
+                                    </td>
+                                    <td class="partial_refund_fields current-edit" style="display:none;"></td>
+                                </tr>
+                            {/if}
+                            {if isset($additional_service_price_tax_excl) && $additional_service_price_tax_excl > 0}
+                                <tr id="total_tax_order">
+                                    <td class="text-right">{l s='Extra services Tax'}</td>
+                                    <td class="text-right nowrap">
+                                        {displayPrice price=(($additional_service_price_tax_incl - $additional_service_price_tax_excl) - ($totalConvenienceFeeTI - $totalConvenienceFeeTE)) currency=$currency->id}
+                                    </td>
+                                    <td class="partial_refund_fields current-edit" style="display:none;"></td>
+                                </tr>
+                            {/if}
+                            {if isset($totalConvenienceFeeTE) && $totalConvenienceFeeTE > 0}
+                                <tr id="total_products">
+                                    <td class="text-right">{l s='Convenience Fee Tax'}</td>
+                                    <td class="amount text-right nowrap">
+                                        {displayPrice price=($totalConvenienceFeeTI - $totalConvenienceFeeTE) currency=$currency->id}
+                                    </td>
+                                    <td class="partial_refund_fields current-edit" style="display:none;"></td>
+                                </tr>
+                            {/if}
+
+                            {* {if ($order->getTaxCalculationMethod() == $smarty.const.PS_TAX_EXC)} *}
+                            <tr id="total_taxes">
+                                <td class="text-right"><strong>{l s='Total Taxes'}</strong>
+                                </td>
+                                <td class="amount text-right nowrap" ><strong>{displayPrice price=(($order->total_paid_tax_incl + $order->total_discounts_tax_incl) - ($order->total_paid_tax_excl + $order->total_discounts_tax_excl)) currency=$currency->id}</strong>
+                                </td>
+                                <td class="partial_refund_fields current-edit" style="display:none;"></td>
+                            </tr>
+                            {* {/if} *}
                             <tr id="total_discounts" {if $order->total_discounts_tax_incl == 0}style="display: none;"{/if}>
-                                <td class="text-right">{l s='Discounts'}</td>
+                                <td class="text-right"><strong>{l s='Total Booking Amount'}</strong></td>
                                 <td class="amount text-right nowrap">
-                                    -{displayPrice price=$order_discount_price currency=$currency->id}
+                                    <strong>{displayPrice price=($order->total_paid_tax_incl + $order->total_discounts_tax_incl) currency=$currency->id}</strong>
+                                </td>
+                                <td class="partial_refund_fields current-edit" style="display:none;"></td>
+                            </tr>
+                            <tr id="total_discounts" {if $order->total_discounts_tax_incl == 0}style="display: none;"{/if}>
+                                <td class="text-right"><strong>{l s='Discounts'}</strong></td>
+                                <td class="amount text-right nowrap">
+                                    <strong>-{displayPrice price=$order->total_discounts_tax_incl currency=$currency->id}</strong>
                                 </td>
                                 <td class="partial_refund_fields current-edit" style="display:none;"></td>
                             </tr>
@@ -982,24 +1018,6 @@
                                 </td>
                                 <td class="partial_refund_fields current-edit" style="display:none;"></td>
                             </tr>
-                            {if isset($totalConvenienceFeeTI) && $totalConvenienceFeeTI > 0}
-                                <tr id="total_products">
-                                    <td class="text-right">{l s='Convenience Fee'}</td>
-                                    <td class="amount text-right nowrap">
-                                        {displayPrice price=$totalConvenienceFeeTE currency=$currency->id}
-                                    </td>
-                                    <td class="partial_refund_fields current-edit" style="display:none;"></td>
-                                </tr>
-                            {/if}
-                            {* {if ($order->getTaxCalculationMethod() == $smarty.const.PS_TAX_EXC)} *}
-                                <tr id="total_taxes">
-                                    <td class="text-right">{l s='Total Taxes'}
-                                    </td>
-                                    <td class="amount text-right nowrap" >{displayPrice price=($order->total_paid_tax_incl - $order->total_paid_tax_excl) currency=$currency->id}
-                                    </td>
-                                    <td class="partial_refund_fields current-edit" style="display:none;"></td>
-                                </tr>
-                            {* {/if} *}
                             <tr id="total_order">
                                 <td class="text-right"><strong>{l s='Final Booking Total'}</strong></td>
                                 <td class="amount text-right nowrap">
