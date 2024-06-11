@@ -22,45 +22,52 @@ class WkRoomSearchBlockAutoCompleteSearchModuleFrontController extends ModuleFro
 {
     public function initContent()
     {
-        $result = array();
         $this->display_column_left = false;
         $this->display_column_right = false;
+
+        $result = array('status' => false);
         $search_data = Tools::getValue('to_search_data');
         $location_category_id = Tools::getValue('location_category_id');
         $obj_htl_info = new HotelBranchInformation();
         if (isset($search_data) && $search_data) {
-            $return_data = $obj_htl_info->getHotelCategoryTree($search_data);
-            if ($return_data) {
-                $html = '';
-                foreach ($return_data as $value) {
-                    $html .= '<li value="'.$value['id_category'].'" tabindex="-1" class="search_result_li">'.
-                    $value['name'].'</li>';
-                }
-                $result['status'] = 'success';
+            $locationCategories = $obj_htl_info->getHotelCategoryTree($search_data);
+            if ($locationCategories) {
+                $this->context->smarty->assign(array('location_categories' => $locationCategories));
+                $html = $this->context->smarty->fetch(
+                    $this->module->getTemplatePath('location-options.tpl')
+                );
+                $result['status'] = true;
                 $result['data'] = $html;
             }
         } elseif (isset($location_category_id) && $location_category_id) {
-            $cat_ids = Category::getAllCategoriesName($location_category_id);
-            if ($cat_ids) {
-                $html = '';
-                foreach ($cat_ids as $value) {
-                    if ($hotel_info = $obj_htl_info->hotelBranchInfoByCategoryId($value['id_category'])) {
-                        $maxOrderDate = HotelOrderRestrictDate::getMaxOrderDate($hotel_info['id']);
-                        $preparationTime = (int) HotelOrderRestrictDate::getPreparationTime($hotel_info['id']);
+            $locationCategories = Category::getAllCategoriesName($location_category_id);
+            if ($locationCategories) {
+                $hotelsInfo = array();
+                foreach ($locationCategories as $category) {
+                    if ($hotelInfo = $obj_htl_info->hotelBranchInfoByCategoryId($category['id_category'])) {
+                        $maxOrderDate = HotelOrderRestrictDate::getMaxOrderDate($hotelInfo['id']);
                         $maxOrderDate = date('Y-m-d', strtotime($maxOrderDate));
-                        $html .= '<li tabindex="-1" class="search_result_li" data-id-hotel="'.$hotel_info['id'].'" data-hotel-cat-id="'.
-                        $hotel_info['id_category'].'" data-max_order_date="'.$maxOrderDate.'" data-preparation_time="'.$preparationTime.'">'.
-                        $hotel_info['hotel_name'].'</li>';
+                        $preparationTime = (int) HotelOrderRestrictDate::getPreparationTime($hotelInfo['id']);
+                        $hotelsInfo[] = array(
+                            'id_hotel' => $hotelInfo['id'],
+                            'id_category' => $hotelInfo['id_category'],
+                            'hotel_name' => $hotelInfo['hotel_name'],
+                            'max_order_date' => $maxOrderDate,
+                            'preparation_time' => $preparationTime
+                        );
                     }
                 }
-                $result['status'] = 'success';
-                $result['data'] = $html;
-            } else {
-                $result['status'] = 'failed2';
+
+                $this->context->smarty->assign(array('hotels_info' => $hotelsInfo));
+                $html = $this->context->smarty->fetch(
+                    $this->module->getTemplatePath('hotel-options.tpl')
+                );
+
+                $result['status'] = true;
+                $result['html_hotel_options'] = $html;
             }
-        } else {
-            $result['status'] = 'failed3';
         }
-        die(json_encode($result));
+
+        $this->ajaxDie(json_encode($result));
     }
 }
