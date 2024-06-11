@@ -374,7 +374,7 @@ class CartCore extends ObjectModel
         if ($cart_vat_amount == 0 || $cart_amount_te == 0) {
             return 0;
         } else {
-            return Tools::ps_round($cart_vat_amount / $cart_amount_te, 3);
+            return Tools::ps_round($cart_vat_amount / $cart_amount_te, 6);
         }
     }
 
