@@ -167,7 +167,7 @@
 				$(form).find('table.table .field_optional').hide();
 				$(form).find('table.table .field_optional').each(function(i, val) {
 					if (list_fields_visibility.includes($(this).data('key'))) {
-						$(this).show();
+						$(this).css('display', '');
 					}
 				});
 				updateListVisibility(list_fields_visibility)
@@ -553,10 +553,11 @@
 	<style>
 	@media (max-width: 992px) {
 		{foreach from=$fields_display item=param name=params}
-			{if isset($params.displayed) && $params.displayed === false}{continue}{/if}
-			.table-responsive-row td:nth-of-type({math equation="x+y" x=$smarty.foreach.params.index y=$y}):before {
+			{if isset($param.displayed) && $param.displayed === false}{continue}{/if}
+			.table-responsive-row td:nth-of-type({$y}):before {
 				content: "{$param.title}";
 			}
+            {assign var=y value=$y+1}
 		{/foreach}
 	}
 	</style>

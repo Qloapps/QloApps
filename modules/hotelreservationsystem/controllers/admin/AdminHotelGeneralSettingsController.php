@@ -81,6 +81,32 @@ class AdminHotelGeneralSettingsController extends ModuleAdminController
                         'hint' => $this->l('This option can be disabled if only one active hotel in the website.
                         In case of more than one active hotel, Hotel Name will always be shown in the search panel.'),
                     ),
+                    'WK_SEARCH_AUTO_FOCUS_NEXT_FIELD' => array(
+                        'title' => $this->l('Focus next field automatically'),
+                        'cast' => 'intval',
+                        'type' => 'bool',
+                        'default' => '0',
+                        'values' => array(
+                            array(
+                                'id' => 'active_on',
+                                'value' => 1,
+                            ),
+                            array(
+                                'id' => 'active_off',
+                                'value' => 0,
+                            ),
+                        ),
+                        'hint' => $this->l('Enable if you want the next booking search field to be focused automatically after setting value for a field.'),
+                    ),
+                    'WK_HOTEL_NAME_SEARCH_THRESHOLD' => array(
+                        'title' => $this->l('Hotel name search threshold'),
+                        'type' => 'text',
+                        'required' => true,
+                        'validation' => 'isUnsignedInt',
+                        'hint' => $this->l('Enter the number of hotels after which user can search hotel by name.'),
+                        'desc' => $this->l('Set to 0 to always show the search box.'),
+                        'class' => 'fixed-width-xxl',
+                    ),
                 ),
                 'submit' => array(
                     'title' => $this->l('Save'),
@@ -312,6 +338,8 @@ class AdminHotelGeneralSettingsController extends ModuleAdminController
     public function postProcess()
     {
         if (Tools::isSubmit('submitOptions'.$this->table)) {
+            $hotelNameSearchThreshold = Tools::getValue('WK_HOTEL_NAME_SEARCH_THRESHOLD');
+
             // check if field is atleast in default language. Not available in default prestashop
             $defaultLangId = Configuration::get('PS_LANG_DEFAULT');
             $objDefaultLanguage = Language::getLanguage((int) $defaultLangId);
@@ -323,6 +351,12 @@ class AdminHotelGeneralSettingsController extends ModuleAdminController
             $globalMaxChildInRoom = Tools::getValue('WK_GLOBAL_MAX_CHILD_IN_ROOM');
 
             // End occupancy fields validation
+
+            if (!$hotelNameSearchThreshold && $hotelNameSearchThreshold !== '0') {
+                $this->errors[] = $this->l('Hotel name search threshold field is required.');
+            } elseif (!Validate::isUnsignedInt($hotelNameSearchThreshold)) {
+                $this->errors[] = $this->l('Hotel name search threshold field is invalid.');
+            }
 
             if (!trim(Tools::getValue('WK_HTL_CHAIN_NAME_'.$defaultLangId))) {
                 $this->errors[] = $this->l('Hotel chain name is required at least in ').$objDefaultLanguage['name'];
