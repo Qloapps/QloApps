@@ -509,6 +509,7 @@ class HotelReservationSystem extends Module
                 'htl_room_type_global_demand',
                 'htl_room_type_global_demand_advance_option',
                 'htl_order_refund_rules',
+                'htl_settings_link',
             );
             //If Admin update new language when we do entry in module all lang tables.
             HotelHelper::updateLangTables($newIdLang, $langTables);
