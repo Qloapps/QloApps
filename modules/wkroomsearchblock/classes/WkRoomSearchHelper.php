@@ -159,11 +159,13 @@ class WkRoomSearchHelper
                         $searchedData['location'] = $objLocationCategory->name;
                     } else {
                         $locationCategoryId = $objCategory->id_parent;
-                        $searchedData['location'] = $searchedData['htl_dtl']['city'];
-                        if (isset($searchedData['htl_dtl']['state_name'])) {
-                            $searchedData['location'] .= ', '.$searchedData['htl_dtl']['state_name'];
+                        if ($searchedData['htl_dtl']) {
+                            $searchedData['location'] = $searchedData['htl_dtl']['city'];
+                            if (isset($searchedData['htl_dtl']['state_name'])) {
+                                $searchedData['location'] .= ', '.$searchedData['htl_dtl']['state_name'];
+                            }
+                            $searchedData['location'] .= ', '.$searchedData['htl_dtl']['country_name'];
                         }
-                        $searchedData['location'] .= ', '.$searchedData['htl_dtl']['country_name'];
                     }
                     $searchedData['location_category_id'] = $locationCategoryId;
 
@@ -226,6 +228,7 @@ class WkRoomSearchHelper
         $smartyVars['hotels_info'] = $hotelsInfo;
         $smartyVars['show_hotel_name'] = Configuration::get('WK_HOTEL_NAME_ENABLE');
         $smartyVars['max_child_age'] = Configuration::get('WK_GLOBAL_CHILD_MAX_AGE');
+        $smartyVars['hotel_name_search_threshold'] = (int) Configuration::get('WK_HOTEL_NAME_SEARCH_THRESHOLD');
 
         $maxOrderDate = HotelOrderRestrictDate::getMaxOrderDate($idHotel);
         $smartyVars['max_order_date'] = date('Y-m-d', strtotime($maxOrderDate));
