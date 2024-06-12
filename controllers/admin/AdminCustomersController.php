@@ -1035,6 +1035,7 @@ class AdminCustomersControllerCore extends AdminController
         parent::processBulkDelete();
     }
 
+
     public function processAdd()
     {
         if (Tools::getValue('submitFormAjax')) {
@@ -1045,23 +1046,19 @@ class AdminCustomersControllerCore extends AdminController
         $customer = new Customer();
         if (Validate::isEmail($customer_email)) {
             $customer->getByEmail($customer_email);
-            if ($customer->id) {
-                $this->errors[] = Tools::displayError('An account already exists for this email address:').' '.$customer_email;
-                $this->display = 'edit';
-                return $customer;
-            } elseif (trim(Tools::getValue('passwd')) == '') {
-                $this->validateRules();
-                $this->errors[] = Tools::displayError('Password can not be empty.');
-                $this->display = 'edit';
-            } elseif ($customer = parent::processAdd()) {
-                $this->context->smarty->assign('new_customer', $customer);
-                return $customer;
-            }
-        } else {
-            $this->errors[] = Tools::displayError('Invalid email address.');
-            $this->display = 'edit';
         }
-
+        if ($customer->id) {
+            $this->errors[] = Tools::displayError('An account already exists for this email address:').' '.$customer_email;
+            $this->display = 'edit';
+            return $customer;
+        } elseif (trim(Tools::getValue('passwd')) == '') {
+            $this->validateRules();
+            $this->errors[] = Tools::displayError('Password can not be empty.');
+            $this->display = 'edit';
+        } elseif ($customer = parent::processAdd()) {
+            $this->context->smarty->assign('new_customer', $customer);
+            return $customer;
+        }
         return false;
     }
 
@@ -1075,11 +1072,7 @@ class AdminCustomersControllerCore extends AdminController
                 $customer = new Customer();
                 if (Validate::isEmail($customer_email)) {
                     $customer->getByEmail($customer_email);
-                } else {
-                    $this->errors[] = Tools::displayError('Invalid email address.');
-                    $this->display = 'edit';
                 }
-
                 if (($customer->id) && ($customer->id != (int)$this->object->id)) {
                     $this->errors[] = Tools::displayError('An account already exists for this email address:').' '.$customer_email;
                 }
