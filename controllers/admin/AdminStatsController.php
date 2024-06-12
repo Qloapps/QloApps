@@ -516,6 +516,46 @@ class AdminStatsControllerCore extends AdminStatsTabController
         }
     }
 
+    public static function getRefunds($date_from, $date_to, $granularity = false, $id_hotel = 0)
+    {
+        if ($granularity == 'day') {
+            $refunds = array();
+            $result = Db::getInstance(_PS_USE_SQL_SLAVE_)->ExecuteS('
+			SELECT
+				LEFT(`invoice_date`, 10) as date,
+				SUM(orr.`refunded_amount`) as total_refund_amount,
+                (
+                    SELECT hbd.`id_hotel`
+                    FROM`'._DB_PREFIX_.'htl_booking_detail` hbd
+                    WHERE hbd.`id_order` = o.`id_order` LIMIT 1
+                ) AS id_hotel
+			FROM `'._DB_PREFIX_.'orders` o
+			LEFT JOIN `'._DB_PREFIX_.'order_return` orr ON (o.id_order = orr.id_order)
+            LEFT JOIN `'._DB_PREFIX_.'order_state` os ON (o.current_state = os.id_order_state)
+			WHERE orr.`payment_mode` != "" AND orr.`id_transaction` != "" AND `invoice_date` BETWEEN "'.pSQL($date_from).' 00:00:00" AND "'.pSQL($date_to).' 23:59:59" AND os.logable = 1'.'
+			GROUP BY LEFT(`invoice_date`, 10) HAVING 1 '.HotelBranchInformation::addHotelRestriction($id_hotel));
+
+            foreach ($result as $row) {
+                $refunds[strtotime($row['date'])] = $row['total_refund_amount'];
+            }
+
+            return $refunds;
+        } else {
+            return Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue(
+                'SELECT SUM(orr.`refunded_amount`),
+                (
+                    SELECT hbd.`id_hotel`
+                    FROM`'._DB_PREFIX_.'htl_booking_detail` hbd
+                    WHERE hbd.`id_order` = o.`id_order` LIMIT 1
+                ) AS id_hotel
+                FROM `'._DB_PREFIX_.'orders` o
+                LEFT JOIN `'._DB_PREFIX_.'order_return` orr ON (o.id_order = orr.id_order)
+                LEFT JOIN `'._DB_PREFIX_.'order_state` os ON (o.current_state = os.id_order_state)
+                WHERE orr.`payment_mode` != "" AND orr.`id_transaction` != "" AND `invoice_date` BETWEEN "'.pSQL($date_from).' 00:00:00" AND "'.pSQL($date_to).' 23:59:59" AND os.logable = 1 HAVING 1 '.HotelBranchInformation::addHotelRestriction($id_hotel)
+            );
+        }
+    }
+
     public static function getExpenses($date_from, $date_to, $granularity = false, $id_hotel = 0)
     {
         $expenses = ($granularity == 'day' ? array() : 0);
