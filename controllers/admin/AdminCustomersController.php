@@ -822,6 +822,7 @@ class AdminCustomersControllerCore extends AdminController
         }
 
         $total_ok = 0;
+        $total_ko = 0;
         $orders_ok = array();
         $orders_ko = array();
         foreach ($orders as $order) {
@@ -834,6 +835,7 @@ class AdminCustomersControllerCore extends AdminController
                 $total_ok += $order['total_paid_real_not_formated']/$order['conversion_rate'];
             } else {
                 $orders_ko[] = $order;
+                $total_ko += $order['total_paid'] / $order['conversion_rate'];
             }
         }
 
@@ -933,6 +935,7 @@ class AdminCustomersControllerCore extends AdminController
             'orders_ok' => $orders_ok,
             'orders_ko' => $orders_ko,
             'total_ok' => Tools::displayPrice($total_ok, $this->context->currency->id),
+            'total_ko' => Tools::displayPrice($total_ko, $this->context->currency->id),
             // Products
             'products' => $products,
             // Addresses
