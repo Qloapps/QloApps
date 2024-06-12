@@ -158,12 +158,12 @@
 											{l s='Inactive'}
 										</span>
 									{/if}
-								{else  if $customer->deleted == Customer::STATUS_BANNED}
+								{elseif $customer->deleted == Customer::STATUS_BANNED}
 									<span class="label label-warning">
 										<i class="icon-remove"></i>
 										{l s='Banned'}
 									</span>
-								{else  if $customer->deleted == Customer::STATUS_DELETED}
+								{elseif $customer->deleted == Customer::STATUS_DELETED}
 									<span class="label label-danger">
 										<i class="icon-remove"></i>
 										{l s='Deleted'}
