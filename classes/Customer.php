@@ -570,7 +570,8 @@ class CustomerCore extends ObjectModel
     public function getStats()
     {
         $result = Db::getInstance()->getRow('
-		SELECT COUNT(`id_order`) AS nb_orders, SUM(`total_paid` / o.`conversion_rate`) AS total_orders
+		SELECT COUNT(`id_order`) AS nb_orders, SUM(`total_paid` / o.`conversion_rate`) AS total_orders,
+        SUM(o.`total_paid_real` / o.`conversion_rate`) AS total_spent
 		FROM `'._DB_PREFIX_.'orders` o
 		WHERE o.`id_customer` = '.(int)$this->id.'
 		AND o.valid = 1');
