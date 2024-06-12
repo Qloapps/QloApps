@@ -1581,6 +1581,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
             LEFT JOIN `'._DB_PREFIX_.'product` p ON (p.`id_product` = hbd.`id_product`)
             LEFT JOIN `'._DB_PREFIX_.'orders` o ON (o.`id_order` = hbd.`id_order`)
             WHERE p.`active` = 1
+            AND o.`valid` = 1
             AND hbd.`is_refunded` = 0
             AND hbd.`date_from` < "'.pSQL($discreteDate['date_to']).' 00:00:00" AND hbd.`date_to` > "'.pSQL($discreteDate['date_from']).' 00:00:00"'.
             (!is_null($idHotel) ? HotelBranchInformation::addHotelRestriction($idHotel, 'hbd') : '');
@@ -1597,6 +1598,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
             LEFT JOIN `'._DB_PREFIX_.'product` p ON (p.`id_product` = hbd.`id_product`)
             LEFT JOIN `'._DB_PREFIX_.'orders` o ON (o.`id_order` = hbd.`id_order`)
             WHERE p.`active` = 1
+            AND o.`valid` = 1
             AND hbd.`is_refunded` = 0
             AND hbd.`date_from` < "'.pSQL($discreteDate['date_to']).' 00:00:00" AND hbd.`date_to` > "'.pSQL($discreteDate['date_from']).' 00:00:00"'.
             (!is_null($idHotel) ? HotelBranchInformation::addHotelRestriction($idHotel, 'hbd') : '');
@@ -2085,6 +2087,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
                 LEFT JOIN `'._DB_PREFIX_.'order_detail` od ON (od.`id_order_detail` = hbd.`id_order_detail`)
                 LEFT JOIN `'._DB_PREFIX_.'orders` o ON (od.`id_order` = o.`id_order`)
                 WHERE p.`active` = 1
+                AND o.`valid` = 1
                 AND hbd.`is_refunded` = 0
                 AND hbd.`date_from` < "'.pSQL($discreteDate['date_to']).' 00:00:00" AND hbd.`date_to` > "'.pSQL($discreteDate['date_from']).' 00:00:00"'.
                 (!is_null($idHotel) ? HotelBranchInformation::addHotelRestriction($idHotel, 'hbd') : '');
@@ -2110,6 +2113,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
                     LEFT JOIN `'._DB_PREFIX_.'order_detail` od ON (od.`id_order_detail` = rtspod.`id_order_detail`)
                     LEFT JOIN `'._DB_PREFIX_.'orders` o ON (od.`id_order` = o.`id_order`)
                     WHERE p.`active` = 1
+                    AND o.`valid` = 1
                     AND hbd.`is_refunded` = 0
                     AND hbd.`date_from` < "'.pSQL($discreteDate['date_to']).' 00:00:00" AND hbd.`date_to` > "'.pSQL($discreteDate['date_from']).' 00:00:00"'.
                     (!is_null($idHotel) ? HotelBranchInformation::addHotelRestriction($idHotel, 'hbd') : '');
