@@ -898,8 +898,6 @@
     background-color: #F5F5F5;
 }
 #create-new-refund-popup .tab-content .room-details.cancelled .badge-cancelled {
-    position: absolute;
-    top: -4px;
     margin-left: 6px;
     padding: 5px 10px;
     border-radius: 31px;

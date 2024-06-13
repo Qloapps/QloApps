@@ -142,6 +142,11 @@ class OrderDetailControllerCore extends FrontController
                                 $cartHotelData[$type_key]['paid_unit_price_tax_excl'] = ($order_details_obj->total_price_tax_excl)/$order_details_obj->product_quantity;
                                 $cartHotelData[$type_key]['paid_unit_price_tax_incl'] = ($order_details_obj->total_price_tax_incl)/$order_details_obj->product_quantity;
 
+                                // Get last refund request for booking
+                                if ($bookingRefundDetail = OrderReturn::getOrdersReturnDetail($data_v['id_order'], 0, $data_v['id'])) {
+                                    $bookingRefundDetail = reset($bookingRefundDetail);
+                                }
+
                                 if (isset($cartHotelData[$type_key]['date_diff'][$date_join])) {
                                     $cartHotelData[$type_key]['date_diff'][$date_join]['num_rm'] += 1;
 
@@ -165,7 +170,7 @@ class OrderDetailControllerCore extends FrontController
                                     if ($refundReqBookings && in_array($data_v['id'], $refundReqBookings) && $data_v['is_refunded']) {
                                         if ($data_v['is_cancelled']) {
                                             $cartHotelData[$type_key]['date_diff'][$date_join]['count_cancelled'] += 1;
-                                        } else {
+                                        } elseif ($bookingRefundDetail && $bookingRefundDetail['refunded'] && $bookingRefundDetail['id_customization']) {
                                             $cartHotelData[$type_key]['date_diff'][$date_join]['count_refunded'] += 1;
                                         }
                                     }
@@ -194,7 +199,7 @@ class OrderDetailControllerCore extends FrontController
                                     if ($refundReqBookings && in_array($data_v['id'], $refundReqBookings) && $data_v['is_refunded']) {
                                         if ($data_v['is_cancelled']) {
                                             $cartHotelData[$type_key]['date_diff'][$date_join]['count_cancelled'] += 1;
-                                        } else {
+                                        } elseif ($bookingRefundDetail && $bookingRefundDetail['refunded'] && $bookingRefundDetail['id_customization']) {
                                             $cartHotelData[$type_key]['date_diff'][$date_join]['count_refunded'] += 1;
                                         }
                                     }
@@ -208,6 +213,11 @@ class OrderDetailControllerCore extends FrontController
                                 $cartHotelData[$type_key]['date_diff'][$date_join]['hotel_booking_details'][$data_v['id']]['is_refunded'] = $data_v['is_refunded'];
                                 $cartHotelData[$type_key]['date_diff'][$date_join]['hotel_booking_details'][$data_v['id']]['is_cancelled'] = $data_v['is_cancelled'];
                                 $cartHotelData[$type_key]['date_diff'][$date_join]['hotel_booking_details'][$data_v['id']]['id_status'] = $data_v['id_status'];
+
+                                $cartHotelData[$type_key]['date_diff'][$date_join]['hotel_booking_details'][$data_v['id']]['refund_denied'] = 0;
+                                if ($bookingRefundDetail && $bookingRefundDetail['refunded'] && !$bookingRefundDetail['id_customization']) {
+                                    $cartHotelData[$type_key]['date_diff'][$date_join]['hotel_booking_details'][$data_v['id']]['refund_denied'] = 1;
+                                }
 
                                 $cartHotelData[$type_key]['date_diff'][$date_join]['is_refunded'] = $data_v['is_refunded'];
 
@@ -330,6 +340,7 @@ class OrderDetailControllerCore extends FrontController
                                     Product::PRICE_ADDITION_TYPE_WITH_ROOM
                                 );
                             }
+
                             // calculate averages now
                             foreach ($cartHotelData[$type_key]['date_diff'] as $key => &$value) {
                                 $value['avg_paid_unit_price_tax_excl'] = Tools::ps_round($value['avg_paid_unit_price_tax_excl'] / $value['num_rm'], 6);

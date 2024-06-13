@@ -1233,6 +1233,14 @@ function setRoomTypeGuestOccupancy(booking_occupancy_wrapper)
 var flagRefund = '';
 
 $(document).ready(function() {
+    // when change order state to cancel or refund then show modal of bookings cancellation
+    $(document).on('change', '#id_order_state', function(e) {
+        if ($(this).val() == PS_OS_CANCELED || $(this).val() == PS_OS_REFUND) {
+            e.preventDefault();
+            CancelRoomBookingModal.show();
+        }
+    });
+
 	$('#desc-order-partial_refund').click(function() {
 		$('.cancel_product_change_link:visible').trigger('click');
 		if (flagRefund == 'partial') {

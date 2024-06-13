@@ -30,6 +30,8 @@ class OrderReturnDetailCore extends ObjectModel
     public $refunded_amount;
 
     public $id_order_detail;
+
+    // Used to manage refunded or refunde denied bookings in a refund request : 1 for only refunded request completed and refunded bookings
     public $id_customization;
     public $product_quantity;
 

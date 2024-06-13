@@ -2750,7 +2750,9 @@ class OrderCore extends ObjectModel
                         if ($bookingRefundDetail = OrderReturn::getOrdersReturnDetail($this->id, 0, $orderBooking['id'])) {
                             $bookingRefundDetail = reset($bookingRefundDetail);
                         }
-                        if (($bookingRefundDetail && $bookingRefundDetail['refunded'] && $orderBooking['is_refunded'])
+
+                        // $bookingRefundDetail['id_customization'] is 1 for only refunded request completed and refunded bookings
+                        if (($bookingRefundDetail && $bookingRefundDetail['refunded'] && $orderBooking['is_refunded'] && $bookingRefundDetail['id_customization'])
                             || ($orderBooking['is_cancelled'] && $orderBooking['is_refunded'])
                         ) {
                             continue;

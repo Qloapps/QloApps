@@ -131,8 +131,12 @@
 											{if !$isRefundCompleted}
 												<th>{l s='Rooms cancelation charges' mod='hotelreservationsystem'}</th>
 											{/if}
-											{if $hasOrderDiscountOrPayment}
+											{if $hasOrderDiscountOrPayment || $isRefundCompleted}
 												<th>{l s='Refund amount' mod='hotelreservationsystem'}</th>
+
+                                                {if $isRefundCompleted}
+                                                    <th>{l s='Refund status' mod='hotelreservationsystem'}</th>
+                                                {/if}
 											{/if}
 										</tr>
 										{foreach $refundReqBookings as $booking}
@@ -184,16 +188,11 @@
 														{/if}
 													</td>
 												{/if}
-												{if $hasOrderDiscountOrPayment}
+												{if $hasOrderDiscountOrPayment || $isRefundCompleted}
 													<td>
 														<div class="input-group">
 															{if $isRefundCompleted}
-                                                                {* used id_customization to check if in this request which bookings are refunded or not*}
-                                                                {if $booking['is_refunded'] && $booking['id_customization']}
-																    {displayPrice price=$booking['refunded_amount'] currency=$orderCurrency['id']}
-                                                                {else}
-                                                                    {l s='Not refunded' mod='hotelreservationsystem'}
-                                                                {/if}
+                                                                {displayPrice price=$booking['refunded_amount'] currency=$orderCurrency['id']}
 															{else}
 																<span class="input-group-addon">{$orderCurrency['sign']|escape:'html':'UTF-8'}</span>
 																<input placeholder="" type="text" name="refund_amounts[{$booking['id_order_return_detail']|escape:'html':'UTF-8'}]" value="{if ($booking['room_paid_amount'] + $booking['extra_service_total_paid_amount'] - $booking['cancelation_charge']) > 0}{Tools::ps_round(($booking['room_paid_amount'] + $booking['extra_service_total_paid_amount'] - $booking['cancelation_charge']), 2)}{else}0{/if}">
@@ -201,6 +200,18 @@
 															{/if}
 														</div>
 													</td>
+                                                    {if $isRefundCompleted}
+                                                        <td>
+                                                            {if $booking['is_cancelled']}
+                                                                <span class="badge badge-danger">{l s='Cancelled' mod='hotelreservationsystem'}</span>
+                                                            {* used id_customization to check if in this request which bookings are refunded or not*}
+                                                            {else if $booking['id_customization']}
+                                                                <span class="badge badge-success">{l s='Refunded' mod='hotelreservationsystem'}</span>
+                                                            {else}
+                                                                <span class="badge badge-danger">{l s='Denied' mod='hotelreservationsystem'}</span>
+                                                            {/if}
+                                                        </td>
+                                                    {/if}
 												{/if}
 											</tr>
 										{/foreach}

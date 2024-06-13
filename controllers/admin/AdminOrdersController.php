@@ -1445,6 +1445,9 @@ class AdminOrdersControllerCore extends AdminController
                                 $this->errors[] = Tools::displayError('An error occurred while cancelling the booking.');
                             }
                         }
+
+                        // As object order is already changed in processRefundInBookingTables
+                        $order = new Order($order->id);
                         // complete the booking refund directly in the refund request
                         $objOrderReturn->changeIdOrderReturnState(Configuration::get('PS_ORS_REFUNDED'));
 
@@ -2737,6 +2740,13 @@ class AdminOrdersControllerCore extends AdminController
         // get booking information by order
         $bookingOrderInfo = $objBookingDetail->getBookingDataByOrderId($order->id);
         foreach ($bookingOrderInfo as &$bookingOrderRoomInfo) {
+            // Get last refund request for booking
+            if ($bookingRefundDetail = OrderReturn::getOrdersReturnDetail($bookingOrderRoomInfo['id_order'], 0, $bookingOrderRoomInfo['id'])) {
+                $bookingRefundDetail = reset($bookingRefundDetail);
+                if (!$bookingRefundDetail['id_customization']) {
+                    $bookingOrderRoomInfo['is_refunded'] = 0;
+                }
+            }
             $bookingOrderRoomInfo['num_checkin_documents'] = HotelBookingDocument::getCountByIdHtlBooking($bookingOrderRoomInfo['id']);
         }
 
