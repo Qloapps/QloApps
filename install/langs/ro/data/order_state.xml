@@ -45,7 +45,7 @@
     <template/>
   </order_state>
   <order_state id="Partial_payment_accepted">
-    <name>Partial payment accepted</name>
-    <template>payment_accepted</template>
+    <name>Plata parțială primită</name>
+    <template>partial_payment_accepted</template>
   </order_state>
 </entity_order_state>
