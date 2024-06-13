@@ -96,6 +96,12 @@
     <keywords/>
     <url_rewrite>histórico-de-pedidos</url_rewrite>
   </meta>
+  <meta id="order-detail" id_shop="1">
+    <title>Devezh bemdez</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>devezh-bemdez</url_rewrite>
+  </meta>
   <meta id='identity' id_shop='1'>
     <title>Identificação</title>
     <description/>

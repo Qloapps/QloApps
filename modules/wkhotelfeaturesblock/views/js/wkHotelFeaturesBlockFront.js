@@ -43,15 +43,19 @@ $(document).ready(function() {
 	if ($('.homeAmenitiesBlock').length) {
 		setAmenitiesDescContHeight();
 	}
-});
 
-$(window).resize(function() {
 	if ($('.home_amenities_wrapper').length) {
 		setAmenitiesWrapperHeight();
 	}
+});
 
+$(window).resize(function() {
 	if ($('.homeAmenitiesBlock').length) {
 		$('.amenity_desc_cont').css('height', 0);
 		setAmenitiesDescContHeight();
+	}
+
+	if ($('.home_amenities_wrapper').length) {
+		setAmenitiesWrapperHeight();
 	}
 });

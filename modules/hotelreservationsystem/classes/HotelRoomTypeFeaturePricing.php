@@ -794,14 +794,14 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
      * @param  [int] $id_product [id of the product]
      * @return [array] [returns all feature prices by product]
      */
-    public function getFeaturePricesbyIdProduct($id_product)
+    public function getFeaturePricesbyIdProduct($id_product, $id_cart = 0, $id_guest = 0, $id_room = 0)
     {
         $idLang = Context::getContext()->language->id;
         return Db::getInstance()->executeS(
             'SELECT hrfp.*, hrfpl.`feature_price_name` FROM `'._DB_PREFIX_.'htl_room_type_feature_pricing` hrfp
             LEFT JOIN `'._DB_PREFIX_.'htl_room_type_feature_pricing_lang` hrfpl
             ON(hrfp.`id_feature_price` = hrfpl.`id_feature_price` AND hrfpl.`id_lang` = '.(int)$idLang.')
-            WHERE `id_product` = '.(int)$id_product
+            WHERE `id_product` = '.(int)$id_product.' AND `id_cart` = '.(int)$id_cart.' AND `id_guest` = '.(int)$id_guest.' AND `id_room` = '.(int)$id_room
         );
     }
 

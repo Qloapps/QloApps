@@ -1,5 +1,5 @@
 {*
-* 2010-2023 Webkul.
+* Since 2010 Webkul.
 *
 * NOTICE OF LICENSE
 *
@@ -13,11 +13,11 @@
 * needs please refer to https://store.webkul.com/customisation-guidelines/ for more information.
 *
 *  @author    Webkul IN <support@webkul.com>
-*  @copyright 2010-2023 Webkul IN
+*  @copyright Since 2010 Webkul IN
 *  @license   https://store.webkul.com/license.html
 *}
 
-<div id="room_type_demands_desc" class="tab-pane active">
+<div id="room_type_demands_desc" class="tab-pane {if (isset($show_active) && $show_active) || (!isset($orderEdit) || !$orderEdit)}active{/if} extra-services-container">
 	<input type="hidden" value="{$id_booking_detail}" id="id_htl_booking">
 	{if isset($orderEdit) && $orderEdit}
 		<p class="col-sm-12 facility_nav_btn">
@@ -52,13 +52,13 @@
 										</div>
 									</td>
 									<td>{displayPrice price=$demand['total_price_tax_excl'] currency=$orderCurrency}</td>
-									<td><a class="btn btn-danger pull-right del-order-room-demand" href="#" id_booking_demand="{$demand['id_booking_demand']}"><i class="icon-trash"></i></a></td>
+									<td class="text-right"><a class="btn btn-danger pull-right del-order-room-demand" href="#" id_booking_demand="{$demand['id_booking_demand']}"><i class="icon-trash"></i></a></td>
 								</tr>
 							{/foreach}
 						{/foreach}
 					{else}
 						<tr>
-							<td colspan="3">
+							<td colspan="4">
 								<i class="icon-warning"></i> {l s='No facilities added yet.'}
 							</td>
 						</tr>
@@ -77,7 +77,7 @@
 								<th></th>
 								<th>{l s='Name'}</th>
 								<th>{l s='Option'}</th>
-								<th class="text-right">{l s='Unit Price'}</th>
+								<th>{l s='Unit Price'}</th>
 							</tr>
 						</thead>
 						<tbody>
@@ -105,8 +105,7 @@
 											<input type="hidden" class="id_option" value="0" />
 										{/if}
 									</td>
-									<td class="text-right">
-
+									<td>
 										<div class="input-group">
 											<span class="input-group-addon">{$currencySign}</span>
 											{if isset($selected_adv_option) && isset($demand['adv_option'][$selected_adv_option]['price_tax_excl'])}
@@ -126,41 +125,50 @@
 							{/foreach}
 						</tbody>
 					</table>
+
+                    <div class="modal-footer">
+                        <button type="button" id="save_room_demands" class="btn btn-primary"><i class="icon icon-save"></i> &nbsp;{l s="Update Facilities"}</button>
+                    </div>
 				{else}
-					<i class="icon-warning"></i> {l s='No facilities available for this room.'}
+                    <i class="icon-warning"></i> {l s='No facilities available for this room.'}
 				{/if}
 			</div>
-			<button type="button" id="save_room_demands" class="btn btn-success pull-right"><i class="icon-save"></i> {l s='Save'}</button>
 		</div>
-	{elseif isset($extraDemands) && $extraDemands}
-		{foreach $extraDemands as $roomDemand}
-			<div class="row room_demand_detail">
-				<table class="table">
-					<thead>
-						<tr>
-							<th>{l s='Name'}</th>
-							<th>{l s='Unit Price'}</th>
-							<th class="text-right">{l s='Total Price'}</th>
-						</tr>
-					</thead>
-					<tbody>
-						{foreach $roomDemand['extra_demands'] as $demand}
-							<tr class="room_demand_block">
-								<td>{$demand['name']}</td>
-								<td>
-									{displayPrice price=$demand['unit_price_tax_excl'] currency=$orderCurrency}
-									{if $demand['price_calc_method'] == HotelRoomTypeGlobalDemand::WK_PRICE_CALC_METHOD_EACH_DAY}
-										{l s='/ night'}
-									{/if}
-								</td>
-								<td class="text-right">{displayPrice price=$demand['total_price_tax_excl'] currency=$orderCurrency}</td>
-							</tr>
-						{/foreach}
-					</tbody>
-				</table>
-			</div>
-		{/foreach}
 	{else}
-		{l s='No facilities selected!'}
+        <div class="room_demand_detail">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>{l s='Name'}</th>
+                        <th>{l s='Unit Price'}</th>
+                        <th>{l s='Total Price'}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {if isset($extraDemands) && $extraDemands}
+                        {foreach $extraDemands as $roomDemand}
+                            {foreach $roomDemand['extra_demands'] as $demand}
+                                <tr class="room_demand_block">
+                                    <td>{$demand['name']}</td>
+                                    <td>
+                                        {displayPrice price=$demand['unit_price_tax_excl'] currency=$orderCurrency}
+                                        {if $demand['price_calc_method'] == HotelRoomTypeGlobalDemand::WK_PRICE_CALC_METHOD_EACH_DAY}
+                                            {l s='/ night'}
+                                        {/if}
+                                    </td>
+                                    <td>{displayPrice price=$demand['total_price_tax_excl'] currency=$orderCurrency}</td>
+                                </tr>
+                            {/foreach}
+                        {/foreach}
+                    {else}
+                        <tr>
+                            <td colspan="3">
+                                <i class="icon-warning"></i> {l s='No facilities added yet.'}
+                            </td>
+                        </tr>
+                    {/if}
+                </tbody>
+            </table>
+        </div>
 	{/if}
 </div>
