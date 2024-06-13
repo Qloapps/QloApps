@@ -41,6 +41,7 @@
 			<label for="email">{l s='Email address'}</label>
 			<input class="form-control" type="email" id="email" name="email" value="{if isset($smarty.post.email)}{$smarty.post.email|escape:'html':'UTF-8'|stripslashes}{/if}" />
 		</div>
+		{hook h='displayForgotPasswordFieldsAfter'}
 		<p class="submit">
             <button type="submit" class="btn button button-medium"><span>{l s='Retrieve Password'}&nbsp;<i class="icon-chevron-right right"></i></span></button>
 		</p>
