@@ -259,7 +259,6 @@ class AdminProductsControllerCore extends AdminController
                 'list' => $this->hotelsArray,
                 'optional' => true,
                 'class' => 'chosen',
-                'remove_onchange' => true,
                 'visible_default' => true,
             );
         }
@@ -308,7 +307,6 @@ class AdminProductsControllerCore extends AdminController
             'list' => array(1 => $this->l('Yes'), 0 => $this->l('No')),
             'optional' => true,
             'visible_default' => true,
-            'remove_onchange' => true,
             'orderby' => false
         );
 
@@ -412,7 +410,6 @@ class AdminProductsControllerCore extends AdminController
             'type' => 'select',
             'list' => $this->locationsAndHotels,
             'filter_key' => 'a!id_category_default',
-            'remove_onchange' => true,
             'displayed' => false,
         );
 
@@ -1092,16 +1089,18 @@ class AdminProductsControllerCore extends AdminController
             }
 
             $id_product = Tools::getValue('id_product');
-
             $id_adv_pmt = Tools::getValue('id_adv_pmt');
             if ($id_adv_pmt) {
                 $obj_adv_pmt = new HotelAdvancedPayment($id_adv_pmt);
             } else {
                 $obj_adv_pmt = new HotelAdvancedPayment();
+                if ($adv_pmt_info = $obj_adv_pmt->getIdAdvPaymentByIdProduct($id_product)) {
+                    // To prevent duplication from two separate tabs
+                    $obj_adv_pmt = new HotelAdvancedPayment((int) $adv_pmt_info['id']);
+                }
             }
 
             $adv_payment_active = Tools::getValue('adv_payment_active');
-
             $obj_adv_pmt->id_product = $id_product;
             $obj_adv_pmt->active = $adv_payment_active;
 
@@ -2552,6 +2551,8 @@ class AdminProductsControllerCore extends AdminController
 
         $this->tpl_list_vars['title'] = $this->l('Room Types');
 
+        $this->_new_list_header_design = true;
+
         return parent::renderList();
     }
 
@@ -3179,12 +3180,8 @@ class AdminProductsControllerCore extends AdminController
                                 $objRoomTypeServiceProductPrice->id_element = $idProduct;
                                 $objRoomTypeServiceProductPrice->element_type = RoomTypeServiceProduct::WK_ELEMENT_TYPE_ROOM_TYPE;
                             }
-
                             $objRoomTypeServiceProductPrice->price = $price;
-                            if ($idTaxRulesGroup) {
-                                $objRoomTypeServiceProductPrice->id_tax_rules_group = $idTaxRulesGroup;
-                            }
-
+                            $objRoomTypeServiceProductPrice->id_tax_rules_group = $idTaxRulesGroup;
                             $objRoomTypeServiceProductPrice->save();
                         } else {
                             // create new association
@@ -3911,7 +3908,7 @@ class AdminProductsControllerCore extends AdminController
         } else {
             $address->id_country = (int)$address_infos['id_country'];
             $address->id_state = (int)$address_infos['id_state'];
-            $address->zipcode = $address_infos['postcode'];
+            $address->postcode = $address_infos['postcode'];
         }
 
         $tax_rules_groups = TaxRulesGroup::getTaxRulesGroups(true);
