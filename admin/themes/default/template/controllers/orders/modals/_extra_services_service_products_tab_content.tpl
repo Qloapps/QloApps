@@ -1,5 +1,5 @@
 {*
-* 2010-2023 Webkul.
+* Since 2010 Webkul.
 *
 * NOTICE OF LICENSE
 *
@@ -13,11 +13,11 @@
 * needs please refer to https://store.webkul.com/customisation-guidelines/ for more information.
 *
 *  @author    Webkul IN <support@webkul.com>
-*  @copyright 2010-2023 Webkul IN
+*  @copyright Since 2010 Webkul IN
 *  @license   https://store.webkul.com/license.html
 *}
 
-<div id="room_type_service_product_desc" class="tab-pane {if isset($show_active) && $show_active}active{/if}">
+<div id="room_type_service_product_desc" class="tab-pane {if isset($show_active) && $show_active}active{/if} extra-services-container">
 	{if isset($orderEdit) && $orderEdit}
 
 		<p class="col-sm-12 facility_nav_btn">
@@ -27,12 +27,12 @@
 
 		{* Already selected room services *}
 		<div class="col-sm-12 room_ordered_services table-responsive">
-			<table class="table">
+			<table class="table table-striped">
 				<thead>
 					<tr>
 						<th>{l s='Name'}</th>
 						<th class="fixed-width-sm"></th>
-						<th class="fixed-width-sm">{l s='Quantity'}</th>
+						<th class="fixed-width-sm text-center">{l s='Quantity'}</th>
 						<th>{l s='Unit Price'}</th>
 						<th>{l s='Total Price'}</th>
 						<th class="text-right">{l s='Action'}</th>
@@ -45,7 +45,7 @@
 								<td>
 									<div>{$service['name']|escape:'html':'UTF-8'}</div>
 								</td>
-								<td class="text-center">
+								<td>
 									{if $service['product_auto_add'] && $service['product_price_addition_type'] == Product::PRICE_ADDITION_TYPE_WITH_ROOM}
 										<span class="badge badge-info label">{l s='Auto added'}</span><br>
 									{/if}
@@ -53,7 +53,7 @@
 										<span class="badge badge-info label">{l s='Convenience fee'}</span>
 									{/if}
 								</td>
-								<td>
+								<td class="text-center">
 									{if $service['allow_multiple_quantity']}
 										<div class="qty_container">
 											<input type="number" class="form-control qty" min="1" data-id_product="{$service['id_product']|escape:'html':'UTF-8'}" value="{$service['quantity']|escape:'html':'UTF-8'}">
@@ -78,7 +78,7 @@
 									{/if} *}
 								</td>
 								<td>{displayPrice price=$service['total_price_tax_excl']|escape:'html':'UTF-8' currency=$orderCurrency}</td>
-								<td><a class="btn btn-danger pull-right del_room_additional_service" data-id_room_type_service_product_order_detail="{$service['id_room_type_service_product_order_detail']}" href="#"><i class="icon-trash"></i></a></td>
+								<td class="text-right"><a class="btn btn-danger pull-right del_room_additional_service" data-id_room_type_service_product_order_detail="{$service['id_room_type_service_product_order_detail']}" href="#"><i class="icon-trash"></i></a></td>
 							</tr>
 						{/foreach}
 					{else}
@@ -100,7 +100,7 @@
 								<th></th>
 								<th>{l s='Name'}</th>
 								<th class="fixed-width-sm"> </th>
-								<th class="fixed-width-sm">{l s='Quantity'}</th>
+								<th class="fixed-width-sm text-center">{l s='Quantity'}</th>
 								<th>{l s='Unit Price'}</th>
 							</tr>
 						</thead>
@@ -121,7 +121,7 @@
 											<span class="badge badge-info label">{l s='Convenience fee'}</span>
 										{/if}
 									</td>
-									<td>
+									<td class="text-center">
 										{if $product['allow_multiple_quantity']}
 											<div class="qty_container">
 												<input type="number" class="form-control qty" min="1" id="qty_{$product['id_product']|escape:'html':'UTF-8'}" name="service_qty[{$product['id_product']|escape:'html':'UTF-8'}]" data-id-product="{$product.id_product|escape:'html':'UTF-8'}" value="1">
@@ -143,12 +143,15 @@
 							{/foreach}
 						</tbody>
 					</table>
+
+                    <div class="modal-footer">
+                        <button type="submit" id="save_service_service" class="btn btn-primary"><i class="icon icon-save"></i> &nbsp;{l s="Update Services"}</button>
+                    </div>
 				{else}
 					<i class="icon-warning"></i> {l s='No services available to add to this room.'}
 				{/if}
 			</div>
 			<input type="hidden" name="id_booking_detail" value="{$id_booking_detail}">
-			<button type="submit" id="save_service_service" class="btn btn-success pull-right"><i class="icon-save"></i> {l s='Save'}</button>
 		</form>
 
 	{elseif isset($additionalServices) && $additionalServices}
@@ -159,7 +162,7 @@
 					<th>{l s='Name'}</th>
 					<th></th>
 					<th>{l s='Unit Price'}</th>
-					<th class="text-right">{l s='Total Price'}</th>
+					<th>{l s='Total Price'}</th>
 				</tr>
 			</thead>
 			</tbody>
@@ -169,7 +172,7 @@
 							{$service['id_product']|escape:'html':'UTF-8'} <a target="blank" href="{$link->getAdminLink('AdminNormalProducts')|escape:'html':'UTF-8'}&amp;id_product={$service['id_product']|escape:'html':'UTF-8'}&amp;updateproduct"><i class="icon-external-link-sign"></i></a>
 						</td>
 						<td>{$service['name']|escape:'html':'UTF-8'}</td>
-						<td class="text-center">
+						<td>
 							{if $service['product_auto_add'] && $service['product_price_addition_type'] == Product::PRICE_ADDITION_TYPE_INDEPENDENT}
 								<span class="badge badge-info label">{l s='Convenience fee'}</span>
 							{/if}
@@ -183,7 +186,7 @@
 								{l s='/ night'}
 							{/if}
 						</td>
-						<td class="text-right">
+						<td>
 							{displayPrice price=$service['total_price_tax_excl'] currency=$orderCurrency}
 						</td>
 					</tr>
