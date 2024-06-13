@@ -48,6 +48,12 @@
     height: unset;
     min-height: 45px;
   }
+  #search_hotel_block_form .hotel-selector-wrap .chosen-container-single .chosen-single {
+    min-height: 45px;
+  }
+  #search_hotel_block_form .hotel-selector-wrap .chosen-container-single .chosen-search {
+    height: 45px;
+  }
   /* #search_hotel_block_form #search_room_submit {
     height: 45px;
   } */
