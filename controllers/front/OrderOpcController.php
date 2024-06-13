@@ -173,7 +173,9 @@ class OrderOpcControllerCore extends ParentOrderController
 
                             if (!count($this->errors)) {
                                 $customer = new Customer($this->context->customer->id);
-                                if ($customer->transformToCustomer($this->context->language->id, $passwd)) {
+                                if (!$customer->isGuest()) {
+                                    $this->errors[] = Tools::displayError('This account is already registered as a customer.');
+                                } else if ($customer->transformToCustomer($this->context->language->id, $passwd)) {
                                     $this->context->updateCustomer($customer);
                                 } else {
                                     $this->errors[] = Tools::displayError('An error occurred while transforming your account into a registered customer.');
@@ -424,7 +426,7 @@ class OrderOpcControllerCore extends ParentOrderController
     public function initContent()
     {
         // validate room types before payment by customer
-        $orderRestrictErr = HotelCartBookingData::validateCartBookings();
+        $this->errors = HotelCartBookingData::validateCartBookings();
 
         parent::initContent();
 
@@ -492,7 +494,7 @@ class OrderOpcControllerCore extends ParentOrderController
         // $objCurrency = new Currency(Configuration::get('PS_CURRENCY_DEFAULT'));
         $this->context->smarty->assign(
             array(
-                'orderRestrictErr' => $orderRestrictErr,
+                'orderRestrictErr' => count($this->errors) ? 1 : 0,
                 // 'allDemands' => $allDemands,
                 // 'defaultcurrencySign' => $objCurrency->sign,
                 'THEME_DIR' => _THEME_DIR_,
