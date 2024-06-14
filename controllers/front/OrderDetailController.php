@@ -228,6 +228,7 @@ class OrderDetailControllerCore extends FrontController
                                         1,
                                         1
                                     );
+
                                     if (empty($cartHotelData[$type_key]['date_diff'][$date_join]['extra_demands_price_te'])) {
                                         $cartHotelData[$type_key]['date_diff'][$date_join]['extra_demands_price_te'] = 0;
                                     }

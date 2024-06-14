@@ -1143,8 +1143,9 @@ function initRoomEvents()
 		var date_from = tr_product.data('date_from');
 		var date_to = tr_product.data('date_to');
 		var id_order_detail = tr_product.data('id_order_detail');
+		var id_htl_booking = tr_product.data('id_htl_booking');
 		//var id_order_detail = $(this).closest('.product-line-row').find('td .edit_product_id_order_detail').val();
-		var query = 'ajax=1&action=deleteRoomLine&token='+token+'&id_order='+id_order+'&id_room='+id_room+'&id_product='+id_product+'&id_hotel='+id_hotel+'&date_from='+date_from+'&date_to='+date_to+'&id_order_detail='+id_order_detail;
+		var query = 'ajax=1&action=deleteRoomLine&token='+token+'&id_order='+id_order+'&id_htl_booking='+id_htl_booking+'&id_room='+id_room+'&id_product='+id_product+'&id_hotel='+id_hotel+'&date_from='+date_from+'&date_to='+date_to+'&id_order_detail='+id_order_detail;
 		query += $(this).parent().parent().find('input, select:visible, .edit_product_id_order_detail').serialize();
 		$.ajax({
 			type: 'POST',
@@ -1542,6 +1543,7 @@ $(document).ready(function() {
                 id_order: idOrder,
                 date_from: dateFrom,
                 date_to: dateTo,
+                id_htl_booking: idHtlBooking,
                 orderEdit: orderEdit,
                 action: 'getRoomTypeBookingDemands',
                 ajax: true

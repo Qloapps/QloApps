@@ -149,7 +149,9 @@ class HotelOrderRefundRules extends ObjectModel
                         $objHtlBooking->date_from,
                         $objHtlBooking->date_to,
                         1,
-                        1
+                        1,
+                        1,
+                        $objHtlBooking->id
                     );
 
                     $totalServicesPrice = $objRoomTypeServiceProductOrderDetail->getSelectedServicesForRoom(

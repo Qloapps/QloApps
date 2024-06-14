@@ -74,7 +74,8 @@ class HotelBookingDemands extends ObjectModel
         $dateTo = 0,
         $groupByRoom = 1,
         $getTotalPrice = 0,
-        $useTax = 1
+        $useTax = 1,
+        $idHtlBookingDetail = 0
     ) {
         $moduleObj = Module::getInstanceByName('hotelreservationsystem');
         $context = Context::getContext();
@@ -88,21 +89,24 @@ class HotelBookingDemands extends ObjectModel
         $totalDemandsPrice = 0;
         $sql = 'SELECT hb.`id_room`, hb.`adults`, hb.`children`, hd.* FROM `'._DB_PREFIX_.'htl_booking_demands` hd
         LEFT JOIN `'._DB_PREFIX_.'htl_booking_detail` hb ON (hd.`id_htl_booking` = hb.`id`)
-        WHERE hd.`id_htl_booking` IN
-        (SELECT `id` FROM `'._DB_PREFIX_.'htl_booking_detail`
-        WHERE `id_order`='.(int) $idOrder;
+        WHERE hb.`id_order` ='.(int) $idOrder;
+
         if ($idProduct) {
-            $sql .= ' AND `id_product`='.(int)$idProduct;
+            $sql .= ' AND hb.`id_product`='.(int)$idProduct;
         }
         if ($idRoom) {
-            $sql .= ' AND `id_room`='.(int)$idRoom;
+            $sql .= ' AND hb.`id_room`='.(int)$idRoom;
         }
         if ($dateFrom && $dateTo) {
             $dateFrom = date('Y-m-d', strtotime($dateFrom));
             $dateTo = date('Y-m-d', strtotime($dateTo));
-            $sql .= ' AND `date_from`=\''.pSQL($dateFrom).'\' AND `date_to`= \''.pSQL($dateTo).'\'';
+            $sql .= ' AND hb.`date_from`=\''.pSQL($dateFrom).'\' AND hb.`date_to`= \''.pSQL($dateTo).'\'';
         }
-        $sql .= ')';
+
+        if ($idHtlBookingDetail) {
+            $sql .= ' AND hb.`id` = '.(int)$idHtlBookingDetail;
+        }
+
         if ($getTotalPrice) {
             $totalDemandsPrice = 0;
         }
