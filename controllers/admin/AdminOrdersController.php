@@ -2571,7 +2571,7 @@ class AdminOrdersControllerCore extends AdminController
         $totalConvenienceFeeTI = 0;
         $totalDemandsPriceTE = 0;
         $totalDemandsPriceTI = 0;
-
+        $totalRefundedRooms = 0;
         if ($order_detail_data = $objBookingDetail->getOrderFormatedBookinInfoByIdOrder($order->id)) {
             $objBookingDemand = new HotelBookingDemands();
             $objHotelRoomType = new HotelRoomType();
@@ -2732,6 +2732,15 @@ class AdminOrdersControllerCore extends AdminController
                 $order_detail_data[$key]['amt_with_qty_tax_incl'] = $value['total_price_tax_incl'];
                 $order_detail_data[$key]['room_type_info'] = $objHotelRoomType->getRoomTypeInfoByIdProduct($value['id_product']);
                 $order_detail_data[$key]['total_room_tax'] = $order_detail_data[$key]['total_room_price_ti'] - $order_detail_data[$key]['total_room_price_te'];
+
+                if (isset($value['refund_info'])
+                    && $value['refund_info']['refunded']
+                    && $value['refund_info']['id_customization']
+                    && $value['is_refunded']
+                    && !$value['is_cancelled']
+                ) {
+                    $totalRefundedRooms += 1;
+                }
             }
         } else {
             $order_detail_data = array();
@@ -2776,7 +2785,7 @@ class AdminOrdersControllerCore extends AdminController
         $orderOverBookings = $objHotelBookingDetail->getOverbookedRooms($order->id, 0, '', '', 0, 0, 1);
 
         $this->tpl_view_vars = array(
-            // refund info
+            'totalRefundedRooms' => $totalRefundedRooms,
             'orderOverBookings' => $orderOverBookings,
             'refund_allowed' => (int) $order->isReturnable(),
             'applicable_refund_policies' => $applicableRefundPolicies,
