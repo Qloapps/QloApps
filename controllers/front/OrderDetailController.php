@@ -610,6 +610,9 @@ class OrderDetailControllerCore extends FrontController
                         $objOrderReturnDetail->product_quantity = $numDays;
                         $objOrderReturnDetail->id_htl_booking = $idHtlBooking;
                         $objOrderReturnDetail->refunded_amount = 0;
+                        if (!$objOrder->getCartRules() && $objOrder->getTotalPaid() <= 0) {
+                            $objOrderReturnDetail->id_customization = 1;
+                        }
                         $objOrderReturnDetail->save();
                     }
                 }
@@ -617,7 +620,7 @@ class OrderDetailControllerCore extends FrontController
                 // Emails to customer, superadmin and employees on refund request state change
                 $objOrderReturn->changeIdOrderReturnState(Configuration::get('PS_ORS_PENDING'));
 
-                if ($objOrder->getTotalPaid() <= 0) {
+                if (!$objOrder->getCartRules() && $objOrder->getTotalPaid() <= 0) {
                     // Process refund in booking tables
                     foreach ($idsHtlBooking as $idHtlBooking) {
                         $objHtlBooking = new HotelBookingDetail($idHtlBooking);

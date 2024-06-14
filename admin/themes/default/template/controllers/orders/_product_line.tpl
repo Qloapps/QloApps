@@ -198,7 +198,7 @@
             {if $data.id|in_array:$refundReqBookings}
 			    {if $data.is_cancelled}
 				    <span class="badge badge-danger">{l s='Cancelled'}</span>
-			    {elseif isset($data.refund_info) && $data.refund_info}
+			    {elseif isset($data.refund_info) && (!$data.refund_info.refunded || $data.refund_info.id_customization)}
 				    <span class="badge" style="background-color:{$data.refund_info.color|escape:'html':'UTF-8'}">{$data.refund_info.name|escape:'html':'UTF-8'}</span>
                 {else}
 	    			<span>--</span>

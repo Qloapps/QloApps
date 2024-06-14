@@ -962,15 +962,18 @@ class AdminOrdersControllerCore extends AdminController
                 'modal_class' => 'modal-md order_detail_modal',
                 'modal_title' => '<i class="icon icon-exchange"></i> &nbsp'.$this->l('Cancel Bookings'),
                 'modal_content' => $this->context->smarty->fetch('controllers/orders/modals/_cancel_room_bookings.tpl'),
-                'modal_actions' => array(
+            );
+
+            if ($bookingOrderInfo) {
+                $modal['modal_actions'] = array(
                     array(
                         'type' => 'button',
                         'value' => 'submitCancelBooking',
                         'class' => 'submitCancelBooking btn-primary pull-right',
                         'label' => '<i class="icon-exchange"></i> '.$this->l('Cancel Bookings'),
-                    ),
-                ),
-            );
+                    )
+                );
+            }
 
             $this->context->smarty->assign($modal);
             $response['hasError'] = 0;
@@ -1428,6 +1431,9 @@ class AdminOrdersControllerCore extends AdminController
                             $objOrderReturnDetail->product_quantity = $numDays;
                             $objOrderReturnDetail->id_htl_booking = $idHtlBooking;
                             $objOrderReturnDetail->refunded_amount = 0;
+                            if (!$order->getCartRules() && $order->getTotalPaid() <= 0) {
+                                $objOrderReturnDetail->id_customization = 1;
+                            }
                             $objOrderReturnDetail->save();
                         }
                     }
@@ -2777,8 +2783,6 @@ class AdminOrdersControllerCore extends AdminController
             'returns' => OrderReturn::getOrdersReturn($order->id_customer, $order->id),
             'refundReqBookings' => $refundReqBookings,
             'completeRefundRequestOrCancel' => $order->hasCompletelyRefunded(Order::ORDER_COMPLETE_CANCELLATION_OR_REFUND_REQUEST_FLAG),
-            'allBookingsRefunded' => $order->hasCompletelyRefunded(Order::ORDER_COMPLETE_REFUND_FLAG),
-            'allBookingsCancelled' => $order->hasCompletelyRefunded(Order::ORDER_COMPLETE_CANCELLATION_FLAG),
             'refundedAmount' => $refundedAmount,
             'totalDemandsPriceTI' => $totalDemandsPriceTI,
             'totalDemandsPriceTE' => $totalDemandsPriceTE,
