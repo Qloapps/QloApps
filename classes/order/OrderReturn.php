@@ -480,7 +480,7 @@ class OrderReturnCore extends ObjectModel
                         Mail::Send(
                             (int)$idLang,
                             $objOrderReturnState->customer_template,
-                            $objOrderReturnState->name,
+                            sprintf(Mail::l('Refund %s', (int)$idLang), $objOrderReturnState->name),
                             $data,
                             $objCustomer->email,
                             $objCustomer->firstname.' '.$objCustomer->lastname,
@@ -523,7 +523,7 @@ class OrderReturnCore extends ObjectModel
                                         Mail::Send(
                                             (int)$idLang,
                                             $objOrderReturnState->admin_template,
-                                            $objOrderReturnState->name,
+                                            sprintf(Mail::l('Refund %s', (int)$idLang), $objOrderReturnState->name),
                                             $data,
                                             $superAdminEmployee['email'],
                                             $superAdminEmployee['firstname'].' '.$superAdminEmployee['lastname'],
@@ -553,7 +553,7 @@ class OrderReturnCore extends ObjectModel
                                 Mail::Send(
                                     (int)$idLang,
                                     $objOrderReturnState->admin_template,
-                                    $objOrderReturnState->name,
+                                    sprintf(Mail::l('Refund %s', (int)$idLang), $objOrderReturnState->name),
                                     $data,
                                     $objHotel->email,
                                     null,
@@ -585,7 +585,7 @@ class OrderReturnCore extends ObjectModel
                                                         Mail::Send(
                                                             (int)$idLang,
                                                             $objOrderReturnState->admin_template,
-                                                            $objOrderReturnState->name,
+                                                            sprintf(Mail::l('Refund %s', (int)$idLang), $objOrderReturnState->name),
                                                             $data,
                                                             $empl['email'],
                                                             $empl['firstname'].' '.$empl['lastname'],
