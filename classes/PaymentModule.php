@@ -420,7 +420,7 @@ abstract class PaymentModuleCore extends Module
                         && number_format($cart_total_paid, _PS_PRICE_COMPUTE_PRECISION_) != number_format($amount_paid, _PS_PRICE_COMPUTE_PRECISION_)
                         && $this->name != 'wsorder'
                         && $this->name != 'bo_order'
-                        && $this->name != 'csvbooking'
+                        && $this->name != 'csvorder'
                     ) {
                         // if customer is paying full payment amount
                         $id_order_state = Configuration::get('PS_OS_ERROR');
@@ -694,7 +694,7 @@ abstract class PaymentModuleCore extends Module
                                     '{id_order}' => $order->reference,
                                     '{order_name}' => $order->getUniqReference()
                                 );
-                                if ($this->name != 'csvbooking') {
+                                if ($this->name != 'csvorder') {
                                     Mail::Send(
                                         (int)$order->id_lang,
                                         'voucher',
@@ -1101,7 +1101,7 @@ abstract class PaymentModuleCore extends Module
                     $order = new Order((int)$order->id);
 
                     // Send an e-mail to customer (one order = one email)
-                    if ($id_order_state != Configuration::get('PS_OS_ERROR') && $id_order_state != Configuration::get('PS_OS_CANCELED') && $this->context->customer->id && $this->name != 'csvbooking') {
+                    if ($id_order_state != Configuration::get('PS_OS_ERROR') && $id_order_state != Configuration::get('PS_OS_CANCELED') && $this->context->customer->id && $this->name != 'csvorder') {
                         $invoice = new Address($order->id_address_invoice);
                         $delivery = new Address($order->id_address_delivery);
                         $delivery_state = $delivery->id_state ? new State($delivery->id_state) : false;

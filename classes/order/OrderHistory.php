@@ -414,7 +414,7 @@ class OrderHistoryCore extends ObjectModel
             return false;
         }
 
-        if (Tools::getValue('controller') != 'AdminImport') {
+        if ($order->module != 'csvorder') {
             if (!$this->sendEmail($order, $template_vars)) {
                 return false;
             }
