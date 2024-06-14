@@ -121,7 +121,7 @@
         <ul class="stats-list">
             <li>
                 <span class="item-label">
-                    <a href="{$link->getAdminLink("AdminCustomers")|escape:"html":"UTF-8"}" target="_blank">
+                <a href="#" data-href="{$link->getAdminLink("AdminCustomers")|escape:"html":"UTF-8"}&filterOnlyNewCustomer=1" id="dash_filter_new_customers" target="_blank">
                         <span>{l s="New Customers" mod='dashactivity'}</span>
                     </a>
                 </span>

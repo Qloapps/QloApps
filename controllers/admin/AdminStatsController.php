@@ -981,6 +981,12 @@ class AdminStatsControllerCore extends AdminStatsTabController
             case 'average_lead_time':
                 $dateToday = date('Y-m-d');
                 $value = Tools::ps_round(AdminStatsController::getAverageLeadTime(), 2);
+                if ($value && $value <= 1) {
+                    $value .= ' '.$this->l('day');
+                } else {
+                    $value .= ' '.$this->l('days');
+                }
+
                 break;
             case 'average_guest_in_booking':
                 $dateToday = date('Y-m-d');
@@ -1879,7 +1885,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
 
     public static function getTotalNewCustomers($nbDaysNewCustomers)
     {
-        $maxDateAdd = date('Y-m-d H:i:s', strtotime('-'.$nbDaysNewCustomers.' day'));
+        $maxDateAdd = date('Y-m-d', strtotime('-'.$nbDaysNewCustomers.' day'));
         $sql = 'SELECT COUNT(c.`id_customer`)
         FROM `'._DB_PREFIX_.'customer` c
         WHERE c.`date_add` >= "'.pSQL($maxDateAdd).'" AND c.`deleted` = 0';
