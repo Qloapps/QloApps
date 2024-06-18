@@ -112,18 +112,41 @@ class AdminAddressesControllerCore extends AdminController
 
     public function renderForm()
     {
+        $customerSelectField =array(
+            'type' => 'text_customer',
+            'label' => $this->l('Customer'),
+            'name' => 'id_customer',
+            'required' => false,
+        );
+        if ($this->loadObject(true)
+            && !$this->object->id
+        ) {
+            $customerEmails = array(array(
+                'email' => $this->l('Select Customer'),
+                'id_customer' => 0,
+                'id_address'=> 0
+            ));
+            $customerEmails = array_merge($customerEmails, Customer::getAllCustomers(false, null, 0));
+            $customerSelectField = array(
+                'type' => 'select',
+                'label' => $this->l('Customer'),
+                'name' => 'id_customer',
+                'class' => 'chosen',
+                'options' => array(
+                    'query' => $customerEmails,
+                    'id' => 'id_customer',
+                    'name' => 'email'
+                ),
+            );
+        }
+
         $this->fields_form = array(
             'legend' => array(
                 'title' => $this->l('Addresses'),
                 'icon' => 'icon-envelope-alt'
             ),
             'input' => array(
-                array(
-                    'type' => 'text_customer',
-                    'label' => $this->l('Customer'),
-                    'name' => 'id_customer',
-                    'required' => false,
-                ),
+                $customerSelectField,
                 array(
                     'type' => 'text',
                     'label' => $this->l('Identification Number'),
@@ -190,7 +213,6 @@ class AdminAddressesControllerCore extends AdminController
             $token_customer = Tools::getAdminToken('AdminCustomers'.(int)(Tab::getIdFromClassName('AdminCustomers')).(int)$this->context->employee->id);
         }
 
-        $this->fields_value['email'] = Tools::getValue('email');
         $this->tpl_form_vars = array(
             'customer' => (isset($customer) && $this->object->id) ? $customer : null,
             'tokenCustomer' => isset($token_customer) ? $token_customer : null
@@ -503,21 +525,23 @@ class AdminAddressesControllerCore extends AdminController
         return $out;
     }
 
-    /**
-     * Method called when an ajax request is made
+     /**
+     * Method called when an ajax request is made to load the customer info for the selected email
      * @see AdminController::postProcess()
      */
-    public function ajaxProcess()
+    public function ajaxProcessLoadCustomer()
     {
-        if (Tools::isSubmit('email')) {
-            $email = pSQL(Tools::getValue('email'));
-            $customer = Customer::searchByName($email);
-            if (!empty($customer)) {
-                $customer = $customer['0'];
-                echo json_encode(array('infos' => pSQL($customer['firstname']).'_'.pSQL($customer['lastname']).'_'.pSQL($customer['company']).'_'.pSQL($customer['id_customer'])));
-            }
+        $response = array('status' => false);
+        if (Tools::getValue('id_customer')
+            && Validate::isLoadedObject($objCustomer = new Customer(Tools::getValue('id_customer')))
+        ) {
+            $response['status'] = true;
+            $response['firstname'] = $objCustomer->firstname;
+            $response['lastname'] = $objCustomer->lastname;
+            $response['company'] = $objCustomer->company;
         }
-        die;
+
+        $this->ajaxDie(json_encode($response));
     }
 
     /**

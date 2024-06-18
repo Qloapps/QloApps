@@ -951,4 +951,19 @@ class CustomerCore extends ObjectModel
         $sql_filter .= Shop::addSqlRestriction(Shop::SHARE_CUSTOMER, 'main');
         return parent::getWebserviceObjectList($sql_join, $sql_filter, $sql_sort, $sql_limit);
     }
+
+    public static function getAllCustomers($withAddress = null, $active = null, $deleted = null)
+    {
+        return Db::getInstance()->executeS(
+            'SELECT  c.`firstname`, c.`lastname`, c.`id_customer`, c.`email`, a.`id_address`
+            FROM `'._DB_PREFIX_.'customer` c
+            LEFT JOIN `'._DB_PREFIX_.'address` a
+            ON a.`id_customer` = c.`id_customer` AND a.`deleted`=0
+            WHERE 1 '.
+            (!is_null($deleted) ? ' AND c.`deleted` = '.(int) $deleted : ' ').
+            (!is_null($active) ?  ' AND c.`active` = '.(int) $active: ' ' ).
+            (!is_null($withAddress) ?  (($withAddress) ? ' AND a.`id_address` !='.(int) 0: ' AND ISNULL(a.`id_address`)'): ' ' )
+        );
+    }
+
 }

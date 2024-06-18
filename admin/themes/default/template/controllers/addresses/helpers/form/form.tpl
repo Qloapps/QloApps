@@ -47,50 +47,47 @@
 			</div>
 			<input type="hidden" name="id_customer" value="{$customer->id}" />
 			<input type="hidden" name="email" value="{$customer->email}" />
-		{else}
-			<script type="text/javascript">
-			$('input[name=email]').live('blur', function(e)
+		{/if}
+	{else if $input.type == 'select' && $input.name == 'id_customer'}
+		{$smarty.block.parent}
+		<script type="text/javascript">
+			$('#id_customer').on('change', function(e)
 			{
-				var email = $(this).val();
-				if (email.length > 5)
-				{
+				var id_customer = parseInt($(this).val());
+				if (!isNaN(id_customer)) {
 					var data = {};
-					data.email = email;
+					data.id_customer = id_customer;
 					data.token = "{$token|escape:'html':'UTF-8'}";
 					data.ajax = 1;
 					data.controller = "AdminAddresses";
-					data.action = "loadNames";
+					data.action = "loadCustomer";
 					$.ajax({
 						type: "POST",
 						url: "ajax-tab.php",
 						data: data,
 						dataType: 'json',
 						async : true,
-						success: function(msg)
-						{
-							if (msg)
-							{
-								var infos = msg.infos.replace("\\'", "'").split('_');
-
-								$('input[name=firstname]').val(infos[0]);
-								$('input[name=lastname]').val(infos[1]);
-								$('input[name=company]').val(infos[2]);
-								$('input[name=id_customer]').val(infos[3]);
+						success: function(response) {
+							if (response.status) {
+								$('input[name=firstname]').val(response.firstname);
+								$('input[name=lastname]').val(response.lastname);
+								$('input[name=company]').val(response.company);
+							} else {
+								resetCustomerRelatedAddressFields();
 							}
-						},
-						error: function(msg)
-						{
 						}
 					});
+				} else {
+					resetCustomerRelatedAddressFields();
 				}
 			});
-			</script>
-
-			<div class="col-lg-4">
-				<input type="hidden" name="id_customer" value="{$fields_value[$input.name]}" />
-				<input type="email" id="email" name="email" value="{if isset($fields_value['email'])}{$fields_value['email']|escape:'html':'UTF-8'}{/if}"/>
-			</div>
-		{/if}
+			function resetCustomerRelatedAddressFields() {
+				$('input[name=firstname]').val('');
+				$('input[name=lastname]').val('');
+				$('input[name=company]').val('');
+				$('input[name=id_customer]').val('');
+			}
+		</script>
 	{else}
 		{$smarty.block.parent}
 	{/if}
