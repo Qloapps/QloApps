@@ -162,7 +162,7 @@ abstract class PaymentModuleCore extends Module
      */
     public function validateOrder($id_cart, $id_order_state, $amount_paid, $payment_method = 'Unknown',
         $message = null, $extra_vars = array(), $currency_special = null, $dont_touch_amount = false,
-        $secure_key = false, Shop $shop = null)
+        $secure_key = false, Shop $shop = null, $send_mails = true)
     {
         if (self::DEBUG_MODE) {
             PrestaShopLogger::addLog('PaymentModule::validateOrder - Function called', 1, null, 'Cart', (int)$id_cart, true);
@@ -420,6 +420,7 @@ abstract class PaymentModuleCore extends Module
                         && number_format($cart_total_paid, _PS_PRICE_COMPUTE_PRECISION_) != number_format($amount_paid, _PS_PRICE_COMPUTE_PRECISION_)
                         && $this->name != 'wsorder'
                         && $this->name != 'bo_order'
+                        && (!isset($this->ValidateOrderAmount) || $this->validateOrderAmount)
                     ) {
                         // if customer is paying full payment amount
                         $id_order_state = Configuration::get('PS_OS_ERROR');
@@ -684,24 +685,25 @@ abstract class PaymentModuleCore extends Module
                             if ($voucher->add()) {
                                 // If the voucher has conditions, they are now copied to the new voucher
                                 CartRule::copyConditions($cart_rule['obj']->id, $voucher->id);
-
-                                $params = array(
-                                    '{voucher_amount}' => Tools::displayPrice($voucher->reduction_amount, $this->context->currency, false),
-                                    '{voucher_num}' => $voucher->code,
-                                    '{firstname}' => $this->context->customer->firstname,
-                                    '{lastname}' => $this->context->customer->lastname,
-                                    '{id_order}' => $order->reference,
-                                    '{order_name}' => $order->getUniqReference()
-                                );
-                                Mail::Send(
-                                    (int)$order->id_lang,
-                                    'voucher',
-                                    sprintf(Mail::l('New voucher for your order %s', (int)$order->id_lang), $order->reference),
-                                    $params,
-                                    $this->context->customer->email,
-                                    $this->context->customer->firstname.' '.$this->context->customer->lastname,
-                                    null, null, null, null, _PS_MAIL_DIR_, false, (int)$order->id_shop
-                                );
+                                if ($send_mails) {
+                                    $params = array(
+                                        '{voucher_amount}' => Tools::displayPrice($voucher->reduction_amount, $this->context->currency, false),
+                                        '{voucher_num}' => $voucher->code,
+                                        '{firstname}' => $this->context->customer->firstname,
+                                        '{lastname}' => $this->context->customer->lastname,
+                                        '{id_order}' => $order->reference,
+                                        '{order_name}' => $order->getUniqReference()
+                                    );
+                                    Mail::Send(
+                                        (int)$order->id_lang,
+                                        'voucher',
+                                        sprintf(Mail::l('New voucher for your order %s', (int)$order->id_lang), $order->reference),
+                                        $params,
+                                        $this->context->customer->email,
+                                        $this->context->customer->firstname.' '.$this->context->customer->lastname,
+                                        null, null, null, null, _PS_MAIL_DIR_, false, (int)$order->id_shop
+                                    );
+                                }
                             }
                         }
 
@@ -1050,10 +1052,12 @@ abstract class PaymentModuleCore extends Module
                     // Set the order status
                     $new_history = new OrderHistory();
                     $new_history->id_order = (int)$order->id;
-
                     $new_history->changeIdOrderState((int)$id_order_state, $order, true);
-
-                    $new_history->addWithemail(true, $extra_vars);
+                    if ($send_mails) {
+                        $new_history->addWithemail(true, $extra_vars);
+                    } else {
+                        $new_history->add(true);
+                    }
 
                     // Switch to back order if needed
                     $objHotelBookingDetail = new HotelBookingDetail();
@@ -1089,7 +1093,11 @@ abstract class PaymentModuleCore extends Module
                         $history = new OrderHistory();
                         $history->id_order = (int)$order->id;
                         $history->changeIdOrderState($id_order_state, $order, true);
-                        $history->addWithemail();
+                        if ($send_mails) {
+                            $history->addWithemail();
+                        } else {
+                            $history->add();
+                        }
                     }
 
                     unset($order_detail);
@@ -1240,7 +1248,9 @@ abstract class PaymentModuleCore extends Module
                         // Send order confirmation/overbooking mails to the reciepients according to the order mail configuration
                         $overBookingStates = OrderState::getOverBookingStates();
                         $isOverBookingStatus = in_array($id_order_state, $overBookingStates);
-                        if (Configuration::get('PS_ORDER_CONF_MAIL_TO_CUSTOMER')){
+                        if (Configuration::get('PS_ORDER_CONF_MAIL_TO_CUSTOMER')
+                            && $send_mails
+                        ){
                             // If order currenct state is overbooking, the send overbooking email or send order confirmation email
                             if ($isOverBookingStatus) {
                                 $subject = Mail::l('Order Not Confirmed', (int)$order->id_lang);
@@ -1292,7 +1302,9 @@ abstract class PaymentModuleCore extends Module
                                 }
                             }
                         }
-                        if (Configuration::get('PS_ORDER_CONF_MAIL_TO_SUPERADMIN')){
+                        if (Configuration::get('PS_ORDER_CONF_MAIL_TO_SUPERADMIN')
+                            && $send_mails
+                        ){
                             // get superadmin employees
                             if ($superAdminEmployees = Employee::getEmployeesByProfile(_PS_ADMIN_PROFILE_, true)) {
                                 // If order currenct state is overbooking, the send overbooking email or send order confirmation email
@@ -1329,6 +1341,7 @@ abstract class PaymentModuleCore extends Module
                         }
                         if ($idHotel
                             && Validate::isLoadedObject($objHotel = new HotelBranchInformation($idHotel))
+                            && $send_mails
                         ) {
                             if (Configuration::get('PS_ORDER_CONF_MAIL_TO_HOTEL_MANAGER')){
                                 // If order currenct state is overbooking, the send overbooking email or send order confirmation email
