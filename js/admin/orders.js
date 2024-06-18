@@ -2580,6 +2580,10 @@ const AddRoomBookingModal = {
                                 $('#add_product_product_price_tax_incl').val(data.price_tax_incl);
                                 $('#add_product_product_price_tax_excl').val(data.price_tax_excl);
 
+                                $("#new_product .max_adults").val(data.room_type_info.max_adults);
+                                $("#new_product .max_children").val(data.room_type_info.max_children);
+                                $("#new_product .max_guests").val(data.room_type_info.max_guests);
+
                                 //Added by webkul to set curent date in the date fields by default
                                 var date_in = $.datepicker.formatDate('dd-mm-yy', new Date());
                                 var date_out = $.datepicker.formatDate('dd-mm-yy', new Date(new Date().getTime()+24*60*60*1000));
