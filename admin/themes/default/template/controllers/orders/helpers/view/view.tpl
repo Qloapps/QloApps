@@ -97,11 +97,10 @@
                                 <table class="table">
                                     <thead>
                                         <tr>
-                                            <th>{l s='Room No.'}</th>
-                                            <th>{l s='Room Type'}</th>
+                                            <th>{l s='Room'}</th>
                                             <th>{l s='Duration'}</th>
-                                            <th>{l s='Documents'}</th>
-                                            <th>{l s='Room Status'}</th>
+                                            <th>{l s='Check-In'}</th>
+                                            <th>{l s='Check-Out'}</th>
                                             <th>{l s='Allotment'}</th>
                                             <th>{l s='Action'}</th>
                                         </tr>
@@ -111,26 +110,24 @@
                                             {foreach from=$htl_booking_order_data item=data}
                                                 <tr>
                                                     <td>
-                                                        {$data['room_num']}
-                                                    </td>
-                                                    <td>
+                                                        {$data['room_num']}<br>
                                                         <a href="{$link->getAdminLink('AdminProducts')|escape:'html':'UTF-8'}&amp;id_product={$data['id_product']}&amp;updateproduct" target="_blank">{$data['room_type_name']|escape:'html':'UTF-8'}</a>
                                                     </td>
                                                     <td>
                                                         {dateFormat date=$data['date_from']} - {dateFormat date=$data['date_to']}
                                                     </td>
                                                     <td>
-                                                        <a href="#" onclick="BookingDocumentsModal.init({$data.id|intval}, this); return false;">
-                                                            {if $data.num_checkin_documents > 0}{$data.num_checkin_documents}{else}{l s='Upload'}{/if} {l s='Documents'}
-                                                        </a>
+                                                        {if ($data['id_status'] == $hotel_order_status['STATUS_CHECKED_IN']['id_status']) || ($data['id_status'] == $hotel_order_status['STATUS_CHECKED_OUT']['id_status'])}
+                                                            <span class="text-danger room_status">{l s='Checked in on'}<br>{dateFormat date=$data['check_in'] full=1}</span>
+                                                        {else}
+                                                            --
+                                                        {/if}
                                                     </td>
                                                     <td>
-                                                        {if $data['id_status'] == $hotel_order_status['STATUS_ALLOTED']['id_status']}
-                                                            {l s='Alloted'}
-                                                        {elseif $data['id_status'] == $hotel_order_status['STATUS_CHECKED_IN']['id_status']}
-                                                            <span class="text-danger room_status">{l s='Checked in on'} {dateFormat date=$data['check_in'] full=1}</span>
-                                                        {elseif $data['id_status'] == $hotel_order_status['STATUS_CHECKED_OUT']['id_status']}
-                                                            <span class="text-success room_status">{l s='Checked out on'} {dateFormat date=$data['check_out'] full=1}</span>
+                                                        {if $data['id_status'] == $hotel_order_status['STATUS_CHECKED_OUT']['id_status']}
+                                                            <span class="text-success room_status">{l s='Checked out on'}<br>{dateFormat date=$data['check_out'] full=1}</span>
+                                                        {else}
+                                                            --
                                                         {/if}
                                                     </td>
                                                     <td>
@@ -141,6 +138,10 @@
                                                         {/if}
                                                     </td>
                                                     <td>
+                                                        <a title="{l s='Upload/Check guest documents'}" class="btn btn-default" href="#" onclick="BookingDocumentsModal.init({$data.id|intval}, this); return false;">
+                                                            {if $data.num_checkin_documents > 0}<span class="badge badge-info">{$data.num_checkin_documents}</span> <i class="icon-file-text"></i>{else}<i class="icon-upload"></i>{/if}
+                                                        </a>
+
                                                         {if $data.is_refunded || $data.is_cancelled}
                                                             <span class="badge badge-danger">{if $data.is_cancelled}{l s='Cancelled'}{else}{l s='Refunded'}{/if}</span>
                                                         {else}
