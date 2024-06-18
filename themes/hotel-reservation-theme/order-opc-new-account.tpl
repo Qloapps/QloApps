@@ -394,3 +394,8 @@
 		</div>
 	</form>
 </div>
+{strip}
+	{if isset($countries)}
+		{addJsDef countries=$countries}
+	{/if}
+{/strip}

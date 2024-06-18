@@ -313,7 +313,5 @@
     {else}
         {addJsDef idSelectedCountryInvoice=false}
     {/if}
-    {if isset($countries)}
-        {addJsDef countries=$countries}
-    {/if}
+
 {/strip}

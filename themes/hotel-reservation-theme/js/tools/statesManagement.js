@@ -100,6 +100,7 @@ function bindStateInputAndUpdate()
 
 	$(document).on('change', '#id_country', function(e)
 	{
+		console.log('change country');
 		updateState();
 		updateNeedIDNumber();
 		updateZipCode();
@@ -142,8 +143,10 @@ function updateState(suffix)
 		$('.id_state' + (typeof suffix !== 'undefined' ? '_' + suffix : '') + ':hidden').fadeIn('slow');
 		$('#id_state_invoice').uniform();
 	}
-	else
+	else {
+		console.log('else');
 		$('.id_state' + (typeof suffix !== 'undefined' ? '_' + suffix : '')).fadeOut('fast');
+	}
 }
 
 function updateNeedIDNumber(suffix)
