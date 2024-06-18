@@ -139,7 +139,7 @@
                                                     </td>
                                                     <td>
                                                         <a title="{l s='Upload/Check guest documents'}" class="btn btn-default" href="#" onclick="BookingDocumentsModal.init({$data.id|intval}, this); return false;">
-                                                            {if $data.num_checkin_documents > 0}<span class="badge badge-info">{$data.num_checkin_documents}</span> <i class="icon-file-text"></i>{else}<i class="icon-upload"></i>{/if}
+                                                            <span class="badge badge-info">{if $data.num_checkin_documents > 0}{$data.num_checkin_documents}{else}0{/if}</span> <i class="icon-file-text"></i>
                                                         </a>
 
                                                         {if $data.is_refunded || $data.is_cancelled}

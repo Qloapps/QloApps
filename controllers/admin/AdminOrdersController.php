@@ -781,10 +781,13 @@ class AdminOrdersControllerCore extends AdminController
             if ($objBookingDetail->booking_type == HotelBookingDetail::ALLOTMENT_MANUAL) {
                 // get booking information by order
                 $this->context->smarty->assign('comment', $objBookingDetail->comment);
+
+                $title = $objBookingDetail->room_num.' - '.$objBookingDetail->room_type_name.' ('.
+                Tools::displayDate($objBookingDetail->date_from).' - '.Tools::displayDate($objBookingDetail->date_to).')';
                 $modal = array(
                     'modal_id' => 'room-allotment-comment-modal',
                     'modal_class' => 'modal-md order_detail_modal',
-                    'modal_title' => '<i class="icon icon-comment"></i> &nbsp'.$this->l('Room Manual Allotment Comment'),
+                    'modal_title' => '<i class="icon icon-comment"></i> &nbsp'.$title,
                     'modal_content' => $this->context->smarty->fetch('controllers/orders/modals/_room_allotment_comment.tpl'),
                     'modal_actions' => array(),
                 );
