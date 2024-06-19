@@ -1,11 +1,11 @@
+[/{shop_url}]
 
-[{shop_url}]
+HALLO,
 
-Hallo,
 
-Sie haben unseren Newsletter abonniert. Als Dankeschön erhalten
-Sie den folgenden Gutschein: {discount}
+NEWSLETTERANMELDUNG
 
-{shop_name} [{shop_url}] powered by
-Webkul(tm) [https://webkul.com]
+Für Ihr Newsletter-Abonnement bieten wir Ihnen gerne folgenden Gutschein an: {discount}
 
+{shop_name} [/{shop_url}] bereitgestellt von Webkul(tm)
+[https://webkul.com]

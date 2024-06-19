@@ -1,11 +1,12 @@
+[/{shop_url}]
 
-[{shop_url}]
+HAI,
 
-Halo,
 
-Karena telah berlangganan newsletter, kami dengan senang hati
-menawarkan voucher berikut: {discount}
+BERLANGGANAN BULETIN
 
-{shop_name} [{shop_url}] didukung oleh
-Webkul(tm) [https://webkul.com]
+Mengenai langganan buletin Anda, kami dengan senang hati menawarkan voucher berikut: {discount}
+
+{shop_name} [/{shop_url}] diberdayakan oleh Webkul(tm)
+[https://webkul.com]
 

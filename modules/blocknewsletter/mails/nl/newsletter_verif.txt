@@ -1,13 +1,10 @@
+[/{shop_url}]
 
-[{shop_url}]
+HOI,
 
-Hallo,
+Bedankt voor uw inschrijving op onze nieuwsbrief. Bevestig uw verzoek door
+hier te klikken.[/{verif_url}]
 
-Hartelijk dank voor uw inschrijving op onze nieuwsbrief. Bevestig uw
-aanvraag door te klikken op de volgende link:
-
-{verif_url} [{verif_url}]
-
-{shop_name} [{shop_url}] gebouwd met
-Webkul(tm) [https://webkul.com]
+{shop_name} [/{shop_url}] mogelijk gemaakt door Webkul(tm)
+[https://webkul.com]
 

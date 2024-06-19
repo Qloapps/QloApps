@@ -1,10 +1,10 @@
+[/{shop_url}]
 
-[{shop_url}]
+HALLO,
 
-Hallo,
+Vielen Dank, dass Sie unseren Newsletter abonniert haben! Falls Sie sich abmelden möchten, klicken Sie bitte
+hier.[/{{unsub_url}}]
 
-VIELEN DANK FÜR IHRE ANMELDUNG ZU UNSEREM NEWSLETTER.
-
-{shop_name} [{shop_url}] powered by
-Webkul(tm) [https://webkul.com]
+{shop_name} [/{shop_url}] bereitgestellt von Webkul(tm)
+[https://webkul.com]
 

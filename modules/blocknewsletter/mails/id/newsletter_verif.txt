@@ -1,13 +1,9 @@
+[/{shop_url}]
 
-[{shop_url}]
+HAI,
 
-Halo,
+Terima kasih telah berlangganan buletin kami, silakan konfirmasi permintaan Anda dengan mengklik
+di sini.[/{verif_url}]
 
-Terima kasih telah berlangganan newsletter, silahkan konfirmasi
-dengan klik pada tautan berikut :
-
-{verif_url} [{verif_url}]
-
-{shop_name} [{shop_url}] didukung oleh
-Webkul(tm) [https://webkul.com]
-
+{shop_name} [/{shop_url}] diberdayakan oleh Webkul(tm)
+[https://webkul.com]

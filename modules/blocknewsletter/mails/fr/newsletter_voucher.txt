@@ -1,11 +1,11 @@
-
 [/{shop_url}]
 
-Bonjour,
+SALUT,
 
-En remerciement pour votre inscription à notre newsletter nous
-avons le plaisir de vous offrir un bon de réduction : {discount}
 
-{shop_name} [/{shop_url}] réalisé avec Webkul(tm)
+INSCRIPTION À LA NEWSLETTER
+
+Concernant votre inscription à la newsletter, nous avons le plaisir de vous offrir le bon d'achat suivant : {discount}
+
+{shop_name} [/{shop_url}] propulsé par Webkul(tm)
 [https://webkul.com]
-

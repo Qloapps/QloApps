@@ -1,13 +1,10 @@
+[/{shop_url}]
 
-[{shop_url}]
+HOLA,
 
-Ei,
+Gràcies per subscriure't al nostre butlletí, confirmeu la vostra sol·licitud fent clic
+aquí.[/{verif_url}]
 
-Gràcies per subscriure-us al nostre butlletí, si us plau confirmeu
-la petició fent clic sobre l'enllaç de sota:
-
-{verif_url} [{verif_url}]
-
-{shop_name} [{shop_url}] desenvolupat amb
-Webkul(tm) [https://webkul.com]
+{shop_name} [/{shop_url}]  impulsat per Webkul(tm)
+[https://webkul.com]
 

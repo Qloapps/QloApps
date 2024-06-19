@@ -1,11 +1,11 @@
+[/{shop_url}]
 
-[{shop_url}]
+HOLA,
 
-Ei,
+SUBSCRIPCIÓ AL BUTLLETÍ
 
-Quant a la subscripció a la newsletter, ens plau oferir-vos el
-següent cupó de descompte: {discount}
+Pel que fa a la teva subscripció al butlletí, ens complau oferir-te el següent val: {discount}
 
-{shop_name} [{shop_url}] desenvolupat amb
-Webkul(tm) [https://webkul.com]
+{shop_name} [/{shop_url}] impulsat per Webkul(tm)
+[https://webkul.com]
 

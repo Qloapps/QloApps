@@ -24,12 +24,43 @@
 *  International Registered Trademark & Property of PrestaShop SA
 */
 
-header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
-header("Last-Modified: ".gmdate("D, d M Y H:i:s")." GMT");
+/**
+ * @since 1.5.0
+ */
+class BlocknewsletterUnsubscribeModuleFrontController extends ModuleFrontController
+{
+	/**
+	 * @see FrontController::postProcess()
+	 */
+	public function postProcess()
+	{
+		$this->errors = array_merge(
+			$this->errors,
+			$this->module->unsubscribeByToken(Tools::getValue('token'))
+		);
+	}
 
-header("Cache-Control: no-store, no-cache, must-revalidate");
-header("Cache-Control: post-check=0, pre-check=0", false);
-header("Pragma: no-cache");
+	/**
+	 * @see FrontController::initContent()
+	 */
+	public function initContent()
+	{
+		$this->display_column_left = false;
+		$this->display_column_right = false;
 
-header("Location: ../");
-exit;
+		parent::initContent();
+
+		$this->setTemplate('unsubscription_execution.tpl');
+	}
+
+	public function setMedia()
+	{
+		parent::setMedia();
+
+		$this->addJS($this->module->getPathUri().'views/js/front/homepage_redirect.js');
+
+		Media::addJsDef(array(
+			'homepage_url' => $this->context->link->getPageLink('index'),
+		));
+	}
+}

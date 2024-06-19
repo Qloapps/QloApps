@@ -1,13 +1,11 @@
+[/{shop_url}]
 
-[{shop_url}]
+HOLA,
 
-Hola,
+Gracias por suscribirte a nuestro boletín, confirma tu solicitud haciendo clic
+aquí.[/{verif_url}]
 
-Gracias por suscribirse a nuestro boletín de noticias, confirmar su
-solicitud haciendo clic en enlace de té abajo:
+{shop_name} [/{shop_url}]  impulsado por Webkul(tm)
+[https://webkul.com]
 
-{verif_url} [{verif_url}]
-
-{shop_name} [{shop_url}] creado por
-Webkul(tm) [https://webkul.com]
 

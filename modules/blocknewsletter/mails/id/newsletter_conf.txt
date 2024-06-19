@@ -1,10 +1,9 @@
+[/{shop_url}]
 
-[{shop_url}]
+HAI,
 
-Halo,
+Terima kasih telah berlangganan buletin kami! Jika Anda ingin berhenti berlangganan, silakan klik
+di sini.[/{{unsub_url}}]
 
-TERIMA KASIH TELAH BERLANGGANAN NEWSLETTER KAMI.
-
-{shop_name} [{shop_url}] didukung oleh
-Webkul(tm) [https://webkul.com]
-
+{shop_name} [/{shop_url}] diberdayakan oleh Webkul(tm)
+[https://webkul.com]

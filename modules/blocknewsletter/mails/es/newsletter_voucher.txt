@@ -1,11 +1,12 @@
+[/{shop_url}]
 
-[{shop_url}]
+HOLA,
 
-Hola,
 
-Después de su suscripción a nuestro boletín, nos complace
-ofrecerle el siguiente cupón: {discount}
 
-{shop_name} [{shop_url}] creado por
-Webkul(tm) [https://webkul.com]
+BOLETÍN DE SUSCRIPCIÓN
 
+En relación con su suscripción al boletín, nos complace ofrecerle el siguiente bono: {discount}
+
+{shop_name} [/{shop_url}]  impulsado por Webkul(tm)
+[https://webkul.com]
