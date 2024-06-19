@@ -822,7 +822,8 @@ class HTMLTemplateInvoiceCore extends HTMLTemplate
      */
     protected function getTemplateByCountry($iso_country)
     {
-        $file = Configuration::get('PS_INVOICE_MODEL');
+        // $file = Configuration::get('PS_INVOICE_MODEL');
+        $file = 'invoice';
 
         // try to fetch the iso template
         $template = $this->getTemplate($file.'.'.$iso_country);
