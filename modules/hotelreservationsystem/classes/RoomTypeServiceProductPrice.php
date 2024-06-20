@@ -72,8 +72,10 @@ class RoomTypeServiceProductPrice extends ObjectModel
         if ($result = Db::getInstance()->getRow('
             SELECT spp.`price`, spp.`id_tax_rules_group`, p.`auto_add_to_cart`, p.`price_addition_type`
             FROM `'._DB_PREFIX_.'product` p
-            LEFT JOIN `'._DB_PREFIX_.'htl_room_type_service_product` sp ON (sp.`id_product` = p.`id_product`)
-            LEFT JOIN `'._DB_PREFIX_.'htl_room_type_service_product_price` spp ON (spp.`id_product` = p.`id_product`)
+            LEFT JOIN `'._DB_PREFIX_.'htl_room_type_service_product` sp
+            ON (sp.`id_product` = p.`id_product`)
+            LEFT JOIN `'._DB_PREFIX_.'htl_room_type_service_product_price` spp
+            ON (spp.`id_product` = sp.`id_product` AND spp.`id_element` = sp.`id_element` AND spp.`element_type` = sp.`element_type`)
             WHERE p.`id_product`='.(int)$idProduct.
             ' AND sp.`id_element`='.(int)$idElement.
             ' AND sp.`element_type`='.(int)$elementType)

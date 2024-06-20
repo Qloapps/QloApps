@@ -1,7 +1,7 @@
 <form method="POST" id="search_hotel_block_form" class="grid">
     {if isset($location_enabled) && $location_enabled}
         <div class="form-group area-{$column_widths['location']}">
-            <input type="text" class="form-control header-rmsearch-input input-location" id="hotel_location" name="hotel_location" autocomplete="off" placeholder="{l s='Hotel location' mod='wkroomsearchblock'}" {if isset($search_data)}value="{$search_data['location']|escape:'htmlall':'UTF-8'}"{/if}>
+            <input type="text" class="form-control header-rmsearch-input input-location" id="hotel_location" name="hotel_location" autocomplete="off" placeholder="{l s='Hotel Location' mod='wkroomsearchblock'}" {if isset($search_data)}value="{$search_data['location']|escape:'htmlall':'UTF-8'}"{/if}>
             <input hidden="hidden" name="location_category_id" id="location_category_id" {if isset($search_data)}value="{$search_data['location_category_id']|escape:'htmlall':'UTF-8'}"{/if}>
             <div class="dropdown">
                 <ul class="location_search_results_ul dropdown-menu"></ul>
@@ -16,29 +16,19 @@
         <input type="hidden" id="htl_name" class="form-control header-rmsearch-input" value="{$hotels_info[0]['hotel_name']}" readonly>
     {else}
         <div class="form-group area-{$column_widths['hotel']}">
-            {if isset($hotels_info) && count($hotels_info)}
-                <div class="dropdown">
-                    <input type="hidden" id="hotel_cat_id" name="hotel_cat_id" {if isset($search_data)}value="{$search_data['htl_dtl']['id_category']|escape:'htmlall':'UTF-8'}"{/if}>
-                    <input type="hidden" id="id_hotel" name="id_hotel" {if isset($search_data)}value="{$search_data['htl_dtl']['id']|escape:'htmlall':'UTF-8'}"{/if}>
-                    <input type="hidden" id="max_order_date" name="max_order_date" value="{if isset($max_order_date)}{$max_order_date|escape:'htmlall':'UTF-8'}{/if}">
-                    <input type="hidden" id="preparation_time" name="preparation_time" value="{if isset($preparation_time)}{$preparation_time|escape:'htmlall':'UTF-8'}{/if}">
+            <input type="hidden" id="hotel_cat_id" name="hotel_cat_id" {if isset($search_data)}value="{$search_data['htl_dtl']['id_category']|escape:'htmlall':'UTF-8'}"{/if}>
+            <input type="hidden" id="id_hotel" name="id_hotel" {if isset($search_data)}value="{$search_data['htl_dtl']['id']|escape:'htmlall':'UTF-8'}"{/if}>
+            <input type="hidden" id="max_order_date" name="max_order_date" value="{if isset($max_order_date)}{$max_order_date|escape:'htmlall':'UTF-8'}{/if}">
+            <input type="hidden" id="preparation_time" name="preparation_time" value="{if isset($preparation_time)}{$preparation_time|escape:'htmlall':'UTF-8'}{/if}">
 
-                    <button class="form-control header-rmsearch-input input-hotel {if isset($error) && $error == 1}error_border{/if}" type="button" data-toggle="dropdown" id="id_hotel_button">
-                        {if isset($search_data)}
-                        <span id="hotel_cat_name" class="pull-left">{$search_data['htl_dtl']['hotel_name']|escape:'htmlall':'UTF-8'}</span>
-                    {else}
-                        <span id="hotel_cat_name" class="pull-left">{l s='Select Hotel' mod='wkroomsearchblock'}</span>
-                    {/if}
-                    </button>
-                    <ul class="dropdown-menu hotel_dropdown_ul">
-                        {if isset($hotels_info) && $hotels_info}
-                            {foreach $hotels_info as $name_val}
-                                <li tabindex="-1" class="search_result_li" data-id-hotel="{$name_val['id']|escape:'htmlall':'UTF-8'}" data-hotel-cat-id="{$name_val['id_category']|escape:'htmlall':'UTF-8'}" data-max_order_date="{$name_val['max_order_date']}" data-preparation_time="{$name_val['preparation_time']|escape:'htmlall':'UTF-8'}">{$name_val['hotel_name']|escape:'htmlall':'UTF-8'}</li>
-                            {/foreach}
-                        {/if}
-                    </ul>
-                </div>
-            {/if}
+            <div class="hotel-selector-wrap">
+                <select name="id_hotel" class="chosen header-rmsearch-input" data-placeholder="{l s='Select Hotel' mod='wkroomsearchblock'}" id="id_hotel_button">
+                    <option value=""></option>
+                    {foreach $hotels_info as $name_val}
+                        <option class="search_result_li" value="{$name_val['id']|escape:'htmlall':'UTF-8'}" data-id-hotel="{$name_val['id']|escape:'htmlall':'UTF-8'}" data-hotel-cat-id="{$name_val['id_category']|escape:'htmlall':'UTF-8'}" data-max_order_date="{$name_val['max_order_date']}" data-preparation_time="{$name_val['preparation_time']|escape:'htmlall':'UTF-8'}" {if isset($search_data) && $name_val['id'] == $search_data['htl_dtl']['id']}selected{/if}>{$name_val['hotel_name']|escape:'htmlall':'UTF-8'}</option>
+                    {/foreach}
+                </select>
+            </div>
         </div>
     {/if}
     {if isset($multiple_dates_input) && $multiple_dates_input}
@@ -56,7 +46,7 @@
         <div class="form-group area-{$column_widths['date']}">
             <input type="hidden" id="check_in_time" name="check_in_time" {if isset($search_data)}value="{$search_data['date_from']|escape:'htmlall':'UTF-8'}"{/if}>
             <input type="hidden" id="check_out_time" name="check_out_time" {if isset($search_data)}value="{$search_data['date_to']|escape:'htmlall':'UTF-8'}"{/if}>
-            <div class="form-control header-rmsearch-input input-date" id="daterange_value"  autocomplete="off" placeholder="{l s='Check-in - Check-out' mod='wkroomsearchblock'}"><span>{l s='Check-in' mod='wkroomsearchblock'} &nbsp;<i class="icon icon-minus"></i>&nbsp; {l s='Check-out' mod='wkroomsearchblock'}</span></div>
+            <div class="form-control header-rmsearch-input input-date" id="daterange_value"  autocomplete="off" placeholder="{l s='Check-in - Check-out' mod='wkroomsearchblock'}" tabindex="-1"><span>{l s='Check-in' mod='wkroomsearchblock'} &nbsp;<i class="icon icon-minus"></i>&nbsp; {l s='Check-out' mod='wkroomsearchblock'}</span></div>
         </div>
     {/if}
 
