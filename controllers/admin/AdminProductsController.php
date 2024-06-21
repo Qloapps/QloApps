@@ -400,10 +400,7 @@ class AdminProductsControllerCore extends AdminController
         $idLocationsCategory = Configuration::get('PS_LOCATIONS_CATEGORY');
         $this->objLocationsCategory = new Category($idLocationsCategory, $this->context->language->id);
         $nestedCategories = Category::getNestedCategories($idLocationsCategory);
-        if (isset($nestedCategories[$idLocationsCategory]['children'])
-            && is_array($nestedCategories[$idLocationsCategory]['children'])
-            && count($nestedCategories[$idLocationsCategory]['children'])
-        ) {
+        if (isset($nestedCategories[$idLocationsCategory]['children']) && $nestedCategories[$idLocationsCategory]['children']) {
             foreach ($nestedCategories[$idLocationsCategory]['children'] as $childCategory) {
                 $this->buildCategoryOptions($childCategory);
             }
