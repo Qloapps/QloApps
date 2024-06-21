@@ -549,9 +549,10 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
     {
         parent::setMedia();
 
-        $this->addJqueryUI('ui.tooltip', 'base', true);
-
-        $this->addJs(_MODULE_DIR_.$this->module->name.'/views/js/admin/wk_refund_request.js');
-        $this->addCSS(_MODULE_DIR_.$this->module->name.'/views/css/admin/wk_refund_request.css');
+        if ($this->display == 'view') {
+            $this->addJqueryUI('ui.tooltip', 'base', true);
+            $this->addJs(_MODULE_DIR_.$this->module->name.'/views/js/admin/wk_refund_request.js');
+            $this->addCSS(_MODULE_DIR_.$this->module->name.'/views/css/admin/wk_refund_request.css');
+        }
     }
 }
