@@ -78,13 +78,15 @@ class AdminStatsControllerCore extends AdminStatsTabController
         return $visits;
     }
 
-    public static function getAbandonedCarts($date_from, $date_to)
+
+    public static function getAbandonedCarts($date_from, $date_to, $timeDiff = false)
     {
         return Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue('
-		SELECT COUNT(DISTINCT id_guest)
-		FROM `'._DB_PREFIX_.'cart`
-		WHERE `date_add` BETWEEN "'.pSQL($date_from).'" AND "'.pSQL($date_to).'"
-		AND NOT EXISTS (SELECT 1 FROM `'._DB_PREFIX_.'orders` WHERE `'._DB_PREFIX_.'orders`.id_cart = `'._DB_PREFIX_.'cart`.id_cart)
+		SELECT COUNT(`id_cart`)
+		FROM `'._DB_PREFIX_.'cart` c
+		WHERE `date_add` BETWEEN "'.pSQL($date_from).'" AND "'.pSQL($date_to).'"'.
+        (($timeDiff) ? 'AND TIME_TO_SEC(TIMEDIFF(\''.pSQL(date('Y-m-d H:i:00', time())).'\', `date_add`)) > '.$timeDiff : ' ').'
+		AND NOT EXISTS (SELECT 1 FROM `'._DB_PREFIX_.'orders` o WHERE o.`id_cart` = c.`id_cart`)
 		'.Shop::addSqlRestriction());
     }
 
@@ -638,7 +640,11 @@ class AdminStatsControllerCore extends AdminStatsTabController
                 break;
 
             case 'abandoned_cart':
-                $value = AdminStatsController::getAbandonedCarts(date('Y-m-d H:i:s', strtotime('-2 day')), date('Y-m-d H:i:s', strtotime('-1 day')));
+                $value = AdminStatsController::getAbandonedCarts(
+                    date('Y-m-d', strtotime('-2 day')).' 0:0:0',
+                    date('Y-m-d', strtotime('-1 day')).' 23:59:59',
+                    _TIME_1_DAY_
+                );
                 break;
 
             case 'installed_modules':
