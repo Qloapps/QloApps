@@ -2349,6 +2349,7 @@ class AdminControllerCore extends Controller
     public function ajaxProcessRefreshModuleList($force_reload_cache = false)
     {
         $this->status = Module::refreshModuleList($force_reload_cache);
+        $this->ajaxDie(json_encode(array('status' => $this->status)));
     }
 
     /**

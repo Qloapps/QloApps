@@ -90,10 +90,10 @@ div#leftpannel{
 }
 
 	div#buttons{
-		clear:both;
-		margin:0 0 0 295px;
-		height:60px;
+		margin-top: 20px;
+		margin-bottom: 20px;
 		width:650px;
+		padding:0 14px;
 }
 	* html div#buttons {
 		margin-bottom:60px;
