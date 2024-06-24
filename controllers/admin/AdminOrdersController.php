@@ -2783,9 +2783,17 @@ class AdminOrdersControllerCore extends AdminController
         // Overbookings information of the order
         $orderOverBookings = $objHotelBookingDetail->getOverbookedRooms($order->id, 0, '', '', 0, 0, 1);
 
+        // Guest address info
+        $guestFormatedAddress = '';
+        if ($idGuestAddress = Customer::getCustomerIdAddress($order->id_customer)) {
+            $guestFormatedAddress = AddressFormat::generateAddress(new Address($idGuestAddress), array(), "<br />");
+        }
+
         $this->tpl_view_vars = array(
-            // refund info
+            'guestFormatedAddress' => $guestFormatedAddress,
+            'idGuestAddress' => $idGuestAddress,
             'orderOverBookings' => $orderOverBookings,
+            // refund info
             'refund_allowed' => (int) $order->isReturnable(),
             'applicable_refund_policies' => $applicableRefundPolicies,
             'returns' => OrderReturn::getOrdersReturn($order->id_customer, $order->id),

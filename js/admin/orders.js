@@ -1248,7 +1248,22 @@ function setRoomTypeGuestOccupancy(booking_occupancy_wrapper)
 /* Refund system script */
 var flagRefund = '';
 
+// when submit from ajax from guest address controller the function will be called from the controller header
+function getSummary()
+{
+    return;
+}
 $(document).ready(function() {
+    // when click edit/add guest address we have to initialize fancybox
+    $('.fancybox').fancybox({
+        'type': 'iframe',
+        'width': '90%',
+        'height': '90%',
+        afterClose: function() {
+            location.reload();
+        },
+    });
+
 	$('#desc-order-partial_refund').click(function() {
 		$('.cancel_product_change_link:visible').trigger('click');
 		if (flagRefund == 'partial') {
