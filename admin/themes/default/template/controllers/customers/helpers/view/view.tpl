@@ -188,15 +188,15 @@
 					{if $count_ok || $count_ko}
 						<div class="nav nav-tabs">
 							<ul class="nav nav-tabs">
-								<li {if $count_ok && !$count_ko}class="active"{/if}>
-									<a data-toggle="tab" class="idTabHrefShort" href="#valid_orders">
+								<li {if $count_ok}class="active"{/if}>
+									<a data-toggle="tab" href="#valid_orders">
 										<i class="icon-ok-circle icon-big"></i>
 										{l s='Valid orders:'}
 										<span class="label label-success">{$count_ok}</span>
 									</a>
 								</li>
 								<li {if !$count_ok && $count_ko}class="active"{/if}>
-									<a data-toggle="tab" class="idTabHrefShort" href="#invalid_orders">
+									<a data-toggle="tab" href="#invalid_orders">
 										<i class="icon-exclamation-sign icon-big"></i>
 										{l s='Invalid orders:'}
 										<span class="label label-danger">{$count_ko}</span>
@@ -204,7 +204,7 @@
 								</li>
 							</ul>
 							<div class="tab-content panel">
-								<div class="tab-pane {if $count_ok && !$count_ko}active{/if}" id="valid_orders">
+								<div class="tab-pane {if $count_ok}active{/if}" id="valid_orders">
 									<div class="row">
 										<div class="col-lg-5">
 											{l s='Total amount received: %s' sprintf=$total_ok}
