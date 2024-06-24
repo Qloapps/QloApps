@@ -1152,16 +1152,6 @@ abstract class PaymentModuleCore extends Module
                                 $this->context->currency,
                                 false
                             ),
-                            '{delivery_block_txt}' => $this->_getFormatedAddress($delivery, "\n"),
-                            '{invoice_block_txt}' => $this->_getFormatedAddress($invoice, "\n"),
-                            '{delivery_block_html}' => $this->_getFormatedAddress($delivery, '<br />', array(
-                                'firstname'    => '<span style="font-weight:bold;">%s</span>',
-                                'lastname'    => '<span style="font-weight:bold;">%s</span>'
-                            )),
-                            '{invoice_block_html}' => $this->_getFormatedAddress($invoice, '<br />', array(
-                                    'firstname'    => '<span style="font-weight:bold;">%s</span>',
-                                    'lastname'    => '<span style="font-weight:bold;">%s</span>'
-                            )),
                             '{delivery_company}' => $delivery->company,
                             '{delivery_firstname}' => $delivery->firstname,
                             '{delivery_lastname}' => $delivery->lastname,
