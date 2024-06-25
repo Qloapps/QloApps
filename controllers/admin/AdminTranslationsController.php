@@ -961,6 +961,7 @@ class AdminTranslationsControllerCore extends AdminController
         static $str_write = '';
         static $array_check_duplicate = array();
         static $module_existing_translations = array();
+        static $empty_translation_fields = array();
 
         // Set file_name in static var, this allow to open and wright the file just one time
         if (!isset($cache_file[$theme_name.'-'.$file_name])) {
@@ -1016,6 +1017,7 @@ class AdminTranslationsControllerCore extends AdminController
 
                     if (array_key_exists($post_key, $_POST) && !in_array($pattern, $array_check_duplicate)) {
                         if ($_POST[$post_key] == '') {
+                            $empty_translation_fields[] = $pattern;
                             continue;
                         }
                         $array_check_duplicate[] = $pattern;
@@ -1028,13 +1030,15 @@ class AdminTranslationsControllerCore extends AdminController
 
         if ($copyExistingTranslations) {
             foreach ($module_existing_translations as $key => $value) {
-                if (!in_array('\''.$key.'\'', $array_check_duplicate)) {
+                if (!in_array('\''.$key.'\'', $array_check_duplicate)
+                    && !in_array('\''.$key.'\'', $empty_translation_fields)
+                ) {
                     $str_write .= '$_MODULE[\''.$key.'\'] = \''.pSQL(str_replace(array("\r\n", "\r", "\n"), ' ', $value)).'\';'."\n";
                 }
             }
         }
 
-        if (isset($cache_file[$theme_name.'-'.$file_name]) && $str_write != "<?php\n\nglobal \$_MODULE;\n\$_MODULE = array();\n") {
+        if (isset($cache_file[$theme_name.'-'.$file_name])) {
             file_put_contents($file_name, $str_write);
         }
     }
