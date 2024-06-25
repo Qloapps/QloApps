@@ -840,6 +840,8 @@ class AdminProductsControllerCore extends AdminController
                 }
                 if ($product->hasAttributes()) {
                     Product::updateDefaultAttribute($product->id);
+                } else {
+                    Product::duplicateSpecificPrices($id_product_old, $product->id);
                 }
 
                 if (!Tools::getValue('noimage') && !Image::duplicateProductImages($id_product_old, $product->id, $combination_images)) {
