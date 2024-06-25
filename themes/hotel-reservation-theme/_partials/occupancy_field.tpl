@@ -175,14 +175,16 @@
                 </div>
             {/if}
         </div>
-        <span class="add_occupancy_block">
-            <a class="add_new_occupancy_btn{if isset($occupancies) && $occupancies && isset($total_available_rooms) && $total_available_rooms <= count($occupancies)} disabled{/if}" data-title-available="{l s='Click to add more rooms.'}" data-title-unavailable="{l s='No more rooms available.'}" href="#">
-                <i class="icon-plus"></i>
-                <span>{l s='Add Room'}</span>
-            </a>
-        </span>
-        <span>
-            <button type="submit" class="select_occupancy_btn btn btn btn-primary pull-right">{l s='Done'}</button>
-        </span>
+        <div>
+            <span class="add_occupancy_block">
+                <a class="add_new_occupancy_btn{if isset($occupancies) && $occupancies && isset($total_available_rooms) && $total_available_rooms <= count($occupancies)} disabled{/if}" data-title-available="{l s='Click to add more rooms.'}" data-title-unavailable="{l s='No more rooms available.'}" href="#">
+                    <i class="icon-plus"></i>
+                    <span>{l s='Add Room'}</span>
+                </a>
+            </span>
+            <span>
+                <button type="submit" class="select_occupancy_btn btn btn btn-primary pull-right">{l s='Done'}</button>
+            </span>
+        </div>
     </div>
 </div>
