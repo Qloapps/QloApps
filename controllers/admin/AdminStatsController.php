@@ -573,20 +573,19 @@ class AdminStatsControllerCore extends AdminStatsTabController
     {
         $sql = 'SELECT p.`id_product`,
         (
-            SELECT IFNULL(SUM(ROUND((DATEDIFF(LEAST(hbd.`date_to`, "'.pSQL($dateTo).'"), GREATEST(hbd.`date_from`, "'.pSQL($dateFrom).'")) / DATEDIFF(hbd.`date_to`, hbd.`date_from`)) * hbd.`total_price_tax_excl`, 2)), 0)
+            SELECT count(hbd.`id_product`)
             FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
             LEFT JOIN `'._DB_PREFIX_.'orders` o
             ON (o.`id_order` = hbd.`id_order`)
             WHERE hbd.`id_product` = p.`id_product` AND o.`valid` = 1
             AND hbd.`date_to` > "'.pSQL($dateFrom).'" AND hbd.`date_from` < "'.pSQL($dateTo).'"
-        ) AS totalRevenue
-        FROM `'._DB_PREFIX_.'product` p
+        ) as total_booked FROM `'._DB_PREFIX_.'product` p
         INNER JOIN `'._DB_PREFIX_.'htl_room_type` hrt
         ON (hrt.`id_product` = p.`id_product`)
-        WHERE p.`active` = 1 AND p.`booking_product` = 1'.
+        WHERE p.`active` = 1 AND p.`booking_product` = 1 '.
         (!is_null($idHotel) ? HotelBranchInformation::addHotelRestriction($idHotel, 'hrt') : '').'
-        HAVING totalRevenue > 0
-        ORDER BY totalRevenue DESC';
+        GROUP By p.`id_product`
+        ORDER BY total_booked DESC';
 
         return Db::getInstance()->getValue($sql);
     }
