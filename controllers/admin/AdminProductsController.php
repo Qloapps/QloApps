@@ -3273,22 +3273,26 @@ class AdminProductsControllerCore extends AdminController
                         $this->errors[] = Tools::displayError('Invalid base children');
                     } else if (Configuration::get('WK_GLOBAL_MAX_CHILD_IN_ROOM')) {
                         if ($baseChildren > Configuration::get('WK_GLOBAL_MAX_CHILD_IN_ROOM')) {
-                            $this->errors[] = sprintf(Tools::displayError('Base children cannot be greater than max childern allowed on your website (Max: %s)'), Configuration::get('WK_GLOBAL_MAX_CHILD_IN_ROOM'));
+                            $this->errors[] = sprintf(Tools::displayError('Base children cannot be greater than max childern allowed in the room of this room type (Max: %s)'), Configuration::get('WK_GLOBAL_MAX_CHILD_IN_ROOM'));
                         }
                     }
                     if (!$maxAdults || !Validate::isUnsignedInt($maxAdults)) {
                         $this->errors[] = Tools::displayError('Invalid maximum number of adults');
                     } elseif ($maxAdults < $baseAdults) {
                         $this->errors[] = Tools::displayError('Maximum number of adults cannot be less than base adults');
+                    } elseif ($maxAdults > $maxGuests) {
+                        $this->errors[] = Tools::displayError('Maximum number of adults cannot be more than maximum number of guests');
                     }
                     if ($maxChildren == '' || !Validate::isUnsignedInt($maxChildren)) {
                         $this->errors[] = Tools::displayError('Invalid maximum number of children');
-                    } else if (Configuration::get('WK_GLOBAL_MAX_CHILD_IN_ROOM')) {
-                        if ($maxChildren > Configuration::get('WK_GLOBAL_MAX_CHILD_IN_ROOM')) {
-                            $this->errors[] = sprintf(Tools::displayError('Maximum number of children cannot be greater than max childern allowed on your website (Max: %s)'), Configuration::get('WK_GLOBAL_MAX_CHILD_IN_ROOM'));
-                        }
                     } elseif ($maxChildren < $baseChildren) {
                         $this->errors[] = Tools::displayError('Maximum number of children cannot be less than base children');
+                    } elseif ($maxChildren >= $maxGuests) {
+                        $this->errors[] = Tools::displayError('Maximum number of children cannot be more or equal than maximum number of guests.(1 adult is mandatory in a room)');
+                    } else if (Configuration::get('WK_GLOBAL_MAX_CHILD_IN_ROOM')) {
+                        if ($maxChildren > Configuration::get('WK_GLOBAL_MAX_CHILD_IN_ROOM')) {
+                            $this->errors[] = sprintf(Tools::displayError('Maximum number of children cannot be greater than max childern allowed in the room of this room type (Max: %s)'), Configuration::get('WK_GLOBAL_MAX_CHILD_IN_ROOM'));
+                        }
                     }
                     if (!$maxGuests || !Validate::isUnsignedInt($maxGuests)) {
                         $this->errors[] = Tools::displayError('Invalid maximum number of guests');
