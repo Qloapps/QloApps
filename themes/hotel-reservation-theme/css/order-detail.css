@@ -522,20 +522,20 @@
     border-radius: 4px;
 }
 
-.button-medium {
+.button.button-medium {
     padding: 8px 15px;
     background-color: #379bf0;
     background-image: none;
     border-radius: 2px;
 }
 
-.button-medium span {
+.button.button-medium span {
     padding: 0;
 }
 
-.button-medium:hover,
-.button-medium:focus,
-.button-medium:active {
+.button.button-medium:hover,
+.button.button-medium:focus,
+.button.button-medium:active {
     opacity: 0.8;
 }
 
