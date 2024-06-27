@@ -101,8 +101,8 @@ class CategoryControllerCore extends FrontController
         // validate dates if available
         $dateFrom = Tools::getValue('date_from');
         $dateTo = Tools::getValue('date_to');
-
-        if (!HotelHelper::validateDateRange($dateFrom, $dateTo)) {
+        $idHotel = HotelBranchInformation::getHotelIdByIdCategory($id_category);
+        if (!HotelHelper::validateDateRangeForHotel($dateFrom, $dateTo, $idHotel)) {
             Tools::redirect($this->context->link->getPageLink('pagenotfound'));
         }
 
