@@ -1937,7 +1937,7 @@ class AdminProductsControllerCore extends AdminController
         if ($this->object->save()) {
             Tools::redirectAdmin(self::$currentIndex.'&token='.$this->token.'&conf=4');
         } else {
-            $this->errors[] = $this->l('Something error occurred.');
+            $this->errors[] = $this->l('An error occurred while updating "show at front".');
         }
     }
 
