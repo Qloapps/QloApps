@@ -92,6 +92,12 @@
 	<configuration id="PS_SHOP_ENABLE" name="PS_SHOP_ENABLE">
 		<value>1</value>
 	</configuration>
+	<configuration id="PS_ALLOW_EMP" name="PS_ALLOW_EMP">
+		<value>0</value>
+	</configuration>
+	<configuration id="PS_ALLOW_EMP_MAX_ATTEMPTS" name="PS_ALLOW_EMP_MAX_ATTEMPTS">
+		<value>3</value>
+	</configuration>
 	<configuration id="PS_NB_DAYS_NEW_PRODUCT" name="PS_NB_DAYS_NEW_PRODUCT">
 		<value>20</value>
 	</configuration>
