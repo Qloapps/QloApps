@@ -183,7 +183,7 @@
                 </a>
             </span>
             <span>
-                <button type="submit" class="select_occupancy_btn btn btn btn-primary pull-right">{l s='Done'}</button>
+                <button type="submit" class="submit_occupancy_btn btn btn btn-primary pull-right">{l s='Done'}</button>
             </span>
         </div>
     </div>

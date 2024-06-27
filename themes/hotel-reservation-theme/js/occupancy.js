@@ -160,7 +160,7 @@ $(document).ready(function(){
         }
     });
 
-    $(document).on('click', '.booking_occupancy_wrapper .select_occupancy_btn', function(e) {
+    $(document).on('click', '.booking_occupancy_wrapper .submit_occupancy_btn', function(e) {
         e.preventDefault();
         if ($('.booking_occupancy_wrapper:visible').length) {
             return validateBookingOccupancies(e);

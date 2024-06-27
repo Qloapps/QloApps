@@ -215,7 +215,7 @@
                             <a class="add_new_occupancy_btn" href="#"><i class="icon-plus"></i> <span>{l s='Add Room' mod='wkroomsearchblock'}</span></a>
                         </span>
                         <span>
-                            <button class="select_occupancy_btn btn btn btn-primary pull-right">{l s='Done' mod='wkroomsearchblock'}</button>
+                            <button class="submit_occupancy_btn btn btn btn-primary pull-right">{l s='Done' mod='wkroomsearchblock'}</button>
                         </span>
                     </div>
                 </div>

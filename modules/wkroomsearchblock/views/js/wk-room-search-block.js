@@ -831,7 +831,7 @@ $(document).ready(function() {
         }
     });
 
-    $(document).on('click', '#search_occupancy_wrapper .select_occupancy_btn', function(e) {
+    $(document).on('click', '#search_occupancy_wrapper .submit_occupancy_btn', function(e) {
         e.preventDefault();
         if ($('#search_occupancy_wrapper').length) {
             if ($('#search_occupancy_wrapper').css('display') !== 'none') {
