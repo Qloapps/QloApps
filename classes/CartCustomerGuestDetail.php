@@ -39,7 +39,7 @@ class CartCustomerGuestDetailCore extends ObjectModel
             'firstname' => array('type' => self::TYPE_STRING, 'validate' => 'isName', 'size' => 32),
             'lastname' => array('type' => self::TYPE_STRING, 'validate' => 'isName', 'size' => 32),
             'email' => array('type' => self::TYPE_STRING, 'validate' => 'isEmail', 'size' => 128),
-            'phone' => array('type' => self::TYPE_STRING, 'validate' => 'isPhoneNumber', 'size' => 32),
+            'phone' => array('type' => self::TYPE_STRING, 'size' => 32),
             'date_add' => array('type' => self::TYPE_DATE, 'validate' => 'isDate'),
             'date_upd' => array('type' => self::TYPE_DATE, 'validate' => 'isDate'),
         ),

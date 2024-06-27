@@ -967,11 +967,19 @@ class AdminCustomersControllerCore extends AdminController
         // If customer is going to be deleted permanently then if customer has orders the change this customer as an anonymous customer
         if (Validate::isLoadedObject($objCustomer = $this->loadObject())) {
             if ($this->delete_mode == 'real' && Order::getCustomerOrders($objCustomer->id, true)) {
+                $customerEmail = $objCustomer->email; 
                 $objCustomer->email = 'anonymous'.'-'.$objCustomer->id.'@'.Tools::getShopDomain();
                 $objCustomer->deleted = 1;
                 if (!$objCustomer->update()) {
                     $this->errors[] = Tools::displayError('Some error ocurred while deleting the Customer');
                     return;
+                } else {
+                    if ($customerDetail = CartCustomerGuestDetail::getCustomerDefaultDetails($customerEmail)) {
+                        $objCartCustomerGuestDetail = new CartCustomerGuestDetail($customerDetail['id_customer_guest_detail']);
+                        $objCartCustomerGuestDetail->phone = preg_replace('/[0-p]/', 'x', $objCustomer->phone);
+                        $objCartCustomerGuestDetail->email = $objCustomer->email;
+                        $objCartCustomerGuestDetail->save();
+                    }
                 }
 
                 $this->redirect_after = self::$currentIndex.'&conf=1&token='.$this->token;
