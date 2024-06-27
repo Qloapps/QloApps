@@ -522,20 +522,20 @@
     border-radius: 4px;
 }
 
-#submitMessage.button-medium {
+.button-medium {
     padding: 8px 15px;
     background-color: #379bf0;
     background-image: none;
     border-radius: 2px;
 }
 
-#submitMessage.button-medium span {
+.button-medium span {
     padding: 0;
 }
 
-#submitMessage.button-medium:hover,
-#submitMessage.button-medium:focus,
-#submitMessage.button-medium:active {
+.button-medium:hover,
+.button-medium:focus,
+.button-medium:active {
     opacity: 0.8;
 }
 

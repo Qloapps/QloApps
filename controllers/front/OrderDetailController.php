@@ -100,7 +100,7 @@ class OrderDetailControllerCore extends FrontController
                     $total_demands_price_ti = 0;
                     $total_convenience_fee_te = 0;
                     $total_convenience_fee_ti = 0;
-                    $formattedProducts = array();
+                    $roomTypes = array();
                     if (!empty($products)) {
                         foreach ($products as $type_key => $type_value) {
                             if (in_array($type_value['product_id'], $processedProducts)) {
@@ -375,7 +375,7 @@ class OrderDetailControllerCore extends FrontController
                                 }
                             }
 
-                            $formattedProducts[$type_value['id_product']] = $type_value;
+                            $roomTypes[$type_value['id_product']] = $type_value;
                         }
 
                         $redirectTermsLink = $this->context->link->getCMSLink(new CMS(3, $this->context->language->id), null, $this->context->language->id);
@@ -438,7 +438,7 @@ class OrderDetailControllerCore extends FrontController
                         'order_history' => $order->getHistory($this->context->language->id, false, true),
                         'overbooking_order_states' => OrderState::getOverBookingStates(),
                         'products' => $products,
-                        'formattedProducts' => $formattedProducts,
+                        'roomTypes' => $roomTypes,
                         'discounts' => $order->getCartRules(),
                         'carrier' => $carrier,
                         'address_invoice' => $addressInvoice,
