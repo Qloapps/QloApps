@@ -5369,7 +5369,7 @@ class ProductCore extends ObjectModel
 
         $currentPosition = $this->getPositionInCategory();
 
-        if ($currentPosition && isset($result[$currentPosition])) {
+        if ($currentPosition !== false && isset($result[$currentPosition])) {
             $save = $result[$currentPosition];
             unset($result[$currentPosition]);
             array_splice($result, (int)$position, 0, $save);
