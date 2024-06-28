@@ -407,7 +407,7 @@ class OrderDetailControllerCore extends FrontController
                             'obj_hotel_branch_information' => $objHotelBranchInformation,
                             'hotel_address_info' => $hotelAddressInfo,
                             'hotel_refund_rules' => $hotelRefundRules,
-                            'view_on_google_map' => Configuration::get('WK_GOOGLE_ACTIVE_MAP'),
+                            'view_on_map' => Configuration::get('WK_GOOGLE_ACTIVE_MAP'),
                         )
                     );
                 // }
