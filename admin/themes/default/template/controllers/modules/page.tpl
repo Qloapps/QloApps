@@ -152,7 +152,7 @@
 					{l s='All'} <span class="badge pull-right">{$nb_modules}</span>
 				</a>
 				{foreach from=$list_modules_categories item=module_category key=module_category_key}
-					<a class="categoryModuleFilterLink list-group-item {if isset($categoryFiltered[$module_category_key])}active{/if}" href="{$currentIndex|escape:'html':'UTF-8'}&amp;token={$token|escape:'html':'UTF-8'}&amp;{if isset($categoryFiltered[$module_category_key])}un{/if}filterCategory={$module_category_key}" id="filter_{$module_category_key}">
+					<a class="categoryModuleFilterLink list-group-item {if isset($categoryFiltered[$module_category_key])}active{/if}" href="{$currentIndex|escape:'html':'UTF-8'}&amp;token={$token|escape:'html':'UTF-8'}&amp;filterCategory={$module_category_key}" id="filter_{$module_category_key}">
 						{$module_category.name} <span class="badge pull-right">{$module_category.nb}</span>
 					</a>
 				{/foreach}
