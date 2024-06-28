@@ -122,8 +122,8 @@
 				checkParentFolder(this);
 			});
 		{/if}
-		$('#{$id|escape:'html':'UTF-8'}').tree('collapseAll');
-		$('#collapse-all-{$id|escape:'html':'UTF-8'}').hide();
+		$('#{$id|escape:'html':'UTF-8'}').tree('expandAll');
+		$('#expand-all-{$id|escape:'html':'UTF-8'}').hide();
 	}
 	startTree();
 </script>
