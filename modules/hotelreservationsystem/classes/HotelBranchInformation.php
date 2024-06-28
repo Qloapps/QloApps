@@ -1228,13 +1228,13 @@ class HotelBranchInformation extends ObjectModel
 
             if (!$this->use_global_preparation_time) {
                 if ($this->preparation_time === '') {
-                    $message = Tools::displayError('Preparation time is a required.');
+                    $message = Tools::displayError('Minimum booking offset is a required.');
                     if ($die) {
                         throw new PrestaShopException($message);
                     }
                     return $error_return ? $message : false;
                 } elseif ($this->preparation_time !== '0' && !Validate::isUnsignedInt($this->preparation_time)) {
-                    $message = Tools::displayError('Preparation time is invalid.');
+                    $message = Tools::displayError('Minimum booking offset is invalid.');
                     if ($die) {
                         throw new PrestaShopException($message);
                     }

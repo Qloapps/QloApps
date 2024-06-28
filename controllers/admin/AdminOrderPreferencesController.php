@@ -95,8 +95,8 @@ class AdminOrderPreferencesControllerCore extends AdminController
                         'class' => 'fixed-width-xxl readonly',
                     ),
                     'GLOBAL_PREPARATION_TIME' => array(
-                        'title' => $this->l('Preparation time'),
-                        'hint' => $this->l('Number of days required to prepare a room for a guest\'s stay. For example, if you set this value to 3 and someone is booking on 2nd of March he can only book rooms for dates from and after 3 days, i.e, 5th of March.'),
+                        'title' => $this->l('Minimum booking offset'),
+                        'hint' => $this->l('The minimum booking offset refers to the furthest future date from which a guest can book a room relative to their desired check-in date. For example, if you set this value to 3 and someone is booking on 2nd of March he can only book rooms for dates from and after 3 days, i.e, 5th of March.'),
                         'desc' => $this->l('Set to 0 to disable this feature.'),
                         'type' => 'text',
                         'class' => 'fixed-width-xl',
@@ -342,9 +342,9 @@ class AdminOrderPreferencesControllerCore extends AdminController
         }
 
         if ($globalPreparationTime === '') {
-            $this->errors[] = Tools::displayError('Field \'Preparation time\' can not be empty.');
+            $this->errors[] = Tools::displayError('Field \'Minimum booking offset\' can not be empty.');
         } elseif ($globalPreparationTime !== '0' && !Validate::isUnsignedInt($globalPreparationTime)) {
-            $this->errors[] = Tools::displayError('Field \'Preparation time\' is invalid.');
+            $this->errors[] = Tools::displayError('Field \'Minimum booking offset\' is invalid.');
         }
     }
 
