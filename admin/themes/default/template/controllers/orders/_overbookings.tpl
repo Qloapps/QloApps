@@ -42,7 +42,7 @@
                                 <td>{dateFormat date=$data['date_from']} {l s='To'} {dateFormat date=$data['date_to']}</td>
                                 <td>
                                     {if $order->with_occupancy && $data['children']}
-                                        <div class="dropdown booking_occupancy_show">
+                                        <div class="dropdown">
                                             <button class="btn btn-default btn-left btn-block" data-toggle="dropdown" type="button">
                                                 <span>{if $data['adults']}{$data['adults']}{/if} {if $data['adults'] > 1}{l s='Adults'}{else}{l s='Adult'}{/if}{if {$data['children']}}, {$data['children']} {if $data['children'] > 1}{l s='Children'}{else}{l s='Child'}{/if}{/if}</span>
                                             </button>
@@ -58,7 +58,7 @@
                                             </div>
                                         </div>
                                     {else}
-                                        <span class="booking_occupancy_show">{if $data['adults']}{$data['adults']}{/if} {if $data['adults'] > 1}{l s='Adults'}{else}{l s='Adult'}{/if}{if {$data['children']}}, {$data['children']} {if $data['children'] > 1}{l s='Children'}{else}{l s='Child'}{/if}{/if}</span>
+                                        <span>{if $data['adults']}{$data['adults']}{/if} {if $data['adults'] > 1}{l s='Adults'}{else}{l s='Adult'}{/if}{if {$data['children']}}, {$data['children']} {if $data['children'] > 1}{l s='Children'}{else}{l s='Child'}{/if}{/if}</span>
                                     {/if}
                                 </td>
                                 <td>
