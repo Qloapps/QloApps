@@ -543,6 +543,7 @@
                                         <dl class="list-detail col-sm-12">
                                             <label class="label-title">{l s='Guest info'}</label>
 
+                                            <dd><i class="icon-user"></i> &nbsp;<b><a  href="?tab=AdminCustomers&amp;id_customer={$customer->id}&amp;viewcustomer&amp;token={getAdminToken tab='AdminCustomers'}">{$customer->firstname} {$customer->lastname}</a></b></dd>
                                             <dd><i class="icon-envelope"></i>  &nbsp;<b><a  href="mailto:{$customer->email}">{$customer->email}</a></b></dd>
                                             {if $addresses.invoice->phone_mobile || $addresses.invoice->phone}
                                                 <dd><i class="icon-phone"></i>  &nbsp;<b><a  href="tel:{if $addresses.invoice->phone_mobile}{$addresses.invoice->phone_mobile}{else}{$addresses.invoice->phone}{/if}">{if $addresses.invoice->phone_mobile}{$addresses.invoice->phone_mobile}{else}{$addresses.invoice->phone}{/if}</a></b></dd>
