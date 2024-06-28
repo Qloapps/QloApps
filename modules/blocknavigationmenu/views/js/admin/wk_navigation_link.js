@@ -55,11 +55,11 @@ function setCategoryWiseCmsPages()
 {
 	var selectedPage = parseInt($('input[name="id_cms"]:checked').val());
 	var selectedCategory = parseInt($('#id_cms_category').val());
-	var formattedData = JSON.parse(catFormatCmsPages);
+	var cmsPages = JSON.parse(categoryWiseCmsPages);
 	if (!isNaN(selectedCategory)) {
-		formattedData = formattedData[selectedCategory];
+		cmsPages = cmsPages[selectedCategory];
 		var html = '';
-		$.each(formattedData, function(i, v) {
+		$.each(cmsPages, function(i, v) {
 			html += '<tr>';
 			html += '<td><input type="radio" value="'+v['id_cms']+'" name="id_cms"></td>';
 			html += '<td>'+v['id_cms']+'</td>';

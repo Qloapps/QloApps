@@ -105,41 +105,20 @@ class blocknavigationmenu extends Module
 
     public function hookActionObjectCMSUpdateAfter($params)
     {
-        $id_cms = $params['object']->id;
-        // Disabling all the related navigation links to disabled CMS page
+        $idCMS = $params['object']->id;
         if (!$params['object']->active) {
-            $this->disableRelatedLinks($id_cms);
+            $objCustomNavigationLink = new WkCustomNavigationLink();
+            // Disabling depended Navigation link
+            $objCustomNavigationLink->disableNavigationLinksByIdCMS($idCMS);
         }
     }
 
     public function hookActionObjectCMSDeleteAfter($params)
     {
-        $id_cms = $params['object']->id;
-        // Disabling all the related navigation links to deleted CMS page
-        $this->deleteRelatedLinks($id_cms);
-    }
-
-    public function disableRelatedLinks($id_cms)
-    {
+        $idCMS = $params['object']->id;
         $objCustomNavigationLink = new WkCustomNavigationLink();
-        if ($navLinks = $objCustomNavigationLink->getRelatedNavLinksByIdCMS($id_cms)) {
-            foreach ($navLinks as $navLink) {
-                $objCustomNavigationLink = new WkCustomNavigationLink((int) $navLink['id_navigation_link']);
-                $objCustomNavigationLink->active = 0;
-                $objCustomNavigationLink->save();
-            }
-        }
-    }
-
-    public function deleteRelatedLinks($id_cms)
-    {
-        $objCustomNavigationLink = new WkCustomNavigationLink();
-        if ($navLinks = $objCustomNavigationLink->getRelatedNavLinksByIdCMS($id_cms)) {
-            foreach ($navLinks as $navLink) {
-                $objCustomNavigationLink = new WkCustomNavigationLink((int) $navLink['id_navigation_link']);
-                $objCustomNavigationLink->delete();
-            }
-        }
+        // Deleting depended Navigation link
+        $objCustomNavigationLink->deleteNavigationLinksByIdCMS($idCMS);
     }
 
     public function install()

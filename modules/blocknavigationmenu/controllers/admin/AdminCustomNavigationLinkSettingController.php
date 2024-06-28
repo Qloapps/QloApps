@@ -225,7 +225,7 @@ class AdminCustomNavigationLinkSettingController extends ModuleAdminController
 
         Media::addJsDef(
             array(
-                'catFormatCmsPages' => json_encode($categoryWiseCmsPages)
+                'categoryWiseCmsPages' => json_encode($categoryWiseCmsPages)
             )
         );
 
@@ -425,7 +425,9 @@ class AdminCustomNavigationLinkSettingController extends ModuleAdminController
             && !$this->object->is_custom_link //Check for CMS related navigation link
         ) {
             $objCMS = new CMS($this->object->id_cms);
-            if (!$objCMS->active) {
+            if (!$objCMS->active
+                && !$this->object->active
+            ) {
                 $this->errors[] = $this->l('Please activate the relate CMS page to activate this link');
             }
         }
@@ -440,6 +442,8 @@ class AdminCustomNavigationLinkSettingController extends ModuleAdminController
     public function setMedia()
     {
         parent::setMedia();
-        $this->addJS(_MODULE_DIR_.$this->module->name.'/views/js/admin/wk_navigation_link.js');
+        if ($this->display == 'edit' || $this->display == 'add') {
+            $this->addJS($this->module->getPathUri().'views/js/admin/wk_navigation_link.js');
+        }
     }
 }

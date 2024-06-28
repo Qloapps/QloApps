@@ -79,6 +79,7 @@ class CmsControllerCore extends FrontController
         } elseif (Validate::isLoadedObject($this->cms_category) && $this->cms_category->active && $this->cms_category->isAssociatedToShop()) {
             $this->assignCase = 2;
         } else {
+            // incase the cms page in invalid i.e, url is tampered
             Tools::redirect($this->context->link->getPageLink('pagenotfound'));
         }
     }
@@ -134,6 +135,7 @@ class CmsControllerCore extends FrontController
                 'body_classes' => array($this->php_self.'-'.$this->cms_category->id, $this->php_self.'-'.$this->cms_category->link_rewrite)
             ));
         } else {
+            // incase the cms page is inactive
             Tools::redirect($this->context->link->getPageLink('pagenotfound'));
         }
 
