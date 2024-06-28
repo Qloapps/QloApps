@@ -43,7 +43,7 @@
                                 {l s='Price'}
                             </th>
                             <th>
-                                {l s='Tax rule'}
+                                {l s='Tax rate'}
                             </th>
                             <th class="fixed-width-lg text-center">
                                 {l s='Per day price calculation'}

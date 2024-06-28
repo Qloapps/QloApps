@@ -27,7 +27,7 @@
                                 <span>{l s='Price'}</span>
                             </th>
                             <th>
-                                <span>{l s='Tax rule'}</span>
+                                <span>{l s='Tax rate'}</span>
                             </th>
                         </tr>
                     </thead>
