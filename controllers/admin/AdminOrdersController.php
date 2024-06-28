@@ -285,11 +285,6 @@ class AdminOrdersControllerCore extends AdminController
             'payment' => array(
                 'title' => $this->l('Payment')
             ),
-            'currency' => array(
-                'title' => $this->l('Order Currency'),
-                'hint' => $this->l('This is the currency in which customer created the order.'),
-                'havingFilter' => true,
-            ),
             'order_source' => array(
                 'title' => $this->l('Order Source'),
                 'type' => 'select',
@@ -915,6 +910,10 @@ class AdminOrdersControllerCore extends AdminController
                 $smartyVars['roomTypeServiceProducts'] = $roomTypeServiceProducts;
             }
 
+            $objOrderReturn = new OrderReturn();
+            $refundReqBookings = $objOrderReturn->getOrderRefundRequestedBookings($objOrder->id, 0, 1);
+            $smartyVars['refundReqBookings'] = $refundReqBookings;
+
             $this->context->smarty->assign($smartyVars);
 
             $modal = array(
@@ -1045,28 +1044,13 @@ class AdminOrdersControllerCore extends AdminController
                         if (!Validate::isLoadedObject($order)) {
                             $this->errors[] = sprintf(Tools::displayError('Order #%d cannot be loaded'), $id_order);
                         } else {
-                            $current_order_state = $order->getCurrentOrderState();
-                            if ($current_order_state->id == $order_state->id) {
-                                $this->errors[] = $this->displayWarning(sprintf('Order #%d has already been assigned this status.', $id_order));
-                            } else {
-                                $history = new OrderHistory();
-                                $history->id_order = $order->id;
-                                $history->id_employee = (int)$this->context->employee->id;
-
-                                $use_existings_payment = !$order->hasInvoice();
-                                $history->changeIdOrderState((int)$order_state->id, $order, $use_existings_payment);
-
-                                $carrier = new Carrier($order->id_carrier, $order->id_lang);
-                                $templateVars = array();
-
-                                if ($history->addWithemail(true, $templateVars)) {
-                                    if (Configuration::get('PS_ADVANCED_STOCK_MANAGEMENT')) {
-                                        foreach ($order->getProducts() as $product) {
-                                            if (StockAvailable::dependsOnStock($product['product_id'])) {
-                                                StockAvailable::synchronize($product['product_id'], (int)$product['id_shop']);
-                                            }
-                                        }
-                                    }
+                            $result = $order->changeOrderStatus();
+                            if (!$result['status']) {
+                                if (isset($result['has_mail_error']) && $result['has_mail_error']) {
+                                    $this->errors[] = sprintf(
+                                        Tools::displayError('Unable to send email to the customer while changing order status for order #%d.'),
+                                        $id_order
+                                    );
                                 } else {
                                     $this->errors[] = sprintf(Tools::displayError('Cannot change status for order #%d.'), $id_order);
                                 }
@@ -1075,6 +1059,7 @@ class AdminOrdersControllerCore extends AdminController
                     }
                 }
             }
+
             if (!count($this->errors)) {
                 Tools::redirectAdmin(self::$currentIndex.'&conf=4&token='.$this->token);
             }
@@ -1280,115 +1265,11 @@ class AdminOrdersControllerCore extends AdminController
         /* Change order status, add a new entry in order history and send an e-mail to the customer if needed */
         elseif (Tools::isSubmit('submitState') && isset($order)) {
             if ($this->tabAccess['edit'] === '1') {
-                $order_state = new OrderState(Tools::getValue('id_order_state'));
-
-                if (!Validate::isLoadedObject($order_state)) {
-                    $this->errors[] = Tools::displayError('The new order status is invalid.');
+                $result = $order->changeOrderStatus();
+                if ($result['status']) {
+                    Tools::redirectAdmin(self::$currentIndex.'&id_order='.(int)$order->id.'&conf=5&vieworder&token='.$this->token);
                 } else {
-                    $current_order_state = $order->getCurrentOrderState();
-
-                    if ($current_order_state->id == Configuration::get('PS_OS_REFUND')) {
-                        $this->errors[] = Tools::displayError('Order status can not be changed once order status is set to Refunded.');
-                    } elseif ($current_order_state->id == Configuration::get('PS_OS_CANCELED')) {
-                        $this->errors[] = Tools::displayError('Order status can not be changed once order status is set to Cancelled.');
-                    } elseif (in_array($order_state->id, array (Configuration::get('PS_OS_OVERBOOKING_PAID'), Configuration::get('PS_OS_OVERBOOKING_UNPAID'), Configuration::get('PS_OS_OVERBOOKING_PARTIAL_PAID')))) {
-                        $objHotelBooking = new HotelBookingDetail();
-                        if (!$objHotelBooking->getOverbookedRooms($order->id)) {
-                            $this->errors[] = Tools::displayError('Order status can not be changed to any overbooking status as there are no overbooked rooms in the order.');
-                        }
-                    } elseif ($order_state->id == Configuration::get('PS_OS_REFUND')
-                        && !$order->hasCompletelyRefunded(Order::ORDER_COMPLETE_REFUND_FLAG)
-                    ) {
-                        $this->errors[] = Tools::displayError('Order status can not be set to Refunded until all bookings in the order are completely refunded.');
-                    } elseif ($order_state->id == Configuration::get('PS_OS_CANCELED')
-                        && !$order->hasCompletelyRefunded(Order::ORDER_COMPLETE_CANCELLATION_FLAG)
-                    ) {
-                        $this->errors[] = Tools::displayError('Order status can not be set to Cancelled until all bookings in the order are cancelled.');
-                    } elseif ($current_order_state->id == Configuration::get('PS_OS_ERROR') && !($order_state->id == Configuration::get('PS_OS_ERROR'))) {
-                        // All rooms must be available before changing status from Payment Error to Other status in which rooms are getting blocked again
-                        $objHotelBooking = new HotelBookingDetail();
-                        if ($orderBookings = $objHotelBooking->getOrderCurrentDataByOrderId($order->id)) {
-                            foreach ($orderBookings as $orderBooking) {
-                                // If booking is refunded then no need to check inventory
-                                if ((OrderReturn::getOrdersReturnDetail($order->id, 0, $orderBooking['id']) && $orderBooking['is_refunded'])
-                                    || ($orderBooking['is_cancelled'] && $orderBooking['is_refunded'])
-                                ) {
-                                    continue;
-                                } else {
-                                    // if inventory is available for that booking
-                                    $bookingParams = array(
-                                        'date_from' => $orderBooking['date_from'],
-                                        'date_to' => $orderBooking['date_to'],
-                                        'hotel_id' => $orderBooking['id_hotel'],
-                                        'id_room_type' => $orderBooking['id_product'],
-                                        'only_search_data' => 1
-                                    );
-
-                                    $objHotelBookingDetail = new HotelBookingDetail($orderBooking['id']);
-                                    if ($searchRoomsInfo = $objHotelBooking->getBookingData($bookingParams)) {
-                                        if (isset($searchRoomsInfo['rm_data'][$orderBooking['id_product']]['data']['available'])
-                                            && $searchRoomsInfo['rm_data'][$orderBooking['id_product']]['data']['available']
-                                        ) {
-                                            $availableRoomsInfo = $searchRoomsInfo['rm_data'][$orderBooking['id_product']]['data']['available'];
-                                            if ($roomIdsAvailable = array_column($availableRoomsInfo, 'id_room')) {
-                                                // Check If room is still there in the available rooms list
-                                                if (!in_array($orderBooking['id_room'], $roomIdsAvailable)) {
-                                                    $this->errors[] = Tools::displayError('You can not change the order status as some rooms are not available now in this order. You can reallocate/swap rooms with other rooms to make rooms available and then change the order status.');
-
-                                                    break;
-                                                } else {
-                                                    $objHotelBookingDetail->is_refunded = 0;
-                                                    $objHotelBookingDetail->save();
-                                                }
-                                            } else {
-                                                $this->errors[] = Tools::displayError('You can not change the order status as some rooms are not available now in this order. You can reallocate/swap rooms with other rooms to make rooms available and then change the order status.');
-                                                break;
-                                            }
-                                        }
-                                    } else {
-                                        $this->errors[] = Tools::displayError('You can not change the order status as some rooms are not available now in this order. You can reallocate/swap rooms with other rooms to make rooms available and then change the order status.');
-
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-                    } elseif ($current_order_state->id == $order_state->id) {
-                        $this->errors[] = Tools::displayError('The order has already been assigned this status.');
-                    }
-
-                    // If no errors then we change the order status
-                    if (!count($this->errors)) {
-                        // Create new OrderHistory
-                        $history = new OrderHistory();
-                        $history->id_order = $order->id;
-                        $history->id_employee = (int)$this->context->employee->id;
-
-                        $use_existings_payment = false;
-                        if (!$order->hasInvoice()) {
-                            $use_existings_payment = true;
-                        }
-                        $history->changeIdOrderState((int)$order_state->id, $order, $use_existings_payment);
-
-                        $carrier = new Carrier($order->id_carrier, $order->id_lang);
-                        $templateVars = array();
-
-                        // Save all changes
-                        if ($history->addWithemail(true, $templateVars)) {
-                            // synchronizes quantities if needed..
-                            if (Configuration::get('PS_ADVANCED_STOCK_MANAGEMENT')) {
-                                foreach ($order->getProducts() as $product) {
-                                    if (StockAvailable::dependsOnStock($product['product_id'])) {
-                                        StockAvailable::synchronize($product['product_id'], (int)$product['id_shop']);
-                                    }
-                                }
-                            }
-
-                            Tools::redirectAdmin(self::$currentIndex.'&id_order='.(int)$order->id.'&conf=5&vieworder&token='.$this->token);
-                        }
-
-                        $this->errors[] = Tools::displayError('An error occurred while changing order status, or we were unable to send an email to the customer.');
-                    }
+                    $this->errors = array_merge($this->errors, $result['errors']);
                 }
             } else {
                 $this->errors[] = Tools::displayError('You do not have permission to edit this.');
@@ -2027,6 +1908,41 @@ class AdminOrdersControllerCore extends AdminController
                         }
                     }
 
+                    // update Order refund prices (order_return and order_return_detail)
+                    if ($orderReturns = OrderReturn::getOrdersReturn($order->id_customer, $order->id)) {
+                        $fields = array(
+                            'refunded_amount',
+                        );
+                        foreach ($orderReturns as $orderReturn) {
+                            $objOrderReturn = new OrderReturn($orderReturn['id_order_return']);
+                            foreach ($fields as $field) {
+                                $objOrderReturn->{$field} = Tools::convertPriceFull(
+                                    $objOrderReturn->{$field},
+                                    $old_currency,
+                                    $currency
+                                );
+                            }
+                            $objOrderReturn->update();
+                        }
+                    }
+
+                    if ($orderReturnDetails = OrderReturn::getOrdersReturnDetail($order->id)) {
+                        $fields = array(
+                            'refunded_amount',
+                        );
+                        foreach ($orderReturnDetails as $orderReturnDetail) {
+                            $objOrderReturnDetail = new OrderReturnDetail($orderReturnDetail['id_order_return_detail']);
+                            foreach ($fields as $field) {
+                                $objOrderReturnDetail->{$field} = Tools::convertPriceFull(
+                                    $objOrderReturnDetail->{$field},
+                                    $old_currency,
+                                    $currency
+                                );
+                            }
+                            $objOrderReturnDetail->update();
+                        }
+                    }
+
                     // If everything is updated, then redirect to view order with success message
                     Tools::redirectAdmin(self::$currentIndex.'&id_order='.$order->id.'&vieworder&conf=4&token='.$this->token);
                 } else {
@@ -2107,7 +2023,7 @@ class AdminOrdersControllerCore extends AdminController
                     switch (Tools::getValue('discount_type')) {
                         // Percent type
                         case 1:
-                            if ($discount_value < 100) {
+                            if ($discount_value <= 100) {
                                 if (isset($order_invoice)) {
                                     $cart_rules[$order_invoice->id]['value_tax_incl'] = Tools::ps_round($order_invoice->total_paid_tax_incl * $discount_value / 100, 2);
                                     $cart_rules[$order_invoice->id]['value_tax_excl'] = Tools::ps_round($order_invoice->total_paid_tax_excl * $discount_value / 100, 2);
@@ -4559,103 +4475,6 @@ class AdminOrdersControllerCore extends AdminController
         $children = $occupancy['children'];
         $child_ages = $occupancy['child_ages'];
 
-        /*By webkul to validate fields before deleting the cart and order data form the tables*/
-        if ($id_hotel == '') {
-            die(json_encode(array(
-                'result' => false,
-                'error' => Tools::displayError('Hotel Id is mising.'),
-            )));
-        } elseif ($id_room == '') {
-            die(json_encode(array(
-                'result' => false,
-                'error' => Tools::displayError('Room Id is missing.'),
-            )));
-        } elseif ($new_date_from == '') {
-            die(json_encode(array(
-                'result' => false,
-                'error' => Tools::displayError('Please Enter Check In Date.'),
-            )));
-        } elseif (!Validate::isDateFormat($new_date_from)) {
-            die(json_encode(array(
-                'result' => false,
-                'error' => Tools::displayError('Please Enter a Valid Check In Date.'),
-            )));
-        } elseif ($new_date_to == '') {
-            die(json_encode(array(
-                'result' => false,
-                'error' => Tools::displayError('Please Enter Check Out Date.'),
-            )));
-        } elseif (!Validate::isDateFormat($new_date_to)) {
-            die(json_encode(array(
-                'result' => false,
-                'error' => Tools::displayError('Please Enter a valid Check out Date.'),
-            )));
-        } elseif ($new_date_from < $curr_date) {
-            die(json_encode(array(
-                'result' => false,
-                'error' => Tools::displayError('Check In date should not be after current date.'),
-            )));
-        } elseif ($new_date_to <= $new_date_from) {
-            die(json_encode(array(
-                'result' => false,
-                'error' => Tools::displayError('Check out Date Should be after Check In date.'),
-            )));
-        } elseif ($room_unit_price == '') {
-            die(json_encode(array(
-                'result' => false,
-                'error' => Tools::displayError('Please enter unit price.'),
-            )));
-        } elseif (!Validate::isPrice($room_unit_price)) {
-            die(json_encode(array(
-                'result' => false,
-                'error' => Tools::displayError('Please enter a valid unit price.'),
-            )));
-        } elseif (!Validate::isUnsignedInt($product_quantity)) {
-            die(json_encode(array(
-                'result' => false,
-                'error' => Tools::displayError('Invalid quantity.'),
-            )));
-        }
-
-        // validations if order is with occupancy
-        if (!isset($adults) || !$adults || !Validate::isUnsignedInt($adults)) {
-            die(json_encode(array(
-                'result' => false,
-                'error' => Tools::displayError('Invalid number of adults.'),
-            )));
-        } elseif (!Validate::isUnsignedInt($children)) {
-            die(json_encode(array(
-                'result' => false,
-                'error' => Tools::displayError('Invalid number of children.'),
-            )));
-        }
-
-        if ($children > 0) {
-            if (!isset($child_ages) || ($children != count($child_ages))) {
-                die(json_encode(array(
-                    'result' => false,
-                    'error' => Tools::displayError('Please provide all children age.'),
-                )));
-            } else {
-                foreach($child_ages as $childAge) {
-                    if (!Validate::isUnsignedInt($childAge)) {
-                        die(json_encode(array(
-                            'result' => false,
-                            'error' => Tools::displayError('Invalid children age.'),
-                        )));
-                    }
-                }
-            }
-        }
-
-        $rooms_booked = $obj_booking_detail->getRoomBookinInformationForDateRangeByOrder($id_room, $old_date_from, $old_date_to, $new_date_from, $new_date_to);
-        if ($rooms_booked) {
-            die(json_encode(array(
-                'result' => false,
-                'error' => Tools::displayError('This Room Unavailable For Selected Duration.'),
-            )));
-        }
-
         // By webkul to calculate rates of the product from hotelreservationsystem tables with feature prices....
         // add feature price for updated price
 
@@ -5601,8 +5420,48 @@ class AdminOrdersControllerCore extends AdminController
     {
         $this->doEditValidation($order_detail, $order, $order_invoice);
 
+        $id_hotel_booking = Tools::getValue('id_booking_detail');
         $product_price_tax_incl = str_replace(',', '.', Tools::getValue('product_price_tax_incl'));
         $product_price_tax_excl = str_replace(',', '.', Tools::getValue('product_price_tax_excl'));
+        $product_informations = $_POST['edit_product'];
+        $new_date_from = trim(date('Y-m-d', strtotime($product_informations['date_from'])));
+        $new_date_to = trim(date('Y-m-d', strtotime($product_informations['date_to'])));
+        $old_date_from = date('Y-m-d', strtotime(trim(Tools::getValue('date_from'))));
+        $old_date_to = date('Y-m-d', strtotime(trim(Tools::getValue('date_to'))));
+        $id_hotel = trim(Tools::getValue('id_hotel'));
+        $id_room = trim(Tools::getValue('id_room'));
+        $id_product = trim(Tools::getValue('id_product'));
+        $room_unit_price = trim(Tools::getValue('room_unit_price'));
+        $obj_booking_detail = new HotelBookingDetail();
+        $product_quantity = (int) $obj_booking_detail->getNumberOfDays($new_date_from, $new_date_to);
+        $old_product_quantity =  (int) $obj_booking_detail->getNumberOfDays($old_date_from, $old_date_to);
+        $qty_diff = $product_quantity - $old_product_quantity;
+        $occupancy = array_shift(Tools::getValue('occupancy'));
+        $adults = $occupancy['adults'];
+        $children = $occupancy['children'];
+        $child_ages = $occupancy['child_ages'];
+
+        // If order is refunded, the validate changes which are not allowed
+        $objOrderReturn = new OrderReturn();
+        $refundReqBookings = $objOrderReturn->getOrderRefundRequestedBookings($order->id, 0, 1);
+        if ($refundReqBookings && (in_array($id_hotel_booking, $refundReqBookings))) {
+            $objBookingDetail = new HotelBookingDetail($id_hotel_booking);
+            // If order is cancelled, we can't edit order
+            if ($objBookingDetail->is_refunded && $objBookingDetail->is_cancelled) {
+                die(json_encode(array(
+                    'result' => false,
+                    'error' => Tools::displayError('Booking cannot be edited if booking is cancelled.'),
+                )));
+            // If order is refunded, we can't edit dates
+            } elseif ($objBookingDetail->is_refunded
+                && (strtotime($old_date_from) != strtotime($new_date_from) || strtotime($old_date_to) != strtotime($new_date_to))
+            ) {
+                die(json_encode(array(
+                    'result' => false,
+                    'error' => Tools::displayError('Check-In/Check-Out dates cannot be changed if booking is refunded.'),
+                )));
+            }
+        }
 
         if (!Validate::isPrice($product_price_tax_incl) || !Validate::isPrice($product_price_tax_excl)) {
             die(json_encode(array(
@@ -5611,46 +5470,89 @@ class AdminOrdersControllerCore extends AdminController
             )));
         }
 
-        $product_informations = Tools::getValue('edit_product');
-        $old_date_from = date('Y-m-d', strtotime(trim(Tools::getValue('date_from'))));
-        $old_date_to = date('Y-m-d', strtotime(trim(Tools::getValue('date_to'))));
-        $new_date_from = trim(date('Y-m-d', strtotime($product_informations['date_from'])));
-        $new_date_to = trim(date('Y-m-d', strtotime($product_informations['date_to'])));
-        $obj_booking_detail = new HotelBookingDetail();
-        $product_quantity = (int) $obj_booking_detail->getNumberOfDays($new_date_from, $new_date_to);
-        $id_room = Tools::getValue('id_room');
-
-        if (trim(Tools::getValue('id_hotel')) == '') {
+        if ($id_hotel == '') {
             die(json_encode(array(
                 'result' => false,
                 'error' => Tools::displayError('Hotel Id is mising.'),
             )));
-        } elseif (trim($id_room) == '') {
+        } elseif ($id_room == '') {
             die(json_encode(array(
                 'result' => false,
                 'error' => Tools::displayError('Room Id is missing.'),
             )));
-        } elseif (trim(date('Y-m-d', strtotime($product_informations['date_from']))) == '') {
+        } elseif ($new_date_from == '') {
             die(json_encode(array(
                 'result' => false,
-                'error' => Tools::displayError('Please enter check-in date.'),
+                'error' => Tools::displayError('Please enter Check-In date.'),
             )));
         } elseif (!Validate::isDateFormat($new_date_from)) {
             die(json_encode(array(
                 'result' => false,
-                'error' => Tools::displayError('Please enter a valid check-in date.'),
+                'error' => Tools::displayError('Please enter a valid Check-In date.'),
             )));
         } elseif ($new_date_to == '') {
             die(json_encode(array(
                 'result' => false,
-                'error' => Tools::displayError('Please enter check-out date.'),
+                'error' => Tools::displayError('Please enter Check-Out date.'),
             )));
         } elseif (!Validate::isDateFormat($new_date_to)) {
             die(json_encode(array(
                 'result' => false,
-                'error' => Tools::displayError('Please enter a valid check-out date.'),
+                'error' => Tools::displayError('Please enter a valid Check-out date.'),
+            )));
+        } elseif ($new_date_to <= $new_date_from) {
+            die(json_encode(array(
+                'result' => false,
+                'error' => Tools::displayError('Check-out date should be after Check-In date.'),
+            )));
+        } elseif ($room_unit_price == '') {
+            die(json_encode(array(
+                'result' => false,
+                'error' => Tools::displayError('Please enter unit price.'),
+            )));
+        } elseif (!Validate::isPrice($room_unit_price)) {
+            die(json_encode(array(
+                'result' => false,
+                'error' => Tools::displayError('Please enter a valid unit price.'),
+            )));
+        } elseif (!Validate::isUnsignedInt($product_quantity)) {
+            die(json_encode(array(
+                'result' => false,
+                'error' => Tools::displayError('Invalid quantity.'),
             )));
         }
+
+        // validations if order is with occupancy
+        if (!isset($adults) || !$adults || !Validate::isUnsignedInt($adults)) {
+            die(json_encode(array(
+                'result' => false,
+                'error' => Tools::displayError('Invalid number of adults.'),
+            )));
+        } elseif (!Validate::isUnsignedInt($children)) {
+            die(json_encode(array(
+                'result' => false,
+                'error' => Tools::displayError('Invalid number of children.'),
+            )));
+        }
+
+        if ($children > 0) {
+            if (!isset($child_ages) || ($children != count($child_ages))) {
+                die(json_encode(array(
+                    'result' => false,
+                    'error' => Tools::displayError('Please provide all children age.'),
+                )));
+            } else {
+                foreach($child_ages as $childAge) {
+                    if (!Validate::isUnsignedInt($childAge)) {
+                        die(json_encode(array(
+                            'result' => false,
+                            'error' => Tools::displayError('Invalid children age.'),
+                        )));
+                    }
+                }
+            }
+        }
+
         if ($this->context->employee->isSuperAdmin()) {
             $backOrderConfigKey = 'PS_BACKDATE_ORDER_SUPERADMIN';
         } else {
@@ -5661,24 +5563,18 @@ class AdminOrdersControllerCore extends AdminController
             if ($new_date_from < $compareDate) {
                 die(json_encode(array(
                     'result' => false,
-                    'error' => sprintf(Tools::displayError('Check-in date should not be date before %s.'),$compareDate)
+                    'error' => sprintf(Tools::displayError('Check-In date should not be date before %s.'),$compareDate)
                 )));
             }
         }
-        if ($new_date_to <= $new_date_from) {
-            die(json_encode(array(
-                'result' => false,
-                'error' => Tools::displayError('Check-out date should be after check-in date.'),
-            )));
-        } elseif (!Validate::isUnsignedInt($product_quantity)) {
-            die(json_encode(array(
-                'result' => false,
-                'error' => Tools::displayError('Invalid quantity.'),
-            )));
-        }
 
-        $rooms_booked = $obj_booking_detail->getRoomBookinInformationForDateRangeByOrder($id_room, $old_date_from, $old_date_to, $new_date_from, $new_date_to);
-        if ($rooms_booked) {
+        if ($rooms_booked = $obj_booking_detail->getRoomBookinInformationForDateRangeByOrder(
+            $id_room,
+            $old_date_from,
+            $old_date_to,
+            $new_date_from,
+            $new_date_to
+        )) {
             die(json_encode(array(
                 'result' => false,
                 'error' => Tools::displayError('This room is unavailable for selected duration.'),
