@@ -27,7 +27,7 @@
                                 <span>{l s='Price'}</span>
                             </th>
                             <th>
-                                <span>{l s='Tax rate'}</span>
+                                <span>{l s='Tax'}</span>
                             </th>
                         </tr>
                     </thead>
