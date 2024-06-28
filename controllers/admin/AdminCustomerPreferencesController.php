@@ -124,7 +124,6 @@ class AdminCustomerPreferencesControllerCore extends AdminController
                 ),
                 'submit' => array(
                     'title' => $this->l('Save'),
-                    'name' => 'submitCustomerGeneralConfig'
                 ),
             ),
             'customer_kpi' => array(
@@ -169,29 +168,9 @@ class AdminCustomerPreferencesControllerCore extends AdminController
                 ),
                 'submit' => array(
                     'title' => $this->l('Save'),
-                    'name' => 'submitCustomerKpiConfig'
                 ),
             )
         );
-    }
-
-    public function postProcess()
-    {
-        // using this to separate the saving process for the both option fields
-        $fields = $this->fields_options;
-        if (Tools::isSubmit('submitCustomerKpiConfig')) {
-            unset($this->fields_options['general']);
-            $this->processUpdateOptions();
-            $this->redirect_after = self::$currentIndex.'&token='.$this->token.'&conf=6';
-        } else if (Tools::isSubmit('submitCustomerGeneralConfig')) {
-            unset($this->fields_options['customer_kpi']);
-            $this->processUpdateOptions();
-            $this->redirect_after = self::$currentIndex.'&token='.$this->token.'&conf=6';
-        }
-
-        $this->fields_options = $fields;
-
-        return parent::postProcess();
     }
 
     /**
