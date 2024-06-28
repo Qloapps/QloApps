@@ -332,7 +332,7 @@ class AdminProductsControllerCore extends AdminController
         if (Configuration::get('WK_ALLOW_ADVANCED_PAYMENT')) {
             $this->fields_list['advance_payment'] = array(
                 'title' => $this->l('Advance Payment'),
-                'callback' => 'getAdvancePaymentBadge',
+                'callback' => 'getAdvancePaymentStatus',
                 'align' => 'text-center',
                 'type' => 'bool',
                 'optional' => true,
@@ -341,17 +341,6 @@ class AdminProductsControllerCore extends AdminController
                 'orderby' => false,
             );
         }
-
-        $this->statusBadge = array(
-            0 => array(
-                'badge' => 'badge-danger',
-                'text' => $this->l('No')
-            ),
-            1 => array(
-                'badge' => 'badge-success',
-                'text' => $this->l('Yes')
-            )
-        );
 
         $taxRulesGroups = array();
         foreach (TaxRulesGroup::getTaxRulesGroups(true) as $taxRulesGroup) {
@@ -452,9 +441,15 @@ class AdminProductsControllerCore extends AdminController
         }
     }
 
-    public function getAdvancePaymentBadge($val, $row)
+    public function getAdvancePaymentStatus($val, $row)
     {
-        return '<span class="badge '.$this->statusBadge[(int)$val]['badge'].'" >'.$this->statusBadge[(int)$val]['text'].'</a>';
+        if ($val) {
+            $str_return = '<span class="badge badge-success" >'.$this->l('Yes').'</a>';
+        } else {
+            $str_return = '<span class="badge badge-danger" >'.$this->l('No').'</a>';
+        }
+
+        return $str_return;
     }
 
 
