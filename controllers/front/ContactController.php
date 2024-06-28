@@ -115,99 +115,112 @@ class ContactControllerCore extends FrontController
 					WHERE cc.id_customer_thread = '.(int)$id_customer_thread.' AND cc.id_shop = '.(int)$this->context->shop->id.'
 					ORDER BY cm.date_add DESC');
                 if ($old_message == $message) {
-                    $this->context->smarty->assign('alreadySent', 1);
+                    $this->errors[] = Tools::displayError('Your message has already been sent.');
+                    $_POST = array();
                     $contact->email = '';
                     $contact->customer_service = 0;
-                }
-
-                if ($contact->customer_service) {
-                    if ((int)$id_customer_thread) {
-                        $ct = new CustomerThread($id_customer_thread);
-                        $ct->status = 'open';
-                        $ct->id_lang = (int)$this->context->language->id;
-                        $ct->id_contact = (int)$id_contact;
-                        $ct->id_order = (int)$id_order;
-                        if ($id_product = (int)Tools::getValue('id_product')) {
-                            $ct->id_product = $id_product;
+                } else {
+                    if ($contact->customer_service) {
+                        if ((int)$id_customer_thread) {
+                            $ct = new CustomerThread($id_customer_thread);
+                            $ct->status = 'open';
+                            $ct->id_lang = (int)$this->context->language->id;
+                            $ct->id_contact = (int)$id_contact;
+                            $ct->id_order = (int)$id_order;
+                            if ($id_product = (int)Tools::getValue('id_product')) {
+                                $ct->id_product = $id_product;
+                            }
+                            $ct->update();
+                        } else {
+                            $ct = new CustomerThread();
+                            if (isset($customer->id)) {
+                                $ct->id_customer = (int)$customer->id;
+                            }
+                            $ct->id_shop = (int)$this->context->shop->id;
+                            $ct->id_order = (int)$id_order;
+                            if ($id_product = (int)Tools::getValue('id_product')) {
+                                $ct->id_product = $id_product;
+                            }
+                            $ct->id_contact = (int)$id_contact;
+                            $ct->id_lang = (int)$this->context->language->id;
+                            $ct->email = $from;
+                            $ct->status = 'open';
+                            $ct->token = Tools::passwdGen(12);
+                            $ct->add();
                         }
-                        $ct->update();
-                    } else {
-                        $ct = new CustomerThread();
-                        if (isset($customer->id)) {
-                            $ct->id_customer = (int)$customer->id;
-                        }
-                        $ct->id_shop = (int)$this->context->shop->id;
-                        $ct->id_order = (int)$id_order;
-                        if ($id_product = (int)Tools::getValue('id_product')) {
-                            $ct->id_product = $id_product;
-                        }
-                        $ct->id_contact = (int)$id_contact;
-                        $ct->id_lang = (int)$this->context->language->id;
-                        $ct->email = $from;
-                        $ct->status = 'open';
-                        $ct->token = Tools::passwdGen(12);
-                        $ct->add();
-                    }
 
-                    if ($ct->id) {
-                        $cm = new CustomerMessage();
-                        $cm->id_customer_thread = $ct->id;
-                        $cm->message = $message;
-                        if (isset($file_attachment['rename']) && !empty($file_attachment['rename']) && rename($file_attachment['tmp_name'], _PS_UPLOAD_DIR_.basename($file_attachment['rename']))) {
-                            $cm->file_name = $file_attachment['rename'];
-                            @chmod(_PS_UPLOAD_DIR_.basename($file_attachment['rename']), 0664);
-                        }
-                        $cm->ip_address = (int)ip2long(Tools::getRemoteAddr());
-                        $cm->user_agent = $_SERVER['HTTP_USER_AGENT'];
-                        if (!$cm->add()) {
-                            $this->errors[] = Tools::displayError('An error occurred while sending the message.');
-                        }
-                    } else {
-                        $this->errors[] = Tools::displayError('An error occurred while sending the message.');
-                    }
-                }
-
-                if (!count($this->errors)) {
-                    $var_list = array(
-                                    '{order_name}' => '-',
-                                    '{attached_file}' => '-',
-                                    '{message}' => Tools::nl2br(stripslashes($message)),
-                                    '{email}' =>  $from,
-                                    '{product_name}' => '',
-                                );
-
-                    if (isset($file_attachment['name'])) {
-                        $var_list['{attached_file}'] = $file_attachment['name'];
-                    }
-
-                    $id_product = (int)Tools::getValue('id_product');
-
-                    if (isset($ct) && Validate::isLoadedObject($ct) && $ct->id_order) {
-                        $order = new Order((int)$ct->id_order);
-                        $var_list['{order_name}'] = $order->getUniqReference();
-                        $var_list['{id_order}'] = (int)$order->id;
-                    }
-
-                    if ($id_product) {
-                        $product = new Product((int)$id_product);
-                        if (Validate::isLoadedObject($product) && isset($product->name[Context::getContext()->language->id])) {
-                            $var_list['{product_name}'] = $product->name[Context::getContext()->language->id];
-                        }
-                    }
-
-                    if (!empty($contact->email)) {
-                        if (!Mail::Send($this->context->language->id, 'contact', Mail::l('Message from contact form').' [no_sync]',
-                            $var_list, $contact->email, $contact->name, null, null,
-                                    $file_attachment, null,    _PS_MAIL_DIR_, false, null, null, $from)) {
+                        if ($ct->id) {
+                            $cm = new CustomerMessage();
+                            $cm->id_customer_thread = $ct->id;
+                            $cm->message = $message;
+                            if (isset($file_attachment['rename']) && !empty($file_attachment['rename']) && rename($file_attachment['tmp_name'], _PS_UPLOAD_DIR_.basename($file_attachment['rename']))) {
+                                $cm->file_name = $file_attachment['rename'];
+                                @chmod(_PS_UPLOAD_DIR_.basename($file_attachment['rename']), 0664);
+                            }
+                            $cm->ip_address = (int)ip2long(Tools::getRemoteAddr());
+                            $cm->user_agent = $_SERVER['HTTP_USER_AGENT'];
+                            if (!$cm->add()) {
+                                $this->errors[] = Tools::displayError('An error occurred while sending the message.');
+                            }
+                        } else {
                             $this->errors[] = Tools::displayError('An error occurred while sending the message.');
                         }
                     }
-                }
 
-                if (count($this->errors) > 1) {
-                    array_unique($this->errors);
-                } elseif (!count($this->errors)) {
-                    $this->context->smarty->assign('confirmation', 1);
+                    if (!count($this->errors)) {
+                        $var_list = array(
+                                        '{order_name}' => '-',
+                                        '{attached_file}' => '-',
+                                        '{message}' => Tools::nl2br(stripslashes($message)),
+                                        '{email}' =>  $from,
+                                        '{product_name}' => '',
+                                    );
+
+                        if (isset($file_attachment['name'])) {
+                            $var_list['{attached_file}'] = $file_attachment['name'];
+                        }
+
+                        $id_product = (int)Tools::getValue('id_product');
+
+                        if (isset($ct) && Validate::isLoadedObject($ct) && $ct->id_order) {
+                            $order = new Order((int)$ct->id_order);
+                            $var_list['{order_name}'] = $order->getUniqReference();
+                            $var_list['{id_order}'] = (int)$order->id;
+                        }
+
+                        if ($id_product) {
+                            $product = new Product((int)$id_product);
+                            if (Validate::isLoadedObject($product) && isset($product->name[Context::getContext()->language->id])) {
+                                $var_list['{product_name}'] = $product->name[Context::getContext()->language->id];
+                            }
+                        }
+
+                        if (!empty($contact->email)) {
+                            Mail::Send(
+                                $this->context->language->id,
+                                'contact',
+                                Mail::l('Message from contact form').' [no_sync]',
+                                $var_list,
+                                $contact->email,
+                                $contact->name,
+                                null,
+                                null,
+                                $file_attachment,
+                                null,
+                                _PS_MAIL_DIR_,
+                                false,
+                                null,
+                                null,
+                                $from
+                            );
+                        }
+                    }
+
+                    if (count($this->errors) > 1) {
+                        array_unique($this->errors);
+                    } elseif (!count($this->errors)) {
+                        Tools::redirect($this->context->link->getPageLink('contact', null, null, array('confirm' => 1)));
+                    }
                 }
             }
         }
@@ -313,6 +326,7 @@ class ContactControllerCore extends FrontController
             }
         }
         //End
+
         $this->setTemplate(_PS_THEME_DIR_.'contact-form.tpl');
     }
 
