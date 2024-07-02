@@ -50,9 +50,9 @@ class AdminCustomerPreferencesControllerCore extends AdminController
 
         $this->fields_options = array(
             'general' => array(
-                'title' =>    $this->l('General'),
-                'icon' =>    'icon-cogs',
-                'fields' =>    array(
+                'title' => $this->l('General'),
+                'icon' => 'icon-cogs',
+                'fields' => array(
                     'PS_REGISTRATION_PROCESS_TYPE' => array(
                         'title' => $this->l('Registration process type'),
                         'hint' => $this->l('The "Only account creation" registration option allows the customer to register faster, and create his/her address later.'),
@@ -121,6 +121,15 @@ class AdminCustomerPreferencesControllerCore extends AdminController
                         'cast' => 'intval',
                         'type' => 'bool'
                     ),
+                ),
+                'submit' => array(
+                    'title' => $this->l('Save'),
+                ),
+            ),
+            'customer_kpi' => array(
+                'title' => $this->l('Customer KPI configuration'),
+                'icon' => 'icon-cogs',
+                'fields' => array(
                     'PS_KPI_FREQUENT_CUSTOMER_NB_ORDERS' => array(
                         'title' => $this->l('Number of orders to use to calculate frequent customers'),
                         'hint' => $this->l('Set the number of orders to use to calculate frequent customers.'),
@@ -157,8 +166,10 @@ class AdminCustomerPreferencesControllerCore extends AdminController
                         'class' => 'fixed-width-xl',
                     ),
                 ),
-                'submit' => array('title' => $this->l('Save')),
-            ),
+                'submit' => array(
+                    'title' => $this->l('Save'),
+                ),
+            )
         );
     }
 
