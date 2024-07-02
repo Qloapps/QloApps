@@ -49,28 +49,39 @@
 	<div class="table-responsive wk-datatable-wrapper">
 		<table class="table table-bordered">
 			<tr>
+				<th>{l s='Rooms'}</th>
 				<th>{l s='Room type'}</th>
 				<th>{l s='Hotel'}</th>
 				<th>{l s='Duration'}</th>
-				<th>{l s='Num rooms'}</th>
 				<th>{l s='Total rooms price (tax incl.)'}</th>
 				<th>{l s='Extra services price (tax incl.)'}</th>
 				{if $isRefundCompleted}
 					<th>{l s='Refund amount'}</th>
+                    <th>{l s='Refund Status'}</th>
 				{/if}
 			</tr>
 
-			{foreach $refundReqBookings as $booking}
+            {foreach from=$refundReqBookings item=$booking name=refundRequest}
 				<tr>
+                    <td>{l s='Room'} - {$smarty.foreach.refundRequest.iteration|string_format:'%02d'}</td>
 					<td>{$booking['room_type_name']|escape:'htmlall':'UTF-8'}</td>
 					<td>{$booking['hotel_name']|escape:'htmlall':'UTF-8'}</td>
 					<td>{$booking['date_from']|date_format:"%d-%m-%Y"} {l s='To'} {$booking['date_to']|date_format:"%d-%m-%Y"}</td>
-					<td>{$booking['num_rooms']|escape:'htmlall':'UTF-8'}</td>
 					<td>{displayPrice price=$booking['total_price_tax_incl'] currency=$orderCurrency['id']}</td>
 					<td>{displayPrice price=$booking['extra_service_total_price_tax_incl'] currency=$orderCurrency['id']}</td>
 					{if $isRefundCompleted}
 						<td>
 							{displayPrice price=$booking['refunded_amount'] currency=$orderCurrency['id']}
+						</td>
+                        <td>
+                            {if $booking['is_cancelled']}
+                                <span class="badge badge-danger">{l s='Cancelled' mod='hotelreservationsystem'}</span>
+							{* used id_customization to check if in this request which bookings are refunded or not*}
+                            {else if $booking['id_customization']}
+                                <span class="badge badge-success">{l s='Refunded' mod='hotelreservationsystem'}</span>
+                            {else}
+                                <span class="badge badge-danger">{l s='Denied' mod='hotelreservationsystem'}</span>
+                            {/if}
 						</td>
 					{/if}
 				</tr>
@@ -83,12 +94,7 @@
 			<strong>{l s='Current refund state'} </strong>
 		</div>
 		<div class="col-sm-9 col-md-10">
-			<span class="badge wk-badge" style="background-color:{$currentStateInfo['color']|escape:'html':'UTF-8'}">
-				{if $isCanceled}
-					{l s='Cancelled'}
-				{else}
-					{$currentStateInfo['name']|escape:'html':'UTF-8'}
-				{/if}
+                <span class="badge wk-badge" style="background-color:{$currentStateInfo['color']|escape:'html':'UTF-8'}">{$currentStateInfo['name']|escape:'html':'UTF-8'}
 			</span>
 		</div>
 	</div>
