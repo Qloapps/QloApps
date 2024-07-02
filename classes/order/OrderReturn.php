@@ -177,9 +177,18 @@ class OrderReturnCore extends ObjectModel
         return (int)($data['total']);
     }
 
-    public function getOrderRefundRequestedBookings($idOrder, $idOrderReturn = 0, $onlyBookingIds = 0, $customerView = 0)
+    /**
+     * Get order refund requested bookings
+     * @param integer $idOrder
+     * @param integer $idOrderReturn
+     * @param integer $onlyBookingIds
+     * @param integer $customerView
+     * @param integer $skipReqCompletedNonRefunded: send 1 if you want to skip refund request completed but non-refunded booking
+     * @return array of refund requested bookings
+     */
+    public function getOrderRefundRequestedBookings($idOrder, $idOrderReturn = 0, $onlyBookingIds = 0, $customerView = 0, $skipReqCompletedNonRefunded = 0)
     {
-        $sql = 'SELECT hbd.*, ord.* FROM `'._DB_PREFIX_.'order_return` orr';
+        $sql = 'SELECT hbd.*, ord.*, orr.`state` as id_return_state FROM `'._DB_PREFIX_.'order_return` orr';
         $sql .= ' LEFT JOIN `'._DB_PREFIX_.'order_return_detail` ord ON (orr.`id_order_return` = ord.`id_order_return`)';
         $sql .= ' LEFT JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd ON (hbd.`id` = ord.`id_htl_booking`)';
         $sql .= ' WHERE orr.`id_order` = '.(int)$idOrder;
@@ -189,110 +198,120 @@ class OrderReturnCore extends ObjectModel
         }
 
         if ($returnDetails = Db::getInstance()->executeS($sql)) {
-            if ($onlyBookingIds) {
-                return array_column($returnDetails, 'id_htl_booking');
-            }
-
             if ($customerView) {
                 $returnsCustView = array();
             }
 
+            $objOrder = new Order($idOrder);
             $objBookingDemands = new HotelBookingDemands();
             $objRoomTypeServiceProductOrderDetail = new RoomTypeServiceProductOrderDetail();
-            $objOrder = new Order($idOrder);
 
             $calcServicePriceFirst = false;
             if ($objOrder->is_advance_payment && $objOrder->advance_paid_amount <= $objOrder->total_paid_real) {
                 $calcServicePriceFirst = true;
             }
 
-            foreach ($returnDetails as &$bookingRow) {
-                $bookingRow['extra_service_total_paid_amount'] = 0;
-                $bookingRow['extra_service_total_price_tax_incl'] = 0;
-                $bookingRow['room_paid_amount'] = 0;
-
-                $roomSelectedDemands = $objBookingDemands->getRoomTypeBookingExtraDemands(
-                    $idOrder,
-                    $bookingRow['id_product'],
-                    $bookingRow['id_room'],
-                    $bookingRow['date_from'],
-                    $bookingRow['date_to'],
-                    0
-                );
-                if (count($roomSelectedDemands)) {
-                    foreach ($roomSelectedDemands as $demand) {
-                        if ($demand['total_price_tax_incl'] > 0) {
-                            if ($objOrder->round_type == Order::ROUND_ITEM || $objOrder->round_type == Order::ROUND_LINE) {
-                                $demand['total_price_tax_incl'] = Tools::ps_round($demand['total_price_tax_incl'], _PS_PRICE_DISPLAY_PRECISION_);
-                            }
-                            if ($objOrder->total_paid_real > 0) {
-                                if ($calcServicePriceFirst) {
-                                    $bookingRow['extra_service_total_paid_amount'] += $demand['total_price_tax_incl'];
-                                } else {
-                                    $bookingRow['extra_service_total_paid_amount'] += ($objOrder->total_paid_real*$demand['total_price_tax_incl'])/($objOrder->total_paid_tax_incl + $objOrder->total_discounts_tax_incl);
-                                }
-                            }
-                            $bookingRow['extra_service_total_price_tax_incl'] += $demand['total_price_tax_incl'];
-                        }
+            foreach ($returnDetails as $key => &$bookingRow) {
+                if ($skipReqCompletedNonRefunded) {
+                    $objReturnState = new OrderReturnState($bookingRow['id_return_state']);
+                    if ($objReturnState->refunded && !$bookingRow['is_refunded']) {
+                        unset($returnDetails[$key]);
+                        continue;
                     }
                 }
 
-                if ($roomSelectedServices = $objRoomTypeServiceProductOrderDetail->getSelectedServicesForRoom(
-                    $bookingRow['id_htl_booking']
-                )) {
-                    if (count($roomSelectedServices['additional_services'])) {
-                        foreach ($roomSelectedServices['additional_services'] as $service) {
-                            if ($service['total_price_tax_incl'] > 0) {
+                if (!$onlyBookingIds) {
+                    $bookingRow['extra_service_total_paid_amount'] = 0;
+                    $bookingRow['extra_service_total_price_tax_incl'] = 0;
+                    $bookingRow['room_paid_amount'] = 0;
+
+                    $roomSelectedDemands = $objBookingDemands->getRoomTypeBookingExtraDemands(
+                        $idOrder,
+                        $bookingRow['id_product'],
+                        $bookingRow['id_room'],
+                        $bookingRow['date_from'],
+                        $bookingRow['date_to'],
+                        0
+                    );
+                    if (count($roomSelectedDemands)) {
+                        foreach ($roomSelectedDemands as $demand) {
+                            if ($demand['total_price_tax_incl'] > 0) {
                                 if ($objOrder->round_type == Order::ROUND_ITEM || $objOrder->round_type == Order::ROUND_LINE) {
-                                    $service['total_price_tax_incl'] = Tools::ps_round($service['total_price_tax_incl'], _PS_PRICE_DISPLAY_PRECISION_);
+                                    $demand['total_price_tax_incl'] = Tools::ps_round($demand['total_price_tax_incl'], _PS_PRICE_DISPLAY_PRECISION_);
                                 }
                                 if ($objOrder->total_paid_real > 0) {
                                     if ($calcServicePriceFirst) {
-                                        $bookingRow['extra_service_total_paid_amount'] += $service['total_price_tax_incl'];
+                                        $bookingRow['extra_service_total_paid_amount'] += $demand['total_price_tax_incl'];
                                     } else {
-                                        $bookingRow['extra_service_total_paid_amount'] += ($objOrder->total_paid_real*$service['total_price_tax_incl'])/($objOrder->total_paid_tax_incl + $objOrder->total_discounts_tax_incl);
+                                        $bookingRow['extra_service_total_paid_amount'] += ($objOrder->total_paid_real*$demand['total_price_tax_incl'])/($objOrder->total_paid_tax_incl + $objOrder->total_discounts_tax_incl);
                                     }
-
                                 }
-                                $bookingRow['extra_service_total_price_tax_incl'] += $service['total_price_tax_incl'];
+                                $bookingRow['extra_service_total_price_tax_incl'] += $demand['total_price_tax_incl'];
                             }
                         }
                     }
-                }
-                if ($bookingRow['total_price_tax_incl'] > 0) {
-                    if ($objOrder->round_type == Order::ROUND_ITEM || $objOrder->round_type == Order::ROUND_LINE) {
-                        $bookingRow['total_price_tax_incl'] = Tools::ps_round($bookingRow['total_price_tax_incl'], _PS_PRICE_DISPLAY_PRECISION_);
+
+                    if ($roomSelectedServices = $objRoomTypeServiceProductOrderDetail->getSelectedServicesForRoom(
+                        $bookingRow['id_htl_booking']
+                    )) {
+                        if (count($roomSelectedServices['additional_services'])) {
+                            foreach ($roomSelectedServices['additional_services'] as $service) {
+                                if ($service['total_price_tax_incl'] > 0) {
+                                    if ($objOrder->round_type == Order::ROUND_ITEM || $objOrder->round_type == Order::ROUND_LINE) {
+                                        $service['total_price_tax_incl'] = Tools::ps_round($service['total_price_tax_incl'], _PS_PRICE_DISPLAY_PRECISION_);
+                                    }
+                                    if ($objOrder->total_paid_real > 0) {
+                                        if ($calcServicePriceFirst) {
+                                            $bookingRow['extra_service_total_paid_amount'] += $service['total_price_tax_incl'];
+                                        } else {
+                                            $bookingRow['extra_service_total_paid_amount'] += ($objOrder->total_paid_real*$service['total_price_tax_incl'])/($objOrder->total_paid_tax_incl + $objOrder->total_discounts_tax_incl);
+                                        }
+                                    }
+                                    $bookingRow['extra_service_total_price_tax_incl'] += $service['total_price_tax_incl'];
+                                }
+                            }
+                        }
                     }
-                    if ($objOrder->total_paid_real > 0) {
-                        if ($calcServicePriceFirst) {
-                            $totalRoomShare = ($objOrder->total_paid_real*($bookingRow['total_price_tax_incl'] + $bookingRow['extra_service_total_price_tax_incl'])/ ($objOrder->total_paid_tax_incl + $objOrder->total_discounts_tax_incl));
-                            $bookingRow['room_paid_amount'] += $totalRoomShare - $bookingRow['extra_service_total_price_tax_incl'];
+                    if ($bookingRow['total_price_tax_incl'] > 0) {
+                        if ($objOrder->round_type == Order::ROUND_ITEM || $objOrder->round_type == Order::ROUND_LINE) {
+                            $bookingRow['total_price_tax_incl'] = Tools::ps_round($bookingRow['total_price_tax_incl'], _PS_PRICE_DISPLAY_PRECISION_);
+                        }
+                        if ($objOrder->total_paid_real > 0) {
+                            if ($calcServicePriceFirst) {
+                                $totalRoomShare = ($objOrder->total_paid_real*($bookingRow['total_price_tax_incl'] + $bookingRow['extra_service_total_price_tax_incl'])/ ($objOrder->total_paid_tax_incl + $objOrder->total_discounts_tax_incl));
+                                $bookingRow['room_paid_amount'] += $totalRoomShare - $bookingRow['extra_service_total_price_tax_incl'];
+                            } else {
+                                $bookingRow['room_paid_amount'] = ($objOrder->total_paid_real*$bookingRow['total_price_tax_incl'])/ ($objOrder->total_paid_tax_incl + $objOrder->total_discounts_tax_incl);
+                            }
+                        }
+                    }
+                    if ($customerView) {
+                        $dateJoin = $bookingRow['id_product'].'_'.strtotime($bookingRow['date_from']).strtotime($bookingRow['date_to']);
+                        if (isset($returnsCustView[$dateJoin]['num_rooms'])) {
+                            $returnsCustView[$dateJoin]['num_rooms'] += 1;
+                            $returnsCustView[$dateJoin]['refunded_amount'] += $bookingRow['refunded_amount'];
+                            $returnsCustView[$dateJoin]['total_price_tax_incl'] += $bookingRow['total_price_tax_incl'];
+                            $returnsCustView[$dateJoin]['total_paid_amount'] += $bookingRow['total_paid_amount'];
                         } else {
-                            $bookingRow['room_paid_amount'] = ($objOrder->total_paid_real*$bookingRow['total_price_tax_incl'])/ ($objOrder->total_paid_tax_incl + $objOrder->total_discounts_tax_incl);
+                            unset($bookingRow['id_room']);
+                            unset($bookingRow['room_num']);
+                            unset($bookingRow['id_htl_booking']);
+                            $returnsCustView[$dateJoin] = $bookingRow;
+                            $returnsCustView[$dateJoin]['num_rooms'] = 1;
                         }
                     }
                 }
-
-                if ($customerView) {
-                    $dateJoin = $bookingRow['id_product'].'_'.strtotime($bookingRow['date_from']).strtotime($bookingRow['date_to']);
-                    if (isset($returnsCustView[$dateJoin]['num_rooms'])) {
-                        $returnsCustView[$dateJoin]['num_rooms'] += 1;
-                        $returnsCustView[$dateJoin]['refunded_amount'] += $bookingRow['refunded_amount'];
-                        $returnsCustView[$dateJoin]['total_price_tax_incl'] += $bookingRow['total_price_tax_incl'];
-                        $returnsCustView[$dateJoin]['total_paid_amount'] += $bookingRow['total_paid_amount'];
-                    } else {
-                        unset($bookingRow['id_room']);
-                        unset($bookingRow['room_num']);
-                        unset($bookingRow['id_htl_booking']);
-                        $returnsCustView[$dateJoin] = $bookingRow;
-                        $returnsCustView[$dateJoin]['num_rooms'] = 1;
-                    }
-                }
             }
+
+            if ($onlyBookingIds) {
+                return array_column($returnDetails, 'id_htl_booking');
+            }
+
             if ($customerView) {
                 return $returnsCustView;
             }
         }
+
         return $returnDetails;
     }
 
@@ -328,8 +347,21 @@ class OrderReturnCore extends ObjectModel
         return $data;
     }
 
-    public static function getOrdersReturnDetail($idOrder, $idOrderReturn = 0, $idHtlBooking = 0, $idLang = 0)
-    {
+    /**
+     * @param $idOrder
+     * @param int $idOrderReturn
+     * @param int $idHtlBooking
+     * @param int $idLang
+     * @param int $orderByLatestRequest : If you want to return request with in the Desc order of refund requests
+     * @return array
+     */
+    public static function getOrdersReturnDetail(
+        $idOrder,
+        $idOrderReturn = 0,
+        $idHtlBooking = 0,
+        $idLang = 0,
+        $orderByLatestRequest = 1
+    ) {
         if (!$idLang) {
             $idLang = Context::getContext()->language->id;
         }
@@ -345,6 +377,10 @@ class OrderReturnCore extends ObjectModel
 
         if ($idHtlBooking) {
             $sql .= ' AND ord.`id_htl_booking` = '.(int)$idHtlBooking;
+        }
+
+        if ($orderByLatestRequest) {
+            $sql .= ' ORDER BY orr.`id_order_return` DESC';
         }
 
         return Db::getInstance()->executeS($sql);
@@ -480,8 +516,8 @@ class OrderReturnCore extends ObjectModel
                         '{order_reference}' => $objOrder->reference,
                         '{order_date}' => date('Y-m-d h:i:s', strtotime($objOrder->date_add)),
                         '{refunded_amount}' => Tools::displayPrice($this->refunded_amount, new Currency($objOrder->id_currency)),
-                        '{payment_mode}' => $this->payment_mode,
-                        '{id_transaction}' => $this->id_transaction,
+                        '{payment_mode}' => $this->payment_mode ? $this->payment_mode : '--',
+                        '{id_transaction}' => $this->id_transaction ? $this->id_transaction : '--',
                     );
 
                     // if mail is true for the customer then send mail to customer with selected template
@@ -511,7 +547,7 @@ class OrderReturnCore extends ObjectModel
                         Mail::Send(
                             (int)$idLang,
                             $objOrderReturnState->customer_template,
-                            $objOrderReturnState->name,
+                            sprintf(Mail::l('Refund %s', (int)$idLang), $objOrderReturnState->name),
                             $data,
                             $objCustomer->email,
                             $objCustomer->firstname.' '.$objCustomer->lastname,
@@ -554,7 +590,7 @@ class OrderReturnCore extends ObjectModel
                                         Mail::Send(
                                             (int)$idLang,
                                             $objOrderReturnState->admin_template,
-                                            $objOrderReturnState->name,
+                                            sprintf(Mail::l('Refund %s', (int)$idLang), $objOrderReturnState->name),
                                             $data,
                                             $superAdminEmployee['email'],
                                             $superAdminEmployee['firstname'].' '.$superAdminEmployee['lastname'],
@@ -584,7 +620,7 @@ class OrderReturnCore extends ObjectModel
                                 Mail::Send(
                                     (int)$idLang,
                                     $objOrderReturnState->admin_template,
-                                    $objOrderReturnState->name,
+                                    sprintf(Mail::l('Refund %s', (int)$idLang), $objOrderReturnState->name),
                                     $data,
                                     $objHotel->email,
                                     null,
@@ -616,7 +652,7 @@ class OrderReturnCore extends ObjectModel
                                                         Mail::Send(
                                                             (int)$idLang,
                                                             $objOrderReturnState->admin_template,
-                                                            $objOrderReturnState->name,
+                                                            sprintf(Mail::l('Refund %s', (int)$idLang), $objOrderReturnState->name),
                                                             $data,
                                                             $empl['email'],
                                                             $empl['firstname'].' '.$empl['lastname'],
