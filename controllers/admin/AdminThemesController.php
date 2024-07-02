@@ -186,8 +186,8 @@ class AdminThemesControllerCore extends AdminController
                         'thumb' => $this->context->link->getMediaLink(_PS_IMG_.Configuration::get('PS_FAVICON').(Tools::getValue('conf') ? sprintf('?%04d', rand(0, 9999)) : ''))
                     ),
                     'PS_STORES_ICON' => array(
-                        'title' => $this->l('Store icon'),
-                        'hint' => $this->l('Will appear on the store locator (inside Google Maps).').'<br />'.$this->l('Suggested size: 30x30, transparent GIF.'),
+                        'title' => $this->l('Location icon'),
+                        'hint' => $this->l('Will appear at hotel locations on Google Maps.').'<br />'.$this->l('Suggested size: 30x30, transparent GIF.'),
                         'type' => 'file',
                         'name' => 'PS_STORES_ICON',
                         'tab' => 'icons',
