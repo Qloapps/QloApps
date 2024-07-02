@@ -1040,7 +1040,7 @@ class AdminCustomersControllerCore extends AdminController
             $this->redirect_after = false;
         }
         // Check that the new email is not already in use
-        $customer_email = strval(Tools::getValue('email'));
+        $customer_email = trim(strval(Tools::getValue('email')));
         $customer = new Customer();
         if (Validate::isEmail($customer_email)) {
             $customer->getByEmail($customer_email);
@@ -1049,7 +1049,7 @@ class AdminCustomersControllerCore extends AdminController
             $this->errors[] = Tools::displayError('An account already exists for this email address:').' '.$customer_email;
             $this->display = 'edit';
             return $customer;
-        } elseif (trim(Customer::customerExists($customer_email, false, true))) {
+        } elseif (Customer::customerExists($customer_email, false, true)) {
             $this->errors[] = Tools::displayError('The email is already associated with a banned account. Please use a different one.');
             $this->display = 'edit';
         } elseif (trim(Tools::getValue('passwd')) == '') {
@@ -1066,7 +1066,7 @@ class AdminCustomersControllerCore extends AdminController
     public function processUpdate()
     {
         if (Validate::isLoadedObject($this->object)) {
-            $customer_email = strval(Tools::getValue('email'));
+            $customer_email = trim(strval(Tools::getValue('email')));
 
             // check if e-mail already used
             if ($customer_email != $this->object->email) {
@@ -1298,7 +1298,7 @@ class AdminCustomersControllerCore extends AdminController
         $response = array(
             'status' => true
         );
-        if ($email = Tools::getValue('email')) {
+        if ($email = trim(strval(Tools::getValue('email')))) {
             $newIdCustomer = Tools::getValue('id_customer', 0);
             $oldIdCustomer = Customer::customerExists($email, true, false);
             if ($oldIdCustomer) { // means that the account exists.
