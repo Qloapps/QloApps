@@ -39,8 +39,7 @@ p {
     cursor: pointer;
 }
 
-.hiddendiv {
-    display: none;
+.login-form-wrap {
     width: 300px;
 }
 

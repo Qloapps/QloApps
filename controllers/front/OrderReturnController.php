@@ -50,22 +50,23 @@ class OrderReturnControllerCore extends FrontController
                     $objOrder = new Order($objOrderReturn->id_order);
                     $orderCurrency = new Currency($objOrder->id_currency);
 
-                    $refundReqBookings = $objOrderReturn->getOrderRefundRequestedBookings($objOrderReturn->id_order, $objOrderReturn->id, 0, 1);
-                    $isCanceled = false;
+                    $refundReqBookings = $objOrderReturn->getOrderRefundRequestedBookings($objOrderReturn->id_order, $objOrderReturn->id);
+                    $isCanceledBookings = false;
                     if (count(array_unique(array_column($refundReqBookings, 'is_cancelled'))) === 1
                         && array_unique(array_column($refundReqBookings, 'is_cancelled'))[0] != 0
                     ) {
-                        $isCanceled = true;
+                        $isCanceledBookings = true;
                     }
                     $voucher = '';
                     if (Validate::isLoadedObject($objCartRule = new CartRule($objOrderReturn->id_return_type))) {
                         $voucher = $objCartRule->name[$this->context->language->id];
                     }
+
                     $this->context->smarty->assign(
                         array (
                             'orderReturnInfo' => (array)$objOrderReturn,
                             'refundReqBookings' => $refundReqBookings,
-                            'isCanceled' => $isCanceled,
+                            'isCanceledBookings' => $isCanceledBookings,
                             'orderInfo' => (array) $objOrder,
                             'orderCurrency' => (array) $orderCurrency,
                             'currentStateInfo' => (array) new OrderReturnState($objOrderReturn->state,
