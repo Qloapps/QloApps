@@ -51,9 +51,16 @@ class WkRoomSearchBlock extends Module
             $objHotelBranchInformation = new HotelBranchInformation();
             $hotelBranchesInfo = $objHotelBranchInformation->hotelBranchesInfo(0, 1);
             if (is_array($hotelBranchesInfo) && count($hotelBranchesInfo)) {
+                $this->context->controller->addJS(_PS_JS_DIR_.'jquery/plugins/jquery.chosen.js');
+                $this->context->controller->addCSS($this->_path.'/views/css/chosen.css');
+
                 $this->context->controller->addCSS($this->_path.'/views/css/wk-global-search.css');
                 $this->context->controller->addJS($this->_path.'/views/js/wk-room-search-block.js');
 
+                $isOccupancyWiseSearch = false;
+                if (Configuration::get('PS_FRONT_SEARCH_TYPE') == HotelBookingDetail::SEARCH_TYPE_OWS) {
+                    $isOccupancyWiseSearch = true;
+                }
                 Media::addJsDef(
                     array (
                         'autocomplete_search_url' => $this->context->link->getModuleLink(
@@ -66,6 +73,7 @@ class WkRoomSearchBlock extends Module
                         'check_out_time_cond' => $this->l('Please enter Check Out time', false, true),
                         'less_checkin_date' => $this->l('Check In date can not be before current date.', false, true),
                         'more_checkout_date' => $this->l('Check Out date must be greater than Check In date.', false, true),
+                        'hotel_location_txt' => $this->l('Hotel Location', false, true),
                         'select_htl_txt' => $this->l('Select Hotel', false, true),
                         'select_age_txt' => $this->l('Select age', false, true),
                         'under_1_age' => $this->l('Under 1', false, true),
@@ -80,6 +88,9 @@ class WkRoomSearchBlock extends Module
                         'years_txt' => $this->l('years', false, true),
                         'all_children_txt' => $this->l('All Children', false, true),
                         'invalid_occupancy_txt' => $this->l('Invalid occupancy(adults/children) found.', false, true),
+                        'hotel_name_has_search' => count($hotelBranchesInfo) >= Configuration::get('WK_HOTEL_NAME_SEARCH_THRESHOLD'),
+                        'search_auto_focus_next_field' => (bool) Configuration::get('WK_SEARCH_AUTO_FOCUS_NEXT_FIELD'),
+                        'is_occupancy_wise_search' => $isOccupancyWiseSearch,
                     )
                 );
             }
@@ -116,7 +127,10 @@ class WkRoomSearchBlock extends Module
     // In the xs sceen the booking button on the landing page
     public function hookDisplayAfterHeaderHotelDesc()
     {
-        return $this->display(__FILE__, 'landingPageXsBtn.tpl');
+        $objHotelInfo = new HotelBranchInformation();
+        if ($objHotelInfo->hotelBranchesInfo(0, 1)) {
+            return $this->display(__FILE__, 'landingPageXsBtn.tpl');
+        }
     }
 
     // search panel block on the category page on left block
