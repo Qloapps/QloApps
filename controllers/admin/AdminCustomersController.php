@@ -509,7 +509,7 @@ class AdminCustomersControllerCore extends AdminController
         );
 
         // if we add a customer via fancybox (ajax), it's a customer and he doesn't need to be added to the visitor and guest groups
-        if (Tools::isSubmit('addcustomer') && Tools::isSubmit('submitFormAjax')) {
+        if (Tools::isSubmit('submitFormAjax')) {
             $visitor_group = Configuration::get('PS_UNIDENTIFIED_GROUP');
             $guest_group = Configuration::get('PS_GUEST_GROUP');
             foreach ($groups as $key => $g) {
