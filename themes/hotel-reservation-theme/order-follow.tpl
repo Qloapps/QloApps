@@ -61,13 +61,7 @@
 								{$return.total_rooms|escape:'html':'UTF-8'}
 							</td>
 							<td>
-								<span class="badge wk-badge" style="background-color:{$return.state_color|escape:'html':'UTF-8'}">
-									{if $return.is_cancelled}
-										{l s='Cancelled'}
-									{else}
-										{$return.state_name|escape:'html':'UTF-8'}
-									{/if}
-								</span>
+                                <span class="badge wk-badge" style="background-color:{$return.state_color|escape:'html':'UTF-8'}">{$return.state_name|escape:'html':'UTF-8'}
 							</td>
 							<td>
 								{dateFormat date=$return.date_add full=0}
