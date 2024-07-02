@@ -337,7 +337,7 @@ class HelperListCore extends Helper
             }
         }
 
-        foreach ($this->fields_list as $key => $params) {
+        foreach ($this->fields_list as $key => $field) {
             if (isset($field['optional']) && $field['optional']) {
                 $this->fields_optional[$key] = $field;
             }
@@ -733,8 +733,8 @@ class HelperListCore extends Helper
             }
             if (isset($field['optional']) && $field['optional']) {
                 $this->fields_optional[$key] = $field;
-                if ((empty($list_visibility) && isset($field['visible_default']) && $field['visible_default'])
-                    || $list_visibility && in_array($key , $list_visibility)
+                if ((!is_array($list_visibility) && isset($field['visible_default']) && $field['visible_default'])
+                    || ($list_visibility && in_array($key , $list_visibility))
                 ) {
                     $this->fields_optional[$key]['selected'] = true;
                 }
