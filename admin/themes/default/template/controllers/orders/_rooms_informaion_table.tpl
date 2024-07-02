@@ -33,7 +33,7 @@
                             <th><span class="title_box">{l s='Extra Services/Fee (Tax excl.)'}</span></th>
                             <th><span class="title_box">{l s='Total Tax'}</span></th>
                             <th><span class="title_box">{l s='Total Price (Tax incl.)'}</span></th>
-                            {if (isset($refundReqBookings) && $refundReqBookings) || (isset($isCancelledRoom) && $isCancelledRoom)}
+                            {if (isset($refundReqBookings) && $refundReqBookings)}
                                 <th><span class="title_box">{l s='Refund/Cancel Status'}</span></th>
                                 <th><span class="title_box">{l s='Refunded amount'}</span></th>
                             {/if}

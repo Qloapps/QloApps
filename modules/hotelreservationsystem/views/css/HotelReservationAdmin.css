@@ -596,3 +596,11 @@ body.adminhotelroomsbooking .ui-tooltip {
     padding: 10px;
     box-shadow: 0px 0px 15px 0px #00000026;
 }
+
+#room-reallocation-modal .modal-footer {
+	padding: 15px 0px 0px 0px
+}
+#room-reallocation-modal .modal-body, #room-reallocation-modal .tab-content {
+	padding: 15px;
+	border: 1px solid #ddd
+}
