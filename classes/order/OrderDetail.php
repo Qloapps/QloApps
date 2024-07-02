@@ -857,4 +857,103 @@ class OrderDetailCore extends ObjectModel
 
         return $wholesale_price;
     }
+
+    /**
+     * @param OrderDetail $order_detail
+     * @param int $qty_cancel_product
+     * @param bool $delete
+     */
+    public function reinjectQuantity($order_detail, $qty_cancel_product, $delete = false)
+    {
+        $errors = array();
+        $context = Context::getContext();
+        // Reinject product
+        $reinjectable_quantity = (int)$order_detail->product_quantity - (int)$order_detail->product_quantity_reinjected;
+        $quantity_to_reinject = $qty_cancel_product > $reinjectable_quantity ? $reinjectable_quantity : $qty_cancel_product;
+        // @since 1.5.0 : Advanced Stock Management
+        $product_to_inject = new Product($order_detail->product_id, false, (int)$context->language->id, (int)$order_detail->id_shop);
+
+        $product = new Product($order_detail->product_id, false, (int)$context->language->id, (int)$order_detail->id_shop);
+
+        if (Configuration::get('PS_ADVANCED_STOCK_MANAGEMENT') && $product->advanced_stock_management && $order_detail->id_warehouse != 0) {
+            $manager = StockManagerFactory::getManager();
+            $movements = StockMvt::getNegativeStockMvts(
+                $order_detail->id_order,
+                $order_detail->product_id,
+                $order_detail->product_attribute_id,
+                $quantity_to_reinject
+            );
+            $left_to_reinject = $quantity_to_reinject;
+            foreach ($movements as $movement) {
+                if ($left_to_reinject > $movement['physical_quantity']) {
+                    $quantity_to_reinject = $movement['physical_quantity'];
+                }
+
+                $left_to_reinject -= $quantity_to_reinject;
+                if (Pack::isPack((int)$product->id)) {
+                    // Gets items
+                    if ($product->pack_stock_type == 1 || $product->pack_stock_type == 2 || ($product->pack_stock_type == 3 && Configuration::get('PS_PACK_STOCK_TYPE') > 0)) {
+                        $products_pack = Pack::getItems((int)$product->id, (int)Configuration::get('PS_LANG_DEFAULT'));
+                        // Foreach item
+                        foreach ($products_pack as $product_pack) {
+                            if ($product_pack->advanced_stock_management == 1) {
+                                $manager->addProduct(
+                                    $product_pack->id,
+                                    $product_pack->id_pack_product_attribute,
+                                    new Warehouse($movement['id_warehouse']),
+                                    $product_pack->pack_quantity * $quantity_to_reinject,
+                                    null,
+                                    $movement['price_te'],
+                                    true
+                                );
+                            }
+                        }
+                    }
+                    if ($product->pack_stock_type == 0 || $product->pack_stock_type == 2 ||
+                            ($product->pack_stock_type == 3 && (Configuration::get('PS_PACK_STOCK_TYPE') == 0 || Configuration::get('PS_PACK_STOCK_TYPE') == 2))) {
+                        $manager->addProduct(
+                            $order_detail->product_id,
+                            $order_detail->product_attribute_id,
+                            new Warehouse($movement['id_warehouse']),
+                            $quantity_to_reinject,
+                            null,
+                            $movement['price_te'],
+                            true
+                        );
+                    }
+                } else {
+                    $manager->addProduct(
+                        $order_detail->product_id,
+                        $order_detail->product_attribute_id,
+                        new Warehouse($movement['id_warehouse']),
+                        $quantity_to_reinject,
+                        null,
+                        $movement['price_te'],
+                        true
+                    );
+                }
+            }
+
+            $id_product = $order_detail->product_id;
+            if ($delete) {
+                $order_detail->delete();
+            }
+            StockAvailable::synchronize($id_product);
+        } elseif ($order_detail->id_warehouse == 0) {
+            StockAvailable::updateQuantity(
+                $order_detail->product_id,
+                $order_detail->product_attribute_id,
+                $quantity_to_reinject,
+                $order_detail->id_shop
+            );
+
+            if ($delete) {
+                $order_detail->delete();
+            }
+        } else {
+            $errors[] = Tools::displayError('This product cannot be re-stocked.');
+        }
+
+        return $errors;
+    }
 }
