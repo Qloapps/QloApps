@@ -193,18 +193,22 @@
 		</div>
 		{/if}
 	</td>
-	{if (isset($refundReqBookings) && $refundReqBookings) || (isset($isCancelledRoom) && $isCancelledRoom)}
+	{if (isset($refundReqBookings) && $refundReqBookings)}
 		<td>
-			{if $data.is_cancelled}
-				<span class="badge badge-danger">{l s='Cancelled'}</span>
-			{elseif isset($data.refund_info) && $data.refund_info}
-				<span class="badge" style="background-color:{$data.refund_info.color|escape:'html':'UTF-8'}">{$data.refund_info.name|escape:'html':'UTF-8'}</span>
+            {if $data.id|in_array:$refundReqBookings}
+			    {if $data.is_cancelled}
+				    <span class="badge badge-danger">{l s='Cancelled'}</span>
+			    {elseif isset($data.refund_info) && (!$data.refund_info.refunded || $data.refund_info.id_customization)}
+				    <span class="badge" style="background-color:{$data.refund_info.color|escape:'html':'UTF-8'}">{$data.refund_info.name|escape:'html':'UTF-8'}</span>
+                {else}
+	    			<span>--</span>
+                {/if}
 			{else}
-				<span>--</span>
-			{/if}
+                <span>--</span>
+            {/if}
 		</td>
 		<td>
-			{if isset($data.refund_info) && $data.refund_info}
+			{if $data.is_refunded && isset($data.refund_info) && $data.refund_info}
 				{convertPriceWithCurrency price=$data.refund_info.refunded_amount currency=$currency->id}
             {else}
 				--

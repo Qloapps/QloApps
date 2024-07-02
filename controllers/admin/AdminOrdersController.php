@@ -494,11 +494,14 @@ class AdminOrdersControllerCore extends AdminController
                 );
 
                 if (((int) $order->isReturnable()) && !$order->hasCompletelyRefunded(Order::ORDER_COMPLETE_CANCELLATION_OR_REFUND_REQUEST_FLAG)) {
+                    $orderTotalPaid = $order->getTotalPaid();
+                    $orderDiscounts = $order->getCartRules();
+                    $hasOrderDiscountOrPayment = ((float)$orderTotalPaid > 0 || $orderDiscounts) ? true : false;
                     $this->toolbar_btn['cancel'] = array(
-                        'short' => ((float) $order->getTotalPaid()) ? $this->l('Refund') : $this->l('Cancel'),
+                        'short' => ($hasOrderDiscountOrPayment) ? $this->l('Refund') : $this->l('Cancel'),
                         'href' => '#refundForm',
                         'id' => 'desc-order-standard_refund',
-                        'desc' => ((float) $order->getTotalPaid()) ? $this->l('Initiate refund') : $this->l('Cancel bookings'),
+                        'desc' => ($hasOrderDiscountOrPayment) ? $this->l('Initiate refund') : $this->l('Cancel bookings'),
                         'class' => 'icon-exchange',
                         'target' => true,
                     );
@@ -938,7 +941,7 @@ class AdminOrdersControllerCore extends AdminController
             // get booking information by order
             $objBookingDetail = new HotelBookingDetail();
             $objOrderReturn = new OrderReturn();
-            $refundReqBookings = $objOrderReturn->getOrderRefundRequestedBookings($objOrder->id, 0, 1);
+            $refundReqBookings = $objOrderReturn->getOrderRefundRequestedBookings($objOrder->id, 0, 1, 0, 1);
             if ($bookingOrderInfo = $objBookingDetail->getBookingDataByOrderId($objOrder->id)) {
                 foreach($bookingOrderInfo as $key => $booking) {
                     if ((in_array($booking['id'], $refundReqBookings)) || $booking['is_refunded']) {
@@ -946,6 +949,7 @@ class AdminOrdersControllerCore extends AdminController
                     }
                 }
             }
+
             $this->context->smarty->assign(
                 array(
                     'order' => $objOrder,
@@ -958,15 +962,18 @@ class AdminOrdersControllerCore extends AdminController
                 'modal_class' => 'modal-md order_detail_modal',
                 'modal_title' => '<i class="icon icon-exchange"></i> &nbsp'.$this->l('Cancel Bookings'),
                 'modal_content' => $this->context->smarty->fetch('controllers/orders/modals/_cancel_room_bookings.tpl'),
-                'modal_actions' => array(
+            );
+
+            if ($bookingOrderInfo) {
+                $modal['modal_actions'] = array(
                     array(
                         'type' => 'button',
                         'value' => 'submitCancelBooking',
                         'class' => 'submitCancelBooking btn-primary pull-right',
                         'label' => '<i class="icon-exchange"></i> '.$this->l('Cancel Bookings'),
-                    ),
-                ),
-            );
+                    )
+                );
+            }
 
             $this->context->smarty->assign($modal);
             $response['hasError'] = 0;
@@ -1375,19 +1382,22 @@ class AdminOrdersControllerCore extends AdminController
                     }
                 }
             } else {
-                $this->errors[] = Tools::displayError('You do not have permission to delete this.');
+                $this->errors[] = Tools::displayError('You do not have permission to edit this.');
             }
         }
 
         /* booking refunds from order */
         elseif (Tools::isSubmit('initiateRefund') && isset($order)) {
-            if ($this->tabAccess['delete'] === '1') {
+            if ($this->tabAccess['edit'] === '1') {
                 $bookings = Tools::getValue('id_htl_booking');
                 if ($bookings && count($bookings)) {
                     foreach ($bookings as $idHtlBooking) {
-                        if (OrderReturn::getOrdersReturnDetail($order->id, 0, $idHtlBooking)) {
-                            $this->errors[] = Tools::displayError('Wrong bookings found for booking cancelation.');
-                            break;
+                        if ($bookingRefundDetail = OrderReturn::getOrdersReturnDetail($order->id, 0, $idHtlBooking)) {
+                            $bookingRefundDetail = reset($bookingRefundDetail);
+                            if (!$bookingRefundDetail['refunded']) {
+                                $this->errors[] = Tools::displayError('Wrong bookings found for booking cancelation.');
+                                break;
+                            }
                         }
                     }
                 } else {
@@ -1399,50 +1409,65 @@ class AdminOrdersControllerCore extends AdminController
                 }
 
                 if (!count($this->errors)) {
-                    // if amount paid is > 0 then create refund request else cancel the booking directly
-                    if ($order->getTotalPaid() > 0) {
-                        $objOrderReturn = new OrderReturn();
-                        $objOrderReturn->id_customer = $order->id_customer;
-                        $objOrderReturn->id_order = $order->id;
-                        $objOrderReturn->state = Configuration::get('PS_ORS_PENDING');
-                        $objOrderReturn->by_admin = 1;
-                        $objOrderReturn->question = $refundReason;
-                        $objOrderReturn->save();
-                        if ($objOrderReturn->id) {
-                            foreach ($bookings as $idHtlBooking) {
-                                $objHtlBooking = new HotelBookingDetail($idHtlBooking);
-                                $numDays = $objHtlBooking->getNumberOfDays(
-                                    $objHtlBooking->date_from,
-                                    $objHtlBooking->date_to
-                                );
-                                $objOrderReturnDetail = new OrderReturnDetail();
-                                $objOrderReturnDetail->id_order_return = $objOrderReturn->id;
-                                $objOrderReturnDetail->id_order_detail = $objHtlBooking->id_order_detail;
-                                $objOrderReturnDetail->product_quantity = $numDays;
-                                $objOrderReturnDetail->id_htl_booking = $idHtlBooking;
-                                $objOrderReturnDetail->save();
+                    // create refund request
+                    $objOrderReturn = new OrderReturn();
+                    $objOrderReturn->id_customer = $order->id_customer;
+                    $objOrderReturn->id_order = $order->id;
+                    $objOrderReturn->state = 0;
+                    $objOrderReturn->by_admin = 1;
+                    $objOrderReturn->question = $refundReason;
+                    $objOrderReturn->refunded_amount = 0;
+                    $objOrderReturn->save();
+                    if ($objOrderReturn->id) {
+                        foreach ($bookings as $idHtlBooking) {
+                            $objHtlBooking = new HotelBookingDetail($idHtlBooking);
+                            $numDays = $objHtlBooking->getNumberOfDays(
+                                $objHtlBooking->date_from,
+                                $objHtlBooking->date_to
+                            );
+                            $objOrderReturnDetail = new OrderReturnDetail();
+                            $objOrderReturnDetail->id_order_return = $objOrderReturn->id;
+                            $objOrderReturnDetail->id_order_detail = $objHtlBooking->id_order_detail;
+                            $objOrderReturnDetail->product_quantity = $numDays;
+                            $objOrderReturnDetail->id_htl_booking = $idHtlBooking;
+                            $objOrderReturnDetail->refunded_amount = 0;
+                            if (!$order->getCartRules() && $order->getTotalPaid() <= 0) {
+                                $objOrderReturnDetail->id_customization = 1;
                             }
+                            $objOrderReturnDetail->save();
                         }
-                    } else {
-                        // cancel the booking directly
+                    }
+
+                    // Change order refund state
+                    // Emails to customer, superadmin and employees on refund request state change
+                    $objOrderReturn->changeIdOrderReturnState(Configuration::get('PS_ORS_PENDING'));
+
+                    // process direct cancellations
+                    if (!$order->getCartRules() && $order->getTotalPaid() <= 0) {
+                        // Process refund in booking tables
                         foreach ($bookings as $idHtlBooking) {
                             $objHtlBooking = new HotelBookingDetail($idHtlBooking);
                             if (!$objHtlBooking->processRefundInBookingTables()) {
                                 $this->errors[] = Tools::displayError('An error occurred while cancelling the booking.');
-                            } else {
-                                // set the message for the cancellation
-                                $message = $this->l('Room').': '.$objHtlBooking->room_num.', '.$objHtlBooking->room_type_name.' '.$this->l('has been cancelled by the hotel.');
-                                $message .= PHP_EOL.$this->l('Reasonn').': '.$refundReason;
-                                $objHtlBooking->setBookingCancellationMessage($message, 1);
                             }
                         }
 
-                        // if all bookings are getting cancelled then cancel the order also
-                        if ($order->hasCompletelyRefunded(Order::ORDER_COMPLETE_CANCELLATION_FLAG)) {
+                        // As object order is already changed in processRefundInBookingTables
+                        $order = new Order($order->id);
+                        // complete the booking refund directly in the refund request
+                        $objOrderReturn->changeIdOrderReturnState(Configuration::get('PS_ORS_REFUNDED'));
+
+                        // if all bookings are getting cancelled/Refunded then Cancel/Refund the order also
+                        $idOrderState = 0;
+                        if ($order->hasCompletelyRefunded(Order::ORDER_COMPLETE_REFUND_FLAG)) {
+                            $idOrderState = Configuration::get('PS_OS_REFUND');
+                        } elseif ($order->hasCompletelyRefunded(Order::ORDER_COMPLETE_CANCELLATION_FLAG)) {
+                            $idOrderState = Configuration::get('PS_OS_CANCELED');
+                        }
+
+                        if ($idOrderState) {
                             $objOrderHistory = new OrderHistory();
                             $objOrderHistory->id_order = (int)$order->id;
-
-                            $idOrderState = Configuration::get('PS_OS_CANCELED');
 
                             $useExistingPayment = false;
                             if (!$order->hasInvoice()) {
@@ -1460,7 +1485,7 @@ class AdminOrdersControllerCore extends AdminController
                     Tools::redirectAdmin(self::$currentIndex.'&id_order='.$order->id.'&vieworder&conf=3&token='.$this->token);
                 }
             } else {
-                $this->errors[] = Tools::displayError('You do not have permission to delete this.');
+                $this->errors[] = Tools::displayError('You do not have permission to edit this.');
             }
         } elseif (Tools::isSubmit('messageReaded')) {
             Message::markAsReaded(Tools::getValue('messageReaded'), $this->context->employee->id);
@@ -2546,7 +2571,7 @@ class AdminOrdersControllerCore extends AdminController
         $totalConvenienceFeeTI = 0;
         $totalDemandsPriceTE = 0;
         $totalDemandsPriceTI = 0;
-
+        $totalRefundedRooms = 0;
         if ($order_detail_data = $objBookingDetail->getOrderFormatedBookinInfoByIdOrder($order->id)) {
             $objBookingDemand = new HotelBookingDemands();
             $objHotelRoomType = new HotelRoomType();
@@ -2707,6 +2732,15 @@ class AdminOrdersControllerCore extends AdminController
                 $order_detail_data[$key]['amt_with_qty_tax_incl'] = $value['total_price_tax_incl'];
                 $order_detail_data[$key]['room_type_info'] = $objHotelRoomType->getRoomTypeInfoByIdProduct($value['id_product']);
                 $order_detail_data[$key]['total_room_tax'] = $order_detail_data[$key]['total_room_price_ti'] - $order_detail_data[$key]['total_room_price_te'];
+
+                if (isset($value['refund_info'])
+                    && $value['refund_info']['refunded']
+                    && $value['refund_info']['id_customization']
+                    && $value['is_refunded']
+                    && !$value['is_cancelled']
+                ) {
+                    $totalRefundedRooms += 1;
+                }
             }
         } else {
             $order_detail_data = array();
@@ -2714,19 +2748,25 @@ class AdminOrdersControllerCore extends AdminController
 
         $objOrderReturn = new OrderReturn();
         $refundedAmount = 0;
-        if ($refundReqBookings = $objOrderReturn->getOrderRefundRequestedBookings($order->id, 0, 1)) {
+        if ($refundReqBookings = $objOrderReturn->getOrderRefundRequestedBookings($order->id, 0, 1, 0, 1)) {
             $refundedAmount = $objOrderReturn->getRefundedAmount($order->id);
         }
 
         // get booking information by order
         $bookingOrderInfo = $objBookingDetail->getBookingDataByOrderId($order->id);
         foreach ($bookingOrderInfo as &$bookingOrderRoomInfo) {
+            // Get last refund request for booking
+            if ($bookingRefundDetail = OrderReturn::getOrdersReturnDetail($bookingOrderRoomInfo['id_order'], 0, $bookingOrderRoomInfo['id'])) {
+                $bookingRefundDetail = reset($bookingRefundDetail);
+                if (!$bookingRefundDetail['id_customization']) {
+                    $bookingOrderRoomInfo['is_refunded'] = 0;
+                }
+            }
             $bookingOrderRoomInfo['num_checkin_documents'] = HotelBookingDocument::getCountByIdHtlBooking($bookingOrderRoomInfo['id']);
         }
 
         $objHotelBookingDetail = new HotelBookingDetail();
         $htlBookingDetail = $objHotelBookingDetail->getOrderCurrentDataByOrderId($order->id);
-        $isCancelledRoom = in_array(1, array_column($htlBookingDetail, 'is_cancelled'));
 
         // hotel booking statuses
         $htlOrderStatus = HotelBookingDetail::getAllHotelOrderStatus();
@@ -2745,15 +2785,13 @@ class AdminOrdersControllerCore extends AdminController
         $orderOverBookings = $objHotelBookingDetail->getOverbookedRooms($order->id, 0, '', '', 0, 0, 1);
 
         $this->tpl_view_vars = array(
-            // refund info
+            'totalRefundedRooms' => $totalRefundedRooms,
             'orderOverBookings' => $orderOverBookings,
             'refund_allowed' => (int) $order->isReturnable(),
             'applicable_refund_policies' => $applicableRefundPolicies,
             'returns' => OrderReturn::getOrdersReturn($order->id_customer, $order->id),
             'refundReqBookings' => $refundReqBookings,
             'completeRefundRequestOrCancel' => $order->hasCompletelyRefunded(Order::ORDER_COMPLETE_CANCELLATION_OR_REFUND_REQUEST_FLAG),
-            'allBookingsRefunded' => $order->hasCompletelyRefunded(Order::ORDER_COMPLETE_REFUND_FLAG),
-            'allBookingsCancelled' => $order->hasCompletelyRefunded(Order::ORDER_COMPLETE_CANCELLATION_FLAG),
             'refundedAmount' => $refundedAmount,
             'totalDemandsPriceTI' => $totalDemandsPriceTI,
             'totalDemandsPriceTE' => $totalDemandsPriceTE,
@@ -2840,7 +2878,6 @@ class AdminOrdersControllerCore extends AdminController
                 'products' => $products,
                 'customer' => $customer)
             ),
-            'isCancelledRoom' => $isCancelledRoom,
             'orderDocuments' => $order->getDocuments(),
             'ROOM_STATUS_ALLOTED' => HotelBookingDetail::STATUS_ALLOTED,
             'ROOM_STATUS_CHECKED_IN' => HotelBookingDetail::STATUS_CHECKED_IN,
