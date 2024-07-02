@@ -245,9 +245,10 @@ class AdminProductsControllerCore extends AdminController
             );
         } else {
             $hotels = HotelBranchInformation::getProfileAccessedHotels($this->context->employee->id_profile, 1);
+            $hotelsArray = array();
             foreach ($hotels as $hotel) {
                 $addressInfo = HotelBranchInformation::getAddress($hotel['id_hotel']);
-                $this->hotelsArray[$hotel['id_hotel']] = $hotel['hotel_name'].', '.$addressInfo['city'];
+                $hotelsArray[$hotel['id_hotel']] = $hotel['hotel_name'].', '.$addressInfo['city'];
             }
 
             $this->fields_list['hotel_name'] = array(
@@ -256,7 +257,7 @@ class AdminProductsControllerCore extends AdminController
                 'multiple' => true,
                 'operator' => 'or',
                 'filter_key' => 'hrt!id_hotel',
-                'list' => $this->hotelsArray,
+                'list' => $hotelsArray,
                 'optional' => true,
                 'class' => 'chosen',
                 'visible_default' => true,
@@ -399,7 +400,7 @@ class AdminProductsControllerCore extends AdminController
         $idLocationsCategory = Configuration::get('PS_LOCATIONS_CATEGORY');
         $this->objLocationsCategory = new Category($idLocationsCategory, $this->context->language->id);
         $nestedCategories = Category::getNestedCategories($idLocationsCategory);
-        if ($nestedCategories) {
+        if (isset($nestedCategories[$idLocationsCategory]['children']) && $nestedCategories[$idLocationsCategory]['children']) {
             foreach ($nestedCategories[$idLocationsCategory]['children'] as $childCategory) {
                 $this->buildCategoryOptions($childCategory);
             }
