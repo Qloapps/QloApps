@@ -3727,7 +3727,7 @@ class AdminProductsControllerCore extends AdminController
                     }
                 }
                 if (count($errors)) {
-                    $this->warnings[] = Tools::displayError('Invalid price values are not saved. Please correct them and save again.');
+                    $this->warnings[] = Tools::displayError('Invalid price values for additional facilities were not saved. Please correct them and try again.');
                     $this->errors = array_merge($this->errors, $errors);
                 }
 
