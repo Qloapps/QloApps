@@ -65,7 +65,7 @@
         <div class="list-empty">
             <div class="list-empty-msg">
                 <i class="icon-warning-sign list-empty-icon"></i>
-                {l s='No room bookings found.'}
+                {l s='No room bookings found to cancel'}
             </div>
         </div>
     {/if}

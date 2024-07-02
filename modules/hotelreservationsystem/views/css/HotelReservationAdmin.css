@@ -600,3 +600,11 @@ body.adminhotelroomsbooking .ui-tooltip {
     max-height: 350px;
     overflow-y: auto;
 }
+
+#room-reallocation-modal .modal-footer {
+	padding: 15px 0px 0px 0px
+}
+#room-reallocation-modal .modal-body, #room-reallocation-modal .tab-content {
+	padding: 15px;
+	border: 1px solid #ddd
+}
