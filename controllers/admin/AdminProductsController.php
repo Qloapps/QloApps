@@ -245,9 +245,10 @@ class AdminProductsControllerCore extends AdminController
             );
         } else {
             $hotels = HotelBranchInformation::getProfileAccessedHotels($this->context->employee->id_profile, 1);
+            $hotelsArray = array();
             foreach ($hotels as $hotel) {
                 $addressInfo = HotelBranchInformation::getAddress($hotel['id_hotel']);
-                $this->hotelsArray[$hotel['id_hotel']] = $hotel['hotel_name'].', '.$addressInfo['city'];
+                $hotelsArray[$hotel['id_hotel']] = $hotel['hotel_name'].', '.$addressInfo['city'];
             }
 
             $this->fields_list['hotel_name'] = array(
@@ -256,7 +257,7 @@ class AdminProductsControllerCore extends AdminController
                 'multiple' => true,
                 'operator' => 'or',
                 'filter_key' => 'hrt!id_hotel',
-                'list' => $this->hotelsArray,
+                'list' => $hotelsArray,
                 'optional' => true,
                 'class' => 'chosen',
                 'visible_default' => true,
@@ -399,7 +400,7 @@ class AdminProductsControllerCore extends AdminController
         $idLocationsCategory = Configuration::get('PS_LOCATIONS_CATEGORY');
         $this->objLocationsCategory = new Category($idLocationsCategory, $this->context->language->id);
         $nestedCategories = Category::getNestedCategories($idLocationsCategory);
-        if ($nestedCategories) {
+        if (isset($nestedCategories[$idLocationsCategory]['children']) && $nestedCategories[$idLocationsCategory]['children']) {
             foreach ($nestedCategories[$idLocationsCategory]['children'] as $childCategory) {
                 $this->buildCategoryOptions($childCategory);
             }
@@ -3272,22 +3273,26 @@ class AdminProductsControllerCore extends AdminController
                         $this->errors[] = Tools::displayError('Invalid base children');
                     } else if (Configuration::get('WK_GLOBAL_MAX_CHILD_IN_ROOM')) {
                         if ($baseChildren > Configuration::get('WK_GLOBAL_MAX_CHILD_IN_ROOM')) {
-                            $this->errors[] = sprintf(Tools::displayError('Base children cannot be greater than max childern allowed on your website (Max: %s)'), Configuration::get('WK_GLOBAL_MAX_CHILD_IN_ROOM'));
+                            $this->errors[] = sprintf(Tools::displayError('Base children cannot be greater than max childern allowed in the room of this room type (Max: %s)'), Configuration::get('WK_GLOBAL_MAX_CHILD_IN_ROOM'));
                         }
                     }
                     if (!$maxAdults || !Validate::isUnsignedInt($maxAdults)) {
                         $this->errors[] = Tools::displayError('Invalid maximum number of adults');
                     } elseif ($maxAdults < $baseAdults) {
                         $this->errors[] = Tools::displayError('Maximum number of adults cannot be less than base adults');
+                    } elseif ($maxAdults > $maxGuests) {
+                        $this->errors[] = Tools::displayError('Maximum number of adults cannot be more than maximum number of guests');
                     }
                     if ($maxChildren == '' || !Validate::isUnsignedInt($maxChildren)) {
                         $this->errors[] = Tools::displayError('Invalid maximum number of children');
-                    } else if (Configuration::get('WK_GLOBAL_MAX_CHILD_IN_ROOM')) {
-                        if ($maxChildren > Configuration::get('WK_GLOBAL_MAX_CHILD_IN_ROOM')) {
-                            $this->errors[] = sprintf(Tools::displayError('Maximum number of children cannot be greater than max childern allowed on your website (Max: %s)'), Configuration::get('WK_GLOBAL_MAX_CHILD_IN_ROOM'));
-                        }
                     } elseif ($maxChildren < $baseChildren) {
                         $this->errors[] = Tools::displayError('Maximum number of children cannot be less than base children');
+                    } elseif ($maxChildren >= $maxGuests) {
+                        $this->errors[] = Tools::displayError('Maximum number of children cannot be more or equal than maximum number of guests.(1 adult is mandatory in a room)');
+                    } else if (Configuration::get('WK_GLOBAL_MAX_CHILD_IN_ROOM')) {
+                        if ($maxChildren > Configuration::get('WK_GLOBAL_MAX_CHILD_IN_ROOM')) {
+                            $this->errors[] = sprintf(Tools::displayError('Maximum number of children cannot be greater than max childern allowed in the room of this room type (Max: %s)'), Configuration::get('WK_GLOBAL_MAX_CHILD_IN_ROOM'));
+                        }
                     }
                     if (!$maxGuests || !Validate::isUnsignedInt($maxGuests)) {
                         $this->errors[] = Tools::displayError('Invalid maximum number of guests');
@@ -3670,6 +3675,7 @@ class AdminProductsControllerCore extends AdminController
     public function processAdditionalFacilities()
     {
         if ($idProduct = Tools::getValue('id_product')) {
+            $errors = array();
             $objRoomTypeDemand = new HotelRoomTypeDemand();
             $objRoomTypeDemandPrice = new HotelRoomTypeDemandPrice();
             // first delete all the previously saved prices and demands of this room type
@@ -3697,7 +3703,7 @@ class AdminProductsControllerCore extends AdminController
                                 $objRoomTypeDemandPrice->save();
                             }
                         } else {
-                            $this->errors[] = Tools::displayError('Invalid demand price of facility.').
+                            $errors[] = Tools::displayError('Invalid demand price of facility.').
                             ' : '.$objGlobalDemand->name[$this->context->language->id];
                         }
                         if ($advOptions = $objAdvOption->getGlobalDemandAdvanceOptions($idGlobalDemand)) {
@@ -3714,15 +3720,16 @@ class AdminProductsControllerCore extends AdminController
                                             $objRoomTypeDemandPrice->save();
                                         }
                                     } else {
-                                        $this->errors[] = Tools::displayError('Invalid price of advanced option: ').$objAdvOption->name[$this->context->language->id];
+                                        $errors[] = Tools::displayError('Invalid price of advanced option: ').$objAdvOption->name[$this->context->language->id];
                                     }
                                 }
                             }
                         }
                     }
                 }
-                if (count($this->errors)) {
-                    $this->warnings[] = Tools::displayError('Invalid price values are not saved. Please correct them and save again.');
+                if (count($errors)) {
+                    $this->warnings[] = Tools::displayError('Invalid price values for additional facilities were not saved. Please correct them and try again.');
+                    $this->errors = array_merge($this->errors, $errors);
                 }
 
                 $objCartBookingData = new HotelCartBookingData();
