@@ -34,12 +34,12 @@ class OrderCustomerGuestDetailCore extends ObjectModel
         'table' => 'order_customer_guest_detail',
         'primary' => 'id_order_customer_guest_detail',
         'fields' => array(
-            'id_order' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
+            'id_order' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId', 'required' => true),
             'id_gender' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
-            'firstname' => array('type' => self::TYPE_STRING, 'validate' => 'isName', 'size' => 32),
-            'lastname' => array('type' => self::TYPE_STRING, 'validate' => 'isName', 'size' => 32),
-            'email' => array('type' => self::TYPE_STRING, 'validate' => 'isEmail', 'size' => 128),
-            'phone' => array('type' => self::TYPE_STRING, 'validate' => 'isPhoneNumber', 'size' => 32),
+            'firstname' => array('type' => self::TYPE_STRING, 'validate' => 'isName', 'size' => 32, 'required' => true),
+            'lastname' => array('type' => self::TYPE_STRING, 'validate' => 'isName', 'size' => 32, 'required' => true),
+            'email' => array('type' => self::TYPE_STRING, 'validate' => 'isEmail', 'size' => 128, 'required' => true),
+            'phone' => array('type' => self::TYPE_STRING, 'validate' => 'isPhoneNumber', 'size' => 32, 'required' => true),
             'date_add' => array('type' => self::TYPE_DATE, 'validate' => 'isDate'),
             'date_upd' => array('type' => self::TYPE_DATE, 'validate' => 'isDate'),
         ),
@@ -52,23 +52,5 @@ class OrderCustomerGuestDetailCore extends ObjectModel
             FROM `'._DB_PREFIX_.'order_customer_guest_detail`
             WHERE `id_order` = '.(int)$id_order
         );
-    }
-
-    public function validateGuestInfo()
-    {
-        $isValid = true;
-        if (!trim($this->firstname) || !Validate::isName($this->firstname)) {
-            $isValid = false;
-        }
-        if (!trim($this->lastname) || !Validate::isName($this->lastname)) {
-            $isValid = false;
-        }
-        if (!trim($this->email) || !Validate::isEmail($this->email)) {
-            $isValid = false;
-        }
-        if (!trim($this->phone) || !Validate::isPhoneNumber($this->phone)) {
-            $isValid = false;
-        }
-        return $isValid;
     }
 }
