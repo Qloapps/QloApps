@@ -989,7 +989,7 @@ class AdminControllerCore extends Controller
 
     public function processListVisibility()
     {
-        $listFieldsVisibility = Tools::getValue('list_fields_visibility');
+        $listFieldsVisibility = Tools::getValue('list_fields_visibility', array()); //  To set optional list empty in case none is selected
         $controller = 'list_visibility_'.$this->context->controller->className;
         $this->context->cookie->$controller = json_encode($listFieldsVisibility);
 
@@ -2313,6 +2313,7 @@ class AdminControllerCore extends Controller
     public function ajaxProcessRefreshModuleList($force_reload_cache = false)
     {
         $this->status = Module::refreshModuleList($force_reload_cache);
+        $this->ajaxDie(json_encode(array('status' => $this->status)));
     }
 
     /**

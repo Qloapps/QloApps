@@ -982,4 +982,31 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
 
         return $this->update($null_values);
     }
+
+    public static function createAutoFeaturePrice($params)
+    {
+        $context = Context::getContext();
+        $featurePriceName = array();
+        foreach (Language::getIDs(true) as $idLang) {
+            $featurePriceName[$idLang] = 'Auto-generated';
+        }
+
+        $objFeaturePricing = new HotelRoomTypeFeaturePricing();
+        $objFeaturePricing->id_product = (int) $params['id_product'];
+        $objFeaturePricing->id_cart = (int) $params['id_cart'];
+        $objFeaturePricing->id_guest = (int) $params['id_guest'];
+        $objFeaturePricing->id_room = (int) $params['id_room'];
+        $objFeaturePricing->feature_price_name = $featurePriceName;
+        $objFeaturePricing->date_selection_type = HotelRoomTypeFeaturePricing::DATE_SELECTION_TYPE_RANGE;
+        $objFeaturePricing->date_from = date('Y-m-d', strtotime($params['date_from']));
+        $objFeaturePricing->date_to = date('Y-m-d', strtotime($params['date_to']));
+        $objFeaturePricing->is_special_days_exists = 0;
+        $objFeaturePricing->special_days = json_encode(false);
+        $objFeaturePricing->impact_way = HotelRoomTypeFeaturePricing::IMPACT_WAY_FIX_PRICE;
+        $objFeaturePricing->impact_type = HotelRoomTypeFeaturePricing::IMPACT_TYPE_FIXED_PRICE;
+        $objFeaturePricing->impact_value = $params['price'];
+        $objFeaturePricing->active = 1;
+        $objFeaturePricing->groupBox = array_column(Group::getGroups($context->language->id), 'id_group');
+        $objFeaturePricing->add();
+    }
 }
