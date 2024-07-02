@@ -1,17 +1,17 @@
 <?xml version="1.0"?>
 <entity_order_return_state>
   <order_return_state id="Pending">
-    <name>Pending</name>
+    <name>Chưa giải quyết</name>
     <customer_template>order_refund_pending_customer</customer_template>
     <admin_template>order_refund_pending_admin</admin_template>
   </order_return_state>
   <order_return_state id="Refund_denied">
-    <name>Refund denied</name>
+    <name>Từ chối</name>
     <customer_template>order_refund_denied_customer</customer_template>
     <admin_template>order_refund_denied_admin</admin_template>
   </order_return_state>
   <order_return_state id="Refund_completed">
-    <name>Refund completed</name>
+    <name>Hoàn thành</name>
     <customer_template>order_refund_completed_customer</customer_template>
     <admin_template>order_refund_completed_admin</admin_template>
   </order_return_state>
