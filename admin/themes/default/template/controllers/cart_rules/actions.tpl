@@ -46,7 +46,6 @@
 			<span class="input-group-addon">%</span>
 			<input type="text" id="reduction_percent" class="input-mini" name="reduction_percent" value="{$currentTab->getFieldValue($currentObject, 'reduction_percent')|floatval}" />
 		</div>
-		<span class="help-block"><i class="icon-warning-sign"></i> {l s='Does not apply to the shipping costs'}</span>
 	</div>
 </div>
 
