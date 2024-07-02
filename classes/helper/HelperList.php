@@ -733,9 +733,8 @@ class HelperListCore extends Helper
             }
             if (isset($field['optional']) && $field['optional']) {
                 $this->fields_optional[$key] = $field;
-                if (((empty($list_visibility) && isset($field['visible_default']) && $field['visible_default'])
+                if (((!is_array($list_visibility) && isset($field['visible_default']) && $field['visible_default'])
                     || $list_visibility && in_array($key , $list_visibility))
-                    && (!is_array($list_visibility) || !empty($list_visibility))
                 ) {
                     $this->fields_optional[$key]['selected'] = true;
                 }
