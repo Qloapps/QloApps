@@ -3064,42 +3064,50 @@ class AdminOrdersControllerCore extends AdminController
     public function ajaxProcessUpdateGuestDetails()
     {
         $response = array(
-            'success' => false
+            'hasError' => false,
+            'errors' => array(),
         );
         if (Validate::isLoadedObject($order = new Order(Tools::getValue('id_order')))) {
-            if ($id_customer_guest_detail = OrderCustomerGuestDetail::isCustomerGuestBooking($order->id)) {
-                if (Validate::isLoadedObject($objCustomerGuestDetail = new OrderCustomerGuestDetail($id_customer_guest_detail))) {
-                    $id_gender = Tools::getValue('id_gender');
-                    $firstname = Tools::getValue('firstname');
-                    $lastname = Tools::getValue('lastname');
-                    $email = Tools::getValue('email');
-                    $phone = Tools::getValue('phone');
-                    $objCustomerGuestDetail->id_gender = $id_gender;
-                    $objCustomerGuestDetail->firstname = $firstname;
-                    $objCustomerGuestDetail->lastname = $lastname;
-                    $objCustomerGuestDetail->email = $email;
-                    $objCustomerGuestDetail->phone = $phone;
-                    if ($objCustomerGuestDetail->validateGuestInfo()) {
+            $objCustomerGuestDetail = new OrderCustomerGuestDetail();
+            $response['errors'] = $objCustomerGuestDetail->validateController();
+            if (!$response['errors']) {
+                if ($id_customer_guest_detail = OrderCustomerGuestDetail::isCustomerGuestBooking($order->id)) {
+                    if (Validate::isLoadedObject($objCustomerGuestDetail = new OrderCustomerGuestDetail($id_customer_guest_detail))) {
+                        $id_gender = Tools::getValue('id_gender');
+                        $firstname = Tools::getValue('firstname');
+                        $lastname = Tools::getValue('lastname');
+                        $email = Tools::getValue('email');
+                        $phone = Tools::getValue('phone');
+                        $objCustomerGuestDetail->id_gender = $id_gender;
+                        $objCustomerGuestDetail->firstname = $firstname;
+                        $objCustomerGuestDetail->lastname = $lastname;
+                        $objCustomerGuestDetail->email = $email;
+                        $objCustomerGuestDetail->phone = $phone;
                         if ($objCustomerGuestDetail->save()) {
-                            $response['success'] = true;
                             $gender = new Gender($objCustomerGuestDetail->id_gender, $this->context->language->id);
                             $response['data']['gender_name'] = $gender->name;
                             $response['data']['guest_name'] = $objCustomerGuestDetail->firstname.' '.$objCustomerGuestDetail->lastname ;
                             $response['data']['guest_email'] = $objCustomerGuestDetail->email;
                             $response['data']['guest_phone'] = $objCustomerGuestDetail->phone;
+
                             $response['msg'] = $this->l('Guest details are updated.');
                         } else {
                             $response['errors'][] = $this->l('Unable to save guest details.');
                         }
                     } else {
-                        $response['errors'][] = $this->l('Invalid guest details, please check and try again.');
+                        $response['errors'][] = $this->l('Guest details not found.');
                     }
                 } else {
                     $response['errors'][] = $this->l('Guest details not found.');
                 }
-            } else {
-                $response['errors'][] = $this->l('Guest details not found.');
             }
+        }
+
+        if ($response['errors']) {
+            $response['hasError'] = true;
+            $this->context->smarty->assign('errors', $response['errors']);
+
+            $response['errorsHtml'] = $this->context->smarty->fetch('alerts.tpl');
         }
 
         $this->ajaxDie(json_encode($response));

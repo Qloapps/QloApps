@@ -1077,21 +1077,52 @@ class OrderOpcControllerCore extends ParentOrderController
             $customerGuestDetailLastname = Tools::getValue('customer_guest_detail_lastname');
             $customerGuestDetailEmail = Tools::getValue('customer_guest_detail_email');
             $customerGuestDetailPhone = Tools::getValue('customer_guest_detail_phone');
+
+            $className = 'CartCustomerGuestDetail';
+            $rules = call_user_func(array($className, 'getValidationRules'), $className);
+
             if (trim($customerGuestDetailGender) && Validate::isUnsignedInt($customerGuestDetailGender)) {
                 $objCustomerGuestDetail->id_gender = $customerGuestDetailGender;
+            } else {
+                $result['errors']['customer_guest_detail_gender'] = Tools::displayError('Invalid gender');
             }
-            if (trim($customerGuestDetailFirstname) && Validate::isName($customerGuestDetailFirstname)) {
+
+            if (trim($customerGuestDetailFirstname)
+                && Validate::isName($customerGuestDetailFirstname)
+                && (!isset($rules['size']['firstname'])
+                   || (isset($rules['size']['firstname']) && (Tools::strlen(trim($customerGuestDetailFirstname)) <= $rules['size']['firstname']))
+                )
+            ) {
                 $objCustomerGuestDetail->firstname = $customerGuestDetailFirstname;
             }
-            if (trim($customerGuestDetailLastname) && Validate::isName($customerGuestDetailLastname)) {
+
+            if (trim($customerGuestDetailLastname)
+                && Validate::isName($customerGuestDetailLastname)
+                && (!isset($rules['size']['lastname'])
+                  || (isset($rules['size']['lastname']) && (Tools::strlen(trim($customerGuestDetailLastname)) <= $rules['size']['lastname']))
+                )
+            ) {
                 $objCustomerGuestDetail->lastname = $customerGuestDetailLastname;
             }
-            if (trim($customerGuestDetailEmail) && Validate::isEmail($customerGuestDetailEmail)) {
+
+            if (trim($customerGuestDetailEmail)
+                && Validate::isEmail($customerGuestDetailEmail)
+                && (!isset($rules['size']['email'])
+                  || (isset($rules['size']['email']) && (Tools::strlen(trim($customerGuestDetailEmail)) <= $rules['size']['email']))
+                )
+            ) {
                 $objCustomerGuestDetail->email = $customerGuestDetailEmail;
             }
-            if (trim($customerGuestDetailPhone) && Validate::isPhoneNumber($customerGuestDetailPhone)) {
+
+            if (trim($customerGuestDetailPhone)
+                && Validate::isPhoneNumber($customerGuestDetailPhone)
+                && (!isset($rules['size']['phone'])
+                  || (isset($rules['size']['phone']) && (Tools::strlen(trim($customerGuestDetailPhone)) <= $rules['size']['phone']))
+                )
+            ) {
                 $objCustomerGuestDetail->phone = $customerGuestDetailPhone;
             }
+
             $objCustomerGuestDetail->id_cart = $this->context->cart->id;
             $objCustomerGuestDetail->save();
         } else {
@@ -1101,6 +1132,7 @@ class OrderOpcControllerCore extends ParentOrderController
                 }
             }
         }
+
         $this->context->cart->save();
     }
 }
