@@ -30,6 +30,29 @@
                     <a href="{$link->getProductLink($data_v.id_product)|escape:'html':'UTF-8'}" title="{$data_v.name|escape:'html':'UTF-8'}" target="_blank" class="room-type-name">
                         <h3>{$data_v.name|escape:'html':'UTF-8'}</h3>
                     </a>
+
+                    {if $rm_v['count_refunded'] > 0 || $rm_v['count_cancelled'] > 0}
+                        <div class="num-refunded-rooms">
+                            {if $rm_v['count_cancelled'] > 0}
+                                <span class="badge badge-danger">
+                                    {if $rm_v['count_cancelled'] > 1}
+                                        {$rm_v['count_cancelled']} {l s='Rooms Cancelled'}
+                                    {else}
+                                        {$rm_v['count_cancelled']} {l s='Room Cancelled'}
+                                    {/if}
+                                </span>
+                            {/if}
+                            {if $rm_v['count_refunded'] > 0}
+                                <span class="badge badge-danger">
+                                    {if $rm_v['count_refunded'] > 1}
+                                        {$rm_v['count_refunded']} {l s='Rooms Refunded'}
+                                    {else}
+                                        {$rm_v['count_refunded']} {l s='Room Refunded'}
+                                    {/if}
+                                </span>
+                            {/if}
+                        </div>
+                    {/if}
                 </div>
                 <div class="col-xs-12">
                     <div class="description-list">
@@ -141,16 +164,4 @@
             </div>
         </div>
     </div>
-
-    {if $rm_v['count_refunded'] > 0}
-        <div class="num-refunded-rooms">
-            <span class="badge badge-danger">
-                {if $rm_v['count_refunded'] > 1}
-                    {$rm_v['count_refunded']} {l s='Rooms Refunded'}
-                {else}
-                    {$rm_v['count_refunded']} {l s='Room Refunded'}
-                {/if}
-            </span>
-        </div>
-    {/if}
 </div>

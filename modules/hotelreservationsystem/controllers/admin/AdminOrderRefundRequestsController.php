@@ -28,15 +28,23 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
         $this->list_no_link = true;
         $this->context = Context::getContext();
 
-        $this->_select = ' COUNT(IF(a.`state` = '.(int) Configuration::get('PS_ORS_PENDING').', 1, NULL)) AS total_pending_requests,
-        ord.`id_currency`, ord.`total_paid_tax_incl` AS total_order, SUM(a.`refunded_amount`) AS refunded_amount, CONCAT(firstname, " ", lastname) AS cust_name, os.`color`, os.`id_order_state`';
+        $this->_select = ' ord.`id_currency`, CONCAT(firstname, " ", lastname) AS cust_name';
         $this->_join .= ' LEFT JOIN `'._DB_PREFIX_.'orders` ord ON (a.`id_order` = ord.`id_order`)';
-        $this->_join .= 'LEFT JOIN '._DB_PREFIX_.'order_state os ON (os.`id_order_state` = ord.`current_state`)';
-        $this->_join .= 'LEFT JOIN '._DB_PREFIX_.'order_state_lang osl ON (osl.`id_order_state` = os.`id_order_state` AND osl.`id_lang` = '.(int)$this->context->language->id.')';
         $this->_join .= ' LEFT JOIN `'._DB_PREFIX_.'customer` cust ON (cust.`id_customer` = ord.`id_customer`)';
 
         $this->_orderWay = 'DESC';
-        $this->_group = 'GROUP BY ord.`id_order`';
+        if ($idOrder = Tools::getValue('id_order')) {
+            $this->_select .= ', orsl.`name` as `status_name`, ors.`color`';
+            $this->_join .= 'LEFT JOIN '._DB_PREFIX_.'order_return_state ors ON (ors.`id_order_return_state` = a.`state`)';
+            $this->_join .= 'LEFT JOIN '._DB_PREFIX_.'order_return_state_lang orsl ON (orsl.`id_order_return_state` = a.`state` AND orsl.`id_lang` = '.(int)$this->context->language->id.')';
+            $this->_where = ' AND a.`id_order`='. (int)$idOrder;
+            $this->_group = '';
+        } else {
+            $this->_select .= ', ord.`total_paid_tax_incl` AS total_order, os.`id_order_state`, os.`color`, COUNT(IF(a.`state` = '.(int) Configuration::get('PS_ORS_PENDING').', 1, NULL)) AS total_pending_requests, SUM(a.`refunded_amount`) AS refunded_amount';
+            $this->_join .= 'LEFT JOIN '._DB_PREFIX_.'order_state os ON (os.`id_order_state` = ord.`current_state`)';
+            $this->_join .= 'LEFT JOIN '._DB_PREFIX_.'order_state_lang osl ON (osl.`id_order_state` = os.`id_order_state` AND osl.`id_lang` = '.(int)$this->context->language->id.')';
+            $this->_group = 'GROUP BY ord.`id_order`';
+        }
 
         $orderStatuses = OrderState::getOrderStates($this->context->language->id);
         $ordStatuses = array();
@@ -44,38 +52,85 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
             $ordStatuses[$status['id_order_state']] = $status['name'];
         }
         /*for showing status of booking with badge_danger or success*/
-        $this->fields_list = array(
-            'id_order' => array(
+        $this->fields_list = array();
+
+        if ($idOrder = Tools::getValue('id_order')) {
+            $refundStatuses = OrderReturnStateCore::getOrderReturnStates($this->context->language->id);
+
+            $retStatuses = array();
+            foreach ($refundStatuses as $status) {
+                $retStatuses[$status['id_order_return_state']] = $status['name'];
+            }
+            $this->fields_list['id_order_return'] = array(
+                'title' => $this->l('Request ID'),
+                'align' => 'center',
+                'class' => 'fixed-width-xs',
+            );
+            $this->fields_list['id_order'] = array(
                 'title' => $this->l('Order ID'),
                 'align' => 'center',
                 'class' => 'fixed-width-xs',
                 'callback' => 'setOrderLink',
                 'havingFilter' => true,
-            ),
-            'cust_name' => array(
+            );
+            $this->fields_list['cust_name'] = array(
                 'title' => $this->l('Customer Name'),
                 'align' => 'center',
                 'havingFilter' => true,
                 'callback' => 'setCustomerLink',
-            ),
-            'total_order' => array(
-                'title' => $this->l('Total Order Amount'),
-                'align' => 'center',
-                'callback' => 'setOrderCurrency',
-                'havingFilter' => true,
-            ),
-            'refunded_amount' => array(
+            );
+            $this->fields_list['refunded_amount'] = array(
                 'title' => $this->l('Refunded Amount'),
                 'align' => 'center',
                 'callback' => 'setOrderCurrency',
                 'havingFilter' => true,
-            ),
-            'total_pending_requests' => array(
+            );
+            $this->fields_list['status_name'] = array(
+                'title' => $this->l('Refund Status'),
+                'type' => 'select',
+                'color' => 'color',
+                'list' => $retStatuses,
+                'filter_key' => 'ors!id_order_return_state',
+                'filter_type' => 'int',
+            );
+            $this->fields_list['date_add'] = array(
+                'title' => $this->l('Requested Date'),
+                'type' => 'datetime',
+                'havingFilter' => true,
+                'filter_key' => 'a!date_add',
+            );
+        } else {
+            $this->fields_list['id_order'] = array(
+                'title' => $this->l('Order ID'),
+                'align' => 'center',
+                'class' => 'fixed-width-xs',
+                'callback' => 'setOrderLink',
+                'havingFilter' => true,
+            );
+            $this->fields_list['cust_name'] = array(
+                'title' => $this->l('Customer Name'),
+                'align' => 'center',
+                'havingFilter' => true,
+                'callback' => 'setCustomerLink',
+            );
+            $this->fields_list['refunded_amount'] = array(
+                'title' => $this->l('Refunded Amount'),
+                'align' => 'center',
+                'callback' => 'setOrderCurrency',
+                'havingFilter' => true,
+            );
+            $this->fields_list['total_order'] = array(
+                'title' => $this->l('Total Order Amount'),
+                'align' => 'center',
+                'callback' => 'setOrderCurrency',
+                'havingFilter' => true,
+            );
+            $this->fields_list['total_pending_requests'] = array(
                 'title' => $this->l('Pending Requests'),
                 'align' => 'center',
                 'havingFilter' => true,
-            ),
-        );
+            );
+        }
         $this->addRowAction('view');
         $this->identifier = 'id_order_return';
 
@@ -88,14 +143,19 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
 
         parent::__construct();
 
-        // work on renderlist filter on render view page
-        if (Tools::isSubmit('submitResetorder_return') && Tools::getValue('id_order')) {
-            Tools::redirectAdmin($this->context->link->getAdminLink('AdminOrderRefundRequests').'&id_order='.Tools::getValue('id_order').'&view'.$this->table);
-        }
 
         $this->_conf[101] = $this->l('Refund request has been denied successfully.');
         $this->_conf[102] = $this->l('Refund request has been completed successfully.');
     }
+
+    public function init()
+    {
+        parent::init();
+        if ($idOrder = Tools::getValue('id_order')) {
+            self::$currentIndex = self::$currentIndex.'&id_order='.(int) $idOrder;
+        }
+    }
+
 
     public function setOrderCurrency($echo, $row)
     {
@@ -122,7 +182,7 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
     {
         if (!Tools::getValue('id_order')) {
             $objOrderReturn = new OrderReturn($idOrderReturn);
-            return '<a href="'.$this->context->link->getAdminLink('AdminOrderRefundRequests').'&id_order_return='.(int)$idOrderReturn.'&id_order='.(int)$objOrderReturn->id_order.'&view'.$this->table.'" title="'.$this->l('Cancel').'">
+            return '<a href="'.$this->context->link->getAdminLink('AdminOrderRefundRequests').'&id_order='.(int)$objOrderReturn->id_order.'" >
                 <i class="icon-search-plus"></i> '.$this->l('View').
             '</a>';
         } else {
@@ -139,137 +199,61 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
             return;
         }
         $refundStatuses = OrderReturnStateCore::getOrderReturnStates($this->context->language->id);
-        if ($idOrder = Tools::getValue('id_order')) {
-            // work on renderlist filter on renderview page
-            if (!Tools::isSubmit('submitFilterorder_return')) {
-                $this->processResetFilters();
+        $objCustomer = new Customer($objOrderReturn->id_customer);
+        $objOrder = new Order($objOrderReturn->id_order);
+        $orderCurrency = new Currency($objOrder->id_currency);
+
+        $objRefundRules = new HotelOrderRefundRules();
+        if ($refundReqBookings = $objOrderReturn->getOrderRefundRequestedBookings($objOrderReturn->id_order, $objOrderReturn->id)){
+            foreach ($refundReqBookings as &$booking) {
+                $bookingCharges = $objRefundRules->getBookingCancellationDetails(
+                    $objOrderReturn->id_order,
+                    $objOrderReturn->id,
+                    $booking['id']
+                );
+                $booking = array_merge($booking, array_shift($bookingCharges));
             }
-
-            $this->table = 'order_return';
-            $this->identifier = 'id_order_return';
-
-            /*for showing status of booking with badge_danger or success*/
-            $this->_select = ' CONCAT(cust.`firstname`, " ", cust.`lastname`) AS `cust_name`, ors.`color`, orsl.`name` as `status_name`, ord.`id_currency`';
-            $this->_join = ' LEFT JOIN `'._DB_PREFIX_.'customer` cust ON (cust.`id_customer` = a.`id_customer`)';
-            $this->_join .= ' LEFT JOIN `'._DB_PREFIX_.'orders` ord ON (ord.`id_order` = a.`id_order`)';
-            $this->_join .= 'LEFT JOIN '._DB_PREFIX_.'order_return_state ors ON (ors.`id_order_return_state` = a.`state`)';
-            $this->_join .= 'LEFT JOIN '._DB_PREFIX_.'order_return_state_lang orsl ON (orsl.`id_order_return_state` = a.`state` AND orsl.`id_lang` = '.(int)$this->context->language->id.')';
-
-            $this->_where = ' AND a.`id_order`='. (int)$idOrder;
-            $this->_group = '';
-
-            $retStatuses = array();
-            foreach ($refundStatuses as $status) {
-                $retStatuses[$status['id_order_return_state']] = $status['name'];
-            }
-            $this->fields_list = array(
-                'id_order_return' => array(
-                    'title' => $this->l('Request ID'),
-                    'align' => 'center',
-                    'class' => 'fixed-width-xs',
-                ),
-                'id_order' => array(
-                    'title' => $this->l('Order ID'),
-                    'align' => 'center',
-                    'class' => 'fixed-width-xs',
-                    'callback' => 'setOrderLink',
-                    'havingFilter' => true,
-                    'filter_key' => 'a!id_order',
-                    'filter_type' => 'int',
-                ),
-                'cust_name' => array(
-                    'title' => $this->l('Customer Name'),
-                    'align' => 'center',
-                    'havingFilter' => true,
-                    'callback' => 'setCustomerLink',
-                ),
-                'status_name' => array(
-                    'title' => $this->l('Refund Status'),
-                    'type' => 'select',
-                    'color' => 'color',
-                    'list' => $retStatuses,
-                    'filter_key' => 'ors!id_order_return_state',
-                    'filter_type' => 'int',
-                ),
-                'refunded_amount' => array(
-                    'title' => $this->l('Refunded Amount'),
-                    'align' => 'center',
-                    'callback' => 'setOrderCurrency',
-                    'havingFilter' => true,
-                ),
-                'date_add' => array(
-                    'title' => $this->l('Requested Date'),
-                    'type' => 'datetime',
-                    'havingFilter' => true,
-                    'filter_key' => 'a!date_add',
-                ),
-            );
-
-            $this->identifier = 'id_order_return';
-
-            if (Tools::isSubmit('submitFilterorder_return')) {
-                $this->processFilter();
-            }
-
-            return parent::renderList();
-        } else {
-            $objCustomer = new Customer($objOrderReturn->id_customer);
-            $objOrder = new Order($objOrderReturn->id_order);
-            $orderCurrency = new Currency($objOrder->id_currency);
-
-            $objRefundRules = new HotelOrderRefundRules();
-            if ($refundReqBookings = $objOrderReturn->getOrderRefundRequestedBookings($objOrderReturn->id_order, $objOrderReturn->id)){
-                foreach ($refundReqBookings as &$booking) {
-                    $bookingCharges = $objRefundRules->getBookingCancellationDetails(
-                        $objOrderReturn->id_order,
-                        $objOrderReturn->id,
-                        $booking['id']
-                    );
-                    $booking = array_merge($booking, array_shift($bookingCharges));
-                }
-            }
-
-            $paymentMethods = array();
-            foreach (PaymentModule::getInstalledPaymentModules() as $payment) {
-                $module = Module::getInstanceByName($payment['name']);
-                if (Validate::isLoadedObject($module) && $module->active) {
-                    $paymentMethods[] = $module->displayName;
-                }
-            }
-
-            $this->context->smarty->assign(
-                array (
-                    'orderTotalPaid' => $objOrder->getTotalPaid(),
-                    'customer_name' => $objCustomer->firstname.' '.$objCustomer->lastname,
-                    'customer_email' => $objCustomer->email,
-                    'orderReturnInfo' => (array)$objOrderReturn,
-                    'refundReqBookings' => $refundReqBookings,
-                    'orderInfo' => (array) $objOrder,
-                    'orderCurrency' => (array) $orderCurrency,
-                    'currentOrderStateInfo' => (array) new OrderState($objOrder->current_state,
-                    $this->context->language->id),
-                    'currentStateInfo' => (array) new OrderReturnState($objOrderReturn->state,
-                    $this->context->language->id),
-                    'current_id_lang' => $this->context->language->id,
-                    'refundStatuses' => $refundStatuses,
-                    'isRefundCompleted' => $objOrderReturn->hasBeenCompleted(),
-                    'paymentMethods' => $paymentMethods,
-                    'name_controller' => Tools::getValue('controller'),
-                    'info_icon_path' => $this->context->link->getMediaLink(_MODULE_DIR_.'hotelreservationsystem/views/img/Slices/icon-info.svg')
-                )
-            );
-
-            return parent::renderView();
         }
+
+        $paymentMethods = array();
+        foreach (PaymentModule::getInstalledPaymentModules() as $payment) {
+            $module = Module::getInstanceByName($payment['name']);
+            if (Validate::isLoadedObject($module) && $module->active) {
+                $paymentMethods[] = $module->displayName;
+            }
+        }
+
+        $orderTotalPaid = $objOrder->getTotalPaid();
+        $orderDiscounts = $objOrder->getCartRules();
+        $hasOrderDiscountOrPayment = ((float)$orderTotalPaid > 0 || $orderDiscounts) ? true : false;
+        $this->context->smarty->assign(
+            array (
+                'hasOrderDiscountOrPayment' => $hasOrderDiscountOrPayment,
+                'orderTotalPaid' => $orderTotalPaid,
+                'customer_name' => $objCustomer->firstname.' '.$objCustomer->lastname,
+                'customer_email' => $objCustomer->email,
+                'orderReturnInfo' => (array)$objOrderReturn,
+                'refundReqBookings' => $refundReqBookings,
+                'orderInfo' => (array) $objOrder,
+                'orderCurrency' => (array) $orderCurrency,
+                'currentOrderStateInfo' => (array) new OrderState($objOrder->current_state,
+                $this->context->language->id),
+                'currentStateInfo' => (array) new OrderReturnState($objOrderReturn->state,
+                $this->context->language->id),
+                'current_id_lang' => $this->context->language->id,
+                'refundStatuses' => $refundStatuses,
+                'isRefundCompleted' => $objOrderReturn->hasBeenCompleted(),
+                'paymentMethods' => $paymentMethods,
+                'name_controller' => Tools::getValue('controller'),
+                'info_icon_path' => $this->context->link->getMediaLink(_MODULE_DIR_.'hotelreservationsystem/views/img/Slices/icon-info.svg')
+            )
+        );
+
+        return parent::renderView();
     }
 
     public function postProcess()
     {
-        // for the filteration
-        if (Tools::isSubmit('submitFilterorder_return') && Tools::isSubmit('order_returnFilter_ors!id_order_return_state')) {
-            self::$currentIndex .= '&id_order_return=1&id_order=1&vieworder_return';
-        }
-
         /*If Admin update the status of the order cancellation request*/
         if (Tools::isSubmit('submitRefundReqBookings') || Tools::isSubmit('submitRefundReqBookingsAndStay')) {
             $idOrderReturn = Tools::getValue('id_order_return');
@@ -277,11 +261,14 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
             if (Validate::isLoadedObject($objOrderReturn = new OrderReturn($idOrderReturn))) {
                 $objOrder = new Order($objOrderReturn->id_order);
                 $orderTotalPaid = $objOrder->getTotalPaid();
+                $orderDiscounts = $objOrder->getCartRules();
+                $hasOrderDiscountOrPayment = ((float)$orderTotalPaid > 0 || $orderDiscounts) ? true : false;
+
                 $idRefundState = Tools::getValue('id_refund_state');
                 if (Validate::isLoadedObject($objRefundState = new OrderReturnState($idRefundState))) {
                     if ($objRefundState->refunded) {
                         $refundedAmounts = Tools::getValue('refund_amounts');
-                        if ((float) $orderTotalPaid > 0) {
+                        if ($hasOrderDiscountOrPayment) {
                             if ($idsReturnDetail && count($idsReturnDetail)) {
                                 if ($refundedAmounts) {
                                     foreach ($idsReturnDetail as $idRetDetail) {
@@ -371,6 +358,8 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
                         // save individual booking amount for every booking refund
                         $refundedAmount = $refundedAmounts[$idRetDetail];
                         $objOrderReturnDetail->refunded_amount = $refundedAmount;
+                        // set the id_customization to check if in this request which bookings are refunded or not for future
+                        $objOrderReturnDetail->id_customization = 1;
                         $objOrderReturnDetail->save();
 
                         // sum the refund amount for total order refund amount
@@ -397,7 +386,7 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
                     }
 
                     // if bookings are refunded then set the payment information
-                    if ((float) $orderTotalPaid > 0) {
+                    if ($hasOrderDiscountOrPayment) {
                         if (Tools::isSubmit('refundTransactionAmount')) {
                             $objOrderReturn->payment_mode = $paymentMode;
                             $objOrderReturn->id_transaction = $idTransaction;
@@ -420,7 +409,7 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
                         $idOrderState = 0;
                         if ($objOrder->hasCompletelyRefunded(Order::ORDER_COMPLETE_REFUND_FLAG)) {
                             $idOrderState = Configuration::get('PS_OS_REFUND');
-                        } elseif ($objOrder->hasCompletelyRefunded(Order::ORDER_COMPLETE_REFUND_FLAG)) {
+                        } elseif ($objOrder->hasCompletelyRefunded(Order::ORDER_COMPLETE_CANCELLATION_FLAG)) {
                             $idOrderState = Configuration::get('PS_OS_CANCELED');
                         }
 
@@ -579,11 +568,12 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
     {
         parent::setMedia();
 
-        $this->addJqueryUI('ui.tooltip', 'base', true);
-        $this->removeJS(Media::getJqueryUIPath('effects.core', 'base', false), false);
+        if ($this->display == 'view') {
+            $this->addJqueryUI('ui.tooltip', 'base', true);
+            $this->removeJS(Media::getJqueryUIPath('effects.core', 'base', false), false);
 
-
-        $this->addJs(_MODULE_DIR_.$this->module->name.'/views/js/admin/wk_refund_request.js');
-        $this->addCSS(_MODULE_DIR_.$this->module->name.'/views/css/admin/wk_refund_request.css');
+            $this->addJs(_MODULE_DIR_.$this->module->name.'/views/js/admin/wk_refund_request.js');
+            $this->addCSS(_MODULE_DIR_.$this->module->name.'/views/css/admin/wk_refund_request.css');
+        }
     }
 }
