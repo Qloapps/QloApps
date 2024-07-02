@@ -2631,9 +2631,12 @@ class OrderCore extends ObjectModel
      * Order::ORDER_COMPLETE_REFUND_FLAG for complete refunded and
      * Order::ORDER_COMPLETE_CANCELLATION_FLAG for completely cancelled and
      * Order::ORDER_COMPLETE_CANCELLATION_OR_REFUND_REQUEST_FLAG for all rooms are either cancelled or requested for refunded
+     *
+     * @param integer includeCheckIn = 1: If you want to get result for rooms that are refunded or cancelled Or Checkin/Checkout. Send $action = 0
+     *
      * @return boolean: true if order has been completely refunded as per requested parameters or false
      */
-    public function hasCompletelyRefunded($action = 0)
+    public function hasCompletelyRefunded($action = 0, $includeCheckIn = 0)
     {
         $objHotelBooking = new HotelBookingdetail();
         if ($orderBookings = $objHotelBooking->getOrderCurrentDataByOrderId($this->id)) {
@@ -2658,17 +2661,34 @@ class OrderCore extends ObjectModel
             } elseif ($action == Order::ORDER_COMPLETE_CANCELLATION_OR_REFUND_REQUEST_FLAG) {
                 foreach ($orderBookings as $booking) {
                     if (!$booking['is_refunded']) {
-                        if (!OrderReturn::getOrdersReturnDetail($this->id, 0, $booking['id'])) {
+                        // If booking refund request is created and request is completed but booking is not refunded then return false
+                        if ($bookingRefundDetail = OrderReturn::getOrdersReturnDetail($this->id, 0, $booking['id'])) {
+                            $bookingRefundDetail = reset($bookingRefundDetail);
+                            if ($bookingRefundDetail['refunded']) {
+                                return false;
+                            }
+                        } else {
                             return false;
                         }
                     }
                 }
+
                 return true;
             // Default process to check if order is fully refunded or cancelled or not
             } else {
                 // if is_refunded is 1 means booking either is cancelled or refunded. So check all bookings must have is_refunded = 1
                 $uniqueRefundedBookings = array_unique(array_column($orderBookings, 'is_refunded'));
                 if (count($uniqueRefundedBookings) == 1 && $uniqueRefundedBookings[0] == 1) {
+                    return true;
+                } elseif ($includeCheckIn) {
+                    foreach ($orderBookings as $booking) {
+                        if ($booking['is_refunded'] == 0
+                            && !OrderReturn::getOrdersReturnDetail($this->id, 0, $booking['id'])
+                            && $booking['id_status'] == HotelBookingDetail::STATUS_ALLOTED
+                        ) {
+                            return false;
+                        }
+                    }
                     return true;
                 }
             }
@@ -2727,7 +2747,12 @@ class OrderCore extends ObjectModel
                 if ($orderBookings = $objHotelBooking->getOrderCurrentDataByOrderId($this->id)) {
                     foreach ($orderBookings as $orderBooking) {
                         // If booking is refunded then no need to check inventory
-                        if ((OrderReturn::getOrdersReturnDetail($this->id, 0, $orderBooking['id']) && $orderBooking['is_refunded'])
+                        if ($bookingRefundDetail = OrderReturn::getOrdersReturnDetail($this->id, 0, $orderBooking['id'])) {
+                            $bookingRefundDetail = reset($bookingRefundDetail);
+                        }
+
+                        // $bookingRefundDetail['id_customization'] is 1 for only refunded request completed and refunded bookings
+                        if (($bookingRefundDetail && $bookingRefundDetail['refunded'] && $orderBooking['is_refunded'] && $bookingRefundDetail['id_customization'])
                             || ($orderBooking['is_cancelled'] && $orderBooking['is_refunded'])
                         ) {
                             continue;

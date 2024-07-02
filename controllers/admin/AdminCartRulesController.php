@@ -411,7 +411,7 @@ class AdminCartRulesControllerCore extends AdminController
                             $ruleGroupId,
                             $ruleId,
                             Tools::getValue('product_rule_'.$ruleGroupId.'_'.$ruleId.'_type'),
-                            Tools::getValue('product_rule_select_'.$ruleGroupId.'_'.$ruleId)
+                            Tools::getValue('product_rule_select_'.$ruleGroupId.'_'.$ruleId, array())
                         );
                     }
                 }
@@ -486,6 +486,7 @@ class AdminCartRulesControllerCore extends AdminController
                 ON (p.`id_product` = hrt.`id_product`)
                 LEFT JOIN `'._DB_PREFIX_.'htl_branch_info_lang` hbl
                 ON (hrt.`id_hotel` = hbl.`id` AND hbl.`id_lang` = '.(int)Context::getContext()->language->id.Shop::addSqlRestrictionOnLang('pl').')
+                WHERE p.`booking_product` = 1
 				ORDER BY name');
                 foreach ($results as $row) {
                     if($row['hotel_name']) {
