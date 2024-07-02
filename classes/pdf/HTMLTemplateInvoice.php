@@ -412,8 +412,7 @@ class HTMLTemplateInvoiceCore extends HTMLTemplate
                                     1,
                                     1,
                                     1,
-                                    Product::PRICE_ADDITION_TYPE_WITH_ROOM,
-                                    $type_value['id_order_detail']
+                                    Product::PRICE_ADDITION_TYPE_WITH_ROOM
                                 );
                                 $cart_htl_data[$type_key]['date_diff'][$date_join]['additional_services_price_auto_add_te'] = $objRoomTypeServiceProductOrderDetail->getroomTypeServiceProducts(
                                     $order_obj->id,
@@ -426,8 +425,7 @@ class HTMLTemplateInvoiceCore extends HTMLTemplate
                                     1,
                                     0,
                                     1,
-                                    Product::PRICE_ADDITION_TYPE_WITH_ROOM,
-                                    $type_value['id_order_detail']
+                                    Product::PRICE_ADDITION_TYPE_WITH_ROOM
                                 );
 
                                 $cart_htl_data[$type_key]['date_diff'][$date_join]['num_rm'] += 1;
@@ -482,12 +480,7 @@ class HTMLTemplateInvoiceCore extends HTMLTemplate
                                     $data_v['id_product'],
                                     $data_v['date_from'],
                                     $data_v['date_to'],
-                                    0,
-                                    0,
-                                    null,
-                                    0,
-                                    null,
-                                    $type_value['id_order_detail']
+                                    0
                                 );
 
                                 $cart_htl_data[$type_key]['date_diff'][$date_join]['additional_services_price_ti'] = $objRoomTypeServiceProductOrderDetail->getroomTypeServiceProducts(
@@ -499,10 +492,7 @@ class HTMLTemplateInvoiceCore extends HTMLTemplate
                                     $data_v['date_to'],
                                     0,
                                     1,
-                                    1,
-                                    0,
-                                    null,
-                                    $type_value['id_order_detail']
+                                    1
                                 );
                                 $cart_htl_data[$type_key]['date_diff'][$date_join]['additional_services_price_te'] = $objRoomTypeServiceProductOrderDetail->getroomTypeServiceProducts(
                                     $order_obj->id,
@@ -513,10 +503,7 @@ class HTMLTemplateInvoiceCore extends HTMLTemplate
                                     $data_v['date_to'],
                                     0,
                                     1,
-                                    0,
-                                    0,
-                                    null,
-                                    $type_value['id_order_detail']
+                                    0
                                 );
 
                                 $cart_htl_data[$type_key]['date_diff'][$date_join]['additional_services_price_auto_add_ti'] = $objRoomTypeServiceProductOrderDetail->getroomTypeServiceProducts(
@@ -530,9 +517,7 @@ class HTMLTemplateInvoiceCore extends HTMLTemplate
                                     1,
                                     1,
                                     1,
-                                    Product::PRICE_ADDITION_TYPE_WITH_ROOM,
-                                    null,
-                                    $type_value['id_order_detail']
+                                    Product::PRICE_ADDITION_TYPE_WITH_ROOM
                                 );
                                 $cart_htl_data[$type_key]['date_diff'][$date_join]['additional_services_price_auto_add_te'] = $objRoomTypeServiceProductOrderDetail->getroomTypeServiceProducts(
                                     $order_obj->id,
@@ -545,9 +530,7 @@ class HTMLTemplateInvoiceCore extends HTMLTemplate
                                     1,
                                     0,
                                     1,
-                                    Product::PRICE_ADDITION_TYPE_WITH_ROOM,
-                                    null,
-                                    $type_value['id_order_detail']
+                                    Product::PRICE_ADDITION_TYPE_WITH_ROOM
                                 );
 
                                 $num_days = $obj_htl_bk_dtl->getNumberOfDays($data_v['date_from'], $data_v['date_to']);
@@ -576,11 +559,7 @@ class HTMLTemplateInvoiceCore extends HTMLTemplate
                                 $type_value['product_id'],
                                 $data_v['id_room'],
                                 $data_v['date_from'],
-                                $data_v['date_to'],
-                                1,
-                                0,
-                                1,
-                                $type_value['id_order_detail']
+                                $data_v['date_to']
                             )) {
                                 $extraDemands = array_shift($extraDemands);
                                 $extraDemands['product_id'] = $type_value['product_id'];
@@ -597,12 +576,7 @@ class HTMLTemplateInvoiceCore extends HTMLTemplate
                                 $type_value['product_id'],
                                 $data_v['date_from'],
                                 $data_v['date_to'],
-                                $data_v['id_room'],
-                                0,
-                                null,
-                                0,
-                                null,
-                                $type_value['id_order_detail']
+                                $data_v['id_room']
                             )) {
                                 $additionalServices = array_shift($additionalServices);
                                 $additionalServices['product_id'] = $type_value['product_id'];
