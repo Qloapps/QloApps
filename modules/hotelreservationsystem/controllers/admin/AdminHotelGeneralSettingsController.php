@@ -307,7 +307,7 @@ class AdminHotelGeneralSettingsController extends ModuleAdminController
                                 'value' => 0,
                             ),
                         ),
-                        'hint' => $this->l('If set to No, Google Maps will not be displayed for hotel location. You need to set hotels location from edit hotel page to display location on the map on front office.'),
+                        'hint' => $this->l('Enable to display Google Maps for hotel locations. If disabled, Google Maps will not be shown.'),
                     ),
                     'WK_MAP_HOTEL_ACTIVE_ONLY' => array(
                         'title' => $this->l('Display Active Hotels Only'),
