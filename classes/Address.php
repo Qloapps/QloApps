@@ -483,6 +483,14 @@ class AddressCore extends ObjectModel
         return array();
     }
 
+    public function cacheFieldsRequiredDatabase($all = false)
+    {
+        parent::cacheFieldsRequiredDatabase($all);
+        if ($this->id_hotel) {
+            self::$fieldsRequiredDatabase['Address'] = array();
+        }
+    }
+
     public function searchByName($query, $idLang = false)
     {
         if (!$idLang) {

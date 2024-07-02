@@ -484,7 +484,11 @@ class HotelReservationSystem extends Module
 
         // Make rooms available for booking if order status is cancelled, refunded or error
         if (in_array($params['newOrderStatus']->id, $objHtlBkDtl->getOrderStatusToFreeBookedRoom())) {
-            if (!$objHtlBkDtl->updateOrderRefundStatus($params['id_order'])) {
+            $isCancelled = 0;
+            if ($params['newOrderStatus']->id == Configuration::get('PS_OS_CANCELED')) {
+                $isCancelled = 1;
+            }
+            if (!$objHtlBkDtl->updateOrderRefundStatus($params['id_order'], false, false, array(), 1, $isCancelled)) {
                 $this->context->controller->errors[] = $this->l('Error while making booked rooms available, attached with this order. Please try again !!');
             }
         }
@@ -509,6 +513,7 @@ class HotelReservationSystem extends Module
                 'htl_room_type_global_demand',
                 'htl_room_type_global_demand_advance_option',
                 'htl_order_refund_rules',
+                'htl_settings_link',
             );
             //If Admin update new language when we do entry in module all lang tables.
             HotelHelper::updateLangTables($newIdLang, $langTables);

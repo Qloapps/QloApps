@@ -56,79 +56,40 @@
                                                     <td class="booking_occupancy">
                                                         <div class="dropdown">
                                                             <button class="btn btn-default btn-left btn-block booking_guest_occupancy input-occupancy" type="button">
-                                                                <span>
-                                                                    {if isset($book_v['occupancies']) && $book_v['occupancies']}
-                                                                        {if (isset($book_v['occupancy_adults']) && $book_v['occupancy_adults'])}{$book_v['occupancy_adults']} {if $book_v['occupancy_adults'] > 1}{l s='Adults' mod='hotelreservationsystem'}{else}{l s='Adult' mod='hotelreservationsystem'}{/if}, {if isset($book_v['occupancy_children']) && $book_v['occupancy_children']}{$book_v['occupancy_children']} {if $book_v['occupancy_children'] > 1} {l s='Children' mod='hotelreservationsystem'}{else}{l s='Child' mod='hotelreservationsystem'}{/if}, {/if}{$book_v['occupancies']|count} {if $book_v['occupancies']|count > 1}{l s='Rooms' mod='hotelreservationsystem'}{else}{l s='Room' mod='hotelreservationsystem'}{/if}{else}{l s='1 Adult, 1 Room' mod='hotelreservationsystem'}{/if}
-                                                                    {else}
-                                                                        {l s='Select occupancy' mod='hotelreservationsystem'}
-                                                                    {/if}
-                                                                </span>
+                                                                <span>{l s='Select occupancy' mod='hotelreservationsystem'}</span>
                                                             </button>
                                                             <div class="dropdown-menu booking_occupancy_wrapper well well-sm">
                                                                 <input type="hidden" class="max_adults" value="{if isset($book_v)}{$book_v['max_adults']|escape:'html':'UTF-8'}{/if}">
                                                                 <input type="hidden" class="max_children" value="{if isset($book_v)}{$book_v['max_children']|escape:'html':'UTF-8'}{/if}">
                                                                 <input type="hidden" class="max_guests" value="{if isset($book_v)}{$book_v['max_guests']|escape:'html':'UTF-8'}{/if}">
                                                                 <div class="booking_occupancy_inner row">
-                                                                    {if isset($book_v['occupancies']) && $book_v['occupancies']}
-                                                                        {assign var=countRoom value=1}
-                                                                        {foreach from=$book_v['occupancies'] key=key item=$occupancy name=occupancyInfo}
-                                                                            <div class="occupancy_info_block selected col-sm-12" occ_block_index="0">
-                                                                                <div class="occupancy_info_head col-sm-12"><label class="room_num_wrapper">{l s='Room - 1' mod='hotelreservationsystem'}</label></div>
-                                                                                <div class="col-sm-12">
-                                                                                    <div class="row">
-                                                                                        <div class="form-group col-xs-6 occupancy_count_block">
-                                                                                            <label>{l s='Adults' mod='hotelreservationsystem'}</label>
-                                                                                            <input type="number" class="form-control num_occupancy num_adults" name="occupancy[{$key|escape:'htmlall':'UTF-8'}][adults]" value="{$occupancy['adults']|escape:'htmlall':'UTF-8'}" min="1"  data-max="{if isset($book_v)}{$book_v['max_adults']|escape:'html':'UTF-8'}{/if}">
-                                                                                        </div>
-                                                                                        <div class="form-group col-xs-6 occupancy_count_block">
-                                                                                            <label>{l s='Children' mod='hotelreservationsystem'} <span class="label-desc-txt"></span></label>
-                                                                                            <input type="number" class="form-control num_occupancy num_children" name="occupancy[{$key|escape:'htmlall':'UTF-8'}][children]" value="{$occupancy['children']|escape:'htmlall':'UTF-8'}" min="0" data-max="{if isset($book_v)}{$book_v['max_children']|escape:'html':'UTF-8'}{else}{$max_child_in_room}{/if}">
-                                                                                            ({l s='Below' mod='hotelreservationsystem'}  {$max_child_age|escape:'htmlall':'UTF-8'} {l s='years' mod='hotelreservationsystem'})
-                                                                                        </div>
-                                                                                    </div>
-                                                                                    <p style="display:none;"><span class="text-danger occupancy-input-errors"></span></p>
-                                                                                    <div class="row children_age_info_block" style="display:none">
-                                                                                        <div class="form-group col-sm-12">
-                                                                                            <label class="">{l s='All Children' mod='hotelreservationsystem'}</label>
-                                                                                            <div class="">
-                                                                                                <div class="row children_ages">
-                                                                                                </div>
-                                                                                            </div>
+                                                                    <div class="occupancy_info_block col-sm-12" occ_block_index="0">
+                                                                        <div class="occupancy_info_head col-sm-12"><label class="room_num_wrapper">{l s='Room - 1' mod='hotelreservationsystem'}</label></div>
+                                                                        <div class="col-sm-12">
+                                                                            <div class="row">
+                                                                                <div class="form-group col-xs-6 occupancy_count_block">
+                                                                                    <label>{l s='Adults' mod='hotelreservationsystem'}</label>
+                                                                                    <input type="number" class="form-control num_occupancy num_adults" name="occupancy[0][adults]" value="1" min="1"  data-max="{if isset($book_v)}{$book_v['max_adults']|escape:'html':'UTF-8'}{/if}">
+                                                                                </div>
+                                                                                <div class="form-group col-xs-6 occupancy_count_block">
+                                                                                    <label>{l s='Children' mod='hotelreservationsystem'} <span class="label-desc-txt"></span></label>
+                                                                                    <input type="number" class="form-control num_occupancy num_children" name="occupancy[0][children]" value="0" min="0" data-max="{if isset($book_v)}{$book_v['max_children']|escape:'html':'UTF-8'}{else}{$max_child_in_room}{/if}">
+                                                                                    ({l s='Below' mod='hotelreservationsystem'}  {$max_child_age|escape:'htmlall':'UTF-8'} {l s='years' mod='hotelreservationsystem'})
+                                                                                </div>
+                                                                            </div>
+                                                                            <p style="display:none;"><span class="text-danger occupancy-input-errors"></span></p>
+                                                                            <div class="row children_age_info_block" style="display:none">
+                                                                                <div class="form-group col-sm-12">
+                                                                                    <label class="">{l s='All Children' mod='hotelreservationsystem'}</label>
+                                                                                    <div class="">
+                                                                                        <div class="row children_ages">
                                                                                         </div>
                                                                                     </div>
                                                                                 </div>
                                                                             </div>
-                                                                            {assign var=countRoom value=$countRoom+1}
-                                                                        {/foreach}
-                                                                    {else}
-                                                                        <div class="occupancy_info_block col-sm-12" occ_block_index="0">
-                                                                            <div class="occupancy_info_head col-sm-12"><label class="room_num_wrapper">{l s='Room - 1' mod='hotelreservationsystem'}</label></div>
-                                                                            <div class="col-sm-12">
-                                                                                <div class="row">
-                                                                                    <div class="form-group col-xs-6 occupancy_count_block">
-                                                                                        <label>{l s='Adults' mod='hotelreservationsystem'}</label>
-                                                                                        <input type="number" class="form-control num_occupancy num_adults" name="occupancy[0][adults]" value="1" min="1"  max="{if isset($book_v)}{$book_v['max_adults']|escape:'html':'UTF-8'}{/if}">
-                                                                                    </div>
-                                                                                    <div class="form-group col-xs-6 occupancy_count_block">
-                                                                                        <label>{l s='Children' mod='hotelreservationsystem'} <span class="label-desc-txt"></span></label>
-                                                                                        <input type="number" class="form-control num_occupancy num_children" name="occupancy[0][children]" value="0" min="0" max="{if isset($book_v)}{$book_v['max_children']|escape:'html':'UTF-8'}{else}{$max_child_in_room}{/if}">
-                                                                                        ({l s='Below'}  {$max_child_age|escape:'htmlall':'UTF-8'} {l s='years' mod='hotelreservationsystem'})
-                                                                                    </div>
-                                                                                </div>
-                                                                                <p style="display:none;"><span class="text-danger occupancy-input-errors"></span></p>
-                                                                                <div class="row children_age_info_block" style="display:none">
-                                                                                    <div class="form-group col-sm-12">
-                                                                                        <label class="">{l s='All Children' mod='hotelreservationsystem'}</label>
-                                                                                        <div class="">
-                                                                                            <div class="row children_ages">
-                                                                                            </div>
-                                                                                        </div>
-                                                                                    </div>
-                                                                                </div>
-                                                                            </div>
-                                                                            {* <hr class="occupancy-info-separator"> *}
                                                                         </div>
-                                                                    {/if}
+                                                                        {* <hr class="occupancy-info-separator"> *}
+                                                                    </div>
                                                                 </div>
                                                                 {* <div class="add_occupancy_block">
                                                                     <a class="add_new_occupancy_btn" href="#"><i class="icon-plus"></i> <span>{l s='Add Room'}</span></a>
@@ -183,79 +144,40 @@
                                                         <td class="booking_occupancy">
                                                             <div class="dropdown">
                                                                 <button class="btn btn-default btn-left btn-block booking_guest_occupancy input-occupancy" type="button">
-                                                                    <span>
-                                                                        {if isset($book_v['occupancies']) && $book_v['occupancies']}
-                                                                            {if (isset($book_v['occupancy_adults']) && $book_v['occupancy_adults'])}{$book_v['occupancy_adults']} {if $book_v['occupancy_adults'] > 1}{l s='Adults' mod='hotelreservationsystem'}{else}{l s='Adult' mod='hotelreservationsystem'}{/if}, {if isset($book_v['occupancy_children']) && $book_v['occupancy_children']}{$book_v['occupancy_children']} {if $book_v['occupancy_children'] > 1} {l s='Children' mod='hotelreservationsystem'}{else}{l s='Child' mod='hotelreservationsystem'}{/if}, {/if}{$book_v['occupancies']|count} {if $book_v['occupancies']|count > 1}{l s='Rooms' mod='hotelreservationsystem'}{else}{l s='Room' mod='hotelreservationsystem'}{/if}{else}{l s='1 Adult, 1 Room' mod='hotelreservationsystem'}{/if}
-                                                                        {else}
-                                                                            {l s='Select occupancy' mod='hotelreservationsystem'}
-                                                                        {/if}
-                                                                    </span>
+                                                                    <span>{l s='Select occupancy' mod='hotelreservationsystem'}</span>
                                                                 </button>
                                                                 <div class="dropdown-menu booking_occupancy_wrapper well well-sm">
                                                                     <input type="hidden" class="max_adults" value="{if isset($book_v)}{$book_v['max_adults']|escape:'html':'UTF-8'}{/if}">
                                                                     <input type="hidden" class="max_children" value="{if isset($book_v)}{$book_v['max_children']|escape:'html':'UTF-8'}{/if}">
                                                                     <input type="hidden" class="max_guests" value="{if isset($book_v)}{$book_v['max_guests']|escape:'html':'UTF-8'}{/if}">
                                                                     <div class="booking_occupancy_inner row">
-                                                                        {if isset($book_v['occupancies']) && $book_v['occupancies']}
-                                                                            {assign var=countRoom value=1}
-                                                                            {foreach from=$book_v['occupancies'] key=key item=$occupancy name=occupancyInfo}
-                                                                                <div class="occupancy_info_block selected col-sm-12" occ_block_index="0">
-                                                                                    <div class="occupancy_info_head col-sm-12"><label class="room_num_wrapper">{l s='Room - 1' mod='hotelreservationsystem'}</label></div>
-                                                                                    <div class="col-sm-12">
-                                                                                        <div class="row">
-                                                                                            <div class="form-group col-xs-6 occupancy_count_block">
-                                                                                                <label>{l s='Adults' mod='hotelreservationsystem'}</label>
-                                                                                                <input type="number" class="form-control num_occupancy num_adults" name="occupancy[{$key|escape:'htmlall':'UTF-8'}][adults]" value="{$occupancy['adults']|escape:'htmlall':'UTF-8'}" min="1"  data-max="{if isset($book_v)}{$book_v['max_adults']|escape:'html':'UTF-8'}{/if}">
-                                                                                            </div>
-                                                                                            <div class="form-group col-xs-6 occupancy_count_block">
-                                                                                                <label>{l s='Children' mod='hotelreservationsystem'} <span class="label-desc-txt"></span></label>
-                                                                                                <input type="number" class="form-control num_occupancy num_children" name="occupancy[{$key|escape:'htmlall':'UTF-8'}][children]" value="{$occupancy['children']|escape:'htmlall':'UTF-8'}" min="0" data-max="{if isset($book_v)}{$book_v['max_children']|escape:'html':'UTF-8'}{else}{$max_child_in_room}{/if}">
-                                                                                                ({l s='Below' mod='hotelreservationsystem'}  {$max_child_age|escape:'htmlall':'UTF-8'} {l s='years' mod='hotelreservationsystem'})
-                                                                                            </div>
-                                                                                        </div>
-                                                                                        <p style="display:none;"><span class="text-danger occupancy-input-errors"></span></p>
-                                                                                        <div class="row children_age_info_block" style="display:none">
-                                                                                            <div class="form-group col-sm-12">
-                                                                                                <label class="">{l s='All Children' mod='hotelreservationsystem'}</label>
-                                                                                                <div class="">
-                                                                                                    <div class="row children_ages">
-                                                                                                    </div>
-                                                                                                </div>
+                                                                        <div class="occupancy_info_block col-sm-12" occ_block_index="0">
+                                                                            <div class="occupancy_info_head col-sm-12"><label class="room_num_wrapper">{l s='Room - 1' mod='hotelreservationsystem'}</label></div>
+                                                                            <div class="col-sm-12">
+                                                                                <div class="row">
+                                                                                    <div class="form-group col-xs-6 occupancy_count_block">
+                                                                                        <label>{l s='Adults' mod='hotelreservationsystem'}</label>
+                                                                                        <input type="number" class="form-control num_occupancy num_adults" name="occupancy[0][adults]" value="1" min="1"  data-max="{if isset($book_v)}{$book_v['max_adults']|escape:'html':'UTF-8'}{/if}">
+                                                                                    </div>
+                                                                                    <div class="form-group col-xs-6 occupancy_count_block">
+                                                                                        <label>{l s='Children' mod='hotelreservationsystem'} <span class="label-desc-txt"></span></label>
+                                                                                        <input type="number" class="form-control num_occupancy num_children" name="occupancy[0][children]" value="0" min="0" data-max="{if isset($book_v)}{$book_v['max_children']|escape:'html':'UTF-8'}{else}{$max_child_in_room}{/if}">
+                                                                                        ({l s='Below'}  {$max_child_age|escape:'htmlall':'UTF-8'} {l s='years' mod='hotelreservationsystem'})
+                                                                                    </div>
+                                                                                </div>
+                                                                                <p style="display:none;"><span class="text-danger occupancy-input-errors"></span></p>
+                                                                                <div class="row children_age_info_block" style="display:none">
+                                                                                    <div class="form-group col-sm-12">
+                                                                                        <label class="">{l s='All Children' mod='hotelreservationsystem'}</label>
+                                                                                        <div class="">
+                                                                                            <div class="row children_ages">
                                                                                             </div>
                                                                                         </div>
                                                                                     </div>
                                                                                 </div>
-                                                                                {assign var=countRoom value=$countRoom+1}
-                                                                            {/foreach}
-                                                                        {else}
-                                                                            <div class="occupancy_info_block col-sm-12" occ_block_index="0">
-                                                                                <div class="occupancy_info_head col-sm-12"><label class="room_num_wrapper">{l s='Room - 1' mod='hotelreservationsystem'}</label></div>
-                                                                                <div class="col-sm-12">
-                                                                                    <div class="row">
-                                                                                        <div class="form-group col-xs-6 occupancy_count_block">
-                                                                                            <label>{l s='Adults' mod='hotelreservationsystem'}</label>
-                                                                                            <input type="number" class="form-control num_occupancy num_adults" name="occupancy[0][adults]" value="1" min="1"  data-max="{if isset($book_v)}{$book_v['max_adults']|escape:'html':'UTF-8'}{/if}">
-                                                                                        </div>
-                                                                                        <div class="form-group col-xs-6 occupancy_count_block">
-                                                                                            <label>{l s='Children' mod='hotelreservationsystem'} <span class="label-desc-txt"></span></label>
-                                                                                            <input type="number" class="form-control num_occupancy num_children" name="occupancy[0][children]" value="0" data-max="{if isset($book_v)}{$book_v['max_children']|escape:'html':'UTF-8'}{else}{$max_child_in_room}{/if}">
-                                                                                            ({l s='Below' mod='hotelreservationsystem'}  {$max_child_age|escape:'htmlall':'UTF-8'} {l s='years' mod='hotelreservationsystem'})
-                                                                                        </div>
-                                                                                    </div>
-                                                                                    <p style="display:none;"><span class="text-danger occupancy-input-errors"></span></p>
-                                                                                    <div class="row children_age_info_block" style="display:none">
-                                                                                        <div class="form-group col-sm-12">
-                                                                                            <label class="">{l s='All Children' mod='hotelreservationsystem'}</label>
-                                                                                            <div class="">
-                                                                                                <div class="row children_ages">
-                                                                                                </div>
-                                                                                            </div>
-                                                                                        </div>
-                                                                                    </div>
-                                                                                </div>
-                                                                                {* <hr class="occupancy-info-separator"> *}
                                                                             </div>
-                                                                        {/if}
+                                                                            {* <hr class="occupancy-info-separator"> *}
+                                                                        </div>
                                                                     </div>
                                                                     {* <div class="add_occupancy_block">
                                                                         <a class="add_new_occupancy_btn" href="#"><i class="icon-plus"></i> <span>{l s='Add Room'}</span></a>
@@ -300,7 +222,7 @@
                                                     </td>
                                                     <td>
                                                         {if $rm_dtl_v['booking_type'] == HotelBookingDetail::ALLOTMENT_AUTO}
-                                                            <button type="button" class="btn btn-primary" id="reallocate_room_{$rm_dtl_v['id_htl_booking']}" data-room_type_name="{$rm_dtl_v['room_type_name']}" data-toggle="modal" data-target="#mySwappigModal" data-id_htl_booking="{$rm_dtl_v['id_htl_booking']}" data-id_order="{$rm_dtl_v['id_order']}" data-room_num='{$booked_v['room_num']}' data-currency_sign='{$rm_dtl_v['currency_sign']}' data-id_room_type='{$booked_v['id_product']}' data-cust_name='{$rm_dtl_v['alloted_cust_name']}' data-cust_email='{$rm_dtl_v['alloted_cust_email']}' data-avail_rm_swap='{$rm_dtl_v['avail_rooms_to_swap']|@json_encode}' data-avail_realloc_room_types='{$rm_dtl_v['avail_room_types_to_realloc']|@json_encode}'>
+                                                            <button type="button" class="btn btn-primary room_reallocate_swap" id="reallocate_room_{$rm_dtl_v['id_htl_booking']}" data-room_type_name="{$rm_dtl_v['room_type_name']}" data-id_htl_booking="{$rm_dtl_v['id_htl_booking']}" data-id_order="{$rm_dtl_v['id_order']}" data-room_num='{$booked_v['room_num']}' data-currency_sign='{$rm_dtl_v['currency_sign']}' data-id_room_type='{$booked_v['id_product']}' data-cust_name='{$rm_dtl_v['alloted_cust_name']}' data-cust_email='{$rm_dtl_v['alloted_cust_email']}' data-avail_rm_swap='{$rm_dtl_v['avail_rooms_to_swap']|@json_encode}' data-avail_realloc_room_types='{$rm_dtl_v['avail_room_types_to_realloc']|@json_encode}'>
                                                                 {l s='Reallocate Room' mod='hotelreservationsystem'}
                                                             </button>
                                                         {else}
