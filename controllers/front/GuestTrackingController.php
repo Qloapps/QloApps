@@ -249,6 +249,7 @@ class GuestTrackingControllerCore extends FrontController
                         $total_demands_price_ti = 0;
                         $total_convenience_fee_te = 0;
                         $total_convenience_fee_ti = 0;
+
                         foreach ($orderProducts as $type_key => $type_value) {
                             if (in_array($type_value['product_id'], $processedProducts)) {
                                 continue;
@@ -306,13 +307,6 @@ class GuestTrackingControllerCore extends FrontController
                                         if ($data_v['is_back_order']) {
                                             $anyBackOrder = 1;
                                         }
-                                        if ($data_v['is_refunded']) {
-                                            $cartHotelData[$type_key]['date_diff'][$date_join]['count_refunded'] += 1;
-                                        }
-                                        if ($data_v['is_cancelled']) {
-                                            $cartHotelData[$type_key]['date_diff'][$date_join]['count_cancelled'] += 1;
-                                            $cartHotelData[$type_key]['date_diff'][$date_join]['count_refunded'] -= 1;
-                                        }
                                     } else {
                                         $num_days = $objBookingDetail->getNumberOfDays($data_v['date_from'], $data_v['date_to']);
                                         $cartHotelData[$type_key]['date_diff'][$date_join]['num_rm'] = 1;
@@ -331,15 +325,6 @@ class GuestTrackingControllerCore extends FrontController
                                         $cartHotelData[$type_key]['date_diff'][$date_join]['is_backorder'] = $data_v['is_back_order'];
                                         if ($data_v['is_back_order']) {
                                             $anyBackOrder = 1;
-                                        }
-                                        $cartHotelData[$type_key]['date_diff'][$date_join]['count_cancelled'] = 0;
-                                        $cartHotelData[$type_key]['date_diff'][$date_join]['count_refunded'] = 0;
-                                        if ($data_v['is_refunded']) {
-                                            $cartHotelData[$type_key]['date_diff'][$date_join]['count_refunded'] += 1;
-                                        }
-                                        if ($data_v['is_cancelled']) {
-                                            $cartHotelData[$type_key]['date_diff'][$date_join]['count_cancelled'] += 1;
-                                            $cartHotelData[$type_key]['date_diff'][$date_join]['count_refunded'] -= 1;
                                         }
                                     }
 
