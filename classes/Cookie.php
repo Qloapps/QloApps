@@ -89,8 +89,8 @@ class CookieCore
             $this->_path = '/'.$this->_path;
         }
         $this->_path = rawurlencode($this->_path);
-        $search = array('%2F', '%7E', '%28', '%29');
-        $replace = array('/', '~', '(', ')');
+        $search = array('%2F', '%7E', '%28', '%29', '%2B', '%26');
+        $replace = array('/', '~', '(', ')', '+', '&');
         $this->_path = str_replace($search, $replace, $this->_path);
         $this->_domain = $this->getDomain($shared_urls);
         $this->_sameSite = Configuration::get('PS_COOKIE_SAMESITE');
