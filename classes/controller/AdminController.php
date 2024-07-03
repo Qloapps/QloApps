@@ -933,88 +933,86 @@ class AdminControllerCore extends Controller
         }
 
         if (empty($this->errors)) {
-            if ($filters) {
-                foreach ($filters as $key => $value) {
-                    $this->context->cookie->$key = $value;
-                }
-            }
             $definition = false;
             if (isset($this->className) && $this->className) {
                 $definition = ObjectModel::getDefinition($this->className);
             }
+            if ($filters) {
+                foreach ($filters as $key => $value) {
+                    $this->context->cookie->$key = $value;
 
-            foreach ($filters as $key => $value) {
-                /* Extracting filters from $_POST on key filter_ */
-                if ($value != null && !strncmp($key, $prefix.$this->list_id.'Filter_', 7 + Tools::strlen($prefix.$this->list_id))) {
-                    $key_org = $key;
-                    $key = Tools::substr($key, 7 + Tools::strlen($prefix.$this->list_id));
-                    /* Table alias could be specified using a ! eg. alias!field */
-                    $tmp_tab = explode('!', $key);
-                    $filter = count($tmp_tab) > 1 ? $tmp_tab[1] : $tmp_tab[0];
+                    /* Extracting filters from $_POST on key filter_ */
+                    if ($value != null && !strncmp($key, $prefix.$this->list_id.'Filter_', 7 + Tools::strlen($prefix.$this->list_id))) {
+                        $key_org = $key;
+                        $key = Tools::substr($key, 7 + Tools::strlen($prefix.$this->list_id));
+                        /* Table alias could be specified using a ! eg. alias!field */
+                        $tmp_tab = explode('!', $key);
+                        $filter = count($tmp_tab) > 1 ? $tmp_tab[1] : $tmp_tab[0];
 
-                    if ($field = $this->filterToField($key, $filter)) {
-                        $type = (array_key_exists('filter_type', $field) ? $field['filter_type'] : (array_key_exists('type', $field) ? $field['type'] : false));
-                        if ((($type == 'date' || $type == 'datetime' || $type == 'range') || ($type == 'select' && (isset($field['multiple']) && $field['multiple'])))
-                            && is_string($value)
-                        ) {
-                            $value = json_decode($value, true);
-                        }
-                        $key = isset($tmp_tab[1]) ? $tmp_tab[0].'.`'.$tmp_tab[1].'`' : '`'.$tmp_tab[0].'`';
-
-                        // as in database 0 means position 1 in the renderlist
-                        if (isset($field['position']) && Validate::isInt($value)) {
-                            $value -= 1;
-                        }
-
-                        // Assignment by reference
-                        if (array_key_exists('tmpTableFilter', $field)) {
-                            $sql_filter = & $this->_tmpTableFilter;
-                        } elseif (array_key_exists('havingFilter', $field)) {
-                            $sql_filter = & $this->_filterHaving;
-                        } else {
-                            $sql_filter = & $this->_filter;
-                        }
-
-                        if (is_array($value)) {
-                            if ($type == 'select' && (isset($field['multiple']) && $field['multiple']) && isset($field['operator'])) {
-                                if ($field['operator'] == 'and') {
-                                    $sql_filter .= ' AND '.pSQL($key).' IN ('.pSQL(implode(',', $value)).')';
-                                    $this->_filterHaving .= ' AND COUNT(DISTINCT '.pSQL($key).') = '.(int) count($value);
-                                } elseif ($field['operator'] == 'or') {
-                                    $sql_filter .= ' AND '.pSQL($key).' IN ('.pSQL(implode(',', $value)).')';
-                                }
-                            } elseif ($type == 'range') {
-
-                                if (isset($value[0]) && ($value[0] !== '' || $value[0] === 0)) {
-                                    $sql_filter .= ' AND '.pSQL($key).' >= '.pSQL($value[0]);
-                                }
-                                if (isset($value[1]) && ($value[1] !== '' || $value[1] === 0)) {
-                                    $sql_filter .= ' AND '.pSQL($key).' <= '.pSQL($value[1]);
-                                }
-                            } else {
-                                if (isset($value[0]) && !empty($value[0])) {
-                                    $sql_filter .= ' AND '.pSQL($key).' >= \''.pSQL(Tools::dateFrom($value[0])).'\'';
-                                }
-                                if (isset($value[1]) && !empty($value[1])) {
-                                    $sql_filter .= ' AND '.pSQL($key).' <= \''.pSQL(Tools::dateTo($value[1])).'\'';
-                                }
+                        if ($field = $this->filterToField($key, $filter)) {
+                            $type = (array_key_exists('filter_type', $field) ? $field['filter_type'] : (array_key_exists('type', $field) ? $field['type'] : false));
+                            if ((($type == 'date' || $type == 'datetime' || $type == 'range') || ($type == 'select' && (isset($field['multiple']) && $field['multiple'])))
+                                && is_string($value)
+                            ) {
+                                $value = json_decode($value, true);
                             }
-                        } else {
-                            $sql_filter .= ' AND ';
-                            $check_key = ($key == $this->identifier || $key == '`'.$this->identifier.'`');
-                            $alias = ($definition && !empty($definition['fields'][$filter]['shop'])) ? 'sa' : 'a';
+                            $key = isset($tmp_tab[1]) ? $tmp_tab[0].'.`'.$tmp_tab[1].'`' : '`'.$tmp_tab[0].'`';
 
-                            if ($type == 'int' || $type == 'bool') {
-                                $sql_filter .= (($check_key || $key == '`active`') ?  $alias.'.' : '').pSQL($key).' = '.(int)$value.' ';
-                            } elseif ($type == 'decimal') {
-                                $sql_filter .= ($check_key ?  $alias.'.' : '').pSQL($key).' = '.(float)$value.' ';
-                            } elseif ($type == 'select') {
-                                $sql_filter .= ($check_key ?  $alias.'.' : '').pSQL($key).' = \''.pSQL($value).'\' ';
-                            } elseif ($type == 'price') {
-                                $value = (float)str_replace(',', '.', $value);
-                                $sql_filter .= ($check_key ?  $alias.'.' : '').pSQL($key).' = '.pSQL(trim($value)).' ';
+                            // as in database 0 means position 1 in the renderlist
+                            if (isset($field['position']) && Validate::isInt($value)) {
+                                $value -= 1;
+                            }
+
+                            // Assignment by reference
+                            if (array_key_exists('tmpTableFilter', $field)) {
+                                $sql_filter = & $this->_tmpTableFilter;
+                            } elseif (array_key_exists('havingFilter', $field)) {
+                                $sql_filter = & $this->_filterHaving;
                             } else {
-                                $sql_filter .= ($check_key ?  $alias.'.' : '').pSQL($key).' LIKE \'%'.pSQL(trim($value)).'%\' ';
+                                $sql_filter = & $this->_filter;
+                            }
+
+                            if (is_array($value)) {
+                                if ($type == 'select' && (isset($field['multiple']) && $field['multiple']) && isset($field['operator'])) {
+                                    if ($field['operator'] == 'and') {
+                                        $sql_filter .= ' AND '.pSQL($key).' IN ('.pSQL(implode(',', $value)).')';
+                                        $this->_filterHaving .= ' AND COUNT(DISTINCT '.pSQL($key).') = '.(int) count($value);
+                                    } elseif ($field['operator'] == 'or') {
+                                        $sql_filter .= ' AND '.pSQL($key).' IN ('.pSQL(implode(',', $value)).')';
+                                    }
+                                } elseif ($type == 'range') {
+
+                                    if (isset($value[0]) && ($value[0] !== '' || $value[0] === 0)) {
+                                        $sql_filter .= ' AND '.pSQL($key).' >= '.pSQL($value[0]);
+                                    }
+                                    if (isset($value[1]) && ($value[1] !== '' || $value[1] === 0)) {
+                                        $sql_filter .= ' AND '.pSQL($key).' <= '.pSQL($value[1]);
+                                    }
+                                } else {
+                                    if (isset($value[0]) && !empty($value[0])) {
+                                        $sql_filter .= ' AND '.pSQL($key).' >= \''.pSQL(Tools::dateFrom($value[0])).'\'';
+                                    }
+                                    if (isset($value[1]) && !empty($value[1])) {
+                                        $sql_filter .= ' AND '.pSQL($key).' <= \''.pSQL(Tools::dateTo($value[1])).'\'';
+                                    }
+                                }
+                            } else {
+                                $sql_filter .= ' AND ';
+                                $check_key = ($key == $this->identifier || $key == '`'.$this->identifier.'`');
+                                $alias = ($definition && !empty($definition['fields'][$filter]['shop'])) ? 'sa' : 'a';
+
+                                if ($type == 'int' || $type == 'bool') {
+                                    $sql_filter .= (($check_key || $key == '`active`') ?  $alias.'.' : '').pSQL($key).' = '.(int)$value.' ';
+                                } elseif ($type == 'decimal') {
+                                    $sql_filter .= ($check_key ?  $alias.'.' : '').pSQL($key).' = '.(float)$value.' ';
+                                } elseif ($type == 'select') {
+                                    $sql_filter .= ($check_key ?  $alias.'.' : '').pSQL($key).' = \''.pSQL($value).'\' ';
+                                } elseif ($type == 'price') {
+                                    $value = (float)str_replace(',', '.', $value);
+                                    $sql_filter .= ($check_key ?  $alias.'.' : '').pSQL($key).' = '.pSQL(trim($value)).' ';
+                                } else {
+                                    $sql_filter .= ($check_key ?  $alias.'.' : '').pSQL($key).' LIKE \'%'.pSQL(trim($value)).'%\' ';
+                                }
                             }
                         }
                     }
