@@ -60,14 +60,6 @@
 		{
 			$tree.find(':input[type=checkbox]').each(function(){
 				$(this).prop('checked', false);
-
-				$('select#id_category_default option[value='+$(this).val()+']').remove();
-				if ($('select#id_category_default option').length == 0)
-				{
-					$('select#id_category_default').closest('.form-group').hide();
-					$('#no_default_category').show();
-				}
-
 				$(this).parent().removeClass('tree-selected');
 			});
 		}
