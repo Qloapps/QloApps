@@ -278,7 +278,7 @@ class AdminNormalProductsControllerCore extends AdminController
         $idServiceCategory = Configuration::get('PS_SERVICE_CATEGORY');
         $this->objLocationsCategory = new Category($idServiceCategory, $this->context->language->id);
         $nestedCategories = Category::getNestedCategories($idServiceCategory);
-        if ($nestedCategories) {
+        if (isset($nestedCategories[$idServiceCategory]['children']) && $nestedCategories[$idServiceCategory]['children']) {
             foreach ($nestedCategories[$idServiceCategory]['children'] as $childCategory) {
                 $this->buildCategoryOptions($childCategory);
             }

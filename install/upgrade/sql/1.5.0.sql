@@ -56,9 +56,9 @@ SELECT '1', `id_lang`, 'Waiting for confirmation', 'order_refund_waiting_custome
 INSERT INTO `PREFIX_order_return_state_lang` (`id_order_return_state`, `id_lang`, `name`, `customer_template`, `admin_template`)
 SELECT '2', `id_lang`, 'Request received', 'order_refund_received_customer', 'order_refund_received_admin' FROM `PREFIX_lang`;
 INSERT INTO `PREFIX_order_return_state_lang` (`id_order_return_state`, `id_lang`, `name`, `customer_template`, `admin_template`)
-SELECT '3', `id_lang`, 'Refund denied', 'order_refund_denied_customer', 'order_refund_denied_admin' FROM `PREFIX_lang`;
+SELECT '3', `id_lang`, 'Denied', 'order_refund_denied_customer', 'order_refund_denied_admin' FROM `PREFIX_lang`;
 INSERT INTO `PREFIX_order_return_state_lang` (`id_order_return_state`, `id_lang`, `name`, `customer_template`, `admin_template`)
-SELECT '4', `id_lang`, 'Refund completed', 'order_refund_completed_customer', 'order_refund_completed_admin' FROM `PREFIX_lang`;
+SELECT '4', `id_lang`, 'Completed', 'order_refund_completed_customer', 'order_refund_completed_admin' FROM `PREFIX_lang`;
 
 
 ALTER TABLE `PREFIX_order_slip_detail`
