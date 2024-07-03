@@ -372,14 +372,16 @@
 									<div class="generate_discount_fields" style="display:none;">
 										<div class="form-group">
 											<div class="col-sm-3">
-												<label for="voucher_expiry" class="control-label required">
-													<span title="" data-toggle="tooltip" class="label-tooltip" data-original-title="{l s='Select voucher expiry date.' mod='hotelreservationsystem'}">{l s='Voucher expiry date' mod='hotelreservationsystem'}</span> :
+												<label for="voucher_expiry" class="control-label">
+													<span title="" data-toggle="tooltip" class="label-tooltip" data-original-title="{l s='Please select the date until which the voucher can be used.' mod='hotelreservationsystem'}">{l s='Voucher expiry date' mod='hotelreservationsystem'}</span> :
 												</label>
 											</div>
 											<div class="col-sm-3">
-												<input type="text" id="voucher_expiry">
-												<input type="hidden" name="voucher_expiry_date" id="voucher_expiry_date">
-
+												<div class="input-group">
+													<input type="text" id="voucher_expiry">
+													<div class="input-group-addon"><i class="icon-calendar"></i></div>
+													<input type="hidden" name="voucher_expiry_date" id="voucher_expiry_date">
+												</div>
 											</div>
 										</div>
 									</div>
