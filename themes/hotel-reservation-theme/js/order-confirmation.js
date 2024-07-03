@@ -18,7 +18,7 @@
 */
 
 $(document).ready(function(){
-    $(document).off('click').on('click', '.open_rooms_extra_services_panel', function(e) {
+    $(document).on('click', '.open_rooms_extra_services_panel', function(e) {
         var idProduct = $(this).data('id_product');
         var idOrder = $(this).data('id_order');
         var dateFrom = $(this).data('date_from');
