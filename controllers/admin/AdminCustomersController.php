@@ -230,23 +230,6 @@ class AdminCustomersControllerCore extends AdminController
             ));
         }
 
-        $prefix = $this->getCookieFilterPrefix();
-        if (Tools::getValue('filterOnlyNewCustomer')) {
-            if (($dateFrom = Tools::getValue('date_from'))
-                && ($dateTo = Tools::getValue('date_to'))
-                && strtotime($dateTo) >= strtotime($dateFrom)
-            ) {
-                $this->processResetFilters();
-                $this->context->cookie->{'submitFilter'.$this->table} = true;
-                //Updating the date format of the filter dates to the desired format.
-                $dateFrom = date('Y-m-d', strtotime($dateFrom));
-                $dateTo = date('Y-m-d', strtotime($dateTo));
-                $this->context->cookie->{$prefix.$this->table.'Filter_date_add'} = json_encode(array($dateFrom, $dateTo));
-            }
-
-            $this->redirect_after = $this->context->link->getAdminLink('AdminCustomers');
-        }
-
         if (!$this->can_add_customer && !$this->display) {
             $this->informations[] = $this->l('You have to select a shop if you want to create a customer.');
         }
@@ -758,7 +741,7 @@ class AdminCustomersControllerCore extends AdminController
         $nbDaysNewCustomers = Validate::isUnsignedInt(Configuration::get('PS_KPI_NEW_CUSTOMERS_NB_DAYS')) ? Configuration::get('PS_KPI_NEW_CUSTOMERS_NB_DAYS') : 30;
         $date_from = date('Y-m-d', strtotime('-'.$nbDaysNewCustomers.' day'));
         $date_to = date('Y-m-d');
-        $helper->href = $this->context->link->getAdminLink('AdminCustomers').'&filterOnlyNewCustomer=1&date_from='.$date_from.'&date_to='.$date_to;
+        $helper->href = $this->context->link->getAdminLink('AdminCustomers').'&customerFilter_date_add[]='.$date_from.'&customerFilter_date_add[]='.$date_to;
         $helper->subtitle = sprintf($this->l('%d Days', null, null, false), (int) $nbDaysNewCustomers);
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=total_new_customers';
         $helper->tooltip = $this->l('The total number of new customers who registered in given period of time.', null, null, false);

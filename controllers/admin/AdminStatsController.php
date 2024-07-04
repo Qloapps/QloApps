@@ -585,6 +585,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
         WHERE p.`active` = 1 AND p.`booking_product` = 1 '.
         (!is_null($idHotel) ? HotelBranchInformation::addHotelRestriction($idHotel, 'hrt') : '').'
         GROUP By p.`id_product`
+        HAVING total_booked > 0
         ORDER BY total_booked DESC';
 
         return Db::getInstance()->getValue($sql);
