@@ -457,7 +457,6 @@ $(document).ready(function() {
             });
         } else {
             $('#daterange_value').dateRangePicker({
-                startDate: $.datepicker.formatDate('dd-mm-yy', new Date()),
                 startDate: start_date,
                 endDate: max_order_date,
             }).on('datepicker-first-date-selected', function() {
