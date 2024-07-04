@@ -201,13 +201,15 @@ class AdminProductsControllerCore extends AdminController
 				LEFT JOIN `'._DB_PREFIX_.'address` aa ON (aa.`id_hotel` = hb.`id`)
 				LEFT JOIN `'._DB_PREFIX_.'feature_product` fp ON (fp.`id_product` = a.`id_product`)
 				LEFT JOIN `'._DB_PREFIX_.'htl_room_type_demand` hrtd ON (hrtd.`id_product` = a.`id_product`)
-				LEFT JOIN `'._DB_PREFIX_.'htl_room_type_service_product` hrtsp ON ((hrtsp.`element_type` = '.(int) RoomTypeServiceProduct::WK_ELEMENT_TYPE_HOTEL.' AND hrtsp.`id_element` = hrt.`id_hotel`) OR (hrtsp.`element_type` = '.(int) RoomTypeServiceProduct::WK_ELEMENT_TYPE_ROOM_TYPE.' AND hrtsp.`id_element` = a.`id_product`))';
+				LEFT JOIN `'._DB_PREFIX_.'htl_room_type_service_product` hrtsp ON ((hrtsp.`element_type` = '.(int) RoomTypeServiceProduct::WK_ELEMENT_TYPE_HOTEL.' AND hrtsp.`id_element` = hrt.`id_hotel`) OR (hrtsp.`element_type` = '.(int) RoomTypeServiceProduct::WK_ELEMENT_TYPE_ROOM_TYPE.' AND hrtsp.`id_element` = a.`id_product`))
+				LEFT JOIN `'._DB_PREFIX_.'htl_advance_payment` hap ON (hap.`id_product` = a.`id_product`)';
 
         $this->_select .= ' a.`show_at_front`, (SELECT COUNT(hri.`id`) FROM `'._DB_PREFIX_.'htl_room_information` hri WHERE hri.`id_product` = a.`id_product`) as num_rooms, ';
         $this->_select .= 'hrt.`adults`, hrt.`children`, hrt.`max_guests`, hb.`id` as id_hotel, aa.`city`, hbl.`hotel_name`, ';
         $this->_select .= 'shop.`name` AS `shopname`, a.`id_shop_default`, ';
         $this->_select .= $alias_image.'.`id_image` AS `id_image`, cl.`name` AS `name_category`, '.$alias.'.`price`, 0 AS `price_final`, a.`is_virtual`, pd.`nb_downloadable`, sav.`quantity` AS `sav_quantity`, '.$alias.'.`active`, IF(sav.`quantity`<=0, 1, 0) AS `badge_danger`';
-        $this->_select .= ', IFNULL((SELECT hap.`active` FROM `'._DB_PREFIX_.'htl_advance_payment` hap WHERE hap.`id_product` = a.`id_product`), 0) AS advance_payment';
+        $this->_select .= ', IFNULL(hap.`active`, 0) AS advance_payment';
+        $this->_select .= ', IF(IFNULL(hap.`active`, 0), 1, 0) badge_success, IF(IFNULL(hap.`active`, 0), 0, 1) badge_danger ';
 
         if ($join_category) {
             $this->_join .= ' INNER JOIN `'._DB_PREFIX_.'category_product` cp ON (cp.`id_product` = a.`id_product` AND cp.`id_category` = '.(int)$this->_category->id.') ';
@@ -334,6 +336,8 @@ class AdminProductsControllerCore extends AdminController
             $this->fields_list['advance_payment'] = array(
                 'title' => $this->l('Advance Payment'),
                 'callback' => 'getAdvancePaymentStatus',
+                'badge_success' => true,
+                'badge_danger' => true,
                 'align' => 'text-center',
                 'type' => 'bool',
                 'optional' => true,
@@ -445,9 +449,9 @@ class AdminProductsControllerCore extends AdminController
     public function getAdvancePaymentStatus($val, $row)
     {
         if ($val) {
-            $str_return = '<span class="badge badge-success" >'.$this->l('Yes').'</a>';
+            $str_return = $this->l('Yes');
         } else {
-            $str_return = '<span class="badge badge-danger" >'.$this->l('No').'</a>';
+            $str_return = $this->l('No');
         }
 
         return $str_return;
