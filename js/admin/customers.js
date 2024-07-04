@@ -21,6 +21,7 @@ $(document).ready(function() {
     $(document).on('focusout', '#email', function() {
         var email = $.trim($('#email').val());
         if (email != '') {
+            $('.customer_email_msg').hide();
             $.ajax({
                 url: customer_controller_url,
                 method: 'POST',
@@ -36,7 +37,7 @@ $(document).ready(function() {
                         if ($('#email').closest('.input-group').parent().find('.customer_email_msg').length) {
                             $('.customer_email_msg').text(response.msg);
                         } else {
-                            $('#email').closest('.input-group').parent().append('<p class="help-block customer_email_msg">'+ response.msg+'</p>');
+                            $('#email').closest('.input-group').parent().append('<p class="text-danger customer_email_msg">'+ response.msg+'</p>');
                         }
 
                         $('.customer_email_msg').show();

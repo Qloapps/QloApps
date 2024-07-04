@@ -1295,20 +1295,18 @@ class AdminCustomersControllerCore extends AdminController
 
     public function ajaxProcessVerifyCustomerEmail()
     {
-        $response = array(
-            'status' => true
-        );
-        if ($email = trim(strval(Tools::getValue('email')))) {
-            $newIdCustomer = Tools::getValue('id_customer', 0);
-            $oldIdCustomer = Customer::customerExists($email, true, false);
-            if ($oldIdCustomer) { // means that the account exists.
-                $objCustomer = Customer::getByEmail($email, null, false);
-                if (!$objCustomer // means that the customer was deleted
-                    && $oldIdCustomer != $newIdCustomer // the admin is trying to update another account in case the new id is not zero
-                ) {
-                    $response['status'] = false;
-                    $response['msg'] = Tools::displayError('The email is already associated with a banned account. Please use a different one.');
-                }
+        $response = array('status' => true);
+        $newIdCustomer = Tools::getValue('id_customer', 0);
+        if (($email = trim(strval(Tools::getValue('email'))))
+            && ($oldIdCustomer = Customer::customerExists($email, true, false))
+            && (Validate::isLoadedObject($objCustomer = new Customer($oldIdCustomer)))
+            && $oldIdCustomer != $newIdCustomer // the admin is trying to add/update the account
+        ) {
+            $response['status'] = false;
+            if ($objCustomer->deleted) {
+                $response['msg'] = Tools::displayError('The email is already associated with a banned account. Please use a different one.');
+            } else {
+                $response['msg'] = Tools::displayError('The email is already associated with a another account. Please use a different one.');
             }
         }
 
