@@ -175,6 +175,11 @@ function validate_isPasswd(s)
 	return (s.length >= 5 && s.length < 255);
 }
 
+function validate_maxSize(s, maxSize)
+{
+	return (s.length <= maxSize);
+}
+
 function validate_field(that)
 {
 	if ($(that).hasClass('is_required') || $(that).val().length)
@@ -191,6 +196,15 @@ function validate_field(that)
 		else if($(that).attr('data-validate'))
 			var result = window['validate_' + $(that).attr('data-validate')]($(that).val());
 		if (result) {
+            if ($(that).attr('data-maxSize')) {
+                var maxSize = $(that).attr('data-maxSize');
+                var resultmaxSize = validate_maxSize($(that).val(), maxSize);
+                if (!resultmaxSize) {
+                    $(that).parent().addClass('form-error').removeClass('form-ok');
+                    return false;
+                }
+            }
+
 			$(that).parent().removeClass('form-error').addClass('form-ok');
 			return true;
 		} else {
