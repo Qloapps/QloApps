@@ -62,7 +62,7 @@ class StatsBestCategories extends ModuleGrid
             ),
             array(
                 'id' => 'totalRoomsBooked',
-                'header' => $this->l('Rooms booked'),
+                'header' => $this->l('Room nights booked'),
                 'dataIndex' => 'totalRoomsBooked',
                 'align' => 'center',
                 'tooltip' => $this->l('The room nights booked for the hotel.'),

@@ -92,6 +92,7 @@ class GraphNvD3 extends ModuleGraphEngine
                     .y(function(d) { return d.value; })
                     .showLabels(true)
                     .labelType("percent")'
+                    .((isset($params['format']) && $params['format']) ? '.valueFormat(d3.format("'.$params['format'].'"))' : '')
         );
 
         return '

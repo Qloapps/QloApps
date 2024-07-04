@@ -70,7 +70,7 @@ class StatsBestProducts extends ModuleGrid
             ),
             array(
                 'id' => 'totalRoomsBooked',
-                'header' => $this->l('Rooms booked'),
+                'header' => $this->l('Room nights booked'),
                 'dataIndex' => 'totalRoomsBooked',
                 'tooltip' => $this->l('The room nights booked for the room type.'),
                 'align' => 'center',
