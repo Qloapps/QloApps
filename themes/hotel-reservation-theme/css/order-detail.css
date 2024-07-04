@@ -277,6 +277,13 @@
     border-bottom: 1px solid #E5E5E5;
 }
 
+@media (min-width: 576px) {
+    .booking-room-detail .num-refunded-rooms {
+        float: right;
+        display: inline-block;
+    }
+}
+
 @media (max-width: 576px) {
     .room-details .card-header {
         flex-direction: column;
@@ -286,6 +293,11 @@
     .room-details .card-header .booking-actions-wrap {
         margin-top: 10px;
         margin-left: -10px;
+    }
+
+    .booking-room-detail .num-refunded-rooms {
+        display: block;
+        float: none;
     }
 }
 
@@ -321,17 +333,12 @@
     top: -1px;
 }
 
-.booking-room-detail .num-refunded-rooms {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-}
-
 .booking-room-detail .num-refunded-rooms .badge {
     padding: 5px;
     font-weight: normal;
     font-size: 12px;
     border-radius: 2px;
+    margin-top: 5px;
 }
 
 .booking-room-detail .btn-view-extra-services {
@@ -891,8 +898,6 @@
     background-color: #F5F5F5;
 }
 #create-new-refund-popup .tab-content .room-details.cancelled .badge-cancelled {
-    position: absolute;
-    top: -4px;
     margin-left: 6px;
     padding: 5px 10px;
     border-radius: 31px;
