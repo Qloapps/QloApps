@@ -1304,9 +1304,9 @@ class AdminCustomersControllerCore extends AdminController
         ) {
             $response['status'] = false;
             if ($objCustomer->deleted) {
-                $response['msg'] = Tools::displayError('The email is already associated with a banned account. Please use a different one.');
+                $response['msg'] = Tools::displayError('This email is already associated with a banned account. Please use a different one.');
             } else {
-                $response['msg'] = Tools::displayError('The email is already associated with a another account. Please use a different one.');
+                $response['msg'] = Tools::displayError('An account already exists for this email address!!');
             }
         }
 
