@@ -1077,7 +1077,6 @@ class AdminCustomersControllerCore extends AdminController
                     $customer->getByEmail($customer_email);
                 } else {
                     $this->errors[] = Tools::displayError('Invalid email address.');
-                    $this->display = 'edit';
                 }
 
                 if (($customer->id) && ($customer->id != (int)$this->object->id)) {
