@@ -222,15 +222,8 @@ class AdminCustomersControllerCore extends AdminController
             $this->redirect_after = $this->context->link->getAdminLink('AdminCustomers');
         }
 
-        $prefix = $this->getCookieFilterPrefix();
-        if (Tools::getValue('filterOnlyBannedCustomer')) {
-            $this->processResetFilters();
-            $this->context->cookie->{'submitFilter'.$this->table} = true;
-            $this->context->cookie->{$prefix.$this->table.'Filter_deleted'} = Customer::STATUS_BANNED;
-            $this->redirect_after = $this->context->link->getAdminLink('AdminCustomers');
-        }
-
         parent::postProcess();
+        $prefix = $this->getCookieFilterPrefix();
         $filters = $this->context->cookie->getFamily($prefix.$this->table.'Filter_');
         if (isset($filters[$prefix.$this->table.'Filter_deleted']) && $filters[$prefix.$this->table.'Filter_deleted'] == 1) {
             $this->deleted = false;
@@ -767,7 +760,7 @@ class AdminCustomersControllerCore extends AdminController
         $helper->color = 'color2';
         $helper->title = $this->l('Banned Customers', null, null, false);
         $helper->subtitle = $this->l('All Time', null, null, false);
-        $helper->href = $this->context->link->getAdminLink('AdminCustomers').'&filterOnlyBannedCustomer=1';
+        $helper->href = $this->context->link->getAdminLink('AdminCustomers').'&customerFilter_deleted=1';
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=total_banned_customers';
         $helper->tooltip = $this->l('The total number of banned customers.', null, null, false);
         $kpis[] = $helper;
