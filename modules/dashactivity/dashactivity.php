@@ -266,6 +266,7 @@ class Dashactivity extends Module
 			SELECT COUNT(*)
 			FROM `'._DB_PREFIX_.'customer`
 			WHERE `date_add` BETWEEN "'.pSQL($params['date_from']).'" AND "'.pSQL($params['date_to']).'"
+            AND `deleted` = 0
 			'.Shop::addSqlRestriction(Shop::SHARE_ORDER)
         );
 

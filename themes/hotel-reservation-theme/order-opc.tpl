@@ -98,23 +98,23 @@
 																				</div>
 																				<div class="required form-group col-sm-5">
 																					<label for="firstname">{l s='First name'} <sup>*</sup></label>
-																					<input type="text" class="text form-control validate is_required" id="customer_guest_detail_firstname" name="customer_guest_detail_firstname" data-validate="isName"{if isset($smarty.post.customer_guest_detail_firstname) && $smarty.post.customer_guest_detail_firstname}  value="{$smarty.post.customer_guest_detail_firstname}"{elseif isset($customer_guest_detail) && $customer_guest_detail.firstname} value="{$customer_guest_detail.firstname}"{/if}/>
+																					<input type="text" class="text form-control validate is_required" id="customer_guest_detail_firstname" name="customer_guest_detail_firstname" data-validate="isName" data-maxSize="32"{if isset($smarty.post.customer_guest_detail_firstname) && $smarty.post.customer_guest_detail_firstname}  value="{$smarty.post.customer_guest_detail_firstname}"{elseif isset($customer_guest_detail) && $customer_guest_detail.firstname} value="{$customer_guest_detail.firstname}"{/if}/>
 																				</div>
 																				<div class="required form-group col-sm-5">
 																					<label for="lastname">{l s='Last name'} <sup>*</sup></label>
-																					<input type="text" class="form-control validate is_required" id="customer_guest_detail_lastname" name="customer_guest_detail_lastname" data-validate="isName"{if isset($smarty.post.customer_guest_detail_lastname) && $smarty.post.customer_guest_detail_lastname}  value="{$smarty.post.customer_guest_detail_lastname}"{elseif isset($customer_guest_detail) && $customer_guest_detail.lastname} value="{$customer_guest_detail.lastname}"{/if}/>
+																					<input type="text" class="form-control validate is_required" id="customer_guest_detail_lastname" name="customer_guest_detail_lastname" data-validate="isName" data-maxSize="32"{if isset($smarty.post.customer_guest_detail_lastname) && $smarty.post.customer_guest_detail_lastname}  value="{$smarty.post.customer_guest_detail_lastname}"{elseif isset($customer_guest_detail) && $customer_guest_detail.lastname} value="{$customer_guest_detail.lastname}"{/if}/>
 																				</div>
 																			</div>
 																			<div class="row">
 																				<div class="required text form-group col-sm-6">
 																					<label for="email">{l s='Email'} <sup>*</sup></label>
-																					<input type="email" class="text form-control validate is_required" id="customer_guest_detail_email" name="customer_guest_detail_email" data-validate="isEmail"{if isset($smarty.post.customer_guest_detail_email) && $smarty.post.customer_guest_detail_email}  value="{$smarty.post.customer_guest_detail_email}"{elseif isset($customer_guest_detail) && $customer_guest_detail.email} value="{$customer_guest_detail.email}"{/if}/>
+																					<input type="email" class="text form-control validate is_required" id="customer_guest_detail_email" name="customer_guest_detail_email" data-validate="isEmail" data-maxSize="128"{if isset($smarty.post.customer_guest_detail_email) && $smarty.post.customer_guest_detail_email}  value="{$smarty.post.customer_guest_detail_email}"{elseif isset($customer_guest_detail) && $customer_guest_detail.email} value="{$customer_guest_detail.email}"{/if}/>
 																				</div>
 																			</div>
 																			<div class="row">
 																				<div class="{if isset($one_phone_at_least) && $one_phone_at_least}required {/if}form-group col-sm-6">
 																					<label for="phone_mobile">{l s='Mobile phone'}{if isset($one_phone_at_least) && $one_phone_at_least} <sup>**</sup>{/if}</label>
-																					<input type="text" class="text form-control validate is_required" name="customer_guest_detail_phone" id="customer_guest_detail_phone" data-validate="isPhoneNumber"{if isset($smarty.post.customer_guest_detail_phone) && $smarty.post.customer_guest_detail_phone}  value="{$smarty.post.customer_guest_detail_phone}"{elseif isset($customer_guest_detail) && $customer_guest_detail.phone} value="{$customer_guest_detail.phone}"{/if}/>
+																					<input type="text" class="text form-control validate is_required" name="customer_guest_detail_phone" id="customer_guest_detail_phone" data-validate="isPhoneNumber" data-maxSize="32"{if isset($smarty.post.customer_guest_detail_phone) && $smarty.post.customer_guest_detail_phone}  value="{$smarty.post.customer_guest_detail_phone}"{elseif isset($customer_guest_detail) && $customer_guest_detail.phone} value="{$customer_guest_detail.phone}"{/if}/>
 																				</div>
 																			</div>
 																		</div>
