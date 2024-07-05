@@ -418,8 +418,6 @@ abstract class PaymentModuleCore extends Module
                     // If webservice order request then no need to impose equal amounts(total cart and sent amount) condition
                     if ($order_status->logable
                         && number_format($cart_total_paid, _PS_PRICE_COMPUTE_PRECISION_) != number_format($amount_paid, _PS_PRICE_COMPUTE_PRECISION_)
-                        && $this->name != 'wsorder'
-                        && $this->name != 'bo_order'
                         && (!isset($this->ValidateOrderAmount) || $this->validateOrderAmount)
                     ) {
                         // if customer is paying full payment amount
@@ -1106,7 +1104,11 @@ abstract class PaymentModuleCore extends Module
                     $order = new Order((int)$order->id);
 
                     // Send an e-mail to customer (one order = one email)
-                    if ($id_order_state != Configuration::get('PS_OS_ERROR') && $id_order_state != Configuration::get('PS_OS_CANCELED') && $this->context->customer->id) {
+                    if ($id_order_state != Configuration::get('PS_OS_ERROR')
+                        && $id_order_state != Configuration::get('PS_OS_CANCELED')
+                        && $this->context->customer->id
+                        && $send_mails
+                    ) {
                         $invoice = new Address($order->id_address_invoice);
                         $delivery = new Address($order->id_address_delivery);
                         $delivery_state = $delivery->id_state ? new State($delivery->id_state) : false;
@@ -1248,9 +1250,7 @@ abstract class PaymentModuleCore extends Module
                         // Send order confirmation/overbooking mails to the reciepients according to the order mail configuration
                         $overBookingStates = OrderState::getOverBookingStates();
                         $isOverBookingStatus = in_array($id_order_state, $overBookingStates);
-                        if (Configuration::get('PS_ORDER_CONF_MAIL_TO_CUSTOMER')
-                            && $send_mails
-                        ){
+                        if (Configuration::get('PS_ORDER_CONF_MAIL_TO_CUSTOMER')){
                             // If order currenct state is overbooking, the send overbooking email or send order confirmation email
                             if ($isOverBookingStatus) {
                                 $subject = Mail::l('Order Not Confirmed', (int)$order->id_lang);
@@ -1302,9 +1302,7 @@ abstract class PaymentModuleCore extends Module
                                 }
                             }
                         }
-                        if (Configuration::get('PS_ORDER_CONF_MAIL_TO_SUPERADMIN')
-                            && $send_mails
-                        ){
+                        if (Configuration::get('PS_ORDER_CONF_MAIL_TO_SUPERADMIN')){
                             // get superadmin employees
                             if ($superAdminEmployees = Employee::getEmployeesByProfile(_PS_ADMIN_PROFILE_, true)) {
                                 // If order currenct state is overbooking, the send overbooking email or send order confirmation email
@@ -1339,10 +1337,7 @@ abstract class PaymentModuleCore extends Module
                                 }
                             }
                         }
-                        if ($idHotel
-                            && Validate::isLoadedObject($objHotel = new HotelBranchInformation($idHotel))
-                            && $send_mails
-                        ) {
+                        if ($idHotel && Validate::isLoadedObject($objHotel = new HotelBranchInformation($idHotel))) {
                             if (Configuration::get('PS_ORDER_CONF_MAIL_TO_HOTEL_MANAGER')){
                                 // If order currenct state is overbooking, the send overbooking email or send order confirmation email
                                 if ($isOverBookingStatus) {
