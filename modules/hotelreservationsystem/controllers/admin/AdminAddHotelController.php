@@ -229,7 +229,7 @@ class AdminAddHotelController extends ModuleAdminController
         $longitude = Tools::getValue('loclongitude');
         $map_formated_address = Tools::getValue('locformatedAddr');
         $map_input_text = Tools::getValue('googleInputField');
-        $hotelFeatures = Tools::getValue('childHotelFeatureBox');
+        $hotelFeatures = Tools::getValue('childHotelFeatureBox', array());
 
         // check if field is atleast in default language. Not available in default prestashop
         $defaultLangId = Configuration::get('PS_LANG_DEFAULT');
@@ -346,10 +346,6 @@ class AdminAddHotelController extends ModuleAdminController
                 } elseif (strtotime($maximumBookingDateFormatted) < strtotime(date('Y-m-d'))) {
                     $this->errors[] = $this->l('Maximum Check-out Date to book a room can not be a past date. Please use a future date.');
                 }
-            }
-
-            if (!$hotelFeatures) {
-                $this->errors[] = $this->l('Please select at least one feature to assign to a hotel.');
             }
 
             if (!$enableUseGlobalPreparationTime) {
