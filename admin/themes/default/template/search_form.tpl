@@ -64,7 +64,7 @@
 					</li>
 					<li class="search-invoices search-option">
 						<a href="#" data-value="{$QLO_SEARCH_TYPE_INVOICE}" data-placeholder="{l s='Invoice Number'}" data-icon="icon-book">
-							<i class="icon-book"></i> {l s='Invoices'}
+							<i class="icon-file-text"></i> {l s='Invoices'}
 						</a>
 					</li>
 					<li class="search-carts search-option">

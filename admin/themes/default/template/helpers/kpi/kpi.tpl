@@ -25,39 +25,41 @@
 
 <{if isset($href) && $href}a style="display:block" href="{$href|escape:'html':'UTF-8'}"{else}div{/if} id="{$id|escape:'html':'UTF-8'}" data-toggle="tooltip" class="box-stats label-tooltip {$color|escape}" data-original-title="{$tooltip|escape}" {if $target}target="_blank"{/if}>
 	<div class="kpi-content">
-		<div class="title-subtitle">
-			<div class="title-container">
-				<span class="title">
-					{if isset($icon) && $icon}<i class="{$icon|escape}"></i>{/if}
-					{$title|escape}
-				</span>
-			</div>
-			{if $subtitle}
-				<div class="subtitle-container">
-					<span class="subtitle">
-						{$subtitle|escape}
+		{if isset($icon) && $icon}<i class="{$icon|escape} kpi-icon"></i>{/if}
+		<div class="kpi-data">
+			<div class="title-subtitle">
+				<div class="title-container">
+					<span class="title">
+						{$title|escape}
 					</span>
 				</div>
-			{/if}
-		</div>
-		{if isset($chart) && $chart}
-			<div class="boxchart-overlay">
-				<div class="boxchart">
-				</div>
+				{if $subtitle}
+					<div class="subtitle-container">
+						<span class="subtitle">
+							{$subtitle|escape}
+						</span>
+					</div>
+				{/if}
 			</div>
-		{/if}
-		<div class="value-container">
-			{if isset($source) && $source}
-				<span class="value skeleton-loading-wave loading-container-bar loading"></span>
-			{elseif isset($value) && $value !== ''}
-				<span class="value">{$value|escape:'html':'UTF-8'}</span>
+			{if isset($chart) && $chart}
+				<div class="boxchart-overlay">
+					<div class="boxchart">
+					</div>
+				</div>
+			{/if}
+			<div class="value-container">
+				{if isset($source) && $source}
+					<span class="value skeleton-loading-wave loading-container-bar loading"></span>
+				{elseif isset($value) && $value !== ''}
+					<span class="value">{$value|escape:'html':'UTF-8'}</span>
+				{/if}
+			</div>
+			{if isset($href) && $href}
+				<span class="arrow pull-right"><i class="icon-angle-right"></i></span>
 			{/if}
 		</div>
 
-		{if isset($href) && $href}
-			<span class="arrow"><i class="icon-angle-right"></i></span>
-		{/if}
-	</div>
+		</div>
 </{if isset($href) && $href}a{else}div{/if}>
 
 {if isset($source) && $source}
