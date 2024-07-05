@@ -374,7 +374,7 @@ class CartCore extends ObjectModel
         if ($cart_vat_amount == 0 || $cart_amount_te == 0) {
             return 0;
         } else {
-            return Tools::ps_round($cart_vat_amount / $cart_amount_te, 3);
+            return Tools::ps_round($cart_vat_amount / $cart_amount_te, 6);
         }
     }
 
@@ -2380,7 +2380,6 @@ class CartCore extends ObjectModel
                                 $array = array();
                                 foreach($selectedServiceProducts as $selectedProduct) {
                                     if (isset($array[$selectedProduct['id_hotel']])) {
-                                        $array[$selectedProduct['id_hotel']]['quantity'] += $selectedProduct['quantity'];
                                         $array[$selectedProduct['id_hotel']]['total_price_tax_excl'] += $selectedProduct['total_price_tax_excl'];
                                         $array[$selectedProduct['id_hotel']]['total_price_tax_incl'] += $selectedProduct['total_price_tax_incl'];
                                     } else {
