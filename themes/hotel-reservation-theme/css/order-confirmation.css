@@ -1,0 +1,193 @@
+/**
+ * 2010-2023 Webkul.
+ *
+ * NOTICE OF LICENSE
+ *
+ * All right is reserved,
+ * Please go through LICENSE.txt file inside our module
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade this module to newer
+ * versions in the future. If you wish to customize this module for your
+ * needs please refer to CustomizationPolicy.txt file inside our module for more information.
+ *
+ * @author Webkul IN
+ * @copyright 2010-2023 Webkul IN
+ * @license LICENSE.txt
+ */
+
+.fancybox-wrap.fancybox-extra-services .card {
+    width: 650px;
+    margin-bottom: 0;
+}
+
+.fancybox-wrap.fancybox-extra-services .fancybox-close {
+    background: none;
+    top: 12px;
+    right: 12px;
+    font-size: 32px;
+}
+
+.fancybox-wrap.fancybox-extra-services .fancybox-close:after {
+    content: '\00D7';
+    color: #333;
+}
+.fancybox-wrap.fancybox-extra-services .card-body {
+    padding: 0;
+    max-height: 70vh;
+    overflow: auto;
+}
+
+.card {
+    padding: 0;
+    border-radius: 4px;
+    border: 1px solid #E5E5E5;
+    background: #FFF;
+    box-shadow: 0px 1px 6px 0px rgba(0, 0, 0, 0.10);
+    color: #333;
+}
+.card .card-header {
+    padding: 14px 18px;
+    margin-bottom: 0;
+    border-bottom: 1px solid #E5E5E5;
+    font-size: 19px;
+    font-weight: bold;
+    line-height: 27px;
+}
+
+.card.card-toolbar .card-header {
+    padding: 8px 18px;
+}
+
+.card .card-subheader {
+    margin-bottom: 0;
+    font-size: 14px;
+    font-weight: normal;
+}
+
+.card .card-body {
+    padding: 18px;
+}
+
+.card .card-body .card-title {
+    margin: 0;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.card .card-body .card-subtitle {
+    margin: 0;
+    margin-bottom: 8px;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.card .card-body .card-text {
+    font-size: 14px;
+    line-height: 26px;
+}
+
+/* card-tabs - start */
+.card.card-tabs .nav-tabs {
+    border: none;
+}
+
+.card.card-tabs .nav-tabs li > a {
+    padding: 0 18px;
+    border: none;
+    color: #333;
+}
+
+.card.card-tabs .nav-tabs li.active:after {
+    content: '';
+    position: absolute;
+    top: 39px;
+    width: 100%;
+    height: 2px;
+    background: #379aef;
+}
+
+.card.card-tabs .tab-content {
+    margin-top: 0;
+}
+/* card-tabs - end */
+
+#rooms_extra_services .nav-tabs {
+    border-bottom: none;
+}
+
+#rooms_extra_services .nav-tabs > li {
+    width: 50%;
+    text-align: center;
+    margin: 0;
+}
+
+#rooms_extra_services .nav-tabs > li > a {
+    border: none;
+    margin: 0;
+    font-size: 14px;
+    font-weight: bold;
+    color: #333;
+}
+
+#rooms_extra_services .nav-tabs > li.active {
+    border-bottom: 1px solid #1292FF;
+}
+
+#rooms_extra_services .nav-tabs > li.active > a {
+    color: #1292FF;
+}
+
+#rooms_extra_services .nav-tabs > li:not(.active) {
+    border-bottom: 1px solid #F0F0F0;
+}
+
+#rooms_extra_services .tab-content {
+    margin-top: 0;
+    padding: 0;
+    padding-bottom: 15px;
+}
+
+#rooms_extra_services .tab-content .rooms_extra_demands_head {
+    padding: 10px 18px;
+    border-bottom: 1px solid #F0F0F0;
+}
+
+#rooms_extra_services .tab-content .rooms_extra_demands_text {
+    font-size: 12px;
+    margin-bottom: 0;
+}
+
+#rooms_extra_services .tab-content .room_demands {
+    padding: 0 18px;
+    margin-top: 20px;
+}
+
+#rooms_extra_services .tab-content .demand_header {
+    font-size: 16px;
+    font-weight: bold;
+    line-height: 24px;
+    margin-bottom: 10px;
+}
+
+#rooms_extra_services .tab-content .room_demand_detail {
+    font-size: 14px;
+    font-weight: 500;
+    margin-top: 0;
+    padding-top: 0;
+    border-top: unset;
+}
+
+#rooms_extra_services .tab-content .room_demand_block {
+    display: flex;
+    justify-content: space-between;
+}
+
+#rooms_extra_services .tab-content .room_demand_block:not(:last-of-type) {
+    margin-bottom: 12px;
+}
+
+#rooms_extra_services .nav-tabs > li.active:after {
+    content: unset;
+}
