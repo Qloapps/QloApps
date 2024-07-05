@@ -132,7 +132,9 @@ class StatsProduct extends ModuleGraph
 
     private function getSales($id_product)
     {
-        $sql = 'SELECT o.`date_add`, o.`id_order`, o.`id_customer`, c.`firstname`, c.`lastname`, od.`product_quantity`, (od.`product_price` * od.`product_quantity`) AS total, od.`tax_name`, od.`product_name`, SUM(DATEDIFF(hbd.`date_to`, hbd.`date_from`)) AS total_booked
+        $sql = 'SELECT o.`date_add`, o.`id_order`, o.`id_customer`, c.`firstname`, c.`lastname`, od.`product_quantity`,
+        (od.`product_price` * od.`product_quantity`) AS total, od.`tax_name`, od.`product_name`, o.`id_currency`,
+        SUM(DATEDIFF(hbd.`date_to`, hbd.`date_from`)) AS total_booked
         FROM `'._DB_PREFIX_.'orders` o
         LEFT JOIN `'._DB_PREFIX_.'order_detail` od ON o.`id_order` = od.`id_order`
         LEFT JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd ON (od.`id_order` = hbd.`id_order` AND od.`product_id` = hbd.`id_product`)
@@ -266,7 +268,7 @@ class StatsProduct extends ModuleGraph
                                     <td class="text-left"><a href="?tab=AdminCustomers&id_customer='.$sale['id_customer'].'&viewcustomer&token='.$token_customer.'" target="_blank">'.$sale['firstname'].' '.$sale['lastname'].' (#'.(int) $sale['id_customer'].')'.'</a></td>
                                     '.($has_attribute ? '<td>'.$sale['product_name'].'</td>' : '').'
                                     <td>'.(int)$sale['total_booked'].'</td>
-                                    <td>'.Tools::displayprice($sale['total'], $currency).'</td>
+                                    <td>'.Tools::displayprice($sale['total'], (int)$sale['id_currency']).'</td>
                                 </tr>';
                         }
                         $this->html .= '
@@ -332,7 +334,7 @@ class StatsProduct extends ModuleGraph
             $this->html .= '
 				</tbody>
 			</table>
-			<a class="btn btn-default export-csv" href="'.Tools::safeOutput($_SERVER['REQUEST_URI'].'&export=1').'">
+			<a class="btn btn-default export-csv" href="'.Tools::safeOutput($_SERVER['REQUEST_URI'].'&export=1').($id_hotel ? '&id_hotel='.(int)$id_hotel : '').'">
 				<i class="icon-cloud-download"></i> '.$this->l('CSV Export').'
 			</a>';
         }
@@ -356,7 +358,6 @@ class StatsProduct extends ModuleGraph
                 }
                 $this->_titles['main'][] = $this->l('Room nights');
                 $this->_titles['main'][] = $this->l('Views (x100)');
-                $this->_titles['x'] = $this->l('Date');
                 $this->_titles['y'] = $this->l('Room nights, Views (x100)');
                 $this->_formats['y'] = 'd';
 
