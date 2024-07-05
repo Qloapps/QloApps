@@ -213,6 +213,12 @@
         text-transform: uppercase;
         border: none;
         border-radius: 4px;}
+      .submit_occupancy_btn {
+        background-color: #1292FF;
+        font-size: 13px;
+        border: none;
+        padding: 5px 20px;
+        border-radius: 4px;}
 
 
 /* occupancy  */
@@ -223,7 +229,7 @@
   overflow: auto;
   box-shadow: 0 8px 25px -4px rgba(0,0,0,0.39);
   left: 0px;
-  padding: 20px;}
+  padding: 12px 20px;}
   #search_occupancy_wrapper.top {
     top: unset;
     bottom: 100%; }
