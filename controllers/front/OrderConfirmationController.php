@@ -175,6 +175,7 @@ class OrderConfirmationControllerCore extends FrontController
                                 $order_bk_data = $obj_htl_bk_dtl->getOnlyOrderBookingData($idOrder, $customer->id_guest, $type_value['product_id']);
                             }
                             if ($rm_dtl = $obj_rm_type->getRoomTypeInfoByIdProduct($type_value['product_id'])) {
+                                $cart_htl_data[$type_key]['id_order'] = $idOrder;
                                 $cart_htl_data[$type_key]['id_product'] = $type_value['product_id'];
                                 $cart_htl_data[$type_key]['cover_img'] = $cover_img;
                                 $cart_htl_data[$type_key]['adults'] = $rm_dtl['adults'];
@@ -366,9 +367,6 @@ class OrderConfirmationControllerCore extends FrontController
                             }
                         }
 
-                        if (!empty($cart_htl_data)) {
-                            $this->context->smarty->assign('cart_htl_data', $cart_htl_data);
-                        }
                         if (!empty($cart_service_products)) {
                             $this->context->smarty->assign('cart_service_products', $cart_service_products);
                         }
@@ -397,6 +395,10 @@ class OrderConfirmationControllerCore extends FrontController
 
             $this->context->smarty->assign('orderTotalInfo', $orderTotalInfo);
             $this->context->smarty->assign('orders_has_invoice', $orders_has_invoice);
+        }
+
+        if (!empty($cart_htl_data)) {
+            $this->context->smarty->assign('cart_htl_data', $cart_htl_data);
         }
 
         $shw_bo_msg = Configuration::get('WK_SHOW_MSG_ON_BO');
@@ -469,6 +471,8 @@ class OrderConfirmationControllerCore extends FrontController
             parent::setMedia();
             $this->addCSS(_THEME_CSS_DIR_.'history.css');
             $this->addJS(_THEME_JS_DIR_.'history.js');
+            $this->addJS(_THEME_JS_DIR_.'order-confirmation.js');
+            $this->addCSS(_THEME_CSS_DIR_.'order-confirmation.css');
             $this->addJqueryPlugin(array('fancybox')); //fancybox not found for some client theme
             $this->addJqueryUI('ui.tooltip', 'base', true);
         }
