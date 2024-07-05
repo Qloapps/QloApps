@@ -140,14 +140,15 @@ class CustomerThreadCore extends ObjectModel
         return Db::getInstance()->executeS($sql);
     }
 
-    public static function getIdCustomerThreadByEmailAndIdOrder($email, $id_order)
+    public static function getIdCustomerThreadByEmailAndIdOrder($email, $id_order, $id_contact = false)
     {
         return Db::getInstance()->getValue('
 			SELECT cm.id_customer_thread
 			FROM '._DB_PREFIX_.'customer_thread cm
 			WHERE cm.email = \''.pSQL($email).'\'
 				AND cm.id_shop = '.(int)Context::getContext()->shop->id.'
-				AND cm.id_order = '.(int)$id_order
+				AND cm.id_order = '.(int)$id_order.' '.
+                (($id_contact) ? ' AND cm.id_contact='.(int) $id_contact : ' ')
         );
     }
 
