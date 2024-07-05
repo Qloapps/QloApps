@@ -70,7 +70,7 @@ class StatsBestProducts extends ModuleGrid
             ),
             array(
                 'id' => 'totalRoomsBooked',
-                'header' => $this->l('Rooms booked'),
+                'header' => $this->l('Room nights booked'),
                 'dataIndex' => 'totalRoomsBooked',
                 'tooltip' => $this->l('The room nights booked for the room type.'),
                 'align' => 'center',
@@ -96,7 +96,7 @@ class StatsBestProducts extends ModuleGrid
             ),
             array(
                 'id' => 'availableRooms',
-                'header' => $this->l('Available rooms'),
+                'header' => $this->l('Room nights available'),
                 'dataIndex' => 'availableRooms',
                 'tooltip' => $this->l('The room nights available for booking for the room type.'),
                 'align' => 'center',
@@ -168,7 +168,10 @@ class StatsBestProducts extends ModuleGrid
             AND hbd.`date_to` > "'.pSQL($date_from).'" AND hbd.`date_from` < "'.pSQL($date_to).'"
         ) AS totalRoomsBooked,
         (
-            SELECT IFNULL(AVG(hbd.`total_price_tax_excl` / o.`conversion_rate`), 0)
+            SELECT IFNULL(ROUND(
+                SUM(hbd.`total_price_tax_excl` * DATEDIFF(LEAST(hbd.`date_to`, "'.pSQL($date_to).'"), GREATEST(hbd.`date_from`, "'.pSQL($date_from).'")) / (o.`conversion_rate` * DATEDIFF(hbd.`date_to`, hbd.`date_from`))) / SUM(DATEDIFF(LEAST(hbd.`date_to`, "'.pSQL($date_to).'"), GREATEST(hbd.`date_from`, "'.pSQL($date_from).'"))),
+                2
+            ), 0)
             FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
             LEFT JOIN `'._DB_PREFIX_.'orders` o
             ON (o.`id_order` = hbd.`id_order`)
@@ -176,7 +179,10 @@ class StatsBestProducts extends ModuleGrid
             AND hbd.`date_to` > "'.pSQL($date_from).'" AND hbd.`date_from` < "'.pSQL($date_to).'"
         ) AS sellingPrice,
         (
-            SELECT IFNULL(SUM(ROUND((DATEDIFF(LEAST(hbd.`date_to`, "'.pSQL($date_to).'"), GREATEST(hbd.`date_from`, "'.pSQL($date_from).'")) / DATEDIFF(hbd.`date_to`, hbd.`date_from`)) * (hbd.`total_price_tax_excl` / o.`conversion_rate`) , 2)), 0)
+            SELECT IFNULL(ROUND(
+                SUM(hbd.`total_price_tax_excl` * DATEDIFF(LEAST(hbd.`date_to`, "'.pSQL($date_to).'"), GREATEST(hbd.`date_from`, "'.pSQL($date_from).'")) / (o.`conversion_rate` * DATEDIFF(hbd.`date_to`, hbd.`date_from`))),
+                2
+            ), 0)
             FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
             LEFT JOIN `'._DB_PREFIX_.'orders` o
             ON (o.`id_order` = hbd.`id_order`)
@@ -229,18 +235,17 @@ class StatsBestProducts extends ModuleGrid
             if (Tools::getValue('export') == false) {
                 $value['roomTypeName'] = '<a href="'.$this->context->link->getAdminLink('AdminProducts').'&id_product='.$value['id_product'].'&updateproduct" target="_blank">'.$value['roomTypeName'].'</a>';
                 $value['hotelName'] = '<a href="'.$this->context->link->getAdminLink('AdminAddHotel').'&id='.$value['id_hotel'].'&updatehtl_branch_info" target="_blank">'.$value['hotelName'].'</a>';
+                if ($value['active']) {
+                    $value['active'] = '<span class="badge badge-success">'.$this->l('Yes').'</span>';
+                } else {
+                    $value['active'] = '<span class="badge badge-danger">'.$this->l('No').'</span>';
+                }
             }
             $value['totalRoomsBooked'] = (int) $value['totalRoomsBooked'];
             $value['availableRooms'] = max($value['totalRooms'] - $value['totalRoomsBooked'], 0); // availableRooms can be negative if more rooms are disabled than available for booking
             $value['bookingsPerDay'] = sprintf('%0.2f', ($numberOfDays ? $value['totalRoomsBooked'] / $numberOfDays : 0));
             $value['sellingPrice'] = Tools::displayPrice($value['sellingPrice'], $currency);
             $value['totalRevenue'] = Tools::displayPrice($value['totalRevenue'], $currency);
-
-            if ($value['active']) {
-                $value['active'] = '<span class="badge badge-success">'.$this->l('Yes').'</span>';
-            } else {
-                $value['active'] = '<span class="badge badge-danger">'.$this->l('No').'</span>';
-            }
         }
 
         $this->_values = $values;
