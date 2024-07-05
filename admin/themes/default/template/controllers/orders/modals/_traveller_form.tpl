@@ -18,6 +18,7 @@
 *}
 
 <div class="modal-body">
+    <div class="text-left errors-wrap"></div>
     <form id="customer-guest-details-form">
         <div class="form-group row">
             <div class="col-sm-2">

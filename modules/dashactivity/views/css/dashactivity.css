@@ -43,11 +43,9 @@
 	color: #555555;
 }
 
-#dashactivity .value {
-	position: absolute;
-	top: 0;
-	right: 0;
-	text-align: right;
+#dashactivity .dash-live {
+	display: flex;
+	justify-content: space-between;
 }
 
 #dashactivity .value span {
@@ -75,6 +73,11 @@
 	padding-top: 10px;
 }
 
+#dashactivity .stats-list > li {
+	display: flex;
+	justify-content: space-between;
+}
+
 #dashactivity .stats-list > li:not(:last-child) {
 	margin-bottom: 10px;
 }
@@ -88,12 +91,6 @@
 #dashactivity .stats-list .item-label.heading span {
 	font-size: 14px;
 	font-weight: bold;
-}
-
-#dashactivity .stats-list .item-value {
-	position: absolute;
-	right: 0;
-	text-align: right;
 }
 
 #dashactivity .stats-list .item-value span {
