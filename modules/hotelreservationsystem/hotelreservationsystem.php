@@ -70,7 +70,7 @@ class HotelReservationSystem extends Module
         ) {
             Configuration::updateValue(
                 'MAX_GLOBAL_BOOKING_DATE',
-                date('d-m-Y', strtotime(date('Y-m-d', time()).' + 1 year'))
+                date('Y-m-d', strtotime(date('Y-m-d', time()).' + 1 year'))
             );
         }
         if (!Configuration::get('PS_CATALOG_MODE')) {
