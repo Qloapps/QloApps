@@ -50,11 +50,15 @@
 		{/if}
 	{else if $input.type == 'select' && $input.name == 'id_customer'}
 		{$smarty.block.parent}
+		<input type="hidden" name="email" id="email" value="">
 		<script type="text/javascript">
 			$('#id_customer').on('change', function(e)
 			{
 				var id_customer = parseInt($(this).val());
+				$('#email').val('');
 				if (!isNaN(id_customer)) {
+					var email = $(this).find('[value="'+id_customer+'"]').text();
+					$('#email').val(email);
 					var data = {};
 					data.id_customer = id_customer;
 					data.token = "{$token|escape:'html':'UTF-8'}";
