@@ -22,10 +22,12 @@
         <div class="col-xs-12 col-sm-6 col-md-4 element-panel">
             <div class="panel">
                 <div class="module-info-wrapper">
-                    <div class="module-logo clearfix">
-                        <img src="{if isset($element->image)}{$element->image}{else}{$modules_uri}/{$element->name}/{$element->logo}{/if}" title="{$element->displayName}" class="pull-left">
-                        <h4 class="name" data-name="{$element->name}">{$element->displayName}</h4>
-                        <p class="text-muted">{$element->version} {l s='By'} {$element->author}</p>
+                    <div class="module-logo">
+                        <img src="{if isset($element->image)}{$element->image}{else}{$modules_uri}/{$element->name}/{$element->logo}{/if}" title="{$element->displayName}">
+                        <div>
+                            <h4 class="name" data-name="{$element->name}">{$element->displayName}</h4>
+                            <p class="text-muted">{$element->version} {l s='By'} {$element->author}</p>
+                        </div>
                     </div>
                     <p>
                         {if $element->description_full}
