@@ -382,6 +382,23 @@ class HelperTreeHotelsCore extends TreeCore
         $this->addAction($expand_all);
 
         if ($this->useCheckBox()) {
+            if ($this->useBulkActions()) {
+                $check_all = new TreeToolbarLink(
+                    'Check All',
+                    '#',
+                    'checkAllAssociatedHotels($(\'#'.$this->getId().'\'));return false;',
+                    'icon-check-sign');
+                $check_all->setAttribute('id', 'check-all-'.$this->getId());
+                $uncheck_all = new TreeToolbarLink(
+                    'Uncheck All',
+                    '#',
+                    'uncheckAllAssociatedHotels($(\'#'.$this->getId().'\'));return false;',
+                    'icon-check-empty');
+                $uncheck_all->setAttribute('id', 'uncheck-all-'.$this->getId());
+                $this->addAction($check_all);
+                $this->addAction($uncheck_all);
+            }
+
             $this->setNodeFolderTemplate('tree_node_hotel_folder_checkbox.tpl');
             $this->setNodeItemTemplate('tree_node_hotel_item_checkbox.tpl');
             $this->setAttribute('use_checkbox', $this->useCheckBox());
