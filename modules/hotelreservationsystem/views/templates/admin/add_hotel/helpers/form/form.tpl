@@ -363,8 +363,7 @@
 						<div class="form-group" {if isset($smarty.post.enable_use_global_max_order_date)}{if !$smarty.post.enable_use_global_max_order_date}style="display:block;"{else}style="display:none;"{/if}{elseif isset($order_restrict_date_info.use_global_max_order_date) && !$order_restrict_date_info.use_global_max_order_date}style="display:block;" {else} style="display:none;" {/if}>
 							<label class="control-label col-sm-3 required" for="maximum_booking_date">{l s='Maximum Check-out Date to book a room :' mod='hotelreservationsystem'}</label>
 							<div class="col-sm-2">
-								<input type="text" class="form-control" id="maximum_booking_date_formatted" name="maximum_booking_date_formatted" value="{if isset($smarty.post.maximum_booking_date_formatted)}{$smarty.post.maximum_booking_date_formatted|escape:'html':'UTF-8'}{elseif isset($edit) && isset($order_restrict_date_info.max_order_date)}{date('d-m-Y', strtotime($order_restrict_date_info.max_order_date|escape:'htmlall':'UTF-8'))}{/if}" />
-								<input type="hidden" name="maximum_booking_date" value="{if isset($order_restrict_date_info.max_order_date)}{$order_restrict_date_info.max_order_date|escape:'htmlall':'UTF-8'}{/if}"/>
+								<input type="text" class="form-control" id="maximum_booking_date" name="maximum_booking_date" value="{if isset($order_restrict_date_info.max_order_date)}{$order_restrict_date_info.max_order_date|escape:'htmlall':'UTF-8'}{/if}" />
 							</div>
 						</div>
 						<div class="form-group">

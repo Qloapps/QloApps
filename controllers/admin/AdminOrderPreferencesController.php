@@ -82,22 +82,20 @@ class AdminOrderPreferencesControllerCore extends AdminController
             )
         );
 
-        $maxOrderDate = (Tools::getValue('MAX_GLOBAL_BOOKING_DATE'))? Tools::getValue('MAX_GLOBAL_BOOKING_DATE') : Configuration::get('MAX_GLOBAL_BOOKING_DATE');
+        $maxOrderDate = Tools::getValue('MAX_GLOBAL_BOOKING_DATE', Configuration::get('MAX_GLOBAL_BOOKING_DATE'));
         $this->fields_options = array(
             'order_restrict' => array(
                 'title' => $this->l('Order Restrict'),
                 'icon' => 'icon-cogs',
                 'fields' => array(
-                    'max_global_booking_date_formatted' => array(
+                    'MAX_GLOBAL_BOOKING_DATE' => array(
                         'title' => $this->l('Maximum Global Check-out Date to book a room'),
                         'hint' => $this->l('Maximum date of check-out for which rooms of your hotels can be booked.'),
-                        'defaultValue' => date('d-m-Y', strtotime($maxOrderDate)),
                         'type' => 'text',
                         'id' => 'max_global_book_date',
+                        'auto_value' => false,
+                        'value' => date('d-m-Y', strtotime($maxOrderDate)),
                         'class' => 'fixed-width-xxl readonly',
-                    ),
-                    'MAX_GLOBAL_BOOKING_DATE' => array(
-                        'type' => 'hidden',
                     ),
                     'GLOBAL_PREPARATION_TIME' => array(
                         'title' => $this->l('Preparation time'),
@@ -334,8 +332,6 @@ class AdminOrderPreferencesControllerCore extends AdminController
             $this->errors[] = Tools::displayError('Please assign a valid CMS page for Terms and Conditions.');
         }
 
-        // To prevent this from saving in the configuration table
-        unset($_POST['max_global_booking_date_formatted']);
         $_POST['MAX_GLOBAL_BOOKING_DATE'] = date('Y-m-d', strtotime(Tools::getValue('MAX_GLOBAL_BOOKING_DATE')));
         $maxGlobalBookingDate = Tools::getValue('MAX_GLOBAL_BOOKING_DATE');
         $globalPreparationTime = Tools::getValue('GLOBAL_PREPARATION_TIME');

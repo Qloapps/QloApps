@@ -556,8 +556,6 @@ $(document).ready(function() {
     $("#max_global_book_date").datepicker({
         defaultDate: new Date(),
         dateFormat: 'dd-mm-yy',
-        altFormat: 'yy-mm-dd',
-        altField: 'input[name="MAX_GLOBAL_BOOKING_DATE"]',
         minDate: 0,
     });
 
@@ -803,19 +801,17 @@ $(document).ready(function() {
     }
 
     // manage hotel page
-    $('#maximum_booking_date_formatted').datepicker({
+    $('#maximum_booking_date').datepicker({
         defaultDate: new Date(),
         dateFormat: 'dd-mm-yy',
-        altFormat: 'yy-mm-dd',
-        altField: 'input[name="maximum_booking_date"]',
         minDate: 0,
     });
 
     $('input[name="enable_use_global_max_order_date"]').on('change', function () {
         if (parseInt($(this).val())) {
-            $('input[name="maximum_booking_date_formatted"]').closest('.form-group').hide(200);
+            $('input[name="maximum_booking_date"]').closest('.form-group').hide(200);
         } else {
-            $('input[name="maximum_booking_date_formatted"]').closest('.form-group').show(200);
+            $('input[name="maximum_booking_date"]').closest('.form-group').show(200);
         }
     });
 
