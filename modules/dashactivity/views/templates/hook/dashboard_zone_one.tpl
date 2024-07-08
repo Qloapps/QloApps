@@ -41,34 +41,35 @@
     </section>
 
     <section class="activity-section dash-live">
-        <span class="title">
+        <div class="title">
             <a href="{$link->getAdminLink("AdminStats")|escape:"html":"UTF-8"}&module=statslive" target="_blank">
                 <span>{l s="Online Visitors" mod='dashactivity'}</span>
             </a>
-        </span>
-        <span class="value">
+            <div class="sub-title">
+                <small class="text-muted">
+                    {l s="in the last %d minutes" sprintf=$DASHACTIVITY_VISITOR_ONLINE|intval mod='dashactivity'}
+                </small>
+            </div>
+        </div>
+        <div class="value">
             <span id="online_visitor"></span>
-        </span>
-        <div class="sub-title">
-            <small class="text-muted">
-                {l s="in the last %d minutes" sprintf=$DASHACTIVITY_VISITOR_ONLINE|intval mod='dashactivity'}
-            </small>
         </div>
     </section>
 
     <section class="activity-section dash-live">
-        <span class="title">
+        <div class="title">
             <a href="{$link->getAdminLink("AdminCarts")|escape:"html":"UTF-8"}" target="_blank">
                 <span>{l s="Active Booking Carts" mod='dashactivity'}</span>
             </a>
-        </span>
-        <span class="value">
+            <div class="sub-title">
+                <small class="text-muted">
+                    {l s="in the last %d minutes" sprintf=$DASHACTIVITY_CART_ACTIVE|intval mod='dashactivity'}
+                </small>
+            </div>
+        </div>
+
+        <div class="value">
             <span id="active_shopping_cart"></span>
-        </span>
-        <div class="sub-title">
-            <small class="text-muted">
-                {l s="in the last %d minutes" sprintf=$DASHACTIVITY_CART_ACTIVE|intval mod='dashactivity'}
-            </small>
         </div>
     </section>
 
