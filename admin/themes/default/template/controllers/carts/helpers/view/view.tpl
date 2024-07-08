@@ -35,15 +35,9 @@
 			<h3><i class="icon-user"></i> {l s='Customer information'}</h3>
 			{if $customer->id}
 				<a class="btn btn-default pull-right" href="mailto:{$customer->email}"><i class="icon-envelope"></i> {$customer->email}</a>
-				<h2>
-					{if $customer->id_gender == 1}
-					<i class="icon-male"></i>
-					{elseif $customer->id_gender == 2}
-					<i class="icon-female"></i>
-					{else}
-					<i class="icon-question"></i>
-					{/if}
-					<a href="{$link->getAdminLink('AdminCustomers')|escape:'html':'UTF-8'}&amp;id_customer={$customer->id|intval}&amp;viewcustomer">{$customer->firstname} {$customer->lastname}</a></h2>
+				<h4 style="padding-top:10px">
+					{l s='Customer Name'}:
+					<a href="{$link->getAdminLink('AdminCustomers')|escape:'html':'UTF-8'}&amp;id_customer={$customer->id|intval}&amp;viewcustomer">{$customer->firstname} {$customer->lastname}</a></h4>
 				<div class="form-horizontal">
 					<div class="form-group">
 						<label class="col-lg-3 control-label">{l s='Account registration date:'}</label>

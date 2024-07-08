@@ -127,7 +127,10 @@ class WkRoomSearchBlock extends Module
     // In the xs sceen the booking button on the landing page
     public function hookDisplayAfterHeaderHotelDesc()
     {
-        return $this->display(__FILE__, 'landingPageXsBtn.tpl');
+        $objHotelInfo = new HotelBranchInformation();
+        if ($objHotelInfo->hotelBranchesInfo(0, 1)) {
+            return $this->display(__FILE__, 'landingPageXsBtn.tpl');
+        }
     }
 
     // search panel block on the category page on left block
