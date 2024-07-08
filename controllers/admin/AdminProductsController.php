@@ -2212,10 +2212,14 @@ class AdminProductsControllerCore extends AdminController
                 }
 
                 if (!$res) {
-                    $this->errors[] = sprintf(
-                        Tools::displayError('The %s field is invalid.'),
-                        call_user_func(array($className, 'displayFieldName'), $field, $className)
-                    );
+                    if (Tools::strtolower($field) == 'wholesale_price') {
+                        $this->errors[] = Tools::displayError('The Pre-tax operating cost field is invalid.');
+                    } else {
+                        $this->errors[] = sprintf(
+                            Tools::displayError('The %s field is invalid.'),
+                            call_user_func(array($className, 'displayFieldName'), $field, $className)
+                        );
+                    }
                 }
             }
         }
