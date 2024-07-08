@@ -229,10 +229,6 @@ class QloStatsServiceProducts extends ModuleGrid
             )
             AND p.`booking_product` = 0)';
 
-        $this->_totalCount = Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue(
-            'SELECT COUNT(p.`id_product`) FROM '._DB_PREFIX_.'product p WHERE p.`booking_product` = 0 AND p.`active` = 1'
-        );
-
         $this->option = 'services';
     }
 
@@ -278,10 +274,6 @@ class QloStatsServiceProducts extends ModuleGrid
             WHERE o.valid = 1 AND o.invoice_date BETWEEN '.$dateBetween.'
             '.HotelBranchInformation::addHotelRestriction(false, 'hbd').' ))';
 
-        $this->_totalCount = Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue(
-            'SELECT COUNT(`id_global_demand`) FROM '._DB_PREFIX_.'htl_room_type_global_demand'
-        );
-
         $this->option = 'facilities';
     }
 
@@ -299,6 +291,7 @@ class QloStatsServiceProducts extends ModuleGrid
 			$this->query .= ' LIMIT '.(int)$this->_start.', '.(int)$this->_limit;
 
 		$values = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($this->query);
+        $this->_totalCount = Db::getInstance()->NumRows();
         foreach ($values as &$value)
         {
             if (!Tools::getValue('export')) {
