@@ -116,7 +116,8 @@ class StatsPersonalInfos extends ModuleGraph
 						<div class="col-lg-8">
 							'.$this->engine(array(
                     'type' => 'pie',
-                    'option' => 'gender'
+                    'option' => 'gender',
+                    'format' => 'd'
                 )).'
 						</div>
 						<div class="col-lg-4">
@@ -133,7 +134,8 @@ class StatsPersonalInfos extends ModuleGraph
 						<div class="col-lg-8">
 							'.$this->engine(array(
                     'type' => 'pie',
-                    'option' => 'age'
+                    'option' => 'age',
+                    'format' => 'd'
                 )).'
 						</div>
 						<div class="col-lg-4">
@@ -150,7 +152,8 @@ class StatsPersonalInfos extends ModuleGraph
 						<div class="col-lg-8">
 							'.$this->engine(array(
                     'type' => 'pie',
-                    'option' => 'country'
+                    'option' => 'country',
+                    'format' => 'd'
                 )).'
 						</div>
 						<div class="col-lg-4">
@@ -167,7 +170,8 @@ class StatsPersonalInfos extends ModuleGraph
 						<div class="col-lg-8">
 							'.$this->engine(array(
                     'type' => 'pie',
-                    'option' => 'currency'
+                    'option' => 'currency',
+                    'format' => 'd'
                 )).'
 						</div>
 						<div class="col-lg-4">
