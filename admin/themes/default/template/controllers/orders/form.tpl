@@ -1171,7 +1171,7 @@
 		currency_format = jsonSummary.currency.format;
 		currency_sign = jsonSummary.currency.sign;
 		currency_blank = jsonSummary.currency.blank;
-		priceDisplayPrecision = jsonSummary.currency.decimals ? 2 : 0;
+		priceDisplayPrecision = parseInt(jsonSummary.currency.decimals) ? {$smarty.const._PS_PRICE_DISPLAY_PRECISION_|intval} : 0;
 
 		updateCartProducts(jsonSummary.summary.products, jsonSummary.summary.gift_products, jsonSummary.cart.id_address_delivery);
 		updateCartVouchers(jsonSummary.summary.discounts);
