@@ -47,7 +47,7 @@
 <div class="form-group">
 	<label class="control-label col-lg-3">
 		<span class="label-tooltip" data-toggle="tooltip"
-			title="{l s='You can choose a minimum amount for the cart either with or without the taxes and shipping.'}">
+			title="{l s='You can choose a minimum amount for the cart either with or without the taxes.'}">
 			{l s='Minimum amount'}
 		</span>
 	</label>
@@ -125,7 +125,6 @@
 					{l s='Country selection'}
 				</label>
 			</p>
-			<span class="help-block">{l s='This restriction applies to the country of delivery.'}</span>
 			<div id="country_restriction_div">
 				<br />
 				<table class="table">
