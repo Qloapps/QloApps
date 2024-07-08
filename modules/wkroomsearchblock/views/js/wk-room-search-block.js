@@ -469,7 +469,6 @@ $(document).ready(function() {
             });
         } else {
             $('#daterange_value').dateRangePicker({
-                startDate: $.datepicker.formatDate('dd-mm-yy', new Date()),
                 startDate: start_date,
                 endDate: max_order_date,
             }).on('datepicker-first-date-selected', function() {
@@ -839,6 +838,15 @@ $(document).ready(function() {
                     // Before closing the occupancy block validate the values inside
                     return validateOccupancies();
                 }
+            }
+        }
+    });
+
+    $(document).on('click', '#search_occupancy_wrapper .submit_occupancy_btn', function(e) {
+        e.preventDefault();
+        if ($('#search_occupancy_wrapper').length) {
+            if ($('#search_occupancy_wrapper').css('display') !== 'none') {
+                return validateOccupancies();
             }
         }
     });
