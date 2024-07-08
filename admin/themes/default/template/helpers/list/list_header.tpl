@@ -295,28 +295,30 @@
 													<label class="col-xs-3" for="filter_input_{$key}">{$params['title']|escape:'html':'UTF-8'}</label>
 													<div class="col-xs-9">
 														{if $params.type == 'range'}
+															{$field_name="`$list_id`Filter_{if isset($params.filter_key)}`$params.filter_key`{else}`$key`{/if}"}
 															<div class="input_range">
-																<input type="text" class="filter form-control" name="{$list_id}Filter_{if isset($params.filter_key)}{$params.filter_key}{else}{$key}{/if}[0]" placeholder="{l s='From'}" value="{if isset($params.value.0)}{$params.value.0}{/if}">
-																<input type="text" class="filter form-control" name="{$list_id}Filter_{if isset($params.filter_key)}{$params.filter_key}{else}{$key}{/if}[1]" placeholder="{l s='To'}" value="{if isset($params.value.1)}{$params.value.1}{/if}">
+																<input type="text" class="filter form-control" name="{$field_name}[0]" placeholder="{l s='From'}" value="{if isset($smarty.post[$field_name][0]) && $smarty.post[$field_name][0]}{$smarty.post[$field_name][0]}{elseif isset($params.value.0)}{$params.value.0}{/if}">
+																<input type="text" class="filter form-control" name="{$field_name}[1]" placeholder="{l s='To'}" value="{if isset($smarty.post[$field_name][1]) && $smarty.post[$field_name][1]}{$smarty.post[$field_name][1]}{elseif isset($params.value.1)}{$params.value.1}{/if}">
 															</div>
 														{elseif $params.type == 'bool'}
-															<select id="filter_input_{$key}" class="filter center" name="{$list_id}Filter_{if isset($params.filter_key)}{$params.filter_key}{else}{$key}{/if}">
+															{$field_name="`$list_id`Filter_{if isset($params.filter_key)}`$params.filter_key`{else}`$key`{/if}"}
+															<select id="filter_input_{$key}" class="filter center" name="{$field_name}">
 																<option value="">-</option>
-																<option value="1" {if $params.value == 1} selected="selected" {/if}>{l s='Yes'}</option>
-																<option value="0" {if $params.value == 0 && $params.value != ''} selected="selected" {/if}>{l s='No'}</option>
+																<option value="1" {if isset($smarty.post.$field_name) && $smarty.post.$field_name == 1} selected="selected"{elseif $params.value == 1} selected="selected" {/if}>{l s='Yes'}</option>
+																<option value="0" {if isset($smarty.post.$field_name) && $smarty.post.$field_name == 0} selected="selected"{elseif $params.value == 0 && $params.value != ''} selected="selected" {/if}>{l s='No'}</option>
 															</select>
 														{elseif $params.type == 'date' || $params.type == 'datetime'}
 															<div class="date_range">
 																<div class="input-group center">
 																	<input type="text" class="filter datepicker date-input form-control" id="local_{$params.id_date}_0" name="local_{$params.name_date}[0]"  placeholder="{l s='From'}" autocomplete="off"/>
-																	<input type="hidden" id="{$params.id_date}_0" name="{$params.name_date}[0]" value="{if isset($params.value.0)}{$params.value.0}{/if}">
+																	<input type="hidden" id="{$params.id_date}_0" name="{$params.name_date}[0]" value="{if isset($smarty.post[$params.name_date][0]) && $smarty.post[$params.name_date][0]}{$smarty.post[$params.name_date][0]}{elseif isset($params.value.0)}{$params.value.0}{/if}">
 																	<span class="input-group-addon">
 																		<i class="icon-calendar"></i>
 																	</span>
 																</div>
 																<div class="input-group center">
 																	<input type="text" class="filter datepicker date-input form-control" id="local_{$params.id_date}_1" name="local_{$params.name_date}[1]"  placeholder="{l s='To'}"  autocomplete="off"/>
-																	<input type="hidden" id="{$params.id_date}_1" name="{$params.name_date}[1]" value="{if isset($params.value.1)}{$params.value.1}{/if}">
+																	<input type="hidden" id="{$params.id_date}_1" name="{$params.name_date}[1]" value="{if isset($smarty.post[$params.name_date][1]) && $smarty.post[$params.name_date][1]}{$smarty.post[$params.name_date][1]}{elseif isset($params.value.1)}{$params.value.1}{/if}">
 																	<span class="input-group-addon">
 																		<i class="icon-calendar"></i>
 																	</span>
@@ -370,28 +372,30 @@
 																</script>
 															</div>
 														{elseif $params.type == 'select'}
+															{$field_name="`$list_id`Filter_`$params.filter_key`"}
 															{if isset($params.multiple) && $params.multiple}
-																<select id="filter_input_{$key}" class="filter{if isset($params.align) && $params.align == 'center'}center{/if} select_multiple_{$params.operator} chosen" multiple name="{$list_id}Filter_{$params.filter_key}[]" {if isset($params.width)} style="width:{$params.width}px"{/if}>
+																<select id="filter_input_{$key}" class="filter{if isset($params.align) && $params.align == 'center'}center{/if} select_multiple_{$params.operator} chosen" multiple name="{$field_name}[]" {if isset($params.width)} style="width:{$params.width}px"{/if}>
 																	{if isset($params.list) && is_array($params.list)}
 																		{foreach $params.list AS $option_value => $option_display}
-																			<option value="{$option_value}" {if isset($params.value) && $params.value}{if in_array($option_value, $params.value)} selected="selected"{/if}{/if}>{$option_display}</option>
+																			<option value="{$option_value}" {if isset($smarty.post.$field_name) && $smarty.post.$field_name && in_array($option_value, $smarty.post.$field_name)} selected="selected"{elseif isset($params.value) && $params.value}{if in_array($option_value, $params.value)} selected="selected"{/if}{/if}>{$option_display}</option>
 																		{/foreach}
 																	{/if}
 																</select>
 															{else}
 																{if isset($params.filter_key)}
-																	<select id="filter_input_{$key}" class="filter{if isset($params.align) && $params.align == 'center'}center{/if} {if isset($params.class)}{$params.class}{/if}" name="{$list_id}Filter_{$params.filter_key}" {if isset($params.width)} style="width:{$params.width}px"{/if}>
+																	<select id="filter_input_{$key}" class="filter{if isset($params.align) && $params.align == 'center'}center{/if} {if isset($params.class)}{$params.class}{/if}" name="{$field_name}" {if isset($params.width)} style="width:{$params.width}px"{/if}>
 																		<option value="" {if $params.value == ''} selected="selected" {/if}>-</option>
 																		{if isset($params.list) && is_array($params.list)}
 																			{foreach $params.list AS $option_value => $option_display}
-																				<option value="{$option_value}" {if (string)$option_display === (string)$params.value ||  (string)$option_value === (string)$params.value} selected="selected"{/if}>{$option_display}</option>
+																				<option value="{$option_value}" {if isset($smarty.post.$field_name) && $smarty.post.$field_name == $option_value} selected="selected"{elseif (string)$option_display === (string)$params.value ||  (string)$option_value === (string)$params.value} selected="selected"{/if}>{$option_display}</option>
 																			{/foreach}
 																		{/if}
 																	</select>
 																{/if}
 															{/if}
 														{else}
-															<input type="text" id="filter_input_{$key}" class="filter" name="{$list_id}Filter_{if isset($params.filter_key)}{$params.filter_key}{else}{$key}{/if}" value="{$params.value|escape:'html':'UTF-8'}" {if isset($params.width) && $params.width != 'auto'} style="width:{$params.width}px"{/if} />
+															{$field_name="`$list_id`Filter_{if isset($params.filter_key)}`$params.filter_key`{else}`$key`{/if}"}
+															<input type="text" id="filter_input_{$key}" class="filter" name="{$field_name}" value="{if isset($smarty.post.$field_name) && $smarty.post.$field_name}{$smarty.post.$field_name}{else}{$params.value|escape:'html':'UTF-8'}{/if}" {if isset($params.width) && $params.width != 'auto'} style="width:{$params.width}px"{/if} />
 														{/if}
 													</div>
 												</div>
