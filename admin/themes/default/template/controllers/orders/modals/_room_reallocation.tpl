@@ -41,7 +41,7 @@
             </div>
 
             <hr>
-            <form class="form-hozizontal" method="post" action="{$current_index}&amp;vieworder&amp;token={$smarty.get.token|escape:'html':'UTF-8'}&amp;id_order={$order->id|intval}">
+            <form class="form-hozizontal" method="post" action="{$reallocate_form_action}">
                 <div class="form-group">
                     <div class="row">
                         <div class="form-group col-sm-6">
@@ -102,7 +102,7 @@
                 </dl>
             </div>
             <hr>
-            <form method="post" action="{$current_index}&amp;vieworder&amp;token={$smarty.get.token|escape:'html':'UTF-8'}&amp;id_order={$order->id|intval}">
+            <form method="post" action="{$reallocate_form_action}">
                 <div class="form-group">
                 </div>
                 <div class="form-group">
