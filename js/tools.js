@@ -53,7 +53,7 @@ function formatNumber(value, numberOfDecimal, thousenSeparator, virgule)
 
 	if (parseInt(numberOfDecimal) === 0)
 		return abs_val_string;
-	return abs_val_string + virgule + (deci_string > 0 ? deci_string : '00');
+	return abs_val_string + virgule + deci_string;
 }
 
 function formatCurrency(price, currencyFormat, currencySign, currencyBlank)

@@ -1044,24 +1044,29 @@ class AdminCustomersControllerCore extends AdminController
         $customer = new Customer();
         if (Validate::isEmail($customer_email)) {
             $customer->getByEmail($customer_email);
+            if ($customer->id) {
+                $this->errors[] = Tools::displayError('An account already exists for this email address:').' '.$customer_email;
+                $this->display = 'edit';
+                return $customer;
+            } elseif (Customer::customerExists($customer_email, false, true)) {
+                $this->errors[] = Tools::displayError('The email is already associated with a banned account. Please use a different one.');
+                $this->display = 'edit';
+            } elseif (trim(Tools::getValue('passwd')) == '') {
+                $this->validateRules();
+                $this->errors[] = Tools::displayError('Password can not be empty.');
+                $this->display = 'edit';
+            } elseif ($customer = parent::processAdd()) {
+                $this->context->smarty->assign('new_customer', $customer);
+                return $customer;
+            }
+        } else {
+            $this->errors[] = Tools::displayError('Invalid email address.');
+            $this->display = 'edit';
         }
-        if ($customer->id) {
-            $this->errors[] = Tools::displayError('An account already exists for this email address:').' '.$customer_email;
-            $this->display = 'edit';
-            return $customer;
-        } elseif (Customer::customerExists($customer_email, false, true)) {
-            $this->errors[] = Tools::displayError('The email is already associated with a banned account. Please use a different one.');
-            $this->display = 'edit';
-        } elseif (trim(Tools::getValue('passwd')) == '') {
-            $this->validateRules();
-            $this->errors[] = Tools::displayError('Password can not be empty.');
-            $this->display = 'edit';
-        } elseif ($customer = parent::processAdd()) {
-            $this->context->smarty->assign('new_customer', $customer);
-            return $customer;
-        }
+
         return false;
     }
+
 
     public function processUpdate()
     {
@@ -1073,7 +1078,10 @@ class AdminCustomersControllerCore extends AdminController
                 $customer = new Customer();
                 if (Validate::isEmail($customer_email)) {
                     $customer->getByEmail($customer_email);
+                } else {
+                    $this->errors[] = Tools::displayError('Invalid email address.');
                 }
+
                 if (($customer->id) && ($customer->id != (int)$this->object->id)) {
                     $this->errors[] = Tools::displayError('An account already exists for this email address:').' '.$customer_email;
                 }

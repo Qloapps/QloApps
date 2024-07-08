@@ -118,7 +118,7 @@ h1, h2, h3, h4, h5, h6,
 			border-radius: $border-radius-base $border-radius-base 0 0
 
 	// pulling this in mainly for less shorthand
-	&.nav-justified 
+	&.nav-justified
 		@extend .nav-justified
 		@extend .nav-tabs-justified
 
@@ -169,9 +169,9 @@ h1, h2, h3, h4, h5, h6,
 
 // The dropdown menu (ul)
 .dropdown-menu
-	right: 0
-	float: left
-	left: auto
+	right: unset
+	float: right
+	left: 0
 
 	// Aligns the dropdown menu to left
 	&.pull-left
@@ -184,6 +184,11 @@ h1, h2, h3, h4, h5, h6,
 	left: 0
 	float: right
 	right: auto
+
+.pull-right > .dropdown-menu
+	right: unset
+	float: right
+	left: 0
 
 // Right aligned menus need alt position
 .navbar-nav.pull-left > li > .dropdown-menu,
@@ -338,13 +343,13 @@ h1, h2, h3, h4, h5, h6,
 
 // Popovers
 // -------------------------
-.popover.top, 
+.popover.top,
 .popover.bottom
 	direction:ltr
 
-.popover.top .popover-title, 
+.popover.top .popover-title,
 .popover.top .popover-content,
-.popover.bottom .popover-title, 
+.popover.bottom .popover-title,
 .popover.bottom .popover-content
 	direction: rtl
 	text-align: right
