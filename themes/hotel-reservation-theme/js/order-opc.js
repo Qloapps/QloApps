@@ -546,6 +546,50 @@ $(document).ready(function()
 		}
     });
 
+	$(document).on('click', '.open_rooms_extra_services_panel', function() {
+		var idOrder = $(this).data('id_order');
+		var dateFrom = $(this).data('date_from');
+		var dateTo = $(this).data('date_to');
+		var action = $(this).data('action');
+		$.ajax({
+			type: 'POST',
+			headers: {
+				"cache-control": "no-cache"
+			},
+			url: action,
+			dataType: 'json',
+			cache: false,
+			data: {
+				date_from: dateFrom,
+				date_to: dateTo,
+				id_product: idProduct,
+				id_order: idOrder,
+				method: 'getRoomTypeBookingDemands',
+				ajax: true,
+				token: static_token
+			},
+			success: function(result) {
+				if (result.extra_demands) {
+					$('#rooms_extra_services').html('');
+					$('#rooms_extra_services').append(result.extra_demands);
+				}
+				$.fancybox({
+					href: "#rooms_extra_services",
+					autoSize : true,
+					autoScale : true,
+					maxWidth : '100%',
+					'hideOnContentClick': false,
+					afterClose: function() {
+						if (result.reload) {
+							// reload so that changes prices will reflect everywhere
+							location.reload();
+						}
+					},
+				});
+			},
+		});
+	});
+
 	function updateServiceProducts(element)
 	{
 		var operator = $(element).is(':checked') ? 'up' : 'down';

@@ -41,7 +41,7 @@
 	top: -50px;
 	bottom: 50px;
 	left: -50px;
-	right: 50px;
+	right: -50px;
 	width: calc(100% + 100px);
 	height: calc(100% + 100px);
 }
