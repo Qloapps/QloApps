@@ -776,6 +776,7 @@ class FrontControllerCore extends Controller
         }
 
         if (Tools::isSubmit('SubmitLogin')
+            && !Configuration::get('PS_SHOP_ENABLE')
             && Configuration::get('PS_ALLOW_EMP')
             && !Context::getContext()->cookie->enable_maintenance_view
         ) {
@@ -812,56 +813,102 @@ class FrontControllerCore extends Controller
 
     protected function processLogin($email, $passwd)
     {
-        $result = false;
-        $objMaintenanceAccess = new MaintenanceAccess();
+        $remoteIpAddress = Tools::getRemoteAddr();
+        $maxAttempts = Configuration::get('PS_ALLOW_EMP_MAX_ATTEMPTS');
 
-        /* Check fields validity */
-        if (empty($email)) {
-            $this->errors[] = Tools::displayError('Email is empty.');
-        } elseif (!Validate::isEmail($email)) {
-            $this->errors[] = Tools::displayError('Invalid email address.');
-        }
+        if ($maxAttempts) {
+            $objMaintenanceAccess = new MaintenanceAccess();
+            $attemptsCount = $objMaintenanceAccess->getFailedAttemptsCount($email, $remoteIpAddress); // does not include the current one
+            if ($attemptsCount >= $maxAttempts) {
+                if ($lastAttempt = $objMaintenanceAccess->getLastAttempt($email, $remoteIpAddress)) {
+                    $minutesElapsed = (int) ((time() - strtotime($lastAttempt['date_add'])) / 60);
 
-        if (empty($passwd)) {
-            $this->errors[] = Tools::displayError('The password field is blank.');
-        } elseif (!Validate::isPasswd($passwd)) {
-            $this->errors[] = Tools::displayError('Invalid password.');
-        }
-
-        if ($objMaintenanceAccess->checkLimit($email)) {
-            $this->errors[] =Tools::displayError('You have exceeded the limit of login attempts, please try after some time');
+                    if ($minutesElapsed <= MaintenanceAccess::LOGIN_ATTEMPTS_WINDOW) {
+                        $minutesLeft = MaintenanceAccess::LOGIN_ATTEMPTS_WINDOW - $minutesElapsed;
+                        if ($minutesLeft > 1) {
+                            $this->errors[] = Tools::displayError(sprintf('You have reached the limit of login attempts, please try after %d minutes.', $minutesLeft));
+                        } elseif ($minutesLeft == 1) {
+                            $this->errors[] = Tools::displayError(sprintf('You have reached the limit of login attempts, please try after %d minute.', $minutesLeft));
+                        }
+                    }
+                }
+            }
         }
 
         if (!count($this->errors)) {
-            // Find employee
-            $this->context->employee = new Employee();
-            $is_employee_loaded = $this->context->employee->getByEmail($email, $passwd);
-            $employee_associated_shop = $this->context->employee->getAssociatedShops();
-            if (!$is_employee_loaded) {
-                $this->errors[] = Tools::displayError('The Employee does not exist, or the password provided is incorrect.');
-                $this->context->employee->logout();
-            } elseif (empty($employee_associated_shop) && !$this->context->employee->isSuperAdmin()) {
-                $this->errors[] = Tools::displayError('This employee does not manage the shop anymore (Either the shop has been deleted or permissions have been revoked).');
-                $this->context->employee->logout();
-            } else {
-                // Update cookie
-                $cookie = Context::getContext()->cookie;
-                $cookie->enable_maintenance_view = $this->context->employee->id;
-                $cookie->remote_addr = ip2long(Tools::getRemoteAddr());
-                $cookie->write();
+            if (empty($email)) {
+                $this->errors[] = Tools::displayError('The Email address field is blank.');
+            } elseif (!Validate::isEmail($email)) {
+                $this->errors[] = Tools::displayError('Invalid Email address.');
             }
-            if (count($this->errors)) {
-                $this->context->smarty->assign('errors', $this->errors);
-                $objMaintenanceAccess->email = $email;
-                $objMaintenanceAccess->ip_address = Tools::getRemoteAddr();
-                $objMaintenanceAccess->save();
+
+            if (empty($passwd)) {
+                $this->errors[] = Tools::displayError('The Password field is blank.');
+            } elseif (!Validate::isPasswd($passwd)) {
+                $this->errors[] = Tools::displayError('Invalid Password.');
+            }
+
+            if (!count($this->errors)) {
+                // Find employee
+                $this->context->employee = new Employee();
+                $is_employee_loaded = $this->context->employee->getByEmail($email, $passwd);
+                $employee_associated_shop = $this->context->employee->getAssociatedShops();
+
+                if (!$is_employee_loaded) {
+                    $this->errors[] = Tools::displayError('The employee does not exist, or the password provided is incorrect.');
+                    $this->context->employee->logout();
+                } elseif (empty($employee_associated_shop) && !$this->context->employee->isSuperAdmin()) {
+                    $this->errors[] = Tools::displayError('This employee does not manage the website anymore (either the website has been deleted or permissions have been revoked).');
+                    $this->context->employee->logout();
+                } else {
+                    // Login successful
+                    // Update cookie
+                    $cookie = Context::getContext()->cookie;
+                    $cookie->enable_maintenance_view = $this->context->employee->id;
+                    $cookie->remote_addr = ip2long($remoteIpAddress);
+                    $cookie->write();
+
+                    // Reset attempts count on successful login
+                    $objMaintenanceAccess->removeFailedAttempts($email, $remoteIpAddress);
+                }
+
+                if (count($this->errors)) {
+                    // Save only if attempts limit is set
+                    if ($maxAttempts) {
+                        $objMaintenanceAccess = new MaintenanceAccess();
+                        $objMaintenanceAccess->email = $email;
+                        $objMaintenanceAccess->ip_address = $remoteIpAddress;
+                        $objMaintenanceAccess->save();
+
+                        if ($attemptsCount < $maxAttempts) {
+                            $attemptsLeft = $maxAttempts - $attemptsCount - 1;
+
+                            if ($attemptsLeft > 0) {
+                                if ($attemptsLeft > 1) {
+                                    $this->errors[] = Tools::displayError(sprintf('%d attempts left.', ($maxAttempts - $attemptsCount - 1)));
+                                } else {
+                                    $this->errors[] = Tools::displayError(sprintf('%d attempt left.', ($maxAttempts - $attemptsCount - 1)));
+                                }
+                            } else {
+                                if (MaintenanceAccess::LOGIN_ATTEMPTS_WINDOW > 1) {
+                                    $this->errors[] = Tools::displayError(sprintf('You have reached the limit of login attempts, please try after %d minutes.', MaintenanceAccess::LOGIN_ATTEMPTS_WINDOW));
+                                } else {
+                                    $this->errors[] = Tools::displayError(sprintf('You have reached the limit of login attempts, please try after %d minute.', MaintenanceAccess::LOGIN_ATTEMPTS_WINDOW));
+                                }
+                            }
+                        }
+                    }
+
+                    $this->context->smarty->assign('errors', $this->errors);
+                } else {
+                    Tools::redirect('index.php');
+                }
             } else {
-                Tools::redirect('index.php');
+                $this->context->smarty->assign('errors', $this->errors);
             }
         } else {
             $this->context->smarty->assign('errors', $this->errors);
         }
-        return $result;
     }
 
     /**

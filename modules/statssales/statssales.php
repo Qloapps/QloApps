@@ -176,6 +176,7 @@ class StatsSales extends ModuleGraph
 						'.($totals['orderCount'] ? $this->engine(array(
                             'type' => 'pie',
                             'option' => '3-'.(int)Tools::getValue('id_country').'-'.(int)Tools::getValue('id_hotel'),
+                            'format' => 'd'
                         )) : $this->l('No orders found.')).'
 					</div>
 					<div class="col-lg-4">
