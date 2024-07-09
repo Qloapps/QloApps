@@ -396,12 +396,6 @@ class AdminNormalProductsControllerCore extends AdminController
             $bo_theme = 'default';
         }
 
-        Media::addJsDef(
-            array(
-                'tb_pathToImage' => '../img/loadingAnimation.gif'
-            )
-        );
-
         $this->addJs(__PS_BASE_URI__.$this->admin_webpath.'/themes/'.$bo_theme.'/js/jquery.iframe-transport.js');
         $this->addJs(__PS_BASE_URI__.$this->admin_webpath.'/themes/'.$bo_theme.'/js/jquery.fileupload.js');
         $this->addJs(__PS_BASE_URI__.$this->admin_webpath.'/themes/'.$bo_theme.'/js/jquery.fileupload-process.js');
@@ -1399,7 +1393,10 @@ class AdminNormalProductsControllerCore extends AdminController
             parent::postProcess();
         }
 
-        if ($this->display == 'edit' || $this->display == 'add') {
+        if (in_array($this->display, array('add', 'edit'))
+            && $this->tabAccess[$this->display] == '1'
+            && $this->loadObject(true)
+        ) {
             $this->addJqueryUI(array(
                 'ui.core',
                 'ui.widget'
