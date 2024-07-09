@@ -758,35 +758,6 @@
                     </script>
                 </div>
 
-                <div class="panel">
-                    <div class="panel-heading">
-                        <i class="icon icon-envelope"></i> &nbsp;{l s='Guest Address'}
-                        {if $can_edit}
-                            {if $idGuestAddress}
-                                <a id="edit_guest_address" class="btn btn-primary pull-right fancybox" href="{$link->getAdminLink('AdminAddresses')}&amp;id_address={$idGuestAddress}&updateaddress&realedit=1&liteDisplaying=1&submitFormAjax=1#">
-                                    <i class="icon-pencil"></i> {l s='Edit'}
-                                </a>
-                            {else}
-                                <a id="add_guest_address" class="btn btn-primary pull-right fancybox" href="{$link->getAdminLink('AdminAddresses')}&amp;addaddress&amp;id_customer={$order->id_customer}&amp;liteDisplaying=1&amp;submitFormAjax=1#">
-                                    <i class="icon-plus-circle"></i> {l s='Add Address'}
-                                </a>
-                            {/if}
-                        {/if}
-                    </div>
-                    <div class="row">
-                        {if $guestFormatedAddress}
-                            {$guestFormatedAddress}
-                        {else}
-                            <div class="list-empty">
-                                <div class="list-empty-msg">
-                                    <i class="icon-warning-sign list-empty-icon"></i>
-                                    {l s='Guest address not found.'}
-                                </div>
-                            </div>
-                        {/if}
-                    </div>
-                </div>
-
                 {* Order Internal notes *}
                 {if (sizeof($messages))}
                     <div class="panel">
