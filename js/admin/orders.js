@@ -1109,7 +1109,7 @@ function initRoomEvents()
 						{
 							if (data.refresh)
 							{
-								location.reload();
+                                window.location.href = admin_order_tab_link + '&conf=3&vieworder&id_order=' + id_order;
 								return;
 							}
 							go = false;
@@ -1121,8 +1121,7 @@ function initRoomEvents()
 
 							// Initialize all events
 							init();
-							//Added by webkul
-							location.reload();
+							window.location.href = admin_order_tab_link + '&conf=3&vieworder&id_order=' + id_order;
 							//End
 							// $('.partial_refund_fields').hide();
 						}
@@ -1172,7 +1171,8 @@ function initRoomEvents()
 					updateAmounts(data.order);
 					updateInvoice(data.invoices);
 					updateDocuments(data.documents_html);
-					location.reload();
+
+					window.location.href = admin_order_tab_link + '&conf=1&vieworder&id_order=' + data.order.id;
 				}
 				else
 					jAlert(data.error);
@@ -1262,6 +1262,14 @@ $(document).ready(function() {
         afterClose: function() {
             location.reload();
         },
+    });
+
+    // when change order state to cancel or refund then show modal of bookings cancellation
+    $(document).on('change', '#id_order_state', function(e) {
+        if ($(this).val() == PS_OS_CANCELED || $(this).val() == PS_OS_REFUND) {
+            e.preventDefault();
+            CancelRoomBookingModal.show();
+        }
     });
 
 	$('#desc-order-partial_refund').click(function() {
@@ -1751,7 +1759,6 @@ $(document).ready(function() {
     // End: RoomStatusModal: Processes
     // ======================================
 
-
     // Start: RoomAllotmentCommentModal: Processes
     $(document).on('click', '.manual_allotment_comment', function(e){
         e.preventDefault();
@@ -1848,7 +1855,7 @@ $(document).ready(function() {
                 success : function(data) {
                     if (data.result) {
                         init();
-                        location.reload();
+                        window.location.href = admin_order_tab_link + '&conf=4&vieworder&id_order=' + data.order.id;
                     } else {
                         jAlert(data.error);
                     }
@@ -2256,6 +2263,7 @@ const TravellerModal = {
     },
     submit: function() {
         $(".loading_overlay").show();
+        TravellerModal.hideErrors();
         $.ajax({
             type: 'POST',
             headers: {
@@ -2266,7 +2274,9 @@ const TravellerModal = {
             cache: false,
             data: $('#customer-guest-details-form').serialize()+'&ajax=true&id_order='+id_order+'&action=updateGuestDetails',
             success: function(result) {
-                if (result.success) {
+                if (result.hasError == true) {
+                    TravellerModal.showErrors(result.errorsHtml);
+                } else {
                     if (result.msg) {
                         showSuccessMessage(result.msg);
                     }
@@ -2283,14 +2293,20 @@ const TravellerModal = {
                     if (result.data.guest_phone) {
                         $('#customer-guest-details .guest_phone a').attr('href', 'tel'+result.data.guest_phone).html('<i class="icon-phone"></i> ' + result.data.guest_phone);
                     }
-                } else if (result.errors) {
-                    showErrorMessage(result.errors);
                 }
             },
             complete: function() {
                 $(".loading_overlay").hide();
             }
         });
+    },
+    showErrors: function(errorsHtml) {
+        $('#traveller-modal .errors-wrap').html(errorsHtml);
+        $('#traveller-modal .errors-wrap').show(200);
+    },
+    hideErrors: function(cb) {
+        $('#traveller-modal .errors-wrap').hide(200);
+        $('#traveller-modal .errors-wrap').html('');
     }
 };
 
@@ -2908,22 +2924,6 @@ function updateRoomDemand(element)
             $(".loading_overlay").hide();
         }
     });
-}
-
-function setRoomsForReallocation(roomsAvailable)
-{
-    if (typeof(roomsAvailable) != 'undefined' && roomsAvailable.length) {
-        var roomsHtml = '<select class="form-control" name="realloc_avail_rooms" id="realloc_avail_rooms">';
-            roomsHtml += '<option class="realloc_rm_opts" value="0">---- ' + select_room_txt + ' ----</option>';
-            $.each(roomsAvailable, function(key, roomInfo) {
-                roomsHtml += '<option class="realloc_rm_opts" value="' + roomInfo.id_room + '">' + roomInfo.room_num + '</option>';
-            });
-        roomsHtml += '</select>';
-
-        $(".realloc_avail_rooms_container").empty().append(roomsHtml);
-    } else {
-        $(".realloc_avail_rooms_container").empty().text(no_realloc_rm_avail_txt);
-    }
 }
 
 function checkPartialRefundProductQuantity(it)

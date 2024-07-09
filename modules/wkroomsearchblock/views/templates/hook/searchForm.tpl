@@ -1,3 +1,22 @@
+{*
+* Copyright since 2010 Webkul.
+*
+* NOTICE OF LICENSE
+*
+* All right is reserved,
+* Please go through this link for complete license : https://store.webkul.com/license.html
+*
+* DISCLAIMER
+*
+* Do not edit or add to this file if you wish to upgrade this module to newer
+* versions in the future. If you wish to customize this module for your
+* needs please refer to https://store.webkul.com/customisation-guidelines/ for more information.
+*
+*  @author    Webkul IN <support@webkul.com>
+*  @copyright since 2010 Webkul IN
+*  @license   https://store.webkul.com/license.html
+*}
+
 <form method="POST" id="search_hotel_block_form" class="grid">
     {if isset($location_enabled) && $location_enabled}
         <div class="form-group area-{$column_widths['location']}">
@@ -191,8 +210,13 @@
                             </div>
                         {/if}
                     </div>
-                    <div id="add_new_occupancy">
-                        <a class="add_new_occupancy_btn" href="#"><i class="icon-plus"></i> <span>{l s='Add Room' mod='wkroomsearchblock'}</span></a>
+                    <div>
+                        <span id="add_new_occupancy">
+                            <a class="add_new_occupancy_btn" href="#"><i class="icon-plus"></i> <span>{l s='Add Room' mod='wkroomsearchblock'}</span></a>
+                        </span>
+                        <span>
+                            <button class="submit_occupancy_btn btn btn btn-primary pull-right">{l s='Done' mod='wkroomsearchblock'}</button>
+                        </span>
                     </div>
                 </div>
             </div>

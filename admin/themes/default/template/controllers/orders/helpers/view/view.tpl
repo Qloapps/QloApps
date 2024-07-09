@@ -41,6 +41,7 @@
 {block name="override_tpl"}
 	<script type="text/javascript">
 	var admin_order_tab_link = "{$link->getAdminLink('AdminOrders')|addslashes}";
+    var rooms_reallocation_url = "{$link->getAdminLink('AdminOrders')|addslashes}";
 	var id_order = {$order->id};
 	var id_lang = {$current_id_lang};
 	var id_currency = {$order->id_currency};
@@ -142,7 +143,7 @@
                                                             <span class="badge badge-info">{if $data.num_checkin_documents > 0}{$data.num_checkin_documents}{else}0{/if}</span> <i class="icon-file-text"></i>
                                                         </a>
 
-                                                        {if $data.is_refunded || $data.is_cancelled}
+                                                        {if isset($refundReqBookings) && $refundReqBookings && $data.id|in_array:$refundReqBookings && $data.is_refunded}
                                                             <span class="badge badge-danger">{if $data.is_cancelled}{l s='Cancelled'}{else}{l s='Refunded'}{/if}</span>
                                                         {else}
                                                             <a class="open_room_status_form btn btn-default" href="#" data-id_hotel_booking_detail="{$data['id']}" data-id_order="{$data['id_order']}" data-id_status="{$data['id_status']}" data-id_room="{$data['id_room']}" data-date_from="{$data['date_from']|date_format:"%Y-%m-%d"}" data-date_to="{$data['date_to']|date_format:"%Y-%m-%d"}" data-check_in_time="{$data['check_in_time']}" data-check_out_time="{$data['check_out_time']}">
@@ -255,7 +256,7 @@
                                         <div class="col-lg-9">
                                             <select id="id_order_state" class="chosen form-control" name="id_order_state">
                                                 {foreach from=$states item=state}
-                                                    <option value="{$state['id_order_state']|intval}"{if isset($currentState) && $state['id_order_state'] == $currentState->id} selected="selected" disabled="disabled"{elseif ($state['id_order_state'] == Configuration::get('PS_OS_REFUND') && !$allBookingsRefunded)} disabled="disabled"{elseif ($state['id_order_state'] == Configuration::get('PS_OS_CANCELED') && !$allBookingsCancelled)} disabled="disabled"{elseif ($state['id_order_state'] == Configuration::get('PS_OS_OVERBOOKING_PAID') || $state['id_order_state'] == Configuration::get('PS_OS_OVERBOOKING_UNPAID') || $state['id_order_state'] == Configuration::get('PS_OS_OVERBOOKING_PARTIAL_PAID')) && (!isset($orderOverBookings) || !$orderOverBookings)} disabled="disabled"{/if}>{$state['name']|escape}</option>
+                                                    <option value="{$state['id_order_state']|intval}"{if isset($currentState) && $state['id_order_state'] == $currentState->id} selected="selected" disabled="disabled"{elseif ($state['id_order_state'] == Configuration::get('PS_OS_REFUND') && ($total_paid <= 0 && !$discounts|count))} disabled="disabled"{elseif ($state['id_order_state'] == Configuration::get('PS_OS_CANCELED') && ($totalRefundedRooms || $discounts|count || $total_paid > 0))} disabled="disabled"{elseif ($state['id_order_state'] == Configuration::get('PS_OS_OVERBOOKING_PAID') || $state['id_order_state'] == Configuration::get('PS_OS_OVERBOOKING_UNPAID') || $state['id_order_state'] == Configuration::get('PS_OS_OVERBOOKING_PARTIAL_PAID')) && (!isset($orderOverBookings) || !$orderOverBookings)} disabled="disabled"{/if}>{$state['name']|escape}</option>
                                                 {/foreach}
                                             </select>
                                             <input type="hidden" name="id_order" value="{$order->id}" />
@@ -551,6 +552,7 @@
                                         <dl class="list-detail col-sm-12">
                                             <label class="label-title">{l s='Guest info'}</label>
 
+                                            <dd><i class="icon-user"></i> &nbsp;<b><a  href="?tab=AdminCustomers&amp;id_customer={$customer->id}&amp;viewcustomer&amp;token={getAdminToken tab='AdminCustomers'}">{$customer->firstname} {$customer->lastname}</a></b></dd>
                                             <dd><i class="icon-envelope"></i>  &nbsp;<b><a  href="mailto:{$customer->email}">{$customer->email}</a></b></dd>
                                             {if $addresses.invoice->phone_mobile || $addresses.invoice->phone}
                                                 <dd><i class="icon-phone"></i>  &nbsp;<b><a  href="tel:{if $addresses.invoice->phone_mobile}{$addresses.invoice->phone_mobile}{else}{$addresses.invoice->phone}{/if}">{if $addresses.invoice->phone_mobile}{$addresses.invoice->phone_mobile}{else}{$addresses.invoice->phone}{/if}</a></b></dd>
@@ -1305,6 +1307,8 @@
         {addJsDef ROOM_STATUS_CHECKED_IN=$ROOM_STATUS_CHECKED_IN|escape:'quotes':'UTF-8'}
         {addJsDef ROOM_STATUS_CHECKED_OUT=$ROOM_STATUS_CHECKED_OUT|escape:'quotes':'UTF-8'}
         {addJsDef ALLOTMENT_MANUAL=$ALLOTMENT_MANUAL|escape:'quotes':'UTF-8'}
+        {addJsDef PS_OS_CANCELED=Configuration::get('PS_OS_CANCELED')|escape:'quotes':'UTF-8'}
+        {addJsDef PS_OS_REFUND=Configuration::get('PS_OS_REFUND')|escape:'quotes':'UTF-8'}
         {addJsDefL name=txt_booking_document_upload_success}{l s='Document uploaded successfully.' js=1}{/addJsDefL}
         {addJsDefL name=txt_booking_document_delete_confirm}{l s='Are you sure?' js=1}{/addJsDefL}
         {addJsDefL name=txt_booking_document_delete_success}{l s='Document deleted successfully.' js=1}{/addJsDefL}

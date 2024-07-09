@@ -3,6 +3,7 @@ $kpi-gap: 10px
 
 .kpi-container
 	display: flex
+	gap: 15px
 	justify-content: space-between
 	padding: 12px !important
 	.kpis-wrap
@@ -23,7 +24,6 @@ $kpi-gap: 10px
 			padding-right: $kpi-gap / 2
 	.actions-wrap
 		width: 16px
-		margin-left: 16px
 		button
 			padding: 0
 			border: none
@@ -97,11 +97,21 @@ $kpi-gap: 10px
 		border: 1px solid #e7edfa
 		border-left-width: 3px
 		border-radius: 6px
-		padding: 4px 8px 8px 42px
+		padding: 4px 8px 8px 4px
 		display: flex
-		flex-direction: column
-		justify-content: space-between
+		gap: 10px
 		white-space: normal
+		i.kpi-icon
+			font-size: 15px
+			text-align: center
+			color: white
+			line-height: 26px
+			background: #eee
+			width: 28px
+			height: 28px
+			@include border-radius(6px)
+		.kpi-data
+			flex-grow: 1
 		.title-subtitle
 			display: flex
 			justify-content: space-between
@@ -109,22 +119,7 @@ $kpi-gap: 10px
 				display: block
 				color: #666
 				font-size: 13px
-				i
-					position: absolute
-					top: 5px
-					font-size: 15px
-					text-align: center
-					color: white
-					line-height: 26px
-					background: #eee
-					width: 28px
-					height: 28px
-					@include left(5px)
-					@include border-radius(6px)
-					&::before
-						position: absolute
-						top: 1px
-						left: 8px
+
 			.subtitle
 				display: block
 				text-transform: capitalize
@@ -144,12 +139,8 @@ $kpi-gap: 10px
 				&.loading
 					height: 22px
 					min-width: 40px
-		.arrow
-			position: absolute
-			bottom: 7px
-			right: 9px
-			i
-				color: #828282 !important
+		.arrow i
+			color: #828282 !important
 	&:hover
 		text-decoration: none
 .color1

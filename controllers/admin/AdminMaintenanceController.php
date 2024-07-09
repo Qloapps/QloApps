@@ -54,7 +54,16 @@ class AdminMaintenanceControllerCore extends AdminController
                         'validation' => 'isBool',
                         'cast' => 'intval',
                         'type' => 'bool',
-                        'class' => "hello"
+                        'form_group_class' => (Tools::getValue('PS_SHOP_ENABLE', Configuration::get('PS_SHOP_ENABLE'))) ? 'collapse' : '',
+                    ),
+                    'PS_ALLOW_EMP_MAX_ATTEMPTS' => array(
+                        'title' => $this->l('Maximum Login Attempts'),
+                        'validation' => 'isUnsignedInt',
+                        'cast' => 'intval',
+                        'type' => 'text',
+                        'class' => 'fixed-width-xl',
+                        'desc' => sprintf($this->l('Set the number of maximum login attempts allowed in %d minutes. Set to 0 to disable this feature.'), MaintenanceAccess::LOGIN_ATTEMPTS_WINDOW),
+                        'form_group_class' => ((Tools::getValue('PS_SHOP_ENABLE', Configuration::get('PS_SHOP_ENABLE'))) || !(Tools::getValue('PS_ALLOW_EMP', Configuration::get('PS_ALLOW_EMP')))) ? ' collapse' : '',
                     ),
                     'PS_MAINTENANCE_IP' => array(
                         'title' => $this->l('Maintenance IP'),
@@ -69,9 +78,44 @@ class AdminMaintenanceControllerCore extends AdminController
         );
     }
 
+    public function postProcess()
+    {
+        if (Tools::isSubmit('submitOptionsconfiguration')) {
+            $shopEnable = Tools::getValue('PS_SHOP_ENABLE');
+            $allowEmp = Tools::getValue('PS_ALLOW_EMP');
+            $allowEmpMaxAttempts = trim(Tools::getValue('PS_ALLOW_EMP_MAX_ATTEMPTS'));
+            $maintenanceIp = trim(Tools::getValue('PS_MAINTENANCE_IP'));
+
+            // validations
+            if (!$shopEnable && $allowEmp) {
+                if ($allowEmpMaxAttempts == '') {
+                    $this->errors[] = $this->l('Maximum Login Attempts is a required field.');
+                } elseif (!Validate::isUnsignedInt($allowEmpMaxAttempts)) {
+                    $this->errors[] = $this->l('Maximum Login Attempts is invalid. Please enter a value greater than or equal to 0.');
+                }
+            }
+
+            // update values
+            if (!count($this->errors)) {
+                Configuration::updateValue('PS_SHOP_ENABLE', $shopEnable);
+                Configuration::updateValue('PS_MAINTENANCE_IP', $maintenanceIp);
+
+                if (!$shopEnable) {
+                    Configuration::updateValue('PS_ALLOW_EMP', $allowEmp);
+
+                    if ($allowEmp) {
+                        Configuration::updateValue('PS_ALLOW_EMP_MAX_ATTEMPTS', $allowEmpMaxAttempts);
+                    }
+                }
+
+                Tools::redirectAdmin(self::$currentIndex.'&token='.$this->token.'&conf=6');
+            }
+        }
+    }
+
     public function setMedia()
     {
         parent::setMedia();
-        $this->addJS(_PS_JS_DIR_.'maintenance.js');
+        $this->addJS(_PS_JS_DIR_.'/admin/maintenance.js');
     }
 }

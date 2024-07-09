@@ -89,8 +89,9 @@ class CookieCore
             $this->_path = '/'.$this->_path;
         }
         $this->_path = rawurlencode($this->_path);
-        $this->_path = str_replace('%2F', '/', $this->_path);
-        $this->_path = str_replace('%7E', '~', $this->_path);
+        $search = array('%2F', '%7E', '%28', '%29', '%2B', '%26');
+        $replace = array('/', '~', '(', ')', '+', '&');
+        $this->_path = str_replace($search, $replace, $this->_path);
         $this->_domain = $this->getDomain($shared_urls);
         $this->_sameSite = Configuration::get('PS_COOKIE_SAMESITE');
         $this->_name = 'QloApps-'.md5(($this->_standalone ? '' : _PS_VERSION_).$name.$this->_domain);
