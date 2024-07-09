@@ -179,14 +179,14 @@ class AdminCustomNavigationLinkSettingController extends ModuleAdminController
         if (Validate::isLoadedObject($objNavigationLink)) {
             $smartyVars['navigationLinkInfo'] = (array) $objNavigationLink;
             $smartyVars['edit'] = 1;
-            if (!$objNavigationLink->is_custom_link
+            if ($objNavigationLink->id_cms
                 && Validate::isLoadedObject($objCMS = new CMS($objNavigationLink->id_cms))
             ) {
                 $smartyVars['id_cms_category'] = $objCMS->id_cms_category;
                 if (empty($this->errors)
                     && !$objCMS->active
                 ) {
-                    $this->warnings[] = $this->l('To enable this link you need to enable the related CMS page first');
+                    $this->warnings[] = $this->l('The selected CMS page is currently disabled. Please enable it first in order to activate this navigation link.');
                 }
             }
         }
