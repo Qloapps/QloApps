@@ -2380,7 +2380,6 @@ class CartCore extends ObjectModel
                                 $array = array();
                                 foreach($selectedServiceProducts as $selectedProduct) {
                                     if (isset($array[$selectedProduct['id_hotel']])) {
-                                        $array[$selectedProduct['id_hotel']]['quantity'] += $selectedProduct['quantity'];
                                         $array[$selectedProduct['id_hotel']]['total_price_tax_excl'] += $selectedProduct['total_price_tax_excl'];
                                         $array[$selectedProduct['id_hotel']]['total_price_tax_incl'] += $selectedProduct['total_price_tax_incl'];
                                     } else {
