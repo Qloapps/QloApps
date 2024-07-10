@@ -112,7 +112,7 @@ class AdminAddressesControllerCore extends AdminController
 
     public function renderForm()
     {
-        $customerSelectField =array(
+        $customerField =array(
             'type' => 'text_customer',
             'label' => $this->l('Customer'),
             'name' => 'id_customer',
@@ -120,14 +120,15 @@ class AdminAddressesControllerCore extends AdminController
         );
         if ($this->loadObject(true)
             && !$this->object->id
+            && !Tools::getValue('liteDisplaying')
         ) {
             $customerEmails = array(array(
                 'email' => $this->l('Select Customer'),
                 'id_customer' => 0,
                 'id_address'=> 0
             ));
-            $customerEmails = array_merge($customerEmails, Customer::getAllCustomers(false, null, 0));
-            $customerSelectField = array(
+            $customerEmails = array_merge($customerEmails, Customer::getCustomers(null, false, 0));
+            $customerField = array(
                 'type' => 'select',
                 'label' => $this->l('Customer'),
                 'name' => 'id_customer',
@@ -146,7 +147,7 @@ class AdminAddressesControllerCore extends AdminController
                 'icon' => 'icon-envelope-alt'
             ),
             'input' => array(
-                $customerSelectField,
+                $customerField,
                 array(
                     'type' => 'text',
                     'label' => $this->l('Identification Number'),
@@ -214,7 +215,7 @@ class AdminAddressesControllerCore extends AdminController
         }
 
         $this->tpl_form_vars = array(
-            'customer' => (isset($customer) && $this->object->id) ? $customer : null,
+            'customer' => (isset($customer) && ($this->object->id || Tools::getValue('liteDisplaying'))) ? $customer : null,
             'tokenCustomer' => isset($token_customer) ? $token_customer : null
         );
 

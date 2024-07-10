@@ -296,16 +296,28 @@ class CustomerCore extends ObjectModel
     /**
      * Return customers list
      *
-     * @param null|bool $only_active Returns only active customers when true
+     * @param null|bool $only_active Returns customers by active status
+     * @param null|bool $havingAddress Returns customers having | not having address
+     * @param null|bool $deleted Returns customers by deleted status
      * @return array Customers
      */
-    public static function getCustomers($only_active = null)
+    public static function getCustomers($only_active = null, $havingAddress = null, $deleted = null)
     {
-        $sql = 'SELECT `id_customer`, `email`, `firstname`, `lastname`
-				FROM `'._DB_PREFIX_.'customer`
-				WHERE 1 '.Shop::addSqlRestriction(Shop::SHARE_CUSTOMER).
-				($only_active ? ' AND `active` = 1' : '').'
-				ORDER BY `id_customer` ASC';
+        $sqlSelect = 'SELECT c.`id_customer`, c.`email`, c.`firstname`, c.`lastname` ';
+        $sqlFrom = ' FROM `'._DB_PREFIX_.'customer` c';
+		$sqlWhere = 'WHERE 1 '.Shop::addSqlRestriction(Shop::SHARE_CUSTOMER).
+                (!is_null($only_active) ?  ' AND c.`active` = '.(int) $only_active: ' ' ).
+                (!is_null($deleted) ? ' AND c.`deleted` = '.(int) $deleted : ' ');
+		$sqlOrderBY = 'ORDER BY c.`id_customer` ASC';
+
+        if (!is_null($havingAddress)) {
+            $sqlFrom .= ' LEFT JOIN `'._DB_PREFIX_.'address` a
+                ON a.`id_customer` = c.`id_customer` AND a.`deleted`=0';
+            $sqlWhere .= (($havingAddress) ? ' AND a.`id_address` !='.(int) 0: ' AND ISNULL(a.`id_address`)');
+        }
+
+        $sql = $sqlSelect .' '. $sqlFrom.' '. $sqlWhere.' '.$sqlOrderBY;
+
         return Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql);
     }
 
@@ -950,20 +962,6 @@ class CustomerCore extends ObjectModel
     {
         $sql_filter .= Shop::addSqlRestriction(Shop::SHARE_CUSTOMER, 'main');
         return parent::getWebserviceObjectList($sql_join, $sql_filter, $sql_sort, $sql_limit);
-    }
-
-    public static function getAllCustomers($withAddress = null, $active = null, $deleted = null)
-    {
-        return Db::getInstance()->executeS(
-            'SELECT  c.`firstname`, c.`lastname`, c.`id_customer`, c.`email`, a.`id_address`
-            FROM `'._DB_PREFIX_.'customer` c
-            LEFT JOIN `'._DB_PREFIX_.'address` a
-            ON a.`id_customer` = c.`id_customer` AND a.`deleted`=0
-            WHERE 1 '.
-            (!is_null($deleted) ? ' AND c.`deleted` = '.(int) $deleted : ' ').
-            (!is_null($active) ?  ' AND c.`active` = '.(int) $active: ' ' ).
-            (!is_null($withAddress) ?  (($withAddress) ? ' AND a.`id_address` !='.(int) 0: ' AND ISNULL(a.`id_address`)'): ' ' )
-        );
     }
 
 }
