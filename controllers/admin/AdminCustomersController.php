@@ -1304,17 +1304,17 @@ class AdminCustomersControllerCore extends AdminController
     public function ajaxProcessVerifyCustomerEmail()
     {
         $response = array('status' => true);
-        $newIdCustomer = Tools::getValue('id_customer', 0);
+        $idCustomer = Tools::getValue('id_customer', 0);
         if (($email = trim(strval(Tools::getValue('email'))))
-            && ($oldIdCustomer = Customer::customerExists($email, true, false))
-            && (Validate::isLoadedObject($objCustomer = new Customer($oldIdCustomer)))
-            && $oldIdCustomer != $newIdCustomer // the admin is trying to add/update the account
+            && ($idCustomerByEmail = Customer::customerExists($email, true, false))
+            && (Validate::isLoadedObject($objCustomer = new Customer($idCustomerByEmail)))
+            && $idCustomerByEmail != $idCustomer // the admin is trying to add/update the account
         ) {
             $response['status'] = false;
             if ($objCustomer->deleted) {
                 $response['msg'] = Tools::displayError('This email is already associated with a banned account. Please use a different one.');
             } else {
-                $response['msg'] = Tools::displayError('An account already exists for this email address!!');
+                $response['msg'] = Tools::displayError('An account already exists for this email address.');
             }
         }
 
