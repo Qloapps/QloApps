@@ -18,17 +18,29 @@
 */
 
 $(document).ready(function() {
-	setCategoryWiseCmsPages();
+	displayCategoryWiseCmsPages();
 	$("input[name='is_cms_block_link").on('change', function () {
-		toggleElements(this, "#cms_block_content", "#non_cms_block_content");
+		if (parseInt($(this).val())) {
+			$("#cms_block_content").removeClass('hidden');
+			$("#non_cms_block_content").addClass('hidden');
+		} else {
+			$("#cms_block_content").addClass('hidden');
+			$("#non_cms_block_content").removeClass('hidden');
+		}
 	});
 
 	$("input[name='is_custom_redirect_link").on('change', function () {
-		toggleElements(this, ".custom_redirect_link_div", ".custom_redirect_page_div");
+		if (parseInt($(this).val())) {
+			$(".custom_redirect_link_div").removeClass('hidden');
+			$(".custom_redirect_page_div").addClass('hidden');
+		} else {
+			$(".custom_redirect_link_div").addClass('hidden');
+			$(".custom_redirect_page_div").removeClass('hidden');
+		}
 	});
 
 	$(document).on('change', '#id_cms_category', function(){
-		setCategoryWiseCmsPages();
+		displayCategoryWiseCmsPages();
 	});
 });
 
@@ -40,37 +52,12 @@ function showNavigationLinkLangField(lang_iso_code, id_lang)
 	$('#navigation_link_name_'+id_lang).show();
 }
 
-function toggleElements(element, selectorFirst, selectorSecond)
+function displayCategoryWiseCmsPages()
 {
-	if (parseInt($(element).val())) {
-		$(selectorFirst).removeClass('hidden');
-		$(selectorSecond).addClass('hidden');
-	} else {
-		$(selectorFirst).addClass('hidden');
-		$(selectorSecond).removeClass('hidden');
-	}
-}
-
-function setCategoryWiseCmsPages()
-{
-	var selectedPage = parseInt($('input[name="id_cms"]:checked').val());
 	var selectedCategory = parseInt($('#id_cms_category').val());
-	var cmsPages = JSON.parse(categoryWiseCmsPages);
-	if (!isNaN(selectedCategory)) {
-		cmsPages = cmsPages[selectedCategory];
-		var html = '';
-		$.each(cmsPages, function(i, v) {
-			html += '<tr>';
-			html += '<td><input type="radio" value="'+v['id_cms']+'" name="id_cms"></td>';
-			html += '<td>'+v['id_cms']+'</td>';
-			html += '<td><label for="groupBox_'+v['id_cms']+'">'+v['meta_title']+'</label></td>'
-			html += '</tr>';
-		});
-		$('table.cms_pages tbody').html(html);
-	}
+	$(document).find('.cms_pages').each(function(){
+		$(this).hide();
+	});
 
-	if (!isNaN(selectedPage)) {
-		$('input[name="id_cms"][value="'+selectedPage+'"]').attr('checked', 'checked');
-	}
-
+	$('#cms_pages_'+selectedCategory).show();
 }

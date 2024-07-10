@@ -71,7 +71,7 @@
 					</div>
 				</div>
 				{*Display CMS Pages*}
-				{if isset($cmsPages)}
+				{if isset($categoryWiseCmsPages)}
 					<div class="form-group">
 						<label class="control-label col-lg-3">
 							<span class="label-tooltip" data-toggle="tooltip"
@@ -79,32 +79,34 @@
 								{l s='Select CMS Page' mod='blocknavigationmenu'}
 							</span>
 						</label>
-						<div class="col-lg-9">
-							<table class="table table-bordered cms_pages" style="width:40%;">
-								<thead>
-									<tr>
-										<th class="fixed-width-xs">
-										</th>
-										<th class="fixed-width-xs"><span class="title_box">{l s='ID' mod='blocknavigationmenu'}</span></th>
-										<th>
-											<span class="title_box">
-												{l s='CMS Page Name' mod='blocknavigationmenu'}
-											</span>
-										</th>
-									</tr>
-								</thead>
-								<tbody>
-									{foreach $cmsPages as $cmsPage}
+						{foreach $categoryWiseCmsPages as $idCMSCategory => $cmsPages}
+							<div class="col-lg-9">
+								<table class="table table-bordered cms_pages" id="cms_pages_{$idCMSCategory}" style="width:40%;">
+									<thead>
 										<tr>
-											<td><input type="radio" value="{$cmsPage.id_cms|escape:'htmlall':'UTF-8'}" name="id_cms" {if isset($navigationLinkInfo['id_cms']) && $navigationLinkInfo['id_cms'] == $cmsPage.id_cms}checked="checked"{/if}>
-											</td>
-											<td>{$cmsPage.id_cms|escape:'htmlall':'UTF-8'}</td>
-											<td><label for="groupBox_{$cmsPage.id_cms|escape:'htmlall':'UTF-8'}">{$cmsPage.meta_title}</label></td>
+											<th class="fixed-width-xs">
+											</th>
+											<th class="fixed-width-xs"><span class="title_box">{l s='ID' mod='blocknavigationmenu'}</span></th>
+											<th>
+												<span class="title_box">
+													{l s='CMS Page Name' mod='blocknavigationmenu'}
+												</span>
+											</th>
 										</tr>
-									{/foreach}
-								</tbody>
-							</table>
-						</div>
+									</thead>
+									<tbody>
+										{foreach $cmsPages as $cmsPage}
+											<tr>
+												<td><input type="radio" value="{$cmsPage.id_cms|escape:'htmlall':'UTF-8'}" name="id_cms" {if isset($navigationLinkInfo['id_cms']) && $navigationLinkInfo['id_cms'] == $cmsPage.id_cms}checked="checked"{/if}>
+												</td>
+												<td>{$cmsPage.id_cms|escape:'htmlall':'UTF-8'}</td>
+												<td><label for="groupBox_{$cmsPage.id_cms|escape:'htmlall':'UTF-8'}">{$cmsPage.meta_title}</label></td>
+											</tr>
+										{/foreach}
+									</tbody>
+								</table>
+							</div>
+						{/foreach}
 					</div>
 				{/if}
 			</div>

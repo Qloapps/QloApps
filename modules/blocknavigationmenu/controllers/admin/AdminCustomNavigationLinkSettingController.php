@@ -186,7 +186,8 @@ class AdminCustomNavigationLinkSettingController extends ModuleAdminController
                 if (empty($this->errors)
                     && !$objCMS->active
                 ) {
-                    $this->warnings[] = $this->l('The selected CMS page is currently disabled. Please enable it first in order to activate this navigation link.');
+                    $cmsEditLink = $this->context->link->getAdminLink('AdminCmsContent').'&updatecms&id_cms='.(int) $objCMS->id;
+                    $this->warnings[] = $this->l('Please enable linked').' <a href="'.$cmsEditLink.'" target="_blank">'.$this->l('CMS page').'</a> '.$this->l('to enable this navigation link.');
                 }
             }
         }
@@ -223,13 +224,7 @@ class AdminCustomNavigationLinkSettingController extends ModuleAdminController
             }
         }
 
-        Media::addJsDef(
-            array(
-                'categoryWiseCmsPages' => json_encode($categoryWiseCmsPages)
-            )
-        );
-
-        $smartyVars['cmsPages'] = $cmsPages;
+        $smartyVars['categoryWiseCmsPages'] = $categoryWiseCmsPages;
         $smartyVars['categories'] = $cmsCategories;
         $this->context->smarty->assign($smartyVars);
         $this->fields_form = array(
@@ -403,7 +398,7 @@ class AdminCustomNavigationLinkSettingController extends ModuleAdminController
             if (isset($pos[2]) && (int) $pos[2] === $idNavigationLink) {
                 if ($objFeatureBlock = new WkCustomNavigationLink((int) $pos[2])) {
                     if (isset($position)
-                        && $objFeatureBlock->updatePosition($way, $position, $idNavigationLink)
+                        && $objFeatureBlock->updatePosition($way, $position)
                     ) {
                         echo 'ok position '.(int) $position.' for custom navigation link '.(int) $pos[1].'\r\n';
                     } else {
@@ -422,13 +417,13 @@ class AdminCustomNavigationLinkSettingController extends ModuleAdminController
     public function processStatus()
     {
         if (Validate::isLoadedObject($this->loadObject())
-            && !$this->object->is_custom_link //Check for CMS related navigation link
+            && $this->object->id_cms
+            && Validate::isLoadedObject($objCMS = new CMS($this->object->id_cms))
         ) {
-            $objCMS = new CMS($this->object->id_cms);
             if (!$objCMS->active
                 && !$this->object->active
             ) {
-                $this->errors[] = $this->l('Please activate the relate CMS page to activate this link');
+                $this->errors[] = $this->l('Please activate the linked CMS page to enable this navigation link.');
             }
         }
 
