@@ -60,22 +60,24 @@
 					var email = $(this).find('[value="'+id_customer+'"]').text();
 					$('#email').val(email);
 					var data = {};
-					data.id_customer = id_customer;
+					data.email = email;
 					data.token = "{$token|escape:'html':'UTF-8'}";
 					data.ajax = 1;
 					data.controller = "AdminAddresses";
-					data.action = "loadCustomer";
+					data.action = "loadNames";
 					$.ajax({
 						type: "POST",
 						url: "ajax-tab.php",
 						data: data,
 						dataType: 'json',
 						async : true,
-						success: function(response) {
-							if (response.status) {
-								$('input[name=firstname]').val(response.firstname);
-								$('input[name=lastname]').val(response.lastname);
-								$('input[name=company]').val(response.company);
+						success: function(msg) {
+							if (msg) {
+								var infos = msg.infos.replace("\\'", "'").split('_');
+								$('input[name=firstname]').val(infos[0]);
+								$('input[name=lastname]').val(infos[1]);
+								$('input[name=company]').val(infos[2]);
+								$('input[name=id_customer]').val(infos[3]);
 							} else {
 								resetCustomerRelatedAddressFields();
 							}

@@ -527,22 +527,20 @@ class AdminAddressesControllerCore extends AdminController
     }
 
      /**
-     * Method called when an ajax request is made to load the customer info for the selected email
+     * Method called when an ajax request is made
      * @see AdminController::postProcess()
      */
-    public function ajaxProcessLoadCustomer()
+    public function ajaxProcess()
     {
-        $response = array('status' => false);
-        if (Tools::getValue('id_customer')
-            && Validate::isLoadedObject($objCustomer = new Customer(Tools::getValue('id_customer')))
-        ) {
-            $response['status'] = true;
-            $response['firstname'] = $objCustomer->firstname;
-            $response['lastname'] = $objCustomer->lastname;
-            $response['company'] = $objCustomer->company;
+        if (Tools::isSubmit('email')) {
+            $email = pSQL(Tools::getValue('email'));
+            $customer = Customer::searchByName($email);
+            if (!empty($customer)) {
+                $customer = $customer['0'];
+                echo json_encode(array('infos' => pSQL($customer['firstname']).'_'.pSQL($customer['lastname']).'_'.pSQL($customer['company']).'_'.pSQL($customer['id_customer'])));
+            }
         }
-
-        $this->ajaxDie(json_encode($response));
+        die;
     }
 
     /**
