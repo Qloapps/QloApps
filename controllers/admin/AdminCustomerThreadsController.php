@@ -318,14 +318,20 @@ class AdminCustomerThreadsControllerCore extends AdminController
 
     public function postProcess()
     {
-        // using this to separate the saving process for the both option fields
-        $fields = $this->fields_options;
-        if (Tools::isSubmit('submitOptionsCustomerService')) {
-            unset($this->fields_options['general']);
-            $this->processUpdateOptions();
-        } else if (Tools::isSubmit('submitOptionsIMAPConfig')) {
-            unset($this->fields_options['contact']);
-            $this->processUpdateOptions();
+        if ($this->tabAccess['edit'] === '1') {
+            // using this to separate the saving process for the both option fields
+            $fields = $this->fields_options;
+            if (Tools::isSubmit('submitOptionsCustomerService')) {
+                unset($this->fields_options['general']);
+                $this->processUpdateOptions();
+            } else if (Tools::isSubmit('submitOptionsIMAPConfig')) {
+                unset($this->fields_options['contact']);
+                $this->processUpdateOptions();
+            }
+
+            $this->fields_options = $fields;
+        } else {
+            $this->errors[] = Tools::displayError('You do not have permission to edit this.');
         }
 
         $this->fields_options = $fields;
