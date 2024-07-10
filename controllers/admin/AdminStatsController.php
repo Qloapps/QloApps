@@ -965,7 +965,6 @@ class AdminStatsControllerCore extends AdminStatsTabController
             case 'average_lead_time':
                 $dateToday = date('Y-m-d');
                 $value = Tools::ps_round(AdminStatsController::getAverageLeadTime(), 2);
-
                 break;
             case 'average_guest_in_booking':
                 $dateToday = date('Y-m-d');

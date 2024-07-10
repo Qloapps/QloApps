@@ -223,6 +223,7 @@ class AdminCustomersControllerCore extends AdminController
         }
 
         parent::postProcess();
+        // Added this to check if the filter for the banned(deleted) is used, since $this->delete = true will not display the deleted customers.
         $prefix = $this->getCookieFilterPrefix();
         $filters = $this->context->cookie->getFamily($prefix.$this->table.'Filter_');
         if (isset($filters[$prefix.$this->table.'Filter_deleted']) && $filters[$prefix.$this->table.'Filter_deleted'] == 1) {
