@@ -26,6 +26,6 @@ class BoOrder extends PaymentModule
     public function __construct()
     {
         $this->displayName = $this->l('Back office order');
-        $this->ValidateOrderAmount = false;
+        $this->validateOrderAmount = false;
     }
 }

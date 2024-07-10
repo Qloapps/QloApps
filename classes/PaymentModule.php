@@ -33,6 +33,7 @@ abstract class PaymentModuleCore extends Module
     public $currencies = true;
     public $currencies_mode = 'checkbox';
     public $payment_type = OrderPayment::PAYMENT_TYPE_REMOTE_PAYMENT;
+    public $validateOrderAmount = true;
 
     public function install()
     {
@@ -418,7 +419,7 @@ abstract class PaymentModuleCore extends Module
                     // If webservice order request then no need to impose equal amounts(total cart and sent amount) condition
                     if ($order_status->logable
                         && number_format($cart_total_paid, _PS_PRICE_COMPUTE_PRECISION_) != number_format($amount_paid, _PS_PRICE_COMPUTE_PRECISION_)
-                        && (!isset($this->ValidateOrderAmount) || $this->validateOrderAmount)
+                        && ($this->validateOrderAmount)
                     ) {
                         // if customer is paying full payment amount
                         $id_order_state = Configuration::get('PS_OS_ERROR');
