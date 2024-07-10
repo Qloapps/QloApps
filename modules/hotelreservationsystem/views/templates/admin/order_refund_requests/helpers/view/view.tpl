@@ -378,9 +378,9 @@
 											</div>
 											<div class="col-sm-3">
 												<div class="input-group">
-													<input type="text" id="voucher_expiry">
+													<input type="text" id="voucher_expiry" value="{$expiry_date|date_format:"%d-%m-%Y"}">
 													<div class="input-group-addon"><i class="icon-calendar"></i></div>
-													<input type="hidden" name="voucher_expiry_date" id="voucher_expiry_date">
+													<input type="hidden" name="voucher_expiry_date" id="voucher_expiry_date" value="{$expiry_date|date_format:"%Y-%m-%d"}">
 												</div>
 											</div>
 										</div>
