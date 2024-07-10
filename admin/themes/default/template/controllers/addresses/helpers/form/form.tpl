@@ -29,22 +29,15 @@
 	{if $input.name == 'vat_number'}
 		<div id="vat_area" style="display: visible">
 	{/if}
-
-	{if $input.type == 'text_customer' && !isset($customer)}
-		<label class="control-label col-lg-3 required" for="email">{l s='Customer email'}</label>
-	{else}
-		{$smarty.block.parent}
-	{/if}
+	{$smarty.block.parent}
 {/block}
 
-{block name="field"}
+{block name="input"}
 	{if $input.type == 'text_customer'}
 		{if isset($customer)}
-			<div class="col-lg-9">
-				<a class="btn btn-default" href="?tab=AdminCustomers&amp;id_customer={$customer->id|intval}&amp;viewcustomer&amp;token={$tokenCustomer}">
-					<i class="icon-eye-open"></i> {$customer->lastname} {$customer->firstname} ({$customer->email})
-				</a>
-			</div>
+			<a class="btn btn-default" href="?tab=AdminCustomers&amp;id_customer={$customer->id|intval}&amp;viewcustomer&amp;token={$tokenCustomer}">
+				<i class="icon-eye-open"></i> {$customer->lastname} {$customer->firstname} ({$customer->email})
+			</a>
 			<input type="hidden" name="id_customer" value="{$customer->id}" />
 			<input type="hidden" name="email" value="{$customer->email}" />
 		{/if}

@@ -127,11 +127,12 @@ class AdminAddressesControllerCore extends AdminController
                 'id_customer' => 0,
                 'id_address'=> 0
             ));
-            $customerEmails = array_merge($customerEmails, Customer::getCustomers(null, false, 0));
+            $customerEmails = array_merge($customerEmails, Customer::getCustomers(null, 0, 0));
             $customerField = array(
                 'type' => 'select',
                 'label' => $this->l('Customer'),
                 'name' => 'id_customer',
+                'required' => true,
                 'class' => 'chosen',
                 'options' => array(
                     'query' => $customerEmails,
