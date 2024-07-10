@@ -486,7 +486,7 @@ class Blocknewsletter extends Module
             $sql = 'SELECT MD5(CONCAT( `email` , `newsletter_date_add`, \''.pSQL(Configuration::get('NW_SALT')).'\')) as token
 					FROM `'._DB_PREFIX_.'newsletter`
 					WHERE 1 AND `email` = \''.pSQL($email).'\'';
-        } elseif ($register_status == self::CUSTOMER_NOT_REGISTERED) {
+        } elseif (in_array($register_status, array(self::CUSTOMER_NOT_REGISTERED, self::CUSTOMER_REGISTERED))) {
             $sql = 'SELECT MD5(CONCAT( `email` , `date_add`, \''.pSQL(Configuration::get('NW_SALT')).'\' )) as token
 					FROM `'._DB_PREFIX_.'customer`
 					WHERE 1 AND `email` = \''.pSQL($email).'\'';
