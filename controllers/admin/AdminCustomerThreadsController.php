@@ -334,7 +334,6 @@ class AdminCustomerThreadsControllerCore extends AdminController
             $this->errors[] = Tools::displayError('You do not have permission to edit this.');
         }
 
-        $this->fields_options = $fields;
         if ($id_customer_thread = (int)Tools::getValue('id_customer_thread')) {
             if (($id_contact = (int)Tools::getValue('id_contact'))) {
                 Db::getInstance()->execute('
