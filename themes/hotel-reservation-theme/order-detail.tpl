@@ -59,7 +59,7 @@
 
     {$HOOK_ORDERDETAILDISPLAYED}
 
-    <div class="row">
+    <div class="row" id="order_detail_container">
         <div class="col-md-8">
             {hook h='displayOrderDetailTopLeft' id_order=$order->id}
 
