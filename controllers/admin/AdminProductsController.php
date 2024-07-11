@@ -2463,7 +2463,7 @@ class AdminProductsControllerCore extends AdminController
         $helper->title = $this->l('Occupied Rooms', null, null, false);
         $helper->subtitle = $this->l('Today', null, null, false);
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=occupied_rooms';
-        $helper->tooltip = $this->l('The current count of rooms that are currently occupied by guests.', null, null, false);
+        $helper->tooltip = $this->l('The count of rooms that are currently occupied by guests.', null, null, false);
         $kpis[] = $helper;
 
         $helper = new HelperKpi();
@@ -2473,7 +2473,7 @@ class AdminProductsControllerCore extends AdminController
         $helper->title = $this->l('Vacant Rooms', null, null, false);
         $helper->subtitle = $this->l('Today', null, null, false);
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=vacant_rooms';
-        $helper->tooltip = $this->l('The count of rooms that are currently unoccupied and available for booking.', null, null, false);
+        $helper->tooltip = $this->l('The count of rooms that are either booked but currently unoccupied or available for booking', null, null, false);
         $kpis[] = $helper;
 
         $helper = new HelperKpi();
@@ -2483,7 +2483,7 @@ class AdminProductsControllerCore extends AdminController
         $helper->title = $this->l('Booked Rooms', null, null, false);
         $helper->subtitle = $this->l('Today', null, null, false);
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=booked_rooms';
-        $helper->tooltip = $this->l('The number of rooms that are currently booked but not yet occupied.', null, null, false);
+        $helper->tooltip = $this->l('The total number of rooms that are currently booked and and awaiting guest check-in', null, null, false);
         $kpis[] = $helper;
 
         $helper = new HelperKpi();
@@ -2493,7 +2493,7 @@ class AdminProductsControllerCore extends AdminController
         $helper->title = $this->l('Disabled Rooms', null, null, false);
         $helper->subtitle = $this->l('Today', null, null, false);
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=disabled_rooms';
-        $helper->tooltip = $this->l('The number of rooms that are currently disabled.', null, null, false);
+        $helper->tooltip = $this->l('The total number of rooms that are currently disabled.', null, null, false);
         $kpis[] = $helper;
 
         $helper = new HelperKpi();
@@ -2503,7 +2503,7 @@ class AdminProductsControllerCore extends AdminController
         $helper->title = $this->l('Online Bookable Rooms', null, null, false);
         $helper->subtitle = $this->l('Today', null, null, false);
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=online_bookable_rooms';
-        $helper->tooltip = $this->l('The total number of rooms that can be booked only using website.', null, null, false);
+        $helper->tooltip = $this->l('The total number of rooms that can be booked directly from the front office.', null, null, false);
         $kpis[] = $helper;
 
         $helper = new HelperKpi();
@@ -2513,7 +2513,7 @@ class AdminProductsControllerCore extends AdminController
         $helper->title = $this->l('Offline Bookable Rooms', null, null, false);
         $helper->subtitle = $this->l('Today', null, null, false);
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=offline_bookable_rooms';
-        $helper->tooltip = $this->l('The number of rooms that can be booked either through website or offline channels (e.g., phone or in-person).', null, null, false);
+        $helper->tooltip = $this->l('The total number of rooms available for booking through the back office.', null, null, false);
         $kpis[] = $helper;
 
         $helper = new HelperKpi();
