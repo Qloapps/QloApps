@@ -1250,7 +1250,7 @@ class HotelHelper
         $obj_hotel_info->check_out = '11:00';
 
         // lang fields
-        $languages = Languaghtl_room_ftrse::getLanguages(false);
+        $languages = Language::getLanguages(false);
 
         $htlShortDescLang = array(
             'en' => 'The Hotel Prime is the perfect destination for both business and leisure travelers seeking a memorable stay.',
@@ -2334,7 +2334,7 @@ class HotelHelper
         }
 
         if (!is_array($name)) {
-            $name['en'] = $name;
+            $name = array('en' => $name);
         }
 
         $defaultCatName = $name['en'];
