@@ -6746,9 +6746,10 @@ table.table_block td {
   .page-heading.product-listing {
     border-bottom: none;
     margin-bottom: 0; }
-
-.page-subheading {
-  font-weight: 700;
+.rte .page-heading {
+  color: #000;}
+  .page-subheading {
+  font-weight: 600;
   color: #3C3C3C;
 
   font-family: 'Oxygen', sans-serif;
@@ -7529,7 +7530,9 @@ div.star a:hover {
 #tinymce ol,
 #tinymce dl {
   margin-left: 20px; }
-
+.rte {
+  color : #3C3C3C;
+}
 .rte ul {
   list-style-type: disc;
   padding-left: 15px; }

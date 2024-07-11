@@ -30,7 +30,7 @@
 <div class="margin-top-50 htl-contact-page">
 	<div class="row">
 		<p class="contact-header col-sm-offset-2 col-sm-8">{l s='Contact Us'}</p>
-		<p class="contact-desc col-sm-offset-2 col-sm-8">{l s='Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry`s standard dummy text.'}</p>
+		<p class="contact-desc col-sm-offset-2 col-sm-8">{l s='Reach out to us for any inquiries or assistance. We\'re here to help make your experience with us exceptional.'}</p>
 	</div>
 	<div class="row margin-top-50">
 		{if (isset($gblHtlAddress) && $gblHtlAddress) && (isset($gblHtlPhone) && $gblHtlPhone) && (isset($gblHtlEmail) && $gblHtlEmail)}
