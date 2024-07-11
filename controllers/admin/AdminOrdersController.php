@@ -5132,7 +5132,6 @@ class AdminOrdersControllerCore extends AdminController
 
         $bookingPriceTaxIncl = $objBookingDetail->total_price_tax_incl;
         $bookingPriceTaxExcl = $objBookingDetail->total_price_tax_excl;
-        ddd($objBookingDetail);
         $objBookingDemand = new HotelBookingDemands();
         $roomExtraDemandTI = $objBookingDemand->getRoomTypeBookingExtraDemands(
             $id_order,
