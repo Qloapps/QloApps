@@ -816,6 +816,13 @@ class AdminProductsControllerCore extends AdminController
                 if (!$id_hotel_new) {
                     $id_hotel_new = $room_type_info['id_hotel'];
                 }
+
+                if ($product->hasAttributes()) {
+                    Product::updateDefaultAttribute($product->id);
+                } else {
+                    Product::duplicateSpecificPrices($id_product_old, $product->id);
+                }
+
                 $id_room_type_new = HotelRoomType::duplicateRoomType(
                     $id_product_old,
                     $product->id,
@@ -838,11 +845,6 @@ class AdminProductsControllerCore extends AdminController
                     }
                 } else {
                     $this->errors[] = Tools::displayError('An error occurred while duplicating room type.');
-                }
-                if ($product->hasAttributes()) {
-                    Product::updateDefaultAttribute($product->id);
-                } else {
-                    Product::duplicateSpecificPrices($id_product_old, $product->id);
                 }
 
                 if (!Tools::getValue('noimage') && !Image::duplicateProductImages($id_product_old, $product->id, $combination_images)) {
