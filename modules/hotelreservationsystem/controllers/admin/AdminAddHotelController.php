@@ -345,9 +345,9 @@ class AdminAddHotelController extends ModuleAdminController
 
             if (!$enableUseGlobalPreparationTime) {
                 if ($preparationTime === '') {
-                    $this->errors[] = $this->l('Preparation time is a required field.');
+                    $this->errors[] = $this->l('Minimum booking offset is a required field.');
                 } elseif ($preparationTime !== '0' && !Validate::isUnsignedInt($preparationTime)) {
-                    $this->errors[] = $this->l('Preparation time is invalid.');
+                    $this->errors[] = $this->l('Minimum booking offset is invalid.');
                 }
             }
         }
