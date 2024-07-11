@@ -157,6 +157,16 @@ class CategoryControllerCore extends FrontController
         $currency = new Currency($this->context->currency->id);
 
         if ($id_hotel = HotelBranchInformation::getHotelIdByIdCategory($id_category)) {
+            $preparationTime = (int) HotelOrderRestrictDate::getPreparationTime($id_hotel);
+            if ($preparationTime
+                && strtotime('+ '.$preparationTime.' day') >= strtotime($date_from)
+            ) {
+                $date_from = date('Y-m-d', strtotime('+ '.$preparationTime.' day'));
+                if (strtotime($date_from) >= strtotime($date_to)) {
+                    $date_to = date('Y-m-d', strtotime($date_from) + 86400);
+                }
+            }
+
             $id_cart = $this->context->cart->id;
             $id_guest = $this->context->cookie->id_guest;
 
