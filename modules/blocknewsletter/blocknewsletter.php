@@ -85,8 +85,8 @@ class Blocknewsletter extends Module
                 'registerGDPRConsent',
                 'actionExportGDPRData',
                 'actionDeleteGDPRCustomer',
-                'actionCartRulesAvailable',
-                'actionCheckCartRuleValid',
+                'actionCustomerCartRulesModifier',
+                'actionValidateCartRule',
                 'actionObjectCustomerDeleteAfter',
             )
         );
@@ -124,32 +124,36 @@ class Blocknewsletter extends Module
         }
     }
 
-    public function hookActionCartRulesAvailable($params)
+    public function hookActionCustomerCartRulesModifier($params)
     {
-        foreach($params['result'] as $key => $cartRule) {
+        $customer = new Customer($params['id_customer']);
+        foreach($params['cart_rules'] as $key => $cartRule) {
             if ($cartRule['code'] == Configuration::get('NW_VOUCHER_CODE')) {
-                if ($params['id_customer']) {
-                    if (count(OrderCore::getCustomerOrders($params['id_customer']))) {
+                if ($customer->id && !$customer->is_guest) {
+                    if (count(Order::getCustomerOrders($customer->id))) {
                         // remove welcome voucher
-                        unset($params['result'][$key]);
+                        unset($params['cart_rules'][$key]);
                     }
                 } else {
                     // remove welcome voucher
-                    unset($params['result'][$key]);
+                    unset($params['cart_rules'][$key]);
                 }
             }
         }
     }
 
-    public function hookActionCheckCartRuleValid($params)
+    public function hookActionValidateCartRule($params)
     {
-        if ($params['cartRule']->code == Configuration::get('NW_VOUCHER_CODE')) {
-            if ($params['id_customer']) {
-                if (count(OrderCore::getCustomerOrders($params['id_customer']))) {
-                    return $this->l('This voucher is not available for this booking.');
+        $customer = new Customer($params['context']->cart->id_customer);
+        if ($params['cart_rule']->code == Configuration::get('NW_VOUCHER_CODE')) {
+            if ($customer->id && !$customer->is_guest) {
+                if (count(Order::getCustomerOrders($customer->id))) {
+                    $params['isValidatedByModules'] = false;
+                    $params['isValidatedByModulesError'] = $this->l('This voucher is not available for this booking.');
                 }
             } else {
-                return $this->l('This voucher is not available for this booking.');
+                $params['isValidatedByModules'] = false;
+                $params['isValidatedByModulesError'] = $this->l('This voucher is not available for this booking.');
             }
         }
     }
