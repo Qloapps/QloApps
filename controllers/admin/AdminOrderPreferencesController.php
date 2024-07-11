@@ -82,6 +82,7 @@ class AdminOrderPreferencesControllerCore extends AdminController
             )
         );
 
+        $maxOrderDate = Tools::getValue('MAX_GLOBAL_BOOKING_DATE', Configuration::get('MAX_GLOBAL_BOOKING_DATE'));
         $this->fields_options = array(
             'order_restrict' => array(
                 'title' => $this->l('Order Restrict'),
@@ -92,6 +93,8 @@ class AdminOrderPreferencesControllerCore extends AdminController
                         'hint' => $this->l('Maximum date of check-out for which rooms of your hotels can be booked.'),
                         'type' => 'text',
                         'id' => 'max_global_book_date',
+                        'auto_value' => false,
+                        'value' => date('d-m-Y', strtotime($maxOrderDate)),
                         'class' => 'fixed-width-xxl readonly',
                     ),
                     'GLOBAL_PREPARATION_TIME' => array(
@@ -329,6 +332,7 @@ class AdminOrderPreferencesControllerCore extends AdminController
             $this->errors[] = Tools::displayError('Please assign a valid CMS page for Terms and Conditions.');
         }
 
+        $_POST['MAX_GLOBAL_BOOKING_DATE'] = date('Y-m-d', strtotime(Tools::getValue('MAX_GLOBAL_BOOKING_DATE')));
         $maxGlobalBookingDate = Tools::getValue('MAX_GLOBAL_BOOKING_DATE');
         $globalPreparationTime = Tools::getValue('GLOBAL_PREPARATION_TIME');
         $maxGlobalBookingDateFormatted = date('Y-m-d', strtotime($maxGlobalBookingDate));
