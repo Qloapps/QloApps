@@ -159,7 +159,7 @@ class AdminHotelGeneralSettingsController extends ModuleAdminController
                         'type' => 'file',
                         'image' => $imgExist ? $image : false,
                         'hint' => $this->l('This image appears as header background image on home page.'),
-                        'name' => 'htl_header_image',
+                        'name' => 'WK_HOTEL_HEADER_IMAGE',
                         'url' => _PS_IMG_,
                     ),
                 ),
@@ -392,8 +392,8 @@ class AdminHotelGeneralSettingsController extends ModuleAdminController
                     }
                 }
             }
-            if ($_FILES['htl_header_image']['name']) {
-                if ($error = ImageManager::validateUpload($_FILES['htl_header_image'], Tools::getMaxUploadSize())) {
+            if ($_FILES['WK_HOTEL_HEADER_IMAGE']['name']) {
+                if ($error = ImageManager::validateUpload($_FILES['WK_HOTEL_HEADER_IMAGE'], Tools::getMaxUploadSize())) {
                     $this->errors[] = $error;
                 }
 
@@ -401,8 +401,10 @@ class AdminHotelGeneralSettingsController extends ModuleAdminController
                     $file_name = 'hotel_header_image_'.time().'.jpg';
                     $img_path = _PS_IMG_DIR_.$file_name;
 
-                    if (ImageManager::resize($_FILES['htl_header_image']['tmp_name'], $img_path)) {
+                    if (ImageManager::resize($_FILES['WK_HOTEL_HEADER_IMAGE']['tmp_name'], $img_path)) {
+                        $olderHeaderImg = _PS_IMG_DIR_.Configuration::get('WK_HOTEL_HEADER_IMAGE');
                         Configuration::updateValue('WK_HOTEL_HEADER_IMAGE', $file_name);
+                        Tools::deleteFile($olderHeaderImg);
                     } else {
                         $this->errors[] = $this->l('Some error occured while uoploading image.Please try again.');
                     }
