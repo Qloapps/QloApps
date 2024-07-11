@@ -155,7 +155,7 @@
                         <div class="card-text">{l s='Hotel location not available.'}</div>
                     {/if}
 
-                    {if ($obj_hotel_branch_information->latitude|floatval != 0 && $obj_hotel_branch_information->longitude|floatval != 0)}
+                    {if ($obj_hotel_branch_information->latitude|floatval != 0 && $obj_hotel_branch_information->longitude|floatval != 0) && $view_on_map}
                         <div class="hotel-location-map">
                             <div class="booking-hotel-map-container"></div>
                         </div>
@@ -542,7 +542,7 @@
                         <div class="card-text">{l s='Hotel location not available.'}</div>
                     {/if}
 
-                    {if ($obj_hotel_branch_information->latitude|floatval != 0 && $obj_hotel_branch_information->longitude|floatval != 0)}
+                    {if ($obj_hotel_branch_information->latitude|floatval != 0 && $obj_hotel_branch_information->longitude|floatval != 0) && $view_on_map}
                         <div class="hotel-location-map">
                             <div class="booking-hotel-map-container"></div>
                         </div>
