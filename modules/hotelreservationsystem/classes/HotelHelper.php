@@ -931,4 +931,25 @@ class HotelHelper
 
         return $daysDifference;
     }
+
+    public static function validateDateRangeForHotel($dateFrom, $dateTo, $idHotel)
+    {
+        $validStartDateTimeStamp = strtotime(date('Y-m-d'));
+        if ($preparationTime = (int) HotelOrderRestrictDate::getPreparationTime($idHotel)) {
+            $validStartDateTimeStamp = strtotime(date('Y-m-d', strtotime('+ '.$preparationTime.' day')));
+        }
+
+        $dateFromTimestamp = strtotime($dateFrom);
+        $dateToTimestamp = strtotime($dateTo);
+        $isValid = true;
+        if ($dateFrom != '' && ($dateFromTimestamp === false || ($dateFromTimestamp < $validStartDateTimeStamp))) {
+            $isValid = false;
+        } else if ($dateTo != '' && ($dateToTimestamp === false || ($dateToTimestamp < $validStartDateTimeStamp))) {
+            $isValid = false;
+        } else if ($dateTo != '' && $dateFrom != '' && $dateFromTimestamp >= $dateToTimestamp) {
+            $isValid = false;
+        }
+
+        return $isValid;
+    }
 }

@@ -109,26 +109,18 @@ class ProductControllerCore extends FrontController
         // validate dates if available
         $dateFrom = Tools::getValue('date_from');
         $dateTo = Tools::getValue('date_to');
-
-        $currentTimestamp = strtotime(date('Y-m-d'));
-        $dateFromTimestamp = strtotime($dateFrom);
-        $dateToTimestamp = strtotime($dateTo);
-
-        if ($dateFrom != '' && ($dateFromTimestamp === false || ($dateFromTimestamp < $currentTimestamp))) {
-            Tools::redirect($this->context->link->getPageLink('pagenotfound'));
-        }
-
-        if ($dateTo != '' && ($dateToTimestamp === false || ($dateToTimestamp < $currentTimestamp))) {
-            Tools::redirect($this->context->link->getPageLink('pagenotfound'));
-        }
-
         parent::init();
 
         if ($id_product = (int) Tools::getValue('id_product')) {
             $this->product = new Product($id_product, true, $this->context->language->id, $this->context->shop->id);
         }
 
-        if (!$this->product->booking_product || ($this->product->booking_product && !$this->product->show_at_front)) {
+        $objHotelRoomType = new HotelRoomType();
+        $hotelRoomInfo = $objHotelRoomType->getRoomTypeInfoByIdProduct($this->product->id);
+        $idHotel = (int) $hotelRoomInfo['id_hotel'];
+        if (!HotelHelper::validateDateRangeForHotel($dateFrom, $dateTo, $idHotel)) {
+            Tools::redirect($this->context->link->getPageLink('pagenotfound'));
+        } else if (!$this->product->booking_product || ($this->product->booking_product && !$this->product->show_at_front)) {
             Tools::redirect($this->context->link->getPageLink('pagenotfound'));
         }
 
