@@ -372,7 +372,7 @@
 									<div class="generate_discount_fields" style="display:none;">
 										<div class="form-group">
 											<div class="col-sm-3">
-												<label for="voucher_expiry" class="control-label">
+												<label for="voucher_expiry" class="control-label required">
 													<span title="" data-toggle="tooltip" class="label-tooltip" data-original-title="{l s='Please select the date until which the voucher can be used.' mod='hotelreservationsystem'}">{l s='Voucher expiry date' mod='hotelreservationsystem'}</span> :
 												</label>
 											</div>
