@@ -101,16 +101,8 @@ class CategoryControllerCore extends FrontController
         // validate dates if available
         $dateFrom = Tools::getValue('date_from');
         $dateTo = Tools::getValue('date_to');
-
-        $currentTimestamp = strtotime(date('Y-m-d'));
-        $dateFromTimestamp = strtotime($dateFrom);
-        $dateToTimestamp = strtotime($dateTo);
-
-        if ($dateFrom != '' && ($dateFromTimestamp === false || ($dateFromTimestamp < $currentTimestamp))) {
-            Tools::redirect($this->context->link->getPageLink('pagenotfound'));
-        }
-
-        if ($dateTo != '' && ($dateToTimestamp === false || ($dateToTimestamp < $currentTimestamp))) {
+        $idHotel = HotelBranchInformation::getHotelIdByIdCategory($id_category);
+        if (!HotelHelper::validateDateRangeForHotel($dateFrom, $dateTo, $idHotel)) {
             Tools::redirect($this->context->link->getPageLink('pagenotfound'));
         }
 
@@ -165,6 +157,16 @@ class CategoryControllerCore extends FrontController
         $currency = new Currency($this->context->currency->id);
 
         if ($id_hotel = HotelBranchInformation::getHotelIdByIdCategory($id_category)) {
+            $preparationTime = (int) HotelOrderRestrictDate::getPreparationTime($id_hotel);
+            if ($preparationTime
+                && strtotime('+ '.$preparationTime.' day') >= strtotime($date_from)
+            ) {
+                $date_from = date('Y-m-d', strtotime('+ '.$preparationTime.' day'));
+                if (strtotime($date_from) >= strtotime($date_to)) {
+                    $date_to = date('Y-m-d', strtotime($date_from) + 86400);
+                }
+            }
+
             $id_cart = $this->context->cart->id;
             $id_guest = $this->context->cookie->id_guest;
 
