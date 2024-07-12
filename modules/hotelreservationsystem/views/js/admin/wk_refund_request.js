@@ -23,6 +23,21 @@ $(document).ready(function() {
         manageRefundOptions();
     }
 
+    $('#order_return_form').on('submit', function() {
+        if ($("#id_refund_state option:selected").attr('refunded') == 1) {
+            if ($('#generateDiscount:checked').length) {
+                if ($('#voucher_expiry').val() == '') {
+                    $('#voucher_expiry').parent().addClass('has-error');
+                    return false;
+                }
+            }
+        }
+    });
+
+    $('#voucher_expiry').on('focus', function() {
+        $('#voucher_expiry').parent().removeClass('has-error');
+    });
+
     // initialize tootip for room price
     if ($('#rooms_refund_info .price_info').length) {
         $('#rooms_refund_info .price_info').each(function (i, element) {
@@ -67,6 +82,21 @@ $(document).ready(function() {
 			$(".refund_transaction_fields").show(200);
 		} else {
             $(".refund_transaction_fields").hide(200);
+        }
+    });
+
+    $('#voucher_expiry').datepicker({
+        dateFormat: 'dd-mm-yy',
+        altFormat: 'yy-mm-dd',
+        altField: '#voucher_expiry_date',
+        minDate: 0,
+    });
+
+    $(document).on('change', '#generateDiscount', function() {
+		if ($(this).is(':checked')) {
+			$(".generate_discount_fields").show(200);
+		} else {
+            $(".generate_discount_fields").hide(200);
         }
     });
 
