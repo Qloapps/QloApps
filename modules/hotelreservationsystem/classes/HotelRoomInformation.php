@@ -34,6 +34,9 @@ class HotelRoomInformation extends ObjectModel
     const STATUS_INACTIVE = 2;
     const STATUS_TEMPORARY_INACTIVE = 3;
 
+    const STATUS_SEARCH_LOS_UNSATISFIED = 4;
+    const STATUS_SEARCH_OCCUPANCY_UNSATISFIED = 5;
+
     public static $definition = array(
         'table' => 'htl_room_information',
         'primary' => 'id',
@@ -138,22 +141,37 @@ class HotelRoomInformation extends ObjectModel
 
     public function getAllRoomStatus()
     {
-        $moduleInstance = Module::getInstanceByName('hotelreservationsystem');
-
         $status = array(
             'STATUS_ACTIVE' => array(
                 'id' => self::STATUS_ACTIVE,
-                'status' => $moduleInstance->l('Active', 'hotelreservationsystem')
+                'status' => self::getRoomStatusTitle(self::STATUS_ACTIVE)
             ),
             'STATUS_INACTIVE' => array(
                 'id' => self::STATUS_INACTIVE,
-                'status' => $moduleInstance->l('Inactive', 'hotelreservationsystem')
+                'status' => self::getRoomStatusTitle(self::STATUS_INACTIVE)
             ),
             'STATUS_TEMPORARY_INACTIVE' => array(
                 'id' => self::STATUS_TEMPORARY_INACTIVE,
-                'status' => $moduleInstance->l('Temporarily Inactive', 'hotelreservationsystem')
+                'status' => self::getRoomStatusTitle(self::STATUS_TEMPORARY_INACTIVE)
             ),
         );
+        return $status;
+    }
+
+    public static function getRoomStatusTitle($idStatus = false)
+    {
+        $moduleInstance = Module::getInstanceByName('hotelreservationsystem');
+        $status = array(
+            self::STATUS_ACTIVE => $moduleInstance->l('Active', 'hotelreservationsystem'),
+            self::STATUS_INACTIVE => $moduleInstance->l('Inactive', 'hotelreservationsystem'),
+            self::STATUS_TEMPORARY_INACTIVE => $moduleInstance->l('Temporarily Inactive', 'hotelreservationsystem'),
+            self::STATUS_SEARCH_LOS_UNSATISFIED => $moduleInstance->l('Lenght of stay', 'hotelreservationsystem'),
+            self::STATUS_SEARCH_OCCUPANCY_UNSATISFIED => $moduleInstance->l('Occupancy', 'hotelreservationsystem'),
+        );
+
+        if ($idStatus) {
+            return isset($status[$idStatus]) ? $status[$idStatus] : false;
+        }
         return $status;
     }
 
