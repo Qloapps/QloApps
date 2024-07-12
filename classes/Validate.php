@@ -364,7 +364,7 @@ class ValidateCore
      */
     public static function isCityName($city)
     {
-        return preg_match(Tools::cleanNonUnicodeSupport('/^[^!<>;?=+@#"°{}_$%]*$/u'), $city);
+        return preg_match(Tools::cleanNonUnicodeSupport('/^\p{L}+[^!<>;?=+@#"°{}_$%]*$/u'), $city);
     }
 
     /**
