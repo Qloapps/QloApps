@@ -748,6 +748,9 @@ class AdminCustomersControllerCore extends AdminController
         $helper->color = 'color4';
         $helper->title = $this->l('New Customers', null, null, false);
         $nbDaysNewCustomers = Validate::isUnsignedInt(Configuration::get('PS_KPI_NEW_CUSTOMERS_NB_DAYS')) ? Configuration::get('PS_KPI_NEW_CUSTOMERS_NB_DAYS') : 30;
+        $date_from = date('Y-m-d', strtotime('-'.$nbDaysNewCustomers.' day'));
+        $date_to = date('Y-m-d');
+        $helper->href = $this->context->link->getAdminLink('AdminCustomers').'&customerFilter_date_add[]='.$date_from.'&customerFilter_date_add[]='.$date_to;
         $helper->subtitle = sprintf($this->l('%d Days', null, null, false), (int) $nbDaysNewCustomers);
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=total_new_customers';
         $helper->tooltip = $this->l('The total number of new customers who registered in given period of time.', null, null, false);
@@ -968,7 +971,7 @@ class AdminCustomersControllerCore extends AdminController
         if (Validate::isLoadedObject($objCustomer = $this->loadObject())) {
             if ($this->delete_mode == 'real' && Order::getCustomerOrders($objCustomer->id, true)) {
                 $customerEmail = $objCustomer->email;
-                $objCustomer->email = 'anonymous'.'-'.$objCustomer->id.'@'.Tools::getShopDomain();
+                $objCustomer->email = 'anonymous'.'-'.$objCustomer->id.'@'.Tools::link_rewrite(Configuration::get('PS_SHOP_NAME')).'_anonymous.com';
                 $objCustomer->deleted = 1;
                 if (!$objCustomer->update()) {
                     $this->errors[] = Tools::displayError('Some error ocurred while deleting the Customer');
@@ -1057,7 +1060,7 @@ class AdminCustomersControllerCore extends AdminController
             $this->redirect_after = false;
         }
         // Check that the new email is not already in use
-        $customer_email = strval(Tools::getValue('email'));
+        $customer_email = trim(strval(Tools::getValue('email')));
         $customer = new Customer();
         if (Validate::isEmail($customer_email)) {
             $customer->getByEmail($customer_email);
@@ -1065,6 +1068,9 @@ class AdminCustomersControllerCore extends AdminController
                 $this->errors[] = Tools::displayError('An account already exists for this email address:').' '.$customer_email;
                 $this->display = 'edit';
                 return $customer;
+            } elseif (Customer::customerExists($customer_email, false, true)) {
+                $this->errors[] = Tools::displayError('The email is already associated with a banned account. Please use a different one.');
+                $this->display = 'edit';
             } elseif (trim(Tools::getValue('passwd')) == '') {
                 $this->validateRules();
                 $this->errors[] = Tools::displayError('Password can not be empty.');
@@ -1086,7 +1092,7 @@ class AdminCustomersControllerCore extends AdminController
     public function processUpdate()
     {
         if (Validate::isLoadedObject($this->object)) {
-            $customer_email = strval(Tools::getValue('email'));
+            $customer_email = trim(strval(Tools::getValue('email')));
 
             // check if e-mail already used
             if ($customer_email != $this->object->email) {
@@ -1327,6 +1333,43 @@ class AdminCustomersControllerCore extends AdminController
                 die('error:update');
             }
             die('ok');
+        }
+    }
+
+    public function ajaxProcessVerifyCustomerEmail()
+    {
+        $response = array('status' => true);
+        $idCustomer = Tools::getValue('id_customer', 0);
+        if (($email = trim(strval(Tools::getValue('email'))))
+            && ($idCustomerByEmail = Customer::customerExists($email, true, false))
+            && (Validate::isLoadedObject($objCustomer = new Customer($idCustomerByEmail)))
+            && $idCustomerByEmail != $idCustomer // the admin is trying to add/update the account
+        ) {
+            $response['status'] = false;
+            if ($objCustomer->deleted) {
+                $response['msg'] = Tools::displayError('This email is already associated with a banned account. Please use a different one.');
+            } else {
+                $response['msg'] = Tools::displayError('An account already exists for this email address.');
+            }
+        }
+
+        $this->ajaxDie(json_encode($response));
+    }
+
+    public function setMedia()
+    {
+        parent::setMedia();
+        if ($this->loadObject(true)
+            && ($this->display == 'edit' || $this->display == 'add')
+        ) {
+            $idCustomer = $this->object->id ? $this->object->id : 0;
+            Media::addJSDef(
+                array(
+                    'customer_controller_url' => self::$currentIndex.'&token='.$this->token,
+                    'id_customer' => $idCustomer
+                )
+            );
+            $this->addJS(_PS_JS_DIR_.'admin/customers.js');
         }
     }
 }
