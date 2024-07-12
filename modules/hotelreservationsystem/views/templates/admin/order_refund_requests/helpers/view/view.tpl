@@ -5,7 +5,7 @@
 				<i class="icon-info-circle"></i> &nbsp;{l s='Order Cancellation Request Information' mod='hotelreservationsystem'}
 			</div>
 			<br>
-			<form id="{$table|escape:'htmlall':'UTF-8'}_form" class="defaultForm {$name_controller|escape:'htmlall':'UTF-8'} form-horizontal" action="{$current|escape:'htmlall':'UTF-8'}&{if !empty($submit_action)}{$submit_action|escape:'htmlall':'UTF-8'}{/if}&token={$token|escape:'htmlall':'UTF-8'}" method="post" enctype="multipart/form-data" {if isset($style)}style="{$style|escape:'htmlall':'UTF-8'}"{/if}>
+			<form id="{$table|escape:'htmlall':'UTF-8'}_form" class="defaultForm {$name_controller|escape:'htmlall':'UTF-8'} form-horizontal" action="{$current|escape:'htmlall':'UTF-8'}{if !empty($submit_action)}&{$submit_action|escape:'htmlall':'UTF-8'}{/if}&id_order_return{$orderReturnInfo['id']|escape:'html':'UTF-8'}&vieworder_return&token={$token|escape:'htmlall':'UTF-8'}" method="post" enctype="multipart/form-data" {if isset($style)}style="{$style|escape:'htmlall':'UTF-8'}"{/if}>
 				<div class="panel">
 					{if isset($customer_name)}
 						<div class="row">
