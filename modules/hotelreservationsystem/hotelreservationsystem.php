@@ -70,7 +70,7 @@ class HotelReservationSystem extends Module
         ) {
             Configuration::updateValue(
                 'MAX_GLOBAL_BOOKING_DATE',
-                date('d-m-Y', strtotime(date('Y-m-d', time()).' + 1 year'))
+                date('Y-m-d', strtotime(date('Y-m-d', time()).' + 1 year'))
             );
         }
         if (!Configuration::get('PS_CATALOG_MODE')) {
@@ -293,7 +293,9 @@ class HotelReservationSystem extends Module
     public function hookDisplayLeftColumn()
     {
         if (Tools::getValue('controller') == 'category') {
-            if ($apiKey = Configuration::get('PS_API_KEY')) {
+            if (($apiKey = Configuration::get('PS_API_KEY'))
+                && Configuration::get('WK_GOOGLE_ACTIVE_MAP')
+            ) {
                 $idCategory = Tools::getValue('id_category');
                 $idHotel = HotelBranchInformation::getHotelIdByIdCategory($idCategory);
                 $objHotel = new HotelBranchInformation($idHotel, $this->context->language->id);
