@@ -4860,6 +4860,7 @@ class AdminOrdersControllerCore extends AdminController
             'tax_excl' => $totalRoomPriceAfterTE,
             'tax_incl' => $totalRoomPriceAfterTI,
         );
+
         if ($update_htl_tables = $obj_booking_detail->UpdateHotelCartHotelOrderOnOrderEdit(
             $id_order,
             $id_room,
