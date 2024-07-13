@@ -201,13 +201,15 @@ class AdminProductsControllerCore extends AdminController
 				LEFT JOIN `'._DB_PREFIX_.'address` aa ON (aa.`id_hotel` = hb.`id`)
 				LEFT JOIN `'._DB_PREFIX_.'feature_product` fp ON (fp.`id_product` = a.`id_product`)
 				LEFT JOIN `'._DB_PREFIX_.'htl_room_type_demand` hrtd ON (hrtd.`id_product` = a.`id_product`)
-				LEFT JOIN `'._DB_PREFIX_.'htl_room_type_service_product` hrtsp ON ((hrtsp.`element_type` = '.(int) RoomTypeServiceProduct::WK_ELEMENT_TYPE_HOTEL.' AND hrtsp.`id_element` = hrt.`id_hotel`) OR (hrtsp.`element_type` = '.(int) RoomTypeServiceProduct::WK_ELEMENT_TYPE_ROOM_TYPE.' AND hrtsp.`id_element` = a.`id_product`))';
+				LEFT JOIN `'._DB_PREFIX_.'htl_room_type_service_product` hrtsp ON ((hrtsp.`element_type` = '.(int) RoomTypeServiceProduct::WK_ELEMENT_TYPE_HOTEL.' AND hrtsp.`id_element` = hrt.`id_hotel`) OR (hrtsp.`element_type` = '.(int) RoomTypeServiceProduct::WK_ELEMENT_TYPE_ROOM_TYPE.' AND hrtsp.`id_element` = a.`id_product`))
+				LEFT JOIN `'._DB_PREFIX_.'htl_advance_payment` hap ON (hap.`id_product` = a.`id_product`)';
 
-        $this->_select .= ' (SELECT COUNT(hri.`id`) FROM `'._DB_PREFIX_.'htl_room_information` hri WHERE hri.`id_product` = a.`id_product`) as num_rooms, ';
+        $this->_select .= ' a.`show_at_front`, (SELECT COUNT(hri.`id`) FROM `'._DB_PREFIX_.'htl_room_information` hri WHERE hri.`id_product` = a.`id_product`) as num_rooms, ';
         $this->_select .= 'hrt.`adults`, hrt.`children`, hrt.`max_guests`, hb.`id` as id_hotel, aa.`city`, hbl.`hotel_name`, ';
         $this->_select .= 'shop.`name` AS `shopname`, a.`id_shop_default`, ';
         $this->_select .= $alias_image.'.`id_image` AS `id_image`, cl.`name` AS `name_category`, '.$alias.'.`price`, 0 AS `price_final`, a.`is_virtual`, pd.`nb_downloadable`, sav.`quantity` AS `sav_quantity`, '.$alias.'.`active`, IF(sav.`quantity`<=0, 1, 0) AS `badge_danger`';
-        $this->_select .= ', IFNULL((SELECT hap.`active` FROM `'._DB_PREFIX_.'htl_advance_payment` hap WHERE hap.`id_product` = a.`id_product`), 0) AS advance_payment';
+        $this->_select .= ', IFNULL(hap.`active`, 0) AS advance_payment';
+        $this->_select .= ', IF(IFNULL(hap.`active`, 0), 1, 0) badge_success, IF(IFNULL(hap.`active`, 0), 0, 1) badge_danger ';
 
         if ($join_category) {
             $this->_join .= ' INNER JOIN `'._DB_PREFIX_.'category_product` cp ON (cp.`id_product` = a.`id_product` AND cp.`id_category` = '.(int)$this->_category->id.') ';
@@ -319,10 +321,23 @@ class AdminProductsControllerCore extends AdminController
             'optional' => true,
         );
 
+        $this->fields_list['show_at_front'] = array(
+            'title' => $this->l('Show at front'),
+            'align' => 'text-center',
+            'type' => 'bool',
+            'active' => 'show_at_front',
+            'optional' => true,
+            'havingFilter' => true,
+            'visible_default' => true,
+            'orderby' => false,
+        );
+
         if (Configuration::get('WK_ALLOW_ADVANCED_PAYMENT')) {
             $this->fields_list['advance_payment'] = array(
                 'title' => $this->l('Advance Payment'),
-                'active' => 'advance_payment',
+                'callback' => 'getAdvancePaymentStatus',
+                'badge_success' => true,
+                'badge_danger' => true,
                 'align' => 'text-center',
                 'type' => 'bool',
                 'optional' => true,
@@ -430,6 +445,18 @@ class AdminProductsControllerCore extends AdminController
             );
         }
     }
+
+    public function getAdvancePaymentStatus($val, $row)
+    {
+        if ($val) {
+            $str_return = $this->l('Yes');
+        } else {
+            $str_return = $this->l('No');
+        }
+
+        return $str_return;
+    }
+
 
     private function buildCategoryOptions($category)
     {
@@ -816,6 +843,13 @@ class AdminProductsControllerCore extends AdminController
                 if (!$id_hotel_new) {
                     $id_hotel_new = $room_type_info['id_hotel'];
                 }
+
+                if ($product->hasAttributes()) {
+                    Product::updateDefaultAttribute($product->id);
+                } else {
+                    Product::duplicateSpecificPrices($id_product_old, $product->id);
+                }
+
                 $id_room_type_new = HotelRoomType::duplicateRoomType(
                     $id_product_old,
                     $product->id,
@@ -838,11 +872,6 @@ class AdminProductsControllerCore extends AdminController
                     }
                 } else {
                     $this->errors[] = Tools::displayError('An error occurred while duplicating room type.');
-                }
-                if ($product->hasAttributes()) {
-                    Product::updateDefaultAttribute($product->id);
-                } else {
-                    Product::duplicateSpecificPrices($id_product_old, $product->id);
                 }
 
                 if (!Tools::getValue('noimage') && !Image::duplicateProductImages($id_product_old, $product->id, $combination_images)) {
@@ -1336,10 +1365,10 @@ class AdminProductsControllerCore extends AdminController
                 $this->errors[] = Tools::displayError('You do not have permission to add this.');
             }
         }
-        // Toggle Advance Payment
-        elseif (Tools::getIsset('advance_payment'.$this->table)) {
+        // Toggle Show at front
+        elseif (Tools::getIsset('show_at_front'.$this->table)) {
             if ($this->tabAccess['edit'] === '1') {
-                $this->action = 'toggleAdvancePayment';
+                $this->action = 'toggleShowAtFront';
             } else {
                 $this->errors[] = Tools::displayError('You do not have permission to edit this.');
             }
@@ -1896,38 +1925,21 @@ class AdminProductsControllerCore extends AdminController
         return $res;
     }
 
-    public function processToggleAdvancePayment()
+    public function processToggleShowAtFront()
     {
-        if (Configuration::get('WK_ALLOW_ADVANCED_PAYMENT')) {
-            $this->loadObject(true);
-            if (!Validate::isLoadedObject($this->object)) {
-                return false;
-            }
+        if (!$this->loadObject()) {
+            return false;
+        }
 
-            if (!Product::isBookingProduct($this->object->id)) {
-                return false;
-            }
+        if (!Product::isBookingProduct($this->object->id)) {
+            return false;
+        }
 
-            $objHotelAdvancedPayment = new HotelAdvancedPayment();
-            $roomTypeAdvancePaymentInfo = $objHotelAdvancedPayment->getIdAdvPaymentByIdProduct($this->object->id);
-            if ($roomTypeAdvancePaymentInfo) {
-                $objHotelAdvancedPayment = new HotelAdvancedPayment($roomTypeAdvancePaymentInfo['id']);
-                $objHotelAdvancedPayment->active = !$objHotelAdvancedPayment->active;
-            } else {
-                $objHotelAdvancedPayment->id_product = $this->object->id;
-                $objHotelAdvancedPayment->payment_type = '';
-                $objHotelAdvancedPayment->value = '';
-                $objHotelAdvancedPayment->id_currency = '';
-                $objHotelAdvancedPayment->tax_include = '';
-                $objHotelAdvancedPayment->calculate_from = 0;
-                $objHotelAdvancedPayment->active = 1;
-            }
-
-            if ($objHotelAdvancedPayment->save()) {
-                Tools::redirectAdmin(self::$currentIndex.'&token='.$this->token.'&conf=4');
-            } else {
-                $this->errors[] = $this->l('Something went wrong while updating Advance payment status.');
-            }
+        $this->object->show_at_front = !$this->object->show_at_front;
+        if ($this->object->save()) {
+            Tools::redirectAdmin(self::$currentIndex.'&token='.$this->token.'&conf=4');
+        } else {
+            $this->errors[] = $this->l('An error occurred while updating "show at front".');
         }
     }
 
@@ -2202,10 +2214,14 @@ class AdminProductsControllerCore extends AdminController
                 }
 
                 if (!$res) {
-                    $this->errors[] = sprintf(
-                        Tools::displayError('The %s field is invalid.'),
-                        call_user_func(array($className, 'displayFieldName'), $field, $className)
-                    );
+                    if (Tools::strtolower($field) == 'wholesale_price') {
+                        $this->errors[] = Tools::displayError('The Pre-tax operating cost field is invalid.');
+                    } else {
+                        $this->errors[] = sprintf(
+                            Tools::displayError('The %s field is invalid.'),
+                            call_user_func(array($className, 'displayFieldName'), $field, $className)
+                        );
+                    }
                 }
             }
         }
@@ -2459,7 +2475,7 @@ class AdminProductsControllerCore extends AdminController
         $helper->title = $this->l('Occupied Rooms', null, null, false);
         $helper->subtitle = $this->l('Today', null, null, false);
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=occupied_rooms';
-        $helper->tooltip = $this->l('The current count of rooms that are currently occupied by guests.', null, null, false);
+        $helper->tooltip = $this->l('The count of rooms that are currently occupied by guests.', null, null, false);
         $kpis[] = $helper;
 
         $helper = new HelperKpi();
@@ -2469,7 +2485,7 @@ class AdminProductsControllerCore extends AdminController
         $helper->title = $this->l('Vacant Rooms', null, null, false);
         $helper->subtitle = $this->l('Today', null, null, false);
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=vacant_rooms';
-        $helper->tooltip = $this->l('The count of rooms that are currently unoccupied and available for booking.', null, null, false);
+        $helper->tooltip = $this->l('The count of rooms that are either booked but currently unoccupied or available for booking', null, null, false);
         $kpis[] = $helper;
 
         $helper = new HelperKpi();
@@ -2479,7 +2495,7 @@ class AdminProductsControllerCore extends AdminController
         $helper->title = $this->l('Booked Rooms', null, null, false);
         $helper->subtitle = $this->l('Today', null, null, false);
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=booked_rooms';
-        $helper->tooltip = $this->l('The number of rooms that are currently booked but not yet occupied.', null, null, false);
+        $helper->tooltip = $this->l('The total number of rooms that are currently booked and and awaiting guest check-in', null, null, false);
         $kpis[] = $helper;
 
         $helper = new HelperKpi();
@@ -2489,7 +2505,7 @@ class AdminProductsControllerCore extends AdminController
         $helper->title = $this->l('Disabled Rooms', null, null, false);
         $helper->subtitle = $this->l('Today', null, null, false);
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=disabled_rooms';
-        $helper->tooltip = $this->l('The number of rooms that are currently disabled.', null, null, false);
+        $helper->tooltip = $this->l('The total number of rooms that are currently disabled.', null, null, false);
         $kpis[] = $helper;
 
         $helper = new HelperKpi();
@@ -2499,7 +2515,7 @@ class AdminProductsControllerCore extends AdminController
         $helper->title = $this->l('Online Bookable Rooms', null, null, false);
         $helper->subtitle = $this->l('Today', null, null, false);
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=online_bookable_rooms';
-        $helper->tooltip = $this->l('The total number of rooms that can be booked only using website.', null, null, false);
+        $helper->tooltip = $this->l('The total number of rooms that can be booked directly from the front office.', null, null, false);
         $kpis[] = $helper;
 
         $helper = new HelperKpi();
@@ -2509,7 +2525,7 @@ class AdminProductsControllerCore extends AdminController
         $helper->title = $this->l('Offline Bookable Rooms', null, null, false);
         $helper->subtitle = $this->l('Today', null, null, false);
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=offline_bookable_rooms';
-        $helper->tooltip = $this->l('The number of rooms that can be booked either through website or offline channels (e.g., phone or in-person).', null, null, false);
+        $helper->tooltip = $this->l('The total number of rooms available for booking through the back office.', null, null, false);
         $kpis[] = $helper;
 
         $helper = new HelperKpi();

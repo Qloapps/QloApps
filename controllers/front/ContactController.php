@@ -77,7 +77,7 @@ class ContactControllerCore extends FrontController
 						SELECT cm.id_customer_thread FROM '._DB_PREFIX_.'customer_thread cm
 						WHERE cm.id_customer_thread = '.(int)$id_customer_thread.' AND cm.id_shop = '.(int)$this->context->shop->id.' AND token = \''.pSQL(Tools::getValue('token')).'\'')
                     ) || (
-                        $id_customer_thread = CustomerThread::getIdCustomerThreadByEmailAndIdOrder($from, $id_order)
+                        $id_customer_thread = CustomerThread::getIdCustomerThreadByEmailAndIdOrder($from, $id_order, $id_contact)
                     ))) {
                     $fields = Db::getInstance()->executeS('
 					SELECT cm.id_customer_thread, cm.id_contact, cm.id_customer, cm.id_order, cm.id_product, cm.email
@@ -308,6 +308,7 @@ class ContactControllerCore extends FrontController
         $this->context->smarty->assign(
             array(
                 'hotelsInfo' => $hotelsInfo,
+                'viewOnMap' => Configuration::get('WK_GOOGLE_ACTIVE_MAP'),
                 'gblHtlPhone' => $gblHtlPhone,
                 'gblHtlEmail' => $gblHtlEmail,
                 'gblHtlAddress' => $gblHtlAddress,
