@@ -2098,6 +2098,14 @@ class HotelBookingDetail extends ObjectModel
                 // Reinject quantity in stock
                 $objOldOrderDetail->reinjectQuantity($objOldOrderDetail, $objOldOrderDetail->product_quantity, $deleteQty);
 
+                // retrieve and delete HotelCartBookingData row
+                $idHotelCartBookingData = Db::getInstance()->getValue('SELECT `id` FROM `'._DB_PREFIX_.'htl_cart_booking_data`
+                    WHERE date_from = "'.pSQL($objOldHotelBooking->date_from).'" AND date_to = "'.pSQL($objOldHotelBooking->date_to).'"
+                    AND id_room = '.(int) $objOldHotelBooking->id_room.' AND `id_order` = '.(int) $objOldHotelBooking->id_order
+                );
+                $objCartBookingData = new HotelCartBookingData($idHotelCartBookingData);
+                $objCartBookingData->delete();
+
                 // delete the booking detail
                 $objOldHotelBooking = new HotelBookingDetail($idHotelBooking);
                 $objOldHotelBooking->delete();
@@ -2107,6 +2115,19 @@ class HotelBookingDetail extends ObjectModel
                 // ===============================================================
             } else {
                 // If we are reallocating to the same room type then we need to update only the room details
+                // update in the cart booking data
+                // retrieve HotelCartBookingData row
+                $idHotelCartBookingData = Db::getInstance()->getValue('SELECT `id` FROM `'._DB_PREFIX_.'htl_cart_booking_data`
+                    WHERE date_from = "'.pSQL($objOldHotelBooking->date_from).'" AND date_to = "'.pSQL($objOldHotelBooking->date_to).'"
+                    AND id_room = '.(int) $objOldHotelBooking->id_room.' AND `id_order` = '.(int) $objOldHotelBooking->id_order
+                );
+                $objCartBookingData = new HotelCartBookingData($idHotelCartBookingData);
+                $objCartBookingData->id_room = $idRoom;
+                // set backorder to 0 as available reallocate rooms will always be free
+                $objOldHotelBooking->is_back_order = 0;
+                $objCartBookingData->save();
+
+                // update in the hotel booking detail table
                 $objOldHotelBooking->id_room = $idRoom;
                 $objOldHotelBooking->room_num = $objHotelRoomInfo->room_num;
                 // set backorder to 0 as available reallocate rooms will always be free
