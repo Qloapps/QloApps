@@ -532,7 +532,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
 			FROM `'._DB_PREFIX_.'orders` o
 			LEFT JOIN `'._DB_PREFIX_.'order_return` orr ON (o.id_order = orr.id_order)
             LEFT JOIN `'._DB_PREFIX_.'order_state` os ON (o.current_state = os.id_order_state)
-			WHERE orr.`payment_mode` != "" AND orr.`id_transaction` != "" AND `invoice_date` BETWEEN "'.pSQL($date_from).' 00:00:00" AND "'.pSQL($date_to).' 23:59:59" AND os.logable = 1'.'
+			WHERE orr.`payment_mode` != "" AND `invoice_date` BETWEEN "'.pSQL($date_from).' 00:00:00" AND "'.pSQL($date_to).' 23:59:59" AND os.logable = 1'.'
 			GROUP BY LEFT(`invoice_date`, 10) HAVING 1 '.HotelBranchInformation::addHotelRestriction($id_hotel));
 
             foreach ($result as $row) {
