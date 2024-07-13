@@ -1718,8 +1718,14 @@ ul.service-product-nav > li:hover {
 
 #room_info_hotel_images .skeleton-loading-wrap .loading-container-box {
   height: 200px; }
+  .hotel_name_block > span {
+    display: flex;
+  }
   #hotel_rating {
-    font-size: 16px;
-    display: inline-block;
+    font-size: 12px;
+    display: inline-flex;
     color: #3e3d3d;
+    float: inline-end;
+    padding-top: 4px;
+    padding-left: 4px;
   }
