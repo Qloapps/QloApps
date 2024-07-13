@@ -713,6 +713,7 @@ class AdminStatusesControllerCore extends AdminController
             'shipped.html',
             'in_transit.html',
             'download_products.html',
+            'header_order_conf.html',
             'test.html'
         );
 
