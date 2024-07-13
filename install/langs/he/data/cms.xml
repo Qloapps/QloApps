@@ -88,7 +88,7 @@
       &lt;p&gt;תודה על בחירתך במלון שלנו. אנו מקווים שהשהייה שלך תהיה נעימה ומרגיעה.&lt;/p&gt;
       &lt;/div&gt;
     </content>
-    <link_rewrite>הבהרות-משפטיות</link_rewrite>
+    <link_rewrite>legal-notice</link_rewrite>
   </cms>
   <cms id="Terms_and_conditions_of_use">
     <meta_title>תנאים והגבלות שימוש</meta_title>
@@ -127,7 +127,7 @@
       &lt;/div&gt;
       &lt;/div&gt;
     </content>
-    <link_rewrite>תנאים-הגבלים-והערות</link_rewrite>
+    <link_rewrite>terms-and-conditions-of-use</link_rewrite>
   </cms>
   <cms id="About_us">
     <meta_title>אודותינו</meta_title>
@@ -179,7 +179,7 @@
       &lt;/div&gt;
       &lt;/div&gt;
     </content>
-    <link_rewrite>אודותינו</link_rewrite>
+    <link_rewrite>about-us</link_rewrite>
   </cms>
   <cms id="Secure_payment">
     <meta_title>תשלום מאובטח</meta_title>
@@ -191,6 +191,6 @@
       &lt;hr /&gt;&lt;/div&gt;
       &lt;div&gt;אנו מעלים את הבטיחות שלכם לראש סדר העדיפויות שלנו. כל העסקאות שנעשות באתר שלנו מוצפנות באמצעות טכנולוגיית Secure Socket Layer (SSL) כדי להבטיח שהמידע האישי שלכם ופרטי התשלום שלכם מוגנים. אנו מקבלים כרטיסי אשראי ראשיים ומספקים סביבה מאובטחת לחוויית ההזמנה החלקה שלכם. לכל שאלה או בקשה בנוגע לביטחון התשלום, אנא צרו קשר עם צוות התמיכה שלנו.&lt;/div&gt;
     </content>
-    <link_rewrite>תשלום-מאובטח</link_rewrite>
+    <link_rewrite>secure-payment</link_rewrite>
   </cms>
 </entity_cms>

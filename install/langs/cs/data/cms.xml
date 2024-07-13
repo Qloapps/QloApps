@@ -60,7 +60,7 @@
       &lt;/ul&gt;
       &lt;/div&gt;
     </content>
-    &lt;link_rewrite&gt;politiky&lt;/link_rewrite&gt;
+    <link_rewrite>politiky</link_rewrite>
   </cms>
   <cms id="Legal_Notice">
     <meta_title>Právní upozornění</meta_title>
@@ -89,7 +89,7 @@
       &lt;p&gt;Email: legal@hotel-example.com&lt;/p&gt;
       &lt;p&gt;Telefon: +123456789&lt;/p&gt;
     </content>
-    &lt;link_rewrite&gt;pravni-upozorneni&lt;/link_rewrite&gt;
+    <link_rewrite>pravni-upozorneni</link_rewrite>
   </cms>
   <cms id="Terms_and_conditions_of_use">
       <meta_title>Obchodní podmínky</meta_title>

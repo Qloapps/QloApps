@@ -183,7 +183,7 @@
       &lt;/div&gt;
       &lt;/div&gt;
     </content>
-    <link_rewrite>à-propos-de-nous</link_rewrite>
+    <link_rewrite>propos-de-nous</link_rewrite>
   </cms>
   <cms id="Secure_payment">
     <meta_title>Paiement Sécurisé</meta_title>
