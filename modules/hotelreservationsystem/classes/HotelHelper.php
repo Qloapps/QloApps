@@ -1065,7 +1065,7 @@ class HotelHelper
 
         Configuration::updateValue(
             'MAX_GLOBAL_BOOKING_DATE',
-            date('d-m-Y', strtotime(date('Y-m-d', time()).' + 1 year'))
+            date('Y-m-d', strtotime(date('Y-m-d', time()).' + 1 year'))
         );
 
         Configuration::updateValue('GLOBAL_PREPARATION_TIME', 0);
@@ -2499,5 +2499,26 @@ class HotelHelper
         $daysDifference = $startDate->diff($endDate)->days;
 
         return $daysDifference;
+    }
+
+    public static function validateDateRangeForHotel($dateFrom, $dateTo, $idHotel)
+    {
+        $validStartDateTimeStamp = strtotime(date('Y-m-d'));
+        if ($preparationTime = (int) HotelOrderRestrictDate::getPreparationTime($idHotel)) {
+            $validStartDateTimeStamp = strtotime(date('Y-m-d', strtotime('+ '.$preparationTime.' day')));
+        }
+
+        $dateFromTimestamp = strtotime($dateFrom);
+        $dateToTimestamp = strtotime($dateTo);
+        $isValid = true;
+        if ($dateFrom != '' && ($dateFromTimestamp === false || ($dateFromTimestamp < $validStartDateTimeStamp))) {
+            $isValid = false;
+        } else if ($dateTo != '' && ($dateToTimestamp === false || ($dateToTimestamp < $validStartDateTimeStamp))) {
+            $isValid = false;
+        } else if ($dateTo != '' && $dateFrom != '' && $dateFromTimestamp >= $dateToTimestamp) {
+            $isValid = false;
+        }
+
+        return $isValid;
     }
 }
