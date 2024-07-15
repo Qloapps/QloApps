@@ -245,7 +245,8 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
                 'isRefundCompleted' => $objOrderReturn->hasBeenCompleted(),
                 'paymentMethods' => $paymentMethods,
                 'name_controller' => Tools::getValue('controller'),
-                'info_icon_path' => $this->context->link->getMediaLink(_MODULE_DIR_.'hotelreservationsystem/views/img/Slices/icon-info.svg')
+                'info_icon_path' => $this->context->link->getMediaLink(_MODULE_DIR_.'hotelreservationsystem/views/img/Slices/icon-info.svg'),
+                'expiry_date' => time() + (3600 * 24 * 365.25)
             )
         );
 
@@ -324,6 +325,11 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
                     }
                 } else {
                     $this->errors[] = $this->l('Invalid refund state.');
+                }
+                if (!$voucher_expiry_date = Tools::getValue('voucher_expiry_date')) {
+                    $this->errors[] = $this->l('Voucher expiry date is required.');
+                } elseif (!Validate::isDate($voucher_expiry_date)) {
+                    $this->errors[] = $this->l('Invalid voucher expiry date.');
                 }
             } else {
                 $this->errors[] = $this->l('Invalid refund information found.');
@@ -480,7 +486,12 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
                         $cartrule->id_customer = $objOrder->id_customer;
                         $now = time();
                         $cartrule->date_from = date('Y-m-d H:i:s', $now);
-                        $cartrule->date_to = date('Y-m-d H:i:s', $now + (3600 * 24 * 365.25)); /* 1 year */
+                        // generateDiscount
+                        if ($voucher_expiry_date) {
+                            $cartrule->date_to = date('Y-m-d H:i:s', strtotime($voucher_expiry_date));
+                        } else {
+                            $cartrule->date_to = date('Y-m-d H:i:s', $now + (3600 * 24 * 365.25)); /* 1 year */
+                        }
                         $cartrule->active = 1;
                         $cartrule->highlight = 1;
                         $cartrule->reduction_amount = $totalRefundedAmount;
@@ -560,6 +571,8 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
 
         if ($this->display == 'view') {
             $this->addJqueryUI('ui.tooltip', 'base', true);
+            $this->removeJS(Media::getJqueryUIPath('effects.core', 'base', false), false);
+
             $this->addJs(_MODULE_DIR_.$this->module->name.'/views/js/admin/wk_refund_request.js');
             $this->addCSS(_MODULE_DIR_.$this->module->name.'/views/css/admin/wk_refund_request.css');
         }
