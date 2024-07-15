@@ -547,6 +547,7 @@ $(document).ready(function()
     });
 
 	$(document).on('click', '.open_rooms_extra_services_panel', function() {
+		var idProduct = $(this).data('id_product');
 		var idOrder = $(this).data('id_order');
 		var dateFrom = $(this).data('date_from');
 		var dateTo = $(this).data('date_to');
