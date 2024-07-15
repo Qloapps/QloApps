@@ -97,6 +97,42 @@ function initPriceTooltip() {
     }
 }
 
+// initialize tooltip for
+function initRefundDeniedTooltip() {
+    if ($('.refund-denied-info').length) {
+        $('.refund-denied-info').each(function () {
+            $(this).tooltip({
+                content: $(this).data('refund_denied_info'),
+                items: 'i',
+                trigger: 'hover',
+                tooltipClass: 'refund-denied-tootip',
+                open: function (event, ui) {
+                    if (typeof (event.originalEvent) === 'undefined') {
+                        return false;
+                    }
+
+                    var $id = $(ui.tooltip).attr('id');
+
+                    // close any lingering tooltips
+                    if ($('div.ui-tooltip').not('#' + $id).length) {
+                        return false;
+                    }
+                },
+                close: function (event, ui) {
+                    ui.tooltip.hover(function () {
+                        $(this).stop(true).fadeTo(400, 1);
+                    },
+                    function () {
+                        $(this).fadeOut('400', function () {
+                            $(this).remove();
+                        });
+                    });
+                }
+            });
+        });
+    }
+}
+
 function initMap() {
     const hotelLocation = {
         lat: Number(hotel_location.latitude),
@@ -232,6 +268,9 @@ const BookingRefundManager = {
             href: '#popup-cancellation-submit-success',
             wrapCSS: 'fancybox-order-detail feedback',
             padding: 0,
+            afterClose: function() {
+                location.reload();
+            },
         });
     },
     showOrderCancelSuccessMessage: function() {
@@ -341,4 +380,6 @@ $(document).ready(function () {
     ) {
         initMap();
     }
+
+    initRefundDeniedTooltip();
 });

@@ -70,7 +70,7 @@ class HotelReservationSystem extends Module
         ) {
             Configuration::updateValue(
                 'MAX_GLOBAL_BOOKING_DATE',
-                date('d-m-Y', strtotime(date('Y-m-d', time()).' + 1 year'))
+                date('Y-m-d', strtotime(date('Y-m-d', time()).' + 1 year'))
             );
         }
         if (!Configuration::get('PS_CATALOG_MODE')) {
@@ -293,7 +293,9 @@ class HotelReservationSystem extends Module
     public function hookDisplayLeftColumn()
     {
         if (Tools::getValue('controller') == 'category') {
-            if ($apiKey = Configuration::get('PS_API_KEY')) {
+            if (($apiKey = Configuration::get('PS_API_KEY'))
+                && Configuration::get('WK_GOOGLE_ACTIVE_MAP')
+            ) {
                 $idCategory = Tools::getValue('id_category');
                 $idHotel = HotelBranchInformation::getHotelIdByIdCategory($idCategory);
                 $objHotel = new HotelBranchInformation($idHotel, $this->context->language->id);
@@ -484,7 +486,11 @@ class HotelReservationSystem extends Module
 
         // Make rooms available for booking if order status is cancelled, refunded or error
         if (in_array($params['newOrderStatus']->id, $objHtlBkDtl->getOrderStatusToFreeBookedRoom())) {
-            if (!$objHtlBkDtl->updateOrderRefundStatus($params['id_order'])) {
+            $isCancelled = 0;
+            if ($params['newOrderStatus']->id == Configuration::get('PS_OS_CANCELED')) {
+                $isCancelled = 1;
+            }
+            if (!$objHtlBkDtl->updateOrderRefundStatus($params['id_order'], false, false, array(), 1, $isCancelled)) {
                 $this->context->controller->errors[] = $this->l('Error while making booked rooms available, attached with this order. Please try again !!');
             }
         }

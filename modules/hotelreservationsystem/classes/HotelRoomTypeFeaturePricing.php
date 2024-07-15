@@ -180,6 +180,7 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
         $id_product,
         $date_from,
         $date_to,
+        $groups,
         $type = 'date_range',
         $current_Special_days = false,
         $id_feature_price = 0
@@ -188,20 +189,26 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
         $date_to = date('Y-m-d', strtotime($date_to));
         if ($type == 'specific_date') {
             return Db::getInstance()->getRow(
-                'SELECT * FROM `'._DB_PREFIX_.'htl_room_type_feature_pricing`
-                WHERE `id_product`='.(int) $id_product.' AND `active`=1
-                AND `date_selection_type` = '.(int) self::DATE_SELECTION_TYPE_SPECIFIC.'
-                AND `date_from` = \''.pSQL($date_from).'\'
-                AND `id_feature_price`!='.(int) $id_feature_price
+                'SELECT * FROM `'._DB_PREFIX_.'htl_room_type_feature_pricing` rtfp
+                INNER JOIN `'._DB_PREFIX_.'htl_room_type_feature_pricing_group` rtfpg
+                ON (rtfp.`id_feature_price` = rtfpg.`id_feature_price`)
+                WHERE rtfp.`id_product`='.(int) $id_product.' AND rtfp.`active`=1
+                AND rtfp.`date_selection_type` = '.(int) self::DATE_SELECTION_TYPE_SPECIFIC.'
+                AND rtfp.`date_from` = \''.pSQL($date_from).'\'
+                AND rtfp.`id_feature_price`!='.(int) $id_feature_price.'
+                AND rtfpg.`id_group` IN ('.pSQL(implode(', ',$groups)).')'
             );
         } elseif ($type == 'special_day') {
             $featurePrices = Db::getInstance()->executeS(
-                'SELECT * FROM `'._DB_PREFIX_.'htl_room_type_feature_pricing`
-                WHERE `id_product`='.(int) $id_product.'
-                AND `is_special_days_exists`=1 AND `active`=1
-                AND `date_from` < \''.pSQL($date_to).'\'
-                AND `date_to` > \''.pSQL($date_from).'\'
-                AND `id_feature_price`!='.(int) $id_feature_price
+                'SELECT * FROM `'._DB_PREFIX_.'htl_room_type_feature_pricing` rtfp
+                INNER JOIN `'._DB_PREFIX_.'htl_room_type_feature_pricing_group` rtfpg
+                ON (rtfp.`id_feature_price` = rtfpg.`id_feature_price`)
+                WHERE rtfp.`id_product`='.(int) $id_product.'
+                AND rtfp.`is_special_days_exists`=1 AND `active`=1
+                AND rtfp.`date_from` < \''.pSQL($date_to).'\'
+                AND rtfp.`date_to` > \''.pSQL($date_from).'\'
+                AND rtfp.`id_feature_price`!='.(int) $id_feature_price.'
+                AND rtfpg.`id_group` IN ('.pSQL(implode(', ',$groups)).')'
             );
             if ($featurePrices) {
                 foreach ($featurePrices as $featurePrice) {
@@ -216,13 +223,16 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
             return false;
         } elseif ($type == 'date_range') {
             return Db::getInstance()->getRow(
-                'SELECT * FROM `'._DB_PREFIX_.'htl_room_type_feature_pricing`
-                WHERE `id_product`='.(int) $id_product.' AND `active`=1
-                AND `date_selection_type` = '.(int) self::DATE_SELECTION_TYPE_RANGE.'
-                AND `is_special_days_exists`=0
-                AND `date_from` <= \''.pSQL($date_to).'\'
-                AND `date_to` >= \''.pSQL($date_from).'\'
-                AND `id_feature_price`!='.(int) $id_feature_price
+                'SELECT * FROM `'._DB_PREFIX_.'htl_room_type_feature_pricing` rtfp
+                INNER JOIN `'._DB_PREFIX_.'htl_room_type_feature_pricing_group` rtfpg
+                ON (rtfp.`id_feature_price` = rtfpg.`id_feature_price`)
+                WHERE rtfp.`id_product`='.(int) $id_product.' AND rtfp.`active`=1
+                AND rtfp.`date_selection_type` = '.(int) self::DATE_SELECTION_TYPE_RANGE.'
+                AND rtfp.`is_special_days_exists`=0
+                AND rtfp.`date_from` <= \''.pSQL($date_to).'\'
+                AND rtfp.`date_to` >= \''.pSQL($date_from).'\'
+                AND rtfp.`id_feature_price`!='.(int) $id_feature_price.'
+                AND rtfpg.`id_group` IN ('.pSQL(implode(', ',$groups)).')'
             );
         }
         return false;
@@ -971,5 +981,32 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
         }
 
         return $this->update($null_values);
+    }
+
+    public static function createAutoFeaturePrice($params)
+    {
+        $context = Context::getContext();
+        $featurePriceName = array();
+        foreach (Language::getIDs(true) as $idLang) {
+            $featurePriceName[$idLang] = 'Auto-generated';
+        }
+
+        $objFeaturePricing = new HotelRoomTypeFeaturePricing();
+        $objFeaturePricing->id_product = (int) $params['id_product'];
+        $objFeaturePricing->id_cart = (int) $params['id_cart'];
+        $objFeaturePricing->id_guest = (int) $params['id_guest'];
+        $objFeaturePricing->id_room = (int) $params['id_room'];
+        $objFeaturePricing->feature_price_name = $featurePriceName;
+        $objFeaturePricing->date_selection_type = HotelRoomTypeFeaturePricing::DATE_SELECTION_TYPE_RANGE;
+        $objFeaturePricing->date_from = date('Y-m-d', strtotime($params['date_from']));
+        $objFeaturePricing->date_to = date('Y-m-d', strtotime($params['date_to']));
+        $objFeaturePricing->is_special_days_exists = 0;
+        $objFeaturePricing->special_days = json_encode(false);
+        $objFeaturePricing->impact_way = HotelRoomTypeFeaturePricing::IMPACT_WAY_FIX_PRICE;
+        $objFeaturePricing->impact_type = HotelRoomTypeFeaturePricing::IMPACT_TYPE_FIXED_PRICE;
+        $objFeaturePricing->impact_value = $params['price'];
+        $objFeaturePricing->active = 1;
+        $objFeaturePricing->groupBox = array_column(Group::getGroups($context->language->id), 'id_group');
+        $objFeaturePricing->add();
     }
 }

@@ -277,6 +277,13 @@
     border-bottom: 1px solid #E5E5E5;
 }
 
+@media (min-width: 576px) {
+    .booking-room-detail .num-refunded-rooms {
+        float: right;
+        display: inline-block;
+    }
+}
+
 @media (max-width: 576px) {
     .room-details .card-header {
         flex-direction: column;
@@ -286,6 +293,11 @@
     .room-details .card-header .booking-actions-wrap {
         margin-top: 10px;
         margin-left: -10px;
+    }
+
+    .booking-room-detail .num-refunded-rooms {
+        display: block;
+        float: none;
     }
 }
 
@@ -321,17 +333,12 @@
     top: -1px;
 }
 
-.booking-room-detail .num-refunded-rooms {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-}
-
 .booking-room-detail .num-refunded-rooms .badge {
     padding: 5px;
     font-weight: normal;
     font-size: 12px;
     border-radius: 2px;
+    margin-top: 5px;
 }
 
 .booking-room-detail .btn-view-extra-services {
@@ -385,11 +392,11 @@
     margin-bottom: 10px;
 }
 
-.add-order-message form #submitMessage {
+#order_detail_container #submitMessage {
     padding: 6px 20px;
 }
 
-.add-order-message form #submitMessage span {
+#order_detail_container #submitMessage span {
     font-size: 14px;
     font-weight: bold;
 }
@@ -522,20 +529,20 @@
     border-radius: 4px;
 }
 
-.button.button-medium {
+#order_detail_container .button.button-medium {
     padding: 8px 15px;
     background-color: #379bf0;
     background-image: none;
     border-radius: 2px;
 }
 
-.button.button-medium span {
+#order_detail_container .button.button-medium span {
     padding: 0;
 }
 
-.button.button-medium:hover,
-.button.button-medium:focus,
-.button.button-medium:active {
+#order_detail_container .button.button-medium:hover,
+#order_detail_container .button.button-medium:focus,
+#order_detail_container .button.button-medium:active {
     opacity: 0.8;
 }
 
@@ -891,8 +898,6 @@
     background-color: #F5F5F5;
 }
 #create-new-refund-popup .tab-content .room-details.cancelled .badge-cancelled {
-    position: absolute;
-    top: -4px;
     margin-left: 6px;
     padding: 5px 10px;
     border-radius: 31px;

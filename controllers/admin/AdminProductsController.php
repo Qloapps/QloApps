@@ -201,13 +201,15 @@ class AdminProductsControllerCore extends AdminController
 				LEFT JOIN `'._DB_PREFIX_.'address` aa ON (aa.`id_hotel` = hb.`id`)
 				LEFT JOIN `'._DB_PREFIX_.'feature_product` fp ON (fp.`id_product` = a.`id_product`)
 				LEFT JOIN `'._DB_PREFIX_.'htl_room_type_demand` hrtd ON (hrtd.`id_product` = a.`id_product`)
-				LEFT JOIN `'._DB_PREFIX_.'htl_room_type_service_product` hrtsp ON ((hrtsp.`element_type` = '.(int) RoomTypeServiceProduct::WK_ELEMENT_TYPE_HOTEL.' AND hrtsp.`id_element` = hrt.`id_hotel`) OR (hrtsp.`element_type` = '.(int) RoomTypeServiceProduct::WK_ELEMENT_TYPE_ROOM_TYPE.' AND hrtsp.`id_element` = a.`id_product`))';
+				LEFT JOIN `'._DB_PREFIX_.'htl_room_type_service_product` hrtsp ON ((hrtsp.`element_type` = '.(int) RoomTypeServiceProduct::WK_ELEMENT_TYPE_HOTEL.' AND hrtsp.`id_element` = hrt.`id_hotel`) OR (hrtsp.`element_type` = '.(int) RoomTypeServiceProduct::WK_ELEMENT_TYPE_ROOM_TYPE.' AND hrtsp.`id_element` = a.`id_product`))
+				LEFT JOIN `'._DB_PREFIX_.'htl_advance_payment` hap ON (hap.`id_product` = a.`id_product`)';
 
-        $this->_select .= ' (SELECT COUNT(hri.`id`) FROM `'._DB_PREFIX_.'htl_room_information` hri WHERE hri.`id_product` = a.`id_product`) as num_rooms, ';
+        $this->_select .= ' a.`show_at_front`, (SELECT COUNT(hri.`id`) FROM `'._DB_PREFIX_.'htl_room_information` hri WHERE hri.`id_product` = a.`id_product`) as num_rooms, ';
         $this->_select .= 'hrt.`adults`, hrt.`children`, hrt.`max_guests`, hb.`id` as id_hotel, aa.`city`, hbl.`hotel_name`, ';
         $this->_select .= 'shop.`name` AS `shopname`, a.`id_shop_default`, ';
         $this->_select .= $alias_image.'.`id_image` AS `id_image`, cl.`name` AS `name_category`, '.$alias.'.`price`, 0 AS `price_final`, a.`is_virtual`, pd.`nb_downloadable`, sav.`quantity` AS `sav_quantity`, '.$alias.'.`active`, IF(sav.`quantity`<=0, 1, 0) AS `badge_danger`';
-        $this->_select .= ', IFNULL((SELECT hap.`active` FROM `'._DB_PREFIX_.'htl_advance_payment` hap WHERE hap.`id_product` = a.`id_product`), 0) AS advance_payment';
+        $this->_select .= ', IFNULL(hap.`active`, 0) AS advance_payment';
+        $this->_select .= ', IF(IFNULL(hap.`active`, 0), 1, 0) badge_success, IF(IFNULL(hap.`active`, 0), 0, 1) badge_danger ';
 
         if ($join_category) {
             $this->_join .= ' INNER JOIN `'._DB_PREFIX_.'category_product` cp ON (cp.`id_product` = a.`id_product` AND cp.`id_category` = '.(int)$this->_category->id.') ';
@@ -245,9 +247,10 @@ class AdminProductsControllerCore extends AdminController
             );
         } else {
             $hotels = HotelBranchInformation::getProfileAccessedHotels($this->context->employee->id_profile, 1);
+            $hotelsArray = array();
             foreach ($hotels as $hotel) {
                 $addressInfo = HotelBranchInformation::getAddress($hotel['id_hotel']);
-                $this->hotelsArray[$hotel['id_hotel']] = $hotel['hotel_name'].', '.$addressInfo['city'];
+                $hotelsArray[$hotel['id_hotel']] = $hotel['hotel_name'].', '.$addressInfo['city'];
             }
 
             $this->fields_list['hotel_name'] = array(
@@ -256,7 +259,7 @@ class AdminProductsControllerCore extends AdminController
                 'multiple' => true,
                 'operator' => 'or',
                 'filter_key' => 'hrt!id_hotel',
-                'list' => $this->hotelsArray,
+                'list' => $hotelsArray,
                 'optional' => true,
                 'class' => 'chosen',
                 'visible_default' => true,
@@ -318,10 +321,23 @@ class AdminProductsControllerCore extends AdminController
             'optional' => true,
         );
 
+        $this->fields_list['show_at_front'] = array(
+            'title' => $this->l('Show at front'),
+            'align' => 'text-center',
+            'type' => 'bool',
+            'active' => 'show_at_front',
+            'optional' => true,
+            'havingFilter' => true,
+            'visible_default' => true,
+            'orderby' => false,
+        );
+
         if (Configuration::get('WK_ALLOW_ADVANCED_PAYMENT')) {
             $this->fields_list['advance_payment'] = array(
                 'title' => $this->l('Advance Payment'),
-                'active' => 'advance_payment',
+                'callback' => 'getAdvancePaymentStatus',
+                'badge_success' => true,
+                'badge_danger' => true,
                 'align' => 'text-center',
                 'type' => 'bool',
                 'optional' => true,
@@ -399,7 +415,7 @@ class AdminProductsControllerCore extends AdminController
         $idLocationsCategory = Configuration::get('PS_LOCATIONS_CATEGORY');
         $this->objLocationsCategory = new Category($idLocationsCategory, $this->context->language->id);
         $nestedCategories = Category::getNestedCategories($idLocationsCategory);
-        if ($nestedCategories) {
+        if (isset($nestedCategories[$idLocationsCategory]['children']) && $nestedCategories[$idLocationsCategory]['children']) {
             foreach ($nestedCategories[$idLocationsCategory]['children'] as $childCategory) {
                 $this->buildCategoryOptions($childCategory);
             }
@@ -429,6 +445,18 @@ class AdminProductsControllerCore extends AdminController
             );
         }
     }
+
+    public function getAdvancePaymentStatus($val, $row)
+    {
+        if ($val) {
+            $str_return = $this->l('Yes');
+        } else {
+            $str_return = $this->l('No');
+        }
+
+        return $str_return;
+    }
+
 
     private function buildCategoryOptions($category)
     {
@@ -815,6 +843,13 @@ class AdminProductsControllerCore extends AdminController
                 if (!$id_hotel_new) {
                     $id_hotel_new = $room_type_info['id_hotel'];
                 }
+
+                if ($product->hasAttributes()) {
+                    Product::updateDefaultAttribute($product->id);
+                } else {
+                    Product::duplicateSpecificPrices($id_product_old, $product->id);
+                }
+
                 $id_room_type_new = HotelRoomType::duplicateRoomType(
                     $id_product_old,
                     $product->id,
@@ -837,11 +872,6 @@ class AdminProductsControllerCore extends AdminController
                     }
                 } else {
                     $this->errors[] = Tools::displayError('An error occurred while duplicating room type.');
-                }
-                if ($product->hasAttributes()) {
-                    Product::updateDefaultAttribute($product->id);
-                } else {
-                    Product::duplicateSpecificPrices($id_product_old, $product->id);
                 }
 
                 if (!Tools::getValue('noimage') && !Image::duplicateProductImages($id_product_old, $product->id, $combination_images)) {
@@ -1335,10 +1365,10 @@ class AdminProductsControllerCore extends AdminController
                 $this->errors[] = Tools::displayError('You do not have permission to add this.');
             }
         }
-        // Toggle Advance Payment
-        elseif (Tools::getIsset('advance_payment'.$this->table)) {
+        // Toggle Show at front
+        elseif (Tools::getIsset('show_at_front'.$this->table)) {
             if ($this->tabAccess['edit'] === '1') {
-                $this->action = 'toggleAdvancePayment';
+                $this->action = 'toggleShowAtFront';
             } else {
                 $this->errors[] = Tools::displayError('You do not have permission to edit this.');
             }
@@ -1895,38 +1925,21 @@ class AdminProductsControllerCore extends AdminController
         return $res;
     }
 
-    public function processToggleAdvancePayment()
+    public function processToggleShowAtFront()
     {
-        if (Configuration::get('WK_ALLOW_ADVANCED_PAYMENT')) {
-            $this->loadObject(true);
-            if (!Validate::isLoadedObject($this->object)) {
-                return false;
-            }
+        if (!$this->loadObject()) {
+            return false;
+        }
 
-            if (!Product::isBookingProduct($this->object->id)) {
-                return false;
-            }
+        if (!Product::isBookingProduct($this->object->id)) {
+            return false;
+        }
 
-            $objHotelAdvancedPayment = new HotelAdvancedPayment();
-            $roomTypeAdvancePaymentInfo = $objHotelAdvancedPayment->getIdAdvPaymentByIdProduct($this->object->id);
-            if ($roomTypeAdvancePaymentInfo) {
-                $objHotelAdvancedPayment = new HotelAdvancedPayment($roomTypeAdvancePaymentInfo['id']);
-                $objHotelAdvancedPayment->active = !$objHotelAdvancedPayment->active;
-            } else {
-                $objHotelAdvancedPayment->id_product = $this->object->id;
-                $objHotelAdvancedPayment->payment_type = '';
-                $objHotelAdvancedPayment->value = '';
-                $objHotelAdvancedPayment->id_currency = '';
-                $objHotelAdvancedPayment->tax_include = '';
-                $objHotelAdvancedPayment->calculate_from = 0;
-                $objHotelAdvancedPayment->active = 1;
-            }
-
-            if ($objHotelAdvancedPayment->save()) {
-                Tools::redirectAdmin(self::$currentIndex.'&token='.$this->token.'&conf=4');
-            } else {
-                $this->errors[] = $this->l('Something went wrong while updating Advance payment status.');
-            }
+        $this->object->show_at_front = !$this->object->show_at_front;
+        if ($this->object->save()) {
+            Tools::redirectAdmin(self::$currentIndex.'&token='.$this->token.'&conf=4');
+        } else {
+            $this->errors[] = $this->l('An error occurred while updating "show at front".');
         }
     }
 
@@ -2201,10 +2214,14 @@ class AdminProductsControllerCore extends AdminController
                 }
 
                 if (!$res) {
-                    $this->errors[] = sprintf(
-                        Tools::displayError('The %s field is invalid.'),
-                        call_user_func(array($className, 'displayFieldName'), $field, $className)
-                    );
+                    if (Tools::strtolower($field) == 'wholesale_price') {
+                        $this->errors[] = Tools::displayError('The Pre-tax operating cost field is invalid.');
+                    } else {
+                        $this->errors[] = sprintf(
+                            Tools::displayError('The %s field is invalid.'),
+                            call_user_func(array($className, 'displayFieldName'), $field, $className)
+                        );
+                    }
                 }
             }
         }
@@ -2458,7 +2475,7 @@ class AdminProductsControllerCore extends AdminController
         $helper->title = $this->l('Occupied Rooms', null, null, false);
         $helper->subtitle = $this->l('Today', null, null, false);
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=occupied_rooms';
-        $helper->tooltip = $this->l('The current count of rooms that are currently occupied by guests.', null, null, false);
+        $helper->tooltip = $this->l('The count of rooms that are currently occupied by guests.', null, null, false);
         $kpis[] = $helper;
 
         $helper = new HelperKpi();
@@ -2468,7 +2485,7 @@ class AdminProductsControllerCore extends AdminController
         $helper->title = $this->l('Vacant Rooms', null, null, false);
         $helper->subtitle = $this->l('Today', null, null, false);
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=vacant_rooms';
-        $helper->tooltip = $this->l('The count of rooms that are currently unoccupied and available for booking.', null, null, false);
+        $helper->tooltip = $this->l('The count of rooms that are either booked but currently unoccupied or available for booking', null, null, false);
         $kpis[] = $helper;
 
         $helper = new HelperKpi();
@@ -2478,7 +2495,7 @@ class AdminProductsControllerCore extends AdminController
         $helper->title = $this->l('Booked Rooms', null, null, false);
         $helper->subtitle = $this->l('Today', null, null, false);
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=booked_rooms';
-        $helper->tooltip = $this->l('The number of rooms that are currently booked but not yet occupied.', null, null, false);
+        $helper->tooltip = $this->l('The total number of rooms that are currently booked and and awaiting guest check-in', null, null, false);
         $kpis[] = $helper;
 
         $helper = new HelperKpi();
@@ -2488,7 +2505,7 @@ class AdminProductsControllerCore extends AdminController
         $helper->title = $this->l('Disabled Rooms', null, null, false);
         $helper->subtitle = $this->l('Today', null, null, false);
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=disabled_rooms';
-        $helper->tooltip = $this->l('The number of rooms that are currently disabled.', null, null, false);
+        $helper->tooltip = $this->l('The total number of rooms that are currently disabled.', null, null, false);
         $kpis[] = $helper;
 
         $helper = new HelperKpi();
@@ -2498,7 +2515,7 @@ class AdminProductsControllerCore extends AdminController
         $helper->title = $this->l('Online Bookable Rooms', null, null, false);
         $helper->subtitle = $this->l('Today', null, null, false);
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=online_bookable_rooms';
-        $helper->tooltip = $this->l('The total number of rooms that can be booked only using website.', null, null, false);
+        $helper->tooltip = $this->l('The total number of rooms that can be booked directly from the front office.', null, null, false);
         $kpis[] = $helper;
 
         $helper = new HelperKpi();
@@ -2508,7 +2525,7 @@ class AdminProductsControllerCore extends AdminController
         $helper->title = $this->l('Offline Bookable Rooms', null, null, false);
         $helper->subtitle = $this->l('Today', null, null, false);
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=offline_bookable_rooms';
-        $helper->tooltip = $this->l('The number of rooms that can be booked either through website or offline channels (e.g., phone or in-person).', null, null, false);
+        $helper->tooltip = $this->l('The total number of rooms available for booking through the back office.', null, null, false);
         $kpis[] = $helper;
 
         $helper = new HelperKpi();
@@ -3272,22 +3289,26 @@ class AdminProductsControllerCore extends AdminController
                         $this->errors[] = Tools::displayError('Invalid base children');
                     } else if (Configuration::get('WK_GLOBAL_MAX_CHILD_IN_ROOM')) {
                         if ($baseChildren > Configuration::get('WK_GLOBAL_MAX_CHILD_IN_ROOM')) {
-                            $this->errors[] = sprintf(Tools::displayError('Base children cannot be greater than max childern allowed on your website (Max: %s)'), Configuration::get('WK_GLOBAL_MAX_CHILD_IN_ROOM'));
+                            $this->errors[] = sprintf(Tools::displayError('Base children cannot be greater than max childern allowed in the room of this room type (Max: %s)'), Configuration::get('WK_GLOBAL_MAX_CHILD_IN_ROOM'));
                         }
                     }
                     if (!$maxAdults || !Validate::isUnsignedInt($maxAdults)) {
                         $this->errors[] = Tools::displayError('Invalid maximum number of adults');
                     } elseif ($maxAdults < $baseAdults) {
                         $this->errors[] = Tools::displayError('Maximum number of adults cannot be less than base adults');
+                    } elseif ($maxAdults > $maxGuests) {
+                        $this->errors[] = Tools::displayError('Maximum number of adults cannot be more than maximum number of guests');
                     }
                     if ($maxChildren == '' || !Validate::isUnsignedInt($maxChildren)) {
                         $this->errors[] = Tools::displayError('Invalid maximum number of children');
-                    } else if (Configuration::get('WK_GLOBAL_MAX_CHILD_IN_ROOM')) {
-                        if ($maxChildren > Configuration::get('WK_GLOBAL_MAX_CHILD_IN_ROOM')) {
-                            $this->errors[] = sprintf(Tools::displayError('Maximum number of children cannot be greater than max childern allowed on your website (Max: %s)'), Configuration::get('WK_GLOBAL_MAX_CHILD_IN_ROOM'));
-                        }
                     } elseif ($maxChildren < $baseChildren) {
                         $this->errors[] = Tools::displayError('Maximum number of children cannot be less than base children');
+                    } elseif ($maxChildren >= $maxGuests) {
+                        $this->errors[] = Tools::displayError('Maximum number of children cannot be more or equal than maximum number of guests.(1 adult is mandatory in a room)');
+                    } else if (Configuration::get('WK_GLOBAL_MAX_CHILD_IN_ROOM')) {
+                        if ($maxChildren > Configuration::get('WK_GLOBAL_MAX_CHILD_IN_ROOM')) {
+                            $this->errors[] = sprintf(Tools::displayError('Maximum number of children cannot be greater than max childern allowed in the room of this room type (Max: %s)'), Configuration::get('WK_GLOBAL_MAX_CHILD_IN_ROOM'));
+                        }
                     }
                     if (!$maxGuests || !Validate::isUnsignedInt($maxGuests)) {
                         $this->errors[] = Tools::displayError('Invalid maximum number of guests');
@@ -3670,6 +3691,7 @@ class AdminProductsControllerCore extends AdminController
     public function processAdditionalFacilities()
     {
         if ($idProduct = Tools::getValue('id_product')) {
+            $errors = array();
             $objRoomTypeDemand = new HotelRoomTypeDemand();
             $objRoomTypeDemandPrice = new HotelRoomTypeDemandPrice();
             // first delete all the previously saved prices and demands of this room type
@@ -3697,7 +3719,7 @@ class AdminProductsControllerCore extends AdminController
                                 $objRoomTypeDemandPrice->save();
                             }
                         } else {
-                            $this->errors[] = Tools::displayError('Invalid demand price of facility.').
+                            $errors[] = Tools::displayError('Invalid demand price of facility.').
                             ' : '.$objGlobalDemand->name[$this->context->language->id];
                         }
                         if ($advOptions = $objAdvOption->getGlobalDemandAdvanceOptions($idGlobalDemand)) {
@@ -3714,15 +3736,16 @@ class AdminProductsControllerCore extends AdminController
                                             $objRoomTypeDemandPrice->save();
                                         }
                                     } else {
-                                        $this->errors[] = Tools::displayError('Invalid price of advanced option: ').$objAdvOption->name[$this->context->language->id];
+                                        $errors[] = Tools::displayError('Invalid price of advanced option: ').$objAdvOption->name[$this->context->language->id];
                                     }
                                 }
                             }
                         }
                     }
                 }
-                if (count($this->errors)) {
-                    $this->warnings[] = Tools::displayError('Invalid price values are not saved. Please correct them and save again.');
+                if (count($errors)) {
+                    $this->warnings[] = Tools::displayError('Invalid price values for additional facilities were not saved. Please correct them and try again.');
+                    $this->errors = array_merge($this->errors, $errors);
                 }
 
                 $objCartBookingData = new HotelCartBookingData();

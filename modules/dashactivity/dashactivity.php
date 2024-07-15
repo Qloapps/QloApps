@@ -87,10 +87,13 @@ class Dashactivity extends Module
     public function hookDashboardZoneOne($params)
     {
         $this->context->smarty->assign($this->getConfigFieldsValues());
+        $date_from =  $this->context->employee->stats_date_from;
+        $date_to = $this->context->employee->stats_date_to;
         $this->context->smarty->assign(
             array(
                 'dashactivity_config_form' => $this->renderConfigForm(),
-                'link' => $this->context->link
+                'link' => $this->context->link,
+                'new_customer_filter_link' => $this->context->link->getAdminLink('AdminCustomers').'&customerFilter_date_add[]='.$date_from.'&customerFilter_date_add[]='.$date_to
             )
         );
 
@@ -266,6 +269,7 @@ class Dashactivity extends Module
 			SELECT COUNT(*)
 			FROM `'._DB_PREFIX_.'customer`
 			WHERE `date_add` BETWEEN "'.pSQL($params['date_from']).'" AND "'.pSQL($params['date_to']).'"
+            AND `deleted` = 0
 			'.Shop::addSqlRestriction(Shop::SHARE_ORDER)
         );
 
