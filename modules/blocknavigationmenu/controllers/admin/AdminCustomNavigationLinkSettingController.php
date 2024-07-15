@@ -217,6 +217,10 @@ class AdminCustomNavigationLinkSettingController extends ModuleAdminController
         }
 
         if ($cmsCategories = CMSCategory::getCategories($this->context->language->id, false, false)) {
+            if (!isset($smartyVars['id_cms_category'])) {
+                $smartyVars['id_cms_category'] = $cmsCategories[0]['id_cms_category'];
+            }
+
             foreach ($cmsCategories as $cmsCatKey => $cmsCategory) {
                 if (!isset($categoryWiseCmsPages[$cmsCategory['id_cms_category']])) {
                     unset($cmsCategories[$cmsCatKey]);

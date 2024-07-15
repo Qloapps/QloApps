@@ -18,7 +18,6 @@
 */
 
 $(document).ready(function() {
-	displayCategoryWiseCmsPages();
 	$("input[name='is_cms_block_link").on('change', function () {
 		if (parseInt($(this).val())) {
 			$("#cms_block_content").removeClass('hidden');
@@ -40,7 +39,9 @@ $(document).ready(function() {
 	});
 
 	$(document).on('change', '#id_cms_category', function(){
-		displayCategoryWiseCmsPages();
+		var id_cat = parseInt($('#id_cms_category').val());
+		$('.cms_pages_table').hide();
+		$('#cms_pages_table_'+id_cat).show();
 	});
 });
 
@@ -50,14 +51,4 @@ function showNavigationLinkLangField(lang_iso_code, id_lang)
 
 	$('.navigation_link_name_all').hide();
 	$('#navigation_link_name_'+id_lang).show();
-}
-
-function displayCategoryWiseCmsPages()
-{
-	var selectedCategory = parseInt($('#id_cms_category').val());
-	$(document).find('.cms_pages').each(function(){
-		$(this).hide();
-	});
-
-	$('#cms_pages_'+selectedCategory).show();
 }

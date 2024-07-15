@@ -81,7 +81,7 @@
 						</label>
 						{foreach $categoryWiseCmsPages as $idCMSCategory => $cmsPages}
 							<div class="col-lg-9">
-								<table class="table table-bordered cms_pages" id="cms_pages_{$idCMSCategory}" style="width:40%;">
+								<table class="table table-bordered cms_pages_table" id="cms_pages_table_{$idCMSCategory}" style="width:40%; {if isset($smarty.post.id_cms_category) && $smarty.post.id_cms_category != $idCMSCategory}display:none;{else if isset($id_cms_category) && ($id_cms_category != $idCMSCategory)}display:none;{/if}">
 									<thead>
 										<tr>
 											<th class="fixed-width-xs">
