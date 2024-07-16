@@ -2818,9 +2818,7 @@ class AdminNormalProductsControllerCore extends AdminController
         }
 
         // let's calculate this once for all
-        if (!Validate::isLoadedObject($this->object) && Validate::isUnsignedId(Tools::getValue('id_product'))) {
-            $this->errors[] = 'Unable to load object';
-        } else {
+        if ($this->loadObject(true)) {
             $this->_displayDraftWarning($this->object->active);
 
             // if there was an error while saving, we don't want to lose posted data
