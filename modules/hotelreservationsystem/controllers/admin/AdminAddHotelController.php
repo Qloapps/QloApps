@@ -778,6 +778,7 @@ class AdminAddHotelController extends ModuleAdminController
                 'sortRowsUrl' => $this->context->link->getAdminLink('AdminAddHotel'),
                 'primaryHotelId' => Configuration::get('WK_PRIMARY_HOTEL'),
                 'disableHotelMsg' => $this->l('Primary hotel for website will be updated to first available active hotel.', null, true),
+                'PS_STORES_ICON' => $this->context->link->getMediaLink(_PS_IMG_.Configuration::get('PS_STORES_ICON')),
             )
         );
         // GOOGLE MAP

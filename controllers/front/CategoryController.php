@@ -59,7 +59,11 @@ class CategoryControllerCore extends FrontController
 
         $this->addCSS(_THEME_CSS_DIR_.'occupancy.css');
         $this->addJS(_THEME_JS_DIR_.'occupancy.js');
-
+        Media::addJsDef(
+            array(
+                'PS_STORES_ICON' => $this->context->link->getMediaLink(_PS_IMG_.Configuration::get('PS_STORES_ICON')),
+            )
+        );
         $scenes = Scene::getScenes($this->category->id, $this->context->language->id, true, false);
         if ($scenes && count($scenes)) {
             $this->addJS(_THEME_JS_DIR_.'scenes.js');
