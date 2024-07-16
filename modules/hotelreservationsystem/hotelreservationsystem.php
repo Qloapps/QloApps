@@ -310,6 +310,7 @@ class HotelReservationSystem extends Module
                             'map_input_text' => $objHotel->map_input_text,
                         ),
                         'hotel_name' => $objHotel->hotel_name,
+                        'PS_STORES_ICON' => $this->context->link->getMediaLink(_PS_IMG_.Configuration::get('PS_STORES_ICON')),
                     ));
 
                     $this->context->controller->addJS(
