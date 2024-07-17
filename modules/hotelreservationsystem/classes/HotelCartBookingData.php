@@ -1574,21 +1574,13 @@ class HotelCartBookingData extends ObjectModel
                                         $data_v['id_room'],
                                         0
                                     );
-                                    $totalPriceWithoutDiscount = HotelRoomType::getRoomTypeTotalPriceForDateRange(
-                                        $product['id_product'],
-                                        $data_v['date_from'],
-                                        $data_v['date_to'],
-                                        $context->cart->id,
-                                        $context->cart->id_guest
-                                    );
+                                    $totalPriceWithoutDiscount = $objProduct->getPriceWithoutReduct(!$price_tax, false, 6, 1) * $numDays;
                                     if (!$price_tax) {
                                         $amount = $roomTypeDateRangePrice['total_price_tax_excl'];
                                         $amountWithoutAutoAdd = $roomTypeDateRangePriceWithoutAutoAdd['total_price_tax_excl'];
-                                        $totalPriceWithoutDiscount  = $totalPriceWithoutDiscount['total_price_tax_excl'];
                                     } else {
                                         $amount = $roomTypeDateRangePrice['total_price_tax_incl'];
                                         $amountWithoutAutoAdd = $roomTypeDateRangePriceWithoutAutoAdd['total_price_tax_incl'];
-                                        $totalPriceWithoutDiscount  = $totalPriceWithoutDiscount['total_price_tax_incl'];
                                     }
                                     $cartHotelData[$prodKey]['date_diff'][$dateJoin]['amount'] = $amount * $varQty;
                                     $cartHotelData[$prodKey]['date_diff'][$dateJoin]['total_price_without_discount'] = $totalPriceWithoutDiscount * $varQty;
@@ -1631,21 +1623,13 @@ class HotelCartBookingData extends ObjectModel
                                         $data_v['id_room'],
                                         0
                                     );
-                                    $totalPriceWithoutDiscount = HotelRoomType::getRoomTypeTotalPriceForDateRange(
-                                        $product['id_product'],
-                                        $data_v['date_from'],
-                                        $data_v['date_to'],
-                                        $context->cart->id,
-                                        $context->cart->id_guest
-                                    );
+                                    $totalPriceWithoutDiscount = $objProduct->getPriceWithoutReduct(!$price_tax, false, 6, 1) * $numDays;
                                     if (!$price_tax) {
                                         $amount = $roomTypeDateRangePrice['total_price_tax_excl'];
                                         $amountWithoutAutoAdd = $roomTypeDateRangePriceWithoutAutoAdd['total_price_tax_excl'];
-                                        $totalPriceWithoutDiscount  = $totalPriceWithoutDiscount['total_price_tax_excl'];
                                     } else {
                                         $amount = $roomTypeDateRangePrice['total_price_tax_incl'];
                                         $amountWithoutAutoAdd = $roomTypeDateRangePriceWithoutAutoAdd['total_price_tax_incl'];
-                                        $totalPriceWithoutDiscount  = $totalPriceWithoutDiscount['total_price_tax_incl'];
                                     }
                                     $cartHotelData[$prodKey]['date_diff'][$dateJoin]['amount'] = $amount;
                                     $cartHotelData[$prodKey]['date_diff'][$dateJoin]['amount_without_auto_add'] = $amountWithoutAutoAdd;
