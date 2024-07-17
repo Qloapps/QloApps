@@ -107,6 +107,11 @@ class HotelRoomType extends ObjectModel
         $objHotelRoomType->id_hotel = $idHotelNew;
         $objHotelRoomType->adults = $roomType['adults'];
         $objHotelRoomType->children = $roomType['children'];
+        $objHotelRoomType->max_adults = $roomType['max_adults'];
+        $objHotelRoomType->max_children = $roomType['max_children'];
+        $objHotelRoomType->max_guests = $roomType['max_guests'];
+        $objHotelRoomType->min_los = $roomType['min_los'];
+        $objHotelRoomType->max_los = $roomType['max_los'];
         if ($objHotelRoomType->save()) {
             $objHotelRoomType->updateCategories();
             return $returnId ? $objHotelRoomType->id : true;

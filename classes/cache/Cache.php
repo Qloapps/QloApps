@@ -502,7 +502,7 @@ abstract class CacheCore
             $this->_deleteMulti($invalidKeys);
 
             if ($keyToKeep) {
-                $this->sql_tables_cached[$table][$keyToKeep] = $toKeep ?? null;
+                $this->sql_tables_cached[$table][$keyToKeep] = isset($toKeep) ? $toKeep : null;
             }
         }
         $this->adjustTableCacheSize = false;
