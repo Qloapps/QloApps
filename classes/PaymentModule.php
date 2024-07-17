@@ -33,6 +33,7 @@ abstract class PaymentModuleCore extends Module
     public $currencies = true;
     public $currencies_mode = 'checkbox';
     public $payment_type = OrderPayment::PAYMENT_TYPE_REMOTE_PAYMENT;
+    public $validateOrderAmount = true;
 
     public function install()
     {
@@ -162,7 +163,7 @@ abstract class PaymentModuleCore extends Module
      */
     public function validateOrder($id_cart, $id_order_state, $amount_paid, $payment_method = 'Unknown',
         $message = null, $extra_vars = array(), $currency_special = null, $dont_touch_amount = false,
-        $secure_key = false, Shop $shop = null)
+        $secure_key = false, Shop $shop = null, $send_mails = true)
     {
         if (self::DEBUG_MODE) {
             PrestaShopLogger::addLog('PaymentModule::validateOrder - Function called', 1, null, 'Cart', (int)$id_cart, true);
@@ -418,9 +419,7 @@ abstract class PaymentModuleCore extends Module
                     // If webservice order request then no need to impose equal amounts(total cart and sent amount) condition
                     if ($order_status->logable
                         && number_format($cart_total_paid, _PS_PRICE_COMPUTE_PRECISION_) != number_format($amount_paid, _PS_PRICE_COMPUTE_PRECISION_)
-                        && $this->name != 'wsorder'
-                        && $this->name != 'bo_order'
-                        && $this->name != 'csvorder'
+                        && ($this->validateOrderAmount)
                     ) {
                         // if customer is paying full payment amount
                         $id_order_state = Configuration::get('PS_OS_ERROR');
@@ -685,16 +684,15 @@ abstract class PaymentModuleCore extends Module
                             if ($voucher->add()) {
                                 // If the voucher has conditions, they are now copied to the new voucher
                                 CartRule::copyConditions($cart_rule['obj']->id, $voucher->id);
-
-                                $params = array(
-                                    '{voucher_amount}' => Tools::displayPrice($voucher->reduction_amount, $this->context->currency, false),
-                                    '{voucher_num}' => $voucher->code,
-                                    '{firstname}' => $this->context->customer->firstname,
-                                    '{lastname}' => $this->context->customer->lastname,
-                                    '{id_order}' => $order->reference,
-                                    '{order_name}' => $order->getUniqReference()
-                                );
-                                if ($this->name != 'csvorder') {
+                                if ($send_mails) {
+                                    $params = array(
+                                        '{voucher_amount}' => Tools::displayPrice($voucher->reduction_amount, $this->context->currency, false),
+                                        '{voucher_num}' => $voucher->code,
+                                        '{firstname}' => $this->context->customer->firstname,
+                                        '{lastname}' => $this->context->customer->lastname,
+                                        '{id_order}' => $order->reference,
+                                        '{order_name}' => $order->getUniqReference()
+                                    );
                                     Mail::Send(
                                         (int)$order->id_lang,
                                         'voucher',
@@ -1053,10 +1051,12 @@ abstract class PaymentModuleCore extends Module
                     // Set the order status
                     $new_history = new OrderHistory();
                     $new_history->id_order = (int)$order->id;
-
                     $new_history->changeIdOrderState((int)$id_order_state, $order, true);
-
-                    $new_history->addWithemail(true, $extra_vars);
+                    if ($send_mails) {
+                        $new_history->addWithemail(true, $extra_vars);
+                    } else {
+                        $new_history->add(true);
+                    }
 
                     // Switch to back order if needed
                     $objHotelBookingDetail = new HotelBookingDetail();
@@ -1092,7 +1092,11 @@ abstract class PaymentModuleCore extends Module
                         $history = new OrderHistory();
                         $history->id_order = (int)$order->id;
                         $history->changeIdOrderState($id_order_state, $order, true);
-                        $history->addWithemail();
+                        if ($send_mails) {
+                            $history->addWithemail();
+                        } else {
+                            $history->add();
+                        }
                     }
 
                     unset($order_detail);
@@ -1101,7 +1105,11 @@ abstract class PaymentModuleCore extends Module
                     $order = new Order((int)$order->id);
 
                     // Send an e-mail to customer (one order = one email)
-                    if ($id_order_state != Configuration::get('PS_OS_ERROR') && $id_order_state != Configuration::get('PS_OS_CANCELED') && $this->context->customer->id && $this->name != 'csvorder') {
+                    if ($id_order_state != Configuration::get('PS_OS_ERROR')
+                        && $id_order_state != Configuration::get('PS_OS_CANCELED')
+                        && $this->context->customer->id
+                        && $send_mails
+                    ) {
                         $invoice = new Address($order->id_address_invoice);
                         $delivery = new Address($order->id_address_delivery);
                         $delivery_state = $delivery->id_state ? new State($delivery->id_state) : false;
@@ -1330,9 +1338,7 @@ abstract class PaymentModuleCore extends Module
                                 }
                             }
                         }
-                        if ($idHotel
-                            && Validate::isLoadedObject($objHotel = new HotelBranchInformation($idHotel))
-                        ) {
+                        if ($idHotel && Validate::isLoadedObject($objHotel = new HotelBranchInformation($idHotel))) {
                             if (Configuration::get('PS_ORDER_CONF_MAIL_TO_HOTEL_MANAGER')){
                                 // If order currenct state is overbooking, the send overbooking email or send order confirmation email
                                 if ($isOverBookingStatus) {
