@@ -1213,9 +1213,14 @@ Quick View Styles
     margin-bottom: 10px;}
 
 .hotel_name_block {
+display: flex;
+margin-bottom: 10px;
+}
+.hotel_name_block h1 {
   font-size: 22px;
   color: #000000;
-  margin-bottom: 8px;}
+  margin: 0;
+}
 .room_hotel_name_block
 {
   padding-bottom: 12px;}
@@ -1718,14 +1723,13 @@ ul.service-product-nav > li:hover {
 
 #room_info_hotel_images .skeleton-loading-wrap .loading-container-box {
   height: 200px; }
-  .hotel_name_block > span {
-    display: flex;
-  }
   #hotel_rating {
-    font-size: 12px;
     display: inline-flex;
     color: #3e3d3d;
-    float: inline-end;
-    padding-top: 4px;
-    padding-left: 4px;
+    font-size: 12px;
+    margin-left: 10px;
+    margin-top: 7px;
+  }
+  #hotel_rating .icon-star {
+    margin-right: 1px;
   }

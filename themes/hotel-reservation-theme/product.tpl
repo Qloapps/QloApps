@@ -68,11 +68,11 @@
 				<div class="room_type_img_containter card">
 					<div class="room_hotel_name_block">
 						<div class="hotel_name_block">
-							<span>{$product->name}
+							<h1>{$product->name}
 								{* Block for booking products *}
 								{if isset($id_hotel) && $id_hotel}&nbsp;-&nbsp;{$hotel_name}{/if}
-								{if isset($hotel_rating) && $hotel_rating}<span id="hotel_rating">{for $i=0; $i < $hotel_rating; $i++}<i class="icon-star"></i>{/for}</span>{/if}
-							</span>
+							</h1>
+							{if isset($hotel_rating) && $hotel_rating}<div id="hotel_rating">{for $i=0; $i < $hotel_rating; $i++}<i class="icon-star"></i>{/for}</div>{/if}
 							{hook h='displayRoomTypeDetailRoomTypeNameBlock' id_product=$product->id}
 						</div>
 						{hook h='displayRoomTypeDetailRoomTypeNameAfter' id_product=$product->id}
