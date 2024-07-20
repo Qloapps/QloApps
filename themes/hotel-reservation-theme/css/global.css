@@ -7739,7 +7739,10 @@ a.price_discount_delete {
   #order-detail-content #cart_summary tfoot tr .text-right, #order-detail-content #cart_summary tfoot tr tbody td.cart_unit, #order-detail-content #cart_summary tbody tfoot tr td.cart_unit, #order-detail-content #cart_summary tfoot tr tbody td.cart_total, #order-detail-content #cart_summary tbody tfoot tr td.cart_total, #order-detail-content #cart_summary tfoot tr .price {
     display: block;
     float: left;
-    width: 50%; } }
+    width: 50%; }
+    .margin-btm-sm-10 {
+      margin-bottom: 10px
+    } }
 @media (max-width: 768px) {
   #order-detail-content #cart_summary tbody td .price {
     text-align: center; }
