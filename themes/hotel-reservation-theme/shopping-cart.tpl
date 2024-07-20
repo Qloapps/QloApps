@@ -146,14 +146,12 @@
 							<div class="row room_price_detail_block">
 								<div class="col-sm-7 margin-btm-sm-10">
 									{if $rm_v['amount'] && isset($rm_v['total_price_without_discount']) && $rm_v['total_price_without_discount'] > $rm_v['amount']}
-										<div>
-											<span class="room_type_old_price">
+										<span class="room_type_old_price">
 											{displayPrice price=$rm_v['total_price_without_discount']|floatval}
-											</span>
-										</div>
+										</span>
 									{/if}
 									<div class="row">
-										<div class="col-xs-6">
+										<div class="{if (isset($data_v['extra_demands']) && $data_v['extra_demands']) || (isset($data_v['service_products']) && $data_v['service_products'])}col-xs-6{else}col-xs-12{/if}">
 											<div class="price_block">
 												<p class="total_price">
 													<span>

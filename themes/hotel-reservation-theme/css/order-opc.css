@@ -167,7 +167,8 @@
 }
 #order-opc .room_type_old_price {
 	text-decoration: line-through;
-	color:#979797;
+	color:#FF4B4B;
+	display: block;
 	font-size:12px;
 }
 #order-opc .block-small-header {
@@ -447,9 +448,6 @@
 @media (max-width: 767px) {
 	.room_price_detail_block .price_block, .room_type_old_price{
 		padding-left: 15px;
-	}
-	.order-detail-content .room_price_detail_block .plus-sign, .order-detail-content .product_price_detail_block .plus-sign {
-		display: none;
 	}
 	#order-opc .cart_voucher_detail_block .submit_discount_div {
 		margin-top: 10px;
