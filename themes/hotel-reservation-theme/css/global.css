@@ -7224,7 +7224,9 @@ div.star a:hover {
   background: none repeat scroll 0 0 lightyellow; }
 
 #page .rte {
-  background: transparent none repeat scroll 0 0; }
+  background: transparent none repeat scroll 0 0;
+  color : #333;
+}
   #page .rte em {
     font-style: italic !important; }
 
@@ -7529,9 +7531,6 @@ div.star a:hover {
 #tinymce ol,
 #tinymce dl {
   margin-left: 20px; }
-.rte {
-  color : #3C3C3C;
-}
 .rte ul {
   list-style-type: disc;
   padding-left: 15px; }
