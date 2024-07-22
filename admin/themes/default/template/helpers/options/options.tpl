@@ -138,6 +138,9 @@
 												</select>
 											{elseif isset($input.empty_message)}
 												{$input.empty_message}
+											{else}
+												<select class="form-control fixed-width-xxl {if isset($field['class'])}{$field['class']}{/if}" name="{$key}"{if isset($field['js'])} onchange="{$field['js']}"{/if} id="{$key}" {if isset($field['size'])} size="{$field['size']}"{/if}>
+												</select>
 											{/if}
 										</div>
 									{elseif $field['type'] == 'bool'}

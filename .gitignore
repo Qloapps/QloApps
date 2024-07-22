@@ -53,6 +53,7 @@ composer.lock
 
 img/**
 !/img/404.gif
+!/img/.htaccess
 !/img/admin/
 !/img/admin/*.gif
 !/img/admin/*.png
