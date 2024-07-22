@@ -707,6 +707,15 @@ class AdminStatusesControllerCore extends AdminController
         $theme = new Theme($this->context->shop->id_theme);
         $default_path = '../mails/';
         $theme_path = '../themes/'.$theme->directory.'/mails/'; // Mail templates can also be found in the theme folder
+        $templatesToIgnore = array(
+            'footer.html',
+            'header.html',
+            'shipped.html',
+            'in_transit.html',
+            'download_products.html',
+            'header_order_conf.html',
+            'test.html'
+        );
 
         $array = array();
         foreach (Language::getLanguages(false) as $language) {
@@ -722,7 +731,9 @@ class AdminStatusesControllerCore extends AdminController
             // We merge all available emails in one array
             $templates = array_unique(array_merge(scandir(_PS_ADMIN_DIR_.'/'.$default_path.$iso_code), $theme_templates));
             foreach ($templates as $key => $template) {
-                if (!strncmp(strrev($template), 'lmth.', 5)) {
+                if (!strncmp(strrev($template), 'lmth.', 5)
+                    && !in_array($template, $templatesToIgnore)
+                ) {
                     $search_result = array_search($template, $theme_templates);
                     $array[$iso_code][] = array(
                                 'id' => substr($template, 0, -5),
