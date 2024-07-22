@@ -614,7 +614,9 @@ class GuestTrackingControllerCore extends FrontController
                     if ($idHotel = HotelBookingDetail::getIdHotelByIdOrder($objOrder->id)) {
                         $objHotelBranchInformation = new HotelBranchInformation($idHotel, $this->context->language->id);
                         if (Validate::isLoadedObject($objHotelBranchInformation)) {
-                            if ($apiKey = Configuration::get('PS_API_KEY')) {
+                            if (($apiKey = Configuration::get('PS_API_KEY'))
+                                && Configuration::get('WK_GOOGLE_ACTIVE_MAP')
+                            ) {
                                 if (floatval($objHotelBranchInformation->latitude) != 0
                                     && floatval($objHotelBranchInformation->longitude) != 0
                                 ) {
