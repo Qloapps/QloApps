@@ -18,14 +18,14 @@
 *  @license   https://store.webkul.com/license.html
 */
 
-class WebserviceOrderCore extends PaymentModule
+class BoOrder extends PaymentModule
 {
     public $active = 1;
-    public $name = 'wsorder';
+    public $name = 'bo_order';
 
     public function __construct()
     {
-        $this->displayName = $this->l('Order from API');
+        $this->displayName = $this->l('Back office order');
         $this->validateOrderAmount = false;
     }
 }
