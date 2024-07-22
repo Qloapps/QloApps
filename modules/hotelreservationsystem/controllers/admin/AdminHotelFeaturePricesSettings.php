@@ -182,6 +182,7 @@ class AdminHotelFeaturePricesSettingsController extends ModuleAdminController
                 $objFeaturePricing->id_product,
                 $objFeaturePricing->date_from,
                 $objFeaturePricing->date_to,
+                $objFeaturePricing->getGroups($objFeaturePricing->id),
                 $objFeaturePricing->id,
                 $objFeaturePricing->is_special_days_exists,
                 $objFeaturePricing->special_days
@@ -283,6 +284,7 @@ class AdminHotelFeaturePricesSettingsController extends ModuleAdminController
         $roomTypeId,
         $dateFrom,
         $dateTo,
+        $group,
         $idFeaturePrice,
         $isSpecialDaysExists = false,
         $jsonSpecialDays = "false"
@@ -293,6 +295,7 @@ class AdminHotelFeaturePricesSettingsController extends ModuleAdminController
                 $roomTypeId,
                 $dateFrom,
                 $dateTo,
+                $group,
                 'specific_date',
                 false,
                 $idFeaturePrice
@@ -302,6 +305,7 @@ class AdminHotelFeaturePricesSettingsController extends ModuleAdminController
                 $roomTypeId,
                 $dateFrom,
                 $dateTo,
+                $group,
                 'special_day',
                 $jsonSpecialDays,
                 $idFeaturePrice
@@ -311,6 +315,7 @@ class AdminHotelFeaturePricesSettingsController extends ModuleAdminController
                 $roomTypeId,
                 $dateFrom,
                 $dateTo,
+                $group,
                 'date_range',
                 false,
                 $idFeaturePrice
@@ -335,6 +340,7 @@ class AdminHotelFeaturePricesSettingsController extends ModuleAdminController
         $impactValue = Tools::getValue('impact_value');
         $dateSelectionType = Tools::getValue('date_selection_type');
         $specificDate = date('Y-m-d', strtotime(Tools::getValue('specific_date')));
+        $groups = Tools::getValue('groupBox');
         $jsonSpecialDays = json_encode($specialDays);
         $defaultLangId = Configuration::get('PS_LANG_DEFAULT');
 
@@ -361,6 +367,7 @@ class AdminHotelFeaturePricesSettingsController extends ModuleAdminController
                 $roomTypeId,
                 $dateFrom,
                 $dateTo,
+                $groups,
                 $idFeaturePrice,
                 $isSpecialDaysExists,
                 $jsonSpecialDays
@@ -435,7 +442,7 @@ class AdminHotelFeaturePricesSettingsController extends ModuleAdminController
                 }
             }
 
-            if (!(bool)Tools::getValue('groupBox')) {
+            if (!(bool)$groups) {
                 $this->errors[] = $this->l('Please select at least one group for the group access');
             }
 
@@ -467,7 +474,7 @@ class AdminHotelFeaturePricesSettingsController extends ModuleAdminController
                 $objFeaturePricing->active = $enableFeaturePrice;
 
                 // set the values of the groups for this feature price
-                $objFeaturePricing->groupBox = Tools::getValue('groupBox');
+                $objFeaturePricing->groupBox = $groups;
 
                 if ($objFeaturePricing->save()) {
                     if (Tools::isSubmit('submitAdd'.$this->table.'AndStay')) {

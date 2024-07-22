@@ -392,11 +392,11 @@
     margin-bottom: 10px;
 }
 
-.add-order-message form #submitMessage {
+#order_detail_container #submitMessage {
     padding: 6px 20px;
 }
 
-.add-order-message form #submitMessage span {
+#order_detail_container #submitMessage span {
     font-size: 14px;
     font-weight: bold;
 }
@@ -529,20 +529,20 @@
     border-radius: 4px;
 }
 
-.button.button-medium {
+#order_detail_container .button.button-medium {
     padding: 8px 15px;
     background-color: #379bf0;
     background-image: none;
     border-radius: 2px;
 }
 
-.button.button-medium span {
+#order_detail_container .button.button-medium span {
     padding: 0;
 }
 
-.button.button-medium:hover,
-.button.button-medium:focus,
-.button.button-medium:active {
+#order_detail_container .button.button-medium:hover,
+#order_detail_container .button.button-medium:focus,
+#order_detail_container .button.button-medium:active {
     opacity: 0.8;
 }
 
