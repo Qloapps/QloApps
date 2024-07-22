@@ -573,20 +573,20 @@ class AdminStatsControllerCore extends AdminStatsTabController
     {
         $sql = 'SELECT p.`id_product`,
         (
-            SELECT IFNULL(SUM(ROUND((DATEDIFF(LEAST(hbd.`date_to`, "'.pSQL($dateTo).'"), GREATEST(hbd.`date_from`, "'.pSQL($dateFrom).'")) / DATEDIFF(hbd.`date_to`, hbd.`date_from`)) * hbd.`total_price_tax_excl`, 2)), 0)
+            SELECT count(hbd.`id_product`)
             FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
             LEFT JOIN `'._DB_PREFIX_.'orders` o
             ON (o.`id_order` = hbd.`id_order`)
             WHERE hbd.`id_product` = p.`id_product` AND o.`valid` = 1
             AND hbd.`date_to` > "'.pSQL($dateFrom).'" AND hbd.`date_from` < "'.pSQL($dateTo).'"
-        ) AS totalRevenue
-        FROM `'._DB_PREFIX_.'product` p
+        ) as total_booked FROM `'._DB_PREFIX_.'product` p
         INNER JOIN `'._DB_PREFIX_.'htl_room_type` hrt
         ON (hrt.`id_product` = p.`id_product`)
-        WHERE p.`active` = 1 AND p.`booking_product` = 1'.
+        WHERE p.`active` = 1 AND p.`booking_product` = 1 '.
         (!is_null($idHotel) ? HotelBranchInformation::addHotelRestriction($idHotel, 'hrt') : '').'
-        HAVING totalRevenue > 0
-        ORDER BY totalRevenue DESC';
+        GROUP By p.`id_product`
+        HAVING total_booked > 0
+        ORDER BY total_booked DESC';
 
         return Db::getInstance()->getValue($sql);
     }
@@ -856,20 +856,36 @@ class AdminStatsControllerCore extends AdminStatsTabController
                 break;
 
             case 'occupied_rooms':
-                $value = AdminStatsController::getOccupiedRooms(0);
+                $value = AdminStatsController::getDistinctRoomBookingsCount(
+                    date('Y-m-d', strtotime('-1 day')),
+                    date('Y-m-d'),
+                    0,
+                    HotelBookingDetail::STATUS_CHECKED_IN
+                );
 
                 break;
 
             case 'vacant_rooms':
-                $totalAvailableRooms = AdminStatsController::getAvailableRoomsForDiscreteDates(date('Y-m-d'), null, 0);
-                $totalAvailableRooms = $totalAvailableRooms[strtotime(date('Y-m-d'))];
-                $totalOccupiedRooms = AdminStatsController::getOccupiedRooms(0);
-                $value = $totalAvailableRooms - $totalOccupiedRooms;
+                $totalUnAvailRooms = AdminStatsController::getDisabledRoomsForDiscreteDates(date('Y-m-d'), null, 0);
+                $totalUnAvailRooms = $totalUnAvailRooms[strtotime(date('Y-m-d'))];
+                $totalRooms = AdminStatsController::getTotalRooms(0);
+                $totalOccupiedRooms = AdminStatsController::getDistinctRoomBookingsCount(
+                    date('Y-m-d', strtotime('-1 day')),
+                    date('Y-m-d'),
+                    0,
+                    HotelBookingDetail::STATUS_CHECKED_IN
+                );
+                $value = $totalRooms - ($totalUnAvailRooms + $totalOccupiedRooms);
 
                 break;
 
             case 'booked_rooms':
-                $value = AdminStatsController::getBookedRooms(0);
+                $value = AdminStatsController::getDistinctRoomBookingsCount(
+                    date('Y-m-d'),
+                    date('Y-m-d', strtotime('+1 day')),
+                    0,
+                    HotelBookingDetail::STATUS_ALLOTED
+                );
 
                 break;
 
@@ -965,6 +981,12 @@ class AdminStatsControllerCore extends AdminStatsTabController
             case 'average_lead_time':
                 $dateToday = date('Y-m-d');
                 $value = Tools::ps_round(AdminStatsController::getAverageLeadTime(), 2);
+                if ($value && $value <= 1) {
+                    $value .= ' '.$this->l('day');
+                } else {
+                    $value .= ' '.$this->l('days');
+                }
+
                 break;
             case 'average_guest_in_booking':
                 $dateToday = date('Y-m-d');
@@ -1103,13 +1125,14 @@ class AdminStatsControllerCore extends AdminStatsTabController
         );
     }
 
-    public static function getTotalRooms($idHotel = null)
+    public static function getTotalRooms($idHotel = null, $active = null)
     {
         $sql = 'SELECT COUNT(hri.`id`)
         FROM `'._DB_PREFIX_.'htl_room_information` hri
         INNER JOIN `'._DB_PREFIX_.'product` p
         ON (p.`id_product` = hri.`id_product`)
         WHERE p.`booking_product` = 1 '.
+        (!is_null($active) ? ' AND p.`active` ='.(int) $active : ' ').
         (!is_null($idHotel) ? HotelBranchInformation::addHotelRestriction($idHotel, 'hri') : '');
 
         return Db::getInstance()->getValue($sql);
@@ -1123,16 +1146,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
 
         $occupancyData = array('count_total' => 0, 'count_occupied' => 0, 'count_available' => 0, 'count_unavailable' => 0);
 
-        $countTotal = Db::getInstance()->getValue(
-            'SELECT COUNT(hri.`id`)
-            FROM `'._DB_PREFIX_.'htl_room_information` hri
-            INNER JOIN `'._DB_PREFIX_.'htl_branch_info` hbi
-            ON (hbi.`id` = hri.`id_hotel`)
-            LEFT JOIN `'._DB_PREFIX_.'product` p
-            ON (p.`id_product` = hri.`id_product`)
-            WHERE p.`active` = 1'.
-            HotelBranchInformation::addHotelRestriction($idsHotel, 'hri')
-        );
+        $countTotal = self::getTotalRooms($idsHotel, true);
         $occupancyData['count_total'] = $countTotal;
 
         // Occupied rooms are booked rooms that are not refunded in the date range
@@ -1417,7 +1431,27 @@ class AdminStatsControllerCore extends AdminStatsTabController
         return $result;
     }
 
-    public static function getTotalOccupiedRooms($dateFrom, $dateTo, $idHotel = null)
+    public static function getDistinctRoomBookingsCount($dateFrom = false, $dateTo = false, $idHotel = null, $roomBookingStatus = null)
+    {
+        $sql = 'SELECT COUNT(DISTINCT hbd.`id_room`)
+        FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
+        LEFT JOIN `'._DB_PREFIX_.'htl_room_information` hri
+        ON (hri.`id` = hbd.`id_room`)
+        LEFT JOIN `'._DB_PREFIX_.'product` p
+        ON (p.`id_product` = hri.`id_product`)
+        WHERE p.`active` = 1
+        AND hbd.`is_refunded` = 0
+        AND hbd.`is_cancelled` = 0 '.
+        (($dateFrom && $dateTo) ? ' AND hbd.`date_from` <= "'.pSQL($dateTo).' 00:00:00" AND hbd.`date_to` > "'.pSQL($dateFrom).' 00:00:00" ': ' ').
+        (!is_null($roomBookingStatus) ? ' AND hbd.`id_status` = '.(int) $roomBookingStatus : ' ').
+        (!is_null($idHotel) ? HotelBranchInformation::addHotelRestriction($idHotel, 'hbd') : '');
+        $result = Db::getInstance()->getValue($sql);
+
+        return $result ? $result : 0;
+
+    }
+
+    public static function getTotalBookedRooms($dateFrom, $dateTo, $idHotel = null)
     {
         $sql = 'SELECT COUNT(hbd.`id_room`)
         FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
@@ -1795,46 +1829,6 @@ class AdminStatsControllerCore extends AdminStatsTabController
         return $result;
     }
 
-    /**
-     * Returns the number of rooms that have been checked-in.
-     */
-    public static function getOccupiedRooms($idHotel = null)
-    {
-        $sql = 'SELECT COUNT(DISTINCT hbd.`id_room`)
-        FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
-        LEFT JOIN `'._DB_PREFIX_.'htl_room_information` hri
-        ON (hri.`id` = hbd.`id_room`)
-        LEFT JOIN `'._DB_PREFIX_.'product` p
-        ON (p.`id_product` = hri.`id_product`)
-        WHERE p.`active` = 1
-        AND hbd.`is_refunded` = 0
-        AND hbd.`is_cancelled` = 0
-        AND hbd.`id_status` = '.(int) HotelBookingDetail::STATUS_CHECKED_IN.
-        (!is_null($idHotel) ? HotelBranchInformation::addHotelRestriction($idHotel, 'hbd') : '');
-        $result = Db::getInstance()->getValue($sql);
-
-        return $result;
-    }
-
-    /**
-     * Returns the number of rooms that have been booked but not checked-in yet.
-     */
-    public static function getBookedRooms($idHotel = null)
-    {
-        $dateToday = date('Y-m-d');
-
-        $sql = 'SELECT COUNT(DISTINCT hbd.`id_room`)
-        FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
-        WHERE hbd.`is_refunded` = 0
-        AND hbd.`is_cancelled` = 0
-        AND hbd.`id_status` = '.(int) HotelBookingDetail::STATUS_ALLOTED.'
-        AND hbd.`date_from` = "'.pSQL($dateToday).' 00:00:00"'.
-        (!is_null($idHotel) ? HotelBranchInformation::addHotelRestriction($idHotel, 'hbd') : '');
-        $result = Db::getInstance()->getValue($sql);
-
-        return $result;
-    }
-
     public static function getTotalFrequentCustomers($nbOrders = 5, $idHotel = null)
     {
         $sql = 'SELECT COUNT(t.`id_customer`)
@@ -1891,7 +1885,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
 
     public static function getTotalNewCustomers($nbDaysNewCustomers)
     {
-        $maxDateAdd = date('Y-m-d H:i:s', strtotime('-'.$nbDaysNewCustomers.' day'));
+        $maxDateAdd = date('Y-m-d', strtotime('-'.$nbDaysNewCustomers.' day'));
         $sql = 'SELECT COUNT(c.`id_customer`)
         FROM `'._DB_PREFIX_.'customer` c
         WHERE c.`date_add` >= "'.pSQL($maxDateAdd).'" AND c.`deleted` = 0';
@@ -1976,7 +1970,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
         $nightsBookedByDate = self::getRoomNightsData($dateFrom, $dateTo, $idHotel);
 
         $totalNightsBooked = array_sum($nightsBookedByDate);
-        $totalOccupiedRoom = self::getTotalOccupiedRooms($dateFrom, $dateTo, $idHotel);
+        $totalOccupiedRoom = self::getTotalBookedRooms($dateFrom, $dateTo, $idHotel);
 
         return $totalOccupiedRoom ? ($totalNightsBooked / $totalOccupiedRoom) : 0;
     }

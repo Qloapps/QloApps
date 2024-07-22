@@ -140,11 +140,31 @@ class WkRoomSearchHelper
                     if (!$dateTo = Tools::getValue('date_to')) {
                         $dateTo = date('Y-m-d', strtotime('+1 day', strtotime($dateFrom)));
                     }
-                    $smartyVars['date_from'] = $dateFrom;
-                    $smartyVars['date_to'] = $dateTo;
 
                     $idHotel = HotelBranchInformation::getHotelIdByIdCategory($idHotelCategory);
                     $htlCategoryInfo = $objHotelInfo->getCategoryDataByIdCategory((int) $objCategory->id_parent);
+                    $searchedData['htl_dtl'] = $objHotelInfo->hotelBranchesInfo(0, 1, 1, $idHotel);
+                    $preparationTime = (int) HotelOrderRestrictDate::getPreparationTime($idHotel);
+                    if ($preparationTime
+                        && strtotime('+ '.$preparationTime.' day') >= strtotime($dateFrom)
+                    ) {
+                        $dateFrom = date('Y-m-d', strtotime('+ '.$preparationTime.' day'));
+                        if (strtotime($dateFrom) >= strtotime($dateTo)) {
+                            $controller = Tools::getValue('controller');
+                            if ($controller == 'product'
+                                && ($idProduct = Tools::getValue('id_product'))
+                            ) {
+                                $objHotelRoomTypeRestrictionDateRange = new HotelRoomTypeRestrictionDateRange();
+                                $los = $objHotelRoomTypeRestrictionDateRange->getRoomTypeLengthOfStay($idProduct, $dateFrom);
+                                $dateTo = date('Y-m-d', strtotime('+'.$los['min_los'].' day', strtotime($dateFrom)));
+                            } else {
+                                $dateTo = date('Y-m-d', strtotime('+1 day', strtotime($dateFrom)));
+                            }
+                        }
+                    }
+
+                    $smartyVars['date_from'] = $dateFrom;
+                    $smartyVars['date_to'] = $dateTo;
 
                     $objBookingDetail = new HotelBookingDetail();
                     $searchedData['num_days'] = $objBookingDetail->getNumberOfDays($dateFrom, $dateTo);
@@ -152,7 +172,6 @@ class WkRoomSearchHelper
                     $searchedData['parent_data'] = $htlCategoryInfo;
                     $searchedData['date_from'] = $dateFrom;
                     $searchedData['date_to'] = $dateTo;
-                    $searchedData['htl_dtl'] = $objHotelInfo->hotelBranchesInfo(0, 1, 1, $idHotel);
 
                     if ($locationCategoryId) {
                         $objLocationCategory = new Category($locationCategoryId, $context->language->id);
