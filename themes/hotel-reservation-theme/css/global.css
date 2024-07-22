@@ -6746,10 +6746,9 @@ table.table_block td {
   .page-heading.product-listing {
     border-bottom: none;
     margin-bottom: 0; }
-.rte .page-heading {
-  color: #000;}
-  .page-subheading {
-  font-weight: 600;
+
+.page-subheading {
+  font-weight: 700;
   color: #3C3C3C;
 
   font-family: 'Oxygen', sans-serif;
