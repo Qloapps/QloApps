@@ -3816,10 +3816,6 @@ class CartCore extends ObjectModel
 
                 }
             }
-
-            if (((float)$cart_rule['value_real'] == 0 && (int)$cart_rule['free_shipping'] == 0)) {
-                unset($cart_rules[$key]);
-            }
         }
 
         $objHotelAdvancedPayment = new HotelAdvancedPayment();

@@ -1399,9 +1399,9 @@ abstract class PaymentModuleCore extends Module
 
                 foreach ($appliedCartRules as $idCartRule => $cartRule) {
                     $remaining_amount = 0;
-                    if (!$cartRule['tax'] && $cartRule['reduction_amount'] > $cartRule['used']['excl']) {
+                    if (!$cartRule['tax'] && $cartRule['used']['excl'] && $cartRule['reduction_amount'] > $cartRule['used']['excl']) {
                         $remaining_amount = $cartRule['reduction_amount'] - $cartRule['used']['excl'];
-                    } elseif ($cartRule['tax'] && $cartRule['reduction_amount'] > $cartRule['used']['incl']) {
+                    } elseif ($cartRule['tax'] && $cartRule['used']['incl'] && $cartRule['reduction_amount'] > $cartRule['used']['incl']) {
                         $remaining_amount = $cartRule['reduction_amount'] - $cartRule['used']['incl'];
                     }
 
