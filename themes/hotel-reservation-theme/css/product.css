@@ -1726,10 +1726,8 @@ ul.service-product-nav > li:hover {
   #hotel_rating {
     display: inline-flex;
     color: #3e3d3d;
+    gap: 1px;
     font-size: 12px;
     margin-left: 10px;
     margin-top: 8px;
-  }
-  #hotel_rating .icon-star {
-    margin-right: 1px;
   }
