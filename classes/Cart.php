@@ -262,25 +262,10 @@ class CartCore extends ObjectModel
             $to_update = true;
             $this->id_address_invoice = $id_address_new;
         }
-        if (!isset($this->id_address_delivery) || $this->id_address_delivery == $id_address) {
-            $to_update = true;
-            $this->id_address_delivery = $id_address_new;
-        }
         if ($to_update) {
             $this->update();
         }
 
-        $sql = 'UPDATE `'._DB_PREFIX_.'cart_product`
-		SET `id_address_delivery` = '.(int)$id_address_new.'
-		WHERE  `id_cart` = '.(int)$this->id.'
-			AND `id_address_delivery` = '.(int)$id_address;
-        Db::getInstance()->execute($sql);
-
-        $sql = 'UPDATE `'._DB_PREFIX_.'customization`
-			SET `id_address_delivery` = '.(int)$id_address_new.'
-			WHERE  `id_cart` = '.(int)$this->id.'
-				AND `id_address_delivery` = '.(int)$id_address;
-        Db::getInstance()->execute($sql);
     }
 
     public function delete()
@@ -1076,13 +1061,13 @@ class CartCore extends ObjectModel
         }
 
         if (Context::getContext()->customer->id) {
-            if ($id_address_delivery == 0 && (int)$this->id_address_delivery) { // The $id_address_delivery is null, use the cart delivery address
-                $id_address_delivery = $this->id_address_delivery;
-            } elseif ($id_address_delivery == 0) { // The $id_address_delivery is null, get the default customer address
-                $id_address_delivery = (int)Address::getFirstCustomerAddressId((int)Context::getContext()->customer->id);
-            } elseif (!Customer::customerHasAddress(Context::getContext()->customer->id, $id_address_delivery)) { // The $id_address_delivery must be linked with customer
-                $id_address_delivery = 0;
-            }
+            // if ($id_address_delivery == 0 && (int)$this->id_address_delivery) { // The $id_address_delivery is null, use the cart delivery address
+            //     $id_address_delivery = $this->id_address_delivery;
+            // } elseif ($id_address_delivery == 0) { // The $id_address_delivery is null, get the default customer address
+            //     $id_address_delivery = (int)Address::getFirstCustomerAddressId((int)Context::getContext()->customer->id);
+            // } elseif (!Customer::customerHasAddress(Context::getContext()->customer->id, $id_address_delivery)) { // The $id_address_delivery must be linked with customer
+            //     $id_address_delivery = 0;
+            // }
         }
 
         $quantity = (int)$quantity;
@@ -2518,6 +2503,8 @@ class CartCore extends ObjectModel
         $final_package_list = $hotelWisePackageList;
         // END $package_list hotel wise
         $cache[$cache_key] = $final_package_list;
+        // ddd($this);
+        // ddd($final_package_list);
         return $final_package_list;
     }
 
@@ -4108,9 +4095,9 @@ class CartCore extends ObjectModel
         $cart->id_shop = $this->id_shop;
         $cart->id_shop_group = $this->id_shop_group;
 
-        if (!Customer::customerHasAddress((int)$cart->id_customer, (int)$cart->id_address_delivery)) {
-            $cart->id_address_delivery = (int)Address::getFirstCustomerAddressId((int)$cart->id_customer);
-        }
+        // if (!Customer::customerHasAddress((int)$cart->id_customer, (int)$cart->id_address_delivery)) {
+        //     $cart->id_address_delivery = (int)Address::getFirstCustomerAddressId((int)$cart->id_customer);
+        // }
 
         if (!Customer::customerHasAddress((int)$cart->id_customer, (int)$cart->id_address_invoice)) {
             $cart->id_address_invoice = (int)Address::getFirstCustomerAddressId((int)$cart->id_customer);
@@ -4136,7 +4123,7 @@ class CartCore extends ObjectModel
         foreach ($products as $product) {
             if ($id_address_delivery) {
                 if (Customer::customerHasAddress((int)$cart->id_customer, $product['id_address_delivery'])) {
-                    $id_address_delivery = $product['id_address_delivery'];
+                    // $id_address_delivery = $product['id_address_delivery'];
                 }
             }
 
@@ -4502,11 +4489,11 @@ class CartCore extends ObjectModel
     {
         $id_address_delivery = 0;
         // Get the main address of the customer
-        if ((int)$this->id_address_delivery > 0) {
-            $id_address_delivery = (int)$this->id_address_delivery;
-        } else {
-            $id_address_delivery = (int)Address::getFirstCustomerAddressId(Context::getContext()->customer->id);
-        }
+        // if ((int)$this->id_address_delivery > 0) {
+        //     $id_address_delivery = (int)$this->id_address_delivery;
+        // } else {
+        //     $id_address_delivery = (int)Address::getFirstCustomerAddressId(Context::getContext()->customer->id);
+        // }
 
         if (!$id_address_delivery) {
             return;
