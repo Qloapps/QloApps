@@ -208,7 +208,6 @@ class AdminNormalProductsControllerCore extends AdminController
         // show the list of the product according to the booking or service products
         $this->_where .= ' AND a.`booking_product` = 0';
 
-        $this->_use_found_rows = false;
         $this->_group = 'GROUP BY a.`id_product`';
 
         $this->fields_list = array();
@@ -1393,7 +1392,10 @@ class AdminNormalProductsControllerCore extends AdminController
             parent::postProcess();
         }
 
-        if ($this->display == 'edit' || $this->display == 'add') {
+        if (in_array($this->display, array('add', 'edit'))
+            && $this->tabAccess[$this->display] == '1'
+            && $this->loadObject(true)
+        ) {
             $this->addJqueryUI(array(
                 'ui.core',
                 'ui.widget'
@@ -2815,9 +2817,7 @@ class AdminNormalProductsControllerCore extends AdminController
         }
 
         // let's calculate this once for all
-        if (!Validate::isLoadedObject($this->object) && Tools::getValue('id_product')) {
-            $this->errors[] = 'Unable to load object';
-        } else {
+        if ($this->loadObject(true)) {
             $this->_displayDraftWarning($this->object->active);
 
             // if there was an error while saving, we don't want to lose posted data
