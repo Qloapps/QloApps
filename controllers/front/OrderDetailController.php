@@ -811,6 +811,7 @@ class OrderDetailControllerCore extends FrontController
                                     'map_input_text' => $objHotelBranchInformation->map_input_text,
                                 ),
                                 'hotel_name' => $objHotelBranchInformation->hotel_name,
+                                'PS_STORES_ICON' => $this->context->link->getMediaLink(_PS_IMG_.Configuration::get('PS_STORES_ICON'))
                             ));
 
                             $this->addJS(
