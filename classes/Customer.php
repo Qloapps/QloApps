@@ -135,6 +135,9 @@ class CustomerCore extends ObjectModel
 
     public $groupBox;
 
+    const STATUS_BANNED = 1;
+    const STATUS_DELETED = 2;
+
     protected $webserviceParameters = array(
         'fields' => array(
             'id_default_group' => array('xlink_resource' => 'groups'),
@@ -179,7 +182,7 @@ class CustomerCore extends ObjectModel
             'id_risk' =>                    array('type' => self::TYPE_INT, 'validate' => 'isUnsignedInt', 'copy_post' => false),
             'max_payment_days' =>            array('type' => self::TYPE_INT, 'validate' => 'isUnsignedInt', 'copy_post' => false),
             'active' =>                    array('type' => self::TYPE_BOOL, 'validate' => 'isBool', 'copy_post' => false),
-            'deleted' =>                    array('type' => self::TYPE_BOOL, 'validate' => 'isBool', 'copy_post' => false),
+            'deleted' =>                    array('type' => self::TYPE_INT, 'validate' => 'isUnsignedInt', 'copy_post' => false),
             'note' =>                        array('type' => self::TYPE_HTML, 'validate' => 'isCleanHtml', 'size' => 65000, 'copy_post' => false),
             'is_guest' =>                    array('type' => self::TYPE_BOOL, 'validate' => 'isBool', 'copy_post' => false),
             'id_shop' =>                    array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId', 'copy_post' => false),

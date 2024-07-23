@@ -104,6 +104,9 @@ class AdminAddHotelController extends ModuleAdminController
 
     public function renderForm()
     {
+        if (!$this->loadObject(true)) {
+            return;
+        }
         $smartyVars = array();
         //tinymce setup
         $smartyVars['path_css'] = _THEME_CSS_DIR_;
@@ -125,7 +128,7 @@ class AdminAddHotelController extends ModuleAdminController
         $smartyVars['defaultCountry'] = $country->name[Configuration::get('PS_LANG_DEFAULT')];
 
         $idCountry = null;
-        if ($this->display == 'edit') {
+        if ($this->object->id) {
             $idHotel = Tools::getValue('id');
             $hotelBranchInfo = new HotelBranchInformation($idHotel);
             $objCategory = new Category($hotelBranchInfo->id_category);
@@ -168,13 +171,11 @@ class AdminAddHotelController extends ModuleAdminController
                 }
             }
             $smartyVars['order_restrict_date_info'] = $restrictDateInfo;
-        }
-
-        // manage state option
-        if ($this->display == 'add') {
+        } else {
             $idCountry = Tools::getValue('hotel_country');
         }
 
+        // manage state option
         $stateOptions = null;
         if ($idCountry) {
             $stateOptions = State::getStatesByIdCountry($idCountry);
@@ -778,6 +779,7 @@ class AdminAddHotelController extends ModuleAdminController
                 'sortRowsUrl' => $this->context->link->getAdminLink('AdminAddHotel'),
                 'primaryHotelId' => Configuration::get('WK_PRIMARY_HOTEL'),
                 'disableHotelMsg' => $this->l('Primary hotel for website will be updated to first available active hotel.', null, true),
+                'PS_STORES_ICON' => $this->context->link->getMediaLink(_PS_IMG_.Configuration::get('PS_STORES_ICON')),
             )
         );
         // GOOGLE MAP
