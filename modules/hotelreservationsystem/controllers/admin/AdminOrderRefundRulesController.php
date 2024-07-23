@@ -141,14 +141,13 @@ class AdminOrderRefundRulesController extends ModuleAdminController
         $smartyVars = array();
         $objCurrency = new Currency(Configuration::get('PS_CURRENCY_DEFAULT'));
         $smartyVars['objCurrency'] = $objCurrency;
-
-        if ($this->display == 'edit'
-            && $refundRuleInfo = $this->loadObject(true)
+        if (($refundRuleInfo = $this->loadObject(true))
+            && $this->object->id
         ) {
             $smartyVars['edit'] = 1;
             $idRefundRule = Tools::getValue('id_refund_rule');
             $objRefundRule = new HotelOrderRefundRules();
-            $smartyVars['refund_rules_info'] = (array)$refundRuleInfo;
+            $smartyVars['refund_rules_info'] = (array) $refundRuleInfo;
         }
 
         //lang vars
