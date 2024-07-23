@@ -24,17 +24,6 @@
 *  International Registered Trademark & Property of PrestaShop SA
 */
 
-class BoOrder extends PaymentModule
-{
-    public $active = 1;
-    public $name = 'bo_order';
-
-    public function __construct()
-    {
-        $this->displayName = $this->l('Back office order');
-    }
-}
-
 /**
  * @property Order $object
  */

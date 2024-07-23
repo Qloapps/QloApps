@@ -2274,10 +2274,14 @@ class HotelBookingDetail extends ObjectModel
      *
      * @return [boolean] [true if updated otherwise false]
      */
-    public function updateOrderRefundStatus($id_order, $date_from = false, $date_to = false, $id_rooms = array(), $is_refunded = 1, $is_cancelled = 0)
+    public function updateOrderRefundStatus($id_order, $date_from = false, $date_to = false, $id_rooms = array(), $is_refunded = 1, $is_cancelled = null)
     {
         $table = 'htl_booking_detail';
-        $data = array('is_refunded' => (int) $is_refunded, 'is_cancelled' => (int) $is_cancelled);
+        $data = array('is_refunded' => (int) $is_refunded);
+
+        if (!is_null($is_cancelled)) {
+            $data['is_cancelled'] = (int) $is_cancelled;
+        }
 
         if ($id_rooms) {
             foreach ($id_rooms as $key_rm => $val_rm) {
