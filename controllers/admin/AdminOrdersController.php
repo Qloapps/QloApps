@@ -980,7 +980,9 @@ class AdminOrdersControllerCore extends AdminController
         $this->addJS(_PS_JS_DIR_.'vendor/d3.v3.min.js');
 
         if ($this->tabAccess['edit'] == 1 && $this->display == 'view') {
-            $this->addJS(_PS_JS_DIR_.'admin/orders.js');
+            if ($this->loadObject()) {
+                $this->addJS(_PS_JS_DIR_.'admin/orders.js');
+            }
             // add js for reallocation process
             $this->addJS(_PS_JS_DIR_.'admin/reallocation.js');
             // $this->addJS(_PS_JS_DIR_.'admin/orders-product-event.js');

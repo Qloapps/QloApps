@@ -1392,7 +1392,10 @@ class AdminNormalProductsControllerCore extends AdminController
             parent::postProcess();
         }
 
-        if ($this->display == 'edit' || $this->display == 'add') {
+        if (in_array($this->display, array('add', 'edit'))
+            && $this->tabAccess[$this->display] == '1'
+            && $this->loadObject(true)
+        ) {
             $this->addJqueryUI(array(
                 'ui.core',
                 'ui.widget'
@@ -2814,9 +2817,7 @@ class AdminNormalProductsControllerCore extends AdminController
         }
 
         // let's calculate this once for all
-        if (!Validate::isLoadedObject($this->object) && Tools::getValue('id_product')) {
-            $this->errors[] = 'Unable to load object';
-        } else {
+        if ($this->loadObject(true)) {
             $this->_displayDraftWarning($this->object->active);
 
             // if there was an error while saving, we don't want to lose posted data
