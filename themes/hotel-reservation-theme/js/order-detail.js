@@ -151,6 +151,7 @@ function initMap() {
             position: hotelLocation,
             map: map,
             title: hotel_name,
+            icon: PS_STORES_ICON
         });
 
         marker.addListener('click', function() {
