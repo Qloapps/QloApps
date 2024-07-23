@@ -1,5 +1,16 @@
-Order deny,allow
-Deny from all
-<FilesMatch "\.(html|txt)$">
-Allow from all
-</FilesMatch>
+# Apache 2.2
+<IfModule !mod_authz_core.c>
+    Order deny,allow
+    Deny from all
+    <FilesMatch "\.(html|txt)$">
+        Allow from all
+    </FilesMatch>
+</IfModule>
+
+# Apache 2.4
+<IfModule mod_authz_core.c>
+    Require all denied
+    <FilesMatch "\.(html|txt)$">
+        Require all granted
+    </FilesMatch>
+</IfModule>
