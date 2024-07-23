@@ -31,8 +31,8 @@
 					<thead>
 						<tr>
 							<th>{l s='Name'}</th>
-							<th>{l s='Unit Price'}</th>
-							<th>{l s='Total Price'}</th>
+							<th>{l s='Unit Price (tax excl.)'}</th>
+							<th>{l s='Total Price (tax excl.)'}</th>
 							<th class="text-right">{l s='Action'}</th>
 						</tr>
 					</thead>
@@ -77,7 +77,7 @@
 								<th></th>
 								<th>{l s='Name'}</th>
 								<th>{l s='Option'}</th>
-								<th>{l s='Unit Price'}</th>
+								<th>{l s='Unit Price (tax excl.)'}</th>
 							</tr>
 						</thead>
 						<tbody>
