@@ -30,13 +30,23 @@
         <div role="tabpanel" class="tab-pane active" id="reallocate_room_tab">
             <div class="row">
                 <dl class="list-detail col-sm-6">
+                    <label class="label-title">{l s='Current Room Number'}</label>
+                    <dd><i class="icon-bed"></i> &nbsp;<span class="modal_curr_room_num"></span></dd>
+                </dl>
+                <dl class="list-detail col-sm-6">
+                    <label class="label-title">{l s='Allotment type'}</label>
+                    <dd><span class="modal_curr_allotent_type"></span></dd>
+                </dl>
+            </div>
+            <div class="row">
+                <dl class="list-detail col-sm-6">
                     <label class="label-title">{l s='Currently Alloted Customer'}</label>
                     <dd><i class="icon-user"></i> &nbsp;<span class="cust_name"></span></dd>
                     <dd><i class="icon-envelope"></i> &nbsp;<span class="cust_email"></span></dd>
                 </dl>
-                <dl class="list-detail col-sm-6">
-                    <label class="label-title">{l s='Current Room Number'}</label>
-                    <dd><i class="icon-bed"></i> &nbsp;<span class="modal_curr_room_num"></span></dd>
+                <dl class="list-detail col-sm-6 allotment_comment_block">
+                    <label class="label-title">{l s='Allotment Comment'}</label>
+                    <dd><span class="modal_curr_allotment_comment"></span></dd>
                 </dl>
             </div>
 
@@ -92,13 +102,23 @@
         <div role="tabpanel" class="tab-pane" id="swap_room_tab">
             <div class="row">
                 <dl class="list-detail col-sm-6">
+                    <label class="label-title">{l s='Current Room Number'}</label>
+                    <dd><i class="icon-bed"></i> &nbsp;<span class="modal_curr_room_num"></span></dd>
+                </dl>
+                <dl class="list-detail col-sm-6">
+                    <label class="label-title">{l s='Allotment type'}</label>
+                    <dd><span class="modal_curr_allotent_type"></span></dd>
+                </dl>
+            </div>
+            <div class="row">
+                <dl class="list-detail col-sm-6">
                     <label class="label-title">{l s='Currently Alloted Customer'}</label>
                     <dd><i class="icon-user"></i> &nbsp;<span class="cust_name"></span></dd>
                     <dd><i class="icon-envelope"></i> &nbsp;<span class="cust_email"></span></dd>
                 </dl>
-                <dl class="list-detail col-sm-6">
-                    <label class="label-title">{l s='Current Room Number'}</label>
-                    <dd><i class="icon-bed"></i> &nbsp;<span class="modal_curr_room_num"></span></dd>
+                <dl class="list-detail col-sm-6 allotment_comment_block">
+                    <label class="label-title">{l s='Allotment Comment'}</label>
+                    <dd><span class="modal_curr_allotment_comment"></span></dd>
                 </dl>
             </div>
             <hr>
