@@ -195,7 +195,7 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
 
     public function renderView()
     {
-        if (!($objOrderReturn = $this->loadObject(true))) {
+        if (!($objOrderReturn = $this->loadObject())) {
             return;
         }
         $refundStatuses = OrderReturnStateCore::getOrderReturnStates($this->context->language->id);
