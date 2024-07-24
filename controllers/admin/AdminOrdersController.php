@@ -2671,10 +2671,35 @@ class AdminOrdersControllerCore extends AdminController
         $totalDemandsPriceTE = 0;
         $totalDemandsPriceTI = 0;
         $totalRefundedRooms = 0;
+        $bookingConvenienceProducts = array();
         if ($order_detail_data = $objBookingDetail->getOrderFormatedBookinInfoByIdOrder($order->id)) {
             $objBookingDemand = new HotelBookingDemands();
             $objHotelRoomType = new HotelRoomType();
             foreach ($order_detail_data as $key => $value) {
+                $roomTypeConvenienceProducts = $objRoomTypeServiceProductOrderDetail->getroomTypeServiceProducts(
+                    $order->id,
+                    0,
+                    0,
+                    $value['id_product'],
+                    0,
+                    0,
+                    0,
+                    0,
+                    null,
+                    1,
+                    Product::PRICE_ADDITION_TYPE_INDEPENDENT
+                );
+                if (isset($roomTypeConvenienceProducts[$value['id']]['additional_services'])) {
+                    foreach($roomTypeConvenienceProducts[$value['id']]['additional_services'] as $convenienceProduct) {
+                        if (isset($bookingConvenienceProducts[$convenienceProduct['id_product']])) {
+                            $bookingConvenienceProducts[$convenienceProduct['id_product']]['total_price_tax_excl'] += $convenienceProduct['total_price_tax_excl'];
+                        } else {
+                            $bookingConvenienceProducts[$convenienceProduct['id_product']]['name'] = $convenienceProduct['name'];
+                            $bookingConvenienceProducts[$convenienceProduct['id_product']]['total_price_tax_excl'] = $convenienceProduct['total_price_tax_excl'];
+                        }
+                    }
+                }
+
                 $order_detail_data[$key]['total_room_price_te'] = $value['total_price_tax_excl'];
                 $order_detail_data[$key]['total_room_price_ti'] = $value['total_price_tax_incl'];
 
@@ -2982,6 +3007,7 @@ class AdminOrdersControllerCore extends AdminController
             'ROOM_STATUS_CHECKED_IN' => HotelBookingDetail::STATUS_CHECKED_IN,
             'ROOM_STATUS_CHECKED_OUT' => HotelBookingDetail::STATUS_CHECKED_OUT,
             'ALLOTMENT_MANUAL' => HotelBookingDetail::ALLOTMENT_MANUAL,
+            'booking_convenience_products' => $bookingConvenienceProducts,
         );
 
         return parent::renderView();

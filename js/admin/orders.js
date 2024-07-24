@@ -29,6 +29,18 @@ var ajaxQueries = new Array();
 $(document).ready(function() {
 	// Init all events
 	init();
+    $('#view_convenience_fee_products').popover({
+        title: ' ',
+        html: true,
+        placement: 'top',
+        template: $('#total_auto_added_products_container').parent().html(),
+    });
+
+    $(document).on('click', function(e){
+        if (!$(e.target).closest('.popover_container, #view_convenience_fee_products').length) {
+            $('#view_convenience_fee_products').popover('hide');
+        }
+    });
 
 	$('img.js-disabled-action').css({"opacity":0.5});
 });

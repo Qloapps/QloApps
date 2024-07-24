@@ -955,7 +955,7 @@
 
                             {if isset($totalConvenienceFeeTE) && $totalConvenienceFeeTE > 0}
                                 <tr id="total_products">
-                                    <td class="text-right">{l s='Convenience Fee (Tax excl.)'}</td>
+                                    <td class="text-right">{l s='Convenience Fee (Tax excl.)'}<span id="view_convenience_fee_products" class="pull-left"><i class="icon icon-lg icon-info-circle"></i></span></td>
                                     <td class="amount text-right nowrap">
                                         {displayPrice price=$totalConvenienceFeeTE currency=$currency->id}
                                     </td>
@@ -1051,7 +1051,22 @@
                     </div>
                 </div>
             </div>
-
+            {if isset($booking_convenience_products) && count($booking_convenience_products)}
+                <div hidden>
+                    <div id="total_auto_added_products_container">
+                        <table class="table table-responsive">
+                            <tbody>
+                                {foreach $booking_convenience_products as $convenienceProduct}
+                                    <tr>
+                                        <td class="text-left"><span>{$convenienceProduct.name}</span></td>
+                                        <td><span>{displayPrice price=$convenienceProduct.total_price_tax_excl currency=$currency->id}</span></td>
+                                    </tr>
+                                {/foreach}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            {/if}
             {* Discount block *}
             <div class="col-lg-4 col-sm-6 col-xs-12 pull-right">
                 <div class="panel panel-vouchers">
