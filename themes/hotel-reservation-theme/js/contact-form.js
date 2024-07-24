@@ -93,6 +93,7 @@ function initMap() {
             map: map,
             title: location.hotel_name,
             animation: google.maps.Animation.DROP,
+            icon: PS_STORES_ICON
         });
 
         // Allow each marker to have an info window
