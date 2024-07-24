@@ -58,6 +58,10 @@ class AdminHotelFeaturesController extends ModuleAdminController
 
     public function renderForm()
     {
+        if (!$this->loadObject(true)) {
+            return;
+        }
+
         $smartyVars = array();
         //lang vars
         $languages = Language::getLanguages(false);
@@ -66,7 +70,7 @@ class AdminHotelFeaturesController extends ModuleAdminController
         $smartyVars['languages'] = $languages;
         $smartyVars['currentLang'] = $currentLang;
         $smartyVars['ps_img_dir'] = _PS_IMG_.'l/';
-        if ($id = Tools::getValue('id')) {
+        if ($id = $this->object->id) {
             $smartyVars['edit'] = 1;
             if (Validate::isLoadedObject($objFeatures = new HotelFeatures($id))) {
                 $featureInfo = (array) $objFeatures;
