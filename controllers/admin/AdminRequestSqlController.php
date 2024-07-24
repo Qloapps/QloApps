@@ -283,11 +283,9 @@ class AdminRequestSqlControllerCore extends AdminController
         $this->initToolbar();
         $this->initPageHeaderToolbar();
         if ($this->display == 'edit' || $this->display == 'add') {
-            if (!$this->loadObject(true)) {
-                return;
+            if ($this->loadObject(true)) {
+                $this->content .= $this->renderForm();
             }
-
-            $this->content .= $this->renderForm();
         } elseif ($this->display == 'view') {
             // Some controllers use the view action without an object
             if ($this->className) {
