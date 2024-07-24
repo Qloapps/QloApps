@@ -5,7 +5,7 @@
 				<i class="icon-info-circle"></i> &nbsp;{l s='Order Cancellation Request Information' mod='hotelreservationsystem'}
 			</div>
 			<br>
-			<form id="{$table|escape:'htmlall':'UTF-8'}_form" class="defaultForm {$name_controller|escape:'htmlall':'UTF-8'} form-horizontal" action="{$current|escape:'htmlall':'UTF-8'}{if !empty($submit_action)}&{$submit_action|escape:'htmlall':'UTF-8'}{/if}&id_order_return{$orderReturnInfo['id']|escape:'html':'UTF-8'}&vieworder_return&token={$token|escape:'htmlall':'UTF-8'}" method="post" enctype="multipart/form-data" {if isset($style)}style="{$style|escape:'htmlall':'UTF-8'}"{/if}>
+			<form id="{$table|escape:'htmlall':'UTF-8'}_form" class="defaultForm {$name_controller|escape:'htmlall':'UTF-8'} form-horizontal" action="{$link->getAdminLink('AdminOrderRefundRequests')|escape:'html':'UTF-8'}&amp;vieworder_return&amp;id_order_return={$orderReturnInfo['id']|escape:'html':'UTF-8'|intval}" method="post" enctype="multipart/form-data" {if isset($style)}style="{$style|escape:'htmlall':'UTF-8'}"{/if}>
 				<div class="panel">
 					{if isset($customer_name)}
 						<div class="row">
@@ -366,6 +366,22 @@
 												<label>
 													<input value="1" type="checkbox" name="generateDiscount" id="generateDiscount"/> &nbsp;{l s='Create Voucher' mod='hotelreservationsystem'}
 												</label>
+											</div>
+										</div>
+									</div>
+									<div class="generate_discount_fields" style="display:none;">
+										<div class="form-group">
+											<div class="col-sm-3">
+												<label for="voucher_expiry" class="control-label required">
+													<span title="" data-toggle="tooltip" class="label-tooltip" data-original-title="{l s='Please select the date until which the voucher can be used.' mod='hotelreservationsystem'}">{l s='Voucher expiry date' mod='hotelreservationsystem'}</span> :
+												</label>
+											</div>
+											<div class="col-sm-3">
+												<div class="input-group">
+													<input type="text" id="voucher_expiry" value="{$expiry_date|date_format:"%d-%m-%Y"}">
+													<div class="input-group-addon"><i class="icon-calendar"></i></div>
+													<input type="hidden" name="voucher_expiry_date" id="voucher_expiry_date" value="{$expiry_date|date_format:"%Y-%m-%d"}">
+												</div>
 											</div>
 										</div>
 									</div>

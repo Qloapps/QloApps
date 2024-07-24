@@ -1275,6 +1275,7 @@ function initMap() {
     const marker = new google.maps.Marker({
         position: hotelLatLng,
         map: map,
+        icon: PS_STORES_ICON
     });
 
     const uiContent = $('#room-info-map-ui-content .hotel-info-wrap').get(0);

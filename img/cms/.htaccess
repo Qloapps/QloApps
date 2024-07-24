@@ -1,8 +1,0 @@
-<IfModule mod_php5.c>
-	php_flag engine off
-</IfModule>
-deny from all
-<Files ~ "(?i)^.*\.(jpg|jpeg|gif|png|bmp|tiff|svg|pdf|mov|mpeg|mp4|avi|mpg|wma|flv|webm)$">
-	order deny,allow
-	allow from all
-</Files>
