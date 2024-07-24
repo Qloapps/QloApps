@@ -28,9 +28,9 @@
 {block name=pageTitle}
     <h2 class="order_page_title page-title">
         {if is_array($title)}{$title|end|strip_tags}{else}{$title|strip_tags}{/if}
-        {if $currentState == Configuration::get('PS_OS_REFUND')}
+        {if $currentState->id == Configuration::get('PS_OS_REFUND')}
             <span class="toolbar_order_status_badge badge badge-danger">{l s='Refunded'}</span>
-        {elseif $currentState == Configuration::get('PS_OS_CANCELED')}
+        {elseif $currentState->id == Configuration::get('PS_OS_CANCELED')}
             <span class="toolbar_order_status_badge badge badge-danger">{l s='Cancelled'}</span>
         {else}
             <span class="toolbar_order_status_badge badge badge-success">{l s='Booked'}</span>
@@ -98,12 +98,12 @@
                                 <table class="table">
                                     <thead>
                                         <tr>
-                                            <th>{l s='Room No.'}</th>
-                                            <th>{l s='Room Type'}</th>
+                                            <th>{l s='Room'}</th>
                                             <th>{l s='Duration'}</th>
-                                            <th>{l s='Documents'}</th>
-                                            <th>{l s='Room Status'}</th>
-                                            <th class="text-center">{l s='Action'}</th>
+                                            <th>{l s='Check-In'}</th>
+                                            <th>{l s='Check-Out'}</th>
+                                            <th>{l s='Allotment'}</th>
+                                            <th>{l s='Action'}</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -111,34 +111,43 @@
                                             {foreach from=$htl_booking_order_data item=data}
                                                 <tr>
                                                     <td>
-                                                        {$data['room_num']}
-                                                    </td>
-                                                    <td>
+                                                        {$data['room_num']}<br>
                                                         <a href="{$link->getAdminLink('AdminProducts')|escape:'html':'UTF-8'}&amp;id_product={$data['id_product']}&amp;updateproduct" target="_blank">{$data['room_type_name']|escape:'html':'UTF-8'}</a>
                                                     </td>
                                                     <td>
                                                         {dateFormat date=$data['date_from']} - {dateFormat date=$data['date_to']}
                                                     </td>
                                                     <td>
-                                                        <a href="#" onclick="BookingDocumentsModal.init({$data.id|intval}, this); return false;">
-                                                            {if $data.num_checkin_documents > 0}{$data.num_checkin_documents}{else}{l s='Upload'}{/if} {l s='Documents'}
-                                                        </a>
-                                                    </td>
-                                                    <td>
-                                                        {if $data['id_status'] == $hotel_order_status['STATUS_ALLOTED']['id_status']}
-                                                            {l s='Alloted'}
-                                                        {elseif $data['id_status'] == $hotel_order_status['STATUS_CHECKED_IN']['id_status']}
-                                                            <span class="text-danger room_status">{l s='Checked in on'} {dateFormat date=$data['check_in']}</span>
-                                                        {elseif $data['id_status'] == $hotel_order_status['STATUS_CHECKED_OUT']['id_status']}
-                                                            <span class="text-success room_status">{l s='Checked out on'} {dateFormat date=$data['check_out']}</span>
+                                                        {if ($data['id_status'] == $hotel_order_status['STATUS_CHECKED_IN']['id_status']) || ($data['id_status'] == $hotel_order_status['STATUS_CHECKED_OUT']['id_status'])}
+                                                            <span class="text-danger room_status">{l s='Checked in on'}<br>{dateFormat date=$data['check_in'] full=1}</span>
+                                                        {else}
+                                                            --
                                                         {/if}
                                                     </td>
-                                                    <td class="text-center">
+                                                    <td>
+                                                        {if $data['id_status'] == $hotel_order_status['STATUS_CHECKED_OUT']['id_status']}
+                                                            <span class="text-success room_status">{l s='Checked out on'}<br>{dateFormat date=$data['check_out'] full=1}</span>
+                                                        {else}
+                                                            --
+                                                        {/if}
+                                                    </td>
+                                                    <td>
+                                                         {if $data['booking_type'] == $ALLOTMENT_MANUAL}
+                                                            {l s='Manual'} &nbsp;{if $data['comment'] != ''}<a class="manual_allotment_comment" href="#" data-id_hotel_booking_detail="{$data['id']}"><i class="icon-info-circle"></i></a>{/if}
+                                                        {else}
+                                                            {l s='Auto'}
+                                                        {/if}
+                                                    </td>
+                                                    <td>
+                                                        <a title="{l s='Upload/Check guest documents'}" class="btn btn-default" href="#" onclick="BookingDocumentsModal.init({$data.id|intval}, this); return false;">
+                                                            <span class="badge badge-info">{if $data.num_checkin_documents > 0}{$data.num_checkin_documents}{else}0{/if}</span> <i class="icon-file-text"></i>
+                                                        </a>
+
                                                         {if isset($refundReqBookings) && $refundReqBookings && $data.id|in_array:$refundReqBookings && $data.is_refunded}
                                                             <span class="badge badge-danger">{if $data.is_cancelled}{l s='Cancelled'}{else}{l s='Refunded'}{/if}</span>
                                                         {else}
                                                             <a class="open_room_status_form btn btn-default" href="#" data-id_hotel_booking_detail="{$data['id']}" data-id_order="{$data['id_order']}" data-id_status="{$data['id_status']}" data-id_room="{$data['id_room']}" data-date_from="{$data['date_from']|date_format:"%Y-%m-%d"}" data-date_to="{$data['date_to']|date_format:"%Y-%m-%d"}" data-check_in_time="{$data['check_in_time']}" data-check_out_time="{$data['check_out_time']}">
-                                                                <i class="icon-pencil"></i>
+                                                                <i class="icon-pencil"></i> {l s='Edit'}
                                                             </a>
                                                         {/if}
                                                     </td>
@@ -783,7 +792,7 @@
                     </div>
                 {/if}
 
-                <div class="panel">
+                <div class="panel panel-refund-request">
                     <div class="panel-heading">
                         <i class="icon-undo"></i> &nbsp;{l s='Refund Requests'}
                     </div>
@@ -814,7 +823,7 @@
                                                 <td>
                                                     <span class="badge" style="background-color:{$return_info.state_color}">{$return_info.state_name}</span>
                                                     {if $return_info.refunded_amount > 0}
-                                                        &nbsp;<span class="badge badge-success">{displayPrice price=$return_info.refunded_amount currency=$currency->id}</span>
+                                                        &nbsp;<span class="badge badge-success refunded_amount">{displayPrice price=$return_info.refunded_amount currency=$currency->id}</span>
                                                     {/if}
                                                 </td>
                                             </tr>
@@ -920,7 +929,7 @@
                             {assign var=additional_service_price_tax_incl value=($order->getTotalProductsWithTaxes(false, false, Product::SERVICE_PRODUCT_WITH_ROOMTYPE) + $totalDemandsPriceTI)}
                             {if $room_price_tax_excl}
                                 <tr id="total_products">
-                                    <td class="text-right">{l s='Total Rooms Cost (tax excl.)'}</td>
+                                    <td class="text-right">{l s='Total Rooms Cost (Tax excl.)'}</td>
                                     <td class="amount text-right nowrap">
                                         {displayPrice price=$room_price_tax_excl currency=$currency->id}
                                     </td>
@@ -929,34 +938,16 @@
                             {/if}
                             {if isset($additional_service_price_tax_excl) && $additional_service_price_tax_excl > 0}
                                 <tr id="total_products">
-                                    <td class="text-right">{l s='Total Extra services (tax excl.)'}</td>
+                                    <td class="text-right">{l s='Total Extra services (Tax excl.)'}</td>
                                     <td class="amount text-right nowrap">
                                         {displayPrice price=($additional_service_price_tax_excl - $convenience_fee_price_tax_excl) currency=$currency->id}
                                     </td>
                                     <td class="partial_refund_fields current-edit" style="display:none;"></td>
                                 </tr>
                             {/if}
-                            {* {if $room_price_tax_excl}
-                                <tr id="total_tax_order">
-                                    <td class="text-right"><strong>{l s='Total Rooms Tax'}</strong></td>
-                                    <td class="text-right nowrap">
-                                        <strong>{displayPrice price=($room_price_tax_incl - $room_price_tax_excl) currency=$currency->id}</strong>
-                                    </td>
-                                    <td class="partial_refund_fields current-edit" style="display:none;"></td>
-                                </tr>
-                            {/if}
-                            {if isset($additional_service_price_tax_excl) && $additional_service_price_tax_excl > 0}
-                                <tr id="total_tax_order">
-                                    <td class="text-right"><strong>{l s='Extra services Tax'}</strong></td>
-                                    <td class="text-right nowrap">
-                                        <strong>{displayPrice price=($additional_service_price_tax_incl - $additional_service_price_tax_excl) currency=$currency->id}</strong>
-                                    </td>
-                                    <td class="partial_refund_fields current-edit" style="display:none;"></td>
-                                </tr>
-                            {/if} *}
                             {if $service_products_price_tax_excl}
                                 <tr id="total_products">
-                                    <td class="text-right">{l s='Total service products cost (tax excl.)'}</td>
+                                    <td class="text-right">{l s='Total service products cost (Tax excl.)'}</td>
                                     <td class="amount text-right nowrap">
                                         {displayPrice price=$service_products_price_tax_excl currency=$currency->id}
                                     </td>
@@ -964,10 +955,64 @@
                                 </tr>
                             {/if}
 
+                            {if isset($convenience_fee_price_tax_excl) && $convenience_fee_price_tax_excl > 0}
+                                <tr id="total_products">
+                                    <td class="text-right">{l s='Convenience Fee (Tax excl.)'}</td>
+                                    <td class="amount text-right nowrap">
+                                        {displayPrice price=$convenience_fee_price_tax_excl currency=$currency->id}
+                                    </td>
+                                    <td class="partial_refund_fields current-edit" style="display:none;"></td>
+                                </tr>
+                            {/if}
+
+                            {if $room_price_tax_excl}
+                                <tr id="total_tax_order">
+                                    <td class="text-right">{l s='Total Rooms Tax'}</td>
+                                    <td class="text-right nowrap">
+                                        {displayPrice price=($room_price_tax_incl - $room_price_tax_excl) currency=$currency->id}
+                                    </td>
+                                    <td class="partial_refund_fields current-edit" style="display:none;"></td>
+                                </tr>
+                            {/if}
+                            {if isset($additional_service_price_tax_excl) && $additional_service_price_tax_excl > 0}
+                                <tr id="total_tax_order">
+                                    <td class="text-right">{l s='Extra services Tax'}</td>
+                                    <td class="text-right nowrap">
+                                        {displayPrice price=(($additional_service_price_tax_incl - $additional_service_price_tax_excl) - ($convenience_fee_price_tax_incl - $convenience_fee_price_tax_excl)) currency=$currency->id}
+                                    </td>
+                                    <td class="partial_refund_fields current-edit" style="display:none;"></td>
+                                </tr>
+                            {/if}
+                            {if isset($convenience_fee_price_tax_excl) && $convenience_fee_price_tax_excl > 0}
+                                <tr id="total_products">
+                                    <td class="text-right">{l s='Convenience Fee Tax'}</td>
+                                    <td class="amount text-right nowrap">
+                                        {displayPrice price=($convenience_fee_price_tax_incl - $convenience_fee_price_tax_excl) currency=$currency->id}
+                                    </td>
+                                    <td class="partial_refund_fields current-edit" style="display:none;"></td>
+                                </tr>
+                            {/if}
+
+                            {* {if ($order->getTaxCalculationMethod() == $smarty.const.PS_TAX_EXC)} *}
+                            <tr id="total_taxes">
+                                <td class="text-right"><strong>{l s='Total Taxes'}</strong>
+                                </td>
+                                <td class="amount text-right nowrap" ><strong>{displayPrice price=(($order->total_paid_tax_incl + $order->total_discounts_tax_incl) - ($order->total_paid_tax_excl + $order->total_discounts_tax_excl)) currency=$currency->id}</strong>
+                                </td>
+                                <td class="partial_refund_fields current-edit" style="display:none;"></td>
+                            </tr>
+                            {* {/if} *}
                             <tr id="total_discounts" {if $order->total_discounts_tax_incl == 0}style="display: none;"{/if}>
-                                <td class="text-right">{l s='Discounts'}</td>
+                                <td class="text-right"><strong>{l s='Total Booking Amount'}</strong></td>
                                 <td class="amount text-right nowrap">
-                                    -{displayPrice price=$order_discount_price currency=$currency->id}
+                                    <strong>{displayPrice price=($order->total_paid_tax_incl + $order->total_discounts_tax_incl) currency=$currency->id}</strong>
+                                </td>
+                                <td class="partial_refund_fields current-edit" style="display:none;"></td>
+                            </tr>
+                            <tr id="total_discounts" {if $order->total_discounts_tax_incl == 0}style="display: none;"{/if}>
+                                <td class="text-right"><strong>{l s='Discounts'}</strong></td>
+                                <td class="amount text-right nowrap">
+                                    <strong>-{displayPrice price=$order->total_discounts_tax_incl currency=$currency->id}</strong>
                                 </td>
                                 <td class="partial_refund_fields current-edit" style="display:none;"></td>
                             </tr>
@@ -978,24 +1023,6 @@
                                 </td>
                                 <td class="partial_refund_fields current-edit" style="display:none;"></td>
                             </tr>
-                            {if isset($convenience_fee_price_tax_incl) && $convenience_fee_price_tax_incl > 0}
-                                <tr id="total_products">
-                                    <td class="text-right">{l s='Convenience Fee'}</td>
-                                    <td class="amount text-right nowrap">
-                                        {displayPrice price=$convenience_fee_price_tax_excl currency=$currency->id}
-                                    </td>
-                                    <td class="partial_refund_fields current-edit" style="display:none;"></td>
-                                </tr>
-                            {/if}
-                            {* {if ($order->getTaxCalculationMethod() == $smarty.const.PS_TAX_EXC)} *}
-                                <tr id="total_taxes">
-                                    <td class="text-right">{l s='Total Taxes'}
-                                    </td>
-                                    <td class="amount text-right nowrap" >{displayPrice price=($order->total_paid_tax_incl - $order->total_paid_tax_excl) currency=$currency->id}
-                                    </td>
-                                    <td class="partial_refund_fields current-edit" style="display:none;"></td>
-                                </tr>
-                            {* {/if} *}
                             <tr id="total_order">
                                 <td class="text-right"><strong>{l s='Final Booking Total'}</strong></td>
                                 <td class="amount text-right nowrap">
@@ -1250,12 +1277,11 @@
         {addJsDefL name='select_room_txt'}{l s='Select room' js=1}{/addJsDefL}
         {addJsDef max_child_age=$max_child_age|escape:'quotes':'UTF-8'}
         {addJsDef max_child_in_room=$max_child_in_room|escape:'quotes':'UTF-8'}
-        {addJsDef ROOM_STATUS_ALLOTED=$ROOM_STATUS_ALLOTED|escape:'quotes':'UTF-8'}
         {addJsDef ROOM_STATUS_CHECKED_IN=$ROOM_STATUS_CHECKED_IN|escape:'quotes':'UTF-8'}
         {addJsDef ROOM_STATUS_CHECKED_OUT=$ROOM_STATUS_CHECKED_OUT|escape:'quotes':'UTF-8'}
+        {addJsDef ALLOTMENT_MANUAL=$ALLOTMENT_MANUAL|escape:'quotes':'UTF-8'}
         {addJsDef PS_OS_CANCELED=Configuration::get('PS_OS_CANCELED')|escape:'quotes':'UTF-8'}
         {addJsDef PS_OS_REFUND=Configuration::get('PS_OS_REFUND')|escape:'quotes':'UTF-8'}
-
         {addJsDefL name=txt_booking_document_upload_success}{l s='Document uploaded successfully.' js=1}{/addJsDefL}
         {addJsDefL name=txt_booking_document_delete_confirm}{l s='Are you sure?' js=1}{/addJsDefL}
         {addJsDefL name=txt_booking_document_delete_success}{l s='Document deleted successfully.' js=1}{/addJsDefL}

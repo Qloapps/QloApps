@@ -49,7 +49,7 @@
 
             <div class="row form-group">
                 <div class="col-sm-6">
-                    <label class="control-label">{l s='Price (Tax excl.)'}</label>
+                    <label class="control-label">{l s='Price (tax excl.)'}</label>
                     <div class="input-group">
                         {if $currency->format % 2}<div class="input-group-addon">{$currency->sign}</div>{/if}
                         <input class="form-control" type="text" name="add_product[product_price_tax_excl]" id="add_product_product_price_tax_excl" value=""  disabled="disabled"/>
@@ -57,7 +57,7 @@
                     </div>
                 </div>
                 <div class="col-sm-6">
-                    <label class="control-label">{l s='Price (Tax incl.)'}</label>
+                    <label class="control-label">{l s='Price (tax incl.)'}</label>
                     <div class="input-group">
                         {if $currency->format % 2}<div class="input-group-addon">{$currency->sign}</div>{/if}
                         <input class="form-control" type="text" name="add_product[product_price_tax_incl]" id="add_product_product_price_tax_incl" value=""  disabled="disabled"/>

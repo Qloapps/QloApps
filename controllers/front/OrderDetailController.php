@@ -423,6 +423,7 @@ class OrderDetailControllerCore extends FrontController
                         'obj_hotel_branch_information' => $objHotelBranchInformation,
                         'hotel_address_info' => $hotelAddressInfo,
                         'hotel_refund_rules' => $hotelRefundRules,
+                        'view_on_map' => Configuration::get('WK_GOOGLE_ACTIVE_MAP'),
                     )
                 );
 
@@ -797,7 +798,9 @@ class OrderDetailControllerCore extends FrontController
             if ($idHotel = HotelBookingDetail::getIdHotelByIdOrder(Tools::getValue('id_order'))) {
                 $objHotelBranchInformation = new HotelBranchInformation($idHotel, $this->context->language->id);
                 if (Validate::isLoadedObject($objHotelBranchInformation)) {
-                    if ($apiKey = Configuration::get('PS_API_KEY')) {
+                    if (($apiKey = Configuration::get('PS_API_KEY'))
+                        && Configuration::get('WK_GOOGLE_ACTIVE_MAP')
+                    ) {
                         if (floatval($objHotelBranchInformation->latitude) != 0
                             && floatval($objHotelBranchInformation->longitude) != 0
                         ) {
@@ -808,6 +811,7 @@ class OrderDetailControllerCore extends FrontController
                                     'map_input_text' => $objHotelBranchInformation->map_input_text,
                                 ),
                                 'hotel_name' => $objHotelBranchInformation->hotel_name,
+                                'PS_STORES_ICON' => $this->context->link->getMediaLink(_PS_IMG_.Configuration::get('PS_STORES_ICON'))
                             ));
 
                             $this->addJS(
