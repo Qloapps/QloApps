@@ -152,15 +152,27 @@
 						<label class="control-label col-lg-3">{l s='Status'}</label>
 						<div class="col-lg-9">
 							<p class="form-control-static">
-								{if $customer->active}
-									<span class="label label-success">
-										<i class="icon-check"></i>
-										{l s='Active'}
+								{if !$customer->deleted}
+									{if $customer->active}
+										<span class="label label-success">
+											<i class="icon-check"></i>
+											{l s='Active'}
+										</span>
+									{else}
+										<span class="label label-danger">
+											<i class="icon-remove"></i>
+											{l s='Inactive'}
+										</span>
+									{/if}
+								{elseif $customer->deleted == Customer::STATUS_BANNED}
+									<span class="label label-warning">
+										<i class="icon-remove"></i>
+										{l s='Banned'}
 									</span>
-								{else}
+								{elseif $customer->deleted == Customer::STATUS_DELETED}
 									<span class="label label-danger">
 										<i class="icon-remove"></i>
-										{l s='Inactive'}
+										{l s='Deleted'}
 									</span>
 								{/if}
 							</p>

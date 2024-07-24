@@ -137,6 +137,9 @@ class CustomerCore extends ObjectModel
 
     public $phone;
 
+    const STATUS_BANNED = 1;
+    const STATUS_DELETED = 2;
+
     protected $webserviceParameters = array(
         'fields' => array(
             'id_default_group' => array('xlink_resource' => 'groups'),
@@ -181,7 +184,7 @@ class CustomerCore extends ObjectModel
             'id_risk' =>                    array('type' => self::TYPE_INT, 'validate' => 'isUnsignedInt', 'copy_post' => false),
             'max_payment_days' =>            array('type' => self::TYPE_INT, 'validate' => 'isUnsignedInt', 'copy_post' => false),
             'active' =>                    array('type' => self::TYPE_BOOL, 'validate' => 'isBool', 'copy_post' => false),
-            'deleted' =>                    array('type' => self::TYPE_BOOL, 'validate' => 'isBool', 'copy_post' => false),
+            'deleted' =>                    array('type' => self::TYPE_INT, 'validate' => 'isUnsignedInt', 'copy_post' => false),
             'note' =>                        array('type' => self::TYPE_HTML, 'validate' => 'isCleanHtml', 'size' => 65000, 'copy_post' => false),
             'is_guest' =>                    array('type' => self::TYPE_BOOL, 'validate' => 'isBool', 'copy_post' => false),
             'id_shop' =>                    array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId', 'copy_post' => false),
@@ -300,20 +303,36 @@ class CustomerCore extends ObjectModel
     }
 
     /**
-     * Return customers list
+     * Returns a list of customers.
      *
-     * @param null|bool $only_active Returns only active customers when true
-     * @return array Customers
+     * @param null|bool $active Optional. Filter customers by their active status. If null, no filter is applied.
+     * @param null|bool $deleted Optional. Filter customers by their deleted status. If null, no filter is applied.
+     * @param null|bool $havingAddress Optional. Filter customers having|not having address. If true, only customers having an address are returned.
+     * If false, only customers without an address are returned. If null, no filter is applied.
+     * @return array List of customers matching the specified criteria.
      */
-    public static function getCustomers($only_active = null)
+    public static function getCustomers($active = null, $deleted = null, $havingAddress = null)
     {
-        $sql = 'SELECT `id_customer`, `email`, `firstname`, `lastname`
-				FROM `'._DB_PREFIX_.'customer`
-				WHERE 1 '.Shop::addSqlRestriction(Shop::SHARE_CUSTOMER).
-				($only_active ? ' AND `active` = 1' : '').'
-				ORDER BY `id_customer` ASC';
+        $sqlSelect = 'SELECT c.`id_customer`, c.`email`, c.`firstname`, c.`lastname`';
+        $sqlFrom = 'FROM `'._DB_PREFIX_.'customer` c';
+        $sqlJoin = '';
+		$sqlWhere = 'WHERE 1 '.Shop::addSqlRestriction(Shop::SHARE_CUSTOMER).
+                (!is_null($active) ?  ' AND c.`active` = '.(int) $active: ' ' ).
+                (!is_null($deleted) ? ' AND c.`deleted` = '.(int) $deleted : ' ');
+		$sqlOrderBy = 'ORDER BY c.`id_customer` ASC';
+		$sqlGroupBy = 'GROUP BY c.`id_customer`';
+
+        if (!is_null($havingAddress)) {
+            $sqlJoin .= ' LEFT JOIN `'._DB_PREFIX_.'address` a
+                ON a.`id_customer` = c.`id_customer` AND a.`deleted`=0';
+            $sqlWhere .= (($havingAddress) ? ' AND a.`id_address` IS NOT NULL': ' AND a.`id_address` IS NULL');
+        }
+
+        $sql = $sqlSelect .' '. $sqlFrom.' '.$sqlJoin.' '.$sqlWhere.' '.$sqlGroupBy.' '.$sqlOrderBy;
+
         return Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql);
     }
+
 
     /**
      * Return customer instance from its e-mail (optionnaly check password)
@@ -957,4 +976,5 @@ class CustomerCore extends ObjectModel
         $sql_filter .= Shop::addSqlRestriction(Shop::SHARE_CUSTOMER, 'main');
         return parent::getWebserviceObjectList($sql_join, $sql_filter, $sql_sort, $sql_limit);
     }
+
 }
