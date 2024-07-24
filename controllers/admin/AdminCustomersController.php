@@ -176,6 +176,11 @@ class AdminCustomersControllerCore extends AdminController
                 'search' => false,
                 'havingFilter' => true
             ),
+            'deleted' => array(
+                'title' => $this->l('Banned'),
+                'type' => 'bool',
+                'displayed' => false,
+            ),
             'order_date' => array(
                 'title' => $this->l('Order date'),
                 'type' => 'date',
@@ -218,6 +223,12 @@ class AdminCustomersControllerCore extends AdminController
         }
 
         parent::postProcess();
+        // Added this to check if the filter for the banned(deleted) is used, since $this->delete = true will not display the deleted customers.
+        $prefix = $this->getCookieFilterPrefix();
+        $filters = $this->context->cookie->getFamily($prefix.$this->table.'Filter_');
+        if (isset($filters[$prefix.$this->table.'Filter_deleted']) && $filters[$prefix.$this->table.'Filter_deleted'] == 1) {
+            $this->deleted = false;
+        }
     }
 
     public function initContent()
@@ -754,6 +765,7 @@ class AdminCustomersControllerCore extends AdminController
         $helper->color = 'color2';
         $helper->title = $this->l('Banned Customers', null, null, false);
         $helper->subtitle = $this->l('All Time', null, null, false);
+        $helper->href = $this->context->link->getAdminLink('AdminCustomers').'&customerFilter_deleted=1';
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=total_banned_customers';
         $helper->tooltip = $this->l('The total number of banned customers.', null, null, false);
         $kpis[] = $helper;
@@ -963,7 +975,7 @@ class AdminCustomersControllerCore extends AdminController
         if (Validate::isLoadedObject($objCustomer = $this->loadObject())) {
             if ($this->delete_mode == 'real' && Order::getCustomerOrders($objCustomer->id, true)) {
                 $objCustomer->email = 'anonymous'.'-'.$objCustomer->id.'@'.Tools::link_rewrite(Configuration::get('PS_SHOP_NAME')).'_anonymous.com';
-                $objCustomer->deleted = 1;
+                $objCustomer->deleted = Customer::STATUS_DELETED;
                 if (!$objCustomer->update()) {
                     $this->errors[] = Tools::displayError('Some error ocurred while deleting the Customer');
                     return;
@@ -1004,7 +1016,7 @@ class AdminCustomersControllerCore extends AdminController
                         // check if customer has orders for email change else customer will be deleted
                         if (Order::getCustomerOrders($objCustomer->id, true)) {
                             $objCustomer->email = 'anonymous'.'-'.$objCustomer->id.'@'.Tools::getShopDomain();
-                            $objCustomer->deleted = 1;
+                            $objCustomer->deleted = Customer::STATUS_DELETED;
                             if ($objCustomer->update()) {
                                 // unset the customer which is processed
                                 // not processed customers will be deleted with default process if no errors are there
