@@ -112,18 +112,43 @@ class AdminAddressesControllerCore extends AdminController
 
     public function renderForm()
     {
+        $customerField =array(
+            'type' => 'text_customer',
+            'label' => $this->l('Customer'),
+            'name' => 'id_customer',
+            'required' => false,
+        );
+        if ($this->loadObject(true)
+            && !$this->object->id
+            && !Tools::getValue('liteDisplaying')
+        ) {
+            $customerEmails = array(array(
+                'email' => $this->l('Select Customer'),
+                'id_customer' => 0,
+                'id_address'=> 0
+            ));
+            $customerEmails = array_merge($customerEmails, Customer::getCustomers(null, 0, 0));
+            $customerField = array(
+                'type' => 'select',
+                'label' => $this->l('Customer'),
+                'name' => 'id_customer',
+                'required' => true,
+                'class' => 'chosen',
+                'options' => array(
+                    'query' => $customerEmails,
+                    'id' => 'id_customer',
+                    'name' => 'email'
+                ),
+            );
+        }
+
         $this->fields_form = array(
             'legend' => array(
                 'title' => $this->l('Addresses'),
                 'icon' => 'icon-envelope-alt'
             ),
             'input' => array(
-                array(
-                    'type' => 'text_customer',
-                    'label' => $this->l('Customer'),
-                    'name' => 'id_customer',
-                    'required' => false,
-                ),
+                $customerField,
                 array(
                     'type' => 'text',
                     'label' => $this->l('Identification Number'),
@@ -191,9 +216,8 @@ class AdminAddressesControllerCore extends AdminController
         }
 
         $this->tpl_form_vars = array(
-            'customer' => isset($customer) ? $customer : null,
-            'tokenCustomer' => isset($token_customer) ? $token_customer : null,
-            'back_url' => urldecode(Tools::getValue('back'))
+            'customer' => (isset($customer) && ($this->object->id || Tools::getValue('liteDisplaying'))) ? $customer : null,
+            'tokenCustomer' => isset($token_customer) ? $token_customer : null
         );
 
         // Order address fields depending on country format
@@ -503,7 +527,7 @@ class AdminAddressesControllerCore extends AdminController
         return $out;
     }
 
-    /**
+     /**
      * Method called when an ajax request is made
      * @see AdminController::postProcess()
      */

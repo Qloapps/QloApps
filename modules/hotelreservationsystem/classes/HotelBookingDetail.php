@@ -2254,6 +2254,14 @@ class HotelBookingDetail extends ObjectModel
                 // Reinject quantity in stock
                 $objOldOrderDetail->reinjectQuantity($objOldOrderDetail, $objOldOrderDetail->product_quantity, $deleteQty);
 
+                // retrieve and delete HotelCartBookingData row
+                $idHotelCartBookingData = Db::getInstance()->getValue('SELECT `id` FROM `'._DB_PREFIX_.'htl_cart_booking_data`
+                    WHERE date_from = "'.pSQL($objOldHotelBooking->date_from).'" AND date_to = "'.pSQL($objOldHotelBooking->date_to).'"
+                    AND id_room = '.(int) $objOldHotelBooking->id_room.' AND `id_order` = '.(int) $objOldHotelBooking->id_order
+                );
+                $objCartBookingData = new HotelCartBookingData($idHotelCartBookingData);
+                $objCartBookingData->delete();
+
                 // delete the booking detail
                 $objOldHotelBooking = new HotelBookingDetail($idHotelBooking);
                 $objOldHotelBooking->delete();
@@ -2263,6 +2271,19 @@ class HotelBookingDetail extends ObjectModel
                 // ===============================================================
             } else {
                 // If we are reallocating to the same room type then we need to update only the room details
+                // update in the cart booking data
+                // retrieve HotelCartBookingData row
+                $idHotelCartBookingData = Db::getInstance()->getValue('SELECT `id` FROM `'._DB_PREFIX_.'htl_cart_booking_data`
+                    WHERE date_from = "'.pSQL($objOldHotelBooking->date_from).'" AND date_to = "'.pSQL($objOldHotelBooking->date_to).'"
+                    AND id_room = '.(int) $objOldHotelBooking->id_room.' AND `id_order` = '.(int) $objOldHotelBooking->id_order
+                );
+                $objCartBookingData = new HotelCartBookingData($idHotelCartBookingData);
+                $objCartBookingData->id_room = $idRoom;
+                // set backorder to 0 as available reallocate rooms will always be free
+                $objOldHotelBooking->is_back_order = 0;
+                $objCartBookingData->save();
+
+                // update in the hotel booking detail table
                 $objOldHotelBooking->id_room = $idRoom;
                 $objOldHotelBooking->room_num = $objHotelRoomInfo->room_num;
                 // set backorder to 0 as available reallocate rooms will always be free
@@ -2409,10 +2430,14 @@ class HotelBookingDetail extends ObjectModel
      *
      * @return [boolean] [true if updated otherwise false]
      */
-    public function updateOrderRefundStatus($id_order, $date_from = false, $date_to = false, $id_rooms = array(), $is_refunded = 1, $is_cancelled = 0)
+    public function updateOrderRefundStatus($id_order, $date_from = false, $date_to = false, $id_rooms = array(), $is_refunded = 1, $is_cancelled = null)
     {
         $table = 'htl_booking_detail';
-        $data = array('is_refunded' => (int) $is_refunded, 'is_cancelled' => (int) $is_cancelled);
+        $data = array('is_refunded' => (int) $is_refunded);
+
+        if (!is_null($is_cancelled)) {
+            $data['is_cancelled'] = (int) $is_cancelled;
+        }
 
         if ($id_rooms) {
             foreach ($id_rooms as $key_rm => $val_rm) {
@@ -3514,15 +3539,19 @@ class HotelBookingDetail extends ObjectModel
             }
         }
 
-        if ($bookedRoomInfoFlag && !$roomCount && $result) {
+        if (!$roomCount && $result) {
             $link = new Link();
             foreach ($result as $key => $bookingInfo) {
-                $result[$key]['booked_room_info'] = $this->chechRoomBooked($bookingInfo['id_room'], $bookingInfo['date_from'], $bookingInfo['date_to']);
-                $result[$key]['orders_filter_link'] = $link->getAdminLink('AdminOrders');
+                $result[$key]['child_ages'] = json_decode($bookingInfo['child_ages'], true);
 
-                // if need only rooms which are available to resolve overbooking the unset booked rooms
-                if ($bookedRoomInfoFlag == 2 && $result[$key]['booked_room_info']) {
-                    unset($result[$key]);
+                if ($bookedRoomInfoFlag) {
+                    $result[$key]['booked_room_info'] = $this->chechRoomBooked($bookingInfo['id_room'], $bookingInfo['date_from'], $bookingInfo['date_to']);
+                    $result[$key]['orders_filter_link'] = $link->getAdminLink('AdminOrders');
+
+                    // if need only rooms which are available to resolve overbooking the unset booked rooms
+                    if ($bookedRoomInfoFlag == 2 && $result[$key]['booked_room_info']) {
+                        unset($result[$key]);
+                    }
                 }
             }
         }
