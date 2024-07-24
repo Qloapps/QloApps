@@ -33,8 +33,8 @@
 						<th>{l s='Name'}</th>
 						<th class="fixed-width-sm"></th>
 						<th class="fixed-width-sm text-center">{l s='Quantity'}</th>
-						<th>{l s='Unit Price'}</th>
-						<th>{l s='Total Price'}</th>
+						<th>{l s='Unit Price (tax excl.)'}</th>
+						<th>{l s='Total Price (tax excl.)'}</th>
 						<th class="text-right">{l s='Action'}</th>
 					</tr>
 				</thead>
@@ -101,7 +101,7 @@
 								<th>{l s='Name'}</th>
 								<th class="fixed-width-sm"> </th>
 								<th class="fixed-width-sm text-center">{l s='Quantity'}</th>
-								<th>{l s='Unit Price'}</th>
+								<th>{l s='Unit Price (tax excl.)'}</th>
 							</tr>
 						</thead>
 						<tbody>

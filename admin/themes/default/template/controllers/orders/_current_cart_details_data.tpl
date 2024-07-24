@@ -92,7 +92,7 @@
 																			{foreach $data['child_ages'] as $childAge}
 																				<p class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
 																					<select class="guest_child_age room_occupancies" name="occupancy[0][child_ages][]">
-																						<option value="-1" {if $childAge == -1}selected{/if}>{l s='Select 1'}</option>
+																						<option value="-1" {if $childAge == -1}selected{/if}>{l s='Select age'}</option>
 																						<option value="0" {if $childAge == 0}selected{/if}>{l s='Under 1'}</option>
 																						{for $age=1 to ($max_child_age-1)}
 																							<option value="{$age|escape:'htmlall':'UTF-8'}" {if $childAge == $age}selected{/if}>{$age|escape:'htmlall':'UTF-8'}</option>

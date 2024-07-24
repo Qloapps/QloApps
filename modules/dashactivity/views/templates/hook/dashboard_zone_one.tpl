@@ -122,7 +122,7 @@
         <ul class="stats-list">
             <li>
                 <span class="item-label">
-                    <a href="{$link->getAdminLink("AdminCustomers")|escape:"html":"UTF-8"}" target="_blank">
+                    <a href="{$new_customer_filter_link|escape:"html":"UTF-8"}" target="_blank">
                         <span>{l s="New Customers" mod='dashactivity'}</span>
                     </a>
                 </span>

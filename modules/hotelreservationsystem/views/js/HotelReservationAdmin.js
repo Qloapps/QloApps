@@ -217,6 +217,7 @@ var GoogleMapsManager = {
             position: latLng,
             map: that.map,
             draggable: true,
+            icon: PS_STORES_ICON
         });
         that.markers.push(marker);
         marker.addListener('dragend', function(e) {
@@ -531,6 +532,10 @@ $(document).ready(function() {
     });
 
     /* ----  HotelConfigurationSettingController Admin ---- */
+    toggleGoogleMapsFields();
+    $('#WK_GOOGLE_ACTIVE_MAP_on').parent().on('click', function(e) {
+        toggleGoogleMapsFields();
+    });
 
     if ($('#WK_SHOW_MSG_ON_BO_on').prop('checked') === true) {
         $("#conf_id_WK_BO_MESSAGE").show();
@@ -826,7 +831,14 @@ $(document).ready(function() {
     initGoogleMaps();
 });
 
-
+function toggleGoogleMapsFields()
+{
+    if ($('#WK_GOOGLE_ACTIVE_MAP_on').attr('checked') == 'checked') {
+        $('#conf_id_WK_MAP_HOTEL_ACTIVE_ONLY').parent().show();
+    } else {
+        $('#conf_id_WK_MAP_HOTEL_ACTIVE_ONLY').parent().hide();
+    }
+}
 
 
 function showFeaturePriceRuleLangField(lang_iso_code, id_lang)

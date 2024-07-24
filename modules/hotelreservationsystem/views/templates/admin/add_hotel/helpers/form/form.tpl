@@ -357,17 +357,18 @@
 									<label for="enable_use_global_max_order_date_off">{l s='No' mod='hotelreservationsystem'}</label>
 									<a class="slide-button btn"></a>
 								</span>
+								<div class="help-block">{l s='Global max order date:' mod='hotelreservationsystem'} {dateFormat date=$MAX_GLOBAL_BOOKING_DATE}</div>
 							</div>
 						</div>
 						<div class="form-group" {if isset($smarty.post.enable_use_global_max_order_date)}{if !$smarty.post.enable_use_global_max_order_date}style="display:block;"{else}style="display:none;"{/if}{elseif isset($order_restrict_date_info.use_global_max_order_date) && !$order_restrict_date_info.use_global_max_order_date}style="display:block;" {else} style="display:none;" {/if}>
 							<label class="control-label col-sm-3 required" for="maximum_booking_date">{l s='Maximum Check-out Date to book a room :' mod='hotelreservationsystem'}</label>
 							<div class="col-sm-2">
-								<input type="text" class="form-control" id="maximum_booking_date" name="maximum_booking_date" value="{if isset($smarty.post.maximum_booking_date)}{$smarty.post.maximum_booking_date|escape:'html':'UTF-8'}{elseif isset($edit) && isset($order_restrict_date_info.max_order_date)}{$order_restrict_date_info.max_order_date|escape:'htmlall':'UTF-8'}{/if}" />
+								<input type="text" class="form-control" id="maximum_booking_date" name="maximum_booking_date" value="{if isset($order_restrict_date_info.max_order_date)}{$order_restrict_date_info.max_order_date|escape:'htmlall':'UTF-8'}{/if}" />
 							</div>
 						</div>
 						<div class="form-group">
 							<label class="control-label col-lg-3">
-								<span>{l s='Use Global preparation time :' mod='hotelreservationsystem'}</span>
+								<span>{l s='Use Global minimum booking offset :' mod='hotelreservationsystem'}</span>
 							</label>
 							<div class="col-lg-6">
 								<span class="switch prestashop-switch fixed-width-lg">
@@ -377,10 +378,11 @@
 									<label for="enable_use_global_preparation_time_off">{l s='No' mod='hotelreservationsystem'}</label>
 									<a class="slide-button btn"></a>
 								</span>
+								<div class="help-block">{l s='Global preparation time :' mod='hotelreservationsystem'} {$GLOBAL_PREPARATION_TIME}</div>
 							</div>
 						</div>
 						<div class="form-group" {if isset($smarty.post.enable_use_global_preparation_time)}{if !$smarty.post.enable_use_global_preparation_time}style="display:block;"{else}style="display:none;"{/if}{elseif isset($order_restrict_date_info.use_global_preparation_time) && !$order_restrict_date_info.use_global_preparation_time}style="display:block;" {else} style="display:none;" {/if}>
-							<label class="control-label col-sm-3 required" for="preparation_time">{l s='Preparation time :' mod='hotelreservationsystem'}</label>
+							<label class="control-label col-sm-3 required" for="preparation_time">{l s='Minimum booking offset :' mod='hotelreservationsystem'}</label>
 							<div class="col-sm-2">
 								<input type="text" class="form-control" id="preparation_time" name="preparation_time" value="{if isset($smarty.post.preparation_time)}{$smarty.post.preparation_time|escape:'html':'UTF-8'}{elseif isset($edit) && isset($order_restrict_date_info.preparation_time)}{$order_restrict_date_info.preparation_time|escape:'htmlall':'UTF-8'}{/if}" />
 							</div>

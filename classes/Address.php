@@ -517,5 +517,4 @@ class AddressCore extends ObjectModel
                 )
         ');
     }
-
 }
