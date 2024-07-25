@@ -25,9 +25,6 @@
     cursor: pointer;
     font-weight: 400;
 }
-.htlRoomTypeDescTextContainer p{
-    margin: 0px;
-}
 @media (min-width: 530px) {
     .hotelRoomDescContainer{
         position: absolute;
@@ -72,7 +69,7 @@
 	color: #555555;
 	font-weight: 300;
 	line-height: 21px;
-    margin-bottom: 9px;
+    margin-bottom: 10px;
 }
 a.htlRoomTypeBookNow {
 	font-size: 15px;

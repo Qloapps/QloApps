@@ -59,13 +59,10 @@
                                             {/if}
                                         </div>
                                         <div class="row margin-lr-0 htlRoomTypeDescText htlRoomTypeDescTextContainer">
-                                            {$roomDisplay.description}
-                                        </div>
-                                        <div  class="htlRoomTypeDescTextOriginal" style="display: none;">
-                                            {$roomDisplay.description}
+                                            {$roomDisplay.description|escape:'html':'UTF-8'}
                                         </div>
                                         <div class="row margin-lr-0">
-                                            <a class="btn btn-default htlRoomTypeBookNow" href="{$link->getProductLink($roomDisplay.id_product)|escape:'html':'UTF-8'}"><span>{if !isset($restricted_country_mode) && !$PS_CATALOG_MODE}{l s='book now' mod='wkhotelroom'}{else}{l s='View' mod='wkhotelroom'}{/if}</span></a>
+                                            <a class="btn htlRoomTypeBookNow" href="{$link->getProductLink($roomDisplay.id_product)|escape:'html':'UTF-8'}"><span>{if !isset($restricted_country_mode) && !$PS_CATALOG_MODE}{l s='book now' mod='wkhotelroom'}{else}{l s='View' mod='wkhotelroom'}{/if}</span></a>
                                         </div>
                                     </div>
                                 </div>
