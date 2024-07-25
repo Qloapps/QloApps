@@ -151,7 +151,7 @@
 										</span>
 									{/if}
 									<div class="row">
-										<div class="{if (isset($data_v['extra_demands']) && $data_v['extra_demands']) || (isset($data_v['service_products']) && $data_v['service_products'])}col-xs-6{else}col-xs-12{/if}">
+										<div class="{if (isset($data_v['extra_demands']) && $data_v['extra_demands']) || (isset($data_v['service_products']) && $data_v['service_products'])}col-xs-6 plus-sign{else}col-xs-12{/if}">
 											<div class="price_block">
 												<p class="total_price">
 													<span>
@@ -175,7 +175,7 @@
 											</div>
 										</div>
 										{if (isset($data_v['extra_demands']) && $data_v['extra_demands']) || (isset($data_v['service_products']) && $data_v['service_products'])}
-											<div class="col-xs-6 plus-sign">
+											<div class="col-xs-6">
 												<div class="demand_price_block">
 													<p class="demand_total_price">
 														<span>

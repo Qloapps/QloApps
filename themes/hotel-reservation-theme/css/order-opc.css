@@ -237,10 +237,23 @@
 .order-detail-content .room_price_detail_block{
 	clear: both;
 }
-.order-detail-content .room_price_detail_block .plus-sign:before{
+.order-detail-content .room_price_detail_block .plus-sign:after{
 	color: #777;
 	content: '+';
-	margin-right: 15px;
+}
+.room_price_detail_block .demand_total_price, .room_price_detail_block .total_price {
+	line-height: 28px;
+}
+
+@media (max-width: 1199px) {
+	.order-detail-content .room_price_detail_block .plus-sign:after{
+		transform: translate(5px, 0px);
+	}
+}
+@media (max-width: 430px) {
+	.order-detail-content .room_price_detail_block .plus-sign:after{
+		transform: translate(15px, 0px);
+	}
 }
 .room_price_detail_block .price_block .total_price, .room_price_detail_block .demand_price_block .demand_total_price{
 	word-break: break-word;

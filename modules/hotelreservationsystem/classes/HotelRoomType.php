@@ -419,5 +419,4 @@ class HotelRoomType extends ObjectModel
             'SELECT `id` FROM `'._DB_PREFIX_.'htl_room_information` WHERE `id_product` = '.(int)$this->id_product.' ORDER BY `id` ASC'
         );
     }
-
 }
