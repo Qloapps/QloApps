@@ -103,6 +103,24 @@ class blocknavigationmenu extends Module
         }
     }
 
+    public function hookActionObjectCMSUpdateAfter($params)
+    {
+        $idCMS = $params['object']->id;
+        if (!$params['object']->active) {
+            $objCustomNavigationLink = new WkCustomNavigationLink();
+            // Disabling depended Navigation link
+            $objCustomNavigationLink->disableNavigationLinksByIdCMS($idCMS);
+        }
+    }
+
+    public function hookActionObjectCMSDeleteAfter($params)
+    {
+        $idCMS = $params['object']->id;
+        $objCustomNavigationLink = new WkCustomNavigationLink();
+        // Deleting depended Navigation link
+        $objCustomNavigationLink->deleteNavigationLinksByIdCMS($idCMS);
+    }
+
     public function install()
     {
         $objModuleDb = new WkBlockNavigationMenuDb();
@@ -125,6 +143,8 @@ class blocknavigationmenu extends Module
             array (
                 'footer',
                 'actionObjectLanguageAddAfter',
+                'actionObjectCMSUpdateAfter',
+                'actionObjectCMSDeleteAfter',
                 'displayDefaultNavigationHook',
                 'displayNavigationHook',
                 'top',

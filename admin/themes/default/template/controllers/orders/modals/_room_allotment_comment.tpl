@@ -1,6 +1,5 @@
-<?php
-/**
-* 2010-2022 Webkul.
+{*
+* Since 2010 Webkul.
 *
 * NOTICE OF LICENSE
 *
@@ -14,18 +13,16 @@
 * needs please refer to https://store.webkul.com/customisation-guidelines/ for more information.
 *
 *  @author    Webkul IN <support@webkul.com>
-*  @copyright 2010-2022 Webkul IN
+*  @copyright Since 2010 Webkul IN
 *  @license   https://store.webkul.com/license.html
-*/
+*}
 
-class WebserviceOrderCore extends PaymentModule
-{
-    public $active = 1;
-    public $name = 'wsorder';
+<div class="modal-body">
+    <div><b>{l s='Allotment remark'}</b>: {$comment}</div>
 
-    public function __construct()
-    {
-        $this->displayName = $this->l('Order from API');
-        $this->validateOrderAmount = false;
-    }
-}
+    {if isset($loaderImg) && $loaderImg}
+        <div class="loading_overlay">
+            <img src='{$loaderImg}' class="loading-img"/>
+        </div>
+    {/if}
+</div>
