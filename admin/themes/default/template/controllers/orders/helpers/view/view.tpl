@@ -625,148 +625,51 @@
                         </div>
 
                     {/if}
-                    <!-- Tab nav -->
-                    <div class="row" style="display:none">
-                        <ul class="nav nav-tabs" id="tabAddresses">
-                            <li class="active">
-                                <a href="#addressShipping">
-                                    <i class="icon-truck"></i>
-                                    {l s='Shipping address'}
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#addressInvoice">
-                                    <i class="icon-file-text"></i>
-                                    {l s='Invoice address'}
-                                </a>
-                            </li>
-                        </ul>
-                        <!-- Tab content -->
-                        <div class="tab-content panel">
-                            <!-- Tab status -->
-                            <div class="tab-pane  in active" id="addressShipping">
-                                <!-- Addresses -->
-                                <h4 class="visible-print">{l s='Shipping address'}</h4>
-                                {if !$order->isVirtual()}
-                                <!-- Shipping address -->
-                                    {if $can_edit}
-                                        <form class="form-horizontal hidden-print" method="post" action="{$link->getAdminLink('AdminOrders')|escape:'html':'UTF-8'}&amp;vieworder&amp;id_order={$order->id|intval}">
-                                            <div class="form-group">
-                                                <div class="col-lg-9">
-                                                    <select name="id_address">
-                                                        {foreach from=$customer_addresses item=address}
-                                                        <option value="{$address['id_address']}"
-                                                            {if $address['id_address'] == $order->id_address_delivery}
-                                                                selected="selected"
-                                                            {/if}>
-                                                            {$address['alias']} -
-                                                            {$address['address1']}
-                                                            {$address['postcode']}
-                                                            {$address['city']}
-                                                            {if !empty($address['state'])}
-                                                                {$address['state']}
-                                                            {/if},
-                                                            {$address['country']}
-                                                        </option>
-                                                        {/foreach}
-                                                    </select>
-                                                </div>
-                                                <div class="col-lg-3">
-                                                    <button class="btn btn-default" type="submit" name="submitAddressShipping"><i class="icon-refresh"></i> {l s='Change'}</button>
-                                                </div>
-                                            </div>
-                                        </form>
-                                    {/if}
-                                    <div class="well">
-                                        <div class="row">
-                                            <div class="col-sm-6">
-                                                <a class="btn btn-default pull-right" href="?tab=AdminAddresses&amp;id_address={$addresses.delivery->id}&amp;addaddress&amp;realedit=1&amp;id_order={$order->id}&amp;address_type=1&amp;token={getAdminToken tab='AdminAddresses'}&amp;back={$smarty.server.REQUEST_URI|urlencode}">
-                                                    <i class="icon-pencil"></i>
-                                                    {l s='Edit'}
-                                                </a>
-                                                {displayAddressDetail address=$addresses.delivery newLine='<br />'}
-                                                {if $addresses.delivery->other}
-                                                    <hr />{$addresses.delivery->other}<br />
-                                                {/if}
-                                            </div>
-                                        </div>
-                                    </div>
-                                {/if}
-                            </div>
-                            <div class="tab-pane " id="addressInvoice">
-                                <!-- Invoice address -->
-                                <h4 class="visible-print">{l s='Invoice address'}</h4>
-                                {if $can_edit}
-                                    <form class="form-horizontal hidden-print" method="post" action="{$link->getAdminLink('AdminOrders')|escape:'html':'UTF-8'}&amp;vieworder&amp;id_order={$order->id|intval}">
-                                        <div class="form-group">
-                                            <div class="col-lg-9">
-                                                <select name="id_address">
-                                                    {foreach from=$customer_addresses item=address}
-                                                    <option value="{$address['id_address']}"
-                                                        {if $address['id_address'] == $order->id_address_invoice}
-                                                        selected="selected"
-                                                        {/if}>
-                                                        {$address['alias']} -
-                                                        {$address['address1']}
-                                                        {$address['postcode']}
-                                                        {$address['city']}
-                                                        {if !empty($address['state'])}
-                                                            {$address['state']}
-                                                        {/if},
-                                                        {$address['country']}
-                                                    </option>
-                                                    {/foreach}
-                                                </select>
-                                            </div>
-                                            <div class="col-lg-3">
-                                                <button class="btn btn-default" type="submit" name="submitAddressInvoice"><i class="icon-refresh"></i> {l s='Change'}</button>
-                                            </div>
-                                        </div>
-                                    </form>
-                                {/if}
-                                <div class="well">
-                                    <div class="row">
-                                        <div class="col-sm-6">
-                                            <a class="btn btn-default pull-right" href="?tab=AdminAddresses&amp;id_address={$addresses.invoice->id}&amp;addaddress&amp;realedit=1&amp;id_order={$order->id}&amp;address_type=2&amp;back={$smarty.server.REQUEST_URI|urlencode}&amp;token={getAdminToken tab='AdminAddresses'}">
-                                                <i class="icon-pencil"></i>
-                                                {l s='Edit'}
-                                            </a>
-                                            {displayAddressDetail address=$addresses.invoice newLine='<br />'}
-                                            {if $addresses.invoice->other}
-                                                <hr />{$addresses.invoice->other}<br />
-                                            {/if}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <script>
-                        $('#tabAddresses a').click(function (e) {
-                            e.preventDefault()
-                            $(this).tab('show')
-                        })
-                    </script>
                 </div>
 
-                <div class="panel">
+                <div class="panel panel-guest_address">
                     <div class="panel-heading">
-                        <i class="icon icon-envelope"></i> &nbsp;{l s='Guest Address'}
+                        <span class="panel-title"><i class="icon icon-envelope"></i> &nbsp;{l s='Guest Address'}</span>
                         {if $can_edit}
-                            {if $idGuestAddress}
-                                <a id="edit_guest_address" class="btn btn-primary pull-right fancybox" href="{$link->getAdminLink('AdminAddresses')}&amp;id_address={$idGuestAddress}&updateaddress&realedit=1&liteDisplaying=1&submitFormAjax=1#">
+                            {if $idOrderAddressInvoice}
+                                <button id="edit_guest_address" class="btn btn-primary pull-right fancybox" href="{$link->getAdminLink('AdminAddresses')}&amp;id_address={$idOrderAddressInvoice}&amp;updateaddress&amp;id_order={$order->id|intval}&amp;address_type=2&amp;realedit=1&amp;liteDisplaying=1&amp;submitFormAjax=1#">
                                     <i class="icon-pencil"></i> {l s='Edit'}
-                                </a>
+                                </button>
+                                {if (!$idCurrentAddress || ($idCurrentAddress != $idOrderAddressInvoice)) || $ordersWithDiffInvAddr}
+                                    <div class="guest_address_actions dropdown">
+                                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                                            <i class="icon-ellipsis-vertical"></i>
+                                        </a>
+                                        <ul class="dropdown-menu">
+                                            {if $ordersWithDiffInvAddr}
+                                                <li><a href="{$current_index}&amp;vieworder&amp;token={$smarty.get.token|escape:'html':'UTF-8'}&amp;id_order={$order->id|intval}&amp;action=set_old_orders_address">{l s='Set for all orders'}</a></li>
+                                            {/if}
+                                            {if !$idCurrentAddress || ($idCurrentAddress != $idOrderAddressInvoice)}
+                                                <li><a href="{$current_index}&amp;vieworder&amp;token={$smarty.get.token|escape:'html':'UTF-8'}&amp;id_order={$order->id|intval}&amp;action=set_address_current_address">{l s='Set as current address'}</a></li>
+                                            {/if}
+                                        </ul>
+                                    </div>
+                                {/if}
                             {else}
-                                <a id="add_guest_address" class="btn btn-primary pull-right fancybox" href="{$link->getAdminLink('AdminAddresses')}&amp;addaddress&amp;id_customer={$order->id_customer}&amp;liteDisplaying=1&amp;submitFormAjax=1#">
+                                <button id="add_guest_address" class="btn btn-primary pull-right fancybox" href="{$link->getAdminLink('AdminAddresses')}&amp;addaddress&amp;id_order={$order->id|intval}&amp;address_type=2&amp;id_customer={$order->id_customer}&amp;liteDisplaying=1&amp;submitFormAjax=1#">
                                     <i class="icon-plus-circle"></i> {l s='Add Address'}
-                                </a>
+                                </button>
+                                {if $idCurrentAddress}
+                                    <div class="guest_address_actions dropdown">
+                                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                                            <i class="icon-ellipsis-vertical"></i>
+                                        </a>
+                                        <ul class="dropdown-menu">
+                                            <li><a href="{$current_index}&amp;vieworder&amp;token={$smarty.get.token|escape:'html':'UTF-8'}&amp;id_order={$order->id|intval}&amp;action=set_order_active_address">{l s='Set current address for this order'}</a></li>
+                                        </ul>
+                                    </div>
+                                {/if}
                             {/if}
                         {/if}
                     </div>
                     <div class="row">
-                        {if $guestFormatedAddress}
-                            {$guestFormatedAddress}
+                        {if $guestFormattedAddress}
+                            {$guestFormattedAddress}
                         {else}
                             <div class="list-empty">
                                 <div class="list-empty-msg">

@@ -2236,6 +2236,91 @@ class AdminOrdersControllerCore extends AdminController
             } else {
                 $this->errors = Tools::displayError('An error occurred while resolving overbooking.');
             }
+        // Set old orders address as current order address
+        } elseif (Tools::getValue('action') && Tools::getValue('action') == 'set_old_orders_address') {
+            if ($idOrder = Tools::getValue('id_order')) {
+                if (Validate::isLoadedObject($objOrder = new Order($idOrder))) {
+                    $idAddressInvoice = $objOrder->id_address_invoice;
+                    if ($idAddressInvoice && Validate::isLoadedObject(new Address($idAddressInvoice))) {
+                        // get all customer orders and set old orders address as current order address
+                        if ($customerOrders = Order::getCustomerOrders($objOrder->id_customer)) {
+                            foreach ($customerOrders as $order) {
+                                $objOrder = new Order($order['id_order']);
+                                $objOrder->id_address_invoice = $idAddressInvoice;
+                                $objOrder->update();
+                            }
+                        }
+                        Tools::redirectAdmin(self::$currentIndex.'&id_order='.$idOrder.'&vieworder&conf=6&token='.$this->token);
+                    } else {
+                        $this->errors = Tools::displayError('Address not found. Please try again.');
+                    }
+                } else {
+                    $this->errors = Tools::displayError('Order not found. Please try again.');
+                }
+            } else {
+                $this->errors = Tools::displayError('Order not found. Please try again.');
+            }
+        // Set customer current active address as current order address
+        } elseif (Tools::getValue('action') && Tools::getValue('action') == 'set_address_current_address') {
+            if ($idOrder = Tools::getValue('id_order')) {
+                if (Validate::isLoadedObject($objOrder = new Order($idOrder))) {
+                    $idAddressInvoice = $objOrder->id_address_invoice;
+                    if ($idAddressInvoice && Validate::isLoadedObject($objOrderAddress = new Address($idAddressInvoice))) {
+                        $updateAddress = 1;
+                        if ($idCustomerAddress = Customer::getCustomerIdAddress($objOrder->id_customer)) {
+                            // only proceed if current active address and current order address are different
+                            if ($idCustomerAddress != $idAddressInvoice) {
+                                if (Validate::isLoadedObject($objActiveAddress = new Address($idCustomerAddress))) {
+                                    // Call delete as it will manage to delete current active address if it has no orders associated
+                                    // else it will just update deleted = 1 to the current active address
+                                    $objActiveAddress->delete();
+                                } else {
+                                    $this->errors = Tools::displayError('Guest address not found. Please try again.');
+                                }
+                            } else {
+                                // if current active address and current order address are same then no need to update
+                                $updateAddress = 0;
+                            }
+                        }
+
+                        if ($updateAddress && !count($this->errors)) {
+                            // set current order address as current active address
+                            $objOrderAddress->deleted = 0;
+                            if ($objOrderAddress->update()) {
+                                Tools::redirectAdmin(self::$currentIndex.'&id_order='.$idOrder.'&vieworder&conf=6&token='.$this->token);
+                            } else {
+                                $this->errors = Tools::displayError('Some error occurred while updating address detail. Please try again.');
+                            }
+                        }
+                    } else {
+                        $this->errors = Tools::displayError('Address not found. Please try again.');
+                    }
+                } else {
+                    $this->errors = Tools::displayError('Order not found. Please try again.');
+                }
+            } else {
+                $this->errors = Tools::displayError('Order not found. Please try again.');
+            }
+        } elseif (Tools::getValue('action') && Tools::getValue('action') == 'set_order_active_address') {
+            if ($idOrder = Tools::getValue('id_order')) {
+                if (Validate::isLoadedObject($objOrder = new Order($idOrder))) {
+                    // get currenct active address of the customer
+                    if ($idCustomerAddress = Customer::getCustomerIdAddress($objOrder->id_customer)) {
+                        $objOrder->id_address_invoice = $idCustomerAddress;
+                        if ($objOrder->update()) {
+                            Tools::redirectAdmin(self::$currentIndex.'&id_order='.$idOrder.'&vieworder&conf=6&token='.$this->token);
+                        } else {
+                            $this->errors[] = Tools::displayError('Some error occurred while updating address detail. Please try again.');
+                        }
+                    } else {
+                        $this->errors = Tools::displayError('Guest address not found. Please try again.');
+                    }
+                } else {
+                    $this->errors = Tools::displayError('Order not found. Please try again.');
+                }
+            } else {
+                $this->errors = Tools::displayError('Order not found. Please try again.');
+            }
         }
 
         // Sending loader image for the modals to be used for all the modals ajax processes
@@ -2854,13 +2939,26 @@ class AdminOrdersControllerCore extends AdminController
         $orderOverBookings = $objHotelBookingDetail->getOverbookedRooms($order->id, 0, '', '', 0, 0, 1);
 
         // Guest address info
-        $guestFormatedAddress = '';
-        if ($idGuestAddress = Customer::getCustomerIdAddress($order->id_customer)) {
-            $guestFormatedAddress = AddressFormat::generateAddress(new Address($idGuestAddress), array(), "<br />");
+        $guestFormattedAddress = '';
+        $idOrderAddressInvoice = 0;
+        $ordersWithDiffInvAddr = 0;
+        $idCurrentAddress = Customer::getCustomerIdAddress($order->id_customer);
+        if ($order->id_address_invoice && Validate::isLoadedObject($objGuestAddress = new Address($order->id_address_invoice))) {
+            $idOrderAddressInvoice = $order->id_address_invoice;
+            $guestFormattedAddress = AddressFormat::generateAddress($objGuestAddress, array(), "<br />");
+
+            // get customer orders without same id_address_invoice
+            if ($customerOrders = Order::getCustomerOrders($order->id_customer, false, null, $idOrderAddressInvoice, 1)) {
+                if ($customerOrders > 1) {
+                    $ordersWithDiffInvAddr = 1;
+                }
+            }
         }
         $this->tpl_view_vars = array(
-            'guestFormatedAddress' => $guestFormatedAddress,
-            'idGuestAddress' => $idGuestAddress,
+            'guestFormattedAddress' => $guestFormattedAddress,
+            'idOrderAddressInvoice' => $idOrderAddressInvoice,
+            'ordersWithDiffInvAddr' => $ordersWithDiffInvAddr,
+            'idCurrentAddress' => $idCurrentAddress,
             'totalRefundedRooms' => $totalRefundedRooms,
             'orderOverBookings' => $orderOverBookings,
             'refund_allowed' => (int) $order->isReturnable(),

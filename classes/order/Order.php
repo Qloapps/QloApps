@@ -954,21 +954,30 @@ class OrderCore extends ObjectModel
      *
      * @param int $id_customer Customer id
      * @param bool $show_hidden_status Display or not hidden order statuses
+     * @param bool $skip_id_address_invoice Skip orders from this id_address_invoice
      * @return array Customer orders
      */
-    public static function getCustomerOrders($id_customer, $show_hidden_status = false, Context $context = null)
+    public static function getCustomerOrders($id_customer, $show_hidden_status = false, Context $context = null, $id_address_invoice = null, $skip_address = 0)
     {
         if (!$context) {
             $context = Context::getContext();
         }
 
-        $res = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS('
-        SELECT o.*, (SELECT SUM(od.`product_quantity`) FROM `'._DB_PREFIX_.'order_detail` od WHERE od.`id_order` = o.`id_order`) nb_products
+        $sql = 'SELECT o.*, (SELECT SUM(od.`product_quantity`) FROM `'._DB_PREFIX_.'order_detail` od WHERE od.`id_order` = o.`id_order`) nb_products
         FROM `'._DB_PREFIX_.'orders` o
-        WHERE o.`id_customer` = '.(int)$id_customer.
-        Shop::addSqlRestriction(Shop::SHARE_ORDER).'
+        WHERE o.`id_customer` = '.(int)$id_customer;
+
+        // if you want orders from / not from a specific id_address_invoice
+        if (!is_null($id_address_invoice)) {
+            $sql .= ' AND o.`id_address_invoice`';
+            $sql .= ($skip_address ? ' != ' : ' = ').(int)$id_address_invoice;
+        }
+
+        $sql .= Shop::addSqlRestriction(Shop::SHARE_ORDER).'
         GROUP BY o.`id_order`
-        ORDER BY o.`date_add` DESC');
+        ORDER BY o.`date_add` DESC';
+
+        $res = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql);
         if (!$res) {
             return array();
         }
