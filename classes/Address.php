@@ -551,5 +551,4 @@ class AddressCore extends ObjectModel
                 )
         ');
     }
-
 }

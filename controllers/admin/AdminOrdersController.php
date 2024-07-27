@@ -24,17 +24,6 @@
 *  International Registered Trademark & Property of PrestaShop SA
 */
 
-class BoOrder extends PaymentModule
-{
-    public $active = 1;
-    public $name = 'bo_order';
-
-    public function __construct()
-    {
-        $this->displayName = $this->l('Back office order');
-    }
-}
-
 /**
  * @property Order $object
  */
@@ -628,11 +617,23 @@ class AdminOrdersControllerCore extends AdminController
                     $payment_methods[] = $module->displayName;
                 }
             }
+
+            // Set the order currency at first element of currencies
+            if ($currencies = Currency::getCurrenciesByIdShop($objOrder->id_shop)) {
+                foreach ($currencies as $key => $currency) {
+                    if ($currency['id_currency'] == $objOrder->id_currency) {
+                        unset($currencies[$key]);
+                        array_unshift($currencies, $currency);
+                        break;
+                    }
+                }
+            }
+
             $this->context->smarty->assign(
                 array(
                     'current_index' => self::$currentIndex,
                     'order' => $objOrder,
-                    'currencies' => Currency::getCurrenciesByIdShop($objOrder->id_shop),
+                    'currencies' => $currencies,
                     'payment_methods' => $payment_methods,
                     'payment_types' => $this->getPaymentsTypes(),
                     'invoices_collection' => $objOrder->getInvoicesCollection(),
@@ -760,6 +761,33 @@ class AdminOrdersControllerCore extends AdminController
             $response['STATUS_CHECKED_IN'] = HotelBookingDetail::STATUS_CHECKED_IN;
             $response['STATUS_CHECKED_OUT'] = HotelBookingDetail::STATUS_CHECKED_OUT;
             $response['modalHtml'] = $this->context->smarty->fetch('modal.tpl');
+        }
+
+        die(Tools::jsonEncode($response));
+    }
+
+    public function ajaxProcessInitRoomAllotmentCommentModal()
+    {
+        $response['hasError'] = 1;
+        if (Validate::isLoadedObject($objBookingDetail = new HotelBookingDetail(Tools::getValue('id_hotel_booking')))) {
+            if ($objBookingDetail->booking_type == HotelBookingDetail::ALLOTMENT_MANUAL) {
+                // get booking information by order
+                $this->context->smarty->assign('comment', $objBookingDetail->comment);
+
+                $title = $objBookingDetail->room_num.' - '.$objBookingDetail->room_type_name.' ('.
+                Tools::displayDate($objBookingDetail->date_from).' - '.Tools::displayDate($objBookingDetail->date_to).')';
+                $modal = array(
+                    'modal_id' => 'room-allotment-comment-modal',
+                    'modal_class' => 'modal-md order_detail_modal',
+                    'modal_title' => '<i class="icon icon-comment"></i> &nbsp'.$title,
+                    'modal_content' => $this->context->smarty->fetch('controllers/orders/modals/_room_allotment_comment.tpl'),
+                    'modal_actions' => array(),
+                );
+
+                $this->context->smarty->assign($modal);
+                $response['hasError'] = 0;
+                $response['modalHtml'] = $this->context->smarty->fetch('modal.tpl');
+            }
         }
 
         die(Tools::jsonEncode($response));
@@ -991,7 +1019,9 @@ class AdminOrdersControllerCore extends AdminController
         $this->addJS(_PS_JS_DIR_.'vendor/d3.v3.min.js');
 
         if ($this->tabAccess['edit'] == 1 && $this->display == 'view') {
-            $this->addJS(_PS_JS_DIR_.'admin/orders.js');
+            if ($this->loadObject()) {
+                $this->addJS(_PS_JS_DIR_.'admin/orders.js');
+            }
             // add js for reallocation process
             $this->addJS(_PS_JS_DIR_.'admin/reallocation.js');
             // $this->addJS(_PS_JS_DIR_.'admin/orders-product-event.js');
@@ -2961,6 +2991,7 @@ class AdminOrdersControllerCore extends AdminController
             'idCurrentAddress' => $idCurrentAddress,
             'totalRefundedRooms' => $totalRefundedRooms,
             'orderOverBookings' => $orderOverBookings,
+            // refund info
             'refund_allowed' => (int) $order->isReturnable(),
             'applicable_refund_policies' => $applicableRefundPolicies,
             'returns' => OrderReturn::getOrdersReturn($order->id_customer, $order->id),
@@ -3053,9 +3084,9 @@ class AdminOrdersControllerCore extends AdminController
                 'customer' => $customer)
             ),
             'orderDocuments' => $order->getDocuments(),
-            'ROOM_STATUS_ALLOTED' => HotelBookingDetail::STATUS_ALLOTED,
             'ROOM_STATUS_CHECKED_IN' => HotelBookingDetail::STATUS_CHECKED_IN,
             'ROOM_STATUS_CHECKED_OUT' => HotelBookingDetail::STATUS_CHECKED_OUT,
+            'ALLOTMENT_MANUAL' => HotelBookingDetail::ALLOTMENT_MANUAL,
         );
 
         return parent::renderView();
@@ -4925,6 +4956,7 @@ class AdminOrdersControllerCore extends AdminController
             'tax_excl' => $totalRoomPriceAfterTE,
             'tax_incl' => $totalRoomPriceAfterTI,
         );
+
         if ($update_htl_tables = $obj_booking_detail->UpdateHotelCartHotelOrderOnOrderEdit(
             $id_order,
             $id_room,

@@ -306,10 +306,16 @@ function init()
 		e.preventDefault();
 	});
 
+    // voucher modal show and close
 	$('#add_voucher').unbind('click').click(function(e) {
 		e.preventDefault();
 		VoucherModal.show();
 	});
+
+    $(document).on('hidden.bs.modal', '#voucher-modal', function(){
+        $('#voucher-modal').remove();
+    });
+    // End: voucher modal show and close
 
 	$(document).on('change','#discount_type', function(e) {
 		// Percent type
@@ -342,10 +348,17 @@ function init()
 			$('select[name=discount_invoice]').attr('disabled', false);
 	});
 
+    // payment information modal show and close
 	$('.open_payment_information').unbind('click').click(function(e) {
 		e.preventDefault();
 		OrderPaymentDetailModal.show($(this));
 	});
+
+    $(document).on('hidden.bs.modal', '#payment-detail-modal', function(){
+        $('#payment-detail-modal').remove();
+    });
+    // End: payment information modal show and close
+
 
 	initRoomEvents();
 	initProductEvents();
@@ -523,15 +536,12 @@ function initProductEvents()
                 $(this).val(max_child_in_room);
                 if (elementVal == 1) {
                     showOccupancyError(no_children_allowed_txt, $(this).closest(".occupancy_info_block"));
-                    haserror = true;
                 } else {
                     showOccupancyError(max_children_txt, $(this).closest(".occupancy_info_block"));
-                    haserror = true;
                 }
             } else if (elementVal > max_allowed_for_current)  {
                 $(this).val(max_allowed_for_current);
                 showOccupancyError(max_occupancy_reached_txt, $(this).closest(".occupancy_info_block"));
-                haserror = true;
             }
         } else {
             max_adults_in_room = $(this).closest(".booking_occupancy_wrapper").find('.max_adults').val();
@@ -1171,15 +1181,21 @@ function initRoomEvents()
 		e.preventDefault();
 	});
 
+    // order-payment-modal hide and show
 	$('#add_new_payment').on('click', function(e) {
 		e.preventDefault();
 		OrderPaymentModal.show();
 	});
 
+    $(document).on('hidden.bs.modal', '#order-payment-modal', function(){
+        $('#order-payment-modal').remove();
+    });
+
 	$('#cancle_add_payment').on('click', function(e) {
 		e.preventDefault();
 		OrderPaymentModal.hide();
 	});
+    // end order-payment-modal hide and show
 }
 function addRoomRefreshTotal() {
 	var quantity = parseInt($('#add_product_product_quantity').val());
@@ -1671,6 +1687,10 @@ $(document).ready(function() {
         DocumentNoteModal.show($(this));
     });
 
+    $(document).on('hidden.bs.modal', '#document-note-modal', function(){
+        $('#document-note-modal').remove();
+    });
+
     $(document).on('click', '.submitDocumentNote', function(e) {
         e.preventDefault();
         DocumentNoteModal.submit();
@@ -1683,6 +1703,10 @@ $(document).ready(function() {
     $(document).on('click', '#edit_guest_details', function(e) {
         e.preventDefault();
         TravellerModal.show();
+    });
+
+    $(document).on('hidden.bs.modal', '#traveller-modal', function(){
+        $('#traveller-modal').remove();
     });
 
     $(document).on('click', '.submitTravellerInfo', function(e) {
@@ -1725,11 +1749,28 @@ $(document).ready(function() {
         RoomStatusModal.show($(this));
     });
 
+    $(document).on('hidden.bs.modal', '#room-status-modal', function(){
+        $('#room-status-modal').remove();
+    });
+
     $(document).on('click', '.submitRoomStatus', function(e) {
         e.preventDefault();
         RoomStatusModal.submit();
     });
     // End: RoomStatusModal: Processes
+    // ======================================
+
+    // Start: RoomAllotmentCommentModal: Processes
+    $(document).on('click', '.manual_allotment_comment', function(e){
+        e.preventDefault();
+
+        RoomAllotmentCommentModal.show(this);
+    });
+
+    $(document).on('hidden.bs.modal', '#room-allotment-comment-modal', function(){
+        $('#room-allotment-comment-modal').remove();
+    });
+    // End: RoomAllotmentCommentModal: Processes
     // ======================================
 
     // Start: AddRoomBookingModal: Processes
@@ -1751,6 +1792,10 @@ $(document).ready(function() {
         if ($('#new_product #add_product_product_id').val() == 0) {
             $('.submitAddRoom').attr('disabled', true);
         }
+    });
+
+    $(document).on('hidden.bs.modal', '#add-room-booking-modal', function(){
+        $('#add-room-booking-modal').remove();
     });
     // End: AddRoomBookingModal: Processes
     // ======================================
@@ -1803,6 +1848,10 @@ $(document).ready(function() {
     $(document).on('click', '#page-header-desc-order-cancel', function(e) {
         e.preventDefault();
         CancelRoomBookingModal.show();
+    });
+
+    $(document).on('hidden.bs.modal', '#cancel-room-booking-modal', function(){
+        $('#cancel-room-booking-modal').remove();
     });
 
     $(document).on('click', '.submitCancelBooking', function(e) {
@@ -2353,6 +2402,10 @@ const AddRoomBookingModal = {
                                 $('#add_product_product_price_tax_incl').val(data.price_tax_incl);
                                 $('#add_product_product_price_tax_excl').val(data.price_tax_excl);
 
+                                $("#new_product .max_adults").val(data.room_type_info.max_adults);
+                                $("#new_product .max_children").val(data.room_type_info.max_children);
+                                $("#new_product .max_guests").val(data.room_type_info.max_guests);
+
                                 //Added by webkul to set curent date in the date fields by default
                                 var date_in = $.datepicker.formatDate('dd-mm-yy', new Date());
                                 var date_out = $.datepicker.formatDate('dd-mm-yy', new Date(new Date().getTime()+24*60*60*1000));
@@ -2541,6 +2594,40 @@ const CancelRoomBookingModal = {
     },
     submit: function() {
         $('#initiateRefund').click();
+    }
+};
+
+// Modal object to handle comment on rooms for manual cancellation
+const RoomAllotmentCommentModal = {
+    show: function(element) {
+        $(".loading_overlay").show();
+        let idHtlBooking = parseInt($(element).attr('data-id_hotel_booking_detail'));
+        $.ajax({
+            type: 'POST',
+            headers: {
+                "cache-control": "no-cache"
+            },
+            url: admin_order_tab_link,
+            dataType: 'JSON',
+            cache: false,
+            data: 'ajax=true&id_hotel_booking='+idHtlBooking+'&action=initRoomAllotmentCommentModal',
+            success: function(result) {
+                if (result.hasError == 0 && result.modalHtml) {
+                    $('#footer').next('.bootstrap').append(result.modalHtml);
+
+                    $('#room-allotment-comment-modal').modal('show');
+
+                } else {
+                    showErrorMessage(txtSomeErr);
+                }
+            },
+            complete: function() {
+                $(".loading_overlay").hide();
+            }
+        });
+    },
+    close: function() {
+        $('#room-allotment-comment-modal').modal('hide');
     }
 };
 
