@@ -414,10 +414,8 @@ class OrderHistoryCore extends ObjectModel
             return false;
         }
 
-        if ($order->module != 'csvorder') {
-            if (!$this->sendEmail($order, $template_vars)) {
-                return false;
-            }
+        if (!$this->sendEmail($order, $template_vars)) {
+            return false;
         }
 
         return true;

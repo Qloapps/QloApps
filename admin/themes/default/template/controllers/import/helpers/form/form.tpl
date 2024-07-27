@@ -326,27 +326,12 @@
 				<a class="list-group-item _blank" href="../docs/csv_import/categories_import.csv">
 					{l s='Sample Categories file'}
 				</a>
-				{* <a class="list-group-item _blank" href="../docs/csv_import/combinations_import.csv">
-					{l s='Sample Combinations file'}
-				</a> *}
 				<a class="list-group-item _blank" href="../docs/csv_import/customers_import.csv">
 					{l s='Sample Customers file'}
 				</a>
 				<a class="list-group-item _blank" href="../docs/csv_import/bookings_import.csv">
 					{l s='Sample Bookings file'}
 				</a>
-				{* <a class="list-group-item _blank" href="../docs/csv_import/addresses_import.csv">
-					{l s='Sample Addresses file'}
-				</a> *}
-				{* <a class="list-group-item _blank" href="../docs/csv_import/manufacturers_import.csv">
-					{l s='Sample Manufacturers file'}
-				</a> *}
-				{* <a class="list-group-item _blank" href="../docs/csv_import/suppliers_import.csv">
-					{l s='Sample Suppliers file'}
-				</a> *}
-				{* <a class="list-group-item _blank" href="../docs/csv_import/alias_import.csv">
-					{l s='Sample Aliases file'}
-				</a> *}
 				{if $PS_ADVANCED_STOCK_MANAGEMENT}
 				<a class="list-group-item _blank" href="../docs/csv_import/supply_orders_import.csv">
 					{l s='Sample Supply Orders file'}
