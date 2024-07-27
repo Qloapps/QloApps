@@ -2491,8 +2491,8 @@ class AdminImportControllerCore extends AdminController
                 $objHotelBookingDetails = new HotelBookingDetail();
                 $amount = 0;
                 $dueAmount = 0;
-                // $this->context->cart->setNoMultishipping();
-                // $this->context->cart->save();
+                $this->context->cart->setNoMultishipping();
+                $this->context->cart->save();
                 $occupancy = $featurePrices = array();
                 foreach ($orderRow as $idHotel => $orderByHotel) {
                     foreach($orderByHotel as $key => $orderProduct) {
