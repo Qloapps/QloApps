@@ -1214,7 +1214,7 @@ Quick View Styles
 
 .hotel_name_block {
   display: flex;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
 }
 .hotel_name_block h1 {
   font-size: 22px;
@@ -1743,7 +1743,6 @@ ul.service-product-nav > li:hover {
 }
 @media (max-width:768px) {
   #hotel_rating {
-    margin-left: 0px;
     display: block;
   }
 }
