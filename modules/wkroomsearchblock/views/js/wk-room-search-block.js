@@ -138,7 +138,11 @@ const BookingSearchManager = {
                             $('#hotel_cat_id').val('');
                             $('#id_hotel_button').html(result.html_hotel_options);
                             $('#id_hotel_button').trigger('chosen:updated');
-
+                            // Resetting the data from previously selected hotel
+                            $('#preparation_time').val(0);
+                            var max_order_date = $('#max_order_date').val();
+                            var preparation_time = 0;
+                            createDateRangePicker(max_order_date, preparation_time, $('#check_in_time').val(), $('#check_out_time').val());
                             if (search_auto_focus_next_field) {
                                 BookingSearchManager.activateStep('hotel');
                             }
@@ -380,6 +384,14 @@ $(document).ready(function() {
         if (preparation_time) {
             start_date.setDate(start_date.getDate() + parseInt(preparation_time));
             start_date.setHours(0, 0, 0, 0);
+            let selectedDateFrom = new Date(Date.parse(dateFrom));
+            let selectedDateTo = new Date(Date.parse(dateTo));
+            if (selectedDateFrom < start_date
+                || selectedDateTo < start_date
+            ) {
+                $('#check_in_time').val('');
+                $('#check_out_time').val('');
+            }
         }
 
         if (max_order_date) {
