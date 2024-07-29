@@ -854,7 +854,17 @@ class AdminCustomersControllerCore extends AdminController
             }
         }
 
-        $products = $customer->getBoughtProducts();
+        $purchasedServices = array();
+        $purchasedRoomTypes = array();
+        if ($products = $customer->getBoughtProducts()) {
+            foreach ($products as $product) {
+                if ($product['is_booking_product']) {
+                    $purchasedRoomTypes[] = $product;
+                } else {
+                    $purchasedServices[] = $product;
+                }
+            }
+        }
 
         $carts = Cart::getCustomerCarts($customer->id);
         $total_carts = count($carts);
@@ -953,6 +963,8 @@ class AdminCustomersControllerCore extends AdminController
             'total_ko' => Tools::displayPrice($total_ko, $this->context->currency->id),
             // Products
             'products' => $products,
+            'purchasedRoomTypes' => $purchasedRoomTypes,
+            'purchasedServices' => $purchasedServices,
             // Addresses
             'addresses' => $customer->getAddresses($this->default_form_language),
             // Discounts
@@ -1052,7 +1064,6 @@ class AdminCustomersControllerCore extends AdminController
         $this->_setDeletedMode();
         parent::processBulkDelete();
     }
-
 
     public function processAdd()
     {

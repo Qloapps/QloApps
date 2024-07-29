@@ -963,8 +963,7 @@ class OrderCore extends ObjectModel
         }
 
         $res = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS('
-        SELECT o.*, (SELECT SUM(od.`product_quantity`) FROM `'._DB_PREFIX_.'order_detail` od WHERE od.`id_order` = o.`id_order`) nb_products,
-        (SELECT MAX(hbd.`date_to`) FROM `'._DB_PREFIX_.'htl_booking_detail` hbd WHERE hbd.`id_order` = o.`id_order`) order_last_date
+        SELECT o.*, (SELECT SUM(od.`product_quantity`) FROM `'._DB_PREFIX_.'order_detail` od WHERE od.`id_order` = o.`id_order`) nb_products
         FROM `'._DB_PREFIX_.'orders` o
         WHERE o.`id_customer` = '.(int)$id_customer.
         Shop::addSqlRestriction(Shop::SHARE_ORDER).'

@@ -350,33 +350,95 @@
 				{/if}
 			</div>
 			{if $products AND count($products)}
-			<div class="panel">
-				<div class="panel-heading">
-					<i class="icon-archive"></i> {l s='Room types and services'} <span class="badge">{count($products)}</span>
+				<div class="panel">
+					<div class="panel-heading">
+						<i class="icon-archive"></i> {l s='Room types and services'} <span class="badge">{count($products)}</span>
+					</div>
+					<div class="nav nav-tabs">
+						<ul class="nav nav-tabs">
+							{assign var=count_room_types value=count($purchasedRoomTypes)}
+							{assign var=count_services value=count($purchasedServices)}
+							{if $count_room_types}
+								<li class="active">
+									<a data-toggle="tab" href="#purchased_room_types">
+										{l s='Room Types'}
+										<span class="label label-success">{$count_room_types}</span>
+									</a>
+								</li>
+							{/if}
+							{if $count_services}
+								<li {if !$count_room_types} class="active" {/if}>
+									<a data-toggle="tab" href="#purchased_services">
+										{l s='Services:'}
+										<span class="label label-success">{$count_services}</span>
+									</a>
+								</li>
+							{/if}
+						</ul>
+						<div class="tab-content panel">
+							{if $count_room_types}
+								<div class="tab-pane active" id="purchased_room_types">
+									<table class="table">
+										<thead>
+											<tr>
+												<th><span class="title_box">{l s='ID Order'}</span></th>
+												<th><span class="title_box">{l s='Name'}</span></th>
+												<th><span class="title_box">{l s='Nights booked'}</span></th>
+												<th><span class="title_box">{l s='Booking Date'}</span></th>
+											</tr>
+										</thead>
+										<tbody>
+											{foreach $purchasedRoomTypes AS $key => $product}
+											<tr onclick="document.location = '?tab=AdminOrders&amp;id_order={$product['id_order']|intval}&amp;vieworder&amp;token={getAdminToken tab='AdminOrders'}'">
+												<td>
+													<a href="?tab=AdminOrders&amp;id_order={$product['id_order']}&amp;vieworder&amp;token={getAdminToken tab='AdminOrders'}">
+														#{$product['id_order']}
+													</a>
+												</td>
+												<td>
+													{$product['product_name']}
+												</td>
+												<td>{$product['product_quantity']}</td>
+												<td>{dateFormat date=$product['date_add'] full=0}</td>
+											</tr>
+											{/foreach}
+										</tbody>
+									</table>
+								</div>
+							{/if}
+							{if $count_services}
+								<div class="tab-pane {if !$count_room_types}active{/if}" id="purchased_services">
+									<table class="table">
+										<thead>
+											<tr>
+												<th><span class="title_box">{l s='ID Order'}</span></th>
+												<th><span class="title_box">{l s='Name'}</span></th>
+												<th><span class="title_box">{l s='Quantity'}</span></th>
+												<th><span class="title_box">{l s='Booking Date'}</span></th>
+											</tr>
+										</thead>
+										<tbody>
+											{foreach $purchasedServices AS $key => $product}
+											<tr onclick="document.location = '?tab=AdminOrders&amp;id_order={$product['id_order']|intval}&amp;vieworder&amp;token={getAdminToken tab='AdminOrders'}'">
+												<td>
+													<a href="?tab=AdminOrders&amp;id_order={$product['id_order']}&amp;vieworder&amp;token={getAdminToken tab='AdminOrders'}">
+														#{$product['id_order']}
+													</a>
+												</td>
+												<td>
+													{$product['product_name']}
+												</td>
+												<td>{$product['product_quantity']}</td>
+												<td>{dateFormat date=$product['date_add'] full=0}</td>
+											</tr>
+											{/foreach}
+										</tbody>
+									</table>
+								</div>
+							{/if}
+						</div>
+					</div>
 				</div>
-				<table class="table">
-					<thead>
-						<tr>
-							<th><span class="title_box">{l s='Date'}</span></th>
-							<th><span class="title_box">{l s='Name'}</span></th>
-							<th><span class="title_box">{l s='Quantity'}</span></th>
-						</tr>
-					</thead>
-					<tbody>
-						{foreach $products AS $key => $product}
-						<tr onclick="document.location = '?tab=AdminOrders&amp;id_order={$product['id_order']|intval}&amp;vieworder&amp;token={getAdminToken tab='AdminOrders'}'">
-							<td>{dateFormat date=$product['date_add'] full=0}</td>
-							<td>
-								<a href="?tab=AdminOrders&amp;id_order={$product['id_order']}&amp;vieworder&amp;token={getAdminToken tab='AdminOrders'}">
-									{$product['product_name']}
-								</a>
-							</td>
-							<td>{$product['product_quantity']}</td>
-						</tr>
-						{/foreach}
-					</tbody>
-				</table>
-			</div>
 			{/if}
 			{if count($interested)}
 			<div class="panel">
