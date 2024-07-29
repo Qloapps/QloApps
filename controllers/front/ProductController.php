@@ -765,7 +765,7 @@ class ProductControllerCore extends FrontController
         $demandsPrice = $demandsPricePerRoom * $quantity;
         // calculate total price
         $totalPrice = $totalRoomPrice + $demandsPrice;
-        $totalPriceWithoutDiscount = $objProduct->getPriceWithoutReduct(!$useTax, false, 6, 1) * $numDays;
+        $totalPriceWithoutDiscount = $objProduct->getPriceWithoutReduct(!$useTax, false, 6, 1) * $numDays * $quantity;
         // send occupancy information searched by the user
         if ($occupancy && is_array($occupancy)) {
             $smartyVars['occupancies'] = $occupancy;
