@@ -2518,10 +2518,19 @@ class AdminImportControllerCore extends AdminController
                             if (isset($orderProduct['id_service_products']) && count($orderProduct['id_service_products'])) {
                                 foreach ($orderProduct['id_service_products'] as $serviceProdKey =>  $serviceProd) {
                                     $serviceProd = explode(':', $serviceProd);
-                                    $objServiceProduct = new Product($serviceProd[0]);
-                                    if (Validate::isLoadedObject($objServiceProduct)) {
+                                    if (Validate::isLoadedObject($objServiceProduct = new Product($serviceProd[0]))) {
                                         $serviceProducts[$serviceProdKey]['id_product'] = $serviceProd[0];
-                                        $serviceProducts[$serviceProdKey]['quantity'] = isset($serviceProd[1]) ? $serviceProd[1] : 1;
+                                        $serviceProducts[$serviceProdKey]['quantity'] = 1;
+                                        if ($objServiceProduct->allow_multiple_quantity
+                                            && isset($serviceProd[1])
+                                            && $serviceProd[1]
+                                        ) {
+                                            if ($serviceProd[1] < $objServiceProduct->max_quantity) {
+                                                $serviceProducts[$serviceProdKey]['quantity'] = $serviceProd[1];
+                                            } else {
+                                                $serviceProducts[$serviceProdKey]['quantity'] = $objServiceProduct->max_quantity;
+                                            }
+                                        }
                                     }
                                 }
                             }
