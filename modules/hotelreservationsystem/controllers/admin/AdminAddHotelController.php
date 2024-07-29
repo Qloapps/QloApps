@@ -582,6 +582,7 @@ class AdminAddHotelController extends ModuleAdminController
                             if ($objHotelBranch->id_category) {
                                 $objCategory = new Category($objHotelBranch->id_category);
                                 $objCategory->name = $objHotelBranch->hotel_name;
+                                $objCategory->link_rewrite = $linkRewriteArray;
                                 $objCategory->id_parent = $catCity;
                                 $objCategory->save();
                                 Category::regenerateEntireNtree();
