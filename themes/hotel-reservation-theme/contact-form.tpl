@@ -139,6 +139,7 @@
 					</div>
 				{/if}
 				{hook h='displayGDPRConsent' moduleName='contactform'}
+				{hook h='displayContactFormFieldsAfter'}
 				<div class="form-group">
 					<input type="text" name="url" value="" class="hidden" />
 					<input type="hidden" name="contactKey" value="{$contactKey}" />
