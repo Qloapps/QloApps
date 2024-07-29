@@ -18,12 +18,10 @@
 */
 
 $(document).ready(function() {
-    $(document).find('.htlRoomTypeDescText').each(function() {
-        // checking if the display:overFlow has been applied to the description.
-        if ($(this).prop('scrollHeight') - $(this).prop('clientHeight') > 15) {
-            // Only show read more and read less text if the text is wrapped.
-            initToogleOtions($(this)[0]);
-        }
+    applyChangesToDescription();
+    $(window).on('resize', function() {
+        cleanDescriptions();
+        applyChangesToDescription();
     });
 
     $(document).on('click', '.read-extra-text', function(e) {
@@ -37,15 +35,30 @@ $(document).ready(function() {
         }
     });
 });
+function cleanDescriptions() {
+    $(document).find('.htlRoomTypeDescText').each(function() {
+        $(this).addClass('htlRoomTypeDescTextContainer');
+        $(this).html($(this).parent().find('.htlRoomTypeDescOriginal').html());
+    });
+}
 
-function initToogleOtions(target)
-{
+function applyChangesToDescription() {
+    $(document).find('.htlRoomTypeDescText').each(function() {
+        // checking if the display:overFlow has been applied to the description.
+        if ($(this).prop('scrollHeight') - $(this).prop('clientHeight') > 15) {
+            // Only show read more and read less text if the text is wrapped.
+            initToggleOptions($(this)[0]);
+        }
+    });
+}
+
+function initToggleOptions(target) {
     // Getting the number of displayed characters
     var show_char = getChars(target);
     var ellipses = "... ";
     var content = $(target).html();
     if (content.trim().length > show_char) {
-        // Dividing the text into two parts so that we are able to diffrentiate the displayed text from hidden text.
+        // Dividing the text into two parts so that we are able to differentiate the displayed text from hidden text.
         var a = content.trim().substr(0, show_char);
         var b = content.trim().substr(show_char - content.trim().length);
         // Adding the read more and read less text with the ellipses to the original text.
@@ -69,5 +82,17 @@ function getChars(target) {
     // Counting the number of the characters in the lines
     var displayedCharacters = $(target).text().split('').slice(0, lines * (width / parseInt(font_size))).join('').length;
 
-    return displayedCharacters + 20;
+    if ($(document).width() > 991) {
+        displayedCharacters += 30;
+    } else if ($(document).width() > 768) {
+        displayedCharacters += 34;
+    } else if ($(document).width() > 570) {
+        displayedCharacters += 25;
+    } else if ($(document).width() > 444) {
+        displayedCharacters += 20;
+    } else {
+        displayedCharacters += 15;
+    }
+
+    return displayedCharacters;
 }
