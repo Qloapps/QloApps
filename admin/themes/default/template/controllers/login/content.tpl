@@ -67,6 +67,7 @@
 						</label>
 						<input name="passwd" type="password" id="passwd" class="form-control" value="{if isset($password)}{$password|escape:'html':'UTF-8'}{/if}" tabindex="2" placeholder="&#xf084 {l s='Password'}" />
 					</div>
+					{hook h="displayAdminLoginFormFieldsAfter"}
 					<div class="form-group row-padding-top">
 						<button name="submitLogin" type="submit" tabindex="4" class="btn btn-primary btn-lg btn-block ladda-button" data-style="slide-up" data-spinner-color="white" >
 							<span class="ladda-label">

@@ -415,6 +415,7 @@ class ProductControllerCore extends FrontController
                             'hotel_address1' => $addressInfo['address1'],
                             'hotel_phone' => $addressInfo['phone'],
                             'hotel_name' => $hotel_name,
+                            'hotel_rating' => $hotel_info_by_id['rating'],
                             'hotel_policies' => $hotel_policies,
                             'hotel_features' => $htl_features,
                             'hotel_image_link' => $hotelImageLink,
