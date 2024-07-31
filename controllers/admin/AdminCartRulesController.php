@@ -41,7 +41,8 @@ class AdminCartRulesControllerCore extends AdminController
 
         $this->context = Context::getContext();
 
-        $this->bulk_actions = array('delete' => array('text' => $this->l('Delete selected'),'icon' => 'icon-trash', 'confirm' => $this->l('Delete selected items?')));
+        $this->bulk_actions = array('delete' => array('text' => $this->l('Delete selected'),'icon' => 'icon-trash'));
+        $this->specificConfirmDelete = false;
 
         $this->fields_list = array(
             'id_cart_rule' => array('title' => $this->l('ID'), 'align' => 'center', 'class' => 'fixed-width-xs'),
@@ -143,15 +144,103 @@ class AdminCartRulesControllerCore extends AdminController
         echo json_encode(array('html' => $html, 'next_link' => $next_link));
     }
 
+    public function ajaxProcessInitRuleDeleteModal()
+    {
+        $response = array('success' => false);
+        if ($idCartRule = Tools::getValue('id_cart_rule')) {
+            if ($generatedByDetails = CartRule::getGeneratedBy($idCartRule)) {
+                if (Validate::isLoadedObject($objCartRule = new CartRule($idCartRule, $this->context->language->id))) {
+                    if ($generatedByDetails['generated_by'] == CartRule::GENERATED_BY_REFUND) {
+                        $obj  = new OrderReturn($generatedByDetails['id_generated_by']);
+                    } else if ($generatedByDetails['generated_by'] == CartRule::GENERATED_BY_ORDER_SLIP) {
+                        $obj  = new OrderSlip($generatedByDetails['id_generated_by']);
+                    }
+                    $objOrder = new Order($obj->id_order);
+                    $objCustomer = new Customer($objOrder->id_customer);
+
+                    $modalConfirmDelete = $this->createTemplate('modal_confirm_delete.tpl');
+                    $modalConfirmDelete->assign(array(
+                        'generatedBy' => $generatedByDetails['generated_by'],
+                        'generatedById' => $generatedByDetails['id_generated_by'],
+                        'Customer' => $objCustomer,
+                        'Order' => $objOrder,
+                        'CartRule' => $objCartRule,
+                        'link' => $this->context->link
+                    ));
+                    $tpl = $this->createTemplate('modal.tpl');
+                    $tpl->assign(array(
+                        'modal_id' => 'moduleConfirmDelete',
+                        'modal_class' => 'modal-lg',
+                        'modal_content' => $modalConfirmDelete->fetch(),
+                        'modal_actions' => array(
+                            array(
+                                'type' => 'button',
+                                'class' => 'process_delete btn-primary',
+                                'label' => $this->l('Delete'),
+                            ),
+                        ),
+
+                    ));
+                    $response['confirm_delete'] = true;
+                    $response['modalHtml'] = $tpl->fetch();
+                }
+            }
+        }
+        $response['success'] = true;
+
+        die(Tools::jsonEncode($response));
+    }
+
+    public function ajaxProcessInitRuleBulkDeleteModal()
+    {
+        $response = array('success' => false);
+        if ($idCartRules = Tools::getValue('id_cart_rule')) {
+            $toConfirm = array();
+            foreach($idCartRules as $idCartRule) {
+                if ($generatedByDetails = CartRule::getGeneratedBy($idCartRule)) {
+                    $toConfirm[] = array_merge(['id_cart_rule' => $idCartRule], $generatedByDetails);
+                }
+            }
+            if (count($toConfirm)) {
+                $modalConfirmDelete = $this->createTemplate('modal_confirm_bulk_delete.tpl');
+                $modalConfirmDelete->assign(array(
+                    'cartRules' => $toConfirm,
+                    'link' => $this->context->link
+                ));
+                $tpl = $this->createTemplate('modal.tpl');
+                $tpl->assign(array(
+                    'modal_id' => 'moduleConfirmDelete',
+                    'modal_class' => 'modal-md',
+                    'modal_content' => $modalConfirmDelete->fetch(),
+                    'modal_actions' => array(
+                        array(
+                            'type' => 'button',
+                            'class' => 'process_delete btn-primary',
+                            'label' => $this->l('Delete'),
+                        ),
+                    ),
+
+                ));
+                $response['confirm_delete'] = true;
+                $response['modalHtml'] = $tpl->fetch();
+            }
+        }
+        $response['success'] = true;
+
+        die(Tools::jsonEncode($response));
+    }
+
     public function setMedia()
     {
         parent::setMedia();
         Media::addJsDef(
             array(
+                'admin_cart_rule_tab_link' => $this->context->link->getAdminLink('AdminCartRules'),
                 'room_access_err' => $this->l('You can only select room types which hotel(s) access is provided to this employee.'),
                 'room_rmv_txt' => $this->l('Unselect below room types'),
             )
         );
+        $this->addJS(_PS_JS_DIR_.'admin/cart-rules.js');
         $this->addJqueryPlugin(array('typewatch', 'fancybox', 'autocomplete'));
     }
 
