@@ -25,12 +25,14 @@
 						<input class="form-control validate" type="password" id="login_passwd" name="login_passwd" data-validate="isPasswd" />
 					</div>
 				</div>
+				{hook h='displayLoginFormFieldsAfter'}
 				<a href="{$link->getPageLink('password', true)|escape:'html':'UTF-8'}" class="lost_password pull-right">{l s='Forgot your password?'}</a>
 				<div style="clear:both"></div>
 				<p class="submit">
 					{if isset($back)}<input type="hidden" class="hidden" name="back" value="{$back|escape:'html':'UTF-8'}" />{/if}
 					<button type="submit" id="SubmitLogin" name="SubmitLogin" class="button btn btn-default button-medium pull-right"><span>{l s='Sign in'}</span></button>
 				</p>
+				{hook h='displayLoginFormBottom'}
 			</div>
 		</fieldset>
 	</form>

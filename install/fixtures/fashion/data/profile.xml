@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<entity_profile>
-  <fields id="name" class="Profile" sql="a.id_profile &gt; 1"/>
-  <entities>
-    <profile id="Logistician"/>
-    <profile id="Translator"/>
-    <profile id="Salesman"/>
-  </entities>
-</entity_profile>
