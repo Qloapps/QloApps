@@ -210,6 +210,7 @@
 							</div>
 						</li>
 					{/if}
+					{hook h='displayBackOfficeTopNotificaiton'}
 				</ul>
 				{if count($quick_access) >= 0}
 					<ul id="header_quick">
