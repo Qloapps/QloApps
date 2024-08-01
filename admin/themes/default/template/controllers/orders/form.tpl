@@ -1457,16 +1457,6 @@
 			$('#address_delivery, #address_invoice').show();
 		}
 
-		/*Changed by webkul to make delivery and invoice addresses same*/
-		// $('#id_address_delivery').html(addresses_delivery_options).hide();
-		// $('#id_address_invoice').html(addresses_delivery_options).hide();
-		// $('#address_delivery_detail').html(address_delivery_detail);
-		// $('#address_invoice_detail').html(address_delivery_detail);
-		// $('#edit_delivery_address').attr('href', delivery_address_edit_link);
-		// $('#edit_invoice_address').attr('href', delivery_address_edit_link);
-		/*END*/
-
-		/*Original*/
 		$('#id_address_delivery').html(addresses_delivery_options).hide();
 		$('#id_address_invoice').html(addresses_invoice_options).hide();
 		$('#address_delivery_detail').html(address_delivery_detail);

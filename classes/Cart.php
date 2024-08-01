@@ -1060,16 +1060,6 @@ class CartCore extends ObjectModel
             $shop = Context::getContext()->shop;
         }
 
-        if (Context::getContext()->customer->id) {
-            // if ($id_address_delivery == 0 && (int)$this->id_address_delivery) { // The $id_address_delivery is null, use the cart delivery address
-            //     $id_address_delivery = $this->id_address_delivery;
-            // } elseif ($id_address_delivery == 0) { // The $id_address_delivery is null, get the default customer address
-            //     $id_address_delivery = (int)Address::getFirstCustomerAddressId((int)Context::getContext()->customer->id);
-            // } elseif (!Customer::customerHasAddress(Context::getContext()->customer->id, $id_address_delivery)) { // The $id_address_delivery must be linked with customer
-            //     $id_address_delivery = 0;
-            // }
-        }
-
         $quantity = (int)$quantity;
         $id_product = (int)$id_product;
         $id_product_attribute = (int)$id_product_attribute;
@@ -2503,8 +2493,6 @@ class CartCore extends ObjectModel
         $final_package_list = $hotelWisePackageList;
         // END $package_list hotel wise
         $cache[$cache_key] = $final_package_list;
-        // ddd($this);
-        // ddd($final_package_list);
         return $final_package_list;
     }
 
@@ -4095,10 +4083,6 @@ class CartCore extends ObjectModel
         $cart->id_shop = $this->id_shop;
         $cart->id_shop_group = $this->id_shop_group;
 
-        // if (!Customer::customerHasAddress((int)$cart->id_customer, (int)$cart->id_address_delivery)) {
-        //     $cart->id_address_delivery = (int)Address::getFirstCustomerAddressId((int)$cart->id_customer);
-        // }
-
         if (!Customer::customerHasAddress((int)$cart->id_customer, (int)$cart->id_address_invoice)) {
             $cart->id_address_invoice = (int)Address::getFirstCustomerAddressId((int)$cart->id_customer);
         }
@@ -4121,11 +4105,6 @@ class CartCore extends ObjectModel
         $id_address_delivery = Configuration::get('PS_ALLOW_MULTISHIPPING') ? $cart->id_address_delivery : 0;
 
         foreach ($products as $product) {
-            if ($id_address_delivery) {
-                if (Customer::customerHasAddress((int)$cart->id_customer, $product['id_address_delivery'])) {
-                    // $id_address_delivery = $product['id_address_delivery'];
-                }
-            }
 
             foreach ($product_gift as $gift) {
                 if (isset($gift['gift_product']) && isset($gift['gift_product_attribute']) && (int)$gift['gift_product'] == (int)$product['id_product'] && (int)$gift['gift_product_attribute'] == (int)$product['id_product_attribute']) {
@@ -4488,12 +4467,10 @@ class CartCore extends ObjectModel
     public function autosetProductAddress()
     {
         $id_address_delivery = 0;
-        // Get the main address of the customer
-        // if ((int)$this->id_address_delivery > 0) {
-        //     $id_address_delivery = (int)$this->id_address_delivery;
-        // } else {
-        //     $id_address_delivery = (int)Address::getFirstCustomerAddressId(Context::getContext()->customer->id);
-        // }
+
+        if ((int)$this->id_address_delivery > 0) {
+            $id_address_delivery = (int)$this->id_address_delivery;
+        }
 
         if (!$id_address_delivery) {
             return;
