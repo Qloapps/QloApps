@@ -2671,10 +2671,35 @@ class AdminOrdersControllerCore extends AdminController
         $totalDemandsPriceTE = 0;
         $totalDemandsPriceTI = 0;
         $totalRefundedRooms = 0;
+        $bookingAutoAddedServices = array();
         if ($order_detail_data = $objBookingDetail->getOrderFormatedBookinInfoByIdOrder($order->id)) {
             $objBookingDemand = new HotelBookingDemands();
             $objHotelRoomType = new HotelRoomType();
             foreach ($order_detail_data as $key => $value) {
+                $roomTypeAutoAddedService = $objRoomTypeServiceProductOrderDetail->getroomTypeServiceProducts(
+                    $order->id,
+                    0,
+                    0,
+                    $value['id_product'],
+                    0,
+                    0,
+                    0,
+                    0,
+                    null,
+                    1,
+                    Product::PRICE_ADDITION_TYPE_INDEPENDENT
+                );
+                if (isset($roomTypeAutoAddedService[$value['id']]['additional_services'])) {
+                    foreach($roomTypeAutoAddedService[$value['id']]['additional_services'] as $service) {
+                        if (isset($bookingAutoAddedServices[$service['id_product']])) {
+                            $bookingAutoAddedServices[$service['id_product']]['total_price_tax_excl'] += $service['total_price_tax_excl'];
+                        } else {
+                            $bookingAutoAddedServices[$service['id_product']]['name'] = $service['name'];
+                            $bookingAutoAddedServices[$service['id_product']]['total_price_tax_excl'] = $service['total_price_tax_excl'];
+                        }
+                    }
+                }
+
                 $order_detail_data[$key]['total_room_price_te'] = $value['total_price_tax_excl'];
                 $order_detail_data[$key]['total_room_price_ti'] = $value['total_price_tax_incl'];
 
@@ -2982,6 +3007,7 @@ class AdminOrdersControllerCore extends AdminController
             'ROOM_STATUS_CHECKED_IN' => HotelBookingDetail::STATUS_CHECKED_IN,
             'ROOM_STATUS_CHECKED_OUT' => HotelBookingDetail::STATUS_CHECKED_OUT,
             'ALLOTMENT_MANUAL' => HotelBookingDetail::ALLOTMENT_MANUAL,
+            'booking_auto_added_services' => $bookingAutoAddedServices,
         );
 
         return parent::renderView();
