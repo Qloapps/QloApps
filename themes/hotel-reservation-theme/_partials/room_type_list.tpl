@@ -17,6 +17,7 @@
 * @license LICENSE.txt
 *}
 
+{hook h='displayRoomTypeListBefore'}
 {if isset($booking_data['rm_data']) && $booking_data['rm_data']}
 	{foreach from=$booking_data['rm_data'] key=room_k item=room_v}
 		<div class="col-sm-12 room_cont" data-id-product="{$room_v['id_product']|escape:'htmlall':'UTF-8'}">
@@ -79,8 +80,6 @@
 									{if !isset($restricted_country_mode) && !$PS_CATALOG_MODE && !$order_date_restrict}
 										{if isset($occupancy_required_for_booking) && $occupancy_required_for_booking}
 											<div class="booking_guest_occupancy_conatiner">
-												{assign var=occupancies value=$room_v['occupancies']}
-												{assign var=occupancy_adults value=$room_v['occupancy_adults']}
 												{include file="./occupancy_field.tpl" room_type_info=$room_v total_available_rooms=$room_v['room_left']}
 											</div>
 										{else}

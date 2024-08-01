@@ -173,7 +173,9 @@ class OrderOpcControllerCore extends ParentOrderController
 
                             if (!count($this->errors)) {
                                 $customer = new Customer($this->context->customer->id);
-                                if ($customer->transformToCustomer($this->context->language->id, $passwd)) {
+                                if (!$customer->isGuest()) {
+                                    $this->errors[] = Tools::displayError('This account is already registered as a customer.');
+                                } else if ($customer->transformToCustomer($this->context->language->id, $passwd)) {
                                     $this->context->updateCustomer($customer);
                                 } else {
                                     $this->errors[] = Tools::displayError('An error occurred while transforming your account into a registered customer.');
@@ -424,7 +426,9 @@ class OrderOpcControllerCore extends ParentOrderController
     public function initContent()
     {
         // validate room types before payment by customer
-        $orderRestrictErr = HotelCartBookingData::validateCartBookings();
+        if ($orderRestrictErr = HotelCartBookingData::validateCartBookings()) {
+            $this->errors = array_merge($this->errors, $orderRestrictErr);
+        }
 
         parent::initContent();
 
@@ -492,7 +496,7 @@ class OrderOpcControllerCore extends ParentOrderController
         // $objCurrency = new Currency(Configuration::get('PS_CURRENCY_DEFAULT'));
         $this->context->smarty->assign(
             array(
-                'orderRestrictErr' => $orderRestrictErr,
+                'orderRestrictErr' => count($orderRestrictErr) ? 1 : 0,
                 // 'allDemands' => $allDemands,
                 // 'defaultcurrencySign' => $objCurrency->sign,
                 'THEME_DIR' => _THEME_DIR_,
@@ -589,7 +593,6 @@ class OrderOpcControllerCore extends ParentOrderController
             if (!empty($cartProducts)) {
 
                 if ($cartBookingInfo = HotelCartBookingData::getHotelCartBookingData()) {
-                    // ddd($cartBookingInfo);
                     $this->context->smarty->assign('cart_htl_data', $cartBookingInfo);
                 }
                 $objHotelServiceProductCartDetail = new HotelServiceProductCartDetail();
@@ -1076,21 +1079,52 @@ class OrderOpcControllerCore extends ParentOrderController
             $customerGuestDetailLastname = Tools::getValue('customer_guest_detail_lastname');
             $customerGuestDetailEmail = Tools::getValue('customer_guest_detail_email');
             $customerGuestDetailPhone = Tools::getValue('customer_guest_detail_phone');
+
+            $className = 'CartCustomerGuestDetail';
+            $rules = call_user_func(array($className, 'getValidationRules'), $className);
+
             if (trim($customerGuestDetailGender) && Validate::isUnsignedInt($customerGuestDetailGender)) {
                 $objCustomerGuestDetail->id_gender = $customerGuestDetailGender;
+            } else {
+                $result['errors']['customer_guest_detail_gender'] = Tools::displayError('Invalid gender');
             }
-            if (trim($customerGuestDetailFirstname) && Validate::isName($customerGuestDetailFirstname)) {
+
+            if (trim($customerGuestDetailFirstname)
+                && Validate::isName($customerGuestDetailFirstname)
+                && (!isset($rules['size']['firstname'])
+                   || (isset($rules['size']['firstname']) && (Tools::strlen(trim($customerGuestDetailFirstname)) <= $rules['size']['firstname']))
+                )
+            ) {
                 $objCustomerGuestDetail->firstname = $customerGuestDetailFirstname;
             }
-            if (trim($customerGuestDetailLastname) && Validate::isName($customerGuestDetailLastname)) {
+
+            if (trim($customerGuestDetailLastname)
+                && Validate::isName($customerGuestDetailLastname)
+                && (!isset($rules['size']['lastname'])
+                  || (isset($rules['size']['lastname']) && (Tools::strlen(trim($customerGuestDetailLastname)) <= $rules['size']['lastname']))
+                )
+            ) {
                 $objCustomerGuestDetail->lastname = $customerGuestDetailLastname;
             }
-            if (trim($customerGuestDetailEmail) && Validate::isEmail($customerGuestDetailEmail)) {
+
+            if (trim($customerGuestDetailEmail)
+                && Validate::isEmail($customerGuestDetailEmail)
+                && (!isset($rules['size']['email'])
+                  || (isset($rules['size']['email']) && (Tools::strlen(trim($customerGuestDetailEmail)) <= $rules['size']['email']))
+                )
+            ) {
                 $objCustomerGuestDetail->email = $customerGuestDetailEmail;
             }
-            if (trim($customerGuestDetailPhone) && Validate::isPhoneNumber($customerGuestDetailPhone)) {
+
+            if (trim($customerGuestDetailPhone)
+                && Validate::isPhoneNumber($customerGuestDetailPhone)
+                && (!isset($rules['size']['phone'])
+                  || (isset($rules['size']['phone']) && (Tools::strlen(trim($customerGuestDetailPhone)) <= $rules['size']['phone']))
+                )
+            ) {
                 $objCustomerGuestDetail->phone = $customerGuestDetailPhone;
             }
+
             $objCustomerGuestDetail->id_cart = $this->context->cart->id;
             $objCustomerGuestDetail->save();
         } else {
@@ -1100,6 +1134,7 @@ class OrderOpcControllerCore extends ParentOrderController
                 }
             }
         }
+
         $this->context->cart->save();
     }
 }

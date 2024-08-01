@@ -306,10 +306,16 @@ function init()
 		e.preventDefault();
 	});
 
+    // voucher modal show and close
 	$('#add_voucher').unbind('click').click(function(e) {
 		e.preventDefault();
 		VoucherModal.show();
 	});
+
+    $(document).on('hidden.bs.modal', '#voucher-modal', function(){
+        $('#voucher-modal').remove();
+    });
+    // End: voucher modal show and close
 
 	$(document).on('change','#discount_type', function(e) {
 		// Percent type
@@ -342,10 +348,17 @@ function init()
 			$('select[name=discount_invoice]').attr('disabled', false);
 	});
 
+    // payment information modal show and close
 	$('.open_payment_information').unbind('click').click(function(e) {
 		e.preventDefault();
 		OrderPaymentDetailModal.show($(this));
 	});
+
+    $(document).on('hidden.bs.modal', '#payment-detail-modal', function(){
+        $('#payment-detail-modal').remove();
+    });
+    // End: payment information modal show and close
+
 
 	initRoomEvents();
 	initProductEvents();
@@ -523,15 +536,12 @@ function initProductEvents()
                 $(this).val(max_child_in_room);
                 if (elementVal == 1) {
                     showOccupancyError(no_children_allowed_txt, $(this).closest(".occupancy_info_block"));
-                    haserror = true;
                 } else {
                     showOccupancyError(max_children_txt, $(this).closest(".occupancy_info_block"));
-                    haserror = true;
                 }
             } else if (elementVal > max_allowed_for_current)  {
                 $(this).val(max_allowed_for_current);
                 showOccupancyError(max_occupancy_reached_txt, $(this).closest(".occupancy_info_block"));
-                haserror = true;
             }
         } else {
             max_adults_in_room = $(this).closest(".booking_occupancy_wrapper").find('.max_adults').val();
@@ -1099,7 +1109,7 @@ function initRoomEvents()
 						{
 							if (data.refresh)
 							{
-								location.reload();
+                                window.location.href = admin_order_tab_link + '&conf=3&vieworder&id_order=' + id_order;
 								return;
 							}
 							go = false;
@@ -1111,8 +1121,7 @@ function initRoomEvents()
 
 							// Initialize all events
 							init();
-							//Added by webkul
-							location.reload();
+							window.location.href = admin_order_tab_link + '&conf=3&vieworder&id_order=' + id_order;
 							//End
 							// $('.partial_refund_fields').hide();
 						}
@@ -1162,7 +1171,8 @@ function initRoomEvents()
 					updateAmounts(data.order);
 					updateInvoice(data.invoices);
 					updateDocuments(data.documents_html);
-					location.reload();
+
+					window.location.href = admin_order_tab_link + '&conf=1&vieworder&id_order=' + data.order.id;
 				}
 				else
 					jAlert(data.error);
@@ -1171,15 +1181,21 @@ function initRoomEvents()
 		e.preventDefault();
 	});
 
+    // order-payment-modal hide and show
 	$('#add_new_payment').on('click', function(e) {
 		e.preventDefault();
 		OrderPaymentModal.show();
 	});
 
+    $(document).on('hidden.bs.modal', '#order-payment-modal', function(){
+        $('#order-payment-modal').remove();
+    });
+
 	$('#cancle_add_payment').on('click', function(e) {
 		e.preventDefault();
 		OrderPaymentModal.hide();
 	});
+    // end order-payment-modal hide and show
 }
 function addRoomRefreshTotal() {
 	var quantity = parseInt($('#add_product_product_quantity').val());
@@ -1233,6 +1249,14 @@ function setRoomTypeGuestOccupancy(booking_occupancy_wrapper)
 var flagRefund = '';
 
 $(document).ready(function() {
+    // when change order state to cancel or refund then show modal of bookings cancellation
+    $(document).on('change', '#id_order_state', function(e) {
+        if ($(this).val() == PS_OS_CANCELED || $(this).val() == PS_OS_REFUND) {
+            e.preventDefault();
+            CancelRoomBookingModal.show();
+        }
+    });
+
 	$('#desc-order-partial_refund').click(function() {
 		$('.cancel_product_change_link:visible').trigger('click');
 		if (flagRefund == 'partial') {
@@ -1647,6 +1671,10 @@ $(document).ready(function() {
         DocumentNoteModal.show($(this));
     });
 
+    $(document).on('hidden.bs.modal', '#document-note-modal', function(){
+        $('#document-note-modal').remove();
+    });
+
     $(document).on('click', '.submitDocumentNote', function(e) {
         e.preventDefault();
         DocumentNoteModal.submit();
@@ -1659,6 +1687,10 @@ $(document).ready(function() {
     $(document).on('click', '#edit_guest_details', function(e) {
         e.preventDefault();
         TravellerModal.show();
+    });
+
+    $(document).on('hidden.bs.modal', '#traveller-modal', function(){
+        $('#traveller-modal').remove();
     });
 
     $(document).on('click', '.submitTravellerInfo', function(e) {
@@ -1701,6 +1733,10 @@ $(document).ready(function() {
         RoomStatusModal.show($(this));
     });
 
+    $(document).on('hidden.bs.modal', '#room-status-modal', function(){
+        $('#room-status-modal').remove();
+    });
+
     $(document).on('click', '.submitRoomStatus', function(e) {
         e.preventDefault();
         RoomStatusModal.submit();
@@ -1708,36 +1744,17 @@ $(document).ready(function() {
     // End: RoomStatusModal: Processes
     // ======================================
 
-    // Start: RoomReallocationModal: Processes
-    // For processing room reallocation and swapping
-    $(document).on('click', '.room_reallocate_swap', function(e) {
+    // Start: RoomAllotmentCommentModal: Processes
+    $(document).on('click', '.manual_allotment_comment', function(e){
         e.preventDefault();
-        RoomReallocationModal.show($(this));
+
+        RoomAllotmentCommentModal.show(this);
     });
 
-    $(document).on('hidden.bs.modal', '#room-reallocation-modal', function(){
-        location.reload();
+    $(document).on('hidden.bs.modal', '#room-allotment-comment-modal', function(){
+        $('#room-allotment-comment-modal').remove();
     });
-
-    /*For reallocating rooms in the modal*/
-    $(document).on('click', '#realloc_allocated_rooms', function(e){
-        if (RoomReallocationModal.reallocate() == false) {
-            return false;
-        }
-    });
-    /*For swaping rooms in the modal*/
-    $(document).on('click', '#swap_allocated_rooms', function(){
-        if (RoomReallocationModal.swap() == false) {
-            return false;
-        }
-    });
-
-    // change room type for reallocation
-    $(document).on("change", "#realloc_avail_room_type", function(e) {
-        e.preventDefault();
-        RoomReallocationModal.changeRoomType($(this));
-    });
-    // End: RoomReallocationModal: Processes
+    // End: RoomAllotmentCommentModal: Processes
     // ======================================
 
     // Start: AddRoomBookingModal: Processes
@@ -1759,6 +1776,10 @@ $(document).ready(function() {
         if ($('#new_product #add_product_product_id').val() == 0) {
             $('.submitAddRoom').attr('disabled', true);
         }
+    });
+
+    $(document).on('hidden.bs.modal', '#add-room-booking-modal', function(){
+        $('#add-room-booking-modal').remove();
     });
     // End: AddRoomBookingModal: Processes
     // ======================================
@@ -1787,7 +1808,7 @@ $(document).ready(function() {
                 success : function(data) {
                     if (data.result) {
                         init();
-                        location.reload();
+                        window.location.href = admin_order_tab_link + '&conf=4&vieworder&id_order=' + data.order.id;
                     } else {
                         jAlert(data.error);
                     }
@@ -1811,6 +1832,10 @@ $(document).ready(function() {
     $(document).on('click', '#page-header-desc-order-cancel', function(e) {
         e.preventDefault();
         CancelRoomBookingModal.show();
+    });
+
+    $(document).on('hidden.bs.modal', '#cancel-room-booking-modal', function(){
+        $('#cancel-room-booking-modal').remove();
     });
 
     $(document).on('click', '.submitCancelBooking', function(e) {
@@ -2191,6 +2216,7 @@ const TravellerModal = {
     },
     submit: function() {
         $(".loading_overlay").show();
+        TravellerModal.hideErrors();
         $.ajax({
             type: 'POST',
             headers: {
@@ -2201,7 +2227,9 @@ const TravellerModal = {
             cache: false,
             data: $('#customer-guest-details-form').serialize()+'&ajax=true&id_order='+id_order+'&action=updateGuestDetails',
             success: function(result) {
-                if (result.success) {
+                if (result.hasError == true) {
+                    TravellerModal.showErrors(result.errorsHtml);
+                } else {
                     if (result.msg) {
                         showSuccessMessage(result.msg);
                     }
@@ -2218,14 +2246,20 @@ const TravellerModal = {
                     if (result.data.guest_phone) {
                         $('#customer-guest-details .guest_phone a').attr('href', 'tel'+result.data.guest_phone).html('<i class="icon-phone"></i> ' + result.data.guest_phone);
                     }
-                } else if (result.errors) {
-                    showErrorMessage(result.errors);
                 }
             },
             complete: function() {
                 $(".loading_overlay").hide();
             }
         });
+    },
+    showErrors: function(errorsHtml) {
+        $('#traveller-modal .errors-wrap').html(errorsHtml);
+        $('#traveller-modal .errors-wrap').show(200);
+    },
+    hideErrors: function(cb) {
+        $('#traveller-modal .errors-wrap').hide(200);
+        $('#traveller-modal .errors-wrap').html('');
     }
 };
 
@@ -2276,177 +2310,6 @@ const RoomStatusModal = {
     },
     submit: function() {
         $(document).find('#submitbookingOrderStatus').click();
-    }
-};
-
-// Modal object to handle room reallocation processes
-const RoomReallocationModal = {
-    show: function(roomObj) {
-        $(".loading_overlay").show();
-        $.ajax({
-            type: 'POST',
-            headers: {
-                "cache-control": "no-cache"
-            },
-            url: admin_order_tab_link,
-            dataType: 'JSON',
-            cache: false,
-            data: 'ajax=true&id_order='+id_order+'&action=InitRoomReallocationModal',
-            success: function(result) {
-                if (result.hasError == 0 && result.modalHtml) {
-                    $('#footer').next('.bootstrap').append(result.modalHtml);
-
-                    $(".modal_id_htl_booking").val(roomObj.data('id_htl_booking'));
-                    $("input.modal_curr_room_num").val(roomObj.data('room_num'));
-                    $("span.modal_curr_room_num").text(roomObj.data('room_num') + ', ' + roomObj.data('room_type_name'));
-                    $(".cust_name").text(roomObj.data('cust_name'));
-                    $(".cust_email").text(roomObj.data('cust_email'));
-
-                    // reset price difference fields
-                    $("#reallocation_price_diff").val(0);
-                    $("#reallocation_price_diff_block").hide();
-                    $(".realloc_roomtype_change_message").hide();
-
-                    // For Rooms Swapping
-                    var json_arr_rm_swp = roomObj.data('avail_rm_swap');
-                    if (roomObj.data('avail_rm_swap') != 'false' && json_arr_rm_swp.length != 0) {
-                        html = '<select class="form-control" name="swap_avail_rooms" id="swap_avail_rooms">';
-                            $.each(json_arr_rm_swp, function(key,val) {
-                                html += '<option class="swp_rm_opts" value="'+val.id_hotel_booking+'" >'+val.room_num+'</option>';
-                            });
-                        html += '</select>';
-                        $(".swap_avail_rooms_container").empty().append(html);
-                    } else {
-                        $(".swap_avail_rooms_container").empty().text(no_swap_rm_avail_txt).addClass('text-danger');
-                        $("#swap_room_tab .modal-footer").hide();
-                    }
-
-                    // For Rooms Reallocation
-                    var json_arr_realloc_room_types = roomObj.data('avail_realloc_room_types');
-                    if (roomObj.data('avail_realloc_room_types') != 'false' && json_arr_realloc_room_types.length != 0) {
-                        var idCurrentRoomType = roomObj.data('id_room_type');
-                        var roomsTypesHtml = '<select data-id_htl_booking="' + roomObj.data('id_htl_booking') + '" class="form-control" name="realloc_avail_room_type" id="realloc_avail_room_type">';
-                            $.each(json_arr_realloc_room_types, function(key, room_type) {
-                                roomsTypesHtml += "<option rooms_available='" + JSON.stringify(room_type.rooms) + "' class='realloc_rm_type_opts' value='" + room_type.id_product + "'";
-                                if (idCurrentRoomType == room_type.id_product) {
-                                    roomsTypesHtml += ' selected="selected"';
-                                }
-                                roomsTypesHtml += '>' + room_type.room_type_name + '</option>';
-                            });
-                            roomsTypesHtml += '</select>';
-
-                        setRoomsForReallocation(json_arr_realloc_room_types[idCurrentRoomType]['rooms']);
-
-                        $(".realloc_avail_room_type_container").empty().append(roomsTypesHtml);
-                    } else {
-                        $(".realloc_avail_rooms_container").empty().text(no_realloc_rm_avail_txt).addClass('text-danger');
-                        $(".realloc_avail_room_type_container").empty().text(no_realloc_rm_type_avail_txt).addClass('text-danger');
-                        $("#reallocate_room_tab .modal-footer").hide();
-                    }
-
-                    $('#room-reallocation-modal').modal('show');
-                } else {
-                    showErrorMessage(txtSomeErr);
-                }
-            },
-            complete: function() {
-                $(".loading_overlay").hide();
-            }
-        });
-    },
-    swap: function() {
-        $(".error_text").text('');
-        var room_to_swap = $('#swap_avail_rooms').val();
-        if (typeof room_to_swap == 'undefined' || room_to_swap == 0) {
-            $("#swap_sel_rm_err_p").text(slct_rm_err);
-            return false;
-        }
-
-        return true;
-    },
-    reallocate: function(reallocateBtnObj) {
-        $(".error_text").text('');
-        var room_to_reallocate = $('#realloc_avail_rooms').val();
-        var room_type_to_reallocate = $('#realloc_avail_room_type').val();
-
-        if (typeof room_type_to_reallocate == 'undefined' || room_type_to_reallocate == 0) {
-            $("#realloc_sel_rm_type_err_p").text(slct_rm_type_err);
-            return false;
-        }
-
-        if (typeof room_to_reallocate == 'undefined' || room_to_reallocate == 0) {
-            $("#realloc_sel_rm_err_p").text(slct_rm_err);
-            return false;
-        }
-
-        return true;
-    },
-    changeRoomType: function(roomTypeObj) {
-        $(".loading_overlay").show();
-        var idHotelBooking = roomTypeObj.data('id_htl_booking');
-        $("#reallocation_price_diff").val(0);
-        $("#reallocation_price_diff_block").hide();
-        if (parseInt(idHotelBooking) > 0) {
-            var optionSelected = roomTypeObj.find('option:selected');
-            var roomsAvailable = JSON.parse(optionSelected.attr('rooms_available'));
-
-            // set the rooms of the selceted room type
-            setRoomsForReallocation(roomsAvailable);
-
-            // send an ajax for fetching if price has changes in the new room type seleceted
-            $.ajax({
-                type: 'POST',
-                headers: {
-                    "cache-control": "no-cache"
-                },
-                url: admin_order_tab_link,
-                dataType: 'JSON',
-                cache: false,
-                data: {
-                    id_htl_booking: idHotelBooking,
-                    id_new_room_type: roomTypeObj.val(),
-                    action: 'changeRoomTypeToReallocate',
-                    ajax: true
-                },
-                success: function(result) {
-                    if (result.success == 1) {
-                        // has room type changed for reallocation
-                        if (result.has_room_type_change == 1) {
-                            $(".realloc_roomtype_change_message").show();
-                            // has room type price changed for reallocation
-                            if (result.has_price_changes == 1) {
-                                $("#reallocation_price_diff").val(result.price_diff);
-                                $("#reallocation_price_diff_block").show();
-                            }
-                        } else {
-                            $(".realloc_roomtype_change_message").hide();
-                        }
-                        $('#room_type_change_info').empty();
-                        if (result.is_changes_present == 1) {
-                        }
-                    } else if (typeof(result.error) != 'undefinded' && result.error) {
-                        showErrorMessage(result.error);
-                    } else {
-                        showErrorMessage(txtSomeErr);
-                    }
-                },
-                error: function(XMLHttpRequest, textStatus, errorThrown) {
-                    showErrorMessage(txtSomeErr);
-                },
-                complete: function() {
-                    $(".loading_overlay").hide();
-                }
-            });
-        } else {
-            $(".loading_overlay").hide();
-            showErrorMessage(txtSomeErr);
-            return false;
-        }
-    },
-    close: function() {
-        $('#room-reallocation-modal').modal('hide');
-    },
-    submit: function() {
     }
 };
 
@@ -2515,13 +2378,6 @@ const AddRoomBookingModal = {
                                     $('#new_product .booking_guest_occupancy').removeClass('disabled');
                                     setRoomTypeGuestOccupancy($('#new_product .booking_occupancy_wrapper'));
                                 }
-                                if (data.room_type_info) {
-                                    $('#new_product .max_adults').val(data.room_type_info.max_adults);
-                                    $('#new_product .max_children').val(data.room_type_info.max_children);
-                                    $('#new_product .max_guests').val(data.room_type_info.max_guests);
-                                    $('#new_product .num_adults').attr('max', data.room_type_info.max_adults);
-                                    $('#new_product .num_children').attr('max', data.room_type_info.max_children);
-                                }
 
                                 // Keep product variable
                                 current_product = data;
@@ -2529,6 +2385,10 @@ const AddRoomBookingModal = {
                                 $('#add_product_product_name').val(data.name);
                                 $('#add_product_product_price_tax_incl').val(data.price_tax_incl);
                                 $('#add_product_product_price_tax_excl').val(data.price_tax_excl);
+
+                                $("#new_product .max_adults").val(data.room_type_info.max_adults);
+                                $("#new_product .max_children").val(data.room_type_info.max_children);
+                                $("#new_product .max_guests").val(data.room_type_info.max_guests);
 
                                 //Added by webkul to set curent date in the date fields by default
                                 var date_in = $.datepicker.formatDate('dd-mm-yy', new Date());
@@ -2721,6 +2581,40 @@ const CancelRoomBookingModal = {
     }
 };
 
+// Modal object to handle comment on rooms for manual cancellation
+const RoomAllotmentCommentModal = {
+    show: function(element) {
+        $(".loading_overlay").show();
+        let idHtlBooking = parseInt($(element).attr('data-id_hotel_booking_detail'));
+        $.ajax({
+            type: 'POST',
+            headers: {
+                "cache-control": "no-cache"
+            },
+            url: admin_order_tab_link,
+            dataType: 'JSON',
+            cache: false,
+            data: 'ajax=true&id_hotel_booking='+idHtlBooking+'&action=initRoomAllotmentCommentModal',
+            success: function(result) {
+                if (result.hasError == 0 && result.modalHtml) {
+                    $('#footer').next('.bootstrap').append(result.modalHtml);
+
+                    $('#room-allotment-comment-modal').modal('show');
+
+                } else {
+                    showErrorMessage(txtSomeErr);
+                }
+            },
+            complete: function() {
+                $(".loading_overlay").hide();
+            }
+        });
+    },
+    close: function() {
+        $('#room-allotment-comment-modal').modal('hide');
+    }
+};
+
 function updateAdditionalServices(element)
 {
     var id_room_type_service_product_order_detail = $(element).data('id_room_type_service_product_order_detail');
@@ -2805,22 +2699,6 @@ function updateRoomDemand(element)
             $(".loading_overlay").hide();
         }
     });
-}
-
-function setRoomsForReallocation(roomsAvailable)
-{
-    if (typeof(roomsAvailable) != 'undefined' && roomsAvailable.length) {
-        var roomsHtml = '<select class="form-control" name="realloc_avail_rooms" id="realloc_avail_rooms">';
-            roomsHtml += '<option class="realloc_rm_opts" value="0">---- ' + select_room_txt + ' ----</option>';
-            $.each(roomsAvailable, function(key, roomInfo) {
-                roomsHtml += '<option class="realloc_rm_opts" value="' + roomInfo.id_room + '">' + roomInfo.room_num + '</option>';
-            });
-        roomsHtml += '</select>';
-
-        $(".realloc_avail_rooms_container").empty().append(roomsHtml);
-    } else {
-        $(".realloc_avail_rooms_container").empty().text(no_realloc_rm_avail_txt);
-    }
 }
 
 function checkPartialRefundProductQuantity(it)

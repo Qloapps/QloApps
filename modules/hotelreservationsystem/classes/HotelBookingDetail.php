@@ -385,6 +385,7 @@ class HotelBookingDetail extends ObjectModel
                     $partiallyAvailRoomTypes = $partiallyAvailRoomTypes['partiallyAvailRooms'];
                 }
 
+                // Now we will formate the data after geting search result according to search type
                 $roomTypesDetail = $objRoomType->getRoomTypeDetailByRoomTypeIds($allowedIdRoomTypes);
                 if ($roomTypesDetail) {
                     // Formate data for response
@@ -503,15 +504,12 @@ class HotelBookingDetail extends ObjectModel
         $sql1 = 'SELECT `id` AS `id_room`, `id_product`, `id_hotel`, `room_num`, `comment` AS `room_comment`
                 FROM `'._DB_PREFIX_.'htl_room_information`
                 WHERE `id_hotel`='.(int)$idHotel.' AND `id_status` = '. HotelRoomInformation::STATUS_INACTIVE.' AND IF('.(int)$idRoomType.' > 0, `id_product` = '.(int)$idRoomType.', 1) AND `id_product` IN ('.$allowedIdRoomTypes.')';
-        // if ($idRoomType) {
-        //     $sql1 .= ' AND `id_product` ='.(int)$idRoomType;
-        // }
 
         // check room is temperory inactive
         $sql2 = 'SELECT hri.`id` AS `id_room`, hri.`id_product`, hri.`id_hotel`, hri.`room_num`, hri.`comment` AS `room_comment`
                 FROM `'._DB_PREFIX_.'htl_room_information` AS hri
                 INNER JOIN `'._DB_PREFIX_.'htl_room_disable_dates` AS hrdd ON (hrdd.`id_room_type` = hri.`id_product` AND hrdd.	id_room = hri.`id`)
-                WHERE hri.`id_hotel`='.$idHotel.' AND hri.`id_status` = '. HotelRoomInformation::STATUS_TEMPORARY_INACTIVE .' AND hrdd.`date_from` < \''.pSql($dateTo).'\' AND hrdd.`date_to` > \''.pSql($dateFrom).'\' AND IF('.(int)$idRoomType.' > 0, hri.`id_product` = '.(int)$idRoomType.', 1) AND hri.`id_product` IN ('.$allowedIdRoomTypes.')';
+                WHERE hri.`id_hotel`='.$idHotel.' AND hri.`id_status` = '. HotelRoomInformation::STATUS_TEMPORARY_INACTIVE .' AND hrdd.`date_from` <= \''.pSql($dateFrom).'\' AND hrdd.`date_to` >= \''.pSql($dateTo).'\' AND IF('.(int)$idRoomType.' > 0, hri.`id_product` = '.(int)$idRoomType.', 1) AND hri.`id_product` IN ('.$allowedIdRoomTypes.')';
 
         $sql = $sql1.' UNION '.$sql2;
 
@@ -566,6 +564,7 @@ class HotelBookingDetail extends ObjectModel
 
         return $cartRoomTypes;
     }
+
 
     /**
      * $params = array(
@@ -906,7 +905,6 @@ class HotelBookingDetail extends ObjectModel
         );
     }
 
-
     /**
      * $params = array(
      *      'idHotel' => ...,
@@ -1096,7 +1094,7 @@ class HotelBookingDetail extends ObjectModel
             }
             unset($datetimeObj);
 
-            // If all dates rae covered
+            // If all dates are covered
             if (!$datesToCover) {
                 // array in ascending order of dates
                 ksort($dateWiseRoomTypes);
@@ -1106,19 +1104,28 @@ class HotelBookingDetail extends ObjectModel
                 if (!empty($idCart) && !empty($idGuest)) {
                     $sql = 'SELECT `id_product`, `id_room`, `date_from`
                         FROM `'._DB_PREFIX_.'htl_cart_booking_data`
-                        WHERE `id_hotel` = '.(int)$idHotel.' AND `id_cart` = '.(int)$idCart.' AND `id_guest` = '.(int)$idGuest.' AND `is_refunded` = 0 AND  `is_back_order` = 0 AND IF('.(int)$idRoomType.' > 0, `id_product` = '.(int)$idRoomType.', 1) AND `id_product` IN ('.$allowedIdRoomTypes.')';
+                        WHERE `id_hotel` = '.(int)$idHotel.' AND `id_cart` = '.(int)$idCart.' AND `id_guest` = '.(int)$idGuest.' AND `is_refunded` = 0 AND  `is_back_order` = 0 AND IF('.(int)$idRoomType.' > 0, `id_product` = '.(int)$idRoomType.', 1) AND `id_product` IN ('.$allowedIdRoomTypes.') AND (';
 
                     $datetimeObj = new DateTime();
+                    $countIteration = 0;
                     foreach ($timeStampWiseRooms as $timeStamp => $roomList) {
+                        $countIteration++;
+
                         $datetimeObj->setTimestamp($timeStamp);
                         $partialDateFrom = $datetimeObj->format('Y-m-d H:i:s');
 
                         $datetimeObj->modify('+1 day');
                         $partialDateTo = $datetimeObj->format('Y-m-d H:i:s');
 
-                        $sql .= ' AND (`date_from` = \''.pSQL($partialDateFrom).'\' AND `date_to` = \''.pSQL($partialDateTo).'\' AND `id_room` IN ('.implode(",", $roomList).'))';
+                        $sql .= '(`date_from` = \''.pSQL($partialDateFrom).'\' AND `date_to` = \''.pSQL($partialDateTo).'\' AND `id_room` IN ('.implode(",", $roomList).'))';
+
+                        if (count($timeStampWiseRooms) > $countIteration) {
+                            $sql .= ' OR ';
+                        }
                     }
-                    unset($datetimeObj);
+                    $sql .= ')';
+
+                    unset($datetimeObj, $countIteration);
 
                     $partiallyAvailCartRooms = Db::getInstance()->executeS($sql);
                     if ($partiallyAvailCartRooms) {
@@ -1215,9 +1222,8 @@ class HotelBookingDetail extends ObjectModel
                 $partiallyAvailRooms = array();
                 $dateWiseRoomTypes = array();
             }
-            unset($datesToCover);
-            unset($timeStampWiseRooms);
-            unset($partiallyAvailRooms);
+
+            unset($datesToCover, $timeStampWiseRooms, $partiallyAvailRooms);
         }
 
         return array(
@@ -1755,81 +1761,380 @@ class HotelBookingDetail extends ObjectModel
     {
         $result = true;
         // get the cart booking data for the given booking
-        if (Validate::isLoadedObject($objHotelBooking = new HotelBookingDetail($idHotelBooking))) {
-            $objHotelCartBooking = new HotelCartBookingData();
-            if ($cartBookingInfo = $objHotelCartBooking->getRoomRowByIdProductIdRoomInDateRange(
-                $objHotelBooking->id_cart,
-                $objHotelBooking->id_product,
-                $objHotelBooking->date_from,
-                $objHotelBooking->date_to,
-                $objHotelBooking->id_room
-            )) {
-                // Reallocate the rooms in the room cart booking table
-                if (Validate::isLoadedObject($objHotelCartBooking = new HotelCartBookingData($cartBookingInfo['id']))) {
-                    $objHotelCartBooking->id_room = $idRoom;
-                    $result &= $objHotelCartBooking->save();
-                }
-            }
-
-            // Reallocate the rooms in the room booking table
+        if (Validate::isLoadedObject($objOldHotelBooking = new HotelBookingDetail($idHotelBooking))) {
             $objHotelRoomInfo = new HotelRoomInformation($idRoom);
             $idNewRoomType = $objHotelRoomInfo->id_product;
-            if ($objHotelBooking->id_product != $idNewRoomType) {
-                $objHotelBooking->id_product = $idNewRoomType;
-                $objProduct = new Product($idNewRoomType, false, Configuration::get('PS_LANG_DEFAULT'));
-                $objHotelBooking->room_type_name = $objProduct->name;
+            if ($objOldHotelBooking->id_product != $idNewRoomType) {
+                $objOrder = new Order($objOldHotelBooking->id_order);
+                $objOldOrderDetail = new OrderDetail($objOldHotelBooking->id_order_detail);
 
-                // change product name in order detail table
-                $objOrderDetail = new OrderDetail((int) $objHotelBooking->id_order_detail);
-                $objOrderDetail->product_name = $objProduct->name;
+                $productQty = (int)$objOldHotelBooking->getNumberOfDays($objOldHotelBooking->date_from, $objOldHotelBooking->date_to);
+                $oldRoomPriceTaxExcl = $objOldHotelBooking->total_price_tax_excl / $productQty;
+                $newRoomPriceTaxExcl = $oldRoomPriceTaxExcl + $priceDiffTaxExcl;
 
-                // manage the prices in the order tables for the price diffrence
-                if ($priceDiffTaxExcl != 0) {
-                    $taxCalculator = $objOrderDetail->getTaxCalculator();
-                    $priceDiffTaxIncl = Tools::ps_round($taxCalculator->addTaxes($priceDiffTaxExcl), _PS_PRICE_COMPUTE_PRECISION_);
+                $totalRoomPriceTaxIncl = $objOldHotelBooking->total_price_tax_incl;
+                $totalRoomPriceTaxExcl = $objOldHotelBooking->total_price_tax_excl;
 
-                    // set price changes in htl_booking_detail table
-                    $objHotelBooking->total_price_tax_excl += (float)$priceDiffTaxExcl;
-                    $objHotelBooking->total_price_tax_incl += (float)$priceDiffTaxIncl;
+                // ===============================================================
+                // Start: Add Process of the old booking
+                // ===============================================================
+                // Total method
+                $totalMethod = Cart::BOTH_WITHOUT_SHIPPING;
+                // Create new cart
+                $cart = new Cart();
+                $cart->id_shop_group = $objOrder->id_shop_group;
+                $cart->id_shop = $objOrder->id_shop;
+                $cart->id_customer = $objOrder->id_customer;
+                $cart->id_carrier = $objOrder->id_carrier;
+                $cart->id_address_delivery = $objOrder->id_address_delivery;
+                $cart->id_address_invoice = $objOrder->id_address_invoice;
+                $cart->id_currency = $objOrder->id_currency;
+                $cart->id_lang = $objOrder->id_lang;
+                $cart->secure_key = $objOrder->secure_key;
+                $cart->add();
 
-                    // set price changes in order_detail table
-                    $roomTypeTotalPrice = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice(
-                        $idNewRoomType,
-                        $objHotelBooking->date_from,
-                        $objHotelBooking->date_to
+                // Save context (in order to apply cart rule)
+                $this->context->cart = $cart;
+                $this->context->customer = new Customer($objOrder->id_customer);
+                $this->context->currency = new Currency($objOrder->id_currency);
+
+                // always add taxes even if not displayed to the customer
+                $useTaxes = true;
+
+                $initialProductPriceTE = Product::getPriceStatic(
+                    $idNewRoomType,
+                    $useTaxes,
+                    null,
+                    2,
+                    null,
+                    false,
+                    true,
+                    1,
+                    false,
+                    $objOrder->id_customer,
+                    $cart->id,
+                    $objOrder->id_address_tax
+                );
+
+                // create feature price if needed
+                $createFeaturePrice = $newRoomPriceTaxExcl != $initialProductPriceTE;
+                if ($createFeaturePrice) {
+                    $featurePriceParams = array();
+                    $featurePriceParams = array(
+                        'id_cart' => $this->context->cart->id,
+                        'id_guest' => $this->context->cookie->id_guest,
+                        'price' => $newRoomPriceTaxExcl,
+                        'id_product' => $idNewRoomType,
                     );
-
-                    $objOrderDetail->unit_price_tax_excl = Product::getPriceStatic($idNewRoomType, false, null, _PS_PRICE_COMPUTE_PRECISION_);
-                    $objOrderDetail->unit_price_tax_incl = Tools::ps_round(
-                        $taxCalculator->addTaxes($objOrderDetail->unit_price_tax_excl),
-                        _PS_PRICE_COMPUTE_PRECISION_
-                    );
-
-                    $objOrderDetail->total_price_tax_excl += (float)$priceDiffTaxExcl;
-                    $objOrderDetail->total_price_tax_incl += (float)$priceDiffTaxIncl;
-
-                    // set price changes in orders table
-                    $objOrder = new Order($objOrderDetail->id_order);
-                    $objOrder->total_products += (float)$priceDiffTaxExcl;
-                    $objOrder->total_products_wt += (float)$priceDiffTaxIncl;
-                    $objOrder->total_paid += (float)$priceDiffTaxIncl;
-                    $objOrder->total_paid_tax_excl += (float)$priceDiffTaxExcl;
-                    $objOrder->total_paid_tax_incl += (float)$priceDiffTaxIncl;
-
-                    $result &= $objOrder->update();
-
-                    // update taxes in order detail
-                    $result &= $objOrderDetail->updateTaxAmount($objOrder);
                 }
 
-                $result &= $objOrderDetail->update();
-            }
+                $objRoomTypeServiceProductCartDetail = new RoomTypeServiceProductCartDetail();
 
-            $objHotelBooking->id_room = $idRoom;
-            $objHotelBooking->room_num = $objHotelRoomInfo->room_num;
-            // set backorder to 0 as available reallocate rooms will always be free
-            $objHotelBooking->is_back_order = 0;
-            $result &= $objHotelBooking->save();
+                $bookingParams = array(
+                    'date_from' => $objOldHotelBooking->date_from,
+                    'date_to' => $objOldHotelBooking->date_to,
+                    'hotel_id' => $objOldHotelBooking->id_hotel,
+                    'id_room_type' => $idNewRoomType,
+                    'only_search_data' => 1,
+                );
+
+                if ($roomAvailabilityInfo = $objOldHotelBooking->dataForFrontSearch($bookingParams)) {
+                    if ($availableRooms = $roomAvailabilityInfo['rm_data'][$idNewRoomType]['data']['available']) {
+                        $roomInfo = reset($availableRooms);
+                        $objCartBookingData = new HotelCartBookingData();
+                        $objCartBookingData->id_cart = $this->context->cart->id;
+                        $objCartBookingData->id_guest = $this->context->cookie->id_guest;
+                        $objCartBookingData->id_customer = $objOrder->id_customer;
+                        $objCartBookingData->id_currency = $objOrder->id_currency;
+                        $objCartBookingData->id_product = $roomInfo['id_product'];
+                        $objCartBookingData->id_room = $roomInfo['id_room'];
+                        $objCartBookingData->id_hotel = $roomInfo['id_hotel'];
+                        $objCartBookingData->booking_type = 1;
+                        $objCartBookingData->quantity = $productQty;
+                        $objCartBookingData->date_from = $objOldHotelBooking->date_from;
+                        $objCartBookingData->date_to = $objOldHotelBooking->date_to;
+                        $objCartBookingData->adults = $objOldHotelBooking->adults;
+                        $objCartBookingData->children = $objOldHotelBooking->children;
+                        $objCartBookingData->child_ages = $objOldHotelBooking->child_ages;
+                        $objCartBookingData->save();
+
+                        // create feature price if needed
+                        if ($createFeaturePrice) {
+                            $featurePriceParams['id_room'] = $roomInfo['id_room'];
+                            $featurePriceParams = array_merge(
+                                $featurePriceParams,
+                                array('date_from' => $objOldHotelBooking->date_from, 'date_to' => $objOldHotelBooking->date_to)
+                            );
+                            HotelRoomTypeFeaturePricing::createAutoFeaturePrice($featurePriceParams);
+                        }
+                    } else {
+                        return false;
+                    }
+                } else {
+                    return false;
+                }
+
+                $totalRoomTypePrice = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice(
+                    $idNewRoomType,
+                    $objCartBookingData->date_from,
+                    $objCartBookingData->date_to,
+                    0,
+                    Group::getCurrent()->id,
+                    $this->context->cart->id,
+                    $this->context->cookie->id_guest,
+                    $objCartBookingData->id_room,
+                    0
+                );
+
+                // Add product to cart
+                $updateQuantity = $cart->updateQty(
+                    $productQty,
+                    $idNewRoomType,
+                    null,
+                    null,
+                    'up',
+                    0,
+                    new Shop($cart->id_shop)
+                );
+
+                // If order is valid, we can create a new invoice or edit an existing invoice
+                if ($objOrder->hasInvoice()) {
+                    $objOrderInvoice = new OrderInvoice($objOldOrderDetail->id_order_invoice);
+                    $objOrderInvoice->total_paid_tax_excl += (float)($cart->getOrderTotal(false, $totalMethod));
+                    $objOrderInvoice->total_paid_tax_incl += (float)($cart->getOrderTotal($useTaxes, $totalMethod));
+                    $objOrderInvoice->total_products += (float)$cart->getOrderTotal(false, Cart::ONLY_PRODUCTS);
+                    $objOrderInvoice->total_products_wt += (float)$cart->getOrderTotal($useTaxes, Cart::ONLY_PRODUCTS);
+                    $objOrderInvoice->update();
+                }
+
+                // Create Order detail information
+                $objOrderDetail = new OrderDetail();
+                $objOrderDetail->createList($objOrder, $cart, $objOrder->getCurrentOrderState(), $cart->getProducts(), (isset($objOrderInvoice->id) ? $objOrderInvoice->id : 0), $useTaxes, (int)Tools::getValue('add_product_warehouse'));
+
+                // update totals amount of order
+                $objOrder->total_products += (float)$cart->getOrderTotal(false, Cart::ONLY_PRODUCTS);
+                $objOrder->total_products_wt += (float)$cart->getOrderTotal($useTaxes, Cart::ONLY_PRODUCTS);
+
+                $objOrder->total_paid += (float)($cart->getOrderTotal(true, $totalMethod));
+                $objOrder->total_paid_tax_excl += (float)($cart->getOrderTotal(false, $totalMethod));
+                $objOrder->total_paid_tax_incl += (float)($cart->getOrderTotal($useTaxes, $totalMethod));
+
+                // Save changes of order
+                $objOrder->update();
+
+                // Update Tax lines
+                $objOrderDetail->updateTaxAmount($objOrder);
+
+                $objRoomType = new HotelRoomType();
+                $objBookingDetail = new HotelBookingDetail();
+                $idNewOrderDetail = $objBookingDetail->getLastInsertedRoomIdOrderDetail($objOrder->id);
+                $objCartBookingData = new HotelCartBookingData();
+                if ($cartBookingsData = $objCartBookingData->getOnlyCartBookingData(
+                    $this->context->cart->id,
+                    $this->context->cart->id_guest,
+                    $idNewRoomType
+                )) {
+                    foreach ($cartBookingsData as $cartBookingInfo) {
+                        $objCartBookingData = new HotelCartBookingData($cartBookingInfo['id']);
+                        $objCartBookingData->id_order = $objOrder->id;
+                        $objCartBookingData->save();
+
+                        $objBookingDetail = new HotelBookingDetail();
+                        $objBookingDetail->id_product = $idNewRoomType;
+                        $objBookingDetail->id_order = $objOrder->id;
+                        $objBookingDetail->id_order_detail = $idNewOrderDetail;
+                        $objBookingDetail->id_cart = $this->context->cart->id;
+                        $objBookingDetail->id_room = $objCartBookingData->id_room;
+                        $objBookingDetail->id_hotel = $objCartBookingData->id_hotel;
+                        $objBookingDetail->id_customer = $objOrder->id_customer;
+                        $objBookingDetail->booking_type = $objCartBookingData->booking_type;
+                        $objBookingDetail->id_status = 1;
+                        $objBookingDetail->comment = $objCartBookingData->comment;
+                        $objBookingDetail->room_type_name = Product::getProductName($idNewRoomType, null, $objOrder->id_lang);
+
+                        $objBookingDetail->date_from = $objCartBookingData->date_from;
+                        $objBookingDetail->date_to = $objCartBookingData->date_to;
+                        $objBookingDetail->adults = $objCartBookingData->adults;
+                        $objBookingDetail->children = $objCartBookingData->children;
+                        $objBookingDetail->child_ages = $objCartBookingData->child_ages;
+
+                        $totalRoomTypePrice = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice(
+                            $idNewRoomType,
+                            $objCartBookingData->date_from,
+                            $objCartBookingData->date_to,
+                            0,
+                            Group::getCurrent()->id,
+                            $this->context->cart->id,
+                            $this->context->cookie->id_guest,
+                            $objCartBookingData->id_room,
+                            0
+                        );
+                        $objBookingDetail->total_price_tax_excl = $totalRoomTypePrice['total_price_tax_excl'];
+                        $objBookingDetail->total_price_tax_incl = $totalRoomTypePrice['total_price_tax_incl'];
+                        $objBookingDetail->total_paid_amount = $totalRoomTypePrice['total_price_tax_incl'];
+
+                        // Save hotel information/location/contact
+                        if (Validate::isLoadedObject($objRoom = new HotelRoomInformation($objCartBookingData->id_room))) {
+                            $objBookingDetail->room_num = $objRoom->room_num;
+                        }
+                        if (Validate::isLoadedObject($objHotelBranch = new HotelBranchInformation(
+                            $objCartBookingData->id_hotel,
+                            $this->context->cart->id_lang
+                        ))) {
+                            $addressInfo = $objHotelBranch->getAddress($objCartBookingData->id_hotel);
+                            $objBookingDetail->hotel_name = $objHotelBranch->hotel_name;
+                            $objBookingDetail->city = $addressInfo['city'];
+                            $objBookingDetail->state = State::getNameById($addressInfo['id_state']);
+                            $objBookingDetail->country = Country::getNameById($this->context->cart->id_lang, $addressInfo['id_country']);
+                            $objBookingDetail->zipcode = $addressInfo['postcode'];;
+                            $objBookingDetail->phone = $addressInfo['phone'];
+                            $objBookingDetail->email = $objHotelBranch->email;
+                            $objBookingDetail->check_in_time = $objHotelBranch->check_in;
+                            $objBookingDetail->check_out_time = $objHotelBranch->check_out;
+                        }
+
+                        if ($objBookingDetail->save()) {
+                            // Get Booking Demands of the old booking to add in the new booking creation
+                            $objBookingDemand = new HotelBookingDemands();
+                            if ($oldBookingDemands = $objBookingDemand->getRoomTypeBookingExtraDemands(
+                                $objOldHotelBooking->id_order,
+                                $objOldHotelBooking->id_product,
+                                $objOldHotelBooking->id_room,
+                                $objOldHotelBooking->date_from,
+                                $objOldHotelBooking->date_to
+                            )) {
+                                if (isset($oldBookingDemands[$objOldHotelBooking->id_room]['extra_demands']) && $oldBookingDemands[$objOldHotelBooking->id_room]['extra_demands']) {
+                                    foreach ($oldBookingDemands[$objOldHotelBooking->id_room]['extra_demands'] as $bookingDemand) {
+                                        $objBookingDemand = new HotelBookingDemands($bookingDemand['id_booking_demand']);
+                                        $objBookingDemand->id_htl_booking = $objBookingDetail->id;
+                                        $objBookingDemand->save();
+                                    }
+                                }
+                            }
+
+                            // Get Booking services of the old booking to add in the new booking creation
+                            $objServiceProductOrderDetail = new RoomTypeServiceProductOrderDetail();
+                            if ($oldAdditonalServices = $objServiceProductOrderDetail->getSelectedServicesForRoom($idHotelBooking)) {
+                                if (isset($oldAdditonalServices['additional_services']) && $oldAdditonalServices['additional_services']) {
+                                    foreach ($oldAdditonalServices['additional_services'] as $service) {
+                                        $objServiceProductOrderDetail = new RoomTypeServiceProductOrderDetail($service['id_room_type_service_product_order_detail']);
+                                        $objServiceProductOrderDetail->id_htl_booking_detail = $objBookingDetail->id;
+                                        $objServiceProductOrderDetail->save();
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // delete cart feature prices after room addition success
+                HotelRoomTypeFeaturePricing::deleteByIdCart($this->context->cart->id);
+
+                // ===============================================================
+                // END: Add Process of the old booking
+                // ===============================================================
+
+                // ===============================================================
+                // Start: Delete Process of the old booking
+                // ===============================================================
+                $deleteQty = false;
+                if ($productQty >= $objOldOrderDetail->product_quantity) {
+                    $deleteQty = true;
+                } else {
+                    // Calculate differences of price (Before / After)
+
+                    $objOldOrderDetail->total_price_tax_incl -= $totalRoomPriceTaxIncl;
+                    $objOldOrderDetail->total_price_tax_excl -= $totalRoomPriceTaxExcl;
+
+                    $old_quantity = $objOldOrderDetail->product_quantity;
+
+                    $objOldOrderDetail->product_quantity = $old_quantity - $product_quantity;
+                    $objOldOrderDetail->reduction_percent = 0;
+
+                    // update taxes
+                    $res &= $objOldOrderDetail->updateTaxAmount($objOrder);
+
+                    // Save order detail
+                    $res &= $objOldOrderDetail->update();
+                }
+
+                // Update OrderInvoice of this OrderDetail
+                if ($objOldOrderDetail->id_order_invoice != 0) {
+                    // values changes as values are calculated accoding to the quantity of the product by webkul
+                    $objOrderInvoice = new OrderInvoice($objOldOrderDetail->id_order_invoice);
+                    $objOrderInvoice->total_paid_tax_excl -= $totalRoomPriceTaxExcl;
+                    $objOrderInvoice->total_paid_tax_excl = $objOrderInvoice->total_paid_tax_excl > 0 ? $objOrderInvoice->total_paid_tax_excl : 0;
+
+                    $objOrderInvoice->total_paid_tax_incl -= $totalRoomPriceTaxIncl;
+                    $objOrderInvoice->total_paid_tax_incl = $objOrderInvoice->total_paid_tax_incl > 0 ? $objOrderInvoice->total_paid_tax_incl : 0;
+
+                    $objOrderInvoice->total_products -= $totalRoomPriceTaxExcl;
+                    $objOrderInvoice->total_products = $objOrderInvoice->total_products > 0 ? $objOrderInvoice->total_products : 0;
+
+                    $objOrderInvoice->total_products_wt -= $totalRoomPriceTaxIncl;
+                    $objOrderInvoice->total_products_wt = $objOrderInvoice->total_products_wt > 0 ? $objOrderInvoice->total_products_wt : 0;
+
+                    $res &= $objOrderInvoice->update();
+                }
+
+                // values changes as values are calculated accoding to the quantity of the product by webkul
+                $objOrder->total_paid -= $totalRoomPriceTaxIncl;
+                $objOrder->total_paid = $objOrder->total_paid > 0 ? $objOrder->total_paid : 0;
+
+                $objOrder->total_paid_tax_incl -= $totalRoomPriceTaxIncl;
+                $objOrder->total_paid_tax_incl = $objOrder->total_paid_tax_incl > 0 ? $objOrder->total_paid_tax_incl : 0;
+
+                $objOrder->total_paid_tax_excl -= $totalRoomPriceTaxExcl;
+                $objOrder->total_paid_tax_excl = $objOrder->total_paid_tax_excl > 0 ? $objOrder->total_paid_tax_excl : 0;
+
+                $objOrder->total_products -= $totalRoomPriceTaxExcl;
+                $objOrder->total_products = $objOrder->total_products > 0 ? $objOrder->total_products : 0;
+
+                $objOrder->total_products_wt -= $totalRoomPriceTaxIncl;
+                $objOrder->total_products_wt = $objOrder->total_products_wt > 0 ? $objOrder->total_products_wt : 0;
+
+                $objOrder->update();
+
+                // Reinject quantity in stock
+                $objOldOrderDetail->reinjectQuantity($objOldOrderDetail, $objOldOrderDetail->product_quantity, $deleteQty);
+
+                // retrieve and delete HotelCartBookingData row
+                $idHotelCartBookingData = Db::getInstance()->getValue('SELECT `id` FROM `'._DB_PREFIX_.'htl_cart_booking_data`
+                    WHERE date_from = "'.pSQL($objOldHotelBooking->date_from).'" AND date_to = "'.pSQL($objOldHotelBooking->date_to).'"
+                    AND id_room = '.(int) $objOldHotelBooking->id_room.' AND `id_order` = '.(int) $objOldHotelBooking->id_order
+                );
+                $objCartBookingData = new HotelCartBookingData($idHotelCartBookingData);
+                $objCartBookingData->delete();
+
+                // delete the booking detail
+                $objOldHotelBooking = new HotelBookingDetail($idHotelBooking);
+                $objOldHotelBooking->delete();
+
+                // ===============================================================
+                // END Delete Process of the old booking
+                // ===============================================================
+            } else {
+                // If we are reallocating to the same room type then we need to update only the room details
+                // update in the cart booking data
+                // retrieve HotelCartBookingData row
+                $idHotelCartBookingData = Db::getInstance()->getValue('SELECT `id` FROM `'._DB_PREFIX_.'htl_cart_booking_data`
+                    WHERE date_from = "'.pSQL($objOldHotelBooking->date_from).'" AND date_to = "'.pSQL($objOldHotelBooking->date_to).'"
+                    AND id_room = '.(int) $objOldHotelBooking->id_room.' AND `id_order` = '.(int) $objOldHotelBooking->id_order
+                );
+                $objCartBookingData = new HotelCartBookingData($idHotelCartBookingData);
+                $objCartBookingData->id_room = $idRoom;
+                // set backorder to 0 as available reallocate rooms will always be free
+                $objOldHotelBooking->is_back_order = 0;
+                $objCartBookingData->save();
+
+                // update in the hotel booking detail table
+                $objOldHotelBooking->id_room = $idRoom;
+                $objOldHotelBooking->room_num = $objHotelRoomInfo->room_num;
+                // set backorder to 0 as available reallocate rooms will always be free
+                $objOldHotelBooking->is_back_order = 0;
+
+                $result &= $objOldHotelBooking->save();
+            }
 
             if ($result) {
                 Hook::exec(
@@ -1969,10 +2274,14 @@ class HotelBookingDetail extends ObjectModel
      *
      * @return [boolean] [true if updated otherwise false]
      */
-    public function updateOrderRefundStatus($id_order, $date_from = false, $date_to = false, $id_rooms = array(), $is_refunded = 1)
+    public function updateOrderRefundStatus($id_order, $date_from = false, $date_to = false, $id_rooms = array(), $is_refunded = 1, $is_cancelled = null)
     {
         $table = 'htl_booking_detail';
         $data = array('is_refunded' => (int) $is_refunded);
+
+        if (!is_null($is_cancelled)) {
+            $data['is_cancelled'] = (int) $is_cancelled;
+        }
 
         if ($id_rooms) {
             foreach ($id_rooms as $key_rm => $val_rm) {
@@ -2190,7 +2499,7 @@ class HotelBookingDetail extends ObjectModel
                 $order_detail_data[$key]['child_ages'] = json_decode($value['child_ages']);
 
                 // Check if this booking as any refund history then enter refund data
-                if ($refundInfo = OrderReturnCore::getOrdersReturnDetail($id_order, 0, $value['id'])) {
+                if ($refundInfo = OrderReturn::getOrdersReturnDetail($id_order, 0, $value['id'])) {
                     $order_detail_data[$key]['refund_info'] = reset($refundInfo);
                 }
             }
@@ -2864,9 +3173,12 @@ class HotelBookingDetail extends ObjectModel
             );
             $objOrder = new Order($this->id_order);
             $orderTotalPaid = $objOrder->getTotalPaid();
+            $orderDiscounts = $objOrder->getCartRules();
+
+            $hasOrderDiscountOrPayment = ((float)$orderTotalPaid > 0 || $orderDiscounts) ? true : false;
 
             // things to do if order is not paid
-            if ((float) $orderTotalPaid <= 0) {
+            if (!$hasOrderDiscountOrPayment) {
                 $objHotelBookingDemands = new HotelBookingDemands();
                 $objRoomTypeServiceProductOrderDetail = new RoomTypeServiceProductOrderDetail();
 
@@ -2913,8 +3225,14 @@ class HotelBookingDetail extends ObjectModel
                                 $objOrderDetail->product_quantity_refunded = $objOrderDetail->product_quantity;
                             }
 
-                            $objOrderDetail->total_price_tax_excl -= Tools::ps_round((float) $objRoomTypeServiceProductOrderDetail->total_price_tax_excl, 6);
-                            $objOrderDetail->total_price_tax_incl -= Tools::ps_round((float) $objRoomTypeServiceProductOrderDetail->total_price_tax_incl, 6);
+                            $objOrderDetail->total_price_tax_excl = Tools::ps_round(
+                                ($objOrderDetail->total_price_tax_excl - $objRoomTypeServiceProductOrderDetail->total_price_tax_excl),
+                                6
+                            );
+                            $objOrderDetail->total_price_tax_incl = Tools::ps_round(
+                                ($objOrderDetail->total_price_tax_incl - $objRoomTypeServiceProductOrderDetail->total_price_tax_incl),
+                                6
+                            );
 
                             $objOrderDetail->save();
                         }
@@ -2939,16 +3257,47 @@ class HotelBookingDetail extends ObjectModel
                     $objOrderDetail->product_quantity_refunded = $objOrderDetail->product_quantity;
                 }
 
-                if ((float) $orderTotalPaid <= 0) {
+                if (!$hasOrderDiscountOrPayment) {
                     // reduce room amount from order and order detail
-                    $objOrderDetail->total_price_tax_incl -= Tools::ps_round((float) $this->total_price_tax_incl, 6);
-                    $objOrderDetail->total_price_tax_excl -= Tools::ps_round((float) $this->total_price_tax_excl, 6);
+                    $objOrderDetail->total_price_tax_incl = Tools::ps_round(
+                        ($objOrderDetail->total_price_tax_incl - $this->total_price_tax_incl),
+                        6
+                    );
+                    $objOrderDetail->total_price_tax_excl = Tools::ps_round(
+                        ($objOrderDetail->total_price_tax_excl - $this->total_price_tax_excl),
+                        6
+                    );
                     if (Validate::isLoadedObject($objOrder = new Order($this->id_order))) {
-                        $objOrder->total_paid -= $reduction_amount['total_price_tax_incl'];
-                        $objOrder->total_paid_tax_excl -= Tools::ps_round((float) $reduction_amount['total_price_tax_excl'], 6);
-                        $objOrder->total_paid_tax_incl -= Tools::ps_round((float) $reduction_amount['total_price_tax_incl'], 6);
-                        $objOrder->total_products -= Tools::ps_round((float) $reduction_amount['total_products_tax_excl'], 6);
-                        $objOrder->total_products_wt -= Tools::ps_round((float) $reduction_amount['total_products_tax_incl'], 6);
+                        $objOrder->total_paid = Tools::ps_round(
+                            ($objOrder->total_paid - $reduction_amount['total_price_tax_incl']),
+                            6
+                        );
+                        $objOrder->total_paid = $objOrder->total_paid > 0 ? $objOrder->total_paid : 0;
+
+                        $objOrder->total_paid_tax_excl = Tools::ps_round(
+                            ($objOrder->total_paid_tax_excl - $reduction_amount['total_price_tax_excl']),
+                            6
+                        );
+                        $objOrder->total_paid_tax_excl = $objOrder->total_paid_tax_excl > 0 ? $objOrder->total_paid_tax_excl : 0;
+
+                        $objOrder->total_paid_tax_incl = Tools::ps_round(
+                            ($objOrder->total_paid_tax_incl - $reduction_amount['total_price_tax_incl']),
+                            6
+                        );
+                        $objOrder->total_paid_tax_incl = $objOrder->total_paid_tax_incl > 0 ? $objOrder->total_paid_tax_incl : 0;
+
+                        $objOrder->total_products = Tools::ps_round(
+                            ($objOrder->total_products - $reduction_amount['total_products_tax_excl']),
+                            6
+                        );
+                        $objOrder->total_products = $objOrder->total_products > 0 ? $objOrder->total_products : 0;
+
+                        $objOrder->total_products_wt = Tools::ps_round(
+                            ($objOrder->total_products_wt - $reduction_amount['total_products_tax_incl']),
+                            6
+                        );
+                        $objOrder->total_products_wt = $objOrder->total_products_wt > 0 ? $objOrder->total_products_wt : 0;
+
                         $objOrder->save();
                     }
                 }
@@ -2958,7 +3307,7 @@ class HotelBookingDetail extends ObjectModel
 
             // as refund is completed then set the booking as refunded
             $this->is_refunded = 1;
-            if ((float) $orderTotalPaid <= 0) {
+            if (!$hasOrderDiscountOrPayment) {
                 // Reduce room amount from htl_booking_detail
                 $this->is_cancelled = 1;
                 $this->total_price_tax_excl = 0;
@@ -2966,66 +3315,6 @@ class HotelBookingDetail extends ObjectModel
             }
 
             $this->save();
-
-            return true;
-        }
-
-        return false;
-    }
-
-    public function setBookingCancellationMessage($message, $byAdmin = 0)
-    {
-        if (Validate::isLoadedObject($this)) {
-            // First save the message for the admin for the refund
-            $objectMessage = new Message();
-            $objectMessage->message = $message;
-            $objectMessage->id_cart = (int)$this->id_cart;
-            $objectMessage->id_customer = (int)($this->id_customer);
-            $objectMessage->id_order = (int)$this->id_order;
-            $objectMessage->private = 1;
-
-            // If cancelled by admin then set the employee id who is doing this cancellation else put 0
-            $context = Context::getContext();
-            if ($byAdmin) {
-                $objectMessage->id_employee = (int)$context->employee->id;
-            } else {
-                $objectMessage->id_employee = 0;
-            }
-
-            $objectMessage->add();
-
-            // save this message for the customer
-            $objCustomer = new Customer($this->id_customer);
-            $idCustomerThread = CustomerThread::getIdCustomerThreadByEmailAndIdOrder($objCustomer->email, $this->id_order);
-            if (!$idCustomerThread) {
-                $objCustomerThread = new CustomerThread();
-                $objCustomerThread->id_contact = 0;
-                $objCustomerThread->id_customer = (int)$this->id_customer;
-                $objCustomerThread->id_shop = (int)$context->shop->id;
-                $objCustomerThread->id_order = (int)$this->id_order;
-                $objCustomerThread->id_lang = (int)$context->language->id;
-                $objCustomerThread->email = $objCustomer->email;
-                $objCustomerThread->status = 'open';
-                $objCustomerThread->token = Tools::passwdGen(12);
-                $objCustomerThread->add();
-            } else {
-                $objCustomerThread = new CustomerThread((int)$idCustomerThread);
-            }
-
-            $objCustomerMessage = new CustomerMessage();
-            $objCustomerMessage->id_customer_thread = $objCustomerThread->id;
-
-            // If cancelled by admin then set the employee id who is doing this cancellation else put 0
-            if ($byAdmin) {
-                $objCustomerMessage->id_employee = (int)$context->employee->id;
-            } else {
-                $objCustomerMessage->id_employee = 0;
-            }
-
-            $objCustomerMessage->message = $message;
-            $objCustomerMessage->private = 0;
-
-            $objCustomerMessage->add();
 
             return true;
         }
@@ -3094,15 +3383,19 @@ class HotelBookingDetail extends ObjectModel
             }
         }
 
-        if ($bookedRoomInfoFlag && !$roomCount && $result) {
+        if (!$roomCount && $result) {
             $link = new Link();
             foreach ($result as $key => $bookingInfo) {
-                $result[$key]['booked_room_info'] = $this->chechRoomBooked($bookingInfo['id_room'], $bookingInfo['date_from'], $bookingInfo['date_to']);
-                $result[$key]['orders_filter_link'] = $link->getAdminLink('AdminOrders');
+                $result[$key]['child_ages'] = json_decode($bookingInfo['child_ages'], true);
 
-                // if need only rooms which are available to resolve overbooking the unset booked rooms
-                if ($bookedRoomInfoFlag == 2 && $result[$key]['booked_room_info']) {
-                    unset($result[$key]);
+                if ($bookedRoomInfoFlag) {
+                    $result[$key]['booked_room_info'] = $this->chechRoomBooked($bookingInfo['id_room'], $bookingInfo['date_from'], $bookingInfo['date_to']);
+                    $result[$key]['orders_filter_link'] = $link->getAdminLink('AdminOrders');
+
+                    // if need only rooms which are available to resolve overbooking the unset booked rooms
+                    if ($bookedRoomInfoFlag == 2 && $result[$key]['booked_room_info']) {
+                        unset($result[$key]);
+                    }
                 }
             }
         }

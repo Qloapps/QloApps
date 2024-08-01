@@ -1213,9 +1213,14 @@ Quick View Styles
     margin-bottom: 10px;}
 
 .hotel_name_block {
+  display: flex;
+  margin-bottom: 8px;
+}
+.hotel_name_block h1 {
   font-size: 22px;
   color: #000000;
-  margin-bottom: 8px;}
+  margin: 0;
+}
 .room_hotel_name_block
 {
   padding-bottom: 12px;}
@@ -1528,7 +1533,7 @@ ul.service-product-nav > li:hover {
 .service_product_action_block {
     display: flex;
     justify-content: space-between;
-    align-items: end;
+    align-items: center;
     flex-wrap: wrap;
 }
 .service-product-element .service-product-img {
@@ -1543,6 +1548,13 @@ ul.service-product-nav > li:hover {
   font-size: 14px;
   line-height: 22px;
 }
+.service-max-quantity-info {
+  font-size: 12px;
+  line-height: 1.3;
+  font-style: italic;
+  color: #959595;
+  font-weight: 400;
+}
 .service-product-element .service-product-price {
   font-weight: 600;
   font-size: 22px;
@@ -1554,10 +1566,6 @@ ul.service-product-nav > li:hover {
 
 .service-product-element .service-product-actions {
   display: flex;
-  justify-content: space-between;
-}
-.service-product-element .service-product-actions > div {
-  flex-grow: 1;
 }
 
 .service-product-element .qty_container > * {
@@ -1715,3 +1723,26 @@ ul.service-product-nav > li:hover {
 
 #room_info_hotel_images .skeleton-loading-wrap .loading-container-box {
   height: 200px; }
+  #hotel_rating {
+    position:relative;
+    top: -3px;
+    display: inline-flex;
+    color: #333;
+    gap: 1px;
+  }
+  #hotel_rating i {
+    font-size: 12px;
+  }
+@media (min-width:768px) {
+  .hotel_name_block{
+    flex-wrap: wrap;
+  }
+  .hotel_name{
+    margin-right: 10px;
+  }
+}
+@media (max-width:768px) {
+  #hotel_rating {
+    display: block;
+  }
+}

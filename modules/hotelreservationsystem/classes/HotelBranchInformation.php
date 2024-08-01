@@ -183,10 +183,10 @@ class HotelBranchInformation extends ObjectModel
 
         /* Query definition */
         $query = 'REPLACE INTO `'._DB_PREFIX_.'htl_access` (`id_profile`, `id_hotel`, `access`)';
-        $query .= ' VALUES '.'(1, '.(int)$idHotel.', 1)';
+        $query .= ' VALUES '.'('.(int) _PS_ADMIN_PROFILE_.', '.(int)$idHotel.', 1)';
         /* Profile selection */
-        $profiles = Db::getInstance()->executeS('SELECT `id_profile` FROM '._DB_PREFIX_.'profile WHERE `id_profile` != 1');
-        if (!$profiles || empty($profiles)) {
+        $profiles = Db::getInstance()->executeS('SELECT `id_profile` FROM '._DB_PREFIX_.'profile WHERE `id_profile` != '.(int) _PS_ADMIN_PROFILE_);
+        if ($profiles) {
             foreach ($profiles as $profile) {
                 $access = 0;
                 if (isset($context->employee->id_profile)) {
@@ -1228,13 +1228,13 @@ class HotelBranchInformation extends ObjectModel
 
             if (!$this->use_global_preparation_time) {
                 if ($this->preparation_time === '') {
-                    $message = Tools::displayError('Preparation time is a required.');
+                    $message = Tools::displayError('Minimum booking offset is a required.');
                     if ($die) {
                         throw new PrestaShopException($message);
                     }
                     return $error_return ? $message : false;
                 } elseif ($this->preparation_time !== '0' && !Validate::isUnsignedInt($this->preparation_time)) {
-                    $message = Tools::displayError('Preparation time is invalid.');
+                    $message = Tools::displayError('Minimum booking offset is invalid.');
                     if ($die) {
                         throw new PrestaShopException($message);
                     }

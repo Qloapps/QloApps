@@ -140,11 +140,31 @@ class WkRoomSearchHelper
                     if (!$dateTo = Tools::getValue('date_to')) {
                         $dateTo = date('Y-m-d', strtotime('+1 day', strtotime($dateFrom)));
                     }
-                    $smartyVars['date_from'] = $dateFrom;
-                    $smartyVars['date_to'] = $dateTo;
 
                     $idHotel = HotelBranchInformation::getHotelIdByIdCategory($idHotelCategory);
                     $htlCategoryInfo = $objHotelInfo->getCategoryDataByIdCategory((int) $objCategory->id_parent);
+                    $searchedData['htl_dtl'] = $objHotelInfo->hotelBranchesInfo(0, 1, 1, $idHotel);
+                    $preparationTime = (int) HotelOrderRestrictDate::getPreparationTime($idHotel);
+                    if ($preparationTime
+                        && strtotime('+ '.$preparationTime.' day') >= strtotime($dateFrom)
+                    ) {
+                        $dateFrom = date('Y-m-d', strtotime('+ '.$preparationTime.' day'));
+                        if (strtotime($dateFrom) >= strtotime($dateTo)) {
+                            $controller = Tools::getValue('controller');
+                            if ($controller == 'product'
+                                && ($idProduct = Tools::getValue('id_product'))
+                            ) {
+                                $objHotelRoomTypeRestrictionDateRange = new HotelRoomTypeRestrictionDateRange();
+                                $los = $objHotelRoomTypeRestrictionDateRange->getRoomTypeLengthOfStay($idProduct, $dateFrom);
+                                $dateTo = date('Y-m-d', strtotime('+'.$los['min_los'].' day', strtotime($dateFrom)));
+                            } else {
+                                $dateTo = date('Y-m-d', strtotime('+1 day', strtotime($dateFrom)));
+                            }
+                        }
+                    }
+
+                    $smartyVars['date_from'] = $dateFrom;
+                    $smartyVars['date_to'] = $dateTo;
 
                     $objBookingDetail = new HotelBookingDetail();
                     $searchedData['num_days'] = $objBookingDetail->getNumberOfDays($dateFrom, $dateTo);
@@ -152,18 +172,19 @@ class WkRoomSearchHelper
                     $searchedData['parent_data'] = $htlCategoryInfo;
                     $searchedData['date_from'] = $dateFrom;
                     $searchedData['date_to'] = $dateTo;
-                    $searchedData['htl_dtl'] = $objHotelInfo->hotelBranchesInfo(0, 1, 1, $idHotel);
 
                     if ($locationCategoryId) {
                         $objLocationCategory = new Category($locationCategoryId, $context->language->id);
                         $searchedData['location'] = $objLocationCategory->name;
                     } else {
                         $locationCategoryId = $objCategory->id_parent;
-                        $searchedData['location'] = $searchedData['htl_dtl']['city'];
-                        if (isset($searchedData['htl_dtl']['state_name'])) {
-                            $searchedData['location'] .= ', '.$searchedData['htl_dtl']['state_name'];
+                        if ($searchedData['htl_dtl']) {
+                            $searchedData['location'] = $searchedData['htl_dtl']['city'];
+                            if (isset($searchedData['htl_dtl']['state_name'])) {
+                                $searchedData['location'] .= ', '.$searchedData['htl_dtl']['state_name'];
+                            }
+                            $searchedData['location'] .= ', '.$searchedData['htl_dtl']['country_name'];
                         }
-                        $searchedData['location'] .= ', '.$searchedData['htl_dtl']['country_name'];
                     }
                     $searchedData['location_category_id'] = $locationCategoryId;
 
@@ -226,6 +247,7 @@ class WkRoomSearchHelper
         $smartyVars['hotels_info'] = $hotelsInfo;
         $smartyVars['show_hotel_name'] = Configuration::get('WK_HOTEL_NAME_ENABLE');
         $smartyVars['max_child_age'] = Configuration::get('WK_GLOBAL_CHILD_MAX_AGE');
+        $smartyVars['hotel_name_search_threshold'] = (int) Configuration::get('WK_HOTEL_NAME_SEARCH_THRESHOLD');
 
         $maxOrderDate = HotelOrderRestrictDate::getMaxOrderDate($idHotel);
         $smartyVars['max_order_date'] = date('Y-m-d', strtotime($maxOrderDate));

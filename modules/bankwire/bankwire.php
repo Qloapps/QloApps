@@ -208,14 +208,16 @@ class Bankwire extends PaymentModule
         }
 
         $objOrder = $params['objOrder'];
-        $orderState = $objOrder->getCurrentState();
+        $idOrderState = $objOrder->getCurrentState();
+        $objOrderState = new OrderState($idOrderState);
+        $history = $objOrder->getHistory($this->context->language->id);
+        $initialStatus = array_pop($history);
         $smartyVars = array();
-        if (in_array(
-            $orderState,
-            array(
-                Configuration::get('PS_OS_AWAITING_PAYMENT'),
+        if ($idOrderState == Configuration::get('PS_OS_AWAITING_PAYMENT')
+            || ($objOrderState->logable
+                && $initialStatus['id_order_state'] == Configuration::get('PS_OS_AWAITING_PAYMENT')
             )
-        )) {
+        ) {
             $objCart = new Cart($objOrder->id_cart);
             if ($objCart->is_advance_payment) {
                 $cartTotal = $objOrder->getOrdersTotalPaid(1);

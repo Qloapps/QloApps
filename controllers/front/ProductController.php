@@ -78,7 +78,8 @@ class ProductControllerCore extends FrontController
                         'hotel_location' => array(
                             'latitude' => $objHotelBranchInformation->latitude,
                             'longitude' => $objHotelBranchInformation->longitude,
-                        )
+                        ),
+                        'PS_STORES_ICON' => $this->context->link->getMediaLink(_PS_IMG_.Configuration::get('PS_STORES_ICON'))
                     ));
 
                     $this->addJS(
@@ -109,26 +110,18 @@ class ProductControllerCore extends FrontController
         // validate dates if available
         $dateFrom = Tools::getValue('date_from');
         $dateTo = Tools::getValue('date_to');
-
-        $currentTimestamp = strtotime(date('Y-m-d'));
-        $dateFromTimestamp = strtotime($dateFrom);
-        $dateToTimestamp = strtotime($dateTo);
-
-        if ($dateFrom != '' && ($dateFromTimestamp === false || ($dateFromTimestamp < $currentTimestamp))) {
-            Tools::redirect($this->context->link->getPageLink('pagenotfound'));
-        }
-
-        if ($dateTo != '' && ($dateToTimestamp === false || ($dateToTimestamp < $currentTimestamp))) {
-            Tools::redirect($this->context->link->getPageLink('pagenotfound'));
-        }
-
         parent::init();
 
         if ($id_product = (int) Tools::getValue('id_product')) {
             $this->product = new Product($id_product, true, $this->context->language->id, $this->context->shop->id);
         }
 
-        if (!$this->product->booking_product || ($this->product->booking_product && !$this->product->show_at_front)) {
+        $objHotelRoomType = new HotelRoomType();
+        $hotelRoomInfo = $objHotelRoomType->getRoomTypeInfoByIdProduct($this->product->id);
+        $idHotel = (int) $hotelRoomInfo['id_hotel'];
+        if (!HotelHelper::validateDateRangeForHotel($dateFrom, $dateTo, $idHotel)) {
+            Tools::redirect($this->context->link->getPageLink('pagenotfound'));
+        } else if (!$this->product->booking_product || ($this->product->booking_product && !$this->product->show_at_front)) {
             Tools::redirect($this->context->link->getPageLink('pagenotfound'));
         }
 
@@ -341,6 +334,7 @@ class ProductControllerCore extends FrontController
                     $date_from = Tools::getValue('date_from');
                     $date_to = Tools::getValue('date_to');
 
+                    $preparationTime = (int) HotelOrderRestrictDate::getPreparationTime($hotel_id);
                     if (!($date_from = Tools::getValue('date_from'))) {
                         $date_from = date('Y-m-d');
                         // set date to according to los
@@ -353,6 +347,17 @@ class ProductControllerCore extends FrontController
                         $objHotelRoomTypeRestrictionDateRange = new HotelRoomTypeRestrictionDateRange();
                         $los = $objHotelRoomTypeRestrictionDateRange->getRoomTypeLengthOfStay($this->product->id, $date_from);
                         $date_to = date('Y-m-d', strtotime('+'.$los['min_los'].' day', strtotime($date_from)));
+                    }
+
+                    if ($preparationTime
+                        && strtotime('+ '.$preparationTime.' day') >= strtotime($date_from)
+                    ) {
+                        $date_from = date('Y-m-d', strtotime('+ '.$preparationTime.' day'));
+                        if (strtotime($date_from) >= strtotime($date_to)) {
+                            $objHotelRoomTypeRestrictionDateRange = new HotelRoomTypeRestrictionDateRange();
+                            $los = $objHotelRoomTypeRestrictionDateRange->getRoomTypeLengthOfStay($this->product->id, $date_from);
+                            $date_to = date('Y-m-d', strtotime('+'.$los['min_los'].' day', strtotime($date_from)));
+                        }
                     }
 
                     $hotel_branch_obj = new HotelBranchInformation($hotel_id);
@@ -368,9 +373,6 @@ class ProductControllerCore extends FrontController
                         }
                     }
                     /*End*/
-                    // booking preparation time
-                    $preparationTime = (int) HotelOrderRestrictDate::getPreparationTime($hotel_id);
-
                     $objHotelImage = new HotelImage();
                     $hotelImageLink = null;
                     if ($coverImage = HotelImage::getCover($hotel_id)) {
@@ -413,6 +415,7 @@ class ProductControllerCore extends FrontController
                             'hotel_address1' => $addressInfo['address1'],
                             'hotel_phone' => $addressInfo['phone'],
                             'hotel_name' => $hotel_name,
+                            'hotel_rating' => $hotel_info_by_id['rating'],
                             'hotel_policies' => $hotel_policies,
                             'hotel_features' => $htl_features,
                             'hotel_image_link' => $hotelImageLink,
@@ -427,14 +430,27 @@ class ProductControllerCore extends FrontController
                     if (Configuration::get('PS_FRONT_ROOM_UNIT_SELECTION_TYPE') == HotelBookingDetail::PS_ROOM_UNIT_SELECTION_TYPE_QUANTITY) {
                         $occupancy_value = 1;
                     } else {
-                        $occupancy_value = array(
-                            array(
-                                'adults' => $room_info_by_product_id['adults'],
-                                'children' => 0,
-                                'child_ages' => array(),
-                            ),
-                        );
+                        $useDefaultOccupancy = true;
+                        // if coming from hotel page do not set occupancy, otherwise set base adult occupancy
+                        if (isset($_SERVER['HTTP_REFERER']) && $_SERVER['HTTP_REFERER'] == Tools::secureReferrer($_SERVER['HTTP_REFERER'])) { // Assure us the previous page was one of the site
+                            $idCategoryHotel = $hotel_branch_obj->id_category;
+                            $categoryPageLink = $this->context->link->getCategoryLink($idCategoryHotel);
+                            if (Tools::strpos($_SERVER['HTTP_REFERER'], $categoryPageLink) === 0) {
+                                $useDefaultOccupancy = false;
+                            }
+                        }
+
+                        if ($useDefaultOccupancy) {
+                            $occupancy_value = array(
+                                array(
+                                    'adults' => $room_info_by_product_id['adults'],
+                                    'children' => 0,
+                                    'child_ages' => array(),
+                                ),
+                            );
+                        }
                     }
+
                     $this->assignBookingFormVars($this->product->id, $date_from, $date_to, $occupancy_value);
                     $this->assignServiceProductVars();
 

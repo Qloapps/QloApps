@@ -82,6 +82,7 @@ class AdminOrderPreferencesControllerCore extends AdminController
             )
         );
 
+        $maxOrderDate = Tools::getValue('MAX_GLOBAL_BOOKING_DATE', Configuration::get('MAX_GLOBAL_BOOKING_DATE'));
         $this->fields_options = array(
             'order_restrict' => array(
                 'title' => $this->l('Order Restrict'),
@@ -92,11 +93,13 @@ class AdminOrderPreferencesControllerCore extends AdminController
                         'hint' => $this->l('Maximum date of check-out for which rooms of your hotels can be booked.'),
                         'type' => 'text',
                         'id' => 'max_global_book_date',
+                        'auto_value' => false,
+                        'value' => date('d-m-Y', strtotime($maxOrderDate)),
                         'class' => 'fixed-width-xxl readonly',
                     ),
                     'GLOBAL_PREPARATION_TIME' => array(
-                        'title' => $this->l('Preparation time'),
-                        'hint' => $this->l('Number of days required to prepare a room for a guest\'s stay. For example, if you set this value to 3 and someone is booking on 2nd of March he can only book rooms for dates from and after 3 days, i.e, 5th of March.'),
+                        'title' => $this->l('Minimum booking offset'),
+                        'hint' => $this->l('The minimum booking offset is the minimum number of days before the check-in date that a guest must book a room. For example, if you set this value to 3 and someone is booking on 2nd of March he can only book rooms for dates from and after 3 days, i.e, 5th of March.'),
                         'desc' => $this->l('Set to 0 to disable this feature.'),
                         'type' => 'text',
                         'class' => 'fixed-width-xl',
@@ -329,6 +332,7 @@ class AdminOrderPreferencesControllerCore extends AdminController
             $this->errors[] = Tools::displayError('Please assign a valid CMS page for Terms and Conditions.');
         }
 
+        $_POST['MAX_GLOBAL_BOOKING_DATE'] = date('Y-m-d', strtotime(Tools::getValue('MAX_GLOBAL_BOOKING_DATE')));
         $maxGlobalBookingDate = Tools::getValue('MAX_GLOBAL_BOOKING_DATE');
         $globalPreparationTime = Tools::getValue('GLOBAL_PREPARATION_TIME');
         $maxGlobalBookingDateFormatted = date('Y-m-d', strtotime($maxGlobalBookingDate));
@@ -342,9 +346,9 @@ class AdminOrderPreferencesControllerCore extends AdminController
         }
 
         if ($globalPreparationTime === '') {
-            $this->errors[] = Tools::displayError('Field \'Preparation time\' can not be empty.');
+            $this->errors[] = Tools::displayError('Field \'Minimum booking offset\' can not be empty.');
         } elseif ($globalPreparationTime !== '0' && !Validate::isUnsignedInt($globalPreparationTime)) {
-            $this->errors[] = Tools::displayError('Field \'Preparation time\' is invalid.');
+            $this->errors[] = Tools::displayError('Field \'Minimum booking offset\' is invalid.');
         }
     }
 

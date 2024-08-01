@@ -68,10 +68,10 @@
 				<div class="room_type_img_containter card">
 					<div class="room_hotel_name_block">
 						<div class="hotel_name_block">
-							<span>{$product->name}
+							<h1><span class="hotel_name">{$product->name}
 								{* Block for booking products *}
-								{if isset($id_hotel) && $id_hotel}&nbsp;-&nbsp;{$hotel_name}{/if}
-							</span>
+								{if isset($id_hotel) && $id_hotel}&nbsp;-&nbsp;{$hotel_name}{/if}</span>{if isset($hotel_rating) && $hotel_rating}<div id="hotel_rating">{for $i=0; $i < $hotel_rating; $i++}<i class="icon-star"></i>{/for}</div>{/if}
+							</h1>
 							{hook h='displayRoomTypeDetailRoomTypeNameBlock' id_product=$product->id}
 						</div>
 						{hook h='displayRoomTypeDetailRoomTypeNameAfter' id_product=$product->id}
@@ -785,7 +785,9 @@
 	{addJsDefL name=wrong_qty_cond}{l s='you are trying for a invalid quantity.' js=1}{/addJsDefL}
 	{addJsDefL name=select_txt}{l s='Select' js=1}{/addJsDefL}
 	{addJsDefL name=remove_txt}{l s='Remove' js=1}{/addJsDefL}
-    {addJsDefL name=cart_extra_service_add}{l s='Service is added to cart' js=1}{/addJsDefL}
-
+	{addJsDefL name=unselect_txt}{l s='Unselect' js=1}{/addJsDefL}
+    {addJsDefL name=service_added_txt}{l s='Service added' js=1}{/addJsDefL}
+    {addJsDefL name=service_removed_txt}{l s='Service removed' js=1}{/addJsDefL}
+    {addJsDefL name=service_updated_txt}{l s='Service updated' js=1}{/addJsDefL}
 	{/strip}
 {/if}

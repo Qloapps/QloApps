@@ -175,7 +175,7 @@ class AdminLocalizationControllerCore extends AdminController
 
             if (($iso_localization_pack = Tools::getValue('iso_localization_pack')) && Validate::isFileName($iso_localization_pack)) {
                 if (Tools::getValue('download_updated_pack') == '1' || defined('_PS_HOST_MODE_')) {
-                    $pack = @Tools::file_get_contents(_PS_API_URL_.'/localization/'.$version.'/'.$iso_localization_pack.'.xml');
+                    $pack = @Tools::file_get_contents(_QLO_API_URL_.'/localization/'.$version.'/'.$iso_localization_pack.'.xml');
                 } else {
                     $pack = false;
                 }
@@ -226,7 +226,7 @@ class AdminLocalizationControllerCore extends AdminController
         $localizations_pack = false;
         $this->tpl_option_vars['options_content'] = $this->renderOptions();
 
-        $xml_localization = Tools::simplexml_load_file(_PS_API_URL_.'/rss/localization.xml');
+        $xml_localization = Tools::simplexml_load_file(_QLO_API_URL_.'/xml/localization.xml');
         if (!$xml_localization) {
             $localization_file = _PS_ROOT_DIR_.'/localization/localization.xml';
             if (file_exists($localization_file)) {
@@ -248,7 +248,7 @@ class AdminLocalizationControllerCore extends AdminController
         }
 
         if (!$localizations_pack) {
-            return $this->displayWarning($this->l('Cannot connect to '._PS_API_URL_));
+            return $this->displayWarning($this->l('Cannot connect to '._QLO_API_URL_));
         }
 
         // Add local localization .xml files to the list if they are not already there

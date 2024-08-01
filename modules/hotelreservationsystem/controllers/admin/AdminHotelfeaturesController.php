@@ -58,6 +58,10 @@ class AdminHotelFeaturesController extends ModuleAdminController
 
     public function renderForm()
     {
+        if (!$this->loadObject(true)) {
+            return;
+        }
+
         $smartyVars = array();
         //lang vars
         $languages = Language::getLanguages(false);
@@ -66,7 +70,7 @@ class AdminHotelFeaturesController extends ModuleAdminController
         $smartyVars['languages'] = $languages;
         $smartyVars['currentLang'] = $currentLang;
         $smartyVars['ps_img_dir'] = _PS_IMG_.'l/';
-        if ($id = Tools::getValue('id')) {
+        if ($id = $this->object->id) {
             $smartyVars['edit'] = 1;
             if (Validate::isLoadedObject($objFeatures = new HotelFeatures($id))) {
                 $featureInfo = (array) $objFeatures;
@@ -148,18 +152,6 @@ class AdminHotelFeaturesController extends ModuleAdminController
                 }
             } else {
                 $this->errors[] = $this->l('Please add atleast one Child features.');
-            }
-
-            foreach ($languages as $lang) {
-                if (!trim(Tools::getValue('parent_ftr_name_'.$lang['id_lang']))) {
-                    $objHotelFeatures->name[$lang['id_lang']] = Tools::getValue(
-                        'parent_ftr_name_'.$defaultLangId
-                    );
-                } else {
-                    $objHotelFeatures->name[$lang['id_lang']] = Tools::getValue(
-                        'parent_ftr_name_'.$lang['id_lang']
-                    );
-                }
             }
 
             if (!count($this->errors)) {
@@ -297,13 +289,20 @@ class AdminHotelFeaturesController extends ModuleAdminController
 
     public function ajaxProcessDeleteFeature()
     {
-        $idFeature = Tools::getValue('feature_id');
-        $objHotelFeatures = new HotelFeatures();
-        if ($objHotelFeatures->deleteHotelFeatures($idFeature)) {
-            die('success');
+        $response = array('status' => false);
+        if ($this->tabAccess['delete']) {
+            $idFeature = Tools::getValue('feature_id');
+            $objHotelFeatures = new HotelFeatures();
+            if ($objHotelFeatures->deleteHotelFeatures($idFeature)) {
+                $response['status'] = true;
+            } else {
+                $response['msg'] = $this->l('Some error occurred while deleting feature. Please try again.');
+            }
         } else {
-            echo 0;
+            $response['msg'] = $this->l('You do not have the permission to delete this.');
         }
+
+        $this->ajaxDie(json_encode($response));
     }
 
     public function setMedia()

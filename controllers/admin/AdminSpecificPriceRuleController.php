@@ -172,6 +172,7 @@ class AdminSpecificPriceRuleControllerCore extends AdminController
                     'name' => 'name',
                     'maxlength' => 32,
                     'required' => true,
+                    'col' => 3,
                     'hint' => $this->l('Forbidden characters').' <>;=#{}'
                 ),
                 array(
@@ -222,8 +223,8 @@ class AdminSpecificPriceRuleControllerCore extends AdminController
                     'name' => 'price',
                     'disabled' => ($this->object->price == -1 ? 1 : 0),
                     'maxlength' => 10,
-                    'suffix' => $this->context->currency->getSign('right'),
-
+                    'suffix' => $this->context->currency->sign,
+                    'col' => 3,
                 ),
                 array(
                     'type' => 'checkbox',
@@ -279,6 +280,7 @@ class AdminSpecificPriceRuleControllerCore extends AdminController
                     'type' => 'text',
                     'label' => $this->l('Reduction'),
                     'name' => 'reduction',
+                    'col' => 3,
                     'required' => true,
                 ),
             ),
@@ -297,16 +299,12 @@ class AdminSpecificPriceRuleControllerCore extends AdminController
         );
 
         $price = $this->getFieldValue($this->object, 'price');
-        if ($price != -1 && Validate::isPrice($price)) {
-            $price = number_format($price, 6);
-        } else {
+        if ($price == -1 || !Validate::isPrice($price)) {
             $price = '';
         }
 
         $reduction = $this->getFieldValue($this->object, 'reduction');
-        if (Validate::isPrice($reduction)) {
-            $reduction = number_format($reduction, 6);
-        } else {
+        if (!Validate::isPrice($reduction)) {
             $reduction = 0;
         }
 
