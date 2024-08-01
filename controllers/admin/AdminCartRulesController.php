@@ -147,12 +147,14 @@ class AdminCartRulesControllerCore extends AdminController
     public function ajaxProcessInitRuleDeleteModal()
     {
         $response = array('success' => false);
+        $modalConfirmDelete = $this->createTemplate('modal_confirm_delete.tpl');
+        $modalClass = 'modal-md';
         if ($idCartRule = Tools::getValue('id_cart_rule')) {
             if ($generatedByDetails = CartRule::getGeneratedBy($idCartRule)) {
                 if (Validate::isLoadedObject($objCartRule = new CartRule($idCartRule, $this->context->language->id))) {
                     if ($generatedByDetails['generated_by'] == CartRule::GENERATED_BY_REFUND) {
                         $obj  = new OrderReturn($generatedByDetails['id_generated_by']);
-                    } else if ($generatedByDetails['generated_by'] == CartRule::GENERATED_BY_ORDER_SLIP) {
+                    } else {
                         $obj  = new OrderSlip($generatedByDetails['id_generated_by']);
                     }
                     $objOrder = new Order($obj->id_order);
@@ -162,30 +164,32 @@ class AdminCartRulesControllerCore extends AdminController
                     $modalConfirmDelete->assign(array(
                         'generatedBy' => $generatedByDetails['generated_by'],
                         'generatedById' => $generatedByDetails['id_generated_by'],
-                        'Customer' => $objCustomer,
-                        'Order' => $objOrder,
-                        'CartRule' => $objCartRule,
+                        'customer' => $objCustomer,
+                        'order' => $objOrder,
+                        'cartRule' => $objCartRule,
                         'link' => $this->context->link
                     ));
-                    $tpl = $this->createTemplate('modal.tpl');
-                    $tpl->assign(array(
-                        'modal_id' => 'moduleConfirmDelete',
-                        'modal_class' => 'modal-lg',
-                        'modal_content' => $modalConfirmDelete->fetch(),
-                        'modal_actions' => array(
-                            array(
-                                'type' => 'button',
-                                'class' => 'process_delete btn-primary',
-                                'label' => $this->l('Delete'),
-                            ),
-                        ),
-
-                    ));
-                    $response['confirm_delete'] = true;
-                    $response['modalHtml'] = $tpl->fetch();
+                    $modalClass = 'modal-lg';
                 }
             }
         }
+        $tpl = $this->createTemplate('modal.tpl');
+        $tpl->assign(array(
+            'modal_id' => 'moduleConfirmDelete',
+            'modal_class' => $modalClass,
+            'modal_content' => $modalConfirmDelete->fetch(),
+            'modal_actions' => array(
+                array(
+                    'type' => 'button',
+                    'class' => 'process_delete btn-primary',
+                    'label' => $this->l('Delete'),
+                ),
+            ),
+
+        ));
+        $response['confirm_delete'] = true;
+        $response['modalHtml'] = $tpl->fetch();
+        $response['confirm_delete'] = true;
         $response['success'] = true;
 
         die(Tools::jsonEncode($response));
@@ -194,37 +198,48 @@ class AdminCartRulesControllerCore extends AdminController
     public function ajaxProcessInitRuleBulkDeleteModal()
     {
         $response = array('success' => false);
+        $modalConfirmDelete = $this->createTemplate('modal_confirm_bulk_delete.tpl');
         if ($idCartRules = Tools::getValue('id_cart_rule')) {
             $toConfirm = array();
             foreach($idCartRules as $idCartRule) {
-                if ($generatedByDetails = CartRule::getGeneratedBy($idCartRule)) {
-                    $toConfirm[] = array_merge(['id_cart_rule' => $idCartRule], $generatedByDetails);
+                if ($ruleDetails = CartRule::getGeneratedBy($idCartRule)) {
+                    $ruleDetails['id_cart_rule'] = $idCartRule;
+                    $objCartRule = new CartRule($idCartRule, $this->context->language->id);
+                    $ruleDetails['cart_rule'] = $objCartRule;
+                    if ($ruleDetails['generated_by'] == CartRule::GENERATED_BY_REFUND) {
+                        $obj  = new OrderReturn($ruleDetails['id_generated_by']);
+                    } else {
+                        $obj  = new OrderSlip($ruleDetails['id_generated_by']);
+                    }
+                    $objOrder = new Order($obj->id_order);
+                    $ruleDetails['order'] = $objOrder;
+                    $toConfirm[] = $ruleDetails;
                 }
             }
             if (count($toConfirm)) {
-                $modalConfirmDelete = $this->createTemplate('modal_confirm_bulk_delete.tpl');
                 $modalConfirmDelete->assign(array(
                     'cartRules' => $toConfirm,
                     'link' => $this->context->link
                 ));
-                $tpl = $this->createTemplate('modal.tpl');
-                $tpl->assign(array(
-                    'modal_id' => 'moduleConfirmDelete',
-                    'modal_class' => 'modal-md',
-                    'modal_content' => $modalConfirmDelete->fetch(),
-                    'modal_actions' => array(
-                        array(
-                            'type' => 'button',
-                            'class' => 'process_delete btn-primary',
-                            'label' => $this->l('Delete'),
-                        ),
-                    ),
 
-                ));
-                $response['confirm_delete'] = true;
-                $response['modalHtml'] = $tpl->fetch();
             }
         }
+        $tpl = $this->createTemplate('modal.tpl');
+        $tpl->assign(array(
+            'modal_id' => 'moduleConfirmDelete',
+            'modal_class' => 'modal-md',
+            'modal_content' => $modalConfirmDelete->fetch(),
+            'modal_actions' => array(
+                array(
+                    'type' => 'button',
+                    'class' => 'process_delete btn-primary',
+                    'label' => $this->l('Delete'),
+                ),
+            ),
+
+        ));
+        $response['confirm_delete'] = true;
+        $response['modalHtml'] = $tpl->fetch();
         $response['success'] = true;
 
         die(Tools::jsonEncode($response));

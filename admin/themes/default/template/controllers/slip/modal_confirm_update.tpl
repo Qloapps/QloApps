@@ -19,7 +19,7 @@
 <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal"><i class="icon-remove-sign"></i></button>
     <h4 class="modal-title"><i class="icon icon-exclamation-triangle"></i>&nbsp;{l s='Confirm Update'}</h4>
-    <p>{l s='Are you sure you want to change the status?'}</p>
+    <p>{l s='This action is irreversable, Are you sure you want to change the status?'}</p>
 </div>
 <div class="modal-body">
     <div class="row">
