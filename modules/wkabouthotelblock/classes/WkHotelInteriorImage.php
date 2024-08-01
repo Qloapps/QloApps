@@ -141,9 +141,30 @@ class WkHotelInteriorImage extends ObjectModel
         $languages = Language::getLanguages(false);
         $HOTEL_INTERIOR_HEADING = array();
         $HOTEL_INTERIOR_DESCRIPTION = array();
+        $htlInteriorHeadingLang = array(
+            'en' => 'Explore the Interiors!',
+            'nl' => 'Verken de interieurs!',
+            'fr' => 'Explorez les intérieurs!',
+            'de' => 'Entdecken Sie die Innenräume!',
+            'ru' => 'Исследуйте интерьеры!',
+            'es' => '¡Explora los interiores!',
+        );
+        $htlInteriorDescLang = array(
+            'en' => 'Step into the sophisticated elegance of our hotel, where every detail is designed with your comfort in mind.',
+            'nl' => 'Stap in de verfijnde elegantie van ons hotel, waar elk detail is ontworpen met uw comfort in gedachten.',
+            'fr' => 'Entrez dans l\'élégance sophistiquée de notre hôtel, où chaque détail est conçu pour votre confort.',
+            'de' => 'Treten Sie ein in die raffinierte Eleganz unseres Hotels, wo jedes Detail mit Ihrem Komfort im Hinterkopf gestaltet ist.',
+            'ru' => 'Погрузитесь в утонченную элегантность нашего отеля, где каждая деталь создана с заботой о вашем комфорте.',
+            'es' => 'Sumérgete en la elegancia sofisticada de nuestro hotel, donde cada detalle está diseñado pensando en tu comodidad.',
+        );
         foreach ($languages as $lang) {
-            $HOTEL_INTERIOR_HEADING[$lang['id_lang']] = 'Interior';
-            $HOTEL_INTERIOR_DESCRIPTION[$lang['id_lang']] = 'Families travelling with kids will find Amboseli national park a safari destination matched to no other, with less tourist traffic, breathtaking open space.';
+            if (isset($htlInteriorHeadingLang[$lang['iso_code']])) {
+                $HOTEL_INTERIOR_HEADING[$lang['id_lang']] = $htlInteriorHeadingLang[$lang['iso_code']];
+                $HOTEL_INTERIOR_DESCRIPTION[$lang['id_lang']] = $htlInteriorDescLang[$lang['iso_code']];
+            } else {
+                $HOTEL_INTERIOR_HEADING[$lang['id_lang']] = $htlInteriorHeadingLang['en'];
+                $HOTEL_INTERIOR_DESCRIPTION[$lang['id_lang']] = $htlInteriorDescLang['en'];
+            }
         }
         // update global configuration values in multilang
         Configuration::updateValue('HOTEL_INTERIOR_HEADING', $HOTEL_INTERIOR_HEADING);
