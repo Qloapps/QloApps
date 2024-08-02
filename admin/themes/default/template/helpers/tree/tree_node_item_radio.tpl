@@ -24,7 +24,7 @@
 *}
 <li class="tree-item{if isset($node['disabled']) && $node['disabled'] == true} tree-item-disable{/if}">
 	<span class="tree-item-name">
-		<input type="radio" name="{$input_name}" value="{$node['id_category']}"{if isset($node['disabled']) && $node['disabled'] == true} disabled="disabled"{/if} />
+		<input type="radio" name="{$node['input_name']}" value="{$node['value']}"{if isset($node['selected']) && $node['selected'] == true} checked="checked"{/if}{if isset($node['disabled']) && $node['disabled'] == true} disabled="disabled"{/if} />
 		<i class="tree-dot"></i>
 		<label class="tree-toggler">{$node['name']}</label>
 	</span>

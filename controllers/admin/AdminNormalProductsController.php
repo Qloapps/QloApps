@@ -2875,7 +2875,7 @@ class AdminNormalProductsControllerCore extends AdminController
     {
         if (Validate::isLoadedObject($product)) {
             $objRoomTypeServiceProduct = new RoomTypeServiceProduct();
-            $associatedRoomTypes = $objRoomTypeServiceProduct->getAssociatedHotelsAndRoomType($product->id)['room_types'];
+            $associatedRoomTypes = $objRoomTypeServiceProduct->getAssociatedHotelsAndRoomType($product->id)['room_type'];
             if (Product::SERVICE_PRODUCT_WITH_ROOMTYPE == $product->service_product_type) {
                 $selectedRoomTypes = Tools::getValue('roomTypeBox');
 
@@ -3499,18 +3499,16 @@ class AdminNormalProductsControllerCore extends AdminController
 
         $objRoomTypeServiceProduct = new RoomTypeServiceProduct();
         $selectedElements = $objRoomTypeServiceProduct->getAssociatedHotelsAndRoomType($product->id);
-        $tree = new HelperTreeHotels('associated-hotels-tree', 'Associated hotels');
-        $tree->setTemplate('tree_associated_hotels.tpl')
-            ->setHeaderTemplate('tree_associated_header.tpl')
-            ->setRootCategory((int)Configuration::get('PS_LOCATIONS_CATEGORY'))
-            ->setUseCheckBox(true)
-            ->setFullTree(true)
-            ->setRoomsOnly(false)
-            ->setSelectedHotels($selectedElements['hotels'])
-            ->setSelectedRoomTypes($selectedElements['room_types'])
-            ->setUseBulkActions(true)
-            ->setAccessedHotels(HotelBranchInformation::getProfileAccessedHotels($this->context->employee->id_profile, 1, 0));
 
+        $tree = new HelperTree('hotels-tree');
+        $tree->setData(HotelHelper::generateTreeData([
+                // 'rootNode' => HotelHelper::NODE_HOTEL,
+                // 'leafNode' => HotelHelper::NODE_ROOM_TYPE,
+                'selectedElements' => $selectedElements
+            ]))
+            ->setUseCheckBox(true)
+            ->setUseBulkActions(true)
+            ->setUseSearch(true);
         $data->assign('hotel_tree', $tree->render());
 
         // TinyMCE

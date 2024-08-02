@@ -107,9 +107,9 @@ class RoomTypeServiceProduct extends ObjectModel
         );
 
         if ($formated) {
-            $response = array('hotels' => array(), 'room_types' => array());
+            $response = array('hotel' => array(), 'room_type' => array());
             foreach($rows as $row) {
-                $key = $row['element_type'] == self::WK_ELEMENT_TYPE_HOTEL ? 'hotels' : 'room_types';
+                $key = $row['element_type'] == self::WK_ELEMENT_TYPE_HOTEL ? 'hotel' : 'room_type';
                 $response[$key][] = $row['id_element'];
             }
             return $response;

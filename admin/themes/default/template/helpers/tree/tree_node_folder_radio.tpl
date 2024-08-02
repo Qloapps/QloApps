@@ -24,9 +24,9 @@
 *}
 <li class="tree-folder">
 	<span class="tree-folder-name{if isset($node['disabled']) && $node['disabled'] == true} tree-folder-name-disable{/if}">
-		{if $node['id_category'] != $root_category}
-		<input type="radio" name="{$input_name}" value="{$node['id_category']}"{if isset($node['disabled']) && $node['disabled'] == true} disabled="disabled"{/if} />
-		{/if}
+		{* {if $node[$input_id] != $root_category} *}
+		<input type="radio" name="{$node['input_name']}" value="{$node['value']}"{if isset($node['selected']) && $node['selected'] == true} checked="checked"{/if}{if isset($node['disabled']) && $node['disabled'] == true} disabled="disabled"{/if} />
+		{* {/if} *}
 		<i class="icon-folder-close"></i>
 		<label class="tree-toggler">{$node['name']|escape:'html':'UTF-8'}</label>
 	</span>
