@@ -5411,6 +5411,10 @@ class AdminOrdersControllerCore extends AdminController
         $obj_htl_booking = new HotelBookingDetail();
         $delete_room_order = $obj_htl_booking->deleteOrderedRoomFromOrder($id_order, $id_hotel, $id_room, $date_from, $date_to);
 
+        // Reducing the quantity from the cart after removing the room from the order
+        $objCart = new Cart($bookingInfo['id_cart']);
+        $objCart->updateQty($product_quantity, $bookingInfo['id_product'], null, false, 'down', 0, null, true);
+
         // Assign to smarty informations in order to show the new product line
         $this->context->smarty->assign(array(
             'order' => $order,
