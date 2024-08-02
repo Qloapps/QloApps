@@ -45,7 +45,15 @@ class HotelRoomDisableDates extends ObjectModel
 
     public function getRoomDisableDates($id_room)
     {
-        return Db::getInstance()->executeS('SELECT `date_from`, `date_to`, `reason` FROM `'._DB_PREFIX_.'htl_room_disable_dates` WHERE `id_room`='.(int)$id_room);
+        $disabledDates =  Db::getInstance()->executeS('SELECT `id`, `date_from`, `date_to`, `reason`, `date_add` FROM `'._DB_PREFIX_.'htl_room_disable_dates` WHERE `id_room`='.(int) $id_room);
+        Hook::exec('actionRoomDisabledDatesModifier',
+            array(
+                'disabled_dates' => &$disabledDates,
+                'id_room' => $id_room
+            )
+        );
+
+        return $disabledDates;
     }
 
     public function checkIfRoomAlreadyDisabled($params)
