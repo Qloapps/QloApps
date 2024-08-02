@@ -2518,7 +2518,7 @@ class AdminImportControllerCore extends AdminController
                             if (isset($orderProduct['id_service_products']) && count($orderProduct['id_service_products'])) {
                                 foreach ($orderProduct['id_service_products'] as $serviceProdKey =>  $serviceProd) {
                                     $serviceProd = explode(':', $serviceProd);
-                                    if (Validate::isLoadedObject($objServiceProduct = new Product($serviceProd[0]))) {
+                                    if (Validate::isLoadedObject($objServiceProduct = new Product((int) $serviceProd[0]))) {
                                         $serviceProducts[$serviceProdKey]['id_product'] = $serviceProd[0];
                                         $serviceProducts[$serviceProdKey]['quantity'] = 1;
                                         if ($objServiceProduct->allow_multiple_quantity
@@ -3234,10 +3234,10 @@ class AdminImportControllerCore extends AdminController
                     WHERE id_category NOT IN ('.$exclCategories.')');
                 Db::getInstance()->execute('
                     DELETE FROM `'._DB_PREFIX_.'category_lang`
-                    WHERE id_category NOT IN ('.$core_categories.')');
+                    WHERE id_category NOT IN ('.$exclCategories.')');
                 Db::getInstance()->execute('
                     DELETE FROM `'._DB_PREFIX_.'category_shop`
-                    WHERE `id_category` NOT IN ('.$core_categories.')');
+                    WHERE `id_category` NOT IN ('.$exclCategories.')');
                 Db::getInstance()->execute('ALTER TABLE `'._DB_PREFIX_.'category` AUTO_INCREMENT = '.(count($core_categories) + 1));
                 foreach (scandir(_PS_CAT_IMG_DIR_) as $d) {
                     if (preg_match('/^[0-9]+(\-(.*))?\.jpg$/', $d)) {
@@ -3364,6 +3364,11 @@ class AdminImportControllerCore extends AdminController
                     LEFT JOIN `'._DB_PREFIX_.'stock_available` sta ON p.id_product = sta.id_product
                     LEFT JOIN `'._DB_PREFIX_.'supply_order_detail` sod ON p.id_product = sod.id_product
                     WHERE p.booking_product=0');
+
+                Db::getInstance()->execute('TRUNCATE TABLE `'._DB_PREFIX_.'htl_room_type_service_product`');
+                Db::getInstance()->execute('TRUNCATE TABLE `'._DB_PREFIX_.'htl_room_type_service_product_price`');
+                Db::getInstance()->execute('TRUNCATE TABLE `'._DB_PREFIX_.'htl_room_type_service_product_cart_detail`');
+                Db::getInstance()->execute('DELETE FROM `'._DB_PREFIX_.'product` WHERE booking_product=0');
             break;
             case $this->entities[$this->l('Customers')]:
                 Db::getInstance()->execute('TRUNCATE TABLE `'._DB_PREFIX_.'customer`');
