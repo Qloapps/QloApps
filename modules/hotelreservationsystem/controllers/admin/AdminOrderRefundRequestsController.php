@@ -196,7 +196,7 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
 
     public function renderView()
     {
-        if (!($objOrderReturn = $this->loadObject(true))) {
+        if (!($objOrderReturn = $this->loadObject())) {
             return;
         }
         $refundStatuses = OrderReturnStateCore::getOrderReturnStates($this->context->language->id);
@@ -327,10 +327,13 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
                 } else {
                     $this->errors[] = $this->l('Invalid refund state.');
                 }
-                if (!$voucher_expiry_date = Tools::getValue('voucher_expiry_date')) {
-                    $this->errors[] = $this->l('Voucher expiry date is required.');
-                } elseif (!Validate::isDate($voucher_expiry_date)) {
-                    $this->errors[] = $this->l('Invalid voucher expiry date.');
+
+                if (Tools::isSubmit('generateDiscount')) {
+                    if (!$voucher_expiry_date = Tools::getValue('voucher_expiry_date')) {
+                        $this->errors[] = $this->l('Voucher expiry date is required.');
+                    } elseif (!Validate::isDate($voucher_expiry_date)) {
+                        $this->errors[] = $this->l('Invalid voucher expiry date.');
+                    }
                 }
             } else {
                 $this->errors[] = $this->l('Invalid refund information found.');

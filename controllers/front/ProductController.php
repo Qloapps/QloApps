@@ -78,7 +78,8 @@ class ProductControllerCore extends FrontController
                         'hotel_location' => array(
                             'latitude' => $objHotelBranchInformation->latitude,
                             'longitude' => $objHotelBranchInformation->longitude,
-                        )
+                        ),
+                        'PS_STORES_ICON' => $this->context->link->getMediaLink(_PS_IMG_.Configuration::get('PS_STORES_ICON'))
                     ));
 
                     $this->addJS(
@@ -414,6 +415,7 @@ class ProductControllerCore extends FrontController
                             'hotel_address1' => $addressInfo['address1'],
                             'hotel_phone' => $addressInfo['phone'],
                             'hotel_name' => $hotel_name,
+                            'hotel_rating' => $hotel_info_by_id['rating'],
                             'hotel_policies' => $hotel_policies,
                             'hotel_features' => $htl_features,
                             'hotel_image_link' => $hotelImageLink,
