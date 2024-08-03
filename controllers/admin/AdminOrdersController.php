@@ -2301,26 +2301,23 @@ class AdminOrdersControllerCore extends AdminController
                             // only proceed if current active address and current order address are different
                             if ($idCustomerAddress != $idAddressInvoice) {
                                 if (Validate::isLoadedObject($objActiveAddress = new Address($idCustomerAddress))) {
-                                    // Call delete as it will manage to delete current active address if it has no orders associated
-                                    // else it will just update deleted = 1 to the current active address
-                                    $objActiveAddress->delete();
+                                    // set current active address information from order address
+                                    $objOrderAddress->id = $objOrderAddress->id_address = $objActiveAddress->id;
+                                    $objOrderAddress->deleted = 0;
+                                    $objOrderAddress->update();
                                 } else {
-                                    $this->errors = Tools::displayError('Guest address not found. Please try again.');
+                                    $this->errors = Tools::displayError('Customer address not found. Please try again.');
                                 }
-                            } else {
-                                // if current active address and current order address are same then no need to update
-                                $updateAddress = 0;
                             }
+                        } else {
+                            // If customer has no active address, create new customer address with the order address
+                            $objOrderAddress->id = $objOrderAddress->id_address = null;
+                            $objOrderAddress->deleted = 0;
+                            $objOrderAddress->add();
                         }
 
-                        if ($updateAddress && !count($this->errors)) {
-                            // set current order address as current active address
-                            $objOrderAddress->deleted = 0;
-                            if ($objOrderAddress->update()) {
-                                Tools::redirectAdmin(self::$currentIndex.'&id_order='.$idOrder.'&vieworder&conf=6&token='.$this->token);
-                            } else {
-                                $this->errors = Tools::displayError('Some error occurred while updating address detail. Please try again.');
-                            }
+                        if (!count($this->errors)) {
+                            Tools::redirectAdmin(self::$currentIndex.'&id_order='.$idOrder.'&vieworder&conf=6&token='.$this->token);
                         }
                     } else {
                         $this->errors = Tools::displayError('Address not found. Please try again.');
@@ -2343,7 +2340,7 @@ class AdminOrdersControllerCore extends AdminController
                             $this->errors[] = Tools::displayError('Some error occurred while updating address detail. Please try again.');
                         }
                     } else {
-                        $this->errors = Tools::displayError('Guest address not found. Please try again.');
+                        $this->errors = Tools::displayError('Customer address not found. Please try again.');
                     }
                 } else {
                     $this->errors = Tools::displayError('Order not found. Please try again.');

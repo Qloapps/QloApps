@@ -638,7 +638,7 @@
 
                 <div class="panel panel-guest_address">
                     <div class="panel-heading">
-                        <span class="panel-title"><i class="icon icon-envelope"></i> &nbsp;{l s='Guest Address'}</span>
+                        <span class="panel-title"><i class="icon icon-envelope"></i> &nbsp;{l s='Customer Address'}</span>
                         {if $can_edit}
                             {if $idOrderAddressInvoice}
                                 <button id="edit_guest_address" class="btn btn-primary pull-right fancybox" href="{$link->getAdminLink('AdminAddresses')}&amp;id_address={$idOrderAddressInvoice}&amp;updateaddress&amp;id_order={$order->id|intval}&amp;address_type=2&amp;realedit=1&amp;liteDisplaying=1&amp;submitFormAjax=1#">
