@@ -481,7 +481,7 @@ class AdminAddressesControllerCore extends AdminController
 
         // in case of save and stay, redirect after save with current address.
         // Because the current address can not be same as the current one(We have to delete it and create a new one in case address is used in orders)
-        if (Tools::isSubmit('submitAdd'.$this->table.'AndStay')) {
+        if (empty($this->errors) && Tools::isSubmit('submitAdd'.$this->table.'AndStay')) {
             $idCurrentAddress = Customer::getCustomerIdAddress($this->object->id_customer, false);
             if ($idCurrentAddress != $this->object->id) {
                 $this->redirect_after = self::$currentIndex.'&'.$this->identifier.'='.$idCurrentAddress.'&conf=4&update'.$this->table.'&token='.$this->token;
