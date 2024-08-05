@@ -258,7 +258,7 @@
 													<span>{l s='Hotel Description'}</span>
 												</div>
 												<div class="room_info_content">
-													<p class="">{$hotel_description}</p>
+													{$hotel_description}
 												</div>
 											</div>
 										{/if}
