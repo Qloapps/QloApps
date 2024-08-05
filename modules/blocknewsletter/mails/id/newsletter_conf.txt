@@ -1,9 +1,0 @@
-[/{shop_url}]
-
-HAI,
-
-Terima kasih telah berlangganan buletin kami! Jika Anda ingin berhenti berlangganan, silakan klik
-di sini.[/{{unsub_url}}]
-
-{shop_name} [/{shop_url}] diberdayakan oleh Webkul(tm)
-[https://webkul.com]

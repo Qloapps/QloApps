@@ -1,9 +1,0 @@
-[/{shop_url}]
-
-SALUT,
-
-Merci de votre inscription à notre newsletter, merci de confirmer votre demande en cliquant
-ici.[/{verif_url}]
-
-{shop_name} [/{shop_url}] propulsé par Webkul(tm)
-[https://webkul.com]

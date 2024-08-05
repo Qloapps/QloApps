@@ -1,8 +1,0 @@
-[/{shop_url}]
-
-HALLO,
-
-Vielen Dank für die Anmeldung zu unserem Newsletter, bitte bestätigen Sie Ihre Anfrage, indem Sie hier klicken. [/{verif_url}]
-
-{shop_name} [/{shop_url}] bereitgestellt von Webkul(tm)
-[https://webkul.com]

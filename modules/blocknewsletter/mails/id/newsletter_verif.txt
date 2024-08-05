@@ -1,9 +1,0 @@
-[/{shop_url}]
-
-HAI,
-
-Terima kasih telah berlangganan buletin kami, silakan konfirmasi permintaan Anda dengan mengklik
-di sini.[/{verif_url}]
-
-{shop_name} [/{shop_url}] diberdayakan oleh Webkul(tm)
-[https://webkul.com]
