@@ -29,6 +29,7 @@ class HelperTreeCore extends TreeCore
     private $_use_bulk_actions;
     private $_use_checkbox;
     private $_show_collapse_expand_button = true;
+    private $_max_height = 350;
 
 
     public function setUseSearch($value)
@@ -70,6 +71,18 @@ class HelperTreeCore extends TreeCore
         return $this;
     }
 
+    public function setMaxHeight($value)
+    {
+        $this->_max_height = (bool)$value;
+        return $this;
+    }
+
+    public function maxHeight()
+    {
+        return $this->_max_height;
+    }
+
+
     public function showCollapseExpandButton()
     {
         return (isset($this->_show_collapse_expand_button) && $this->_show_collapse_expand_button);
@@ -77,7 +90,6 @@ class HelperTreeCore extends TreeCore
 
     public function render($data = null)
     {
-
         if ($this->useCheckBox()) {
             if($this->useBulkActions()) {
                 $check_all = new TreeToolbarLink(
@@ -125,11 +137,10 @@ class HelperTreeCore extends TreeCore
             $this->addAction($expand_all);
         }
 
+        $this->setAttribute('max_height', $this->maxHeight());
+        $this->setAttribute('root_selectable', $this->rootElementSelectable());
+
 
         return parent::render($data);
     }
-
-
-
-
 }

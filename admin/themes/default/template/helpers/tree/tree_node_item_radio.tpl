@@ -28,4 +28,10 @@
 		<i class="tree-dot"></i>
 		<label class="tree-toggler">{$node['name']}</label>
 	</span>
+	{if isset($node['badge'])}
+		<span class="badge {if isset($node['badge']['class'])}{$node['badge']['class']}{/if}">{$node['badge']['title']}</span>
+	{/if}
+	{if isset($node['hint'])}
+		<div class="node-hint">{$node['hint']}</div>
+	{/if}
 </li>

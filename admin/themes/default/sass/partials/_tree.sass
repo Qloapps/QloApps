@@ -7,6 +7,7 @@
 		font-size: $icon-size-base
 .tree
 	list-style: none
+	overflow: auto
 	@include padding(0, 0, 0, 20px)
 	input
 		vertical-align: baseline
@@ -42,6 +43,10 @@
 		&:hover
 			color: #ccc
 			background-color: none
+	.node-hint
+		font-style: italic
+		color: #959595
+		margin-left: 30px
 .tree-actions
 	display: inline-block
 

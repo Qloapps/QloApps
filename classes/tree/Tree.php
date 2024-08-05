@@ -42,6 +42,8 @@ class TreeCore
     protected $_node_folder_template;
     protected $_node_item_template;
     protected $_template;
+    private $_root_element_selectable = true;
+
 
     /** @var string */
     private $_template_directory;
@@ -342,6 +344,17 @@ class TreeCore
         return $this;
     }
 
+    public function setRootElementSelectable($value)
+    {
+        $this->_root_element_selectable = (bool)$value;
+        return $this;
+    }
+
+    public function rootElementSelectable()
+    {
+        return (isset($this->_root_element_selectable) && $this->_root_element_selectable);
+    }
+
     public function getToolbar()
     {
         if (isset($this->_toolbar)) {
@@ -419,14 +432,14 @@ class TreeCore
         //Assign Tree nodes
         $template->assign($this->getAttributes())->assign(array(
             'id'    => $this->getId(),
-            'nodes' => $this->renderNodes($data),
+            'nodes' => $this->renderNodes($data, true),
             'id_tree' => $this->getIdTree()
         ));
 
         return (isset($html) ? $html : '').$template->fetch();
     }
 
-    public function renderNodes($data = null)
+    public function renderNodes($data = null, $root = false)
     {
         if (!isset($data)) {
             $data = $this->getData();
@@ -446,14 +459,16 @@ class TreeCore
                     $this->getContext()->smarty
                 )->assign(array(
                     'children' => $this->renderNodes($item['children']),
-                    'node'     => $item
+                    'node'     => $item,
+                    'selectable' => !$root || $this->rootElementSelectable()
                 ))->fetch();
             } else {
                 $html .= $this->getContext()->smarty->createTemplate(
                     $this->getTemplateFile($this->getNodeItemTemplate()),
                     $this->getContext()->smarty
                 )->assign(array(
-                    'node' => $item
+                    'node' => $item,
+                    'selectable' => !$root || $this->rootElementSelectable()
                 ))->fetch();
             }
         }

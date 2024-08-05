@@ -2877,7 +2877,7 @@ class AdminNormalProductsControllerCore extends AdminController
             $objRoomTypeServiceProduct = new RoomTypeServiceProduct();
             $associatedRoomTypes = $objRoomTypeServiceProduct->getAssociatedHotelsAndRoomType($product->id)['room_type'];
             if (Product::SERVICE_PRODUCT_WITH_ROOMTYPE == $product->service_product_type) {
-                $selectedRoomTypes = Tools::getValue('roomTypeBox');
+                $selectedRoomTypes = Tools::getValue('room_type_box');
 
                 // Generate list of new associations
                 $newRoomTypes = array();
@@ -3502,8 +3502,8 @@ class AdminNormalProductsControllerCore extends AdminController
 
         $tree = new HelperTree('hotels-tree');
         $tree->setData(HotelHelper::generateTreeData([
-                // 'rootNode' => HotelHelper::NODE_HOTEL,
-                // 'leafNode' => HotelHelper::NODE_ROOM_TYPE,
+                'rootNode' => HotelHelper::NODE_HOTEL,
+                'leafNode' => HotelHelper::NODE_ROOM_TYPE,
                 'selectedElements' => $selectedElements
             ]))
             ->setUseCheckBox(true)

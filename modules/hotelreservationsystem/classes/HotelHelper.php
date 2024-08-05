@@ -2533,10 +2533,10 @@ class HotelHelper
      *                      room --> leaf
      *
      * You can edit the start and end point to generate tree for different levels
-     * @param $start
-     * @param $end
-     * @param $start_element_id int|array
-     * @param $selected_elements int|array
+     * @param $rootNode = 'country'
+     * @param $leafNode = 'room'
+     * @param $rootNodeId int|array
+     * @param $selectedElements int|array
      */
 
     const NODE_COUNTRY = 1;
@@ -2548,12 +2548,6 @@ class HotelHelper
 
     public static function generateTreeData($params)
     {
-        // $rootNode = 'country'
-        // $leafNode = 'room'
-        // $startElementId = false
-        // $selectedElements = array()
-
-
         extract($params);
 
         if (!isset($rootNode)) {
@@ -2562,141 +2556,265 @@ class HotelHelper
         if (!isset($leafNode)) {
             $leafNode = self::NODE_ROOM;
         }
-        if (!isset($leafNode)) {
+        if (!isset($selectedElements)) {
             $selectedElements = array();
         }
-        $rootNodeId = false;
+        if (!isset($rootNodeId)) {
+            $rootNodeId = false;
+        }
         $treeData = array();
-        if ($rootNode <= self::NODE_COUNTRY && $leafNode >= self::NODE_COUNTRY) {
-            self::generateCountryTree($treeData, $rootNode, $rootNodeId, $selectedElements);
-        }
-        if ($rootNode <= self::NODE_STATE && $leafNode >= self::NODE_STATE) {
-            self::generateStateTree($treeData, $rootNode, $rootNodeId, $selectedElements);
 
+        if ($rootNode == self::NODE_COUNTRY) {
+            $treeData = self::generateCountryTree($selectedElements, $leafNode, $rootNodeId);
+        } else if ($rootNode == self::NODE_STATE) {
+            $treeData = self::generateStateTree($selectedElements, $leafNode, $rootNodeId);
+        } else if ($rootNode == self::NODE_CITY) {
+            $treeData = self::generateCityTree($selectedElements, $leafNode, $rootNodeId);
+        } else if ($rootNode == self::NODE_HOTEL) {
+            $treeData = self::generateHotelTree($selectedElements, $leafNode, $rootNodeId);
+        } else if ($rootNode == self::NODE_ROOM_TYPE) {
+            $treeData = self::generateRoomTypeTree($selectedElements, $leafNode, $rootNodeId);
+        } else if ($rootNode == self::NODE_ROOM) {
+            $treeData = self::generateRoomTree($selectedElements, $leafNode, $rootNodeId);
         }
-        if ($rootNode <= self::NODE_CITY && $leafNode >= self::NODE_CITY) {
-            self::generateCityTree($treeData, $rootNode, $rootNodeId, $selectedElements);
 
-        }
-        if ($rootNode <= self::NODE_HOTEL && $leafNode >= self::NODE_HOTEL) {
-            self::generateHotelTree($treeData, $rootNode, $rootNodeId, $selectedElements);
-        }
-        if ($rootNode <= self::NODE_ROOM_TYPE && $leafNode >= self::NODE_ROOM_TYPE) {
-            self::generateRoomTypeTree($treeData, $rootNode, $rootNodeId, $selectedElements);
-
-        }
-        if ($rootNode <= self::NODE_ROOM && $leafNode >= self::NODE_ROOM) {
-            self::generateRoomTree($treeData, $rootNode, $rootNodeId, $selectedElements);
-        }
-        // $objHotelInfo = new HotelBranchInformation();
-        // if ($hotels = $objHotelInfo->hotelBranchesInfo()) {
-        //     foreach ($hotels as $hotel) {
-        //         $objRoomType = new HotelRoomType();
-        //         if ($roomTypes = $objRoomType->getRoomTypeByHotelId($hotel['id'], Context::getContext()->language->id)) {
-        //             foreach ($roomTypes as &$roomType) {
-        //                 $objHotelRoomInformation = new HotelRoomInformation();
-        //                 if ($rooms = $objHotelRoomInformation->getHotelRoomInfoByProductId($roomType['id_product'])) {
-        //                     foreach ($rooms as &$room) {
-        //                         $room = array(
-        //                             'name' => $room['room_num'],
-        //                             'input_name' => 'room',
-        //                             'value' => $room['id']
-        //                         );
-
-        //                         if (isset($selectedElements['room']) && in_array($room['id'], $selectedElements['room'])) {
-        //                             $room['selected'] = true;
-        //                         }
-        //                     }
-        //                 }
-        //                 $roomType = array(
-        //                     'name' => $roomType['room_type'],
-        //                     'input_name' => 'roomTypeBox',
-        //                     'value' => $roomType['id_product'],
-        //                     'children' => $rooms
-        //                 );
-        //                 if (isset($selectedElements['room_type']) && in_array($roomType['id_product'], $selectedElements['room_type'])) {
-        //                     $roomType['selected'] = true;
-        //                 }
-        //             }
-        //         }
-
-        //         $hotel = array(
-        //             'name' => $hotel['hotel_name'],
-        //             'input_name' => 'hotelBox',
-        //             'value' => $hotel['id'],
-        //             'children' => $roomTypes
-        //         );
-        //         if (isset($selectedElements['hotel']) && in_array($hotel['id'], $selectedElements['hotel'])) {
-        //             $hotel['selected'] = true;
-        //         }
-        //         $treeData[] = array(
-        //             'name' => $hotel['hotel_name'],
-        //             'input_name' => 'hotelBox',
-        //             'value' => $hotel['id'],
-        //             'children' => $roomTypes
-        //         );
-        //     }
-        // }
-        ddd($treeData);
         return $treeData;
     }
 
-    public static function generateHotelTree(&$treeData, $rootNode, $rootNodeId)
+    public static function generateCountryTree($selectedElements, $leafNode, $rootNodeId, $previousElements = false)
     {
-        // $objHotelInfo = new HotelBranchInformation();
-        // if ($hotels = $objHotelInfo->hotelBranchesInfo()) {
-        // }
+        $return = array();
+        $countries = self::getcategoryByParent($previousElements, 3, 'country', $rootNodeId);
+        $stateIds = array_column($countries, 'value');
 
+        if ($leafNode > self::NODE_COUNTRY) {
+            $states = self::generateStateTree($selectedElements, $leafNode, false, $stateIds);
+        }
+
+        foreach ($countries as $country) {
+            if (isset($selectedElements['state']) && in_array($country['value'], $selectedElements['state'])) {
+                $country['selected'] = true;
+            }
+
+            if (isset($states[$country['value']])) {
+                $country['children'] = $states[$country['value']];
+            }
+
+            if ($previousElements) {
+                $return[$country['id_parent']][] = $country;
+            } else {
+                $return[] = $country;
+            }
+        }
+
+        return $return;
     }
-    public static function generateRoomTypeTree(&$treeData, $rootNode, $rootNodeId)
+    public static function generateStateTree($selectedElements, $leafNode, $rootNodeId, $previousElements = false)
     {
+        $return = array();
+        $states = self::getcategoryByParent($previousElements, 4, 'state', $rootNodeId);
+        $stateIds = array_column($states, 'value');
 
+        if ($leafNode > self::NODE_STATE) {
+            $cities = self::generateCityTree($selectedElements, $leafNode, false, $stateIds);
+        }
+
+        foreach ($states as $state) {
+            if (isset($selectedElements['state']) && in_array($state['value'], $selectedElements['state'])) {
+                $state['selected'] = true;
+            }
+
+            if (isset($cities[$state['value']])) {
+                $state['children'] = $cities[$state['value']];
+            }
+
+            if ($previousElements) {
+                $return[$state['id_parent']][] = $state;
+            } else {
+                $return[] = $state;
+            }
+        }
+
+        return $return;
     }
-    public static function generateRoomTree(&$treeData, $rootNode, $rootNodeId)
+    public static function generateCityTree($selectedElements, $leafNode, $rootNodeId, $previousElements = false)
     {
+        $return = array();
+        $cities = self::getcategoryByParent($previousElements, 5, 'city', $rootNodeId);
+        $cityIds = array_column($cities, 'value');
 
+        if ($leafNode > self::NODE_CITY) {
+            $hotels = self::generateHotelTree($selectedElements, $leafNode, false, $cityIds);
+        }
+
+        foreach ($cities as $city) {
+            if (isset($selectedElements['city']) && in_array($city['value'], $selectedElements['city'])) {
+                $city['selected'] = true;
+            }
+
+            if (isset($hotels[$city['value']])) {
+                $city['children'] = $hotels[$city['value']];
+            }
+
+            if ($previousElements) {
+                $return[$city['id_parent']][] = $city;
+            } else {
+                $return[] = $city;
+            }
+        }
+
+        return $return;
     }
 
-    public static function generateCountryTree(&$treeData, $rootNode, $rootNodeId)
+    public static function generateHotelTree($selectedElements, $leafNode, $rootNodeId, $previousElements = false)
+    {
+        $return = array();
+        $hotels = self::getHotelsByIdCity($previousElements, $rootNodeId);
+        $hotelIds = array_column($hotels, 'value');
+
+        if ($leafNode > self::NODE_HOTEL) {
+            $roomTypes = self::generateRoomTypeTree($selectedElements, $leafNode, false, $hotelIds);
+        }
+
+        foreach ($hotels as $hotel) {
+            if (isset($selectedElements['hotel']) && in_array($hotel['value'], $selectedElements['hotel'])) {
+                $hotel['selected'] = true;
+            }
+
+            if (isset($roomTypes[$hotel['value']])) {
+                $hotel['children'] = $roomTypes[$hotel['value']];
+            }
+
+            if ($previousElements) {
+                $return[$hotel['id_parent']][] = $hotel;
+            } else {
+                $return[] = $hotel;
+            }
+        }
+
+        return $return;
+    }
+
+    public static function generateRoomTypeTree($selectedElements, $leafNode, $rootNodeId, $previousElements = false)
+    {
+        $return = array();
+        $roomTypes = self::getRoomTypesByHotelsId($previousElements, $rootNodeId);
+        $roomTypeIds = array_column($roomTypes, 'value');
+
+        if ($leafNode > self::NODE_ROOM_TYPE) {
+            $rooms = self::generateRoomTree($selectedElements, $leafNode, false, $roomTypeIds);
+        }
+
+        foreach ($roomTypes as $roomType) {
+            if (isset($selectedElements['room_type']) && in_array($roomType['value'], $selectedElements['room_type'])) {
+                $roomType['selected'] = true;
+            }
+
+            if (isset($rooms[$roomType['value']])) {
+                $roomType['children'] = $rooms[$roomType['value']];
+            }
+
+            if ($previousElements) {
+                $return[$roomType['id_hotel']][] = $roomType;
+            } else {
+                $return[] = $roomType;
+            }
+        }
+
+        return $return;
+    }
+
+    public static function generateRoomTree($selectedElements, $leafNode, $rootNodeId, $previousElements = false)
+    {
+        $return = array();
+        $rooms = self::getRoomsByRoomTypeId($previousElements, $rootNodeId);
+
+        foreach ($rooms as $room) {
+            if (isset($selectedElements['room']) && in_array($room['value'], $selectedElements['room'])) {
+                $room['selected'] = true;
+            }
+
+            if ($previousElements) {
+                $return[$room['id_product']][] = $room;
+            } else {
+                $return[] = $room;
+            }
+        }
+
+        return $return;
+    }
+
+    public static function getcategoryByParent($idParents, $levelDepth, $input_name, $rootNodeId)
     {
         $locationCategory = new Category(Configuration::get('PS_LOCATIONS_CATEGORY'));
+        $sql = 'SELECT c.`id_category` as `value` , cl.`name`, "'.pSQL($input_name).'_box" as `input_name`, c.`id_parent`
+        FROM `'._DB_PREFIX_.'category` AS c
+        INNER JOIN `'._DB_PREFIX_.'category_lang` AS cl
+        ON (c.`id_category` = cl.`id_category` AND cl.`id_lang`='.(int)Context::getContext()->language->id.')
+        WHERE c.`nleft` > '.(int)$locationCategory->nleft.' AND c.`nright` < '.(int)$locationCategory->nright.'
+        AND c.`level_depth` = '.(int)$levelDepth;
 
-        if ($countries = Db::getInstance()->executeS(
-            'SELECT cl.`id_category` as `value` , cl.`name` as `name`
-            FROM `'._DB_PREFIX_.'category_lang` AS cl
-            INNER JOIN `'._DB_PREFIX_.'category` AS c ON (cl.`id_category` = c.`id_category`)
-            WHERE c.`id_parent` = '.(int)Configuration::get('PS_LOCATIONS_CATEGORY').' and cl.`id_lang`='.(int)Context::getContext()->language->id.'
-            GROUP BY cl.`name`'
-        )) {
-            foreach ($countries as $country) {
-                $country['input_name'] = 'countryBox';
-                if (isset($selectedElements['country']) && in_array($country['id'], $selectedElements['country'])) {
-                    $country['selected'] = true;
-                }
-                $treeData[$country['value']] = $country;
-            }
+        if ($idParents) {
+            $sql .= ' AND c.`id_parent` IN ('.implode(', ', $idParents).')';
         }
-    }
-    public static function generateStateTree(&$treeData, $rootNode, $rootNodeId)
-    {
-        if ($states = Db::getInstance()->executeS(
-            'SELECT cl.`id_category` as `value` , cl.`name` as `name`
-            FROM `'._DB_PREFIX_.'category_lang` AS cl
-            INNER JOIN `'._DB_PREFIX_.'category` AS c ON (cl.`id_category` = c.`id_category`)
-            WHERE c.`id_parent` = '.(int)Configuration::get('PS_LOCATIONS_CATEGORY').' and cl.`id_lang`='.(int)Context::getContext()->language->id.'
-            GROUP BY cl.`name`'
-        )) {
-            foreach ($states as $country) {
-                $country['input_name'] = 'countryBox';
-                if (isset($selectedElements['country']) && in_array($country['id'], $selectedElements['country'])) {
-                    $country['selected'] = true;
-                }
-                $treeData[$country['value']] = $country;
-            }
+        if ($rootNodeId) {
+            $sql .= ' AND c.`id_category` = '.(int)$rootNodeId;
         }
+
+        return Db::getInstance()->executeS($sql);
     }
-    public static function generateCityTree(&$treeData, $rootNode, $rootNodeId)
+
+    public static function getHotelsByIdCity($cities, $rootNodeId)
     {
 
+        $sql = 'SELECT hbi.`id` as `value` , hbil.`hotel_name` as `name`, "hotel_box" as `input_name`, c.`id_parent`
+        FROM `'._DB_PREFIX_.'htl_branch_info` AS hbi
+        INNER JOIN `'._DB_PREFIX_.'htl_branch_info_lang` AS hbil
+        ON (hbi.`id` = hbil.`id` AND hbil.`id_lang`='.(int)Context::getContext()->language->id.')
+        INNER JOIN `'._DB_PREFIX_.'category` AS c ON (hbi.`id_category` = c.`id_category`)
+        WHERE 1';
+
+        if ($cities) {
+            $sql .= ' AND c.`id_parent` IN ('.implode(', ', $cities).')';
+        }
+        if ($rootNodeId) {
+            $sql .= ' AND hbi.`id` = '.(int)$rootNodeId;
+        }
+        return Db::getInstance()->executeS($sql);
+    }
+
+    public static function getRoomTypesByHotelsId($hotels, $rootNodeId)
+    {
+        $sql = 'SELECT p.`id_product` AS `value`, pl.`name`, "room_type_box" as `input_name`, rt.`id_hotel`
+			FROM `'._DB_PREFIX_.'htl_room_type` AS rt';
+
+        $sql .= ' INNER JOIN `'._DB_PREFIX_.'product` AS p ON (rt.`id_product` = p.`id_product`)
+            INNER JOIN `'._DB_PREFIX_.'product_lang` AS pl
+            ON (p.`id_product` = pl.`id_product` AND pl.`id_lang`='.(int)Context::getContext()->language->id.')
+            WHERE 1';
+
+        if ($hotels) {
+            $sql .= ' AND rt.`id_hotel` IN ('.implode(', ', $hotels).')';
+        }
+        if ($rootNodeId) {
+            $sql .= ' AND p.`id_product` = '.(int)$rootNodeId;
+        }
+
+        return Db::getInstance()->executeS($sql);
+    }
+
+    public static function getRoomsByRoomTypeId($roomTypes, $rootNodeId)
+    {
+        $sql = 'SELECT `id` as `value`, `room_num` as `name`, "room_box" as `input_name`, `id_product`
+        FROM `'._DB_PREFIX_.'htl_room_information`
+        WHERE 1';
+        if ($roomTypes) {
+            $sql .= ' AND `id_product` IN ('.implode(', ', $roomTypes).')';
+        }
+        if ($rootNodeId) {
+            $sql .= ' AND `id` = '.(int)$rootNodeId;
+        }
+
+        return Db::getInstance()->executeS($sql);
     }
 }
