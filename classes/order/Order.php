@@ -602,13 +602,19 @@ class OrderCore extends ObjectModel
         $is_booking = null,
         $product_service_type = null,
         $product_auto_add = null,
-        $product_price_addition_type = null
+        $product_price_addition_type = null,
+        $ids_order_detail = []
     ) {
         $sql = 'SELECT *
             FROM `'._DB_PREFIX_.'order_detail` od
             LEFT JOIN `'._DB_PREFIX_.'product` p ON (p.id_product = od.product_id)
             LEFT JOIN `'._DB_PREFIX_.'product_shop` ps ON (ps.id_product = p.id_product AND ps.id_shop = od.id_shop)
             WHERE od.`id_order` = '.(int)$this->id;
+
+        if ($ids_order_detail) {
+            $sql .= ' AND od.`id_order_detail` IN ('.implode(',', $ids_order_detail).')';
+        }
+
         if ($is_booking !== null) {
             $sql .= ' AND od.`is_booking_product` = '. (int)$is_booking;
             if (!$is_booking && $product_service_type !== null) {
@@ -954,21 +960,30 @@ class OrderCore extends ObjectModel
      *
      * @param int $id_customer Customer id
      * @param bool $show_hidden_status Display or not hidden order statuses
+     * @param bool $skip_id_address_invoice Skip orders from this id_address_invoice
      * @return array Customer orders
      */
-    public static function getCustomerOrders($id_customer, $show_hidden_status = false, Context $context = null)
+    public static function getCustomerOrders($id_customer, $show_hidden_status = false, Context $context = null, $id_address_invoice = null, $skip_address = 0)
     {
         if (!$context) {
             $context = Context::getContext();
         }
 
-        $res = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS('
-        SELECT o.*, (SELECT SUM(od.`product_quantity`) FROM `'._DB_PREFIX_.'order_detail` od WHERE od.`id_order` = o.`id_order`) nb_products
+        $sql = 'SELECT o.*, (SELECT SUM(od.`product_quantity`) FROM `'._DB_PREFIX_.'order_detail` od WHERE od.`id_order` = o.`id_order`) nb_products
         FROM `'._DB_PREFIX_.'orders` o
-        WHERE o.`id_customer` = '.(int)$id_customer.
-        Shop::addSqlRestriction(Shop::SHARE_ORDER).'
+        WHERE o.`id_customer` = '.(int)$id_customer;
+
+        // if you want orders from / not from a specific id_address_invoice
+        if (!is_null($id_address_invoice)) {
+            $sql .= ' AND o.`id_address_invoice`';
+            $sql .= ($skip_address ? ' != ' : ' = ').(int)$id_address_invoice;
+        }
+
+        $sql .= Shop::addSqlRestriction(Shop::SHARE_ORDER).'
         GROUP BY o.`id_order`
-        ORDER BY o.`date_add` DESC');
+        ORDER BY o.`date_add` DESC';
+
+        $res = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql);
         if (!$res) {
             return array();
         }
@@ -1091,11 +1106,12 @@ class OrderCore extends ObjectModel
         $bookingProducts = null,
         $product_service_type = null,
         $product_auto_add = null,
-        $product_price_addition_type = null
+        $product_price_addition_type = null,
+        $ids_order_detail = []
     ) {
         // update
         if (!$products) {
-            $products = $this->getProductsDetail($bookingProducts, $product_service_type, $product_auto_add, $product_price_addition_type);
+            $products = $this->getProductsDetail($bookingProducts, $product_service_type, $product_auto_add, $product_price_addition_type, $ids_order_detail);
         }
 
         $return = 0;
@@ -1116,11 +1132,12 @@ class OrderCore extends ObjectModel
         $bookingProducts = null,
         $product_service_type = null,
         $product_auto_add = null,
-        $product_price_addition_type = null
+        $product_price_addition_type = null,
+        $ids_order_detail = []
     ) {
         /* Retro-compatibility (now set directly on the validateOrder() method) */
         if (!$products) {
-            $products = $this->getProductsDetail($bookingProducts, $product_service_type, $product_auto_add, $product_price_addition_type);
+            $products = $this->getProductsDetail($bookingProducts, $product_service_type, $product_auto_add, $product_price_addition_type, $ids_order_detail);
         }
 
         $return = 0;
