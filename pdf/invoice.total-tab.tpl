@@ -138,7 +138,7 @@
 				{l s='Due Amount' pdf='true'}
 			</td>
 			<td class="white">
-				{displayPrice currency=$order->id_currency price=($order->total_paid - $order->total_paid_real)}
+				{displayPrice currency=$order->id_currency price=($footer.total_paid_tax_incl - $footer.total_paid_real)}
 			</td>
 		</tr>
 	{/if}
