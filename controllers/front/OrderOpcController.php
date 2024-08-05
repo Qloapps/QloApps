@@ -119,7 +119,11 @@ class OrderOpcControllerCore extends ParentOrderController
                             if (Configuration::get('PS_ONE_PHONE_AT_LEAST') && !$phone) {
                                 $this->errors[] = Tools::displayError('Phone number is a required field.', false);
                             }
+                            $className = 'CartCustomerGuestDetail';
+                            $rules = call_user_func(array($className, 'getValidationRules'), $className);
                             if (!Validate::isPhoneNumber($phone)) {
+                                $this->errors[] = Tools::displayError('Please enter a valid Mobile phone number.', false);
+                            } elseif (Tools::strlen($phone) > $rules['size']['phone']) {
                                 $this->errors[] = Tools::displayError('Please enter a valid Mobile phone number.', false);
                             }
 

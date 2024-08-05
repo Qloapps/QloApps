@@ -1159,7 +1159,11 @@ class AdminCustomersControllerCore extends AdminController
                 $this->errors[] = Tools::displayError('Phone number is required.');
             }
         }
+        $className = 'CartCustomerGuestDetail';
+        $rules = call_user_func(array($className, 'getValidationRules'), $className);
         if ($phone && !Validate::isPhoneNumber($phone)) {
+            $this->errors[] = Tools::displayError('Invaid phone number.');
+        } elseif ($phone && Tools::strlen($phone) > $rules['size']['phone']) {
             $this->errors[] = Tools::displayError('Invaid phone number.');
         }
 

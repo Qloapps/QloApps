@@ -427,13 +427,19 @@ class AuthControllerCore extends FrontController
                 }
             }
 
+            $className = 'CartCustomerGuestDetail';
+            $rules = call_user_func(array($className, 'getValidationRules'), $className);
             if ($error_phone) {
                 $this->errors[] = Tools::displayError('Phone number is required.');
             } else {
                 if (Tools::getValue('phone') && !Validate::isPhoneNumber(Tools::getValue('phone'))) {
                     $this->errors[] = Tools::displayError('Invald phone number.');
+                } elseif (Tools::getValue('phone') && Tools::strlen(Tools::getValue('phone')) > $rules['size']['phone']) {
+                    $this->errors[] = Tools::displayError('Invald phone number.');
                 }
                 if (Tools::getValue('phone_mobile') && !Validate::isPhoneNumber(Tools::getValue('phone_mobile'))) {
+                    $this->errors[] = Tools::displayError('Invald mobile phone number.');
+                } elseif (Tools::getValue('phone_mobile') && Tools::strlen(Tools::getValue('phone_mobile')) > $rules['size']['phone']) {
                     $this->errors[] = Tools::displayError('Invald mobile phone number.');
                 }
             }
