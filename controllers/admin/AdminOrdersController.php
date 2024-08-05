@@ -6268,6 +6268,14 @@ class AdminOrdersControllerCore extends AdminController
                     $res &= $objOrderDetail->update();
                 }
 
+                if ($objOrderDetail->id_order_invoice != 0) {
+                    // values changes as values are calculated
+                    $objOrderInvoice = new OrderInvoice($objOrderDetail->id_order_invoice);
+                    $objOrderInvoice->total_paid_tax_excl -= $priceTaxExcl;
+                    $objOrderInvoice->total_paid_tax_incl -= $priceTaxIncl;
+                    $res &= $objOrderInvoice->update();
+                }
+
                 $order->total_paid_tax_excl -= $priceTaxExcl;
                 $order->total_paid_tax_incl -= $priceTaxIncl;
                 $order->total_paid -= $priceTaxIncl;
@@ -6300,6 +6308,9 @@ class AdminOrdersControllerCore extends AdminController
             // valiadate services being added
             if (Validate::isLoadedObject($objHotelBookingDetail = new HotelBookingDetail($idBookingDetail))) {
                 $objOrder = new Order($objHotelBookingDetail->id_order);
+                $objOrderDetail = new OrderDetail($objHotelBookingDetail->id_order_detail);
+                $objOrderInvoice = new OrderInvoice($objOrderDetail->id_order_invoice);
+
                 // set context currency So that we can get prices in the order currency
                 $this->context->currency = new Currency($objOrder->id_currency);
 
@@ -6481,7 +6492,7 @@ class AdminOrdersControllerCore extends AdminController
                         }
 
                         $order_detail = new OrderDetail();
-                        $order_detail->createList($order, $cart, $order->getCurrentOrderState(), $productList, (isset($order_invoice) ? $order_invoice->id : 0), true);
+                        $order_detail->createList($order, $cart, $order->getCurrentOrderState(), $productList, (isset($objOrderInvoice) ? $objOrderInvoice->id : 0), true);
 
                         $objRoomTypeServiceProductOrderDetail = new RoomTypeServiceProductOrderDetail();
                         $objRoomTypeServiceProductOrderDetail->id_product = $product['id_product'];
@@ -6505,16 +6516,18 @@ class AdminOrdersControllerCore extends AdminController
                         $order->total_paid_tax_excl += Tools::ps_round((float)($totalPriceChangeTaxExcl), 2);
                         $order->total_paid_tax_incl += Tools::ps_round((float)($totalPriceChangeTaxIncl), 2);
 
-                        if (isset($order_invoice) && Validate::isLoadedObject($order_invoice)) {
-                            $order->total_shipping = $order_invoice->total_shipping_tax_incl;
-                            $order->total_shipping_tax_incl = $order_invoice->total_shipping_tax_incl;
-                            $order->total_shipping_tax_excl = $order_invoice->total_shipping_tax_excl;
+                        // update invoice total
+                        if (isset($objOrderInvoice) && Validate::isLoadedObject($objOrderInvoice)) {
+                            $objOrderInvoice->total_paid_tax_excl += Tools::ps_round((float)($totalPriceChangeTaxExcl), 2);
+                            $objOrderInvoice->total_paid_tax_incl += Tools::ps_round((float)($totalPriceChangeTaxIncl), 2);
+                            $objOrderInvoice->save();
                         }
 
                         // discount
                         $order->total_discounts += (float)abs($cart->getOrderTotal(true, Cart::ONLY_DISCOUNTS));
                         $order->total_discounts_tax_excl += (float)abs($cart->getOrderTotal(false, Cart::ONLY_DISCOUNTS));
                         $order->total_discounts_tax_incl += (float)abs($cart->getOrderTotal(true, Cart::ONLY_DISCOUNTS));
+
                         // Save changes of order
                         $order->update();
                         if (Validate::isLoadedObject($specific_price)) {
@@ -6713,8 +6726,9 @@ class AdminOrdersControllerCore extends AdminController
                         $order_invoice = new OrderInvoice($order_detail->id_order_invoice);
                         $order_invoice->total_paid_tax_excl += $priceDiffTaxExcl;
                         $order_invoice->total_paid_tax_incl += $priceDiffTaxIncl;
-                        $res &= $order_invoice->update();
+                        $order_invoice->update();
                     }
+
                     $order = new Order($objBookingDetail->id_order);
                     $order->total_paid_tax_excl += $priceDiffTaxExcl;
                     $order->total_paid_tax_incl += $priceDiffTaxIncl;

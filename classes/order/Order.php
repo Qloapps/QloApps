@@ -602,13 +602,19 @@ class OrderCore extends ObjectModel
         $is_booking = null,
         $product_service_type = null,
         $product_auto_add = null,
-        $product_price_addition_type = null
+        $product_price_addition_type = null,
+        $ids_order_detail = []
     ) {
         $sql = 'SELECT *
             FROM `'._DB_PREFIX_.'order_detail` od
             LEFT JOIN `'._DB_PREFIX_.'product` p ON (p.id_product = od.product_id)
             LEFT JOIN `'._DB_PREFIX_.'product_shop` ps ON (ps.id_product = p.id_product AND ps.id_shop = od.id_shop)
             WHERE od.`id_order` = '.(int)$this->id;
+
+        if ($ids_order_detail) {
+            $sql .= ' AND od.`id_order_detail` IN ('.implode(',', $ids_order_detail).')';
+        }
+
         if ($is_booking !== null) {
             $sql .= ' AND od.`is_booking_product` = '. (int)$is_booking;
             if (!$is_booking && $product_service_type !== null) {
@@ -1091,11 +1097,12 @@ class OrderCore extends ObjectModel
         $bookingProducts = null,
         $product_service_type = null,
         $product_auto_add = null,
-        $product_price_addition_type = null
+        $product_price_addition_type = null,
+        $ids_order_detail = []
     ) {
         // update
         if (!$products) {
-            $products = $this->getProductsDetail($bookingProducts, $product_service_type, $product_auto_add, $product_price_addition_type);
+            $products = $this->getProductsDetail($bookingProducts, $product_service_type, $product_auto_add, $product_price_addition_type, $ids_order_detail);
         }
 
         $return = 0;
@@ -1116,11 +1123,12 @@ class OrderCore extends ObjectModel
         $bookingProducts = null,
         $product_service_type = null,
         $product_auto_add = null,
-        $product_price_addition_type = null
+        $product_price_addition_type = null,
+        $ids_order_detail = []
     ) {
         /* Retro-compatibility (now set directly on the validateOrder() method) */
         if (!$products) {
-            $products = $this->getProductsDetail($bookingProducts, $product_service_type, $product_auto_add, $product_price_addition_type);
+            $products = $this->getProductsDetail($bookingProducts, $product_service_type, $product_auto_add, $product_price_addition_type, $ids_order_detail);
         }
 
         $return = 0;
