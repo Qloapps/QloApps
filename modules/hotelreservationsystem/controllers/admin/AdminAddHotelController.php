@@ -274,7 +274,7 @@ class AdminAddHotelController extends ModuleAdminController
             }
         }
 
-        if (!$phone) {
+        if (!$phone = trim($phone)) {
             $this->errors[] = $this->l('Phone number is required field.');
         } elseif (!Validate::isPhoneNumber($phone)) {
             $this->errors[] = $this->l('Please enter a valid phone number.');
@@ -300,7 +300,7 @@ class AdminAddHotelController extends ModuleAdminController
             $this->errors[] = $this->l('Rating is required field.');
         }
 
-        if ($address == '') {
+        if (!$address = trim($address)) {
             $this->errors[] = $this->l('Address is required field.');
         }
 
