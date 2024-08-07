@@ -4558,8 +4558,6 @@ class AdminOrdersControllerCore extends AdminController
         $res = true;
         $id_order = (int) Tools::getValue('id_order');
         $order = new Order($id_order);
-        $cart = new Cart($order->id_cart);
-        $customer = new Cart($order->id_customer);
         //$order_detail = new OrderDetail((int)Tools::getValue('product_id_order_detail'));
         $order_detail = new OrderDetail((int) Tools::getValue('id_order_detail'));//by webkul id_order_detail from our table
         $this->doEditRoomValidation($order_detail, $order, isset($order_invoice) ? $order_invoice : null);
@@ -4585,6 +4583,9 @@ class AdminOrdersControllerCore extends AdminController
         $adults = $occupancy['adults'];
         $children = $occupancy['children'];
         $child_ages = $occupancy['child_ages'];
+
+        $bookingInfo = $obj_booking_detail->getRowByIdOrderIdProductInDateRange($id_order, $id_product, $old_date_from, $old_date_to, $id_room);
+        $cart = new Cart($bookingInfo['id_cart']);
 
         // By webkul to calculate rates of the product from hotelreservationsystem tables with feature prices....
         // add feature price for updated price
@@ -4757,6 +4758,17 @@ class AdminOrdersControllerCore extends AdminController
         // Save order invoice
         if (isset($order_invoice)) {
             $res &= $order_invoice->update();
+        }
+
+        if ($qty_diff != 0) {
+            $cartQty = $qty_diff;
+            $op = 'up';
+            if ($qty_diff < 0) {
+                $op = 'down';
+                $cartQty = -$cartQty;
+            }
+
+            $cart->updateQty($cartQty, $bookingInfo['id_product'], null, false, $op, 0, null, true);
         }
 
         // Update product available quantity
