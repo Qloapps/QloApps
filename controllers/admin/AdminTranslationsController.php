@@ -2995,7 +2995,7 @@ class AdminTranslationsControllerCore extends AdminController
                                     $tabs_array[$prefix_key][$key]['use_sprintf'] = Translate::checkIfKeyUseSprintf($key);
                                 }
                             }
-                        } elseif (Tools::file_exists_cache($file_path) && preg_match('/^(.*)\.php$/', $file_path)) {
+                        } elseif (Tools::file_exists_cache($file_path) && is_file($file_path)) {
                             $tabs_array = $this->parsePdfClass($file_path, 'php', $GLOBALS[$name_var], $prefix_key, $tabs_array, $missing_translations_pdf);
                         }
                     }
