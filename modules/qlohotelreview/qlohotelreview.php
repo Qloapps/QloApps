@@ -282,7 +282,7 @@ class QloHotelReview extends Module
 
     public function hookActionCleanData($params)
     {
-        if ($params['method'] == 'truncateCatalog' || $params['method'] ==  'truncateSales') {
+        if ($params['method'] == 'catalog' || $params['method'] ==  'sales') {
             QhrHotelReviewDb::truncateUserData();
         }
     }

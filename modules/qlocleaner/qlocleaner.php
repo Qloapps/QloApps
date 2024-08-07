@@ -66,7 +66,7 @@ class QloCleaner extends Module
             && Tools::getValue('configure') == $this->name
         ) {
             Media::addJsDef(array(
-                'confirm_txt' => $this->l('Are you sure, you want to perform the following operation?')
+                'confirm_txt' => $this->l('Are you sure, you want to perform the following action?')
             ));
             $this->context->controller->addJS($this->_path.'views/js/qlocleaner_config.js');
         }
@@ -97,11 +97,11 @@ class QloCleaner extends Module
             $html .= $this->displayConfirmation($conf);
         } elseif (Tools::getValue('submitTruncateCatalog') && Tools::getValue('checkTruncateCatalog')) {
             self::truncate('catalog');
-            Hook::exec('actionCleanData', array('method' => 'truncateCatalog'));
+            Hook::exec('actionCleanData', array('method' => 'catalog'));
             $html .= $this->displayConfirmation($this->l('Catalog truncated successfuly, please run functional Integrity constraints to clean the database.'));
         } elseif (Tools::getValue('submitTruncateSales') && Tools::getValue('checkTruncateSales')) {
             self::truncate('sales');
-            Hook::exec('actionCleanData', array('method' => 'truncateSales'));
+            Hook::exec('actionCleanData', array('method' => 'sales'));
             $html .= $this->displayConfirmation($this->l('Orders and customers truncated successfuly, please run functional Integrity constraints to clean the database'));
         }
 

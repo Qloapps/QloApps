@@ -143,7 +143,7 @@ class WkHotelRoom extends Module
 
     public function hookActionCleanData($params)
     {
-        if ($params['method'] == 'truncateCatalog') {
+        if ($params['method'] == 'catalog') {
             WkHotelRoomDb::truncateTables();
         }
     }
