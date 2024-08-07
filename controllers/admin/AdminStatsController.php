@@ -910,7 +910,12 @@ class AdminStatsControllerCore extends AdminStatsTabController
             case 'total_frequent_customers':
                 $nbOrdersFrequentCustomers = Configuration::get('PS_KPI_FREQUENT_CUSTOMER_NB_ORDERS');
 
-                $value = AdminStatsController::getTotalFrequentCustomers($nbOrdersFrequentCustomers, 0);
+                $value = AdminStatsController::getTotalFrequentCustomers(
+                    date('Y-m-d', strtotime('-365 day')),
+                    date('Y-m-d'),
+                    $nbOrdersFrequentCustomers,
+                    0
+                );
 
                 break;
 
@@ -1829,7 +1834,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
         return $result;
     }
 
-    public static function getTotalFrequentCustomers($nbOrders = 5, $idHotel = null)
+    public static function getTotalFrequentCustomers($dateFrom, $dateTo, $nbOrders = 5, $idHotel = null)
     {
         $sql = 'SELECT COUNT(t.`id_customer`)
         FROM (
@@ -1840,7 +1845,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
                 WHERE hbd.`id_order` = o.`id_order` LIMIT 1
             ) AS id_hotel
             FROM `'._DB_PREFIX_.'orders` o
-            WHERE o.`valid` = 1
+            WHERE o.`valid` = 1 AND o.`date_add` BETWEEN "'.pSQL($dateFrom).' 00:00:00" AND "'.pSQL($dateTo).' 23:59:59"
             GROUP BY o.`id_customer`
             HAVING 1 '.(!is_null($idHotel) ? HotelBranchInformation::addHotelRestriction($idHotel) : '').'
         ) AS t

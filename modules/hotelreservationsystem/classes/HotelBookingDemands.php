@@ -74,7 +74,8 @@ class HotelBookingDemands extends ObjectModel
         $dateTo = 0,
         $groupByRoom = 1,
         $getTotalPrice = 0,
-        $useTax = 1
+        $useTax = 1,
+        $idOrderDetail = 0
     ) {
         $moduleObj = Module::getInstanceByName('hotelreservationsystem');
         $context = Context::getContext();
@@ -91,6 +92,10 @@ class HotelBookingDemands extends ObjectModel
         WHERE hd.`id_htl_booking` IN
         (SELECT `id` FROM `'._DB_PREFIX_.'htl_booking_detail`
         WHERE `id_order`='.(int) $idOrder;
+
+        if ($idOrderDetail) {
+            $sql .= ' AND `id_order_detail`='.(int)$idOrderDetail;
+        }
         if ($idProduct) {
             $sql .= ' AND `id_product`='.(int)$idProduct;
         }
@@ -247,16 +252,21 @@ class HotelBookingDemands extends ObjectModel
             || Configuration::get('PS_INVOICE_TAXES_BREAKDOWN');
     }
 
-    public function getExtraDemandsTaxesDetails($idOrder)
+    public function getExtraDemandsTaxesDetails($idOrder, $idsOrderDetail = [])
     {
-        $taxDetails = Db::getInstance()->executeS(
-            'SELECT hb.`id` as id_htl_booking, hbd.`unit_price_tax_excl`, hbd.`total_price_tax_excl`, hb.`id_order_detail`, hdt.*, t.* FROM '._DB_PREFIX_.'orders o '.
-            'INNER JOIN '._DB_PREFIX_.'htl_booking_detail hb ON hb.id_order = o.id_order '.
-            'INNER JOIN '._DB_PREFIX_.'htl_booking_demands hbd ON hbd.id_htl_booking = hb.id '.
-            'INNER JOIN '._DB_PREFIX_.'htl_booking_demands_tax hdt ON hbd.id_booking_demand = hdt.id_booking_demand '.
-            'INNER JOIN '._DB_PREFIX_.'tax t ON t.id_tax = hdt.id_tax '.
-            'WHERE o.id_order = '.(int)$idOrder
-        );
+        $sql = 'SELECT hb.`id` as id_htl_booking, hbd.`unit_price_tax_excl`, hbd.`total_price_tax_excl`, hb.`id_order_detail`, hdt.*, t.* FROM '._DB_PREFIX_.'orders o '.
+        'INNER JOIN '._DB_PREFIX_.'htl_booking_detail hb ON hb.id_order = o.id_order '.
+        'INNER JOIN '._DB_PREFIX_.'htl_booking_demands hbd ON hbd.id_htl_booking = hb.id '.
+        'INNER JOIN '._DB_PREFIX_.'htl_booking_demands_tax hdt ON hbd.id_booking_demand = hdt.id_booking_demand '.
+        'INNER JOIN '._DB_PREFIX_.'tax t ON t.id_tax = hdt.id_tax '.
+        'WHERE o.id_order = '.(int)$idOrder;
+
+        if ($idsOrderDetail) {
+            $sql .= ' AND hb.`id_order_detail` IN ('.implode(',', $idsOrderDetail).')';
+        }
+
+        $taxDetails = Db::getInstance()->executeS($sql);
+
         if ($taxDetails) {
             foreach ($taxDetails as &$detail) {
                 $priceTaxExcl = $detail['unit_price_tax_excl'];
