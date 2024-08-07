@@ -20,8 +20,7 @@
     <button type="button" class="close" data-dismiss="modal"><i class="icon-remove-sign"></i></button>
     <h4 class="modal-title"><i class="icon icon-exclamation-triangle"></i>&nbsp;{l s='Confirm Delete'}</h4>
     {if isset($cartRules)}
-        <p>{l s='The following cart rules in your selection were created dynamically from refunds or credit slips. Please confirm if you also intend
-        to delete these cart rules.'}</p>
+        <p>{l s='The following cart rules in your selection were created dynamically from refunds or credit slips. Please confirm if you also intend to delete these cart rules?'}</p>
     {else}
         <p>{l s='Are you sure, you want to delete the selected cart rules?'}</p>
 

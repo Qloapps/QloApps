@@ -18,7 +18,7 @@
 *}
 <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal"><i class="icon-remove-sign"></i></button>
-    <h4 class="modal-title"><i class="icon icon-exclamation-triangle"></i>{l s='Confirm Delete'}</h4>
+    <h4 class="modal-title"><i class="icon icon-exclamation-triangle"></i> {l s='Confirm Delete'}</h4>
     <p>{l s='Are you sure, you want to delete this cart rule?'}</p>
 </div>
 {if isset($cartRule)}

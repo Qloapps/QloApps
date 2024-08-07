@@ -144,7 +144,7 @@ class AdminCartRulesControllerCore extends AdminController
         echo json_encode(array('html' => $html, 'next_link' => $next_link));
     }
 
-    public function ajaxProcessInitRuleDeleteModal()
+    public function ajaxProcessInitCartRuleDeleteModal()
     {
         $response = array('success' => false);
         $modalConfirmDelete = $this->createTemplate('modal_confirm_delete.tpl');
@@ -195,11 +195,11 @@ class AdminCartRulesControllerCore extends AdminController
         die(Tools::jsonEncode($response));
     }
 
-    public function ajaxProcessInitRuleBulkDeleteModal()
+    public function ajaxProcessInitCartRuleBulkDeleteModal()
     {
         $response = array('success' => false);
         $modalConfirmDelete = $this->createTemplate('modal_confirm_bulk_delete.tpl');
-        if ($idCartRules = Tools::getValue('id_cart_rule')) {
+        if ($idCartRules = Tools::getValue('id_cart_rules')) {
             $toConfirm = array();
             foreach($idCartRules as $idCartRule) {
                 if ($ruleDetails = CartRule::getGeneratedBy($idCartRule)) {
