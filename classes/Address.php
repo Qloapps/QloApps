@@ -180,7 +180,7 @@ class AddressCore extends ObjectModel
     {
         // for customer address we need to check of customer address already exists.
         if ($this->id_customer) {
-            if ($id_address = Customer::getCustomerIdAddress($this->id_customer, false)) {
+            if ($this->deleted == 0 && $id_address = Customer::getCustomerIdAddress($this->id_customer, false)) {
                 return false;
             }
         }
@@ -196,6 +196,8 @@ class AddressCore extends ObjectModel
 
     public function update($null_values = false)
     {
+
+        $context = Context::getContext();
         // Empty related caches
         if (isset(self::$_idCountries[$this->id])) {
             unset(self::$_idCountries[$this->id]);
@@ -208,7 +210,40 @@ class AddressCore extends ObjectModel
             Customer::resetAddressCache($this->id_customer, $this->id);
         }
 
+        // If address is already used in any order, it will not be edited directly, set address to "deleted" and create a new address
+        if ($this->isUsed() && $this->deleted == 0) {
+            return $this->updateUsedAddress($this);
+        }
+
         return parent::update($null_values);
+    }
+
+    /**
+     * If address is already used in any order
+     * set address to "deleted" and create a new address
+     * @param Address $address
+     * @return bool
+     */
+    public function updateUsedAddress(Address $address)
+    {
+        $objOldAddress = new Address($address->id);
+        $address->id = $address->id_address = null;
+
+        if ($objOldAddress->delete() && $address->save()) {
+            // we need to change the address id in the current cart as the deleted ID can assigned in context->cart.
+            if ($customerCarts = Cart::getCustomerCarts($objOldAddress->id_customer, false)) {
+                foreach ($customerCarts as $cart) {
+                    $objCart = new Cart($cart['id_cart']);
+                    if ($cart['id_address_invoice'] == $objOldAddress->id) {
+                        $objCart->updateAddressId($objOldAddress->id, $address->id);
+                    }
+                }
+            }
+
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -222,12 +257,12 @@ class AddressCore extends ObjectModel
         // reset checkout process if addresses deletes
         CheckoutProcess::refreshCheckoutProcess();
 
-        if (!$this->isUsed()) {
-            return parent::delete();
-        } else {
+        if ($this->isUsed()) {
             $this->deleted = true;
             return $this->update();
         }
+
+        return parent::delete();
     }
 
     /**
@@ -252,10 +287,9 @@ class AddressCore extends ObjectModel
 
         // for customer address we need to check of customer address already exists.
         // if we are editing an address we do not need to validate already created address.
-        if (!Validate::isLoadedObject($this)) {
+        if (!Validate::isLoadedObject($this) && $this->deleted != 0) {
             if ($idCustomer = Tools::getValue('id_customer')) {
                 if ($id_address = Customer::getCustomerIdAddress($idCustomer)) {
-
                     $errors[] =  sprintf(Tools::displayError('Customer address already exists. Id address: #%d'), $id_address);
                 }
             }
