@@ -632,6 +632,7 @@ class WebserviceOutputBuilderCore
                             $value = $object_assoc;
                         }
                         if (empty($fields_assoc)) {
+                            $value['id'] = isset($value['id']) ? $value['id'] : '';
                             $fields_assoc = array(array('id' => $value['id']));
                         }
                         $output_details .= $this->renderFlatAssociation($object, $depth, $assoc_name, $association['resource'], $fields_assoc, $value, $parent_details);
@@ -680,7 +681,7 @@ class WebserviceOutputBuilderCore
                     $field['sqlId'] = 'id';
                     $field['value'] = isset($object_assoc['id']) ? $object_assoc['id'] : null;
                 } elseif (!isset($field['sqlId'])) {
-                    $field['sqlId'] = $field_name;
+                    $field['sqlId'] = $field_name ? $field_name : 'id';
                     $field['value'] = isset($object_assoc[$field_name]) ? $object_assoc[$field_name] : null;
                 }
 
@@ -829,4 +830,10 @@ class WebserviceOutputBuilderCore
     {
         $this->fieldsToDisplay = $fields;
     }
+
+    public static function setWsParams($class, $params)
+    {
+        WebserviceOutputBuilder::$_cache_ws_parameters[$class] = $params;
+    }
+
 }

@@ -198,4 +198,22 @@ class GuestCore extends ObjectModel
         $guest->save();
         $cookie->id_guest = (int)($guest->id);
     }
+
+    public function validateFields($die = true, $error_return = false)
+    {
+        if (isset($this->webservice_validation) && $this->webservice_validation) {
+            if ((int) $this->id_customer && !Validate::isLoadedObject(new Customer((int) $this->id_customer))) {
+                $message = Tools::displayError('Invalid Id customer.');
+            }
+
+            if (isset($message)) {
+                if ($die) {
+                    throw new PrestaShopException($message);
+                }
+                return $error_return ? $message : false;
+            }
+        }
+        return parent::validateFields($die, $error_return);
+    }
+
 }

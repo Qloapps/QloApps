@@ -149,12 +149,15 @@ class AddressCore extends ObjectModel
     protected $webserviceParameters = array(
         'objectsNodeName' => 'addresses',
         'fields' => array(
-            'id_customer' => array('xlink_resource'=> 'customers'),
+            'id_customer' => array('xlink_resource'=> 'customers', 'required' => true),
             'id_manufacturer' => array('xlink_resource'=> 'manufacturers'),
             'id_supplier' => array('xlink_resource'=> 'suppliers'),
             'id_warehouse' => array('xlink_resource'=> 'warehouse'),
             'id_country' => array('xlink_resource'=> 'countries'),
             'id_state' => array('xlink_resource'=> 'states'),
+        ),
+        'hidden_fields' => array(
+            'id_hotel'
         ),
     );
 
@@ -551,4 +554,39 @@ class AddressCore extends ObjectModel
                 )
         ');
     }
+
+    public function validateFields($die = true, $error_return = false)
+    {
+        if (isset($this->webservice_validation) && $this->webservice_validation) {
+            if (!$this->id_customer || !Validate::isLoadedObject(new Customer((int) $this->id_customer))) {
+                $message = Tools::displayError('Invalid Id customer.');
+            } else if (!$this->id_country || !Validate::isLoadedObject($objCountry = new Country($this->id_country))) {
+                $message = Tools::displayError('Invalid Id country');
+            } else if ($objCountry->contains_states
+                && (!$this->id_state || !Validate::isLoadedObject($objState = new State((int) $this->id_state)))
+            ) {
+                $message = Tools::displayError('Invalid Id state');
+            } else if ($objCountry->id != $objState->id) {
+                $message = Tools::displayError('The given provided Id state does not belongs to the provided Id country');
+            } else if ($objCountry->id != $objState->id) {
+                $message = Tools::displayError('The given provided Id state does not belongs to the provided Id country');
+            } else if ($objCountry->zip_code_format && !$objCountry->checkZipCode($this->postcode)) {
+                $message = Tools::displayError('Your Zip/postal code is incorrect');
+            } else if (empty($this->postcode) && $objCountry->need_zip_code) {
+                $message = Tools::displayError('A Zip/postal code is required.');
+            } else if ($this->postcode && !Validate::isPostCode($this->postcode)) {
+                $message = Tools::displayError('The Zip/postal code is invalid.');
+            }
+
+            if (isset($message)) {
+                if ($die) {
+                    throw new PrestaShopException($message);
+                }
+                return $error_return ? $message : false;
+            }
+        }
+
+        return parent::validateFields($die, $error_return);
+    }
+
 }

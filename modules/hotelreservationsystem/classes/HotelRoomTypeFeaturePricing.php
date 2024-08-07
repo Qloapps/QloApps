@@ -277,7 +277,7 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
         $date_from = date('Y-m-d', strtotime($date_from));
         $date_to = date('Y-m-d', strtotime($date_to));
         for($date = $date_from; $date < $date_to; $date = date('Y-m-d', strtotime('+1 day', strtotime($date)))) {
-            $currentDate = date('Y-m-d', $date);
+            $currentDate = date('Y-m-d', strtotime($date));
             $nextDayDate = date('Y-m-d', strtotime('+1 day', strtotime($currentDate)));
             if ($id_product) {
                 $bookingParams = array(

@@ -289,7 +289,7 @@ class WebserviceRequestCore
             'room_type_feature_values' => array('description' => 'The product feature values','class' => 'FeatureValue'),
             'room_type_options' => array('description' => 'The product options','class' => 'AttributeGroup'),
             'room_type_option_values' => array('description' => 'The product options value','class' => 'Attribute'),
-            'room_types' => array('description' => 'The room types','class' => 'Product'),
+            'room_types' => array('description' => 'The room types','class' => 'Product', 'parameters_attribute' => 'webserviceRoomTypeParameters'),
             'states' => array('description' => 'The available states of countries','class' => 'State'),
             'stores' => array('description' => 'The stores', 'class' => 'Store'),
             'suppliers' => array('description' => 'The product suppliers','class' => 'Supplier'),
@@ -515,6 +515,8 @@ class WebserviceRequestCore
                         } else {
                             $this->resourceConfiguration = $object->getWebserviceParameters();
                         }
+
+                        WebserviceOutputBuilder::setWsParams($url_resource['class'], $this->resourceConfiguration);
                     }
                     $success = false;
                     // execute the action
