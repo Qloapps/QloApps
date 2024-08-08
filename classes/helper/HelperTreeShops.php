@@ -126,7 +126,7 @@ class HelperTreeShopsCore extends TreeCore
         return parent::render($data);
     }
 
-    public function renderNodes($data = null)
+    public function renderNodes($data = null, $root = false)
     {
         if (!isset($data)) {
             $data = $this->getData();

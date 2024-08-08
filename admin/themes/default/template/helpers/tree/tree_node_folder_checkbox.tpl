@@ -24,7 +24,7 @@
 *}
 <li class="tree-folder">
 	<span class="tree-folder-name{if isset($node['disabled']) && $node['disabled'] == true} tree-folder-name-disable{/if}">
-		{if $selectable}
+		{if !isset($selectable) || $selectable}
 			<input type="checkbox" name="{$node['input_name']}[]" value="{$node['value']}"{if isset($node['selected']) && $node['selected'] == true} checked="checked"{/if}{if isset($node['disabled']) && $node['disabled'] == true} disabled="disabled"{/if} />
 		{/if}
 		<i class="icon-folder-close"></i>

@@ -422,7 +422,7 @@ class HelperTreeCategoriesCore extends TreeCore
     }
 
     /* Override */
-    public function renderNodes($data = null)
+    public function renderNodes($data = null, $root = false)
     {
         if (!isset($data)) {
             $data = $this->getData();
