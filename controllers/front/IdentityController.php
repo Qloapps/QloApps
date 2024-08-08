@@ -93,7 +93,7 @@ class IdentityControllerCore extends FrontController
             if ($phone && !Validate::isPhoneNumber($phone)) {
                 $this->errors[] = Tools::displayError('Invaid phone number.');
             } elseif ($phone && Tools::strlen($phone) > $rules['size']['phone']) {
-                $this->errors[] = Tools::displayError('Invaid phone number.');
+                $this->errors[] = sprintf(Tools::displayError('Phone number is too long. (%s chars max).'), $rules['size']['phone']);;
             }
 
             if (!count($this->errors)) {

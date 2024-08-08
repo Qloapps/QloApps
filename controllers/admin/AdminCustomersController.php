@@ -992,7 +992,7 @@ class AdminCustomersControllerCore extends AdminController
                 } else {
                     if ($customerDetail = CartCustomerGuestDetail::getCustomerDefaultDetails($customerEmail)) {
                         $objCartCustomerGuestDetail = new CartCustomerGuestDetail($customerDetail['id_customer_guest_detail']);
-                        $objCartCustomerGuestDetail->phone = preg_replace('/[0-p]/', '0', $objCustomer->phone);
+                        $objCartCustomerGuestDetail->phone = preg_replace('/[0-9]/', '0', $objCustomer->phone);
                         $objCartCustomerGuestDetail->email = $objCustomer->email;
                         $objCartCustomerGuestDetail->save();
                     }
@@ -1165,7 +1165,7 @@ class AdminCustomersControllerCore extends AdminController
         if ($phone && !Validate::isPhoneNumber($phone)) {
             $this->errors[] = Tools::displayError('Invaid phone number.');
         } elseif ($phone && Tools::strlen($phone) > $rules['size']['phone']) {
-            $this->errors[] = Tools::displayError('Invaid phone number.');
+            $this->errors[] = sprintf(Tools::displayError('Phone number is too long. (%s chars max).'), $rules['size']['phone']);
         }
 
 

@@ -124,7 +124,7 @@ class OrderOpcControllerCore extends ParentOrderController
                             if (!Validate::isPhoneNumber($phone)) {
                                 $this->errors[] = Tools::displayError('Please enter a valid Mobile phone number.', false);
                             } elseif (Tools::strlen($phone) > $rules['size']['phone']) {
-                                $this->errors[] = Tools::displayError('Please enter a valid Mobile phone number.', false);
+                                $this->errors[] = sprintf(Tools::displayError('Mobile phone number is too long. (%s chars max).'), $rules['size']['phone']);
                             }
 
                             $_POST['lastname'] = $_POST['customer_lastname'];

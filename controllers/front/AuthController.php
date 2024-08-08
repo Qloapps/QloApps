@@ -435,12 +435,12 @@ class AuthControllerCore extends FrontController
                 if (Tools::getValue('phone') && !Validate::isPhoneNumber(Tools::getValue('phone'))) {
                     $this->errors[] = Tools::displayError('Invald phone number.');
                 } elseif (Tools::getValue('phone') && Tools::strlen(Tools::getValue('phone')) > $rules['size']['phone']) {
-                    $this->errors[] = Tools::displayError('Invald phone number.');
+                    $this->errors[] = sprintf(Tools::displayError('Phone number is too long. (%s chars max).'), $rules['size']['phone']);
                 }
                 if (Tools::getValue('phone_mobile') && !Validate::isPhoneNumber(Tools::getValue('phone_mobile'))) {
                     $this->errors[] = Tools::displayError('Invald mobile phone number.');
                 } elseif (Tools::getValue('phone_mobile') && Tools::strlen(Tools::getValue('phone_mobile')) > $rules['size']['phone']) {
-                    $this->errors[] = Tools::displayError('Invald mobile phone number.');
+                    $this->errors[] = sprintf(Tools::displayError('mobile phone number is too long. (%s chars max).'), $rules['size']['phone']);;
                 }
             }
 
