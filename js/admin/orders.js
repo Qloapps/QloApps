@@ -30,6 +30,12 @@ $(document).ready(function() {
 	// Init all events
 	init();
 
+    $(document).on('click', '.delete-voucher', function(e) {
+        if (!confirm(txt_confirm)) {
+            e.preventDefault();
+        }
+    });
+
 	$('img.js-disabled-action').css({"opacity":0.5});
 });
 
