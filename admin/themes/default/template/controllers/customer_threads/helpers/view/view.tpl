@@ -33,7 +33,7 @@
 		{if isset($next_thread) && $next_thread}
 			<a class="btn btn-default pull-right" href="{$next_thread.href|escape:'html':'UTF-8'}">
 				{$next_thread.name} <i class="icon-forward"></i>
-			</a> 
+			</a>
 		{/if}
 	</div>
 	<div class="well">
@@ -71,7 +71,7 @@
 						<div class="col-sm-6">
 							<p>
 							{if $count_ok}
-								{l s='[1]%1$d[/1] order(s) validated for a total amount of [2]%2$s[/2]' sprintf=[$count_ok, $total_ok] tags=['<span class="badge">', '<span class="badge badge-success">']}
+								{l s='[1]%1$d[/1] order(s) validated, total amount paid [2]%2$s[/2]' sprintf=[$count_ok, $total_ok] tags=['<span class="badge">', '<span class="badge badge-success">']}
 							{else}
 								{l s="No orders validated for the moment"}
 							{/if}
@@ -115,7 +115,7 @@
 			<i class="icon-magic icon-2x"></i><br>
 			{l s="Choose a template"}
 		</button>
-		-->		
+		-->
 		<button class="btn btn-default pull-right" name="submitReply"><i class="process-icon-mail-reply"></i> {l s="Send"}</button>
 		<input type="hidden" name="id_customer_thread" value="{$thread->id|intval}" />
 		<input type="hidden" name="msg_email" value="{$thread->email}" />
@@ -159,7 +159,7 @@
 			});
 			timer = setInterval("markAsRead()", 3000);
 		});
-	
+
 	function markAsRead()
 	{
 		$.ajax({
