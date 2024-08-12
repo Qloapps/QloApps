@@ -838,6 +838,7 @@ class AdminCustomersControllerCore extends AdminController
         }
 
         $total_ok = 0;
+        $total_ko = 0;
         $orders_ok = array();
         $orders_ko = array();
         foreach ($orders as $order) {
@@ -850,10 +851,21 @@ class AdminCustomersControllerCore extends AdminController
                 $total_ok += $order['total_paid_real_not_formated']/$order['conversion_rate'];
             } else {
                 $orders_ko[] = $order;
+                $total_ko += $order['total_paid'] / $order['conversion_rate'];
             }
         }
 
-        $products = $customer->getBoughtProducts();
+        $purchasedServices = array();
+        $purchasedRoomTypes = array();
+        if ($products = $customer->getBoughtProducts()) {
+            foreach ($products as $product) {
+                if ($product['is_booking_product']) {
+                    $purchasedRoomTypes[] = $product;
+                } else {
+                    $purchasedServices[] = $product;
+                }
+            }
+        }
 
         $carts = Cart::getCustomerCarts($customer->id);
         $total_carts = count($carts);
@@ -876,6 +888,7 @@ class AdminCustomersControllerCore extends AdminController
 				FROM '._DB_PREFIX_.'cart_product cp
 				JOIN '._DB_PREFIX_.'cart c ON (c.id_cart = cp.id_cart)
 				JOIN '._DB_PREFIX_.'product p ON (cp.id_product = p.id_product)
+                AND p.booking_product=1
 				WHERE c.id_customer = '.(int)$customer->id.'
 					AND NOT EXISTS (
 							SELECT 1
@@ -948,8 +961,11 @@ class AdminCustomersControllerCore extends AdminController
             'orders_ok' => $orders_ok,
             'orders_ko' => $orders_ko,
             'total_ok' => Tools::displayPrice($total_ok, $this->context->currency->id),
+            'total_ko' => Tools::displayPrice($total_ko, $this->context->currency->id),
             // Products
             'products' => $products,
+            'purchasedRoomTypes' => $purchasedRoomTypes,
+            'purchasedServices' => $purchasedServices,
             // Addresses
             'addresses' => $customer->getAddresses($this->default_form_language),
             // Discounts
