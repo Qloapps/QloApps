@@ -30,7 +30,7 @@
 <div class="margin-top-50 htl-contact-page">
 	<div class="row">
 		<p class="contact-header col-sm-offset-2 col-sm-8">{l s='Contact Us'}</p>
-		<p class="contact-desc col-sm-offset-2 col-sm-8">{l s='Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry`s standard dummy text.'}</p>
+		<p class="contact-desc col-sm-offset-2 col-sm-8">{l s='Reach out to us for any inquiries or assistance. We\'re here to help make your experience with us exceptional.'}</p>
 	</div>
 	<div class="row margin-top-50">
 		{if (isset($gblHtlAddress) && $gblHtlAddress) && (isset($gblHtlPhone) && $gblHtlPhone) && (isset($gblHtlEmail) && $gblHtlEmail)}
@@ -139,6 +139,7 @@
 					</div>
 				{/if}
 				{hook h='displayGDPRConsent' moduleName='contactform'}
+				{hook h='displayContactFormFieldsAfter'}
 				<div class="form-group">
 					<input type="text" name="url" value="" class="hidden" />
 					<input type="hidden" name="contactKey" value="{$contactKey}" />
@@ -164,7 +165,7 @@
 						<div class="col-xs-8">
 							<p class="hotel-name"><span>{$hotel['hotel_name']}</span></p>
 							<p class="hotel-branch-info-value">{$hotel['address']}, {$hotel['city']}, {if {$hotel['state_name']}}{$hotel['state_name']},{/if} {$hotel['country_name']}, {$hotel['postcode']}</p>
-							{if $hotel['latitude'] != 0 || $hotel['longitude'] != 0}
+							{if $hotel['latitude'] != 0 || $hotel['longitude'] != 0 && $viewOnMap}
 								<p class="hotel-branch-info-value">
 									<a class="btn htl-map-direction-btn" href="http://maps.google.com/maps?daddr=({$hotel['latitude']},{$hotel['longitude']})" target="_blank">
 										<span class="">{l s='View on map'}</span>

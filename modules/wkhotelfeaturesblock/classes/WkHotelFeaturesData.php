@@ -139,24 +139,124 @@ class WkHotelFeaturesData extends ObjectModel
     public function insertModuleDemoData()
     {
         $languages = Language::getLanguages(false);
+        $htlAmenitiesHeading = array(
+            'en' => 'Amenities',
+            'nl' => 'Voorzieningen',
+            'fr' => 'Équipements',
+            'de' => 'Ausstattung',
+            'ru' => 'Удобства',
+            'es' => 'Servicios',
+        );
+        $htlAmenitiesDescription = array(
+            'en' => 'Experience luxury at our hotel with top-notch amenities. Enjoy our fitness center, rejuvenating spa, serene outdoor pool, and exquisite dining.',
+            'nl' => 'Ervaar luxe in ons hotel met eersteklas voorzieningen. Geniet van ons fitnesscentrum, verjongende spa, rustige buitenzwembad en voortreffelijk dineren.',
+            'fr' => 'Découvrez le luxe dans notre hôtel avec des équipements de premier ordre. Profitez de notre centre de remise en forme, de notre spa revitalisant, de notre piscine extérieure paisible et de notre restaurant exquis.',
+            'de' => 'Erleben Sie Luxus in unserem Hotel mit erstklassigen Annehmlichkeiten. Genießen Sie unser Fitnesscenter, das belebende Spa, den ruhigen Außenpool und das exquisite Essen.',
+            'ru' => 'Испытайте роскошь в нашем отеле с первоклассными удобствами. Наслаждайтесь нашим фитнес-центром, омолаживающим спа, спокойным открытым бассейном и изысканной кухней.',
+            'es' => 'Experimenta el lujo en nuestro hotel con servicios de primera clase. Disfruta de nuestro gimnasio, spa rejuvenecedor, tranquila piscina al aire libre y exquisita gastronomía.',
+        );
+
         $HOTEL_AMENITIES_HEADING = array();
         $HOTEL_AMENITIES_DESCRIPTION = array();
         foreach ($languages as $lang) {
-            $HOTEL_AMENITIES_HEADING[$lang['id_lang']] = 'Amenities';
-            $HOTEL_AMENITIES_DESCRIPTION[$lang['id_lang']] = 'Families travelling with kids will find Amboseli national park a safari destination matched to no other, with less tourist traffic, breathtaking open space.';
+            if (isset($htlAmenitiesHeading[$lang['iso_code']])) {
+                $HOTEL_AMENITIES_HEADING[$lang['id_lang']] = $htlAmenitiesHeading[$lang['iso_code']];
+                $HOTEL_AMENITIES_DESCRIPTION[$lang['id_lang']] = $htlAmenitiesDescription[$lang['iso_code']];
+            } else {
+                $HOTEL_AMENITIES_HEADING[$lang['id_lang']] = $htlAmenitiesHeading['en'];
+                $HOTEL_AMENITIES_DESCRIPTION[$lang['id_lang']] = $htlAmenitiesDescription['en'];
+            }
         }
+
         Configuration::updateValue('HOTEL_AMENITIES_HEADING', $HOTEL_AMENITIES_HEADING);
         Configuration::updateValue('HOTEL_AMENITIES_DESCRIPTION', $HOTEL_AMENITIES_DESCRIPTION);
-
-        $amenityTitle = array('luxurious Rooms', 'World class cheffs', 'Restaurants', 'Gym & Spa');
-        $amenityDescription  = 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry`s standard dummy text ever since the 1500s';
+        $amenityDemoData = array(
+            array(
+                'name' => array(
+                    'en' => 'Luxurious Rooms',
+                    'nl' => 'Luxe kamers',
+                    'fr' => 'Chambres luxueuses',
+                    'de' => 'Luxuriöse Zimmer',
+                    'ru' => 'Роскошные номера',
+                    'es' => 'Habitaciones lujosas',
+                ),
+                'description' => array(
+                    'en' => 'Experience unparalleled comfort in our luxurious rooms, featuring premium amenities and stunning views of the lake or cityscape.',
+                    'nl' => 'Ervaar ongeëvenaard comfort in onze luxe kamers, met eersteklas voorzieningen en adembenemend uitzicht op het meer of de stad.',
+                    'fr' => 'Vivez un confort inégalé dans nos chambres luxueuses, dotées d\'équipements haut de gamme et offrant une vue imprenable sur le lac ou la ville.',
+                    'de' => 'Erleben Sie unvergleichlichen Komfort in unseren luxuriösen Zimmern mit erstklassigen Annehmlichkeiten und atemberaubendem Blick auf den See oder die Stadt.',
+                    'ru' => 'Испытайте непревзойденный комфорт в наших роскошных номерах, оборудованных первоклассными удобствами и с захватывающим видом на озеро или городской пейзаж.',
+                    'es' => 'Disfruta de un confort inigualable en nuestras lujosas habitaciones, que cuentan con servicios premium y vistas impresionantes al lago o a la ciudad.',
+                )
+            ),
+            array(
+                'name' => array(
+                    'en' => 'World class chefs',
+                    'nl' => 'Topkoks',
+                    'fr' => 'Chefs de renommée mondiale',
+                    'de' => 'Weltklasse-Köche',
+                    'ru' => 'Шеф-повара мирового класса',
+                    'es' => 'Chefs de clase mundial',
+                ),
+                'description' => array(
+                    'en' => 'Experience culinary excellence with world-class chefs, where gourmet dishes are crafted from the finest local ingredients.',
+                    'nl' => 'Ervaar culinaire excellentie met topkoks, waar gourmetgerechten worden bereid met de beste lokale ingrediënten.',
+                    'fr' => 'Découvrez l\'excellence culinaire avec des chefs de renommée mondiale, où des plats gastronomiques sont élaborés à partir des meilleurs ingrédients locaux.',
+                    'de' => 'Erleben Sie kulinarische Exzellenz mit Weltklasse-Köchen, wo Gourmetgerichte aus den feinsten lokalen Zutaten kreiert werden.',
+                    'ru' => 'Исследуйте кулинарное искусство с шеф-поварами мирового класса, где гурманские блюда создаются из лучших местных ингредиентов.',
+                    'es' => 'Experimenta la excelencia culinaria con chefs de clase mundial, donde se elaboran platos gourmet con los mejores ingredientes locales.',
+                )
+            ),
+            array(
+                'name' => array(
+                    'en' => 'Restaurants',
+                    'nl' => 'Restaurants',
+                    'fr' => 'Restaurants',
+                    'de' => 'Restaurants',
+                    'ru' => 'Рестораны',
+                    'es' => 'Restaurantes',
+                ),
+                'description' => array(
+                    'en' => 'Savor exquisite dining at our restaurant, where a delightful menu is crafted from the finest local ingredients.',
+                    'nl' => 'Geniet van voortreffelijk dineren in ons restaurant, waar een heerlijk menu wordt bereid met de beste lokale ingrediënten.',
+                    'fr' => 'Dégustez une cuisine exquise dans notre restaurant, où un menu délicieux est élaboré à partir des meilleurs ingrédients locaux.',
+                    'de' => 'Genießen Sie exquisites Essen in unserem Restaurant, wo ein köstliches Menü aus den feinsten lokalen Zutaten kreiert wird.',
+                    'ru' => 'Наслаждайтесь изысканным ужином в нашем ресторане, где прекрасное меню создано из лучших местных ингредиентов.',
+                    'es' => 'Disfruta de una comida exquisita en nuestro restaurante, donde se elabora un delicioso menú con los mejores ingredientes locales.',
+                )
+            ),
+            array(
+                'name' => array(
+                    'en' => 'Gym & Spa',
+                    'nl' => 'Fitness & Spa',
+                    'fr' => 'Gym & Spa',
+                    'de' => 'Fitness & Spa',
+                    'ru' => 'Фитнес и Спа',
+                    'es' => 'Gimnasio y Spa',
+                ),
+                'description' => array(
+                    'en' => 'Rejuvenate with our state-of-the-art gym and spa, offering a sanctuary for relaxation and fitness.',
+                    'nl' => 'Kom tot rust in onze moderne fitness en spa, waar een oase van ontspanning en fitness wordt geboden.',
+                    'fr' => 'Revitalisez-vous avec notre salle de sport et spa dernier cri, offrant un sanctuaire pour la relaxation et la remise en forme.',
+                    'de' => 'Erholen Sie sich in unserem hochmodernen Fitnessstudio und Spa, das einen Rückzugsort für Entspannung und Fitness bietet.',
+                    'ru' => 'Восстановитесь в нашем современном фитнес-центре и спа, предлагающем убежище для релаксации и фитнеса.',
+                    'es' => 'Rejuvenezca con nuestro gimnasio y spa de última generación, que ofrece un santuario para la relajación y el fitness.',
+                )
+            )
+        );
 
         for ($i = 0; $i < 4; $i++) {
             $objFeatureData = new WkHotelFeaturesData();
             foreach ($languages as $lang) {
-                $objFeatureData->feature_title[$lang['id_lang']] = $amenityTitle[$i];
-                $objFeatureData->feature_description[$lang['id_lang']] = $amenityDescription;
+                if (isset($amenityDemoData[$i]['name'][$lang['iso_code']])) {
+                    $objFeatureData->feature_title[$lang['id_lang']] = $amenityDemoData[$i]['name'][$lang['iso_code']];
+                    $objFeatureData->feature_description[$lang['id_lang']] = $amenityDemoData[$i]['description'][$lang['iso_code']];
+                } else {
+                    $objFeatureData->feature_title[$lang['id_lang']] = $amenityDemoData[$i]['name']['en'];
+                    $objFeatureData->feature_description[$lang['id_lang']] = $amenityDemoData[$i]['description']['en'];
+                }
             }
+
             $objFeatureData->active = 1;
             $objFeatureData->position = WkHotelFeaturesData::getHigherPosition();
             if ($objFeatureData->save()) {

@@ -250,6 +250,9 @@ class GuestTrackingControllerCore extends FrontController
                         $total_convenience_fee_te = 0;
                         $total_convenience_fee_ti = 0;
 
+                        $objOrderReturn = new OrderReturn();
+                        $refundReqBookings = $objOrderReturn->getOrderRefundRequestedBookings($order->id, 0, 1);
+
                         foreach ($orderProducts as $type_key => $type_value) {
                             if (in_array($type_value['product_id'], $processedProducts)) {
                                 continue;
@@ -307,6 +310,14 @@ class GuestTrackingControllerCore extends FrontController
                                         if ($data_v['is_back_order']) {
                                             $anyBackOrder = 1;
                                         }
+
+                                        if ($refundReqBookings && in_array($data_v['id'], $refundReqBookings) && $data_v['is_refunded']) {
+                                            if ($data_v['is_cancelled']) {
+                                                $cartHotelData[$type_key]['date_diff'][$date_join]['count_cancelled'] += 1;
+                                            } else {
+                                                $cartHotelData[$type_key]['date_diff'][$date_join]['count_refunded'] += 1;
+                                            }
+                                        }
                                     } else {
                                         $num_days = $objBookingDetail->getNumberOfDays($data_v['date_from'], $data_v['date_to']);
                                         $cartHotelData[$type_key]['date_diff'][$date_join]['num_rm'] = 1;
@@ -325,6 +336,16 @@ class GuestTrackingControllerCore extends FrontController
                                         $cartHotelData[$type_key]['date_diff'][$date_join]['is_backorder'] = $data_v['is_back_order'];
                                         if ($data_v['is_back_order']) {
                                             $anyBackOrder = 1;
+                                        }
+
+                                        $cartHotelData[$type_key]['date_diff'][$date_join]['count_cancelled'] = 0;
+                                        $cartHotelData[$type_key]['date_diff'][$date_join]['count_refunded'] = 0;
+                                        if ($refundReqBookings && in_array($data_v['id'], $refundReqBookings) && $data_v['is_refunded']) {
+                                            if ($data_v['is_cancelled']) {
+                                                $cartHotelData[$type_key]['date_diff'][$date_join]['count_cancelled'] += 1;
+                                            } else {
+                                                $cartHotelData[$type_key]['date_diff'][$date_join]['count_refunded'] += 1;
+                                            }
                                         }
                                     }
 
@@ -583,6 +604,7 @@ class GuestTrackingControllerCore extends FrontController
             'CUSTOMIZE_TEXTFIELD' => Product::CUSTOMIZE_TEXTFIELD,
             'use_tax' => Configuration::get('PS_TAX'),
             'guestInformations' => (array)$customer,
+            'view_on_map' => Configuration::get('WK_GOOGLE_ACTIVE_MAP'),
         ));
     }
 
@@ -614,7 +636,9 @@ class GuestTrackingControllerCore extends FrontController
                     if ($idHotel = HotelBookingDetail::getIdHotelByIdOrder($objOrder->id)) {
                         $objHotelBranchInformation = new HotelBranchInformation($idHotel, $this->context->language->id);
                         if (Validate::isLoadedObject($objHotelBranchInformation)) {
-                            if ($apiKey = Configuration::get('PS_API_KEY')) {
+                            if (($apiKey = Configuration::get('PS_API_KEY'))
+                                && Configuration::get('WK_GOOGLE_ACTIVE_MAP')
+                            ) {
                                 if (floatval($objHotelBranchInformation->latitude) != 0
                                     && floatval($objHotelBranchInformation->longitude) != 0
                                 ) {
@@ -625,6 +649,7 @@ class GuestTrackingControllerCore extends FrontController
                                             'map_input_text' => $objHotelBranchInformation->map_input_text,
                                         ),
                                         'hotel_name' => $objHotelBranchInformation->hotel_name,
+                                        'PS_STORES_ICON' => $this->context->link->getMediaLink(_PS_IMG_.Configuration::get('PS_STORES_ICON'))
                                     ));
 
                                     $this->addJS(
