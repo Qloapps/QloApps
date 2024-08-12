@@ -58,6 +58,14 @@
                     {$order->reference} (<a href="{$link->getAdminLink('AdminOrders')}&vieworder&id_order={$order->id}" target="_blank">#{$order->id}</a>)
                 </p>
             </div>
+            {if !$cartRule->quantity}
+                <div class="col-sm-4">
+                    <label>{l s='Status'}</label>
+                    <p class="control-value">
+                        <span class="badge badge-danger">{l s='Used'}</span>
+                    </p>
+                </div>
+            {/if}
         </div>
     </div>
 {/if}

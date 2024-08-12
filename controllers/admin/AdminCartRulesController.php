@@ -160,7 +160,6 @@ class AdminCartRulesControllerCore extends AdminController
                     $objOrder = new Order($obj->id_order);
                     $objCustomer = new Customer($objOrder->id_customer);
 
-                    $modalConfirmDelete = $this->createTemplate('modal_confirm_delete.tpl');
                     $modalConfirmDelete->assign(array(
                         'generatedBy' => $generatedByDetails['generated_by'],
                         'generatedById' => $generatedByDetails['id_generated_by'],

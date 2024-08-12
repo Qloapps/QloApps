@@ -64,6 +64,9 @@
                                 <b>{l s='Generated against credit slip'}</b>
                                 (<a href="{$link->getAdminLink('AdminPdf')}&submitAction=generateOrderSlipPDF&id_order_slip={$cartRule['id_generated_by']}" target="_blank">#{$cartRule['id_generated_by']}</a>)
                             {/if}
+                            {if !$cartRule['cart_rule']->quantity}
+                                <span class="badge badge-danger">{l s='Used'}</span>
+                            {/if}
                         </td>
                         <td>
                             <a href="{$link->getAdminLink('AdminOrders')}&vieworder&id_order={$cartRule['order']->id}" target="_blank">#{$cartRule['order']->id}</a>
