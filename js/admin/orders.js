@@ -40,6 +40,12 @@ $(document).ready(function() {
         $('#view_order_tax_details .icon-angle-down').toggle();
     });
 
+    $(document).on('click', '.delete-voucher', function(e) {
+        if (!confirm(txt_confirm)) {
+            e.preventDefault();
+        }
+    });
+
 	$('img.js-disabled-action').css({"opacity":0.5});
 });
 
