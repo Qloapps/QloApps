@@ -179,6 +179,10 @@
   left: -9999px;
 }
 
+.rtl .chosen-container-single.chosen-container-single-nosearch .chosen-search {
+  display:none;
+}
+
 /* @end */
 /* @group Results */
 .chosen-container .chosen-results {
