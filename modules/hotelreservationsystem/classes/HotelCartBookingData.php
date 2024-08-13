@@ -1890,7 +1890,7 @@ class HotelCartBookingData extends ObjectModel
             $this->extra_demands = json_encode(array());
         }
 
-        return parent::add($null_values);
+        return parent::add($auto_date, $null_values);
     }
 
     // Webservice :: get extra demands for the cart booking
