@@ -515,8 +515,8 @@ class AdminAddHotelController extends ModuleAdminController
                 $objAddress->city = $city;
                 $objAddress->postcode = $zipcode;
                 $hotelName = $objHotelBranch->hotel_name[$defaultLangId];
-                $objAddress->alias = trim(substr($hotelName, 0, 32));
                 $hotelName = trim(preg_replace('/[0-9!<>,;?=+()@#"°{}_$%:]*$/u', '', $hotelName));
+                $objAddress->alias = trim(substr($hotelName, 0, 32));
                 $addressFirstName = $hotelName;
                 $addressLastName = $hotelName;
                 // If hotel name is length is greater than 32 then we split it into two
