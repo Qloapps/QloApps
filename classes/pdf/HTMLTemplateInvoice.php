@@ -349,9 +349,9 @@ class HTMLTemplateInvoiceCore extends HTMLTemplate
                         if ($type_value)
                         if (isset($customer->id)) {
                             $cart_obj = new Cart($this->order->id_cart);
-                            $order_bk_data = $obj_htl_bk_dtl->getOnlyOrderBookingData($this->order->id, $cart_obj->id_guest, $type_value['product_id'], $customer->id);
+                            $order_bk_data = $obj_htl_bk_dtl->getOnlyOrderBookingData($this->order->id, $cart_obj->id_guest, $type_value['product_id'], $customer->id, $type_value['id_order_detail']);
                         } else {
-                            $order_bk_data = $obj_htl_bk_dtl->getOnlyOrderBookingData($this->order->id, $customer->id_guest, $type_value['product_id']);
+                            $order_bk_data = $obj_htl_bk_dtl->getOnlyOrderBookingData($this->order->id, $customer->id_guest, $type_value['product_id'], 0, $type_value['id_order_detail']);
                         }
 
                         $cart_htl_data[$type_key]['id_product'] = $type_value['product_id'];
@@ -387,7 +387,8 @@ class HTMLTemplateInvoiceCore extends HTMLTemplate
                                     $data_v['date_to'],
                                     0,
                                     1,
-                                    0
+                                    0,
+                                    $type_value['id_order_detail']
                                 );
                                 $cart_htl_data[$type_key]['date_diff'][$date_join]['extra_demands_price_ti'] = $objBookingDemand->getRoomTypeBookingExtraDemands(
                                     $order_obj->id,
@@ -397,7 +398,8 @@ class HTMLTemplateInvoiceCore extends HTMLTemplate
                                     $data_v['date_to'],
                                     0,
                                     1,
-                                    1
+                                    1,
+                                    $type_value['id_order_detail']
                                 );
                                 $cart_htl_data[$type_key]['date_diff'][$date_join]['additional_services_price_auto_add_ti'] = $objRoomTypeServiceProductOrderDetail->getroomTypeServiceProducts(
                                     $order_obj->id,
@@ -457,7 +459,8 @@ class HTMLTemplateInvoiceCore extends HTMLTemplate
                                     $data_v['date_to'],
                                     0,
                                     1,
-                                    0
+                                    0,
+                                    $type_value['id_order_detail']
                                 );
                                 $cart_htl_data[$type_key]['date_diff'][$date_join]['extra_demands_price_ti'] = $objBookingDemand->getRoomTypeBookingExtraDemands(
                                     $order_obj->id,
@@ -467,7 +470,8 @@ class HTMLTemplateInvoiceCore extends HTMLTemplate
                                     $data_v['date_to'],
                                     0,
                                     1,
-                                    1
+                                    1,
+                                    $type_value['id_order_detail']
                                 );
                                 $cart_htl_data[$type_key]['date_diff'][$date_join]['additional_services'] = $objRoomTypeServiceProductOrderDetail->getroomTypeServiceProducts(
                                     $order_obj->id,
@@ -610,14 +614,25 @@ class HTMLTemplateInvoiceCore extends HTMLTemplate
                 $footer['total_extra_demands_te'] = $totalDemandsPriceTE;
             }
         }
-        $footer['room_price_tax_excl'] = $this->order->getTotalProductsWithoutTaxes(false, true) + $this->order->getTotalProductsWithoutTaxes(false, false, Product::SERVICE_PRODUCT_WITH_ROOMTYPE, 1, Product::PRICE_ADDITION_TYPE_WITH_ROOM);
-        $footer['room_price_tax_incl'] = $this->order->getTotalProductsWithTaxes(false, true) + $this->order->getTotalProductsWithoutTaxes(false, false, Product::SERVICE_PRODUCT_WITH_ROOMTYPE, 1, Product::PRICE_ADDITION_TYPE_WITH_ROOM);
-        // $footer['service_products_price_tax_excl'] = $this->order->getTotalProductsWithoutTaxes(false, false, Product::SERVICE_PRODUCT_WITHOUT_ROOMTYPE);
-        // $footer['service_products_price_tax_incl'] = $this->order->getTotalProductsWithTaxes(false, false, Product::SERVICE_PRODUCT_WITHOUT_ROOMTYPE);
-        $footer['additional_service_price_tax_excl'] = $this->order->getTotalProductsWithoutTaxes(false, false, Product::SERVICE_PRODUCT_WITH_ROOMTYPE, 0) + $totalDemandsPriceTE;
-        $footer['additional_service_price_tax_incl'] = $this->order->getTotalProductsWithTaxes(false, false, Product::SERVICE_PRODUCT_WITH_ROOMTYPE, 0) + $totalDemandsPriceTI;
-        $footer['total_convenience_fee_te'] = $this->order->getTotalProductsWithoutTaxes(false, false, Product::SERVICE_PRODUCT_WITH_ROOMTYPE, 1, Product::PRICE_ADDITION_TYPE_INDEPENDENT);
-        $footer['total_convenience_fee_ti'] = $this->order->getTotalProductsWithTaxes(false, false, Product::SERVICE_PRODUCT_WITH_ROOMTYPE, 1, Product::PRICE_ADDITION_TYPE_INDEPENDENT);
+
+        $footer['room_price_tax_excl'] = 0;
+        $footer['room_price_tax_incl'] = 0;
+        $footer['additional_service_price_tax_excl'] = 0;
+        $footer['additional_service_price_tax_incl'] =0;
+        $footer['total_convenience_fee_te'] = 0;
+        $footer['total_convenience_fee_ti'] = 0;
+        if ($idsOrderDetail = array_column($order_details, 'id_order_detail')) {
+            $footer['room_price_tax_excl'] = $this->order->getTotalProductsWithoutTaxes(false, true, null, null, null, $idsOrderDetail) + $this->order->getTotalProductsWithoutTaxes(false, false, Product::SERVICE_PRODUCT_WITH_ROOMTYPE, 1, Product::PRICE_ADDITION_TYPE_WITH_ROOM, $idsOrderDetail);
+            $footer['room_price_tax_incl'] = $this->order->getTotalProductsWithTaxes(false, true, null, null, null, $idsOrderDetail) + $this->order->getTotalProductsWithoutTaxes(false, false, Product::SERVICE_PRODUCT_WITH_ROOMTYPE, 1, Product::PRICE_ADDITION_TYPE_WITH_ROOM, $idsOrderDetail);
+            // $footer['service_products_price_tax_excl'] = $this->order->getTotalProductsWithoutTaxes(false, false, Product::SERVICE_PRODUCT_WITHOUT_ROOMTYPE);
+            // $footer['service_products_price_tax_incl'] = $this->order->getTotalProductsWithTaxes(false, false, Product::SERVICE_PRODUCT_WITHOUT_ROOMTYPE);
+            $footer['additional_service_price_tax_excl'] = $this->order->getTotalProductsWithoutTaxes(false, false, Product::SERVICE_PRODUCT_WITH_ROOMTYPE, 0, null, $idsOrderDetail) + $totalDemandsPriceTE;
+            $footer['additional_service_price_tax_incl'] = $this->order->getTotalProductsWithTaxes(false, false, Product::SERVICE_PRODUCT_WITH_ROOMTYPE, 0, null, $idsOrderDetail) + $totalDemandsPriceTI;
+            $footer['total_convenience_fee_te'] = $this->order->getTotalProductsWithoutTaxes(false, false, Product::SERVICE_PRODUCT_WITH_ROOMTYPE, 1, Product::PRICE_ADDITION_TYPE_INDEPENDENT, $idsOrderDetail);
+            $footer['total_convenience_fee_ti'] = $this->order->getTotalProductsWithTaxes(false, false, Product::SERVICE_PRODUCT_WITH_ROOMTYPE, 1, Product::PRICE_ADDITION_TYPE_INDEPENDENT, $idsOrderDetail);
+        }
+        $footer['total_paid_real'] = $this->order_invoice->getTotalPaid();
+
         $data = array(
             'cart_htl_data' => $cart_htl_data,
             'service_product_data' => $service_product_data,
@@ -737,6 +752,7 @@ class HTMLTemplateInvoiceCore extends HTMLTemplate
             'ecotax_tax' => $this->order_invoice->getEcoTaxTaxesBreakdown(),
             'wrapping_tax' => $this->order_invoice->getWrappingTaxesBreakdown(),
         );
+
         foreach ($breakdowns as $type => $bd) {
             if (empty($bd)) {
                 unset($breakdowns[$type]);
@@ -822,7 +838,9 @@ class HTMLTemplateInvoiceCore extends HTMLTemplate
      */
     protected function getTemplateByCountry($iso_country)
     {
-        $file = Configuration::get('PS_INVOICE_MODEL');
+        // $file = Configuration::get('PS_INVOICE_MODEL');
+        // @todo redesign invoice template for b2b, for now we have ony one template design.
+        $file = 'invoice';
 
         // try to fetch the iso template
         $template = $this->getTemplate($file.'.'.$iso_country);

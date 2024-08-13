@@ -235,6 +235,11 @@ class ContactControllerCore extends FrontController
 
         // GOOGLE MAP
         if (($PS_API_KEY = Configuration::get('PS_API_KEY')) && Configuration::get('WK_GOOGLE_ACTIVE_MAP')) {
+            Media::addJsDef(
+                array(
+                    'PS_STORES_ICON' => $this->context->link->getMediaLink(_PS_IMG_.Configuration::get('PS_STORES_ICON')),
+                )
+            );
             $this->addJS(
                 'https://maps.googleapis.com/maps/api/js?key='.$PS_API_KEY.
                 '&libraries=places&language='.$this->context->language->iso_code.'&region='.$this->context->country->iso_code
@@ -308,6 +313,7 @@ class ContactControllerCore extends FrontController
         $this->context->smarty->assign(
             array(
                 'hotelsInfo' => $hotelsInfo,
+                'viewOnMap' => Configuration::get('WK_GOOGLE_ACTIVE_MAP'),
                 'gblHtlPhone' => $gblHtlPhone,
                 'gblHtlEmail' => $gblHtlEmail,
                 'gblHtlAddress' => $gblHtlAddress,
