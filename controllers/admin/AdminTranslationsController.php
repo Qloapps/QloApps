@@ -2626,12 +2626,14 @@ class AdminTranslationsControllerCore extends AdminController
             }
 
             foreach ($dir_to_copy_iso as $dir) {
-                foreach (scandir($dir) as $file) {
-                    if (!in_array($file, Translate::$ignore_folder)) {
-                        $files_to_copy_iso[] = array(
-                            "from" => $dir.$file,
-                            "to" => str_replace((strpos($dir, _PS_CORE_DIR_) !== false) ? _PS_CORE_DIR_ : _PS_ROOT_DIR_, _PS_ROOT_DIR_.'/themes/'.$current_theme, $dir).$file
-                        );
+                if (is_dir($dir)) {
+                    foreach (scandir($dir) as $file) {
+                        if (!in_array($file, Translate::$ignore_folder)) {
+                            $files_to_copy_iso[] = array(
+                                "from" => $dir.$file,
+                                "to" => str_replace((strpos($dir, _PS_CORE_DIR_) !== false) ? _PS_CORE_DIR_ : _PS_ROOT_DIR_, _PS_ROOT_DIR_.'/themes/'.$current_theme, $dir).$file
+                            );
+                        }
                     }
                 }
             }
@@ -2993,7 +2995,7 @@ class AdminTranslationsControllerCore extends AdminController
                                     $tabs_array[$prefix_key][$key]['use_sprintf'] = Translate::checkIfKeyUseSprintf($key);
                                 }
                             }
-                        } elseif (Tools::file_exists_cache($file_path)) {
+                        } elseif (Tools::file_exists_cache($file_path) && is_file($file_path)) {
                             $tabs_array = $this->parsePdfClass($file_path, 'php', $GLOBALS[$name_var], $prefix_key, $tabs_array, $missing_translations_pdf);
                         }
                     }
