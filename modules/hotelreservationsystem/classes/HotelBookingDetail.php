@@ -239,6 +239,8 @@ class HotelBookingDetail extends ObjectModel
             $params['only_search_data'] = 0;
         }
 
+        Hook::exec('actionBookingDataParamsModifier', array('params' => &$params));
+
         return $params;
     }
 
@@ -1548,25 +1550,24 @@ class HotelBookingDetail extends ObjectModel
      * @param [date] $dateTo   [End date of the booking]
      *
      * @return [int] [Returns number of days between two dates]
-     * @deprecated use hotelBookingDetail::getDays() instead
+     * @deprecated use HotelHelper::getNumberOfDays() instead
      */
     public function getNumberOfDays($dateFrom, $dateTo)
     {
-        return self::getDays($dateFrom, $dateTo);
-        // $startDate = new DateTime($dateFrom);
-        // $endDate = new DateTime($dateTo);
-        // $daysDifference = $startDate->diff($endDate)->days;
-
-        // return $daysDifference;
+        return HotelHelper::getNumberOfDays($dateFrom, $dateTo);
     }
 
+    /**
+     *
+     * @param [date] $dateFrom [Start date of the booking]
+     * @param [date] $dateTo   [End date of the booking]
+     *
+     * @return [int] [Returns number of days between two dates]
+     * @deprecated use HotelHelper::getNumberOfDays() instead
+     */
     public static function getDays($dateFrom, $dateTo)
     {
-        $startDate = new DateTime($dateFrom);
-        $endDate = new DateTime($dateTo);
-        $daysDifference = $startDate->diff($endDate)->days;
-
-        return $daysDifference;
+        return HotelHelper::getNumberOfDays($dateFrom, $dateTo);
     }
 
     public function generateRoomOccupancyWeight($availRoomTypeCount, $totalOccupancy, $totalAdult, $totalChildren)
