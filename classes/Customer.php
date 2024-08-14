@@ -490,6 +490,18 @@ class CustomerCore extends ObjectModel
         return Cache::retrieve($cache_id);
     }
 
+    public static function getPhone($id_customer)
+    {
+
+        return Db::getInstance()->getValue(
+            'SELECT cgd.`phone`
+            FROM `'._DB_PREFIX_.'customer` c
+            INNER JOIN `'._DB_PREFIX_.'cart_customer_guest_detail` cgd
+            ON (cgd.`email` = c.`email`)
+            WHERE `id_cart` = 0 AND c.`id_customer` = '.(int)($id_customer)
+        );
+    }
+
     public static function getCustomerIdAddress($id_customer, $use_cache = true)
     {
         $cache_id = 'Customer::getCustomerIdAddress'.(int)$id_customer;
