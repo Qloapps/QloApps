@@ -281,16 +281,25 @@ class HotelRoomType extends ObjectModel
     /**
      * @param [int] $roomTypesList: string of idRoomTypes seperated by ","
      */
-    public function getRoomTypeDetailByRoomTypeIds($roomTypesList, $position = true)
+    public function getRoomTypeDetailByRoomTypeIds($roomTypesList, $position = true, $fullDetail = false, $idLang = false)
     {
-        $sql = 'SELECT COUNT(hri.`id`) AS `numberOfRooms`, hrt.`id_product`, `adults`, `children`, `max_adults`, `max_children`, `max_guests`'.
-        ($position ? ', cp.`position`' : '').'
+        if (!$idLang) {
+            $idLang = Context::getContext()->language->id;
+        }
+
+        $sql = 'SELECT pl.`name`, COUNT(hri.`id`) AS `numberOfRooms`, hrt.`id_product`, `adults`, `children`, `max_adults`, `max_children`, `max_guests`
+        '.($position ? ', cp.`position`' : '').'
+        '.($fullDetail ? ', pl.`link_rewrite`, pl.`description_short`' : '').'
         FROM `'._DB_PREFIX_.'htl_room_type` AS `hrt`
         INNER JOIN `'._DB_PREFIX_.'htl_room_information` AS `hri` ON (hri.`id_product` = hrt.`id_product`)';
+        $sql .= ' INNER JOIN `'._DB_PREFIX_.'product_lang` pl ON (hrt.`id_product` = pl.`id_product` AND pl.`id_lang` = '.(int)$idLang.')';
 
         if ($position) {
             $sql .= ' INNER JOIN `'._DB_PREFIX_.'htl_branch_info` hbi ON (hbi.`id` = hrt.`id_hotel`)
             INNER JOIN `'._DB_PREFIX_.'category_product` cp ON cp.`id_category` = hbi.`id_category` AND cp.`id_product` = hrt.`id_product`';
+        }
+        if ($fullDetail) {
+
         }
 
         $sql .= 'WHERE hrt.`id_product` IN ('.$roomTypesList.')
