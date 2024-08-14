@@ -1740,6 +1740,10 @@ ul.service-product-nav > li:hover {
   .hotel_name{
     margin-right: 10px;
   }
+  .rtl .hotel_name{
+    margin-left: 10px;
+    margin-right: 0px;
+  }
 }
 @media (max-width:768px) {
   #hotel_rating {
