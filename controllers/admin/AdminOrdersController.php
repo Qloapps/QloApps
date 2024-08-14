@@ -5449,6 +5449,9 @@ class AdminOrdersControllerCore extends AdminController
 
         $objBookingDetail->delete();
 
+        // delete refund request of the room if exists.
+        OrderReturnDetail::deleteReturnDetailByIdBookingDetail($id_order, $idHotelBooking);
+
         // Assign to smarty informations in order to show the new product line
         $this->context->smarty->assign(array(
             'order' => $order,
