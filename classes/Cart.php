@@ -262,10 +262,25 @@ class CartCore extends ObjectModel
             $to_update = true;
             $this->id_address_invoice = $id_address_new;
         }
+        if (!isset($this->id_address_delivery) || $this->id_address_delivery == $id_address) {
+            $to_update = true;
+            $this->id_address_delivery = $id_address_new;
+        }
         if ($to_update) {
             $this->update();
         }
 
+        $sql = 'UPDATE `'._DB_PREFIX_.'cart_product`
+		SET `id_address_delivery` = '.(int)$id_address_new.'
+		WHERE  `id_cart` = '.(int)$this->id.'
+			AND `id_address_delivery` = '.(int)$id_address;
+        Db::getInstance()->execute($sql);
+
+        $sql = 'UPDATE `'._DB_PREFIX_.'customization`
+			SET `id_address_delivery` = '.(int)$id_address_new.'
+			WHERE  `id_cart` = '.(int)$this->id.'
+				AND `id_address_delivery` = '.(int)$id_address;
+        Db::getInstance()->execute($sql);
     }
 
     public function delete()
@@ -1058,6 +1073,14 @@ class CartCore extends ObjectModel
     {
         if (!$shop) {
             $shop = Context::getContext()->shop;
+        }
+
+        if (Context::getContext()->customer->id) {
+            if ($id_address_delivery == 0 && (int)$this->id_address_delivery) { // The $id_address_delivery is null, use the cart delivery address
+                $id_address_delivery = $this->id_address_delivery;
+            } elseif (!Customer::customerHasAddress(Context::getContext()->customer->id, $id_address_delivery)) { // The $id_address_delivery must be linked with customer
+                $id_address_delivery = 0;
+            }
         }
 
         $quantity = (int)$quantity;
@@ -4083,6 +4106,10 @@ class CartCore extends ObjectModel
         $cart->id_shop = $this->id_shop;
         $cart->id_shop_group = $this->id_shop_group;
 
+        if (!Customer::customerHasAddress((int)$cart->id_customer, (int)$cart->id_address_delivery)) {
+            $cart->id_address_delivery = 0;
+        }
+
         if (!Customer::customerHasAddress((int)$cart->id_customer, (int)$cart->id_address_invoice)) {
             $cart->id_address_invoice = (int)Address::getFirstCustomerAddressId((int)$cart->id_customer);
         }
@@ -4105,6 +4132,11 @@ class CartCore extends ObjectModel
         $id_address_delivery = Configuration::get('PS_ALLOW_MULTISHIPPING') ? $cart->id_address_delivery : 0;
 
         foreach ($products as $product) {
+            if ($id_address_delivery) {
+                if (Customer::customerHasAddress((int)$cart->id_customer, $product['id_address_delivery'])) {
+                    $id_address_delivery = $product['id_address_delivery'];
+                }
+            }
 
             foreach ($product_gift as $gift) {
                 if (isset($gift['gift_product']) && isset($gift['gift_product_attribute']) && (int)$gift['gift_product'] == (int)$product['id_product'] && (int)$gift['gift_product_attribute'] == (int)$product['id_product_attribute']) {
