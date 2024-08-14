@@ -183,7 +183,7 @@ class AuthControllerCore extends FrontController
             // send page html only if no errors in the form and we have to open registration form
             // It also prevents opening html in the response in case of an error for XSS protection
             if (empty($this->errors)) {
-                $return['page'] = $this->context->smarty->fetch($this->template);
+                $return['page'] = $this->fetch($this->template);
             }
 
             $this->ajaxDie(json_encode($return));

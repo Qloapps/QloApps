@@ -337,7 +337,7 @@ class CategoryControllerCore extends FrontController
             }
 
             $this->context->smarty->assign(array('booking_data' => $booking_data));
-            $html = $this->context->smarty->fetch('_partials/room_type_list.tpl');
+            $html = $this->fetch('_partials/room_type_list.tpl');
             $response['status'] = true;
             $response['html_room_type_list'] = $html;
         }

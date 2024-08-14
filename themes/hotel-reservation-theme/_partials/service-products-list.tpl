@@ -21,5 +21,7 @@
     {if !($product@first && isset($init) && $init == true)}
         <hr>
     {/if}
-    {include file="{$tpl_dir}_partials/service-products-list-row.tpl" product=$product}
+    {block name='service-products-list-row'}
+        {include file="{$tpl_dir}_partials/service-products-list-row.tpl" product=$product}
+    {/block}
 {/foreach}

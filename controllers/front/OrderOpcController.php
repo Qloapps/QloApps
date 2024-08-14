@@ -223,7 +223,7 @@ class OrderOpcControllerCore extends ParentOrderController
                                 }
 
                                 $return = array_merge(array(
-                                    'order_opc_adress' => $this->context->smarty->fetch(_PS_THEME_DIR_.$tpl),
+                                    'order_opc_adress' => $this->fetch(_PS_THEME_DIR_.$tpl),
                                     'block_user_info' => '',
                                     // 'block_user_info_nav' => (isset($block_user_info) ? $block_user_info->hookDisplayTop(array()) : ''), //changed to below line
                                     'block_user_info_nav' => (isset($block_user_info) ? $block_user_info->displayUserInfo(array()) : ''),
@@ -898,7 +898,7 @@ class OrderOpcControllerCore extends ParentOrderController
                     'delivery_option_list' => $this->context->cart->getDeliveryOptionList(),
                     'delivery_option' => $this->context->cart->getDeliveryOption(null, true)
                 )),
-                'carrier_block' => $this->context->smarty->fetch(_PS_THEME_DIR_.'order-carrier.tpl')
+                'carrier_block' => $this->fetch(_PS_THEME_DIR_.'order-carrier.tpl')
             );
 
             Cart::addExtraCarriers($result);
@@ -908,7 +908,7 @@ class OrderOpcControllerCore extends ParentOrderController
             return array(
                 'hasError' => true,
                 'errors' => $this->errors,
-                'carrier_block' => $this->context->smarty->fetch(_PS_THEME_DIR_.'order-carrier.tpl')
+                'carrier_block' => $this->fetch(_PS_THEME_DIR_.'order-carrier.tpl')
             );
         }
     }
@@ -1039,7 +1039,7 @@ class OrderOpcControllerCore extends ParentOrderController
                 ));
             }
         }
-        $response['extra_demands'] = $this->context->smarty->fetch(
+        $response['extra_demands'] = $this->fetch(
             _PS_THEME_DIR_.'_partials/cart_booking_demands.tpl'
         );
 

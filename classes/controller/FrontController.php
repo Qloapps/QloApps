@@ -1624,8 +1624,7 @@ class FrontControllerCore extends Controller
         if ($this->useMobileTheme()) {
             $this->setMobileTemplate($default_template);
         } else {
-            $template = $this->getOverrideTemplate();
-            if ($template) {
+            if ($template = $this->getOverrideTemplate($default_template)) {
                 parent::setTemplate($template);
             } else {
                 parent::setTemplate($default_template);
@@ -1638,12 +1637,25 @@ class FrontControllerCore extends Controller
      * If not overridden, will return false. This method can be easily overriden in a
      * specific controller.
      *
-    * @since 1.5.0.13
-    * @return string|bool
-    */
-    public function getOverrideTemplate()
+     * @return array|bool
+     */
+    public function getOverrideTemplate($default_template)
     {
-        return Hook::exec('DisplayOverrideTemplate', array('controller' => $this));
+        return Hook::exec('DisplayOverrideTemplate', array('controller' => $this, 'default_template' => $default_template));
+    }
+
+    /**
+     * Fetches a template for the front controller and returns the content of the template fetched.
+     * This method is added to help in overriding templates fetched directly using the smart fetch() function.
+     * @return string|bool
+     */
+    protected function fetch($template)
+    {
+        if ($overrideTemplate = $this->getOverrideTemplate($template)) {
+            $template = $overrideTemplate;
+        }
+
+        return $this->context->smarty->fetch($template);
     }
 
     /**

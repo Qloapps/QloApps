@@ -17,24 +17,26 @@
 * @license LICENSE.txt
 *}
 
-<div class="message {if isset($message.id_employee) && $message.id_employee}management{else}customer{/if}">
-    <div class="profile">
-        <div class="row">
-            <div class="col-sm-6">
-                <strong>
-                    {if $message.id_employee}
-                        {$obj_hotel_branch_information->hotel_name|escape:'html':'UTF-8'}
-                    {else}
-                        {$message.cfirstname|escape:'html':'UTF-8'} {$message.clastname|escape:'html':'UTF-8'}
-                    {/if}
-                </strong>
-            </div>
-            <div class="col-sm-6 text-right">
-                {dateFormat date=$message.date_add full=1}
+{block name='order_message'}
+    <div class="message {if isset($message.id_employee) && $message.id_employee}management{else}customer{/if}">
+        <div class="profile">
+            <div class="row">
+                <div class="col-sm-6">
+                    <strong>
+                        {if $message.id_employee}
+                            {$obj_hotel_branch_information->hotel_name|escape:'html':'UTF-8'}
+                        {else}
+                            {$message.cfirstname|escape:'html':'UTF-8'} {$message.clastname|escape:'html':'UTF-8'}
+                        {/if}
+                    </strong>
+                </div>
+                <div class="col-sm-6 text-right">
+                    {dateFormat date=$message.date_add full=1}
+                </div>
             </div>
         </div>
+        <div class="message-content">
+            {$message.message|escape:'html':'UTF-8'|nl2br}
+        </div>
     </div>
-    <div class="message-content">
-        {$message.message|escape:'html':'UTF-8'|nl2br}
-    </div>
-</div>
+{/block}

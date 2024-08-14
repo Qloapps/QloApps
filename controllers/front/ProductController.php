@@ -1286,7 +1286,7 @@ class ProductControllerCore extends FrontController
             $roomTypeDemands,
             $roomServiceProducts
         )) {
-            $html = $this->context->smarty->fetch('_partials/booking-form.tpl');
+            $html = $this->fetch('_partials/booking-form.tpl');
             $response['status'] = true;
             $response['html_booking_form'] = $html;
         }
@@ -1318,7 +1318,7 @@ class ProductControllerCore extends FrontController
 
         if (is_array($hotelImages) && count($hotelImages)) {
             $this->context->smarty->assign(array('hotel_images' => $hotelImages));
-            $html = $this->context->smarty->fetch(
+            $html = $this->fetch(
                 $this->getTemplatePath('_partials/hotel_images.tpl')
             );
 
@@ -1366,7 +1366,7 @@ class ProductControllerCore extends FrontController
                             } else {
                                 $this->context->smarty->assign('group', 'all');
                             }
-                            $response['service_products'] = $this->context->smarty->fetch(_PS_THEME_DIR_.'_partials/service-products-list.tpl');
+                            $response['service_products'] = $this->fetch(_PS_THEME_DIR_.'_partials/service-products-list.tpl');
                         }
                     }
                 } else {

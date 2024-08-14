@@ -62,11 +62,17 @@ class ModuleFrontControllerCore extends FrontController
      */
     public function setTemplate($template)
     {
-        if (!$path = $this->getTemplatePath($template)) {
-            throw new PrestaShopException("Template '$template' not found");
-        }
+        if ($this->useMobileTheme()) {
+            $this->setMobileTemplate($template);
+        } else {
+            if ((!$path = $this->getOverrideTemplate($template))
+                && (!$path = $this->getTemplatePath($template))
+            ) {
+                throw new PrestaShopException("Template '$template' not found");
+            }
 
-        $this->template = $path;
+            $this->template = $path;
+        }
     }
 
     /**

@@ -540,7 +540,7 @@ class OrderDetailControllerCore extends FrontController
                 'objOrder' => new Order($idOrder),
             ));
 
-            $response['extra_demands'] = $this->context->smarty->fetch(_PS_THEME_DIR_.'_partials/order-extra-services.tpl');
+            $response['extra_demands'] = $this->fetch(_PS_THEME_DIR_.'_partials/order-extra-services.tpl');
         }
 
         $this->ajaxDie(json_encode($response));
@@ -661,7 +661,7 @@ class OrderDetailControllerCore extends FrontController
 
         if (count($this->errors)) {
             $this->context->smarty->assign(array('errors' => $this->errors));
-            $response['errors_html'] = $this->context->smarty->fetch(_PS_THEME_DIR_.'errors.tpl');
+            $response['errors_html'] = $this->fetch(_PS_THEME_DIR_.'errors.tpl');
         }
 
         $response['has_errors'] = (bool) count($this->errors);
@@ -763,7 +763,7 @@ class OrderDetailControllerCore extends FrontController
 
                 $message = CustomerMessage::getMessagesByOrderId($order->id, false)[0];
                 $this->context->smarty->assign(array('message' => $message));
-                $response['message_html'] = $this->context->smarty->fetch(_PS_THEME_DIR_.'_partials/order-message.tpl');
+                $response['message_html'] = $this->fetch(_PS_THEME_DIR_.'_partials/order-message.tpl');
             } else {
                 $this->errors[] = Tools::displayError('Order not found');
             }
@@ -771,7 +771,7 @@ class OrderDetailControllerCore extends FrontController
 
         if (count($this->errors)) {
             $this->context->smarty->assign(array('errors' => $this->errors));
-            $response['errors_html'] = $this->context->smarty->fetch(_PS_THEME_DIR_.'errors.tpl');
+            $response['errors_html'] = $this->fetch(_PS_THEME_DIR_.'errors.tpl');
         }
 
         $response['has_errors'] = (bool) count($this->errors);
