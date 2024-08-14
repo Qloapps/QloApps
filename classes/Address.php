@@ -560,15 +560,15 @@ class AddressCore extends ObjectModel
         if (isset($this->webservice_validation) && $this->webservice_validation) {
             if (!$this->id_customer || !Validate::isLoadedObject(new Customer((int) $this->id_customer))) {
                 $message = Tools::displayError('Invalid Id customer.');
+            } else if (Customer::getCustomerIdAddress($this->id_customer, false) && !$this->id) {
+                $message = Tools::displayError('You cannot create multiple addresses for a single customer.');
             } else if (!$this->id_country || !Validate::isLoadedObject($objCountry = new Country($this->id_country))) {
                 $message = Tools::displayError('Invalid Id country');
             } else if ($objCountry->contains_states
                 && (!$this->id_state || !Validate::isLoadedObject($objState = new State((int) $this->id_state)))
             ) {
                 $message = Tools::displayError('Invalid Id state');
-            } else if ($objCountry->id != $objState->id) {
-                $message = Tools::displayError('The given provided Id state does not belongs to the provided Id country');
-            } else if ($objCountry->id != $objState->id) {
+            } else if ($objState->id && ($objCountry->id != $objState->id_country)) {
                 $message = Tools::displayError('The given provided Id state does not belongs to the provided Id country');
             } else if ($objCountry->zip_code_format && !$objCountry->checkZipCode($this->postcode)) {
                 $message = Tools::displayError('Your Zip/postal code is incorrect');
@@ -585,7 +585,6 @@ class AddressCore extends ObjectModel
                 return $error_return ? $message : false;
             }
         }
-
         return parent::validateFields($die, $error_return);
     }
 
