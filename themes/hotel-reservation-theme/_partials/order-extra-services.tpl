@@ -25,53 +25,12 @@
         {if (isset($extraDemands) && $extraDemands) || (isset($additionalServices) && $additionalServices)}
             <div class="">
                 <ul class="nav nav-tabs">
-                    {if isset($extraDemands) && $extraDemands}
-                        <li class="active"><a href="#room_type_demands_desc" data-toggle="tab">{l s='Facilities'}</a></li>
-                    {/if}
-                    {if isset($additionalServices) && $additionalServices}
-                        <li{if !isset($extraDemands) || !$extraDemands} class="active"{/if}><a href="#room_type_service_product_desc" data-toggle="tab">{l s='Services'}</a></li>
-                    {/if}
+                    <li {if isset($additionalServices) && $additionalServices} class="active"{/if}><a href="#room_type_service_product_desc" data-toggle="tab">{l s='Services'}</a></li>
+                    <li {if !isset($additionalServices) || !$additionalServices}class="active" {/if}><a href="#room_type_demands_desc" data-toggle="tab">{l s='Facilities'}</a></li>
                 </ul>
                 <div class="tab-content">
-                    {if isset($extraDemands) && $extraDemands}
-                        <div id="room_type_demands_desc" class="tab-pane active">
-                            <div class="rooms_extra_demands_head">
-                                <p class="rooms_extra_demands_text">{l s='Facilities chosen for this booking.'}</p>
-                            </div>
-                            {assign var=roomCount value=1}
-                            {foreach $extraDemands as $roomDemand}
-                                <div class="room_demands">
-                                    <div class="demand_header">
-                                        {l s='Room'} {$roomCount|string_format:'%02d'}&nbsp;
-                                        <span>({if {$roomDemand['adults']} <= 9}0{$roomDemand['adults']}{else}{$roomDemand['adults']}{/if} {if $roomDemand['adults'] > 1}{l s='Adults'}{else}{l s='Adult'}{/if}{if $roomDemand['children'] > 0}, {if {$roomDemand['children']} <= 9}0{$roomDemand['children']}{else}{$roomDemand['children']}{/if} {if $roomDemand['children'] > 1}{l s='Children'}{else}{l s='Child'}{/if}{/if})</span>
-                                    </div>
-                                    <div class="room_demand_detail">
-                                        {foreach $roomDemand['extra_demands'] as $demand}
-                                            <div class="room_demand_block">
-                                                <div class="">{$demand['name']|escape:'html':'UTF-8'}</div>
-                                                <div class="">
-                                                    <span>
-                                                        {if $useTax}
-                                                            {displayPrice price="{$demand['total_price_tax_incl']|escape:'html':'UTF-8'}" currency=$objOrder->id_currency}
-                                                        {else}
-                                                            {displayPrice price="{$demand['total_price_tax_excl']|escape:'html':'UTF-8'}" currency=$objOrder->id_currency}
-                                                        {/if}
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        {/foreach}
-                                    </div>
-                                </div>
-                                {assign var=roomCount value=$roomCount+1}
-                            {/foreach}
-                        </div>
-                    {/if}
-
-                    {if isset($additionalServices) && $additionalServices}
-                        <div id="room_type_service_product_desc" class="tab-pane{if !isset($extraDemands) || !$extraDemands} active{/if}">
-                            <div class="rooms_extra_demands_head">
-                                <p class="rooms_extra_demands_text">{l s='Services chosen for this booking.'}</p>
-                            </div>
+                    <div id="room_type_service_product_desc" class="tab-pane {if isset($additionalServices) && $additionalServices}active{/if}">
+                        {if isset($additionalServices) && $additionalServices}
                             {assign var=roomCount value=1}
                             {foreach $additionalServices as $key => $roomAdditionalService}
                                 <div class="room_demands">
@@ -105,8 +64,46 @@
                                 </div>
                                 {assign var=roomCount value=$roomCount+1}
                             {/foreach}
-                        </div>
-                    {/if}
+                        {else}
+                            <div class="services_not_booked">
+                                {l s='No service found.'}
+                            </div>
+                        {/if}
+                    </div>
+                    <div id="room_type_demands_desc" class="tab-pane {if !isset($additionalServices) || !$additionalServices}active{/if}">
+                        {if isset($extraDemands) && $extraDemands}
+                            {assign var=roomCount value=1}
+                            {foreach $extraDemands as $roomDemand}
+                                <div class="room_demands">
+                                    <div class="demand_header">
+                                        {l s='Room'} {$roomCount|string_format:'%02d'}&nbsp;
+                                        <span>({if {$roomDemand['adults']} <= 9}0{$roomDemand['adults']}{else}{$roomDemand['adults']}{/if} {if $roomDemand['adults'] > 1}{l s='Adults'}{else}{l s='Adult'}{/if}{if $roomDemand['children'] > 0}, {if {$roomDemand['children']} <= 9}0{$roomDemand['children']}{else}{$roomDemand['children']}{/if} {if $roomDemand['children'] > 1}{l s='Children'}{else}{l s='Child'}{/if}{/if})</span>
+                                    </div>
+                                    <div class="room_demand_detail">
+                                        {foreach $roomDemand['extra_demands'] as $demand}
+                                            <div class="room_demand_block">
+                                                <div class="">{$demand['name']|escape:'html':'UTF-8'}</div>
+                                                <div class="">
+                                                    <span>
+                                                        {if $useTax}
+                                                            {displayPrice price="{$demand['total_price_tax_incl']|escape:'html':'UTF-8'}" currency=$objOrder->id_currency}
+                                                        {else}
+                                                            {displayPrice price="{$demand['total_price_tax_excl']|escape:'html':'UTF-8'}" currency=$objOrder->id_currency}
+                                                        {/if}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        {/foreach}
+                                    </div>
+                                </div>
+                                {assign var=roomCount value=$roomCount+1}
+                            {/foreach}
+                        {else}
+                            <div class="services_not_booked">
+                                {l s='No facility found.'}
+                            </div>
+                        {/if}
+                    </div>
                 </div>
             </div>
         {/if}
