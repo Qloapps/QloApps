@@ -1098,13 +1098,13 @@
                 </div>
             {/if}
 
-            <div class="col-lg-4 col-sm-6 col-xs-12">
+            <div class="col-lg-4 col-sm-6 col-xs-12 hidden-print">
                 <div class="panel">
                     <div class="panel-heading">
                         <i class="icon-envelope"></i> &nbsp;{l s='Messages'} <span class="badge">{sizeof($customer_thread_message)}</span>
                         <a href="{$link->getAdminLink('AdminCustomerThreads')|escape:'html':'UTF-8'}&amp;id_order={$order->id|intval}" class="pull-right">{l s='Show all messages'}</a>
                     </div>
-                    <div id="messages" class="hidden-print">
+                    <div id="messages">
                         <form action="{$smarty.server.REQUEST_URI|escape:'html':'UTF-8'}&amp;token={$smarty.get.token|escape:'html':'UTF-8'}" method="post" onsubmit="if (getE('visibility').checked == true) return confirm('{l s='Do you want to send this message to the customer?'}');">
                             <div id="message" class="form-horizontal">
                                 <div class="form-group">

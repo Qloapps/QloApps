@@ -37,6 +37,26 @@ $(document).ready(function() {
     });
 
 	$('img.js-disabled-action').css({"opacity":0.5});
+
+    // change table design for printing
+    $(window).on('beforeprint', function() {
+        $('#customer_cart_details thead tr th').each(function(i, val) {
+            $('#customer_cart_details tbody td:nth-child('+(i+1)+')').each(function () {
+                let span = $('<span>').addClass('print-class-container')
+                    .append($('<span>').addClass('print-class-title').html($(val).html()))
+                    .append($('<span>').addClass('print-class-content').html(
+                        $(this).html()
+                    )
+                );
+                $(this).html($(span).html());
+            });
+        });
+    });
+    $(window).on('afterprint', function() {
+        $('#customer_cart_details tbody td').each(function () {
+            $(this).html($(this).find('span.print-class-content').html());
+        });
+    });
 });
 
 function stopAjaxQuery() {
