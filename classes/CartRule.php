@@ -912,7 +912,7 @@ class CartRuleCore extends ObjectModel
 
         $reduction_value = 0;
         $objHotelAdvancePayment = new HotelAdvancedPayment();
-        $cache_id = 'getContextualValue_'.(int)$this->id.'_'.(int)$use_tax.'_'.(int)$context->cart->id.'_'.(int)$filter.'_'.(int)$only_advance_payment_products;
+        $cache_id = 'getContextualValue_'.(int)$this->id.'_'.(int)$use_tax.'_'.(int)$context->cart->id.'_'.(int)$context->currency->id.'_'.(int)$filter.'_'.(int)$only_advance_payment_products;
         foreach ($package['products'] as $key => $product) {
             if ($only_advance_payment_products) {
                 if ($advancePaymentInfo = $objHotelAdvancePayment->getIdAdvPaymentByIdProduct($product['id_product'])) {
