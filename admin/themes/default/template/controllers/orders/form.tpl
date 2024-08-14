@@ -275,7 +275,7 @@
 				id_room: parseInt($(cart_row).attr('data-id-room')),
 				date_from: $(cart_row).attr('data-date-from'),
 				date_to: $(cart_row).attr('data-date-to'),
-				price: new Number($(this).val().replace(",",".")).toFixed(4).toString(),
+				price: new Number($(this).val().replace(",",".")).toString(),
 				id_cart: id_cart
 			};
 			updateProductPrice(params, cart_row);
