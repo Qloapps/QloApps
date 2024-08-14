@@ -26,10 +26,10 @@
 	<div class="modal-dialog {if isset($modal_class)}{$modal_class}{/if}">
 		<div class="modal-content">
 			{if isset($modal_title)}
-			<div class="modal-header">
-				<button type="button" class="close" data-dismiss="modal"><i class="icon-remove-sign"></i></button>
-				<h4 class="modal-title">{$modal_title}</h4>
-			</div>
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal"><i class="icon-remove-sign"></i></button>
+					<h4 class="modal-title">{$modal_title}</h4>
+				</div>
 			{/if}
 
 			{$modal_content}
