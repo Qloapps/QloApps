@@ -230,7 +230,10 @@ class OrderReturnCore extends ObjectModel
                         $bookingRow['id_room'],
                         $bookingRow['date_from'],
                         $bookingRow['date_to'],
-                        0
+                        0,
+                        0,
+                        1,
+                        $bookingRow['id']
                     );
                     if (count($roomSelectedDemands)) {
                         foreach ($roomSelectedDemands as $demand) {
