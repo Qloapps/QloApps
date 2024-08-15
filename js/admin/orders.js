@@ -2536,7 +2536,9 @@ const EditRoomBookingModal = {
                     const dateTo = $.datepicker.formatDate('dd-mm-yy', $.datepicker.parseDate('yy-mm-dd', jsonProductLineData.date_to));
 
                     $('#edit_product .edit_product_date_from').attr('value', dateFrom);
+                    $('#edit_product .edit_product_date_from').attr('data-min_date', dateFrom);
                     $('#edit_product .edit_product_date_to').attr('value', dateTo);
+                    $('#edit_product .edit_product_date_to').attr('data-min_date', dateFrom);
                     $('#edit_product .edit_product_date_from_actual').attr('value', jsonProductLineData.date_from);
                     $('#edit_product .edit_product_date_to_actual').attr('value', jsonProductLineData.date_to);
                     $('#edit_product .room_unit_price').val(parseFloat(jsonProductLineData.paid_unit_price_tax_excl));
