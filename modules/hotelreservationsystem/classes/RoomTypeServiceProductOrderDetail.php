@@ -192,7 +192,9 @@ class RoomTypeServiceProductOrderDetail extends ObjectModel
     public function getSelectedServicesForRoom(
         $idHotelBookingDetail,
         $getTotalPrice = 0,
-        $useTax = null
+        $useTax = null,
+        $autoAddToCart = null,
+        $priceAdditionType = null
     ) {
 
         if ($useTax === null) {
@@ -211,6 +213,13 @@ class RoomTypeServiceProductOrderDetail extends ObjectModel
         $sql .= ' INNER JOIN `'._DB_PREFIX_.'product` p ON (p.`id_product` = rsod.`id_product`)';
 
         $sql .= ' WHERE hbd.`id` = '.(int)$idHotelBookingDetail;
+
+        if (!is_null($autoAddToCart)) {
+            $sql .= ' AND od.`product_auto_add` = '. (int)$autoAddToCart;
+            if ($autoAddToCart == 1 && !is_null($priceAdditionType)) {
+                $sql .= ' AND od.`product_price_addition_type` = '.$priceAdditionType;
+            }
+        }
 
         if ($getTotalPrice) {
             $totalPrice = 0;
