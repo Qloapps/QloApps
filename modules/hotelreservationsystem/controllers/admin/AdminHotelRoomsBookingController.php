@@ -855,7 +855,7 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
                 }
             }
         }
-        // ddd($booking_data);
+
         return $booking_data;
     }
 
