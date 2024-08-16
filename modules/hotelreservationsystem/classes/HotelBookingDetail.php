@@ -3198,7 +3198,10 @@ class HotelBookingDetail extends ObjectModel
                     $this->id_room,
                     $this->date_from,
                     $this->date_to,
-                    0
+                    0,
+                    0,
+                    1,
+                    $this->id
                 )) {
                     foreach ($roomDemands as $roomDemand) {
                         $objHotelBookingDemands = new HotelBookingDemands($roomDemand['id_booking_demand']);
