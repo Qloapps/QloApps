@@ -72,6 +72,9 @@ class CartRuleCore extends ObjectModel
     public $date_add;
     public $date_upd;
 
+    const GENERATED_BY_REFUND = 1;
+    const GENERATED_BY_ORDER_SLIP = 2;
+
     /**
      * @see ObjectModel::$definition
      */
@@ -909,7 +912,7 @@ class CartRuleCore extends ObjectModel
 
         $reduction_value = 0;
         $objHotelAdvancePayment = new HotelAdvancedPayment();
-        $cache_id = 'getContextualValue_'.(int)$this->id.'_'.(int)$use_tax.'_'.(int)$context->cart->id.'_'.(int)$filter.'_'.(int)$only_advance_payment_products;
+        $cache_id = 'getContextualValue_'.(int)$this->id.'_'.(int)$use_tax.'_'.(int)$context->cart->id.'_'.(int)$context->currency->id.'_'.(int)$filter.'_'.(int)$only_advance_payment_products;
         foreach ($package['products'] as $key => $product) {
             if ($only_advance_payment_products) {
                 if ($advancePaymentInfo = $objHotelAdvancePayment->getIdAdvPaymentByIdProduct($product['id_product'])) {
@@ -1497,5 +1500,26 @@ class CartRuleCore extends ObjectModel
         } else {
             return Db::getInstance()->executeS($sql_base.' AND code LIKE \'%'.pSQL($name).'%\'');
         }
+    }
+
+    public static function getGeneratedBy($id)
+    {
+        if (!$id) {
+            return false;
+        }
+        $response = array();
+        $sql = 'SELECT `id_order_slip` FROM '._DB_PREFIX_.'order_slip os
+            WHERE os.`id_cart_rule` = '.(int)$id;
+        if ($result = Db::getInstance()->getValue($sql)) {
+            $response['generated_by'] = self::GENERATED_BY_ORDER_SLIP;
+            $response['id_generated_by'] = $result;
+        }
+        $sql = 'SELECT `id_order_return` FROM '._DB_PREFIX_.'order_return o
+            WHERE o.`return_type` = '.OrderReturn::RETURN_TYPE_CART_RULE.' AND o.`id_return_type` = '.(int)$id;
+        if ($result = Db::getInstance()->getValue($sql)) {
+            $response['generated_by'] = self::GENERATED_BY_REFUND;
+            $response['id_generated_by'] = $result;
+        }
+        return $response;
     }
 }

@@ -17,7 +17,7 @@
  * @license LICENSE.txt
  *}
 
-<a href="{$status_change_link|escape:'html':'UTF-8'}" title="{l s='Change Status'}">
+<a href="{$status_change_link|escape:'html':'UTF-8'}" title="{l s='Change Status'}" class="change_status">
     <i class="icon-refresh"></i>
     {l s='Change Status'}
 </a>
