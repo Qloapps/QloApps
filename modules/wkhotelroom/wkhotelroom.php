@@ -98,7 +98,7 @@ class WkHotelRoom extends Module
                     $useTax
                 );
                 $htlRoom['feature_price'] = $featurePrice;
-                $htlRoom['feature_price_diff'] = (float)($productPriceWithoutReduction - $featurePrice);
+                $htlRoom['feature_price_diff'] = (float)($priceWithoutReduction - $featurePrice);
             }
         }
         $this->context->smarty->assign(
