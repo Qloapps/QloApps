@@ -69,11 +69,22 @@
 					<div class="row cart_amt_div">
 						<table class="table table-responsive">
 							<tr>
-								<th colspan="2">{l s='Total Amount (Tax excl.):' mod='hotelreservationsystem'}</th>
-								<th colspan="2" class="text-right" id="cart_total_amt">
+								<td>{l s='Rooms Amount (Tax excl.):' mod='hotelreservationsystem'}</td>
+								<td class="text-right" id="cart_rooms_amount">
+									{if isset($cart_rooms_amount)}{convertPrice price=$cart_rooms_amount}{else}{convertPrice price=0}{/if}
+								</td>
+							</tr>
+							<tr>
+								<td>{l s='Convenience Fee (Tax excl.):' mod='hotelreservationsystem'}</td>
+								<td class="text-right" id="cart_convenience_fee">
+									{if isset($cart_amount_convenience_fee)}{convertPrice price=$cart_amount_convenience_fee}{else}{convertPrice price=0}{/if}
+								</td>
+							</tr>
+							<tr>
+								<th>{l s='Total Amount (Tax excl.):' mod='hotelreservationsystem'}</th>
+								<th class="text-right" id="cart_total_amt">
 									{if isset($cart_tamount)}{convertPrice price=$cart_tamount}{else}{convertPrice price=0}{/if}
 								</th>
-								<th colspan="1"></th>
 							</tr>
 						</table>
 					</div>
