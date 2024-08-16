@@ -6203,11 +6203,13 @@ class AdminOrdersControllerCore extends AdminController
             $objHotelBookingDetail = new HotelBookingDetail($objRoomTypeServiceProductOrderDetail->id_htl_booking_detail);
             $res = true;
             if (!$response['hasError']) {
-                $oldPriceTaxExcl = $objRoomTypeServiceProductOrderDetail->unit_price_tax_excl;
-                $oldPriceTaxIncl = $objRoomTypeServiceProductOrderDetail->unit_price_tax_incl;
+                $oldUnitPriceTaxExcl = $objRoomTypeServiceProductOrderDetail->unit_price_tax_excl;
+                $oldUnitPriceTaxIncl = $objRoomTypeServiceProductOrderDetail->unit_price_tax_incl;
+                $oldTotalPriceTaxExcl = $objRoomTypeServiceProductOrderDetail->total_price_tax_excl;
+                $oldTotalPriceTaxIncl = $objRoomTypeServiceProductOrderDetail->total_price_tax_incl;
                 $oldQuantity = $objRoomTypeServiceProductOrderDetail->quantity;
                 if ($oldPriceTaxExcl > 0) {
-                    $oldTaxMultiplier = $oldPriceTaxIncl / $oldPriceTaxExcl;
+                    $oldTaxMultiplier = $oldUnitPriceTaxIncl / $oldUnitPriceTaxExcl;
                 } else {
                     $oldTaxMultiplier = 1;
                 }
@@ -6227,8 +6229,8 @@ class AdminOrdersControllerCore extends AdminController
                 $objRoomTypeServiceProductOrderDetail->total_price_tax_incl = Tools::ps_round($objRoomTypeServiceProductOrderDetail->unit_price_tax_incl * $quantity, 6);
                 if ($res &= $objRoomTypeServiceProductOrderDetail->save()) {
                     $order = new Order($objRoomTypeServiceProductOrderDetail->id_order);
-                    $priceDiffTaxExcl = $objRoomTypeServiceProductOrderDetail->total_price_tax_excl - $oldPriceTaxExcl;
-                    $priceDiffTaxIncl = $objRoomTypeServiceProductOrderDetail->total_price_tax_incl - $oldPriceTaxIncl;
+                    $priceDiffTaxExcl = $objRoomTypeServiceProductOrderDetail->total_price_tax_excl - $oldTotalPriceTaxExcl;
+                    $priceDiffTaxIncl = $objRoomTypeServiceProductOrderDetail->total_price_tax_incl - $oldTotalPriceTaxIncl;
                     $quantityDiff = $objRoomTypeServiceProductOrderDetail->quantity - $oldQuantity;
 
                     $objOrderDetail->product_quantity += $quantityDiff;
