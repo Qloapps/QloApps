@@ -653,7 +653,18 @@ class ProductControllerCore extends FrontController
         // calculate room type price first
         $useTax = HotelBookingDetail::useTax();
         $totalPrice = 0;
-        $productPriceWithoutReduction = $objProduct->getPriceWithoutReduct(!$useTax);
+        $priceWithoutDiscount = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice(
+            $idProduct,
+            $dateFrom,
+            $dateTo,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0
+        );
         $roomTypeDateRangePrice = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice(
             $idProduct,
             $dateFrom,
@@ -669,6 +680,8 @@ class ProductControllerCore extends FrontController
                 true
             );
             $roomTypeDateRangePrice = $roomTypeDateRangePrice['total_price_tax_incl'];
+            $totalPriceWithoutDiscount = $priceWithoutDiscount['total_price_tax_incl'];
+
         } else {
             $featurePrice = HotelRoomTypeFeaturePricing::getRoomTypeFeaturePricesPerDay(
                 $idProduct,
@@ -677,9 +690,10 @@ class ProductControllerCore extends FrontController
                 false
             );
             $roomTypeDateRangePrice = $roomTypeDateRangePrice['total_price_tax_excl'];
+            $totalPriceWithoutDiscount = $priceWithoutDiscount['total_price_tax_excl'];
         }
-        $featurePriceDiff = (float) ($productPriceWithoutReduction - $featurePrice);
 
+        $totalPriceWithoutDiscount *= $quantity;
         $totalRoomPrice = $roomTypeDateRangePrice * $quantity;
         // calculate demand price now
         $demandsPricePerRoom = 0;
@@ -767,7 +781,6 @@ class ProductControllerCore extends FrontController
         $demandsPrice = $demandsPricePerRoom * $quantity;
         // calculate total price
         $totalPrice = $totalRoomPrice + $demandsPrice;
-        $totalPriceWithoutDiscount = $objProduct->getPriceWithoutReduct(!$useTax, false, 6, 1) * $numDays * $quantity;
         // send occupancy information searched by the user
         if ($occupancy && is_array($occupancy)) {
             $smartyVars['occupancies'] = $occupancy;
