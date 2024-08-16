@@ -4,7 +4,9 @@
 Hi,
 
 Regarding your newsletter subscription, we are pleased to offer
-you the following voucher: {discount}
+you the welcome voucher: {discount}
+
+Please note that the voucher will be valid on your first order.
 
 {shop_name} [/{shop_url}] powered by Webkul(tm)
 [https://webkul.com]
