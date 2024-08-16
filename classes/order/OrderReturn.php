@@ -206,6 +206,11 @@ class OrderReturnCore extends ObjectModel
             $objBookingDemands = new HotelBookingDemands();
             $objRoomTypeServiceProductOrderDetail = new RoomTypeServiceProductOrderDetail();
 
+            $calcServicePriceFirst = false;
+            if ($objOrder->is_advance_payment && $objOrder->advance_paid_amount <= $objOrder->total_paid_real) {
+                $calcServicePriceFirst = true;
+            }
+
             foreach ($returnDetails as $key => &$bookingRow) {
                 if ($skipReqCompletedNonRefunded) {
                     $objReturnState = new OrderReturnState($bookingRow['id_return_state']);
@@ -219,24 +224,27 @@ class OrderReturnCore extends ObjectModel
                     $bookingRow['extra_service_total_paid_amount'] = 0;
                     $bookingRow['extra_service_total_price_tax_incl'] = 0;
                     $bookingRow['room_paid_amount'] = 0;
-                    if ($bookingRow['total_price_tax_incl'] > 0) {
-                        if ($objOrder->total_paid_real > 0) {
-                            $bookingRow['room_paid_amount'] = ($objOrder->total_paid_real*$bookingRow['total_price_tax_incl'])/$objOrder->total_paid_tax_incl;
-                        }
-                    }
+
                     $roomSelectedDemands = $objBookingDemands->getRoomTypeBookingExtraDemands(
                         $idOrder,
                         $bookingRow['id_product'],
                         $bookingRow['id_room'],
                         $bookingRow['date_from'],
                         $bookingRow['date_to'],
-                        0
+                        0,
+                        0,
+                        1,
+                        $bookingRow['id']
                     );
                     if (count($roomSelectedDemands)) {
                         foreach ($roomSelectedDemands as $demand) {
                             if ($demand['total_price_tax_incl'] > 0) {
                                 if ($objOrder->total_paid_real > 0) {
-                                    $bookingRow['extra_service_total_paid_amount'] += ($objOrder->total_paid_real*$demand['total_price_tax_incl'])/$objOrder->total_paid_tax_incl;
+                                    if ($calcServicePriceFirst) {
+                                        $bookingRow['extra_service_total_paid_amount'] += $demand['total_price_tax_incl'];
+                                    } else {
+                                        $bookingRow['extra_service_total_paid_amount'] += ($objOrder->total_paid_real*$demand['total_price_tax_incl'])/($objOrder->total_paid_tax_incl + $objOrder->total_discounts_tax_incl);
+                                    }
                                 }
                                 $bookingRow['extra_service_total_price_tax_incl'] += $demand['total_price_tax_incl'];
                             }
@@ -250,10 +258,24 @@ class OrderReturnCore extends ObjectModel
                             foreach ($roomSelectedServices['additional_services'] as $service) {
                                 if ($service['total_price_tax_incl'] > 0) {
                                     if ($objOrder->total_paid_real > 0) {
-                                        $bookingRow['extra_service_total_paid_amount'] += ($objOrder->total_paid_real*$service['total_price_tax_incl'])/$objOrder->total_paid_tax_incl;
+                                        if ($calcServicePriceFirst) {
+                                            $bookingRow['extra_service_total_paid_amount'] += $service['total_price_tax_incl'];
+                                        } else {
+                                            $bookingRow['extra_service_total_paid_amount'] += ($objOrder->total_paid_real*$service['total_price_tax_incl'])/($objOrder->total_paid_tax_incl + $objOrder->total_discounts_tax_incl);
+                                        }
                                     }
                                     $bookingRow['extra_service_total_price_tax_incl'] += $service['total_price_tax_incl'];
                                 }
+                            }
+                        }
+                    }
+                    if ($bookingRow['total_price_tax_incl'] > 0) {
+                        if ($objOrder->total_paid_real > 0) {
+                            if ($calcServicePriceFirst) {
+                                $totalRoomShare = ($objOrder->total_paid_real*($bookingRow['total_price_tax_incl'] + $bookingRow['extra_service_total_price_tax_incl'])/ ($objOrder->total_paid_tax_incl + $objOrder->total_discounts_tax_incl));
+                                $bookingRow['room_paid_amount'] += $totalRoomShare - $bookingRow['extra_service_total_price_tax_incl'];
+                            } else {
+                                $bookingRow['room_paid_amount'] = ($objOrder->total_paid_real*$bookingRow['total_price_tax_incl'])/ ($objOrder->total_paid_tax_incl + $objOrder->total_discounts_tax_incl);
                             }
                         }
                     }

@@ -584,7 +584,7 @@
 
                                         <dd><b><i class="icon-calendar"></i> &nbsp; {$customer->date_add|date_format:"%d %b, %Y"}</b> ({l s='Member since'})</dd>
                                         <dd><b><i class="icon-list"></i> &nbsp; {$customerStats['nb_orders']|intval}</b> ({l s='Total valid order placed'})</dd>
-                                        <dd><b><i class="icon-credit-card"></i> &nbsp; {displayPrice price=Tools::ps_round(Tools::convertPrice($customerStats['total_orders'], $currency), 2) currency=$currency->id}</b> ({l s='Total spent since registration'})</dd>
+                                        <dd><b><i class="icon-credit-card"></i> &nbsp; {displayPrice price=Tools::ps_round(Tools::convertPrice($customerStats['total_spent'], $currency), 2) currency=$currency->id}</b> ({l s='Total spent since registration'})</dd>
                                         {if Configuration::get('PS_B2B_ENABLE')}
                                             <dd><b>{$customer->siret}</b> ({l s='Siret'})</dd>
                                             <dd><b>{$customer->ape|date_format:"%d %b, %Y"}</b> ({l s='APE'})</dd>
@@ -855,6 +855,8 @@
                             {assign var=room_price_tax_incl value=$order->getTotalProductsWithTaxes(false, true)}
                             {assign var=service_products_price_tax_excl value=$order->getTotalProductsWithoutTaxes(false, false, Product::SERVICE_PRODUCT_WITHOUT_ROOMTYPE)}
                             {assign var=service_products_price_tax_incl value=$order->getTotalProductsWithTaxes(false, false, Product::SERVICE_PRODUCT_WITHOUT_ROOMTYPE)}
+                            {assign var=convenience_fee_price_tax_excl value=$order->getTotalProductsWithoutTaxes(false, false, Product::SERVICE_PRODUCT_WITH_ROOMTYPE, 1, Product::PRICE_ADDITION_TYPE_INDEPENDENT)}
+                            {assign var=convenience_fee_price_tax_incl value=$order->getTotalProductsWithTaxes(false, false, Product::SERVICE_PRODUCT_WITH_ROOMTYPE, 1, Product::PRICE_ADDITION_TYPE_INDEPENDENT)}
                             {assign var=additional_service_price_tax_excl value=($order->getTotalProductsWithoutTaxes(false, false, Product::SERVICE_PRODUCT_WITH_ROOMTYPE) + $totalDemandsPriceTE)}
                             {assign var=additional_service_price_tax_incl value=($order->getTotalProductsWithTaxes(false, false, Product::SERVICE_PRODUCT_WITH_ROOMTYPE) + $totalDemandsPriceTI)}
                             {if $room_price_tax_excl}
@@ -870,7 +872,7 @@
                                 <tr id="total_products">
                                     <td class="text-right">{l s='Total Extra services (Tax excl.)'}</td>
                                     <td class="amount text-right nowrap">
-                                        {displayPrice price=($additional_service_price_tax_excl - $totalConvenienceFeeTE) currency=$currency->id}
+                                        {displayPrice price=($additional_service_price_tax_excl - $convenience_fee_price_tax_excl) currency=$currency->id}
                                     </td>
                                     <td class="partial_refund_fields current-edit" style="display:none;"></td>
                                 </tr>
@@ -885,11 +887,11 @@
                                 </tr>
                             {/if}
 
-                            {if isset($totalConvenienceFeeTE) && $totalConvenienceFeeTE > 0}
+                            {if isset($convenience_fee_price_tax_excl) && $convenience_fee_price_tax_excl > 0}
                                 <tr id="total_products">
                                     <td class="text-right">{l s='Convenience Fee (Tax excl.)'}</td>
                                     <td class="amount text-right nowrap">
-                                        {displayPrice price=$totalConvenienceFeeTE currency=$currency->id}
+                                        {displayPrice price=$convenience_fee_price_tax_excl currency=$currency->id}
                                     </td>
                                     <td class="partial_refund_fields current-edit" style="display:none;"></td>
                                 </tr>
@@ -908,16 +910,16 @@
                                 <tr id="total_tax_order">
                                     <td class="text-right">{l s='Extra services Tax'}</td>
                                     <td class="text-right nowrap">
-                                        {displayPrice price=(($additional_service_price_tax_incl - $additional_service_price_tax_excl) - ($totalConvenienceFeeTI - $totalConvenienceFeeTE)) currency=$currency->id}
+                                        {displayPrice price=(($additional_service_price_tax_incl - $additional_service_price_tax_excl) - ($convenience_fee_price_tax_incl - $convenience_fee_price_tax_excl)) currency=$currency->id}
                                     </td>
                                     <td class="partial_refund_fields current-edit" style="display:none;"></td>
                                 </tr>
                             {/if}
-                            {if isset($totalConvenienceFeeTE) && $totalConvenienceFeeTE > 0}
+                            {if isset($convenience_fee_price_tax_excl) && $convenience_fee_price_tax_excl > 0}
                                 <tr id="total_products">
                                     <td class="text-right">{l s='Convenience Fee Tax'}</td>
                                     <td class="amount text-right nowrap">
-                                        {displayPrice price=($totalConvenienceFeeTI - $totalConvenienceFeeTE) currency=$currency->id}
+                                        {displayPrice price=($convenience_fee_price_tax_incl - $convenience_fee_price_tax_excl) currency=$currency->id}
                                     </td>
                                     <td class="partial_refund_fields current-edit" style="display:none;"></td>
                                 </tr>
@@ -1026,7 +1028,7 @@
                                                 </td>
                                                 {if $can_edit}
                                                     <td class="text-center">
-                                                        <a class="btn btn-default" href="{$current_index}&amp;submitDeleteVoucher&amp;id_order_cart_rule={$discount['id_order_cart_rule']}&amp;id_order={$order->id}&amp;token={$smarty.get.token|escape:'html':'UTF-8'}"><i class="icon-trash"></i></a>
+                                                        <a class="btn btn-default delete-voucher" href="{$current_index}&amp;submitDeleteVoucher&amp;id_order_cart_rule={$discount['id_order_cart_rule']}&amp;id_order={$order->id}&amp;token={$smarty.get.token|escape:'html':'UTF-8'}"><i class="icon-trash"></i></a>
                                                     </td>
                                                 {/if}
                                             </tr>
@@ -1098,13 +1100,13 @@
                 </div>
             {/if}
 
-            <div class="col-lg-4 col-sm-6 col-xs-12">
+            <div class="col-lg-4 col-sm-6 col-xs-12 hidden-print">
                 <div class="panel">
                     <div class="panel-heading">
                         <i class="icon-envelope"></i> &nbsp;{l s='Messages'} <span class="badge">{sizeof($customer_thread_message)}</span>
                         <a href="{$link->getAdminLink('AdminCustomerThreads')|escape:'html':'UTF-8'}&amp;id_order={$order->id|intval}" class="pull-right">{l s='Show all messages'}</a>
                     </div>
-                    <div id="messages" class="hidden-print">
+                    <div id="messages">
                         <form action="{$smarty.server.REQUEST_URI|escape:'html':'UTF-8'}&amp;token={$smarty.get.token|escape:'html':'UTF-8'}" method="post" onsubmit="if (getE('visibility').checked == true) return confirm('{l s='Do you want to send this message to the customer?'}');">
                             <div id="message" class="form-horizontal">
                                 <div class="form-group">
