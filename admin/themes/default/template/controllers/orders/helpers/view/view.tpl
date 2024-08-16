@@ -855,6 +855,8 @@
                             {assign var=room_price_tax_incl value=$order->getTotalProductsWithTaxes(false, true)}
                             {assign var=service_products_price_tax_excl value=$order->getTotalProductsWithoutTaxes(false, false, Product::SERVICE_PRODUCT_WITHOUT_ROOMTYPE)}
                             {assign var=service_products_price_tax_incl value=$order->getTotalProductsWithTaxes(false, false, Product::SERVICE_PRODUCT_WITHOUT_ROOMTYPE)}
+                            {assign var=convenience_fee_price_tax_excl value=$order->getTotalProductsWithoutTaxes(false, false, Product::SERVICE_PRODUCT_WITH_ROOMTYPE, 1, Product::PRICE_ADDITION_TYPE_INDEPENDENT)}
+                            {assign var=convenience_fee_price_tax_incl value=$order->getTotalProductsWithTaxes(false, false, Product::SERVICE_PRODUCT_WITH_ROOMTYPE, 1, Product::PRICE_ADDITION_TYPE_INDEPENDENT)}
                             {assign var=additional_service_price_tax_excl value=($order->getTotalProductsWithoutTaxes(false, false, Product::SERVICE_PRODUCT_WITH_ROOMTYPE) + $totalDemandsPriceTE)}
                             {assign var=additional_service_price_tax_incl value=($order->getTotalProductsWithTaxes(false, false, Product::SERVICE_PRODUCT_WITH_ROOMTYPE) + $totalDemandsPriceTI)}
                             {if $room_price_tax_excl}
@@ -870,7 +872,7 @@
                                 <tr id="total_products">
                                     <td class="text-right">{l s='Total Extra services (Tax excl.)'}</td>
                                     <td class="amount text-right nowrap">
-                                        {displayPrice price=($additional_service_price_tax_excl - $totalConvenienceFeeTE) currency=$currency->id}
+                                        {displayPrice price=($additional_service_price_tax_excl - $convenience_fee_price_tax_excl) currency=$currency->id}
                                     </td>
                                     <td class="partial_refund_fields current-edit" style="display:none;"></td>
                                 </tr>
@@ -885,7 +887,7 @@
                                 </tr>
                             {/if}
 
-                            {if isset($totalConvenienceFeeTE) && $totalConvenienceFeeTE > 0}
+                            {if isset($convenience_fee_price_tax_excl) && $convenience_fee_price_tax_excl > 0}
                                 <tr id="total_products">
                                     <td class="text-right">
                                         {l s='Convenience Fee (Tax excl.)'}
@@ -1130,13 +1132,13 @@
                 </div>
             {/if}
 
-            <div class="col-lg-4 col-sm-6 col-xs-12">
+            <div class="col-lg-4 col-sm-6 col-xs-12 hidden-print">
                 <div class="panel">
                     <div class="panel-heading">
                         <i class="icon-envelope"></i> &nbsp;{l s='Messages'} <span class="badge">{sizeof($customer_thread_message)}</span>
                         <a href="{$link->getAdminLink('AdminCustomerThreads')|escape:'html':'UTF-8'}&amp;id_order={$order->id|intval}" class="pull-right">{l s='Show all messages'}</a>
                     </div>
-                    <div id="messages" class="hidden-print">
+                    <div id="messages">
                         <form action="{$smarty.server.REQUEST_URI|escape:'html':'UTF-8'}&amp;token={$smarty.get.token|escape:'html':'UTF-8'}" method="post" onsubmit="if (getE('visibility').checked == true) return confirm('{l s='Do you want to send this message to the customer?'}');">
                             <div id="message" class="form-horizontal">
                                 <div class="form-group">
