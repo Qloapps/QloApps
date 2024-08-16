@@ -247,8 +247,6 @@ abstract class PaymentModuleCore extends Module
             // Make sure CartRule caches are empty
             CartRule::cleanCache();
             $cart_rules = $this->context->cart->getCartRules();
-            $appliedCartRules = array();
-            $orderTotals = array();
             foreach ($cart_rules as $cart_rule) {
                 if (($rule = new CartRule((int)$cart_rule['obj']->id)) && Validate::isLoadedObject($rule)) {
                     if ($error = $rule->checkValidity($this->context, true, true)) {
@@ -263,28 +261,11 @@ abstract class PaymentModuleCore extends Module
                             $error = sprintf(Tools::displayError('CartRule ID %1s (%2s) used in this cart is not valid and has been withdrawn from cart'), (int)$rule->id, $rule_name);
                             PrestaShopLogger::addLog($error, 3, '0000002', 'Cart', (int)$this->context->cart->id);
                         }
-                    } else {
-                        $appliedCartRules[$rule->id] = array(
-                            'obj' => $cart_rule['obj'],
-                            'tax' => $cart_rule['obj']->reduction_tax,
-                            'reduction_amount' => $rule->reduction_amount,
-                            'available_for_use' => array(),
-                            'used' => array(
-                                'excl' => 0,
-                                'incl' => 0
-                            )
-                        );
-                        if ((int) $rule->reduction_currency !== (int) $this->context->cart->id_currency) {
-                            $appliedCartRules[$rule->id]['reduction_amount'] = Tools::convertPriceFull(
-                                $rule->reduction_amount,
-                                new Currency($rule->reduction_currency),
-                                new Currency($this->context->cart->id_currency)
-                            );
-                        }
                     }
                 }
             }
 
+            $orderTotals = array();
             Hook::exec('actionPackageListGenerateOrder', array('package_list' => &$package_list));
             foreach ($package_list as $id_address => $packageByAddress) {
                 foreach ($packageByAddress as $id_package => $package) {
@@ -384,6 +365,7 @@ abstract class PaymentModuleCore extends Module
 
                     // advance payment information
                     $order->is_advance_payment = $this->context->cart->is_advance_payment;
+                    $order->amount_paid = 0;
                     if ($order->is_advance_payment) {
                         $order->advance_paid_amount = (float)Tools::ps_round(
                             (float)$this->context->cart->getOrderTotal(true, Cart::ADVANCE_PAYMENT, $order->product_list, $id_carrier),
@@ -410,6 +392,7 @@ abstract class PaymentModuleCore extends Module
 
                     // Creating order
                     $result = $order->add();
+                    $orderTotals[$order->id] = array('incl' => $order->total_products_wt, 'excl' => $order->total_products);
 
                     if (!$result) {
                         PrestaShopLogger::addLog('PaymentModule::validateOrder - Order cannot be created', 3, null, 'Cart', (int)$id_cart, true);
@@ -512,11 +495,11 @@ abstract class PaymentModuleCore extends Module
             // Make sure CartRule caches are empty
             CartRule::cleanCache();
             $objRoomType = new HotelRoomType();
+            $cart_rules = $this->context->cart->getCartRules();
             foreach ($order_detail_list as $key => $order_detail) {
                 /** @var OrderDetail $order_detail */
 
                 $order = $order_list[$key];
-                $orderTotals[$order->id] = array('incl' => $order->total_products_wt, 'excl' => $order->total_products);
                 if (!$order_creation_failed && isset($order->id)) {
                     // first set if_hotel as 0 and get the hotel id from room type info -> below
                     $idHotel = 0;
@@ -625,7 +608,7 @@ abstract class PaymentModuleCore extends Module
                     }
 
                     $cart_rules_list = array();
-                    foreach ($cart_rules as $cart_rule) {
+                    foreach ($cart_rules as $key => $cart_rule) {
                         if ($cart_rule['obj']->reduction_product > 0 && !$order->orderContainProduct($cart_rule['obj']->reduction_product)) {
                             continue;
                         }
@@ -640,10 +623,34 @@ abstract class PaymentModuleCore extends Module
                         if (!$values['tax_excl']) {
                             continue;
                         }
-                        if (!isset($appliedCartRules[$cart_rule['obj']->id]['available_for_use'][$order->id])) {
-                            $appliedCartRules[$cart_rule['obj']->id]['available_for_use'][$order->id];
+
+                        $used = array('incl' => 0, 'excl' => 0);
+                        if (!isset($cart_rules[$key]['remaining'])) {
+                            $cart_rules[$key]['remaining'] = $cart_rule['reduction_amount'];
                         }
-                        $appliedCartRules[$cart_rule['obj']->id]['available_for_use'][$order->id] = $values;
+                        if ($cart_rule['reduction_tax']) {
+                            if ($orderTotals[$order->id]['incl'] > $values['tax_incl']) {
+                                $used['incl'] = $values['tax_incl'];
+                                $used['excl'] = $values['tax_excl'];
+                            } else {
+                                $used['incl'] = $orderTotals[$order->id]['incl'];
+                                $used['excl'] = $orderTotals[$order->id]['excl'];
+                            }
+                            $orderTotals[$order->id]['incl'] -= $used['incl'];
+                            $orderTotals[$order->id]['excl'] -= $used['excl'];
+                            $cart_rules[$key]['remaining'] -= $used['incl'];
+                        } else {
+                            if ($orderTotals[$order->id]['excl'] > $values['tax_excl']) {
+                                $used['incl'] = $values['tax_incl'];
+                                $used['excl'] = $values['tax_excl'];
+                            } else {
+                                $used['incl'] = $orderTotals[$order->id]['incl'];
+                                $used['excl'] = $orderTotals[$order->id]['excl'];
+                            }
+                            $orderTotals[$order->id]['incl'] -= $used['incl'];
+                            $orderTotals[$order->id]['excl'] -= $used['excl'];
+                            $cart_rules[$key]['remaining'] -= $used['excl'];
+                        }
 
                         $order->addCartRule($cart_rule['obj']->id, $cart_rule['obj']->name, $values, 0, $cart_rule['obj']->free_shipping);
 
@@ -1372,40 +1379,10 @@ abstract class PaymentModuleCore extends Module
                 }
             } // End foreach $order_detail_list
 
-            if (count($appliedCartRules)) {
-                // check if any cart rules have available reduction_amount remaining and are partiall applied
-                foreach ($appliedCartRules as $idCartRule => $cartRule) {
-                    if (count($cartRule['available_for_use'])) {
-                        foreach ($cartRule['available_for_use'] as $idOrder => $cartValOrders) {
-                            if (isset($orderTotals[$idOrder])) {
-                                if ($orderTotals[$idOrder]['excl'] > $cartRule['available_for_use'][$idOrder]['tax_excl']) {
-                                    $appliedCartRules[$idCartRule]['used']['excl'] += $cartRule['available_for_use'][$idOrder]['tax_excl'];
-                                    $orderTotals[$idOrder]['excl'] -= $cartRule['available_for_use'][$idOrder]['tax_excl'];
-                                } else {
-                                    $appliedCartRules[$idCartRule]['used']['excl'] += $orderTotals[$idOrder]['excl'];
-                                    $orderTotals[$idOrder]['excl'] = 0;
-                                }
-                                if ($orderTotals[$idOrder]['incl'] > $cartRule['available_for_use'][$idOrder]['tax_incl']) {
-                                    $appliedCartRules[$idCartRule]['used']['incl'] += $cartRule['available_for_use'][$idOrder]['tax_incl'];
-                                    $orderTotals[$idOrder]['incl'] -= $cartRule['available_for_use'][$idOrder]['tax_incl'];
-                                } else {
-                                    $appliedCartRules[$idCartRule]['used']['incl'] += $orderTotals[$idOrder]['incl'];
-                                    $orderTotals[$idOrder]['incl'] = 0;
-                                }
-                            }
-                        }
-                    }
-                }
+            if (count($cart_rules)) {
+                foreach ($cart_rules as $idCartRule => $cartRule) {
 
-                foreach ($appliedCartRules as $idCartRule => $cartRule) {
-                    $remaining_amount = 0;
-                    if (!$cartRule['tax'] && $cartRule['used']['excl'] && $cartRule['reduction_amount'] > $cartRule['used']['excl']) {
-                        $remaining_amount = $cartRule['reduction_amount'] - $cartRule['used']['excl'];
-                    } elseif ($cartRule['tax'] && $cartRule['used']['incl'] && $cartRule['reduction_amount'] > $cartRule['used']['incl']) {
-                        $remaining_amount = $cartRule['reduction_amount'] - $cartRule['used']['incl'];
-                    }
-
-                    if ($remaining_amount > 0 && $cartRule['obj']->partial_use == 1) {
+                    if ($cartRule['remaining'] > 0 && $cartRule['obj']->partial_use == 1) {
                         // IF
                         //	The value of the voucher is greater than the used value
                         //	Partial use is allowed
@@ -1428,7 +1405,7 @@ abstract class PaymentModuleCore extends Module
                         }
 
                         // Set the new voucher value
-                        $voucher->reduction_amount = $remaining_amount;
+                        $voucher->reduction_amount = $cartRule['remaining'];
                         if ($voucher->reduction_tax) {
                             // Add total shipping amout only if reduction amount > total shipping
                             if ($voucher->free_shipping == 1 && $voucher->reduction_amount >= $order->total_shipping_tax_incl) {

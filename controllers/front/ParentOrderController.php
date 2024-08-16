@@ -106,15 +106,19 @@ class ParentOrderControllerCore extends FrontController
                         $this->errors[] = Tools::displayError('The voucher code is invalid.');
                     } else {
                         if (($cartRule = new CartRule(CartRule::getIdByCode($code))) && Validate::isLoadedObject($cartRule)) {
-                            if ($error = $cartRule->checkValidity($this->context, false, true)) {
-                                $this->errors[] = $error;
-                            } else {
-                                $this->context->cart->addCartRule($cartRule->id);
-                                CartRule::autoAddToCart($this->context);
-                                if (Configuration::get('PS_ORDER_PROCESS_TYPE') == 1) {
-                                    Tools::redirect('index.php?controller=order-opc&addingCartRule=1');
+                            if ($this->context->cart->getOrderTotal(true, Cart::BOTH) > 0) {
+                                if ($error = $cartRule->checkValidity($this->context, false, true)) {
+                                    $this->errors[] = $error;
+                                } else {
+                                    $this->context->cart->addCartRule($cartRule->id);
+                                    CartRule::autoAddToCart($this->context);
+                                    if (Configuration::get('PS_ORDER_PROCESS_TYPE') == 1) {
+                                        Tools::redirect('index.php?controller=order-opc&addingCartRule=1');
+                                    }
+                                    Tools::redirect('index.php?controller=order&addingCartRule=1');
                                 }
-                                Tools::redirect('index.php?controller=order&addingCartRule=1');
+                            } else {
+                                $this->errors[] = Tools::displayError('You cannot add any more voucher.');
                             }
                         } else {
                             $this->errors[] = Tools::displayError('This voucher does not exists.');

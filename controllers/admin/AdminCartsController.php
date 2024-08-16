@@ -713,6 +713,9 @@ class AdminCartsControllerCore extends AdminController
             } elseif ($err = $cart_rule->checkValidity($this->context)) {
                 $errors[] = $err;
             }
+            if ($this->context->cart->getOrderTotal(true, Cart::BOTH) <= 0) {
+                $errors[] = Tools::displayError('Cannot add any more voucher.');
+            }
             if (!count($errors)) {
                 if (!$this->context->cart->addCartRule((int)$cart_rule->id)) {
                     $errors[] = Tools::displayError('Can\'t add the voucher.');
