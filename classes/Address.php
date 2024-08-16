@@ -568,7 +568,7 @@ class AddressCore extends ObjectModel
                 && (!$this->id_state || !Validate::isLoadedObject($objState = new State((int) $this->id_state)))
             ) {
                 $message = Tools::displayError('Invalid Id state');
-            } else if ($objState->id && ($objCountry->id != $objState->id_country)) {
+            } else if (isset($objState) && ($objCountry->id != $objState->id_country)) {
                 $message = Tools::displayError('The given provided Id state does not belongs to the provided Id country');
             } else if ($objCountry->zip_code_format && !$objCountry->checkZipCode($this->postcode)) {
                 $message = Tools::displayError('Your Zip/postal code is incorrect');
