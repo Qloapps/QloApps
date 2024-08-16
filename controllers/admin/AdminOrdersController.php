@@ -2752,30 +2752,6 @@ class AdminOrdersControllerCore extends AdminController
             $objBookingDemand = new HotelBookingDemands();
             $objHotelRoomType = new HotelRoomType();
             foreach ($order_detail_data as $key => $value) {
-                $roomTypeAutoAddedService = $objRoomTypeServiceProductOrderDetail->getroomTypeServiceProducts(
-                    $order->id,
-                    0,
-                    0,
-                    $value['id_product'],
-                    0,
-                    0,
-                    0,
-                    0,
-                    null,
-                    1,
-                    Product::PRICE_ADDITION_TYPE_INDEPENDENT
-                );
-                if (isset($roomTypeAutoAddedService[$value['id']]['additional_services'])) {
-                    foreach($roomTypeAutoAddedService[$value['id']]['additional_services'] as $service) {
-                        if (isset($bookingAutoAddedServices[$service['id_product']])) {
-                            $bookingAutoAddedServices[$service['id_product']]['total_price_tax_excl'] += $service['total_price_tax_excl'];
-                        } else {
-                            $bookingAutoAddedServices[$service['id_product']]['name'] = $service['name'];
-                            $bookingAutoAddedServices[$service['id_product']]['total_price_tax_excl'] = $service['total_price_tax_excl'];
-                        }
-                    }
-                }
-
                 $order_detail_data[$key]['total_room_price_te'] = $value['total_price_tax_excl'];
                 $order_detail_data[$key]['total_room_price_ti'] = $value['total_price_tax_incl'];
 
@@ -2906,6 +2882,34 @@ class AdminOrdersControllerCore extends AdminController
         } else {
             $order_detail_data = array();
         }
+
+        if ($orderedRooms = $objRoomTypeServiceProductOrderDetail->getroomTypeServiceProducts(
+            $order->id,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            null,
+            1,
+            Product::PRICE_ADDITION_TYPE_INDEPENDENT
+        )) {
+            foreach($orderedRooms as $orderedRoom) {
+                if (isset($orderedRoom['additional_services']) && $orderedRoom['additional_services']) {
+                    foreach ($orderedRoom['additional_services'] as $service) {
+                        if (isset($bookingAutoAddedServices[$service['id_product']])) {
+                            $bookingAutoAddedServices[$service['id_product']]['total_price_tax_excl'] += $service['total_price_tax_excl'];
+                        } else {
+                            $bookingAutoAddedServices[$service['id_product']]['name'] = $service['name'];
+                            $bookingAutoAddedServices[$service['id_product']]['total_price_tax_excl'] = $service['total_price_tax_excl'];
+                        }
+                    }
+                }
+            }
+        }
+
 
         $objOrderReturn = new OrderReturn();
         $refundedAmount = 0;

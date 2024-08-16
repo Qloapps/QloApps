@@ -837,7 +837,7 @@
             <div class="col-lg-4 col-sm-6 col-xs-12 pull-right">
                 <div class="panel panel-total">
                     <div class="table-responsive">
-                        <table class="table" id="order-details">
+                        <table class="table" id="order-details-price">
                             {* Assign order price *}
                             {if ($order->getTaxCalculationMethod() == $smarty.const.PS_TAX_EXC)}
                                 {assign var=order_product_price value=($order->total_products)}
@@ -896,7 +896,7 @@
                                         {/if}
                                     </td>
                                     <td class="amount text-right nowrap">
-                                        {displayPrice price=$totalConvenienceFeeTE currency=$currency->id}
+                                        {displayPrice price=$convenience_fee_price_tax_excl currency=$currency->id}
                                     </td>
                                     <td class="partial_refund_fields current-edit" style="display:none;"></td>
                                 </tr>
@@ -942,20 +942,20 @@
                                                         </td>
                                                     </tr>
                                                 {/if}
-                                                {if isset($additional_service_price_tax_incl) && (($additional_service_price_tax_incl - $additional_service_price_tax_excl) - ($totalConvenienceFeeTI - $totalConvenienceFeeTE)) > 0}
+                                                {if isset($additional_service_price_tax_incl) && (($additional_service_price_tax_incl - $additional_service_price_tax_excl) - ($convenience_fee_price_tax_incl - $convenience_fee_price_tax_excl)) > 0}
                                                     <tr>
                                                         <td class="text-left">{l s='Extra services Tax'}</td>
                                                         <td class="text-right nowrap">
-                                                            {displayPrice price=(($additional_service_price_tax_incl - $additional_service_price_tax_excl) - ($totalConvenienceFeeTI - $totalConvenienceFeeTE)) currency=$currency->id}
+                                                            {displayPrice price=(($additional_service_price_tax_incl - $additional_service_price_tax_excl) - ($convenience_fee_price_tax_incl - $convenience_fee_price_tax_excl)) currency=$currency->id}
                                                         </td>
                                                         <td class="partial_refund_fields current-edit" style="display:none;"></td>
                                                     </tr>
                                                 {/if}
-                                                {if isset($totalConvenienceFeeTE) && $totalConvenienceFeeTE > 0}
+                                                {if isset($convenience_fee_price_tax_excl) && $convenience_fee_price_tax_excl > 0}
                                                     <tr id="total_products">
                                                         <td class="text-left">{l s='Convenience Fee Tax'}</td>
                                                         <td class="amount text-right nowrap">
-                                                            {displayPrice price=($totalConvenienceFeeTI - $totalConvenienceFeeTE) currency=$currency->id}
+                                                            {displayPrice price=($convenience_fee_price_tax_incl - $convenience_fee_price_tax_excl) currency=$currency->id}
                                                         </td>
                                                         <td class="partial_refund_fields current-edit" style="display:none;"></td>
                                                     </tr>
