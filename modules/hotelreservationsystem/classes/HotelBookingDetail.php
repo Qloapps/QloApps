@@ -2545,12 +2545,16 @@ class HotelBookingDetail extends ObjectModel
      * @param int    $id_customer [description]
      * @return [type] [description]
      */
-    public function getOnlyOrderBookingData($id_order, $id_guest, $id_product, $id_customer = 0)
+    public function getOnlyOrderBookingData($id_order, $id_guest, $id_product, $id_customer = 0, $id_order_detail = 0)
     {
         $sql = 'SELECT hbd.*, od.`unit_price_tax_incl`, od.`unit_price_tax_excl`, od.`reduction_amount_tax_excl`,
         od.`reduction_amount_tax_incl` FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
         INNER JOIN `'._DB_PREFIX_.'order_detail` od ON (od.`id_order_detail` = hbd.`id_order_detail`)
         WHERE hbd.`id_order` = '.(int)$id_order.' AND hbd.`id_product` = '.(int)$id_product;
+
+        if ($id_order_detail) {
+            $sql .=  ' AND hbd.`id_order_detail` = '.(int)$id_order_detail;
+        }
 
         if ($id_customer) {
             $sql .=  ' AND hbd.`id_customer` = '.(int)$id_customer;
@@ -3194,7 +3198,10 @@ class HotelBookingDetail extends ObjectModel
                     $this->id_room,
                     $this->date_from,
                     $this->date_to,
-                    0
+                    0,
+                    0,
+                    1,
+                    $this->id
                 )) {
                     foreach ($roomDemands as $roomDemand) {
                         $objHotelBookingDemands = new HotelBookingDemands($roomDemand['id_booking_demand']);
