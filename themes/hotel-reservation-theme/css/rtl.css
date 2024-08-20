@@ -80,6 +80,16 @@ ul.footer_links li .button.button-small span i {
   }
 }
 
+.room_price_detail_block [class*=col],
+#checkout-guest-info-block [class*=col],
+.cart_product_line [class*=col],
+.room_duration_block [class*=col],
+.avail_vouchers_block [class*=col],
+#order-opc .cart_total_detail_block .cart_total_values,
+#order-opc .avail_vouchers_block .avail_voucher_name>.voucher_name {
+  float: right !important;
+}
+
 .booking-actions-wrap .btn.pull-right {
   float: left !important;
   margin-left: unset;
