@@ -1083,6 +1083,11 @@
 #popup-view-extra-services .tab-content .room_demand_block:not(:last-of-type) {
     margin-bottom: 12px;
 }
+.payment-summary tr, .guest-details tr {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
 
 /* Guest Tracking page styles - start */
 .transform-account .card-text p {
