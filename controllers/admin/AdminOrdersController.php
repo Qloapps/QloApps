@@ -4621,6 +4621,9 @@ class AdminOrdersControllerCore extends AdminController
             $order_invoice = new OrderInvoice((int) Tools::getValue('product_invoice'));
         }
         /*By webkul To edit Order and cart entries when edit rooms from the orderLine when editing the order*/
+        $obj_booking_detail = new HotelBookingDetail((int) Tools::getValue('id_booking_detail'));
+        $cart = new Cart($obj_booking_detail->id_cart);
+
         $product_informations = $_POST['edit_product'];
         $new_date_from = trim(date('Y-m-d', strtotime($product_informations['date_from'])));
         $new_date_to = trim(date('Y-m-d', strtotime($product_informations['date_to'])));
@@ -4630,7 +4633,6 @@ class AdminOrdersControllerCore extends AdminController
         $id_room = trim(Tools::getValue('id_room'));
         $id_product = trim(Tools::getValue('id_product'));
         $room_unit_price = trim(Tools::getValue('room_unit_price'));
-        $obj_booking_detail = new HotelBookingDetail();
         $product_quantity = (int) $obj_booking_detail->getNumberOfDays($new_date_from, $new_date_to);
         $old_product_quantity =  (int) $obj_booking_detail->getNumberOfDays($old_date_from, $old_date_to);
         $qty_diff = $product_quantity - $old_product_quantity;
@@ -4638,9 +4640,6 @@ class AdminOrdersControllerCore extends AdminController
         $adults = $occupancy['adults'];
         $children = $occupancy['children'];
         $child_ages = $occupancy['child_ages'];
-
-        $bookingInfo = $obj_booking_detail->getRowByIdOrderIdProductInDateRange($id_order, $id_product, $old_date_from, $old_date_to, $id_room);
-        $cart = new Cart($bookingInfo['id_cart']);
 
         // By webkul to calculate rates of the product from hotelreservationsystem tables with feature prices....
         // add feature price for updated price
@@ -4823,7 +4822,7 @@ class AdminOrdersControllerCore extends AdminController
                 $cartQty = -$cartQty;
             }
 
-            $cart->updateQty($cartQty, $bookingInfo['id_product'], null, false, $op, 0, null, true);
+            $cart->updateQty($cartQty, $obj_booking_detail->id_product, null, false, $op, 0, null, true);
         }
 
         // Update product available quantity
@@ -4890,20 +4889,26 @@ class AdminOrdersControllerCore extends AdminController
             0,
             0,
             0,
-            $old_date_from,
-            $old_date_to,
+            0,
+            0,
             $id_room,
             0,
             null,
-            null
+            0,
+            null,
+            $obj_booking_detail->id
         );
 
         $extraDemands = $objBookingDemand->getRoomTypeBookingExtraDemands(
             $id_order,
             0,
             $id_room,
-            $old_date_from,
-            $old_date_to
+            0,
+            0,
+            1,
+            0,
+            1,
+            $obj_booking_detail->id
         );
 
         // set occupancy details
@@ -4919,7 +4924,7 @@ class AdminOrdersControllerCore extends AdminController
             'tax_incl' => $totalRoomPriceAfterTI,
         );
 
-        if ($update_htl_tables = $obj_booking_detail->UpdateHotelCartHotelOrderOnOrderEdit(
+        if ($obj_booking_detail->updateHotelCartHotelOrderOnOrderEdit(
             $id_order,
             $id_room,
             $old_date_from,
@@ -4927,7 +4932,8 @@ class AdminOrdersControllerCore extends AdminController
             $new_date_from,
             $new_date_to,
             $occupancy,
-            $new_total_price
+            $new_total_price,
+            $obj_booking_detail->id
         )) {
             // update extra demands total prices if dates are changes (price calc method for each day)
             if ($extraDemands) {
@@ -5465,8 +5471,8 @@ class AdminOrdersControllerCore extends AdminController
         OrderReturnDetail::deleteReturnDetailByIdBookingDetail($id_order, $idHotelBooking);
 
         // Reducing the quantity from the cart after removing the room from the order
-        $objCart = new Cart($bookingInfo['id_cart']);
-        $objCart->updateQty($product_quantity, $bookingInfo['id_product'], null, false, 'down', 0, null, true);
+        $objCart = new Cart($objBookingDetail->id_cart);
+        $objCart->updateQty($product_quantity, $objBookingDetail->id_product, null, false, 'down', 0, null, true);
 
         // Assign to smarty informations in order to show the new product line
         $this->context->smarty->assign(array(
@@ -6211,7 +6217,7 @@ class AdminOrdersControllerCore extends AdminController
                 $oldTotalPriceTaxExcl = $objRoomTypeServiceProductOrderDetail->total_price_tax_excl;
                 $oldTotalPriceTaxIncl = $objRoomTypeServiceProductOrderDetail->total_price_tax_incl;
                 $oldQuantity = $objRoomTypeServiceProductOrderDetail->quantity;
-                if ($oldPriceTaxExcl > 0) {
+                if ($oldUnitPriceTaxExcl > 0) {
                     $oldTaxMultiplier = $oldUnitPriceTaxIncl / $oldUnitPriceTaxExcl;
                 } else {
                     $oldTaxMultiplier = 1;

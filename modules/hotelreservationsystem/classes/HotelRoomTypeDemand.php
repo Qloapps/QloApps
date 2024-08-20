@@ -336,8 +336,11 @@ class HotelRoomTypeDemand extends ObjectModel
                     $price = $objGlobalDemand->price;
                 }
             }
+
+            // since this will update the custom price according to the default currency, which is not required for custom price
+            $price = Tools::convertPrice($price, $idCurrency);
         }
-        $price = Tools::convertPrice($price, $idCurrency);
+
         // Tax calculation section
         $address->id_country = $idCountry;
         $address->id_state = $idState;
