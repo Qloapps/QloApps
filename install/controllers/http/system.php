@@ -94,6 +94,7 @@ class InstallControllerHttpSystem extends InstallControllerHttp
                         'pdo_mysql' => $this->l('PDO MySQL extension is not loaded'),
                         'curl' => $this->l('Curl extension is not loaded'),
                         'soap' => $this->l('SOAP extension is not loaded'),
+                        'openssl' => $this->l('OpenSSL extension is not loaded.'),
                         'simplexml' => $this->l('SimpleXml extension is not loaded'),
                         'memory_limit' => $this->l('In the PHP configuration set memory_limit to minimum 128M'),
                         'max_execution_time' => $this->l('In the PHP configuration set max_execution_time to minimum 500'),
