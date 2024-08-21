@@ -515,6 +515,9 @@ class CartRuleCore extends ObjectModel
             return false;
         }
 
+        if (!$alreadyInCart && $context->cart->getOrderTotal(true, Cart::BOTH) <= 0) {
+            return (!$display_error) ? false : Tools::displayError('You cannot add any more voucher.');
+        }
         if (!$this->active) {
             return (!$display_error) ? false : Tools::displayError('This voucher is disabled');
         }
