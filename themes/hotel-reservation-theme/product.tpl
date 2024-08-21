@@ -252,6 +252,16 @@
 												</div>
 											</div>
 										{/if}
+										{if isset($hotel_description) && $hotel_description}
+											<div class="info_margin_div">
+												<div class="room_info_heading">
+													<span>{l s='Hotel Description'}</span>
+												</div>
+												<div class="room_info_content">
+													{$hotel_description}
+												</div>
+											</div>
+										{/if}
 									{/if}
 									{if isset($hotel_has_images) && $hotel_has_images}
 										<div class="room_info_hotel_images_wrap">
