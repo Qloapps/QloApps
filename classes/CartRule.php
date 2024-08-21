@@ -518,9 +518,7 @@ class CartRuleCore extends ObjectModel
         }
 
         /*
-         * Custom cart rule validation from modules. Allows to create infinite possibilities of rules.
-         *
-         * If null is provided, nothing happens and built-in validation is ran. Useful if you want your own conditions,
+         * If null is provided, default validation will be processed. Useful if you want your own conditions,
          * but also want to retain functionality of the core.
          *
          * If true is provided, the validation ends here and the rule is VALID, ignoring the rest of core validation.
