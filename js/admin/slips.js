@@ -48,4 +48,56 @@ $(document).ready(function() {
             }
         },
     });
+
+    $('.change_status').on('click', function (e) {
+        e.preventDefault();
+        var id_order_slip = $.trim($(this).closest('tr').find('td[data-key="id_order_slip"]').text());
+        processupdate(id_order_slip, $(this).attr('href'))
+        return false;
+    });
+
+    function processupdate(id_order_slip, link)
+    {
+        confirmDelete(id_order_slip).then((toUpdate) => {
+            if (toUpdate) {
+                window.location = link;
+            }
+        });
+
+    }
+
+    function confirmDelete(id_order_slip)
+    {
+        return new Promise((resolve) => {
+            $.ajax({
+                type: 'POST',
+                url: admin_order_slip_tab_link,
+                dataType: 'JSON',
+                cache: false,
+                data: {
+                    ajax: true,
+                    action: 'initSlipStatusModal',
+                    id_order_slip: id_order_slip
+                },
+                success: function(result) {
+                    if (result.success && result.modalHtml) {
+                        $('#moduleConfirmUpdate').remove();
+                        $('#footer').next('.bootstrap').append(result.modalHtml);
+                        $('#moduleConfirmUpdate').modal('show');
+                        $('#moduleConfirmUpdate .process_update').click(() => {
+                            resolve(true);
+                        });
+                        $('#moduleConfirmUpdate .btn-close').click(() => {
+                            resolve(false);
+                        });
+                    } else {
+                        resolve(true);
+                    }
+                },
+                complete: function() {
+                    $(".loading_overlay").hide();
+                }
+            });
+        });
+    }
 });
