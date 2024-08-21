@@ -464,6 +464,8 @@ class AuthControllerCore extends FrontController
 
                     if (!count($this->errors)) {
                         if ($customer->add()) {
+                            $phone = Tools::getValue('phone');
+                            CartCustomerGuestDetail::updateCustomerPhoneNumber($customer->email, $phone);
                             if (!$customer->is_guest) {
                                 if (!$this->sendConfirmationMail($customer)) {
                                     $this->errors[] = Tools::displayError('The email cannot be sent.');
