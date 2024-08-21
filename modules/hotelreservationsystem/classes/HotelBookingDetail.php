@@ -1525,66 +1525,64 @@ class HotelBookingDetail extends ObjectModel
                 $objRoomType = new HotelRoomType();
 
                 foreach ($bookingData['rm_data'] as $key => $value) {
-                    if (count($value['data']['available'])) {
-                        $product_feature = Product::getFrontFeaturesStatic($this->context->language->id, $value['id_product']);
-                        $prod_amen = array();
-                        if (!empty($amenities) && $amenities) {
-                            $prod_amen = $amenities;
-                            foreach ($product_feature as $a_key => $a_val) {
-                                if (($pa_key = array_search($a_val['id_feature'], $prod_amen)) !== false) {
-                                    unset($prod_amen[$pa_key]);
-                                    if (empty($prod_amen)) {
-                                        break;
-                                    }
+                    $product_feature = Product::getFrontFeaturesStatic($this->context->language->id, $value['id_product']);
+                    $prod_amen = array();
+                    if (!empty($amenities) && $amenities) {
+                        $prod_amen = $amenities;
+                        foreach ($product_feature as $a_key => $a_val) {
+                            if (($pa_key = array_search($a_val['id_feature'], $prod_amen)) !== false) {
+                                unset($prod_amen[$pa_key]);
+                                if (empty($prod_amen)) {
+                                    break;
                                 }
                             }
-                            if (!empty($prod_amen)) {
-                                unset($bookingData['rm_data'][$key]);
-                                continue;
-                            }
                         }
-                        $productFeaturePrice = HotelRoomTypeFeaturePricing::getRoomTypeFeaturePricesPerDay($value['id_product'], $date_from, $date_to, self::useTax());
-                        if (!empty($price) && ($price['from'] > $productFeaturePrice || $price['to'] < $productFeaturePrice)) {
+                        if (!empty($prod_amen)) {
                             unset($bookingData['rm_data'][$key]);
                             continue;
                         }
+                    }
+                    $productFeaturePrice = HotelRoomTypeFeaturePricing::getRoomTypeFeaturePricesPerDay($value['id_product'], $date_from, $date_to, self::useTax());
+                    if (!empty($price) && ($price['from'] > $productFeaturePrice || $price['to'] < $productFeaturePrice)) {
+                        unset($bookingData['rm_data'][$key]);
+                        continue;
+                    }
 
-                        $prod_price = Product::getPriceStatic($value['id_product'], self::useTax());
-                        $productPriceWithoutReduction = Product::getPriceWithoutReductStatic($value['id_product'], !self::useTax());
-                        $productFeaturePriceWithoutAutoAdd = HotelRoomTypeFeaturePricing::getRoomTypeFeaturePricesPerDay($value['id_product'], $date_from, $date_to, self::useTax(), 0, 0, 0, 0, 0);
-                        $cover_image_arr = Product::getCover($value['id_product']);
-                        if (!empty($cover_image_arr)) {
-                            $cover_img = $this->context->link->getImageLink($value['link_rewrite'], $value['id_product'].'-'.$cover_image_arr['id_image'], 'home_default');
-                        } else {
-                            $cover_img = $this->context->link->getImageLink($value['link_rewrite'], $this->context->language->iso_code.'-default', 'home_default');
-                        }
-                        $bookingData['rm_data'][$key]['image'] = $cover_img;
-                        $bookingData['rm_data'][$key]['feature'] = $product_feature;
-                        $bookingData['rm_data'][$key]['price'] = $prod_price;
-                        $bookingData['rm_data'][$key]['feature_price'] = $productFeaturePrice;
-                        $bookingData['rm_data'][$key]['feature_price_withoout_auto_add'] = $productFeaturePriceWithoutAutoAdd;
-                        $bookingData['rm_data'][$key]['price_without_reduction'] = $productPriceWithoutReduction;
-                        $bookingData['rm_data'][$key]['price_without_reduction_with_auto_add'] = $productPriceWithoutReduction + ($productFeaturePrice - $productFeaturePriceWithoutAutoAdd);
-                        $bookingData['rm_data'][$key]['feature_price_diff'] = $bookingData['rm_data'][$key]['price_without_reduction_with_auto_add'] - $productFeaturePrice;
-                        $bookingData['rm_data'][$key]['room_left'] = count($bookingData['rm_data'][$key]['data']['available']);
+                    $prod_price = Product::getPriceStatic($value['id_product'], self::useTax());
+                    $productPriceWithoutReduction = Product::getPriceWithoutReductStatic($value['id_product'], !self::useTax());
+                    $productFeaturePriceWithoutAutoAdd = HotelRoomTypeFeaturePricing::getRoomTypeFeaturePricesPerDay($value['id_product'], $date_from, $date_to, self::useTax(), 0, 0, 0, 0, 0);
+                    $cover_image_arr = Product::getCover($value['id_product']);
+                    if (!empty($cover_image_arr)) {
+                        $cover_img = $this->context->link->getImageLink($value['link_rewrite'], $value['id_product'].'-'.$cover_image_arr['id_image'], 'home_default');
+                    } else {
+                        $cover_img = $this->context->link->getImageLink($value['link_rewrite'], $this->context->language->iso_code.'-default', 'home_default');
+                    }
+                    $bookingData['rm_data'][$key]['image'] = $cover_img;
+                    $bookingData['rm_data'][$key]['feature'] = $product_feature;
+                    $bookingData['rm_data'][$key]['price'] = $prod_price;
+                    $bookingData['rm_data'][$key]['feature_price'] = $productFeaturePrice;
+                    $bookingData['rm_data'][$key]['feature_price_withoout_auto_add'] = $productFeaturePriceWithoutAutoAdd;
+                    $bookingData['rm_data'][$key]['price_without_reduction'] = $productPriceWithoutReduction;
+                    $bookingData['rm_data'][$key]['price_without_reduction_with_auto_add'] = $productPriceWithoutReduction + ($productFeaturePrice - $productFeaturePriceWithoutAutoAdd);
+                    $bookingData['rm_data'][$key]['feature_price_diff'] = $bookingData['rm_data'][$key]['price_without_reduction_with_auto_add'] - $productFeaturePrice;
+                    $bookingData['rm_data'][$key]['room_left'] = count($bookingData['rm_data'][$key]['data']['available']);
 
-                        // create URL with the parameters from URL
-                        $urlData = array ('date_from' => $date_from, 'date_to' => $date_to);
-                        if (!isset($occupancy)) {
-                            $occupancy = Tools::getValue('occupancy');
-                        }
-                        if ($occupancy) {
-                            $urlData['occupancy'] = $occupancy;
-                        }
-                        if ($location = Tools::getValue('location')) {
-                            $urlData['location'] = $location;
-                        }
+                    // create URL with the parameters from URL
+                    $urlData = array ('date_from' => $date_from, 'date_to' => $date_to);
+                    if (!isset($occupancy)) {
+                        $occupancy = Tools::getValue('occupancy');
+                    }
+                    if ($occupancy) {
+                        $urlData['occupancy'] = $occupancy;
+                    }
+                    if ($location = Tools::getValue('location')) {
+                        $urlData['location'] = $location;
+                    }
 
-                        if (Configuration::get('PS_REWRITING_SETTINGS')) {
-                            $bookingData['rm_data'][$key]['product_link'] = $this->context->link->getProductLink($value['id_product']).'?'.http_build_query($urlData);
-                        } else {
-                            $bookingData['rm_data'][$key]['product_link'] = $this->context->link->getProductLink($value['id_product']).'&'.http_build_query($urlData);
-                        }
+                    if (Configuration::get('PS_REWRITING_SETTINGS')) {
+                        $bookingData['rm_data'][$key]['product_link'] = $this->context->link->getProductLink($value['id_product']).'?'.http_build_query($urlData);
+                    } else {
+                        $bookingData['rm_data'][$key]['product_link'] = $this->context->link->getProductLink($value['id_product']).'&'.http_build_query($urlData);
                     }
                 }
             }

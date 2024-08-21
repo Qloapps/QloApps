@@ -298,9 +298,6 @@ class HotelRoomType extends ObjectModel
             $sql .= ' INNER JOIN `'._DB_PREFIX_.'htl_branch_info` hbi ON (hbi.`id` = hrt.`id_hotel`)
             INNER JOIN `'._DB_PREFIX_.'category_product` cp ON cp.`id_category` = hbi.`id_category` AND cp.`id_product` = hrt.`id_product`';
         }
-        if ($fullDetail) {
-
-        }
 
         $sql .= 'WHERE hrt.`id_product` IN ('.$roomTypesList.')
         GROUP BY hrt.`id_product`'.
