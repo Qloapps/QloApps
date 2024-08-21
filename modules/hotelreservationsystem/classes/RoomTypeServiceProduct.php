@@ -135,7 +135,7 @@ class RoomTypeServiceProduct extends ObjectModel
         return Db::getInstance()->getValue($sql);
     }
 
-    public static function getAutoAddServices($idProduct, $dateFrom = null, $dateTo = null, $priceAdditionType = null, $useTax = null, $idCart = 0, $idGuest = 0)
+    public static function getAutoAddServices($idProduct, $dateFrom = null, $dateTo = null, $priceAdditionType = null, $useTax = null, $idCart = 0, $idGuest = 0, $use_reduc = 1)
     {
         if (Product::isBookingProduct($idProduct)) {
             $sql = 'SELECT p.`id_product` FROM  `'._DB_PREFIX_.'htl_room_type_service_product` rsp
@@ -157,7 +157,10 @@ class RoomTypeServiceProduct extends ObjectModel
                         1,
                         $dateFrom,
                         $dateTo,
-                        $useTax
+                        $useTax,
+                        false,
+                        null,
+                        $use_reduc
                     );
                 }
                 return $services;
