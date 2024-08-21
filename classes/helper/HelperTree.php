@@ -114,7 +114,7 @@ class HelperTreeCore extends TreeCore
 
         if ($this->useSearch()) {
             $this->addAction(new TreeToolbarSearch(
-                'dasdasd',
+                $this->getId().' search',
                 $this->getId().'-search')
             );
             $this->setAttribute('use_search', $this->useSearch());

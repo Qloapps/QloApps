@@ -2565,30 +2565,33 @@ class HotelHelper
         $treeData = array();
 
         if ($rootNode == self::NODE_COUNTRY) {
-            $treeData = self::generateCountryTree($selectedElements, $leafNode, $rootNodeId);
+            $treeData = self::generateCountryNodes($rootNodeId, $leafNode, $selectedElements);
         } else if ($rootNode == self::NODE_STATE) {
-            $treeData = self::generateStateTree($selectedElements, $leafNode, $rootNodeId);
+            $treeData = self::generateStateNodes($rootNodeId, $leafNode, $selectedElements);
         } else if ($rootNode == self::NODE_CITY) {
-            $treeData = self::generateCityTree($selectedElements, $leafNode, $rootNodeId);
+            $treeData = self::generateCityNodes($rootNodeId, $leafNode, $selectedElements);
         } else if ($rootNode == self::NODE_HOTEL) {
-            $treeData = self::generateHotelTree($selectedElements, $leafNode, $rootNodeId);
+            $treeData = self::generateHotelNodes($rootNodeId, $leafNode, $selectedElements);
         } else if ($rootNode == self::NODE_ROOM_TYPE) {
-            $treeData = self::generateRoomTypeTree($selectedElements, $leafNode, $rootNodeId);
+            $treeData = self::generateRoomTypeNodes($rootNodeId, $leafNode, $selectedElements);
         } else if ($rootNode == self::NODE_ROOM) {
-            $treeData = self::generateRoomTree($selectedElements, $leafNode, $rootNodeId);
+            $treeData = self::generateRoomNodes($rootNodeId, $leafNode, $selectedElements);
         }
 
         return $treeData;
     }
 
-    public static function generateCountryTree($selectedElements, $leafNode, $rootNodeId, $previousElements = false)
+    /**
+     * Generate the node data for country
+     */
+    protected static function generateCountryNodes($rootNodeId, $leafNode, $selectedElements, $previousElements = false)
     {
         $return = array();
         $countries = self::getcategoryByParent($previousElements, 3, 'country', $rootNodeId);
-        $stateIds = array_column($countries, 'value');
+        $countriesIds = array_column($countries, 'value');
 
         if ($leafNode > self::NODE_COUNTRY) {
-            $states = self::generateStateTree($selectedElements, $leafNode, false, $stateIds);
+            $states = self::generateStateNodes(false, $leafNode, $selectedElements, $countriesIds);
         }
 
         foreach ($countries as $country) {
@@ -2609,14 +2612,18 @@ class HotelHelper
 
         return $return;
     }
-    public static function generateStateTree($selectedElements, $leafNode, $rootNodeId, $previousElements = false)
+
+    /**
+     * Generate the node data for state
+     */
+    protected static function generateStateNodes($rootNodeId, $leafNode, $selectedElements, $previousElements = false)
     {
         $return = array();
         $states = self::getcategoryByParent($previousElements, 4, 'state', $rootNodeId);
         $stateIds = array_column($states, 'value');
 
         if ($leafNode > self::NODE_STATE) {
-            $cities = self::generateCityTree($selectedElements, $leafNode, false, $stateIds);
+            $cities = self::generateCityNodes(false, $leafNode, $selectedElements, $stateIds);
         }
 
         foreach ($states as $state) {
@@ -2637,14 +2644,18 @@ class HotelHelper
 
         return $return;
     }
-    public static function generateCityTree($selectedElements, $leafNode, $rootNodeId, $previousElements = false)
+
+    /**
+     * Generate the node data for city
+     */
+    protected static function generateCityNodes($rootNodeId, $leafNode, $selectedElements, $previousElements = false)
     {
         $return = array();
         $cities = self::getcategoryByParent($previousElements, 5, 'city', $rootNodeId);
         $cityIds = array_column($cities, 'value');
 
         if ($leafNode > self::NODE_CITY) {
-            $hotels = self::generateHotelTree($selectedElements, $leafNode, false, $cityIds);
+            $hotels = self::generateHotelNodes(false, $leafNode, $selectedElements, $cityIds);
         }
 
         foreach ($cities as $city) {
@@ -2666,14 +2677,17 @@ class HotelHelper
         return $return;
     }
 
-    public static function generateHotelTree($selectedElements, $leafNode, $rootNodeId, $previousElements = false)
+    /**
+     * Generate the node data for hotels
+     */
+    protected static function generateHotelNodes($rootNodeId, $leafNode, $selectedElements, $previousElements = false)
     {
         $return = array();
         $hotels = self::getHotelsByIdCity($previousElements, $rootNodeId);
         $hotelIds = array_column($hotels, 'value');
 
         if ($leafNode > self::NODE_HOTEL) {
-            $roomTypes = self::generateRoomTypeTree($selectedElements, $leafNode, false, $hotelIds);
+            $roomTypes = self::generateRoomTypeNodes(false, $leafNode, $selectedElements, $hotelIds);
         }
 
         foreach ($hotels as $hotel) {
@@ -2695,14 +2709,17 @@ class HotelHelper
         return $return;
     }
 
-    public static function generateRoomTypeTree($selectedElements, $leafNode, $rootNodeId, $previousElements = false)
+    /**
+     * Generate the node data for room types
+     */
+    protected static function generateRoomTypeNodes($rootNodeId, $leafNode, $selectedElements, $previousElements = false)
     {
         $return = array();
         $roomTypes = self::getRoomTypesByHotelsId($previousElements, $rootNodeId);
         $roomTypeIds = array_column($roomTypes, 'value');
 
         if ($leafNode > self::NODE_ROOM_TYPE) {
-            $rooms = self::generateRoomTree($selectedElements, $leafNode, false, $roomTypeIds);
+            $rooms = self::generateRoomNodes(false, $leafNode, $selectedElements, $roomTypeIds);
         }
 
         foreach ($roomTypes as $roomType) {
@@ -2713,7 +2730,11 @@ class HotelHelper
             if (isset($rooms[$roomType['value']])) {
                 $roomType['children'] = $rooms[$roomType['value']];
             }
-
+            $roomType['hint'] = 'This is Room type hint';
+            $roomType['badge'] = array(
+                'class' => 'badge-danger',
+                'title' => 'Disabled'
+            );
             if ($previousElements) {
                 $return[$roomType['id_hotel']][] = $roomType;
             } else {
@@ -2724,7 +2745,10 @@ class HotelHelper
         return $return;
     }
 
-    public static function generateRoomTree($selectedElements, $leafNode, $rootNodeId, $previousElements = false)
+    /**
+     * Generate the node data for rooms
+     */
+    protected static function generateRoomNodes($rootNodeId, $leafNode, $selectedElements, $previousElements = false)
     {
         $return = array();
         $rooms = self::getRoomsByRoomTypeId($previousElements, $rootNodeId);
@@ -2744,7 +2768,10 @@ class HotelHelper
         return $return;
     }
 
-    public static function getcategoryByParent($idParents, $levelDepth, $input_name, $rootNodeId)
+    /**
+     * Get all the children category of the provided id categories
+     */
+    protected static function getcategoryByParent($idParents, $levelDepth, $input_name, $rootNodeId)
     {
         $locationCategory = new Category(Configuration::get('PS_LOCATIONS_CATEGORY'));
         $sql = 'SELECT c.`id_category` as `value` , cl.`name`, "'.pSQL($input_name).'_box" as `input_name`, c.`id_parent`
@@ -2764,7 +2791,10 @@ class HotelHelper
         return Db::getInstance()->executeS($sql);
     }
 
-    public static function getHotelsByIdCity($cities, $rootNodeId)
+    /**
+     * Get all the hotels of the passed cities (city id_category)
+     */
+    protected static function getHotelsByIdCity($cities, $rootNodeId)
     {
 
         $sql = 'SELECT hbi.`id` as `value` , hbil.`hotel_name` as `name`, "hotel_box" as `input_name`, c.`id_parent`
@@ -2783,7 +2813,10 @@ class HotelHelper
         return Db::getInstance()->executeS($sql);
     }
 
-    public static function getRoomTypesByHotelsId($hotels, $rootNodeId)
+    /**
+     * Get all the room types of the passed hotels
+     */
+    protected static function getRoomTypesByHotelsId($hotels, $rootNodeId)
     {
         $sql = 'SELECT p.`id_product` AS `value`, pl.`name`, "room_type_box" as `input_name`, rt.`id_hotel`
 			FROM `'._DB_PREFIX_.'htl_room_type` AS rt';
@@ -2803,7 +2836,10 @@ class HotelHelper
         return Db::getInstance()->executeS($sql);
     }
 
-    public static function getRoomsByRoomTypeId($roomTypes, $rootNodeId)
+    /**
+     * Get all the rooms of the passed room types (city id_category)
+     */
+    protected static function getRoomsByRoomTypeId($roomTypes, $rootNodeId)
     {
         $sql = 'SELECT `id` as `value`, `room_num` as `name`, "room_box" as `input_name`, `id_product`
         FROM `'._DB_PREFIX_.'htl_room_information`
