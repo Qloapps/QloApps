@@ -38,7 +38,7 @@
                     </p>
                     <div class="panel-action clearfix">
                         <span class="module-price">{if isset($element->price)}{if $element->price|floatval == 0}{l s='Free'}{else}{$element->price_formatted}{/if}{/if}</span>
-                        {if isset($element->type) && $element->type == 'addonsMustHave' && !$element->not_on_disk}<span class="label label-primary">{l s='In library'}</span>{/if}
+                        {if isset($element->type) && $element->type == 'addonsMustHave' && !$element->not_on_disk}&nbsp;<span class="label label-primary">{l s='In Module Directory'}</span>{/if}
                         {if isset($element->type) && $element->type == 'addonsMustHave' && $element->not_on_disk}
                             <a class="btn button-action pull-right btn-primary _blank" href="{$element->addons_buy_url|replace:' ':'+'|escape:'html':'UTF-8'}">{l s='Explore'}</a>
                         {else}
