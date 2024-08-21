@@ -774,7 +774,8 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
         $id_cart = 0,
         $id_guest = 0,
         $id_room = 0,
-        $with_auto_room_services = 1
+        $with_auto_room_services = 1,
+        $use_reduc = 1
     ) {
         $dateFrom = date('Y-m-d', strtotime($date_from));
         $dateTo = date('Y-m-d', strtotime($date_to));
@@ -787,7 +788,8 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
             $id_cart,
             $id_guest,
             $id_room,
-            $with_auto_room_services
+            $with_auto_room_services,
+            $use_reduc
         );
 
         $totalDurationPriceTI = $totalDurationPrice['total_price_tax_incl'];

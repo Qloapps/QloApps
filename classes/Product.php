@@ -3494,20 +3494,6 @@ class ProductCore extends ObjectModel
         return $price;
     }
 
-    public static function getPriceWithoutReductStatic($id_product, $notax = false, $id_product_attribute = false, $decimals = 6, $with_auto_add_services = 0)
-    {
-        $price = Product::getPriceStatic((int)$id_product, !$notax, $id_product_attribute, $decimals, null, false, false);
-        if ($with_auto_add_services) {
-            if ($services = RoomTypeServiceProduct::getAutoAddServices((int) $id_product, null, null, Product::PRICE_ADDITION_TYPE_WITH_ROOM, !$notax)) {
-                foreach($services as $service) {
-                    $price += $service['price'];
-                }
-            }
-        }
-
-        return $price;
-    }
-
     /**
     * Display price with right format and currency
     *
