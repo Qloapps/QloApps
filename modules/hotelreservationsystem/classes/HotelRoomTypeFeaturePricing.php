@@ -82,10 +82,6 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
     protected $webserviceParameters = array(
         'objectsNodeName' => 'feature_prices',
         'objectNodeName' => 'feature_price',
-        'objectMethods' => array(
-            'add' => 'addWs',
-            'update' => 'updateWs',
-        ),
         'fields' => array(
             'id_product' => array(
                 'xlink_resource' => array(
@@ -919,72 +915,37 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
         return true;
     }
 
-    // Webservice :: function will run when feature price added from API
-    public function addWs($autodate = true, $null_values = false)
+    public function validateFields($die = true, $error_return = false)
     {
-        $postData = trim(file_get_contents('php://input'));
-        libxml_use_internal_errors(true);
-        $xml = simplexml_load_string(utf8_decode($postData));
-        $postFieldsObj = json_decode(json_encode($xml));
-
-        // we will check this also as empty value comes in empty std class
-        $specialDaysArray = (array) $postFieldsObj->feature_price->special_days;
-
-        if (!empty($postFieldsObj->feature_price->special_days)
-            && $postFieldsObj->feature_price->special_days
-            && $specialDaysArray
-        ) {
+        if (isset($this->webservice_validation) && $this->webservice_validation) {
             $weekDays = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
-            $specialDays = json_decode($postFieldsObj->feature_price->special_days, true);
-            if (is_array($specialDays) && $specialDays) {
-                if (count(array_diff($specialDays, $weekDays))) {
-                    WebserviceRequest::getInstance()->setError(400, 'Invalid special days. format must match with : ["mon", "tue", "wed", "thu", "fri", "sat", "sun"]', 134);
-
-                    return false;
+            if($this->is_special_days_exists) {
+                if ($this->special_days
+                    && ($specialDays = json_decode($this->special_days, true))
+                ) {
+                    if (is_array($specialDays) && $specialDays) {
+                        if (count(array_diff($specialDays, $weekDays))) {
+                            $message = Tools::displayError('Invalid special days. format must match with : ["mon", "tue", "wed", "thu", "fri", "sat", "sun"]', false);
+                        }
+                    } else {
+                        $message = Tools::displayError('Invalid special days. format must match with : ["mon", "tue", "wed", "thu", "fri", "sat", "sun"]', false);
+                    }
+                } else {
+                    $message = Tools::displayError('Invalid special days. format must match with : ["mon", "tue", "wed", "thu", "fri", "sat", "sun"]', false);
                 }
-            } else {
-                WebserviceRequest::getInstance()->setError(400, 'Invalid special days. format must match with : ["mon", "tue", "wed", "thu", "fri", "sat", "sun"]', 134);
+            }
 
-                return false;
+            if (isset($message) && $message != '') {
+                if ($die) {
+                    throw new PrestaShopException($message);
+                }
+
+                return $error_return ? $message : false;
             }
         }
 
-        return $this->add($autodate, $null_values);
+        return parent::validateFields($die, $error_return);
     }
-
-    // Webservice :: function will run when feature price updated from API
-    public function updateWs($null_values = false)
-    {
-        $postData = trim(file_get_contents('php://input'));
-        libxml_use_internal_errors(true);
-        $xml = simplexml_load_string(utf8_decode($postData));
-        $postFieldsObj = json_decode(json_encode($xml));
-
-        // we will check this also as empty value comes in empty std class
-        $specialDaysArray = (array) $postFieldsObj->feature_price->special_days;
-
-        if (!empty($postFieldsObj->feature_price->special_days)
-            && $postFieldsObj->feature_price->special_days
-            && $specialDaysArray
-        ) {
-            $weekDays = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
-            $specialDays = json_decode($postFieldsObj->feature_price->special_days, true);
-            if (is_array($specialDays) && $specialDays) {
-                if (count(array_diff($specialDays, $weekDays))) {
-                    WebserviceRequest::getInstance()->setError(400, 'Invalid special days. format must match with : ["mon", "tue", "wed", "thu", "fri", "sat", "sun"]', 134);
-
-                    return false;
-                }
-            } else {
-                WebserviceRequest::getInstance()->setError(400, 'Invalid special days. format must match with : ["mon", "tue", "wed", "thu", "fri", "sat", "sun"]', 134);
-
-                return false;
-            }
-        }
-
-        return $this->update($null_values);
-    }
-
     public static function createAutoFeaturePrice($params)
     {
         $context = Context::getContext();
