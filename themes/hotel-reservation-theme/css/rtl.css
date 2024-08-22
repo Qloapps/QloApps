@@ -8,6 +8,18 @@
   text-align: right !important; }
 
 /* globals - start */
+.pull-left {
+  float: right !important;
+}
+.pull-right {
+  float: left !important;
+}
+.text-right {
+  text-align: left !important;
+}
+.text-left {
+  text-align: right !important;
+}
 .owl-stage-outer {
   direction: rtl !important;
 }
@@ -311,6 +323,35 @@ div.uploader .filename, div.uploader .action {
   float: right !important;
 }
 /* my account - end */
+
+/* Room type - start */
+#image-block-cont {
+  padding-left: 15px !important;
+}
+.close_room_serach_wrapper {
+  right: unset !important;
+  left: 0px;
+}
+/* Room type - end */
+
+/* order-opc - start */
+
+#order-opc .avail_vouchers_block .avail_voucher_name>.voucher_name,
+#tc_txt, .product_info_label{
+  float: right !important;
+}
+#order-opc .cart_total_detail_block .cart_total_values {
+  float: left !important;
+}
+
+/* order-opc - end */
+
+/* contact-us - start */
+
+#contact_type {
+  text-align: right !important;
+}
+/* contact-us - end */
 
 /* order-detail - start */
 @media (min-width: 576px) {

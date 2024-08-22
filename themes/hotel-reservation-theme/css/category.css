@@ -324,3 +324,7 @@ p.capa_txt {
   color:#e85757;
   font-size:18px;
 }
+
+.rm_desc .view_more {
+    display: inline-block;
+}
