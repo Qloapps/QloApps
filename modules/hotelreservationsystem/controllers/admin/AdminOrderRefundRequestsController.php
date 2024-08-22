@@ -195,7 +195,7 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
 
     public function renderView()
     {
-        if (!($objOrderReturn = $this->loadObject(true))) {
+        if (!($objOrderReturn = $this->loadObject())) {
             return;
         }
         $refundStatuses = OrderReturnStateCore::getOrderReturnStates($this->context->language->id);
@@ -245,7 +245,8 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
                 'isRefundCompleted' => $objOrderReturn->hasBeenCompleted(),
                 'paymentMethods' => $paymentMethods,
                 'name_controller' => Tools::getValue('controller'),
-                'info_icon_path' => $this->context->link->getMediaLink(_MODULE_DIR_.'hotelreservationsystem/views/img/Slices/icon-info.svg')
+                'info_icon_path' => $this->context->link->getMediaLink(_MODULE_DIR_.'hotelreservationsystem/views/img/Slices/icon-info.svg'),
+                'expiry_date' => time() + (3600 * 24 * 365.25)
             )
         );
 
@@ -266,64 +267,76 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
 
                 $idRefundState = Tools::getValue('id_refund_state');
                 if (Validate::isLoadedObject($objRefundState = new OrderReturnState($idRefundState))) {
-                    if ($objRefundState->refunded) {
-                        $refundedAmounts = Tools::getValue('refund_amounts');
-                        if ($hasOrderDiscountOrPayment) {
-                            if ($idsReturnDetail && count($idsReturnDetail)) {
-                                if ($refundedAmounts) {
-                                    foreach ($idsReturnDetail as $idRetDetail) {
-                                        if (!isset($refundedAmounts[$idRetDetail]) || !Validate::isPrice($refundedAmounts[$idRetDetail])) {
-                                            $this->errors[] = $this->l('Invalid refund amount(s) entered.');
+                    if ($idRefundState != $objOrderReturn->state) {
+                        if ($objRefundState->refunded) {
+                            $refundedAmounts = Tools::getValue('refund_amounts');
+                            if ($hasOrderDiscountOrPayment) {
+                                if ($idsReturnDetail && count($idsReturnDetail)) {
+                                    if ($refundedAmounts) {
+                                        foreach ($idsReturnDetail as $idRetDetail) {
+                                            if (!isset($refundedAmounts[$idRetDetail]) || !Validate::isPrice($refundedAmounts[$idRetDetail])) {
+                                                $this->errors[] = $this->l('Invalid refund amount(s) entered.');
+                                            }
+                                        }
+                                    } else {
+                                        $this->errors[] = $this->l('Invalid refund amount(s) entered.');
+                                    }
+
+                                    // If there are no errors in the refund amounts the check validations depends on refund amount
+                                    if (!count($this->errors)) {
+                                        $totalRefundAmount = array_sum($refundedAmounts);
+                                        if (Tools::isSubmit('generateCreditSlip')) {
+                                            if ($totalRefundAmount <= 0) {
+                                                $this->errors[] = $this->l('Invalid refund amount(s) for generating credit slip.');
+                                            }
+                                        }
+                                        if (Tools::isSubmit('generateDiscount')) {
+                                            if ($totalRefundAmount <= 0) {
+                                                $this->errors[] = $this->l('Invalid refund amount(s) for generating voucher.');
+                                            }
+                                        }
+
+                                        if (Tools::isSubmit('refundTransactionAmount')) {
+                                            if ($totalRefundAmount <= 0) {
+                                                $this->errors[] = $this->l('Invalid refund amount(s) for entering refund transaction details.');
+                                            } else {
+                                                $paymentMode = Tools::getValue('payment_method');
+                                                if (!$paymentMode) {
+                                                    $paymentMode = Tools::getValue('other_payment_mode');
+                                                    if (!$paymentMode) {
+                                                        $this->errors[] = $this->l('Please enter the payment mode of the refund transaction.');
+                                                    } elseif (!Validate::isGenericName($paymentMode)) {
+                                                        $this->errors[] = $this->l('Invalid payment mode entered.');
+                                                    }
+                                                }
+
+                                                $idTransaction = Tools::getValue('id_transaction');
+                                                if (!$idTransaction) {
+                                                    $this->errors[] = $this->l('Please enter the transaction id of the refund transaction.');
+                                                } elseif (!Validate::isGenericName($idTransaction)) {
+                                                    $this->errors[] = $this->l('Invalid transaction id entered.');
+                                                }
+                                            }
                                         }
                                     }
                                 } else {
-                                    $this->errors[] = $this->l('Invalid refund amount(s) entered.');
+                                    $this->errors[] = $this->l('Select at least one booking for refund.');
                                 }
-
-                                // If there are no errors in the refund amounts the check validations depends on refund amount
-                                if (!count($this->errors)) {
-                                    $totalRefundAmount = array_sum($refundedAmounts);
-                                    if (Tools::isSubmit('generateCreditSlip')) {
-                                        if ($totalRefundAmount <= 0) {
-                                            $this->errors[] = $this->l('Invalid refund amount(s) for generating credit slip.');
-                                        }
-                                    }
-                                    if (Tools::isSubmit('generateDiscount')) {
-                                        if ($totalRefundAmount <= 0) {
-                                            $this->errors[] = $this->l('Invalid refund amount(s) for generating voucher.');
-                                        }
-                                    }
-
-                                    if (Tools::isSubmit('refundTransactionAmount')) {
-                                        if ($totalRefundAmount <= 0) {
-                                            $this->errors[] = $this->l('Invalid refund amount(s) for entering refund transaction details.');
-                                        } else {
-                                            $paymentMode = Tools::getValue('payment_method');
-                                            if (!$paymentMode) {
-                                                $paymentMode = Tools::getValue('other_payment_mode');
-                                                if (!$paymentMode) {
-                                                    $this->errors[] = $this->l('Please enter the payment mode of the refund transaction.');
-                                                } elseif (!Validate::isGenericName($paymentMode)) {
-                                                    $this->errors[] = $this->l('Invalid payment mode entered.');
-                                                }
-                                            }
-
-                                            $idTransaction = Tools::getValue('id_transaction');
-                                            if (!$idTransaction) {
-                                                $this->errors[] = $this->l('Please enter the transaction id of the refund transaction.');
-                                            } elseif (!Validate::isGenericName($idTransaction)) {
-                                                $this->errors[] = $this->l('Invalid transaction id entered.');
-                                            }
-                                        }
-                                    }
-                                }
-                            } else {
-                                $this->errors[] = $this->l('Select at least one booking for refund.');
                             }
                         }
+                    } else {
+                        $this->errors[] = $this->l('Please select a different refund status.');
                     }
                 } else {
                     $this->errors[] = $this->l('Invalid refund state.');
+                }
+
+                if (Tools::isSubmit('generateDiscount')) {
+                    if (!$voucher_expiry_date = Tools::getValue('voucher_expiry_date')) {
+                        $this->errors[] = $this->l('Voucher expiry date is required.');
+                    } elseif (!Validate::isDate($voucher_expiry_date)) {
+                        $this->errors[] = $this->l('Invalid voucher expiry date.');
+                    }
                 }
             } else {
                 $this->errors[] = $this->l('Invalid refund information found.');
@@ -480,7 +493,12 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
                         $cartrule->id_customer = $objOrder->id_customer;
                         $now = time();
                         $cartrule->date_from = date('Y-m-d H:i:s', $now);
-                        $cartrule->date_to = date('Y-m-d H:i:s', $now + (3600 * 24 * 365.25)); /* 1 year */
+                        // generateDiscount
+                        if ($voucher_expiry_date) {
+                            $cartrule->date_to = date('Y-m-d H:i:s', strtotime($voucher_expiry_date));
+                        } else {
+                            $cartrule->date_to = date('Y-m-d H:i:s', $now + (3600 * 24 * 365.25)); /* 1 year */
+                        }
                         $cartrule->active = 1;
                         $cartrule->highlight = 1;
                         $cartrule->reduction_amount = $totalRefundedAmount;
@@ -560,6 +578,8 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
 
         if ($this->display == 'view') {
             $this->addJqueryUI('ui.tooltip', 'base', true);
+            $this->removeJS(Media::getJqueryUIPath('effects.core', 'base', false), false);
+
             $this->addJs(_MODULE_DIR_.$this->module->name.'/views/js/admin/wk_refund_request.js');
             $this->addCSS(_MODULE_DIR_.$this->module->name.'/views/css/admin/wk_refund_request.css');
         }

@@ -68,10 +68,10 @@
 				<div class="room_type_img_containter card">
 					<div class="room_hotel_name_block">
 						<div class="hotel_name_block">
-							<span>{$product->name}
+							<h1><span class="hotel_name">{$product->name}
 								{* Block for booking products *}
-								{if isset($id_hotel) && $id_hotel}&nbsp;-&nbsp;{$hotel_name}{/if}
-							</span>
+								{if isset($id_hotel) && $id_hotel}&nbsp;-&nbsp;{$hotel_name}{/if}</span>{if isset($hotel_rating) && $hotel_rating}<div id="hotel_rating">{for $i=0; $i < $hotel_rating; $i++}<i class="icon-star"></i>{/for}</div>{/if}
+							</h1>
 							{hook h='displayRoomTypeDetailRoomTypeNameBlock' id_product=$product->id}
 						</div>
 						{hook h='displayRoomTypeDetailRoomTypeNameAfter' id_product=$product->id}
@@ -249,6 +249,16 @@
 													{foreach from=$hotel_features key=ftr_k item=ftr_v}
 														<div class="col-sm-4 col-xs-12"><i class="circle-small">o</i> {$ftr_v|escape:'html':'UTF-8'}</div>
 													{/foreach}
+												</div>
+											</div>
+										{/if}
+										{if isset($hotel_description) && $hotel_description}
+											<div class="info_margin_div">
+												<div class="room_info_heading">
+													<span>{l s='Hotel Description'}</span>
+												</div>
+												<div class="room_info_content">
+													{$hotel_description}
 												</div>
 											</div>
 										{/if}
