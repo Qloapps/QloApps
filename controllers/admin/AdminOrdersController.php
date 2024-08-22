@@ -4894,8 +4894,9 @@ class AdminOrdersControllerCore extends AdminController
             $id_room,
             0,
             null,
-            0,
             null,
+            null,
+            0,
             $obj_booking_detail->id
         );
 
