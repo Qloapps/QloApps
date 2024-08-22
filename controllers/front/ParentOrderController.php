@@ -423,25 +423,6 @@ class ParentOrderControllerCore extends FrontController
 
                 $customerAddresses = array_values($customerAddresses);
 
-                if (!count($customerAddresses) && !Tools::isSubmit('ajax')) {
-                    $bad_delivery = false;
-                    if (($bad_delivery = (bool)!Address::isCountryActiveById((int)$this->context->cart->id_address_delivery)) || !Address::isCountryActiveById((int)$this->context->cart->id_address_invoice)) {
-                        $params = array();
-                        if ($this->step) {
-                            $params['step'] = (int)$this->step;
-                        }
-                        if ($multi = (int)Tools::getValue('multi-shipping')) {
-                            $params['multi-shipping'] = $multi;
-                        }
-                        $back_url = $this->context->link->getPageLink('order', true, (int)$this->context->language->id, $params);
-
-                        $params = array('back' => $back_url, 'id_address' => ($bad_delivery ? (int)$this->context->cart->id_address_delivery : (int)$this->context->cart->id_address_invoice));
-                        if ($multi) {
-                            $params['multi-shipping'] = $multi;
-                        }
-
-                    }
-                }
                 $this->context->smarty->assign(array(
                     'addresses' => $customerAddresses,
                     'formatedAddressFieldsValuesList' => $formatedAddressFieldsValuesList)
