@@ -371,7 +371,7 @@ class ProductCore extends ObjectModel
         ),
     );
 
-    protected $webserviceRoomTypeParameters = array(
+    protected $webserviceParameters = array(
         'objectMethods' => array(
             'add' => 'addWsRoomType',
             'update' => 'updateWsRoomType',
@@ -470,8 +470,8 @@ class ProductCore extends ObjectModel
                     'price' => array(),
                 )
             ),
-            'extra_services' => array(
-                'resource' => 'extra_service',
+            'services' => array(
+                'resource' => 'service',
                 'fields' => array(
                     'id' => array('validate' => 'isUnsignedId', 'required' => true),
                     'price' => array('validate' => 'isPrice', 'required' => true),
@@ -485,14 +485,14 @@ class ProductCore extends ObjectModel
         ),
     );
 
-    protected $webserviceRoomTypeServicesParameters = array(
+    protected $webserviceServicesParameters = array(
         'objectMethods' => array(
             'add' => 'addWsServices',
             'update' => 'updateWsServices',
             'delete' => 'deleteWs'
         ),
-        'objectsNodeName' => 'extra_services',
-        'objectNodeName' => 'extra_service',
+        'objectsNodeName' => 'services',
+        'objectNodeName' => 'service',
         'retrieveData' => array(
             'retrieveMethod' => 'getServicesObjectList'
         ),
@@ -6594,13 +6594,12 @@ class ProductCore extends ObjectModel
 
     public function getWsExtraServices()
     {
-        // since the service prodcuts are also store in the product table, so we are using the RoomTypeServiceProduct class for the service products
         return Db::getInstance()->executeS(
             'SELECT spp.`price`, spp.`id_tax_rules_group`, sp.`id_product` AS id
-                FROM `'._DB_PREFIX_.'htl_room_type_service_product` sp
-                LEFT JOIN `'._DB_PREFIX_.'htl_room_type_service_product_price` spp
-                ON (spp.`id_product` = sp.`id_product` AND spp.`id_element` = sp.`id_element` AND spp.`element_type` = sp.`element_type`)
-                WHERE sp.`id_element` = '.(int)$this->id
+            FROM `'._DB_PREFIX_.'htl_room_type_service_product` sp
+            LEFT JOIN `'._DB_PREFIX_.'htl_room_type_service_product_price` spp
+            ON (spp.`id_product` = sp.`id_product` AND spp.`id_element` = sp.`id_element` AND spp.`element_type` = sp.`element_type`)
+            WHERE sp.`id_element` = '.(int)$this->id
         );
     }
 
@@ -6756,5 +6755,4 @@ class ProductCore extends ObjectModel
 
         return true;
     }
-
 }

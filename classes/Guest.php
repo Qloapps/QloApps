@@ -215,5 +215,4 @@ class GuestCore extends ObjectModel
         }
         return parent::validateFields($die, $error_return);
     }
-
 }

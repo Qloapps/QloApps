@@ -560,21 +560,21 @@ class AddressCore extends ObjectModel
         if (isset($this->webservice_validation) && $this->webservice_validation) {
             if (!$this->id_customer || !Validate::isLoadedObject(new Customer((int) $this->id_customer))) {
                 $message = Tools::displayError('Invalid Id customer.');
-            } else if (Customer::getCustomerIdAddress($this->id_customer, false) && !$this->id) {
-                $message = Tools::displayError('You cannot create multiple addresses for a single customer.');
-            } else if (!$this->id_country || !Validate::isLoadedObject($objCountry = new Country($this->id_country))) {
+            } elseif (Customer::getCustomerIdAddress($this->id_customer, false) && !$this->id) {
+                $message = Tools::displayError('A single customer cannot have multiple addresses.');
+            } elseif (!$this->id_country || !Validate::isLoadedObject($objCountry = new Country($this->id_country))) {
                 $message = Tools::displayError('Invalid Id country');
-            } else if ($objCountry->contains_states
+            } elseif ($objCountry->contains_states
                 && (!$this->id_state || !Validate::isLoadedObject($objState = new State((int) $this->id_state)))
             ) {
                 $message = Tools::displayError('Invalid Id state');
-            } else if (isset($objState) && ($objCountry->id != $objState->id_country)) {
+            } elseif (isset($objState) && ($objCountry->id != $objState->id_country)) {
                 $message = Tools::displayError('The given provided Id state does not belongs to the provided Id country');
-            } else if ($objCountry->zip_code_format && !$objCountry->checkZipCode($this->postcode)) {
+            } elseif ($objCountry->zip_code_format && !$objCountry->checkZipCode($this->postcode)) {
                 $message = Tools::displayError('Your Zip/postal code is incorrect');
-            } else if (empty($this->postcode) && $objCountry->need_zip_code) {
+            } elseif (empty($this->postcode) && $objCountry->need_zip_code) {
                 $message = Tools::displayError('A Zip/postal code is required.');
-            } else if ($this->postcode && !Validate::isPostCode($this->postcode)) {
+            } elseif ($this->postcode && !Validate::isPostCode($this->postcode)) {
                 $message = Tools::displayError('The Zip/postal code is invalid.');
             }
 
@@ -587,5 +587,4 @@ class AddressCore extends ObjectModel
         }
         return parent::validateFields($die, $error_return);
     }
-
 }

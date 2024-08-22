@@ -425,7 +425,7 @@ class HotelRoomType extends ObjectModel
         if (isset($this->webservice_validation) && $this->webservice_validation) {
             if (!(int) $this->id_product || !Validate::isLoadedObject(new Product((int) $this->id_product))) {
                 $message = Tools::displayError('Invalid Id product.');
-            } else if (!(int)$this->id_hote || !Validate::isLoadedObject(new HotelBranchInformation((int) $this->id_hotel))) {
+            } elseif (!(int)$this->id_hotel || !Validate::isLoadedObject(new HotelBranchInformation((int) $this->id_hotel))) {
                 $message = Tools::displayError('Invalid Id hotel.');
             }
 

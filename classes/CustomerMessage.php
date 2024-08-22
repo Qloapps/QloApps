@@ -149,5 +149,4 @@ class CustomerMessageCore extends ObjectModel
 
         return parent::validateFields($die, $error_return);
     }
-
 }

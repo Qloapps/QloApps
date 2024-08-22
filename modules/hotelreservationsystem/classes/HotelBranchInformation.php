@@ -1069,56 +1069,56 @@ class HotelBranchInformation extends ObjectModel
         if (isset($this->webservice_validation) && $this->webservice_validation) {
             if ($this->rating < 1 || $this->rating > 5) {
                 $message = Tools::displayError('Rating must be between 1 and 5.');
-            } else if (!strtotime($this->check_in)) {
+            } elseif (!strtotime($this->check_in)) {
                 $message = Tools::displayError('Check In time is invalid.');
-            } else if (!strtotime($this->check_out)) {
+            } elseif (!strtotime($this->check_out)) {
                 $message = Tools::displayError('Check out time is invalid.');
-            } else if ($this->check_in && $this->check_out && strtotime($this->check_out) >= strtotime($this->check_in)) {
+            } elseif ($this->check_in && $this->check_out && strtotime($this->check_out) >= strtotime($this->check_in)) {
                 $message = Tools::displayError('Check Out time must be before Check In time.');
-            } else if (!trim($this->phone)) {
+            } elseif (!trim($this->phone)) {
                 $message = Tools::displayError('Phone number is required field.');
-            } else if (!Validate::isPhoneNumber($this->phone)) {
+            } elseif (!Validate::isPhoneNumber($this->phone)) {
                 $message = Tools::displayError('Please enter a valid phone number.');
-            } else if (trim($this->address) == '') {
+            } elseif (trim($this->address) == '') {
                 $message = Tools::displayError('Address is required field.');
-            } else if (!Validate::isAddress($this->address)) {
+            } elseif (!Validate::isAddress($this->address)) {
                 $message = Tools::displayError('Address is invalid.');
-            } else if (!$this->id_country) {
+            } elseif (!$this->id_country) {
                 $message = Tools::displayError('Country is required field.');
-            } else if ($this->city == '') {
+            } elseif ($this->city == '') {
                 $message = Tools::displayError('City is required field.');
-            } else if (!Validate::isCityName($this->city)) {
+            } elseif (!Validate::isCityName($this->city)) {
                 $message = Tools::displayError('Enter a Valid City Name.');
-            } else if (!Validate::isBool($this->use_global_max_order_date)) {
+            } elseif (!Validate::isBool($this->use_global_max_order_date)) {
                 $message = Tools::displayError('invalid value for use_global_max_order_date.');
-            } else if (!Validate::isBool($this->use_global_preparation_time)) {
+            } elseif (!Validate::isBool($this->use_global_preparation_time)) {
                 $message = Tools::displayError('invalid value for use_global_preparation_time.');
-            } else if (!$this->use_global_max_order_date && $this->max_order_date == '') {
+            } elseif (!$this->use_global_max_order_date && $this->max_order_date == '') {
                 $message = Tools::displayError('Maximum date to book a room is required.');
-            } else if (!$this->use_global_max_order_date && !Validate::isDate($this->max_order_date)) {
+            } elseif (!$this->use_global_max_order_date && !Validate::isDate($this->max_order_date)) {
                 $message = Tools::displayError('Maximum date to book a room is invalid.');
-            } else if (!$this->use_global_max_order_date
+            } elseif (!$this->use_global_max_order_date
                 && ($maxOrderDateFormatted = date('Y-m-d', strtotime($this->max_order_date)))
                 && strtotime($maxOrderDateFormatted) < strtotime(date('Y-m-d'))
             ) {
                 $message = Tools::displayError('Maximum Global Date to book a room can not be a past date. Please use a future date.');
-            } else if (!$this->use_global_preparation_time && $this->preparation_time === '') {
+            } elseif (!$this->use_global_preparation_time && $this->preparation_time === '') {
                 $message = Tools::displayError('Minimum booking offset is a required.');
-            } else if (!$this->use_global_preparation_time && $this->preparation_time !== '0' && !Validate::isUnsignedInt($this->preparation_time)) {
+            } elseif (!$this->use_global_preparation_time && $this->preparation_time !== '0' && !Validate::isUnsignedInt($this->preparation_time)) {
                 $message = Tools::displayError('Minimum booking offset is invalid.');
-            } else if (!Validate::isLoadedObject($objCountry = new Country($this->id_country))) {
+            } elseif (!Validate::isLoadedObject($objCountry = new Country($this->id_country))) {
                 $message = Tools::displayError('country is invalid.');
-            } else if ($this->id_state
+            } elseif ($this->id_state
                 && (!Validate::isLoadedObject($objState = new State($this->id_state)) || $objState->id_country != $this->id_country)
             ) {
                 $message = Tools::displayError('State is invalid.');
-            } else if (State::getStatesByIdCountry($this->id_country) && !$this->id_state) {
+            } elseif (State::getStatesByIdCountry($this->id_country) && !$this->id_state) {
                 $message = Tools::displayError('State is required field.');
-            } else if (empty($this->zipcode) && $objCountry->need_zip_code) {
+            } elseif (empty($this->zipcode) && $objCountry->need_zip_code) {
                 $message = Tools::displayError('A Zip / Postal code is required.');
-            } else if ($objCountry->zip_code_format && !$objCountry->checkZipCode($this->zipcode)) {
+            } elseif ($objCountry->zip_code_format && !$objCountry->checkZipCode($this->zipcode)) {
                 $message = sprintf(Tools::displayError('The Zip/Postal code you have entered is invalid. It must follow this format: %s'), str_replace('C', $objCountry->iso_code, str_replace('N', '0', str_replace('L', 'A', $objCountry->zip_code_format))));
-            } else if ($this->zipcode && !Validate::isPostCode($this->zipcode)) {
+            } elseif ($this->zipcode && !Validate::isPostCode($this->zipcode)) {
                 $message = Tools::displayError('The Zip / Postal code is invalid.');
             } else {
                 if ($addressValidation = Address::getValidationRules('Address')) {
@@ -1129,19 +1129,19 @@ class HotelBranchInformation extends ObjectModel
                                 $maxSize
                             );
                             break;
-                        } else if ('address1' == $field && Tools::strlen($this->address) > $maxSize) {
+                        } elseif ('address1' == $field && Tools::strlen($this->address) > $maxSize) {
                             $message = sprintf(
                                 Tools::displayError('The Hotel address is too long (%1$d chars max).'),
                                 $maxSize
                             );
                             break;
-                        }  else if ('city' == $field && Tools::strlen($this->city) > $maxSize) {
+                        }  elseif ('city' == $field && Tools::strlen($this->city) > $maxSize) {
                             $message = sprintf(
                                 Tools::displayError('The Hotel city name is too long (%1$d chars max).'),
                                 $maxSize
                             );
                             break;
-                        } else if ('postcode' == $field && Tools::strlen($this->zipcode) > $maxSize) {
+                        } elseif ('postcode' == $field && Tools::strlen($this->zipcode) > $maxSize) {
                             $message = sprintf(
                                 Tools::displayError('The Hotel zip code is too long (%1$d chars max).'),
                                 $maxSize
