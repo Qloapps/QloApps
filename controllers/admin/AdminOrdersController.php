@@ -352,6 +352,19 @@ class AdminOrdersControllerCore extends AdminController
         return Tools::displayPrice($echo, (int)$idCurrency);
     }
 
+    public function initPageHeaderToolbar()
+    {
+        if (empty($this->display)) {
+            $this->page_header_toolbar_btn['new_order'] = array(
+                'href' => self::$currentIndex.'&addorder&token='.$this->token,
+                'desc' => $this->l('Add new order', null, null, false),
+                'icon' => 'process-icon-new'
+            );
+        }
+
+        parent::initPageHeaderToolbar();
+    }
+
     public function renderForm()
     {
         if (Context::getContext()->shop->getContext() != Shop::CONTEXT_SHOP && Shop::isFeatureActive()) {
