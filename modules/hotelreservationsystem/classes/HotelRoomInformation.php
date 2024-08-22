@@ -158,21 +158,18 @@ class HotelRoomInformation extends ObjectModel
         return $status;
     }
 
-    public static function getRoomStatusTitle($idStatus = false)
+    public static function getRoomStatusTitle($idStatus)
     {
         $moduleInstance = Module::getInstanceByName('hotelreservationsystem');
         $status = array(
             self::STATUS_ACTIVE => $moduleInstance->l('Active', 'hotelreservationsystem'),
             self::STATUS_INACTIVE => $moduleInstance->l('Inactive', 'hotelreservationsystem'),
             self::STATUS_TEMPORARY_INACTIVE => $moduleInstance->l('Temporarily Inactive', 'hotelreservationsystem'),
-            self::STATUS_SEARCH_LOS_UNSATISFIED => $moduleInstance->l('Lenght of stay', 'hotelreservationsystem'),
-            self::STATUS_SEARCH_OCCUPANCY_UNSATISFIED => $moduleInstance->l('Occupancy', 'hotelreservationsystem'),
+            self::STATUS_SEARCH_LOS_UNSATISFIED => $moduleInstance->l('Searched duration outside room length of stay requirements', 'hotelreservationsystem'),
+            self::STATUS_SEARCH_OCCUPANCY_UNSATISFIED => $moduleInstance->l('Occupancy exceeds room capacity', 'hotelreservationsystem'),
         );
 
-        if ($idStatus) {
-            return isset($status[$idStatus]) ? $status[$idStatus] : false;
-        }
-        return $status;
+        return isset($status[$idStatus]) ? $status[$idStatus] : '';
     }
 
     /**

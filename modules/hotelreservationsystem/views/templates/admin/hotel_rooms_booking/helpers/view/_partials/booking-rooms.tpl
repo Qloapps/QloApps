@@ -217,7 +217,7 @@
                                                         <td rowspan="{$booked_v['detail']|count}">{$booked_v['room_num']|escape:'htmlall':'UTF-8'} {hook h='displayRoomNumAfter' data=$booked_v key=$rm_dtl_k type='booked'}</td>
                                                     {/if}
                                                     <td>{dateFormat date=date('Y-m-d', strtotime($rm_dtl_v['date_from']))} - {dateFormat date=date('Y-m-d', strtotime($rm_dtl_v['date_to']))}</td>
-                                                    <td><a href="{$link->getAdminLink('AdminOrders')}&id_order={$rm_dtl_v['id_order']|intval}&vieworder">#{$rm_dtl_v['id_order']}</a></td>
+                                                    <td><a href="{$link->getAdminLink('AdminOrders')}&id_order={$rm_dtl_v['id_order']|intval}&vieworder" target="_blank">#{$rm_dtl_v['id_order']}</a></td>
                                                     <td>{$rm_dtl_v['comment']|escape:'htmlall':'UTF-8'}</td>
                                                     <td>
                                                         {if $rm_dtl_v['booking_type'] == HotelBookingDetail::ALLOTMENT_AUTO}{l s='Auto Allotment' mod='hotelreservationsystem'}{elseif $rm_dtl_v['booking_type'] == HotelBookingDetail::ALLOTMENT_MANUAL}{l s='Manual Allotment' mod='hotelreservationsystem'}{/if}

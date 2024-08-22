@@ -963,21 +963,7 @@ $(document).ready(function() {
 
     function initstatstooltip()
     {
-        console.log($(".htl_room_data_cont").find('.status-info'));
-        $(".htl_room_data_cont").find('.status-info').tooltip({
-            // content: function()
-            // {
-            //     $('#date-stats-tooltop .tip_date').text(info.event.extendedProps.data.date_format);
-            //     $.each(info.event.extendedProps.data.stats, function(elem, val) {
-            //         if (elem == 'num_part_avai') {
-            //             $('#date-stats-tooltop').find('.'+elem).hide().find('.tip_element_value').text('');
-            //         } else {
-            //             $('#date-stats-tooltop').find('.'+elem).show().find('.tip_element_value').text(val);
-            //         }
-            //     });
-            //     return $('#date-stats-tooltop').html();
-            // },
-            // items: "div",
+        $(".htl_room_data_cont").find('.status-info-tooltip').tooltip({
             trigger : 'hover',
             show: {
                 delay: 100,

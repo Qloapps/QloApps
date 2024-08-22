@@ -216,7 +216,7 @@ p.room_cat_data
     font-weight: 700;
     margin-bottom: 0px;
 }
-.status-info {
+.status-info-tooltip {
     position: relative;
     display: inline-block;
     left: 100%;
