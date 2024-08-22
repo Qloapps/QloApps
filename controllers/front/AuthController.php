@@ -648,7 +648,6 @@ class AuthControllerCore extends FrontController
                                 $customer->addGroups(array((int)Configuration::get('PS_GUEST_GROUP')));
                             }
 
-                            $this->context->cart->id_address_delivery = (int)Address::getFirstCustomerAddressId((int)$customer->id);
                             $this->context->cart->id_address_invoice = (int)Address::getFirstCustomerAddressId((int)$customer->id);
                             if (isset($address_invoice) && Validate::isLoadedObject($address_invoice)) {
                                 $this->context->cart->id_address_invoice = (int)$address_invoice->id;

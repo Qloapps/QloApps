@@ -2748,9 +2748,6 @@ class HotelBookingDetail extends ObjectModel
             if (!$this->context->cart->id_address_invoice && isset($addresses[0])) {
                 $this->context->cart->id_address_invoice = (int)$addresses[0]['id_address'];
             }
-            if (!$this->context->cart->id_address_delivery && isset($addresses[0])) {
-                $this->context->cart->id_address_delivery = $addresses[0]['id_address'];
-            }
             $this->context->cart->setNoMultishipping();
 
             if ($this->context->cart->save()) {

@@ -450,10 +450,6 @@ class ParentOrderControllerCore extends FrontController
 
             /* Setting default addresses for cart */
             if (count($customerAddresses)) {
-                if ((!isset($this->context->cart->id_address_delivery) || empty($this->context->cart->id_address_delivery)) || !Address::isCountryActiveById((int)$this->context->cart->id_address_delivery)) {
-                    $this->context->cart->id_address_delivery = (int)$customerAddresses[0]['id_address'];
-                    $update = 1;
-                }
                 if ((!isset($this->context->cart->id_address_invoice) || empty($this->context->cart->id_address_invoice)) || !Address::isCountryActiveById((int)$this->context->cart->id_address_invoice)) {
                     $this->context->cart->id_address_invoice = (int)$customerAddresses[0]['id_address'];
                     $update = 1;
