@@ -647,15 +647,16 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
         $id_cart = 0,
         $id_guest = 0,
         $id_room = 0,
-        $with_auto_room_services = 1
+        $with_auto_room_services = 1,
+        $use_reduc = 1
     ) {
         $totalPrice = array();
         $totalPrice['total_price_tax_incl'] = 0;
         $totalPrice['total_price_tax_excl'] = 0;
         $featureImpactPriceTE = 0;
         $featureImpactPriceTI = 0;
-        $productPriceTI = Product::getPriceStatic((int) $id_product, true);
-        $productPriceTE = Product::getPriceStatic((int) $id_product, false);
+        $productPriceTI = Product::getPriceStatic((int) $id_product, true, false, 6, null, false, $use_reduc);
+        $productPriceTE = Product::getPriceStatic((int) $id_product, false, false, 6, null, false, $use_reduc);
         if ($productPriceTE) {
             $taxRate = (($productPriceTI-$productPriceTE)/$productPriceTE)*100;
         } else {
@@ -678,14 +679,14 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
         $date_from = date('Y-m-d', strtotime($date_from));
         $date_to = date('Y-m-d', strtotime($date_to));
         for($currentDate = $date_from; $currentDate < $date_to; $currentDate = date('Y-m-d', strtotime('+1 day', strtotime($currentDate)))) {
-            if ($featurePrice = $hotelCartBookingData->getProductFeaturePricePlanByDateByPriority(
+            if ($use_reduc && ($featurePrice = $hotelCartBookingData->getProductFeaturePricePlanByDateByPriority(
                 $id_product,
                 $currentDate,
                 $id_group,
                 $id_cart,
                 $id_guest,
                 $id_room
-            )) {
+            ))) {
                 if ($featurePrice['impact_type'] == self::IMPACT_TYPE_PERCENTAGE) {
                     //percentage
                     $featureImpactPriceTE = $productPriceTE * ($featurePrice['impact_value'] / 100);
@@ -728,7 +729,8 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
                 Product::PRICE_ADDITION_TYPE_WITH_ROOM,
                 true,
                 $id_cart,
-                $id_guest
+                $id_guest,
+                $use_reduc
             )) {
                 foreach($servicesWithTax as $service) {
                     $totalPrice['total_price_tax_incl'] += $service['price'];
@@ -741,7 +743,8 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
                 Product::PRICE_ADDITION_TYPE_WITH_ROOM,
                 false,
                 $id_cart,
-                $id_guest
+                $id_guest,
+                $use_reduc
             )) {
                 foreach($servicesWithoutTax as $service) {
                     $totalPrice['total_price_tax_excl'] += $service['price'];
@@ -771,7 +774,8 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
         $id_cart = 0,
         $id_guest = 0,
         $id_room = 0,
-        $with_auto_room_services = 1
+        $with_auto_room_services = 1,
+        $use_reduc = 1
     ) {
         $dateFrom = date('Y-m-d', strtotime($date_from));
         $dateTo = date('Y-m-d', strtotime($date_to));
@@ -784,7 +788,8 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
             $id_cart,
             $id_guest,
             $id_room,
-            $with_auto_room_services
+            $with_auto_room_services,
+            $use_reduc
         );
 
         $totalDurationPriceTI = $totalDurationPrice['total_price_tax_incl'];
