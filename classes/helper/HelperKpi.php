@@ -49,7 +49,6 @@ class HelperKpiCore extends Helper
     {
         $this->tpl = $this->createTemplate($this->base_tpl);
 
-        $this->manageHotelPremissions();
         $this->tpl->assign(array(
             'id' => $this->id,
             'icon' => $this->icon,

@@ -593,7 +593,6 @@ class AdminStatsControllerCore extends AdminStatsTabController
 
     public function displayAjaxGetKpi()
     {
-        ddd(Tools::getValue('id_hotels'));
         $value = $this->getLatestKpiValue(Tools::getValue('kpi'), Tools::getValue('id_hotels'));
         if ($value !== false) {
             $array = array('value' => $value);

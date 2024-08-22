@@ -2690,7 +2690,6 @@ class AdminControllerCore extends Controller
         ));
 
         foreach ($this->kpis as $key => &$kpi) {
-            $kpi->exclude_id_hotels[] = 3;
             if (count($kpi->exclude_id_hotels)) {
                 if (empty($kpi->id_hotels)) {
                     $kpi->id_hotels = HotelBranchInformation::getProfileAccessedHotels($this->context->employee->id_profile, 1, 1);
