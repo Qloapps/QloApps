@@ -113,9 +113,12 @@
 }
 /* card-tabs - end */
 
+#rooms_extra_services .card-body{
+    padding: 0px 18px;
+}
+
 #rooms_extra_services .nav-tabs {
     border-bottom: none;
-    margin-left: 15px;
 }
 
 #rooms_extra_services .nav-tabs > li {
@@ -160,7 +163,6 @@
 }
 
 #rooms_extra_services .tab-content .room_demands {
-    padding: 0 18px;
     margin-top: 20px;
 }
 

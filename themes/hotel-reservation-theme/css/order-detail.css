@@ -1003,9 +1003,12 @@
     line-height: 24px;
 }
 
+#popup-view-extra-services .card-body{
+    padding: 0px 18px;
+}
+
 #popup-view-extra-services .nav-tabs {
     border-bottom: none;
-    margin-left: 15px;
 }
 
 #popup-view-extra-services .nav-tabs > li {
@@ -1049,7 +1052,6 @@
 }
 
 #popup-view-extra-services .tab-content .room_demands {
-    padding: 0 18px;
     margin-top: 20px;
 }
 
