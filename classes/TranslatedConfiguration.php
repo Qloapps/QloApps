@@ -46,7 +46,7 @@ class TranslatedConfigurationCore extends Configuration
             'id_shop' =>        array('type' => self::TYPE_NOTHING, 'validate' => 'isUnsignedId'),
             'value' =>            array('type' => self::TYPE_STRING, 'lang' => true),
             'date_add' =>        array('type' => self::TYPE_DATE, 'validate' => 'isDate'),
-            'date_upd' =>        array('type' => self::TYPE_DATE, 'validate' => 'isDate'),
+            'date_upd' =>        array('type' => self::TYPE_DATE, 'validate' => 'isDate', 'lang' => true),
         ),
     );
 
