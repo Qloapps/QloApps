@@ -2689,18 +2689,20 @@ class AdminControllerCore extends Controller
             'kpis' => &$this->kpis,
         ));
 
-        foreach ($this->kpis as $key => &$kpi) {
-            if (count($kpi->exclude_id_hotels)) {
-                if (empty($kpi->id_hotels)) {
-                    $kpi->id_hotels = HotelBranchInformation::getProfileAccessedHotels($this->context->employee->id_profile, 1, 1);
+        if (count($this->kpis)) {
+            foreach ($this->kpis as $key => &$kpi) {
+                if (count($kpi->exclude_id_hotels)) {
+                    if (empty($kpi->id_hotels)) {
+                        $kpi->id_hotels = HotelBranchInformation::getProfileAccessedHotels($this->context->employee->id_profile, 1, 1);
+                    }
+                    $kpi->id_hotels = array_diff($kpi->id_hotels, $kpi->exclude_id_hotels);
                 }
-                $kpi->id_hotels = array_diff($kpi->id_hotels, $kpi->exclude_id_hotels);
             }
-        }
 
-        $helper = new HelperKpiRow();
-        $helper->kpis = $this->kpis;
-        return $helper->generate();
+            $helper = new HelperKpiRow();
+            $helper->kpis = $this->kpis;
+            return $helper->generate();
+        }
     }
 
     /**
