@@ -410,6 +410,8 @@ class CartRuleCore extends ObjectModel
         }
         unset($cart_rule);
 
+        Hook::exec('actionCustomerCartRulesModifier', array('cart_rules' => &$result, 'id_customer' => (int)$id_customer));
+
         return $result;
     }
 
@@ -516,6 +518,38 @@ class CartRuleCore extends ObjectModel
     {
         if (!CartRule::isFeatureActive()) {
             return false;
+        }
+
+        /*
+         * If null is provided, default validation will be processed. Useful if you want your own conditions,
+         * but also want to retain functionality of the core.
+         *
+         * If true is provided, the validation ends here and the rule is VALID, ignoring the rest of core validation.
+         *
+         * If false is provided, the validation ends here and the rule is not VALID, ignoring the rest of core validation.
+         * In this case, it's recommended to properly alter the isValidatedByModulesError error message so the user knows why.
+         */
+        $isValidatedByModules = null;
+        $isValidatedByModulesError = Tools::displayError('This voucher is not valid.');
+        Hook::exec(
+            'actionValidateCartRule',
+            array(
+                'cart_rule' => $this,
+                'context' => $context,
+                'alreadyInCart' => $alreadyInCart,
+                'display_error' => $display_error,
+                'check_carrier' => $check_carrier,
+                'isValidatedByModules' => &$isValidatedByModules,
+                'isValidatedByModulesError' => &$isValidatedByModulesError,
+            )
+        );
+
+        if ($isValidatedByModules === false) {
+            return (!$display_error) ? false : $isValidatedByModulesError;
+        }
+
+        if ($isValidatedByModules === true) {
+            return (!$display_error) ? true : null;
         }
 
         if (!$this->active) {

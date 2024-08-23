@@ -432,6 +432,15 @@ class AdminCustomersControllerCore extends AdminController
                     'autocomplete' => false
                 ),
                 array(
+                    'type' => 'text',
+                    'prefix' => '<i class="icon-phone"></i>',
+                    'label' => $this->l('Phone'),
+                    'name' => 'phone',
+                    'col' => '4',
+                    'required' => true,
+                    'autocomplete' => false
+                ),
+                array(
                     'type' => 'password',
                     'label' => $this->l('Password'),
                     'name' => 'passwd',
@@ -984,11 +993,19 @@ class AdminCustomersControllerCore extends AdminController
         // If customer is going to be deleted permanently then if customer has orders the change this customer as an anonymous customer
         if (Validate::isLoadedObject($objCustomer = $this->loadObject())) {
             if ($this->delete_mode == 'real' && Order::getCustomerOrders($objCustomer->id, true)) {
+                $customerEmail = $objCustomer->email;
                 $objCustomer->email = 'anonymous'.'-'.$objCustomer->id.'@'.Tools::link_rewrite(Configuration::get('PS_SHOP_NAME')).'_anonymous.com';
                 $objCustomer->deleted = Customer::STATUS_DELETED;
                 if (!$objCustomer->update()) {
                     $this->errors[] = Tools::displayError('Some error ocurred while deleting the Customer');
                     return;
+                } else {
+                    if ($customerDetail = CartCustomerGuestDetail::getCustomerDefaultDetails($customerEmail)) {
+                        $objCartCustomerGuestDetail = new CartCustomerGuestDetail($customerDetail['id_customer_guest_detail']);
+                        $objCartCustomerGuestDetail->phone = preg_replace('/[0-9]/', '0', $objCustomer->phone);
+                        $objCartCustomerGuestDetail->email = $objCustomer->email;
+                        $objCartCustomerGuestDetail->save();
+                    }
                 }
 
                 $this->redirect_after = self::$currentIndex.'&conf=1&token='.$this->token;
@@ -1082,6 +1099,7 @@ class AdminCustomersControllerCore extends AdminController
                 $this->errors[] = Tools::displayError('Password can not be empty.');
                 $this->display = 'edit';
             } elseif ($customer = parent::processAdd()) {
+                CartCustomerGuestDetail::updateCustomerPhoneNumber($customer->email, Tools::getValue('phone'));
                 $this->context->smarty->assign('new_customer', $customer);
                 return $customer;
             }
@@ -1113,7 +1131,10 @@ class AdminCustomersControllerCore extends AdminController
                 }
             }
 
-            return parent::processUpdate();
+            if ($res = parent::processUpdate()) {
+                CartCustomerGuestDetail::updateCustomerPhoneNumber($this->object->email, Tools::getValue('phone'));
+                return $res;
+            }
         } else {
             $this->errors[] = Tools::displayError('An error occurred while loading the object.').'
 				<b>'.$this->table.'</b> '.Tools::displayError('(cannot load object)');
@@ -1142,6 +1163,21 @@ class AdminCustomersControllerCore extends AdminController
                 $this->errors[] = Tools::displayError("Please select a valid month of birthday");
             }
         }
+
+        $phone = Tools::getValue('phone');
+        if (Configuration::get('PS_ONE_PHONE_AT_LEAST')) {
+            if ($phone == '') {
+                $this->errors[] = Tools::displayError('Phone number is required.');
+            }
+        }
+        $className = 'CartCustomerGuestDetail';
+        $rules = call_user_func(array($className, 'getValidationRules'), $className);
+        if ($phone && !Validate::isPhoneNumber($phone)) {
+            $this->errors[] = Tools::displayError('Invaid phone number.');
+        } elseif ($phone && Tools::strlen($phone) > $rules['size']['phone']) {
+            $this->errors[] = sprintf(Tools::displayError('Phone number is too long. (%s chars max).'), $rules['size']['phone']);
+        }
+
 
         $customer = new Customer();
         $this->errors = array_merge($this->errors, $customer->validateFieldsRequiredDatabase());
