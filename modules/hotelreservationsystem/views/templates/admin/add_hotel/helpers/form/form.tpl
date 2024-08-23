@@ -83,6 +83,12 @@
 						{l s='Refund Policies' mod='hotelreservationsystem'}
 					</a>
 				</li>
+				<li>
+					<a href="#hotel-features" data-toggle="tab">
+						<i class="icon-list-alt"></i>
+						{l s='Features' mod='hotelreservationsystem'}
+					</a>
+				</li>
 				{hook h='displayAdminAddHotelFormTab' id_hotel=$hook_arg_id_hotel}
 			</ul>
 			<div class="tab-content panel collapse in">
@@ -487,6 +493,25 @@
 					{/if}
 
 					{hook h='displayAdminAddHotelFormRefundPoliciesTabAfter' id_hotel=$hook_arg_id_hotel}
+				</div>
+				<div class="tab-pane" id="hotel-features">
+					{hook h='displayAdminAddHotelFormFeaturesTabBefore' id_hotel=$hook_arg_id_hotel}
+					{if isset($hotel_info.id) && $hotel_info.id}
+						<div class="form-group">
+							<label for="hotel_feature" class="control-label col-sm-3">
+								<span title="" data-toggle="tooltip" class="label-tooltip" data-original-title='{l s='Select features for this hotel.' mod='hotelreservationsystem'}'>{l s='Select feature' mod='hotelreservationsystem'}</span>
+							</label>
+							<div class="col-xs-7 hotel_features_tree">
+								{$hotel_feature_tree}
+							</div>
+						</div>
+					{else}
+						<div class="alert alert-warning">
+							{l s='Please save hotel information before assigning hotel features.' mod='hotelreservationsystem'}
+						</div>
+					{/if}
+
+					{hook h='displayAdminAddHotelFormFeaturesTabAfter' id_hotel=$hook_arg_id_hotel}
 				</div>
 				{hook h='displayAdminAddHotelFormTabContent' id_hotel=$hook_arg_id_hotel}
 			</div>
