@@ -6592,7 +6592,7 @@ class ProductCore extends ObjectModel
         return $res;
     }
 
-    public function getWsExtraServices()
+    public function getWsServices()
     {
         return Db::getInstance()->executeS(
             'SELECT spp.`price`, spp.`id_tax_rules_group`, sp.`id_product` AS id
@@ -6707,7 +6707,7 @@ class ProductCore extends ObjectModel
         return true;
     }
 
-    public function setWsExtraServices($services)
+    public function setWsServices($services)
     {
         Db::getInstance()->execute('
 			DELETE FROM `'._DB_PREFIX_.'htl_room_type_service_product`
