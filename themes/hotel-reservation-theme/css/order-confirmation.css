@@ -115,10 +115,10 @@
 
 #rooms_extra_services .nav-tabs {
     border-bottom: none;
+    margin-left: 15px;
 }
 
 #rooms_extra_services .nav-tabs > li {
-    width: 50%;
     text-align: center;
     margin: 0;
 }

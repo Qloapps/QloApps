@@ -1005,10 +1005,10 @@
 
 #popup-view-extra-services .nav-tabs {
     border-bottom: none;
+    margin-left: 15px;
 }
 
 #popup-view-extra-services .nav-tabs > li {
-    width: 50%;
     text-align: center;
     margin: 0;
 }

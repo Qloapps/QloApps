@@ -25,8 +25,12 @@
         {if (isset($extraDemands) && $extraDemands) || (isset($additionalServices) && $additionalServices)}
             <div class="">
                 <ul class="nav nav-tabs">
-                    <li {if isset($additionalServices) && $additionalServices} class="active"{/if}><a href="#room_type_service_product_desc" data-toggle="tab">{l s='Services'}</a></li>
-                    <li {if !isset($additionalServices) || !$additionalServices}class="active" {/if}><a href="#room_type_demands_desc" data-toggle="tab">{l s='Facilities'}</a></li>
+                    {if isset($additionalServices) && $additionalServices}
+                        <li class="active"><a href="#room_type_service_product_desc" data-toggle="tab">{l s='Services'}</a></li>
+                    {/if}
+                    {if isset($extraDemands) && $extraDemands}
+                        <li {if !isset($additionalServices) || !$additionalServices} class="active" {/if}><a href="#room_type_demands_desc" data-toggle="tab">{l s='Facilities'}</a></li>
+                    {/if}
                 </ul>
                 <div class="tab-content">
                     <div id="room_type_service_product_desc" class="tab-pane {if isset($additionalServices) && $additionalServices}active{/if}">
@@ -64,10 +68,6 @@
                                 </div>
                                 {assign var=roomCount value=$roomCount+1}
                             {/foreach}
-                        {else}
-                            <div class="services_not_booked">
-                                {l s='No service found.'}
-                            </div>
                         {/if}
                     </div>
                     <div id="room_type_demands_desc" class="tab-pane {if !isset($additionalServices) || !$additionalServices}active{/if}">
@@ -98,9 +98,6 @@
                                 </div>
                                 {assign var=roomCount value=$roomCount+1}
                             {/foreach}
-                        {else}
-                            <div class="services_not_booked">
-                                {l s='No facility found.'}
                             </div>
                         {/if}
                     </div>
