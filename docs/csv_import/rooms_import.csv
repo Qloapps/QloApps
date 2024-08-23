@@ -1,0 +1,3 @@
+Room No;Floor;Product ID;Room Status (1 = Active, 2 = Inactive, 3 = Temporarily Inactive);Extra Information;Disabled Dates And Reason Incase Of Temporary Inactive
+GR-109;First;1;3;Newly added room;2024-01-01:2024-01-02:Reason1, 2023-02-03:2023-02-02:Reason2
+DR-107;First;2;1;;

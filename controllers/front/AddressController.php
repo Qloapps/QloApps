@@ -76,6 +76,7 @@ class AddressControllerCore extends FrontController
             $_POST['firstname'] = $this->context->customer->firstname;
             $_POST['lastname'] = $this->context->customer->lastname;
             $_POST['company'] = $this->context->customer->company;
+            $_POST['phone'] = $this->context->customer->phone;
         }
     }
 

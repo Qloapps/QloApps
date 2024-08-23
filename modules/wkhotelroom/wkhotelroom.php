@@ -65,14 +65,32 @@ class WkHotelRoom extends Module
                         ImageType::getFormatedName('large')
                     );
                 }
-                $productPriceWithoutReduction = $product->getPriceWithoutReduct(!$useTax, false, 6, 1);
+                $productPriceWithoutReduction = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice(
+                    $idProduct,
+                    $dateFrom,
+                    $dateTo,
+                    $useTax,
+                    0,
+                    0,
+                    0,
+                    0,
+                    1,
+                    0
+                );
+
+                if ($useTax) {
+                    $priceWithoutReduction = $productPriceWithoutReduction['total_price_tax_incl'];
+                } else {
+                    $priceWithoutReduction = $productPriceWithoutReduction['total_price_tax_excl'];
+                }
+
                 $product_price = Product::getPriceStatic($idProduct, $useTax);
                 $htlRoom['image'] = $prodImg;
                 $htlRoom['description'] = $product->description_short;
                 $htlRoom['name'] = $product->name;
                 $htlRoom['show_price'] = $product->show_price;
                 $htlRoom['price'] = $product_price;
-                $htlRoom['price_without_reduction'] = $productPriceWithoutReduction;
+                $htlRoom['price_without_reduction'] = $priceWithoutReduction;
                 $featurePrice = HotelRoomTypeFeaturePricing::getRoomTypeFeaturePricesPerDay(
                     $idProduct,
                     $dateFrom,
@@ -80,7 +98,7 @@ class WkHotelRoom extends Module
                     $useTax
                 );
                 $htlRoom['feature_price'] = $featurePrice;
-                $htlRoom['feature_price_diff'] = (float)($productPriceWithoutReduction - $featurePrice);
+                $htlRoom['feature_price_diff'] = (float)($priceWithoutReduction - $featurePrice);
             }
         }
         $this->context->smarty->assign(
@@ -149,6 +167,13 @@ class WkHotelRoom extends Module
         }
     }
 
+    public function hookActionCleanData($params)
+    {
+        if ($params['method'] == 'catalog') {
+            WkHotelRoomDb::truncateTables();
+        }
+    }
+
     public function callInstallTab()
     {
         //Controllers which are to be used in this modules but we have not to create tab for those controllers...
@@ -206,7 +231,8 @@ class WkHotelRoom extends Module
                 'actionProductDelete',
                 'displayFooterExploreSectionHook',
                 'actionProductSave',
-                'actionObjectLanguageAddAfter'
+                'actionObjectLanguageAddAfter',
+                'actionCleanData',
             )
         );
     }

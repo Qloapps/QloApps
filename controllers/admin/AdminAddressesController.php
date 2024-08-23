@@ -544,7 +544,8 @@ class AdminAddressesControllerCore extends AdminController
             $customer = Customer::searchByName($email);
             if (!empty($customer)) {
                 $customer = $customer['0'];
-                echo json_encode(array('infos' => pSQL($customer['firstname']).'_'.pSQL($customer['lastname']).'_'.pSQL($customer['company']).'_'.pSQL($customer['id_customer'])));
+                $phone = Customer::getPhone($customer['id_customer']);
+                echo json_encode(array('infos' => pSQL($customer['firstname']).'_'.pSQL($customer['lastname']).'_'.pSQL($customer['company']).'_'.pSQL($customer['id_customer']).'_'.pSQL($phone)));
             }
         }
         die;
