@@ -80,7 +80,7 @@
         <ul class="stats-list">
             <li>
                 <span class="item-label">
-                    <a href="{$link->getAdminLink("AdminOrders")|escape:"html":"UTF-8"}" target="_blank">
+                    <a href="{$link->getAdminLink("AdminOrders")|escape:"html":"UTF-8"}&amp;orders_not_paid=1" target="_blank">
                         <span>{l s="Bookings (not paid)" mod='dashactivity'}</span>
                     </a>
                 </span>
@@ -90,7 +90,7 @@
             </li>
             <li>
                 <span class="item-label">
-                    <a href="{$link->getAdminLink("AdminOrderRefundRequests")|escape:"html":"UTF-8"}&amp;&submitFilterorder_return=1&amp;order_returnFilter_total_pending_requests=1" target="_blank">
+                    <a href="{$link->getAdminLink("AdminOrderRefundRequests")|escape:"html":"UTF-8"}&amp;&submitFilterorder_return=1&amp;order_returnFilter_total_pending_requests[0]=1" target="_blank">
                         <span>{l s="Refunds" mod='dashactivity'}</span>
                     </a>
                 </span>
@@ -100,7 +100,7 @@
             </li>
             <li>
                 <span class="item-label">
-                    <a href="{$link->getAdminLink("AdminCarts")|escape:"html":"UTF-8"}&amp;submitFiltercart=1&amp;cartFilter_filter_ids_order=Abandoned cart" target="_blank">
+                    <a href="{$link->getAdminLink("AdminCarts")|escape:"html":"UTF-8"}&amp;action=filterOnlyAbandonedCarts" target="_blank">
                         <span>{l s="Abandoned Carts" mod='dashactivity'}</span>
                     </a>
                 </span>

@@ -285,7 +285,10 @@ class HotelRoomInformation extends ObjectModel
         if ($roomTypeInfo = $objRoomType->getRoomTypeInfoByIdProduct($this->id_product)) {
             $this->id_hotel = $roomTypeInfo['id_hotel'];
             return $this->add($autodate, $null_values);
+        } else {
+            WebserviceRequest::getInstance()->setError(400, 'Invalid id product', 134);
         }
+
         return false;
     }
 
@@ -296,7 +299,10 @@ class HotelRoomInformation extends ObjectModel
         if ($roomTypeInfo = $objRoomType->getRoomTypeInfoByIdProduct($this->id_product)) {
             $this->id_hotel = $roomTypeInfo['id_hotel'];
             return $this->update($null_values);
+        } else {
+            WebserviceRequest::getInstance()->setError(400, 'Invalid id product', 134);
         }
+
         return false;
     }
 

@@ -295,9 +295,12 @@ class AdminDashboardControllerCore extends AdminController
     public function postProcess()
     {
         if (Tools::isSubmit('submitDateRange')) {
-            if (!Validate::isDate(Tools::getValue('date_from'))
-                || !Validate::isDate(Tools::getValue('date_to'))) {
+            if (!Validate::isDate(Tools::getValue('date_from')) && !Validate::isDate(Tools::getValue('date_to'))) {
                 $this->errors[] = Tools::displayError('The selected date range is not valid.');
+            } elseif (!Validate::isDate(Tools::getValue('date_from'))) {
+                $this->errors[] = Tools::displayError('Date from in not selected. Please select a date range from the calendar.');
+            } elseif (!Validate::isDate(Tools::getValue('date_to'))) {
+                $this->errors[] = Tools::displayError('Date to in not selected. Please select a date range from the calendar.');
             }
 
             if (Tools::getValue('datepicker_compare')) {
