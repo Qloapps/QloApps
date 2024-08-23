@@ -107,9 +107,9 @@ class RoomTypeServiceProduct extends ObjectModel
         );
 
         if ($formated) {
-            $response = array('hotels' => array(), 'room_types' => array());
+            $response = array('hotel' => array(), 'room_type' => array());
             foreach($rows as $row) {
-                $key = $row['element_type'] == self::WK_ELEMENT_TYPE_HOTEL ? 'hotels' : 'room_types';
+                $key = $row['element_type'] == self::WK_ELEMENT_TYPE_HOTEL ? 'hotel' : 'room_type';
                 $response[$key][] = $row['id_element'];
             }
             return $response;
@@ -135,7 +135,7 @@ class RoomTypeServiceProduct extends ObjectModel
         return Db::getInstance()->getValue($sql);
     }
 
-    public static function getAutoAddServices($idProduct, $dateFrom = null, $dateTo = null, $priceAdditionType = null, $useTax = null, $idCart = 0, $idGuest = 0)
+    public static function getAutoAddServices($idProduct, $dateFrom = null, $dateTo = null, $priceAdditionType = null, $useTax = null, $idCart = 0, $idGuest = 0, $use_reduc = 1)
     {
         if (Product::isBookingProduct($idProduct)) {
             $sql = 'SELECT p.`id_product` FROM  `'._DB_PREFIX_.'htl_room_type_service_product` rsp
@@ -157,7 +157,10 @@ class RoomTypeServiceProduct extends ObjectModel
                         1,
                         $dateFrom,
                         $dateTo,
-                        $useTax
+                        $useTax,
+                        false,
+                        null,
+                        $use_reduc
                     );
                 }
                 return $services;

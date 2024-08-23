@@ -86,6 +86,8 @@ class Blocknewsletter extends Module
                 'actionExportGDPRData',
                 'actionObjectCustomerUpdateBefore',
                 'actionDeleteGDPRCustomer',
+                'actionCustomerCartRulesModifier',
+                'actionValidateCartRule',
                 'actionObjectCustomerDeleteAfter',
             )
         );
@@ -130,6 +132,40 @@ class Blocknewsletter extends Module
                 return json_encode(true);
             }
             return json_encode($this->l('Newsletter block : Unable to delete customer using email.'));
+        }
+    }
+
+    public function hookActionCustomerCartRulesModifier($params)
+    {
+        $customer = new Customer($params['id_customer']);
+        foreach($params['cart_rules'] as $key => $cartRule) {
+            if ($cartRule['code'] == Configuration::get('NW_VOUCHER_CODE')) {
+                if ($customer->id && !$customer->is_guest) {
+                    if (count(Order::getCustomerOrders($customer->id))) {
+                        // remove welcome voucher
+                        unset($params['cart_rules'][$key]);
+                    }
+                } else {
+                    // remove welcome voucher
+                    unset($params['cart_rules'][$key]);
+                }
+            }
+        }
+    }
+
+    public function hookActionValidateCartRule($params)
+    {
+        $customer = new Customer($params['context']->cart->id_customer);
+        if ($params['cart_rule']->code == Configuration::get('NW_VOUCHER_CODE')) {
+            if ($customer->id && !$customer->is_guest) {
+                if (count(Order::getCustomerOrders($customer->id))) {
+                    $params['isValidatedByModules'] = false;
+                    $params['isValidatedByModulesError'] = $this->l('This voucher is not available for this booking.');
+                }
+            } else {
+                $params['isValidatedByModules'] = false;
+                $params['isValidatedByModulesError'] = $this->l('This voucher is not available for this booking.');
+            }
         }
     }
 
