@@ -87,11 +87,10 @@
                     </div>
                 </div>
 
-                <div class="row">
-                    <div class="{if isset($one_phone_at_least) && $one_phone_at_least}required {/if}form-group col-sm-6">
-                        <label for="phone_mobile">{l s='Mobile phone'}{if isset($one_phone_at_least) && $one_phone_at_least} <sup>**</sup>{/if}</label>
-                        <input type="text" class="text form-control validate" name="phone_mobile" id="phone_mobile" data-validate="isPhoneNumber" value="{if isset($guestInformations) && isset($guestInformations.phone_mobile) && $guestInformations.phone_mobile}{$guestInformations.phone_mobile}{/if}" />
-                    </div>
+            <div class="row">
+                <div class="{if isset($one_phone_at_least) && $one_phone_at_least}required {/if}form-group col-sm-6">
+                    <label for="phone">{l s='Phone Number'}{if isset($one_phone_at_least) && $one_phone_at_least} <sup>**</sup>{/if}</label>
+                    <input type="text" class="text form-control validate" name="phone" id="phone" data-validate="isPhoneNumber" value="{if isset($guestInformations) && isset($guestInformations.phone) && $guestInformations.phone}{$guestInformations.phone}{/if}" />
                 </div>
 
                 <div class="row">
@@ -318,9 +317,5 @@
         {else}
             {addJsDef idSelectedCountryInvoice=false}
         {/if}
-        {if isset($countries)}
-            {addJsDef countries=$countries}
-        {/if}
-        {addJsDef PS_REGISTRATION_PROCESS_TYPE=$PS_REGISTRATION_PROCESS_TYPE|intval}
     {/strip}
 {/block}

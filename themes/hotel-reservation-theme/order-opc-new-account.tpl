@@ -103,11 +103,11 @@
 						<span class="form_info">{l s='(five characters min.)'}</span>
 					</div>
 				</div>
-				<div class="row">
-					<div class="{if isset($one_phone_at_least) && $one_phone_at_least}required {/if}form-group col-sm-6">
-						<label for="phone_mobile">{l s='Mobile phone'}{if isset($one_phone_at_least) && $one_phone_at_least} <sup>**</sup>{/if}</label>
-						<input type="text" class="text form-control validate" name="phone_mobile" id="phone_mobile" data-validate="isPhoneNumber" value="{if isset($guestInformations) && isset($guestInformations.phone_mobile) && $guestInformations.phone_mobile}{$guestInformations.phone_mobile}{/if}" />
-					</div>
+			</div>
+			<div class="row">
+				<div class="{if isset($one_phone_at_least) && $one_phone_at_least}required {/if}form-group col-sm-6">
+					<label for="customer_phone">{l s='Phone'}{if isset($one_phone_at_least) && $one_phone_at_least} <sup>*</sup>{/if}</label>
+					<input type="text" class="text form-control validate" name="customer_phone" id="customer_phone" data-validate="isPhoneNumber" value="{if isset($guestInformations) && isset($guestInformations.phone_mobile) && $guestInformations.phone_mobile}{$guestInformations.phone_mobile}{/if}" onblur="$('#phone').val($(this).val());"/>
 				</div>
 				{if isset($PS_REGISTRATION_PROCESS_TYPE) && $PS_REGISTRATION_PROCESS_TYPE}
 					{if isset($birthday) && $birthday}
@@ -401,3 +401,8 @@
 		</form>
 	{/block}
 </div>
+{strip}
+	{if isset($countries)}
+		{addJsDef countries=$countries}
+	{/if}
+{/strip}

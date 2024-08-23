@@ -1459,22 +1459,12 @@
 			$('#address_delivery, #address_invoice').show();
 		}
 
-		/*Changed by webkul to make delivery and invoice addresses same*/
 		$('#id_address_delivery').html(addresses_delivery_options).hide();
-		$('#id_address_invoice').html(addresses_delivery_options).hide();
-		$('#address_delivery_detail').html(address_delivery_detail);
-		$('#address_invoice_detail').html(address_delivery_detail);
-		$('#edit_delivery_address').attr('href', delivery_address_edit_link);
-		$('#edit_invoice_address').attr('href', delivery_address_edit_link);
-		/*END*/
-
-		/*Original*/
-		/*$('#id_address_delivery').html(addresses_delivery_options);
-		$('#id_address_invoice').html(addresses_invoice_options);
+		$('#id_address_invoice').html(addresses_invoice_options).hide();
 		$('#address_delivery_detail').html(address_delivery_detail);
 		$('#address_invoice_detail').html(address_invoice_detail);
 		$('#edit_delivery_address').attr('href', delivery_address_edit_link);
-		$('#edit_invoice_address').attr('href', invoice_address_edit_link);*/
+		$('#edit_invoice_address').attr('href', invoice_address_edit_link);
 	}
 
 	function updateAddresses()
@@ -2004,7 +1994,7 @@
             <div id="addresses_err" class="alert alert-warning" style="display:none;"></div>
 
             <div class="row">
-                <div id="address_delivery" class="col-xs-6 col-sm-6">
+                <div id="address_delivery" class="col-xs-6 col-sm-6 hidden">
                     <h4>
                         <i class="icon-map-marker"></i>
                         {l s='Customer Address'}
@@ -2017,7 +2007,7 @@
                         <div id="address_delivery_detail"></div>
                     </div>
                 </div>
-                <div id="address_invoice" class="col-lg-6 hidden">
+                <div id="address_invoice" class="col-lg-6">
                     <h4>
                         <i class="icon-file-text"></i>
                         {l s='Invoice'}

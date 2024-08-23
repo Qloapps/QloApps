@@ -42,12 +42,12 @@
 					{else}
 						{if $productNumber}
 
-							<div class="col-md-8">
-							{block name='order_opc_errors_block'}
-								{include file="$tpl_dir./errors.tpl"}
-							{/block}
-								{* Accordian for all blocks *}
-								{block name='order_opc_accordion'}
+							{block name='order_opc_accordion'}
+								<div class="col-md-8">
+									{block name='order_opc_errors_block'}
+										{include file="$tpl_dir./errors.tpl"}
+									{/block}
+									{* Accordian for all blocks *}
 									<div class="accordion" id="oprder-opc-accordion">
 										<input type="hidden" name="opc_id_address_delivery" value="{$cart->id_address_delivery}" id="opc_id_address_delivery" />
 										<input type="hidden" name="opc_id_address_invoice" value="{$cart->id_address_invoice}" id="opc_id_address_invoice" />
@@ -129,44 +129,30 @@
 																				</form>
 																			{/if}
 																			<div id="checkout-guest-info-block"  {if $id_customer_guest_detail}style="display: none;"{/if}>
-																				{block name='order_opc_guest_info_name'}
+																				<div class="row margin-btm-10">
+																					<div class="col-sm-3 col-xs-5 info-head">{l s='Name'}</div>
+																					<div class="col-sm-9 col-xs-7 info-value">
+																						{if $isGuest}
+																							{$guestInformations['customer_firstname']|escape:'html':'UTF-8'} {$guestInformations['customer_lastname']|escape:'html':'UTF-8'}
+																						{else}
+																							{$guestInformations['firstname']|escape:'html':'UTF-8'} {$guestInformations['lastname']|escape:'html':'UTF-8'}
+																						{/if}
+																					</div>
+																				</div>
+																				<div class="row margin-btm-10">
+																					<div class="col-sm-3 col-xs-5 info-head">{l s='Email'}</div>
+																					<div class="col-sm-9 col-xs-7 info-value">{$guestInformations['email']|escape:'html':'UTF-8'}</div>
+																				</div>
+																				{if (isset({$guestInformations['phone']}) && {$guestInformations['phone']})}
 																					<div class="row margin-btm-10">
-																						<div class="col-sm-3 col-xs-5 info-head">{l s='Name'}</div>
+																						<div class="col-sm-3 col-xs-5 info-head">
+																								{l s='Phone Number'}
+																						</div>
 																						<div class="col-sm-9 col-xs-7 info-value">
-																							{if $isGuest}
-																								{$guestInformations['customer_firstname']} {$guestInformations['customer_lastname']}
-																							{else}
-																								{$guestInformations['firstname']} {$guestInformations['lastname']}
-																							{/if}
+																							{$guestInformations['phone']|escape:'html':'UTF-8'}
 																						</div>
 																					</div>
-																				{/block}
-																				{block name='order_opc_guest_info_email'}
-																					<div class="row margin-btm-10">
-																						<div class="col-sm-3 col-xs-5 info-head">{l s='Email'}</div>
-																						<div class="col-sm-9 col-xs-7 info-value">{$guestInformations['email']}</div>
-																					</div>
-																				{/block}
-																				{block name='order_opc_guest_info_mobile'}
-																					{if (isset($delivery->phone_mobile) && $delivery->phone_mobile) || (isset($delivery->phone) && $delivery->phone)}
-																						<div class="row margin-btm-10">
-																							<div class="col-sm-3 col-xs-5 info-head">
-																								{if isset($delivery->phone_mobile) && $delivery->phone_mobile}
-																									{l s='Mobile Number'}
-																								{else}
-																									{l s='Phone Number'}
-																								{/if}
-																							</div>
-																							<div class="col-sm-9 col-xs-7 info-value">
-																								{if isset($delivery->phone_mobile) && $delivery->phone_mobile}
-																									{$delivery->phone_mobile|escape:'html':'UTF-8'}
-																								{else}
-																									{$delivery->phone|escape:'html':'UTF-8'}
-																								{/if}
-																							</div>
-																						</div>
-																					{/if}
-																				{/block}
+																				{/if}
 																			</div>
 
 																			{* proceed only if no order restrict errors are there *}
@@ -198,11 +184,13 @@
 																			{/block}
 																		{/if}
 																	</div>
-																	<div class="card-body hidden" id="order-opc-edit-guest-info">
-																		{block name='order_opc_edit_guest_form_container'}
-																			{include file="./order-opc-edit-guest-info.tpl"}
-																		{/block}
-																	</div>
+																	{if $is_logged || $isGuest}
+																		<div class="card-body hidden" id="order-opc-edit-guest-info">
+																			{block name='order_opc_edit_guest_form_container'}
+																				{include file="./order-opc-edit-guest-info.tpl"}
+																			{/block}
+																		</div>
+																	{/if}
 																</div>
 															{/if}
 														</div>
@@ -238,34 +226,75 @@
 											{/foreach}
 										{/if}
 									</div>
-								{/block}
-							</div>
+								</div>
+							{/block}
 							{block name='order_opc_cart_summary_block'}
 								<div class="col-md-4">
-									{block name='cart_total_detail_block'}
 									{* Total cart details, tax details, advance payment details and voucher details *}
-										<div class="col-sm-12 card cart_total_detail_block">
-											{* {if $total_rooms}
-												<p>
-													<span>{l s='Total rooms cost'}{if $display_tax_label}{l s=' (tax excl.)'}{/if}</span>
-													<span class="cart_total_values">{displayPrice price=$total_rooms}</span>
-												</p>
-											{/if}
-											{if (isset($total_extra_demands) && $total_extra_demands) || (isset($total_additional_services) && $total_additional_services)}
-												<p>
-													<span>{l s='Total extra services'}{if $display_tax_label}{l s=' (tax excl.)'}{/if}</span>
-													<span class="cart_total_values">{displayPrice price=($total_extra_demands + $total_additional_services)}</span>
-												</p>
-											{/if} *}
-											{* {if $total_service_products}
-												<p>
-													<span>{l s='Total service products cost'}{if $display_tax_label}{l s=' (tax excl.)'}{/if}</span>
-													<span class="cart_total_values">{displayPrice price=$total_service_products}</span>
-												</p>
-											{/if} *}
+									<div class="col-sm-12 card cart_total_detail_block">
+										{* {if $total_rooms}
 											<p>
+												<span>{l s='Total rooms cost'}{if $display_tax_label}{l s=' (tax excl.)'}{/if}</span>
+												<span class="cart_total_values">{displayPrice price=$total_rooms}</span>
+											</p>
+										{/if}
+										{if (isset($total_extra_demands) && $total_extra_demands) || (isset($total_additional_services) && $total_additional_services)}
+											<p>
+												<span>{l s='Total extra services'}{if $display_tax_label}{l s=' (tax excl.)'}{/if}</span>
+												<span class="cart_total_values">{displayPrice price=($total_extra_demands + $total_additional_services)}</span>
+											</p>
+										{/if} *}
+										{* {if $total_service_products}
+											<p>
+												<span>{l s='Total service products cost'}{if $display_tax_label}{l s=' (tax excl.)'}{/if}</span>
+												<span class="cart_total_values">{displayPrice price=$total_service_products}</span>
+											</p>
+										{/if} *}
+										<p>
+											<span>
+												{l s='Total rooms cost'}
+												{if $display_tax_label}
+													{if $use_taxes && $priceDisplay == 0}
+														{l s='(tax incl)'}
+													{else}
+														{l s='(tax excl)'}
+													{/if}
+												{/if}
+											</span>
+											<span class="cart_total_values">
+												{if $use_taxes && $priceDisplay == 0}
+													{assign var='total_rooms_cost' value=($total_rooms_wt + $total_extra_demands_wt + $total_additional_services_wt + $total_additional_services_auto_add_wt)}
+												{else}
+													{assign var='total_rooms_cost' value=($total_rooms + $total_extra_demands + $total_additional_services + $total_additional_services_auto_add)}
+												{/if}
+												{displayPrice price=$total_rooms_cost}
+											</span>
+										</p>
+										<p class="total_discount_block {if $total_discounts == 0}unvisible{/if}">
+											<span>
+												{if $display_tax_label}
+													{if $use_taxes && $priceDisplay == 0}
+														{l s='Total Discount (tax incl)'}
+													{else}
+														{l s='Total Discount (tax excl)'}
+													{/if}
+												{else}
+													{l s='Total Discount'}
+												{/if}
+											</span>
+											<span class="cart_total_values">
+												{if $use_taxes && $priceDisplay == 0}
+													{assign var='total_discounts_negative' value=$total_discounts * -1}
+												{else}
+													{assign var='total_discounts_negative' value=$total_discounts_tax_exc * -1}
+												{/if}
+												{displayPrice price=$total_discounts_negative}
+											</span>
+										</p>
+										{* {if $priceDisplay != 0} *}
+											<p class="cart_total_price {if $total_discounts == 0}unvisible{/if}" >
 												<span>
-													{l s='Total rooms cost'}
+													{l s='Total'}
 													{if $display_tax_label}
 														{if $use_taxes && $priceDisplay == 0}
 															{l s='(tax incl)'}
@@ -275,147 +304,104 @@
 													{/if}
 												</span>
 												<span class="cart_total_values">
-													{if $use_taxes && $priceDisplay == 0}
-														{assign var='total_rooms_cost' value=($total_rooms_wt + $total_extra_demands_wt + $total_additional_services_wt + $total_additional_services_auto_add_wt)}
+												{if $use_taxes && $priceDisplay == 0}
+														{displayPrice price=$total_price - $convenience_fee_wt}
 													{else}
-														{assign var='total_rooms_cost' value=($total_rooms + $total_extra_demands + $total_additional_services + $total_additional_services_auto_add)}
+														{displayPrice price=$total_price_without_tax - $convenience_fee}
 													{/if}
-													{displayPrice price=$total_rooms_cost}
 												</span>
 											</p>
-											<p class="total_discount_block {if $total_discounts == 0}unvisible{/if}">
-												<span>
-													{if $display_tax_label}
-														{if $use_taxes && $priceDisplay == 0}
-															{l s='Total Discount (tax incl)'}
-														{else}
-															{l s='Total Discount (tax excl)'}
-														{/if}
-													{else}
-														{l s='Total Discount'}
-													{/if}
-												</span>
-												<span class="cart_total_values">
-													{if $use_taxes && $priceDisplay == 0}
-														{assign var='total_discounts_negative' value=$total_discounts * -1}
-													{else}
-														{assign var='total_discounts_negative' value=$total_discounts_tax_exc * -1}
-													{/if}
-													{displayPrice price=$total_discounts_negative}
-												</span>
-											</p>
-											{* {if $priceDisplay != 0} *}
-												<p class="cart_total_price {if $total_discounts == 0}unvisible{/if}" >
-													<span>
-														{l s='Total'}
-														{if $display_tax_label}
-															{if $use_taxes && $priceDisplay == 0}
-																{l s='(tax incl)'}
-															{else}
-																{l s='(tax excl)'}
-															{/if}
-														{/if}
-													</span>
-													<span class="cart_total_values">
-													{if $use_taxes && $priceDisplay == 0}
-															{displayPrice price=$total_price - $convenience_fee_wt}
-														{else}
-															{displayPrice price=$total_price_without_tax - $convenience_fee}
-														{/if}
-													</span>
-												</p>
-											{* {/if} *}
-											{* {if $total_rooms_wt != 0}
-												<p class="cart_total_tax">
-													<span>{l s='Tax on rooms'}</span>
-													<span class="cart_total_values">{displayPrice price=($total_rooms_wt - $total_rooms)}</span>
-												</p>
-											{/if} *}
-											{if $convenience_fee_wt}
-												<p>
-													<span>{l s='Convenience Fees'}</span>
-													<span class="cart_total_values">
-													{if $use_taxes && $priceDisplay == 0}
-														{displayPrice price=$convenience_fee_wt}
-													{else}
-														{displayPrice price=$convenience_fee}
-													{/if}
-													</span>
-												</p>
-											{/if}
-											{block name='hook_display_cart_total_price_label_before_tax'}
-												{hook h="displayCartTotalPriceLabel" type='before_tax'}
-											{/block}
-
+										{* {/if} *}
+										{* {if $total_rooms_wt != 0}
 											<p class="cart_total_tax">
-												<span>{l s='Total tax'}</span>
-												<span class="cart_total_values">{displayPrice price=($total_tax)}</span>
+												<span>{l s='Tax on rooms'}</span>
+												<span class="cart_total_values">{displayPrice price=($total_rooms_wt - $total_rooms)}</span>
 											</p>
-											{* {if $use_taxes && $show_taxes && ($total_extra_demands_wt + $total_additional_services_wt)!= 0 }
-												<p class="cart_total_tax">
-													<span>{l s='Tax on services'}</span>
-													<span class="cart_total_values">{displayPrice price=(($total_extra_demands_wt - $total_extra_demands) + ($total_additional_services_wt - $total_additional_services))}</span>
-												</p>
-											{/if} *}
-											{* {if $use_taxes && $show_taxes && $total_service_products_wt != 0 }
-												<p class="cart_total_tax">
-													<span>{l s='Tax on service products'}</span>
-													<span class="cart_total_values">{displayPrice price=($total_service_products_wt - $total_service_products)}</span>
-												</p>
-											{/if} *}
-
-											<p {if $total_wrapping == 0}class="unvisible"{/if}>
-												<span>
-													{if $use_taxes}
-														{if $display_tax_label}{l s='Total gift wrapping (tax incl.)'}{else}{l s='Total gift-wrapping cost'}{/if}
-													{else}
-														{l s='Total gift-wrapping cost'}
-													{/if}
+										{/if} *}
+										{if $convenience_fee_wt}
+											<p>
+												<span>{l s='Convenience Fees'}</span>
+												<span class="cart_total_values">
+												{if $use_taxes && $priceDisplay == 0}
+													{displayPrice price=$convenience_fee_wt}
+												{else}
+													{displayPrice price=$convenience_fee}
+												{/if}
 												</span>
+											</p>
+										{/if}
+										{block name='hook_display_cart_total_price_label_before_tax'}
+											{hook h="displayCartTotalPriceLabel" type='before_tax'}
+										{/block}
+
+										<p class="cart_total_tax">
+											<span>{l s='Total tax'}</span>
+											<span class="cart_total_values">{displayPrice price=($total_tax)}</span>
+										</p>
+										{* {if $use_taxes && $show_taxes && ($total_extra_demands_wt + $total_additional_services_wt)!= 0 }
+											<p class="cart_total_tax">
+												<span>{l s='Tax on services'}</span>
+												<span class="cart_total_values">{displayPrice price=(($total_extra_demands_wt - $total_extra_demands) + ($total_additional_services_wt - $total_additional_services))}</span>
+											</p>
+										{/if} *}
+										{* {if $use_taxes && $show_taxes && $total_service_products_wt != 0 }
+											<p class="cart_total_tax">
+												<span>{l s='Tax on service products'}</span>
+												<span class="cart_total_values">{displayPrice price=($total_service_products_wt - $total_service_products)}</span>
+											</p>
+										{/if} *}
+
+										<p {if $total_wrapping == 0}class="unvisible"{/if}>
+											<span>
+												{if $use_taxes}
+													{if $display_tax_label}{l s='Total gift wrapping (tax incl.)'}{else}{l s='Total gift-wrapping cost'}{/if}
+												{else}
+													{l s='Total gift-wrapping cost'}
+												{/if}
+											</span>
+											<span class="cart_total_values">
+												{if $use_taxes}
+													{if $priceDisplay}
+														{displayPrice price=$total_wrapping_tax_exc}
+													{else}
+														{displayPrice price=$total_wrapping}
+													{/if}
+												{else}
+													{displayPrice price=$total_wrapping_tax_exc}
+												{/if}
+											</span>
+										</p>
+
+										{if isset($is_advance_payment) && $is_advance_payment}
+											<p>
+												<span>{l s='Advance Payment Amount'}</span>
+												<span class="cart_total_values">{displayPrice price=$advPaymentAmount}</span>
+											</p>
+											<p>
+												<span>{l s='Due Amount'}</span>
+												<span class="cart_total_values">{displayPrice price=$dueAmount}</span>
+											</p>
+										{/if}
+										<p class="cart_final_total_block">
+											<span>{l s='Final Total'}</span>
+											{if isset($is_advance_payment) && $is_advance_payment}
+												<span class="cart_total_values">{displayPrice price=$advPaymentAmount}</span>
+											{else}
 												<span class="cart_total_values">
 													{if $use_taxes}
-														{if $priceDisplay}
-															{displayPrice price=$total_wrapping_tax_exc}
-														{else}
-															{displayPrice price=$total_wrapping}
-														{/if}
+														{displayPrice price=$total_price}
 													{else}
-														{displayPrice price=$total_wrapping_tax_exc}
+														{displayPrice price=$total_price_without_tax}
 													{/if}
 												</span>
-											</p>
-
-											{if isset($is_advance_payment) && $is_advance_payment}
-												<p>
-													<span>{l s='Advance Payment Amount'}</span>
-													<span class="cart_total_values">{displayPrice price=$advPaymentAmount}</span>
-												</p>
-												<p>
-													<span>{l s='Due Amount'}</span>
-													<span class="cart_total_values">{displayPrice price=$dueAmount}</span>
-												</p>
+												<div class="hookDisplayProductPriceBlock-price">
+													{block name='hook_display_cart_total_price_label'}
+														{hook h="displayCartTotalPriceLabel"}
+													{/block}
+												</div>
 											{/if}
-											<p class="cart_final_total_block">
-												<span>{l s='Final Total'}</span>
-												{if isset($is_advance_payment) && $is_advance_payment}
-													<span class="cart_total_values">{displayPrice price=$advPaymentAmount}</span>
-												{else}
-													<span class="cart_total_values">
-														{if $use_taxes}
-															{displayPrice price=$total_price}
-														{else}
-															{displayPrice price=$total_price_without_tax}
-														{/if}
-													</span>
-													<div class="hookDisplayProductPriceBlock-price">
-														{block name='hook_display_cart_total_price_label'}
-															{hook h="displayCartTotalPriceLabel"}
-														{/block}
-													</div>
-												{/if}
-											</p>
-										</div>
-									{/block}
+										</p>
+									</div>
 									{* Check if voucher feature is enabled currently *}
 									{if $voucherAllowed}
 										{block name='cart_voucher_detail_block'}
@@ -473,7 +459,7 @@
 														{foreach from=$displayVouchers key=key item=voucher name=availVoucher}
 															<div class="col-xs-12">
 																<p class="avail_voucher_name">
-																	<span class="voucher_name" data-code="{$voucher.code|escape:'html':'UTF-8'}">{$voucher.code|escape:'html':'UTF-8'} - </span>{$voucher.name}
+																<span class="voucher_name" data-code="{$voucher.code|escape:'html':'UTF-8'}">{$voucher.code|escape:'html':'UTF-8'} -</span>&nbsp;{$voucher.name}
 																</p>
 																{if not $smarty.foreach.availVoucher.last}
 																	<hr class="seperator">
@@ -518,6 +504,7 @@
 								{addJsDef addresses=array()}
 								{addJsDef isVirtualCart=$isVirtualCart|intval}
 								{addJsDef isPaymentStep=$isPaymentStep|intval}
+								{addJsDef PS_REGISTRATION_PROCESS_TYPE=$PS_REGISTRATION_PROCESS_TYPE|intval}
 								{addJsDefL name=txtWithTax}{l s='(tax incl.)' js=1}{/addJsDefL}
 								{addJsDefL name=txtWithoutTax}{l s='(tax excl.)' js=1}{/addJsDefL}
 								{addJsDefL name=txtHasBeenSelected}{l s='has been selected' js=1}{/addJsDefL}

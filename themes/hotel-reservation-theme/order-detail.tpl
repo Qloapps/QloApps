@@ -367,12 +367,18 @@
                                             </tr>
                                         {/if}
 
-                                        {if isset($address_invoice->phone) && $address_invoice->phone}
-                                            <tr>
-                                                <td>{l s='Phone'}</td>
-                                                <td class="text-right">{$address_invoice->phone|escape:'html':'UTF-8'}</td>
-                                            </tr>
-                                        {/if}
+                                    {if isset($guestInformations['phone']) && $guestInformations['phone']}
+                                        <tr>
+                                            <td>{l s='Phone'}</td>
+                                            <td class="text-right">{$guestInformations['phone']|escape:'html':'UTF-8'} </td>
+                                        </tr>
+                                    {/if}
+
+                                    {if isset($address_invoice->phone_mobile) && $address_invoice->phone_mobile}
+                                        <tr>
+                                            <td>{l s='Mobile'}</td>
+                                            <td class="text-right">{$address_invoice->phone_mobile|escape:'html':'UTF-8'}</td>
+                                        </tr>
                                     {/if}
 
                                     {hook h='displayOrderDetailGuestDetailsRow' id_order=$order->id}
@@ -709,19 +715,21 @@
                                             <td class="text-right">{$guestInformations['email']|escape:'html':'UTF-8'}</td>
                                         </tr>
 
-                                        {if isset($address_invoice->phone_mobile) && $address_invoice->phone_mobile}
-                                            <tr>
-                                                <td>{l s='Mobile'}</td>
-                                                <td class="text-right">{$address_invoice->phone_mobile|escape:'html':'UTF-8'}</td>
-                                            </tr>
-                                        {/if}
-
-                                        {if isset($address_invoice->phone) && $address_invoice->phone}
-                                            <tr>
-                                                <td>{l s='Phone'}</td>
-                                                <td class="text-right">{$address_invoice->phone|escape:'html':'UTF-8'}</td>
-                                            </tr>
-                                        {/if}
+                                    <tr>
+                                        <td>{l s='Email'}</td>
+                                        <td class="text-right">{$guestInformations['email']|escape:'html':'UTF-8'}</td>
+                                    </tr>
+                                    {if isset($guestInformations['phone']) && $guestInformations['phone']}
+                                        <tr>
+                                            <td>{l s='Phone'}</td>
+                                            <td class="text-right">{$guestInformations['phone']|escape:'html':'UTF-8'} </td>
+                                        </tr>
+                                    {/if}
+                                    {if isset($address_invoice->phone_mobile) && $address_invoice->phone_mobile}
+                                        <tr>
+                                            <td>{l s='Mobile'}</td>
+                                            <td class="text-right">{$address_invoice->phone_mobile|escape:'html':'UTF-8'}</td>
+                                        </tr>
                                     {/if}
 
                                     {hook h='displayOrderDetailGuestDetailsRow' id_order=$order->id}

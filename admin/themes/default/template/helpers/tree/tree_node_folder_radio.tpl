@@ -24,12 +24,18 @@
 *}
 <li class="tree-folder">
 	<span class="tree-folder-name{if isset($node['disabled']) && $node['disabled'] == true} tree-folder-name-disable{/if}">
-		{if $node['id_category'] != $root_category}
-		<input type="radio" name="{$input_name}" value="{$node['id_category']}"{if isset($node['disabled']) && $node['disabled'] == true} disabled="disabled"{/if} />
+		{if !isset($selectable) || $selectable}
+			<input type="radio" name="{$node['input_name']}" value="{$node['value']}"{if isset($node['selected']) && $node['selected'] == true} checked="checked"{/if}{if isset($node['disabled']) && $node['disabled'] == true} disabled="disabled"{/if} />
 		{/if}
 		<i class="icon-folder-close"></i>
 		<label class="tree-toggler">{$node['name']|escape:'html':'UTF-8'}</label>
 	</span>
+	{if isset($node['badge'])}
+		<span class="badge {if isset($node['badge']['class'])}{$node['badge']['class']}{/if}">{$node['badge']['title']}</span>
+	{/if}
+	{if isset($node['hint'])}
+		<div class="node-hint">{$node['hint']}</div>
+	{/if}
 	<ul class="tree">
 		{$children}
 	</ul>

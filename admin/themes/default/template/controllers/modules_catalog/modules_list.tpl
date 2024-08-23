@@ -37,11 +37,12 @@
                         {/if}
                     </p>
                     <div class="panel-action clearfix">
+                        <span class="module-price">{if isset($element->price)}{if $element->price|floatval == 0}{l s='Free'}{else}{$element->price_formatted}{/if}{else}{l s='Free'}{/if}</span>
+                        {if isset($element->type) && $element->type == 'addonsMustHave' && !$element->not_on_disk}&nbsp;<span class="label label-primary">{l s='In Module Directory'}</span>{/if}
                         {if isset($element->type) && $element->type == 'addonsMustHave' && $element->not_on_disk}
-                            <span class="module-price">{if isset($element->price)}{if $element->price|floatval == 0}{l s='Free'}{elseif isset($element->id_currency)}{displayPrice price=$element->price currency=$element->id_currency}{/if}{/if}</span>
                             <a class="btn button-action pull-right btn-primary _blank" href="{$element->addons_buy_url|replace:' ':'+'|escape:'html':'UTF-8'}">{l s='Explore'}</a>
                         {else}
-                        <a class="btn button-action pull-right btn-primary{if !$element->trusted} untrustedaddon{/if}" {if !$element->trusted} data-target="#moduleNotTrusted"  data-toggle="modal"{/if} data-link="{$element->options.install_url|escape:'html':'UTF-8'}" data-module-display-name="{$element->displayName|escape:'html':'UTF-8'}" data-module-name="{$element->name|escape:'html':'UTF-8'}" data-module-image="{if isset($element->image)}{$element->image}{else}{$modules_uri}/{$element->name}/{$element->logo}{/if}" data-author-name="{$element->author|escape:'html':'UTF-8'}" data-author-uri="{if isset($element->author_uri)}{$element->author_uri|escape:'html':'UTF-8'}{/if}" href="{if !$element->trusted}#{else}{$element->options.install_url|escape:'html':'UTF-8'}{/if}" title="{l s='Install'}">{l s='Install'}</a>
+                            <a class="btn button-action pull-right btn-primary{if !$element->trusted} untrustedaddon{/if}" {if !$element->trusted} data-target="#moduleNotTrusted"  data-toggle="modal"{/if} data-link="{$element->options.install_url|escape:'html':'UTF-8'}" data-module-display-name="{$element->displayName|escape:'html':'UTF-8'}" data-module-name="{$element->name|escape:'html':'UTF-8'}" data-module-image="{if isset($element->image)}{$element->image}{else}{$modules_uri}/{$element->name}/{$element->logo}{/if}" data-author-name="{$element->author|escape:'html':'UTF-8'}" data-author-uri="{if isset($element->author_uri)}{$element->author_uri|escape:'html':'UTF-8'}{/if}" href="{if !$element->trusted}#{else}{$element->options.install_url|escape:'html':'UTF-8'}{/if}" title="{l s='Install'}">{l s='Install'}</a>
                         {/if}
                     </div>
                 </div>
