@@ -43,9 +43,6 @@ Extra Services Tax
 Final Booking Amount
 {total_paid}
 
-Customer address
-{invoice_block_html}
-
 You can review your order and download your invoice from the
 "Order history" [{history_url}] section of your
 customer account by clicking "My account"

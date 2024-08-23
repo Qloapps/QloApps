@@ -71,6 +71,7 @@
 								$('input[name=lastname]').val(infos[1]);
 								$('input[name=company]').val(infos[2]);
 								$('input[name=id_customer]').val(infos[3]);
+								$('input[name=phone]').val(infos[4]);
 							} else {
 								resetCustomerRelatedAddressFields();
 							}

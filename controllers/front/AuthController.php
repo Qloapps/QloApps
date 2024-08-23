@@ -409,8 +409,10 @@ class AuthControllerCore extends FrontController
             $customer = new Customer();
             $lastnameAddress = Tools::getValue('lastname');
             $firstnameAddress = Tools::getValue('firstname');
+            $phoneAddress = Tools::getValue('phone');
             $_POST['lastname'] = Tools::getValue('customer_lastname', $lastnameAddress);
             $_POST['firstname'] = Tools::getValue('customer_firstname', $firstnameAddress);
+            $_POST['phone'] = Tools::getValue('customer_phone', $phoneAddress);
             $addresses_types = [];
             if (Configuration::get('PS_REGISTRATION_PROCESS_TYPE')) {
                 $addresses_types[] = 'address';
@@ -420,22 +422,16 @@ class AuthControllerCore extends FrontController
                 $addresses_types[] = 'address_invoice';
             }
 
-            $error_phone = false;
-            if (Configuration::get('PS_ONE_PHONE_AT_LEAST')) {
-                if (Tools::isSubmit('submitGuestAccount') || !Tools::getValue('is_new_customer')) {
-                    if (!Tools::getValue('phone') && !Tools::getValue('phone_mobile')) {
-                        $error_phone = true;
-                    }
-                } elseif (((Configuration::get('PS_REGISTRATION_PROCESS_TYPE') && Configuration::get('PS_ORDER_PROCESS_TYPE'))
-                        || (Configuration::get('PS_ORDER_PROCESS_TYPE') && !Tools::getValue('email_create'))
-                        || (Configuration::get('PS_REGISTRATION_PROCESS_TYPE') && Tools::getValue('email_create')))
-                        && (!Tools::getValue('phone') && !Tools::getValue('phone_mobile'))) {
-                    $error_phone = true;
+            $className = 'CartCustomerGuestDetail';
+            $rules = call_user_func(array($className, 'getValidationRules'), $className);
+            if (Configuration::get('PS_ONE_PHONE_AT_LEAST') && !Tools::getValue('phone')) {
+                $this->errors[] = Tools::displayError('Phone number is required.');
+            } else {
+                if (Tools::getValue('phone') && !Validate::isPhoneNumber(Tools::getValue('phone'))) {
+                    $this->errors[] = Tools::displayError('Invald phone number.');
+                } elseif (Tools::getValue('phone') && Tools::strlen(Tools::getValue('phone')) > $rules['size']['phone']) {
+                    $this->errors[] = sprintf(Tools::displayError('Phone number is too long. (%s chars max).'), $rules['size']['phone']);
                 }
-            }
-
-            if ($error_phone) {
-                $this->errors[] = Tools::displayError('You must register at least one phone number.');
             }
 
             if (!Tools::getValue('is_new_customer', 1)) {
@@ -468,6 +464,8 @@ class AuthControllerCore extends FrontController
 
                     if (!count($this->errors)) {
                         if ($customer->add()) {
+                            $phone = Tools::getValue('phone');
+                            CartCustomerGuestDetail::updateCustomerPhoneNumber($customer->email, $phone);
                             if (!$customer->is_guest) {
                                 if (!$this->sendConfirmationMail($customer)) {
                                     $this->errors[] = Tools::displayError('The email cannot be sent.');
@@ -614,6 +612,11 @@ class AuthControllerCore extends FrontController
                     if (!$customer->save()) {
                         $this->errors[] = Tools::displayError('An error occurred while creating your account.');
                     } else {
+                        // save customer phone number in cart_customer_guest_detail
+                        $phone = Tools::getValue('phone');
+                        CartCustomerGuestDetail::updateCustomerPhoneNumber($customer->email, $phone);
+                        $_POST['phone'] = $phoneAddress;
+
                         foreach ($addresses_types as $addresses_type) {
                             $$addresses_type->id_customer = (int)$customer->id;
                             if ($addresses_type == 'address_invoice') {
@@ -648,7 +651,6 @@ class AuthControllerCore extends FrontController
                                 $customer->addGroups(array((int)Configuration::get('PS_GUEST_GROUP')));
                             }
 
-                            $this->context->cart->id_address_delivery = (int)Address::getFirstCustomerAddressId((int)$customer->id);
                             $this->context->cart->id_address_invoice = (int)Address::getFirstCustomerAddressId((int)$customer->id);
                             if (isset($address_invoice) && Validate::isLoadedObject($address_invoice)) {
                                 $this->context->cart->id_address_invoice = (int)$address_invoice->id;
