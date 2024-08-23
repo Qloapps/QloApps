@@ -325,3 +325,7 @@ p.capa_txt {
   font-size:18px;
   display: block;
 }
+
+.rm_desc .view_more {
+    display: inline-block;
+}

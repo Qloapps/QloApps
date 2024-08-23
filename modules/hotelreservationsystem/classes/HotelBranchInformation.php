@@ -71,10 +71,10 @@ class HotelBranchInformation extends ObjectModel
     public $zipcode;
     public $address;
     public $phone;
-    public $use_global_max_order_date;
-    public $max_order_date;
-    public $use_global_preparation_time;
-    public $preparation_time;
+    public $use_global_max_order_date = 1;
+    public $max_order_date = '0000-00-00';
+    public $use_global_preparation_time = 1;
+    public $preparation_time = '0000-00-00';
 
     protected $webserviceParameters = array(
         'objectsNodeName' => 'hotels',
@@ -140,7 +140,7 @@ class HotelBranchInformation extends ObjectModel
         $this->moduleInstance = Module::getInstanceByName('hotelreservationsystem');
         parent::__construct($id, $id_lang, $id_shop);
 
-        $this->use_global_max_order_date = $this->max_order_date = $this->use_global_preparation_time = $this->preparation_time = $this->id_country = $this->id_state = $this->city = $this->zipcode = $this->address = $this->phone = null;
+        $this->id_country = $this->id_state = $this->city = $this->zipcode = $this->address = $this->phone = null;
         if ($id) {
             if ($hotelAddress = $this->getAddress($id)) {
                 $this->id_country = $hotelAddress['id_country'];
@@ -1015,18 +1015,26 @@ class HotelBranchInformation extends ObjectModel
         }
 
         $hotelName = $this->hotel_name[Configuration::get('PS_LANG_DEFAULT')];
-        $hotelName = preg_replace('/[0-9!<>,;"?=+()@#°{}_$%:]*/u', '', $hotelName);
-
+        $hotelName = trim(preg_replace('/[0-9!<>,;?=+()@#"°{}_$%:]*$/u', '', $hotelName));
         $objAddress->id_hotel = $this->id;
         $objAddress->id_country = $this->id_country;
         $objAddress->id_state = $this->id_state;
         $objAddress->city = $this->city;
         $objAddress->postcode = $this->zipcode;
-        $objAddress->lastname = $hotelName;
-        $objAddress->firstname = $hotelName;
-        $objAddress->alias = $hotelName;
         $objAddress->address1 = $this->address;
         $objAddress->phone = $this->phone;
+        $objAddress->alias = substr($hotelName, 0, 32);
+        $addressFirstName = $hotelName;
+        $addressLastName = $hotelName;
+        if (Tools::strlen($hotelName) > 32) {
+            $addressFirstName = trim(substr($hotelName, 0, 32));
+            if (!$addressLastName = trim(substr($hotelName, 32, 32))) {
+                $addressLastName = $addressFirstName;
+            }
+        }
+
+        $objAddress->firstname = $addressFirstName;
+        $objAddress->lastname = $addressLastName;
 
         return $objAddress->save();
     }
@@ -1061,185 +1069,95 @@ class HotelBranchInformation extends ObjectModel
         if (isset($this->webservice_validation) && $this->webservice_validation) {
             if ($this->rating < 1 || $this->rating > 5) {
                 $message = Tools::displayError('Rating must be between 1 and 5.');
-                if ($die) {
-                    throw new PrestaShopException($message);
-                }
-                return $error_return ? $message : false;
-            }
-
-            if (!strtotime($this->check_in)) {
+            } elseif (!strtotime($this->check_in)) {
                 $message = Tools::displayError('Check In time is invalid.');
-                if ($die) {
-                    throw new PrestaShopException($message);
-                }
-                return $error_return ? $message : false;
-            }
-            if (!strtotime($this->check_out)) {
+            } elseif (!strtotime($this->check_out)) {
                 $message = Tools::displayError('Check out time is invalid.');
-                if ($die) {
-                    throw new PrestaShopException($message);
-                }
-                return $error_return ? $message : false;
-            }
-
-            if ($this->check_in && $this->check_out && strtotime($this->check_out) >= strtotime($this->check_in)) {
+            } elseif ($this->check_in && $this->check_out && strtotime($this->check_out) >= strtotime($this->check_in)) {
                 $message = Tools::displayError('Check Out time must be before Check In time.');
-                if ($die) {
-                    throw new PrestaShopException($message);
-                }
-                return $error_return ? $message : false;
-            }
-            if (!$this->phone) {
+            } elseif (!trim($this->phone)) {
                 $message = Tools::displayError('Phone number is required field.');
-                if ($die) {
-                    throw new PrestaShopException($message);
-                }
-                return $error_return ? $message : false;
             } elseif (!Validate::isPhoneNumber($this->phone)) {
                 $message = Tools::displayError('Please enter a valid phone number.');
-                if ($die) {
-                    throw new PrestaShopException($message);
-                }
-                return $error_return ? $message : false;
-            }
-            if ($this->address == '') {
+            } elseif (trim($this->address) == '') {
                 $message = Tools::displayError('Address is required field.');
-                if ($die) {
-                    throw new PrestaShopException($message);
-                }
-                return $error_return ? $message : false;
             } elseif (!Validate::isAddress($this->address)) {
                 $message = Tools::displayError('Address is invalid.');
-                if ($die) {
-                    throw new PrestaShopException($message);
-                }
-                return $error_return ? $message : false;
-            }
-
-            if (!$this->id_country) {
+            } elseif (!$this->id_country) {
                 $message = Tools::displayError('Country is required field.');
-                if ($die) {
-                    throw new PrestaShopException($message);
-                }
-                return $error_return ? $message : false;
-            } else {
-                if (Validate::isLoadedObject($objCountry = new Country($this->id_country))) {
-                    $statesbycountry = State::getStatesByIdCountry($this->id_country);
-                    /*If selected country has states only the validate state field*/
-                    if ($this->id_state) {
-                        $objState = new State($this->id_state);
-                        if ($objState->id_country != $this->id_country) {
-                            $message = Tools::displayError('State is invalid.');
-                            if ($die) {
-                                throw new PrestaShopException($message);
-                            }
-                            return $error_return ? $message : false;
-                        }
-                    } else {
-                        if ($statesbycountry) {
-                            $message = Tools::displayError('State is required field.');
-                            if ($die) {
-                                throw new PrestaShopException($message);
-                            }
-                            return $error_return ? $message : false;
-                        }
-                    }
-                    /* Check zip code format */
-                    if (empty($this->zipcode) && $objCountry->need_zip_code) {
-                        $message = Tools::displayError('A Zip / Postal code is required.');
-                        if ($die) {
-                            throw new PrestaShopException($message);
-                        }
-                        return $error_return ? $message : false;
-                    } elseif ($objCountry->zip_code_format && !$objCountry->checkZipCode($this->zipcode)) {
-                        $message = sprintf(Tools::displayError('The Zip/Postal code you have entered is invalid. It must follow this format: %s'), str_replace('C', $objCountry->iso_code, str_replace('N', '0', str_replace('L', 'A', $objCountry->zip_code_format))));
-                        if ($die) {
-                            throw new PrestaShopException($message);
-                        }
-                        return $error_return ? $message : false;
-                    } elseif ($this->zipcode && !Validate::isPostCode($this->zipcode)) {
-                        $message = Tools::displayError('The Zip / Postal code is invalid.');
-                        if ($die) {
-                            throw new PrestaShopException($message);
-                        }
-                        return $error_return ? $message : false;
-                    }
-                } else {
-                    $message = Tools::displayError('country is invalid.');
-                    if ($die) {
-                        throw new PrestaShopException($message);
-                    }
-                    return $error_return ? $message : false;
-                }
-            }
-
-            if ($this->city == '') {
+            } elseif ($this->city == '') {
                 $message = Tools::displayError('City is required field.');
-                if ($die) {
-                    throw new PrestaShopException($message);
-                }
-                return $error_return ? $message : false;
             } elseif (!Validate::isCityName($this->city)) {
                 $message = Tools::displayError('Enter a Valid City Name.');
-                if ($die) {
-                    throw new PrestaShopException($message);
-                }
-                return $error_return ? $message : false;
-            }
-
-            if (!Validate::isBool($this->use_global_max_order_date)) {
+            } elseif (!Validate::isBool($this->use_global_max_order_date)) {
                 $message = Tools::displayError('invalid value for use_global_max_order_date.');
-                if ($die) {
-                    throw new PrestaShopException($message);
-                }
-                return $error_return ? $message : false;
-            }
-
-            if (!Validate::isBool($this->use_global_preparation_time)) {
+            } elseif (!Validate::isBool($this->use_global_preparation_time)) {
                 $message = Tools::displayError('invalid value for use_global_preparation_time.');
+            } elseif (!$this->use_global_max_order_date && $this->max_order_date == '') {
+                $message = Tools::displayError('Maximum date to book a room is required.');
+            } elseif (!$this->use_global_max_order_date && !Validate::isDate($this->max_order_date)) {
+                $message = Tools::displayError('Maximum date to book a room is invalid.');
+            } elseif (!$this->use_global_max_order_date
+                && ($maxOrderDateFormatted = date('Y-m-d', strtotime($this->max_order_date)))
+                && strtotime($maxOrderDateFormatted) < strtotime(date('Y-m-d'))
+            ) {
+                $message = Tools::displayError('Maximum Global Date to book a room can not be a past date. Please use a future date.');
+            } elseif (!$this->use_global_preparation_time && $this->preparation_time === '') {
+                $message = Tools::displayError('Minimum booking offset is a required.');
+            } elseif (!$this->use_global_preparation_time && $this->preparation_time !== '0' && !Validate::isUnsignedInt($this->preparation_time)) {
+                $message = Tools::displayError('Minimum booking offset is invalid.');
+            } elseif (!Validate::isLoadedObject($objCountry = new Country($this->id_country))) {
+                $message = Tools::displayError('country is invalid.');
+            } elseif ($this->id_state
+                && (!Validate::isLoadedObject($objState = new State($this->id_state)) || $objState->id_country != $this->id_country)
+            ) {
+                $message = Tools::displayError('State is invalid.');
+            } elseif (State::getStatesByIdCountry($this->id_country) && !$this->id_state) {
+                $message = Tools::displayError('State is required field.');
+            } elseif (empty($this->zipcode) && $objCountry->need_zip_code) {
+                $message = Tools::displayError('A Zip / Postal code is required.');
+            } elseif ($objCountry->zip_code_format && !$objCountry->checkZipCode($this->zipcode)) {
+                $message = sprintf(Tools::displayError('The Zip/Postal code you have entered is invalid. It must follow this format: %s'), str_replace('C', $objCountry->iso_code, str_replace('N', '0', str_replace('L', 'A', $objCountry->zip_code_format))));
+            } elseif ($this->zipcode && !Validate::isPostCode($this->zipcode)) {
+                $message = Tools::displayError('The Zip / Postal code is invalid.');
+            } else {
+                if ($addressValidation = Address::getValidationRules('Address')) {
+                    foreach ($addressValidation['size'] as $field => $maxSize) {
+                        if ('phone' == $field && Tools::strlen($this->phone) > $maxSize) {
+                            $message = sprintf(
+                                Tools::displayError('The Hotel phone number is too long (%1$d chars max).'),
+                                $maxSize
+                            );
+                            break;
+                        } elseif ('address1' == $field && Tools::strlen($this->address) > $maxSize) {
+                            $message = sprintf(
+                                Tools::displayError('The Hotel address is too long (%1$d chars max).'),
+                                $maxSize
+                            );
+                            break;
+                        }  elseif ('city' == $field && Tools::strlen($this->city) > $maxSize) {
+                            $message = sprintf(
+                                Tools::displayError('The Hotel city name is too long (%1$d chars max).'),
+                                $maxSize
+                            );
+                            break;
+                        } elseif ('postcode' == $field && Tools::strlen($this->zipcode) > $maxSize) {
+                            $message = sprintf(
+                                Tools::displayError('The Hotel zip code is too long (%1$d chars max).'),
+                                $maxSize
+                            );
+                            break;
+                        }
+                    }
+                }
+            }
+
+            if (isset($message) && $message != '') {
                 if ($die) {
                     throw new PrestaShopException($message);
                 }
+
                 return $error_return ? $message : false;
-            }
-
-            if (!$this->use_global_max_order_date) {
-                $maxOrderDateFormatted = date('Y-m-d', strtotime($this->max_order_date));
-                if ($this->max_order_date == '') {
-                    $message = Tools::displayError('Maximum date to book a room is required.');
-                    if ($die) {
-                        throw new PrestaShopException($message);
-                    }
-                    return $error_return ? $message : false;
-                } elseif (!Validate::isDate($this->max_order_date)) {
-                    $message = Tools::displayError('Maximum date to book a room is invalid.');
-                    if ($die) {
-                        throw new PrestaShopException($message);
-                    }
-                    return $error_return ? $message : false;
-                } elseif (strtotime($maxOrderDateFormatted) < strtotime(date('Y-m-d'))) {
-                    $message = Tools::displayError('Maximum Global Date to book a room can not be a past date. Please use a future date.');
-                    if ($die) {
-                        throw new PrestaShopException($message);
-                    }
-                    return $error_return ? $message : false;
-                }
-            }
-
-            if (!$this->use_global_preparation_time) {
-                if ($this->preparation_time === '') {
-                    $message = Tools::displayError('Minimum booking offset is a required.');
-                    if ($die) {
-                        throw new PrestaShopException($message);
-                    }
-                    return $error_return ? $message : false;
-                } elseif ($this->preparation_time !== '0' && !Validate::isUnsignedInt($this->preparation_time)) {
-                    $message = Tools::displayError('Minimum booking offset is invalid.');
-                    if ($die) {
-                        throw new PrestaShopException($message);
-                    }
-                    return $error_return ? $message : false;
-                }
             }
         }
 
@@ -1272,6 +1190,11 @@ class HotelBranchInformation extends ObjectModel
             }
             $objCountry = new Country();
             $countryName = $objCountry->getNameById($idLang, $this->id_country);
+            $linkRewriteArray =  array();
+            foreach (Language::getLanguages(true) as $lang) {
+                $linkRewriteArray[$lang['id_lang']] = Tools::link_rewrite($this->hotel_name[$lang['id_lang']]);
+            }
+
             if ($catCountry = $this->addCategory($countryName, false, $groupIds)) {
                 if ($this->id_state) {
                     $objState = new State();
@@ -1284,8 +1207,15 @@ class HotelBranchInformation extends ObjectModel
                 if ($catState) {
                     if ($catCity = $this->addCategory($this->city, $catState, $groupIds)) {
                         $hotelCatName = $this->hotel_name[Configuration::get('PS_LANG_DEFAULT')];
-                        if ($catHotel = $this->addCategory(
-                            $hotelCatName, $catCity, $groupIds, 1, $this->id
+                        if ($this->id_category) {
+                            $objCategory = new Category($this->id_category);
+                            $objCategory->name = $this->hotel_name;
+                            $objCategory->link_rewrite = $linkRewriteArray;
+                            $objCategory->id_parent = $catCity;
+                            $objCategory->save();
+                            Category::regenerateEntireNtree();
+                        } else if ($catHotel = $this->addCategory(
+                            $hotelCatName, $catCity, $groupIds, 1, $this->id, $linkRewriteArray
                         )) {
                             $this->id_category = $catHotel;
                             $this->save();
