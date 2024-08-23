@@ -115,6 +115,18 @@ class OrderOpcControllerCore extends ParentOrderController
                                 $this->context->customer->birthday = (int)Tools::getValue('years').'-'.(int)Tools::getValue('months').'-'.(int)Tools::getValue('days');
                             }
 
+                            $phone = Tools::getValue('phone');
+                            if (Configuration::get('PS_ONE_PHONE_AT_LEAST') && !$phone) {
+                                $this->errors[] = Tools::displayError('Phone number is a required field.', false);
+                            }
+                            $className = 'CartCustomerGuestDetail';
+                            $rules = call_user_func(array($className, 'getValidationRules'), $className);
+                            if (!Validate::isPhoneNumber($phone)) {
+                                $this->errors[] = Tools::displayError('Please enter a valid Mobile phone number.', false);
+                            } elseif (Tools::strlen($phone) > $rules['size']['phone']) {
+                                $this->errors[] = sprintf(Tools::displayError('Mobile phone number is too long. (%s chars max).'), $rules['size']['phone']);
+                            }
+
                             $_POST['lastname'] = $_POST['customer_lastname'];
                             $_POST['firstname'] = $_POST['customer_firstname'];
                             $this->errors = array_merge($this->errors, $this->context->customer->validateController());
@@ -125,18 +137,9 @@ class OrderOpcControllerCore extends ParentOrderController
                             if ($idAddressDelivery = Tools::getValue('opc_id_address_delivery')) {
                                 $objAddress = new Address($idAddressDelivery);
                                 if (Validate::isLoadedObject($objAddress)) {
-                                    $phoneMobile = Tools::getValue('phone_mobile');
-
-                                    if (Configuration::get('PS_ONE_PHONE_AT_LEAST') && !$phoneMobile) {
-                                        $this->errors[] = Tools::displayError('Mobile phone number is a required field.', false);
-                                    }
-
-                                    if (!Validate::isPhoneNumber($phoneMobile)) {
-                                        $this->errors[] = Tools::displayError('Please enter a valid Mobile phone number.', false);
-                                    }
 
                                     if (!count($this->errors)) {
-                                        $objAddress->phone_mobile = $phoneMobile;
+                                        $objAddress->phone_mobile = $phone;
                                         $objAddress->firstname = $this->context->customer->firstname;
                                         $objAddress->lastname = $this->context->customer->lastname;
                                         if (!$objAddress->save()) {
@@ -154,6 +157,8 @@ class OrderOpcControllerCore extends ParentOrderController
                             );
                             if (!count($this->errors)) {
                                 $return['isSaved'] = (bool)$this->context->customer->update();
+                                CartCustomerGuestDetail::updateCustomerPhoneNumber($this->context->customer->email, $phone);
+
                             } else {
                                 $return['isSaved'] = false;
                             }
@@ -686,6 +691,7 @@ class OrderOpcControllerCore extends ParentOrderController
             'id_country' => (int)$address_delivery->id_country,
             'id_state' => (int)$address_delivery->id_state,
             'id_gender' => (int)$customer->id_gender,
+            'phone' => (int)$customer->phone,
             'sl_year' => $birthday[0],
             'sl_month' => $birthday[1],
             'sl_day' => $birthday[2],

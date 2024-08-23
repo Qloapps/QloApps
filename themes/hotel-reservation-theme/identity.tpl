@@ -84,6 +84,12 @@
                     </label>
                     <input class="is_required validate form-control" data-validate="isEmail" type="email" name="email" id="email" value="{$smarty.post.email}" />
                 </div>
+                <div class="required form-group">
+                    <label for="phone" class="required">
+                        {l s='Phone'}
+                    </label>
+                    <input class="is_required validate form-control" data-validate="isPhoneNumber" type="phone" name="phone" id="phone" value="{$smarty.post.phone}" />
+                </div>
                 {if isset($birthday) && $birthday}
                     <div class="form-group">
                         <label>

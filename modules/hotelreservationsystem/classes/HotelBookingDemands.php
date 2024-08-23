@@ -75,8 +75,8 @@ class HotelBookingDemands extends ObjectModel
         $groupByRoom = 1,
         $getTotalPrice = 0,
         $useTax = 1,
-        $idOrderDetail = 0,
-        $idHtlBookingDetail = 0
+        $idHtlBookingDetail = 0,
+        $idOrderDetail = 0
     ) {
         $moduleObj = Module::getInstanceByName('hotelreservationsystem');
         $context = Context::getContext();
