@@ -1665,17 +1665,9 @@ abstract class ModuleCore
                     if ($item->type == 'addonsMustHave') {
                         $item->addons_buy_url = strip_tags((string)$modaddons->url);
                         $prices = (array)$modaddons->price;
-                        $id_default_currency = Configuration::get('PS_CURRENCY_DEFAULT');
 
-                        foreach ($prices as $currency => $price) {
-                            if ($id_currency = Currency::getIdByIsoCode($currency)) {
-                                $item->price = (float)$price;
-                                $item->id_currency = (int)$id_currency;
-
-                                if ($id_default_currency == $id_currency) {
-                                    break;
-                                }
-                            }
+                        foreach ($prices as $key => $value) {
+                            $item->{$key} = $value;
                         }
                     }
 
