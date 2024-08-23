@@ -173,9 +173,18 @@ class GuestCore extends ObjectModel
     public function mergeWithCustomer($idGuest, $idCustomer)
     {
         // Since the guests are merged, the guest id in the connections table must be changed too
-        Db::getInstance()->update('connections', [
-            'id_guest' => (int) $idGuest,
-        ], 'id_guest = ' . (int) $this->id);
+        // If guest entry is already there in the connection within 30 mins then delete the visitor entry else update it with guest id of the customer
+
+        $sql = 'SELECT SQL_NO_CACHE `id_guest` FROM `'._DB_PREFIX_.'connections`
+                WHERE `id_guest` = '.(int)$idGuest.' AND `date_add` > \''.pSQL(date('Y-m-d H:i:00', time() - 1800)).'\''.
+                Shop::addSqlRestriction(Shop::SHARE_CUSTOMER).' ORDER BY `date_add` DESC';
+        if (Db::getInstance()->getRow($sql, false)) {
+            Db::getInstance()->delete('connections', 'id_guest = ' . (int) $this->id);
+        } else {
+            Db::getInstance()->update('connections', [
+                'id_guest' => (int) $idGuest,
+            ], 'id_guest = ' . (int) $this->id);
+        }
 
         // Since the guests are merged, the guest id in the cart table must be changed too
         Db::getInstance()->update('cart', [

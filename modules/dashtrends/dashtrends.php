@@ -107,6 +107,7 @@ class Dashtrends extends Module
                 $tmp_data['total_paid_tax_excl'][$date] = $tmp_data['orders'][$date] * $tmp_data['average_cart_value'][$date];
                 $tmp_data['total_purchases'][$date] = $tmp_data['total_paid_tax_excl'][$date] * rand(50, 70) / 100;
                 $tmp_data['total_expenses'][$date] = $tmp_data['total_paid_tax_excl'][$date] * rand(0, 10) / 100;
+                $tmp_data['total_refunds'][$date] = $tmp_data['total_paid_tax_excl'][$date] * rand(0, 5) / 100;
             }
         } else {
             $tmp_data['visits'] = AdminStatsController::getVisits(false, $date_from, $date_to, 'day');
@@ -114,6 +115,7 @@ class Dashtrends extends Module
             $tmp_data['total_paid_tax_excl'] = AdminStatsController::getTotalSales($date_from, $date_to, 'day', $id_hotel);
             $tmp_data['total_purchases'] = AdminStatsController::getPurchases($date_from, $date_to, 'day', $id_hotel);
             $tmp_data['total_expenses'] = AdminStatsController::getExpenses($date_from, $date_to, 'day', $id_hotel);
+            $tmp_data['total_refunds'] = AdminStatsController::getRefunds($date_from, $date_to, 'day', $id_hotel);
         }
 
         return $tmp_data;
@@ -151,6 +153,7 @@ class Dashtrends extends Module
             $refined_data['net_profits'][$date] += (isset($gross_data['total_paid_tax_excl'][$date]) ? $gross_data['total_paid_tax_excl'][$date] : 0);
             $refined_data['net_profits'][$date] -= (isset($gross_data['total_purchases'][$date]) ? $gross_data['total_purchases'][$date] : 0);
             $refined_data['net_profits'][$date] -= (isset($gross_data['total_expenses'][$date]) ? $gross_data['total_expenses'][$date] : 0);
+            $refined_data['net_profits'][$date] -= (isset($gross_data['total_refunds'][$date]) ? $gross_data['total_refunds'][$date] : 0);
         }
 
         return $refined_data;
