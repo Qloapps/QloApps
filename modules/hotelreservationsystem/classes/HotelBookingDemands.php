@@ -74,7 +74,9 @@ class HotelBookingDemands extends ObjectModel
         $dateTo = 0,
         $groupByRoom = 1,
         $getTotalPrice = 0,
-        $useTax = 1
+        $useTax = 1,
+        $idHtlBookingDetail = 0,
+        $idOrderDetail = 0
     ) {
         $moduleObj = Module::getInstanceByName('hotelreservationsystem');
         $context = Context::getContext();
@@ -88,21 +90,28 @@ class HotelBookingDemands extends ObjectModel
         $totalDemandsPrice = 0;
         $sql = 'SELECT hb.`id_room`, hb.`adults`, hb.`children`, hd.* FROM `'._DB_PREFIX_.'htl_booking_demands` hd
         LEFT JOIN `'._DB_PREFIX_.'htl_booking_detail` hb ON (hd.`id_htl_booking` = hb.`id`)
-        WHERE hd.`id_htl_booking` IN
-        (SELECT `id` FROM `'._DB_PREFIX_.'htl_booking_detail`
-        WHERE `id_order`='.(int) $idOrder;
+        WHERE hb.`id_order` ='.(int) $idOrder;
+
+
+        if ($idOrderDetail) {
+            $sql .= ' AND `id_order_detail`='.(int)$idOrderDetail;
+        }
         if ($idProduct) {
-            $sql .= ' AND `id_product`='.(int)$idProduct;
+            $sql .= ' AND hb.`id_product`='.(int)$idProduct;
         }
         if ($idRoom) {
-            $sql .= ' AND `id_room`='.(int)$idRoom;
+            $sql .= ' AND hb.`id_room`='.(int)$idRoom;
         }
         if ($dateFrom && $dateTo) {
             $dateFrom = date('Y-m-d', strtotime($dateFrom));
             $dateTo = date('Y-m-d', strtotime($dateTo));
-            $sql .= ' AND `date_from`=\''.pSQL($dateFrom).'\' AND `date_to`= \''.pSQL($dateTo).'\'';
+            $sql .= ' AND hb.`date_from`=\''.pSQL($dateFrom).'\' AND hb.`date_to`= \''.pSQL($dateTo).'\'';
         }
-        $sql .= ')';
+
+        if ($idHtlBookingDetail) {
+            $sql .= ' AND hb.`id` = '.(int)$idHtlBookingDetail;
+        }
+
         if ($getTotalPrice) {
             $totalDemandsPrice = 0;
         }
@@ -247,16 +256,21 @@ class HotelBookingDemands extends ObjectModel
             || Configuration::get('PS_INVOICE_TAXES_BREAKDOWN');
     }
 
-    public function getExtraDemandsTaxesDetails($idOrder)
+    public function getExtraDemandsTaxesDetails($idOrder, $idsOrderDetail = [])
     {
-        $taxDetails = Db::getInstance()->executeS(
-            'SELECT hb.`id` as id_htl_booking, hbd.`unit_price_tax_excl`, hbd.`total_price_tax_excl`, hb.`id_order_detail`, hdt.*, t.* FROM '._DB_PREFIX_.'orders o '.
-            'INNER JOIN '._DB_PREFIX_.'htl_booking_detail hb ON hb.id_order = o.id_order '.
-            'INNER JOIN '._DB_PREFIX_.'htl_booking_demands hbd ON hbd.id_htl_booking = hb.id '.
-            'INNER JOIN '._DB_PREFIX_.'htl_booking_demands_tax hdt ON hbd.id_booking_demand = hdt.id_booking_demand '.
-            'INNER JOIN '._DB_PREFIX_.'tax t ON t.id_tax = hdt.id_tax '.
-            'WHERE o.id_order = '.(int)$idOrder
-        );
+        $sql = 'SELECT hb.`id` as id_htl_booking, hbd.`unit_price_tax_excl`, hbd.`total_price_tax_excl`, hb.`id_order_detail`, hdt.*, t.* FROM '._DB_PREFIX_.'orders o '.
+        'INNER JOIN '._DB_PREFIX_.'htl_booking_detail hb ON hb.id_order = o.id_order '.
+        'INNER JOIN '._DB_PREFIX_.'htl_booking_demands hbd ON hbd.id_htl_booking = hb.id '.
+        'INNER JOIN '._DB_PREFIX_.'htl_booking_demands_tax hdt ON hbd.id_booking_demand = hdt.id_booking_demand '.
+        'INNER JOIN '._DB_PREFIX_.'tax t ON t.id_tax = hdt.id_tax '.
+        'WHERE o.id_order = '.(int)$idOrder;
+
+        if ($idsOrderDetail) {
+            $sql .= ' AND hb.`id_order_detail` IN ('.implode(',', $idsOrderDetail).')';
+        }
+
+        $taxDetails = Db::getInstance()->executeS($sql);
+
         if ($taxDetails) {
             foreach ($taxDetails as &$detail) {
                 $priceTaxExcl = $detail['unit_price_tax_excl'];

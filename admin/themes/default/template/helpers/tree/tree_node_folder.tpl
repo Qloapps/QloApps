@@ -27,6 +27,12 @@
 		<i class="icon-folder-close"></i>
 		<label class="tree-toggler">{$node['name']|escape:'html':'UTF-8'}</label>
 	</span>
+	{if isset($node['badge'])}
+		<span class="badge {if isset($node['badge']['class'])}{$node['badge']['class']}{/if}">{$node['badge']['title']}</span>
+	{/if}
+	{if isset($node['hint'])}
+		<div class="node-hint">{$node['hint']}</div>
+	{/if}
 	<ul class="tree">
 		{$children|escape:'UTF-8'}
 	</ul>

@@ -66,7 +66,7 @@
 			<!-- left infos-->
 			<div class="pb-left-column col-xs-12 col-sm-8 col-md-8">
 				<div class="room_type_img_containter card">
-					<div class="room_hotel_name_block">
+					<div class="room_hotel_name_block {if isset($language_is_rtl) && $language_is_rtl}rtl{/if}">
 						<div class="hotel_name_block">
 							<h1><span class="hotel_name">{$product->name}
 								{* Block for booking products *}
@@ -249,6 +249,16 @@
 													{foreach from=$hotel_features key=ftr_k item=ftr_v}
 														<div class="col-sm-4 col-xs-12"><i class="circle-small">o</i> {$ftr_v|escape:'html':'UTF-8'}</div>
 													{/foreach}
+												</div>
+											</div>
+										{/if}
+										{if isset($hotel_description) && $hotel_description}
+											<div class="info_margin_div">
+												<div class="room_info_heading">
+													<span>{l s='Hotel Description'}</span>
+												</div>
+												<div class="room_info_content">
+													{$hotel_description}
 												</div>
 											</div>
 										{/if}

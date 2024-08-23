@@ -64,7 +64,7 @@ class AdminCustomerPreferencesControllerCore extends AdminController
                     ),
                     'PS_ONE_PHONE_AT_LEAST' => array(
                         'title' => $this->l('Phone number is mandatory'),
-                        'hint' => $this->l('If you chose yes, your customer will have to provide at least one phone number to register.'),
+                        'hint' => $this->l('If you chose yes, your customer will have to provide phone number to register.'),
                         'validation' => 'isBool',
                         'cast' => 'intval',
                         'type' => 'bool'
@@ -133,7 +133,7 @@ class AdminCustomerPreferencesControllerCore extends AdminController
                     'PS_KPI_FREQUENT_CUSTOMER_NB_ORDERS' => array(
                         'title' => $this->l('Number of orders to use to calculate frequent customers'),
                         'hint' => $this->l('Set the number of orders to use to calculate frequent customers.'),
-                        'validation' => 'isUnsignedInt',
+                        'validation' => 'isInt',
                         'cast' => 'intval',
                         'type' => 'text',
                         'class' => 'fixed-width-xxl',
@@ -171,6 +171,14 @@ class AdminCustomerPreferencesControllerCore extends AdminController
                 ),
             )
         );
+    }
+
+    public function beforeUpdateOptions()
+    {
+        $fieldData = $this->fields_options['customer_kpi']['fields']['PS_KPI_FREQUENT_CUSTOMER_NB_ORDERS'];
+        if (!Tools::getValue('PS_KPI_FREQUENT_CUSTOMER_NB_ORDERS')) {
+            $this->errors[] = sprintf(Tools::displayError('field %s must be greater than 0.'), $fieldData['title']);;
+        }
     }
 
     /**

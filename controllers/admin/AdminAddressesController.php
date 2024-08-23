@@ -454,10 +454,8 @@ class AdminAddressesControllerCore extends AdminController
         ** we delete its id_address to force the creation of a new one */
         if ((int)Tools::getValue('id_order')) {
             $this->_redirect = false;
-            if (isset($_POST['address_type'])) {
-                $_POST['id_address'] = '';
-                $this->id_object = null;
-            }
+            // set deleted=1 as customer can have only one address and this address is for an order only
+            $_POST['deleted'] = 1;
         }
 
         // Check the requires fields which are settings in the BO
@@ -478,10 +476,18 @@ class AdminAddressesControllerCore extends AdminController
         if ($this->action == 'save' && ($id_order = (int)Tools::getValue('id_order')) && !count($this->errors) && !empty($address_type)) {
             if (!Db::getInstance()->Execute('UPDATE '._DB_PREFIX_.'orders SET `id_address_'.bqSQL($address_type).'` = '.(int)$this->object->id.' WHERE `id_order` = '.(int)$id_order)) {
                 $this->errors[] = Tools::displayError('An error occurred while linking this address to its order.');
-            } else {
-                Tools::redirectAdmin(urldecode(Tools::getValue('back')).'&conf=4');
             }
         }
+
+        // in case of save and stay, redirect after save with current address.
+        // Because the current address can not be same as the current one(We have to delete it and create a new one in case address is used in orders)
+        if (empty($this->errors) && Tools::isSubmit('submitAdd'.$this->table.'AndStay')) {
+            $idCurrentAddress = Customer::getCustomerIdAddress($this->object->id_customer, false);
+            if ($idCurrentAddress != $this->object->id) {
+                $this->redirect_after = self::$currentIndex.'&'.$this->identifier.'='.$idCurrentAddress.'&conf=4&update'.$this->table.'&token='.$this->token;
+            }
+        }
+
         return $return;
     }
 
@@ -538,7 +544,8 @@ class AdminAddressesControllerCore extends AdminController
             $customer = Customer::searchByName($email);
             if (!empty($customer)) {
                 $customer = $customer['0'];
-                echo json_encode(array('infos' => pSQL($customer['firstname']).'_'.pSQL($customer['lastname']).'_'.pSQL($customer['company']).'_'.pSQL($customer['id_customer'])));
+                $phone = Customer::getPhone($customer['id_customer']);
+                echo json_encode(array('infos' => pSQL($customer['firstname']).'_'.pSQL($customer['lastname']).'_'.pSQL($customer['company']).'_'.pSQL($customer['id_customer']).'_'.pSQL($phone)));
             }
         }
         die;

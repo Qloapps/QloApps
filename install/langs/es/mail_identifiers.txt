@@ -8,4 +8,4 @@ Tu información personal en {shop_name} es:
 {shop_name} - {shop_url}
 
 
-{shop_url} desarrollado por PrestaShop®
+{shop_url} impulsado por Webkul™

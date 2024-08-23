@@ -416,6 +416,7 @@ class ProductControllerCore extends FrontController
                             'hotel_phone' => $addressInfo['phone'],
                             'hotel_name' => $hotel_name,
                             'hotel_rating' => $hotel_info_by_id['rating'],
+                            'hotel_description' => $hotel_info_by_id['description'],
                             'hotel_policies' => $hotel_policies,
                             'hotel_features' => $htl_features,
                             'hotel_image_link' => $hotelImageLink,
@@ -652,7 +653,18 @@ class ProductControllerCore extends FrontController
         // calculate room type price first
         $useTax = HotelBookingDetail::useTax();
         $totalPrice = 0;
-        $productPriceWithoutReduction = $objProduct->getPriceWithoutReduct(!$useTax);
+        $priceWithoutDiscount = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice(
+            $idProduct,
+            $dateFrom,
+            $dateTo,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0
+        );
         $roomTypeDateRangePrice = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice(
             $idProduct,
             $dateFrom,
@@ -668,6 +680,8 @@ class ProductControllerCore extends FrontController
                 true
             );
             $roomTypeDateRangePrice = $roomTypeDateRangePrice['total_price_tax_incl'];
+            $totalPriceWithoutDiscount = $priceWithoutDiscount['total_price_tax_incl'];
+
         } else {
             $featurePrice = HotelRoomTypeFeaturePricing::getRoomTypeFeaturePricesPerDay(
                 $idProduct,
@@ -676,9 +690,10 @@ class ProductControllerCore extends FrontController
                 false
             );
             $roomTypeDateRangePrice = $roomTypeDateRangePrice['total_price_tax_excl'];
+            $totalPriceWithoutDiscount = $priceWithoutDiscount['total_price_tax_excl'];
         }
-        $featurePriceDiff = (float) ($productPriceWithoutReduction - $featurePrice);
 
+        $totalPriceWithoutDiscount *= $quantity;
         $totalRoomPrice = $roomTypeDateRangePrice * $quantity;
         // calculate demand price now
         $demandsPricePerRoom = 0;
@@ -787,6 +802,7 @@ class ProductControllerCore extends FrontController
         $smartyVars['has_room_type_demands'] = $roomTypeDemands ? true : false; // whether to show price breakup
         $smartyVars['rooms_price'] = $totalRoomPrice;
         $smartyVars['demands_price_per_room'] = $demandsPricePerRoom;
+        $smartyVars['total_price_without_discount'] = $totalPriceWithoutDiscount + $demandsPrice;
         $smartyVars['demands_price'] = $demandsPrice;
         $smartyVars['total_price'] = $totalPrice;
         $this->context->smarty->assign($smartyVars);
