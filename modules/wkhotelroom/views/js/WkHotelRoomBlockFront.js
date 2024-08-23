@@ -83,15 +83,15 @@ function getChars(target) {
     var displayedCharacters = $(target).text().split('').slice(0, lines * (width / parseInt(font_size))).join('').length;
 
     if ($(document).width() > 991) {
-        displayedCharacters += 30;
-    } else if ($(document).width() > 768) {
-        displayedCharacters += 34;
-    } else if ($(document).width() > 570) {
         displayedCharacters += 25;
-    } else if ($(document).width() > 444) {
+    } else if ($(document).width() > 768) {
+        displayedCharacters += 35;
+    } else if ($(document).width() > 570) {
         displayedCharacters += 20;
+    } else if ($(document).width() > 444) {
+        displayedCharacters += 10;
     } else {
-        displayedCharacters += 15;
+        displayedCharacters += 5;
     }
 
     return displayedCharacters;
