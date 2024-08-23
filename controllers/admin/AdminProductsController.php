@@ -2980,12 +2980,24 @@ class AdminProductsControllerCore extends AdminController
                                             // To display the disabled dates events with date_to as inclusive in the full calendar
                                             $disabledDates[$disabledDatesKey]['date_to'] = date('Y-m-d', strtotime($dates['date_to']));
                                             $disabledDates[$disabledDatesKey]['date_add'] = date('Y-m-d', strtotime($dates['date_add']));
-                                            if (!isset($dates['id_module_event'])) {
-                                                $disabledDates[$disabledDatesKey]['is_deleteable'] = 1;
+                                            if (!isset($dates['id_event'])) {
+                                                $disabledDates[$disabledDatesKey]['id_event'] = 0;
+                                            }
+
+                                            if (!isset($dates['is_editable'])) {
                                                 $disabledDates[$disabledDatesKey]['is_editable'] = 1;
+                                            }
+
+                                            if (!isset($dates['is_deleteable'])) {
+                                                $disabledDates[$disabledDatesKey]['is_deleteable'] = 1;
+                                            }
+
+                                            if (!isset($dates['event_title'])) {
                                                 $disabledDates[$disabledDatesKey]['event_title'] = 0;
-                                                $disabledDates[$disabledDatesKey]['id_module_event'] = 0;
-                                                $disabledDates[$disabledDatesKey]['module_event_url'] = 0;
+                                            }
+
+                                            if (!isset($dates['event_url'])) {
+                                                $disabledDates[$disabledDatesKey]['event_url'] = 0;
                                             }
                                         }
                                     }
@@ -4997,7 +5009,7 @@ class AdminProductsControllerCore extends AdminController
         ));
     }
 
-    public function ajaxProcessSubmitValidateDisableDates()
+    public function ajaxProcessSubmitDisableDates()
     {
         $response = array('status' => false);
         $idRoom = (int) Tools::getValue('id_room');
@@ -5034,7 +5046,11 @@ class AdminProductsControllerCore extends AdminController
                     && $objHotelRoomDisableDates->save()
                 ) {
                     $response['id_disabled_date'] = $objHotelRoomDisableDates->id;
-                    $this->confirmations[] = $this->l('Room successfully disabled for the specified date range.');
+                    if (Tools::getValue('id_disabled_date')) {
+                        $this->confirmations[] = $this->l('Successfully updated.');
+                    } else {
+                        $this->confirmations[] = $this->l('Room disabled successfully for the specified date range.');
+                    }
                 } else {
                     $this->errors[] = Tools::displayError('An error occurred while trying to save the disable dates.');
                 }
@@ -5056,7 +5072,7 @@ class AdminProductsControllerCore extends AdminController
         $this->ajaxDie(json_encode($response));
     }
 
-    public function ajaxProcessEnableSelectedDate()
+    public function ajaxProcessRemoveSelectedDate()
     {
         $response = array('status' => false);
         $idRoom = (int) Tools::getValue('id_room');
@@ -5117,12 +5133,24 @@ class AdminProductsControllerCore extends AdminController
             if ($disabledDates = $objRoomDisableDates->getRoomDisableDates($idRoom)) {
                 foreach ($disabledDates as $disabledDatesKey => $dates) {
                     $disabledDates[$disabledDatesKey]['date_add'] = date('Y-m-d', strtotime($dates['date_add']));
-                    if (!isset($dates['id_module_event'])) {
-                        $disabledDates[$disabledDatesKey]['is_deleteable'] = 1;
+                    if (!isset($dates['id_event'])) {
+                        $disabledDates[$disabledDatesKey]['id_event'] = 0;
+                    }
+
+                    if (!isset($dates['is_editable'])) {
                         $disabledDates[$disabledDatesKey]['is_editable'] = 1;
+                    }
+
+                    if (!isset($dates['is_deleteable'])) {
+                        $disabledDates[$disabledDatesKey]['is_deleteable'] = 1;
+                    }
+
+                    if (!isset($dates['event_title'])) {
                         $disabledDates[$disabledDatesKey]['event_title'] = 0;
-                        $disabledDates[$disabledDatesKey]['id_module_event'] = 0;
-                        $disabledDates[$disabledDatesKey]['module_event_url'] = 0;
+                    }
+
+                    if (!isset($dates['event_url'])) {
+                        $disabledDates[$disabledDatesKey]['event_url'] = 0;
                     }
                 }
             } else {

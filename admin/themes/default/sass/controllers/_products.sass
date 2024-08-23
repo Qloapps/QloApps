@@ -1,24 +1,6 @@
 #leave_bprice
     margin-left: 0px
 
-.margin-lt-5
-    margin-left: 5px
-
-.margin-lt-10
-    margin-left: 10px
-
-.margin-lt-20
-    margin-left: 20px
-
-.margin-rt-5
-    margin-right: 5px
-
-.margin-rt-10
-    margin-right: 10px
-
-.margin-rt-20
-    margin-right: 20px
-
 #deactiveDatesModal
     .fc-daygrid-event
         box-shadow: 0px 1px 2px 0px rgba(171, 171, 171, 0.3)
@@ -48,6 +30,10 @@
             padding-right: 0px
         padding: 10px
     .modal-title
+        .add_new_dates, .close
+            margin-right: 10px
+        .remove_dates_btn
+            margin-right: 20px
         .close
             line-height: 2
         .disabled-dates-modal-title
@@ -87,12 +73,13 @@
         .tooltip_content_label
             border: 1px solid #D9D9D9
             border-radius: 6px
-            padding: 5px
+            padding: 5px 10px
         .tooltip_content
+            .tooltip_reason_container, .module_event_id
+                margin-top: 10px
             &> div
                 display: inline-block
             .row
-                padding-bottom: 15px
                 margin-left: 0
                 margin-right: 0
             ul.disabled_dates_actions
@@ -106,8 +93,11 @@
         font-size: 14px
         z-index: 99999
         position: absolute
-        max-width: 400px
+        min-width: 450px
+        max-width: 450px
         background: #fff
         box-shadow: 0 8px 25px -2px rgba(0,0,0,0.20)
-        padding: 10px 15px
+        padding: 15px
         border-radius: 6px
+    .tooltip_action_block
+        min-width: unset

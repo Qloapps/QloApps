@@ -20,13 +20,13 @@
 {l s='This room already has a booking for the selected date range.'}
 <div class="row">
     <div class="col-xs-12">
-        {l s='Order ID:'} <a href="{$link->getAdminLink('AdminOrders')}&id_order={$orderDetails->id_order}&vieworder" target="_blank"><strong>#{$orderDetails->id_order|intval}</strong></a>
+        <span class="error_message_label">{l s='Order ID'}:</span> <a href="{$link->getAdminLink('AdminOrders')}&id_order={$orderDetails->id_order}&vieworder" target="_blank"><strong>#{$orderDetails->id_order|intval}</strong></a>
     </div>
     <div class="col-xs-12">
-        {l s='Date From:'} {dateFormat date=$orderDetails->date_from}
+        <span class="error_message_label">{l s='Date From'}:</span> {dateFormat date=$orderDetails->date_from}
     </div>
     <div class="col-xs-12">
-        {l s='Date To:'} {dateFormat date=$orderDetails->date_to}
+        <span class="error_message_label">{l s='Date To'}:</span> {dateFormat date=$orderDetails->date_to}
     </div>
     <div>
     </div>

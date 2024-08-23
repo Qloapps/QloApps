@@ -2917,7 +2917,8 @@ class AdminControllerCore extends Controller
             'current' => self::$currentIndex,
             'token' => $this->token,
             'host_mode' => defined('_PS_HOST_MODE_') ? 1 : 0,
-            'stock_management' => (int)Configuration::get('PS_STOCK_MANAGEMENT')
+            'stock_management' => (int)Configuration::get('PS_STOCK_MANAGEMENT'),
+            'language_is_rtl' => $this->context->language->is_rtl
         ));
 
         if ($this->display_header) {

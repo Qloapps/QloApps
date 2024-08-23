@@ -184,9 +184,9 @@
                     <div class="row">
                         <div class="disabled-dates-modal-title"><i class="icon-calendar"></i>&nbsp; {l s='Disable Dates'} <span class="disabled-dates-modal-room-num"></span></div>
                         <div class="pull-right">
-                            <button type="submit" class="btn btn-success margin-rt-10 add_new_dates">{l s='Add Dates'}</button>
-                            <button type="submit" class="btn btn-danger margin-rt-20 remove_dates_btn">{l s='Remove Dates'}</button>
-                            <button type="button" class="close margin-rt-10" data-dismiss="modal" aria-label="Close">
+                            <button type="submit" class="btn btn-success add_new_dates">{l s='Add Dates'}</button>
+                            <button type="submit" class="btn btn-danger remove_dates_btn">{l s='Remove Dates'}</button>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                             </button>
                         </div>
@@ -293,18 +293,18 @@
         <div class="tooltip_container tooltip_info_block">
             <div class="tooltip_title"></div>
             <div class="tooltip_content">
-                <div class="row col-xs-7">
-                    <div class="tooltip_label">{l s='Disabled Duration'} </div>
+                <div class="row col-xs-6">
+                    <div class="tooltip_label">{l s='Duration'} </div>
                     <div>
                         <span class="tooltip_date_from"></span> - <span class="tooltip_date_to"></span>
                     </div>
                 </div>
-                <div class="row col-xs-5">
+                <div class="row col-xs-6">
                     <div class="tooltip_label">{l s='Disabled on'} </div>
                     <div<span class="tooltip_date_add"></span>
                 </div>
-                <div class="row col-xs-12"><div class="tooltip_label">{l s='Event Id'} </div><span class="tooltip_event_id_module"></span></div>
-                <div><div class="tooltip_label col-xs-12">{l s='Reason'}</div><span class="tooltip_reason col-xs-12"></span></div>
+                <div class="row col-xs-12 module_event_id"><div class="tooltip_label">{l s='Event Id'} </div><span class="tooltip_event_id_module"></span></div>
+                <div><div class="tooltip_label tooltip_reason_container col-xs-12">{l s='Reason'}</div><span class="tooltip_reason col-xs-12"></span></div>
             </div>
         </div>
     </div>
@@ -356,6 +356,7 @@
             initialDate: '{date('Y-m-d', time())}',
             dayMaxEventRows: true,
             selectable: true,
+            direction:{if isset($language_is_rtl) && $language_is_rtl}'rlt'{else}'ltr'{/if},
             unselectAuto: true,
             eventTextColor: '#333333',
             selectAllow: function(info) {
@@ -386,8 +387,6 @@
                     if (is_editable) {
                         $(info.el).find('.fc-event-title-container').append('<i class="icon-pencil pull-right edit_disabled_dates"></i>');
                     }
-
-
                 }
 
                 var dateFrom = info.event.extendedProps.date_from_formatted;
@@ -416,7 +415,7 @@
                 }
 
                 if (id_module_event) {
-                    var event_html = '(#'+id_module_event+')';
+                    var event_html = '#'+id_module_event;
                     if (module_event_url != '') {
                         event_html = '<a target="_blank" href="'+module_event_url+'">'+ event_html + '</a>';
                     } else {
@@ -437,7 +436,7 @@
                     container: $('#disabled_dates_full_calendar').closest('div'),
                     delay: {
                         show: 600,
-                        hide: 300
+                        hide: 500
                     },
                     placement: 'auto'
                 }
@@ -478,9 +477,9 @@
                     container: $('#disabled_dates_full_calendar').closest('div'),
                     delay: {
                         show: 600,
-                        hide: 400
+                        hide: 500
                     },
-                    placement: 'auto|bottom',
+                    placement: {if isset($language_is_rtl) && $language_is_rtl}'left'{else}'right'{/if},
                 }
                 $(selectedElement).tooltip(options);
                 // since we are hiding the form after 200, if we show before hiding the position get wrong for the tooltip
@@ -495,6 +494,7 @@
                 }, 1);
             }
         });
+
         function updateEventDates(event, add) {
             if (event.start && event.end) {
                 let dateFrom = new Date(event.start);
@@ -579,8 +579,8 @@
                             'is_deleteable' : v['is_deleteable'],
                             'date_to_formatted': v['date_to'],
                             'date_from_formatted': v['date_from'],
-                            'id_module_event' : v['id_module_event'],
-                            'module_event_url' : v['module_event_url'],
+                            'id_module_event' : v['id_event'],
+                            'module_event_url' : v['event_url'],
                             'backgroundColor': '#FFFFFF',
                             'borderColor': '#FFFFFF'
                         });
@@ -662,7 +662,7 @@
                 $('#disabled_dates_form').show(200);
                 $('#deactiveDatesModal').animate({ scrollTop: 0 }, 'slow');
             },
-            submitValidateDisableDates: function(cb) {
+            submitDisableDates: function(cb) {
                 let idRoom = parseInt($('#deactiveDatesModal').attr('data-id-room'));
                 idRoom = idRoom == isNaN(idRoom) ? 0 : idRoom;
                 var formElem = $('#disabled_dates_form');
@@ -681,7 +681,7 @@
                     type: 'POST',
                     data: {
                         ajax: true,
-                        action: 'submitValidateDisableDates',
+                        action: 'submitDisableDates',
                         id_disabled_date : id_disabled_date,
                         id_product: idProduct,
                         id_room: idRoom,
@@ -1062,7 +1062,7 @@
                 const dateTo = $.datepicker.formatDate('yy-mm-dd', dateToFormatted);
                 var data = {
                     ajax: true,
-                    action: 'enableSelectedDate',
+                    action: 'removeSelectedDate',
                     id_room: idRoom,
                     date_from: dateFrom,
                     date_to: dateTo
@@ -1092,8 +1092,8 @@
                                         'date_to_formatted': value['date_to'],
                                         'date_from_formatted': value['date_from'],
                                         'is_deleteable' : value['is_deleteable'],
-                                        'id_module_event' : value['id_module_event'],
-                                        'module_event_url' : value['module_event_url'],
+                                        'id_module_event' : value['module_event'],
+                                        'module_event_url' : value['event_url'],
                                         'backgroundColor': '#FFFFFF',
                                         'borderColor': '#FFFFFF'
                                     });
@@ -1144,7 +1144,7 @@
             if (confirm("{l s='Are you sure?'}")) {
                 $('.add_new_dates').removeClass('triggred');
                 $('.room_disable_reason').closest('.form-group').show();
-                DisableDatesModal.submitValidateDisableDates();
+                DisableDatesModal.submitDisableDates();
             }
         });
         $(document).on('click', '.close_action_tooltip', function(){
