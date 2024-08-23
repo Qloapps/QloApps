@@ -137,7 +137,14 @@
                                 <div class="row">
                                     <div class="total_price_block col-xs-7 form-group">
                                         <label class="control-label">{l s='Subtotal'}</label>
-                                        <p>{convertPrice price=$total_price|floatval}</p>
+                                        <p>
+                                            {if $total_price && $total_price_without_discount > $total_price}
+                                                <span class="room_type_old_price">
+                                                    {convertPrice price=$total_price_without_discount|floatval}
+                                                </span>
+                                            {/if}
+                                            {convertPrice price=$total_price|floatval}
+                                        </p>
                                     </div>
                                     {if $total_available_rooms <= $warning_count}
                                         <div class="col-xs-5 form-group text-right num_quantity_alert">

@@ -1,0 +1,4 @@
+ID;Active(0/1);Name;Categories (x,y,z...);Associated Room Types IDs (x,y,z...);Pre-Tax Retail Price;Pre-tax Operating Cost;Tax Rule ID;Auto add to cart (0 = No,1 = Yes);Price display preference (If auto add to cart);Show at front office (0 = No,1 = Yes);Price calculation method(1 = Once per booking,2 = Each day);Short description;Image URLs (x,y,z...);Delete existing images (0 = No,1 = Yes)
+30;1;Room Maintenance Fee;;1,2;250;0;1;1;1;;;;http://localhost/hotelcommerce/img/p/1/0/10.jpg;0
+;1;Breakfast;;1,2;350;0;1;0;;1;2;;http://localhost/hotelcommerce/img/p/9/9.jpg;0
+;1;Cab on demand;;1,3;200;0;1;0;;1;1;;http://localhost/hotelcommerce/img/p/9/9.jpg;0

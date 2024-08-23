@@ -777,7 +777,7 @@
 		<value>localhost</value>
 	</configuration>
 	<configuration id="PS_SHOP_NAME" name="PS_SHOP_NAME">
-		<value>PrestaShop</value>
+		<value>QloApps</value>
 	</configuration>
 	<configuration id="PS_SHOP_EMAIL" name="PS_SHOP_EMAIL">
 		<value>pub@qloapps.com</value>

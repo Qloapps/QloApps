@@ -63,6 +63,45 @@ class CartCustomerGuestDetailCore extends ObjectModel
         );
     }
 
+    public static function getCustomerDefaultDetails($email)
+    {
+        return Db::getInstance()->getRow(
+            'SELECT * FROM `'._DB_PREFIX_.'cart_customer_guest_detail`
+            WHERE `id_cart` = 0 AND `email` = "'.pSQL($email).'"'
+        );
+    }
+
+    public static function updateCustomerPhoneNumber($email, $phone)
+    {
+        if ($customerDetail = self::getCustomerDefaultDetails($email)) {
+            $objCartCustomerGuestDetail = new CartCustomerGuestDetail($customerDetail['id_customer_guest_detail']);
+            $objCartCustomerGuestDetail->phone = $phone;
+            return $objCartCustomerGuestDetail->save();
+        } else {
+            $objCustomer = new Customer();
+            if (Validate::isLoadedObject($customer = $objCustomer->getByEmail($email, null, false))) {
+                $objCartCustomerGuestDetail = new CartCustomerGuestDetail();
+                $objCartCustomerGuestDetail->id_cart = 0;
+                $objCartCustomerGuestDetail->id_gender = $customer->id_gender;
+                $objCartCustomerGuestDetail->firstname = $customer->firstname;
+                $objCartCustomerGuestDetail->lastname = $customer->lastname;
+                $objCartCustomerGuestDetail->email = $customer->email;
+                $objCartCustomerGuestDetail->phone = $phone;
+                return $objCartCustomerGuestDetail->save();
+            }
+        }
+
+        return false;
+    }
+
+    public static function getCustomerPhone($email)
+    {
+        return Db::getInstance()->getValue(
+            'SELECT `phone` FROM `'._DB_PREFIX_.'cart_customer_guest_detail`
+            WHERE `id_cart` = 0 AND `email` = "'.pSQL($email).'"'
+        );
+    }
+
     public function validateGuestInfo()
     {
         $isValid = true;

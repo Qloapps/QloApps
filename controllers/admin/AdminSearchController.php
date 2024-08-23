@@ -246,7 +246,7 @@ class AdminSearchControllerCore extends AdminController
                     }
                 } else if ($associatedData = $objRoomTypeServiceProduct->getAssociatedHotelsAndRoomType($product['id_product'])) {
                     $count = 0;
-                    foreach ($associatedData['room_types'] as $id_room_type) {
+                    foreach ($associatedData['room_type'] as $id_room_type) {
                         $objRoomType = new HotelRoomType($id_room_type);
                         if (in_array($objRoomType->id_hotel, $accessibleHotels)) {
                             $count += 1;

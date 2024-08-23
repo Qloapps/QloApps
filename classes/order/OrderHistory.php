@@ -317,6 +317,8 @@ class OrderHistoryCore extends ObjectModel
                 // if order is created by API then create a direct object instead of creating an object from module
                 if ($order->module == 'wsorder') {
                     $payment_method = new WebserviceOrder();
+                } else if ($order->module == 'bo_order') {
+                    $payment_method = new BoOrder();
                 } else {
                     $payment_method = Module::getInstanceByName($order->module);
                 }

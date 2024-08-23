@@ -25,7 +25,7 @@
 <div class="leadin">{block name="leadin"}{/block}</div>
 {if $module_confirmation}
 <div class="alert alert-success clearfix">
-	{l s='Your .CSV file has been successfully imported into your shop. Don\'t forget to re-build the products\' search index.'}
+	{l s='Your .CSV file has been successfully imported to your website.'}
 </div>
 {/if}
 <div class="row">
@@ -63,7 +63,6 @@
 				<div class="alert alert-warning import_products_categories">
 					<ul>
 						<li>{l s='Note that the Category import does not support having two categories with the same name.'}</li>
-						<li>{l s='Note that you can have several products with the same reference.'}</li>
 					</ul>
 				</div>
 				<div class="alert alert-warning import_supply_orders_details">
@@ -166,12 +165,12 @@
 					</div>
 				</div>
 				<div class="form-group" id="csv_file_selected" style="display: none;">
-					<div class="alert alert-success clearfix">
+					<div class="alert alert-success clearfix" style="display:flex; align-items:center;">
 						<input type="hidden" value="{$csv_selected}" name="csv" id="csv_selected_value" />
-						<div class="col-lg-8">
+						<div class="col-xs-8">
 							<span id="csv_selected_filename">{$csv_selected|escape:'html':'UTF-8'}</span>
 						</div>
-						<div class="col-lg-4">
+						<div class="col-xs-4">
 							<div class="btn-group pull-right">
 								<button id="file-remove-button" type="button" class="btn btn-default">
 									<i class="icon-refresh"></i>
@@ -199,42 +198,40 @@
 				<div class="form-group">
 					<label for="convert" class="control-label col-lg-4">{l s='ISO 8859-1 encoded file?'}</label>
 					<div class="col-lg-8">
-						<label class="switch-light prestashop-switch fixed-width-lg">
-							<input name="convert" id="convert" type="checkbox" />
-							<span>
-								<span>{l s='Yes'}</span>
-								<span>{l s='No'}</span>
-							</span>
+						<span class="switch prestashop-switch fixed-width-lg">
+							<input type="radio" name="convert" id="convert_on" value="1">
+								<label for="convert_on">{l s='Yes'}</label>
+							<input type="radio" name="convert" id="convert_off" value="0" checked="checked">
+								<label for="convert_off">{l s='No'}</label>
 							<a class="slide-button btn"></a>
-						</label>
+						</span>
 					</div>
 				</div>
 				<div class="form-group">
 					<label for="separator" class="control-label col-lg-4">{l s='Field separator'}</label>
 					<div class="col-lg-8">
 						<input id="separator" name="separator" class="fixed-width-xs form-control" type="text" value="{if isset($separator_selected)}{$separator_selected|escape:'html':'UTF-8'}{else};{/if}" />
-						<div class="help-block">{l s='e.g. '} 1; Blouse; 129.90; 5</div>
+						<div class="help-block">{l s='e.g. '} 6; 1; The Sunshine Luxury</div>
 					</div>
 				</div>
 				<div class="form-group">
 					<label for="multiple_value_separator" class="control-label col-lg-4">{l s='Multiple value separator'}</label>
 					<div class="col-lg-8">
 						<input id="multiple_value_separator" name="multiple_value_separator" class="fixed-width-xs form-control" type="text" value="{if isset($multiple_value_separator_selected)}{$multiple_value_separator_selected|escape:'html':'UTF-8'}{else},{/if}" />
-						<div class="help-block">{l s='e.g. '} Blouse; red.jpg, blue.jpg, green.jpg; 129.90</div>
+						<div class="help-block">{l s='e.g. '} The Sunshine Luxury; News Paper:2.jpg, Gym:7.jpg</div>
 					</div>
 				</div>
 				<hr />
 				<div class="form-group">
 					<label for="truncate" class="control-label col-lg-4">{l s='Delete all'} <span id="entitie">{l s='categories'}</span> {l s='before import'} </label>
 					<div class="col-lg-8">
-						<label class="switch-light prestashop-switch fixed-width-lg">
-							<input id="truncate" name="truncate" type="checkbox"/>
-							<span>
-								<span>{l s='Yes'}</span>
-								<span>{l s='No'}</span>
-							</span>
+						<span class="switch prestashop-switch fixed-width-lg">
+							<input type="radio" name="truncate" id="truncate_on" value="1">
+								<label for="truncate_on">{l s='Yes'}</label>
+							<input type="radio" name="truncate" id="truncate_off" value="0" checked="checked">
+								<label for="truncate_off">{l s='No'}</label>
 							<a class="slide-button btn"></a>
-						</label>
+						</span>
 					</div>
 				</div>
 				<div class="form-group" style="display: none">
@@ -244,52 +241,49 @@
 						</span>
 					</label>
 					<div class="col-lg-8">
-						<label class="switch-light prestashop-switch fixed-width-lg">
-							<input id="match_ref" name="match_ref" type="checkbox" />
-							<span>
-								<span>{l s='Yes'}</span>
-								<span>{l s='No'}</span>
-							</span>
+						<span class="switch prestashop-switch fixed-width-lg">
+							<input type="radio" name="match_ref" id="match_ref_on" value="1">
+								<label for="match_ref_on">{l s='Yes'}</label>
+							<input type="radio" name="match_ref" id="match_ref_off" value="0" checked="checked">
+								<label for="match_ref_off">{l s='No'}</label>
 							<a class="slide-button btn"></a>
-						</label>
+						</span>
 					</div>
 				</div>
 				<div class="form-group">
 					<label for="regenerate" class="control-label col-lg-4">{l s='Skip thumbnails regeneration'}</label>
 					<div class="col-lg-8">
-						<label class="switch-light prestashop-switch fixed-width-lg">
-							<input id="regenerate" name="regenerate" type="checkbox" />
-							<span>
-								<span>{l s='Yes'}</span>
-								<span>{l s='No'}</span>
-							</span>
+						<span class="switch prestashop-switch fixed-width-lg">
+							<input type="radio" name="regenerate" id="regenerate_on" value="1">
+								<label for="regenerate_on">{l s='Yes'}</label>
+							<input type="radio" name="regenerate" id="regenerate_off" value="0" checked="checked">
+								<label for="regenerate_off">{l s='No'}</label>
 							<a class="slide-button btn"></a>
-						</label>
+						</span>
 					</div>
 				</div>
 				<div class="form-group">
 					<label for="forceIDs" class="control-label col-lg-4">
-						<span data-toggle="tooltip" class="label-tooltip" data-original-title="{l s='If you enable this option, your imported items\' ID number will be used as-is. If you do not enable this option, the imported ID number will be ignored, and PrestaShop will instead create auto-incremented ID numbers for all the imported items.'}">
+						<span data-toggle="tooltip" class="label-tooltip" data-original-title="{l s='If you enable this option, your imported items\' ID number will be used as-is. If you do not enable this option, the imported ID number will be ignored, and QloApps will instead create auto-incremented ID numbers for all the imported items.'}">
 							{l s='Force all ID numbers'}
 						</span>
 					</label>
 					<div class="col-lg-8">
-						<label class="switch-light prestashop-switch fixed-width-lg">
-							<input  id="forceIDs" name="forceIDs" type="checkbox"/>
-							<span>
-								<span>{l s='Yes'}</span>
-								<span>{l s='No'}</span>
-							</span>
+						<span class="switch prestashop-switch fixed-width-lg">
+							<input type="radio" name="forceIDs" id="forceIDs_on" value="1">
+								<label for="forceIDs_on">{l s='Yes'}</label>
+							<input type="radio" name="forceIDs" id="forceIDs_off" value="0" checked="checked">
+								<label for="forceIDs_off">{l s='No'}</label>
 							<a class="slide-button btn"></a>
-						</label>
+						</span>
 					</div>
 				</div>
-<!--
+	<!--
 				{*if empty($files_to_import)*}
 				<div class="alert alert-info">{l s='You must upload a file in order to proceed to the next step'}</div>
 				{*if !count($files_to_import)*}
 				<p>{l s='There is no CSV file available. Please upload one using the \'Upload\' button above.'}</p>
--->
+	-->
 				<div class="panel-footer">
 					<button type="submit" name="submitImportFile" id="submitImportFile" class="btn btn-default pull-right" >
 						<i class="process-icon-next"></i> <span>{l s='Next step'}</span>
@@ -317,29 +311,26 @@
 			</div>
 
 			<div class="list-group">
+				<a class="list-group-item _blank" href="../docs/csv_import/hotels_import.csv">
+					{l s='Sample Hotels file'}
+				</a>
+				<a class="list-group-item _blank" href="../docs/csv_import/room_types_import.csv">
+					{l s='Sample Room Types file'}
+				</a>
+				<a class="list-group-item _blank" href="../docs/csv_import/rooms_import.csv">
+					{l s='Sample Rooms file'}
+				</a>
+				<a class="list-group-item _blank" href="../docs/csv_import/service_products_import.csv">
+					{l s='Sample Service Products file'}
+				</a>
 				<a class="list-group-item _blank" href="../docs/csv_import/categories_import.csv">
 					{l s='Sample Categories file'}
-				</a>
-				<a class="list-group-item _blank" href="../docs/csv_import/products_import.csv">
-					{l s='Sample Products file'}
-				</a>
-				<a class="list-group-item _blank" href="../docs/csv_import/combinations_import.csv">
-					{l s='Sample Combinations file'}
 				</a>
 				<a class="list-group-item _blank" href="../docs/csv_import/customers_import.csv">
 					{l s='Sample Customers file'}
 				</a>
-				<a class="list-group-item _blank" href="../docs/csv_import/addresses_import.csv">
-					{l s='Sample Addresses file'}
-				</a>
-				<a class="list-group-item _blank" href="../docs/csv_import/manufacturers_import.csv">
-					{l s='Sample Manufacturers file'}
-				</a>
-				<a class="list-group-item _blank" href="../docs/csv_import/suppliers_import.csv">
-					{l s='Sample Suppliers file'}
-				</a>
-				<a class="list-group-item _blank" href="../docs/csv_import/alias_import.csv">
-					{l s='Sample Aliases file'}
+				<a class="list-group-item _blank" href="../docs/csv_import/bookings_import.csv">
+					{l s='Sample Bookings file'}
 				</a>
 				{if $PS_ADVANCED_STOCK_MANAGEMENT}
 				<a class="list-group-item _blank" href="../docs/csv_import/supply_orders_import.csv">
@@ -352,9 +343,9 @@
 			</div>
 		</div>
 	</div>
-</div>
+	</div>
 
-<script type="text/javascript">
+	<script type="text/javascript">
 
 	function humanizeSize(bytes) {
 		if (typeof bytes !== 'number')
@@ -506,12 +497,13 @@
 			else {
 				$("#match_ref").closest('.form-group').hide();
 			}
-			if ($("#entity > option:selected").val() == 1 || $("#entity > option:selected").val() == 0) {
+			if ($("#entity > option:selected").val() == 3) {
 				$(".import_products_categories").show();
 			}
 			else {
 				$(".import_products_categories").hide();
 			}
+
 			if ($("#entity > option:selected").val() == 0 || $("#entity > option:selected").val() == 1 ||
 				$("#entity > option:selected").val() == 5 || $("#entity > option:selected").val() == 6) {
 					$("#regenerate").closest('.form-group').show();
