@@ -107,11 +107,15 @@ class WebserviceSpecificManagementQlo implements WebserviceSpecificManagementInt
                         if (!isset($this->wsObject->urlFragments['id_hotel']) ) {
                             throw new WebserviceException('You have to set \'id_hotel\', \'date_from\' and \'date_to\'parameters to get a result', array(100, 400));
                         }
-                        $kwargs = [
+                        $dateFrom = isset($this->wsObject->urlFragments['date_from']) ? $this->wsObject->urlFragments['date_from'] : date('Y-m-d');
+                        $dateTo = isset($this->wsObject->urlFragments['date_to']) ? $this->wsObject->urlFragments['date_to'] : date('Y-m-d', strtotime($dateFrom.' + 1 day'));
+                        $kwargs = array(
                             'idHotel' => $this->wsObject->urlFragments['id_hotel'],
-                            'dateFrom' => $this->wsObject->urlFragments['date_from'],
-                            'dateTo' => $this->wsObject->urlFragments['date_to'],
-                        ];
+                            'dateFrom' => $dateFrom,
+                            'dateTo' => $dateTo,
+                            'idRoomType' => isset($this->wsObject->urlFragments['id_room_type']) ? $this->wsObject->urlFragments['id_room_type'] : 0,
+                        );
+
                         $this->output .= $objQloRoomType->getRoomRates($kwargs);
                         break;
 

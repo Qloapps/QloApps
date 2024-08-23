@@ -135,6 +135,8 @@ class CustomerCore extends ObjectModel
 
     public $groupBox;
 
+    public $phone;
+
     const STATUS_BANNED = 1;
     const STATUS_DELETED = 2;
 
@@ -202,6 +204,10 @@ class CustomerCore extends ObjectModel
     {
         $this->id_default_group = (int)Configuration::get('PS_CUSTOMER_GROUP');
         parent::__construct($id);
+
+        if ($this->email) {
+            $this->phone = CartCustomerGuestDetail::getCustomerPhone($this->email);
+        }
     }
 
     public function add($autodate = true, $null_values = true)
@@ -482,6 +488,18 @@ class CustomerCore extends ObjectModel
             return $result;
         }
         return Cache::retrieve($cache_id);
+    }
+
+    public static function getPhone($id_customer)
+    {
+
+        return Db::getInstance()->getValue(
+            'SELECT cgd.`phone`
+            FROM `'._DB_PREFIX_.'customer` c
+            INNER JOIN `'._DB_PREFIX_.'cart_customer_guest_detail` cgd
+            ON (cgd.`email` = c.`email`)
+            WHERE `id_cart` = 0 AND c.`id_customer` = '.(int)($id_customer)
+        );
     }
 
     public static function getCustomerIdAddress($id_customer, $use_cache = true)

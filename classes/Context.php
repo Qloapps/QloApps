@@ -326,8 +326,6 @@ class ContextCore
                     $this->cart->setDeliveryOption(null);
                 }
                 $this->cart->id_customer = (int) $customer->id;
-                $this->cart->updateAddressId($this->cart->id_address_delivery, (int) Address::getFirstCustomerAddressId((int) ($customer->id)));
-                $this->cart->id_address_delivery = (int) Address::getFirstCustomerAddressId((int) ($customer->id));
                 $this->cart->id_address_invoice = (int) Address::getFirstCustomerAddressId((int) ($customer->id));
 
                 // update id guest in htl_cart_booking_data for bookings added to the cart as a visitor

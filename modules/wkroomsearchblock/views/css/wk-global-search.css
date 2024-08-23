@@ -215,9 +215,7 @@
         border-radius: 4px;}
       .submit_occupancy_btn {
         background-color: #1292FF;
-        font-size: 13px;
         border: none;
-        padding: 5px 20px;
         border-radius: 4px;}
 
 
@@ -229,7 +227,7 @@
   overflow: auto;
   box-shadow: 0 8px 25px -4px rgba(0,0,0,0.39);
   left: 0px;
-  padding: 12px 20px;}
+  padding: 15px 20px;}
   #search_occupancy_wrapper.top {
     top: unset;
     bottom: 100%; }
@@ -253,8 +251,11 @@
       font-weight: bold;
       text-decoration: none;
       font-size: 14px;
-      color: #0000FF;
-      line-height: 24px;}
+      color: #0000FF;}
+      #search_occupancy_wrapper .occupancy_block_actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;}
       #search_occupancy_wrapper .add_new_occupancy_btn:active, #search_occupancy_wrapper .add_new_occupancy_btn:focus, #search_occupancy_wrapper .add_new_occupancy_btn:hover {
         text-decoration: none;
         color: #0000FF;}

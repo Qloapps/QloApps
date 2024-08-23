@@ -29,6 +29,16 @@ var ajaxQueries = new Array();
 $(document).ready(function() {
 	// Init all events
 	init();
+    $(document).on('click', '#view_convenience_services', function(e) {
+        $('#convenience_services').toggle(100);
+        $('#view_convenience_services .icon-angle-up').toggle();
+        $('#view_convenience_services .icon-angle-down').toggle();
+    });
+    $(document).on('click', '#view_order_tax_details', function(e) {
+        $('#order_tax_details').toggle(100);
+        $('#view_order_tax_details .icon-angle-up').toggle();
+        $('#view_order_tax_details .icon-angle-down').toggle();
+    });
 
     $(document).on('click', '.delete-voucher', function(e) {
         if (!confirm(txt_confirm)) {

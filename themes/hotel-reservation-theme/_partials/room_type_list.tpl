@@ -37,7 +37,7 @@
 							</p>
 						{/if}
 					</div>
-					<div class="rm_desc">{$room_v['description']|truncate:190:"":true}&nbsp;<a href="{$room_v['product_link']|escape:'htmlall':'UTF-8'}">{l s='View More'}....</a></div>
+					<div class="rm_desc">{$room_v['description']|truncate:190:"":true}&nbsp;<a class="view_more" href="{$room_v['product_link']|escape:'htmlall':'UTF-8'}">{l s='View More'}....</a></div>
 					<div class="room_features_cont">
 						<div class="row">
 							<div class="col-sm-12 col-md-5 col-lg-6">

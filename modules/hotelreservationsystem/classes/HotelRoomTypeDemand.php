@@ -336,8 +336,10 @@ class HotelRoomTypeDemand extends ObjectModel
                     $price = $objGlobalDemand->price;
                 }
             }
+
+            $price = Tools::convertPrice($price, $idCurrency);
         }
-        $price = Tools::convertPrice($price, $idCurrency);
+
         // Tax calculation section
         $address->id_country = $idCountry;
         $address->id_state = $idState;

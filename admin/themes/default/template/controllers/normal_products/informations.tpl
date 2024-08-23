@@ -234,13 +234,13 @@
 	</div>
 	<div class="form-group" id="associated_hotel_rooms_tree" {if $product->service_product_type == Product::SERVICE_PRODUCT_WITHOUT_ROOMTYPE}style="display:none;"{/if}>
 		<div class="col-lg-1"><span class="pull-right">{include file="controllers/products/multishop/checkbox.tpl" field="category_box" type="category_box"}</span></div>
-		<label class="control-label col-lg-2" for="category_block">
+		<label class="control-label col-lg-2" for="hotel_block">
 			<span class="label-tooltip" data-toggle="tooltip" title="{l s='Select room type and hotels for which this service will be available.'}">
 				{l s='Associated Hotels and Room Types'}
 			</span>
 		</label>
 		<div class="col-lg-9">
-			<div id="category_block">
+			<div id="hotel_block">
 				{$hotel_tree}
 			</div>
 		</div>
