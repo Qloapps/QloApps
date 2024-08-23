@@ -208,7 +208,7 @@ class AdminAboutHotelBlockSettingController extends ModuleAdminController
                         $this->l('Maximum image size: %1s'),
                         Tools::formatBytes(Tools::getMaxUploadSize())
                     ),
-                    'desc' => $this->l('Recommended resolution: 720 x 720 pixels (Ratio 1:1).'),
+                    'desc' => $this->l('Recommended resolution: 720 x 360 pixels.'),
                 ),
                 array(
                     'type' => 'switch',

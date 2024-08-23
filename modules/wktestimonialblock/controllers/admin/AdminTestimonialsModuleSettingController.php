@@ -185,7 +185,7 @@ class AdminTestimonialsModuleSettingController extends ModuleAdminController
                     'display_image' => true,
                     'image' => $imgExist ? $image : false,
                     'hint' => $this->l('Upload an image of the person to whom this testimonial belongs.'),
-                    'desc' => $this->l('Recommended resolution: 98 x 98 pixels (Ratio 1:1).'),
+                    'desc' => $this->l('Recommended resolution: 98 x 98 pixels.'),
                 ),
                 array(
                     'type' => 'switch',
