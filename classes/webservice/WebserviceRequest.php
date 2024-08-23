@@ -513,11 +513,11 @@ class WebserviceRequestCore
                         $object = new $url_resource['class']();
                         if (isset($this->resourceList[$this->urlSegment[0]]['parameters_attribute'])) {
                             $this->resourceConfiguration = $object->getWebserviceParameters($this->resourceList[$this->urlSegment[0]]['parameters_attribute']);
+                            // Setting the parameters for the output builder in cache for the resources having parameters_attribute.
+                            $this->objOutput->setWsParameters($url_resource['class'], $this->resourceConfiguration);
                         } else {
                             $this->resourceConfiguration = $object->getWebserviceParameters();
                         }
-
-                        WebserviceOutputBuilder::setWsParams($url_resource['class'], $this->resourceConfiguration);
                     }
                     $success = false;
                     // execute the action

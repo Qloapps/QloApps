@@ -831,9 +831,9 @@ class WebserviceOutputBuilderCore
         $this->fieldsToDisplay = $fields;
     }
 
-    public static function setWsParams($class, $params)
+    public function setWsParameters($class, $parameters)
     {
-        WebserviceOutputBuilder::$_cache_ws_parameters[$class] = $params;
+        WebserviceOutputBuilder::$_cache_ws_parameters[$class] = $parameters;
     }
 
 }
