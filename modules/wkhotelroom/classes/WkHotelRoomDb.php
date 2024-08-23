@@ -56,4 +56,11 @@ class WkHotelRoomDb
             `'._DB_PREFIX_.'htl_room_block_data`;
         ');
     }
+
+    public static function truncateTables()
+    {
+        return DB::getInstance()->execute(
+            'TRUNCATE TABLE `'._DB_PREFIX_.'htl_room_block_data`;
+        ');
+    }
 }
