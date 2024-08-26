@@ -64,36 +64,36 @@
             {hook h='displayOrderDetailTopLeft' id_order=$order->id}
 
             {block name='order_detial_hotel-details'}
-            <div class="card hotel-details">
-                <div class="card-header">
-                    {l s='Hotel Details'}
+                <div class="card hotel-details">
+                    <div class="card-header">
+                        {l s='Hotel Details'}
+                    </div>
+                    <div class="card-body">
+                        {if Validate::isLoadedObject($obj_hotel_branch_information)}
+                            <div class="description-list">
+                                <dl class="">
+                                    <div class="row">
+                                        <dt class="col-xs-6 col-sm-3">{l s='Hotel Name'}</dt>
+                                        <dd class="col-xs-6 col-sm-3">{$obj_hotel_branch_information->hotel_name}</dd>
+                                        <dt class="col-xs-6 col-sm-3">{l s='Phone Number'}</dt>
+                                        <dd class="col-xs-6 col-sm-3">
+                                            <a href="tel:{if $hotel_address_info.phone_mobile}{$hotel_address_info.phone_mobile}{else}{$hotel_address_info.phone}{/if}">
+                                                {if $hotel_address_info.phone_mobile}{$hotel_address_info.phone_mobile}{else}{$hotel_address_info.phone}{/if}
+                                            </a>
+                                        </dd>
+                                        <dt class="col-xs-6 col-sm-3">{l s='Email'}</dt>
+                                        <dd class="col-xs-6 col-sm-3">
+                                            <a href="mailto:{$obj_hotel_branch_information->email}" class="hotel-email">{$obj_hotel_branch_information->email}</a>
+                                        </dd>
+                                        {hook h='displayOrderDetailHotelDetailsAfter' id_order=$order->id}
+                                    </div>
+                                </dl>
+                            </div>
+                        {else}
+                            <div class="card-text">{l s='Hotel details not available.'}</div>
+                        {/if}
+                    </div>
                 </div>
-                <div class="card-body">
-                    {if Validate::isLoadedObject($obj_hotel_branch_information)}
-                        <div class="description-list">
-                            <dl class="">
-                                <div class="row">
-                                    <dt class="col-xs-6 col-sm-3">{l s='Hotel Name'}</dt>
-                                    <dd class="col-xs-6 col-sm-3">{$obj_hotel_branch_information->hotel_name}</dd>
-                                    <dt class="col-xs-6 col-sm-3">{l s='Phone Number'}</dt>
-                                    <dd class="col-xs-6 col-sm-3">
-                                        <a href="tel:{if $hotel_address_info.phone_mobile}{$hotel_address_info.phone_mobile}{else}{$hotel_address_info.phone}{/if}">
-                                            {if $hotel_address_info.phone_mobile}{$hotel_address_info.phone_mobile}{else}{$hotel_address_info.phone}{/if}
-                                        </a>
-                                    </dd>
-                                    <dt class="col-xs-6 col-sm-3">{l s='Email'}</dt>
-                                    <dd class="col-xs-6 col-sm-3">
-                                        <a href="mailto:{$obj_hotel_branch_information->email}" class="hotel-email">{$obj_hotel_branch_information->email}</a>
-                                    </dd>
-                                    {hook h='displayOrderDetailHotelDetailsAfter' id_order=$order->id}
-                                </div>
-                            </dl>
-                        </div>
-                    {else}
-                        <div class="card-text">{l s='Hotel details not available.'}</div>
-                    {/if}
-                </div>
-            </div>
             {/block}
 
             {block name='order_detail_payment_details_sm'}
@@ -360,6 +360,13 @@
                                             <td class="text-right">{$guestInformations['email']|escape:'html':'UTF-8'}</td>
                                         </tr>
 
+                                        {if isset($guestInformations['phone']) && $guestInformations['phone']}
+                                            <tr>
+                                                <td>{l s='Phone'}</td>
+                                                <td class="text-right">{$guestInformations['phone']|escape:'html':'UTF-8'} </td>
+                                            </tr>
+                                        {/if}
+
                                         {if isset($address_invoice->phone_mobile) && $address_invoice->phone_mobile}
                                             <tr>
                                                 <td>{l s='Mobile'}</td>
@@ -367,18 +374,12 @@
                                             </tr>
                                         {/if}
 
-                                    {if isset($guestInformations['phone']) && $guestInformations['phone']}
-                                        <tr>
-                                            <td>{l s='Phone'}</td>
-                                            <td class="text-right">{$guestInformations['phone']|escape:'html':'UTF-8'} </td>
-                                        </tr>
-                                    {/if}
-
-                                    {if isset($address_invoice->phone_mobile) && $address_invoice->phone_mobile}
-                                        <tr>
-                                            <td>{l s='Mobile'}</td>
-                                            <td class="text-right">{$address_invoice->phone_mobile|escape:'html':'UTF-8'}</td>
-                                        </tr>
+                                        {if isset($address_invoice->phone) && $address_invoice->phone}
+                                            <tr>
+                                                <td>{l s='Phone'}</td>
+                                                <td class="text-right">{$address_invoice->phone|escape:'html':'UTF-8'}</td>
+                                            </tr>
+                                        {/if}
                                     {/if}
 
                                     {hook h='displayOrderDetailGuestDetailsRow' id_order=$order->id}
@@ -493,8 +494,8 @@
                                 </div>
                             </form>
                         </div>
-                    {/block}
-                </div>
+                    </div>
+                {/block}
             {/if}
 
             {hook h='displayOrderDetailBottomLeft' id_order=$order->id}
@@ -714,22 +715,25 @@
                                             <td>{l s='Email'}</td>
                                             <td class="text-right">{$guestInformations['email']|escape:'html':'UTF-8'}</td>
                                         </tr>
+                                        {if isset($guestInformations['phone']) && $guestInformations['phone']}
+                                            <tr>
+                                                <td>{l s='Phone'}</td>
+                                                <td class="text-right">{$guestInformations['phone']|escape:'html':'UTF-8'} </td>
+                                            </tr>
+                                        {/if}
+                                        {if isset($address_invoice->phone_mobile) && $address_invoice->phone_mobile}
+                                            <tr>
+                                                <td>{l s='Mobile'}</td>
+                                                <td class="text-right">{$address_invoice->phone_mobile|escape:'html':'UTF-8'}</td>
+                                            </tr>
+                                        {/if}
 
-                                    <tr>
-                                        <td>{l s='Email'}</td>
-                                        <td class="text-right">{$guestInformations['email']|escape:'html':'UTF-8'}</td>
-                                    </tr>
-                                    {if isset($guestInformations['phone']) && $guestInformations['phone']}
-                                        <tr>
-                                            <td>{l s='Phone'}</td>
-                                            <td class="text-right">{$guestInformations['phone']|escape:'html':'UTF-8'} </td>
-                                        </tr>
-                                    {/if}
-                                    {if isset($address_invoice->phone_mobile) && $address_invoice->phone_mobile}
-                                        <tr>
-                                            <td>{l s='Mobile'}</td>
-                                            <td class="text-right">{$address_invoice->phone_mobile|escape:'html':'UTF-8'}</td>
-                                        </tr>
+                                        {if isset($address_invoice->phone) && $address_invoice->phone}
+                                            <tr>
+                                                <td>{l s='Phone'}</td>
+                                                <td class="text-right">{$address_invoice->phone|escape:'html':'UTF-8'}</td>
+                                            </tr>
+                                        {/if}
                                     {/if}
 
                                     {hook h='displayOrderDetailGuestDetailsRow' id_order=$order->id}

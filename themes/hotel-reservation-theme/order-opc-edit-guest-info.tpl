@@ -87,10 +87,11 @@
                     </div>
                 </div>
 
-            <div class="row">
-                <div class="{if isset($one_phone_at_least) && $one_phone_at_least}required {/if}form-group col-sm-6">
-                    <label for="phone">{l s='Phone Number'}{if isset($one_phone_at_least) && $one_phone_at_least} <sup>**</sup>{/if}</label>
-                    <input type="text" class="text form-control validate" name="phone" id="phone" data-validate="isPhoneNumber" value="{if isset($guestInformations) && isset($guestInformations.phone) && $guestInformations.phone}{$guestInformations.phone}{/if}" />
+                <div class="row">
+                    <div class="{if isset($one_phone_at_least) && $one_phone_at_least}required {/if}form-group col-sm-6">
+                        <label for="phone">{l s='Phone Number'}{if isset($one_phone_at_least) && $one_phone_at_least} <sup>**</sup>{/if}</label>
+                        <input type="text" class="text form-control validate" name="phone" id="phone" data-validate="isPhoneNumber" value="{if isset($guestInformations) && isset($guestInformations.phone) && $guestInformations.phone}{$guestInformations.phone}{/if}" />
+                    </div>
                 </div>
 
                 <div class="row">

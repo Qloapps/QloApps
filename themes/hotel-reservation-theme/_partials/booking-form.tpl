@@ -146,29 +146,48 @@
                                             </div>
                                             <hr class="separator-hr-mg-10 form-group">
                                         {/if}
-                                    </div>
-                                </div>
-                                <hr class="separator-hr-mg-10 form-group">
-                            {/if}
-                            <div id="booking_action_block">
-                                <div class="row">
-                                    <div class="total_price_block col-xs-7 form-group">
-                                        <label class="control-label">{l s='Subtotal'}</label>
-                                        <p>
-                                            {if $total_price && $total_price_without_discount > $total_price}
-                                                <span class="room_type_old_price">
-                                                    {convertPrice price=$total_price_without_discount|floatval}
-                                                </span>
-                                            {/if}
-                                            {convertPrice price=$total_price|floatval}
-                                        </p>
-                                    </div>
-                                    {if $total_available_rooms <= $warning_count}
-                                        <div class="col-xs-5 form-group text-right num_quantity_alert">
-                                            <span class="num_searched_avail_rooms">
-                                                {$total_available_rooms|escape:'html':'UTF-8'}
-                                            </span>
-                                            {if $total_available_rooms > 1} {l s='rooms left!'} {else} {l s='room left!'} {/if}
+                                        <div id="booking_action_block">
+                                            <div class="row">
+                                                <div class="total_price_block col-xs-7 form-group">
+                                                    <label class="control-label">{l s='Subtotal'}</label>
+                                                    <p>
+                                                        {if $total_price && $total_price_without_discount > $total_price}
+                                                            <span class="room_type_old_price">
+                                                                {convertPrice price=$total_price_without_discount|floatval}
+                                                            </span>
+                                                        {/if}
+                                                        {convertPrice price=$total_price|floatval}
+                                                    </p>
+                                                </div>
+                                                {if $total_available_rooms <= $warning_count}
+                                                    <div class="col-xs-5 form-group text-right num_quantity_alert">
+                                                        <span class="num_searched_avail_rooms">
+                                                            {$total_available_rooms|escape:'html':'UTF-8'}
+                                                        </span>
+                                                        {if $total_available_rooms > 1} {l s='rooms left!'} {else} {l s='room left!'} {/if}
+                                                    </div>
+                                                {/if}
+                                            </div>
+                                            <div>
+                                                {if (!$allow_oosp && $product->quantity <= 0) || !$product->available_for_order || (isset($restricted_country_mode) && $restricted_country_mode) || $PS_CATALOG_MODE || $order_date_restrict}
+                                                {else}
+                                                    <div id="additional_products" class="hidden">
+                                                        {if isset($selected_service_product) && $selected_service_product}
+                                                            {foreach $selected_service_product as $product}
+                                                                <input type="hidded" id="service_product_{$product['id_product']}" name="service_product[{$product['id_product']}][]" class="service_product" data-id_product="{$product['id_product']}" value="{$product['quantity']}">
+                                                            {/foreach}
+                                                        {/if}
+                                                    </div>
+                                                    <p id="add_to_cart" class="buttons_bottom_block no-print">
+                                                        <button type="submit" name="Submit" class="exclusive book_now_submit">
+                                                            <span>
+                                                                {if isset($content_only) && $content_only && (isset($product->customization_required) && $product->customization_required)}{l s='Customize'}{else}{l s='Book Now'}{/if}
+                                                            </span>
+                                                            <span id="booking_action_loader"></span>
+                                                        </button>
+                                                    </p>
+                                                {/if}
+                                            </div>
                                         </div>
                                     {else}
                                         <div class="sold_out_alert">
