@@ -176,6 +176,10 @@
 {/if}
 
 {*Disable Dates Model*}
+<div id="modal_loader" class="loading_overlay" style="display: none;">
+    <img src="{$link->getMediaLink(($smarty.const._PS_ADMIN_IMG_))}ajax-loader.gif" class="loading-img"/>
+</div>
+
 <div class="modal fade" id="deactiveDatesModal" tabindex="-1" role="dialog" aria-labelledby="deactiveDatesLabel">
 	<div class="modal-dialog modal-lg" role="document">
 		<div class="modal-content">
@@ -672,6 +676,9 @@
                 var reason = $(formElem).find('.room_disable_reason').val();
                 var idProduct = $('[name="id_product"]').val();
                 var id_disabled_date = parseInt($(formElem).find('.id_disabled_date').val());
+                if (isNaN(id_disabled_date)) {
+                    id_disabled_date = 0;
+                }
                 var event_date_to = new Date(dateTo);
                 // setting the date_to +1 since the full calendar does not includes the date to
                 event_date_to.setDate(event_date_to.getDate() + 1);
@@ -691,6 +698,7 @@
                     },
                     dataType: 'JSON',
                     success: function(response) {
+                        reason = $.trim(reason);
                         if (response.status) {
                             var validatedEvent = {
                                 'id' : DisableDatesModal.getUniqueEventId(),
@@ -749,9 +757,10 @@
                     }
                 });
             },
-            showMessages: function(errors) {
-                $('#deactiveDatesModal .messages-wrap').html(errors);
+            showMessages: function(messages) {
+                $('#deactiveDatesModal .messages-wrap').html(messages);
                 $('#deactiveDatesModal .messages-wrap').show();
+                $('#deactiveDatesModal').animate({ scrollTop: 0 }, 'slow');
             },
             hideMessages: function() {
                 $('#deactiveDatesModal .messages-wrap').hide();
@@ -793,9 +802,13 @@
 
         $('#deactiveDatesModal').on('shown.bs.modal', function(e) {
             calendar.updateSize();
+            $('#modal_loader').hide();
+            $('#deactiveDatesModal').css('visibility', 'visible');
         });
         // Disable dates data filling when model open calendar.
         $('#deactiveDatesModal').on('show.bs.modal', function(e) {
+            $('#deactiveDatesModal').css('visibility', 'hidden');
+            $('#modal_loader').show();
             DisableDatesModal.resetModalInfo();
             const triggerRoomRow = $(e.relatedTarget);
             const idRoom = parseInt($(triggerRoomRow).attr('data-id-room'));
@@ -1075,9 +1088,9 @@
                     success: function(response) {
                         if (response.status) {
                             DisableDatesModal.resetModalInfo();
-                            if (response.new_disabled_dates.length) {
+                            if (response.disabled_dates.length) {
                                 var events = [];
-                                $.each(response.new_disabled_dates, function(index, value) {
+                                $.each(response.disabled_dates, function(index, value) {
                                     var eventId = DisableDatesModal.getUniqueEventId();
                                     events.push({
                                         'id' : eventId,

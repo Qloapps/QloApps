@@ -3571,7 +3571,6 @@ class AdminProductsControllerCore extends AdminController
                 if ($roomInfo['floor'] && !Validate::isGenericName($roomInfo['floor'])) {
                     $this->errors[] = sprintf(Tools::displayError('Invalid floor for room %s.'), $roomIndex);
                 }
-                Hook::exec('actionRoomInformationValidate', array('room_information', $roomInfo));
                 if ($roomInfo['id_status'] == HotelRoomInformation::STATUS_INACTIVE) {
                     $objHotelRoomInformation = new HotelRoomInformation();
                     if (count($objHotelRoomInformation->getFutureBookings($roomInfo['id']))) {
@@ -3585,6 +3584,7 @@ class AdminProductsControllerCore extends AdminController
                         $this->errors[] = sprintf(Tools::displayError('Please add disable dates for room %s.'), $roomIndex);
                     }
                 }
+                Hook::exec('actionValidateRoomInformation', array('room_information', $roomInfo));
             }
         } else {
             $this->errors[] = Tools::displayError('Please add at least one room.');
@@ -5000,7 +5000,7 @@ class AdminProductsControllerCore extends AdminController
         die(json_encode($response));
     }
 
-    public function assignSmartyMessages()
+    public function assignAlerts()
     {
         $this->context->smarty->assign(array(
             'errors' => $this->errors,
@@ -5040,7 +5040,7 @@ class AdminProductsControllerCore extends AdminController
 
                 $objHotelRoomDisableDates->date_from = $dateFrom;
                 $objHotelRoomDisableDates->date_to = $dateTo;
-                $objHotelRoomDisableDates->reason = Tools::getValue('reason');
+                $objHotelRoomDisableDates->reason = trim(Tools::getValue('reason'));
                 $objHotelRoomInfo->id_status = HotelRoomInformation::STATUS_TEMPORARY_INACTIVE;
                 if ($objHotelRoomInfo->save()
                     && $objHotelRoomDisableDates->save()
@@ -5067,7 +5067,7 @@ class AdminProductsControllerCore extends AdminController
             $response['status'] = true;
         }
 
-        $this->assignSmartyMessages();
+        $this->assignAlerts();
         $response['msg'] = $this->context->smarty->fetch('alerts.tpl');
         $this->ajaxDie(json_encode($response));
     }
@@ -5087,18 +5087,18 @@ class AdminProductsControllerCore extends AdminController
                 'date_to' => $dateTo,
                 'id_room' => $idRoom
             );
-            Hook::exec('actionRoomDisabledDatesRemoveBefore', array('disabled_dates_info', $params));
-            if (($disabledDates = $objRoomDisableDates->checkIfRoomAlreadyDisabled($params))
-                && empty($this->errors)
+            Hook::exec('actionRoomDisabledDatesRemoveBefore', array('disabled_dates', $params));
+            if (empty($this->errors)
+                && ($disabledDates = $objRoomDisableDates->checkIfRoomAlreadyDisabled($params))
             ) {
                 $newDates = array();
-                foreach ($disabledDates as $data) {
-                    $objRoomDisableDates = new HotelRoomDisableDates($data['id']);
-                    $newDates[0]['date_from'] = $data['date_from'];
+                foreach ($disabledDates as $disabledDatesInfo) {
+                    $objRoomDisableDates = new HotelRoomDisableDates($disabledDatesInfo['id']);
+                    $newDates[0]['date_from'] = $disabledDatesInfo['date_from'];
                     $newDates[0]['date_to'] = $params['date_from'];
 
                     $newDates[1]['date_from'] = $params['date_to'];
-                    $newDates[1]['date_to'] = date('Y-m-d', strtotime($data['date_to']));
+                    $newDates[1]['date_to'] = date('Y-m-d', strtotime($disabledDatesInfo['date_to']));
 
                     if (strtotime($newDates[0]['date_from']) >= strtotime($newDates[0]['date_to'])) {
                         unset($newDates[0]);
@@ -5129,7 +5129,7 @@ class AdminProductsControllerCore extends AdminController
             $response['status'] = false;
         } else {
             $response['status'] = true;
-            $this->confirmations[] = $this->l('Selected dates were removed successfully.');
+            $this->confirmations[] = $this->l('Removed successfully.');
             if ($disabledDates = $objRoomDisableDates->getRoomDisableDates($idRoom)) {
                 foreach ($disabledDates as $disabledDatesKey => $dates) {
                     $disabledDates[$disabledDatesKey]['date_add'] = date('Y-m-d', strtotime($dates['date_add']));
@@ -5159,10 +5159,10 @@ class AdminProductsControllerCore extends AdminController
                 $objRoomInfo->save();
             }
 
-            $response['new_disabled_dates'] = $disabledDates;
+            $response['disabled_dates'] = $disabledDates;
         }
 
-        $this->assignSmartyMessages();
+        $this->assignAlerts();
         $response['msg'] = $this->context->smarty->fetch('alerts.tpl');
         $this->ajaxDie(json_encode($response));
     }
@@ -5195,7 +5195,7 @@ class AdminProductsControllerCore extends AdminController
             $this->confirmations[] = $this->l('Removed successfully');
         }
 
-        $this->assignSmartyMessages();
+        $this->assignAlerts();
         $response['msg'] = $this->context->smarty->fetch('alerts.tpl');
         $this->ajaxDie(json_encode($response));
     }
