@@ -185,7 +185,7 @@ class HotelBookingDetail extends ObjectModel
         return $result;
     }
 
-    public function getBookingDataParams($params)
+    public function getBookingDataParams(&$params)
     {
         if (!isset($params['id_room_type'])) {
             $params['id_room_type'] = 0;
@@ -304,7 +304,7 @@ class HotelBookingDetail extends ObjectModel
                         'idRoomType' => $id_room_type,
                         'allowedIdRoomTypes' => $allowedIdRoomTypes,
                         'applyLosRestriction' => $applyLosRestriction,
-                        'extra_params' => $params,
+                        'allParams' => $params,
                     );
                     $unavailRoomTypes = $this->getSearchUnavailableRooms($searchParams);
                 }
@@ -317,7 +317,7 @@ class HotelBookingDetail extends ObjectModel
                         'idGuest' => $id_guest,
                         'idRoomType' => $id_room_type,
                         'allowedIdRoomTypes' => $allowedIdRoomTypes,
-                        'extra_params' => $params,
+                        'allParams' => $params,
                     );
                     $cartRoomTypes = $this->getSearchCartRooms($searchParams);
                 }
@@ -335,7 +335,7 @@ class HotelBookingDetail extends ObjectModel
                         'allowedIdRoomTypes' => $allowedIdRoomTypes,
                         'applyLosRestriction' => $applyLosRestriction,
                         'hourlyBooking' => $hourly_booking,
-                        'extra_params' => $params,
+                        'allParams' => $params,
                     );
                     $availableRoomTypes = $this->getSearchAvailableRooms($searchParams);
                     if ($availableRoomTypes['unavailableRoomTypes'] && $search_unavai) {
@@ -370,7 +370,7 @@ class HotelBookingDetail extends ObjectModel
                         'dateTo' => $date_to,
                         'idRoomType' => $id_room_type,
                         'allowedIdRoomTypes' => $allowedIdRoomTypes,
-                        'extra_params' => $params,
+                        'allParams' => $params,
                     );
                     $bookedRoomTypes = $this->getSearchBookedRooms($searchParams);
                 }
@@ -387,7 +387,7 @@ class HotelBookingDetail extends ObjectModel
                         'searchOccupancy' => $occupancy,
                         'allowedIdRoomTypes' => $allowedIdRoomTypes,
                         'hourlyBooking' => $hourly_booking,
-                        'extra_params' => $params,
+                        'allParams' => $params,
                     );
 
                     $partiallyAvailRoomTypes = $this->getSearchPartiallyAvailRooms($searchParams);
@@ -493,7 +493,7 @@ class HotelBookingDetail extends ObjectModel
      *      'idRoomType' => ...,
      *      'allowedIdRoomTypes' => ...,
      *      'applyLosRestriction' => ...,
-     *      'extra_params' => ...,
+     *      'allParams' => ...,
      * );
      */
     protected function getSearchUnavailableRooms($params)
@@ -541,19 +541,16 @@ class HotelBookingDetail extends ObjectModel
 
         }
 
-        $hookParams = array(
+        Hook::exec('actionUnavailRoomSearchSqlModifier', array(
             'sql' => &$sql,
             'params' => array(
                 'id_hotel' => $idHotel,
                 'id_product' => $idRoomType,
                 'date_from' => $dateFrom,
                 'date_to' => $dateTo,
+                'all_params' => $allParams
             )
-        );
-        if (isset($extra_params)) {
-            $hookParams['params']['extra_params'] = $extra_params;
-        }
-        Hook::exec('actionUnavailRoomSearchSqlModifier', $hookParams);
+        ));
 
         $sql = implode(' UNION ', $sql);
         $sql .= ' ORDER BY `id_room`, `date_from` ASC';
@@ -589,7 +586,7 @@ class HotelBookingDetail extends ObjectModel
      *      'idGuest' => ...,
      *      'idRoomType' => ...,
      *      'allowedIdRoomTypes' => ...,
-     *      'extra_params' => ...,
+     *      'allParams' => ...,
      *  );
      */
     protected function getSearchCartRooms($params)
@@ -609,7 +606,7 @@ class HotelBookingDetail extends ObjectModel
             $orderByCartRoomSearch = '';
             $orderWayCartRoomSearch = '';
 
-            $hookParams = array(
+            Hook::exec('actionCartRoomSearchSqlModifier', array(
                 'select' => $selectCartRoomSearch,
                 'join' => &$joinCartRoomSearch,
                 'where' => &$whereCartRoomSearch,
@@ -621,12 +618,9 @@ class HotelBookingDetail extends ObjectModel
                     'id_product' => $idRoomType,
                     'idCart' => $idCart,
                     'idGuest' => $idGuest,
+                    'all_params' => $allParams
                 )
-            );
-            if (isset($extra_params)) {
-                $hookParams['params']['extra_params'] = $extra_params;
-            }
-            Hook::exec('actionCartRoomSearchSqlModifier', $hookParams);
+            ));
 
             $sql = $selectCartRoomSearch;
             $sql .= ' FROM `'._DB_PREFIX_.'htl_cart_booking_data` AS cbd';
@@ -659,7 +653,7 @@ class HotelBookingDetail extends ObjectModel
      *      'allowedIdRoomTypes' => ...,
      *      'applyLosRestriction' => ...,
      *      'hourlyBooking' => ...,
-     *      'extra_params' => ...,
+     *      'allParams' => ...,
      * );
      */
     protected function getSearchAvailableRooms($params)
@@ -689,8 +683,8 @@ class HotelBookingDetail extends ObjectModel
         }
 
         // Exculde Booked rooms
-        $exclude_ids = array();
-        $exclude_ids['checked_out'] = 'SELECT `id_room`
+        $excludeRoomId = array();
+        $excludeRoomId['checked_out'] = 'SELECT `id_room`
         FROM `'._DB_PREFIX_.'htl_booking_detail`
         WHERE `id_hotel` = '.(int)$idHotel.' AND `is_back_order` = 0 AND `is_refunded` = 0 AND IF(`id_status` = '. self::STATUS_CHECKED_OUT.',
             IF('.(int) $hourlyBooking.', 1, (DATE_FORMAT(`check_out`,  "%Y-%m-%d") != DATE_FORMAT(\''.pSQL($dateFrom).'\',  "%Y-%m-%d")) AND (`check_out` > \''.pSQL($dateFrom).'\' AND `check_out` <= \''.PSQL($dateTo).'\')) AND (
@@ -706,14 +700,14 @@ class HotelBookingDetail extends ObjectModel
         )) AND IF('.(int)$idRoomType.' > 0, `id_product` = '.(int)$idRoomType.', 1) AND `id_product` IN ('.$allowedIdRoomTypes.')';
 
         // Exclude temporary disable rooms
-        $exclude_ids['disabled'] = 'SELECT hri.`id` AS id_room
+        $excludeRoomId['disabled'] = 'SELECT hri.`id` AS id_room
             FROM `'._DB_PREFIX_.'htl_room_information` AS hri
             INNER JOIN `'._DB_PREFIX_.'htl_room_disable_dates` AS hrdd ON (hrdd.`id_room_type` = hri.`id_product` AND hrdd.`id_room` = hri.`id`)
             WHERE hri.`id_hotel`='.(int)$idHotel.' AND hri.`id_status` = '. HotelRoomInformation::STATUS_TEMPORARY_INACTIVE .' AND (hrdd.`date_from` < \''.pSql($dateTo).'\' AND hrdd.`date_to` > \''.pSql($dateFrom).'\') AND IF('.(int)$idRoomType.' > 0, hri.`id_product` = '.(int)$idRoomType.', 1) AND hri.`id_product` IN ('.$allowedIdRoomTypes.')';
 
         // LOS Restriction. Also, Remember to check max LOS restriction is greater than zero
         if ($applyLosRestriction) {
-            $exclude_ids['length_of_stay'] = 'SELECT hri.`id` AS `id_room`
+            $excludeRoomId['length_of_stay'] = 'SELECT hri.`id` AS `id_room`
                 FROM `'._DB_PREFIX_.'htl_room_information` AS hri
                 INNER JOIN `'._DB_PREFIX_.'htl_room_type` AS hrt ON (hrt.`id_product` = hri.`id_product`)
                 LEFT JOIN `'._DB_PREFIX_.'htl_room_type_restriction_date_range` AS hrtr ON (hrt.`id_product` = hrtr.`id_product` AND (hrtr.`date_from` <= \''.pSQL($stayStartDate).'\' AND hrtr.`date_to` > \''.pSQL($stayStartDate).'\'))
@@ -731,11 +725,11 @@ class HotelBookingDetail extends ObjectModel
         $orderByAvailRoomSearch = 'ORDER BY ri.`id`';
         $orderWayAvailRoomSearch = 'ASC';
 
-        $hookParams = array(
+        Hook::exec('actionAvailRoomSearchSqlModifier', array(
             'select' => $selectAvailRoomSearch,
             'join' => &$joinAvailRoomSearch,
             'where' => &$whereAvailRoomSearch,
-            'exclude_ids' => &$exclude_ids,
+            'exclude_room_id' => &$excludeRoomId,
             'group_by' => &$groupByAvailRoomSearch,
             'order_by' => &$orderByAvailRoomSearch,
             'order_way' => &$orderWayAvailRoomSearch,
@@ -744,18 +738,15 @@ class HotelBookingDetail extends ObjectModel
                 'id_product' => $idRoomType,
                 'date_from' => $dateFrom,
                 'date_to' => $dateTo,
+                'all_params' => $allParams
             )
-        );
-        if (isset($extra_params)) {
-            $hookParams['params']['extra_params'] = $extra_params;
-        }
-        Hook::exec('actionAvailRoomSearchSqlModifier', $hookParams);
+        ));
 
         $sql = $selectAvailRoomSearch;
         $sql .= ' FROM `'._DB_PREFIX_.'htl_room_information` AS ri';
         $sql .= ' '.$joinAvailRoomSearch;
         $sql .= ' '.$whereAvailRoomSearch;
-        $sql .= ' AND ri.`id` NOT IN ('.implode(' UNION ', $exclude_ids).')';
+        $sql .= ' AND ri.`id` NOT IN ('.implode(' UNION ', $excludeRoomId).')';
         $sql .= ' '.$groupByAvailRoomSearch;
         $sql .= ' '.$orderByAvailRoomSearch;
         $sql .= ' '.$orderWayAvailRoomSearch;
@@ -1013,7 +1004,7 @@ class HotelBookingDetail extends ObjectModel
      *      'searchOccupancy' => ...,
      *      'allowedIdRoomTypes' => ...,
      *      'hourlyBooking' => ...,
-     *      'extra_params' => ...,
+     *      'allParams' => ...,
      * );
      */
     protected function getSearchPartiallyAvailRooms($params)
@@ -1045,19 +1036,16 @@ class HotelBookingDetail extends ObjectModel
                 (hrdd.`date_from` > \''.pSQL($dateFrom).'\' AND hrdd.`date_from` < \''.pSQL($dateTo).'\' AND hrdd.`date_to` < \''.pSQL($dateTo).'\')
             ) AND IF('.(int)$idRoomType.' > 0, hri.`id_product` = '.(int)$idRoomType.', 1) AND hri.`id_product` IN ('.$allowedIdRoomTypes.')';
 
-        $hookParams = array(
+        Hook::exec('actionPartiallyAvailRoomSearchSqlModifier', array(
             'sql' => &$sql,
             'params' => array(
                 'id_hotel' => $idHotel,
                 'id_product' => $idRoomType,
                 'date_from' => $dateFrom,
                 'date_to' => $dateTo,
+                'all_params' => $allParams
             )
-        );
-        if (isset($extra_params)) {
-            $hookParams['params']['extra_params'] = $extra_params;
-        }
-        Hook::exec('actionPartiallyAvailRoomSearchSqlModifier', $hookParams);
+        ));
 
         $sql = implode(' UNION ', $sql);
         $sql .= ' ORDER BY id_room ASC';
@@ -1372,10 +1360,10 @@ class HotelBookingDetail extends ObjectModel
             (`date_from` <= \''.pSQL($dateFrom).'\' AND `date_to` >= \''.pSQL($dateTo).'\')
         )) AND IF('.(int)$idRoomType.' > 0, `id_product` = '.(int)$idRoomType.', 1) AND `id_product` IN ('.$allowedIdRoomTypes.')';
         $groupByBookedRoomSearch = '';
-        $orderByBookedRoomSearch = 'ORDER BY `id_room`, `date_from` ASC';
-        $orderWayBookedRoomSearch = '';
+        $orderByBookedRoomSearch = 'ORDER BY `id_room`, `date_from`';
+        $orderWayBookedRoomSearch = 'ASC';
 
-        $hookParams = array(
+        Hook::exec('actionBookedRoomSearchSqlModifier', array(
             'select' => $selectBookedRoomSearch,
             'join' => &$joinBookedRoomSearch,
             'where' => &$whereBookedRoomSearch,
@@ -1387,12 +1375,9 @@ class HotelBookingDetail extends ObjectModel
                 'id_product' => $idRoomType,
                 'date_from' => $dateFrom,
                 'date_to' => $dateTo,
+                'all_params' => $allParams
             )
-        );
-        if (isset($extra_params)) {
-            $hookParams['params']['extra_params'] = $extra_params;
-        }
-        Hook::exec('actionBookedRoomSearchSqlModifier', $hookParams);
+        ));
 
         $sql = $selectBookedRoomSearch;
         $sql .= ' FROM `'._DB_PREFIX_.'htl_booking_detail`';

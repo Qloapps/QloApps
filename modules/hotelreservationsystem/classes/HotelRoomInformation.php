@@ -79,7 +79,7 @@ class HotelRoomInformation extends ObjectModel
     {
         if ($idRoom = $this->id) {
             // delete rooms from cart which are set inactive
-            if ($this->id_status == self::STATUS_INACTIVE) {
+            if ($this->id_status == HotelRoomInformation::STATUS_INACTIVE) {
                 $objCartBookingData = new HotelCartBookingData();
                 if (!$objCartBookingData->deleteCartBookingData(0, 0, $idRoom)) {
                     return false;
@@ -143,16 +143,16 @@ class HotelRoomInformation extends ObjectModel
     {
         $status = array(
             'STATUS_ACTIVE' => array(
-                'id' => self::STATUS_ACTIVE,
-                'status' => self::getRoomStatusTitle(self::STATUS_ACTIVE)
+                'id' => HotelRoomInformation::STATUS_ACTIVE,
+                'status' => self::getRoomStatusTitle(HotelRoomInformation::STATUS_ACTIVE)
             ),
             'STATUS_INACTIVE' => array(
-                'id' => self::STATUS_INACTIVE,
-                'status' => self::getRoomStatusTitle(self::STATUS_INACTIVE)
+                'id' => HotelRoomInformation::STATUS_INACTIVE,
+                'status' => self::getRoomStatusTitle(HotelRoomInformation::STATUS_INACTIVE)
             ),
             'STATUS_TEMPORARY_INACTIVE' => array(
-                'id' => self::STATUS_TEMPORARY_INACTIVE,
-                'status' => self::getRoomStatusTitle(self::STATUS_TEMPORARY_INACTIVE)
+                'id' => HotelRoomInformation::STATUS_TEMPORARY_INACTIVE,
+                'status' => self::getRoomStatusTitle(HotelRoomInformation::STATUS_TEMPORARY_INACTIVE)
             ),
         );
         return $status;
@@ -162,11 +162,11 @@ class HotelRoomInformation extends ObjectModel
     {
         $moduleInstance = Module::getInstanceByName('hotelreservationsystem');
         $status = array(
-            self::STATUS_ACTIVE => $moduleInstance->l('Active', 'hotelreservationsystem'),
-            self::STATUS_INACTIVE => $moduleInstance->l('Inactive', 'hotelreservationsystem'),
-            self::STATUS_TEMPORARY_INACTIVE => $moduleInstance->l('Temporarily Inactive', 'hotelreservationsystem'),
-            self::STATUS_SEARCH_LOS_UNSATISFIED => $moduleInstance->l('Searched duration outside room length of stay requirements', 'hotelreservationsystem'),
-            self::STATUS_SEARCH_OCCUPANCY_UNSATISFIED => $moduleInstance->l('Occupancy exceeds room capacity', 'hotelreservationsystem'),
+            HotelRoomInformation::STATUS_ACTIVE => $moduleInstance->l('Active', 'hotelreservationsystem'),
+            HotelRoomInformation::STATUS_INACTIVE => $moduleInstance->l('Inactive', 'hotelreservationsystem'),
+            HotelRoomInformation::STATUS_TEMPORARY_INACTIVE => $moduleInstance->l('Temporarily Inactive', 'hotelreservationsystem'),
+            HotelRoomInformation::STATUS_SEARCH_LOS_UNSATISFIED => $moduleInstance->l('Length of stay restriction not satisfied', 'hotelreservationsystem'),
+            HotelRoomInformation::STATUS_SEARCH_OCCUPANCY_UNSATISFIED => $moduleInstance->l('Occupancy exceeds room capacity', 'hotelreservationsystem'),
         );
 
         return isset($status[$idStatus]) ? $status[$idStatus] : '';
