@@ -1216,6 +1216,7 @@ class FrontControllerCore extends Controller
          */
         if ($this->context->language->is_rtl) {
             $this->addCSS(_THEME_CSS_DIR_.'rtl.css');
+            $this->addCSS(_THEME_CSS_DIR_.'rtl_grid.css');
             $this->addCSS(_THEME_CSS_DIR_.$this->context->language->iso_code.'.css');
         }
     }

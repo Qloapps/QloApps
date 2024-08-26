@@ -23,15 +23,15 @@
 *  International Registered Trademark & Property of PrestaShop SA
 *}
 
-{block name='contact_form_success_message'}
-	{if isset($smarty.get.confirm)}
-		<p class="alert alert-success">{l s='Your message has been successfully sent to our team.'}</p>
-	{/if}
-{/block}
-{block name='contact_errors_block'}
-	{include file="$tpl_dir./errors.tpl"}
-{/block}
-{block name='contact_page_content'}
+{block name='contact_page'}
+	{block name='contact_form_success_message'}
+		{if isset($smarty.get.confirm)}
+			<p class="alert alert-success">{l s='Your message has been successfully sent to our team.'}</p>
+		{/if}
+	{/block}
+	{block name='contact_errors_block'}
+		{include file="$tpl_dir./errors.tpl"}
+	{/block}
 	<div class="margin-top-50 htl-contact-page">
 		{block name='contact_page_heading'}
 			<div class="row">
@@ -175,9 +175,9 @@
 								<span class="htl-map-icon"></span><span>{$hotel['city']}</span>
 							</div>
 							<div class="hotel-address-container">
-									<div class="col-xs-4">
-										<img class="htl-img" style="width:100%" src="{$hotel['image_url']}">
-									</div>
+								<div class="col-xs-4">
+									<img class="htl-img" style="width:100%" src="{$hotel['image_url']}">
+								</div>
 								<div class="col-xs-8">
 									<p class="hotel-name"><span>{$hotel['hotel_name']}</span></p>
 									<p class="hotel-branch-info-value">{$hotel['address']}, {$hotel['city']}, {if {$hotel['state_name']}}{$hotel['state_name']},{/if} {$hotel['country_name']}, {$hotel['postcode']}</p>

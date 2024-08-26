@@ -128,6 +128,7 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
             $this->fields_list['total_pending_requests'] = array(
                 'title' => $this->l('Pending Requests'),
                 'align' => 'center',
+                'type' => 'range',
                 'havingFilter' => true,
             );
         }
