@@ -122,7 +122,7 @@ abstract class HTMLTemplateCore
 
         $width = 0;
         $height = 0;
-        if (!empty($path_logo)) {
+        if (!empty($path_logo) && file_exists($path_logo)) {
             list($width, $height) = getimagesize($path_logo);
         }
 

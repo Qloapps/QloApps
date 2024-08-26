@@ -524,7 +524,7 @@ class HotelCartBookingData extends ObjectModel
                 }
             }
             if ($res && $objCart->updateQty((int)($roomsRequired * $num_days), $id_product)) {
-                if ($id_room) {
+                if ($roomsRequired == 1) {
                     return $obj_htl_cart_booking_data->id;
                 } else {
                     return true;
