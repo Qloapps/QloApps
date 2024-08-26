@@ -430,6 +430,8 @@ class HotelCartBookingData extends ObjectModel
                 }
             }
         }
+        // after room is removed from cart, check if any of the appled cart rules are not being used
+        CartRule::removeUnusedCartRules(Context::getContext());
 
         // return number of rooms deleted
         return true;
@@ -524,6 +526,8 @@ class HotelCartBookingData extends ObjectModel
                 }
             }
             if ($res && $objCart->updateQty((int)($roomsRequired * $num_days), $id_product)) {
+                // after room is added in cart, check if any of the appled cart rules are not being used
+                CartRule::removeUnusedCartRules(Context::getContext());
                 if ($id_room) {
                     return $obj_htl_cart_booking_data->id;
                 } else {
@@ -1873,6 +1877,14 @@ class HotelCartBookingData extends ObjectModel
         } else {
             return $roomTypeDemands;
         }
+    }
+
+    public function save($null_values = false, $auto_date = true)
+    {
+        $return = parent::save($null_values = false, $auto_date = true);
+        // after updating cart data, check if any of the appled cart rules are not being used
+        CartRule::removeUnusedCartRules(Context::getContext());
+        return $return;
     }
 
     // Webservice :: get extra demands for the cart booking
