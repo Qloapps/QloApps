@@ -20,7 +20,7 @@
 $(document).ready(function() {
     applyChangesToDescription();
     $(window).on('resize', function() {
-        cleanDescriptions();
+     resetDescriptions();
         applyChangesToDescription();
     });
 
@@ -35,7 +35,8 @@ $(document).ready(function() {
         }
     });
 });
-function cleanDescriptions() {
+
+function resetDescriptions() {
     $(document).find('.htlRoomTypeDescText').each(function() {
         $(this).addClass('htlRoomTypeDescTextContainer');
         $(this).html($(this).parent().find('.htlRoomTypeDescOriginal').html());
@@ -45,7 +46,7 @@ function cleanDescriptions() {
 function applyChangesToDescription() {
     $(document).find('.htlRoomTypeDescText').each(function() {
         // checking if the display:overFlow has been applied to the description.
-        if ($(this).prop('scrollHeight') - $(this).prop('clientHeight') > 15) {
+        if ($(this).prop('scrollHeight') - $(this).prop('clientHeight') > 14) {
             // Only show read more and read less text if the text is wrapped.
             initToggleOptions($(this)[0]);
         }
@@ -54,45 +55,51 @@ function applyChangesToDescription() {
 
 function initToggleOptions(target) {
     // Getting the number of displayed characters
-    var show_char = getChars(target);
+    var show_char = getVisibleWords(target);
     var ellipses = "... ";
     var content = $(target).html();
+    show_char = show_char - (readMoreText.length + ellipses.length + 5); // adding extra 5 chars of space
     if (content.trim().length > show_char) {
         // Dividing the text into two parts so that we are able to differentiate the displayed text from hidden text.
-        var a = content.trim().substr(0, show_char);
-        var b = content.trim().substr(show_char - content.trim().length);
+        var visibleText = content.trim().substr(0, show_char);
+        var hiddenText = content.trim().substr(show_char - content.trim().length);
         // Adding the read more and read less text with the ellipses to the original text.
-        var html = a + "<span class='truncated'>" + ellipses + "</span><span class='read-extra-text'>"+ readMoreText +"</span><span class='truncated' style='display:none'>" + b + "</span><span class='read-extra-text' style='display:none'> "+ readLessText +"</span></span>";
+        var html = visibleText + "<span class='truncated'>" + ellipses + "</span><span class='read-extra-text'>"+ readMoreText +"</span><span class='truncated' style='display:none'>" + hiddenText + "</span><span class='read-extra-text' style='display:none'> "+ readLessText +"</span></span>";
         $(target).html(html);
     }
 }
 
-// Getting the number of characters displayed to the user.
-function getChars(target) {
+function getVisibleWords(target) {
     var style = window.getComputedStyle(target, null);
-    // Getting the size of the container displayed to the user, this will ignore the overflow: hidden text.
-    var line_height = parseInt(style.getPropertyValue("line-height"));
-    var font_size = parseInt(style.getPropertyValue("font-size"));
-    var height = parseInt(style.getPropertyValue("height"));
     var width = parseInt(style.getPropertyValue("width"));
+    var lines = 3; // since we are using line clamp to display only three lines.
+    var text = $(target).text();
+    var words = text.split(/\s+/); // Split text into words based on whitespace
+    var visibleWords = [];
+    var currentLineWidth = 0;
 
-    if(isNaN(line_height)) line_height = font_size * 1.2;
-    // Counting the number of the lines displayed to the user by the display:overFlow property, since this can vary depending the screen size.
-    var lines = Math.ceil(height / line_height) + 1;
-    // Counting the number of the characters in the lines
-    var displayedCharacters = $(target).text().split('').slice(0, lines * (width / parseInt(font_size))).join('').length;
+    for (var i = 0; i < words.length; i++) {
+        var word = words[i];
+        var wordWidth = getTextWidth(word, style);
 
-    if ($(document).width() > 991) {
-        displayedCharacters += 25;
-    } else if ($(document).width() > 768) {
-        displayedCharacters += 35;
-    } else if ($(document).width() > 570) {
-        displayedCharacters += 20;
-    } else if ($(document).width() > 444) {
-        displayedCharacters += 10;
-    } else {
-        displayedCharacters += 5;
+        if (currentLineWidth + wordWidth <= width) {
+            visibleWords.push(word);
+            currentLineWidth += wordWidth + getTextWidth(' ', style); // Add space width
+        } else {
+            lines--;
+            if (lines <= 0) break;
+
+            visibleWords.push(word);
+            currentLineWidth = wordWidth + getTextWidth(' ', style); // Start a new line with the current word
+        }
     }
 
-    return displayedCharacters;
+    return visibleWords.join(' ').length;
+}
+
+function getTextWidth(text, style) {
+    var canvas = document.createElement('canvas');
+    var context = canvas.getContext('2d');
+    context.font = `${style.getPropertyValue("font-weight")} ${style.getPropertyValue("font-size")} ${style.getPropertyValue("font-family")}`;
+    return context.measureText(text).width;
 }
