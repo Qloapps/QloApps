@@ -2494,11 +2494,23 @@ class HotelHelper
 
     public static function getNumberOfDays($dateFrom, $dateTo)
     {
-        $startDate = new DateTime($dateFrom);
-        $endDate = new DateTime($dateTo);
-        $daysDifference = $startDate->diff($endDate)->days;
+        $start = new DateTime($dateFrom);
+        $end = new DateTime($dateTo);
+        $difference = $start->diff($end);
+        if ($start->format('Y-m-d') == $end->format('Y-m-d')) {
+            // hourly
+            $diff = $difference->h;
+        } else {
+            $diff = $difference->days;
 
-        return $daysDifference;
+            $time1 = $start->format('H:i');
+            $time2 = $end->format('H:i');
+            if (strtotime($time1) > strtotime($time2)) {
+                $diff += 1;
+            }
+        }
+
+        return $diff;
     }
 
     public static function validateDateRangeForHotel($dateFrom, $dateTo, $idHotel)

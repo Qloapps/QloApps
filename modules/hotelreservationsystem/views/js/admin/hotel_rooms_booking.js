@@ -22,7 +22,7 @@ $(document).ready(function() {
     // calender
     if ($('#fullcalendar').length) {
         var calendar = new FullCalendar.Calendar($('#fullcalendar').get(0), {
-            initialView: 'dayGridMonth',
+            initialView: initialView,
             initialDate: initialDate,
             events: {
                 url: rooms_booking_url,

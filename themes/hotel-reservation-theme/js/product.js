@@ -1335,6 +1335,7 @@ var BookingForm = {
             disableRoomTypeDemands(0);
             disableRoomTypeServices(0);
         }
+        $(document).trigger("QloApps:afterBookingFormInit");
     },
     initDatepicker: function(max_order_date, preparation_time, dateFrom, dateTo) {
         let start_date = new Date();
@@ -1393,35 +1394,29 @@ var BookingForm = {
         }
     },
     getFormData: function () {
-        // var quantity = parseInt($('#quantity_wanted').val());
-        // quantity = (isNaN(quantity) || quantity < 1) ? 1 : quantity;
-
-        var data = {
-            id_product: parseInt($('#product_page_product_id').val()),
-            date_from: $('#room_check_in').val(),
-            date_to: $('#room_check_out').val(),
-            // quantity: quantity,
-            room_type_demands: JSON.stringify(getRoomsExtraDemands()),
-            room_service_products: JSON.stringify(getRoomsServiceProducts()),
-        };
+        console.log($('#booking-form'));
+        var formData = new FormData($('form#booking-form').get(0));
+        formData.append('ajax', true);
+        formData.append('action', 'refreshBookingForm');
+        formData.append('room_type_demands', JSON.stringify(getRoomsExtraDemands()));
+        formData.append('room_service_products', JSON.stringify(getRoomsServiceProducts()));
         if (occupancy = getBookingOccupancy()) {
-            data.occupancy = occupancy;
+            formData.append('occupancy', occupancy);
         }
-
-        return data;
+        return formData;
     },
     refresh: function(resetOccupancy = false) {
         return new Promise((resolve, reject) => {
+
+
             BookingForm.currentRequest = $.ajax({
                 url: product_controller_url,
                 type: 'POST',
-                headers: { 'cache-control': 'no-cache' },
                 dataType: 'JSON',
                 cache: false,
-                data: $.extend({
-                    ajax: true,
-                    action: 'refreshBookingForm',
-                }, BookingForm.getFormData()),
+                data: BookingForm.getFormData(),
+                processData: false,
+                contentType: false,
                 beforeSend: function() {
                     if(BookingForm.currentRequest != null) {
                         BookingForm.currentRequest.abort();

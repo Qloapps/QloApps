@@ -646,6 +646,9 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
         $with_auto_room_services = 1,
         $use_reduc = 1
     ) {
+        if ($date_from == $date_to) {
+            ddd('<pre>'.print_r(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS), true).'</pre>');
+        }
         $totalPrice = array();
         $totalPrice['total_price_tax_incl'] = 0;
         $totalPrice['total_price_tax_excl'] = 0;
@@ -666,15 +669,15 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
 
         // if date_from and date_to are same then date_to will be the next date date of date_from
         if (strtotime($date_from) == strtotime($date_to)) {
-            $date_to = date('Y-m-d', strtotime('+1 day', strtotime($date_from)));
+            $date_to = date('Y-m-d H:i:s', strtotime('+1 day', strtotime($date_from)));
         }
         $context = Context::getContext();
         $id_currency = Validate::isLoadedObject($context->currency) ? (int)$context->currency->id : (int)Configuration::get('PS_CURRENCY_DEFAULT');
 
         $hotelCartBookingData = new HotelCartBookingData();
-        $date_from = date('Y-m-d', strtotime($date_from));
-        $date_to = date('Y-m-d', strtotime($date_to));
-        for($currentDate = $date_from; $currentDate < $date_to; $currentDate = date('Y-m-d', strtotime('+1 day', strtotime($currentDate)))) {
+        $date_from = date('Y-m-d H:i:s', strtotime($date_from));
+        $date_to = date('Y-m-d H:i:s', strtotime($date_to));
+        for($currentDate = $date_from; $currentDate < $date_to; $currentDate = date('Y-m-d H:i:s', strtotime('+1 day', strtotime($currentDate)))) {
             if ($use_reduc && ($featurePrice = $hotelCartBookingData->getProductFeaturePricePlanByDateByPriority(
                 $id_product,
                 $currentDate,
@@ -717,6 +720,18 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
                 $totalPrice['total_price_tax_excl'] += $productPriceTE;
             }
         }
+        Hook::exec('actionRoomTypeTotalFeaturePriceModifier',
+            array(
+                'price' => &$totalPrice,
+                'idProduct' => $id_product,
+                'idRoom' => $id_room,
+                'dateFrom' => $date_from,
+                'dateTo' => $date_to,
+                'idCart' => $id_cart,
+                'idGuest' => $id_guest,
+                'useReduc' => $use_reduc
+            )
+        );
         if ($with_auto_room_services) {
             if ($servicesWithTax = RoomTypeServiceProduct::getAutoAddServices(
                 $id_product,
@@ -773,8 +788,8 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
         $with_auto_room_services = 1,
         $use_reduc = 1
     ) {
-        $dateFrom = date('Y-m-d', strtotime($date_from));
-        $dateTo = date('Y-m-d', strtotime($date_to));
+        $dateFrom = date('Y-m-d H:i:s', strtotime($date_from));
+        $dateTo = date('Y-m-d H:i:s', strtotime($date_to));
         $totalDurationPrice = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice(
             $id_product,
             $dateFrom,

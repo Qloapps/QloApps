@@ -101,8 +101,16 @@ class RoomTypeServiceProductPrice extends ObjectModel
         );
     }
 
-    public function getServicePrice($idProduct, $idProductRoomType, $quantity, $dateFrom = null, $dateTo = null, $useTax = null, $id_cart = false, $id_address = null, $use_reduc= 1)
-    {
+    public function getServicePrice($idProduct,
+        $idProductRoomType,
+        $quantity,
+        $dateFrom = null,
+        $dateTo = null,
+        $useTax = null,
+        $id_cart = false,
+        $id_address = null,
+        $use_reduc= 1
+    ) {
         if ($useTax === null)
             $useTax = Product::$_taxCalculationMethod == PS_TAX_EXC ? false : true;
 
@@ -127,6 +135,19 @@ class RoomTypeServiceProductPrice extends ObjectModel
             null,
             true,
             (int)$idProductRoomType
+        );
+
+        Hook::exec('actionServicePriceModifier',
+            array(
+                'price' => &$price,
+                'idProduct' => $idProduct,
+                'idProductRoomType' => $idProductRoomType,
+                'dateFrom' => $dateFrom,
+                'dateTo' => $dateTo,
+                'useTax' => $useTax,
+                'idCart' => $id_cart,
+                'useReduc' => $use_reduc
+            )
         );
 
         if (Product::getProductPriceCalculation($idProduct) == Product::PRICE_CALCULATION_METHOD_PER_DAY

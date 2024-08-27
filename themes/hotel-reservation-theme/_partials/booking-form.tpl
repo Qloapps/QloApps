@@ -20,6 +20,12 @@
 <div class="booking-form card">
     <div class="booking_room_fields">
         <form id="booking-form" action="" method="post">
+            <p class="hidden">
+                <input type="hidden" name="token" value="{$static_token}" />
+                <input type="hidden" name="id_product" value="{$product->id|intval}" id="product_page_product_id" />
+                <input type="hidden" name="add" value="1" />
+                <input type="hidden" name="id_product_attribute" id="idCombination" value="" />
+            </p>
             {if isset($id_hotel) && $id_hotel}
                 <div class="form-group htl_location_block">
                     <label for="" class="control-label">{l s='Hotel Location'}</label>
@@ -29,7 +35,8 @@
             {if $product->show_price && !isset($restricted_country_mode) && !$PS_CATALOG_MODE}
                 {* Block for booking products *}
                 {if $product->booking_product}
-                    {if  !$order_date_restrict}
+                    {if !$order_date_restrict}
+                        {hook h='displayBookingFormTop' id_product=$product->id id_hotel=$id_hotel}
                         <div class="row">
                             <div class="form-group col-sm-12">
                                 <label class="control-label">{l s='Check In - Check Out'}</label>
