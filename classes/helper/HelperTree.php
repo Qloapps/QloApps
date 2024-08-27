@@ -29,6 +29,7 @@ class HelperTreeCore extends TreeCore
     private $_use_bulk_actions;
     private $_use_checkbox;
     private $_show_collapse_expand_button = true;
+    private $_auto_select_children = false;
     private $_max_height = 350;
 
 
@@ -42,6 +43,18 @@ class HelperTreeCore extends TreeCore
     {
         return (isset($this->_use_search) && $this->_use_search);
     }
+
+    public function setAutoSelectChildren($value)
+    {
+        $this->_auto_select_children = (bool)$value;
+        return $this;
+    }
+
+    public function autoSelectChildren()
+    {
+        return (isset($this->_auto_select_children) && $this->_auto_select_children);
+    }
+
 
     public function setUseBulkActions($value)
     {
@@ -119,6 +132,7 @@ class HelperTreeCore extends TreeCore
             );
             $this->setAttribute('use_search', $this->useSearch());
         }
+        $this->setAttribute('auto_select_children', $this->autoSelectChildren());
 
         if ($this->showCollapseExpandButton()) {
             $collapse_all = new TreeToolbarLink(

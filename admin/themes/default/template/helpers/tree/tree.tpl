@@ -84,6 +84,22 @@
 			});
 		{/if}
 
+		{if isset($auto_select_children) && $auto_select_children == true}
+			$('#{$id|escape:'html':'UTF-8'}').find(':input[type=checkbox]').on('click', function(){
+				if ($(this).is(":checked")) {
+					$(this).closest('.tree-folder').find(':input[type=checkbox]').each(function(){
+						$(this).prop('checked', true);
+						$(this).parent().addClass('tree-selected');
+					});
+				} else {
+					$(this).closest('.tree-folder').find(':input[type=checkbox]').each(function(){
+						$(this).prop('checked', false);
+						$(this).parent().removeClass('tree-selected');
+					});
+				}
+			});
+		{/if}
+
 		$(document).ready(function () {
 			var tree = $("#{$id|escape:'html':'UTF-8'}").tree('collapseAll');
 
