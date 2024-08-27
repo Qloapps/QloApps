@@ -144,9 +144,14 @@
 								</div>
 							</div>
 							<div class="row room_price_detail_block">
-								<div class="col-sm-7">
+								<div class="col-sm-7 margin-btm-sm-10">
+									{if $rm_v['amount'] && isset($rm_v['total_price_without_discount']) && $rm_v['total_price_without_discount'] > $rm_v['amount']}
+										<span class="room_type_old_price">
+											{displayPrice price=$rm_v['total_price_without_discount']|floatval}
+										</span>
+									{/if}
 									<div class="row">
-										<div class="col-sm-6">
+										<div class="{if (isset($data_v['extra_demands']) && $data_v['extra_demands']) || (isset($data_v['service_products']) && $data_v['service_products'])}col-xs-6 plus-sign{else}col-xs-12{/if}">
 											<div class="price_block">
 												<p class="total_price">
 													<span>
@@ -163,11 +168,6 @@
 															</div>
 														</div>
 													{/if}
-													{if (isset($data_v['extra_demands']) && $data_v['extra_demands']) || (isset($data_v['service_products']) && $data_v['service_products'])}
-														<span class="plus-sign pull-right">
-															+
-														</span>
-													{/if}
 												</p>
 												<p class="total_price_detial">
 													{l s='Total rooms price'} {if $display_tax_label}{if $priceDisplay} {l s='(Excl.'} {else}{l s='(Incl.)'}{/if} {l s='all taxes.)'}{/if}
@@ -175,7 +175,7 @@
 											</div>
 										</div>
 										{if (isset($data_v['extra_demands']) && $data_v['extra_demands']) || (isset($data_v['service_products']) && $data_v['service_products'])}
-											<div class="col-sm-6">
+											<div class="col-xs-6">
 												<div class="demand_price_block">
 													<p class="demand_total_price">
 														<span>
@@ -193,7 +193,7 @@
 									</div>
 								</div>
 								<div class="col-sm-5">
-									<div class="total_price_block pull-right">
+									<div class="total_price_block col-xs-12">
 										<p class="total_price">
 											<span>
 												{displayPrice price=($rm_v['amount']+$rm_v['demand_price'])}

@@ -379,6 +379,7 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
             'occupancy_required_for_booking' => $occupancyRequiredForBooking,
             'max_child_age' => Configuration::get('WK_GLOBAL_CHILD_MAX_AGE'),
             'max_child_in_room' => Configuration::get('WK_GLOBAL_MAX_CHILD_IN_ROOM'),
+            'link' => $this->context->link
         ));
 
         if (Configuration::get('PS_BACKOFFICE_SEARCH_TYPE') == HotelBookingDetail::SEARCH_TYPE_OWS) {
@@ -414,9 +415,11 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
         $smartyVars['rms_in_cart'] = $objHotelCartBookingData->getCountRoomsInCart($this->id_cart, $this->id_guest);
         $smartyVars['products_in_cart'] = $products_in_cart;
         $smartyVars['total_products_in_cart'] = (int)$rms_in_cart + (int)$products_in_cart;
-        $cartAmountTotal = $this->context->cart->getOrderTotal(false);
+        $cartRoomsAmount  = $this->context->cart->getOrderTotal(false, cart::ONLY_ROOMS) + $this->context->cart->getOrderTotal(false, cart::ONLY_ROOM_SERVICES_WITHOUT_CONVENIENCE_FEE);
         $cartAmountConvenienceFee  = $this->context->cart->getOrderTotal(false, cart::ONLY_CONVENIENCE_FEE);
-        $smartyVars['cart_tamount'] = $cartAmountTotal - $cartAmountConvenienceFee;
+        $smartyVars['cart_rooms_amount'] = $cartRoomsAmount;
+        $smartyVars['cart_amount_convenience_fee'] = $cartAmountConvenienceFee;
+        $smartyVars['cart_tamount'] = $cartRoomsAmount + $cartAmountConvenienceFee;
 
         $this->context->smarty->assign($smartyVars);
     }

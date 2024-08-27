@@ -41,6 +41,12 @@
   border-top: 0;
   box-shadow: 0 4px 5px rgba(0, 0, 0, 0.15);
 }
+.rtl .chosen-container .chosen-drop {
+  right: -9999px;
+}
+.rtl .chosen-container.chosen-with-drop .chosen-drop {
+  right: 0;
+}
 .chosen-container.chosen-container-single-nosearch .chosen-drop {
   top: 100%;
 }
@@ -171,6 +177,10 @@
 .chosen-container-single.chosen-container-single-nosearch .chosen-search {
   position: absolute;
   left: -9999px;
+}
+
+.rtl .chosen-container-single.chosen-container-single-nosearch .chosen-search {
+  display:none;
 }
 
 /* @end */

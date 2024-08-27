@@ -135,6 +135,8 @@ class CustomerCore extends ObjectModel
 
     public $groupBox;
 
+    public $phone;
+
     const STATUS_BANNED = 1;
     const STATUS_DELETED = 2;
 
@@ -202,6 +204,10 @@ class CustomerCore extends ObjectModel
     {
         $this->id_default_group = (int)Configuration::get('PS_CUSTOMER_GROUP');
         parent::__construct($id);
+
+        if ($this->email) {
+            $this->phone = CartCustomerGuestDetail::getCustomerPhone($this->email);
+        }
     }
 
     public function add($autodate = true, $null_values = true)
@@ -484,6 +490,18 @@ class CustomerCore extends ObjectModel
         return Cache::retrieve($cache_id);
     }
 
+    public static function getPhone($id_customer)
+    {
+
+        return Db::getInstance()->getValue(
+            'SELECT cgd.`phone`
+            FROM `'._DB_PREFIX_.'customer` c
+            INNER JOIN `'._DB_PREFIX_.'cart_customer_guest_detail` cgd
+            ON (cgd.`email` = c.`email`)
+            WHERE `id_cart` = 0 AND c.`id_customer` = '.(int)($id_customer)
+        );
+    }
+
     public static function getCustomerIdAddress($id_customer, $use_cache = true)
     {
         $cache_id = 'Customer::getCustomerIdAddress'.(int)$id_customer;
@@ -589,7 +607,8 @@ class CustomerCore extends ObjectModel
     public function getStats()
     {
         $result = Db::getInstance()->getRow('
-		SELECT COUNT(`id_order`) AS nb_orders, SUM(`total_paid` / o.`conversion_rate`) AS total_orders
+		SELECT COUNT(`id_order`) AS nb_orders, SUM(`total_paid` / o.`conversion_rate`) AS total_orders,
+        SUM(o.`total_paid_real` / o.`conversion_rate`) AS total_spent
 		FROM `'._DB_PREFIX_.'orders` o
 		WHERE o.`id_customer` = '.(int)$this->id.'
 		AND o.valid = 1');
@@ -736,7 +755,7 @@ class CustomerCore extends ObjectModel
         return Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS('
 		SELECT * FROM `'._DB_PREFIX_.'orders` o
 		LEFT JOIN `'._DB_PREFIX_.'order_detail` od ON o.id_order = od.id_order
-		WHERE o.valid = 1 AND o.`id_customer` = '.(int)$this->id);
+        WHERE od.`product_auto_add`= 0 AND o.valid = 1 AND o.`id_customer` = '.(int)$this->id);
     }
 
     public static function getDefaultGroupId($id_customer)

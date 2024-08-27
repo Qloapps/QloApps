@@ -86,6 +86,8 @@ class Blocknewsletter extends Module
                 'actionExportGDPRData',
                 'actionObjectCustomerUpdateBefore',
                 'actionDeleteGDPRCustomer',
+                'actionCustomerCartRulesModifier',
+                'actionValidateCartRule',
                 'actionObjectCustomerDeleteAfter',
             )
         );
@@ -130,6 +132,40 @@ class Blocknewsletter extends Module
                 return json_encode(true);
             }
             return json_encode($this->l('Newsletter block : Unable to delete customer using email.'));
+        }
+    }
+
+    public function hookActionCustomerCartRulesModifier($params)
+    {
+        $customer = new Customer($params['id_customer']);
+        foreach($params['cart_rules'] as $key => $cartRule) {
+            if ($cartRule['code'] == Configuration::get('NW_VOUCHER_CODE')) {
+                if ($customer->id && !$customer->is_guest) {
+                    if (count(Order::getCustomerOrders($customer->id))) {
+                        // remove welcome voucher
+                        unset($params['cart_rules'][$key]);
+                    }
+                } else {
+                    // remove welcome voucher
+                    unset($params['cart_rules'][$key]);
+                }
+            }
+        }
+    }
+
+    public function hookActionValidateCartRule($params)
+    {
+        $customer = new Customer($params['context']->cart->id_customer);
+        if ($params['cart_rule']->code == Configuration::get('NW_VOUCHER_CODE')) {
+            if ($customer->id && !$customer->is_guest) {
+                if (count(Order::getCustomerOrders($customer->id))) {
+                    $params['isValidatedByModules'] = false;
+                    $params['isValidatedByModulesError'] = $this->l('This voucher is not available for this booking.');
+                }
+            } else {
+                $params['isValidatedByModules'] = false;
+                $params['isValidatedByModulesError'] = $this->l('This voucher is not available for this booking.');
+            }
         }
     }
 
@@ -457,13 +493,13 @@ class Blocknewsletter extends Module
      *
      * @return string email
      */
-    protected function getGuestEmailByToken($token)
+    protected function getGuestEmailByToken($token, $active = false)
     {
         $sql = 'SELECT `email`
 				FROM `'._DB_PREFIX_.'newsletter`
 				WHERE MD5(CONCAT( `email` , `newsletter_date_add`, \''.pSQL(Configuration::get('NW_SALT')).'\')) = \''.
                 pSQL($token).'\'
-				AND `active` = 0';
+				AND `active` = '.(int) $active;
 
         return Db::getInstance()->getValue($sql);
     }
@@ -475,12 +511,12 @@ class Blocknewsletter extends Module
      *
      * @return string email
      */
-    protected function getUserEmailByToken($token)
+    protected function getUserEmailByToken($token, $active = false)
     {
         $sql = 'SELECT `email`
 				FROM `'._DB_PREFIX_.'customer`
 				WHERE MD5(CONCAT( `email` , `date_add`, \''.pSQL(Configuration::get('NW_SALT')).'\')) = \''.
-                pSQL($token).'\' AND `newsletter` = 0';
+                pSQL($token).'\' AND `newsletter` = '.(int) $active;
 
         return Db::getInstance()->getValue($sql);
     }
@@ -496,13 +532,11 @@ class Blocknewsletter extends Module
         if (in_array($register_status, array(self::GUEST_NOT_REGISTERED, self::GUEST_REGISTERED))) {
             $sql = 'SELECT MD5(CONCAT( `email` , `newsletter_date_add`, \''.pSQL(Configuration::get('NW_SALT')).'\')) as token
 					FROM `'._DB_PREFIX_.'newsletter`
-					WHERE `active` = 0
-					AND `email` = \''.pSQL($email).'\'';
-        } elseif ($register_status == self::CUSTOMER_NOT_REGISTERED) {
+					WHERE 1 AND `email` = \''.pSQL($email).'\'';
+        } elseif (in_array($register_status, array(self::CUSTOMER_NOT_REGISTERED, self::CUSTOMER_REGISTERED))) {
             $sql = 'SELECT MD5(CONCAT( `email` , `date_add`, \''.pSQL(Configuration::get('NW_SALT')).'\' )) as token
 					FROM `'._DB_PREFIX_.'customer`
-					WHERE `newsletter` = 0
-					AND `email` = \''.pSQL($email).'\'';
+					WHERE 1 AND `email` = \''.pSQL($email).'\'';
         }
 
         return Db::getInstance()->getValue($sql);
@@ -537,6 +571,25 @@ class Blocknewsletter extends Module
 
             if (Configuration::get('NW_CONFIRMATION_EMAIL')) {
                 $this->sendConfirmationEmail($email);
+            }
+        }
+
+        return $errors;
+    }
+
+    public function unsubscribeByToken($token)
+    {
+        $errors = array();
+        if (!($email = $this->getGuestEmailByToken($token, true))) {
+            $email = $this->getUserEmailByToken($token, true);
+        }
+
+        if (!$email) {
+            $errors[] = $this->l('This email address is not registered.');
+        } else {
+            $register_status = $this->isNewsletterRegistered($email);
+            if (!$this->unregister($email, $register_status)) {
+                $errors[] = $this->l('An error occurred while attempting to unsubscribe.');
             }
         }
 
@@ -586,7 +639,15 @@ class Blocknewsletter extends Module
      */
     protected function sendConfirmationEmail($email)
     {
-        return Mail::Send($this->context->language->id, 'newsletter_conf', Mail::l('Newsletter confirmation', $this->context->language->id), array(), pSQL($email), null, null, null, null, null, dirname(__FILE__).'/mails/', false, $this->context->shop->id);
+        $register_status = $this->isNewsletterRegistered($email);
+        $token = $this->getToken($email, $register_status);
+        $emailParams = array(
+            '{unsub_url}' => $this->context->link->getModuleLink(
+                'blocknewsletter', 'unsubscribe', array('token' => $token)
+            )
+        );
+
+        return Mail::Send($this->context->language->id, 'newsletter_conf', Mail::l('Newsletter confirmation', $this->context->language->id), $emailParams, pSQL($email), null, null, null, null, null, dirname(__FILE__).'/mails/', false, $this->context->shop->id);
     }
 
     /**
