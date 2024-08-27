@@ -192,14 +192,14 @@ class AdminAddHotelController extends ModuleAdminController
                         }
                     }
                 }
-            }
 
-            $tree = new HelperTree('hotel-features-tree', $features);
-            $tree->setShowCollapseExpandButton(true)
-                ->setUseCheckBox(true)
-                ->setUseBulkActions(true);
-            $treeContent = $tree->render();
-            $smartyVars['hotel_feature_tree'] = $treeContent;
+                $tree = new HelperTree('hotel-features-tree', $features);
+                $tree->setShowCollapseExpandButton(true)
+                    ->setUseCheckBox(true)
+                    ->setUseBulkActions(true);
+                $treeContent = $tree->render();
+                $smartyVars['hotel_feature_tree'] = $treeContent;
+            }
         } else {
             $idCountry = Tools::getValue('hotel_country');
         }
