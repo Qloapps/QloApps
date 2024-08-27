@@ -54,6 +54,7 @@ class HotelReservationSystem extends Module
             'bookings' => array('description' => 'Order bookings', 'class' => 'HotelBookingDetail'),
             'booking_extra_demands' => array('description' => 'Booking extra demands', 'class' => 'HotelBookingDemands'),
             'extra_demands' => array('description' => 'Extra demands', 'class' => 'HotelRoomTypeGlobalDemand'),
+            'extra_services' => array('description' => 'Extra services', 'class' => 'Product', 'parameters_attribute' => 'webserviceRoomTypeServicesParameters'),
             'demand_advance_options' => array('description' => 'Extra demand advance options', 'class' => 'HotelRoomTypeGlobalDemandAdvanceOption'),
             'hotel_ari' => array('description' => 'Search availability, rates and inventory', 'specific_management' => true),
             'qlo' => array('description' => 'qlo API', 'specific_management' => true),

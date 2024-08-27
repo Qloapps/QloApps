@@ -290,6 +290,7 @@ class WebserviceRequestCore
             'room_type_options' => array('description' => 'The product options','class' => 'AttributeGroup'),
             'room_type_option_values' => array('description' => 'The product options value','class' => 'Attribute'),
             'room_types' => array('description' => 'The room types','class' => 'Product'),
+            'services' => array('description' => 'Services', 'class' => 'Product', 'parameters_attribute' => 'webserviceServicesParameters'),
             'states' => array('description' => 'The available states of countries','class' => 'State'),
             'stores' => array('description' => 'The stores', 'class' => 'Store'),
             'suppliers' => array('description' => 'The product suppliers','class' => 'Supplier'),
@@ -512,6 +513,8 @@ class WebserviceRequestCore
                         $object = new $url_resource['class']();
                         if (isset($this->resourceList[$this->urlSegment[0]]['parameters_attribute'])) {
                             $this->resourceConfiguration = $object->getWebserviceParameters($this->resourceList[$this->urlSegment[0]]['parameters_attribute']);
+                            // Setting the parameters for the output builder in cache for the resources having parameters_attribute.
+                            $this->objOutput->setWsParameters($url_resource['class'], $this->resourceConfiguration);
                         } else {
                             $this->resourceConfiguration = $object->getWebserviceParameters();
                         }
