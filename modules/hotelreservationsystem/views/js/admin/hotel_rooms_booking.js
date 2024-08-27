@@ -954,7 +954,53 @@ $(document).ready(function() {
             success: function(result) {
                 if (result.success) {
                     $(".htl_room_data_cont").html(result.data.stats_panel);
+                    initstatstooltip();
                 }
+            }
+        });
+    }
+    initstatstooltip();
+
+    function initstatstooltip()
+    {
+        $(".htl_room_data_cont").find('.status-info-tooltip').tooltip({
+            trigger : 'hover',
+            show: {
+                delay: 100,
+            },
+            hide: {
+                delay: 300,
+            },
+            open: function(event, ui)
+            {
+                if(event.buttons == 1 || event.buttons == 3){
+                    ui.tooltip.remove();
+                }
+
+                if (typeof(event.originalEvent) === 'undefined') {
+                    return false;
+                }
+
+                var $id = $(ui.tooltip).attr('id');
+
+                // close any lingering tooltips
+                if ($('div.ui-tooltip').not('#' + $id).length) {
+                    return false;
+                }
+
+                // ajax function to pull in data and add it to the tooltip goes here
+            },
+            close: function(event, ui)
+            {
+                ui.tooltip.hover(function() {
+                    $(this).stop(true).fadeTo(300, 1);
+                },
+                function() {
+                    $(this).fadeOut('300', function()
+                    {
+                        $(this).remove();
+                    });
+                });
             }
         });
     }

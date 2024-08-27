@@ -216,7 +216,13 @@ p.room_cat_data
     font-weight: 700;
     margin-bottom: 0px;
 }
-
+.status-info-tooltip {
+    position: relative;
+    display: inline-block;
+    left: 100%;
+    margin-left: -10px;
+    padding: 0px;
+}
 .color_indicate
 {
     width: 10px;
@@ -238,6 +244,7 @@ p.room_cat_data
 {
     margin: 10px 0px;
 }
+
 
 .cart-table-thead
 {
@@ -279,7 +286,10 @@ p.room_cat_data
     font-size: 14px!important;
     font-weight: 600!important;
 }
-
+#htl_rooms_list table td {
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
 #room-status-tabs li
 {
     font-size: 14px;
