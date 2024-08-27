@@ -4698,7 +4698,7 @@ class CartCore extends ObjectModel
     public function getWsCartBookings()
     {
         return Db::getInstance()->executeS('
-			SELECT `id`
+			SELECT `id`, `date_from`, `date_to`, `id_hotel`, `id_product`
 			FROM `'._DB_PREFIX_.'htl_cart_booking_data`
 			WHERE id_cart = '.(int)$this->id.' ORDER BY `id` ASC'
         );

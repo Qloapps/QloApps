@@ -469,8 +469,6 @@ class OrderConfirmationControllerCore extends FrontController
     {
         if (Tools::getValue('ajax') != 'true') {
             parent::setMedia();
-            $this->addCSS(_THEME_CSS_DIR_.'history.css');
-            $this->addJS(_THEME_JS_DIR_.'history.js');
             $this->addJS(_THEME_JS_DIR_.'order-confirmation.js');
             $this->addCSS(_THEME_CSS_DIR_.'order-confirmation.css');
             $this->addJqueryPlugin(array('fancybox')); //fancybox not found for some client theme

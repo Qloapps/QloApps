@@ -40,7 +40,7 @@
             <input type="hidden" id="max_order_date" name="max_order_date" value="{if isset($max_order_date)}{$max_order_date|escape:'htmlall':'UTF-8'}{/if}">
             <input type="hidden" id="preparation_time" name="preparation_time" value="{if isset($preparation_time)}{$preparation_time|escape:'htmlall':'UTF-8'}{/if}">
 
-            <div class="hotel-selector-wrap">
+            <div class="hotel-selector-wrap {if isset($language_is_rtl) && $language_is_rtl}rtl{/if}">
                 <select name="id_hotel" class="chosen header-rmsearch-input" data-placeholder="{l s='Select Hotel' mod='wkroomsearchblock'}" id="id_hotel_button">
                     <option value=""></option>
                     {foreach $hotels_info as $name_val}
@@ -210,12 +210,12 @@
                             </div>
                         {/if}
                     </div>
-                    <div>
+                    <div class="occupancy_block_actions">
                         <span id="add_new_occupancy">
                             <a class="add_new_occupancy_btn" href="#"><i class="icon-plus"></i> <span>{l s='Add Room' mod='wkroomsearchblock'}</span></a>
                         </span>
                         <span>
-                            <button class="submit_occupancy_btn btn btn btn-primary pull-right">{l s='Done' mod='wkroomsearchblock'}</button>
+                            <button class="submit_occupancy_btn btn btn-primary">{l s='Done' mod='wkroomsearchblock'}</button>
                         </span>
                     </div>
                 </div>

@@ -17,7 +17,7 @@
 * @license LICENSE.txt
 *}
 
-<div id="hotel-reviews" class="tab-pane card">
+<div id="hotel-reviews" class="tab-pane card {if isset($language_is_rtl) && $language_is_rtl} rtl {/if}">
     {if is_array($reviews) && count($reviews)}
         {include file='./_partials/review-summary.tpl'}
         {include file='./_partials/media-list.tpl'}
