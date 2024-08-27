@@ -113,12 +113,15 @@
 }
 /* card-tabs - end */
 
+#rooms_extra_services .card-body{
+    padding: 0px 18px;
+}
+
 #rooms_extra_services .nav-tabs {
     border-bottom: none;
 }
 
 #rooms_extra_services .nav-tabs > li {
-    width: 50%;
     text-align: center;
     margin: 0;
 }
@@ -160,7 +163,6 @@
 }
 
 #rooms_extra_services .tab-content .room_demands {
-    padding: 0 18px;
     margin-top: 20px;
 }
 
@@ -190,4 +192,24 @@
 
 #rooms_extra_services .nav-tabs > li.active:after {
     content: unset;
+}
+
+#rooms_extra_services .services_not_booked {
+    text-align: center;
+    margin: 30px 0px;
+    font-size: 14px;
+}
+
+.price-info-tooltip-cont {
+    min-width: 180px;
+}
+
+.price-info-tooltip-cont .list-row {
+    display: flex;
+    justify-content: space-between;
+    margin: 5px 0;
+}
+
+.price-info-tooltip-cont .list-row p {
+    margin: 0;
 }

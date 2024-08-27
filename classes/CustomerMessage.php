@@ -141,4 +141,12 @@ class CustomerMessageCore extends ObjectModel
         ');
     }
 
+    public function validateFields($die = true, $error_return = false)
+    {
+        if (isset($this->webservice_validation) && $this->webservice_validation) {
+            $this->message = trim($this->message);
+        }
+
+        return parent::validateFields($die, $error_return);
+    }
 }

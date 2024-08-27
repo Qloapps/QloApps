@@ -51,6 +51,7 @@ class WebserviceSpecificManagementImagesCore implements WebserviceSpecificManage
         'room_types' => array(),
         'hotels' => array(),
         'categories' => array(),
+        'extra_service' => array(),
         // 'manufacturers' => array(),
         // 'suppliers' => array(),
         // 'stores' => array(),
@@ -286,7 +287,9 @@ class WebserviceSpecificManagementImagesCore implements WebserviceSpecificManage
 
         $this->imageType = $this->wsObject->urlSegment[1];
         // if image type requested is room_types then process products images
-        if ($this->imageType == 'room_types') {
+        if ($this->imageType == 'room_types'
+            || $this->imageType == 'extra_services'
+        ) {
             $this->imageType = 'products';
         }
 
