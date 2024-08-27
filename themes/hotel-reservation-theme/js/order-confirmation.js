@@ -70,4 +70,41 @@ $(document).ready(function(){
             },
         });
     });
+
+    initPriceTooltip();
 });
+
+function initPriceTooltip() {
+    if ($('.order-price-info').length) {
+        $('.order-price-info').each(function () {
+            $(this).tooltip({
+                content: $(this).closest('td').find('.price-info-container').html(),
+                items: 'span',
+                trigger: 'hover',
+                tooltipClass: 'price-tootip',
+                open: function (event, ui) {
+                    if (typeof (event.originalEvent) === 'undefined') {
+                        return false;
+                    }
+
+                    var $id = $(ui.tooltip).attr('id');
+
+                    // close any lingering tooltips
+                    if ($('div.ui-tooltip').not('#' + $id).length) {
+                        return false;
+                    }
+                },
+                close: function (event, ui) {
+                    ui.tooltip.hover(function () {
+                        $(this).stop(true).fadeTo(400, 1);
+                    },
+                    function () {
+                        $(this).fadeOut('400', function () {
+                            $(this).remove();
+                        });
+                    });
+                }
+            });
+        });
+    }
+}
