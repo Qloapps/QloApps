@@ -1032,7 +1032,8 @@ class CartCore extends ObjectModel
             $this->updateQty(1, $cartRule->gift_product, $cartRule->gift_product_attribute, false, 'up', 0, null, false);
         }
         // after adding new cart rule, check if any of the appled cart rules are not being used
-        CartRule::removeUnusedCartRules(Context::getContext());
+        CartRule::autoRemoveFromCart(Context::getContext());
+        CartRule::autoAddToCart(Context::getContext());
 
         return true;
     }
@@ -1235,8 +1236,6 @@ class CartCore extends ObjectModel
         if ($auto_add_cart_rule) {
             CartRule::autoAddToCart($context);
         }
-        // after cart qty is updated, check if any of the appled cart rules are not being used
-        CartRule::removeUnusedCartRules($context);
 
         if ($product->customizable) {
             return $this->_updateCustomizationQuantity((int)$quantity, (int)$id_customization, (int)$id_product, (int)$id_product_attribute, (int)$id_address_delivery, $operator);
@@ -1485,8 +1484,6 @@ class CartCore extends ObjectModel
             if ($auto_add_cart_rule) {
                 CartRule::autoAddToCart();
             }
-            // after cart qty is updated, check if any of the appled cart rules are not being used
-            CartRule::removeUnusedCartRules();
 
             return $return;
         }

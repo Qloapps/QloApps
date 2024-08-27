@@ -1380,33 +1380,23 @@ class CartRuleCore extends ObjectModel
             return array();
         }
 
+        $order_total = $context->cart->getOrderTotal(true, Cart::ONLY_PRODUCTS_WITH_DEMANDS, null, null, false);
         static $errors = array();
         foreach ($context->cart->getCartRules() as $cart_rule) {
             if ($error = $cart_rule['obj']->checkValidity($context, true)) {
                 $context->cart->removeCartRule($cart_rule['obj']->id);
                 $context->cart->update();
                 $errors[] = $error;
+            } else {
+                if ($order_total <= 0) {
+                    // remove cart rule if cart amount is already reached 0
+                    $context->cart->removeCartRule($cart_rule['obj']->id);
+                } else {
+                    $order_total = $order_total - $cart_rule['value_real'];
+                }
             }
         }
         return $errors;
-    }
-
-    public static function removeUnusedCartRules($context = null)
-    {
-        if (!$context) {
-            $context = Context::getContext();
-        }
-        $cartRules = $context->cart->getCartRules();
-        $orderTotal = $context->cart->getOrderTotal(true, Cart::ONLY_PRODUCTS_WITH_DEMANDS, null, null, false);
-        // ppp([$cartRules, $orderTotal]);
-        foreach ($cartRules as $cartRule) {
-            if ($orderTotal <= 0) {
-                // remove cart rule if cart amount is already reached 0
-                $context->cart->removeCartRule($cartRule['id_cart_rule']);
-            } else {
-                $orderTotal = $orderTotal - $cartRule['value_real'];
-            }
-        }
     }
 
     /**
