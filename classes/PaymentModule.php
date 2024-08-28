@@ -626,8 +626,16 @@ abstract class PaymentModuleCore extends Module
 
                         $used = array('incl' => 0, 'excl' => 0);
                         if (!isset($cart_rules[$key]['remaining'])) {
-                            $cart_rules[$key]['remaining'] = $cart_rule['reduction_amount'];
+                            $cart_rules[$key]['remaining'] = $cart_rule['obj']->reduction_amount;
+                            if ((int) $cart_rule['obj']->reduction_currency !== (int) $cart->id_currency) {
+                                $cart_rules[$key]['remaining'] = Tools::convertPriceFull(
+                                    $cart_rule['obj']->reduction_amount,
+                                    new Currency($cart_rule['obj']->reduction_currency),
+                                    new Currency($cart->id_currency)
+                                );
+                            }
                         }
+
                         if ($cart_rule['reduction_tax']) {
                             if ($orderTotals[$order->id]['incl'] > $values['tax_incl']) {
                                 $used['incl'] = $values['tax_incl'];
