@@ -352,15 +352,16 @@
     var rm_status = {$rm_status|@json_encode};
     var currentRoomRow = 0;
     $(document).ready(function() {
-        var count = 0;
-        var eventDates = {};
+        var tooltipCounter = 0;
+        var disabledDates = {};
         const dateToday = new Date("{date('Y-m-d')}");
-        const calendar = new FullCalendar.Calendar($('#disabled_dates_full_calendar').get(0), {
+        const DisabledDatesCalendar = new FullCalendar.Calendar($('#disabled_dates_full_calendar').get(0), {
             initialView: 'dayGridMonth',
             initialDate: '{date('Y-m-d', time())}',
             dayMaxEventRows: true,
             selectable: true,
             direction:{if isset($language_is_rtl) && $language_is_rtl}'rlt'{else}'ltr'{/if},
+            {if isset($locale) && $locale}locale: '{$locale}',{/if}
             unselectAuto: true,
             eventTextColor: '#333333',
             selectAllow: function(info) {
@@ -378,13 +379,13 @@
             },
             eventDidMount: function(info) {
                 // setting background display color
-                updateEventDates(info.event, true);
-                // will be used to get this particular event
-                $(info.el).find('.fc-event-title').attr('data-event_id', info.event.id);
+                DisableDatesObj.updateEventDates(info.event, true);
+                DisableDatesObj.initEventTooltip(info.event, info.el);
+
                 if (info.isEnd) {
-                    var is_deleteable = info.event.extendedProps.is_deleteable;
+                    var is_deletable = info.event.extendedProps.is_deletable;
                     var is_editable = info.event.extendedProps.is_editable;
-                    if (is_deleteable) {
+                    if (is_deletable) {
                         $(info.el).find('.fc-event-title-container').append('<i class="icon-trash pull-right delete_disabled_dates"></i>');
                     }
 
@@ -392,63 +393,6 @@
                         $(info.el).find('.fc-event-title-container').append('<i class="icon-pencil pull-right edit_disabled_dates"></i>');
                     }
                 }
-
-                var dateFrom = info.event.extendedProps.date_from_formatted;
-                var event_date_to = new Date(info.event.extendedProps.date_to_formatted);
-                // setting the date_to to -1 days since the full calendar does not includes the date to
-                event_date_to.setDate(event_date_to.getDate() - 1);
-                var dateTo = $.datepicker.formatDate('yy-mm-dd', event_date_to);
-                var reason = info.event.extendedProps.reason;
-                var event_title = info.event.extendedProps.event_title;
-                var id_module_event = info.event.extendedProps.id_module_event;
-                var module_event_url = info.event.extendedProps.module_event_url;
-                var dateAdd = info.event.extendedProps.date_add;
-                $('#tooltip_info_block .tooltip_date_from').text(dateFrom);
-                $('#tooltip_info_block .tooltip_date_to').text(dateTo);
-                $('#tooltip_info_block .tooltip_date_add').text(dateAdd);
-                $('#tooltip_info_block .tooltip_reason').parent().hide();
-                if (reason != '') {
-                    $('#tooltip_info_block .tooltip_reason').text(reason).parent().show();
-                }
-
-                if (event_title != '') {
-                    event_title = '<span class="tooltip_content_label">'+event_title+'</span>';
-                    $('#tooltip_info_block .tooltip_title').html(event_title).show();
-                } else {
-                    $('#tooltip_info_block .tooltip_title').html('').hide();
-                }
-
-                if (id_module_event) {
-                    var event_html = '#'+id_module_event;
-                    if (module_event_url != '') {
-                        event_html = '<a target="_blank" href="'+module_event_url+'">'+ event_html + '</a>';
-                    } else {
-                        event_html = '<span>'+ event_html + '</span>';
-                    }
-
-                    $('#tooltip_info_block .tooltip_event_id_module').html(event_html).parent().show();
-                } else {
-                    $('#tooltip_info_block .tooltip_event_id_module').html('').parent().hide();
-                }
-
-                $('#tooltip_info_block .tooltip_container').attr('data-tooltip-id', info.event.id + '-'+ count);
-                var html = $('#tooltip_info_block').html();
-                var options = {
-                    title: ' ',
-                    html: true,
-                    template: html,
-                    container: $('#disabled_dates_full_calendar').closest('div'),
-                    delay: {
-                        show: 600,
-                        hide: 500
-                    },
-                    placement: 'auto'
-                }
-
-                $(info.el).addClass('event-id-' + info.event.id);
-                $(info.el).find('.fc-event-main-frame').tooltip(options);
-                $(info.el).find('.fc-event-main-frame').attr('id', 'tooltip-id-' + info.event.id + '-' + count);
-                count = count+1;
                 if (info.isStart) {
                     $(info.el).find('.fc-event-title').addClass('display_title');
                 } else {
@@ -458,12 +402,11 @@
                 $('.hide_title').text('');
             },
             eventWillUnmount: function(info) {
-                updateEventDates(info.event, false);
+                DisableDatesObj.updateEventDates(info.event, false);
             },
             select: function(info) {
                 var selectedElement = $('.fc-daygrid-bg-harness').last();
-                DisableDatesModal.resetDisabledDatesForm();
-                DisableDatesModal.resetButtons();
+                DisableDatesObj.resetForm();
                 var data = {
                     disabled_date_from : info.startStr,
                     disabled_date_to : info.endStr,
@@ -471,7 +414,7 @@
                     room_disable_reason : '',
                     event_id : ''
                 };
-                DisableDatesModal.setDisabledDateFormData(data);
+                DisableDatesObj.setFormData(data);
                 var html = $('#tooltip_action_block').html();
                 var options = {
                     title: ' ',
@@ -499,79 +442,50 @@
             }
         });
 
-        function updateEventDates(event, add) {
-            if (event.start && event.end) {
-                let dateFrom = new Date(event.start);
-                let endDate = new Date(event.end);
-                dateFrom.setDate(dateFrom.getDate() + 1)
-                let startDate = dateFrom;
-                // Loop through all the days the event spans
-                for (let date = startDate; date <= endDate; date.setDate(date.getDate() + 1)) {
-                    let dateString = date.toISOString().split('T')[0];
-                    if (add) {
-                        if (!eventDates[dateString]) {
-                            eventDates[dateString] = 0;
-                        }
-
-                        eventDates[dateString]++;
-                    } else {
-                        eventDates[dateString]--;
-                        if (eventDates[dateString] <= 0) {
-                            delete eventDates[dateString];
-                        }
-                    }
-                }
-            } else if (event.start) {
-                let dateFrom = new Date(event.start);
-                dateFrom.setDate(dateFrom.getDate() + 1);
-                let dateString = dateFrom.toISOString().split('T')[0];
-                if (add) {
-                    if (!eventDates[dateString]) {
-                        eventDates[dateString] = 0;
-                    }
-
-                    eventDates[dateString]++;
-                } else {
-                    eventDates[dateString]--;
-                    if (eventDates[dateString] <= 0) {
-                        delete eventDates[dateString];
-                    }
-                }
-            }
-
-            updateDayHighlights();
-        }
-        function updateDayHighlights() {
-            const today = new Date().toISOString().split('T')[0];
-            $('.fc-daygrid-day').each(function() {
-                let dateString = $(this).data('date');
-                if (dateString !== today) {
-                    if (eventDates[dateString]) {
-                        $(this).addClass('highlight-event-day');
-                    } else {
-                        $(this).removeClass('highlight-event-day');
-                    }
-                }
-            });
-        }
         $(document).on('mouseenter', '.tooltip_info_block', function(){
             var tooltipId = $(this).attr('data-tooltip-id');
             if ($('#tooltip-id-'+tooltipId).length) {
                 $('#tooltip-id-'+tooltipId).tooltip('show');
             }
         });
+
         $(document).on('mouseleave', '.tooltip_info_block', function(){
             $('.fc-event-main-frame').tooltip('hide');
         });
-        calendar.render();
-        const DisableDatesModal = {
+
+        DisabledDatesCalendar.render();
+        const DisableDatesObj = {
+            init: function(triggerRoomRow) {
+                const idRoom = parseInt($(triggerRoomRow).attr('data-id-room'));
+                const roomRowIndex = parseInt($(triggerRoomRow).closest('tr').attr('data-row-index'));
+                var room_num = $(triggerRoomRow).closest('tr').find('[name="rooms_info['+roomRowIndex+'][room_num]"]').val();
+                $('#deactiveDatesModal').attr('data-room-row-index', roomRowIndex);
+                $('#deactiveDatesModal').attr('data-id-room', idRoom);
+                let disableDates = $(triggerRoomRow).closest('tr').find('.disable_dates_json').val();
+                if ($.trim(room_num) != '') {
+                    room_num = '( '+'{l s='Room No'}'+' '+room_num+')';
+                }
+
+                if (isNaN(idRoom)) {
+                    DisableDatesObj.restrictCalendarActions();
+                }
+
+                $('#deactiveDatesModal .disabled-dates-modal-room-num').html(room_num);
+                if (!disableDates) {
+                    return;
+                }
+
+                disableDates = JSON.parse(disableDates);
+                DisableDatesObj.initEvents(disableDates);
+                DisableDatesObj.hideMessages();
+            },
             initEvents: function(datesInfo) {
                 if (datesInfo.length) {
                     var events = [];
                     $.each(datesInfo, function(i, v) {
-                        var eventId = DisableDatesModal.getUniqueEventId();
+                        var eventId = DisableDatesObj.getUniqueEventId();
                         events.push({
-                            'id': DisableDatesModal.getUniqueEventId(),
+                            'id': DisableDatesObj.getUniqueEventId(),
                             'title': v['reason'],
                             'start': v['date_from'],
                             'end': v['date_to'],
@@ -579,47 +493,107 @@
                             'date_add' : v['date_add'],
                             'id_disabled_date' : v['id'],
                             'is_editable' : v['is_editable'],
+                            'is_deletable' : v['is_deletable'],
                             'event_title' : v['event_title'],
-                            'is_deleteable' : v['is_deleteable'],
                             'date_to_formatted': v['date_to'],
                             'date_from_formatted': v['date_from'],
-                            'id_module_event' : v['id_event'],
-                            'module_event_url' : v['event_url'],
+                            'id_external_event' : v['id_external_event'],
+                            'external_event_url' : v['external_event_url'],
                             'backgroundColor': '#FFFFFF',
                             'borderColor': '#FFFFFF'
                         });
                     });
-                    calendar.addEventSource(events);
+                    DisabledDatesCalendar.addEventSource(events);
                 }
-                DisableDatesModal.hideMessages();
             },
-            disableCalendarActions: function() {
+            initEventTooltip: function(event, element) {
+                // will be used to get this particular event
+                $(element).find('.fc-event-title').attr('data-event_id', event.id);
+                var dateFrom = event.extendedProps.date_from_formatted;
+                var event_date_to = new Date(event.extendedProps.date_to_formatted);
+                // setting the date_to to -1 days since the full calendar does not includes the end date
+                event_date_to.setDate(event_date_to.getDate() - 1);
+                var dateTo = $.datepicker.formatDate('yy-mm-dd', event_date_to);
+                var reason = event.extendedProps.reason;
+                var event_title = event.extendedProps.event_title;
+                var id_external_event = event.extendedProps.id_external_event;
+                var external_event_url = event.extendedProps.external_event_url;
+                var dateAdd = event.extendedProps.date_add;
+                $('#tooltip_info_block .tooltip_date_from').text(dateFrom);
+                $('#tooltip_info_block .tooltip_date_to').text(dateTo);
+                $('#tooltip_info_block .tooltip_date_add').text(dateAdd);
+                $('#tooltip_info_block .tooltip_reason').parent().hide();
+                if (reason != '') {
+                    $('#tooltip_info_block .tooltip_reason').text(reason).parent().show();
+                }
+
+                if (event_title != '') {
+                    event_title = '<span class="tooltip_content_label">'+event_title+'</span>';
+                    $('#tooltip_info_block .tooltip_title').html(event_title).show();
+                } else {
+                    $('#tooltip_info_block .tooltip_title').html('').hide();
+                }
+
+                if (id_external_event) {
+                    if (external_event_url != '') {
+                        event_html = '<a target="_blank" href="'+external_event_url+'">'+ '#'+id_external_event + '</a>';
+                    } else {
+                        event_html = '<span>'+ '#'+id_external_event + '</span>';
+                    }
+
+                    $('#tooltip_info_block .tooltip_event_id_module').html(event_html).parent().show();
+                } else {
+                    $('#tooltip_info_block .tooltip_event_id_module').html('').parent().hide();
+                }
+
+                $('#tooltip_info_block .tooltip_container').attr('data-tooltip-id', event.id + '-'+ tooltipCounter);
+                var html = $('#tooltip_info_block').html();
+                var options = {
+                    title: ' ',
+                    html: true,
+                    template: html,
+                    container: $('#disabled_dates_full_calendar').closest('div'),
+                    delay: {
+                        show: 600,
+                        hide: 500
+                    },
+                    placement: 'auto'
+                }
+
+                $(element).addClass('event-id-' + event.id);
+                $(element).find('.fc-event-main-frame').tooltip(options);
+                $(element).find('.fc-event-main-frame').attr('id', 'tooltip-id-' + event.id + '-' + tooltipCounter);
+                tooltipCounter = tooltipCounter+1;
+            },
+            restrictCalendarActions: function() {
                 $('#deactiveDatesModal .add_new_dates').hide();
                 $('#deactiveDatesModal .remove_dates_btn').hide();
                 $('#deactiveDatesModal .room_not_saved_warning').show();
             },
-            enableCalendarActions: function() {
+            allowCalendarActions: function() {
                 $('#deactiveDatesModal .add_new_dates').show();
                 $('#deactiveDatesModal .remove_dates_btn').show();
                 $('#deactiveDatesModal .room_not_saved_warning').hide();
             },
-            resetModalInfo: function(tr) {
-                var source = calendar.getEventSources();
+            reset: function(today=true) {
+                var source = DisabledDatesCalendar.getEventSources();
                 if (source.length) {
                     $.each(source, function(i, event) {
                         event.remove();
                     });
                 }
 
-                count = 0;
+                tooltipCounter = 0;
 
                 $('#deactiveDatesModal .disabled-dates-modal-room-num').html('');
                 $('#disabled_dates_full_calendar .tooltip_container').remove();
-                DisableDatesModal.resetButtons();
-                DisableDatesModal.resetDisabledDatesForm();
-                calendar.today();
+                DisableDatesObj.hideMessages();
+                DisableDatesObj.resetForm();
+                if (today) {
+                    DisabledDatesCalendar.today();
+                }
             },
-            resetDisabledDatesForm: function () {
+            resetForm: function () {
                 $('#disabled_dates_form .ui-datepicker').hide();
                 $('.disabled_date_from').val('');
                 $('.disabled_date_to').val('');
@@ -630,16 +604,9 @@
                 $('.date_from_container').datepicker("option", "minDate", "{date('Y-m-d')}");
                 $('.date_from_container').find('.ui-datepicker').hide();
                 $('.date_to_container').find('.ui-datepicker').hide();
-                DisableDatesModal.hideDisabledDateForm();
-                DisableDatesModal.hideMessages();
+                DisableDatesObj.hideForm();
             },
-            resetButtons: function() {
-                $('.add_new_dates').removeClass('triggred');
-                $('.remove_dates_btn').removeClass('triggred');
-                $('.add_new_dates').removeClass('disabled');
-                $('.remove_dates_btn').removeClass('disabled');
-            },
-            setDisabledDateFormData: function(data) {
+            setFormData: function(data) {
                 var event_date_to = new Date(data.disabled_date_to);
                 // setting the date_to to -1 since the full calendar does not includes the date to
                 event_date_to.setDate(event_date_to.getDate() - 1);
@@ -653,15 +620,16 @@
                 $('.room_disable_reason').val(data.room_disable_reason);
                 $('.event_id').val(data.event_id);
             },
-            hideDisabledDateForm: function(){
+            hideForm: function(){
                 $('#disabled_dates_form').hide(200);
                 $('.form-title-text').hide(200);
                 $('.submit_disabled_date').hide(200);
                 $('.submit_remove_date').hide(200);
             },
-            displayDisabledDateForm: function(elem) {
+            displayForm: function(elem) {
+                DisableDatesObj.hideMessages();
                 $('#disabled_dates_full_calendar').find('.tooltip_container').remove();
-                calendar.unselect();
+                DisabledDatesCalendar.unselect();
                 $(elem).show(200);
                 $('#disabled_dates_form').show(200);
                 $('#deactiveDatesModal').animate({ scrollTop: 0 }, 'slow');
@@ -701,44 +669,43 @@
                         reason = $.trim(reason);
                         if (response.status) {
                             var validatedEvent = {
-                                'id' : DisableDatesModal.getUniqueEventId(),
+                                'id' : DisableDatesObj.getUniqueEventId(),
                                 'title': reason,
                                 'start': dateFrom,
                                 'date_from_formatted': dateFrom,
                                 'end': dateTo,
                                 'date_to_formatted': dateTo,
                                 'reason': reason,
-                                'id': DisableDatesModal.getUniqueEventId(),
-                                'is_deleteable' : 1,
+                                'id': DisableDatesObj.getUniqueEventId(),
+                                'is_deletable' : 1,
                                 'is_editable' : 1,
                                 'id_disabled_date': response.id_disabled_date,
                                 'event_title' : '',
-                                'id_module_event' : '',
-                                'module_event_url' : '',
+                                'id_external_event' : '',
+                                'external_event_url' : '',
                                 'date_add' : "{date('Y-m-d')}",
                                 'backgroundColor': '#FFFFFF',
                                 'borderColor': '#FFFFFF'
                             }
 
                             if (!isNaN(eventId)) {
-                                var olderEvent = calendar.getEventById(eventId);
+                                var olderEvent = DisabledDatesCalendar.getEventById(eventId);
                                 if (olderEvent) {
-                                    validatedEvent.is_deleteable = olderEvent.extendedProps.is_deleteable;
+                                    validatedEvent.is_deletable = olderEvent.extendedProps.is_deletable;
                                     validatedEvent.is_editable = olderEvent.extendedProps.is_editable;
                                     validatedEvent.event_title = olderEvent.extendedProps.event_title;
-                                    validatedEvent.id_module_event = olderEvent.extendedProps.id_module_event;
-                                    validatedEvent.module_event_url = olderEvent.extendedProps.module_event_url;
+                                    validatedEvent.id_external_event = olderEvent.extendedProps.id_external_event;
+                                    validatedEvent.external_event_url = olderEvent.extendedProps.external_event_url;
                                     olderEvent.remove();
                                 }
                             }
 
                             var event = [];
                             event.push(validatedEvent);
-                            calendar.addEventSource(event);
-                            DisableDatesModal.resetDisabledDatesForm();
-                            DisableDatesModal.resetButtons();
+                            DisabledDatesCalendar.addEventSource(event);
+                            DisableDatesObj.resetForm();
                         }
-                        DisableDatesModal.showMessages(response.msg);
+                        DisableDatesObj.showMessages(response.msg);
                     }
                 });
             },
@@ -753,7 +720,7 @@
                     },
                     dataType: 'JSON',
                     success: function(response) {
-                        DisableDatesModal.showMessages(response.msg);
+                        DisableDatesObj.showMessages(response.msg);
                     }
                 });
             },
@@ -768,7 +735,7 @@
             },
             getDisableDatesInfo: function() {
                 var disableDates = [];
-                var events = calendar.getEvents();
+                var events = DisabledDatesCalendar.getEvents();
                 if (events.length) {
                     $.each(events, function(i, event) {
                         var data = {
@@ -779,9 +746,9 @@
                             id : event.extendedProps.id_disabled_date,
                             is_editable : event.extendedProps.is_editable,
                             event_title : event.extendedProps.event_title,
-                            is_deleteable : event.extendedProps.is_deleteable,
-                            id_module_event : event.extendedProps.id_module_event,
-                            module_event_url : event.extendedProps.module_event_url
+                            is_deletable : event.extendedProps.is_deletable,
+                            id_external_event : event.extendedProps.id_external_event,
+                            external_event_url : event.extendedProps.external_event_url
                         }
 
                         disableDates.push(data);
@@ -792,56 +759,91 @@
             },
             getUniqueEventId: function() {
                 var id = Math.floor(Math.random() * 100000);
-                var event = calendar.getEventById(id);
+                var event = DisabledDatesCalendar.getEventById(id);
                 if (event) {
-                    return DisableDatesModal.getUniqueEventId()
+                    return DisableDatesObj.getUniqueEventId()
                 }
                 return id;
+            },
+            updateEventDates : function(event, add) {
+                if (event.start && event.end) {
+                    let dateFrom = new Date(event.start);
+                    let endDate = new Date(event.end);
+                    dateFrom.setDate(dateFrom.getDate() + 1)
+                    let startDate = dateFrom;
+                    // Loop through all the days the event spans
+                    for (let date = startDate; date <= endDate; date.setDate(date.getDate() + 1)) {
+                        let dateString = date.toISOString().split('T')[0];
+                        if (add) {
+                            if (!disabledDates[dateString]) {
+                                disabledDates[dateString] = 0;
+                            }
+
+                            disabledDates[dateString]++;
+                        } else {
+                            disabledDates[dateString]--;
+                            if (disabledDates[dateString] <= 0) {
+                                delete disabledDates[dateString];
+                            }
+                        }
+                    }
+                } else if (event.start) {
+                    let dateFrom = new Date(event.start);
+                    dateFrom.setDate(dateFrom.getDate() + 1);
+                    let dateString = dateFrom.toISOString().split('T')[0];
+                    if (add) {
+                        if (!disabledDates[dateString]) {
+                            disabledDates[dateString] = 0;
+                        }
+
+                        disabledDates[dateString]++;
+                    } else {
+                        disabledDates[dateString]--;
+                        if (disabledDates[dateString] <= 0) {
+                            delete disabledDates[dateString];
+                        }
+                    }
+                }
+
+                DisableDatesObj.updateDayHighlights();
+            },
+            updateDayHighlights: function() {
+                const today = new Date().toISOString().split('T')[0];
+                $('.fc-daygrid-day').each(function() {
+                    let dateString = $(this).data('date');
+                    if (dateString !== today) {
+                        if (disabledDates[dateString]) {
+                            $(this).addClass('highlight-event-day');
+                        } else {
+                            $(this).removeClass('highlight-event-day');
+                        }
+                    }
+                });
             }
         }
 
         $('#deactiveDatesModal').on('shown.bs.modal', function(e) {
-            calendar.updateSize();
+            DisabledDatesCalendar.updateSize();
             $('#modal_loader').hide();
             $('#deactiveDatesModal').css('visibility', 'visible');
         });
+
         // Disable dates data filling when model open calendar.
         $('#deactiveDatesModal').on('show.bs.modal', function(e) {
             $('#deactiveDatesModal').css('visibility', 'hidden');
             $('#modal_loader').show();
-            DisableDatesModal.resetModalInfo();
-            const triggerRoomRow = $(e.relatedTarget);
-            const idRoom = parseInt($(triggerRoomRow).attr('data-id-room'));
-            const roomRowIndex = parseInt($(triggerRoomRow).closest('tr').attr('data-row-index'));
-            var room_num = $(triggerRoomRow).closest('tr').find('[name="rooms_info['+roomRowIndex+'][room_num]"]').val();
-            $('#deactiveDatesModal').attr('data-room-row-index', roomRowIndex);
-            $('#deactiveDatesModal').attr('data-id-room', idRoom);
-            let disableDates = $(triggerRoomRow).closest('tr').find('.disable_dates_json').val();
-            if ($.trim(room_num) != '') {
-                room_num = '( '+'{l s='Room No'}'+' '+room_num+')';
-            }
-
-            if (isNaN(idRoom)) {
-                DisableDatesModal.disableCalendarActions();
-            }
-
-            $('#deactiveDatesModal .disabled-dates-modal-room-num').html(room_num);
-            if (!disableDates) {
-                return;
-            }
-
-            disableDates = JSON.parse(disableDates);
-            DisableDatesModal.initEvents(disableDates);
+            DisableDatesObj.reset();
+            DisableDatesObj.init($(e.relatedTarget));
         });
 
         // Disable dates data filling when model open calender.
         $('#deactiveDatesModal').on('hide.bs.modal', function(e) {
-            const disableDates = DisableDatesModal.getDisableDatesInfo();
+            const disableDates = DisableDatesObj.getDisableDatesInfo();
             const roomRowIndex = parseInt($('#deactiveDatesModal').attr('data-room-row-index'));
             const roomRow = $('#product-configuration .hotel-room tr.room_data_values[data-row-index='+roomRowIndex+']');
             $(roomRow).find('.disable_dates_json').val(JSON.stringify(disableDates));
-            DisableDatesModal.resetModalInfo();
-            DisableDatesModal.enableCalendarActions();
+            DisableDatesObj.reset();
+            DisableDatesObj.allowCalendarActions();
         });
 
         {literal}
@@ -1005,6 +1007,7 @@
                 $(this).find('.ui-datepicker').hide();
             }
         });
+
         $(document).on('focus', '.disabled_date_from, .disabled_date_to', function() {
             if ($(this).hasClass('disabled_date_from')) {
                 $('.date_to_container').find('.ui-datepicker').hide();
@@ -1014,6 +1017,7 @@
                 $('.date_from_container').find('.ui-datepicker').hide();
             }
         });
+
         $(document).on('focus click', function(e) {
             if (!$(e.target).closest('.date_from_container, .date_to_container').length
                 && ($(e.target).hasClass('disabled_date_from') || $(e.target).hasClass('disabled_date_to'))
@@ -1033,23 +1037,25 @@
                 }
             }
         });
+
         $(document).on('click', '.delete_disabled_dates', function() {
             if (confirm("{l s='Are you sure?'}")) {
                 var eventId = parseInt($(this).parent().find('.fc-event-title').attr('data-event_id'));
-                var event = calendar.getEventById(eventId);
+                var event = DisabledDatesCalendar.getEventById(eventId);
                 $('.event-id-'+eventId).find('.fc-event-main-frame').tooltip('destroy');
-                DisableDatesModal.deleteDisabledDate(event.extendedProps.id_disabled_date);
+                DisableDatesObj.deleteDisabledDate(event.extendedProps.id_disabled_date);
                 event.remove();
                 var formEventId = parseInt($('.event_id').val());
                 if (!isNaN(formEventId) && formEventId == eventId) {
-                    DisableDatesModal.resetDisabledDatesForm();
+                    DisableDatesObj.resetForm();
                 }
             }
         });
+
         $(document).on('click', '.edit_disabled_dates', function() {
             var element = $(this).parent().find('.fc-event-title');
-            var event = calendar.getEventById($(element).attr('data-event_id'));
-            var data = {
+            var event = DisabledDatesCalendar.getEventById($(element).attr('data-event_id'));
+            var formData = {
                 disabled_date_from : event.extendedProps.date_from_formatted,
                 disabled_date_to : event.extendedProps.date_to_formatted,
                 id_disabled_date : event.extendedProps.id_disabled_date,
@@ -1057,12 +1063,12 @@
                 event_id: $(element).attr('data-event_id')
             };
 
-            DisableDatesModal.resetDisabledDatesForm();
-            DisableDatesModal.setDisabledDateFormData(data);
-            DisableDatesModal.resetButtons();
-            DisableDatesModal.displayDisabledDateForm('.update_title');
+            DisableDatesObj.resetForm();
+            DisableDatesObj.setFormData(formData);
+            DisableDatesObj.displayForm('.update_title');
             $('.submit_disabled_date').show(200);
         });
+
         $(document).on('click', '.submit_remove_date', function(e) {
             e.preventDefault();
             if (confirm("{l s='Are you sure you want to remove the selected date range?'}")) {
@@ -1087,84 +1093,70 @@
                     dataType: 'JSON',
                     success: function(response) {
                         if (response.status) {
-                            DisableDatesModal.resetModalInfo();
+                            DisableDatesObj.reset(false);
                             if (response.disabled_dates.length) {
-                                var events = [];
-                                $.each(response.disabled_dates, function(index, value) {
-                                    var eventId = DisableDatesModal.getUniqueEventId();
-                                    events.push({
-                                        'id' : eventId,
-                                        'id_disabled_date' : value['id'],
-                                        'title': value['reason'],
-                                        'start': value['date_from'],
-                                        'end': value['date_to'],
-                                        'reason': value['reason'],
-                                        'date_add' : value['date_add'],
-                                        'is_editable' : value['is_editable'],
-                                        'event_title' : value['event_title'],
-                                        'date_to_formatted': value['date_to'],
-                                        'date_from_formatted': value['date_from'],
-                                        'is_deleteable' : value['is_deleteable'],
-                                        'id_module_event' : value['module_event'],
-                                        'module_event_url' : value['event_url'],
-                                        'backgroundColor': '#FFFFFF',
-                                        'borderColor': '#FFFFFF'
-                                    });
-                                });
-                                calendar.addEventSource(events);
+                                DisableDatesObj.initEvents(response.disabled_dates);
                             }
-                            DisableDatesModal.resetDisabledDatesForm();
                         }
-                        DisableDatesModal.showMessages(response.msg);
+                        DisableDatesObj.showMessages(response.msg);
                     }
                 });
             }
         });
+
         $(document).on('click', '.add_new_dates', function(e){
             e.preventDefault();
-            DisableDatesModal.resetDisabledDatesForm();
-            DisableDatesModal.displayDisabledDateForm('.add_title');
+            DisableDatesObj.resetForm();
+            DisableDatesObj.displayForm('.add_title');
             $('.submit_disabled_date').show(200);
         });
+
         $(document).on('click', '.tooltip_action_block .close', function(){
             $(this).closest('.tooltip_action_block').remove();
         });
+
         $(document).on('click', '.remove_dates_btn', function(e){
             e.preventDefault();
-            DisableDatesModal.resetDisabledDatesForm();
-            DisableDatesModal.displayDisabledDateForm('.remove_title');
+            DisableDatesObj.resetForm();
+            DisableDatesObj.displayForm('.remove_title');
             $('.date_from_container').datepicker("option", "minDate", null);
             $('.room_disable_reason').closest('.form-group').hide();
             $('.submit_remove_date').show(200);
         });
+
         $(document).on('click', function(e) {
             $('.hide_title').text('');
         });
+
         $(document).on('click', '.add_selected_dates', function(e){
             e.preventDefault();
-            DisableDatesModal.displayDisabledDateForm('.add_title');
+            DisableDatesObj.displayForm('.add_title');
             $('.submit_disabled_date').show(200);
         });
+
         $(document).on('click', '.remove_selected_dates', function(e){
             e.preventDefault();
             $('.room_disable_reason').closest('.form-group').hide();
             $('.date_from_container').datepicker("option", "minDate", null);
-            DisableDatesModal.displayDisabledDateForm('.remove_title');
+            DisableDatesObj.displayForm('.remove_title');
             $('.submit_remove_date').show();
         });
+
         $(document).on('click', '.submit_disabled_date', function(e){
             e.preventDefault();
             if (confirm("{l s='Are you sure?'}")) {
                 $('.add_new_dates').removeClass('triggred');
                 $('.room_disable_reason').closest('.form-group').show();
-                DisableDatesModal.submitDisableDates();
+                DisableDatesObj.submitDisableDates();
             }
         });
+
         $(document).on('click', '.close_action_tooltip', function(){
             $('#disabled_dates_full_calendar .tooltip_container').remove();
         });
+
         $(document).on('click', '.close_disabled_dates_form', function(){
-            DisableDatesModal.resetDisabledDatesForm();
+            DisableDatesObj.resetForm();
         });
     });
 </script>
