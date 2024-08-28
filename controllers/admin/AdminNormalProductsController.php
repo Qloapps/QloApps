@@ -3507,6 +3507,7 @@ class AdminNormalProductsControllerCore extends AdminController
                 'selectedElements' => $selectedElements
             ]))
             ->setUseCheckBox(true)
+            ->setAutoSelectChildren(true)
             ->setUseBulkActions(true)
             ->setUseSearch(true);
         $data->assign('hotel_tree', $tree->render());

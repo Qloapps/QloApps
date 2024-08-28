@@ -2730,11 +2730,7 @@ class HotelHelper
             if (isset($rooms[$roomType['value']])) {
                 $roomType['children'] = $rooms[$roomType['value']];
             }
-            $roomType['hint'] = 'This is Room type hint';
-            $roomType['badge'] = array(
-                'class' => 'badge-danger',
-                'title' => 'Disabled'
-            );
+
             if ($previousElements) {
                 $return[$roomType['id_hotel']][] = $roomType;
             } else {
