@@ -1689,39 +1689,40 @@ class HotelBookingDetail extends ObjectModel
                         unset($bookingData['rm_data'][$key]);
                         continue;
                     }
+                    if (count($value['data']['available'])) {
+                        $prod_price = Product::getPriceStatic($value['id_product'], self::useTax());
+                        $productPriceWithoutReduction = HotelRoomTypeFeaturePricing::getRoomTypeFeaturePricesPerDay($value['id_product'], $date_from, $date_to, self::useTax(), 0, 0, 0, 0, 1, 0);
+                        $cover_image_arr = Product::getCover($value['id_product']);
+                        if (!empty($cover_image_arr)) {
+                            $cover_img = $this->context->link->getImageLink($value['link_rewrite'], $value['id_product'].'-'.$cover_image_arr['id_image'], 'home_default');
+                        } else {
+                            $cover_img = $this->context->link->getImageLink($value['link_rewrite'], $this->context->language->iso_code.'-default', 'home_default');
+                        }
+                        $bookingData['rm_data'][$key]['image'] = $cover_img;
+                        $bookingData['rm_data'][$key]['feature'] = $product_feature;
+                        $bookingData['rm_data'][$key]['price'] = $prod_price;
+                        $bookingData['rm_data'][$key]['feature_price'] = $productFeaturePrice;
+                        $bookingData['rm_data'][$key]['price_without_reduction'] = $productPriceWithoutReduction;
+                        $bookingData['rm_data'][$key]['feature_price_diff'] = $productPriceWithoutReduction - $productFeaturePrice;
+                        $bookingData['rm_data'][$key]['room_left'] = count($bookingData['rm_data'][$key]['data']['available']);
 
-                    $prod_price = Product::getPriceStatic($value['id_product'], self::useTax());
-                    $productPriceWithoutReduction = HotelRoomTypeFeaturePricing::getRoomTypeFeaturePricesPerDay($value['id_product'], $date_from, $date_to, self::useTax(), 0, 0, 0, 0, 1, 0);
-                    $cover_image_arr = Product::getCover($value['id_product']);
-                    if (!empty($cover_image_arr)) {
-                        $cover_img = $this->context->link->getImageLink($value['link_rewrite'], $value['id_product'].'-'.$cover_image_arr['id_image'], 'home_default');
-                    } else {
-                        $cover_img = $this->context->link->getImageLink($value['link_rewrite'], $this->context->language->iso_code.'-default', 'home_default');
-                    }
-                    $bookingData['rm_data'][$key]['image'] = $cover_img;
-                    $bookingData['rm_data'][$key]['feature'] = $product_feature;
-                    $bookingData['rm_data'][$key]['price'] = $prod_price;
-                    $bookingData['rm_data'][$key]['feature_price'] = $productFeaturePrice;
-                    $bookingData['rm_data'][$key]['price_without_reduction'] = $productPriceWithoutReduction;
-                    $bookingData['rm_data'][$key]['feature_price_diff'] = $productPriceWithoutReduction - $productFeaturePrice;
-                    $bookingData['rm_data'][$key]['room_left'] = count($bookingData['rm_data'][$key]['data']['available']);
+                        // create URL with the parameters from URL
+                        $urlData = array ('date_from' => $date_from, 'date_to' => $date_to);
+                        if (!isset($occupancy)) {
+                            $occupancy = Tools::getValue('occupancy');
+                        }
+                        if ($occupancy) {
+                            $urlData['occupancy'] = $occupancy;
+                        }
+                        if ($location = Tools::getValue('location')) {
+                            $urlData['location'] = $location;
+                        }
 
-                    // create URL with the parameters from URL
-                    $urlData = array ('date_from' => $date_from, 'date_to' => $date_to);
-                    if (!isset($occupancy)) {
-                        $occupancy = Tools::getValue('occupancy');
-                    }
-                    if ($occupancy) {
-                        $urlData['occupancy'] = $occupancy;
-                    }
-                    if ($location = Tools::getValue('location')) {
-                        $urlData['location'] = $location;
-                    }
-
-                    if (Configuration::get('PS_REWRITING_SETTINGS')) {
-                        $bookingData['rm_data'][$key]['product_link'] = $this->context->link->getProductLink($value['id_product']).'?'.http_build_query($urlData);
-                    } else {
-                        $bookingData['rm_data'][$key]['product_link'] = $this->context->link->getProductLink($value['id_product']).'&'.http_build_query($urlData);
+                        if (Configuration::get('PS_REWRITING_SETTINGS')) {
+                            $bookingData['rm_data'][$key]['product_link'] = $this->context->link->getProductLink($value['id_product']).'?'.http_build_query($urlData);
+                        } else {
+                            $bookingData['rm_data'][$key]['product_link'] = $this->context->link->getProductLink($value['id_product']).'&'.http_build_query($urlData);
+                        }
                     }
                 }
             }
