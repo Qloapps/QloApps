@@ -708,7 +708,7 @@
             initialDate: '{date('Y-m-d', time())}',
             dayMaxEventRows: true,
             selectable: true,
-            direction:{if isset($language_is_rtl) && $language_is_rtl}'rlt'{else}'ltr'{/if},
+            direction:{if isset($language_is_rtl) && $language_is_rtl}'rtl'{else}'ltr'{/if},
             locale:{if isset($locale) && $locale}'{$locale}'{else}'en'{/if},
             unselectAuto: true,
             eventTextColor: '#333333',
