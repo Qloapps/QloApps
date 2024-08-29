@@ -1691,8 +1691,7 @@ class HotelBookingDetail extends ObjectModel
                     }
 
                     $prod_price = Product::getPriceStatic($value['id_product'], self::useTax());
-                    $productPriceWithoutReduction = Product::getPriceWithoutReductStatic($value['id_product'], !self::useTax());
-                    $productFeaturePriceWithoutAutoAdd = HotelRoomTypeFeaturePricing::getRoomTypeFeaturePricesPerDay($value['id_product'], $date_from, $date_to, self::useTax(), 0, 0, 0, 0, 0);
+                    $productPriceWithoutReduction = HotelRoomTypeFeaturePricing::getRoomTypeFeaturePricesPerDay($value['id_product'], $date_from, $date_to, self::useTax(), 0, 0, 0, 0, 1, 0);
                     $cover_image_arr = Product::getCover($value['id_product']);
                     if (!empty($cover_image_arr)) {
                         $cover_img = $this->context->link->getImageLink($value['link_rewrite'], $value['id_product'].'-'.$cover_image_arr['id_image'], 'home_default');
@@ -1703,10 +1702,8 @@ class HotelBookingDetail extends ObjectModel
                     $bookingData['rm_data'][$key]['feature'] = $product_feature;
                     $bookingData['rm_data'][$key]['price'] = $prod_price;
                     $bookingData['rm_data'][$key]['feature_price'] = $productFeaturePrice;
-                    $bookingData['rm_data'][$key]['feature_price_withoout_auto_add'] = $productFeaturePriceWithoutAutoAdd;
                     $bookingData['rm_data'][$key]['price_without_reduction'] = $productPriceWithoutReduction;
-                    $bookingData['rm_data'][$key]['price_without_reduction_with_auto_add'] = $productPriceWithoutReduction + ($productFeaturePrice - $productFeaturePriceWithoutAutoAdd);
-                    $bookingData['rm_data'][$key]['feature_price_diff'] = $bookingData['rm_data'][$key]['price_without_reduction_with_auto_add'] - $productFeaturePrice;
+                    $bookingData['rm_data'][$key]['feature_price_diff'] = $productPriceWithoutReduction - $productFeaturePrice;
                     $bookingData['rm_data'][$key]['room_left'] = count($bookingData['rm_data'][$key]['data']['available']);
 
                     // create URL with the parameters from URL
