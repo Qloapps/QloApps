@@ -9,52 +9,44 @@
         padding: 4px
     .highlight-event-day
         background: #F5F5F5
-    .display_title
+    .event_title_container
         text-overflow: ellipsis
         white-space: nowrap
         max-width: 65%
         overflow: hidden
         border-left: 2px solid red
         padding-left: 10px
-    #disabled_dates_form
+    #disable_dates_form
+        .date_from_container, .date_to_container
+            .ui-datepicker
+                position: absolute
+                top: 62px
+                left: 5px
+            position: relative
         textarea
             border-radius: 4px
         .form-group
             .control-label
                 margin-bottom: 5px
             .btn
-                margin-top: 10px
-                margin-left: 5px
                 border-radius: 5px
-            margin: 0
-            padding-right: 0px
-        padding: 10px
     .modal-title
-        .add_new_dates, .close
+        .add_disable_dates, .close
             margin-right: 10px
-        .remove_dates_btn
+        .remove_disable_dates
             margin-right: 20px
         .close
             line-height: 2
-        .disabled-dates-modal-title
-            .disabled-dates-modal-room-num
+        .disable_dates_title
+            .disable_dates_room_num
                 color: grey
             display: inline-block
             font-weight: 600
         line-height: 2
-    .form-title-text
-        font-size: 15px
-    .delete_disabled_dates
+    .delete_disable_dates
         margin-left: 10px
-    .delete_disabled_dates:hover , .edit_disabled_dates:hover
+    .delete_disable_dates:hover , .edit_disable_dates:hover
         cursor: pointer
-    .date_from_container, .date_to_container
-        .ui-datepicker
-            position: absolute
-            top: 60px
-            left: 5px
-        padding-right: 0
-        position: relative
     .tooltip_info_block
         .tooltip_title
             margin: 10px 5px
@@ -70,19 +62,19 @@
             font-weight: 400
             color: #888888
             margin-bottom: 5px
-        .tooltip_content_label
+        .tooltip_event_title
             border: 1px solid #D9D9D9
             border-radius: 6px
             padding: 5px 10px
         .tooltip_content
-            .tooltip_reason_container, .module_event_id
+            .tooltip_reason_container, .id_event
                 margin-top: 10px
             &> div
                 display: inline-block
             .row
                 margin-left: 0
                 margin-right: 0
-            ul.disabled_dates_actions
+            ul.disable_dates_actions
                 .btn
                     text-align: left
                     display: block

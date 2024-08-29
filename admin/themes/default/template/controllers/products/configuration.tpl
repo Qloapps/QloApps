@@ -175,21 +175,21 @@
 	</div>
 {/if}
 
-{*Disable Dates Model*}
 <div id="modal_loader" class="loading_overlay" style="display: none;">
     <img src="{$link->getMediaLink(($smarty.const._PS_ADMIN_IMG_))}ajax-loader.gif" class="loading-img"/>
 </div>
 
+{*Disable Dates Model*}
 <div class="modal fade" id="deactiveDatesModal" tabindex="-1" role="dialog" aria-labelledby="deactiveDatesLabel">
 	<div class="modal-dialog modal-lg" role="document">
 		<div class="modal-content">
 			<div class="modal-header">
                 <div class="modal-title">
                     <div class="row">
-                        <div class="disabled-dates-modal-title"><i class="icon-calendar"></i>&nbsp; {l s='Disable Dates'} <span class="disabled-dates-modal-room-num"></span></div>
+                        <div class="disable_dates_title"><i class="icon-calendar"></i>&nbsp; {l s='Disable Dates'} <span class="disable_dates_room_num"></span></div>
                         <div class="pull-right">
-                            <button type="submit" class="btn btn-success add_new_dates">{l s='Add Dates'}</button>
-                            <button type="submit" class="btn btn-danger remove_dates_btn">{l s='Remove Dates'}</button>
+                            <button type="submit" class="btn btn-success add_disable_dates"><i class="icon-plus-circle"></i> {l s='Add Dates'}</button>
+                            <button type="submit" class="btn btn-danger remove_disable_dates"><i class="icon-trash"></i> {l s='Remove Dates'}</button>
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                             </button>
@@ -199,7 +199,7 @@
 			</div>
 			<div class="modal-body">
                 <div class="text-left messages-wrap" style="display: none;"></div>
-                <div class="text-left room_not_saved_warning" style="display: none;">
+                <div class="text-left room_not_found" style="display: none;">
                     <div class="alert alert-warning">
                         <button type="button" class="close" data-dismiss="alert">&times;</button>
                         <ul class="list-unstyled">
@@ -207,55 +207,61 @@
                         </ul>
                     </div>
                 </div>
-                <div id="disabled_dates_form" class="panel" hidden>
-                    <div class="disabled_dates_form_container">
-                        <input type="hidden" class="id_disabled_date">
-                        <input type="hidden" class="event_id">
-                        <div class="form-group panel-heading col-xs-12">
-                            <div class="form-title-text add_title">{l s='Add Dates'}</div>
-                            <div class="form-title-text update_title">{l s='Update Dates'}</div>
-                            <div class="form-title-text remove_title">{l s='Remove Dates'}</div>
-                        </div>
-                        <div class="form-group row">
+                <div id="disable_dates_form" class="panel" hidden>
+                    <input type="hidden" class="id_disable_date">
+                    <input type="hidden" class="id_calendar_event">
+                    <div class="panel-heading col-xs-12">
+                        <div class="disable_dates_form_title disable_dates_form_title_add"><i class="icon-plus-circle"></i> {l s='Add Dates'}</div>
+                        <div class="disable_dates_form_title disable_dates_form_title_update"><i class="icon-pencil"></i> {l s='Update Dates'}</div>
+                        <div class="disable_dates_form_title disable_dates_form_title_delete"><i class="icon-trash"></i> {l s='Remove Dates'}</div>
+                    </div>
+                    <div class="panel-content">
+                        <div class="row form-group">
                             <div class="col-sm-6 date_from_container">
-                                <label class="control-label" for="disabled_date_from">
+                                <label class="control-label" for="disable_date_from">
                                     <span>{l s='Date From'}</span>
                                 </label>
                                 <div>
                                     <div class="input-group">
-                                        <input type="text" class="form-control disabled_date_from" name="disabled_date_from" value="" readonly>
+                                        <input type="text" class="form-control disable_date_from" name="disable_date_from" value="" readonly>
                                         <div class="input-group-addon"><i class="icon-calendar"></i></div>
                                     </div>
                                 </div>
                             </div>
                             <div class="col-sm-6 date_to_container">
-                                <label class="control-label" for="disabled_date_to">
+                                <label class="control-label" for="disable_date_to">
                                     <span>{l s='Date To'}</span>
                                 </label>
                                 <div>
                                     <div class="input-group">
-                                        <input type="textarea" class="form-control disabled_date_to" name="disabled_date_to" value="" readonly>
+                                        <input type="textarea" class="form-control disable_date_to" name="disable_date_to" value="" readonly>
                                         <div class="input-group-addon"><i class="icon-calendar"></i></div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="form-group col-xs-12">
-                            <label class="control-label" for="room_disable_reason">
-                                <span>{l s='Reason'}</span>
-                            </label>
-                            <div class="input-group col-xs-12">
-                                <textarea class="form-control room_disable_reason" name="room_disable_reason" value=""></textarea>
+                        <div class="row form-group">
+                            <div class="col-xs-12">
+                                <label class="control-label" for="room_disable_reason">
+                                    <span>{l s='Reason'}</span>
+                                </label>
+                                <div class="input-group col-xs-12">
+                                    <textarea class="form-control room_disable_reason" name="room_disable_reason" value=""></textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-6">
+                                <button type="button" class="btn btn-default pull-left close_disable_dates_form">{l s='Close'}</button>
+                            </div>
+                            <div class="col-xs-6">
+                                <button type="button" class="btn btn-primary pull-right submit_add_disable_date">{l s='Submit'}</button>
+                                <button type="button" class="btn btn-primary pull-right submit_remove_disable_date">{l s='Remove'}</button>
                             </div>
                         </div>
                     </div>
-                    <div class="form-group">
-    				    <button type="button" class="btn btn-default pull-left close_disabled_dates_form">{l s='Close'}</button>
-    				    <button type="button" class="btn btn-primary pull-right submit_disabled_date">{l s='Submit'}</button>
-    				    <button type="button" class="btn btn-primary pull-right submit_remove_date">{l s='Remove'}</button>
-                    </div>
                 </div>
-                <div id="disabled_dates_full_calendar"></div>
+                <div id="disable_dates_full_calendar"></div>
 			</div>
 		</div>
 	</div>
@@ -291,7 +297,7 @@
         </div>
     </div>
 </div>
-{* needs some design*}
+
 <div class="hidden">
     <div id="tooltip_info_block">
         <div class="tooltip_container tooltip_info_block">
@@ -307,7 +313,7 @@
                     <div class="tooltip_label">{l s='Disabled on'} </div>
                     <div<span class="tooltip_date_add"></span>
                 </div>
-                <div class="row col-xs-12 module_event_id"><div class="tooltip_label">{l s='Event Id'} </div><span class="tooltip_event_id_module"></span></div>
+                <div class="row col-xs-12 id_event"><div class="tooltip_label">{l s='Event Id'} </div><span class="tooltip_id_event"></span></div>
                 <div><div class="tooltip_label tooltip_reason_container col-xs-12">{l s='Reason'}</div><span class="tooltip_reason col-xs-12"></span></div>
             </div>
         </div>
@@ -320,15 +326,15 @@
                 </button>
             </div>
             <div class="tooltip_content">
-                <ul class="disabled_dates_actions">
-                    <li class="remove_selected_dates btn btn-default">
-                        <span class="remove_selected_dates">
+                <ul class="disable_dates_actions">
+                    <li class="enable_selected_dates btn btn-default">
+                        <span class="enable_selected_dates">
                             <i class="icon-check"></i>
                             {l s='Make Room Available'}
                         </span>
                     </li>
-                    <li class="add_selected_dates btn btn-default">
-                        <span class="add_selected_dates">
+                    <li class="disabled_selected_dates btn btn-default">
+                        <span class="disabled_selected_dates">
                             <i class="icon-ban"></i>
                             {l s='Disable Room'}
                         </span>
@@ -346,506 +352,17 @@
 	}
 </style>
 
-
 <script>
     var prod_link = "{$link->getAdminLink('AdminProducts')}";
     var rm_status = {$rm_status|@json_encode};
+    var confirm_text = "{l s='Are you sure?' js=1}";
+    var removeDisableDateText = "{l s='Are you sure you want to remove the selected date range?' js=1}";
     var currentRoomRow = 0;
     $(document).ready(function() {
         var tooltipCounter = 0;
-        var disabledDates = {};
+        var disableDates = {};
+        // Setting the Date object without current time.
         const dateToday = new Date("{date('Y-m-d')}");
-        const DisabledDatesCalendar = new FullCalendar.Calendar($('#disabled_dates_full_calendar').get(0), {
-            initialView: 'dayGridMonth',
-            initialDate: '{date('Y-m-d', time())}',
-            dayMaxEventRows: true,
-            selectable: true,
-            direction:{if isset($language_is_rtl) && $language_is_rtl}'rlt'{else}'ltr'{/if},
-            {if isset($locale) && $locale}locale: '{$locale}',{/if}
-            unselectAuto: true,
-            eventTextColor: '#333333',
-            selectAllow: function(info) {
-                $('#disabled_dates_full_calendar .tooltip_container').remove();
-                let idRoom = parseInt($('#deactiveDatesModal').attr('data-id-room'));
-                if (isNaN(idRoom)) {
-                    return false;
-                }
-                var date_start = new Date(info.startStr);
-                if (date_start < dateToday) {
-                    return false;
-                }
-
-                return true;
-            },
-            eventDidMount: function(info) {
-                // setting background display color
-                DisableDatesObj.updateEventDates(info.event, true);
-                DisableDatesObj.initEventTooltip(info.event, info.el);
-
-                if (info.isEnd) {
-                    var is_deletable = info.event.extendedProps.is_deletable;
-                    var is_editable = info.event.extendedProps.is_editable;
-                    if (is_deletable) {
-                        $(info.el).find('.fc-event-title-container').append('<i class="icon-trash pull-right delete_disabled_dates"></i>');
-                    }
-
-                    if (is_editable) {
-                        $(info.el).find('.fc-event-title-container').append('<i class="icon-pencil pull-right edit_disabled_dates"></i>');
-                    }
-                }
-                if (info.isStart) {
-                    $(info.el).find('.fc-event-title').addClass('display_title');
-                } else {
-                    $(info.el).find('.fc-event-title').addClass('hide_title');
-                }
-
-                $('.hide_title').text('');
-            },
-            eventWillUnmount: function(info) {
-                DisableDatesObj.updateEventDates(info.event, false);
-            },
-            select: function(info) {
-                var selectedElement = $('.fc-daygrid-bg-harness').last();
-                DisableDatesObj.resetForm();
-                var data = {
-                    disabled_date_from : info.startStr,
-                    disabled_date_to : info.endStr,
-                    id_disabled_date : '',
-                    room_disable_reason : '',
-                    event_id : ''
-                };
-                DisableDatesObj.setFormData(data);
-                var html = $('#tooltip_action_block').html();
-                var options = {
-                    title: ' ',
-                    html: true,
-                    template: html,
-                    trigger: 'click',
-                    container: $('#disabled_dates_full_calendar').closest('div'),
-                    delay: {
-                        show: 600,
-                        hide: 500
-                    },
-                    placement: {if isset($language_is_rtl) && $language_is_rtl}'left'{else}'right'{/if},
-                }
-                $(selectedElement).tooltip(options);
-                // since we are hiding the form after 200, if we show before hiding the position get wrong for the tooltip
-                setTimeout(() => {
-                    $(selectedElement).tooltip('show');
-                }, 200);
-            },
-            unselect: function(){
-                // since this will also work incase we select any action
-                setTimeout(() => {
-                    $('#disabled_dates_full_calendar .tooltip_action_block').remove();
-                }, 1);
-            }
-        });
-
-        $(document).on('mouseenter', '.tooltip_info_block', function(){
-            var tooltipId = $(this).attr('data-tooltip-id');
-            if ($('#tooltip-id-'+tooltipId).length) {
-                $('#tooltip-id-'+tooltipId).tooltip('show');
-            }
-        });
-
-        $(document).on('mouseleave', '.tooltip_info_block', function(){
-            $('.fc-event-main-frame').tooltip('hide');
-        });
-
-        DisabledDatesCalendar.render();
-        const DisableDatesObj = {
-            init: function(triggerRoomRow) {
-                const idRoom = parseInt($(triggerRoomRow).attr('data-id-room'));
-                const roomRowIndex = parseInt($(triggerRoomRow).closest('tr').attr('data-row-index'));
-                var room_num = $(triggerRoomRow).closest('tr').find('[name="rooms_info['+roomRowIndex+'][room_num]"]').val();
-                $('#deactiveDatesModal').attr('data-room-row-index', roomRowIndex);
-                $('#deactiveDatesModal').attr('data-id-room', idRoom);
-                let disableDates = $(triggerRoomRow).closest('tr').find('.disable_dates_json').val();
-                if ($.trim(room_num) != '') {
-                    room_num = '( '+'{l s='Room No'}'+' '+room_num+')';
-                }
-
-                if (isNaN(idRoom)) {
-                    DisableDatesObj.restrictCalendarActions();
-                }
-
-                $('#deactiveDatesModal .disabled-dates-modal-room-num').html(room_num);
-                if (!disableDates) {
-                    return;
-                }
-
-                disableDates = JSON.parse(disableDates);
-                DisableDatesObj.initEvents(disableDates);
-                DisableDatesObj.hideMessages();
-            },
-            initEvents: function(datesInfo) {
-                if (datesInfo.length) {
-                    var events = [];
-                    $.each(datesInfo, function(i, v) {
-                        var eventId = DisableDatesObj.getUniqueEventId();
-                        events.push({
-                            'id': DisableDatesObj.getUniqueEventId(),
-                            'title': v['reason'],
-                            'start': v['date_from'],
-                            'end': v['date_to'],
-                            'reason': v['reason'],
-                            'date_add' : v['date_add'],
-                            'id_disabled_date' : v['id'],
-                            'is_editable' : v['is_editable'],
-                            'is_deletable' : v['is_deletable'],
-                            'event_title' : v['event_title'],
-                            'date_to_formatted': v['date_to'],
-                            'date_from_formatted': v['date_from'],
-                            'id_external_event' : v['id_external_event'],
-                            'external_event_url' : v['external_event_url'],
-                            'backgroundColor': '#FFFFFF',
-                            'borderColor': '#FFFFFF'
-                        });
-                    });
-                    DisabledDatesCalendar.addEventSource(events);
-                }
-            },
-            initEventTooltip: function(event, element) {
-                // will be used to get this particular event
-                $(element).find('.fc-event-title').attr('data-event_id', event.id);
-                var dateFrom = event.extendedProps.date_from_formatted;
-                var event_date_to = new Date(event.extendedProps.date_to_formatted);
-                // setting the date_to to -1 days since the full calendar does not includes the end date
-                event_date_to.setDate(event_date_to.getDate() - 1);
-                var dateTo = $.datepicker.formatDate('yy-mm-dd', event_date_to);
-                var reason = event.extendedProps.reason;
-                var event_title = event.extendedProps.event_title;
-                var id_external_event = event.extendedProps.id_external_event;
-                var external_event_url = event.extendedProps.external_event_url;
-                var dateAdd = event.extendedProps.date_add;
-                $('#tooltip_info_block .tooltip_date_from').text(dateFrom);
-                $('#tooltip_info_block .tooltip_date_to').text(dateTo);
-                $('#tooltip_info_block .tooltip_date_add').text(dateAdd);
-                $('#tooltip_info_block .tooltip_reason').parent().hide();
-                if (reason != '') {
-                    $('#tooltip_info_block .tooltip_reason').text(reason).parent().show();
-                }
-
-                if (event_title != '') {
-                    event_title = '<span class="tooltip_content_label">'+event_title+'</span>';
-                    $('#tooltip_info_block .tooltip_title').html(event_title).show();
-                } else {
-                    $('#tooltip_info_block .tooltip_title').html('').hide();
-                }
-
-                if (id_external_event) {
-                    if (external_event_url != '') {
-                        event_html = '<a target="_blank" href="'+external_event_url+'">'+ '#'+id_external_event + '</a>';
-                    } else {
-                        event_html = '<span>'+ '#'+id_external_event + '</span>';
-                    }
-
-                    $('#tooltip_info_block .tooltip_event_id_module').html(event_html).parent().show();
-                } else {
-                    $('#tooltip_info_block .tooltip_event_id_module').html('').parent().hide();
-                }
-
-                $('#tooltip_info_block .tooltip_container').attr('data-tooltip-id', event.id + '-'+ tooltipCounter);
-                var html = $('#tooltip_info_block').html();
-                var options = {
-                    title: ' ',
-                    html: true,
-                    template: html,
-                    container: $('#disabled_dates_full_calendar').closest('div'),
-                    delay: {
-                        show: 600,
-                        hide: 500
-                    },
-                    placement: 'auto'
-                }
-
-                $(element).addClass('event-id-' + event.id);
-                $(element).find('.fc-event-main-frame').tooltip(options);
-                $(element).find('.fc-event-main-frame').attr('id', 'tooltip-id-' + event.id + '-' + tooltipCounter);
-                tooltipCounter = tooltipCounter+1;
-            },
-            restrictCalendarActions: function() {
-                $('#deactiveDatesModal .add_new_dates').hide();
-                $('#deactiveDatesModal .remove_dates_btn').hide();
-                $('#deactiveDatesModal .room_not_saved_warning').show();
-            },
-            allowCalendarActions: function() {
-                $('#deactiveDatesModal .add_new_dates').show();
-                $('#deactiveDatesModal .remove_dates_btn').show();
-                $('#deactiveDatesModal .room_not_saved_warning').hide();
-            },
-            reset: function(today=true) {
-                var source = DisabledDatesCalendar.getEventSources();
-                if (source.length) {
-                    $.each(source, function(i, event) {
-                        event.remove();
-                    });
-                }
-
-                tooltipCounter = 0;
-
-                $('#deactiveDatesModal .disabled-dates-modal-room-num').html('');
-                $('#disabled_dates_full_calendar .tooltip_container').remove();
-                DisableDatesObj.hideMessages();
-                DisableDatesObj.resetForm();
-                if (today) {
-                    DisabledDatesCalendar.today();
-                }
-            },
-            resetForm: function () {
-                $('#disabled_dates_form .ui-datepicker').hide();
-                $('.disabled_date_from').val('');
-                $('.disabled_date_to').val('');
-                $('.id_disabled_date').val('');
-                $('.room_disable_reason').val('');
-                $('.event_id').val('');
-                $('.room_disable_reason').closest('.form-group').show();
-                $('.date_from_container').datepicker("option", "minDate", "{date('Y-m-d')}");
-                $('.date_from_container').find('.ui-datepicker').hide();
-                $('.date_to_container').find('.ui-datepicker').hide();
-                DisableDatesObj.hideForm();
-            },
-            setFormData: function(data) {
-                var event_date_to = new Date(data.disabled_date_to);
-                // setting the date_to to -1 since the full calendar does not includes the date to
-                event_date_to.setDate(event_date_to.getDate() - 1);
-                var date_to_formatted = $.datepicker.formatDate('yy-mm-dd', event_date_to);
-                $('.disabled_date_from').val(data.disabled_date_from);
-                $('.disabled_date_to').val(date_to_formatted);
-                $('.date_from_container').datepicker("setDate", data.disabled_date_from);
-                $('.date_to_container').datepicker("setDate", date_to_formatted);
-                $('.date_to_container').datepicker("option", "minDate", data.disabled_date_from)
-                $('.id_disabled_date').val(data.id_disabled_date);
-                $('.room_disable_reason').val(data.room_disable_reason);
-                $('.event_id').val(data.event_id);
-            },
-            hideForm: function(){
-                $('#disabled_dates_form').hide(200);
-                $('.form-title-text').hide(200);
-                $('.submit_disabled_date').hide(200);
-                $('.submit_remove_date').hide(200);
-            },
-            displayForm: function(elem) {
-                DisableDatesObj.hideMessages();
-                $('#disabled_dates_full_calendar').find('.tooltip_container').remove();
-                DisabledDatesCalendar.unselect();
-                $(elem).show(200);
-                $('#disabled_dates_form').show(200);
-                $('#deactiveDatesModal').animate({ scrollTop: 0 }, 'slow');
-            },
-            submitDisableDates: function(cb) {
-                let idRoom = parseInt($('#deactiveDatesModal').attr('data-id-room'));
-                idRoom = idRoom == isNaN(idRoom) ? 0 : idRoom;
-                var formElem = $('#disabled_dates_form');
-                var dateFrom =  $(formElem).find('.disabled_date_from').val();
-                var dateTo = $(formElem).find('.disabled_date_to').val();
-                var eventId = parseInt($(formElem).find('.event_id').val());
-                var reason = $(formElem).find('.room_disable_reason').val();
-                var idProduct = $('[name="id_product"]').val();
-                var id_disabled_date = parseInt($(formElem).find('.id_disabled_date').val());
-                if (isNaN(id_disabled_date)) {
-                    id_disabled_date = 0;
-                }
-                var event_date_to = new Date(dateTo);
-                // setting the date_to +1 since the full calendar does not includes the date to
-                event_date_to.setDate(event_date_to.getDate() + 1);
-                var dateTo = $.datepicker.formatDate('yy-mm-dd', event_date_to);
-                $.ajax({
-                    url: prod_link,
-                    type: 'POST',
-                    data: {
-                        ajax: true,
-                        action: 'submitDisableDates',
-                        id_disabled_date : id_disabled_date,
-                        id_product: idProduct,
-                        id_room: idRoom,
-                        date_from: dateFrom,
-                        date_to: dateTo,
-                        reason: reason
-                    },
-                    dataType: 'JSON',
-                    success: function(response) {
-                        reason = $.trim(reason);
-                        if (response.status) {
-                            var validatedEvent = {
-                                'id' : DisableDatesObj.getUniqueEventId(),
-                                'title': reason,
-                                'start': dateFrom,
-                                'date_from_formatted': dateFrom,
-                                'end': dateTo,
-                                'date_to_formatted': dateTo,
-                                'reason': reason,
-                                'id': DisableDatesObj.getUniqueEventId(),
-                                'is_deletable' : 1,
-                                'is_editable' : 1,
-                                'id_disabled_date': response.id_disabled_date,
-                                'event_title' : '',
-                                'id_external_event' : '',
-                                'external_event_url' : '',
-                                'date_add' : "{date('Y-m-d')}",
-                                'backgroundColor': '#FFFFFF',
-                                'borderColor': '#FFFFFF'
-                            }
-
-                            if (!isNaN(eventId)) {
-                                var olderEvent = DisabledDatesCalendar.getEventById(eventId);
-                                if (olderEvent) {
-                                    validatedEvent.is_deletable = olderEvent.extendedProps.is_deletable;
-                                    validatedEvent.is_editable = olderEvent.extendedProps.is_editable;
-                                    validatedEvent.event_title = olderEvent.extendedProps.event_title;
-                                    validatedEvent.id_external_event = olderEvent.extendedProps.id_external_event;
-                                    validatedEvent.external_event_url = olderEvent.extendedProps.external_event_url;
-                                    olderEvent.remove();
-                                }
-                            }
-
-                            var event = [];
-                            event.push(validatedEvent);
-                            DisabledDatesCalendar.addEventSource(event);
-                            DisableDatesObj.resetForm();
-                        }
-                        DisableDatesObj.showMessages(response.msg);
-                    }
-                });
-            },
-            deleteDisabledDate: function(id_disabled_date) {
-                $.ajax({
-                    url: prod_link,
-                    type: 'POST',
-                    data: {
-                        ajax: true,
-                        action: 'deleteDisabledDate',
-                        id_disabled_date : id_disabled_date,
-                    },
-                    dataType: 'JSON',
-                    success: function(response) {
-                        DisableDatesObj.showMessages(response.msg);
-                    }
-                });
-            },
-            showMessages: function(messages) {
-                $('#deactiveDatesModal .messages-wrap').html(messages);
-                $('#deactiveDatesModal .messages-wrap').show();
-                $('#deactiveDatesModal').animate({ scrollTop: 0 }, 'slow');
-            },
-            hideMessages: function() {
-                $('#deactiveDatesModal .messages-wrap').hide();
-                $('#deactiveDatesModal .messages-wrap').html('');
-            },
-            getDisableDatesInfo: function() {
-                var disableDates = [];
-                var events = DisabledDatesCalendar.getEvents();
-                if (events.length) {
-                    $.each(events, function(i, event) {
-                        var data = {
-                            date_from: event.extendedProps.date_from_formatted,
-                            date_to: event.extendedProps.date_to_formatted,
-                            reason: event.extendedProps.reason,
-                            date_add : event.extendedProps.date_add,
-                            id : event.extendedProps.id_disabled_date,
-                            is_editable : event.extendedProps.is_editable,
-                            event_title : event.extendedProps.event_title,
-                            is_deletable : event.extendedProps.is_deletable,
-                            id_external_event : event.extendedProps.id_external_event,
-                            external_event_url : event.extendedProps.external_event_url
-                        }
-
-                        disableDates.push(data);
-                    });
-                }
-
-                return disableDates;
-            },
-            getUniqueEventId: function() {
-                var id = Math.floor(Math.random() * 100000);
-                var event = DisabledDatesCalendar.getEventById(id);
-                if (event) {
-                    return DisableDatesObj.getUniqueEventId()
-                }
-                return id;
-            },
-            updateEventDates : function(event, add) {
-                if (event.start && event.end) {
-                    let dateFrom = new Date(event.start);
-                    let endDate = new Date(event.end);
-                    dateFrom.setDate(dateFrom.getDate() + 1)
-                    let startDate = dateFrom;
-                    // Loop through all the days the event spans
-                    for (let date = startDate; date <= endDate; date.setDate(date.getDate() + 1)) {
-                        let dateString = date.toISOString().split('T')[0];
-                        if (add) {
-                            if (!disabledDates[dateString]) {
-                                disabledDates[dateString] = 0;
-                            }
-
-                            disabledDates[dateString]++;
-                        } else {
-                            disabledDates[dateString]--;
-                            if (disabledDates[dateString] <= 0) {
-                                delete disabledDates[dateString];
-                            }
-                        }
-                    }
-                } else if (event.start) {
-                    let dateFrom = new Date(event.start);
-                    dateFrom.setDate(dateFrom.getDate() + 1);
-                    let dateString = dateFrom.toISOString().split('T')[0];
-                    if (add) {
-                        if (!disabledDates[dateString]) {
-                            disabledDates[dateString] = 0;
-                        }
-
-                        disabledDates[dateString]++;
-                    } else {
-                        disabledDates[dateString]--;
-                        if (disabledDates[dateString] <= 0) {
-                            delete disabledDates[dateString];
-                        }
-                    }
-                }
-
-                DisableDatesObj.updateDayHighlights();
-            },
-            updateDayHighlights: function() {
-                const today = new Date().toISOString().split('T')[0];
-                $('.fc-daygrid-day').each(function() {
-                    let dateString = $(this).data('date');
-                    if (dateString !== today) {
-                        if (disabledDates[dateString]) {
-                            $(this).addClass('highlight-event-day');
-                        } else {
-                            $(this).removeClass('highlight-event-day');
-                        }
-                    }
-                });
-            }
-        }
-
-        $('#deactiveDatesModal').on('shown.bs.modal', function(e) {
-            DisabledDatesCalendar.updateSize();
-            $('#modal_loader').hide();
-            $('#deactiveDatesModal').css('visibility', 'visible');
-        });
-
-        // Disable dates data filling when model open calendar.
-        $('#deactiveDatesModal').on('show.bs.modal', function(e) {
-            $('#deactiveDatesModal').css('visibility', 'hidden');
-            $('#modal_loader').show();
-            DisableDatesObj.reset();
-            DisableDatesObj.init($(e.relatedTarget));
-        });
-
-        // Disable dates data filling when model open calender.
-        $('#deactiveDatesModal').on('hide.bs.modal', function(e) {
-            const disableDates = DisableDatesObj.getDisableDatesInfo();
-            const roomRowIndex = parseInt($('#deactiveDatesModal').attr('data-room-row-index'));
-            const roomRow = $('#product-configuration .hotel-room tr.room_data_values[data-row-index='+roomRowIndex+']');
-            $(roomRow).find('.disable_dates_json').val(JSON.stringify(disableDates));
-            DisableDatesObj.reset();
-            DisableDatesObj.allowCalendarActions();
-        });
-
         {literal}
         $('#room-dates-modal').on('show.bs.modal', function(e) {
             const triggerRoom = $(e.relatedTarget);
@@ -964,33 +481,33 @@
             }
         });
 
-        $('.date_from_container').datepicker({
+        // Initializing datepicker for date from for the disable dates calendar
+        $('#disable_dates_form .date_from_container').datepicker({
             showOtherMonths: true,
             dateFormat: 'yy-mm-dd',
-            inline: true,
             minDate: 0,
             onSelect: function(selectedDate) {
                 let objDateToMin = $.datepicker.parseDate('yy-mm-dd', selectedDate);
-                $(this).find('.disabled_date_from').val(selectedDate);
+                $(this).find('.disable_date_from').val(selectedDate);
                 objDateToMin.setDate(objDateToMin.getDate());
 
-                $(this).closest('#disabled_dates_form').find('.date_to_container').datepicker('option', 'minDate', objDateToMin);
-                var dateTo = $(this).closest('#disabled_dates_form').find('.disabled_date_to').val();
+                $(this).closest('#disable_dates_form').find('.date_to_container').datepicker('option', 'minDate', objDateToMin);
+                var dateTo = $(this).closest('#disable_dates_form').find('.disable_date_to').val();
                 $(this).find('.ui-datepicker').hide();
                 if (!dateTo || (dateTo && selectedDate > dateTo)) {
-                    $('.disabled_date_to').val($.datepicker.formatDate('yy-mm-dd', objDateToMin));
-                    $('.date_to_container').find('.ui-datepicker').show();
+                    $('#disable_dates_form .disable_date_to').val($.datepicker.formatDate('yy-mm-dd', objDateToMin));
+                    $('#disable_dates_form .date_to_container').find('.ui-datepicker').show();
                 }
             }
         });
 
-        $('.date_to_container').datepicker({
+        // Initializing datepicker for date to for the disable dates calendar
+        $('#disable_dates_form .date_to_container').datepicker({
             showOtherMonths: true,
             dateFormat: 'yy-mm-dd',
-            inline: true,
             minDate: 0,
             beforeShow: function (input, instance) {
-                let dateFrom = $(this).closest('#disabled_dates_form').find('.disabled_date_from').val();
+                let dateFrom = $(this).closest('#disable_dates_form').find('.disable_date_from').val();
 
                 let objDateToMin = null;
                 if (typeof dateFrom != 'undefined' && dateFrom != '') {
@@ -1003,85 +520,97 @@
                 $(this).datepicker('option', 'minDate', objDateToMin);
             },
             onSelect: function(selectedDate) {
-                $(this).find('.disabled_date_to').val(selectedDate);
+                $(this).find('.disable_date_to').val(selectedDate);
                 $(this).find('.ui-datepicker').hide();
             }
         });
 
-        $(document).on('focus', '.disabled_date_from, .disabled_date_to', function() {
-            if ($(this).hasClass('disabled_date_from')) {
-                $('.date_to_container').find('.ui-datepicker').hide();
-                $('.date_from_container').find('.ui-datepicker').show();
-            } else if ($(this).hasClass('disabled_date_to')) {
-                $('.date_to_container').find('.ui-datepicker').show();
-                $('.date_from_container').find('.ui-datepicker').hide();
+        // Since the datepickers are mounted on to the container instead of the input fields, we are handeling the date picker hide and show events.
+        $(document).on('focus', '#disable_dates_form .disable_date_from, #disable_dates_form .disable_date_to', function() {
+            if ($(this).hasClass('disable_date_from')) {
+                $('#disable_dates_form .date_to_container').find('.ui-datepicker').hide();
+                $('#disable_dates_form .date_from_container').find('.ui-datepicker').show();
+            } else if ($(this).hasClass('disable_date_to')) {
+                $('#disable_dates_form .date_to_container').find('.ui-datepicker').show();
+                $('#disable_dates_form .date_from_container').find('.ui-datepicker').hide();
             }
         });
 
-        $(document).on('focus click', function(e) {
+        // Handeling the date picker hide and show events for the click events.
+        $('#disable_dates_form').on('focus click', function(e) {
             if (!$(e.target).closest('.date_from_container, .date_to_container').length
-                && ($(e.target).hasClass('disabled_date_from') || $(e.target).hasClass('disabled_date_to'))
+                && ($(e.target).hasClass('disable_date_from') || $(e.target).hasClass('disable_date_to'))
             ) {
-                $('.ui-datepicker').hide();
+                $('#disable_dates_form .ui-datepicker').hide();
             } else {
-                if ($(e.target).hasClass('disabled_date_from')) {
-                    $('.date_to_container').find('.ui-datepicker').hide();
-                    $('.date_from_container').find('.ui-datepicker').show();
-                } else if ($(e.target).hasClass('disabled_date_to')) {
-                    $('.date_to_container').find('.ui-datepicker').show();
-                    $('.date_from_container').find('.ui-datepicker').hide();
+                if ($(e.target).hasClass('disable_date_from')) {
+                    $('#disable_dates_form .date_to_container').find('.ui-datepicker').hide();
+                    $('#disable_dates_form .date_from_container').find('.ui-datepicker').show();
+                } else if ($(e.target).hasClass('disable_date_to')) {
+                    $('#disable_dates_form .date_to_container').find('.ui-datepicker').show();
+                    $('#disable_dates_form .date_from_container').find('.ui-datepicker').hide();
                 } else if (!$(e.target).parents('.ui-datepicker').length
                     && (!$(e.target).hasClass('ui-corner-all') && !$(e.target).hasClass('ui-icon'))
                 ) {
-                    $('.ui-datepicker').hide();
+                    $('#disable_dates_form .ui-datepicker').hide();
                 }
             }
         });
 
-        $(document).on('click', '.delete_disabled_dates', function() {
-            if (confirm("{l s='Are you sure?'}")) {
-                var eventId = parseInt($(this).parent().find('.fc-event-title').attr('data-event_id'));
-                var event = DisabledDatesCalendar.getEventById(eventId);
-                $('.event-id-'+eventId).find('.fc-event-main-frame').tooltip('destroy');
-                DisableDatesObj.deleteDisabledDate(event.extendedProps.id_disabled_date);
-                event.remove();
-                var formEventId = parseInt($('.event_id').val());
+        // Removing single disable date range and its event from calendar.
+        $(document).on('click', '#disable_dates_full_calendar .delete_disable_dates', function() {
+            if (confirm(confirm_text)) {
+                var calendarEventId = parseInt($(this).parent().find('.fc-event-title').attr('data-id_calendar_event'));
+                var calendarEvent = DisableDatesCalendar.getEventById(calendarEventId);
+                $('#disable_dates_full_calendar .id_calendar_event_'+calendarEventId).find('.fc-event-main-frame').tooltip('destroy');
+                DisableDatesObj.deleteDisableDate(calendarEvent.extendedProps.id_disable_date);
+                calendarEvent.remove();
+                var formEventId = parseInt($('#disable_dates_form .id_calendar_event').val());
                 if (!isNaN(formEventId) && formEventId == eventId) {
-                    DisableDatesObj.resetForm();
+                    DisableDatesForm.resetForm();
+                    DisableDatesForm.hideForm();
                 }
             }
         });
 
-        $(document).on('click', '.edit_disabled_dates', function() {
+        // Setting data for single disable date range into form for updation.
+        $(document).on('click', '#disable_dates_full_calendar .edit_disable_dates', function() {
             var element = $(this).parent().find('.fc-event-title');
-            var event = DisabledDatesCalendar.getEventById($(element).attr('data-event_id'));
+            var calendarEvent = DisableDatesCalendar.getEventById($(element).attr('data-id_calendar_event'));
             var formData = {
-                disabled_date_from : event.extendedProps.date_from_formatted,
-                disabled_date_to : event.extendedProps.date_to_formatted,
-                id_disabled_date : event.extendedProps.id_disabled_date,
-                room_disable_reason : event.extendedProps.reason,
-                event_id: $(element).attr('data-event_id')
+                disable_date_from : calendarEvent.extendedProps.date_from_formatted,
+                disable_date_to : calendarEvent.extendedProps.date_to_formatted,
+                id_disable_date : calendarEvent.extendedProps.id_disable_date,
+                room_disable_reason : calendarEvent.extendedProps.reason,
+                id_calendar_event: $(element).attr('data-id_calendar_event') // this will be used to identify this event on the calendar
             };
+            if ($('#disable_dates_form').attr('data-form_action') == 'update'
+                && $('#disable_dates_form .id_calendar_event').val() != formData.id_calendar_event
+            ) {
+                $('#disable_dates_form').attr('data-form_action',' ')
+            }
 
-            DisableDatesObj.resetForm();
-            DisableDatesObj.setFormData(formData);
-            DisableDatesObj.displayForm('.update_title');
-            $('.submit_disabled_date').show(200);
+            DisableDatesForm.displayUpdateDatesForm();
+            DisableDatesForm.setFormData(formData);
         });
 
-        $(document).on('click', '.submit_remove_date', function(e) {
+        // Removing multiple disable dates that intersects with the selected date range.
+        $(document).on('click', '#disable_dates_form .submit_remove_disable_date', function(e) {
             e.preventDefault();
-            if (confirm("{l s='Are you sure you want to remove the selected date range?'}")) {
+            if (confirm(removeDisableDateText)) {
                 let idRoom = parseInt($('#deactiveDatesModal').attr('data-id-room'));
-                idRoom = idRoom == isNaN(idRoom) ? 0 : idRoom;
-                const formElem = $('#disabled_dates_form');
-                const dateFrom =  $(formElem).find('.disabled_date_from').val();
-                var dateToFormatted = new Date($(formElem).find('.disabled_date_to').val());
-                dateToFormatted.setDate(dateToFormatted.getDate() + 1);
-                const dateTo = $.datepicker.formatDate('yy-mm-dd', dateToFormatted);
+                if(isNaN(idRoom)) {
+                    idRoom = 0;
+                }
+
+                const formElem = $('#disable_dates_form');
+                var dateFrom =  $(formElem).find('.disable_date_from').val();
+                var dateTo = new Date($(formElem).find('.disable_date_to').val());
+                dateTo.setDate(dateTo.getDate() + 1);
+                dateTo = $.datepicker.formatDate('yy-mm-dd', dateTo);
                 var data = {
                     ajax: true,
-                    action: 'removeSelectedDate',
+                    action: 'removeDisableDatesInDateRange',
                     id_room: idRoom,
                     date_from: dateFrom,
                     date_to: dateTo
@@ -1094,69 +623,657 @@
                     success: function(response) {
                         if (response.status) {
                             DisableDatesObj.reset(false);
-                            if (response.disabled_dates.length) {
-                                DisableDatesObj.initEvents(response.disabled_dates);
+                            if (response.disable_dates.length) {
+                                DisableDatesObj.initEvents(response.disable_dates);
                             }
                         }
-                        DisableDatesObj.showMessages(response.msg);
+                        DisableDatesForm.showMessages(response.msg);
                     }
                 });
             }
         });
 
-        $(document).on('click', '.add_new_dates', function(e){
+        // opening form for adding new disable date.
+        $(document).on('click', '#deactiveDatesModal .add_disable_dates, #deactiveDatesModal .disabled_selected_dates', function(e){
             e.preventDefault();
-            DisableDatesObj.resetForm();
-            DisableDatesObj.displayForm('.add_title');
-            $('.submit_disabled_date').show(200);
+            DisableDatesForm.displayAddDatesForm();
         });
 
-        $(document).on('click', '.tooltip_action_block .close', function(){
+        // closing the actions tooltip for the calendar drag drop event.
+        $(document).on('click', '#disable_dates_full_calendar .tooltip_action_block .close', function(){
             $(this).closest('.tooltip_action_block').remove();
         });
 
-        $(document).on('click', '.remove_dates_btn', function(e){
+        // opening form for removing disable date.
+        $(document).on('click', '#deactiveDatesModal .remove_disable_dates, #deactiveDatesModal .enable_selected_dates', function(e){
             e.preventDefault();
-            DisableDatesObj.resetForm();
-            DisableDatesObj.displayForm('.remove_title');
-            $('.date_from_container').datepicker("option", "minDate", null);
-            $('.room_disable_reason').closest('.form-group').hide();
-            $('.submit_remove_date').show(200);
+            DisableDatesForm.displayRemoveDatesForm();
         });
 
-        $(document).on('click', function(e) {
-            $('.hide_title').text('');
-        });
-
-        $(document).on('click', '.add_selected_dates', function(e){
+        // to save the dates on submit button click event
+        $(document).on('click', '#disable_dates_form .submit_add_disable_date', function(e){
             e.preventDefault();
-            DisableDatesObj.displayForm('.add_title');
-            $('.submit_disabled_date').show(200);
-        });
-
-        $(document).on('click', '.remove_selected_dates', function(e){
-            e.preventDefault();
-            $('.room_disable_reason').closest('.form-group').hide();
-            $('.date_from_container').datepicker("option", "minDate", null);
-            DisableDatesObj.displayForm('.remove_title');
-            $('.submit_remove_date').show();
-        });
-
-        $(document).on('click', '.submit_disabled_date', function(e){
-            e.preventDefault();
-            if (confirm("{l s='Are you sure?'}")) {
-                $('.add_new_dates').removeClass('triggred');
-                $('.room_disable_reason').closest('.form-group').show();
+            if (confirm(confirm_text)) {
                 DisableDatesObj.submitDisableDates();
             }
         });
 
-        $(document).on('click', '.close_action_tooltip', function(){
-            $('#disabled_dates_full_calendar .tooltip_container').remove();
+        // Closing the form on click event.
+        $(document).on('click', '.close_disable_dates_form', function(){
+            DisableDatesForm.resetForm();
+            DisableDatesForm.hideForm();
         });
 
-        $(document).on('click', '.close_disabled_dates_form', function(){
-            DisableDatesObj.resetForm();
+        // This is added to keep the tooltip visible on hover
+        $(document).on('mouseenter', '#disable_dates_full_calendar .tooltip_info_block', function(){
+            var tooltipId = $(this).attr('data-tooltip-id');
+            if ($('#tooltip-id-'+tooltipId).length) {
+                $('#tooltip-id-'+tooltipId).tooltip('show');
+            }
         });
+
+        // This is added to hide the tooltip after hover.
+        $(document).on('mouseleave', '#disable_dates_full_calendar .tooltip_info_block', function(){
+            $('#disable_dates_full_calendar .fc-event-main-frame').tooltip('hide');
+        });
+
+        // Called after the modal is shown, since the modal is hidden at first, the size of the fullcalendar is render incorrectly.
+        $('#deactiveDatesModal').on('shown.bs.modal', function(e) {
+            DisableDatesCalendar.updateSize();
+            $('#modal_loader').hide();
+            $('#deactiveDatesModal').css('visibility', 'visible');
+        });
+
+        // Reseting and populating the modal.
+        $('#deactiveDatesModal').on('show.bs.modal', function(e) {
+            $('#deactiveDatesModal').css('visibility', 'hidden');
+            $('#modal_loader').show();
+            DisableDatesObj.reset();
+            DisableDatesObj.init($(e.relatedTarget));
+        });
+
+        // Disable dates data filling in the tr so that we cal validate it while saving this room type.
+        $('#deactiveDatesModal').on('hide.bs.modal', function(e) {
+            const disableDates = DisableDatesObj.getAllDisableDates();
+            const roomRowIndex = parseInt($('#deactiveDatesModal').attr('data-room-row-index'));
+            const roomRow = $('#product-configuration .hotel-room tr.room_data_values[data-row-index='+roomRowIndex+']');
+            $(roomRow).find('.disable_dates_json').val(JSON.stringify(disableDates));
+            DisableDatesObj.reset();
+            DisableDatesObj.allowCalendarActions();
+        });
+
+        // Init full calander object.
+        const DisableDatesCalendar = new FullCalendar.Calendar($('#disable_dates_full_calendar').get(0), {
+            initialView: 'dayGridMonth',
+            initialDate: '{date('Y-m-d', time())}',
+            dayMaxEventRows: true,
+            selectable: true,
+            direction:{if isset($language_is_rtl) && $language_is_rtl}'rlt'{else}'ltr'{/if},
+            locale:{if isset($locale) && $locale}'{$locale}'{else}'en'{/if},
+            unselectAuto: true,
+            eventTextColor: '#333333',
+            // This function is used to check the clicked date on calendar can be selected.
+            selectAllow: function(info) {
+                $('#disable_dates_full_calendar .tooltip_container').remove();
+                let idRoom = parseInt($('#deactiveDatesModal').attr('data-id-room'));
+                // disabling select action incase room is not saved.
+                if (isNaN(idRoom)) {
+                    return false;
+                }
+
+                var date_start = new Date(info.startStr);
+                if (date_start < dateToday) {
+                    return false;
+                }
+
+                return true;
+            },
+            // This is used to set the content for the calendar event, classes added are added by default, if we do not send them.
+            // This event is called ever time there is any changes in the event source. we are sending our own html content since we do not want to display the event tittle every week.
+            eventContent: function(info) {
+                if (info.isStart && !info.isEnd) {
+                    return {
+                        html: '<div class="fc-event-main-frame"><div class="fc-event-title-container"><div class="fc-event-title">&nbsp;'+info.event.title+'</div></div></div>'
+                    };
+                } else if (!info.isStart) {
+                    return {
+                        html: '<div class="fc-event-main-frame"><div class="fc-event-title-container"><div class="fc-event-title">&nbsp;</div></div></div>'
+                    }
+                }
+            },
+            // This event is called every time an event has mounted successfully.
+            // This event is called not called incase there is any changes in the event source.
+            eventDidMount: function(info) {
+                DisableDatesObj.handleEventDateBackgroundHighlight(info.event, true);
+                DisableDatesObj.initEventTooltip(info.event, info.el);
+                if (info.isEnd) {
+                    var isDeletable = info.event.extendedProps.is_deletable;
+                    var isEditable = info.event.extendedProps.is_editable;
+                    if (isDeletable) {
+                        $(info.el).find('.fc-event-title-container').append('<i class="icon-trash pull-right delete_disable_dates"></i>');
+                    }
+
+                    if (isDeletable) {
+                        $(info.el).find('.fc-event-title-container').append('<i class="icon-pencil pull-right edit_disable_dates"></i>');
+                    }
+                }
+
+                if (info.isStart) {
+                    $(info.el).find('.fc-event-title').addClass('event_title_container');
+                }
+            },
+            // This event is called when a calendar event is removed from the full calendar.
+            eventWillUnmount: function(info) {
+                DisableDatesObj.handleEventDateBackgroundHighlight(info.event, false);
+            },
+            // This event is caled when admin select and dates on full calendar using mouse.
+            select: function(info) {
+                var selectedElement = $('#disable_dates_full_calendar .fc-daygrid-bg-harness').last();
+                DisableDatesForm.resetForm();
+                DisableDatesForm.hideForm();
+                $('#disable_dates_form').attr('data-form_action', 'add');
+                var formData = {
+                    disable_date_from : info.startStr,
+                    disable_date_to : info.endStr,
+                };
+                DisableDatesForm.setFormData(formData);
+                var html = $('#tooltip_action_block').html();
+                var options = {
+                    title: ' ',
+                    html: true,
+                    template: html,
+                    trigger: 'click',
+                    container: $('#disable_dates_full_calendar').closest('div'),
+                    delay: {
+                        show: 600,
+                        hide: 500
+                    },
+                    placement: {if isset($language_is_rtl) && $language_is_rtl}'left'{else}'right'{/if},
+                }
+                $(selectedElement).tooltip(options);
+                // since we are hiding the form after 200, if we show tooltip before hiding the form the position of the tooltip get wrong.
+                setTimeout(() => {
+                    $(selectedElement).tooltip('show');
+                }, 200);
+            },
+            unselect: function(){
+                // since unselectAuto: true will remove the element on which we are adding the tooltip, so the tooltip is destroyed on any action.
+                // which will not allow the events binded to the tooltip_action_block class
+                setTimeout(() => {
+                    $('#disable_dates_full_calendar .tooltip_action_block').remove();
+                }, 1);
+            }
+        });
+
+        DisableDatesCalendar.render();
+
+        //Object to handle all disable date form related operations.
+        const DisableDatesForm = {
+            // used for resetting the disable date form form.
+            resetForm: function () {
+                $('#disable_dates_form .ui-datepicker').hide();
+                $('#disable_dates_form .disable_date_from').val('');
+                $('#disable_dates_form .disable_date_to').val('');
+                $('#disable_dates_form .id_disable_date').val('');
+                $('#disable_dates_form .room_disable_reason').val('');
+                $('#disable_dates_form .id_calendar_event').val('');
+                $('#disable_dates_form .room_disable_reason').closest('.form-group').show();
+                $('#disable_dates_form .date_from_container').datepicker("option", "minDate", "{date('Y-m-d')}");
+                $('#disable_dates_form .date_to_container').datepicker("setDate", null);
+                $('#disable_dates_form .date_from_container').datepicker("setDate", null);
+                $('#disable_dates_form .date_from_container').find('.ui-datepicker').hide();
+                $('#disable_dates_form .date_to_container').find('.ui-datepicker').hide();
+            },
+            // used for opulating the disable dates form with the data.
+            setFormData: function(formData) {
+                var disableDateTo = new Date(formData.disable_date_to);
+                // setting the date_to to -1 since the full calendar does not includes the date to
+                disableDateTo.setDate(disableDateTo.getDate() - 1);
+                disableDateTo = $.datepicker.formatDate('yy-mm-dd', disableDateTo);
+                //setting the min dates dfor the date picker
+                $('#disable_dates_form .date_from_container').datepicker("setDate", formData.disable_date_from);
+                $('#disable_dates_form .date_to_container').datepicker("setDate", disableDateTo);
+                $('#disable_dates_form .date_to_container').datepicker("option", "minDate", formData.disable_date_from);
+
+                $('#disable_dates_form .disable_date_from').val(formData.disable_date_from);
+                $('#disable_dates_form .disable_date_to').val(disableDateTo);
+                if (typeof(formData.id_disable_date) !== undefined)
+                    $('#disable_dates_form .id_disable_date').val(formData.id_disable_date);
+
+                if (typeof(formData.room_disable_reason) !== undefined)
+                    $('#disable_dates_form .room_disable_reason').val(formData.room_disable_reason);
+
+                if (typeof(formData.id_calendar_event) !== undefined)
+                    $('#disable_dates_form .id_calendar_event').val(formData.id_calendar_event);
+            },
+            // used for hiding the disable date form form.
+            hideForm: function(){
+                $('#disable_dates_form').hide(200);
+                $('#disable_dates_form .disable_dates_form_title').hide(200);
+                $('#disable_dates_form .submit_add_disable_date').hide(200);
+                $('#disable_dates_form .submit_remove_disable_date').hide(200);
+            },
+            // used for display the disable dates form with add action.
+            displayAddDatesForm: function () {
+                DisableDatesForm.hideMessages();
+                DisableDatesCalendar.unselect();
+                if ($('#disable_dates_form').attr('data-form_action') != 'add') {
+                    $('#disable_dates_form').attr('data-form_action', 'add');
+                    DisableDatesForm.resetForm();
+                    DisableDatesForm.hideForm();
+                }
+
+                DisableDatesForm.displayForm();
+                $('#disable_dates_full_calendar').find('.tooltip_container').remove();
+                $('#disable_dates_form .disable_dates_form_title_add').show(200);
+                $('#disable_dates_form .submit_add_disable_date').show(200);
+            },
+            // used for display the disable dates form with remove action.
+            displayRemoveDatesForm: function () {
+                DisableDatesForm.hideMessages();
+                DisableDatesCalendar.unselect();
+                $('#disable_dates_full_calendar').find('.tooltip_container').remove();
+                if ($('#disable_dates_form').attr('data-form_action') != 'remove') {
+                    $('#disable_dates_form').attr('data-form_action', 'remove');
+                    DisableDatesForm.resetForm();
+                    DisableDatesForm.hideForm();
+                }
+
+                DisableDatesForm.displayForm();
+                $('#disable_dates_form .disable_dates_form_title_delete').show(200);
+                $('#disable_dates_form .submit_remove_disable_date').show(200);
+                $('#disable_dates_form .room_disable_reason').closest('.form-group').hide();
+                $('#disable_dates_form .date_from_container').datepicker("option", "minDate", null);
+            },
+            // used for display the disable dates form with update action.
+            displayUpdateDatesForm: function () {
+                DisableDatesForm.hideMessages();
+                DisableDatesCalendar.unselect();
+                if ($('#disable_dates_form').attr('data-form_action') != 'update') {
+                    $('#disable_dates_form').attr('data-form_action', 'update');
+                    DisableDatesForm.resetForm();
+                    DisableDatesForm.hideForm();
+                }
+
+                DisableDatesForm.displayForm();
+                $('#disable_dates_full_calendar').find('.tooltip_container').remove();
+                $('#disable_dates_form .disable_dates_form_title_update').show(200);
+                $('#disable_dates_form .submit_add_disable_date').show(200);
+            },
+            // used for display the disable dates, also the screen is scrolled to top to show the form on the screen.
+            displayForm: function() {
+                if ($('#deactiveDatesModal').scrollTop() > 0) {
+                    $('#deactiveDatesModal').animate({ scrollTop: 0 });
+                }
+
+                $('#disable_dates_form').show(200);
+            },
+            // used to display messages related to the disable date form
+            showMessages: function(messages) {
+                $('#deactiveDatesModal .messages-wrap').html(messages);
+                $('#deactiveDatesModal .messages-wrap').show();
+                $('#deactiveDatesModal').animate({ scrollTop: 0 });
+            },
+            // used to hide messages related to the disable date form
+            hideMessages: function() {
+                $('#deactiveDatesModal .messages-wrap').hide();
+                $('#deactiveDatesModal .messages-wrap').html('');
+            }
+        }
+
+        //Object to handle all calander and disable dates related operations.
+        const DisableDatesObj = {
+            // called to initilize and set actions for the modal.
+            init: function(triggerRoomRow) {
+                var idRoom = parseInt($(triggerRoomRow).attr('data-id-room'));
+                var roomRowIndex = parseInt($(triggerRoomRow).closest('tr').attr('data-row-index'));
+                var roomNum = $(triggerRoomRow).closest('tr').find('[name="rooms_info['+roomRowIndex+'][room_num]"]').val();
+                $('#deactiveDatesModal').attr('data-room-row-index', roomRowIndex);
+                $('#deactiveDatesModal').attr('data-id-room', idRoom);
+                if ($.trim(roomNum) != '') {
+                    roomNum = '( '+'{l s='Room No'}'+' '+roomNum+')';
+                }
+
+                $('#deactiveDatesModal .disable_dates_room_num').html(roomNum);
+                if (isNaN(idRoom)) {
+                    DisableDatesObj.restrictCalendarActions();
+                    return;
+                } else {
+                    DisableDatesObj.getPopulateRoomDisableDates(idRoom);
+                }
+            },
+            // called to add events in the calendar.
+            initEvents: function(datesInfo) {
+                if (datesInfo.length) {
+                    var events = [];
+                    $.each(datesInfo, function(index, dateInfo) {
+                        var eventId = DisableDatesObj.getUniqueEventId();
+                        events.push({
+                            'id': DisableDatesObj.getUniqueEventId(),
+                            'title': dateInfo['reason'],
+                            'start': dateInfo['date_from'],
+                            'end': dateInfo['date_to'],
+                            'reason': dateInfo['reason'],
+                            'date_add' : dateInfo['date_add'],
+                            'id_disable_date' : parseInt(dateInfo['id']),
+                            'is_editable' : parseInt(dateInfo['is_editable']),
+                            'is_deletable' : parseInt(dateInfo['is_deletable']),
+                            'event_title' : dateInfo['event_title'],
+                            'date_to_formatted': dateInfo['date_to'],
+                            'date_from_formatted': dateInfo['date_from'],
+                            'id_event' : dateInfo['id_event'],
+                            'event_url' : dateInfo['event_url'],
+                            'backgroundColor': '#FFFFFF',
+                            'borderColor': '#FFFFFF'
+                        });
+                    });
+                    DisableDatesCalendar.addEventSource(events);
+                }
+            },
+            // called to initlized the tooltips for the events in the calendar.
+            initEventTooltip: function(event, element) {
+                // will be used to get this particular event
+                $(element).find('.fc-event-title').attr('data-id_calendar_event', event.id);
+                var dateFrom = event.extendedProps.date_from_formatted;
+                var eventDateTo = new Date(event.extendedProps.date_to_formatted);
+                // setting the date_to to -1 days since the full calendar does not includes the end date
+                eventDateTo.setDate(eventDateTo.getDate() - 1);
+                var dateTo = $.datepicker.formatDate('yy-mm-dd', eventDateTo);
+                var reason = event.extendedProps.reason;
+                var eventTitle = event.extendedProps.event_title;
+                var idEvent = event.extendedProps.id_event;
+                var eventUrl = event.extendedProps.event_url;
+                var dateAdd = event.extendedProps.date_add;
+                $('#tooltip_info_block .tooltip_date_from').text(dateFrom);
+                $('#tooltip_info_block .tooltip_date_to').text(dateTo);
+                $('#tooltip_info_block .tooltip_date_add').text(dateAdd);
+                $('#tooltip_info_block .tooltip_reason').parent().hide();
+                if (reason != '') {
+                    $('#tooltip_info_block .tooltip_reason').text(reason).parent().show();
+                }
+
+                if (eventTitle != '' && eventTitle != null) {
+                    eventTitle = '<span class="tooltip_event_title">'+eventTitle+'</span>';
+                    $('#tooltip_info_block .tooltip_title').html(eventTitle).show();
+                } else {
+                    $('#tooltip_info_block .tooltip_title').html('').hide();
+                }
+
+                if (idEvent && idEvent !== null) {
+                    var eventHtml = '';
+                    if (eventUrl != '' && eventUrl != null) {
+                        eventHtml = '<a target="_blank" href="'+eventUrl+'">'+ '#'+idEvent + '</a>';
+                    } else {
+                        eventHtml = '<span>'+ '#'+idEvent + '</span>';
+                    }
+
+                    $('#tooltip_info_block .tooltip_id_event').html(eventHtml).parent().show();
+                } else {
+                    $('#tooltip_info_block .tooltip_id_event').html('').parent().hide();
+                }
+
+                $('#tooltip_info_block .tooltip_container').attr('data-tooltip-id', event.id + '-'+ tooltipCounter);
+                var html = $('#tooltip_info_block').html();
+                var options = {
+                    title: ' ',
+                    html: true,
+                    template: html,
+                    container: $('#disable_dates_full_calendar').closest('div'),
+                    delay: {
+                        show: 600,
+                        hide: 500
+                    },
+                    placement: 'auto'
+                }
+
+                // linking the tooltip with the calander event, so we can perform actions on them.
+                $(element).addClass('id_calendar_event_' + event.id);
+                $(element).find('.fc-event-main-frame').tooltip(options);
+
+                // since an event can be for more than one time, we have to display the tooltip for more than one time, so we are adding counter for unique id for them
+                $(element).find('.fc-event-main-frame').attr('id', 'tooltip-id-' + event.id + '-' + tooltipCounter);
+                tooltipCounter++;
+            },
+            // called to restrict and hide all actions on the modal
+            restrictCalendarActions: function() {
+                $('#deactiveDatesModal .add_disable_dates').hide();
+                $('#deactiveDatesModal .remove_disable_dates').hide();
+                $('#deactiveDatesModal .room_not_found').show();
+            },
+            // called to enable the restricted actions on the modal
+            allowCalendarActions: function() {
+                $('#deactiveDatesModal .add_disable_dates').show();
+                $('#deactiveDatesModal .remove_disable_dates').show();
+                $('#deactiveDatesModal .room_not_found').hide();
+            },
+            // called to get the disable dates for a perticular room.
+            getPopulateRoomDisableDates: function(idRoom) {
+                $.ajax({
+                    url: prod_link,
+                    type: 'POST',
+                    data: {
+                        ajax: true,
+                        action: 'getDisableDates',
+                        id_room: idRoom,
+                    },
+                    dataType: 'JSON',
+                    success: function(response) {
+                        if (response.status) {
+                            if (response.disable_dates.length) {
+                                DisableDatesObj.initEvents(response.disable_dates);
+                            }
+                        }
+
+                        DisableDatesForm.hideMessages();
+                    }
+                });
+            },
+            // This is called to reset the disable dates calendar and the form.
+            reset: function(showCurrentDay = true) {
+                var source = DisableDatesCalendar.getEventSources();
+                if (source.length) {
+                    $.each(source, function(i, event) {
+                        event.remove();
+                    });
+                }
+
+                tooltipCounter = 0;
+
+                $('#deactiveDatesModal .disable_dates_room_num').html('');
+                $('#disable_dates_full_calendar .tooltip_container').remove();
+                DisableDatesForm.hideMessages();
+                DisableDatesForm.resetForm();
+                DisableDatesForm.hideForm();
+                if (showCurrentDay) {
+                    // this is used to show the current day on the calendar
+                    DisableDatesCalendar.today();
+                }
+            },
+            // This is called to submit the dates selected in the disable date form.
+            submitDisableDates: function() {
+                let idRoom = parseInt($('#deactiveDatesModal').attr('data-id-room'));
+                if(isNaN(idRoom)) {
+                    idRoom = 0;
+                }
+                var formElem = $('#disable_dates_form');
+                var dateFrom =  $(formElem).find('.disable_date_from').val();
+                var dateTo = $(formElem).find('.disable_date_to').val();
+                var eventId = parseInt($(formElem).find('.id_calendar_event').val());
+                var reason = $(formElem).find('.room_disable_reason').val();
+                var idProduct = $('[name="id_product"]').val();
+                var idDisableDate = parseInt($(formElem).find('.id_disable_date').val());
+                if (isNaN(idDisableDate)) {
+                    idDisableDate = 0;
+                }
+
+                dateTo = new Date(dateTo);
+                // setting the date_to +1 since the full calendar does not includes the date to
+                dateTo.setDate(dateTo.getDate() + 1);
+                dateTo = $.datepicker.formatDate('yy-mm-dd', dateTo);
+                $.ajax({
+                    url: prod_link,
+                    type: 'POST',
+                    data: {
+                        ajax: true,
+                        action: 'submitDisableDates',
+                        id_disable_date : idDisableDate,
+                        id_product: idProduct,
+                        id_room: idRoom,
+                        date_from: dateFrom,
+                        date_to: dateTo,
+                        reason: reason
+                    },
+                    dataType: 'JSON',
+                    success: function(response) {
+                        reason = $.trim(reason);
+                        if (response.status) {
+                            var validatedEvent = {
+                                'id' : DisableDatesObj.getUniqueEventId(),
+                                'title': reason,
+                                'start': dateFrom,
+                                'end': dateTo,
+                                'date_from_formatted': dateFrom,
+                                'date_to_formatted': dateTo,
+                                'reason': reason,
+                                'id': DisableDatesObj.getUniqueEventId(),
+                                'is_deletable' : 1,
+                                'is_editable' : 1,
+                                'id_disable_date': response.id_disable_date,
+                                'event_title' : '',
+                                'id_event' : '',
+                                'event_url' : '',
+                                'date_add' : "{date('Y-m-d')}",
+                                'backgroundColor': '#FFFFFF',
+                                'borderColor': '#FFFFFF'
+                            }
+
+                            if (!isNaN(eventId)) {
+                                var olderEvent = DisableDatesCalendar.getEventById(eventId);
+                                if (olderEvent) {
+                                    validatedEvent.is_deletable = olderEvent.extendedProps.is_deletable;
+                                    validatedEvent.is_editable = olderEvent.extendedProps.is_editable;
+                                    validatedEvent.event_title = olderEvent.extendedProps.event_title;
+                                    validatedEvent.id_event = olderEvent.extendedProps.id_event;
+                                    validatedEvent.event_url = olderEvent.extendedProps.event_url;
+                                    olderEvent.remove();
+                                }
+                            }
+
+                            var event = [];
+                            event.push(validatedEvent);
+                            DisableDatesCalendar.addEventSource(event);
+                            DisableDatesForm.resetForm();
+                            DisableDatesForm.hideForm();
+                        }
+                        DisableDatesForm.showMessages(response.msg);
+                    }
+                });
+            },
+            // This is called to delete the disable date object using the idDisableDate.
+            deleteDisableDate: function(idDisableDate) {
+                $.ajax({
+                    url: prod_link,
+                    type: 'POST',
+                    data: {
+                        ajax: true,
+                        action: 'deleteDisableDate',
+                        id_disable_date : idDisableDate,
+                    },
+                    dataType: 'JSON',
+                    success: function(response) {
+                        DisableDatesForm.showMessages(response.msg);
+                    }
+                });
+            },
+            // This is called to get the all disable dates from the calander.
+            getAllDisableDates: function() {
+                var disableDates = [];
+                var events = DisableDatesCalendar.getEvents();
+                if (events.length) {
+                    $.each(events, function(i, event) {
+                        var data = {
+                            date_from: event.extendedProps.date_from_formatted,
+                            date_to: event.extendedProps.date_to_formatted,
+                            reason: event.extendedProps.reason,
+                            date_add : event.extendedProps.date_add,
+                            id : event.extendedProps.id_disable_date,
+                            is_editable : event.extendedProps.is_editable,
+                            event_title : event.extendedProps.event_title,
+                            is_deletable : event.extendedProps.is_deletable,
+                            id_event : event.extendedProps.id_event,
+                            event_url : event.extendedProps.event_url
+                        }
+
+                        disableDates.push(data);
+                    });
+                }
+
+                return disableDates;
+            },
+            // This is used to generate and get a unique id for all the events, which are added to the tooltips to link them together.
+            getUniqueEventId: function() {
+                var id = Math.floor(Math.random() * 100000);
+                var event = DisableDatesCalendar.getEventById(id);
+                if (event) {
+                    return DisableDatesObj.getUniqueEventId()
+                }
+                return id;
+            },
+            // This is used to set/highlight the background for all the days that are added in the calander as event.
+            handleEventDateBackgroundHighlight: function(event, add) {
+                if (event.start && event.end) {
+                    let dateFrom = new Date(event.start);
+                    let endDate = new Date(event.end);
+                    dateFrom.setDate(dateFrom.getDate() + 1)
+                    let startDate = dateFrom;
+                    // Loop through all the days the event spans
+                    for (let date = startDate; date <= endDate; date.setDate(date.getDate() + 1)) {
+                        // This return the date in format of Y-m-d, and we are counting the date for overlapping events.
+                        let dateString = date.toISOString().split('T')[0];
+                        if (add) {
+                            if (!disableDates[dateString]) {
+                                disableDates[dateString] = 0;
+                            }
+
+                            disableDates[dateString]++;
+                        } else {
+                            disableDates[dateString]--;
+                            if (disableDates[dateString] <= 0) {
+                                delete disableDates[dateString];
+                            }
+                        }
+                    }
+                } else if (event.start) {
+                    let dateFrom = new Date(event.start);
+                    dateFrom.setDate(dateFrom.getDate() + 1);
+                    let dateString = dateFrom.toISOString().split('T')[0];
+                    if (add) {
+                        if (!disableDates[dateString]) {
+                            disableDates[dateString] = 0;
+                        }
+
+                        disableDates[dateString]++;
+                    } else {
+                        disableDates[dateString]--;
+                        if (disableDates[dateString] <= 0) {
+                            delete disableDates[dateString];
+                        }
+                    }
+                }
+
+                const today = new Date().toISOString().split('T')[0];
+                $('#disable_dates_full_calendar .fc-daygrid-day').each(function() {
+                    let dateString = $(this).data('date');
+                    if (dateString !== today) {
+                        if (disableDates[dateString]) {
+                            $(this).addClass('highlight-event-day');
+                        } else {
+                            $(this).removeClass('highlight-event-day');
+                        }
+                    }
+                });
+            }
+        }
     });
+
 </script>
