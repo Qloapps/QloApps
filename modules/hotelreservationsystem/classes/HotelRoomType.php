@@ -425,4 +425,24 @@ class HotelRoomType extends ObjectModel
             'SELECT `id` FROM `'._DB_PREFIX_.'htl_room_information` WHERE `id_product` = '.(int)$this->id_product.' ORDER BY `id` ASC'
         );
     }
+
+    public function validateFields($die = true, $error_return = false)
+    {
+        if (isset($this->webservice_validation) && $this->webservice_validation) {
+            if (!(int) $this->id_product || !Validate::isLoadedObject(new Product((int) $this->id_product))) {
+                $message = Tools::displayError('Invalid Id product.');
+            } elseif (!(int)$this->id_hotel || !Validate::isLoadedObject(new HotelBranchInformation((int) $this->id_hotel))) {
+                $message = Tools::displayError('Invalid Id hotel.');
+            }
+
+            if (isset($message)) {
+                if ($die) {
+                    throw new PrestaShopException($message);
+                }
+                return $error_return ? $message : false;
+            }
+        }
+        return parent::validateFields($die, $error_return);
+    }
+
 }

@@ -1163,16 +1163,6 @@ abstract class PaymentModuleCore extends Module
                                 $this->context->currency,
                                 false
                             ),
-                            '{delivery_block_txt}' => $this->_getFormatedAddress($delivery, "\n"),
-                            '{invoice_block_txt}' => $this->_getFormatedAddress($invoice, "\n"),
-                            '{delivery_block_html}' => $this->_getFormatedAddress($delivery, '<br />', array(
-                                'firstname'    => '<span style="font-weight:bold;">%s</span>',
-                                'lastname'    => '<span style="font-weight:bold;">%s</span>'
-                            )),
-                            '{invoice_block_html}' => $this->_getFormatedAddress($invoice, '<br />', array(
-                                    'firstname'    => '<span style="font-weight:bold;">%s</span>',
-                                    'lastname'    => '<span style="font-weight:bold;">%s</span>'
-                            )),
                             '{delivery_company}' => $delivery->company,
                             '{delivery_firstname}' => $delivery->firstname,
                             '{delivery_lastname}' => $delivery->lastname,
@@ -1650,8 +1640,6 @@ abstract class PaymentModuleCore extends Module
             $objRoomTypeServiceProductOrderDetail = new RoomTypeServiceProductOrderDetail();
             $result['total_extra_demands_te'] = 0;
             $result['total_extra_demands_ti'] = 0;
-            $result['total_additional_services_te'] =0;
-            $result['total_additional_services_ti'] =0;
             $cart_htl_data = array();
             if (!empty($products)) {
                 foreach ($products as $type_key => $type_value) {
@@ -1697,67 +1685,12 @@ abstract class PaymentModuleCore extends Module
 
 
                                 $cart_htl_data[$type_key]['date_diff'][$date_join]['amount'] = $roomTypeDateRangePrice['total_price_tax_incl']*$vart_quant;
-                                // extra demands prices
-                                $cart_htl_data[$type_key]['date_diff'][$date_join]['extra_demands'] = $objBookingDemand->getRoomTypeBookingExtraDemands(
-                                    $order->id,
-                                    $type_value['product_id'],
-                                    0,
-                                    $data_v['date_from'],
-                                    $data_v['date_to']
-                                );
-                                $cart_htl_data[$type_key]['date_diff'][$date_join]['extra_demands_price_te'] = $objBookingDemand->getRoomTypeBookingExtraDemands(
-                                    $order->id,
-                                    $type_value['product_id'],
-                                    0,
-                                    $data_v['date_from'],
-                                    $data_v['date_to'],
-                                    0,
-                                    1,
-                                    0
-                                );
-                                $cart_htl_data[$type_key]['date_diff'][$date_join]['extra_demands_price_ti'] = $objBookingDemand->getRoomTypeBookingExtraDemands(
-                                    $order->id,
-                                    $type_value['product_id'],
-                                    0,
-                                    $data_v['date_from'],
-                                    $data_v['date_to'],
-                                    0,
-                                    1,
-                                    1
-                                );
-                                $cart_htl_data[$type_key]['date_diff'][$date_join]['additional_services_price_auto_add_ti'] = $objRoomTypeServiceProductOrderDetail->getroomTypeServiceProducts(
-                                    $order->id,
-                                    0,
-                                    0,
-                                    $type_value['product_id'],
-                                    $data_v['date_from'],
-                                    $data_v['date_to'],
-                                    $data_v['id_room'],
-                                    1,
-                                    1,
-                                    1,
-                                    Product::PRICE_ADDITION_TYPE_WITH_ROOM
-                                );
-                                $cart_htl_data[$type_key]['date_diff'][$date_join]['additional_services_price_auto_add_te'] = $objRoomTypeServiceProductOrderDetail->getroomTypeServiceProducts(
-                                    $order->id,
-                                    0,
-                                    0,
-                                    $type_value['product_id'],
-                                    $data_v['date_from'],
-                                    $data_v['date_to'],
-                                    $data_v['id_room'],
-                                    1,
-                                    0,
-                                    1,
-                                    Product::PRICE_ADDITION_TYPE_WITH_ROOM
-                                );
-
                                 $cart_htl_data[$type_key]['date_diff'][$date_join]['paid_unit_price_tax_incl'] = $data_v['total_price_tax_incl']/$num_days;
                                 $cart_htl_data[$type_key]['date_diff'][$date_join]['paid_unit_price_tax_excl'] = $data_v['total_price_tax_excl']/$num_days;
-                                $cart_htl_data[$type_key]['date_diff'][$date_join]['avg_paid_unit_price_tax_incl'] += ($cart_htl_data[$type_key]['date_diff'][$date_join]['paid_unit_price_tax_incl'] + $cart_htl_data[$type_key]['date_diff'][$date_join]['additional_services_price_auto_add_ti']);
-                                $cart_htl_data[$type_key]['date_diff'][$date_join]['avg_paid_unit_price_tax_excl'] += ($cart_htl_data[$type_key]['date_diff'][$date_join]['paid_unit_price_tax_excl'] + $cart_htl_data[$type_key]['date_diff'][$date_join]['additional_services_price_auto_add_te']);
-                                $cart_htl_data[$type_key]['date_diff'][$date_join]['amount_tax_incl'] += ($data_v['total_price_tax_incl'] + $cart_htl_data[$type_key]['date_diff'][$date_join]['additional_services_price_auto_add_te']);
-                                $cart_htl_data[$type_key]['date_diff'][$date_join]['amount_tax_excl'] += ($data_v['total_price_tax_excl'] + $cart_htl_data[$type_key]['date_diff'][$date_join]['additional_services_price_auto_add_te']);
+                                $cart_htl_data[$type_key]['date_diff'][$date_join]['avg_paid_unit_price_tax_incl'] += $cart_htl_data[$type_key]['date_diff'][$date_join]['paid_unit_price_tax_incl'];
+                                $cart_htl_data[$type_key]['date_diff'][$date_join]['avg_paid_unit_price_tax_excl'] += $cart_htl_data[$type_key]['date_diff'][$date_join]['paid_unit_price_tax_excl'];
+                                $cart_htl_data[$type_key]['date_diff'][$date_join]['amount_tax_incl'] += $data_v['total_price_tax_incl'];
+                                $cart_htl_data[$type_key]['date_diff'][$date_join]['amount_tax_excl'] += $data_v['total_price_tax_excl'];
                             } else {
                                 $num_days = $obj_htl_bk_dtl->getNumberOfDays($data_v['date_from'], $data_v['date_to']);
 
@@ -1809,28 +1742,6 @@ abstract class PaymentModuleCore extends Module
                                     $data_v['date_from'],
                                     $data_v['date_to']
                                 );
-                                $cart_htl_data[$type_key]['date_diff'][$date_join]['additional_services_price_ti'] = $objRoomTypeServiceProductOrderDetail->getroomTypeServiceProducts(
-                                    $order->id,
-                                    0,
-                                    0,
-                                    $type_value['product_id'],
-                                    $data_v['date_from'],
-                                    $data_v['date_to'],
-                                    $data_v['id_room'],
-                                    1,
-                                    1
-                                );
-                                $cart_htl_data[$type_key]['date_diff'][$date_join]['additional_services_price_te'] = $objRoomTypeServiceProductOrderDetail->getroomTypeServiceProducts(
-                                    $order->id,
-                                    0,
-                                    0,
-                                    $type_value['product_id'],
-                                    $data_v['date_from'],
-                                    $data_v['date_to'],
-                                    $data_v['id_room'],
-                                    1,
-                                    0
-                                );
                                 $cart_htl_data[$type_key]['date_diff'][$date_join]['additional_services_price_auto_add_ti'] = $objRoomTypeServiceProductOrderDetail->getroomTypeServiceProducts(
                                     $order->id,
                                     0,
@@ -1838,7 +1749,7 @@ abstract class PaymentModuleCore extends Module
                                     $type_value['product_id'],
                                     $data_v['date_from'],
                                     $data_v['date_to'],
-                                    $data_v['id_room'],
+                                    0,
                                     1,
                                     1,
                                     1,
@@ -1851,7 +1762,7 @@ abstract class PaymentModuleCore extends Module
                                     $type_value['product_id'],
                                     $data_v['date_from'],
                                     $data_v['date_to'],
-                                    $data_v['id_room'],
+                                    0,
                                     1,
                                     0,
                                     1,
@@ -1867,8 +1778,6 @@ abstract class PaymentModuleCore extends Module
 
                                 $result['total_extra_demands_te'] += $cart_htl_data[$type_key]['date_diff'][$date_join]['extra_demands_price_te'];
                                 $result['total_extra_demands_ti'] += $cart_htl_data[$type_key]['date_diff'][$date_join]['extra_demands_price_ti'];
-                                $result['total_additional_services_te'] += $cart_htl_data[$type_key]['date_diff'][$date_join]['additional_services_price_te'];
-                                $result['total_additional_services_ti'] += $cart_htl_data[$type_key]['date_diff'][$date_join]['additional_services_price_ti'];
                             }
                         }
                         // calculate averages now

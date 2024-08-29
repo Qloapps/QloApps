@@ -25,7 +25,7 @@
     <template>payment_error</template>
   </order_state>
   <order_state id="Payment_remotely_accepted">
-    <name>Zahlung ausserhalb von PrestaShop eingegangen</name>
+    <name>Fernzahlung akzeptiert</name>
     <template>payment_accepted</template>
   </order_state>
   <order_state id="Awaiting_remote_payment">

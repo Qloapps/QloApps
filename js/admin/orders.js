@@ -29,6 +29,16 @@ var ajaxQueries = new Array();
 $(document).ready(function() {
 	// Init all events
 	init();
+    $(document).on('click', '#view_convenience_services', function(e) {
+        $('#convenience_services').toggle(100);
+        $('#view_convenience_services .icon-angle-up').toggle();
+        $('#view_convenience_services .icon-angle-down').toggle();
+    });
+    $(document).on('click', '#view_order_tax_details', function(e) {
+        $('#order_tax_details').toggle(100);
+        $('#view_order_tax_details .icon-angle-up').toggle();
+        $('#view_order_tax_details .icon-angle-down').toggle();
+    });
 
     $(document).on('click', '.delete-voucher', function(e) {
         if (!confirm(txt_confirm)) {
@@ -37,6 +47,26 @@ $(document).ready(function() {
     });
 
 	$('img.js-disabled-action').css({"opacity":0.5});
+
+    // change table design for printing
+    $(window).on('beforeprint', function() {
+        $('#customer_cart_details thead tr th').each(function(i, val) {
+            $('#customer_cart_details tbody td:nth-child('+(i+1)+')').each(function () {
+                let span = $('<span>').addClass('print-class-container')
+                    .append($('<span>').addClass('print-class-title').html($(val).html()))
+                    .append($('<span>').addClass('print-class-content').html(
+                        $(this).html()
+                    )
+                );
+                $(this).html($(span).html());
+            });
+        });
+    });
+    $(window).on('afterprint', function() {
+        $('#customer_cart_details tbody td').each(function () {
+            $(this).html($(this).find('span.print-class-content').html());
+        });
+    });
 });
 
 function stopAjaxQuery() {
@@ -1158,8 +1188,9 @@ function initRoomEvents()
 		var date_from = tr_product.data('date_from');
 		var date_to = tr_product.data('date_to');
 		var id_order_detail = tr_product.data('id_order_detail');
+		var id_htl_booking = tr_product.data('id_htl_booking');
 		//var id_order_detail = $(this).closest('.product-line-row').find('td .edit_product_id_order_detail').val();
-		var query = 'ajax=1&action=deleteRoomLine&token='+token+'&id_order='+id_order+'&id_room='+id_room+'&id_product='+id_product+'&id_hotel='+id_hotel+'&date_from='+date_from+'&date_to='+date_to+'&id_order_detail='+id_order_detail;
+		var query = 'ajax=1&action=deleteRoomLine&token='+token+'&id_order='+id_order+'&id_htl_booking='+id_htl_booking+'&id_room='+id_room+'&id_product='+id_product+'&id_hotel='+id_hotel+'&date_from='+date_from+'&date_to='+date_to+'&id_order_detail='+id_order_detail;
 		query += $(this).parent().parent().find('input, select:visible, .edit_product_id_order_detail').serialize();
 		$.ajax({
 			type: 'POST',
@@ -1588,6 +1619,7 @@ $(document).ready(function() {
                 id_order: idOrder,
                 date_from: dateFrom,
                 date_to: dateTo,
+                id_htl_booking: idHtlBooking,
                 orderEdit: orderEdit,
                 action: 'getRoomTypeBookingDemands',
                 ajax: true
@@ -2514,7 +2546,9 @@ const EditRoomBookingModal = {
                     const dateTo = $.datepicker.formatDate('dd-mm-yy', $.datepicker.parseDate('yy-mm-dd', jsonProductLineData.date_to));
 
                     $('#edit_product .edit_product_date_from').attr('value', dateFrom);
+                    $('#edit_product .edit_product_date_from').attr('data-min_date', dateFrom);
                     $('#edit_product .edit_product_date_to').attr('value', dateTo);
+                    $('#edit_product .edit_product_date_to').attr('data-min_date', dateFrom);
                     $('#edit_product .edit_product_date_from_actual').attr('value', jsonProductLineData.date_from);
                     $('#edit_product .edit_product_date_to_actual').attr('value', jsonProductLineData.date_to);
                     $('#edit_product .room_unit_price').val(parseFloat(jsonProductLineData.paid_unit_price_tax_excl));

@@ -1078,8 +1078,6 @@ class CartCore extends ObjectModel
         if (Context::getContext()->customer->id) {
             if ($id_address_delivery == 0 && (int)$this->id_address_delivery) { // The $id_address_delivery is null, use the cart delivery address
                 $id_address_delivery = $this->id_address_delivery;
-            } elseif ($id_address_delivery == 0) { // The $id_address_delivery is null, get the default customer address
-                $id_address_delivery = (int)Address::getFirstCustomerAddressId((int)Context::getContext()->customer->id);
             } elseif (!Customer::customerHasAddress(Context::getContext()->customer->id, $id_address_delivery)) { // The $id_address_delivery must be linked with customer
                 $id_address_delivery = 0;
             }
@@ -4109,7 +4107,7 @@ class CartCore extends ObjectModel
         $cart->id_shop_group = $this->id_shop_group;
 
         if (!Customer::customerHasAddress((int)$cart->id_customer, (int)$cart->id_address_delivery)) {
-            $cart->id_address_delivery = (int)Address::getFirstCustomerAddressId((int)$cart->id_customer);
+            $cart->id_address_delivery = 0;
         }
 
         if (!Customer::customerHasAddress((int)$cart->id_customer, (int)$cart->id_address_invoice)) {
@@ -4501,11 +4499,9 @@ class CartCore extends ObjectModel
     public function autosetProductAddress()
     {
         $id_address_delivery = 0;
-        // Get the main address of the customer
+
         if ((int)$this->id_address_delivery > 0) {
             $id_address_delivery = (int)$this->id_address_delivery;
-        } else {
-            $id_address_delivery = (int)Address::getFirstCustomerAddressId(Context::getContext()->customer->id);
         }
 
         if (!$id_address_delivery) {
@@ -4702,7 +4698,7 @@ class CartCore extends ObjectModel
     public function getWsCartBookings()
     {
         return Db::getInstance()->executeS('
-			SELECT `id`
+			SELECT `id`, `date_from`, `date_to`, `id_hotel`, `id_product`
 			FROM `'._DB_PREFIX_.'htl_cart_booking_data`
 			WHERE id_cart = '.(int)$this->id.' ORDER BY `id` ASC'
         );

@@ -69,9 +69,9 @@ class RoomTypeServiceProductOrderDetail extends ObjectModel
         $useTax = null,
         $autoAddToCart = 0,
         $priceAdditionType = null,
-        $idOrderDetail = 0
+        $idOrderDetail = 0,
+        $idHtlBookingDetail = 0
     ) {
-
         if ($useTax === null) {
             $useTax = Product::$_taxCalculationMethod == PS_TAX_EXC ? false : true;
         }
@@ -110,6 +110,9 @@ class RoomTypeServiceProductOrderDetail extends ObjectModel
         }
         if ($idRoom) {
             $sql .= ' AND hbd.`id_room`='.(int) $idRoom;
+        }
+        if ($idHtlBookingDetail) {
+            $sql .= ' AND hbd.`id` = '.(int)$idHtlBookingDetail;
         }
         $sql .= ' ORDER BY hbd.`id`';
 
@@ -192,7 +195,9 @@ class RoomTypeServiceProductOrderDetail extends ObjectModel
     public function getSelectedServicesForRoom(
         $idHotelBookingDetail,
         $getTotalPrice = 0,
-        $useTax = null
+        $useTax = null,
+        $autoAddToCart = null,
+        $priceAdditionType = null
     ) {
 
         if ($useTax === null) {
@@ -211,6 +216,13 @@ class RoomTypeServiceProductOrderDetail extends ObjectModel
         $sql .= ' INNER JOIN `'._DB_PREFIX_.'product` p ON (p.`id_product` = rsod.`id_product`)';
 
         $sql .= ' WHERE hbd.`id` = '.(int)$idHotelBookingDetail;
+
+        if (!is_null($autoAddToCart)) {
+            $sql .= ' AND od.`product_auto_add` = '. (int)$autoAddToCart;
+            if ($autoAddToCart == 1 && !is_null($priceAdditionType)) {
+                $sql .= ' AND od.`product_price_addition_type` = '.$priceAdditionType;
+            }
+        }
 
         if ($getTotalPrice) {
             $totalPrice = 0;

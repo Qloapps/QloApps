@@ -750,16 +750,6 @@
     display: none;
 }
 
-.ui-tooltip.price-tootip {
-    box-shadow: 0 2px 6px 0 rgb(0 0 0 / 20%);
-    background: #FFFFFF;
-    border: unset;
-    color: #333;
-    padding: 2px 10px;
-    max-height: 310px;
-    overflow-y: auto;
-}
-
 .price-info-tooltip-cont {
     min-width: 180px;
 }
@@ -1013,12 +1003,15 @@
     line-height: 24px;
 }
 
+#popup-view-extra-services .card-body{
+    padding: 0px 18px;
+}
+
 #popup-view-extra-services .nav-tabs {
     border-bottom: none;
 }
 
 #popup-view-extra-services .nav-tabs > li {
-    width: 50%;
     text-align: center;
     margin: 0;
 }
@@ -1059,7 +1052,6 @@
 }
 
 #popup-view-extra-services .tab-content .room_demands {
-    padding: 0 18px;
     margin-top: 20px;
 }
 
@@ -1082,6 +1074,17 @@
 
 #popup-view-extra-services .tab-content .room_demand_block:not(:last-of-type) {
     margin-bottom: 12px;
+}
+.payment-summary tr, .guest-details tr {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#popup-view-extra-services .services_not_booked {
+    text-align: center;
+    margin: 30px 0px;
+    font-size: 14px;
 }
 
 /* Guest Tracking page styles - start */

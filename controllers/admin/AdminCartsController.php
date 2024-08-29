@@ -395,19 +395,19 @@ class AdminCartsControllerCore extends AdminController
                 $this->context->cart->id_currency = (($id_currency = (int)Tools::getValue('id_currency')) ? $id_currency : Configuration::get('PS_CURRENCY_DEFAULT'));
             }
 
-            $addresses = $customer->getAddresses((int)$this->context->cart->id_lang);
-            $id_address_delivery = (int)Tools::getValue('id_address_delivery');
-            $id_address_invoice = (int)Tools::getValue('id_address_invoice');
+            if (Validate::isLoadedObject($customer)) {
+                $addresses = $customer->getAddresses((int)$this->context->cart->id_lang);
+                $id_address_delivery = (int)Tools::getValue('id_address_delivery');
+                $id_address_invoice = (int)Tools::getValue('id_address_invoice');
 
-            if (!$this->context->cart->id_address_invoice && isset($addresses[0])) {
-                $this->context->cart->id_address_invoice = (int)$addresses[0]['id_address'];
-            } elseif ($id_address_invoice) {
-                $this->context->cart->id_address_invoice = (int)$id_address_delivery;
-            }
-            if (!$this->context->cart->id_address_delivery && isset($addresses[0])) {
-                $this->context->cart->id_address_delivery = $addresses[0]['id_address'];
-            } elseif ($id_address_delivery) {
-                $this->context->cart->id_address_delivery = (int)$id_address_delivery;
+                if (!$this->context->cart->id_address_invoice && isset($addresses[0])) {
+                    $this->context->cart->id_address_invoice = (int)$addresses[0]['id_address'];
+                } elseif ($id_address_invoice) {
+                    $this->context->cart->id_address_invoice = (int)$id_address_delivery;
+                }
+                if ($id_address_delivery) {
+                    $this->context->cart->id_address_delivery = (int)$id_address_delivery;
+                }
             }
             $this->context->cart->setNoMultishipping();
 
@@ -417,7 +417,6 @@ class AdminCartsControllerCore extends AdminController
                 $this->context->cart->secure_key = $this->context->customer->secure_key;
                 $addresses = $customer->getAddresses((int)$this->context->cart->id_lang);
                 $this->context->cart->id_address_invoice = (int)$addresses[0]['id_address'];
-                $this->context->cart->id_address_delivery = (int)$addresses[0]['id_address'];
                 $this->context->cart->setNoMultishipping();
             }
             /*END*/
@@ -946,6 +945,11 @@ class AdminCartsControllerCore extends AdminController
         $date_from = date('Y-m-d', strtotime($date_from));
         $date_to = date('Y-m-d', strtotime($date_to));
 
+        if ($this->context->cart->id_currency != (int)Configuration::get('PS_CURRENCY_DEFAULT')) {
+            $currency = Currency::getCurrencyInstance($this->context->cart->id_currency);
+            $price = Tools::ps_round($price/$currency->conversion_rate, 6);
+        }
+
         if ($this->tabAccess['edit'] === '1') {
             HotelRoomTypeFeaturePricing::deleteByIdCart($id_cart, $id_product, $id_room, $date_from, $date_to);
             $feature_price_name = array();
@@ -977,7 +981,7 @@ class AdminCartsControllerCore extends AdminController
                 if ($bookingInfo['id'] == $id_booking_data) {
                     $amt_with_qty = $bookingInfo['amt_with_qty'];
                     $bookingInfo['amt_with_qty'] = Tools::displayPrice($amt_with_qty);
-                    $bookingInfo['total_price'] = Tools::displayPrice($amt_with_qty + $bookingInfo['demand_price'] + $bookingInfo['additional_service_price']);
+                    $bookingInfo['total_price'] = Tools::displayPrice($amt_with_qty + $bookingInfo['demand_price'] + $bookingInfo['additional_service_price'] + $bookingInfo['additional_services_auto_add_price']);
                     $response = array(
                         'curr_booking_info' => $bookingInfo,
                         'cart_info' => $this->ajaxReturnVars(),

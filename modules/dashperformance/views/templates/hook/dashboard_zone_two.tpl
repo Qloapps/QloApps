@@ -30,7 +30,7 @@
 		<section>
 			<div class="row stats-wrap">
 				<div class="col-xs-6 col-lg-3">
-					<div class="stat-box label-tooltip" data-toggle="tooltip" data-original-title="{l s='Average Daily Rate (ADR) represents the average rental income per paid occupied room over a given time period.' mod='dashperformance'}" data-placement="top" style="background-color: #B7F0FF;">
+					<div class="stat-box label-tooltip" data-toggle="tooltip" data-original-title="{l s='Average Daily Rate (ADR) represents the average rental income per occupied room over a given time period.' mod='dashperformance'}" data-placement="top" style="background-color: #B7F0FF;">
 						<div class="title-wrapper">
 							<p>{l s='Average Daily Rate' mod='dashperformance'}</p>
 						</div>
