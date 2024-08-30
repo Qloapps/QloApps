@@ -22,14 +22,21 @@
 *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 *}
+
 {if isset($HOOK_HOME_TAB_CONTENT) && $HOOK_HOME_TAB_CONTENT|trim}
-    {if isset($HOOK_HOME_TAB) && $HOOK_HOME_TAB|trim}
-        <ul id="home-page-tabs" class="nav nav-tabs clearfix">
-			{$HOOK_HOME_TAB}
-		</ul>
+	{if isset($HOOK_HOME_TAB) && $HOOK_HOME_TAB|trim}
+		{block name='hook_home_tab'}
+			<ul id="home-page-tabs" class="nav nav-tabs clearfix">
+				{$HOOK_HOME_TAB}
+			</ul>
+		{/block}
 	{/if}
-	<div class="tab-content">{$HOOK_HOME_TAB_CONTENT}</div>
+	{block name='hook_home_tab_content'}
+		<div class="tab-content">{$HOOK_HOME_TAB_CONTENT}</div>
+	{/block}
 {/if}
 {if isset($HOOK_HOME) && $HOOK_HOME|trim}
-	<div class="clearfix">{$HOOK_HOME}</div>
+		{block name='hook_home'}
+		<div class="clearfix">{$HOOK_HOME}</div>
+	{/block}
 {/if}

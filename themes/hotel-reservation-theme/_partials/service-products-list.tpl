@@ -17,9 +17,13 @@
 * @license LICENSE.txt
 *}
 
-{foreach $service_products as $product}
-    {if !($product@first && isset($init) && $init == true)}
-        <hr>
-    {/if}
-    {include file="{$tpl_dir}_partials/service-products-list-row.tpl" product=$product}
-{/foreach}
+{block name='service_product_list_content'}
+    {foreach $service_products as $product}
+        {if !($product@first && isset($init) && $init == true)}
+            <hr>
+        {/if}
+        {block name='service_product_list_row_container'}
+            {include file="{$tpl_dir}_partials/service-products-list-row.tpl" product=$product}
+        {/block}
+    {/foreach}
+{/block}

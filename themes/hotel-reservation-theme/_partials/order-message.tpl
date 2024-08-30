@@ -17,7 +17,8 @@
 * @license LICENSE.txt
 *}
 
-<div class="message {if isset($message.id_employee) && $message.id_employee}management{else}customer{/if}">
+{block name='order_message_content'}
+    <div class="message {if isset($message.id_employee) && $message.id_employee}management{else}customer{/if}">
     <div class="profile">
         <div class="row">
             <div class="col-sm-6">
@@ -38,3 +39,4 @@
         {$message.message|escape:'html':'UTF-8'|nl2br}
     </div>
 </div>
+{/block}

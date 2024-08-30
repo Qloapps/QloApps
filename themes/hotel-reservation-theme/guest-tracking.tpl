@@ -23,119 +23,133 @@
 *  International Registered Trademark & Property of PrestaShop SA
 *}
 
-{capture name=path}{l s='Guest Tracking'}{/capture}
+{block name='guest_tracking_content'}
+	{capture name=path}{l s='Guest Tracking'}{/capture}
 
-<h1 class="page-heading">{l s='Guest Tracking'}</h1>
+	<h1 class="page-heading">{l s='Guest Tracking'}</h1>
 
-{if isset($order_collection)}
-	{foreach $order_collection as $order}
-		{assign var=order_state value=$order->getCurrentState()}
-		{assign var=invoice value=$order->invoice}
-		{assign var=order_history value=$order->order_history}
-		{assign var=overbooking_order_states value=$order->overbooking_order_states}
-		{assign var=carrier value=$order->carrier}
-		{assign var=address_invoice value=$order->address_invoice}
-		{assign var=address_delivery value=$order->address_delivery}
-		{assign var=inv_adr_fields value=$order->inv_adr_fields}
-		{assign var=dlv_adr_fields value=$order->dlv_adr_fields}
-		{assign var=invoiceAddressFormatedValues value=$order->invoiceAddressFormatedValues}
-		{assign var=deliveryAddressFormatedValues value=$order->deliveryAddressFormatedValues}
-		{assign var=currency value=$order->currency}
-		{assign var=discounts value=$order->discounts}
-		{assign var=invoiceState value=$order->invoiceState}
-		{assign var=deliveryState value=$order->deliveryState}
-		{assign var=products value=$order->products}
-		{assign var=customizedDatas value=$order->customizedDatas}
-		{assign var=HOOK_ORDERDETAILDISPLAYED value=$order->hook_orderdetaildisplayed}
-		{assign var=total_convenience_fee_ti value=$order->total_convenience_fee_ti}
-		{assign var=total_convenience_fee_te value=$order->total_convenience_fee_te}
-		{assign var=total_demands_price_ti value=$order->total_demands_price_ti}
-		{assign var=total_demands_price_te value=$order->total_demands_price_te}
-		{assign var=any_back_order value=$order->any_back_order}
-		{assign var=shw_bo_msg value=$order->shw_bo_msg}
-		{assign var=back_ord_msg value=$order->back_ord_msg}
-		{assign var=order_has_invoice value=$order->order_has_invoice}
-		{assign var=cart_htl_data value=$order->cart_htl_data}
-		{assign var=customerGuestDetail value=$order->customerGuestDetail}
-		{assign var=obj_hotel_branch_information value=$order->obj_hotel_branch_information}
-		{assign var=hotel_address_info value=$order->hotel_address_info}
-		{assign var=hotel_refund_rules value=$order->hotel_refund_rules}
+	{if isset($order_collection)}
+		{foreach $order_collection as $order}
+			{assign var=order_state value=$order->getCurrentState()}
+			{assign var=invoice value=$order->invoice}
+			{assign var=order_history value=$order->order_history}
+			{assign var=overbooking_order_states value=$order->overbooking_order_states}
+			{assign var=carrier value=$order->carrier}
+			{assign var=address_invoice value=$order->address_invoice}
+			{assign var=address_delivery value=$order->address_delivery}
+			{assign var=inv_adr_fields value=$order->inv_adr_fields}
+			{assign var=dlv_adr_fields value=$order->dlv_adr_fields}
+			{assign var=invoiceAddressFormatedValues value=$order->invoiceAddressFormatedValues}
+			{assign var=deliveryAddressFormatedValues value=$order->deliveryAddressFormatedValues}
+			{assign var=currency value=$order->currency}
+			{assign var=discounts value=$order->discounts}
+			{assign var=invoiceState value=$order->invoiceState}
+			{assign var=deliveryState value=$order->deliveryState}
+			{assign var=products value=$order->products}
+			{assign var=customizedDatas value=$order->customizedDatas}
+			{assign var=HOOK_ORDERDETAILDISPLAYED value=$order->hook_orderdetaildisplayed}
+			{assign var=total_convenience_fee_ti value=$order->total_convenience_fee_ti}
+			{assign var=total_convenience_fee_te value=$order->total_convenience_fee_te}
+			{assign var=total_demands_price_ti value=$order->total_demands_price_ti}
+			{assign var=total_demands_price_te value=$order->total_demands_price_te}
+			{assign var=any_back_order value=$order->any_back_order}
+			{assign var=shw_bo_msg value=$order->shw_bo_msg}
+			{assign var=back_ord_msg value=$order->back_ord_msg}
+			{assign var=order_has_invoice value=$order->order_has_invoice}
+			{assign var=cart_htl_data value=$order->cart_htl_data}
+			{assign var=customerGuestDetail value=$order->customerGuestDetail}
+			{assign var=obj_hotel_branch_information value=$order->obj_hotel_branch_information}
+			{assign var=hotel_address_info value=$order->hotel_address_info}
+			{assign var=hotel_refund_rules value=$order->hotel_refund_rules}
 
-		{if isset($order->total_old)}
-			{assign var=total_old value=$order->total_old}
-		{/if}
-		{if isset($order->followup)}
-			{assign var=followup value=$order->followup}
-		{/if}
+			{if isset($order->total_old)}
+				{assign var=total_old value=$order->total_old}
+			{/if}
+			{if isset($order->followup)}
+				{assign var=followup value=$order->followup}
+			{/if}
 
-		<div id="block-history">
-			<div id="block-order-detail" class="std">
-				{include file="./order-detail.tpl"}
+			{block name='order_detail_container'}
+				<div id="block-history">
+					<div id="block-order-detail" class="std">
+						{include file="./order-detail.tpl"}
+					</div>
+				</div>
+			{/block}
+		{/foreach}
+
+		<div class="row">
+			<div class="col-md-8">
+				{if isset($transformSuccess)}
+					<p class="alert alert-success alert-transformed">{l s='Your guest account has been successfully transformed into a customer account. You can now log in as a registered user. '} <a href="{$link->getPageLink('authentication', true)|escape:'html':'UTF-8'}">{l s='Log in now.'}</a></p>
+				{else}
+					{block name='guest_tracking_transform_account_container'}
+						<div class="card transform-account">
+							<div class="card-header">
+								{l s='For More Advantages'}
+							</div>
+							<div class="card-body">
+								{block name='guest_tracking_transform_account_form'}
+									<form method="post" action="{$action|escape:'html':'UTF-8'}#guestToCustomer" class="std">
+										{block name='guest_tracking_errors_container'}
+											{include file="$tpl_dir./errors.tpl"}
+										{/block}
+
+										<p class="card-subtitle">
+											{l s='Transform your guest account into a customer account and enjoy:'}
+										</p>
+
+										<div class="card-text">
+											<p>{l s='- Personalized and secure access.'}</p>
+											<p>{l s='- Fast and easy checkout'}</p>
+											<p>{l s='- Easier refund process'}</p>
+										</div>
+
+										<div class="form-group password">
+											<label>{l s='Set your password:'}</label>
+											<input type="password" name="password" class="form-control" />
+										</div>
+
+										<input type="hidden" name="id_order" value="{if isset($order->id)}{$order->id}{else}{if isset($smarty.get.id_order)}{$smarty.get.id_order|escape:'html':'UTF-8'}{else}{if isset($smarty.post.id_order)}{$smarty.post.id_order|escape:'html':'UTF-8'}{/if}{/if}{/if}" />
+										<input type="hidden" name="order_reference" value="{if isset($smarty.get.order_reference)}{$smarty.get.order_reference|escape:'html':'UTF-8'}{else}{if isset($smarty.post.order_reference)}{$smarty.post.order_reference|escape:'html':'UTF-8'}{/if}{/if}" />
+										<input type="hidden" name="email" value="{if isset($smarty.get.email)}{$smarty.get.email|escape:'html':'UTF-8'}{else}{if isset($smarty.post.email)}{$smarty.post.email|escape:'html':'UTF-8'}{/if}{/if}" />
+
+										<button type="submit" name="submitTransformGuestToCustomer" class="button button-medium btn btn-submit">
+											<span>{l s='Send'}</span>
+										</button>
+									</form>
+								{/block}
+							</div>
+						</div>
+					{/block}
+				{/if}
 			</div>
 		</div>
-	{/foreach}
-
-    <div class="row">
-        <div class="col-md-8">
-            {if isset($transformSuccess)}
-                <p class="alert alert-success alert-transformed">{l s='Your guest account has been successfully transformed into a customer account. You can now log in as a registered user. '} <a href="{$link->getPageLink('authentication', true)|escape:'html':'UTF-8'}">{l s='Log in now.'}</a></p>
-            {else}
-                <div class="card transform-account">
-                    <div class="card-header">
-                        {l s='For More Advantages'}
-                    </div>
-                    <div class="card-body">
-                        <form method="post" action="{$action|escape:'html':'UTF-8'}#guestToCustomer" class="std">
-                            {include file="$tpl_dir./errors.tpl"}
-
-                            <p class="card-subtitle">
-                                {l s='Transform your guest account into a customer account and enjoy:'}
-                            </p>
-
-                            <div class="card-text">
-                                <p>{l s='- Personalized and secure access.'}</p>
-                                <p>{l s='- Fast and easy checkout'}</p>
-                                <p>{l s='- Easier refund process'}</p>
-                            </div>
-
-                            <div class="form-group password">
-                                <label>{l s='Set your password:'}</label>
-                                <input type="password" name="password" class="form-control" />
-                            </div>
-
-                            <input type="hidden" name="id_order" value="{if isset($order->id)}{$order->id}{else}{if isset($smarty.get.id_order)}{$smarty.get.id_order|escape:'html':'UTF-8'}{else}{if isset($smarty.post.id_order)}{$smarty.post.id_order|escape:'html':'UTF-8'}{/if}{/if}{/if}" />
-                            <input type="hidden" name="order_reference" value="{if isset($smarty.get.order_reference)}{$smarty.get.order_reference|escape:'html':'UTF-8'}{else}{if isset($smarty.post.order_reference)}{$smarty.post.order_reference|escape:'html':'UTF-8'}{/if}{/if}" />
-                            <input type="hidden" name="email" value="{if isset($smarty.get.email)}{$smarty.get.email|escape:'html':'UTF-8'}{else}{if isset($smarty.post.email)}{$smarty.post.email|escape:'html':'UTF-8'}{/if}{/if}" />
-
-                            <button type="submit" name="submitTransformGuestToCustomer" class="button button-medium btn btn-submit">
-                                <span>{l s='Send'}</span>
-                            </button>
-                        </form>
-                    </div>
-                </div>
-            {/if}
-        </div>
-    </div>
-{else}
-	{include file="$tpl_dir./errors.tpl"}
-	{if isset($show_login_link) && $show_login_link}
-		<p><img src="{$img_dir}icon/userinfo.gif" alt="{l s='Information'}" class="icon" /><a href="{$link->getPageLink('my-account', true)|escape:'html':'UTF-8'}">{l s='Click here to log in to your customer account.'}</a><br /><br /></p>
+	{else}
+		{block name='guest_tracking_errors_container'}
+			{include file="$tpl_dir./errors.tpl"}
+		{/block}
+		{if isset($show_login_link) && $show_login_link}
+			<p><img src="{$img_dir}icon/userinfo.gif" alt="{l s='Information'}" class="icon" /><a href="{$link->getPageLink('my-account', true)|escape:'html':'UTF-8'}">{l s='Click here to log in to your customer account.'}</a><br /><br /></p>
+		{/if}
+		{block name='guest_tracking_order_detail_form'}
+			<form method="post" action="{$action|escape:'html':'UTF-8'}" class="std" id="guestTracking">
+				<fieldset class="description_box box">
+					<h2 class="page-subheading">{l s='To track your order, please enter the following information:'}</h2>
+							<div class="text form-group">
+								<label>{l s='Order Reference:'} </label>
+								<input class="form-control" type="text" name="order_reference" value="{if isset($smarty.get.id_order)}{$smarty.get.id_order|escape:'html':'UTF-8'}{else}{if isset($smarty.post.id_order)}{$smarty.post.id_order|escape:'html':'UTF-8'}{/if}{/if}" size="8" />
+								<i>{l s='For example: QIIXJXNUI'}</i>
+							</div>
+							<div class="text form-group">
+								<label>{l s='Email:'}</label>
+								<input class="form-control" type="email" name="email" value="{if isset($smarty.get.email)}{$smarty.get.email|escape:'html':'UTF-8'}{else}{if isset($smarty.post.email)}{$smarty.post.email|escape:'html':'UTF-8'}{/if}{/if}" />
+							</div>
+					<p>
+						<button type="submit" name="submitGuestTracking" class="button btn btn-default button-medium"><span>{l s='Send'}<i class="icon-chevron-right right"></i></span></button>
+					</p>
+				</fieldset>
+			</form>
+		{/block}
 	{/if}
-	<form method="post" action="{$action|escape:'html':'UTF-8'}" class="std" id="guestTracking">
-		<fieldset class="description_box box">
-			<h2 class="page-subheading">{l s='To track your order, please enter the following information:'}</h2>
-                    <div class="text form-group">
-                        <label>{l s='Order Reference:'} </label>
-                        <input class="form-control" type="text" name="order_reference" value="{if isset($smarty.get.id_order)}{$smarty.get.id_order|escape:'html':'UTF-8'}{else}{if isset($smarty.post.id_order)}{$smarty.post.id_order|escape:'html':'UTF-8'}{/if}{/if}" size="8" />
-                        <i>{l s='For example: QIIXJXNUI'}</i>
-                    </div>
-                    <div class="text form-group">
-                        <label>{l s='Email:'}</label>
-                        <input class="form-control" type="email" name="email" value="{if isset($smarty.get.email)}{$smarty.get.email|escape:'html':'UTF-8'}{else}{if isset($smarty.post.email)}{$smarty.post.email|escape:'html':'UTF-8'}{/if}{/if}" />
-                    </div>
-			<p>
-                <button type="submit" name="submitGuestTracking" class="button btn btn-default button-medium"><span>{l s='Send'}<i class="icon-chevron-right right"></i></span></button>
-            </p>
-		</fieldset>
-	</form>
-{/if}
+{/block}

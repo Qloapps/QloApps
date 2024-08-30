@@ -62,7 +62,9 @@
 			<script type="text/javascript" src="{$js_uri|escape:'html':'UTF-8'}"></script>
 			{/foreach}
 		{/if}
-		{$HOOK_HEADER}
+		{block name='hook_header'}
+			{$HOOK_HEADER}
+		{/block}
 		<!-- <link rel="stylesheet" href="http{if Tools::usingSecureMode()}s{/if}://fonts.googleapis.com/css?family=Open+Sans:300,600&amp;subset=latin,latin-ext" type="text/css" media="all" /> -->
 
 		<!--[if IE 8]>
@@ -88,14 +90,18 @@
 					<div class="banner">
 						<div class="container">
 							<div class="row">
-								{hook h="displayBanner"}
+								{block name='display_banner'}
+									{hook h="displayBanner"}
+								{/block}
 							</div>
 						</div>
 					</div>
 					<div id="nav-main">
 						<div class="container">
 							<div class="row">
-								<nav>{hook h="displayNav"}</nav>
+								{block name='display_nav'}
+									<nav>{hook h="displayNav"}</nav>
+									{/block}
 							</div>
 						</div>
 					</div>
@@ -109,14 +115,20 @@
 										</a>
 									</div>
 									<div class="header-top-menu">
-										{if isset($HOOK_TOP)}{$HOOK_TOP}{/if}
+										{block name='hook_top'}
+											{if isset($HOOK_TOP)}{$HOOK_TOP}{/if}
+										{/block}
 									</div>
 								</div>
 							</div>
-							{hook h='displaySearchHotelPanel'}
+							{block name='display_search_hotel_panel'}
+								{hook h='displaySearchHotelPanel'}
+							{/block}
 						</div>
 					</div>
-					{hook h='displayAfterHookTop'}
+					{block name='display_after_hook_top'}
+						{hook h='displayAfterHookTop'}
+					{/block}
 				</header>
 			</div>
 			<div class="columns-container">
