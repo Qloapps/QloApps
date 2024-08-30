@@ -24,20 +24,60 @@
  * International Registered Trademark & Property of PrestaShop SA
  */
 
-class SmartyCustomCore extends SmartyDev
+class SmartyCustomCore extends Smarty
 {
-    public $display_comments = false;
     public function __construct()
     {
         parent::__construct();
         $this->template_class = 'Smarty_Custom_Template';
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function fetch($template = null, $cache_id = null, $compile_id = null, $parent = null, $display = false, $merge_tpl_vars = true, $no_output_filter = false)
+    {
+        if (($overrideTemplate = Hook::exec('displayOverrideTemplate', array('default_template' => $template, 'controller' => Context::getContext()->controller)))
+            && file_exists($overrideTemplate)
+        ) {
+            $template = $overrideTemplate;
+        }
+
+        $response = parent::fetch($template, $cache_id, $compile_id, $parent, $display, $merge_tpl_vars, $no_output_filter);
+        if (isset($this->display_comments) && $this->display_comments) {
+            $response =  "\n<!-- begin $template -->\n".$response."\n<!-- end $template -->\n";
+        }
+
+        return $response;
+    }
 }
 
-class Smarty_Custom_Template extends Smarty_Dev_Template
+class Smarty_Custom_Template extends Smarty_Internal_Template
 {
     /** @var SmartyCustom|null */
     public $smarty = null;
-    public $display_comments = false;
+
+    public function fetch($template = null, $cache_id = null, $compile_id = null, $parent = null, $display = false, $merge_tpl_vars = true, $no_output_filter = false)
+    {
+        if (!is_null($template)) {
+            $tpl = $template->template_resource;
+        } else {
+            $tpl = $this->template_resource;
+        }
+
+        if (($templatePath = Hook::exec('displayOverrideTemplate', array('default_template' => $tpl, 'controller' => Context::getContext()->controller)))
+            && file_exists($templatePath)
+        ) {
+            $template = Context::getContext()->smarty->createTemplate($templatePath);
+            $tpl = $template->template_resource;
+        }
+
+        $response = parent::fetch($template, $cache_id, $compile_id, $parent, $display, $merge_tpl_vars, $no_output_filter);
+        if (isset($this->display_comments) && $this->display_comments) {
+            $response =  "\n<!-- begin $tpl -->\n".$response."\n<!-- end $tpl -->\n";
+        }
+
+        return $response;
+    }
 
 }

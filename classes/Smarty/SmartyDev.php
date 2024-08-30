@@ -24,63 +24,22 @@
  * International Registered Trademark & Property of PrestaShop SA
  */
 
-class SmartyDev extends Smarty
+class SmartyDev extends SmartyCustom
 {
+    public $display_comments = true;
+
     public function __construct()
     {
         parent::__construct();
         $this->template_class = 'Smarty_Dev_Template';
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function fetch($template = null, $cache_id = null, $compile_id = null, $parent = null, $display = false, $merge_tpl_vars = true, $no_output_filter = false)
-    {
-        if (($overrideTemplate = Hook::exec('displayOverrideTemplate', array('default_template' => $template, 'controller' => Context::getContext()->controller)))
-            && file_exists($overrideTemplate)
-        ) {
-            $template = $overrideTemplate;
-        }
-
-        $response = parent::fetch($template, $cache_id, $compile_id, $parent, $display, $merge_tpl_vars, $no_output_filter);
-        if (!isset($this->display_comments) || $this->display_comments) {
-            $response =  "\n<!-- begin $template -->\n".$response."\n<!-- end $template -->\n";
-        }
-
-        return $response;
-    }
 }
 
-class Smarty_Dev_Template extends Smarty_Internal_Template
+class Smarty_Dev_Template extends Smarty_Custom_Template
 {
     /** @var SmartyCustom|null */
     public $smarty = null;
+    public $display_comments = true;
 
-    public function fetch($template = null, $cache_id = null, $compile_id = null, $parent = null, $display = false, $merge_tpl_vars = true, $no_output_filter = false)
-    {
-        if (!is_null($template)) {
-            $tpl = $template->template_resource;
-        } else {
-            $tpl = $this->template_resource;
-        }
-
-        if (($overrideTemplate = Hook::exec('displayOverrideTemplate', array('default_template' => $tpl, 'controller' => Context::getContext()->controller)))
-            && file_exists($overrideTemplate)
-        ) {
-            $tpl = $overrideTemplate;
-            if (!is_null($template)) {
-                $template = Context::getContext()->smarty->createTemplate($tpl);
-            } else {
-                $template = $tpl;
-            }
-        }
-
-        $response = parent::fetch($template, $cache_id, $compile_id, $parent, $display, $merge_tpl_vars, $no_output_filter);
-        if (!isset($this->display_comments) || $this->display_comments) {
-            $response =  "\n<!-- begin $tpl -->\n".$response."\n<!-- end $tpl -->\n";
-        }
-
-        return $response;
-    }
 }
