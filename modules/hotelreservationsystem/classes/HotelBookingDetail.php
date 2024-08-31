@@ -2184,9 +2184,18 @@ class HotelBookingDetail extends ObjectModel
                     $deleteQty = true;
                 } else {
                     // Calculate differences of price (Before / After)
-
-                    $objOldOrderDetail->total_price_tax_incl -= $totalRoomPriceTaxIncl;
-                    $objOldOrderDetail->total_price_tax_excl -= $totalRoomPriceTaxExcl;
+                    $objOldOrderDetail->total_price_tax_incl -= Tools::processPriceRounding(
+                        ($objOldOrderDetail->total_price_tax_incl - $totalRoomPriceTaxIncl),
+                        1,
+                        $objOrder->round_type,
+                        $objOrder->round_mode
+                    );
+                    $objOldOrderDetail->total_price_tax_excl -= Tools::processPriceRounding(
+                        ($objOldOrderDetail->total_price_tax_excl - $totalRoomPriceTaxExcl),
+                        1,
+                        $objOrder->round_type,
+                        $objOrder->round_mode
+                    );
 
                     $old_quantity = $objOldOrderDetail->product_quantity;
 
@@ -2204,16 +2213,16 @@ class HotelBookingDetail extends ObjectModel
                 if ($objOldOrderDetail->id_order_invoice != 0) {
                     // values changes as values are calculated accoding to the quantity of the product by webkul
                     $objOrderInvoice = new OrderInvoice($objOldOrderDetail->id_order_invoice);
-                    $objOrderInvoice->total_paid_tax_excl -= $totalRoomPriceTaxExcl;
+                    $objOrderInvoice->total_paid_tax_excl -= Tools::ps_round($totalRoomPriceTaxExcl, _PS_PRICE_COMPUTE_PRECISION_);
                     $objOrderInvoice->total_paid_tax_excl = $objOrderInvoice->total_paid_tax_excl > 0 ? $objOrderInvoice->total_paid_tax_excl : 0;
 
-                    $objOrderInvoice->total_paid_tax_incl -= $totalRoomPriceTaxIncl;
+                    $objOrderInvoice->total_paid_tax_incl -= Tools::ps_round($totalRoomPriceTaxIncl, _PS_PRICE_COMPUTE_PRECISION_);
                     $objOrderInvoice->total_paid_tax_incl = $objOrderInvoice->total_paid_tax_incl > 0 ? $objOrderInvoice->total_paid_tax_incl : 0;
 
-                    $objOrderInvoice->total_products -= $totalRoomPriceTaxExcl;
+                    $objOrderInvoice->total_products -= Tools::ps_round($totalRoomPriceTaxExcl, _PS_PRICE_COMPUTE_PRECISION_);
                     $objOrderInvoice->total_products = $objOrderInvoice->total_products > 0 ? $objOrderInvoice->total_products : 0;
 
-                    $objOrderInvoice->total_products_wt -= $totalRoomPriceTaxIncl;
+                    $objOrderInvoice->total_products_wt -= Tools::ps_round($totalRoomPriceTaxIncl, _PS_PRICE_COMPUTE_PRECISION_);
                     $objOrderInvoice->total_products_wt = $objOrderInvoice->total_products_wt > 0 ? $objOrderInvoice->total_products_wt : 0;
 
                     $res &= $objOrderInvoice->update();
@@ -2223,16 +2232,16 @@ class HotelBookingDetail extends ObjectModel
                 $objOrder->total_paid -= $totalRoomPriceTaxIncl;
                 $objOrder->total_paid = $objOrder->total_paid > 0 ? $objOrder->total_paid : 0;
 
-                $objOrder->total_paid_tax_incl -= $totalRoomPriceTaxIncl;
+                $objOrder->total_paid_tax_incl -= Tools::ps_round($totalRoomPriceTaxIncl, _PS_PRICE_COMPUTE_PRECISION_);
                 $objOrder->total_paid_tax_incl = $objOrder->total_paid_tax_incl > 0 ? $objOrder->total_paid_tax_incl : 0;
 
-                $objOrder->total_paid_tax_excl -= $totalRoomPriceTaxExcl;
+                $objOrder->total_paid_tax_excl -= Tools::ps_round($totalRoomPriceTaxExcl, _PS_PRICE_COMPUTE_PRECISION_);
                 $objOrder->total_paid_tax_excl = $objOrder->total_paid_tax_excl > 0 ? $objOrder->total_paid_tax_excl : 0;
 
-                $objOrder->total_products -= $totalRoomPriceTaxExcl;
+                $objOrder->total_products -= Tools::ps_round($totalRoomPriceTaxExcl, _PS_PRICE_COMPUTE_PRECISION_);
                 $objOrder->total_products = $objOrder->total_products > 0 ? $objOrder->total_products : 0;
 
-                $objOrder->total_products_wt -= $totalRoomPriceTaxIncl;
+                $objOrder->total_products_wt -= Tools::ps_round($totalRoomPriceTaxIncl, _PS_PRICE_COMPUTE_PRECISION_);
                 $objOrder->total_products_wt = $objOrder->total_products_wt > 0 ? $objOrder->total_products_wt : 0;
 
                 $objOrder->update();
@@ -2560,8 +2569,8 @@ class HotelBookingDetail extends ObjectModel
                 // update $objHotelBookingDetail
                 $objHotelBookingDetail->date_from = $newDateFrom;
                 $objHotelBookingDetail->date_to = $newDateTo;
-                $objHotelBookingDetail->total_price_tax_excl = Tools::ps_round($newTotalPriceTE, 6);
-                $objHotelBookingDetail->total_price_tax_incl = Tools::ps_round($newTotalPriceTI, 6);
+                $objHotelBookingDetail->total_price_tax_excl = $newTotalPriceTE;
+                $objHotelBookingDetail->total_price_tax_incl = $newTotalPriceTI;
                 $objHotelBookingDetail->adults = $occupancy['adults'];
                 $objHotelBookingDetail->children = $occupancy['children'];
                 $objHotelBookingDetail->child_ages = json_encode($occupancy['child_ages']);
@@ -3324,10 +3333,10 @@ class HotelBookingDetail extends ObjectModel
                 $objHotelBookingDemands = new HotelBookingDemands();
                 $objRoomTypeServiceProductOrderDetail = new RoomTypeServiceProductOrderDetail();
 
-                $reduction_amount['total_price_tax_excl'] = Tools::ps_round((float) $this->total_price_tax_excl, 6);
-                $reduction_amount['total_products_tax_excl'] = Tools::ps_round((float) $this->total_price_tax_excl, 6);
-                $reduction_amount['total_price_tax_incl'] = Tools::ps_round((float) $this->total_price_tax_incl, 6);
-                $reduction_amount['total_products_tax_incl'] = Tools::ps_round((float) $this->total_price_tax_incl, 6);
+                $reduction_amount['total_price_tax_excl'] = (float) $this->total_price_tax_excl;
+                $reduction_amount['total_products_tax_excl'] = (float) $this->total_price_tax_excl;
+                $reduction_amount['total_price_tax_incl'] = (float) $this->total_price_tax_incl;
+                $reduction_amount['total_products_tax_incl'] = (float) $this->total_price_tax_incl;
 
                 // reduce facilities amount from order and services_detail
                 if ($roomDemands = $objHotelBookingDemands->getRoomTypeBookingExtraDemands(
@@ -3343,8 +3352,8 @@ class HotelBookingDetail extends ObjectModel
                 )) {
                     foreach ($roomDemands as $roomDemand) {
                         $objHotelBookingDemands = new HotelBookingDemands($roomDemand['id_booking_demand']);
-                        $reduction_amount['total_price_tax_excl'] += Tools::ps_round((float) $objHotelBookingDemands->total_price_tax_excl, 6);
-                        $reduction_amount['total_price_tax_incl'] += Tools::ps_round((float) $objHotelBookingDemands->total_price_tax_incl, 6);
+                        $reduction_amount['total_price_tax_excl'] += (float) $objHotelBookingDemands->total_price_tax_excl;
+                        $reduction_amount['total_price_tax_incl'] += (float) $objHotelBookingDemands->total_price_tax_incl;
                         $objHotelBookingDemands->total_price_tax_excl = 0;
                         $objHotelBookingDemands->total_price_tax_incl = 0;
                         $objHotelBookingDemands->save();
@@ -3359,10 +3368,10 @@ class HotelBookingDetail extends ObjectModel
                         $objRoomTypeServiceProductOrderDetail = new RoomTypeServiceProductOrderDetail(
                             $roomService['id_room_type_service_product_order_detail']
                         );
-                        $reduction_amount['total_price_tax_excl'] += Tools::ps_round((float) $objRoomTypeServiceProductOrderDetail->total_price_tax_excl, 6);
-                        $reduction_amount['total_products_tax_excl'] += Tools::ps_round((float) $objRoomTypeServiceProductOrderDetail->total_price_tax_excl, 6);
-                        $reduction_amount['total_price_tax_incl'] += Tools::ps_round((float) $objRoomTypeServiceProductOrderDetail->total_price_tax_incl, 6);
-                        $reduction_amount['total_products_tax_incl'] += Tools::ps_round((float) $objRoomTypeServiceProductOrderDetail->total_price_tax_incl, 6);
+                        $reduction_amount['total_price_tax_excl'] += (float) $objRoomTypeServiceProductOrderDetail->total_price_tax_excl;
+                        $reduction_amount['total_products_tax_excl'] += (float) $objRoomTypeServiceProductOrderDetail->total_price_tax_excl;
+                        $reduction_amount['total_price_tax_incl'] += (float) $objRoomTypeServiceProductOrderDetail->total_price_tax_incl;
+                        $reduction_amount['total_products_tax_incl'] += (float) $objRoomTypeServiceProductOrderDetail->total_price_tax_incl;
 
                         if (Validate::isLoadedObject($objOrderDetail = new OrderDetail($objRoomTypeServiceProductOrderDetail->id_order_detail))) {
                             $objOrderDetail->product_quantity_refunded += $objRoomTypeServiceProductOrderDetail->quantity;
@@ -3370,15 +3379,18 @@ class HotelBookingDetail extends ObjectModel
                                 $objOrderDetail->product_quantity_refunded = $objOrderDetail->product_quantity;
                             }
 
-                            $objOrderDetail->total_price_tax_excl = Tools::ps_round(
-                                ($objOrderDetail->total_price_tax_excl - $objRoomTypeServiceProductOrderDetail->total_price_tax_excl),
-                                6
+                            $objOrderDetail->total_price_tax_excl -= Tools::processPriceRounding(
+                                $objOrderDetail->total_price_tax_excl,
+                                1,
+                                $objOrder->round_type,
+                                $objOrder->round_mode
                             );
-                            $objOrderDetail->total_price_tax_incl = Tools::ps_round(
-                                ($objOrderDetail->total_price_tax_incl - $objRoomTypeServiceProductOrderDetail->total_price_tax_incl),
-                                6
+                            $objOrderDetail->total_price_tax_incl -= Tools::processPriceRounding(
+                                $objOrderDetail->total_price_tax_incl,
+                                1,
+                                $objOrder->round_type,
+                                $objOrder->round_mode
                             );
-
                             $objOrderDetail->save();
                         }
 
@@ -3404,43 +3416,34 @@ class HotelBookingDetail extends ObjectModel
 
                 if (!$hasOrderDiscountOrPayment) {
                     // reduce room amount from order and order detail
-                    $objOrderDetail->total_price_tax_incl = Tools::ps_round(
-                        ($objOrderDetail->total_price_tax_incl - $this->total_price_tax_incl),
-                        6
+                    $objOrderDetail->total_price_tax_incl -= Tools::processPriceRounding(
+                        $this->total_price_tax_incl,
+                        1,
+                        $objOrder->round_type,
+                        $objOrder->round_mode
                     );
-                    $objOrderDetail->total_price_tax_excl = Tools::ps_round(
-                        ($objOrderDetail->total_price_tax_excl - $this->total_price_tax_excl),
-                        6
+
+                    $objOrderDetail->total_price_tax_excl -= Tools::processPriceRounding(
+                        $this->total_price_tax_excl,
+                        1,
+                        $objOrder->round_type,
+                        $objOrder->round_mode
                     );
+
                     if (Validate::isLoadedObject($objOrder = new Order($this->id_order))) {
-                        $objOrder->total_paid = Tools::ps_round(
-                            ($objOrder->total_paid - $reduction_amount['total_price_tax_incl']),
-                            6
-                        );
+                        $objOrder->total_paid -= Tools::ps_round($reduction_amount['total_price_tax_incl'], _PS_PRICE_COMPUTE_PRECISION_);
                         $objOrder->total_paid = $objOrder->total_paid > 0 ? $objOrder->total_paid : 0;
 
-                        $objOrder->total_paid_tax_excl = Tools::ps_round(
-                            ($objOrder->total_paid_tax_excl - $reduction_amount['total_price_tax_excl']),
-                            6
-                        );
+                        $objOrder->total_paid_tax_excl -= Tools::ps_round($reduction_amount['total_price_tax_excl'], _PS_PRICE_COMPUTE_PRECISION_);
                         $objOrder->total_paid_tax_excl = $objOrder->total_paid_tax_excl > 0 ? $objOrder->total_paid_tax_excl : 0;
 
-                        $objOrder->total_paid_tax_incl = Tools::ps_round(
-                            ($objOrder->total_paid_tax_incl - $reduction_amount['total_price_tax_incl']),
-                            6
-                        );
+                        $objOrder->total_paid_tax_incl -= Tools::ps_round($reduction_amount['total_price_tax_incl'], _PS_PRICE_COMPUTE_PRECISION_);
                         $objOrder->total_paid_tax_incl = $objOrder->total_paid_tax_incl > 0 ? $objOrder->total_paid_tax_incl : 0;
 
-                        $objOrder->total_products = Tools::ps_round(
-                            ($objOrder->total_products - $reduction_amount['total_products_tax_excl']),
-                            6
-                        );
+                        $objOrder->total_products -= Tools::ps_round($reduction_amount['total_products_tax_excl'], _PS_PRICE_COMPUTE_PRECISION_);
                         $objOrder->total_products = $objOrder->total_products > 0 ? $objOrder->total_products : 0;
 
-                        $objOrder->total_products_wt = Tools::ps_round(
-                            ($objOrder->total_products_wt - $reduction_amount['total_products_tax_incl']),
-                            6
-                        );
+                        $objOrder->total_products_wt -= Tools::ps_round($reduction_amount['total_products_tax_incl'], _PS_PRICE_COMPUTE_PRECISION_);
                         $objOrder->total_products_wt = $objOrder->total_products_wt > 0 ? $objOrder->total_products_wt : 0;
 
                         $objOrder->save();

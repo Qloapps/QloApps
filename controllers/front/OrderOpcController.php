@@ -1032,11 +1032,14 @@ class OrderOpcControllerCore extends ParentOrderController
                 $roomTypeServiceProducts = $objRoomTypeServiceProduct->getServiceProductsData($idProduct, 1, 0, true, 1);
                 $cartRooms = $objCartBookingData->getHotelCartRoomsInfoByRoomType($this->context->cart->id, $idProduct,$dateFrom, $dateTo);
                 foreach($cartRooms as &$room) {
-                    $room['selected_service'] = $objRoomTypeServiceProductCartDetail->getRoomServiceProducts(
-                        $room['id'],
+                    $room['selected_service'] = $objRoomTypeServiceProductCartDetail->getServiceProductsInCart(
+                        $room['id_cart'],
                         0,
-                        null,
-                        null
+                        0,
+                        0,
+                        0,
+                        0,
+                        $room['id']
                     );
                 }
                 $this->context->smarty->assign(array(

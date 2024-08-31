@@ -283,7 +283,6 @@ class OrderSlipCore extends ObjectModel
 
     /**
      * @deprecated since 1.6.0.10 use OrderSlip::create() instead
-     *
      */
     public static function createOrderSlip($order, $productList, $qtyList, $shipping_cost = false)
     {
@@ -386,21 +385,18 @@ class OrderSlipCore extends ObjectModel
                 }
             }
 
-            $product_tax_incl_line = Tools::ps_round($tax_calculator->{$add_or_remove.'Taxes'}($price) * $numDays, _PS_PRICE_COMPUTE_PRECISION_);
-
-            switch (Configuration::get('PS_ROUND_TYPE')) {
-                case Order::ROUND_ITEM:
-                    $product_tax_incl = Tools::ps_round($tax_calculator->{$add_or_remove.'Taxes'}($price), _PS_PRICE_COMPUTE_PRECISION_) * $numDays;
-                    $total_products[$id_tax_rules_group] += $product_tax_incl;
-                    break;
-                case Order::ROUND_LINE:
-                    $product_tax_incl = $product_tax_incl_line;
-                    $total_products[$id_tax_rules_group] += $product_tax_incl;
-                    break;
-                case Order::ROUND_TOTAL:
-                    $product_tax_incl = $product_tax_incl_line;
-                    $total_products[$id_tax_rules_group.'_'.$id_address] += $price * $numDays;
-                    break;
+            if ($ps_round_type == Order::ROUND_TOTAL) {
+                $product_tax_incl = Tools::processPriceRounding(
+                    $tax_calculator->{$add_or_remove.'Taxes'}($price),
+                    $numDays
+                );
+                $total_products[$id_tax_rules_group.'_'.$id_address] += $product_tax_incl;
+            } else {
+                $product_tax_incl = Tools::processPriceRounding(
+                    $tax_calculator->{$add_or_remove.'Taxes'}($price),
+                    $numDays
+                );
+                $total_products[$id_tax_rules_group] += $product_tax_incl;
             }
 
             $booking['unit_price_tax_'.$inc_or_ex_1] = $price;

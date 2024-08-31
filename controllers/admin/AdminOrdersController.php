@@ -3718,8 +3718,8 @@ class AdminOrdersControllerCore extends AdminController
                 $carrier = new Carrier((int)$order->id_carrier);
                 $tax_calculator = $carrier->getTaxCalculator($invoice_address);
 
-                $order_invoice->total_paid_tax_excl = Tools::ps_round((float)$cart->getOrderTotal(false, $total_method), 2);
-                $order_invoice->total_paid_tax_incl = Tools::ps_round((float)$cart->getOrderTotal($use_taxes, $total_method), 2);
+                $order_invoice->total_paid_tax_excl = (float)$cart->getOrderTotal(false, $total_method);
+                $order_invoice->total_paid_tax_incl = (float)$cart->getOrderTotal($use_taxes, $total_method);
                 $order_invoice->total_products = (float)$cart->getOrderTotal(false, Cart::ONLY_PRODUCTS);
                 $order_invoice->total_products_wt = (float)$cart->getOrderTotal($use_taxes, Cart::ONLY_PRODUCTS);
                 $order_invoice->total_shipping_tax_excl = (float)$cart->getTotalShippingCost(null, false);
@@ -3752,8 +3752,8 @@ class AdminOrdersControllerCore extends AdminController
             }
             // Update current invoice
             else {
-                $order_invoice->total_paid_tax_excl += Tools::ps_round((float)($cart->getOrderTotal(false, $total_method)), 2);
-                $order_invoice->total_paid_tax_incl += Tools::ps_round((float)($cart->getOrderTotal($use_taxes, $total_method)), 2);
+                $order_invoice->total_paid_tax_excl += (float)$cart->getOrderTotal(false, $total_method);
+                $order_invoice->total_paid_tax_incl += (float)$cart->getOrderTotal($use_taxes, $total_method);
                 $order_invoice->total_products += (float)$cart->getOrderTotal(false, Cart::ONLY_PRODUCTS);
                 $order_invoice->total_products_wt += (float)$cart->getOrderTotal($use_taxes, Cart::ONLY_PRODUCTS);
                 $order_invoice->update();
@@ -3768,9 +3768,9 @@ class AdminOrdersControllerCore extends AdminController
         $order->total_products += (float)$cart->getOrderTotal(false, Cart::ONLY_PRODUCTS);
         $order->total_products_wt += (float)$cart->getOrderTotal($use_taxes, Cart::ONLY_PRODUCTS);
 
-        $order->total_paid += Tools::ps_round((float)($cart->getOrderTotal(true, $total_method)), 2);
-        $order->total_paid_tax_excl += Tools::ps_round((float)($cart->getOrderTotal(false, $total_method)), 2);
-        $order->total_paid_tax_incl += Tools::ps_round((float)($cart->getOrderTotal($use_taxes, $total_method)), 2);
+        $order->total_paid += (float)$cart->getOrderTotal(true, $total_method);
+        $order->total_paid_tax_excl += (float)$cart->getOrderTotal(false, $total_method);
+        $order->total_paid_tax_incl += (float)$cart->getOrderTotal($use_taxes, $total_method);
 
         if (isset($order_invoice) && Validate::isLoadedObject($order_invoice)) {
             $order->total_shipping = $order_invoice->total_shipping_tax_incl;
@@ -4308,8 +4308,8 @@ class AdminOrdersControllerCore extends AdminController
             }
             // Update current invoice
             else {
-                $order_invoice->total_paid_tax_excl += Tools::ps_round((float)($cart->getOrderTotal(false, $total_method)), 2);
-                $order_invoice->total_paid_tax_incl += Tools::ps_round((float)($cart->getOrderTotal($use_taxes, $total_method)), 2);
+                $order_invoice->total_paid_tax_excl += (float)$cart->getOrderTotal(false, $total_method);
+                $order_invoice->total_paid_tax_incl += (float)$cart->getOrderTotal($use_taxes, $total_method);
                 $order_invoice->total_products += (float)$cart->getOrderTotal(false, Cart::ONLY_PRODUCTS);
                 $order_invoice->total_products_wt += (float)$cart->getOrderTotal($use_taxes, Cart::ONLY_PRODUCTS);
                 $order_invoice->update();
@@ -4323,10 +4323,9 @@ class AdminOrdersControllerCore extends AdminController
         // update totals amount of order
         $order->total_products += (float)$cart->getOrderTotal(false, Cart::ONLY_PRODUCTS);
         $order->total_products_wt += (float)$cart->getOrderTotal($use_taxes, Cart::ONLY_PRODUCTS);
-
-        $order->total_paid += Tools::ps_round((float)($cart->getOrderTotal(true, $total_method)), 2);
-        $order->total_paid_tax_excl += Tools::ps_round((float)($cart->getOrderTotal(false, $total_method)), 2);
-        $order->total_paid_tax_incl += Tools::ps_round((float)($cart->getOrderTotal($use_taxes, $total_method)), 2);
+        $order->total_paid += (float)$cart->getOrderTotal(true, $total_method);
+        $order->total_paid_tax_excl += (float)$cart->getOrderTotal(false, $total_method);
+        $order->total_paid_tax_incl += (float)$cart->getOrderTotal($use_taxes, $total_method);
 
         if (isset($order_invoice) && Validate::isLoadedObject($order_invoice)) {
             $order->total_shipping = $order_invoice->total_shipping_tax_incl;
@@ -4486,7 +4485,7 @@ class AdminOrdersControllerCore extends AdminController
                 );
                 $objBookingDetail->total_price_tax_excl = $total_price['total_price_tax_excl'];
                 $objBookingDetail->total_price_tax_incl = $total_price['total_price_tax_incl'];
-                $objBookingDetail->total_paid_amount = Tools::ps_round($total_price['total_price_tax_incl'], 5);
+                $objBookingDetail->total_paid_amount = $total_price['total_price_tax_incl'];
 
                 // Save hotel information/location/contact
                 if (Validate::isLoadedObject($objRoom = new HotelRoomInformation($objCartBookingData->id_room))) {
@@ -4517,7 +4516,18 @@ class AdminOrdersControllerCore extends AdminController
                     $objRoomTypeServiceProduct = new RoomTypeServiceProduct();
                     $objRoomTypeServiceProductPrice = new RoomTypeServiceProductPrice();
                     $objRoomTypeServiceProductCartDetail = new RoomTypeServiceProductCartDetail();
-                    if ($services = $objRoomTypeServiceProductCartDetail->getRoomServiceProducts($objCartBookingData->id, 0, null, 1)) {
+                    if ($services = $objRoomTypeServiceProductCartDetail->getServiceProductsInCart(
+                        $objCartBookingData->id_cart,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        $objCartBookingData->id,
+                        0,
+                        null,
+                        1
+                    )) {
                         foreach ($services as $service) {
                             $insertedServiceProductIdOrderDetail = $objBookingDetail->getLastInsertedServiceIdOrderDetail($order->id, $service['id_product']);
                             $numDays = 1;
@@ -4541,24 +4551,22 @@ class AdminOrdersControllerCore extends AdminController
                                 $objBookingDetail->date_to,
                                 true
                             );
-                            $unitPriceTaxExcl = $totalPriceTaxExcl / $numDays;
-                            $unitPriceTaxIncl = $totalPriceTaxIncl / $numDays;
-                            switch (Configuration::get('PS_ROUND_TYPE')) {
-                                case Order::ROUND_TOTAL:
-                                    $service['total'] = $totalPriceTaxExcl;
-                                    $service['total_wt'] = $totalPriceTaxIncl;
-                                    break;
-                                case Order::ROUND_LINE:
-                                    $service['total'] = Tools::ps_round($totalPriceTaxExcl, _PS_PRICE_COMPUTE_PRECISION_);
-                                    $service['total_wt'] = Tools::ps_round($totalPriceTaxIncl, _PS_PRICE_COMPUTE_PRECISION_);
-                                    break;
-
-                                case Order::ROUND_ITEM:
-                                default:
-                                    $service['total'] = Tools::ps_round($totalPriceTaxExcl, _PS_PRICE_COMPUTE_PRECISION_);
-                                    $service['total_wt'] = Tools::ps_round($totalPriceTaxIncl, _PS_PRICE_COMPUTE_PRECISION_);
-                                    break;
-                            }
+                            $unitPriceTaxIncl = $objRoomTypeServiceProductPrice->getServicePrice(
+                                (int)$service['id_product'],
+                                $roomTypeInfo['id'],
+                                1,
+                                null,
+                                null,
+                                true
+                            );
+                            $unitPriceTaxExcl = $objRoomTypeServiceProductPrice->getServicePrice(
+                                (int) $service['id_product'],
+                                $roomTypeInfo['id'],
+                                1,
+                                null,
+                                null,
+                                false
+                            );
 
                             $objRoomTypeServiceProductOrderDetail = new RoomTypeServiceProductOrderDetail();
                             $objRoomTypeServiceProductOrderDetail->id_product = $service['id_product'];
@@ -4742,8 +4750,8 @@ class AdminOrdersControllerCore extends AdminController
                         // room price with tax
                         $roomPriceTI = $taxCalculator->addTaxes($room_unit_price);
 
-                        $totalRoomPriceTE = Tools::ps_round(($room_unit_price * $product_quantity), _PS_PRICE_COMPUTE_PRECISION_);
-                        $totalRoomPriceTI = Tools::ps_round(($roomPriceTI * $product_quantity), _PS_PRICE_COMPUTE_PRECISION_);
+                        $totalRoomPriceTE = Tools::processPriceRounding($room_unit_price, $product_quantity);
+                        $totalRoomPriceTI = Tools::processPriceRounding($roomPriceTI, $product_quantity);
 
                         // room price changes
                         $totalRoomPriceAfterTE += (float) $totalRoomPriceTE;
@@ -4778,8 +4786,8 @@ class AdminOrdersControllerCore extends AdminController
         else
             $product_quantity = Tools::getValue('product_quantity');*/
         /*End*/
-        $product_price_tax_incl = Tools::ps_round(Tools::getValue('product_price_tax_incl'), 2);
-        $product_price_tax_excl = Tools::ps_round(Tools::getValue('product_price_tax_excl'), 2);
+        $product_price_tax_incl = Tools::getValue('product_price_tax_incl');
+        $product_price_tax_excl = Tools::getValue('product_price_tax_excl');
         // Calculate differences of price (Before / After)
         //$diff_price_tax_incl = $product_price_tax_incl * $qty_diff;
         $diff_price_tax_incl = $totalProductPriceAfterTI - $totalProductPriceBeforeTI;
@@ -4792,47 +4800,43 @@ class AdminOrdersControllerCore extends AdminController
             if ($order_detail->id_order_invoice != $order_invoice->id) {
                 $old_order_invoice = new OrderInvoice($order_detail->id_order_invoice);
                 // We remove cost of products
-                $old_order_invoice->total_products -= Tools::ps_round($order_detail->total_price_tax_excl, 6);
-                $old_order_invoice->total_products_wt -= Tools::ps_round($order_detail->total_price_tax_incl, 6);
-
-                $old_order_invoice->total_paid_tax_excl -= Tools::ps_round($order_detail->total_price_tax_excl, 6);
-                $old_order_invoice->total_paid_tax_incl -= Tools::ps_round($order_detail->total_price_tax_incl, 6);
+                $old_order_invoice->total_products -= $order_detail->total_price_tax_excl;
+                $old_order_invoice->total_products_wt -= $order_detail->total_price_tax_incl;
+                $old_order_invoice->total_paid_tax_excl -= $order_detail->total_price_tax_excl;
+                $old_order_invoice->total_paid_tax_incl -= $order_detail->total_price_tax_incl;
 
                 $res &= $old_order_invoice->update();
 
-                $order_invoice->total_products += Tools::ps_round($order_detail->total_price_tax_excl, 6);
-                $order_invoice->total_products_wt += Tools::ps_round($order_detail->total_price_tax_incl, 6);
-
-                $order_invoice->total_paid_tax_excl += Tools::ps_round($order_detail->total_price_tax_excl, 6);
-                $order_invoice->total_paid_tax_incl += Tools::ps_round($order_detail->total_price_tax_incl, 6);
+                $order_invoice->total_products += $order_detail->total_price_tax_excl;
+                $order_invoice->total_products_wt += $order_detail->total_price_tax_incl;
+                $order_invoice->total_paid_tax_excl += $order_detail->total_price_tax_excl;
+                $order_invoice->total_paid_tax_incl += $order_detail->total_price_tax_incl;
 
                 $order_detail->id_order_invoice = $order_invoice->id;
             }
         }
 
         if ($diff_price_tax_incl != 0 && $diff_price_tax_excl != 0) {
-            $order_detail->unit_price_tax_excl = Tools::ps_round($product_price_tax_excl, 6);
-            $order_detail->unit_price_tax_incl = Tools::ps_round($product_price_tax_incl, 6);
-
-            $order_detail->total_price_tax_incl += Tools::ps_round((float)$diff_price_tax_incl, 6);
-            $order_detail->total_price_tax_excl += Tools::ps_round((float)$diff_price_tax_excl, 6);
+            $order_detail->unit_price_tax_excl = $product_price_tax_excl;
+            $order_detail->unit_price_tax_incl = $product_price_tax_incl;
+            $order_detail->total_price_tax_incl += (float)$diff_price_tax_incl;
+            $order_detail->total_price_tax_excl += (float)$diff_price_tax_excl;
 
             if (isset($order_invoice)) {
                 // Apply changes on OrderInvoice
-                $order_invoice->total_products += Tools::ps_round((float)$diff_price_tax_excl, 6);
-                $order_invoice->total_products_wt += Tools::ps_round((float)$diff_price_tax_incl, 6);
-
-                $order_invoice->total_paid_tax_excl += Tools::ps_round((float)$diff_price_tax_excl, 6);
-                $order_invoice->total_paid_tax_incl += Tools::ps_round((float)$diff_price_tax_incl, 6);
+                $order_invoice->total_products += (float)$diff_price_tax_excl;
+                $order_invoice->total_products_wt += (float)$diff_price_tax_incl;
+                $order_invoice->total_paid_tax_excl += (float)$diff_price_tax_excl;
+                $order_invoice->total_paid_tax_incl += (float)$diff_price_tax_incl;
             }
 
             // Apply changes on Order
             $order = new Order($order_detail->id_order);
-            $order->total_products += Tools::ps_round((float)$diff_price_tax_excl, 6);
-            $order->total_products_wt += Tools::ps_round((float)$diff_price_tax_incl, 6);
-            $order->total_paid += Tools::ps_round((float)$diff_price_tax_incl, 6);
-            $order->total_paid_tax_excl += Tools::ps_round((float)$diff_price_tax_excl, 6);
-            $order->total_paid_tax_incl += Tools::ps_round((float)$diff_price_tax_incl, 6);
+            $order->total_products += (float)$diff_price_tax_excl;
+            $order->total_products_wt += (float)$diff_price_tax_incl;
+            $order->total_paid += (float)$diff_price_tax_incl;
+            $order->total_paid_tax_excl += (float)$diff_price_tax_excl;
+            $order->total_paid_tax_incl += (float)$diff_price_tax_incl;
 
             $res &= $order->update();
         }
@@ -4995,6 +4999,8 @@ class AdminOrdersControllerCore extends AdminController
                                 $objBookingDemand = new HotelBookingDemands($rDemand['id_booking_demand']);
 
                                 // change order total
+                                $objOrder->total_products -= $objBookingDemand->total_price_tax_excl;
+                                $objOrder->total_products_wt -= $objBookingDemand->total_price_tax_incl;
                                 $objOrder->total_paid_tax_excl -= $objBookingDemand->total_price_tax_excl;
                                 $objOrder->total_paid_tax_incl -= $objBookingDemand->total_price_tax_incl;
                                 $objOrder->total_paid -= $objBookingDemand->total_price_tax_incl;
@@ -5039,11 +5045,15 @@ class AdminOrdersControllerCore extends AdminController
                                 $newTotalPriceTaxExcl =  $newNumDays * $objRoomTypeServiceProductOrderDetail->quantity * $unitPriceTaxExcl;                                $unitPriceTaxIncl = $objRoomTypeServiceProductOrderDetail->unit_price_tax_incl;
                                 $newTotalPriceTaxIncl = $newNumDays * $objRoomTypeServiceProductOrderDetail->quantity * $unitPriceTaxIncl;
 
+                                $objOrder->total_products -= $objRoomTypeServiceProductOrderDetail->total_price_tax_excl;
+                                $objOrder->total_products_wt -= $objRoomTypeServiceProductOrderDetail->total_price_tax_incl;
                                 $objOrder->total_paid_tax_excl -= $objRoomTypeServiceProductOrderDetail->total_price_tax_excl;
                                 $objOrder->total_paid_tax_incl -= $objRoomTypeServiceProductOrderDetail->total_price_tax_incl;
                                 $objOrder->total_paid -= $objRoomTypeServiceProductOrderDetail->total_price_tax_incl;
 
                                 // change order total
+                                $objOrder->total_products += $newTotalPriceTaxExcl;
+                                $objOrder->total_products_wt += $newTotalPriceTaxIncl;
                                 $objOrder->total_paid_tax_excl += $newTotalPriceTaxExcl;
                                 $objOrder->total_paid_tax_incl += $newTotalPriceTaxIncl;
                                 $objOrder->total_paid += $newTotalPriceTaxIncl;
@@ -5065,7 +5075,6 @@ class AdminOrdersControllerCore extends AdminController
                                 $objRoomTypeServiceProductOrderDetail->total_price_tax_excl = $newTotalPriceTaxExcl;
                                 $objRoomTypeServiceProductOrderDetail->total_price_tax_incl = $newTotalPriceTaxIncl;
                                 $objRoomTypeServiceProductOrderDetail->save();
-
                             }
                         }
                     }
@@ -5139,8 +5148,10 @@ class AdminOrdersControllerCore extends AdminController
 
         $product_price_tax_incl = $order_detail->unit_price_tax_incl;
         $product_price_tax_excl = $order_detail->unit_price_tax_excl;
-        $total_products_tax_incl = $product_price_tax_incl * $product_quantity;
-        $total_products_tax_excl = $product_price_tax_excl * $product_quantity;
+
+
+        $total_products_tax_excl = Tools::processPriceRounding($product_price_tax_excl, $product_quantity);
+        $total_products_tax_incl = Tools::processPriceRounding($product_price_tax_incl, $product_quantity);
 
         // Calculate differences of price (Before / After)
         $diff_price_tax_incl = $total_products_tax_incl - $order_detail->total_price_tax_incl;
@@ -5190,7 +5201,6 @@ class AdminOrdersControllerCore extends AdminController
             $order = new Order($order_detail->id_order);
             $order->total_products += $diff_price_tax_excl;
             $order->total_products_wt += $diff_price_tax_incl;
-
             $order->total_paid += $diff_price_tax_incl;
             $order->total_paid_tax_excl += $diff_price_tax_excl;
             $order->total_paid_tax_incl += $diff_price_tax_incl;
@@ -5394,8 +5404,8 @@ class AdminOrdersControllerCore extends AdminController
         } else {
             // Calculate differences of price (Before / After)
 
-            $order_detail->total_price_tax_incl -= Tools::ps_round($diff_products_tax_incl, 6);
-            $order_detail->total_price_tax_excl -= Tools::ps_round($diff_products_tax_excl, 6);
+            $order_detail->total_price_tax_incl -= $diff_products_tax_incl;
+            $order_detail->total_price_tax_excl -= $diff_products_tax_excl;
 
             $old_quantity = $order_detail->product_quantity;
 
@@ -5419,8 +5429,8 @@ class AdminOrdersControllerCore extends AdminController
             if ($cart_quantity >= $serviceOrderDetail->product_quantity) {
                 $serviceOrderDetail->delete();
             } else {
-                $serviceOrderDetail->total_price_tax_incl -= Tools::ps_round($service['total_price_tax_incl'], 6);
-                $serviceOrderDetail->total_price_tax_excl -= Tools::ps_round($service['total_price_tax_excl'], 6);
+                $serviceOrderDetail->total_price_tax_incl -= $service['total_price_tax_incl'];
+                $serviceOrderDetail->total_price_tax_excl -= $service['total_price_tax_excl'];
                 $serviceOrderDetail->product_quantity -= $cart_quantity;
 
                 // update taxes
@@ -5436,16 +5446,16 @@ class AdminOrdersControllerCore extends AdminController
         if ($order_detail->id_order_invoice != 0) {
             // values changes as values are calculated accoding to the quantity of the product by webkul
             $order_invoice = new OrderInvoice($order_detail->id_order_invoice);
-            $order_invoice->total_paid_tax_excl -= Tools::ps_round(($diff_products_tax_excl + $roomExtraDemandTE + $additionlServicesTE), 6);
+            $order_invoice->total_paid_tax_excl -= ($diff_products_tax_excl + $roomExtraDemandTE + $additionlServicesTE);
             $order_invoice->total_paid_tax_excl = $order_invoice->total_paid_tax_excl > 0 ? $order_invoice->total_paid_tax_excl : 0;
 
-            $order_invoice->total_paid_tax_incl -= Tools::ps_round(($diff_products_tax_incl + $roomExtraDemandTI + $additionlServicesTI), 6);
+            $order_invoice->total_paid_tax_incl -= ($diff_products_tax_incl + $roomExtraDemandTI + $additionlServicesTI);
             $order_invoice->total_paid_tax_incl = $order_invoice->total_paid_tax_incl > 0 ? $order_invoice->total_paid_tax_incl : 0;
 
-            $order_invoice->total_products -= Tools::ps_round($diff_products_tax_excl, 6);
+            $order_invoice->total_products -= $diff_products_tax_excl;
             $order_invoice->total_products = $order_invoice->total_products > 0 ? $order_invoice->total_products : 0;
 
-            $order_invoice->total_products_wt -= Tools::ps_round($diff_products_tax_incl, 6);
+            $order_invoice->total_products_wt -= $diff_products_tax_incl;
             $order_invoice->total_products_wt = $order_invoice->total_products_wt > 0 ? $order_invoice->total_products_wt : 0;
 
             $res &= $order_invoice->update();
@@ -5453,19 +5463,19 @@ class AdminOrdersControllerCore extends AdminController
 
         // Update Order
         // values changes as values are calculated accoding to the quantity of the product by webkul
-        $order->total_paid -= Tools::ps_round(($diff_products_tax_incl + $roomExtraDemandTI + $additionlServicesTI), 6);
+        $order->total_paid -= ($diff_products_tax_incl + $roomExtraDemandTI + $additionlServicesTI);
         $order->total_paid = $order->total_paid > 0 ? $order->total_paid : 0;
 
-        $order->total_paid_tax_incl -= Tools::ps_round(($diff_products_tax_incl + $roomExtraDemandTI + $additionlServicesTI), 6);
+        $order->total_paid_tax_incl -= ($diff_products_tax_incl + $roomExtraDemandTI + $additionlServicesTI);
         $order->total_paid_tax_incl = $order->total_paid_tax_incl > 0 ? $order->total_paid_tax_incl : 0;
 
-        $order->total_paid_tax_excl -= Tools::ps_round(($diff_products_tax_excl + $roomExtraDemandTE + $additionlServicesTE), 6);
+        $order->total_paid_tax_excl -= ($diff_products_tax_excl + $roomExtraDemandTE + $additionlServicesTE);
         $order->total_paid_tax_excl = $order->total_paid_tax_excl > 0 ? $order->total_paid_tax_excl : 0;
 
-        $order->total_products -= Tools::ps_round(($diff_products_tax_excl + $additionlServicesTE), 6);
+        $order->total_products -= ($diff_products_tax_excl + $additionlServicesTE);
         $order->total_products = $order->total_products > 0 ? $order->total_products : 0;
 
-        $order->total_products_wt -= Tools::ps_round(($diff_products_tax_incl + $additionlServicesTI), 6);
+        $order->total_products_wt -= ($diff_products_tax_incl + $additionlServicesTI);
         $order->total_products_wt = $order->total_products_wt > 0 ? $order->total_products_wt : 0;
 
         $res &= $order->update();
@@ -5556,19 +5566,19 @@ class AdminOrdersControllerCore extends AdminController
         // Update OrderInvoice of this OrderDetail
         if ($order_detail->id_order_invoice != 0) {
             $order_invoice = new OrderInvoice($order_detail->id_order_invoice);
-            $order_invoice->total_paid_tax_excl -= $order_detail->total_price_tax_excl;
-            $order_invoice->total_paid_tax_incl -= $order_detail->total_price_tax_incl;
-            $order_invoice->total_products -= $order_detail->total_price_tax_excl;
-            $order_invoice->total_products_wt -= $order_detail->total_price_tax_incl;
+            $order_invoice->total_paid_tax_excl -= Tools::ps_round($order_detail->total_price_tax_excl, _PS_PRICE_COMPUTE_PRECISION_);
+            $order_invoice->total_paid_tax_incl -= Tools::ps_round($order_detail->total_price_tax_incl, _PS_PRICE_COMPUTE_PRECISION_);
+            $order_invoice->total_products -= Tools::ps_round($order_detail->total_price_tax_excl, _PS_PRICE_COMPUTE_PRECISION_);
+            $order_invoice->total_products_wt -= Tools::ps_round($order_detail->total_price_tax_incl, _PS_PRICE_COMPUTE_PRECISION_);
             $res &= $order_invoice->update();
         }
 
         // Update Order
-        $order->total_paid -= $order_detail->total_price_tax_incl;
-        $order->total_paid_tax_incl -= $order_detail->total_price_tax_incl;
-        $order->total_paid_tax_excl -= $order_detail->total_price_tax_excl;
-        $order->total_products -= $order_detail->total_price_tax_excl;
-        $order->total_products_wt -= $order_detail->total_price_tax_incl;
+        $order->total_paid -= Tools::ps_round($order_detail->total_price_tax_incl, _PS_PRICE_COMPUTE_PRECISION_);
+        $order->total_paid_tax_incl -= Tools::ps_round($order_detail->total_price_tax_incl, _PS_PRICE_COMPUTE_PRECISION_);
+        $order->total_paid_tax_excl -= Tools::ps_round($order_detail->total_price_tax_excl, _PS_PRICE_COMPUTE_PRECISION_);
+        $order->total_products -= Tools::ps_round($order_detail->total_price_tax_excl, _PS_PRICE_COMPUTE_PRECISION_);
+        $order->total_products_wt -= Tools::ps_round($order_detail->total_price_tax_incl, _PS_PRICE_COMPUTE_PRECISION_);
 
         $res &= $order->update();
 
@@ -6276,16 +6286,17 @@ class AdminOrdersControllerCore extends AdminController
                     $quantity = 1;
                 }
                 $objRoomTypeServiceProductOrderDetail->quantity = $quantity;
-                $objRoomTypeServiceProductOrderDetail->unit_price_tax_excl = Tools::ps_round($unitPrice, 6);
-                $objRoomTypeServiceProductOrderDetail->unit_price_tax_incl = Tools::ps_round($unitPrice * $oldTaxMultiplier, 6);
+                $objRoomTypeServiceProductOrderDetail->unit_price_tax_excl = $unitPrice;
+                $objRoomTypeServiceProductOrderDetail->unit_price_tax_incl = $unitPrice * $oldTaxMultiplier;
                 if ($objOrderDetail->product_price_calculation_method == Product::PRICE_CALCULATION_METHOD_PER_DAY) {
                     $quantity = $quantity * HotelHelper::getNumberOfDays(
                         $objHotelBookingDetail->date_from,
                         $objHotelBookingDetail->date_to
                     );
                 }
-                $objRoomTypeServiceProductOrderDetail->total_price_tax_excl = Tools::ps_round($objRoomTypeServiceProductOrderDetail->unit_price_tax_excl * $quantity, 6);
-                $objRoomTypeServiceProductOrderDetail->total_price_tax_incl = Tools::ps_round($objRoomTypeServiceProductOrderDetail->unit_price_tax_incl * $quantity, 6);
+                $objRoomTypeServiceProductOrderDetail->total_price_tax_excl = $total_products_tax_excl = Tools::processPriceRounding($objRoomTypeServiceProductOrderDetail->unit_price_tax_excl, $quantity);
+                $objRoomTypeServiceProductOrderDetail->total_price_tax_incl = $total_products_tax_excl = Tools::processPriceRounding($objRoomTypeServiceProductOrderDetail->unit_price_tax_incl, $quantity);
+
                 if ($res &= $objRoomTypeServiceProductOrderDetail->save()) {
                     $order = new Order($objRoomTypeServiceProductOrderDetail->id_order);
                     $priceDiffTaxExcl = $objRoomTypeServiceProductOrderDetail->total_price_tax_excl - $oldTotalPriceTaxExcl;
@@ -6295,8 +6306,8 @@ class AdminOrdersControllerCore extends AdminController
                     $objOrderDetail->product_quantity += $quantityDiff;
                     $objOrderDetail->total_price_tax_excl += $priceDiffTaxExcl;
                     $objOrderDetail->total_price_tax_incl += $priceDiffTaxIncl;
-                    $objOrderDetail->unit_price_tax_excl = Tools::ps_round(($objOrderDetail->total_price_tax_excl / $objOrderDetail->product_quantity), 6);
-                    $objOrderDetail->unit_price_tax_incl = Tools::ps_round(($objOrderDetail->total_price_tax_incl / $objOrderDetail->product_quantity), 6);
+                    $objOrderDetail->unit_price_tax_excl = ($objOrderDetail->total_price_tax_excl / $objOrderDetail->product_quantity);
+                    $objOrderDetail->unit_price_tax_incl = ($objOrderDetail->total_price_tax_incl / $objOrderDetail->product_quantity);
                     $res &= $objOrderDetail->updateTaxAmount($order);
 
                     $res &= $objOrderDetail->update();
@@ -6304,14 +6315,16 @@ class AdminOrdersControllerCore extends AdminController
                     if ($objOrderDetail->id_order_invoice != 0) {
                         // values changes as values are calculated accoding to the quantity of the product by webkul
                         $order_invoice = new OrderInvoice($objOrderDetail->id_order_invoice);
-                        $order_invoice->total_paid_tax_excl += $priceDiffTaxExcl;
-                        $order_invoice->total_paid_tax_incl += $priceDiffTaxIncl;
+                        $order_invoice->total_paid_tax_excl += Tools::ps_round((float)$priceDiffTaxExcl, _PS_PRICE_COMPUTE_PRECISION_);
+                        $order_invoice->total_paid_tax_incl += Tools::ps_round((float)$priceDiffTaxIncl, _PS_PRICE_COMPUTE_PRECISION_);
                         $res &= $order_invoice->update();
                     }
 
-                    $order->total_paid_tax_excl += $priceDiffTaxExcl;
-                    $order->total_paid_tax_incl += $priceDiffTaxIncl;
-                    $order->total_paid += $priceDiffTaxIncl;
+                    $order->total_products += Tools::ps_round((float)$priceDiffTaxExcl, _PS_PRICE_COMPUTE_PRECISION_);
+                    $order->total_products_wt += Tools::ps_round((float)$priceDiffTaxIncl, _PS_PRICE_COMPUTE_PRECISION_);
+                    $order->total_paid_tax_excl += Tools::ps_round((float)$priceDiffTaxExcl, _PS_PRICE_COMPUTE_PRECISION_);
+                    $order->total_paid_tax_incl += Tools::ps_round((float)$priceDiffTaxIncl, _PS_PRICE_COMPUTE_PRECISION_);
+                    $order->total_paid += Tools::ps_round((float)$priceDiffTaxIncl, _PS_PRICE_COMPUTE_PRECISION_);
 
                     $res &= $order->update();
                 }
@@ -6358,8 +6371,18 @@ class AdminOrdersControllerCore extends AdminController
                 } else {
                     $objOrderDetail->product_quantity -= $quantity;
 
-                    $objOrderDetail->total_price_tax_excl -= $priceTaxExcl;
-                    $objOrderDetail->total_price_tax_incl -= $priceTaxIncl;
+                    $objOrderDetail->total_price_tax_excl -= Tools::processPriceRounding(
+                        $priceTaxExcl,
+                        1,
+                        $order->round_type,
+                        $order->round_mode
+                    );
+                    $objOrderDetail->total_price_tax_incl -= Tools::processPriceRounding(
+                        $priceTaxIncl,
+                        1,
+                        $order->round_type,
+                        $order->round_mode
+                    );
 
                     $res &= $objOrderDetail->updateTaxAmount($order);
 
@@ -6369,14 +6392,16 @@ class AdminOrdersControllerCore extends AdminController
                 if ($objOrderDetail->id_order_invoice != 0) {
                     // values changes as values are calculated
                     $objOrderInvoice = new OrderInvoice($objOrderDetail->id_order_invoice);
-                    $objOrderInvoice->total_paid_tax_excl -= $priceTaxExcl;
-                    $objOrderInvoice->total_paid_tax_incl -= $priceTaxIncl;
+                    $objOrderInvoice->total_paid_tax_excl -= Tools::ps_round((float)$priceTaxExcl, _PS_PRICE_COMPUTE_PRECISION_);
+                    $objOrderInvoice->total_paid_tax_incl -= Tools::ps_round((float)$priceTaxIncl, _PS_PRICE_COMPUTE_PRECISION_);
                     $res &= $objOrderInvoice->update();
                 }
 
-                $order->total_paid_tax_excl -= $priceTaxExcl;
-                $order->total_paid_tax_incl -= $priceTaxIncl;
-                $order->total_paid -= $priceTaxIncl;
+                $order->total_products -= Tools::ps_round((float)$priceTaxExcl, _PS_PRICE_COMPUTE_PRECISION_);
+                $order->total_products_wt -= Tools::ps_round((float)$priceTaxIncl, _PS_PRICE_COMPUTE_PRECISION_);
+                $order->total_paid_tax_excl -= Tools::ps_round((float)$priceTaxExcl, _PS_PRICE_COMPUTE_PRECISION_);
+                $order->total_paid_tax_incl -= Tools::ps_round((float)$priceTaxIncl, _PS_PRICE_COMPUTE_PRECISION_);
+                $order->total_paid -= Tools::ps_round((float)$priceTaxIncl, _PS_PRICE_COMPUTE_PRECISION_);
 
                 $res &= $order->update();
             }
@@ -6553,24 +6578,18 @@ class AdminOrdersControllerCore extends AdminController
                                     $cart->id
                                 );
 
-                                $totalPriceChangeTaxExcl += $totalPriceTaxExcl = ($unitPriceTaxExcl * $product['cart_quantity']);
-                                $totalPriceChangeTaxIncl += $totalPriceTaxIncl = ($unitPriceTaxIncl * $product['cart_quantity']);
-                                switch (Configuration::get('PS_ROUND_TYPE')) {
-                                    case Order::ROUND_TOTAL:
-                                        $product['total'] = $totalPriceTaxExcl;
-                                        $product['total_wt'] = $totalPriceTaxIncl;
-                                        break;
-                                    case Order::ROUND_LINE:
-                                        $product['total'] = Tools::ps_round($totalPriceTaxExcl, _PS_PRICE_COMPUTE_PRECISION_);
-                                        $product['total_wt'] = Tools::ps_round($totalPriceTaxIncl, _PS_PRICE_COMPUTE_PRECISION_);
-                                        break;
-
-                                    case Order::ROUND_ITEM:
-                                    default:
-                                        $product['total'] = Tools::ps_round($totalPriceTaxExcl, _PS_PRICE_COMPUTE_PRECISION_);
-                                        $product['total_wt'] = Tools::ps_round($totalPriceTaxIncl, _PS_PRICE_COMPUTE_PRECISION_);
-                                        break;
-                                }
+                                $totalPriceChangeTaxExcl += $totalPriceTaxExcl = Tools::processPriceRounding(
+                                    $unitPriceTaxExcl,
+                                    $product['cart_quantity'],
+                                    $objOrder->round_type,
+                                    $objOrder->round_mode
+                                );
+                                $totalPriceChangeTaxIncl += $totalPriceTaxIncl = Tools::processPriceRounding(
+                                    $unitPriceTaxIncl,
+                                    $product['cart_quantity'],
+                                    $objOrder->round_type,
+                                    $objOrder->round_mode
+                                );
                             }
                         }
 
@@ -6592,17 +6611,16 @@ class AdminOrdersControllerCore extends AdminController
                         $objRoomTypeServiceProductOrderDetail->save();
 
                         // update totals amount of order
-                        $order->total_products += (float)$totalPriceChangeTaxExcl;
-                        $order->total_products_wt += (float)$totalPriceChangeTaxIncl;
-
-                        $order->total_paid += Tools::ps_round((float)$totalPriceChangeTaxIncl, 2);
-                        $order->total_paid_tax_excl += Tools::ps_round((float)($totalPriceChangeTaxExcl), 2);
-                        $order->total_paid_tax_incl += Tools::ps_round((float)($totalPriceChangeTaxIncl), 2);
+                        $order->total_products += Tools::ps_round((float)$totalPriceChangeTaxExcl, _PS_PRICE_COMPUTE_PRECISION_);
+                        $order->total_products_wt += Tools::ps_round((float)$totalPriceChangeTaxIncl, _PS_PRICE_COMPUTE_PRECISION_);
+                        $order->total_paid += Tools::ps_round((float)$totalPriceChangeTaxIncl, _PS_PRICE_COMPUTE_PRECISION_);
+                        $order->total_paid_tax_excl += Tools::ps_round((float)$totalPriceChangeTaxExcl, _PS_PRICE_COMPUTE_PRECISION_);
+                        $order->total_paid_tax_incl += Tools::ps_round((float)$totalPriceChangeTaxIncl, _PS_PRICE_COMPUTE_PRECISION_);
 
                         // update invoice total
                         if (isset($objOrderInvoice) && Validate::isLoadedObject($objOrderInvoice)) {
-                            $objOrderInvoice->total_paid_tax_excl += Tools::ps_round((float)($totalPriceChangeTaxExcl), 2);
-                            $objOrderInvoice->total_paid_tax_incl += Tools::ps_round((float)($totalPriceChangeTaxIncl), 2);
+                            $objOrderInvoice->total_paid_tax_excl += Tools::ps_round((float)$totalPriceChangeTaxExcl, _PS_PRICE_COMPUTE_PRECISION_);
+                            $objOrderInvoice->total_paid_tax_incl += Tools::ps_round((float)$totalPriceChangeTaxIncl, _PS_PRICE_COMPUTE_PRECISION_);
                             $objOrderInvoice->save();
                         }
 
@@ -6705,33 +6723,30 @@ class AdminOrdersControllerCore extends AdminController
                                 null,
                                 $demand['unit_price']
                             );
-                            $qty = 1;
+                            $numDays = 1;
                             if ($objGlobalDemand->price_calc_method == HotelRoomTypeGlobalDemand::WK_PRICE_CALC_METHOD_EACH_DAY) {
                                 $numDays = $objHtlBkDtl->getNumberOfDays(
                                     $objBookingDetail->date_from,
                                     $objBookingDetail->date_to
                                 );
-                                if ($numDays > 1) {
-                                    $qty *= $numDays;
-                                }
                             }
-                            $objBookingDemand->total_price_tax_excl = $objBookingDemand->unit_price_tax_excl * $qty;
-                            $objBookingDemand->total_price_tax_incl = $objBookingDemand->unit_price_tax_incl * $qty;
+                            $objBookingDemand->total_price_tax_excl = $objBookingDemand->unit_price_tax_excl * $numDays;
+                            $objBookingDemand->total_price_tax_incl = $objBookingDemand->unit_price_tax_incl * $numDays;
 
                             $order_detail = new OrderDetail($objBookingDetail->id_order_detail);
                             // Update OrderInvoice of this OrderDetail
                             if ($order_detail->id_order_invoice != 0) {
                                 // values changes as values are calculated accoding to the quantity of the product by webkul
                                 $order_invoice = new OrderInvoice($order_detail->id_order_invoice);
-                                $order_invoice->total_paid_tax_excl += $objBookingDemand->total_price_tax_excl;
-                                $order_invoice->total_paid_tax_incl += $objBookingDemand->total_price_tax_incl;
+                                $order_invoice->total_paid_tax_excl += Tools::ps_round((float)$objBookingDemand->total_price_tax_excl, _PS_PRICE_COMPUTE_PRECISION_);
+                                $order_invoice->total_paid_tax_incl += Tools::ps_round((float)$objBookingDemand->total_price_tax_incl, _PS_PRICE_COMPUTE_PRECISION_);
                                 $res &= $order_invoice->update();
                             }
 
                             // change order total
-                            $order->total_paid_tax_excl += $objBookingDemand->total_price_tax_excl;
-                            $order->total_paid_tax_incl += $objBookingDemand->total_price_tax_incl;
-                            $order->total_paid += $objBookingDemand->total_price_tax_incl;
+                            $order->total_paid_tax_excl += Tools::ps_round((float)$objBookingDemand->total_price_tax_excl, _PS_PRICE_COMPUTE_PRECISION_);
+                            $order->total_paid_tax_incl += Tools::ps_round((float)$objBookingDemand->total_price_tax_incl, _PS_PRICE_COMPUTE_PRECISION_);
+                            $order->total_paid += Tools::ps_round((float)$objBookingDemand->total_price_tax_incl, _PS_PRICE_COMPUTE_PRECISION_);
 
                             $objBookingDemand->price_calc_method = $objGlobalDemand->price_calc_method;
                             $objBookingDemand->id_tax_rules_group = $objGlobalDemand->id_tax_rules_group;
@@ -6809,15 +6824,16 @@ class AdminOrdersControllerCore extends AdminController
                     if ($order_detail->id_order_invoice != 0) {
                         // values changes as values are calculated accoding to the quantity of the product by webkul
                         $order_invoice = new OrderInvoice($order_detail->id_order_invoice);
-                        $order_invoice->total_paid_tax_excl += $priceDiffTaxExcl;
-                        $order_invoice->total_paid_tax_incl += $priceDiffTaxIncl;
+
+                        $order_invoice->total_paid_tax_excl += Tools::ps_round((float)$priceDiffTaxExcl, _PS_PRICE_COMPUTE_PRECISION_);
+                        $order_invoice->total_paid_tax_incl += Tools::ps_round((float)$priceDiffTaxIncl, _PS_PRICE_COMPUTE_PRECISION_);
                         $order_invoice->update();
                     }
 
                     $order = new Order($objBookingDetail->id_order);
-                    $order->total_paid_tax_excl += $priceDiffTaxExcl;
-                    $order->total_paid_tax_incl += $priceDiffTaxIncl;
-                    $order->total_paid += $priceDiffTaxIncl;
+                    $order->total_paid_tax_excl += Tools::ps_round((float)$priceDiffTaxExcl, _PS_PRICE_COMPUTE_PRECISION_);
+                    $order->total_paid_tax_incl += Tools::ps_round((float)$priceDiffTaxIncl, _PS_PRICE_COMPUTE_PRECISION_);
+                    $order->total_paid += Tools::ps_round((float)$priceDiffTaxIncl, _PS_PRICE_COMPUTE_PRECISION_);
                     if ($order->save()) {
                         $response['facilities_panel'] = $this->processRenderFacilitiesBlock(
                             $order->id,
@@ -6849,9 +6865,11 @@ class AdminOrdersControllerCore extends AdminController
                         if (Validate::isLoadedObject($objBookingDetail = new HotelBookingDetail($objBookingDemand->id_htl_booking))) {
                             // change order total
                             $order = new Order($objBookingDetail->id_order);
-                            $order->total_paid_tax_excl -= $objBookingDemand->total_price_tax_excl;
-                            $order->total_paid_tax_incl -= $objBookingDemand->total_price_tax_incl;
-                            $order->total_paid -= $objBookingDemand->total_price_tax_incl;
+
+                            $order->total_paid_tax_excl -= Tools::ps_round((float)$objBookingDemand->total_price_tax_excl, _PS_PRICE_COMPUTE_PRECISION_);
+                            $order->total_paid_tax_incl -= Tools::ps_round((float)$objBookingDemand->total_price_tax_incl, _PS_PRICE_COMPUTE_PRECISION_);
+                            $order->total_paid -= Tools::ps_round((float)$objBookingDemand->total_price_tax_incl, _PS_PRICE_COMPUTE_PRECISION_);
+
                             $order->save();
 
                             $order_detail = new OrderDetail($objBookingDetail->id_order_detail);
@@ -6859,8 +6877,8 @@ class AdminOrdersControllerCore extends AdminController
                             if ($order_detail->id_order_invoice != 0) {
                                 // values changes as values are calculated accoding to the quantity of the product by webkul
                                 $order_invoice = new OrderInvoice($order_detail->id_order_invoice);
-                                $order_invoice->total_paid_tax_excl -= $objBookingDemand->total_price_tax_excl;
-                                $order_invoice->total_paid_tax_incl -= $objBookingDemand->total_price_tax_incl;
+                                $order_invoice->total_paid_tax_excl -= Tools::ps_round((float)$objBookingDemand->total_price_tax_excl, _PS_PRICE_COMPUTE_PRECISION_);
+                                $order_invoice->total_paid_tax_incl -= Tools::ps_round((float)$objBookingDemand->total_price_tax_incl, _PS_PRICE_COMPUTE_PRECISION_);
                                 $res &= $order_invoice->update();
                             }
                             if ($res) {

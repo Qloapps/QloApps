@@ -748,9 +748,10 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
             }
         }
         if ($quantity) {
-            $totalPrice['total_price_tax_incl'] = $totalPrice['total_price_tax_incl'] * $quantity;
-            $totalPrice['total_price_tax_excl'] = $totalPrice['total_price_tax_excl'] * $quantity;
+            $totalPrice['total_price_tax_incl'] = Tools::processPriceRounding($totalPrice['total_price_tax_incl'], $quantity);
+            $totalPrice['total_price_tax_excl'] = Tools::processPriceRounding($totalPrice['total_price_tax_excl'], $quantity);
         }
+
         return $totalPrice;
     }
 
