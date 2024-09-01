@@ -415,7 +415,7 @@ class RoomTypeServiceProductCartDetail extends ObjectModel
             foreach ($serviceProducts as $product) {
                 $qty = $product['quantity'] ? (int)$product['quantity'] : 1;
                 if ($getTotalPrice) {
-                    $servicePrice += $objRoomTypeServiceProductPrice->getServicePrice(
+                    $servicePrice = $objRoomTypeServiceProductPrice->getServicePrice(
                         (int)$product['id_product'],
                         (int)$product['room_type_id_product'],
                         1,

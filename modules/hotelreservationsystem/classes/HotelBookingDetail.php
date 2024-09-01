@@ -2528,7 +2528,7 @@ class HotelBookingDetail extends ObjectModel
         $newDateFrom,
         $newDateTo,
         $occupancy,
-        $newTotalPrice = null,
+        $newTotalPrice,
         $idHotelBookingDetail
     ) {
         $objHotelBookingDetail = new self((int) $idHotelBookingDetail);
@@ -2544,19 +2544,7 @@ class HotelBookingDetail extends ObjectModel
             $objHotelCartBookingData = new HotelCartBookingData($idHotelCartBookingData);
             if (Validate::isLoadedObject($objHotelCartBookingData)) {
                 // calculate new prices
-                $newTotalPriceTE = '';
-                $newTotalPriceTI = '';
                 $newNumDays = $this->getNumberOfDays($newDateFrom, $newDateTo);
-                if ($newTotalPrice) {
-                    $newTotalPriceTE = $newTotalPrice['tax_excl'];
-                    $newTotalPriceTI = $newTotalPrice['tax_incl'];
-                } else {
-                    $oldNumDays = $this->getNumberOfDays($oldDateFrom, $oldDateTo);
-                    $unitRoomPriceTE = $objHotelBookingDetail->total_price_tax_excl / $oldNumDays;
-                    $unitRoomPriceTI = $objHotelBookingDetail->total_price_tax_incl / $oldNumDays;
-                    $newTotalPriceTE = $unitRoomPriceTE * $newNumDays;
-                    $newTotalPriceTI = $unitRoomPriceTI * $newNumDays;
-                }
 
                 // update $objHotelCartBookingData
                 $objHotelCartBookingData->date_from = $newDateFrom;
@@ -2569,8 +2557,8 @@ class HotelBookingDetail extends ObjectModel
                 // update $objHotelBookingDetail
                 $objHotelBookingDetail->date_from = $newDateFrom;
                 $objHotelBookingDetail->date_to = $newDateTo;
-                $objHotelBookingDetail->total_price_tax_excl = $newTotalPriceTE;
-                $objHotelBookingDetail->total_price_tax_incl = $newTotalPriceTI;
+                $objHotelBookingDetail->total_price_tax_excl = $newTotalPrice['tax_excl'];
+                $objHotelBookingDetail->total_price_tax_incl = $newTotalPrice['tax_incl'];
                 $objHotelBookingDetail->adults = $occupancy['adults'];
                 $objHotelBookingDetail->children = $occupancy['children'];
                 $objHotelBookingDetail->child_ages = json_encode($occupancy['child_ages']);

@@ -1790,9 +1790,9 @@ class CartCore extends ObjectModel
                         0
                     );
                     if ($with_taxes) {
-                        $totalPriceByProduct += $roomTotalPrice['total_price_tax_incl'];
+                        $totalPriceByProduct = $roomTotalPrice['total_price_tax_incl'];
                     } else {
-                        $totalPriceByProduct += $roomTotalPrice['total_price_tax_excl'];
+                        $totalPriceByProduct = $roomTotalPrice['total_price_tax_excl'];
                     }
 
                     // If customer has selected advance payment of the cart

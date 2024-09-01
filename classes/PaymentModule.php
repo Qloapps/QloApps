@@ -954,8 +954,8 @@ abstract class PaymentModuleCore extends Module
                                                 );
                                             }
 
-                                            $objBookingDemand->total_price_tax_excl = $objBookingDemand->unit_price_tax_excl * $numDays;
-                                            $objBookingDemand->total_price_tax_incl = $objBookingDemand->unit_price_tax_incl * $numDays;
+                                            $objBookingDemand->total_price_tax_excl = Tools::processPriceRounding(($objBookingDemand->unit_price_tax_excl * $numDays));
+                                            $objBookingDemand->total_price_tax_incl = Tools::processPriceRounding(($objBookingDemand->unit_price_tax_incl * $numDays));
 
                                             $objBookingDemand->price_calc_method = $objGlobalDemand->price_calc_method;
                                             $objBookingDemand->id_tax_rules_group = $objGlobalDemand->id_tax_rules_group;
