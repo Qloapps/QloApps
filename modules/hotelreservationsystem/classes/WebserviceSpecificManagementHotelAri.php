@@ -235,6 +235,11 @@ class WebserviceSpecificManagementHotelAri extends ObjectModel implements Webser
                             $dateWiseBreakdown = 1;
 
                             $datesAriInfo = [];
+                            $bookingParams['search_available'] = 1;
+                            $bookingParams['search_booked'] = 1;
+                            $bookingParams['search_partial'] = 1;
+                            $bookingParams['search_unavai'] = 1;
+                            $ariInfo = $objBookingDtl->getBookingData($bookingParams);
 
                             $dateFrom = $bookingParams['date_from'];
                             $dateTo = $bookingParams['date_to'];
@@ -243,20 +248,73 @@ class WebserviceSpecificManagementHotelAri extends ObjectModel implements Webser
                             $dateBookingParams = $bookingParams;
                             // for a single date there is no use of partial available rooms
                             $dateBookingParams['search_partial'] = 0;
+                            $objCurrency = new Currency(Configuration::get('PS_CURRENCY_DEFAULT'));
 
-                            for ($currentDate = $dateFrom; $currentDate < $dateTo; $currentDate = date('Y-m-d', strtotime('+1 day', strtotime($currentDate)))) {
-                                $dateBookingParams['date_from'] = $currentDate;
-                                $dateBookingParams['date_to'] = date('Y-m-d', strtotime('+1 day', strtotime($currentDate)));
+                            foreach ($ariInfo['rm_data'] as $key => $roomType) {
+                                $rooms = HotelRoomInformation::getHotelRoomsInfo($ariParams['id_hotel'], $roomType['id_product']);
+                                $ariInfo['rm_data'][$key]['all_rooms'] = array_map(function ($room) { return array('id_room' => $room['id'], 'room_number' => $room['room_num']); }, $rooms);
+
+                            }
+                            for ($currentDate = $dateFrom; $currentDate < $dateTo; $currentDate = date('Y-m-d H:i:s', strtotime('+1 day', strtotime($currentDate)))) {
+                                // $dateBookingParams['date_from'] = $currentDate;
+                                // $dateBookingParams['date_to'] = date('Y-m-d', strtotime('+1 day', strtotime($currentDate)));
 
                                 // get inventories for every date
-                                $ariInfo = $objBookingDtl->getBookingData($dateBookingParams);
-                                // append request fields also. will be attached in the response xml
-                                $ariInfo['id_hotel'] = $ariParams['id_hotel'];
-                                $ariInfo['date_from'] = $dateBookingParams['date_from'];
-                                $ariInfo['date_to'] = $dateBookingParams['date_to'];
-                                $ariInfo['num_rooms'] = $totalRooms;
+                                // $ariInfo = $objBookingDtl->getBookingData($dateBookingParams);
 
-                                $searchAriData[] = $ariInfo;
+                                // append request fields also. will be attached in the response xml
+                                $ariDateInfo['id_hotel'] = $ariParams['id_hotel'];
+                                $ariDateInfo['date_from'] = $currentDate;
+                                $ariDateInfo['date_to'] = date('Y-m-d H:i:s', strtotime('+1 day', strtotime($currentDate)));
+                                $ariDateInfo['currency'] = $objCurrency->iso_code;
+                                $ariDateInfo['total_rooms'] = $totalRooms;
+                                $ariDateInfo['total_available_rooms'] = $totalRooms;
+                                $ariDateInfo['room_types'] = array();
+                                foreach ($ariInfo['rm_data'] as $roomType)
+                                {
+                                    $rooms = array();
+                                    $rooms['available'] = $roomType['all_rooms'];
+                                    foreach ($rooms['available'] as $roomKey => $room) {
+                                        if (isset($roomType['data']['booked'][$room['id_room']])) {
+                                            foreach ($roomType['data']['booked'][$room['id_room']]['detail'] as $bookedDetail) {
+                                                if ($bookedDetail['date_to'] > $ariDateInfo['date_from'] && $bookedDetail['date_from'] <= $ariDateInfo['date_to']) {
+                                                    unset($rooms['available'][$roomKey]);
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                    $roomTypePriceTE = HotelRoomTypeFeaturePricing::getRoomTypeFeaturePricesPerDay(
+                                        $roomTypeInfo['id_product'],
+                                        $ariInfo['date_from'],
+                                        $ariInfo['date_to'],
+                                        0
+                                    );
+
+                                    $roomTypePriceTI = HotelRoomTypeFeaturePricing::getRoomTypeFeaturePricesPerDay(
+                                        $roomTypeInfo['id_product'],
+                                        $ariInfo['date_from'],
+                                        $ariInfo['date_to'],
+                                        1
+                                    );
+                                    $totalBookingPrice = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice(
+                                        $roomTypeInfo['id_product'],
+                                        $ariInfo['date_from'],
+                                        $ariInfo['date_to'],
+                                        $ariInfo['num_rooms']
+                                    );
+                                    $ariDateInfo['room_types'][] = array(
+                                        'id_room_type' => $roomType->id_product,
+                                        'base_price' => $roomTypePriceTE,
+                                        'base_price_with_tax' => $roomTypePriceTE,
+                                        'total_price' => $totalBookingPrice['total_price_tax_excl'],
+                                        'total_price_with_tax' => $totalBookingPrice['total_price_tax_incl'],
+                                        'name' => $roomType->name,
+                                        'rooms' => array()
+                                    );
+                                }
+
+                                $searchAriData[] = $ariDateInfo;
                             }
                         } else { // If api is called for getting ari info for a particular date range
                             $dateWiseBreakdown = 0;
@@ -272,6 +330,7 @@ class WebserviceSpecificManagementHotelAri extends ObjectModel implements Webser
 
                             $searchAriData[] = $ariInfo;
                         }
+                        ddd($searchAriData);
 
                         // We have to create the json and xml response for request by ourself. So we need to check if data to be sent in xml or json
                         // We have no way to check the output format from parent classed. So we used below code
