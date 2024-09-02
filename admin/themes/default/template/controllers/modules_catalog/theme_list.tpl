@@ -1,9 +1,9 @@
 {*
-* 2010-2022 Webkul.
+* Copyright since 2007 Webkul.
 *
 * NOTICE OF LICENSE
 *
-* All right is reserved,
+* All rights is reserved,
 * Please go through this link for complete license : https://store.webkul.com/license.html
 *
 * DISCLAIMER
@@ -13,7 +13,7 @@
 * needs please refer to https://store.webkul.com/customisation-guidelines/ for more information.
 *
 *  @author    Webkul IN <support@webkul.com>
-*  @copyright 2010-2022 Webkul IN
+*  @copyright since 2007 Webkul IN
 *  @license   https://store.webkul.com/license.html
 *}
 

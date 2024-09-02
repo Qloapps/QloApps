@@ -1,6 +1,6 @@
 <?php
 /**
-* Copyright since 2010 Webkul.
+* * Copyright since 2007 Webkul.
 *
 * NOTICE OF LICENSE
 *
@@ -14,7 +14,7 @@
 * needs please refer to https://store.webkul.com/customisation-guidelines/ for more information.
 *
 *  @author    Webkul IN <support@webkul.com>
-*  @copyright since 2010 Webkul IN
+*  @copyright since 2007 Webkul IN
 *  @license   https://store.webkul.com/license.html
 */
 

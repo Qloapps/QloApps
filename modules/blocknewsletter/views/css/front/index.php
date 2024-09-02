@@ -1,6 +1,6 @@
 <?php
 /**
- * 2010-2024 Webkul.
+ * Copyright since 2007 Webkul.
  *
  * NOTICE OF LICENSE
  *
@@ -14,6 +14,6 @@
  * needs please refer to CustomizationPolicy.txt file inside our module for more information.
  *
  * @author Webkul IN
- * @copyright 2010-2024 Webkul IN
+ * @copyright since 2007 Webkul IN
  * @license LICENSE.txt
  */
