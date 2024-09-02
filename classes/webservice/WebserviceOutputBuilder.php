@@ -626,7 +626,7 @@ class WebserviceOutputBuilderCore
                 }
                 $output_details = '';
                 foreach ($objects_assoc as $object_assoc) {
-                    if (isset($association['single_entity']) && $association['single_entity']) {
+                    if (isset($association['only_leaf_nodes']) && $association['only_leaf_nodes']) {
                         unset($association['single_entity']);
                         unset($association['getter']);
                         unset($association['setter']);
@@ -690,7 +690,7 @@ class WebserviceOutputBuilderCore
         $output .= $this->setIndent($depth - 1).$this->objectRender->renderNodeHeader($resource_name, array(), $more_attr);
 
         foreach ($fields_assoc as $field_name => $field) {
-            if (isset($field['resource'])) {
+            if (isset($field['resource']) && isset($field['fields'])) {
                 $parent_details = array(
                     'object_id'    => null,
                     'entity_name'    => $field['resource'],
