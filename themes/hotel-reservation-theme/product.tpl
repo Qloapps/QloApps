@@ -148,6 +148,7 @@
 													</li>
 												{/foreach}
 											{/if}
+											{hook h='displayProductExtraThumbnail'}
 											</ul>
 										</div> <!-- end thumbs_list -->
 										{if isset($images) && count($images) > 2}
