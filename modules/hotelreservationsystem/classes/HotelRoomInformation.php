@@ -34,6 +34,9 @@ class HotelRoomInformation extends ObjectModel
     const STATUS_INACTIVE = 2;
     const STATUS_TEMPORARY_INACTIVE = 3;
 
+    const STATUS_SEARCH_LOS_UNSATISFIED = 4;
+    const STATUS_SEARCH_OCCUPANCY_UNSATISFIED = 5;
+
     public static $definition = array(
         'table' => 'htl_room_information',
         'primary' => 'id',
@@ -76,7 +79,7 @@ class HotelRoomInformation extends ObjectModel
     {
         if ($idRoom = $this->id) {
             // delete rooms from cart which are set inactive
-            if ($this->id_status == self::STATUS_INACTIVE) {
+            if ($this->id_status == HotelRoomInformation::STATUS_INACTIVE) {
                 $objCartBookingData = new HotelCartBookingData();
                 if (!$objCartBookingData->deleteCartBookingData(0, 0, $idRoom)) {
                     return false;
@@ -138,23 +141,35 @@ class HotelRoomInformation extends ObjectModel
 
     public function getAllRoomStatus()
     {
-        $moduleInstance = Module::getInstanceByName('hotelreservationsystem');
-
         $status = array(
             'STATUS_ACTIVE' => array(
-                'id' => self::STATUS_ACTIVE,
-                'status' => $moduleInstance->l('Active', 'hotelreservationsystem')
+                'id' => HotelRoomInformation::STATUS_ACTIVE,
+                'status' => self::getRoomStatusTitle(HotelRoomInformation::STATUS_ACTIVE)
             ),
             'STATUS_INACTIVE' => array(
-                'id' => self::STATUS_INACTIVE,
-                'status' => $moduleInstance->l('Inactive', 'hotelreservationsystem')
+                'id' => HotelRoomInformation::STATUS_INACTIVE,
+                'status' => self::getRoomStatusTitle(HotelRoomInformation::STATUS_INACTIVE)
             ),
             'STATUS_TEMPORARY_INACTIVE' => array(
-                'id' => self::STATUS_TEMPORARY_INACTIVE,
-                'status' => $moduleInstance->l('Temporarily Inactive', 'hotelreservationsystem')
+                'id' => HotelRoomInformation::STATUS_TEMPORARY_INACTIVE,
+                'status' => self::getRoomStatusTitle(HotelRoomInformation::STATUS_TEMPORARY_INACTIVE)
             ),
         );
         return $status;
+    }
+
+    public static function getRoomStatusTitle($idStatus)
+    {
+        $moduleInstance = Module::getInstanceByName('hotelreservationsystem');
+        $status = array(
+            HotelRoomInformation::STATUS_ACTIVE => $moduleInstance->l('Active', 'hotelreservationsystem'),
+            HotelRoomInformation::STATUS_INACTIVE => $moduleInstance->l('Inactive', 'hotelreservationsystem'),
+            HotelRoomInformation::STATUS_TEMPORARY_INACTIVE => $moduleInstance->l('Temporarily Inactive', 'hotelreservationsystem'),
+            HotelRoomInformation::STATUS_SEARCH_LOS_UNSATISFIED => $moduleInstance->l('Length of stay restriction not satisfied', 'hotelreservationsystem'),
+            HotelRoomInformation::STATUS_SEARCH_OCCUPANCY_UNSATISFIED => $moduleInstance->l('Occupancy exceeds room capacity', 'hotelreservationsystem'),
+        );
+
+        return isset($status[$idStatus]) ? $status[$idStatus] : '';
     }
 
     /**
@@ -285,7 +300,10 @@ class HotelRoomInformation extends ObjectModel
         if ($roomTypeInfo = $objRoomType->getRoomTypeInfoByIdProduct($this->id_product)) {
             $this->id_hotel = $roomTypeInfo['id_hotel'];
             return $this->add($autodate, $null_values);
+        } else {
+            WebserviceRequest::getInstance()->setError(400, 'Invalid id product', 134);
         }
+
         return false;
     }
 
@@ -296,7 +314,10 @@ class HotelRoomInformation extends ObjectModel
         if ($roomTypeInfo = $objRoomType->getRoomTypeInfoByIdProduct($this->id_product)) {
             $this->id_hotel = $roomTypeInfo['id_hotel'];
             return $this->update($null_values);
+        } else {
+            WebserviceRequest::getInstance()->setError(400, 'Invalid id product', 134);
         }
+
         return false;
     }
 

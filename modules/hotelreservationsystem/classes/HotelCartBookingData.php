@@ -1905,13 +1905,31 @@ class HotelCartBookingData extends ObjectModel
         }
     }
 
+    public function update($null_values = false)
+    {
+        if (!$this->extra_demands) {
+            $this->extra_demands = json_encode(array());
+        }
+
+        return parent::update($null_values);
+    }
+
+    public function add($auto_date = true, $null_values = false)
+    {
+        if (!$this->extra_demands) {
+            $this->extra_demands = json_encode(array());
+        }
+
+        return parent::add($auto_date, $null_values);
+    }
+
     // Webservice :: get extra demands for the cart booking
     public function getWsExtraDemands()
     {
         $extraDemands = json_decode($this->extra_demands, true);
-        if (count($extraDemands)) {
-            foreach ($extraDemands as &$demnad) {
-                $demnad['id'] = $demnad['id_global_demand'];
+        if ($extraDemands) {
+            foreach ($extraDemands as &$demand) {
+                $demand['id'] = $demand['id_global_demand'];
             }
             return $extraDemands;
         }
