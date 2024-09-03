@@ -1758,20 +1758,19 @@ class CartCore extends ObjectModel
                 )) {
                     foreach ($servicesWithRoom as $service) {
                         if ($with_taxes) {
-                            $servicePrice = $service['unit_price_tax_incl'];
+                            $servicePrice = $service['total_price_tax_incl'];
                         } else {
-                            $servicePrice = $service['unit_price_tax_excl'];
+                            $servicePrice = $service['total_price_tax_excl'];
                         }
 
                         // Rounding as per configurations
                         if ($ps_round_type == Order::ROUND_TOTAL) {
-                            $products_total[$id_tax_rules_group.'_'.$id_address] += Tools::processPriceRounding($servicePrice, $service['quantity']);
+                            $products_total[$id_tax_rules_group.'_'.$id_address] += $servicePrice;
                         } else {
-                            $products_total[$id_tax_rules_group] += Tools::processPriceRounding($servicePrice, $service['quantity']);
+                            $products_total[$id_tax_rules_group] += $servicePrice;
                         }
                     }
                 }
-
             } else if ($roomTypesByIdProduct = $objCartBookingData->getCartInfoIdCartIdProduct($this->id, $product['id_product'])) {
                 // by webkul to calculate rates of the product from hotelreservation syatem tables with feature prices....
                 $totalPriceByProduct = 0;

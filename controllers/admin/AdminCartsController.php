@@ -847,6 +847,7 @@ class AdminCartsControllerCore extends AdminController
                 $cart['total_price'] = Tools::displayPrice($cart_obj->getOrderTotal(), $currency);
             }
         }
+
         if (count($orders)) {
             foreach ($orders as &$order) {
                 $order['total_paid_real'] = Tools::displayPrice($order['total_paid_real'], $currency);
@@ -1121,11 +1122,11 @@ class AdminCartsControllerCore extends AdminController
                 )) {
                     $selectedRoomServiceProduct['selected_service'] = $objRoomTypeServiceProductCartDetail->getServiceProductsInCart(
                         $idCart,
-                        $idProduct = 0,
-                        $idHotel = 0,
-                        $roomTypeIdProduct = 0,
-                        $dateFrom = 0,
-                        $dateTo = 0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
                         $selectedRoomServiceProduct['id'],
                     );
                 }
