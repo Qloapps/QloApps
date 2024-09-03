@@ -5039,11 +5039,15 @@ class AdminOrdersControllerCore extends AdminController
                                 $newTotalPriceTaxExcl =  $newNumDays * $objRoomTypeServiceProductOrderDetail->quantity * $unitPriceTaxExcl;                                $unitPriceTaxIncl = $objRoomTypeServiceProductOrderDetail->unit_price_tax_incl;
                                 $newTotalPriceTaxIncl = $newNumDays * $objRoomTypeServiceProductOrderDetail->quantity * $unitPriceTaxIncl;
 
+                                $objOrder->total_products -= $objRoomTypeServiceProductOrderDetail->total_price_tax_excl;
+                                $objOrder->total_products_wt -= $objRoomTypeServiceProductOrderDetail->total_price_tax_incl;
                                 $objOrder->total_paid_tax_excl -= $objRoomTypeServiceProductOrderDetail->total_price_tax_excl;
                                 $objOrder->total_paid_tax_incl -= $objRoomTypeServiceProductOrderDetail->total_price_tax_incl;
                                 $objOrder->total_paid -= $objRoomTypeServiceProductOrderDetail->total_price_tax_incl;
 
                                 // change order total
+                                $objOrder->total_products += $newTotalPriceTaxExcl;
+                                $objOrder->total_products_wt += $newTotalPriceTaxIncl;
                                 $objOrder->total_paid_tax_excl += $newTotalPriceTaxExcl;
                                 $objOrder->total_paid_tax_incl += $newTotalPriceTaxIncl;
                                 $objOrder->total_paid += $newTotalPriceTaxIncl;
@@ -6309,6 +6313,8 @@ class AdminOrdersControllerCore extends AdminController
                         $res &= $order_invoice->update();
                     }
 
+                    $order->total_products += $priceDiffTaxExcl;
+                    $order->total_products_wt += $priceDiffTaxIncl;
                     $order->total_paid_tax_excl += $priceDiffTaxExcl;
                     $order->total_paid_tax_incl += $priceDiffTaxIncl;
                     $order->total_paid += $priceDiffTaxIncl;
@@ -6374,6 +6380,8 @@ class AdminOrdersControllerCore extends AdminController
                     $res &= $objOrderInvoice->update();
                 }
 
+                $order->total_products -= $priceTaxExcl;
+                $order->total_products_wt -= $priceTaxIncl;
                 $order->total_paid_tax_excl -= $priceTaxExcl;
                 $order->total_paid_tax_incl -= $priceTaxIncl;
                 $order->total_paid -= $priceTaxIncl;
