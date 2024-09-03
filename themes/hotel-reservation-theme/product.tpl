@@ -148,7 +148,7 @@
 													</li>
 												{/foreach}
 											{/if}
-											{hook h='displayProductExtraThumbnail'}
+											{hook h='displayRoomTypeThumbnailsBottom'}
 											</ul>
 										</div> <!-- end thumbs_list -->
 										{if isset($images) && count($images) > 2}
@@ -156,6 +156,8 @@
 												{l s='Next'}
 											</a>
 										{/if}
+										dasdas
+										{hook h="displayRoomTypeThumbnailsAfter"}
 									</div> <!-- end views-block -->
 								<!-- end thumbnails -->
 							{/if}
