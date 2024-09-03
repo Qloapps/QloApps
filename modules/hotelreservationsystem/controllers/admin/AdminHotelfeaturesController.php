@@ -41,11 +41,6 @@ class AdminHotelFeaturesController extends ModuleAdminController
             'desc' => $this->l('Add new Features'),
             'imgclass' => 'new'
         );
-
-        $this->page_header_toolbar_btn['new'] = array(
-            'href' => $this->context->link->getAdminLink('AdminAssignHotelFeatures'),
-            'desc' => $this->l('Assign Features To Hotel'),
-        );
     }
 
     public function renderView()
