@@ -564,6 +564,9 @@ class CartRuleCore extends ObjectModel
         if (strtotime($this->date_to) < time()) {
             return (!$display_error) ? false : Tools::displayError('This voucher has expired');
         }
+        if (!$alreadyInCart && $context->cart->getOrderTotal(true, Cart::BOTH) <= 0) {
+            return (!$display_error) ? false : Tools::displayError('You cannot add more vouchers. Please remove an existing voucher before applying a new one.');
+        }
 
         if ($context->cart->id_customer) {
             $quantityUsed = Db::getInstance()->getValue('
@@ -970,8 +973,8 @@ class CartRuleCore extends ObjectModel
 
         $all_cart_rules_ids = $context->cart->getOrderedCartRulesIds();
 
-        $cart_amount_ti = $context->cart->getOrderTotal(true, Cart::ONLY_PRODUCTS);
-        $cart_amount_te = $context->cart->getOrderTotal(false, Cart::ONLY_PRODUCTS);
+        $cart_amount_ti = $context->cart->getOrderTotal(true, Cart::ONLY_PRODUCTS_WITH_DEMANDS);
+        $cart_amount_te = $context->cart->getOrderTotal(false, Cart::ONLY_PRODUCTS_WITH_DEMANDS);
 
         // Free shipping on selected carriers
         if ($this->free_shipping && in_array($filter, array(CartRule::FILTER_ACTION_ALL, CartRule::FILTER_ACTION_ALL_NOCAP, CartRule::FILTER_ACTION_SHIPPING))) {
@@ -997,7 +1000,7 @@ class CartRuleCore extends ObjectModel
             // Discount (%) on the whole order
             if ($this->reduction_percent && $this->reduction_product == 0) {
                 // Do not give a reduction on free products!
-                $order_total = $context->cart->getOrderTotal($use_tax, Cart::ONLY_PRODUCTS, $package_products);
+                $order_total = $context->cart->getOrderTotal($use_tax, Cart::ONLY_PRODUCTS_WITH_DEMANDS, $package_products);
                 foreach ($context->cart->getCartRules(CartRule::FILTER_ACTION_GIFT) as $cart_rule) {
                     $order_total -= Tools::ps_round($cart_rule['obj']->getContextualValue($use_tax, $context, CartRule::FILTER_ACTION_GIFT, $package), _PS_PRICE_COMPUTE_PRECISION_);
                 }
@@ -1070,9 +1073,9 @@ class CartRuleCore extends ObjectModel
             if ((float)$this->reduction_amount > 0) {
                 $prorata = 1;
                 if (!is_null($package) && count($all_products)) {
-                    $total_products = $context->cart->getOrderTotal($use_tax, Cart::ONLY_PRODUCTS);
+                    $total_products = $context->cart->getOrderTotal($use_tax, Cart::ONLY_PRODUCTS_WITH_DEMANDS);
                     if ($total_products) {
-                        $prorata = $context->cart->getOrderTotal($use_tax, Cart::ONLY_PRODUCTS, $package['products']) / $total_products;
+                        $prorata = $context->cart->getOrderTotal($use_tax, Cart::ONLY_PRODUCTS_WITH_DEMANDS, $package['products']) / $total_products;
                     }
                 }
 
@@ -1121,7 +1124,7 @@ class CartRuleCore extends ObjectModel
                 if ($this->reduction_tax == $use_tax) {
                     // The reduction cannot exceed the products total, except when we do not want it to be limited (for the partial use calculation)
                     if ($filter != CartRule::FILTER_ACTION_ALL_NOCAP) {
-                        $cart_amount = $context->cart->getOrderTotal($use_tax, Cart::ONLY_PRODUCTS);
+                        $cart_amount = $context->cart->getOrderTotal($use_tax, Cart::ONLY_PRODUCTS_WITH_DEMANDS);
                         $reduction_amount = min($reduction_amount, $cart_amount);
                     }
                     $reduction_value += $prorata * $reduction_amount;
@@ -1377,12 +1380,20 @@ class CartRuleCore extends ObjectModel
             return array();
         }
 
+        $order_total = $context->cart->getOrderTotal(true, Cart::ONLY_PRODUCTS_WITH_DEMANDS, null, null, false);
         static $errors = array();
         foreach ($context->cart->getCartRules() as $cart_rule) {
             if ($error = $cart_rule['obj']->checkValidity($context, true)) {
                 $context->cart->removeCartRule($cart_rule['obj']->id);
                 $context->cart->update();
                 $errors[] = $error;
+            } else {
+                if ($order_total <= 0) {
+                    // remove cart rule if cart amount is already reached 0
+                    $context->cart->removeCartRule($cart_rule['obj']->id);
+                } else {
+                    $order_total = $order_total - $cart_rule['value_real'];
+                }
             }
         }
         return $errors;
