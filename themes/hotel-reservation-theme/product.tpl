@@ -148,11 +148,7 @@
 													</li>
 												{/foreach}
 											{/if}
-
-                                            {hook h="displayRoomTypeThumbnailsBottom"}
 											</ul>
-
-                                            {hook h="displayRoomTypeThumbnailsAfter"}
 										</div> <!-- end thumbs_list -->
 										{if isset($images) && count($images) > 2}
 											<a id="view_scroll_right" title="{l s='Other views'}" href="javascript:{ldelim}{rdelim}">

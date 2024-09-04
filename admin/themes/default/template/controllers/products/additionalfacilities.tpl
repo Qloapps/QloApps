@@ -81,7 +81,7 @@
                                                 <input type="text" name="option_price_{$option['id']|escape:'html':'UTF-8'}" value="{if isset($selectedDemands[$demand['id_global_demand']]['adv_option'][$option['id']]['price'])}{$selectedDemands[$demand['id_global_demand']]['adv_option'][$option['id']]['price']|escape:'html':'UTF-8'}{else}{$option['price']|escape:'html':'UTF-8'}{/if}"/>
                                             </div>
                                             <div class="price_display" {if isset($selectedDemands[$demand['id_global_demand']])}style="display:none"{/if}>
-                                                {$option['price']|escape:'html':'UTF-8'}
+                                                {displayPrice price={$option['price']|escape:'html':'UTF-8'}  currency=$idDefaultcurrency}
                                             </div>
 
                                         </td>
