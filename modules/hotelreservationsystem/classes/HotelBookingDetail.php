@@ -1193,6 +1193,7 @@ class HotelBookingDetail extends ObjectModel
                 }
             }
             unset($datetimeObj);
+            unset($roomDetail);
 
             // If all dates are covered
             if (!$datesToCover) {
