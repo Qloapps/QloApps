@@ -23,9 +23,13 @@
     -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
 }
-.read-extra-text{
+.htlRoomTypeDescReadmore, .htlRoomTypeDescReadless{
     cursor: pointer;
     font-weight: 400;
+    display: none;
+}
+.htlRoomTypeDescExtras {
+    display: none;
 }
 @media (min-width: 530px) {
     .hotelRoomDescContainer{
@@ -68,6 +72,7 @@
 }
 .htlRoomTypeDescText{
 	font-size: 16px;
+    word-break: break-word;
 	color: #555555;
 	font-weight: 300;
 	line-height: 21px;

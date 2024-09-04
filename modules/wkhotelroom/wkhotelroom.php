@@ -115,13 +115,6 @@ class WkHotelRoom extends Module
             )
         );
 
-        Media::addJsDef(
-            array(
-                'readMoreText' => $this->l('Read More.', null, true),
-                'readLessText' => $this->l('Read Less.', null, true)
-            )
-        );
-
         $this->context->controller->addJs($this->_path.'/views/js/WkHotelRoomBlockFront.js');
         $this->context->controller->addCSS($this->_path.'/views/css/WkHotelRoomBlockFront.css');
 
