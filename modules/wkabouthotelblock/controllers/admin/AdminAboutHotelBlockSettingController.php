@@ -208,6 +208,7 @@ class AdminAboutHotelBlockSettingController extends ModuleAdminController
                         $this->l('Maximum image size: %1s'),
                         Tools::formatBytes(Tools::getMaxUploadSize())
                     ),
+                    'desc' => $this->l('Recommended resolution: 720 x 360 pixels.'),
                 ),
                 array(
                     'type' => 'switch',
@@ -272,12 +273,11 @@ class AdminAboutHotelBlockSettingController extends ModuleAdminController
                 } while ((bool)Tools::file_get_contents(
                     $this->context->link->getMediaLink(_MODULE_DIR_.$this->module->name.'/views/img/hotel_interior/'.$tmp_name.'.jpg')
                 ));
-                $imageSize = ImageType::getByName(ImageType::getFormatedName('large'));
                 ImageManager::resize(
                     $file['tmp_name'],
                     _PS_MODULE_DIR_.$this->module->name.'/views/img/hotel_interior/'.$tmp_name.'.jpg',
-                    $imageSize['width'],
-                    $imageSize['height']
+                    720,
+                    360
                 );
 
                 $objHtlInteriorImg->name = $tmp_name;

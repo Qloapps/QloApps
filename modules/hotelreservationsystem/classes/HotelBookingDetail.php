@@ -1936,6 +1936,7 @@ class HotelBookingDetail extends ObjectModel
                 $cart->add();
 
                 // Save context (in order to apply cart rule)
+                $this->context = Context::getContext();
                 $this->context->cart = $cart;
                 $this->context->customer = new Customer($objOrder->id_customer);
                 $this->context->currency = new Currency($objOrder->id_currency);
@@ -1947,7 +1948,7 @@ class HotelBookingDetail extends ObjectModel
                     $idNewRoomType,
                     $useTaxes,
                     null,
-                    2,
+                    6,
                     null,
                     false,
                     true,
@@ -2199,49 +2200,76 @@ class HotelBookingDetail extends ObjectModel
 
                     $old_quantity = $objOldOrderDetail->product_quantity;
 
-                    $objOldOrderDetail->product_quantity = $old_quantity - $product_quantity;
+                    $objOldOrderDetail->product_quantity = $old_quantity - $productQty;
                     $objOldOrderDetail->reduction_percent = 0;
 
                     // update taxes
-                    $res &= $objOldOrderDetail->updateTaxAmount($objOrder);
+                    $result &= $objOldOrderDetail->updateTaxAmount($objOrder);
 
                     // Save order detail
-                    $res &= $objOldOrderDetail->update();
+                    $result &= $objOldOrderDetail->update();
                 }
 
                 // Update OrderInvoice of this OrderDetail
                 if ($objOldOrderDetail->id_order_invoice != 0) {
                     // values changes as values are calculated accoding to the quantity of the product by webkul
                     $objOrderInvoice = new OrderInvoice($objOldOrderDetail->id_order_invoice);
-                    $objOrderInvoice->total_paid_tax_excl -= Tools::ps_round($totalRoomPriceTaxExcl, _PS_PRICE_COMPUTE_PRECISION_);
+                    $objOrderInvoice->total_paid_tax_excl = Tools::ps_round(
+                        ($objOrderInvoice->total_paid_tax_excl - $totalRoomPriceTaxExcl),
+                        _PS_PRICE_COMPUTE_PRECISION_
+                    );
                     $objOrderInvoice->total_paid_tax_excl = $objOrderInvoice->total_paid_tax_excl > 0 ? $objOrderInvoice->total_paid_tax_excl : 0;
 
-                    $objOrderInvoice->total_paid_tax_incl -= Tools::ps_round($totalRoomPriceTaxIncl, _PS_PRICE_COMPUTE_PRECISION_);
+                    $objOrderInvoice->total_paid_tax_incl = Tools::ps_round(
+                        ($objOrderInvoice->total_paid_tax_incl - $totalRoomPriceTaxIncl),
+                        _PS_PRICE_COMPUTE_PRECISION_
+                    );
                     $objOrderInvoice->total_paid_tax_incl = $objOrderInvoice->total_paid_tax_incl > 0 ? $objOrderInvoice->total_paid_tax_incl : 0;
 
-                    $objOrderInvoice->total_products -= Tools::ps_round($totalRoomPriceTaxExcl, _PS_PRICE_COMPUTE_PRECISION_);
+                    $objOrderInvoice->total_products = Tools::ps_round(
+                        ($objOrderInvoice->total_products - $totalRoomPriceTaxExcl),
+                        _PS_PRICE_COMPUTE_PRECISION_
+                    );
                     $objOrderInvoice->total_products = $objOrderInvoice->total_products > 0 ? $objOrderInvoice->total_products : 0;
 
-                    $objOrderInvoice->total_products_wt -= Tools::ps_round($totalRoomPriceTaxIncl, _PS_PRICE_COMPUTE_PRECISION_);
+                    $objOrderInvoice->total_products_wt = Tools::ps_round(
+                        ($objOrderInvoice->total_products_wt - $totalRoomPriceTaxIncl),
+                        _PS_PRICE_COMPUTE_PRECISION_
+                    );
                     $objOrderInvoice->total_products_wt = $objOrderInvoice->total_products_wt > 0 ? $objOrderInvoice->total_products_wt : 0;
 
-                    $res &= $objOrderInvoice->update();
+                    $result &= $objOrderInvoice->update();
                 }
 
                 // values changes as values are calculated accoding to the quantity of the product by webkul
-                $objOrder->total_paid -= $totalRoomPriceTaxIncl;
+                $objOrder->total_paid = Tools::ps_round(
+                    ($objOrder->total_paid_tax_incl - $totalRoomPriceTaxIncl),
+                    _PS_PRICE_COMPUTE_PRECISION_
+                );
                 $objOrder->total_paid = $objOrder->total_paid > 0 ? $objOrder->total_paid : 0;
 
-                $objOrder->total_paid_tax_incl -= Tools::ps_round($totalRoomPriceTaxIncl, _PS_PRICE_COMPUTE_PRECISION_);
+                $objOrder->total_paid_tax_incl = Tools::ps_round(
+                    ($objOrder->total_paid_tax_incl - $totalRoomPriceTaxIncl),
+                    _PS_PRICE_COMPUTE_PRECISION_
+                );
                 $objOrder->total_paid_tax_incl = $objOrder->total_paid_tax_incl > 0 ? $objOrder->total_paid_tax_incl : 0;
 
-                $objOrder->total_paid_tax_excl -= Tools::ps_round($totalRoomPriceTaxExcl, _PS_PRICE_COMPUTE_PRECISION_);
+                $objOrder->total_paid_tax_excl = Tools::ps_round(
+                    ($objOrder->total_paid_tax_excl - $totalRoomPriceTaxExcl),
+                    _PS_PRICE_COMPUTE_PRECISION_
+                );
                 $objOrder->total_paid_tax_excl = $objOrder->total_paid_tax_excl > 0 ? $objOrder->total_paid_tax_excl : 0;
 
-                $objOrder->total_products -= Tools::ps_round($totalRoomPriceTaxExcl, _PS_PRICE_COMPUTE_PRECISION_);
+                $objOrder->total_products = Tools::ps_round(
+                    ($objOrder->total_products - $totalRoomPriceTaxExcl),
+                    _PS_PRICE_COMPUTE_PRECISION_
+                );
                 $objOrder->total_products = $objOrder->total_products > 0 ? $objOrder->total_products : 0;
 
-                $objOrder->total_products_wt -= Tools::ps_round($totalRoomPriceTaxIncl, _PS_PRICE_COMPUTE_PRECISION_);
+                $objOrder->total_products_wt = Tools::ps_round(
+                    ($objOrder->total_products_wt - $totalRoomPriceTaxIncl),
+                    _PS_PRICE_COMPUTE_PRECISION_
+                );
                 $objOrder->total_products_wt = $objOrder->total_products_wt > 0 ? $objOrder->total_products_wt : 0;
 
                 $objOrder->update();
@@ -3379,6 +3407,7 @@ class HotelBookingDetail extends ObjectModel
                                 $objOrder->round_type,
                                 $objOrder->round_mode
                             );
+
                             $objOrderDetail->save();
                         }
 
@@ -3419,19 +3448,30 @@ class HotelBookingDetail extends ObjectModel
                     );
 
                     if (Validate::isLoadedObject($objOrder = new Order($this->id_order))) {
-                        $objOrder->total_paid -= Tools::ps_round($reduction_amount['total_price_tax_incl'], _PS_PRICE_COMPUTE_PRECISION_);
+                        $objOrder->total_paid = Tools::ps_round(
+                            ($objOrder->total_paid - $reduction_amount['total_price_tax_incl']),
+                            _PS_PRICE_COMPUTE_PRECISION_
+                        );
                         $objOrder->total_paid = $objOrder->total_paid > 0 ? $objOrder->total_paid : 0;
 
-                        $objOrder->total_paid_tax_excl -= Tools::ps_round($reduction_amount['total_price_tax_excl'], _PS_PRICE_COMPUTE_PRECISION_);
+                        $objOrder->total_paid_tax_excl = Tools::ps_round(($objOrder->total_paid_tax_excl - $reduction_amount['total_price_tax_excl']),
+                            _PS_PRICE_COMPUTE_PRECISION_
+                        );
                         $objOrder->total_paid_tax_excl = $objOrder->total_paid_tax_excl > 0 ? $objOrder->total_paid_tax_excl : 0;
 
-                        $objOrder->total_paid_tax_incl -= Tools::ps_round($reduction_amount['total_price_tax_incl'], _PS_PRICE_COMPUTE_PRECISION_);
+                        $objOrder->total_paid_tax_incl = Tools::ps_round(($objOrder->total_paid_tax_incl - $reduction_amount['total_price_tax_incl']),
+                            _PS_PRICE_COMPUTE_PRECISION_
+                        );
                         $objOrder->total_paid_tax_incl = $objOrder->total_paid_tax_incl > 0 ? $objOrder->total_paid_tax_incl : 0;
 
-                        $objOrder->total_products -= Tools::ps_round($reduction_amount['total_products_tax_excl'], _PS_PRICE_COMPUTE_PRECISION_);
+                        $objOrder->total_products = Tools::ps_round(($objOrder->total_products - $reduction_amount['total_products_tax_excl']),
+                            _PS_PRICE_COMPUTE_PRECISION_
+                        );
                         $objOrder->total_products = $objOrder->total_products > 0 ? $objOrder->total_products : 0;
 
-                        $objOrder->total_products_wt -= Tools::ps_round($reduction_amount['total_products_tax_incl'], _PS_PRICE_COMPUTE_PRECISION_);
+                        $objOrder->total_products_wt = Tools::ps_round(($objOrder->total_products_wt - $reduction_amount['total_products_tax_incl']),
+                            _PS_PRICE_COMPUTE_PRECISION_
+                        );
                         $objOrder->total_products_wt = $objOrder->total_products_wt > 0 ? $objOrder->total_products_wt : 0;
 
                         $objOrder->save();
