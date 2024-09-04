@@ -61,7 +61,7 @@ function initToggleOptions(target) {
     truncatedText = truncateText(target);
     $(target).text(truncatedText);
     $(target).append($('.htlRoomTypeDescExtras').html());
-    $(target).find('.htlRoomTypeDescReadmore').first().show();
+    $(target).find('.htlRoomTypeDescReadmore').first().show().css('display', 'inline-block');
 }
 
 function truncateText(target) {
