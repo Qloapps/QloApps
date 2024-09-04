@@ -387,10 +387,6 @@
 									{if sizeof($discounts)}
 										<div class="row">
 											{foreach $discounts as $discount}
-												{if ((float)$discount.value_real == 0 && $discount.free_shipping != 1) || ((float)$discount.value_real == 0 && $discount.code == '')}
-													{continue}
-												{/if}
-
 												<div class="col-sm-12 margin-btm-10 cart_discount {if $discount@last}last_item{elseif $discount@first}first_item{else}item{/if}" id="cart_discount_{$discount.id_discount}">
 													<span class="cart_discount_name">
 														{$discount.name|escape:'html':'UTF-8'}
