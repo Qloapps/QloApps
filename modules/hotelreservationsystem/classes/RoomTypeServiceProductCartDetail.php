@@ -175,12 +175,11 @@ class RoomTypeServiceProductCartDetail extends ObjectModel
         $id_address = null,
         $priceAdditionType = null
     ) {
-        $selectedServiceProducts = array();
         if (Validate::isLoadedObject($objHotelCartBookingData = new HotelCartBookingData($htlCartBookingId))) {
             $selectedServiceProducts = $this->getServiceProductsInCart(
                 $objHotelCartBookingData->id_cart,
                 0,
-                $idHotel = 0,
+                0,
                 0,
                 0,
                 0,
@@ -191,9 +190,13 @@ class RoomTypeServiceProductCartDetail extends ObjectModel
                 $id_address,
                 $priceAdditionType
             );
+
+            if (isset($selectedServiceProducts[$htlCartBookingId]['selected_products_info'])) {
+                return $selectedServiceProducts;
+            }
         }
 
-        return $selectedServiceProducts;
+        return array();
     }
 
     public function getServiceProductsInCart(

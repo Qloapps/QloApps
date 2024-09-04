@@ -375,34 +375,39 @@ class OrderSlipCore extends ObjectModel
 
             $order_slip->{'total_products_tax_'.$inc_or_ex_1} += $price * $numDays;
 
-            if (in_array(Configuration::get('PS_ROUND_TYPE'), array(Order::ROUND_ITEM, Order::ROUND_LINE))) {
-                if (!isset($total_products[$id_tax_rules_group])) {
-                    $total_products[$id_tax_rules_group] = 0;
-                }
-            } else {
+            $ps_round_type = Configuration::get('PS_ROUND_TYPE');
+            if ($ps_round_type == Order::ROUND_TOTAL) {
                 if (!isset($total_products[$id_tax_rules_group.'_'.$id_address])) {
                     $total_products[$id_tax_rules_group.'_'.$id_address] = 0;
                 }
+            } else {
+                if (!isset($total_products[$id_tax_rules_group])) {
+                    $total_products[$id_tax_rules_group] = 0;
+                }
             }
 
+            $product_tax_excl = Tools::processPriceRounding(
+                ($price * $numDays),
+                1,
+                $order->round_type,
+                $order->round_mode
+            );
+            $product_tax_incl = Tools::processPriceRounding(
+                ($tax_calculator->{$add_or_remove.'Taxes'}($price * $numDays)),
+                1,
+                $order->round_type,
+                $order->round_mode
+            );
             if ($ps_round_type == Order::ROUND_TOTAL) {
-                $product_tax_incl = Tools::processPriceRounding(
-                    $tax_calculator->{$add_or_remove.'Taxes'}($price),
-                    $numDays
-                );
                 $total_products[$id_tax_rules_group.'_'.$id_address] += $product_tax_incl;
             } else {
-                $product_tax_incl = Tools::processPriceRounding(
-                    $tax_calculator->{$add_or_remove.'Taxes'}($price),
-                    $numDays
-                );
                 $total_products[$id_tax_rules_group] += $product_tax_incl;
             }
 
             $booking['unit_price_tax_'.$inc_or_ex_1] = $price;
-            $booking['unit_price_tax_'.$inc_or_ex_2] = Tools::ps_round($tax_calculator->{$add_or_remove.'Taxes'}($price), _PS_PRICE_COMPUTE_PRECISION_);
-            $booking['total_price_tax_'.$inc_or_ex_1] = Tools::ps_round($price * $numDays, _PS_PRICE_COMPUTE_PRECISION_);
-            $booking['total_price_tax_'.$inc_or_ex_2] = Tools::ps_round($product_tax_incl, _PS_PRICE_COMPUTE_PRECISION_);
+            $booking['unit_price_tax_'.$inc_or_ex_2] = $tax_calculator->{$add_or_remove.'Taxes'}($price);
+            $booking['total_price_tax_'.$inc_or_ex_1] = $product_tax_excl;
+            $booking['total_price_tax_'.$inc_or_ex_2] = $product_tax_incl;
         }
 
         unset($product);
