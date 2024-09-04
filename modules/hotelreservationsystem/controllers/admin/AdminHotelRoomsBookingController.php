@@ -149,11 +149,6 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
                 $occupancy = array();
             }
 
-            // $booking_product = 1;
-            // if (Tools::getisset('booking_product')) {
-            //     $booking_product = Tools::getValue('booking_product');
-            // }
-
             $this->id_cart = (int) $this->context->cart->id;
             $this->id_guest = (int) $this->context->cookie->id_guest;
             $this->id_hotel = $id_hotel;
@@ -177,7 +172,6 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
             Tools::redirectAdmin($this->context->link->getAdminLink('AdminHotelRoomsBooking').'&'.http_build_query($urlData));
         }
 
-        // Process reallocation of rooms
         // Process reallocation of rooms
         if (Tools::isSubmit('realloc_allocated_rooms')) {
             if ($this->tabAccess['edit'] === '1') {
@@ -204,7 +198,7 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
                             $this->errors[] = $this->l('Selected room is not available for reallocation.');
                         } elseif (!in_array($idRoomToReallocate, array_column($availableRooms, 'id_room'))) {
                             $this->errors[] = $this->l('Selected room is not available for reallocation.');
-                        } elseif (!Validate::isFloat($priceDiff)) {
+                        } elseif (!Validate::isPrice($priceDiff)) {
                             $this->errors[] = $this->l('Invalid price difference of the room types.');
                         }
                     } else {
@@ -216,7 +210,11 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
 
                 if (!count($this->errors)) {
                     // Finally, reallocate the room
-                    if ($objBookingDetail->reallocateBooking($idHtlBookingFrom, $idRoomToReallocate, $priceDiff)) {
+                    if ($reallocatedBookingId = $objBookingDetail->reallocateBooking($idHtlBookingFrom, $idRoomToReallocate, $priceDiff)) {
+                        $objHtlBookingDetail = new HotelBookingDetail($reallocatedBookingId);
+                        $objHtlBookingDetail->comment = $this->l('Room manually reallocated.');
+                        $objHtlBookingDetail->save();
+
                         Tools::redirectAdmin(self::$currentIndex.'&id_order='.(int) $idOrder.'&vieworder&conf=52&token='.$this->token);
                     } else {
                         $this->errors[] = $this->l('Some error occured. Please try again.');
@@ -379,7 +377,8 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
             'occupancy_required_for_booking' => $occupancyRequiredForBooking,
             'max_child_age' => Configuration::get('WK_GLOBAL_CHILD_MAX_AGE'),
             'max_child_in_room' => Configuration::get('WK_GLOBAL_MAX_CHILD_IN_ROOM'),
-            'link' => $this->context->link
+            'link' => $this->context->link,
+            'ALLOTMENT_MANUAL' => HotelBookingDetail::ALLOTMENT_MANUAL,
         ));
 
         if (Configuration::get('PS_BACKOFFICE_SEARCH_TYPE') == HotelBookingDetail::SEARCH_TYPE_OWS) {

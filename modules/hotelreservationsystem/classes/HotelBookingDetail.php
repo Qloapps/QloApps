@@ -1902,6 +1902,7 @@ class HotelBookingDetail extends ObjectModel
     public function reallocateBooking($idHotelBooking, $idRoom, $priceDiffTaxExcl = 0)
     {
         $result = true;
+        $reallocatedBookingId = 0;
         // get the cart booking data for the given booking
         if (Validate::isLoadedObject($objOldHotelBooking = new HotelBookingDetail($idHotelBooking))) {
             $objHotelRoomInfo = new HotelRoomInformation($idRoom);
@@ -1912,7 +1913,10 @@ class HotelBookingDetail extends ObjectModel
 
                 $productQty = (int)$objOldHotelBooking->getNumberOfDays($objOldHotelBooking->date_from, $objOldHotelBooking->date_to);
                 $oldRoomPriceTaxExcl = $objOldHotelBooking->total_price_tax_excl / $productQty;
-                $newRoomPriceTaxExcl = $oldRoomPriceTaxExcl + $priceDiffTaxExcl;
+
+                // Calculate new room price per qty
+                $priceDiffPerQtyTaxExcl = $priceDiffTaxExcl / $productQty;
+                $newRoomPriceTaxExcl = $oldRoomPriceTaxExcl + $priceDiffPerQtyTaxExcl;
 
                 $totalRoomPriceTaxIncl = $objOldHotelBooking->total_price_tax_incl;
                 $totalRoomPriceTaxExcl = $objOldHotelBooking->total_price_tax_excl;
@@ -1992,7 +1996,7 @@ class HotelBookingDetail extends ObjectModel
                         $objCartBookingData->id_product = $roomInfo['id_product'];
                         $objCartBookingData->id_room = $roomInfo['id_room'];
                         $objCartBookingData->id_hotel = $roomInfo['id_hotel'];
-                        $objCartBookingData->booking_type = 1;
+                        $objCartBookingData->booking_type = Self::ALLOTMENT_MANUAL;
                         $objCartBookingData->quantity = $productQty;
                         $objCartBookingData->date_from = $objOldHotelBooking->date_from;
                         $objCartBookingData->date_to = $objOldHotelBooking->date_to;
@@ -2017,18 +2021,6 @@ class HotelBookingDetail extends ObjectModel
                     return false;
                 }
 
-                $totalRoomTypePrice = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice(
-                    $idNewRoomType,
-                    $objCartBookingData->date_from,
-                    $objCartBookingData->date_to,
-                    0,
-                    Group::getCurrent()->id,
-                    $this->context->cart->id,
-                    $this->context->cookie->id_guest,
-                    $objCartBookingData->id_room,
-                    0
-                );
-
                 // Add product to cart
                 $updateQuantity = $cart->updateQty(
                     $productQty,
@@ -2047,7 +2039,7 @@ class HotelBookingDetail extends ObjectModel
                     $objOrderInvoice->total_paid_tax_incl += (float)($cart->getOrderTotal($useTaxes, $totalMethod));
                     $objOrderInvoice->total_products += (float)$cart->getOrderTotal(false, Cart::ONLY_PRODUCTS);
                     $objOrderInvoice->total_products_wt += (float)$cart->getOrderTotal($useTaxes, Cart::ONLY_PRODUCTS);
-                    $objOrderInvoice->update();
+                    $result &= $objOrderInvoice->update();
                 }
 
                 // Create Order detail information
@@ -2063,7 +2055,7 @@ class HotelBookingDetail extends ObjectModel
                 $objOrder->total_paid_tax_incl += (float)($cart->getOrderTotal($useTaxes, $totalMethod));
 
                 // Save changes of order
-                $objOrder->update();
+                $result &= $objOrder->update();
 
                 // Update Tax lines
                 $objOrderDetail->updateTaxAmount($objOrder);
@@ -2092,7 +2084,6 @@ class HotelBookingDetail extends ObjectModel
                         $objBookingDetail->id_customer = $objOrder->id_customer;
                         $objBookingDetail->booking_type = $objCartBookingData->booking_type;
                         $objBookingDetail->id_status = 1;
-                        $objBookingDetail->comment = $objCartBookingData->comment;
                         $objBookingDetail->room_type_name = Product::getProductName($idNewRoomType, null, $objOrder->id_lang);
 
                         $objBookingDetail->date_from = $objCartBookingData->date_from;
@@ -2136,7 +2127,8 @@ class HotelBookingDetail extends ObjectModel
                             $objBookingDetail->check_out_time = $objHotelBranch->check_out;
                         }
 
-                        if ($objBookingDetail->save()) {
+                        if ($result &= $objBookingDetail->save()) {
+                            $reallocatedBookingId = $objBookingDetail->id;
                             // Get Booking Demands of the old booking to add in the new booking creation
                             $objBookingDemand = new HotelBookingDemands();
                             if ($oldBookingDemands = $objBookingDemand->getRoomTypeBookingExtraDemands(
@@ -2168,10 +2160,12 @@ class HotelBookingDetail extends ObjectModel
                             }
                         }
                     }
+                } else {
+                    return false;
                 }
 
                 // delete cart feature prices after room addition success
-                HotelRoomTypeFeaturePricing::deleteByIdCart($this->context->cart->id);
+                // HotelRoomTypeFeaturePricing::deleteByIdCart($this->context->cart->id);
 
                 // ===============================================================
                 // END: Add Process of the old booking
@@ -2272,7 +2266,7 @@ class HotelBookingDetail extends ObjectModel
                 );
                 $objOrder->total_products_wt = $objOrder->total_products_wt > 0 ? $objOrder->total_products_wt : 0;
 
-                $objOrder->update();
+                $result &= $objOrder->update();
 
                 // Reinject quantity in stock
                 $objOldOrderDetail->reinjectQuantity($objOldOrderDetail, $objOldOrderDetail->product_quantity, $deleteQty);
@@ -2309,20 +2303,27 @@ class HotelBookingDetail extends ObjectModel
                 // update in the hotel booking detail table
                 $objOldHotelBooking->id_room = $idRoom;
                 $objOldHotelBooking->room_num = $objHotelRoomInfo->room_num;
+                $objOldHotelBooking->booking_type = Self::ALLOTMENT_MANUAL;
                 // set backorder to 0 as available reallocate rooms will always be free
                 $objOldHotelBooking->is_back_order = 0;
 
                 $result &= $objOldHotelBooking->save();
+
+                $reallocatedBookingId = $objOldHotelBooking->id;
             }
 
-            if ($result) {
+            if ($result && $reallocatedBookingId) {
                 Hook::exec(
                     'actionRoomReallocateAfter',
                     array(
-                        'id_htl_booking' => $idHotelBooking,
-                        'id_room' => $idRoom
+                        'id_htl_booking_from' => $idHotelBooking,
+                        'id_htl_booking_to' => $reallocatedBookingId,
                     )
                 );
+
+                return $reallocatedBookingId;
+            } else {
+                $result = false;
             }
         } else {
             $result = false;

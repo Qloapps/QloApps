@@ -1175,7 +1175,7 @@ class AdminOrdersControllerCore extends AdminController
                             $this->errors[] = $this->l('Selected room is not available for reallocation.');
                         } elseif (!in_array($idRoomToReallocate, array_column($availableRooms, 'id_room'))) {
                             $this->errors[] = $this->l('Selected room is not available for reallocation.');
-                        } elseif (!Validate::isFloat($priceDiff)) {
+                        } elseif (!Validate::isPrice($priceDiff)) {
                             $this->errors[] = $this->l('Invalid price difference of the room types.');
                         }
                     } else {
@@ -1187,7 +1187,11 @@ class AdminOrdersControllerCore extends AdminController
 
                 if (!count($this->errors)) {
                     // Finally, reallocate the room
-                    if ($objBookingDetail->reallocateBooking($idHtlBookingFrom, $idRoomToReallocate, $priceDiff)) {
+                    if ($reallocatedBookingId = $objBookingDetail->reallocateBooking($idHtlBookingFrom, $idRoomToReallocate, $priceDiff)) {
+                        $objHtlBookingDetail = new HotelBookingDetail($reallocatedBookingId);
+                        $objHtlBookingDetail->comment = $this->l('Room manually reallocated.');
+                        $objHtlBookingDetail->save();
+
                         Tools::redirectAdmin(self::$currentIndex.'&id_order='.(int) $idOrder.'&vieworder&conf=52&token='.$this->token);
                     } else {
                         $this->errors[] = $this->l('Some error occured. Please try again.');
@@ -7064,7 +7068,7 @@ class AdminOrdersControllerCore extends AdminController
                     );
                     if ($objHotelBooking->total_price_tax_excl != $newRoomTotalPrice['total_price_tax_excl']) {
                         $result['has_price_changes'] = 1;
-                        $result['price_diff'] = Tools::ps_round(($newRoomTotalPrice['total_price_tax_excl'] - $objHotelBooking->total_price_tax_excl), 6);
+                        $result['price_diff'] = $newRoomTotalPrice['total_price_tax_excl'] - $objHotelBooking->total_price_tax_excl;
                     }
                 }
             } else {
