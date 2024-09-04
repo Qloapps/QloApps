@@ -72,6 +72,13 @@ const RoomReallocationModal = {
                     $("span.modal_curr_room_num").text(roomObj.data('room_num') + ', ' + roomObj.data('room_type_name'));
                     $(".cust_name").text(roomObj.data('cust_name'));
                     $(".cust_email").text(roomObj.data('cust_email'));
+                    $(".modal_curr_allotent_type").text(roomObj.data('allotment_type_label'));
+
+                    if ((roomObj.data('comment') == '') || (roomObj.data('comment') == null)) {
+                        $(".allotment_comment_block").hide();
+                    } else {
+                        $(".modal_curr_allotment_comment").text(roomObj.data('comment'));
+                    }
 
                     // reset price difference fields
                     $("#reallocation_price_diff").val(0);

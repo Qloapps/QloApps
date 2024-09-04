@@ -320,6 +320,9 @@ class AdminControllerCore extends Controller
     /** @var string */
     protected $display;
 
+    /** @var array  */
+    public $kpis = array();
+
     /** @var bool */
     protected $_includeContainer = true;
 
@@ -2682,6 +2685,24 @@ class AdminControllerCore extends Controller
 
     public function renderKpis()
     {
+        Hook::exec('action'.$this->controller_name.'KPIListingModifier', array(
+            'kpis' => &$this->kpis,
+        ));
+
+        if (count($this->kpis)) {
+            foreach ($this->kpis as $key => &$kpi) {
+                if (count($kpi->exclude_id_hotels)) {
+                    if (empty($kpi->id_hotels)) {
+                        $kpi->id_hotels = HotelBranchInformation::getProfileAccessedHotels($this->context->employee->id_profile, 1, 1);
+                    }
+                    $kpi->id_hotels = array_diff($kpi->id_hotels, $kpi->exclude_id_hotels);
+                }
+            }
+
+            $helper = new HelperKpiRow();
+            $helper->kpis = $this->kpis;
+            return $helper->generate();
+        }
     }
 
     /**
