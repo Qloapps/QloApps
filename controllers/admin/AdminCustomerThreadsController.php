@@ -546,7 +546,7 @@ class AdminCustomerThreadsControllerCore extends AdminController
         $helper->color = 'color1';
         $helper->title = $this->l('Pending Discussion Threads', null, null, false);
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=pending_messages';
-        $kpis[] = $helper;
+        $this->kpis[] = $helper;
 
         $helper = new HelperKpi();
         $helper->id = 'box-age';
@@ -555,7 +555,7 @@ class AdminCustomerThreadsControllerCore extends AdminController
         $helper->title = $this->l('Average Response Time', null, null, false);
         $helper->subtitle = $this->l('30 days', null, null, false);
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=avg_msg_response_time';
-        $kpis[] = $helper;
+        $this->kpis[] = $helper;
 
         $helper = new HelperKpi();
         $helper->id = 'box-messages-per-thread';
@@ -564,15 +564,9 @@ class AdminCustomerThreadsControllerCore extends AdminController
         $helper->title = $this->l('Messages per Thread', null, null, false);
         $helper->subtitle = $this->l('30 day', null, null, false);
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=messages_per_thread';
-        $kpis[] = $helper;
+        $this->kpis[] = $helper;
 
-        Hook::exec('action'.$this->controller_name.'KPIListingModifier', array(
-            'kpis' => &$kpis,
-        ));
-
-        $helper = new HelperKpiRow();
-        $helper->kpis = $kpis;
-        return $helper->generate();
+        return parent::renderKpis();
     }
 
     public function renderView()

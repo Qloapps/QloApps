@@ -186,6 +186,8 @@ class CartCore extends ObjectModel
     const ONLY_ROOM_SERVICES_WITH_AUTO_ADD_WITHOUT_CONVENIENCE_FEE = 17;
     const ONLY_CONVENIENCE_FEE = 18;
 
+    const ONLY_PRODUCTS_WITH_DEMANDS = 19;
+
     public function __construct($id = null, $id_lang = null)
     {
         parent::__construct($id);
@@ -366,8 +368,8 @@ class CartCore extends ObjectModel
      */
     public function getAverageProductsTaxRate(&$cart_amount_te = null, &$cart_amount_ti = null)
     {
-        $cart_amount_ti = $this->getOrderTotal(true, Cart::ONLY_PRODUCTS);
-        $cart_amount_te = $this->getOrderTotal(false, Cart::ONLY_PRODUCTS);
+        $cart_amount_ti = $this->getOrderTotal(true, Cart::ONLY_PRODUCTS_WITH_DEMANDS);
+        $cart_amount_te = $this->getOrderTotal(false, Cart::ONLY_PRODUCTS_WITH_DEMANDS);
 
         $cart_vat_amount = $cart_amount_ti - $cart_amount_te;
 
@@ -1029,6 +1031,9 @@ class CartCore extends ObjectModel
         if ((int)$cartRule->gift_product) {
             $this->updateQty(1, $cartRule->gift_product, $cartRule->gift_product_attribute, false, 'up', 0, null, false);
         }
+        // after adding new cart rule, check if any of the appled cart rules are not being used
+        CartRule::autoRemoveFromCart(Context::getContext());
+        CartRule::autoAddToCart(Context::getContext());
 
         return true;
     }
@@ -1612,6 +1617,7 @@ class CartCore extends ObjectModel
             Cart::ONLY_PHYSICAL_PRODUCTS_WITHOUT_SHIPPING,
             Cart::ADVANCE_PAYMENT,
             Cart::ADVANCE_PAYMENT_ONLY_PRODUCTS,
+            Cart::ONLY_PRODUCTS_WITH_DEMANDS,
         );
 
         // Define virtual context to prevent case where the cart is not the in the global context
@@ -1875,16 +1881,14 @@ class CartCore extends ObjectModel
 
 
             // price of extra demands on room type in the cart
-            if ($type == Cart::BOTH || $type == Cart::BOTH_WITHOUT_SHIPPING || $type == Cart::ADVANCE_PAYMENT) {
-                $totalDemandsPrice += $objCartBookingData->getCartExtraDemands($this->id, $product['id_product'], 0, 0, 0, 1, 0, (int)$with_taxes);
-            }
+            $totalDemandsPrice += $objCartBookingData->getCartExtraDemands($this->id, $product['id_product'], 0, 0, 0, 1, 0, (int)$with_taxes);
         }
 
         foreach ($products_total as $key => $price) {
             $order_total += $price;
         }
 
-        $order_total_products = $order_total;
+        $order_total_products = $order_total + $totalDemandsPrice;
 
         if ($type == Cart::ONLY_DISCOUNTS) {
             $order_total = 0;
@@ -1904,7 +1908,11 @@ class CartCore extends ObjectModel
         }
 
         // price of extra demands on room type in the cart
-        if ($type == Cart::BOTH || $type == Cart::BOTH_WITHOUT_SHIPPING || $type == Cart::ADVANCE_PAYMENT) {
+        if ($type == Cart::BOTH
+            || $type == Cart::BOTH_WITHOUT_SHIPPING
+            || $type == Cart::ADVANCE_PAYMENT
+            || $type == Cart::ONLY_PRODUCTS_WITH_DEMANDS
+        ) {
             $order_total += $totalDemandsPrice;
         }
 
@@ -1921,7 +1929,8 @@ class CartCore extends ObjectModel
             Cart::ONLY_CONVENIENCE_FEE,
             Cart::ONLY_ROOM_SERVICES_WITHOUT_AUTO_ADD,
             Cart::ONLY_ROOM_SERVICES_WITHOUT_CONVENIENCE_FEE,
-            Cart::ONLY_ROOM_SERVICES_WITH_AUTO_ADD_WITHOUT_CONVENIENCE_FEE)
+            Cart::ONLY_ROOM_SERVICES_WITH_AUTO_ADD_WITHOUT_CONVENIENCE_FEE,
+            Cart::ONLY_PRODUCTS_WITH_DEMANDS)
             ) && CartRule::isFeatureActive()
         ) {
             // First, retrieve the cart rules associated to this "getOrderTotal"
@@ -3813,10 +3822,6 @@ class CartCore extends ObjectModel
                     }
 
                 }
-            }
-
-            if (((float)$cart_rule['value_real'] == 0 && (int)$cart_rule['free_shipping'] == 0)) {
-                unset($cart_rules[$key]);
             }
         }
 
