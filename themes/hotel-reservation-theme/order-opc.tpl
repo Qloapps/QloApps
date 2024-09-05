@@ -211,18 +211,6 @@
 						<div class="col-md-4">
 							{* Total cart details, tax details, advance payment details and voucher details *}
 							<div class="col-sm-12 card cart_total_detail_block">
-								{* {if $total_rooms}
-									<p>
-										<span>{l s='Total rooms cost'}{if $display_tax_label}{l s=' (tax excl.)'}{/if}</span>
-										<span class="cart_total_values">{displayPrice price=$total_rooms}</span>
-									</p>
-								{/if}
-								{if (isset($total_extra_demands) && $total_extra_demands) || (isset($total_additional_services) && $total_additional_services)}
-									<p>
-										<span>{l s='Total extra services'}{if $display_tax_label}{l s=' (tax excl.)'}{/if}</span>
-										<span class="cart_total_values">{displayPrice price=($total_extra_demands + $total_additional_services)}</span>
-									</p>
-								{/if} *}
 								{* {if $total_service_products}
 									<p>
 										<span>{l s='Total service products cost'}{if $display_tax_label}{l s=' (tax excl.)'}{/if}</span>
@@ -249,6 +237,34 @@
 										{displayPrice price=$total_rooms_cost}
 									</span>
 								</p>
+								{if $convenience_fee_wt}
+									<p>
+										<span>
+											{l s='Convenience Fees'}
+											{if $display_tax_label}
+												{if $use_taxes && $priceDisplay == 0}
+													{l s='(tax incl)'}
+												{else}
+													{l s='(tax excl)'}
+												{/if}
+											{/if}
+										</span>
+										<span class="cart_total_values">
+										{if $use_taxes && $priceDisplay == 0}
+											{displayPrice price=$convenience_fee_wt}
+										{else}
+											{displayPrice price=$convenience_fee}
+										{/if}
+										</span>
+									</p>
+								{/if}
+								{if $show_taxes}
+									{hook h="displayCartTotalPriceLabel" type='before_tax'}
+									<p class="cart_total_tax">
+										<span>{l s='Total tax'}</span>
+										<span class="cart_total_values">{displayPrice price=($total_tax)}</span>
+									</p>
+								{/if}
 								<p class="total_discount_block {if $total_discounts == 0}unvisible{/if}">
 									<span>
 										{if $display_tax_label}
@@ -270,112 +286,33 @@
 										{displayPrice price=$total_discounts_negative}
 									</span>
 								</p>
-								{* {if $priceDisplay != 0} *}
-									<p class="cart_total_price {if $total_discounts == 0}unvisible{/if}" >
-										<span>
-											{l s='Total'}
-											{if $display_tax_label}
-												{if $use_taxes && $priceDisplay == 0}
-													{l s='(tax incl)'}
-												{else}
-													{l s='(tax excl)'}
-												{/if}
-											{/if}
-										</span>
-										<span class="cart_total_values">
-										{if $use_taxes && $priceDisplay == 0}
-												{displayPrice price=$total_price - $convenience_fee_wt}
-											{else}
-												{displayPrice price=$total_price_without_tax - $convenience_fee}
-											{/if}
-										</span>
-									</p>
-								{* {/if} *}
-								{* {if $total_rooms_wt != 0}
-									<p class="cart_total_tax">
-										<span>{l s='Tax on rooms'}</span>
-										<span class="cart_total_values">{displayPrice price=($total_rooms_wt - $total_rooms)}</span>
-									</p>
-								{/if} *}
-								{if $convenience_fee_wt}
-									<p>
-										<span>{l s='Convenience Fees'}</span>
-										<span class="cart_total_values">
-										{if $use_taxes && $priceDisplay == 0}
-											{displayPrice price=$convenience_fee_wt}
-										{else}
-											{displayPrice price=$convenience_fee}
-										{/if}
-										</span>
-									</p>
-								{/if}
-								{hook h="displayCartTotalPriceLabel" type='before_tax'}
-
-								<p class="cart_total_tax">
-									<span>{l s='Total tax'}</span>
-									<span class="cart_total_values">{displayPrice price=($total_tax)}</span>
-								</p>
-								{* {if $use_taxes && $show_taxes && ($total_extra_demands_wt + $total_additional_services_wt)!= 0 }
-									<p class="cart_total_tax">
-										<span>{l s='Tax on services'}</span>
-										<span class="cart_total_values">{displayPrice price=(($total_extra_demands_wt - $total_extra_demands) + ($total_additional_services_wt - $total_additional_services))}</span>
-									</p>
-								{/if} *}
-								{* {if $use_taxes && $show_taxes && $total_service_products_wt != 0 }
-									<p class="cart_total_tax">
-										<span>{l s='Tax on service products'}</span>
-										<span class="cart_total_values">{displayPrice price=($total_service_products_wt - $total_service_products)}</span>
-									</p>
-								{/if} *}
-
-								<p {if $total_wrapping == 0}class="unvisible"{/if}>
-									<span>
+								<hr>
+								<p {if !isset($is_advance_payment) || !$is_advance_payment}class="cart_final_total_block"{/if}>
+									<span class="strong">{l s='Total'}</span>
+									<span class="cart_total_values{if isset($is_advance_payment) && $is_advance_payment} strong{/if}">
 										{if $use_taxes}
-											{if $display_tax_label}{l s='Total gift wrapping (tax incl.)'}{else}{l s='Total gift-wrapping cost'}{/if}
+											{displayPrice price=$total_price}
 										{else}
-											{l s='Total gift-wrapping cost'}
+											{displayPrice price=$total_price_without_tax}
 										{/if}
 									</span>
-									<span class="cart_total_values">
-										{if $use_taxes}
-											{if $priceDisplay}
-												{displayPrice price=$total_wrapping_tax_exc}
-											{else}
-												{displayPrice price=$total_wrapping}
-											{/if}
-										{else}
-											{displayPrice price=$total_wrapping_tax_exc}
-										{/if}
-									</span>
+									<div class="hookDisplayProductPriceBlock-price">
+										{hook h="displayCartTotalPriceLabel"}
+									</div>
 								</p>
-
 								{if isset($is_advance_payment) && $is_advance_payment}
-									<p>
-										<span>{l s='Advance Payment Amount'}</span>
-										<span class="cart_total_values">{displayPrice price=$advPaymentAmount}</span>
-									</p>
+									<hr>
 									<p>
 										<span>{l s='Due Amount'}</span>
 										<span class="cart_total_values">{displayPrice price=$dueAmount}</span>
 									</p>
-								{/if}
-								<p class="cart_final_total_block">
-									<span>{l s='Final Total'}</span>
-									{if isset($is_advance_payment) && $is_advance_payment}
+									<p class="cart_final_total_block">
+										<span class="strong">{l s='Partially Payable Total'}</span>
 										<span class="cart_total_values">{displayPrice price=$advPaymentAmount}</span>
-									{else}
-										<span class="cart_total_values">
-											{if $use_taxes}
-												{displayPrice price=$total_price}
-											{else}
-												{displayPrice price=$total_price_without_tax}
-											{/if}
-										</span>
-										<div class="hookDisplayProductPriceBlock-price">
-											{hook h="displayCartTotalPriceLabel"}
-										</div>
-									{/if}
-								</p>
+									</p>
+								{else}
+								{/if}
+
 							</div>
 							{* Check if voucher feature is enabled currently *}
 							{if $voucherAllowed}

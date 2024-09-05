@@ -438,6 +438,12 @@
 	margin-top: 10px;
     margin-bottom: 10px;
 }
+#order-opc .cart_total_detail_block hr {
+	margin: 9px 0;
+}
+#order-opc .cart_total_detail_block .strong {
+	font-weight: 600;
+}
 #order-opc .cart_total_detail_block .cart_total_values {
 	float: right;
 }
