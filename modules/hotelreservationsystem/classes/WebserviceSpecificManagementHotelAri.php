@@ -226,6 +226,7 @@ class WebserviceSpecificManagementHotelAri extends ObjectModel implements Webser
                         }
 
                         // now call the function
+                        $objCurrency = new Currency(Configuration::get('PS_CURRENCY_DEFAULT'));
                         $objBookingDtl = new HotelBookingDetail();
                         $searchAriData = [];
 
@@ -245,15 +246,13 @@ class WebserviceSpecificManagementHotelAri extends ObjectModel implements Webser
                             $bookingParams['search_unavai'] = 1;
                             $bookingData = $objBookingDtl->getBookingData($bookingParams);
 
-                            $objCurrency = new Currency(Configuration::get('PS_CURRENCY_DEFAULT'));
-
                             // saving date wise booked and unavailable rooms to manage available rooms calculation .
                             $bookedDates = array();
                             $unavailableDates = array();
                             foreach ($bookingData['rm_data'] as $key => $roomType) {
                                 if ($rooms = HotelRoomInformation::getHotelRoomsInfo($ariParams['id_hotel'], $roomType['id_product'])) {
                                     foreach ($rooms as $room) {
-                                        $bookingData['rm_data'][$key]['all_rooms'][$room['id']] = array('id_room' => $room['id'], 'room_number' => $room['room_num']);
+                                        $bookingData['rm_data'][$key]['all_rooms'][$room['id']] = array('id_room' => $room['id'], 'room_num' => $room['room_num']);
                                     }
                                     if (count($roomType['data']['booked'])) {
                                         foreach ($roomType['data']['booked'] as $bookedRoom) {
@@ -292,6 +291,15 @@ class WebserviceSpecificManagementHotelAri extends ObjectModel implements Webser
                                 $ariDateInfo['currency'] = $objCurrency->iso_code;
                                 $ariDateInfo['total_rooms'] = 0;
                                 $ariDateInfo['room_types'] = array();
+                                if ($getavail) {
+                                    $ariDateInfo['total_available_rooms'] = 0;
+                                }
+                                if ($getUnavai) {
+                                    $ariDateInfo['total_unavailable_rooms'] = 0;
+                                }
+                                if ($getBooked) {
+                                    $ariDateInfo['total_booked_rooms'] = 0;
+                                }
                                 foreach ($bookingData['rm_data'] as $roomType)
                                 {
                                     if (count($roomType['all_rooms'])) {
@@ -312,7 +320,7 @@ class WebserviceSpecificManagementHotelAri extends ObjectModel implements Webser
                                                 $roomDetail['unavailable'] = array();
                                         }
                                         if ($getavail) {
-                                            $ariDateInfo[''] += count($roomDetail['available']);
+                                            $ariDateInfo['total_available_rooms'] += count($roomDetail['available']);
                                         } else {
                                             unset($roomDetail['available']);
                                         }
@@ -387,21 +395,21 @@ class WebserviceSpecificManagementHotelAri extends ObjectModel implements Webser
                             foreach ($bookingData['rm_data'] as $roomType) {
                                 $roomTypePriceTE = HotelRoomTypeFeaturePricing::getRoomTypeFeaturePricesPerDay(
                                     $roomType['id_product'],
-                                    $currentDate,
-                                    date('Y-m-d H:i:s', strtotime('+1 day', strtotime($currentDate))),
+                                    $bookingParams['date_from'],
+                                    $bookingParams['date_to'],
                                     0
                                 );
                                 $roomTypePriceTI = HotelRoomTypeFeaturePricing::getRoomTypeFeaturePricesPerDay(
                                     $roomType['id_product'],
-                                    $currentDate,
-                                    date('Y-m-d H:i:s', strtotime('+1 day', strtotime($currentDate))),
+                                    $bookingParams['date_from'],
+                                    $bookingParams['date_to'],
                                     1
                                 );
 
                                 $totalBookingPrice = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice(
                                     $roomType['id_product'],
-                                    $currentDate,
-                                    date('Y-m-d H:i:s', strtotime('+1 day', strtotime($currentDate))),
+                                    $bookingParams['date_from'],
+                                    $bookingParams['date_to'],
                                     $totalRooms
                                 );
                                 $ariInfo['room_types'][] = array(
@@ -626,8 +634,8 @@ class WebserviceSpecificManagementHotelAri extends ObjectModel implements Webser
 
                     foreach ($ariInfo['room_types'] as $roomTypeInfo) {
                         $this->output .= $this->objOutput->getObjectRender()->renderNodeHeader('room_type', array(), array(
-                            'id' => $roomTypeInfo['id_product'],
-                            'xlink_resource' => $this->wsObject->wsUrl.'room_types'.'/'.$roomTypeInfo['id_product']
+                            'id' => $roomTypeInfo['id_room_type'],
+                            'xlink_resource' => $this->wsObject->wsUrl.'room_types'.'/'.$roomTypeInfo['id_room_type']
                         ));
 
                         $field = array('sqlId' => 'id_room_type', 'value' => $roomTypeInfo['id_room_type'], 'xlink_resource' => 'room_types');
@@ -650,11 +658,6 @@ class WebserviceSpecificManagementHotelAri extends ObjectModel implements Webser
                         $this->output .= $this->objOutput->getObjectRender()->renderField($field);
 
                         // rooms info of the room type
-                        if ($dateWiseBreakdown) {
-                            $roomTypeKey = 'rooms';
-                        } else {
-                            $roomTypeKey = 'data';
-                        }
                         if (isset($roomTypeInfo['rooms']) && $roomTypeInfo['rooms']) {
                             $this->output .= $this->objOutput->getObjectRender()->renderNodeHeader('rooms', array());
                             foreach ($roomTypeInfo['rooms'] as $key => $roomsInfo) {
@@ -698,7 +701,7 @@ class WebserviceSpecificManagementHotelAri extends ObjectModel implements Webser
                                             $field = array('sqlId' => 'id_room', 'value' => $roomInfo['id_room']);
                                             $this->output .= $this->objOutput->getObjectRender()->renderField($field);
 
-                                            $field = array('sqlId' => 'room_number', 'value' => $roomInfo['room_number']);
+                                            $field = array('sqlId' => 'room_number', 'value' => $roomInfo['room_num']);
                                             $this->output .= $this->objOutput->getObjectRender()->renderField($field);
 
                                             $this->output .= $this->objOutput->getObjectRender()->renderNodeFooter('room', array());
