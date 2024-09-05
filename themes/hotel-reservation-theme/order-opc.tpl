@@ -310,7 +310,6 @@
 										<span class="strong">{l s='Partially Payable Total'}</span>
 										<span class="cart_total_values">{displayPrice price=$advPaymentAmount}</span>
 									</p>
-								{else}
 								{/if}
 
 							</div>
