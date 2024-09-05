@@ -156,7 +156,6 @@
 												{l s='Next'}
 											</a>
 										{/if}
-										dasdas
 										{hook h="displayRoomTypeThumbnailsAfter"}
 									</div> <!-- end views-block -->
 								<!-- end thumbnails -->
