@@ -45,22 +45,24 @@
                                         <div class="row margin-lr-0">
                                             <p class="htlRoomTypeNameText pull-left">{$roomDisplay.name|escape:'htmlall':'UTF-8'}</p>
                                             {if $roomDisplay.show_price && !isset($restricted_country_mode) && !$PS_CATALOG_MODE}
-                                                <p class="htlRoomTypePriceText pull-right">
+                                                <p class="htlRoomTypePriceText">
                                                     {if $roomDisplay.feature_price_diff >= 0}
                                                         <span class="wk_roomType_price {if $roomDisplay.feature_price_diff>0}room_type_old_price{/if}">{convertPrice price = $roomDisplay.price_without_reduction}</span>
                                                     {/if}
                                                     {if $roomDisplay.feature_price_diff}
                                                         <span class="wk_roomType_price">{convertPrice price = $roomDisplay.feature_price}</span>
                                                     {/if}
-                                                    /&nbsp;{l s='Per Night' mod='wkhotelroom'}
+                                                    <span class="wk_roomType_price_type">
+                                                        /&nbsp;{l s='Per Night' mod='wkhotelroom'}
+                                                    </span>
                                                 </p>
                                             {/if}
                                         </div>
-                                        <div class="row margin-lr-0 htlRoomTypeDescText">
-                                            {$roomDisplay.description}
-                                        </div>
+                                        <div class="row margin-lr-0 htlRoomTypeDescText htlRoomTypeDescTextContainer">{$roomDisplay.description|escape:'html':'UTF-8'}</div>
+                                        <div class="row htlRoomTypeDescOriginal" hidden>{$roomDisplay.description|escape:'html':'UTF-8'}</div>
+                                        <div class="htlRoomTypeDescExtras"><span class='htlRoomTypeDescReadmore'>...{l s='Read More.' mod='wkhotelroom'}</span><span class='htlRoomTypeDescReadless'>...{l s='Read Less.' mod='wkhotelroom'}</span></div>
                                         <div class="row margin-lr-0">
-                                            <a class="btn btn-default button htlRoomTypeBookNow" href="{$link->getProductLink($roomDisplay.id_product)|escape:'html':'UTF-8'}"><span>{if !isset($restricted_country_mode) && !$PS_CATALOG_MODE}{l s='book now' mod='wkhotelroom'}{else}{l s='View' mod='wkhotelroom'}{/if}</span></a>
+                                            <a class="btn htlRoomTypeBookNow" href="{$link->getProductLink($roomDisplay.id_product)|escape:'html':'UTF-8'}"><span>{if !isset($restricted_country_mode) && !$PS_CATALOG_MODE}{l s='book now' mod='wkhotelroom'}{else}{l s='View' mod='wkhotelroom'}{/if}</span></a>
                                         </div>
                                     </div>
                                 </div>
