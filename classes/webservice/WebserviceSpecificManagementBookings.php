@@ -36,7 +36,7 @@ class WebserviceSpecificManagementBookingsCore Extends ObjectModel implements We
 
     public static $definition = array(
         'table' => 'htl_booking_detail',
-        'primary' => 'booking_id',
+        'primary' => 'id',
         'fields' => array()
     );
 
@@ -627,8 +627,12 @@ class WebserviceSpecificManagementBookingsCore Extends ObjectModel implements We
             $this->error_msg = Tools::displayError('Invalid booking status.');
         } else if (isset($params['payment_status']) && (!$params['payment_status'] ||$params['payment_status'] > 3)){
             $this->error_msg = Tools::displayError('Invalid payment status.');
-        } else {
-            $this->validateCartRules($params);
+        } else if (isset($params['cart_rules']) && $params['cart_rules']) {
+            if (is_array($params['cart_rules'])) {
+                $this->validateCartRules($params['cart_rules']);
+            } else {
+                $this->error_msg = Tools::displayError('Invalid cart rules.');
+            }
         }
 
         if (!$this->error_msg && $this->error_msg == '') {
@@ -759,11 +763,11 @@ class WebserviceSpecificManagementBookingsCore Extends ObjectModel implements We
         $this->processGuestDetails($params['customer_detail']);
         $this->processLanguage($params);
         $this->processCurrency($params);
-        //saving the cart after adding the guest, language and the currency in the cart
+        // Saving the cart after adding the guest, language and the currency in the cart.
         $this->context->cart->save();
         $this->addRoomsInCart($params['room_types']);
         $this->processCustomer($params['customer_detail']);
-        // validating these here since these cart rule checkValidity() only works if there are products in the cart.
+        // validating Cart rules here since the cart rule checkValidity() only works if there are products in the cart.
         if (($error = $this->applyCartRules($params)) && $error != '') {
             throw new WebserviceException(
                 $error,
@@ -868,6 +872,7 @@ class WebserviceSpecificManagementBookingsCore Extends ObjectModel implements We
             $objOrder = new Order($objPaymentModule->currentOrder);
             if (isset($params['booking_date'])
                 && $params['booking_date']
+                && Validate::isDate($params['booking_date'])
             ) {
                 $objOrder->date_add = date('Y-m-d H:i:s', strtotime($params['booking_date']));
             }
@@ -890,14 +895,23 @@ class WebserviceSpecificManagementBookingsCore Extends ObjectModel implements We
 
     /**
      * Updating the services and their prices.
-     * Also, updating the prices after validate order is not is lengthy process, we are adding the prices after validate order
      */
     public function updateServicesAndDemandsInOrder($idOrder)
     {
         $objOrder = new Order($idOrder);
         $objRoomTypeServiceProductOrderDetail = new RoomTypeServiceProductOrderDetail();
         if (isset($this->wsRequestedRoomTypes) && $this->wsRequestedRoomTypes) {
-            if ($orderedServices = $objRoomTypeServiceProductOrderDetail->getroomTypeServiceProducts($objOrder->id)) {
+            if ($orderedServices = $objRoomTypeServiceProductOrderDetail->getroomTypeServiceProducts($objOrder->id,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                null,
+                null
+            )) {
                 foreach ($orderedServices as $orderedService) {
                     $objHotelBookingDetail = new HotelBookingDetail($orderedService['id_htl_booking_detail']);
                     $dateJoinKey = strtotime($objHotelBookingDetail->date_from).''.strtotime($objHotelBookingDetail->date_to).$orderedService['id_room'];
@@ -1204,25 +1218,27 @@ class WebserviceSpecificManagementBookingsCore Extends ObjectModel implements We
     /**
      * Validating the cart rules.
      */
-    public function validateCartRules($params, $inOrder = false)
+    public function validateCartRules($cartRules, $inOrder = false)
     {
-        $cartRulesCount = array();
-        foreach ($params['cart_rules'] as $cartRule) {
-            if (!($code = trim($cartRule['code']))
+        foreach ($cartRules as $cartRule) {
+            if (!isset($cartRule['code']) || !$cartRule['code']) {
+                $this->error_msg = Tools::displayError('Invalid code for cart rule.');
+                break;
+            } else if (!($code = trim($cartRule['code']))
                 || !Validate::isCleanHtml($code)
             ) {
-                $this->error_msg = Tools::displayError('Invalid cart rule!!');
+                $this->error_msg = Tools::displayError('Invalid cart rule.');
                 break;
             } else if ($inOrder && !Validate::isLoadedObject($objCartRule = new CartRule(CartRule::getIdByCode($code)))
                 && (!isset($cartRule['value']) || !$cartRule['value'])
             ) {
-                $this->error_msg = Tools::displayError('Invalid cart rule parameters!!');
+                $this->error_msg = Tools::displayError('Invalid cart rule parameters.');
                 break;
             } else if (!$inOrder && !Validate::isLoadedObject($objCartRule = new CartRule(CartRule::getIdByCode($code)))
                 && (!isset($cartRule['type']) || $cartRule['type'] != 'percentage' || $cartRule['type'] != 'amount')
                 && (!isset($cartRule['value']) || !$cartRule['value'] || ($cartRule['type'] == 'percentage' && $cartRule['value'] > 100))
             ) {
-                $this->error_msg = Tools::displayError('Invalid cart rule parameters!!');
+                $this->error_msg = Tools::displayError('Invalid cart rule parameters.');
                 break;
             }
         }
@@ -1510,7 +1526,7 @@ class WebserviceSpecificManagementBookingsCore Extends ObjectModel implements We
         }
 
         if (isset($params['remark']) && $params['remark'] && !empty(trim($params['remark']))) {
-            $this->addCustomerMessage($params['remark']);
+            $this->addCustomerMessage($params['id'], $params['remark']);
         }
 
         $this->processCurrency($params);
@@ -1711,6 +1727,7 @@ class WebserviceSpecificManagementBookingsCore Extends ObjectModel implements We
                                             $taxMultiplier = 1;
                                         }
 
+                                        $quantity = $service['quantity'] * $numDays;
                                         $totalPriceTaxExclOld = $totalPriceTaxExcl;
                                         $totalPriceTaxInclOld = $totalPriceTaxIncl;
                                         $unitPriceTaxExclOld = $unitPriceTaxExcl;
@@ -1720,14 +1737,6 @@ class WebserviceSpecificManagementBookingsCore Extends ObjectModel implements We
                                         if ((int) $this->wsRequestedRoomTypes[$dateJoinKey]['services'][$service['id_product']]['total_price_with_tax']) {
                                             $totalPriceTaxExcl = $this->wsRequestedRoomTypes[$dateJoinKey]['services'][$service['id_product']]['total_price_with_tax']/$taxMultiplier;
                                             $totalPriceTaxIncl = $this->wsRequestedRoomTypes[$dateJoinKey]['services'][$service['id_product']]['total_price_with_tax'];
-                                        }
-
-                                        $quantity = $service['quantity'] * $numDays;
-                                        if ($objOrderDetail->product_price_calculation_method == Product::PRICE_CALCULATION_METHOD_PER_DAY) {
-                                            $quantity = $quantity * HotelHelper::getNumberOfDays(
-                                                $objHotelBookingDetail->date_from,
-                                                $objHotelBookingDetail->date_to
-                                            );
                                         }
 
                                         $unitPriceTaxExcl = 0;
@@ -1759,10 +1768,10 @@ class WebserviceSpecificManagementBookingsCore Extends ObjectModel implements We
                                     $objRoomTypeServiceProductOrderDetail->id_order_detail = $insertedServiceProductIdOrderDetail;
                                     $objRoomTypeServiceProductOrderDetail->id_cart = $this->context->cart->id;
                                     $objRoomTypeServiceProductOrderDetail->id_htl_booking_detail = $objBookingDetail->id;
-                                    $objRoomTypeServiceProductOrderDetail->unit_price_tax_excl = $unitPriceTaxExcl;
-                                    $objRoomTypeServiceProductOrderDetail->unit_price_tax_incl = $unitPriceTaxIncl;
-                                    $objRoomTypeServiceProductOrderDetail->total_price_tax_excl = $totalPriceTaxExcl;
-                                    $objRoomTypeServiceProductOrderDetail->total_price_tax_incl = $totalPriceTaxIncl;
+                                    $objRoomTypeServiceProductOrderDetail->unit_price_tax_excl = Tools::ps_round($unitPriceTaxExcl, _PS_PRICE_COMPUTE_PRECISION_);
+                                    $objRoomTypeServiceProductOrderDetail->unit_price_tax_incl = Tools::ps_round($unitPriceTaxIncl, _PS_PRICE_COMPUTE_PRECISION_);
+                                    $objRoomTypeServiceProductOrderDetail->total_price_tax_excl = Tools::ps_round($totalPriceTaxExcl, _PS_PRICE_COMPUTE_PRECISION_);
+                                    $objRoomTypeServiceProductOrderDetail->total_price_tax_incl = Tools::ps_round($totalPriceTaxIncl, _PS_PRICE_COMPUTE_PRECISION_);
                                     $objRoomTypeServiceProductOrderDetail->name = $service['name'];
                                     $objRoomTypeServiceProductOrderDetail->quantity = $service['quantity'];
                                     $objRoomTypeServiceProductOrderDetail->save();
@@ -2110,11 +2119,11 @@ class WebserviceSpecificManagementBookingsCore Extends ObjectModel implements We
     /**
      * Adding new custmer messages.
      */
-    public function addCustomerMessage($params)
+    public function addCustomerMessage($idOrder, $remark)
     {
-        $objOrder = new Order((int) $params['id']);
+        $objOrder = new Order((int) $idOrder);
         $objMessage = new Message();
-        $message = strip_tags($params['remark'], '<br>');
+        $message = strip_tags($remark, '<br>');
         $saveMessage = true;
         $idCart = Cart::getCartIdByOrderId($objOrder->id);
         if ($customerMessages = Message::getMessagesByOrderId($objOrder->id, true)) {
@@ -2136,7 +2145,7 @@ class WebserviceSpecificManagementBookingsCore Extends ObjectModel implements We
     }
 
     /**
-     * Adding order payment.
+     * Adding order payment from PUT requests.
      */
     public function addOrderPayment($params)
     {
@@ -2227,7 +2236,7 @@ class WebserviceSpecificManagementBookingsCore Extends ObjectModel implements We
         $objCustomer = new Customer();
         $this->error_msg = '';
         if (!isset($params['id']) || !$params['id']) {
-            $this->error_msg = Tools::displayError('id is required with PUT requests!!');
+            $this->error_msg = Tools::displayError('id is required with PUT requests.');
         } else if (!Validate::isLoadedObject(new Order($params['id']))) {
             $this->error_msg = Tools::displayError('Booking not found.');
         } else if (!isset($params['booking_status'])
@@ -2256,7 +2265,11 @@ class WebserviceSpecificManagementBookingsCore Extends ObjectModel implements We
         ) {
             $this->error_msg = Tools::displayError('Requested room(s) not available');
         } else if (isset($params['cart_rules']) && $params['cart_rules']) {
-            $this->validateCartRules($params['cart_rules'], true);
+            if (is_array($params['cart_rules'])) {
+                $this->validateCartRules($params['cart_rules']);
+            } else {
+                $this->error_msg = Tools::displayError('Invalid cart rules.');
+            }
         }
 
         if (!$this->error_msg && $this->error_msg == '') {
@@ -2830,9 +2843,9 @@ class WebserviceSpecificManagementBookingsCore Extends ObjectModel implements We
             );
 
             $priceDetails = array(
-                'total_paid' => (float) $objOrder->total_paid_real,
-                'total_price_with_tax' => (float) $objOrder->total_paid_tax_incl,
-                'total_tax' => (float) ($objOrder->total_paid_tax_incl - $objOrder->total_paid_tax_excl)
+                'total_paid' => Tools::ps_round($objOrder->total_paid_real, _PS_PRICE_COMPUTE_PRECISION_),
+                'total_price_with_tax' => Tools::ps_round($objOrder->total_paid_tax_incl, _PS_PRICE_COMPUTE_PRECISION_),
+                'total_tax' => Tools::ps_round(($objOrder->total_paid_tax_incl - $objOrder->total_paid_tax_excl), _PS_PRICE_COMPUTE_PRECISION_)
             );
 
             $orderCartRules = array();
@@ -2840,7 +2853,7 @@ class WebserviceSpecificManagementBookingsCore Extends ObjectModel implements We
                 foreach ($cartRules as $cartRule) {
                     $rule = array();
                     $rule['code'] = $cartRule['name'];
-                    $rule['value'] = (float) $cartRule['value'];
+                    $rule['value'] = Tools::ps_round($cartRule['value'], _PS_PRICE_COMPUTE_PRECISION_);
                     $rule['currency'] = strtoupper($objCurrency->iso_code);
                     $rule['id_order_invoice'] = (int) $cartRule['id_order_invoice'];
                     $orderCartRules[] = $rule;
@@ -2854,6 +2867,8 @@ class WebserviceSpecificManagementBookingsCore Extends ObjectModel implements We
             if (Group::getPriceDisplayMethod($objCustomer->id_default_group) == PS_TAX_INC) {
                 $useTax = 1;
             }
+
+            $params['associations']['remarks'] = array();
             if ($customerMessages = Message::getMessagesByOrderId($objOrder->id, true)) {
                 foreach ($customerMessages as $customerMessage) {
                     $message = $customerMessage['message'];
@@ -2869,23 +2884,26 @@ class WebserviceSpecificManagementBookingsCore Extends ObjectModel implements We
                         $roomTypeInfo[$dateJoin]['id_room_type'] = (int) $orderData['id_product'];
                         $roomTypeInfo[$dateJoin]['checkin_date'] = $orderData['date_from'];
                         $roomTypeInfo[$dateJoin]['checkout_date'] = $orderData['date_to'];
-                        $roomTypeInfo[$dateJoin]['total_price_with_tax'] = (float)$orderData['total_price_tax_incl'];
-                        $roomTypeInfo[$dateJoin]['total_tax'] = (float)($orderData['total_price_tax_incl'] - $orderData['total_price_tax_excl']);
+                        $roomTypeInfo[$dateJoin]['total_price_with_tax'] = $orderData['total_price_tax_incl'];
+                        $roomTypeInfo[$dateJoin]['total_tax'] = ($orderData['total_price_tax_incl'] - $orderData['total_price_tax_excl']);
                         $roomTypeInfo[$dateJoin]['number_of_rooms'] = 1;
                         $roomTypeInfo[$dateJoin]['name'] = $orderData['room_type_name'];
                     } else {
                         $roomTypeInfo[$dateJoin]['total_price_with_tax'] += $orderData['total_price_tax_incl'];
-                        $roomTypeInfo[$dateJoin]['total_tax'] += $orderData['total_price_tax_incl'] - $orderData['total_price_tax_excl'];
+                        $roomTypeInfo[$dateJoin]['total_tax'] += ($orderData['total_price_tax_incl'] - $orderData['total_price_tax_excl']);
                         $roomTypeInfo[$dateJoin]['number_of_rooms'] += 1;
                     }
+
+                    $roomTypeInfo[$dateJoin]['total_price_with_tax'] = Tools::ps_round($roomTypeInfo[$dateJoin]['total_price_with_tax'], _PS_PRICE_COMPUTE_PRECISION_);
+                    $roomTypeInfo[$dateJoin]['total_tax'] = Tools::ps_round($roomTypeInfo[$dateJoin]['total_tax'], _PS_PRICE_COMPUTE_PRECISION_);
 
                     $roomInfo = array();
                     $roomInfo['id_room'] = (int) $orderData['id_room'];
                     $roomInfo['id_hotel_booking'] = (int) $orderData['id'];
                     $roomInfo['adults'] = (int) $orderData['adults'];
                     $roomInfo['child'] = (int) $orderData['children'];
-                    $roomInfo['total_price_with_tax'] = (float)$orderData['total_price_tax_incl'];
-                    $roomInfo['total_tax'] = (float) ($orderData['total_price_tax_incl'] - $orderData['total_price_tax_excl']);
+                    $roomInfo['total_price_with_tax'] = Tools::ps_round($orderData['total_price_tax_incl'], _PS_PRICE_COMPUTE_PRECISION_);
+                    $roomInfo['total_tax'] = Tools::ps_round(($orderData['total_price_tax_incl'] - $orderData['total_price_tax_excl']), _PS_PRICE_COMPUTE_PRECISION_);
                     if(isset($roomInfo['facilities'])) {
                         unset($roomInfo['facilities']);
                     }
@@ -2905,11 +2923,11 @@ class WebserviceSpecificManagementBookingsCore Extends ObjectModel implements We
                             $demand['name'] = $extraDemand['name'];
                             $demand['quantity'] = 1;
                             if ($useTax) {
-                                $demand['total_price'] = (float) $extraDemand['total_price_tax_incl'];
-                                $demand['unit_price'] = (float) $extraDemand['unit_price_tax_incl'];
+                                $demand['total_price'] = Tools::ps_round($extraDemand['total_price_tax_incl'], _PS_PRICE_COMPUTE_PRECISION_);
+                                $demand['unit_price'] = Tools::ps_round($extraDemand['unit_price_tax_incl'], _PS_PRICE_COMPUTE_PRECISION_);
                             } else {
-                                $demand['total_price'] = (float) $extraDemand['total_price_tax_excl'];
-                                $demand['unit_price'] = (float) $extraDemand['unit_price_tax_excl'];
+                                $demand['total_price'] = Tools::ps_round($extraDemand['total_price_tax_excl'], _PS_PRICE_COMPUTE_PRECISION_);
+                                $demand['unit_price'] = Tools::ps_round($extraDemand['unit_price_tax_excl'], _PS_PRICE_COMPUTE_PRECISION_);
                             }
 
                             $demand['per_night'] = 0;
@@ -2945,11 +2963,11 @@ class WebserviceSpecificManagementBookingsCore Extends ObjectModel implements We
                                 $services['quantity'] = (int) $service['quantity'];
 
                                 if ($useTax) {
-                                    $services['unit_price'] = (float) $service['total_price_tax_incl'] / $services['quantity'];
-                                    $services['total_price'] = (float) $service['total_price_tax_incl'];
+                                    $services['unit_price'] = Tools::ps_round(($service['total_price_tax_incl'] / $services['quantity']), _PS_PRICE_COMPUTE_PRECISION_);
+                                    $services['total_price'] = Tools::ps_round($service['total_price_tax_incl'], _PS_PRICE_COMPUTE_PRECISION_);
                                 } else {
-                                    $services['unit_price'] = (float) $service['total_price_tax_excl'] / $services['quantity'];
-                                    $services['total_price'] = (float) $service['total_price_tax_excl'];
+                                    $services['unit_price'] = Tools::ps_round(($service['total_price_tax_excl'] / $services['quantity']), _PS_PRICE_COMPUTE_PRECISION_);
+                                    $services['total_price'] = Tools::ps_round($service['total_price_tax_excl'], _PS_PRICE_COMPUTE_PRECISION_);
                                 }
 
                                 $objProduct = new Product($service['id_product']);

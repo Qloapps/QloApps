@@ -627,7 +627,7 @@ class WebserviceOutputBuilderCore
                 $output_details = '';
                 foreach ($objects_assoc as $object_assoc) {
                     if (isset($association['only_leaf_nodes']) && $association['only_leaf_nodes']) {
-                        unset($association['single_entity']);
+                        unset($association['only_leaf_nodes']);
                         unset($association['getter']);
                         unset($association['setter']);
                         foreach ($association as $associationKey => $resource) {
