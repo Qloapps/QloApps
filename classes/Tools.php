@@ -3800,6 +3800,27 @@ exit;
         }
         return $base;
     }
+
+    public static function processPriceRounding($value, $qty = 1, $roundType = null, $roundMode = null)
+    {
+        if (!$roundType) {
+            $roundType = Configuration::get('PS_ROUND_TYPE');
+        }
+        switch ($roundType) {
+            case Order::ROUND_TOTAL:
+                $value = $value;
+                break;
+            case Order::ROUND_LINE:
+                $value = Tools::ps_round(($value * $qty), _PS_PRICE_COMPUTE_PRECISION_, $roundMode);
+                break;
+            case Order::ROUND_ITEM:
+            default:
+                $value = Tools::ps_round($value, _PS_PRICE_COMPUTE_PRECISION_, $roundMode) * $qty;
+                break;
+        }
+
+        return $value;
+    }
 }
 
 /**
