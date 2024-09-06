@@ -249,31 +249,33 @@ class WebserviceSpecificManagementHotelAri extends ObjectModel implements Webser
                             // saving date wise booked and unavailable rooms to manage available rooms calculation .
                             $bookedDates = array();
                             $unavailableDates = array();
-                            foreach ($bookingData['rm_data'] as $key => $roomType) {
-                                if ($rooms = HotelRoomInformation::getHotelRoomsInfo($ariParams['id_hotel'], $roomType['id_product'])) {
-                                    foreach ($rooms as $room) {
-                                        $bookingData['rm_data'][$key]['all_rooms'][$room['id']] = array('id_room' => $room['id'], 'room_num' => $room['room_num']);
-                                    }
-                                    if (count($roomType['data']['booked'])) {
-                                        foreach ($roomType['data']['booked'] as $bookedRoom) {
-                                            foreach ($bookedRoom['detail'] as $bookDetail) {
-                                                for ($currentDate = date('Y-m-d', strtotime($bookDetail['date_from']));
-                                                    $currentDate < date('Y-m-d', strtotime($bookDetail['date_to']));
-                                                    $currentDate = date('Y-m-d', strtotime('+1 day', strtotime($currentDate)))
-                                                ) {
-                                                    $bookedDates[$currentDate][$roomType['id_product']][$bookedRoom['id_room']] = $bookedRoom['id_room'];
+                            if (isset($bookingData['rm_data']) && $bookingData['rm_data']) {
+                                foreach ($bookingData['rm_data'] as $key => $roomType) {
+                                    if ($rooms = HotelRoomInformation::getHotelRoomsInfo($ariParams['id_hotel'], $roomType['id_product'])) {
+                                        foreach ($rooms as $room) {
+                                            $bookingData['rm_data'][$key]['all_rooms'][$room['id']] = array('id_room' => $room['id'], 'room_num' => $room['room_num']);
+                                        }
+                                        if (count($roomType['data']['booked'])) {
+                                            foreach ($roomType['data']['booked'] as $bookedRoom) {
+                                                foreach ($bookedRoom['detail'] as $bookDetail) {
+                                                    for ($currentDate = date('Y-m-d', strtotime($bookDetail['date_from']));
+                                                        $currentDate < date('Y-m-d', strtotime($bookDetail['date_to']));
+                                                        $currentDate = date('Y-m-d', strtotime('+1 day', strtotime($currentDate)))
+                                                    ) {
+                                                        $bookedDates[$currentDate][$roomType['id_product']][$bookedRoom['id_room']] = $bookedRoom['id_room'];
+                                                    }
                                                 }
                                             }
                                         }
-                                    }
-                                    if (count($roomType['data']['unavailable'])) {
-                                        foreach ($roomType['data']['unavailable'] as $unavailableRooms) {
-                                            foreach ($unavailableRooms['detail'] as $unavailableDetail) {
-                                                for ($currentDate = date('Y-m-d', strtotime($unavailableDetail['date_from']));
-                                                    $currentDate < date('Y-m-d', strtotime($unavailableDetail['date_to']));
-                                                    $currentDate = date('Y-m-d', strtotime('+1 day', strtotime($currentDate)))
-                                                ) {
-                                                    $unavailableDates[$currentDate][$roomType['id_product']][$bookedRoom['id_room']] = $bookedRoom['id_room'];
+                                        if (count($roomType['data']['unavailable'])) {
+                                            foreach ($roomType['data']['unavailable'] as $unavailableRooms) {
+                                                foreach ($unavailableRooms['detail'] as $unavailableDetail) {
+                                                    for ($currentDate = date('Y-m-d', strtotime($unavailableDetail['date_from']));
+                                                        $currentDate < date('Y-m-d', strtotime($unavailableDetail['date_to']));
+                                                        $currentDate = date('Y-m-d', strtotime('+1 day', strtotime($currentDate)))
+                                                    ) {
+                                                        $unavailableDates[$currentDate][$roomType['id_product']][$bookedRoom['id_room']] = $bookedRoom['id_room'];
+                                                    }
                                                 }
                                             }
                                         }
@@ -289,82 +291,83 @@ class WebserviceSpecificManagementHotelAri extends ObjectModel implements Webser
                                 $ariDateInfo['date_from'] = $currentDate;
                                 $ariDateInfo['date_to'] = $nextDate;
                                 $ariDateInfo['currency'] = $objCurrency->iso_code;
-                                $ariDateInfo['total_rooms'] = 0;
-                                $ariDateInfo['room_types'] = array();
-                                if ($getavail) {
-                                    $ariDateInfo['total_available_rooms'] = 0;
-                                }
-                                if ($getUnavai) {
-                                    $ariDateInfo['total_unavailable_rooms'] = 0;
-                                }
-                                if ($getBooked) {
-                                    $ariDateInfo['total_booked_rooms'] = 0;
-                                }
-                                foreach ($bookingData['rm_data'] as $roomType)
-                                {
-                                    if (count($roomType['all_rooms'])) {
-                                        $ariDateInfo['total_rooms'] += count($roomType['all_rooms']);
-                                        $roomDetail = array();
-
-                                        $roomDetail['available'] = $roomType['all_rooms'];
-                                        if (isset($bookedDates[$currentDate][$roomType['id_product']])) {
-                                            $roomDetail['available'] = array_diff_key($roomDetail['available'], $bookedDates[$currentDate][$roomType['id_product']]);
-                                                $roomDetail['booked'] = array_intersect_key($roomType['all_rooms'], $bookedDates[$currentDate][$roomType['id_product']]);
-                                        } else {
-                                                $roomDetail['booked'] = array();
-                                        }
-                                        if (isset($unavailableDates[$currentDate][$roomType['id_product']])) {
-                                            $roomDetail['available'] = array_diff_key($roomDetail['available'], $unavailableDates[$currentDate][$roomType['id_product']]);
-                                                $roomDetail['unavailable'] = array_intersect_key($roomType['all_rooms'], $unavailableDates[$currentDate][$roomType['id_product']]);
-                                        } else {
-                                                $roomDetail['unavailable'] = array();
-                                        }
-                                        if ($getavail) {
-                                            $ariDateInfo['total_available_rooms'] += count($roomDetail['available']);
-                                        } else {
-                                            unset($roomDetail['available']);
-                                        }
-                                        if ($getUnavai) {
-                                            $ariDateInfo['total_unavailable_rooms'] += count($roomDetail['available']);
-                                        } else {
-                                            unset($roomDetail['unavailable']);
-                                        }
-                                        if ($getBooked) {
-                                            $ariDateInfo['total_booked_rooms'] += count($roomDetail['available']);
-                                        } else {
-                                            unset($roomDetail['booked']);
-                                        }
+                                if (isset($bookingData['rm_data']) && $bookingData['rm_data']) {
+                                    $ariDateInfo['total_rooms'] = 0;
+                                    $ariDateInfo['room_types'] = array();
+                                    if ($getavail) {
+                                        $ariDateInfo['total_available_rooms'] = 0;
                                     }
+                                    if ($getUnavai) {
+                                        $ariDateInfo['total_unavailable_rooms'] = 0;
+                                    }
+                                    if ($getBooked) {
+                                        $ariDateInfo['total_booked_rooms'] = 0;
+                                    }
+                                    foreach ($bookingData['rm_data'] as $roomType)
+                                    {
+                                        if (count($roomType['all_rooms'])) {
+                                            $ariDateInfo['total_rooms'] += count($roomType['all_rooms']);
+                                            $roomDetail = array();
 
-                                    $roomTypePriceTE = HotelRoomTypeFeaturePricing::getRoomTypeFeaturePricesPerDay(
-                                        $roomType['id_product'],
-                                        $currentDate,
-                                        date('Y-m-d H:i:s', strtotime('+1 day', strtotime($currentDate))),
-                                        0
-                                    );
-                                    $roomTypePriceTI = HotelRoomTypeFeaturePricing::getRoomTypeFeaturePricesPerDay(
-                                        $roomType['id_product'],
-                                        $currentDate,
-                                        date('Y-m-d H:i:s', strtotime('+1 day', strtotime($currentDate))),
-                                        1
-                                    );
-                                    $totalBookingPrice = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice(
-                                        $roomType['id_product'],
-                                        $currentDate,
-                                        date('Y-m-d H:i:s', strtotime('+1 day', strtotime($currentDate))),
-                                        $totalRooms
-                                    );
-                                    $ariDateInfo['room_types'][] = array(
-                                        'id_room_type' => $roomType['id_product'],
-                                        'base_price' => $roomTypePriceTE,
-                                        'base_price_with_tax' => $roomTypePriceTI,
-                                        'total_price' => $totalBookingPrice['total_price_tax_excl'],
-                                        'total_price_with_tax' => $totalBookingPrice['total_price_tax_incl'],
-                                        'name' => $roomType['name'],
-                                        'rooms' => $roomDetail
-                                    );
+                                            $roomDetail['available'] = $roomType['all_rooms'];
+                                            if (isset($bookedDates[$currentDate][$roomType['id_product']])) {
+                                                $roomDetail['available'] = array_diff_key($roomDetail['available'], $bookedDates[$currentDate][$roomType['id_product']]);
+                                                    $roomDetail['booked'] = array_intersect_key($roomType['all_rooms'], $bookedDates[$currentDate][$roomType['id_product']]);
+                                            } else {
+                                                    $roomDetail['booked'] = array();
+                                            }
+                                            if (isset($unavailableDates[$currentDate][$roomType['id_product']])) {
+                                                $roomDetail['available'] = array_diff_key($roomDetail['available'], $unavailableDates[$currentDate][$roomType['id_product']]);
+                                                    $roomDetail['unavailable'] = array_intersect_key($roomType['all_rooms'], $unavailableDates[$currentDate][$roomType['id_product']]);
+                                            } else {
+                                                    $roomDetail['unavailable'] = array();
+                                            }
+                                            if ($getavail) {
+                                                $ariDateInfo['total_available_rooms'] += count($roomDetail['available']);
+                                            } else {
+                                                unset($roomDetail['available']);
+                                            }
+                                            if ($getUnavai) {
+                                                $ariDateInfo['total_unavailable_rooms'] += count($roomDetail['available']);
+                                            } else {
+                                                unset($roomDetail['unavailable']);
+                                            }
+                                            if ($getBooked) {
+                                                $ariDateInfo['total_booked_rooms'] += count($roomDetail['available']);
+                                            } else {
+                                                unset($roomDetail['booked']);
+                                            }
+                                        }
+
+                                        $roomTypePriceTE = HotelRoomTypeFeaturePricing::getRoomTypeFeaturePricesPerDay(
+                                            $roomType['id_product'],
+                                            $currentDate,
+                                            date('Y-m-d H:i:s', strtotime('+1 day', strtotime($currentDate))),
+                                            0
+                                        );
+                                        $roomTypePriceTI = HotelRoomTypeFeaturePricing::getRoomTypeFeaturePricesPerDay(
+                                            $roomType['id_product'],
+                                            $currentDate,
+                                            date('Y-m-d H:i:s', strtotime('+1 day', strtotime($currentDate))),
+                                            1
+                                        );
+                                        $totalBookingPrice = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice(
+                                            $roomType['id_product'],
+                                            $currentDate,
+                                            date('Y-m-d H:i:s', strtotime('+1 day', strtotime($currentDate))),
+                                            $totalRooms
+                                        );
+                                        $ariDateInfo['room_types'][] = array(
+                                            'id_room_type' => $roomType['id_product'],
+                                            'base_price' => $roomTypePriceTE,
+                                            'base_price_with_tax' => $roomTypePriceTI,
+                                            'total_price' => $totalBookingPrice['total_price_tax_excl'],
+                                            'total_price_with_tax' => $totalBookingPrice['total_price_tax_incl'],
+                                            'name' => $roomType['name'],
+                                            'rooms' => $roomDetail
+                                        );
+                                    }
                                 }
-
                                 $searchAriData[] = $ariDateInfo;
                             }
                         } else { // If api is called for getting ari info for a particular date range
@@ -378,49 +381,53 @@ class WebserviceSpecificManagementHotelAri extends ObjectModel implements Webser
                             $ariInfo['date_from'] = $bookingParams['date_from'];
                             $ariInfo['date_to'] = $bookingParams['date_to'];
                             $ariInfo['currency'] = $objCurrency->iso_code;
-                            $ariInfo['total_rooms'] = $bookingData['stats']['total_rooms'];
-                            if (isset($bookingData['stats']['num_avail'])) {
-                                $ariInfo['total_available_rooms'] = $bookingData['stats']['num_avail'];
-                            }
-                            if (isset($bookingData['stats']['num_unavail'])) {
-                                $ariInfo['total_unavailable_rooms'] = $bookingData['stats']['num_unavail'];
-                            }
-                            if (isset($bookingData['stats']['num_part_avai'])) {
-                                $ariInfo['total_partial_available_rooms'] = $bookingData['stats']['num_part_avai'];
-                            }
-                            if (isset($bookingData['stats']['num_booked'])) {
-                                $ariInfo['total_booked_rooms'] = $bookingData['stats']['num_booked'];
-                            }
-                            $ariInfo['room_types'] = array();
-                            foreach ($bookingData['rm_data'] as $roomType) {
-                                $roomTypePriceTE = HotelRoomTypeFeaturePricing::getRoomTypeFeaturePricesPerDay(
-                                    $roomType['id_product'],
-                                    $bookingParams['date_from'],
-                                    $bookingParams['date_to'],
-                                    0
-                                );
-                                $roomTypePriceTI = HotelRoomTypeFeaturePricing::getRoomTypeFeaturePricesPerDay(
-                                    $roomType['id_product'],
-                                    $bookingParams['date_from'],
-                                    $bookingParams['date_to'],
-                                    1
-                                );
+                            if (isset($bookingData['rm_data']) && $bookingData['rm_data']) {
+                                if (isset($bookingData['stats']['total_rooms'])) {
+                                    $ariInfo['total_rooms'] = $bookingData['stats']['total_rooms'];
+                                }
+                                if (isset($bookingData['stats']['num_avail'])) {
+                                    $ariInfo['total_available_rooms'] = $bookingData['stats']['num_avail'];
+                                }
+                                if (isset($bookingData['stats']['num_unavail'])) {
+                                    $ariInfo['total_unavailable_rooms'] = $bookingData['stats']['num_unavail'];
+                                }
+                                if (isset($bookingData['stats']['num_part_avai'])) {
+                                    $ariInfo['total_partial_available_rooms'] = $bookingData['stats']['num_part_avai'];
+                                }
+                                if (isset($bookingData['stats']['num_booked'])) {
+                                    $ariInfo['total_booked_rooms'] = $bookingData['stats']['num_booked'];
+                                }
+                                $ariInfo['room_types'] = array();
+                                foreach ($bookingData['rm_data'] as $roomType) {
+                                    $roomTypePriceTE = HotelRoomTypeFeaturePricing::getRoomTypeFeaturePricesPerDay(
+                                        $roomType['id_product'],
+                                        $bookingParams['date_from'],
+                                        $bookingParams['date_to'],
+                                        0
+                                    );
+                                    $roomTypePriceTI = HotelRoomTypeFeaturePricing::getRoomTypeFeaturePricesPerDay(
+                                        $roomType['id_product'],
+                                        $bookingParams['date_from'],
+                                        $bookingParams['date_to'],
+                                        1
+                                    );
 
-                                $totalBookingPrice = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice(
-                                    $roomType['id_product'],
-                                    $bookingParams['date_from'],
-                                    $bookingParams['date_to'],
-                                    $totalRooms
-                                );
-                                $ariInfo['room_types'][] = array(
-                                    'id_room_type' => $roomType['id_product'],
-                                    'base_price' => $roomTypePriceTE,
-                                    'base_price_with_tax' => $roomTypePriceTI,
-                                    'total_price' => $totalBookingPrice['total_price_tax_excl'],
-                                    'total_price_with_tax' => $totalBookingPrice['total_price_tax_incl'],
-                                    'name' => $roomType['name'],
-                                    'rooms' => $roomType['data']
-                                );
+                                    $totalBookingPrice = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice(
+                                        $roomType['id_product'],
+                                        $bookingParams['date_from'],
+                                        $bookingParams['date_to'],
+                                        $totalRooms
+                                    );
+                                    $ariInfo['room_types'][] = array(
+                                        'id_room_type' => $roomType['id_product'],
+                                        'base_price' => $roomTypePriceTE,
+                                        'base_price_with_tax' => $roomTypePriceTI,
+                                        'total_price' => $totalBookingPrice['total_price_tax_excl'],
+                                        'total_price_with_tax' => $totalBookingPrice['total_price_tax_incl'],
+                                        'name' => $roomType['name'],
+                                        'rooms' => $roomType['data']
+                                    );
+                                }
                             }
                             $searchAriData[] = $ariInfo;
                         }
@@ -605,8 +612,10 @@ class WebserviceSpecificManagementHotelAri extends ObjectModel implements Webser
                 $field = array('sqlId' => 'currency', 'value' => $ariInfo['currency']);
                 $this->output .= $this->objOutput->getObjectRender()->renderField($field);
 
-                $field = array('sqlId' => 'total_rooms', 'value' => $ariInfo['total_rooms']);
-                $this->output .= $this->objOutput->getObjectRender()->renderField($field);
+                if (isset($ariInfo['total_rooms'])) {
+                    $field = array('sqlId' => 'total_rooms', 'value' => $ariInfo['total_rooms']);
+                    $this->output .= $this->objOutput->getObjectRender()->renderField($field);
+                }
 
                 if (isset($ariInfo['total_available_rooms'])) {
                     $field = array('sqlId' => 'total_available_rooms', 'value' => $ariInfo['total_available_rooms']);
