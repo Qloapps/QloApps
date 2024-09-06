@@ -197,7 +197,7 @@ class AdminCartsControllerCore extends AdminController
             $helper->data = ConfigurationKPI::get('CONVERSION_RATE_CHART');
         }
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=conversion_rate';
-        $kpis[] = $helper;
+        $this->kpis[] = $helper;
 
         $helper = new HelperKpi();
         $helper->id = 'box-carts';
@@ -209,7 +209,7 @@ class AdminCartsControllerCore extends AdminController
         $helper->subtitle = sprintf($this->l('From %s to %s', null, null, false), $date_from, $date_to);
         $helper->href = $this->context->link->getAdminLink('AdminCarts').'&action=filterOnlyAbandonedCarts&date_from='.$date_from.'&date_to='.$date_to;
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=abandoned_cart';
-        $kpis[] = $helper;
+        $this->kpis[] = $helper;
 
         $daysForAvgOrderVal = Configuration::get('PS_ORDER_KPI_AVG_ORDER_VALUE_NB_DAYS');
         $helper = new HelperKpi();
@@ -219,7 +219,7 @@ class AdminCartsControllerCore extends AdminController
         $helper->title = $this->l('Average Order Value', null, null, false);
         $helper->subtitle = $daysForAvgOrderVal.' '.$this->l('days', null, null, false);
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=average_order_value';
-        $kpis[] = $helper;
+        $this->kpis[] = $helper;
 
         $daysForProfitPerVisitor = Configuration::get('PS_ORDER_KPI_PER_VISITOR_PROFIT_NB_DAYS');
         $helper = new HelperKpi();
@@ -229,15 +229,9 @@ class AdminCartsControllerCore extends AdminController
         $helper->title = $this->l('Net Profit per Visitor', null, null, false);
         $helper->subtitle = $daysForProfitPerVisitor.' '.$this->l('days', null, null, false);
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=netprofit_visit';
-        $kpis[] = $helper;
+        $this->kpis[] = $helper;
 
-        Hook::exec('action'.$this->controller_name.'KPIListingModifier', array(
-            'kpis' => &$kpis,
-        ));
-
-        $helper = new HelperKpiRow();
-        $helper->kpis = $kpis;
-        return $helper->generate();
+        return parent::renderKpis();
     }
 
 

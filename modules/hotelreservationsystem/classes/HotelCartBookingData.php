@@ -430,6 +430,9 @@ class HotelCartBookingData extends ObjectModel
                 }
             }
         }
+        // after room is removed from cart, check if any of the appled cart rules are not being used
+        CartRule::autoRemoveFromCart(Context::getContext());
+        CartRule::autoAddToCart(Context::getContext());
 
         // return number of rooms deleted
         return true;
@@ -1910,6 +1913,15 @@ class HotelCartBookingData extends ObjectModel
         } else {
             return $roomTypeDemands;
         }
+    }
+
+    public function save($null_values = false, $auto_date = true)
+    {
+        $return = parent::save($null_values = false, $auto_date = true);
+        // after updating cart data, check if any of the appled cart rules are not being used
+        CartRule::autoRemoveFromCart(Context::getContext());
+        CartRule::autoAddToCart(Context::getContext());
+        return $return;
     }
 
     public function update($null_values = false)
