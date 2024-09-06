@@ -3923,9 +3923,9 @@ class AdminOrdersControllerCore extends AdminController
         $product_informations = $_POST['add_product'];
 
         /*By Webkul Code is added to add order information In our table while adding product in the process order edit from order detail page.*/
-        $date_from = date('Y-m-d', strtotime($product_informations['date_from']));
-        $date_to = date('Y-m-d', strtotime($product_informations['date_to']));
-        $curr_date = date('Y-m-d');
+        $date_from = date('Y-m-d H:i:s', strtotime($product_informations['date_from']));
+        $date_to = date('Y-m-d H:i:s', strtotime($product_informations['date_to']));
+        $curr_date = date('Y-m-d H:i:s');
         $occupancy = Tools::getValue('occupancy');
         /*Validations*/
         if ($date_from == '') {
@@ -4674,8 +4674,8 @@ class AdminOrdersControllerCore extends AdminController
         $cart = new Cart($obj_booking_detail->id_cart);
 
         $product_informations = $_POST['edit_product'];
-        $new_date_from = trim(date('Y-m-d', strtotime($product_informations['date_from'])));
-        $new_date_to = trim(date('Y-m-d', strtotime($product_informations['date_to'])));
+        $new_date_from = trim(date('Y-m-d H:i:s', strtotime($product_informations['date_from'])));
+        $new_date_to = trim(date('Y-m-d H:i:s', strtotime($product_informations['date_to'])));
         $old_date_from = trim(Tools::getValue('date_from'));
         $old_date_to = trim(Tools::getValue('date_to'));
         $id_hotel = trim(Tools::getValue('id_hotel'));
@@ -5652,10 +5652,10 @@ class AdminOrdersControllerCore extends AdminController
         $product_price_tax_incl = str_replace(',', '.', Tools::getValue('product_price_tax_incl'));
         $product_price_tax_excl = str_replace(',', '.', Tools::getValue('product_price_tax_excl'));
         $product_informations = $_POST['edit_product'];
-        $new_date_from = trim(date('Y-m-d', strtotime($product_informations['date_from'])));
-        $new_date_to = trim(date('Y-m-d', strtotime($product_informations['date_to'])));
-        $old_date_from = date('Y-m-d', strtotime(trim(Tools::getValue('date_from'))));
-        $old_date_to = date('Y-m-d', strtotime(trim(Tools::getValue('date_to'))));
+        $new_date_from = trim(date('Y-m-d H:i:s', strtotime($product_informations['date_from'])));
+        $new_date_to = trim(date('Y-m-d H:i:s', strtotime($product_informations['date_to'])));
+        $old_date_from = date('Y-m-d H:i:s', strtotime(trim(Tools::getValue('date_from'))));
+        $old_date_to = date('Y-m-d H:i:s', strtotime(trim(Tools::getValue('date_to'))));
         $id_hotel = trim(Tools::getValue('id_hotel'));
         $id_room = trim(Tools::getValue('id_room'));
         $id_product = trim(Tools::getValue('id_product'));

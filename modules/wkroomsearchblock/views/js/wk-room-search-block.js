@@ -337,6 +337,21 @@ const BookingSearchManager = {
         return true;
     },
 }
+function updateGridColumns() {
+    const gridContainer = $('#search_hotel_block_form');
+    const gridItems = $('#search_hotel_block_form div.grid-item');
+    let totalColumns = 0;
+
+    Array.from(gridItems).forEach(item => {
+        totalColumns += parseInt(getComputedStyle(item).getPropertyValue('--col-span'));
+    });
+
+    $(gridContainer).css('grid-template-columns', `repeat(${totalColumns}, 1fr)`);
+
+    Array.from(gridItems).forEach(item => {
+        item.style.gridColumn = `span ${getComputedStyle(item).getPropertyValue('--col-span')}`;
+    });
+}
 
 $(document).ready(function() {
     // initialize booking search fields

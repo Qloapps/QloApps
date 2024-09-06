@@ -646,9 +646,6 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
         $with_auto_room_services = 1,
         $use_reduc = 1
     ) {
-        if ($date_from == $date_to) {
-            ddd('<pre>'.print_r(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS), true).'</pre>');
-        }
         $totalPrice = array();
         $totalPrice['total_price_tax_incl'] = 0;
         $totalPrice['total_price_tax_excl'] = 0;
@@ -727,9 +724,15 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
                 'idRoom' => $id_room,
                 'dateFrom' => $date_from,
                 'dateTo' => $date_to,
+                'idCurrency' => $id_currency,
+                'quantity' => $quantity,
                 'idCart' => $id_cart,
                 'idGuest' => $id_guest,
-                'useReduc' => $use_reduc
+                'idGroup' => $id_group,
+                'useReduc' => $use_reduc,
+                'taxRate' => $taxRate,
+                'productPriceTI' => $productPriceTI,
+                'productPriceTE' => $productPriceTE
             )
         );
         if ($with_auto_room_services) {

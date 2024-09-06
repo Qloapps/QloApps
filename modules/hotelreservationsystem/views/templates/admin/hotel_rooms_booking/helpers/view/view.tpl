@@ -6,7 +6,7 @@
 					<i class="icon-info"></i> {l s='Booking Form' mod='hotelreservationsystem'}
 				</div>
 				<div class="panel-body">
-					<form method="post" action="">
+					<form method="post" action="" id="room-search-form">
 						<div class="row">
 							{* <div class="form-group col-sm-12">
 								<label for="booking_product" class="control-label col-sm-4 required">

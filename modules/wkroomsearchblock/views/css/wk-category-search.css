@@ -54,11 +54,11 @@
   #search_hotel_block_form .hotel-selector-wrap .chosen-container-single .chosen-search {
     height: 45px;
   }
-  /* #search_hotel_block_form #search_room_submit {
-    height: 45px;
-  } */
-  #search_hotel_block_form {
-    grid-template-columns: 1fr;
+  #search_hotel_block_form.grid {
+    display: block;
+  }
+  #search_hotel_block_form.grid > div {
+    display: block;
   }
   #search_hotel_block_form > div {
     grid-column-end: unset!important;

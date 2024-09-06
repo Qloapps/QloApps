@@ -22,7 +22,7 @@ $(document).ready(function() {
     // calender
     if ($('#fullcalendar').length) {
         var calendar = new FullCalendar.Calendar($('#fullcalendar').get(0), {
-            initialView: initialView,
+            initialView: 'dayGridMonth',
             initialDate: initialDate,
             events: {
                 url: rooms_booking_url,
@@ -934,23 +934,17 @@ $(document).ready(function() {
 
     function refreshStatsData()
     {
-        var search_id_room_type = $("#search_id_room_type").val();
-        var search_id_hotel = $("#search_id_hotel").val();
-        var search_date_from = $("#search_date_from").val();
-        var search_date_to = $("#search_date_to").val();
+        var formData = new FormData($('form#room-search-form').get(0));
+        formData.append('ajax', true);
+        formData.append('action', 'getBookingStats');
 
         $.ajax({
             url: rooms_booking_url,
             type: 'POST',
             dataType: 'JSON',
-            data: {
-                ajax: true,
-                action: 'getBookingStats',
-                search_id_room_type: search_id_room_type,
-                search_id_hotel: search_id_hotel,
-                search_date_from: search_date_from,
-                search_date_to: search_date_to,
-            },
+            data: formData,
+            processData: false,
+            contentType: false,
             success: function(result) {
                 if (result.success) {
                     $(".htl_room_data_cont").html(result.data.stats_panel);

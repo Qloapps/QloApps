@@ -18,8 +18,9 @@
 *}
 
 <form method="POST" id="search_hotel_block_form" class="grid">
+    {hook h='displaySearchFormTop'}
     {if isset($location_enabled) && $location_enabled}
-        <div class="form-group area-{$column_widths['location']}">
+        <div class="form-group grid-item area-3">
             <input type="text" class="form-control header-rmsearch-input input-location" id="hotel_location" name="hotel_location" autocomplete="off" placeholder="{l s='Hotel Location' mod='wkroomsearchblock'}" {if isset($search_data)}value="{$search_data['location']|escape:'htmlall':'UTF-8'}"{/if}>
             <input hidden="hidden" name="location_category_id" id="location_category_id" {if isset($search_data)}value="{$search_data['location_category_id']|escape:'htmlall':'UTF-8'}"{/if}>
             <div class="dropdown">
@@ -34,7 +35,7 @@
         <input type="hidden" id="id_hotel" name="id_hotel" value="{$hotels_info[0]['id']|escape:'htmlall':'UTF-8'}">
         <input type="hidden" id="htl_name" class="form-control header-rmsearch-input" value="{$hotels_info[0]['hotel_name']}" readonly>
     {else}
-        <div class="form-group area-{$column_widths['hotel']}">
+        <div class="form-group grid-item area-3">
             <input type="hidden" id="hotel_cat_id" name="hotel_cat_id" {if isset($search_data)}value="{$search_data['htl_dtl']['id_category']|escape:'htmlall':'UTF-8'}"{/if}>
             <input type="hidden" id="id_hotel" name="id_hotel" {if isset($search_data)}value="{$search_data['htl_dtl']['id']|escape:'htmlall':'UTF-8'}"{/if}>
             <input type="hidden" id="max_order_date" name="max_order_date" value="{if isset($max_order_date)}{$max_order_date|escape:'htmlall':'UTF-8'}{/if}">
@@ -51,7 +52,7 @@
         </div>
     {/if}
     {if isset($multiple_dates_input) && $multiple_dates_input}
-        <div class="grid area-{$column_widths['date']}" id="daterange_value">
+        <div class="grid-item area-5 multi-date" id="daterange_value">
             <div class="form-group">
                 <input type="hidden" id="check_in_time" name="check_in_time" {if isset($search_data)}value="{$search_data['date_from']|escape:'htmlall':'UTF-8'}"{/if}>
                 <div class="form-control header-rmsearch-input input-date" autocomplete="off" id="daterange_value_from" placeholder="{l s='Check-in' mod='wkroomsearchblock'}"><span>{l s='Check-in' mod='wkroomsearchblock'}</span></div>
@@ -62,7 +63,7 @@
             </div>
         </div>
     {else}
-        <div class="form-group area-{$column_widths['date']}">
+        <div class="form-group grid-item area-4">
             <input type="hidden" id="check_in_time" name="check_in_time" {if isset($search_data)}value="{$search_data['date_from']|escape:'htmlall':'UTF-8'}"{/if}>
             <input type="hidden" id="check_out_time" name="check_out_time" {if isset($search_data)}value="{$search_data['date_to']|escape:'htmlall':'UTF-8'}"{/if}>
             <div class="form-control header-rmsearch-input input-date" id="daterange_value"  autocomplete="off" placeholder="{l s='Check-in - Check-out' mod='wkroomsearchblock'}" tabindex="-1"><span>{l s='Check-in' mod='wkroomsearchblock'} &nbsp;<i class="icon icon-minus"></i>&nbsp; {l s='Check-out' mod='wkroomsearchblock'}</span></div>
@@ -70,7 +71,7 @@
     {/if}
 
     {if isset($is_occupancy_wise_search) && $is_occupancy_wise_search}
-        <div class="form-group area-{$column_widths['occupancy']}">
+        <div class="form-group grid-item area-4">
             <div class="dropdown">
                 <button class="form-control input-occupancy header-rmsearch-input {if isset($error) && $error == 1}error_border{/if}" type="button" data-toggle="dropdown" id="guest_occupancy">
                     <span class="pull-left">{if (isset($search_data['occupancy_adults']) && $search_data['occupancy_adults'])}{$search_data['occupancy_adults']} {if $search_data['occupancy_adults'] > 1}{l s='Adults' mod='wkroomsearchblock'}{else}{l s='Adult' mod='wkroomsearchblock'}{/if}, {if isset($search_data['occupancy_children']) && $search_data['occupancy_children']}{$search_data['occupancy_children']} {if $search_data['occupancy_children'] > 1}
@@ -222,9 +223,16 @@
             </div>
         </div>
     {/if}
-    <div class="form-group search_room_submit_block area-{$column_widths['search']}">
-        <button type="submit" class="btn btn btn-primary pull-right" name="search_room_submit" id="search_room_submit">
+    <div class="form-group grid-item search_room_submit_block area-3">
+        <button type="submit" class="btn btn btn-primary" name="search_room_submit" id="search_room_submit">
             <span>{l s='Search Rooms' mod='wkroomsearchblock'}</span>
         </button>
     </div>
 </form>
+<script>
+    {literal}
+        // Call the function to set the grid columns on load
+        updateGridColumns();
+    {/literal}
+
+</script>

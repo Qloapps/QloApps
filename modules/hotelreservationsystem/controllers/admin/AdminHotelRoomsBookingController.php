@@ -313,8 +313,7 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
             'is_occupancy_wise_search' => $isOccupancyWiseSearch,
         ));
         MediaCore::addJsDef(array(
-            'initialDate' => $this->date_from,
-            'initialView' => 'timeGridDay'
+            'initialDate' => $this->date_from
         ));
 
     }

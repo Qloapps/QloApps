@@ -484,7 +484,7 @@ class HotelCartBookingData extends ObjectModel
                     ) {
                         $objHotelBranchInformation = new HotelBranchInformation($id_hotel);
                         $date_from = date('Y-m-d H:i:s', strtotime($objHotelBranchInformation->check_in, strtotime($date_from)));
-                        $date_to = date('Y-m-d H:i:s', strtotime($objHotelBranchInformation->check_in, strtotime($date_to)));
+                        $date_to = date('Y-m-d H:i:s', strtotime($objHotelBranchInformation->check_out, strtotime($date_to)));
                     }
                     $obj_htl_cart_booking_data->date_from = $date_from;
                     $obj_htl_cart_booking_data->date_to = $date_to;
@@ -1610,11 +1610,11 @@ class HotelCartBookingData extends ObjectModel
                                     $numDays = $objBookingDetail->getNumberOfDays($data_v['date_from'], $data_v['date_to']);
                                     $cartHotelData[$prodKey]['date_diff'][$dateJoin]['num_rm'] = 1;
                                     $cartHotelData[$prodKey]['date_diff'][$dateJoin]['data_form'] = date(
-                                        'Y-m-d',
+                                        'Y-m-d H:i:s',
                                         strtotime($data_v['date_from'])
                                     );
                                     $cartHotelData[$prodKey]['date_diff'][$dateJoin]['data_to'] = date(
-                                        'Y-m-d',
+                                        'Y-m-d H:i:s',
                                         strtotime($data_v['date_to'])
                                     );
                                     $cartHotelData[$prodKey]['date_diff'][$dateJoin]['num_days'] = $numDays;

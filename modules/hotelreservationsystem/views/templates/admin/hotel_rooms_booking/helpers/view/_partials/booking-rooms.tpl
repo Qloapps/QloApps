@@ -41,7 +41,7 @@
                                         {foreach from=$book_v['data']['available'] key=avai_k item=avai_v}
                                             <tr>
                                                 <td>{$avai_v['room_num']|escape:'htmlall':'UTF-8'} {hook h='displayRoomNumAfter' data=$avai_v type='available'}</td>
-                                                <td>{dateFormat date=date('Y-m-d', strtotime($date_from))} - {dateFormat date=date('Y-m-d', strtotime($date_to))}</td>
+                                                <td>{dateFormat date=$date_from} - {dateFormat date=$date_to}</td>
                                                 <td>{$avai_v['room_comment']|escape:'htmlall':'UTF-8'}</td>
                                                 <td>
                                                     {foreach $allotment_types as $allotment_type}
@@ -127,7 +127,7 @@
                                                 <tr>
                                                     {if $sub_part_v@first}
                                                         <td rowspan="{$part_v['rooms']|count}">
-                                                            <p>{dateFormat date=date('Y-m-d', strtotime($part_v['date_from']))} - {dateFormat date=date('Y-m-d', strtotime($part_v['date_to']))}</p>
+                                                            <p>{dateFormat date=$part_v['date_from']} - {dateFormat date=$part_v['date_to']}</p>
                                                         </td>
                                                     {/if}
                                                     <td >{$sub_part_v['room_num']|escape:'htmlall':'UTF-8'} {hook h='displayRoomNumAfter' data=$sub_part_v type='partially_available'}</td>
@@ -216,7 +216,7 @@
                                                     {if $rm_dtl_v@first}
                                                         <td rowspan="{$booked_v['detail']|count}">{$booked_v['room_num']|escape:'htmlall':'UTF-8'} {hook h='displayRoomNumAfter' data=$booked_v key=$rm_dtl_k type='booked'}</td>
                                                     {/if}
-                                                    <td>{dateFormat date=date('Y-m-d', strtotime($rm_dtl_v['date_from']))} - {dateFormat date=date('Y-m-d', strtotime($rm_dtl_v['date_to']))}</td>
+                                                    <td>{dateFormat date=$rm_dtl_v['date_from']} - {dateFormat date=$rm_dtl_v['date_to']}</td>
                                                     <td><a href="{$link->getAdminLink('AdminOrders')}&id_order={$rm_dtl_v['id_order']|intval}&vieworder" target="_blank">#{$rm_dtl_v['id_order']}</a></td>
                                                     <td>{$rm_dtl_v['comment']|escape:'htmlall':'UTF-8'}</td>
                                                     <td>
@@ -259,7 +259,7 @@
                                                     <td>{HotelRoomInformation::getRoomStatusTitle($unavail_dtl_v['id_status'])|escape:'htmlall':'UTF-8'}</td>
                                                     <td>
                                                         {if $unavail_dtl_v['date_from'] && $unavail_dtl_v['date_to']}
-                                                            {dateFormat date=date('Y-m-d', strtotime($unavail_dtl_v['date_from']))} - {dateFormat date=date('Y-m-d', strtotime($unavail_dtl_v['date_to']))}
+                                                            {dateFormat date=$unavail_dtl_v['date_from']} - {dateFormat date=$unavail_dtl_v['date_to']}
                                                         {else}
                                                             --
                                                         {/if}
