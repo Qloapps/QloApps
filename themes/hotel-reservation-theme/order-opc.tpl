@@ -259,7 +259,6 @@
 									</p>
 								{/if}
 								{if $show_taxes}
-									{hook h="displayCartTotalPriceLabel" type='before_tax'}
 									<p class="cart_total_tax">
 										<span>{l s='Total tax'}</span>
 										<span class="cart_total_values">{displayPrice price=($total_tax)}</span>
@@ -289,6 +288,7 @@
 								<hr>
 								<p {if !isset($is_advance_payment) || !$is_advance_payment}class="cart_final_total_block"{/if}>
 									<span class="strong">{l s='Total'}</span>
+									{hook h="displayCartTotalPriceLabel" type='total'}
 									<span class="cart_total_values{if isset($is_advance_payment) && $is_advance_payment} strong{/if}">
 										{if $use_taxes}
 											{displayPrice price=$total_price}
@@ -296,9 +296,6 @@
 											{displayPrice price=$total_price_without_tax}
 										{/if}
 									</span>
-									<div class="hookDisplayProductPriceBlock-price">
-										{hook h="displayCartTotalPriceLabel"}
-									</div>
 								</p>
 								{if isset($is_advance_payment) && $is_advance_payment}
 									<hr>
@@ -308,10 +305,10 @@
 									</p>
 									<p class="cart_final_total_block">
 										<span class="strong">{l s='Partially Payable Total'}</span>
+										{hook h="displayCartTotalPriceLabel" type='partial'}
 										<span class="cart_total_values">{displayPrice price=$advPaymentAmount}</span>
 									</p>
 								{/if}
-
 							</div>
 							{* Check if voucher feature is enabled currently *}
 							{if $voucherAllowed}

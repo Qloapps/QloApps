@@ -451,6 +451,7 @@
 	color: #459C3D;
 }
 #order-opc .cart_total_detail_block .cart_final_total_block {
+	margin-bottom: 0;
 	line-height: 40px;
 }
 #order-opc .cart_total_detail_block .cart_final_total_block > .cart_total_values {
