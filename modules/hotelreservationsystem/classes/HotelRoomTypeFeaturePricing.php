@@ -729,7 +729,7 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
                 $use_reduc
             )) {
                 foreach($servicesWithTax as $service) {
-                    $totalPrice['total_price_tax_incl'] += $service['price'];
+                    $totalPrice['total_price_tax_incl'] += Tools::processPriceRounding($service['price']);
                 }
             }
             if ($servicesWithoutTax = RoomTypeServiceProduct::getAutoAddServices(
@@ -743,7 +743,7 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
                 $use_reduc
             )) {
                 foreach($servicesWithoutTax as $service) {
-                    $totalPrice['total_price_tax_excl'] += $service['price'];
+                    $totalPrice['total_price_tax_excl'] += Tools::processPriceRounding($service['price']);
                 }
             }
         }

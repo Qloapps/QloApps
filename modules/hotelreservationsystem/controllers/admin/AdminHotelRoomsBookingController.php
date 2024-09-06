@@ -210,11 +210,7 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
 
                 if (!count($this->errors)) {
                     // Finally, reallocate the room
-                    if ($reallocatedBookingId = $objBookingDetail->reallocateBooking($idHtlBookingFrom, $idRoomToReallocate, $priceDiff)) {
-                        $objHtlBookingDetail = new HotelBookingDetail($reallocatedBookingId);
-                        $objHtlBookingDetail->comment = $this->l('Room manually reallocated.');
-                        $objHtlBookingDetail->save();
-
+                    if ($objBookingDetail->reallocateBooking($idHtlBookingFrom, $idRoomToReallocate, $priceDiff)) {
                         Tools::redirectAdmin(self::$currentIndex.'&id_order='.(int) $idOrder.'&vieworder&conf=52&token='.$this->token);
                     } else {
                         $this->errors[] = $this->l('Some error occured. Please try again.');

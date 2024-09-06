@@ -1996,7 +1996,8 @@ class HotelBookingDetail extends ObjectModel
                         $objCartBookingData->id_product = $roomInfo['id_product'];
                         $objCartBookingData->id_room = $roomInfo['id_room'];
                         $objCartBookingData->id_hotel = $roomInfo['id_hotel'];
-                        $objCartBookingData->booking_type = Self::ALLOTMENT_MANUAL;
+                        $objCartBookingData->booking_type = $objOldHotelBooking->booking_type;
+                        $objCartBookingData->comment = $objOldHotelBooking->comment;
                         $objCartBookingData->quantity = $productQty;
                         $objCartBookingData->date_from = $objOldHotelBooking->date_from;
                         $objCartBookingData->date_to = $objOldHotelBooking->date_to;
@@ -2083,9 +2084,9 @@ class HotelBookingDetail extends ObjectModel
                         $objBookingDetail->id_hotel = $objCartBookingData->id_hotel;
                         $objBookingDetail->id_customer = $objOrder->id_customer;
                         $objBookingDetail->booking_type = $objCartBookingData->booking_type;
+                        $objBookingDetail->comment = $objCartBookingData->comment;
                         $objBookingDetail->id_status = 1;
                         $objBookingDetail->room_type_name = Product::getProductName($idNewRoomType, null, $objOrder->id_lang);
-
                         $objBookingDetail->date_from = $objCartBookingData->date_from;
                         $objBookingDetail->date_to = $objCartBookingData->date_to;
                         $objBookingDetail->adults = $objCartBookingData->adults;
@@ -2303,7 +2304,6 @@ class HotelBookingDetail extends ObjectModel
                 // update in the hotel booking detail table
                 $objOldHotelBooking->id_room = $idRoom;
                 $objOldHotelBooking->room_num = $objHotelRoomInfo->room_num;
-                $objOldHotelBooking->booking_type = Self::ALLOTMENT_MANUAL;
                 // set backorder to 0 as available reallocate rooms will always be free
                 $objOldHotelBooking->is_back_order = 0;
 
