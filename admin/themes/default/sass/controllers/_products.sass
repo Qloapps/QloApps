@@ -2,20 +2,32 @@
     margin-left: 0px
 
 #deactiveDatesModal
+    .fc-event-end, .fc-event-start
+        margin-left: unset !important
+        margin-right: unset !important
+    .fc-popover.fc-more-popover
+        max-width: 450px
     .fc-daygrid-event
         box-shadow: 0px 1px 2px 0px rgba(171, 171, 171, 0.3)
         border-radius: 4px
+    .fc-daygrid-day-frame
+        min-height: 100px !important
+    .calendar_hover_highlight
+        border-color: #CAE4FF !important
+        background: #CAE4FF !important
     .fc-event-title-container
+        cursor: pointer
         padding: 4px
     .highlight-event-day
         background: #F5F5F5
-    .event_title_container
+    .fc-event-title
         text-overflow: ellipsis
         white-space: nowrap
         max-width: 65%
         overflow: hidden
-        border-left: 2px solid red
         padding-left: 10px
+    .event_title_container, .fc-popover-body .fc-event-title
+        border-left: 2px solid red
     #disable_dates_form
         .date_from_container, .date_to_container
             .ui-datepicker
@@ -67,6 +79,10 @@
             border-radius: 6px
             padding: 5px 10px
         .tooltip_content
+            .tooltip_reason
+                word-wrap: break-word
+                max-height: 200px
+                overflow: auto
             .tooltip_reason_container, .id_event
                 margin-top: 10px
             &> div

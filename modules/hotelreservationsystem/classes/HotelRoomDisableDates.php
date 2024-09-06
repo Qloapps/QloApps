@@ -45,8 +45,10 @@ class HotelRoomDisableDates extends ObjectModel
 
     public function getRoomDisableDates($id_room)
     {
+        $objModule = Module::getInstanceByName('hotelreservationsystem');
         $disabledDates =  Db::getInstance()->executeS('SELECT `id`, `date_from`, `date_to`, `reason`, `date_add`,
-            NULL AS `id_event`, NULL AS `event_url`, NULL AS `event_title`, 1 AS `is_editable`, 1 AS `is_deletable`
+            NULL AS `id_event`, NULL AS `event_url`, "'.$objModule->l('Disabled', 'HotelRoomDisableDates').'" AS `event_title`,
+            1 AS `is_editable`, 1 AS `is_deletable`
             FROM `'._DB_PREFIX_.'htl_room_disable_dates` WHERE `id_room`='.(int) $id_room
         );
 

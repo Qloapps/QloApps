@@ -5013,6 +5013,7 @@ class AdminProductsControllerCore extends AdminController
                     && $objHotelRoomDisableDates->save()
                 ) {
                     $response['id_disable_date'] = $objHotelRoomDisableDates->id;
+                    $response['event_title'] = $this->l('Disabled');
                     if (Tools::getValue('id_disable_date')) {
                         $this->confirmations[] = $this->l('Successfully updated.');
                     } else {

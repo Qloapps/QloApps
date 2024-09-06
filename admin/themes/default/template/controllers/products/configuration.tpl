@@ -355,12 +355,12 @@
 <script>
     var prod_link = "{$link->getAdminLink('AdminProducts')}";
     var rm_status = {$rm_status|@json_encode};
-    var confirm_text = "{l s='Are you sure?' js=1}";
+    var confirmText = "{l s='Are you sure?' js=1}";
     var removeDisableDateText = "{l s='Are you sure you want to remove the selected date range?' js=1}";
     var currentRoomRow = 0;
     $(document).ready(function() {
         var tooltipCounter = 0;
-        var disableDates = {};
+        var disableDatesCounter = {};
         // Setting the Date object without current time.
         const dateToday = new Date("{date('Y-m-d')}");
         {literal}
@@ -496,6 +496,7 @@
                 $(this).find('.ui-datepicker').hide();
                 if (!dateTo || (dateTo && selectedDate > dateTo)) {
                     $('#disable_dates_form .disable_date_to').val($.datepicker.formatDate('yy-mm-dd', objDateToMin));
+                    $('#disable_dates_form .date_to_container').datepicker("setDate", $.datepicker.formatDate('yy-mm-dd', objDateToMin));
                     $('#disable_dates_form .date_to_container').find('.ui-datepicker').show();
                 }
             }
@@ -518,6 +519,7 @@
 
                 objDateToMin.setDate(objDateToMin.getDate() + 1);
                 $(this).datepicker('option', 'minDate', objDateToMin);
+                $(this).datepicker("setDate", objDateToMin);
             },
             onSelect: function(selectedDate) {
                 $(this).find('.disable_date_to').val(selectedDate);
@@ -559,7 +561,7 @@
 
         // Removing single disable date range and its event from calendar.
         $(document).on('click', '#disable_dates_full_calendar .delete_disable_dates', function() {
-            if (confirm(confirm_text)) {
+            if (confirm(confirmText)) {
                 var calendarEventId = parseInt($(this).parent().find('.fc-event-title').attr('data-id_calendar_event'));
                 var calendarEvent = DisableDatesCalendar.getEventById(calendarEventId);
                 $('#disable_dates_full_calendar .id_calendar_event_'+calendarEventId).find('.fc-event-main-frame').tooltip('destroy');
@@ -653,28 +655,32 @@
         // to save the dates on submit button click event
         $(document).on('click', '#disable_dates_form .submit_add_disable_date', function(e){
             e.preventDefault();
-            if (confirm(confirm_text)) {
+            if (confirm(confirmText)) {
                 DisableDatesObj.submitDisableDates();
             }
         });
 
         // Closing the form on click event.
-        $(document).on('click', '.close_disable_dates_form', function(){
+        $(document).on('click', '#disable_dates_form .close_disable_dates_form', function(){
             DisableDatesForm.resetForm();
             DisableDatesForm.hideForm();
         });
 
-        // This is added to keep the tooltip visible on hover
-        $(document).on('mouseenter', '#disable_dates_full_calendar .tooltip_info_block', function(){
-            var tooltipId = $(this).attr('data-tooltip-id');
-            if ($('#tooltip-id-'+tooltipId).length) {
-                $('#tooltip-id-'+tooltipId).tooltip('show');
+        // Hide tooltips on click.
+        $(document).on('click', function(e) {
+            var hideAll = true;
+            if ($(e.target).closest('.tooltip_info_block').length) {
+                hideAll = false;
             }
-        });
 
-        // This is added to hide the tooltip after hover.
-        $(document).on('mouseleave', '#disable_dates_full_calendar .tooltip_info_block', function(){
-            $('#disable_dates_full_calendar .fc-event-main-frame').tooltip('hide');
+            $('#disable_dates_full_calendar .tooltip_info_block').each(function(){
+                var tooltipId = $(this).attr('data-tooltip-id');
+                if (!$('#tooltip-id-'+tooltipId).length) {
+                    $('#disable_dates_full_calendar .tooltip_info_block').remove();
+                } else if (hideAll) {
+                    $('#tooltip-id-'+tooltipId).tooltip('hide');
+                }
+            });
         });
 
         // Called after the modal is shown, since the modal is hidden at first, the size of the fullcalendar is render incorrectly.
@@ -712,6 +718,12 @@
             locale:{if isset($locale) && $locale}'{$locale}'{else}'en'{/if},
             unselectAuto: true,
             eventTextColor: '#333333',
+            contentHeight: 'auto',
+            views: {
+                dayGridMonth: {
+                    dayMaxEventRows: 10
+                }
+            },
             // This function is used to check the clicked date on calendar can be selected.
             selectAllow: function(info) {
                 $('#disable_dates_full_calendar .tooltip_container').remove();
@@ -728,34 +740,19 @@
 
                 return true;
             },
-            // This is used to set the content for the calendar event, classes added are added by default, if we do not send them.
-            // This event is called ever time there is any changes in the event source. we are sending our own html content since we do not want to display the event tittle every week.
-            eventContent: function(info) {
-                if (info.isStart && !info.isEnd) {
-                    return {
-                        html: '<div class="fc-event-main-frame"><div class="fc-event-title-container"><div class="fc-event-title">&nbsp;'+info.event.title+'</div></div></div>'
-                    };
-                } else if (!info.isStart) {
-                    return {
-                        html: '<div class="fc-event-main-frame"><div class="fc-event-title-container"><div class="fc-event-title">&nbsp;</div></div></div>'
-                    }
-                }
-            },
             // This event is called every time an event has mounted successfully.
             // This event is called not called incase there is any changes in the event source.
             eventDidMount: function(info) {
                 DisableDatesObj.handleEventDateBackgroundHighlight(info.event, true);
                 DisableDatesObj.initEventTooltip(info.event, info.el);
-                if (info.isEnd) {
-                    var isDeletable = info.event.extendedProps.is_deletable;
-                    var isEditable = info.event.extendedProps.is_editable;
-                    if (isDeletable) {
-                        $(info.el).find('.fc-event-title-container').append('<i class="icon-trash pull-right delete_disable_dates"></i>');
-                    }
+                var isDeletable = info.event.extendedProps.is_deletable;
+                var isEditable = info.event.extendedProps.is_editable;
+                if (isDeletable) {
+                    $(info.el).find('.fc-event-title-container').append('<i class="icon-trash pull-right delete_disable_dates"></i>');
+                }
 
-                    if (isDeletable) {
-                        $(info.el).find('.fc-event-title-container').append('<i class="icon-pencil pull-right edit_disable_dates"></i>');
-                    }
+                if (isDeletable) {
+                    $(info.el).find('.fc-event-title-container').append('<i class="icon-pencil pull-right edit_disable_dates"></i>');
                 }
 
                 if (info.isStart) {
@@ -771,7 +768,7 @@
                 var selectedElement = $('#disable_dates_full_calendar .fc-daygrid-bg-harness').last();
                 DisableDatesForm.resetForm();
                 DisableDatesForm.hideForm();
-                $('#disable_dates_form').attr('data-form_action', 'add');
+                $('#disable_dates_form').attr('data-form_action', 'tooltip_actions');
                 var formData = {
                     disable_date_from : info.startStr,
                     disable_date_to : info.endStr,
@@ -791,9 +788,12 @@
                     placement: {if isset($language_is_rtl) && $language_is_rtl}'left'{else}'right'{/if},
                 }
                 $(selectedElement).tooltip(options);
-                // since we are hiding the form after 200, if we show tooltip before hiding the form the position of the tooltip get wrong.
+                $('#disable_dates_full_calendar .tooltip_action_block .enable_selected_dates').hide();
                 setTimeout(() => {
                     $(selectedElement).tooltip('show');
+                    if (!DisableDatesObj.checkDisabled(formData)) {
+                        $('#disable_dates_full_calendar .tooltip_action_block .enable_selected_dates').hide();
+                    }
                 }, 200);
             },
             unselect: function(){
@@ -802,6 +802,17 @@
                 setTimeout(() => {
                     $('#disable_dates_full_calendar .tooltip_action_block').remove();
                 }, 1);
+            },
+            eventMouseEnter: function (info) {
+                var idCalendarEvent = $(info.el).find('.fc-event-title').attr('data-id_calendar_event');
+                $('.id_calendar_event_' + idCalendarEvent).addClass('calendar_hover_highlight');
+                $(info.el).addClass('calendar_hover_highlight');
+                $(info.el).addClass('id_calendar_event_' + idCalendarEvent);
+            },
+            eventMouseLeave: function(info) {
+                var idCalendarEvent = $(info.el).find('.fc-event-title').attr('data-id_calendar_event');
+                $('.id_calendar_event_' + idCalendarEvent).removeClass('calendar_hover_highlight');
+                $(info.el).removeClass('calendar_hover_highlight');
             }
         });
 
@@ -831,12 +842,12 @@
                 disableDateTo.setDate(disableDateTo.getDate() - 1);
                 disableDateTo = $.datepicker.formatDate('yy-mm-dd', disableDateTo);
                 //setting the min dates dfor the date picker
-                $('#disable_dates_form .date_from_container').datepicker("setDate", formData.disable_date_from);
-                $('#disable_dates_form .date_to_container').datepicker("setDate", disableDateTo);
-                $('#disable_dates_form .date_to_container').datepicker("option", "minDate", formData.disable_date_from);
-
                 $('#disable_dates_form .disable_date_from').val(formData.disable_date_from);
+                $('#disable_dates_form .date_from_container').datepicker("setDate", formData.disable_date_from);
+
                 $('#disable_dates_form .disable_date_to').val(disableDateTo);
+                $('#disable_dates_form .date_to_container').datepicker("option", "minDate", formData.disable_date_from);
+                $('#disable_dates_form .date_to_container').datepicker("setDate", disableDateTo);
                 if (typeof(formData.id_disable_date) !== undefined)
                     $('#disable_dates_form .id_disable_date').val(formData.id_disable_date);
 
@@ -857,6 +868,10 @@
             displayAddDatesForm: function () {
                 DisableDatesForm.hideMessages();
                 DisableDatesCalendar.unselect();
+                if ($('#disable_dates_form').attr('data-form_action') == 'tooltip_actions') {
+                    $('#disable_dates_form').attr('data-form_action', 'add');
+                }
+
                 if ($('#disable_dates_form').attr('data-form_action') != 'add') {
                     $('#disable_dates_form').attr('data-form_action', 'add');
                     DisableDatesForm.resetForm();
@@ -864,7 +879,6 @@
                 }
 
                 DisableDatesForm.displayForm();
-                $('#disable_dates_full_calendar').find('.tooltip_container').remove();
                 $('#disable_dates_form .disable_dates_form_title_add').show(200);
                 $('#disable_dates_form .submit_add_disable_date').show(200);
             },
@@ -872,7 +886,10 @@
             displayRemoveDatesForm: function () {
                 DisableDatesForm.hideMessages();
                 DisableDatesCalendar.unselect();
-                $('#disable_dates_full_calendar').find('.tooltip_container').remove();
+                if ($('#disable_dates_form').attr('data-form_action') == 'tooltip_actions') {
+                    $('#disable_dates_form').attr('data-form_action', 'remove');
+                }
+
                 if ($('#disable_dates_form').attr('data-form_action') != 'remove') {
                     $('#disable_dates_form').attr('data-form_action', 'remove');
                     DisableDatesForm.resetForm();
@@ -896,7 +913,6 @@
                 }
 
                 DisableDatesForm.displayForm();
-                $('#disable_dates_full_calendar').find('.tooltip_container').remove();
                 $('#disable_dates_form .disable_dates_form_title_update').show(200);
                 $('#disable_dates_form .submit_add_disable_date').show(200);
             },
@@ -907,6 +923,9 @@
                 }
 
                 $('#disable_dates_form').show(200);
+                setTimeout(() => {
+                    $('#disable_dates_full_calendar .tooltip_info_block').remove();
+                }, 610);
             },
             // used to display messages related to the disable date form
             showMessages: function(messages) {
@@ -1018,6 +1037,7 @@
                     title: ' ',
                     html: true,
                     template: html,
+                    trigger: 'click',
                     container: $('#disable_dates_full_calendar').closest('div'),
                     delay: {
                         show: 600,
@@ -1027,6 +1047,7 @@
                 }
 
                 // linking the tooltip with the calander event, so we can perform actions on them.
+
                 $(element).addClass('id_calendar_event_' + event.id);
                 $(element).find('.fc-event-main-frame').tooltip(options);
 
@@ -1139,10 +1160,10 @@
                                 'is_deletable' : 1,
                                 'is_editable' : 1,
                                 'id_disable_date': response.id_disable_date,
-                                'event_title' : '',
+                                'event_title' : response.event_title,
                                 'id_event' : '',
                                 'event_url' : '',
-                                'date_add' : "{date('Y-m-d')}",
+                                'date_add' : "{date('Y-m-d H:i:s')}",
                                 'backgroundColor': '#FFFFFF',
                                 'borderColor': '#FFFFFF'
                             }
@@ -1231,15 +1252,15 @@
                         // This return the date in format of Y-m-d, and we are counting the date for overlapping events.
                         let dateString = date.toISOString().split('T')[0];
                         if (add) {
-                            if (!disableDates[dateString]) {
-                                disableDates[dateString] = 0;
+                            if (!disableDatesCounter[dateString]) {
+                                disableDatesCounter[dateString] = 0;
                             }
 
-                            disableDates[dateString]++;
+                            disableDatesCounter[dateString]++;
                         } else {
-                            disableDates[dateString]--;
-                            if (disableDates[dateString] <= 0) {
-                                delete disableDates[dateString];
+                            disableDatesCounter[dateString]--;
+                            if (disableDatesCounter[dateString] <= 0) {
+                                delete disableDatesCounter[dateString];
                             }
                         }
                     }
@@ -1248,15 +1269,15 @@
                     dateFrom.setDate(dateFrom.getDate() + 1);
                     let dateString = dateFrom.toISOString().split('T')[0];
                     if (add) {
-                        if (!disableDates[dateString]) {
-                            disableDates[dateString] = 0;
+                        if (!disableDatesCounter[dateString]) {
+                            disableDatesCounter[dateString] = 0;
                         }
 
-                        disableDates[dateString]++;
+                        disableDatesCounter[dateString]++;
                     } else {
-                        disableDates[dateString]--;
-                        if (disableDates[dateString] <= 0) {
-                            delete disableDates[dateString];
+                        disableDatesCounter[dateString]--;
+                        if (disableDatesCounter[dateString] <= 0) {
+                            delete disableDatesCounter[dateString];
                         }
                     }
                 }
@@ -1265,13 +1286,27 @@
                 $('#disable_dates_full_calendar .fc-daygrid-day').each(function() {
                     let dateString = $(this).data('date');
                     if (dateString !== today) {
-                        if (disableDates[dateString]) {
+                        if (disableDatesCounter[dateString]) {
                             $(this).addClass('highlight-event-day');
                         } else {
                             $(this).removeClass('highlight-event-day');
                         }
                     }
                 });
+            },
+            checkDisabled: function(dates) {
+                let dateFrom = new Date(dates.disable_date_from);
+                let endDate = new Date(dates.disable_date_to);
+                dateFrom.setDate(dateFrom.getDate() - 1)
+                let startDate = dateFrom;
+                for (let date = startDate; date < endDate; date.setDate(date.getDate() + 1)) {
+                    let dateString = date.toISOString().split('T')[0];
+                    if (disableDatesCounter[dateString]) {
+                        return true;
+                    }
+                }
+
+                return false;
             }
         }
     });
