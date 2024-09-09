@@ -4984,7 +4984,7 @@ class AdminProductsControllerCore extends AdminController
         $dateTo = Tools::getValue('date_to');
         $idProduct = Tools::getValue('id_product');
         if (!Validate::isDate($dateFrom) || !Validate::isDate($dateTo)) {
-            $this->errors[] = $this->l('Please select valid date range to temporary disable this room');
+            $this->errors[] = $this->l('Please select a valid date range to temporary disable this room');
         } else if ($idRoom && Validate::isLoadedObject($objHotelRoomInfo = new HotelRoomInformation((int) $idRoom))) {
             $dateTo = date('Y-m-d', strtotime($dateTo));
             $objHotelBookingDetail = new HotelBookingDetail();
