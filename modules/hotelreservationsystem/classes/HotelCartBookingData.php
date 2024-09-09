@@ -430,6 +430,9 @@ class HotelCartBookingData extends ObjectModel
                 }
             }
         }
+        // after room is removed from cart, check if any of the appled cart rules are not being used
+        CartRule::autoRemoveFromCart(Context::getContext());
+        CartRule::autoAddToCart(Context::getContext());
 
         // return number of rooms deleted
         return true;
@@ -1574,14 +1577,29 @@ class HotelCartBookingData extends ObjectModel
                                         $data_v['id_room'],
                                         0
                                     );
+                                    $priceWithoutDiscount = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice(
+                                        $product['id_product'],
+                                        $data_v['date_from'],
+                                        $data_v['date_to'],
+                                        0,
+                                        0,
+                                        $context->cart->id,
+                                        $context->cart->id_guest,
+                                        $data_v['id_room'],
+                                        1,
+                                        0
+                                    );
                                     if (!$price_tax) {
                                         $amount = $roomTypeDateRangePrice['total_price_tax_excl'];
                                         $amountWithoutAutoAdd = $roomTypeDateRangePriceWithoutAutoAdd['total_price_tax_excl'];
+                                        $totalPriceWithoutDiscount = $priceWithoutDiscount['total_price_tax_excl'];
                                     } else {
                                         $amount = $roomTypeDateRangePrice['total_price_tax_incl'];
                                         $amountWithoutAutoAdd = $roomTypeDateRangePriceWithoutAutoAdd['total_price_tax_incl'];
+                                        $totalPriceWithoutDiscount = $priceWithoutDiscount['total_price_tax_incl'];
                                     }
                                     $cartHotelData[$prodKey]['date_diff'][$dateJoin]['amount'] = $amount * $varQty;
+                                    $cartHotelData[$prodKey]['date_diff'][$dateJoin]['total_price_without_discount'] = $totalPriceWithoutDiscount * $varQty;
                                     $cartHotelData[$prodKey]['date_diff'][$dateJoin]['amount_without_auto_add'] = $amountWithoutAutoAdd * $varQty;
                                 } else {
                                     $cartHotelData[$prodKey]['date_diff'][$dateJoin]['demand_price'] = $totalAdditionalServicePrice;
@@ -1621,15 +1639,30 @@ class HotelCartBookingData extends ObjectModel
                                         $data_v['id_room'],
                                         0
                                     );
+                                    $priceWithoutDiscount = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice(
+                                        $product['id_product'],
+                                        $data_v['date_from'],
+                                        $data_v['date_to'],
+                                        0,
+                                        0,
+                                        $context->cart->id,
+                                        $context->cart->id_guest,
+                                        $data_v['id_room'],
+                                        1,
+                                        0
+                                    );
                                     if (!$price_tax) {
                                         $amount = $roomTypeDateRangePrice['total_price_tax_excl'];
                                         $amountWithoutAutoAdd = $roomTypeDateRangePriceWithoutAutoAdd['total_price_tax_excl'];
+                                        $totalPriceWithoutDiscount = $priceWithoutDiscount['total_price_tax_excl'];
                                     } else {
                                         $amount = $roomTypeDateRangePrice['total_price_tax_incl'];
                                         $amountWithoutAutoAdd = $roomTypeDateRangePriceWithoutAutoAdd['total_price_tax_incl'];
+                                        $totalPriceWithoutDiscount = $priceWithoutDiscount['total_price_tax_incl'];
                                     }
                                     $cartHotelData[$prodKey]['date_diff'][$dateJoin]['amount'] = $amount;
                                     $cartHotelData[$prodKey]['date_diff'][$dateJoin]['amount_without_auto_add'] = $amountWithoutAutoAdd;
+                                    $cartHotelData[$prodKey]['date_diff'][$dateJoin]['total_price_without_discount'] = $totalPriceWithoutDiscount;
                                     $cartHotelData[$prodKey]['date_diff'][$dateJoin]['link'] = $context->link->getPageLink(
                                         'order-opc',
                                         null,
@@ -1875,13 +1908,40 @@ class HotelCartBookingData extends ObjectModel
         }
     }
 
+    public function save($null_values = false, $auto_date = true)
+    {
+        $return = parent::save($null_values = false, $auto_date = true);
+        // after updating cart data, check if any of the appled cart rules are not being used
+        CartRule::autoRemoveFromCart(Context::getContext());
+        CartRule::autoAddToCart(Context::getContext());
+        return $return;
+    }
+
+    public function update($null_values = false)
+    {
+        if (!$this->extra_demands) {
+            $this->extra_demands = json_encode(array());
+        }
+
+        return parent::update($null_values);
+    }
+
+    public function add($auto_date = true, $null_values = false)
+    {
+        if (!$this->extra_demands) {
+            $this->extra_demands = json_encode(array());
+        }
+
+        return parent::add($auto_date, $null_values);
+    }
+
     // Webservice :: get extra demands for the cart booking
     public function getWsExtraDemands()
     {
         $extraDemands = json_decode($this->extra_demands, true);
-        if (count($extraDemands)) {
-            foreach ($extraDemands as &$demnad) {
-                $demnad['id'] = $demnad['id_global_demand'];
+        if ($extraDemands) {
+            foreach ($extraDemands as &$demand) {
+                $demand['id'] = $demand['id_global_demand'];
             }
             return $extraDemands;
         }

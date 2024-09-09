@@ -64,8 +64,10 @@ $(document).ready(function() {
 
     $("#header .shopping_cart a:first").hover(
         function() {
-            if (ajaxCart.nb_total_products > 0 || parseInt($('.ajax_cart_quantity').html()) > 0)
-                $("#header .cart_block").stop(true, true).slideDown(450);
+            if (!is_touch_enabled) {
+                if (ajaxCart.nb_total_products > 0 || parseInt($('.ajax_cart_quantity').html()) > 0)
+                    $("#header .cart_block").stop(true, true).slideDown(450);
+            }
         },
         function() {
             setTimeout(function() {

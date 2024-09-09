@@ -125,31 +125,23 @@
 																		<div class="col-sm-3 col-xs-5 info-head">{l s='Name'}</div>
 																		<div class="col-sm-9 col-xs-7 info-value">
 																			{if $isGuest}
-																				{$guestInformations['customer_firstname']} {$guestInformations['customer_lastname']}
+																				{$guestInformations['customer_firstname']|escape:'html':'UTF-8'} {$guestInformations['customer_lastname']|escape:'html':'UTF-8'}
 																			{else}
-																				{$guestInformations['firstname']} {$guestInformations['lastname']}
+																				{$guestInformations['firstname']|escape:'html':'UTF-8'} {$guestInformations['lastname']|escape:'html':'UTF-8'}
 																			{/if}
 																		</div>
 																	</div>
 																	<div class="row margin-btm-10">
 																		<div class="col-sm-3 col-xs-5 info-head">{l s='Email'}</div>
-																		<div class="col-sm-9 col-xs-7 info-value">{$guestInformations['email']}</div>
+																		<div class="col-sm-9 col-xs-7 info-value">{$guestInformations['email']|escape:'html':'UTF-8'}</div>
 																	</div>
-																	{if (isset($delivery->phone_mobile) && $delivery->phone_mobile) || (isset($delivery->phone) && $delivery->phone)}
+																	{if (isset({$guestInformations['phone']}) && {$guestInformations['phone']})}
 																		<div class="row margin-btm-10">
 																			<div class="col-sm-3 col-xs-5 info-head">
-																				{if isset($delivery->phone_mobile) && $delivery->phone_mobile}
-																					{l s='Mobile Number'}
-																				{else}
 																					{l s='Phone Number'}
-																				{/if}
 																			</div>
 																			<div class="col-sm-9 col-xs-7 info-value">
-																				{if isset($delivery->phone_mobile) && $delivery->phone_mobile}
-																					{$delivery->phone_mobile|escape:'html':'UTF-8'}
-																				{else}
-																					{$delivery->phone|escape:'html':'UTF-8'}
-																				{/if}
+																				{$guestInformations['phone']|escape:'html':'UTF-8'}
 																			</div>
 																		</div>
 																	{/if}
@@ -180,9 +172,11 @@
 																{include file="$tpl_dir./order-opc-new-account.tpl"}
 															{/if}
 														</div>
-														<div class="card-body hidden" id="order-opc-edit-guest-info">
-															{include file="./order-opc-edit-guest-info.tpl"}
-														</div>
+														{if $is_logged || $isGuest}
+															<div class="card-body hidden" id="order-opc-edit-guest-info">
+																{include file="./order-opc-edit-guest-info.tpl"}
+															</div>
+														{/if}
 													</div>
 												{/if}
 											</div>
@@ -393,10 +387,6 @@
 									{if sizeof($discounts)}
 										<div class="row">
 											{foreach $discounts as $discount}
-												{if ((float)$discount.value_real == 0 && $discount.free_shipping != 1) || ((float)$discount.value_real == 0 && $discount.code == '')}
-													{continue}
-												{/if}
-
 												<div class="col-sm-12 margin-btm-10 cart_discount {if $discount@last}last_item{elseif $discount@first}first_item{else}item{/if}" id="cart_discount_{$discount.id_discount}">
 													<span class="cart_discount_name">
 														{$discount.name|escape:'html':'UTF-8'}
@@ -439,7 +429,7 @@
 											{foreach from=$displayVouchers key=key item=voucher name=availVoucher}
 												<div class="col-xs-12">
 													<p class="avail_voucher_name">
-														<span class="voucher_name" data-code="{$voucher.code|escape:'html':'UTF-8'}">{$voucher.code|escape:'html':'UTF-8'} - </span>{$voucher.name}
+													<span class="voucher_name" data-code="{$voucher.code|escape:'html':'UTF-8'}">{$voucher.code|escape:'html':'UTF-8'} -</span>&nbsp;{$voucher.name}
 													</p>
 													{if not $smarty.foreach.availVoucher.last}
 														<hr class="seperator">
@@ -477,6 +467,7 @@
 						{addJsDef addresses=array()}
 						{addJsDef isVirtualCart=$isVirtualCart|intval}
 						{addJsDef isPaymentStep=$isPaymentStep|intval}
+					    {addJsDef PS_REGISTRATION_PROCESS_TYPE=$PS_REGISTRATION_PROCESS_TYPE|intval}
 						{addJsDefL name=txtWithTax}{l s='(tax incl.)' js=1}{/addJsDefL}
 						{addJsDefL name=txtWithoutTax}{l s='(tax excl.)' js=1}{/addJsDefL}
 						{addJsDefL name=txtHasBeenSelected}{l s='has been selected' js=1}{/addJsDefL}

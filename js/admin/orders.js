@@ -29,6 +29,16 @@ var ajaxQueries = new Array();
 $(document).ready(function() {
 	// Init all events
 	init();
+    $(document).on('click', '#view_convenience_services', function(e) {
+        $('#convenience_services').toggle(100);
+        $('#view_convenience_services .icon-angle-up').toggle();
+        $('#view_convenience_services .icon-angle-down').toggle();
+    });
+    $(document).on('click', '#view_order_tax_details', function(e) {
+        $('#order_tax_details').toggle(100);
+        $('#view_order_tax_details .icon-angle-up').toggle();
+        $('#view_order_tax_details .icon-angle-down').toggle();
+    });
 
     $(document).on('click', '.delete-voucher', function(e) {
         if (!confirm(txt_confirm)) {
@@ -2571,7 +2581,9 @@ const EditRoomBookingModal = {
                     const dateTo = $.datepicker.formatDate('dd-mm-yy', $.datepicker.parseDate('yy-mm-dd', jsonProductLineData.date_to));
 
                     $('#edit_product .edit_product_date_from').attr('value', dateFrom);
+                    $('#edit_product .edit_product_date_from').attr('data-min_date', dateFrom);
                     $('#edit_product .edit_product_date_to').attr('value', dateTo);
+                    $('#edit_product .edit_product_date_to').attr('data-min_date', dateFrom);
                     $('#edit_product .edit_product_date_from_actual').attr('value', jsonProductLineData.date_from);
                     $('#edit_product .edit_product_date_to_actual').attr('value', jsonProductLineData.date_to);
                     $('#edit_product .room_unit_price').val(parseFloat(jsonProductLineData.paid_unit_price_tax_excl));

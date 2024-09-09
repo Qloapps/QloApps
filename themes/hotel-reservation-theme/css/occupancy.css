@@ -23,8 +23,13 @@
     overflow: auto;
     box-shadow: 0 8px 25px -4px rgba(0,0,0,0.39);
     left: 0px;
-    padding: 20px;
+    padding: 15px 20px;
     min-width: 280px}
+    .booking_occupancy_wrapper .btn {
+      font-weight: 600;}
+    .booking_occupancy_wrapper .btn-primary {
+      background-color: #1292FF;
+      color: #FFF;}
     .booking_occupancy_wrapper .occupancy-info-separator {
       margin-bottom: 15px;
       margin-top: 15px;
@@ -53,8 +58,11 @@
         font-weight: bold;
         text-decoration: none;
         font-size: 14px;
-        color: #0000FF;
-        line-height: 24px;}
+        color: #0000FF;}
+        .booking_occupancy_wrapper .occupancy_block_actions {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;}
         .booking_occupancy_wrapper .add_new_occupancy_btn:active, .booking_occupancy_wrapper .add_new_occupancy_btn:focus, .booking_occupancy_wrapper .add_new_occupancy_btn:hover {
           text-decoration: none;
           color: #0000FF;}

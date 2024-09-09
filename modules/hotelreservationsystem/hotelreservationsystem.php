@@ -54,6 +54,7 @@ class HotelReservationSystem extends Module
             'bookings' => array('description' => 'Order bookings', 'class' => 'HotelBookingDetail'),
             'booking_extra_demands' => array('description' => 'Booking extra demands', 'class' => 'HotelBookingDemands'),
             'extra_demands' => array('description' => 'Extra demands', 'class' => 'HotelRoomTypeGlobalDemand'),
+            'extra_services' => array('description' => 'Extra services', 'class' => 'Product', 'parameters_attribute' => 'webserviceRoomTypeServicesParameters'),
             'demand_advance_options' => array('description' => 'Extra demand advance options', 'class' => 'HotelRoomTypeGlobalDemandAdvanceOption'),
             'hotel_ari' => array('description' => 'Search availability, rates and inventory', 'specific_management' => true),
             'qlo' => array('description' => 'qlo API', 'specific_management' => true),
@@ -557,9 +558,8 @@ class HotelReservationSystem extends Module
     public function callInstallTab()
     {
         $this->installTab('AdminHotelReservationSystemManagement', 'Hotel Reservation System');
-        $this->installTab('AdminHotelRoomsBooking', 'Book Now', 'AdminHotelReservationSystemManagement');
-        $this->installTab('AdminHotelConfigurationSetting', 'Settings', 'AdminHotelReservationSystemManagement');
         $this->installTab('AdminAddHotel', 'Manage Hotel', 'AdminHotelReservationSystemManagement');
+        $this->installTab('AdminHotelRoomsBooking', 'Book Now', 'AdminHotelReservationSystemManagement');
         $this->installTab('AdminHotelFeatures', 'Manage Hotel Features', 'AdminHotelReservationSystemManagement');
         $this->installTab(
             'AdminOrderRefundRules',
@@ -572,11 +572,11 @@ class HotelReservationSystem extends Module
             'AdminHotelReservationSystemManagement'
         );
 
+        $this->installTab('AdminHotelConfigurationSetting', 'General Settings', 'AdminHotelReservationSystemManagement');
         // Controllers without tabs
         $this->installTab('AdminHotelGeneralSettings', 'Hotel General Configuration', 'AdminHotelConfigurationSetting', false);
         $this->installTab('AdminHotelFeaturePricesSettings', 'Advanced Price Rules', 'AdminHotelConfigurationSetting', false);
         $this->installTab('AdminRoomTypeGlobalDemand', 'Additional Demand Configuration', 'AdminHotelConfigurationSetting', false);
-        $this->installTab('AdminAssignHotelFeatures', 'Assign Hotel Features', false, false);
         $this->installTab('AdminBookingDocument', 'Booking Documents', false, false);
 
         return true;

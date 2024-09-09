@@ -69,9 +69,9 @@ class RoomTypeServiceProductOrderDetail extends ObjectModel
         $useTax = null,
         $autoAddToCart = 0,
         $priceAdditionType = null,
-        $idOrderDetail = 0
+        $idOrderDetail = 0,
+        $idHtlBookingDetail = 0
     ) {
-
         if ($useTax === null) {
             $useTax = Product::$_taxCalculationMethod == PS_TAX_EXC ? false : true;
         }
@@ -110,6 +110,9 @@ class RoomTypeServiceProductOrderDetail extends ObjectModel
         }
         if ($idRoom) {
             $sql .= ' AND hbd.`id_room`='.(int) $idRoom;
+        }
+        if ($idHtlBookingDetail) {
+            $sql .= ' AND hbd.`id` = '.(int)$idHtlBookingDetail;
         }
         $sql .= ' ORDER BY hbd.`id`';
 

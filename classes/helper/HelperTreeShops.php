@@ -68,24 +68,6 @@ class HelperTreeShopsCore extends TreeCore
         return $this->_lang;
     }
 
-    public function getNodeFolderTemplate()
-    {
-        if (!isset($this->_node_folder_template)) {
-            $this->setNodeFolderTemplate(self::DEFAULT_NODE_FOLDER_TEMPLATE);
-        }
-
-        return $this->_node_folder_template;
-    }
-
-    public function getNodeItemTemplate()
-    {
-        if (!isset($this->_node_item_template)) {
-            $this->setNodeItemTemplate(self::DEFAULT_NODE_ITEM_TEMPLATE);
-        }
-
-        return $this->_node_item_template;
-    }
-
     public function setSelectedShops($value)
     {
         if (!is_array($value)) {
@@ -103,15 +85,6 @@ class HelperTreeShopsCore extends TreeCore
         }
 
         return $this->_selected_shops;
-    }
-
-    public function getTemplate()
-    {
-        if (!isset($this->_template)) {
-            $this->setTemplate(self::DEFAULT_TEMPLATE);
-        }
-
-        return $this->_template;
     }
 
     public function render($data = null, $use_default_actions = true, $use_selected_shop = true)
@@ -153,7 +126,7 @@ class HelperTreeShopsCore extends TreeCore
         return parent::render($data);
     }
 
-    public function renderNodes($data = null)
+    public function renderNodes($data = null, $root = false)
     {
         if (!isset($data)) {
             $data = $this->getData();

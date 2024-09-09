@@ -66,7 +66,7 @@
 			<!-- left infos-->
 			<div class="pb-left-column col-xs-12 col-sm-8 col-md-8">
 				<div class="room_type_img_containter card">
-					<div class="room_hotel_name_block">
+					<div class="room_hotel_name_block {if isset($language_is_rtl) && $language_is_rtl}rtl{/if}">
 						<div class="hotel_name_block">
 							<h1><span class="hotel_name">{$product->name}
 								{* Block for booking products *}
@@ -148,6 +148,7 @@
 													</li>
 												{/foreach}
 											{/if}
+											{hook h='displayRoomTypeThumbnailsBottom'}
 											</ul>
 										</div> <!-- end thumbs_list -->
 										{if isset($images) && count($images) > 2}
@@ -155,6 +156,7 @@
 												{l s='Next'}
 											</a>
 										{/if}
+										{hook h="displayRoomTypeThumbnailsAfter"}
 									</div> <!-- end views-block -->
 								<!-- end thumbnails -->
 							{/if}

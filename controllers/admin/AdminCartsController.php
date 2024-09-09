@@ -197,7 +197,7 @@ class AdminCartsControllerCore extends AdminController
             $helper->data = ConfigurationKPI::get('CONVERSION_RATE_CHART');
         }
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=conversion_rate';
-        $kpis[] = $helper;
+        $this->kpis[] = $helper;
 
         $helper = new HelperKpi();
         $helper->id = 'box-carts';
@@ -209,7 +209,7 @@ class AdminCartsControllerCore extends AdminController
         $helper->subtitle = sprintf($this->l('From %s to %s', null, null, false), $date_from, $date_to);
         $helper->href = $this->context->link->getAdminLink('AdminCarts').'&action=filterOnlyAbandonedCarts&date_from='.$date_from.'&date_to='.$date_to;
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=abandoned_cart';
-        $kpis[] = $helper;
+        $this->kpis[] = $helper;
 
         $daysForAvgOrderVal = Configuration::get('PS_ORDER_KPI_AVG_ORDER_VALUE_NB_DAYS');
         $helper = new HelperKpi();
@@ -219,7 +219,7 @@ class AdminCartsControllerCore extends AdminController
         $helper->title = $this->l('Average Order Value', null, null, false);
         $helper->subtitle = $daysForAvgOrderVal.' '.$this->l('days', null, null, false);
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=average_order_value';
-        $kpis[] = $helper;
+        $this->kpis[] = $helper;
 
         $daysForProfitPerVisitor = Configuration::get('PS_ORDER_KPI_PER_VISITOR_PROFIT_NB_DAYS');
         $helper = new HelperKpi();
@@ -229,15 +229,9 @@ class AdminCartsControllerCore extends AdminController
         $helper->title = $this->l('Net Profit per Visitor', null, null, false);
         $helper->subtitle = $daysForProfitPerVisitor.' '.$this->l('days', null, null, false);
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=netprofit_visit';
-        $kpis[] = $helper;
+        $this->kpis[] = $helper;
 
-        Hook::exec('action'.$this->controller_name.'KPIListingModifier', array(
-            'kpis' => &$kpis,
-        ));
-
-        $helper = new HelperKpiRow();
-        $helper->kpis = $kpis;
-        return $helper->generate();
+        return parent::renderKpis();
     }
 
 
@@ -395,19 +389,19 @@ class AdminCartsControllerCore extends AdminController
                 $this->context->cart->id_currency = (($id_currency = (int)Tools::getValue('id_currency')) ? $id_currency : Configuration::get('PS_CURRENCY_DEFAULT'));
             }
 
-            $addresses = $customer->getAddresses((int)$this->context->cart->id_lang);
-            $id_address_delivery = (int)Tools::getValue('id_address_delivery');
-            $id_address_invoice = (int)Tools::getValue('id_address_invoice');
+            if (Validate::isLoadedObject($customer)) {
+                $addresses = $customer->getAddresses((int)$this->context->cart->id_lang);
+                $id_address_delivery = (int)Tools::getValue('id_address_delivery');
+                $id_address_invoice = (int)Tools::getValue('id_address_invoice');
 
-            if (!$this->context->cart->id_address_invoice && isset($addresses[0])) {
-                $this->context->cart->id_address_invoice = (int)$addresses[0]['id_address'];
-            } elseif ($id_address_invoice) {
-                $this->context->cart->id_address_invoice = (int)$id_address_delivery;
-            }
-            if (!$this->context->cart->id_address_delivery && isset($addresses[0])) {
-                $this->context->cart->id_address_delivery = $addresses[0]['id_address'];
-            } elseif ($id_address_delivery) {
-                $this->context->cart->id_address_delivery = (int)$id_address_delivery;
+                if (!$this->context->cart->id_address_invoice && isset($addresses[0])) {
+                    $this->context->cart->id_address_invoice = (int)$addresses[0]['id_address'];
+                } elseif ($id_address_invoice) {
+                    $this->context->cart->id_address_invoice = (int)$id_address_delivery;
+                }
+                if ($id_address_delivery) {
+                    $this->context->cart->id_address_delivery = (int)$id_address_delivery;
+                }
             }
             $this->context->cart->setNoMultishipping();
 
@@ -417,7 +411,6 @@ class AdminCartsControllerCore extends AdminController
                 $this->context->cart->secure_key = $this->context->customer->secure_key;
                 $addresses = $customer->getAddresses((int)$this->context->cart->id_lang);
                 $this->context->cart->id_address_invoice = (int)$addresses[0]['id_address'];
-                $this->context->cart->id_address_delivery = (int)$addresses[0]['id_address'];
                 $this->context->cart->setNoMultishipping();
             }
             /*END*/
