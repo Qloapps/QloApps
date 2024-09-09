@@ -135,14 +135,30 @@ class RoomTypeServiceProduct extends ObjectModel
         return Db::getInstance()->getValue($sql);
     }
 
-    public static function getAutoAddServices($idProduct, $dateFrom = null, $dateTo = null, $priceAdditionType = null, $useTax = null, $idCart = 0, $idGuest = 0, $use_reduc = 1)
-    {
+    public static function getAutoAddServices($idProduct,
+        $dateFrom = null,
+        $dateTo = null,
+        $priceAdditionType = null,
+        $useTax = null,
+        $idCart = 0,
+        $idGuest = 0,
+        $use_reduc = 1,
+        $idRoom = 0
+    ) {
         if (Product::isBookingProduct($idProduct)) {
             $sql = 'SELECT p.`id_product` FROM  `'._DB_PREFIX_.'htl_room_type_service_product` rsp
             INNER JOIN `'._DB_PREFIX_.'product` p ON (rsp.`id_product` = p.`id_product` AND p.`auto_add_to_cart` = 1)';
             if ($idCart) {
                 $sql .= ' INNER JOIN `'._DB_PREFIX_.'htl_room_type_service_product_cart_detail` spcd
                     ON (rsp.`id_product` = spcd.`id_product` AND spcd.`id_cart` = '.(int)$idCart.')';
+                    if ($dateFrom && $dateTo && $idRoom) {
+                        $sql .= ' INNER JOIN `'._DB_PREFIX_.'htl_cart_booking_data` hcbd
+                            ON (hcbd.`id` = spcd.`htl_cart_booking_id`
+                                AND hcbd.`id_room` = '.(int)$idRoom.'
+                                AND hcbd.`date_from` = \''.pSQL($dateFrom).'\'
+                                AND hcbd.`date_to` = \''.pSQL($dateTo).'\'
+                            )';
+                    }
             }
             $sql .= ' WHERE p.`active` = 1 AND `id_element` = '.(int)$idProduct.' AND `element_type` = '.self::WK_ELEMENT_TYPE_ROOM_TYPE;
             if (!is_null($priceAdditionType)) {

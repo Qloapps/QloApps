@@ -726,7 +726,8 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
                 true,
                 $id_cart,
                 $id_guest,
-                $use_reduc
+                $use_reduc,
+                $id_room
             )) {
                 foreach($servicesWithTax as $service) {
                     $totalPrice['total_price_tax_incl'] += $service['price'];
@@ -740,7 +741,8 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
                 false,
                 $id_cart,
                 $id_guest,
-                $use_reduc
+                $use_reduc,
+                $id_room
             )) {
                 foreach($servicesWithoutTax as $service) {
                     $totalPrice['total_price_tax_excl'] += $service['price'];
