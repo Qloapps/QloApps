@@ -17,7 +17,7 @@
 *  @license   https://store.webkul.com/license.html
 *}
 
-{block name='header_hotel_desc_block_content'}
+{block name='header-hotel-desc-block'}
 	<div class="header-desc-container">
 		<div class="header-desc-wrapper">
 			<div class="header-desc-primary">
@@ -33,7 +33,7 @@
 							</div>
 						</div>
 					</div>
-					{block name='display_after_header_hotel_desc'}
+					{block name='displayAfterHeaderHotelDesc'}
 						{hook h="displayAfterHeaderHotelDesc"}
 					{/block}
 				</div>

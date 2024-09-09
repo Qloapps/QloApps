@@ -17,7 +17,7 @@
 *  @license   https://store.webkul.com/license.html
 *}
 
-{block name='navigation_menu_content'}
+{block name='navigation-menu-block'}
 	<div class="header-top-item">
 		<button type="button" class="nav_toggle">
 			<span class="icon-bar"></span>
@@ -41,11 +41,11 @@
 								</li>
 							{/foreach}
 						{/if}
-						{block name='display_default_navigation_hook'}
+						{block name='displayDefaultNavigationHook'}
 							{hook h="displayDefaultNavigationHook"}
 						{/block}
 					</ul>
-					{block name='display_external_navigation_hook'}
+					{block name='displayExternalNavigationHook'}
 						{hook h="displayExternalNavigationHook"}
 					{/block}
 				</div>

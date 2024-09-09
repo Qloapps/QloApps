@@ -23,7 +23,7 @@
 *  International Registered Trademark & Property of PrestaShop SA
 *}
 
-{block name='order_payment_advanced_content'}
+{block name='order-payment-advanced'}
     {if !isset($addresses_style)}
         {$addresses_style.company = 'address_company'}
         {$addresses_style.firstname = 'address_name'}
@@ -49,24 +49,24 @@
     {capture name=path}{l s='Your shopping cart'}{/capture}
 
     {if $productNumber == 0}
-        <p class="alert alert-warning">{l s='Your shopping cart is empty.'}</p>
+    <p class="alert alert-warning">{l s='Your shopping cart is empty.'}</p>
     {elseif $PS_CATALOG_MODE}
-        <p class="alert alert-warning">{l s='This store has not accepted your new order.'}</p>
+    <p class="alert alert-warning">{l s='This store has not accepted your new order.'}</p>
     {else}
         <p id="emptyCartWarning" class="alert alert-warning unvisible">{l s='Your shopping cart is empty.'}</p>
         <h2>{l s='Payment Options'}</h2>
         <!-- HOOK_ADVANCED_PAYMENT -->
-        <div id="HOOK_ADVANCED_PAYMENT">
-            <div class="row">
-            <!-- Should get a collection of "PaymentOption" object -->
-            {assign var='adv_payment_empty' value=true}
-            {foreach from=$HOOK_ADVANCED_PAYMENT item=pay_option key=key}
-                {if $pay_option}
-                    {assign var='adv_payment_empty' value=false}
-                {/if}
-            {/foreach}
-            {if $HOOK_ADVANCED_PAYMENT && !$adv_payment_empty}
-                {block name='order_payment_advanced_option_list'}
+        {block name='HOOK_ADVANCED_PAYMENT'}
+            <div id="HOOK_ADVANCED_PAYMENT">
+                <div class="row">
+                <!-- Should get a collection of "PaymentOption" object -->
+                {assign var='adv_payment_empty' value=true}
+                {foreach from=$HOOK_ADVANCED_PAYMENT item=pay_option key=key}
+                    {if $pay_option}
+                        {assign var='adv_payment_empty' value=false}
+                    {/if}
+                {/foreach}
+                {if $HOOK_ADVANCED_PAYMENT && !$adv_payment_empty}
                     {foreach $HOOK_ADVANCED_PAYMENT as $advanced_payment_opt_list}
                         {foreach $advanced_payment_opt_list as $paymentOption}
                             <div class="col-xs-12 col-md-6">
@@ -98,14 +98,14 @@
                             </div>
                         {/foreach}
                     {/foreach}
-                {/block}
+                </div>
+                {else}
+                <div class="col-xs-12 col-md-12">
+                    <p class="alert alert-warning ">{l s='Unable to find any available payment option for your cart. Please contact us if the problem persists'}</p>
+                </div>
+                {/if}
             </div>
-            {else}
-            <div class="col-xs-12 col-md-12">
-                <p class="alert alert-warning ">{l s='Unable to find any available payment option for your cart. Please contact us if the problem persists'}</p>
-            </div>
-            {/if}
-        </div>
+        {/block}
         <!-- end HOOK_ADVANCED_PAYMENT -->
 
         {if $opc}
@@ -122,8 +122,8 @@
             <!-- END Create account / Guest account / Login block -->
         {/if}
 
-        <!-- TNC -->
-        {block name='order_payment_advanced_conditions'}
+        {block name='order-payment-advanced-terms-conditions'}
+            <!-- TNC -->
             {if $conditions AND $cms_id}
                 {if $override_tos_display }
                     {$override_tos_display}
@@ -142,12 +142,9 @@
                     </div>
                 {/if}
             {/if}
+            <!-- end TNC -->
         {/block}
-        <!-- end TNC -->
 
-        {block name='shopping_cart_advanced_content'}
-            {include file="$tpl_dir./shopping-cart-advanced.tpl"}
-        {/block}
+        {include file="$tpl_dir./shopping-cart-advanced.tpl"}
     {/if}
-
 {/block}

@@ -23,7 +23,7 @@
 *  International Registered Trademark & Property of PrestaShop SA
 *}
 
-{block name='global_js_vars'}
+{block name='global'}
 	{strip}
 	{addJsDef isMobile=$mobile_device}
 	{addJsDef baseDir=$content_dir}

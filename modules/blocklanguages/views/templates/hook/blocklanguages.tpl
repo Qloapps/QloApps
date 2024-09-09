@@ -17,7 +17,7 @@
 * @license LICENSE.txt
 *}
 
-{block name='block_languages_content'}
+{block name='block-languages'}
     {if count($languages) > 1}
         <div id="languages-block-top" class="languages-block-wrap nav-main-item-right hidden-xs pull-right">
             <div class="dropdown">

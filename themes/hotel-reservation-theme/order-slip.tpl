@@ -23,7 +23,7 @@
 *  International Registered Trademark & Property of PrestaShop SA
 *}
 
-{block name='order_slip_content'}
+{block name='order-slip'}
 	{capture name=path}<a href="{$link->getPageLink('my-account', true)|escape:'html':'UTF-8'}">{l s='My account'}</a><span class="navigation-pipe">{$navigationPipe}</span><span class="navigation_page">{l s='Credit slips'}</span>{/capture}
 
 	<h1 class="page-heading bottom-indent">
@@ -33,9 +33,7 @@
 		{l s='Credit slips you have received after canceled orders'}.
 	</p>
 
-	{block name='order_slip_errors_container'}
-		{include file="$tpl_dir./errors.tpl"}
-	{/block}
+	{include file="$tpl_dir./errors.tpl"}
 
 	{if isset($smarty.get.confirmation) && $smarty.get.confirmation}
 		<p class="alert alert-success">
@@ -43,66 +41,62 @@
 		</p>
 	{/if}
 
-	{block name='order_slip_table_container'}
+	{block name='order-slip-list'}
 		<div class="block-center" id="block-history">
 			{if $ordersSlip && count($ordersSlip)}
 				<table id="order-list" class="table table-bordered footab">
-					{block name='order_slip_table_head'}
-						<thead>
-							<tr>
-								<th data-sort-ignore="true" class="first_item">{l s='Credit slip'}</th>
-								<th data-sort-ignore="true" class="item">{l s='Order'}</th>
-								<th class="item">{l s='Date issued'}</th>
-								<th data-sort-ignore="true" data-hide="phone">{l s='View credit slip'}</th>
-								<th data-sort-ignore="true">{l s='Status'}</th>
-								<th data-sort-ignore="true" data-hide="phone" class="last_item">{l s='Actions'}</th>
+					<thead>
+						<tr>
+							<th data-sort-ignore="true" class="first_item">{l s='Credit slip'}</th>
+							<th data-sort-ignore="true" class="item">{l s='Order'}</th>
+							<th class="item">{l s='Date issued'}</th>
+							<th data-sort-ignore="true" data-hide="phone">{l s='View credit slip'}</th>
+							<th data-sort-ignore="true">{l s='Status'}</th>
+							<th data-sort-ignore="true" data-hide="phone" class="last_item">{l s='Actions'}</th>
+						</tr>
+					</thead>
+					<tbody>
+						{foreach from=$ordersSlip item=slip name=myLoop}
+							<tr class="{if $smarty.foreach.myLoop.first}first_item{elseif $smarty.foreach.myLoop.last}last_item{else}item{/if} {if $smarty.foreach.myLoop.index % 2}alternate_item{/if}">
+								<td class="bold">
+									<span class="color-myaccount">
+										#{Configuration::get('PS_CREDIT_SLIP_PREFIX', $lang_id)}{$slip.id_order_slip|string_format:"%06d"}
+									</span>
+								</td>
+								<td class="history_method">
+									<a class="color-myaccount" href="{$link->getPageLink('order-detail', true, NULL, "id_order={$slip.id_order|intval}")|escape:'html':'UTF-8'}" target="_blank">
+										#{$slip.id_order|string_format:"%06d"}
+									</a>
+								</td>
+								<td class="bold"  data-value="{$slip.date_add|regex_replace:"/[\-\:\ ]/":""}">
+									{dateFormat date=$slip.date_add full=0}
+								</td>
+								<td class="history_invoice">
+									<a class="link-button" href="{$link->getPageLink('pdf-order-slip', true, NULL, "id_order_slip={$slip.id_order_slip|intval}")|escape:'html':'UTF-8'}" title="{l s='Credit slip'} #{Configuration::get('PS_CREDIT_SLIP_PREFIX', $lang_id)}{$slip.id_order_slip|string_format:"%06d"}">
+										<i class="icon-file-text large"></i>{l s='PDF'}
+									</a>
+								</td>
+								<td>
+									{if $slip.redeem_status == OrderSlip::REDEEM_STATUS_REDEEMED}
+										<span class="badge badge-danger">{l s='Redeemed'}</span>
+									{else}
+										<span class="badge badge-success">{l s='Active'}</span>
+									{/if}
+								</td>
+								<td>
+									{if $slip.redeem_status == OrderSlip::REDEEM_STATUS_ACTIVE && !$slip.id_cart_rule}
+										<a href="{$link->getPageLink('order-slip', true, NULL, "generateVoucher=1&id_order_slip={$slip.id_order_slip|intval}")|escape:'html':'UTF-8'}" title="{l s='Generate voucher for credit slip '} #{Configuration::get('PS_CREDIT_SLIP_PREFIX', $lang_id)}{$slip.id_order_slip|string_format:"%06d"}">
+											<u>{l s='Generate Voucher'}</u>
+										</a>
+									{elseif $slip.redeem_status == OrderSlip::REDEEM_STATUS_REDEEMED && $slip.id_cart_rule}
+										<span class="badge badge-danger">{l s='Voucher Generated'}</span>
+									{elseif $slip.redeem_status == OrderSlip::REDEEM_STATUS_REDEEMED && !$slip.id_cart_rule}
+										--
+									{/if}
+								</td>
 							</tr>
-						</thead>
-					{/block}
-					{block name='order_slip_table_body'}
-						<tbody>
-							{foreach from=$ordersSlip item=slip name=myLoop}
-								<tr class="{if $smarty.foreach.myLoop.first}first_item{elseif $smarty.foreach.myLoop.last}last_item{else}item{/if} {if $smarty.foreach.myLoop.index % 2}alternate_item{/if}">
-									<td class="bold">
-										<span class="color-myaccount">
-											#{Configuration::get('PS_CREDIT_SLIP_PREFIX', $lang_id)}{$slip.id_order_slip|string_format:"%06d"}
-										</span>
-									</td>
-									<td class="history_method">
-										<a class="color-myaccount" href="{$link->getPageLink('order-detail', true, NULL, "id_order={$slip.id_order|intval}")|escape:'html':'UTF-8'}" target="_blank">
-											#{$slip.id_order|string_format:"%06d"}
-										</a>
-									</td>
-									<td class="bold"  data-value="{$slip.date_add|regex_replace:"/[\-\:\ ]/":""}">
-										{dateFormat date=$slip.date_add full=0}
-									</td>
-									<td class="history_invoice">
-										<a class="link-button" href="{$link->getPageLink('pdf-order-slip', true, NULL, "id_order_slip={$slip.id_order_slip|intval}")|escape:'html':'UTF-8'}" title="{l s='Credit slip'} #{Configuration::get('PS_CREDIT_SLIP_PREFIX', $lang_id)}{$slip.id_order_slip|string_format:"%06d"}">
-											<i class="icon-file-text large"></i>{l s='PDF'}
-										</a>
-									</td>
-									<td>
-										{if $slip.redeem_status == OrderSlip::REDEEM_STATUS_REDEEMED}
-											<span class="badge badge-danger">{l s='Redeemed'}</span>
-										{else}
-											<span class="badge badge-success">{l s='Active'}</span>
-										{/if}
-									</td>
-									<td>
-										{if $slip.redeem_status == OrderSlip::REDEEM_STATUS_ACTIVE && !$slip.id_cart_rule}
-											<a href="{$link->getPageLink('order-slip', true, NULL, "generateVoucher=1&id_order_slip={$slip.id_order_slip|intval}")|escape:'html':'UTF-8'}" title="{l s='Generate voucher for credit slip '} #{Configuration::get('PS_CREDIT_SLIP_PREFIX', $lang_id)}{$slip.id_order_slip|string_format:"%06d"}">
-												<u>{l s='Generate Voucher'}</u>
-											</a>
-										{elseif $slip.redeem_status == OrderSlip::REDEEM_STATUS_REDEEMED && $slip.id_cart_rule}
-											<span class="badge badge-danger">{l s='Voucher Generated'}</span>
-										{elseif $slip.redeem_status == OrderSlip::REDEEM_STATUS_REDEEMED && !$slip.id_cart_rule}
-											--
-										{/if}
-									</td>
-								</tr>
-							{/foreach}
-						</tbody>
-					{/block}
+						{/foreach}
+					</tbody>
 				</table>
 				<div id="block-order-detail" class="unvisible">&nbsp;</div>
 			{else}
@@ -110,9 +104,7 @@
 			{/if}
 		</div><!-- #block-history -->
 	{/block}
-
-
-	{block name='order_slip_footer_links'}
+	{block name='order-slip-footer-links'}
 		<ul class="footer_links clearfix">
 			<li>
 				<a class="btn btn-default button button-small" href="{$link->getPageLink('my-account', true)|escape:'html':'UTF-8'}">

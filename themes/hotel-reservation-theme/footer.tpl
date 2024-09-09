@@ -28,14 +28,14 @@
 						<div id="right_column" class="col-xs-12 col-sm-{$right_column_size|intval} column">{$HOOK_RIGHT_COLUMN}</div>
 					{/if}
 					</div><!-- .row -->
-					{block name='display_columns_bottom'}
+					{block name='displayColumnsBottom'}
 						{hook h='displayColumnsBottom'}
 					{/block}
 				</div><!-- #columns -->
 			</div><!-- .columns-container -->
-			{block name='hook_footer'}
+			{block name='HOOK_FOOTER'}
 				{if isset($HOOK_FOOTER)}
-					{block name='display_footer_before'}
+					{block name='displayFooterBefore'}
 						{hook h='displayFooterBefore'}
 					{/block}
 					<!-- Footer -->
@@ -43,7 +43,7 @@
 						<footer id="footer"  class="container">
 							<div class="row margin-btm-50">{$HOOK_FOOTER}</div>
 						</footer>
-						{block name='display_after_defautl_footer_hook'}
+						{block name='displayAfterDefautlFooterHook'}
 							{hook h="displayAfterDefautlFooterHook"}
 						{/block}
 					</div><!-- #footer -->
@@ -51,8 +51,6 @@
 			{/block}
 		</div><!-- #page -->
 {/if}
-{block name='global_container'}
-	{include file="$tpl_dir./global.tpl"}
-{/block}
+{include file="$tpl_dir./global.tpl"}
 	</body>
 </html>

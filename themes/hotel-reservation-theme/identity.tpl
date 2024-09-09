@@ -23,7 +23,7 @@
 *  International Registered Trademark & Property of PrestaShop SA
 *}
 
-{block name='identity_content'}
+{block name='identity'}
     {capture name=path}
         <a href="{$link->getPageLink('my-account', true)|escape:'html':'UTF-8'}">
             {l s='My account'}
@@ -40,9 +40,7 @@
             {l s='Personal information'}
         </h1>
 
-        {block name='identity_errors_container'}
-            {include file="$tpl_dir./errors.tpl"}
-        {/block}
+        {include file="$tpl_dir./errors.tpl"}
 
         {if isset($confirmation) && $confirmation}
             <p class="alert alert-success">
@@ -56,7 +54,7 @@
             <p class="required">
                 <sup>*</sup>{l s='Required field'}
             </p>
-            {block name='identity_form_container'}
+            {block name='identity-form'}
                 <form action="{$link->getPageLink('identity', true)|escape:'html':'UTF-8'}" method="post" class="std">
                     <fieldset>
                         <div class="clearfix">
@@ -87,6 +85,12 @@
                                 {l s='E-mail address'}
                             </label>
                             <input class="is_required validate form-control" data-validate="isEmail" type="email" name="email" id="email" value="{$smarty.post.email}" />
+                        </div>
+                        <div class="required form-group">
+                            <label for="phone" class="required">
+                                {l s='Phone'}
+                            </label>
+                            <input class="is_required validate form-control" data-validate="isPhoneNumber" type="phone" name="phone" id="phone" value="{$smarty.post.phone}" />
                         </div>
                         {if isset($birthday) && $birthday}
                             <div class="form-group">
@@ -196,7 +200,8 @@
                                 <input type="text" class="form-control" id="website" name="website" value="{if isset($smarty.post.website)}{$smarty.post.website}{/if}" />
                             </div>
                         {/if}
-                        {block name='hook_customer_identity_form'}
+
+                        {block name='HOOK_CUSTOMER_IDENTITY_FORM'}
                             {if isset($HOOK_CUSTOMER_IDENTITY_FORM)}
                                 {$HOOK_CUSTOMER_IDENTITY_FORM}
                             {/if}
@@ -211,7 +216,7 @@
             {/block}
         {/if}
     </div>
-    {block name='identity_footer_links'}
+    {block name='identity-footer-links'}
         <ul class="footer_links clearfix">
             <li>
                 <a class="btn btn-default button button-small" href="{$link->getPageLink('my-account', true)}">

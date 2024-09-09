@@ -17,17 +17,17 @@
 * @license LICENSE.txt
 *}
 
-{block name='order_room_detail_content'}
+{block name='order-room-detail'}
     <div class="booking-room-detail" data-id-product="{$data_v.id_product}" data-date-diff="{$rm_k}">
         <div class="row">
-            {block name='order_room_image'}
+            {block name='order-room-detial-room-image'}
                 <div class="col-xs-3 col-sm-2">
                     <a href="{$link->getProductLink($data_v.id_product)|escape:'html':'UTF-8'}" title="{$data_v.name|escape:'html':'UTF-8'}" target="_blank">
                         <img class="img img-responsive img-room-type" src="{$data_v.cover_img|escape:'html':'UTF-8'}" />
                     </a>
                 </div>
             {/block}
-            {block name='order_room_info'}
+            {block name='order-room-detial-room-details'}
                 <div class="col-xs-9 col-sm-10 info-wrap">
                     <div class="row">
                         <div class="col-xs-12">

@@ -17,13 +17,11 @@
 * @license LICENSE.txt
 *}
 
-{block name='service_product_list_content'}
+{block name='service-products-list'}
     {foreach $service_products as $product}
         {if !($product@first && isset($init) && $init == true)}
             <hr>
         {/if}
-        {block name='service_product_list_row_container'}
-            {include file="{$tpl_dir}_partials/service-products-list-row.tpl" product=$product}
-        {/block}
+        {include file="{$tpl_dir}_partials/service-products-list-row.tpl" product=$product}
     {/foreach}
 {/block}

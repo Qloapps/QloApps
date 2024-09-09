@@ -17,10 +17,10 @@
 *  @license   https://store.webkul.com/license.html
 *}
 
-{block name='hotel_filter_content'}
+{block name='htl-filter-block'}
 	<div id="filter_results" class="row block">
 		<div class="col-sm-12">
-			{block name='hotel_filter_amenitt_filter'}
+			{block name='htl-filter-block-amenities-filter'}
 				{if isset($config) && $config['SHOW_AMENITIES_FILTER'] && $all_feat}
 					<div class="row margin-lr-0 layered_filter_cont">
 						<div class="col-sm-12 layered_filter_heading">
@@ -44,7 +44,7 @@
 				{/if}
 			{/block}
 
-			{block name='hotel_filter_price_filter'}
+			{block name='htl-filter-block-price-filter'}
 				{if isset($config) && $config['SHOW_PRICE_FILTER']}
 					<div class="row margin-lr-0 layered_filter_cont">
 						<div class="col-sm-12 layered_filter_heading">
@@ -68,19 +68,19 @@
 			{/block}
 		</div>
 	</div>
-{/block}
-{block name='hotel_filter_js_vars'}
-	{strip}
-		{addJsDef num_days = $num_days}
-		{addJsDef date_from = $date_from}
-		{addJsDef date_to = $date_to}
+	{block name='htl-filter-block-js-vars'}
+		{strip}
+			{addJsDef num_days = $num_days}
+			{addJsDef date_from = $date_from}
+			{addJsDef date_to = $date_to}
 
-		{addJsDef cat_link = $cat_link}
-		{addJsDef min_price = $min_price}
-		{addJsDef max_price = $max_price}
-		{addJsDef warning_num = $warning_num}
+			{addJsDef cat_link = $cat_link}
+			{addJsDef min_price = $min_price}
+			{addJsDef max_price = $max_price}
+			{addJsDef warning_num = $warning_num}
 
-		{addJsDefL name=viewMoreTxt}{l s='View More' js=1 mod='wkhotelfilterblock'}{/addJsDefL}
-		{addJsDefL name=bookNowTxt}{l s='Book Now' js=1 mod='wkhotelfilterblock'}{/addJsDefL}
-	{/strip}
+			{addJsDefL name=viewMoreTxt}{l s='View More' js=1 mod='wkhotelfilterblock'}{/addJsDefL}
+			{addJsDefL name=bookNowTxt}{l s='Book Now' js=1 mod='wkhotelfilterblock'}{/addJsDefL}
+		{/strip}
+	{/block}
 {/block}

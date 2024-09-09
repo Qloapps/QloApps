@@ -17,7 +17,7 @@
 * @license LICENSE.txt
 *}
 
-{block name='hotel_images'}
+{block name='hotel-images'}
     {if is_array($hotel_images) && count($hotel_images)}
         {foreach from=$hotel_images item=hotel_image}
             <div class="col-sm-4 image-item">

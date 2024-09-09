@@ -17,10 +17,10 @@
 * @license LICENSE.txt
 *}
 
-{block name='cart_booking_demands_content'}
+{block name='cart-booking-demands'}
 	<section>
 		{if (isset($selectedRoomDemands) && $selectedRoomDemands) || (isset($roomTypeServiceProducts) && $roomTypeServiceProducts)}
-			{block name='cart_booking_demand_tabs'}
+			{block name='cart-booking-demands-tabs'}
 				<ul class="nav nav-tabs">
 					{if isset($selectedRoomDemands) && $selectedRoomDemands}
 						<li class="active"><a href="#room_type_demands_desc" data-toggle="tab">{l s='Facilities'}</a></li>
@@ -30,9 +30,9 @@
 					{/if}
 				</ul>
 			{/block}
-			{block name='cart_booking_demand_tabs_content'}
+			{block name='cart-booking-demands-tabs-content'}
 				<div class="tab-content">
-					{block name='cart_booking_demand_tab_content'}
+					{block name='cart-booking-demands-tab-content'}
 						{if isset($selectedRoomDemands) && $selectedRoomDemands}
 							<div id="room_type_demands_desc" class="tab-pane active">
 								<div class="rooms_extra_demands_head">
@@ -60,31 +60,31 @@
 																		</p>
 																	</div>
 																	<div class="col-xs-10 demand_adv_option_block">
-																		<p>{$demand['name']|escape:'html':'UTF-8'}</p>
-																		{if isset($demand['adv_option']) && $demand['adv_option']}
-																			<select class="id_option">
-																				{foreach $demand['adv_option'] as $idOption => $option}
-																					{assign var=demand_key value="`$idGlobalDemand`-`$idOption`"}
-																					<option optionPrice="{$option['price']|escape:'html':'UTF-8'}" value="{$idOption|escape:'html':'UTF-8'}" {if isset($roomDemand['extra_demands'][$demand_key])}selected{/if} key="{$demand_key}">{$option['name']}</option>
-																					{if isset($roomDemand['extra_demands'][$demand_key])}
-																						{assign var=selected_adv_option value="$idOption"}
-																					{/if}
-																				{/foreach}
-																			</select>
-																		{else}
-																			<input type="hidden" class="id_option" value="0" />
-																		{/if}
+																			<p>{$demand['name']|escape:'html':'UTF-8'}</p>
+																			{if isset($demand['adv_option']) && $demand['adv_option']}
+																				<select class="id_option">
+																					{foreach $demand['adv_option'] as $idOption => $option}
+																						{assign var=demand_key value="`$idGlobalDemand`-`$idOption`"}
+																						<option optionPrice="{$option['price']|escape:'html':'UTF-8'}" value="{$idOption|escape:'html':'UTF-8'}" {if isset($roomDemand['extra_demands'][$demand_key])}selected{/if} key="{$demand_key}">{$option['name']}</option>
+																						{if isset($roomDemand['extra_demands'][$demand_key])}
+																							{assign var=selected_adv_option value="$idOption"}
+																						{/if}
+																					{/foreach}
+																				</select>
+																			{else}
+																				<input type="hidden" class="id_option" value="0" />
+																			{/if}
+																		</div>
 																	</div>
 																</div>
+																<div class="col-xs-4">
+																	<p class="pull-right">
+																		<span class="extra_demand_option_price">{if isset($selected_adv_option) && isset($demand['adv_option'][$selected_adv_option]['price'])}{convertPrice price = $demand['adv_option'][$selected_adv_option]['price']|escape:'html':'UTF-8'}{else}{convertPrice price = $demand['price']|escape:'html':'UTF-8'}{/if}</span>{if $demand['price_calc_method'] == HotelRoomTypeGlobalDemand::WK_PRICE_CALC_METHOD_EACH_DAY}{l s='/Night'}{/if}
+																	</p>
+																</div>
 															</div>
-															<div class="col-xs-4">
-																<p class="pull-right">
-																	<span class="extra_demand_option_price">{if isset($selected_adv_option) && isset($demand['adv_option'][$selected_adv_option]['price'])}{convertPrice price = $demand['adv_option'][$selected_adv_option]['price']|escape:'html':'UTF-8'}{else}{convertPrice price = $demand['price']|escape:'html':'UTF-8'}{/if}</span>{if $demand['price_calc_method'] == HotelRoomTypeGlobalDemand::WK_PRICE_CALC_METHOD_EACH_DAY}{l s='/Night'}{/if}
-																</p>
-															</div>
-														</div>
-													{/foreach}
-												{/if}
+														{/foreach}
+													{/if}
 											</div>
 										</div>
 									</div>
@@ -93,7 +93,8 @@
 							</div>
 						{/if}
 					{/block}
-					{block name='cart_booking_service_tab_content'}
+
+					{block name='cart-booking-services-tab-content'}
 						{if isset($roomTypeServiceProducts) && $roomTypeServiceProducts}
 							<div id="room_type_service_product_desc" class="tab-pane{if !isset($selectedRoomDemands) || !$selectedRoomDemands} active{/if}">
 								<div class="rooms_extra_demands_head">
@@ -139,6 +140,7 @@
 															<div class="col-xs-4">
 																{if ($product.show_price && !isset($restricted_country_mode)) || isset($groups)}
 																	<span class="pull-right">{if !$priceDisplay}{convertPrice price=$product.price_tax_incl}{else}{convertPrice price=$product.price_tax_exc}{/if}{if $product.price_calculation_method == Product::PRICE_CALCULATION_METHOD_PER_DAY}{l s='/Night'}{/if}</span>
+
 																{/if}
 															</div>
 														</div>

@@ -17,25 +17,23 @@
 * @license LICENSE.txt
 *}
 
-{block name='service_product_list_row_content'}
+{block name='service-products-list-row'}
     {if isset($product) && $product}
         <li class="row service-product-element">
-            {block name='service_product_images'}
-                <div class="col-xs-4 col-sm-3 col-md-2">
-                    <a href="{$link->getImageLink($product.link_rewrite, $product.id_image, 'large_default')|escape:'html':'UTF-8'}" rel="htl-images{$product['id_product']}" class="fancybox" title="{if !empty($product.legend)}{$product.legend|escape:'html':'UTF-8'}{else}{$product.name|escape:'html':'UTF-8'}{/if}">
-                        <img class="img-responsive service-product-img" src="{$link->getImageLink($product.link_rewrite, $product.id_image, 'home_default')|escape:'html':'UTF-8'}" alt="{if !empty($product.legend)}{$product.legend|escape:'html':'UTF-8'}{else}{$product.name|escape:'html':'UTF-8'}{/if}" title="{if !empty($product.legend)}{$product.legend|escape:'html':'UTF-8'}{else}{$product.name|escape:'html':'UTF-8'}{/if}">
-                    </a>
-                    {foreach $product.images as $image}
-                        {if $image['cover'] == 0}
-                            <a href="{$link->getImageLink($product.link_rewrite, $image.id_image, 'large_default')|escape:'html':'UTF-8'}" rel="htl-images{$product['id_product']}" class="fancybox hidden"  title="{if !empty($image.legend)}{$image.legend|escape:'html':'UTF-8'}{else}{$product.name|escape:'html':'UTF-8'}{/if}">
-                            </a>
-                        {/if}
-                    {/foreach}
-                </div>
-            {/block}
-            {block name='service_product_info'}
-                <div class="col-xs-8 col-sm-9 col-md-10">
-                    <div class="row">
+            <div class="col-xs-4 col-sm-3 col-md-2">
+                <a href="{$link->getImageLink($product.link_rewrite, $product.id_image, 'large_default')|escape:'html':'UTF-8'}" rel="htl-images{$product['id_product']}" class="fancybox" title="{if !empty($product.legend)}{$product.legend|escape:'html':'UTF-8'}{else}{$product.name|escape:'html':'UTF-8'}{/if}">
+                    <img class="img-responsive service-product-img" src="{$link->getImageLink($product.link_rewrite, $product.id_image, 'home_default')|escape:'html':'UTF-8'}" alt="{if !empty($product.legend)}{$product.legend|escape:'html':'UTF-8'}{else}{$product.name|escape:'html':'UTF-8'}{/if}" title="{if !empty($product.legend)}{$product.legend|escape:'html':'UTF-8'}{else}{$product.name|escape:'html':'UTF-8'}{/if}">
+                </a>
+                {foreach $product.images as $image}
+                    {if $image['cover'] == 0}
+                        <a href="{$link->getImageLink($product.link_rewrite, $image.id_image, 'large_default')|escape:'html':'UTF-8'}" rel="htl-images{$product['id_product']}" class="fancybox hidden"  title="{if !empty($image.legend)}{$image.legend|escape:'html':'UTF-8'}{else}{$product.name|escape:'html':'UTF-8'}{/if}">
+                        </a>
+                    {/if}
+                {/foreach}
+            </div>
+            <div class="col-xs-8 col-sm-9 col-md-10">
+                <div class="row">
+                    {block name='service-products-list-row-details'}
                         <div class="col-sm-12 clearfix service-product-block">
                             <span class="service-product-name">{$product['name']}</span>
                         </div>
@@ -44,7 +42,9 @@
                                 {$product['description_short']}
                             </div>
                         {/if}
+                    {/block}
 
+                    {block name='service-products-list-row-actions'}
                         <div class="col-sm-12 service_product_action_block">
                             {if !$PS_CATALOG_MODE && !$order_date_restrict && ($product.show_price && !isset($restricted_country_mode))}
                                 <div class="service-product-price">
@@ -77,9 +77,9 @@
                                 {/if}
                             {/if}
                         </div>
-                    </div>
+                    {/block}
                 </div>
-            {/block}
+            </div>
         </li>
     {/if}
 {/block}

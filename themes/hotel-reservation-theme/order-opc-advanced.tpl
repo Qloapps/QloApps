@@ -23,7 +23,7 @@
 *  International Registered Trademark & Property of PrestaShop SA
 *}
 
-{block name='order_opc_advanced_content'}
+{block name='order-opc-advanced'}
     {if $opc}
         {assign var="back_order_page" value="order-opc.php"}
     {else}
@@ -36,20 +36,16 @@
         <p class="alert alert-warning">{l s='Your new order was not accepted.'}</p>
     {else}
         {if $productNumber}
-            {block name='order_payment_advanced_container'}
-                <!-- Payment -->
-                {include file="$tpl_dir./order-payment-advanced.tpl"}
-                <!-- END Payment -->
-            {/block}
+            <!-- Payment -->
+            {include file="$tpl_dir./order-payment-advanced.tpl"}
+            <!-- END Payment -->
         {else}
             {capture name=path}{l s='Your shopping cart'}{/capture}
             <h2 class="page-heading">{l s='Your shopping cart'}</h2>
-            {block name='order_opc_advanced_errors_container'}
-                {include file="$tpl_dir./errors.tpl"}
-            {/block}
+            {include file="$tpl_dir./errors.tpl"}
             <p class="alert alert-warning">{l s='Your shopping cart is empty.'}</p>
         {/if}
-        {block name='order_opc_advanced_js_vars'}
+        {block name='order-opc-advanced-js-vars'}
             {strip}
                 {addJsDef imgDir=$img_dir}
                 {addJsDef authenticationUrl=$link->getPageLink("authentication", true)|escape:'quotes':'UTF-8'}

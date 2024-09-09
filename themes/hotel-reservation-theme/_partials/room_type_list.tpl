@@ -17,27 +17,27 @@
 * @license LICENSE.txt
 *}
 
-{block name='room_types_list_content'}
-	{block name='hook_display_room_type_list_before'}
+{block name='room-type-list'}
+	{block name='displayRoomTypeListBefore'}
 		{hook h='displayRoomTypeListBefore'}
 	{/block}
 	{if isset($booking_data['rm_data']) && $booking_data['rm_data']}
 		{foreach from=$booking_data['rm_data'] key=room_k item=room_v}
-			{block name='room_type_info'}
-				<div class="col-sm-12 room_cont" data-id-product="{$room_v['id_product']|escape:'htmlall':'UTF-8'}">
-					<div class="row">
-						{block name='room_type_image'}
-							<div class="col-sm-4">
+			<div class="col-sm-12 room_cont" data-id-product="{$room_v['id_product']|escape:'htmlall':'UTF-8'}">
+				<div class="row">
+					{block name='room-type-list-room-image'}
+						<div class="col-sm-4">
 								<a href="{$room_v['product_link']|escape:'htmlall':'UTF-8'}">
 								<img src="{$room_v['image']|escape:'htmlall':'UTF-8'}" class="img-responsive room-type-image">
-								{block name='hook_display_room_type_list_image_after'}
+								{block name='displayRoomTypeListImageAfter'}
 									{hook h='displayRoomTypeListImageAfter' product=$room_v}
 								{/block}
-								</a>
-							</div>
-						{/block}
-						{block name='room_type_content'}
-							<div class="col-sm-8 room_info_cont">
+							</a>
+						</div>
+					{/block}
+					{block name='room-type-list-room-details'}
+						<div class="col-sm-8 room_info_cont">
+							{block name='room-type-list-room-quantity'}
 								<div class="row">
 									<p class="rm_heading col-sm-12 col-md-7">{$room_v['name']|escape:'htmlall':'UTF-8'}</p>
 									{if !isset($restricted_country_mode) && !$PS_CATALOG_MODE && !$order_date_restrict}
@@ -46,7 +46,9 @@
 										</p>
 									{/if}
 								</div>
-								<div class="rm_desc">{$room_v['description']|truncate:190:"":true}&nbsp;<a class="view_more" href="{$room_v['product_link']|escape:'htmlall':'UTF-8'}">{l s='View More'}....</a></div>
+							{/block}
+							<div class="rm_desc">{$room_v['description']|truncate:190:"":true}&nbsp;<a class="view_more" href="{$room_v['product_link']|escape:'htmlall':'UTF-8'}">{l s='View More'}....</a></div>
+							{block name='room-type-list-room-features'}
 								<div class="room_features_cont">
 									<div class="row">
 										<div class="col-sm-12 col-md-5 col-lg-6">
@@ -88,18 +90,14 @@
 											<div class="booking_room_fields">
 												{if !isset($restricted_country_mode) && !$PS_CATALOG_MODE && !$order_date_restrict}
 													{if isset($occupancy_required_for_booking) && $occupancy_required_for_booking}
-													{block name='room_type_occupancy_field_container'}
 														<div class="booking_guest_occupancy_conatiner">
 															{include file="./occupancy_field.tpl" room_type_info=$room_v total_available_rooms=$room_v['room_left']}
 														</div>
-													{/block}
 													{else}
-													{block name='room_type_quantity_field_container'}
 														<div>
 															<label>{l s='Qty:'}</label>
 															{include file="./quantity_field.tpl" total_available_rooms=$room_v['room_left']}
 														</div>
-													{/block}
 													{/if}
 													<div>
 														<a cat_rm_check_in="{$booking_date_from|escape:'htmlall':'UTF-8'}" cat_rm_check_out="{$booking_date_to|escape:'htmlall':'UTF-8'}" href="" rm_product_id="{$room_v['id_product']}" cat_rm_book_nm_days="{$num_days|escape:'htmlall':'UTF-8'}" data-id-product-attribute="0" data-id-product="{$room_v['id_product']|intval}" class="btn btn-default button button-medium ajax_add_to_cart_button"><span>{l s='Book Now'}</span></a>
@@ -109,11 +107,11 @@
 										</div>
 									</div>
 								</div>
-							</div>
-						{/block}
-					</div>
+							{/block}
+						</div>
+					{/block}
 				</div>
-			{/block}
+			</div>
 		{/foreach}
 	{else}
 		<div class="noRoomsAvailAlert">

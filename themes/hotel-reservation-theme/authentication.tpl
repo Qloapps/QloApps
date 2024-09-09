@@ -23,7 +23,7 @@
 *  International Registered Trademark & Property of PrestaShop SA
 *}
 
-{block name='authentication_content'}
+{block name='authentication'}
 	{capture name=path}
 		{if !isset($email_create)}{l s='Authentication'}{else}
 			<a href="{$link->getPageLink('authentication', true)|escape:'html':'UTF-8'}" rel="nofollow" title="{l s='Authentication'}">{l s='Authentication'}</a>
@@ -59,7 +59,7 @@
 					</div>
 				</div>
 			{/if}
-			{block name='authentication_create_account_form'}
+			{block name='authentication-create-account-form'}
 				<div class="col-xs-12 col-sm-6">
 					<form action="{$link->getPageLink('authentication', true)|escape:'html':'UTF-8'}" method="post" id="create-account_form" class="box">
 						<h3 class="page-subheading">{l s='Create an account'}</h3>
@@ -84,7 +84,7 @@
 					</form>
 				</div>
 			{/block}
-			{block name='authentication_login_form'}
+			{block name='authentication-login-form'}
 				<div class="col-xs-12 col-sm-6">
 					<form action="{$link->getPageLink('authentication', true)|escape:'html':'UTF-8'}" method="post" id="login_form" class="box">
 						<h3 class="page-subheading">{l s='Already registered?'}</h3>
@@ -97,7 +97,7 @@
 								<label class="" for="passwd">{l s='Password'}</label>
 								<input class="is_required validate account_input form-control" type="password" data-validate="isPasswd" id="passwd" name="passwd" value="" />
 							</div>
-							{block name='display_login_form_fields_after'}
+							{block name='displayLoginFormFieldsAfter'}
 								{hook h='displayLoginFormFieldsAfter'}
 							{/block}
 							<p class="lost_password form-group"><a href="{$link->getPageLink('password')|escape:'html':'UTF-8'}" title="{l s='Recover your forgotten password'}" rel="nofollow">{l s='Forgot your password?'}</a></p>
@@ -110,7 +110,7 @@
 									</span>
 								</button>
 							</p>
-							{block name='display_login_form_bottom'}
+							{block name='displayLoginFormBottom'}
 								{hook h="displayLoginFormBottom"}
 							{/block}
 						</div>
@@ -118,7 +118,7 @@
 				</div>
 			{/block}
 		</div>
-		{block name='authentication_new_account_tpl'}
+		{block name='authentication-new-account-form'}
 			{if isset($inOrderProcess) && $inOrderProcess && $PS_GUEST_CHECKOUT_ENABLED}
 				<form action="{$link->getPageLink('authentication', true, NULL, "back=$back")|escape:'html':'UTF-8'}" method="post" id="new_account_form" class="std clearfix">
 					<div class="box">
@@ -415,7 +415,9 @@
 							</div>
 							<!-- END Account -->
 						</div>
-						{$HOOK_CREATE_ACCOUNT_FORM}
+						{block name='HOOK_CREATE_ACCOUNT_FORM'}
+							{$HOOK_CREATE_ACCOUNT_FORM}
+						{/block}
 					</div>
 					<p class="cart_navigation required submit clearfix">
 						<span><sup>*</sup>{l s='Required field'}</span>
@@ -445,9 +447,11 @@
 			</ol>
 		</div>
 		{/if}-->
-		{block name='authentication_account_creation_form'}
+		{block name='authentication-account-creation-form'}
 			<form action="{$link->getPageLink('authentication', true)|escape:'html':'UTF-8'}" method="post" id="account-creation_form" class="std box">
-				{$HOOK_CREATE_ACCOUNT_TOP}
+				{block name='HOOK_CREATE_ACCOUNT_TOP'}
+					{$HOOK_CREATE_ACCOUNT_TOP}
+				{/block}
 				<div class="account_creation">
 					<h3 class="page-subheading">{l s='Your personal information'}</h3>
 					<div class="clearfix">
@@ -683,7 +687,9 @@
 						</p>
 					</div>
 				{/if}
-				{$HOOK_CREATE_ACCOUNT_FORM}
+				{block name='HOOK_CREATE_ACCOUNT_FORM'}
+					{$HOOK_CREATE_ACCOUNT_FORM}
+				{/block}
 				<div class="submit clearfix">
 					<input type="hidden" name="email_create" value="1" />
 					<input type="hidden" name="is_new_customer" value="1" />
@@ -696,9 +702,8 @@
 			</form>
 		{/block}
 	{/if}
-{/block}
-{block name='authentication_js_vars'}
-	{strip}
+	{block name='authentication-js-vars'}
+		{strip}
 		{if isset($smarty.post.id_state) && $smarty.post.id_state}
 			{addJsDef idSelectedState=$smarty.post.id_state|intval}
 		{elseif isset($address->id_state) && $address->id_state}
@@ -731,5 +736,6 @@
 		{else}
 			{addJsDef email_create=false}
 		{/if}
-	{/strip}
+		{/strip}
+	{/block}
 {/block}

@@ -17,16 +17,14 @@
 *  @license   https://store.webkul.com/license.html
 *}
 
-{block name='category_page_search_content'}
+{block name='category-page-search'}
     {if isset($hotels_info) && count($hotels_info)}
         <div class="header-rmsearch-wrapper">
-            <div class="filter_header clearfix">
-                <p>{l s='Search Rooms' mod='wkroomsearchblock'}</p>
-                <hr class="header-bottom-hr">
-            </div>
-            {block name='search_form_container'}
-                {include file="./searchForm.tpl"}
-            {/block}
+        <div class="filter_header clearfix">
+        <p>{l s='Search Rooms' mod='wkroomsearchblock'}</p>
+        <hr class="header-bottom-hr">
+        </div>
+		{include file="./searchForm.tpl"}
         </div>
     {/if}
 {/block}

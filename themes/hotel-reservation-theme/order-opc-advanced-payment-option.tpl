@@ -1,10 +1,10 @@
 
-{block name='order_opc_advance_payment_content'}
+{block name='order-opc-advanced-payment-option'}
 	{if isset($advance_payment_active)}
 		<div class="opc_advance_payment_block">
 			<p class="block-small-header">{l s='PAYMENT TYPES'}</p>
-			{block name='order_opc_advance_payment_form'}
-				<div class="row adv_payment_type_form">
+			<div class="row adv_payment_type_form">
+			{block name='order-opc-advanced-payment-option-form'}
 					<form method="POST" action="{$link->getPageLink('order-opc')|escape:'html':'UTF-8'}" id="advanced-payment">
 						<div class="col-sm-12 col-xs-12">
 							<label>
@@ -42,8 +42,8 @@
 							</button>
 						</div>
 					</form>
-				</div>
-			{/block}
+				{/block}
+			</div>
 		</div>
 	{/if}
 {/block}

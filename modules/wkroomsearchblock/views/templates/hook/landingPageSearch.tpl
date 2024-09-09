@@ -17,8 +17,7 @@
 *  @license   https://store.webkul.com/license.html
 *}
 
-
-{block name='landing_page_search_content'}
+{block name='landing-page-search'}
     {if isset($is_index_page) && $is_index_page}
         <div class="header-rmsearch-container header-rmsearch-hide-xs hidden-xs">
             {if isset($hotels_info) && count($hotels_info)}
@@ -30,9 +29,7 @@
                         </div>
                         <div class="container">
                             <div class="header-rmsearch-inner-wrapper">
-                                {block name='search_form_container'}
-                                    {include file="./searchForm.tpl"}
-                                {/block}
+                                {include file="./searchForm.tpl"}
                             </div>
                         </div>
                     </div>

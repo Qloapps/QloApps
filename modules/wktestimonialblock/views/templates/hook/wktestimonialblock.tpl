@@ -17,22 +17,20 @@
 *  @license   https://store.webkul.com/license.html
 *}
 
-{block name='testimonial_content'}
+{block name='testimonial-block'}
     {if isset($testimonials_data) && $testimonials_data}
         <div id="hotelTestimonialBlock" class="row home_block_container">
             <div class="col-xs-12 col-sm-12">
-                {block name='testimonial_header'}
-                    {if $HOTEL_TESIMONIAL_BLOCK_HEADING && $HOTEL_TESIMONIAL_BLOCK_CONTENT}
-                        <div class="row home_block_desc_wrapper">
-                            <div class="col-md-offset-1 col-md-10 col-lg-offset-2 col-lg-8">
-                                <p class="home_block_heading">{$HOTEL_TESIMONIAL_BLOCK_HEADING|escape:'htmlall':'UTF-8'}</p>
-                                <p class="home_block_description">{$HOTEL_TESIMONIAL_BLOCK_CONTENT|escape:'htmlall':'UTF-8'}</p>
-                                <hr class="home_block_desc_line"/>
-                            </div>
+                {if $HOTEL_TESIMONIAL_BLOCK_HEADING && $HOTEL_TESIMONIAL_BLOCK_CONTENT}
+                    <div class="row home_block_desc_wrapper">
+                        <div class="col-md-offset-1 col-md-10 col-lg-offset-2 col-lg-8">
+                            <p class="home_block_heading">{$HOTEL_TESIMONIAL_BLOCK_HEADING|escape:'htmlall':'UTF-8'}</p>
+                            <p class="home_block_description">{$HOTEL_TESIMONIAL_BLOCK_CONTENT|escape:'htmlall':'UTF-8'}</p>
+                            <hr class="home_block_desc_line"/>
                         </div>
-                    {/if}
-                {/block}
-                {block name='testimonial_body'}
+                    </div>
+                {/if}
+                {block name='testimonial-block-content'}
                     <div class="row home_block_content htlTestemonial-owlCarousel">
                         <div class="col-sm-12 col-xs-12">
                             <div class="owl-carousel">

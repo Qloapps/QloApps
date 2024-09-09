@@ -17,16 +17,14 @@
 * @license LICENSE.txt
 *}
 
-{block name='ordered_extra_services_content'}
+{block name='order-extra-services'}
     <div class="card">
-        {block name='ordered_extra_services_header'}
-            <div class="card-header">
-                {l s='Extra Services'}
-            </div>
-        {/block}
+        <div class="card-header">
+            {l s='Extra Services'}
+        </div>
         <div class="card-body">
             {if (isset($extraDemands) && $extraDemands) || (isset($additionalServices) && $additionalServices)}
-                {block name='ordered_extra_services_tabs'}
+                {block name='order-extra-services-tabs'}
                     <ul class="nav nav-tabs">
                         {if isset($additionalServices) && $additionalServices}
                             <li class="active"><a href="#room_type_service_product_desc" data-toggle="tab">{l s='Services'}</a></li>
@@ -36,9 +34,9 @@
                         {/if}
                     </ul>
                 {/block}
-                {block name='ordered_extra_servies_tab_content'}
+                {block name='order-extra-services-tabs-content'}
                     <div class="tab-content">
-                        {block name='ordered_extra_services'}
+                        {block name='order-extra-services-tab-content'}
                             {if isset($additionalServices) && $additionalServices}
                                 <div id="room_type_service_product_desc" class="tab-pane {if isset($additionalServices) && $additionalServices}active{/if}">
                                     {assign var=roomCount value=1}
@@ -77,7 +75,8 @@
                                 </div>
                             {/if}
                         {/block}
-                        {block name='ordered_extra_demands'}
+
+                        {block name='order-extra-demands-tab-content'}
                             {if isset($extraDemands) && $extraDemands}
                                 <div id="room_type_demands_desc" class="tab-pane {if !isset($additionalServices) || !$additionalServices}active{/if}">
                                     {assign var=roomCount value=1}

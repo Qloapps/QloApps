@@ -23,7 +23,7 @@
 *  International Registered Trademark & Property of PrestaShop SA
 *}
 
-{block name='my_account_content'}
+{block name='my-account'}
     {capture name=path}{l s='My account'}{/capture}
 
     <h1 class="page-heading">{l s='My account'}</h1>
@@ -45,25 +45,28 @@
                 <li><a href="{$link->getPageLink('identity', true)|escape:'html':'UTF-8'}" title="{l s='Personal information'}"><i class="icon-user"></i><span>{l s='Personal information'}</span></a></li>
             </ul>
         </div>
-    {if $voucherAllowed || isset($HOOK_CUSTOMER_ACCOUNT) && $HOOK_CUSTOMER_ACCOUNT !=''}
-        <div class="col-xs-12 col-sm-6 col-lg-4">
-            <ul class="myaccount-link-list">
-                {if $voucherAllowed}
-                    <li><a href="{$link->getPageLink('discount', true)|escape:'html':'UTF-8'}" title="{l s='Vouchers'}"><i class="icon-barcode"></i><span>{l s='Vouchers'}</span></a></li>
-                {/if}
-                {block name='hook_customer_account'}
-                    {$HOOK_CUSTOMER_ACCOUNT}
-                {/block}
-            </ul>
-        </div>
-    {/if}
+        {block name='HOOK_CUSTOMER_ACCOUNT'}
+            {if $voucherAllowed || isset($HOOK_CUSTOMER_ACCOUNT) && $HOOK_CUSTOMER_ACCOUNT !=''}
+                <div class="col-xs-12 col-sm-6 col-lg-4">
+                    <ul class="myaccount-link-list">
+                        {if $voucherAllowed}
+                            <li><a href="{$link->getPageLink('discount', true)|escape:'html':'UTF-8'}" title="{l s='Vouchers'}"><i class="icon-barcode"></i><span>{l s='Vouchers'}</span></a></li>
+                        {/if}
+                        {$HOOK_CUSTOMER_ACCOUNT}
+                    </ul>
+                </div>
+            {/if}
+        {/block}
     </div>
 
-    {block name='display_customer_account_after_tabs'}
+    {block name='displayCustomerAccountAfterTabs'}
         {hook h='displayCustomerAccountAfterTabs'}
     {/block}
 
-    <ul class="footer_links clearfix">
+    {block name='my-account-footer-links'}
+        <ul class="footer_links clearfix">
         <li><a class="btn btn-default button button-small" href="{if isset($force_ssl) && $force_ssl}{$base_dir_ssl}{else}{$base_dir}{/if}" title="{l s='Home'}"><span><i class="icon-chevron-left"></i> {l s='Home'}</span></a></li>
-    </ul>
+        </ul>
+    {/block}
+
 {/block}

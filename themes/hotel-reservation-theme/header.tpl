@@ -62,7 +62,7 @@
 			<script type="text/javascript" src="{$js_uri|escape:'html':'UTF-8'}"></script>
 			{/foreach}
 		{/if}
-		{block name='hook_header'}
+		{block name='HOOK_HEADER'}
 			{$HOOK_HEADER}
 		{/block}
 		<!-- <link rel="stylesheet" href="http{if Tools::usingSecureMode()}s{/if}://fonts.googleapis.com/css?family=Open+Sans:300,600&amp;subset=latin,latin-ext" type="text/css" media="all" /> -->
@@ -90,7 +90,7 @@
 					<div class="banner">
 						<div class="container">
 							<div class="row">
-								{block name='display_banner'}
+								{block name='displayBanner'}
 									{hook h="displayBanner"}
 								{/block}
 							</div>
@@ -99,9 +99,9 @@
 					<div id="nav-main">
 						<div class="container">
 							<div class="row">
-								{block name='display_nav'}
+								{block name='displayNav'}
 									<nav>{hook h="displayNav"}</nav>
-									{/block}
+								{/block}
 							</div>
 						</div>
 					</div>
@@ -115,18 +115,18 @@
 										</a>
 									</div>
 									<div class="header-top-menu">
-										{block name='hook_top'}
+										{block name='HOOK_TOP'}
 											{if isset($HOOK_TOP)}{$HOOK_TOP}{/if}
 										{/block}
 									</div>
 								</div>
 							</div>
-							{block name='display_search_hotel_panel'}
+							{block name='displaySearchHotelPanel'}
 								{hook h='displaySearchHotelPanel'}
 							{/block}
 						</div>
 					</div>
-					{block name='display_after_hook_top'}
+					{block name='displayAfterHookTop'}
 						{hook h='displayAfterHookTop'}
 					{/block}
 				</header>

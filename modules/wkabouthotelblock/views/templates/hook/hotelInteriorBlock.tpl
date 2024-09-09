@@ -17,23 +17,21 @@
 *  @license   https://store.webkul.com/license.html
 *}
 
-{block name='hotel_interior_content'}
+{block name='hotel-interior-block'}
     {if isset($InteriorImg) && $InteriorImg}
         <div id="hotelInteriorBlock" class="row home_block_container">
             <div class="col-xs-12 col-sm-12">
-                {block name='hotel_interior_heading'}
-                    {if $HOTEL_INTERIOR_HEADING && $HOTEL_INTERIOR_DESCRIPTION}
-                        <div class="row home_block_desc_wrapper">
-                            <div class="col-md-offset-1 col-md-10 col-lg-offset-2 col-lg-8">
-                                <p class="home_block_heading">{$HOTEL_INTERIOR_HEADING|escape:'htmlall':'UTF-8'}</p>
-                                <p class="home_block_description">{$HOTEL_INTERIOR_DESCRIPTION|escape:'htmlall':'UTF-8'}</p>
-                                {hook h="displayInteriorExtraContent"}
-                                <hr class="home_block_desc_line"/>
-                            </div>
+                {if $HOTEL_INTERIOR_HEADING && $HOTEL_INTERIOR_DESCRIPTION}
+                    <div class="row home_block_desc_wrapper">
+                        <div class="col-md-offset-1 col-md-10 col-lg-offset-2 col-lg-8">
+                            <p class="home_block_heading">{$HOTEL_INTERIOR_HEADING|escape:'htmlall':'UTF-8'}</p>
+                            <p class="home_block_description">{$HOTEL_INTERIOR_DESCRIPTION|escape:'htmlall':'UTF-8'}</p>
+                            {hook h="displayInteriorExtraContent"}
+                            <hr class="home_block_desc_line"/>
                         </div>
-                    {/if}
-                {/block}
-                {block name='hotel_interior_body'}
+                    </div>
+                {/if}
+                {block name='hotel-interior-images'}
                     <div class="row home_block_content htlInterior-owlCarousel">
                         <div class="col-sm-12 col-xs-12">
                             <div class="owl-carousel owl-theme">

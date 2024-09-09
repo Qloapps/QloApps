@@ -23,13 +23,11 @@
 *  International Registered Trademark & Property of PrestaShop SA
 *}
 
-{block name='order_payment_classic_content'}
-    <div class="payment_block">
-        {block name='order_opc_advanced_payment_option'}
-            {include file="$tpl_dir./order-opc-advanced-payment-option.tpl"}
-        {/block}
+{block name='order-payment-classic'}
+    <div class="paiement_block">
+        {include file="$tpl_dir./order-opc-advanced-payment-option.tpl"}
 
-        {block name='order_payment_tc_content'}
+        {block name='order-payment-classic-terms-conditions'}
             <div id="tc_cont">
                 <p class="checkbox">
                     <input type="checkbox" name="cgv" id="cgv" value="1" {if $checkedTOS}checked="checked"{/if} />
@@ -38,14 +36,13 @@
                 </p>
             </div>
         {/block}
-
         <p class="block-small-header">{l s='PAYMENT RESOURCE'}</p>
-        {block name='hook_top_payment'}
+        {block name='HOOK_TOP_PAYMENT'}
             <div id="HOOK_TOP_PAYMENT">{$HOOK_TOP_PAYMENT}</div>
         {/block}
         {if $HOOK_PAYMENT}
             {if !$opc}
-                {block name='order_detail_content'}
+                {block name='order-payment-classic-cart-summary'}
                     <div id="order-detail-content" class="table_block table-responsive">
                         <table id="cart_summary" class="table table-bordered">
                             <thead>
@@ -224,9 +221,7 @@
                                 {assign var='noDeleteButton' value=1}
 
                                 {* Display the product line *}
-                                {block name='shopping_cart_product_line_container_1'}
-                                    {include file="$tpl_dir./shopping-cart-product-line.tpl"}
-                                {/block}
+                                {include file="$tpl_dir./shopping-cart-product-line.tpl"}
 
                                 {* Then the customized datas ones*}
                                 {if isset($customizedDatas.$productId.$productAttributeId)}
@@ -280,9 +275,7 @@
                                 {assign var='ignoreProductLast' value=isset($customizedDatas.$productId.$productAttributeId)}
                                 {assign var='cannotModify' value=1}
                                 {* Display the gift product line *}
-                                {block name='shopping_cart_product_line_container_2'}
-                                    {include file="./shopping-cart-product-line.tpl" productLast=$product@last productFirst=$product@first}
-                                {/block}
+                                {include file="./shopping-cart-product-line.tpl" productLast=$product@last productFirst=$product@first}
                             {/foreach}
                             </tbody>
 
@@ -295,27 +288,27 @@
                                     <tr class="cart_discount {if $smarty.foreach.discountLoop.last}last_item{elseif $smarty.foreach.discountLoop.first}first_item{else}item{/if}" id="cart_discount_{$discount.id_discount}">
                                         <td class="cart_discount_name" colspan="{if $PS_STOCK_MANAGEMENT}3{else}2{/if}">{$discount.name}</td>
                                         <td class="cart_discount_price">
-                                            <span class="price-discount">
-                                                {if $discount.value_real > 0}
-                                                    {if !$priceDisplay}
-                                                        {displayPrice price=$discount.value_real*-1}
-                                                    {else}
-                                                        {displayPrice price=$discount.value_tax_exc*-1}
-                                                    {/if}
-                                                {/if}
-                                            </span>
+                                                            <span class="price-discount">
+                                                                {if $discount.value_real > 0}
+                                                                    {if !$priceDisplay}
+                                                                        {displayPrice price=$discount.value_real*-1}
+                                                                    {else}
+                                                                        {displayPrice price=$discount.value_tax_exc*-1}
+                                                                    {/if}
+                                                                {/if}
+                                                            </span>
                                         </td>
                                         <td class="cart_discount_delete">1</td>
                                         <td class="cart_discount_price">
-                                            <span class="price-discount">
-                                                {if $discount.value_real > 0}
-                                                    {if !$priceDisplay}
-                                                        {displayPrice price=$discount.value_real*-1}
-                                                    {else}
-                                                        {displayPrice price=$discount.value_tax_exc*-1}
-                                                    {/if}
-                                                {/if}
-                                            </span>
+                                                            <span class="price-discount">
+                                                                {if $discount.value_real > 0}
+                                                                    {if !$priceDisplay}
+                                                                        {displayPrice price=$discount.value_real*-1}
+                                                                    {else}
+                                                                        {displayPrice price=$discount.value_tax_exc*-1}
+                                                                    {/if}
+                                                                {/if}
+                                                            </span>
                                         </td>
                                     </tr>
                                 {/foreach}
@@ -328,7 +321,7 @@
             {if $opc}
                 <div id="opc_payment_methods-content">
             {/if}
-            {block name='hook_payment'}
+            {block name='HOOK_PAYMENT'}
                 <div id="HOOK_PAYMENT">
                     {$HOOK_PAYMENT}
                 </div>

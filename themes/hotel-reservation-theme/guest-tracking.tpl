@@ -23,7 +23,7 @@
 *  International Registered Trademark & Property of PrestaShop SA
 *}
 
-{block name='guest_tracking_content'}
+{block name='guest-tracking'}
 	{capture name=path}{l s='Guest Tracking'}{/capture}
 
 	<h1 class="page-heading">{l s='Guest Tracking'}</h1>
@@ -69,70 +69,62 @@
 				{assign var=followup value=$order->followup}
 			{/if}
 
-			{block name='order_detail_container'}
-				<div id="block-history">
-					<div id="block-order-detail" class="std">
-						{include file="./order-detail.tpl"}
-					</div>
+			<div id="block-history">
+				<div id="block-order-detail" class="std">
+					{include file="./order-detail.tpl"}
 				</div>
-			{/block}
+			</div>
 		{/foreach}
 
-		<div class="row">
-			<div class="col-md-8">
-				{if isset($transformSuccess)}
-					<p class="alert alert-success alert-transformed">{l s='Your guest account has been successfully transformed into a customer account. You can now log in as a registered user. '} <a href="{$link->getPageLink('authentication', true)|escape:'html':'UTF-8'}">{l s='Log in now.'}</a></p>
-				{else}
-					{block name='guest_tracking_transform_account_container'}
+		{block name='guest-tracking-guest-transform'}
+			<div class="row">
+				<div class="col-md-8">
+					{if isset($transformSuccess)}
+						<p class="alert alert-success alert-transformed">{l s='Your guest account has been successfully transformed into a customer account. You can now log in as a registered user. '} <a href="{$link->getPageLink('authentication', true)|escape:'html':'UTF-8'}">{l s='Log in now.'}</a></p>
+					{else}
 						<div class="card transform-account">
 							<div class="card-header">
 								{l s='For More Advantages'}
 							</div>
 							<div class="card-body">
-								{block name='guest_tracking_transform_account_form'}
-									<form method="post" action="{$action|escape:'html':'UTF-8'}#guestToCustomer" class="std">
-										{block name='guest_tracking_errors_container'}
-											{include file="$tpl_dir./errors.tpl"}
-										{/block}
+								<form method="post" action="{$action|escape:'html':'UTF-8'}#guestToCustomer" class="std">
+									{include file="$tpl_dir./errors.tpl"}
 
-										<p class="card-subtitle">
-											{l s='Transform your guest account into a customer account and enjoy:'}
-										</p>
+									<p class="card-subtitle">
+										{l s='Transform your guest account into a customer account and enjoy:'}
+									</p>
 
-										<div class="card-text">
-											<p>{l s='- Personalized and secure access.'}</p>
-											<p>{l s='- Fast and easy checkout'}</p>
-											<p>{l s='- Easier refund process'}</p>
-										</div>
+									<div class="card-text">
+										<p>{l s='- Personalized and secure access.'}</p>
+										<p>{l s='- Fast and easy checkout'}</p>
+										<p>{l s='- Easier refund process'}</p>
+									</div>
 
-										<div class="form-group password">
-											<label>{l s='Set your password:'}</label>
-											<input type="password" name="password" class="form-control" />
-										</div>
+									<div class="form-group password">
+										<label>{l s='Set your password:'}</label>
+										<input type="password" name="password" class="form-control" />
+									</div>
 
-										<input type="hidden" name="id_order" value="{if isset($order->id)}{$order->id}{else}{if isset($smarty.get.id_order)}{$smarty.get.id_order|escape:'html':'UTF-8'}{else}{if isset($smarty.post.id_order)}{$smarty.post.id_order|escape:'html':'UTF-8'}{/if}{/if}{/if}" />
-										<input type="hidden" name="order_reference" value="{if isset($smarty.get.order_reference)}{$smarty.get.order_reference|escape:'html':'UTF-8'}{else}{if isset($smarty.post.order_reference)}{$smarty.post.order_reference|escape:'html':'UTF-8'}{/if}{/if}" />
-										<input type="hidden" name="email" value="{if isset($smarty.get.email)}{$smarty.get.email|escape:'html':'UTF-8'}{else}{if isset($smarty.post.email)}{$smarty.post.email|escape:'html':'UTF-8'}{/if}{/if}" />
+									<input type="hidden" name="id_order" value="{if isset($order->id)}{$order->id}{else}{if isset($smarty.get.id_order)}{$smarty.get.id_order|escape:'html':'UTF-8'}{else}{if isset($smarty.post.id_order)}{$smarty.post.id_order|escape:'html':'UTF-8'}{/if}{/if}{/if}" />
+									<input type="hidden" name="order_reference" value="{if isset($smarty.get.order_reference)}{$smarty.get.order_reference|escape:'html':'UTF-8'}{else}{if isset($smarty.post.order_reference)}{$smarty.post.order_reference|escape:'html':'UTF-8'}{/if}{/if}" />
+									<input type="hidden" name="email" value="{if isset($smarty.get.email)}{$smarty.get.email|escape:'html':'UTF-8'}{else}{if isset($smarty.post.email)}{$smarty.post.email|escape:'html':'UTF-8'}{/if}{/if}" />
 
-										<button type="submit" name="submitTransformGuestToCustomer" class="button button-medium btn btn-submit">
-											<span>{l s='Send'}</span>
-										</button>
-									</form>
-								{/block}
+									<button type="submit" name="submitTransformGuestToCustomer" class="button button-medium btn btn-submit">
+										<span>{l s='Send'}</span>
+									</button>
+								</form>
 							</div>
 						</div>
-					{/block}
-				{/if}
+					{/if}
+				</div>
 			</div>
-		</div>
-	{else}
-		{block name='guest_tracking_errors_container'}
-			{include file="$tpl_dir./errors.tpl"}
 		{/block}
+	{else}
+		{include file="$tpl_dir./errors.tpl"}
 		{if isset($show_login_link) && $show_login_link}
 			<p><img src="{$img_dir}icon/userinfo.gif" alt="{l s='Information'}" class="icon" /><a href="{$link->getPageLink('my-account', true)|escape:'html':'UTF-8'}">{l s='Click here to log in to your customer account.'}</a><br /><br /></p>
 		{/if}
-		{block name='guest_tracking_order_detail_form'}
+		{block name='guest-tracking-form'}
 			<form method="post" action="{$action|escape:'html':'UTF-8'}" class="std" id="guestTracking">
 				<fieldset class="description_box box">
 					<h2 class="page-subheading">{l s='To track your order, please enter the following information:'}</h2>

@@ -23,17 +23,17 @@
 *  International Registered Trademark & Property of PrestaShop SA
 *}
 
-{block name='shopping_cart_advanced_content'}
+{block name='shopping-cart-advanced'}
     <h2>{l s='Cart Summary'}</h2>
     {assign var='total_discounts_num' value="{if $total_discounts != 0}1{else}0{/if}"}
     {assign var='use_show_taxes' value="{if $use_taxes && $show_taxes}2{else}0{/if}"}
     {assign var='total_wrapping_taxes_num' value="{if $total_wrapping != 0}1{else}0{/if}"}
     {* eu-legal *}
-    {block name='display_before_shopping_cart_block'}
+    {block name='displayBeforeShoppingCartBlock'}
         {hook h="displayBeforeShoppingCartBlock"}
     {/block}
-    <div id="order-detail-content" class="table_block table-responsive">
-        {block name='shopping_cart_advanced_summary'}
+    {block name='shopping-cart-details'}
+        <div id="order-detail-content" class="table_block table-responsive">
             <table id="cart_summary" class="table table-bordered {if $PS_STOCK_MANAGEMENT}stock-management-on{else}stock-management-off{/if}">
                 <thead>
                 <tr>
@@ -238,9 +238,11 @@
                 <tr class="cart_total_price">
                     <td colspan="{$col_span_subtotal}" class="total_price_container text-right">
                         <span>{l s='Total'}</span>
-                        <div class="hookDisplayProductPriceBlock-price">
-                            {hook h="displayCartTotalPriceLabel"}
-                        </div>
+                        {block name='displayCartTotalPriceLabel'}
+                            <div class="hookDisplayProductPriceBlock-price">
+                                {hook h="displayCartTotalPriceLabel"}
+                            </div>
+                        {/block}
                     </td>
                     {if $use_taxes}
                         <td colspan="2" class="price" id="total_price_container">
@@ -252,7 +254,9 @@
                         </td>
                     {/if}
                 </tr>
-                {hook h="displayAfterShoppingCartBlock" colspan_total=$col_span_total}
+                {block name='displayAfterShoppingCartBlock'}
+                    {hook h="displayAfterShoppingCartBlock" colspan_total=$col_span_total}
+                {/block}
                 </tfoot>
                 <tbody>
                 {assign var='odd' value=0}
@@ -359,29 +363,26 @@
                     </tbody>
                 {/if}
             </table>
-        {/block}
-    </div> <!-- end order-detail-content -->
-
-
-    {block name='shopping_cart_advanced_navigation'}
-        <p class="cart_navigation clearfix">
-
-            {if $opc}
-                {assign var='back_link' value=$link->getPageLink('index')}
-            {else}
-                {assign var='back_link' value=$link->getPageLink('order', true, NULL, "step=2")}
-            {/if}
-            <a href="{$back_link|escape:'html':'UTF-8'}" title="{l s='Previous'}" class="button-exclusive btn btn-default">
-                <i class="icon-chevron-left"></i>
-                {l s='Continue shopping'}
-            </a>
-            <button data-show-if-js="" style="" id="confirmOrder" type="button" class="button btn btn-default standard-checkout button-medium"><span>{l s='Order With Obligation To Pay'}</span></button>
-        </p>
+        </div> <!-- end order-detail-content -->
     {/block}
-{/block}
 
-{block name='shopping_cart_advanced_js_vars'}
+
+    <p class="cart_navigation clearfix">
+
+        {if $opc}
+            {assign var='back_link' value=$link->getPageLink('index')}
+        {else}
+            {assign var='back_link' value=$link->getPageLink('order', true, NULL, "step=2")}
+        {/if}
+        <a href="{$back_link|escape:'html':'UTF-8'}" title="{l s='Previous'}" class="button-exclusive btn btn-default">
+            <i class="icon-chevron-left"></i>
+            {l s='Continue shopping'}
+        </a>
+        <button data-show-if-js="" style="" id="confirmOrder" type="button" class="button btn btn-default standard-checkout button-medium"><span>{l s='Order With Obligation To Pay'}</span></button>
+    </p>
+
     {strip}
-        {addJsDef deliveryAddress=$cart->id_address_delivery|intval}
+    {addJsDef deliveryAddress=$cart->id_address_delivery|intval}
     {/strip}
+
 {/block}
