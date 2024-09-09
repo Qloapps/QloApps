@@ -17,7 +17,7 @@
 * @license LICENSE.txt
 *}
 
-{block name='display-nav'}
+{block name='display_nav'}
     {if $email != ''}
         <div class="contact-item">
             <i class="icon-envelope-o"></i>

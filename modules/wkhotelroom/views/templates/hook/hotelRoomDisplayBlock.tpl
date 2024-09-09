@@ -17,7 +17,7 @@
 *  @license   https://store.webkul.com/license.html
 *}
 
-{block name='hotel-room-display-block'}
+{block name='hotel_room_display_block'}
 {if isset($hotelRoomDisplay) && $hotelRoomDisplay}
     <div id="hotelRoomsBlock" class="row home_block_container">
         <div class="col-xs-12 col-sm-12">
@@ -30,7 +30,7 @@
                     </div>
                 </div>
             {/if}
-            {block name='hotel-room-display-block-content'}
+            {block name='hotel_room_display_block_content'}
                 <div class="row home_block_content">
                     <div class="col-sm-12 col-xs-12">
                         {assign var='htlRoomBlockIteration' value=0}

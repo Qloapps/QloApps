@@ -17,9 +17,9 @@
 * @license LICENSE.txt
 *}
 
-{block name='occupancy-field'}
+{block name='occupancy_field'}
     <div class="form-group dropdown">
-        {block name='occupancy-field-button'}
+        {block name='occupancy_field_button'}
             <button class="form-control booking_guest_occupancy input-occupancy{if isset($error) && $error == 1} error_border{/if}" type="button">
                 <span class="">
                     {if isset($occupancies) && $occupancies}
@@ -31,7 +31,7 @@
             </button>
         {/block}
 
-        {block name='occupancy-field-dropdown'}
+        {block name='occupancy_field_dropdown'}
             <div class="dropdown-menu booking_occupancy_wrapper">
                 <input type="hidden" class="max_avail_type_qty" value="{if isset($total_available_rooms)}{$total_available_rooms|escape:'html':'UTF-8'}{/if}">
                 <input type="hidden" class="max_adults" value="{$room_type_info['max_adults']|escape:'html':'UTF-8'}">
@@ -179,7 +179,7 @@
                         </div>
                     {/if}
                 </div>
-                {block name='occupancy-field-actions'}
+                {block name='occupancy_field_actions'}
                     <div class="occupancy_block_actions">
                         <span class="add_occupancy_block">
                             <a class="add_new_occupancy_btn{if isset($occupancies) && $occupancies && isset($total_available_rooms) && $total_available_rooms <= count($occupancies)} disabled{/if}" data-title-available="{l s='Click to add more rooms.'}" data-title-unavailable="{l s='No more rooms available.'}" href="#">

@@ -59,7 +59,7 @@
 					</div>
 				</div>
 			{/if}
-			{block name='authentication-create-account-form'}
+			{block name='authentication_create_account_form'}
 				<div class="col-xs-12 col-sm-6">
 					<form action="{$link->getPageLink('authentication', true)|escape:'html':'UTF-8'}" method="post" id="create-account_form" class="box">
 						<h3 class="page-subheading">{l s='Create an account'}</h3>
@@ -84,7 +84,7 @@
 					</form>
 				</div>
 			{/block}
-			{block name='authentication-login-form'}
+			{block name='authentication_login_form'}
 				<div class="col-xs-12 col-sm-6">
 					<form action="{$link->getPageLink('authentication', true)|escape:'html':'UTF-8'}" method="post" id="login_form" class="box">
 						<h3 class="page-subheading">{l s='Already registered?'}</h3>
@@ -118,7 +118,7 @@
 				</div>
 			{/block}
 		</div>
-		{block name='authentication-new-account-form'}
+		{block name='authentication_new_account_form'}
 			{if isset($inOrderProcess) && $inOrderProcess && $PS_GUEST_CHECKOUT_ENABLED}
 				<form action="{$link->getPageLink('authentication', true, NULL, "back=$back")|escape:'html':'UTF-8'}" method="post" id="new_account_form" class="std clearfix">
 					<div class="box">
@@ -447,7 +447,7 @@
 			</ol>
 		</div>
 		{/if}-->
-		{block name='authentication-account-creation-form'}
+		{block name='authentication_account_creation_form'}
 			<form action="{$link->getPageLink('authentication', true)|escape:'html':'UTF-8'}" method="post" id="account-creation_form" class="std box">
 				{block name='HOOK_CREATE_ACCOUNT_TOP'}
 					{$HOOK_CREATE_ACCOUNT_TOP}
@@ -702,7 +702,7 @@
 			</form>
 		{/block}
 	{/if}
-	{block name='authentication-js-vars'}
+	{block name='authentication_js_vars'}
 		{strip}
 		{if isset($smarty.post.id_state) && $smarty.post.id_state}
 			{addJsDef idSelectedState=$smarty.post.id_state|intval}

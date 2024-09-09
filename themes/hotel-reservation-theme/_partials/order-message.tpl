@@ -17,7 +17,7 @@
 * @license LICENSE.txt
 *}
 
-{block name='order-message'}
+{block name='order_message'}
     <div class="message {if isset($message.id_employee) && $message.id_employee}management{else}customer{/if}">
         <div class="profile">
             <div class="row">

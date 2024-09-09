@@ -74,7 +74,7 @@
 		</div>
 	{/if}
 	<br />
-	{block name='cms-js-vars'}
+	{block name='cms_js_vars'}
 		{strip}
 			{if isset($smarty.get.ad) && $smarty.get.ad}
 				{addJsDefL name=ad}{$base_dir|cat:$smarty.get.ad|escape:'html':'UTF-8'}{/addJsDefL}

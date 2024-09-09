@@ -23,7 +23,7 @@
 *  International Registered Trademark & Property of PrestaShop SA
 *}
 
-{block name='order-follow'}
+{block name='order_follow'}
 	{capture name=path}
 		<a href="{$link->getPageLink('my-account', true)|escape:'html':'UTF-8'}">
 			{l s='My account'}
@@ -80,7 +80,7 @@
 		{/if}
 	</div>
 
-	{block name='order-follow-footer-links'}
+	{block name='order_follow_footer_links'}
 		<ul class="footer_links clearfix">
 			<li><a class="btn btn-default button button-small" href="{$link->getPageLink('my-account', true)|escape:'html':'UTF-8'}"><span><i class="icon-chevron-left"></i> {l s='Back to My account'}</span></a></li>
 			<li><a class="btn btn-default button button-small" href="{if isset($force_ssl) && $force_ssl}{$base_dir_ssl}{else}{$base_dir}{/if}"><span><i class="icon-chevron-left"></i> {l s='Home'}</span></a></li>

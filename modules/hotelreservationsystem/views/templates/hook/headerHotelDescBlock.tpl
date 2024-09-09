@@ -17,7 +17,7 @@
 *  @license   https://store.webkul.com/license.html
 *}
 
-{block name='header-hotel-desc-block'}
+{block name='header_hotel_desc_block'}
 	<div class="header-desc-container">
 		<div class="header-desc-wrapper">
 			<div class="header-desc-primary">

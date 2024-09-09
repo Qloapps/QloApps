@@ -17,7 +17,7 @@
 * @license LICENSE.txt
 *}
 
-{block name='room-type-list'}
+{block name='room_type_list'}
 	{block name='displayRoomTypeListBefore'}
 		{hook h='displayRoomTypeListBefore'}
 	{/block}
@@ -25,7 +25,7 @@
 		{foreach from=$booking_data['rm_data'] key=room_k item=room_v}
 			<div class="col-sm-12 room_cont" data-id-product="{$room_v['id_product']|escape:'htmlall':'UTF-8'}">
 				<div class="row">
-					{block name='room-type-list-room-image'}
+					{block name='room_type_list_room_image'}
 						<div class="col-sm-4">
 								<a href="{$room_v['product_link']|escape:'htmlall':'UTF-8'}">
 								<img src="{$room_v['image']|escape:'htmlall':'UTF-8'}" class="img-responsive room-type-image">
@@ -35,9 +35,9 @@
 							</a>
 						</div>
 					{/block}
-					{block name='room-type-list-room-details'}
+					{block name='room_type_list_room_details'}
 						<div class="col-sm-8 room_info_cont">
-							{block name='room-type-list-room-quantity'}
+							{block name='room_type_list_room_quantity'}
 								<div class="row">
 									<p class="rm_heading col-sm-12 col-md-7">{$room_v['name']|escape:'htmlall':'UTF-8'}</p>
 									{if !isset($restricted_country_mode) && !$PS_CATALOG_MODE && !$order_date_restrict}
@@ -48,7 +48,7 @@
 								</div>
 							{/block}
 							<div class="rm_desc">{$room_v['description']|truncate:190:"":true}&nbsp;<a class="view_more" href="{$room_v['product_link']|escape:'htmlall':'UTF-8'}">{l s='View More'}....</a></div>
-							{block name='room-type-list-room-features'}
+							{block name='room_type_list_room_features'}
 								<div class="room_features_cont">
 									<div class="row">
 										<div class="col-sm-12 col-md-5 col-lg-6">

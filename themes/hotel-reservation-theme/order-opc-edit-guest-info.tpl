@@ -17,10 +17,10 @@
 * @license LICENSE.txt
 *}
 
-{block name='order-opc-edit-guest-info'}
+{block name='order_opc_edit_guest_info'}
     <div id="opc_new_account" class="opc-main-block">
         <div id="opc_new_account-overlay" class="opc-overlay" style="display: none;"></div>
-        {block name='order-opc-edit-guest-info-login-form'}
+        {block name='order_opc_edit_guest_info_login_form'}
             <form action="{$link->getPageLink('authentication', true, NULL, "back=order-opc")|escape:'html':'UTF-8'}" method="post" id="login_form">
                 <fieldset>
                     <div id="login_form_content" style="display:none;">
@@ -45,7 +45,7 @@
                 </fieldset>
             </form>
         {/block}
-        {block name='order-opc-edit-guest-info-new-account-form'}
+        {block name='order_opc_edit_guest_info_new_account_form'}
             <form action="{$link->getPageLink('authentication', true)|escape:'html':'UTF-8'}" method="post" id="new_account_form" class="std" autocomplete="on" autofill="on">
                 <div id="opc_account_form" class="unvisible">
                     {block name='HOOK_CREATE_ACCOUNT_TOP'}
@@ -301,7 +301,7 @@
         {/block}
     </div>
 
-    {block name='order-opc-edit-guest-info-js-vars'}
+    {block name='order_opc_edit_guest_info_js_vars'}
         {strip}
             {if isset($guestInformations) && isset($guestInformations.id_state) && $guestInformations.id_state}
                 {addJsDef idSelectedState=$guestInformations.id_state|intval}

@@ -23,7 +23,7 @@
 *  International Registered Trademark & Property of PrestaShop SA
 *}
 
-{block name='order-payment'}
+{block name='order_payment'}
 	{if !$opc}
 		{addJsDefL name=txtProduct}{l s='product' js=1}{/addJsDefL}
 		{addJsDefL name=txtProducts}{l s='products' js=1}{/addJsDefL}

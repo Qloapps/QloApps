@@ -17,12 +17,12 @@
 * @license LICENSE.txt
 *}
 
-{block name='booking-form'}
+{block name='booking_form'}
     <div class="booking-form card">
         <div class="booking_room_fields">
-            {block name='booking-form-form'}
+            {block name='booking_form_form'}
                 <form id="booking-form" action="" method="post">
-                    {block name='booking-form-hotel-location'}
+                    {block name='booking_form_hotel_location'}
                         {if isset($id_hotel) && $id_hotel}
                             <div class="form-group htl_location_block">
                                 <label for="" class="control-label">{l s='Hotel Location'}</label>
@@ -35,7 +35,7 @@
                         {if $product->booking_product}
                             {if  !$order_date_restrict}
                                 <div class="row">
-                                    {block name='booking-form-dates-fields'}
+                                    {block name='booking_form_dates_fields'}
                                         <div class="form-group col-sm-12">
                                             <label class="control-label">{l s='Check In - Check Out'}</label>
                                             <div class="form-control input-date" id="room_date_range"  autocomplete="off" placeholder="{l s='Check-in - Check-out'}"><span>{l s='Check-in'} &nbsp;<i class="icon icon-minus"></i>&nbsp; {l s='Check-out'}</span></div>
@@ -45,7 +45,7 @@
                                     {/block}
                                 </div>
                                 {if $total_available_rooms > 0}
-                                    {block name='booking-form-quantity-fields'}
+                                    {block name='booking_form_quantity_fields'}
                                         <div class="row">
                                             <div class="form-group col-sm-12"{if !$product->available_for_order || $PS_CATALOG_MODE} style="display: none;"{/if}>
                                                 {if isset($occupancy_required_for_booking) && $occupancy_required_for_booking}
@@ -58,7 +58,7 @@
                                             </div>
                                         </div>
                                     {/block}
-                                    {block name='booking-form-price-desc'}
+                                    {block name='booking_form_price_desc'}
                                         {if (isset($has_room_type_demands) && $has_room_type_demands) || (isset($service_products_exists) && $service_products_exists)}
                                             <hr class="separator-hr-mg-10">
                                             <div class="row price_desc_block">
@@ -143,7 +143,7 @@
                                             <hr class="separator-hr-mg-10 form-group">
                                         {/if}
                                     {/block}
-                                    {block name='booking-form-actions'}
+                                    {block name='booking_form_actions'}
                                         <div id="booking_action_block">
                                             <div class="row">
                                                 <div class="total_price_block col-xs-7 form-group">
@@ -157,7 +157,7 @@
                                                         {convertPrice price=$total_price|floatval}
                                                     </p>
                                                 </div>
-                                                {block name='booking-form-num-avail'}
+                                                {block name='booking_form_num_avail'}
                                                     {if $total_available_rooms <= $warning_count}
                                                         <div class="col-xs-5 form-group text-right num_quantity_alert">
                                                             <span class="num_searched_avail_rooms">

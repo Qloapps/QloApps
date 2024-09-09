@@ -54,7 +54,7 @@
             <p class="required">
                 <sup>*</sup>{l s='Required field'}
             </p>
-            {block name='identity-form'}
+            {block name='identity_form'}
                 <form action="{$link->getPageLink('identity', true)|escape:'html':'UTF-8'}" method="post" class="std">
                     <fieldset>
                         <div class="clearfix">
@@ -216,7 +216,7 @@
             {/block}
         {/if}
     </div>
-    {block name='identity-footer-links'}
+    {block name='identity_footer_links'}
         <ul class="footer_links clearfix">
             <li>
                 <a class="btn btn-default button button-small" href="{$link->getPageLink('my-account', true)}">

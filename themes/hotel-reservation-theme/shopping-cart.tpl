@@ -23,7 +23,7 @@
 *  International Registered Trademark & Property of PrestaShop SA
 *}
 
-{block name='shopping-cart'}
+{block name='shopping_cart'}
 	{capture name=path}{l s='Your shopping cart'}{/capture}
 
 	{* <h1 id="cart_title" class="page-heading">{l s='Shopping-cart summary'}
@@ -81,7 +81,7 @@
 			{hook h="displayBeforeShoppingCartBlock"}
 		{/block}
 
-		{block name='shopping-cart-details'}
+		{block name='shopping_cart_details'}
 			<div class="order-detail-content">
 				{if isset($cart_htl_data) && $cart_htl_data}
 					<p class="cart_section_title">{l s='rooms information'}</p>
@@ -432,7 +432,7 @@
 				<div id="HOOK_SHOPPING_CART_EXTRA">{if isset($HOOK_SHOPPING_CART_EXTRA)}{$HOOK_SHOPPING_CART_EXTRA}{/if}</div>
 			{/block}
 		</div>
-		{block name='shopping-cart-js-vars'}
+		{block name='shopping_cart_js_vars'}
 			{strip}
 				{addJsDef deliveryAddress=$cart->id_address_delivery|intval}
 				{addJsDefL name=txtProduct}{l s='product' js=1}{/addJsDefL}
@@ -442,7 +442,7 @@
 	{/if}
 
 	{* Fancybox for extra demands*}
-	{block name='shopping-cart-extra-services'}
+	{block name='shopping_cart_extra_services'}
 		<div style="display:none;" id="rooms_extra_services">
 			{* <div id="rooms_type_extra_services"> *}
 				{* <div class="panel">

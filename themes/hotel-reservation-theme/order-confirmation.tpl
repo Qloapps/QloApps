@@ -23,7 +23,7 @@
 *  International Registered Trademark & Property of PrestaShop SA
 *}
 
-{block name='order-confirmation'}
+{block name='order_confirmation'}
 	{capture name=path}{l s='Order confirmation'}{/capture}
 
 	<h1 class="page-heading">{l s='Order confirmation'}</h1>
@@ -63,7 +63,7 @@
 				{/if}
 				<hr>
 				<p><strong>{l s='Order Details -'}</strong></p>
-				{block name='order-detail-content'}
+				{block name='order_detail_content'}
 					<div id="order-detail-content" class="">
 						<table class="table table-bordered">
 							{if isset($cart_htl_data)}
@@ -405,7 +405,7 @@
 	</div>
 
 	{* Fancybox for extra demands*}
-	{block name='order-confirmation-room-extra-services'}
+	{block name='order_confirmation_room_extra_services'}
 		<div style="display:none;" id="rooms_extra_services">
 			{* <div id="rooms_type_extra_demands">
 				<div class="panel">
@@ -418,7 +418,7 @@
 			</div> *}
 		</div>
 	{/block}
-	{block name='order-confirmation-js-vars'}
+	{block name='order_confirmation_js_vars'}
 		{strip}
 			{addJsDef historyUrl=$link->getPageLink("orderdetail", true)|escape:'quotes':'UTF-8'}
 			{addJsDefL name=req_sent_msg}{l s='Request Sent..' js=1}{/addJsDefL}

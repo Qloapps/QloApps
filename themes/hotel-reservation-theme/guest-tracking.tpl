@@ -23,7 +23,7 @@
 *  International Registered Trademark & Property of PrestaShop SA
 *}
 
-{block name='guest-tracking'}
+{block name='guest_tracking'}
 	{capture name=path}{l s='Guest Tracking'}{/capture}
 
 	<h1 class="page-heading">{l s='Guest Tracking'}</h1>
@@ -76,7 +76,7 @@
 			</div>
 		{/foreach}
 
-		{block name='guest-tracking-guest-transform'}
+		{block name='guest_tracking_guest_transform'}
 			<div class="row">
 				<div class="col-md-8">
 					{if isset($transformSuccess)}
@@ -124,7 +124,7 @@
 		{if isset($show_login_link) && $show_login_link}
 			<p><img src="{$img_dir}icon/userinfo.gif" alt="{l s='Information'}" class="icon" /><a href="{$link->getPageLink('my-account', true)|escape:'html':'UTF-8'}">{l s='Click here to log in to your customer account.'}</a><br /><br /></p>
 		{/if}
-		{block name='guest-tracking-form'}
+		{block name='guest_tracking_form'}
 			<form method="post" action="{$action|escape:'html':'UTF-8'}" class="std" id="guestTracking">
 				<fieldset class="description_box box">
 					<h2 class="page-subheading">{l s='To track your order, please enter the following information:'}</h2>

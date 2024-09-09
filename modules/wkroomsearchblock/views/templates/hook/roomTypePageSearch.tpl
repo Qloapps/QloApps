@@ -17,9 +17,9 @@
 *  @license   https://store.webkul.com/license.html
 *}
 
-{block name='room-type-page-search'}
+{block name='room_type_page_search'}
 	{if isset($hotels_info) && count($hotels_info)}
-		{block name='room-type-page-search'}
+		{block name='room_type_page_search'}
 			{* searched information wrapper block*}
 			{if isset($search_data) && $search_data}
 				<div class="header-rmsearch-details-wrapper">

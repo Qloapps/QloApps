@@ -23,7 +23,7 @@
 *  International Registered Trademark & Property of PrestaShop SA
 *}
 
-{block name='order-slip'}
+{block name='order_slip'}
 	{capture name=path}<a href="{$link->getPageLink('my-account', true)|escape:'html':'UTF-8'}">{l s='My account'}</a><span class="navigation-pipe">{$navigationPipe}</span><span class="navigation_page">{l s='Credit slips'}</span>{/capture}
 
 	<h1 class="page-heading bottom-indent">
@@ -41,7 +41,7 @@
 		</p>
 	{/if}
 
-	{block name='order-slip-list'}
+	{block name='order_slip_list'}
 		<div class="block-center" id="block-history">
 			{if $ordersSlip && count($ordersSlip)}
 				<table id="order-list" class="table table-bordered footab">
@@ -104,7 +104,7 @@
 			{/if}
 		</div><!-- #block-history -->
 	{/block}
-	{block name='order-slip-footer-links'}
+	{block name='order_slip_footer_links'}
 		<ul class="footer_links clearfix">
 			<li>
 				<a class="btn btn-default button button-small" href="{$link->getPageLink('my-account', true)|escape:'html':'UTF-8'}">

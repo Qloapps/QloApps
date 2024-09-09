@@ -17,9 +17,9 @@
 * @license LICENSE.txt
 *}
 
-{block name='service-products'}
+{block name='service_products'}
     {if isset($service_products_exists) && $service_products_exists}
-        {block name='service-products-tabs'}
+        {block name='service_products_tabs'}
             <ul class="nav nav-tabs product_description_tabs">
                 {if !$PS_SERVICE_PRODUCT_CATEGORY_FILTER}
                     <li class="active"><a href="#all_products" class="idTabHrefShort" data-toggle="tab">{l s='Services'}</a></li>
@@ -30,7 +30,7 @@
                 {/if}
             </ul>
         {/block}
-        {block name='service-products-tabs-content'}
+        {block name='service_products_tabs_content'}
             <div class="card">
                 <div class="row">
                     <div class="col-sm-12 tab-content">

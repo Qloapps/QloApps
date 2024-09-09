@@ -17,7 +17,7 @@
 *  @license   https://store.webkul.com/license.html
 *}
 
-{block name='navigation-menu-block'}
+{block name='navigation_menu_block'}
 	<div class="header-top-item">
 		<button type="button" class="nav_toggle">
 			<span class="icon-bar"></span>

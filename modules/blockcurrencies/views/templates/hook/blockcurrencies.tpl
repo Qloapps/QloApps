@@ -23,7 +23,7 @@
 *  International Registered Trademark & Property of PrestaShop SA
 *}
 
-{block name='block-currencies'}
+{block name='block_currencies'}
     {if count($currencies) > 1}
         <div id="currencies-block-top" class="currencies-block-wrap nav-main-item-right hidden-xs pull-right">
             <div class="dropdown">

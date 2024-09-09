@@ -23,7 +23,7 @@
 *  International Registered Trademark & Property of PrestaShop SA
 *}
 
-{block name='order-opc'}
+{block name='order_opc'}
 	{if $opc}
 		{assign var="back_order_page" value="order-opc.php"}
 		{else}
@@ -52,7 +52,7 @@
 									{if isset($checkout_process_steps) && $checkout_process_steps}
 										{foreach $checkout_process_steps as $step}
 											{if $step->step_key == 'checkout_rooms_summary'}
-												{block name='order-opc-checkout-rooms-summary'}
+												{block name='order_opc_checkout_rooms_summary'}
 													<div class="card">
 														<div class="card-header" id="shopping-cart-summary-head">
 															<h5 class="accordion-header" data-toggle="collapse" data-target="#collapse-shopping-cart" aria-expanded="true" aria-controls="collapse-shopping-cart">
@@ -72,7 +72,7 @@
 												{/block}
 											{* End Shopping Cart *}
 											{elseif $step->step_key == 'checkout_customer'}
-												{block name='order-opc-checkout-customer'}
+												{block name='order_opc_checkout_customer'}
 													<div class="card" id="guest-info-block">
 														<div class="card-header" id="guest-info-head">
 															<h5 class="accordion-header" data-toggle="collapse" data-target="#collapse-guest-info" aria-expanded="true" aria-controls="collapse-guest-info">
@@ -186,7 +186,7 @@
 													</div>
 												{/block}
 											{elseif $step->step_key == 'checkout_payment'}
-												{block name='order-opc-checkout-payment'}
+												{block name='order_opc_checkout_payment'}
 													{* <div class="card col-sm-12">
 														<!-- Carrier -->
 														{include file="$tpl_dir./order-carrier.tpl"}
@@ -216,7 +216,7 @@
 								</div>
 							</div>
 							<div class="col-md-4">
-								{block name='order-opc-cart-total-details'}
+								{block name='order_opc_cart_total_details'}
 									{* Total cart details, tax details, advance payment details and voucher details *}
 									<div class="col-sm-12 card cart_total_detail_block">
 										{* {if $total_rooms}
@@ -390,7 +390,7 @@
 										</p>
 									</div>
 								{/block}
-								{block name='order-opc-vouchers'}
+								{block name='order_opc_vouchers'}
 									{* Check if voucher feature is enabled currently *}
 									{if $voucherAllowed}
 										{* Cart vouchers block *}
@@ -467,7 +467,7 @@
 
 							<p class="alert alert-warning">{l s='You have not added any room to your cart yet.'}</p>
 						{/if}
-						{block name='order-opc-js-vars'}
+						{block name='order_opc_js_vars'}
 							{strip}
 								{addJsDef imgDir=$img_dir}
 								{addJsDef authenticationUrl=$link->getPageLink("authentication", true)|escape:'quotes':'UTF-8'}

@@ -1,8 +1,8 @@
-{block name='order-opc-new-account-advanced'}
+{block name='order_opc_new_account_advanced'}
     <div id="opc_new_account" class="opc-main-block">
         <div id="opc_new_account-overlay" class="opc-overlay" style="display: none;"></div>
         <h2>{l s='Account'}</h2>
-        {block name='order-opc-new-account-advanced-login-form'}
+        {block name='order_opc_new_account_advanced_login_form'}
             <form action="{$link->getPageLink('authentication', true, NULL, "back=order-opc")|escape:'html':'UTF-8'}" method="post" id="login_form" class="box">
                 <fieldset>
                     <h3 class="page-subheading">{l s='Already registered?'}</h3>
@@ -28,7 +28,7 @@
                 </fieldset>
             </form>
         {/block}
-        {block name='order-opc-new-account-advanced-new-account-form'}
+        {block name='order_opc_new_account_advanced_new_account_form'}
             <form action="{$link->getPageLink('authentication', true)|escape:'html':'UTF-8'}" method="post" id="new_account_form" class="std" autocomplete="on" autofill="on">
                 <fieldset>
                     <div class="box">
@@ -391,7 +391,7 @@
             </form>
         {/block}
     </div>
-    {block name='order-opc-new-account-advanced-js-vars'}
+    {block name='order_opc_new_account_advanced_js_vars'}
         {strip}
             {if isset($guestInformations) && isset($guestInformations.id_state) && $guestInformations.id_state}
                 {addJsDef idSelectedState=$guestInformations.id_state|intval}

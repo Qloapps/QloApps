@@ -95,7 +95,7 @@
 		<p class="alert alert-warning">{l s='You do not have any vouchers.'}</p>
 	{/if}
 
-	{block name='discount-footer-links'}
+	{block name='discount_footer_links'}
 		<ul class="footer_links clearfix">
 			<li>
 				<a class="btn btn-default button button-small" href="{$link->getPageLink('my-account', true)|escape:'html':'UTF-8'}">

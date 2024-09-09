@@ -17,7 +17,7 @@
 *  @license   https://store.webkul.com/license.html
 *}
 
-{block name='testimonial-block'}
+{block name='testimonial_block'}
     {if isset($testimonials_data) && $testimonials_data}
         <div id="hotelTestimonialBlock" class="row home_block_container">
             <div class="col-xs-12 col-sm-12">
@@ -30,7 +30,7 @@
                         </div>
                     </div>
                 {/if}
-                {block name='testimonial-block-content'}
+                {block name='testimonial_block_content'}
                     <div class="row home_block_content htlTestemonial-owlCarousel">
                         <div class="col-sm-12 col-xs-12">
                             <div class="owl-carousel">

@@ -23,7 +23,7 @@
 *  International Registered Trademark & Property of PrestaShop SA
 *}
 
-{block name='order-return'}
+{block name='order_return'}
 	{capture name=path}
 		<a href="{$link->getPageLink('my-account', true)|escape:'html':'UTF-8'}">
 			{l s='My account'}
@@ -42,7 +42,7 @@
 		</span>
 	{/capture}
 
-	{block name='order-return-details'}
+	{block name='order_return_details'}
 		{include file="./errors.tpl"}
 		<div class="panel card">
 			<h1 class="page-heading bottom-indent">
@@ -181,7 +181,7 @@
 		</div>
 	{/block}
 
-	{block name='order-return-footer-links'}
+	{block name='order_return_footer_links'}
 		<ul class="footer_links clearfix">
 			<li><a class="btn btn-default button button-small" href="{$link->getPageLink('my-account', true)|escape:'html':'UTF-8'}"><span><i class="icon-chevron-left"></i> {l s='Back to your account'}</span></a></li>
 			<li><a class="btn btn-default button button-small" href="{if isset($force_ssl) && $force_ssl}{$base_dir_ssl}{else}{$base_dir}{/if}"><span><i class="icon-chevron-left"></i> {l s='Home'}</span></a></li>

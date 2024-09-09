@@ -23,7 +23,7 @@
 *  International Registered Trademark & Property of PrestaShop SA
 *}
 
-{block name='order-steps'}
+{block name='order_steps'}
 	{* Assign a value to 'current_step' to display current style *}
 	{capture name="url_back"}
 	{if isset($back) && $back}back={$back}{/if}

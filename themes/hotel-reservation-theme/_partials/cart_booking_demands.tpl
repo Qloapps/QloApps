@@ -17,10 +17,10 @@
 * @license LICENSE.txt
 *}
 
-{block name='cart-booking-demands'}
+{block name='cart_booking_demands'}
 	<section>
 		{if (isset($selectedRoomDemands) && $selectedRoomDemands) || (isset($roomTypeServiceProducts) && $roomTypeServiceProducts)}
-			{block name='cart-booking-demands-tabs'}
+			{block name='cart_booking_demands_tabs'}
 				<ul class="nav nav-tabs">
 					{if isset($selectedRoomDemands) && $selectedRoomDemands}
 						<li class="active"><a href="#room_type_demands_desc" data-toggle="tab">{l s='Facilities'}</a></li>
@@ -30,9 +30,9 @@
 					{/if}
 				</ul>
 			{/block}
-			{block name='cart-booking-demands-tabs-content'}
+			{block name='cart_booking_demands_tabs_content'}
 				<div class="tab-content">
-					{block name='cart-booking-demands-tab-content'}
+					{block name='cart_booking_demands_tab_content'}
 						{if isset($selectedRoomDemands) && $selectedRoomDemands}
 							<div id="room_type_demands_desc" class="tab-pane active">
 								<div class="rooms_extra_demands_head">
@@ -94,7 +94,7 @@
 						{/if}
 					{/block}
 
-					{block name='cart-booking-services-tab-content'}
+					{block name='cart_booking_services_tab_content'}
 						{if isset($roomTypeServiceProducts) && $roomTypeServiceProducts}
 							<div id="room_type_service_product_desc" class="tab-pane{if !isset($selectedRoomDemands) || !$selectedRoomDemands} active{/if}">
 								<div class="rooms_extra_demands_head">

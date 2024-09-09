@@ -17,7 +17,7 @@
 *  @license   https://store.webkul.com/license.html
 *}
 
-{block name='hotel-interior-block'}
+{block name='hotel_interior_block'}
     {if isset($InteriorImg) && $InteriorImg}
         <div id="hotelInteriorBlock" class="row home_block_container">
             <div class="col-xs-12 col-sm-12">
@@ -31,7 +31,7 @@
                         </div>
                     </div>
                 {/if}
-                {block name='hotel-interior-images'}
+                {block name='hotel_interior_images'}
                     <div class="row home_block_content htlInterior-owlCarousel">
                         <div class="col-sm-12 col-xs-12">
                             <div class="owl-carousel owl-theme">

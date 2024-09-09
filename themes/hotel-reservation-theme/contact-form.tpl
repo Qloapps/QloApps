@@ -23,7 +23,7 @@
 *  International Registered Trademark & Property of PrestaShop SA
 *}
 
-{block name='contact-form'}
+{block name='contact_form'}
 {if isset($smarty.get.confirm)}
 	<p class="alert alert-success">{l s='Your message has been successfully sent to our team.'}</p>
 {/if}
@@ -35,7 +35,7 @@
 	</div>
 	<div class="row margin-top-50">
 		{if (isset($gblHtlAddress) && $gblHtlAddress) && (isset($gblHtlPhone) && $gblHtlPhone) && (isset($gblHtlEmail) && $gblHtlEmail)}
-			{block name='contact-form-gloal-hotel-address'}
+			{block name='contact_form_gloal_hotel_address'}
 				<div class="col-sm-6">
 					<div class="htl-global-address-div col-md-8 col-sm-12">
 						{if isset($gblHtlPhone) && $gblHtlPhone }
@@ -66,7 +66,7 @@
 				</div>
 			{/block}
 		{/if}
-		{block name='contact-form-form'}
+		{block name='contact_form_form'}
 			<div class="col-sm-6 {if !(isset($gblHtlAddress) && $gblHtlAddress) && !(isset($gblHtlPhone) && $gblHtlPhone) && !(isset($gblHtlEmail) && $gblHtlEmail)} col-sm-offset-3 {/if}">
 				<form action="{$link->getPageLink('contact')}" method="post" class="contact-form-box" enctype="multipart/form-data">
 					{if isset($customerThread.id_contact) && $customerThread.id_contact && $contacts|count}
@@ -153,7 +153,7 @@
 			</div>
 		{/block}
 	</div>
-	{block name='contact-form-hotel-locations'}
+	{block name='contact_form_hotel_locations'}
 		{if isset($hotelsInfo) && $hotelsInfo}
 			<div class="row hotels-container">
 				<div class="col-sm-12 hotel-header">
@@ -201,7 +201,7 @@
 	{/block}
 </div>
 
-	{block name='contact-form-js-vars'}
+	{block name='contact_form_js_vars'}
 		{strip}
 			{addJsDefL name='contact_fileDefaultHtml'}{l s='No file selected' js=1}{/addJsDefL}
 			{addJsDefL name='contact_fileButtonHtml'}{l s='Choose File' js=1}{/addJsDefL}

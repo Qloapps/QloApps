@@ -23,7 +23,7 @@
 *  International Registered Trademark & Property of PrestaShop SA
 *}
 
-{block name='order-payment-advanced'}
+{block name='order_payment_advanced'}
     {if !isset($addresses_style)}
         {$addresses_style.company = 'address_company'}
         {$addresses_style.firstname = 'address_name'}
@@ -122,7 +122,7 @@
             <!-- END Create account / Guest account / Login block -->
         {/if}
 
-        {block name='order-payment-advanced-terms-conditions'}
+        {block name='order_payment_advanced_terms_conditions'}
             <!-- TNC -->
             {if $conditions AND $cms_id}
                 {if $override_tos_display }

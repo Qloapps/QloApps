@@ -56,7 +56,7 @@
 		</p>
 		{include file="$tpl_dir./errors.tpl"}
 		<p class="required"><sup>*</sup>{l s='Required field'}</p>
-		{block name='address-form'}
+		{block name='address_form'}
 			<form action="{$link->getPageLink('address', true)|escape:'html':'UTF-8'}" method="post" class="std" id="add_address">
 				<!--h3 class="page-subheading">{if isset($id_address)}{l s='Your address'}{else}{l s='New address'}{/if}</h3-->
 				{assign var="stateExist" value=false}
@@ -226,7 +226,7 @@
 			</form>
 		{/block}
 	</div>
-	{block name='address-footer-links'}
+	{block name='address_footer_links'}
 		<ul class="footer_links clearfix">
 			<li>
 				<a class="btn btn-defaul button button-small" href="{$link->getPageLink('my-account', true)|escape:'html':'UTF-8'}">
@@ -235,7 +235,7 @@
 			</li>
 		</ul>
 	{/block}
-	{block name='adderss-js-vars'}
+	{block name='adderss_js_vars'}
 		{strip}
 		{if isset($smarty.post.id_state) && $smarty.post.id_state}
 			{addJsDef idSelectedState=$smarty.post.id_state|intval}

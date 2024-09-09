@@ -17,7 +17,7 @@
 * @license LICENSE.txt
 *}
 
-{block name='service-products-list-row'}
+{block name='service_products_list_row'}
     {if isset($product) && $product}
         <li class="row service-product-element">
             <div class="col-xs-4 col-sm-3 col-md-2">
@@ -33,7 +33,7 @@
             </div>
             <div class="col-xs-8 col-sm-9 col-md-10">
                 <div class="row">
-                    {block name='service-products-list-row-details'}
+                    {block name='service_products_list_row_details'}
                         <div class="col-sm-12 clearfix service-product-block">
                             <span class="service-product-name">{$product['name']}</span>
                         </div>
@@ -44,7 +44,7 @@
                         {/if}
                     {/block}
 
-                    {block name='service-products-list-row-actions'}
+                    {block name='service_products_list_row_actions'}
                         <div class="col-sm-12 service_product_action_block">
                             {if !$PS_CATALOG_MODE && !$order_date_restrict && ($product.show_price && !isset($restricted_country_mode))}
                                 <div class="service-product-price">

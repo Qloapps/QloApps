@@ -23,7 +23,7 @@
 *  International Registered Trademark & Property of PrestaShop SA
 *}
 
-{block name='order-opc-advanced'}
+{block name='order_opc_advanced'}
     {if $opc}
         {assign var="back_order_page" value="order-opc.php"}
     {else}
@@ -45,7 +45,7 @@
             {include file="$tpl_dir./errors.tpl"}
             <p class="alert alert-warning">{l s='Your shopping cart is empty.'}</p>
         {/if}
-        {block name='order-opc-advanced-js-vars'}
+        {block name='order_opc_advanced_js_vars'}
             {strip}
                 {addJsDef imgDir=$img_dir}
                 {addJsDef authenticationUrl=$link->getPageLink("authentication", true)|escape:'quotes':'UTF-8'}

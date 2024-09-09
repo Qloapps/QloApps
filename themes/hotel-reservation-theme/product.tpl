@@ -23,7 +23,7 @@
 *  International Registered Trademark & Property of PrestaShop SA
 *}
 
-{block name='room-type'}
+{block name='room_type'}
 	{include file="$tpl_dir./errors.tpl"}
 	{if $errors|@count == 0}
 		{if !isset($priceDisplayPrecision)}
@@ -65,10 +65,10 @@
 					</p>
 				{/if}
 				<!-- left infos-->
-				{block name='room-type-left-column'}
+				{block name='room_type_left_column'}
 					<div class="pb-left-column col-xs-12 col-sm-8 col-md-8">
 						<div class="room_type_img_containter card">
-							{block name='room-type-hotel-name-block'}
+							{block name='room_type_hotel_name_block'}
 								<div class="room_hotel_name_block {if isset($language_is_rtl) && $language_is_rtl}rtl{/if}">
 									<div class="hotel_name_block">
 										<h1><span class="hotel_name">{$product->name}
@@ -88,10 +88,10 @@
 								{hook h='displayRoomTypeDetailRoomTypeImageBlockBefore' id_product=$product->id}
 							{/block}
 							<!-- product img-->
-							{block name='room-type-images'}
+							{block name='room_type_images'}
 								<div class="row">
 
-									{block name='room-type-cover-image'}
+									{block name='room_type_cover_image'}
 										<div id="image-block-cont" class="col-xs-12 col-sm-9 col-sm-push-3 col-md-10 col-md-push-2">
 											<div id="image-block" class="clearfix">
 												<!-- {if $product->new}
@@ -135,7 +135,7 @@
 											</div> <!-- end image-block -->
 										</div>
 									{/block}
-									{block name='room-type-thumbnails'}
+									{block name='room_type_thumbnails'}
 										<div class="col-xs-12 col-sm-3 col-sm-pull-9 col-md-2 col-md-pull-10">
 											{if isset($images) && count($images) > 0}
 												<!-- thumbnails -->
@@ -206,7 +206,7 @@
 							<!-- tab hook is added here -->
 							<!--HOOK_PRODUCT_TAB -->
 							<section class="page-product-box">
-								{block name='room-type-tabs'}
+								{block name='room_type_tabs'}
 									<ul class="nav nav-tabs product_description_tabs">
 										<li class="active"><a href="#product_info_tab" class="idTabHrefShort" data-toggle="tab">{l s='Room Information'}</a></li>
 										{* Block for booking products *}
@@ -221,9 +221,9 @@
 										{/block}
 									</ul>
 								{/block}
-								{block name='room-type-tabs-content'}
+								{block name='room_type_tabs_content'}
 									<div class="tab-content product_description_tabs_contents">
-										{block name='room-type-info-tab-content'}
+										{block name='room_type_info_tab_content'}
 											<div id="product_info_tab" class="tab-pane active card">
 												<div id="product_info_tab_information">
 													<div class="row info_margin_div room_description">
@@ -340,7 +340,7 @@
 												</div>
 											</div>
 										{/block}
-										{block name='room-type-refund-policies-tab-content'}
+										{block name='room_type_refund_policies_tab_content'}
 											{* Block for booking products *}
 											{if isset($id_hotel) && $id_hotel}
 												<div id="refund_policies_tab" class="tab-pane card">
@@ -362,7 +362,7 @@
 												</div>
 											{/if}
 										{/block}
-										{block name='room-type-map-tab-content'}
+										{block name='room_type_map_tab_content'}
 											{if $display_google_maps && ($hotel_latitude|floatval != 0 && $hotel_longitude|floatval != 0)}
 												<div id="room_type_map_tab" class="tab-pane card">
 													<div class="map-wrap"></div>
@@ -396,10 +396,10 @@
 					</div> <!-- end pb-left-column -->
 				{/block}
 
-				{block name='room-type-right-column'}
+				{block name='room_type_right_column'}
 					<div class="pb-right-column col-xs-12 col-sm-4 col-md-4">
 						{if ($product->show_price && !isset($restricted_country_mode)) || isset($groups) || $product->reference || (isset($HOOK_PRODUCT_ACTIONS) && $HOOK_PRODUCT_ACTIONS)}
-							{block name='room-type-hidden-fields'}
+							{block name='room_type_hidden_fields'}
 								<p class="hidden">
 									<input type="hidden" name="token" value="{$static_token}" />
 									<input type="hidden" name="id_product" value="{$product->id|intval}" id="product_page_product_id" />
@@ -410,7 +410,7 @@
 
 							{include file='./_partials/booking-form.tpl'}
 
-							{block name='room-type-demands'}
+							{block name='room_type_demands'}
 								{* extra room type demands *}
 								{if isset($room_type_demands) && $room_type_demands}
 									<div class="col-sm-12 card room_demands_container">
@@ -722,7 +722,7 @@
 			</div>
 		{/if}
 	</div> <!-- itemscope product wrapper -->
-	{block name='room-type-js-vars'}
+	{block name='room_type_js_vars'}
 		{strip}
 			{if isset($id_hotel) && $id_hotel}
 				{addJsDef id_hotels = $id_hotel}

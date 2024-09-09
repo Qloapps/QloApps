@@ -23,12 +23,12 @@
 *  International Registered Trademark & Property of PrestaShop SA
 *}
 
-{block name='block-cart'}
+{block name='block_cart'}
 	<!-- MODULE Block cart -->
 	{if isset($blockcart_top) && $blockcart_top}
 	<div class="header-top-item {if $PS_CATALOG_MODE}header_user_catalog{/if}">
 	{/if}
-		{block name='block-cart-shopping-cart'}
+		{block name='block_cart_shopping_cart'}
 			<div class="shopping_cart">
 				<a href="{$link->getPageLink($order_process, true)|escape:'html':'UTF-8'}" title="{l s='View my booking cart' mod='blockcart'}" rel="nofollow">
 					<!-- <b>{l s='Cart' mod='blockcart'}</b> -->
@@ -262,7 +262,7 @@
 	</div>
 	{/if}
 	{counter name=active_overlay assign=active_overlay}
-	{block name='block-cart-layer-cart'}
+	{block name='block_cart_layer_cart'}
 		{if !$PS_CATALOG_MODE && $active_overlay == 1}
 			<div id="layer_cart">
 				<div class="clearfix">
@@ -411,7 +411,7 @@
 			<div class="layer_cart_overlay"></div>
 		{/if}
 	{/block}
-	{block name='blockcart-js-vars'}
+	{block name='blockcart_js_vars'}
 		{strip}
 		{addJsDefL name=someErrorCondition}{l s='Some Error occured.Please try again.' mod='blockcart' js=1}{/addJsDefL}
 		{addJsDef CUSTOMIZE_TEXTFIELD=$CUSTOMIZE_TEXTFIELD}

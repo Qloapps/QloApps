@@ -17,14 +17,14 @@
 * @license LICENSE.txt
 *}
 
-{block name='order-extra-services'}
+{block name='order_extra_services'}
     <div class="card">
         <div class="card-header">
             {l s='Extra Services'}
         </div>
         <div class="card-body">
             {if (isset($extraDemands) && $extraDemands) || (isset($additionalServices) && $additionalServices)}
-                {block name='order-extra-services-tabs'}
+                {block name='order_extra_services_tabs'}
                     <ul class="nav nav-tabs">
                         {if isset($additionalServices) && $additionalServices}
                             <li class="active"><a href="#room_type_service_product_desc" data-toggle="tab">{l s='Services'}</a></li>
@@ -34,9 +34,9 @@
                         {/if}
                     </ul>
                 {/block}
-                {block name='order-extra-services-tabs-content'}
+                {block name='order_extra_services_tabs_content'}
                     <div class="tab-content">
-                        {block name='order-extra-services-tab-content'}
+                        {block name='order_extra_services_tab_content'}
                             {if isset($additionalServices) && $additionalServices}
                                 <div id="room_type_service_product_desc" class="tab-pane {if isset($additionalServices) && $additionalServices}active{/if}">
                                     {assign var=roomCount value=1}
@@ -76,7 +76,7 @@
                             {/if}
                         {/block}
 
-                        {block name='order-extra-demands-tab-content'}
+                        {block name='order_extra_demands_tab_content'}
                             {if isset($extraDemands) && $extraDemands}
                                 <div id="room_type_demands_desc" class="tab-pane {if !isset($additionalServices) || !$additionalServices}active{/if}">
                                     {assign var=roomCount value=1}

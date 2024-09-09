@@ -23,7 +23,7 @@
 *  International Registered Trademark & Property of PrestaShop SA
 *}
 
-{block name='order-detail'}
+{block name='order_detail'}
     {capture name=path}
         <a href="{$link->getPageLink('my-account', true)|escape:'html':'UTF-8'}">
             {l s='My account'}
@@ -68,7 +68,7 @@
                     {hook h='displayOrderDetailTopLeft' id_order=$order->id}
                 {/block}
 
-                {block name='order-detail-hotel-details'}
+                {block name='order_detail_hotel_details'}
                     <div class="card hotel-details">
                         <div class="card-header">
                             {l s='Hotel Details'}
@@ -103,7 +103,7 @@
                     </div>
                 {/block}
 
-                {block name='order-details-payment-details-mobile'}
+                {block name='order_details_payment_details_mobile'}
                     <div class="card payment-details visible-xs visible-sm hidden-md hidden-lg">
                         <div class="card-header">
                             {l s='Payment Details'}
@@ -147,7 +147,7 @@
                     </div>
                 {/block}
 
-                {block name='order-detail-hotel-location-mobile'}
+                {block name='order_detail_hotel_location_mobile'}
                     <div class="card hotel-location visible-xs visible-sm hidden-md hidden-lg">
                         <div class="card-header">
                             {l s='Hotel Location'}
@@ -182,7 +182,7 @@
                     </div>
                 {/block}
 
-                {block name='order-detail-refund-requests'}
+                {block name='order_detail_refund_requests'}
                     {if isset($refundReqBookings) && $refundReqBookings}
                         <div class="alert alert-info-light cancel_requests_link_wrapper">
                             <i class="icon-info-circle"></i>
@@ -199,7 +199,7 @@
                     {hook h='displayOrderDetailRoomDetailsBefore' id_order=$order->id}
                 {/block}
 
-                {block name='order-detail-room-details'}
+                {block name='order_detail_room_details'}
                     <div class="card room-details">
                         <div class="card-header">
                             {l s='Room Details'}
@@ -241,7 +241,7 @@
                     </div>
                 {/block}
 
-                {block name='order-detail-payment-summary-mobile'}
+                {block name='order_detail_payment_summary_mobile'}
                     <div class="card payment-summary visible-xs visible-sm hidden-md hidden-lg">
                         <div class="card-header">
                             {l s='Payment Summary'}
@@ -339,7 +339,7 @@
                     </div>
                 {/block}
 
-                {block name='order-detail-guest-details-mobile'}
+                {block name='order_detail_guest_details_mobile'}
                     <div class="card guest-details visible-xs visible-sm hidden-md hidden-lg">
                         <div class="card-header">
                             {l s='Guest Details'}
@@ -420,7 +420,7 @@
                     </div>
                 {/block}
 
-                {block name='order-detail-hotel-policies'}
+                {block name='order_detail_hotel_policies'}
                     {assign var=has_general_hotel_policies value=(isset($obj_hotel_branch_information->policies) && $obj_hotel_branch_information->policies)}
                     {assign var=has_refund_hotel_policies value=($obj_hotel_branch_information->isRefundable() && $hotel_refund_rules)}
                     {if $has_general_hotel_policies || $has_refund_hotel_policies}
@@ -470,7 +470,7 @@
                     {/if}
                 {/block}
 
-                {block name='order-detail-order-messages'}
+                {block name='order_detail_order_messages'}
                     {if !$is_guest}
                         <div class="card order-messages {if !count($messages)}hide{/if}">
                             <div class="card-header">
@@ -492,7 +492,7 @@
                     {hook h='displayOrderDetailMessagesBefore' id_order=$order->id}
                 {/block}
 
-                {block name='order-detail-add-order-messages'}
+                {block name='order_detail_add_order_messages'}
                     {if !$is_guest}
                         <div class="card add-order-message" id="add-order-message">
                             <div class="card-header">
@@ -506,7 +506,7 @@
                             <div class="card-body">
                                 <div class="errors-block" style="display: none;"></div>
 
-                                {block name='order-detail-add-order-messages-form'}
+                                {block name='order_detail_add_order_messages_form'}
                                     <form action="{$link->getPageLink('order-detail', true)|escape:'html':'UTF-8'}" method="post" class="std" id="sendOrderMessage">
                                         <div class="form-group select-room-type">
                                             <label for="id_product">{l s='Room Type'}</label>
@@ -546,7 +546,7 @@
                     {hook h='displayOrderDetailTopRight' id_order=$order->id}
                 {/block}
 
-                {block name='order-detail-payment-details'}
+                {block name='order_detail_payment_details'}
                     <div class="card payment-details hidden-xs hidden-sm visible-md">
                         <div class="card-header">
                             {l s='Payment Details'}
@@ -590,7 +590,7 @@
                     </div>
                 {/block}
 
-                {block name='order-detail-hotel-location'}
+                {block name='order_detail_hotel_location'}
                     <div class="card hotel-location hidden-xs hidden-sm visible-md">
                         <div class="card-header">
                             {l s='Hotel Location'}
@@ -625,7 +625,7 @@
                     </div>
                 {/block}
 
-                {block name='order-detail-payment-summary'}
+                {block name='order_detail_payment_summary'}
                     <div class="card payment-summary hidden-xs hidden-sm visible-md">
                         <div class="card-header">
                             {l s='Payment Summary'}
@@ -723,7 +723,7 @@
                     </div>
                 {/block}
 
-                {block name='order-detail-guest-details'}
+                {block name='order_detail_guest_details'}
                     <div class="card guest-details hidden-xs hidden-sm visible-md">
                         <div class="card-header">
                             {l s='Guest Details'}
@@ -816,7 +816,7 @@
             </div>
         {/if}
 
-        {block name='order-detail-refund-popups'}
+        {block name='order_detail_refund_popups'}
         {if isset($refund_allowed) && $refund_allowed}
             <div style="display: none;">
                 <div id="create-new-refund-popup">
@@ -998,7 +998,7 @@
         <div id="popup-view-extra-services" class="popup-view-extra-services" style="display: none;"></div>
     {/if}
 
-    {block name='order-detial-js-vars'}
+    {block name='order_detial_js_vars'}
         {strip}
             {addJsDef historyUrl=$link->getPageLink('orderdetail', true)|escape:'quotes':'UTF-8'}
             {addJsDefL name=req_sent_msg}{l s='Request Sent..' js=1}{/addJsDefL}

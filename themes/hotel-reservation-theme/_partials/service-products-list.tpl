@@ -17,7 +17,7 @@
 * @license LICENSE.txt
 *}
 
-{block name='service-products-list'}
+{block name='service_products_list'}
     {foreach $service_products as $product}
         {if !($product@first && isset($init) && $init == true)}
             <hr>

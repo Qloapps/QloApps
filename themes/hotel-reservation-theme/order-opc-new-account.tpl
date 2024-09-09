@@ -1,7 +1,7 @@
-{block name='order-opc-new-account'}
+{block name='order_opc_new_account'}
 <div id="opc_new_account" class="opc-main-block">
 	<div id="opc_new_account-overlay" class="opc-overlay" style="display: none;"></div>
-	{block name='order-opc-new-account-login-form'}
+	{block name='order_opc_new_account_login_form'}
 		<form action="{$link->getPageLink('authentication', true, NULL, "back=order-opc")|escape:'html':'UTF-8'}" method="post" id="login_form">
 			<fieldset>
 				<div class="already_registered_block">
@@ -43,7 +43,7 @@
 			</fieldset>
 		</form>
 	{/block}
-	{block name='order-opc-new-account-new-account-form'}
+	{block name='order_opc_new_account_new_account_form'}
 		<form action="{$link->getPageLink('authentication', true)|escape:'html':'UTF-8'}" method="post" id="new_account_form" class="std" autocomplete="on" autofill="on">
 			<div id="opc_account_choice" class="row">
 				<div class="col-xs-12">

@@ -17,10 +17,10 @@
 *  @license   https://store.webkul.com/license.html
 *}
 
-{block name='htl-filter-block'}
+{block name='htl_filter_block'}
 	<div id="filter_results" class="row block">
 		<div class="col-sm-12">
-			{block name='htl-filter-block-amenities-filter'}
+			{block name='htl_filter_block_amenities_filter'}
 				{if isset($config) && $config['SHOW_AMENITIES_FILTER'] && $all_feat}
 					<div class="row margin-lr-0 layered_filter_cont">
 						<div class="col-sm-12 layered_filter_heading">
@@ -44,7 +44,7 @@
 				{/if}
 			{/block}
 
-			{block name='htl-filter-block-price-filter'}
+			{block name='htl_filter_block_price_filter'}
 				{if isset($config) && $config['SHOW_PRICE_FILTER']}
 					<div class="row margin-lr-0 layered_filter_cont">
 						<div class="col-sm-12 layered_filter_heading">
@@ -68,7 +68,7 @@
 			{/block}
 		</div>
 	</div>
-	{block name='htl-filter-block-js-vars'}
+	{block name='htl_filter_block_js_vars'}
 		{strip}
 			{addJsDef num_days = $num_days}
 			{addJsDef date_from = $date_from}

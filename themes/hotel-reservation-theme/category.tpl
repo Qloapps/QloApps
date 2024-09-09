@@ -26,7 +26,7 @@
 {block name='category'}
     <div class="row cat_cont">
         <div class="col-sm-12">
-            {block name='category-sort'}
+            {block name='category_sort'}
                 <div class="row margin-lr-0 catSortBlock">
                     <div class="col-sm-2 sortBlockHeading">
                         <p>{l s='Sort By:'}</p>
@@ -53,7 +53,7 @@
         </div>
     </div>
 
-    {block name='category-js-vars'}
+    {block name='category_js_vars'}
         {strip}
             {addJsDef product_controller_url=$link->getPageLink('product')}
             {* {addJsDef feat_img_dir=$feat_img_dir} *}

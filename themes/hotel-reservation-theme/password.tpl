@@ -36,7 +36,7 @@
 	<p class="alert alert-success">{l s='A confirmation email has been sent to your address:'} {if isset($customer_email)}{$customer_email|escape:'html':'UTF-8'|stripslashes}{/if}</p>
 	{else}
 	<p>{l s='Please enter the email address you used to register. We will then send you a new password. '}</p>
-	{block name='password-form'}
+	{block name='password_form'}
 		<form action="{$request_uri|escape:'html':'UTF-8'}" method="post" class="std" id="form_forgotpassword">
 			<fieldset>
 				<div class="form-group">

@@ -23,7 +23,7 @@
 *  International Registered Trademark & Property of PrestaShop SA
 *}
 
-{block name='shopping-cart-advanced'}
+{block name='shopping_cart_advanced'}
     <h2>{l s='Cart Summary'}</h2>
     {assign var='total_discounts_num' value="{if $total_discounts != 0}1{else}0{/if}"}
     {assign var='use_show_taxes' value="{if $use_taxes && $show_taxes}2{else}0{/if}"}
@@ -32,7 +32,7 @@
     {block name='displayBeforeShoppingCartBlock'}
         {hook h="displayBeforeShoppingCartBlock"}
     {/block}
-    {block name='shopping-cart-details'}
+    {block name='shopping_cart_details'}
         <div id="order-detail-content" class="table_block table-responsive">
             <table id="cart_summary" class="table table-bordered {if $PS_STOCK_MANAGEMENT}stock-management-on{else}stock-management-off{/if}">
                 <thead>

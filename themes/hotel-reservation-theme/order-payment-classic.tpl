@@ -23,11 +23,11 @@
 *  International Registered Trademark & Property of PrestaShop SA
 *}
 
-{block name='order-payment-classic'}
+{block name='order_payment_classic'}
     <div class="paiement_block">
         {include file="$tpl_dir./order-opc-advanced-payment-option.tpl"}
 
-        {block name='order-payment-classic-terms-conditions'}
+        {block name='order_payment_classic_terms_conditions'}
             <div id="tc_cont">
                 <p class="checkbox">
                     <input type="checkbox" name="cgv" id="cgv" value="1" {if $checkedTOS}checked="checked"{/if} />
@@ -42,7 +42,7 @@
         {/block}
         {if $HOOK_PAYMENT}
             {if !$opc}
-                {block name='order-payment-classic-cart-summary'}
+                {block name='order_payment_classic_cart_summary'}
                     <div id="order-detail-content" class="table_block table-responsive">
                         <table id="cart_summary" class="table table-bordered">
                             <thead>
