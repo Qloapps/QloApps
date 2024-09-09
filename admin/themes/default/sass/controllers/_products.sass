@@ -2,19 +2,25 @@
     margin-left: 0px
 
 #deactiveDatesModal
-    .fc-event-end, .fc-event-start
-        margin-left: unset !important
-        margin-right: unset !important
+    .fc-popover-body .fc-daygrid-event-harness
+        .fc-event-end, .fc-event-start
+            margin-left: unset
+            margin-right: unset
     .fc-popover.fc-more-popover
         max-width: 450px
     .fc-daygrid-event
         box-shadow: 0px 1px 2px 0px rgba(171, 171, 171, 0.3)
         border-radius: 4px
-    .fc-daygrid-day-frame
-        min-height: 100px !important
-    .calendar_hover_highlight
-        border-color: #CAE4FF !important
-        background: #CAE4FF !important
+    .fc-daygrid-day-bg
+        min-height: 40px
+    .fc-h-event.fc-event
+        border-color: #FFFFFF
+        background: #FFFFFF
+    .fc-h-event .fc-event-main
+        color: #333333
+    .fc-h-event.fc-event.calendar_hover_highlight
+        border-color: #CAE4FF
+        background: #CAE4FF
     .fc-event-title-container
         cursor: pointer
         padding: 4px

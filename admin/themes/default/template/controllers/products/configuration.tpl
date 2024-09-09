@@ -717,7 +717,6 @@
             direction:{if isset($language_is_rtl) && $language_is_rtl}'rtl'{else}'ltr'{/if},
             locale:{if isset($locale) && $locale}'{$locale}'{else}'en'{/if},
             unselectAuto: true,
-            eventTextColor: '#333333',
             contentHeight: 'auto',
             views: {
                 dayGridMonth: {
@@ -981,9 +980,7 @@
                             'date_to_formatted': dateInfo['date_to'],
                             'date_from_formatted': dateInfo['date_from'],
                             'id_event' : dateInfo['id_event'],
-                            'event_url' : dateInfo['event_url'],
-                            'backgroundColor': '#FFFFFF',
-                            'borderColor': '#FFFFFF'
+                            'event_url' : dateInfo['event_url']
                         });
                     });
                     DisableDatesCalendar.addEventSource(events);
@@ -1163,9 +1160,7 @@
                                 'event_title' : response.event_title,
                                 'id_event' : '',
                                 'event_url' : '',
-                                'date_add' : "{date('Y-m-d H:i:s')}",
-                                'backgroundColor': '#FFFFFF',
-                                'borderColor': '#FFFFFF'
+                                'date_add' : "{date('Y-m-d H:i:s')}"
                             }
 
                             if (!isNaN(eventId)) {
