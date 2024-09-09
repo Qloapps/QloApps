@@ -213,7 +213,7 @@ class RoomTypeServiceProductOrderDetail extends ObjectModel
             INNER JOIN `'._DB_PREFIX_.'htl_room_type_service_product_order_detail` rsod ON(rsod.`id_htl_booking_detail` = hbd.`id`)';
 
         $sql .= ' LEFT JOIN `'._DB_PREFIX_.'order_detail` od ON(od.`id_order_detail` = rsod.`id_order_detail`)';
-        $sql .= ' INNER JOIN `'._DB_PREFIX_.'product` p ON (p.`id_product` = rsod.`id_product`)';
+        $sql .= ' LEFT JOIN `'._DB_PREFIX_.'product` p ON (p.`id_product` = rsod.`id_product`)';
 
         $sql .= ' WHERE hbd.`id` = '.(int)$idHotelBookingDetail;
 
