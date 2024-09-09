@@ -84,7 +84,7 @@ class WebserviceSpecificManagementBookingsCore Extends ObjectModel implements We
             ),
             'price_details' => array(
                 'only_leaf_nodes' => true,
-                'total_paid' => array('type' => self::TYPE_FLOAT, 'required' => true, 'validate' => 'isPrice'),
+                'total_paid' => array('type' => self::TYPE_FLOAT, 'validate' => 'isPrice'),
             ),
             'payment_detail' => array(
                 'only_leaf_nodes' => true,
@@ -128,6 +128,8 @@ class WebserviceSpecificManagementBookingsCore Extends ObjectModel implements We
                                 'fields' => array(
                                     'id_service' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedInt'),
                                     'quantity' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedInt'),
+                                    'price_mode' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedInt'),
+                                    'name' => array('type' => self::TYPE_STRING, 'validate' => 'isString'),
                                     'unit_price_without_tax' => array('type' => self::TYPE_FLOAT, 'validate' => 'isPrice'),
                                     'total_price_without_tax' => array('type' => self::TYPE_FLOAT, 'validate' => 'isPrice'),
                                     'id_tax_rules_group' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedInt'),
