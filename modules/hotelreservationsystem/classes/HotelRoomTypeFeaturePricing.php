@@ -725,9 +725,8 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
                 Product::PRICE_ADDITION_TYPE_WITH_ROOM,
                 true,
                 $id_cart,
-                $id_guest,
-                $use_reduc,
-                $id_room
+                $id_room,
+                $use_reduc
             )) {
                 foreach($servicesWithTax as $service) {
                     $totalPrice['total_price_tax_incl'] += $service['price'];
@@ -740,9 +739,8 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
                 Product::PRICE_ADDITION_TYPE_WITH_ROOM,
                 false,
                 $id_cart,
-                $id_guest,
-                $use_reduc,
-                $id_room
+                $id_room,
+                $use_reduc
             )) {
                 foreach($servicesWithoutTax as $service) {
                     $totalPrice['total_price_tax_excl'] += $service['price'];

@@ -1598,9 +1598,9 @@ class HotelCartBookingData extends ObjectModel
                                         $amountWithoutAutoAdd = $roomTypeDateRangePriceWithoutAutoAdd['total_price_tax_incl'];
                                         $totalPriceWithoutDiscount = $priceWithoutDiscount['total_price_tax_incl'];
                                     }
-                                    $cartHotelData[$prodKey]['date_diff'][$dateJoin]['amount'] = $amount * $varQty;
-                                    $cartHotelData[$prodKey]['date_diff'][$dateJoin]['total_price_without_discount'] = $totalPriceWithoutDiscount * $varQty;
-                                    $cartHotelData[$prodKey]['date_diff'][$dateJoin]['amount_without_auto_add'] = $amountWithoutAutoAdd * $varQty;
+                                    $cartHotelData[$prodKey]['date_diff'][$dateJoin]['amount'] += $amount;
+                                    $cartHotelData[$prodKey]['date_diff'][$dateJoin]['total_price_without_discount'] += $totalPriceWithoutDiscount;
+                                    $cartHotelData[$prodKey]['date_diff'][$dateJoin]['amount_without_auto_add'] += $amountWithoutAutoAdd;
                                 } else {
                                     $cartHotelData[$prodKey]['date_diff'][$dateJoin]['demand_price'] = $totalAdditionalServicePrice;
                                     $numDays = $objBookingDetail->getNumberOfDays($data_v['date_from'], $data_v['date_to']);
