@@ -33,7 +33,7 @@
             </div>
             <div class="col-xs-8 col-sm-9 col-md-10">
                 <div class="row">
-                    {block name='service_products_list_row_details'}
+                    {block name='service_products_list_row_detail'}
                         <div class="col-sm-12 clearfix service-product-block">
                             <span class="service-product-name">{$product['name']}</span>
                         </div>

@@ -35,7 +35,7 @@
 							</a>
 						</div>
 					{/block}
-					{block name='room_type_list_room_details'}
+					{block name='room_type_list_room_detail'}
 						<div class="col-sm-8 room_info_cont">
 							{block name='room_type_list_room_quantity'}
 								<div class="row">
@@ -47,10 +47,12 @@
 									{/if}
 								</div>
 							{/block}
-							<div class="rm_desc">{$room_v['description']|truncate:190:"":true}&nbsp;<a class="view_more" href="{$room_v['product_link']|escape:'htmlall':'UTF-8'}">{l s='View More'}....</a></div>
-							{block name='room_type_list_room_features'}
-								<div class="room_features_cont">
-									<div class="row">
+							{block name='room_type_list_room_description'}
+								<div class="rm_desc">{$room_v['description']|truncate:190:"":true}&nbsp;<a class="view_more" href="{$room_v['product_link']|escape:'htmlall':'UTF-8'}">{l s='View More'}....</a></div>
+							{/block}
+							<div class="room_features_cont">
+								<div class="row">
+									{block name='room_type_list_room_features'}
 										<div class="col-sm-12 col-md-5 col-lg-6">
 											{if !empty($room_v['feature'])}
 												<p class="rm_amenities_cont">
@@ -60,9 +62,13 @@
 												</p>
 											{/if}
 										</div>
+									{/block}
+									{block name='room_type_list_room_max_guests_mobile'}
 										<div class="col-sm-12 hidden-md hidden-lg">
 											<p class="capa_txt"><span>{$room_v['max_guests']|escape:'htmlall':'UTF-8'} {l s='Max guests:'}</span><span class="capa_data"> {$room_v['max_adults']|escape:'htmlall':'UTF-8'} {l s='Adults'}, {$room_v['max_children']|escape:'htmlall':'UTF-8'} {if $room_v['children'] > 1}{l s='Children'}{else}{l s='Child'}{/if}</span></p>
 										</div>
+									{/block}
+									{block name='room_type_list_room_price'}
 										<div class="col-sm-12 col-md-7 col-lg-6">
 											{if !isset($restricted_country_mode) && !$PS_CATALOG_MODE && !$order_date_restrict}
 
@@ -81,12 +87,16 @@
 												</p>
 											{/if}
 										</div>
-									</div>
-									<div class="row">
+									{/block}
+								</div>
+								<div class="row">
+									{block name='room_type_list_room_max_guests'}
 										<div class="col-sm-12 col-md-6 col-lg-4 visible-md visible-lg">
 											<div class="capa_txt"><span>{$room_v['max_guests']|escape:'htmlall':'UTF-8'} {l s='Max guests:'}</span><br><span class="capa_data"> {$room_v['max_adults']|escape:'htmlall':'UTF-8'} {l s='Adults'}, {$room_v['max_children']|escape:'htmlall':'UTF-8'} {if $room_v['children'] > 1}{l s='Children'}{else}{l s='Child'}{/if}</span></div>
 										</div>
-										<div class="col-sm-12 col-md-6 col-lg-8">
+									{/block}
+									<div class="col-sm-12 col-md-6 col-lg-8">
+										{block name='room_type_list_room_booking_fields'}
 											<div class="booking_room_fields">
 												{if !isset($restricted_country_mode) && !$PS_CATALOG_MODE && !$order_date_restrict}
 													{if isset($occupancy_required_for_booking) && $occupancy_required_for_booking}
@@ -99,15 +109,17 @@
 															{include file="./quantity_field.tpl" total_available_rooms=$room_v['room_left']}
 														</div>
 													{/if}
-													<div>
-														<a cat_rm_check_in="{$booking_date_from|escape:'htmlall':'UTF-8'}" cat_rm_check_out="{$booking_date_to|escape:'htmlall':'UTF-8'}" href="" rm_product_id="{$room_v['id_product']}" cat_rm_book_nm_days="{$num_days|escape:'htmlall':'UTF-8'}" data-id-product-attribute="0" data-id-product="{$room_v['id_product']|intval}" class="btn btn-default button button-medium ajax_add_to_cart_button"><span>{l s='Book Now'}</span></a>
-													</div>
+													{block name='room_type_list_room_book_now_button'}
+														<div>
+															<a cat_rm_check_in="{$booking_date_from|escape:'htmlall':'UTF-8'}" cat_rm_check_out="{$booking_date_to|escape:'htmlall':'UTF-8'}" href="" rm_product_id="{$room_v['id_product']}" cat_rm_book_nm_days="{$num_days|escape:'htmlall':'UTF-8'}" data-id-product-attribute="0" data-id-product="{$room_v['id_product']|intval}" class="btn btn-default button button-medium ajax_add_to_cart_button"><span>{l s='Book Now'}</span></a>
+														</div>
+													{/block}
 												{/if}
 											</div>
-										</div>
+										{/block}
 									</div>
 								</div>
-							{/block}
+							</div>
 						</div>
 					{/block}
 				</div>

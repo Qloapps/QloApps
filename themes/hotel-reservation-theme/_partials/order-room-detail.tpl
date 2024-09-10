@@ -27,7 +27,7 @@
                     </a>
                 </div>
             {/block}
-            {block name='order_room_detial_room_details'}
+            {block name='order_room_detial_room_detail'}
                 <div class="col-xs-9 col-sm-10 info-wrap">
                     <div class="row">
                         <div class="col-xs-12">

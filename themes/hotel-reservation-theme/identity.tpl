@@ -201,7 +201,7 @@
                             </div>
                         {/if}
 
-                        {block name='HOOK_CUSTOMER_IDENTITY_FORM'}
+                        {block name='displayCustomerIdentityForm'}
                             {if isset($HOOK_CUSTOMER_IDENTITY_FORM)}
                                 {$HOOK_CUSTOMER_IDENTITY_FORM}
                             {/if}

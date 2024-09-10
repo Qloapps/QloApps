@@ -32,7 +32,7 @@
     {block name='displayBeforeShoppingCartBlock'}
         {hook h="displayBeforeShoppingCartBlock"}
     {/block}
-    {block name='shopping_cart_details'}
+    {block name='shopping_cart_detail'}
         <div id="order-detail-content" class="table_block table-responsive">
             <table id="cart_summary" class="table table-bordered {if $PS_STOCK_MANAGEMENT}stock-management-on{else}stock-management-off{/if}">
                 <thead>

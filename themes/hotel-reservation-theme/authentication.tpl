@@ -415,7 +415,7 @@
 							</div>
 							<!-- END Account -->
 						</div>
-						{block name='HOOK_CREATE_ACCOUNT_FORM'}
+						{block name='displayCustomerAccountForm'}
 							{$HOOK_CREATE_ACCOUNT_FORM}
 						{/block}
 					</div>
@@ -449,7 +449,7 @@
 		{/if}-->
 		{block name='authentication_account_creation_form'}
 			<form action="{$link->getPageLink('authentication', true)|escape:'html':'UTF-8'}" method="post" id="account-creation_form" class="std box">
-				{block name='HOOK_CREATE_ACCOUNT_TOP'}
+				{block name='displayCustomerAccountFormTop'}
 					{$HOOK_CREATE_ACCOUNT_TOP}
 				{/block}
 				<div class="account_creation">
@@ -687,7 +687,7 @@
 						</p>
 					</div>
 				{/if}
-				{block name='HOOK_CREATE_ACCOUNT_FORM'}
+				{block name='displayCustomerAccountForm'}
 					{$HOOK_CREATE_ACCOUNT_FORM}
 				{/block}
 				<div class="submit clearfix">

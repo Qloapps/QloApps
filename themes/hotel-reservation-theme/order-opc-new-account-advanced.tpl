@@ -53,7 +53,7 @@
                             </div>
                         </div>
                         <div id="opc_account_form" class="unvisible">
-                            {block name='HOOK_CREATE_ACCOUNT_TOP'}
+                            {block name='displayCustomerAccountFormTop'}
                                 {$HOOK_CREATE_ACCOUNT_TOP}
                             {/block}
                             <!-- Error return block -->
@@ -371,7 +371,7 @@
                                 </div>
                                 <input type="hidden" name="alias_invoice" id="alias_invoice" value="{l s='My Invoice address'}" />
                             </div>
-                            {block name='HOOK_CREATE_ACCOUNT_FORM'}
+                            {block name='displayCustomerAccountForm'}
                                 {$HOOK_CREATE_ACCOUNT_FORM}
                             {/block}
                             <div class="submit opc-add-save clearfix">

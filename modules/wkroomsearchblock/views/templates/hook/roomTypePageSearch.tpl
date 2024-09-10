@@ -19,7 +19,7 @@
 
 {block name='room_type_page_search'}
 	{if isset($hotels_info) && count($hotels_info)}
-		{block name='room_type_page_search'}
+		{block name='room_type_page_search_input'}
 			{* searched information wrapper block*}
 			{if isset($search_data) && $search_data}
 				<div class="header-rmsearch-details-wrapper">
@@ -49,15 +49,17 @@
 		{/block}
 
 		{* search form wrapper block*}
-		<div class="header-rmsearch-wrapper">
-			<div class="container">
-				<div class="filter_header">
-					<p>{l s='Searched results for' mod='wkroomsearchblock'}</p>
+		{block name='room_type_page_search_form'}
+			<div class="header-rmsearch-wrapper">
+				<div class="container">
+					<div class="filter_header">
+						<p>{l s='Searched results for' mod='wkroomsearchblock'}</p>
+					</div>
+					{* search form *}
+					{include file="./searchForm.tpl"}
+					<a href="#" class="close_room_serach_wrapper"><img src="{$module_dir}views/img/icon-close.svg"></a>
 				</div>
-				{* search form *}
-				{include file="./searchForm.tpl"}
-				<a href="#" class="close_room_serach_wrapper"><img src="{$module_dir}views/img/icon-close.svg"></a>
 			</div>
-		</div>
+		{/block}
 	{/if}
 {/block}

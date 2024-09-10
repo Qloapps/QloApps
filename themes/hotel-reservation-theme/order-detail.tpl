@@ -24,41 +24,45 @@
 *}
 
 {block name='order_detail'}
-    {capture name=path}
-        <a href="{$link->getPageLink('my-account', true)|escape:'html':'UTF-8'}">
-            {l s='My account'}
-        </a>
-        <span class="navigation-pipe">
-            {$navigationPipe}
-        </span>
-        <a href="{$link->getPageLink('history', true)|escape:'html':'UTF-8'}">
-            {l s='Bookings'}
-        </a>
-        <span class="navigation-pipe">
-            {$navigationPipe}
-        </span>
-        <span class="navigation_page">
-            {l s='Booking details'}
-        </span>
-    {/capture}
+    {block name='order_detail_heading'}
+        {capture name=path}
+            <a href="{$link->getPageLink('my-account', true)|escape:'html':'UTF-8'}">
+                {l s='My account'}
+            </a>
+            <span class="navigation-pipe">
+                {$navigationPipe}
+            </span>
+            <a href="{$link->getPageLink('history', true)|escape:'html':'UTF-8'}">
+                {l s='Bookings'}
+            </a>
+            <span class="navigation-pipe">
+                {$navigationPipe}
+            </span>
+            <span class="navigation_page">
+                {l s='Booking details'}
+            </span>
+        {/capture}
 
-    <h1 class="page-heading bottom-indent">
-        {l s='Booking Details'}
-    </h1>
+        <h1 class="page-heading bottom-indent">
+            {l s='Booking Details'}
+        </h1>
+    {/block}
 
     {include file="$tpl_dir./errors.tpl"}
 
     {if isset($order) && $order}
-        <div class="row">
-            <div class="col-lg-12">
-                <div class="well well-md well-order-date">
-                    {l s='Booking Reference ' sprintf=$order->getUniqReference()}<strong>{$order->getUniqReference()}</strong>{l s=' - placed on'}
-                    <span title="{dateFormat date=$order->date_add full=1}">{dateFormat date=$order->date_add}</span>
+        {block name='order_detail_subheading'}
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="well well-md well-order-date">
+                        {l s='Booking Reference ' sprintf=$order->getUniqReference()}<strong>{$order->getUniqReference()}</strong>{l s=' - placed on'}
+                        <span title="{dateFormat date=$order->date_add full=1}">{dateFormat date=$order->date_add}</span>
+                    </div>
                 </div>
             </div>
-        </div>
+        {/block}
 
-        {block name='HOOK_ORDERDETAILDISPLAYED'}
+        {block name='displayOrderDetail'}
             {$HOOK_ORDERDETAILDISPLAYED}
         {/block}
 
@@ -817,185 +821,185 @@
         {/if}
 
         {block name='order_detail_refund_popups'}
-        {if isset($refund_allowed) && $refund_allowed}
-            <div style="display: none;">
-                <div id="create-new-refund-popup">
-                    <form id="form-cancel-booking">
-                        <input type="hidden" name="id_order" value="{$order->id}">
-                        <div class="card cancel-booking">
-                            <div class="card-header">
-                                {l s='Cancel Bookings'}
-                            </div>
-                            <div class="card-body">
-                                <div class="errors" style="display: none;"></div>
+            {if isset($refund_allowed) && $refund_allowed}
+                <div style="display: none;">
+                    <div id="create-new-refund-popup">
+                        <form id="form-cancel-booking">
+                            <input type="hidden" name="id_order" value="{$order->id}">
+                            <div class="card cancel-booking">
+                                <div class="card-header">
+                                    {l s='Cancel Bookings'}
+                                </div>
+                                <div class="card-body">
+                                    <div class="errors" style="display: none;"></div>
 
-                                <div class="col-xs-12">
-                                    <div class="row no-gutters">
-                                        <div class="col-xs-4">
-                                            <ul class="nav nav-tabs nav-stacked">
-                                                {assign var='flag_is_first_iteration' value=true}
-                                                {foreach from=$cart_htl_data key=data_k item=data_v}
-                                                    {foreach from=$data_v['date_diff'] key=rm_k item=rm_v}
-                                                        <li class="{if $flag_is_first_iteration}active{/if}">
-                                                            <a href="#room-info-tab-{$data_v.id_product}-{$rm_k}" class="" data-toggle="tab">
-                                                                <div class="room-type-name">{$data_v.name}</div>
-                                                                <div class="duration">{dateFormat date=$rm_v.data_form} - {dateFormat date=$rm_v.data_to}</div>
-                                                            </a>
-                                                        </li>
-                                                        {if $flag_is_first_iteration}{assign var='flag_is_first_iteration' value=false}{/if}
+                                    <div class="col-xs-12">
+                                        <div class="row no-gutters">
+                                            <div class="col-xs-4">
+                                                <ul class="nav nav-tabs nav-stacked">
+                                                    {assign var='flag_is_first_iteration' value=true}
+                                                    {foreach from=$cart_htl_data key=data_k item=data_v}
+                                                        {foreach from=$data_v['date_diff'] key=rm_k item=rm_v}
+                                                            <li class="{if $flag_is_first_iteration}active{/if}">
+                                                                <a href="#room-info-tab-{$data_v.id_product}-{$rm_k}" class="" data-toggle="tab">
+                                                                    <div class="room-type-name">{$data_v.name}</div>
+                                                                    <div class="duration">{dateFormat date=$rm_v.data_form} - {dateFormat date=$rm_v.data_to}</div>
+                                                                </a>
+                                                            </li>
+                                                            {if $flag_is_first_iteration}{assign var='flag_is_first_iteration' value=false}{/if}
+                                                        {/foreach}
                                                     {/foreach}
-                                                {/foreach}
-                                            </ul>
-                                        </div>
-                                        <div class="col-xs-8">
-                                            <div class="tab-content clearfix">
-                                                {assign var='flag_is_first_iteration' value=true}
-                                                {foreach from=$cart_htl_data key=data_k item=data_v}
-                                                    {foreach from=$data_v['date_diff'] key=rm_k item=rm_v}
-                                                        <div id="room-info-tab-{$data_v.id_product}-{$rm_k}" class="tab-pane {if $flag_is_first_iteration}active{/if}">
-                                                            <div class="room-type-summary clearfix">
-                                                                <p class="room-type-name">{$data_v.name}</p>
-                                                                <div class="col-xs-3">
-                                                                    <p>{l s='Total Rooms'}</p>
-                                                                    <strong>{$rm_v.num_rm|string_format:'%02d'}</strong>
-                                                                </div>
-                                                                <div class="col-xs-3">
-                                                                    <p>{l s='Cancelled Rooms'}</p>
-                                                                    <strong>{($rm_v.count_cancelled + $rm_v.count_refunded)|string_format:'%02d'}</strong>
-                                                                </div>
-                                                            </div>
-                                                            <div class="rooms-summary">
-                                                                {foreach from=$rm_v['hotel_booking_details'] item=$hotel_booking_detail name=foreachRefundRooms}
-                                                                    {assign var=is_room_cancelled value=(isset($refundReqBookings) && in_array($hotel_booking_detail.id_htl_booking, $refundReqBookings))}
-                                                                    <div class="room-details {if $is_room_cancelled || ($hotel_booking_detail.id_status != $ROOM_STATUS_ALLOTED)}cancelled{/if} clearfix">
-                                                                        <div class="occupancy-wrap">
-                                                                            <div class="checkbox">
-                                                                                <label for="bookings_to_refund_{$hotel_booking_detail.id_htl_booking}">
-                                                                                    <input type="checkbox" class="bookings_to_refund" id="bookings_to_refund_{$hotel_booking_detail.id_htl_booking}" name="bookings_to_refund[]" value="{$hotel_booking_detail.id_htl_booking|escape:'html':'UTF-8'}" {if $is_room_cancelled || ($hotel_booking_detail.id_status != $ROOM_STATUS_ALLOTED)}disabled{/if}/>
-                                                                                    {l s='Room'} - {$smarty.foreach.foreachRefundRooms.iteration|string_format:'%02d'}
-                                                                                </label>
-
-                                                                                <span>({$hotel_booking_detail.adults|string_format:'%02d'} {if $hotel_booking_detail.adults > 1}{l s='Adults'}{else}{l s='Adult'}{/if}{if $hotel_booking_detail.children > 0}{l s=', '}{$hotel_booking_detail.children|string_format:'%02d'} {if $hotel_booking_detail.children > 1}{l s='Children'}{else}{l s='Child'}{/if}{/if})</span>
-                                                                                {if $hotel_booking_detail.is_cancelled}<span class="badge badge-danger badge-cancelled">{l s='Cancelled'}</span>{else if $hotel_booking_detail.is_refunded}<span class="badge badge-danger badge-cancelled">{l s='Refunded'}</span>{else if $hotel_booking_detail.refund_denied}<span class="badge badge-danger badge-cancelled">{l s='Refund denied'}</span> <i class="icon-info-circle refund-denied-info" data-refund_denied_info="{l s='Refund for this booking is denied. Please contact admin for more detail.'}"></i>{else if $hotel_booking_detail.id_status != $ROOM_STATUS_ALLOTED}<span class="badge badge-danger badge-cancelled">{if $hotel_booking_detail.id_status == $ROOM_STATUS_CHECKED_OUT}{l s='Checked-Out'}{else}{l s='Checked-In'}{/if}</span>{/if}
-                                                                            </div>
-                                                                        </div>
-
-                                                                        {* Services are indexed with id_htl_booking *}
-                                                                        {assign var='has_services' value=(isset($rm_v.additional_services) && isset($rm_v.additional_services[$hotel_booking_detail.id_htl_booking]) && isset($rm_v.additional_services[$hotel_booking_detail.id_htl_booking]['additional_services']))}
-                                                                        {* Additional Facilities are indexed with id_room *}
-                                                                        {assign var='has_facilities' value=(isset($rm_v.extra_demands) && isset($rm_v.extra_demands[$hotel_booking_detail.id_room]) && isset($rm_v.extra_demands[$hotel_booking_detail.id_room]['extra_demands']))}
-                                                                        {if $has_services || $has_facilities}
-                                                                            <div class="extra-services-wrap clearfix">
-                                                                                {if $has_services}
-                                                                                    <div class="services-wrap clearfix">
-                                                                                        <div class="col-xs-3">
-                                                                                            <strong>{l s='Services'}</strong>
-                                                                                        </div>
-                                                                                        <div class="col-xs-9">
-                                                                                            {foreach from=$rm_v.additional_services[$hotel_booking_detail.id_htl_booking]['additional_services'] item=service}
-                                                                                                <span class="service">{$service.name}</span>
-                                                                                            {/foreach}
-                                                                                        </div>
-                                                                                    </div>
-                                                                                {/if}
-                                                                                {if $has_facilities}
-                                                                                    <div class="facilities-wrap clearfix">
-                                                                                        <div class="col-xs-3">
-                                                                                            <strong>{l s='Facilities'}</strong>
-                                                                                        </div>
-                                                                                        <div class="col-xs-9">
-                                                                                            {foreach from=$rm_v.extra_demands[$hotel_booking_detail.id_room]['extra_demands'] item=facility}
-                                                                                                <span class="facility">{$facility.name}</span>
-                                                                                            {/foreach}
-                                                                                        </div>
-                                                                                    </div>
-                                                                                {/if}
-                                                                            </div>
-                                                                        {else}
-                                                                            <div class="extra-services-wrap clearfix">
-                                                                                <p class="text-muted">{l s='No extra services added for this room.'}</p>
-                                                                            </div>
-                                                                        {/if}
+                                                </ul>
+                                            </div>
+                                            <div class="col-xs-8">
+                                                <div class="tab-content clearfix">
+                                                    {assign var='flag_is_first_iteration' value=true}
+                                                    {foreach from=$cart_htl_data key=data_k item=data_v}
+                                                        {foreach from=$data_v['date_diff'] key=rm_k item=rm_v}
+                                                            <div id="room-info-tab-{$data_v.id_product}-{$rm_k}" class="tab-pane {if $flag_is_first_iteration}active{/if}">
+                                                                <div class="room-type-summary clearfix">
+                                                                    <p class="room-type-name">{$data_v.name}</p>
+                                                                    <div class="col-xs-3">
+                                                                        <p>{l s='Total Rooms'}</p>
+                                                                        <strong>{$rm_v.num_rm|string_format:'%02d'}</strong>
                                                                     </div>
-                                                                {/foreach}
+                                                                    <div class="col-xs-3">
+                                                                        <p>{l s='Cancelled Rooms'}</p>
+                                                                        <strong>{($rm_v.count_cancelled + $rm_v.count_refunded)|string_format:'%02d'}</strong>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="rooms-summary">
+                                                                    {foreach from=$rm_v['hotel_booking_details'] item=$hotel_booking_detail name=foreachRefundRooms}
+                                                                        {assign var=is_room_cancelled value=(isset($refundReqBookings) && in_array($hotel_booking_detail.id_htl_booking, $refundReqBookings))}
+                                                                        <div class="room-details {if $is_room_cancelled || ($hotel_booking_detail.id_status != $ROOM_STATUS_ALLOTED)}cancelled{/if} clearfix">
+                                                                            <div class="occupancy-wrap">
+                                                                                <div class="checkbox">
+                                                                                    <label for="bookings_to_refund_{$hotel_booking_detail.id_htl_booking}">
+                                                                                        <input type="checkbox" class="bookings_to_refund" id="bookings_to_refund_{$hotel_booking_detail.id_htl_booking}" name="bookings_to_refund[]" value="{$hotel_booking_detail.id_htl_booking|escape:'html':'UTF-8'}" {if $is_room_cancelled || ($hotel_booking_detail.id_status != $ROOM_STATUS_ALLOTED)}disabled{/if}/>
+                                                                                        {l s='Room'} - {$smarty.foreach.foreachRefundRooms.iteration|string_format:'%02d'}
+                                                                                    </label>
+
+                                                                                    <span>({$hotel_booking_detail.adults|string_format:'%02d'} {if $hotel_booking_detail.adults > 1}{l s='Adults'}{else}{l s='Adult'}{/if}{if $hotel_booking_detail.children > 0}{l s=', '}{$hotel_booking_detail.children|string_format:'%02d'} {if $hotel_booking_detail.children > 1}{l s='Children'}{else}{l s='Child'}{/if}{/if})</span>
+                                                                                    {if $hotel_booking_detail.is_cancelled}<span class="badge badge-danger badge-cancelled">{l s='Cancelled'}</span>{else if $hotel_booking_detail.is_refunded}<span class="badge badge-danger badge-cancelled">{l s='Refunded'}</span>{else if $hotel_booking_detail.refund_denied}<span class="badge badge-danger badge-cancelled">{l s='Refund denied'}</span> <i class="icon-info-circle refund-denied-info" data-refund_denied_info="{l s='Refund for this booking is denied. Please contact admin for more detail.'}"></i>{else if $hotel_booking_detail.id_status != $ROOM_STATUS_ALLOTED}<span class="badge badge-danger badge-cancelled">{if $hotel_booking_detail.id_status == $ROOM_STATUS_CHECKED_OUT}{l s='Checked-Out'}{else}{l s='Checked-In'}{/if}</span>{/if}
+                                                                                </div>
+                                                                            </div>
+
+                                                                            {* Services are indexed with id_htl_booking *}
+                                                                            {assign var='has_services' value=(isset($rm_v.additional_services) && isset($rm_v.additional_services[$hotel_booking_detail.id_htl_booking]) && isset($rm_v.additional_services[$hotel_booking_detail.id_htl_booking]['additional_services']))}
+                                                                            {* Additional Facilities are indexed with id_room *}
+                                                                            {assign var='has_facilities' value=(isset($rm_v.extra_demands) && isset($rm_v.extra_demands[$hotel_booking_detail.id_room]) && isset($rm_v.extra_demands[$hotel_booking_detail.id_room]['extra_demands']))}
+                                                                            {if $has_services || $has_facilities}
+                                                                                <div class="extra-services-wrap clearfix">
+                                                                                    {if $has_services}
+                                                                                        <div class="services-wrap clearfix">
+                                                                                            <div class="col-xs-3">
+                                                                                                <strong>{l s='Services'}</strong>
+                                                                                            </div>
+                                                                                            <div class="col-xs-9">
+                                                                                                {foreach from=$rm_v.additional_services[$hotel_booking_detail.id_htl_booking]['additional_services'] item=service}
+                                                                                                    <span class="service">{$service.name}</span>
+                                                                                                {/foreach}
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    {/if}
+                                                                                    {if $has_facilities}
+                                                                                        <div class="facilities-wrap clearfix">
+                                                                                            <div class="col-xs-3">
+                                                                                                <strong>{l s='Facilities'}</strong>
+                                                                                            </div>
+                                                                                            <div class="col-xs-9">
+                                                                                                {foreach from=$rm_v.extra_demands[$hotel_booking_detail.id_room]['extra_demands'] item=facility}
+                                                                                                    <span class="facility">{$facility.name}</span>
+                                                                                                {/foreach}
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    {/if}
+                                                                                </div>
+                                                                            {else}
+                                                                                <div class="extra-services-wrap clearfix">
+                                                                                    <p class="text-muted">{l s='No extra services added for this room.'}</p>
+                                                                                </div>
+                                                                            {/if}
+                                                                        </div>
+                                                                    {/foreach}
+                                                                </div>
                                                             </div>
-                                                        </div>
-                                                        {if $flag_is_first_iteration}{assign var='flag_is_first_iteration' value=false}{/if}
+                                                            {if $flag_is_first_iteration}{assign var='flag_is_first_iteration' value=false}{/if}
+                                                        {/foreach}
                                                     {/foreach}
-                                                {/foreach}
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="card-footer">
-                                <div class="selected-rooms-wrap">
-                                    {l s='Selected Rooms: '}<span class="num-selected-rooms">{l s='00'}</span>
+                                <div class="card-footer">
+                                    <div class="selected-rooms-wrap">
+                                        {l s='Selected Rooms: '}<span class="num-selected-rooms">{l s='00'}</span>
+                                    </div>
+                                    <div class="actions-wrap">
+                                        <button class="btn btn-secondary btn-cancel">
+                                            {l s='Cancel'}
+                                        </button>
+                                        <button class="btn btn-primary btn-next">
+                                            {l s='Next'}
+                                        </button>
+                                    </div>
                                 </div>
-                                <div class="actions-wrap">
-                                    <button class="btn btn-secondary btn-cancel">
-                                        {l s='Cancel'}
-                                    </button>
-                                    <button class="btn btn-primary btn-next">
-                                        {l s='Next'}
-                                    </button>
-                                </div>
                             </div>
-                        </div>
 
-                        <div class="card cancel-booking-preview" style="display:none;">
-                            <div class="card-header">
-                                {l s='Cancellation Reason'}
-                            </div>
-                            <div class="card-body">
-                                <div class="errors" style="display: none;"></div>
-
-                                <div class="well well-sm">
-                                    <p class="text">{l s='Total Rooms to Cancel:'} <span class="count-total-rooms">{l s='00'}</span></p>
+                            <div class="card cancel-booking-preview" style="display:none;">
+                                <div class="card-header">
+                                    {l s='Cancellation Reason'}
                                 </div>
+                                <div class="card-body">
+                                    <div class="errors" style="display: none;"></div>
 
-                                <div class="form-group">
-                                    <label class="label">{l s='Mention reason for cancellation'}<sup>{l s='*'}</sup></label>
-                                    <textarea class="form-control cancellation_reason" name="cancellation_reason" rows="4" placeholder="{l s='Type here...'}"></textarea>
+                                    <div class="well well-sm">
+                                        <p class="text">{l s='Total Rooms to Cancel:'} <span class="count-total-rooms">{l s='00'}</span></p>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="label">{l s='Mention reason for cancellation'}<sup>{l s='*'}</sup></label>
+                                        <textarea class="form-control cancellation_reason" name="cancellation_reason" rows="4" placeholder="{l s='Type here...'}"></textarea>
+                                    </div>
+                                </div>
+                                <div class="card-footer clearfix">
+                                    <div class="pull-right">
+                                        <button class="btn btn-secondary btn-back">
+                                            {l s='Back'}
+                                        </button>
+                                        <button class="btn btn-primary btn-submit">
+                                            {l s='Submit'}
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="card-footer clearfix">
-                                <div class="pull-right">
-                                    <button class="btn btn-secondary btn-back">
-                                        {l s='Back'}
-                                    </button>
-                                    <button class="btn btn-primary btn-submit">
-                                        {l s='Submit'}
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-            </div>
-
-            <div id="popup-cancellation-submit-success" class="popup-cancellation-submit-success" style="display: none;">
-                <div class="card">
-                    <div class="text-center">
-                        <div><i class="icon icon-check-circle text-success"></i></div>
-                        <h3><b>{l s='Request submitted successfully'}</b></h3>
-                        <h4>{l s='Your cancellation request has been submitted successfully. Go to Booking Refund Requests page for further updates.'}</h4>
+                        </form>
                     </div>
                 </div>
-            </div>
 
-            <div id="popup-cancellation-order-cancel-success" class="popup-cancellation-submit-success" style="display: none;">
-                <div class="card">
-                    <div class="text-center">
-                        <div><i class="icon icon-check-circle text-success"></i></div>
-                        <h3><b>{l s='Booking cancelled successfully'}</b></h3>
-                        <h4>{l s='Your booking has been cancelled successfully.'}</h4>
+                <div id="popup-cancellation-submit-success" class="popup-cancellation-submit-success" style="display: none;">
+                    <div class="card">
+                        <div class="text-center">
+                            <div><i class="icon icon-check-circle text-success"></i></div>
+                            <h3><b>{l s='Request submitted successfully'}</b></h3>
+                            <h4>{l s='Your cancellation request has been submitted successfully. Go to Booking Refund Requests page for further updates.'}</h4>
+                        </div>
                     </div>
                 </div>
-            </div>
-        {/if}
 
-        <div id="popup-view-extra-services" class="popup-view-extra-services" style="display: none;"></div>
+                <div id="popup-cancellation-order-cancel-success" class="popup-cancellation-submit-success" style="display: none;">
+                    <div class="card">
+                        <div class="text-center">
+                            <div><i class="icon icon-check-circle text-success"></i></div>
+                            <h3><b>{l s='Booking cancelled successfully'}</b></h3>
+                            <h4>{l s='Your booking has been cancelled successfully.'}</h4>
+                        </div>
+                    </div>
+                </div>
+            {/if}
+            <div id="popup-view-extra-services" class="popup-view-extra-services" style="display: none;"></div>
+        {/block}
     {/if}
 
     {block name='order_detial_js_vars'}

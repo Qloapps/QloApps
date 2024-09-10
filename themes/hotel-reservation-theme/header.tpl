@@ -62,7 +62,7 @@
 			<script type="text/javascript" src="{$js_uri|escape:'html':'UTF-8'}"></script>
 			{/foreach}
 		{/if}
-		{block name='HOOK_HEADER'}
+		{block name='displayHeader'}
 			{$HOOK_HEADER}
 		{/block}
 		<!-- <link rel="stylesheet" href="http{if Tools::usingSecureMode()}s{/if}://fonts.googleapis.com/css?family=Open+Sans:300,600&amp;subset=latin,latin-ext" type="text/css" media="all" /> -->
@@ -96,36 +96,40 @@
 							</div>
 						</div>
 					</div>
-					<div id="nav-main">
-						<div class="container">
-							<div class="row">
-								{block name='displayNav'}
-									<nav>{hook h="displayNav"}</nav>
+					{block name='header_nav'}
+						<div id="nav-main">
+							<div class="container">
+								<div class="row">
+									{block name='displayNav'}
+										<nav>{hook h="displayNav"}</nav>
+									{/block}
+								</div>
+							</div>
+						</div>
+					{/block}
+					{block name='header_top'}
+						<div class="header-top">
+							<div class="container">
+								<div class="row">
+									<div class="col-xs-12">
+										<div id="header_logo">
+											<a href="{if isset($force_ssl) && $force_ssl}{$base_dir_ssl}{else}{$base_dir}{/if}" title="{$shop_name|escape:'html':'UTF-8'}">
+												<img class="logo img-responsive" src="{$logo_url}" alt="{$shop_name|escape:'html':'UTF-8'}"/>
+											</a>
+										</div>
+										<div class="header-top-menu">
+											{block name='displayFooter'}
+												{if isset($HOOK_TOP)}{$HOOK_TOP}{/if}
+											{/block}
+										</div>
+									</div>
+								</div>
+								{block name='displaySearchHotelPanel'}
+									{hook h='displaySearchHotelPanel'}
 								{/block}
 							</div>
 						</div>
-					</div>
-					<div class="header-top">
-						<div class="container">
-							<div class="row">
-								<div class="col-xs-12">
-									<div id="header_logo">
-										<a href="{if isset($force_ssl) && $force_ssl}{$base_dir_ssl}{else}{$base_dir}{/if}" title="{$shop_name|escape:'html':'UTF-8'}">
-											<img class="logo img-responsive" src="{$logo_url}" alt="{$shop_name|escape:'html':'UTF-8'}"/>
-										</a>
-									</div>
-									<div class="header-top-menu">
-										{block name='HOOK_TOP'}
-											{if isset($HOOK_TOP)}{$HOOK_TOP}{/if}
-										{/block}
-									</div>
-								</div>
-							</div>
-							{block name='displaySearchHotelPanel'}
-								{hook h='displaySearchHotelPanel'}
-							{/block}
-						</div>
-					</div>
+					{/block}
 					{block name='displayAfterHookTop'}
 						{hook h='displayAfterHookTop'}
 					{/block}

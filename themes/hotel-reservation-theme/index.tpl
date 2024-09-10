@@ -23,9 +23,9 @@
 *  International Registered Trademark & Property of PrestaShop SA
 *}
 
-{block name='HOOK_HOME_TAB_CONTENT'}
+{block name='displayHomeTabContent'}
 	{if isset($HOOK_HOME_TAB_CONTENT) && $HOOK_HOME_TAB_CONTENT|trim}
-		{block name='HOOK_HOME_TAB'}
+		{block name='displayHomeTab'}
 			{if isset($HOOK_HOME_TAB) && $HOOK_HOME_TAB|trim}
 				<ul id="home-page-tabs" class="nav nav-tabs clearfix">
 					{$HOOK_HOME_TAB}
@@ -35,7 +35,7 @@
 		<div class="tab-content">{$HOOK_HOME_TAB_CONTENT}</div>
 	{/if}
 {/block}
-{block name='HOOK_HOME'}
+{block name='displayHome'}
 	{if isset($HOOK_HOME) && $HOOK_HOME|trim}
 		<div class="clearfix">{$HOOK_HOME}</div>
 	{/if}

@@ -232,10 +232,12 @@
             </div>
         {/if}
     {/block}
-    <div class="form-group search_room_submit_block area-{$column_widths['search']}">
-        <button type="submit" class="btn btn btn-primary pull-right" name="search_room_submit" id="search_room_submit">
-            <span>{l s='Search Rooms' mod='wkroomsearchblock'}</span>
-        </button>
-    </div>
+    {block name='search_form_submit'}
+        <div class="form-group search_room_submit_block area-{$column_widths['search']}">
+            <button type="submit" class="btn btn btn-primary pull-right" name="search_room_submit" id="search_room_submit">
+                <span>{l s='Search Rooms' mod='wkroomsearchblock'}</span>
+            </button>
+        </div>
+    {/block}
 </form>
 {/block}

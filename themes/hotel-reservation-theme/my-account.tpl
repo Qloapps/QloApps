@@ -24,28 +24,34 @@
 *}
 
 {block name='my_account'}
-    {capture name=path}{l s='My account'}{/capture}
+    {block name='my_account_heading'}
+        {capture name=path}{l s='My account'}{/capture}
 
-    <h1 class="page-heading">{l s='My account'}</h1>
+        <h1 class="page-heading">{l s='My account'}</h1>
+    {/block}
     {if isset($account_created)}
         <p class="alert alert-success">
             {l s='Your account has been created.'}
         </p>
     {/if}
-    <p class="info-account">{l s='Welcome to your account. Here you can manage all of your personal information and orders.'}</p>
+    {block name='my_account_heading_info'}
+        <p class="info-account">{l s='Welcome to your account. Here you can manage all of your personal information and orders.'}</p>
+    {/block}
     <div class="row addresses-lists">
         <div class="col-xs-12 col-sm-6 col-lg-4">
-            <ul class="myaccount-link-list">
-                <li><a href="{$link->getPageLink('address', true)|escape:'html':'UTF-8'}" title="{l s='Address'}"><i class="icon-building"></i><span>{l s='Address'}</span></a></li>
-                <li><a href="{$link->getPageLink('history', true)|escape:'html':'UTF-8'}" title="{l s='Bookings'}"><i class="icon-list-ol"></i><span>{l s='Bookings'}</span></a></li>
-                {if $refundAllowed}
-                    <li><a href="{$link->getPageLink('order-follow', true)|escape:'html':'UTF-8'}" title="{l s='Booking refund requests'}"><i class="icon-refresh"></i><span>{l s='Booking refund requests'}</span></a></li>
-                {/if}
-                <li><a href="{$link->getPageLink('order-slip', true)|escape:'html':'UTF-8'}" title="{l s='Credit slips'}"><i class="icon-file-o"></i><span>{l s='Credit slips'}</span></a></li>
-                <li><a href="{$link->getPageLink('identity', true)|escape:'html':'UTF-8'}" title="{l s='Personal information'}"><i class="icon-user"></i><span>{l s='Personal information'}</span></a></li>
-            </ul>
+            {block name='my_account_link_list'}
+                <ul class="myaccount-link-list">
+                    <li><a href="{$link->getPageLink('address', true)|escape:'html':'UTF-8'}" title="{l s='Address'}"><i class="icon-building"></i><span>{l s='Address'}</span></a></li>
+                    <li><a href="{$link->getPageLink('history', true)|escape:'html':'UTF-8'}" title="{l s='Bookings'}"><i class="icon-list-ol"></i><span>{l s='Bookings'}</span></a></li>
+                    {if $refundAllowed}
+                        <li><a href="{$link->getPageLink('order-follow', true)|escape:'html':'UTF-8'}" title="{l s='Booking refund requests'}"><i class="icon-refresh"></i><span>{l s='Booking refund requests'}</span></a></li>
+                    {/if}
+                    <li><a href="{$link->getPageLink('order-slip', true)|escape:'html':'UTF-8'}" title="{l s='Credit slips'}"><i class="icon-file-o"></i><span>{l s='Credit slips'}</span></a></li>
+                    <li><a href="{$link->getPageLink('identity', true)|escape:'html':'UTF-8'}" title="{l s='Personal information'}"><i class="icon-user"></i><span>{l s='Personal information'}</span></a></li>
+                </ul>
+            {/block}
         </div>
-        {block name='HOOK_CUSTOMER_ACCOUNT'}
+        {block name='displayCustomerAccount'}
             {if $voucherAllowed || isset($HOOK_CUSTOMER_ACCOUNT) && $HOOK_CUSTOMER_ACCOUNT !=''}
                 <div class="col-xs-12 col-sm-6 col-lg-4">
                     <ul class="myaccount-link-list">

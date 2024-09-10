@@ -48,7 +48,7 @@
         {block name='order_opc_edit_guest_info_new_account_form'}
             <form action="{$link->getPageLink('authentication', true)|escape:'html':'UTF-8'}" method="post" id="new_account_form" class="std" autocomplete="on" autofill="on">
                 <div id="opc_account_form" class="unvisible">
-                    {block name='HOOK_CREATE_ACCOUNT_TOP'}
+                    {block name='displayCustomerAccountFormTop'}
                         {$HOOK_CREATE_ACCOUNT_TOP}
                     {/block}
                     <div style="display: none;" id="opc_account_saved" class="alert alert-success">
@@ -289,7 +289,7 @@
                             </div>
                         </div>
                     {/if}
-                    {block name='HOOK_CREATE_ACCOUNT_FORM'}
+                    {block name='displayCustomerAccountForm'}
                         {$HOOK_CREATE_ACCOUNT_FORM}
                     {/block}
                     <div class="submit opc-add-save clearfix">

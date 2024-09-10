@@ -35,7 +35,7 @@
                         {if $product->booking_product}
                             {if  !$order_date_restrict}
                                 <div class="row">
-                                    {block name='booking_form_dates_fields'}
+                                    {block name='booking_form_dates_field'}
                                         <div class="form-group col-sm-12">
                                             <label class="control-label">{l s='Check In - Check Out'}</label>
                                             <div class="form-control input-date" id="room_date_range"  autocomplete="off" placeholder="{l s='Check-in - Check-out'}"><span>{l s='Check-in'} &nbsp;<i class="icon icon-minus"></i>&nbsp; {l s='Check-out'}</span></div>
@@ -45,7 +45,7 @@
                                     {/block}
                                 </div>
                                 {if $total_available_rooms > 0}
-                                    {block name='booking_form_quantity_fields'}
+                                    {block name='booking_form_quantity_field'}
                                         <div class="row">
                                             <div class="form-group col-sm-12"{if !$product->available_for_order || $PS_CATALOG_MODE} style="display: none;"{/if}>
                                                 {if isset($occupancy_required_for_booking) && $occupancy_required_for_booking}
@@ -146,17 +146,19 @@
                                     {block name='booking_form_actions'}
                                         <div id="booking_action_block">
                                             <div class="row">
-                                                <div class="total_price_block col-xs-7 form-group">
-                                                    <label class="control-label">{l s='Subtotal'}</label>
-                                                    <p>
-                                                        {if $total_price && $total_price_without_discount > $total_price}
-                                                            <span class="room_type_old_price">
-                                                                {convertPrice price=$total_price_without_discount|floatval}
-                                                            </span>
-                                                        {/if}
-                                                        {convertPrice price=$total_price|floatval}
-                                                    </p>
-                                                </div>
+                                                {block name='booking_form_total_price'}
+                                                    <div class="total_price_block col-xs-7 form-group">
+                                                        <label class="control-label">{l s='Subtotal'}</label>
+                                                        <p>
+                                                            {if $total_price && $total_price_without_discount > $total_price}
+                                                                <span class="room_type_old_price">
+                                                                    {convertPrice price=$total_price_without_discount|floatval}
+                                                                </span>
+                                                            {/if}
+                                                            {convertPrice price=$total_price|floatval}
+                                                        </p>
+                                                    </div>
+                                                {/block}
                                                 {block name='booking_form_num_avail'}
                                                     {if $total_available_rooms <= $warning_count}
                                                         <div class="col-xs-5 form-group text-right num_quantity_alert">
@@ -178,14 +180,16 @@
                                                             {/foreach}
                                                         {/if}
                                                     </div>
-                                                    <p id="add_to_cart" class="buttons_bottom_block no-print">
-                                                        <button type="submit" name="Submit" class="exclusive book_now_submit">
-                                                            <span>
-                                                                {if isset($content_only) && $content_only && (isset($product->customization_required) && $product->customization_required)}{l s='Customize'}{else}{l s='Book Now'}{/if}
-                                                            </span>
-                                                            <span id="booking_action_loader"></span>
-                                                        </button>
-                                                    </p>
+                                                    {block name='booking_form_book_now_button'}
+                                                        <p id="add_to_cart" class="buttons_bottom_block no-print">
+                                                            <button type="submit" name="Submit" class="exclusive book_now_submit">
+                                                                <span>
+                                                                    {if isset($content_only) && $content_only && (isset($product->customization_required) && $product->customization_required)}{l s='Customize'}{else}{l s='Book Now'}{/if}
+                                                                </span>
+                                                                <span id="booking_action_loader"></span>
+                                                            </button>
+                                                        </p>
+                                                    {/block}
                                                 {/if}
                                             </div>
                                         </div>

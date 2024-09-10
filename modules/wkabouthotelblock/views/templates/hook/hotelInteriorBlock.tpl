@@ -24,9 +24,15 @@
                 {if $HOTEL_INTERIOR_HEADING && $HOTEL_INTERIOR_DESCRIPTION}
                     <div class="row home_block_desc_wrapper">
                         <div class="col-md-offset-1 col-md-10 col-lg-offset-2 col-lg-8">
-                            <p class="home_block_heading">{$HOTEL_INTERIOR_HEADING|escape:'htmlall':'UTF-8'}</p>
-                            <p class="home_block_description">{$HOTEL_INTERIOR_DESCRIPTION|escape:'htmlall':'UTF-8'}</p>
-                            {hook h="displayInteriorExtraContent"}
+                            {block name='hotel_interior_heading'}
+                                <p class="home_block_heading">{$HOTEL_INTERIOR_HEADING|escape:'htmlall':'UTF-8'}</p>
+                            {/block}
+                            {block name='hotel_interior_description'}
+                                <p class="home_block_description">{$HOTEL_INTERIOR_DESCRIPTION|escape:'htmlall':'UTF-8'}</p>
+                            {/block}
+                            {block name='displayInteriorExtraContent'}
+                                {hook h="displayInteriorExtraContent"}
+                            {/block}
                             <hr class="home_block_desc_line"/>
                         </div>
                     </div>

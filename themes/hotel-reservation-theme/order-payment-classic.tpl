@@ -37,7 +37,7 @@
             </div>
         {/block}
         <p class="block-small-header">{l s='PAYMENT RESOURCE'}</p>
-        {block name='HOOK_TOP_PAYMENT'}
+        {block name='displayPaymentTop'}
             <div id="HOOK_TOP_PAYMENT">{$HOOK_TOP_PAYMENT}</div>
         {/block}
         {if $HOOK_PAYMENT}
@@ -321,7 +321,7 @@
             {if $opc}
                 <div id="opc_payment_methods-content">
             {/if}
-            {block name='HOOK_PAYMENT'}
+            {block name='displayPayment'}
                 <div id="HOOK_PAYMENT">
                     {$HOOK_PAYMENT}
                 </div>

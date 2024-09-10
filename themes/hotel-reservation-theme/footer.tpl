@@ -33,7 +33,7 @@
 					{/block}
 				</div><!-- #columns -->
 			</div><!-- .columns-container -->
-			{block name='HOOK_FOOTER'}
+			{block name='displayFooter'}
 				{if isset($HOOK_FOOTER)}
 					{block name='displayFooterBefore'}
 						{hook h='displayFooterBefore'}

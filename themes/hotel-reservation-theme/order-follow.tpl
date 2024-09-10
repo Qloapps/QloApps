@@ -24,22 +24,25 @@
 *}
 
 {block name='order_follow'}
-	{capture name=path}
-		<a href="{$link->getPageLink('my-account', true)|escape:'html':'UTF-8'}">
-			{l s='My account'}
-		</a>
-		<span class="navigation-pipe">
-			{$navigationPipe}
-		</span>
-		<span class="navigation_page">
-			{l s='Booking refund requests'}
-		</span>
-	{/capture}
-
+	{block name='order_follow_heading'}
+		{capture name=path}
+			<a href="{$link->getPageLink('my-account', true)|escape:'html':'UTF-8'}">
+				{l s='My account'}
+			</a>
+			<span class="navigation-pipe">
+				{$navigationPipe}
+			</span>
+			<span class="navigation_page">
+				{l s='Booking refund requests'}
+			</span>
+		{/capture}
+	{/block}
 	<div class="panel">
-		<h1 class="page-heading bottom-indent">
-			<i class="icon-tasks"></i> &nbsp;{l s='Booking Refund Requests'}
-		</h1>
+		{block name='order_follow_subheading'}
+			<h1 class="page-heading bottom-indent">
+				<i class="icon-tasks"></i> &nbsp;{l s='Booking Refund Requests'}
+			</h1>
+		{/block}
 		{if $ordersReturns && $ordersReturns|count}
 			<div class="table-responsive wk-datatable-wrapper">
 				<table class="table table-bordered">

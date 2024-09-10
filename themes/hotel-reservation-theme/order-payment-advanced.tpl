@@ -56,7 +56,7 @@
         <p id="emptyCartWarning" class="alert alert-warning unvisible">{l s='Your shopping cart is empty.'}</p>
         <h2>{l s='Payment Options'}</h2>
         <!-- HOOK_ADVANCED_PAYMENT -->
-        {block name='HOOK_ADVANCED_PAYMENT'}
+        {block name='advancedPaymentOptions'}
             <div id="HOOK_ADVANCED_PAYMENT">
                 <div class="row">
                 <!-- Should get a collection of "PaymentOption" object -->
