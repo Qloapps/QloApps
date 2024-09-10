@@ -165,7 +165,7 @@
     <unit type="base_distance" value="m"/>
     <unit type="long_distance" value="km"/>
   </units>
-  <state>
+  <states>
     <state name="Bjelovarsko-bilogorska županija" iso_code="HR-07" country="HR" zone="Europe"/>
     <state name="Brodsko-posavska županija"       iso_code="HR-12" country="HR" zone="Europe"/>
     <state name="Dubrovačko-neretvanska županija" iso_code="HR-19" country="HR" zone="Europe"/>
@@ -187,5 +187,5 @@
     <state name="Vukovarsko-srijemska županija"   iso_code="HR-16" country="HR" zone="Europe"/>
     <state name="Zadarska županija"               iso_code="HR-13" country="HR" zone="Europe"/>
     <state name="Zagrebačka županija"             iso_code="HR-01" country="HR" zone="Europe"/> 
-  </state>
+  </states>
 </localizationPack>
