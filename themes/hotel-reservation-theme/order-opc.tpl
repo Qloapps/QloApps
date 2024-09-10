@@ -161,23 +161,25 @@
 
 																		{* proceed only if no order restrict errors are there *}
 																		{if !$orderRestrictErr}
-																			<hr>
-																			<div class="row">
-																				<div class="col-sm-12 proceed_btn_block">
-																					<a class="btn btn-default button button-medium pull-right" href="{$link->getPageLink('order-opc', null, null, ['proceed_to_payment' => 1])}" title="Proceed to Payment" rel="nofollow">
-																						<span>
-																							{l s='Proceed'}
-																						</span>
-																					</a>
-																					{if $isGuest}
-																						<a class="btn btn-default btn-edit-guest-info pull-right" href="#" rel="nofollow">
+																			{block name='order_opc_checkout_guest_detail_proceed_button'}
+																				<hr>
+																				<div class="row">
+																					<div class="col-sm-12 proceed_btn_block">
+																						<a class="btn btn-default button button-medium pull-right" href="{$link->getPageLink('order-opc', null, null, ['proceed_to_payment' => 1])}" title="Proceed to Payment" rel="nofollow">
 																							<span>
-																								{l s='Edit'}
+																								{l s='Proceed'}
 																							</span>
 																						</a>
-																					{/if}
+																						{if $isGuest}
+																							<a class="btn btn-default btn-edit-guest-info pull-right" href="#" rel="nofollow">
+																								<span>
+																									{l s='Edit'}
+																								</span>
+																							</a>
+																						{/if}
+																					</div>
 																				</div>
-																			</div>
+																			{/block}
 																		{/if}
 																	{else}
 																		<!-- Create account / Guest account / Login block -->

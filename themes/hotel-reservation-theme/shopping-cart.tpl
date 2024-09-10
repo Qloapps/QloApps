@@ -331,15 +331,17 @@
 
 				{* proceed only if no order restrict errors are there *}
 				{if !$orderRestrictErr}
-					<div class="row">
-						<div class="col-sm-12 proceed_btn_block">
-							<a class="btn btn-default button button-medium pull-right" href="{$link->getPageLink('order-opc', null, null, ['proceed_to_customer_dtl' => 1])}" title="Proceed to checkout" rel="nofollow">
-								<span>
-									{l s='Proceed'}
-								</span>
-							</a>
+					{block name='shopping_cart_proceed_button'}
+						<div class="row">
+							<div class="col-sm-12 proceed_btn_block">
+								<a class="btn btn-default button button-medium pull-right" href="{$link->getPageLink('order-opc', null, null, ['proceed_to_customer_dtl' => 1])}" title="Proceed to checkout" rel="nofollow">
+									<span>
+										{l s='Proceed'}
+									</span>
+								</a>
+							</div>
 						</div>
-					</div>
+					{/block}
 				{/if}
 			</div>
 		{/block}

@@ -694,9 +694,11 @@
 					<input type="hidden" name="email_create" value="1" />
 					<input type="hidden" name="is_new_customer" value="1" />
 					{if isset($back)}<input type="hidden" class="hidden" name="back" value="{$back|escape:'html':'UTF-8'}" />{/if}
-					<button type="submit" name="submitAccount" id="submitAccount" class="btn button button-medium">
-						<span>{l s='Register'}&nbsp;<i class="icon-chevron-right right"></i></span>
-					</button>
+					{block name='authentication_submit_account_button'}
+						<button type="submit" name="submitAccount" id="submitAccount" class="btn button button-medium">
+							<span>{l s='Register'}&nbsp;<i class="icon-chevron-right right"></i></span>
+						</button>
+					{/block}
 					<p class="pull-right required"><span><sup>*</sup>{l s='Required field'}</span></p>
 				</div>
 			</form>
