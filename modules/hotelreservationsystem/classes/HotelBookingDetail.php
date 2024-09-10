@@ -225,9 +225,6 @@ class HotelBookingDetail extends ObjectModel
             $params['occupancy'] = array();
         }
 
-        if (!isset($params['ratting'])) {
-            $params['ratting'] = -1;
-        }
         if (!isset($params['amenities'])) {
             $params['amenities'] = 0;
         }
@@ -237,6 +234,10 @@ class HotelBookingDetail extends ObjectModel
 
         if (!isset($params['only_search_data'])) {
             $params['only_search_data'] = 0;
+        }
+
+        if (!isset($params['full_detail'])) {
+            $params['full_detail'] = 0;
         }
 
         Hook::exec('actionBookingDataParamsModifier', array('params' => &$params));
@@ -399,7 +400,7 @@ class HotelBookingDetail extends ObjectModel
                 }
 
                 // Now we will formate the data after geting search result according to search type
-                $roomTypesDetail = $objRoomType->getRoomTypeDetailByRoomTypeIds($allowedIdRoomTypes);
+                $roomTypesDetail = $objRoomType->getRoomTypeDetailByRoomTypeIds($allowedIdRoomTypes, true, $full_detail);
                 if ($roomTypesDetail) {
                     // Formate data for response
                     $finalSearchResponse = array(
@@ -414,15 +415,12 @@ class HotelBookingDetail extends ObjectModel
                         $finalSearchResponse['stats']['total_rooms'] += $roomTypeDetail['numberOfRooms'];
                         $idProduct = $roomTypeDetail['id_product'];
 
-                        $roomTypeSearchData = array(
-                            'name' => (new Product((int) $idProduct, false, $this->context->cookie->id_lang))->name,
-                            'id_product' => $idProduct,
-                            'adults' => $roomTypeDetail['adults'],
-                            'children' => $roomTypeDetail['children'],
-                            'max_adults' => $roomTypeDetail['max_adults'],
-                            'max_children' => $roomTypeDetail['max_children'],
-                            'max_guests' => $roomTypeDetail['max_guests'],
-                            'data' => array(),
+                        $roomTypeSearchData = array_merge(
+                            $roomTypeDetail,
+                            array(
+                                'id_product' => $idProduct,
+                                'data' => array(),
+                            )
                         );
 
                         if ($search_unavai) {
@@ -1195,6 +1193,7 @@ class HotelBookingDetail extends ObjectModel
                 }
             }
             unset($datetimeObj);
+            unset($roomDetail);
 
             // If all dates are covered
             if (!$datesToCover) {
@@ -1634,7 +1633,6 @@ class HotelBookingDetail extends ObjectModel
      * @param [int]  $only_search_data [used for product page and category page for block cart]
      * @param [int]  $adults         []
      * @param [int]  $children      []
-     * @param []     $ratting       [description]
      * @param []     $amenities     [description]
      * @param []     $price         [description]
      * @param [int]  $id_cart       [Id of the cart]
@@ -1645,10 +1643,6 @@ class HotelBookingDetail extends ObjectModel
      */
     public function dataForFrontSearch($bookingParams)
     {
-        // if (Module::isInstalled('productcomments')) {
-        //     require_once _PS_MODULE_DIR_.'productcomments/ProductComment.php';
-        // }
-
         $this->context = Context::getContext();
 
         if (!isset($bookingParams['search_available'])) {
@@ -1664,6 +1658,7 @@ class HotelBookingDetail extends ObjectModel
             $bookingParams['search_unavai'] = 0;
         }
 
+        $bookingParams['full_detail'] = 1;
         $bookingData = $this->getBookingData($bookingParams);
 
         extract($this->getBookingDataParams($bookingParams));
@@ -1673,104 +1668,62 @@ class HotelBookingDetail extends ObjectModel
                 $objRoomType = new HotelRoomType();
 
                 foreach ($bookingData['rm_data'] as $key => $value) {
-                    if (empty($value['data']['available'])) {
+                    $product_feature = Product::getFrontFeaturesStatic($this->context->language->id, $value['id_product']);
+                    $prod_amen = array();
+                    if (!empty($amenities) && $amenities) {
+                        $prod_amen = $amenities;
+                        foreach ($product_feature as $a_key => $a_val) {
+                            if (($pa_key = array_search($a_val['id_feature'], $prod_amen)) !== false) {
+                                unset($prod_amen[$pa_key]);
+                                if (empty($prod_amen)) {
+                                    break;
+                                }
+                            }
+                        }
+                        if (!empty($prod_amen)) {
+                            unset($bookingData['rm_data'][$key]);
+                            continue;
+                        }
+                    }
+                    $productFeaturePrice = HotelRoomTypeFeaturePricing::getRoomTypeFeaturePricesPerDay($value['id_product'], $date_from, $date_to, self::useTax());
+                    if (!empty($price) && ($price['from'] > $productFeaturePrice || $price['to'] < $productFeaturePrice)) {
                         unset($bookingData['rm_data'][$key]);
-                    } else {
-                        $prod_ratting = 0;
-                        // if (Module::isInstalled('productcomments')) {
-                        //     $prod_ratting = ProductComment::getAverageGrade($value['id_product'])['grade'];
-                        // }
-                        // if (empty($prod_ratting)) {
-                        //     $prod_ratting = 0;
-                        // }
+                        continue;
+                    }
+                    if (count($value['data']['available'])) {
+                        $prod_price = Product::getPriceStatic($value['id_product'], self::useTax());
+                        $productPriceWithoutReduction = HotelRoomTypeFeaturePricing::getRoomTypeFeaturePricesPerDay($value['id_product'], $date_from, $date_to, self::useTax(), 0, 0, 0, 0, 1, 0);
+                        $cover_image_arr = Product::getCover($value['id_product']);
+                        if (!empty($cover_image_arr)) {
+                            $cover_img = $this->context->link->getImageLink($value['link_rewrite'], $value['id_product'].'-'.$cover_image_arr['id_image'], 'home_default');
+                        } else {
+                            $cover_img = $this->context->link->getImageLink($value['link_rewrite'], $this->context->language->iso_code.'-default', 'home_default');
+                        }
+                        $bookingData['rm_data'][$key]['image'] = $cover_img;
+                        $bookingData['rm_data'][$key]['feature'] = $product_feature;
+                        $bookingData['rm_data'][$key]['price'] = $prod_price;
+                        $bookingData['rm_data'][$key]['feature_price'] = $productFeaturePrice;
+                        $bookingData['rm_data'][$key]['price_without_reduction'] = $productPriceWithoutReduction;
+                        $bookingData['rm_data'][$key]['feature_price_diff'] = $productPriceWithoutReduction - $productFeaturePrice;
+                        $bookingData['rm_data'][$key]['room_left'] = count($bookingData['rm_data'][$key]['data']['available']);
 
-                        // if ($prod_ratting < $ratting && $ratting != -1) {
-                        //     unset($bookingData['rm_data'][$key]);
-                        // } else
-                        // {
-                        $product = new Product($value['id_product'], false, $this->context->language->id);
-
-                        $product_feature = $product->getFrontFeaturesStatic($this->context->language->id, $value['id_product']);
-
-                        $prod_amen = array();
-                        if (!empty($amenities) && $amenities) {
-                            $prod_amen = $amenities;
-                            foreach ($product_feature as $a_key => $a_val) {
-                                if (($pa_key = array_search($a_val['id_feature'], $prod_amen)) !== false) {
-                                    unset($prod_amen[$pa_key]);
-                                    if (empty($prod_amen)) {
-                                        break;
-                                    }
-                                }
-                            }
-                            if (!empty($prod_amen)) {
-                                unset($bookingData['rm_data'][$key]);
-                            }
+                        // create URL with the parameters from URL
+                        $urlData = array ('date_from' => $date_from, 'date_to' => $date_to);
+                        if (!isset($occupancy)) {
+                            $occupancy = Tools::getValue('occupancy');
+                        }
+                        if ($occupancy) {
+                            $urlData['occupancy'] = $occupancy;
+                        }
+                        if ($location = Tools::getValue('location')) {
+                            $urlData['location'] = $location;
                         }
 
-                        if (empty($prod_amen)) {
-                            $prod_price = Product::getPriceStatic($value['id_product'], self::useTax());
-                            $productPriceWithoutReduction = $product->getPriceWithoutReduct(!self::useTax());
-                            $productFeaturePrice = HotelRoomTypeFeaturePricing::getRoomTypeFeaturePricesPerDay($value['id_product'], $date_from, $date_to, self::useTax());
-                            $productFeaturePriceWithoutAutoAdd = HotelRoomTypeFeaturePricing::getRoomTypeFeaturePricesPerDay($value['id_product'], $date_from, $date_to, self::useTax(), 0, 0, 0, 0, 0);
-
-                            if (empty($price) || ($price['from'] <= $prod_price && $price['to'] >= $prod_price)) {
-                                $cover_image_arr = $product->getCover($value['id_product']);
-
-                                if (!empty($cover_image_arr)) {
-                                    $cover_img = $this->context->link->getImageLink($product->link_rewrite, $product->id.'-'.$cover_image_arr['id_image'], 'home_default');
-                                } else {
-                                    $cover_img = $this->context->link->getImageLink($product->link_rewrite, $this->context->language->iso_code.'-default', 'home_default');
-                                }
-
-                                $room_left = count($bookingData['rm_data'][$key]['data']['available']);
-
-                                $rm_dtl = $objRoomType->getRoomTypeInfoByIdProduct($value['id_product']);
-
-                                $bookingData['rm_data'][$key]['name'] = $product->name;
-                                $bookingData['rm_data'][$key]['image'] = $cover_img;
-                                $bookingData['rm_data'][$key]['description'] = $product->description_short;
-                                $bookingData['rm_data'][$key]['feature'] = $product_feature;
-                                $bookingData['rm_data'][$key]['price'] = $prod_price;
-                                $bookingData['rm_data'][$key]['feature_price'] = $productFeaturePrice;
-                                $bookingData['rm_data'][$key]['feature_price_withoout_auto_add'] = $productFeaturePriceWithoutAutoAdd;
-                                $bookingData['rm_data'][$key]['price_without_reduction'] = $productPriceWithoutReduction;
-                                $bookingData['rm_data'][$key]['price_without_reduction_with_auto_add'] = $productPriceWithoutReduction + ($productFeaturePrice - $productFeaturePriceWithoutAutoAdd);
-                                $bookingData['rm_data'][$key]['feature_price_diff'] = $bookingData['rm_data'][$key]['price_without_reduction_with_auto_add'] - $productFeaturePrice;
-
-                                // if ($room_left <= (int)Configuration::get('WK_ROOM_LEFT_WARNING_NUMBER'))
-                                $bookingData['rm_data'][$key]['room_left'] = $room_left;
-
-                                $bookingData['rm_data'][$key]['adults'] = $rm_dtl['adults'];
-                                $bookingData['rm_data'][$key]['children'] = $rm_dtl['children'];
-
-                                $bookingData['rm_data'][$key]['ratting'] = $prod_ratting;
-                                // if (Module::isInstalled('productcomments')) {
-                                //     $bookingData['rm_data'][$key]['num_review'] = ProductComment::getCommentNumber($value['id_product']);
-                                //  }
-
-                                // create URL with the parameters from URL
-                                $urlData = array ('date_from' => $date_from, 'date_to' => $date_to);
-                                if (!isset($occupancy)) {
-                                    $occupancy = Tools::getValue('occupancy');
-                                }
-                                if ($occupancy) {
-                                    $urlData['occupancy'] = $occupancy;
-                                }
-                                if ($location = Tools::getValue('location')) {
-                                    $urlData['location'] = $location;
-                                }
-
-                                if (Configuration::get('PS_REWRITING_SETTINGS')) {
-                                    $bookingData['rm_data'][$key]['product_link'] = $this->context->link->getProductLink($product).'?'.http_build_query($urlData);
-                                } else {
-                                    $bookingData['rm_data'][$key]['product_link'] = $this->context->link->getProductLink($product).'&'.http_build_query($urlData);
-                                }
-                            } else {
-                                unset($bookingData['rm_data'][$key]);
-                            }
+                        if (Configuration::get('PS_REWRITING_SETTINGS')) {
+                            $bookingData['rm_data'][$key]['product_link'] = $this->context->link->getProductLink($value['id_product']).'?'.http_build_query($urlData);
+                        } else {
+                            $bookingData['rm_data'][$key]['product_link'] = $this->context->link->getProductLink($value['id_product']).'&'.http_build_query($urlData);
                         }
-                        // }
                     }
                 }
             }
@@ -1902,6 +1855,7 @@ class HotelBookingDetail extends ObjectModel
     public function reallocateBooking($idHotelBooking, $idRoom, $priceDiffTaxExcl = 0)
     {
         $result = true;
+        $reallocatedBookingId = 0;
         // get the cart booking data for the given booking
         if (Validate::isLoadedObject($objOldHotelBooking = new HotelBookingDetail($idHotelBooking))) {
             $objHotelRoomInfo = new HotelRoomInformation($idRoom);
@@ -1912,7 +1866,10 @@ class HotelBookingDetail extends ObjectModel
 
                 $productQty = (int)$objOldHotelBooking->getNumberOfDays($objOldHotelBooking->date_from, $objOldHotelBooking->date_to);
                 $oldRoomPriceTaxExcl = $objOldHotelBooking->total_price_tax_excl / $productQty;
-                $newRoomPriceTaxExcl = $oldRoomPriceTaxExcl + $priceDiffTaxExcl;
+
+                // Calculate new room price per qty
+                $priceDiffPerQtyTaxExcl = $priceDiffTaxExcl / $productQty;
+                $newRoomPriceTaxExcl = $oldRoomPriceTaxExcl + $priceDiffPerQtyTaxExcl;
 
                 $totalRoomPriceTaxIncl = $objOldHotelBooking->total_price_tax_incl;
                 $totalRoomPriceTaxExcl = $objOldHotelBooking->total_price_tax_excl;
@@ -1936,6 +1893,7 @@ class HotelBookingDetail extends ObjectModel
                 $cart->add();
 
                 // Save context (in order to apply cart rule)
+                $this->context = Context::getContext();
                 $this->context->cart = $cart;
                 $this->context->customer = new Customer($objOrder->id_customer);
                 $this->context->currency = new Currency($objOrder->id_currency);
@@ -1947,7 +1905,7 @@ class HotelBookingDetail extends ObjectModel
                     $idNewRoomType,
                     $useTaxes,
                     null,
-                    2,
+                    6,
                     null,
                     false,
                     true,
@@ -1991,7 +1949,8 @@ class HotelBookingDetail extends ObjectModel
                         $objCartBookingData->id_product = $roomInfo['id_product'];
                         $objCartBookingData->id_room = $roomInfo['id_room'];
                         $objCartBookingData->id_hotel = $roomInfo['id_hotel'];
-                        $objCartBookingData->booking_type = 1;
+                        $objCartBookingData->booking_type = $objOldHotelBooking->booking_type;
+                        $objCartBookingData->comment = $objOldHotelBooking->comment;
                         $objCartBookingData->quantity = $productQty;
                         $objCartBookingData->date_from = $objOldHotelBooking->date_from;
                         $objCartBookingData->date_to = $objOldHotelBooking->date_to;
@@ -2016,18 +1975,6 @@ class HotelBookingDetail extends ObjectModel
                     return false;
                 }
 
-                $totalRoomTypePrice = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice(
-                    $idNewRoomType,
-                    $objCartBookingData->date_from,
-                    $objCartBookingData->date_to,
-                    0,
-                    Group::getCurrent()->id,
-                    $this->context->cart->id,
-                    $this->context->cookie->id_guest,
-                    $objCartBookingData->id_room,
-                    0
-                );
-
                 // Add product to cart
                 $updateQuantity = $cart->updateQty(
                     $productQty,
@@ -2046,7 +1993,7 @@ class HotelBookingDetail extends ObjectModel
                     $objOrderInvoice->total_paid_tax_incl += (float)($cart->getOrderTotal($useTaxes, $totalMethod));
                     $objOrderInvoice->total_products += (float)$cart->getOrderTotal(false, Cart::ONLY_PRODUCTS);
                     $objOrderInvoice->total_products_wt += (float)$cart->getOrderTotal($useTaxes, Cart::ONLY_PRODUCTS);
-                    $objOrderInvoice->update();
+                    $result &= $objOrderInvoice->update();
                 }
 
                 // Create Order detail information
@@ -2062,7 +2009,7 @@ class HotelBookingDetail extends ObjectModel
                 $objOrder->total_paid_tax_incl += (float)($cart->getOrderTotal($useTaxes, $totalMethod));
 
                 // Save changes of order
-                $objOrder->update();
+                $result &= $objOrder->update();
 
                 // Update Tax lines
                 $objOrderDetail->updateTaxAmount($objOrder);
@@ -2090,10 +2037,9 @@ class HotelBookingDetail extends ObjectModel
                         $objBookingDetail->id_hotel = $objCartBookingData->id_hotel;
                         $objBookingDetail->id_customer = $objOrder->id_customer;
                         $objBookingDetail->booking_type = $objCartBookingData->booking_type;
-                        $objBookingDetail->id_status = 1;
                         $objBookingDetail->comment = $objCartBookingData->comment;
+                        $objBookingDetail->id_status = 1;
                         $objBookingDetail->room_type_name = Product::getProductName($idNewRoomType, null, $objOrder->id_lang);
-
                         $objBookingDetail->date_from = $objCartBookingData->date_from;
                         $objBookingDetail->date_to = $objCartBookingData->date_to;
                         $objBookingDetail->adults = $objCartBookingData->adults;
@@ -2135,7 +2081,8 @@ class HotelBookingDetail extends ObjectModel
                             $objBookingDetail->check_out_time = $objHotelBranch->check_out;
                         }
 
-                        if ($objBookingDetail->save()) {
+                        if ($result &= $objBookingDetail->save()) {
+                            $reallocatedBookingId = $objBookingDetail->id;
                             // Get Booking Demands of the old booking to add in the new booking creation
                             $objBookingDemand = new HotelBookingDemands();
                             if ($oldBookingDemands = $objBookingDemand->getRoomTypeBookingExtraDemands(
@@ -2167,10 +2114,12 @@ class HotelBookingDetail extends ObjectModel
                             }
                         }
                     }
+                } else {
+                    return false;
                 }
 
                 // delete cart feature prices after room addition success
-                HotelRoomTypeFeaturePricing::deleteByIdCart($this->context->cart->id);
+                // HotelRoomTypeFeaturePricing::deleteByIdCart($this->context->cart->id);
 
                 // ===============================================================
                 // END: Add Process of the old booking
@@ -2184,58 +2133,94 @@ class HotelBookingDetail extends ObjectModel
                     $deleteQty = true;
                 } else {
                     // Calculate differences of price (Before / After)
-
-                    $objOldOrderDetail->total_price_tax_incl -= $totalRoomPriceTaxIncl;
-                    $objOldOrderDetail->total_price_tax_excl -= $totalRoomPriceTaxExcl;
+                    $objOldOrderDetail->total_price_tax_incl -= Tools::processPriceRounding(
+                        ($objOldOrderDetail->total_price_tax_incl - $totalRoomPriceTaxIncl),
+                        1,
+                        $objOrder->round_type,
+                        $objOrder->round_mode
+                    );
+                    $objOldOrderDetail->total_price_tax_excl -= Tools::processPriceRounding(
+                        ($objOldOrderDetail->total_price_tax_excl - $totalRoomPriceTaxExcl),
+                        1,
+                        $objOrder->round_type,
+                        $objOrder->round_mode
+                    );
 
                     $old_quantity = $objOldOrderDetail->product_quantity;
 
-                    $objOldOrderDetail->product_quantity = $old_quantity - $product_quantity;
+                    $objOldOrderDetail->product_quantity = $old_quantity - $productQty;
                     $objOldOrderDetail->reduction_percent = 0;
 
                     // update taxes
-                    $res &= $objOldOrderDetail->updateTaxAmount($objOrder);
+                    $result &= $objOldOrderDetail->updateTaxAmount($objOrder);
 
                     // Save order detail
-                    $res &= $objOldOrderDetail->update();
+                    $result &= $objOldOrderDetail->update();
                 }
 
                 // Update OrderInvoice of this OrderDetail
                 if ($objOldOrderDetail->id_order_invoice != 0) {
                     // values changes as values are calculated accoding to the quantity of the product by webkul
                     $objOrderInvoice = new OrderInvoice($objOldOrderDetail->id_order_invoice);
-                    $objOrderInvoice->total_paid_tax_excl -= $totalRoomPriceTaxExcl;
+                    $objOrderInvoice->total_paid_tax_excl = Tools::ps_round(
+                        ($objOrderInvoice->total_paid_tax_excl - $totalRoomPriceTaxExcl),
+                        _PS_PRICE_COMPUTE_PRECISION_
+                    );
                     $objOrderInvoice->total_paid_tax_excl = $objOrderInvoice->total_paid_tax_excl > 0 ? $objOrderInvoice->total_paid_tax_excl : 0;
 
-                    $objOrderInvoice->total_paid_tax_incl -= $totalRoomPriceTaxIncl;
+                    $objOrderInvoice->total_paid_tax_incl = Tools::ps_round(
+                        ($objOrderInvoice->total_paid_tax_incl - $totalRoomPriceTaxIncl),
+                        _PS_PRICE_COMPUTE_PRECISION_
+                    );
                     $objOrderInvoice->total_paid_tax_incl = $objOrderInvoice->total_paid_tax_incl > 0 ? $objOrderInvoice->total_paid_tax_incl : 0;
 
-                    $objOrderInvoice->total_products -= $totalRoomPriceTaxExcl;
+                    $objOrderInvoice->total_products = Tools::ps_round(
+                        ($objOrderInvoice->total_products - $totalRoomPriceTaxExcl),
+                        _PS_PRICE_COMPUTE_PRECISION_
+                    );
                     $objOrderInvoice->total_products = $objOrderInvoice->total_products > 0 ? $objOrderInvoice->total_products : 0;
 
-                    $objOrderInvoice->total_products_wt -= $totalRoomPriceTaxIncl;
+                    $objOrderInvoice->total_products_wt = Tools::ps_round(
+                        ($objOrderInvoice->total_products_wt - $totalRoomPriceTaxIncl),
+                        _PS_PRICE_COMPUTE_PRECISION_
+                    );
                     $objOrderInvoice->total_products_wt = $objOrderInvoice->total_products_wt > 0 ? $objOrderInvoice->total_products_wt : 0;
 
-                    $res &= $objOrderInvoice->update();
+                    $result &= $objOrderInvoice->update();
                 }
 
                 // values changes as values are calculated accoding to the quantity of the product by webkul
-                $objOrder->total_paid -= $totalRoomPriceTaxIncl;
+                $objOrder->total_paid = Tools::ps_round(
+                    ($objOrder->total_paid_tax_incl - $totalRoomPriceTaxIncl),
+                    _PS_PRICE_COMPUTE_PRECISION_
+                );
                 $objOrder->total_paid = $objOrder->total_paid > 0 ? $objOrder->total_paid : 0;
 
-                $objOrder->total_paid_tax_incl -= $totalRoomPriceTaxIncl;
+                $objOrder->total_paid_tax_incl = Tools::ps_round(
+                    ($objOrder->total_paid_tax_incl - $totalRoomPriceTaxIncl),
+                    _PS_PRICE_COMPUTE_PRECISION_
+                );
                 $objOrder->total_paid_tax_incl = $objOrder->total_paid_tax_incl > 0 ? $objOrder->total_paid_tax_incl : 0;
 
-                $objOrder->total_paid_tax_excl -= $totalRoomPriceTaxExcl;
+                $objOrder->total_paid_tax_excl = Tools::ps_round(
+                    ($objOrder->total_paid_tax_excl - $totalRoomPriceTaxExcl),
+                    _PS_PRICE_COMPUTE_PRECISION_
+                );
                 $objOrder->total_paid_tax_excl = $objOrder->total_paid_tax_excl > 0 ? $objOrder->total_paid_tax_excl : 0;
 
-                $objOrder->total_products -= $totalRoomPriceTaxExcl;
+                $objOrder->total_products = Tools::ps_round(
+                    ($objOrder->total_products - $totalRoomPriceTaxExcl),
+                    _PS_PRICE_COMPUTE_PRECISION_
+                );
                 $objOrder->total_products = $objOrder->total_products > 0 ? $objOrder->total_products : 0;
 
-                $objOrder->total_products_wt -= $totalRoomPriceTaxIncl;
+                $objOrder->total_products_wt = Tools::ps_round(
+                    ($objOrder->total_products_wt - $totalRoomPriceTaxIncl),
+                    _PS_PRICE_COMPUTE_PRECISION_
+                );
                 $objOrder->total_products_wt = $objOrder->total_products_wt > 0 ? $objOrder->total_products_wt : 0;
 
-                $objOrder->update();
+                $result &= $objOrder->update();
 
                 // Reinject quantity in stock
                 $objOldOrderDetail->reinjectQuantity($objOldOrderDetail, $objOldOrderDetail->product_quantity, $deleteQty);
@@ -2276,16 +2261,22 @@ class HotelBookingDetail extends ObjectModel
                 $objOldHotelBooking->is_back_order = 0;
 
                 $result &= $objOldHotelBooking->save();
+
+                $reallocatedBookingId = $objOldHotelBooking->id;
             }
 
-            if ($result) {
+            if ($result && $reallocatedBookingId) {
                 Hook::exec(
                     'actionRoomReallocateAfter',
                     array(
-                        'id_htl_booking' => $idHotelBooking,
-                        'id_room' => $idRoom
+                        'id_htl_booking_from' => $idHotelBooking,
+                        'id_htl_booking_to' => $reallocatedBookingId,
                     )
                 );
+
+                return $reallocatedBookingId;
+            } else {
+                $result = false;
             }
         } else {
             $result = false;
@@ -2519,7 +2510,7 @@ class HotelBookingDetail extends ObjectModel
         $newDateFrom,
         $newDateTo,
         $occupancy,
-        $newTotalPrice = null,
+        $newTotalPrice,
         $idHotelBookingDetail
     ) {
         $objHotelBookingDetail = new self((int) $idHotelBookingDetail);
@@ -2535,19 +2526,7 @@ class HotelBookingDetail extends ObjectModel
             $objHotelCartBookingData = new HotelCartBookingData($idHotelCartBookingData);
             if (Validate::isLoadedObject($objHotelCartBookingData)) {
                 // calculate new prices
-                $newTotalPriceTE = '';
-                $newTotalPriceTI = '';
                 $newNumDays = $this->getNumberOfDays($newDateFrom, $newDateTo);
-                if ($newTotalPrice) {
-                    $newTotalPriceTE = $newTotalPrice['tax_excl'];
-                    $newTotalPriceTI = $newTotalPrice['tax_incl'];
-                } else {
-                    $oldNumDays = $this->getNumberOfDays($oldDateFrom, $oldDateTo);
-                    $unitRoomPriceTE = $objHotelBookingDetail->total_price_tax_excl / $oldNumDays;
-                    $unitRoomPriceTI = $objHotelBookingDetail->total_price_tax_incl / $oldNumDays;
-                    $newTotalPriceTE = $unitRoomPriceTE * $newNumDays;
-                    $newTotalPriceTI = $unitRoomPriceTI * $newNumDays;
-                }
 
                 // update $objHotelCartBookingData
                 $objHotelCartBookingData->date_from = $newDateFrom;
@@ -2560,8 +2539,8 @@ class HotelBookingDetail extends ObjectModel
                 // update $objHotelBookingDetail
                 $objHotelBookingDetail->date_from = $newDateFrom;
                 $objHotelBookingDetail->date_to = $newDateTo;
-                $objHotelBookingDetail->total_price_tax_excl = Tools::ps_round($newTotalPriceTE, 6);
-                $objHotelBookingDetail->total_price_tax_incl = Tools::ps_round($newTotalPriceTI, 6);
+                $objHotelBookingDetail->total_price_tax_excl = $newTotalPrice['tax_excl'];
+                $objHotelBookingDetail->total_price_tax_incl = $newTotalPrice['tax_incl'];
                 $objHotelBookingDetail->adults = $occupancy['adults'];
                 $objHotelBookingDetail->children = $occupancy['children'];
                 $objHotelBookingDetail->child_ages = json_encode($occupancy['child_ages']);
@@ -3324,10 +3303,10 @@ class HotelBookingDetail extends ObjectModel
                 $objHotelBookingDemands = new HotelBookingDemands();
                 $objRoomTypeServiceProductOrderDetail = new RoomTypeServiceProductOrderDetail();
 
-                $reduction_amount['total_price_tax_excl'] = Tools::ps_round((float) $this->total_price_tax_excl, 6);
-                $reduction_amount['total_products_tax_excl'] = Tools::ps_round((float) $this->total_price_tax_excl, 6);
-                $reduction_amount['total_price_tax_incl'] = Tools::ps_round((float) $this->total_price_tax_incl, 6);
-                $reduction_amount['total_products_tax_incl'] = Tools::ps_round((float) $this->total_price_tax_incl, 6);
+                $reduction_amount['total_price_tax_excl'] = (float) $this->total_price_tax_excl;
+                $reduction_amount['total_products_tax_excl'] = (float) $this->total_price_tax_excl;
+                $reduction_amount['total_price_tax_incl'] = (float) $this->total_price_tax_incl;
+                $reduction_amount['total_products_tax_incl'] = (float) $this->total_price_tax_incl;
 
                 // reduce facilities amount from order and services_detail
                 if ($roomDemands = $objHotelBookingDemands->getRoomTypeBookingExtraDemands(
@@ -3343,8 +3322,8 @@ class HotelBookingDetail extends ObjectModel
                 )) {
                     foreach ($roomDemands as $roomDemand) {
                         $objHotelBookingDemands = new HotelBookingDemands($roomDemand['id_booking_demand']);
-                        $reduction_amount['total_price_tax_excl'] += Tools::ps_round((float) $objHotelBookingDemands->total_price_tax_excl, 6);
-                        $reduction_amount['total_price_tax_incl'] += Tools::ps_round((float) $objHotelBookingDemands->total_price_tax_incl, 6);
+                        $reduction_amount['total_price_tax_excl'] += (float) $objHotelBookingDemands->total_price_tax_excl;
+                        $reduction_amount['total_price_tax_incl'] += (float) $objHotelBookingDemands->total_price_tax_incl;
                         $objHotelBookingDemands->total_price_tax_excl = 0;
                         $objHotelBookingDemands->total_price_tax_incl = 0;
                         $objHotelBookingDemands->save();
@@ -3359,10 +3338,10 @@ class HotelBookingDetail extends ObjectModel
                         $objRoomTypeServiceProductOrderDetail = new RoomTypeServiceProductOrderDetail(
                             $roomService['id_room_type_service_product_order_detail']
                         );
-                        $reduction_amount['total_price_tax_excl'] += Tools::ps_round((float) $objRoomTypeServiceProductOrderDetail->total_price_tax_excl, 6);
-                        $reduction_amount['total_products_tax_excl'] += Tools::ps_round((float) $objRoomTypeServiceProductOrderDetail->total_price_tax_excl, 6);
-                        $reduction_amount['total_price_tax_incl'] += Tools::ps_round((float) $objRoomTypeServiceProductOrderDetail->total_price_tax_incl, 6);
-                        $reduction_amount['total_products_tax_incl'] += Tools::ps_round((float) $objRoomTypeServiceProductOrderDetail->total_price_tax_incl, 6);
+                        $reduction_amount['total_price_tax_excl'] += (float) $objRoomTypeServiceProductOrderDetail->total_price_tax_excl;
+                        $reduction_amount['total_products_tax_excl'] += (float) $objRoomTypeServiceProductOrderDetail->total_price_tax_excl;
+                        $reduction_amount['total_price_tax_incl'] += (float) $objRoomTypeServiceProductOrderDetail->total_price_tax_incl;
+                        $reduction_amount['total_products_tax_incl'] += (float) $objRoomTypeServiceProductOrderDetail->total_price_tax_incl;
 
                         if (Validate::isLoadedObject($objOrderDetail = new OrderDetail($objRoomTypeServiceProductOrderDetail->id_order_detail))) {
                             $objOrderDetail->product_quantity_refunded += $objRoomTypeServiceProductOrderDetail->quantity;
@@ -3370,13 +3349,17 @@ class HotelBookingDetail extends ObjectModel
                                 $objOrderDetail->product_quantity_refunded = $objOrderDetail->product_quantity;
                             }
 
-                            $objOrderDetail->total_price_tax_excl = Tools::ps_round(
-                                ($objOrderDetail->total_price_tax_excl - $objRoomTypeServiceProductOrderDetail->total_price_tax_excl),
-                                6
+                            $objOrderDetail->total_price_tax_excl -= Tools::processPriceRounding(
+                                $objOrderDetail->total_price_tax_excl,
+                                1,
+                                $objOrder->round_type,
+                                $objOrder->round_mode
                             );
-                            $objOrderDetail->total_price_tax_incl = Tools::ps_round(
-                                ($objOrderDetail->total_price_tax_incl - $objRoomTypeServiceProductOrderDetail->total_price_tax_incl),
-                                6
+                            $objOrderDetail->total_price_tax_incl -= Tools::processPriceRounding(
+                                $objOrderDetail->total_price_tax_incl,
+                                1,
+                                $objOrder->round_type,
+                                $objOrder->round_mode
                             );
 
                             $objOrderDetail->save();
@@ -3404,42 +3387,44 @@ class HotelBookingDetail extends ObjectModel
 
                 if (!$hasOrderDiscountOrPayment) {
                     // reduce room amount from order and order detail
-                    $objOrderDetail->total_price_tax_incl = Tools::ps_round(
-                        ($objOrderDetail->total_price_tax_incl - $this->total_price_tax_incl),
-                        6
+                    $objOrderDetail->total_price_tax_incl -= Tools::processPriceRounding(
+                        $this->total_price_tax_incl,
+                        1,
+                        $objOrder->round_type,
+                        $objOrder->round_mode
                     );
-                    $objOrderDetail->total_price_tax_excl = Tools::ps_round(
-                        ($objOrderDetail->total_price_tax_excl - $this->total_price_tax_excl),
-                        6
+
+                    $objOrderDetail->total_price_tax_excl -= Tools::processPriceRounding(
+                        $this->total_price_tax_excl,
+                        1,
+                        $objOrder->round_type,
+                        $objOrder->round_mode
                     );
+
                     if (Validate::isLoadedObject($objOrder = new Order($this->id_order))) {
                         $objOrder->total_paid = Tools::ps_round(
                             ($objOrder->total_paid - $reduction_amount['total_price_tax_incl']),
-                            6
+                            _PS_PRICE_COMPUTE_PRECISION_
                         );
                         $objOrder->total_paid = $objOrder->total_paid > 0 ? $objOrder->total_paid : 0;
 
-                        $objOrder->total_paid_tax_excl = Tools::ps_round(
-                            ($objOrder->total_paid_tax_excl - $reduction_amount['total_price_tax_excl']),
-                            6
+                        $objOrder->total_paid_tax_excl = Tools::ps_round(($objOrder->total_paid_tax_excl - $reduction_amount['total_price_tax_excl']),
+                            _PS_PRICE_COMPUTE_PRECISION_
                         );
                         $objOrder->total_paid_tax_excl = $objOrder->total_paid_tax_excl > 0 ? $objOrder->total_paid_tax_excl : 0;
 
-                        $objOrder->total_paid_tax_incl = Tools::ps_round(
-                            ($objOrder->total_paid_tax_incl - $reduction_amount['total_price_tax_incl']),
-                            6
+                        $objOrder->total_paid_tax_incl = Tools::ps_round(($objOrder->total_paid_tax_incl - $reduction_amount['total_price_tax_incl']),
+                            _PS_PRICE_COMPUTE_PRECISION_
                         );
                         $objOrder->total_paid_tax_incl = $objOrder->total_paid_tax_incl > 0 ? $objOrder->total_paid_tax_incl : 0;
 
-                        $objOrder->total_products = Tools::ps_round(
-                            ($objOrder->total_products - $reduction_amount['total_products_tax_excl']),
-                            6
+                        $objOrder->total_products = Tools::ps_round(($objOrder->total_products - $reduction_amount['total_products_tax_excl']),
+                            _PS_PRICE_COMPUTE_PRECISION_
                         );
                         $objOrder->total_products = $objOrder->total_products > 0 ? $objOrder->total_products : 0;
 
-                        $objOrder->total_products_wt = Tools::ps_round(
-                            ($objOrder->total_products_wt - $reduction_amount['total_products_tax_incl']),
-                            6
+                        $objOrder->total_products_wt = Tools::ps_round(($objOrder->total_products_wt - $reduction_amount['total_products_tax_incl']),
+                            _PS_PRICE_COMPUTE_PRECISION_
                         );
                         $objOrder->total_products_wt = $objOrder->total_products_wt > 0 ? $objOrder->total_products_wt : 0;
 

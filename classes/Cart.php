@@ -186,6 +186,8 @@ class CartCore extends ObjectModel
     const ONLY_ROOM_SERVICES_WITH_AUTO_ADD_WITHOUT_CONVENIENCE_FEE = 17;
     const ONLY_CONVENIENCE_FEE = 18;
 
+    const ONLY_PRODUCTS_WITH_DEMANDS = 19;
+
     public function __construct($id = null, $id_lang = null)
     {
         parent::__construct($id);
@@ -366,8 +368,8 @@ class CartCore extends ObjectModel
      */
     public function getAverageProductsTaxRate(&$cart_amount_te = null, &$cart_amount_ti = null)
     {
-        $cart_amount_ti = $this->getOrderTotal(true, Cart::ONLY_PRODUCTS);
-        $cart_amount_te = $this->getOrderTotal(false, Cart::ONLY_PRODUCTS);
+        $cart_amount_ti = $this->getOrderTotal(true, Cart::ONLY_PRODUCTS_WITH_DEMANDS);
+        $cart_amount_te = $this->getOrderTotal(false, Cart::ONLY_PRODUCTS_WITH_DEMANDS);
 
         $cart_vat_amount = $cart_amount_ti - $cart_amount_te;
 
@@ -719,29 +721,6 @@ class CartCore extends ObjectModel
                 $cart_shop_context
             );
 
-            /*Before Changes by webkul*/
-            // switch (Configuration::get('PS_ROUND_TYPE'))
-            // {
-            // 	case Order::ROUND_TOTAL:
-            // 		$row['total'] = $row['price_with_reduction_without_tax'] * (int)$row['cart_quantity'];
-            // 		$row['total_wt'] = $row['price_with_reduction'] * (int)$row['cart_quantity'];
-            // 		break;
-            // 	case Order::ROUND_LINE:
-            // 		$row['total'] = Tools::ps_round($row['price_with_reduction_without_tax'] * (int)$row['cart_quantity'], _PS_PRICE_COMPUTE_PRECISION_);
-            // 		$row['total_wt'] = Tools::ps_round($row['price_with_reduction'] * (int)$row['cart_quantity'], _PS_PRICE_COMPUTE_PRECISION_);
-            // 		break;
-
-            // 	case Order::ROUND_ITEM:
-            // 	default:
-            // 		$row['total'] = Tools::ps_round($row['price_with_reduction_without_tax'], _PS_PRICE_COMPUTE_PRECISION_) * (int)$row['cart_quantity'];
-            // 		$row['total_wt'] = Tools::ps_round($row['price_with_reduction'], _PS_PRICE_COMPUTE_PRECISION_) * (int)$row['cart_quantity'];
-            // 		break;
-            // }
-            //$row['price_wt'] = $row['price_with_reduction'];
-            //
-            //
-            /*By Webkul */
-
             if ($row['booking_product']) {
                 if (Module::isInstalled('hotelreservationsystem') && Module::isEnabled('hotelreservationsystem')) {
                     require_once _PS_MODULE_DIR_.'hotelreservationsystem/define.php';
@@ -755,81 +734,57 @@ class CartCore extends ObjectModel
                     $priceDisplay = Group::getPriceDisplayMethod(Group::getCurrent()->id);
                     foreach ($roomTypesByIdProduct as $key => $cartRoomInfo) {
                         $roomTotalPrice = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice(
-                        $cartRoomInfo['id_product'],
-                        $cartRoomInfo['date_from'],
-                        $cartRoomInfo['date_to'],
-                        0,
-                        Group::getCurrent()->id,
-                        $cartRoomInfo['id_cart'],
-                        $cartRoomInfo['id_guest'],
-                        $cartRoomInfo['id_room'],
-                        0
-                    );
+                            $cartRoomInfo['id_product'],
+                            $cartRoomInfo['date_from'],
+                            $cartRoomInfo['date_to'],
+                            0,
+                            Group::getCurrent()->id,
+                            $cartRoomInfo['id_cart'],
+                            $cartRoomInfo['id_guest'],
+                            $cartRoomInfo['id_room'],
+                            0
+                        );
                         $totalPriceByProductTaxIncl += $roomTotalPrice['total_price_tax_incl'];
                         $totalPriceByProductTaxExcl += $roomTotalPrice['total_price_tax_excl'];
                     }
 
-                    switch (Configuration::get('PS_ROUND_TYPE')) {
-                        case Order::ROUND_TOTAL:
-                            $row['total'] = $totalPriceByProductTaxExcl;
-                            $row['total_wt'] = $totalPriceByProductTaxIncl;
-                            break;
-                        case Order::ROUND_LINE:
-                            $row['total'] = Tools::ps_round($totalPriceByProductTaxExcl, _PS_PRICE_COMPUTE_PRECISION_);
-                            $row['total_wt'] = Tools::ps_round($totalPriceByProductTaxIncl, _PS_PRICE_COMPUTE_PRECISION_);
-                            break;
-
-                        case Order::ROUND_ITEM:
-                        default:
-                            $row['total'] = Tools::ps_round($totalPriceByProductTaxExcl, _PS_PRICE_COMPUTE_PRECISION_);
-                            $row['total_wt'] = Tools::ps_round($totalPriceByProductTaxIncl, _PS_PRICE_COMPUTE_PRECISION_);
-                            break;
-                    }
+                    // Rounding as per configurations
+                    $row['total'] = Tools::processPriceRounding($totalPriceByProductTaxExcl);
+                    $row['total_wt'] = Tools::processPriceRounding($totalPriceByProductTaxIncl);
                 }
             } else if  (Product::SERVICE_PRODUCT_WITH_ROOMTYPE == $row['service_product_type']) {
+                $row['total'] = 0;
+                $row['total_wt'] = 0;
                 $objRoomTypeServiceProductCartDetail = new RoomTypeServiceProductCartDetail();
-                $totalPriceByProductTaxIncl = $objRoomTypeServiceProductCartDetail->getServiceProductsTotalInCart($this->id, (int)$row['id_product'], 0, 0, 0, 0, 0, true, null);
-                $totalPriceByProductTaxExcl = $objRoomTypeServiceProductCartDetail->getServiceProductsTotalInCart($this->id, (int)$row['id_product'], 0, 0, 0, 0, 0, false, null);
-
-
-                switch (Configuration::get('PS_ROUND_TYPE')) {
-                    case Order::ROUND_TOTAL:
-                        $row['total'] = $totalPriceByProductTaxExcl;
-                        $row['total_wt'] = $totalPriceByProductTaxIncl;
-                        break;
-                    case Order::ROUND_LINE:
-                        $row['total'] = Tools::ps_round($totalPriceByProductTaxExcl, _PS_PRICE_COMPUTE_PRECISION_);
-                        $row['total_wt'] = Tools::ps_round($totalPriceByProductTaxIncl, _PS_PRICE_COMPUTE_PRECISION_);
-                        break;
-
-                    case Order::ROUND_ITEM:
-                    default:
-                        $row['total'] = Tools::ps_round($totalPriceByProductTaxExcl, _PS_PRICE_COMPUTE_PRECISION_);
-                        $row['total_wt'] = Tools::ps_round($totalPriceByProductTaxIncl, _PS_PRICE_COMPUTE_PRECISION_);
-                        break;
+                if ($servicesWithRoom = $objRoomTypeServiceProductCartDetail->getServiceProductsInCart(
+                    $this->id,
+                    (int)$row['id_product'],
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    null,
+                    $row['auto_add_to_cart'],
+                    null,
+                    null
+                )) {
+                    foreach ($servicesWithRoom as $service) {
+                        // Rounding as per configurations
+                        $row['total'] += Tools::processPriceRounding($service['unit_price_tax_excl'], $service['quantity']);
+                        $row['total_wt'] += Tools::processPriceRounding($service['unit_price_tax_incl'], $service['quantity']);
+                    }
                 }
             } else {
                 $objHotelServiceProductCartDetail = new HotelServiceProductCartDetail();
                 $unitPriceByProductTaxIncl = $objHotelServiceProductCartDetail->getHotelProductUnitPrice($this->id, (int)$row['id_product'], 0, true);
                 $unitPriceByProductTaxExcl = $objHotelServiceProductCartDetail->getHotelProductUnitPrice($this->id, (int)$row['id_product'], 0, false);
 
-                switch (Configuration::get('PS_ROUND_TYPE'))
-                {
-                    case Order::ROUND_TOTAL:
-                        $row['total'] = $unitPriceByProductTaxExcl * (int)$row['cart_quantity'];
-                        $row['total_wt'] = $unitPriceByProductTaxIncl * (int)$row['cart_quantity'];
-                        break;
-                    case Order::ROUND_LINE:
-                        $row['total'] = Tools::ps_round($unitPriceByProductTaxExcl * (int)$row['cart_quantity'], _PS_PRICE_COMPUTE_PRECISION_);
-                        $row['total_wt'] = Tools::ps_round($unitPriceByProductTaxIncl * (int)$row['cart_quantity'], _PS_PRICE_COMPUTE_PRECISION_);
-                        break;
+                // Rounding as per configurations
+                $row['total'] += Tools::processPriceRounding($unitPriceByProductTaxExcl, $row['cart_quantity']);
+                $row['total_wt'] += Tools::processPriceRounding($unitPriceByProductTaxIncl, $row['cart_quantity']);
 
-                    case Order::ROUND_ITEM:
-                    default:
-                        $row['total'] = Tools::ps_round($unitPriceByProductTaxExcl, _PS_PRICE_COMPUTE_PRECISION_) * (int)$row['cart_quantity'];
-                        $row['total_wt'] = Tools::ps_round($unitPriceByProductTaxIncl, _PS_PRICE_COMPUTE_PRECISION_) * (int)$row['cart_quantity'];
-                        break;
-                }
                 $row['price_wt'] = $row['price_with_reduction'];
             }
 
@@ -1029,6 +984,9 @@ class CartCore extends ObjectModel
         if ((int)$cartRule->gift_product) {
             $this->updateQty(1, $cartRule->gift_product, $cartRule->gift_product_attribute, false, 'up', 0, null, false);
         }
+        // after adding new cart rule, check if any of the appled cart rules are not being used
+        CartRule::autoRemoveFromCart(Context::getContext());
+        CartRule::autoAddToCart(Context::getContext());
 
         return true;
     }
@@ -1612,6 +1570,7 @@ class CartCore extends ObjectModel
             Cart::ONLY_PHYSICAL_PRODUCTS_WITHOUT_SHIPPING,
             Cart::ADVANCE_PAYMENT,
             Cart::ADVANCE_PAYMENT_ONLY_PRODUCTS,
+            Cart::ONLY_PRODUCTS_WITH_DEMANDS,
         );
 
         // Define virtual context to prevent case where the cart is not the in the global context
@@ -1788,19 +1747,36 @@ class CartCore extends ObjectModel
                 $objHotelServiceProductCartDetail = new HotelServiceProductCartDetail();
                 $price = $objHotelServiceProductCartDetail->getHotelProductUnitPrice($this->id, (int)$product['id_product'], 0, $with_taxes);
             } else if (!$product['booking_product'] && Product::SERVICE_PRODUCT_WITH_ROOMTYPE == $product['service_product_type']) {
-
                 $objRoomTypeServiceProductCartDetail = new RoomTypeServiceProductCartDetail();
-                $totalPriceByProduct = $objRoomTypeServiceProductCartDetail->getServiceProductsTotalInCart(
+                if ($servicesWithRoom = $objRoomTypeServiceProductCartDetail->getServiceProductsInCart(
                     $this->id,
                     (int)$product['id_product'],
-                    isset($product['id_hotel']) ? $product['id_hotel'] : 0,
                     0,
                     0,
                     0,
                     0,
-                    $with_taxes,
+                    0,
+                    0,
+                    null,
+                    $product['auto_add_to_cart'],
+                    null,
                     null
-                );
+                )) {
+                    foreach ($servicesWithRoom as $service) {
+                        if ($with_taxes) {
+                            $servicePrice = $service['total_price_tax_incl'];
+                        } else {
+                            $servicePrice = $service['total_price_tax_excl'];
+                        }
+
+                        // Rounding as per configurations
+                        if ($ps_round_type == Order::ROUND_TOTAL) {
+                            $products_total[$id_tax_rules_group.'_'.$id_address] += $servicePrice;
+                        } else {
+                            $products_total[$id_tax_rules_group] += $servicePrice;
+                        }
+                    }
+                }
             } else if ($roomTypesByIdProduct = $objCartBookingData->getCartInfoIdCartIdProduct($this->id, $product['id_product'])) {
                 // by webkul to calculate rates of the product from hotelreservation syatem tables with feature prices....
                 $totalPriceByProduct = 0;
@@ -1819,9 +1795,9 @@ class CartCore extends ObjectModel
                         0
                     );
                     if ($with_taxes) {
-                        $totalPriceByProduct += $roomTotalPrice['total_price_tax_incl'];
+                        $totalPriceByProduct = $roomTotalPrice['total_price_tax_incl'];
                     } else {
-                        $totalPriceByProduct += $roomTotalPrice['total_price_tax_excl'];
+                        $totalPriceByProduct = $roomTotalPrice['total_price_tax_excl'];
                     }
 
                     // If customer has selected advance payment of the cart
@@ -1840,51 +1816,25 @@ class CartCore extends ObjectModel
                             $totalPriceByProduct = $advProductPrice;
                         }
                     }
+
+                    // Rounding as per configurations
+                    if ($ps_round_type == Order::ROUND_TOTAL) {
+                        $products_total[$id_tax_rules_group.'_'.$id_address] += Tools::processPriceRounding($totalPriceByProduct);
+                    } else {
+                        $products_total[$id_tax_rules_group] += Tools::processPriceRounding($totalPriceByProduct);
+                    }
                 }
             }
 
-            switch ($ps_round_type) {
-                case Order::ROUND_TOTAL:
-                    if ($product['booking_product'] || (Product::SERVICE_PRODUCT_WITH_ROOMTYPE == $product['service_product_type'])) {
-                        $products_total[$id_tax_rules_group.'_'.$id_address] += $totalPriceByProduct;
-                    } else {
-                        $products_total[$id_tax_rules_group.'_'.$id_address] += $price * (int)$product['cart_quantity'];
-                    }
-                    break;
-
-                case Order::ROUND_LINE:
-                    if ($product['booking_product'] || (Product::SERVICE_PRODUCT_WITH_ROOMTYPE == $product['service_product_type'])) {
-                        $product_price = $totalPriceByProduct;
-                    } else {
-                        $product_price = $price * $product['cart_quantity'];
-                    }
-                    $products_total[$id_tax_rules_group] += Tools::ps_round($product_price, $compute_precision);
-                    break;
-
-                case Order::ROUND_ITEM:
-                default:
-                    if ($product['booking_product'] || (Product::SERVICE_PRODUCT_WITH_ROOMTYPE == $product['service_product_type'])) {
-                        $product_price = $totalPriceByProduct;
-                        $products_total[$id_tax_rules_group] += Tools::ps_round($product_price, $compute_precision);
-                    } else {
-                        $product_price = /*$with_taxes ? $tax_calculator->addTaxes($price) : */$price;
-                        $products_total[$id_tax_rules_group] += Tools::ps_round($product_price, $compute_precision) * (int)$product['cart_quantity'];
-                    }
-                    break;
-            }
-
-
             // price of extra demands on room type in the cart
-            if ($type == Cart::BOTH || $type == Cart::BOTH_WITHOUT_SHIPPING || $type == Cart::ADVANCE_PAYMENT) {
-                $totalDemandsPrice += $objCartBookingData->getCartExtraDemands($this->id, $product['id_product'], 0, 0, 0, 1, 0, (int)$with_taxes);
-            }
+            $totalDemandsPrice += $objCartBookingData->getCartExtraDemands($this->id, $product['id_product'], 0, 0, 0, 1, 0, (int)$with_taxes);
         }
 
         foreach ($products_total as $key => $price) {
             $order_total += $price;
         }
 
-        $order_total_products = $order_total;
+        $order_total_products = $order_total + $totalDemandsPrice;
 
         if ($type == Cart::ONLY_DISCOUNTS) {
             $order_total = 0;
@@ -1904,7 +1854,11 @@ class CartCore extends ObjectModel
         }
 
         // price of extra demands on room type in the cart
-        if ($type == Cart::BOTH || $type == Cart::BOTH_WITHOUT_SHIPPING || $type == Cart::ADVANCE_PAYMENT) {
+        if ($type == Cart::BOTH
+            || $type == Cart::BOTH_WITHOUT_SHIPPING
+            || $type == Cart::ADVANCE_PAYMENT
+            || $type == Cart::ONLY_PRODUCTS_WITH_DEMANDS
+        ) {
             $order_total += $totalDemandsPrice;
         }
 
@@ -1921,7 +1875,8 @@ class CartCore extends ObjectModel
             Cart::ONLY_CONVENIENCE_FEE,
             Cart::ONLY_ROOM_SERVICES_WITHOUT_AUTO_ADD,
             Cart::ONLY_ROOM_SERVICES_WITHOUT_CONVENIENCE_FEE,
-            Cart::ONLY_ROOM_SERVICES_WITH_AUTO_ADD_WITHOUT_CONVENIENCE_FEE)
+            Cart::ONLY_ROOM_SERVICES_WITH_AUTO_ADD_WITHOUT_CONVENIENCE_FEE,
+            Cart::ONLY_PRODUCTS_WITH_DEMANDS)
             ) && CartRule::isFeatureActive()
         ) {
             // First, retrieve the cart rules associated to this "getOrderTotal"
@@ -3813,10 +3768,6 @@ class CartCore extends ObjectModel
                     }
 
                 }
-            }
-
-            if (((float)$cart_rule['value_real'] == 0 && (int)$cart_rule['free_shipping'] == 0)) {
-                unset($cart_rules[$key]);
             }
         }
 
