@@ -233,7 +233,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
                 AND EXISTS (
                     SELECT 1
                     FROM `qlo_htl_booking_detail` hbd
-                    WHERE hbd.`id_order` = o.`id_order`' . HotelBranchInformation::addHotelRestriction($idHotel).'
+                    WHERE hbd.`id_order` = o.`id_order`' . HotelBranchInformation::addHotelRestriction($id_hotel).'
                 )
                 GROUP BY LEFT(`invoice_date`, 10)'
             );
@@ -251,7 +251,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
                 AND EXISTS (
                     SELECT 1
                     FROM `qlo_htl_booking_detail` hbd
-                    WHERE hbd.`id_order` = o.`id_order`' . HotelBranchInformation::addHotelRestriction($idHotel).'
+                    WHERE hbd.`id_order` = o.`id_order`' . HotelBranchInformation::addHotelRestriction($id_hotel).'
                 )
                 GROUP BY LEFT(`invoice_date`, 7)'
             );
