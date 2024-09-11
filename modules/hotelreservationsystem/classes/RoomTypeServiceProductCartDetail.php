@@ -82,11 +82,12 @@ class RoomTypeServiceProductCartDetail extends ObjectModel
         return false;
     }
 
-    public function removeServiceProductByIdHtlCartBooking($htlCartBookingId)
+    public function removeServiceProductByIdHtlCartBooking($htlCartBookingId, $idService = 0)
     {
         if ($stadardProductsData = Db::getInstance()->executeS(
             'SELECT * FROM `' . _DB_PREFIX_ . 'htl_room_type_service_product_cart_detail`
-            WHERE `htl_cart_booking_id` = ' . (int)$htlCartBookingId
+            WHERE `htl_cart_booking_id` = ' . (int)$htlCartBookingId.
+            ($idService? ' AND `id_product` = '.(int)$idService : '')
         )) {
             foreach ($stadardProductsData as $product) {
                 if (Validate::isLoadedObject(
@@ -506,6 +507,16 @@ class RoomTypeServiceProductCartDetail extends ObjectModel
             }
         }
         return false;
+    }
+
+    public function getAllServiceProduct($idCart)
+    {
+        return Db::getInstance()->executeS(
+            'SELECT spcd.*,  cbd.`id_product` as `id_product_room_type`, cbd.`id_room`, cbd.`id_hotel`, cbd.`date_from`, cbd.`date_to` FROM `' . _DB_PREFIX_ . 'htl_room_type_service_product_cart_detail` spcd
+            INNER JOIN `'._DB_PREFIX_.'htl_cart_booking_data` cbd
+            ON(spcd.`htl_cart_booking_id` = cbd.`id`)
+            WHERE spcd.`id_cart` = ' . (int)$idCart
+        );
     }
 
     public static function validateServiceProductsInCart()
