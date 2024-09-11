@@ -502,6 +502,9 @@ class AdminProductsControllerCore extends AdminController
         $this->addJs(__PS_BASE_URI__.$this->admin_webpath.'/themes/'.$bo_theme.'/js/jquery.fileupload-validate.js');
         $this->addJs(__PS_BASE_URI__.'js/vendor/spin.js');
         $this->addJs(__PS_BASE_URI__.'js/vendor/ladda.js');
+        $this->addCSS(_PS_JS_DIR_.'fullcalendar/main.css');
+        $this->addJs(_PS_JS_DIR_.'fullcalendar/main.js');
+
         $this->addJS(_PS_JS_DIR_.'/datatable/jquery.dataTables.min.js');
         $this->addJS(_PS_JS_DIR_.'/datatable/dataTables.bootstrap.js');
     }
@@ -2964,8 +2967,8 @@ class AdminProductsControllerCore extends AdminController
                                 $room['booked_dates'] = json_encode($bookedDates);
 
                                 if ($room['id_status'] == HotelRoomInformation::STATUS_TEMPORARY_INACTIVE) {
-                                    $disabledDates = $objRoomDisableDates->getRoomDisableDates($room['id']);
-                                    $room['disable_dates_json'] = json_encode($disabledDates);
+                                    $disableDates = $objRoomDisableDates->getRoomDisableDates($room['id']);
+                                    $room['disable_dates_json'] = json_encode($disableDates);
                                 }
                             }
                             $data->assign('htl_room_info', $hotelRoomInfo);
@@ -2977,6 +2980,7 @@ class AdminProductsControllerCore extends AdminController
                             'product' => $obj,
                             'htl_info' => $hotelInfo,
                             'rm_status' => $roomStatus,
+                            'locale' => $this->context->language->iso_code
                         )
                     );
                 } else {
@@ -3461,50 +3465,6 @@ class AdminProductsControllerCore extends AdminController
         }
     }
 
-    public function validateDisableDateRanges($disableDates, $roomIndex, $idRoom)
-    {
-        if (is_array($disableDates) && count($disableDates)) {
-            foreach ($disableDates as $disable_key => $disableDate) {
-                if (!$disableDate['date_to'] && !$disableDate['date_from']) {
-                    unset($disableDates[$disable_key]);
-                } elseif (!Validate::isDate($disableDate['date_from']) || !Validate::isDate($disableDate['date_to'])) {
-                    $this->errors[] = sprintf(
-                        Tools::displayError('Please add valid disable dates for room %s.'),
-                        $roomIndex
-                    );
-                } elseif (($disableDate['date_from'] && !$disableDate['date_to']) || (!$disableDate['date_from'] && $disableDate['date_to'])) {
-                    $this->errors[] = sprintf(
-                        Tools::displayError('Please fill date from and date to for disable dates for room %s.'),
-                        $roomIndex
-                    );
-                } else {
-                    $objHotelBookingDetail = new HotelBookingDetail();
-                    foreach ($disableDates as $key => $disDate) {
-                        if ($key != $disable_key) {
-                            if ((($disableDate['date_from'] < $disDate['date_from']) && ($disableDate['date_to'] <= $disDate['date_from'])) || (($disableDate['date_from'] > $disDate['date_from']) && ($disableDate['date_from'] >= $disDate['date_to']))) {
-                                // continue
-                            } else {
-                                $this->errors[] = sprintf(
-                                    Tools::displayError('Disable dates are conflicting for room %s. Please add non-conflicting dates.'),
-                                    $roomIndex
-                                );
-                            }
-                        }
-						// check if room has booking for current date range
-						if ($objHotelBookingDetail->chechRoomBooked($idRoom, $disDate['date_from'], $disDate['date_to'])) {
-							$this->errors[] = sprintf(
-								Tools::displayError('The room %s already has bookings for selected disable dates. Please reselect disable dates.'),
-								$roomIndex
-							);
-						}
-                    }
-                }
-            }
-        } else {
-            $this->errors[] = sprintf(Tools::displayError('Please add disable dates for room %s.'), $roomIndex);
-        }
-    }
-
     public function processConfiguration()
     {
         // Check if save of configuration tab is submitted
@@ -3536,31 +3496,12 @@ class AdminProductsControllerCore extends AdminController
                         $objHotelRoomInfo->id_status = $roomInfo['id_status'];
                         $objHotelRoomInfo->floor = $roomInfo['floor'];
                         $objHotelRoomInfo->comment = $roomInfo['comment'];
-                        if ($objHotelRoomInfo->save()) {
-                            $idRoom = $objHotelRoomInfo->id;
-                            if ($roomInfo['id_status'] == HotelRoomInformation::STATUS_TEMPORARY_INACTIVE) {
-                                $objHotelRoomDisableDates = new HotelRoomDisableDates();
-                                $objHotelRoomDisableDates->deleteRoomDisableDates($idRoom);
-
-                                $disableDates = json_decode($roomInfo['disable_dates_json'], true);
-                                foreach ($disableDates as $disableDate) {
-                                    $objHotelRoomDisableDates = new HotelRoomDisableDates();
-                                    $objHotelRoomDisableDates->id_room_type = $id_product;
-                                    $objHotelRoomDisableDates->id_room = $idRoom;
-                                    $objHotelRoomDisableDates->date_from = $disableDate['date_from'];
-                                    $objHotelRoomDisableDates->date_to = $disableDate['date_to'];
-                                    $objHotelRoomDisableDates->reason = $disableDate['reason'];
-                                    $objHotelRoomDisableDates->add();
-                                }
-
-                                Hook::exec(
-                                    'actionRoomDisableDatesAddAfter',
-                                    array(
-                                        'room_info' => $roomInfo,
-                                        'disable_dates' => $disableDates
-                                    )
-                                );
-                            }
+                        if ($objHotelRoomInfo->save()
+                            && $objHotelRoomInfo->id_status != HotelRoomInformation::STATUS_TEMPORARY_INACTIVE
+                        ) {
+                            // directly deleting the dates since we are validating the dates using hooks before this.
+                            $objRoomDisableDates = new HotelRoomDisableDates();
+                            $objRoomDisableDates->deleteRoomDisableDates($objHotelRoomInfo->id);
                         }
                     }
                 }
@@ -3597,7 +3538,6 @@ class AdminProductsControllerCore extends AdminController
                 if ($roomInfo['floor'] && !Validate::isGenericName($roomInfo['floor'])) {
                     $this->errors[] = sprintf(Tools::displayError('Invalid floor for room %s.'), $roomIndex);
                 }
-
                 if ($roomInfo['id_status'] == HotelRoomInformation::STATUS_INACTIVE) {
                     $objHotelRoomInformation = new HotelRoomInformation();
                     if (count($objHotelRoomInformation->getFutureBookings($roomInfo['id']))) {
@@ -3605,10 +3545,13 @@ class AdminProductsControllerCore extends AdminController
                     }
                 } elseif ($roomInfo['id_status'] == HotelRoomInformation::STATUS_TEMPORARY_INACTIVE) {
                     $disableDates = json_decode($roomInfo['disable_dates_json'], true);
-                    if ($roomInfo['disable_dates_json'] !== 0) {
-                        $this->validateDisableDateRanges($disableDates, $roomInfo['room_num'], $roomInfo['id']);
+                    if (!is_array($disableDates)
+                        || !count($disableDates)
+                    ) {
+                        $this->errors[] = sprintf(Tools::displayError('Please add disable dates for room %s.'), $roomIndex);
                     }
                 }
+                Hook::exec('actionValidateRoomInformation', array('room_information', $roomInfo));
             }
         } else {
             $this->errors[] = Tools::displayError('Please add at least one room.');
@@ -5024,76 +4967,196 @@ class AdminProductsControllerCore extends AdminController
         die(json_encode($response));
     }
 
-    public function ajaxProcessValidateDisableDates()
+    public function assignAlerts()
+    {
+        $this->context->smarty->assign(array(
+            'errors' => $this->errors,
+            'confirmations' => $this->confirmations,
+            'warnings' => $this->warnings
+        ));
+    }
+
+    public function ajaxProcessSubmitDisableDates()
     {
         $response = array('status' => false);
-
         $idRoom = (int) Tools::getValue('id_room');
-        $disableDates = Tools::getValue('disable_dates');
+        $dateFrom = Tools::getValue('date_from');
+        $dateTo = Tools::getValue('date_to');
+        $idProduct = Tools::getValue('id_product');
+        if (!Validate::isDate($dateFrom) || !Validate::isDate($dateTo)) {
+            $this->errors[] = $this->l('Please select a valid date range to temporary disable this room');
+        } else if ($idRoom && Validate::isLoadedObject($objHotelRoomInfo = new HotelRoomInformation((int) $idRoom))) {
+            $dateTo = date('Y-m-d', strtotime($dateTo));
+            $objHotelBookingDetail = new HotelBookingDetail();
+            if ($bookingRow = $objHotelBookingDetail->chechRoomBooked($idRoom, $dateFrom, $dateTo)) {
+                $orderDetails = new HotelBookingDetail($bookingRow['id']);
+                $this->context->smarty->assign(array(
+                    'link' => $this->context->link,
+                    'orderDetails' => $orderDetails,
+                ));
 
-        $rowsToHighlight = array();
-        $bookedRows = array();
-        if (is_array($disableDates) && count($disableDates)) {
-            foreach ($disableDates as $key => $dateRange) {
-                if (!Validate::isDate($dateRange['date_from']) || !Validate::isDate($dateRange['date_to'])) {
-                    $this->errors[] = $this->l('Some dates are missing. Please select all the date ranges.');
-                    $rowsToHighlight[] = $key;
+                $this->errors[] = $this->context->smarty->fetch('controllers/products/booked_room_date_ranges_list.tpl');
+            } else {
+                if (!Tools::getValue('id_disable_date')
+                    || !Validate::isLoadedObject($objHotelRoomDisableDates = new HotelRoomDisableDates((int) Tools::getValue('id_disable_date')))
+                ) {
+                    $objHotelRoomDisableDates = new HotelRoomDisableDates();
+                    $objHotelRoomDisableDates->id_room_type = $idProduct;
+                    $objHotelRoomDisableDates->id_room = $idRoom;
                 }
-            }
 
-            if (!count($this->errors)) {
-                foreach ($disableDates as $keyOuter => $dateRangeOuter) {
-                    foreach ($disableDates as $keyInner => $dateRangeInner) {
-                        if ($keyInner != $keyOuter) {
-                            if ((($dateRangeOuter['date_from'] >= $dateRangeInner['date_from']) && ($dateRangeOuter['date_from'] < $dateRangeInner['date_to']))
-                                || (($dateRangeInner['date_from'] >= $dateRangeOuter['date_from']) && ($dateRangeInner['date_from'] < $dateRangeOuter['date_to']))
-                            ) {
-                                $this->errors[] = $this->l('Some dates are conflicting with each other. Please check and reselect the date ranges.');
-                                $rowsToHighlight[] = $keyOuter;
-                                $rowsToHighlight[] = $keyInner;
-                            }
-                        }
+                $objHotelRoomDisableDates->date_from = $dateFrom;
+                $objHotelRoomDisableDates->date_to = $dateTo;
+                $objHotelRoomDisableDates->reason = trim(Tools::getValue('reason'));
+                $objHotelRoomInfo->id_status = HotelRoomInformation::STATUS_TEMPORARY_INACTIVE;
+                if ($objHotelRoomInfo->save()
+                    && $objHotelRoomDisableDates->save()
+                ) {
+                    $response['id_disable_date'] = $objHotelRoomDisableDates->id;
+                    $response['event_title'] = $this->l('Disabled');
+                    if (Tools::getValue('id_disable_date')) {
+                        $this->confirmations[] = $this->l('Successfully updated.');
+                    } else {
+                        $this->confirmations[] = $this->l('Disable date added successfully.');
                     }
+                } else {
+                    $this->errors[] = Tools::displayError('An error occurred while trying to save the disable dates.');
                 }
             }
-
-            if (!count($this->errors)) {
-                if ($idRoom) {
-                    $objHotelBookingDetail = new HotelBookingDetail();
-                    foreach ($disableDates as $key => $dateRange) {
-                        if ($bookingRow = $objHotelBookingDetail->chechRoomBooked($idRoom, $dateRange['date_from'], $dateRange['date_to'])) {
-                            $bookedRows[] = new HotelBookingDetail($bookingRow['id']);
-                            $rowsToHighlight[] = $key;
-                        }
-                    }
-                }
-            }
+        } else if (!$idRoom) {
+            $this->errors[] = Tools::displayError('You need to save this room first before adding any disabled dates.');
         }
 
-        if (count($bookedRows)) {
-            $this->context->smarty->assign(array(
-                'link' => $this->context->link,
-                'booked_rows_list' => $bookedRows,
-            ));
 
-            $this->errors[] = $this->context->smarty->fetch('controllers/products/booked_room_date_ranges_list.tpl');
-        }
-
-        $this->errors = array_unique($this->errors);
-        $rowsToHighlight = array_values(array_unique($rowsToHighlight));
-
-        if (!count($this->errors)) {
-            $response['status'] = true;
-        } else {
-            $this->context->smarty->assign(array(
-                'errors' => $this->errors,
-            ));
-
-            $response['errors'] = $this->context->smarty->fetch('alerts.tpl');
-            $response['rows_to_highlight'] = $rowsToHighlight;
+        if ($this->errors) {
+            $this->errors = array_unique($this->errors);
             $response['status'] = false;
+        } else {
+            $response['status'] = true;
         }
 
+        $this->assignAlerts();
+        $response['msg'] = $this->context->smarty->fetch('alerts.tpl');
+        $this->ajaxDie(json_encode($response));
+    }
+
+    public function ajaxProcessRemoveDisableDatesInDateRange()
+    {
+        $response = array('status' => false);
+        $idRoom = (int) Tools::getValue('id_room');
+        $dateFrom = date('Y-m-d', strtotime(Tools::getValue('date_from')));
+        $dateTo = date('Y-m-d', strtotime(Tools::getValue('date_to')));
+        if (!Tools::getValue('date_from') || !Tools::getValue('date_to')) {
+            $this->errors[] = Tools::displayError('Please select valid date range.');
+        } else {
+            $objRoomDisableDates = new HotelRoomDisableDates();
+            $params = array(
+                'date_from' => $dateFrom,
+                'date_to' => $dateTo,
+                'id_room' => $idRoom
+            );
+            Hook::exec('actionRoomDisableDatesRemoveBefore', array('disable_dates', $params));
+            if (empty($this->errors)
+                && ($disableDates = $objRoomDisableDates->checkIfRoomAlreadyDisabled($params))
+            ) {
+                $newDates = array();
+                foreach ($disableDates as $disableDatesInfo) {
+                    $objRoomDisableDates = new HotelRoomDisableDates($disableDatesInfo['id']);
+                    $newDates[0]['date_from'] = $disableDatesInfo['date_from'];
+                    $newDates[0]['date_to'] = $params['date_from'];
+
+                    $newDates[1]['date_from'] = $params['date_to'];
+                    $newDates[1]['date_to'] = date('Y-m-d', strtotime($disableDatesInfo['date_to']));
+
+                    if (strtotime($newDates[0]['date_from']) >= strtotime($newDates[0]['date_to'])) {
+                        unset($newDates[0]);
+                    }
+
+                    if (strtotime($newDates[1]['date_from']) >= strtotime($newDates[1]['date_to'])) {
+                        unset($newDates[1]);
+                    }
+
+                    foreach ($newDates as $newDate) {
+                        $objNewDisableDates = new HotelRoomDisableDates();
+                        $objNewDisableDates->id_room_type = $objRoomDisableDates->id_room_type;
+                        $objNewDisableDates->id_room = $objRoomDisableDates->id_room;
+                        $objNewDisableDates->date_from = $newDate['date_from'];
+                        $objNewDisableDates->date_to = $newDate['date_to'];
+                        $objNewDisableDates->reason = $objRoomDisableDates->reason;
+                        $objNewDisableDates->save();
+                    }
+
+                    $objRoomDisableDates->delete();
+                }
+            } else if (!$disableDates) {
+                $this->errors[] = Tools::displayError('Room is not disabled for the selected date range.');
+            }
+        }
+
+        if (count($this->errors)) {
+            $response['status'] = false;
+        } else {
+            $response['status'] = true;
+            $this->confirmations[] = $this->l('Removed successfully.');
+            if (!($disableDates = $objRoomDisableDates->getRoomDisableDates($idRoom))) {
+                $objRoomInfo = new HotelRoomInformation($idRoom);
+                $objRoomInfo->id_status = HotelRoomInformation::STATUS_ACTIVE;
+                $objRoomInfo->save();
+            }
+
+            $response['disable_dates'] = $disableDates;
+        }
+
+        $this->assignAlerts();
+        $response['msg'] = $this->context->smarty->fetch('alerts.tpl');
+        $this->ajaxDie(json_encode($response));
+    }
+
+    public function ajaxProcessGetDisableDates()
+    {
+        $response['status'] = false;
+        if (($idRoom = Tools::getValue('id_room'))
+            && Validate::isLoadedObject(new HotelRoomInformation($idRoom))
+        ) {
+            $objRoomDisableDates = new HotelRoomDisableDates();
+            $disableDates = $objRoomDisableDates->getRoomDisableDates($idRoom);
+            $response['status'] = true;
+            $response['disable_dates'] = $disableDates;
+        }
+
+        $this->ajaxDie(json_encode($response));
+    }
+
+    public function ajaxProcessDeleteDisableDate()
+    {
+        $response = array('status' => false);
+        $idDisableDate = Tools::getValue('id_disable_date');
+        Hook::exec('actionDisableDateDeleteBefore', array('id_disable_date', $idDisableDate));
+        if (empty($this->errors)
+            && (int) $idDisableDate
+            && Validate::isLoadedObject($objRoomDisableDates = new HotelRoomDisableDates($idDisableDate))
+        ) {
+            $idRoom = $objRoomDisableDates->id_room;
+            if (!$objRoomDisableDates->delete()) {
+                $this->errors[] = Tools::displayError('An error occurred while trying to perform this operation.');
+            } else if (!$objRoomDisableDates->getRoomDisableDates($idRoom)) {
+                $objRoomInfo = new HotelRoomInformation($idRoom);
+                $objRoomInfo->id_status = HotelRoomInformation::STATUS_ACTIVE;
+                $objRoomInfo->save();
+            }
+        } else {
+            $this->errors[] = Tools::displayError('Invalid request');
+        }
+
+        if (count($this->errors)) {
+            $response['status'] = false;
+        } else {
+            $response['status'] = true;
+            $this->confirmations[] = $this->l('Removed successfully');
+        }
+
+        $this->assignAlerts();
+        $response['msg'] = $this->context->smarty->fetch('alerts.tpl');
         $this->ajaxDie(json_encode($response));
     }
 
