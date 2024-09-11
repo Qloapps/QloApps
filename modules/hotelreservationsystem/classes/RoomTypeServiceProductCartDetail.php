@@ -211,7 +211,8 @@ class RoomTypeServiceProductCartDetail extends ObjectModel
         $useTax = null,
         $autoAddToCart = 0,
         $id_address = null,
-        $priceAdditionType = null
+        $priceAdditionType = null,
+        $idRoom = 0
     ) {
         if ($useTax === null)
             $useTax = Product::$_taxCalculationMethod == PS_TAX_EXC ? false : true;
@@ -255,6 +256,9 @@ class RoomTypeServiceProductCartDetail extends ObjectModel
         }
         if ($dateFrom && $dateTo) {
             $sql .= ' AND cbd.`date_from` = \''.pSQL($dateFrom).'\' AND cbd.`date_to` = \''.pSQL($dateTo).'\'';
+        }
+        if ($idRoom) {
+            $sql .= ' AND cbd.`id_room`='.(int) $idRoom;
         }
         if ($htlCartBookingId) {
             $sql .= ' AND cbd.`id`='.(int) $htlCartBookingId;
