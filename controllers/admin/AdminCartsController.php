@@ -1122,7 +1122,10 @@ class AdminCartsControllerCore extends AdminController
                         0,
                         0,
                         $selectedRoomServiceProduct['id'],
-                    );
+                        0,
+                        null,
+                        null
+                    )[$selectedRoomServiceProduct['id']]['selected_products_info'];
                 }
                 $this->context->smarty->assign(array(
                     'roomTypeServiceProducts' => $roomTypeServiceProducts,
