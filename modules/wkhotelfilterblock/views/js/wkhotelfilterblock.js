@@ -87,8 +87,8 @@ $(document).ready(function()
 		values: [min_price, max_price],
 		slide: function(event, ui)
 		{
-			$("#filter_price_from").html(ui.values[0]);
-			$("#filter_price_to").html(ui.values[1]);
+			$("#filter_price_from").html(formatCurrency(ui.values[0], currencyFormat, currencySign, currencyBlank));
+			$("#filter_price_to").html(formatCurrency(ui.values[1], currencyFormat, currencySign, currencyBlank));
 		},
 		change: function(event, ui)
 		{

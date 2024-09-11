@@ -27,11 +27,11 @@
 
 	<thead>
 		<tr>
-			<th class="product header small" width="30%">{l s='Room Type / Reference' pdf='true'}</th>
-			<th class="product header small" width="30%">{l s='Duration' pdf='true'}</th>
+			<th class="product header small" width="35%">{l s='Room Type / Reference' pdf='true'}</th>
+			<th class="product header small" width="35%">{l s='Duration' pdf='true'}</th>
 			<th class="product header small" width="10%">{l s='Num rooms' pdf='true'}</th>
-			<th class="product header-right small" width="15%">{l s='Unit price' pdf='true'}<br />{if $tax_excluded_display}{l s='(Tax Excl.)' pdf='true'}{else}{l s='(Tax Incl.)' pdf='true'}{/if}</th>
-			<th class="product header-right small" width="15%">{l s='Price' pdf='true'}<br />{if $tax_excluded_display}{l s='(Tax Excl.)' pdf='true'}{else}{l s='(Tax Incl.)' pdf='true'}{/if}</th>
+			{* <th class="product header-right small" width="15%">{l s='Unit price' pdf='true'}<br />{if $tax_excluded_display}{l s='(Tax Excl.)' pdf='true'}{else}{l s='(Tax Incl.)' pdf='true'}{/if}</th> *}
+			<th class="product header-right small" width="20%">{l s='Total Price' pdf='true'}<br />{if $tax_excluded_display}{l s='(Tax Excl.)' pdf='true'}{else}{l s='(Tax Incl.)' pdf='true'}{/if}</th>
 		</tr>
 	</thead>
 
@@ -55,13 +55,13 @@
 					<td class="product center">
 						{$order_detail.num_rooms}
 					</td>
-					<td class="product right">
+					{* <td class="product right">
 						{if $tax_excluded_display}
 							- {displayPrice currency=$order->id_currency price=$order_detail.unit_price_tax_excl}
 						{else}
 							- {displayPrice currency=$order->id_currency price=$order_detail.unit_price_tax_incl}
 						{/if}
-					</td>
+					</td> *}
 					<td class="product right">
 						{if $tax_excluded_display}
 							- {displayPrice currency=$order->id_currency price=$order_detail.total_price_tax_excl}
