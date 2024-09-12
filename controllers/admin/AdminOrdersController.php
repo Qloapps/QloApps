@@ -4994,7 +4994,7 @@ class AdminOrdersControllerCore extends AdminController
                         && count($orderServiceProduct['additional_services'])
                     ) {
                         foreach ($orderServiceProduct['additional_services'] as $serviceProduct) {
-                            if (Product::getProductPriceCalculation($serviceProduct['id_product']) == Product::PRICE_CALCULATION_METHOD_PER_DAY) {
+                            if ($serviceProduct['price_calculation_method'] == Product::PRICE_CALCULATION_METHOD_PER_DAY) {
                                 $newNumDays = HotelHelper::getNumberOfDays($new_date_from, $new_date_to);
                                 $objRoomTypeServiceProductOrderDetail = new RoomTypeServiceProductOrderDetail((int) $serviceProduct['id_room_type_service_product_order_detail']);
                                 $unitPriceTaxExcl = $objRoomTypeServiceProductOrderDetail->unit_price_tax_excl;

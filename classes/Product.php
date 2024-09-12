@@ -3299,10 +3299,12 @@ class ProductCore extends ObjectModel
             );
         }
 
-        if (isset($priceForRoomInfo) && isset($priceForRoomInfo['price'])) {
-            $price = (float)$priceForRoomInfo['price'];
-        } elseif (!$specific_price || $specific_price['price'] < 0) {
-            $price = (float)$result['price'];
+        if (!$specific_price || $specific_price['price'] < 0) {
+            if (isset($priceForRoomInfo) && isset($priceForRoomInfo['price'])) {
+                $price = (float)$priceForRoomInfo['price'];
+            } else {
+                $price = (float)$result['price'];
+            }
         } else {
             $price = (float)$specific_price['price'];
         }
