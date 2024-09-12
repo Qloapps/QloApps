@@ -1114,18 +1114,12 @@ class AdminCartsControllerCore extends AdminController
                     $dateTo,
                     $idRoom
                 )) {
-                    $selectedRoomServiceProduct['selected_service'] = $objRoomTypeServiceProductCartDetail->getServiceProductsInCart(
-                        $idCart,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
+                    $selectedRoomServiceProduct['selected_service'] = $objRoomTypeServiceProductCartDetail->getRoomServiceProducts(
                         $selectedRoomServiceProduct['id'],
                         0,
                         null,
                         null
-                    )[$selectedRoomServiceProduct['id']]['selected_products_info'];
+                    );
                 }
                 $this->context->smarty->assign(array(
                     'roomTypeServiceProducts' => $roomTypeServiceProducts,
