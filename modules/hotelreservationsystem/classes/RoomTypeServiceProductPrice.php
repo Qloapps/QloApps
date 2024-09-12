@@ -103,7 +103,7 @@ class RoomTypeServiceProductPrice extends ObjectModel
 
     public function getServicePrice($idProduct,
         $idProductRoomType,
-        $quantity,
+        $quantity = 1,
         $dateFrom = null,
         $dateTo = null,
         $useTax = null,

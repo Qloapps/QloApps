@@ -119,9 +119,9 @@ class HotelBookingDemands extends ObjectModel
             if ($getTotalPrice) {
                 foreach ($roomTypeDemands as $demand) {
                     if ($useTax) {
-                        $totalDemandsPrice += $demand['total_price_tax_incl'];
+                        $totalDemandsPrice += Tools::processPriceRounding($demand['total_price_tax_incl']);
                     } else {
-                        $totalDemandsPrice += $demand['total_price_tax_excl'];
+                        $totalDemandsPrice += Tools::processPriceRounding($demand['total_price_tax_excl']);
                     }
                 }
             } else {
@@ -202,24 +202,11 @@ class HotelBookingDemands extends ObjectModel
                         $objBkDetail = new HotelBookingDetail($this->id_htl_booking);
                         $quantity = $objBkDetail->getNumberOfDays($objBkDetail->date_from, $objBkDetail->date_to);
                     }
-                    switch (Configuration::get('PS_ROUND_TYPE')) {
-                        case Order::ROUND_ITEM:
-                            $unitAmount = (float)Tools::ps_round($amount, _PS_PRICE_COMPUTE_PRECISION_);
-                            $totalAmount = $unitAmount * $quantity;
-                            break;
-                        case Order::ROUND_LINE:
-                            $unitAmount = $amount;
-                            $totalAmount = Tools::ps_round(
-                                $unitAmount * $quantity,
-                                _PS_PRICE_COMPUTE_PRECISION_
-                            );
-                            break;
-                        case Order::ROUND_TOTAL:
-                            $unitAmount = $amount;
-                            $totalAmount = $unitAmount * $quantity;
-                            break;
-                    }
-                    $values .= '('.(int)$this->id.','.(int)$idTax.','.(float)$unitAmount.','.
+
+                    // Rounding as per configurations
+                    $totalAmount += Tools::processPriceRounding($amount, $quantity);
+
+                    $values .= '('.(int)$this->id.','.(int)$idTax.','.(float)$amount.','.
                     (float)$totalAmount.'),';
                 }
 
@@ -274,29 +261,15 @@ class HotelBookingDemands extends ObjectModel
         if ($taxDetails) {
             foreach ($taxDetails as &$detail) {
                 $priceTaxExcl = $detail['unit_price_tax_excl'];
-                $quantity = 1;
+                $numDays = 1;
                 $objBkDemand = new HotelBookingDemands($detail['id_booking_demand']);
                 if ($objBkDemand->price_calc_method == HotelRoomTypeGlobalDemand::WK_PRICE_CALC_METHOD_EACH_DAY) {
                     $objBkDetail = new HotelBookingDetail($detail['id_htl_booking']);
-                    $quantity = $objBkDetail->getNumberOfDays($objBkDetail->date_from, $objBkDetail->date_to);
+                    $numDays = $objBkDetail->getNumberOfDays($objBkDetail->date_from, $objBkDetail->date_to);
                 }
-                switch (Configuration::get('PS_ROUND_TYPE')) {
-                    case Order::ROUND_ITEM:
-                        $unitAmount = (float)Tools::ps_round($priceTaxExcl, _PS_PRICE_COMPUTE_PRECISION_);
-                        $totalTaxBase = $unitAmount * $quantity;
-                        break;
-                    case Order::ROUND_LINE:
-                        $unitAmount = $priceTaxExcl;
-                        $totalTaxBase = Tools::ps_round(
-                            $unitAmount * $quantity,
-                            _PS_PRICE_COMPUTE_PRECISION_
-                        );
-                        break;
-                    case Order::ROUND_TOTAL:
-                        $unitAmount = $priceTaxExcl;
-                        $totalTaxBase = $unitAmount * $quantity;
-                        break;
-                }
+
+                $totalTaxBase = $unitAmount * $numDays;
+
                 $detail['total_tax_base'] = $totalTaxBase;
             }
         }

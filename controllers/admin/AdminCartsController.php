@@ -841,6 +841,7 @@ class AdminCartsControllerCore extends AdminController
                 $cart['total_price'] = Tools::displayPrice($cart_obj->getOrderTotal(), $currency);
             }
         }
+
         if (count($orders)) {
             foreach ($orders as &$order) {
                 $order['total_paid_real'] = Tools::displayPrice($order['total_paid_real'], $currency);
@@ -1113,11 +1114,14 @@ class AdminCartsControllerCore extends AdminController
                     $dateTo,
                     $idRoom
                 )) {
-                    $selectedRoomServiceProduct['selected_service'] = $objRoomTypeServiceProductCartDetail->getRoomServiceProducts(
-                        $selectedRoomServiceProduct['id'],
+                    $selectedRoomServiceProduct['selected_service'] = $objRoomTypeServiceProductCartDetail->getServiceProductsInCart(
+                        $idCart,
                         0,
-                        null,
-                        null
+                        0,
+                        0,
+                        0,
+                        0,
+                        $selectedRoomServiceProduct['id'],
                     );
                 }
                 $this->context->smarty->assign(array(
