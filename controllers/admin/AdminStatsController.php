@@ -225,7 +225,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
     {
         if ($granularity == 'day') {
             $sales = array();
-            $result = Db::getInstance(_PS_USE_SQL_SLAVE_)->ExecuteS(
+            if ($result = Db::getInstance(_PS_USE_SQL_SLAVE_)->ExecuteS(
                 'SELECT LEFT(`invoice_date`, 10) AS date, SUM(total_paid_tax_excl / o.conversion_rate) AS sales
                 FROM `'._DB_PREFIX_.'orders` o
                 LEFT JOIN `'._DB_PREFIX_.'order_state` os ON o.current_state = os.id_order_state
@@ -236,14 +236,15 @@ class AdminStatsControllerCore extends AdminStatsTabController
                     WHERE hbd.`id_order` = o.`id_order`' . HotelBranchInformation::addHotelRestriction($id_hotel).'
                 )
                 GROUP BY LEFT(`invoice_date`, 10)'
-            );
-            foreach ($result as $row) {
-                $sales[strtotime($row['date'])] = $row['sales'];
-            }
+            )) {
+                foreach ($result as $row) {
+                    $sales[strtotime($row['date'])] = $row['sales'];
+                }
+	    }
             return $sales;
         } elseif ($granularity == 'month') {
             $sales = array();
-            $result = Db::getInstance(_PS_USE_SQL_SLAVE_)->ExecuteS(
+            if ($result = Db::getInstance(_PS_USE_SQL_SLAVE_)->ExecuteS(
                 'SELECT LEFT(`invoice_date`, 7) AS date, SUM(total_paid_tax_excl / o.conversion_rate) AS sales
                 FROM `'._DB_PREFIX_.'orders` o
                 LEFT JOIN `'._DB_PREFIX_.'order_state` os ON o.current_state = os.id_order_state
@@ -254,11 +255,12 @@ class AdminStatsControllerCore extends AdminStatsTabController
                     WHERE hbd.`id_order` = o.`id_order`' . HotelBranchInformation::addHotelRestriction($id_hotel).'
                 )
                 GROUP BY LEFT(`invoice_date`, 7)'
-            );
+            )) {
 
-            foreach ($result as $row) {
-                $sales[strtotime($row['date'].'-01')] = $row['sales'];
-            }
+                foreach ($result as $row) {
+                   $sales[strtotime($row['date'].'-01')] = $row['sales'];
+                }
+	    }
 
             return $sales;
         } else {
@@ -296,7 +298,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
     {
         if ($granularity == 'day') {
             $orders = array();
-            $result = Db::getInstance(_PS_USE_SQL_SLAVE_)->ExecuteS('
+            if ($result = Db::getInstance(_PS_USE_SQL_SLAVE_)->ExecuteS('
 			SELECT LEFT(`invoice_date`, 10) as date, COUNT(DISTINCT o.`id_order`) as orders
 			FROM `'._DB_PREFIX_.'orders` o
 			LEFT JOIN `'._DB_PREFIX_.'order_state` os ON o.current_state = os.id_order_state
@@ -304,14 +306,15 @@ class AdminStatsControllerCore extends AdminStatsTabController
 			WHERE `invoice_date` BETWEEN "'.pSQL($date_from).' 00:00:00" AND "'.pSQL($date_to).' 23:59:59" AND os.logable = 1
 			'.Shop::addSqlRestriction(false, 'o')
             .HotelBranchInformation::addHotelRestriction($id_hotel, 'hbd').'
-			GROUP BY LEFT(`invoice_date`, 10)');
-            foreach ($result as $row) {
-                $orders[strtotime($row['date'])] = $row['orders'];
-            }
+			GROUP BY LEFT(`invoice_date`, 10)')) {
+                foreach ($result as $row) {
+                    $orders[strtotime($row['date'])] = $row['orders'];
+                }
+	    }
             return $orders;
         } elseif ($granularity == 'month') {
             $orders = array();
-            $result = Db::getInstance(_PS_USE_SQL_SLAVE_)->ExecuteS('
+            if ($result = Db::getInstance(_PS_USE_SQL_SLAVE_)->ExecuteS('
 			SELECT LEFT(`invoice_date`, 7) as date, COUNT(DISTINCT o.`id_order`) as orders
 			FROM `'._DB_PREFIX_.'orders` o
 			LEFT JOIN `'._DB_PREFIX_.'order_state` os ON o.current_state = os.id_order_state
@@ -319,9 +322,10 @@ class AdminStatsControllerCore extends AdminStatsTabController
 			WHERE `invoice_date` BETWEEN "'.pSQL($date_from).' 00:00:00" AND "'.pSQL($date_to).' 23:59:59" AND os.logable = 1
 			'.Shop::addSqlRestriction(false, 'o')
             .HotelBranchInformation::addHotelRestriction($id_hotel, 'hbd').'
-			GROUP BY LEFT(`invoice_date`, 7)');
-            foreach ($result as $row) {
-                $orders[strtotime($row['date'].'-01')] = $row['orders'];
+			GROUP BY LEFT(`invoice_date`, 7)')) {
+                foreach ($result as $row) {
+                    $orders[strtotime($row['date'].'-01')] = $row['orders'];
+                }
             }
             return $orders;
         } else {
@@ -474,7 +478,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
     {
         if ($granularity == 'day') {
             $purchases = array();
-            $result = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS('
+            if ($result = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS('
 			SELECT
 				LEFT(`invoice_date`, 10) as date,
 				SUM(od.`product_quantity` * IF(
@@ -496,10 +500,11 @@ class AdminStatsControllerCore extends AdminStatsTabController
                 FROM `qlo_htl_booking_detail` hbd
                 WHERE hbd.`id_order` = o.`id_order`' . HotelBranchInformation::addHotelRestriction($id_hotel).'
             )
-			GROUP BY LEFT(`invoice_date`, 10)');
+			GROUP BY LEFT(`invoice_date`, 10)')) {
 
-            foreach ($result as $row) {
-                $purchases[strtotime($row['date'])] = $row['total_purchase_price'];
+                foreach ($result as $row) {
+                    $purchases[strtotime($row['date'])] = $row['total_purchase_price'];
+                }
             }
 
             return $purchases;
@@ -527,7 +532,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
     {
         if ($granularity == 'day') {
             $refunds = array();
-            $result = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS('
+            if ($result = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS('
 			SELECT
 				LEFT(`invoice_date`, 10) as date,
 				SUM(orr.`refunded_amount`) as total_refund_amount
@@ -540,10 +545,11 @@ class AdminStatsControllerCore extends AdminStatsTabController
                 FROM `qlo_htl_booking_detail` hbd
                 WHERE hbd.`id_order` = o.`id_order`' . HotelBranchInformation::addHotelRestriction($id_hotel).'
             )
-			GROUP BY LEFT(`invoice_date`, 10)');
+			GROUP BY LEFT(`invoice_date`, 10)')) {
 
-            foreach ($result as $row) {
-                $refunds[strtotime($row['date'])] = $row['total_refund_amount'];
+                foreach ($result as $row) {
+                    $refunds[strtotime($row['date'])] = $row['total_refund_amount'];
+                }
             }
 
             return $refunds;
