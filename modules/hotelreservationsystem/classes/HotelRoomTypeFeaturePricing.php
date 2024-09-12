@@ -718,7 +718,7 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
             }
         }
         if ($with_auto_room_services) {
-            if ($id_cart) {
+            if ($id_cart && $id_room) {
                 $objRoomTypeServiceProductCartDetail = new RoomTypeServiceProductCartDetail();
                 if ($roomServicesServices = $objRoomTypeServiceProductCartDetail->getServiceProductsInCart(
                     $id_cart,
@@ -740,8 +740,8 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
             }
 
             if (isset($selectedServices)) {
-                $totalPrice['total_price_tax_incl'] += Tools::processPriceRounding($selectedServices['total_price_tax_incl']);
-                $totalPrice['total_price_tax_excl'] += Tools::processPriceRounding($selectedServices['total_price_tax_excl']);
+                $totalPrice['total_price_tax_incl'] += $selectedServices['total_price_tax_incl'];
+                $totalPrice['total_price_tax_excl'] += $selectedServices['total_price_tax_excl'];
             } else {
                 if ($servicesWithTax = RoomTypeServiceProduct::getAutoAddServices(
                     $id_product,
