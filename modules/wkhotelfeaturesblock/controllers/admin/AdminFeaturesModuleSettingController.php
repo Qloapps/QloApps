@@ -201,6 +201,7 @@ class AdminFeaturesModuleSettingController extends ModuleAdminController
                         $this->l('Maximum image size: %1s'),
                         Tools::formatBytes(Tools::getMaxUploadSize())
                     ),
+                    'desc' => $this->l('Recommended resolution: 720 x 540 pixels.'),
                 ),
                 array(
                     'type' => 'switch',
@@ -319,12 +320,11 @@ class AdminFeaturesModuleSettingController extends ModuleAdminController
                 if (file_exists($imgPath)) {
                     unlink($imgPath);
                 }
-                $imageSize = ImageType::getByName(ImageType::getFormatedName('large'));
                 ImageManager::resize(
                     $file['tmp_name'],
                     $imgPath,
-                    $imageSize['width'],
-                    $imageSize['height']
+                    720,
+                    540
                 );
             }
 

@@ -357,7 +357,7 @@ class ProductCore extends ObjectModel
             ),
             'name' =>                        array('type' => self::TYPE_STRING, 'lang' => true, 'validate' => 'isCatalogName', 'required' => true, 'size' => 128),
             'description' =>                array('type' => self::TYPE_HTML, 'lang' => true, 'validate' => 'isCleanHtml'),
-            'description_short' =>            array('type' => self::TYPE_HTML, 'lang' => true, 'validate' => 'isCleanHtml'),
+            'description_short' =>            array('type' => self::TYPE_STRING, 'lang' => true, 'validate' => 'isCleanHtml'),
             'available_now' =>                array('type' => self::TYPE_STRING, 'lang' => true, 'validate' => 'isGenericName', 'size' => 255),
             'available_later' =>            array('type' => self::TYPE_STRING, 'lang' => true, 'validate' => 'IsGenericName', 'size' => 255),
         ),
@@ -3299,10 +3299,12 @@ class ProductCore extends ObjectModel
             );
         }
 
-        if (isset($priceForRoomInfo) && isset($priceForRoomInfo['price'])) {
-            $price = (float)$priceForRoomInfo['price'];
-        } elseif (!$specific_price || $specific_price['price'] < 0) {
-            $price = (float)$result['price'];
+        if (!$specific_price || $specific_price['price'] < 0) {
+            if (isset($priceForRoomInfo) && isset($priceForRoomInfo['price'])) {
+                $price = (float)$priceForRoomInfo['price'];
+            } else {
+                $price = (float)$result['price'];
+            }
         } else {
             $price = (float)$specific_price['price'];
         }

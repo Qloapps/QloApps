@@ -45,7 +45,7 @@
 									<td>
 										<div class="input-group">
 											<span class="input-group-addon">{$currencySign}</span>
-											<input type="text" class="form-control unit_price" value="{Tools::ps_round($demand['unit_price_tax_excl'], 2)}">
+											<input type="text" class="form-control unit_price" value="{$demand['unit_price_tax_excl']}">
 											{if $demand['price_calc_method'] == HotelRoomTypeGlobalDemand::WK_PRICE_CALC_METHOD_EACH_DAY}
 												<span class="input-group-addon">{l s='/ night'}</span>
 											{/if}
@@ -115,7 +115,7 @@
 											{else}
 												{assign  var=demand_price value=$demand['price_tax_excl']}
 											{/if}
-											<input type="text" class="form-control unit_price" value="{Tools::ps_round($demand_price, 2)}" data-id-product="{$product['id_product']}">
+											<input type="text" class="form-control unit_price" value="{$demand_price}" data-id-product="{$product['id_product']}">
 											{if $demand['price_calc_method'] == HotelRoomTypeGlobalDemand::WK_PRICE_CALC_METHOD_EACH_DAY}
 												<span class="input-group-addon">{l s='/ night'}</span>
 											{/if}

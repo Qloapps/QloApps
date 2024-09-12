@@ -163,6 +163,7 @@ class RoomTypeServiceProduct extends ObjectModel
                         $use_reduc
                     );
                 }
+
                 return $services;
             }
         }

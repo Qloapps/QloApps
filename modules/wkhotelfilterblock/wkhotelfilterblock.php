@@ -199,7 +199,7 @@ class wkhotelfilterblock extends Module
                     $prod_price = array();
                     if ($room_types) {
                         foreach ($room_types as $key => $value) {
-                            $prod_price[] = Product::getPriceStatic($value['id_product'], HotelBookingDetail::useTax());
+                            $prod_price[] = HotelRoomTypeFeaturePricing::getRoomTypeFeaturePricesPerDay($value['id_product'], $date_from, $date_to, HotelBookingDetail::useTax());
                         }
                     }
 

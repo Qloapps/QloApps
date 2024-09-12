@@ -101,7 +101,7 @@ class RoomTypeServiceProductPrice extends ObjectModel
         );
     }
 
-    public function getServicePrice($idProduct, $idProductRoomType, $quantity, $dateFrom = null, $dateTo = null, $useTax = null, $id_cart = false, $id_address = null, $use_reduc= 1)
+    public function getServicePrice($idProduct, $idProductRoomType, $quantity = 1, $dateFrom = null, $dateTo = null, $useTax = null, $id_cart = false, $id_address = null, $use_reduc= 1)
     {
         if ($useTax === null)
             $useTax = Product::$_taxCalculationMethod == PS_TAX_EXC ? false : true;
