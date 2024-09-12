@@ -6544,20 +6544,20 @@ class AdminOrdersControllerCore extends AdminController
                                     (int)$product['id_product'],
                                     $roomHtlCartInfo['id_product'],
                                     1,
-                                    null,
-                                    null,
+                                    $objHotelBookingDetail->date_from,
+                                    $objHotelBookingDetail->date_to,
                                     false,
                                     $cart->id
-                                );
+                                ) / $numDays;
                                 $unitPriceTaxIncl = $objRoomTypeServiceProductPrice->getServicePrice(
                                     (int)$product['id_product'],
                                     $roomHtlCartInfo['id_product'],
                                     1,
-                                    null,
-                                    null,
+                                    $objHotelBookingDetail->date_from,
+                                    $objHotelBookingDetail->date_to,
                                     true,
                                     $cart->id
-                                );
+                                ) / $numDays;
 
                                 $totalPriceChangeTaxExcl += $totalPriceTaxExcl = ($unitPriceTaxExcl * $product['cart_quantity']);
                                 $totalPriceChangeTaxIncl += $totalPriceTaxIncl = ($unitPriceTaxIncl * $product['cart_quantity']);
