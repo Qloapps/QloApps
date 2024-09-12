@@ -356,7 +356,16 @@
 				</div> -->
 				{if isset($total_convenience_fee)}
 					<div class="layer_cart_row">
-						<strong class="dark">{l s='Convenience Fees' mod='blockcart'}</strong>
+						<strong class="dark">
+							{l s='Convenience Fees' mod='blockcart'}
+							{if $display_tax_label}
+								{if $priceDisplay == 1}
+									{l s='(tax excl.)' mod='blockcart'}
+								{else}
+									{l s='(tax incl.)' mod='blockcart'}
+								{/if}
+							{/if}
+						</strong>
 						<span class="price ajax_cart_convenience_fee pull-right">{convertPrice price=$total_convenience_fee}</span>
 					</div>
 				{/if}
