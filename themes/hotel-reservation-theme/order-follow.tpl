@@ -24,21 +24,19 @@
 *}
 
 {block name='order_follow'}
-	{block name='order_follow_heading'}
-		{capture name=path}
-			<a href="{$link->getPageLink('my-account', true)|escape:'html':'UTF-8'}">
-				{l s='My account'}
-			</a>
-			<span class="navigation-pipe">
-				{$navigationPipe}
-			</span>
-			<span class="navigation_page">
-				{l s='Booking refund requests'}
-			</span>
-		{/capture}
-	{/block}
+	{capture name=path}
+		<a href="{$link->getPageLink('my-account', true)|escape:'html':'UTF-8'}">
+			{l s='My account'}
+		</a>
+		<span class="navigation-pipe">
+			{$navigationPipe}
+		</span>
+		<span class="navigation_page">
+			{l s='Booking refund requests'}
+		</span>
+	{/capture}
 	<div class="panel">
-		{block name='order_follow_subheading'}
+		{block name='order_follow_heading'}
 			<h1 class="page-heading bottom-indent">
 				<i class="icon-tasks"></i> &nbsp;{l s='Booking Refund Requests'}
 			</h1>

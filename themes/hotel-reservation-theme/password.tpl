@@ -26,7 +26,9 @@
 {block name='password'}
 	{capture name=path}<a href="{$link->getPageLink('authentication', true)|escape:'html':'UTF-8'}" title="{l s='Authentication'}" rel="nofollow">{l s='Authentication'}</a><span class="navigation-pipe">{$navigationPipe}</span>{l s='Forgot your password'}{/capture}
 	<div class="box">
-	<h1 class="page-subheading">{l s='Forgot your password?'}</h1>
+	{block name='password_heading'}
+		<h1 class="page-subheading">{l s='Forgot your password?'}</h1>
+	{/block}
 
 	{include file="$tpl_dir./errors.tpl"}
 
@@ -46,9 +48,11 @@
 				{block name='displayForgotPasswordFormFieldsAfter'}
 					{hook h='displayForgotPasswordFormFieldsAfter'}
 				{/block}
-				<p class="submit">
-					<button type="submit" class="btn button button-medium"><span>{l s='Retrieve Password'}&nbsp;<i class="icon-chevron-right right"></i></span></button>
-				</p>
+				{block name='password_form_action'}
+					<p class="submit">
+						<button type="submit" class="btn button button-medium"><span>{l s='Retrieve Password'}&nbsp;<i class="icon-chevron-right right"></i></span></button>
+					</p>
+				{/block}
 			</fieldset>
 		</form>
 	{/block}

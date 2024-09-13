@@ -17,7 +17,7 @@
 *  @license   https://store.webkul.com/license.html
 *}
 
-{block name='landing_page_search'}
+{block name='landing_page_search_panel'}
     {if isset($is_index_page) && $is_index_page}
         <div class="header-rmsearch-container header-rmsearch-hide-xs hidden-xs">
             {if isset($hotels_info) && count($hotels_info)}

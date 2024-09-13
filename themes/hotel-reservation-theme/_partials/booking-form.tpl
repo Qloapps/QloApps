@@ -20,7 +20,7 @@
 {block name='booking_form'}
     <div class="booking-form card">
         <div class="booking_room_fields">
-            {block name='booking_form_form'}
+            {block name='booking_form_content'}
                 <form id="booking-form" action="" method="post">
                     {block name='booking_form_hotel_location'}
                         {if isset($id_hotel) && $id_hotel}
@@ -35,7 +35,7 @@
                         {if $product->booking_product}
                             {if  !$order_date_restrict}
                                 <div class="row">
-                                    {block name='booking_form_dates_field'}
+                                    {block name='booking_form_dates'}
                                         <div class="form-group col-sm-12">
                                             <label class="control-label">{l s='Check In - Check Out'}</label>
                                             <div class="form-control input-date" id="room_date_range"  autocomplete="off" placeholder="{l s='Check-in - Check-out'}"><span>{l s='Check-in'} &nbsp;<i class="icon icon-minus"></i>&nbsp; {l s='Check-out'}</span></div>
@@ -45,20 +45,24 @@
                                     {/block}
                                 </div>
                                 {if $total_available_rooms > 0}
-                                    {block name='booking_form_quantity_field'}
+                                    {block name='booking_form_quantity_wrapper'}
                                         <div class="row">
                                             <div class="form-group col-sm-12"{if !$product->available_for_order || $PS_CATALOG_MODE} style="display: none;"{/if}>
                                                 {if isset($occupancy_required_for_booking) && $occupancy_required_for_booking}
                                                     <label class="control-label">{l s='Guests'}</label>
-                                                    {include file="./occupancy_field.tpl"}
+                                                    {block name='booking_form_occupancy'}
+                                                        {include file="./occupancy_field.tpl"}
+                                                    {/block}
                                                 {else}
                                                     <label class="control-label">{l s='No. of Rooms'}</label>
-                                                    {include file="./quantity_field.tpl"}
+                                                    {block name='booking_form_quantity'}
+                                                        {include file="./quantity_field.tpl"}
+                                                    {/block}
                                                 {/if}
                                             </div>
                                         </div>
                                     {/block}
-                                    {block name='booking_form_price_desc'}
+                                    {block name='booking_form_price_information'}
                                         {if (isset($has_room_type_demands) && $has_room_type_demands) || (isset($service_products_exists) && $service_products_exists)}
                                             <hr class="separator-hr-mg-10">
                                             <div class="row price_desc_block">
@@ -148,7 +152,7 @@
                                             <div class="row">
                                                 {block name='booking_form_total_price'}
                                                     <div class="total_price_block col-xs-7 form-group">
-                                                        <label class="control-label">{l s='Subtotal'}</label>
+                                                        <label class="control-label">{l s='Total'}</label>
                                                         <p>
                                                             {if $total_price && $total_price_without_discount > $total_price}
                                                                 <span class="room_type_old_price">
@@ -159,7 +163,7 @@
                                                         </p>
                                                     </div>
                                                 {/block}
-                                                {block name='booking_form_num_avail'}
+                                                {block name='booking_form_available_quantity'}
                                                     {if $total_available_rooms <= $warning_count}
                                                         <div class="col-xs-5 form-group text-right num_quantity_alert">
                                                             <span class="num_searched_avail_rooms">

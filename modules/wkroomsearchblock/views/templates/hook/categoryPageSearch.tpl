@@ -17,7 +17,7 @@
 *  @license   https://store.webkul.com/license.html
 *}
 
-{block name='category_page_search'}
+{block name='category_page_search_panel'}
     {if isset($hotels_info) && count($hotels_info)}
         <div class="header-rmsearch-wrapper">
         <div class="filter_header clearfix">

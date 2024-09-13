@@ -37,10 +37,12 @@
                         </p>
                         <a href="{$link->getPageLink('password', true)|escape:'html':'UTF-8'}" class="lost_password pull-right">{l s='Forgot your password?'}</a>
                         <div style="clear:both"></div>
-                        <p class="submit">
-                            {if isset($back)}<input type="hidden" class="hidden" name="back" value="{$back|escape:'html':'UTF-8'}" />{/if}
-                            <button type="submit" id="SubmitLogin" name="SubmitLogin" class="button btn btn-default button-medium pull-right"><span><i class="icon-lock left"></i>{l s='Sign in'}</span></button>
-                        </p>
+                        {block name='order_opc_edit_guest_info_login_submit'}
+                            <p class="submit">
+                                {if isset($back)}<input type="hidden" class="hidden" name="back" value="{$back|escape:'html':'UTF-8'}" />{/if}
+                                <button type="submit" id="SubmitLogin" name="SubmitLogin" class="button btn btn-default button-medium pull-right"><span><i class="icon-lock left"></i>{l s='Sign in'}</span></button>
+                            </p>
+                        {/block}
                     </div>
                 </fieldset>
             </form>
@@ -292,7 +294,7 @@
                     {block name='displayCustomerAccountForm'}
                         {$HOOK_CREATE_ACCOUNT_FORM}
                     {/block}
-    				{block name='order_opc_edit_guest_info_submit_account_button'}
+    				{block name='order_opc_edit_guest_info_submit_account'}
                         <div class="submit opc-add-save clearfix">
                             <button type="submit" name="submitAccount" id="submitAccount" class="btn btn-default button button-medium pull-right"><span>{l s='Save'}<i class="icon-chevron-right right"></i></span></button>
                         </div>

@@ -24,26 +24,24 @@
 *}
 
 {block name='address'}
-	{block name='address_heading'}
-		{capture name=path}
-			<a href="{$link->getPageLink('my-account', true)|escape:'html':'UTF-8'}">
-				{l s='My account'}
-			</a>
-			<span class="navigation-pipe">
-				{$navigationPipe}
-			</span>
-			<span class="navigation_page">
-				{l s='Address'}
-			</span>
-		{/capture}
-		{if isset($smarty.get.updated) && $smarty.get.updated}
-			<p class="alert alert-success">
-				{l s='Your address has been successfully updated.'}
-			</p>
-		{/if}
-	{/block}
+	{capture name=path}
+		<a href="{$link->getPageLink('my-account', true)|escape:'html':'UTF-8'}">
+			{l s='My account'}
+		</a>
+		<span class="navigation-pipe">
+			{$navigationPipe}
+		</span>
+		<span class="navigation_page">
+			{l s='Address'}
+		</span>
+	{/capture}
+	{if isset($smarty.get.updated) && $smarty.get.updated}
+		<p class="alert alert-success">
+			{l s='Your address has been successfully updated.'}
+		</p>
+	{/if}
 	<div class="box">
-		{block name='address_subheading'}
+		{block name='address_heading'}
 			<h1 class="page-subheading">{l s='Address'}</h1>
 		{/block}
 		<p class="info-title">

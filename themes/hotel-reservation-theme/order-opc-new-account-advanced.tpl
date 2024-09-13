@@ -20,10 +20,12 @@
                             <input class="form-control validate" type="password" id="login_passwd" name="login_passwd" data-validate="isPasswd" />
                         </p>
                         <a href="{$link->getPageLink('password', true)|escape:'html':'UTF-8'}" class="lost_password">{l s='Forgot your password?'}</a>
-                        <p class="submit">
-                            {if isset($back)}<input type="hidden" class="hidden" name="back" value="{$back|escape:'html':'UTF-8'}" />{/if}
-                            <button type="submit" id="SubmitLogin" name="SubmitLogin" data-adv-api="1" class="button btn btn-default button-medium"><span><i class="icon-lock left"></i>{l s='Sign in'}</span></button>
-                        </p>
+                        {block name='order_opc_new_account_advanced_login_submit'}
+                            <p class="submit">
+                                {if isset($back)}<input type="hidden" class="hidden" name="back" value="{$back|escape:'html':'UTF-8'}" />{/if}
+                                <button type="submit" id="SubmitLogin" name="SubmitLogin" data-adv-api="1" class="button btn btn-default button-medium"><span><i class="icon-lock left"></i>{l s='Sign in'}</span></button>
+                            </p>
+                        {/block}
                     </div>
                 </fieldset>
             </form>
@@ -374,7 +376,7 @@
                             {block name='displayCustomerAccountForm'}
                                 {$HOOK_CREATE_ACCOUNT_FORM}
                             {/block}
-                            {block name='order_opc_new_account_advanced_submit_account_button'}
+                            {block name='order_opc_new_account_advanced_submit_account'}
                                 <div class="submit opc-add-save clearfix">
                                     <p class="required opc-required pull-right">
                                         <sup>*</sup>{l s='Required field'}

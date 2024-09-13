@@ -349,13 +349,6 @@ div.uploader .filename, div.uploader .action {
 #service_products_cont .service-product-element > [class*=col] {
   float: right !important;
 }
-
-@media (min-width: 768px) {
-  .hotel_name {
-    margin-right: unset;
-    margin-left: 10px;
-  }
-}
 /* room-type-detail page - end */
 
 /* abc - start */
@@ -443,18 +436,11 @@ p.payment_module a {
     float: left !important;
   }
 }
-.fancybox-order-detail .fancybox-close {
+.fancybox-wrap.fancybox-order-detail .fancybox-close {
   right: unset !important;
   left: 12px !important;
 }
-/* order-detail - end */
-
-/* order-confirmation - start */
-.fancybox-extra-services .fancybox-close {
-  right: unset !important;
-  left: 12px !important;
-}
-/* order-confirmation - end */
+/* order-detail - start */
 
 /* Booking refund requests - start */
 #order-return .form-group.row div {

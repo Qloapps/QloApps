@@ -118,7 +118,7 @@
 											</a>
 										</div>
 										<div class="header-top-menu">
-											{block name='displayFooter'}
+											{block name='displayTop'}
 												{if isset($HOOK_TOP)}{$HOOK_TOP}{/if}
 											{/block}
 										</div>

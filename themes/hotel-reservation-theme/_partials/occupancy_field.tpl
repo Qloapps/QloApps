@@ -31,7 +31,7 @@
             </button>
         {/block}
 
-        {block name='occupancy_field_dropdown'}
+        {block name='occupancy_field_content'}
             <div class="dropdown-menu booking_occupancy_wrapper">
                 <input type="hidden" class="max_avail_type_qty" value="{if isset($total_available_rooms)}{$total_available_rooms|escape:'html':'UTF-8'}{/if}">
                 <input type="hidden" class="max_adults" value="{$room_type_info['max_adults']|escape:'html':'UTF-8'}">

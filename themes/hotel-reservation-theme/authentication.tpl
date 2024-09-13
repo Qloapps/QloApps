@@ -30,7 +30,9 @@
 			<span class="navigation-pipe">{$navigationPipe}</span>{l s='Create your account'}
 		{/if}
 	{/capture}
-	<h1 class="page-heading">{if !isset($email_create)}{l s='Authentication'}{else}{l s='Create an account'}{/if}</h1>
+	{block name='authentication_heading'}
+		<h1 class="page-heading">{if !isset($email_create)}{l s='Authentication'}{else}{l s='Create an account'}{/if}</h1>
+	{/block}
 	{if isset($back) && preg_match("/^http/", $back)}{assign var='current_step' value='login'}{include file="$tpl_dir./order-steps.tpl"}{/if}
 	{include file="$tpl_dir./errors.tpl"}
 	{assign var='stateExist' value=false}
@@ -59,8 +61,8 @@
 					</div>
 				</div>
 			{/if}
-			{block name='authentication_create_account_form'}
-				<div class="col-xs-12 col-sm-6">
+			<div class="col-xs-12 col-sm-6">
+				{block name='authentication_create_account_form'}
 					<form action="{$link->getPageLink('authentication', true)|escape:'html':'UTF-8'}" method="post" id="create-account_form" class="box">
 						<h3 class="page-subheading">{l s='Create an account'}</h3>
 						<div class="form_content clearfix">
@@ -71,21 +73,23 @@
 								<label for="email_create" class="">{l s='Email address'}</label>
 								<input type="email" class="is_required validate account_input form-control" data-validate="isEmail" id="email_create" name="email_create" value="{if isset($smarty.post.email_create)}{$smarty.post.email_create|stripslashes}{/if}" />
 							</div>
-							<div class="submit">
-								{if isset($back)}<input type="hidden" class="hidden" name="back" value="{$back|escape:'html':'UTF-8'}" />{/if}
-								<button class="btn button button-medium" type="submit" id="SubmitCreate" name="SubmitCreate">
-									<span>
-										<i class="icon-user left"></i>
-										{l s='Create an account'}
-									</span>
-								</button>
-							</div>
+							{block name='authentication_submit_create_account'}
+								<div class="submit">
+									{if isset($back)}<input type="hidden" class="hidden" name="back" value="{$back|escape:'html':'UTF-8'}" />{/if}
+									<button class="btn button button-medium" type="submit" id="SubmitCreate" name="SubmitCreate">
+										<span>
+											<i class="icon-user left"></i>
+											{l s='Create an account'}
+										</span>
+									</button>
+								</div>
+							{/block}
 						</div>
 					</form>
-				</div>
-			{/block}
-			{block name='authentication_login_form'}
-				<div class="col-xs-12 col-sm-6">
+				{/block}
+			</div>
+			<div class="col-xs-12 col-sm-6">
+				{block name='authentication_login_form'}
 					<form action="{$link->getPageLink('authentication', true)|escape:'html':'UTF-8'}" method="post" id="login_form" class="box">
 						<h3 class="page-subheading">{l s='Already registered?'}</h3>
 						<div class="form_content clearfix">
@@ -101,25 +105,27 @@
 								{hook h='displayLoginFormFieldsAfter'}
 							{/block}
 							<p class="lost_password form-group"><a href="{$link->getPageLink('password')|escape:'html':'UTF-8'}" title="{l s='Recover your forgotten password'}" rel="nofollow">{l s='Forgot your password?'}</a></p>
-							<p class="submit">
-								{if isset($back)}<input type="hidden" class="hidden" name="back" value="{$back|escape:'html':'UTF-8'}" />{/if}
-								<button type="submit" id="SubmitLogin" name="SubmitLogin" class="btn button button-medium">
-									<span>
-										<i class="icon-lock left"></i>
-										{l s='Sign in'}
-									</span>
-								</button>
-							</p>
+							{block name='authentication_submit_login_account'}
+								<p class="submit">
+									{if isset($back)}<input type="hidden" class="hidden" name="back" value="{$back|escape:'html':'UTF-8'}" />{/if}
+									<button type="submit" id="SubmitLogin" name="SubmitLogin" class="btn button button-medium">
+										<span>
+											<i class="icon-lock left"></i>
+											{l s='Sign in'}
+										</span>
+									</button>
+								</p>
+							{/block}
 							{block name='displayLoginFormBottom'}
 								{hook h="displayLoginFormBottom"}
 							{/block}
 						</div>
 					</form>
-				</div>
-			{/block}
+				{/block}
+			</div>
 		</div>
-		{block name='authentication_new_account_form'}
-			{if isset($inOrderProcess) && $inOrderProcess && $PS_GUEST_CHECKOUT_ENABLED}
+		{if isset($inOrderProcess) && $inOrderProcess && $PS_GUEST_CHECKOUT_ENABLED}
+			{block name='authentication_new_account_form'}
 				<form action="{$link->getPageLink('authentication', true, NULL, "back=$back")|escape:'html':'UTF-8'}" method="post" id="new_account_form" class="std clearfix">
 					<div class="box">
 						<div id="opc_account_form" style="display: block; ">
@@ -422,16 +428,18 @@
 					<p class="cart_navigation required submit clearfix">
 						<span><sup>*</sup>{l s='Required field'}</span>
 						<input type="hidden" name="display_guest_checkout" value="1" />
-						<button type="submit" class="button btn btn-default button-medium" name="submitGuestAccount" id="submitGuestAccount">
-							<span>
-								{l s='Proceed to checkout'}
-								<i class="icon-chevron-right right"></i>
-							</span>
-						</button>
+						{block name='authentication_submit_guest_account'}
+							<button type="submit" class="button btn btn-default button-medium" name="submitGuestAccount" id="submitGuestAccount">
+								<span>
+									{l s='Proceed to checkout'}
+									<i class="icon-chevron-right right"></i>
+								</span>
+							</button>
+						{/block}
 					</p>
 				</form>
-			{/if}
-		{/block}
+			{/block}
+		{/if}
 	{else}
 		<!--{if isset($account_error)}
 		<div class="error">
@@ -694,7 +702,7 @@
 					<input type="hidden" name="email_create" value="1" />
 					<input type="hidden" name="is_new_customer" value="1" />
 					{if isset($back)}<input type="hidden" class="hidden" name="back" value="{$back|escape:'html':'UTF-8'}" />{/if}
-					{block name='authentication_submit_account_button'}
+					{block name='authentication_submit_account'}
 						<button type="submit" name="submitAccount" id="submitAccount" class="btn button button-medium">
 							<span>{l s='Register'}&nbsp;<i class="icon-chevron-right right"></i></span>
 						</button>

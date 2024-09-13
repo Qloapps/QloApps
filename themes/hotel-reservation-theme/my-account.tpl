@@ -24,22 +24,20 @@
 *}
 
 {block name='my_account'}
-    {block name='my_account_heading'}
-        {capture name=path}{l s='My account'}{/capture}
+    {capture name=path}{l s='My account'}{/capture}
 
+    {block name='my_account_heading'}
         <h1 class="page-heading">{l s='My account'}</h1>
-    {/block}
-    {if isset($account_created)}
-        <p class="alert alert-success">
-            {l s='Your account has been created.'}
-        </p>
-    {/if}
-    {block name='my_account_heading_info'}
+        {if isset($account_created)}
+            <p class="alert alert-success">
+                {l s='Your account has been created.'}
+            </p>
+        {/if}
         <p class="info-account">{l s='Welcome to your account. Here you can manage all of your personal information and orders.'}</p>
     {/block}
     <div class="row addresses-lists">
         <div class="col-xs-12 col-sm-6 col-lg-4">
-            {block name='my_account_link_list'}
+            {block name='my_account_tabs'}
                 <ul class="myaccount-link-list">
                     <li><a href="{$link->getPageLink('address', true)|escape:'html':'UTF-8'}" title="{l s='Address'}"><i class="icon-building"></i><span>{l s='Address'}</span></a></li>
                     <li><a href="{$link->getPageLink('history', true)|escape:'html':'UTF-8'}" title="{l s='Bookings'}"><i class="icon-list-ol"></i><span>{l s='Bookings'}</span></a></li>

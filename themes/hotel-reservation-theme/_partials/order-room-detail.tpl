@@ -20,14 +20,14 @@
 {block name='order_room_detail'}
     <div class="booking-room-detail" data-id-product="{$data_v.id_product}" data-date-diff="{$rm_k}">
         <div class="row">
-            {block name='order_room_detial_room_image'}
+            {block name='order_room_detail_room_image'}
                 <div class="col-xs-3 col-sm-2">
                     <a href="{$link->getProductLink($data_v.id_product)|escape:'html':'UTF-8'}" title="{$data_v.name|escape:'html':'UTF-8'}" target="_blank">
                         <img class="img img-responsive img-room-type" src="{$data_v.cover_img|escape:'html':'UTF-8'}" />
                     </a>
                 </div>
             {/block}
-            {block name='order_room_detial_room_detail'}
+            {block name='order_room_detail_room_detail'}
                 <div class="col-xs-9 col-sm-10 info-wrap">
                     <div class="row">
                         <div class="col-xs-12">

@@ -19,7 +19,7 @@
 
 {block name='room_type_page_search'}
 	{if isset($hotels_info) && count($hotels_info)}
-		{block name='room_type_page_search_input'}
+		{block name='room_type_page_search_info'}
 			{* searched information wrapper block*}
 			{if isset($search_data) && $search_data}
 				<div class="header-rmsearch-details-wrapper">
@@ -49,7 +49,7 @@
 		{/block}
 
 		{* search form wrapper block*}
-		{block name='room_type_page_search_form'}
+		{block name='room_type_page_search_panel'}
 			<div class="header-rmsearch-wrapper">
 				<div class="container">
 					<div class="filter_header">

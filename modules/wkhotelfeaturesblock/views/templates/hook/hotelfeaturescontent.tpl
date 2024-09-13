@@ -17,24 +17,24 @@
 *  @license   https://store.webkul.com/license.html
 *}
 
-{block name='hotel_features_content'}
+{block name='hotel_features_block'}
     {if isset($hotelAmenities) && $hotelAmenities}
         <div id="hotelAmenitiesBlock" class="row home_block_container">
             <div class="col-xs-12 col-sm-12 home_amenities_wrapper">
                 {if $HOTEL_AMENITIES_HEADING && $HOTEL_AMENITIES_DESCRIPTION}
                     <div class="row home_block_desc_wrapper">
                         <div class="col-md-offset-1 col-md-10 col-lg-offset-2 col-lg-8">
-                            {block name='hotel_features_heading'}
+                            {block name='hotel_features_block_heading'}
                                 <p class="home_block_heading">{$HOTEL_AMENITIES_HEADING|escape:'htmlall':'UTF-8'}</p>
                             {/block}
-                            {block name='hotel_features_description'}
+                            {block name='hotel_features_block_description'}
                                 <p class="home_block_description">{$HOTEL_AMENITIES_DESCRIPTION|escape:'htmlall':'UTF-8'}</p>
                             {/block}
                             <hr class="home_block_desc_line"/>
                         </div>
                     </div>
                 {/if}
-                {block name='hotel_features_content_images'}
+                {block name='hotel_features_images'}
                     <div class="homeAmenitiesBlock home_block_content">
                         {assign var='amenityPosition' value=0}
                         {assign var='amenityIteration' value=0}

@@ -36,10 +36,11 @@
         </span>
     {/capture}
     <div class="box">
-        <h1 class="page-subheading">
-            {l s='Personal information'}
-        </h1>
-
+        {block name='identity_heading'}
+            <h1 class="page-subheading">
+                {l s='Personal information'}
+            </h1>
+        {/block}
         {include file="$tpl_dir./errors.tpl"}
 
         {if isset($confirmation) && $confirmation}

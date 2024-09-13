@@ -27,7 +27,7 @@
     <div class="paiement_block">
         {include file="$tpl_dir./order-opc-advanced-payment-option.tpl"}
 
-        {block name='order_payment_classic_terms_conditions'}
+        {block name='order_payment_classic_terms_and_conditions'}
             <div id="tc_cont">
                 <p class="checkbox">
                     <input type="checkbox" name="cgv" id="cgv" value="1" {if $checkedTOS}checked="checked"{/if} />

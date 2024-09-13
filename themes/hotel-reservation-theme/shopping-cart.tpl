@@ -84,41 +84,39 @@
 		{block name='shopping_cart_detail'}
 			<div class="order-detail-content">
 				{if isset($cart_htl_data) && $cart_htl_data}
-					{block name='shopping_cart_detail_heading'}
+					{block name='shopping_cart_heading'}
 						<p class="cart_section_title">{l s='rooms information'}</p>
 					{/block}
 					{foreach from=$cart_htl_data key=data_k item=data_v}
 						{foreach from=$data_v['date_diff'] key=rm_k item=rm_v}
 							<div class="row cart_product_line">
-								{block name='shopping_cart_detail_room_cover_image'}
-									<div class="col-sm-2 product-img-block">
+								<div class="col-sm-2 product-img-block">
+									{block name='shopping_cart_room_type_cover_image'}
 										<p>
 											<a href="{$link->getProductLink($data_v['id_product'])}">
 												<img src="{$data_v['cover_img']}" class="img-responsive" />
 											</a>
 										</p>
-										{block name='shopping_cart_detail_room_remove_button'}
-											<p class="room_remove_block">
-												<a href="{$rm_v['link']}"><i class="icon-trash"></i> &nbsp;{l s='Remove'}</a>
-											</p>
-										{/block}
+										<p class="room_remove_block">
+											<a href="{$rm_v['link']}"><i class="icon-trash"></i> &nbsp;{l s='Remove'}</a>
+										</p>
 										{block name='displayCartRoomImageAfter'}
 											{hook h='displayCartRoomImageAfter' id_product=$data_v['id_product']}
 										{/block}
-									</div>
-								{/block}
+									{/block}
+								</div>
 								<div class="col-sm-10">
 									<div class="room-info-container">
-										{block name='shopping_cart_detail_room_cover_image_mobile'}
+										{block name='shopping_cart_room_type_cover_image_mobile'}
 											<div class="product-xs-img">
 												<a href="{$link->getProductLink($data_v['id_product'])}">
 													<img src="{$data_v['cover_img']}" class="img-responsive" />
 												</a>
 											</div>
 										{/block}
-										{block name='shopping_cart_detail_room_detail'}
+										{block name='shopping_cart_room_detail'}
 											<div class="product-xs-info">
-												{block name='shopping_cart_detail_room_name'}
+												{block name='shopping_cart_room_type_name'}
 													<p class="product-name">
 														<a href="{$link->getProductLink($data_v['id_product'])}">
 															{$data_v['name']}
@@ -129,7 +127,7 @@
 														{/block}
 													</p>
 												{/block}
-												{block name='shopping_cart_detail_room_hotel_location'}
+												{block name='shopping_cart_room_type_hotel_location'}
 													{if isset($data_v['hotel_info']['location'])}
 														<p class="hotel-location">
 															<i class="icon-map-marker"></i> &nbsp;{$data_v['hotel_info']['location']}
@@ -142,7 +140,7 @@
 											</div>
 										{/block}
 									</div>
-									{block name='shopping_cart_detail_room_features'}
+									{block name='shopping_cart_room_type_features'}
 										{if isset($data_v['hotel_info']['room_features'])}
 											<div class="room-type-features">
 											{foreach $data_v['hotel_info']['room_features'] as $feature}
@@ -153,7 +151,7 @@
 											</div>
 										{/if}
 									{/block}
-									{block name='shopping_cart_detail_room_booking_duration'}
+									{block name='shopping_cart_room_type_booking_information'}
 										<div class="room_duration_block">
 											<div class="col-sm-3 col-xs-6">
 												<p class="room_duration_block_head">{l s='CHECK IN'}</p>
@@ -171,57 +169,59 @@
 											</div>
 										</div>
 									{/block}
-									{block name='shopping_cart_detail_room_price_detail'}
+									{block name='shopping_cart_room_type_price_detail'}
 										<div class="row room_price_detail_block">
-											<div class="col-sm-7 margin-btm-sm-10">
-												{if $rm_v['amount'] && isset($rm_v['total_price_without_discount']) && $rm_v['total_price_without_discount'] > $rm_v['amount']}
-													<span class="room_type_old_price">
-														{displayPrice price=$rm_v['total_price_without_discount']|floatval}
-													</span>
-												{/if}
-												<div class="row">
-													<div class="{if (isset($data_v['extra_demands']) && $data_v['extra_demands']) || (isset($data_v['service_products']) && $data_v['service_products'])}col-xs-6 plus-sign{else}col-xs-12{/if}">
-														<div class="price_block">
-															<p class="total_price">
-																<span>
-																	{displayPrice price=($rm_v['amount'])}
-																</span>
-																{if (($rm_v['amount'] - $rm_v['amount_without_auto_add']) > 0) && (in_array($data_v['id_product'], $discounted_products) || $PS_ROOM_PRICE_AUTO_ADD_BREAKDOWN)}
-																	<span class="room-price-detail">
-																		<img src="{$img_dir}icon/icon-info.svg" />
-																	</span>
-																	<div class="room-price-detail-container" style="display: none;">
-																		<div class="room-price-detail-tooltip-cont">
-																			<div><label>{l s='Room price'}</label> : {displayPrice price=($rm_v['amount_without_auto_add'])}</div>
-																			<div><label>{l s='Additional charges'}</label> : {displayPrice price=($rm_v['amount'] - $rm_v['amount_without_auto_add'])}</div>
-																		</div>
-																	</div>
-																{/if}
-															</p>
-															<p class="total_price_detial">
-																{l s='Total rooms price'} {if $display_tax_label}{if $priceDisplay} {l s='(Excl.'} {else}{l s='(Incl.)'}{/if} {l s='all taxes.)'}{/if}
-															</p>
-														</div>
-													</div>
-													{if (isset($data_v['extra_demands']) && $data_v['extra_demands']) || (isset($data_v['service_products']) && $data_v['service_products'])}
-														<div class="col-xs-6">
-															<div class="demand_price_block">
-																<p class="demand_total_price">
+											{block name='shopping_cart_room_type_and_service_price'}
+												<div class="col-sm-7 margin-btm-sm-10">
+													{if $rm_v['amount'] && isset($rm_v['total_price_without_discount']) && $rm_v['total_price_without_discount'] > $rm_v['amount']}
+														<span class="room_type_old_price">
+															{displayPrice price=$rm_v['total_price_without_discount']|floatval}
+														</span>
+													{/if}
+													<div class="row">
+														<div class="{if (isset($data_v['extra_demands']) && $data_v['extra_demands']) || (isset($data_v['service_products']) && $data_v['service_products'])}col-xs-6 plus-sign{else}col-xs-12{/if}">
+															<div class="price_block">
+																<p class="total_price">
 																	<span>
-																		{displayPrice price=$rm_v['demand_price']}
+																		{displayPrice price=($rm_v['amount'])}
 																	</span>
+																	{if (($rm_v['amount'] - $rm_v['amount_without_auto_add']) > 0) && (in_array($data_v['id_product'], $discounted_products) || $PS_ROOM_PRICE_AUTO_ADD_BREAKDOWN)}
+																		<span class="room-price-detail">
+																			<img src="{$img_dir}icon/icon-info.svg" />
+																		</span>
+																		<div class="room-price-detail-container" style="display: none;">
+																			<div class="room-price-detail-tooltip-cont">
+																				<div><label>{l s='Room price'}</label> : {displayPrice price=($rm_v['amount_without_auto_add'])}</div>
+																				<div><label>{l s='Additional charges'}</label> : {displayPrice price=($rm_v['amount'] - $rm_v['amount_without_auto_add'])}</div>
+																			</div>
+																		</div>
+																	{/if}
 																</p>
 																<p class="total_price_detial">
-																	<a data-date_from="{$rm_v['data_form']|escape:'html':'UTF-8'}" data-date_to="{$rm_v['data_to']|escape:'html':'UTF-8'}" data-id_product="{$data_v['id_product']|escape:'html':'UTF-8'}" data-action="{$link->getPageLink('order-opc')}" class="open_rooms_extra_services_panel" href="#rooms_type_extra_services_form">
-																		{l s='Extra Services'}
-																	</a>
+																	{l s='Total rooms price'} {if $display_tax_label}{if $priceDisplay} {l s='(Excl.'} {else}{l s='(Incl.)'}{/if} {l s='all taxes.)'}{/if}
 																</p>
 															</div>
 														</div>
-													{/if}
+														{if (isset($data_v['extra_demands']) && $data_v['extra_demands']) || (isset($data_v['service_products']) && $data_v['service_products'])}
+															<div class="col-xs-6">
+																<div class="demand_price_block">
+																	<p class="demand_total_price">
+																		<span>
+																			{displayPrice price=$rm_v['demand_price']}
+																		</span>
+																	</p>
+																	<p class="total_price_detial">
+																		<a data-date_from="{$rm_v['data_form']|escape:'html':'UTF-8'}" data-date_to="{$rm_v['data_to']|escape:'html':'UTF-8'}" data-id_product="{$data_v['id_product']|escape:'html':'UTF-8'}" data-action="{$link->getPageLink('order-opc')}" class="open_rooms_extra_services_panel" href="#rooms_type_extra_services_form">
+																			{l s='Extra Services'}
+																		</a>
+																	</p>
+																</div>
+															</div>
+														{/if}
+													</div>
 												</div>
-											</div>
-											{block name='shopping_cart_detail_room_total_price'}
+											{/block}
+											{block name='shopping_cart_room_type_total_price'}
 												<div class="col-sm-5">
 													<div class="total_price_block col-xs-12">
 														<p class="total_price">
@@ -242,6 +242,9 @@
 									{/block}
 								</div>
 							</div>
+							{block name='displayCartProductAfter'}
+								{hook h='displayCartProductAfter' cart_detail=$data_v key=$rm_k}
+							{/block}
 							<hr>
 						{/foreach}
 					{/foreach}
@@ -262,7 +265,9 @@
 									</a>
 									{* <a href="{$rm_v['link']}"><i class="icon-trash"></i> &nbsp;{l s='Remove'}</a> *}
 								</p>
-								{hook h='displayCartProductImageAfter' id_product=$product['id_product']}
+								{block name='displayCartProductImageAfter'}
+									{hook h='displayCartProductImageAfter' id_product=$product['id_product']}
+								{/block}
 							</div>
 							<div class="col-sm-10">
 								<div class="product-info-container">
@@ -331,7 +336,7 @@
 
 				{* proceed only if no order restrict errors are there *}
 				{if !$orderRestrictErr}
-					{block name='shopping_cart_proceed_button'}
+					{block name='shopping_cart_proceed_action'}
 						<div class="row">
 							<div class="col-sm-12 proceed_btn_block">
 								<a class="btn btn-default button button-medium pull-right" href="{$link->getPageLink('order-opc', null, null, ['proceed_to_customer_dtl' => 1])}" title="Proceed to checkout" rel="nofollow">

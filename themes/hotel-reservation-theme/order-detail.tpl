@@ -24,25 +24,25 @@
 *}
 
 {block name='order_detail'}
-    {block name='order_detail_heading'}
-        {capture name=path}
-            <a href="{$link->getPageLink('my-account', true)|escape:'html':'UTF-8'}">
-                {l s='My account'}
-            </a>
-            <span class="navigation-pipe">
-                {$navigationPipe}
-            </span>
-            <a href="{$link->getPageLink('history', true)|escape:'html':'UTF-8'}">
-                {l s='Bookings'}
-            </a>
-            <span class="navigation-pipe">
-                {$navigationPipe}
-            </span>
-            <span class="navigation_page">
-                {l s='Booking details'}
-            </span>
-        {/capture}
+    {capture name=path}
+        <a href="{$link->getPageLink('my-account', true)|escape:'html':'UTF-8'}">
+            {l s='My account'}
+        </a>
+        <span class="navigation-pipe">
+            {$navigationPipe}
+        </span>
+        <a href="{$link->getPageLink('history', true)|escape:'html':'UTF-8'}">
+            {l s='Bookings'}
+        </a>
+        <span class="navigation-pipe">
+            {$navigationPipe}
+        </span>
+        <span class="navigation_page">
+            {l s='Booking details'}
+        </span>
+    {/capture}
 
+    {block name='order_detail_heading'}
         <h1 class="page-heading bottom-indent">
             {l s='Booking Details'}
         </h1>
@@ -1002,7 +1002,7 @@
         {/block}
     {/if}
 
-    {block name='order_detial_js_vars'}
+    {block name='order_detail_js_vars'}
         {strip}
             {addJsDef historyUrl=$link->getPageLink('orderdetail', true)|escape:'quotes':'UTF-8'}
             {addJsDefL name=req_sent_msg}{l s='Request Sent..' js=1}{/addJsDefL}

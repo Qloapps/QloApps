@@ -38,7 +38,7 @@
                             {foreach $service_products_by_category as $service_product_category}
                                 <div class="tab-pane {if $service_product_category@iteration == 1}active{/if}" id="category_{$service_product_category['id_category']}">
                                     <ul class="product-list">
-                                        {include file="{$tpl_dir}_partials/service-products-list.tpl" service_products=$service_product_category['products'] group=$service_product_category['id_category'] init=true}
+                                        {include file="{$tpl_dir}_partials/service-products-list.tpl" service_products=$service_product_category['products'] group=$service_product_category['id_category'] init=true product=$product}
                                     </ul>
                                     {if RoomTypeServiceProduct::WK_NUM_RESULTS < $service_product_category['num_products']}
                                         <div class="show_more_btn_container">
@@ -49,7 +49,7 @@
                             {/foreach}
                         {else}
                             <ul class="product-list">
-                                {include file="{$tpl_dir}_partials/service-products-list.tpl" service_products=$service_products group='all' init=true}
+                                {include file="{$tpl_dir}_partials/service-products-list.tpl" service_products=$service_products group='all' init=true  product=$product}
                             </ul>
                             {if RoomTypeServiceProduct::WK_NUM_RESULTS < $num_total_service_products}
                                 <div class="show_more_btn_container">

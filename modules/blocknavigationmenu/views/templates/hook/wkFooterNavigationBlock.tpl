@@ -17,7 +17,7 @@
 *  @license   https://store.webkul.com/license.html
 *}
 
-{block name='footer_navigation_block'}
+{block name='footer_navigation'}
 	{if isset($navigation_links) && $navigation_links}
 		<div class="col-sm-3">
 			<div class="row">

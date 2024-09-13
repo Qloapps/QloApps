@@ -122,7 +122,7 @@
             <!-- END Create account / Guest account / Login block -->
         {/if}
 
-        {block name='order_payment_advanced_terms_conditions'}
+        {block name='order_payment_advanced_terms_and_conditions'}
             <!-- TNC -->
             {if $conditions AND $cms_id}
                 {if $override_tos_display }

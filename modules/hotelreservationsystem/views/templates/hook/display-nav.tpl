@@ -17,17 +17,15 @@
 * @license LICENSE.txt
 *}
 
-{block name='display_nav'}
-    {if $email != ''}
-        <div class="contact-item">
-            <i class="icon-envelope-o"></i>
-            <a href="mailto:{$email}">{$email}</a>
-        </div>
-    {/if}
-    {if $phone != ''}
-        <div class="contact-item">
-            <i class="icon-phone"></i>
-            <a href="tel:{$phone}">{$phone}</a>
-        </div>
-    {/if}
-{/block}
+{if $email != ''}
+    <div class="contact-item">
+        <i class="icon-envelope-o"></i>
+        <a href="mailto:{$email}">{$email}</a>
+    </div>
+{/if}
+{if $phone != ''}
+    <div class="contact-item">
+        <i class="icon-phone"></i>
+        <a href="tel:{$phone}">{$phone}</a>
+    </div>
+{/if}

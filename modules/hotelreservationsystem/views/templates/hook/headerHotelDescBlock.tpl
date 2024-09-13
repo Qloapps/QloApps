@@ -17,7 +17,7 @@
 *  @license   https://store.webkul.com/license.html
 *}
 
-{block name='header_hotel_desc_block'}
+{block name='header_hotel_block'}
 	<div class="header-desc-container">
 		<div class="header-desc-wrapper">
 			<div class="header-desc-primary">
@@ -27,10 +27,10 @@
 							<p class="header-desc-welcome">{l s='Welcome To' mod='hotelreservationsystem'}</p>
 							<hr class="heasder-desc-hr-first"/>
 							<div class="header-desc-inner-wrapper">
-								{block name='header_hotel_desc_block_hotel_name'}
+								{block name='header_hotel_chain_name'}
 									<h1 class="header-hotel-name">{$WK_HTL_CHAIN_NAME|escape:'htmlall':'UTF-8'}</h1>
 								{/block}
-								{block name='header_hotel_desc_block_hotel_tag_line'}
+								{block name='header_hotel_description'}
 									<p class="header-hotel-desc">{$WK_HTL_TAG_LINE|escape:'htmlall':'UTF-8'}</p>
 								{/block}
 								<hr class="heasder-desc-hr-second"/>

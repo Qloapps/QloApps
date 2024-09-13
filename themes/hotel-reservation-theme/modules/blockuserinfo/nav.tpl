@@ -17,7 +17,7 @@
 * @license LICENSE.txt
 *}
 
-{block name='nav'}
+{block name='user_navigation'}
     {if !isset($ajaxCustomerLogin)}
         <div class="header-top-item header_user_info hidden-xs">
     {/if}
@@ -33,6 +33,9 @@
                         <li><a href="{$link->getPageLink('my-account', true)|escape:'html'}" title="{l s='View my customer account' mod='blockuserinfo'}">{l s='Accounts'  mod='blockuserinfo'}</a></li>
                         <li><a href="{$link->getPageLink('history', true)|escape:'html'}" title="{l s='View my orders' mod='blockuserinfo'}">{l s='Orders'}</a></li>
                         <li><a href="{$link->getPageLink('index', true, NULL, "mylogout")|escape:'html'}"  title="{l s='Log me out' mod='blockuserinfo'}">{l s='Logout'}</a></li>
+                        {block name='displayUserNavigationList'}
+                            {hook h='displayUserNavigationList'}
+                        {/block}
                     </ul>
                 </li>
             {else}

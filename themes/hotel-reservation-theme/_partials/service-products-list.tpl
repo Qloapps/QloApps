@@ -18,10 +18,10 @@
 *}
 
 {block name='service_products_list'}
-    {foreach $service_products as $product}
-        {if !($product@first && isset($init) && $init == true)}
+    {foreach $service_products as $service_product}
+        {if !($service_product@first && isset($init) && $init == true)}
             <hr>
         {/if}
-        {include file="{$tpl_dir}_partials/service-products-list-row.tpl" product=$product}
+        {include file="{$tpl_dir}_partials/service-products-list-row.tpl" service_product=$service_product product=$product}
     {/foreach}
 {/block}
