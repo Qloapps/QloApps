@@ -1920,6 +1920,9 @@ const BookingDocumentsModal = {
             dataType: 'JSON',
             cache: false,
             data: 'ajax=true&id_order='+id_order+'&action=InitBookingDocumentsModal',
+            beforeSend: function() {
+                $("#page-loader").show();
+            },
             success: function(result) {
                 if (result.hasError == 0 && result.modalHtml) {
                     $('#footer').next('.bootstrap').append(result.modalHtml);
@@ -1935,6 +1938,7 @@ const BookingDocumentsModal = {
             },
             complete: function() {
                 $(".loading_overlay").hide();
+                $("#page-loader").hide();
             }
         });
 
@@ -2105,6 +2109,9 @@ const VoucherModal = {
             dataType: 'JSON',
             cache: false,
             data: 'ajax=true&id_order='+id_order+'&action=InitVoucherModal',
+            beforeSend: function() {
+                $("#page-loader").show();
+            },
             success: function(result) {
                 if (result.hasError == 0 && result.modalHtml) {
                     $('#footer').next('.bootstrap').append(result.modalHtml);
@@ -2115,6 +2122,7 @@ const VoucherModal = {
             },
             complete: function() {
                 $(".loading_overlay").hide();
+                $("#page-loader").hide();
             }
         });
     },
@@ -2139,6 +2147,9 @@ const OrderPaymentModal = {
             dataType: 'JSON',
             cache: false,
             data: 'ajax=true&id_order='+id_order+'&action=InitOrderPaymentModal',
+            beforeSend: function() {
+                $("#page-loader").show();
+            },
             success: function(result) {
                 if (result.hasError == 0 && result.modalHtml) {
                     $('#footer').next('.bootstrap').append(result.modalHtml);
@@ -2149,6 +2160,7 @@ const OrderPaymentModal = {
             },
             complete: function() {
                 $(".loading_overlay").hide();
+                $("#page-loader").hide();
             }
         });
     },
@@ -2173,6 +2185,9 @@ const OrderPaymentDetailModal = {
             dataType: 'JSON',
             cache: false,
             data: 'ajax=true&id_order='+id_order+'&action=InitOrderPaymentDetailModal',
+            beforeSend: function() {
+                $("#page-loader").show();
+            },
             success: function(result) {
                 if (result.hasError == 0 && result.modalHtml) {
                     $('#footer').next('.bootstrap').append(result.modalHtml);
@@ -2195,6 +2210,7 @@ const OrderPaymentDetailModal = {
             },
             complete: function() {
                 $(".loading_overlay").hide();
+                $("#page-loader").hide();
             }
         });
     },
@@ -2216,6 +2232,9 @@ const DocumentNoteModal = {
             dataType: 'JSON',
             cache: false,
             data: 'ajax=true&id_order='+id_order+'&action=InitOrderDocumentNoteModal',
+            beforeSend: function() {
+                $("#page-loader").show();
+            },
             success: function(result) {
                 if (result.hasError == 0 && result.modalHtml) {
                     $('#footer').next('.bootstrap').append(result.modalHtml);
@@ -2228,6 +2247,7 @@ const DocumentNoteModal = {
             },
             complete: function() {
                 $(".loading_overlay").hide();
+                $("#page-loader").hide();
             }
         });
     },
@@ -2252,6 +2272,9 @@ const TravellerModal = {
             dataType: 'JSON',
             cache: false,
             data: 'ajax=true&id_order='+id_order+'&action=InitTravellerModal',
+            beforeSend: function() {
+                $("#page-loader").show();
+            },
             success: function(result) {
                 if (result.hasError == 0 && result.modalHtml) {
                     $('#footer').next('.bootstrap').append(result.modalHtml);
@@ -2262,6 +2285,7 @@ const TravellerModal = {
             },
             complete: function() {
                 $(".loading_overlay").hide();
+                $("#page-loader").hide();
             }
         });
     },
@@ -2330,6 +2354,9 @@ const RoomStatusModal = {
             dataType: 'JSON',
             cache: false,
             data: 'ajax=true&id_order='+id_order+'&action=InitRoomStatusModal',
+            beforeSend: function() {
+                $("#page-loader").show();
+            },
             success: function(result) {
                 if (result.hasError == 0 && result.modalHtml) {
                     $('#footer').next('.bootstrap').append(result.modalHtml);
@@ -2356,6 +2383,7 @@ const RoomStatusModal = {
             },
             complete: function() {
                 $(".loading_overlay").hide();
+                $("#page-loader").hide();
             }
         });
     },
@@ -2380,6 +2408,9 @@ const AddRoomBookingModal = {
             dataType: 'JSON',
             cache: false,
             data: 'ajax=true&id_order='+id_order+'&action=initAddRoomBookingModal',
+            beforeSend: function() {
+                $("#page-loader").show();
+            },
             success: function(result) {
                 if (result.hasError == 0 && result.modalHtml) {
                     $('#footer').next('.bootstrap').append(result.modalHtml);
@@ -2467,6 +2498,7 @@ const AddRoomBookingModal = {
             },
             complete: function() {
                 $(".loading_overlay").hide();
+                $("#page-loader").hide();
             }
         });
     },
@@ -2538,6 +2570,9 @@ const EditRoomBookingModal = {
             dataType: 'JSON',
             cache: false,
             data: data,
+            beforeSend: function() {
+                $("#page-loader").show();
+            },
             success: function(result) {
                 if (result.hasError == 0 && result.modalHtml) {
                     $('#footer').next('.bootstrap').append(result.modalHtml);
@@ -2564,6 +2599,7 @@ const EditRoomBookingModal = {
             },
             complete: function() {
                 $(".loading_overlay").hide();
+                $("#page-loader").hide();
             }
         });
     },
@@ -2614,6 +2650,9 @@ const CancelRoomBookingModal = {
             dataType: 'JSON',
             cache: false,
             data: 'ajax=true&id_order='+id_order+'&action=initCancelRoomBookingModal',
+            beforeSend: function() {
+                $("#page-loader").show();
+            },
             success: function(result) {
                 if (result.hasError == 0 && result.modalHtml) {
                     $('#footer').next('.bootstrap').append(result.modalHtml);
@@ -2626,6 +2665,7 @@ const CancelRoomBookingModal = {
             },
             complete: function() {
                 $(".loading_overlay").hide();
+                $("#page-loader").hide();
             }
         });
     },
@@ -2651,6 +2691,9 @@ const RoomAllotmentCommentModal = {
             dataType: 'JSON',
             cache: false,
             data: 'ajax=true&id_hotel_booking='+idHtlBooking+'&action=initRoomAllotmentCommentModal',
+            beforeSend: function() {
+                $("#page-loader").show();
+            },
             success: function(result) {
                 if (result.hasError == 0 && result.modalHtml) {
                     $('#footer').next('.bootstrap').append(result.modalHtml);
@@ -2663,6 +2706,7 @@ const RoomAllotmentCommentModal = {
             },
             complete: function() {
                 $(".loading_overlay").hide();
+                $("#page-loader").hide();
             }
         });
     },

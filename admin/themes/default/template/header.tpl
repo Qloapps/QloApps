@@ -371,3 +371,4 @@
 		<div id="main">
 			<div id="content" class="{if !$bootstrap}nobootstrap{else}bootstrap{/if}">
 {/if}
+				<div id="page-loader"><span><i class="icon-refresh icon-spin icon-fw"></i></span></div>
