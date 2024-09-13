@@ -121,7 +121,7 @@ $(document).ready(function() {
             $('#generateCreditSlip, #generateDiscount').prop('checked', false);
 			$(this).prop('checked', true);
 		}
-        $('#generateCreditSlip').change();
+        $('#generateCreditSlip, #generateDiscount').change();
 	});
 
     $(document).on('keyup', '#order_return_form .table input[name^="refund_amounts"]', function() {
