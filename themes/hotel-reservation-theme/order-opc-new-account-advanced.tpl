@@ -376,13 +376,12 @@
                             {block name='displayCustomerAccountForm'}
                                 {$HOOK_CREATE_ACCOUNT_FORM}
                             {/block}
-                            {block name='order_opc_new_account_advanced_submit_account'}
+                            {block name='order_opc_new_account_advanced_account_submit'}
                                 <div class="submit opc-add-save clearfix">
                                     <p class="required opc-required pull-right">
                                         <sup>*</sup>{l s='Required field'}
                                     </p>
                                     <button type="submit" name="submitAccount" id="submitAccount" data-adv-api="1" class="btn btn-default button button-medium"><span>{l s='Save'}<i class="icon-chevron-right right"></i></span></button>
-
                                 </div>
                             {/block}
                             <div style="display: none;" id="opc_account_saved" class="alert alert-success">

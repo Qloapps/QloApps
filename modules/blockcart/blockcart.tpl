@@ -344,7 +344,7 @@
 								</h2>
 							{/block}
 
-							{block name='blockcart_layer_cart_total_price'}
+							{block name='blockcart_layer_cart_total_room_price'}
 								<div class="layer_cart_row">
 									<strong class="dark">
 										{l s='Total Rooms Cost in cart' mod='blockcart'}

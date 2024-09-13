@@ -19,7 +19,7 @@
 
 {block name='search_form'}
     <form method="POST" id="search_hotel_block_form" class="grid">
-        {block name='search_form_location_search_field'}
+        {block name='search_form_location'}
             {if isset($location_enabled) && $location_enabled}
                 <div class="form-group area-{$column_widths['location']}">
                     <input type="text" class="form-control header-rmsearch-input input-location" id="hotel_location" name="hotel_location" autocomplete="off" placeholder="{l s='Hotel Location' mod='wkroomsearchblock'}" {if isset($search_data)}value="{$search_data['location']|escape:'htmlall':'UTF-8'}"{/if}>
@@ -30,7 +30,7 @@
                 </div>
             {/if}
         {/block}
-        {block name='search_form_hotel_search_field'}
+        {block name='search_form_hotel'}
             {if count($hotels_info) <= 1 && !$show_hotel_name}
                 <input type="hidden" id="max_order_date" name="max_order_date" value="{if isset($hotels_info[0]['max_order_date'])}{$hotels_info[0]['max_order_date']|escape:'htmlall':'UTF-8'}{/if}">
                 <input type="hidden" id="preparation_time" name="preparation_time" value="{if isset($hotels_info[0]['preparation_time'])}{$hotels_info[0]['preparation_time']|escape:'htmlall':'UTF-8'}{/if}">
@@ -56,7 +56,7 @@
             {/if}
         {/block}
 
-        {block name='search_form_dates_search_field'}
+        {block name='search_form_dates'}
             {if isset($multiple_dates_input) && $multiple_dates_input}
                 <div class="grid area-{$column_widths['date']}" id="daterange_value">
                     <div class="form-group">
@@ -77,7 +77,7 @@
             {/if}
         {/block}
 
-        {block name='search_form_occupancy_search_field'}
+        {block name='search_form_occupancy'}
             {if isset($is_occupancy_wise_search) && $is_occupancy_wise_search}
                 <div class="form-group area-{$column_widths['occupancy']}">
                     <div class="dropdown">

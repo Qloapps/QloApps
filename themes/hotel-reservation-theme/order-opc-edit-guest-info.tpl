@@ -294,7 +294,7 @@
                     {block name='displayCustomerAccountForm'}
                         {$HOOK_CREATE_ACCOUNT_FORM}
                     {/block}
-    				{block name='order_opc_edit_guest_info_submit_account'}
+    				{block name='order_opc_edit_guest_info_account_submit'}
                         <div class="submit opc-add-save clearfix">
                             <button type="submit" name="submitAccount" id="submitAccount" class="btn btn-default button button-medium pull-right"><span>{l s='Save'}<i class="icon-chevron-right right"></i></span></button>
                         </div>

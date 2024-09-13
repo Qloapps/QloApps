@@ -148,7 +148,7 @@
 														</p>
 													</td>
 												{/block}
-												{block name='order_confirmation_order_room_total'}
+												{block name='order_confirmation_cart_total'}
 													<td class="cart_total text-left">
 														<p class="text-left">
 															{if $group_use_tax}

@@ -73,7 +73,7 @@
 								<label for="email_create" class="">{l s='Email address'}</label>
 								<input type="email" class="is_required validate account_input form-control" data-validate="isEmail" id="email_create" name="email_create" value="{if isset($smarty.post.email_create)}{$smarty.post.email_create|stripslashes}{/if}" />
 							</div>
-							{block name='authentication_submit_create_account'}
+							{block name='authentication_create_account_submit'}
 								<div class="submit">
 									{if isset($back)}<input type="hidden" class="hidden" name="back" value="{$back|escape:'html':'UTF-8'}" />{/if}
 									<button class="btn button button-medium" type="submit" id="SubmitCreate" name="SubmitCreate">
@@ -105,7 +105,7 @@
 								{hook h='displayLoginFormFieldsAfter'}
 							{/block}
 							<p class="lost_password form-group"><a href="{$link->getPageLink('password')|escape:'html':'UTF-8'}" title="{l s='Recover your forgotten password'}" rel="nofollow">{l s='Forgot your password?'}</a></p>
-							{block name='authentication_submit_login_account'}
+							{block name='authentication_login_submit'}
 								<p class="submit">
 									{if isset($back)}<input type="hidden" class="hidden" name="back" value="{$back|escape:'html':'UTF-8'}" />{/if}
 									<button type="submit" id="SubmitLogin" name="SubmitLogin" class="btn button button-medium">
@@ -428,7 +428,7 @@
 					<p class="cart_navigation required submit clearfix">
 						<span><sup>*</sup>{l s='Required field'}</span>
 						<input type="hidden" name="display_guest_checkout" value="1" />
-						{block name='authentication_submit_guest_account'}
+						{block name='authentication_guest_submit'}
 							<button type="submit" class="button btn btn-default button-medium" name="submitGuestAccount" id="submitGuestAccount">
 								<span>
 									{l s='Proceed to checkout'}
@@ -702,7 +702,7 @@
 					<input type="hidden" name="email_create" value="1" />
 					<input type="hidden" name="is_new_customer" value="1" />
 					{if isset($back)}<input type="hidden" class="hidden" name="back" value="{$back|escape:'html':'UTF-8'}" />{/if}
-					{block name='authentication_submit_account'}
+					{block name='authentication_account_submit'}
 						<button type="submit" name="submitAccount" id="submitAccount" class="btn button button-medium">
 							<span>{l s='Register'}&nbsp;<i class="icon-chevron-right right"></i></span>
 						</button>
