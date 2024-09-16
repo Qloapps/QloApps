@@ -342,6 +342,7 @@
 													</p>
 												{/if}
 										</div>
+									{/block}
 									{block name='order_opc_vouchers'}
 										{* Check if voucher feature is enabled currently *}
 										{if $voucherAllowed}
