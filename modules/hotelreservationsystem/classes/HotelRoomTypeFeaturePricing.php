@@ -718,39 +718,64 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
             }
         }
         if ($with_auto_room_services) {
-            if ($servicesWithTax = RoomTypeServiceProduct::getAutoAddServices(
-                $id_product,
-                $date_from,
-                $date_to,
-                Product::PRICE_ADDITION_TYPE_WITH_ROOM,
-                true,
-                $id_cart,
-                $id_guest,
-                $use_reduc
-            )) {
-                foreach($servicesWithTax as $service) {
-                    $totalPrice['total_price_tax_incl'] += $service['price'];
+            if ($id_cart && $id_room) {
+                $objRoomTypeServiceProductCartDetail = new RoomTypeServiceProductCartDetail();
+                if ($roomServicesServices = $objRoomTypeServiceProductCartDetail->getServiceProductsInCart(
+                    $id_cart,
+                    0,
+                    0,
+                    $id_product,
+                    $date_from,
+                    $date_to,
+                    0,
+                    0,
+                    null,
+                    null,
+                    null,
+                    null,
+                    $id_room
+                )) {
+                    $selectedServices = array_shift($roomServicesServices);
                 }
             }
-            if ($servicesWithoutTax = RoomTypeServiceProduct::getAutoAddServices(
-                $id_product,
-                $date_from,
-                $date_to,
-                Product::PRICE_ADDITION_TYPE_WITH_ROOM,
-                false,
-                $id_cart,
-                $id_guest,
-                $use_reduc
-            )) {
-                foreach($servicesWithoutTax as $service) {
-                    $totalPrice['total_price_tax_excl'] += $service['price'];
+
+            if (isset($selectedServices)) {
+                $totalPrice['total_price_tax_incl'] += $selectedServices['total_price_tax_incl'];
+                $totalPrice['total_price_tax_excl'] += $selectedServices['total_price_tax_excl'];
+            } else {
+                if ($servicesWithTax = RoomTypeServiceProduct::getAutoAddServices(
+                    $id_product,
+                    $date_from,
+                    $date_to,
+                    Product::PRICE_ADDITION_TYPE_WITH_ROOM,
+                    true,
+                    $use_reduc
+                )) {
+                    foreach($servicesWithTax as $service) {
+                        $totalPrice['total_price_tax_incl'] += Tools::processPriceRounding($service['price']);
+                    }
+                }
+                if ($servicesWithoutTax = RoomTypeServiceProduct::getAutoAddServices(
+                    $id_product,
+                    $date_from,
+                    $date_to,
+                    Product::PRICE_ADDITION_TYPE_WITH_ROOM,
+                    false,
+                    $use_reduc
+                )) {
+                    foreach($servicesWithoutTax as $service) {
+                        $totalPrice['total_price_tax_excl'] += Tools::processPriceRounding($service['price']);
+                    }
                 }
             }
         }
-        if ($quantity) {
-            $totalPrice['total_price_tax_incl'] = $totalPrice['total_price_tax_incl'] * $quantity;
-            $totalPrice['total_price_tax_excl'] = $totalPrice['total_price_tax_excl'] * $quantity;
+
+        if (!$quantity) {
+            $quantity = 1;
         }
+        $totalPrice['total_price_tax_incl'] = Tools::processPriceRounding($totalPrice['total_price_tax_incl'], $quantity);
+        $totalPrice['total_price_tax_excl'] = Tools::processPriceRounding($totalPrice['total_price_tax_excl'], $quantity);
+
         return $totalPrice;
     }
 

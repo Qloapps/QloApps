@@ -49,6 +49,9 @@ $(document).ready(function() {
                     action: 'initCartRuleDeleteModal',
                     id_cart_rule: id_cart_rule
                 },
+                beforeSend: function() {
+                    $("#page-loader").show();
+                },
                 success: function(result) {
                     if (result.success && result.confirm_delete) {
                         $('#moduleConfirmDelete').remove();
@@ -61,6 +64,9 @@ $(document).ready(function() {
                             resolve(false);
                         });
                     }
+                },
+                complete: function() {
+                    $("#page-loader").hide();
                 }
             });
         });

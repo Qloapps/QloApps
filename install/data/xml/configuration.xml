@@ -276,7 +276,7 @@
 		<value>id_shop;id_currency;id_country;id_group</value>
 	</configuration>
 	<configuration id="PS_TAX_DISPLAY" name="PS_TAX_DISPLAY">
-		<value>0</value>
+		<value>1</value>
 	</configuration>
 	<configuration id="PS_SMARTY_FORCE_COMPILE" name="PS_SMARTY_FORCE_COMPILE">
 		<value>0</value>
@@ -522,7 +522,7 @@
 		<value>1</value>
 	</configuration>
 	<configuration id="PS_TAX_ADDRESS_TYPE" name="PS_TAX_ADDRESS_TYPE">
-		<value>id_address_delivery</value>
+		<value>id_address_invoice</value>
 	</configuration>
 	<configuration id="PS_SHOP_DEFAULT" name="PS_SHOP_DEFAULT">
 		<value>1</value>
@@ -885,7 +885,7 @@
 		<value>1</value>
 	</configuration>
 	<configuration id="PS_ROUND_TYPE" name="PS_ROUND_TYPE">
-		<value>2</value>
+		<value>1</value>
 	</configuration>
 	<configuration id="PS_PRICE_DISPLAY_PRECISION" name="PS_PRICE_DISPLAY_PRECISION">
 		<value>2</value>

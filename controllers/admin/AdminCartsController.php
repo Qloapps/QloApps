@@ -841,6 +841,7 @@ class AdminCartsControllerCore extends AdminController
                 $cart['total_price'] = Tools::displayPrice($cart_obj->getOrderTotal(), $currency);
             }
         }
+
         if (count($orders)) {
             foreach ($orders as &$order) {
                 $order['total_paid_real'] = Tools::displayPrice($order['total_paid_real'], $currency);
