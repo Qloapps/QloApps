@@ -23,31 +23,37 @@
 *  International Registered Trademark & Property of PrestaShop SA
 *}
 
-{block name='order_payment'}
-	{if !$opc}
-		{addJsDefL name=txtProduct}{l s='product' js=1}{/addJsDefL}
-		{addJsDefL name=txtProducts}{l s='products' js=1}{/addJsDefL}
-		{capture name=path}{l s='Your payment method'}{/capture}
-		<h1 class="page-heading">{l s='Please choose your payment method'}
-			{if !isset($empty) && !$PS_CATALOG_MODE}
-				<span class="heading-counter">{l s='Your shopping cart contains:'}
-					<span id="summary_products_quantity">{$productNumber} {if $productNumber == 1}{l s='product'}{else}{l s='products'}{/if}</span>
-				</span>
-			{/if}
-		</h1>
-	{/if}
+{if !$opc}
+	{addJsDefL name=txtProduct}{l s='product' js=1}{/addJsDefL}
+	{addJsDefL name=txtProducts}{l s='products' js=1}{/addJsDefL}
+	{capture name=path}{l s='Your payment method'}{/capture}
+	<h1 class="page-heading">{l s='Please choose your payment method'}
+		{if !isset($empty) && !$PS_CATALOG_MODE}
+			<span class="heading-counter">{l s='Your shopping cart contains:'}
+				<span id="summary_products_quantity">{$productNumber} {if $productNumber == 1}{l s='product'}{else}{l s='products'}{/if}</span>
+			</span>
+		{/if}
+	</h1>
+{/if}
 
-	{if !$opc}
-		{assign var='current_step' value='payment'}
+{if !$opc}
+	{assign var='current_step' value='payment'}
+	{block name='order_steps'}
 		{include file="$tpl_dir./order-steps.tpl"}
+	{/block}
+	{block name='errors'}
 		{include file="$tpl_dir./errors.tpl"}
-	{else}
-		<div id="opc_payment_methods" class="opc-main-block">
-			<div id="opc_payment_methods-overlay" class="opc-overlay" style="display: none;"></div>
-	{/if}
-	{if $advanced_payment_api}
+	{/block}
+{else}
+	<div id="opc_payment_methods" class="opc-main-block">
+		<div id="opc_payment_methods-overlay" class="opc-overlay" style="display: none;"></div>
+{/if}
+{if $advanced_payment_api}
+	{block name='order_payment_advanced'}
 		{include file="$tpl_dir./order-payment-advanced.tpl"}
-	{else}
+	{/block}
+{else}
+	{block name='order_payment_classic'}
 		{include file = "$tpl_dir./order-payment-classic.tpl"}
-	{/if}
-{/block}
+	{/block}
+{/if}

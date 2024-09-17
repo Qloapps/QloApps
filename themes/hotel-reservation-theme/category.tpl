@@ -48,7 +48,9 @@
             {/block}
             <input type="hidden" id="max_order_date" name="max_order_date" value="{$max_order_date}">
             <div class="row margin-lr-0" id="category_data_cont">
-                {include file="./_partials/room_type_list.tpl"}
+                {block name='room_type_list'}
+                    {include file="./_partials/room_type_list.tpl"}
+                {/block}
             </div>
         </div>
     </div>

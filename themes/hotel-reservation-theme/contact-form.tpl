@@ -27,7 +27,9 @@
 	{if isset($smarty.get.confirm)}
 		<p class="alert alert-success">{l s='Your message has been successfully sent to our team.'}</p>
 	{/if}
-	{include file="$tpl_dir./errors.tpl"}
+	{block name='errors'}
+		{include file="$tpl_dir./errors.tpl"}
+	{/block}
 	<div class="margin-top-50 htl-contact-page">
 		<div class="row">
 			<p class="contact-header col-sm-offset-2 col-sm-8">{l s='Contact Us'}</p>

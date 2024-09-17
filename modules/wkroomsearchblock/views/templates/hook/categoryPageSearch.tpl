@@ -24,7 +24,9 @@
         <p>{l s='Search Rooms' mod='wkroomsearchblock'}</p>
         <hr class="header-bottom-hr">
         </div>
-		{include file="./searchForm.tpl"}
+        {block name='search_form'}
+		    {include file="./searchForm.tpl"}
+        {/block}
         </div>
     {/if}
 {/block}

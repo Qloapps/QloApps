@@ -51,6 +51,8 @@
 			{/block}
 		</div><!-- #page -->
 {/if}
-{include file="$tpl_dir./global.tpl"}
+{block name='global'}
+	{include file="$tpl_dir./global.tpl"}
+{/block}
 	</body>
 </html>

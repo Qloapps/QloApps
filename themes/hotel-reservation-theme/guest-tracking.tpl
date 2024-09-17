@@ -73,7 +73,9 @@
 
 			<div id="block-history">
 				<div id="block-order-detail" class="std">
-					{include file="./order-detail.tpl"}
+					{block name='order_detail_wrapper'}
+						{include file="./order-detail.tpl"}
+					{/block}
 				</div>
 			</div>
 		{/foreach}
@@ -90,8 +92,9 @@
 							</div>
 							<div class="card-body">
 								<form method="post" action="{$action|escape:'html':'UTF-8'}#guestToCustomer" class="std">
-									{include file="$tpl_dir./errors.tpl"}
-
+									{block name='errors'}
+										{include file="$tpl_dir./errors.tpl"}
+									{/block}
 									<p class="card-subtitle">
 										{l s='Transform your guest account into a customer account and enjoy:'}
 									</p>
@@ -122,7 +125,9 @@
 			</div>
 		</div>
 	{else}
-		{include file="$tpl_dir./errors.tpl"}
+		{block name='errors'}
+			{include file="$tpl_dir./errors.tpl"}
+		{/block}
 		{if isset($show_login_link) && $show_login_link}
 			<p><img src="{$img_dir}icon/userinfo.gif" alt="{l s='Information'}" class="icon" /><a href="{$link->getPageLink('my-account', true)|escape:'html':'UTF-8'}">{l s='Click here to log in to your customer account.'}</a><br /><br /></p>
 		{/if}

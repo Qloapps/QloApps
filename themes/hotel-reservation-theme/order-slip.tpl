@@ -33,7 +33,9 @@
 		{l s='Credit slips you have received after canceled orders'}.
 	</p>
 
-	{include file="$tpl_dir./errors.tpl"}
+	{block name='errors'}
+		{include file="$tpl_dir./errors.tpl"}
+	{/block}
 
 	{if isset($smarty.get.confirmation) && $smarty.get.confirmation}
 		<p class="alert alert-success">

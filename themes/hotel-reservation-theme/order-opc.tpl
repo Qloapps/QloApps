@@ -36,7 +36,9 @@
 				<div class="row">
 					{if $PS_CATALOG_MODE}
 						{capture name=path}{l s='Your booking cart'}{/capture}
-						<h2 class="page-heading">{l s='Your booking cart'}</h2>
+						{block name='order_opc_heading'}
+							<h2 class="page-heading">{l s='Your booking cart'}</h2>
+						{/block}
 
 						<p class="alert alert-warning">{l s='The hotel is currently not accepting any bookings.'}</p>
 					{else}
@@ -44,7 +46,9 @@
 
 							{block name='order_opc_left_column'}
 								<div class="col-md-8">
-									{include file="$tpl_dir./errors.tpl"}
+            						{block name='errors'}
+										{include file="$tpl_dir./errors.tpl"}
+									{/block}
 
 									{* Accordian for all blocks *}
 									<div class="accordion" id="oprder-opc-accordion">
@@ -67,7 +71,9 @@
 																<div id="collapse-shopping-cart" class="opc-collapse {if !$step->step_is_current}collapse{/if}" aria-labelledby="shopping-cart-head" data-parent="#oprder-opc-accordion">
 																	<div class="card-body">
 																		{* This tpl includes room type lists in the orders *}
-																		{include file="$tpl_dir./shopping-cart.tpl"}
+																		{block name='shopping_cart'}
+																			{include file="$tpl_dir./shopping-cart.tpl"}
+																		{/block}
 																	</div>
 																</div>
 															{/if}
@@ -185,12 +191,16 @@
 																				{/if}
 																			{else}
 																				<!-- Create account / Guest account / Login block -->
-																				{include file="$tpl_dir./order-opc-new-account.tpl"}
+																				{block name='order_opc_new_account'}
+																					{include file="$tpl_dir./order-opc-new-account.tpl"}
+																				{/block}
 																			{/if}
 																		</div>
 																		{if $is_logged || $isGuest}
 																			<div class="card-body hidden" id="order-opc-edit-guest-info">
-																				{include file="./order-opc-edit-guest-info.tpl"}
+																				{block name='order_opc_edit_guest_info'}
+																					{include file="./order-opc-edit-guest-info.tpl"}
+																				{/block}
 																			</div>
 																		{/if}
 																	</div>
@@ -218,7 +228,9 @@
 																<div id="collapse-order-payment" class="opc-collapse {if !$step->step_is_current}collapse{/if}" aria-labelledby="order-payment-head" data-parent="#oprder-opc-accordion">
 																	<div class="card-body">
 																		<!-- Payment -->
-																		{include file="$tpl_dir./order-payment.tpl"}
+																		{block name='order_payment'}
+																			{include file="$tpl_dir./order-payment.tpl"}
+																		{/block}
 																		<!-- END Payment -->
 																	</div>
 																</div>
@@ -416,8 +428,12 @@
 							{/block}
 						{else}
 							{capture name=path}{l s='Your booking cart'}{/capture}
-							<h2 class="page-heading">{l s='Your booking cart'}</h2>
-							{include file="$tpl_dir./errors.tpl"}
+							{block name='order_opc_heading'}
+								<h2 class="page-heading">{l s='Your booking cart'}</h2>
+							{/block}
+							{block name='errors'}
+								{include file="$tpl_dir./errors.tpl"}
+							{/block}
 
 							<p class="alert alert-warning">{l s='You have not added any room to your cart yet.'}</p>
 						{/if}

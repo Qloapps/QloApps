@@ -37,12 +37,16 @@
     {else}
         {if $productNumber}
             <!-- Payment -->
-            {include file="$tpl_dir./order-payment-advanced.tpl"}
+            {block name='order_payment_advanced'}
+                {include file="$tpl_dir./order-payment-advanced.tpl"}
+            {/block}
             <!-- END Payment -->
         {else}
             {capture name=path}{l s='Your shopping cart'}{/capture}
             <h2 class="page-heading">{l s='Your shopping cart'}</h2>
-            {include file="$tpl_dir./errors.tpl"}
+            {block name='errors'}
+                {include file="$tpl_dir./errors.tpl"}
+            {/block}
             <p class="alert alert-warning">{l s='Your shopping cart is empty.'}</p>
         {/if}
         {block name='order_opc_advanced_js_vars'}

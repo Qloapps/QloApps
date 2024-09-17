@@ -41,7 +41,9 @@
                 {l s='Personal information'}
             </h1>
         {/block}
-        {include file="$tpl_dir./errors.tpl"}
+        {block name='errors'}
+            {include file="$tpl_dir./errors.tpl"}
+        {/block}
 
         {if isset($confirmation) && $confirmation}
             <p class="alert alert-success">

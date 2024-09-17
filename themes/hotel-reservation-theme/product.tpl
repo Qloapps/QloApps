@@ -24,7 +24,9 @@
 *}
 
 {block name='product'}
-	{include file="$tpl_dir./errors.tpl"}
+	{block name='errors'}
+		{include file="$tpl_dir./errors.tpl"}
+	{/block}
 	{if $errors|@count == 0}
 		{if !isset($priceDisplayPrecision)}
 			{assign var='priceDisplayPrecision' value=2}
@@ -196,13 +198,13 @@
 							{/block}
 						</div>
 
-						{block name='service_products'}
-							<div id="service_products_cont">
-								{if isset($service_products_exists) && $service_products_exists}
+						<div id="service_products_cont">
+							{if isset($service_products_exists) && $service_products_exists}
+								{block name='service_products'}
 									{include file="{$tpl_dir}_partials/service-products.tpl"}
-								{/if}
-							</div>
-						{/block}
+								{/block}
+							{/if}
+						</div>
 
 						<div class="product_info_containter">
 							<!-- tab hook is added here -->
@@ -426,7 +428,9 @@
 								</p>
 							{/block}
 
-							{include file='./_partials/booking-form.tpl'}
+							{block name='booking_form'}
+								{include file='./_partials/booking-form.tpl'}
+							{/block}
 
 							{block name='product_demands'}
 								{* extra room type demands *}
@@ -559,7 +563,9 @@
 				{if isset($packItems) && $packItems|@count > 0}
 				<section id="blockpack">
 					<h3 class="page-product-heading">{l s='Pack content'}</h3>
-					{include file="$tpl_dir./product-list.tpl" products=$packItems}
+					{block name='product_list'}
+						{include file="$tpl_dir./product-list.tpl" products=$packItems}
+					{/block}
 				</section>
 				{/if}
 				<!-- tab hook is shifted to left column -->

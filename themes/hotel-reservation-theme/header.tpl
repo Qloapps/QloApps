@@ -138,7 +138,9 @@
 			<div class="columns-container">
 				<div id="columns" class="container">
 					{if $show_breadcrump}
-						{include file="$tpl_dir./breadcrumb.tpl"}
+						{block name='breadcrumb'}
+							{include file="$tpl_dir./breadcrumb.tpl"}
+						{/block}
 					{/if}
 					<div id="slider_row" class="row">
 						<div id="top_column" class="center_column col-xs-12 col-sm-12">{hook h="displayTopColumn"}</div>

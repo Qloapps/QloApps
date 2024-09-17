@@ -56,7 +56,9 @@
 				{l s='To add an address, please fill out the form below.'}
 			{/if}
 		</p>
-		{include file="$tpl_dir./errors.tpl"}
+		{block name='errors'}
+			{include file="$tpl_dir./errors.tpl"}
+		{/block}
 		<p class="required"><sup>*</sup>{l s='Required field'}</p>
 		{block name='address_form'}
 			<form action="{$link->getPageLink('address', true)|escape:'html':'UTF-8'}" method="post" class="std" id="add_address">

@@ -30,7 +30,9 @@
 		<h1 class="page-subheading">{l s='Forgot your password?'}</h1>
 	{/block}
 
-	{include file="$tpl_dir./errors.tpl"}
+	{block name='errors'}
+		{include file="$tpl_dir./errors.tpl"}
+	{/block}
 
 	{if isset($confirmation) && $confirmation == 1}
 	<p class="alert alert-success">{l s='Your password has been successfully reset and a confirmation has been sent to your email address:'} {if isset($customer_email)}{$customer_email|escape:'html':'UTF-8'|stripslashes}{/if}</p>

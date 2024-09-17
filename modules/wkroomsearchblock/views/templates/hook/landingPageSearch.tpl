@@ -29,7 +29,9 @@
                         </div>
                         <div class="container">
                             <div class="header-rmsearch-inner-wrapper">
+                            {block name='search_form'}
                                 {include file="./searchForm.tpl"}
+                            {/block}
                             </div>
                         </div>
                     </div>

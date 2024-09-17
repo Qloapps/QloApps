@@ -33,8 +33,10 @@
 	{block name='authentication_heading'}
 		<h1 class="page-heading">{if !isset($email_create)}{l s='Authentication'}{else}{l s='Create an account'}{/if}</h1>
 	{/block}
-	{if isset($back) && preg_match("/^http/", $back)}{assign var='current_step' value='login'}{include file="$tpl_dir./order-steps.tpl"}{/if}
-	{include file="$tpl_dir./errors.tpl"}
+	{if isset($back) && preg_match("/^http/", $back)}{assign var='current_step' value='login'}{block name='order_steps'}{include file="$tpl_dir./order-steps.tpl"}{/block}{/if}
+	{block name='errors'}
+		{include file="$tpl_dir./errors.tpl"}
+	{/block}
 	{assign var='stateExist' value=false}
 	{assign var="postCodeExist" value=false}
 	{assign var="dniExist" value=false}

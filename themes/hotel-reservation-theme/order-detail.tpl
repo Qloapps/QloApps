@@ -48,7 +48,9 @@
         </h1>
     {/block}
 
-    {include file="$tpl_dir./errors.tpl"}
+	{block name='errors'}
+        {include file="$tpl_dir./errors.tpl"}
+    {/block}
 
     {if isset($order) && $order}
         {block name='order_detail_subheading'}
@@ -230,7 +232,9 @@
                                 <div class="rooms-list">
                                     {foreach from=$cart_htl_data key=data_k item=data_v}
                                         {foreach from=$data_v['date_diff'] key=rm_k item=rm_v}
-                                            {include file='./_partials/order-room-detail.tpl'}
+                                            {block name='order_room_detail'}
+                                                {include file='./_partials/order-room-detail.tpl'}
+                                            {/block}
                                         {/foreach}
                                     {/foreach}
 
@@ -484,7 +488,9 @@
                             <div class="card-body">
                                 <div class="messages-list card-text">
                                     {foreach from=$messages item=message}
-                                        {include file='./_partials/order-message.tpl'}
+                                        {block name='order_message'}
+                                            {include file='./_partials/order-message.tpl'}
+                                        {/block}
                                     {/foreach}
                                 </div>
                             </div>
@@ -1018,5 +1024,4 @@
             {addJsDefL name=cancel_booking_txt}{l s='Cancel Bookings' js=1}{/addJsDefL}
         {/strip}
     {/block}
-
 {/block}

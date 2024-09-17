@@ -56,7 +56,9 @@
 						<p>{l s='Searched results for' mod='wkroomsearchblock'}</p>
 					</div>
 					{* search form *}
-					{include file="./searchForm.tpl"}
+					{block name='search_form'}
+						{include file="./searchForm.tpl"}
+					{/block}
 					<a href="#" class="close_room_serach_wrapper"><img src="{$module_dir}views/img/icon-close.svg"></a>
 				</div>
 			</div>

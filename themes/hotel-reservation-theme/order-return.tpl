@@ -42,7 +42,9 @@
 		</span>
 	{/capture}
 
-	{include file="./errors.tpl"}
+	{block name='errors'}
+		{include file="./errors.tpl"}
+	{/block}
 	<div class="panel card">
 		{block name='order_return_heading'}
 			<h1 class="page-heading bottom-indent">

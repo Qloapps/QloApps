@@ -30,10 +30,13 @@
 	{/block}
 
 	{assign var='current_step' value='payment'}
-	{include file="$tpl_dir./order-steps.tpl"}
+	{block name='order_steps'}
+		{include file="$tpl_dir./order-steps.tpl"}
+	{/block}
 
-	{include file="$tpl_dir./errors.tpl"}
-
+	{block name='errors'}
+		{include file="$tpl_dir./errors.tpl"}
+	{/block}
 	{block name='displayOrderConfirmation'}
 		{$HOOK_ORDER_CONFIRMATION}
 	{/block}
