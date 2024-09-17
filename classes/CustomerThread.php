@@ -38,8 +38,6 @@ class CustomerThreadCore extends ObjectModel
     public $token;
     public $date_add;
     public $date_upd;
-    const QLO_CUSTOMER_THREAD_TYPE_SENT = 1;
-    const QLO_CUSTOMER_THREAD_TYPE_RECEIVED = 2;
 
     /**
      * @see ObjectModel::$definition
@@ -122,7 +120,7 @@ class CustomerThreadCore extends ObjectModel
         return $return;
     }
 
-    public static function getCustomerMessages($id_customer, $read = null, $id_order = null, $threadType = null)
+    public static function getCustomerMessages($id_customer, $read = null, $id_order = null, $messageBy = null)
     {
         $sql = 'SELECT *
 			FROM '._DB_PREFIX_.'customer_thread ct
@@ -137,10 +135,10 @@ class CustomerThreadCore extends ObjectModel
             $sql .= ' AND ct.`id_order` = '.(int)$id_order;
         }
 
-        if ($threadType != null) {
-            if (self::QLO_CUSTOMER_THREAD_TYPE_SENT == $threadType) {
+        if ($messageBy !== null) {
+            if (CustomerMessage::QLO_CUSTOMER_MESSAGE_BY_ADMIN == $messageBy) {
                 $sql .= ' AND cm.`id_employee` != 0';
-            } else if (self::QLO_CUSTOMER_THREAD_TYPE_RECEIVED == $threadType) {
+            } else if (CustomerMessage::QLO_CUSTOMER_MESSAGE_BY_ADMIN_CUSTOMER == $messageBy) {
                 $sql .= ' AND cm.`id_employee` = 0';
             }
         }
