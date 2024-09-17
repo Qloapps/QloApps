@@ -22,6 +22,7 @@
 *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 *}
+
 {strip}
 {addJsDef isMobile=$mobile_device}
 {addJsDef baseDir=$content_dir}

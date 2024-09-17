@@ -22,6 +22,7 @@
 *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 *}
+
 {if !isset($addresses_style)}
     {$addresses_style.company = 'address_company'}
     {$addresses_style.firstname = 'address_name'}
@@ -54,90 +55,102 @@
     <p id="emptyCartWarning" class="alert alert-warning unvisible">{l s='Your shopping cart is empty.'}</p>
     <h2>{l s='Payment Options'}</h2>
     <!-- HOOK_ADVANCED_PAYMENT -->
-    <div id="HOOK_ADVANCED_PAYMENT">
-        <div class="row">
-        <!-- Should get a collection of "PaymentOption" object -->
-        {assign var='adv_payment_empty' value=true}
-        {foreach from=$HOOK_ADVANCED_PAYMENT item=pay_option key=key}
-            {if $pay_option}
-                {assign var='adv_payment_empty' value=false}
-            {/if}
-        {/foreach}
-        {if $HOOK_ADVANCED_PAYMENT && !$adv_payment_empty}
-            {foreach $HOOK_ADVANCED_PAYMENT as $advanced_payment_opt_list}
-                {foreach $advanced_payment_opt_list as $paymentOption}
-                    <div class="col-xs-12 col-md-6">
-                        <p class="payment_module pointer-box">
-                            <a class="payment_module_adv">
-                                <img class="payment_option_logo" src="{$paymentOption->getLogo()}"/>
-                                <span class="payment_option_cta">
-                                    {$paymentOption->getCallToActionText()}
-                                </span>
-                                <span class="pull-right payment_option_selected">
-                                    <i class="icon-check"></i>
-                                </span>
-                            </a>
-
-                        </p>
-                        <div class="payment_option_form">
-                            {if $paymentOption->getForm()}
-                                {$paymentOption->getForm()}
-                            {else}
-                                <form method="{if $paymentOption->getMethod()}{$paymentOption->getMethod()}{else}POST{/if}" action="{$paymentOption->getAction()}">
-                                    {if $paymentOption->getInputs()}
-                                        {foreach from=$paymentOption->getInputs() item=value key=name}
-                                            <input type="hidden" name="{$name}" value="{$value}">
-                                        {/foreach}
-                                    {/if}
-                                </form>
-                            {/if}
-                        </div>
-                    </div>
-                {/foreach}
+    {block name='advancedPaymentOptions'}
+        <div id="HOOK_ADVANCED_PAYMENT">
+            <div class="row">
+            <!-- Should get a collection of "PaymentOption" object -->
+            {assign var='adv_payment_empty' value=true}
+            {foreach from=$HOOK_ADVANCED_PAYMENT item=pay_option key=key}
+                {if $pay_option}
+                    {assign var='adv_payment_empty' value=false}
+                {/if}
             {/foreach}
+            {if $HOOK_ADVANCED_PAYMENT && !$adv_payment_empty}
+                {foreach $HOOK_ADVANCED_PAYMENT as $advanced_payment_opt_list}
+                    {foreach $advanced_payment_opt_list as $paymentOption}
+                        <div class="col-xs-12 col-md-6">
+                            <p class="payment_module pointer-box">
+                                <a class="payment_module_adv">
+                                    <img class="payment_option_logo" src="{$paymentOption->getLogo()}"/>
+                                    <span class="payment_option_cta">
+                                        {$paymentOption->getCallToActionText()}
+                                    </span>
+                                    <span class="pull-right payment_option_selected">
+                                        <i class="icon-check"></i>
+                                    </span>
+                                </a>
+
+                            </p>
+                            <div class="payment_option_form">
+                                {if $paymentOption->getForm()}
+                                    {$paymentOption->getForm()}
+                                {else}
+                                    <form method="{if $paymentOption->getMethod()}{$paymentOption->getMethod()}{else}POST{/if}" action="{$paymentOption->getAction()}">
+                                        {if $paymentOption->getInputs()}
+                                            {foreach from=$paymentOption->getInputs() item=value key=name}
+                                                <input type="hidden" name="{$name}" value="{$value}">
+                                            {/foreach}
+                                        {/if}
+                                    </form>
+                                {/if}
+                            </div>
+                        </div>
+                    {/foreach}
+                {/foreach}
+            </div>
+            {else}
+            <div class="col-xs-12 col-md-12">
+                <p class="alert alert-warning ">{l s='Unable to find any available payment option for your cart. Please contact us if the problem persists'}</p>
+            </div>
+            {/if}
         </div>
-        {else}
-        <div class="col-xs-12 col-md-12">
-            <p class="alert alert-warning ">{l s='Unable to find any available payment option for your cart. Please contact us if the problem persists'}</p>
-        </div>
-        {/if}
-    </div>
+    {/block}
     <!-- end HOOK_ADVANCED_PAYMENT -->
 
     {if $opc}
         <!-- Carrier -->
-        {include file="$tpl_dir./order-carrier-advanced.tpl"}
+        {block name='order_carrier_advanced'}
+            {include file="$tpl_dir./order-carrier-advanced.tpl"}
+        {/block}
         <!-- END Carrier -->
     {/if}
 
     {if $is_logged AND !$is_guest}
-        {include file="$tpl_dir./order-address-advanced.tpl"}
+        {block name='order_address_advanced'}
+            {include file="$tpl_dir./order-address-advanced.tpl"}
+        {/block}
     {elseif $opc}
         <!-- Create account / Guest account / Login block -->
-        {include file="$tpl_dir./order-opc-new-account-advanced.tpl"}
+        {block name='order_opc_new_account_advanced'}
+            {include file="$tpl_dir./order-opc-new-account-advanced.tpl"}
+        {/block}
         <!-- END Create account / Guest account / Login block -->
     {/if}
 
-    <!-- TNC -->
-    {if $conditions AND $cms_id}
-        {if $override_tos_display }
-            {$override_tos_display}
-        {else}
-            <div class="row">
-                <div class="col-xs-12 col-md-12">
-                    <h2>{l s='Terms and Conditions'}</h2>
-                    <div class="box">
-                        <p class="checkbox">
-                            <input type="checkbox" name="cgv" id="cgv" value="1" {if $checkedTOS}checked="checked"{/if} />
-                            <label for="cgv">{l s='I agree to the terms of service and will adhere to them unconditionally.'}</label>
-                            <a href="{$link_conditions|escape:'html':'UTF-8'}" class="iframe" rel="nofollow">{l s='(Read the Terms of Service)'}</a>
-                        </p>
+    {block name='order_payment_advanced_terms_and_conditions'}
+        <!-- TNC -->
+        {if $conditions AND $cms_id}
+            {if $override_tos_display }
+                {$override_tos_display}
+            {else}
+                <div class="row">
+                    <div class="col-xs-12 col-md-12">
+                        <h2>{l s='Terms and Conditions'}</h2>
+                        <div class="box">
+                            <p class="checkbox">
+                                <input type="checkbox" name="cgv" id="cgv" value="1" {if $checkedTOS}checked="checked"{/if} />
+                                <label for="cgv">{l s='I agree to the terms of service and will adhere to them unconditionally.'}</label>
+                                <a href="{$link_conditions|escape:'html':'UTF-8'}" class="iframe" rel="nofollow">{l s='(Read the Terms of Service)'}</a>
+                            </p>
+                        </div>
                     </div>
                 </div>
-            </div>
+            {/if}
         {/if}
-    {/if}
-    <!-- end TNC -->
+        <!-- end TNC -->
+    {/block}
 
-    {include file="$tpl_dir./shopping-cart-advanced.tpl"}
+    {block name='shopping_cart_advanced'}
+        {include file="$tpl_dir./shopping-cart-advanced.tpl"}
+    {/block}
 {/if}
