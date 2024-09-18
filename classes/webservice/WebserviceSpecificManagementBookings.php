@@ -534,10 +534,16 @@ class WebserviceSpecificManagementBookingsCore Extends ObjectModel implements We
             $data['child'] = 0;
         }
 
+        if (isset($data['child']) && !$data['child']) {
+            $child_ages = array();
+        } else if (!is_array($child_ages)) {
+            $child_ages = array($child_ages);
+        }
+
         return array(
             array(
                 'adults' => isset($data['adult']) && $data['adult'] ? $data['adult'] : $roomTypeInfo['adults'],
-                'children' =>  isset($data['child']) && $data['child'] ? $data['child'] : $roomTypeInfo['children'],
+                'children' =>  isset($data['child']) ? $data['child'] : $roomTypeInfo['children'],
                 'child_ages' => $child_ages
             )
         );
