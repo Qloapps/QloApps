@@ -4514,18 +4514,7 @@ class AdminOrdersControllerCore extends AdminController
                     $objRoomTypeServiceProduct = new RoomTypeServiceProduct();
                     $objRoomTypeServiceProductPrice = new RoomTypeServiceProductPrice();
                     $objRoomTypeServiceProductCartDetail = new RoomTypeServiceProductCartDetail();
-                    if ($services = $objRoomTypeServiceProductCartDetail->getServiceProductsInCart(
-                        $objCartBookingData->id_cart,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        $objCartBookingData->id,
-                        0,
-                        null,
-                        1
-                    )) {
+                    if ($services = $objRoomTypeServiceProductCartDetail->getRoomServiceProducts($objCartBookingData->id, 0, null, 1)) {
                         foreach ($services as $service) {
                             $insertedServiceProductIdOrderDetail = $objBookingDetail->getLastInsertedServiceIdOrderDetail($order->id, $service['id_product']);
                             $numDays = 1;
