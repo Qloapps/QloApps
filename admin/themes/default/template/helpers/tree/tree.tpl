@@ -64,7 +64,7 @@
 		{/if}
 		{if isset($use_search) && $use_search == true}
 			$("#{$id|escape:'html':'UTF-8'}-search").bind("typeahead:selected", function(obj, datum) {
-				$("#{$id|escape:'html':'UTF-8'}").find(":input").each(
+				$("#{$id|escape:'html':'UTF-8'}").find('[name="'+datum.input_name + '[]"]:input').each(
 					function()
 					{
 						if ($(this).val() == datum.value)
@@ -78,6 +78,15 @@
 								$(this).show();
 								$(this).prev().find('.icon-folder-close').removeClass('icon-folder-close').addClass('icon-folder-open');
 							});
+
+							{if isset($auto_select_children) && $auto_select_children == true}
+								if ($(this).closest('.tree-item').length == 0) {
+									$(this).closest('.tree-folder').find(':input[type=checkbox]').each(function(){
+										$(this).prop('checked', true);
+										$(this).parent().addClass('tree-selected');
+									});
+								}
+							{/if}
 						}
 					}
 				);
@@ -86,7 +95,7 @@
 
 		{if isset($auto_select_children) && $auto_select_children == true}
 			$('#{$id|escape:'html':'UTF-8'}').find(':input[type=checkbox]').on('click', function(){
-				if ($(this).closest('.tree-item').length ==0) {
+				if ($(this).closest('.tree-item').length == 0) {
 					if ($(this).is(":checked")) {
 						$(this).closest('.tree-folder').find(':input[type=checkbox]').each(function(){
 							$(this).prop('checked', true);
@@ -111,9 +120,13 @@
 			});
 		{/if}
 
-		$(document).ready(function () {
-			var tree = $("#{$id|escape:'html':'UTF-8'}").tree('collapseAll');
+		function startTree() {
+			if (typeof $.fn.tree === 'undefined') {
+				setTimeout(startTree, 100);
+				return;
+			}
 
+			var tree = $("#{$id|escape:'html':'UTF-8'}").tree('collapseAll');
 
 			if ($("#{$id|escape:'html':'UTF-8'}").find(":input:checked").length > 1)
 					$('#expand-all-{$id|escape:'html':'UTF-8'}').hide();
@@ -127,6 +140,10 @@
 					$(this).prev().find('.icon-folder-close').removeClass('icon-folder-close').addClass('icon-folder-open');
 				});
 			});
+		}
+
+		$(document).ready(function () {
+			startTree();
 		});
 	{/block}
 </script>
