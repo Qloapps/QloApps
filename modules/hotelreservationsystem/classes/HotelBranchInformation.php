@@ -1221,6 +1221,8 @@ class HotelBranchInformation extends ObjectModel
                             $objCategory->link_rewrite = $linkRewriteArray;
                             $objCategory->id_parent = $catCity;
                             $objCategory->save();
+                            $this->id_category = $objCategory->id;
+                            $this->save();
                             Category::regenerateEntireNtree();
                         } else if ($catHotel = $this->addCategory(
                             $hotelCatName, $catCity, $groupIds, 1, $this->id, $linkRewriteArray
