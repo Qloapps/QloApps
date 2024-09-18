@@ -2502,12 +2502,6 @@ class HotelHelper
             $diff = $difference->h;
         } else {
             $diff = $difference->days;
-
-            $time1 = $start->format('H:i');
-            $time2 = $end->format('H:i');
-            if (strtotime($time1) > strtotime($time2)) {
-                $diff += 1;
-            }
         }
 
         return $diff;

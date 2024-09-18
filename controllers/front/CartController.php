@@ -156,8 +156,8 @@ class CartControllerCore extends FrontController
             // now get updated available rooms
             $date_from = Tools::getValue('dateFrom');
             $date_to = Tools::getValue('dateTo');
-            $date_from = date("Y-m-d", strtotime($date_from));
-            $date_to = date("Y-m-d", strtotime($date_to));
+            $date_from = date("Y-m-d H:i:s", strtotime($date_from));
+            $date_to = date("Y-m-d H:i:s", strtotime($date_to));
             $objRoomType = new HotelRoomType();
             if ($roomTypeInfo = $objRoomType->getRoomTypeInfoByIdProduct($this->id_product)) {
                 if ($id_hotel = $roomTypeInfo['id_hotel']) {
@@ -360,7 +360,7 @@ class CartControllerCore extends FrontController
                     }
 
                     if ($id_hotel = $roomTypeInfo['id_hotel']) {
-                        if (strtotime($date_from) < strtotime(date('Y-m-d'))) {
+                        if (strtotime($date_from) < strtotime(date('Y-m-d H:i:s'))) {
                             $this->errors[] = Tools::displayError('You can\'t book room before current date');
                         } elseif (strtotime($date_from) >= strtotime($date_to)) {
                             $this->errors[] = Tools::displayError('Check-out date must be after check-in date');
@@ -373,9 +373,6 @@ class CartControllerCore extends FrontController
                                 $this->errors[] = Tools::displayError('You can\'t book room after date '.$maxOrdDate);
                             }
                         }
-
-                        // @todo add hook for validation
-                        // change all ymd to ymd h:i:s
 
                         if (!$this->errors) {
                             $objBookingDetail = new HotelBookingDetail();

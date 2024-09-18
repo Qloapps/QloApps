@@ -482,13 +482,6 @@ class HotelCartBookingData extends ObjectModel
                     $obj_htl_cart_booking_data->id_hotel = $id_hotel;
                     $obj_htl_cart_booking_data->quantity = $num_days;
                     $obj_htl_cart_booking_data->extra_demands = $roomDemand;
-                    if ('00:00:00' == date('H:i:s', strtotime($date_from))
-                        && '00:00:00' == date('H:i:s', strtotime($date_to))
-                    ) {
-                        $objHotelBranchInformation = new HotelBranchInformation($id_hotel);
-                        $date_from = date('Y-m-d H:i:s', strtotime($objHotelBranchInformation->check_in, strtotime($date_from)));
-                        $date_to = date('Y-m-d H:i:s', strtotime($objHotelBranchInformation->check_out, strtotime($date_to)));
-                    }
                     $obj_htl_cart_booking_data->date_from = $date_from;
                     $obj_htl_cart_booking_data->date_to = $date_to;
                     $obj_htl_cart_booking_data->booking_type = $booking_type;
