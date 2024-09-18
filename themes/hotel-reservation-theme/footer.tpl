@@ -28,21 +28,31 @@
 						<div id="right_column" class="col-xs-12 col-sm-{$right_column_size|intval} column">{$HOOK_RIGHT_COLUMN}</div>
 					{/if}
 					</div><!-- .row -->
-					{hook h='displayColumnsBottom'}
+					{block name='displayColumnsBottom'}
+						{hook h='displayColumnsBottom'}
+					{/block}
 				</div><!-- #columns -->
 			</div><!-- .columns-container -->
-			{if isset($HOOK_FOOTER)}
-				{hook h='displayFooterBefore'}
-				<!-- Footer -->
-				<div class="footer-container">
-					<footer id="footer"  class="container">
-						<div class="row margin-btm-50">{$HOOK_FOOTER}</div>
-					</footer>
-					{hook h="displayAfterDefautlFooterHook"}
-				</div><!-- #footer -->
-			{/if}
+			{block name='displayFooter'}
+				{if isset($HOOK_FOOTER)}
+					{block name='displayFooterBefore'}
+						{hook h='displayFooterBefore'}
+					{/block}
+					<!-- Footer -->
+					<div class="footer-container">
+						<footer id="footer"  class="container">
+							<div class="row margin-btm-50">{$HOOK_FOOTER}</div>
+						</footer>
+						{block name='displayAfterDefautlFooterHook'}
+							{hook h="displayAfterDefautlFooterHook"}
+						{/block}
+					</div><!-- #footer -->
+				{/if}
+			{/block}
 		</div><!-- #page -->
 {/if}
-{include file="$tpl_dir./global.tpl"}
+{block name='global'}
+	{include file="$tpl_dir./global.tpl"}
+{/block}
 	</body>
 </html>

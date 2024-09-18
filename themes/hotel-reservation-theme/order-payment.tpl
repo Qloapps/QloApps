@@ -38,14 +38,22 @@
 
 {if !$opc}
 	{assign var='current_step' value='payment'}
-	{include file="$tpl_dir./order-steps.tpl"}
-	{include file="$tpl_dir./errors.tpl"}
+	{block name='order_steps'}
+		{include file="$tpl_dir./order-steps.tpl"}
+	{/block}
+	{block name='errors'}
+		{include file="$tpl_dir./errors.tpl"}
+	{/block}
 {else}
 	<div id="opc_payment_methods" class="opc-main-block">
 		<div id="opc_payment_methods-overlay" class="opc-overlay" style="display: none;"></div>
 {/if}
 {if $advanced_payment_api}
-    {include file="$tpl_dir./order-payment-advanced.tpl"}
+	{block name='order_payment_advanced'}
+		{include file="$tpl_dir./order-payment-advanced.tpl"}
+	{/block}
 {else}
-    {include file = "$tpl_dir./order-payment-classic.tpl"}
+	{block name='order_payment_classic'}
+		{include file = "$tpl_dir./order-payment-classic.tpl"}
+	{/block}
 {/if}
