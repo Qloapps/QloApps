@@ -136,7 +136,7 @@ class CustomerThreadCore extends ObjectModel
         }
 
         if ($messageBy !== null) {
-            if (CustomerMessage::QLO_CUSTOMER_MESSAGE_BY_ADMIN == $messageBy) {
+            if (CustomerMessage::QLO_CUSTOMER_MESSAGE_BY_EMPLOYEE == $messageBy) {
                 $sql .= ' AND cm.`id_employee` != 0';
             } else if (CustomerMessage::QLO_CUSTOMER_MESSAGE_BY_CUSTOMER == $messageBy) {
                 $sql .= ' AND cm.`id_employee` = 0';

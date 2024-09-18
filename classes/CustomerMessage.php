@@ -37,7 +37,7 @@ class CustomerMessageCore extends ObjectModel
     public $date_add;
     public $date_upd;
     public $read;
-    const QLO_CUSTOMER_MESSAGE_BY_ADMIN = 1;
+    const QLO_CUSTOMER_MESSAGE_BY_EMPLOYEE = 1;
     const QLO_CUSTOMER_MESSAGE_BY_CUSTOMER = 2;
 
     /**
