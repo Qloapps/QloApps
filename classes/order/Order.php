@@ -2536,7 +2536,7 @@ class OrderCore extends ObjectModel
             foreach ($tax_calculator->getTaxesAmount($discounted_price_tax_excl) as $id_tax => $unit_amount) {
                 $total_tax_base = 0;
                 $total_tax_base = Tools::processPriceRounding($discounted_price_tax_excl, $quantity);
-                $totalPrice = Tools::processPriceRounding($unit_amount, $quantity);
+                $total_amount = Tools::processPriceRounding($unit_amount, $quantity);
 
                 if (!isset($breakdown[$id_tax])) {
                     $breakdown[$id_tax] = array('tax_base' => 0, 'tax_amount' => 0);
