@@ -2431,7 +2431,7 @@ class AdminOrdersControllerCore extends AdminController
             $helper->title = $this->l('Messages');
             $helper->tooltip = $this->l('Messages is the number of customer messages for this order.');
             $helper->href = $this->context->link->getAdminLink('AdminCustomerThreads').'&id_order='.$objOrder->id;
-            $helper->value = count(CustomerThread::getCustomerMessages($objOrder->id_customer, null, $objOrder->id, CustomerMessage::QLO_CUSTOMER_MESSAGE_BY_EMPLOYEE));
+            $helper->value = count(CustomerThread::getCustomerMessages($objOrder->id_customer, null, $objOrder->id, CustomerMessage::QLO_CUSTOMER_MESSAGE_BY_CUSTOMER));
             $this->kpis[] = $helper;
 
             $objHotelBookingDetail = new HotelBookingDetail();

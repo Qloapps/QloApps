@@ -120,6 +120,16 @@ class CustomerThreadCore extends ObjectModel
         return $return;
     }
 
+    /**
+     * Retrieves customer messages based on specified conditions.
+     *
+     * @param int          $id_customer  Customer ID.
+     * @param bool|null    $read         Return read (true), unread (false), or all messages (null).
+     * @param int|null     $id_order     Filter messages by order ID.
+     * @param int|null     $messageBy    Filter messages by sender (employees, customer, or both).
+     *
+     * @return array List of messages matching the conditions.
+     */
     public static function getCustomerMessages($id_customer, $read = null, $id_order = null, $messageBy = null)
     {
         $sql = 'SELECT *
