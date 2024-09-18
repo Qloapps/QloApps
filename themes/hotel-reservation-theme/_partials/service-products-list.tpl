@@ -20,9 +20,11 @@
 * @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
 *}
 
-{foreach $service_products as $product}
-    {if !($product@first && isset($init) && $init == true)}
+{foreach $service_products as $service_product}
+    {if !($service_product@first && isset($init) && $init == true)}
         <hr>
     {/if}
-    {include file="{$tpl_dir}_partials/service-products-list-row.tpl" product=$product}
+    {block name='service_products_list_row'}
+        {include file="{$tpl_dir}_partials/service-products-list-row.tpl" service_product=$service_product product=$product}
+    {/block}
 {/foreach}

@@ -20,8 +20,10 @@
 * @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
 *}
 
-<div class="row margin-top-20 visible-xs">
-	<div class="col-md-offset-1 col-md-10 col-lg-offset-2 col-lg-8">
-		<button id="xs_room_search" class="btn button button-medium" href="#xs_room_search_form"><span>{l s='Make Booking' mod='wkroomsearchblock'}</span></button>
+{block name='landing_page_search_button_mobile'}
+	<div class="row margin-top-20 visible-xs">
+		<div class="col-md-offset-1 col-md-10 col-lg-offset-2 col-lg-8">
+			<button id="xs_room_search" class="btn button button-medium" href="#xs_room_search_form"><span>{l s='Make Booking' mod='wkroomsearchblock'}</span></button>
+		</div>
 	</div>
-</div>
+{/block}

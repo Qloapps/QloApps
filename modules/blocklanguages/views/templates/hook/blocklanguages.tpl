@@ -20,32 +20,34 @@
 * @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
 *}
 
-{if count($languages) > 1}
-    <div id="languages-block-top" class="languages-block-wrap nav-main-item-right hidden-xs pull-right">
-        <div class="dropdown">
-            {foreach from=$languages key=k item=language}
-                {if $language.iso_code == $lang_iso}
-                    <button class="btn dropdown-toggle" type="button" data-toggle="dropdown">
-                        {$language.name|regex_replace:"/\s\(.*\)$/":""}
-                        <span class="caret"></span>
-                    </button>
-                {/if}
-            {/foreach}
-
-            <ul class="dropdown-menu">
+{block name='block_languages'}
+    {if count($languages) > 1}
+        <div id="languages-block-top" class="languages-block-wrap nav-main-item-right hidden-xs pull-right">
+            <div class="dropdown">
                 {foreach from=$languages key=k item=language}
-                    <li {if $language.iso_code == $lang_iso}class="disabled"{/if}>
-                        {assign var=indice_lang value=$language.id_lang}
-                        {if isset($lang_rewrite_urls.$indice_lang)}
-                            <a href="{$lang_rewrite_urls.$indice_lang|escape:'html':'UTF-8'}" title="{$language.name}">
-                        {else}
-                            <a href="{$link->getLanguageLink($language.id_lang)|escape:'html':'UTF-8'}" title="{$language.name}">
-                        {/if}
-                            <span>{$language.name|regex_replace:"/\s\(.*\)$/":""}</span>
-                        </a>
-                    </li>
+                    {if $language.iso_code == $lang_iso}
+                        <button class="btn dropdown-toggle" type="button" data-toggle="dropdown">
+                            {$language.name|regex_replace:"/\s\(.*\)$/":""}
+                            <span class="caret"></span>
+                        </button>
+                    {/if}
                 {/foreach}
-            </ul>
+
+                <ul class="dropdown-menu">
+                    {foreach from=$languages key=k item=language}
+                        <li {if $language.iso_code == $lang_iso}class="disabled"{/if}>
+                            {assign var=indice_lang value=$language.id_lang}
+                            {if isset($lang_rewrite_urls.$indice_lang)}
+                                <a href="{$lang_rewrite_urls.$indice_lang|escape:'html':'UTF-8'}" title="{$language.name}">
+                            {else}
+                                <a href="{$link->getLanguageLink($language.id_lang)|escape:'html':'UTF-8'}" title="{$language.name}">
+                            {/if}
+                                <span>{$language.name|regex_replace:"/\s\(.*\)$/":""}</span>
+                            </a>
+                        </li>
+                    {/foreach}
+                </ul>
+            </div>
         </div>
-    </div>
-{/if}
+    {/if}
+{/block}

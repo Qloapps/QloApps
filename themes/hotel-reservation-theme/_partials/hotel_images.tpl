@@ -20,12 +20,14 @@
 * @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
 *}
 
-{if is_array($hotel_images) && count($hotel_images)}
-    {foreach from=$hotel_images item=hotel_image}
-        <div class="col-sm-4 image-item">
-            <a class="hotel-images-fancybox" href="{$hotel_image.link|escape:'html':'UTF-8'}">
-                <img class="img img-responsive" src="{$hotel_image.link|escape:'html':'UTF-8'}">
-            </a>
-        </div>
-    {/foreach}
-{/if}
+{block name='hotel_images'}
+    {if is_array($hotel_images) && count($hotel_images)}
+        {foreach from=$hotel_images item=hotel_image}
+            <div class="col-sm-4 image-item">
+                <a class="hotel-images-fancybox" href="{$hotel_image.link|escape:'html':'UTF-8'}">
+                    <img class="img img-responsive" src="{$hotel_image.link|escape:'html':'UTF-8'}">
+                </a>
+            </div>
+        {/foreach}
+    {/if}
+{/block}
