@@ -1,0 +1,255 @@
+<?php
+/*
+* 2007-2017 PrestaShop
+*
+* NOTICE OF LICENSE
+*
+* This source file is subject to the Open Software License (OSL 3.0)
+* that is bundled with this package in the file LICENSE.txt.
+* It is also available through the world-wide-web at this URL:
+* http://opensource.org/licenses/osl-3.0.php
+* If you did not receive a copy of the license and are unable to
+* obtain it through the world-wide-web, please send an email
+* to license@prestashop.com so we can send you a copy immediately.
+*
+* DISCLAIMER
+*
+* Do not edit or add to this file if you wish to upgrade PrestaShop to newer
+* versions in the future. If you wish to customize PrestaShop for your
+* needs please refer to http://www.prestashop.com for more information.
+*
+*  @author PrestaShop SA <contact@prestashop.com>
+*  @copyright  2007-2017 PrestaShop SA
+*  @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+*  International Registered Trademark & Property of PrestaShop SA
+*/
+
+class CityCore extends ObjectModel
+{
+    /** @var int Country id which city belongs */
+    public $id_country;
+
+    /** @var int State id which city belongs */
+    public $id_state;
+
+    /** @var string 3 letters iata code */
+    public $iata_code;
+
+    /** @var string Name */
+    public $name;
+
+    /** @var bool Status for delivery */
+    public $active = true;
+
+    /**
+     * @see ObjectModel::$definition
+     */
+    public static $definition = array(
+        'table' => 'city',
+        'primary' => 'id_city',
+        'fields' => array(
+            'id_country' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId', 'required' => true),
+            'id_state' =>    array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId', 'required' => true),
+            'iata_code' =>    array('type' => self::TYPE_STRING, 'validate' => 'isCityIataCode', 'size' => 7),
+            'name' =>        array('type' => self::TYPE_STRING, 'validate' => 'isGenericName', 'required' => true, 'size' => 32),
+            'active' =>    array('type' => self::TYPE_BOOL, 'validate' => 'isBool'),
+        ),
+    );
+
+    protected $webserviceParameters = array(
+        'fields' => array(
+            'id_state' => array('xlink_resource'=> 'states'),
+            'id_country' => array('xlink_resource'=> 'countries')
+        ),
+    );
+
+    public static function getCities($id_lang = false, $active = false)
+    {
+        return Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS('
+		SELECT `id_city`, `id_country`, `id_state`, `iata_code`, `name`, `active`
+		FROM `'._DB_PREFIX_.'city`
+		'.($active ? 'WHERE active = 1' : '').'
+		ORDER BY `name` ASC');
+    }
+
+    /**
+     * Get a city name with its ID
+     *
+     * @param int $id_city Country ID
+     * @return string City name
+     */
+    public static function getNameById($id_city)
+    {
+        if (!$id_city) {
+            return false;
+        }
+        $cache_id = 'City::getNameById_'.(int)$id_city;
+        if (!Cache::isStored($cache_id)) {
+            $result = Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue('
+				SELECT `name`
+				FROM `'._DB_PREFIX_.'city`
+				WHERE `id_city` = '.(int)$id_city
+            );
+            Cache::store($cache_id, $result);
+            return $result;
+        }
+        return Cache::retrieve($cache_id);
+    }
+
+    /**
+     * Get a city id with its name
+     *
+     * @param string $id_city Country ID
+     * @return int city id
+     */
+    public static function getIdByName($city)
+    {
+        if (empty($city)) {
+            return false;
+        }
+        $cache_id = 'City::getIdByName_'.pSQL($city);
+        if (!Cache::isStored($cache_id)) {
+            $result = (int)Db::getInstance()->getValue('
+				SELECT `id_city`
+				FROM `'._DB_PREFIX_.'city`
+				WHERE `name` = \''.pSQL($city).'\'
+			');
+            Cache::store($cache_id, $result);
+            return $result;
+        }
+        return Cache::retrieve($cache_id);
+    }
+
+    /**
+    * Get a city id with its IATA code
+    *
+    * @param string $iata_code IATA code
+    * @return int city id
+    */
+    public static function getIdByIata($iata_code, $id_country = null)
+    {
+        return Db::getInstance()->getValue('
+		SELECT `id_city`
+		FROM `'._DB_PREFIX_.'city`
+		WHERE `iata_code` = \''.pSQL($iata_code).'\'
+		'.($id_country ? 'AND `id_country` = '.(int)$id_country : ''));
+    }
+
+    /**
+    * Delete a city only if is not in use
+    *
+    * @return bool
+    */
+    public function delete()
+    {
+        if (!$this->isUsed()) {
+            // Database deletion
+            $result = Db::getInstance()->delete($this->def['table'], '`'.$this->def['primary'].'` = '.(int)$this->id);
+            if (!$result) {
+                return false;
+            }
+
+            // Database deletion for multilingual fields related to the object
+            if (!empty($this->def['multilang'])) {
+                Db::getInstance()->delete(bqSQL($this->def['table']).'_lang', '`'.$this->def['primary'].'` = '.(int)$this->id);
+            }
+            return $result;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Check if a city is used
+     *
+     * @return bool
+     */
+    public function isUsed()
+    {
+        return ($this->countUsed() > 0);
+    }
+
+    /**
+     * Returns the number of utilisation of a city
+     *
+     * @return int count for this city
+     */
+    public function countUsed()
+    {
+        $result = Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue('
+			SELECT COUNT(*)
+			FROM `'._DB_PREFIX_.'address`
+			WHERE `'.$this->def['primary'].'` = '.(int)$this->id
+        );
+        return $result;
+    }
+
+    public static function getCitiesByIdCountry($id_country, $active = true)
+    {
+        if (empty($id_country)) {
+            die(Tools::displayError());
+        }
+
+        return Db::getInstance()->executeS('
+			SELECT *
+			FROM `'._DB_PREFIX_.'city` s
+			WHERE s.`id_country` = '.(int)$id_country
+			.($active ? ' AND s.active = 1' : '')
+        );
+    }
+
+    public static function getCitiesByIdState($id_state, $active = true)
+    {
+        if (empty($id_state)) {
+            die(Tools::displayError());
+        }
+
+        return Db::getInstance()->executeS('
+			SELECT *
+			FROM `'._DB_PREFIX_.'city` s
+			WHERE s.`id_state` = '.(int)$id_state
+			.($active ? ' AND s.active = 1' : '')
+        );
+    }
+
+    public static function hasCounties($id_city)
+    {
+        return count(County::getCounties((int)$id_city));
+    }
+
+    public static function getIdState($id_city)
+    {
+        if (!Validate::isUnsignedId($id_city)) {
+            die(Tools::displayError());
+        }
+
+        return Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue('
+			SELECT `id_state`
+			FROM `'._DB_PREFIX_.'city`
+			WHERE `id_city` = '.(int)$id_city
+        );
+    }
+
+    /**
+     * @param $ids_cities
+     * @param $id_state
+     * @return bool
+     */
+    public function affectStateToSelection($ids_cities, $id_state)
+    {
+        // cast every array values to int (security)
+        $ids_cities = array_map('intval', $ids_cities);
+        return Db::getInstance()->execute('
+		UPDATE `'._DB_PREFIX_.'city` SET `id_state` = '.(int)$id_state.' WHERE `id_city` IN ('.implode(',', $ids_cities).')
+		');
+    }
+	
+	public static function getListCities($id_lang = false, $active = false)
+    {
+        return Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS('
+		SELECT `id_city`, `id_country`, `id_state`, `iata_code`, `name`, `active`
+		FROM `'._DB_PREFIX_.'city`
+		'.($active ? 'WHERE active = 1' : '').'
+		ORDER BY `name` ASC');
+    }
+}
