@@ -366,7 +366,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
 		SELECT SUM(IF(c.id_gender IS NOT NULL, 1, 0)) as total, SUM(IF(type = 0, 1, 0)) as male, SUM(IF(type = 1, 1, 0)) as female, SUM(IF(type = 2, 1, 0)) as neutral
 		FROM `'._DB_PREFIX_.'customer` c
 		LEFT JOIN `'._DB_PREFIX_.'gender` g ON c.id_gender = g.id_gender
-		WHERE c.active = 1 AND c.deleted = 0 '.Shop::addSqlRestriction());
+		WHERE 1 AND c.deleted = 0 '.Shop::addSqlRestriction());
 
         if (!$row['total']) {
             return false;

@@ -82,7 +82,6 @@ class AdminCustomersControllerCore extends AdminController
         $this->_join .= ' LEFT JOIN '._DB_PREFIX_.'orders o ON (a.id_customer = o.id_customer)';
         $this->_group = 'GROUP BY a.`id_customer`';
 
-        $this->_use_found_rows = false;
         $this->fields_list = array(
             'id_customer' => array(
                 'title' => $this->l('ID'),
