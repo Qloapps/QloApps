@@ -360,7 +360,7 @@ class CartControllerCore extends FrontController
                     }
 
                     if ($id_hotel = $roomTypeInfo['id_hotel']) {
-                        if (strtotime($date_from) < strtotime(date('Y-m-d H:i:s'))) {
+                        if (strtotime($date_from) < strtotime(date('Y-m-d'))) {
                             $this->errors[] = Tools::displayError('You can\'t book room before current date');
                         } elseif (strtotime($date_from) >= strtotime($date_to)) {
                             $this->errors[] = Tools::displayError('Check-out date must be after check-in date');

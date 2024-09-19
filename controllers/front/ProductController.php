@@ -350,7 +350,7 @@ class ProductControllerCore extends FrontController
                     }
 
                     if ($preparationTime
-                        && strtotime('+ '.$preparationTime.' day') >= strtotime($date_from)
+                        && strtotime('+ '.$preparationTime.' day') > strtotime($date_from)
                     ) {
                         $date_from = date('Y-m-d', strtotime('+ '.$preparationTime.' day'));
                         if (strtotime($date_from) >= strtotime($date_to)) {

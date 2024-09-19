@@ -864,7 +864,7 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
         if (!$idProduct) {
             return false;
         }
-        return Db::getInstance()->delete('htl_room_type_feature_pricing', 'id_product = '.(int)$idProduct);
+        return HotelRoomTypeFeaturePricing::deleteFeaturePrices(false, $idProduct);
     }
 
     public static function deleteByIdCart(
@@ -872,16 +872,38 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
         $id_product = false,
         $id_room = false,
         $date_from = false,
-        $date_to = false)
-    {
-        return Db::getInstance()->execute(
-            'DELETE FROM `'._DB_PREFIX_.'htl_room_type_feature_pricing`
-            WHERE `id_cart` = '.(int) $id_cart.
+        $date_to = false
+    ) {
+        return HotelRoomTypeFeaturePricing::deleteFeaturePrices(
+            $id_cart,
+            $id_product,
+            $id_room,
+            $date_from,
+            $date_to
+        );
+    }
+
+    public static function deleteFeaturePrices(
+        $id_cart = false,
+        $id_product = false,
+        $id_room = false,
+        $date_from = false,
+        $date_to = false
+    ) {
+        $idfeaturePrices = Db::getInstance()->executeS(
+            'SELECT `id_feature_price`  FROM `'._DB_PREFIX_.'htl_room_type_feature_pricing`
+            WHERE 1'.
+            ($id_cart ? ' AND `id_cart` = '.(int) $id_cart : '').
             ($id_product ? ' AND `id_product` = '.(int) $id_product : '').
             ($id_room ? ' AND `id_room` = '.(int) $id_room : '').
             ($date_from ? ' AND `date_from` = "'.pSQL($date_from) .'"' : '').
             ($date_to ? ' AND `date_to` = "'.pSQL($date_to) .'"' : '')
         );
+        $res = true;
+        foreach ($idfeaturePrices as $featurePrice) {
+            $objHotelRoomTypeFeaturePricing = new HotelRoomTypeFeaturePricing((int)$featurePrice['id_feature_price']);
+            $res = $res && $objHotelRoomTypeFeaturePricing->delete();
+        }
     }
 
     /**

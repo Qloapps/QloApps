@@ -4542,18 +4542,18 @@ class AdminOrdersControllerCore extends AdminController
                                 (int)$service['id_product'],
                                 $roomTypeInfo['id'],
                                 1,
-                                null,
-                                null,
+                                $objBookingDetail->date_from,
+                                $objBookingDetail->date_to,
                                 true
-                            );
+                            ) / $numDays;
                             $unitPriceTaxExcl = $objRoomTypeServiceProductPrice->getServicePrice(
                                 (int) $service['id_product'],
                                 $roomTypeInfo['id'],
                                 1,
-                                null,
-                                null,
+                                $objBookingDetail->date_from,
+                                $objBookingDetail->date_to,
                                 false
-                            );
+                            ) / $numDays;
 
                             $objRoomTypeServiceProductOrderDetail = new RoomTypeServiceProductOrderDetail();
                             $objRoomTypeServiceProductOrderDetail->id_product = $service['id_product'];
@@ -5979,12 +5979,10 @@ class AdminOrdersControllerCore extends AdminController
         if ($deleted) {
             HotelRoomTypeFeaturePricing::deleteByIdCart($cart_id, $id_product, $room_id, $dt_frm, $dt_to );
             $obj_product_process = new HotelCartBookingData();
-            $date_from = date_create($dt_frm);
-            $date_to = date_create($dt_to);
             $num_cart_rooms = $obj_product_process->getCountRoomsByIdCartIdProduct($cart_id, $id_product, $dt_frm, $dt_to);
 
-            $diff = date_diff($date_from, $date_to);
-            $changed = $obj_product_process->changeProductDataByRoomId($room_id, $id_product, $diff->days, $cart_id);
+            $numDays = HotelHelper::getNumberOfDays($dt_frm, $dt_to);
+            $changed = $obj_product_process->changeProductDataByRoomId($room_id, $id_product, $numDays, $cart_id);
             if ($changed) {
                 $result['status'] = 'deleted';
                 $result['cart_rooms'] = $num_cart_rooms;
@@ -6398,8 +6396,8 @@ class AdminOrdersControllerCore extends AdminController
                 $qty = Tools::getValue('service_qty');
                 $price = Tools::getValue('service_price');
                 foreach ($selectedServices as $key => $service) {
+                    $objProduct = new Product($service, false, $this->context->language->id);
                     if ($objRoomTypeServiceProduct->isRoomTypeLinkedWithProduct($objHotelBookingDetail->id_product, $service)) {
-                        $objProduct = new Product($service, false, $this->context->language->id);
                         if ($objProduct->allow_multiple_quantity) {
                             if (!Validate::isUnsignedInt($qty[$service])) {
                                 $response['hasError'] = true;
@@ -6456,15 +6454,20 @@ class AdminOrdersControllerCore extends AdminController
                         $this->context->cart = $cart;
                         $this->context->customer = new Customer($order->id_customer);
 
+                        $numDays = 1;
+                        if (Product::getProductPriceCalculation($service['id']) == Product::PRICE_CALCULATION_METHOD_PER_DAY) {
+                            $numDays = HotelHelper::getNumberOfDays($objHotelBookingDetail->date_from, $objHotelBookingDetail->date_to);
+                        }
+
                         $objRoomTypeServiceProductPrice = new RoomTypeServiceProductPrice();
                         $initialServicePrice = $objRoomTypeServiceProductPrice->getServicePrice(
                             (int)$service['id'],
                             $roomHtlCartInfo['id_product'],
                             1,
-                            null,
-                            null,
+                            $objHotelBookingDetail->date_from,
+                            $objHotelBookingDetail->date_to,
                             false
-                        );
+                        ) / $numDays;
 
                         if ($initialServicePrice != $service['price']) {
                             $specific_price = new SpecificPrice();
@@ -6509,10 +6512,6 @@ class AdminOrdersControllerCore extends AdminController
                                 $roomHtlCartInfo['id'])
                             ) {
                                 $objRoomTypeServiceProductCartDetail = new RoomTypeServiceProductCartDetail((int) $id_room_type_service_product_cart_detail);
-                                $numDays = 1;
-                                if (Product::getProductPriceCalculation($product['id_product']) == Product::PRICE_CALCULATION_METHOD_PER_DAY) {
-                                    $numDays = HotelHelper::getNumberOfDays($objHotelBookingDetail->date_from, $objHotelBookingDetail->date_to);
-                                }
 
                                 $unitPriceTaxExcl = $objRoomTypeServiceProductPrice->getServicePrice(
                                     (int)$product['id_product'],
