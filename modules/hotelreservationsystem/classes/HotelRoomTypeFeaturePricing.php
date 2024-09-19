@@ -730,9 +730,9 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
                     0,
                     0,
                     null,
+                    1,
                     null,
-                    null,
-                    null,
+                    Product::PRICE_ADDITION_TYPE_WITH_ROOM,
                     $id_room
                 )) {
                     $selectedServices = array_shift($roomServicesServices);
