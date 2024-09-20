@@ -2492,13 +2492,15 @@ class HotelHelper
         return false;
     }
 
+    /**
+     * This function returns the number of days between two dates. If same date is passed, it returns the hourly difference
+     */
     public static function getNumberOfDays($dateFrom, $dateTo)
     {
         $start = new DateTime($dateFrom);
         $end = new DateTime($dateTo);
         $difference = $start->diff($end);
         if ($start->format('Y-m-d') == $end->format('Y-m-d')) {
-            // hourly
             $diff = $difference->h;
         } else {
             $diff = $difference->days;

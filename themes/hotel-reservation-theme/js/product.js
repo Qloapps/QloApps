@@ -1394,10 +1394,7 @@ var BookingForm = {
         }
     },
     getFormData: function () {
-        console.log($('#booking-form'));
         var formData = new FormData($('form#booking-form').get(0));
-        formData.append('ajax', true);
-        formData.append('action', 'refreshBookingForm');
         formData.append('room_type_demands', JSON.stringify(getRoomsExtraDemands()));
         formData.append('room_service_products', JSON.stringify(getRoomsServiceProducts()));
         if (occupancy = getBookingOccupancy()) {
@@ -1407,14 +1404,15 @@ var BookingForm = {
     },
     refresh: function(resetOccupancy = false) {
         return new Promise((resolve, reject) => {
-
-
+            let formData = BookingForm.getFormData();
+            formData.append('ajax', true);
+            formData.append('action', 'refreshBookingForm');
             BookingForm.currentRequest = $.ajax({
                 url: product_controller_url,
                 type: 'POST',
                 dataType: 'JSON',
                 cache: false,
-                data: BookingForm.getFormData(),
+                data: formData,
                 processData: false,
                 contentType: false,
                 beforeSend: function() {

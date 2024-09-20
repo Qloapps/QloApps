@@ -17,11 +17,11 @@
 *  @license   https://store.webkul.com/license.html
 */
 
-#search_hotel_block_form.grid {
+#search_hotel_block_form .grid {
   display: grid;
   column-gap: 5px;
 }
-#search_hotel_block_form.grid .grid-item {
+#search_hotel_block_form .grid .grid-item {
   display: grid;
 }
 #search_hotel_block_form .area-1 {
@@ -39,6 +39,12 @@
 #search_hotel_block_form .area-5 {
   --col-span: 5;
 }
+#search_hotel_block_form .area-6 {
+  --col-span: 6;
+}
+#search_hotel_block_form .area-7 {
+  --col-span: 7;
+}
 #daterange_value.multi-date {
   column-gap: 5px;
   grid-template-columns: repeat(2, 1fr);
@@ -47,10 +53,10 @@
   position: relative;
 }
 @media (max-width: 767px) {
-  #search_hotel_block_form.grid {
+  #search_hotel_block_form .grid {
     display: block;
   }
-  #search_hotel_block_form.grid .grid-item {
+  #search_hotel_block_form .grid .grid-item {
     display: block;
   }
 }

@@ -19,7 +19,7 @@
 									</select>
 								</div>
 							</div> *}
-							{hook h='displaySearchFormTop'}
+							{hook h='displayAdminRoomsBookingSearchFormTop'}
 							<div class="form-group col-sm-12">
 								<label for="date_from" class="control-label col-sm-4 required">
 									<span title="" data-toggle="tooltip" class="label-tooltip">{l s='Check-In' mod='hotelreservationsystem'}</span>
@@ -170,7 +170,7 @@
 									<input type="hidden" name="search_id_room_type" id="search_id_room_type" value="{$id_room_type}">
 								</div>
 							</div>
-							{hook h='displaySearchFormBottom'}
+							{hook h='displayAdminRoomsBookingSearchFormBottom'}
 							<div class="col-sm-12">
 								<button id="search_hotel_list" name="search_hotel_list" type="submit" class="btn btn-primary pull-right">
 									<i class="icon-search"></i>&nbsp;&nbsp;{l s='Search' mod='hotelreservationsystem'}
@@ -182,9 +182,9 @@
 			</div>
 			{if !isset($booking_product) || (isset($booking_product) && $booking_product == 1)}
 				<div class="panel">
-					{hook h='displayStatsBefore'}
+					{hook h='displayAdminRoomsBookingStatsBefore'}
 					{include file="./_partials/search-stats.tpl"}
-					{hook h='displayStatsAfter'}
+					{hook h='displayAdminRoomsBookingStatsAfter'}
 				</div>
 			{/if}
 		</div>
@@ -195,23 +195,23 @@
 					<button type="button" class="btn btn-primary {if $total_products_in_cart|intval == 0}disabled{/if}" id="cart_btn" data-toggle="modal" data-target="#cartModal"><i class="icon-shopping-cart"></i> {l s='Cart' mod='hotelreservationsystem'} <span class="badge" id="cart_record">{$total_products_in_cart}</span></button>
 				</div>
 				{if !isset($booking_product) || (isset($booking_product) && $booking_product == 1)}
-					{hook h='displayCalendarBefore'}
+					{hook h='displayAdminRoomsBookingCalendarBefore'}
 					<div id='fullcalendar'></div>
-					{hook h='displayCalendarAfter'}
+					{hook h='displayAdminRoomsBookingCalendarAfter'}
 				{else}
 					<div class="panel-body">
-						{hook h='displayProductsBefore'}
+						{hook h='displayAdminRoomsBookingProductsBefore'}
 						{include file="./_partials/service-products.tpl"}
-						{hook h='displayProductsAfter'}
+						{hook h='displayAdminRoomsBookingProductsAfter'}
 					</div>
 				{/if}
 			</div>
 		</div>
 		{if !isset($booking_product) || (isset($booking_product) && $booking_product == 1)}
 			{if isset($booking_data) && $booking_data}
-				{hook h='displayRoomsListBefore'}
+				{hook h='displayAdminRoomsBookingRoomsListBefore'}
 				{include file="./_partials/booking-rooms.tpl"}
-				{hook h='displayRoomsListAfter'}
+				{hook h='displayAdminRoomsBookingRoomsListAfter'}
 			{/if}
 		{/if}
 	{else}

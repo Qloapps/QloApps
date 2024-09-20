@@ -140,13 +140,13 @@ class RoomTypeServiceProductPrice extends ObjectModel
         Hook::exec('actionServicePriceModifier',
             array(
                 'price' => &$price,
-                'idProduct' => $idProduct,
-                'idProductRoomType' => $idProductRoomType,
-                'dateFrom' => $dateFrom,
-                'dateTo' => $dateTo,
-                'useTax' => $useTax,
-                'idCart' => $id_cart,
-                'useReduc' => $use_reduc
+                'id_product' => $idProduct,
+                'id_product_room_type' => $idProductRoomType,
+                'date_from' => $dateFrom,
+                'date_to' => $dateTo,
+                'use_tax' => $useTax,
+                'id_cart' => $id_cart,
+                'use_reduc' => $use_reduc
             )
         );
 

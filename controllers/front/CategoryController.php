@@ -141,11 +141,11 @@ class CategoryControllerCore extends FrontController
         $id_category = Tools::getValue('id_category');
 
         if (!($date_from = Tools::getValue('date_from'))) {
-            $date_from = date('Y-m-d H:i:s');
-            $date_to = date('Y-m-d H:i:s', strtotime($date_from) + 86400);
+            $date_from = date('Y-m-d');
+            $date_to = date('Y-m-d', strtotime($date_from) + 86400);
         }
         if (!($date_to = Tools::getValue('date_to'))) {
-            $date_to = date('Y-m-d H:i:s', strtotime($date_from) + 86400);
+            $date_to = date('Y-m-d', strtotime($date_from) + 86400);
         }
 
         // get occupancy of the search
@@ -158,11 +158,11 @@ class CategoryControllerCore extends FrontController
         if ($id_hotel = HotelBranchInformation::getHotelIdByIdCategory($id_category)) {
             $preparationTime = (int) HotelOrderRestrictDate::getPreparationTime($id_hotel);
             if ($preparationTime
-                && strtotime('+ '.$preparationTime.' day') > strtotime($date_from)
+                && strtotime(date('Y-m-d', strtotime('+'. ($preparationTime) .' days'))) > strtotime($date_from)
             ) {
-                $date_from = date('Y-m-d H:i:s', strtotime('+ '.$preparationTime.' day'));
+                $date_from = date('Y-m-d', strtotime('+ '.$preparationTime.' day'));
                 if (strtotime($date_from) >= strtotime($date_to)) {
-                    $date_to = date('Y-m-d H:i:s', strtotime($date_from) + 86400);
+                    $date_to = date('Y-m-d', strtotime($date_from) + 86400);
                 }
             }
 

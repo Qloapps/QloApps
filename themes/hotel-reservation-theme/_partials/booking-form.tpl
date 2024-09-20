@@ -41,7 +41,7 @@
                     {* Block for booking products *}
                     {if $product->booking_product}
                         {if !$order_date_restrict}
-                            {hook h='displayBookingFormTop' id_product=$product->id id_hotel=$id_hotel}
+                            {hook h='displayRoomTypeBookingFormTop' id_product=$product->id id_hotel=$id_hotel}
                             <div class="row">
                                 {block name='booking_form_dates'}
                                     <div class="form-group col-sm-12">

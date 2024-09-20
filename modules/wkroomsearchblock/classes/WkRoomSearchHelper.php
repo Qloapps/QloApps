@@ -146,9 +146,9 @@ class WkRoomSearchHelper
                     $searchedData['htl_dtl'] = $objHotelInfo->hotelBranchesInfo(0, 1, 1, $idHotel);
                     $preparationTime = (int) HotelOrderRestrictDate::getPreparationTime($idHotel);
                     if ($preparationTime
-                        && strtotime('+ '.$preparationTime.' day') > strtotime($dateFrom)
+                        && strtotime(date('Y-m-d', strtotime('+'. ($preparationTime) .' days'))) > strtotime($dateFrom)
                     ) {
-                        $dateFrom = date('Y-m-d', strtotime('+ '.$preparationTime.' day'));
+                        $dateFrom = date('Y-m-d', strtotime(date('Y-m-d', strtotime('+'. ($preparationTime) .' days'))));
                         if (strtotime($dateFrom) >= strtotime($dateTo)) {
                             $controller = Tools::getValue('controller');
                             if ($controller == 'product'

@@ -6396,8 +6396,8 @@ class AdminOrdersControllerCore extends AdminController
                 $qty = Tools::getValue('service_qty');
                 $price = Tools::getValue('service_price');
                 foreach ($selectedServices as $key => $service) {
-                    $objProduct = new Product($service, false, $this->context->language->id);
                     if ($objRoomTypeServiceProduct->isRoomTypeLinkedWithProduct($objHotelBookingDetail->id_product, $service)) {
+                        $objProduct = new Product($service, false, $this->context->language->id);
                         if ($objProduct->allow_multiple_quantity) {
                             if (!Validate::isUnsignedInt($qty[$service])) {
                                 $response['hasError'] = true;
