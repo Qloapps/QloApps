@@ -2492,21 +2492,13 @@ class HotelHelper
         return false;
     }
 
-    /**
-     * This function returns the number of days between two dates. If same date is passed, it returns the hourly difference
-     */
     public static function getNumberOfDays($dateFrom, $dateTo)
     {
-        $start = new DateTime($dateFrom);
-        $end = new DateTime($dateTo);
-        $difference = $start->diff($end);
-        if ($start->format('Y-m-d') == $end->format('Y-m-d')) {
-            $diff = $difference->h;
-        } else {
-            $diff = $difference->days;
-        }
+        $startDate = new DateTime($dateFrom);
+        $endDate = new DateTime($dateTo);
+        $daysDifference = $startDate->diff($endDate)->days;
 
-        return $diff;
+        return $daysDifference;
     }
 
     public static function validateDateRangeForHotel($dateFrom, $dateTo, $idHotel)
