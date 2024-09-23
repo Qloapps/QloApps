@@ -717,8 +717,8 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
         }
         Hook::exec('actionRoomTypeTotalPriceModifier',
             array(
-                'price' => &$totalPrice,
-                'id_product' => $id_product,
+                'total_prices' => &$totalPrice,
+                'id_room_type' => $id_product,
                 'id_room' => $id_room,
                 'date_from' => $date_from,
                 'date_to' => $date_to,
@@ -728,9 +728,7 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
                 'id_guest' => $id_guest,
                 'id_group' => $id_group,
                 'use_reduc' => $use_reduc,
-                'tax_rate' => $taxRate,
-                'product_price_ti' => $productPriceTI,
-                'product_price_te' => $productPriceTE
+                'tax_rate' => $taxRate
             )
         );
         if ($with_auto_room_services) {

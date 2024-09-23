@@ -101,7 +101,8 @@ class RoomTypeServiceProductPrice extends ObjectModel
         );
     }
 
-    public function getServicePrice($idProduct,
+    public function getServicePrice(
+        $idProduct,
         $idProductRoomType,
         $quantity = 1,
         $dateFrom = null,
@@ -140,8 +141,8 @@ class RoomTypeServiceProductPrice extends ObjectModel
         Hook::exec('actionServicePriceModifier',
             array(
                 'price' => &$price,
-                'id_product' => $idProduct,
-                'id_product_room_type' => $idProductRoomType,
+                'id_service_product' => $idProduct,
+                'id_room_type' => $idProductRoomType,
                 'date_from' => $dateFrom,
                 'date_to' => $dateTo,
                 'use_tax' => $useTax,
