@@ -18,7 +18,7 @@
 *}
 
 <form method="POST" id="search_hotel_block_form">
-    {hook h='displayRoomSearchFormTop'}
+    {hook h='displaySearchFormFieldsBefore'}
     {block name="search_form_fields_wrapper"}
         <div class="grid" id="search_form_fields_wrapper">
             {block name='search_form_location'}

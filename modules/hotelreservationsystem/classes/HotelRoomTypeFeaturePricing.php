@@ -715,7 +715,7 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
                 $totalPrice['total_price_tax_excl'] += $productPriceTE;
             }
         }
-        Hook::exec('actionRoomTypeTotalFeaturePriceModifier',
+        Hook::exec('actionRoomTypeTotalPriceModifier',
             array(
                 'price' => &$totalPrice,
                 'id_product' => $id_product,
