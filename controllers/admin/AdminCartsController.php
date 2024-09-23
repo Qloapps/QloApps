@@ -937,8 +937,8 @@ class AdminCartsControllerCore extends AdminController
 
         $this->context->cart = new Cart($id_cart);
 
-        $date_from = date('Y-m-d', strtotime($date_from));
-        $date_to = date('Y-m-d', strtotime($date_to));
+        $date_from = date('Y-m-d H:i:s', strtotime($date_from));
+        $date_to = date('Y-m-d H:i:s', strtotime($date_to));
 
         if ($this->context->cart->id_currency != (int)Configuration::get('PS_CURRENCY_DEFAULT')) {
             $currency = Currency::getCurrencyInstance($this->context->cart->id_currency);

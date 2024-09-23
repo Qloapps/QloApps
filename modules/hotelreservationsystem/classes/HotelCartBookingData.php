@@ -1619,11 +1619,11 @@ class HotelCartBookingData extends ObjectModel
                                     $numDays = $objBookingDetail->getNumberOfDays($data_v['date_from'], $data_v['date_to']);
                                     $cartHotelData[$prodKey]['date_diff'][$dateJoin]['num_rm'] = 1;
                                     $cartHotelData[$prodKey]['date_diff'][$dateJoin]['data_form'] = date(
-                                        'Y-m-d',
+                                        'Y-m-d H:i:s',
                                         strtotime($data_v['date_from'])
                                     );
                                     $cartHotelData[$prodKey]['date_diff'][$dateJoin]['data_to'] = date(
-                                        'Y-m-d',
+                                        'Y-m-d H:i:s',
                                         strtotime($data_v['date_to'])
                                     );
                                     $cartHotelData[$prodKey]['date_diff'][$dateJoin]['num_days'] = $numDays;
