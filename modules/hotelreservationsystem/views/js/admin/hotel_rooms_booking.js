@@ -593,6 +593,7 @@ $(document).ready(function() {
 
     $(document).on('click', '.booking_occupancy_wrapper .remove-room-link', function(e) {
         e.preventDefault();
+        e.stopPropagation();
 
 		booking_occupancy_inner = $(this).closest('.booking_occupancy_inner');
         $(this).closest('.occupancy_info_block').remove();
@@ -600,6 +601,7 @@ $(document).ready(function() {
             $(this).text(room_txt + ' - '+ (key+1) );
         });
         setRoomTypeGuestOccupancy($(booking_occupancy_inner).closest('.booking_occupancy_wrapper'));
+        $('#search_occupancy').parent().addClass('open');
     });
 
     $(document).on('change', '.num_occupancy', function(e) {
@@ -780,8 +782,8 @@ $(document).ready(function() {
                     occupancy_block += '</div>';
                 occupancy_block += '</div>';
             occupancy_block += '</div>';
+            occupancy_block += '<hr class="occupancy-info-separator col-sm-12">';
         occupancy_block += '</div>';
-        occupancy_block += '<hr class="occupancy-info-separator col-sm-12">';
 
         $(booking_occupancy_wrapper).find('.booking_occupancy_inner').append(occupancy_block);
 
