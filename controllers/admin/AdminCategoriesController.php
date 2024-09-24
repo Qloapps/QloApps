@@ -720,12 +720,13 @@ class AdminCategoriesControllerCore extends AdminController
     public function processAdd()
     {
         $id_category = (int)Tools::getValue('id_category');
-        $id_parent = (int)Tools::getValue('id_parent');
-
+        $id_parent = (int)Tools::getValue('categoryBox');
         // if true, we are in a root category creation
         if (!$id_parent) {
             $_POST['is_root_category'] = $_POST['level_depth'] = 1;
             $_POST['id_parent'] = $id_parent = (int)Configuration::get('PS_ROOT_CATEGORY');
+        } else {
+            $_POST['id_parent']  = $id_parent;
         }
 
         if ($id_category) {
