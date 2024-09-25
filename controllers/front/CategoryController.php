@@ -180,7 +180,10 @@ class CategoryControllerCore extends FrontController
                 'id_guest' => $id_guest,
             );
 
-            $booking_data = $objBookingDetail->dataForFrontSearch($bookingParams);
+            $booking_data = array();
+            if (Tools::getValue('action') != 'FilterResults') {
+                $booking_data = $objBookingDetail->dataForFrontSearch($bookingParams);
+            }
 
             $obj_booking_detail = new HotelBookingDetail();
             $num_days = $obj_booking_detail->getNumberOfDays($date_from, $date_to);
