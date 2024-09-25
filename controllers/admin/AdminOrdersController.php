@@ -6504,7 +6504,7 @@ class AdminOrdersControllerCore extends AdminController
                         $totalPriceChangeTaxIncl = 0;
                         $unitPriceTaxIncl = 0;
                         $unitPriceTaxExcl = 0;
-                        foreach ($productList as $product) {
+                        foreach ($productList as &$product) {
                             // This is used to get the actual quanity of the service as it is calculated incorrectly if the service is per night
                             if ($id_room_type_service_product_cart_detail = $objRoomTypeServiceProductCartDetail->alreadyExists(
                                 $service['id'],
