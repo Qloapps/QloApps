@@ -168,7 +168,7 @@ class AdminCartsControllerCore extends AdminController
 
     public function initPageHeaderToolbar()
     {
-        if (empty($this->display)) {
+        if ($this->display != 'edit' && $this->display != 'add' && $this->display !='view') {
             $this->page_header_toolbar_btn['export_cart'] = array(
                 'href' => self::$currentIndex.'&exportcart&token='.$this->token,
                 'desc' => $this->l('Export carts', null, null, false),

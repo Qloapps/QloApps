@@ -168,7 +168,7 @@ class AdminReferrersControllerCore extends AdminController
 
     public function initPageHeaderToolbar()
     {
-        if (empty($this->display)) {
+        if ($this->display != 'edit' && $this->display != 'add' && $this->display !='view') {
             $this->page_header_toolbar_btn['new_referrer'] = array(
                 'href' => self::$currentIndex.'&addreferrer&token='.$this->token,
                 'desc' => $this->l('Add new referrer', null, null, false),

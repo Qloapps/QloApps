@@ -85,7 +85,7 @@ class AdminWarehousesControllerCore extends AdminController
 
     public function initPageHeaderToolbar()
     {
-        if (empty($this->display)) {
+        if ($this->display != 'edit' && $this->display != 'add' && $this->display !='view') {
             $this->page_header_toolbar_btn['new_warehouse'] = array(
                 'href' => self::$currentIndex.'&addwarehouse&token='.$this->token,
                 'desc' => $this->l('Add new warehouse', null, null, false),

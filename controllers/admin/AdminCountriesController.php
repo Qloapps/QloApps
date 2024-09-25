@@ -120,7 +120,7 @@ class AdminCountriesControllerCore extends AdminController
 
     public function initPageHeaderToolbar()
     {
-        if (empty($this->display)) {
+        if ($this->display != 'edit' && $this->display != 'add' && $this->display !='view') {
             $this->page_header_toolbar_btn['new_country'] = array(
                 'href' => self::$currentIndex.'&addcountry&token='.$this->token,
                 'desc' => $this->l('Add new country', null, null, false),

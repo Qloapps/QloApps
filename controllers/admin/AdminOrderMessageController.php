@@ -108,7 +108,7 @@ class AdminOrderMessageControllerCore extends AdminController
 
     public function initPageHeaderToolbar()
     {
-        if (empty($this->display)) {
+        if ($this->display != 'edit' && $this->display != 'add' && $this->display !='view') {
             $this->page_header_toolbar_btn['new_order_message'] = array(
                 'href' => self::$currentIndex.'&addorder_message&token='.$this->token,
                 'desc' => $this->l('Add new order message'),

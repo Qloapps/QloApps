@@ -107,7 +107,7 @@ class AdminLanguagesControllerCore extends AdminController
 
     public function initPageHeaderToolbar()
     {
-        if (empty($this->display)) {
+        if ($this->display != 'edit' && $this->display != 'add' && $this->display !='view') {
             $this->page_header_toolbar_btn['new_language'] = array(
                 'href' => self::$currentIndex.'&addlang&token='.$this->token,
                 'desc' => $this->l('Add new language', null, null, false),

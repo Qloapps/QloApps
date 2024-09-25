@@ -2649,7 +2649,7 @@ class AdminProductsControllerCore extends AdminController
 
     public function initPageHeaderToolbar()
     {
-        if (empty($this->display)) {
+        if ($this->display != 'edit' && $this->display != 'add' && $this->display !='view') {
             $this->page_header_toolbar_btn['new_product'] = array(
                     'href' => self::$currentIndex.'&addproduct&token='.$this->token,
                     // 'desc' => $this->l('Add new room type', null, null, false),

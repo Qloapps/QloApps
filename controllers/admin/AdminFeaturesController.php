@@ -231,7 +231,7 @@ class AdminFeaturesControllerCore extends AdminController
 
     public function initPageHeaderToolbar()
     {
-        if (empty($this->display)) {
+        if ($this->display != 'edit' && $this->display != 'add' && $this->display !='view') {
             $this->page_header_toolbar_btn['new_feature'] = array(
                 'href' => self::$currentIndex.'&addfeature&token='.$this->token,
                 'desc' => $this->l('Add new room feature', null, null, false),

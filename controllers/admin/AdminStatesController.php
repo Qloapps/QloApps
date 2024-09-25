@@ -114,7 +114,7 @@ class AdminStatesControllerCore extends AdminController
 
     public function initPageHeaderToolbar()
     {
-        if (empty($this->display)) {
+        if ($this->display != 'edit' && $this->display != 'add' && $this->display !='view') {
             $this->page_header_toolbar_btn['new_state'] = array(
                 'href' => self::$currentIndex.'&addstate&token='.$this->token,
                 'desc' => $this->l('Add new state', null, null, false),

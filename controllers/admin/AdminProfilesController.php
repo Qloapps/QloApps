@@ -114,7 +114,7 @@ class AdminProfilesControllerCore extends AdminController
 
     public function initPageHeaderToolbar()
     {
-        if (empty($this->display)) {
+        if ($this->display != 'edit' && $this->display != 'add' && $this->display !='view') {
             $this->page_header_toolbar_btn['new_profile'] = array(
                 'href' => self::$currentIndex.'&addprofile&token='.$this->token,
                 'desc' => $this->l('Add new profile', null, null, false),

@@ -135,7 +135,7 @@ class AdminQuickAccessesControllerCore extends AdminController
 
     public function initPageHeaderToolbar()
     {
-        if (empty($this->display)) {
+        if ($this->display != 'edit' && $this->display != 'add' && $this->display !='view') {
             $this->page_header_toolbar_btn['new_quick_access'] = array(
                 'href' => self::$currentIndex.'&addquick_access&token='.$this->token,
                 'desc' => $this->l('Add new quick access', null, null, false),

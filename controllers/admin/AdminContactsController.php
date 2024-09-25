@@ -139,7 +139,7 @@ class AdminContactsControllerCore extends AdminController
     public function initPageHeaderToolbar()
     {
         $this->initToolbar();
-        if (empty($this->display)) {
+        if ($this->display != 'edit' && $this->display != 'add' && $this->display !='view') {
             $this->page_header_toolbar_btn['new_contact'] = array(
                 'href' => self::$currentIndex.'&addcontact&token='.$this->token,
                 'desc' => $this->l('Add new contact', null, null, false),

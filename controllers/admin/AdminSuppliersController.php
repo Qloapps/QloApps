@@ -78,7 +78,7 @@ class AdminSuppliersControllerCore extends AdminController
 
     public function initPageHeaderToolbar()
     {
-        if (empty($this->display)) {
+        if ($this->display != 'edit' && $this->display != 'add' && $this->display !='view') {
             $this->page_header_toolbar_btn['new_supplier'] = array(
                 'href' => self::$currentIndex.'&addsupplier&token='.$this->token,
                 'desc' => $this->l('Add new supplier', null, null, false),

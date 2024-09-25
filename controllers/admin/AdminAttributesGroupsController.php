@@ -506,7 +506,7 @@ class AdminAttributesGroupsControllerCore extends AdminController
 
     public function initPageHeaderToolbar()
     {
-        if (empty($this->display)) {
+        if ($this->display != 'edit' && $this->display != 'add' && $this->display !='view') {
             $this->page_header_toolbar_btn['new_attribute_group'] = array(
                 'href' => self::$currentIndex.'&addattribute_group&token='.$this->token,
                 'desc' => $this->l('Add new attribute', null, null, false),

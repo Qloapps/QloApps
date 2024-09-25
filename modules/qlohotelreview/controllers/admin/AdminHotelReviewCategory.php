@@ -80,7 +80,7 @@ class AdminHotelReviewCategoryController extends ModuleAdminController
     public function initToolbar()
     {
         parent::initToolbar();
-        if (empty($this->display)) {
+        if ($this->display != 'edit' && $this->display != 'add' && $this->display !='view') {
             $this->page_header_toolbar_btn['new'] = array(
                 'href' => self::$currentIndex.'&add'.$this->table.'&token='.$this->token,
                 'desc' => $this->l('Add new category')

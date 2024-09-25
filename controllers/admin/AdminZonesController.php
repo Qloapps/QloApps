@@ -69,7 +69,7 @@ class AdminZonesControllerCore extends AdminController
 
     public function initPageHeaderToolbar()
     {
-        if (empty($this->display)) {
+        if ($this->display != 'edit' && $this->display != 'add' && $this->display !='view') {
             $this->page_header_toolbar_btn['new_zone'] = array(
                 'href' => self::$currentIndex.'&addzone&token='.$this->token,
                 'desc' => $this->l('Add new zone', null, null, false),

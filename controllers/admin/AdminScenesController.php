@@ -120,7 +120,7 @@ class AdminScenesControllerCore extends AdminController
 
     public function initPageHeaderToolbar()
     {
-        if (empty($this->display)) {
+        if ($this->display != 'edit' && $this->display != 'add' && $this->display !='view') {
             $this->page_header_toolbar_btn['new_scene'] = array(
                 'href' => self::$currentIndex.'&addscene&token='.$this->token,
                 'desc' => $this->l('Add new image map', null, null, false),
