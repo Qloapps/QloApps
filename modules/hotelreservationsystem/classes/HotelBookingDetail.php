@@ -1919,7 +1919,7 @@ class HotelBookingDetail extends ObjectModel
                 );
 
                 // create feature price if needed
-                $createFeaturePrice = $newRoomPriceTaxExcl != $initialProductPriceTE;
+                $createFeaturePrice = ($newRoomPriceTaxExcl != $initialProductPriceTE);
                 if ($createFeaturePrice) {
                     $featurePriceParams = array();
                     $featurePriceParams = array(
@@ -2121,7 +2121,7 @@ class HotelBookingDetail extends ObjectModel
                 }
 
                 // delete cart feature prices after room addition success
-                // HotelRoomTypeFeaturePricing::deleteByIdCart($this->context->cart->id);
+                HotelRoomTypeFeaturePricing::deleteByIdCart($this->context->cart->id);
 
                 // ===============================================================
                 // END: Add Process of the old booking
