@@ -6,7 +6,7 @@
 					<i class="icon-info"></i> {l s='Booking Form' mod='hotelreservationsystem'}
 				</div>
 				<div class="panel-body">
-					<form method="post" action="">
+					<form method="post" action="" id="room-search-form">
 						<div class="row">
 							{* <div class="form-group col-sm-12">
 								<label for="booking_product" class="control-label col-sm-4 required">
@@ -19,6 +19,7 @@
 									</select>
 								</div>
 							</div> *}
+							{hook h='displayAdminRoomsBookingSearchFormFieldsBefore'}
 							<div class="form-group col-sm-12">
 								<label for="date_from" class="control-label col-sm-4 required">
 									<span title="" data-toggle="tooltip" class="label-tooltip">{l s='Check-In' mod='hotelreservationsystem'}</span>
@@ -192,6 +193,7 @@
 				</div>
 				{if !isset($booking_product) || (isset($booking_product) && $booking_product == 1)}
 					<div id='fullcalendar'></div>
+					{hook h='displayAdminRoomsBookingCalendarAfter'}
 				{else}
 					<div class="panel-body">
 						{include file="./_partials/service-products.tpl"}
