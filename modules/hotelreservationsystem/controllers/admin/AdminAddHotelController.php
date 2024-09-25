@@ -61,6 +61,7 @@ class AdminAddHotelController extends ModuleAdminController
             'state_name' => array(
                 'title' => $this->l('State'),
                 'align' => 'center',
+                'optional' => true,
                 'filter_key' => 's!name',
             ),
             'country_name' => array(
@@ -98,6 +99,8 @@ class AdminAddHotelController extends ModuleAdminController
     {
         $this->addRowAction('edit');
         $this->addRowAction('delete');
+
+        $this->_new_list_header_design = true;
 
         return parent::renderList();
     }
