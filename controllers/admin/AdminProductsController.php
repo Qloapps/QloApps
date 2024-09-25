@@ -3072,25 +3072,22 @@ class AdminProductsControllerCore extends AdminController
                         if ($serviceProductPriceInfo) {
                             $associationInfo['custom_price'] = $serviceProductPriceInfo['price'];
                             $associationInfo['id_tax_rules_group'] = $serviceProductPriceInfo['id_tax_rules_group'];
-                            if ($serviceProductPriceInfo['id_tax_rules_group'] == 0) {
-                                $associationInfo['tax_rules_group_name'] = $this->l('No tax');
-                            } else {
-                                $objTaxRuleGroup = new TaxRulesGroup(
-                                    $serviceProductPriceInfo['id_tax_rules_group'],
-                                    $this->context->language->id
-                                );
+                            $associationInfo['tax_rules_group_name'] = $this->l('No tax');
+
+                            if (Validate::isLoadedObject($objTaxRuleGroup = new TaxRulesGroup(
+                                $serviceProductPriceInfo['id_tax_rules_group'],
+                                $this->context->language->id
+                            ))) {
                                 $associationInfo['tax_rules_group_name'] = $objTaxRuleGroup->name;
                             }
                             $associationInfo['id_room_type_service_product_price'] = $serviceProductPriceInfo['id_room_type_service_product_price'];
                         }
 
-                        if ($objProduct->id_tax_rules_group == 0) {
-                            $associationInfo['default_tax_rules_group_name'] = $this->l('No tax');
-                        } else {
-                            $objTaxRuleGroup = new TaxRulesGroup(
-                                $objProduct->id_tax_rules_group,
-                                $this->context->language->id
-                            );
+                        $associationInfo['default_tax_rules_group_name'] = $this->l('No tax');
+                        if (Validate::isLoadedObject($objTaxRuleGroup = new TaxRulesGroup(
+                            $objProduct->id_tax_rules_group,
+                            $this->context->language->id
+                        ))) {
                             $associationInfo['default_tax_rules_group_name'] = $objTaxRuleGroup->name;
                         }
 
@@ -3100,9 +3097,13 @@ class AdminProductsControllerCore extends AdminController
                         $associatedServiceProducts[$associationInfo['position']] = $serviceProduct;
                     } else {
                         $serviceProduct['is_associated'] = false;
-
-                        $objTaxRulesGroup = new TaxRulesGroup($serviceProduct['id_tax_rules_group'], $this->context->language->id);
-                        $serviceProduct['tax_rules_group_name'] = $objTaxRulesGroup->name;
+                        $serviceProduct['tax_rules_group_name'] = $this->l('No tax');
+                        if (Validate::isLoadedObject($objTaxRulesGroup = new TaxRulesGroup(
+                            $serviceProduct['id_tax_rules_group'],
+                            $this->context->language->id
+                        ))) {
+                            $serviceProduct['tax_rules_group_name'] = $objTaxRulesGroup->name;
+                        }
 
                         $unassociatedServiceProducts[] = $serviceProduct;
                     }
