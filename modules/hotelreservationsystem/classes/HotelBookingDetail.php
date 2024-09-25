@@ -1872,6 +1872,7 @@ class HotelBookingDetail extends ObjectModel
                 // Calculate new room price per qty
                 $priceDiffPerQtyTaxExcl = $priceDiffTaxExcl / $productQty;
                 $newRoomPriceTaxExcl = $oldRoomPriceTaxExcl + $priceDiffPerQtyTaxExcl;
+                $newRoomPriceTaxExcl = $newRoomPriceTaxExcl < 0 ? 0 : $newRoomPriceTaxExcl;
 
                 $totalRoomPriceTaxIncl = $objOldHotelBooking->total_price_tax_incl;
                 $totalRoomPriceTaxExcl = $objOldHotelBooking->total_price_tax_excl;
