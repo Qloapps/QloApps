@@ -4930,7 +4930,7 @@ class AdminOrdersControllerCore extends AdminController
         )) {
             // update extra demands total prices if dates are changes (price calc method for each day)
             if ($extraDemands) {
-                $objOrder = new Order($id_order);
+                $order = new Order($id_order);
                 foreach ($extraDemands as $demand) {
                     if (isset($demand['extra_demands']) && $demand['extra_demands']) {
                         foreach ($demand['extra_demands'] as $rDemand) {
@@ -4938,27 +4938,27 @@ class AdminOrdersControllerCore extends AdminController
                                 $objBookingDemand = new HotelBookingDemands($rDemand['id_booking_demand']);
 
                                 // change order total
-                                $objOrder->total_paid_tax_excl -= $objBookingDemand->total_price_tax_excl;
-                                $objOrder->total_paid_tax_incl -= $objBookingDemand->total_price_tax_incl;
-                                $objOrder->total_paid -= $objBookingDemand->total_price_tax_incl;
+                                $order->total_paid_tax_excl -= $objBookingDemand->total_price_tax_excl;
+                                $order->total_paid_tax_incl -= $objBookingDemand->total_price_tax_incl;
+                                $order->total_paid -= $objBookingDemand->total_price_tax_incl;
 
                                 $numDays = $obj_booking_detail->getNumberOfDays($new_date_from, $new_date_to);
                                 $demandPriceTE = Tools::processPriceRounding(
                                     ($objBookingDemand->unit_price_tax_excl * $numDays),
                                     1,
-                                    $objOrder->round_type,
-                                    $objOrder->round_mode
+                                    $order->round_type,
+                                    $order->round_mode
                                 );
                                 $demandPriceTI = Tools::processPriceRounding(
                                     ($objBookingDemand->unit_price_tax_incl * $numDays),
                                     1,
-                                    $objOrder->round_type,
-                                    $objOrder->round_mode
+                                    $order->round_type,
+                                    $order->round_mode
                                 );
 
-                                $objOrder->total_paid_tax_excl += $demandPriceTE;
-                                $objOrder->total_paid_tax_incl += $demandPriceTI;
-                                $objOrder->total_paid += $demandPriceTI;
+                                $order->total_paid_tax_excl += $demandPriceTE;
+                                $order->total_paid_tax_incl += $demandPriceTI;
+                                $order->total_paid += $demandPriceTI;
 
                                 $objBookingDemand->total_price_tax_excl = $demandPriceTE;
                                 $objBookingDemand->total_price_tax_incl = $demandPriceTI;
@@ -4969,14 +4969,14 @@ class AdminOrdersControllerCore extends AdminController
                     }
                 }
                 // change order total save
-                $objOrder->save();
+                $order->save();
             }
 
             if (isset($orderServiceProducts)
                 && is_array($orderServiceProducts)
                 && count($orderServiceProducts)
             ) {
-                $objOrder = new Order((int) $id_order);
+                $order = new Order((int) $id_order);
                 foreach ($orderServiceProducts as $orderServiceProduct) {
                     if (isset($orderServiceProduct['additional_services'])
                         && is_array($orderServiceProduct['additional_services'])
@@ -4992,28 +4992,28 @@ class AdminOrdersControllerCore extends AdminController
                                 $newTotalPriceTaxExcl = Tools::processPriceRounding(
                                     ($newNumDays * $unitPriceTaxExcl),
                                     $objRoomTypeServiceProductOrderDetail->quantity,
-                                    $objOrder->round_type,
-                                    $objOrder->round_mode
+                                    $order->round_type,
+                                    $order->round_mode
                                 );
                                 $newTotalPriceTaxIncl = Tools::processPriceRounding(
                                     ($newNumDays * $unitPriceTaxIncl),
                                     $objRoomTypeServiceProductOrderDetail->quantity,
-                                    $objOrder->round_type,
-                                    $objOrder->round_mode
+                                    $order->round_type,
+                                    $order->round_mode
                                 );
 
-                                $objOrder->total_products -= $objRoomTypeServiceProductOrderDetail->total_price_tax_excl;
-                                $objOrder->total_products_wt -= $objRoomTypeServiceProductOrderDetail->total_price_tax_incl;
-                                $objOrder->total_paid_tax_excl -= $objRoomTypeServiceProductOrderDetail->total_price_tax_excl;
-                                $objOrder->total_paid_tax_incl -= $objRoomTypeServiceProductOrderDetail->total_price_tax_incl;
-                                $objOrder->total_paid -= $objRoomTypeServiceProductOrderDetail->total_price_tax_incl;
+                                $order->total_products -= $objRoomTypeServiceProductOrderDetail->total_price_tax_excl;
+                                $order->total_products_wt -= $objRoomTypeServiceProductOrderDetail->total_price_tax_incl;
+                                $order->total_paid_tax_excl -= $objRoomTypeServiceProductOrderDetail->total_price_tax_excl;
+                                $order->total_paid_tax_incl -= $objRoomTypeServiceProductOrderDetail->total_price_tax_incl;
+                                $order->total_paid -= $objRoomTypeServiceProductOrderDetail->total_price_tax_incl;
 
                                 // change order total
-                                $objOrder->total_products += $newTotalPriceTaxExcl;
-                                $objOrder->total_products_wt += $newTotalPriceTaxIncl;
-                                $objOrder->total_paid_tax_excl += $newTotalPriceTaxExcl;
-                                $objOrder->total_paid_tax_incl += $newTotalPriceTaxIncl;
-                                $objOrder->total_paid += $newTotalPriceTaxIncl;
+                                $order->total_products += $newTotalPriceTaxExcl;
+                                $order->total_products_wt += $newTotalPriceTaxIncl;
+                                $order->total_paid_tax_excl += $newTotalPriceTaxExcl;
+                                $order->total_paid_tax_incl += $newTotalPriceTaxIncl;
+                                $order->total_paid += $newTotalPriceTaxIncl;
 
                                 $objOrderDetail = new OrderDetail((int) $serviceProduct['id_order_detail']);
                                 $objOrderDetail->total_price_tax_excl -= $objRoomTypeServiceProductOrderDetail->total_price_tax_excl;
@@ -5038,7 +5038,7 @@ class AdminOrdersControllerCore extends AdminController
                     }
                 }
 
-                $objOrder->save();
+                $order->save();
             }
         }
 
