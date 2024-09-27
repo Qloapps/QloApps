@@ -60,11 +60,7 @@ class QhrHotelReviewHelper
         }
 
         $objOrder = new Order($idOrder);
-        if (!Validate::isLoadedObject($objOrder)
-            || (($objOrderState = $objOrder->getCurrentOrderState())
-                && $objOrderState->id == Configuration::get('PS_OS_CANCELED')
-            )
-        ) {
+        if ($objOrder->hasCompletelyRefunded()) {
             return false;
         }
 
