@@ -66,6 +66,12 @@
 					</a>
 				</li>
 				<li>
+					<a href="#hotel-seo" data-toggle="tab">
+						<i class="icon-link"></i>
+						{l s='Seo' mod='hotelreservationsystem'}
+					</a>
+				</li>
+				<li>
 					<a href="#hotel-images" data-toggle="tab">
 						<i class="icon-image"></i>
 						{l s='Images' mod='hotelreservationsystem'}
@@ -130,27 +136,6 @@
 								maxlength="128"
 								{if $currentLang.id_lang != $language.id_lang}style="display:none;"{/if} />
 							{/foreach}
-						</div>
-					</div>
-					<div class="form-group">
-						<label class="col-sm-3 control-label required" for="link_rewrite" >
-							{l s='Friendly URL :' mod='hotelreservationsystem'}
-							{include file="../../../_partials/htl-form-fields-flag.tpl"}
-						</label>
-						<div class="col-lg-6">
-							{foreach from=$languages item=language}
-								{assign var="link_rewrite" value="link_rewrite_`$language.id_lang`"}
-								<input type="text"
-								id="link_rewrite_{$language.id_lang}"
-								name="link_rewrite_{$language.id_lang}"
-								value="{if isset($smarty.post.$link_rewrite)}{$smarty.post.$link_rewrite|escape:'htmlall':'UTF-8'}{elseif isset($edit)}{$link_rewrite_info[{$language.id_lang}]|escape:'htmlall':'UTF-8'}{/if}"
-								class="form-control wk_text_field_all wk_text_field_{$language.id_lang}"
-								maxlength="128"
-								{if $currentLang.id_lang != $language.id_lang}style="display:none;"{/if} />
-							{/foreach}
-						</div>
-						<div class="col-lg-2">
-							<button type="button" class="btn btn-default" onmousedown="updateFriendlyURLByName();"><i class="icon-random"></i> {l s='Generate'}</button>
 						</div>
 					</div>
 					<div class="form-group">
@@ -318,6 +303,95 @@
 					{/if}
 
 					{hook h='displayAdminAddHotelFormInformationTabAfter' id_hotel=$hook_arg_id_hotel}
+				</div>
+				<div class="tab-pane" id="hotel-seo">
+					{hook h='displayAdminAddHotelFormSeoTabBefore' id_hotel=$hook_arg_id_hotel}
+					<div class="form-group">
+						<label class="col-sm-3 control-label required" for="link_rewrite" >
+							{l s='Friendly URL :' mod='hotelreservationsystem'}
+							{include file="../../../_partials/htl-form-fields-flag.tpl"}
+						</label>
+						<div class="col-lg-6">
+							{foreach from=$languages item=language}
+								{assign var="link_rewrite" value="link_rewrite_`$language.id_lang`"}
+								<input type="text"
+								id="link_rewrite_{$language.id_lang}"
+								name="link_rewrite_{$language.id_lang}"
+								value="{if isset($smarty.post.$link_rewrite)}{$smarty.post.$link_rewrite|escape:'htmlall':'UTF-8'}{elseif isset($edit)}{$link_rewrite_info[{$language.id_lang}]|escape:'htmlall':'UTF-8'}{/if}"
+								class="form-control wk_text_field_all wk_text_field_{$language.id_lang}"
+								maxlength="128"
+								{if $currentLang.id_lang != $language.id_lang}style="display:none;"{/if} />
+							{/foreach}
+						</div>
+						<div class="col-lg-2">
+							<button type="button" class="btn btn-default" onmousedown="updateFriendlyURLByName();"><i class="icon-random"></i> {l s='Generate'}</button>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-sm-3 control-label" for="meta_title" >
+							{l s='Meta title:' mod='hotelreservationsystem'}
+							{include file="../../../_partials/htl-form-fields-flag.tpl"}
+						</label>
+						<div class="col-lg-6">
+						{foreach from=$languages item=language}
+							{assign var="meta_title" value="meta_title_`$language.id_lang`"}
+								<input type="text"
+								id="meta_title_{$language.id_lang}"
+								name="meta_title_{$language.id_lang}"
+								value="{if isset($smarty.post.$meta_title)}{$smarty.post.$meta_title|escape:'htmlall':'UTF-8'}{elseif isset($edit)}{$meta_title_info[$language.id_lang]|escape:'htmlall':'UTF-8'}{/if}""
+								class="form-control wk_text_field_all wk_text_field_{$language.id_lang}"
+								maxlength="128"
+								{if $currentLang.id_lang != $language.id_lang}style="display:none;"{/if} />
+							{/foreach}
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-sm-3 control-label" for="meta_title" >
+							{l s='Meta description:' mod='hotelreservationsystem'}
+							{include file="../../../_partials/htl-form-fields-flag.tpl"}
+						</label>
+						<div class="col-lg-6">
+							{foreach from=$languages item=language}
+								{assign var="meta_description" value="meta_description_`$language.id_lang`"}
+								<input type="text"
+								id="meta_description_{$language.id_lang}"
+								name="meta_description_{$language.id_lang}"
+								value="{if isset($smarty.post.$meta_description)}{$smarty.post.$meta_description|escape:'htmlall':'UTF-8'}{elseif isset($edit)}{$meta_description_info[{$language.id_lang}]|escape:'htmlall':'UTF-8'}{/if}"
+								class="form-control wk_text_field_all wk_text_field_{$language.id_lang}"
+								maxlength="225"
+								{if $currentLang.id_lang != $language.id_lang}style="display:none;"{/if} />
+							{/foreach}
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-sm-3 control-label" for="meta_title" >
+							{l s='Meta keywords:' mod='hotelreservationsystem'}
+							{include file="../../../_partials/htl-form-fields-flag.tpl"}
+						</label>
+						<div class="col-lg-6">
+							{foreach from=$languages item=language}
+								<div class="wk_text_field_all wk_text_field_{$language.id_lang}" {if $currentLang.id_lang != $language.id_lang}style="display:none;"{/if} >
+									{assign var="meta_keywords" value="meta_keywords_`$language.id_lang`"}
+									<script type="text/javascript">
+										$().ready(function () {
+											var input_id = 'meta_keywords_{$language.id_lang}';
+											$("#"+input_id).tagify({ delimiters: [13,44], addTagPrompt: "{l s='Add tag' mod='hotelreservationsystem' js=1}"});
+											$("#htl_branch_info_form").submit( function() {
+												$('#'+input_id).val($('#'+input_id).tagify('serialize'));
+											});
+										});
+									</script>
+									<input type="text"
+									id="meta_keywords_{$language.id_lang}"
+									name="meta_keywords_{$language.id_lang}"
+									value="{if isset($smarty.post.$meta_keywords)}{$smarty.post.$meta_keywords|escape:'htmlall':'UTF-8'}{elseif isset($edit)}{$meta_keywords_info[{$language.id_lang}]|escape:'htmlall':'UTF-8'}{/if}"
+									class="form-control tagify"
+									maxlength="225">
+								</div>
+							{/foreach}
+						</div>
+					</div>
+					{hook h='displayAdminAddHotelFormSeoTabAfter' id_hotel=$hook_arg_id_hotel}
 				</div>
 				<div class="tab-pane" id="hotel-images">
 					{hook h='displayAdminAddHotelFormImagesTabBefore' id_hotel=$hook_arg_id_hotel}
