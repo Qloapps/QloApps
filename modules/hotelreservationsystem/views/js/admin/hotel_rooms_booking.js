@@ -601,7 +601,6 @@ $(document).ready(function() {
             $(this).text(room_txt + ' - '+ (key+1) );
         });
         setRoomTypeGuestOccupancy($(booking_occupancy_inner).closest('.booking_occupancy_wrapper'));
-        $('#search_occupancy').parent().addClass('open');
     });
 
     $(document).on('change', '.num_occupancy', function(e) {
