@@ -759,6 +759,7 @@ class AdminCategoriesControllerCore extends AdminController
         // @todo remove this after adding link_rewrite form option
         // currently have removed link_rewrite as it is currently not required
         // so adding link_rewrite in $_POST
+        $_POST['id_parent']  = $id_parent = (int)Tools::getValue('categoryBox');
         if (!Validate::isLoadedObject($this->object)) {
             foreach (Language::getLanguages(true) as $lang) {
                 $_POST['link_rewrite_'.$lang['id_lang']] = Tools::link_rewrite(Tools::getValue('name_'.$lang['id_lang']));
@@ -768,6 +769,8 @@ class AdminCategoriesControllerCore extends AdminController
                 $_POST['link_rewrite_'.$lang['id_lang']] = $this->object->link_rewrite[$lang['id_lang']];
             }
         }
+
+        return parent::processUpdate();
     }
 
     protected function setDeleteMode()
