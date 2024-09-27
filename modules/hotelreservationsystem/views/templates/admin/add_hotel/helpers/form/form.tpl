@@ -458,7 +458,7 @@
 									<label for="enable_use_global_preparation_time_off">{l s='No' mod='hotelreservationsystem'}</label>
 									<a class="slide-button btn"></a>
 								</span>
-								<div class="help-block">{l s='Global preparation time :' mod='hotelreservationsystem'} {$GLOBAL_PREPARATION_TIME}</div>
+								<div class="help-block">{l s='Global minimum booking offset :' mod='hotelreservationsystem'} {$GLOBAL_PREPARATION_TIME}</div>
 							</div>
 						</div>
 						<div class="form-group" {if isset($smarty.post.enable_use_global_preparation_time)}{if !$smarty.post.enable_use_global_preparation_time}style="display:block;"{else}style="display:none;"{/if}{elseif isset($order_restrict_date_info.use_global_preparation_time) && !$order_restrict_date_info.use_global_preparation_time}style="display:block;" {else} style="display:none;" {/if}>
