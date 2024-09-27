@@ -376,9 +376,9 @@ class AdminCustomersControllerCore extends AdminController
         if (!($obj = $this->loadObject(true))) {
             return;
         } else if ($this->object->deleted == Customer::STATUS_DELETED) {
-            $this->errors[] = $this->l('You cannot update a deleted customer.');
+            $this->warnings[] = $this->l('This is a deleted customer and you cannot update the information of a deleted customer.');
         } else if ($this->object->deleted == Customer::STATUS_BANNED) {
-            $this->errors[] = $this->l('You cannot update a banned customer.');
+            $this->warnings[] = $this->l('This is a banned customer and you cannot update the information of a banned customer.');
         }
 
         $genders = Gender::getGenders();
