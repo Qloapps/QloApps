@@ -375,6 +375,10 @@ class AdminCustomersControllerCore extends AdminController
         /** @var Customer $obj */
         if (!($obj = $this->loadObject(true))) {
             return;
+        } else if ($this->object->deleted == Customer::STATUS_DELETED) {
+            $this->warnings[] = $this->l('This is a deleted customer and you cannot update the information of a deleted customer.');
+        } else if ($this->object->deleted == Customer::STATUS_BANNED) {
+            $this->warnings[] = $this->l('This is a banned customer and you cannot update the information of a banned customer.');
         }
 
         $genders = Gender::getGenders();
@@ -1114,6 +1118,14 @@ class AdminCustomersControllerCore extends AdminController
     public function processUpdate()
     {
         if (Validate::isLoadedObject($this->object)) {
+            if ($this->object->deleted == Customer::STATUS_DELETED) {
+                $this->errors[] = $this->l('You can not update a deleted customer.');
+                return false;
+            } else if ($this->object->deleted == Customer::STATUS_BANNED) {
+                $this->errors[] = $this->l('You can not update a banned customer.');
+                return false;
+            }
+
             $customer_email = trim(strval(Tools::getValue('email')));
 
             // check if e-mail already used
