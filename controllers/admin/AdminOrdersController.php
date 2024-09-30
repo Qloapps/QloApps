@@ -103,7 +103,7 @@ class AdminOrdersControllerCore extends AdminController
         $this->_orderWay = 'DESC';
         $this->_use_found_rows = true;
 
-        $this->_group = ' GROUP BY hbd.`id_order`';
+        $this->_group = ' GROUP BY a.`id_order`';
 
         // if request for resolvable overbooked orders filter comes the set condition for this
         if (Tools::getIsset('resolvable_overbooked_orders') && Tools::getValue('resolvable_overbooked_orders')) {
