@@ -99,7 +99,7 @@
                                                     </td>
                                                 {/if}
                                                 <td>
-                                                    <button type="button" data-id-cart="" data-id-cart-book-data="" data-id-product="{$avai_v['id_product']|escape:'htmlall':'UTF-8'}" data-id-room="{$avai_v['id_room']|escape:'htmlall':'UTF-8'}" data-id-hotel="{$avai_v['id_hotel']}" data-date-from="{$date_from|escape:'htmlall':'UTF-8'|date_format:'%Y-%m-%d'}" data-date-to ="{$date_to|escape:'htmlall':'UTF-8'|date_format:'%Y-%m-%d'}" class="btn btn-primary avai_add_cart">{l s='Add To Cart' mod='hotelreservationsystem'}</button>
+                                                    <button type="button" data-id-cart="" data-id-cart-book-data="" data-id-product="{$avai_v['id_product']|escape:'htmlall':'UTF-8'}" data-id-room="{$avai_v['id_room']|escape:'htmlall':'UTF-8'}" data-id-hotel="{$avai_v['id_hotel']}" data-date-from="{$date_from|escape:'htmlall':'UTF-8'}" data-date-to ="{$date_to|escape:'htmlall':'UTF-8'}" class="btn btn-primary avai_add_cart">{l s='Add To Cart' mod='hotelreservationsystem'}</button>
                                                 </td>
                                             </tr>
                                         {/foreach}
@@ -187,7 +187,7 @@
                                                         </td>
                                                     {/if}
                                                     <td>
-                                                        <button type="button" data-id-cart="" data-id-cart-book-data="" data-id-product="{$sub_part_v['id_product']|escape:'htmlall':'UTF-8'}" data-id-room="{$sub_part_v['id_room']|escape:'htmlall':'UTF-8'}" data-id-hotel="{$sub_part_v['id_hotel']|escape:'htmlall':'UTF-8'}" data-date-from="{$part_v['date_from']|escape:'htmlall':'UTF-8'|date_format:'%Y-%m-%d'}" data-date-to ="{$part_v['date_to']|escape:'htmlall':'UTF-8'|date_format:'%Y-%m-%d'}" data-sub-key="{$sub_part_k|escape:'htmlall':'UTF-8'}" class="btn btn-primary par_add_cart">{l s='Add To Cart' mod='hotelreservationsystem'}</button>
+                                                        <button type="button" data-id-cart="" data-id-cart-book-data="" data-id-product="{$sub_part_v['id_product']|escape:'htmlall':'UTF-8'}" data-id-room="{$sub_part_v['id_room']|escape:'htmlall':'UTF-8'}" data-id-hotel="{$sub_part_v['id_hotel']|escape:'htmlall':'UTF-8'}" data-date-from="{$part_v['date_from']|escape:'htmlall':'UTF-8'}" data-date-to ="{$part_v['date_to']|escape:'htmlall':'UTF-8'}" data-sub-key="{$sub_part_k|escape:'htmlall':'UTF-8'}" class="btn btn-primary par_add_cart">{l s='Add To Cart' mod='hotelreservationsystem'}</button>
                                                     </td>
                                                 </tr>
                                             {/foreach}
