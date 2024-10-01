@@ -95,7 +95,7 @@
                                         <i class="icon-pencil"></i> &nbsp;{l s='Edit note'}
                                     {/if}
                                 </a>
-                                {if $document->getRestPaid()}
+                                {if $can_edit && $document->getRestPaid()}
                                     <a href="#form_add_payment_panel" class="btn btn-default js-set-payment anchor pull-right" data-amount="{$document->getRestPaid()}" data-id-invoice="{$document->id}" title="{l s='Set payment form'}">
                                         <i class="icon-money"></i> &nbsp;{l s='Enter payment'}
                                     </a>
@@ -117,7 +117,7 @@
 		</tbody>
 	</table>
 
-    {if !$orderDocuments|count && isset($invoice_management_active) && $invoice_management_active}
+    {if $can_edit && !$orderDocuments|count && isset($invoice_management_active) && $invoice_management_active}
         <div class="well hidden-print">
             <a class="btn btn-primary" href="{$current_index}&amp;viewOrder&amp;submitGenerateInvoice&amp;id_order={$order->id}{if isset($smarty.get.token)}&amp;token={$smarty.get.token|escape:'html':'UTF-8'}{/if}">
                 <i class="icon-file-text"></i> {l s='Generate invoice'}

@@ -145,7 +145,7 @@
 
                                                         {if isset($refundReqBookings) && $refundReqBookings && $data.id|in_array:$refundReqBookings && $data.is_refunded}
                                                             <span class="badge badge-danger">{if $data.is_cancelled}{l s='Cancelled'}{else}{l s='Refunded'}{/if}</span>
-                                                        {else}
+                                                        {elseif $can_edit}
                                                             <a class="open_room_status_form btn btn-default" href="#" data-id_hotel_booking_detail="{$data['id']}" data-id_order="{$data['id_order']}" data-id_status="{$data['id_status']}" data-id_room="{$data['id_room']}" data-date_from="{$data['date_from']|date_format:"%Y-%m-%d"}" data-date_to="{$data['date_to']|date_format:"%Y-%m-%d"}" data-check_in_time="{$data['check_in_time']}" data-check_out_time="{$data['check_out_time']}">
                                                                 <i class="icon-pencil"></i> {l s='Edit'}
                                                             </a>
@@ -219,14 +219,17 @@
                                                     <td style="background-color:{$row['color']};color:{$row['text-color']}">{$row['ostate_name']|stripslashes}</td>
                                                     <td style="background-color:{$row['color']};color:{$row['text-color']}">{if $row['employee_lastname']}{$row['employee_firstname']|stripslashes} {$row['employee_lastname']|stripslashes}{/if}</td>
                                                     <td style="background-color:{$row['color']};color:{$row['text-color']}">{dateFormat date=$row['date_add'] full=true}</td>
-                                                    <td style="background-color:{$row['color']};color:{$row['text-color']}" class="text-right">
-                                                        {if $row['send_email']|intval}
-                                                            <a class="btn btn-default" href="{$link->getAdminLink('AdminOrders')|escape:'html':'UTF-8'}&amp;vieworder&amp;id_order={$order->id|intval}&amp;sendStateEmail={$row['id_order_state']|intval}&amp;id_order_history={$row['id_order_history']|intval}" title="{l s='Resend this email to the customer'}">
-                                                                <i class="icon-mail-reply"></i>
-                                                                {l s='Resend email'}
-                                                            </a>
-                                                        {/if}
-                                                    </td>
+
+                                                    {if $can_edit}
+                                                        <td style="background-color:{$row['color']};color:{$row['text-color']}" class="text-right">
+                                                            {if $row['send_email']|intval}
+                                                                <a class="btn btn-default" href="{$link->getAdminLink('AdminOrders')|escape:'html':'UTF-8'}&amp;vieworder&amp;id_order={$order->id|intval}&amp;sendStateEmail={$row['id_order_state']|intval}&amp;id_order_history={$row['id_order_history']|intval}" title="{l s='Resend this email to the customer'}">
+                                                                    <i class="icon-mail-reply"></i>
+                                                                    {l s='Resend email'}
+                                                                </a>
+                                                            {/if}
+                                                        </td>
+                                                    {/if}
                                                 </tr>
                                             {else}
                                                 <tr>
@@ -234,14 +237,16 @@
                                                     <td>{$row['ostate_name']|stripslashes}</td>
                                                     <td>{if $row['employee_lastname']}{$row['employee_firstname']|stripslashes} {$row['employee_lastname']|stripslashes}{else}&nbsp;{/if}</td>
                                                     <td>{dateFormat date=$row['date_add'] full=true}</td>
-                                                    <td class="text-right">
-                                                        {if $row['send_email']|intval}
-                                                            <a  href="{$link->getAdminLink('AdminOrders')|escape:'html':'UTF-8'}&amp;vieworder&amp;id_order={$order->id|intval}&amp;sendStateEmail={$row['id_order_state']|intval}&amp;id_order_history={$row['id_order_history']|intval}" title="{l s='Resend this email to the customer'}">
-                                                                <i class="icon-mail-reply"></i>
-                                                                {l s='Resend email'}
-                                                            </a>
-                                                        {/if}
-                                                    </td>
+                                                    {if $can_edit}
+                                                        <td class="text-right">
+                                                            {if $row['send_email']|intval}
+                                                                <a  href="{$link->getAdminLink('AdminOrders')|escape:'html':'UTF-8'}&amp;vieworder&amp;id_order={$order->id|intval}&amp;sendStateEmail={$row['id_order_state']|intval}&amp;id_order_history={$row['id_order_history']|intval}" title="{l s='Resend this email to the customer'}">
+                                                                    <i class="icon-mail-reply"></i>
+                                                                    {l s='Resend email'}
+                                                                </a>
+                                                            {/if}
+                                                        </td>
+                                                    {/if}
                                                 </tr>
                                             {/if}
                                         {/foreach}
@@ -250,7 +255,7 @@
                             </div>
                             <!-- Change status form -->
                             {* If current state is refunded or cancelled the further order status changes are not allowed *}
-                            {if !isset($currentState) || (isset($currentState) && ($currentState->id != Configuration::get('PS_OS_REFUND') && $currentState->id != Configuration::get('PS_OS_CANCELED')))}
+                            {if $can_edit && (!isset($currentState) || (isset($currentState) && ($currentState->id != Configuration::get('PS_OS_REFUND') && $currentState->id != Configuration::get('PS_OS_CANCELED'))))}
                                 <form action="{$currentIndex|escape:'html':'UTF-8'}&amp;vieworder&amp;id_order={$order->id|intval}&amp;token={$smarty.get.token}" method="post" class="form-horizontal well hidden-print">
                                     <div class="row">
                                         <div class="col-lg-9">
@@ -474,12 +479,14 @@
                             </table>
                         </div>
                     </div>
-                    <div class="form-group">
-                        <button class="btn btn-primary add_new_payment" id="add_new_payment">
-                            <i class="icon-plus-sign"></i> {l s='Add new payment'}
-                        </button>
-                    </div>
-                    {if (!$order->valid && sizeof($currencies) > 1)}
+                    {if $can_edit}
+                        <div class="form-group">
+                            <button class="btn btn-primary add_new_payment" id="add_new_payment">
+                                <i class="icon-plus-sign"></i> {l s='Add new payment'}
+                            </button>
+                        </div>
+                    {/if}
+                    {if $can_edit && (!$order->valid && sizeof($currencies) > 1)}
                         <form class="form-horizontal well" method="post" action="{$currentIndex|escape:'html':'UTF-8'}&amp;vieworder&amp;id_order={$order->id}&amp;token={$smarty.get.token|escape:'html':'UTF-8'}">
                             <div class="form-group">
                                 <label class="control-label col-lg-2 col-md-3 text-left">{l s='Change currency'}</label>
@@ -560,8 +567,11 @@
                                         </dl>
                                         <form method="post" action="index.php?tab=AdminCustomers&amp;id_customer={$customer->id}&amp;id_order={$order->id|intval}&amp;token={getAdminToken tab='AdminCustomers'}">
                                             <input type="hidden" name="id_lang" value="{$order->id_lang}" />
-                                            <input class="btn btn-primary" type="submit" name="submitGuestToCustomer" value="{l s='Transform this guest into a customer'}" />
-                                            <p class="help-block">{l s='This feature will generate a random password and send an email to the customer.'}</p>
+
+                                            {if $can_edit}
+                                                <button class="btn btn-primary" type="submit" name="submitGuestToCustomer"><i class='icon-refresh'></i> {l s='Transform this guest into a customer'}</button>
+                                                <p class="help-block">{l s='This feature will generate a random password and send an email to the customer.'}</p>
+                                            {/if}
                                         </form>
                                     {else}
                                         <div class="alert alert-warning">
@@ -603,13 +613,15 @@
                                                 <textarea rows="3" name="note" id="noteContent" class="textarea-autosize" onkeyup="$(this).val().length > 0 ? $('#submitCustomerNote').removeAttr('disabled') : $('#submitCustomerNote').attr('disabled', 'disabled')">{$customer->note}</textarea>
                                             </div>
                                         </div>
-                                        <div class="row">
-                                            <div class="col-lg-12">
-                                                <button type="submit" id="submitCustomerNote" class="btn btn-primary pull-right" disabled="disabled">
-                                                    <i class="icon-save"></i> {l s='Add Note'}
-                                                </button>
+                                        {if $can_edit}
+                                            <div class="row">
+                                                <div class="col-lg-12">
+                                                    <button type="submit" id="submitCustomerNote" class="btn btn-primary pull-right" disabled="disabled">
+                                                        <i class="icon-save"></i> {l s='Add Note'}
+                                                    </button>
+                                                </div>
                                             </div>
-                                        </div>
+                                        {/if}
                                         <span id="note_feedback"></span>
                                     </form>
                                 </div>
@@ -811,7 +823,7 @@
                     <div class="panel" id="refundForm">
                         <div class="panel-heading">
                             <i class="icon-bed"></i> &nbsp;{l s='Rooms Booking Detail'} <span class="badge">{$order_detail_data|@count}</span>
-                            {if !$order->hasBeenDelivered() && $currentState->id != Configuration::get('PS_OS_REFUND') && $currentState->id != Configuration::get('PS_OS_CANCELED')}
+                            {if $can_edit && (!$order->hasBeenDelivered() && $currentState->id != Configuration::get('PS_OS_REFUND') && $currentState->id != Configuration::get('PS_OS_CANCELED'))}
                                 <button type="button" id="add_room" class="btn btn-primary pull-right">
                                     <i class="icon-plus-sign"></i> {l s='Add Rooms'}
                                 </button>
@@ -1138,49 +1150,53 @@
                         <a href="{$link->getAdminLink('AdminCustomerThreads')|escape:'html':'UTF-8'}&amp;id_order={$order->id|intval}" class="pull-right">{l s='Show all messages'}</a>
                     </div>
                     <div id="messages">
-                        <form action="{$smarty.server.REQUEST_URI|escape:'html':'UTF-8'}&amp;token={$smarty.get.token|escape:'html':'UTF-8'}" method="post" onsubmit="if (getE('visibility').checked == true) return confirm('{l s='Do you want to send this message to the customer?'}');">
-                            <div id="message" class="form-horizontal">
+                        {if $can_edit}
+                            <form action="{$smarty.server.REQUEST_URI|escape:'html':'UTF-8'}&amp;token={$smarty.get.token|escape:'html':'UTF-8'}" method="post" onsubmit="if (getE('visibility').checked == true) return confirm('{l s='Do you want to send this message to the customer?'}');">
+                                <div id="message" class="form-horizontal">
+                                    <div class="form-group">
+                                        <label class="control-label">{l s='Choose a standard message'}</label>
+                                        <p>
+                                            <select class="chosen form-control" name="order_message" id="order_message" onchange="orderOverwriteMessage(this, '{l s='Do you want to overwrite your existing message?'}')">
+                                                <option value="0" selected="selected">-</option>
+                                                {foreach from=$orderMessages item=orderMessage}
+                                                <option value="{$orderMessage['message']|escape:'html':'UTF-8'}">{$orderMessage['name']}</option>
+                                                {/foreach}
+                                            </select>
+                                        </p>
+                                        <div>
+                                            <a  href="{$link->getAdminLink('AdminOrderMessage')|escape:'html':'UTF-8'}">
+                                                {l s='Configure predefined messages'}
+                                                <i class="icon-external-link"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <label class="control-label">{l s='Message'}</label>
+                                        <textarea rows="3" id="txt_msg" class="textarea-autosize" name="message">{Tools::getValue('message')|escape:'html':'UTF-8'}</textarea>
+                                    </div>
+
                                 <div class="form-group">
-                                    <label class="control-label">{l s='Choose a standard message'}</label>
-                                    <p>
-                                        <select class="chosen form-control" name="order_message" id="order_message" onchange="orderOverwriteMessage(this, '{l s='Do you want to overwrite your existing message?'}')">
-                                            <option value="0" selected="selected">-</option>
-                                            {foreach from=$orderMessages item=orderMessage}
-                                            <option value="{$orderMessage['message']|escape:'html':'UTF-8'}">{$orderMessage['name']}</option>
-                                            {/foreach}
-                                        </select>
-                                    </p>
-                                    <div>
-                                        <a  href="{$link->getAdminLink('AdminOrderMessage')|escape:'html':'UTF-8'}">
-                                            {l s='Configure predefined messages'}
-                                            <i class="icon-external-link"></i>
-                                        </a>
+                                        <p class="checkbox">
+                                            <label class="control-label" for="visibility">
+                                                <input type="checkbox" name="visibility" id="visibility" value="1" />
+                                                {l s='Display Message to Customer?'}
+                                            </label>
+                                        </p>
+                                    </div>
+                                    <input type="hidden" name="id_order" value="{$order->id}" />
+                                    <input type="hidden" name="id_customer" value="{$order->id_customer}" />
+
+                                    <div class="row">
+                                        <button type="submit" id="submitMessage" class="btn btn-primary pull-right" name="submitMessage">
+                                            <i class="icon-paper-plane"></i> {l s='Send Message'}
+                                        </button>
                                     </div>
                                 </div>
-
-                                <div class="row">
-                                    <label class="control-label">{l s='Message'}</label>
-                                    <textarea rows="3" id="txt_msg" class="textarea-autosize" name="message">{Tools::getValue('message')|escape:'html':'UTF-8'}</textarea>
-                                </div>
-
-                               <div class="form-group">
-                                    <p class="checkbox">
-                                        <label class="control-label" for="visibility">
-                                            <input type="checkbox" name="visibility" id="visibility" value="1" />
-                                            {l s='Display Message to Customer?'}
-                                        </label>
-                                    </p>
-                                </div>
-                                <input type="hidden" name="id_order" value="{$order->id}" />
-                                <input type="hidden" name="id_customer" value="{$order->id_customer}" />
-
-                                <div class="row">
-                                    <button type="submit" id="submitMessage" class="btn btn-primary pull-right" name="submitMessage">
-                                        <i class="icon-paper-plane"></i> {l s='Send Message'}
-                                    </button>
-                                </div>
-                            </div>
-                        </form>
+                            </form>
+                        {else}
+                            <div class="alert alert-warning">{l s='You do not have permission to edit this order.'}</div>
+                        {/if}
                     </div>
                 </div>
             </div>
