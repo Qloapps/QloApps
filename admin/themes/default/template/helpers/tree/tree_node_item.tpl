@@ -23,7 +23,7 @@
 *  International Registered Trademark & Property of PrestaShop SA
 *}
 
-<li class="tree-item">
+<li class="tree-item" {if isset($node['hidden']) && $node['hidden'] == true} hidden="hidden"{/if}>
 	<span class="tree-item-name">
 		<i class="tree-dot"></i>
 		<label class="tree-toggler">{$node['name']}</label>

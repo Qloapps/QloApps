@@ -601,15 +601,15 @@ class AdminCartRulesControllerCore extends AdminController
                 $products['selected'] = HotelBranchInformation::filterDataByHotelAccess(
                     $products['selected'],
                     $this->context->employee->id_profile,
-                    0,
-                    1,
+                    false,
+                    'id',
                     1
                 );
                 $products['unselected'] = HotelBranchInformation::filterDataByHotelAccess(
                     $products['unselected'],
                     $this->context->employee->id_profile,
-                    0,
-                    1,
+                    false,
+                    'id',
                     1
                 );
                 Context::getContext()->smarty->assign('product_rule_itemlist', $products);
