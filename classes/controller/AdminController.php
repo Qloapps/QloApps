@@ -2160,7 +2160,8 @@ class AdminControllerCore extends Controller
             'currentIndex' => self::$currentIndex,
             'bootstrap' => $this->bootstrap,
             'default_language' => (int)Configuration::get('PS_LANG_DEFAULT'),
-            'display_addons_connection' => Tab::checkTabRights(Tab::getIdFromClassName('AdminModulesController'))
+            'display_addons_connection' => Tab::checkTabRights(Tab::getIdFromClassName('AdminModulesController')),
+            'show_full_date' => $this->show_full_date,
         ));
 
         $module = Module::getInstanceByName('themeconfigurator');

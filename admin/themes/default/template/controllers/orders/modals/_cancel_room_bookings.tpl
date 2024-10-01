@@ -42,7 +42,8 @@
                                     <td><b>{$bookingInfo.room_num|escape:'html':'UTF-8'}</b></td>
                                     <td>{$bookingInfo.room_type_name|escape:'html':'UTF-8'}</td>
                                     <td>{$bookingInfo.hotel_name|escape:'html':'UTF-8'}</td>
-                                    <td>{dateFormat date=$bookingInfo.date_from} - {dateFormat date=$bookingInfo.date_to}</span></td>
+                                    {assign var="is_full_date" value=($show_full_date && ($bookingInfo['date_from']|date_format:'%D' == $bookingInfo['date_to']|date_format:'%D'))}
+                                    <td>{dateFormat date=$bookingInfo.date_from full=$is_full_date} - {dateFormat date=$bookingInfo.date_to full=$is_full_date}</span></td>
                                     <td>{convertPriceWithCurrency price=$bookingInfo.total_price_tax_incl currency=$currency->id}</td>
                                 </tr>
                             {/foreach}
