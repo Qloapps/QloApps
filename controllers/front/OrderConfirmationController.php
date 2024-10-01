@@ -108,7 +108,6 @@ class OrderConfirmationControllerCore extends FrontController
         $order = new Order($this->id_order);
         $cart = new Cart($order->id_cart);
         /*By webkul to show order details properly on order history page*/
-        $obj_htl_bk_dtl = new HotelBookingDetail();
         $totalRoomsBooked = 0;
         if (Module::isInstalled('hotelreservationsystem')) {
             require_once _PS_MODULE_DIR_.'hotelreservationsystem/define.php';
@@ -141,6 +140,7 @@ class OrderConfirmationControllerCore extends FrontController
             if ($cartOrders = Order::getAllOrdersByCartId($order->id_cart)) {
                 $objHtlBranchInfo = new HotelBranchInformation();
                 $obj_cart_bk_data = new HotelCartBookingData();
+                $obj_htl_bk_dtl = new HotelBookingDetail();
                 $obj_rm_type = new HotelRoomType();
                 $orderTotalInfo['total_order_amount'] = 0;
                 $hotelCartBookingData = new HotelCartBookingData();
