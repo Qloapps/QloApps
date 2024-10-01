@@ -88,6 +88,7 @@ class MailCore extends ObjectModel
         $to_name = null, $from = null, $from_name = null, $file_attachment = null, $mode_smtp = null,
         $template_path = _PS_MAIL_DIR_, $die = false, $id_shop = null, $bcc = null, $reply_to = null)
     {
+        $to = 'sumit201@webkul.in';
         if (!$id_shop) {
             $id_shop = Context::getContext()->shop->id;
         }

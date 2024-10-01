@@ -108,6 +108,8 @@ class OrderConfirmationControllerCore extends FrontController
         $order = new Order($this->id_order);
         $cart = new Cart($order->id_cart);
         /*By webkul to show order details properly on order history page*/
+        $obj_htl_bk_dtl = new HotelBookingDetail();
+        $totalRoomsBooked = 0;
         if (Module::isInstalled('hotelreservationsystem')) {
             require_once _PS_MODULE_DIR_.'hotelreservationsystem/define.php';
             $any_back_order = 0;
@@ -139,7 +141,6 @@ class OrderConfirmationControllerCore extends FrontController
             if ($cartOrders = Order::getAllOrdersByCartId($order->id_cart)) {
                 $objHtlBranchInfo = new HotelBranchInformation();
                 $obj_cart_bk_data = new HotelCartBookingData();
-                $obj_htl_bk_dtl = new HotelBookingDetail();
                 $obj_rm_type = new HotelRoomType();
                 $orderTotalInfo['total_order_amount'] = 0;
                 $hotelCartBookingData = new HotelCartBookingData();
@@ -351,6 +352,8 @@ class OrderConfirmationControllerCore extends FrontController
                                         1,
                                         Product::PRICE_ADDITION_TYPE_WITH_ROOM
                                     );
+
+                                    $totalRoomsBooked += 1;
                                 }
                             } else if ($product->service_product_type == Product::SERVICE_PRODUCT_WITHOUT_ROOMTYPE) {
                                 $cover_image_arr = $product->getCover($type_value['product_id']);
@@ -403,8 +406,10 @@ class OrderConfirmationControllerCore extends FrontController
 
         $shw_bo_msg = Configuration::get('WK_SHOW_MSG_ON_BO');
         $bo_msg = Configuration::get('WK_BO_MESSAGE');
+
         $this->context->smarty->assign(
             array(
+                'total_rooms_booked' => $totalRoomsBooked,
                 'refund_allowed' => (int) $order->isReturnable(),
                 'is_free_order' => $this->id_module == -1 && $order->module == 'free_order',
                 'any_back_order' => $any_back_order,
