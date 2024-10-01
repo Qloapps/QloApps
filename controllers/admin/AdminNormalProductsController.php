@@ -1393,7 +1393,7 @@ class AdminNormalProductsControllerCore extends AdminController
         }
 
         if (in_array($this->display, array('add', 'edit'))
-            && $this->tabAccess[$this->display] == '1'
+            && $this->tabAccess['view'] == '1'
             && $this->loadObject(true)
         ) {
             $this->addJqueryUI(array(
