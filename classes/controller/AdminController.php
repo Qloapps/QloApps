@@ -2161,7 +2161,6 @@ class AdminControllerCore extends Controller
             'bootstrap' => $this->bootstrap,
             'default_language' => (int)Configuration::get('PS_LANG_DEFAULT'),
             'display_addons_connection' => Tab::checkTabRights(Tab::getIdFromClassName('AdminModulesController')),
-            'show_full_date' => $this->show_full_date,
         ));
 
         $module = Module::getInstanceByName('themeconfigurator');
@@ -2940,7 +2939,8 @@ class AdminControllerCore extends Controller
             'token' => $this->token,
             'host_mode' => defined('_PS_HOST_MODE_') ? 1 : 0,
             'stock_management' => (int)Configuration::get('PS_STOCK_MANAGEMENT'),
-            'language_is_rtl' => $this->context->language->is_rtl
+            'language_is_rtl' => $this->context->language->is_rtl,
+            'show_full_date' => $this->show_full_date,
         ));
 
         if ($this->display_header) {

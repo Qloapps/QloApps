@@ -135,7 +135,7 @@
 																						<tr class="rooms_remove_container">
 																							{assign var="is_full_date" value=($show_full_date && ($data_v['data_form']|date_format:'%D' == $data_v['data_to']|date_format:'%D'))}
 																							<td>
-																								{dateFormat date=$data_v['data_form'] full=$is_full_date}&nbsp;-&nbsp;{dateFormat date=$data_v['data_to'] full=$show_full_date}
+																								{dateFormat date=$data_v['data_form'] full=$is_full_date}&nbsp;-&nbsp;{dateFormat date=$data_v['data_to'] full=$is_full_date}
 																							</td>
 																							<td class="num_rooms_in_date">{$data_v['num_rm']}</td>
 																							<td>{convertPrice price=($data_v['amount'] + $data_v['demand_price'])}</td>
