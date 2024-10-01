@@ -851,7 +851,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
                 AND "'.pSQL(date('Y-m-d')).' 23:59:59" AND os.`logable` = 1 AND EXISTS (
                     SELECT 1
                     FROM `qlo_htl_booking_detail` hbd
-                    WHERE hbd.`id_order` = o.`id_order`' . HotelBranchInformation::addHotelRestriction($idHotel).'
+                    WHERE hbd.`id_order` = o.`id_order`' . HotelBranchInformation::addHotelRestriction($idHotels).'
                 )');
                 $value = Tools::displayPrice($row['orders'] ? $row['total_paid_tax_excl'] / $row['orders'] : 0, $currency).' ('.$this->l('tax excl.').')';
 
@@ -1036,7 +1036,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
                 break;
             case 'total_due_amount':
                 $dateToday = date('Y-m-d');
-                $dueAmount = AdminStatsController::getTotalDueAmount('', '', $idHotels, 1);
+                $dueAmount = AdminStatsController::getTotalDueAmount('', '', $idHotels);
                 if ($dueAmount > 0) {
                     $value = Tools::displayPrice($dueAmount, $currency);
                 } else {
@@ -2426,7 +2426,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
         $objHotelBooking = new HotelBookingDetail();
         $invalidOrderStates = $objHotelBooking->getOrderStatusToFreeBookedRoom();
 
-        $sql = 'SELECT ' . ($useTax ? 'SUM(o.`total_paid_tax_incl` / o.`conversion_rate`)' : 'SUM(o.`total_paid_tax_excl` / o.`conversion_rate`)') . ' - SUM(o.`total_paid_real` / o.`conversion_rate`)
+        $sql = 'SELECT SUM(IF(((o.`total_paid_tax_incl` / o.`conversion_rate`) - (o.`total_paid_real` / o.`conversion_rate`) > 0), ((o.`total_paid_tax_incl` / o.`conversion_rate`) - (o.`total_paid_real` / o.`conversion_rate`)), 0))
         FROM `'._DB_PREFIX_.'orders` o
         LEFT JOIN `'._DB_PREFIX_.'order_state` os ON o.current_state = os.id_order_state
         WHERE 1 ' .
