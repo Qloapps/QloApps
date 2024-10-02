@@ -342,8 +342,6 @@ class AdminOrdersControllerCore extends AdminController
 
         parent::__construct();
 
-        $this->tabAccess['edit'] = 1;
-
         // overbooking success status
         $this->_conf[51] = $this->l('Overbooking is successfully resolved');
         $this->_conf[52] = $this->l('Room in the booking is successfully reallocated');
