@@ -47,7 +47,7 @@
 		{/block}
 		{if isset($order->id) && $order->id}
 			{if $is_guest}
-				<p>{l s='Your order ID is:'} <span class="bold">{$order->reference}</span></p>
+				<p>{l s='Your Order Reference is:'} <span class="bold">{$order->reference}</span></p>
 				<p class="cart_navigation exclusive">
 				<a class="button-exclusive btn btn-default" href="{$link->getPageLink('guest-tracking', true, NULL, "id_order={$reference_order|urlencode}&email={$email|urlencode}")|escape:'html':'UTF-8'}" title="{l s='Follow my order'}"><i class="icon-chevron-left"></i>{l s='Follow my order'}</a>
 				</p>
