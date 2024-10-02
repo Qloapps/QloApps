@@ -867,6 +867,12 @@ class OrderCore extends ObjectModel
 		WHERE ocr.`id_order` = '.(int)$this->id);
     }
 
+    public function getCartRulesTotal($useTax = false)
+    {
+        return Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue(
+            'SELECT '.($useTax ? 'SUM(ocr.`value`)' : 'SUM(ocr.`value_tax_excl`)').' FROM `'._DB_PREFIX_.'order_cart_rule` ocr WHERE ocr.`id_order` = '.(int)$this->id);
+    }
+
     public static function getDiscountsCustomer($id_customer, $id_cart_rule)
     {
         $cache_id = 'Order::getDiscountsCustomer_'.(int)$id_customer.'-'.(int)$id_cart_rule;

@@ -2063,18 +2063,33 @@ class AdminOrdersControllerCore extends AdminController
                         $order_invoice->update();
                     }
 
-                    // Update amounts of order
-                    $order->total_discounts = ($order->total_discounts - $order_cart_rule->value) > 0 ? ($order->total_discounts - $order_cart_rule->value) : 0;
-                    $order->total_discounts_tax_incl = ($order->total_discounts_tax_incl - $order_cart_rule->value) > 0 ? ($order->total_discounts_tax_incl - $order_cart_rule->value) : 0;
-                    $order->total_discounts_tax_excl = ($order->total_discounts_tax_excl - $order_cart_rule->value_tax_excl) > 0 ? ($order->total_discounts_tax_excl - $order_cart_rule->value_tax_excl) : 0;
+                    if ($order_cart_rule->delete()) {
+                        $orderTotalDiscountTE = $order->getCartRulesTotal();
+                        $orderTotalDiscountTI = $order->getCartRulesTotal(true);
 
-                    $order->total_paid += Tools::ps_round($order_cart_rule->value, _PS_PRICE_COMPUTE_PRECISION_);
-                    $order->total_paid_tax_incl += Tools::ps_round($order_cart_rule->value, _PS_PRICE_COMPUTE_PRECISION_);
-                    $order->total_paid_tax_excl += Tools::ps_round($order_cart_rule->value_tax_excl, _PS_PRICE_COMPUTE_PRECISION_);
+                        $totalRoomsAndServicesTI = $order->getTotalProductsWithTaxes();
+                        $totalRoomsAndServicesTE = $order->getTotalProductsWithoutTaxes();
 
-                    // Delete Order Cart Rule and update Order
-                    $order_cart_rule->delete();
-                    $order->update();
+                        $objBookingDemand = new HotelBookingDemands();
+                        $totalExtraDemandsTE = $objBookingDemand->getRoomTypeBookingExtraDemands($order->id, 0, 0, 0, 0, 0, 1, 0);
+                        $totalExtraDemandsTI = $objBookingDemand->getRoomTypeBookingExtraDemands($order->id, 0, 0, 0, 0, 0, 1, 1);
+
+                        // Update amounts of order
+                        $order->total_discounts = ($order->total_discounts - $order_cart_rule->value) > 0 ? ($order->total_discounts - $order_cart_rule->value) : 0;
+                        $order->total_discounts_tax_incl = ($order->total_discounts_tax_incl - $order_cart_rule->value) > 0 ? ($order->total_discounts_tax_incl - $order_cart_rule->value) : 0;
+                        $order->total_discounts_tax_excl = ($order->total_discounts_tax_excl - $order_cart_rule->value_tax_excl) > 0 ? ($order->total_discounts_tax_excl - $order_cart_rule->value_tax_excl) : 0;
+
+                        // Update order with new amounts after removing cart rule
+                        $totalOrderTE = ($totalExtraDemandsTE + $totalRoomsAndServicesTE) - $orderTotalDiscountTE;
+                        $totalOrderTE = $totalOrderTE > 0 ? $totalOrderTE : 0;
+                        $totalOrderTI = ($totalExtraDemandsTI + $totalRoomsAndServicesTI) - $orderTotalDiscountTI;
+                        $totalOrderTI = $totalOrderTI > 0 ? $totalOrderTI : 0;
+
+                        $order->total_paid = Tools::ps_round($totalOrderTI, _PS_PRICE_COMPUTE_PRECISION_);
+                        $order->total_paid_tax_incl = Tools::ps_round($totalOrderTI, _PS_PRICE_COMPUTE_PRECISION_);
+                        $order->total_paid_tax_excl = Tools::ps_round($totalOrderTE, _PS_PRICE_COMPUTE_PRECISION_);
+                        $order->update();
+                    }
 
                     Tools::redirectAdmin(self::$currentIndex.'&id_order='.$order->id.'&vieworder&conf=4&token='.$this->token);
                 } else {
@@ -2779,7 +2794,7 @@ class AdminOrdersControllerCore extends AdminController
         $totalDemandsPriceTE = 0;
         $totalDemandsPriceTI = 0;
         $totalRefundedRooms = 0;
-        $bookingAutoAddedServices = array();
+        $orderConvenienceFeeServices = array();
         if ($order_detail_data = $objBookingDetail->getOrderFormatedBookinInfoByIdOrder($order->id)) {
             $objBookingDemand = new HotelBookingDemands();
             $objHotelRoomType = new HotelRoomType();
@@ -2931,11 +2946,11 @@ class AdminOrdersControllerCore extends AdminController
             foreach($orderedRooms as $orderedRoom) {
                 if (isset($orderedRoom['additional_services']) && $orderedRoom['additional_services']) {
                     foreach ($orderedRoom['additional_services'] as $service) {
-                        if (isset($bookingAutoAddedServices[$service['id_product']])) {
-                            $bookingAutoAddedServices[$service['id_product']]['total_price_tax_excl'] += $service['total_price_tax_excl'];
+                        if (isset($orderConvenienceFeeServices[$service['id_product']])) {
+                            $orderConvenienceFeeServices[$service['id_product']]['total_price_tax_excl'] += $service['total_price_tax_excl'];
                         } else {
-                            $bookingAutoAddedServices[$service['id_product']]['name'] = $service['name'];
-                            $bookingAutoAddedServices[$service['id_product']]['total_price_tax_excl'] = $service['total_price_tax_excl'];
+                            $orderConvenienceFeeServices[$service['id_product']]['name'] = $service['name'];
+                            $orderConvenienceFeeServices[$service['id_product']]['total_price_tax_excl'] = $service['total_price_tax_excl'];
                         }
                     }
                 }
@@ -3098,7 +3113,7 @@ class AdminOrdersControllerCore extends AdminController
             'ROOM_STATUS_CHECKED_IN' => HotelBookingDetail::STATUS_CHECKED_IN,
             'ROOM_STATUS_CHECKED_OUT' => HotelBookingDetail::STATUS_CHECKED_OUT,
             'ALLOTMENT_MANUAL' => HotelBookingDetail::ALLOTMENT_MANUAL,
-            'booking_auto_added_services' => $bookingAutoAddedServices,
+            'order_convenience_fee_services' => $orderConvenienceFeeServices,
         );
 
         return parent::renderView();
@@ -4467,9 +4482,9 @@ class AdminOrdersControllerCore extends AdminController
             // Create OrderCartRule
             $rule = new CartRule($cart_rule['id_cart_rule']);
             $values = array(
-                    'tax_incl' => $rule->getContextualValue(true),
-                    'tax_excl' => $rule->getContextualValue(false)
-                    );
+                'tax_incl' => $rule->getContextualValue(true),
+                'tax_excl' => $rule->getContextualValue(false)
+            );
             $order_cart_rule = new OrderCartRule();
             $order_cart_rule->id_order = $order->id;
             $order_cart_rule->id_cart_rule = $cart_rule['id_cart_rule'];
@@ -5042,7 +5057,6 @@ class AdminOrdersControllerCore extends AdminController
                     }
                 }
                 // change order total save
-                ppp($order);
                 $order->save();
             }
 
@@ -5563,6 +5577,24 @@ class AdminOrdersControllerCore extends AdminController
         // Reducing the quantity from the cart after removing the room from the order
         $objCart = new Cart($objBookingDetail->id_cart);
         $objCart->updateQty($product_quantity, $objBookingDetail->id_product, null, false, 'down', 0, null, true);
+
+        // If no rooms left in the order, delete all cart rules of the order
+        if (!$objBookingDetail->getBookingDataByOrderId($order->id)) {
+            if ($orderDiscounts = $order->getCartRules()) {
+                foreach ($orderDiscounts as $orderDiscount) {
+                    $objOrderCartRule = new OrderCartRule($orderDiscount['id_order_cart_rule']);
+                    $objOrderCartRule->delete();
+                }
+
+                $order->total_discounts = 0;
+                $order->total_discounts_tax_incl = 0;
+                $order->total_discounts_tax_excl = 0;
+                $order->total_paid = 0;
+                $order->total_paid_tax_incl = 0;
+                $order->total_paid_tax_excl = 0;
+                $order->update();
+            }
+        }
 
         // Assign to smarty informations in order to show the new product line
         $this->context->smarty->assign(array(
