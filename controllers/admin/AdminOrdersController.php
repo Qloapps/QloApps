@@ -2238,9 +2238,15 @@ class AdminOrdersControllerCore extends AdminController
                                 $order->total_discounts = Tools::ps_round($order->total_discounts + $order_cart_rule->value, _PS_PRICE_COMPUTE_PRECISION_);
                                 $order->total_discounts_tax_incl = Tools::ps_round($order->total_discounts_tax_incl + $order_cart_rule->value, _PS_PRICE_COMPUTE_PRECISION_);
                                 $order->total_discounts_tax_excl = Tools::ps_round($order->total_discounts_tax_excl + $order_cart_rule->value_tax_excl, _PS_PRICE_COMPUTE_PRECISION_);
+
                                 $order->total_paid = Tools::ps_round($order->total_paid - $order_cart_rule->value, _PS_PRICE_COMPUTE_PRECISION_);
+                                $order->total_paid = $order->total_paid > 0 ? $order->total_paid : 0;
+
                                 $order->total_paid_tax_incl = Tools::ps_round($order->total_paid_tax_incl - $order_cart_rule->value, _PS_PRICE_COMPUTE_PRECISION_);
+                                $order->total_paid_tax_incl = $order->total_paid_tax_incl > 0 ? $order->total_paid_tax_incl : 0;
+
                                 $order->total_paid_tax_excl = Tools::ps_round($order->total_paid_tax_excl - $order_cart_rule->value_tax_excl, _PS_PRICE_COMPUTE_PRECISION_);
+                                $order->total_paid_tax_excl = $order->total_paid_tax_excl > 0 ? $order->total_paid_tax_excl : 0;
                             }
 
                             // Update Order
@@ -3912,9 +3918,15 @@ class AdminOrdersControllerCore extends AdminController
             $order->total_discounts += $order_cart_rule->value;
             $order->total_discounts_tax_incl += $order_cart_rule->value;
             $order->total_discounts_tax_excl += $order_cart_rule->value_tax_excl;
+
             $order->total_paid -= $order_cart_rule->value;
+            $order->total_paid = $order->total_paid > 0 ? $order->total_paid : 0;
+
             $order->total_paid_tax_incl -= $order_cart_rule->value;
+            $order->total_paid_tax_incl = $order->total_paid_tax_incl > 0 ? $order->total_paid_tax_incl : 0;
+
             $order->total_paid_tax_excl -= $order_cart_rule->value_tax_excl;
+            $order->total_paid_tax_excl = $order->total_paid_tax_excl > 0 ? $order->total_paid_tax_excl : 0;
         }
 
         // Update Order
@@ -4470,9 +4482,15 @@ class AdminOrdersControllerCore extends AdminController
             $order->total_discounts += $order_cart_rule->value;
             $order->total_discounts_tax_incl += $order_cart_rule->value;
             $order->total_discounts_tax_excl += $order_cart_rule->value_tax_excl;
+
             $order->total_paid -= $order_cart_rule->value;
+            $order->total_paid = $order->total_paid > 0 ? $order->total_paid : 0;
+
             $order->total_paid_tax_incl -= $order_cart_rule->value;
+            $order->total_paid_tax_incl = $order->total_paid_tax_incl > 0 ? $order->total_paid_tax_incl : 0;
+
             $order->total_paid_tax_excl -= $order_cart_rule->value_tax_excl;
+            $order->total_paid_tax_excl = $order->total_paid_tax_excl > 0 ? $order->total_paid_tax_excl : 0;
         }
 
         // Update Order
@@ -4822,10 +4840,15 @@ class AdminOrdersControllerCore extends AdminController
             // Apply changes on Order
             $order = new Order($order_detail->id_order);
             $order->total_products += (float)$diff_price_tax_excl;
+            $order->total_products = $order->total_products > 0 ? $order->total_products : 0;
             $order->total_products_wt += (float)$diff_price_tax_incl;
+            $order->total_products_wt = $order->total_products_wt > 0 ? $order->total_products_wt : 0;
             $order->total_paid += (float)$diff_price_tax_incl;
+            $order->total_paid = $order->total_paid > 0 ? $order->total_paid : 0;
             $order->total_paid_tax_excl += (float)$diff_price_tax_excl;
+            $order->total_paid_tax_excl = $order->total_paid_tax_excl > 0 ? $order->total_paid_tax_excl : 0;
             $order->total_paid_tax_incl += (float)$diff_price_tax_incl;
+            $order->total_paid_tax_incl = $order->total_paid_tax_incl > 0 ? $order->total_paid_tax_incl : 0;
 
             $res &= $order->update();
         }
@@ -5019,6 +5042,7 @@ class AdminOrdersControllerCore extends AdminController
                     }
                 }
                 // change order total save
+                ppp($order);
                 $order->save();
             }
 
@@ -5192,10 +5216,15 @@ class AdminOrdersControllerCore extends AdminController
             // Apply changes on Order
             $order = new Order($order_detail->id_order);
             $order->total_products += $diff_price_tax_excl;
+            $order->total_products = $order->total_products > 0 ? $order->total_products : 0;
             $order->total_products_wt += $diff_price_tax_incl;
+            $order->total_products_wt = $order->total_products_wt > 0 ? $order->total_products_wt : 0;
             $order->total_paid += $diff_price_tax_incl;
+            $order->total_paid = $order->total_paid > 0 ? $order->total_paid : 0;
             $order->total_paid_tax_excl += $diff_price_tax_excl;
+            $order->total_paid_tax_excl = $order->total_paid_tax_excl > 0 ? $order->total_paid_tax_excl : 0;
             $order->total_paid_tax_incl += $diff_price_tax_incl;
+            $order->total_paid_tax_incl = $order->total_paid_tax_incl > 0 ? $order->total_paid_tax_incl : 0;
 
             $res &= $order->update();
         }
@@ -5584,10 +5613,19 @@ class AdminOrdersControllerCore extends AdminController
 
         // Update Order
         $order->total_paid -= Tools::ps_round($order_detail->total_price_tax_incl, _PS_PRICE_COMPUTE_PRECISION_);
+        $order->total_paid = $order->total_paid > 0 ? $order->total_paid : 0;
+
         $order->total_paid_tax_incl -= Tools::ps_round($order_detail->total_price_tax_incl, _PS_PRICE_COMPUTE_PRECISION_);
+        $order->total_paid_tax_incl = $order->total_paid_tax_incl > 0 ? $order->total_paid_tax_incl : 0;
+
         $order->total_paid_tax_excl -= Tools::ps_round($order_detail->total_price_tax_excl, _PS_PRICE_COMPUTE_PRECISION_);
+        $order->total_paid_tax_excl = $order->total_paid_tax_excl > 0 ? $order->total_paid_tax_excl : 0;
+
         $order->total_products -= Tools::ps_round($order_detail->total_price_tax_excl, _PS_PRICE_COMPUTE_PRECISION_);
+        $order->total_products = $order->total_products > 0 ? $order->total_products : 0;
+
         $order->total_products_wt -= Tools::ps_round($order_detail->total_price_tax_incl, _PS_PRICE_COMPUTE_PRECISION_);
+        $order->total_products_wt = $order->total_products_wt > 0 ? $order->total_products_wt : 0;
 
         $res &= $order->update();
 
@@ -6364,10 +6402,19 @@ class AdminOrdersControllerCore extends AdminController
                         }
 
                         $order->total_products = Tools::ps_round((float)($order->total_products + $priceDiffTaxExcl), _PS_PRICE_COMPUTE_PRECISION_);
+                        $order->total_products = $order->total_products > 0 ? $order->total_products : 0;
+
                         $order->total_products_wt = Tools::ps_round((float)($order->total_products_wt + $priceDiffTaxIncl), _PS_PRICE_COMPUTE_PRECISION_);
+                        $order->total_products_wt = $order->total_products_wt > 0 ? $order->total_products_wt : 0;
+
                         $order->total_paid_tax_excl = Tools::ps_round((float)($order->total_paid_tax_excl + $priceDiffTaxExcl), _PS_PRICE_COMPUTE_PRECISION_);
+                        $order->total_paid_tax_excl = $order->total_paid_tax_excl > 0 ? $order->total_paid_tax_excl : 0;
+
                         $order->total_paid_tax_incl = Tools::ps_round((float)($order->total_paid_tax_incl + $priceDiffTaxIncl), _PS_PRICE_COMPUTE_PRECISION_);
+                        $order->total_paid_tax_incl = $order->total_paid_tax_incl > 0 ? $order->total_paid_tax_incl : 0;
+
                         $order->total_paid = Tools::ps_round((float)($order->total_paid + $priceDiffTaxIncl), _PS_PRICE_COMPUTE_PRECISION_);
+                        $order->total_paid = $order->total_paid > 0 ? $order->total_paid : 0;
 
                         $res &= $order->update();
                     }
@@ -6447,10 +6494,19 @@ class AdminOrdersControllerCore extends AdminController
                     }
 
                     $order->total_products = Tools::ps_round((float)($order->total_products - $priceTaxExcl), _PS_PRICE_COMPUTE_PRECISION_);
+                    $order->total_products = $order->total_products > 0 ? $order->total_products : 0;
+
                     $order->total_products_wt = Tools::ps_round((float)($order->total_products_wt - $priceTaxIncl), _PS_PRICE_COMPUTE_PRECISION_);
+                    $order->total_products_wt = $order->total_products_wt > 0 ? $order->total_products_wt : 0;
+
                     $order->total_paid_tax_excl = Tools::ps_round((float)($order->total_paid_tax_excl - $priceTaxExcl), _PS_PRICE_COMPUTE_PRECISION_);
+                    $order->total_paid_tax_excl = $order->total_paid_tax_excl > 0 ? $order->total_paid_tax_excl : 0;
+
                     $order->total_paid_tax_incl = Tools::ps_round((float)($order->total_paid_tax_incl - $priceTaxIncl), _PS_PRICE_COMPUTE_PRECISION_);
+                    $order->total_paid_tax_incl = $order->total_paid_tax_incl > 0 ? $order->total_paid_tax_incl : 0;
+
                     $order->total_paid = Tools::ps_round((float)($order->total_paid - $priceTaxIncl), _PS_PRICE_COMPUTE_PRECISION_);
+                    $order->total_paid = $order->total_paid > 0 ? $order->total_paid : 0;
 
                     $res &= $order->update();
                 }
