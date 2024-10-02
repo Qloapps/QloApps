@@ -191,14 +191,14 @@ abstract class PaymentModuleCore extends Module
 
         if (!$this->active) {
             PrestaShopLogger::addLog('PaymentModule::validateOrder - Module is not active', 3, null, 'Cart', (int)$id_cart, true);
-            die(Tools::displayError());
+            die(Tools::displayError('Error in processing order. Payment module is not active.'));
         }
 
         // Does order already exists ?
         if (Validate::isLoadedObject($this->context->cart) && $this->context->cart->OrderExists() == false) {
             if ($secure_key !== false && $secure_key != $this->context->cart->secure_key) {
                 PrestaShopLogger::addLog('PaymentModule::validateOrder - Secure key does not match', 3, null, 'Cart', (int)$id_cart, true);
-                die(Tools::displayError());
+                die(Tools::displayError('Error processing order. Secure key does not match.'));
             }
 
             // For each package, generate an order
