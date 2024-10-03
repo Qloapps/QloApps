@@ -995,7 +995,6 @@ function setGuestOccupancy()
 
 // position dropdowns
 function setBookingSearchPositions() {
-    console.log('dasdas');
     // calculate available spaces
     let searchForm = $('#search_hotel_block_form');
 
