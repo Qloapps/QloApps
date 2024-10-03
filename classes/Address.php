@@ -539,10 +539,10 @@ class AddressCore extends ObjectModel
             cl.`name` AS `country_name`, s.`name` AS `state_name`
             FROM `'._DB_PREFIX_.'address` a
             LEFT JOIN `'._DB_PREFIX_.'country_lang` cl
-            ON cl.`id_country` = a.`id_country`
+            ON cl.`id_country` = a.`id_country` AND cl.`id_lang` ='.(int) $idLang.'
             LEFT JOIN `'._DB_PREFIX_.'state` s
-            ON s.`id_country` = cl.`id_country`
-            WHERE id_customer > 0 AND
+            ON s.`id_country` = cl.`id_country` AND s.`id_state` = a.`id_state`
+            WHERE id_customer > 0 AND a.`deleted` = 0 AND
                 (a.`address1` LIKE \'%'.$query.'%\' OR
                     a.`postcode` LIKE \'%'.$query.'%\' OR
                     a.`city` LIKE \'%'.$query.'%\' OR
