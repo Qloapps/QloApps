@@ -93,7 +93,7 @@ class Dashactivity extends Module
             array(
                 'dashactivity_config_form' => $this->renderConfigForm(),
                 'link' => $this->context->link,
-                'new_customer_filter_link' => $this->context->link->getAdminLink('AdminCustomers').'&customerFilter_date_add[]='.$date_from.'&customerFilter_date_add[]='.$date_to
+                'new_customer_filter_link' => $this->context->link->getAdminLink('AdminCustomers').'&customerFilter_a!date_add[]='.$date_from.'&customerFilter_a!date_add[]='.$date_to
             )
         );
 
