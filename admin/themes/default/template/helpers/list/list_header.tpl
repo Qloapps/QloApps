@@ -305,7 +305,7 @@
 															<select id="filter_input_{$key}" class="filter center" name="{$field_name}">
 																<option value="">-</option>
 																<option value="1" {if isset($smarty.post.$field_name) && $smarty.post.$field_name == 1} selected="selected"{elseif $params.value == 1} selected="selected" {/if}>{l s='Yes'}</option>
-																<option value="0" {if isset($smarty.post.$field_name) && $smarty.post.$field_name == 0} selected="selected"{elseif $params.value == 0 && $params.value != ''} selected="selected" {/if}>{l s='No'}</option>
+																<option value="0" {if isset($smarty.post.$field_name) && $smarty.post.$field_name != '' && $smarty.post.$field_name == 0} selected="selected"{elseif $params.value == 0 && $params.value != ''} selected="selected" {/if}>{l s='No'}</option>
 															</select>
 														{elseif $params.type == 'date' || $params.type == 'datetime'}
 															<div class="date_range">
@@ -387,7 +387,7 @@
 																		<option value="" {if $params.value == ''} selected="selected" {/if}>-</option>
 																		{if isset($params.list) && is_array($params.list)}
 																			{foreach $params.list AS $option_value => $option_display}
-																				<option value="{$option_value}" {if isset($smarty.post.$field_name) && $smarty.post.$field_name == $option_value} selected="selected"{elseif (string)$option_display === (string)$params.value ||  (string)$option_value === (string)$params.value} selected="selected"{/if}>{$option_display}</option>
+																				<option value="{$option_value}" {if isset($smarty.post.$field_name) && $smarty.post.$field_name != '' && $smarty.post.$field_name == $option_value} selected="selected"{elseif (string)$option_display === (string)$params.value ||  (string)$option_value === (string)$params.value} selected="selected"{/if}>{$option_display}</option>
 																			{/foreach}
 																		{/if}
 																	</select>

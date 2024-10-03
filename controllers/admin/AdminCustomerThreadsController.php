@@ -66,9 +66,8 @@ class AdminCustomerThreadsControllerCore extends AdminController
         $this->access_select = ' SELECT a.`id_customer_thread` FROM '._DB_PREFIX_.'customer_thread a';
         $this->access_join = ' LEFT JOIN '._DB_PREFIX_.'orders ord ON (a.id_order = ord.id_order)';
         $this->access_join .= ' LEFT JOIN '._DB_PREFIX_.'htl_booking_detail hbd ON (hbd.id_order = ord.id_order)';
-        $this->access_where = ' WHERE 1 ';
         if ($acsHtls = HotelBranchInformation::getProfileAccessedHotels($this->context->employee->id_profile, 1, 1)) {
-            $this->access_where .= ' AND IF(a.`id_order`, hbd.`id_hotel` IN ('.implode(',', $acsHtls).'), 1)';
+            $this->access_where = ' AND IF(a.`id_order`, hbd.`id_hotel` IN ('.implode(',', $acsHtls).'), 1)';
         }
 
         $this->fields_list = array(

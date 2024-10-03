@@ -141,6 +141,10 @@ class CustomerCore extends ObjectModel
     const STATUS_DELETED = 2;
 
     protected $webserviceParameters = array(
+        'objectMethods' => array(
+            'add' => 'addWs',
+            'update' => 'updateWs'
+        ),
         'fields' => array(
             'id_default_group' => array('xlink_resource' => 'groups'),
             'id_lang' => array('xlink_resource' => 'languages'),
@@ -150,6 +154,7 @@ class CustomerCore extends ObjectModel
             'secure_key' => array('setter' => null),
             'deleted' => array(),
             'passwd' => array('setter' => 'setWsPasswd'),
+            'phone' => array()
         ),
         'associations' => array(
             'groups' => array('resource' => 'group'),
@@ -208,6 +213,32 @@ class CustomerCore extends ObjectModel
         if ($this->email) {
             $this->phone = CartCustomerGuestDetail::getCustomerPhone($this->email);
         }
+
+        if (Configuration::get('PS_ONE_PHONE_AT_LEAST')) {
+            $this->webserviceParameters['fields']['phone']['required'] = true;
+        }
+    }
+
+    public function validateFields($die = true, $error_return = false)
+    {
+        if (isset($this->webservice_validation) && $this->webservice_validation) {
+            if (Configuration::get('PS_ONE_PHONE_AT_LEAST')) {
+                if (!$this->phone) {
+                    $message = Tools::displayError('Phone is required field.');
+                } else if (!Validate::isPhoneNumber(trim($this->phone))) {
+                    $message = Tools::displayError('Invalid phone.');
+                }
+            }
+
+            if (isset($message)) {
+                if ($die) {
+                    throw new PrestaShopException($message);
+                }
+                return $error_return ? $message : false;
+            }
+        }
+
+        return parent::validateFields($die, $error_return);
     }
 
     public function add($autodate = true, $null_values = true)
@@ -260,6 +291,24 @@ class CustomerCore extends ObjectModel
         }
 
         return parent::update(true);
+    }
+
+    public function addWs($autodate = true, $null_values = false)
+    {
+        if ($this->phone) {
+            CartCustomerGuestDetail::updateCustomerPhoneNumber($this->email, $this->phone);
+        }
+
+        return $this->add($autodate, $null_values);
+    }
+
+    public function updateWs($autodate = true, $null_values = false)
+    {
+        if ($this->phone) {
+            CartCustomerGuestDetail::updateCustomerPhoneNumber($this->email, $this->phone);
+        }
+
+        return $this->update($autodate, $null_values);
     }
 
     public function delete()
