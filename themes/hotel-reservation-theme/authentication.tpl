@@ -489,7 +489,7 @@
 						<input type="email" class="is_required validate form-control" data-validate="isEmail" id="email" name="email" value="{if isset($smarty.post.email)}{$smarty.post.email}{/if}" />
 					</div>
 					<div class="required form-group">
-						<label for="customer_phone">{l s='Phone'}</label>
+						<label for="customer_phone">{l s='Phone'} {if isset($one_phone_at_least) && $one_phone_at_least}<sup>*</sup>{/if}</label>
 						<input onkeyup="$('#phone').val(this.value);" class="is_required validate form-control" data-validate="isPhoneNumber" type="phone" name="customer_phone" id="customer_phone" value="{if isset($smarty.post.customer_phone)}{$smarty.post.customer_phone}{/if}" />
 					</div>
 					<div class="required password form-group">
