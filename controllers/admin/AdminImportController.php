@@ -2846,9 +2846,6 @@ class AdminImportControllerCore extends AdminController
 
                         if ($res && isset($customer_groups)) {
                             $customer->updateGroup($customer_groups);
-                            if ($phoneRequired) {
-                                CartCustomerGuestDetail::updateCustomerPhoneNumber($customer->email, $customer->phone);
-                            }
                         }
                     }
                 }
