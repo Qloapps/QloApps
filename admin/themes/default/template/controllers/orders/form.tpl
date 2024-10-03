@@ -705,10 +705,11 @@
 	}
 
 	function updateCartSummaryData(jsonSummary) {
-		$('#total_rooms').html(formatCurrency(parseFloat(jsonSummary.summary.total_rooms + jsonSummary.summary.total_extra_demands + jsonSummary.summary.total_additional_services + jsonSummary.summary.total_additional_services_auto_add), currency_format, currency_sign, currency_blank));
-		$('#total_vouchers').html(formatCurrency(parseFloat(jsonSummary.summary.total_discounts_tax_exc), currency_format, currency_sign, currency_blank));
+		var totalRooms = jsonSummary.summary.total_rooms + jsonSummary.summary.total_extra_demands + jsonSummary.summary.total_additional_services + jsonSummary.summary.total_additional_services_auto_add;
+		$('#total_rooms').html(formatCurrency(parseFloat(totalRooms), currency_format, currency_sign, currency_blank));
+		$('#total_vouchers').html(formatCurrency(parseFloat(jsonSummary.summary.total_discounts), currency_format, currency_sign, currency_blank));
 		$('#total_convenience_fees').html(formatCurrency(parseFloat(jsonSummary.summary.convenience_fee), currency_format, currency_sign, currency_blank));
-		$('#total_without_taxes').html(formatCurrency(parseFloat(jsonSummary.summary.total_price_without_tax), currency_format, currency_sign, currency_blank));
+		$('#total_without_taxes').html(formatCurrency(parseFloat(totalRooms + jsonSummary.summary.convenience_fee), currency_format, currency_sign, currency_blank));
 		// $('#total_service_products').html(formatCurrency(parseFloat(jsonSummary.summary.total_service_products), currency_format, currency_sign, currency_blank));
 		$('#total_taxes').html(formatCurrency(parseFloat(jsonSummary.summary.total_tax), currency_format, currency_sign, currency_blank));
 		$('#total_with_taxes').html(formatCurrency(parseFloat(jsonSummary.summary.total_price), currency_format, currency_sign, currency_blank));
@@ -1211,11 +1212,12 @@
 
 		shipping_price_selected_carrier = jsonSummary.summary.total_shipping;
 
-		$('#total_vouchers').html(formatCurrency(parseFloat(jsonSummary.summary.total_discounts_tax_exc), currency_format, currency_sign, currency_blank));
+		var totalRooms = jsonSummary.summary.total_rooms + jsonSummary.summary.total_extra_demands + jsonSummary.summary.total_additional_services + jsonSummary.summary.total_additional_services_auto_add;
+		$('#total_vouchers').html(formatCurrency(parseFloat(jsonSummary.summary.total_discounts), currency_format, currency_sign, currency_blank));
 		$('#total_taxes').html(formatCurrency(parseFloat(jsonSummary.summary.total_tax), currency_format, currency_sign, currency_blank));
-		$('#total_without_taxes').html(formatCurrency(parseFloat(jsonSummary.summary.total_price_without_tax), currency_format, currency_sign, currency_blank));
+		$('#total_without_taxes').html(formatCurrency(parseFloat(totalRooms + jsonSummary.summary.convenience_fee), currency_format, currency_sign, currency_blank));
 		$('#total_with_taxes').html(formatCurrency(parseFloat(jsonSummary.summary.total_price), currency_format, currency_sign, currency_blank));
-		$('#total_rooms').html(formatCurrency(parseFloat(jsonSummary.summary.total_rooms + jsonSummary.summary.total_extra_demands + jsonSummary.summary.total_additional_services + jsonSummary.summary.total_additional_services_auto_add), currency_format, currency_sign, currency_blank));
+		$('#total_rooms').html(formatCurrency(parseFloat(totalRooms), currency_format, currency_sign, currency_blank));
 		$('#total_convenience_fees').html(formatCurrency(parseFloat(jsonSummary.summary.convenience_fee), currency_format, currency_sign, currency_blank));
 		// $('#total_service_products').html(formatCurrency(parseFloat(jsonSummary.summary.total_service_products), currency_format, currency_sign, currency_blank));
 
@@ -2136,22 +2138,22 @@
 							<span id="total_convenience_fees" class="size_l"></span>
 						</div>
 					</div>
+					<div class="col-lg-2">
+						<div class="data-focus">
+							<span>{l s='Total (Tax excl.)'}</span><br/>
+							<span id="total_without_taxes" class="size_l"></span>
+						</div>
+					</div>
+					<div class="col-lg-2">
+						<div class="data-focus">
+							<span>{l s='Total taxes'}</span><br/>
+							<span id="total_taxes" class="size_l"></span>
+						</div>
+					</div>
                     <div class="col-lg-2">
                         <div class="data-focus">
-                            <span>{l s='Total vouchers (Tax excl.)'}</span><br/>
+                            <span>{l s='Total vouchers'}</span><br/>
                             <span id="total_vouchers" class="size_l text-danger"></span>
-                        </div>
-                    </div>
-                    <div class="col-lg-2">
-                        <div class="data-focus">
-                            <span>{l s='Total (Tax excl.)'}</span><br/>
-                            <span id="total_without_taxes" class="size_l"></span>
-                        </div>
-                    </div>
-                    <div class="col-lg-2">
-                        <div class="data-focus">
-                            <span>{l s='Total taxes'}</span><br/>
-                            <span id="total_taxes" class="size_l"></span>
                         </div>
                     </div>
                     <div class="col-lg-2">
