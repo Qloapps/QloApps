@@ -375,6 +375,10 @@ class AdminCustomersControllerCore extends AdminController
         /** @var Customer $obj */
         if (!($obj = $this->loadObject(true))) {
             return;
+        } else if ($this->object->deleted == Customer::STATUS_DELETED) {
+            $this->warnings[] = $this->l('This is a deleted customer and you cannot update the information of a deleted customer.');
+        } else if ($this->object->deleted == Customer::STATUS_BANNED) {
+            $this->warnings[] = $this->l('This is a banned customer and you cannot update the information of a banned customer.');
         }
 
         $genders = Gender::getGenders();
@@ -761,7 +765,7 @@ class AdminCustomersControllerCore extends AdminController
         $nbDaysNewCustomers = Validate::isUnsignedInt(Configuration::get('PS_KPI_NEW_CUSTOMERS_NB_DAYS')) ? Configuration::get('PS_KPI_NEW_CUSTOMERS_NB_DAYS') : 30;
         $date_from = date('Y-m-d', strtotime('-'.$nbDaysNewCustomers.' day'));
         $date_to = date('Y-m-d');
-        $helper->href = $this->context->link->getAdminLink('AdminCustomers').'&customerFilter_date_add[]='.$date_from.'&customerFilter_date_add[]='.$date_to;
+        $helper->href = $this->context->link->getAdminLink('AdminCustomers').'&customerFilter_a!date_add[]='.$date_from.'&customerFilter_a!date_add[]='.$date_to;
         $helper->subtitle = sprintf($this->l('%d Days', null, null, false), (int) $nbDaysNewCustomers);
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=total_new_customers';
         $helper->tooltip = $this->l('The total number of new customers who registered in given period of time.', null, null, false);
@@ -1114,6 +1118,14 @@ class AdminCustomersControllerCore extends AdminController
     public function processUpdate()
     {
         if (Validate::isLoadedObject($this->object)) {
+            if ($this->object->deleted == Customer::STATUS_DELETED) {
+                $this->errors[] = $this->l('You can not update a deleted customer.');
+                return false;
+            } else if ($this->object->deleted == Customer::STATUS_BANNED) {
+                $this->errors[] = $this->l('You can not update a banned customer.');
+                return false;
+            }
+
             $customer_email = trim(strval(Tools::getValue('email')));
 
             // check if e-mail already used
