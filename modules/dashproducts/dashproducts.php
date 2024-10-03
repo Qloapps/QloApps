@@ -262,7 +262,7 @@ class DashProducts extends Module
 			(!is_null($id_hotel) ? HotelBranchInformation::addHotelRestriction($id_hotel, 'hbd') : '').'
 			GROUP BY hbd.`id_product`
 			ORDER BY `sales` DESC
-			LIMIT '.(int) Configuration::get('DASHPRODUCT_NBR_SHOW_BEST_SELLER', 10)
+			LIMIT '.(int) Configuration::get('DASHPRODUCT_NBR_SHOW_BEST_SELLER')
 		);
 
 		$body = array();
@@ -366,6 +366,7 @@ class DashProducts extends Module
 			$products = $this->getTotalViewed($date_from, $date_to, (int)Configuration::get('DASHPRODUCT_NBR_SHOW_MOST_VIEWED'), $id_hotel);
 			$body = array();
 			if (is_array($products) && count($products)) {
+				$objHotelRoomType = new HotelRoomType();
 				foreach ($products as $product) {
 					$product_obj = new Product((int)$product['id_object'], true, $this->context->language->id);
 					if (!Validate::isLoadedObject($product_obj)) {
@@ -379,8 +380,8 @@ class DashProducts extends Module
 						$img = ImageManager::thumbnail($path_to_image, 'product_mini_'.$product_obj->id.'.'.$this->context->controller->imageType, 45, $this->context->controller->imageType);
 					}
 
-					$objHotelRoomType = new HotelRoomType($product_obj->id);
-					$objHotelBranch = new HotelBranchInformation($objHotelRoomType->id_hotel, $this->context->language->id);
+					$roomTypeInfo = $objHotelRoomType->getRoomTypeInfoByIdProduct($product_obj->id);
+					$objHotelBranch = new HotelBranchInformation($roomTypeInfo['id_hotel'], $this->context->language->id);
 
 					$tr = array();
 					$tr[] = array(
