@@ -934,11 +934,11 @@ class AdminControllerCore extends Controller
                 } else {
                     if (isset($field['validation']) && $field['validation'] && method_exists('Validate', $field['validation'])) {
                         $validation = $field['validation'];
-                    } else {
-                        $validation = 'isValidSearch';
                     }
                     if (isset($value) && ($value !== '' || !$value === 0)) {
-                        if (!Validate::$validation($value)) {
+                        if (preg_match('/¤|\|/', $value)) {
+                            $this->errors[] = sprintf(Tools::displayError('The %s field is invalid'), $field['title']);
+                        } elseif (isset($validation) && !Validate::$validation($value)) {
                             $this->errors[] = sprintf(Tools::displayError('The %s field is invalid'), $field['title']);
                         }
                     }
