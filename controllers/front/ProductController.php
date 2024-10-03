@@ -350,7 +350,7 @@ class ProductControllerCore extends FrontController
                     }
 
                     if ($preparationTime
-                        && strtotime('+ '.$preparationTime.' day') >= strtotime($date_from)
+                        && strtotime(date('Y-m-d', strtotime('+'. ($preparationTime) .' days'))) > strtotime($date_from)
                     ) {
                         $date_from = date('Y-m-d', strtotime('+ '.$preparationTime.' day'));
                         if (strtotime($date_from) >= strtotime($date_to)) {
@@ -1278,8 +1278,8 @@ class ProductControllerCore extends FrontController
     {
         $response = array('status' => false);
         $idProduct = (int) Tools::getValue('id_product');
-        $dateFrom = Tools::getValue('date_from');
-        $dateTo = Tools::getValue('date_to');
+        $dateFrom = Tools::getValue('room_check_in');
+        $dateTo = Tools::getValue('room_check_out');
         $occupancy = Tools::getValue('occupancy');
         if (Configuration::get('PS_FRONT_ROOM_UNIT_SELECTION_TYPE') == HotelBookingDetail::PS_ROOM_UNIT_SELECTION_TYPE_OCCUPANCY) {
             if (!Validate::isOccupancy($occupancy)) {
@@ -1289,8 +1289,8 @@ class ProductControllerCore extends FrontController
         $roomTypeDemands = Tools::getValue('room_type_demands');
         $roomServiceProducts = Tools::getValue('room_service_products');
 
-        $dateFrom = date('Y-m-d', strtotime($dateFrom));
-        $dateTo = date('Y-m-d', strtotime($dateTo));
+        $dateFrom = date('Y-m-d H:i:s', strtotime($dateFrom));
+        $dateTo = date('Y-m-d H:i:s', strtotime($dateTo));
 
         $this->assignServiceProductVars();
         if ($this->assignBookingFormVars(

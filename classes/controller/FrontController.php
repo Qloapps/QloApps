@@ -1624,26 +1624,8 @@ class FrontControllerCore extends Controller
         if ($this->useMobileTheme()) {
             $this->setMobileTemplate($default_template);
         } else {
-            $template = $this->getOverrideTemplate();
-            if ($template) {
-                parent::setTemplate($template);
-            } else {
-                parent::setTemplate($default_template);
-            }
+            parent::setTemplate($default_template);
         }
-    }
-
-    /**
-     * Returns an overridden template path (if any) for this controller.
-     * If not overridden, will return false. This method can be easily overriden in a
-     * specific controller.
-     *
-    * @since 1.5.0.13
-    * @return string|bool
-    */
-    public function getOverrideTemplate()
-    {
-        return Hook::exec('DisplayOverrideTemplate', array('controller' => $this));
     }
 
     /**

@@ -207,7 +207,7 @@ class AdminCartsControllerCore extends AdminController
         $date_from = date(Context::getContext()->language->date_format_lite, strtotime('-2 day'));
         $date_to = date(Context::getContext()->language->date_format_lite, strtotime('-1 day'));
         $helper->subtitle = sprintf($this->l('From %s to %s', null, null, false), $date_from, $date_to);
-        $helper->href = $this->context->link->getAdminLink('AdminCarts').'&action=filterOnlyAbandonedCarts&date_from='.$date_from.'&date_to='.$date_to;
+        $helper->href = $this->context->link->getAdminLink('AdminCarts').'&action=filterOnlyAbandonedCarts&date_from='.date('Y-m-d', strtotime('-2 day')).'&date_to='.date('Y-m-d', strtotime('-1 day'));
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=abandoned_cart';
         $this->kpis[] = $helper;
 
@@ -937,8 +937,8 @@ class AdminCartsControllerCore extends AdminController
 
         $this->context->cart = new Cart($id_cart);
 
-        $date_from = date('Y-m-d', strtotime($date_from));
-        $date_to = date('Y-m-d', strtotime($date_to));
+        $date_from = date('Y-m-d H:i:s', strtotime($date_from));
+        $date_to = date('Y-m-d H:i:s', strtotime($date_to));
 
         if ($this->context->cart->id_currency != (int)Configuration::get('PS_CURRENCY_DEFAULT')) {
             $currency = Currency::getCurrencyInstance($this->context->cart->id_currency);
@@ -1114,14 +1114,11 @@ class AdminCartsControllerCore extends AdminController
                     $dateTo,
                     $idRoom
                 )) {
-                    $selectedRoomServiceProduct['selected_service'] = $objRoomTypeServiceProductCartDetail->getServiceProductsInCart(
-                        $idCart,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
+                    $selectedRoomServiceProduct['selected_service'] = $objRoomTypeServiceProductCartDetail->getRoomServiceProducts(
                         $selectedRoomServiceProduct['id'],
+                        0,
+                        null,
+                        null
                     );
                 }
                 $this->context->smarty->assign(array(
