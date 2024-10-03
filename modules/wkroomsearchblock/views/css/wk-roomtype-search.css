@@ -69,7 +69,7 @@
         min-height: 45px;
       }
 @media (max-width: 767px) {
-  .header-rmsearch-wrapper #search_hotel_block_form.grid {
+  .header-rmsearch-wrapper #search_hotel_block_form .grid {
     grid-template-columns: 1fr;
     column-gap: 0px;
   }

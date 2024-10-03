@@ -593,6 +593,7 @@ $(document).ready(function() {
 
     $(document).on('click', '.booking_occupancy_wrapper .remove-room-link', function(e) {
         e.preventDefault();
+        e.stopPropagation();
 
 		booking_occupancy_inner = $(this).closest('.booking_occupancy_inner');
         $(this).closest('.occupancy_info_block').remove();
@@ -780,8 +781,8 @@ $(document).ready(function() {
                     occupancy_block += '</div>';
                 occupancy_block += '</div>';
             occupancy_block += '</div>';
+            occupancy_block += '<hr class="occupancy-info-separator col-sm-12">';
         occupancy_block += '</div>';
-        occupancy_block += '<hr class="occupancy-info-separator col-sm-12">';
 
         $(booking_occupancy_wrapper).find('.booking_occupancy_inner').append(occupancy_block);
 
@@ -934,23 +935,17 @@ $(document).ready(function() {
 
     function refreshStatsData()
     {
-        var search_id_room_type = $("#search_id_room_type").val();
-        var search_id_hotel = $("#search_id_hotel").val();
-        var search_date_from = $("#search_date_from").val();
-        var search_date_to = $("#search_date_to").val();
+        var formData = new FormData($('form#room-search-form').get(0));
+        formData.append('ajax', true);
+        formData.append('action', 'getBookingStats');
 
         $.ajax({
             url: rooms_booking_url,
             type: 'POST',
             dataType: 'JSON',
-            data: {
-                ajax: true,
-                action: 'getBookingStats',
-                search_id_room_type: search_id_room_type,
-                search_id_hotel: search_id_hotel,
-                search_date_from: search_date_from,
-                search_date_to: search_date_to,
-            },
+            data: formData,
+            processData: false,
+            contentType: false,
             success: function(result) {
                 if (result.success) {
                     $(".htl_room_data_cont").html(result.data.stats_panel);

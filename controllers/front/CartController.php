@@ -156,8 +156,8 @@ class CartControllerCore extends FrontController
             // now get updated available rooms
             $date_from = Tools::getValue('dateFrom');
             $date_to = Tools::getValue('dateTo');
-            $date_from = date("Y-m-d", strtotime($date_from));
-            $date_to = date("Y-m-d", strtotime($date_to));
+            $date_from = date("Y-m-d H:i:s", strtotime($date_from));
+            $date_to = date("Y-m-d H:i:s", strtotime($date_to));
             $objRoomType = new HotelRoomType();
             if ($roomTypeInfo = $objRoomType->getRoomTypeInfoByIdProduct($this->id_product)) {
                 if ($id_hotel = $roomTypeInfo['id_hotel']) {
@@ -314,8 +314,8 @@ class CartControllerCore extends FrontController
                 if ($roomTypeInfo = $objRoomType->getRoomTypeInfoByIdProduct($this->id_product)) {
                     $date_from = Tools::getValue('dateFrom');
                     $date_to = Tools::getValue('dateTo');
-                    $date_from = date("Y-m-d", strtotime($date_from));
-                    $date_to = date("Y-m-d", strtotime($date_to));
+                    $date_from = date("Y-m-d H:i:s", strtotime($date_from));
+                    $date_to = date("Y-m-d H:i:s", strtotime($date_to));
                     $serviceProducts = json_decode(Tools::getValue('serviceProducts'),true);
 
                     // valdiate occupancy if providede
@@ -373,6 +373,7 @@ class CartControllerCore extends FrontController
                                 $this->errors[] = Tools::displayError('You can\'t book room after date '.$maxOrdDate);
                             }
                         }
+
                         if (!$this->errors) {
                             $objBookingDetail = new HotelBookingDetail();
                             $num_days = $objBookingDetail->getNumberOfDays($date_from, $date_to);

@@ -671,8 +671,8 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
             }
         }
 
-        $date_from = date("Y-m-d", strtotime($date_from));
-        $date_to = date("Y-m-d", strtotime($date_to));
+        $date_from = date("Y-m-d H:i:s", strtotime($date_from));
+        $date_to = date("Y-m-d H:i:s", strtotime($date_to));
 
         $search_id_room_type = Tools::getValue('search_id_room_type');
         $search_id_hotel = Tools::getValue('search_id_hotel');

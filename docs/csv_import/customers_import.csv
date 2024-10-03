@@ -1,10 +1,10 @@
-Customer ID;Active (0/1);Titles ID (Mr = 1, Mrs = 2, else 0);Email *;Password *;Birthday (yyyy-mm-dd);Last Name *;First Name *;Newsletter (0/1);Opt-in (0/1);Groups (x,y,z...);Default Group ID
-1;1;1;peterpan@qloapps.com;123456789;1987-04-02;Pan;Peter;1;0;Customer;3
-2;1;2;monkeydluffy@qloapps.com;123456789;1989-11-12;Luffy;Monkey D;1;0;Customer;3
-3;1;2;tigerlily@qloapps.com;123456789;1982-02-28;Lily;Tiger;1;0;Customer;3
-4;1;1;jameshook@qloapps.com;123456789;1952-12-04;Hook;James;0;1;Guest;2
-5;1;2;tinkerbell@qloapps.com;123456789;1900-01-01;Bell;Tinker;1;1;Customer;3
-6;1;1;bobsmee@qloapps.com;123456789;1971-10-21;Smee;Bob;1;1;Customer;3
-7;1;1;tictaccrocodile@qloapps.com;123456789;1991-09-27;Crocodile;Tictac;0;0;Guest;2
-8;1;1;jackbanning@qloapps.com;123456789;2003-07-05;Banning;Jack;0;0;Visitor;1
-9;0;2;maggiedoe@qloapps.com;123456789;2006-02-27;Doe;Maggie;0;0;Visitor;1
+Customer ID;Active (0/1);Titles ID (Mr = 1, Mrs = 2, else 0);Email *;Password *;Birthday (yyyy-mm-dd);Last Name *;First Name *;Phone;Newsletter (0/1);Opt-in (0/1);Groups (x,y,z...);Default Group ID
+1;1;1;peterpan@qloapps.com;123456789;1987-04-02;Pan;Peter;1234567890;1;0;Customer;3
+2;1;2;monkeydluffy@qloapps.com;123456789;1989-11-12;Luffy;Monkey D;1234567890;1;0;Customer;3
+3;1;2;tigerlily@qloapps.com;123456789;1982-02-28;Lily;Tiger;1234567890;1;0;Customer;3
+4;1;1;jameshook@qloapps.com;123456789;1952-12-04;Hook;James;1234567890;0;1;Guest;2
+5;1;2;tinkerbell@qloapps.com;123456789;1900-01-01;Bell;Tinker;1234567890;1;1;Customer;3
+6;1;1;bobsmee@qloapps.com;123456789;1971-10-21;Smee;Bob;1234567890;1;1;Customer;3
+7;1;1;tictaccrocodile@qloapps.com;123456789;1991-09-27;Crocodile;Tictac;1234567890;0;0;Guest;2
+8;1;1;jackbanning@qloapps.com;123456789;2003-07-05;Banning;Jack;1234567890;0;0;Visitor;1
+9;0;2;maggiedoe@qloapps.com;123456789;2006-02-27;Doe;Maggie;1234567890;0;0;Visitor;1
