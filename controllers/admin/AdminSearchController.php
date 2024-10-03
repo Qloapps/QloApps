@@ -238,24 +238,13 @@ class AdminSearchControllerCore extends AdminController
         ) {
             $objRoomType = new HotelRoomType();
             $accessibleHotels = HotelBranchInformation::getProfileAccessedHotels($this->context->employee->id_profile, 1, 1);
-            $objRoomTypeServiceProduct = new RoomTypeServiceProduct();
             foreach ($this->_list['products'] as $key => $product) {
                 if ($roomInfo = $objRoomType->getRoomTypeInfoByIdProduct($product['id_product'])) {
                     if (!in_array($roomInfo['id_hotel'], $accessibleHotels)) {
                         unset($this->_list['products'][$key]);
                     }
-                } else if ($associatedData = $objRoomTypeServiceProduct->getAssociatedHotelsAndRoomType($product['id_product'])) {
-                    $count = 0;
-                    foreach ($associatedData['room_type'] as $id_room_type) {
-                        $objRoomType = new HotelRoomType($id_room_type);
-                        if (in_array($objRoomType->id_hotel, $accessibleHotels)) {
-                            $count += 1;
-                        }
-                    }
-
-                    if ($count) {
-                        $this->_list['service_products'][] = $this->_list['products'][$key];
-                    }
+                } else if (!Product::isBookingProduct($product['id_product'])) {
+                    $this->_list['service_products'][] = $this->_list['products'][$key];
 
                     unset($this->_list['products'][$key]);
                 }
