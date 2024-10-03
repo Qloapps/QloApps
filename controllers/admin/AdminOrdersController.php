@@ -5482,6 +5482,9 @@ class AdminOrdersControllerCore extends AdminController
             $res &= $order_invoice->update();
         }
 
+        // Reinject quantity in stock
+        $order_detail->reinjectQuantity($order_detail, $order_detail->product_quantity, $delete);
+
         // Update Order
         // values changes as values are calculated accoding to the quantity of the product by webkul
         $order->total_paid = Tools::ps_round($order->getOrderTotal(), _PS_PRICE_COMPUTE_PRECISION_);
@@ -5495,9 +5498,6 @@ class AdminOrdersControllerCore extends AdminController
         $order->total_products_wt = $order->total_products_wt > 0 ? $order->total_products_wt : 0;
 
         $res &= $order->update();
-
-        // Reinject quantity in stock
-        $order_detail->reinjectQuantity($order_detail, $order_detail->product_quantity, $delete);
 
         // Update weight SUM
         $order_carrier = new OrderCarrier((int) $order->getIdOrderCarrier());
@@ -5558,6 +5558,7 @@ class AdminOrdersControllerCore extends AdminController
                     $objOrderCartRule->delete();
                 }
 
+                // If no rooms left in the order, Update Order total and discounts to 0
                 $order->total_discounts = 0;
                 $order->total_discounts_tax_incl = 0;
                 $order->total_discounts_tax_excl = 0;

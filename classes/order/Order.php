@@ -2854,6 +2854,11 @@ class OrderCore extends ObjectModel
         return $result;
     }
 
+    /**
+     * @param bool $useTax: if true, total with tax, if false, total without tax
+     * @param bool $withDiscounts: if true, total including discount, if false, total excluding discount
+     * @return float total of the order
+     */
     public function getOrderTotal($useTax = true, $withDiscounts = true)
     {
         // Get total of rooms and services
