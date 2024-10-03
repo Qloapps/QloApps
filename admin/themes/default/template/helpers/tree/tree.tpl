@@ -42,7 +42,7 @@
 		{if isset($use_checkbox) && $use_checkbox == true}
 			function checkAll($tree)
 			{
-				$tree.find(":input[type=checkbox]").each(
+				$tree.find(":input[type=checkbox]:not([hidden])").each(
 					function()
 					{
 						$(this).prop("checked", true);
@@ -53,7 +53,7 @@
 
 			function uncheckAll($tree)
 			{
-				$tree.find(":input[type=checkbox]").each(
+				$tree.find(":input[type=checkbox]:not([hidden])").each(
 					function()
 					{
 						$(this).prop("checked", false);
