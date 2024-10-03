@@ -565,7 +565,7 @@ class CartRuleCore extends ObjectModel
             return (!$display_error) ? false : Tools::displayError('This voucher has expired');
         }
         if (!$alreadyInCart && $context->cart->getOrderTotal(true, Cart::BOTH) <= 0) {
-            return (!$display_error) ? false : Tools::displayError('You cannot add more vouchers. Please remove an existing voucher before applying a new one.');
+            return (!$display_error) ? false : Tools::displayError('You cannot add more vouchers since the booking amount has already reached zero. Please remove an existing voucher before adding a new one.');
         }
 
         if ($context->cart->id_customer) {
