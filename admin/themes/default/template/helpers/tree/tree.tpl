@@ -64,7 +64,8 @@
 		{/if}
 		{if isset($use_search) && $use_search == true}
 			$("#{$id|escape:'html':'UTF-8'}-search").bind("typeahead:selected", function(obj, datum) {
-				$("#{$id|escape:'html':'UTF-8'}").find('[name="'+datum.input_name + '[]"]:input').each(
+				var suffix = '{if isset($use_checkbox) && $use_checkbox == true}[]{/if}';
+				$("#{$id|escape:'html':'UTF-8'}").find('[name="'+datum.input_name + suffix + '"]:input').each(
 					function()
 					{
 						if ($(this).val() == datum.value)
