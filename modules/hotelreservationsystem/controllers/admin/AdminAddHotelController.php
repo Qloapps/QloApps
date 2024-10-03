@@ -688,18 +688,19 @@ class AdminAddHotelController extends ModuleAdminController
                                 Category::regenerateEntireNtree();
                             } else {
                                 if ($catHotel = $objHotelBranch->addCategory(
-                                    $hotelCatName, $catCity, $groupIds, 1, $newIdHotel, $linkRewriteArray
+                                    $hotelCatName,
+                                    $catCity,
+                                    $groupIds,
+                                    1,
+                                    $newIdHotel,
+                                    $linkRewriteArray,
+                                    $metaTitleArray,
+                                    $metaDescriptionArray,
+                                    $metaKeywordsArray
                                 )) {
                                     $objHotelBranch = new HotelBranchInformation($newIdHotel);
                                     $objHotelBranch->id_category = $catHotel;
                                     $objHotelBranch->save();
-
-                                    $objCategory = new Category($catHotel);
-                                    $objCategory->meta_title = $metaTitleArray;
-                                    $objCategory->meta_description = $metaDescriptionArray;
-                                    $objCategory->meta_keywords = $metaKeywordsArray;
-                                    $objCategory->save();
-
                                 }
                             }
                         }

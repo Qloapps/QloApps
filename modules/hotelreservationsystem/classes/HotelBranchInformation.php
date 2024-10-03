@@ -653,7 +653,7 @@ class HotelBranchInformation extends ObjectModel
         return $return;
     }
 
-    public function addCategory($name, $parent_cat = false, $group_ids, $ishotel = false, $idHotel = false, $link_rewrite = false)
+    public function addCategory($name, $parent_cat = false, $group_ids, $ishotel = false, $idHotel = false, $link_rewrite = false, $meta_title = false, $meta_description = false, $meta_keywords = false)
     {
         $context = Context::getContext();
         if (!$parent_cat) {
@@ -700,6 +700,15 @@ class HotelBranchInformation extends ObjectModel
             }
             $category->id_parent = $parent_cat;
             $category->groupBox = $group_ids;
+            if ($meta_title) {
+                $category->meta_title = $meta_title;
+            }
+            if ($meta_description) {
+                $category->meta_description = $meta_description;
+            }
+            if ($meta_keywords) {
+                $category->meta_keywords = $meta_keywords;
+            }
             $category->add();
             return $category->id;
         }
