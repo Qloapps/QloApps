@@ -276,6 +276,11 @@ class RoomTypeServiceProductCartDetail extends ObjectModel
         if ($serviceProducts = Db::getInstance()->executeS($sql)) {
             foreach ($serviceProducts as $product) {
                 $qty = $product['quantity'] ? (int)$product['quantity'] : 1;
+                $numdays = 1;
+                if (Product::getProductPriceCalculation($product['id_product']) == Product::PRICE_CALCULATION_METHOD_PER_DAY) {
+                    $numdays = HotelHelper::getNumberOfDays($product['date_from'], $product['date_to']);
+                }
+
                 if ($getTotalPrice) {
                     $servicePrice = $objRoomTypeServiceProductPrice->getServicePrice(
                         (int)$product['id_product'],
@@ -301,26 +306,26 @@ class RoomTypeServiceProductCartDetail extends ObjectModel
                                 'auto_add_to_cart' => $product['auto_add_to_cart'],
                                 'price_addition_type' => $product['price_addition_type'],
                                 'price_calculation_method' => $product['price_calculation_method'],
-                                'unit_price_tax_excl' => $objRoomTypeServiceProductPrice->getServicePrice(
+                                'unit_price_tax_excl' => ($objRoomTypeServiceProductPrice->getServicePrice(
                                     (int)$product['id_product'],
                                     (int)$product['room_type_id_product'],
                                     1,
-                                    null,
-                                    null,
+                                    $product['date_from'],
+                                    $product['date_to'],
                                     false,
                                     false,
                                     $id_address
-                                ),
-                                'unit_price_tax_incl' => $objRoomTypeServiceProductPrice->getServicePrice(
+                                ) / $numdays),
+                                'unit_price_tax_incl' => ($objRoomTypeServiceProductPrice->getServicePrice(
                                     (int)$product['id_product'],
                                     (int)$product['room_type_id_product'],
                                     1,
-                                    null,
-                                    null,
+                                    $product['date_from'],
+                                    $product['date_to'],
                                     true,
                                     false,
                                     $id_address
-                                ),
+                                ) / $numdays),
                             );
                         }
 
@@ -384,22 +389,22 @@ class RoomTypeServiceProductCartDetail extends ObjectModel
                                 (int)$product['id_product'],
                                 (int)$product['room_type_id_product'],
                                 1,
-                                null,
-                                null,
+                                $product['date_from'],
+                                $product['date_to'],
                                 false,
                                 false,
                                 $id_address
-                            );
+                            ) / $numdays;
                             $selectedServiceProducts[$product['htl_cart_booking_id']]['unit_price_tax_incl'] = $objRoomTypeServiceProductPrice->getServicePrice(
                                 (int)$product['id_product'],
                                 (int)$product['room_type_id_product'],
                                 1,
-                                null,
-                                null,
+                                $product['date_from'],
+                                $product['date_to'],
                                 true,
                                 false,
                                 $id_address
-                            );
+                            ) / $numdays;
                         } else {
                             $selectedServiceProducts[$product['htl_cart_booking_id']]['selected_products_info'][$product['id_product']] =  array(
                                 'id_product' => $product['id_product'],
@@ -408,7 +413,7 @@ class RoomTypeServiceProductCartDetail extends ObjectModel
                                 'auto_add_to_cart' => $product['auto_add_to_cart'],
                                 'price_addition_type' => $product['price_addition_type'],
                                 'price_calculation_method' => $product['price_calculation_method'],
-                                'unit_price_tax_excl' => $objRoomTypeServiceProductPrice->getServicePrice(
+                                'unit_price_tax_excl' => ($objRoomTypeServiceProductPrice->getServicePrice(
                                     (int)$product['id_product'],
                                     (int)$product['room_type_id_product'],
                                     1,
@@ -417,8 +422,8 @@ class RoomTypeServiceProductCartDetail extends ObjectModel
                                     false,
                                     false,
                                     $id_address
-                                ),
-                                'unit_price_tax_incl' => $objRoomTypeServiceProductPrice->getServicePrice(
+                                ) / $numdays),
+                                'unit_price_tax_incl' => ($objRoomTypeServiceProductPrice->getServicePrice(
                                     (int)$product['id_product'],
                                     (int)$product['room_type_id_product'],
                                     1,
@@ -427,7 +432,7 @@ class RoomTypeServiceProductCartDetail extends ObjectModel
                                     true,
                                     false,
                                     $id_address
-                                ),
+                                ) / $numdays),
                             );
                         }
 

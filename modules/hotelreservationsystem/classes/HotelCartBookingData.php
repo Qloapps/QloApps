@@ -530,7 +530,7 @@ class HotelCartBookingData extends ObjectModel
                 }
             }
             if ($res && $objCart->updateQty((int)($roomsRequired * $num_days), $id_product)) {
-                if ($id_room) {
+                if ($roomsRequired == 1) {
                     return $obj_htl_cart_booking_data->id;
                 } else {
                     return true;
@@ -1023,7 +1023,7 @@ class HotelCartBookingData extends ObjectModel
                                                 $context->language->id
                                             );
                                             $errors[] = sprintf(
-                                                'You can not book rooms for hotel \'%s\' after date %s. Please remove rooms from %s - %s to proceed.',
+                                                $objModule->l('You can not book rooms for hotel "%s" after date %s. Please remove rooms from %s - %s to proceed.', 'HotelOrderRestrictDate'),
                                                 $objHotelBranchInformation->hotel_name,
                                                 Tools::displayDate($maxOrderDate),
                                                 Tools::displayDate($roomData['date_from']),
@@ -1043,7 +1043,7 @@ class HotelCartBookingData extends ObjectModel
                                                 $context->language->id
                                             );
                                             $errors[] = sprintf(
-                                                'You can not book rooms for hotel \'%s\' before date %s. Please remove rooms from %s - %s to proceed.',
+                                                $objModule->l('You can not book rooms for hotel "%s" before date %s. Please remove rooms from %s - %s to proceed.', 'HotelOrderRestrictDate'),
                                                 $objHotelBranchInformation->hotel_name,
                                                 Tools::displayDate($minOrderDate),
                                                 Tools::displayDate($roomData['date_from']),
@@ -1069,9 +1069,9 @@ class HotelCartBookingData extends ObjectModel
                                         }
                                     }
                                     if ($isRoomBooked) {
-                                        $errors[] = sprintf($objModule->l('The Room \'%s\' has been booked by another customer from \'%s\' to \'%s\' Please remove rooms from cart to proceed', 'HotelOrderRestrictDate'), $product['name'], date('d-m-Y', strtotime($roomData['date_from'])), date('d-m-Y', strtotime($roomData['date_to'])));
+                                        $errors[] = sprintf($objModule->l('The Room "%s" has been booked by another customer from "%s" to "%s" Please remove rooms from cart to proceed', 'HotelOrderRestrictDate'), $product['name'], date('d-m-Y', strtotime($roomData['date_from'])), date('d-m-Y', strtotime($roomData['date_to'])));
                                     } else {
-                                        $errors[] = sprintf($objModule->l('The Room \'%s\' is no longer avalable from \'%s\' to \'%s\' Please remove rooms from cart to proceed', 'HotelOrderRestrictDate'), $product['name'], date('d-m-Y', strtotime($roomData['date_from'])), date('d-m-Y', strtotime($roomData['date_to'])));
+                                        $errors[] = sprintf($objModule->l('The Room "%s" is no longer available from "%s" to "%s" Please remove rooms from cart to proceed', 'HotelOrderRestrictDate'), $product['name'], date('d-m-Y', strtotime($roomData['date_from'])), date('d-m-Y', strtotime($roomData['date_to'])));
                                     }
                                 }
                             }
@@ -1622,11 +1622,11 @@ class HotelCartBookingData extends ObjectModel
                                     $numDays = $objBookingDetail->getNumberOfDays($data_v['date_from'], $data_v['date_to']);
                                     $cartHotelData[$prodKey]['date_diff'][$dateJoin]['num_rm'] = 1;
                                     $cartHotelData[$prodKey]['date_diff'][$dateJoin]['data_form'] = date(
-                                        'Y-m-d',
+                                        'Y-m-d H:i:s',
                                         strtotime($data_v['date_from'])
                                     );
                                     $cartHotelData[$prodKey]['date_diff'][$dateJoin]['data_to'] = date(
-                                        'Y-m-d',
+                                        'Y-m-d H:i:s',
                                         strtotime($data_v['date_to'])
                                     );
                                     $cartHotelData[$prodKey]['date_diff'][$dateJoin]['num_days'] = $numDays;

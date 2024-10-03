@@ -54,7 +54,7 @@ class HotelReservationSystem extends Module
             'feature_prices' => array('description' => 'Feature prices', 'class' => 'HotelRoomTypeFeaturePricing'),
             'advance_payments' => array('description' => 'Room type advance payment', 'class' => 'HotelAdvancedPayment'),
             'cart_bookings' => array('description' => 'Cart bookings', 'class' => 'HotelCartBookingData'),
-            'bookings' => array('description' => 'Order bookings', 'class' => 'HotelBookingDetail'),
+            'room_bookings' => array('description' => 'Room bookings', 'class' => 'HotelBookingDetail'),
             'booking_extra_demands' => array('description' => 'Booking extra demands', 'class' => 'HotelBookingDemands'),
             'extra_demands' => array('description' => 'Extra demands', 'class' => 'HotelRoomTypeGlobalDemand'),
             'extra_services' => array('description' => 'Extra services', 'class' => 'Product', 'parameters_attribute' => 'webserviceRoomTypeServicesParameters'),

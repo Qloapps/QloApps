@@ -410,21 +410,23 @@
 				</span>
 			</div>
 		</div>
-		<div id="max_quantity_container" class="form-group" {if ($product->auto_add_to_cart && $product->isAssociatedToShop()) || !$product->allow_multiple_quantity}style="display:none;"{/if}>
-			<label class="control-label col-lg-3" for="max_quantity">
-				<span class="label-tooltip" data-toggle="tooltip"
-					title="{l s='Enter max allowed quantity per room, enter 0 for unlimited.'}">
-					{l s='Max quantity allow'}
-				</span>
-			</label>
-			<div class="col-lg-3">
-				<input type="text" id="max_quantity" name="max_quantity" value="{$product->max_quantity|escape:'html':'UTF-8'}" />
+		<div id="max_quantity_container" {if ($product->auto_add_to_cart && $product->isAssociatedToShop()) || !$product->allow_multiple_quantity}style="display:none;"{/if}>
+			<div class="form-group">
+				<label class="control-label col-lg-3" for="max_quantity">
+					<span class="label-tooltip" data-toggle="tooltip"
+						title="{l s='Enter max allowed quantity per room, enter 0 for unlimited.'}">
+						{l s='Max quantity allow'}
+					</span>
+				</label>
+				<div class="col-lg-3">
+					<input type="text" id="max_quantity" name="max_quantity" value="{$product->max_quantity|escape:'html':'UTF-8'}" />
+				</div>
 			</div>
-		</div>
-		<div class="form-group">
-			<div class="col-lg-6 col-lg-offset-3">
-				<div class="alert alert-info">
-				{l s='By default all products have infinte quantity, Using this setting you can restrict customer to purchase only one product per room.'}
+			<div class="form-group">
+				<div class="col-lg-6 col-lg-offset-3">
+					<div class="alert alert-info">
+					{l s='By default all products have infinte quantity, Using this setting you can restrict customer to purchase only one product per room.'}
+					</div>
 				</div>
 			</div>
 		</div>

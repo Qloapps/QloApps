@@ -55,7 +55,7 @@
   margin-top: 20px;
   text-align: center;}
 @media (max-width: 767px) {
-  .header-rmsearch-wrapper #search_hotel_block_form.grid {
+  .header-rmsearch-wrapper #search_hotel_block_form .grid {
     grid-template-columns: 1fr;
     column-gap: 0px;
   }

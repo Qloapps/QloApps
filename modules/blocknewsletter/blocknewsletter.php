@@ -153,7 +153,7 @@ class Blocknewsletter extends Module
     public function hookActionValidateCartRule($params)
     {
         $customer = new Customer($params['context']->cart->id_customer);
-        if ($params['cart_rule']->code == Configuration::get('NW_VOUCHER_CODE')) {
+        if ($params['cart_rule']->code && $params['cart_rule']->code == Configuration::get('NW_VOUCHER_CODE')) {
             if ($customer->id && !$customer->is_guest) {
                 if (count(Order::getCustomerOrders($customer->id))) {
                     $params['isValidatedByModules'] = false;

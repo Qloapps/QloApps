@@ -478,6 +478,8 @@ class HotelBookingDetail extends ObjectModel
                     }
                     unset($roomTypesDetail);
 
+                    Hook::exec('actionBookingDataResultModifier', array('params' => $params, 'final_search_response' => &$finalSearchResponse));
+
                     return $finalSearchResponse;
                 }
             }

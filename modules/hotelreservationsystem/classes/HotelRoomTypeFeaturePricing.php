@@ -669,15 +669,13 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
 
         // if date_from and date_to are same then date_to will be the next date date of date_from
         if (strtotime($date_from) == strtotime($date_to)) {
-            $date_to = date('Y-m-d', strtotime('+1 day', strtotime($date_from)));
+            $date_to = date('Y-m-d H:i:s', strtotime('+1 day', strtotime($date_from)));
         }
         $context = Context::getContext();
         $id_currency = Validate::isLoadedObject($context->currency) ? (int)$context->currency->id : (int)Configuration::get('PS_CURRENCY_DEFAULT');
 
         $hotelCartBookingData = new HotelCartBookingData();
-        $date_from = date('Y-m-d', strtotime($date_from));
-        $date_to = date('Y-m-d', strtotime($date_to));
-        for($currentDate = $date_from; $currentDate < $date_to; $currentDate = date('Y-m-d', strtotime('+1 day', strtotime($currentDate)))) {
+        for($currentDate = date('Y-m-d', strtotime($date_from)); $currentDate < date('Y-m-d', strtotime($date_to)); $currentDate = date('Y-m-d', strtotime('+1 day', strtotime($currentDate)))) {
             if ($use_reduc && ($featurePrice = $hotelCartBookingData->getProductFeaturePricePlanByDateByPriority(
                 $id_product,
                 $currentDate,
@@ -720,6 +718,22 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
                 $totalPrice['total_price_tax_excl'] += $productPriceTE;
             }
         }
+        Hook::exec('actionRoomTypeTotalPriceModifier',
+            array(
+                'total_prices' => &$totalPrice,
+                'id_room_type' => $id_product,
+                'id_room' => $id_room,
+                'date_from' => $date_from,
+                'date_to' => $date_to,
+                'id_currency' => $id_currency,
+                'quantity' => $quantity,
+                'id_cart' => $id_cart,
+                'id_guest' => $id_guest,
+                'id_group' => $id_group,
+                'use_reduc' => $use_reduc,
+                'tax_rate' => $taxRate
+            )
+        );
         if ($with_auto_room_services) {
             if ($id_cart && $id_room) {
                 $objRoomTypeServiceProductCartDetail = new RoomTypeServiceProductCartDetail();
@@ -733,9 +747,9 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
                     0,
                     0,
                     null,
+                    1,
                     null,
-                    null,
-                    null,
+                    Product::PRICE_ADDITION_TYPE_WITH_ROOM,
                     $id_room
                 )) {
                     $selectedServices = array_shift($roomServicesServices);
@@ -801,8 +815,8 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
         $with_auto_room_services = 1,
         $use_reduc = 1
     ) {
-        $dateFrom = date('Y-m-d', strtotime($date_from));
-        $dateTo = date('Y-m-d', strtotime($date_to));
+        $dateFrom = date('Y-m-d H:i:s', strtotime($date_from));
+        $dateTo = date('Y-m-d H:i:s', strtotime($date_to));
         $totalDurationPrice = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice(
             $id_product,
             $dateFrom,
@@ -844,29 +858,66 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
         );
     }
 
+    /**
+     * @deprecated since 1.6.1 use deleteFeaturePrices() instead
+    */
     public function deleteFeaturePriceByIdProduct($idProduct)
     {
         if (!$idProduct) {
             return false;
         }
-        return Db::getInstance()->delete('htl_room_type_feature_pricing', 'id_product = '.(int)$idProduct);
+        return HotelRoomTypeFeaturePricing::deleteFeaturePrices(false, $idProduct);
     }
 
+    /**
+     * @deprecated since 1.6.1 use deleteFeaturePrices() instead
+    */
     public static function deleteByIdCart(
         $id_cart,
         $id_product = false,
         $id_room = false,
         $date_from = false,
-        $date_to = false)
-    {
-        return Db::getInstance()->execute(
-            'DELETE FROM `'._DB_PREFIX_.'htl_room_type_feature_pricing`
-            WHERE `id_cart` = '.(int) $id_cart.
+        $date_to = false
+    ) {
+        return HotelRoomTypeFeaturePricing::deleteFeaturePrices(
+            $id_cart,
+            $id_product,
+            $id_room,
+            $date_from,
+            $date_to
+        );
+    }
+
+    public static function deleteFeaturePrices(
+        $id_cart = false,
+        $id_product = false,
+        $id_room = false,
+        $date_from = false,
+        $date_to = false
+    ) {
+        if ($date_from) {
+            $date_from = date('Y-m-d', strtotime($date_from));
+        }
+
+        if ($date_to) {
+            $date_to = date('Y-m-d', strtotime($date_to));
+        }
+
+        $idfeaturePrices = Db::getInstance()->executeS(
+            'SELECT `id_feature_price`  FROM `'._DB_PREFIX_.'htl_room_type_feature_pricing`
+            WHERE 1'.
+            ($id_cart ? ' AND `id_cart` = '.(int) $id_cart : '').
             ($id_product ? ' AND `id_product` = '.(int) $id_product : '').
             ($id_room ? ' AND `id_room` = '.(int) $id_room : '').
             ($date_from ? ' AND `date_from` = "'.pSQL($date_from) .'"' : '').
             ($date_to ? ' AND `date_to` = "'.pSQL($date_to) .'"' : '')
         );
+        $res = true;
+        foreach ($idfeaturePrices as $featurePrice) {
+            $objHotelRoomTypeFeaturePricing = new HotelRoomTypeFeaturePricing((int)$featurePrice['id_feature_price']);
+            $res = $res && $objHotelRoomTypeFeaturePricing->delete();
+        }
+        return $res;
     }
 
     /**

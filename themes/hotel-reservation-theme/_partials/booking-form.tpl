@@ -24,6 +24,14 @@
     <div class="booking_room_fields">
         {block name='booking_form_content'}
             <form id="booking-form" action="" method="post">
+                {block name='product_hidden_fields'}
+                    <p class="hidden">
+                        <input type="hidden" name="token" value="{$static_token}" />
+                        <input type="hidden" name="id_product" value="{$product->id|intval}" id="product_page_product_id" />
+                        <input type="hidden" name="add" value="1" />
+                        <input type="hidden" name="id_product_attribute" id="idCombination" value="" />
+                    </p>
+                {/block}
                 {block name='booking_form_hotel_location'}
                     {if isset($id_hotel) && $id_hotel}
                         <div class="form-group htl_location_block">
@@ -35,7 +43,8 @@
                 {if $product->show_price && !isset($restricted_country_mode) && !$PS_CATALOG_MODE}
                     {* Block for booking products *}
                     {if $product->booking_product}
-                        {if  !$order_date_restrict}
+                        {if !$order_date_restrict}
+                            {hook h='displayRoomTypeBookingFormFieldsBefore' id_product=$product->id id_hotel=$id_hotel}
                             <div class="row">
                                 {block name='booking_form_dates'}
                                     <div class="form-group col-sm-12">

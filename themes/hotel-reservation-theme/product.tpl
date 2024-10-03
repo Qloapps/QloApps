@@ -419,14 +419,6 @@
 				{block name='product_right_column'}
 					<div class="pb-right-column col-xs-12 col-sm-4 col-md-4">
 						{if ($product->show_price && !isset($restricted_country_mode)) || isset($groups) || $product->reference || (isset($HOOK_PRODUCT_ACTIONS) && $HOOK_PRODUCT_ACTIONS)}
-							{block name='product_hidden_fields'}
-								<p class="hidden">
-									<input type="hidden" name="token" value="{$static_token}" />
-									<input type="hidden" name="id_product" value="{$product->id|intval}" id="product_page_product_id" />
-									<input type="hidden" name="add" value="1" />
-									<input type="hidden" name="id_product_attribute" id="idCombination" value="" />
-								</p>
-							{/block}
 
 							{block name='booking_form'}
 								{include file='./_partials/booking-form.tpl'}
