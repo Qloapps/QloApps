@@ -1003,8 +1003,8 @@ class AdminCustomersControllerCore extends AdminController
                     $this->errors[] = Tools::displayError('Some error ocurred while deleting the Customer');
                     return;
                 } else {
-                    if ($customerDetail = CartCustomerGuestDetail::getCustomerDefaultDetails($customerEmail)) {
-                        $objCartCustomerGuestDetail = new CartCustomerGuestDetail($customerDetail['id_customer_guest_detail']);
+                    if ($idCustomerGuest = CartCustomerGuestDetail::getIdCustomerGuest($customerEmail)) {
+                        $objCartCustomerGuestDetail = new CartCustomerGuestDetail($idCustomerGuest);
                         $objCartCustomerGuestDetail->phone = preg_replace('/[0-9]/', '0', $objCustomer->phone);
                         $objCartCustomerGuestDetail->email = $objCustomer->email;
                         $objCartCustomerGuestDetail->save();
@@ -1102,7 +1102,6 @@ class AdminCustomersControllerCore extends AdminController
                 $this->errors[] = Tools::displayError('Password can not be empty.');
                 $this->display = 'edit';
             } elseif ($customer = parent::processAdd()) {
-                CartCustomerGuestDetail::updateCustomerPhoneNumber($customer->email, Tools::getValue('phone'));
                 $this->context->smarty->assign('new_customer', $customer);
                 return $customer;
             }
@@ -1142,10 +1141,7 @@ class AdminCustomersControllerCore extends AdminController
                 }
             }
 
-            if ($res = parent::processUpdate()) {
-                CartCustomerGuestDetail::updateCustomerPhoneNumber($this->object->email, Tools::getValue('phone'));
-                return $res;
-            }
+            return parent::processUpdate();
         } else {
             $this->errors[] = Tools::displayError('An error occurred while loading the object.').'
 				<b>'.$this->table.'</b> '.Tools::displayError('(cannot load object)');
