@@ -301,7 +301,7 @@
 											{if $show_taxes}
 												<p class="cart_total_tax">
 													<span>{l s='Total tax'}</span>
-													<span class="cart_total_values">{displayPrice price=($total_tax)}</span>
+													<span class="cart_total_values">{displayPrice price=($total_tax_without_discount)}</span>
 												</p>
 											{/if}
 											<p class="total_discount_block {if $total_discounts == 0}unvisible{/if}">

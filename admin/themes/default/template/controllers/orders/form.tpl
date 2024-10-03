@@ -387,7 +387,6 @@
         		let haserror = false
 				if ($(this).hasClass('num_children')) {
 					max_child_in_room = $(this).closest(".booking_occupancy_wrapper").find('.max_children').val();
-					console.log(no_children_allowed_txt);
 					if (elementVal > max_child_in_room) {
 						$(this).val(max_child_in_room);
 						if (elementVal == 1) {
@@ -705,13 +704,12 @@
 	}
 
 	function updateCartSummaryData(jsonSummary) {
-		var totalRooms = jsonSummary.summary.total_rooms + jsonSummary.summary.total_extra_demands + jsonSummary.summary.total_additional_services + jsonSummary.summary.total_additional_services_auto_add;
-		$('#total_rooms').html(formatCurrency(parseFloat(totalRooms), currency_format, currency_sign, currency_blank));
+		$('#total_rooms').html(formatCurrency(parseFloat(jsonSummary.summary.total_rooms_services_tax_excl_without_discount), currency_format, currency_sign, currency_blank));
 		$('#total_vouchers').html(formatCurrency(parseFloat(jsonSummary.summary.total_discounts), currency_format, currency_sign, currency_blank));
 		$('#total_convenience_fees').html(formatCurrency(parseFloat(jsonSummary.summary.convenience_fee), currency_format, currency_sign, currency_blank));
-		$('#total_without_taxes').html(formatCurrency(parseFloat(totalRooms + jsonSummary.summary.convenience_fee), currency_format, currency_sign, currency_blank));
+		$('#total_without_taxes').html(formatCurrency(parseFloat(jsonSummary.summary.total_tax_excl_without_discount), currency_format, currency_sign, currency_blank));
 		// $('#total_service_products').html(formatCurrency(parseFloat(jsonSummary.summary.total_service_products), currency_format, currency_sign, currency_blank));
-		$('#total_taxes').html(formatCurrency(parseFloat(jsonSummary.summary.total_tax), currency_format, currency_sign, currency_blank));
+		$('#total_taxes').html(formatCurrency(parseFloat(jsonSummary.summary.total_tax_without_discount), currency_format, currency_sign, currency_blank));
 		$('#total_with_taxes').html(formatCurrency(parseFloat(jsonSummary.summary.total_price), currency_format, currency_sign, currency_blank));
 
 		$('#payment_amount').val(jsonSummary.summary.total_price);
@@ -1212,12 +1210,11 @@
 
 		shipping_price_selected_carrier = jsonSummary.summary.total_shipping;
 
-		var totalRooms = jsonSummary.summary.total_rooms + jsonSummary.summary.total_extra_demands + jsonSummary.summary.total_additional_services + jsonSummary.summary.total_additional_services_auto_add;
 		$('#total_vouchers').html(formatCurrency(parseFloat(jsonSummary.summary.total_discounts), currency_format, currency_sign, currency_blank));
-		$('#total_taxes').html(formatCurrency(parseFloat(jsonSummary.summary.total_tax), currency_format, currency_sign, currency_blank));
-		$('#total_without_taxes').html(formatCurrency(parseFloat(totalRooms + jsonSummary.summary.convenience_fee), currency_format, currency_sign, currency_blank));
+		$('#total_taxes').html(formatCurrency(parseFloat(jsonSummary.summary.total_tax_without_discount), currency_format, currency_sign, currency_blank));
+		$('#total_without_taxes').html(formatCurrency(parseFloat(jsonSummary.summary.total_tax_excl_without_discount), currency_format, currency_sign, currency_blank));
 		$('#total_with_taxes').html(formatCurrency(parseFloat(jsonSummary.summary.total_price), currency_format, currency_sign, currency_blank));
-		$('#total_rooms').html(formatCurrency(parseFloat(totalRooms), currency_format, currency_sign, currency_blank));
+		$('#total_rooms').html(formatCurrency(parseFloat(jsonSummary.summary.total_rooms_services_tax_excl_without_discount), currency_format, currency_sign, currency_blank));
 		$('#total_convenience_fees').html(formatCurrency(parseFloat(jsonSummary.summary.convenience_fee), currency_format, currency_sign, currency_blank));
 		// $('#total_service_products').html(formatCurrency(parseFloat(jsonSummary.summary.total_service_products), currency_format, currency_sign, currency_blank));
 
