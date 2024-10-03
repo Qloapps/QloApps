@@ -2853,4 +2853,27 @@ class OrderCore extends ObjectModel
 
         return $result;
     }
+
+    public function getOrderTotal($useTax = true, $withDiscounts = true)
+    {
+        // Get total of rooms and services
+        if ($useTax) {
+            $totalRoomsAndServices = $this->getTotalProductsWithTaxes();
+        } else {
+            $totalRoomsAndServices = $this->getTotalProductsWithoutTaxes();
+        }
+
+        // Get total of extra demands
+        $objBookingDemand = new HotelBookingDemands();
+        $totalExtraDemands = $objBookingDemand->getRoomTypeBookingExtraDemands($this->id, 0, 0, 0, 0, 0, 1, $useTax);
+
+        // Get cart rules total
+        $orderTotalDiscount = $this->getCartRulesTotal($useTax);
+
+        // Update order with new amounts after removing cart rule
+        $totalOrder = ($totalExtraDemands + $totalRoomsAndServices) - $orderTotalDiscount;
+        $totalOrder = $totalOrder > 0 ? $totalOrder : 0;
+
+        return $totalOrder;
+    }
 }

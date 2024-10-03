@@ -2064,30 +2064,23 @@ class AdminOrdersControllerCore extends AdminController
                     }
 
                     if ($order_cart_rule->delete()) {
-                        $orderTotalDiscountTE = $order->getCartRulesTotal();
-                        $orderTotalDiscountTI = $order->getCartRulesTotal(true);
-
-                        $totalRoomsAndServicesTI = $order->getTotalProductsWithTaxes();
-                        $totalRoomsAndServicesTE = $order->getTotalProductsWithoutTaxes();
-
-                        $objBookingDemand = new HotelBookingDemands();
-                        $totalExtraDemandsTE = $objBookingDemand->getRoomTypeBookingExtraDemands($order->id, 0, 0, 0, 0, 0, 1, 0);
-                        $totalExtraDemandsTI = $objBookingDemand->getRoomTypeBookingExtraDemands($order->id, 0, 0, 0, 0, 0, 1, 1);
-
                         // Update amounts of order
                         $order->total_discounts = ($order->total_discounts - $order_cart_rule->value) > 0 ? ($order->total_discounts - $order_cart_rule->value) : 0;
                         $order->total_discounts_tax_incl = ($order->total_discounts_tax_incl - $order_cart_rule->value) > 0 ? ($order->total_discounts_tax_incl - $order_cart_rule->value) : 0;
                         $order->total_discounts_tax_excl = ($order->total_discounts_tax_excl - $order_cart_rule->value_tax_excl) > 0 ? ($order->total_discounts_tax_excl - $order_cart_rule->value_tax_excl) : 0;
 
-                        // Update order with new amounts after removing cart rule
-                        $totalOrderTE = ($totalExtraDemandsTE + $totalRoomsAndServicesTE) - $orderTotalDiscountTE;
-                        $totalOrderTE = $totalOrderTE > 0 ? $totalOrderTE : 0;
-                        $totalOrderTI = ($totalExtraDemandsTI + $totalRoomsAndServicesTI) - $orderTotalDiscountTI;
-                        $totalOrderTI = $totalOrderTI > 0 ? $totalOrderTI : 0;
-
-                        $order->total_paid = Tools::ps_round($totalOrderTI, _PS_PRICE_COMPUTE_PRECISION_);
-                        $order->total_paid_tax_incl = Tools::ps_round($totalOrderTI, _PS_PRICE_COMPUTE_PRECISION_);
-                        $order->total_paid_tax_excl = Tools::ps_round($totalOrderTE, _PS_PRICE_COMPUTE_PRECISION_);
+                        $order->total_paid = Tools::ps_round(
+                            $order->getOrderTotal(),
+                            _PS_PRICE_COMPUTE_PRECISION_
+                        );
+                        $order->total_paid_tax_incl = Tools::ps_round(
+                            $order->getOrderTotal(),
+                            _PS_PRICE_COMPUTE_PRECISION_
+                        );
+                        $order->total_paid_tax_excl = Tools::ps_round(
+                            $order->getOrderTotal(false),
+                            _PS_PRICE_COMPUTE_PRECISION_
+                        );
                         $order->update();
                     }
 
@@ -2254,14 +2247,9 @@ class AdminOrdersControllerCore extends AdminController
                                 $order->total_discounts_tax_incl = Tools::ps_round($order->total_discounts_tax_incl + $order_cart_rule->value, _PS_PRICE_COMPUTE_PRECISION_);
                                 $order->total_discounts_tax_excl = Tools::ps_round($order->total_discounts_tax_excl + $order_cart_rule->value_tax_excl, _PS_PRICE_COMPUTE_PRECISION_);
 
-                                $order->total_paid = Tools::ps_round($order->total_paid - $order_cart_rule->value, _PS_PRICE_COMPUTE_PRECISION_);
-                                $order->total_paid = $order->total_paid > 0 ? $order->total_paid : 0;
-
-                                $order->total_paid_tax_incl = Tools::ps_round($order->total_paid_tax_incl - $order_cart_rule->value, _PS_PRICE_COMPUTE_PRECISION_);
-                                $order->total_paid_tax_incl = $order->total_paid_tax_incl > 0 ? $order->total_paid_tax_incl : 0;
-
-                                $order->total_paid_tax_excl = Tools::ps_round($order->total_paid_tax_excl - $order_cart_rule->value_tax_excl, _PS_PRICE_COMPUTE_PRECISION_);
-                                $order->total_paid_tax_excl = $order->total_paid_tax_excl > 0 ? $order->total_paid_tax_excl : 0;
+                                $order->total_paid = Tools::ps_round($order->getOrderTotal(), _PS_PRICE_COMPUTE_PRECISION_);
+                                $order->total_paid_tax_incl = Tools::ps_round($order->getOrderTotal(), _PS_PRICE_COMPUTE_PRECISION_);
+                                $order->total_paid_tax_excl = Tools::ps_round($order->getOrderTotal(false), _PS_PRICE_COMPUTE_PRECISION_);
                             }
 
                             // Update Order
@@ -3822,9 +3810,9 @@ class AdminOrdersControllerCore extends AdminController
         $order->total_products += (float)$cart->getOrderTotal(false, Cart::ONLY_PRODUCTS);
         $order->total_products_wt += (float)$cart->getOrderTotal($use_taxes, Cart::ONLY_PRODUCTS);
 
-        $order->total_paid += (float)$cart->getOrderTotal(true, $total_method);
-        $order->total_paid_tax_excl += (float)$cart->getOrderTotal(false, $total_method);
-        $order->total_paid_tax_incl += (float)$cart->getOrderTotal($use_taxes, $total_method);
+        $order->total_paid = Tools::ps_round($order->getOrderTotal(), _PS_PRICE_COMPUTE_PRECISION_);
+        $order->total_paid_tax_incl = Tools::ps_round($order->getOrderTotal(), _PS_PRICE_COMPUTE_PRECISION_);
+        $order->total_paid_tax_excl = Tools::ps_round($order->getOrderTotal(false), _PS_PRICE_COMPUTE_PRECISION_);
 
         if (isset($order_invoice) && Validate::isLoadedObject($order_invoice)) {
             $order->total_shipping = $order_invoice->total_shipping_tax_incl;
@@ -4391,9 +4379,10 @@ class AdminOrdersControllerCore extends AdminController
         // update totals amount of order
         $order->total_products += (float)$cart->getOrderTotal(false, Cart::ONLY_PRODUCTS);
         $order->total_products_wt += (float)$cart->getOrderTotal($use_taxes, Cart::ONLY_PRODUCTS);
-        $order->total_paid += (float)$cart->getOrderTotal(true, $total_method);
-        $order->total_paid_tax_excl += (float)$cart->getOrderTotal(false, $total_method);
-        $order->total_paid_tax_incl += (float)$cart->getOrderTotal($use_taxes, $total_method);
+
+        $order->total_paid = Tools::ps_round($order->getOrderTotal(), _PS_PRICE_COMPUTE_PRECISION_);
+        $order->total_paid_tax_incl = Tools::ps_round($order->getOrderTotal(), _PS_PRICE_COMPUTE_PRECISION_);
+        $order->total_paid_tax_excl = Tools::ps_round($order->getOrderTotal(false), _PS_PRICE_COMPUTE_PRECISION_);
 
         if (isset($order_invoice) && Validate::isLoadedObject($order_invoice)) {
             $order->total_shipping = $order_invoice->total_shipping_tax_incl;
@@ -4858,12 +4847,10 @@ class AdminOrdersControllerCore extends AdminController
             $order->total_products = $order->total_products > 0 ? $order->total_products : 0;
             $order->total_products_wt += (float)$diff_price_tax_incl;
             $order->total_products_wt = $order->total_products_wt > 0 ? $order->total_products_wt : 0;
-            $order->total_paid += (float)$diff_price_tax_incl;
-            $order->total_paid = $order->total_paid > 0 ? $order->total_paid : 0;
-            $order->total_paid_tax_excl += (float)$diff_price_tax_excl;
-            $order->total_paid_tax_excl = $order->total_paid_tax_excl > 0 ? $order->total_paid_tax_excl : 0;
-            $order->total_paid_tax_incl += (float)$diff_price_tax_incl;
-            $order->total_paid_tax_incl = $order->total_paid_tax_incl > 0 ? $order->total_paid_tax_incl : 0;
+
+            $order->total_paid = Tools::ps_round($order->getOrderTotal(), _PS_PRICE_COMPUTE_PRECISION_);
+            $order->total_paid_tax_incl = Tools::ps_round($order->getOrderTotal(), _PS_PRICE_COMPUTE_PRECISION_);
+            $order->total_paid_tax_excl = Tools::ps_round($order->getOrderTotal(false), _PS_PRICE_COMPUTE_PRECISION_);
 
             $res &= $order->update();
         }
@@ -5025,11 +5012,6 @@ class AdminOrdersControllerCore extends AdminController
                             if ($rDemand['price_calc_method'] == HotelRoomTypeGlobalDemand::WK_PRICE_CALC_METHOD_EACH_DAY) {
                                 $objBookingDemand = new HotelBookingDemands($rDemand['id_booking_demand']);
 
-                                // change order total
-                                $order->total_paid_tax_excl -= $objBookingDemand->total_price_tax_excl;
-                                $order->total_paid_tax_incl -= $objBookingDemand->total_price_tax_incl;
-                                $order->total_paid -= $objBookingDemand->total_price_tax_incl;
-
                                 $numDays = $obj_booking_detail->getNumberOfDays($new_date_from, $new_date_to);
                                 $demandPriceTE = Tools::processPriceRounding(
                                     ($objBookingDemand->unit_price_tax_excl * $numDays),
@@ -5044,10 +5026,6 @@ class AdminOrdersControllerCore extends AdminController
                                     $order->round_mode
                                 );
 
-                                $order->total_paid_tax_excl += $demandPriceTE;
-                                $order->total_paid_tax_incl += $demandPriceTI;
-                                $order->total_paid += $demandPriceTI;
-
                                 $objBookingDemand->total_price_tax_excl = $demandPriceTE;
                                 $objBookingDemand->total_price_tax_incl = $demandPriceTI;
 
@@ -5057,6 +5035,10 @@ class AdminOrdersControllerCore extends AdminController
                     }
                 }
                 // change order total save
+                $order->total_paid = Tools::ps_round($order->getOrderTotal(), _PS_PRICE_COMPUTE_PRECISION_);
+                $order->total_paid_tax_incl = Tools::ps_round($order->getOrderTotal(), _PS_PRICE_COMPUTE_PRECISION_);
+                $order->total_paid_tax_excl = Tools::ps_round($order->getOrderTotal(false), _PS_PRICE_COMPUTE_PRECISION_);
+
                 $order->save();
             }
 
@@ -5092,16 +5074,10 @@ class AdminOrdersControllerCore extends AdminController
 
                                 $order->total_products -= $objRoomTypeServiceProductOrderDetail->total_price_tax_excl;
                                 $order->total_products_wt -= $objRoomTypeServiceProductOrderDetail->total_price_tax_incl;
-                                $order->total_paid_tax_excl -= $objRoomTypeServiceProductOrderDetail->total_price_tax_excl;
-                                $order->total_paid_tax_incl -= $objRoomTypeServiceProductOrderDetail->total_price_tax_incl;
-                                $order->total_paid -= $objRoomTypeServiceProductOrderDetail->total_price_tax_incl;
 
                                 // change order total
                                 $order->total_products += $newTotalPriceTaxExcl;
                                 $order->total_products_wt += $newTotalPriceTaxIncl;
-                                $order->total_paid_tax_excl += $newTotalPriceTaxExcl;
-                                $order->total_paid_tax_incl += $newTotalPriceTaxIncl;
-                                $order->total_paid += $newTotalPriceTaxIncl;
 
                                 $objOrderDetail = new OrderDetail((int) $serviceProduct['id_order_detail']);
                                 $objOrderDetail->total_price_tax_excl -= $objRoomTypeServiceProductOrderDetail->total_price_tax_excl;
@@ -5126,6 +5102,9 @@ class AdminOrdersControllerCore extends AdminController
                     }
                 }
 
+                $order->total_paid = Tools::ps_round($order->getOrderTotal(), _PS_PRICE_COMPUTE_PRECISION_);
+                $order->total_paid_tax_incl = Tools::ps_round($order->getOrderTotal(), _PS_PRICE_COMPUTE_PRECISION_);
+                $order->total_paid_tax_excl = Tools::ps_round($order->getOrderTotal(false), _PS_PRICE_COMPUTE_PRECISION_);
                 $order->save();
             }
         }
@@ -5233,12 +5212,10 @@ class AdminOrdersControllerCore extends AdminController
             $order->total_products = $order->total_products > 0 ? $order->total_products : 0;
             $order->total_products_wt += $diff_price_tax_incl;
             $order->total_products_wt = $order->total_products_wt > 0 ? $order->total_products_wt : 0;
-            $order->total_paid += $diff_price_tax_incl;
-            $order->total_paid = $order->total_paid > 0 ? $order->total_paid : 0;
-            $order->total_paid_tax_excl += $diff_price_tax_excl;
-            $order->total_paid_tax_excl = $order->total_paid_tax_excl > 0 ? $order->total_paid_tax_excl : 0;
-            $order->total_paid_tax_incl += $diff_price_tax_incl;
-            $order->total_paid_tax_incl = $order->total_paid_tax_incl > 0 ? $order->total_paid_tax_incl : 0;
+
+            $order->total_paid = Tools::ps_round($order->getOrderTotal(), _PS_PRICE_COMPUTE_PRECISION_);
+            $order->total_paid_tax_incl = Tools::ps_round($order->getOrderTotal(), _PS_PRICE_COMPUTE_PRECISION_);
+            $order->total_paid_tax_excl = Tools::ps_round($order->getOrderTotal(false), _PS_PRICE_COMPUTE_PRECISION_);
 
             $res &= $order->update();
         }
@@ -5507,14 +5484,9 @@ class AdminOrdersControllerCore extends AdminController
 
         // Update Order
         // values changes as values are calculated accoding to the quantity of the product by webkul
-        $order->total_paid -= ($diff_products_tax_incl + $roomExtraDemandTI + $additionlServicesTI);
-        $order->total_paid = $order->total_paid > 0 ? $order->total_paid : 0;
-
-        $order->total_paid_tax_incl -= ($diff_products_tax_incl + $roomExtraDemandTI + $additionlServicesTI);
-        $order->total_paid_tax_incl = $order->total_paid_tax_incl > 0 ? $order->total_paid_tax_incl : 0;
-
-        $order->total_paid_tax_excl -= ($diff_products_tax_excl + $roomExtraDemandTE + $additionlServicesTE);
-        $order->total_paid_tax_excl = $order->total_paid_tax_excl > 0 ? $order->total_paid_tax_excl : 0;
+        $order->total_paid = Tools::ps_round($order->getOrderTotal(), _PS_PRICE_COMPUTE_PRECISION_);
+        $order->total_paid_tax_incl = Tools::ps_round($order->getOrderTotal(), _PS_PRICE_COMPUTE_PRECISION_);
+        $order->total_paid_tax_excl = Tools::ps_round($order->getOrderTotal(false), _PS_PRICE_COMPUTE_PRECISION_);
 
         $order->total_products -= ($diff_products_tax_excl + $additionlServicesTE);
         $order->total_products = $order->total_products > 0 ? $order->total_products : 0;
@@ -5644,14 +5616,9 @@ class AdminOrdersControllerCore extends AdminController
         }
 
         // Update Order
-        $order->total_paid -= Tools::ps_round($order_detail->total_price_tax_incl, _PS_PRICE_COMPUTE_PRECISION_);
-        $order->total_paid = $order->total_paid > 0 ? $order->total_paid : 0;
-
-        $order->total_paid_tax_incl -= Tools::ps_round($order_detail->total_price_tax_incl, _PS_PRICE_COMPUTE_PRECISION_);
-        $order->total_paid_tax_incl = $order->total_paid_tax_incl > 0 ? $order->total_paid_tax_incl : 0;
-
-        $order->total_paid_tax_excl -= Tools::ps_round($order_detail->total_price_tax_excl, _PS_PRICE_COMPUTE_PRECISION_);
-        $order->total_paid_tax_excl = $order->total_paid_tax_excl > 0 ? $order->total_paid_tax_excl : 0;
+        $order->total_paid = Tools::ps_round($order->getOrderTotal(), _PS_PRICE_COMPUTE_PRECISION_);
+        $order->total_paid_tax_incl = Tools::ps_round($order->getOrderTotal(), _PS_PRICE_COMPUTE_PRECISION_);
+        $order->total_paid_tax_excl = Tools::ps_round($order->getOrderTotal(false), _PS_PRICE_COMPUTE_PRECISION_);
 
         $order->total_products -= Tools::ps_round($order_detail->total_price_tax_excl, _PS_PRICE_COMPUTE_PRECISION_);
         $order->total_products = $order->total_products > 0 ? $order->total_products : 0;
@@ -6439,14 +6406,9 @@ class AdminOrdersControllerCore extends AdminController
                         $order->total_products_wt = Tools::ps_round((float)($order->total_products_wt + $priceDiffTaxIncl), _PS_PRICE_COMPUTE_PRECISION_);
                         $order->total_products_wt = $order->total_products_wt > 0 ? $order->total_products_wt : 0;
 
-                        $order->total_paid_tax_excl = Tools::ps_round((float)($order->total_paid_tax_excl + $priceDiffTaxExcl), _PS_PRICE_COMPUTE_PRECISION_);
-                        $order->total_paid_tax_excl = $order->total_paid_tax_excl > 0 ? $order->total_paid_tax_excl : 0;
-
-                        $order->total_paid_tax_incl = Tools::ps_round((float)($order->total_paid_tax_incl + $priceDiffTaxIncl), _PS_PRICE_COMPUTE_PRECISION_);
-                        $order->total_paid_tax_incl = $order->total_paid_tax_incl > 0 ? $order->total_paid_tax_incl : 0;
-
-                        $order->total_paid = Tools::ps_round((float)($order->total_paid + $priceDiffTaxIncl), _PS_PRICE_COMPUTE_PRECISION_);
-                        $order->total_paid = $order->total_paid > 0 ? $order->total_paid : 0;
+                        $order->total_paid = Tools::ps_round($order->getOrderTotal(), _PS_PRICE_COMPUTE_PRECISION_);
+                        $order->total_paid_tax_incl = Tools::ps_round($order->getOrderTotal(), _PS_PRICE_COMPUTE_PRECISION_);
+                        $order->total_paid_tax_excl = Tools::ps_round($order->getOrderTotal(false), _PS_PRICE_COMPUTE_PRECISION_);
 
                         $res &= $order->update();
                     }
@@ -6531,14 +6493,9 @@ class AdminOrdersControllerCore extends AdminController
                     $order->total_products_wt = Tools::ps_round((float)($order->total_products_wt - $priceTaxIncl), _PS_PRICE_COMPUTE_PRECISION_);
                     $order->total_products_wt = $order->total_products_wt > 0 ? $order->total_products_wt : 0;
 
-                    $order->total_paid_tax_excl = Tools::ps_round((float)($order->total_paid_tax_excl - $priceTaxExcl), _PS_PRICE_COMPUTE_PRECISION_);
-                    $order->total_paid_tax_excl = $order->total_paid_tax_excl > 0 ? $order->total_paid_tax_excl : 0;
-
-                    $order->total_paid_tax_incl = Tools::ps_round((float)($order->total_paid_tax_incl - $priceTaxIncl), _PS_PRICE_COMPUTE_PRECISION_);
-                    $order->total_paid_tax_incl = $order->total_paid_tax_incl > 0 ? $order->total_paid_tax_incl : 0;
-
-                    $order->total_paid = Tools::ps_round((float)($order->total_paid - $priceTaxIncl), _PS_PRICE_COMPUTE_PRECISION_);
-                    $order->total_paid = $order->total_paid > 0 ? $order->total_paid : 0;
+                    $order->total_paid = Tools::ps_round($order->getOrderTotal(), _PS_PRICE_COMPUTE_PRECISION_);
+                    $order->total_paid_tax_incl = Tools::ps_round($order->getOrderTotal(), _PS_PRICE_COMPUTE_PRECISION_);
+                    $order->total_paid_tax_excl = Tools::ps_round($order->getOrderTotal(false), _PS_PRICE_COMPUTE_PRECISION_);
 
                     $res &= $order->update();
                 }
@@ -6759,9 +6716,10 @@ class AdminOrdersControllerCore extends AdminController
                             // update totals amount of order
                             $order->total_products = Tools::ps_round((float)($order->total_products + $totalPriceChangeTaxExcl), _PS_PRICE_COMPUTE_PRECISION_);
                             $order->total_products_wt = Tools::ps_round((float)($order->total_products_wt + $totalPriceChangeTaxIncl), _PS_PRICE_COMPUTE_PRECISION_);
-                            $order->total_paid = Tools::ps_round((float)($order->total_paid + $totalPriceChangeTaxIncl), _PS_PRICE_COMPUTE_PRECISION_);
-                            $order->total_paid_tax_excl = Tools::ps_round((float)($order->total_paid_tax_excl + $totalPriceChangeTaxExcl), _PS_PRICE_COMPUTE_PRECISION_);
-                            $order->total_paid_tax_incl = Tools::ps_round((float)($order->total_paid_tax_incl + $totalPriceChangeTaxIncl), _PS_PRICE_COMPUTE_PRECISION_);
+
+                            $order->total_paid = Tools::ps_round($order->getOrderTotal(), _PS_PRICE_COMPUTE_PRECISION_);
+                            $order->total_paid_tax_incl = Tools::ps_round($order->getOrderTotal(), _PS_PRICE_COMPUTE_PRECISION_);
+                            $order->total_paid_tax_excl = Tools::ps_round($order->getOrderTotal(false), _PS_PRICE_COMPUTE_PRECISION_);
 
                             // update invoice total
                             if (isset($objOrderInvoice) && Validate::isLoadedObject($objOrderInvoice)) {
@@ -6904,11 +6862,6 @@ class AdminOrdersControllerCore extends AdminController
                                     $res &= $order_invoice->update();
                                 }
 
-                                // change order total
-                                $order->total_paid_tax_excl = Tools::ps_round((float)($order->total_paid_tax_excl + $objBookingDemand->total_price_tax_excl), _PS_PRICE_COMPUTE_PRECISION_);
-                                $order->total_paid_tax_incl = Tools::ps_round((float)($order->total_paid_tax_incl + $objBookingDemand->total_price_tax_incl), _PS_PRICE_COMPUTE_PRECISION_);
-                                $order->total_paid = Tools::ps_round((float)($order->total_paid + $objBookingDemand->total_price_tax_incl), _PS_PRICE_COMPUTE_PRECISION_);
-
                                 $objBookingDemand->price_calc_method = $objGlobalDemand->price_calc_method;
                                 $objBookingDemand->id_tax_rules_group = $objGlobalDemand->id_tax_rules_group;
                                 $taxManager = TaxManagerFactory::getManager(
@@ -6923,6 +6876,10 @@ class AdminOrdersControllerCore extends AdminController
                                     $objBookingDemand->setBookingDemandTaxDetails();
                                 }
                             }
+
+                            $order->total_paid = Tools::ps_round($order->getOrderTotal(), _PS_PRICE_COMPUTE_PRECISION_);
+                            $order->total_paid_tax_incl = Tools::ps_round($order->getOrderTotal(), _PS_PRICE_COMPUTE_PRECISION_);
+                            $order->total_paid_tax_excl = Tools::ps_round($order->getOrderTotal(false), _PS_PRICE_COMPUTE_PRECISION_);
                             if ($order->save()) {
                                 $response['facilities_panel'] = $this->processRenderFacilitiesBlock(
                                     $order->id,
@@ -6995,7 +6952,7 @@ class AdminOrdersControllerCore extends AdminController
                             $order->round_type,
                             $order->round_mode
                         );
-                        $objBookingDemand->total_price_tax_excl = Tools::processPriceRounding(
+                        $objBookingDemand->total_price_tax_incl = Tools::processPriceRounding(
                             $objBookingDemand->unit_price_tax_incl,
                             1,
                             $order->round_type,
@@ -7058,9 +7015,9 @@ class AdminOrdersControllerCore extends AdminController
                                 // change order total
                                 $order = new Order($objBookingDetail->id_order);
 
-                                $order->total_paid_tax_excl = Tools::ps_round((float)($order->total_paid_tax_excl - $objBookingDemand->total_price_tax_excl), _PS_PRICE_COMPUTE_PRECISION_);
-                                $order->total_paid_tax_incl = Tools::ps_round((float)($order->total_paid_tax_incl - $objBookingDemand->total_price_tax_incl), _PS_PRICE_COMPUTE_PRECISION_);
-                                $order->total_paid = Tools::ps_round((float)($order->total_paid - $objBookingDemand->total_price_tax_incl), _PS_PRICE_COMPUTE_PRECISION_);
+                                $order->total_paid = Tools::ps_round($order->getOrderTotal(), _PS_PRICE_COMPUTE_PRECISION_);
+                                $order->total_paid_tax_incl = Tools::ps_round($order->getOrderTotal(), _PS_PRICE_COMPUTE_PRECISION_);
+                                $order->total_paid_tax_excl = Tools::ps_round($order->getOrderTotal(false), _PS_PRICE_COMPUTE_PRECISION_);
 
                                 $order->save();
 
