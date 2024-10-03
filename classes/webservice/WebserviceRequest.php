@@ -255,7 +255,8 @@ class WebserviceRequestCore
     public static function getResources()
     {
         $resources = array(
-            'addresses' => array('description' => 'The Customer, Manufacturer and Customer addresses','class' => 'Address'),
+            'addresses' => array('description' => 'The Customer address','class' => 'Address'),
+            'bookings' => array('description' => 'The Customer bookings', 'specific_management' => 'true','forbidden_method' => array('DELETE')),
             'carriers' => array('description' => 'The Carriers','class' => 'Carrier'),
             'carts' => array('description' => 'Customer\'s carts', 'class' => 'Cart'),
             'cart_rules' => array('description' => 'Cart rules management', 'class' => 'CartRule'),
