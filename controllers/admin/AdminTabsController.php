@@ -324,7 +324,7 @@ class AdminTabsControllerCore extends AdminController
                     break;
                 }
             }
-        } else {
+        } else if ($this->display == 'add') {
             // Temporary add the position depend of the selection of the parent category
             if (!Tools::isSubmit('id_tab')) { // @todo Review
                 $_POST['position'] = Tab::getNbTabs(Tools::getValue('id_parent'));

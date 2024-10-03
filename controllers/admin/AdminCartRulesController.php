@@ -752,10 +752,12 @@ class AdminCartRulesControllerCore extends AdminController
     public function renderForm()
     {
         $limit = 40;
-        $this->toolbar_btn['save-and-stay'] = array(
-            'href' => '#',
-            'desc' => $this->l('Save and Stay')
-        );
+        if (!Tools::getValue('liteDisplaying')) {
+            $this->toolbar_btn['save-and-stay'] = array(
+                'href' => '#',
+                'desc' => $this->l('Save and Stay')
+            );
+        }
 
         /** @var CartRule $current_object */
         $current_object = $this->loadObject(true);
