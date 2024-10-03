@@ -154,7 +154,8 @@ class HTMLTemplateOrderSlipCore extends HTMLTemplateInvoice
             'invoice_address' => $formatted_invoice_address,
             'addresses' => array('invoice' => $invoice_address, 'delivery' => $delivery_address),
             'tax_excluded_display' => $tax_excluded_display,
-            'total_cart_rule' => $total_cart_rule
+            'total_cart_rule' => $total_cart_rule,
+            'customer' => $customer
         ));
 
         $tpls = array(
@@ -256,7 +257,7 @@ class HTMLTemplateOrderSlipCore extends HTMLTemplateInvoice
     		SELECT od.`tax_computation_method`
     		FROM `' . _DB_PREFIX_ . 'order_detail_tax` odt
     		LEFT JOIN `' . _DB_PREFIX_ . 'order_detail` od ON (od.`id_order_detail` = odt.`id_order_detail`)
-    		WHERE od.`id_order` = ' . (int) $this->order->id_order . '
+    		WHERE od.`id_order` = ' . (int) $this->order->id . '
     		AND od.`tax_computation_method` = ' . (int) TaxCalculator::ONE_AFTER_ANOTHER_METHOD)
             || Configuration::get('PS_INVOICE_TAXES_BREAKDOWN');
     }
@@ -271,8 +272,8 @@ class HTMLTemplateOrderSlipCore extends HTMLTemplateInvoice
         $breakdown = array();
 
         $order_detail = array_filter($this->order->products, function($v) {
-            return ($v['is_booking_product']
-                || ($v['product_auto_add']
+            return ((isset($v['is_booking_product']) && $v['is_booking_product'])
+                || ((isset($v['product_auto_add']) && $v['product_auto_add'])
                     && $v['product_service_type'] == Product::SERVICE_PRODUCT_WITH_ROOMTYPE
                     && $v['product_price_addition_type'] == ProductCore::PRICE_ADDITION_TYPE_WITH_ROOM)
             );

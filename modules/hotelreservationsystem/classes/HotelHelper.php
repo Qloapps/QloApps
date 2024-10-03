@@ -2229,15 +2229,7 @@ class HotelHelper
             $idProduct = $objProduct->id;
 
             // add to applicable categories
-            $objCategory = new Category($serviceProduct['id_category_default']);
-            if ($categories = $objCategory->getParentsCategories()) {
-                $idsCategory = array();
-                foreach ($categories as $category) {
-                    $idsCategory[] = $category['id_category'];
-                }
-                $objProduct->addToCategories($idsCategory);
-            }
-
+            $objProduct->addToCategories($serviceProduct['id_category_default']);
             Search::indexation(Tools::link_rewrite($serviceProdDataDefult['name']), $idProduct);
 
             StockAvailable::updateQuantity($idProduct, null, 999999999);
