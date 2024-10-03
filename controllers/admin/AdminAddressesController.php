@@ -140,6 +140,9 @@ class AdminAddressesControllerCore extends AdminController
                     'name' => 'email'
                 ),
             );
+        } else if (isset($this->object->id) && $this->object->id_hotel) {
+            $this->errors[] = Tools::displayError('The object cannot be loaded (or found)');
+            return false;
         }
 
         $this->fields_form = array(

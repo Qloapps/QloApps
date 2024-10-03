@@ -2546,7 +2546,7 @@ class AdminOrdersControllerCore extends AdminController
             $dateFrom = date(Context::getContext()->language->date_format_lite, strtotime('-2 day'));
             $dateTo = date(Context::getContext()->language->date_format_lite, strtotime('-1 day'));
             $helper->subtitle = sprintf($this->l('From %s to %s', null, null, false), $dateFrom, $dateTo);
-            $helper->href = $this->context->link->getAdminLink('AdminCarts').'&action=filterOnlyAbandonedCarts&date_from='.$dateFrom.'&date_to='.$dateTo;
+            $helper->href = $this->context->link->getAdminLink('AdminCarts').'&action=filterOnlyAbandonedCarts&date_from='.date('Y-m-d', strtotime('-2 day')).'&date_to='.date('Y-m-d', strtotime('-1 day'));
             $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=abandoned_cart';
             $helper->tooltip = $this->l('Total number of abandoned carts  in given period of time.', null, null, false);
             $this->kpis[] = $helper;

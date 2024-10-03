@@ -318,8 +318,10 @@ class AdminImportControllerCore extends AdminController
                 );
             break;
             case $this->entities[$this->l('Customers')]:
-                //Overwrite required_fields AS only email is required whereas other entities
                 $this->required_fields = array('email', 'passwd', 'lastname', 'firstname');
+                if (Configuration::get('PS_ONE_PHONE_AT_LEAST')) {
+                    $this->required_fields[] = 'phone';
+                }
 
                 $this->available_fields = array(
                     'no' => array('label' => $this->l('Ignore this column')),
@@ -331,6 +333,7 @@ class AdminImportControllerCore extends AdminController
                     'birthday' => array('label' => $this->l('Birthday (yyyy-mm-dd)')),
                     'lastname' => array('label' => $this->l('Last Name *')),
                     'firstname' => array('label' => $this->l('First Name *')),
+                    'phone' => array('label' => $this->l('Phone'). (Configuration::get('PS_ONE_PHONE_AT_LEAST') ? ' *' : '' )),
                     'newsletter' => array('label' => $this->l('Newsletter (0/1)')),
                     'optin' => array('label' => $this->l('Opt-in (0/1)')),
                     'group' => array('label' => $this->l('Groups (x,y,z...)')),
@@ -2699,6 +2702,10 @@ class AdminImportControllerCore extends AdminController
 
         $convert = Tools::getValue('convert');
         $force_ids = Tools::getValue('forceIDs');
+        $phoneRequired = false;
+        if (Configuration::get('PS_ONE_PHONE_AT_LEAST')) {
+            $phoneRequired = true;
+        }
 
         for ($current_line = 0; $line = fgetcsv($handle, MAX_LINE_SIZE, $this->separator); $current_line++) {
             if ($convert) {
@@ -2707,7 +2714,13 @@ class AdminImportControllerCore extends AdminController
 
             $info = AdminImportController::getMaskedRow($line);
             $has_required_fields = $this->checkRequiredFields($info, 'firstname');
-            if ($has_required_fields) {
+            if ($phoneRequired && !Validate::isPhoneNumber(trim($info['phone']))) {
+                $this->errors[] = sprintf(
+                    Tools::displayError('Invalid phone for %1$s (ID: %2$s).'),
+                    $info['email'],
+                    (isset($info['id']) && !empty($info['id']))? $info['id'] : 'null'
+                );
+            } else if ($has_required_fields) {
                 AdminImportController::setDefaultValues($info);
                 $customerExists = false;
                 if (isset($info['id'])
@@ -2723,7 +2736,7 @@ class AdminImportControllerCore extends AdminController
                         $customer->force_id = $info['id'];
                     }
                 } else {
-                        $customer = new Customer();
+                    $customer = new Customer();
                 }
 
                 $customer_exist = false;
@@ -2833,6 +2846,9 @@ class AdminImportControllerCore extends AdminController
 
                         if ($res && isset($customer_groups)) {
                             $customer->updateGroup($customer_groups);
+                            if ($phoneRequired) {
+                                CartCustomerGuestDetail::updateCustomerPhoneNumber($customer->email, $customer->phone);
+                            }
                         }
                     }
                 }
