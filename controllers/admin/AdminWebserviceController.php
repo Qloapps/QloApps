@@ -102,7 +102,7 @@ class AdminWebserviceControllerCore extends AdminController
 
     public function initPageHeaderToolbar()
     {
-        if ($this->display != 'edit' && $this->display != 'add' && $this->display !='view') {
+        if (empty($this->display)) {
             $this->page_header_toolbar_btn['new_webservice'] = array(
                 'href' => self::$currentIndex.'&addwebservice_account&token='.$this->token,
                 'desc' => $this->l('Add new webservice key', null, null, false),

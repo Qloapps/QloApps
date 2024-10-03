@@ -161,7 +161,7 @@ class AdminSupplyOrdersControllerCore extends AdminController
                 'desc' => $this->l('Back to list', null, null, false),
                 'icon' => 'process-icon-back'
             );
-        } elseif ($this->display != 'edit' && $this->display != 'add' && $this->display !='view') {
+        } elseif (empty($this->display)) {
             $this->page_header_toolbar_btn['new_supply_order'] = array(
                 'href' => self::$currentIndex.'&addsupply_order&token='.$this->token,
                 'desc' => $this->l('Add new supply order', null, null, false),

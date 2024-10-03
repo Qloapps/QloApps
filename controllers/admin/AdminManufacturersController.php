@@ -109,7 +109,7 @@ class AdminManufacturersControllerCore extends AdminController
 
     public function initPageHeaderToolbar()
     {
-        if ($this->display != 'edit' && $this->display != 'add' && $this->display !='view') {
+        if (empty($this->display)) {
             $this->page_header_toolbar_btn['new_manufacturer'] = array(
                 'href' => self::$currentIndex.'&addmanufacturer&token='.$this->token,
                 'desc' => $this->l('Add new manufacturer', null, null, false),

@@ -242,7 +242,7 @@ class AdminStatusesControllerCore extends AdminController
 
     public function initPageHeaderToolbar()
     {
-        if ($this->display != 'edit' && $this->display != 'add' && $this->display !='view') {
+        if (empty($this->display)) {
             $this->page_header_toolbar_btn['new_order_state'] = array(
                 'href' => self::$currentIndex.'&addorder_state&token='.$this->token,
                 'desc' => $this->l('Add new order status', null, null, false),

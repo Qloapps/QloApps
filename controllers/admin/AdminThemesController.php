@@ -734,7 +734,7 @@ class AdminThemesControllerCore extends AdminController
     {
         parent::initPageHeaderToolbar();
 
-        if ($this->display != 'edit' && $this->display != 'add' && $this->display !='view') {
+        if (empty($this->display)) {
             $this->page_header_toolbar_btn['import_theme'] = array(
                 'href' => self::$currentIndex.'&action=importtheme&token='.$this->token,
                 'desc' => $this->l('Add new theme', null, null, false),

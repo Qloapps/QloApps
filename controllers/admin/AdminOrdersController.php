@@ -360,7 +360,7 @@ class AdminOrdersControllerCore extends AdminController
 
     public function initPageHeaderToolbar()
     {
-        if ($this->display != 'edit' && $this->display != 'add' && $this->display !='view') {
+        if (empty($this->display)) {
             $this->page_header_toolbar_btn['new_order'] = array(
                 'href' => self::$currentIndex.'&addorder&token='.$this->token,
                 'desc' => $this->l('Add new order', null, null, false),

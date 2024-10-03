@@ -242,7 +242,7 @@ class AdminSearchConfControllerCore extends AdminController
 
     public function initPageHeaderToolbar()
     {
-        if ($this->display != 'edit' && $this->display != 'add' && $this->display !='view') {
+        if (empty($this->display) || $this->display == 'list') {
             $this->page_header_toolbar_btn['new_alias'] = array(
                 'href' => self::$currentIndex.'&addalias&token='.$this->token,
                 'desc' => $this->l('Add new alias', null, null, false),

@@ -77,7 +77,7 @@ class AdminTaxRulesGroupControllerCore extends AdminController
 
     public function initPageHeaderToolbar()
     {
-        if ($this->display != 'edit' && $this->display != 'add' && $this->display !='view') {
+        if (empty($this->display)) {
             $this->page_header_toolbar_btn['new_tax_rules_group'] = array(
                 'href' => self::$currentIndex.'&addtax_rules_group&token='.$this->token,
                 'desc' => $this->l('Add new tax rules group', null, null, false),

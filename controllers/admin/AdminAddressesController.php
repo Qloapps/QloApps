@@ -99,7 +99,7 @@ class AdminAddressesControllerCore extends AdminController
 
     public function initPageHeaderToolbar()
     {
-        if ($this->display != 'edit' && $this->display != 'add' && $this->display !='view') {
+        if (empty($this->display)) {
             $this->page_header_toolbar_btn['new_address'] = array(
                 'href' => self::$currentIndex.'&addaddress&token='.$this->token,
                 'desc' => $this->l('Add new address', null, null, false),

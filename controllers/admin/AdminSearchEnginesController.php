@@ -92,7 +92,7 @@ class AdminSearchEnginesControllerCore extends AdminController
 
     public function initPageHeaderToolbar()
     {
-        if ($this->display != 'edit' && $this->display != 'add' && $this->display !='view') {
+        if (empty($this->display)) {
             $this->page_header_toolbar_btn['new_search_engine'] = array(
                 'href' => self::$currentIndex.'&addsearch_engine&token='.$this->token,
                 'desc' => $this->l('Add new search engine', null, null, false),

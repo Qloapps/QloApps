@@ -278,7 +278,7 @@ class AdminCategoriesControllerCore extends AdminController
 
     public function initToolbar()
     {
-        if ($this->display != 'edit' && $this->display != 'add' && $this->display !='view') {
+        if (empty($this->display)) {
             $this->toolbar_btn['new'] = array(
                 'href' => self::$currentIndex.'&add'.$this->table.'&token='.$this->token,
                 'desc' => $this->l('Add New')
@@ -317,7 +317,7 @@ class AdminCategoriesControllerCore extends AdminController
             unset($this->toolbar_btn['new']);
         }
         // after adding a category
-        if ($this->display != 'edit' && $this->display != 'add' && $this->display !='view') {
+        if (empty($this->display)) {
             $id_category = (Tools::isSubmit('id_category')) ? '&id_parent='.(int)Tools::getValue('id_category') : '';
             $this->toolbar_btn['new'] = array(
                 'href' => self::$currentIndex.'&add'.$this->table.'&token='.$this->token.$id_category,
