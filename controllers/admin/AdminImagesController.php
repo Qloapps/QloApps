@@ -823,7 +823,7 @@ class AdminImagesControllerCore extends AdminController
 
     public function initPageHeaderToolbar()
     {
-        if (empty($this->display)) {
+        if (empty($this->display) || $this->display == 'list') {
             $this->page_header_toolbar_btn['new_image_type'] = array(
                 'href' => self::$currentIndex.'&addimage_type&token='.$this->token,
                 'desc' => $this->l('Add new image type', null, null, false),

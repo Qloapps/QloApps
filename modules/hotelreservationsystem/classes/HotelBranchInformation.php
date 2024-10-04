@@ -275,8 +275,8 @@ class HotelBranchInformation extends ObjectModel
     public static function filterDataByHotelAccess(
         $dataArray,
         $idProfile,
-        $idAsIdHotel = 0,
-        $idAsIdProduct = 0,
+        $idHotelAlias = false,
+        $idProductAlias = false,
         $addAccessKey = 0
     ) {
         if ($hotelAccessInfo =  Db::getInstance()->executeS(
@@ -299,20 +299,20 @@ class HotelBranchInformation extends ObjectModel
                                 unset($dataArray[$key]);
                             }
                         }
-                    } elseif ($idAsIdHotel && isset($row['id'])) {
+                    } elseif ($idHotelAlias && isset($row[$idHotelAlias])) {
                         if ($addAccessKey) {
                             $dataArray[$key]['htl_access'] = 0;
-                            if (in_array($row['id'], $hotels)) {
+                            if (in_array($row[$idHotelAlias], $hotels)) {
                                 $dataArray[$key]['htl_access'] = 1;
                             }
                         } else {
-                            if (!in_array($row['id'], $hotels)) {
+                            if (!in_array($row[$idHotelAlias], $hotels)) {
                                 unset($dataArray[$key]);
                             }
                         }
-                    } elseif ($idAsIdProduct && isset($row['id'])) {
+                    } elseif ($idProductAlias && isset($row[$idProductAlias])) {
                         $objRoomType = new HotelRoomType();
-                        if ($roomTypeInfo = $objRoomType->getRoomTypeInfoByIdProduct($row['id'])) {
+                        if ($roomTypeInfo = $objRoomType->getRoomTypeInfoByIdProduct($row[$idProductAlias])) {
                             if ($addAccessKey) {
                                 $dataArray[$key]['htl_access'] = 0;
                                 if (in_array($roomTypeInfo['id_hotel'], $hotels)) {
