@@ -232,7 +232,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
                 WHERE os.logable = 1'. (($date_from && $date_to) ? ' AND `invoice_date` BETWEEN "'.pSQL($date_from).' 00:00:00" AND "'.pSQL($date_to).' 23:59:59"' : '').'
                 AND EXISTS (
                     SELECT 1
-                    FROM `qlo_htl_booking_detail` hbd
+                    FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
                     WHERE hbd.`id_order` = o.`id_order`' . HotelBranchInformation::addHotelRestriction($id_hotel).'
                 )
                 GROUP BY LEFT(`invoice_date`, 10)'
@@ -251,7 +251,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
                 WHERE os.logable = 1'. (($date_from && $date_to) ? ' AND `invoice_date` BETWEEN "'.pSQL($date_from).' 00:00:00" AND "'.pSQL($date_to).' 23:59:59"' : '').'
                 AND EXISTS (
                     SELECT 1
-                    FROM `qlo_htl_booking_detail` hbd
+                    FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
                     WHERE hbd.`id_order` = o.`id_order`' . HotelBranchInformation::addHotelRestriction($id_hotel).'
                 )
                 GROUP BY LEFT(`invoice_date`, 7)'
@@ -497,7 +497,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
 			WHERE `invoice_date` BETWEEN "'.pSQL($date_from).' 00:00:00" AND "'.pSQL($date_to).' 23:59:59"
             AND os.logable = 1 AND EXISTS (
                 SELECT 1
-                FROM `qlo_htl_booking_detail` hbd
+                FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
                 WHERE hbd.`id_order` = o.`id_order`' . HotelBranchInformation::addHotelRestriction($id_hotel).'
             )
 			GROUP BY LEFT(`invoice_date`, 10)')) {
@@ -521,7 +521,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
                 WHERE `invoice_date` BETWEEN "'.pSQL($date_from).' 00:00:00" AND "'.pSQL($date_to).' 23:59:59"
                 AND os.logable = 1 AND EXISTS (
                     SELECT 1
-                    FROM `qlo_htl_booking_detail` hbd
+                    FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
                     WHERE hbd.`id_order` = o.`id_order`' . HotelBranchInformation::addHotelRestriction($id_hotel).'
                 )'
             );
@@ -542,7 +542,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
 			WHERE orr.`payment_mode` != "" AND `invoice_date` BETWEEN "'.pSQL($date_from).' 00:00:00"
             AND "'.pSQL($date_to).' 23:59:59" AND EXISTS (
                 SELECT 1
-                FROM `qlo_htl_booking_detail` hbd
+                FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
                 WHERE hbd.`id_order` = o.`id_order`' . HotelBranchInformation::addHotelRestriction($id_hotel).'
             )
 			GROUP BY LEFT(`invoice_date`, 10)')) {
@@ -568,7 +568,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
                 AND `invoice_date` BETWEEN "'.pSQL($date_from).' 00:00:00" AND "'.pSQL($date_to).' 23:59:59"
                 AND EXISTS (
                     SELECT 1
-                    FROM `qlo_htl_booking_detail` hbd
+                    FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
                     WHERE hbd.`id_order` = o.`id_order`' . HotelBranchInformation::addHotelRestriction($id_hotel).'
                 )'
             );
@@ -850,7 +850,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
                 WHERE o.`invoice_date` BETWEEN "'.pSQL(date('Y-m-d', strtotime('-'.($daysForAvgOrderVal + 1).' day'))).' 00:00:00"
                 AND "'.pSQL(date('Y-m-d')).' 23:59:59" AND os.`logable` = 1 AND EXISTS (
                     SELECT 1
-                    FROM `qlo_htl_booking_detail` hbd
+                    FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
                     WHERE hbd.`id_order` = o.`id_order`' . HotelBranchInformation::addHotelRestriction($idHotels).'
                 )');
                 $value = Tools::displayPrice($row['orders'] ? $row['total_paid_tax_excl'] / $row['orders'] : 0, $currency).' ('.$this->l('tax excl.').')';
@@ -1918,7 +1918,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
             WHERE o.`valid` = 1 AND o.`date_add` BETWEEN "'.pSQL($dateFrom).' 00:00:00" AND "'.pSQL($dateTo).' 23:59:59"
             AND EXISTS (
                 SELECT 1
-                FROM `qlo_htl_booking_detail` hbd
+                FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
                 WHERE hbd.`id_order` = o.`id_order`' . HotelBranchInformation::addHotelRestriction($idHotel).'
             )
             GROUP BY o.`id_customer`
@@ -2434,7 +2434,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
         (($dateFrom && $dateTo) ? ' AND o.`date_add` BETWEEN "'.pSQL($dateFrom).' 00:00:00" AND "'.pSQL($dateTo).' 23:59:59"' : '').
         ' AND EXISTS (
             SELECT 1
-            FROM `qlo_htl_booking_detail` hbd
+            FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
             WHERE hbd.`id_order` = o.`id_order`' . HotelBranchInformation::addHotelRestriction($idHotel).'
         )';
         return Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue($sql);
