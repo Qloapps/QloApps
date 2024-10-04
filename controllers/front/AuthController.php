@@ -435,7 +435,9 @@ class AuthControllerCore extends FrontController
             }
 
             if (!Tools::getValue('is_new_customer', 1)) {
-                if ($idCustomer = Customer::customerExists(Tools::getValue('email'), true, false)) {
+                if (Validate::isEmail($email = Tools::getValue('email'))
+                    && $idCustomer = Customer::customerExists(Tools::getValue('email'), true, false)
+                ) {
                     $customer = new Customer($idCustomer);
                 }
             }
@@ -574,7 +576,6 @@ class AuthControllerCore extends FrontController
                     }
                 }
             }
-
             if (!@checkdate(Tools::getValue('months'), Tools::getValue('days'), Tools::getValue('years')) && !(Tools::getValue('months') == '' && Tools::getValue('days') == '' && Tools::getValue('years') == '')) {
                 $this->errors[] = Tools::displayError('Invalid date of birth');
             }

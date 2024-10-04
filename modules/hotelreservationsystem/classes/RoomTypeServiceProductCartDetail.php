@@ -221,7 +221,8 @@ class RoomTypeServiceProductCartDetail extends ObjectModel
             cbd.`id_product` as `room_type_id_product`, cbd.`adults`, cbd.`children`, cbd.`date_from`, cbd.`date_to`';
         if (!$getTotalPrice) {
             $sql .= ', pl.`name`, cbd.`id_guest`, cbd.`id_customer`, p.`auto_add_to_cart`, p.`price_addition_type`,
-                p.`price_calculation_method`, cbd.`id_hotel`, cbd.`id_room`, cbd.`date_from`, cbd.`date_to`, cbd.`is_refunded`';
+                p.`price_calculation_method`, cbd.`id_hotel`, cbd.`id_room`, cbd.`date_from`, cbd.`date_to`,
+                cbd.`is_refunded`, p.`allow_multiple_quantity`';
         }
         $sql .= ' FROM `'._DB_PREFIX_.'htl_cart_booking_data` cbd
             LEFT JOIN `'._DB_PREFIX_.'htl_room_type_service_product_cart_detail` rscd
@@ -296,11 +297,44 @@ class RoomTypeServiceProductCartDetail extends ObjectModel
                         if ($idProduct) {
                             $selectedServiceProducts[$product['htl_cart_booking_id']]['quantity'] += $product['quantity'];
                         } else {
+                            $servicePrice = $objRoomTypeServiceProductPrice->getServicePrice(
+                                (int)$product['id_product'],
+                                (int)$product['room_type_id_product'],
+                                1,
+                                $product['date_from'],
+                                $product['date_to'],
+                                $useTax,
+                                false,
+                                $id_address
+                            );
+
+                            $servicePriceTE = $objRoomTypeServiceProductPrice->getServicePrice(
+                                (int)$product['id_product'],
+                                (int)$product['room_type_id_product'],
+                                1,
+                                $product['date_from'],
+                                $product['date_to'],
+                                false,
+                                false,
+                                $id_address
+                            );
+
+                            $servicePriceTI = $objRoomTypeServiceProductPrice->getServicePrice(
+                                (int)$product['id_product'],
+                                (int)$product['room_type_id_product'],
+                                1,
+                                $product['date_from'],
+                                $product['date_to'],
+                                true,
+                                false,
+                                $id_address
+                            );
                             $selectedServiceProducts[$product['htl_cart_booking_id']]['selected_products_info'][$product['id_product']] = array(
                                 'id_product' => $product['id_product'],
                                 'name' => $product['name'],
                                 'quantity' => $product['quantity'],
                                 'auto_add_to_cart' => $product['auto_add_to_cart'],
+                                'allow_multiple_quantity' => $product['allow_multiple_quantity'],
                                 'price_addition_type' => $product['price_addition_type'],
                                 'price_calculation_method' => $product['price_calculation_method'],
                                 'unit_price_tax_excl' => ($objRoomTypeServiceProductPrice->getServicePrice(
@@ -323,9 +357,28 @@ class RoomTypeServiceProductCartDetail extends ObjectModel
                                     false,
                                     $id_address
                                 ) / $numdays),
+                                'total_price' => $servicePrice,
+                                'total_price_tax_excl' => $servicePriceTE,
+                                'total_price_tax_incl' => $servicePriceTI
                             );
                         }
 
+                        $selectedServiceProducts[$product['htl_cart_booking_id']]['total_price'] += Tools::processPriceRounding($servicePrice, $qty);
+                        $selectedServiceProducts[$product['htl_cart_booking_id']]['total_price_tax_excl'] += Tools::processPriceRounding($servicePriceTE, $qty);
+                        $selectedServiceProducts[$product['htl_cart_booking_id']]['total_price_tax_incl'] += Tools::processPriceRounding($servicePriceTI, $qty);
+                    } else {
+                        $selectedServiceProducts[$product['htl_cart_booking_id']]['htl_cart_booking_id'] = $product['htl_cart_booking_id'];
+                        $selectedServiceProducts[$product['htl_cart_booking_id']]['id_cart'] = $product['id_cart'];
+                        $selectedServiceProducts[$product['htl_cart_booking_id']]['room_type_id_product'] = $product['room_type_id_product'];
+                        $selectedServiceProducts[$product['htl_cart_booking_id']]['id_guest'] = $product['id_guest'];
+                        $selectedServiceProducts[$product['htl_cart_booking_id']]['id_customer'] = $product['id_customer'];
+                        $selectedServiceProducts[$product['htl_cart_booking_id']]['id_hotel'] = $product['id_hotel'];
+                        $selectedServiceProducts[$product['htl_cart_booking_id']]['id_room'] = $product['id_room'];
+                        $selectedServiceProducts[$product['htl_cart_booking_id']]['date_from'] = $product['date_from'];
+                        $selectedServiceProducts[$product['htl_cart_booking_id']]['date_to'] = $product['date_to'];
+                        $selectedServiceProducts[$product['htl_cart_booking_id']]['is_refunded'] = $product['is_refunded'];
+                        $selectedServiceProducts[$product['htl_cart_booking_id']]['adults'] = $product['adults'];
+                        $selectedServiceProducts[$product['htl_cart_booking_id']]['children'] = $product['children'];
                         $servicePrice = $objRoomTypeServiceProductPrice->getServicePrice(
                             (int)$product['id_product'],
                             (int)$product['room_type_id_product'],
@@ -358,28 +411,12 @@ class RoomTypeServiceProductCartDetail extends ObjectModel
                             false,
                             $id_address
                         );
-
-                        $selectedServiceProducts[$product['htl_cart_booking_id']]['total_price'] += Tools::processPriceRounding($servicePrice, $qty);
-                        $selectedServiceProducts[$product['htl_cart_booking_id']]['total_price_tax_excl'] += Tools::processPriceRounding($servicePriceTE, $qty);
-                        $selectedServiceProducts[$product['htl_cart_booking_id']]['total_price_tax_incl'] += Tools::processPriceRounding($servicePriceTI, $qty);
-                    } else {
-                        $selectedServiceProducts[$product['htl_cart_booking_id']]['htl_cart_booking_id'] = $product['htl_cart_booking_id'];
-                        $selectedServiceProducts[$product['htl_cart_booking_id']]['id_cart'] = $product['id_cart'];
-                        $selectedServiceProducts[$product['htl_cart_booking_id']]['room_type_id_product'] = $product['room_type_id_product'];
-                        $selectedServiceProducts[$product['htl_cart_booking_id']]['id_guest'] = $product['id_guest'];
-                        $selectedServiceProducts[$product['htl_cart_booking_id']]['id_customer'] = $product['id_customer'];
-                        $selectedServiceProducts[$product['htl_cart_booking_id']]['id_hotel'] = $product['id_hotel'];
-                        $selectedServiceProducts[$product['htl_cart_booking_id']]['id_room'] = $product['id_room'];
-                        $selectedServiceProducts[$product['htl_cart_booking_id']]['date_from'] = $product['date_from'];
-                        $selectedServiceProducts[$product['htl_cart_booking_id']]['date_to'] = $product['date_to'];
-                        $selectedServiceProducts[$product['htl_cart_booking_id']]['is_refunded'] = $product['is_refunded'];
-                        $selectedServiceProducts[$product['htl_cart_booking_id']]['adults'] = $product['adults'];
-                        $selectedServiceProducts[$product['htl_cart_booking_id']]['children'] = $product['children'];
                         if ($idProduct) {
                             $selectedServiceProducts[$product['htl_cart_booking_id']]['id_product'] = $product['id_product'];
                             $selectedServiceProducts[$product['htl_cart_booking_id']]['name'] = $product['name'];
                             $selectedServiceProducts[$product['htl_cart_booking_id']]['quantity'] = $product['quantity'];
                             $selectedServiceProducts[$product['htl_cart_booking_id']]['auto_add_to_cart'] = $product['auto_add_to_cart'];
+                            $selectedServiceProducts[$product['htl_cart_booking_id']]['allow_multiple_quantity'] = $product['allow_multiple_quantity'];
                             $selectedServiceProducts[$product['htl_cart_booking_id']]['price_addition_type'] = $product['price_addition_type'];
                             $selectedServiceProducts[$product['htl_cart_booking_id']]['price_calculation_method'] = $product['price_calculation_method'];
                             $selectedServiceProducts[$product['htl_cart_booking_id']]['unit_price_tax_excl'] = $objRoomTypeServiceProductPrice->getServicePrice(
@@ -402,12 +439,16 @@ class RoomTypeServiceProductCartDetail extends ObjectModel
                                 false,
                                 $id_address
                             ) / $numdays;
+                            $selectedServiceProducts[$product['htl_cart_booking_id']]['total_price'] = $servicePrice;
+                            $selectedServiceProducts[$product['htl_cart_booking_id']]['total_price_tax_excl'] = $servicePriceTE;
+                            $selectedServiceProducts[$product['htl_cart_booking_id']]['total_price_tax_incl'] = $servicePriceTI;
                         } else {
                             $selectedServiceProducts[$product['htl_cart_booking_id']]['selected_products_info'][$product['id_product']] =  array(
                                 'id_product' => $product['id_product'],
                                 'name' => $product['name'],
                                 'quantity' => $product['quantity'],
                                 'auto_add_to_cart' => $product['auto_add_to_cart'],
+                                'allow_multiple_quantity' => $product['allow_multiple_quantity'],
                                 'price_addition_type' => $product['price_addition_type'],
                                 'price_calculation_method' => $product['price_calculation_method'],
                                 'unit_price_tax_excl' => ($objRoomTypeServiceProductPrice->getServicePrice(
@@ -430,41 +471,13 @@ class RoomTypeServiceProductCartDetail extends ObjectModel
                                     false,
                                     $id_address
                                 ) / $numdays),
+                                'total_price' => $servicePrice,
+                                'total_price_tax_excl' => $servicePriceTE,
+                                'total_price_tax_incl' => $servicePriceTI
                             );
                         }
 
-                        $servicePrice = $objRoomTypeServiceProductPrice->getServicePrice(
-                            (int)$product['id_product'],
-                            (int)$product['room_type_id_product'],
-                            1,
-                            $product['date_from'],
-                            $product['date_to'],
-                            $useTax,
-                            false,
-                            $id_address
-                        );
 
-                        $servicePriceTE = $objRoomTypeServiceProductPrice->getServicePrice(
-                            (int)$product['id_product'],
-                            (int)$product['room_type_id_product'],
-                            1,
-                            $product['date_from'],
-                            $product['date_to'],
-                            false,
-                            false,
-                            $id_address
-                        );
-
-                        $servicePriceTI = $objRoomTypeServiceProductPrice->getServicePrice(
-                            (int)$product['id_product'],
-                            (int)$product['room_type_id_product'],
-                            1,
-                            $product['date_from'],
-                            $product['date_to'],
-                            true,
-                            false,
-                            $id_address
-                        );
 
                         $selectedServiceProducts[$product['htl_cart_booking_id']]['total_price'] = Tools::processPriceRounding($servicePrice, $qty);
                         $selectedServiceProducts[$product['htl_cart_booking_id']]['total_price_tax_excl'] = Tools::processPriceRounding($servicePriceTE, $qty);

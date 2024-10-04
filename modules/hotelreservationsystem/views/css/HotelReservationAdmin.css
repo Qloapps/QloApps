@@ -191,6 +191,10 @@ a.deleteHtlImage {
     margin: 2px 20px;
 }
 
+#room-search-form .booking_occupancy_wrapper {
+    min-width: 250px;
+}
+
 .htl_room_data_cont > div.row > div + div > div.row{
     border-left: 1px solid #C7D6DB;
 }
