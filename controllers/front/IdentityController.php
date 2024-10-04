@@ -165,6 +165,7 @@ class IdentityControllerCore extends FrontController
                 'sl_day' => $birthday[2],
                 'errors' => $this->errors,
                 'genders' => Gender::getGenders(),
+                'one_phone_at_least' => (int)Configuration::get('PS_ONE_PHONE_AT_LEAST'),
             ));
 
         // Call a hook to display more information

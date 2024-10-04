@@ -440,7 +440,7 @@ class AdminCustomersControllerCore extends AdminController
                     'label' => $this->l('Phone'),
                     'name' => 'phone',
                     'col' => '4',
-                    'required' => true,
+                    'required' =>  Configuration::get('PS_ONE_PHONE_AT_LEAST') ? true : false,
                     'autocomplete' => false
                 ),
                 array(
