@@ -2880,9 +2880,11 @@ abstract class ModuleCore
             } elseif (Module::getModuleIdByName($class)) {
                 $classInfo['type'] = self::OVERRIDE_TYPE_MODULE;
             } elseif (preg_match('#^modules/([a-zA-Z0-9_-]+)/controllers/(admin|front)/([0-9a-zA-Z-_]+).php#', $file, $matches)) {
-                $classInfo['type'] = self::OVERRIDE_TYPE_MODULE_CONTROLLER;
-                $classInfo['module'] = $matches[1];
-                $classInfo['controller_type'] = $matches[2];
+                if ($class != 'index') {
+                    $classInfo['type'] = self::OVERRIDE_TYPE_MODULE_CONTROLLER;
+                    $classInfo['module'] = $matches[1];
+                    $classInfo['controller_type'] = $matches[2];
+                }
             }
 
             if ($classInfo['type']) {

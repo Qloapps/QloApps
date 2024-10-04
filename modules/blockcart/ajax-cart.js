@@ -122,7 +122,8 @@ $(document).ready(function() {
 
 //JS Object : update the cart by ajax actions
 var ajaxCart = {
-    dateFormat: 'dd-mm-yy',
+    dateFormat: 'DD-MM-YYYY',
+    dateFormatFull: 'DD-MM-YYYY HH:mm:ss',
     nb_total_products: 0,
     //override every button in the page in relation to the cart
     overrideButtonsInThePage: function() {
@@ -928,8 +929,11 @@ var ajaxCart = {
 
                         if (this.bookingData.date_diff !== 'undefined') {
                             $.each(this.bookingData.date_diff, function(date_diff_k, date_diff_v) {
+                                from = $.datepicker.formatDate(ajaxCart.dateFormat, new Date(date_diff_v.data_form));
+                                to = $.datepicker.formatDate(ajaxCart.dateFormat, new Date(date_diff_v.data_to));
+                                let dateFormatToUse = from == to ? ajaxCart.dateFormatFull : ajaxCart.dateFormat;
                                 content += '<tr class="rooms_remove_container">';
-                                content += '<td>' + $.datepicker.formatDate(ajaxCart.dateFormat, new Date(date_diff_v.data_form)) + '&nbsp;-&nbsp;' + $.datepicker.formatDate(ajaxCart.dateFormat, new Date(date_diff_v.data_to)) + '</td>';
+                                content += '<td>' + moment(new Date(date_diff_v.data_form)).format(dateFormatToUse) + '&nbsp;-&nbsp;' + moment(new Date(date_diff_v.data_to)).format(dateFormatToUse) + '</td>';
                                 content += '<td class="num_rooms_in_date">' + date_diff_v.num_rm + '</td>';
                                 content += '<td>' + formatCurrency(parseFloat(date_diff_v.amount) + parseFloat(date_diff_v.demand_price), currency_format, currency_sign, currency_blank) + '</td>';
                                 content += '<td>';
@@ -965,8 +969,11 @@ var ajaxCart = {
                         var product_price_float = this.price_float;
                         if (this.bookingData.date_diff !== 'undefined') {
                             $.each(this.bookingData.date_diff, function(date_diff_k1, date_diff_v1) {
+                                from = $.datepicker.formatDate(ajaxCart.dateFormat, new Date(date_diff_v1.data_form));
+                                to = $.datepicker.formatDate(ajaxCart.dateFormat, new Date(date_diff_v1.data_to));
+                                let dateFormatToUse = from == to ? ajaxCart.dateFormatFull : ajaxCart.dateFormat;
                                 booking_dates_content += '<tr class="rooms_remove_container">';
-                                booking_dates_content += '<td>' + $.datepicker.formatDate(ajaxCart.dateFormat, new Date(date_diff_v1.data_form)) + '&nbsp;-&nbsp;' + $.datepicker.formatDate(ajaxCart.dateFormat, new Date(date_diff_v1.data_to)) + '</td>';
+                                booking_dates_content += '<td>' + moment(new Date(date_diff_v1.data_form)).format(dateFormatToUse) + '&nbsp;-&nbsp;' + moment(new Date(date_diff_v1.data_to)).format(dateFormatToUse) + '</td>';
                                 booking_dates_content += '<td class="num_rooms_in_date">' + date_diff_v1.num_rm + '</td>';
                                 booking_dates_content += '<td>' + formatCurrency(parseFloat(date_diff_v1.amount) + parseFloat(date_diff_v1.demand_price), currency_format, currency_sign, currency_blank) + '</td>';
                                 booking_dates_content += '<td>';

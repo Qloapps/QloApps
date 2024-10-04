@@ -458,6 +458,14 @@ $(document).ready(function() {
                     }
                 },
                 endDate: max_order_date,
+                customOpenAnimation: function(cb)
+                {
+                    $(this).show(10, cb);
+                },
+                customCloseAnimation: function(cb)
+                {
+                    $(this).hide(10, cb);
+                }
             }).on('datepicker-first-date-selected', function() {
                 calendarFirstDateSelected = true;
             }).on('datepicker-change', function(event,obj){
@@ -488,6 +496,14 @@ $(document).ready(function() {
             $('#daterange_value').dateRangePicker({
                 startDate: start_date,
                 endDate: max_order_date,
+                customOpenAnimation: function(cb)
+                {
+                    $(this).show(10, cb);
+                },
+                customCloseAnimation: function(cb)
+                {
+                    $(this).hide(10, cb);
+                }
             }).on('datepicker-first-date-selected', function() {
                 calendarFirstDateSelected = true;
             }).on('datepicker-change', function(event,obj){

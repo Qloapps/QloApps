@@ -846,10 +846,11 @@
                                                     {assign var='flag_is_first_iteration' value=true}
                                                     {foreach from=$cart_htl_data key=data_k item=data_v}
                                                         {foreach from=$data_v['date_diff'] key=rm_k item=rm_v}
+                                                            {assign var="is_full_date" value=($show_full_date && ($rm_v['data_form']|date_format:'%D' == $rm_v['data_to']|date_format:'%D'))}
                                                             <li class="{if $flag_is_first_iteration}active{/if}">
                                                                 <a href="#room-info-tab-{$data_v.id_product}-{$rm_k}" class="" data-toggle="tab">
                                                                     <div class="room-type-name">{$data_v.name}</div>
-                                                                    <div class="duration">{dateFormat date=$rm_v.data_form} - {dateFormat date=$rm_v.data_to}</div>
+                                                                    <div class="duration">{dateFormat date=$rm_v.data_form full=$is_full_date} - {dateFormat date=$rm_v.data_to full=$is_full_date}</div>
                                                                 </a>
                                                             </li>
                                                             {if $flag_is_first_iteration}{assign var='flag_is_first_iteration' value=false}{/if}
