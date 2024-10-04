@@ -120,7 +120,7 @@
                                 <div class="row">
                                     <label class="col-sm-12">{l s='Adults'}</label>
                                     <div class="col-sm-12">
-                                        <input type="hidden" class="num_occupancy num_adults" name="num_adults[]" value="{$room_type_info['adults']}">
+                                        <input type="hidden" class="num_occupancy num_adults" name="occupancy[0][adults]" value="{$room_type_info['adults']}">
                                         <div class="occupancy_count pull-left">
                                             <span>{$room_type_info['adults']}</span>
                                         </div>
@@ -143,7 +143,7 @@
                                 <div class="row">
                                     <label class="col-sm-12">{l s='Children'}</label>
                                     <div class="col-sm-12 clearfix">
-                                        <input type="hidden" class="num_occupancy num_children" name="num_children[]" value="0">
+                                        <input type="hidden" class="num_occupancy num_children" name="occupancy[0][children]" value="0">
                                         <div class="occupancy_count pull-left">
                                             <span>0</span>
                                         </div>
