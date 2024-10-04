@@ -1027,7 +1027,7 @@ class AdminControllerCore extends Controller
     public function processListVisibility()
     {
         $listFieldsVisibility = Tools::getValue('list_fields_visibility', array()); //  To set optional list empty in case none is selected
-        $controller = 'list_visibility_'.$this->context->controller->className;
+        $controller = 'list_visibility_'.$this->context->controller->controller_name;
         $this->context->cookie->$controller = json_encode($listFieldsVisibility);
 
         return true;
