@@ -41,7 +41,8 @@
                                         {foreach from=$book_v['data']['available'] key=avai_k item=avai_v}
                                             <tr>
                                                 <td>{$avai_v['room_num']|escape:'htmlall':'UTF-8'} {hook h='displayRoomNumAfter' data=$avai_v type='available'}</td>
-                                                <td>{dateFormat date=$date_from} - {dateFormat date=$date_to}</td>
+                                                {assign var="is_full_date" value=($show_full_date && ($date_from|date_format:'%D' == $date_to|date_format:'%D'))}
+                                                <td>{dateFormat date=$date_from full=$is_full_date} - {dateFormat date=$date_to full=$is_full_date}</td>
                                                 <td>{$avai_v['room_comment']|escape:'htmlall':'UTF-8'}</td>
                                                 <td>
                                                     {foreach $allotment_types as $allotment_type}
@@ -99,7 +100,7 @@
                                                     </td>
                                                 {/if}
                                                 <td>
-                                                    <button type="button" data-id-cart="" data-id-cart-book-data="" data-id-product="{$avai_v['id_product']|escape:'htmlall':'UTF-8'}" data-id-room="{$avai_v['id_room']|escape:'htmlall':'UTF-8'}" data-id-hotel="{$avai_v['id_hotel']}" data-date-from="{$date_from|escape:'htmlall':'UTF-8'|date_format:'%Y-%m-%d'}" data-date-to ="{$date_to|escape:'htmlall':'UTF-8'|date_format:'%Y-%m-%d'}" class="btn btn-primary avai_add_cart">{l s='Add To Cart' mod='hotelreservationsystem'}</button>
+                                                    <button type="button" data-id-cart="" data-id-cart-book-data="" data-id-product="{$avai_v['id_product']|escape:'htmlall':'UTF-8'}" data-id-room="{$avai_v['id_room']|escape:'htmlall':'UTF-8'}" data-id-hotel="{$avai_v['id_hotel']}" data-date-from="{$date_from|escape:'htmlall':'UTF-8'}" data-date-to ="{$date_to|escape:'htmlall':'UTF-8'}" class="btn btn-primary avai_add_cart">{l s='Add To Cart' mod='hotelreservationsystem'}</button>
                                                 </td>
                                             </tr>
                                         {/foreach}
@@ -126,8 +127,9 @@
                                             {foreach from=$part_v['rooms'] key=sub_part_k item=sub_part_v}
                                                 <tr>
                                                     {if $sub_part_v@first}
+                                                        {assign var="is_full_date" value=($show_full_date && ($part_v['date_from']|date_format:'%D' == $part_v['date_to']|date_format:'%D'))}
                                                         <td rowspan="{$part_v['rooms']|count}">
-                                                            <p>{dateFormat date=$part_v['date_from']} - {dateFormat date=$part_v['date_to']}</p>
+                                                            <p>{dateFormat date=$part_v['date_from'] full=$is_full_date} - {dateFormat date=$part_v['date_to'] full=$is_full_date}</p>
                                                         </td>
                                                     {/if}
                                                     <td >{$sub_part_v['room_num']|escape:'htmlall':'UTF-8'} {hook h='displayRoomNumAfter' data=$sub_part_v type='partially_available'}</td>
@@ -187,7 +189,7 @@
                                                         </td>
                                                     {/if}
                                                     <td>
-                                                        <button type="button" data-id-cart="" data-id-cart-book-data="" data-id-product="{$sub_part_v['id_product']|escape:'htmlall':'UTF-8'}" data-id-room="{$sub_part_v['id_room']|escape:'htmlall':'UTF-8'}" data-id-hotel="{$sub_part_v['id_hotel']|escape:'htmlall':'UTF-8'}" data-date-from="{$part_v['date_from']|escape:'htmlall':'UTF-8'|date_format:'%Y-%m-%d'}" data-date-to ="{$part_v['date_to']|escape:'htmlall':'UTF-8'|date_format:'%Y-%m-%d'}" data-sub-key="{$sub_part_k|escape:'htmlall':'UTF-8'}" class="btn btn-primary par_add_cart">{l s='Add To Cart' mod='hotelreservationsystem'}</button>
+                                                        <button type="button" data-id-cart="" data-id-cart-book-data="" data-id-product="{$sub_part_v['id_product']|escape:'htmlall':'UTF-8'}" data-id-room="{$sub_part_v['id_room']|escape:'htmlall':'UTF-8'}" data-id-hotel="{$sub_part_v['id_hotel']|escape:'htmlall':'UTF-8'}" data-date-from="{$part_v['date_from']|escape:'htmlall':'UTF-8'}" data-date-to ="{$part_v['date_to']|escape:'htmlall':'UTF-8'}" data-sub-key="{$sub_part_k|escape:'htmlall':'UTF-8'}" class="btn btn-primary par_add_cart">{l s='Add To Cart' mod='hotelreservationsystem'}</button>
                                                     </td>
                                                 </tr>
                                             {/foreach}
@@ -213,10 +215,11 @@
                                         {foreach from=$book_v['data']['booked'] key=booked_k item=booked_v}
                                             {foreach from=$booked_v['detail'] key=rm_dtl_k item=rm_dtl_v}
                                                 <tr>
+                                                    {assign var="is_full_date" value=($show_full_date && ($rm_dtl_v['date_from']|date_format:'%D' == $rm_dtl_v['date_to']|date_format:'%D'))}
                                                     {if $rm_dtl_v@first}
                                                         <td rowspan="{$booked_v['detail']|count}">{$booked_v['room_num']|escape:'htmlall':'UTF-8'} {hook h='displayRoomNumAfter' data=$booked_v key=$rm_dtl_k type='booked'}</td>
                                                     {/if}
-                                                    <td>{dateFormat date=$rm_dtl_v['date_from']} - {dateFormat date=$rm_dtl_v['date_to']}</td>
+                                                    <td>{dateFormat date=$rm_dtl_v['date_from'] full=$is_full_date} - {dateFormat date=$rm_dtl_v['date_to'] full=$is_full_date}</td>
                                                     <td><a href="{$link->getAdminLink('AdminOrders')}&id_order={$rm_dtl_v['id_order']|intval}&vieworder" target="_blank">#{$rm_dtl_v['id_order']}</a></td>
                                                     <td>{$rm_dtl_v['comment']|escape:'htmlall':'UTF-8'}</td>
                                                     <td>

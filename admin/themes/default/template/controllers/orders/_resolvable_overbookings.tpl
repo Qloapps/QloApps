@@ -55,7 +55,8 @@
                                 <td>
                                     <a href="{$link->getAdminLink('AdminAddHotel')}&amp;id={$data['id_hotel']|escape:'html':'UTF-8'}&amp;updatehtl_branch_info" target="_blank"><span>{$data['hotel_name']}</span></a>
                                 </td>
-                                <td>{dateFormat date=$data['date_from']|escape:'html':'UTF-8'} {l s='To'} {dateFormat date=$data['date_to']|escape:'html':'UTF-8'}</td>
+                                {assign var="is_full_date" value=($show_full_date && ($data['date_from']|date_format:'%D' == $data['date_to']|date_format:'%D'))}
+                                <td>{dateFormat date=$data['date_from']|escape:'html':'UTF-8' full=$is_full_date} {l s='To'} {dateFormat date=$data['date_to']|escape:'html':'UTF-8' full=$is_full_date}</td>
                                 <td>
                                     <a href="{$link->getAdminLink('AdminOrders')|escape:'html':'UTF-8'}&amp;vieworder&amp;id_order={$data['id_order']|escape:'html':'UTF-8'}">#{$data['id_order']|escape:'html':'UTF-8'}</a>
                                 </td>
