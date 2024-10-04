@@ -90,7 +90,7 @@
 					</div>
 				</div>
 				<div class="col-xs-6 col-lg-3">
-					<div class="stat-box label-tooltip" data-toggle="tooltip" data-original-title="{l s='Gross Operating Profit Per Available Room (GOPPAR) measures how much gross operating profit comes from each room.' mod='dashperformance'}" data-placement="top" style="background-color: #B7F0FF;">
+					<div class="stat-box label-tooltip" data-toggle="tooltip" data-original-title="{l s='Gross Operating Profit Per Available Room (GOPPAR) measures how much gross operating profit comes from each room including additional facilities and service products.' mod='dashperformance'}" data-placement="top" style="background-color: #B7F0FF;">
 						<div class="title-wrapper">
 							<p>{l s='Gross Operating Profit Per Available Room' mod='dashperformance'}</p>
 						</div>
