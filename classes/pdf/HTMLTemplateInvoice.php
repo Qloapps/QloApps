@@ -310,8 +310,11 @@ class HTMLTemplateInvoiceCore extends HTMLTemplate
 
         $this->context = Context::getContext();
 
+        $cart_htl_data = array();
+        $service_product_data = array();
+        $room_extra_demands = array();
+        $room_additinal_services = array();
         if (Module::isInstalled('hotelreservationsystem')) {
-
             $obj_htl_bk_dtl = new HotelBookingDetail();
             $obj_rm_type = new HotelRoomType();
             $objRoomTypeServiceProductOrderDetail = new RoomTypeServiceProductOrderDetail();
@@ -319,11 +322,6 @@ class HTMLTemplateInvoiceCore extends HTMLTemplate
             $customer = new Customer($this->order->id_customer);
             if (!empty($order_details)) {
                 $processed_product = array();
-                $cart_htl_data = array();
-                $service_product_data = array();
-                $room_extra_demands = array();
-                $room_additinal_services = array();
-
                 $totalDemandsPriceTE = 0;
                 $totalDemandsPriceTI = 0;
                 foreach ($order_details as $type_key => $type_value) {
