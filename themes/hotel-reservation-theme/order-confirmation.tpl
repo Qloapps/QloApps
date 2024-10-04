@@ -347,21 +347,6 @@
 											</td>
 										</tr>
 									{/if}
-									{if $order->total_discounts > 0}
-										<tr class="item">
-											<td colspan="3"></td>
-											<td colspan="3">
-												<strong>{l s='Total Vouchers'}</strong>
-											</td>
-											<td colspan="2">
-												{if $priceDisplay && $use_tax}
-													<span class="price-discount">{displayWtPriceWithCurrency price=($orderTotalInfo['total_discounts_te'] * -1) currency=$objOrderCurrency convert=1}</span>
-												{else}
-													<span class="price-discount">{displayWtPriceWithCurrency price=($orderTotalInfo['total_discounts'] * -1) currency=$objOrderCurrency convert=1}</span>
-												{/if}
-											</td>
-										</tr>
-									{/if}
 									{if $priceDisplay && $use_tax && $orderTotalInfo['total_convenience_fee_te']}
 										<tr class="item">
 											<td colspan="3"></td>
@@ -389,9 +374,24 @@
 											<strong>{l s='Total Tax'}</strong>
 										</td>
 										<td colspan="2">
-											<span class="price-discount">{displayWtPriceWithCurrency price=$orderTotalInfo['total_tax'] currency=$objOrderCurrency convert=1}</span>
+											<span class="price-discount">{displayWtPriceWithCurrency price=$orderTotalInfo['total_tax_without_discount'] currency=$objOrderCurrency convert=1}</span>
 										</td>
 									</tr>
+									{if $order->total_discounts > 0}
+										<tr class="item">
+											<td colspan="3"></td>
+											<td colspan="3">
+												<strong>{l s='Total Vouchers'}</strong>
+											</td>
+											<td colspan="2">
+												{if $priceDisplay && $use_tax}
+													<span class="price-discount">{displayWtPriceWithCurrency price=($orderTotalInfo['total_discounts_te'] * -1) currency=$objOrderCurrency convert=1}</span>
+												{else}
+													<span class="price-discount">{displayWtPriceWithCurrency price=($orderTotalInfo['total_discounts'] * -1) currency=$objOrderCurrency convert=1}</span>
+												{/if}
+											</td>
+										</tr>
+									{/if}
 									<tr class="totalprice item">
 										<td colspan="3"></td>
 										<td colspan="3">

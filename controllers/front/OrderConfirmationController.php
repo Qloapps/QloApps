@@ -391,6 +391,10 @@ class OrderConfirmationControllerCore extends FrontController
                     $orderTotalInfo['total_paid'] += $objCartOrder->total_paid;
                     $orderTotalInfo['total_paid_real'] += $objCartOrder->total_paid_real;
                 }
+
+                $totalTaxIncl = $orderTotalInfo['total_rooms_ti'] + $orderTotalInfo['total_services_ti'] + $orderTotalInfo['total_convenience_fee_ti'];
+                $totalTaxExcl = $orderTotalInfo['total_rooms_te'] + $orderTotalInfo['total_services_te'] + $orderTotalInfo['total_convenience_fee_te'];
+                $orderTotalInfo['total_tax_without_discount'] = $totalTaxIncl - $totalTaxExcl;
             }
 
             $this->context->smarty->assign('orderTotalInfo', $orderTotalInfo);
