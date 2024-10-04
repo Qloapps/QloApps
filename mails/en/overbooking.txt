@@ -1,6 +1,6 @@
 Message from {shop_name}
 Hi {firstname} {lastname},
-Thank you for selecting our hotel!
+Thank you for booking with <strong>{hotel_hotel_name}</strong>!
 Bookings in this order are Not Confirmed yet !!
 We are sorry for your inconvenience. Please contact hotel to get final confirmation for your bookings.
 

@@ -176,7 +176,16 @@ class GuestTrackingControllerCore extends FrontController
             sleep(1);
         }
 
+        $totalRoomsBooked = 0;
+        if ($orderReference = Tools::getValue('id_order')) {
+            // Get rooms bookings in the order
+            $objHotelBooking = new HotelBookingDetail();
+            if ($cartRoomBookings = $objHotelBooking->getBookingDataByOrderReference($orderReference)) {
+                $totalRoomsBooked = count($cartRoomBookings);
+            }
+        }
         $this->context->smarty->assign(array(
+            'total_rooms_booked' => $totalRoomsBooked,
             'action' => $this->context->link->getPageLink('guest-tracking.php', true),
             'errors' => $this->errors,
         ));

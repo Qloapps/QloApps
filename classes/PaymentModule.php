@@ -1100,7 +1100,10 @@ abstract class PaymentModuleCore extends Module
                         // $service_products_price_tax_incl = $order->getTotalProductsWithTaxes(false, false, Product::SERVICE_PRODUCT_WITHOUT_ROOMTYPE);
                         // $service_products_tax = ($order->getTotalProductsWithTaxes(false, false, Product::SERVICE_PRODUCT_WITHOUT_ROOMTYPE) - $order->getTotalProductsWithoutTaxes(false, false, Product::SERVICE_PRODUCT_WITHOUT_ROOMTYPE));
 
+                        $idOrderHotel = HotelBookingDetail::getIdHotelByIdOrder($order->id);
+                        $objHotelBranchInfo = new HotelBranchInformation($idOrderHotel, $order->id_lang);
                         $data = array(
+                            '{hotel_name}' => $objHotelBranchInfo->hotel_name,
                             '{cart_booking_data_html}' => $cart_booking_data_html,
                             '{cart_booking_data_text}' => $cart_booking_data_text,
                             '{extra_demands_details_html}' => $extra_demands_details_html,

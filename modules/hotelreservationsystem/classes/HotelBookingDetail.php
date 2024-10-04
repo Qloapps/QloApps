@@ -1575,6 +1575,18 @@ class HotelBookingDetail extends ObjectModel
         );
     }
 
+    /**
+     * [getBookingDataByOrderReference :: To get all room bookings by order reference].
+     * @param [string] $orderReference [Reference of the order]
+     * @return [array] [If data found Returns the array containing the information of the booking of an order reference]
+     */
+    public function getBookingDataByOrderReference($orderReference)
+    {
+        return Db::getInstance()->executeS(
+            'SELECT * FROM `'._DB_PREFIX_.'htl_booking_detail` WHERE `id_order` IN ( SELECT `id_order` FROM `'._DB_PREFIX_.'orders` WHERE `reference` = "'.pSQL($orderReference).'" )'
+        );
+    }
+
     public static function getIdHotelByIdOrder($idOrder)
     {
         return Db::getInstance()->getValue(
