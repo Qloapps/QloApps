@@ -726,7 +726,7 @@ class HelperListCore extends Helper
         }
 
         // get selected fields to display
-        $list_visibility = json_decode($this->context->cookie->{'list_visibility_'.$this->context->controller->className});
+        $list_visibility = json_decode($this->context->cookie->{'list_visibility_'.$this->context->controller->controller_name});
         foreach ($this->fields_list as $key => $field) {
             if (!(isset($field['search']) && $field['search'] === false)) {
                 $has_search_field = true;

@@ -117,7 +117,7 @@ class AdminTaxesControllerCore extends AdminController
 
     public function initPageHeaderToolbar()
     {
-        if (empty($this->display)) {
+        if (empty($this->display) || $this->display == 'list') {
             $this->page_header_toolbar_btn['new_tax'] = array(
                 'href' => self::$currentIndex.'&addtax&token='.$this->token,
                 'desc' => $this->l('Add new tax', null, null, false),

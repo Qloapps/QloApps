@@ -310,7 +310,7 @@ class AdminRequestSqlControllerCore extends AdminController
 
     public function initPageHeaderToolbar()
     {
-        if (empty($this->display)) {
+        if (empty($this->display) || $this->display == 'list') {
             $this->page_header_toolbar_btn['new_request'] = array(
                 'href' => self::$currentIndex.'&addrequest_sql&token='.$this->token,
                 'desc' => $this->l('Add new SQL query', null, null, false),
