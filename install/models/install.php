@@ -181,7 +181,7 @@ class InstallModelInstall extends InstallAbstractModel
             if (!$all_languages) {
                 $iso_codes_to_install = array($this->language->getLanguageIso());
                 if ($iso_country) {
-                    $version = str_replace('.', '', _PS_VERSION_);
+                    $version = str_replace('.', '', _QLOAPPS_VERSION_);
                     $version = substr($version, 0, 2);
                     $localization_file_content = $this->getLocalizationPackContent($version, $iso_country);
 
@@ -403,7 +403,7 @@ class InstallModelInstall extends InstallAbstractModel
             if (is_file($path_cache_file)) {
                 $localization_file_content = file_get_contents($path_cache_file);
             } else {
-                $localization_file_content = @Tools::file_get_contents('http://api.prestashop.com/localization/'.$version.'/'.$country.'.xml');
+                $localization_file_content = @Tools::file_get_contents('http://api.qloapps.com/localization/'.$version.'/'.$country.'.xml');
                 if (!@simplexml_load_string($localization_file_content)) {
                     $localization_file_content = false;
                 }
@@ -544,7 +544,7 @@ class InstallModelInstall extends InstallAbstractModel
         Db::getInstance()->execute('UPDATE '._DB_PREFIX_.'country SET active = 0 WHERE id_country != '.(int)$id_country);
 
         // Set localization configuration
-        $version = str_replace('.', '', _PS_VERSION_);
+        $version = str_replace('.', '', _QLOAPPS_VERSION_);
         $version = substr($version, 0, 2);
         $localization_file_content = $this->getLocalizationPackContent($version, $data['shop_country']);
 
