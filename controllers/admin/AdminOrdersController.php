@@ -1175,7 +1175,7 @@ class AdminOrdersControllerCore extends AdminController
                             $this->errors[] = $this->l('Selected room is not available for reallocation.');
                         } elseif (!in_array($idRoomToReallocate, array_column($availableRooms, 'id_room'))) {
                             $this->errors[] = $this->l('Selected room is not available for reallocation.');
-                        } elseif (!Validate::isPrice($priceDiff)) {
+                        } elseif (!Validate::isFloat($priceDiff)) {
                             $this->errors[] = $this->l('Invalid price difference of the room types.');
                         }
                     } else {
