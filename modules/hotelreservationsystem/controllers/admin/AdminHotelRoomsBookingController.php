@@ -98,7 +98,7 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
         $objHotelBranchInformation = new HotelBranchInformation();
         $hotelBranchesInfo = $objHotelBranchInformation->hotelBranchesInfo(false, 1);
         // filter hotels as per accessed hotels
-        $hotelBranchesInfo = HotelBranchInformation::filterDataByHotelAccess($hotelBranchesInfo, $this->context->employee->id_profile, 1);
+        $hotelBranchesInfo = HotelBranchInformation::filterDataByHotelAccess($hotelBranchesInfo, $this->context->employee->id_profile, 'id');
 
         if ($hotelBranchesInfo) {
             if (Tools::getValue('date_from')) {
@@ -133,7 +133,7 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
                     $htl_info = HotelBranchInformation::filterDataByHotelAccess(
                         $htl_info,
                         $this->context->employee->id_profile,
-                        1
+                        'id'
                     );
                     $id_hotel = reset($htl_info)['id'];
                 } else {
@@ -289,7 +289,7 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
         $hotel_list = HotelBranchInformation::filterDataByHotelAccess(
             $hotel_list,
             $this->context->employee->id_profile,
-            1
+            'id'
         );
         $all_room_type = $obj_rm_type->getRoomTypeByHotelId($this->id_hotel, Configuration::get('PS_LANG_DEFAULT'), 1);
 
@@ -320,7 +320,7 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
         $objHotelBranchInformation = new HotelBranchInformation();
         $hotelBranchesInfo = $objHotelBranchInformation->hotelBranchesInfo(false, 1);
         // filter hotels as per accessed hotels
-        $hotelBranchesInfo = HotelBranchInformation::filterDataByHotelAccess($hotelBranchesInfo, $this->context->employee->id_profile, 1);
+        $hotelBranchesInfo = HotelBranchInformation::filterDataByHotelAccess($hotelBranchesInfo, $this->context->employee->id_profile, 'id');
 
         if ($hotelBranchesInfo) {
             $this->tpl_view_vars['id_cart'] = (int) $this->context->cart->id;

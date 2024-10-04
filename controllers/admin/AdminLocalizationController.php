@@ -170,7 +170,7 @@ class AdminLocalizationControllerCore extends AdminController
         }
 
         if (Tools::isSubmit('submitLocalizationPack')) {
-            $version = str_replace('.', '', _PS_VERSION_);
+            $version = str_replace('.', '', _QLOAPPS_VERSION_);
             $version = substr($version, 0, 2);
 
             if (($iso_localization_pack = Tools::getValue('iso_localization_pack')) && Validate::isFileName($iso_localization_pack)) {

@@ -244,7 +244,7 @@
 			function afterDeleteProductImage(data)
 			{
 				data = $.parseJSON(data);
-				if (data)
+				if (data.status)
 				{
 					cover = 0;
 					id = data.content.id;
@@ -262,6 +262,8 @@
 
 					if (parseInt($("#countImage").html()) <= 1)
 						$('#caption_selection').addClass('hidden');
+				} else if (data.error) {
+					showErrorMessage(data.error);
 				}
 			}
 

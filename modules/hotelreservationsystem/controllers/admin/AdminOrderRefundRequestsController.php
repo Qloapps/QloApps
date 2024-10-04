@@ -499,7 +499,7 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
                         $cartrule->date_from = date('Y-m-d H:i:s', $now);
                         // generateDiscount
                         if ($voucher_expiry_date) {
-                            $cartrule->date_to = date('Y-m-d H:i:s', strtotime($voucher_expiry_date));
+                            $cartrule->date_to = date('Y-m-d', strtotime($voucher_expiry_date)).' 23:59:59';
                         } else {
                             $cartrule->date_to = date('Y-m-d H:i:s', $now + (3600 * 24 * 365.25)); /* 1 year */
                         }

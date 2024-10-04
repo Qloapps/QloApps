@@ -92,7 +92,7 @@ $(document).ready(function() {
         dateFormat: 'dd-mm-yy',
         altFormat: 'yy-mm-dd',
         altField: '#voucher_expiry_date',
-        minDate: 0,
+        minDate: +1,
     });
 
     $(document).on('change', '#generateDiscount', function() {

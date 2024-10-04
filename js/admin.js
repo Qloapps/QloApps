@@ -687,7 +687,7 @@ function doAdminAjax(data, success_func, error_func)
 				return success_func(data);
 
 			data = $.parseJSON(data);
-			if (data.confirmations.length != 0)
+			if (data.confirmations && data.confirmations.length != 0)
 				showSuccessMessage(data.confirmations);
 			else
 				showErrorMessage(data.error);

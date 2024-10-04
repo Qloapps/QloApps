@@ -2681,6 +2681,12 @@ class HotelHelper
         $hotels = self::getHotelsByIdCity($previousElements, $rootNodeId);
         $hotelIds = array_column($hotels, 'value');
 
+        if (Validate::isLoadedObject(Context::getContext()->employee)){
+            if (!Context::getContext()->employee->isSuperAdmin()) {
+                $hotels = HotelBranchInformation::filterDataByHotelAccess($hotels, Context::getContext()->employee->id_profile, 'value', false, true);
+            }
+        }
+
         if ($leafNode > self::NODE_HOTEL) {
             $roomTypes = self::generateRoomTypeNodes(false, $leafNode, $selectedElements, $hotelIds);
         }
@@ -2688,6 +2694,10 @@ class HotelHelper
         foreach ($hotels as $hotel) {
             if (isset($selectedElements['hotel']) && in_array($hotel['value'], $selectedElements['hotel'])) {
                 $hotel['selected'] = true;
+            }
+
+            if (isset($hotel['htl_access']) && !$hotel['htl_access']) {
+                $hotel['hidden'] = true;
             }
 
             if (isset($roomTypes[$hotel['value']])) {
@@ -2713,6 +2723,18 @@ class HotelHelper
         $roomTypes = self::getRoomTypesByHotelsId($previousElements, $rootNodeId);
         $roomTypeIds = array_column($roomTypes, 'value');
 
+        if (Validate::isLoadedObject(Context::getContext()->employee)){
+            if (!Context::getContext()->employee->isSuperAdmin()) {
+                $roomTypes = HotelBranchInformation::filterDataByHotelAccess(
+                    $roomTypes,
+                    Context::getContext()->employee->id_profile,
+                    false,
+                    'value',
+                    true
+                );
+            }
+        }
+
         if ($leafNode > self::NODE_ROOM_TYPE) {
             $rooms = self::generateRoomNodes(false, $leafNode, $selectedElements, $roomTypeIds);
         }
@@ -2720,6 +2742,10 @@ class HotelHelper
         foreach ($roomTypes as $roomType) {
             if (isset($selectedElements['room_type']) && in_array($roomType['value'], $selectedElements['room_type'])) {
                 $roomType['selected'] = true;
+            }
+
+            if (isset($roomType['htl_access']) && !$roomType['htl_access']) {
+                $roomType['hidden'] = true;
             }
 
             if (isset($rooms[$roomType['value']])) {
@@ -2743,10 +2769,25 @@ class HotelHelper
     {
         $return = array();
         $rooms = self::getRoomsByRoomTypeId($previousElements, $rootNodeId);
+        if (Validate::isLoadedObject(Context::getContext()->employee)){
+            if (!Context::getContext()->employee->isSuperAdmin()) {
+                $rooms = HotelBranchInformation::filterDataByHotelAccess(
+                    $rooms,
+                    Context::getContext()->employee->id_profile,
+                    false,
+                    false,
+                    true
+                );
+            }
+        }
 
         foreach ($rooms as $room) {
             if (isset($selectedElements['room']) && in_array($room['value'], $selectedElements['room'])) {
                 $room['selected'] = true;
+            }
+
+            if (isset($room['htl_access']) && !$room['htl_access']) {
+                $room['hidden'] = true;
             }
 
             if ($previousElements) {
