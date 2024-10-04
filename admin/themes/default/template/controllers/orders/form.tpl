@@ -707,7 +707,7 @@
 		$('#total_rooms').html(formatCurrency(parseFloat(jsonSummary.summary.total_rooms_with_services_without_discount_te), currency_format, currency_sign, currency_blank));
 		$('#total_vouchers').html(formatCurrency(parseFloat(jsonSummary.summary.total_discounts), currency_format, currency_sign, currency_blank));
 		$('#total_convenience_fees').html(formatCurrency(parseFloat(jsonSummary.summary.convenience_fee), currency_format, currency_sign, currency_blank));
-		$('#total_without_taxes').html(formatCurrency(parseFloat(jsonSummary.summary.total_without_discount_te), currency_format, currency_sign, currency_blank));
+		$('#total_without_taxes').html(formatCurrency(parseFloat(jsonSummary.summary.cart_total_without_discount_te), currency_format, currency_sign, currency_blank));
 		// $('#total_service_products').html(formatCurrency(parseFloat(jsonSummary.summary.total_service_products), currency_format, currency_sign, currency_blank));
 		$('#total_taxes').html(formatCurrency(parseFloat(jsonSummary.summary.total_tax_without_discount), currency_format, currency_sign, currency_blank));
 		$('#total_with_taxes').html(formatCurrency(parseFloat(jsonSummary.summary.total_price), currency_format, currency_sign, currency_blank));
@@ -1212,7 +1212,7 @@
 
 		$('#total_vouchers').html(formatCurrency(parseFloat(jsonSummary.summary.total_discounts), currency_format, currency_sign, currency_blank));
 		$('#total_taxes').html(formatCurrency(parseFloat(jsonSummary.summary.total_tax_without_discount), currency_format, currency_sign, currency_blank));
-		$('#total_without_taxes').html(formatCurrency(parseFloat(jsonSummary.summary.total_without_discount_te), currency_format, currency_sign, currency_blank));
+		$('#total_without_taxes').html(formatCurrency(parseFloat(jsonSummary.summary.cart_total_without_discount_te), currency_format, currency_sign, currency_blank));
 		$('#total_with_taxes').html(formatCurrency(parseFloat(jsonSummary.summary.total_price), currency_format, currency_sign, currency_blank));
 		$('#total_rooms').html(formatCurrency(parseFloat(jsonSummary.summary.total_rooms_with_services_without_discount_te), currency_format, currency_sign, currency_blank));
 		$('#total_convenience_fees').html(formatCurrency(parseFloat(jsonSummary.summary.convenience_fee), currency_format, currency_sign, currency_blank));
