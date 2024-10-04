@@ -2421,7 +2421,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
     }
 
     // Get to totalo due amount in the orders
-    public static function getTotalDueAmount($dateFrom = '', $dateTo = '', $idHotel = false, $useTax = 0)
+    public static function getTotalDueAmount($dateFrom = '', $dateTo = '', $idHotel = false)
     {
         $objHotelBooking = new HotelBookingDetail();
         $invalidOrderStates = $objHotelBooking->getOrderStatusToFreeBookedRoom();
