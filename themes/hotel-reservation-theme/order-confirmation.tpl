@@ -120,17 +120,18 @@
 														</p>
 													</td>
 												{/block}
+												{assign var="is_full_date" value=($show_full_date && ($rm_v['data_form']|date_format:'%D' == $rm_v['data_to']|date_format:'%D'))}
 												{block name='order_detail_room_type_check_in'}
 													<td class="text-center">
 														<p>
-															{$rm_v['data_form']|date_format:"%d-%m-%Y"}
+															{dateFormat date=$rm_v['data_form'] full=$is_full_date}
 														</p>
 													</td>
 												{/block}
 												{block name='order_detail_room_type_check_out'}
 													<td class="text-center">
 														<p>
-															{$rm_v['data_to']|date_format:"%d-%m-%Y"}
+															{dateFormat date=$rm_v['data_to'] full=$is_full_date}
 														</p>
 													</td>
 												{/block}

@@ -71,7 +71,8 @@
 							<td>{l s='Room'} - {$smarty.foreach.refundRequest.iteration|string_format:'%02d'}</td>
 							<td>{$booking['room_type_name']|escape:'htmlall':'UTF-8'}</td>
 							<td>{$booking['hotel_name']|escape:'htmlall':'UTF-8'}</td>
-							<td>{$booking['date_from']|date_format:"%d-%m-%Y"} {l s='To'} {$booking['date_to']|date_format:"%d-%m-%Y"}</td>
+							{assign var="is_full_date" value=($show_full_date && ($booking['date_from']|date_format:'%D' == $booking['date_to']|date_format:'%D'))}
+							<td>{dateFormat date=$booking['date_from'] full=$is_full_date} {l s='To'} {dateFormat date=$booking['date_to'] full=$is_full_date}</td>
 							<td>{displayPrice price=$booking['total_price_tax_incl'] currency=$orderCurrency['id']}</td>
 							<td>{displayPrice price=$booking['extra_service_total_price_tax_incl'] currency=$orderCurrency['id']}</td>
 							{if $isRefundCompleted}

@@ -68,6 +68,7 @@
   font-weight: 400;
   border: 1px solid #555555;
   background-color: #FFF;
+  height: 100%;
   min-height: 55px;}
   #search_hotel_block_form .header-rmsearch-input:active, #search_hotel_block_form .header-rmsearch-input:focus {
     border: 2px solid #1292FF;}
@@ -75,12 +76,9 @@
     appearance: none;
     width: 100%;
     padding-left: 35px;
+    padding-right: 20px;
     background: url("../../views/img/icon-hotel.svg") no-repeat 10px 50%, url("../../views/img/icon-dropdown-arrow.svg") no-repeat calc(100% - 10px) 50%;
     background-color: #FFF;}
-  #search_hotel_block_form #guest_occupancy {
-    height: unset;
-    text-align: unset;
-  }
   #search_hotel_block_form .input-date {
     display: grid;
     cursor: text;}
@@ -181,7 +179,8 @@
         font-size: 13px;
         text-transform: uppercase;
         border: none;
-        border-radius: 4px;}
+        border-radius: 4px;
+        min-height: 55px;}
       .submit_occupancy_btn {
         background-color: #1292FF;
         border: none;
