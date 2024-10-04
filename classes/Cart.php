@@ -3772,11 +3772,12 @@ class CartCore extends ObjectModel
         }
 
         $objHotelAdvancedPayment = new HotelAdvancedPayment();
-        $total_rooms_services_tax_excl_without_discount = $total_rooms + $total_demands + $total_additional_services + $total_additional_services_auto_add;
-        $total_rooms_services_tax_incl_without_discount = $total_rooms_wt + $total_demands_wt + $total_additional_services_wt + $total_additional_services_auto_add_wt;
-        $total_tax_excl_without_discount = $total_rooms_services_tax_excl_without_discount + $convenience_fee;
-        $total_tax_incl_without_discount = $total_rooms_services_tax_incl_without_discount + $convenience_fee_wt;
-        $total_tax_without_discount = $total_tax_incl_without_discount - $total_tax_excl_without_discount;
+        $total_rooms_with_services_without_discount_te = $total_rooms + $total_demands + $total_additional_services + $total_additional_services_auto_add;
+        $total_rooms_with_services_without_discount_ti = $total_rooms_wt + $total_demands_wt + $total_additional_services_wt + $total_additional_services_auto_add_wt;
+
+        $cart_total_without_discount_te = $total_rooms_with_services_without_discount_te + $convenience_fee;
+        $cart_total_without_discount_ti = $total_rooms_with_services_without_discount_ti + $convenience_fee_wt;
+        $total_tax_without_discount = $cart_total_without_discount_ti - $cart_total_without_discount_te;
         if ($total_tax_without_discount < 0) {
             $total_tax_without_discount = 0;
         }
@@ -3822,10 +3823,10 @@ class CartCore extends ObjectModel
             'is_multi_address_delivery' => $this->isMultiAddressDelivery() || ((int)Tools::getValue('multi-shipping') == 1),
             'free_ship' =>!$total_shipping && !count($this->getDeliveryAddressesWithoutCarriers(true, $errors)),
             'carrier' => new Carrier($this->id_carrier, $id_lang),
-            'total_rooms_services_tax_excl_without_discount' => $total_rooms_services_tax_excl_without_discount,
-            'total_rooms_services_tax_incl_without_discount' => $total_rooms_services_tax_incl_without_discount,
-            'total_tax_excl_without_discount' => $total_tax_excl_without_discount,
-            'total_tax_incl_without_discount' => $total_tax_incl_without_discount,
+            'total_rooms_with_services_without_discount_te' => $total_rooms_with_services_without_discount_te,
+            'total_rooms_with_services_without_discount_ti' => $total_rooms_with_services_without_discount_ti,
+            'cart_total_without_discount_te' => $cart_total_without_discount_te,
+            'cart_total_without_discount_ti' => $cart_total_without_discount_ti,
             'total_tax_without_discount' => $total_tax_without_discount
         );
 
