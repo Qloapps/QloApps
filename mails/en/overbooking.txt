@@ -29,8 +29,6 @@ Total Rooms Cost
 Total Extra Services Cost
 {total_extra_demands_te}
 
-{discounts}
-
 Discounts
 {total_discounts}
 
