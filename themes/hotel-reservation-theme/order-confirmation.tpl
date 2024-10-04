@@ -37,6 +37,7 @@
 	{block name='errors'}
 		{include file="$tpl_dir./errors.tpl"}
 	{/block}
+
 	{block name='displayOrderConfirmation'}
 		{$HOOK_ORDER_CONFIRMATION}
 	{/block}
@@ -46,13 +47,13 @@
 		{/block}
 		{if isset($order->id) && $order->id}
 			{if $is_guest}
-				<p>{l s='Your order ID is:'} <span class="bold">{$id_order_formatted}</span> . {l s='Your order ID has been sent via email.'}</p>
+				<p>{l s='Your Order Reference is:'} <span class="bold">{$order->reference}</span></p>
 				<p class="cart_navigation exclusive">
 				<a class="button-exclusive btn btn-default" href="{$link->getPageLink('guest-tracking', true, NULL, "id_order={$reference_order|urlencode}&email={$email|urlencode}")|escape:'html':'UTF-8'}" title="{l s='Follow my order'}"><i class="icon-chevron-left"></i>{l s='Follow my order'}</a>
 				</p>
 			{else}
 				{if isset($is_free_order) && $is_free_order}
-					<p class="alert alert-success">{l s='Your order on %s is complete.' sprintf=$shop_name}</p><br />
+					<p class="alert alert-success">{l s='Your'} {if $totalRoomsBooked > 1}{l s='bookings have'}{else}{l s='booking has'}{/if} {l s='been created successfully!'}</p><br />
 				{/if}
 				<p><strong>{l s='Order Status :'}</strong> <span>{l s='Confirmed'}</span></p>
 				<p><strong>{l s='Order Reference :'}</strong> <span class="bold">{$order->reference}</span></p>
@@ -120,17 +121,18 @@
 														</p>
 													</td>
 												{/block}
+												{assign var="is_full_date" value=($show_full_date && ($rm_v['data_form']|date_format:'%D' == $rm_v['data_to']|date_format:'%D'))}
 												{block name='order_detail_room_type_check_in'}
 													<td class="text-center">
 														<p>
-															{$rm_v['data_form']|date_format:"%d-%m-%Y"}
+															{dateFormat date=$rm_v['data_form'] full=$is_full_date}
 														</p>
 													</td>
 												{/block}
 												{block name='order_detail_room_type_check_out'}
 													<td class="text-center">
 														<p>
-															{$rm_v['data_to']|date_format:"%d-%m-%Y"}
+															{dateFormat date=$rm_v['data_to'] full=$is_full_date}
 														</p>
 													</td>
 												{/block}

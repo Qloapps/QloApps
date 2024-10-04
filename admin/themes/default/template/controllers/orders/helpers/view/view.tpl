@@ -115,7 +115,8 @@
                                                         <a href="{$link->getAdminLink('AdminProducts')|escape:'html':'UTF-8'}&amp;id_product={$data['id_product']}&amp;updateproduct" target="_blank">{$data['room_type_name']|escape:'html':'UTF-8'}</a>
                                                     </td>
                                                     <td>
-                                                        {dateFormat date=$data['date_from']} - {dateFormat date=$data['date_to']}
+                                                        {assign var="is_full_date" value=($show_full_date && ($data['date_from']|date_format:'%D' == $data['date_to']|date_format:'%D'))}
+                                                        {dateFormat date=$data['date_from'] full=$is_full_date} - {dateFormat date=$data['date_to'] full=$is_full_date}
                                                     </td>
                                                     <td>
                                                         {if ($data['id_status'] == $hotel_order_status['STATUS_CHECKED_IN']['id_status']) || ($data['id_status'] == $hotel_order_status['STATUS_CHECKED_OUT']['id_status'])}
@@ -145,7 +146,7 @@
 
                                                         {if isset($refundReqBookings) && $refundReqBookings && $data.id|in_array:$refundReqBookings && $data.is_refunded}
                                                             <span class="badge badge-danger">{if $data.is_cancelled}{l s='Cancelled'}{else}{l s='Refunded'}{/if}</span>
-                                                        {else}
+                                                        {elseif $can_edit}
                                                             <a class="open_room_status_form btn btn-default" href="#" data-id_hotel_booking_detail="{$data['id']}" data-id_order="{$data['id_order']}" data-id_status="{$data['id_status']}" data-id_room="{$data['id_room']}" data-date_from="{$data['date_from']|date_format:"%Y-%m-%d"}" data-date_to="{$data['date_to']|date_format:"%Y-%m-%d"}" data-check_in_time="{$data['check_in_time']}" data-check_out_time="{$data['check_out_time']}">
                                                                 <i class="icon-pencil"></i> {l s='Edit'}
                                                             </a>
@@ -219,14 +220,17 @@
                                                     <td style="background-color:{$row['color']};color:{$row['text-color']}">{$row['ostate_name']|stripslashes}</td>
                                                     <td style="background-color:{$row['color']};color:{$row['text-color']}">{if $row['employee_lastname']}{$row['employee_firstname']|stripslashes} {$row['employee_lastname']|stripslashes}{/if}</td>
                                                     <td style="background-color:{$row['color']};color:{$row['text-color']}">{dateFormat date=$row['date_add'] full=true}</td>
-                                                    <td style="background-color:{$row['color']};color:{$row['text-color']}" class="text-right">
-                                                        {if $row['send_email']|intval}
-                                                            <a class="btn btn-default" href="{$link->getAdminLink('AdminOrders')|escape:'html':'UTF-8'}&amp;vieworder&amp;id_order={$order->id|intval}&amp;sendStateEmail={$row['id_order_state']|intval}&amp;id_order_history={$row['id_order_history']|intval}" title="{l s='Resend this email to the customer'}">
-                                                                <i class="icon-mail-reply"></i>
-                                                                {l s='Resend email'}
-                                                            </a>
-                                                        {/if}
-                                                    </td>
+
+                                                    {if $can_edit}
+                                                        <td style="background-color:{$row['color']};color:{$row['text-color']}" class="text-right">
+                                                            {if $row['send_email']|intval}
+                                                                <a class="btn btn-default" href="{$link->getAdminLink('AdminOrders')|escape:'html':'UTF-8'}&amp;vieworder&amp;id_order={$order->id|intval}&amp;sendStateEmail={$row['id_order_state']|intval}&amp;id_order_history={$row['id_order_history']|intval}" title="{l s='Resend this email to the customer'}">
+                                                                    <i class="icon-mail-reply"></i>
+                                                                    {l s='Resend email'}
+                                                                </a>
+                                                            {/if}
+                                                        </td>
+                                                    {/if}
                                                 </tr>
                                             {else}
                                                 <tr>
@@ -234,14 +238,16 @@
                                                     <td>{$row['ostate_name']|stripslashes}</td>
                                                     <td>{if $row['employee_lastname']}{$row['employee_firstname']|stripslashes} {$row['employee_lastname']|stripslashes}{else}&nbsp;{/if}</td>
                                                     <td>{dateFormat date=$row['date_add'] full=true}</td>
-                                                    <td class="text-right">
-                                                        {if $row['send_email']|intval}
-                                                            <a  href="{$link->getAdminLink('AdminOrders')|escape:'html':'UTF-8'}&amp;vieworder&amp;id_order={$order->id|intval}&amp;sendStateEmail={$row['id_order_state']|intval}&amp;id_order_history={$row['id_order_history']|intval}" title="{l s='Resend this email to the customer'}">
-                                                                <i class="icon-mail-reply"></i>
-                                                                {l s='Resend email'}
-                                                            </a>
-                                                        {/if}
-                                                    </td>
+                                                    {if $can_edit}
+                                                        <td class="text-right">
+                                                            {if $row['send_email']|intval}
+                                                                <a  href="{$link->getAdminLink('AdminOrders')|escape:'html':'UTF-8'}&amp;vieworder&amp;id_order={$order->id|intval}&amp;sendStateEmail={$row['id_order_state']|intval}&amp;id_order_history={$row['id_order_history']|intval}" title="{l s='Resend this email to the customer'}">
+                                                                    <i class="icon-mail-reply"></i>
+                                                                    {l s='Resend email'}
+                                                                </a>
+                                                            {/if}
+                                                        </td>
+                                                    {/if}
                                                 </tr>
                                             {/if}
                                         {/foreach}
@@ -250,7 +256,7 @@
                             </div>
                             <!-- Change status form -->
                             {* If current state is refunded or cancelled the further order status changes are not allowed *}
-                            {if !isset($currentState) || (isset($currentState) && ($currentState->id != Configuration::get('PS_OS_REFUND') && $currentState->id != Configuration::get('PS_OS_CANCELED')))}
+                            {if $can_edit && (!isset($currentState) || (isset($currentState) && ($currentState->id != Configuration::get('PS_OS_REFUND') && $currentState->id != Configuration::get('PS_OS_CANCELED'))))}
                                 <form action="{$currentIndex|escape:'html':'UTF-8'}&amp;vieworder&amp;id_order={$order->id|intval}&amp;token={$smarty.get.token}" method="post" class="form-horizontal well hidden-print">
                                     <div class="row">
                                         <div class="col-lg-9">
@@ -474,12 +480,14 @@
                             </table>
                         </div>
                     </div>
-                    <div class="form-group">
-                        <button class="btn btn-primary add_new_payment" id="add_new_payment">
-                            <i class="icon-plus-sign"></i> {l s='Add new payment'}
-                        </button>
-                    </div>
-                    {if (!$order->valid && sizeof($currencies) > 1)}
+                    {if $can_edit}
+                        <div class="form-group">
+                            <button class="btn btn-primary add_new_payment" id="add_new_payment">
+                                <i class="icon-plus-sign"></i> {l s='Add new payment'}
+                            </button>
+                        </div>
+                    {/if}
+                    {if $can_edit && (!$order->valid && sizeof($currencies) > 1)}
                         <form class="form-horizontal well" method="post" action="{$currentIndex|escape:'html':'UTF-8'}&amp;vieworder&amp;id_order={$order->id}&amp;token={$smarty.get.token|escape:'html':'UTF-8'}">
                             <div class="form-group">
                                 <label class="control-label col-lg-2 col-md-3 text-left">{l s='Change currency'}</label>
@@ -560,8 +568,11 @@
                                         </dl>
                                         <form method="post" action="index.php?tab=AdminCustomers&amp;id_customer={$customer->id}&amp;id_order={$order->id|intval}&amp;token={getAdminToken tab='AdminCustomers'}">
                                             <input type="hidden" name="id_lang" value="{$order->id_lang}" />
-                                            <input class="btn btn-primary" type="submit" name="submitGuestToCustomer" value="{l s='Transform this guest into a customer'}" />
-                                            <p class="help-block">{l s='This feature will generate a random password and send an email to the customer.'}</p>
+
+                                            {if $can_edit}
+                                                <button class="btn btn-primary" type="submit" name="submitGuestToCustomer"><i class='icon-refresh'></i> {l s='Transform this guest into a customer'}</button>
+                                                <p class="help-block">{l s='This feature will generate a random password and send an email to the customer.'}</p>
+                                            {/if}
                                         </form>
                                     {else}
                                         <div class="alert alert-warning">
@@ -603,13 +614,15 @@
                                                 <textarea rows="3" name="note" id="noteContent" class="textarea-autosize" onkeyup="$(this).val().length > 0 ? $('#submitCustomerNote').removeAttr('disabled') : $('#submitCustomerNote').attr('disabled', 'disabled')">{$customer->note}</textarea>
                                             </div>
                                         </div>
-                                        <div class="row">
-                                            <div class="col-lg-12">
-                                                <button type="submit" id="submitCustomerNote" class="btn btn-primary pull-right" disabled="disabled">
-                                                    <i class="icon-save"></i> {l s='Add Note'}
-                                                </button>
+                                        {if $can_edit}
+                                            <div class="row">
+                                                <div class="col-lg-12">
+                                                    <button type="submit" id="submitCustomerNote" class="btn btn-primary pull-right" disabled="disabled">
+                                                        <i class="icon-save"></i> {l s='Add Note'}
+                                                    </button>
+                                                </div>
                                             </div>
-                                        </div>
+                                        {/if}
                                         <span id="note_feedback"></span>
                                     </form>
                                 </div>
@@ -811,7 +824,7 @@
                     <div class="panel" id="refundForm">
                         <div class="panel-heading">
                             <i class="icon-bed"></i> &nbsp;{l s='Rooms Booking Detail'} <span class="badge">{$order_detail_data|@count}</span>
-                            {if !$order->hasBeenDelivered() && $currentState->id != Configuration::get('PS_OS_REFUND') && $currentState->id != Configuration::get('PS_OS_CANCELED')}
+                            {if $can_edit && (!$order->hasBeenDelivered() && $currentState->id != Configuration::get('PS_OS_REFUND') && $currentState->id != Configuration::get('PS_OS_CANCELED'))}
                                 <button type="button" id="add_room" class="btn btn-primary pull-right">
                                     <i class="icon-plus-sign"></i> {l s='Add Rooms'}
                                 </button>
@@ -850,61 +863,66 @@
                                 {assign var=order_shipping_price value=$order->total_shipping_tax_incl}
                             {/if}
 
-                            {assign var=room_price_tax_excl value=$order->getTotalProductsWithoutTaxes(false, true)}
-                            {assign var=room_price_tax_incl value=$order->getTotalProductsWithTaxes(false, true)}
-                            {assign var=service_products_price_tax_excl value=$order->getTotalProductsWithoutTaxes(false, false, Product::SERVICE_PRODUCT_WITHOUT_ROOMTYPE)}
-                            {assign var=service_products_price_tax_incl value=$order->getTotalProductsWithTaxes(false, false, Product::SERVICE_PRODUCT_WITHOUT_ROOMTYPE)}
-                            {assign var=convenience_fee_price_tax_excl value=$order->getTotalProductsWithoutTaxes(false, false, Product::SERVICE_PRODUCT_WITH_ROOMTYPE, 1, Product::PRICE_ADDITION_TYPE_INDEPENDENT)}
-                            {assign var=convenience_fee_price_tax_incl value=$order->getTotalProductsWithTaxes(false, false, Product::SERVICE_PRODUCT_WITH_ROOMTYPE, 1, Product::PRICE_ADDITION_TYPE_INDEPENDENT)}
-                            {assign var=additional_service_price_tax_excl value=($order->getTotalProductsWithoutTaxes(false, false, Product::SERVICE_PRODUCT_WITH_ROOMTYPE) + $totalDemandsPriceTE)}
-                            {assign var=additional_service_price_tax_incl value=($order->getTotalProductsWithTaxes(false, false, Product::SERVICE_PRODUCT_WITH_ROOMTYPE) + $totalDemandsPriceTI)}
-                            {if $room_price_tax_excl}
+                            {* total extra demands prices *}
+                            {* $totalDemandsPriceTE
+                            $totalDemandsPriceTI *}
+
+                            {* Get total rooms prices *}
+                            {assign var=total_rooms_price_tax_excl value=$order->getTotalProductsWithoutTaxes(false, true)}
+                            {assign var=total_rooms_price_tax_incl value=$order->getTotalProductsWithTaxes(false, true)}
+
+                            {* Get total extra services including convenience fees prices *}
+                            {assign var=total_services_price_tax_excl value=$order->getTotalProductsWithoutTaxes(false, false)}
+                            {assign var=total_services_price_tax_incl value=$order->getTotalProductsWithTaxes(false, false)}
+
+                            {* Get total of extra services and extra demands prices(excluding convenience fee) *}
+                            {assign var=total_room_services_and_demands_tax_excl value=($order->getTotalProductsWithoutTaxes(false, false, Product::SERVICE_PRODUCT_WITH_ROOMTYPE) + $totalDemandsPriceTE)}
+                            {assign var=total_room_services_and_demands_tax_incl value=($order->getTotalProductsWithTaxes(false, false, Product::SERVICE_PRODUCT_WITH_ROOMTYPE) + $totalDemandsPriceTI)}
+
+                            {* Get total of only convenience fees prices *}
+                            {assign var=total_convenience_fee_tax_excl value=$order->getTotalProductsWithoutTaxes(false, false, Product::SERVICE_PRODUCT_WITH_ROOMTYPE, 1, Product::PRICE_ADDITION_TYPE_INDEPENDENT)}
+                            {assign var=total_convenience_fee_tax_incl value=$order->getTotalProductsWithTaxes(false, false, Product::SERVICE_PRODUCT_WITH_ROOMTYPE, 1, Product::PRICE_ADDITION_TYPE_INDEPENDENT)}
+
+                            {assign var=order_total_price_tax_excl value=($total_rooms_price_tax_excl + $total_services_price_tax_excl + $totalDemandsPriceTE)}
+                            {assign var=order_total_price_tax_incl value=($total_rooms_price_tax_incl + $total_services_price_tax_incl + $totalDemandsPriceTI)}
+
+                            {if $total_rooms_price_tax_excl}
                                 <tr id="total_products">
                                     <td class="text-right">{l s='Total Rooms Cost (Tax excl.)'}</td>
                                     <td class="amount text-right nowrap">
-                                        {displayPrice price=$room_price_tax_excl currency=$currency->id}
+                                        {displayPrice price=$total_rooms_price_tax_excl currency=$currency->id}
                                     </td>
                                     <td class="partial_refund_fields current-edit" style="display:none;"></td>
                                 </tr>
                             {/if}
-                            {if isset($additional_service_price_tax_excl) && $additional_service_price_tax_excl > 0}
+                            {if isset($total_room_services_and_demands_tax_excl) && $total_room_services_and_demands_tax_excl > 0}
                                 <tr id="total_products">
                                     <td class="text-right">{l s='Total Extra services (Tax excl.)'}</td>
                                     <td class="amount text-right nowrap">
-                                        {displayPrice price=($additional_service_price_tax_excl - $convenience_fee_price_tax_excl) currency=$currency->id}
+                                        {displayPrice price=($total_room_services_and_demands_tax_excl - $total_convenience_fee_tax_excl) currency=$currency->id}
                                     </td>
                                     <td class="partial_refund_fields current-edit" style="display:none;"></td>
                                 </tr>
                             {/if}
-                            {if $service_products_price_tax_excl}
-                                <tr id="total_products">
-                                    <td class="text-right">{l s='Total service products cost (Tax excl.)'}</td>
-                                    <td class="amount text-right nowrap">
-                                        {displayPrice price=$service_products_price_tax_excl currency=$currency->id}
-                                    </td>
-                                    <td class="partial_refund_fields current-edit" style="display:none;"></td>
-                                </tr>
-                            {/if}
-
-                            {if isset($convenience_fee_price_tax_excl) && $convenience_fee_price_tax_excl > 0}
+                            {if isset($total_convenience_fee_tax_excl) && $total_convenience_fee_tax_excl > 0}
                                 <tr id="total_products">
                                     <td class="text-right">
                                         {l s='Convenience Fee (Tax excl.)'}
-                                        {if isset($booking_auto_added_services) && count($booking_auto_added_services)}
+                                        {if isset($order_convenience_fee_services) && count($order_convenience_fee_services)}
                                             <span role="button" id="view_convenience_services" class="pull-left"><i class="icon-angle-down icon-bold"></i><i class="icon-angle-up icon-bold" style="display:none;"></i></span>
                                         {/if}
                                     </td>
                                     <td class="amount text-right nowrap">
-                                        {displayPrice price=$convenience_fee_price_tax_excl currency=$currency->id}
+                                        {displayPrice price=$total_convenience_fee_tax_excl currency=$currency->id}
                                     </td>
                                     <td class="partial_refund_fields current-edit" style="display:none;"></td>
                                 </tr>
-                                {if isset($booking_auto_added_services) && count($booking_auto_added_services)}
+                                {if isset($order_convenience_fee_services) && count($order_convenience_fee_services)}
                                     <tr id="convenience_services" style="display:none;">
                                         <td colspan="3" class="panel">
                                             <table class="table table-responsive">
                                                 <tbody>
-                                                    {foreach $booking_auto_added_services as $service}
+                                                    {foreach $order_convenience_fee_services as $service}
                                                         <tr>
                                                             <td class="text-left"><span>{$service.name}</span></td>
                                                             <td class="text-right"><span>{displayPrice price=$service.total_price_tax_excl currency=$currency->id}</span></td>
@@ -920,41 +938,41 @@
                             <tr id="total_taxes">
                                 <td class="text-right">
                                     <strong>{l s='Total Taxes'} </strong>
-                                    {if ($order->total_paid_tax_incl - $order->total_paid_tax_excl) > 0}
+                                    {if ($order_total_price_tax_incl - $order_total_price_tax_excl) > 0}
                                         <span role="button" id="view_order_tax_details" class="pull-left"><i class="icon-angle-down icon-bold"></i><i class="icon-angle-up icon-bold" style="display:none;"></i></span>
                                     {/if}
                                 </td>
-                                <td class="amount text-right nowrap" ><strong>{displayPrice price=(($order->total_paid_tax_incl + $order->total_discounts_tax_incl) - ($order->total_paid_tax_excl + $order->total_discounts_tax_excl)) currency=$currency->id}</strong>
+                                <td class="amount text-right nowrap" ><strong>{displayPrice price=($order_total_price_tax_incl - $order_total_price_tax_excl) currency=$currency->id}</strong>
                                 </td>
                                 <td class="partial_refund_fields current-edit" style="display:none;"></td>
                             </tr>
-                            {if ($order->total_paid_tax_incl - $order->total_paid_tax_excl) > 0}
+                            {if ($order_total_price_tax_incl - $order_total_price_tax_excl) > 0}
                                 <tr id="order_tax_details" style="display:none;">
                                     <td colspan="3" class="panel">
                                         <table class="table table-responsive">
                                             <tbody>
-                                                {if $room_price_tax_excl}
+                                                {if $total_rooms_price_tax_excl}
                                                     <tr>
                                                         <td class="text-left">{l s='Total Rooms Tax'}</td>
                                                         <td class="text-right">
-                                                            {displayPrice price=($room_price_tax_incl - $room_price_tax_excl) currency=$currency->id}
+                                                            {displayPrice price=($total_rooms_price_tax_incl - $total_rooms_price_tax_excl) currency=$currency->id}
                                                         </td>
                                                     </tr>
                                                 {/if}
-                                                {if isset($additional_service_price_tax_incl) && (($additional_service_price_tax_incl - $additional_service_price_tax_excl) - ($convenience_fee_price_tax_incl - $convenience_fee_price_tax_excl)) > 0}
+                                                {if isset($total_room_services_and_demands_tax_incl) && (($total_room_services_and_demands_tax_incl - $total_room_services_and_demands_tax_excl) - ($total_convenience_fee_tax_incl - $total_convenience_fee_tax_excl)) > 0}
                                                     <tr>
                                                         <td class="text-left">{l s='Extra services Tax'}</td>
                                                         <td class="text-right nowrap">
-                                                            {displayPrice price=(($additional_service_price_tax_incl - $additional_service_price_tax_excl) - ($convenience_fee_price_tax_incl - $convenience_fee_price_tax_excl)) currency=$currency->id}
+                                                            {displayPrice price=(($total_room_services_and_demands_tax_incl - $total_room_services_and_demands_tax_excl) - ($total_convenience_fee_tax_incl - $total_convenience_fee_tax_excl)) currency=$currency->id}
                                                         </td>
                                                         <td class="partial_refund_fields current-edit" style="display:none;"></td>
                                                     </tr>
                                                 {/if}
-                                                {if isset($convenience_fee_price_tax_excl) && $convenience_fee_price_tax_excl > 0}
+                                                {if isset($total_convenience_fee_tax_excl) && $total_convenience_fee_tax_excl > 0}
                                                     <tr id="total_products">
                                                         <td class="text-left">{l s='Convenience Fee Tax'}</td>
                                                         <td class="amount text-right nowrap">
-                                                            {displayPrice price=($convenience_fee_price_tax_incl - $convenience_fee_price_tax_excl) currency=$currency->id}
+                                                            {displayPrice price=($total_convenience_fee_tax_incl - $total_convenience_fee_tax_excl) currency=$currency->id}
                                                         </td>
                                                         <td class="partial_refund_fields current-edit" style="display:none;"></td>
                                                     </tr>
@@ -968,7 +986,7 @@
                             <tr id="total_discounts" {if $order->total_discounts_tax_incl == 0}style="display: none;"{/if}>
                                 <td class="text-right"><strong>{l s='Total Booking Amount'}</strong></td>
                                 <td class="amount text-right nowrap">
-                                    <strong>{displayPrice price=($order->total_paid_tax_incl + $order->total_discounts_tax_incl) currency=$currency->id}</strong>
+                                    <strong>{displayPrice price=($order_total_price_tax_incl) currency=$currency->id}</strong>
                                 </td>
                                 <td class="partial_refund_fields current-edit" style="display:none;"></td>
                             </tr>
@@ -1022,7 +1040,7 @@
                 <div class="panel panel-vouchers">
                     <div class="panel-heading">
                         <span><i class="icon-tag"></i> &nbsp;{l s='Voucher'}</span>
-                        {if $can_edit}
+                        {if $can_edit && $order->total_paid > 0}
                             <button id="add_voucher" class="btn btn-primary pull-right" type="button" >
                                 <i class="icon-ticket"></i> {l s='Add new voucher'}
                             </button>
@@ -1138,49 +1156,53 @@
                         <a href="{$link->getAdminLink('AdminCustomerThreads')|escape:'html':'UTF-8'}&amp;id_order={$order->id|intval}" class="pull-right">{l s='Show all messages'}</a>
                     </div>
                     <div id="messages">
-                        <form action="{$smarty.server.REQUEST_URI|escape:'html':'UTF-8'}&amp;token={$smarty.get.token|escape:'html':'UTF-8'}" method="post" onsubmit="if (getE('visibility').checked == true) return confirm('{l s='Do you want to send this message to the customer?'}');">
-                            <div id="message" class="form-horizontal">
+                        {if $can_edit}
+                            <form action="{$smarty.server.REQUEST_URI|escape:'html':'UTF-8'}&amp;token={$smarty.get.token|escape:'html':'UTF-8'}" method="post" onsubmit="if (getE('visibility').checked == true) return confirm('{l s='Do you want to send this message to the customer?'}');">
+                                <div id="message" class="form-horizontal">
+                                    <div class="form-group">
+                                        <label class="control-label">{l s='Choose a standard message'}</label>
+                                        <p>
+                                            <select class="chosen form-control" name="order_message" id="order_message" onchange="orderOverwriteMessage(this, '{l s='Do you want to overwrite your existing message?'}')">
+                                                <option value="0" selected="selected">-</option>
+                                                {foreach from=$orderMessages item=orderMessage}
+                                                <option value="{$orderMessage['message']|escape:'html':'UTF-8'}">{$orderMessage['name']}</option>
+                                                {/foreach}
+                                            </select>
+                                        </p>
+                                        <div>
+                                            <a  href="{$link->getAdminLink('AdminOrderMessage')|escape:'html':'UTF-8'}">
+                                                {l s='Configure predefined messages'}
+                                                <i class="icon-external-link"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <label class="control-label">{l s='Message'}</label>
+                                        <textarea rows="3" id="txt_msg" class="textarea-autosize" name="message">{Tools::getValue('message')|escape:'html':'UTF-8'}</textarea>
+                                    </div>
+
                                 <div class="form-group">
-                                    <label class="control-label">{l s='Choose a standard message'}</label>
-                                    <p>
-                                        <select class="chosen form-control" name="order_message" id="order_message" onchange="orderOverwriteMessage(this, '{l s='Do you want to overwrite your existing message?'}')">
-                                            <option value="0" selected="selected">-</option>
-                                            {foreach from=$orderMessages item=orderMessage}
-                                            <option value="{$orderMessage['message']|escape:'html':'UTF-8'}">{$orderMessage['name']}</option>
-                                            {/foreach}
-                                        </select>
-                                    </p>
-                                    <div>
-                                        <a  href="{$link->getAdminLink('AdminOrderMessage')|escape:'html':'UTF-8'}">
-                                            {l s='Configure predefined messages'}
-                                            <i class="icon-external-link"></i>
-                                        </a>
+                                        <p class="checkbox">
+                                            <label class="control-label" for="visibility">
+                                                <input type="checkbox" name="visibility" id="visibility" value="1" />
+                                                {l s='Display Message to Customer?'}
+                                            </label>
+                                        </p>
+                                    </div>
+                                    <input type="hidden" name="id_order" value="{$order->id}" />
+                                    <input type="hidden" name="id_customer" value="{$order->id_customer}" />
+
+                                    <div class="row">
+                                        <button type="submit" id="submitMessage" class="btn btn-primary pull-right" name="submitMessage">
+                                            <i class="icon-paper-plane"></i> {l s='Send Message'}
+                                        </button>
                                     </div>
                                 </div>
-
-                                <div class="row">
-                                    <label class="control-label">{l s='Message'}</label>
-                                    <textarea rows="3" id="txt_msg" class="textarea-autosize" name="message">{Tools::getValue('message')|escape:'html':'UTF-8'}</textarea>
-                                </div>
-
-                               <div class="form-group">
-                                    <p class="checkbox">
-                                        <label class="control-label" for="visibility">
-                                            <input type="checkbox" name="visibility" id="visibility" value="1" />
-                                            {l s='Display Message to Customer?'}
-                                        </label>
-                                    </p>
-                                </div>
-                                <input type="hidden" name="id_order" value="{$order->id}" />
-                                <input type="hidden" name="id_customer" value="{$order->id_customer}" />
-
-                                <div class="row">
-                                    <button type="submit" id="submitMessage" class="btn btn-primary pull-right" name="submitMessage">
-                                        <i class="icon-paper-plane"></i> {l s='Send Message'}
-                                    </button>
-                                </div>
-                            </div>
-                        </form>
+                            </form>
+                        {else}
+                            <div class="alert alert-warning">{l s='You do not have permission to edit this order.'}</div>
+                        {/if}
                     </div>
                 </div>
             </div>

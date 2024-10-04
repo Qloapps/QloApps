@@ -2017,30 +2017,33 @@ const BookingDocumentsModal = {
         });
     },
     deleteDocument: function($this) {
-        BookingDocumentsModal.hideErrors();
-        let idHtlBookingDocument = parseInt($($this).attr('data-id-htl-booking-document'));
-        let data = {
-            ajax: true,
-            action: 'deleteBookingDocument',
-            id_htl_booking_document: idHtlBookingDocument,
-        };
+        BookingDocumentsModal.beforeSubmit(function() {
+            let idHtlBookingDocument = parseInt($($this).attr('data-id-htl-booking-document'));
+            let data = {
+                ajax: true,
+                action: 'deleteBookingDocument',
+                id_htl_booking_document: idHtlBookingDocument,
+            };
 
-        $(".loading_overlay").show();
-        $.ajax({
-            url: admin_order_tab_link,
-            data: data,
-            type: 'POST',
-            dataType: 'JSON',
-            success: function(response) {
-                if (response.status) {
-                    BookingDocumentsModal.setBodyHtml(response.html);
-                    BookingDocumentsModal.setDocumentsCount(response.num_checkin_documents);
-                    showSuccessMessage(txt_booking_document_delete_success);
+            $(".loading_overlay").show();
+            $.ajax({
+                url: admin_order_tab_link,
+                data: data,
+                type: 'POST',
+                dataType: 'JSON',
+                success: function(response) {
+                    if (response.status) {
+                        BookingDocumentsModal.setBodyHtml(response.html);
+                        BookingDocumentsModal.setDocumentsCount(response.num_checkin_documents);
+                        showSuccessMessage(txt_booking_document_delete_success);
+                    } else {
+                        BookingDocumentsModal.showErrors(response.errors);
+                    }
+                },
+                complete: function() {
+                    $(".loading_overlay").hide();
                 }
-            },
-            complete: function() {
-                $(".loading_overlay").hide();
-            }
+            });
         });
     },
     showErrors: function(errors) {

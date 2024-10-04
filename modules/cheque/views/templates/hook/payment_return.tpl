@@ -24,7 +24,7 @@
 *}
 
 {if $status == 'ok'}
-	<p class="alert alert-success">{l s='Your order on %s is complete.' sprintf=$shop_name mod='cheque'}</p><br />
+	    <p class="alert alert-success">{l s='Your' mod='cheque'} {if $cart_room_bookings|count > 1}{l s='bookings have' mod='cheque'}{else}{l s='booking has' mod='cheque'}{/if} {l s='been created successfully!' mod='cheque'}</p><br /><br />
 		{l s='Your check must include:' mod='cheque'}<br />
 		- {l s='Payment amount.' mod='cheque'} <span class="price"><strong>{$total_to_pay}</strong></span>
 		<br />- {l s='Payable to the order of' mod='cheque'} <strong>{if $chequeName}{$chequeName}{else}___________{/if}</strong>

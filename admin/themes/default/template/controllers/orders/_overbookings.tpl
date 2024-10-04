@@ -39,7 +39,8 @@
                             <tr>
                                 <td>{$data['room_num']}</td>
                                 <td>{$data['room_type_name']}</td>
-                                <td>{dateFormat date=$data['date_from']} {l s='To'} {dateFormat date=$data['date_to']}</td>
+                                {assign var="is_full_date" value=($show_full_date && ($data['date_from']|date_format:'%D' == $data['date_to']|date_format:'%D'))}
+                                <td>{dateFormat date=$data['date_from'] full=$is_full_date} {l s='To'} {dateFormat date=$data['date_to'] full=$is_full_date}</td>
                                 <td>
                                     {if $order->with_occupancy && $data['children']}
                                         <div class="dropdown">

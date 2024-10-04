@@ -3,7 +3,7 @@
 
 Hi {firstname} {lastname},
 
-Your order with the reference {order_name} from {shop_name} has
+Your order with the reference {order_name} from <strong>{hotel_hotel_name}</strong> has
 been canceled.
 
 Here are your order details:

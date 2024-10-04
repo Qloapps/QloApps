@@ -496,6 +496,7 @@ class FrontControllerCore extends Controller
             'occupancy_required_for_booking' => $occupancyRequiredForBooking,
             'max_child_age' => Configuration::get('WK_GLOBAL_CHILD_MAX_AGE'),
             'max_child_in_room' => Configuration::get('WK_GLOBAL_MAX_CHILD_IN_ROOM'),
+            'show_full_date' => $this->show_full_date
         ));
 
         // Add the tpl files directory for mobile
@@ -596,7 +597,7 @@ class FrontControllerCore extends Controller
                 'HOOK_TOP'          => Hook::exec('displayTop'),
                 'HOOK_LEFT_COLUMN'  => ($this->display_column_left  ? Hook::exec('displayLeftColumn') : ''),
                 'HOOK_RIGHT_COLUMN' => ($this->display_column_right ? Hook::exec('displayRightColumn', array('cart' => $this->context->cart)) : ''),
-                'show_breadcrump'   => $this->show_breadcrump,              // By webkul
+                'show_breadcrump'   => $this->show_breadcrump,
             ));
         } else {
             $this->context->smarty->assign('HOOK_MOBILE_HEADER', Hook::exec('displayMobileHeader'));

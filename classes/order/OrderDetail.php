@@ -399,7 +399,7 @@ class OrderDetailCore extends ObjectModel
         $values = '';
         foreach ($this->tax_calculator->getTaxesAmount($discounted_price_tax_excl) as $id_tax => $amount) {
 
-            $total_amount = Tools::processPriceRounding($unit_amount, $this->product_quantity, $order->round_type, $order->round_mode);
+            $total_amount = Tools::processPriceRounding($amount, $this->product_quantity, $order->round_type, $order->round_mode);
 
             $values .= '('.(int)$this->id.','.(int)$id_tax.','.(float)$amount.','.(float)$total_amount.'),';
         }

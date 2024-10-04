@@ -57,6 +57,7 @@
 {addJsDef quickView=$quick_view|boolval}
 {addJsDef displayList=Configuration::get('PS_GRID_PRODUCT')|boolval}
 {addJsDef highDPI=Configuration::get('PS_HIGHT_DPI')|boolval}
+{addJsDef showFullDate=$show_full_date|boolval}
 {* occupancy text *}
 {addJsDef is_occupancy_wise_search=$is_occupancy_wise_search|boolval}
 {addJsDef occupancy_required_for_booking=$occupancy_required_for_booking|boolval}
