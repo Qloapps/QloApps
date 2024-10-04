@@ -235,6 +235,13 @@ class AdminAddressesControllerCore extends AdminController
         $addresses_fields = array_unique(array_merge($addresses_fields, $required_fields));
 
         $temp_fields = array();
+        // In case phone is required by the configuration but is not present in the the country wise format, we will show a phone field.
+        if (Configuration::get('PS_ONE_PHONE_AT_LEAST')
+            && !in_array('phone', $addresses_fields)
+            && !in_array('phone_mobile', $addresses_fields)
+        ) {
+            $addresses_fields[] = 'phone';
+        }
 
         foreach ($addresses_fields as $addr_field_item) {
             if ($addr_field_item == 'company') {
@@ -372,20 +379,6 @@ class AdminAddressesControllerCore extends AdminController
                     sprintf($this->l('You must register at least one phone number.')) : ''
                 );
             }
-        }
-
-        // In case phone is required by the configuration but is not present in the the country wise format, we will show a phone field.
-        if (Configuration::get('PS_ONE_PHONE_AT_LEAST') && !in_array('phone', $addresses_fields) && !in_array('phone_mobile', $addresses_fields)) {
-            $temp_fields[] = array(
-                'type' => 'text',
-                'label' => $this->l('Home phone'),
-                'name' => 'phone',
-                'required' => in_array('phone', $required_fields) || Configuration::get('PS_ONE_PHONE_AT_LEAST'),
-                'col' => '4',
-                Configuration::get('PS_ONE_PHONE_AT_LEAST') ?
-                'hint' : '' => Configuration::get('PS_ONE_PHONE_AT_LEAST') ?
-                sprintf($this->l('You must register at least one phone number.')) : ''
-            );
         }
 
         // merge address format with the rest of the form

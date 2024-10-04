@@ -661,8 +661,9 @@ class WebserviceSpecificManagementBookingsCore Extends ObjectModel implements We
             || empty(trim($params['customer_detail']['email']))
         ) {
             $this->error_msg = Tools::displayError('Please provide a valid email.');
-        } else if (Configuration::get('PS_ONE_PHONE_AT_LEAST')
-            && (!isset($params['customer_detail']['phone']) || !$params['customer_detail']['phone'] || empty(trim($params['customer_detail']['phone'])))
+        } else if ((Configuration::get('PS_ONE_PHONE_AT_LEAST')
+            && (!isset($params['customer_detail']['phone']) || !$params['customer_detail']['phone'] || empty(trim($params['customer_detail']['phone']))))
+            || (isset($params['customer_detail']['phone']) && !Validate::isPhoneNumber($params['customer_detail']['phone']))
         ) {
             $this->error_msg = Tools::displayError('Please provide a valid phone number.');
         } else if (isset($params['price_details']['total_paid'])
@@ -1331,7 +1332,7 @@ class WebserviceSpecificManagementBookingsCore Extends ObjectModel implements We
             $objCustomer->lastname = $customerDetails['lastname'];
             $objCustomer->email = $customerDetails['email'];
             $objCustomer->passwd = md5(time()._COOKIE_KEY_);
-            $objCustomer->phone = ($customerDetails['phone'] ? $customerDetails['phone'] : '');
+            $objCustomer->phone = (isset($customerDetails['phone']) ? $customerDetails['phone'] : '');
             $objCustomer->cleanGroups();
             $objCustomer->add();
             $this->bookingCustomer = $objCustomer;
