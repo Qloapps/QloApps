@@ -932,14 +932,15 @@ class AdminControllerCore extends Controller
                         }
                     }
                 } else {
-                    if (isset($field['validation']) && $field['validation'] && method_exists('Validate', $field['validation'])) {
-                        $validation = $field['validation'];
-                    }
                     if (isset($value) && ($value !== '' || !$value === 0)) {
                         if (preg_match('/¤|\|/', $value)) {
                             $this->errors[] = sprintf(Tools::displayError('The %s field is invalid'), $field['title']);
-                        } elseif (isset($validation) && !Validate::$validation($value)) {
-                            $this->errors[] = sprintf(Tools::displayError('The %s field is invalid'), $field['title']);
+                        } else {
+                            if (isset($field['validation']) && $field['validation'] && method_exists('Validate', $field['validation'])) {
+                                if (!Validate::{$field['validation']}($value)) {
+                                    $this->errors[] = sprintf(Tools::displayError('The %s field is invalid'), $field['title']);
+                                }
+                            }
                         }
                     }
                 }
