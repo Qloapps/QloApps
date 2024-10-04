@@ -1488,7 +1488,7 @@ class AdminProductsControllerCore extends AdminController
         ));
 
         if (in_array($this->display, array('add', 'edit'))
-            && $this->tabAccess[$this->display] == '1'
+            && $this->tabAccess['view'] == '1'
             && $this->loadObject(true)
         ) {
             $this->addJqueryUI(array(
@@ -1622,6 +1622,9 @@ class AdminProductsControllerCore extends AdminController
 
     public function ajaxProcessDeleteProductImage()
     {
+        if ($this->tabAccess['edit'] === '0') {
+            return die(json_encode(array('error' => $this->l('You do not have the right permission'))));
+        }
         $this->display = 'content';
         $res = true;
         /* Delete product image */
@@ -4388,125 +4391,130 @@ class AdminProductsControllerCore extends AdminController
 
     public function ajaxProcessaddProductImage()
     {
-        self::$currentIndex = 'index.php?tab=AdminProducts';
-        $product = new Product((int)Tools::getValue('id_product'));
-        $legends = Tools::getValue('legend');
-
-        if (!is_array($legends)) {
-            $legends = (array)$legends;
-        }
-
-        if (!Validate::isLoadedObject($product)) {
-            $files = array();
-            $files[0]['error'] = Tools::displayError('Cannot add image because room type creation failed.');
-        }
-
+        $files = array();
         $image_uploader = new HelperImageUploader('file');
-        $image_uploader->setAcceptTypes(array('jpeg', 'gif', 'png', 'jpg'))->setMaxSize($this->max_image_size);
-        $files = $image_uploader->process();
+        if ($this->tabAccess['edit'] === '0') {
+            $files[0]['name'] = $this->l('Error');
+            $files[0]['error'] = Tools::displayError('You do not have the right permission.');
+        } else {
+            self::$currentIndex = 'index.php?tab=AdminProducts';
+            $product = new Product((int)Tools::getValue('id_product'));
+            $legends = Tools::getValue('legend');
 
-        foreach ($files as &$file) {
-            $image = new Image();
-            $image->id_product = (int)($product->id);
-            $image->position = Image::getHighestPosition($product->id) + 1;
-
-            foreach ($legends as $key => $legend) {
-                if (!empty($legend)) {
-                    $image->legend[(int)$key] = $legend;
-                }
+            if (!is_array($legends)) {
+                $legends = (array)$legends;
             }
 
-            if (!Image::getCover($image->id_product)) {
-                $image->cover = 1;
-            } else {
-                $image->cover = 0;
+            if (!Validate::isLoadedObject($product)) {
+                $files[0]['error'] = Tools::displayError('Cannot add image because room type creation failed.');
             }
 
-            if (($validate = $image->validateFieldsLang(false, true)) !== true) {
-                $file['error'] = Tools::displayError($validate);
-            }
+            $image_uploader->setAcceptTypes(array('jpeg', 'gif', 'png', 'jpg'))->setMaxSize($this->max_image_size);
+            $files = $image_uploader->process();
 
-            if (isset($file['error']) && (!is_numeric($file['error']) || $file['error'] != 0)) {
-                continue;
-            }
+            foreach ($files as &$file) {
+                $image = new Image();
+                $image->id_product = (int)($product->id);
+                $image->position = Image::getHighestPosition($product->id) + 1;
 
-            if (!$image->add()) {
-                $file['error'] = Tools::displayError('Error while creating additional image');
-            } else {
-                if (!$new_path = $image->getPathForCreation()) {
-                    $file['error'] = Tools::displayError('An error occurred during new folder creation');
-                    continue;
-                }
-
-                $error = 0;
-
-                if (!ImageManager::resize($file['save_path'], $new_path.'.'.$image->image_format, null, null, 'jpg', false, $error)) {
-                    switch ($error) {
-                        case ImageManager::ERROR_FILE_NOT_EXIST :
-                            $file['error'] = Tools::displayError('An error occurred while copying image, the file does not exist anymore.');
-                            break;
-
-                        case ImageManager::ERROR_FILE_WIDTH :
-                            $file['error'] = Tools::displayError('An error occurred while copying image, the file width is 0px.');
-                            break;
-
-                        case ImageManager::ERROR_MEMORY_LIMIT :
-                            $file['error'] = Tools::displayError('An error occurred while copying image, check your memory limit.');
-                            break;
-
-                        default:
-                            $file['error'] = Tools::displayError('An error occurred while copying image.');
-                            break;
+                foreach ($legends as $key => $legend) {
+                    if (!empty($legend)) {
+                        $image->legend[(int)$key] = $legend;
                     }
-                    continue;
+                }
+
+                if (!Image::getCover($image->id_product)) {
+                    $image->cover = 1;
                 } else {
-                    $imagesTypes = ImageType::getImagesTypes('products');
-                    $generate_hight_dpi_images = (bool)Configuration::get('PS_HIGHT_DPI');
+                    $image->cover = 0;
+                }
 
-                    foreach ($imagesTypes as $imageType) {
-                        if (!ImageManager::resize($file['save_path'], $new_path.'-'.stripslashes($imageType['name']).'.'.$image->image_format, $imageType['width'], $imageType['height'], $image->image_format)) {
-                            $file['error'] = Tools::displayError('An error occurred while copying image:').' '.stripslashes($imageType['name']);
-                            continue;
+                if (($validate = $image->validateFieldsLang(false, true)) !== true) {
+                    $file['error'] = Tools::displayError($validate);
+                }
+
+                if (isset($file['error']) && (!is_numeric($file['error']) || $file['error'] != 0)) {
+                    continue;
+                }
+
+                if (!$image->add()) {
+                    $file['error'] = Tools::displayError('Error while creating additional image');
+                } else {
+                    if (!$new_path = $image->getPathForCreation()) {
+                        $file['error'] = Tools::displayError('An error occurred during new folder creation');
+                        continue;
+                    }
+
+                    $error = 0;
+
+                    if (!ImageManager::resize($file['save_path'], $new_path.'.'.$image->image_format, null, null, 'jpg', false, $error)) {
+                        switch ($error) {
+                            case ImageManager::ERROR_FILE_NOT_EXIST :
+                                $file['error'] = Tools::displayError('An error occurred while copying image, the file does not exist anymore.');
+                                break;
+
+                            case ImageManager::ERROR_FILE_WIDTH :
+                                $file['error'] = Tools::displayError('An error occurred while copying image, the file width is 0px.');
+                                break;
+
+                            case ImageManager::ERROR_MEMORY_LIMIT :
+                                $file['error'] = Tools::displayError('An error occurred while copying image, check your memory limit.');
+                                break;
+
+                            default:
+                                $file['error'] = Tools::displayError('An error occurred while copying image.');
+                                break;
                         }
+                        continue;
+                    } else {
+                        $imagesTypes = ImageType::getImagesTypes('products');
+                        $generate_hight_dpi_images = (bool)Configuration::get('PS_HIGHT_DPI');
 
-                        if ($generate_hight_dpi_images) {
-                            if (!ImageManager::resize($file['save_path'], $new_path.'-'.stripslashes($imageType['name']).'2x.'.$image->image_format, (int)$imageType['width']*2, (int)$imageType['height']*2, $image->image_format)) {
+                        foreach ($imagesTypes as $imageType) {
+                            if (!ImageManager::resize($file['save_path'], $new_path.'-'.stripslashes($imageType['name']).'.'.$image->image_format, $imageType['width'], $imageType['height'], $image->image_format)) {
                                 $file['error'] = Tools::displayError('An error occurred while copying image:').' '.stripslashes($imageType['name']);
                                 continue;
                             }
+
+                            if ($generate_hight_dpi_images) {
+                                if (!ImageManager::resize($file['save_path'], $new_path.'-'.stripslashes($imageType['name']).'2x.'.$image->image_format, (int)$imageType['width']*2, (int)$imageType['height']*2, $image->image_format)) {
+                                    $file['error'] = Tools::displayError('An error occurred while copying image:').' '.stripslashes($imageType['name']);
+                                    continue;
+                                }
+                            }
                         }
                     }
+
+                    unlink($file['save_path']);
+                    //Necesary to prevent hacking
+                    unset($file['save_path']);
+                    Hook::exec('actionWatermark', array('id_image' => $image->id, 'id_product' => $product->id));
+
+                    if (!$image->update()) {
+                        $file['error'] = Tools::displayError('Error while updating status');
+                        continue;
+                    }
+
+                    // Associate image to shop from context
+                    $shops = Shop::getContextListShopID();
+                    $image->associateTo($shops);
+                    $json_shops = array();
+
+                    foreach ($shops as $id_shop) {
+                        $json_shops[$id_shop] = true;
+                    }
+
+                    $file['status']   = 'ok';
+                    $file['id']       = $image->id;
+                    $file['position'] = $image->position;
+                    $file['cover']    = $image->cover;
+                    $file['legend']   = $image->legend;
+                    $file['path']     = $image->getExistingImgPath();
+                    $file['shops']    = $json_shops;
+
+                    @unlink(_PS_TMP_IMG_DIR_.'product_'.(int)$product->id.'.jpg');
+                    @unlink(_PS_TMP_IMG_DIR_.'product_mini_'.(int)$product->id.'_'.$this->context->shop->id.'.jpg');
                 }
-
-                unlink($file['save_path']);
-                //Necesary to prevent hacking
-                unset($file['save_path']);
-                Hook::exec('actionWatermark', array('id_image' => $image->id, 'id_product' => $product->id));
-
-                if (!$image->update()) {
-                    $file['error'] = Tools::displayError('Error while updating status');
-                    continue;
-                }
-
-                // Associate image to shop from context
-                $shops = Shop::getContextListShopID();
-                $image->associateTo($shops);
-                $json_shops = array();
-
-                foreach ($shops as $id_shop) {
-                    $json_shops[$id_shop] = true;
-                }
-
-                $file['status']   = 'ok';
-                $file['id']       = $image->id;
-                $file['position'] = $image->position;
-                $file['cover']    = $image->cover;
-                $file['legend']   = $image->legend;
-                $file['path']     = $image->getExistingImgPath();
-                $file['shops']    = $json_shops;
-
-                @unlink(_PS_TMP_IMG_DIR_.'product_'.(int)$product->id.'.jpg');
-                @unlink(_PS_TMP_IMG_DIR_.'product_mini_'.(int)$product->id.'_'.$this->context->shop->id.'.jpg');
             }
         }
 

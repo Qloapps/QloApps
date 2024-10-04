@@ -22,7 +22,7 @@
 *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 *}
-<li class="tree-folder">
+<li class="tree-folder" {if isset($node['hidden']) && $node['hidden'] == true} hidden="hidden"{/if}>
 	<span class="tree-folder-name">
 		<i class="icon-folder-close"></i>
 		<label class="tree-toggler">{$node['name']|escape:'html':'UTF-8'}</label>

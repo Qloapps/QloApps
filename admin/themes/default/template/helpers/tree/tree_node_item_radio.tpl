@@ -22,9 +22,9 @@
 *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 *}
-<li class="tree-item{if isset($node['disabled']) && $node['disabled'] == true} tree-item-disable{/if}">
+<li class="tree-item{if isset($node['disabled']) && $node['disabled'] == true} tree-item-disable{/if}" {if isset($node['hidden']) && $node['hidden'] == true} hidden="hidden"{/if}>
 	<span class="tree-item-name">
-		<input type="radio" name="{$node['input_name']}" value="{$node['value']}"{if isset($node['selected']) && $node['selected'] == true} checked="checked"{/if}{if isset($node['disabled']) && $node['disabled'] == true} disabled="disabled"{/if} />
+		<input type="radio" name="{$node['input_name']}" value="{$node['value']}"{if isset($node['selected']) && $node['selected'] == true} checked="checked"{/if}{if isset($node['disabled']) && $node['disabled'] == true} disabled="disabled"{/if} {if isset($node['hidden']) && $node['hidden'] == true} hidden="hidden"{/if} />
 		<i class="tree-dot"></i>
 		<label class="tree-toggler">{$node['name']}</label>
 	</span>

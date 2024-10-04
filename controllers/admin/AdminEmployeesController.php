@@ -177,7 +177,7 @@ class AdminEmployeesControllerCore extends AdminController
     {
         parent::initPageHeaderToolbar();
 
-        if (empty($this->display)) {
+        if (empty($this->display) || $this->display == 'list') {
             $this->page_header_toolbar_btn['new_employee'] = array(
                 'href' => self::$currentIndex.'&addemployee&token='.$this->token,
                 'desc' => $this->l('Add new employee', null, null, false),
