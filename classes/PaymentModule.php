@@ -1090,15 +1090,17 @@ abstract class PaymentModuleCore extends Module
                         $additional_service_price_tax_incl = ($order->getTotalProductsWithTaxes(false, false, Product::SERVICE_PRODUCT_WITH_ROOMTYPE, 0) + $cart_booking_data['total_extra_demands_ti']);
                         $additional_service_tax = ($additional_service_price_tax_incl - $additional_service_price_tax_excl);
 
-
                         // convenience fee price
                         $total_convenience_fee_ti = $order->getTotalProductsWithTaxes(false, false, Product::SERVICE_PRODUCT_WITH_ROOMTYPE, 1, Product::PRICE_ADDITION_TYPE_INDEPENDENT);
                         $total_convenience_fee_te = $order->getTotalProductsWithoutTaxes(false, false, Product::SERVICE_PRODUCT_WITH_ROOMTYPE, 1, Product::PRICE_ADDITION_TYPE_INDEPENDENT);
+                        $total_convenience_fee_tax = $total_convenience_fee_ti - $total_convenience_fee_te;
 
                         // service products
                         // $service_products_price_tax_excl = $order->getTotalProductsWithoutTaxes(false, false, Product::SERVICE_PRODUCT_WITHOUT_ROOMTYPE);
                         // $service_products_price_tax_incl = $order->getTotalProductsWithTaxes(false, false, Product::SERVICE_PRODUCT_WITHOUT_ROOMTYPE);
                         // $service_products_tax = ($order->getTotalProductsWithTaxes(false, false, Product::SERVICE_PRODUCT_WITHOUT_ROOMTYPE) - $order->getTotalProductsWithoutTaxes(false, false, Product::SERVICE_PRODUCT_WITHOUT_ROOMTYPE));
+
+                        $total_order_tax = $room_tax + $additional_service_tax + $total_convenience_fee_tax;
 
                         $data = array(
                             '{cart_booking_data_html}' => $cart_booking_data_html,
@@ -1155,6 +1157,7 @@ abstract class PaymentModuleCore extends Module
                             '{total_wrapping}' => Tools::displayPrice($order->total_wrapping, $this->context->currency, false),
                             // '{total_tax_paid}' => Tools::displayPrice(($order->total_products_wt - $order->total_products) + ($order->total_shipping_tax_incl - $order->total_shipping_tax_excl), $this->context->currency, false),
                             '{total_tax_paid}' => Tools::displayPrice(($order->total_paid_tax_incl - $order->total_paid_tax_excl), $this->context->currency, false),
+                            '{total_order_tax}' => Tools::displayPrice(($total_order_tax), $this->context->currency, false),
                             // additional data
                             '{room_price_tax_excl}' => Tools::displayPrice($room_price_tax_excl, $this->context->currency, false),
                             '{room_price_tax_incl}' => Tools::displayPrice($room_price_tax_incl, $this->context->currency, false),

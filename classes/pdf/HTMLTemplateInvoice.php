@@ -570,7 +570,14 @@ class HTMLTemplateInvoiceCore extends HTMLTemplate
             $footer['total_convenience_fee_te'] = $this->order->getTotalProductsWithoutTaxes(false, false, Product::SERVICE_PRODUCT_WITH_ROOMTYPE, 1, Product::PRICE_ADDITION_TYPE_INDEPENDENT, $idsOrderDetail);
             $footer['total_convenience_fee_ti'] = $this->order->getTotalProductsWithTaxes(false, false, Product::SERVICE_PRODUCT_WITH_ROOMTYPE, 1, Product::PRICE_ADDITION_TYPE_INDEPENDENT, $idsOrderDetail);
         }
+
         $footer['total_paid_real'] = $this->order_invoice->getTotalPaid();
+        $footer['total_tax_excl_without_discount'] = $footer['room_price_tax_excl'] + $footer['total_convenience_fee_te'] + $footer['additional_service_price_tax_excl'];
+        $footer['total_tax_incl_without_discount'] = $footer['room_price_tax_incl'] + $footer['total_convenience_fee_ti'] + $footer['additional_service_price_tax_incl'];
+        $footer['total_tax_without_discount'] = $footer['total_tax_incl_without_discount'] - $footer['total_tax_excl_without_discount'];
+        if ($footer['total_tax_without_discount'] < 0) {
+            $footer['total_tax_without_discount'] = 0;
+        }
 
         $data = array(
             'cart_htl_data' => $cart_htl_data,
@@ -592,6 +599,9 @@ class HTMLTemplateInvoiceCore extends HTMLTemplate
             'ps_price_compute_precision' => _PS_PRICE_COMPUTE_PRECISION_,
             'round_type' => $round_type,
             'legal_free_text' => $legal_free_text,
+            'total_tax_excl_without_discount' => $total_tax_excl_without_discount,
+            'total_tax_incl_without_discount' => $total_tax_incl_without_discount,
+            'total_tax_without_discount' => $total_tax_without_discount
         );
 
         if (Tools::getValue('debug')) {

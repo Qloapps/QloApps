@@ -23,13 +23,13 @@ Total
 
 {extra_demands_details_text}
 
-{discounts}
-
 Total Rooms Cost
 {total_products}
 
 Total Extra Services Cost
 {total_extra_demands_te}
+
+{discounts}
 
 Discounts
 {total_discounts}
