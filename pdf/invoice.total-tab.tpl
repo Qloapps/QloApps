@@ -101,7 +101,7 @@
 			{displayPrice currency=$order->id_currency price=$footer.total_without_discount_te}
 		</td>
 	</tr>
-	{if $footer.total_taxes > 0}
+	{if $footer.total_tax_without_discount > 0}
 	<tr class="bold">
 		<td class="grey">
 			{l s='Total Tax' pdf='true'}
