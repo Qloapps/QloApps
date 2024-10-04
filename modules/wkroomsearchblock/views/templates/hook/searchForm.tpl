@@ -24,9 +24,9 @@
             {block name='search_form_location'}
                 {if isset($location_enabled) && $location_enabled}
                     <div class="form-group grid-item area-4">
-                        <input type="text" class="form-control header-rmsearch-input input-location" id="hotel_location" name="hotel_location" autocomplete="off" placeholder="{l s='Hotel Location' mod='wkroomsearchblock'}" {if isset($search_data)}value="{$search_data['location']|escape:'htmlall':'UTF-8'}"{/if}>
-                        <input hidden="hidden" name="location_category_id" id="location_category_id" {if isset($search_data)}value="{$search_data['location_category_id']|escape:'htmlall':'UTF-8'}"{/if}>
                         <div class="dropdown">
+                            <input type="text" class="form-control header-rmsearch-input input-location" id="hotel_location" name="hotel_location" autocomplete="off" placeholder="{l s='Hotel Location' mod='wkroomsearchblock'}" {if isset($search_data)}value="{$search_data['location']|escape:'htmlall':'UTF-8'}"{/if}>
+                            <input hidden="hidden" name="location_category_id" id="location_category_id" {if isset($search_data)}value="{$search_data['location_category_id']|escape:'htmlall':'UTF-8'}"{/if}>
                             <ul class="location_search_results_ul dropdown-menu"></ul>
                         </div>
                     </div>

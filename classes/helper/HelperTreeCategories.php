@@ -71,7 +71,6 @@ class HelperTreeCategoriesCore extends TreeCore
             $categoryId = (int)$category['id_category'];
             $tree[$categoryId] = $category;
             $tree[$categoryId]['value'] = $category['id_category'];
-            $tree[$categoryId]['input_name'] = 'categoryBox';
 
             if (Category::hasChildren($categoryId, $this->getLang(), false, $this->getShop()->id)) {
                 $categoryChildren = Category::getChildren(
@@ -434,13 +433,13 @@ class HelperTreeCategoriesCore extends TreeCore
 
         $html = '';
         foreach ($data as $item) {
+            $item['input_name'] = $this->getInputName();
             if (array_key_exists('children', $item)
                 && !empty($item['children'])) {
                 $html .= $this->getContext()->smarty->createTemplate(
                     $this->getTemplateFile($this->getNodeFolderTemplate()),
                     $this->getContext()->smarty
                 )->assign(array(
-                    'input_name' => $this->getInputName(),
                     'input_id' => $this->getInputId(),
                     'children' => $this->renderNodes($item['children']),
                     'node'     => $item
@@ -450,7 +449,6 @@ class HelperTreeCategoriesCore extends TreeCore
                     $this->getTemplateFile($this->getNodeItemTemplate()),
                     $this->getContext()->smarty
                 )->assign(array(
-                    'input_name' => $this->getInputName(),
                     'input_id' => $this->getInputId(),
                     'node' => $item
                 ))->fetch();
