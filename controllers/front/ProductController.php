@@ -337,27 +337,19 @@ class ProductControllerCore extends FrontController
                     $preparationTime = (int) HotelOrderRestrictDate::getPreparationTime($hotel_id);
                     if (!($date_from = Tools::getValue('date_from'))) {
                         $date_from = date('Y-m-d');
-                        // set date to according to los
-                        $objHotelRoomTypeRestrictionDateRange = new HotelRoomTypeRestrictionDateRange();
-                        $los = $objHotelRoomTypeRestrictionDateRange->getRoomTypeLengthOfStay($this->product->id, $date_from);
-                        $date_to = date('Y-m-d', strtotime('+'.$los['min_los'].' day', strtotime($date_from)));
-                    }
-                    if (!($date_to = Tools::getValue('date_to'))) {
-                        // set date to according to los
-                        $objHotelRoomTypeRestrictionDateRange = new HotelRoomTypeRestrictionDateRange();
-                        $los = $objHotelRoomTypeRestrictionDateRange->getRoomTypeLengthOfStay($this->product->id, $date_from);
-                        $date_to = date('Y-m-d', strtotime('+'.$los['min_los'].' day', strtotime($date_from)));
                     }
 
                     if ($preparationTime
                         && strtotime(date('Y-m-d', strtotime('+'. ($preparationTime) .' days'))) > strtotime($date_from)
                     ) {
                         $date_from = date('Y-m-d', strtotime('+ '.$preparationTime.' day'));
-                        if (strtotime($date_from) >= strtotime($date_to)) {
-                            $objHotelRoomTypeRestrictionDateRange = new HotelRoomTypeRestrictionDateRange();
-                            $los = $objHotelRoomTypeRestrictionDateRange->getRoomTypeLengthOfStay($this->product->id, $date_from);
-                            $date_to = date('Y-m-d', strtotime('+'.$los['min_los'].' day', strtotime($date_from)));
-                        }
+                    }
+
+                    if (!($date_to = Tools::getValue('date_to'))) {
+                        // set date to according to los
+                        $objHotelRoomTypeRestrictionDateRange = new HotelRoomTypeRestrictionDateRange();
+                        $los = $objHotelRoomTypeRestrictionDateRange->getRoomTypeLengthOfStay($this->product->id, $date_from);
+                        $date_to = date('Y-m-d', strtotime('+'.$los['min_los'].' day', strtotime($date_from)));
                     }
 
                     $hotel_branch_obj = new HotelBranchInformation($hotel_id);
