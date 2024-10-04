@@ -3981,7 +3981,7 @@ class AdminOrdersControllerCore extends AdminController
         /*By Webkul Code is added to add order information In our table while adding product in the process order edit from order detail page.*/
         $date_from = date('Y-m-d H:i:s', strtotime($product_informations['date_from']));
         $date_to = date('Y-m-d H:i:s', strtotime($product_informations['date_to']));
-        $curr_date = date('Y-m-d H:i:s');
+        $curr_date = date('Y-m-d');
         $occupancy = Tools::getValue('occupancy');
         /*Validations*/
         if ($date_from == '') {
