@@ -32,14 +32,15 @@ Total Rooms Cost
 Total Extra Services Cost
 {total_extra_demands_te}
 
-Discounts
-{total_discounts}
 
 Total Rooms Tax
 {total_tax_paid}
 
 Extra Services Tax
 {extra_demands_tax}
+
+Discounts
+{total_discounts}
 
 Final Booking Amount
 {total_paid}
