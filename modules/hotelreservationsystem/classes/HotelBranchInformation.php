@@ -1022,6 +1022,9 @@ class HotelBranchInformation extends ObjectModel
             // set categories of the hotel
             $this->setWsHotelCategories();
 
+            // update room categories after the hotel category is updated.
+            $this->updateRoomTypeCategories();
+
             return true;
         }
 
@@ -1229,14 +1232,7 @@ class HotelBranchInformation extends ObjectModel
                 if ($catState) {
                     if ($catCity = $this->addCategory($this->city, $catState, $groupIds)) {
                         $hotelCatName = $this->hotel_name[Configuration::get('PS_LANG_DEFAULT')];
-                        if ($this->id_category) {
-                            $objCategory = new Category($this->id_category);
-                            $objCategory->name = $this->hotel_name;
-                            $objCategory->link_rewrite = $linkRewriteArray;
-                            $objCategory->id_parent = $catCity;
-                            $objCategory->save();
-                            Category::regenerateEntireNtree();
-                        } else if ($catHotel = $this->addCategory(
+                        if ($catHotel = $this->addCategory(
                             $hotelCatName, $catCity, $groupIds, 1, $this->id, $linkRewriteArray
                         )) {
                             $this->id_category = $catHotel;
