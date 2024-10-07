@@ -53,7 +53,7 @@
 				</p>
 			{else}
 				{if isset($is_free_order) && $is_free_order}
-					<p class="alert alert-success">{l s='Your'} {if $totalRoomsBooked > 1}{l s='bookings have'}{else}{l s='booking has'}{/if} {l s='been created successfully!'}</p><br />
+					<p class="alert alert-success">{l s='Your'} {if $total_rooms_booked > 1}{l s='bookings have'}{else}{l s='booking has'}{/if} {l s='been created successfully!'}</p><br />
 				{/if}
 				<p><strong>{l s='Order Status :'}</strong> <span>{l s='Confirmed'}</span></p>
 				<p><strong>{l s='Order Reference :'}</strong> <span class="bold">{$order->reference}</span></p>
