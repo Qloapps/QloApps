@@ -141,10 +141,6 @@ class CustomerCore extends ObjectModel
     const STATUS_DELETED = 2;
 
     protected $webserviceParameters = array(
-        'objectMethods' => array(
-            'add' => 'addWs',
-            'update' => 'updateWs'
-        ),
         'fields' => array(
             'id_default_group' => array('xlink_resource' => 'groups'),
             'id_lang' => array('xlink_resource' => 'languages'),
@@ -268,6 +264,7 @@ class CustomerCore extends ObjectModel
         }
         $success = parent::add($autodate, $null_values);
         $this->updateGroup($this->groupBox);
+        $this->updateCustomerAdditionalDetails(CartCustomerGuestDetail::getIdCustomerGuest($this->email));
         return $success;
     }
 
@@ -290,25 +287,22 @@ class CustomerCore extends ObjectModel
             }
         }
 
-        return parent::update(true);
+        $objOldCustomer = new Customer($this->id);
+        $success = parent::update(true);
+        $this->updateCustomerAdditionalDetails(CartCustomerGuestDetail::getIdCustomerGuest($objOldCustomer->email));
+        return $success;
     }
 
-    public function addWs($autodate = true, $null_values = false)
+    public function updateCustomerAdditionalDetails($idCustomerGuest)
     {
-        if ($this->phone) {
-            CartCustomerGuestDetail::updateCustomerPhoneNumber($this->email, $this->phone);
-        }
-
-        return $this->add($autodate, $null_values);
-    }
-
-    public function updateWs($autodate = true, $null_values = false)
-    {
-        if ($this->phone) {
-            CartCustomerGuestDetail::updateCustomerPhoneNumber($this->email, $this->phone);
-        }
-
-        return $this->update($autodate, $null_values);
+        $objCartCustomerGuestDetail = new CartCustomerGuestDetail($idCustomerGuest);
+        $objCartCustomerGuestDetail->id_cart = 0;
+        $objCartCustomerGuestDetail->id_gender = $this->id_gender;
+        $objCartCustomerGuestDetail->firstname = $this->firstname;
+        $objCartCustomerGuestDetail->lastname = $this->lastname;
+        $objCartCustomerGuestDetail->email = $this->email;
+        $objCartCustomerGuestDetail->phone = $this->phone;
+        return $objCartCustomerGuestDetail->save();
     }
 
     public function delete()
@@ -348,6 +342,9 @@ class CustomerCore extends ObjectModel
         }
 
         CartRule::deleteByIdCustomer((int)$this->id);
+        // delete customer data from customerGuest table
+        $objCartCustomerGuestDetail = new CartCustomerGuestDetail(CartCustomerGuestDetail::getIdCustomerGuest($this->email));
+        $objCartCustomerGuestDetail->delete();
         return parent::delete();
     }
 

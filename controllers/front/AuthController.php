@@ -465,9 +465,8 @@ class AuthControllerCore extends FrontController
                     $customer->active = 1;
 
                     if (!count($this->errors)) {
+                        $customer->phone = Tools::getValue('phone');
                         if ($customer->add()) {
-                            $phone = Tools::getValue('phone');
-                            CartCustomerGuestDetail::updateCustomerPhoneNumber($customer->email, $phone);
                             if (!$customer->is_guest) {
                                 if (!$this->sendConfirmationMail($customer)) {
                                     $this->errors[] = Tools::displayError('The email cannot be sent.');
@@ -610,12 +609,10 @@ class AuthControllerCore extends FrontController
                     } else {
                         $customer->is_guest = 0;
                     }
+                    $customer->phone = Tools::getValue('phone');
                     if (!$customer->save()) {
                         $this->errors[] = Tools::displayError('An error occurred while creating your account.');
                     } else {
-                        // save customer phone number in cart_customer_guest_detail
-                        $phone = Tools::getValue('phone');
-                        CartCustomerGuestDetail::updateCustomerPhoneNumber($customer->email, $phone);
                         $_POST['phone'] = $phoneAddress;
 
                         foreach ($addresses_types as $addresses_type) {

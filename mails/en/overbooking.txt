@@ -23,8 +23,6 @@ Total
 
 {extra_demands_details_text}
 
-{discounts}
-
 Total Rooms Cost
 {total_products}
 

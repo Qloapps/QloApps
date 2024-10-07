@@ -387,7 +387,6 @@
         		let haserror = false
 				if ($(this).hasClass('num_children')) {
 					max_child_in_room = $(this).closest(".booking_occupancy_wrapper").find('.max_children').val();
-					console.log(no_children_allowed_txt);
 					if (elementVal > max_child_in_room) {
 						$(this).val(max_child_in_room);
 						if (elementVal == 1) {
@@ -705,12 +704,12 @@
 	}
 
 	function updateCartSummaryData(jsonSummary) {
-		$('#total_rooms').html(formatCurrency(parseFloat(jsonSummary.summary.total_rooms + jsonSummary.summary.total_extra_demands + jsonSummary.summary.total_additional_services + jsonSummary.summary.total_additional_services_auto_add), currency_format, currency_sign, currency_blank));
-		$('#total_vouchers').html(formatCurrency(parseFloat(jsonSummary.summary.total_discounts_tax_exc), currency_format, currency_sign, currency_blank));
+		$('#total_rooms').html(formatCurrency(parseFloat(jsonSummary.summary.total_rooms_with_services_without_discount_te), currency_format, currency_sign, currency_blank));
+		$('#total_vouchers').html(formatCurrency(parseFloat(jsonSummary.summary.total_discounts), currency_format, currency_sign, currency_blank));
 		$('#total_convenience_fees').html(formatCurrency(parseFloat(jsonSummary.summary.convenience_fee), currency_format, currency_sign, currency_blank));
-		$('#total_without_taxes').html(formatCurrency(parseFloat(jsonSummary.summary.total_price_without_tax - jsonSummary.summary.convenience_fee), currency_format, currency_sign, currency_blank));
+		$('#total_without_taxes').html(formatCurrency(parseFloat(jsonSummary.summary.cart_total_without_discount_te), currency_format, currency_sign, currency_blank));
 		// $('#total_service_products').html(formatCurrency(parseFloat(jsonSummary.summary.total_service_products), currency_format, currency_sign, currency_blank));
-		$('#total_taxes').html(formatCurrency(parseFloat(jsonSummary.summary.total_tax), currency_format, currency_sign, currency_blank));
+		$('#total_taxes').html(formatCurrency(parseFloat(jsonSummary.summary.total_tax_without_discount), currency_format, currency_sign, currency_blank));
 		$('#total_with_taxes').html(formatCurrency(parseFloat(jsonSummary.summary.total_price), currency_format, currency_sign, currency_blank));
 
 		$('#payment_amount').val(jsonSummary.summary.total_price);
@@ -1211,11 +1210,11 @@
 
 		shipping_price_selected_carrier = jsonSummary.summary.total_shipping;
 
-		$('#total_vouchers').html(formatCurrency(parseFloat(jsonSummary.summary.total_discounts_tax_exc), currency_format, currency_sign, currency_blank));
-		$('#total_taxes').html(formatCurrency(parseFloat(jsonSummary.summary.total_tax), currency_format, currency_sign, currency_blank));
-		$('#total_without_taxes').html(formatCurrency(parseFloat(jsonSummary.summary.total_price_without_tax - jsonSummary.summary.convenience_fee), currency_format, currency_sign, currency_blank));
+		$('#total_vouchers').html(formatCurrency(parseFloat(jsonSummary.summary.total_discounts), currency_format, currency_sign, currency_blank));
+		$('#total_taxes').html(formatCurrency(parseFloat(jsonSummary.summary.total_tax_without_discount), currency_format, currency_sign, currency_blank));
+		$('#total_without_taxes').html(formatCurrency(parseFloat(jsonSummary.summary.cart_total_without_discount_te), currency_format, currency_sign, currency_blank));
 		$('#total_with_taxes').html(formatCurrency(parseFloat(jsonSummary.summary.total_price), currency_format, currency_sign, currency_blank));
-		$('#total_rooms').html(formatCurrency(parseFloat(jsonSummary.summary.total_rooms + jsonSummary.summary.total_extra_demands + jsonSummary.summary.total_additional_services + jsonSummary.summary.total_additional_services_auto_add), currency_format, currency_sign, currency_blank));
+		$('#total_rooms').html(formatCurrency(parseFloat(jsonSummary.summary.total_rooms_with_services_without_discount_te), currency_format, currency_sign, currency_blank));
 		$('#total_convenience_fees').html(formatCurrency(parseFloat(jsonSummary.summary.convenience_fee), currency_format, currency_sign, currency_blank));
 		// $('#total_service_products').html(formatCurrency(parseFloat(jsonSummary.summary.total_service_products), currency_format, currency_sign, currency_blank));
 
@@ -2130,28 +2129,28 @@
                             <span id="total_service_products" class="size_l text-success"></span>
                         </div>
                     </div> *}
+					<div class="col-lg-2">
+						<div class="data-focus">
+							<span>{l s='Convenience fees (Tax excl.)'}</span><br/>
+							<span id="total_convenience_fees" class="size_l"></span>
+						</div>
+					</div>
+					<div class="col-lg-2">
+						<div class="data-focus">
+							<span>{l s='Total (Tax excl.)'}</span><br/>
+							<span id="total_without_taxes" class="size_l"></span>
+						</div>
+					</div>
+					<div class="col-lg-2">
+						<div class="data-focus">
+							<span>{l s='Total taxes'}</span><br/>
+							<span id="total_taxes" class="size_l"></span>
+						</div>
+					</div>
                     <div class="col-lg-2">
                         <div class="data-focus">
-                            <span>{l s='Total vouchers (Tax excl.)'}</span><br/>
+                            <span>{l s='Total vouchers'}</span><br/>
                             <span id="total_vouchers" class="size_l text-danger"></span>
-                        </div>
-                    </div>
-                    <div class="col-lg-2">
-                        <div class="data-focus">
-                            <span>{l s='Total (Tax excl.)'}</span><br/>
-                            <span id="total_without_taxes" class="size_l"></span>
-                        </div>
-                    </div>
-                    <div class="col-lg-2">
-                        <div class="data-focus">
-                            <span>{l s='Convenience fees (Tax excl.)'}</span><br/>
-                            <span id="total_convenience_fees" class="size_l"></span>
-                        </div>
-                    </div>
-                    <div class="col-lg-2">
-                        <div class="data-focus">
-                            <span>{l s='Total taxes'}</span><br/>
-                            <span id="total_taxes" class="size_l"></span>
                         </div>
                     </div>
                     <div class="col-lg-2">
