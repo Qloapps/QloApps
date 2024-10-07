@@ -1331,6 +1331,7 @@ class WebserviceSpecificManagementBookingsCore Extends ObjectModel implements We
             $objCustomer->lastname = $customerDetails['lastname'];
             $objCustomer->email = $customerDetails['email'];
             $objCustomer->passwd = md5(time()._COOKIE_KEY_);
+            $objCustomer->phone = (isset($customerDetails['phone']) ? $customerDetails['phone'] : '');
             $objCustomer->cleanGroups();
             $objCustomer->add();
             $this->bookingCustomer = $objCustomer;
@@ -1345,8 +1346,10 @@ class WebserviceSpecificManagementBookingsCore Extends ObjectModel implements We
 
             if (isset($customerDetails['email']) && Validate::isEmail($customerDetails['email'])) {
                 $this->bookingCustomer->email = $customerDetails['email'];
-            } else {
-                $customerDetails['email'] = $this->bookingCustomer->email;
+            }
+
+            if (isset($customerDetails['phone']) && Validate::isPhoneNumber($customerDetails['phone'])) {
+                $this->bookingCustomer->phone = $customerDetails['phone'];
             }
 
             $this->bookingCustomer->save();
@@ -1387,10 +1390,6 @@ class WebserviceSpecificManagementBookingsCore Extends ObjectModel implements We
             $objAddress->id_state = isset($customerDetails['id_state']) ? $customerDetails['id_state'] : 0;
 
             $objAddress->save();
-        }
-
-        if (isset($customerDetails['phone']) && Validate::isPhoneNumber($customerDetails['phone'])) {
-            CartCustomerGuestDetail::updateCustomerPhoneNumber($customerDetails['email'], $customerDetails['phone']);
         }
 
         // to remove the older non ordered cart for this customer.

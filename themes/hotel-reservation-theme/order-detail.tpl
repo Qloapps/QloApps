@@ -262,6 +262,7 @@
                                         {assign var=room_price_tax_incl value=$order->getTotalProductsWithTaxes(false, true)}
                                         {assign var=additional_service_price_tax_excl value=($order->getTotalProductsWithoutTaxes(false, false, Product::SERVICE_PRODUCT_WITH_ROOMTYPE) + $total_demands_price_te)}
                                         {assign var=additional_service_price_tax_incl value=($order->getTotalProductsWithTaxes(false, false, Product::SERVICE_PRODUCT_WITH_ROOMTYPE) + $total_demands_price_ti)}
+                                        {assign var=total_tax_without_discount value=(($room_price_tax_incl - $room_price_tax_excl) + ($additional_service_price_tax_incl - $additional_service_price_tax_excl ))}
                                         {if $priceDisplay && $use_tax && $room_price_tax_excl}
                                             <tr>
                                                 <td>{l s='Total rooms cost (tax excl.)'}</td>
@@ -278,14 +279,6 @@
                                             </tr>
                                         {/if}
 
-                                        {if $order->total_discounts > 0}
-                                            <tr>
-                                                <td>{l s='Total Vouchers'}</td>
-                                                <td class="text-right">
-                                                    <span class="price price-discount">-{displayWtPriceWithCurrency price=$order->total_discounts currency=$currency convert=1}</span>
-                                                </td>
-                                            </tr>
-                                        {/if}
                                         {if $priceDisplay && $use_tax && $total_convenience_fee_te}
                                             <tr>
                                                 <td>{l s='Total Convenience Fees (tax excl.)'}</td>
@@ -305,9 +298,18 @@
                                         <tr class="totalprice item">
                                             <td>{l s='Total Tax'}</td>
                                             <td class="text-right">
-                                                <span class="price">{displayWtPriceWithCurrency price=($order->total_paid - $order->total_paid_tax_excl) currency=$currency}</span>
+                                                <span class="price">{displayWtPriceWithCurrency price=($total_tax_without_discount) currency=$currency}</span>
                                             </td>
                                         </tr>
+
+                                        {if $order->total_discounts > 0}
+                                            <tr>
+                                                <td>{l s='Total Vouchers'}</td>
+                                                <td class="text-right">
+                                                    <span class="price price-discount">-{displayWtPriceWithCurrency price=$order->total_discounts currency=$currency convert=1}</span>
+                                                </td>
+                                            </tr>
+                                        {/if}
                                         <tr class="totalprice item">
                                             <td><strong>{l s='Final Booking Total'}<strong></td>
                                             <td class="text-right">
@@ -648,6 +650,7 @@
                                         {assign var=room_price_tax_incl value=$order->getTotalProductsWithTaxes(false, true)}
                                         {assign var=additional_service_price_tax_excl value=($order->getTotalProductsWithoutTaxes(false, false, Product::SERVICE_PRODUCT_WITH_ROOMTYPE) + $total_demands_price_te)}
                                         {assign var=additional_service_price_tax_incl value=($order->getTotalProductsWithTaxes(false, false, Product::SERVICE_PRODUCT_WITH_ROOMTYPE) + $total_demands_price_ti)}
+                                        {assign var=total_tax_without_discount value=(($room_price_tax_incl - $room_price_tax_excl) + ($additional_service_price_tax_incl - $additional_service_price_tax_excl ))}
                                         {if $priceDisplay && $use_tax && $room_price_tax_excl}
                                             <tr>
                                                 <td>{l s='Total rooms cost (tax excl.)'}</td>
@@ -664,14 +667,6 @@
                                             </tr>
                                         {/if}
 
-                                        {if $order->total_discounts > 0}
-                                            <tr>
-                                                <td>{l s='Total Vouchers'}</td>
-                                                <td class="text-right">
-                                                    <span class="price price-discount">-{displayWtPriceWithCurrency price=$order->total_discounts currency=$currency convert=1}</span>
-                                                </td>
-                                            </tr>
-                                        {/if}
                                         {if $priceDisplay && $use_tax && $total_convenience_fee_te}
                                             <tr>
                                                 <td>{l s='Total Convenience Fees (tax excl.)'}</td>
@@ -691,9 +686,17 @@
                                         <tr class="totalprice item">
                                             <td>{l s='Total Tax'}</td>
                                             <td class="text-right">
-                                                <span class="price">{displayWtPriceWithCurrency price=($order->total_paid - $order->total_paid_tax_excl) currency=$currency}</span>
+                                                <span class="price">{displayWtPriceWithCurrency price=($total_tax_without_discount) currency=$currency}</span>
                                             </td>
                                         </tr>
+                                        {if $order->total_discounts > 0}
+                                            <tr>
+                                                <td>{l s='Total Vouchers'}</td>
+                                                <td class="text-right">
+                                                    <span class="price price-discount">-{displayWtPriceWithCurrency price=$order->total_discounts currency=$currency convert=1}</span>
+                                                </td>
+                                            </tr>
+                                        {/if}
                                         <tr class="totalprice item">
                                             <td><strong>{l s='Final Booking Total'}<strong></td>
                                             <td class="text-right">

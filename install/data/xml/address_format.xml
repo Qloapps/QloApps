@@ -13,7 +13,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_2" id_country="AT">
       <format>firstname lastname
@@ -23,7 +24,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_3" id_country="BE">
       <format>firstname lastname
@@ -33,7 +35,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_4" id_country="CA">
       <format>firstname lastname
@@ -42,7 +45,8 @@ address1
 address2
 city State:name postcode
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_5" id_country="CN">
       <format>firstname lastname
@@ -52,7 +56,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_6" id_country="ES">
       <format>firstname lastname
@@ -62,7 +67,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_7" id_country="FI">
       <format>firstname lastname
@@ -72,7 +78,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_8" id_country="FR">
       <format>firstname lastname
@@ -82,7 +89,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_9" id_country="GR">
       <format>firstname lastname
@@ -92,7 +100,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_10" id_country="IT">
       <format>firstname lastname
@@ -103,7 +112,8 @@ address2
 postcode city
 State:name
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_11" id_country="JP">
       <format>firstname lastname
@@ -114,7 +124,8 @@ address2
 postcode city
 State:name
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_12" id_country="LU">
       <format>firstname lastname
@@ -124,7 +135,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_13" id_country="NL">
       <format>firstname lastname
@@ -134,7 +146,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_14" id_country="PL">
       <format>firstname lastname
@@ -144,7 +157,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_15" id_country="PT">
       <format>firstname lastname
@@ -154,7 +168,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_16" id_country="CZ">
       <format>firstname lastname
@@ -164,7 +179,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_17" id_country="GB">
       <format>firstname lastname
@@ -175,7 +191,8 @@ address2
 city
 postcode
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_18" id_country="SE">
       <format>firstname lastname
@@ -185,7 +202,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_19" id_country="CH">
       <format>firstname lastname
@@ -195,7 +213,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_20" id_country="DK">
       <format>firstname lastname
@@ -205,7 +224,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_21" id_country="US">
       <format>firstname lastname
@@ -213,7 +233,8 @@ company
 address1 address2
 city, State:name postcode
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_22" id_country="HK">
       <format>firstname lastname
@@ -223,7 +244,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_23" id_country="NO">
       <format>firstname lastname
@@ -233,7 +255,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_24" id_country="AU">
       <format>firstname lastname
@@ -243,7 +266,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_25" id_country="SG">
       <format>firstname lastname
@@ -253,7 +277,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_26" id_country="IE">
       <format>firstname lastname
@@ -263,7 +288,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_27" id_country="NZ">
       <format>firstname lastname
@@ -273,7 +299,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_28" id_country="KR">
       <format>firstname lastname
@@ -283,7 +310,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_29" id_country="IL">
       <format>firstname lastname
@@ -293,7 +321,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_30" id_country="ZA">
       <format>firstname lastname
@@ -303,7 +332,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_31" id_country="NG">
       <format>firstname lastname
@@ -313,7 +343,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_32" id_country="CI">
       <format>firstname lastname
@@ -323,7 +354,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_33" id_country="TG">
       <format>firstname lastname
@@ -333,7 +365,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_34" id_country="BO">
       <format>firstname lastname
@@ -343,7 +376,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_35" id_country="MU">
       <format>firstname lastname
@@ -353,7 +387,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_36" id_country="RO">
       <format>firstname lastname
@@ -363,7 +398,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_37" id_country="SK">
       <format>firstname lastname
@@ -373,7 +409,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_38" id_country="DZ">
       <format>firstname lastname
@@ -383,7 +420,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_39" id_country="AS">
       <format>firstname lastname
@@ -393,7 +431,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_40" id_country="AD">
       <format>firstname lastname
@@ -403,7 +442,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_41" id_country="AO">
       <format>firstname lastname
@@ -413,7 +453,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_42" id_country="AI">
       <format>firstname lastname
@@ -423,7 +464,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_43" id_country="AG">
       <format>firstname lastname
@@ -433,7 +475,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_44" id_country="AR">
       <format>firstname lastname
@@ -444,7 +487,8 @@ address2
 postcode city
 State:name
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_45" id_country="AM">
       <format>firstname lastname
@@ -454,7 +498,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_46" id_country="AW">
       <format>firstname lastname
@@ -464,7 +509,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_47" id_country="AZ">
       <format>firstname lastname
@@ -474,7 +520,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_48" id_country="BS">
       <format>firstname lastname
@@ -484,7 +531,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_49" id_country="BH">
       <format>firstname lastname
@@ -494,7 +542,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_50" id_country="BD">
       <format>firstname lastname
@@ -504,7 +553,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_51" id_country="BB">
       <format>firstname lastname
@@ -514,7 +564,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_52" id_country="BY">
       <format>firstname lastname
@@ -524,7 +575,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_53" id_country="BZ">
       <format>firstname lastname
@@ -534,7 +586,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_54" id_country="BJ">
       <format>firstname lastname
@@ -544,7 +597,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_55" id_country="BM">
       <format>firstname lastname
@@ -554,7 +608,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_56" id_country="BT">
       <format>firstname lastname
@@ -564,7 +619,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_57" id_country="BW">
       <format>firstname lastname
@@ -574,7 +630,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_58" id_country="BR">
       <format>firstname lastname
@@ -584,7 +641,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_59" id_country="BN">
       <format>firstname lastname
@@ -594,7 +652,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_60" id_country="BF">
       <format>firstname lastname
@@ -604,7 +663,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_61" id_country="MM">
       <format>firstname lastname
@@ -614,7 +674,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_62" id_country="BI">
       <format>firstname lastname
@@ -624,7 +685,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_63" id_country="KH">
       <format>firstname lastname
@@ -634,7 +696,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_64" id_country="CM">
       <format>firstname lastname
@@ -644,7 +707,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_65" id_country="CV">
       <format>firstname lastname
@@ -654,7 +718,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_66" id_country="CF">
       <format>firstname lastname
@@ -664,7 +729,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_67" id_country="TD">
       <format>firstname lastname
@@ -674,7 +740,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_68" id_country="CL">
       <format>firstname lastname
@@ -684,7 +751,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_69" id_country="CO">
       <format>firstname lastname
@@ -694,7 +762,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_70" id_country="KM">
       <format>firstname lastname
@@ -704,7 +773,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_71" id_country="CD">
       <format>firstname lastname
@@ -714,7 +784,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_72" id_country="CG">
       <format>firstname lastname
@@ -724,7 +795,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_73" id_country="CR">
       <format>firstname lastname
@@ -734,7 +806,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_74" id_country="HR">
       <format>firstname lastname
@@ -744,7 +817,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_75" id_country="CU">
       <format>firstname lastname
@@ -754,7 +828,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_76" id_country="CY">
       <format>firstname lastname
@@ -764,7 +839,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_77" id_country="DJ">
       <format>firstname lastname
@@ -774,7 +850,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_78" id_country="DM">
       <format>firstname lastname
@@ -784,7 +861,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_79" id_country="DO">
       <format>firstname lastname
@@ -794,7 +872,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_80" id_country="TL">
       <format>firstname lastname
@@ -804,7 +883,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_81" id_country="EC">
       <format>firstname lastname
@@ -814,7 +894,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_82" id_country="EG">
       <format>firstname lastname
@@ -824,7 +905,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_83" id_country="SV">
       <format>firstname lastname
@@ -834,7 +916,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_84" id_country="GQ">
       <format>firstname lastname
@@ -844,7 +927,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_85" id_country="ER">
       <format>firstname lastname
@@ -854,7 +938,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_86" id_country="EE">
       <format>firstname lastname
@@ -864,7 +949,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_87" id_country="ET">
       <format>firstname lastname
@@ -874,7 +960,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_88" id_country="FK">
       <format>firstname lastname
@@ -884,7 +971,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_89" id_country="FO">
       <format>firstname lastname
@@ -894,7 +982,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_90" id_country="FJ">
       <format>firstname lastname
@@ -904,7 +993,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_91" id_country="GA">
       <format>firstname lastname
@@ -914,7 +1004,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_92" id_country="GM">
       <format>firstname lastname
@@ -924,7 +1015,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_93" id_country="GE">
       <format>firstname lastname
@@ -934,7 +1026,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_94" id_country="GH">
       <format>firstname lastname
@@ -944,7 +1037,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_95" id_country="GD">
       <format>firstname lastname
@@ -954,7 +1048,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_96" id_country="GL">
       <format>firstname lastname
@@ -964,7 +1059,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_97" id_country="GI">
       <format>firstname lastname
@@ -974,7 +1070,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_98" id_country="GP">
       <format>firstname lastname
@@ -984,7 +1081,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_99" id_country="GU">
       <format>firstname lastname
@@ -994,7 +1092,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_100" id_country="GT">
       <format>firstname lastname
@@ -1004,7 +1103,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_101" id_country="GG">
       <format>firstname lastname
@@ -1014,7 +1114,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_102" id_country="GN">
       <format>firstname lastname
@@ -1024,7 +1125,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_103" id_country="GW">
       <format>firstname lastname
@@ -1034,7 +1136,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_104" id_country="GY">
       <format>firstname lastname
@@ -1044,7 +1147,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_105" id_country="HT">
       <format>firstname lastname
@@ -1054,7 +1158,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_106" id_country="HM">
       <format>firstname lastname
@@ -1064,7 +1169,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_107" id_country="VA">
       <format>firstname lastname
@@ -1074,7 +1180,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_108" id_country="HN">
       <format>firstname lastname
@@ -1084,7 +1191,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_109" id_country="IS">
       <format>firstname lastname
@@ -1094,7 +1202,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_110" id_country="IN">
       <format>firstname lastname
@@ -1104,7 +1213,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_111" id_country="ID">
       <format>firstname lastname
@@ -1115,7 +1225,8 @@ address2
 postcode city
 State:name
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_112" id_country="IR">
       <format>firstname lastname
@@ -1125,7 +1236,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_113" id_country="IQ">
       <format>firstname lastname
@@ -1135,7 +1247,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_114" id_country="IM">
       <format>firstname lastname
@@ -1145,7 +1258,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_115" id_country="JM">
       <format>firstname lastname
@@ -1155,7 +1269,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_116" id_country="JE">
       <format>firstname lastname
@@ -1165,7 +1280,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_117" id_country="JO">
       <format>firstname lastname
@@ -1175,7 +1291,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_118" id_country="KZ">
       <format>firstname lastname
@@ -1185,7 +1302,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_119" id_country="KE">
       <format>firstname lastname
@@ -1195,7 +1313,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_120" id_country="KI">
       <format>firstname lastname
@@ -1205,7 +1324,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_121" id_country="KP">
       <format>firstname lastname
@@ -1215,7 +1335,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_122" id_country="KW">
       <format>firstname lastname
@@ -1225,7 +1346,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_123" id_country="KG">
       <format>firstname lastname
@@ -1235,7 +1357,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_124" id_country="LA">
       <format>firstname lastname
@@ -1245,7 +1368,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_125" id_country="LV">
       <format>firstname lastname
@@ -1255,7 +1379,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_126" id_country="LB">
       <format>firstname lastname
@@ -1265,7 +1390,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_127" id_country="LS">
       <format>firstname lastname
@@ -1275,7 +1401,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_128" id_country="LR">
       <format>firstname lastname
@@ -1285,7 +1412,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_129" id_country="LY">
       <format>firstname lastname
@@ -1295,7 +1423,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_130" id_country="LI">
       <format>firstname lastname
@@ -1305,7 +1434,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_131" id_country="LT">
       <format>firstname lastname
@@ -1315,7 +1445,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_132" id_country="MO">
       <format>firstname lastname
@@ -1325,7 +1456,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_133" id_country="MK">
       <format>firstname lastname
@@ -1335,7 +1467,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_134" id_country="MG">
       <format>firstname lastname
@@ -1345,7 +1478,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_135" id_country="MW">
       <format>firstname lastname
@@ -1355,7 +1489,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_136" id_country="MY">
       <format>firstname lastname
@@ -1365,7 +1500,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_137" id_country="MV">
       <format>firstname lastname
@@ -1375,7 +1511,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_138" id_country="ML">
       <format>firstname lastname
@@ -1385,7 +1522,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_139" id_country="MT">
       <format>firstname lastname
@@ -1395,7 +1533,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_140" id_country="MH">
       <format>firstname lastname
@@ -1405,7 +1544,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_141" id_country="MQ">
       <format>firstname lastname
@@ -1415,7 +1555,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_142" id_country="MR">
       <format>firstname lastname
@@ -1425,7 +1566,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_143" id_country="HU">
       <format>firstname lastname
@@ -1435,7 +1577,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_144" id_country="YT">
       <format>firstname lastname
@@ -1445,7 +1588,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_145" id_country="MX">
       <format>firstname lastname
@@ -1456,7 +1600,8 @@ address2
 postcode city
 State:name
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_146" id_country="FM">
       <format>firstname lastname
@@ -1466,7 +1611,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_147" id_country="MD">
       <format>firstname lastname
@@ -1476,7 +1622,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_148" id_country="MC">
       <format>firstname lastname
@@ -1486,7 +1633,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_149" id_country="MN">
       <format>firstname lastname
@@ -1496,7 +1644,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_150" id_country="ME">
       <format>firstname lastname
@@ -1506,7 +1655,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_151" id_country="MS">
       <format>firstname lastname
@@ -1516,7 +1666,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_152" id_country="MA">
       <format>firstname lastname
@@ -1526,7 +1677,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_153" id_country="MZ">
       <format>firstname lastname
@@ -1536,7 +1688,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_154" id_country="NA">
       <format>firstname lastname
@@ -1546,7 +1699,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_155" id_country="NR">
       <format>firstname lastname
@@ -1556,7 +1710,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_156" id_country="NP">
       <format>firstname lastname
@@ -1566,7 +1721,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_157" id_country="AN">
       <format>firstname lastname
@@ -1576,7 +1732,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_158" id_country="NC">
       <format>firstname lastname
@@ -1586,7 +1743,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_159" id_country="NI">
       <format>firstname lastname
@@ -1596,7 +1754,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_160" id_country="NE">
       <format>firstname lastname
@@ -1606,7 +1765,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_161" id_country="NU">
       <format>firstname lastname
@@ -1616,7 +1776,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_162" id_country="NF">
       <format>firstname lastname
@@ -1626,7 +1787,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_163" id_country="MP">
       <format>firstname lastname
@@ -1636,7 +1798,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_164" id_country="OM">
       <format>firstname lastname
@@ -1646,7 +1809,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_165" id_country="PK">
       <format>firstname lastname
@@ -1656,7 +1820,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_166" id_country="PW">
       <format>firstname lastname
@@ -1666,7 +1831,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_167" id_country="PS">
       <format>firstname lastname
@@ -1676,7 +1842,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_168" id_country="PA">
       <format>firstname lastname
@@ -1686,7 +1853,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_169" id_country="PG">
       <format>firstname lastname
@@ -1696,7 +1864,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_170" id_country="PY">
       <format>firstname lastname
@@ -1706,7 +1875,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_171" id_country="PE">
       <format>firstname lastname
@@ -1716,7 +1886,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_172" id_country="PH">
       <format>firstname lastname
@@ -1726,7 +1897,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_173" id_country="PN">
       <format>firstname lastname
@@ -1736,7 +1908,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_174" id_country="PR">
       <format>firstname lastname
@@ -1746,7 +1919,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_175" id_country="QA">
       <format>firstname lastname
@@ -1756,7 +1930,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_176" id_country="RE">
       <format>firstname lastname
@@ -1766,7 +1941,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_177" id_country="RU">
       <format>firstname lastname
@@ -1776,7 +1952,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_178" id_country="RW">
       <format>firstname lastname
@@ -1786,7 +1963,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_179" id_country="BL">
       <format>firstname lastname
@@ -1796,7 +1974,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_180" id_country="KN">
       <format>firstname lastname
@@ -1806,7 +1985,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_181" id_country="LC">
       <format>firstname lastname
@@ -1816,7 +1996,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_182" id_country="MF">
       <format>firstname lastname
@@ -1826,7 +2007,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_183" id_country="PM">
       <format>firstname lastname
@@ -1836,7 +2018,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_184" id_country="VC">
       <format>firstname lastname
@@ -1846,7 +2029,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_185" id_country="WS">
       <format>firstname lastname
@@ -1856,7 +2040,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_186" id_country="SM">
       <format>firstname lastname
@@ -1866,7 +2051,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_187" id_country="ST">
       <format>firstname lastname
@@ -1876,7 +2062,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_188" id_country="SA">
       <format>firstname lastname
@@ -1886,7 +2073,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_189" id_country="SN">
       <format>firstname lastname
@@ -1896,7 +2084,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_190" id_country="RS">
       <format>firstname lastname
@@ -1906,7 +2095,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_191" id_country="SC">
       <format>firstname lastname
@@ -1916,7 +2106,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_192" id_country="SL">
       <format>firstname lastname
@@ -1926,7 +2117,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_193" id_country="SI">
       <format>firstname lastname
@@ -1936,7 +2128,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_194" id_country="SB">
       <format>firstname lastname
@@ -1946,7 +2139,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_195" id_country="SO">
       <format>firstname lastname
@@ -1956,7 +2150,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_196" id_country="GS">
       <format>firstname lastname
@@ -1966,7 +2161,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_197" id_country="LK">
       <format>firstname lastname
@@ -1976,7 +2172,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_198" id_country="SD">
       <format>firstname lastname
@@ -1986,7 +2183,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_199" id_country="SR">
       <format>firstname lastname
@@ -1996,7 +2194,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_200" id_country="SJ">
       <format>firstname lastname
@@ -2006,7 +2205,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_201" id_country="SZ">
       <format>firstname lastname
@@ -2016,7 +2216,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_202" id_country="SY">
       <format>firstname lastname
@@ -2026,7 +2227,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_203" id_country="TW">
       <format>firstname lastname
@@ -2036,7 +2238,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_204" id_country="TJ">
       <format>firstname lastname
@@ -2046,7 +2249,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_205" id_country="TZ">
       <format>firstname lastname
@@ -2056,7 +2260,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_206" id_country="TH">
       <format>firstname lastname
@@ -2066,7 +2271,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_207" id_country="TK">
       <format>firstname lastname
@@ -2076,7 +2282,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_208" id_country="TO">
       <format>firstname lastname
@@ -2086,7 +2293,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_209" id_country="TT">
       <format>firstname lastname
@@ -2096,7 +2304,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_210" id_country="TN">
       <format>firstname lastname
@@ -2106,7 +2315,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_211" id_country="TR">
       <format>firstname lastname
@@ -2116,7 +2326,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_212" id_country="TM">
       <format>firstname lastname
@@ -2126,7 +2337,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_213" id_country="TC">
       <format>firstname lastname
@@ -2136,7 +2348,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_214" id_country="TV">
       <format>firstname lastname
@@ -2146,7 +2359,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_215" id_country="UG">
       <format>firstname lastname
@@ -2156,7 +2370,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_216" id_country="UA">
       <format>firstname lastname
@@ -2166,7 +2381,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_217" id_country="AE">
       <format>firstname lastname
@@ -2176,7 +2392,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_218" id_country="UY">
       <format>firstname lastname
@@ -2186,7 +2403,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_219" id_country="UZ">
       <format>firstname lastname
@@ -2196,7 +2414,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_220" id_country="VU">
       <format>firstname lastname
@@ -2206,7 +2425,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_221" id_country="VE">
       <format>firstname lastname
@@ -2216,7 +2436,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_222" id_country="VN">
       <format>firstname lastname
@@ -2226,7 +2447,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_223" id_country="VG">
       <format>firstname lastname
@@ -2236,7 +2458,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_224" id_country="VI">
       <format>firstname lastname
@@ -2246,7 +2469,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_225" id_country="WF">
       <format>firstname lastname
@@ -2256,7 +2480,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_226" id_country="EH">
       <format>firstname lastname
@@ -2266,7 +2491,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_227" id_country="YE">
       <format>firstname lastname
@@ -2276,7 +2502,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_228" id_country="ZM">
       <format>firstname lastname
@@ -2286,7 +2513,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_229" id_country="ZW">
       <format>firstname lastname
@@ -2296,7 +2524,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_230" id_country="AL">
       <format>firstname lastname
@@ -2306,7 +2535,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_231" id_country="AF">
       <format>firstname lastname
@@ -2316,7 +2546,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_232" id_country="AQ">
       <format>firstname lastname
@@ -2326,7 +2557,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_233" id_country="BA">
       <format>firstname lastname
@@ -2336,7 +2568,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_234" id_country="BV">
       <format>firstname lastname
@@ -2346,7 +2579,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_235" id_country="IO">
       <format>firstname lastname
@@ -2356,7 +2590,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_236" id_country="BG">
       <format>firstname lastname
@@ -2366,7 +2601,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_237" id_country="KY">
       <format>firstname lastname
@@ -2376,7 +2612,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_238" id_country="CX">
       <format>firstname lastname
@@ -2386,7 +2623,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_239" id_country="CC">
       <format>firstname lastname
@@ -2396,7 +2634,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_240" id_country="CK">
       <format>firstname lastname
@@ -2406,7 +2645,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_241" id_country="GF">
       <format>firstname lastname
@@ -2416,7 +2656,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_242" id_country="PF">
       <format>firstname lastname
@@ -2426,7 +2667,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_243" id_country="TF">
       <format>firstname lastname
@@ -2436,7 +2678,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
     <address_format id="address_format_244" id_country="AX">
       <format>firstname lastname
@@ -2446,7 +2689,8 @@ address1
 address2
 postcode city
 Country:name
-Customer:phone</format>
+phone
+phone_mobile</format>
     </address_format>
   </entities>
 </entity_address_format>

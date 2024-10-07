@@ -182,8 +182,7 @@ class CategoryControllerCore extends FrontController
 
             $booking_data = $objBookingDetail->dataForFrontSearch($bookingParams);
 
-            $obj_booking_detail = new HotelBookingDetail();
-            $num_days = $obj_booking_detail->getNumberOfDays($date_from, $date_to);
+            $num_days = $objBookingDetail->getNumberOfDays($date_from, $date_to);
 
             $warning_num = Configuration::get('WK_ROOM_LEFT_WARNING_NUMBER');
 
