@@ -64,6 +64,7 @@ class AdminAddHotelController extends ModuleAdminController
             'state_name' => array(
                 'title' => $this->l('State'),
                 'align' => 'center',
+                'optional' => true,
                 'filter_key' => 's!name',
             ),
             'country_name' => array(
@@ -101,6 +102,8 @@ class AdminAddHotelController extends ModuleAdminController
     {
         $this->addRowAction('edit');
         $this->addRowAction('delete');
+
+        $this->_new_list_header_design = true;
 
         return parent::renderList();
     }
@@ -143,6 +146,9 @@ class AdminAddHotelController extends ModuleAdminController
             $smartyVars['address_info'] = $addressInfo;
             $smartyVars['hotel_info'] = (array) $hotelBranchInfo;
             $smartyVars['link_rewrite_info'] = $objCategory->link_rewrite;
+            $smartyVars['meta_title_info'] = $objCategory->meta_title;
+            $smartyVars['meta_description_info'] = $objCategory->meta_description;
+            $smartyVars['meta_keywords_info'] = $objCategory->meta_keywords;
             //Hotel Images
             $objHotelImage = new HotelImage();
             if ($hotelAllImages = $objHotelImage->getImagesByHotelId($idHotel)) {
@@ -290,6 +296,31 @@ class AdminAddHotelController extends ModuleAdminController
                     if (!Validate::isCleanHtml($policies)) {
                         $this->errors[] = sprintf($this->l('policies are not valid in %s'), $lang['name']);
                     }
+                }
+
+                if ($metaTitle = trim(Tools::getValue('meta_title_'.$lang['id_lang']))) {
+                    if (!Validate::isGenericName($metaTitle)) {
+                        $this->errors[] = $this->l('Invalid Meta title in ').$lang['name'];
+                    } else if (Tools::strlen($metaTitle) > 128) {
+                        $this->errors[] = $this->l('Meta title cannot be longer than 128  in ').$lang['name'];
+                    }
+                }
+
+                if ($metaDescription = trim(Tools::getValue('meta_description_'.$lang['id_lang']))) {
+                    if (!Validate::isGenericName($metaDescription)) {
+                        $this->errors[] = $this->l('Invalid Meta description in ').$lang['name'];
+                    } else if (Tools::strlen($metaDescription) > 255) {
+                        $this->errors[] = $this->l('Meta description cannot be longer than 128  in ').$lang['name'];
+                    }
+                }
+
+                if ($metaKeyWords = trim(Tools::getValue('meta_keywords_'.$lang['id_lang']))) {
+                    if (!Validate::isGenericName($metaKeyWords)) {
+                        $this->errors[] = $this->l('Invalid Meta keywords in ').$lang['name'];
+                    } else if (Tools::strlen($metaKeyWords) > 255) {
+                        $this->errors[] = $this->l('Meta keywords cannot be longer than 128  in ').$lang['name'];
+                    }
+
                 }
             }
         }
@@ -445,6 +476,9 @@ class AdminAddHotelController extends ModuleAdminController
             // lang fields
             $hotelCatName = array();
             $linkRewriteArray = array();
+            $metaTitleArray = array();
+            $metaDescriptionArray = array();
+            $metaKeywordsArray = array();
             foreach ($languages as $lang) {
                 if (!trim(Tools::getValue('hotel_name_'.$lang['id_lang']))) {
                     $objHotelBranch->hotel_name[$lang['id_lang']] = trim(Tools::getValue(
@@ -508,6 +542,38 @@ class AdminAddHotelController extends ModuleAdminController
                         'policies_'.$lang['id_lang']
                     );
                 }
+
+
+                if (!trim(Tools::getValue('meta_title_'.$lang['id_lang']))) {
+                    $metaTitleArray[$lang['id_lang']] = Tools::getValue(
+                        'meta_title_'.$defaultLangId
+                    );
+                } else {
+                    $metaTitleArray[$lang['id_lang']] = Tools::getValue(
+                        'meta_title_'.$lang['id_lang']
+                    );
+                }
+
+                if (!trim(Tools::getValue('meta_description_'.$lang['id_lang']))) {
+                    $metaDescriptionArray[$lang['id_lang']] = Tools::getValue(
+                        'meta_description_'.$defaultLangId
+                    );
+                } else {
+                    $metaDescriptionArray[$lang['id_lang']] = Tools::getValue(
+                        'meta_description_'.$lang['id_lang']
+                    );
+                }
+
+                if (!trim(Tools::getValue('meta_keywords_'.$lang['id_lang']))) {
+                    $metaKeywordsArray[$lang['id_lang']] = Tools::getValue(
+                        'meta_keywords_'.$defaultLangId
+                    );
+                } else {
+                    $metaKeywordsArray[$lang['id_lang']] = Tools::getValue(
+                        'meta_keywords_'.$lang['id_lang']
+                    );
+                }
+
             }
             $objHotelBranch->email = $email;
             $objHotelBranch->check_in = $check_in;
@@ -617,12 +683,23 @@ class AdminAddHotelController extends ModuleAdminController
                                 $objCategory = new Category($objHotelBranch->id_category);
                                 $objCategory->name = $objHotelBranch->hotel_name;
                                 $objCategory->link_rewrite = $linkRewriteArray;
+                                $objCategory->meta_title = $metaTitleArray;
+                                $objCategory->meta_description = $metaDescriptionArray;
+                                $objCategory->meta_keywords = $metaKeywordsArray;
                                 $objCategory->id_parent = $catCity;
                                 $objCategory->save();
                                 Category::regenerateEntireNtree();
                             } else {
                                 if ($catHotel = $objHotelBranch->addCategory(
-                                    $hotelCatName, $catCity, $groupIds, 1, $newIdHotel, $linkRewriteArray
+                                    $hotelCatName,
+                                    $catCity,
+                                    $groupIds,
+                                    1,
+                                    $newIdHotel,
+                                    $linkRewriteArray,
+                                    $metaTitleArray,
+                                    $metaDescriptionArray,
+                                    $metaKeywordsArray
                                 )) {
                                     $objHotelBranch = new HotelBranchInformation($newIdHotel);
                                     $objHotelBranch->id_category = $catHotel;
@@ -853,6 +930,7 @@ class AdminAddHotelController extends ModuleAdminController
     public function setMedia()
     {
         parent::setMedia();
+        $this->addjQueryPlugin('tagify');
 
         HotelHelper::assignDataTableVariables();
         $this->context->controller->addJS(_PS_JS_DIR_.'/datatable/jquery.dataTables.min.js');

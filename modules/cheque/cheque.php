@@ -207,6 +207,10 @@ class Cheque extends PaymentModule
                 $cartTotal = $objOrder->getOrdersTotalPaid();
 			}
 
+            // Get rooms bookings in the order
+            $objHotelBooking = new HotelBookingDetail();
+            $cartRoomBookings = $objHotelBooking->getBookingDataByOrderReference($objOrder->reference);
+            $smartyVars['cart_room_bookings'] = $cartRoomBookings;
 			$smartyVars['total_to_pay'] = Tools::displayPrice($cartTotal, $params['currencyObj'], false);
             $smartyVars['chequeName'] = $this->chequeName;
             $smartyVars['chequeAddress'] = Tools::nl2br($this->address);

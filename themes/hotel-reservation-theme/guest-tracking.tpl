@@ -131,6 +131,9 @@
 		{if isset($show_login_link) && $show_login_link}
 			<p><img src="{$img_dir}icon/userinfo.gif" alt="{l s='Information'}" class="icon" /><a href="{$link->getPageLink('my-account', true)|escape:'html':'UTF-8'}">{l s='Click here to log in to your customer account.'}</a><br /><br /></p>
 		{/if}
+        {if isset($smarty.get.ord_conf) && $smarty.get.ord_conf}
+            <p class="alert alert-success">{l s='Your'} {if $total_rooms_booked > 1}{l s='bookings have'}{else}{l s='booking has'}{/if} {l s='been created successfully!'}</p><br />
+        {/if}
 		{block name='guest_tracking_form'}
 			<form method="post" action="{$action|escape:'html':'UTF-8'}" class="std" id="guestTracking">
 				<fieldset class="description_box box">

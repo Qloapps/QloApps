@@ -271,7 +271,7 @@ class HotelBookingDemands extends ObjectModel
                     $numDays = $objBkDetail->getNumberOfDays($objBkDetail->date_from, $objBkDetail->date_to);
                 }
 
-                $totalTaxBase = $unitAmount * $numDays;
+                $totalTaxBase = $priceTaxExcl * $numDays;
 
                 $detail['total_tax_base'] = $totalTaxBase;
             }

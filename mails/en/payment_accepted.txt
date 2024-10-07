@@ -3,7 +3,7 @@
 
 Hi {firstname} {lastname},
 
-Thank you for booking with {shop_name}!
+Thank you for booking with <strong>{hotel_hotel_name}</strong>!
 
 Your payment for order with the reference {order_name} was
 successfully processed.

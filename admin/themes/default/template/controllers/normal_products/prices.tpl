@@ -258,7 +258,7 @@ $(document).ready(function () {
 			</div>
 		</div>
 	</div> *}
-	<div class="form-group">
+	{* <div class="form-group">
 		<div class="col-lg-9 col-lg-offset-3">
 			<div class="alert alert-warning">
 				<strong>{l s='Final retail price:'}</strong>
@@ -279,7 +279,7 @@ $(document).ready(function () {
 				</span>
 			</div>
 		</div>
-	</div>
+	</div> *}
 
 	<div class="panel-footer">
 		<a href="{$link->getAdminLink('AdminNormalProducts')|escape:'html':'UTF-8'}{if isset($smarty.request.page) && $smarty.request.page > 1}&amp;submitFilterproduct={$smarty.request.page|intval}{/if}" class="btn btn-default"><i class="process-icon-cancel"></i> {l s='Cancel'}</a>

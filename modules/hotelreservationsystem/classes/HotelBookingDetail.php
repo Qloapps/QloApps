@@ -1578,6 +1578,18 @@ class HotelBookingDetail extends ObjectModel
         );
     }
 
+    /**
+     * [getBookingDataByOrderReference :: To get all room bookings by order reference].
+     * @param [string] $orderReference [Reference of the order]
+     * @return [array] [If data found Returns the array containing the information of the booking of an order reference]
+     */
+    public function getBookingDataByOrderReference($orderReference)
+    {
+        return Db::getInstance()->executeS(
+            'SELECT * FROM `'._DB_PREFIX_.'htl_booking_detail` WHERE `id_order` IN ( SELECT `id_order` FROM `'._DB_PREFIX_.'orders` WHERE `reference` = "'.pSQL($orderReference).'" )'
+        );
+    }
+
     public static function getIdHotelByIdOrder($idOrder)
     {
         return Db::getInstance()->getValue(
@@ -1875,6 +1887,7 @@ class HotelBookingDetail extends ObjectModel
                 // Calculate new room price per qty
                 $priceDiffPerQtyTaxExcl = $priceDiffTaxExcl / $productQty;
                 $newRoomPriceTaxExcl = $oldRoomPriceTaxExcl + $priceDiffPerQtyTaxExcl;
+                $newRoomPriceTaxExcl = $newRoomPriceTaxExcl < 0 ? 0 : $newRoomPriceTaxExcl;
 
                 $totalRoomPriceTaxIncl = $objOldHotelBooking->total_price_tax_incl;
                 $totalRoomPriceTaxExcl = $objOldHotelBooking->total_price_tax_excl;
@@ -1922,7 +1935,7 @@ class HotelBookingDetail extends ObjectModel
                 );
 
                 // create feature price if needed
-                $createFeaturePrice = $newRoomPriceTaxExcl != $initialProductPriceTE;
+                $createFeaturePrice = ($newRoomPriceTaxExcl != $initialProductPriceTE);
                 if ($createFeaturePrice) {
                     $featurePriceParams = array();
                     $featurePriceParams = array(
@@ -2124,7 +2137,7 @@ class HotelBookingDetail extends ObjectModel
                 }
 
                 // delete cart feature prices after room addition success
-                // HotelRoomTypeFeaturePricing::deleteByIdCart($this->context->cart->id);
+                HotelRoomTypeFeaturePricing::deleteByIdCart($this->context->cart->id);
 
                 // ===============================================================
                 // END: Add Process of the old booking

@@ -964,7 +964,7 @@ function confirmFreeOrder()
 			if (response.success) {
 				$('#confirmOrder').prop('disabled', false);
 				if (isGuest) {
-					document.location.href = guestTrackingUrl+'?id_order='+encodeURIComponent(response.reference)+'&email='+encodeURIComponent(response.email);
+					document.location.href = guestTrackingUrl+'?id_order='+encodeURIComponent(response.reference)+'&ord_conf=1'+'&email='+encodeURIComponent(response.email);
 				} else {
 					document.location.href = response.order_confirmation_url;
 				}

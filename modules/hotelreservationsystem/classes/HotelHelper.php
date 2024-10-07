@@ -2514,6 +2514,13 @@ class HotelHelper
             $isValid = false;
         }
 
+        Hook::exec('actionValidateDateRangeForHotel', array(
+            'is_valid' => &$isValid,
+            'date_from' => $dateFrom,
+            'date_to' => $dateTo,
+            'id_hotel' => $idHotel
+        ));
+
         return $isValid;
     }
 

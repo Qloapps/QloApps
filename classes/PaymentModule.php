@@ -191,14 +191,14 @@ abstract class PaymentModuleCore extends Module
 
         if (!$this->active) {
             PrestaShopLogger::addLog('PaymentModule::validateOrder - Module is not active', 3, null, 'Cart', (int)$id_cart, true);
-            die(Tools::displayError());
+            die(Tools::displayError('Error in processing order. Payment module is not active.'));
         }
 
         // Does order already exists ?
         if (Validate::isLoadedObject($this->context->cart) && $this->context->cart->OrderExists() == false) {
             if ($secure_key !== false && $secure_key != $this->context->cart->secure_key) {
                 PrestaShopLogger::addLog('PaymentModule::validateOrder - Secure key does not match', 3, null, 'Cart', (int)$id_cart, true);
-                die(Tools::displayError());
+                die(Tools::displayError('Error processing order. Secure key does not match.'));
             }
 
             // For each package, generate an order
@@ -1100,7 +1100,10 @@ abstract class PaymentModuleCore extends Module
                         // $service_products_price_tax_incl = $order->getTotalProductsWithTaxes(false, false, Product::SERVICE_PRODUCT_WITHOUT_ROOMTYPE);
                         // $service_products_tax = ($order->getTotalProductsWithTaxes(false, false, Product::SERVICE_PRODUCT_WITHOUT_ROOMTYPE) - $order->getTotalProductsWithoutTaxes(false, false, Product::SERVICE_PRODUCT_WITHOUT_ROOMTYPE));
 
+                        $idOrderHotel = HotelBookingDetail::getIdHotelByIdOrder($order->id);
+                        $objHotelBranchInfo = new HotelBranchInformation($idOrderHotel, $order->id_lang);
                         $data = array(
+                            '{hotel_name}' => $objHotelBranchInfo->hotel_name,
                             '{cart_booking_data_html}' => $cart_booking_data_html,
                             '{cart_booking_data_text}' => $cart_booking_data_text,
                             '{extra_demands_details_html}' => $extra_demands_details_html,

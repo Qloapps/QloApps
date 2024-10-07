@@ -753,12 +753,9 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
                     $id_room
                 )) {
                     $selectedServices = array_shift($roomServicesServices);
+                    $totalPrice['total_price_tax_incl'] += $selectedServices['total_price_tax_incl'];
+                    $totalPrice['total_price_tax_excl'] += $selectedServices['total_price_tax_excl'];
                 }
-            }
-
-            if (isset($selectedServices)) {
-                $totalPrice['total_price_tax_incl'] += $selectedServices['total_price_tax_incl'];
-                $totalPrice['total_price_tax_excl'] += $selectedServices['total_price_tax_excl'];
             } else {
                 if ($servicesWithTax = RoomTypeServiceProduct::getAutoAddServices(
                     $id_product,
