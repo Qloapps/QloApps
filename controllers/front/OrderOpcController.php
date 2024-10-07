@@ -125,6 +125,8 @@ class OrderOpcControllerCore extends ParentOrderController
                                 $this->errors[] = Tools::displayError('Please enter a valid Mobile phone number.', false);
                             } elseif (Tools::strlen($phone) > $rules['size']['phone']) {
                                 $this->errors[] = sprintf(Tools::displayError('Mobile phone number is too long. (%s chars max).'), $rules['size']['phone']);
+                            } else {
+                                $this->context->customer = $phone;
                             }
 
                             $_POST['lastname'] = $_POST['customer_lastname'];
@@ -157,7 +159,6 @@ class OrderOpcControllerCore extends ParentOrderController
                             );
                             if (!count($this->errors)) {
                                 $return['isSaved'] = (bool)$this->context->customer->update();
-                                CartCustomerGuestDetail::updateCustomerPhoneNumber($this->context->customer->email, $phone);
 
                             } else {
                                 $return['isSaved'] = false;

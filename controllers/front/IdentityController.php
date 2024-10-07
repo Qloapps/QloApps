@@ -94,6 +94,8 @@ class IdentityControllerCore extends FrontController
                 $this->errors[] = Tools::displayError('Invaid phone number.');
             } elseif ($phone && Tools::strlen($phone) > $rules['size']['phone']) {
                 $this->errors[] = sprintf(Tools::displayError('Phone number is too long. (%s chars max).'), $rules['size']['phone']);;
+            } else {
+                $this->customer->phone = $phone;
             }
 
             if (!count($this->errors)) {
@@ -123,7 +125,6 @@ class IdentityControllerCore extends FrontController
                     $this->context->cookie->passwd = $this->customer->passwd;
                 }
                 if ($this->customer->update()) {
-                    CartCustomerGuestDetail::updateCustomerPhoneNumber($this->customer->email, $phone);
                     $this->context->cookie->customer_lastname = $this->customer->lastname;
                     $this->context->cookie->customer_firstname = $this->customer->firstname;
                     $this->context->smarty->assign('confirmation', 1);
@@ -164,6 +165,7 @@ class IdentityControllerCore extends FrontController
                 'sl_day' => $birthday[2],
                 'errors' => $this->errors,
                 'genders' => Gender::getGenders(),
+                'one_phone_at_least' => (int)Configuration::get('PS_ONE_PHONE_AT_LEAST'),
             ));
 
         // Call a hook to display more information
