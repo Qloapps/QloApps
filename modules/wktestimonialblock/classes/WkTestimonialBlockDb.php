@@ -51,7 +51,7 @@ class WkTestimonialBlockDb
             "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."htl_testimonials_block_data_lang` (
                 `id_testimonial_block` int(11) NOT NULL,
                 `id_lang` int(11) NOT NULL,
-                `testimonial_content` text NOT NULL,
+                `testimonial_content` text CHARACTER SET utf8mb4 NOT NULL,
                 PRIMARY KEY (`id_testimonial_block`, `id_lang`)
             ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8;"
         );

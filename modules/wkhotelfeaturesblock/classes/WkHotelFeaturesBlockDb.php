@@ -49,8 +49,8 @@ class WkHotelFeaturesBlockDb
             "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."htl_features_block_data_lang` (
                 `id_features_block` int(11) NOT NULL,
                 `id_lang` int(11) NOT NULL,
-                `feature_title` text NOT NULL,
-                `feature_description` text NOT NULL,
+                `feature_title` text CHARACTER SET utf8mb4 NOT NULL,
+                `feature_description` text CHARACTER SET utf8mb4 NOT NULL,
                 PRIMARY KEY (`id_features_block`, `id_lang`)
             ) ENGINE=ENGINE_TYPE DEFAULT CHARSET=utf8;"
         );

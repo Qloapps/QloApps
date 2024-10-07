@@ -39,7 +39,7 @@ class WkBlockNavigationMenuDb
             "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."htl_custom_navigation_link_lang` (
                 `id_navigation_link` int(11) NOT NULL,
                 `id_lang` int(11) NOT NULL,
-                `name` varchar(255) NOT NULL,
+                `name` varchar(255) CHARACTER SET utf8mb4 NOT NULL,
                 PRIMARY KEY (`id_navigation_link`, `id_lang`)
                 ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8 ;",
         );
