@@ -672,15 +672,12 @@
 							<label for="other">{l s='Additional information'}</label>
 							<textarea class="form-control" name="other" id="other" cols="26" rows="3">{if isset($smarty.post.other)}{$smarty.post.other}{/if}</textarea>
 						</p>
-						{if isset($one_phone_at_least) && $one_phone_at_least}
-							<p class="inline-infos">{l s='You must register at least one phone number.'}</p>
-						{/if}
-						<p class="form-group">
-							<label class="" for="phone">{l s='Home phone'}</label>
+						<p class="{if isset($one_phone_at_least) && $one_phone_at_least}required {/if} form-group">
+							<label class="" for="phone">{l s='Home phone'}{if isset($one_phone_at_least) && $one_phone_at_least} <sup>*</sup>{/if}</label>
 							<input type="text" class="form-control" name="phone" id="phone" value="{if isset($smarty.post.phone)}{$smarty.post.phone}{/if}" />
 						</p>
-						<p class="{if isset($one_phone_at_least) && $one_phone_at_least}required {/if}form-group">
-							<label for="phone_mobile">{l s='Mobile phone'}{if isset($one_phone_at_least) && $one_phone_at_least} <sup>**</sup>{/if}</label>
+						<p class="form-group">
+							<label for="phone_mobile">{l s='Mobile phone'}</label>
 							<input type="text" class="form-control" name="phone_mobile" id="phone_mobile" value="{if isset($smarty.post.phone_mobile)}{$smarty.post.phone_mobile}{/if}" />
 						</p>
 						<p class="required form-group" id="address_alias">

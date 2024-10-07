@@ -93,7 +93,7 @@
 
                 <div class="row">
                     <div class="{if isset($one_phone_at_least) && $one_phone_at_least}required {/if}form-group col-sm-6">
-                        <label for="phone">{l s='Phone Number'}{if isset($one_phone_at_least) && $one_phone_at_least} <sup>**</sup>{/if}</label>
+                        <label for="phone">{l s='Phone Number'}{if isset($one_phone_at_least) && $one_phone_at_least} <sup>*</sup>{/if}</label>
                         <input type="text" class="text form-control validate" name="phone" id="phone" data-validate="isPhoneNumber" value="{if isset($guestInformations) && isset($guestInformations.phone) && $guestInformations.phone}{$guestInformations.phone}{/if}" />
                     </div>
                 </div>
@@ -264,11 +264,11 @@
                             </div>
                         {/if}
                         <div class="form-group is_customer_param col-sm-6">
-                            <label for="phone">{l s='Home phone'}{if isset($one_phone_at_least) && $one_phone_at_least} <sup>**</sup>{/if}</label>
+                            <label for="phone">{l s='Home phone'}{if isset($one_phone_at_least) && $one_phone_at_least} <sup>*</sup>{/if}</label>
                             <input type="text" class="text form-control validate" name="phone" id="phone" data-validate="isPhoneNumber" value="{if isset($guestInformations) && isset($guestInformations.phone) && $guestInformations.phone}{$guestInformations.phone}{/if}" />
                         </div>
-                        <div class="{if isset($one_phone_at_least) && $one_phone_at_least}required {/if}form-group col-sm-6">
-                            <label for="phone_mobile">{l s='Mobile phone'}{if isset($one_phone_at_least) && $one_phone_at_least} <sup>**</sup>{/if}</label>
+                        <div class="form-group col-sm-6">
+                            <label for="phone_mobile">{l s='Mobile phone'}</label>
                             <input type="text" class="text form-control validate" name="phone_mobile" id="phone_mobile" data-validate="isPhoneNumber" value="{if isset($guestInformations) && isset($guestInformations.phone_mobile) && $guestInformations.phone_mobile}{$guestInformations.phone_mobile}{/if}" />
                         </div>
                         <div class="form-group is_customer_param col-sm-6">
@@ -278,10 +278,6 @@
                     </div>
                     <div class="row">
                         <div class="col-sm-12">
-                            {if isset($one_phone_at_least) && $one_phone_at_least}
-                                {assign var="atLeastOneExists" value=true}
-                                <p class="inline-infos required">** {l s='You must register at least one phone number.'}</p>
-                            {/if}
                             <input type="hidden" name="alias" id="alias" value="{l s='My address'}"/>
 
                             <p class="required opc-required">

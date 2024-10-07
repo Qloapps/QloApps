@@ -412,7 +412,7 @@ class AuthControllerCore extends FrontController
             $phoneAddress = Tools::getValue('phone');
             $_POST['lastname'] = Tools::getValue('customer_lastname', $lastnameAddress);
             $_POST['firstname'] = Tools::getValue('customer_firstname', $firstnameAddress);
-            $_POST['phone'] = Tools::getValue('customer_phone', $phoneAddress);
+            $_POST['phone'] = (Tools::getValue('customer_phone')) ? Tools::getValue('customer_phone') : $phoneAddress;
             $addresses_types = [];
             if (Configuration::get('PS_REGISTRATION_PROCESS_TYPE')) {
                 $addresses_types[] = 'address';
