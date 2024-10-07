@@ -867,6 +867,12 @@ class OrderCore extends ObjectModel
 		WHERE ocr.`id_order` = '.(int)$this->id);
     }
 
+    public function getCartRulesTotal($useTax = false)
+    {
+        return Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue(
+            'SELECT '.($useTax ? 'SUM(ocr.`value`)' : 'SUM(ocr.`value_tax_excl`)').' FROM `'._DB_PREFIX_.'order_cart_rule` ocr WHERE ocr.`id_order` = '.(int)$this->id);
+    }
+
     public static function getDiscountsCustomer($id_customer, $id_cart_rule)
     {
         $cache_id = 'Order::getDiscountsCustomer_'.(int)$id_customer.'-'.(int)$id_cart_rule;
@@ -2846,5 +2852,33 @@ class OrderCore extends ObjectModel
         }
 
         return $result;
+    }
+
+    /**
+     * @param bool $useTax: if true, total with tax, if false, total without tax
+     * @param bool $withDiscounts: if true, total including discount, if false, total excluding discount
+     * @return float total of the order
+     */
+    public function getOrderTotal($useTax = true, $withDiscounts = true)
+    {
+        // Get total of rooms and services
+        if ($useTax) {
+            $totalRoomsAndServices = $this->getTotalProductsWithTaxes();
+        } else {
+            $totalRoomsAndServices = $this->getTotalProductsWithoutTaxes();
+        }
+
+        // Get total of extra demands
+        $objBookingDemand = new HotelBookingDemands();
+        $totalExtraDemands = $objBookingDemand->getRoomTypeBookingExtraDemands($this->id, 0, 0, 0, 0, 0, 1, $useTax);
+
+        // Get cart rules total
+        $orderTotalDiscount = $this->getCartRulesTotal($useTax);
+
+        // Update order with new amounts after removing cart rule
+        $totalOrder = ($totalExtraDemands + $totalRoomsAndServices) - $orderTotalDiscount;
+        $totalOrder = $totalOrder > 0 ? $totalOrder : 0;
+
+        return $totalOrder;
     }
 }

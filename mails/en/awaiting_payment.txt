@@ -3,7 +3,7 @@
 
 Hi {firstname} {lastname},
 
-Thank you for booking with {shop_name}!
+Thank you for booking with <strong>{hotel_hotel_name}</strong>!
 
 Order {order_name} - Awaiting payment
 Order reference: {order_name}
@@ -16,7 +16,7 @@ You can review your order and download your invoice from the
 clicking "My account" [/{my_account_url}] on our website.
 
 If you have a guest account, you can follow your order via the
-"Guest Tracking" [/{guest_tracking_url}] section on our website.
+"Guest Tracking" [/{guest_tracking_url}?id_order={order_name}] section on our website.
 
 {shop_name} [/{shop_url}] powered by Webkul(tm)
 [https://webkul.com]

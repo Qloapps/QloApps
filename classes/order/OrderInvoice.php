@@ -1011,12 +1011,24 @@ class OrderInvoiceCore extends ObjectModel
     {
         $cache_id = 'order_invoice_paid_'.(int)$this->id;
         if (!Cache::isStored($cache_id)) {
+            $objOrder = new Order($this->id_order);
             $amount = 0;
+
             $payments = OrderPaymentDetail::getByInvoiceId($this->id);
             foreach ($payments as $payment) {
                 /** @var OrderPayment $payment */
-                $amount += ($payment['amount'] / $payment['conversion_rate']);
+                if ($payment['id_currency'] == $objOrder->id_currency) {
+                    $amount += $payment['amount'];
+                } else {
+                    $amountConverted = Tools::convertPrice($payment['amount'], $payment['id_currency'], false);
+                    if ($objOrder->id_currency == Configuration::get('PS_CURRENCY_DEFAULT')) {
+                        $amount += $amountConverted;
+                    } else {
+                        $amount += Tools::convertPrice($amountConverted, $objOrder->id_currency, true);
+                    }
+                }
             }
+
             Cache::store($cache_id, $amount);
             return $amount;
         }

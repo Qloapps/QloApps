@@ -1,7 +1,7 @@
 Message from {shop_name}
 Hi {firstname} {lastname},
 
-New Bookings created on {shop_name}!
+New bookings are created on <strong>{hotel_name}</strong>!
 
 Customer details
 Name: {customer_name}
