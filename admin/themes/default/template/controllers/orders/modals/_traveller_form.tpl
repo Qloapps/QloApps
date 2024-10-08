@@ -22,7 +22,7 @@
     <form id="customer-guest-details-form">
         <div class="form-group row">
             <div class="col-sm-2">
-                <label class="control-label">{l s='Date'}</label>
+            <label class="control-label">{l s='Title'}</label>
                 <select name="id_gender">
                     {foreach from=$genders key=k item=gender}
                         <option value="{$gender->id_gender}"{if $customerGuestDetail->id_gender == $gender->id_gender} selected="selected"{/if}>{$gender->name}</option>

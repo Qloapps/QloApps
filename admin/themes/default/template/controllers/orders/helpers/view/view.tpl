@@ -525,7 +525,7 @@
                         <div class="row">
                             <div class="col-xs-12" id="customer-guest-details">
                                 <dl class="list-detail col-sm-6">
-                                    <label class="label-title">{l s='Gender'}</label>
+                                    <label class="label-title">{l s='Title'}</label>
                                     <dd class="gender_name">{$customerGuestDetail->gender->name}</dd>
                                 </dl>
                                 <dl class="list-detail col-sm-6">
