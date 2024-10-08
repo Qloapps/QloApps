@@ -1399,6 +1399,8 @@ class AdminImportControllerCore extends AdminController
                             }
                         }
 
+                        // Updating the room type categories if exists.
+                        $objHotelBranch->updateRoomTypeCategories();
                         $objHotelOrderRestrictDate = new HotelOrderRestrictDate();
                         $restrictDateInfo = HotelOrderRestrictDate::getDataByHotelId($objHotelBranch->id);
                         if ($restrictDateInfo) {
