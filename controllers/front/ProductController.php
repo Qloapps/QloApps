@@ -1277,6 +1277,8 @@ class ProductControllerCore extends FrontController
             if (!Validate::isOccupancy($occupancy)) {
                 $occupancy = array();
             }
+        } else {
+            $occupancy = Tools::getValue('qty', 1);
         }
         $roomTypeDemands = Tools::getValue('room_type_demands');
         $roomServiceProducts = Tools::getValue('room_service_products');
