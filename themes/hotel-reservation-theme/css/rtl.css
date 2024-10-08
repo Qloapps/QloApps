@@ -21,6 +21,15 @@
   text-align: right !important;
 }
 
+#growls {
+  left: 10px;
+  right: unset !important;
+}
+
+.growl .growl-close{
+  float: left;
+}
+
 .icon-angle-double-left:before,
 .icon-double-angle-left:before {
   content: "" !important;
@@ -317,6 +326,10 @@ div.uploader .filename, div.uploader .action {
 
 
 /* room-type-detail page - start */
+#layer_cart .layer_cart_cart .button-container span.exclusive-medium i {
+  padding-left: 5px;
+}
+
 #booking-form #room_date_range,
 #booking-form .input-occupancy {
   padding-right: 35px;
@@ -436,11 +449,20 @@ p.payment_module a {
     float: left !important;
   }
 }
-.fancybox-wrap.fancybox-order-detail .fancybox-close {
+.fancybox-order-detail .fancybox-close {
   right: unset !important;
   left: 12px !important;
 }
-/* order-detail - start */
+/* order-detail - end */
+
+/* order-confirmation - start */
+.fancybox-extra-services .fancybox-close {
+  right: unset !important;
+  left: 12px !important;
+}
+
+/* order-confirmation - end */
+
 
 /* Booking refund requests - start */
 #order-return .form-group.row div {
