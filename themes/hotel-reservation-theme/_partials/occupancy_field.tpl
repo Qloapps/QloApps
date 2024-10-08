@@ -64,7 +64,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="form-group col-sm-7 col-xs-6 occupancy_count_block">
+                                <div class="form-group col-sm-7 col-xs-6 occupancy_count_block {if !$room_type_info['max_children']} hide {/if}">
                                     <div class="row">
                                         <label class="col-sm-12">{l s='Children'}</label>
                                         <div class="col-sm-12 clearfix">
@@ -139,7 +139,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="form-group col-sm-7 col-xs-6 occupancy_count_block">
+                            <div class="form-group col-sm-7 col-xs-6 occupancy_count_block {if !$room_type_info['max_children']} hide {/if}">
                                 <div class="row">
                                     <label class="col-sm-12">{l s='Children'}</label>
                                     <div class="col-sm-12 clearfix">
