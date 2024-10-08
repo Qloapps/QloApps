@@ -4993,48 +4993,52 @@ class AdminProductsControllerCore extends AdminController
         $dateFrom = Tools::getValue('date_from');
         $dateTo = Tools::getValue('date_to');
         $idProduct = Tools::getValue('id_product');
-        if (!Validate::isDate($dateFrom) || !Validate::isDate($dateTo)) {
-            $this->errors[] = $this->l('Please select a valid date range to temporary disable this room');
-        } else if ($idRoom && Validate::isLoadedObject($objHotelRoomInfo = new HotelRoomInformation((int) $idRoom))) {
-            $dateTo = date('Y-m-d', strtotime($dateTo));
-            $objHotelBookingDetail = new HotelBookingDetail();
-            if ($bookingRow = $objHotelBookingDetail->chechRoomBooked($idRoom, $dateFrom, $dateTo)) {
-                $orderDetails = new HotelBookingDetail($bookingRow['id']);
-                $this->context->smarty->assign(array(
-                    'link' => $this->context->link,
-                    'orderDetails' => $orderDetails,
-                ));
+        if ($this->tabAccess['edit'] === '1') {
+            if (!Validate::isDate($dateFrom) || !Validate::isDate($dateTo)) {
+                $this->errors[] = $this->l('Please select a valid date range to temporary disable this room');
+            } else if ($idRoom && Validate::isLoadedObject($objHotelRoomInfo = new HotelRoomInformation((int) $idRoom))) {
+                $dateTo = date('Y-m-d', strtotime($dateTo));
+                $objHotelBookingDetail = new HotelBookingDetail();
+                if ($bookingRow = $objHotelBookingDetail->chechRoomBooked($idRoom, $dateFrom, $dateTo)) {
+                    $orderDetails = new HotelBookingDetail($bookingRow['id']);
+                    $this->context->smarty->assign(array(
+                        'link' => $this->context->link,
+                        'orderDetails' => $orderDetails,
+                    ));
 
-                $this->errors[] = $this->context->smarty->fetch('controllers/products/booked_room_date_ranges_list.tpl');
-            } else {
-                if (!Tools::getValue('id_disable_date')
-                    || !Validate::isLoadedObject($objHotelRoomDisableDates = new HotelRoomDisableDates((int) Tools::getValue('id_disable_date')))
-                ) {
-                    $objHotelRoomDisableDates = new HotelRoomDisableDates();
-                    $objHotelRoomDisableDates->id_room_type = $idProduct;
-                    $objHotelRoomDisableDates->id_room = $idRoom;
-                }
-
-                $objHotelRoomDisableDates->date_from = $dateFrom;
-                $objHotelRoomDisableDates->date_to = $dateTo;
-                $objHotelRoomDisableDates->reason = trim(Tools::getValue('reason'));
-                $objHotelRoomInfo->id_status = HotelRoomInformation::STATUS_TEMPORARY_INACTIVE;
-                if ($objHotelRoomInfo->save()
-                    && $objHotelRoomDisableDates->save()
-                ) {
-                    $response['id_disable_date'] = $objHotelRoomDisableDates->id;
-                    $response['event_title'] = $this->l('Disabled');
-                    if (Tools::getValue('id_disable_date')) {
-                        $this->confirmations[] = $this->l('Successfully updated.');
-                    } else {
-                        $this->confirmations[] = $this->l('Disable date added successfully.');
-                    }
+                    $this->errors[] = $this->context->smarty->fetch('controllers/products/booked_room_date_ranges_list.tpl');
                 } else {
-                    $this->errors[] = Tools::displayError('An error occurred while trying to save the disable dates.');
+                    if (!Tools::getValue('id_disable_date')
+                        || !Validate::isLoadedObject($objHotelRoomDisableDates = new HotelRoomDisableDates((int) Tools::getValue('id_disable_date')))
+                    ) {
+                        $objHotelRoomDisableDates = new HotelRoomDisableDates();
+                        $objHotelRoomDisableDates->id_room_type = $idProduct;
+                        $objHotelRoomDisableDates->id_room = $idRoom;
+                    }
+
+                    $objHotelRoomDisableDates->date_from = $dateFrom;
+                    $objHotelRoomDisableDates->date_to = $dateTo;
+                    $objHotelRoomDisableDates->reason = trim(Tools::getValue('reason'));
+                    $objHotelRoomInfo->id_status = HotelRoomInformation::STATUS_TEMPORARY_INACTIVE;
+                    if ($objHotelRoomInfo->save()
+                        && $objHotelRoomDisableDates->save()
+                    ) {
+                        $response['id_disable_date'] = $objHotelRoomDisableDates->id;
+                        $response['event_title'] = $this->l('Disabled');
+                        if (Tools::getValue('id_disable_date')) {
+                            $this->confirmations[] = $this->l('Successfully updated.');
+                        } else {
+                            $this->confirmations[] = $this->l('Disable date added successfully.');
+                        }
+                    } else {
+                        $this->errors[] = Tools::displayError('An error occurred while trying to save the disable dates.');
+                    }
                 }
+            } else if (!$idRoom) {
+                $this->errors[] = Tools::displayError('You need to save this room first before adding any disabled dates.');
             }
-        } else if (!$idRoom) {
-            $this->errors[] = Tools::displayError('You need to save this room first before adding any disabled dates.');
+        } else {
+            $this->errors[] = Tools::displayError('You do not have permission to perform this operation.');
         }
 
 
@@ -5056,51 +5060,55 @@ class AdminProductsControllerCore extends AdminController
         $idRoom = (int) Tools::getValue('id_room');
         $dateFrom = date('Y-m-d', strtotime(Tools::getValue('date_from')));
         $dateTo = date('Y-m-d', strtotime(Tools::getValue('date_to')));
-        if (!Tools::getValue('date_from') || !Tools::getValue('date_to')) {
-            $this->errors[] = Tools::displayError('Please select valid date range.');
-        } else {
-            $objRoomDisableDates = new HotelRoomDisableDates();
-            $params = array(
-                'date_from' => $dateFrom,
-                'date_to' => $dateTo,
-                'id_room' => $idRoom
-            );
-            Hook::exec('actionRoomDisableDatesRemoveBefore', array('disable_dates', $params));
-            if (empty($this->errors)
-                && ($disableDates = $objRoomDisableDates->checkIfRoomAlreadyDisabled($params))
-            ) {
-                $newDates = array();
-                foreach ($disableDates as $disableDatesInfo) {
-                    $objRoomDisableDates = new HotelRoomDisableDates($disableDatesInfo['id']);
-                    $newDates[0]['date_from'] = $disableDatesInfo['date_from'];
-                    $newDates[0]['date_to'] = $params['date_from'];
+        if ($this->tabAccess['edit'] === '1') {
+            if (!Tools::getValue('date_from') || !Tools::getValue('date_to')) {
+                $this->errors[] = Tools::displayError('Please select valid date range.');
+            } else {
+                $objRoomDisableDates = new HotelRoomDisableDates();
+                $params = array(
+                    'date_from' => $dateFrom,
+                    'date_to' => $dateTo,
+                    'id_room' => $idRoom
+                );
+                Hook::exec('actionRoomDisableDatesRemoveBefore', array('disable_dates', $params));
+                if (empty($this->errors)
+                    && ($disableDates = $objRoomDisableDates->checkIfRoomAlreadyDisabled($params))
+                ) {
+                    $newDates = array();
+                    foreach ($disableDates as $disableDatesInfo) {
+                        $objRoomDisableDates = new HotelRoomDisableDates($disableDatesInfo['id']);
+                        $newDates[0]['date_from'] = $disableDatesInfo['date_from'];
+                        $newDates[0]['date_to'] = $params['date_from'];
 
-                    $newDates[1]['date_from'] = $params['date_to'];
-                    $newDates[1]['date_to'] = date('Y-m-d', strtotime($disableDatesInfo['date_to']));
+                        $newDates[1]['date_from'] = $params['date_to'];
+                        $newDates[1]['date_to'] = date('Y-m-d', strtotime($disableDatesInfo['date_to']));
 
-                    if (strtotime($newDates[0]['date_from']) >= strtotime($newDates[0]['date_to'])) {
-                        unset($newDates[0]);
+                        if (strtotime($newDates[0]['date_from']) >= strtotime($newDates[0]['date_to'])) {
+                            unset($newDates[0]);
+                        }
+
+                        if (strtotime($newDates[1]['date_from']) >= strtotime($newDates[1]['date_to'])) {
+                            unset($newDates[1]);
+                        }
+
+                        foreach ($newDates as $newDate) {
+                            $objNewDisableDates = new HotelRoomDisableDates();
+                            $objNewDisableDates->id_room_type = $objRoomDisableDates->id_room_type;
+                            $objNewDisableDates->id_room = $objRoomDisableDates->id_room;
+                            $objNewDisableDates->date_from = $newDate['date_from'];
+                            $objNewDisableDates->date_to = $newDate['date_to'];
+                            $objNewDisableDates->reason = $objRoomDisableDates->reason;
+                            $objNewDisableDates->save();
+                        }
+
+                        $objRoomDisableDates->delete();
                     }
-
-                    if (strtotime($newDates[1]['date_from']) >= strtotime($newDates[1]['date_to'])) {
-                        unset($newDates[1]);
-                    }
-
-                    foreach ($newDates as $newDate) {
-                        $objNewDisableDates = new HotelRoomDisableDates();
-                        $objNewDisableDates->id_room_type = $objRoomDisableDates->id_room_type;
-                        $objNewDisableDates->id_room = $objRoomDisableDates->id_room;
-                        $objNewDisableDates->date_from = $newDate['date_from'];
-                        $objNewDisableDates->date_to = $newDate['date_to'];
-                        $objNewDisableDates->reason = $objRoomDisableDates->reason;
-                        $objNewDisableDates->save();
-                    }
-
-                    $objRoomDisableDates->delete();
+                } else if (!$disableDates) {
+                    $this->errors[] = Tools::displayError('Room is not disabled for the selected date range.');
                 }
-            } else if (!$disableDates) {
-                $this->errors[] = Tools::displayError('Room is not disabled for the selected date range.');
             }
+        } else {
+            $this->errors[] = Tools::displayError('You do not have permission to perform this operation.');
         }
 
         if (count($this->errors)) {
@@ -5140,22 +5148,26 @@ class AdminProductsControllerCore extends AdminController
     public function ajaxProcessDeleteDisableDate()
     {
         $response = array('status' => false);
-        $idDisableDate = Tools::getValue('id_disable_date');
-        Hook::exec('actionDisableDateDeleteBefore', array('id_disable_date', $idDisableDate));
-        if (empty($this->errors)
-            && (int) $idDisableDate
-            && Validate::isLoadedObject($objRoomDisableDates = new HotelRoomDisableDates($idDisableDate))
-        ) {
-            $idRoom = $objRoomDisableDates->id_room;
-            if (!$objRoomDisableDates->delete()) {
-                $this->errors[] = Tools::displayError('An error occurred while trying to perform this operation.');
-            } else if (!$objRoomDisableDates->getRoomDisableDates($idRoom)) {
-                $objRoomInfo = new HotelRoomInformation($idRoom);
-                $objRoomInfo->id_status = HotelRoomInformation::STATUS_ACTIVE;
-                $objRoomInfo->save();
+        if ($this->tabAccess['edit'] === '1') {
+            $idDisableDate = Tools::getValue('id_disable_date');
+            Hook::exec('actionDisableDateDeleteBefore', array('id_disable_date', $idDisableDate));
+            if (empty($this->errors)
+                && (int) $idDisableDate
+                && Validate::isLoadedObject($objRoomDisableDates = new HotelRoomDisableDates($idDisableDate))
+            ) {
+                $idRoom = $objRoomDisableDates->id_room;
+                if (!$objRoomDisableDates->delete()) {
+                    $this->errors[] = Tools::displayError('An error occurred while trying to perform this operation.');
+                } else if (!$objRoomDisableDates->getRoomDisableDates($idRoom)) {
+                    $objRoomInfo = new HotelRoomInformation($idRoom);
+                    $objRoomInfo->id_status = HotelRoomInformation::STATUS_ACTIVE;
+                    $objRoomInfo->save();
+                }
+            } else {
+                $this->errors[] = Tools::displayError('Invalid request');
             }
         } else {
-            $this->errors[] = Tools::displayError('Invalid request');
+            $this->errors[] = Tools::displayError('You do not have permission to perform this operation.');
         }
 
         if (count($this->errors)) {
