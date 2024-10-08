@@ -283,10 +283,8 @@
     border-radius: 6px;
 }
 .order-detail-content .cart_section_title {
-	font-size: 12px;
-	color: #777777;
-	text-transform: uppercase;
-	font-family: OpenSans-Semibold;
+	font-size: 14px;
+	text-transform: capitalize;
 }
 .order-detail-content .room_unit_price{
 	font-size: 24px;
