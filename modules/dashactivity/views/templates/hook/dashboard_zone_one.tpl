@@ -80,7 +80,7 @@
         <ul class="stats-list">
             <li>
                 <span class="item-label">
-                    <a href="{$link->getAdminLink("AdminOrders")|escape:"html":"UTF-8"}&amp;orderFilter_hbd!is_refunded=0&amp;orderFilter_hbd!is_cancelled=0&amp;orderFilter_amount_due%5B0%5D={$minValue}" target="_blank">
+                    <a href="{$link->getAdminLink("AdminOrders")|escape:"html":"UTF-8"}&amp;submitFilterorder=1&amp;orderFilter_hbd!is_refunded=0&amp;orderFilter_hbd!is_cancelled=0&amp;orderFilter_amount_due%5B0%5D={$min_due_amount}" target="_blank">
                         <span>{l s="Bookings (not paid)" mod='dashactivity'}</span>
                     </a>
                 </span>
