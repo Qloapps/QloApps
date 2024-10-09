@@ -2501,7 +2501,7 @@ class AdminProductsControllerCore extends AdminController
         $helper->title = $this->l('Booked Rooms', null, null, false);
         $helper->subtitle = $this->l('Today', null, null, false);
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=booked_rooms';
-        $helper->tooltip = $this->l('The total number of rooms that are currently booked and and awaiting guest check-in', null, null, false);
+        $helper->tooltip = $this->l('The total number of rooms that are currently booked and awaiting guest check-in', null, null, false);
         $this->kpis[] = $helper;
 
         $helper = new HelperKpi();
