@@ -597,10 +597,7 @@ class HTMLTemplateInvoiceCore extends HTMLTemplate
             'footer' => $footer,
             'ps_price_compute_precision' => _PS_PRICE_COMPUTE_PRECISION_,
             'round_type' => $round_type,
-            'legal_free_text' => $legal_free_text,
-            'total_without_discount_te' => $total_without_discount_te,
-            'total_without_discount_ti' => $total_without_discount_ti,
-            'total_tax_without_discount' => $total_tax_without_discount
+            'legal_free_text' => $legal_free_text
         );
 
         if (Tools::getValue('debug')) {
