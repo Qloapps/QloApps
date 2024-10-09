@@ -1266,7 +1266,8 @@ class HotelHelper
 
         $htlDescLang = array(
             'en' => '<div>
-                <h4 style="text-align: center;"><strong>Welcome to The Hotel Prime!</strong></h4>
+                <h4><strong>Welcome to The Hotel Prime!</strong></h4>
+                <br />
                 <div>Our hotel is the perfect destination for both business and leisure travelers seeking a memorable stay.</div>
                 <br />
                 <div>Benefits of staying at The Hotel Prime!</div>
@@ -1309,7 +1310,8 @@ class HotelHelper
                     create an unforgettable experience for you. Whether you\'re traveling solo, with a loved one, or with a group,
                     our hotel is dedicated to surpassing your expectations and making your stay truly exceptional.</div></div>',
             'nl' => '<div>
-                <h4 style="text-align: center;"><strong>Welkom bij Hotel Prime!</strong></h4>
+                <h4><strong>Welkom bij Hotel Prime!</strong></h4>
+                <br />
                 <div>Ons hotel is de perfecte bestemming voor zowel zakenreizigers als vakantiegangers die op zoek zijn naar een onvergetelijk verblijf.</div>
                 <br />
                 <div>Voordelen van een verblijf in The Hotel Prime!</div>
@@ -1352,7 +1354,8 @@ class HotelHelper
                     een onvergetelijke ervaring voor u creëren. Of u nu alleen reist, met een geliefde of met een groep,
                     ons hotel doet er alles aan om uw verwachtingen te overtreffen en uw verblijf echt uitzonderlijk te maken.</div></div>',
             'fr' => '<div>
-                <h4 style="text-align: center;"><strong>Bienvenue à l\'Hôtel Prime !</strong></h4>
+                <h4><strong>Bienvenue à l\'Hôtel Prime !</strong></h4>
+                <br />
                 <div>Notre hôtel est la destination idéale pour les voyageurs d\'affaires et de loisirs à la recherche d\'un séjour mémorable.</div>
                 <br />
                 <div>Avantages de séjourner à l\'Hôtel Prime !</div>
@@ -1395,7 +1398,8 @@ class HotelHelper
                     créez une expérience inoubliable pour vous. Que vous voyagiez seul, en amoureux ou en groupe,
                     notre hôtel se consacre à dépasser vos attentes et à rendre votre séjour vraiment exceptionnel.</div></div>',
             'de' => '<div>
-                <h4 style="text-align: center;"><strong>Willkommen im Hotel Prime!</strong></h4>
+                <h4><strong>Willkommen im Hotel Prime!</strong></h4>
+                <br />
                 <div>Unser Hotel ist das perfekte Ziel für Geschäfts- und Urlaubsreisende, die einen unvergesslichen Aufenthalt suchen.</div>
                 <br />
                 <div>Vorteile eines Aufenthalts im Hotel Prime!</div>
@@ -1438,7 +1442,8 @@ class HotelHelper
                     Schaffen Sie ein unvergessliches Erlebnis für Sie. Egal, ob Sie alleine, mit einem geliebten Menschen oder mit einer Gruppe reisen,
                     Unser Hotel ist bestrebt, Ihre Erwartungen zu übertreffen und Ihren Aufenthalt wirklich außergewöhnlich zu machen.</div></div>',
             'ru' => '<div>
-                <h4 style="text-align: center;"><strong>Добро пожаловать в отель Prime!</strong></h4>
+                <h4><strong>Добро пожаловать в отель Prime!</strong></h4>
+                <br />
                 <div>Наш отель — идеальное место как для деловых путешественников, так и для туристов, желающих провести незабываемый отдых.</div>
                 <br />
                 <div>Преимущества проживания в отеле Prime!</div>
@@ -1481,7 +1486,8 @@ class HotelHelper
                     подарит вам незабываемые впечатления. Путешествуете ли вы в одиночку, с любимым человеком или с группой,
                     Наш отель стремится превзойти ваши ожидания и сделать ваше пребывание по-настоящему исключительным.</div></div>',
             'es' => '<div>
-                <h4 style="text-align: center;"><strong>¡Bienvenido a The Hotel Prime!</strong></h4>
+                <h4><strong>¡Bienvenido a The Hotel Prime!</strong></h4>
+                <br />
                 <div>Nuestro hotel es el destino perfecto tanto para viajeros de negocios como de placer que buscan una estancia memorable.</div>
                 <br />
                 <div>¡Beneficios de alojarse en The Hotel Prime!</div>

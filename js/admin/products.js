@@ -304,7 +304,7 @@ product_tabs['Seo'] = new function(){
 	var self = this;
 
 	this.onReady = function() {
-		if ($('#link_rewrite_'+id_lang_default).length)
+		if ($('#link_rewrite_'+id_lang_default).length && id_product)
 			if ($('#link_rewrite_'+id_lang_default).val().replace(/^\s+|\s+$/gm,'') == '') {
 				updateFriendlyURLByName();
 			}

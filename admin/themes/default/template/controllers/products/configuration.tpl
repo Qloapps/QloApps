@@ -567,13 +567,14 @@
             if (confirm(confirmText)) {
                 var calendarEventId = parseInt($(this).parent().find('.fc-event-title').attr('data-id_calendar_event'));
                 var calendarEvent = DisableDatesCalendar.getEventById(calendarEventId);
-                $('#disable_dates_full_calendar .id_calendar_event_'+calendarEventId).find('.fc-event-main-frame').tooltip('destroy');
-                DisableDatesObj.deleteDisableDate(calendarEvent.extendedProps.id_disable_date);
-                calendarEvent.remove();
-                var formEventId = parseInt($('#disable_dates_form .id_calendar_event').val());
-                if (!isNaN(formEventId) && formEventId == eventId) {
-                    DisableDatesForm.resetForm();
-                    DisableDatesForm.hideForm();
+                if (DisableDatesObj.deleteDisableDate(calendarEvent.extendedProps.id_disable_date)) {
+                    $('#disable_dates_full_calendar .id_calendar_event_'+calendarEventId).find('.fc-event-main-frame').tooltip('destroy');
+                    calendarEvent.remove();
+                    var formEventId = parseInt($('#disable_dates_form .id_calendar_event').val());
+                    if (!isNaN(formEventId) && formEventId == eventId) {
+                        DisableDatesForm.resetForm();
+                        DisableDatesForm.hideForm();
+                    }
                 }
             }
         });
@@ -1201,6 +1202,8 @@
                     dataType: 'JSON',
                     success: function(response) {
                         DisableDatesForm.showMessages(response.msg);
+
+                        return response.status;
                     }
                 });
             },
@@ -1295,7 +1298,7 @@
             checkDisabled: function(dates) {
                 let dateFrom = new Date(dates.disable_date_from);
                 let endDate = new Date(dates.disable_date_to);
-                dateFrom.setDate(dateFrom.getDate() - 1)
+                dateFrom.setDate(dateFrom.getDate())
                 let startDate = dateFrom;
                 for (let date = startDate; date < endDate; date.setDate(date.getDate() + 1)) {
                     let dateString = date.toISOString().split('T')[0];

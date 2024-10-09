@@ -244,6 +244,7 @@ $(document).ready(function(){
         var roomBlockIndex = parseInt($(booking_occupancy_wrapper).find(".occupancy_info_block").last().attr('occ_block_index'));
         roomBlockIndex += 1;
 
+        var max_children = parseInt($(booking_occupancy_wrapper).find('.max_children').val());
 
         var countRooms = parseInt($(booking_occupancy_wrapper).find('.occupancy_info_block').length);
         countRooms += 1
@@ -272,7 +273,7 @@ $(document).ready(function(){
                             occupancy_block += '</div>';
                         occupancy_block += '</div>';
                     occupancy_block += '</div>';
-                    occupancy_block += '<div class="form-group col-sm-7 col-xs-6 occupancy_count_block">';
+                    occupancy_block += '<div class="form-group col-sm-7 col-xs-6 occupancy_count_block ' + (!max_children ? 'hide' : '') +' ">';
                         occupancy_block += '<div class="row">';
                             occupancy_block += '<label class="col-sm-12">' + children_txt + '</label>';
                             occupancy_block += '<div class="col-sm-12 clearfix">';

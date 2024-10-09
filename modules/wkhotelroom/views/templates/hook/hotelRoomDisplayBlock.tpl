@@ -59,7 +59,7 @@
                                                     <div class="row margin-lr-0">
                                                         <p class="htlRoomTypeNameText pull-left">{$roomDisplay.name|escape:'htmlall':'UTF-8'}</p>
                                                         {if $roomDisplay.show_price && !isset($restricted_country_mode) && !$PS_CATALOG_MODE}
-                                                            <p class="htlRoomTypePriceText">
+                                                            <p class="htlRoomTypePriceText pull-right">
                                                                 {if $roomDisplay.feature_price_diff >= 0}
                                                                     <span class="wk_roomType_price {if $roomDisplay.feature_price_diff>0}room_type_old_price{/if}">{convertPrice price = $roomDisplay.price_without_reduction}</span>
                                                                 {/if}

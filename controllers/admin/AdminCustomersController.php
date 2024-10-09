@@ -1094,7 +1094,7 @@ class AdminCustomersControllerCore extends AdminController
                 $this->errors[] = Tools::displayError('An account already exists for this email address:').' '.$customer_email;
                 $this->display = 'edit';
                 return $customer;
-            } elseif (Customer::customerExists($customer_email, false, true)) {
+            } elseif (Customer::customerExists($customer_email, false, false)) {
                 $this->errors[] = Tools::displayError('The email is already associated with a banned account. Please use a different one.');
                 $this->display = 'edit';
             } elseif (trim(Tools::getValue('passwd')) == '') {

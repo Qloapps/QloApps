@@ -352,6 +352,11 @@ class AdminHotelGeneralSettingsController extends ModuleAdminController
             // max age of infant after which guest will considered as child // below 18
             $globalChildMaxAge = Tools::getValue('WK_GLOBAL_CHILD_MAX_AGE');
             $globalMaxChildInRoom = Tools::getValue('WK_GLOBAL_MAX_CHILD_IN_ROOM');
+            if (!Validate::isUnsignedInt($globalChildMaxAge)) {
+                $this->errors[] = $this->l('Invalid value for "Consider guest as child below age".');
+            } else if ($globalChildMaxAge <= 0) {
+                $this->errors[] = $this->l('The value for "Consider guest as child below age" must be at least 1.');
+            }
 
             // End occupancy fields validation
 
