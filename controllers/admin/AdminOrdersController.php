@@ -81,23 +81,6 @@ class AdminOrdersControllerCore extends AdminController
         LEFT JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd ON (hbd.`id_order` = a.`id_order`)
         LEFT JOIN `'._DB_PREFIX_.'htl_branch_info_lang` hbil ON (hbil.`id` = hbd.`id_hotel`)';
 
-        // Filters for KPIs because unable to filter orders by defult filters
-        if (Tools::getValue('orders_arrival_today')) {
-            $this->_where .= ' AND hbd.`is_refunded` = 0 AND hbd.`date_from` = \''.pSQL(date('Y-m-d')).' 00:00:00\' AND hbd.`id_status` != '.
-            (int) HotelBookingDetail::STATUS_CHECKED_IN.' AND hbd.`id_status` != '.(int) HotelBookingDetail::STATUS_CHECKED_OUT;
-        } elseif (Tools::getValue('orders_departures_today')) {
-            $this->_where .= ' AND hbd.`is_refunded` = 0 AND hbd.`date_to` = \''.pSQL(date('Y-m-d')).' 00:00:00\' AND hbd.`id_status` = '.
-            (int) HotelBookingDetail::STATUS_CHECKED_IN;
-        } elseif (Tools::getValue('orders_stay_over')) {
-            $this->_where .= ' AND hbd.`is_refunded` = 0 AND hbd.`is_back_order` = 0 AND hbd.`id_status` = '.(int) HotelBookingDetail::STATUS_CHECKED_IN.'
-            AND hbd.`date_to` > \''.pSQL(date('Y-m-d')).' 00:00:00\'';
-        } elseif (Tools::getValue('orders_not_paid')) {
-            $this->_where .= ' AND os.`paid` = 0 AND a.`current_state` NOT IN ('.implode(',', array(
-                Configuration::get('PS_OS_CANCELED'),
-                Configuration::get('PS_OS_REFUND'),
-                Configuration::get('PS_OS_ERROR')
-            )).')';
-        }
 
         $this->_orderBy = 'id_order';
         $this->_orderWay = 'DESC';
@@ -316,6 +299,29 @@ class AdminOrdersControllerCore extends AdminController
                 'search' => false,
                 'remove_onclick' => true,
                 'optional' => true,
+            ),
+            'is_refunded' => array(
+                'title' => $this->l('Refunded'),
+                'filter_key' => 'hbd!is_refunded',
+                'type'=>'bool',
+                'displayed' => false,
+            ),
+            'is_cancelled' => array(
+                'title' => $this->l('Cancelled'),
+                'filter_key' => 'hbd!is_cancelled',
+                'type'=>'bool',
+                'displayed' => false,
+            ),
+            'id_status' => array(
+                'title' => $this->l('Room status'),
+                'filter_key' => 'hbd!id_status',
+                'displayed' => false,
+                'type' => 'select',
+                'list' => array(
+                    HotelBookingDetail::STATUS_ALLOTED => $this->l('Alloted'),
+                    HotelBookingDetail::STATUS_CHECKED_IN => $this->l('Checked in'),
+                    HotelBookingDetail::STATUS_CHECKED_OUT => $this->l('Checked out'),
+                ),
             )
         ));
 
@@ -2514,7 +2520,7 @@ class AdminOrdersControllerCore extends AdminController
             $helper->icon = 'icon-money';
             $helper->color = 'color2';
             $helper->title = $this->l('Total Due Amount', null, null, false);
-            $minValue = (float)('0.' . str_repeat('0', (Configuration::get('PS_PRICE_DISPLAY_PRECISION') - 1)) . '1');
+            $minValue = ('0.' . str_repeat('0', (Configuration::get('PS_PRICE_DISPLAY_PRECISION') - 1)) . '1');
             $helper->href = $this->context->link->getAdminLink('AdminOrders').'&submitFilterorder=1&orderFilter_amount_due%5B0%5D='.$minValue;
             $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=total_due_amount';
             $helper->tooltip = $this->l('Total due amount of all the orders created.', null, null, false);
@@ -2527,7 +2533,7 @@ class AdminOrdersControllerCore extends AdminController
             $helper->color = 'color1';
             $helper->title = $this->l('Arrivals', null, null, false);
             $helper->subtitle = $this->l('Today', null, null, false);
-            $helper->href = $this->context->link->getAdminLink('AdminOrders').'&orders_arrival_today=1';
+            $helper->href = $this->context->link->getAdminLink('AdminOrders').'&orderFilter_hbd!is_refunded=0&orderFilter_hbd!id_status='.HotelBookingDetail::STATUS_ALLOTED.'&orderFilter_hbd!date_from[]='.pSQL(date('Y-m-d')).'&orderFilter_hbd!date_from[]='.pSQL(date('Y-m-d'));
             $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=today_arrivals';
             $helper->tooltip = $this->l('Total number of arrivals for today.', null, null, false);
             $this->kpis[] = $helper;
@@ -2539,7 +2545,7 @@ class AdminOrdersControllerCore extends AdminController
             $helper->color = 'color2';
             $helper->title = $this->l('Departures', null, null, false);
             $helper->subtitle = $this->l('Today', null, null, false);
-            $helper->href = $this->context->link->getAdminLink('AdminOrders').'&orders_departures_today=1';
+            $helper->href = $this->context->link->getAdminLink('AdminOrders').'&orderFilter_hbd!is_refunded=0&orderFilter_hbd!id_status='.HotelBookingDetail::STATUS_CHECKED_IN.'&orderFilter_hbd!date_to[]='.pSQL(date('Y-m-d')).'&orderFilter_hbd!date_to[]='.pSQL(date('Y-m-d'));
             $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=today_departures';
             $helper->tooltip = $this->l('Total number of departures for today.', null, null, false);
             $this->kpis[] = $helper;
@@ -2552,7 +2558,7 @@ class AdminOrdersControllerCore extends AdminController
             $helper->color = 'color4';
             $helper->title = $this->l('Stay Overs', null, null, false);
             $helper->subtitle = $this->l('Today', null, null, false);
-            $helper->href = $this->context->link->getAdminLink('AdminOrders').'&orders_stay_over=1';
+            $helper->href = $this->context->link->getAdminLink('AdminOrders').'&orderFilter_hbd!is_refunded=0&orderFilter_hbd!id_status='.HotelBookingDetail::STATUS_CHECKED_IN.'&orderFilter_hbd!date_to[]='.pSQL(date('Y-m-d', strtotime('+ 1 days'))).'&orderFilter_hbd!date_to[]=';
             $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=today_stay_over';
             $helper->tooltip = $this->l('Total number of stay overs for today.', null, null, false);
             $this->kpis[] = $helper;
