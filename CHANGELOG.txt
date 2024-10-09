@@ -1,4 +1,429 @@
 ####################################
+# V1.6.1
+####################################
+
+## Added Features:
+- #941: Admin can add custom prices for facilities and services while editing order.
+- #890: Service products can now be assigned to a room type from room type edit page at back office.
+- #881: Address is not required in booking/order flow
+- #784: Admin can add partial order payment when creating a new booking.
+- #901: Added upgrade/degrade of rooms while reallocation and also fixed reallocation and swapping issues.
+- #833: Added 'Show at front office' option to enable/disable booking from front office.
+- #877: Added New module for extra service and facilities statistics.
+- #830: Added Option to disable backdate order from superadmin and employees.
+- #896: Added configuration for showing prices in Order list in (Default currency or Payment Currency).
+- #1105: Added Option for modules to manipulate KPI data.
+- #918: New design of order detail page of the customer
+- #918: New design of order detail page of the admin in back-office
+- #870: New design for KPIs in back-office
+- #1080: Added option 'Maximum Login Attempts' on Preferences > Maintenance page to allow certain number of employee login attempts.
+- #947: Added KPIs on orders list page in back-office.
+- #1124: Added new KPIs in order view page in the Back-office.
+- #1264: Added Seo fields in manage hotel controller in the back-office
+- #850: Added language dropdown on maintenance page.
+- #1108: Added email template for Partial payment received status.
+- #1164: Added option to add/edit customer address from order detail page of Back office.
+- #819: Added configuration to show or hide 'Date of Birth' field in customer registration and customer information form at front office.
+- #1065: Added Option to view frequent customer in back office customer page.
+- #1094: Added Admin can set voucher expiry along with voucher when managing refund request.
+- #1167: Added Confirmation modal when deleting cart rules and while changing credit slip status.
+- #1204: Added option to show page loader in back office.
+- #1191: Added webservice for bookings management.
+- #1170: Added date wise breakdown in Availability and rates search API
+- #776: Added breadcrumbs on my account pages at front office.
+- #894: Added process to allow modules to override module admin and front controllers.
+- #1168: Added hotel description in room type page in front office.
+- #1092: Added new sorting option "recommended" in search result page.
+- #775: Added demo service products for categories Meals and Transfers.
+- #962: Added new categories in demo data.
+- #882: Added links of Suggested Modules and Themes during installation.
+- #1195: Added process for smarty template overriding.
+- #937: Added hotel wise restriction on the customer messages belonging to an order.
+- #1028: Added hotel wise restrictions on the order notifications for the employee.
+- #1138: Added parameters in PatmentModule::validateOrder() function to prevent the emails on the order validation process.
+- #883: Added 'Save and stay' button on missing pages at back office.
+- Added new hooks in #938, #880, #928, #935, #1121, #1132, #1197, #812, #887, #1197, #1271
+
+## Back Office:
+- Improvements:
+    - #891: Updated design of back office page toolbar
+    - #1031: Updated tab wise permission restriction on the hotel feature delete process.
+    - #1188: Updated hotel features assigning process in the back office.
+    - #965: Improved AdminImportController to handle the csv files required in managing PMS.
+    - #1241: Updated condition to assign default category on the AdminCustomNavigationLinkSettingController in the back-office.
+    - #1185: Updated the tab menu list of the hotel reservation system in the back office.
+    - #1067: Updated the icon for the invoice in search list in the back office
+    - #1064: Updated room type position update field alert message in back office
+    - #1186: Added `Add new order` button on the admin orders list page.
+    - #1025: Added hotel name and room type name in the list in the hotel room block module, added hotel search option while creating new room block.
+    - #1187: Added feature in tree to select all children node when parent node is selected and fixed some text issue
+    - #1119: Added check-all and uncheck-all option in the tree for normal products and scroll bar for the rendered tree.
+    - #1267: Added validations for backoffice list filters for text fields.
+    - #826: Updated filter by Places panel removed and added advanced filters and room type positioning on Manage Room Types page at back office
+    - #808: Updated move Week Days list in a new row on Advanced Price Rule form at back office
+    - #884: Added breadcrumbs for Hotel Booking and Reservation System module controllers under Hotel Reservation System > Settings.
+    - #944: Added Accurate page name display in "Visitors online" statistics.
+    - #736: Updated display voucher table only if needed on Order view at back office
+    - #811: Updated code commented for Pagination panel on Preferences > Room Types page at back office
+    - #1291: Updated validation for 'Consider guest as child below age' in the back-office and removed child ages from occupancy fields in case 'Maximum children' for a room type is 0 from front-office.
+    - #801: Updated code for unused addons login feature at the back office has been commented
+    - #799: Removed subtabs Search Engines and Referers from Stats tab at back office
+    - #1158: Updated the trademark of the head tag of the admin login page
+    - #1068: Added validation for the social name in the admin genders controller and changed the neutral gender to the other.
+    - #1149: Updated preparation time to minimum booking offset and its definition in the admin order preferences controller.
+    - #1088: Updated customer deletion and ban process and added filters for the admin to view the banned customers.
+    - #888: Updated default listing order of rooms on admin book now page to ascending order of room database ID.
+    - #1042: Updated created different block for the customer general and customer KPI configuration in the customer preferences in the admin office.
+    - #1039: Updated abandoned cart Filter and the Abandoned cart KPI in the admin carts controller.
+    - #939: Updated optimized search results in the admin search page.
+    - #873: Removed decimal values from admin stats graph axis where not required
+    - #815: Updated added Rooms filter and added suggestions for Hotel and Room type filter inputs on admin orders list page
+    - #807: Added Warning for maximum quantity of service products in Extra Services popup when creating or editing a booking at back office.
+    - #789: Updated set default occupancy chosen on search results, room type detail and admin book now pages
+    - #1169:: Updated info for convenience fees products and taxes breakup in admin order detail page.
+    - #771: Updated design of 'Delete voucher' button has been changed to button instead of text on admin Order detail page
+    - #770: Updated disable cart popup button on admin Book Now page if cart is empty
+    - #987: Improved Statstics data in admin stats page
+    - #926: Updated renamed tab Configure to Rooms on Catalog > Manage Room Types page
+    - #863: Updated "stats dashboard" page conversion graph design
+    - #835: Updated make Customer Groups inaccessible if option Customer Groups is disabled on Advanced Parameters > Performance page
+    - #827: Updated use Chosen plugin to select hotel on Catalog > Add Room Type page
+    - #748: Updated latest logs created will be displayed at the top on Advanced Parameters > Logs page
+    - #798: Updated move navbar Customer Support contact settings to Hotel Reservation System > Settings > General Settings page
+    - #1268: Updated error message for cart rule validation
+    - #1176: Updated the disabled dates interface, add and update process.
+    - #1165: Displayed image Upload Sizes for Hotel Amenities and Interior Blocks
+    - #1139: Updated the validation for the city name.
+    - #1135: Updated order Return states names changes and Translations added
+    - #1103: Updated validations of order status changes while changing order status using bulk action
+    - #1101: Updated order edit validations for refunded or cancelled bookings
+    - #980: Updated room type pre-tax operating cost validation message
+    - #967: Updated display Helper list filters above list table using new list header option
+    - #865: Updated stats are now shown according to employee hotel access
+    - #851: Updated same day room checkin - checkout and select time along with checkin - checkout
+    - #841: Updated prevent room deletion and room status update to inactive when room has future booking
+    - #1145:: Updated empty dropdown will appear if no options are available and empty message is not set.
+    - #1070: Updated validations for Hotel address when add a new hotel
+    - #837: Updated resolve multiple specific price visible for a single catalog rule
+    - #1146: Udpated Text of column 'tax' to 'Tax rule' in both 'Additional Facilities' & 'Service Products' tab of room type detail page
+    - #1041: Added 'Show at front' column and updated display of 'Advanced payment' column in the room type list in back office.
+    - #1237: Removed Save and stay button for the new voucher popup on the Book Now page in the back-office.
+    - #898: Removed Association tab from back office room type page
+    - #1134: Removed The gender icon from customer information in the AdminCartsController
+    - #1059: Removed Order Currency filter was added multiple time in admin orders page
+    - #930: Removed Hotel wise access restriction for the employees on AdminCustomerController
+    - #875: Removed Information block for 'Save global page views' from admin stats where not required
+    - #869: Removed Custom scrollbar design for badges on admin dashboard
+    - #1115: Removed Retail price field with tax from manage service product panel
+    - #932: Removed Hotel wise access for the employees on the customers addresses
+    - #769: Removed Delivery related fields from Orders > Statuses list page and new Order State form
+    - #726: Removed Country Options section from Localization > Countries page
+    - #1016: Added display global max order date and global preparation time in the restriction tab in manage hotels.
+
+- Bugs Fixed:
+    - #1284: Fixed Getting fatal error on AdminHotelRoomsBookingController when an employee adds an invalid date in the search booking form in back-office.
+    - #1257: Fixed Available fields column of one tab is reset from another tab in backoffice
+    - #1251: Fixed Occupancy selection panel design issue in Backoffice book now page
+    - #1248: Fixed Wrong process for the hotel name for 'most viewed' room types for dashboard in the back-office.
+    - #1243: Fixed Wrong addresses search and hotel access wise Service products search results in AdminSearchController in the back-office.
+    - #1240: Fixed The design issues with the pop up in the search form in Book Now page in back-office.
+    - #1239: Fixed Hotel wise restriction not working in AdminCustomersThreadsController in back-office.
+    - #1233: Fixed Getting Fatal error while trying to use filter in the AdminTabsController in the back-office.
+    - #1231: Fixed Wrong values selected in Select type filter when submitting with empty value in all render-list filters in the back-office.
+    - #1230: Fixed The add new button disappears when the controller display type is not empty in admin controllers in the back-office.
+    - #1228: Fixed Information alert for 'Max quantity allow' field does not hide if 'Allow ordering of multiple quantities' is disabled while adding/editing service products in back-office
+    - #1214: Fixed wrong value of the Messages KPI in AdminOrdersController in back-office.
+    - #1213: Fixed wrong value of Gender percentage in Customers KPI in the AdminCustomerController in the back-office
+    - #1212: Fixed wrong total number of customers in the render-list in the AdminCustomerController in the back-office
+    - #1159: Fixed Total count for the service products is incorrect in the list in back office.
+    - #1125: Fixed Invoice data is not correct when multiple invoices created in an order from back-office
+    - #1122 Fixed currency conversion issue in order if default currency is changed while creating booking from back-office
+    - #1106: Fixed Refund amount not converted while changing the currency of the Order in back office
+    - #1102 Fixed unable to add discount coupon of 100% on order detail page from back-office
+    - #1063: Fixed Order prices decimal value not shown according to configuration when booking from back office
+    - #1049: Fixed warnings for invalid IMAP configuration after saving the default message in the contact in the back office.
+    - #1046: Fixed Getting errors in the back office if the id in the URL is updated manually to an invalid one.
+    - #1045: Fixed The email selection process while creating new address for the customer and back button for the AdminAddressController.
+    - #1043: Fixed The customer page in the back office showing non required information.
+    - #1030: Fixed The errors not being displayed in the AdminThemesController in the back office.
+    - #1023: Fixed Backoffice design issue in RTL language
+    - #1004: Fixed Issues in the process of booking creation from back office
+    - #997: Fixed getting fatal error on order detail page if entered invalid order ID in URL in back-office
+    - #996: Fixed name of the guest user is not present on order detail page in back-office while guest checkout
+    - #986: Fixed tax price is not calculated according to zip code in backoffice controllers
+    - #963: Fixed warning in the Back-office header when update information is not available
+    - #889: Fixed new hotel category gets created instead of updating previous one on hotel name update at back office
+    - #856: Fixed price conversion issues while changing currency in order detail page in back office
+    - #854: Fixed errors shown on order detail page in back office when booked hotel is deleted
+    - #825: Fixed auto added services is not visible at back office add order and view order page
+    - #822: Fixed service products are displayed when searching for room types at back office
+    - #817: Fixed php warning when using non-numeric value for Position filter in renderLists at back office
+    - #814: Fixed voucher of one customer can be applied to another customer at back office
+    - #813: Fixed success message is not displayed for bulk status updates in a list at back office
+    - #806: Fixed new cart getting created even if there are no active hotels for booking at back office Book Now page
+    - #805: Fixed 'Controller not found' alert when clicking on Hotel Reservation System breadcrumb at back office
+    - #803: Fixed php notice for function get_magic_quotes_gpc() on Configuration Information page at back office
+    - #802: Fixed blank space displayed in Customer panel of order detail page in the back-office when customer has deleted
+    - #792: Fixed warnings displayed after deleting all booked rooms from the orders detail page in back-office
+    - #777: Fixed employee can search for inaccessible Service Products using search box at back office
+    - #750: Fixed deleted customers are displayed when searching customer while creating a new order from back office
+    - #738: Fixed Time picker not available in payment block on order detail page at back office
+    - #730: Fixed PHP warning on Booking Carts > View page at back office if address of the cart customer is deleted
+    - #725: Fixed Pre-populate form values after invalid form submission of hotel form at back office
+    - #1270: Fixed console errors in admin room type and service form when only view permission is provided
+    - #1225: Fixed javascript files are included multiple times in admin login page
+    - #1150: Fixed Design issue in order page and kpi when printing admin pages
+    - #1143: Fixed error on AdminTranslationController while translating modules, also optimized the translation process for the modules.
+    - #1128: Fixed Admin is able to create account using 0 as email
+    - #1120: Fixed Incorrect prices show in admin refund request controller
+    - #1118: Fixed Admin was able to create new account using the banned account email.
+    - #1114: Fixed Admin cannot create different Advance price rule for different group for same date ranges
+    - #1093: Fixed Unable to save hotel if admin makes some fields required in address
+    - #1085: Fixed Issues in admin cart rule controller.
+    - #1074: Fixed online column on admin Booking Carts page
+    - #1069: Fixed while creating an account from the book now tab, the admin was able to select visitor and guest groups after submitting the ajax form once with errors.
+    - #1056: Fixed issues if admin tries to add discount having values equals or greater to the order total or due amount.
+    - #1048: Fixed the warning for invalid price shown on the Admin products controller if there is any error.
+    - #1047: Fixed the modules list filter shows all modules in admin office.
+    - #1044: Fixed the issues in catalog price rule (AdminSpecificPriceRuleController).
+    - #1033: Fixed filter issue on Admin refund request page
+    - #1019: Fixed empty copywrite year range in the footer incase the admin does not provide the website launch year.
+    - #1001: Fixed should not allow admin to add rooms if order status is already canceled or refunded.
+    - #1000: Fixed validation messages should be present on the view page on admin order detail page for Document Notes.
+    - #995: Fixed getting a fatal error if the admin reduces(in negative amount) more from the booking than the paid amount.
+    - #989: Fixed same Order ID is displayed multiple times on admin Booking Carts listing page
+    - #983: Fixed number of associated room types are not shown according to hotel permission in admin service product page
+    - #969: Fixed empty cart is creted when KPI visibility is updated in Admin carts page
+    - #958: Fixed admin was able to update the booking dates of a room in an order to the disabled dates of that room.
+    - #957: Fixed Room types and service products were not displayed in the search result in the admin search controller.
+    - #940: Fixed Employee was able to download invoice for all hotels from Admin Invoice controller
+    - #936: Fixed Date selection corrections at different places in admin controllers.
+    - #933: Fixed Admin is able to add/update the quantity of auto added services from the AdminOrdersController, while updating any order.
+    - #929: Fixed AdminOrdersRefundRequestsController showing exception to all employees except the super admin.
+    - #920: Fixed Super admin profile id is used instead of SuperAdmin employees ids while sending Order-Confirmation and Refund emails
+    - #916: Fixed Auto added services price not showing in cart summary in admin book now page
+    - #913: Fixed Added auto add services to the rooms added to the order by admin on edit order from the admin panel
+    - #907: Fixed Room reallocation process on AdminHotelRoomsBooking controller caused by space in the name of the room.
+    - #893: Fixed Invalid security token issue on admin Customers form page
+    - #876: Fixed Currency conversion in admin stats page
+    - #874: Fixed Incorrect forcast data in "stats Dasboard" tab in admin stats page
+    - #859: Fixed Admin login page opens in recommendations popup
+    - #840: Fixed Calendar tooltips reappear on admin book now page after adding or removing rooms from cart
+    - #836: Fixed Employee form language memorization (Administration > Employees) not working for some forms
+    - #831: Fixed Admin is unable to set empty birthday for a customer during update
+    - #791: Fixed Getting PS exception when admin sends `<script>` in the Message from admin order detail page
+    - #790: Fixed Rooms stats issue on admin Book Now page when adding or removing rooms from cart
+    - #742: Fixed Unable to delete room types from cart if admin visits book now page just after booking creation and before order confirmation
+    - #733: Fixed Admin can not set refund amount to 0 when creating refund rules
+    - #723: Fixed PHP warning on Administration > Menus page when changing positions of Menus
+    - #755: Fixed Social title is not displayed on Customers > Groups > View page customer list
+    - #1184: Fixed Issue occurs while deleting room booking line, If there is no refund requests created for the booking
+    - #1129: Fixed Dashboard issues on different sections
+    - #1091: Fixed Fatal error when adding negative price with an absolute numeric value equal to or less than the paid amount but a greater currency value
+    - #1081: Fixed Render list filter values are saved without validation
+    - #1076: Fixed PHP warning on order detail page if all rooms from order are deleted
+    - #1071: Fixed Sort by price in module catelog page
+    - #1053: Fixed Available Fields for render list are not working if there is only one item present in the list.
+    - #1029: Fixed Hotel configuration options in settings only visible in default language
+    - #1012: Fixed Creation of two separate HotelAdvancedPayment objects for a newly created room type from two separate tabs
+    - #1007: Fixed Maximum occupancy, length of stay and specific prices are not duplicating correctly while duplicating a room type.
+    - #1002: Fixed unable to edit the price of the room on order detail page, if price becomes with decimals more than valid limit in calculation
+    - #994: Fixed unable to delete rooms from the Free order
+    - #991: Fixed Need to arrange the options in correct order at order list page in mobile view.
+    - #982: Fixed Advance price rule created during booking are visible in room type price tab
+    - #976: Fixed design issue in new list header design
+    - #925: Fixed Multiple Advance Price Rule can be created with same conditions
+    - #923: Fixed Service product price and quantity was added incorrectly in order on edit/update
+    - #919: Fixed Issue while saving hotel with name starts with numeric values
+    - #900: Fixed Dashboard stats issues and also improved the view of the dashboard
+    - #824: Fixed Allotment Type selection in partial available rooms in book now page
+    - #793: Fixed Order status submitted even on clicking Cancel button while changing status from Bulk actions in orders list
+    - #779: Fixed Module zip validation on Module upload on Modules and Services page
+    - #774: Fixed HelperForm input type 'group' submit name can not be changed
+    - #764: Fixed 'Add new webservice key' button gets hidden on saving Webservice options
+    - #763: Fixed Hote Reservation System tab icon breaks randomly
+    - #754: Fixed 'Add a new module' button is displayed even if current employee is not allowed to install modules
+    - #753: Fixed All file types are available for selection when choosing images for hotel and room type
+    - #751: Fixed Groups selection is removed for Advanced Price Rule when status is changed
+    - #749: Fixed Abandoned Carts filter is not working on Booking Carts page
+    - #741: Fixed PHP notice on Catalog Price Rules page due to invalid input
+    - #731: Fixed Filter reset button is not displayed when clicking on 'Disabled Room Types' on Manage Room Types page
+    - #729: Fixed Hotel permissions are not saved when a hotel is created
+    - #727: Fixed Refund Rules for multiple hotels for same cancellation days can not be created
+    - #1210: Fixed Invalid argument supplied for foreach AdminStatsController
+    - #915: Fixed translated text not visible on admin controllers
+
+## Front Office:
+- Improvements:
+    - #970: Updated Service product updation process on the front in the product controller
+    - #844: Updated Front office room type page show default date according to LOS
+    - #781: Improved room search user experience at front office
+    - #1201: Updated Cart total summary on checkout page
+    - #847: Updated Page not found (Error 404) page
+    - #1133: Updated original price will now be displayed with discounted amount.
+    - #762: Updated Search Results Page Filters options have been moved to module wkhotelfilterblock
+    - #758: Updated Redirect to Page not found for invalid search results page URL
+    - #757: Updated Redirect customer to order confirmation page after free order validation instead of order history page
+    - #735: Updated Open room type detail page in same tab from Our Rooms block on landing page
+    - #724: Updated Bankwire and cheque payment details on order confirmation page
+    - #782: Updated Make Our Rooms images on landing page clickable to open room type detail page
+    - #959: Updated Design for the our room block
+    - #1017: Updated error message for guest account while transforming to customer account
+    - #839: Added error message for maximum occupancy in room occupancy dropdown.
+    - #1058: Added hotel rating is now visible with the hotel name on the room type page.
+    - #966: Added done button in the occupancy popup in the front office.
+
+- Bugs Fixed:
+    - #1292: Fixed Design issues on the order-opc page and growl notifications in RTL mode in the front-office.
+    - #1263: Fixed Responsive design issue in front office search block
+    - #1249: Fixed Translation issues and removed slashes in the error message from cart validation process in the front-office.
+    - #1242: Fixed The default date ranges in the booking form are not correct in case los and minimum booking offset is applied on the room type in the front-office.
+    - #1236: Fixed Cart rule without code is not being applied automatically to the cart in the front-office.
+    - #1234: Fixed The price breakdown was incorrect with tax when a voucher was applied to an order, affecting invoices, emails, front-office, and back-office displays.
+    - #1179: Fixed The price tooltip and updated the design for the booked services and demands popup on the order confirmation page in front office.
+    - #1171: Fixed The RTL languages design issues on the front office.
+    - #1144: Fixed the design for the 'Subscribe' button on the order-detail page in front-office
+    - #1113: Fixed No validation for length of characters in traveller detail fields in Front and Back office
+    - #1020: Fixed a room type shows multiple times in customer message section in front office order detail if admin adds a room from back office.
+    - #1013: Fixed Notice on room type page in the front office caused by selecting 'no tax' as a tax rule option.
+    - #934: Fixed If advance price rule discount is applied on a room type having auto add service with "Add price in room price", discounted price is not displayed on room block section in front office.
+    - #924: Fixed Incorrect room price and final price when admin remove service product or update room price from admin end and proceed for payment at front office
+    - #860: Fixed front office 'hotel-reservation-theme' RTL compatibility
+    - #849: Fixed security Vulnerability: XSS for back and email_create parameters while registration in front office
+    - #838: Fixed services image legend not visible on front office room type page
+    - #834: Fixed buttons positioning issue on search results page at front office due to long length of button texts in certain languages
+    - #816: Fixed customer is logged in automatically after password reset at front office
+    - #795: Fixed 'Add Room' button is displayed on occupancy popup even if no more rooms are available at front office
+    - #788: Fixed error when updating address from customer acccount which has been used to create an order at front office
+    - #786: Fixed php warning on removing room from cart dropdown at front office
+    - #785: Fixed custom price set for a room type in an order at back office is also reflected at front office for same customer
+    - #737: Fixed voucher description usage in front office
+    - #1272: Fixed order confirmation and Guest tracking flow issues and order emails are improved
+    - #1086: Fixed the customer messages sent from the contact page updates the previous message even if the subject (contact) selected is different.
+    - #988: Fixed unable to send customer request mail from contact us page
+    - #981: Fixed Wrong voucher amount in different currencies on customer my vouchers page
+    - #740: Fixed Customer/Guest account form on checkout page is not submitting on pressing Enter key
+    - #1089: Fixed Error on order confirmation page when order status is updated
+    - #977: Fixed Search panel issue on room type page when hotel is disabled
+    - #968: Fixed Display issue with the amenity block in page load/reload in the home page
+    - #917: Fixed Order currency symbol changes on currency change event on order confirmation page.
+    - #886: Fixed If amenities are not present then amenity filter at search results page should not be visible
+    - #845: Fixed Address issue on voucher deletion from cart dropdown on checkout page
+    - #800: Fixed Wrong Amenities block height on landing page in mobile view
+    - #787: Fixed If searched order reference has multiple orders then same rooms are displayed for each order on guest history page
+    - #773: Fixed PHP warning for key 'id_country' on search results page
+    - #772: Fixed Phone number can not be edited during guest checkout
+    - #746: Fixed PHP warning due to occupancy query parameter in URL when generating canonical redirect URL
+
+## Core:
+- Improvements:
+    - #1142: Optimized the flow of the blocknewsletter module
+    - #1194: Updated Optimized dataForFrontSearch function
+    - #1217: Added changes in core algo for managing booking for hourly basis
+    - #1173: Updated The Meta data for the index page on install, and also updated some non translated text for some languages.
+    - #1021: Improvement in the block navigation link module regarding CMS pages.
+    - #960: Updated Installation page design changes.
+    - #1200: Updated Price Rounding process improved in entire QloApps system
+    - #1174: Updated Helper tree | Created a new helper tree class for generating tree
+    - #1161: Updated id_address_delivery is now set as 0 by default
+    - #1156: Updated The demo data added to the database for the QloApps on installation.
+    - #1141: Updated Default invoice will be shown even in case of b2b invoice
+    - #1140: Updated The hero image and its upload process.
+    - #1111: Updated Installation Assistant translations
+    - #1109: Updated Decimal digits maximum limit is removed from price validation by Validate::isPrice()
+    - #1098: Updated validations for the occupancy of the room type for max occupancy of guest
+    - #1084: The google maps will now display the map icon for the hotel locations.
+    - #1079: Updated positions of Installer Assistant footer buttons
+    - #951: Added values for columns 'price_calculation_method' and 'price_addition_type' for demo service products.
+    - #1062: Updated htaccess files comptible with apache 2.2 and 2.4
+    - #1040: Updated QloApps cleaner | Added hook for data cleaning in other module and fixed incorrect data being deleted.
+    - #972: Improved Algo for response data and format
+    - #950: Updated Get localization pack details from qloapps api
+    - #949: Updated Version request while downloading language pack
+    - #892: Updated Use different prefixes for demo room numbers belonging to different room types
+    - #885: Updated Address country of demo customer 'pub@qloapps.com' changed to website default country
+    - #871: Updated Tax of room type will be applied to auto add services having price added to room price
+    - #842: Updated Invoice tax panel content
+    - #862: Updated Order cancelation successful mail content
+    - #861: Updated When translating text in QloApps only update the fields that are changed
+    - #858: Updated Recommendation section update process
+    - #768: Updated Change cookie key prefix to QloApps
+    - #783: Updated Do not create multiple guest acounts with the same email, use previous one if available
+    - #780: Updated Replace 'shop' and 'shopping' with 'website' and 'booking' in email templates
+    - #778: Updated Add India to top countries in list of countries during installation
+    - #759: Updated Function call corrected for room type price calculations
+    - #1221: Reuse existing HotelBookingDetail instance to avoid redundant object creation
+    - #1005: Renamed Partial payment accepted to Partial payment received.
+    - #908: Improved Order Status changes, Refund issues resolved and order and cancellation process improved
+    - #823: Updated Text changes
+    - #821: Removed Password field from new account email sent to customer on registration
+    - #810: Updated Use datepicker plugin to format dates using $.datepicker.parseDate() wherever applicable
+    - #804: Updated Updated flow of blocknewsletter module
+    - #744: Updated Set default customer group to Customer when transforming Guest account
+    - #1193: Updated hr.xml
+    - #1131: Removed Non required emails from the order status template list
+    - #728: Removed Unused module folders from themes/hotel-reservation-theme/
+
+- Bugs Fixed:
+    - #717: Fixed DataForFrontSearch to dataForFrontSearch
+    - #1260: Fixed jquery chosen, select and tinymce plugins used images not visible in different admin theme
+    - #1255: Fixed Localization pack not updating from correct resource during QloApps installation
+    - #1253: Fixed admin is able to select empty country during QloApps installation
+    - #1250: Fixed Categories for demo service products are not created correctly on installation.
+    - #1148: Fixed Welcome voucher is available for every customer and also for guest user
+    - #1090: Fixed cart rule restricted to a single customer is accessable to all customer when group restriction is applied
+    - #867: Fixed when customer age is not available then it is considered 60+ age as default
+    - #820: Fixed Errors set from hook 'actionBeforeAuthentication' are not checked before logging in a customer
+    - #765: Fixed Same voucher code is generated for same customer when auto-generating voucher
+    - #1205: Fixed The undefined variable issue in payment module.
+    - #1203: Fixed Invalid auto-added service prices when multiple rooms are added in cart or service is disabled or removed from catalog.
+    - #1202: Fixed service not visible in booking when service is deleted from catalog after order
+    - #1190: Fixed trying to access array offset on value of type bool in cacheMainDomainForShop() in ShopUrl.php
+    - #1162: Fixed Hotel permission are not being created for new hotels.
+    - #1153: Fixed Partial cart rule not creating when using multiple coupons in a single cart
+    - #1147: Fixed Unable to find correct files for translating pdf and mail files
+    - #1136: Fixed Cancelled room service is visible when same room is added again in order
+    - #1107: Fixed cookie not saving in browser when '+', '&', ')', '(' characters exists in Base URL
+    - #1104: Fixed order-opc page not opening when installed QloApps in Čeština (Czech) language
+    - #1100: Fixed calendar opens for pervious month of max order date is for current month
+    - #1097: Fixed Issues in Refund management flow and Improved Order cancellation flow
+    - #1095: Fixed Multiple coupons gets removed from cart when currency is changed
+    - #1054: Fixed when Order status set as cancelled the rooms are not set is_cancelled=1 in the htl_booking_detail table
+    - #1027: Fixed cart rule does not show under available coupons when cart rule is created from refund request
+    - #1018: Fixed notices and display issue when there is no rooms and no hotel available.
+    - #964: Fixed Room type categories were not updated when hotel name or location is updated
+    - #945: Fixed Data changes are not reflected when using the QloApps cache option
+    - #931: Fixed JS issue due to map if Google Maps API key is set and hotel location is not set
+    - #921: Fixed Pricing issue in order confirmation email
+    - #909: Fixed Missing translation from the templates of the modules.
+    - #906: Fixed When no tax is applies on room extra services, service tax column is shown empty in invoice
+    - #903: Fixed Smarty index.php in smarty cache and compile directory gets deleted when clearing cache
+    - #895: Fixed Overbooking issues in QloApps and added new configurations for overbooking handling
+    - #872: Fixed Invalid tax details in invoice and credit slips
+    - #857: Fixed Exception while order crteation when country sent from API is not active in QloApps
+    - #848: Fixed Wrong prices entered in order_detail table when "Round Type" setting is "Round on each item"
+    - #843: Fixed Friendly URL for search results page can not be changed
+    - #1181: Fixed Missing error message for OpenSSL extension during install system check step
+    - #756: Fixed Cancellation charge amount is incorrect if order currency is other than default currency
+    - #752: Fixed File '/cache/smarty/compile/index.php' gets deleted when clearing cache causing warning on Configuration Information page
+    - #745: Fixed Link::getMediaLink() not used for invoice logo
+    - #734: Fixed New voucher does not create for the remaining amount of the voucher even when Partial Use option is enabled
+    - #732: Fixed Fatal error: Uncaught Error: Class 'HTMLPurifier_Config' not found when enabling HTMLPurifier library
+    - #1220: Fixed apple-mobile-web-app-capable deprecated
+    - #722: Fixed Fatal error when set Awaiting Payment order status as logable and creating partial payment
+
+## Web Services:
+- Improvement:
+    - #1198: Udpated: Optimized Hotel Room Type Availability and rates search webservice
+    - #1247: Added Phone number field in the customer API.
+
+- Bugs Fixed:
+    - #1175: Fixed Issues in the Webservices.
+    - #855: Fixed Issues in getting(GET), creating(POST) and updating(PUT) hotel by hotel API
+    - #720: Fixed Issues in response of Availability & Rates search API for partial available rooms
+
+
+####################################
 # V1.6.0
 ####################################
 
@@ -61,7 +486,7 @@
     - #571: Remove Order Restrict link from Hotel Reservation System > Settings page
     - #580: Updated: removed unused configuration options from admin catagory tab
     - #581: "Updated admin service product configuration in SEO, Prices and association tabs
-    - #582: Removed selected extra services list from current cart in backoffice book now 
+    - #582: Removed selected extra services list from current cart in backoffice book now
     - #586: Update Dashavailability graph
     - #594: Remove unused fields from Catalog Price rule
     - #607: Updated: Service products pop-up modal in admin order view page
@@ -344,60 +769,60 @@
 - core
   - #240: Updated TCPDF library
   - #242: Changes for PHP7 compatibility
-  - #243: Removed pclzip library 
-  - #244: Removed pear JSON lib instead use PHP JSON library 
-  - #245: Updated swift mailer 
-  - #246: Updated htmlpurifier 
-  - #247: Updated Smarty library 
-  - #249: Updated Sql Parser Library 
-  - #250: Updated Pear and Archive tar library 
+  - #243: Removed pclzip library
+  - #244: Removed pear JSON lib instead use PHP JSON library
+  - #245: Updated swift mailer
+  - #246: Updated htmlpurifier
+  - #247: Updated Smarty library
+  - #249: Updated Sql Parser Library
+  - #250: Updated Pear and Archive tar library
   - #267: Removed mysql support, pdomysql now required
   - #269: Replaced mcrypt with openssl
-  - #272: Changed default DB prefix to qlo_ 
-  - #276: Paypal and PaypalUSA module removed 
-  - #290: Updated path for including css and js in modules | Moved plugins to core js folder 
-  - #299: Added composer.json file 
+  - #272: Changed default DB prefix to qlo_
+  - #276: Paypal and PaypalUSA module removed
+  - #290: Updated path for including css and js in modules | Moved plugins to core js folder
+  - #299: Added composer.json file
 
 - Front Office:
-  - #296: Improved Social Sharing module 
+  - #296: Improved Social Sharing module
   - #316: Display Room Capacity on room type detail page
 
 - Back Office
-  - #297: Changed import button icon on Localization page 
-  - #310: Dashboard improvement 
+  - #297: Changed import button icon on Localization page
+  - #310: Dashboard improvement
   - #327: Resolved QloApps dashboard issues
 
 
 ## Bug Fixed:
 - core:
   - #238: Update date format in invoice according to format provided in language
-  - #253: Using room status as constants instead in values 
-  - #270: Using room availability status as constants instead in values 
-  - #273: Fixed date format for additional facilities in invoice 
-  - #281: Resolved smarty html comments issue. 
-  - #283: Invalid value inserted in 'special_days' field in htl_room_type_feature_pricing table through API 
-  - #284: Resolved: No validation for the fields in 'hotel_refund_rules' API for add and update. 
-  - #285: Resolved: No validation for the fields in 'hotel_features' API for add and update 
-  - #286: Validations added for 'password' and 'email' fields for the 'employees' API. 
-  - #287: Resolved fatal error while generating class index file 
-  - #288: Resolved: No validation for field 'id_parent in' in 'categories' API. 
-  - #289: Validations added to the fields of "bookings" API for POST / PUT API requests 
-  - #307: Cart and Order API Issues resolved 
-  - #312: Text issues solved 
+  - #253: Using room status as constants instead in values
+  - #270: Using room availability status as constants instead in values
+  - #273: Fixed date format for additional facilities in invoice
+  - #281: Resolved smarty html comments issue.
+  - #283: Invalid value inserted in 'special_days' field in htl_room_type_feature_pricing table through API
+  - #284: Resolved: No validation for the fields in 'hotel_refund_rules' API for add and update.
+  - #285: Resolved: No validation for the fields in 'hotel_features' API for add and update
+  - #286: Validations added for 'password' and 'email' fields for the 'employees' API.
+  - #287: Resolved fatal error while generating class index file
+  - #288: Resolved: No validation for field 'id_parent in' in 'categories' API.
+  - #289: Validations added to the fields of "bookings" API for POST / PUT API requests
+  - #307: Cart and Order API Issues resolved
+  - #312: Text issues solved
   - #321: Fixed QloApps installation issues
   - #324: Resolved compatibility issue with php5.6
-  
+
 - Back Office:
-  - #255: Fixed filter by Due amount results in "Bad SQL query" 
-  - #259: Fixed room reallocation availability list for temporary unavailable rooms 
-  - #256: Fixed Swap rooms leads to reservations duplications 
-  - #251: Removed unused options from images controller 
-  - #271: Fixed syntax issue in admin information cont 
-  - #275: Resolve order total update issue on additional facilities update 
-  - #282: Order refund states 'Refunded' and 'Denied' should not enabled together from render list 
-  - #293: Add profile access restriction when adding room types 
-  - #294: Resolve order edit issues, Added hooks in order edit process 
-  - #303: In 'Manage Hotel' Controller, validation added for 'check-out time must be before check in' 
+  - #255: Fixed filter by Due amount results in "Bad SQL query"
+  - #259: Fixed room reallocation availability list for temporary unavailable rooms
+  - #256: Fixed Swap rooms leads to reservations duplications
+  - #251: Removed unused options from images controller
+  - #271: Fixed syntax issue in admin information cont
+  - #275: Resolve order total update issue on additional facilities update
+  - #282: Order refund states 'Refunded' and 'Denied' should not enabled together from render list
+  - #293: Add profile access restriction when adding room types
+  - #294: Resolve order edit issues, Added hooks in order edit process
+  - #303: In 'Manage Hotel' Controller, validation added for 'check-out time must be before check in'
   - #304, #315: Text change.
   - #318: Resolve multiple rooms addition issue on AdminOrdersController
   - #320: Resolved new room features automatically mapping to all the room types
@@ -405,15 +830,15 @@
 - Front Office:
   - #252: Update function getRoomBookingData
   - #268: Update blockrss module
-  - #277: In _DB_PREFIX__orders table column advance_paid_amount value is wrong 
-  - #280: Wrong amount displayed in Order confirmation page in the payment gateways PaymentReturn Hook 
-  - #291: Resolved: Wrong price return by advance payment functions in HotelAdvancedPayment class 
-  - #295: Resolve DNI field issue during guest checkout 
-  - #298, #274: QloApps text changes 
-  - #300: Room amenities name shown with feature icon in room type details page 
-  - #301: Unused CSS file htl-reservation-general.css and its classes are removed 
-  - #302: Resolved: On translating page checking and checkout dates are changed to NaN-NaN-NaN 
-  - #305: Resolve tab design issue on room type detail page 
+  - #277: In _DB_PREFIX__orders table column advance_paid_amount value is wrong
+  - #280: Wrong amount displayed in Order confirmation page in the payment gateways PaymentReturn Hook
+  - #291: Resolved: Wrong price return by advance payment functions in HotelAdvancedPayment class
+  - #295: Resolve DNI field issue during guest checkout
+  - #298, #274: QloApps text changes
+  - #300: Room amenities name shown with feature icon in room type details page
+  - #301: Unused CSS file htl-reservation-general.css and its classes are removed
+  - #302: Resolved: On translating page checking and checkout dates are changed to NaN-NaN-NaN
+  - #305: Resolve tab design issue on room type detail page
   - #317: Resolve jQZoom issue on room type detail page
   - #319: Resolved smarty minify HTML issue
 
