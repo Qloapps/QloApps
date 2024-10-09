@@ -301,14 +301,8 @@ class AdminOrdersControllerCore extends AdminController
                 'optional' => true,
             ),
             'is_refunded' => array(
-                'title' => $this->l('Refunded rooms'),
+                'title' => $this->l('Refunded / Cancelled Rooms'),
                 'filter_key' => 'hbd!is_refunded',
-                'type'=>'bool',
-                'displayed' => false,
-            ),
-            'is_cancelled' => array(
-                'title' => $this->l('Cancelled rooms'),
-                'filter_key' => 'hbd!is_cancelled',
                 'type'=>'bool',
                 'displayed' => false,
             ),
@@ -2521,7 +2515,7 @@ class AdminOrdersControllerCore extends AdminController
             $helper->color = 'color2';
             $helper->title = $this->l('Total Due Amount', null, null, false);
             $minValue = ('0.' . str_repeat('0', (Configuration::get('PS_PRICE_DISPLAY_PRECISION') - 1)) . '1');
-            $helper->href = $this->context->link->getAdminLink('AdminOrders').'&submitFilterorder=1&orderFilter_hbd!is_refunded=0&orderFilter_hbd!is_cancelled=0&orderFilter_amount_due%5B0%5D='.$minValue;
+            $helper->href = $this->context->link->getAdminLink('AdminOrders').'&submitFilterorder=1&orderFilter_hbd!is_refunded=0&orderFilter_amount_due%5B0%5D='.$minValue;
             $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=total_due_amount';
             $helper->tooltip = $this->l('Total due amount of all the orders created.', null, null, false);
             $this->kpis[] = $helper;
