@@ -41,7 +41,8 @@ class AdminCartRulesControllerCore extends AdminController
 
         $this->context = Context::getContext();
 
-        $this->bulk_actions = array('delete' => array('text' => $this->l('Delete selected'),'icon' => 'icon-trash', 'confirm' => $this->l('Delete selected items?')));
+        $this->bulk_actions = array('delete' => array('text' => $this->l('Delete selected'),'icon' => 'icon-trash'));
+        $this->specificConfirmDelete = false;
 
         $this->fields_list = array(
             'id_cart_rule' => array('title' => $this->l('ID'), 'align' => 'center', 'class' => 'fixed-width-xs'),
@@ -143,15 +144,117 @@ class AdminCartRulesControllerCore extends AdminController
         echo json_encode(array('html' => $html, 'next_link' => $next_link));
     }
 
+    public function ajaxProcessInitCartRuleDeleteModal()
+    {
+        $response = array('success' => false);
+        $modalConfirmDelete = $this->createTemplate('modal_confirm_delete.tpl');
+        $modalClass = 'modal-md';
+        if ($idCartRule = Tools::getValue('id_cart_rule')) {
+            if ($generatedByDetails = CartRule::getGeneratedBy($idCartRule)) {
+                if (Validate::isLoadedObject($objCartRule = new CartRule($idCartRule, $this->context->language->id))) {
+                    if ($generatedByDetails['generated_by'] == CartRule::GENERATED_BY_REFUND) {
+                        $obj  = new OrderReturn($generatedByDetails['id_generated_by']);
+                    } else {
+                        $obj  = new OrderSlip($generatedByDetails['id_generated_by']);
+                    }
+                    $objOrder = new Order($obj->id_order);
+                    $objCustomer = new Customer($objOrder->id_customer);
+
+                    $modalConfirmDelete->assign(array(
+                        'generatedBy' => $generatedByDetails['generated_by'],
+                        'generatedById' => $generatedByDetails['id_generated_by'],
+                        'customer' => $objCustomer,
+                        'order' => $objOrder,
+                        'cartRule' => $objCartRule,
+                        'link' => $this->context->link
+                    ));
+                    $modalClass = 'modal-lg';
+                }
+            }
+        }
+        $tpl = $this->createTemplate('modal.tpl');
+        $tpl->assign(array(
+            'modal_id' => 'moduleConfirmDelete',
+            'modal_class' => $modalClass,
+            'modal_content' => $modalConfirmDelete->fetch(),
+            'modal_actions' => array(
+                array(
+                    'type' => 'button',
+                    'class' => 'process_delete btn-primary',
+                    'label' => $this->l('Delete'),
+                ),
+            ),
+
+        ));
+        $response['confirm_delete'] = true;
+        $response['modalHtml'] = $tpl->fetch();
+        $response['confirm_delete'] = true;
+        $response['success'] = true;
+
+        die(Tools::jsonEncode($response));
+    }
+
+    public function ajaxProcessInitCartRuleBulkDeleteModal()
+    {
+        $response = array('success' => false);
+        $modalConfirmDelete = $this->createTemplate('modal_confirm_bulk_delete.tpl');
+        if ($idCartRules = Tools::getValue('id_cart_rules')) {
+            $toConfirm = array();
+            foreach($idCartRules as $idCartRule) {
+                if ($ruleDetails = CartRule::getGeneratedBy($idCartRule)) {
+                    $ruleDetails['id_cart_rule'] = $idCartRule;
+                    $objCartRule = new CartRule($idCartRule, $this->context->language->id);
+                    $ruleDetails['cart_rule'] = $objCartRule;
+                    if ($ruleDetails['generated_by'] == CartRule::GENERATED_BY_REFUND) {
+                        $obj  = new OrderReturn($ruleDetails['id_generated_by']);
+                    } else {
+                        $obj  = new OrderSlip($ruleDetails['id_generated_by']);
+                    }
+                    $objOrder = new Order($obj->id_order);
+                    $ruleDetails['order'] = $objOrder;
+                    $toConfirm[] = $ruleDetails;
+                }
+            }
+            if (count($toConfirm)) {
+                $modalConfirmDelete->assign(array(
+                    'cartRules' => $toConfirm,
+                    'link' => $this->context->link
+                ));
+
+            }
+        }
+        $tpl = $this->createTemplate('modal.tpl');
+        $tpl->assign(array(
+            'modal_id' => 'moduleConfirmDelete',
+            'modal_class' => 'modal-md',
+            'modal_content' => $modalConfirmDelete->fetch(),
+            'modal_actions' => array(
+                array(
+                    'type' => 'button',
+                    'class' => 'process_delete btn-primary',
+                    'label' => $this->l('Delete'),
+                ),
+            ),
+
+        ));
+        $response['confirm_delete'] = true;
+        $response['modalHtml'] = $tpl->fetch();
+        $response['success'] = true;
+
+        die(Tools::jsonEncode($response));
+    }
+
     public function setMedia()
     {
         parent::setMedia();
         Media::addJsDef(
             array(
+                'admin_cart_rule_tab_link' => $this->context->link->getAdminLink('AdminCartRules'),
                 'room_access_err' => $this->l('You can only select room types which hotel(s) access is provided to this employee.'),
                 'room_rmv_txt' => $this->l('Unselect below room types'),
             )
         );
+        $this->addJS(_PS_JS_DIR_.'admin/cart-rules.js');
         $this->addJqueryPlugin(array('typewatch', 'fancybox', 'autocomplete'));
     }
 
@@ -411,7 +514,7 @@ class AdminCartRulesControllerCore extends AdminController
                             $ruleGroupId,
                             $ruleId,
                             Tools::getValue('product_rule_'.$ruleGroupId.'_'.$ruleId.'_type'),
-                            Tools::getValue('product_rule_select_'.$ruleGroupId.'_'.$ruleId)
+                            Tools::getValue('product_rule_select_'.$ruleGroupId.'_'.$ruleId, array())
                         );
                     }
                 }
@@ -486,6 +589,7 @@ class AdminCartRulesControllerCore extends AdminController
                 ON (p.`id_product` = hrt.`id_product`)
                 LEFT JOIN `'._DB_PREFIX_.'htl_branch_info_lang` hbl
                 ON (hrt.`id_hotel` = hbl.`id` AND hbl.`id_lang` = '.(int)Context::getContext()->language->id.Shop::addSqlRestrictionOnLang('pl').')
+                WHERE p.`booking_product` = 1
 				ORDER BY name');
                 foreach ($results as $row) {
                     if($row['hotel_name']) {
@@ -497,15 +601,15 @@ class AdminCartRulesControllerCore extends AdminController
                 $products['selected'] = HotelBranchInformation::filterDataByHotelAccess(
                     $products['selected'],
                     $this->context->employee->id_profile,
-                    0,
-                    1,
+                    false,
+                    'id',
                     1
                 );
                 $products['unselected'] = HotelBranchInformation::filterDataByHotelAccess(
                     $products['unselected'],
                     $this->context->employee->id_profile,
-                    0,
-                    1,
+                    false,
+                    'id',
                     1
                 );
                 Context::getContext()->smarty->assign('product_rule_itemlist', $products);
@@ -648,10 +752,12 @@ class AdminCartRulesControllerCore extends AdminController
     public function renderForm()
     {
         $limit = 40;
-        $this->toolbar_btn['save-and-stay'] = array(
-            'href' => '#',
-            'desc' => $this->l('Save and Stay')
-        );
+        if (!Tools::getValue('liteDisplaying')) {
+            $this->toolbar_btn['save-and-stay'] = array(
+                'href' => '#',
+                'desc' => $this->l('Save and Stay')
+            );
+        }
 
         /** @var CartRule $current_object */
         $current_object = $this->loadObject(true);
@@ -768,7 +874,12 @@ class AdminCartRulesControllerCore extends AdminController
     public function displayAjaxSearchCartRuleVouchers()
     {
         $found = false;
-        if ($vouchers = CartRule::getCartsRuleByCode(Tools::getValue('q'), (int)$this->context->language->id, true)) {
+        if ($vouchers = CartRule::getCartsRuleByCode(
+            Tools::getValue('q'),
+            (int)$this->context->language->id,
+            true,
+            (int) Tools::getValue('id_customer')
+        )) {
             $found = true;
         }
         echo json_encode(array('found' => $found, 'vouchers' => $vouchers));

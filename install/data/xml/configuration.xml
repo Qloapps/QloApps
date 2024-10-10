@@ -62,12 +62,6 @@
 	<configuration id="PS_HOTEL_IMAGES_PER_PAGE" name="PS_HOTEL_IMAGES_PER_PAGE">
 		<value>9</value>
 	</configuration>
-	<configuration id="SHOW_AMENITIES_FILTER" name="SHOW_AMENITIES_FILTER">
-		<value>1</value>
-	</configuration>
-	<configuration id="SHOW_PRICE_FILTER" name="SHOW_PRICE_FILTER">
-		<value>1</value>
-	</configuration>
 	<configuration id="PS_PURCHASE_MINIMUM" name="PS_PURCHASE_MINIMUM">
 		<value>0</value>
 	</configuration>
@@ -98,8 +92,17 @@
 	<configuration id="PS_SHOP_ENABLE" name="PS_SHOP_ENABLE">
 		<value>1</value>
 	</configuration>
+	<configuration id="PS_ALLOW_EMP" name="PS_ALLOW_EMP">
+		<value>0</value>
+	</configuration>
+	<configuration id="PS_ALLOW_EMP_MAX_ATTEMPTS" name="PS_ALLOW_EMP_MAX_ATTEMPTS">
+		<value>3</value>
+	</configuration>
 	<configuration id="PS_NB_DAYS_NEW_PRODUCT" name="PS_NB_DAYS_NEW_PRODUCT">
 		<value>20</value>
+	</configuration>
+	<configuration id="PS_KPI_BEST_SELLING_ROOM_TYPE_NB_DAYS" name="PS_KPI_BEST_SELLING_ROOM_TYPE_NB_DAYS">
+		<value>30</value>
 	</configuration>
 	<configuration id="PS_SSL_ENABLED" name="PS_SSL_ENABLED">
 		<value>0</value>
@@ -224,6 +227,9 @@
 	<configuration id="PS_CONDITIONS_CMS_ID" name="PS_CONDITIONS_CMS_ID">
 		<value>3</value>
 	</configuration>
+	<configuration id="PS_ORDER_LIST_PRICE_DISPLAY_CURRENCY" name="PS_ORDER_LIST_PRICE_DISPLAY_CURRENCY">
+		<value>1</value>
+	</configuration>
 	<configuration id="TRACKING_DIRECT_TRAFFIC" name="TRACKING_DIRECT_TRAFFIC">
 		<value>0</value>
 	</configuration>
@@ -270,7 +276,7 @@
 		<value>id_shop;id_currency;id_country;id_group</value>
 	</configuration>
 	<configuration id="PS_TAX_DISPLAY" name="PS_TAX_DISPLAY">
-		<value>0</value>
+		<value>1</value>
 	</configuration>
 	<configuration id="PS_SMARTY_FORCE_COMPILE" name="PS_SMARTY_FORCE_COMPILE">
 		<value>0</value>
@@ -333,6 +339,12 @@
 		<value>cm</value>
 	</configuration>
 	<configuration id="PS_GUEST_CHECKOUT_ENABLED" name="PS_GUEST_CHECKOUT_ENABLED">
+		<value>0</value>
+	</configuration>
+    <configuration id="PS_OVERBOOKING_ORDER_ACTION" name="PS_OVERBOOKING_ORDER_ACTION">
+		<value>1</value>
+	</configuration>
+    <configuration id="PS_MAX_OVERBOOKING_PER_HOTEL_PER_DAY" name="PS_MAX_OVERBOOKING_PER_HOTEL_PER_DAY">
 		<value>0</value>
 	</configuration>
 	<configuration id="PS_ORDER_CONF_MAIL_TO_CUSTOMER" name="PS_ORDER_CONF_MAIL_TO_CUSTOMER">
@@ -434,6 +446,9 @@
 	<configuration id="PS_OS_OVERBOOKING_UNPAID" name="PS_OS_OVERBOOKING_UNPAID">
 		<value>11</value>
 	</configuration>
+    <configuration id="PS_OS_OVERBOOKING_PARTIAL_PAID" name="PS_OS_OVERBOOKING_PARTIAL_PAID">
+		<value>12</value>
+	</configuration>
 	<!-- <configuration id="PS_OS_AWAITING_PARTIAL_PAYMENT" name="PS_OS_AWAITING_PARTIAL_PAYMENT">
 		<value>13</value>
 	</configuration> -->
@@ -507,7 +522,7 @@
 		<value>1</value>
 	</configuration>
 	<configuration id="PS_TAX_ADDRESS_TYPE" name="PS_TAX_ADDRESS_TYPE">
-		<value>id_address_delivery</value>
+		<value>id_address_invoice</value>
 	</configuration>
 	<configuration id="PS_SHOP_DEFAULT" name="PS_SHOP_DEFAULT">
 		<value>1</value>
@@ -762,7 +777,7 @@
 		<value>localhost</value>
 	</configuration>
 	<configuration id="PS_SHOP_NAME" name="PS_SHOP_NAME">
-		<value>PrestaShop</value>
+		<value>QloApps</value>
 	</configuration>
 	<configuration id="PS_SHOP_EMAIL" name="PS_SHOP_EMAIL">
 		<value>pub@qloapps.com</value>
@@ -870,7 +885,7 @@
 		<value>1</value>
 	</configuration>
 	<configuration id="PS_ROUND_TYPE" name="PS_ROUND_TYPE">
-		<value>2</value>
+		<value>1</value>
 	</configuration>
 	<configuration id="PS_PRICE_DISPLAY_PRECISION" name="PS_PRICE_DISPLAY_PRECISION">
 		<value>2</value>
@@ -878,11 +893,32 @@
 	<configuration id="PS_LOG_EMAILS" name="PS_LOG_EMAILS">
 		<value>1</value>
 	</configuration>
+	<configuration id="PS_CUSTOMER_BIRTHDATE" name="PS_CUSTOMER_BIRTHDATE">
+		<value>1</value>
+	</configuration>
 	<configuration id="PS_CUSTOMER_NWSL" name="PS_CUSTOMER_NWSL">
 		<value>1</value>
 	</configuration>
 	<configuration id="PS_CUSTOMER_OPTIN" name="PS_CUSTOMER_OPTIN">
 		<value>1</value>
+	</configuration>
+	<configuration id="PS_KPI_FREQUENT_CUSTOMER_NB_ORDERS" name="PS_KPI_FREQUENT_CUSTOMER_NB_ORDERS">
+		<value>5</value>
+	</configuration>
+	<configuration id="PS_KPI_REVPAC_NB_DAYS" name="PS_KPI_REVPAC_NB_DAYS">
+		<value>30</value>
+	</configuration>
+	<configuration id="PS_KPI_CONVERSION_RATE_NB_DAYS" name="PS_KPI_CONVERSION_RATE_NB_DAYS">
+		<value>30</value>
+	</configuration>
+    <configuration id="PS_ORDER_KPI_AVG_ORDER_VALUE_NB_DAYS" name="PS_ORDER_KPI_AVG_ORDER_VALUE_NB_DAYS">
+		<value>30</value>
+	</configuration>
+    <configuration id="PS_ORDER_KPI_PER_VISITOR_PROFIT_NB_DAYS" name="PS_ORDER_KPI_PER_VISITOR_PROFIT_NB_DAYS">
+		<value>30</value>
+	</configuration>
+	<configuration id="PS_KPI_NEW_CUSTOMERS_NB_DAYS" name="PS_KPI_NEW_CUSTOMERS_NB_DAYS">
+		<value>30</value>
 	</configuration>
 	<configuration id="PS_PACK_STOCK_TYPE" name="PS_PACK_STOCK_TYPE">
 		<value>0</value>
@@ -904,6 +940,12 @@
     </configuration>
 	<configuration id="PS_SERVICE_PRODUCT_CATEGORY_FILTER" name="PS_SERVICE_PRODUCT_CATEGORY_FILTER">
       <value>1</value>
+    </configuration>
+	<configuration id="PS_BACKDATE_ORDER_SUPERADMIN" name="PS_BACKDATE_ORDER_SUPERADMIN">
+      <value>1</value>
+    </configuration>
+	<configuration id="PS_BACKDATE_ORDER_EMPLOYEES" name="PS_BACKDATE_ORDER_EMPLOYEES">
+      <value>0</value>
     </configuration>
   </entities>
 </entity_configuration>

@@ -37,7 +37,7 @@ class QloCleaner extends Module
     {
         $this->name = 'qlocleaner';
         $this->tab = 'administration';
-        $this->version = '1.0.0';
+        $this->version = '1.0.1';
         $this->author = 'PrestaShop';
         $this->need_instance = 0;
         $this->multishop_context = Shop::CONTEXT_ALL;
@@ -48,6 +48,28 @@ class QloCleaner extends Module
         $this->displayName = $this->l('QloApps Data Cleaner');
         $this->description = $this->l('Check and fix functional integrity constraints and remove default data');
         $this->secure_key = Tools::encrypt($this->name);
+    }
+
+    public function install()
+    {
+        if (!parent::install()
+            ||  !$this->registerHook('actionAdminControllerSetMedia')
+        ) {
+            return false;
+        }
+        return true;
+    }
+
+    public function hookActionAdminControllerSetMedia()
+    {
+        if (Tools::getValue('controller') == 'AdminModules'
+            && Tools::getValue('configure') == $this->name
+        ) {
+            Media::addJsDef(array(
+                'confirm_txt' => $this->l('Are you sure, you want to perform the following action?')
+            ));
+            $this->context->controller->addJS($this->_path.'views/js/qlocleaner_config.js');
+        }
     }
 
     public function getContent()
@@ -61,6 +83,7 @@ class QloCleaner extends Module
             } else {
                 $conf = $this->l('Nothing that need to be fixed please run database cleaning to clean your database');
             }
+            Hook::exec('actionCleanData', array('method' => 'checkAndFix'));
             $html .= $this->displayConfirmation($conf);
         } elseif (Tools::isSubmit('submitCleanAndOptimize')) {
             $logs = self::cleanAndOptimize();
@@ -70,12 +93,15 @@ class QloCleaner extends Module
             } else {
                 $conf = $this->l('Nothing that need to be cleaned');
             }
+            Hook::exec('actionCleanData', array('method' => 'cleanAndOptimize'));
             $html .= $this->displayConfirmation($conf);
         } elseif (Tools::getValue('submitTruncateCatalog') && Tools::getValue('checkTruncateCatalog')) {
             self::truncate('catalog');
+            Hook::exec('actionCleanData', array('method' => 'catalog'));
             $html .= $this->displayConfirmation($this->l('Catalog truncated successfuly, please run functional Integrity constraints to clean the database.'));
         } elseif (Tools::getValue('submitTruncateSales') && Tools::getValue('checkTruncateSales')) {
             self::truncate('sales');
+            Hook::exec('actionCleanData', array('method' => 'sales'));
             $html .= $this->displayConfirmation($this->l('Orders and customers truncated successfuly, please run functional Integrity constraints to clean the database'));
         }
 
@@ -244,6 +270,11 @@ class QloCleaner extends Module
                     }
                 }
 
+                Image::deleteAllImages(_PS_HOTEL_IMG_DIR_);
+                if (!file_exists(_PS_HOTEL_IMG_DIR_)) {
+                    mkdir(_PS_HOTEL_IMG_DIR_);
+                }
+
                 // Delete qlo modules's images
                 QcCleanerHelper::deleteFolderImages(
                     _PS_MODULE_DIR_.'wkabouthotelblock/views/img/hotel_interior/'
@@ -308,21 +339,6 @@ class QloCleaner extends Module
             OR date_to < "'.pSQL(date('Y-m-d')).'"
         )
         AND date_add < "'.pSQL(date('Y-m-d', strtotime('-1 month'))).'"';
-        if (Db::getInstance()->Execute($query)) {
-            if ($affected_rows = Db::getInstance()->Affected_Rows()) {
-                $logs[$query] = $affected_rows;
-            }
-        }
-
-        // Delete Qlo tables
-        $query = 'DELETE FROM `'._DB_PREFIX_.'htl_order_refund_rules`';
-        if (Db::getInstance()->Execute($query)) {
-            if ($affected_rows = Db::getInstance()->Affected_Rows()) {
-                $logs[$query] = $affected_rows;
-            }
-        }
-
-        $query = 'DELETE FROM `'._DB_PREFIX_.'htl_order_refund_rules_lang`';
         if (Db::getInstance()->Execute($query)) {
             if ($affected_rows = Db::getInstance()->Affected_Rows()) {
                 $logs[$query] = $affected_rows;
@@ -753,12 +769,7 @@ class QloCleaner extends Module
                 'customization_field',
                 'customization_field_lang',
                 'customized_data',
-                'feature',
-                'feature_lang',
                 'feature_product',
-                'feature_shop',
-                'feature_value',
-                'feature_value_lang',
                 'pack',
                 'search_index',
                 'search_word',
@@ -778,8 +789,6 @@ class QloCleaner extends Module
                 'htl_branch_info_lang',
                 'htl_image',
                 'htl_branch_features',
-                'htl_features',
-                'htl_features_lang',
                 'htl_advance_payment',
                 'htl_branch_refund_rules',
                 'htl_order_restrict_date',
@@ -845,6 +854,8 @@ class QloCleaner extends Module
             'htl_room_type_service_product_order_detail',
             'htl_room_type_service_product_cart_detail',
             'htl_hotel_service_product_cart_detail',
+            'htl_order_refund_rules',
+            'htl_order_refund_rules_lang',
         );
     }
 }

@@ -168,6 +168,15 @@ class AdminNormalProductsControllerCore extends AdminController
             $join_category = true;
         }
 
+        $priceAdditionType = array(
+            Product::PRICE_ADDITION_TYPE_WITH_ROOM => $this->l('Add price in room price'),
+            Product::PRICE_ADDITION_TYPE_INDEPENDENT => $this->l('Convenience Fee')
+        );
+        $priceCalculationMethod = array(
+            Product::PRICE_CALCULATION_METHOD_PER_BOOKING => $this->l('Add price once for the booking range'),
+            Product::PRICE_CALCULATION_METHOD_PER_DAY => $this->l('Add price for each day of booking')
+        );
+
         $this->_join .= '
 		LEFT JOIN `'._DB_PREFIX_.'stock_available` sav ON (sav.`id_product` = a.`id_product` AND sav.`id_product_attribute` = 0
 		'.StockAvailable::addSqlShopRestriction(null, null, 'sav').') ';
@@ -177,19 +186,17 @@ class AdminNormalProductsControllerCore extends AdminController
 
         $id_shop = Shop::isFeatureActive() && Shop::getContext() == Shop::CONTEXT_SHOP? (int)$this->context->shop->id : 'a.id_shop_default';
         $this->_join .= ' JOIN `'._DB_PREFIX_.'product_shop` sa ON (a.`id_product` = sa.`id_product` AND sa.id_shop = '.$id_shop.')
-                LEFT JOIN `'._DB_PREFIX_.'htl_room_type` hrt ON (a.`id_product` = hrt.`id_product`)
-                LEFT JOIN `'._DB_PREFIX_.'htl_branch_info` hb ON (hrt.`id_hotel` = hb.`id`)
-                LEFT JOIN `'._DB_PREFIX_.'htl_branch_info_lang` hbl ON (hb.`id` = hbl.`id` AND b.`id_lang` = hbl.`id_lang`)
 				LEFT JOIN `'._DB_PREFIX_.'category_lang` cl ON ('.$alias.'.`id_category_default` = cl.`id_category` AND b.`id_lang` = cl.`id_lang` AND cl.id_shop = '.$id_shop.')
 				LEFT JOIN `'._DB_PREFIX_.'shop` shop ON (shop.id_shop = '.$id_shop.')
 				LEFT JOIN `'._DB_PREFIX_.'image_shop` image_shop ON (image_shop.`id_product` = a.`id_product` AND image_shop.`cover` = 1 AND image_shop.id_shop = '.$id_shop.')
 				LEFT JOIN `'._DB_PREFIX_.'image` i ON (i.`id_image` = image_shop.`id_image`)
                 LEFT JOIN `'._DB_PREFIX_.'product_download` pd ON (pd.`id_product` = a.`id_product` AND pd.`active` = 1)
                 LEFT JOIN `'._DB_PREFIX_.'htl_room_type_service_product` rsp ON (rsp.`id_product` = a.`id_product`)
-				LEFT JOIN `'._DB_PREFIX_.'address` aa ON (aa.`id_hotel` = hb.`id`)';
+                LEFT JOIN `'._DB_PREFIX_.'htl_room_type` hrt ON (rsp.`id_element` = hrt.`id_product` AND rsp.`element_type` = '.(int)RoomTypeServiceProduct::WK_ELEMENT_TYPE_ROOM_TYPE.')
+                '.HotelBranchInformation::addHotelRestriction(false, 'hrt');
 
-        $this->_select .= ' IF(a.`auto_add_to_cart`, "'.$this->l('Yes').'", "'.$this->l('No').'") as auto_added, IF(a.`auto_add_to_cart`, 1, 0) as badge_success, (SELECT COUNT(hri.`id`) FROM `'._DB_PREFIX_.'htl_room_information` hri WHERE hri.`id_product` = a.`id_product`) as num_rooms, ';
-        $this->_select .= ' COUNT(rsp.`id_product`) as products_associated, hrt.`adults`, hrt.`children`, hb.`id` as id_hotel, aa.`city`, hbl.`hotel_name`, ';
+        $this->_select .= ' IF(a.`auto_add_to_cart`, "'.$this->l('Yes').'", "'.$this->l('No').'") as auto_added, IF(a.`auto_add_to_cart`, 1, 0) as badge_success, IF(a.`show_at_front`, "'.$this->l('Yes').'", "'.$this->l('No').'") as show_at_front_txt, IF(a.`price_calculation_method` = '.(int)Product::PRICE_CALCULATION_METHOD_PER_DAY.', "'.$this->l('Per Day').'", "'.$this->l('Per Booking').'") as price_calculation_method_txt, (SELECT COUNT(hri.`id`) FROM `'._DB_PREFIX_.'htl_room_information` hri WHERE hri.`id_product` = a.`id_product`) as num_rooms, ';
+        $this->_select .= ' COUNT(hrt.`id_product`) as products_associated, ';
         $this->_select .= 'shop.`name` AS `shopname`, a.`id_shop_default`, ';
         $this->_select .= $alias_image.'.`id_image` AS `id_image`, cl.`name` AS `name_category`, '.$alias.'.`price`, 0 AS `price_final`, a.`is_virtual`, pd.`nb_downloadable`, sav.`quantity` AS `sav_quantity`, '.$alias.'.`active`, IF(sav.`quantity`<=0, 1, 0) AS `badge_danger`';
 
@@ -201,7 +208,6 @@ class AdminNormalProductsControllerCore extends AdminController
         // show the list of the product according to the booking or service products
         $this->_where .= ' AND a.`booking_product` = 0';
 
-        $this->_use_found_rows = false;
         $this->_group = 'GROUP BY a.`id_product`';
 
         $this->fields_list = array();
@@ -227,13 +233,61 @@ class AdminNormalProductsControllerCore extends AdminController
             'title' => $this->l('Associated Rooms types'),
             'class' => 'fixed-width-sm',
             'havingFilter' => true,
+            'optional' => true,
+            'visible_default' => true,
         );
         $this->fields_list['auto_added'] = array(
             'title' => $this->l('Auto Added'),
             'filter_key' => 'a!auto_add_to_cart',
             'align' => 'text-center',
             'type' => 'bool',
+            'optional' => true,
+            'visible_default' => true,
             'badge_success' => true
+        );
+        $this->fields_list['show_at_front_txt'] = array(
+            'title' => $this->l('Show at Front'),
+            'filter_key' => 'a!show_at_front',
+            'align' => 'text-center',
+            'type' => 'bool',
+            'optional' => true,
+        );
+        $this->fields_list['available_for_order'] = array(
+            'displayed' => false,
+            'title' => $this->l('Available for order'),
+            'filter_key' => 'a!available_for_order',
+            'type' => 'bool',
+        );
+        $this->fields_list['price_addition_type'] = array(
+            'displayed' => false,
+            'title' => $this->l('Price display preference'),
+            'filter_key' => 'a!price_addition_type',
+            'type' => 'select',
+            'list' => $priceAdditionType,
+        );
+        $this->fields_list['price_calculation_method_txt'] = array(
+            'title' => $this->l('Price calculation method'),
+            'filter_key' => 'a!price_calculation_method',
+            'type' => 'select',
+            'list' => $priceCalculationMethod,
+            'visible_default' => true,
+            'optional' => true,
+        );
+        $this->servicesCategory = array();
+        $idServiceCategory = Configuration::get('PS_SERVICE_CATEGORY');
+        $this->objLocationsCategory = new Category($idServiceCategory, $this->context->language->id);
+        $nestedCategories = Category::getNestedCategories($idServiceCategory);
+        if (isset($nestedCategories[$idServiceCategory]['children']) && $nestedCategories[$idServiceCategory]['children']) {
+            foreach ($nestedCategories[$idServiceCategory]['children'] as $childCategory) {
+                $this->buildCategoryOptions($childCategory);
+            }
+        }
+        $this->fields_list['name_category'] = array(
+            'title' => $this->l('Default Category'),
+            'type' => 'select',
+            'list' => $this->servicesCategory,
+            'filter_key' => 'a!id_category_default',
+            'optional' => true,
         );
         // $serviceProductType = array(
         //     Product::SERVICE_PRODUCT_WITH_ROOMTYPE => $this->l('Bought with room type'),
@@ -285,6 +339,18 @@ class AdminNormalProductsControllerCore extends AdminController
                 'align' => 'center',
                 'position' => 'position'
             );
+        }
+    }
+
+    private function buildCategoryOptions($category)
+    {
+        $space = str_repeat('&nbsp;', 5 * (($category['level_depth'] - $this->objLocationsCategory->level_depth) - 1));
+        $this->servicesCategory[$category['id_category']] = $space.$category['name'];
+
+        if (isset($category['children']) && count($category['children'])) {
+            foreach ($category['children'] as $childCategory) {
+                $this->buildCategoryOptions($childCategory);
+            }
         }
     }
 
@@ -1326,7 +1392,10 @@ class AdminNormalProductsControllerCore extends AdminController
             parent::postProcess();
         }
 
-        if ($this->display == 'edit' || $this->display == 'add') {
+        if (in_array($this->display, array('add', 'edit'))
+            && $this->tabAccess['view'] == '1'
+            && $this->loadObject(true)
+        ) {
             $this->addJqueryUI(array(
                 'ui.core',
                 'ui.widget'
@@ -1558,6 +1627,9 @@ class AdminNormalProductsControllerCore extends AdminController
 
     public function ajaxProcessDeleteProductImage()
     {
+        if ($this->tabAccess['edit'] === '0') {
+            return die(json_encode(array('error' => $this->l('You do not have the right permission'))));
+        }
         $this->display = 'content';
         $res = true;
         /* Delete product image */
@@ -1746,6 +1818,10 @@ class AdminNormalProductsControllerCore extends AdminController
 
         $this->object = new $this->className();
         $this->_removeTaxFromEcotax();
+        if (Tools::getValue('auto_add_to_cart')) {
+            $_POST['allow_multiple_quantity'] = 0;
+        }
+
         $this->copyFromPost($this->object, $this->table);
         $this->object->service_product_type = Product::SERVICE_PRODUCT_WITH_ROOMTYPE;
 
@@ -1884,6 +1960,9 @@ class AdminNormalProductsControllerCore extends AdminController
             /** @var Product $object */
             $object = new $this->className((int)$id);
             $this->object = $object;
+            if (Tools::getValue('auto_add_to_cart')) {
+                $_POST['allow_multiple_quantity'] = 0;
+            }
 
             if (Validate::isLoadedObject($object)) {
                 $this->_removeTaxFromEcotax();
@@ -1897,6 +1976,12 @@ class AdminNormalProductsControllerCore extends AdminController
 
                 // set product visibility to none for current flow.
                 $object->visibility = 'none';
+
+                // if service is auto_added and price addition is in room price, then the tax rule is applied of room price.
+                // so setting tax rule as no tax for now
+                if ($object->auto_add_to_cart && $object->price_addition_type == Product::PRICE_ADDITION_TYPE_WITH_ROOM) {
+                    $object->id_tax_rules_group = 0;
+                }
 
                 // Duplicate combinations if not associated to shop
                 if ($this->context->shop->getContext() == Shop::CONTEXT_SHOP && !$object->isAssociatedToShop()) {
@@ -2433,6 +2518,9 @@ class AdminNormalProductsControllerCore extends AdminController
         $this->addRowAction('edit');
         $this->addRowAction('duplicate');
         $this->addRowAction('delete');
+
+        $this->_new_list_header_design = true;
+
         return parent::renderList();
     }
 
@@ -2732,9 +2820,7 @@ class AdminNormalProductsControllerCore extends AdminController
         }
 
         // let's calculate this once for all
-        if (!Validate::isLoadedObject($this->object) && Tools::getValue('id_product')) {
-            $this->errors[] = 'Unable to load object';
-        } else {
+        if ($this->loadObject(true)) {
             $this->_displayDraftWarning($this->object->active);
 
             // if there was an error while saving, we don't want to lose posted data
@@ -2791,16 +2877,51 @@ class AdminNormalProductsControllerCore extends AdminController
     public function updateLinkedHotelsAndRooms($product)
     {
         if (Validate::isLoadedObject($product)) {
-            RoomTypeServiceProduct::deleteRoomProductLink($product->id);
-
+            $objRoomTypeServiceProduct = new RoomTypeServiceProduct();
+            $associatedRoomTypes = $objRoomTypeServiceProduct->getAssociatedHotelsAndRoomType($product->id)['room_type'];
             if (Product::SERVICE_PRODUCT_WITH_ROOMTYPE == $product->service_product_type) {
-                $objRoomTypeServiceProduct = new RoomTypeServiceProduct();
-                // add product link for room types
-                if ($selectedRoomTypes = Tools::getValue('roomTypeBox')) {
+                $selectedRoomTypes = Tools::getValue('room_type_box');
+
+                // Generate list of new associations
+                $newRoomTypes = array();
+                foreach ($selectedRoomTypes as $selectedRoomType) {
+                    if (!in_array($selectedRoomType, $associatedRoomTypes)) {
+                        $newRoomTypes[] = $selectedRoomType;
+                    }
+                }
+
+                // Generate list of associations to remove
+                $removedRoomTypes = array();
+                foreach ($associatedRoomTypes as $associatedRoomType) {
+                    if (!in_array($associatedRoomType, $selectedRoomTypes)) {
+                        $removedRoomTypes[] = $associatedRoomType;
+                    }
+                }
+
+                // Remove associations
+                foreach ($removedRoomTypes as $removedRoomType) {
+                    RoomTypeServiceProduct::deleteRoomProductLink(
+                        $product->id,
+                        RoomTypeServiceProduct::WK_ELEMENT_TYPE_ROOM_TYPE,
+                        $removedRoomType
+                    );
+                }
+
+                // Save new associations
+                if ($newRoomTypes) {
                     $objRoomTypeServiceProduct->addRoomProductLink(
                         $product->id,
-                        $selectedRoomTypes,
+                        $newRoomTypes,
                         RoomTypeServiceProduct::WK_ELEMENT_TYPE_ROOM_TYPE
+                    );
+                }
+            } else {
+                // Remove associations
+                foreach ($associatedRoomTypes as $associatedRoomType) {
+                    RoomTypeServiceProduct::deleteRoomProductLink(
+                        $product->id,
+                        RoomTypeServiceProduct::WK_ELEMENT_TYPE_ROOM_TYPE,
+                        $associatedRoomType
                     );
                 }
             }
@@ -2874,7 +2995,7 @@ class AdminNormalProductsControllerCore extends AdminController
                 ->setUseSearch(false)
                 ->setFullTree(0)
                 ->setSelectedCategories($categories)
-                ->setUseBulkActions(false);
+                ->setUseBulkActions(true);
 
             $data->assign(array('default_category' => $default_category,
                         'selected_cat_ids' => implode(',', array_keys($selected_cat)),
@@ -2959,7 +3080,7 @@ class AdminNormalProductsControllerCore extends AdminController
         } else {
             $address->id_country = (int)$address_infos['id_country'];
             $address->id_state = (int)$address_infos['id_state'];
-            $address->zipcode = $address_infos['postcode'];
+            $address->postcode = $address_infos['postcode'];
         }
         $tax_rules_groups = TaxRulesGroup::getTaxRulesGroups(true);
         $tax_rates = array(
@@ -3381,18 +3502,17 @@ class AdminNormalProductsControllerCore extends AdminController
 
         $objRoomTypeServiceProduct = new RoomTypeServiceProduct();
         $selectedElements = $objRoomTypeServiceProduct->getAssociatedHotelsAndRoomType($product->id);
-        $tree = new HelperTreeHotels('associated-hotels-tree', 'Associated hotels');
-        $tree->setTemplate('tree_associated_hotels.tpl')
-            ->setHeaderTemplate('tree_associated_header.tpl')
-            ->setRootCategory((int)Configuration::get('PS_LOCATIONS_CATEGORY'))
-            ->setUseCheckBox(true)
-            ->setFullTree(true)
-            ->setRoomsOnly(false)
-            ->setSelectedHotels($selectedElements['hotels'])
-            ->setSelectedRoomTypes($selectedElements['room_types'])
-            ->setUseBulkActions(false)
-            ->setAccessedHotels(HotelBranchInformation::getProfileAccessedHotels($this->context->employee->id_profile, 1, 0));
 
+        $tree = new HelperTree('hotels-tree');
+        $tree->setData(HotelHelper::generateTreeData([
+                'rootNode' => HotelHelper::NODE_HOTEL,
+                'leafNode' => HotelHelper::NODE_ROOM_TYPE,
+                'selectedElements' => $selectedElements
+            ]))
+            ->setUseCheckBox(true)
+            ->setAutoSelectChildren(true)
+            ->setUseBulkActions(true)
+            ->setUseSearch(true);
         $data->assign('hotel_tree', $tree->render());
 
         // TinyMCE
@@ -3462,125 +3582,130 @@ class AdminNormalProductsControllerCore extends AdminController
 
     public function ajaxProcessaddProductImage()
     {
-        self::$currentIndex = 'index.php?tab=AdminNormalProducts';
-        $product = new Product((int)Tools::getValue('id_product'));
-        $legends = Tools::getValue('legend');
-
-        if (!is_array($legends)) {
-            $legends = (array)$legends;
-        }
-
-        if (!Validate::isLoadedObject($product)) {
-            $files = array();
-            $files[0]['error'] = Tools::displayError('Cannot add image because product creation failed.');
-        }
-
+        $files = array();
         $image_uploader = new HelperImageUploader('file');
-        $image_uploader->setAcceptTypes(array('jpeg', 'gif', 'png', 'jpg'))->setMaxSize($this->max_image_size);
-        $files = $image_uploader->process();
+        if ($this->tabAccess['edit'] === '0') {
+            $files[0]['name'] = $this->l('Error');
+            $files[0]['error'] = Tools::displayError('You do not have the right permission.');
+        } else {
+            self::$currentIndex = 'index.php?tab=AdminNormalProducts';
+            $product = new Product((int)Tools::getValue('id_product'));
+            $legends = Tools::getValue('legend');
 
-        foreach ($files as &$file) {
-            $image = new Image();
-            $image->id_product = (int)($product->id);
-            $image->position = Image::getHighestPosition($product->id) + 1;
-
-            foreach ($legends as $key => $legend) {
-                if (!empty($legend)) {
-                    $image->legend[(int)$key] = $legend;
-                }
+            if (!is_array($legends)) {
+                $legends = (array)$legends;
             }
 
-            if (!Image::getCover($image->id_product)) {
-                $image->cover = 1;
-            } else {
-                $image->cover = 0;
+            if (!Validate::isLoadedObject($product)) {
+                $files[0]['error'] = Tools::displayError('Cannot add image because product creation failed.');
             }
 
-            if (($validate = $image->validateFieldsLang(false, true)) !== true) {
-                $file['error'] = Tools::displayError($validate);
-            }
+            $image_uploader->setAcceptTypes(array('jpeg', 'gif', 'png', 'jpg'))->setMaxSize($this->max_image_size);
+            $files = $image_uploader->process();
 
-            if (isset($file['error']) && (!is_numeric($file['error']) || $file['error'] != 0)) {
-                continue;
-            }
+            foreach ($files as &$file) {
+                $image = new Image();
+                $image->id_product = (int)($product->id);
+                $image->position = Image::getHighestPosition($product->id) + 1;
 
-            if (!$image->add()) {
-                $file['error'] = Tools::displayError('Error while creating additional image');
-            } else {
-                if (!$new_path = $image->getPathForCreation()) {
-                    $file['error'] = Tools::displayError('An error occurred during new folder creation');
-                    continue;
-                }
-
-                $error = 0;
-
-                if (!ImageManager::resize($file['save_path'], $new_path.'.'.$image->image_format, null, null, 'jpg', false, $error)) {
-                    switch ($error) {
-                        case ImageManager::ERROR_FILE_NOT_EXIST :
-                            $file['error'] = Tools::displayError('An error occurred while copying image, the file does not exist anymore.');
-                            break;
-
-                        case ImageManager::ERROR_FILE_WIDTH :
-                            $file['error'] = Tools::displayError('An error occurred while copying image, the file width is 0px.');
-                            break;
-
-                        case ImageManager::ERROR_MEMORY_LIMIT :
-                            $file['error'] = Tools::displayError('An error occurred while copying image, check your memory limit.');
-                            break;
-
-                        default:
-                            $file['error'] = Tools::displayError('An error occurred while copying image.');
-                            break;
+                foreach ($legends as $key => $legend) {
+                    if (!empty($legend)) {
+                        $image->legend[(int)$key] = $legend;
                     }
-                    continue;
+                }
+
+                if (!Image::getCover($image->id_product)) {
+                    $image->cover = 1;
                 } else {
-                    $imagesTypes = ImageType::getImagesTypes('products');
-                    $generate_hight_dpi_images = (bool)Configuration::get('PS_HIGHT_DPI');
+                    $image->cover = 0;
+                }
 
-                    foreach ($imagesTypes as $imageType) {
-                        if (!ImageManager::resize($file['save_path'], $new_path.'-'.stripslashes($imageType['name']).'.'.$image->image_format, $imageType['width'], $imageType['height'], $image->image_format)) {
-                            $file['error'] = Tools::displayError('An error occurred while copying image:').' '.stripslashes($imageType['name']);
-                            continue;
+                if (($validate = $image->validateFieldsLang(false, true)) !== true) {
+                    $file['error'] = Tools::displayError($validate);
+                }
+
+                if (isset($file['error']) && (!is_numeric($file['error']) || $file['error'] != 0)) {
+                    continue;
+                }
+
+                if (!$image->add()) {
+                    $file['error'] = Tools::displayError('Error while creating additional image');
+                } else {
+                    if (!$new_path = $image->getPathForCreation()) {
+                        $file['error'] = Tools::displayError('An error occurred during new folder creation');
+                        continue;
+                    }
+
+                    $error = 0;
+
+                    if (!ImageManager::resize($file['save_path'], $new_path.'.'.$image->image_format, null, null, 'jpg', false, $error)) {
+                        switch ($error) {
+                            case ImageManager::ERROR_FILE_NOT_EXIST :
+                                $file['error'] = Tools::displayError('An error occurred while copying image, the file does not exist anymore.');
+                                break;
+
+                            case ImageManager::ERROR_FILE_WIDTH :
+                                $file['error'] = Tools::displayError('An error occurred while copying image, the file width is 0px.');
+                                break;
+
+                            case ImageManager::ERROR_MEMORY_LIMIT :
+                                $file['error'] = Tools::displayError('An error occurred while copying image, check your memory limit.');
+                                break;
+
+                            default:
+                                $file['error'] = Tools::displayError('An error occurred while copying image.');
+                                break;
                         }
+                        continue;
+                    } else {
+                        $imagesTypes = ImageType::getImagesTypes('products');
+                        $generate_hight_dpi_images = (bool)Configuration::get('PS_HIGHT_DPI');
 
-                        if ($generate_hight_dpi_images) {
-                            if (!ImageManager::resize($file['save_path'], $new_path.'-'.stripslashes($imageType['name']).'2x.'.$image->image_format, (int)$imageType['width']*2, (int)$imageType['height']*2, $image->image_format)) {
+                        foreach ($imagesTypes as $imageType) {
+                            if (!ImageManager::resize($file['save_path'], $new_path.'-'.stripslashes($imageType['name']).'.'.$image->image_format, $imageType['width'], $imageType['height'], $image->image_format)) {
                                 $file['error'] = Tools::displayError('An error occurred while copying image:').' '.stripslashes($imageType['name']);
                                 continue;
                             }
+
+                            if ($generate_hight_dpi_images) {
+                                if (!ImageManager::resize($file['save_path'], $new_path.'-'.stripslashes($imageType['name']).'2x.'.$image->image_format, (int)$imageType['width']*2, (int)$imageType['height']*2, $image->image_format)) {
+                                    $file['error'] = Tools::displayError('An error occurred while copying image:').' '.stripslashes($imageType['name']);
+                                    continue;
+                                }
+                            }
                         }
                     }
+
+                    unlink($file['save_path']);
+                    //Necesary to prevent hacking
+                    unset($file['save_path']);
+                    Hook::exec('actionWatermark', array('id_image' => $image->id, 'id_product' => $product->id));
+
+                    if (!$image->update()) {
+                        $file['error'] = Tools::displayError('Error while updating status');
+                        continue;
+                    }
+
+                    // Associate image to shop from context
+                    $shops = Shop::getContextListShopID();
+                    $image->associateTo($shops);
+                    $json_shops = array();
+
+                    foreach ($shops as $id_shop) {
+                        $json_shops[$id_shop] = true;
+                    }
+
+                    $file['status']   = 'ok';
+                    $file['id']       = $image->id;
+                    $file['position'] = $image->position;
+                    $file['cover']    = $image->cover;
+                    $file['legend']   = $image->legend;
+                    $file['path']     = $image->getExistingImgPath();
+                    $file['shops']    = $json_shops;
+
+                    @unlink(_PS_TMP_IMG_DIR_.'product_'.(int)$product->id.'.jpg');
+                    @unlink(_PS_TMP_IMG_DIR_.'product_mini_'.(int)$product->id.'_'.$this->context->shop->id.'.jpg');
                 }
-
-                unlink($file['save_path']);
-                //Necesary to prevent hacking
-                unset($file['save_path']);
-                Hook::exec('actionWatermark', array('id_image' => $image->id, 'id_product' => $product->id));
-
-                if (!$image->update()) {
-                    $file['error'] = Tools::displayError('Error while updating status');
-                    continue;
-                }
-
-                // Associate image to shop from context
-                $shops = Shop::getContextListShopID();
-                $image->associateTo($shops);
-                $json_shops = array();
-
-                foreach ($shops as $id_shop) {
-                    $json_shops[$id_shop] = true;
-                }
-
-                $file['status']   = 'ok';
-                $file['id']       = $image->id;
-                $file['position'] = $image->position;
-                $file['cover']    = $image->cover;
-                $file['legend']   = $image->legend;
-                $file['path']     = $image->getExistingImgPath();
-                $file['shops']    = $json_shops;
-
-                @unlink(_PS_TMP_IMG_DIR_.'product_'.(int)$product->id.'.jpg');
-                @unlink(_PS_TMP_IMG_DIR_.'product_mini_'.(int)$product->id.'_'.$this->context->shop->id.'.jpg');
             }
         }
 

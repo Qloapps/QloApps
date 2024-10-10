@@ -68,22 +68,27 @@ class RoomTypeServiceProductOrderDetail extends ObjectModel
         $getTotalPrice = 0,
         $useTax = null,
         $autoAddToCart = 0,
-        $priceAdditionType = null
+        $priceAdditionType = null,
+        $idOrderDetail = 0,
+        $idHtlBookingDetail = 0
     ) {
-
         if ($useTax === null) {
             $useTax = Product::$_taxCalculationMethod == PS_TAX_EXC ? false : true;
         }
 
         $sql = 'SELECT rsod.*';
         if (!$getTotalPrice) {
-            $sql .= ', hbd.`id_product` as `room_type_id_product`, od.`product_allow_multiple_quantity`, hbd.`id_room`, hbd.`adults`, hbd.`children`';
+            $sql .= ', hbd.`id_product` as `room_type_id_product`, od.`product_allow_multiple_quantity`, od.`product_price_calculation_method`, hbd.`id_room`, hbd.`adults`, hbd.`children`';
         }
         $sql .= ' FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
             LEFT JOIN `'._DB_PREFIX_.'htl_room_type_service_product_order_detail` rsod ON(rsod.`id_htl_booking_detail` = hbd.`id`)';
 
         $sql .= ' LEFT JOIN `'._DB_PREFIX_.'order_detail` od ON(od.`id_order_detail` = rsod.`id_order_detail`)';
         $sql .= ' WHERE rsod.`id_order` = '.(int)$idOrder;
+
+        if ($idOrderDetail) {
+            $sql .= ' AND rsod.`id_order_detail` = '.(int)$idOrderDetail;
+        }
 
         if (!is_null($autoAddToCart)) {
             $sql .= ' AND od.`product_auto_add` = '. (int)$autoAddToCart;
@@ -105,6 +110,9 @@ class RoomTypeServiceProductOrderDetail extends ObjectModel
         }
         if ($idRoom) {
             $sql .= ' AND hbd.`id_room`='.(int) $idRoom;
+        }
+        if ($idHtlBookingDetail) {
+            $sql .= ' AND hbd.`id` = '.(int)$idHtlBookingDetail;
         }
         $sql .= ' ORDER BY hbd.`id`';
 
@@ -144,6 +152,7 @@ class RoomTypeServiceProductOrderDetail extends ObjectModel
                             'product_tax' => $product_tax,
                             'product_tax_label' => $product_tax_label,
                             'allow_multiple_quantity' => $product['product_allow_multiple_quantity'],
+                            'price_calculation_method' => $product['product_price_calculation_method'],
                             'total_price_tax_excl' => $product['total_price_tax_excl'],
                             'total_price_tax_incl' => $product['total_price_tax_incl'],
                         );
@@ -167,6 +176,7 @@ class RoomTypeServiceProductOrderDetail extends ObjectModel
                                 'name' => $product['name'],
                                 'quantity' => $product['quantity'],
                                 'allow_multiple_quantity' => $product['product_allow_multiple_quantity'],
+                                'price_calculation_method' => $product['product_price_calculation_method'],
                                 'product_tax' => $product_tax,
                                 'product_tax_label' => $product_tax_label,
                                 'total_price_tax_excl' => $product['total_price_tax_excl'],
@@ -187,7 +197,9 @@ class RoomTypeServiceProductOrderDetail extends ObjectModel
     public function getSelectedServicesForRoom(
         $idHotelBookingDetail,
         $getTotalPrice = 0,
-        $useTax = null
+        $useTax = null,
+        $autoAddToCart = null,
+        $priceAdditionType = null
     ) {
 
         if ($useTax === null) {
@@ -196,15 +208,23 @@ class RoomTypeServiceProductOrderDetail extends ObjectModel
 
         $sql = 'SELECT rsod.*';
         if (!$getTotalPrice) {
-            $sql .= ', hbd.`id_product` as `room_type_id_product`, hbd.`id_room`, od.`product_allow_multiple_quantity`,
+            $sql .= ', hbd.`id_product` as `room_type_id_product`, hbd.`id_room`, od.`product_allow_multiple_quantity`, p.`max_quantity`,
                 od.`product_auto_add`, od.`product_price_calculation_method`, od.`product_price_addition_type`';
         }
         $sql .= ' FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
             INNER JOIN `'._DB_PREFIX_.'htl_room_type_service_product_order_detail` rsod ON(rsod.`id_htl_booking_detail` = hbd.`id`)';
 
         $sql .= ' LEFT JOIN `'._DB_PREFIX_.'order_detail` od ON(od.`id_order_detail` = rsod.`id_order_detail`)';
+        $sql .= ' LEFT JOIN `'._DB_PREFIX_.'product` p ON (p.`id_product` = rsod.`id_product`)';
 
         $sql .= ' WHERE hbd.`id` = '.(int)$idHotelBookingDetail;
+
+        if (!is_null($autoAddToCart)) {
+            $sql .= ' AND od.`product_auto_add` = '. (int)$autoAddToCart;
+            if ($autoAddToCart == 1 && !is_null($priceAdditionType)) {
+                $sql .= ' AND od.`product_price_addition_type` = '.$priceAdditionType;
+            }
+        }
 
         if ($getTotalPrice) {
             $totalPrice = 0;
@@ -229,6 +249,7 @@ class RoomTypeServiceProductOrderDetail extends ObjectModel
                             'name' => $product['name'],
                             'quantity' => $product['quantity'],
                             'allow_multiple_quantity' => $product['product_allow_multiple_quantity'],
+                            'max_quantity' => $product['max_quantity'],
                             'product_auto_add' => $product['product_auto_add'],
                             'product_price_addition_type' => $product['product_price_addition_type'],
                             'product_price_calculation_method' => $product['product_price_calculation_method'],
@@ -253,6 +274,7 @@ class RoomTypeServiceProductOrderDetail extends ObjectModel
                                 'name' => $product['name'],
                                 'quantity' => $product['quantity'],
                                 'allow_multiple_quantity' => $product['product_allow_multiple_quantity'],
+                                'max_quantity' => $product['max_quantity'],
                                 'product_auto_add' => $product['product_auto_add'],
                                 'product_price_addition_type' => $product['product_price_addition_type'],
                                 'product_price_calculation_method' => $product['product_price_calculation_method'],

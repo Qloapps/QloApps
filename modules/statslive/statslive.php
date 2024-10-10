@@ -36,7 +36,7 @@ class StatsLive extends Module
     {
         $this->name = 'statslive';
         $this->tab = 'analytics_stats';
-        $this->version = '1.3.2';
+        $this->version = '1.3.3';
         $this->author = 'PrestaShop';
         $this->need_instance = 0;
 
@@ -89,6 +89,7 @@ class StatsLive extends Module
 					ORDER BY u.firstname, u.lastname';
         }
         $results = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql);
+		$this->updatePageTypeAlias($results);
 
         return array($results, Db::getInstance()->NumRows());
     }
@@ -130,9 +131,19 @@ class StatsLive extends Module
         }
 
         $results = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql);
+		$this->updatePageTypeAlias($results);
 
         return array($results, Db::getInstance()->NumRows());
     }
+
+	public function updatePageTypeAlias(&$result)
+	{
+		if (count($result)) {
+			foreach ($result as &$customer) {
+				$customer['page'] = Page::getPageTypeAlias($customer['page']);
+			}
+		}
+	}
 
     public function hookAdminStatsModules($params)
     {

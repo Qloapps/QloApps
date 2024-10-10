@@ -33,13 +33,9 @@ class CheckoutCustomerDetailsStepCore extends AbstractCheckoutStepCore
         if (Tools::getValue('proceed_to_customer_dtl')) {
             $this->step_is_reachable = 1;
             $this->step_is_current = 1;
-            if ($idAddressDelivery) {
-                if (!Validate::isLoadedObject($objAddress)) {
-                    if ($this->context->cookie->__get('customer_details_proceeded')) {
-                        $this->step_is_current = 0;
-                        $this->step_is_complete = 1;
-                    }
-                }
+            if ($this->context->cookie->__get('customer_details_proceeded')) {
+                $this->step_is_current = 0;
+                $this->step_is_complete = 1;
             }
         } elseif (Tools::getValue('proceed_to_payment')) {
             $guestInfoComplete = true;
@@ -52,34 +48,20 @@ class CheckoutCustomerDetailsStepCore extends AbstractCheckoutStepCore
             }
             $this->step_is_reachable = 1;
             $this->step_is_current = 1;
-            if ($idAddressDelivery && $guestInfoComplete) {
-                if (Validate::isLoadedObject($objAddress)) {
-                    $this->step_is_current = 0;
-                    $this->step_is_complete = 1;
-                    $this->context->cookie->__set('customer_details_proceeded', 1);
-                }
+            if ($guestInfoComplete) {
+                $this->step_is_current = 0;
+                $this->step_is_complete = 1;
+                $this->context->cookie->__set('customer_details_proceeded', 1);
             }
         } elseif ($this->context->cookie->__get('customer_details_proceeded')
             || $this->context->cookie->__get('cart_summary_proceeded')
         ) {
-            if ($idAddressDelivery) {
-                if (!Validate::isLoadedObject($objAddress)) {
-                    $this->context->cookie->__set('customer_details_proceeded', 0);
-                    $this->step_is_reachable = 1;
-                    $this->step_is_current = 1;
-                }
-            } else {
-                $this->step_is_reachable = 1;
-                $this->step_is_current = 1;
-                $this->context->cookie->__set('customer_details_proceeded', 0);
-            }
         } elseif ($this->context->customer->logged) {
             $this->step_is_reachable = 1;
             if ($idAddressDelivery) {
                 $this->step_is_complete = 1;
             } else {
                 $this->step_is_complete = 0;
-                $this->step_is_current = 1;
             }
         }
     }

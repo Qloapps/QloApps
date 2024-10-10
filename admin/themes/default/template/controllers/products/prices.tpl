@@ -265,7 +265,7 @@ $(document).ready(function () {
 	</div>
 
 	<!-- by webkul -->
-	{if $WK_ALLOW_ADVANCED_PAYMENT}
+	{if isset($WK_ALLOW_ADVANCED_PAYMENT) && $WK_ALLOW_ADVANCED_PAYMENT}
 		<div class="form-group">
 			<div class="col-lg-1"><span class="pull-right">{include file="controllers/products/multishop/checkbox.tpl" field="price" type="price"}</span></div>
 			<label class="control-label col-sm-2">
@@ -494,7 +494,7 @@ $(document).ready(function () {
 				<div class="col-lg-9">
 					<div class="row">
 					{if !$multi_shop}
-						<input type="hidden" name="sp_id_shop" value="0" />
+						<input type="hidden" name="sp_id_shop" value="1" />
 					{else}
 						<div class="col-lg-3">
 							<select name="sp_id_shop" id="sp_id_shop">

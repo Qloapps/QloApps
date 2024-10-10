@@ -357,7 +357,7 @@ class ProductCore extends ObjectModel
             ),
             'name' =>                        array('type' => self::TYPE_STRING, 'lang' => true, 'validate' => 'isCatalogName', 'required' => true, 'size' => 128),
             'description' =>                array('type' => self::TYPE_HTML, 'lang' => true, 'validate' => 'isCleanHtml'),
-            'description_short' =>            array('type' => self::TYPE_HTML, 'lang' => true, 'validate' => 'isCleanHtml'),
+            'description_short' =>            array('type' => self::TYPE_STRING, 'lang' => true, 'validate' => 'isCleanHtml'),
             'available_now' =>                array('type' => self::TYPE_STRING, 'lang' => true, 'validate' => 'isGenericName', 'size' => 255),
             'available_later' =>            array('type' => self::TYPE_STRING, 'lang' => true, 'validate' => 'IsGenericName', 'size' => 255),
         ),
@@ -373,36 +373,22 @@ class ProductCore extends ObjectModel
 
     protected $webserviceParameters = array(
         'objectMethods' => array(
-            'add' => 'addWs',
-            'update' => 'updateWs',
+            'add' => 'addWsRoomType',
+            'update' => 'updateWsRoomType',
             'delete' => 'deleteWs'
         ),
-
         'objectsNodeName' => 'room_types',
         'objectNodeName' => 'room_type',
+        'retrieveData' => array(
+            'retrieveMethod' => 'getRoomTypesObjectList'
+        ),
         'fields' => array(
-            'id_hotel' => array(
-                'getter' => 'getWsHotel',
-                'setter' => 'setWsHotel',
-                'xlink_resource' => 'hotels'
-            ),
-            'adults' => array(
-                'getter' => 'getWsAdults',
-                'setter' => 'setWsAdults',
-            ),
-            'children' => array(
-                'getter' => 'getWsChildren',
-                'setter' => 'setWsChildren',
-            ),
-            'id_manufacturer' => array(
-                'xlink_resource' => 'manufacturers'
-            ),
-            'id_supplier' => array(
-                'xlink_resource' => 'suppliers'
-            ),
-            'id_category_default' => array(
-                'xlink_resource' => 'categories'
-            ),
+            'id_hotel' => array('getter' => 'getWsHotel','setter' => 'setWsHotel', 'xlink_resource' => 'hotels'),
+            'adults' => array('getter' => 'getWsAdults','setter' => 'setWsAdults'),
+            'children' => array('getter' => 'getWsChildren','setter' => 'setWsChildren'),
+            'id_manufacturer' => array('xlink_resource' => 'manufacturers'),
+            'id_supplier' => array('xlink_resource' => 'suppliers'),
+            'id_category_default' => array('xlink_resource' => 'categories'),
             'new' => array(),
             'cache_default_attribute' => array(),
             'id_default_image' => array(
@@ -420,36 +406,28 @@ class ProductCore extends ObjectModel
             //         'resourceName' => 'combinations'
             //     )
             // ),
-            'id_tax_rules_group' => array(
-                'xlink_resource' => array(
-                    'resourceName' => 'tax_rule_groups'
-                )
-            ),
-            'position_in_category' => array(
-                'getter' => 'getWsPositionInCategory',
-                'setter' => 'setWsPositionInCategory'
-            ),
+            'id_tax_rules_group' => array('xlink_resource' => array('resourceName' => 'tax_rule_groups')),
+            'position_in_category' => array('getter' => 'getWsPositionInCategory', 'setter' => 'setWsPositionInCategory'),
             // 'manufacturer_name' => array(
             //     'getter' => 'getWsManufacturerName',
             //     'setter' => false
             // ),
-            'quantity' => array(
-                'getter' => false,
-                'setter' => false
-            ),
-            'type' => array(
-                'getter' => 'getWsType',
-                'setter' => 'setWsType',
-            ),
-            'id_advance_paypent' => array(
-                'xlink_resource' => array(
-                    'resourceName' => 'advance_payments'
-                ),
-                'getter' => 'getWsRoomTypeAdvancePayment',
-                'setter' => false
-            ),
+            'type' => array('getter' => 'getWsType', 'setter' => 'setWsType'),
         ),
         'associations' => array(
+            'advance_payments' => array(
+                'resource' => 'advance_payment',
+                'getter' => 'getWsAdvancePayments',
+                'setter' => 'setWsAdvancePayments',
+                'fields' => array(
+                    'id' => array(),
+                    'payment_type' => array(),
+                    'tax_include' => array(),
+                    'value' => array(),
+                    'active' => array(),
+                    'calculate_from' => array(),
+                ),
+            ),
             'categories' => array(
                 'resource' => 'category',
                 'fields' => array(
@@ -466,7 +444,8 @@ class ProductCore extends ObjectModel
                     'id' => array('required' => true),
                 )
             ),
-            'tags' => array('resource' => 'tag',
+            'tags' => array(
+                'resource' => 'tag',
                 'fields' => array(
                     'id' => array('required' => true),
                 )
@@ -484,12 +463,77 @@ class ProductCore extends ObjectModel
                 )
             ),
             'extra_demands' => array(
-                'setter' => false,
                 'resource' => 'extra_demand',
+                'fields' => array(
+                    'id' => array('required' => true),
+                    'id_option' => array(),
+                    'price' => array(),
+                )
+            ),
+            'services' => array(
+                'resource' => 'service',
+                'fields' => array(
+                    'id' => array('validate' => 'isUnsignedId', 'required' => true),
+                    'price' => array('validate' => 'isPrice', 'required' => true),
+                    'id_tax_rules_group' => array('validate' => 'isUnsignedId')
+                )
+            ),
+        ),
+        'hidden_fields' => array(
+            'booking_product',
+            'service_product_type'
+        ),
+    );
+
+    protected $webserviceServicesParameters = array(
+        'objectMethods' => array(
+            'add' => 'addWsServices',
+            'update' => 'updateWsServices',
+            'delete' => 'deleteWs'
+        ),
+        'objectsNodeName' => 'services',
+        'objectNodeName' => 'service',
+        'retrieveData' => array(
+            'retrieveMethod' => 'getServicesObjectList'
+        ),
+        'fields' => array(
+            'id_manufacturer' => array('xlink_resource' => 'manufacturers'),
+            'id_supplier' => array('xlink_resource' => 'suppliers'),
+            'id_category_default' => array('xlink_resource' => 'categories'),
+            'new' => array(),
+            'cache_default_attribute' => array(),
+            'id_default_image' => array(
+                'getter' => 'getCoverWs',
+                'setter' => 'setCoverWs',
+                'xlink_resource' => array(
+                    'resourceName' => 'images',
+                    'subResourceName' => 'room_types'
+                )
+            ),
+            'id_tax_rules_group' => array('xlink_resource' => array('resourceName' => 'tax_rule_groups')),
+            'position_in_category' => array('getter' => 'getWsPositionInCategory', 'setter' => 'setWsPositionInCategory'),
+            // 'manufacturer_name' => array(
+            //     'getter' => 'getWsManufacturerName',
+            //     'setter' => false
+            // ),
+            'quantity' => array('getter' => false, 'setter' => false),
+            'type' => array('getter' => 'getWsType', 'setter' => 'setWsType'),
+        ),
+        'associations' => array(
+            'categories' => array(
+                'resource' => 'category',
+                'fields' => array('id' => array('required' => true))
+            ),
+            'images' => array('resource' => 'image', 'fields' => array('id' => array())),
+            'feature_prices' => array(
+                'setter' => false, 'resource' => 'feature_price',
                 'fields' => array(
                     'id' => array('required' => true),
                 )
             ),
+        ),
+        'hidden_fields' => array(
+            'booking_product',
         ),
     );
 
@@ -649,12 +693,12 @@ class ProductCore extends ObjectModel
      * @param int $position
      * return boolean Update result
      */
-    public function updatePosition($way, $position)
+    public function updatePosition($way, $position, $id_category = null)
     {
         if (!$res = Db::getInstance()->executeS('
             SELECT cp.`id_product`, cp.`position`, cp.`id_category`
             FROM `'._DB_PREFIX_.'category_product` cp
-            WHERE cp.`id_category` = '.(int)Tools::getValue('id_category', 1).'
+            WHERE cp.`id_category` = '.(int) ($id_category ? $id_category: Tools::getValue('id_category', 1)).'
             ORDER BY cp.`position` ASC')
             ) {
             return false;
@@ -1454,23 +1498,25 @@ class ProductCore extends ObjectModel
         return $result;
     }
 
-    public function getServiceProducts($idLang, $front = false, $context = false)
+    public function getServiceProducts($active = null, $serviceProductType = null, $idLang = null, $orderBy = 'pl.name', $orderWay = 'ASC')
     {
-        if (!$context) {
-            $context = Context::getContext();
+        if (!$idLang) {
+            $idLang = Context::getContext()->language->id;
         }
-        $sql = 'SELECT p.*, product_shop.*, pl.*, image_shop.`id_image` id_image, il.`legend` as legend
-		        FROM `'._DB_PREFIX_.'product` p
-				'.Shop::addSqlAssociation('product', 'p').'
-				LEFT JOIN `'._DB_PREFIX_.'product_lang` pl ON (p.`id_product` = pl.`id_product` '.Shop::addSqlRestrictionOnLang('pl').')
-                LEFT JOIN `'._DB_PREFIX_.'image_shop` image_shop
-					ON (image_shop.`id_product` = p.`id_product` AND image_shop.cover=1 AND image_shop.id_shop='.(int)$context->shop->id.')
-				LEFT JOIN `'._DB_PREFIX_.'image_lang` il
-					ON (image_shop.`id_image` = il.`id_image`
-					AND il.`id_lang` = '.(int)$idLang.')';
-        $sql .= 'WHERE pl.`id_lang` = '.(int)$idLang.' AND p.`booking_product` = 0
-                AND p.`service_product_type` = '.Product::SERVICE_PRODUCT_WITHOUT_ROOMTYPE.'
-				ORDER BY pl.`name`';
+
+        $sql = 'SELECT p.*, pl.*, i.`id_image`, il.`legend` AS legend
+        FROM `'._DB_PREFIX_.'product` p
+        LEFT JOIN `'._DB_PREFIX_.'product_lang` pl ON (pl.`id_product` = p.`id_product` AND pl.`id_lang` = '.(int) $idLang.')
+        LEFT JOIN `'._DB_PREFIX_.'image` i ON (i.`id_product` = p.`id_product` AND i.`cover` = 1)
+        LEFT JOIN `'._DB_PREFIX_.'image_lang` il ON (il.`id_image` = i.`id_image` AND il.`id_lang` = '.(int) $idLang.')
+        WHERE p.`booking_product` = 0'.
+        (!is_null($active) ? ' AND p.`active` = '.(int) $active : '').
+        ($serviceProductType ? ' AND p.`service_product_type` = '.(int) $serviceProductType : '');
+
+        if (Validate::isOrderBy($orderBy) && Validate::isOrderBy($orderWay)) {
+            $sql .= ' ORDER BY '.$orderBy.' '.$orderWay;
+        }
+
         return Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql);
     }
 
@@ -2580,9 +2626,15 @@ class ProductCore extends ObjectModel
 
         $id_address = $context->cart->{Configuration::get('PS_TAX_ADDRESS_TYPE')};
         $ids = Address::getCountryAndState($id_address);
-	$id_country = $ids['id_country'] ? (int) $ids['id_country'] : (int) Configuration::get('PS_COUNTRY_DEFAULT');
 
-        return SpecificPrice::getProductIdByDate(
+        $id_country = null;
+        if (isset($ids['id_country']) && (int) $ids['id_country']) {
+            $id_country = (int) $ids['id_country'];
+        } else {
+            $id_country = (int) Configuration::get('PS_COUNTRY_DEFAULT');
+        }
+
+	    return SpecificPrice::getProductIdByDate(
             $context->shop->id,
             $context->currency->id,
             $id_country,
@@ -2991,7 +3043,7 @@ class ProductCore extends ObjectModel
     public static function getPriceStatic($id_product, $usetax = true, $id_product_attribute = null, $decimals = 6, $divisor = null,
         $only_reduc = false, $usereduc = true, $quantity = 1, $force_associated_tax = false, $id_customer = null, $id_cart = null,
         $id_address = null, &$specific_price_output = null, $with_ecotax = true, $use_group_reduction = true, Context $context = null,
-        $use_customer_price = true, $id_roomtype = false)
+        $use_customer_price = true, $id_product_roomtype = false)
     {
         if (!$context) {
             $context = Context::getContext();
@@ -3057,9 +3109,9 @@ class ProductCore extends ObjectModel
 
         if (!$id_address) {
             if (!Product::isBookingProduct($id_product)) {
-                if ($id_roomtype) {
+                if ($id_product_roomtype) {
                     // if room type is provided with product then we know that the service product price should be calculated accroding to roomt type
-                    $id_address = Cart::getIdAddressForTaxCalculation($id_roomtype);
+                    $id_address = Cart::getIdAddressForTaxCalculation($id_product_roomtype);
                 }
             } else {
                 $id_address = Cart::getIdAddressForTaxCalculation($id_product);
@@ -3113,7 +3165,7 @@ class ProductCore extends ObjectModel
             $use_customer_price,
             $id_cart,
             $cart_quantity,
-            $id_roomtype
+            $id_product_roomtype
         );
 
         return $return;
@@ -3147,9 +3199,8 @@ class ProductCore extends ObjectModel
      **/
     public static function priceCalculation($id_shop, $id_product, $id_product_attribute, $id_country, $id_state, $zipcode, $id_currency,
         $id_group, $quantity, $use_tax, $decimals, $only_reduc, $use_reduc, $with_ecotax, &$specific_price, $use_group_reduction,
-        $id_customer = 0, $use_customer_price = true, $id_cart = 0, $real_quantity = 0, $id_roomtype = false)
+        $id_customer = 0, $use_customer_price = true, $id_cart = 0, $real_quantity = 0, $id_product_roomtype = false)
     {
-
         static $address = null;
         static $context = null;
 
@@ -3176,7 +3227,7 @@ class ProductCore extends ObjectModel
         $cache_id = (int)$id_product.'-'.(int)$id_shop.'-'.(int)$id_currency.'-'.(int)$id_country.'-'.$id_state.'-'.$zipcode.'-'.(int)$id_group.
             '-'.(int)$quantity.'-'.(int)$id_product_attribute.
             '-'.(int)$with_ecotax.'-'.(int)$id_customer.'-'.(int)$use_group_reduction.'-'.(int)$id_cart.'-'.(int)$real_quantity.
-            '-'.($only_reduc?'1':'0').'-'.($use_reduc?'1':'0').'-'.($use_tax?'1':'0').'-'.(int)$decimals.'-'.($id_roomtype?(int)$id_roomtype:'0');
+            '-'.($only_reduc?'1':'0').'-'.($use_reduc?'1':'0').'-'.($use_tax?'1':'0').'-'.(int)$decimals.'-'.($id_product_roomtype?(int)$id_product_roomtype:'0');
 
         // reference parameter is filled before any returns
         $specific_price = SpecificPrice::getSpecificPrice(
@@ -3240,18 +3291,20 @@ class ProductCore extends ObjectModel
         $result = self::$_pricesLevel2[$cache_id_2][(int)$id_product_attribute];
 
         // get price per room type
-        if ($id_roomtype) {
+        if ($id_product_roomtype) {
             $priceForRoomInfo = RoomTypeServiceProductPrice::getProductRoomTypePriceAndTax(
                 $id_product,
-                $id_roomtype,
+                $id_product_roomtype,
                 RoomTypeServiceProduct::WK_ELEMENT_TYPE_ROOM_TYPE
             );
         }
 
-        if (isset($priceForRoomInfo) && isset($priceForRoomInfo['price'])) {
-            $price = (float)$priceForRoomInfo['price'];
-        } elseif (!$specific_price || $specific_price['price'] < 0) {
-            $price = (float)$result['price'];
+        if (!$specific_price || $specific_price['price'] < 0) {
+            if (isset($priceForRoomInfo) && isset($priceForRoomInfo['price'])) {
+                $price = (float)$priceForRoomInfo['price'];
+            } else {
+                $price = (float)$result['price'];
+            }
         } else {
             $price = (float)$specific_price['price'];
         }
@@ -3473,9 +3526,18 @@ class ProductCore extends ObjectModel
         );
     }
 
-    public function getPriceWithoutReduct($notax = false, $id_product_attribute = false, $decimals = 6)
+    public function getPriceWithoutReduct($notax = false, $id_product_attribute = false, $decimals = 6, $with_auto_add_services = 0)
     {
-        return Product::getPriceStatic((int)$this->id, !$notax, $id_product_attribute, $decimals, null, false, false);
+        $price = Product::getPriceStatic((int)$this->id, !$notax, $id_product_attribute, $decimals, null, false, false);
+        if ($with_auto_add_services) {
+            if ($services = RoomTypeServiceProduct::getAutoAddServices((int) $this->id, null, null, Product::PRICE_ADDITION_TYPE_WITH_ROOM, !$notax)) {
+                foreach($services as $service) {
+                    $price += $service['price'];
+                }
+            }
+        }
+
+        return $price;
     }
 
     /**
@@ -5320,6 +5382,68 @@ class ProductCore extends ObjectModel
         return $tax_calculator->getTotalRate();
     }
 
+    public function getPositionInCategory()
+    {
+        return Db::getInstance()->getValue(
+            'SELECT position
+            FROM `'._DB_PREFIX_.'category_product`
+            WHERE id_category = '.(int) $this->id_category_default.'
+            AND id_product = '.(int) $this->id
+        );
+    }
+
+    public function setPositionInCategory($position)
+    {
+        if ($position < 0) {
+            die(Tools::displayError('You cannot set a negative position, the minimum for a position is 0.'));
+        }
+
+        $result = Db::getInstance()->executeS(
+            'SELECT `id_product`
+            FROM `'._DB_PREFIX_.'category_product`
+            WHERE `id_category` = '.(int) $this->id_category_default.'
+            ORDER BY `position`'
+        );
+
+        if (($position > 0) && ($position + 1 > count($result))) {
+            die(Tools::displayError('You cannot set a position greater than the total number of room types in the hotel, minus 1 (position numbering starts at 0).'));
+        }
+
+        foreach ($result as &$value) {
+            $value = $value['id_product'];
+        }
+
+        $currentPosition = $this->getPositionInCategory();
+
+        if ($currentPosition !== false && isset($result[$currentPosition])) {
+            $save = $result[$currentPosition];
+            unset($result[$currentPosition]);
+            array_splice($result, (int)$position, 0, $save);
+        }
+
+        $return = true;
+        foreach ($result as $position => $id_product) {
+            $return &= Db::getInstance()->update(
+                'category_product',
+                array('position' => $position),
+                '(`id_category` = '.(int) $this->id_category_default.' AND `id_product` = '.(int) $id_product.')'
+            );
+        }
+
+        return $return;
+    }
+
+    public static function getHighestPositionInCategory($idCategory)
+    {
+        $position = Db::getInstance()->getValue(
+            'SELECT MAX(`position`)
+            FROM `'._DB_PREFIX_.'category_product`
+            WHERE `id_category` = '.(int) $idCategory
+        );
+
+        return (is_numeric($position)) ? $position : -1;
+    }
+
     /**
     * Webservice getter : get product features association
     * @return array
@@ -5568,14 +5692,7 @@ class ProductCore extends ObjectModel
     */
     public function getWsPositionInCategory()
     {
-        $result = Db::getInstance()->executeS('SELECT position
-			FROM `'._DB_PREFIX_.'category_product`
-			WHERE id_category = '.(int)$this->id_category_default.'
-			AND id_product = '.(int)$this->id);
-        if (count($result) > 0) {
-            return $result[0]['position'];
-        }
-        return '';
+        return $this->getPositionInCategory();
     }
 
     /**
@@ -5624,8 +5741,11 @@ class ProductCore extends ObjectModel
     */
     public function getCoverWs()
     {
-        $result = $this->getCover($this->id);
-        return $result['id_image'];
+        if ($result = $this->getCover($this->id)) {
+            return $result['id_image'];
+        }
+
+        return false;
     }
 
     /**
@@ -5914,8 +6034,9 @@ class ProductCore extends ObjectModel
         return true;
     }
 
-    public function addWs($autodate = true, $null_values = false)
+    public function addWsRoomType($autodate = true, $null_values = false)
     {
+        $this->booking_product = 1;
         if ($success = $this->add($autodate, $null_values)) {
             if (Configuration::get('PS_SEARCH_INDEXATION')) {
                 Search::indexation(false, $this->id);
@@ -5927,17 +6048,54 @@ class ProductCore extends ObjectModel
         return $success;
     }
 
-    public function updateWs($null_values = false)
+    public function updateWsRoomType($null_values = false)
     {
-        $success = parent::update($null_values);
-        if ($success && Configuration::get('PS_SEARCH_INDEXATION')) {
-            Search::indexation(false, $this->id);
+        if (self::isBookingProduct($this->id)) {
+            $this->booking_product = 1; // Since there is nothing set from the API, it might get set as false
+            $success = parent::update($null_values);
+            if ($success && Configuration::get('PS_SEARCH_INDEXATION')) {
+                Search::indexation(false, $this->id);
+            }
+
+            $this->setWsRoomTypeInfo();
+
+            Hook::exec('updateProduct', array('id_product' => (int)$this->id));
+            return $success;
         }
 
-        $this->setWsRoomTypeInfo();
+        WebserviceRequest::getInstance()->setError(500, Tools::displayError('Room type not found.'), 134);
 
-        Hook::exec('updateProduct', array('id_product' => (int)$this->id));
+        return false;
+    }
+
+    public function addWsServices()
+    {
+        $this->booking_product = 0;
+        if ($success = $this->add()) {
+            if (Configuration::get('PS_SEARCH_INDEXATION')) {
+                Search::indexation(false, $this->id);
+            }
+        }
+
         return $success;
+    }
+
+    public function updateWsServices($null_values = false)
+    {
+        if (!self::isBookingProduct($this->id)) {
+            $this->booking_product = 0; // Since there is nothing set from the API.
+            $success = parent::update($null_values);
+            if ($success && Configuration::get('PS_SEARCH_INDEXATION')) {
+                Search::indexation(false, $this->id);
+            }
+
+            Hook::exec('updateProduct', array('id_product' => (int)$this->id));
+            return $success;
+        }
+
+        WebserviceRequest::getInstance()->setError(500, Tools::displayError('Service not found.'), 134);
+
+        return false;
     }
 
     /**
@@ -6299,6 +6457,20 @@ class ProductCore extends ObjectModel
         return $cache_id;
     }
 
+    public function getRoomTypesObjectList($sql_join, $sql_filter, $sql_sort, $sql_limit)
+    {
+        $sql_filter .= ' AND main.`booking_product` = 1';
+
+        return parent::getWebserviceObjectList($sql_join, $sql_filter, $sql_sort, $sql_limit);
+    }
+
+    public function getServicesObjectList($sql_join, $sql_filter, $sql_sort, $sql_limit)
+    {
+        $sql_filter .= ' AND main.`booking_product` = 0';
+
+        return parent::getWebserviceObjectList($sql_join, $sql_filter, $sql_sort, $sql_limit);
+    }
+
     public static function setPackStockType($id_product, $pack_stock_type)
     {
         return Db::getInstance()->execute('UPDATE '._DB_PREFIX_.'product p
@@ -6323,8 +6495,53 @@ class ProductCore extends ObjectModel
     public function getWsAdvancePayments()
     {
         return Db::getInstance()->executeS(
-            'SELECT `id` FROM `'._DB_PREFIX_.'htl_advance_payment` WHERE `id_product` = '.(int)$this->id.' ORDER BY `id` ASC'
+            'SELECT * FROM `'._DB_PREFIX_.'htl_advance_payment` WHERE `id_product` = '.(int)$this->id.' ORDER BY `id` ASC'
         );
+    }
+
+    public function setWsAdvancePayments($adv_payment)
+    {
+        $obj_adv_pmt = new HotelAdvancedPayment();
+        if (!$adv_payment) {
+            if ($adv_pmt_info = $obj_adv_pmt->getIdAdvPaymentByIdProduct($this->id)) {
+                $obj_adv_pmt = new HotelAdvancedPayment((int) $adv_pmt_info['id']);
+            }
+
+            $obj_adv_pmt->payment_type = '';
+            $obj_adv_pmt->id_product = $this->id;
+            $obj_adv_pmt->value = '';
+            $obj_adv_pmt->id_currency = '';
+            $obj_adv_pmt->tax_include = '';
+            $obj_adv_pmt->calculate_from = 0;
+            $obj_adv_pmt->active = 0;
+
+            return $obj_adv_pmt->save();
+        } else if (is_array($adv_payment) && count($adv_payment) == 1) {
+            $fields = array_shift($adv_payment);
+            if (!Validate::isLoadedObject($obj_adv_pmt = new HotelAdvancedPayment($fields['id']))) {
+                if ($adv_pmt_info = $obj_adv_pmt->getIdAdvPaymentByIdProduct($this->id)) {
+                    $obj_adv_pmt = new HotelAdvancedPayment((int) $adv_pmt_info['id']);
+                }
+            }
+
+            $obj_adv_pmt->id_product = $this->id;
+            $obj_adv_pmt->active = 1;
+            $obj_adv_pmt->payment_type = $fields['payment_type'];
+            $obj_adv_pmt->value = $fields['value'];
+
+            if ($fields['payment_type'] == 2) {
+                $obj_adv_pmt->id_currency = (int) Configuration::get('PS_CURRENCY_DEFAULT');
+            } else {
+                $obj_adv_pmt->id_currency = '';
+            }
+
+            $obj_adv_pmt->tax_include = $fields['tax_include'];
+            $obj_adv_pmt->calculate_from = $fields['calculate_from'];
+
+            return $obj_adv_pmt->save();
+        }
+
+        return false;
     }
 
     public function getWsHotel()
@@ -6350,8 +6567,41 @@ class ProductCore extends ObjectModel
 
     public function getWsExtraDemands()
     {
-        return Db::getInstance()->getValue(
-            'SELECT `id_global_demand` as `id` FROM `'._DB_PREFIX_.'htl_room_type_demand` WHERE `id_product` = '.(int)$this->id
+        $objHotelRoomTypeDemand = new HotelRoomTypeDemand();
+        $selectedDemands = Db::getInstance()->executeS(
+            'SELECT `id_global_demand` as `id` FROM `'._DB_PREFIX_.'htl_room_type_demand`
+            WHERE `id_product` = '.(int)$this->id
+        );
+        $res = array();
+        $demands = $objHotelRoomTypeDemand->getRoomTypeDemands($this->id);
+        if ($selectedDemands) {
+            foreach ($selectedDemands as $id_demand => $demand) {
+                $option['id'] = $demand['id'];
+                if (isset($demands[$demand['id']]['adv_option']) && count($demands[$demand['id']]['adv_option'])) {
+                    foreach ($demands[$demand['id']]['adv_option'] as $id_option => $adv_option) {
+                        $option['id_option'] = $id_option;
+                        $option['price'] = $adv_option['price_tax_excl'];
+                        $res[] = $option;
+                    }
+                } else {
+                    $option['id_option'] = false;
+                    $option['price'] = $demand['price_tax_excl'];
+                    $res[] = $option;
+                }
+            }
+        }
+
+        return $res;
+    }
+
+    public function getWsServices()
+    {
+        return Db::getInstance()->executeS(
+            'SELECT spp.`price`, spp.`id_tax_rules_group`, sp.`id_product` AS id
+            FROM `'._DB_PREFIX_.'htl_room_type_service_product` sp
+            LEFT JOIN `'._DB_PREFIX_.'htl_room_type_service_product_price` spp
+            ON (spp.`id_product` = sp.`id_product` AND spp.`id_element` = sp.`id_element` AND spp.`element_type` = sp.`element_type`)
+            WHERE sp.`id_element` = '.(int)$this->id
         );
     }
 
@@ -6404,5 +6654,107 @@ class ProductCore extends ObjectModel
     public function deleteWs()
     {
         return $this->delete();
+    }
+
+    public function setWsExtraDemands($demands)
+    {
+        Db::getInstance()->execute('
+            DELETE FROM `'._DB_PREFIX_.'htl_room_type_demand`
+            WHERE `id_product` = '.(int)$this->id
+        );
+        Db::getInstance()->execute('
+            DELETE FROM `'._DB_PREFIX_.'htl_room_type_demand_price`
+            WHERE `id_product` = '.(int)$this->id
+        );
+        $objAdvOption = new HotelRoomTypeGlobalDemandAdvanceOption();
+        $savedDemands = array();
+        foreach ($demands as $globalDemand) {
+            if (Validate::isLoadedObject($objGlobalDemand = new HotelRoomTypeGlobalDemand($globalDemand['id']))) {
+                if (!isset($savedDemands[$globalDemand['id']])) {
+                    $objRoomTypeDemand = new HotelRoomTypeDemand();
+                    $objRoomTypeDemand->id_product = $this->id;
+                    $objRoomTypeDemand->id_global_demand = $objGlobalDemand->id;
+                    $objRoomTypeDemand->save();
+                    $savedDemands[$globalDemand['id']] = $objRoomTypeDemand->id;
+                }
+
+                if (isset($globalDemand['price'])) {
+                    if ($objAdvOption->getGlobalDemandAdvanceOptions($objGlobalDemand->id)
+                        && isset($globalDemand['id_option'])
+                        && Validate::isLoadedObject($objAdvOption = new HotelRoomTypeGlobalDemandAdvanceOption($globalDemand['id_option']))
+                    ) {
+                        if ($globalDemand['price'] != $objAdvOption->price) {
+                            $objRoomTypeDemandPrice = new HotelRoomTypeDemandPrice();
+                            $objRoomTypeDemandPrice->id_product = $this->id;
+                            $objRoomTypeDemandPrice->id_global_demand = $objGlobalDemand->id;
+                            $objRoomTypeDemandPrice->id_option = $objAdvOption->id;
+                            $objRoomTypeDemandPrice->price = $globalDemand['price'];
+                            $objRoomTypeDemandPrice->save();
+                        }
+                    } else {
+                        // save selected demands prices for this room type
+                        if ($objGlobalDemand->price != $globalDemand['price']) {
+                            $objRoomTypeDemandPrice = new HotelRoomTypeDemandPrice();
+                            $objRoomTypeDemandPrice->id_product = $this->id;
+                            $objRoomTypeDemandPrice->id_global_demand = $objGlobalDemand->id;
+                            $objRoomTypeDemandPrice->id_option = 0;
+                            $objRoomTypeDemandPrice->price = $globalDemand['price'];
+                            $objRoomTypeDemandPrice->save();
+                        }
+                    }
+                }
+            }
+        }
+
+        return true;
+    }
+
+    public function setWsServices($services)
+    {
+        Db::getInstance()->execute('
+			DELETE FROM `'._DB_PREFIX_.'htl_room_type_service_product`
+			WHERE `id_element` = '.(int)$this->id
+        );
+        Db::getInstance()->execute('
+            DELETE FROM `'._DB_PREFIX_.'htl_room_type_service_product_price`
+            WHERE `id_element` = '.(int)$this->id
+        );
+        if ($this->booking_product) {
+            if ($allServiceProducts = $this->getServiceProducts()) {
+                $formttedServiceProducts = array();
+                foreach ($allServiceProducts as $product) {
+                    $formttedServiceProducts[$product['id_product']] = $product;
+                }
+
+                $allServiceProducts = $formttedServiceProducts;
+
+                foreach ($services as $service) {
+                    if (isset($service['id'])
+                        && Validate::isLoadedObject($objServiceProduct = new Product($service['id']))
+                        && !$objServiceProduct->booking_product
+                        && isset($allServiceProducts[$objServiceProduct->id])
+                    ) {
+                        $objRoomTypeServiceProduct = new RoomTypeServiceProduct();
+                        $objRoomTypeServiceProduct->addRoomProductLink(
+                            $objServiceProduct->id,
+                            $this->id,
+                            RoomTypeServiceProduct::WK_ELEMENT_TYPE_ROOM_TYPE
+                        );
+
+                        $objRoomTypeServiceProductPrice = new RoomTypeServiceProductPrice();
+                        $objRoomTypeServiceProductPrice->id_product = $objServiceProduct->id;
+                        $objRoomTypeServiceProductPrice->id_element = $this->id;
+                        $objRoomTypeServiceProductPrice->element_type = RoomTypeServiceProduct::WK_ELEMENT_TYPE_ROOM_TYPE;
+                        $objRoomTypeServiceProductPrice->price = isset($service['price']) ? $service['price'] : $allServiceProducts[$objServiceProduct->id]['price'];
+                        $objRoomTypeServiceProductPrice->id_tax_rules_group = isset($service['id_tax_rules_group']) ? $service['id_tax_rules_group'] : $allServiceProducts[$objServiceProduct->id]['id_tax_rules_group'];
+                        $objRoomTypeServiceProductPrice->save();
+                    }
+                }
+            }
+        } else {
+            return false;
+        }
+
+        return true;
     }
 }

@@ -36,7 +36,7 @@ class StatsOrigin extends ModuleGraph
     {
         $this->name = 'statsorigin';
         $this->tab = 'analytics_stats';
-        $this->version = '1.4.2';
+        $this->version = '1.4.3';
         $this->author = 'PrestaShop';
         $this->need_instance = 0;
 
@@ -142,7 +142,10 @@ class StatsOrigin extends ModuleGraph
 
     protected function getData($layers)
     {
-        $this->_titles['main'] = $this->l('Top ten referral websites');
+        $this->_titles['main'][] = $this->l('Top ten referral websites');
+        if (Tools::getValue('export')) {
+            $this->_titles['main'][] = $this->l('Referal percentage');
+        }
         $websites = $this->getOrigins($this->getDate());
         $total = 0;
         $total2 = 0;

@@ -50,9 +50,9 @@ class AdminCustomerPreferencesControllerCore extends AdminController
 
         $this->fields_options = array(
             'general' => array(
-                'title' =>    $this->l('General'),
-                'icon' =>    'icon-cogs',
-                'fields' =>    array(
+                'title' => $this->l('General'),
+                'icon' => 'icon-cogs',
+                'fields' => array(
                     'PS_REGISTRATION_PROCESS_TYPE' => array(
                         'title' => $this->l('Registration process type'),
                         'hint' => $this->l('The "Only account creation" registration option allows the customer to register faster, and create his/her address later.'),
@@ -64,7 +64,7 @@ class AdminCustomerPreferencesControllerCore extends AdminController
                     ),
                     'PS_ONE_PHONE_AT_LEAST' => array(
                         'title' => $this->l('Phone number is mandatory'),
-                        'hint' => $this->l('If you chose yes, your customer will have to provide at least one phone number to register.'),
+                        'hint' => $this->l('If you chose yes, your customer will have to provide phone number to register.'),
                         'validation' => 'isBool',
                         'cast' => 'intval',
                         'type' => 'bool'
@@ -90,11 +90,19 @@ class AdminCustomerPreferencesControllerCore extends AdminController
                         'cast' => 'intval',
                         'size' => 5,
                         'type' => 'text',
-                        'suffix' => $this->l('minutes')
+                        'suffix' => $this->l('minutes'),
+                        'class' => 'fixed-width-xl',
                     ),
                     'PS_B2B_ENABLE' => array(
                         'title' => $this->l('Enable B2B mode'),
                         'hint' => $this->l('Activate or deactivate B2B mode. When this option is enabled, B2B features will be made available.'),
+                        'validation' => 'isBool',
+                        'cast' => 'intval',
+                        'type' => 'bool'
+                    ),
+                    'PS_CUSTOMER_BIRTHDATE' => array(
+                        'title' => $this->l('Enable date of birth'),
+                        'hint' => $this->l('Display or not the date of birth field.'),
                         'validation' => 'isBool',
                         'cast' => 'intval',
                         'type' => 'bool'
@@ -108,22 +116,69 @@ class AdminCustomerPreferencesControllerCore extends AdminController
                     ),
                     'PS_CUSTOMER_OPTIN' => array(
                         'title' => $this->l('Enable opt-in'),
-                        'hint' => $this->l('Display or not the opt-in tick box, to receive offers from the store\'s partners.'),
-                        'validation' => 'isBool',
-                        'cast' => 'intval',
-                        'type' => 'bool'
-                    ),
-                    'PS_CUSTOMER_ADDRESS_CREATION' => array(
-                        'title' => $this->l('Address creation during checkout'),
-                        'hint' => $this->l('If disabled, Address form will not appear to user during checkout process. So by default hotel address, which rooms guest has in his cart will be considered as user address. Else user has to fill adress details.'),
+                        'hint' => $this->l('Display or not the opt-in tick box, to receive offers from your hotel partners.'),
                         'validation' => 'isBool',
                         'cast' => 'intval',
                         'type' => 'bool'
                     ),
                 ),
-                'submit' => array('title' => $this->l('Save')),
+                'submit' => array(
+                    'title' => $this->l('Save'),
+                ),
             ),
+            'customer_kpi' => array(
+                'title' => $this->l('Customer KPI configuration'),
+                'icon' => 'icon-cogs',
+                'fields' => array(
+                    'PS_KPI_FREQUENT_CUSTOMER_NB_ORDERS' => array(
+                        'title' => $this->l('Number of orders to use to calculate frequent customers'),
+                        'hint' => $this->l('Set the number of orders to use to calculate frequent customers.'),
+                        'validation' => 'isInt',
+                        'cast' => 'intval',
+                        'type' => 'text',
+                        'class' => 'fixed-width-xxl',
+                    ),
+                    'PS_KPI_REVPAC_NB_DAYS' => array(
+                        'title' => $this->l('Number of days to use to calculate RevPAC'),
+                        'hint' => $this->l('Set the number of days to use to calculate Revenue Per Available Customer.'),
+                        'validation' => 'isUnsignedInt',
+                        'cast' => 'intval',
+                        'type' => 'text',
+                        'suffix' => $this->l('days'),
+                        'class' => 'fixed-width-xl',
+                    ),
+                    'PS_KPI_CONVERSION_RATE_NB_DAYS' => array(
+                        'title' => $this->l('Number of days to use to calculate Conversion Rate'),
+                        'hint' => $this->l('Set the number of days to use to calculate Conversion Rate.'),
+                        'validation' => 'isUnsignedInt',
+                        'cast' => 'intval',
+                        'type' => 'text',
+                        'suffix' => $this->l('days'),
+                        'class' => 'fixed-width-xl',
+                    ),
+                    'PS_KPI_NEW_CUSTOMERS_NB_DAYS' => array(
+                        'title' => $this->l('Number of days for which a customer is considered \'new\''),
+                        'hint' => $this->l('Set the number of days for which a customer is considered \'new\' after creation date.'),
+                        'validation' => 'isUnsignedInt',
+                        'cast' => 'intval',
+                        'type' => 'text',
+                        'suffix' => $this->l('days'),
+                        'class' => 'fixed-width-xl',
+                    ),
+                ),
+                'submit' => array(
+                    'title' => $this->l('Save'),
+                ),
+            )
         );
+    }
+
+    public function beforeUpdateOptions()
+    {
+        $fieldData = $this->fields_options['customer_kpi']['fields']['PS_KPI_FREQUENT_CUSTOMER_NB_ORDERS'];
+        if (!Tools::getValue('PS_KPI_FREQUENT_CUSTOMER_NB_ORDERS')) {
+            $this->errors[] = sprintf(Tools::displayError('field %s must be greater than 0.'), $fieldData['title']);;
+        }
     }
 
     /**

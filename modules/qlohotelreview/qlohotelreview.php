@@ -30,7 +30,7 @@ class QloHotelReview extends Module
     {
         $this->name = 'qlohotelreview';
         $this->tab = 'front_office_features';
-        $this->version = '1.0.0';
+        $this->version = '1.0.1';
         $this->ps_versions_compliancy = array('min' => '1.6', 'max' => '1.6');
         $this->author = 'Webkul';
         $this->bootstrap = true;
@@ -72,6 +72,7 @@ class QloHotelReview extends Module
                 'displayBookingAction',
                 'displayBackOfficeHeader',
                 'displayAdminAfterHeader',
+                'actionCleanData',
             )
         );
     }
@@ -107,14 +108,14 @@ class QloHotelReview extends Module
 
     public function reviewPopupResources()
     {
-        $controllers = array('history', 'guesttracking');
+        $controllers = array('orderdetail', 'guesttracking');
         $controller = Tools::getValue('controller');
         if (!in_array($controller, $controllers)) {
             return;
         }
 
         $idOrder = 0;
-        if ($controller == 'history') {
+        if ($controller == 'orderdetail') {
             $idOrder = (int) Tools::getValue('id_order');
         }
 
@@ -162,8 +163,6 @@ class QloHotelReview extends Module
     public function loadMedia($idOrder)
     {
         Media::addJsDef(array('qlo_hotel_review_js_vars' => array(
-            'id_order' => (int) $idOrder, // 0 for guesttracking
-            'link' => $this->context->link->getPageLink('order-detail', true),
             'review_ajax_link' => $this->context->link->getModuleLink($this->name),
             'review_ajax_token' => $this->secure_key,
             'raty_img_path' => $this->getPathUri().'views/img/raty',
@@ -189,19 +188,20 @@ class QloHotelReview extends Module
         if (QhrHotelReviewHelper::getIsReviewable($idOrder)
             && !QhrHotelReview::getByIdOrder($idOrder)
         ) {
-            $hotel = QhrHotelReviewHelper::getHotelByOrder($idOrder);
-            $this->smarty->assign(array(
-                'id_order' => (int) $idOrder,
-                'id_hotel' => $hotel['id_hotel'],
-                'hotel_name' => $hotel['hotel_name'],
-            ));
-            return $this->display(__FILE__, 'booking-action.tpl');
+            if ($hotel = QhrHotelReviewHelper::getHotelByOrder($idOrder)) {
+                $this->smarty->assign(array(
+                    'id_order' => (int) $idOrder,
+                    'id_hotel' => $hotel['id_hotel'],
+                    'hotel_name' => $hotel['hotel_name'],
+                ));
+                return $this->display(__FILE__, 'booking-action.tpl');
+            }
         }
     }
 
     public function hookDisplayFooterBefore()
     {
-        $controllers = array('history', 'guesttracking');
+        $controllers = array('orderdetail', 'guesttracking');
         $controller = Tools::getValue('controller');
         if (in_array($controller, $controllers)) {
             $categories = QhrCategory::getAll();
@@ -278,6 +278,13 @@ class QloHotelReview extends Module
             'show_load_more_btn' => $hasNextPage,
         ));
         return $this->display(__FILE__, 'product-tab-content.tpl');
+    }
+
+    public function hookActionCleanData($params)
+    {
+        if ($params['method'] == 'catalog' || $params['method'] ==  'sales') {
+            QhrHotelReviewDb::truncateUserData();
+        }
     }
 
     public function installModuleTabs()

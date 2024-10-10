@@ -153,14 +153,16 @@ abstract class ModuleGridCore extends Module
     protected function csvExport($datas)
     {
         $this->_sort = $datas['defaultSortColumn'];
-        $this->setLang(Context::getContext()->language->id);
-        $this->getData();
-
-        $layers = isset($datas['layers']) ?  $datas['layers'] : 1;
+        $context = Context::getContext();
+        $this->setLang($context->language->id);
+        $this->setEmployee($context->employee->id);
 
         if (isset($datas['option'])) {
             $this->setOption($datas['option'], $layers);
         }
+        $this->getData();
+
+        $layers = isset($datas['layers']) ?  $datas['layers'] : 1;
 
         if (count($datas['columns'])) {
             foreach ($datas['columns'] as $column) {

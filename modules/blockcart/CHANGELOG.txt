@@ -1,4 +1,15 @@
 -----------------------------
+# V1.6.5 to V1.6.6
+-----------------------------
+
+## Improved/Changed Features:
+
+* [FO] : [#795] Fixed 'Add Room' button is displayed on occupancy popup even if no more rooms are available at front office
+* [CO] : [#1195] Added process for smarty template overriding.
+* [FO] : [#1201] Updated cart total summary on checkout page
+* [CO] : [#1271] Added new hooks
+
+-----------------------------
 # V1.6.4 to V1.6.5
 -----------------------------
 
@@ -24,7 +35,7 @@
 
 * [FO] : [#304] Text changes
 * [CO] : [#281] Optimized ajax cart functions, new function ajaxcart.update added
-* [CO] : [#281] Updated assignContentVars function, now function returns json encoded content without fetching from tpl 
+* [CO] : [#281] Updated assignContentVars function, now function returns json encoded content without fetching from tpl
 * [CO] : [#244] Changed Tools::jsonEncode to json_encode
 
 

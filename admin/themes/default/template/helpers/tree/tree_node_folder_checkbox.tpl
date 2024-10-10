@@ -22,14 +22,20 @@
 *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 *}
-<li class="tree-folder">
+<li class="tree-folder" {if isset($node['hidden']) && $node['hidden'] == true} hidden="hidden"{/if}>
 	<span class="tree-folder-name{if isset($node['disabled']) && $node['disabled'] == true} tree-folder-name-disable{/if}">
-		{if isset($node['id_category']) && $node['id_category'] != $root_category}
-		<input type="checkbox" name="{$input_name}[]" value="{$node['id_category']}"{if isset($node['disabled']) && $node['disabled'] == true} disabled="disabled"{/if} />
+		{if !isset($selectable) || $selectable}
+			<input type="checkbox" name="{$node['input_name']}[]" value="{$node['value']}"{if isset($node['selected']) && $node['selected'] == true} checked="checked"{/if}{if isset($node['disabled']) && $node['disabled'] == true} disabled="disabled"{/if} {if isset($node['hidden']) && $node['hidden'] == true} hidden="hidden"{/if}/>
 		{/if}
 		<i class="icon-folder-close"></i>
 		<label class="tree-toggler">{if isset($node['name'])}{$node['name']|escape:'html':'UTF-8'}{/if}{if isset($node['selected_childs']) && (int)$node['selected_childs'] > 0} {l s='(%s selected)' sprintf=$node['selected_childs']}{/if}</label>
 	</span>
+	{if isset($node['badge'])}
+		<span class="badge {if isset($node['badge']['class'])}{$node['badge']['class']}{/if}">{$node['badge']['title']}</span>
+	{/if}
+	{if isset($node['hint'])}
+		<div class="node-hint">{$node['hint']}</div>
+	{/if}
 	<ul class="tree">
 		{$children|escape:'UTF-8'}
 	</ul>

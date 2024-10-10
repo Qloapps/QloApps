@@ -37,7 +37,7 @@ class StatsPersonalInfos extends ModuleGraph
     {
         $this->name = 'statspersonalinfos';
         $this->tab = 'analytics_stats';
-        $this->version = '1.4.2';
+        $this->version = '1.4.3';
         $this->author = 'PrestaShop';
         $this->need_instance = 0;
 
@@ -116,7 +116,8 @@ class StatsPersonalInfos extends ModuleGraph
 						<div class="col-lg-8">
 							'.$this->engine(array(
                     'type' => 'pie',
-                    'option' => 'gender'
+                    'option' => 'gender',
+                    'format' => 'd'
                 )).'
 						</div>
 						<div class="col-lg-4">
@@ -133,7 +134,8 @@ class StatsPersonalInfos extends ModuleGraph
 						<div class="col-lg-8">
 							'.$this->engine(array(
                     'type' => 'pie',
-                    'option' => 'age'
+                    'option' => 'age',
+                    'format' => 'd'
                 )).'
 						</div>
 						<div class="col-lg-4">
@@ -150,7 +152,8 @@ class StatsPersonalInfos extends ModuleGraph
 						<div class="col-lg-8">
 							'.$this->engine(array(
                     'type' => 'pie',
-                    'option' => 'country'
+                    'option' => 'country',
+                    'format' => 'd'
                 )).'
 						</div>
 						<div class="col-lg-4">
@@ -167,7 +170,8 @@ class StatsPersonalInfos extends ModuleGraph
 						<div class="col-lg-8">
 							'.$this->engine(array(
                     'type' => 'pie',
-                    'option' => 'currency'
+                    'option' => 'currency',
+                    'format' => 'd'
                 )).'
 						</div>
 						<div class="col-lg-4">
@@ -212,7 +216,12 @@ class StatsPersonalInfos extends ModuleGraph
     {
         switch ($this->option) {
             case 'gender':
-                $this->_titles['main'] = $this->l('Gender distribution');
+                if (Tools::getValue('export')) {
+                    $this->_titles['main'][] = $this->l('Gender');
+                    $this->_titles['main'][] = '';
+                } else {
+                    $this->_titles['main'] = $this->l('Gender distribution');
+                }
                 $genders = array(
                     0 => $this->l('Male'),
                     1 => $this->l('Female'),
@@ -243,7 +252,12 @@ class StatsPersonalInfos extends ModuleGraph
                 break;
 
             case 'age':
-                $this->_titles['main'] = $this->l('Age range');
+                if (Tools::getValue('export')) {
+                    $this->_titles['main'][] = $this->l('Age');
+                    $this->_titles['main'][] = '';
+                } else {
+                    $this->_titles['main'] = $this->l('Age range');
+                }
 
                 // 0 - 18 years
                 $sql = 'SELECT COUNT(`id_customer`) as total
@@ -314,7 +328,7 @@ class StatsPersonalInfos extends ModuleGraph
 						FROM `'._DB_PREFIX_.'customer`
 						WHERE (YEAR(CURDATE()) - YEAR(`birthday`)) - (RIGHT(CURDATE(), 5) < RIGHT(`birthday`, 5)) >= 60
 							'.Shop::addSqlRestriction(Shop::SHARE_CUSTOMER).'
-							AND `birthday` IS NOT NULL';
+							AND `birthday` IS NOT NULL AND `birthday` != "0000-00-00"';
                 $result = Db::getInstance(_PS_USE_SQL_SLAVE_)->getRow($sql);
                 if (isset($result['total']) && $result['total']) {
                     $this->_values[] = $result['total'];
@@ -334,7 +348,12 @@ class StatsPersonalInfos extends ModuleGraph
                 break;
 
             case 'country':
-                $this->_titles['main'] = $this->l('Country distribution');
+                if (Tools::getValue('export')) {
+                    $this->_titles['main'][] = $this->l('Country');
+                    $this->_titles['main'][] = '';
+                } else {
+                    $this->_titles['main'] = $this->l('Country distribution');
+                }
                 $sql = 'SELECT cl.`name`, COUNT(c.`id_country`) AS total
 						FROM `'._DB_PREFIX_.'address` a
 						LEFT JOIN `'._DB_PREFIX_.'customer` cu ON cu.id_customer = a.id_customer
@@ -351,7 +370,12 @@ class StatsPersonalInfos extends ModuleGraph
                 break;
 
             case 'currency':
-                $this->_titles['main'] = $this->l('Currency distribution');
+                if (Tools::getValue('export')) {
+                    $this->_titles['main'][] = $this->l('Currency');
+                    $this->_titles['main'][] = '';
+                } else {
+                    $this->_titles['main'] = $this->l('Currency distribution');
+                }
                 $sql = 'SELECT c.`name`, COUNT(c.`id_currency`) AS total
 						FROM `'._DB_PREFIX_.'orders` o
 						LEFT JOIN `'._DB_PREFIX_.'currency` c ON o.`id_currency` = c.`id_currency`
@@ -366,7 +390,12 @@ class StatsPersonalInfos extends ModuleGraph
                 break;
 
             case 'language':
-                $this->_titles['main'] = $this->l('Language distribution');
+                if (Tools::getValue('export')) {
+                    $this->_titles['main'][] = $this->l('Language');
+                    $this->_titles['main'][] = '';
+                } else {
+                    $this->_titles['main'] = $this->l('Language distribution');
+                }
                 $sql = 'SELECT c.`name`, COUNT(c.`id_lang`) AS total
 						FROM `'._DB_PREFIX_.'orders` o
 						LEFT JOIN `'._DB_PREFIX_.'lang` c ON o.`id_lang` = c.`id_lang`

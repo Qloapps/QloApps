@@ -39,7 +39,7 @@
 		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 		<meta name="robots" content="NOFOLLOW, NOINDEX">
 		<title>
-			{$shop_name} {if $meta_title != ''}{if isset($navigationPipe)}{$navigationPipe|escape:'html':'UTF-8'}{else}&gt;{/if} {$meta_title}{/if} (PrestaShop&trade;)
+			{$shop_name} {if $meta_title != ''}{if isset($navigationPipe)}{$navigationPipe|escape:'html':'UTF-8'}{else}&gt;{/if} {$meta_title}{/if} (QloApps&trade;)
 		</title>
 		{if isset($css_files)}
 			{foreach from=$css_files key=css_uri item=media}
@@ -54,14 +54,11 @@
 				{/if}
 			{/foreach}
 		{/if}
-		{foreach from=$js_files item=js_uri}
-			<script type="text/javascript" src="{$js_uri}"></script>
-		{/foreach}
-		<script type="text/javascript" src="../js/admin/login.js?v={$smarty.const._PS_VERSION_|escape:'html':'UTF-8'}"></script>
-
 		{if (isset($js_def) && count($js_def) || isset($js_files) && count($js_files))}
 			{include file=$smarty.const._PS_ALL_THEMES_DIR_|cat:"javascript.tpl"}
 		{/if}
+		<script type="text/javascript" src="../js/admin/login.js?v={$smarty.const._PS_VERSION_|escape:'html':'UTF-8'}"></script>
+
 	</head>
 	<body class="ps_back-office bootstrap">
 		<div id="login">

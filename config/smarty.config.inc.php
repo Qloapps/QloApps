@@ -34,7 +34,7 @@ if (Configuration::get('PS_SMARTY_LOCAL')) {
 } elseif (_PS_MODE_DEV_ && !defined('_PS_ADMIN_DIR_')) {
     $smarty = new SmartyDev();
 } else {
-    $smarty = new Smarty();
+    $smarty = new SmartyCustom();
 }
 
 $smarty->setCompileDir(_PS_CACHE_DIR_.'smarty/compile');

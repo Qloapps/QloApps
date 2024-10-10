@@ -221,6 +221,7 @@ class FrontControllerCore extends Controller
             'js_dir' => _THEME_JS_DIR_,
             'base_dir' => __PS_BASE_URI__,
             'language_code'       => $this->context->language->language_code ? $this->context->language->language_code : $this->context->language->iso_code,
+            'language_is_rtl' => $this->context->language->is_rtl,
         ]);
 
         /* get page name to display it in body id */
@@ -364,13 +365,13 @@ class FrontControllerCore extends Controller
                 $cart->update();
             }
             /* Select an address if not set */
-            if (isset($cart) && (!isset($cart->id_address_delivery) || $cart->id_address_delivery == 0 ||
-                !isset($cart->id_address_invoice) || $cart->id_address_invoice == 0) && $this->context->cookie->id_customer) {
+            if (isset($cart)
+                && (!isset($cart->id_address_invoice)
+                    || $cart->id_address_invoice == 0
+                )
+                && $this->context->cookie->id_customer
+            ) {
                 $to_update = false;
-                if (!isset($cart->id_address_delivery) || $cart->id_address_delivery == 0) {
-                    $to_update = true;
-                    $cart->id_address_delivery = (int)Address::getFirstCustomerAddressId($cart->id_customer);
-                }
                 if (!isset($cart->id_address_invoice) || $cart->id_address_invoice == 0) {
                     $to_update = true;
                     $cart->id_address_invoice = (int)Address::getFirstCustomerAddressId($cart->id_customer);
@@ -390,8 +391,7 @@ class FrontControllerCore extends Controller
             $cart->id_shop = $this->context->shop->id;
             if ($this->context->cookie->id_customer) {
                 $cart->id_customer = (int)$this->context->cookie->id_customer;
-                $cart->id_address_delivery = (int)Address::getFirstCustomerAddressId($cart->id_customer);
-                $cart->id_address_invoice = (int)$cart->id_address_delivery;
+                $cart->id_address_invoice = (int)Address::getFirstCustomerAddressId($cart->id_customer);
             } else {
                 $cart->id_address_delivery = 0;
                 $cart->id_address_invoice = 0;
@@ -416,11 +416,12 @@ class FrontControllerCore extends Controller
 
         $display_tax_label = $this->context->country->display_tax_label;
         if (isset($cart->{Configuration::get('PS_TAX_ADDRESS_TYPE')}) && $cart->{Configuration::get('PS_TAX_ADDRESS_TYPE')}) {
-            $infos = Address::getCountryAndState((int)$cart->{Configuration::get('PS_TAX_ADDRESS_TYPE')});
-            $country = new Country((int)$infos['id_country']);
-            $this->context->country = $country;
-            if (Validate::isLoadedObject($country)) {
-                $display_tax_label = $country->display_tax_label;
+            if ($infos = Address::getCountryAndState((int)$cart->{Configuration::get('PS_TAX_ADDRESS_TYPE')})) {
+                $country = new Country((int)$infos['id_country']);
+                $this->context->country = $country;
+                if (Validate::isLoadedObject($country)) {
+                    $display_tax_label = $country->display_tax_label;
+                }
             }
         }
 
@@ -495,6 +496,7 @@ class FrontControllerCore extends Controller
             'occupancy_required_for_booking' => $occupancyRequiredForBooking,
             'max_child_age' => Configuration::get('WK_GLOBAL_CHILD_MAX_AGE'),
             'max_child_in_room' => Configuration::get('WK_GLOBAL_MAX_CHILD_IN_ROOM'),
+            'show_full_date' => $this->show_full_date
         ));
 
         // Add the tpl files directory for mobile
@@ -595,7 +597,7 @@ class FrontControllerCore extends Controller
                 'HOOK_TOP'          => Hook::exec('displayTop'),
                 'HOOK_LEFT_COLUMN'  => ($this->display_column_left  ? Hook::exec('displayLeftColumn') : ''),
                 'HOOK_RIGHT_COLUMN' => ($this->display_column_right ? Hook::exec('displayRightColumn', array('cart' => $this->context->cart)) : ''),
-                'show_breadcrump'   => $this->show_breadcrump,              // By webkul
+                'show_breadcrump'   => $this->show_breadcrump,
             ));
         } else {
             $this->context->smarty->assign('HOOK_MOBILE_HEADER', Hook::exec('displayMobileHeader'));
@@ -774,6 +776,7 @@ class FrontControllerCore extends Controller
         }
 
         if (Tools::isSubmit('SubmitLogin')
+            && !Configuration::get('PS_SHOP_ENABLE')
             && Configuration::get('PS_ALLOW_EMP')
             && !Context::getContext()->cookie->enable_maintenance_view
         ) {
@@ -795,6 +798,9 @@ class FrontControllerCore extends Controller
                         'HOOK_MAINTENANCE' => Hook::exec('displayMaintenance', array()),
                         'allowEmployee' => Configuration::get('PS_ALLOW_EMP'),
                         'maintenance' => $this->context->link->getAdminLink('AdminMaintenance', false),
+                        'languages' => Language::getLanguages(true, $this->context->shop->id),
+                        'lang_iso' => $this->context->language->iso_code,
+                        'link' => $this->context->link,
                     ));
                     // If the controller is a module, then getTemplatePath will try to find the template in the modules, so we need to instanciate a real frontcontroller
                     $front_controller = preg_match('/ModuleFrontController$/', get_class($this)) ? new FrontController() : $this;
@@ -807,56 +813,102 @@ class FrontControllerCore extends Controller
 
     protected function processLogin($email, $passwd)
     {
-        $result = false;
-        $objMaintenanceAccess = new MaintenanceAccess();
+        $remoteIpAddress = Tools::getRemoteAddr();
+        $maxAttempts = Configuration::get('PS_ALLOW_EMP_MAX_ATTEMPTS');
 
-        /* Check fields validity */
-        if (empty($email)) {
-            $this->errors[] = Tools::displayError('Email is empty.');
-        } elseif (!Validate::isEmail($email)) {
-            $this->errors[] = Tools::displayError('Invalid email address.');
-        }
+        if ($maxAttempts) {
+            $objMaintenanceAccess = new MaintenanceAccess();
+            $attemptsCount = $objMaintenanceAccess->getFailedAttemptsCount($email, $remoteIpAddress); // does not include the current one
+            if ($attemptsCount >= $maxAttempts) {
+                if ($lastAttempt = $objMaintenanceAccess->getLastAttempt($email, $remoteIpAddress)) {
+                    $minutesElapsed = (int) ((time() - strtotime($lastAttempt['date_add'])) / 60);
 
-        if (empty($passwd)) {
-            $this->errors[] = Tools::displayError('The password field is blank.');
-        } elseif (!Validate::isPasswd($passwd)) {
-            $this->errors[] = Tools::displayError('Invalid password.');
-        }
-
-        if ($objMaintenanceAccess->checkLimit($email)) {
-            $this->errors[] =Tools::displayError('You have exceeded the limit of login attempts, please try after some time');
+                    if ($minutesElapsed <= MaintenanceAccess::LOGIN_ATTEMPTS_WINDOW) {
+                        $minutesLeft = MaintenanceAccess::LOGIN_ATTEMPTS_WINDOW - $minutesElapsed;
+                        if ($minutesLeft > 1) {
+                            $this->errors[] = Tools::displayError(sprintf('You have reached the limit of login attempts, please try after %d minutes.', $minutesLeft));
+                        } elseif ($minutesLeft == 1) {
+                            $this->errors[] = Tools::displayError(sprintf('You have reached the limit of login attempts, please try after %d minute.', $minutesLeft));
+                        }
+                    }
+                }
+            }
         }
 
         if (!count($this->errors)) {
-            // Find employee
-            $this->context->employee = new Employee();
-            $is_employee_loaded = $this->context->employee->getByEmail($email, $passwd);
-            $employee_associated_shop = $this->context->employee->getAssociatedShops();
-            if (!$is_employee_loaded) {
-                $this->errors[] = Tools::displayError('The Employee does not exist, or the password provided is incorrect.');
-                $this->context->employee->logout();
-            } elseif (empty($employee_associated_shop) && !$this->context->employee->isSuperAdmin()) {
-                $this->errors[] = Tools::displayError('This employee does not manage the shop anymore (Either the shop has been deleted or permissions have been revoked).');
-                $this->context->employee->logout();
-            } else {
-                // Update cookie
-                $cookie = Context::getContext()->cookie;
-                $cookie->enable_maintenance_view = $this->context->employee->id;
-                $cookie->remote_addr = ip2long(Tools::getRemoteAddr());
-                $cookie->write();
+            if (empty($email)) {
+                $this->errors[] = Tools::displayError('The Email address field is blank.');
+            } elseif (!Validate::isEmail($email)) {
+                $this->errors[] = Tools::displayError('Invalid Email address.');
             }
-            if (count($this->errors)) {
-                $this->context->smarty->assign('errors', $this->errors);
-                $objMaintenanceAccess->email = $email;
-                $objMaintenanceAccess->ip_address = Tools::getRemoteAddr();
-                $objMaintenanceAccess->save();
+
+            if (empty($passwd)) {
+                $this->errors[] = Tools::displayError('The Password field is blank.');
+            } elseif (!Validate::isPasswd($passwd)) {
+                $this->errors[] = Tools::displayError('Invalid Password.');
+            }
+
+            if (!count($this->errors)) {
+                // Find employee
+                $this->context->employee = new Employee();
+                $is_employee_loaded = $this->context->employee->getByEmail($email, $passwd);
+                $employee_associated_shop = $this->context->employee->getAssociatedShops();
+
+                if (!$is_employee_loaded) {
+                    $this->errors[] = Tools::displayError('The employee does not exist, or the password provided is incorrect.');
+                    $this->context->employee->logout();
+                } elseif (empty($employee_associated_shop) && !$this->context->employee->isSuperAdmin()) {
+                    $this->errors[] = Tools::displayError('This employee does not manage the website anymore (either the website has been deleted or permissions have been revoked).');
+                    $this->context->employee->logout();
+                } else {
+                    // Login successful
+                    // Update cookie
+                    $cookie = Context::getContext()->cookie;
+                    $cookie->enable_maintenance_view = $this->context->employee->id;
+                    $cookie->remote_addr = ip2long($remoteIpAddress);
+                    $cookie->write();
+
+                    // Reset attempts count on successful login
+                    $objMaintenanceAccess->removeFailedAttempts($email, $remoteIpAddress);
+                }
+
+                if (count($this->errors)) {
+                    // Save only if attempts limit is set
+                    if ($maxAttempts) {
+                        $objMaintenanceAccess = new MaintenanceAccess();
+                        $objMaintenanceAccess->email = $email;
+                        $objMaintenanceAccess->ip_address = $remoteIpAddress;
+                        $objMaintenanceAccess->save();
+
+                        if ($attemptsCount < $maxAttempts) {
+                            $attemptsLeft = $maxAttempts - $attemptsCount - 1;
+
+                            if ($attemptsLeft > 0) {
+                                if ($attemptsLeft > 1) {
+                                    $this->errors[] = Tools::displayError(sprintf('%d attempts left.', ($maxAttempts - $attemptsCount - 1)));
+                                } else {
+                                    $this->errors[] = Tools::displayError(sprintf('%d attempt left.', ($maxAttempts - $attemptsCount - 1)));
+                                }
+                            } else {
+                                if (MaintenanceAccess::LOGIN_ATTEMPTS_WINDOW > 1) {
+                                    $this->errors[] = Tools::displayError(sprintf('You have reached the limit of login attempts, please try after %d minutes.', MaintenanceAccess::LOGIN_ATTEMPTS_WINDOW));
+                                } else {
+                                    $this->errors[] = Tools::displayError(sprintf('You have reached the limit of login attempts, please try after %d minute.', MaintenanceAccess::LOGIN_ATTEMPTS_WINDOW));
+                                }
+                            }
+                        }
+                    }
+
+                    $this->context->smarty->assign('errors', $this->errors);
+                } else {
+                    Tools::redirect('index.php');
+                }
             } else {
-                Tools::redirect('index.php');
+                $this->context->smarty->assign('errors', $this->errors);
             }
         } else {
             $this->context->smarty->assign('errors', $this->errors);
         }
-        return $result;
     }
 
     /**
@@ -917,8 +969,16 @@ class FrontControllerCore extends Controller
             }
             $excluded_key = array('isolang', 'id_lang', 'controller', 'fc', 'id_product', 'id_category', 'id_manufacturer', 'id_supplier', 'id_cms');
             foreach ($_GET as $key => $value) {
-                if (!in_array($key, $excluded_key) && Validate::isUrl($key) && Validate::isUrl($value)) {
-                    $params[Tools::safeOutput($key)] = Tools::safeOutput($value);
+                if (!in_array($key, $excluded_key)) {
+                    if (is_array($value)) {
+                        if (Validate::isUrl($key)) {
+                            $params[Tools::safeOutput($key)] = $this->sanitizeQueryOutput($value);
+                        }
+                    } else {
+                        if (Validate::isUrl($key) && Validate::isUrl($value)) {
+                            $params[Tools::safeOutput($key)] = Tools::safeOutput($value);
+                        }
+                    }
                 }
             }
 
@@ -941,6 +1001,24 @@ class FrontControllerCore extends Controller
             header('Cache-Control: no-cache');
             Tools::redirectLink($final_url);
         }
+    }
+
+    protected function sanitizeQueryOutput($query)
+    {
+        $params = array();
+        foreach ($query as $key => $value) {
+            if (Validate::isUrl($key)) {
+                if (is_array($value)) {
+                    $params[Tools::safeOutput($key)] = $this->sanitizeQueryOutput($value);
+                } else {
+                    if (Validate::isUrl($value)) {
+                        $params[Tools::safeOutput($key)] = Tools::safeOutput($value);
+                    }
+                }
+            }
+        }
+
+        return $params;
     }
 
     /**
@@ -1104,9 +1182,7 @@ class FrontControllerCore extends Controller
      */
     public function initHeader()
     {
-        /** @see P3P Policies (http://www.w3.org/TR/2002/REC-P3P-20020416/#compact_policies) */
-        header('P3P: CP="IDC DSP COR CURa ADMa OUR IND PHY ONL COM STA"');
-        header('Powered-By: PrestaShop');
+        header('Powered-By: QloApps');
 
         // Hooks are voluntary out the initialize array (need those variables already assigned)
         $this->context->smarty->assign(array(
@@ -1141,6 +1217,7 @@ class FrontControllerCore extends Controller
          */
         if ($this->context->language->is_rtl) {
             $this->addCSS(_THEME_CSS_DIR_.'rtl.css');
+            $this->addCSS(_THEME_CSS_DIR_.'rtl_grid.css');
             $this->addCSS(_THEME_CSS_DIR_.$this->context->language->iso_code.'.css');
         }
     }
@@ -1548,26 +1625,8 @@ class FrontControllerCore extends Controller
         if ($this->useMobileTheme()) {
             $this->setMobileTemplate($default_template);
         } else {
-            $template = $this->getOverrideTemplate();
-            if ($template) {
-                parent::setTemplate($template);
-            } else {
-                parent::setTemplate($default_template);
-            }
+            parent::setTemplate($default_template);
         }
-    }
-
-    /**
-     * Returns an overridden template path (if any) for this controller.
-     * If not overridden, will return false. This method can be easily overriden in a
-     * specific controller.
-     *
-    * @since 1.5.0.13
-    * @return string|bool
-    */
-    public function getOverrideTemplate()
-    {
-        return Hook::exec('DisplayOverrideTemplate', array('controller' => $this));
     }
 
     /**

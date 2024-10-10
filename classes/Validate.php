@@ -233,7 +233,7 @@ class ValidateCore
      */
     public static function isPrice($price)
     {
-        return preg_match('/^[0-9]{1,10}(\.[0-9]{1,9})?$/', $price);
+        return preg_match('/^[0-9]{1,10}(\.[0-9]{1,})?$/', $price);
     }
 
     /**
@@ -244,7 +244,7 @@ class ValidateCore
     */
     public static function isNegativePrice($price)
     {
-        return preg_match('/^[-]?[0-9]{1,10}(\.[0-9]{1,9})?$/', $price);
+        return preg_match('/^[-]?[0-9]{1,10}(\.[0-9]{1,})?$/', $price);
     }
 
     /**
@@ -364,7 +364,7 @@ class ValidateCore
      */
     public static function isCityName($city)
     {
-        return preg_match(Tools::cleanNonUnicodeSupport('/^[^!<>;?=+@#"°{}_$%]*$/u'), $city);
+        return preg_match(Tools::cleanNonUnicodeSupport('/^\p{L}+[^!<>;?=+@#"°{}_$%]*$/u'), $city);
     }
 
     /**
@@ -534,7 +534,7 @@ class ValidateCore
      */
     public static function isPhoneNumber($number)
     {
-        return preg_match('/^[+0-9. ()-]*$/', $number);
+        return preg_match('/^\+?[\s\d.()-]*\d+$/', $number);
     }
 
     /**

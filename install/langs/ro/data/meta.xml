@@ -19,8 +19,8 @@
     <url_rewrite>contact</url_rewrite>
   </meta>
   <meta id="index" id_shop="1">
-    <title/>
-    <description>Magazin motorizat de PrestaShop</description>
+    <title>Hotel Prime</title>
+    <description>Un loc unde confortul și luxul se îmbină cu natura!</description>
     <keywords/>
     <url_rewrite/>
   </meta>
@@ -95,6 +95,12 @@
     <description/>
     <keywords/>
     <url_rewrite>istoric-comenzi</url_rewrite>
+  </meta>
+  <meta id="order-detail" id_shop="1">
+    <title>Detalii rezervare</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>detalii-rezervare</url_rewrite>
   </meta>
   <meta id="identity" id_shop="1">
     <title>Identitate</title>

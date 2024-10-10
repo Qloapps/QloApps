@@ -80,6 +80,39 @@ class ToolsCore
         return $result;
     }
 
+    public static function generateRandomZipcode($idCountry)
+    {
+        $randomZipCode = '';
+        $alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        $alphabetLength = Tools::strlen($alphabet);
+        if (Validate::isLoadedObject($objCountry = new Country($idCountry))
+            && $objCountry->need_zip_code
+        ) {
+            if ($zipCodeFormat = $objCountry->zip_code_format) {
+                for ($i = 0; $i < Tools::strlen($zipCodeFormat); $i++) {
+                    $formatCharacter = $zipCodeFormat[$i];
+                    if (in_array($formatCharacter, array('N', 'L', 'C'))) {
+                        if ($formatCharacter == 'N') {
+                            $randomZipCode .= mt_rand(0, 9);
+                        } elseif ($formatCharacter == 'L') {
+                            $randomZipCode .= $alphabet[mt_rand(0, $alphabetLength - 1)];
+                        } elseif ($formatCharacter == 'C') {
+                            $randomZipCode .= $objCountry->iso_code;
+                        }
+                    } else {
+                        $randomZipCode .= $formatCharacter;
+                    }
+                }
+            } else {
+                for ($i = 1; $i <= 5; $i++) {
+                    $randomZipCode .= mt_rand(0, 9);
+                }
+            }
+        }
+
+        return $randomZipCode;
+    }
+
     /**
      * Random bytes generator
      *
@@ -3023,6 +3056,8 @@ exit;
         $smarty = Context::getContext()->smarty;
         Tools::clearCache($smarty);
         Tools::clearCompile($smarty);
+        @copy(_PS_CACHE_DIR_.'smarty/index.php', _PS_CACHE_DIR_.'smarty/cache/index.php');
+        @copy(_PS_CACHE_DIR_.'smarty/index.php', _PS_CACHE_DIR_.'smarty/compile/index.php');
     }
 
     public static function clearColorListCache($id_product = false)
@@ -3402,14 +3437,9 @@ exit;
                 $post_data .= '&method=listing&action=install-modules';
                 $post_data .= defined('_PS_HOST_MODE_') ? '-od' : '';
                 break;
-            case 'catalog-recommendation':
-                $protocols[] = 'http';
-                $post_data .= '&method=content&action=catalogRecommendation';
-                $post_data .= defined('_PS_HOST_MODE_') ? '-od' : '';
-                break;
-            case 'dashboard-recommendation':
-                $protocols[] = 'http';
-                $post_data .= '&method=content&action=dashboardRecommendation';
+            case 'recommendation':
+                $post_data .= '&method=recommendation&controller=';
+                $post_data .= (isset($params['controller']) ? $params['controller'] : Context::getContext()->controller->controller_name);
                 $post_data .= defined('_PS_HOST_MODE_') ? '-od' : '';
                 break;
             case 'check-version':
@@ -3603,6 +3633,8 @@ exit;
 
     public static function purifyHTML($html, $uri_unescape = null, $allow_style = false)
     {
+        require_once(_PS_TOOL_DIR_.'htmlpurifier/HTMLPurifier.auto.php');
+
         static $use_html_purifier = null;
         static $purifier = null;
 
@@ -3767,6 +3799,27 @@ exit;
             } while (count($head_stack));
         }
         return $base;
+    }
+
+    public static function processPriceRounding($value, $qty = 1, $roundType = null, $roundMode = null)
+    {
+        if (!$roundType) {
+            $roundType = Configuration::get('PS_ROUND_TYPE');
+        }
+        switch ($roundType) {
+            case Order::ROUND_TOTAL:
+                $value = $value;
+                break;
+            case Order::ROUND_LINE:
+                $value = Tools::ps_round(($value * $qty), _PS_PRICE_COMPUTE_PRECISION_, $roundMode);
+                break;
+            case Order::ROUND_ITEM:
+            default:
+                $value = Tools::ps_round($value, _PS_PRICE_COMPUTE_PRECISION_, $roundMode) * $qty;
+                break;
+        }
+
+        return $value;
     }
 }
 

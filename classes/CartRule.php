@@ -72,6 +72,9 @@ class CartRuleCore extends ObjectModel
     public $date_add;
     public $date_upd;
 
+    const GENERATED_BY_REFUND = 1;
+    const GENERATED_BY_ORDER_SLIP = 2;
+
     /**
      * @see ObjectModel::$definition
      */
@@ -294,6 +297,13 @@ class CartRuleCore extends ObjectModel
             return array();
         }
 
+        // Remove cart rule that does not match the id_customer
+        foreach ($result as $key => $cart_rule) {
+            if ($cart_rule['id_customer'] && $cart_rule['id_customer'] != $id_customer) {
+                unset($result[$key]);
+            }
+        }
+
         // Remove cart rule that does not match the customer groups
         $customerGroups = Customer::getGroupsStatic($id_customer);
 
@@ -400,6 +410,8 @@ class CartRuleCore extends ObjectModel
         }
         unset($cart_rule);
 
+        Hook::exec('actionCustomerCartRulesModifier', array('cart_rules' => &$result, 'id_customer' => (int)$id_customer));
+
         return $result;
     }
 
@@ -421,7 +433,7 @@ class CartRuleCore extends ObjectModel
      * @param $name
      * @return bool
      */
-    public static function cartRuleExists($name)
+    public static function cartRuleExists($code, $id_customer = 0)
     {
         if (!CartRule::isFeatureActive()) {
             return false;
@@ -430,7 +442,8 @@ class CartRuleCore extends ObjectModel
         return (bool)Db::getInstance()->getValue('
 		SELECT `id_cart_rule`
 		FROM `'._DB_PREFIX_.'cart_rule`
-		WHERE `code` = \''.pSQL($name).'\'');
+		WHERE `code` = \''.pSQL($code).'\''.
+        ($id_customer ? 'AND `id_customer` = '.(int) $id_customer : ''));
     }
 
     /**
@@ -507,6 +520,38 @@ class CartRuleCore extends ObjectModel
             return false;
         }
 
+        /*
+         * If null is provided, default validation will be processed. Useful if you want your own conditions,
+         * but also want to retain functionality of the core.
+         *
+         * If true is provided, the validation ends here and the rule is VALID, ignoring the rest of core validation.
+         *
+         * If false is provided, the validation ends here and the rule is not VALID, ignoring the rest of core validation.
+         * In this case, it's recommended to properly alter the isValidatedByModulesError error message so the user knows why.
+         */
+        $isValidatedByModules = null;
+        $isValidatedByModulesError = Tools::displayError('This voucher is not valid.');
+        Hook::exec(
+            'actionValidateCartRule',
+            array(
+                'cart_rule' => $this,
+                'context' => $context,
+                'alreadyInCart' => $alreadyInCart,
+                'display_error' => $display_error,
+                'check_carrier' => $check_carrier,
+                'isValidatedByModules' => &$isValidatedByModules,
+                'isValidatedByModulesError' => &$isValidatedByModulesError,
+            )
+        );
+
+        if ($isValidatedByModules === false) {
+            return (!$display_error) ? false : $isValidatedByModulesError;
+        }
+
+        if ($isValidatedByModules === true) {
+            return (!$display_error) ? true : null;
+        }
+
         if (!$this->active) {
             return (!$display_error) ? false : Tools::displayError('This voucher is disabled');
         }
@@ -518,6 +563,9 @@ class CartRuleCore extends ObjectModel
         }
         if (strtotime($this->date_to) < time()) {
             return (!$display_error) ? false : Tools::displayError('This voucher has expired');
+        }
+        if (!$alreadyInCart && $context->cart->getOrderTotal(true, Cart::BOTH) <= 0) {
+            return (!$display_error) ? false : Tools::displayError('You cannot add more vouchers since the booking amount has already reached zero. Please remove an existing voucher before adding a new one.');
         }
 
         if ($context->cart->id_customer) {
@@ -601,7 +649,7 @@ class CartRuleCore extends ObjectModel
 
         // Check if the cart rule is only usable by a specific customer, and if the current customer is the right one
         if ($this->id_customer && $context->cart->id_customer != $this->id_customer) {
-            if (!Context::getContext()->customer->isLogged()) {
+            if (!defined('_PS_ADMIN_DIR_') && !Context::getContext()->customer->isLogged()) {
                 return (!$display_error) ? false : (Tools::displayError('You cannot use this voucher').' - '.Tools::displayError('Please log in first'));
             }
             return (!$display_error) ? false : Tools::displayError('You cannot use this voucher');
@@ -901,7 +949,7 @@ class CartRuleCore extends ObjectModel
 
         $reduction_value = 0;
         $objHotelAdvancePayment = new HotelAdvancedPayment();
-        $cache_id = 'getContextualValue_'.(int)$this->id.'_'.(int)$use_tax.'_'.(int)$context->cart->id.'_'.(int)$filter.'_'.(int)$only_advance_payment_products;
+        $cache_id = 'getContextualValue_'.(int)$this->id.'_'.(int)$use_tax.'_'.(int)$context->cart->id.'_'.(int)$context->currency->id.'_'.(int)$filter.'_'.(int)$only_advance_payment_products;
         foreach ($package['products'] as $key => $product) {
             if ($only_advance_payment_products) {
                 if ($advancePaymentInfo = $objHotelAdvancePayment->getIdAdvPaymentByIdProduct($product['id_product'])) {
@@ -925,8 +973,8 @@ class CartRuleCore extends ObjectModel
 
         $all_cart_rules_ids = $context->cart->getOrderedCartRulesIds();
 
-        $cart_amount_ti = $context->cart->getOrderTotal(true, Cart::ONLY_PRODUCTS);
-        $cart_amount_te = $context->cart->getOrderTotal(false, Cart::ONLY_PRODUCTS);
+        $cart_amount_ti = $context->cart->getOrderTotal(true, Cart::ONLY_PRODUCTS_WITH_DEMANDS);
+        $cart_amount_te = $context->cart->getOrderTotal(false, Cart::ONLY_PRODUCTS_WITH_DEMANDS);
 
         // Free shipping on selected carriers
         if ($this->free_shipping && in_array($filter, array(CartRule::FILTER_ACTION_ALL, CartRule::FILTER_ACTION_ALL_NOCAP, CartRule::FILTER_ACTION_SHIPPING))) {
@@ -952,7 +1000,7 @@ class CartRuleCore extends ObjectModel
             // Discount (%) on the whole order
             if ($this->reduction_percent && $this->reduction_product == 0) {
                 // Do not give a reduction on free products!
-                $order_total = $context->cart->getOrderTotal($use_tax, Cart::ONLY_PRODUCTS, $package_products);
+                $order_total = $context->cart->getOrderTotal($use_tax, Cart::ONLY_PRODUCTS_WITH_DEMANDS, $package_products);
                 foreach ($context->cart->getCartRules(CartRule::FILTER_ACTION_GIFT) as $cart_rule) {
                     $order_total -= Tools::ps_round($cart_rule['obj']->getContextualValue($use_tax, $context, CartRule::FILTER_ACTION_GIFT, $package), _PS_PRICE_COMPUTE_PRECISION_);
                 }
@@ -1025,9 +1073,9 @@ class CartRuleCore extends ObjectModel
             if ((float)$this->reduction_amount > 0) {
                 $prorata = 1;
                 if (!is_null($package) && count($all_products)) {
-                    $total_products = $context->cart->getOrderTotal($use_tax, Cart::ONLY_PRODUCTS);
+                    $total_products = $context->cart->getOrderTotal($use_tax, Cart::ONLY_PRODUCTS_WITH_DEMANDS);
                     if ($total_products) {
-                        $prorata = $context->cart->getOrderTotal($use_tax, Cart::ONLY_PRODUCTS, $package['products']) / $total_products;
+                        $prorata = $context->cart->getOrderTotal($use_tax, Cart::ONLY_PRODUCTS_WITH_DEMANDS, $package['products']) / $total_products;
                     }
                 }
 
@@ -1076,7 +1124,7 @@ class CartRuleCore extends ObjectModel
                 if ($this->reduction_tax == $use_tax) {
                     // The reduction cannot exceed the products total, except when we do not want it to be limited (for the partial use calculation)
                     if ($filter != CartRule::FILTER_ACTION_ALL_NOCAP) {
-                        $cart_amount = $context->cart->getOrderTotal($use_tax, Cart::ONLY_PRODUCTS);
+                        $cart_amount = $context->cart->getOrderTotal($use_tax, Cart::ONLY_PRODUCTS_WITH_DEMANDS);
                         $reduction_amount = min($reduction_amount, $cart_amount);
                     }
                     $reduction_value += $prorata * $reduction_amount;
@@ -1153,6 +1201,18 @@ class CartRuleCore extends ObjectModel
                             $previous_reduction_amount = $prorata * $previous_reduction_amount * (1 + $cart_average_vat_rate);
                         }
 
+                        // First we convert the voucher value to the default currency
+                        $previousCartRuleCurrency = new Currency($this->reduction_currency);
+
+                        if ($previous_reduction_amount == 0 || $previousCartRuleCurrency->conversion_rate == 0) {
+                            $previous_reduction_amount = 0;
+                        } else {
+                            $previous_reduction_amount /= $previousCartRuleCurrency->conversion_rate;
+                        }
+
+                        // Then we convert the voucher value in the default currency into the cart currency
+                        $previous_reduction_amount *= $context->currency->conversion_rate;
+                        $previous_reduction_amount = Tools::ps_round($previous_reduction_amount, _PS_PRICE_COMPUTE_PRECISION_);
                         $current_cart_amount = max($current_cart_amount - (float)$previous_reduction_amount, 0);
                     }
 
@@ -1320,12 +1380,20 @@ class CartRuleCore extends ObjectModel
             return array();
         }
 
+        $order_total = $context->cart->getOrderTotal(true, Cart::ONLY_PRODUCTS_WITH_DEMANDS, null, null, false);
         static $errors = array();
         foreach ($context->cart->getCartRules() as $cart_rule) {
             if ($error = $cart_rule['obj']->checkValidity($context, true)) {
                 $context->cart->removeCartRule($cart_rule['obj']->id);
                 $context->cart->update();
                 $errors[] = $error;
+            } else {
+                if ($order_total <= 0) {
+                    // remove cart rule if cart amount is already reached 0
+                    $context->cart->removeCartRule($cart_rule['obj']->id);
+                } else {
+                    $order_total = $order_total - $cart_rule['value_real'];
+                }
             }
         }
         return $errors;
@@ -1466,15 +1534,37 @@ class CartRuleCore extends ObjectModel
      * @param $id_lang
      * @return array
      */
-    public static function getCartsRuleByCode($name, $id_lang, $extended = false)
+    public static function getCartsRuleByCode($name, $id_lang, $extended = false, $id_customer = 0)
     {
         $sql_base = 'SELECT cr.*, crl.*
-						FROM '._DB_PREFIX_.'cart_rule cr
-						LEFT JOIN '._DB_PREFIX_.'cart_rule_lang crl ON (cr.id_cart_rule = crl.id_cart_rule AND crl.id_lang = '.(int)$id_lang.')';
+        FROM '._DB_PREFIX_.'cart_rule cr
+        LEFT JOIN '._DB_PREFIX_.'cart_rule_lang crl ON (cr.id_cart_rule = crl.id_cart_rule AND crl.id_lang = '.(int)$id_lang.')
+        WHERE 1'.($id_customer ? ' AND (cr.`id_customer` = 0 OR cr.`id_customer` = '.(int) $id_customer.')' : '');
         if ($extended) {
-            return Db::getInstance()->executeS('('.$sql_base.' WHERE code LIKE \'%'.pSQL($name).'%\') UNION ('.$sql_base.' WHERE name LIKE \'%'.pSQL($name).'%\')');
+            return Db::getInstance()->executeS('('.$sql_base.' AND code LIKE \'%'.pSQL($name).'%\') UNION ('.$sql_base.' AND name LIKE \'%'.pSQL($name).'%\')');
         } else {
-            return Db::getInstance()->executeS($sql_base.' WHERE code LIKE \'%'.pSQL($name).'%\'');
+            return Db::getInstance()->executeS($sql_base.' AND code LIKE \'%'.pSQL($name).'%\'');
         }
+    }
+
+    public static function getGeneratedBy($id)
+    {
+        if (!$id) {
+            return false;
+        }
+        $response = array();
+        $sql = 'SELECT `id_order_slip` FROM '._DB_PREFIX_.'order_slip os
+            WHERE os.`id_cart_rule` = '.(int)$id;
+        if ($result = Db::getInstance()->getValue($sql)) {
+            $response['generated_by'] = self::GENERATED_BY_ORDER_SLIP;
+            $response['id_generated_by'] = $result;
+        }
+        $sql = 'SELECT `id_order_return` FROM '._DB_PREFIX_.'order_return o
+            WHERE o.`return_type` = '.OrderReturn::RETURN_TYPE_CART_RULE.' AND o.`id_return_type` = '.(int)$id;
+        if ($result = Db::getInstance()->getValue($sql)) {
+            $response['generated_by'] = self::GENERATED_BY_REFUND;
+            $response['id_generated_by'] = $result;
+        }
+        return $response;
     }
 }

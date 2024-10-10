@@ -26,9 +26,10 @@
 										<tr>
 											<td class="text-center">{$cart_data['room_num']|escape:'htmlall':'UTF-8'}</td>
 											<td class="text-center">{$cart_data['room_type']|escape:'htmlall':'UTF-8'}</td>
-											<td class="text-center">{dateFormat date=$cart_data['date_from']} - {dateFormat date=$cart_data['date_to']}</td>
-											<td class="text-center">{convertPrice price=$cart_data['amt_with_qty']}</td>
-											<td class="text-center"><button class="btn btn-default ajax_cart_delete_data" data-id-product="{$cart_data['id_product']|escape:'htmlall':'UTF-8'}" data-id-hotel="{$cart_data['id_hotel']|escape:'htmlall':'UTF-8'}" data-id-cart="{$cart_data['id_cart']|escape:'htmlall':'UTF-8'}" data-id-cart-book-data="{$cart_data['id_cart_book_data']|escape:'htmlall':'UTF-8'}" data-date-from="{$cart_data['date_from']|escape:'htmlall':'UTF-8'}" data-date-to="{$cart_data['date_to']|escape:'htmlall':'UTF-8'}"><i class='icon-trash'></i></button></td>
+											{assign var="is_full_date" value=($show_full_date && ($cart_data['date_from']|date_format:'%D' == $cart_data['date_to']|date_format:'%D'))}
+											<td class="text-center">{dateFormat date=$cart_data['date_from'] full=$is_full_date} - {dateFormat date=$cart_data['date_to'] full=$is_full_date}</td>
+											<td class="text-center">{convertPrice price=($cart_data['amt_with_qty'] + $cart_data['additional_services_auto_add_with_room_price'] + $cart_data['additional_service_price'] + $cart_data['demand_price'])}</td>
+											<td class="text-center"><button class="btn btn-default ajax_cart_delete_data" data-id-product="{$cart_data['id_product']|escape:'htmlall':'UTF-8'}" data-id-hotel="{$cart_data['id_hotel']|escape:'htmlall':'UTF-8'}" data-id-cart="{$cart_data['id_cart']|escape:'htmlall':'UTF-8'}" data-id-cart-book-data="{$cart_data['id']|escape:'htmlall':'UTF-8'}" data-date-from="{$cart_data['date_from']|escape:'htmlall':'UTF-8'}" data-date-to="{$cart_data['date_to']|escape:'htmlall':'UTF-8'}"><i class='icon-trash'></i></button></td>
 										</tr>
 									{/foreach}
 								{/if}
@@ -54,7 +55,7 @@
                                                     <td>{$cart_data['name']|escape:'htmlall':'UTF-8'}</td>
                                                     <td>{$cart_data['hotel_name']|escape:'htmlall':'UTF-8'}</td>
                                                     <td>{$cart_data['quantity']|escape:'htmlall':'UTF-8'}</td>
-                                                    <td>{convertPrice price=$cart_data['total_price_tax_incl']}</td>
+                                                    <td>{convertPrice price=$cart_data['total_price_tax_excl']}</td>
                                                     <td><button class="btn btn-default service_product_delete" data-id-hotel="{$cart_data['id_hotel']|escape:'htmlall':'UTF-8'}" data-id-product="{$cart_data['id_product']|escape:'htmlall':'UTF-8'}" data-id-cart="{$id_cart|escape:'htmlall':'UTF-8'}"><i class='icon-trash'></i></button></td>
                                                 </tr>
                                             {/foreach}
@@ -69,18 +70,29 @@
 					<div class="row cart_amt_div">
 						<table class="table table-responsive">
 							<tr>
-								<th colspan="2">{l s='Total Amount (Tax incl.):' mod='hotelreservationsystem'}</th>
-								<th colspan="2" class="text-right" id="cart_total_amt">
+								<td>{l s='Rooms Amount (Tax excl.):' mod='hotelreservationsystem'}</td>
+								<td class="text-right" id="cart_rooms_amount">
+									{if isset($cart_rooms_amount)}{convertPrice price=$cart_rooms_amount}{else}{convertPrice price=0}{/if}
+								</td>
+							</tr>
+							<tr>
+								<td>{l s='Convenience Fee (Tax excl.):' mod='hotelreservationsystem'}</td>
+								<td class="text-right" id="cart_convenience_fee">
+									{if isset($cart_amount_convenience_fee)}{convertPrice price=$cart_amount_convenience_fee}{else}{convertPrice price=0}{/if}
+								</td>
+							</tr>
+							<tr>
+								<th>{l s='Total Amount (Tax excl.):' mod='hotelreservationsystem'}</th>
+								<th class="text-right" id="cart_total_amt">
 									{if isset($cart_tamount)}{convertPrice price=$cart_tamount}{else}{convertPrice price=0}{/if}
 								</th>
-								<th colspan="1"></th>
 							</tr>
 						</table>
 					</div>
 				</div>
 			</div>
 			<div class="modal-footer">
-				<a href="{$link->getAdminLink('AdminOrders')}&amp;addorder&amp;cart_id={$id_cart|escape:'htmlall':'UTF-8'|intval}&amp;guest_id={$id_guest|escape:'htmlall':'UTF-8'|intval}" class="btn btn-primary cart_booking_btn" {if !$total_products_in_cart}disabled="disabled"{/if}>
+				<a href="{$link->getAdminLink('AdminOrders')}&amp;addorder&amp;cart_id={$id_cart|escape:'htmlall':'UTF-8'|intval}" class="btn btn-primary cart_booking_btn" {if !$total_products_in_cart}disabled="disabled"{/if}>
 					{l s='Book Now' mod='hotelreservationsystem'}
 				</a>
 				<button type="button" class="btn btn-default" data-dismiss="modal">{l s='Close' mod='hotelreservationsystem'}</button>

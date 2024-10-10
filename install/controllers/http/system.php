@@ -94,6 +94,7 @@ class InstallControllerHttpSystem extends InstallControllerHttp
                         'pdo_mysql' => $this->l('PDO MySQL extension is not loaded'),
                         'curl' => $this->l('Curl extension is not loaded'),
                         'soap' => $this->l('SOAP extension is not loaded'),
+                        'openssl' => $this->l('OpenSSL extension is not loaded.'),
                         'simplexml' => $this->l('SimpleXml extension is not loaded'),
                         'memory_limit' => $this->l('In the PHP configuration set memory_limit to minimum 128M'),
                         'max_execution_time' => $this->l('In the PHP configuration set max_execution_time to minimum 500'),
@@ -137,7 +138,6 @@ class InstallControllerHttpSystem extends InstallControllerHttp
                         'register_globals' => $this->l('PHP register_globals option is enabled'),
                         'gz' => $this->l('GZIP compression is not activated'),
                         'mbstring' => $this->l('Mbstring extension is not enabled'),
-                        'magicquotes' => $this->l('PHP magic quotes option is enabled'),
                         'dom' => $this->l('Dom extension is not loaded'),
                     )
                 ),

@@ -20,7 +20,7 @@ $chosen-focus-box-shadow: 0 1px 1px rgba(0, 0, 0, .075) inset, 0 0 8px rgba(82, 
 $chosen-focus-transition: border linear .2s, box-shadow linear .2s
 $chosen-height: $input-height-base
 $chosen-multi-height: $input-height-base + 6px
-$chosen-sprite-path: '../img/chosen-sprite.png'
+$chosen-sprite-path: '#{$img-path}/chosen-sprite.png'
 
 .chosen-select
 	width: 100%
@@ -200,6 +200,8 @@ $chosen-sprite-path: '../img/chosen-sprite.png'
 		input
 			position: absolute
 			@include left(-9000px)
+		&:before
+			visibility: hidden
 
 .chosen-container-multi
 	.chosen-choices
@@ -227,6 +229,7 @@ $chosen-sprite-path: '../img/chosen-sprite.png'
 				border: 0 !important
 				color: $gray
 				height: $chosen-multi-height - 8px
+				width: 100% !important
 				margin: 0
 				padding: 4px
 				outline: 0

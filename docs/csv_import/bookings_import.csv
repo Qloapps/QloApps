@@ -1,0 +1,4 @@
+Order Reference ID;Customer ID;Room Type ID;Duration(yyyy-mm-dd);Number Of Rooms;Order Price;Due Amount;Currency ID;Order Status ID;Service Product IDs (x:n, y:n, z:n,..);Additional Facilities IDs (x:a, y:b, z:c,...)
+1;1;1;2025-03-09,2025-03-10;1;1250;;1;2;20:2;2:1
+1;1;2;2025-03-09,2025-03-10;2;2000;;;2;20;1
+2;2;1;2024-03-09,2024-03-10;2;1250;250;;8;20;

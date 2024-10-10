@@ -34,7 +34,7 @@ class DashProducts extends Module
 	{
 		$this->name = 'dashproducts';
 		$this->tab = 'dashboard';
-		$this->version = '1.0.2';
+		$this->version = '1.0.3';
 		$this->author = 'PrestaShop';
 
 		$this->push_filename = _PS_CACHE_DIR_.'push/activity';
@@ -86,6 +86,38 @@ class DashProducts extends Module
 
 		return $this->display(__FILE__, 'dashboard_zone_two.tpl');
 	}
+
+    // Validation of the configuration form
+    public function validateDashConfig($configs)
+    {
+        $errors = [];
+
+        if (!Validate::isUnsignedInt($configs['DASHPRODUCT_NBR_SHOW_LAST_ORDER'])
+            || !$configs['DASHPRODUCT_NBR_SHOW_LAST_ORDER']
+        ) {
+            $errors[] = $this->l('Number of recent bookings must be a positive integer.');
+        }
+
+        if (!Validate::isUnsignedInt($configs['DASHPRODUCT_NBR_SHOW_BEST_SELLER'])
+            || !$configs['DASHPRODUCT_NBR_SHOW_BEST_SELLER']
+        ) {
+            $errors[] = $this->l('Number of best selling must be a positive integer.');
+        }
+
+        if (!Validate::isUnsignedInt($configs['DASHPRODUCT_NBR_SHOW_MOST_VIEWED'])
+            || !$configs['DASHPRODUCT_NBR_SHOW_MOST_VIEWED']
+        ) {
+            $errors[] = $this->l('Number of most viewed must be a positive integer.');
+        }
+
+        if (!Validate::isUnsignedInt($configs['DASHPRODUCT_NBR_SHOW_TOP_SEARCH'])
+            || !$configs['DASHPRODUCT_NBR_SHOW_TOP_SEARCH']
+        ) {
+            $errors[] = $this->l('Number of top searches must be a positive integer.');
+        }
+
+        return $errors;
+    }
 
 	public function hookDashboardData($params)
 	{
@@ -169,7 +201,7 @@ class DashProducts extends Module
 			);
 			$tr[] = array(
 				'id' => 'status',
-				'value' => Tools::htmlentitiesUTF8($order['state_name']),
+                'value' => '<span class="label color_field" style="background-color:'.$order['state_color'].'">'.Tools::htmlentitiesUTF8($order['state_name']).'</span>',
 				'class' => 'text-left',
 			);
 			$tr[] = array(
@@ -230,7 +262,7 @@ class DashProducts extends Module
 			(!is_null($id_hotel) ? HotelBranchInformation::addHotelRestriction($id_hotel, 'hbd') : '').'
 			GROUP BY hbd.`id_product`
 			ORDER BY `sales` DESC
-			LIMIT '.(int) Configuration::get('DASHPRODUCT_NBR_SHOW_BEST_SELLER', 10)
+			LIMIT '.(int) Configuration::get('DASHPRODUCT_NBR_SHOW_BEST_SELLER')
 		);
 
 		$body = array();
@@ -331,9 +363,10 @@ class DashProducts extends Module
 		);
 
 		if (Configuration::get('PS_STATSDATA_PAGESVIEWS')) {
-			$products = $this->getTotalViewed($date_from, $date_to, (int)Configuration::get('DASHPRODUCT_NBR_SHOW_MOST_VIEWED'));
+			$products = $this->getTotalViewed($date_from, $date_to, (int)Configuration::get('DASHPRODUCT_NBR_SHOW_MOST_VIEWED'), $id_hotel);
 			$body = array();
 			if (is_array($products) && count($products)) {
+				$objHotelRoomType = new HotelRoomType();
 				foreach ($products as $product) {
 					$product_obj = new Product((int)$product['id_object'], true, $this->context->language->id);
 					if (!Validate::isLoadedObject($product_obj)) {
@@ -347,8 +380,8 @@ class DashProducts extends Module
 						$img = ImageManager::thumbnail($path_to_image, 'product_mini_'.$product_obj->id.'.'.$this->context->controller->imageType, 45, $this->context->controller->imageType);
 					}
 
-					$objHotelRoomType = new HotelRoomType($product_obj->id);
-					$objHotelBranch = new HotelBranchInformation($objHotelRoomType->id_hotel, $this->context->language->id);
+					$roomTypeInfo = $objHotelRoomType->getRoomTypeInfoByIdProduct($product_obj->id);
+					$objHotelBranch = new HotelBranchInformation($roomTypeInfo['id_hotel'], $this->context->language->id);
 
 					$tr = array();
 					$tr[] = array(
@@ -406,14 +439,14 @@ class DashProducts extends Module
 	public function getTableTop10MostSearch($date_from, $date_to)
 	{
 		$header = array(
+            array(
+                'id' => 'image',
+                'title' => $this->l('Image'),
+                'class' => 'text-center'
+            ),
 			array(
 				'id' => 'reference',
 				'title' => $this->l('Hotel'),
-				'class' => 'text-center'
-			),
-			array(
-				'id' => 'image',
-				'title' => $this->l('Cover image'),
 				'class' => 'text-center'
 			),
 			array(
@@ -523,9 +556,8 @@ class DashProducts extends Module
 	{
 		return Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue('
 		SELECT count(`id_product`) as count
-		FROM `'._DB_PREFIX_.'cart_product` cp
+		FROM `'._DB_PREFIX_.'htl_cart_booking_data` cp
 		WHERE cp.`id_product` = '.(int)$id_product.'
-		'.Shop::addSqlRestriction(false, 'cp').'
 		AND cp.`date_add` BETWEEN "'.pSQL($date_from).' 00:00:00" AND "'.pSQL($date_to).' 23:59:59"');
 	}
 
@@ -539,7 +571,7 @@ class DashProducts extends Module
 		);
 	}
 
-	public function getTotalViewed($date_from, $date_to, $limit = 10)
+	public function getTotalViewed($date_from, $date_to, $limit = 10, $id_hotel = 0)
 	{
 		$objGoogleAnalytics = Module::isEnabled('qlogoogleanalytics') ? Module::getInstanceByName('qlogoogleanalytics') : false;
         if (Validate::isLoadedObject($objGoogleAnalytics) && $objGoogleAnalytics->isConfigured()) {

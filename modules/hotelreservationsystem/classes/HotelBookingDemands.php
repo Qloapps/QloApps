@@ -74,7 +74,9 @@ class HotelBookingDemands extends ObjectModel
         $dateTo = 0,
         $groupByRoom = 1,
         $getTotalPrice = 0,
-        $useTax = 1
+        $useTax = 1,
+        $idHtlBookingDetail = 0,
+        $idOrderDetail = 0
     ) {
         $moduleObj = Module::getInstanceByName('hotelreservationsystem');
         $context = Context::getContext();
@@ -88,21 +90,28 @@ class HotelBookingDemands extends ObjectModel
         $totalDemandsPrice = 0;
         $sql = 'SELECT hb.`id_room`, hb.`adults`, hb.`children`, hd.* FROM `'._DB_PREFIX_.'htl_booking_demands` hd
         LEFT JOIN `'._DB_PREFIX_.'htl_booking_detail` hb ON (hd.`id_htl_booking` = hb.`id`)
-        WHERE hd.`id_htl_booking` IN
-        (SELECT `id` FROM `'._DB_PREFIX_.'htl_booking_detail`
-        WHERE `id_order`='.(int) $idOrder;
+        WHERE hb.`id_order` ='.(int) $idOrder;
+
+
+        if ($idOrderDetail) {
+            $sql .= ' AND `id_order_detail`='.(int)$idOrderDetail;
+        }
         if ($idProduct) {
-            $sql .= ' AND `id_product`='.(int)$idProduct;
+            $sql .= ' AND hb.`id_product`='.(int)$idProduct;
         }
         if ($idRoom) {
-            $sql .= ' AND `id_room`='.(int)$idRoom;
+            $sql .= ' AND hb.`id_room`='.(int)$idRoom;
         }
         if ($dateFrom && $dateTo) {
             $dateFrom = date('Y-m-d', strtotime($dateFrom));
             $dateTo = date('Y-m-d', strtotime($dateTo));
-            $sql .= ' AND `date_from`=\''.pSQL($dateFrom).'\' AND `date_to`= \''.pSQL($dateTo).'\'';
+            $sql .= ' AND hb.`date_from`=\''.pSQL($dateFrom).'\' AND hb.`date_to`= \''.pSQL($dateTo).'\'';
         }
-        $sql .= ')';
+
+        if ($idHtlBookingDetail) {
+            $sql .= ' AND hb.`id` = '.(int)$idHtlBookingDetail;
+        }
+
         if ($getTotalPrice) {
             $totalDemandsPrice = 0;
         }
@@ -110,9 +119,9 @@ class HotelBookingDemands extends ObjectModel
             if ($getTotalPrice) {
                 foreach ($roomTypeDemands as $demand) {
                     if ($useTax) {
-                        $totalDemandsPrice += $demand['total_price_tax_incl'];
+                        $totalDemandsPrice += Tools::processPriceRounding($demand['total_price_tax_incl']);
                     } else {
-                        $totalDemandsPrice += $demand['total_price_tax_excl'];
+                        $totalDemandsPrice += Tools::processPriceRounding($demand['total_price_tax_excl']);
                     }
                 }
             } else {
@@ -175,10 +184,9 @@ class HotelBookingDemands extends ObjectModel
         return new TaxCalculator($taxes, $computationMethod);
     }
 
-    public function setBookingDemandTaxDetails()
+    public function setBookingDemandTaxDetails($replace = 0)
     {
-        $idBookingDemand = $this->id;
-        if ($idBookingDemand && Validate::isLoadedObject($objBkDemand = new HotelBookingDemands($idBookingDemand))) {
+        if ($this->id) {
             if ($taxCalculator = $this->tax_calculator) {
                 if (!($taxCalculator instanceof TaxCalculator)) {
                     return false;
@@ -187,34 +195,26 @@ class HotelBookingDemands extends ObjectModel
                     return true;
                 }
                 $values = '';
-                $objGlobalDemand = new HotelRoomTypeGlobalDemand($this->id_global_demand);
-                $priceTaxExcl = $objBkDemand->unit_price_tax_excl;
+                $priceTaxExcl = $this->unit_price_tax_excl;
                 foreach ($taxCalculator->getTaxesAmount($priceTaxExcl) as $idTax => $amount) {
                     $quantity = 1;
-                    if ($objGlobalDemand->price_calc_method == HotelRoomTypeGlobalDemand::WK_PRICE_CALC_METHOD_EACH_DAY) {
-                        $objBkDetail = new HotelBookingDetail($objBkDemand->id_htl_booking);
+                    if ($this->price_calc_method == HotelRoomTypeGlobalDemand::WK_PRICE_CALC_METHOD_EACH_DAY) {
+                        $objBkDetail = new HotelBookingDetail($this->id_htl_booking);
                         $quantity = $objBkDetail->getNumberOfDays($objBkDetail->date_from, $objBkDetail->date_to);
                     }
-                    switch (Configuration::get('PS_ROUND_TYPE')) {
-                        case Order::ROUND_ITEM:
-                            $unitAmount = (float)Tools::ps_round($amount, _PS_PRICE_COMPUTE_PRECISION_);
-                            $totalAmount = $unitAmount * $quantity;
-                            break;
-                        case Order::ROUND_LINE:
-                            $unitAmount = $amount;
-                            $totalAmount = Tools::ps_round(
-                                $unitAmount * $quantity,
-                                _PS_PRICE_COMPUTE_PRECISION_
-                            );
-                            break;
-                        case Order::ROUND_TOTAL:
-                            $unitAmount = $amount;
-                            $totalAmount = $unitAmount * $quantity;
-                            break;
-                    }
-                    $values .= '('.(int)$idBookingDemand.','.(int)$idTax.','.(float)$unitAmount.','.
+
+                    // Rounding as per configurations
+                    $totalAmount += Tools::processPriceRounding($amount, $quantity);
+
+                    $values .= '('.(int)$this->id.','.(int)$idTax.','.(float)$amount.','.
                     (float)$totalAmount.'),';
                 }
+
+                // if delete previous details and save new details
+                if ($replace) {
+                    Db::getInstance()->execute('DELETE FROM `'._DB_PREFIX_.'htl_booking_demands_tax` WHERE id_booking_demand='.(int)$this->id);
+                }
+
                 $values = rtrim($values, ',');
                 $sql = 'INSERT INTO `'._DB_PREFIX_.'htl_booking_demands_tax`
                 (id_booking_demand, id_tax, unit_amount, total_amount)
@@ -243,42 +243,33 @@ class HotelBookingDemands extends ObjectModel
             || Configuration::get('PS_INVOICE_TAXES_BREAKDOWN');
     }
 
-    public function getExtraDemandsTaxesDetails($idOrder)
+    public function getExtraDemandsTaxesDetails($idOrder, $idsOrderDetail = [])
     {
-        $taxDetails = Db::getInstance()->executeS(
-            'SELECT hb.`id` as id_htl_booking, hbd.`unit_price_tax_excl`, hbd.`total_price_tax_excl`, hb.`id_order_detail`, hdt.*, t.* FROM '._DB_PREFIX_.'orders o '.
-            'INNER JOIN '._DB_PREFIX_.'htl_booking_detail hb ON hb.id_order = o.id_order '.
-            'INNER JOIN '._DB_PREFIX_.'htl_booking_demands hbd ON hbd.id_htl_booking = hb.id '.
-            'INNER JOIN '._DB_PREFIX_.'htl_booking_demands_tax hdt ON hbd.id_booking_demand = hdt.id_booking_demand '.
-            'INNER JOIN '._DB_PREFIX_.'tax t ON t.id_tax = hdt.id_tax '.
-            'WHERE o.id_order = '.(int)$idOrder
-        );
+        $sql = 'SELECT hb.`id` as id_htl_booking, hbd.`unit_price_tax_excl`, hbd.`total_price_tax_excl`, hb.`id_order_detail`, hdt.*, t.* FROM '._DB_PREFIX_.'orders o '.
+        'INNER JOIN '._DB_PREFIX_.'htl_booking_detail hb ON hb.id_order = o.id_order '.
+        'INNER JOIN '._DB_PREFIX_.'htl_booking_demands hbd ON hbd.id_htl_booking = hb.id '.
+        'INNER JOIN '._DB_PREFIX_.'htl_booking_demands_tax hdt ON hbd.id_booking_demand = hdt.id_booking_demand '.
+        'INNER JOIN '._DB_PREFIX_.'tax t ON t.id_tax = hdt.id_tax '.
+        'WHERE o.id_order = '.(int)$idOrder;
+
+        if ($idsOrderDetail) {
+            $sql .= ' AND hb.`id_order_detail` IN ('.implode(',', $idsOrderDetail).')';
+        }
+
+        $taxDetails = Db::getInstance()->executeS($sql);
+
         if ($taxDetails) {
             foreach ($taxDetails as &$detail) {
                 $priceTaxExcl = $detail['unit_price_tax_excl'];
-                $quantity = 1;
+                $numDays = 1;
                 $objBkDemand = new HotelBookingDemands($detail['id_booking_demand']);
                 if ($objBkDemand->price_calc_method == HotelRoomTypeGlobalDemand::WK_PRICE_CALC_METHOD_EACH_DAY) {
                     $objBkDetail = new HotelBookingDetail($detail['id_htl_booking']);
-                    $quantity = $objBkDetail->getNumberOfDays($objBkDetail->date_from, $objBkDetail->date_to);
+                    $numDays = $objBkDetail->getNumberOfDays($objBkDetail->date_from, $objBkDetail->date_to);
                 }
-                switch (Configuration::get('PS_ROUND_TYPE')) {
-                    case Order::ROUND_ITEM:
-                        $unitAmount = (float)Tools::ps_round($priceTaxExcl, _PS_PRICE_COMPUTE_PRECISION_);
-                        $totalTaxBase = $unitAmount * $quantity;
-                        break;
-                    case Order::ROUND_LINE:
-                        $unitAmount = $priceTaxExcl;
-                        $totalTaxBase = Tools::ps_round(
-                            $unitAmount * $quantity,
-                            _PS_PRICE_COMPUTE_PRECISION_
-                        );
-                        break;
-                    case Order::ROUND_TOTAL:
-                        $unitAmount = $priceTaxExcl;
-                        $totalTaxBase = $unitAmount * $quantity;
-                        break;
-                }
+
+                $totalTaxBase = $priceTaxExcl * $numDays;
+
                 $detail['total_tax_base'] = $totalTaxBase;
             }
         }

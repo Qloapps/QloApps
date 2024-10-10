@@ -68,7 +68,7 @@ class HotelAdvancedPayment extends ObjectModel
      */
     public function getIdAdvPaymentByIdProduct($id_product)
     {
-        $result = Db::getInstance()->getRow("SELECT * FROM `"._DB_PREFIX_."htl_advance_payment` WHERE `id_product`=".$id_product);
+        $result = Db::getInstance()->getRow("SELECT * FROM `"._DB_PREFIX_."htl_advance_payment` WHERE `id_product`=".(int) $id_product);
 
         if ($result) {
             return $result;
@@ -108,7 +108,13 @@ class HotelAdvancedPayment extends ObjectModel
                 $roomTotalPrices = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice(
                     $cartRoomInfo['id_product'],
                     $cartRoomInfo['date_from'],
-                    $cartRoomInfo['date_to']
+                    $cartRoomInfo['date_to'],
+                    0,
+                    0,
+                    $idCart,
+                    $cartRoomInfo['id_guest'],
+                    $cartRoomInfo['id_room'],
+                    0
                 );
 
                 $roomTypeTotalTI += $roomTotalPrices['total_price_tax_incl'];
@@ -319,7 +325,7 @@ class HotelAdvancedPayment extends ObjectModel
      * @param integer $withTaxes : Amount with(1) or without tax (0)
      * @return [float] advance payment amount of the room type in the cart
      */
-    public function getRoomMinAdvPaymentAmount($idProduct, $dateFrom, $dateTo, $withTaxes = 1)
+    public function getRoomMinAdvPaymentAmount($idProduct, $dateFrom, $dateTo, $withTaxes = 1, $idRoom = 0, $idCart = 0, $idGuest = 0)
     {
         $dateFrom = date('Y-m-d', strtotime($dateFrom));
         $dateTo = date('Y-m-d', strtotime($dateTo));
@@ -328,7 +334,17 @@ class HotelAdvancedPayment extends ObjectModel
         $advGlobalPercent = Configuration::get('WK_ADVANCED_PAYMENT_GLOBAL_MIN_AMOUNT');
         $advGlobalTaxIncl = Configuration::get('WK_ADVANCED_PAYMENT_INC_TAX');
 
-        $roomTotalPrices = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice($idProduct, $dateFrom, $dateTo);
+        $roomTotalPrices = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice(
+            $idProduct,
+            $dateFrom,
+            $dateTo,
+            0,
+            0,
+            $idCart,
+            $idGuest,
+            $idRoom,
+            0
+        );
         $roomTypeTotalTI = $roomTotalPrices['total_price_tax_incl'];
         $roomTypeTotalTE = $roomTotalPrices['total_price_tax_excl'];
 

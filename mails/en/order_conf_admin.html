@@ -63,7 +63,7 @@
 					<table class="table" bgcolor="#ffffff" style="width:100%">
 						<tr>
 							<td align="center" class="logo" style="border-bottom:4px solid #333333;padding:7px 0">
-								<a title="{shop_name}" href="{shop_url}" style="color:#337ff1">
+								<a title="{shop_name}" href="{shop_url}" target="_blank" style="color:#337ff1">
 									<img src="{shop_logo}" alt="{shop_name}" />
 								</a>
 							</td>
@@ -72,7 +72,7 @@
 							<td align="center" class="titleblock" style="padding:7px 0">
 								<font size="2" face="Open-sans, sans-serif" color="#555454">
 									<span class="title" style="font-weight:500;font-size:28px;text-transform:uppercase;line-height:33px">Hi {firstname} {lastname},</span><br/>
-									<span class="subtitle" style="font-weight:500;font-size:16px;text-transform:uppercase;line-height:25px">New Bookings created on {shop_name}!</span>
+									<span class="subtitle" style="font-weight:500;font-size:16px;text-transform:uppercase;line-height:25px">New bookings are created on <strong>{hotel_name}</strong>!</span>
 								</font>
 							</td>
 						</tr>
@@ -149,11 +149,6 @@
 												{extra_demands_details_html}
 											</td>
 										</tr>
-										<tr>
-											<td colspan="9" style="border:1px solid #D6D4D4;text-align:center;color:#777;padding:7px 0">
-												&nbsp;&nbsp;{discounts}
-											</td>
-										</tr>
 										<tr class="conf_body">
 											<td bgcolor="#f8f8f8" colspan="4" style="border:1px solid #D6D4D4;color:#333;padding:7px 0">
 												<table class="table" style="width:100%;border-collapse:collapse">
@@ -189,20 +184,20 @@
 														<td width="10" style="color:#333;padding:0">&nbsp;</td>
 														<td align="right" style="color:#333;padding:0">
 															<font size="2" face="Open-sans, sans-serif" color="#555454">
-																<strong>Discounts</strong>
+																<strong>Extra Services Cost</strong>
 															</font>
 														</td>
 														<td width="10" style="color:#333;padding:0">&nbsp;</td>
 													</tr>
 												</table>
 											</td>
-											<td bgcolor="#f8f8f8" colspan="5" style="border:1px solid #D6D4D4;color:#333;padding:7px 0">
+											<td bgcolor="#f8f8f8" align="right" colspan="5" style="border:1px solid #D6D4D4;color:#333;padding:7px 0">
 												<table class="table" style="width:100%;border-collapse:collapse">
 													<tr>
 														<td width="10" style="color:#333;padding:0">&nbsp;</td>
 														<td align="right" style="color:#333;padding:0">
 															<font size="2" face="Open-sans, sans-serif" color="#555454">
-																{total_discounts}
+																{additional_service_price_tax_excl}
 															</font>
 														</td>
 														<td width="10" style="color:#333;padding:0">&nbsp;</td>
@@ -258,7 +253,35 @@
 														<td width="10" style="color:#333;padding:0">&nbsp;</td>
 														<td align="right" style="color:#333;padding:0">
 															<font size="2" face="Open-sans, sans-serif" color="#555454">
-																{total_tax_paid}
+																{total_order_tax}
+															</font>
+														</td>
+														<td width="10" style="color:#333;padding:0">&nbsp;</td>
+													</tr>
+												</table>
+											</td>
+										</tr>
+										<tr class="conf_body">
+											<td bgcolor="#f8f8f8" colspan="4" style="border:1px solid #D6D4D4;color:#333;padding:7px 0">
+												<table class="table" style="width:100%;border-collapse:collapse">
+													<tr>
+														<td width="10" style="color:#333;padding:0">&nbsp;</td>
+														<td align="right" style="color:#333;padding:0">
+															<font size="2" face="Open-sans, sans-serif" color="#555454">
+																<strong>Discounts</strong>
+															</font>
+														</td>
+														<td width="10" style="color:#333;padding:0">&nbsp;</td>
+													</tr>
+												</table>
+											</td>
+											<td bgcolor="#f8f8f8" colspan="5" style="border:1px solid #D6D4D4;color:#333;padding:7px 0">
+												<table class="table" style="width:100%;border-collapse:collapse">
+													<tr>
+														<td width="10" style="color:#333;padding:0">&nbsp;</td>
+														<td align="right" style="color:#333;padding:0">
+															<font size="2" face="Open-sans, sans-serif" color="#555454">
+																{total_discounts}
 															</font>
 														</td>
 														<td width="10" style="color:#333;padding:0">&nbsp;</td>
@@ -308,7 +331,7 @@
 						</tr>
 						<tr>
 							<td class="footer" style="border-top:4px solid #333333;padding:7px 0">
-								<span><a href="{shop_url}" style="color:#337ff1">{shop_name}</a> powered by <a href="https://webkul.com" style="color:#337ff1">Webkul&trade;</a></span>
+								<span><a href="{shop_url}" target="_blank" style="color:#337ff1">{shop_name}</a> powered by <a href="https://webkul.com" target="_blank" style="color:#337ff1">Webkul&trade;</a></span>
 							</td>
 						</tr>
 					</table>

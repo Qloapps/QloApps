@@ -135,6 +135,11 @@ class CustomerCore extends ObjectModel
 
     public $groupBox;
 
+    public $phone;
+
+    const STATUS_BANNED = 1;
+    const STATUS_DELETED = 2;
+
     protected $webserviceParameters = array(
         'fields' => array(
             'id_default_group' => array('xlink_resource' => 'groups'),
@@ -145,6 +150,7 @@ class CustomerCore extends ObjectModel
             'secure_key' => array('setter' => null),
             'deleted' => array(),
             'passwd' => array('setter' => 'setWsPasswd'),
+            'phone' => array()
         ),
         'associations' => array(
             'groups' => array('resource' => 'group'),
@@ -179,7 +185,7 @@ class CustomerCore extends ObjectModel
             'id_risk' =>                    array('type' => self::TYPE_INT, 'validate' => 'isUnsignedInt', 'copy_post' => false),
             'max_payment_days' =>            array('type' => self::TYPE_INT, 'validate' => 'isUnsignedInt', 'copy_post' => false),
             'active' =>                    array('type' => self::TYPE_BOOL, 'validate' => 'isBool', 'copy_post' => false),
-            'deleted' =>                    array('type' => self::TYPE_BOOL, 'validate' => 'isBool', 'copy_post' => false),
+            'deleted' =>                    array('type' => self::TYPE_INT, 'validate' => 'isUnsignedInt', 'copy_post' => false),
             'note' =>                        array('type' => self::TYPE_HTML, 'validate' => 'isCleanHtml', 'size' => 65000, 'copy_post' => false),
             'is_guest' =>                    array('type' => self::TYPE_BOOL, 'validate' => 'isBool', 'copy_post' => false),
             'id_shop' =>                    array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId', 'copy_post' => false),
@@ -199,6 +205,36 @@ class CustomerCore extends ObjectModel
     {
         $this->id_default_group = (int)Configuration::get('PS_CUSTOMER_GROUP');
         parent::__construct($id);
+
+        if ($this->email) {
+            $this->phone = CartCustomerGuestDetail::getCustomerPhone($this->email);
+        }
+
+        if (Configuration::get('PS_ONE_PHONE_AT_LEAST')) {
+            $this->webserviceParameters['fields']['phone']['required'] = true;
+        }
+    }
+
+    public function validateFields($die = true, $error_return = false)
+    {
+        if (isset($this->webservice_validation) && $this->webservice_validation) {
+            if (Configuration::get('PS_ONE_PHONE_AT_LEAST')) {
+                if (!$this->phone) {
+                    $message = Tools::displayError('Phone is required field.');
+                } else if (!Validate::isPhoneNumber(trim($this->phone))) {
+                    $message = Tools::displayError('Invalid phone.');
+                }
+            }
+
+            if (isset($message)) {
+                if ($die) {
+                    throw new PrestaShopException($message);
+                }
+                return $error_return ? $message : false;
+            }
+        }
+
+        return parent::validateFields($die, $error_return);
     }
 
     public function add($autodate = true, $null_values = true)
@@ -228,6 +264,7 @@ class CustomerCore extends ObjectModel
         }
         $success = parent::add($autodate, $null_values);
         $this->updateGroup($this->groupBox);
+        $this->updateCustomerAdditionalDetails(CartCustomerGuestDetail::getIdCustomerGuest($this->email));
         return $success;
     }
 
@@ -250,7 +287,22 @@ class CustomerCore extends ObjectModel
             }
         }
 
-        return parent::update(true);
+        $objOldCustomer = new Customer($this->id);
+        $success = parent::update(true);
+        $this->updateCustomerAdditionalDetails(CartCustomerGuestDetail::getIdCustomerGuest($objOldCustomer->email));
+        return $success;
+    }
+
+    public function updateCustomerAdditionalDetails($idCustomerGuest)
+    {
+        $objCartCustomerGuestDetail = new CartCustomerGuestDetail($idCustomerGuest);
+        $objCartCustomerGuestDetail->id_cart = 0;
+        $objCartCustomerGuestDetail->id_gender = $this->id_gender;
+        $objCartCustomerGuestDetail->firstname = $this->firstname;
+        $objCartCustomerGuestDetail->lastname = $this->lastname;
+        $objCartCustomerGuestDetail->email = $this->email;
+        $objCartCustomerGuestDetail->phone = $this->phone;
+        return $objCartCustomerGuestDetail->save();
     }
 
     public function delete()
@@ -290,24 +342,43 @@ class CustomerCore extends ObjectModel
         }
 
         CartRule::deleteByIdCustomer((int)$this->id);
+        // delete customer data from customerGuest table
+        $objCartCustomerGuestDetail = new CartCustomerGuestDetail(CartCustomerGuestDetail::getIdCustomerGuest($this->email));
+        $objCartCustomerGuestDetail->delete();
         return parent::delete();
     }
 
     /**
-     * Return customers list
+     * Returns a list of customers.
      *
-     * @param null|bool $only_active Returns only active customers when true
-     * @return array Customers
+     * @param null|bool $active Optional. Filter customers by their active status. If null, no filter is applied.
+     * @param null|bool $deleted Optional. Filter customers by their deleted status. If null, no filter is applied.
+     * @param null|bool $havingAddress Optional. Filter customers having|not having address. If true, only customers having an address are returned.
+     * If false, only customers without an address are returned. If null, no filter is applied.
+     * @return array List of customers matching the specified criteria.
      */
-    public static function getCustomers($only_active = null)
+    public static function getCustomers($active = null, $deleted = null, $havingAddress = null)
     {
-        $sql = 'SELECT `id_customer`, `email`, `firstname`, `lastname`
-				FROM `'._DB_PREFIX_.'customer`
-				WHERE 1 '.Shop::addSqlRestriction(Shop::SHARE_CUSTOMER).
-				($only_active ? ' AND `active` = 1' : '').'
-				ORDER BY `id_customer` ASC';
+        $sqlSelect = 'SELECT c.`id_customer`, c.`email`, c.`firstname`, c.`lastname`';
+        $sqlFrom = 'FROM `'._DB_PREFIX_.'customer` c';
+        $sqlJoin = '';
+		$sqlWhere = 'WHERE 1 '.Shop::addSqlRestriction(Shop::SHARE_CUSTOMER).
+                (!is_null($active) ?  ' AND c.`active` = '.(int) $active: ' ' ).
+                (!is_null($deleted) ? ' AND c.`deleted` = '.(int) $deleted : ' ');
+		$sqlOrderBy = 'ORDER BY c.`id_customer` ASC';
+		$sqlGroupBy = 'GROUP BY c.`id_customer`';
+
+        if (!is_null($havingAddress)) {
+            $sqlJoin .= ' LEFT JOIN `'._DB_PREFIX_.'address` a
+                ON a.`id_customer` = c.`id_customer` AND a.`deleted`=0';
+            $sqlWhere .= (($havingAddress) ? ' AND a.`id_address` IS NOT NULL': ' AND a.`id_address` IS NULL');
+        }
+
+        $sql = $sqlSelect .' '. $sqlFrom.' '.$sqlJoin.' '.$sqlWhere.' '.$sqlGroupBy.' '.$sqlOrderBy;
+
         return Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql);
     }
+
 
     /**
      * Return customer instance from its e-mail (optionnaly check password)
@@ -465,10 +536,22 @@ class CustomerCore extends ObjectModel
         return Cache::retrieve($cache_id);
     }
 
-    public static function getCustomerIdAddress($id_customer)
+    public static function getPhone($id_customer)
+    {
+
+        return Db::getInstance()->getValue(
+            'SELECT cgd.`phone`
+            FROM `'._DB_PREFIX_.'customer` c
+            INNER JOIN `'._DB_PREFIX_.'cart_customer_guest_detail` cgd
+            ON (cgd.`email` = c.`email`)
+            WHERE `id_cart` = 0 AND c.`id_customer` = '.(int)($id_customer)
+        );
+    }
+
+    public static function getCustomerIdAddress($id_customer, $use_cache = true)
     {
         $cache_id = 'Customer::getCustomerIdAddress'.(int)$id_customer;
-        if (!Cache::isStored($cache_id)) {
+        if (!$use_cache || !Cache::isStored($cache_id)) {
             $sql = 'SELECT id_address
 					FROM `'._DB_PREFIX_.'address` a
 					WHERE `id_customer` = '.(int)$id_customer.' AND a.`deleted` = 0';
@@ -528,14 +611,16 @@ class CustomerCore extends ObjectModel
      * @return array|false|mysqli_result|null|PDOStatement|resource Corresponding customers
      * @throws PrestaShopDatabaseException
      */
-    public static function searchByName($query, $limit = null)
+    public static function searchByName($query, $limit = null, $skip_deleted = false)
     {
         $sql_base = 'SELECT *
-				FROM `'._DB_PREFIX_.'customer`';
-        $sql = '('.$sql_base.' WHERE `email` LIKE \'%'.pSQL($query).'%\' '.Shop::addSqlRestriction(Shop::SHARE_CUSTOMER).')';
-        $sql .= ' UNION ('.$sql_base.' WHERE `id_customer` = '.(int)$query.' '.Shop::addSqlRestriction(Shop::SHARE_CUSTOMER).')';
-        $sql .= ' UNION ('.$sql_base.' WHERE `lastname` LIKE \'%'.pSQL($query).'%\' '.Shop::addSqlRestriction(Shop::SHARE_CUSTOMER).')';
-        $sql .= ' UNION ('.$sql_base.' WHERE `firstname` LIKE \'%'.pSQL($query).'%\' '.Shop::addSqlRestriction(Shop::SHARE_CUSTOMER).')';
+        FROM `'._DB_PREFIX_.'customer`';
+        $where_deleted = $skip_deleted ? ' AND `deleted` = 0' : '';
+
+        $sql = '('.$sql_base.' WHERE `email` LIKE \'%'.pSQL($query).'%\' '.$where_deleted.Shop::addSqlRestriction(Shop::SHARE_CUSTOMER).')';
+        $sql .= ' UNION ('.$sql_base.' WHERE `id_customer` = '.(int)$query.' '.$where_deleted.Shop::addSqlRestriction(Shop::SHARE_CUSTOMER).')';
+        $sql .= ' UNION ('.$sql_base.' WHERE `lastname` LIKE \'%'.pSQL($query).'%\' '.$where_deleted.Shop::addSqlRestriction(Shop::SHARE_CUSTOMER).')';
+        $sql .= ' UNION ('.$sql_base.' WHERE `firstname` LIKE \'%'.pSQL($query).'%\' '.$where_deleted.Shop::addSqlRestriction(Shop::SHARE_CUSTOMER).')';
 
         if ($limit) {
             $sql .= ' LIMIT 0, '.(int)$limit;
@@ -568,7 +653,8 @@ class CustomerCore extends ObjectModel
     public function getStats()
     {
         $result = Db::getInstance()->getRow('
-		SELECT COUNT(`id_order`) AS nb_orders, SUM(`total_paid` / o.`conversion_rate`) AS total_orders
+		SELECT COUNT(`id_order`) AS nb_orders, SUM(`total_paid` / o.`conversion_rate`) AS total_orders,
+        SUM(o.`total_paid_real` / o.`conversion_rate`) AS total_spent
 		FROM `'._DB_PREFIX_.'orders` o
 		WHERE o.`id_customer` = '.(int)$this->id.'
 		AND o.valid = 1');
@@ -715,7 +801,7 @@ class CustomerCore extends ObjectModel
         return Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS('
 		SELECT * FROM `'._DB_PREFIX_.'orders` o
 		LEFT JOIN `'._DB_PREFIX_.'order_detail` od ON o.id_order = od.id_order
-		WHERE o.valid = 1 AND o.`id_customer` = '.(int)$this->id);
+        WHERE od.`product_auto_add`= 0 AND o.valid = 1 AND o.`id_customer` = '.(int)$this->id);
     }
 
     public static function getDefaultGroupId($id_customer)
@@ -796,6 +882,7 @@ class CustomerCore extends ObjectModel
         $this->passwd = Tools::encrypt($password);
         $this->cleanGroups();
         $this->addGroups(array(Configuration::get('PS_CUSTOMER_GROUP'))); // add default customer group
+        $this->id_default_group = (int) Configuration::get('PS_CUSTOMER_GROUP');
         if ($this->update()) {
             $vars = array(
                 '{firstname}' => $this->firstname,
@@ -948,4 +1035,5 @@ class CustomerCore extends ObjectModel
         $sql_filter .= Shop::addSqlRestriction(Shop::SHARE_CUSTOMER, 'main');
         return parent::getWebserviceObjectList($sql_join, $sql_filter, $sql_sort, $sql_limit);
     }
+
 }

@@ -179,6 +179,17 @@ class AdminCustomNavigationLinkSettingController extends ModuleAdminController
         if (Validate::isLoadedObject($objNavigationLink)) {
             $smartyVars['navigationLinkInfo'] = (array) $objNavigationLink;
             $smartyVars['edit'] = 1;
+            if ($objNavigationLink->id_cms
+                && Validate::isLoadedObject($objCMS = new CMS($objNavigationLink->id_cms))
+            ) {
+                $smartyVars['id_cms_category'] = $objCMS->id_cms_category;
+                if (empty($this->errors)
+                    && !$objCMS->active
+                ) {
+                    $cmsEditLink = $this->context->link->getAdminLink('AdminCmsContent').'&updatecms&id_cms='.(int) $objCMS->id;
+                    $this->warnings[] = $this->l('Please enable linked').' <a href="'.$cmsEditLink.'" target="_blank">'.$this->l('CMS page').'</a> '.$this->l('to enable this navigation link.');
+                }
+            }
         }
         // send theme's front pages
         $themePages = array();
@@ -196,7 +207,29 @@ class AdminCustomNavigationLinkSettingController extends ModuleAdminController
         $smartyVars['themePages'] = $themePages;
         $smartyVars['languages'] = Language::getLanguages(false);
         $smartyVars['currentLang'] = Language::getLanguage((int) Configuration::get('PS_LANG_DEFAULT'));
-        $smartyVars['cmsPages'] = CMS::getCMSPages($smartyVars['currentLang'], 1);
+        $categoryWiseCmsPages = array();
+        if ($cmsPages = CMS::getCMSPages($smartyVars['currentLang'], null, false)) {
+            foreach ($cmsPages as $page) {
+                $cmsPage['id_cms'] = $page['id_cms'];
+                $cmsPage['meta_title'] = $page['meta_title'];
+                $categoryWiseCmsPages[$page['id_cms_category']][] = $cmsPage;
+            }
+        }
+
+        if ($cmsCategories = CMSCategory::getCategories($this->context->language->id, false, false)) {
+            foreach ($cmsCategories as $cmsCatKey => $cmsCategory) {
+                if (!isset($categoryWiseCmsPages[$cmsCategory['id_cms_category']])) {
+                    unset($cmsCategories[$cmsCatKey]);
+                }
+            }
+
+            if (!isset($smartyVars['id_cms_category']) && $cmsCategories) {
+                $smartyVars['id_cms_category'] = reset($cmsCategories)['id_cms_category'];
+            }
+        }
+
+        $smartyVars['categoryWiseCmsPages'] = $categoryWiseCmsPages;
+        $smartyVars['categories'] = $cmsCategories;
         $this->context->smarty->assign($smartyVars);
         $this->fields_form = array(
             'submit' => array(
@@ -261,6 +294,10 @@ class AdminCustomNavigationLinkSettingController extends ModuleAdminController
             }
             if ($isCmsPage) {
                 $objCustomNavigationLink->id_cms = $idCms;
+                $objCMS = new CMS((int) $idCms);
+                if (!$objCMS->active) {
+                    $active = $objCMS->active;
+                }
             } else {
                 $objCustomNavigationLink->id_cms = 0;
                 foreach ($languages as $language) {
@@ -365,7 +402,7 @@ class AdminCustomNavigationLinkSettingController extends ModuleAdminController
             if (isset($pos[2]) && (int) $pos[2] === $idNavigationLink) {
                 if ($objFeatureBlock = new WkCustomNavigationLink((int) $pos[2])) {
                     if (isset($position)
-                        && $objFeatureBlock->updatePosition($way, $position, $idNavigationLink)
+                        && $objFeatureBlock->updatePosition($way, $position)
                     ) {
                         echo 'ok position '.(int) $position.' for custom navigation link '.(int) $pos[1].'\r\n';
                     } else {
@@ -381,9 +418,31 @@ class AdminCustomNavigationLinkSettingController extends ModuleAdminController
         }
     }
 
+    public function processStatus()
+    {
+        if (Validate::isLoadedObject($this->loadObject())
+            && $this->object->id_cms
+            && Validate::isLoadedObject($objCMS = new CMS($this->object->id_cms))
+        ) {
+            if (!$objCMS->active
+                && !$this->object->active
+            ) {
+                $this->errors[] = $this->l('Please activate the linked CMS page to enable this navigation link.');
+            }
+        }
+
+        if (empty($this->errors)) {
+            return parent::processStatus();
+        }
+
+        return $this->object;
+    }
+
     public function setMedia()
     {
         parent::setMedia();
-        $this->addJS(_MODULE_DIR_.$this->module->name.'/views/js/admin/wk_navigation_link.js');
+        if ($this->display == 'edit' || $this->display == 'add') {
+            $this->addJS($this->module->getPathUri().'views/js/admin/wk_navigation_link.js');
+        }
     }
 }

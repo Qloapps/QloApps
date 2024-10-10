@@ -39,8 +39,8 @@ class AdminCustomersControllerCore extends AdminController
     public function __construct()
     {
         $this->bootstrap = true;
-        $this->required_database = true;
-        $this->required_fields = array('newsletter','optin');
+        // $this->required_database = true;
+        // $this->required_fields = array('newsletter','optin');
         $this->table = 'customer';
         $this->className = 'Customer';
         $this->lang = false;
@@ -71,8 +71,17 @@ class AdminCustomersControllerCore extends AdminController
             $titles_array[$gender->id_gender] = $gender->name;
         }
 
+        $groups_array = array();
+        $groups = Group::getGroups(Context::getContext()->language->id);
+        foreach ($groups as $group) {
+            $groups_array[$group['id_group']] = $group['name'];
+        }
+
         $this->_join = 'LEFT JOIN '._DB_PREFIX_.'gender_lang gl ON (a.id_gender = gl.id_gender AND gl.id_lang = '.(int)$this->context->language->id.')';
-        $this->_use_found_rows = false;
+        $this->_join .= ' LEFT JOIN '._DB_PREFIX_.'group_lang grl ON (a.id_default_group = grl.id_group AND grl.id_lang = '.(int)$this->context->language->id.')';
+        $this->_join .= ' LEFT JOIN '._DB_PREFIX_.'orders o ON (a.id_customer = o.id_customer)';
+        $this->_group = 'GROUP BY a.`id_customer`';
+
         $this->fields_list = array(
             'id_customer' => array(
                 'title' => $this->l('ID'),
@@ -107,9 +116,26 @@ class AdminCustomersControllerCore extends AdminController
         }
 
         $this->fields_list = array_merge($this->fields_list, array(
+            'default_group_name' => array(
+                'title' => $this->l('Default Group'),
+                'optional' => true,
+                'type' => 'select',
+                'list' => $groups_array,
+                'filter_key' => 'a!id_default_group',
+            ),
+            'total_orders' => array(
+                'title' => $this->l('Number of orders'),
+                'type' => 'range',
+                'optional' => true,
+                'visible_default' => true,
+                'havingFilter' => true,
+                'order_key' => 'total_orders'
+            ),
             'total_spent' => array(
                 'title' => $this->l('Sales'),
                 'type' => 'price',
+                'optional' => true,
+                'visible_default' => true,
                 'search' => false,
                 'havingFilter' => true,
                 'align' => 'text-right',
@@ -140,6 +166,7 @@ class AdminCustomersControllerCore extends AdminController
             'date_add' => array(
                 'title' => $this->l('Registration'),
                 'type' => 'date',
+                'filter_key' => 'a!date_add',
                 'align' => 'text-right'
             ),
             'connect' => array(
@@ -147,31 +174,27 @@ class AdminCustomersControllerCore extends AdminController
                 'type' => 'datetime',
                 'search' => false,
                 'havingFilter' => true
+            ),
+            'deleted' => array(
+                'title' => $this->l('Banned'),
+                'type' => 'bool',
+                'displayed' => false,
+            ),
+            'order_date' => array(
+                'title' => $this->l('Order date'),
+                'type' => 'date',
+                'filter_key' => 'o!date_add',
+                'displayed' => false
             )
         ));
 
         $this->shopLinkType = 'shop';
         $this->shopShareDatas = Shop::SHARE_CUSTOMER;
-
-
-        // START send access query information to the admin controller
-        $this->access_select = ' SELECT a.`id_customer` FROM '._DB_PREFIX_.'customer a';
-        $this->access_join = ' INNER JOIN '._DB_PREFIX_.'orders ord ON (a.id_customer = ord.id_customer)';
-        $this->access_join .= ' INNER JOIN '._DB_PREFIX_.'htl_booking_detail hbd ON (hbd.id_order = ord.id_order)';
-        if ($acsHtls = HotelBranchInformation::getProfileAccessedHotels($this->context->employee->id_profile, 1, 1)) {
-            $this->access_where = ' WHERE hbd.id_hotel IN ('.implode(',', $acsHtls).')';
-        }
-
         parent::__construct();
 
         $this->_select = '
-        a.date_add, gl.name as title, (
-            SELECT SUM(total_paid_real / conversion_rate)
-            FROM '._DB_PREFIX_.'orders o
-            WHERE o.id_customer = a.id_customer
-            '.Shop::addSqlRestriction(Shop::SHARE_ORDER, 'o').'
-            AND o.valid = 1
-        ) as total_spent, (
+        a.date_add, gl.name as title, grl.name as default_group_name, COUNT(o.`id_order`) as total_orders,
+        o.`date_add` as order_date, SUM(total_paid_real / conversion_rate) as total_spent, (
             SELECT c.date_add FROM '._DB_PREFIX_.'guest g
             LEFT JOIN '._DB_PREFIX_.'connections c ON c.id_guest = g.id_guest
             WHERE g.id_customer = a.id_customer
@@ -199,6 +222,12 @@ class AdminCustomersControllerCore extends AdminController
         }
 
         parent::postProcess();
+        // Added this to check if the filter for the banned(deleted) is used, since $this->delete = true will not display the deleted customers.
+        $prefix = $this->getCookieFilterPrefix();
+        $filters = $this->context->cookie->getFamily($prefix.$this->table.'Filter_');
+        if (isset($filters[$prefix.$this->table.'Filter_deleted']) && $filters[$prefix.$this->table.'Filter_deleted'] == 1) {
+            $this->deleted = false;
+        }
     }
 
     public function initContent()
@@ -336,6 +365,8 @@ class AdminCustomersControllerCore extends AdminController
             );
         }
 
+        $this->_new_list_header_design = true;
+
         return parent::renderList();
     }
 
@@ -344,6 +375,10 @@ class AdminCustomersControllerCore extends AdminController
         /** @var Customer $obj */
         if (!($obj = $this->loadObject(true))) {
             return;
+        } else if ($this->object->deleted == Customer::STATUS_DELETED) {
+            $this->warnings[] = $this->l('This is a deleted customer and you cannot update the information of a deleted customer.');
+        } else if ($this->object->deleted == Customer::STATUS_BANNED) {
+            $this->warnings[] = $this->l('This is a banned customer and you cannot update the information of a banned customer.');
         }
 
         $genders = Gender::getGenders();
@@ -397,6 +432,15 @@ class AdminCustomersControllerCore extends AdminController
                     'name' => 'email',
                     'col' => '4',
                     'required' => true,
+                    'autocomplete' => false
+                ),
+                array(
+                    'type' => 'text',
+                    'prefix' => '<i class="icon-phone"></i>',
+                    'label' => $this->l('Phone'),
+                    'name' => 'phone',
+                    'col' => '4',
+                    'required' =>  Configuration::get('PS_ONE_PHONE_AT_LEAST') ? true : false,
                     'autocomplete' => false
                 ),
                 array(
@@ -458,8 +502,9 @@ class AdminCustomersControllerCore extends AdminController
                             'label' => $this->l('Disabled')
                         )
                     ),
-                    'disabled' =>  (bool)!Configuration::get('PS_CUSTOMER_NWSL'),
-                    'hint' => $this->l('This customer will receive your newsletter via email.')
+                    'disabled' => (bool)!Configuration::get('PS_CUSTOMER_NWSL'),
+                    'hint' => $this->l('This customer will receive your newsletter via email.'),
+                    'desc' => (bool)!Configuration::get('PS_CUSTOMER_NWSL') ? sprintf($this->l('This field is disabled as option \'Enable newsletter registration\' is disabled. You can change it from %sPreferences > Customers%s page.'), '<a href="'.$this->context->link->getAdminLink('AdminCustomerPreferences').'" target="_blank">', '</a>') : '',
                 ),
                 array(
                     'type' => 'switch',
@@ -487,7 +532,7 @@ class AdminCustomersControllerCore extends AdminController
         );
 
         // if we add a customer via fancybox (ajax), it's a customer and he doesn't need to be added to the visitor and guest groups
-        if (Tools::isSubmit('addcustomer') && Tools::isSubmit('submitFormAjax')) {
+        if (Tools::isSubmit('submitFormAjax')) {
             $visitor_group = Configuration::get('PS_UNIDENTIFIED_GROUP');
             $guest_group = Configuration::get('PS_GUEST_GROUP');
             foreach ($groups as $key => $g) {
@@ -597,8 +642,20 @@ class AdminCustomersControllerCore extends AdminController
             'title' => $this->l('Save'),
         );
 
+        if (!Tools::getValue('liteDisplaying')) {
+            $this->fields_form['buttons'] = array(
+                'save-and-stay' => array(
+                    'title' => $this->l('Save and stay'),
+                    'name' => 'submitAdd'.$this->table.'AndStay',
+                    'type' => 'submit',
+                    'class' => 'btn btn-default pull-right',
+                    'icon' => 'process-icon-save',
+                )
+            );
+        }
+
         $birthday = explode('-', $this->getFieldValue($obj, 'birthday'));
-        
+
         $this->fields_value = array(
             'years' => Tools::getValue('years', $this->getFieldValue($obj, 'birthday') ? $birthday[0] : 0),
             'months' => Tools::getValue('months', $this->getFieldValue($obj, 'birthday') ? $birthday[1] : 0),
@@ -630,6 +687,10 @@ class AdminCustomersControllerCore extends AdminController
                 Tools::getValue('groupBox_'.$group['id_group'], in_array($group['id_group'], $customer_groups_ids));
         }
 
+        if ($back = Tools::getValue('back')) {
+            $this->tpl_form_vars['back_url'] = Tools::htmlentitiesDecodeUTF8(Tools::safeOutput(urldecode($back)));
+        }
+
         return parent::renderForm();
     }
 
@@ -644,44 +705,94 @@ class AdminCustomersControllerCore extends AdminController
         $kpis = array();
 
         $helper = new HelperKpi();
-        $helper->id = 'box-gender';
-        $helper->icon = 'icon-male';
-        $helper->color = 'color1';
-        $helper->title = $this->l('Customers', null, null, false);
-        $helper->subtitle = $this->l('All Time', null, null, false);
-        $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=customer_main_gender';
-        $kpis[] = $helper->generate();
-
-        $helper = new HelperKpi();
-        $helper->id = 'box-age';
-        $helper->icon = 'icon-calendar';
-        $helper->color = 'color2';
-        $helper->title = $this->l('Average Age', 'AdminTab', null, false);
-        $helper->subtitle = $this->l('All Time', null, null, false);
-        $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=avg_customer_age';
-        $kpis[] = $helper->generate();
-
-        $helper = new HelperKpi();
         $helper->id = 'box-orders';
-        $helper->icon = 'icon-retweet';
-        $helper->color = 'color3';
+        $helper->icon = 'icon-shopping-cart';
+        $helper->color = 'color1';
         $helper->title = $this->l('Orders per Customer', null, null, false);
         $helper->subtitle = $this->l('All Time', null, null, false);
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=orders_per_customer';
-        $kpis[] = $helper->generate();
+        $helper->tooltip = $this->l('The average number of orders placed per customer in given period of time.', null, null, false);
+        $this->kpis[] = $helper;
 
         $helper = new HelperKpi();
-        $helper->id = 'box-newsletter';
+        $helper->id = 'box-total-frequent-customers';
+        $helper->icon = 'icon-star';
+        $helper->color = 'color2';
+        $helper->title = $this->l('Total Frequent Customers', null, null, false);
+        $helper->subtitle = $this->l('1 year', null, null, false);
+        $helper->href = $this->context->link->getAdminLink('AdminCustomers').'&submitResetcustomer&submitFiltercustomer=1&customerFilter_total_orders%5B0%5D='.Configuration::get('PS_KPI_FREQUENT_CUSTOMER_NB_ORDERS').'&customerFilter_o%21date_add%5B0%5D='.date('Y-m-d', strtotime('-365 day')).'&customerFilter_o%21date_add%5B1%5D='.date('Y-m-d');
+        $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=total_frequent_customers';
+        $helper->tooltip = $this->l('The total number of frequent customers in given period of time.', null, null, false);
+        $this->kpis[] = $helper;
+
+        $helper = new HelperKpi();
+        $helper->id = 'box-revenue-per-available-customer';
+        $helper->icon = 'icon-dollar';
+        $helper->color = 'color3';
+        $helper->title = $this->l('RevPAC', null, null, false);
+        $nbDaysRevPac = Validate::isUnsignedInt(Configuration::get('PS_KPI_REVPAC_NB_DAYS')) ? Configuration::get('PS_KPI_REVPAC_NB_DAYS') : 30;
+        $helper->subtitle = sprintf($this->l('%d Days', null, null, false), (int) $nbDaysRevPac);
+        $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=revenue_per_available_customer';
+        $helper->tooltip = $this->l('Revenue per Available Customer (RevPAC) in given period of time.', null, null, false);
+        $this->kpis[] = $helper;
+
+        $helper = new HelperKpi();
+        $helper->id = 'box-total-newsletter-registrations';
         $helper->icon = 'icon-envelope';
         $helper->color = 'color4';
-        $helper->title = $this->l('Newsletter Registrations', null, null, false);
+        $helper->title = $this->l('Total Newsletter Registrations', null, null, false);
         $helper->subtitle = $this->l('All Time', null, null, false);
-        $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=newsletter_registrations';
-        $kpis[] = $helper->generate();
+        $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=total_newsletter_registrations';
+        $helper->tooltip = $this->l('The total number of newsletter registrations in given period of time.', null, null, false);
+        $this->kpis[] = $helper;
 
-        $helper = new HelperKpiRow();
-        $helper->kpis = $kpis;
-        return $helper->generate();
+        $helper = new HelperKpi();
+        $helper->id = 'box-conversion-rate';
+        $helper->icon = 'icon-refresh';
+        $helper->color = 'color1';
+        $helper->title = $this->l('Conversion Rate', null, null, false);
+        $nbDaysConversionRate = Validate::isUnsignedInt(Configuration::get('PS_KPI_CONVERSION_RATE_NB_DAYS')) ? Configuration::get('PS_KPI_CONVERSION_RATE_NB_DAYS') : 30;
+        $helper->subtitle = sprintf($this->l('%d Days', null, null, false), (int) $nbDaysConversionRate);
+        $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=conversion_rate';
+        $helper->tooltip = $this->l('The percentage of visitors who created a booking in given period of time.', null, null, false);
+        $this->kpis[] = $helper;
+
+        $helper = new HelperKpi();
+        $helper->id = 'box-total-new-customers';
+        $helper->icon = 'icon-plus-circle';
+        $helper->color = 'color4';
+        $helper->title = $this->l('New Customers', null, null, false);
+        $nbDaysNewCustomers = Validate::isUnsignedInt(Configuration::get('PS_KPI_NEW_CUSTOMERS_NB_DAYS')) ? Configuration::get('PS_KPI_NEW_CUSTOMERS_NB_DAYS') : 30;
+        $date_from = date('Y-m-d', strtotime('-'.$nbDaysNewCustomers.' day'));
+        $date_to = date('Y-m-d');
+        $helper->href = $this->context->link->getAdminLink('AdminCustomers').'&submitResetcustomer&submitFiltercustomer=1&customerFilter_a!date_add[]='.$date_from.'&customerFilter_a!date_add[]='.$date_to;
+        $helper->subtitle = sprintf($this->l('%d Days', null, null, false), (int) $nbDaysNewCustomers);
+        $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=total_new_customers';
+        $helper->tooltip = $this->l('The total number of new customers who registered in given period of time.', null, null, false);
+        $this->kpis[] = $helper;
+
+        $helper = new HelperKpi();
+        $helper->id = 'box-total-banned-customers';
+        $helper->icon = 'icon-ban';
+        $helper->color = 'color2';
+        $helper->title = $this->l('Banned Customers', null, null, false);
+        $helper->subtitle = $this->l('All Time', null, null, false);
+        $helper->href = $this->context->link->getAdminLink('AdminCustomers').'&submitResetcustomer&submitFiltercustomer=1&customerFilter_deleted=1';
+        $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=total_banned_customers';
+        $helper->tooltip = $this->l('The total number of banned customers.', null, null, false);
+        $this->kpis[] = $helper;
+
+        $helper = new HelperKpi();
+        $helper->id = 'box-gender';
+        $helper->icon = 'icon-male';
+        $helper->color = 'color3';
+        $helper->title = $this->l('Customers', null, null, false);
+        $helper->subtitle = $this->l('All Time', null, null, false);
+        $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=customer_main_gender';
+        $helper->tooltip = $this->l('The main gender from all the customers.', null, null, false);
+        $this->kpis[] = $helper;
+
+        return parent::renderKpis();
     }
 
     public function renderView()
@@ -733,6 +844,7 @@ class AdminCustomersControllerCore extends AdminController
         }
 
         $total_ok = 0;
+        $total_ko = 0;
         $orders_ok = array();
         $orders_ko = array();
         foreach ($orders as $order) {
@@ -745,10 +857,21 @@ class AdminCustomersControllerCore extends AdminController
                 $total_ok += $order['total_paid_real_not_formated']/$order['conversion_rate'];
             } else {
                 $orders_ko[] = $order;
+                $total_ko += $order['total_paid'] / $order['conversion_rate'];
             }
         }
 
-        $products = $customer->getBoughtProducts();
+        $purchasedServices = array();
+        $purchasedRoomTypes = array();
+        if ($products = $customer->getBoughtProducts()) {
+            foreach ($products as $product) {
+                if ($product['is_booking_product']) {
+                    $purchasedRoomTypes[] = $product;
+                } else {
+                    $purchasedServices[] = $product;
+                }
+            }
+        }
 
         $carts = Cart::getCustomerCarts($customer->id);
         $total_carts = count($carts);
@@ -771,6 +894,7 @@ class AdminCustomersControllerCore extends AdminController
 				FROM '._DB_PREFIX_.'cart_product cp
 				JOIN '._DB_PREFIX_.'cart c ON (c.id_cart = cp.id_cart)
 				JOIN '._DB_PREFIX_.'product p ON (cp.id_product = p.id_product)
+                AND p.booking_product=1
 				WHERE c.id_customer = '.(int)$customer->id.'
 					AND NOT EXISTS (
 							SELECT 1
@@ -843,8 +967,11 @@ class AdminCustomersControllerCore extends AdminController
             'orders_ok' => $orders_ok,
             'orders_ko' => $orders_ko,
             'total_ok' => Tools::displayPrice($total_ok, $this->context->currency->id),
+            'total_ko' => Tools::displayPrice($total_ko, $this->context->currency->id),
             // Products
             'products' => $products,
+            'purchasedRoomTypes' => $purchasedRoomTypes,
+            'purchasedServices' => $purchasedServices,
             // Addresses
             'addresses' => $customer->getAddresses($this->default_form_language),
             // Discounts
@@ -866,6 +993,33 @@ class AdminCustomersControllerCore extends AdminController
 
     public function processDelete()
     {
+        // If customer is going to be deleted permanently then if customer has orders the change this customer as an anonymous customer
+        if (Validate::isLoadedObject($objCustomer = $this->loadObject())) {
+            if ($this->delete_mode == 'real' && Order::getCustomerOrders($objCustomer->id, true)) {
+                $customerEmail = $objCustomer->email;
+                $objCustomer->email = 'anonymous'.'-'.$objCustomer->id.'@'.Tools::link_rewrite(Configuration::get('PS_SHOP_NAME')).'_anonymous.com';
+                $objCustomer->deleted = Customer::STATUS_DELETED;
+                if (!$objCustomer->update()) {
+                    $this->errors[] = Tools::displayError('Some error ocurred while deleting the Customer');
+                    return;
+                } else {
+                    if ($idCustomerGuest = CartCustomerGuestDetail::getIdCustomerGuest($customerEmail)) {
+                        $objCartCustomerGuestDetail = new CartCustomerGuestDetail($idCustomerGuest);
+                        $objCartCustomerGuestDetail->phone = preg_replace('/[0-9]/', '0', $objCustomer->phone);
+                        $objCartCustomerGuestDetail->email = $objCustomer->email;
+                        $objCartCustomerGuestDetail->save();
+                    }
+                }
+
+                $this->redirect_after = self::$currentIndex.'&conf=1&token='.$this->token;
+
+                return;
+            }
+        } else {
+            $this->errors[] = Tools::displayError('Customer not found.');
+            return;
+        }
+
         $this->_setDeletedMode();
         parent::processDelete();
     }
@@ -884,6 +1038,44 @@ class AdminCustomersControllerCore extends AdminController
 
     protected function processBulkDelete()
     {
+        // If customer is going to be deleted permanently then if customer has orders the change this customer as an anonymous customer
+        if ($this->delete_mode == 'real') {
+            if (is_array($this->boxes) && !empty($this->boxes)) {
+                foreach ($this->boxes as $key => $idCustomer) {
+                    if (Validate::isLoadedObject($objCustomer = new Customer($idCustomer))) {
+                        // check if customer has orders for email change else customer will be deleted
+                        if (Order::getCustomerOrders($objCustomer->id, true)) {
+                            $objCustomer->email = 'anonymous'.'-'.$objCustomer->id.'@'.Tools::getShopDomain();
+                            $objCustomer->deleted = Customer::STATUS_DELETED;
+                            if ($objCustomer->update()) {
+                                // unset the customer which is processed
+                                // not processed customers will be deleted with default process if no errors are there
+                                unset($this->boxes[$key]);
+                            } else {
+                                $this->errors[] = Tools::displayError('Some error ocurred while deleting the Customer with id').': '.$idCustomer;
+                            }
+                        }
+                    } else {
+                        $this->errors[] = Tools::displayError('Customer id').': '.$idCustomer.' '.Tools::displayError('not found.');
+                    }
+                }
+
+                // if all the customers are process above then redirect with success
+                if (!count($this->boxes)) {
+                    $this->redirect_after = self::$currentIndex.'&conf=1&token='.$this->token;
+                    return;
+                }
+            } else {
+                $this->errors[] = Tools::displayError('Customers not found.');
+                return;
+            }
+
+            // if errors are there then do not proceed for default process
+            if (count($this->errors)) {
+                return;
+            }
+        }
+
         $this->_setDeletedMode();
         parent::processBulkDelete();
     }
@@ -894,37 +1086,56 @@ class AdminCustomersControllerCore extends AdminController
             $this->redirect_after = false;
         }
         // Check that the new email is not already in use
-        $customer_email = strval(Tools::getValue('email'));
+        $customer_email = trim(strval(Tools::getValue('email')));
         $customer = new Customer();
         if (Validate::isEmail($customer_email)) {
             $customer->getByEmail($customer_email);
-        }
-        if ($customer->id) {
-            $this->errors[] = Tools::displayError('An account already exists for this email address:').' '.$customer_email;
+            if ($customer->id) {
+                $this->errors[] = Tools::displayError('An account already exists for this email address:').' '.$customer_email;
+                $this->display = 'edit';
+                return $customer;
+            } elseif (Customer::customerExists($customer_email, false, false)) {
+                $this->errors[] = Tools::displayError('The email is already associated with a banned account. Please use a different one.');
+                $this->display = 'edit';
+            } elseif (trim(Tools::getValue('passwd')) == '') {
+                $this->validateRules();
+                $this->errors[] = Tools::displayError('Password can not be empty.');
+                $this->display = 'edit';
+            } elseif ($customer = parent::processAdd()) {
+                $this->context->smarty->assign('new_customer', $customer);
+                return $customer;
+            }
+        } else {
+            $this->errors[] = Tools::displayError('Invalid email address.');
             $this->display = 'edit';
-            return $customer;
-        } elseif (trim(Tools::getValue('passwd')) == '') {
-            $this->validateRules();
-            $this->errors[] = Tools::displayError('Password can not be empty.');
-            $this->display = 'edit';
-        } elseif ($customer = parent::processAdd()) {
-            $this->context->smarty->assign('new_customer', $customer);
-            return $customer;
         }
+
         return false;
     }
+
 
     public function processUpdate()
     {
         if (Validate::isLoadedObject($this->object)) {
-            $customer_email = strval(Tools::getValue('email'));
+            if ($this->object->deleted == Customer::STATUS_DELETED) {
+                $this->errors[] = $this->l('You can not update a deleted customer.');
+                return false;
+            } else if ($this->object->deleted == Customer::STATUS_BANNED) {
+                $this->errors[] = $this->l('You can not update a banned customer.');
+                return false;
+            }
+
+            $customer_email = trim(strval(Tools::getValue('email')));
 
             // check if e-mail already used
             if ($customer_email != $this->object->email) {
                 $customer = new Customer();
                 if (Validate::isEmail($customer_email)) {
                     $customer->getByEmail($customer_email);
+                } else {
+                    $this->errors[] = Tools::displayError('Invalid email address.');
                 }
+
                 if (($customer->id) && ($customer->id != (int)$this->object->id)) {
                     $this->errors[] = Tools::displayError('An account already exists for this email address:').' '.$customer_email;
                 }
@@ -947,7 +1158,7 @@ class AdminCustomersControllerCore extends AdminController
         $days = Tools::getValue('days');
         $months = Tools::getValue('months');
         $years = Tools::getValue('years');
-        
+
         if ($days || $months || $years) {
             if (!$days) {
                 $this->errors[] = Tools::displayError("Please select a valid date of birthday");
@@ -959,11 +1170,41 @@ class AdminCustomersControllerCore extends AdminController
                 $this->errors[] = Tools::displayError("Please select a valid month of birthday");
             }
         }
-        
+
+        $phone = Tools::getValue('phone');
+        if (Configuration::get('PS_ONE_PHONE_AT_LEAST')) {
+            if ($phone == '') {
+                $this->errors[] = Tools::displayError('Phone number is required.');
+            }
+        }
+        $className = 'CartCustomerGuestDetail';
+        $rules = call_user_func(array($className, 'getValidationRules'), $className);
+        if ($phone && !Validate::isPhoneNumber($phone)) {
+            $this->errors[] = Tools::displayError('Invaid phone number.');
+        } elseif ($phone && Tools::strlen($phone) > $rules['size']['phone']) {
+            $this->errors[] = sprintf(Tools::displayError('Phone number is too long. (%s chars max).'), $rules['size']['phone']);
+        }
+
+
         $customer = new Customer();
         $this->errors = array_merge($this->errors, $customer->validateFieldsRequiredDatabase());
-        
+
         return parent::processSave();
+    }
+
+    protected function copyFromPost(&$object, $table)
+    {
+        parent::copyFromPost($object, $table);
+
+        $years = Tools::getValue('years');
+        $months = Tools::getValue('months');
+        $days = Tools::getValue('days');
+
+        if ($years != '' && $months != '' && $days != '') {
+            $object->birthday = (int) $years.'-'.(int) $months.'-'.(int) $days;
+        } else {
+            $object->birthday = '0000-00-00';
+        }
     }
 
     protected function afterDelete($object, $old_id)
@@ -1080,10 +1321,11 @@ class AdminCustomersControllerCore extends AdminController
     public function ajaxProcessSearchCustomers()
     {
         $searches = explode(' ', Tools::getValue('customer_search'));
+        $skip_deleted = Tools::getValue('skip_deleted');
         $customers = array();
         $searches = array_unique($searches);
         foreach ($searches as $search) {
-            if (!empty($search) && $results = Customer::searchByName($search, 50)) {
+            if (!empty($search) && $results = Customer::searchByName($search, 50, $skip_deleted)) {
                 foreach ($results as $result) {
                     if ($result['active']) {
                         $customers[$result['id_customer']] = $result;
@@ -1125,6 +1367,43 @@ class AdminCustomersControllerCore extends AdminController
                 die('error:update');
             }
             die('ok');
+        }
+    }
+
+    public function ajaxProcessVerifyCustomerEmail()
+    {
+        $response = array('status' => true);
+        $idCustomer = Tools::getValue('id_customer', 0);
+        if (($email = trim(strval(Tools::getValue('email'))))
+            && ($idCustomerByEmail = Customer::customerExists($email, true, false))
+            && (Validate::isLoadedObject($objCustomer = new Customer($idCustomerByEmail)))
+            && $idCustomerByEmail != $idCustomer // the admin is trying to add/update the account
+        ) {
+            $response['status'] = false;
+            if ($objCustomer->deleted) {
+                $response['msg'] = Tools::displayError('This email is already associated with a banned account. Please use a different one.');
+            } else {
+                $response['msg'] = Tools::displayError('An account already exists for this email address.');
+            }
+        }
+
+        $this->ajaxDie(json_encode($response));
+    }
+
+    public function setMedia()
+    {
+        parent::setMedia();
+        if ($this->loadObject(true)
+            && ($this->display == 'edit' || $this->display == 'add')
+        ) {
+            $idCustomer = $this->object->id ? $this->object->id : 0;
+            Media::addJSDef(
+                array(
+                    'customer_controller_url' => self::$currentIndex.'&token='.$this->token,
+                    'id_customer' => $idCustomer
+                )
+            );
+            $this->addJS(_PS_JS_DIR_.'admin/customers.js');
         }
     }
 }

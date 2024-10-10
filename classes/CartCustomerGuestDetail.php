@@ -63,6 +63,22 @@ class CartCustomerGuestDetailCore extends ObjectModel
         );
     }
 
+    public static function getIdCustomerGuest($email)
+    {
+        return Db::getInstance()->getValue(
+            'SELECT `id_customer_guest_detail` FROM `'._DB_PREFIX_.'cart_customer_guest_detail`
+            WHERE `id_cart` = 0 AND `email` = "'.pSQL($email).'"'
+        );
+    }
+
+    public static function getCustomerPhone($email)
+    {
+        return Db::getInstance()->getValue(
+            'SELECT `phone` FROM `'._DB_PREFIX_.'cart_customer_guest_detail`
+            WHERE `id_cart` = 0 AND `email` = "'.pSQL($email).'"'
+        );
+    }
+
     public function validateGuestInfo()
     {
         $isValid = true;
@@ -78,6 +94,31 @@ class CartCustomerGuestDetailCore extends ObjectModel
         if (!trim($this->phone) || !Validate::isPhoneNumber($this->phone)) {
             $isValid = false;
         }
+
+        $className = 'CartCustomerGuestDetail';
+        $rules = call_user_func(array($className, 'getValidationRules'), $className);
+
+        if (isset($rules['size']['firstname'])) {
+            if (Tools::strlen(trim($this->firstname)) > $rules['size']['firstname']) {
+                $isValid = false;
+            }
+        }
+        if (isset($rules['size']['lastname'])) {
+            if (Tools::strlen(trim($this->lastname)) > $rules['size']['lastname']) {
+                $isValid = false;
+            }
+        }
+        if (isset($rules['size']['email'])) {
+            if (Tools::strlen(trim($this->email)) > $rules['size']['email']) {
+                $isValid = false;
+            }
+        }
+        if (isset($rules['size']['phone'])) {
+            if (Tools::strlen(trim($this->phone)) > $rules['size']['phone']) {
+                $isValid = false;
+            }
+        }
+
         return $isValid;
     }
 }

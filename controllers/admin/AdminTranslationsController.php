@@ -292,32 +292,63 @@ class AdminTranslationsControllerCore extends AdminController
             }
         }
 
-        if ($fd = fopen($file_path, 'w')) {
-            // Get value of button save and stay
-            $save_and_stay = Tools::isSubmit('submitTranslations'.$type.'AndStay');
+        // Get value of button save and stay
+        $save_and_stay = Tools::isSubmit('submitTranslations'.$type.'AndStay');
 
-            // Get language
-            $lang = strtolower(Tools::getValue('lang'));
+        // Get language
+        $lang = strtolower(Tools::getValue('lang'));
 
-            // Unset all POST which are not translations
-            unset(
-                $_POST['submitTranslations'.$type],
-                $_POST['submitTranslations'.$type.'AndStay'],
-                $_POST['lang'],
-                $_POST['token'],
-                $_POST['theme'],
-                $_POST['type']
-            );
+        // Unset all POST which are not translations
+        unset(
+            $_POST['submitTranslations'.$type],
+            $_POST['submitTranslations'.$type.'AndStay'],
+            $_POST['lang'],
+            $_POST['token'],
+            $_POST['theme'],
+            $_POST['type']
+        );
 
-            // Get all POST which aren't empty
-            $to_insert = array();
-            foreach ($_POST as $key => $value) {
-                if (!empty($value)) {
-                    $to_insert[$key] = $value;
+        // Get all POST which aren't empty
+        $to_update = array();
+        $keysToUpdate = array();
+        foreach ($_POST as $key => $value) {
+            $keysToUpdate[] = $key;
+            $to_update[$key] = $value;
+        }
+        include_once($file_path);
+        switch($this->type_selected) {
+            case 'front':
+                $to_insert = $GLOBALS['_LANG'];
+                break;
+            case 'back':
+                $to_insert = $GLOBALS['_LANGADM'];
+                break;
+            case 'errors':
+                $to_insert = $GLOBALS['_ERRORS'];
+                break;
+            case 'fields':
+                $to_insert = $GLOBALS['_FIELDS'];
+                break;
+            case 'pdf':
+                $to_insert = $GLOBALS['_LANGPDF'];
+                break;
+
+        }
+        foreach ($to_insert as $key => $value) {
+            if (in_array($key, $keysToUpdate)) {
+                if ($to_update[$key]) {
+                    $to_insert[$key] = $to_update[$key];
+                } else {
+                    unset($to_insert[$key]);
                 }
+                unset($to_update[$key]);
             }
+        }
+        foreach ($to_update as $key => $value) {
+            $to_insert[$key] = $value;
+        }
 
-            // translations array is ordered by key (easy merge)
+        if ($fd = fopen($file_path, 'w')) {
             ksort($to_insert);
             $tab = $translation_informations['var'];
             fwrite($fd, "<?php\n\nglobal \$".$tab.";\n\$".$tab." = array();\n");
@@ -923,15 +954,23 @@ class AdminTranslationsControllerCore extends AdminController
      *
      * @throws PrestaShopException
      */
-    protected function findAndWriteTranslationsIntoFile($file_name, $files, $theme_name, $module_name, $dir = false)
+    protected function findAndWriteTranslationsIntoFile($file_name, $files, $theme_name, $module_name, $dir = false, $copyExistingTranslations = false)
     {
         // These static vars allow to use file to write just one time.
         static $cache_file = array();
         static $str_write = '';
         static $array_check_duplicate = array();
+        static $module_existing_translations = array();
 
         // Set file_name in static var, this allow to open and wright the file just one time
         if (!isset($cache_file[$theme_name.'-'.$file_name])) {
+            if (file_exists($file_name)) {
+                require $file_name;
+            } else {
+                $_MODULE = array();
+            }
+
+            $module_existing_translations = $_MODULE;
             $str_write = '';
             $cache_file[$theme_name.'-'.$file_name] = true;
             if (!Tools::file_exists_cache(dirname($file_name))) {
@@ -976,10 +1015,10 @@ class AdminTranslationsControllerCore extends AdminController
                     }
 
                     if (array_key_exists($post_key, $_POST) && !in_array($pattern, $array_check_duplicate)) {
+                        $array_check_duplicate[] = $pattern;
                         if ($_POST[$post_key] == '') {
                             continue;
                         }
-                        $array_check_duplicate[] = $pattern;
                         $str_write .= '$_MODULE['.$pattern.'] = \''.pSQL(str_replace(array("\r\n", "\r", "\n"), ' ', $_POST[$post_key])).'\';'."\n";
                         $this->total_expression++;
                     }
@@ -987,7 +1026,15 @@ class AdminTranslationsControllerCore extends AdminController
             }
         }
 
-        if (isset($cache_file[$theme_name.'-'.$file_name]) && $str_write != "<?php\n\nglobal \$_MODULE;\n\$_MODULE = array();\n") {
+        if ($copyExistingTranslations) {
+            foreach ($module_existing_translations as $key => $value) {
+                if (!in_array('\''.$key.'\'', $array_check_duplicate)) {
+                    $str_write .= '$_MODULE[\''.$key.'\'] = \''.pSQL(str_replace(array("\r\n", "\r", "\n"), ' ', $value)).'\';'."\n";
+                }
+            }
+        }
+
+        if (isset($cache_file[$theme_name.'-'.$file_name])) {
             file_put_contents($file_name, $str_write);
         }
     }
@@ -1014,6 +1061,8 @@ class AdminTranslationsControllerCore extends AdminController
             } elseif ($type_clear === 'file' && !in_array(substr($file, strrpos($file, '.')), $arr_good_ext)) {
                 unset($files[$key]);
             } elseif ($type_clear === 'directory' && (!is_dir($path.$file) || in_array($file, $arr_exclude))) {
+                unset($files[$key]);
+            } else if ($file == 'index.php') {
                 unset($files[$key]);
             }
         }
@@ -1325,7 +1374,7 @@ class AdminTranslationsControllerCore extends AdminController
         $helper->href = $this->context->link->getAdminLink('AdminLanguages');
         $helper->title = $this->l('Enabled Languages', null, null, false);
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=enabled_languages';
-        $kpis[] = $helper->generate();
+        $this->kpis[] = $helper;
 
         $helper = new HelperKpi();
         $helper->id = 'box-fo-translations';
@@ -1333,7 +1382,7 @@ class AdminTranslationsControllerCore extends AdminController
         $helper->color = 'color3';
         $helper->title = $this->l('Front office Translations', null, null, false);
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=frontoffice_translations';
-        $kpis[] = $helper->generate();
+        $this->kpis[] = $helper;
 
         $helper = new HelperKpi();
         $helper->id = 'box-bo-translations';
@@ -1345,11 +1394,9 @@ class AdminTranslationsControllerCore extends AdminController
         }
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=backoffice_translations';
         $helper->refresh = (bool)(ConfigurationKPI::get('BACKOFFICE_TRANSLATIONS_EXPIRE') < $time);
-        $kpis[] = $helper->generate();
+        $this->kpis[] = $helper;
 
-        $helper = new HelperKpiRow();
-        $helper->kpis = $kpis;
-        return $helper->generate();
+        return parent::renderKpis();
     }
 
     /**
@@ -1423,8 +1470,15 @@ class AdminTranslationsControllerCore extends AdminController
                         $arr_files = $this->getAllModuleFiles($modules, null, $this->lang_selected->iso_code, true);
 
                         // Find and write all translation modules files
-                        foreach ($arr_files as $value) {
-                            $this->findAndWriteTranslationsIntoFile($value['file_name'], $value['files'], $value['theme'], $value['module'], $value['dir']);
+                        foreach ($arr_files as $key => $value) {
+                            $copyExistingTranslations = false;
+                            if (!isset($arr_files[$key + 1])
+                                || ($arr_files[$key + 1]['module'] != $value['module'])
+                            ) {
+                                $copyExistingTranslations = true;
+                            }
+
+                            $this->findAndWriteTranslationsIntoFile($value['file_name'], $value['files'], $value['theme'], $value['module'], $value['dir'], $copyExistingTranslations);
                         }
 
                         // Clear modules cache
@@ -2566,12 +2620,14 @@ class AdminTranslationsControllerCore extends AdminController
             }
 
             foreach ($dir_to_copy_iso as $dir) {
-                foreach (scandir($dir) as $file) {
-                    if (!in_array($file, Translate::$ignore_folder)) {
-                        $files_to_copy_iso[] = array(
-                            "from" => $dir.$file,
-                            "to" => str_replace((strpos($dir, _PS_CORE_DIR_) !== false) ? _PS_CORE_DIR_ : _PS_ROOT_DIR_, _PS_ROOT_DIR_.'/themes/'.$current_theme, $dir).$file
-                        );
+                if (is_dir($dir)) {
+                    foreach (scandir($dir) as $file) {
+                        if (!in_array($file, Translate::$ignore_folder)) {
+                            $files_to_copy_iso[] = array(
+                                "from" => $dir.$file,
+                                "to" => str_replace((strpos($dir, _PS_CORE_DIR_) !== false) ? _PS_CORE_DIR_ : _PS_ROOT_DIR_, _PS_ROOT_DIR_.'/themes/'.$current_theme, $dir).$file
+                            );
+                        }
                     }
                 }
             }
@@ -2933,7 +2989,7 @@ class AdminTranslationsControllerCore extends AdminController
                                     $tabs_array[$prefix_key][$key]['use_sprintf'] = Translate::checkIfKeyUseSprintf($key);
                                 }
                             }
-                        } elseif (Tools::file_exists_cache($file_path)) {
+                        } elseif (Tools::file_exists_cache($file_path) && is_file($file_path)) {
                             $tabs_array = $this->parsePdfClass($file_path, 'php', $GLOBALS[$name_var], $prefix_key, $tabs_array, $missing_translations_pdf);
                         }
                     }

@@ -3,8 +3,6 @@ SET NAMES 'utf8';
 UPDATE `PREFIX_configuration` SET value = '1' WHERE name = 'PS_CONDITIONS';
 UPDATE `PREFIX_configuration` SET value = '12' WHERE name = 'PS_PRODUCTS_PER_PAGE';
 UPDATE `PREFIX_configuration` SET value = '9' WHERE name = 'PS_HOTEL_IMAGES_PER_PAGE';
-UPDATE `PREFIX_configuration` SET value = '1' WHERE name = 'SHOW_AMENITIES_FILTER';
-UPDATE `PREFIX_configuration` SET value = '1' WHERE name = 'SHOW_PRICE_FILTER';
 UPDATE `PREFIX_configuration` SET value = '0' WHERE name = 'PS_PRODUCTS_ORDER_WAY';
 UPDATE `PREFIX_configuration` SET value = '4' WHERE name = 'PS_PRODUCTS_ORDER_BY';
 UPDATE `PREFIX_configuration` SET value = '1' WHERE name = 'PS_DISPLAY_QTIES';

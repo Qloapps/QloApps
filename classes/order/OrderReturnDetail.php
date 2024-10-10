@@ -30,8 +30,14 @@ class OrderReturnDetailCore extends ObjectModel
     public $refunded_amount;
 
     public $id_order_detail;
+
+    // Used to manage refunded or refunde denied bookings in a refund request : 1 for only refunded request completed and refunded bookings
     public $id_customization;
     public $product_quantity;
+
+    const REFUND_REQUEST_STATUS_LATEST = 1;
+    const REFUND_REQUEST_STATUS_PENDING = 2;
+    const REFUND_REQUEST_STATUS_COMPLETED = 3;
 
     /**
      * @see ObjectModel::$definition
@@ -48,4 +54,30 @@ class OrderReturnDetailCore extends ObjectModel
             'refunded_amount' => array('type' => self::TYPE_FLOAT),
         ),
     );
+
+    public static function getReturnDetailByIdBookingDetail($idHtlBooking)
+    {
+        $idOrderReturnDetail = Db::getInstance()->getValue('
+            SELECT `id_order_return_detail` FROM `'._DB_PREFIX_.'order_return_detail` ord
+            WHERE `id_htl_booking` = '.(int)$idHtlBooking
+        );
+
+        if ($idOrderReturnDetail) {
+            return new OrderReturnDetail($idOrderReturnDetail);
+        }
+        return null;
+    }
+
+    public static function deleteReturnDetailByIdBookingDetail($idOrder, $idHtlBooking)
+    {
+        if (Validate::isLoadedObject($objOrderReturnDetail = OrderReturnDetail::getReturnDetailByIdBookingDetail($idHtlBooking))) {
+            if ($objOrderReturnDetail->delete()) {
+                $objOrderReturn = new OrderReturn();
+                if (empty($objOrderReturn->getOrderRefundRequestedBookings($idOrder, $objOrderReturnDetail->id_order_return, true))) {
+                    $objOrderReturn = new OrderReturn($objOrderReturnDetail->id_order_return);
+                    $objOrderReturn->delete();
+                }
+            }
+        }
+    }
 }

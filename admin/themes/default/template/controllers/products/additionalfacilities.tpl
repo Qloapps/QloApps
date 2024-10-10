@@ -24,7 +24,7 @@
             <i class="icon-user"></i> {l s='Room Type Additional Facilities'}
         </div>
         <div class="alert alert-info">
-            {l s='To create new Additional facilities'} <a target="_blank" href="{$link->getAdminLink('AdminRoomTypeGlobalDemand')}">{l s='click here.'}</a>
+            {l s='To create new additional facilities please visit'} <a target="_blank" href="{$link->getAdminLink('AdminRoomTypeGlobalDemand')}">{l s='Additional facilities'}</a> {l s='page.'}
         </div>
         {if isset($allDemands) && $allDemands}
 
@@ -43,7 +43,7 @@
                                 {l s='Price'}
                             </th>
                             <th>
-                                {l s='Tax rate'}
+                                {l s='Tax rule'}
                             </th>
                             <th class="fixed-width-lg text-center">
                                 {l s='Per day price calculation'}
@@ -78,7 +78,7 @@
                                         <td class="demand_price_{$demand['id_global_demand']}">
                                             <div class="input-group price_input" {if !isset($selectedDemands[$demand['id_global_demand']])}style="display:none"{/if}>
                                                 <span class="input-group-addon">{$defaultcurrencySign|escape:'html':'UTF-8'}</span>
-                                                <input type="text" name="option_price_{$option['id']|escape:'html':'UTF-8'}" value="{if isset($selectedDemands[$demand['id_global_demand']]['adv_option'][$option['id']]['price'])}{Tools::ps_round($selectedDemands[$demand['id_global_demand']]['adv_option'][$option['id']]['price'], 2)|escape:'html':'UTF-8'}{else}{Tools::ps_round($option['price'], 2)|escape:'html':'UTF-8'}{/if}"/>
+                                                <input type="text" name="option_price_{$option['id']|escape:'html':'UTF-8'}" value="{if isset($selectedDemands[$demand['id_global_demand']]['adv_option'][$option['id']]['price'])}{$selectedDemands[$demand['id_global_demand']]['adv_option'][$option['id']]['price']|escape:'html':'UTF-8'}{else}{$option['price']|escape:'html':'UTF-8'}{/if}"/>
                                             </div>
                                             <div class="price_display" {if isset($selectedDemands[$demand['id_global_demand']])}style="display:none"{/if}>
                                                 {displayPrice price={$option['price']|escape:'html':'UTF-8'}  currency=$idDefaultcurrency}
@@ -112,7 +112,7 @@
                                             <div class="input-group price_input" {if !isset($selectedDemands[$demand['id_global_demand']])}style="display:none"{/if}>
                                                 <span class="input-group-addon">{$defaultcurrencySign|escape:'html':'UTF-8'}</span>
                                                 <input type="text" name="demand_price_{$demand['id_global_demand']|escape:'html':'UTF-8'}"
-                                                value="{if isset($selectedDemands[$demand['id_global_demand']]['price'])}{Tools::ps_round($selectedDemands[$demand['id_global_demand']]['price'], 2)|escape:'html':'UTF-8'}{elseif isset($demand['price'])}{Tools::ps_round($demand['price'], 2)|escape:'html':'UTF-8'}{/if}"/>
+                                                value="{if isset($selectedDemands[$demand['id_global_demand']]['price'])}{$selectedDemands[$demand['id_global_demand']]['price']|escape:'html':'UTF-8'}{elseif isset($demand['price'])}{$demand['price']|escape:'html':'UTF-8'}{/if}"/>
                                             </div>
                                             <div class="price_display" {if isset($selectedDemands[$demand['id_global_demand']])}style="display:none"{/if}>
                                                 {displayPrice price={$demand['price']|escape:'html':'UTF-8'} currency=$idDefaultcurrency}
@@ -147,10 +147,6 @@
                     <i class="process-icon-loading"></i>
                         {l s='Save and stay'}
                 </button>
-            </div>
-        {else}
-            <div class="alert alert-warning">
-                {l s='No additional facilities created yet. To create please visit'} <a target="_blank" href="{$link->getAdminLink('AdminRoomTypeGlobalDemand')}">{l s='Additional facilities'}</a> {l s='page'}.
             </div>
         {/if}
     </div>

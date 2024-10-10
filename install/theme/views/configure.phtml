@@ -59,7 +59,7 @@ var default_iso = '<?php echo $this->session->shop_country ?>';
 			<select name="shop_country" id="infosCountry" class="chosen">
 				<option value="0" style="font-weight: bold"><?php echo $this->l('Select your country') ?></option>
 				<?php foreach ($this->list_countries as $country): ?>
-					<option value="<?php echo (isset($country['iso'])) ? $country['iso'] : '' ?>" <?php if ($this->session->shop_country && isset($country['iso']) && $this->session->shop_country === $country['iso']): ?>selected="selected"<?php endif; ?>><?php echo $country['name'] ?></option>
+					<option value="<?php echo (isset($country['iso'])) ? $country['iso'] : '' ?>" <?php if ($this->session->shop_country && isset($country['iso']) && $this->session->shop_country === $country['iso']): ?>selected="selected"<?php endif; ?><?php if (!isset($country['iso']) || !$country['iso']): ?>disabled<?php endif; ?>><?php echo $country['name'] ?></option>
 				<?php endforeach; ?>
 			</select>
 			<sup class="required">*</sup>

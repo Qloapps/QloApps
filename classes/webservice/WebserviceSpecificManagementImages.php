@@ -51,6 +51,7 @@ class WebserviceSpecificManagementImagesCore implements WebserviceSpecificManage
         'room_types' => array(),
         'hotels' => array(),
         'categories' => array(),
+        'extra_service' => array(),
         // 'manufacturers' => array(),
         // 'suppliers' => array(),
         // 'stores' => array(),
@@ -286,7 +287,9 @@ class WebserviceSpecificManagementImagesCore implements WebserviceSpecificManage
 
         $this->imageType = $this->wsObject->urlSegment[1];
         // if image type requested is room_types then process products images
-        if ($this->imageType == 'room_types') {
+        if ($this->imageType == 'room_types'
+            || $this->imageType == 'extra_services'
+        ) {
             $this->imageType = 'products';
         }
 
@@ -521,6 +524,7 @@ class WebserviceSpecificManagementImagesCore implements WebserviceSpecificManage
                 $ids[] = $image['id_hotel'];
             }
             $ids = array_unique($ids, SORT_NUMERIC);
+            asort($ids);
             foreach ($ids as $id) {
                 $this->output .= $this->objOutput->getObjectRender()->renderNodeHeader('image', array(), array('id' => $id, 'xlink_resource'=>$this->wsObject->wsUrl.'images/'.'hotels'.'/'.$id), false);
             }
