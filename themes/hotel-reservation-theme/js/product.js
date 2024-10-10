@@ -1090,11 +1090,7 @@ $(document).ready(function() {
         e.preventDefault();
 	});
 
-    if (typeof hotel_location == 'object'
-        && $('#room_type_map_tab .map-wrap').length
-        && typeof google == 'object'
-        && typeof google.maps == 'object'
-    ) {
+    if (typeof google === 'object') {
         initMap();
     }
 
@@ -1118,7 +1114,6 @@ $(document).ready(function() {
         }
         $(this).closest('.qty_container').find('.qty_count span').text(newQuantity);
         qtyfield.val(newQuantity);
-        updateServiceQuantity(this);
     });
 
     // The button to decrement the product value
@@ -1133,7 +1128,6 @@ $(document).ready(function() {
             $(this).closest('.qty_container').find('.qty_count span').text(1);
             qtyfield.val(1);
         }
-        updateServiceQuantity(this);
     });
 
     var ajax_check_var = '';
@@ -1205,59 +1199,90 @@ $(document).ready(function() {
             ajax_check_var.abort();
         }
     }
-});
-function addProductToRoomType(that) {
-    var id_product = $(that).data('id-product');
-    var qty = $('input#service_product_qty_'+id_product).val();
-    if (typeof(qty) == 'undefined') {
-        qty = 1;
-    }
-    $(that).prop('disabled', true);
 
-    if ($('#additional_products input#service_product_'+ id_product).length) {
-        $('input#service_product_'+ id_product).val(qty);
-    } else {
-        $('<input type="hidden">').attr({
-            id: 'service_product_'+ id_product,
-            name: 'service_product['+ id_product +'][]',
-            class: 'service_product',
-            'data-id_product': id_product,
-            value: qty
-        }).appendTo('#additional_products');
-    }
-    BookingForm.refresh().then(function (res) {
-        $(that).text(unselect_txt).removeClass('btn-success').removeClass('add_roomtype_product').addClass('btn-danger').addClass('remove_roomtype_product').prop('disabled', false);
-        showSuccessMessage(service_added_txt);
-    });
-}
-
-function removeRoomtypeProduct(that) {
-    var id_product = $(that).data('id-product');
-    $(document).find('input#service_product_'+ id_product).remove();
-    $('.select_room_service_'+ id_product).closest('.service_product_action_block').find('input.service_product_qty').val(1);
-    $('.select_room_service_'+ id_product).closest('.service_product_action_block').find('.qty_count span').text(1);
-    $(that).prop('disabled', true);
-    BookingForm.refresh().then(function (res) {
-        $('.select_room_service_'+ id_product).text(select_txt).removeClass('btn-danger').removeClass('remove_roomtype_product').addClass('btn-success').addClass('add_roomtype_product').prop('disabled', false);
-        showSuccessMessage(service_removed_txt);
-    });
-}
-
-function updateServiceQuantity(that) {
-    var buttonElement = $(that).closest('.service_product_action_block').find('.btn-service-product');
-    if ($(buttonElement).hasClass('remove_roomtype_product')) {
-        var id_product = $(buttonElement).data('id-product');
-        var newQuantity = parseInt($('#service_product_qty_'+id_product).val());
-        var oldQuantity = parseInt($('#service_product_'+id_product).val());
-        if (newQuantity != oldQuantity) {
-            $('#service_product_'+id_product).val(newQuantity);
-            BookingForm.refresh().then(function (res) {
-                showSuccessMessage(service_updated_txt);
-            });
+    function addProductToRoomType(that) {
+        var id_product = $(that).data('id-product');
+        var qty = $('input#service_product_qty_'+id_product).val();
+        if (typeof(qty) == 'undefined') {
+            qty = 1;
         }
+        var added_service_product = [];
+        $('#additional_products input.service_product').each(function () {
+            added_service_product.push({
+                'id_product': $(this).data('id_product'),
+                'quantity':$(this).val(),
+            });
+        });
+        $.ajax({
+            type: 'POST',
+            headers: {
+                "cache-control": "no-cache"
+            },
+            url: product_controller_url,
+            dataType: 'JSON',
+            cache: false,
+            data: {
+                date_from: $('#room_check_in').val(),
+                date_to: $('#room_check_out').val(),
+                qty: qty,
+                id_product: $('#product_page_product_id').val(),
+                service_product: id_product,
+                added_service_product: added_service_product,
+                action: 'checkServiceProductWithRoomType',
+                ajax: true,
+                token: static_token
+            },
+            success: function(result) {
+                if (result.success) {
+                    if (result.add) {
+                        if ($('input#service_product_'+ id_product).length) {
+                            var prevQty = $('input#service_product_'+ id_product).val();
+                            if (parseInt(prevQty) > 0) {
+                                qty = parseInt(qty) + parseInt(prevQty);
+                            }
+                            $('input#service_product_'+ id_product).val(qty);
+                        } else {
+                            $('<input type="hidden">').attr({
+                                id: 'service_product_'+ id_product,
+                                name: 'service_product['+ id_product +'][]',
+                                class: 'service_product',
+                                'data-id_product': id_product,
+                                value: qty
+                            }).appendTo('#additional_products');
+                        }
+                    }
+                    // reset input
+                    $(that).closest('.service_product_action_block').find('input.service_product_qty').val(1);
+                    $(that).closest('.service_product_action_block').find('.qty_count span').text(1);
+                    if (result.msg) {
+                        if (result.add) {
+                            showSuccessMessage(result.msg);
+                        } else {
+                            showErrorMessage(result.msg);
+                        }
+                    }
+                    BookingForm.refresh();
+                } else {
+                    if (result.error) {
+                        showErrorMessage(result.error);
+                    }
+                }
+            },
+            error: function(jqXHR, textStatus, errorThrown)
+            {
+                if ((textStatus != 'error' || errorThrown != '') && textStatus != 'abort')
+                    showErrorMessage(textStatus + ': ' + errorThrown);
+            }
+        });
     }
-}
 
+    function removeRoomtypeProduct(that)
+    {
+        var id_product = $(that).data('id_product');
+        $(document).find('input#service_product_'+ id_product).remove();
+        BookingForm.refresh();
+    }
+});
 
 function initMap() {
     const map = new google.maps.Map($('#room_type_map_tab .map-wrap').get(0), {
@@ -1266,8 +1291,8 @@ function initMap() {
     });
 
     const hotelLatLng = {
-        lat: Number(hotel_location.latitude),
-        lng: Number(hotel_location.longitude),
+        lat: Number(hotel_loc.latitude),
+        lng: Number(hotel_loc.longitude),
     };
 
     map.setCenter(hotelLatLng);
@@ -1275,7 +1300,6 @@ function initMap() {
     const marker = new google.maps.Marker({
         position: hotelLatLng,
         map: map,
-        icon: PS_STORES_ICON
     });
 
     const uiContent = $('#room-info-map-ui-content .hotel-info-wrap').get(0);
@@ -1335,7 +1359,6 @@ var BookingForm = {
             disableRoomTypeDemands(0);
             disableRoomTypeServices(0);
         }
-        $(document).trigger("QloApps:afterBookingFormInit");
     },
     initDatepicker: function(max_order_date, preparation_time, dateFrom, dateTo) {
         let start_date = new Date();
@@ -1394,57 +1417,53 @@ var BookingForm = {
         }
     },
     getFormData: function () {
-        let formData = new FormData($('form#booking-form').get(0));
-        formData.append('room_type_demands', JSON.stringify(getRoomsExtraDemands()));
-        formData.append('room_service_products', JSON.stringify(getRoomsServiceProducts()));
-        return formData;
-    },
-    refresh: function(resetOccupancy = false) {
-        return new Promise((resolve, reject) => {
-            let formData = BookingForm.getFormData();
-            formData.append('ajax', true);
-            formData.append('action', 'refreshBookingForm');
-            BookingForm.currentRequest = $.ajax({
-                url: product_controller_url,
-                type: 'POST',
-                dataType: 'JSON',
-                cache: false,
-                data: formData,
-                processData: false,
-                contentType: false,
-                beforeSend: function() {
-                    if(BookingForm.currentRequest != null) {
-                        BookingForm.currentRequest.abort();
-                    }
-                    $('.book_now_submit').prop('disabled', true).find('span:not(#booking_action_loader)').hide();
-                    $('#booking_action_block').find('#booking_action_loader').addClass('active');
-                },
-                success: function(response) {
-                    if (response.status == true) {
-                        $('.booking-form').replaceWith(response.html_booking_form);
-                        BookingForm.init();
+        // var quantity = parseInt($('#quantity_wanted').val());
+        // quantity = (isNaN(quantity) || quantity < 1) ? 1 : quantity;
 
-                        if (resetOccupancy) {
-                            BookingForm.resetOccupancy();
-                        }
-                        resolve(response);
-                    }
-                },
-                error: function() {
-                    if (!onlineFlag) {
-                        showErrorMessage(no_internet_txt);
-                    }
-                },
-                complete: function() {
-                    $('.book_now_submit').prop('disabled', false).find('span:not(#booking_action_loader)').show();
-                    $('#booking_action_block').find('#booking_action_loader').removeClass('active');
+        var data = {
+            id_product: parseInt($('#product_page_product_id').val()),
+            date_from: $('#room_check_in').val(),
+            date_to: $('#room_check_out').val(),
+            // quantity: quantity,
+            room_type_demands: JSON.stringify(getRoomsExtraDemands()),
+            room_service_products: JSON.stringify(getRoomsServiceProducts()),
+        };
+        if (occupancy = getBookingOccupancy()) {
+            data.occupancy = occupancy;
+        }
+
+        return data;
+    },
+    refresh: function() {
+        BookingForm.currentRequest = $.ajax({
+            url: product_controller_url,
+            type: 'POST',
+            headers: { 'cache-control': 'no-cache' },
+            dataType: 'JSON',
+            cache: false,
+            data: $.extend({
+                ajax: true,
+                action: 'refreshBookingForm',
+            }, BookingForm.getFormData()),
+            beforeSend: function() {
+                if(BookingForm.currentRequest != null) {
+                    BookingForm.currentRequest.abort();
                 }
-            });
+                $('.book_now_submit').prop('disabled', true).find('span:not(#booking_action_loader)').hide();
+                $('#booking_action_block').find('#booking_action_loader').addClass('active');
+            },
+            success: function(response) {
+                if (response.status == true) {
+                    $('.booking-form').replaceWith(response.html_booking_form);
+                    BookingForm.init();
+                }
+            },
+            complete: function() {
+                $('.book_now_submit').prop('disabled', false).find('span:not(#booking_action_loader)').show();
+                $('#booking_action_block').find('#booking_action_loader').removeClass('active');
+            }
         });
     },
-    resetOccupancy: function () {
-        resetOccupancyField($('.booking-form .booking_occupancy_wrapper'));
-    }
 }
 
 function loadHotelImagesByPage(page = 1) {

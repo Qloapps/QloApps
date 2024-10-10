@@ -19,8 +19,8 @@
     <url_rewrite>napiste-nam</url_rewrite>
   </meta>
   <meta id="index" id_shop="1">
-    <title>Hotel Prime</title>
-    <description>Místo, kde se komfort a luxus mísí s přírodou!</description>
+    <title/>
+    <description>Website powered by Webkul™</description>
     <keywords/>
     <url_rewrite/>
   </meta>
@@ -96,12 +96,6 @@
     <keywords/>
     <url_rewrite>historie-objednavek</url_rewrite>
   </meta>
-  <meta id="order-detail" id_shop="1">
-    <title>Detail rezervace</title>
-    <description/>
-    <keywords/>
-    <url_rewrite>detail-rezervace</url_rewrite>
-  </meta>
   <meta id="identity" id_shop="1">
     <title>Identity</title>
     <description/>
@@ -145,10 +139,10 @@
     <url_rewrite>prodejny</url_rewrite>
   </meta>
   <meta id="order-opc" id_shop="1">
-    <title>Rychlá Objednávka</title>
+    <title>Objednávka</title>
     <description/>
     <keywords/>
-    <url_rewrite>rychla-objednavka</url_rewrite>
+    <url_rewrite>objednavka</url_rewrite>
   </meta>
   <meta id="guest-tracking" id_shop="1">
     <title>Sledování objednávky návštěvníka</title>

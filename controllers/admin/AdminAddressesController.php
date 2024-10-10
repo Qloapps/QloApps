@@ -74,6 +74,16 @@ class AdminAddressesControllerCore extends AdminController
             'city' => array('title' => $this->l('City')),
             'country' => array('title' => $this->l('Country'), 'type' => 'select', 'list' => $this->countries_array, 'filter_key' => 'cl!id_country'));
 
+
+        // START send access query information to the admin controller
+        $this->access_select = ' SELECT a.`id_address` FROM '._DB_PREFIX_.'address a';
+        $this->access_join = ' INNER JOIN '._DB_PREFIX_.'customer cust ON (cust.id_customer = a.id_customer)';
+        $this->access_join .= ' INNER JOIN '._DB_PREFIX_.'orders ord ON (cust.id_customer = ord.id_customer)';
+        $this->access_join .= ' INNER JOIN '._DB_PREFIX_.'htl_booking_detail hbd ON (hbd.id_order = ord.id_order)';
+        if ($acsHtls = HotelBranchInformation::getProfileAccessedHotels($this->context->employee->id_profile, 1, 1)) {
+            $this->access_where = ' WHERE hbd.id_hotel IN ('.implode(',', $acsHtls).')';
+        }
+
         parent::__construct();
 
         $this->_select = 'cl.`name` as country';
@@ -112,46 +122,18 @@ class AdminAddressesControllerCore extends AdminController
 
     public function renderForm()
     {
-        $customerField =array(
-            'type' => 'text_customer',
-            'label' => $this->l('Customer'),
-            'name' => 'id_customer',
-            'required' => false,
-        );
-        if ($this->loadObject(true)
-            && !$this->object->id
-            && !Tools::getValue('liteDisplaying')
-        ) {
-            $customerEmails = array(array(
-                'email' => $this->l('Select Customer'),
-                'id_customer' => 0,
-                'id_address'=> 0
-            ));
-            $customerEmails = array_merge($customerEmails, Customer::getCustomers(null, 0, 0));
-            $customerField = array(
-                'type' => 'select',
-                'label' => $this->l('Customer'),
-                'name' => 'id_customer',
-                'required' => true,
-                'class' => 'chosen',
-                'options' => array(
-                    'query' => $customerEmails,
-                    'id' => 'id_customer',
-                    'name' => 'email'
-                ),
-            );
-        } else if (isset($this->object->id) && $this->object->id_hotel) {
-            $this->errors[] = Tools::displayError('The object cannot be loaded (or found)');
-            return false;
-        }
-
         $this->fields_form = array(
             'legend' => array(
                 'title' => $this->l('Addresses'),
                 'icon' => 'icon-envelope-alt'
             ),
             'input' => array(
-                $customerField,
+                array(
+                    'type' => 'text_customer',
+                    'label' => $this->l('Customer'),
+                    'name' => 'id_customer',
+                    'required' => false,
+                ),
                 array(
                     'type' => 'text',
                     'label' => $this->l('Identification Number'),
@@ -195,18 +177,6 @@ class AdminAddressesControllerCore extends AdminController
             )
         );
 
-        if (!Tools::getValue('liteDisplaying')) {
-            $this->fields_form['buttons'] = array(
-                'save-and-stay' => array(
-                    'title' => $this->l('Save and stay'),
-                    'name' => 'submitAdd'.$this->table.'AndStay',
-                    'type' => 'submit',
-                    'class' => 'btn btn-default pull-right',
-                    'icon' => 'process-icon-save',
-                )
-            );
-        }
-
         $this->fields_value['address_type'] = (int)Tools::getValue('address_type', 1);
 
         $id_customer = (int)Tools::getValue('id_customer');
@@ -219,8 +189,9 @@ class AdminAddressesControllerCore extends AdminController
         }
 
         $this->tpl_form_vars = array(
-            'customer' => (isset($customer) && ($this->object->id || Tools::getValue('liteDisplaying'))) ? $customer : null,
-            'tokenCustomer' => isset($token_customer) ? $token_customer : null
+            'customer' => isset($customer) ? $customer : null,
+            'tokenCustomer' => isset($token_customer) ? $token_customer : null,
+            'back_url' => urldecode(Tools::getValue('back'))
         );
 
         // Order address fields depending on country format
@@ -457,8 +428,10 @@ class AdminAddressesControllerCore extends AdminController
         ** we delete its id_address to force the creation of a new one */
         if ((int)Tools::getValue('id_order')) {
             $this->_redirect = false;
-            // set deleted=1 as customer can have only one address and this address is for an order only
-            $_POST['deleted'] = 1;
+            if (isset($_POST['address_type'])) {
+                $_POST['id_address'] = '';
+                $this->id_object = null;
+            }
         }
 
         // Check the requires fields which are settings in the BO
@@ -479,18 +452,10 @@ class AdminAddressesControllerCore extends AdminController
         if ($this->action == 'save' && ($id_order = (int)Tools::getValue('id_order')) && !count($this->errors) && !empty($address_type)) {
             if (!Db::getInstance()->Execute('UPDATE '._DB_PREFIX_.'orders SET `id_address_'.bqSQL($address_type).'` = '.(int)$this->object->id.' WHERE `id_order` = '.(int)$id_order)) {
                 $this->errors[] = Tools::displayError('An error occurred while linking this address to its order.');
+            } else {
+                Tools::redirectAdmin(urldecode(Tools::getValue('back')).'&conf=4');
             }
         }
-
-        // in case of save and stay, redirect after save with current address.
-        // Because the current address can not be same as the current one(We have to delete it and create a new one in case address is used in orders)
-        if (empty($this->errors) && Tools::isSubmit('submitAdd'.$this->table.'AndStay')) {
-            $idCurrentAddress = Customer::getCustomerIdAddress($this->object->id_customer, false);
-            if ($idCurrentAddress != $this->object->id) {
-                $this->redirect_after = self::$currentIndex.'&'.$this->identifier.'='.$idCurrentAddress.'&conf=4&update'.$this->table.'&token='.$this->token;
-            }
-        }
-
         return $return;
     }
 
@@ -536,7 +501,7 @@ class AdminAddressesControllerCore extends AdminController
         return $out;
     }
 
-     /**
+    /**
      * Method called when an ajax request is made
      * @see AdminController::postProcess()
      */
@@ -547,8 +512,7 @@ class AdminAddressesControllerCore extends AdminController
             $customer = Customer::searchByName($email);
             if (!empty($customer)) {
                 $customer = $customer['0'];
-                $phone = Customer::getPhone($customer['id_customer']);
-                echo json_encode(array('infos' => pSQL($customer['firstname']).'_'.pSQL($customer['lastname']).'_'.pSQL($customer['company']).'_'.pSQL($customer['id_customer']).'_'.pSQL($phone)));
+                echo json_encode(array('infos' => pSQL($customer['firstname']).'_'.pSQL($customer['lastname']).'_'.pSQL($customer['company']).'_'.pSQL($customer['id_customer'])));
             }
         }
         die;

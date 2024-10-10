@@ -28,6 +28,5 @@ $(document).ready(function(){
         autoplayTimeout:5000,
         autoplayHoverPause:true,
         responsiveClass:true,
-        rtl: language_is_rtl,
     });
 });

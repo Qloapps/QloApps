@@ -99,6 +99,16 @@ class AdminStatusesControllerCore extends AdminController
                 'orderby' => false,
                 'class' => 'fixed-width-sm'
             ),
+            'delivery' => array(
+                'title' => $this->l('Delivery'),
+                'align' => 'text-center',
+                'active' => 'delivery',
+                'type' => 'bool',
+                'ajax' => true,
+                'orderby' => false,
+                'class' => 'fixed-width-sm'
+            )
+            ,
             'invoice' => array(
                 'title' => $this->l('Invoice'),
                 'align' => 'text-center',
@@ -228,13 +238,8 @@ class AdminStatusesControllerCore extends AdminController
                     'show_admin_template' => $mailToSuperadmin || $mailToEmployee || $mailToHotelier,
             );
         } else {
-            $name = array();
-            foreach ($this->_languages as $language) {
-                $name[$language['id_lang']] = $this->getFieldValue($order_return_state, 'name', $language['id_lang']);
-            }
-
             $this->fields_value = array(
-                'name' => $name,
+                'name' => $this->getFieldValue($order_return_state, 'name'),
                 'color' => "#ffffff",
             );
         }
@@ -407,28 +412,28 @@ class AdminStatusesControllerCore extends AdminController
                             'name' => 'name'
                         ),
                     ),
-                    // array(
-                    //     'type' => 'checkbox',
-                    //     'name' => 'pdf_delivery',
-                    //     'values' => array(
-                    //         'query' => array(
-                    //             array('id' => 'on',  'name' => $this->l('Attach delivery slip PDF to email.'), 'val' => '1'),
-                    //             ),
-                    //         'id' => 'id',
-                    //         'name' => 'name'
-                    //     ),
-                    // ),
-                    // array(
-                    //     'type' => 'checkbox',
-                    //     'name' => 'shipped',
-                    //     'values' => array(
-                    //         'query' => array(
-                    //             array('id' => 'on',  'name' => $this->l('Set the order as shipped.'), 'val' => '1'),
-                    //             ),
-                    //         'id' => 'id',
-                    //         'name' => 'name'
-                    //     )
-                    // ),
+                    array(
+                        'type' => 'checkbox',
+                        'name' => 'pdf_delivery',
+                        'values' => array(
+                            'query' => array(
+                                array('id' => 'on',  'name' => $this->l('Attach delivery slip PDF to email.'), 'val' => '1'),
+                                ),
+                            'id' => 'id',
+                            'name' => 'name'
+                        ),
+                    ),
+                    array(
+                        'type' => 'checkbox',
+                        'name' => 'shipped',
+                        'values' => array(
+                            'query' => array(
+                                array('id' => 'on',  'name' => $this->l('Set the order as shipped.'), 'val' => '1'),
+                                ),
+                            'id' => 'id',
+                            'name' => 'name'
+                        )
+                    ),
                     array(
                         'type' => 'checkbox',
                         'name' => 'paid',
@@ -440,17 +445,17 @@ class AdminStatusesControllerCore extends AdminController
                             'name' => 'name'
                         )
                     ),
-                    // array(
-                    //     'type' => 'checkbox',
-                    //     'name' => 'delivery',
-                    //     'values' => array(
-                    //         'query' => array(
-                    //             array('id' => 'on', 'name' => $this->l('Show delivery PDF.'), 'val' => '1'),
-                    //             ),
-                    //         'id' => 'id',
-                    //         'name' => 'name'
-                    //     )
-                    // ),
+                    array(
+                        'type' => 'checkbox',
+                        'name' => 'delivery',
+                        'values' => array(
+                            'query' => array(
+                                array('id' => 'on', 'name' => $this->l('Show delivery PDF.'), 'val' => '1'),
+                                ),
+                            'id' => 'id',
+                            'name' => 'name'
+                        )
+                    ),
                     array(
                         'type' => 'select_template',
                         'is_customer_template' => 1,
@@ -473,16 +478,7 @@ class AdminStatusesControllerCore extends AdminController
                 ),
                 'submit' => array(
                     'title' => $this->l('Save'),
-                ),
-                'buttons' => array(
-                    'save-and-stay' => array(
-                        'title' => $this->l('Save and stay'),
-                        'name' => 'submitAdd'.$this->table.'AndStay',
-                        'type' => 'submit',
-                        'class' => 'btn btn-default pull-right',
-                        'icon' => 'process-icon-save',
-                    ),
-                ),
+                )
             );
             return $this->renderOrderStatusForm();
         } elseif (Tools::isSubmit('updateorder_return_state')
@@ -687,16 +683,7 @@ class AdminStatusesControllerCore extends AdminController
             ),
             'submit' => array(
                 'title' => $this->l('Save'),
-            ),
-            'buttons' => array(
-                'save-and-stay' => array(
-                    'title' => $this->l('Save and stay'),
-                    'name' => 'submitAdd'.$this->table.'AndStay',
-                    'type' => 'submit',
-                    'class' => 'btn btn-default pull-right',
-                    'icon' => 'process-icon-save',
-                ),
-            ),
+            )
         );
 
         return parent::renderForm();
@@ -707,15 +694,6 @@ class AdminStatusesControllerCore extends AdminController
         $theme = new Theme($this->context->shop->id_theme);
         $default_path = '../mails/';
         $theme_path = '../themes/'.$theme->directory.'/mails/'; // Mail templates can also be found in the theme folder
-        $templatesToIgnore = array(
-            'footer.html',
-            'header.html',
-            'shipped.html',
-            'in_transit.html',
-            'download_products.html',
-            'header_order_conf.html',
-            'test.html'
-        );
 
         $array = array();
         foreach (Language::getLanguages(false) as $language) {
@@ -731,9 +709,7 @@ class AdminStatusesControllerCore extends AdminController
             // We merge all available emails in one array
             $templates = array_unique(array_merge(scandir(_PS_ADMIN_DIR_.'/'.$default_path.$iso_code), $theme_templates));
             foreach ($templates as $key => $template) {
-                if (!strncmp(strrev($template), 'lmth.', 5)
-                    && !in_array($template, $templatesToIgnore)
-                ) {
+                if (!strncmp(strrev($template), 'lmth.', 5)) {
                     $search_result = array_search($template, $theme_templates);
                     $array[$iso_code][] = array(
                                 'id' => substr($template, 0, -5),
@@ -813,11 +789,7 @@ class AdminStatusesControllerCore extends AdminController
                 if (!$order_return_state->save()) {
                     $this->errors[] = Tools::displayError('An error has occurred: Can\'t save the current order\'s refund status.');
                 } else {
-                    if (Tools::isSubmit('submitAddorder_return_stateAndStay')) {
-                        Tools::redirectAdmin(self::$currentIndex.'&updateorder_return_state&id_order_return_state='.$id_order_return_state.'&conf=4&token='.$this->token);
-                    } else {
-                        Tools::redirectAdmin(self::$currentIndex.'&conf=4&token='.$this->token);
-                    }
+                    Tools::redirectAdmin(self::$currentIndex.'&conf=4&token='.$this->token);
                 }
             }
         }

@@ -1,13 +1,4 @@
 ------------------------------
-# V1.3.3 to V1.3.4
-------------------------------
-
-## Improved/Changed Features:
-
-* [BO] : [#877] Added new module for extra service and facilities statistics.
-
-
-------------------------------
 # V1.3.2 to V1.3.3
 ------------------------------
 

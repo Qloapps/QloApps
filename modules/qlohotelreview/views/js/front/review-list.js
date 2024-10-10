@@ -205,6 +205,10 @@ $(document).on('shown.bs.tab', 'a[href="#hotel-reviews"]', function(e) {
 });
 
 $(document).ready(function () {
+    if (typeof qlo_hotel_review_js_vars === 'object' && qlo_hotel_review_js_vars.id_order) {
+        showOrder(1, qlo_hotel_review_js_vars.id_order, qlo_hotel_review_js_vars.link);
+    }
+
     // init raty
     if (typeof qlo_hotel_review_js_vars === 'object' && qlo_hotel_review_js_vars.raty_img_path) {
         initRaty(qlo_hotel_review_js_vars.raty_img_path);

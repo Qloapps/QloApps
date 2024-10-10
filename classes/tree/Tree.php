@@ -42,8 +42,6 @@ class TreeCore
     protected $_node_folder_template;
     protected $_node_item_template;
     protected $_template;
-    private $_root_element_selectable = true;
-
 
     /** @var string */
     private $_template_directory;
@@ -193,7 +191,7 @@ class TreeCore
     public function getHeaderTemplate()
     {
         if (!isset($this->_headerTemplate)) {
-            $this->setHeaderTemplate(static::DEFAULT_HEADER_TEMPLATE);
+            $this->setHeaderTemplate(self::DEFAULT_HEADER_TEMPLATE);
         }
 
         return $this->_headerTemplate;
@@ -219,7 +217,7 @@ class TreeCore
     public function getNodeFolderTemplate()
     {
         if (!isset($this->_node_folder_template)) {
-            $this->setNodeFolderTemplate(static::DEFAULT_NODE_FOLDER_TEMPLATE);
+            $this->setNodeFolderTemplate(self::DEFAULT_NODE_FOLDER_TEMPLATE);
         }
 
         return $this->_node_folder_template;
@@ -234,7 +232,7 @@ class TreeCore
     public function getNodeItemTemplate()
     {
         if (!isset($this->_node_item_template)) {
-            $this->setNodeItemTemplate(static::DEFAULT_NODE_ITEM_TEMPLATE);
+            $this->setNodeItemTemplate(self::DEFAULT_NODE_ITEM_TEMPLATE);
         }
 
         return $this->_node_item_template;
@@ -249,7 +247,7 @@ class TreeCore
     public function getTemplate()
     {
         if (!isset($this->_template)) {
-            $this->setTemplate(static::DEFAULT_TEMPLATE);
+            $this->setTemplate(self::DEFAULT_TEMPLATE);
         }
 
         return $this->_template;
@@ -273,7 +271,7 @@ class TreeCore
     {
         if (!isset($this->_template_directory)) {
             $this->_template_directory = $this->_normalizeDirectory(
-                static::DEFAULT_TEMPLATE_DIRECTORY);
+                self::DEFAULT_TEMPLATE_DIRECTORY);
         }
 
         return $this->_template_directory;
@@ -342,17 +340,6 @@ class TreeCore
 
         $this->_toolbar = $value;
         return $this;
-    }
-
-    public function setRootElementSelectable($value)
-    {
-        $this->_root_element_selectable = (bool)$value;
-        return $this;
-    }
-
-    public function rootElementSelectable()
-    {
-        return (isset($this->_root_element_selectable) && $this->_root_element_selectable);
     }
 
     public function getToolbar()
@@ -432,14 +419,14 @@ class TreeCore
         //Assign Tree nodes
         $template->assign($this->getAttributes())->assign(array(
             'id'    => $this->getId(),
-            'nodes' => $this->renderNodes($data, true),
+            'nodes' => $this->renderNodes($data),
             'id_tree' => $this->getIdTree()
         ));
 
         return (isset($html) ? $html : '').$template->fetch();
     }
 
-    public function renderNodes($data = null, $root = false)
+    public function renderNodes($data = null)
     {
         if (!isset($data)) {
             $data = $this->getData();
@@ -459,16 +446,14 @@ class TreeCore
                     $this->getContext()->smarty
                 )->assign(array(
                     'children' => $this->renderNodes($item['children']),
-                    'node'     => $item,
-                    'selectable' => !$root || $this->rootElementSelectable()
+                    'node'     => $item
                 ))->fetch();
             } else {
                 $html .= $this->getContext()->smarty->createTemplate(
                     $this->getTemplateFile($this->getNodeItemTemplate()),
                     $this->getContext()->smarty
                 )->assign(array(
-                    'node' => $item,
-                    'selectable' => !$root || $this->rootElementSelectable()
+                    'node' => $item
                 ))->fetch();
             }
         }

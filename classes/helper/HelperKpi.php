@@ -38,12 +38,8 @@ class HelperKpiCore extends Helper
     public $value;
     public $data;
     public $source;
-    public $id_hotels = false;
-    public $exclude_id_hotels = array();
     public $href;
-    public $target;
     public $tooltip;
-    public $visible;
 
     public function generate()
     {
@@ -59,12 +55,8 @@ class HelperKpiCore extends Helper
             'value' => $this->value,
             'data' => $this->data,
             'source' => $this->source,
-            'id_hotels' => $this->id_hotels,
-            'exclude_id_hotels' => $this->exclude_id_hotels,
             'href' => $this->href,
-            'target' => $this->target,
-            'tooltip' => $this->tooltip,
-            'visible' => $this->visible,
+            'tooltip' => $this->tooltip
         ));
 
         return $this->tpl->fetch();

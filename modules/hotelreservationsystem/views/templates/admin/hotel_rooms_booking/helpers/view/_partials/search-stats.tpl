@@ -1,7 +1,4 @@
 <div class="htl_room_data_cont">
-    <div class="status-info-tooltip" title="{l s='Due to the dynamic nature of room availability, a single room can fall under multiple categories in the stats panel. For example, if a room is booked from 1st to 3th and then marked as unavailable for maintenance on 4th to 5th, it would be counted in both the "Booked Rooms" and "Unavailable Rooms" categories for those respective dates if search is done from 1st to 6th. This allows admin to understand the room\'s status across different periods accurately.' mod='hotelreservationsystem'}">
-        <i class="icon-info-circle"></i>
-    </div>
     <div class="row">
         <div class="col-sm-6">
             <div class="row">

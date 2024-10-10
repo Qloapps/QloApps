@@ -283,9 +283,11 @@ class AdminRequestSqlControllerCore extends AdminController
         $this->initToolbar();
         $this->initPageHeaderToolbar();
         if ($this->display == 'edit' || $this->display == 'add') {
-            if ($this->loadObject(true)) {
-                $this->content .= $this->renderForm();
+            if (!$this->loadObject(true)) {
+                return;
             }
+
+            $this->content .= $this->renderForm();
         } elseif ($this->display == 'view') {
             // Some controllers use the view action without an object
             if ($this->className) {
@@ -310,7 +312,7 @@ class AdminRequestSqlControllerCore extends AdminController
 
     public function initPageHeaderToolbar()
     {
-        if (empty($this->display) || $this->display == 'list') {
+        if (empty($this->display)) {
             $this->page_header_toolbar_btn['new_request'] = array(
                 'href' => self::$currentIndex.'&addrequest_sql&token='.$this->token,
                 'desc' => $this->l('Add new SQL query', null, null, false),

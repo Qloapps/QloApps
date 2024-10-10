@@ -155,13 +155,4 @@ class OrderStateCore extends ObjectModel
     {
         return !($this->unremovable);
     }
-
-    public static function getOverBookingStates()
-    {
-        return array(
-            Configuration::get('PS_OS_OVERBOOKING_PARTIAL_PAID'),
-            Configuration::get('PS_OS_OVERBOOKING_PAID'),
-            Configuration::get('PS_OS_OVERBOOKING_UNPAID'),
-        );
-    }
 }

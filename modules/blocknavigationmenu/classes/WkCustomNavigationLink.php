@@ -235,39 +235,6 @@ class WkCustomNavigationLink extends ObjectModel
         $objCustomNavigationLink->is_custom_link = 0;
         $objCustomNavigationLink->link = 'contact';
         $objCustomNavigationLink->save();
-
         return true;
     }
-
-    public function getNavigationLinksByIdCMS($idCMS)
-    {
-        return Db::getInstance()->executeS('
-            SELECT * FROM `'._DB_PREFIX_.'htl_custom_navigation_link`
-            WHERE `id_cms`='.(int) $idCMS
-        );
-    }
-
-    public function disableNavigationLinksByIdCMS($idCMS)
-    {
-        $objCustomNavigationLink = new WkCustomNavigationLink();
-        if ($navLinks = $objCustomNavigationLink->getNavigationLinksByIdCMS($idCMS)) {
-            foreach ($navLinks as $navLink) {
-                $objCustomNavigationLink = new WkCustomNavigationLink((int) $navLink['id_navigation_link']);
-                $objCustomNavigationLink->active = 0;
-                $objCustomNavigationLink->save();
-            }
-        }
-    }
-
-    public function deleteNavigationLinksByIdCMS($idCMS)
-    {
-        $objCustomNavigationLink = new WkCustomNavigationLink();
-        if ($navLinks = $objCustomNavigationLink->getNavigationLinksByIdCMS($idCMS)) {
-            foreach ($navLinks as $navLink) {
-                $objCustomNavigationLink = new WkCustomNavigationLink((int) $navLink['id_navigation_link']);
-                $objCustomNavigationLink->delete();
-            }
-        }
-    }
-
 }

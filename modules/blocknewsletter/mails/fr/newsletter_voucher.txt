@@ -1,0 +1,11 @@
+
+[/{shop_url}]
+
+Bonjour,
+
+En remerciement pour votre inscription à notre newsletter nous
+avons le plaisir de vous offrir un bon de réduction : {discount}
+
+{shop_name} [/{shop_url}] réalisé avec Webkul(tm)
+[https://webkul.com]
+

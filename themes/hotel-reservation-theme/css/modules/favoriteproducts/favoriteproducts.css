@@ -1,0 +1,36 @@
+#favoriteproducts_block_account .favoriteproduct {
+  position: relative;
+  margin-bottom: 14px;
+  padding: 12px 8px;
+  border: 1px solid #d6d4d4;
+  -moz-border-radius: 3px;
+  -webkit-border-radius: 3px;
+  border-radius: 3px; }
+  #favoriteproducts_block_account .favoriteproduct a.product_img_link {
+    border: 1px solid #d6d4d4;
+    display: block;
+    float: left;
+    margin-right: 14px;
+    overflow: hidden;
+    position: relative; }
+  #favoriteproducts_block_account .favoriteproduct p.product_desc {
+    line-height: 16px;
+    overflow: hidden;
+    padding: 0; }
+  #favoriteproducts_block_account .favoriteproduct .remove {
+    position: absolute;
+    top: 10px;
+    right: 10px; }
+    #favoriteproducts_block_account .favoriteproduct .remove .icon {
+      cursor: pointer; }
+
+/* lnk fiche produit */
+#usefull_link_block li#favoriteproducts_block_extra_add, #usefull_link_block li#favoriteproducts_block_extra_remove, #usefull_link_block li#favoriteproducts_block_extra_added, #usefull_link_block li#favoriteproducts_block_extra_removed {
+  padding-left: 30px;
+  cursor: pointer; }
+#usefull_link_block li#favoriteproducts_block_extra_added {
+  display: none; }
+#usefull_link_block li#favoriteproducts_block_extra_removed {
+  display: none; }
+
+/*# sourceMappingURL=favoriteproducts.css.map */

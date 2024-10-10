@@ -271,15 +271,9 @@
     margin-right: 5px;
 }
 
-#hotel-reviews .review-sort-by-container {
-    display: inline-block;
-    position: relative;
-}
-
 #hotel-reviews .review-sort-by button {
     text-align: left;
     min-width: 170px;
-    position: relative;
 }
 
 #hotel-reviews .dropdown-menu {
@@ -290,13 +284,4 @@
     position: absolute;
     top: 15px;
     right: 12px;
-}
-
-#hotel-reviews.rtl .sort-by {
-    margin-left: 5px;
-    margin-right: unset;
-}
-
-#hotel-reviews.rtl  [class*=col]{
-  float: right !important;
 }

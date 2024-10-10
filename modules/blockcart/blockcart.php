@@ -34,7 +34,7 @@ class Blockcart extends Module
     {
         $this->name = 'blockcart';
         $this->tab = 'front_office_features';
-        $this->version = '1.6.6';
+        $this->version = '1.6.5';
         $this->author = 'PrestaShop';
         $this->need_instance = 0;
 
@@ -248,9 +248,8 @@ class Blockcart extends Module
                 } else {
                     $addedProduct['price'] = Tools::displayPrice($price['total_price_tax_incl']);
                 }
-                $fullDate = ($this->context->controller->show_full_date && (date('Y-m-d', strtotime($addedProduct['date_from'])) == date('Y-m-d', strtotime($addedProduct['date_to']))) ? true : false);
-                $addedProduct['date_from'] = Tools::displayDate($addedProduct['date_from'], null, $fullDate);
-                $addedProduct['date_to'] = Tools::displayDate($addedProduct['date_to'], null, $fullDate);
+                $addedProduct['date_from'] = Tools::displayDate($addedProduct['date_from']);
+                $addedProduct['date_to'] = Tools::displayDate($addedProduct['date_to']);
             } else {
                 // @todo get price of added product from front
                 $addedProduct['price'] = ProductCore::getPriceStatic(

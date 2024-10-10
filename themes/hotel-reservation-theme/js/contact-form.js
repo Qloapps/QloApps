@@ -50,11 +50,7 @@ $(document).ready(function() {
     showProductSelect($('select[name=id_order]').attr('value'));
 
     //By Webkul JS for Map locations of the hotels on google Map
-    if (typeof hotelLocationArray != 'undefined'
-        && $('#map').length
-        && typeof google == 'object'
-        && typeof google.maps == 'object'
-    ) {
+    if (hotelLocationArray) {
         initMap();
     }
 });
@@ -93,7 +89,6 @@ function initMap() {
             map: map,
             title: location.hotel_name,
             animation: google.maps.Animation.DROP,
-            icon: PS_STORES_ICON
         });
 
         // Allow each marker to have an info window

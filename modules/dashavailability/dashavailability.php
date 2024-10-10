@@ -28,7 +28,7 @@ class DashAvailability extends Module
     {
         $this->name = 'dashavailability';
         $this->tab = 'dashboard';
-        $this->version = '1.0.2';
+        $this->version = '1.0.1';
         $this->ps_versions_compliancy = array('min' => '1.6', 'max' => '1.6');
         $this->author = 'Webkul';
         $this->bootstrap = true;
@@ -52,9 +52,6 @@ class DashAvailability extends Module
     public function hookActionAdminControllerSetMedia()
     {
         if (get_class($this->context->controller) == 'AdminDashboardController') {
-            Media::addJsDef(array(
-                'avail_rooms_txt' => $this->l('Available Rooms'),
-            ));
             $this->context->controller->addJs($this->_path.'views/js/'.$this->name.'.js');
             $this->context->controller->addCSS($this->_path.'views/css/'.$this->name.'.css');
         }
@@ -102,7 +99,7 @@ class DashAvailability extends Module
             $availability_data,
             array(
                 'id' => 'availabilities',
-                'key' => $this->l('Availability'),
+                'key' => $this->l('Availabilities'),
                 'border_color' => '#11f0fc',
                 'color' => '#72C3F0',
             )

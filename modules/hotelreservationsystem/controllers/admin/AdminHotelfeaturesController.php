@@ -41,6 +41,11 @@ class AdminHotelFeaturesController extends ModuleAdminController
             'desc' => $this->l('Add new Features'),
             'imgclass' => 'new'
         );
+
+        $this->page_header_toolbar_btn['new'] = array(
+            'href' => $this->context->link->getAdminLink('AdminAssignHotelFeatures'),
+            'desc' => $this->l('Assign Features To Hotel'),
+        );
     }
 
     public function renderView()
@@ -53,19 +58,15 @@ class AdminHotelFeaturesController extends ModuleAdminController
 
     public function renderForm()
     {
-        if (!$this->loadObject(true)) {
-            return;
-        }
-
         $smartyVars = array();
         //lang vars
         $languages = Language::getLanguages(false);
-        $currentLangId = $this->default_form_language ? $this->default_form_language : Configuration::get('PS_LANG_DEFAULT');
+        $currentLangId = Configuration::get('PS_LANG_DEFAULT');
         $currentLang = Language::getLanguage((int) $currentLangId);
         $smartyVars['languages'] = $languages;
         $smartyVars['currentLang'] = $currentLang;
         $smartyVars['ps_img_dir'] = _PS_IMG_.'l/';
-        if ($id = $this->object->id) {
+        if ($id = Tools::getValue('id')) {
             $smartyVars['edit'] = 1;
             if (Validate::isLoadedObject($objFeatures = new HotelFeatures($id))) {
                 $featureInfo = (array) $objFeatures;
@@ -147,6 +148,18 @@ class AdminHotelFeaturesController extends ModuleAdminController
                 }
             } else {
                 $this->errors[] = $this->l('Please add atleast one Child features.');
+            }
+
+            foreach ($languages as $lang) {
+                if (!trim(Tools::getValue('parent_ftr_name_'.$lang['id_lang']))) {
+                    $objHotelFeatures->name[$lang['id_lang']] = Tools::getValue(
+                        'parent_ftr_name_'.$defaultLangId
+                    );
+                } else {
+                    $objHotelFeatures->name[$lang['id_lang']] = Tools::getValue(
+                        'parent_ftr_name_'.$lang['id_lang']
+                    );
+                }
             }
 
             if (!count($this->errors)) {
@@ -284,20 +297,13 @@ class AdminHotelFeaturesController extends ModuleAdminController
 
     public function ajaxProcessDeleteFeature()
     {
-        $response = array('status' => false);
-        if ($this->tabAccess['delete']) {
-            $idFeature = Tools::getValue('feature_id');
-            $objHotelFeatures = new HotelFeatures();
-            if ($objHotelFeatures->deleteHotelFeatures($idFeature)) {
-                $response['status'] = true;
-            } else {
-                $response['msg'] = $this->l('Some error occurred while deleting feature. Please try again.');
-            }
+        $idFeature = Tools::getValue('feature_id');
+        $objHotelFeatures = new HotelFeatures();
+        if ($objHotelFeatures->deleteHotelFeatures($idFeature)) {
+            die('success');
         } else {
-            $response['msg'] = $this->l('You do not have the permission to delete this.');
+            echo 0;
         }
-
-        $this->ajaxDie(json_encode($response));
     }
 
     public function setMedia()

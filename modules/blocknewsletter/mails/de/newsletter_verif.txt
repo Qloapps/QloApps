@@ -1,0 +1,13 @@
+
+[{shop_url}]
+
+Hallo,
+
+Sie haben sich soeben für unseren Newsletter angemeldet. Bitte
+bestätigen Sie Ihre Anmeldung durch Klick auf den folgenden Link:
+
+{verif_url} [{verif_url}]
+
+{shop_name} [{shop_url}] powered by
+Webkul(tm) [https://webkul.com]
+

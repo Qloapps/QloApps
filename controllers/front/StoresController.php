@@ -208,12 +208,8 @@ class StoresControllerCore extends FrontController
      */
     protected function assignStores()
     {
-        $hasStoreIcon = false;
-        if (Tools::file_get_contents($this->context->link->getMediaLink(_PS_IMG_.Configuration::get('PS_STORES_ICON')))) { // by webkul to get media link.
-            $hasStoreIcon = true;
-        }
+        $this->context->smarty->assign('hasStoreIcon', Tools::file_get_contents($this->context->link->getMediaLink(_PS_IMG_DIR_.Configuration::get('PS_STORES_ICON')))); // by webkul to get media link.
 
-        $this->context->smarty->assign('hasStoreIcon', $hasStoreIcon);
         $distance_unit = Configuration::get('PS_DISTANCE_UNIT');
         if (!in_array($distance_unit, array('km', 'mi'))) {
             $distance_unit = 'km';

@@ -23,7 +23,7 @@ class AdminModulesCatalogControllerCore extends AdminController
 
     public $modules;
 
-    const RECOMMENDATION_CONTENT_FILE_PATH = '/cache/catalog_recommendation.html';
+    const CATALOG_RECOMMENDATION_CONTENT = '/cache/catalog_recommendation.html';
 
     const ELEMENT_TYPE_MODULE = 1;
     const ELEMENT_TYPE_THEME = 2;
@@ -235,9 +235,20 @@ class AdminModulesCatalogControllerCore extends AdminController
         $this->page_header_toolbar_btn['addons'] = array(
             'href' => 'https://qloapps.com/addons/',
             'desc' => $this->l('Explore all Addons'),
-            'imgclass' => 'puzzle-piece',
+            'imgclass' => 'modules-list',
             'target' => true
         );
+    }
+
+    public function getRecommendationContent()
+    {
+        if (!Tools::isFresh(self::CATALOG_RECOMMENDATION_CONTENT, _TIME_1_DAY_, false)) {
+            @file_put_contents(_PS_ROOT_DIR_.self::CATALOG_RECOMMENDATION_CONTENT, Tools::addonsRequest('catalog-recommendation'));
+        }
+        if (file_exists(_PS_ROOT_DIR_.self::CATALOG_RECOMMENDATION_CONTENT)) {
+            return Tools::file_get_contents(_PS_ROOT_DIR_.self::CATALOG_RECOMMENDATION_CONTENT);
+        }
+        return false;
     }
 
     public function sortList(&$list, $type)
@@ -256,23 +267,15 @@ class AdminModulesCatalogControllerCore extends AdminController
                 if ($criteria == 'name') {
                     return strnatcasecmp($a->displayName, $b->displayName);
                 } else if ($criteria == 'price_increasing') {
-                    $priceA = $priceB = 0;
-                    if (isset($a->price)) {
-                        $priceA = $a->price;
-                    }
-                    if (isset($b->price)) {
-                        $priceB = $b->price;
-                    }
-                    return $priceA > $priceB;
+                    if (isset($a->price) && isset($b->price))
+                        return $a->price > $b->price;
+                    else if (isset($b->price) && $b->price)
+                        return true;
                 } else if ($criteria == 'price_decreasing') {
-                    $priceA = $priceB = 0;
-                    if (isset($a->price)) {
-                        $priceA = $a->price;
-                    }
-                    if (isset($b->price)) {
-                        $priceB = $b->price;
-                    }
-                    return $priceA < $priceB;
+                    if (isset($a->price) && isset($b->price))
+                        return $a->price < $b->price;
+                    else if (isset($b->price) && $b->price)
+                        return true;
                 }
 
             });

@@ -42,7 +42,7 @@ class StatsBestCustomers extends ModuleGrid
     {
         $this->name = 'statsbestcustomers';
         $this->tab = 'analytics_stats';
-        $this->version = '1.5.3';
+        $this->version = '1.5.2';
         $this->author = 'PrestaShop';
         $this->need_instance = 0;
 
@@ -152,25 +152,20 @@ class StatsBestCustomers extends ModuleGrid
 
         $this->query = 'SELECT SQL_CALC_FOUND_ROWS c.`id_customer`, c.`lastname`, c.`firstname`, c.`email`,
 			COUNT(co.`id_connections`) as totalVisits,
-            IFNULL((
-				SELECT ROUND(SUM(IFNULL(op.`amount`, 0) / o.`conversion_rate`), 2)
+			IFNULL((
+				SELECT ROUND(SUM(IFNULL(op.`amount`, 0) / cu.conversion_rate), 2)
 				FROM `'._DB_PREFIX_.'orders` o
-				LEFT JOIN `'._DB_PREFIX_.'order_payment_detail` op ON o.id_order = op.id_order
+				LEFT JOIN `'._DB_PREFIX_.'order_payment` op ON o.reference = op.order_reference
+				LEFT JOIN `'._DB_PREFIX_.'currency` cu ON o.id_currency = cu.id_currency
 				WHERE o.id_customer = c.id_customer
-				AND o.`invoice_date` BETWEEN '.$this->getDate().'
+				AND o.invoice_date BETWEEN '.$this->getDate().'
 				AND o.valid
-                AND o.`id_order` IN (
-                    SELECT id_order FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
-                    WHERE 1 '.HotelBranchInformation::addHotelRestriction(false, 'hbd').'
-                    )
 			), 0) as totalMoneySpent,
 			IFNULL((
-				SELECT COUNT(DISTINCT(hbd.id_order))
-				FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
-                INNER JOIN `'._DB_PREFIX_.'orders` o ON (hbd.`id_order` = o.`id_order`)
-				WHERE 1 '.HotelBranchInformation::addHotelRestriction(false, 'hbd').'
-                AND hbd.`id_customer` = c.`id_customer`
-				AND o.`invoice_date` BETWEEN '.$this->getDate().'
+				SELECT COUNT(*)
+				FROM `'._DB_PREFIX_.'orders` o
+				WHERE o.id_customer = c.id_customer
+				AND o.invoice_date BETWEEN '.$this->getDate().'
 				AND o.valid
 			), 0) as totalValidOrders
 		FROM `'._DB_PREFIX_.'customer` c

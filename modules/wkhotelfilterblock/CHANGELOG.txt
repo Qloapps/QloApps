@@ -1,17 +1,4 @@
 ------------------------------
-# V1.0.5 to V1.0.6
-------------------------------
-
-## Improved/Changed Features:
-
-* [FO] : [#758] Updated redirect to Page not found for invalid search results page URL
-* [FO] : [#762] Updated search Results Page Filters options have been moved to module wkhotelfilterblock
-* [FO] : [#886] Fixed if amenities are not present then amenity filter at search results page should not be visible
-* [FO] : [#1092] Added new sorting option "recommended" in search result page.
-* [CO] : [#1194] Updated optimized dataForFrontSearch function
-* [CO] : [#1195] Added process for smarty template overriding.
-
-------------------------------
 # V1.0.4 to V1.0.5
 ------------------------------
 

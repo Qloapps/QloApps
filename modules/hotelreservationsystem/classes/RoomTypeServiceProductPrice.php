@@ -49,16 +49,12 @@ class RoomTypeServiceProductPrice extends ObjectModel
         )
     );
 
-    public static function deleteRoomProductPrices($idProduct, $elementType = 0, $idElement = 0)
+    public static function deleteRoomProductPrices($idProduct, $elementType = 0)
     {
         $where = '`id_product`='.(int)$idProduct;
 
         if ($elementType) {
             $where .= ' AND `element_type`='.(int)$elementType;
-        }
-
-        if ($idElement) {
-            $where .= ' AND `id_element` = '.(int) $idElement;
         }
 
         return Db::getInstance()->delete(
@@ -69,26 +65,12 @@ class RoomTypeServiceProductPrice extends ObjectModel
 
     public static function getProductRoomTypePriceAndTax($idProduct, $idElement, $elementType)
     {
-        if ($result = Db::getInstance()->getRow('
-            SELECT spp.`price`, spp.`id_tax_rules_group`, p.`auto_add_to_cart`, p.`price_addition_type`
-            FROM `'._DB_PREFIX_.'product` p
-            LEFT JOIN `'._DB_PREFIX_.'htl_room_type_service_product` sp
-            ON (sp.`id_product` = p.`id_product`)
-            LEFT JOIN `'._DB_PREFIX_.'htl_room_type_service_product_price` spp
-            ON (spp.`id_product` = sp.`id_product` AND spp.`id_element` = sp.`id_element` AND spp.`element_type` = sp.`element_type`)
-            WHERE p.`id_product`='.(int)$idProduct.
-            ' AND sp.`id_element`='.(int)$idElement.
-            ' AND sp.`element_type`='.(int)$elementType)
-        ) {
-            if ($result['auto_add_to_cart'] && $result['price_addition_type'] == Product::PRICE_ADDITION_TYPE_WITH_ROOM) {
-                // if service is auto add to cart and added in room price, we need to find room type tax rule group
-                if ($elementType == RoomTypeServiceProduct::WK_ELEMENT_TYPE_ROOM_TYPE) {
-                    $result['id_tax_rules_group'] = Product::getIdTaxRulesGroupByIdProduct((int)$idElement);
-                }
-            }
-        }
-
-        return $result;
+        return Db::getInstance()->getRow(
+            'SELECT `price`, `id_tax_rules_group` FROM `'._DB_PREFIX_.'htl_room_type_service_product_price`
+            WHERE `id_product`='.(int)$idProduct.
+            ' AND `id_element`='.(int)$idElement.
+            ' AND `element_type`='.(int)$elementType
+        );
     }
 
     public function getProductRoomTypeLinkPriceInfo($idProduct, $idElement, $elementType)
@@ -101,17 +83,8 @@ class RoomTypeServiceProductPrice extends ObjectModel
         );
     }
 
-    public function getServicePrice(
-        $idProduct,
-        $idProductRoomType,
-        $quantity = 1,
-        $dateFrom = null,
-        $dateTo = null,
-        $useTax = null,
-        $id_cart = false,
-        $id_address = null,
-        $use_reduc= 1
-    ) {
+    public function getServicePrice($idProduct, $idProductRoomType, $quantity, $dateFrom = null, $dateTo = null, $useTax = null, $id_cart = false, $id_address = null, $test= false)
+    {
         if ($useTax === null)
             $useTax = Product::$_taxCalculationMethod == PS_TAX_EXC ? false : true;
 
@@ -124,7 +97,7 @@ class RoomTypeServiceProductPrice extends ObjectModel
             6,
             null,
             false,
-            $use_reduc,
+            true,
             (int)$quantity,
             false,
             null,
@@ -136,19 +109,6 @@ class RoomTypeServiceProductPrice extends ObjectModel
             null,
             true,
             (int)$idProductRoomType
-        );
-
-        Hook::exec('actionServicePriceModifier',
-            array(
-                'price' => &$price,
-                'id_service_product' => $idProduct,
-                'id_room_type' => $idProductRoomType,
-                'date_from' => $dateFrom,
-                'date_to' => $dateTo,
-                'use_tax' => $useTax,
-                'id_cart' => $id_cart,
-                'use_reduc' => $use_reduc
-            )
         );
 
         if (Product::getProductPriceCalculation($idProduct) == Product::PRICE_CALCULATION_METHOD_PER_DAY

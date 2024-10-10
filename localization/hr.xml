@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <localizationPack name="Croatia">
   <currencies>
-    <currency name="Euro" iso_code="EUR" iso_code_num="978" sign="€" blank="1" conversion_rate="1.00" format="2" decimals="1"/>
+    <currency name="Croatian Kuna" iso_code="HRK" iso_code_num="191" sign="kn" blank="1" conversion_rate="1.000000" format="2" decimals="1"/>
   </currencies>
   <languages>
     <language iso_code="hr"/>
@@ -165,27 +165,4 @@
     <unit type="base_distance" value="m"/>
     <unit type="long_distance" value="km"/>
   </units>
-  <states>
-    <state name="Bjelovarsko-bilogorska županija" iso_code="HR-07" country="HR" zone="Europe"/>
-    <state name="Brodsko-posavska županija"       iso_code="HR-12" country="HR" zone="Europe"/>
-    <state name="Dubrovačko-neretvanska županija" iso_code="HR-19" country="HR" zone="Europe"/>
-    <state name="Grad Zagreb"                     iso_code="HR-21" country="HR" zone="Europe"/>
-    <state name="Istarska županija"               iso_code="HR-18" country="HR" zone="Europe"/>
-    <state name="Karlovačka županija"             iso_code="HR-04" country="HR" zone="Europe"/>
-    <state name="Koprivničko-križevačka županija" iso_code="HR-06" country="HR" zone="Europe"/>
-    <state name="Krapinsko-zagorska županija"     iso_code="HR-02" country="HR" zone="Europe"/>
-    <state name="Ličko-senjska županija"          iso_code="HR-09" country="HR" zone="Europe"/>
-    <state name="Međimurska županija"             iso_code="HR-20" country="HR" zone="Europe"/>
-    <state name="Osječko-baranjska županija"      iso_code="HR-14" country="HR" zone="Europe"/>
-    <state name="Požeško-slavonska županija"      iso_code="HR-11" country="HR" zone="Europe"/>
-    <state name="Primorsko-goranska županija"     iso_code="HR-08" country="HR" zone="Europe"/>
-    <state name="Sisačko-moslavačka županija"     iso_code="HR-03" country="HR" zone="Europe"/>
-    <state name="Splitsko-dalmatinska županija"   iso_code="HR-17" country="HR" zone="Europe"/>
-    <state name="Šibensko-kninska županija"       iso_code="HR-15" country="HR" zone="Europe"/>
-    <state name="Varaždinska županija"            iso_code="HR-05" country="HR" zone="Europe"/>
-    <state name="Virovitičko-podravska županija"  iso_code="HR-10" country="HR" zone="Europe"/>
-    <state name="Vukovarsko-srijemska županija"   iso_code="HR-16" country="HR" zone="Europe"/>
-    <state name="Zadarska županija"               iso_code="HR-13" country="HR" zone="Europe"/>
-    <state name="Zagrebačka županija"             iso_code="HR-01" country="HR" zone="Europe"/> 
-  </states>
 </localizationPack>

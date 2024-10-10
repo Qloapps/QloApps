@@ -403,16 +403,7 @@ class AdminImagesControllerCore extends AdminController
             ),
             'submit' => array(
                 'title' => $this->l('Save')
-            ),
-            'buttons' => array(
-                'save-and-stay' => array(
-                    'title' => $this->l('Save and stay'),
-                    'name' => 'submitAdd'.$this->table.'AndStay',
-                    'type' => 'submit',
-                    'class' => 'btn btn-default pull-right',
-                    'icon' => 'process-icon-save',
-                ),
-            ),
+            )
         );
 
         parent::__construct();
@@ -823,7 +814,7 @@ class AdminImagesControllerCore extends AdminController
 
     public function initPageHeaderToolbar()
     {
-        if (empty($this->display) || $this->display == 'list') {
+        if (empty($this->display)) {
             $this->page_header_toolbar_btn['new_image_type'] = array(
                 'href' => self::$currentIndex.'&addimage_type&token='.$this->token,
                 'desc' => $this->l('Add new image type', null, null, false),

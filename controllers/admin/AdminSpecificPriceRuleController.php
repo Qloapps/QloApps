@@ -172,7 +172,6 @@ class AdminSpecificPriceRuleControllerCore extends AdminController
                     'name' => 'name',
                     'maxlength' => 32,
                     'required' => true,
-                    'col' => 3,
                     'hint' => $this->l('Forbidden characters').' <>;=#{}'
                 ),
                 array(
@@ -223,8 +222,8 @@ class AdminSpecificPriceRuleControllerCore extends AdminController
                     'name' => 'price',
                     'disabled' => ($this->object->price == -1 ? 1 : 0),
                     'maxlength' => 10,
-                    'suffix' => $this->context->currency->sign,
-                    'col' => 3,
+                    'suffix' => $this->context->currency->getSign('right'),
+
                 ),
                 array(
                     'type' => 'checkbox',
@@ -280,38 +279,23 @@ class AdminSpecificPriceRuleControllerCore extends AdminController
                     'type' => 'text',
                     'label' => $this->l('Reduction'),
                     'name' => 'reduction',
-                    'col' => 3,
                     'required' => true,
                 ),
             ),
             'submit' => array(
                 'title' => $this->l('Save')
             ),
-            'buttons' => array(
-                'save-and-stay' => array(
-                    'title' => $this->l('Save and stay'),
-                    'name' => 'submitAdd'.$this->table.'AndStay',
-                    'type' => 'submit',
-                    'class' => 'btn btn-default pull-right',
-                    'icon' => 'process-icon-save',
-                ),
-            ),
         );
-
-        $price = $this->getFieldValue($this->object, 'price');
-        if ($price == -1 || !Validate::isPrice($price)) {
+        if (($value = $this->getFieldValue($this->object, 'price')) != -1) {
+            $price = number_format($value, 6);
+        } else {
             $price = '';
-        }
-
-        $reduction = $this->getFieldValue($this->object, 'reduction');
-        if (!Validate::isPrice($reduction)) {
-            $reduction = 0;
         }
 
         $this->fields_value = array(
             'price' => $price,
             'from_quantity' => (($value = $this->getFieldValue($this->object, 'from_quantity')) ? $value : 1),
-            'reduction' => $reduction,
+            'reduction' => number_format((($value = $this->getFieldValue($this->object, 'reduction')) ? $value : 0), 6),
             'leave_bprice_on' => $price ? 0 : 1,
             'shop_id' => (($value = $this->getFieldValue($this->object, 'id_shop')) ? $value : 1)
         );
@@ -372,12 +356,6 @@ class AdminSpecificPriceRuleControllerCore extends AdminController
     public function postProcess()
     {
         Tools::clearSmartyCache();
-        if (Tools::isSubmit('submitAdd'.$this->table)) {
-            if (strtotime(Tools::getValue('from')) > strtotime(Tools::getValue('to'))) {
-                $this->errors[] = Tools::displayError('The price rule cannot end before it begins.');
-            }
-        }
-
         return parent::postProcess();
     }
 }

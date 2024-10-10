@@ -27,7 +27,7 @@
 class AdminDashboardControllerCore extends AdminController
 {
 
-    const RECOMMENDATION_CONTENT_FILE_PATH = '/cache/dashboard_recommendation.html';
+    const DASHBOARD_RECOMMENDATION_CONTENT = '/cache/dashboard_recommendation.html';
 
     public function __construct()
     {
@@ -135,8 +135,8 @@ class AdminDashboardControllerCore extends AdminController
         }
 
         $forms['net_profit']['fields']['CONF_AVERAGE_PRODUCT_MARGIN'] = array(
-            'title' => $this->l('Average gross operating cost percentage'),
-            'desc' => $this->l('This value is only used to calculate Dashboard approximate gross operating cost, if you do not specify operating cost for each room type.'),
+            'title' => $this->l('Average gross margin percentage'),
+            'desc' => $this->l('You should calculate this percentage as follows: ((total sales revenue) - (total operating cost)) / (total sales revenue) * 100. This value is only used to calculate Dashboard approximate gross margin, if you do not specify operating cost for each room type.'),
             'validation' => 'isPercentage',
             'cast' => 'intval',
             'type' => 'text',
@@ -295,12 +295,9 @@ class AdminDashboardControllerCore extends AdminController
     public function postProcess()
     {
         if (Tools::isSubmit('submitDateRange')) {
-            if (!Validate::isDate(Tools::getValue('date_from')) && !Validate::isDate(Tools::getValue('date_to'))) {
+            if (!Validate::isDate(Tools::getValue('date_from'))
+                || !Validate::isDate(Tools::getValue('date_to'))) {
                 $this->errors[] = Tools::displayError('The selected date range is not valid.');
-            } elseif (!Validate::isDate(Tools::getValue('date_from'))) {
-                $this->errors[] = Tools::displayError('Date from in not selected. Please select a date range from the calendar.');
-            } elseif (!Validate::isDate(Tools::getValue('date_to'))) {
-                $this->errors[] = Tools::displayError('Date to in not selected. Please select a date range from the calendar.');
             }
 
             if (Tools::getValue('datepicker_compare')) {
@@ -389,16 +386,7 @@ class AdminDashboardControllerCore extends AdminController
             'extra' => Tools::getValue('extra')
         );
 
-        // code to be added.
-        $data = Hook::exec('dashboardData', $params, $id_module, true, true, (int)Tools::getValue('dashboard_use_push'));
-        Hook::exec('actionDashboardDataModifier', array(
-            'data' => &$data,
-            'params' => $params,
-            'id_module' => $id_module,
-            'dashboard_use_push' => (int)Tools::getValue('dashboard_use_push')
-        ));
-
-        $this->ajaxDie(json_encode($data));
+        die(json_encode(Hook::exec('dashboardData', $params, $id_module, true, true, (int)Tools::getValue('dashboard_use_push'))));
     }
 
     public function ajaxProcessSetSimulationMode()
@@ -504,5 +492,16 @@ class AdminDashboardControllerCore extends AdminController
         }
 
         die(json_encode($return));
+    }
+
+    public function getRecommendationContent()
+    {
+        if (!Tools::isFresh(self::DASHBOARD_RECOMMENDATION_CONTENT, _TIME_1_DAY_, false)) {
+            @file_put_contents(_PS_ROOT_DIR_.self::DASHBOARD_RECOMMENDATION_CONTENT, Tools::addonsRequest('dashboard-recommendation'));
+        }
+        if (file_exists(_PS_ROOT_DIR_.self::DASHBOARD_RECOMMENDATION_CONTENT)) {
+            return Tools::file_get_contents(_PS_ROOT_DIR_.self::DASHBOARD_RECOMMENDATION_CONTENT);
+        }
+        return false;
     }
 }

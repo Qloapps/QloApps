@@ -1,0 +1,13 @@
+
+[{shop_url}]
+
+Olá,
+
+Obrigado por se cadastrar na nossa newsletter, por favor confirme sua
+solicitação clicando no link abaixo:
+
+{verif_url} [{verif_url}]
+
+{shop_name} [{shop_url}] baseado em
+Webkul(tm) [https://webkul.com]
+

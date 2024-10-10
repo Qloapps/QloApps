@@ -721,6 +721,7 @@ class AdminCategoriesControllerCore extends AdminController
     {
         $id_category = (int)Tools::getValue('id_category');
         $id_parent = (int)Tools::getValue('id_parent');
+
         // if true, we are in a root category creation
         if (!$id_parent) {
             $_POST['is_root_category'] = $_POST['level_depth'] = 1;
@@ -766,8 +767,6 @@ class AdminCategoriesControllerCore extends AdminController
                 $_POST['link_rewrite_'.$lang['id_lang']] = $this->object->link_rewrite[$lang['id_lang']];
             }
         }
-
-        return parent::processUpdate();
     }
 
     protected function setDeleteMode()

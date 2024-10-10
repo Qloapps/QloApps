@@ -1,135 +1,4 @@
 ------------------------------
-# V1.5.0 to V1.6.0
-------------------------------
-
-## Improved/Changed Features:
-
-* [CO] : [#720] Fixed issues in response of Availability & Rates search API for partial available rooms
-* [BO] : [#725] Fixed Pre-populate form values after invalid form submission of hotel form at back office
-* [BO] : [#727] Fixed refund Rules for multiple hotels for same cancellation days can not be created
-* [BO] : [#729] Fixed Hotel permissions are not saved when a hotel is created
-* [BO] : [#733] Fixed admin can not set refund amount to 0 when creating refund rules
-* [BO] : [#742] Fixed unable to delete room types from cart if admin visits book now page just after booking creation and before order confirmation
-* [BO] : [#751] Fixed Groups selection is removed for Advanced Price Rule when status is changed
-* [BO] : [#753] Fixed All file types are available for selection when choosing images for hotel and room type
-* [CO] : [#756] Fixed cancellation charge amount is incorrect if order currency is other than default currency
-* [CO] : [#759] Updated function call corrected for room type price calculations
-* [BO] : [#763] Fixed Hote Reservation System tab icon breaks randomly
-* [BO] : [#770] Updated disable cart popup button on admin Book Now page if cart is empty
-* [BO] : [#775] Added demo service products for categories Meals and Transfers.
-* [FO] : [#781] Improved room search user experience at front office
-* [BO] : [#784] Admin can add partial order payment when creating a new booking.
-* [BO] : [#789]  Updated set default occupancy chosen on search results, room type detail and admin book now pages
-* [BO] : [#790] Fixed rooms stats issue on admin Book Now page when adding or removing rooms from cart
-* [BO] : [#798] Updated move navbar Customer Support contact settings to Hotel Reservation System > Settings > General Settings page
-* [BO] : [#806] Fixed new cart getting created even if there are no active hotels for booking at back office Book Now page
-* [BO] : [#807] Added Warning for maximum quantity of service products in Extra Services popup when creating or editing a booking at back office.
-* [BO] : [#808] Updated move Week Days list in a new row on Advanced Price Rule form at back office
-* [CO] : [#810] Updated Use datepicker plugin to format dates using $.datepicker.parseDate() wherever applicable
-* [CO] : [#812] Added new hooks
-* [BO] : [#815] : Updated added Rooms filter and added suggestions for Hotel and Room type filter inputs on admin orders list page
-* [CO] : [#823] Updated text changes
-* [BO] : [#824] Fixed allotment Type selection in partial available rooms in book now page
-* [BO] : [#825] Fixed auto added services is not visible at back office add order and view order page
-* [BO] : [#826] Updated filter by Places panel removed and added advanced filters and room type positioning on Manage Room Types page at back office
-* [BO] : [#830] Added option to disable backdate order from superadmin and employees.
-* [FO] : [#833] Added 'Show at front office' option to enable/disable booking from front office.
-* [BO] : [#835] Updated make Customer Groups inaccessible if option Customer Groups is disabled on Advanced Parameters > Performance page
-* [BO] : [#836] Fixed employee form language memorization (Administration > Employees) not working for some forms
-* [FO] : [#839] Added error message for maximum occupancy in room occupancy dropdown.
-* [BO] : [#840] Fixed calendar tooltips reappear on admin book now page after adding or removing rooms from cart
-* [BO] : [#841] : Updated prevent room deletion and room status update to inactive when room has future booking
-* [CO] : [#843] Fixed friendly URL for search results page can not be changed
-* [BO] : [#854] Fixed errors shown on order detail page in back office when booked hotel is deleted
-* [CO] : [#855] Fixed issues in getting(GET), creating(POST) and updating(PUT) hotel by hotel API
-* [BO] : [#856] Fixed price conversion issues while changing currency in order detail page in back office
-* [CO] : [#871] Updated tax of room type will be applied to auto add services having price added to room price
-* [BO] : [#883] Added 'Save and stay' button on missing pages at back office.
-* [BO] : [#884] Added Accurate page name display in "Visitors online" statistics.
-* [CO] : [#885] Updated address country of demo customer 'pub@qloapps.com' changed to website default country
-* [BO] : [#888] Updated default listing order of rooms on admin book now page to ascending order of room database ID.
-* [BO] : [#889] Fixed new hotel category gets created instead of updating previous one on hotel name update at back office
-* [BO] : [#890] Service products can now be assigned to a room type from room type edit page at back office.
-* [CO] : [#892] Updated use different prefixes for demo room numbers belonging to different room types
-* [CO] : [#895] Fixed overbooking issues in QloApps and added new configurations for overbooking handling
-* [BO] : [#901] Added upgrade/degrade of rooms while reallocation and also fixed reallocation and swapping issues.
-* [BO] : [#907] Fixed room reallocation process on AdminHotelRoomsBooking controller caused by space in the name of the room.
-* [CO] : [#908] Improved Order Status changes, Refund issues resolved and order and cancellation process improved
-* [CO] : [#909] Fixed missing translation from the templates of the modules.
-* [BO] : [#913] Fixed added auto add services to the rooms added to the order by admin on edit order from the admin panel
-* [BO] : [#916] Fixed auto added services price not showing in cart summary in admin book now page
-* [BO] : [#923] Fixed service product price and quantity was added incorrectly in order on edit/update
-* [FO] : [#924] Fixed incorrect room price and final price when admin remove service product or update room price from admin end and proceed for payment at front office
-* [BO] : [#925] Fixed multiple Advance Price Rule can be created with same conditions
-* [CO] : [#928] Added new hooks
-* [BO] : [#929] Fixed AdminOrdersRefundRequestsController showing exception to all employees except the super admin.
-* [CO] : [#931] Fixed js issue due to map if Google Maps API key is set and hotel location is not set
-* [BO] : [#936] Fixed date selection corrections at different places in admin controllers.
-* [BO] : [#939] Updated optimized search results in the admin search page.
-* [BO] : [#941] Admin can add custom prices for facilities and services while editing order.
-* [CO] : [#951] Added values for columns 'price_calculation_method' and 'price_addition_type' for demo service products.
-* [BO] : [#958] Fixed admin was able to update the booking dates of a room in an order to the disabled dates of that room.
-* [BO] : [#962] Added new categories in demo data.
-* [CO] : [#964] Fixed room type categories were not updated when hotel name or location is updated
-* [CO] : [#972] Improved Algo for response data and format
-* [BO] : [#982] Fixed advance price rule created during booking are visible in room type price tab
-* [BO] : [#1004] Fixed issues in the process of booking creation from back office
-* [BO] : [#1007] Fixed maximum occupancy, length of stay and specific prices are not duplicating correctly while duplicating a room type.
-* [BO] : [#1012] Fixed creation of two separate HotelAdvancedPayment objects for a newly created room type from two separate tabs
-* [BO] : [#1016] Added display global max order date and global preparation time in the restriction tab in manage hotels.
-* [BO] : [#1019] Fixed empty copywrite year range in the footer incase the admin does not provide the website launch year.
-* [CO] : [#1027] Fixed cart rule does not show under available coupons when cart rule is created from refund request
-* [BO] : [#1029] Fixed hotel configuration options in settings only visible in default language
-* [BO] : [#1031] Updated tab wise permission restriction on the hotel feature delete process.
-* [BO] : [#1033] Fixed filter issue on Admin refund request page
-* [BO] : [#1046] Fixed getting errors in the back office if the id in the URL is updated manually to an invalid one.
-* [BO] : [#1049] Fixed warnings for invalid IMAP configuration after saving the default message in the contact in the back office.
-* [CO] : [#1054] Fixed when Order status set as cancelled the rooms are not set is_cancelled=1 in the htl_booking_detail table
-* [CO] : [#1062] Updated htaccess files comptible with apache 2.2 and 2.4
-* [BO] : [#1070] Updated validations for Hotel address when add a new hotel
-* [CO] : [#1084] The google maps will now display the map icon for the hotel locations.
-* [BO] : [#1094] Added Admin can set voucher expiry along with voucher when managing refund request.
-* [CO] : [#1097] Fixed issues in Refund management flow and Improved Order cancellation flow
-* [CO] : [#1105] Added option for modules to manipulate KPI data.
-* [BO] : [#1114] Fixed admin cannot create different Advance price rule for different group for same date ranges
-* [BO] : [#1120] Fixed incorrect prices show in admin refund request controller
-* [CO] : [#1121] Added new hooks
-* [BO] : [#1125] Fixed invoice data is not correct when multiple invoices created in an order from back-office
-* [BO] : [#1129] Fixed Dashboard issues on different sections
-* [FO] : [#1133] Updated original price will now be displayed with discounted amount.
-* [CO] : [#1136] Fixed cancelled room service is visible when same room is added again in order
-* [CO] : [#1140] Updated the hero image and its upload process.
-* [CO] : [#1153] Fixed partial cart rule not creating when using multiple coupons in a single cart
-* [CO] : [#1156] Updated the demo data added to the database for the QloApps on installation.
-* [CO] : [#1161] Updated id_address_delivery is now set as 0 by default
-* [CO] : [#1162] Fixed hotel permission are not being created for new hotels.
-* [CO] : [#1170] Added date wise breakdown in Availability and rates search API
-* [CO] : [#1174] Updated helper tree | Created a new helper tree class for generating tree
-* [CO] : [#1175] Fixed issues in the Webservices.
-* [BO] : [#1176] Updated the disabled dates interface, add and update process.
-* [BO] : [#1185] Updated the tab menu list of the hotel reservation system in the back office.
-* [BO] : [#1187] Added feature in tree to select all children node when parent node is selected and fixed some text issue
-* [BO] : [#1188] Updated hotel features assigning process in the back office.
-* [CO] : [#1191] Added webservice for bookings management.
-* [CO] : [#1194] Updated optimized dataForFrontSearch function
-* [CO] : [#1195] Added process for smarty template overriding.
-* [CO] : [#1198] Optimized Hotel Room Type Availability and rates search webservice
-* [CO] : [#1200] Updated price Rounding process improved in entire QloApps system
-* [CO] : [#1202] Fixed service not visible in booking when service is deleted from catalog after order
-* [CO] : [#1203] Fixed invalid auto-added service prices when multiple rooms are added in cart or service is disabled or removed from catalog.
-* [CO] : [#1217] Added changes in core algo for managing booking for hourly basis
-* [BO] : [#1240] Fixed the design issues with the pop up in the search form in Book Now page in back-office.
-* [FO] : [#1249] Fixed translation issues and removed slashes in the error message from cart validation process in the front-office.
-* [CO] : [#1250] Fixed Categories for demo service products are not created correctly on installation.
-* [BO] : [#1251] Fixed occupancy selection panel design issue in Backoffice book now page
-* [BO] : [#1264] Added Seo fields in manage hotel controller in the back-office
-* [CO] : [#1271] Added new hooks
-* [FO] : [#1272] Fixed order confirmation and Guest tracking flow issues and order emails are improved
-* [BO] : [#1284] Fixed getting fatal error on AdminHotelRoomsBookingController when an employee adds an invalid date in the search booking form in back-office.
-* [BO] : [#1291] Updated validation for 'Consider guest as child below age' in the back-office and removed child ages from occupancy fields in case 'Maximum children' for a room type is 0 from front-office.
-* [FO] : [#1292] Fixed design issues on the order-opc page and growl notifications in RTL mode in the front-office.
-
-------------------------------
 # V1.4.3 to V1.5.0
 ------------------------------
 
@@ -250,16 +119,16 @@
 [*] BO : [#270] Using room availability status as constants instead in values, removed HotelRoomStatus class
 [*] CO : [#244] Changed Tools::jsonEncode to json_encode
 [*] CO : [#283] Invalid value inserted in 'special_days' field in htl_room_type_feature_pricing table through API
-[*] CO : [#284] Resolved: No validation for the fields in 'hotel_refund_rules' API for add and update.
+[*] CO : [#284] Resolved: No validation for the fields in 'hotel_refund_rules' API for add and update. 
 [*] CO : [#289] Validations added to the fields of "bookings" API for POST / PUT API requests
 [*] CO : [#274, #274] Text changes
-[*] CO : [#290] Using $this->_path for including css and js | Moved plugins to core js folder
+[*] CO : [#290] Using $this->_path for including css and js | Moved plugins to core js folder 
 
 
 ## Bug/Issues Resolved:
 
-[-] BO : [#259] fixed room reallocation availability list for temporary unavailable rooms
-[-] BO : [#256] Fixed Swap rooms leads to reservations duplications
+[-] BO : [#259] fixed room reallocation availability list for temporary unavailable rooms 
+[-] BO : [#256] Fixed Swap rooms leads to reservations duplications 
 [-] CO : [#252] Fixed getRoomBookingData function always return the first room for same room in order with different dates
 [-] CO : [#291] Resolved: Wrong price return by advance payment functions in HotelAdvancedPayment class
 [-] CO : [#294] Resolve order edit issues, Added hooks in order edit process

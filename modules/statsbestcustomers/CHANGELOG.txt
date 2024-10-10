@@ -1,13 +1,4 @@
 ------------------------------
-# V1.5.2 to V1.5.3
-------------------------------
-
-## Improved/Changed Features:
-
-* [BO] : [#865] Updated stats are now shown according to employee hotel access
-
-
-------------------------------
 # V1.5.1 to V1.5.2
 ------------------------------
 

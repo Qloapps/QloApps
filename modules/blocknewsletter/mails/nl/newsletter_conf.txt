@@ -1,0 +1,10 @@
+
+[{shop_url}]
+
+Hallo,
+
+BEDANKT VOOR UW INSCHRIJVING OP ONZE NIEUWSBRIEF
+
+{shop_name} [{shop_url}] gebouwd met
+Webkul(tm) [https://webkul.com]
+

@@ -1,13 +1,4 @@
 ------------------------------
-# V1.0.1 to V1.0.2
-------------------------------
-
-## Improved/Changed Features:
-
-* [BO] : [#900] Fixed dashboard stats issues and also improved the view of the dashboard
-* [CO] : [#909] Fixed missing translation from the templates of the modules.
-
-------------------------------
 # V1.0.0 to V1.0.1
 ------------------------------
 

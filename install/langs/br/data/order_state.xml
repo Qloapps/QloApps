@@ -5,7 +5,7 @@
     <template>awaiting_payment</template>
   </order_state>
   <order_state id='Payment_accepted'>
-    <name>Pagamento completo recebido</name>
+    <name>Pagamento aceito</name>
     <template>payment_accepted</template>
   </order_state>
   <order_state id='Processing_in_progress'>
@@ -33,19 +33,15 @@
     <template/>
   </order_state>
   <order_state id="Overbooking_paid">
-    <name>Overbooking (Paid)</name>
+    <name>Overbooking (paid)</name>
     <template/>
   </order_state>
   <order_state id="Overbooking_unpaid">
-    <name>Overbooking (Not paid)</name>
-    <template/>
-  </order_state>
-  <order_state id="Overbooking_partial_paid">
-    <name>Overbooking (Partial payment)</name>
+    <name>Overbooking (not paid)</name>
     <template/>
   </order_state>
   <order_state id="Partial_payment_accepted">
-    <name>Pagamento parcial recebido</name>
-    <template>partial_payment_accepted</template>
+    <name>Partial payment accepted</name>
+    <template>payment_accepted</template>
   </order_state>
 </entity_order_state>

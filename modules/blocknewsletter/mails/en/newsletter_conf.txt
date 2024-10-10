@@ -3,8 +3,7 @@
 
 Hi,
 
-Thank you for subscribing to our newsletter! If you wish to unsubscribe, please click
-here.[/{{unsub_url}}]
+THANK YOU FOR SUBSCRIBING TO OUR NEWSLETTER.
 
 {shop_name} [/{shop_url}] powered by Webkul(tm)
 [https://webkul.com]

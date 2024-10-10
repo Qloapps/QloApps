@@ -52,26 +52,8 @@
 			</div>
 			{* Feilds of cms page *}
 			<div id="cms_block_content" class="{if isset($smarty.post.is_cms_block_link)}{if !$smarty.post.is_cms_block_link}hidden{/if}{elseif !isset($navigationLinkInfo['id_cms']) || !$navigationLinkInfo['id_cms']}hidden{/if}">
-				<div class="form-group">
-					<div id="selected_parent_category">
-						<label class="control-label col-lg-3">
-							<span title="" data-toggle="tooltip" class="label-tooltip" data-original-title="{l s='Select CMS category to display related CMS pages' mod='blocknavigationmenu'}" data-html="true">
-								{l s='Select CMS category' mod='blocknavigationmenu'}
-							</span>
-						</label>
-						<div class="col-lg-9">
-							<select class="form-control fixed-width-xxl " name="id_cms_category" id="id_cms_category">
-								{if isset($categories) && count($categories)}
-									{foreach $categories as $category}
-										<option value="{$category.id_cms_category}" {if isset($smarty.post.id_cms_category)}{if ($smarty.post.id_cms_category == $category.id_cms_category)}selected="selected"{/if}{else if isset($id_cms_category) && ($id_cms_category == $category.id_cms_category)}selected="selected"{/if}>{$category.name|escape:'htmlall':'UTF-8'}</option>
-									{/foreach}
-								{/if}
-							</select>
-						</div>
-					</div>
-				</div>
 				{*Display CMS Pages*}
-				{if isset($categoryWiseCmsPages)}
+				{if isset($cmsPages)}
 					<div class="form-group">
 						<label class="control-label col-lg-3">
 							<span class="label-tooltip" data-toggle="tooltip"
@@ -79,34 +61,32 @@
 								{l s='Select CMS Page' mod='blocknavigationmenu'}
 							</span>
 						</label>
-						{foreach $categoryWiseCmsPages as $idCMSCategory => $cmsPages}
-							<div class="col-lg-9">
-								<table class="table table-bordered cms_pages_table" id="cms_pages_table_{$idCMSCategory}" style="width:40%; {if isset($smarty.post.id_cms_category) && $smarty.post.id_cms_category != $idCMSCategory}display:none;{else if isset($id_cms_category) && ($id_cms_category != $idCMSCategory)}display:none;{/if}">
-									<thead>
+						<div class="col-lg-9">
+							<table class="table table-bordered" style="width:40%;">
+								<thead>
+									<tr>
+										<th class="fixed-width-xs">
+										</th>
+										<th class="fixed-width-xs"><span class="title_box">{l s='ID' mod='blocknavigationmenu'}</span></th>
+										<th>
+											<span class="title_box">
+												{l s='CMS Page Name' mod='blocknavigationmenu'}
+											</span>
+										</th>
+									</tr>
+								</thead>
+								<tbody>
+									{foreach $cmsPages as $cmsPage}
 										<tr>
-											<th class="fixed-width-xs">
-											</th>
-											<th class="fixed-width-xs"><span class="title_box">{l s='ID' mod='blocknavigationmenu'}</span></th>
-											<th>
-												<span class="title_box">
-													{l s='CMS Page Name' mod='blocknavigationmenu'}
-												</span>
-											</th>
+											<td><input type="radio" value="{$cmsPage.id_cms|escape:'htmlall':'UTF-8'}" name="id_cms" {if isset($navigationLinkInfo['id_cms']) && $navigationLinkInfo['id_cms'] == $cmsPage.id_cms}checked="checked"{/if}>
+											</td>
+											<td>{$cmsPage.id_cms|escape:'htmlall':'UTF-8'}</td>
+											<td><label for="groupBox_{$cmsPage.id_cms|escape:'htmlall':'UTF-8'}">{$cmsPage.meta_title}</label></td>
 										</tr>
-									</thead>
-									<tbody>
-										{foreach $cmsPages as $cmsPage}
-											<tr>
-												<td><input type="radio" value="{$cmsPage.id_cms|escape:'htmlall':'UTF-8'}" name="id_cms" {if isset($navigationLinkInfo['id_cms']) && $navigationLinkInfo['id_cms'] == $cmsPage.id_cms}checked="checked"{/if}>
-												</td>
-												<td>{$cmsPage.id_cms|escape:'htmlall':'UTF-8'}</td>
-												<td><label for="groupBox_{$cmsPage.id_cms|escape:'htmlall':'UTF-8'}">{$cmsPage.meta_title}</label></td>
-											</tr>
-										{/foreach}
-									</tbody>
-								</table>
-							</div>
-						{/foreach}
+									{/foreach}
+								</tbody>
+							</table>
+						</div>
 					</div>
 				{/if}
 			</div>

@@ -125,8 +125,8 @@ class AddressCore extends ObjectModel
             'id_state' =>            array('type' => self::TYPE_INT, 'validate' => 'isNullOrUnsignedId'),
             'alias' =>                array('type' => self::TYPE_STRING, 'validate' => 'isGenericName', 'required' => true, 'size' => 32),
             'company' =>            array('type' => self::TYPE_STRING, 'validate' => 'isGenericName', 'size' => 255),
-            'lastname' =>            array('type' => self::TYPE_STRING, 'validate' => 'isGenericName', 'required' => true, 'size' => 32),
-            'firstname' =>            array('type' => self::TYPE_STRING, 'validate' => 'isGenericName', 'required' => true, 'size' => 32),
+            'lastname' =>            array('type' => self::TYPE_STRING, 'validate' => 'isName', 'required' => true, 'size' => 32),
+            'firstname' =>            array('type' => self::TYPE_STRING, 'validate' => 'isName', 'required' => true, 'size' => 32),
             'vat_number' =>            array('type' => self::TYPE_STRING, 'validate' => 'isGenericName'),
             'address1' =>            array('type' => self::TYPE_STRING, 'validate' => 'isAddress', 'required' => true, 'size' => 128),
             'address2' =>            array('type' => self::TYPE_STRING, 'validate' => 'isAddress', 'size' => 128),
@@ -149,15 +149,12 @@ class AddressCore extends ObjectModel
     protected $webserviceParameters = array(
         'objectsNodeName' => 'addresses',
         'fields' => array(
-            'id_customer' => array('xlink_resource'=> 'customers', 'required' => true),
+            'id_customer' => array('xlink_resource'=> 'customers'),
             'id_manufacturer' => array('xlink_resource'=> 'manufacturers'),
             'id_supplier' => array('xlink_resource'=> 'suppliers'),
             'id_warehouse' => array('xlink_resource'=> 'warehouse'),
             'id_country' => array('xlink_resource'=> 'countries'),
             'id_state' => array('xlink_resource'=> 'states'),
-        ),
-        'hidden_fields' => array(
-            'id_hotel'
         ),
     );
 
@@ -183,7 +180,7 @@ class AddressCore extends ObjectModel
     {
         // for customer address we need to check of customer address already exists.
         if ($this->id_customer) {
-            if ($this->deleted == 0 && $id_address = Customer::getCustomerIdAddress($this->id_customer, false)) {
+            if ($id_address = Customer::getCustomerIdAddress($this->id_customer)) {
                 return false;
             }
         }
@@ -199,8 +196,6 @@ class AddressCore extends ObjectModel
 
     public function update($null_values = false)
     {
-
-        $context = Context::getContext();
         // Empty related caches
         if (isset(self::$_idCountries[$this->id])) {
             unset(self::$_idCountries[$this->id]);
@@ -213,40 +208,7 @@ class AddressCore extends ObjectModel
             Customer::resetAddressCache($this->id_customer, $this->id);
         }
 
-        // If address is already used in any order, it will not be edited directly, set address to "deleted" and create a new address
-        if ($this->isUsed() && $this->deleted == 0) {
-            return $this->updateUsedAddress($this);
-        }
-
         return parent::update($null_values);
-    }
-
-    /**
-     * If address is already used in any order
-     * set address to "deleted" and create a new address
-     * @param Address $address
-     * @return bool
-     */
-    public function updateUsedAddress(Address $address)
-    {
-        $objOldAddress = new Address($address->id);
-        $address->id = $address->id_address = null;
-
-        if ($objOldAddress->delete() && $address->save()) {
-            // we need to change the address id in the current cart as the deleted ID can assigned in context->cart.
-            if ($customerCarts = Cart::getCustomerCarts($objOldAddress->id_customer, false)) {
-                foreach ($customerCarts as $cart) {
-                    $objCart = new Cart($cart['id_cart']);
-                    if ($cart['id_address_invoice'] == $objOldAddress->id) {
-                        $objCart->updateAddressId($objOldAddress->id, $address->id);
-                    }
-                }
-            }
-
-            return true;
-        }
-
-        return false;
     }
 
     /**
@@ -260,12 +222,12 @@ class AddressCore extends ObjectModel
         // reset checkout process if addresses deletes
         CheckoutProcess::refreshCheckoutProcess();
 
-        if ($this->isUsed()) {
+        if (!$this->isUsed()) {
+            return parent::delete();
+        } else {
             $this->deleted = true;
             return $this->update();
         }
-
-        return parent::delete();
     }
 
     /**
@@ -290,9 +252,10 @@ class AddressCore extends ObjectModel
 
         // for customer address we need to check of customer address already exists.
         // if we are editing an address we do not need to validate already created address.
-        if (!Validate::isLoadedObject($this) && $this->deleted != 0) {
+        if (!Validate::isLoadedObject($this)) {
             if ($idCustomer = Tools::getValue('id_customer')) {
                 if ($id_address = Customer::getCustomerIdAddress($idCustomer)) {
+
                     $errors[] =  sprintf(Tools::displayError('Customer address already exists. Id address: #%d'), $id_address);
                 }
             }
@@ -518,73 +481,5 @@ class AddressCore extends ObjectModel
             return self::$fieldsRequiredDatabase['Address'];
         }
         return array();
-    }
-
-    public function cacheFieldsRequiredDatabase($all = false)
-    {
-        parent::cacheFieldsRequiredDatabase($all);
-        if ($this->id_hotel) {
-            self::$fieldsRequiredDatabase['Address'] = array();
-        }
-    }
-
-    public function searchByName($query, $idLang = false)
-    {
-        if (!$idLang) {
-            $idLang = Context::getContext()->language->id;
-        }
-
-        return Db::getInstance()->executeS(
-            'SELECT  a.`id_address`, a.`firstname`, a.`lastname`, a.`address1`, a.`postcode`, a.`city`,
-            cl.`name` AS `country_name`, s.`name` AS `state_name`
-            FROM `'._DB_PREFIX_.'address` a
-            LEFT JOIN `'._DB_PREFIX_.'country_lang` cl
-            ON cl.`id_country` = a.`id_country` AND cl.`id_lang` ='.(int) $idLang.'
-            LEFT JOIN `'._DB_PREFIX_.'state` s
-            ON s.`id_country` = cl.`id_country` AND s.`id_state` = a.`id_state`
-            WHERE id_customer > 0 AND a.`deleted` = 0 AND
-                (a.`address1` LIKE \'%'.$query.'%\' OR
-                    a.`postcode` LIKE \'%'.$query.'%\' OR
-                    a.`city` LIKE \'%'.$query.'%\' OR
-                    a.`phone` LIKE \'%'.$query.'%\' OR
-                    a.`company` LIKE \'%'.$query.'%\' OR
-                    a.`alias` LIKE \'%'.$query.'%\' OR
-                    s.`name` LIKE \'%'.$query.'%\' OR
-                    cl.`name` LIKE \'%'.$query.'%\'
-                )
-        ');
-    }
-
-    public function validateFields($die = true, $error_return = false)
-    {
-        if (isset($this->webservice_validation) && $this->webservice_validation) {
-            if (!$this->id_customer || !Validate::isLoadedObject(new Customer((int) $this->id_customer))) {
-                $message = Tools::displayError('Invalid Id customer.');
-            } elseif (Customer::getCustomerIdAddress($this->id_customer, false) && !$this->id) {
-                $message = Tools::displayError('A single customer cannot have multiple addresses.');
-            } elseif (!$this->id_country || !Validate::isLoadedObject($objCountry = new Country($this->id_country))) {
-                $message = Tools::displayError('Invalid Id country');
-            } elseif ($objCountry->contains_states
-                && (!$this->id_state || !Validate::isLoadedObject($objState = new State((int) $this->id_state)))
-            ) {
-                $message = Tools::displayError('Invalid Id state');
-            } elseif (isset($objState) && ($objCountry->id != $objState->id_country)) {
-                $message = Tools::displayError('The given provided Id state does not belongs to the provided Id country');
-            } elseif ($objCountry->zip_code_format && !$objCountry->checkZipCode($this->postcode)) {
-                $message = Tools::displayError('Your Zip/postal code is incorrect');
-            } elseif (empty($this->postcode) && $objCountry->need_zip_code) {
-                $message = Tools::displayError('A Zip/postal code is required.');
-            } elseif ($this->postcode && !Validate::isPostCode($this->postcode)) {
-                $message = Tools::displayError('The Zip/postal code is invalid.');
-            }
-
-            if (isset($message)) {
-                if ($die) {
-                    throw new PrestaShopException($message);
-                }
-                return $error_return ? $message : false;
-            }
-        }
-        return parent::validateFields($die, $error_return);
     }
 }

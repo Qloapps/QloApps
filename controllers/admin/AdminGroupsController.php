@@ -126,7 +126,7 @@ class AdminGroupsControllerCore extends AdminController
 
     public function initPageHeaderToolbar()
     {
-        if (empty($this->display) && Group::isFeatureActive()) {
+        if (empty($this->display)) {
             $this->page_header_toolbar_btn['new_group'] = array(
                 'href' => self::$currentIndex.'&addgroup&token='.$this->token,
                 'desc' => $this->l('Add new group', null, null, false),
@@ -148,32 +148,8 @@ class AdminGroupsControllerCore extends AdminController
         parent::initProcess();
     }
 
-    public function initContent()
-    {
-        if (!Group::isFeatureActive()) {
-            parent::initContent();
-
-            $content = $this->displayWarning(sprintf(
-                $this->l('The feature Customer Groups has been disabled. You can enable it from %s page.'),
-                '<a href="'.$this->context->link->getAdminLink('AdminPerformance').'#fieldset_2_2" target="_blank">'.$this->l('Advanced Parameters > Performance').'</a>'
-            ));
-
-            $this->context->smarty->assign(array(
-                'content' => $content,
-            ));
-
-            return;
-        }
-
-        parent::initContent();
-    }
-
     public function postProcess()
     {
-        if (!Group::isFeatureActive()) {
-            return;
-        }
-
         if (isset($_POST['submitResetcustomer_group'])) {
             $this->processResetFilters('customer_group');
         }
@@ -199,12 +175,13 @@ class AdminGroupsControllerCore extends AdminController
 
     protected function renderCustomersList($group)
     {
-        $titles_array = array();
-        $genders = Gender::getGenders($this->context->language->id);
-        foreach ($genders as $gender) {
-            $titles_array[$gender->id_gender] = $gender->name;
+        $genders = array(0 => '?');
+        $genders_icon = array('default' => 'unknown.gif');
+        foreach (Gender::getGenders() as $gender) {
+            /** @var Gender $gender */
+            $genders_icon[$gender->id] = '../genders/'.(int)$gender->id.'.jpg';
+            $genders[$gender->id] = $gender->name;
         }
-
         $this->table = 'customer_group';
         $this->lang = false;
         $this->list_id = 'customer_group';
@@ -217,7 +194,7 @@ class AdminGroupsControllerCore extends AdminController
 
         $this->fields_list = (array(
             'id_customer' => array('title' => $this->l('ID'), 'align' => 'center', 'filter_key' => 'c!id_customer', 'class' => 'fixed-width-xs'),
-            'title' => array('title' => $this->l('Social title'), 'filter_key' => 'c!id_gender', 'type' => 'select', 'list' => $titles_array),
+            'id_gender' => array('title' => $this->l('Social title'), 'icon' => $genders_icon, 'list' => $genders),
             'firstname' => array('title' => $this->l('First name')),
             'lastname' => array('title' => $this->l('Last name')),
             'email' => array('title' => $this->l('Email address'), 'filter_key' => 'c!email', 'orderby' => true),
@@ -225,9 +202,8 @@ class AdminGroupsControllerCore extends AdminController
             'date_add' => array('title' => $this->l('Registration date'), 'type' => 'date', 'class' => 'fixed-width-md', 'align' => 'center'),
             'active' => array('title' => $this->l('Enabled'), 'align' => 'center', 'class' => 'fixed-width-sm', 'type' => 'bool', 'search' => false, 'orderby' => false, 'filter_key' => 'c!active', 'callback' => 'printOptinIcon')
         ));
-        $this->_select = 'c.*, a.id_group, gl.`name` AS title';
+        $this->_select = 'c.*, a.id_group';
         $this->_join = 'LEFT JOIN `'._DB_PREFIX_.'customer` c ON (a.`id_customer` = c.`id_customer`)';
-        $this->_join .= ' LEFT JOIN '._DB_PREFIX_.'gender_lang gl ON (gl.`id_gender` = c.`id_gender` AND gl.`id_lang` = '.(int) $this->context->language->id.')';
         $this->_where = 'AND a.`id_group` = '.(int)$group->id.' AND c.`deleted` != 1';
         $this->_where .= Shop::addSqlRestriction(Shop::SHARE_CUSTOMER, 'c');
         self::$currentIndex = self::$currentIndex.'&id_group='.(int)$group->id.'&viewgroup';
@@ -255,15 +231,6 @@ class AdminGroupsControllerCore extends AdminController
             ),
             'submit' => array(
                 'title' => $this->l('Save'),
-            ),
-            'buttons' => array(
-                'save-and-stay' => array(
-                    'title' => $this->l('Save and stay'),
-                    'name' => 'submitAdd'.$this->table.'AndStay',
-                    'type' => 'submit',
-                    'class' => 'btn btn-default pull-right',
-                    'icon' => 'process-icon-save',
-                ),
             ),
             'input' => array(
                 array(

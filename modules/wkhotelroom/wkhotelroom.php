@@ -30,7 +30,7 @@ class WkHotelRoom extends Module
     {
         $this->name = 'wkhotelroom';
         $this->tab = 'front_office_features';
-        $this->version = '1.1.9';
+        $this->version = '1.1.8';
         $this->author = 'Webkul';
         $this->bootstrap = true;
         parent::__construct();
@@ -65,32 +65,14 @@ class WkHotelRoom extends Module
                         ImageType::getFormatedName('large')
                     );
                 }
-                $productPriceWithoutReduction = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice(
-                    $idProduct,
-                    $dateFrom,
-                    $dateTo,
-                    $useTax,
-                    0,
-                    0,
-                    0,
-                    0,
-                    1,
-                    0
-                );
-
-                if ($useTax) {
-                    $priceWithoutReduction = $productPriceWithoutReduction['total_price_tax_incl'];
-                } else {
-                    $priceWithoutReduction = $productPriceWithoutReduction['total_price_tax_excl'];
-                }
-
+                $productPriceWithoutReduction = $product->getPriceWithoutReduct(!$useTax);
                 $product_price = Product::getPriceStatic($idProduct, $useTax);
                 $htlRoom['image'] = $prodImg;
                 $htlRoom['description'] = $product->description_short;
                 $htlRoom['name'] = $product->name;
                 $htlRoom['show_price'] = $product->show_price;
                 $htlRoom['price'] = $product_price;
-                $htlRoom['price_without_reduction'] = $priceWithoutReduction;
+                $htlRoom['price_without_reduction'] = $productPriceWithoutReduction;
                 $featurePrice = HotelRoomTypeFeaturePricing::getRoomTypeFeaturePricesPerDay(
                     $idProduct,
                     $dateFrom,
@@ -98,7 +80,7 @@ class WkHotelRoom extends Module
                     $useTax
                 );
                 $htlRoom['feature_price'] = $featurePrice;
-                $htlRoom['feature_price_diff'] = (float)($priceWithoutReduction - $featurePrice);
+                $htlRoom['feature_price_diff'] = (float)($productPriceWithoutReduction - $featurePrice);
             }
         }
         $this->context->smarty->assign(
@@ -115,7 +97,6 @@ class WkHotelRoom extends Module
             )
         );
 
-        $this->context->controller->addJs($this->_path.'/views/js/WkHotelRoomBlockFront.js');
         $this->context->controller->addCSS($this->_path.'/views/css/WkHotelRoomBlockFront.css');
 
         return $this->display(__FILE__, 'hotelRoomDisplayBlock.tpl');
@@ -157,13 +138,6 @@ class WkHotelRoom extends Module
                 'HOTEL_ROOM_DISPLAY_DESCRIPTION',
             );
             HotelHelper::updateConfigurationLangKeys($newIdLang, $configKeys);
-        }
-    }
-
-    public function hookActionCleanData($params)
-    {
-        if ($params['method'] == 'catalog') {
-            WkHotelRoomDb::truncateTables();
         }
     }
 
@@ -224,8 +198,7 @@ class WkHotelRoom extends Module
                 'actionProductDelete',
                 'displayFooterExploreSectionHook',
                 'actionProductSave',
-                'actionObjectLanguageAddAfter',
-                'actionCleanData',
+                'actionObjectLanguageAddAfter'
             )
         );
     }
@@ -247,7 +220,7 @@ class WkHotelRoom extends Module
         }
         return true;
     }
-
+    
     public function deleteConfigKeys()
     {
         $configVars = array(

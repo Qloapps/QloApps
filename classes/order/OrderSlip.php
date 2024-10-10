@@ -283,6 +283,7 @@ class OrderSlipCore extends ObjectModel
 
     /**
      * @deprecated since 1.6.0.10 use OrderSlip::create() instead
+     *
      */
     public static function createOrderSlip($order, $productList, $qtyList, $shipping_cost = false)
     {
@@ -373,55 +374,49 @@ class OrderSlipCore extends ObjectModel
             $id_tax_rules_group = Product::getIdTaxRulesGroupByIdProduct((int)$order_detail->product_id);
             $tax_calculator = TaxManagerFactory::getManager($address, $id_tax_rules_group)->getTaxCalculator();
 
-            $ps_round_type = Configuration::get('PS_ROUND_TYPE');
-            if ($ps_round_type == Order::ROUND_TOTAL) {
-                if (!isset($total_products[$id_tax_rules_group.'_'.$id_address])) {
-                    $total_products[$id_tax_rules_group.'_'.$id_address] = 0;
-                }
-            } else {
+            $order_slip->{'total_products_tax_'.$inc_or_ex_1} += $price * $numDays;
+
+            if (in_array(Configuration::get('PS_ROUND_TYPE'), array(Order::ROUND_ITEM, Order::ROUND_LINE))) {
                 if (!isset($total_products[$id_tax_rules_group])) {
                     $total_products[$id_tax_rules_group] = 0;
                 }
+            } else {
+                if (!isset($total_products[$id_tax_rules_group.'_'.$id_address])) {
+                    $total_products[$id_tax_rules_group.'_'.$id_address] = 0;
+                }
             }
 
-            $product_tax_inc_or_ex_1 = Tools::processPriceRounding(
-                ($price * $numDays),
-                1,
-                $order->round_type,
-                $order->round_mode
-            );
+            $product_tax_incl_line = Tools::ps_round($tax_calculator->{$add_or_remove.'Taxes'}($price) * $numDays, _PS_PRICE_COMPUTE_PRECISION_);
 
-            $order_slip->{'total_products_tax_'.$inc_or_ex_1} += $product_tax_inc_or_ex_1;
-
-            $product_tax_inc_or_ex_2 = Tools::processPriceRounding(
-                ($tax_calculator->{$add_or_remove.'Taxes'}($price * $numDays)),
-                1,
-                $order->round_type,
-                $order->round_mode
-            );
-            if ($ps_round_type == Order::ROUND_TOTAL) {
-                $total_products[$id_tax_rules_group.'_'.$id_address] += $product_tax_inc_or_ex_2;
-            } else {
-                $total_products[$id_tax_rules_group] += $product_tax_inc_or_ex_2;
+            switch (Configuration::get('PS_ROUND_TYPE')) {
+                case Order::ROUND_ITEM:
+                    $product_tax_incl = Tools::ps_round($tax_calculator->{$add_or_remove.'Taxes'}($price), _PS_PRICE_COMPUTE_PRECISION_) * $numDays;
+                    $total_products[$id_tax_rules_group] += $product_tax_incl;
+                    break;
+                case Order::ROUND_LINE:
+                    $product_tax_incl = $product_tax_incl_line;
+                    $total_products[$id_tax_rules_group] += $product_tax_incl;
+                    break;
+                case Order::ROUND_TOTAL:
+                    $product_tax_incl = $product_tax_incl_line;
+                    $total_products[$id_tax_rules_group.'_'.$id_address] += $price * $numDays;
+                    break;
             }
 
             $booking['unit_price_tax_'.$inc_or_ex_1] = $price;
-            $booking['unit_price_tax_'.$inc_or_ex_2] = $tax_calculator->{$add_or_remove.'Taxes'}($price);
-            $booking['total_price_tax_'.$inc_or_ex_1] = $product_tax_inc_or_ex_1;
-            $booking['total_price_tax_'.$inc_or_ex_2] = $product_tax_inc_or_ex_2;
+            $booking['unit_price_tax_'.$inc_or_ex_2] = Tools::ps_round($tax_calculator->{$add_or_remove.'Taxes'}($price), _PS_PRICE_COMPUTE_PRECISION_);
+            $booking['total_price_tax_'.$inc_or_ex_1] = Tools::ps_round($price * $numDays, _PS_PRICE_COMPUTE_PRECISION_);
+            $booking['total_price_tax_'.$inc_or_ex_2] = Tools::ps_round($product_tax_incl, _PS_PRICE_COMPUTE_PRECISION_);
         }
+
+        unset($product);
 
         foreach ($total_products as $key => $price) {
             if (Configuration::get('PS_ROUND_TYPE') == Order::ROUND_TOTAL) {
                 $tmp = explode('_', $key);
                 $address = Address::initialize((int)$tmp[1], true);
                 $tax_calculator = TaxManagerFactory::getManager($address, $tmp[0])->getTaxCalculator();
-                $order_slip->{'total_products_tax_'.$inc_or_ex_2} += Tools::processPriceRounding(
-                    ($tax_calculator->{$add_or_remove.'Taxes'}($price)),
-                    1,
-                    $order->round_type,
-                    $order->round_mode
-                );
+                $order_slip->{'total_products_tax_'.$inc_or_ex_2} += Tools::ps_round($tax_calculator->{$add_or_remove.'Taxes'}($price), _PS_PRICE_COMPUTE_PRECISION_);
             } else {
                 $order_slip->{'total_products_tax_'.$inc_or_ex_2} += $price;
             }

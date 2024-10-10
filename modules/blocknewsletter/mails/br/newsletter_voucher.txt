@@ -1,0 +1,11 @@
+
+[{shop_url}]
+
+Olá,
+
+Por se cadastrar na nossa newsletter, nós temos o prazer de lhe
+oferecer o seguinte cupom de desconto: {discount}
+
+{shop_name} [{shop_url}] baseado em
+Webkul(tm) [https://webkul.com]
+

@@ -1,16 +1,3 @@
-------------------------------
-# V1.0.0 to V1.0.1
-------------------------------
-
-## Improved/Changed Features:
-
-* [CO] : [#780] Updated replace 'shop' and 'shopping' with 'website' and 'booking' in email templates
-* [BO] : [#918] New design of order detail page of the admin in back-office
-* [BO] : [#1076] Fixed php warning on order detail page if all rooms from order are deleted
-* [CO] : [#1040] Updated Qloapps cleaner | Added hook for data cleaning in other module and fixed incorrect data being deleted.
-* [FO] : [#1171] Fixed the RTL languages design issues on the front office.
-* [CO] : [#1195] Added process for smarty template overriding.
-
 Changelog
 
 v1.0.0

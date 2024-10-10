@@ -33,7 +33,6 @@ abstract class PaymentModuleCore extends Module
     public $currencies = true;
     public $currencies_mode = 'checkbox';
     public $payment_type = OrderPayment::PAYMENT_TYPE_REMOTE_PAYMENT;
-    public $validateOrderAmount = true;
 
     public function install()
     {
@@ -163,7 +162,7 @@ abstract class PaymentModuleCore extends Module
      */
     public function validateOrder($id_cart, $id_order_state, $amount_paid, $payment_method = 'Unknown',
         $message = null, $extra_vars = array(), $currency_special = null, $dont_touch_amount = false,
-        $secure_key = false, Shop $shop = null, $send_mails = true)
+        $secure_key = false, Shop $shop = null)
     {
         if (self::DEBUG_MODE) {
             PrestaShopLogger::addLog('PaymentModule::validateOrder - Function called', 1, null, 'Cart', (int)$id_cart, true);
@@ -182,6 +181,9 @@ abstract class PaymentModuleCore extends Module
         ShopUrl::resetMainDomainCache();
         $id_currency = $currency_special ? (int)$currency_special : (int)$this->context->cart->id_currency;
         $this->context->currency = new Currency((int)$id_currency, null, (int)$this->context->shop->id);
+        if (Configuration::get('PS_TAX_ADDRESS_TYPE') == 'id_address_delivery') {
+            $context_country = $this->context->country;
+        }
 
         $order_status = new OrderState((int)$id_order_state, (int)$this->context->language->id);
         if (!Validate::isLoadedObject($order_status)) {
@@ -191,14 +193,14 @@ abstract class PaymentModuleCore extends Module
 
         if (!$this->active) {
             PrestaShopLogger::addLog('PaymentModule::validateOrder - Module is not active', 3, null, 'Cart', (int)$id_cart, true);
-            die(Tools::displayError('Error in processing order. Payment module is not active.'));
+            die(Tools::displayError());
         }
 
         // Does order already exists ?
         if (Validate::isLoadedObject($this->context->cart) && $this->context->cart->OrderExists() == false) {
             if ($secure_key !== false && $secure_key != $this->context->cart->secure_key) {
                 PrestaShopLogger::addLog('PaymentModule::validateOrder - Secure key does not match', 3, null, 'Cart', (int)$id_cart, true);
-                die(Tools::displayError('Error processing order. Secure key does not match.'));
+                die(Tools::displayError());
             }
 
             // For each package, generate an order
@@ -265,13 +267,20 @@ abstract class PaymentModuleCore extends Module
                 }
             }
 
-            $orderTotals = array();
             Hook::exec('actionPackageListGenerateOrder', array('package_list' => &$package_list));
             foreach ($package_list as $id_address => $packageByAddress) {
                 foreach ($packageByAddress as $id_package => $package) {
                     /** @var Order $order */
                     $order = new Order();
                     $order->product_list = $package['product_list'];
+
+                    if (Configuration::get('PS_TAX_ADDRESS_TYPE') == 'id_address_delivery') {
+                        $address = new Address((int)$id_address);
+                        $this->context->country = new Country((int)$address->id_country, (int)$this->context->cart->id_lang);
+                        if (!$this->context->country->active) {
+                            throw new PrestaShopException('The delivery address country is not active.');
+                        }
+                    }
 
                     $carrier = null;
                     if (!$this->context->cart->isVirtualCart() && isset($package['id_carrier'])) {
@@ -365,7 +374,6 @@ abstract class PaymentModuleCore extends Module
 
                     // advance payment information
                     $order->is_advance_payment = $this->context->cart->is_advance_payment;
-                    $order->amount_paid = 0;
                     if ($order->is_advance_payment) {
                         $order->advance_paid_amount = (float)Tools::ps_round(
                             (float)$this->context->cart->getOrderTotal(true, Cart::ADVANCE_PAYMENT, $order->product_list, $id_carrier),
@@ -392,7 +400,6 @@ abstract class PaymentModuleCore extends Module
 
                     // Creating order
                     $result = $order->add();
-                    $orderTotals[$order->id] = array('incl' => $order->total_products_wt, 'excl' => $order->total_products);
 
                     if (!$result) {
                         PrestaShopLogger::addLog('PaymentModule::validateOrder - Order cannot be created', 3, null, 'Cart', (int)$id_cart, true);
@@ -422,7 +429,7 @@ abstract class PaymentModuleCore extends Module
                     // If webservice order request then no need to impose equal amounts(total cart and sent amount) condition
                     if ($order_status->logable
                         && number_format($cart_total_paid, _PS_PRICE_COMPUTE_PRECISION_) != number_format($amount_paid, _PS_PRICE_COMPUTE_PRECISION_)
-                        && ($this->validateOrderAmount)
+                        && $this->name != 'wsorder'
                     ) {
                         // if customer is paying full payment amount
                         $id_order_state = Configuration::get('PS_OS_ERROR');
@@ -456,6 +463,15 @@ abstract class PaymentModuleCore extends Module
                 }
             }
 
+            // The country can only change if the address used for the calculation is the delivery address, and if multi-shipping is activated
+            if (Configuration::get('PS_TAX_ADDRESS_TYPE') == 'id_address_delivery') {
+                $this->context->country = $context_country;
+            }
+
+            if (!$this->context->country->active) {
+                PrestaShopLogger::addLog('PaymentModule::validateOrder - Country is not active', 3, null, 'Cart', (int)$id_cart, true);
+                throw new PrestaShopException('The order address country is not active.');
+            }
 
             if (self::DEBUG_MODE) {
                 PrestaShopLogger::addLog('PaymentModule::validateOrder - Payment is about to be added', 1, null, 'Cart', (int)$id_cart, true);
@@ -495,7 +511,6 @@ abstract class PaymentModuleCore extends Module
             // Make sure CartRule caches are empty
             CartRule::cleanCache();
             $objRoomType = new HotelRoomType();
-            $cart_rules = $this->context->cart->getCartRules();
             foreach ($order_detail_list as $key => $order_detail) {
                 /** @var OrderDetail $order_detail */
 
@@ -540,7 +555,7 @@ abstract class PaymentModuleCore extends Module
                         $price_wt = Product::getPriceStatic((int)$product['id_product'], true, ($product['id_product_attribute'] ? (int)$product['id_product_attribute'] : null), 2, null, false, true, $product['cart_quantity'], false, (int)$order->id_customer, (int)$order->id_cart);
 
 
-                        $product_price = Product::getTaxCalculationMethod() == PS_TAX_EXC ? Tools::ps_round($price, _PS_PRICE_COMPUTE_PRECISION_) : $price_wt;
+                        $product_price = Product::getTaxCalculationMethod() == PS_TAX_EXC ? Tools::ps_round($price, 2) : $price_wt;
 
                         $product_var_tpl = array(
                             'reference' => $product['reference'],
@@ -608,7 +623,7 @@ abstract class PaymentModuleCore extends Module
                     }
 
                     $cart_rules_list = array();
-                    foreach ($cart_rules as $key => $cart_rule) {
+                    foreach ($cart_rules as $cart_rule) {
                         if ($cart_rule['obj']->reduction_product > 0 && !$order->orderContainProduct($cart_rule['obj']->reduction_product)) {
                             continue;
                         }
@@ -624,40 +639,85 @@ abstract class PaymentModuleCore extends Module
                             continue;
                         }
 
-                        $used = array('incl' => 0, 'excl' => 0);
-                        if (!isset($cart_rules[$key]['remaining'])) {
-                            $cart_rules[$key]['remaining'] = $cart_rule['obj']->reduction_amount;
-                            if ((int) $cart_rule['obj']->reduction_currency !== (int) $this->context->cart->id_currency) {
-                                $cart_rules[$key]['remaining'] = Tools::convertPriceFull(
-                                    $cart_rule['obj']->reduction_amount,
-                                    new Currency($cart_rule['obj']->reduction_currency),
-                                    new Currency($this->context->cart->id_currency)
+                        // IF
+                        //	The value of the voucher is greater than the total of the order
+                        //	Partial use is allowed
+                        //	This is an "amount" reduction, not a reduction in % or a gift
+                        // THEN
+                        //	The voucher is cloned with a new value corresponding to the remainder
+                        $reduction_amount_converted = $cart_rule['obj']->reduction_amount;
+                        if ((int) $cart_rule['obj']->reduction_currency !== (int) $cart->id_currency) {
+                            $reduction_amount_converted = Tools::convertPriceFull(
+                                $cart_rule['obj']->reduction_amount,
+                                new Currency($cart_rule['obj']->reduction_currency),
+                                new Currency($cart->id_currency)
+                            );
+                        }
+                        if ($cart_rule['obj']->reduction_tax) {
+                            $remaining_amount = $reduction_amount_converted - $values['tax_incl'];
+                        } else {
+                            $remaining_amount = $reduction_amount_converted - $values['tax_excl'];
+                        }
+                        if ($remaining_amount > 0 && $cart_rule['obj']->partial_use == 1 && $reduction_amount_converted > 0) {
+                            // Create a new voucher from the original
+                            $voucher = new CartRule((int)$cart_rule['obj']->id); // We need to instantiate the CartRule without lang parameter to allow saving it
+                            unset($voucher->id);
+
+                            // Set a new voucher code
+                            $voucher->code = empty($voucher->code) ? substr(md5($order->id.'-'.$order->id_customer.'-'.$cart_rule['obj']->id), 0, 16) : $voucher->code.'-2';
+                            if (preg_match('/\-([0-9]{1,2})\-([0-9]{1,2})$/', $voucher->code, $matches) && $matches[1] == $matches[2]) {
+                                $voucher->code = preg_replace('/'.$matches[0].'$/', '-'.(intval($matches[1]) + 1), $voucher->code);
+                            }
+
+                            // Set the new voucher value
+                            $voucher->reduction_amount = $remaining_amount;
+                            if ($voucher->reduction_tax) {
+                                // Add total shipping amout only if reduction amount > total shipping
+                                if ($voucher->free_shipping == 1 && $voucher->reduction_amount >= $order->total_shipping_tax_incl) {
+                                    $voucher->reduction_amount -= $order->total_shipping_tax_incl;
+                                }
+                            } else {
+                                // Add total shipping amout only if reduction amount > total shipping
+                                if ($voucher->free_shipping == 1 && $voucher->reduction_amount >= $order->total_shipping_tax_excl) {
+                                    $voucher->reduction_amount -= $order->total_shipping_tax_excl;
+                                }
+                            }
+                            if ($voucher->reduction_amount <= 0) {
+                                continue;
+                            }
+
+                            if ($this->context->customer->isGuest()) {
+                                $voucher->id_customer = 0;
+                            } else {
+                                $voucher->id_customer = $order->id_customer;
+                            }
+
+                            $voucher->quantity = 1;
+                            $voucher->reduction_currency = $order->id_currency;
+                            $voucher->quantity_per_user = 1;
+                            $voucher->free_shipping = 0;
+                            if ($voucher->add()) {
+                                // If the voucher has conditions, they are now copied to the new voucher
+                                CartRule::copyConditions($cart_rule['obj']->id, $voucher->id);
+
+                                $params = array(
+                                    '{voucher_amount}' => Tools::displayPrice($voucher->reduction_amount, $this->context->currency, false),
+                                    '{voucher_num}' => $voucher->code,
+                                    '{firstname}' => $this->context->customer->firstname,
+                                    '{lastname}' => $this->context->customer->lastname,
+                                    '{id_order}' => $order->reference,
+                                    '{order_name}' => $order->getUniqReference()
+                                );
+                                Mail::Send(
+                                    (int)$order->id_lang,
+                                    'voucher',
+                                    sprintf(Mail::l('New voucher for your order %s', (int)$order->id_lang), $order->reference),
+                                    $params,
+                                    $this->context->customer->email,
+                                    $this->context->customer->firstname.' '.$this->context->customer->lastname,
+                                    null, null, null, null, _PS_MAIL_DIR_, false, (int)$order->id_shop
                                 );
                             }
-                        }
-
-                        if ($cart_rule['reduction_tax']) {
-                            if ($orderTotals[$order->id]['incl'] > $values['tax_incl']) {
-                                $used['incl'] = $values['tax_incl'];
-                                $used['excl'] = $values['tax_excl'];
-                            } else {
-                                $used['incl'] = $orderTotals[$order->id]['incl'];
-                                $used['excl'] = $orderTotals[$order->id]['excl'];
-                            }
-                            $orderTotals[$order->id]['incl'] -= $used['incl'];
-                            $orderTotals[$order->id]['excl'] -= $used['excl'];
-                            $cart_rules[$key]['remaining'] -= $used['incl'];
-                        } else {
-                            if ($orderTotals[$order->id]['excl'] > $values['tax_excl']) {
-                                $used['incl'] = $values['tax_incl'];
-                                $used['excl'] = $values['tax_excl'];
-                            } else {
-                                $used['incl'] = $orderTotals[$order->id]['incl'];
-                                $used['excl'] = $orderTotals[$order->id]['excl'];
-                            }
-                            $orderTotals[$order->id]['incl'] -= $used['incl'];
-                            $orderTotals[$order->id]['excl'] -= $used['excl'];
-                            $cart_rules[$key]['remaining'] -= $used['excl'];
                         }
 
                         $order->addCartRule($cart_rule['obj']->id, $cart_rule['obj']->name, $values, 0, $cart_rule['obj']->free_shipping);
@@ -716,16 +776,15 @@ abstract class PaymentModuleCore extends Module
 
                     // update order in htl tables
                     $objRoomType = new HotelRoomType();
+
                     $objAdvancedPayment = new HotelAdvancedPayment();
-                    $objCartBookingData = new HotelCartBookingData();
-                    $objBookingDetail = new HotelBookingDetail();
+
                     $vatAddress = new Address((int)$order->id_address_tax);
 
                     $idLang = (int)$this->context->cart->id_lang;
                     $normalProducts = array();
-                    // variable to check max overbookings are created in the room in any date of the booking duration
-                    $maxOverbookingCount = 0;
                     foreach ($order->product_list as $product) {
+                        $objCartBookingData = new HotelCartBookingData();
                         $idProduct = $product['id_product'];
                         $cartBookingData = $objCartBookingData->getOnlyCartBookingData($this->context->cart->id, $this->context->cart->id_guest, $idProduct);
                         if ($cartBookingData) {
@@ -733,67 +792,8 @@ abstract class PaymentModuleCore extends Module
                                 $objCartBookingData = new HotelCartBookingData($bookingInfo['id']);
                                 $objCartBookingData->id_order = $order->id;
                                 $objCartBookingData->id_customer = $this->context->customer->id;
-
-                                // check if still room available for this booking or not
-                                $isRoomOverBooked = 1;
-
-                                // get all the available rooms right now
-                                $bookingParams = array(
-                                    'date_from' => $objCartBookingData->date_from,
-                                    'date_to' => $objCartBookingData->date_to,
-                                    'hotel_id' => $objCartBookingData->id_hotel,
-                                    'id_room_type' => $idProduct,
-                                    'only_search_data' => 1
-                                );
-
-                                if ($searchRoomsInfo = $objBookingDetail->getBookingData($bookingParams)) {
-                                    if (isset($searchRoomsInfo['rm_data'][$idProduct]['data']['available'])
-                                        && $searchRoomsInfo['rm_data'][$idProduct]['data']['available']
-                                    ) {
-                                        $availableRoomsInfo = $searchRoomsInfo['rm_data'][$idProduct]['data']['available'];
-                                        if ($roomIdsAvailable = array_column($availableRoomsInfo, 'id_room')) {
-                                            // If room is still there in the available rooms list then it is not in back order
-                                            if (in_array($objCartBookingData->id_room, $roomIdsAvailable)) {
-                                                $isRoomOverBooked = 0;
-                                            } else {
-                                                $isRoomOverBooked = 1;
-                                                foreach ($roomIdsAvailable as $idRoom) {
-                                                    if ($idRoom != $objCartBookingData->id_room) {
-                                                        $objCartBookingData->id_room = $idRoom;
-                                                        $isRoomOverBooked = 0;
-                                                        break;
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-
-                                // if room is not available right now the set it to back order
-                                if ($isRoomOverBooked) {
-                                    $objCartBookingData->is_back_order = 1;
-
-                                    // max overbookings in a room datewise breakup. So that we can know no. of overbookings in every date
-                                    if ($roomOverBookings = $objBookingDetail->getOverbookedRooms(
-                                        0,
-                                        $objCartBookingData->id_hotel,
-                                        $objCartBookingData->date_from,
-                                        $objCartBookingData->date_to,
-                                        0,
-                                        1
-                                    )) {
-                                        // check in the bokking duration what is the max overbookings in ay date in the date range
-                                        // replace $maxOverbookingCount with $maxOverbookingsInDate if it is greater
-                                        if ($maxOverbookingCount < $roomOverBookings) {
-                                            $maxOverbookingCount = $roomOverBookings;
-                                        }
-                                    }
-                                } else {
-                                    $objCartBookingData->is_back_order = 0;
-                                }
                                 $objCartBookingData->save();
 
-                                // Lets set data to the hotel booking detail table
                                 $objBookingDetail = new HotelBookingDetail();
                                 $id_order_detail = $objBookingDetail->getPsOrderDetailIdByIdProduct($idProduct, $order->id);
                                 $objBookingDetail->id_product = $idProduct;
@@ -805,9 +805,12 @@ abstract class PaymentModuleCore extends Module
                                 $objBookingDetail->id_customer = $this->context->customer->id;
                                 $objBookingDetail->booking_type = $objCartBookingData->booking_type;
                                 $objBookingDetail->id_status = 1;
-                                $objBookingDetail->is_back_order = $objCartBookingData->is_back_order;
                                 $objBookingDetail->comment = $objCartBookingData->comment;
 
+                                // For Back Order(Because of cart lock)
+                                if ($objCartBookingData->is_back_order) {
+                                    $objBookingDetail->is_back_order = 1;
+                                }
                                 $total_price = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice(
                                     $idProduct,
                                     $objCartBookingData->date_from,
@@ -819,11 +822,10 @@ abstract class PaymentModuleCore extends Module
                                     $objCartBookingData->id_room,
                                     0
                                 );
-
                                 $objBookingDetail->date_from = $objCartBookingData->date_from;
                                 $objBookingDetail->date_to = $objCartBookingData->date_to;
-                                $objBookingDetail->total_price_tax_excl = $total_price['total_price_tax_excl'];
-                                $objBookingDetail->total_price_tax_incl = $total_price['total_price_tax_incl'];
+                                $objBookingDetail->total_price_tax_excl = Tools::ps_round($total_price['total_price_tax_excl'], 6);
+                                $objBookingDetail->total_price_tax_incl = Tools::ps_round($total_price['total_price_tax_incl'], 6);
                                 $objBookingDetail->adults = $objCartBookingData->adults;
                                 $objBookingDetail->children = $objCartBookingData->children;
                                 $objBookingDetail->child_ages = $objCartBookingData->child_ages;
@@ -851,7 +853,7 @@ abstract class PaymentModuleCore extends Module
                                 }
 
                                 /*for saving details of the advance payment product wise*/
-                                $objBookingDetail->total_paid_amount = $total_price['total_price_tax_incl'];
+                                $objBookingDetail->total_paid_amount = Tools::ps_round($total_price['total_price_tax_incl'], 5);
                                 if ($this->context->cart->is_advance_payment) {
                                     $prod_adv_payment = $objAdvancedPayment->getIdAdvPaymentByIdProduct($idProduct);
                                     if (!$prod_adv_payment
@@ -860,11 +862,7 @@ abstract class PaymentModuleCore extends Module
                                         $objBookingDetail->total_paid_amount = $objAdvancedPayment->getRoomMinAdvPaymentAmount(
                                             $idProduct,
                                             $objCartBookingData->date_from,
-                                            $objCartBookingData->date_to,
-                                            1,
-                                            $objCartBookingData->id_room,
-                                            $objCartBookingData->id_cart,
-                                            $objCartBookingData->id_guest
+                                            $objCartBookingData->date_to
                                         );
                                     }
                                 }
@@ -899,17 +897,18 @@ abstract class PaymentModuleCore extends Module
                                                 $idOption,
                                                 1
                                             );
-
-                                            $numDays = 1;
+                                            $qty = 1;
                                             if ($objGlobalDemand->price_calc_method == HotelRoomTypeGlobalDemand::WK_PRICE_CALC_METHOD_EACH_DAY) {
                                                 $numDays = $objBookingDetail->getNumberOfDays(
                                                     $objBookingDetail->date_from,
                                                     $objBookingDetail->date_to
                                                 );
+                                                if ($numDays > 1) {
+                                                    $qty *= $numDays;
+                                                }
                                             }
-
-                                            $objBookingDemand->total_price_tax_excl = Tools::processPriceRounding(($objBookingDemand->unit_price_tax_excl * $numDays));
-                                            $objBookingDemand->total_price_tax_incl = Tools::processPriceRounding(($objBookingDemand->unit_price_tax_incl * $numDays));
+                                            $objBookingDemand->total_price_tax_excl = $objBookingDemand->unit_price_tax_excl * $qty;
+                                            $objBookingDemand->total_price_tax_incl = $objBookingDemand->unit_price_tax_incl * $qty;
 
                                             $objBookingDemand->price_calc_method = $objGlobalDemand->price_calc_method;
                                             $objBookingDemand->id_tax_rules_group = $objGlobalDemand->id_tax_rules_group;
@@ -921,6 +920,7 @@ abstract class PaymentModuleCore extends Module
                                             $objBookingDemand->tax_computation_method = (int)$taxCalc->computation_method;
                                             if ($objBookingDemand->save()) {
                                                 $objBookingDemand->tax_calculator = $taxCalc;
+                                                $objBookingDemand->id_global_demand = $idGlobalDemand;
                                                 // Now save tax details of the extra demand
                                                 $objBookingDemand->setBookingDemandTaxDetails();
                                             }
@@ -1005,52 +1005,19 @@ abstract class PaymentModuleCore extends Module
                     // Set the order status
                     $new_history = new OrderHistory();
                     $new_history->id_order = (int)$order->id;
-                    $new_history->changeIdOrderState((int)$id_order_state, $order, true);
-                    if ($send_mails) {
-                        $new_history->addWithemail(true, $extra_vars);
+                    if ($order_status->logable && $order->is_advance_payment && $order->advance_paid_amount < $order->total_paid_tax_incl) {
+                        $new_history->changeIdOrderState((int)Configuration::get('PS_OS_PARTIAL_PAYMENT'), $order, true);
                     } else {
-                        $new_history->add(true);
+                        $new_history->changeIdOrderState((int)$id_order_state, $order, true);
                     }
+                    $new_history->addWithemail(true, $extra_vars);
 
                     // Switch to back order if needed
-                    $objHotelBookingDetail = new HotelBookingDetail();
-                    if ($objHotelBookingDetail->getOverbookedRooms($order->id)) {
-                        $cancelOrder = 0;
-                        // Take overbooking action as per order->overbooking Preferences else set order for cancellation
-                        if (Configuration::get('PS_OVERBOOKING_ORDER_ACTION') == Order::OVERBOOKING_ORDER_CANCEL_ACTION) {
-                            $cancelOrder = 1;
-                        } else {
-                            // check conditions for maximun overbookings allowed for the hotel else set order for cancellation
-                            $maxAllowedOverbookings = Configuration::get('PS_MAX_OVERBOOKING_PER_HOTEL_PER_DAY');
-                            // >= condition applied because equal case means already overbooked rooms limit exceeded before this booking
-                            if ($maxAllowedOverbookings && ($maxOverbookingCount >= $maxAllowedOverbookings)) {
-                                $cancelOrder = 1;
-                            }
-                        }
-
-                        // set order status after all conditions checks
-                        if ($cancelOrder) {
-                            $id_order_state = Configuration::get('PS_OS_CANCELED');
-                        } else {
-                            if ($order->valid) {
-                                if ($order->is_advance_payment && $order->advance_paid_amount < $order->total_paid_tax_incl) {
-                                    $id_order_state = Configuration::get('PS_OS_OVERBOOKING_PARTIAL_PAID');
-                                } else {
-                                    $id_order_state = Configuration::get('PS_OS_OVERBOOKING_PAID');
-                                }
-                            } else {
-                                $id_order_state = Configuration::get('PS_OS_OVERBOOKING_UNPAID');
-                            }
-                        }
-
+                    if (Configuration::get('PS_STOCK_MANAGEMENT') && ($order_detail->getStockState() || $order_detail->product_quantity_in_stock <= 0)) {
                         $history = new OrderHistory();
                         $history->id_order = (int)$order->id;
-                        $history->changeIdOrderState($id_order_state, $order, true);
-                        if ($send_mails) {
-                            $history->addWithemail();
-                        } else {
-                            $history->add();
-                        }
+                        $history->changeIdOrderState(Configuration::get($order->valid ? 'PS_OS_OUTOFSTOCK_PAID' : 'PS_OS_OUTOFSTOCK_UNPAID'), $order, true);
+                        $history->addWithemail();
                     }
 
                     unset($order_detail);
@@ -1059,11 +1026,7 @@ abstract class PaymentModuleCore extends Module
                     $order = new Order((int)$order->id);
 
                     // Send an e-mail to customer (one order = one email)
-                    if ($id_order_state != Configuration::get('PS_OS_ERROR')
-                        && $id_order_state != Configuration::get('PS_OS_CANCELED')
-                        && $this->context->customer->id
-                        && $send_mails
-                    ) {
+                    if ($id_order_state != Configuration::get('PS_OS_ERROR') && $id_order_state != Configuration::get('PS_OS_CANCELED') && $this->context->customer->id) {
                         $invoice = new Address($order->id_address_invoice);
                         $delivery = new Address($order->id_address_delivery);
                         $delivery_state = $delivery->id_state ? new State($delivery->id_state) : false;
@@ -1081,30 +1044,54 @@ abstract class PaymentModuleCore extends Module
                         $normal_products_data_txt = $this->getEmailTemplateContent('hotel-service-product-data-text.tpl', Mail::TYPE_TEXT, $orderServiceProducts);
 
                         // total room price
-                        $room_price_tax_excl = $order->getTotalProductsWithoutTaxes(false, true) + $order->getTotalProductsWithoutTaxes(false, false, Product::SERVICE_PRODUCT_WITH_ROOMTYPE, 1, Product::PRICE_ADDITION_TYPE_WITH_ROOM);
-                        $room_price_tax_incl = $order->getTotalProductsWithTaxes(false, true) + $order->getTotalProductsWithTaxes(false, false, Product::SERVICE_PRODUCT_WITH_ROOMTYPE, 1, Product::PRICE_ADDITION_TYPE_WITH_ROOM);
-                        $room_tax = ($room_price_tax_incl - $room_price_tax_excl);
+                        $room_price_tax_excl = $order->getTotalProductsWithoutTaxes(false, true);
+                        $room_price_tax_incl = $order->getTotalProductsWithTaxes(false, true);
+                        $room_tax = ($order->getTotalProductsWithTaxes(false, true) - $order->getTotalProductsWithoutTaxes(false, true));
 
                         // extra services
-                        $additional_service_price_tax_excl = ($order->getTotalProductsWithoutTaxes(false, false, Product::SERVICE_PRODUCT_WITH_ROOMTYPE, 0) + $cart_booking_data['total_extra_demands_te']);
-                        $additional_service_price_tax_incl = ($order->getTotalProductsWithTaxes(false, false, Product::SERVICE_PRODUCT_WITH_ROOMTYPE, 0) + $cart_booking_data['total_extra_demands_ti']);
-                        $additional_service_tax = ($additional_service_price_tax_incl - $additional_service_price_tax_excl);
+                        $additional_service_price_tax_excl = ($order->getTotalProductsWithoutTaxes(false, false, Product::SERVICE_PRODUCT_WITH_ROOMTYPE) + $cart_booking_data['total_extra_demands_te']);
+                        $additional_service_price_tax_incl = ($order->getTotalProductsWithTaxes(false, false, Product::SERVICE_PRODUCT_WITH_ROOMTYPE) + $cart_booking_data['total_extra_demands_ti']);
+                        $additional_service_tax = (($order->getTotalProductsWithTaxes(false, false, Product::SERVICE_PRODUCT_WITH_ROOMTYPE) + $cart_booking_data['total_extra_demands_ti']) - ($order->getTotalProductsWithoutTaxes(false, false, Product::SERVICE_PRODUCT_WITH_ROOMTYPE) + $cart_booking_data['total_extra_demands_te']));
 
                         // convenience fee price
-                        $total_convenience_fee_ti = $order->getTotalProductsWithTaxes(false, false, Product::SERVICE_PRODUCT_WITH_ROOMTYPE, 1, Product::PRICE_ADDITION_TYPE_INDEPENDENT);
-                        $total_convenience_fee_te = $order->getTotalProductsWithoutTaxes(false, false, Product::SERVICE_PRODUCT_WITH_ROOMTYPE, 1, Product::PRICE_ADDITION_TYPE_INDEPENDENT);
-                        $total_convenience_fee_tax = $total_convenience_fee_ti - $total_convenience_fee_te;
+                        $objRoomTypeServiceProductOrderDetail = new RoomTypeServiceProductOrderDetail();
+                        $total_convenience_fee_ti = $objRoomTypeServiceProductOrderDetail->getroomTypeServiceProducts(
+                            $order->id,
+                            0,
+                            0,
+                            0,
+                            0,
+                            0,
+                            0,
+                            1,
+                            1,
+                            1,
+                            Product::PRICE_ADDITION_TYPE_INDEPENDENT
+                        );
+                        $total_convenience_fee_te = $objRoomTypeServiceProductOrderDetail->getroomTypeServiceProducts(
+                            $order->id,
+                            0,
+                            0,
+                            0,
+                            0,
+                            0,
+                            0,
+                            1,
+                            0,
+                            1,
+                            Product::PRICE_ADDITION_TYPE_INDEPENDENT
+                        );
+                        $additional_service_price_tax_excl = $additional_service_price_tax_excl - $total_convenience_fee_te;
+                        $additional_service_price_tax_incl = $additional_service_price_tax_incl - $total_convenience_fee_ti;
+                        $room_price_tax_excl = $room_price_tax_excl + $additional_service_price_tax_excl;
+                        $room_price_tax_incl = $room_price_tax_incl + $additional_service_price_tax_incl;
 
                         // service products
                         // $service_products_price_tax_excl = $order->getTotalProductsWithoutTaxes(false, false, Product::SERVICE_PRODUCT_WITHOUT_ROOMTYPE);
                         // $service_products_price_tax_incl = $order->getTotalProductsWithTaxes(false, false, Product::SERVICE_PRODUCT_WITHOUT_ROOMTYPE);
                         // $service_products_tax = ($order->getTotalProductsWithTaxes(false, false, Product::SERVICE_PRODUCT_WITHOUT_ROOMTYPE) - $order->getTotalProductsWithoutTaxes(false, false, Product::SERVICE_PRODUCT_WITHOUT_ROOMTYPE));
-                        $total_order_tax = $room_tax + $additional_service_tax + $total_convenience_fee_tax;
 
-                        $idOrderHotel = HotelBookingDetail::getIdHotelByIdOrder($order->id);
-                        $objHotelBranchInfo = new HotelBranchInformation($idOrderHotel, $order->id_lang);
                         $data = array(
-                            '{hotel_name}' => $objHotelBranchInfo->hotel_name,
                             '{cart_booking_data_html}' => $cart_booking_data_html,
                             '{cart_booking_data_text}' => $cart_booking_data_text,
                             '{extra_demands_details_html}' => $extra_demands_details_html,
@@ -1121,6 +1108,16 @@ abstract class PaymentModuleCore extends Module
                                 $this->context->currency,
                                 false
                             ),
+                            '{delivery_block_txt}' => $this->_getFormatedAddress($delivery, "\n"),
+                            '{invoice_block_txt}' => $this->_getFormatedAddress($invoice, "\n"),
+                            '{delivery_block_html}' => $this->_getFormatedAddress($delivery, '<br />', array(
+                                'firstname'    => '<span style="font-weight:bold;">%s</span>',
+                                'lastname'    => '<span style="font-weight:bold;">%s</span>'
+                            )),
+                            '{invoice_block_html}' => $this->_getFormatedAddress($invoice, '<br />', array(
+                                    'firstname'    => '<span style="font-weight:bold;">%s</span>',
+                                    'lastname'    => '<span style="font-weight:bold;">%s</span>'
+                            )),
                             '{delivery_company}' => $delivery->company,
                             '{delivery_firstname}' => $delivery->firstname,
                             '{delivery_lastname}' => $delivery->lastname,
@@ -1154,12 +1151,11 @@ abstract class PaymentModuleCore extends Module
                             '{discounts_txt}' => $cart_rules_list_txt,
                             '{total_paid}' => Tools::displayPrice($order->total_paid, $this->context->currency, false),
                             '{total_products}' => Tools::displayPrice(Product::getTaxCalculationMethod() == PS_TAX_EXC ? $order->total_products : $order->total_products_wt, $this->context->currency, false),
-                            '{total_discounts}' => Tools::displayPrice(-$order->total_discounts, $this->context->currency, false),
+                            '{total_discounts}' => Tools::displayPrice($order->total_discounts, $this->context->currency, false),
                             '{total_shipping}' => Tools::displayPrice($order->total_shipping, $this->context->currency, false),
                             '{total_wrapping}' => Tools::displayPrice($order->total_wrapping, $this->context->currency, false),
                             // '{total_tax_paid}' => Tools::displayPrice(($order->total_products_wt - $order->total_products) + ($order->total_shipping_tax_incl - $order->total_shipping_tax_excl), $this->context->currency, false),
                             '{total_tax_paid}' => Tools::displayPrice(($order->total_paid_tax_incl - $order->total_paid_tax_excl), $this->context->currency, false),
-                            '{total_order_tax}' => Tools::displayPrice(($total_order_tax), $this->context->currency, false),
                             // additional data
                             '{room_price_tax_excl}' => Tools::displayPrice($room_price_tax_excl, $this->context->currency, false),
                             '{room_price_tax_incl}' => Tools::displayPrice($room_price_tax_incl, $this->context->currency, false),
@@ -1194,21 +1190,8 @@ abstract class PaymentModuleCore extends Module
                             PrestaShopLogger::addLog('PaymentModule::validateOrder - Mail is about to be sent', 1, null, 'Cart', (int)$id_cart, true);
                         }
 
-                        $orderStatusObj = new OrderState((int)$id_order_state, (int)$this->context->language->id);
-                        $data['{order_status}'] = $orderStatusObj->name;
-                        $data['{order_status_color}'] = $orderStatusObj->color;
-                        // Send order confirmation/overbooking mails to the reciepients according to the order mail configuration
-                        $overBookingStates = OrderState::getOverBookingStates();
-                        $isOverBookingStatus = in_array($id_order_state, $overBookingStates);
+                        // Send order confirmation mails to the reciepients according to the order mail configuration
                         if (Configuration::get('PS_ORDER_CONF_MAIL_TO_CUSTOMER')){
-                            // If order currenct state is overbooking, the send overbooking email or send order confirmation email
-                            if ($isOverBookingStatus) {
-                                $subject = Mail::l('Order Not Confirmed', (int)$order->id_lang);
-                                $template = 'overbooking';
-                            } else {
-                                $subject = Mail::l('Order confirmation', (int)$order->id_lang);
-                                $template = 'order_conf';
-                            }
                             if (Validate::isEmail($this->context->customer->email)) {
                                 // send customer information
                                 $data['{firstname}'] = $this->context->customer->firstname;
@@ -1216,8 +1199,8 @@ abstract class PaymentModuleCore extends Module
                                 $data['{email}'] = $this->context->customer->email;
                                 Mail::Send(
                                     (int)$order->id_lang,
-                                    $template,
-                                    $subject,
+                                    'order_conf',
+                                    Mail::l('Order confirmation', (int)$order->id_lang),
                                     $data,
                                     $this->context->customer->email,
                                     $this->context->customer->firstname.' '.$this->context->customer->lastname,
@@ -1238,8 +1221,8 @@ abstract class PaymentModuleCore extends Module
                                         $data['{email}'] = $objOrderCustomerGuestDetail->email;
                                         Mail::Send(
                                             (int)$order->id_lang,
-                                            $template,
-                                            $subject,
+                                            'order_conf',
+                                            Mail::l('Order confirmation', (int)$order->id_lang),
                                             $data,
                                             $objOrderCustomerGuestDetail->email,
                                             $objOrderCustomerGuestDetail->firstname.' '.$objOrderCustomerGuestDetail->lastname,
@@ -1253,50 +1236,33 @@ abstract class PaymentModuleCore extends Module
                             }
                         }
                         if (Configuration::get('PS_ORDER_CONF_MAIL_TO_SUPERADMIN')){
-                            // get superadmin employees
-                            if ($superAdminEmployees = Employee::getEmployeesByProfile(_PS_ADMIN_PROFILE_, true)) {
-                                // If order currenct state is overbooking, the send overbooking email or send order confirmation email
-                                if ($isOverBookingStatus) {
-                                    $subject = Mail::l('Order Not Confirmed', (int)$order->id_lang);
-                                    $template = 'overbooking_admin';
-                                } else {
-                                    $subject = Mail::l('Order confirmation', (int)$order->id_lang);
-                                    $template = 'order_conf_admin';
-                                }
-
-                                foreach ($superAdminEmployees as $superAdminEmployee) {
-                                    if (Validate::isEmail($superAdminEmployee['email'])) {
-                                        $data['{customer_name}'] = $this->context->customer->firstname.' '.$this->context->customer->lastname;
-                                        $data['{customer_email}'] = $this->context->customer->email;
-                                        $data['{firstname}'] = $superAdminEmployee['firstname'];
-                                        $data['{lastname}'] = $superAdminEmployee['lastname'];
-                                        $data['{email}'] = $superAdminEmployee['email'];
-                                        Mail::Send(
-                                            (int)$order->id_lang,
-                                            $template,
-                                            $subject,
-                                            $data,
-                                            $superAdminEmployee['email'],
-                                            $superAdminEmployee['firstname'].' '.$superAdminEmployee['lastname'],
-                                            null,
-                                            null,
-                                            $file_attachement,
-                                            null, _PS_MAIL_DIR_, false, (int)$order->id_shop
-                                        );
-                                    }
+                            // send superadmin information
+                            if (Validate::isLoadedObject($superAdmin = new Employee(_PS_ADMIN_PROFILE_))) {
+                                if (Validate::isEmail($superAdmin->email)) {
+                                    $data['{customer_name}'] = $this->context->customer->firstname.' '.$this->context->customer->lastname;
+                                    $data['{customer_email}'] = $this->context->customer->email;
+                                    $data['{firstname}'] = $superAdmin->firstname;
+                                    $data['{lastname}'] = $superAdmin->lastname;
+                                    $data['{email}'] = $superAdmin->email;
+                                    Mail::Send(
+                                        (int)$order->id_lang,
+                                        'order_conf_admin',
+                                        Mail::l('Order confirmation', (int)$order->id_lang),
+                                        $data,
+                                        $superAdmin->email,
+                                        $superAdmin->firstname.' '.$superAdmin->lastname,
+                                        null,
+                                        null,
+                                        $file_attachement,
+                                        null, _PS_MAIL_DIR_, false, (int)$order->id_shop
+                                    );
                                 }
                             }
                         }
-                        if ($idHotel && Validate::isLoadedObject($objHotel = new HotelBranchInformation($idHotel))) {
+                        if ($idHotel
+                            && Validate::isLoadedObject($objHotel = new HotelBranchInformation($idHotel))
+                        ) {
                             if (Configuration::get('PS_ORDER_CONF_MAIL_TO_HOTEL_MANAGER')){
-                                // If order currenct state is overbooking, the send overbooking email or send order confirmation email
-                                if ($isOverBookingStatus) {
-                                    $subject = Mail::l('Order Not Confirmed', (int)$order->id_lang);
-                                    $template = 'overbooking_admin';
-                                } else {
-                                    $subject = Mail::l('Order confirmation', (int)$order->id_lang);
-                                    $template = 'order_conf_admin';
-                                }
                                 // send hotel information
                                 $data['{firstname}'] = '';
                                 $data['{lastname}'] = '';
@@ -1306,8 +1272,8 @@ abstract class PaymentModuleCore extends Module
                                 if (Validate::isEmail($objHotel->email)) {
                                     Mail::Send(
                                         (int)$order->id_lang,
-                                        $template,
-                                        $subject,
+                                        'order_conf_admin',
+                                        Mail::l('Order confirmation', (int)$order->id_lang),
                                         $data,
                                         $objHotel->email,
                                         null,
@@ -1322,18 +1288,8 @@ abstract class PaymentModuleCore extends Module
                                 if ($htlAccesses = $objHotel->getHotelAccess($idHotel)) {
                                     $data['{customer_name}'] = $this->context->customer->firstname.' '.$this->context->customer->lastname;
                                     $data['{customer_email}'] = $this->context->customer->email;
-
-                                    // If order currenct state is overbooking, the send overbooking email or send order confirmation email
-                                    if ($isOverBookingStatus) {
-                                        $subject = Mail::l('Order Not Confirmed', (int)$order->id_lang);
-                                        $template = 'overbooking_admin';
-                                    } else {
-                                        $subject = Mail::l('Order confirmation', (int)$order->id_lang);
-                                        $template = 'order_conf_admin';
-                                    }
-
                                     foreach ($htlAccesses as $access) {
-                                        if ($access['access'] && $access['id_profile'] != _PS_ADMIN_PROFILE_) {
+                                        if ($access['id_profile'] != _PS_ADMIN_PROFILE_) {
                                             if ($htlEmployees = Employee::getEmployeesByProfile($access['id_profile'])) {
                                                 foreach ($htlEmployees as $empl) {
                                                     if (Validate::isEmail($empl['email'])) {
@@ -1343,8 +1299,8 @@ abstract class PaymentModuleCore extends Module
                                                         $data['{email}'] = $empl['email'];
                                                         Mail::Send(
                                                             (int)$order->id_lang,
-                                                            $template,
-                                                            $subject,
+                                                            'order_conf_admin',
+                                                            Mail::l('Order confirmation', (int)$order->id_lang),
                                                             $data,
                                                             $empl['email'],
                                                             $empl['firstname'].' '.$empl['lastname'],
@@ -1362,6 +1318,7 @@ abstract class PaymentModuleCore extends Module
                             }
                         }
                     }
+
                     // updates stock in shops
                     if (Configuration::get('PS_ADVANCED_STOCK_MANAGEMENT')) {
                         $product_list = $order->getProducts();
@@ -1381,85 +1338,6 @@ abstract class PaymentModuleCore extends Module
                     die($error);
                 }
             } // End foreach $order_detail_list
-
-            if (count($cart_rules)) {
-                foreach ($cart_rules as $idCartRule => $cartRule) {
-
-                    if ($cartRule['remaining'] > 0 && $cartRule['obj']->partial_use == 1) {
-                        // IF
-                        //	The value of the voucher is greater than the used value
-                        //	Partial use is allowed
-                        //	This is an "amount" reduction, not a reduction in % or a gift
-                        // THEN
-                        //	The voucher is cloned with a new value corresponding to the remainder
-
-                        // Create a new voucher from the original
-                        $voucher = new CartRule((int)$cartRule['obj']->id); // We need to instantiate the CartRule without lang parameter to allow saving it
-                        unset($voucher->id);
-
-                        // Set a new voucher code
-                        // For a customer, applying voucher ABCD will create partial vouchers ABCD-2, ABCD-3 and so on, and
-                        // applying voucher ABCD-2 will create vouchers ABCD-2-2, ABCD-2-3 and so on
-                        $voucher->code = empty($voucher->code) ? substr(md5($order->id.'-'.$order->id_customer.'-'.$cartRule['obj']->id), 0, 16) : $voucher->code.'-2';
-                        while (CartRule::cartRuleExists($voucher->code, $order->id_customer)) {
-                            if (preg_match('/\-([0-9]{1,2})$/', $voucher->code, $matches)) {
-                                $voucher->code = preg_replace('/'.$matches[1].'$/', (intval($matches[1]) + 1), $voucher->code);
-                            }
-                        }
-
-                        // Set the new voucher value
-                        $voucher->reduction_amount = $cartRule['remaining'];
-                        if ($voucher->reduction_tax) {
-                            // Add total shipping amout only if reduction amount > total shipping
-                            if ($voucher->free_shipping == 1 && $voucher->reduction_amount >= $order->total_shipping_tax_incl) {
-                                $voucher->reduction_amount -= $order->total_shipping_tax_incl;
-                            }
-                        } else {
-                            // Add total shipping amout only if reduction amount > total shipping
-                            if ($voucher->free_shipping == 1 && $voucher->reduction_amount >= $order->total_shipping_tax_excl) {
-                                $voucher->reduction_amount -= $order->total_shipping_tax_excl;
-                            }
-                        }
-                        if ($voucher->reduction_amount <= 0) {
-                            continue;
-                        }
-
-                        if ($this->context->customer->isGuest()) {
-                            $voucher->id_customer = 0;
-                        } else {
-                            $voucher->id_customer = $order->id_customer;
-                        }
-
-                        $voucher->quantity = 1;
-                        $voucher->reduction_currency = $order->id_currency;
-                        $voucher->quantity_per_user = 1;
-                        $voucher->free_shipping = 0;
-                        if ($voucher->add()) {
-                            // If the voucher has conditions, they are now copied to the new voucher
-                            CartRule::copyConditions($cartRule['obj']->id, $voucher->id);
-                            if ($send_mails) {
-                                $params = array(
-                                    '{voucher_amount}' => Tools::displayPrice($voucher->reduction_amount, $this->context->currency, false),
-                                    '{voucher_num}' => $voucher->code,
-                                    '{firstname}' => $this->context->customer->firstname,
-                                    '{lastname}' => $this->context->customer->lastname,
-                                    '{id_order}' => $order->reference,
-                                    '{order_name}' => $order->getUniqReference()
-                                );
-                                Mail::Send(
-                                    (int)$order->id_lang,
-                                    'voucher',
-                                    sprintf(Mail::l('New voucher for your order %s', (int)$order->id_lang), $order->reference),
-                                    $params,
-                                    $this->context->customer->email,
-                                    $this->context->customer->firstname.' '.$this->context->customer->lastname,
-                                    null, null, null, null, _PS_MAIL_DIR_, false, (int)$order->id_shop
-                                );
-                            }
-                        }
-                    }
-                }
-            }
 
             // Use the last order as currentOrder
             if (isset($order) && $order->id) {
@@ -1678,6 +1556,8 @@ abstract class PaymentModuleCore extends Module
             $objRoomTypeServiceProductOrderDetail = new RoomTypeServiceProductOrderDetail();
             $result['total_extra_demands_te'] = 0;
             $result['total_extra_demands_ti'] = 0;
+            $result['total_additional_services_te'] =0;
+            $result['total_additional_services_ti'] =0;
             $cart_htl_data = array();
             if (!empty($products)) {
                 foreach ($products as $type_key => $type_value) {
@@ -1723,12 +1603,64 @@ abstract class PaymentModuleCore extends Module
 
 
                                 $cart_htl_data[$type_key]['date_diff'][$date_join]['amount'] = $roomTypeDateRangePrice['total_price_tax_incl']*$vart_quant;
+                                // extra demands prices
+                                $cart_htl_data[$type_key]['date_diff'][$date_join]['extra_demands'] = $objBookingDemand->getRoomTypeBookingExtraDemands(
+                                    $order->id,
+                                    $type_value['product_id'],
+                                    0,
+                                    $data_v['date_from'],
+                                    $data_v['date_to']
+                                );
+                                $cart_htl_data[$type_key]['date_diff'][$date_join]['extra_demands_price_te'] = $objBookingDemand->getRoomTypeBookingExtraDemands(
+                                    $order->id,
+                                    $type_value['product_id'],
+                                    0,
+                                    $data_v['date_from'],
+                                    $data_v['date_to'],
+                                    0,
+                                    1,
+                                    0
+                                );
+                                $cart_htl_data[$type_key]['date_diff'][$date_join]['extra_demands_price_ti'] = $objBookingDemand->getRoomTypeBookingExtraDemands(
+                                    $order->id,
+                                    $type_value['product_id'],
+                                    0,
+                                    $data_v['date_from'],
+                                    $data_v['date_to'],
+                                    0,
+                                    1,
+                                    1
+                                );
+                                $cart_htl_data[$type_key]['date_diff'][$date_join]['additional_services_price_auto_add_ti'] = $objRoomTypeServiceProductOrderDetail->getroomTypeServiceProducts(
+                                    $order->id,
+                                    0,
+                                    0,
+                                    $type_value['product_id'],
+                                    $data_v['date_from'],
+                                    $data_v['date_to'],
+                                    $data_v['id_room'],
+                                    1,
+                                    1,
+                                    1,
+                                    Product::PRICE_ADDITION_TYPE_WITH_ROOM
+                                );
+                                $cart_htl_data[$type_key]['date_diff'][$date_join]['additional_services_price_auto_add_te'] = $objRoomTypeServiceProductOrderDetail->getroomTypeServiceProducts(
+                                    $order->id,
+                                    0,
+                                    0,
+                                    $type_value['product_id'],
+                                    $data_v['date_from'],
+                                    $data_v['date_to'],
+                                    $data_v['id_room'],
+                                    1,
+                                    0,
+                                    1,
+                                    Product::PRICE_ADDITION_TYPE_WITH_ROOM
+                                );
+
                                 $cart_htl_data[$type_key]['date_diff'][$date_join]['paid_unit_price_tax_incl'] = $data_v['total_price_tax_incl']/$num_days;
-                                $cart_htl_data[$type_key]['date_diff'][$date_join]['paid_unit_price_tax_excl'] = $data_v['total_price_tax_excl']/$num_days;
-                                $cart_htl_data[$type_key]['date_diff'][$date_join]['avg_paid_unit_price_tax_incl'] += $cart_htl_data[$type_key]['date_diff'][$date_join]['paid_unit_price_tax_incl'];
-                                $cart_htl_data[$type_key]['date_diff'][$date_join]['avg_paid_unit_price_tax_excl'] += $cart_htl_data[$type_key]['date_diff'][$date_join]['paid_unit_price_tax_excl'];
-                                $cart_htl_data[$type_key]['date_diff'][$date_join]['amount_tax_incl'] += $data_v['total_price_tax_incl'];
-                                $cart_htl_data[$type_key]['date_diff'][$date_join]['amount_tax_excl'] += $data_v['total_price_tax_excl'];
+                                $cart_htl_data[$type_key]['date_diff'][$date_join]['avg_paid_unit_price_tax_incl'] += ($cart_htl_data[$type_key]['date_diff'][$date_join]['paid_unit_price_tax_incl'] + $cart_htl_data[$type_key]['date_diff'][$date_join]['additional_services_price_auto_add_te']);
+                                $cart_htl_data[$type_key]['date_diff'][$date_join]['amount_tax_incl'] += ($data_v['total_price_tax_incl'] + $cart_htl_data[$type_key]['date_diff'][$date_join]['additional_services_price_auto_add_te']);
                             } else {
                                 $num_days = $obj_htl_bk_dtl->getNumberOfDays($data_v['date_from'], $data_v['date_to']);
 
@@ -1780,6 +1712,28 @@ abstract class PaymentModuleCore extends Module
                                     $data_v['date_from'],
                                     $data_v['date_to']
                                 );
+                                $cart_htl_data[$type_key]['date_diff'][$date_join]['additional_services_price_ti'] = $objRoomTypeServiceProductOrderDetail->getroomTypeServiceProducts(
+                                    $order->id,
+                                    0,
+                                    0,
+                                    $type_value['product_id'],
+                                    $data_v['date_from'],
+                                    $data_v['date_to'],
+                                    $data_v['id_room'],
+                                    1,
+                                    1
+                                );
+                                $cart_htl_data[$type_key]['date_diff'][$date_join]['additional_services_price_te'] = $objRoomTypeServiceProductOrderDetail->getroomTypeServiceProducts(
+                                    $order->id,
+                                    0,
+                                    0,
+                                    $type_value['product_id'],
+                                    $data_v['date_from'],
+                                    $data_v['date_to'],
+                                    $data_v['id_room'],
+                                    1,
+                                    0
+                                );
                                 $cart_htl_data[$type_key]['date_diff'][$date_join]['additional_services_price_auto_add_ti'] = $objRoomTypeServiceProductOrderDetail->getroomTypeServiceProducts(
                                     $order->id,
                                     0,
@@ -1787,7 +1741,7 @@ abstract class PaymentModuleCore extends Module
                                     $type_value['product_id'],
                                     $data_v['date_from'],
                                     $data_v['date_to'],
-                                    0,
+                                    $data_v['id_room'],
                                     1,
                                     1,
                                     1,
@@ -1800,7 +1754,7 @@ abstract class PaymentModuleCore extends Module
                                     $type_value['product_id'],
                                     $data_v['date_from'],
                                     $data_v['date_to'],
-                                    0,
+                                    $data_v['id_room'],
                                     1,
                                     0,
                                     1,
@@ -1808,20 +1762,19 @@ abstract class PaymentModuleCore extends Module
                                 );
 
                                 $cart_htl_data[$type_key]['date_diff'][$date_join]['paid_unit_price_tax_incl'] = $data_v['total_price_tax_incl']/$num_days;
-                                $cart_htl_data[$type_key]['date_diff'][$date_join]['paid_unit_price_tax_excl'] = $data_v['total_price_tax_excl']/$num_days;
-                                $cart_htl_data[$type_key]['date_diff'][$date_join]['avg_paid_unit_price_tax_incl'] = ($cart_htl_data[$type_key]['date_diff'][$date_join]['paid_unit_price_tax_incl'] + $cart_htl_data[$type_key]['date_diff'][$date_join]['additional_services_price_auto_add_ti']);
-                                $cart_htl_data[$type_key]['date_diff'][$date_join]['avg_paid_unit_price_tax_excl'] = ($cart_htl_data[$type_key]['date_diff'][$date_join]['paid_unit_price_tax_excl'] + $cart_htl_data[$type_key]['date_diff'][$date_join]['additional_services_price_auto_add_te']);
-                                $cart_htl_data[$type_key]['date_diff'][$date_join]['amount_tax_incl'] = ($data_v['total_price_tax_incl'] + $cart_htl_data[$type_key]['date_diff'][$date_join]['additional_services_price_auto_add_ti']);
-                                $cart_htl_data[$type_key]['date_diff'][$date_join]['amount_tax_excl'] = ($data_v['total_price_tax_excl'] + $cart_htl_data[$type_key]['date_diff'][$date_join]['additional_services_price_auto_add_te']);
+                                $cart_htl_data[$type_key]['date_diff'][$date_join]['avg_paid_unit_price_tax_incl'] = ($cart_htl_data[$type_key]['date_diff'][$date_join]['paid_unit_price_tax_incl'] + $cart_htl_data[$type_key]['date_diff'][$date_join]['additional_services_price_auto_add_te']);
+                                $cart_htl_data[$type_key]['date_diff'][$date_join]['amount_tax_incl'] = ($data_v['total_price_tax_incl'] + $cart_htl_data[$type_key]['date_diff'][$date_join]['additional_services_price_auto_add_te']);
 
                                 $result['total_extra_demands_te'] += $cart_htl_data[$type_key]['date_diff'][$date_join]['extra_demands_price_te'];
                                 $result['total_extra_demands_ti'] += $cart_htl_data[$type_key]['date_diff'][$date_join]['extra_demands_price_ti'];
+                                $result['total_additional_services_te'] += $cart_htl_data[$type_key]['date_diff'][$date_join]['additional_services_price_te'];
+                                $result['total_additional_services_ti'] += $cart_htl_data[$type_key]['date_diff'][$date_join]['additional_services_price_ti'];
                             }
                         }
-                        // calculate averages now
-                        foreach ($cart_htl_data[$type_key]['date_diff'] as $key => &$value) {
-                            $value['avg_paid_unit_price_tax_incl'] = Tools::ps_round($value['avg_paid_unit_price_tax_incl'] / $value['num_rm'], 6);
-                        }
+                    }
+                    // calculate averages now
+                    foreach ($cart_htl_data[$type_key]['date_diff'] as $key => &$value) {
+                        $value['avg_paid_unit_price_tax_incl'] = Tools::ps_round($value['avg_paid_unit_price_tax_incl'] / $value['num_rm'], 6);
                     }
                 }
             }

@@ -38,6 +38,7 @@
 	var id_lang = '';
 	//var txt_show_carts = '{l s='Show carts and orders for this customer.' js=1}';
 	//var txt_hide_carts = '{l s='Hide carts and orders for this customer.' js=1}';
+	var defaults_order_state = new Array();
 	var customization_errors = false;
 	var pic_dir = '{$pic_dir}';
 	var currency_format = 5;
@@ -45,6 +46,9 @@
 	var currency_blank = false;
 	var priceDisplayPrecision = {$smarty.const._PS_PRICE_DISPLAY_PRECISION_|intval};
 
+	{foreach from=$defaults_order_state key='module' item='id_order_state'}
+		defaults_order_state['{$module}'] = '{$id_order_state}';
+	{/foreach}
 	$(document).ready(function() {
 
 		$('#customer').typeWatch({
@@ -58,6 +62,12 @@
 			highlight: true,
 			wait: 750,
 			callback: function(){ searchProducts(); }
+		});
+		$('#payment_module_name').change(function() {
+			var id_order_state = defaults_order_state[this.value];
+			if (typeof(id_order_state) == 'undefined')
+				id_order_state = defaults_order_state['other'];
+			$('#id_order_state').val(id_order_state);
 		});
 		$("#id_address_delivery").change(function() {
 			updateAddresses();
@@ -88,7 +98,6 @@
 					selectFirst: false,
 					scroll: false,
 					dataType: "json",
-					cacheLength: 0,
 					formatItem: function(data, i, max, value, term) {
 						return value;
 					},
@@ -106,8 +115,7 @@
 						ajax: "1",
 						token: "{getAdminToken tab='AdminCartRules'}",
 						tab: "AdminCartRules",
-						action: "searchCartRuleVouchers",
-						id_customer: function () { return window.id_customer },
+						action: "searchCartRuleVouchers"
 					}
 				}
 			)
@@ -139,7 +147,6 @@
 		$('body').on('click', '.delete_hotel_cart_data', function(){
 			if (confirm("{l s='Are you sure?'}"))
         	{
-                var idCart = $(this).data('id_cart');
 				$.ajax({
 					type:"POST",
 					url: "{$link->getAdminLink('AdminOrders')|addslashes}",
@@ -148,7 +155,7 @@
 						action: "deleteRoomProcess",
 						del_id: $(this).data('id'),
 						id_product: $(this).data('id_product'),
-						id_cart: idCart,
+						id_cart: $(this).data('id_cart'),
 						id_room: $(this).data('id_room'),
 						date_from: $(this).data('date_from'),
 						date_to: $(this).data('date_to'),
@@ -160,7 +167,7 @@
 						{
 							showSuccessMessage("{l s='Remove successful'}");
 							if (data.cart_rooms)
-								window.location.href = "{$link->getAdminLink('AdminOrders',true)}" + '&addorder&cart_id=' + idCart;
+								location.reload();
 							else
 								window.location.href = "{$link->getAdminLink('AdminHotelRoomsBooking',true)}";
 						}
@@ -275,7 +282,7 @@
 				id_room: parseInt($(cart_row).attr('data-id-room')),
 				date_from: $(cart_row).attr('data-date-from'),
 				date_to: $(cart_row).attr('data-date-to'),
-				price: new Number($(this).val().replace(",",".")).toString(),
+				price: new Number($(this).val().replace(",",".")).toFixed(4).toString(),
 				id_cart: id_cart
 			};
 			updateProductPrice(params, cart_row);
@@ -352,7 +359,7 @@
 					if (data.result)
 					{
 						$('#cart_detail_form').show();//line added by webkul
-						$('#payment_method_options').replaceWith(data.view)
+						$('#payment_module_name').replaceWith(data.view)
 					}
 				}
 			});
@@ -377,50 +384,28 @@
 			});
 
 			$(document).on('change', '.num_occupancy', function(e) {
-        		let elementVal = parseInt($(this).val());
 				let current_room_occupancy = 0;
 				$(this).closest('.occupancy_info_block').find('.num_occupancy').each(function(){
 					current_room_occupancy += parseInt($(this).val());
 				});
 				let max_guests_in_room = $(this).closest(".booking_occupancy_wrapper").find('.max_guests').val();
 				let max_allowed_for_current = (max_guests_in_room - current_room_occupancy) + parseInt($(this).val());
-        		let haserror = false
-				if ($(this).hasClass('num_children')) {
-					max_child_in_room = $(this).closest(".booking_occupancy_wrapper").find('.max_children').val();
-					if (elementVal > max_child_in_room) {
-						$(this).val(max_child_in_room);
-						if (elementVal == 1) {
-							showOccupancyError(no_children_allowed_txt, $(this).closest(".occupancy_info_block"));
-							haserror = true;
-						} else {
-							showOccupancyError(max_children_txt, $(this).closest(".occupancy_info_block"));
-							haserror = true;
-						}
-					} else if (elementVal > max_allowed_for_current)  {
-						$(this).val(max_allowed_for_current);
-						showOccupancyError(max_occupancy_reached_txt, $(this).closest(".occupancy_info_block"));
-						haserror = true;
-					}
-				} else {
-					max_adults_in_room = $(this).closest(".booking_occupancy_wrapper").find('.max_adults').val();
-					if (elementVal >= max_adults_in_room) {
-						$(this).val(max_adults_in_room);
-						showOccupancyError(max_adults_txt, $(this).closest(".occupancy_info_block"));
-						haserror = true;
-					} else if (elementVal > max_allowed_for_current)  {
-						$(this).val(max_allowed_for_current);
-						showOccupancyError(max_occupancy_reached_txt, $(this).closest(".occupancy_info_block"));
-						haserror = true;
-					}
+				if ($(this).val() > $(this).attr('max')) {
+					$(this).val($(this).attr('max'));
 				}
-
-				if (!haserror) {
-					if ($(this).hasClass('num_children')) {
-						let totalChilds = $(this).closest('.occupancy_info_block').find('.guest_child_age').length;
-						if (totalChilds < $(this).val()) {
+				if ($(this).val() > max_allowed_for_current) {
+					$(this).val(max_allowed_for_current);
+				}
+				if ($(this).hasClass('num_children')) {
+					var totalChilds = $(this).closest('.occupancy_info_block').find('.guest_child_age').length;
+					if (totalChilds < $(this).val()) {
+						if (totalChilds < max_child_in_room) {
 							$(this).closest('.occupancy_info_block').find('.children_age_info_block').show();
 							while ($(this).closest('.occupancy_info_block').find('.guest_child_age').length < $(this).val()) {
+
+
 								var roomBlockIndex = parseInt($(this).closest('.occupancy_info_block').attr('occ_block_index'));
+
 								var childAgeSelect = '<p class="col-xs-12 col-sm-12 col-md-6 col-lg-6">';
 									childAgeSelect += '<select class="guest_child_age room_occupancies" name="occupancy[' +roomBlockIndex+ '][child_ages][]">';
 										childAgeSelect += '<option value="-1">' + select_age_txt + '</option>';
@@ -432,35 +417,23 @@
 								childAgeSelect += '</p>';
 								$(this).closest('.occupancy_info_block').find('.children_ages').append(childAgeSelect);
 							}
-						} else {
-							let child = $(this).val();
-							$(this).closest('.occupancy_info_block').find('.guest_child_age').each(function(ind, element) {
-								if (child <= ind) {
-									$(element).parent().remove();
-								}
-							});
-							if (child == 0) {
-								$(this).closest('.occupancy_info_block').find('.children_age_info_block').hide();
-							}
-
 						}
+					} else {
+						let child = $(this).val();
+						$(this).closest('.occupancy_info_block').find('.guest_child_age').each(function(ind, element) {
+							if (child <= ind) {
+								$(element).parent().remove();
+							}
+						});
+						if (child == 0) {
+							$(this).closest('.occupancy_info_block').find('.children_age_info_block').hide();
+						}
+
 					}
 				}
 				setRoomTypeGuestOccupancy($(this).closest('.booking_occupancy_wrapper'));
+
 			});
-
-			var errorMsgTime;
-			$('.occupancy-input-errors').parent().hide();
-			function showOccupancyError(msg, occupancy_info_block)
-			{
-				var errorMsgBlock = $(occupancy_info_block).find('.occupancy-input-errors')
-				$(errorMsgBlock).html(msg).parent().show('fast');
-				clearTimeout(errorMsgTime);
-				errorMsgTime = setTimeout(function() {
-					$(errorMsgBlock).parent().hide('fast');
-				}, 1000);
-
-			}
 
 
 			$(document).on('click', '.booking_guest_occupancy', function(e) {
@@ -666,8 +639,6 @@
 				tab: "AdminCarts",
 				action: "updateProductPrice",
 				params: params,
-				id_cart: id_cart,
-				id_customer: id_customer
 			},
 			success : function(response) {
 				updateCartLine(response.curr_booking_info, cart_row);
@@ -703,29 +674,14 @@
 		$(cart_row).find('.cart_line_total_price').html(data.total_price);
 	}
 
-	function updateCartSummaryData(jsonSummary) {
-		$('#total_rooms').html(formatCurrency(parseFloat(jsonSummary.summary.total_rooms_with_services_without_discount_te), currency_format, currency_sign, currency_blank));
-		$('#total_vouchers').html(formatCurrency(parseFloat(jsonSummary.summary.total_discounts), currency_format, currency_sign, currency_blank));
+	function updateCartSummaryData(summaryData) {
+		$('#total_rooms').html(formatCurrency(parseFloat(jsonSummary.summary.total_rooms + jsonSummary.summary.total_extra_demands + jsonSummary.summary.total_additional_services + jsonSummary.summary.total_additional_services_auto_add), currency_format, currency_sign, currency_blank));
+		$('#total_vouchers').html(formatCurrency(parseFloat(summaryData.summary.total_discounts_tax_exc), currency_format, currency_sign, currency_blank));
 		$('#total_convenience_fees').html(formatCurrency(parseFloat(jsonSummary.summary.convenience_fee), currency_format, currency_sign, currency_blank));
-		$('#total_without_taxes').html(formatCurrency(parseFloat(jsonSummary.summary.cart_total_without_discount_te), currency_format, currency_sign, currency_blank));
+		$('#total_without_taxes').html(formatCurrency(parseFloat(jsonSummary.summary.total_price_without_tax - jsonSummary.summary.convenience_fee), currency_format, currency_sign, currency_blank));
 		// $('#total_service_products').html(formatCurrency(parseFloat(jsonSummary.summary.total_service_products), currency_format, currency_sign, currency_blank));
-		$('#total_taxes').html(formatCurrency(parseFloat(jsonSummary.summary.total_tax_without_discount), currency_format, currency_sign, currency_blank));
-		$('#total_with_taxes').html(formatCurrency(parseFloat(jsonSummary.summary.total_price), currency_format, currency_sign, currency_blank));
-
-		$('#payment_amount').val(jsonSummary.summary.total_price);
-		if (jsonSummary.summary.is_advance_payment_active) {
-			$('#advance_payment_amount').html(formatCurrency(parseFloat(jsonSummary.summary.advance_payment_amount_with_tax), currency_format, currency_sign, currency_blank));
-			$('#advance_payment_amount_block').show();
-		} else {
-			$('#advance_payment_amount_block').hide();
-		}
-
-		// toggle payment fields
-		if (jsonSummary.summary.total_price == 0) { // if free order
-			$('#send_email_to_customer, [name="is_full_payment"], #payment_amount, #payment_type, #payment_module_name, #payment_transaction_id').closest('.form-group').hide(200);
-		} else {
-			$('#send_email_to_customer, [name="is_full_payment"], #payment_amount, #payment_type, #payment_module_name, #payment_transaction_id').closest('.form-group').show(200);
-		}
+		$('#total_taxes').html(formatCurrency(parseFloat(summaryData.summary.total_tax), currency_format, currency_sign, currency_blank));
+		$('#total_with_taxes').html(formatCurrency(parseFloat(summaryData.summary.total_price), currency_format, currency_sign, currency_blank));
 	}
 
 	function displayQtyInStock(id)
@@ -852,9 +808,7 @@
 				ajax: "1",
 				tab: "AdminCustomers",
 				action: "searchCustomers",
-				customer_search: $('#customer').val(),
-				skip_deleted: "1",
-			},
+				customer_search: $('#customer').val()},
 			success : function(res)
 			{
 				if(res.found)
@@ -1172,7 +1126,7 @@
 		currency_format = jsonSummary.currency.format;
 		currency_sign = jsonSummary.currency.sign;
 		currency_blank = jsonSummary.currency.blank;
-		priceDisplayPrecision = parseInt(jsonSummary.currency.decimals) ? {$smarty.const._PS_PRICE_DISPLAY_PRECISION_|intval} : 0;
+		priceDisplayPrecision = jsonSummary.currency.decimals ? 2 : 0;
 
 		updateCartProducts(jsonSummary.summary.products, jsonSummary.summary.gift_products, jsonSummary.cart.id_address_delivery);
 		updateCartVouchers(jsonSummary.summary.discounts);
@@ -1210,11 +1164,11 @@
 
 		shipping_price_selected_carrier = jsonSummary.summary.total_shipping;
 
-		$('#total_vouchers').html(formatCurrency(parseFloat(jsonSummary.summary.total_discounts), currency_format, currency_sign, currency_blank));
-		$('#total_taxes').html(formatCurrency(parseFloat(jsonSummary.summary.total_tax_without_discount), currency_format, currency_sign, currency_blank));
-		$('#total_without_taxes').html(formatCurrency(parseFloat(jsonSummary.summary.cart_total_without_discount_te), currency_format, currency_sign, currency_blank));
+		$('#total_vouchers').html(formatCurrency(parseFloat(jsonSummary.summary.total_discounts_tax_exc), currency_format, currency_sign, currency_blank));
+		$('#total_taxes').html(formatCurrency(parseFloat(jsonSummary.summary.total_tax), currency_format, currency_sign, currency_blank));
+		$('#total_without_taxes').html(formatCurrency(parseFloat(jsonSummary.summary.total_price_without_tax - jsonSummary.summary.convenience_fee), currency_format, currency_sign, currency_blank));
 		$('#total_with_taxes').html(formatCurrency(parseFloat(jsonSummary.summary.total_price), currency_format, currency_sign, currency_blank));
-		$('#total_rooms').html(formatCurrency(parseFloat(jsonSummary.summary.total_rooms_with_services_without_discount_te), currency_format, currency_sign, currency_blank));
+		$('#total_rooms').html(formatCurrency(parseFloat(jsonSummary.summary.total_rooms + jsonSummary.summary.total_extra_demands + jsonSummary.summary.total_additional_services + jsonSummary.summary.total_additional_services_auto_add), currency_format, currency_sign, currency_blank));
 		$('#total_convenience_fees').html(formatCurrency(parseFloat(jsonSummary.summary.convenience_fee), currency_format, currency_sign, currency_blank));
 		// $('#total_service_products').html(formatCurrency(parseFloat(jsonSummary.summary.total_service_products), currency_format, currency_sign, currency_blank));
 
@@ -1232,22 +1186,6 @@
 			$('#go_order_process').hide();
 		}
 		$('#order_message').val(jsonSummary.order_message);
-		$('#payment_amount').siblings('.input-group-addon').html(currency_sign);
-		$('#payment_amount').val(jsonSummary.summary.total_price);
-		if (jsonSummary.summary.is_advance_payment_active) {
-			$('#advance_payment_amount').html(formatCurrency(parseFloat(jsonSummary.summary.advance_payment_amount_with_tax), currency_format, currency_sign, currency_blank));
-			$('#advance_payment_amount_block').show();
-		} else {
-			$('#advance_payment_amount_block').hide();
-		}
-
-		// toggle payment fields
-		if (jsonSummary.summary.total_price == 0) { // if free order
-			$('#send_email_to_customer, [name="is_full_payment"], #payment_amount, #payment_type, #payment_module_name, #payment_transaction_id').closest('.form-group').hide(200);
-		} else {
-			$('#send_email_to_customer, [name="is_full_payment"], #payment_amount, #payment_type, #payment_module_name, #payment_transaction_id').closest('.form-group').show(200);
-		}
-
 		resetBind();
 	}
 
@@ -1448,22 +1386,39 @@
 		});
 		if (addresses.length == 0)
 		{
+			$('#addresses_err').show().html('{l s='You must add at least one address to process the order.'}');
 			$('#address_delivery, #address_invoice').hide();
 			$("#new_address").show();
+
+			//by webkul (if there is no address then order can not be created)
+			$("button[name=\"submitAddOrder\"]").attr("disabled", "disabled");
 		}
 		else
 		{
 			$('#addresses_err').hide();
 			$("#new_address").hide();
 			$('#address_delivery, #address_invoice').show();
+
+			//by webkul
+			$("button[name=\"submitAddOrder\"]").removeAttr("disabled");
 		}
 
+		/*Changed by webkul to make delivery and invoice addresses same*/
 		$('#id_address_delivery').html(addresses_delivery_options).hide();
-		$('#id_address_invoice').html(addresses_invoice_options).hide();
+		$('#id_address_invoice').html(addresses_delivery_options).hide();
+		$('#address_delivery_detail').html(address_delivery_detail);
+		$('#address_invoice_detail').html(address_delivery_detail);
+		$('#edit_delivery_address').attr('href', delivery_address_edit_link);
+		$('#edit_invoice_address').attr('href', delivery_address_edit_link);
+		/*END*/
+
+		/*Original*/
+		/*$('#id_address_delivery').html(addresses_delivery_options);
+		$('#id_address_invoice').html(addresses_invoice_options);
 		$('#address_delivery_detail').html(address_delivery_detail);
 		$('#address_invoice_detail').html(address_invoice_detail);
 		$('#edit_delivery_address').attr('href', delivery_address_edit_link);
-		$('#edit_invoice_address').attr('href', invoice_address_edit_link);
+		$('#edit_invoice_address').attr('href', invoice_address_edit_link);*/
 	}
 
 	function updateAddresses()
@@ -1624,64 +1579,6 @@
 			}
 		});
 
-		$(document).on('keyup', '#payment_module_name', function() {
-			let paymentMethod = $('#payment_module_name').val().trim().toLowerCase();
-
-			let selectedMethod;
-			$('#payment_module_name_list option').each(function (index, element) {
-				if ($(element).attr('data-name').toLowerCase() == paymentMethod
-					|| $(element).val().toLowerCase() == paymentMethod
-				) {
-					selectedMethod = element;
-				}
-			});
-
-			if ($(selectedMethod).length) {
-				// set Payment source
-				let paymentType = $(selectedMethod).attr('data-payment-type');
-				if ($('select#payment_type option[value="' + paymentType + '"]').length) {
-					$('#payment_type').val(paymentType);
-				}
-			}
-		});
-
-		$(document).on('change', 'input[name="is_full_payment"]', function() {
-			if (parseInt($('input[name="is_full_payment"]:checked').val())) {
-				$('#payment_amount').attr('disabled', true);
-
-				$('#payment_type, #payment_transaction_id').closest('.form-group').show(200);
-			} else {
-				$('#payment_amount').attr('disabled', false);
-
-				managePaymentOptions();
-			}
-		});
-
-		$(document).on('keyup', '#payment_amount', function() {
-			managePaymentOptions();
-		});
-
-		function managePaymentOptions() {
-			let paymentAmount = parseFloat($('#payment_amount').val().trim());
-
-			if (paymentAmount != 0) {
-				$('#payment_type, #payment_transaction_id').closest('.form-group').show(200);
-			} else {
-				$('#payment_type, #payment_transaction_id').closest('.form-group').hide(200);
-			}
-		}
-
-		$(document).on('change', '.room_type_service_product_qty', function(e) {
-			let quantityInputField = this;
-			let maximumQuantity = parseInt($(quantityInputField).attr('data-max-quantity'));
-			let currentQuantity = parseInt($(quantityInputField).val());
-			if (currentQuantity > maximumQuantity) {
-				$(quantityInputField).siblings('p').show();
-			} else {
-				$(quantityInputField).siblings('p').hide();
-			}
-		});
-
 		function updateServiceProducts(element)
 		{
 			var operator = $(element).is(':checked') ? 'up' : 'down';
@@ -1723,540 +1620,502 @@
 
 <div class="leadin">{block name="leadin"}{/block}</div>
 {include file='controllers/orders/_current_cart_details_data.tpl'}
-    {* If cart has errors the do not allow to proceed with this cart *}
-    <div class="panel form-horizontal" id="customer_part" {if isset($is_order_created) && $is_order_created}style="display:none;"{/if}>
-        <div class="panel-heading">
-            <i class="icon-user"></i>
-            {l s='Customer'}
-        </div>
-        <div id="search-customer-form-group" class="form-group">
-            <label class="control-label col-lg-3">
-                <span title="" data-toggle="tooltip" class="label-tooltip" data-original-title="{l s='Search for an existing customer by typing the first letters of his/her name.'}">
-                    {l s='Search for a customer'}
-                </span>
-            </label>
-            <div class="col-lg-9">
-                <div class="row">
-                    <div class="col-lg-6">
-                        <div class="input-group">
-                            <input type="text" id="customer" value="" />
-                            <span class="input-group-addon">
-                                <i class="icon-search"></i>
-                            </span>
-                        </div>
-                    </div>
-                    <div class="col-lg-6">
-                        <span class="form-control-static">{l s='Or'}&nbsp;</span>
-                        <a class="fancybox_customer btn btn-default" href="{$link->getAdminLink('AdminCustomers')|escape:'html':'UTF-8'}&amp;addcustomer&amp;liteDisplaying=1&amp;submitFormAjax=1#">
-                            <i class="icon-plus-sign-alt"></i>
-                            {l s='Add new customer'}
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="row">
-            <div id="customers"></div>
-        </div>
-        {*<div id="carts">
-            <button type="button" id="show_old_carts" class="btn btn-default pull-right" data-toggle="collapse" data-target="#old_carts_orders">
-                <i class="icon-caret-down"></i>
-            </button>
-
-            <ul id="old_carts_orders_navtab" class="nav nav-tabs">
-                <li class="active">
-                    <a href="#nonOrderedCarts" data-toggle="tab">
-                        <i class="icon-shopping-cart"></i>
-                        {l s='Carts'}
-                    </a>
-                </li>
-                <li>
-                    <a href="#lastOrders" data-toggle="tab">
-                        <i class="icon-credit-card"></i>
-                        {l s='Orders'}
-                    </a>
-                </li>
-            </ul>
-            <div id="old_carts_orders" class="tab-content panel collapse in">
-                <div id="nonOrderedCarts" class="tab-pane active">
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th><span class="title_box">{l s='ID'}</span></th>
-                                <th><span class="title_box">{l s='Date'}</span></th>
-                                <th><span class="title_box">{l s='Total'}</span></th>
-                                <th></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        </tbody>
-                    </table>
-                </div>
-                <div id="lastOrders" class="tab-pane">
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th><span class="title_box">{l s='ID'}</span></th>
-                                <th><span class="title_box">{l s='Date'}</span></th>
-                                <th><span class="title_box">{l s='Products'}</span></th>
-                                <th><span class="title_box">{l s='Total paid'}</span></th>
-                                <th><span class="title_box">{l s='Payment'}</span></th>
-                                <th><span class="title_box">{l s='Status'}</span></th>
-                                <th></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div> -->*}<!-- by webkul to hide unnessesary content -->
-    </div>
-
-    <form class="form-horizontal" action="{$link->getAdminLink('AdminOrders')|escape:'html':'UTF-8'}&amp;addorder=1&amp;cart_id={$cart->id}" method="post" style="display:none" id="cart_detail_form">
-        <div class="panel" id="products_part" style="display:none;">
-            <div class="panel-heading">
-                <i class="icon-shopping-cart"></i>
-                {l s='Cart'}
-            </div>
-            <div class="form-group">
-                <input type="hidden" value="{$cart->id}" id="id_cart" name="id_cart" />
-            </div>
-            {*<div class="form-group">
-                <label class="control-label col-lg-3">
-                    <span title="" data-toggle="tooltip" class="label-tooltip" data-original-title="{l s='Search for an existing product by typing the first letters of its name.'}">
-                        {l s='Search for a product'}
-                    </span>
-                </label>
-                <div class="col-lg-9">
-                    <input type="hidden" value="{$cart->id}" id="id_cart" name="id_cart" />
-                    <div class="input-group">
-                        <input type="text" id="product" value="" />
-                        <span class="input-group-addon">
-                            <i class="icon-search"></i>
-                        </span>
-                    </div>
-                </div>
-            </div>
-
-            <div id="products_found">
-                <hr/>
-                <div id="product_list" class="form-group"></div>
-                <div id="attributes_list" class="form-group"></div> -->
-                <!-- @TODO: please be kind refacto -->
-                <div class="form-group">
-                    <div class="col-lg-9 col-lg-offset-3">
-                        <iframe id="customization_list" seamless>
-                            <html>
-                            <head>
-                                {if isset($css_files_orders)}
-                                    {foreach from=$css_files_orders key=css_uri item=media}
-                                        <link href="{$css_uri}" rel="stylesheet" type="text/css" media="{$media}" />
-                                    {/foreach}
-                                {/if}
-                            </head>
-                            <body>
-                            </body>
-                            </html>
-                        </iframe>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="control-label col-lg-3" for="qty">{l s='Quantity'}</label>
-                    <div class="col-lg-9">
-                        <input type="text" name="qty" id="qty" class="form-control fixed-width-sm" value="1" />
-                        <p class="help-block">{l s='In stock'} <span id="qty_in_stock"></span></p>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <div class="col-lg-9 col-lg-offset-3">
-                        <button type="button" class="btn btn-default" id="submitAddProduct" />
-                        <i class="icon-ok text-success"></i>
-                        {l s='Add to cart'}
-                    </div>
-                </div>
-            </div>
-
-            <div id="products_err" class="hide alert alert-danger"></div>
-
-            <hr/>
-
-            <div class="row">
-                <div class="col-lg-12">
-                    <table class="table" id="customer_cart">
-                        <thead>
-                            <tr>
-                                <th><span class="title_box">{l s='Product'}</span></th>
-                                <th><span class="title_box">{l s='Description'}</span></th>
-                                <th><span class="title_box">{l s='Reference'}</span></th>
-                                <th><span class="title_box">{l s='Unit price'}</span></th>
-                                <th><span class="title_box">{l s='Quantity'}</span></th>
-                                <th><span class="title_box">{l s='Price'}</span></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <div class="col-lg-9 col-lg-offset-3">
-                    <div class="alert alert-warning">{l s='The prices are without taxes.'}</div>
-                </div>
-            </div> *}<!-- by webkul to hide unnessesary content -->
-
-
-            <div class="form-group">
-                <label class="control-label col-lg-3" for="id_currency">
-                    {l s='Currency'}
-                </label>
-                <script type="text/javascript">
-                    {foreach from=$currencies item='currency'}
-                        currencies['{$currency.id_currency}'] = '{$currency.sign}';
-                    {/foreach}
-                </script>
-                <div class="col-lg-9">
-                    <select id="id_currency" name="id_currency">
-                        {foreach from=$currencies item='currency'}
-                            <option rel="{$currency.iso_code}" value="{$currency.id_currency}">{$currency.name}</option>
-                        {/foreach}
-                    </select>
-                </div>
-            </div>
-            <div class="form-group">
-                <label class="control-label col-lg-3" for="id_lang">
-                    {l s='Language'}
-                </label>
-                <div class="col-lg-9">
-                    <select id="id_lang" name="id_lang">
-                        {foreach from=$langs item='lang'}
-                            <option value="{$lang.id_lang}">{$lang.name}</option>
-                        {/foreach}
-                    </select>
-                </div>
-            </div>
-        </div>
-
-        <div class="panel" id="vouchers_part" style="display:none;">
-            <div class="panel-heading">
-                <i class="icon-ticket"></i>
-                {l s='Vouchers'}
-            </div>
-            <div class="form-group">
-                <label class="control-label col-lg-3">
-                    {l s='Search for a voucher'}
-                </label>
-                <div class="col-lg-9">
-                    <div class="row">
-                        <div class="col-lg-6">
-                            <div class="input-group">
-                                <input type="text" id="voucher" value="" />
-                                <div class="input-group-addon">
-                                    <i class="icon-search"></i>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-6">
-                            <span class="form-control-static">{l s='Or'}&nbsp;</span>
-                            <a class="fancybox btn btn-default" href="{$link->getAdminLink('AdminCartRules')|escape:'html':'UTF-8'}&amp;addcart_rule&amp;liteDisplaying=1&amp;submitFormAjax=1#">
-                                <i class="icon-plus-sign-alt"></i>
-                                {l s='Add new voucher'}
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <table class="table" id="voucher_list">
-                    <thead>
-                        <tr>
-                            <th><span class="title_box">{l s='Name'}</span></th>
-                            <th><span class="title_box">{l s='Description'}</span></th>
-                            <th><span class="title_box">{l s='Value'}</span></th>
-                            <th></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    </tbody>
-                </table>
-            </div>
-            <div id="vouchers_err" class="alert alert-warning" style="display:none;"></div>
-        </div>
-
-        <div class="panel" id="address_part" style="">
-            <div class="panel-heading">
-                <i class="icon-envelope"></i>
-                {l s='Addresses'}
-            </div>
-            <div id="addresses_err" class="alert alert-warning" style="display:none;"></div>
-
-            <div class="row">
-                <div id="address_delivery" class="col-xs-6 col-sm-6 hidden">
-                    <h4>
-                        <i class="icon-map-marker"></i>
-                        {l s='Customer Address'}
-                    </h4>
-                    <div class="row-margin-bottom">
-                        <select id="id_address_delivery" name="id_address_delivery"></select>
-                    </div>
-                    <div class="well">
-                        <a href="" id="edit_delivery_address" class="btn btn-default pull-right fancybox"><i class="icon-pencil"></i> {l s='Edit'}</a>
-                        <div id="address_delivery_detail"></div>
-                    </div>
-                </div>
-                <div id="address_invoice" class="col-lg-6">
-                    <h4>
-                        <i class="icon-file-text"></i>
-                        {l s='Invoice'}
-                    </h4>
-                    <div class="row-margin-bottom">
-                        <select id="id_address_invoice" name="id_address_invoice"></select>
-                    </div>
-                    <div class="well">
-                        <a href="" id="edit_invoice_address" class="btn btn-default pull-right fancybox"><i class="icon-pencil"></i> {l s='Edit'}</a>
-                        <div id="address_invoice_detail"></div>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-lg-12">
-                    <a class="fancybox btn btn-default" id="new_address" href="{$link->getAdminLink('AdminAddresses')|escape:'html':'UTF-8'}&amp;addaddress&amp;id_customer=42&amp;liteDisplaying=1&amp;submitFormAjax=1#">
-                        <i class="icon-plus-sign-alt"></i>
-                        {l s='Add a new address'}
-                    </a>
-                </div>
-            </div>
-        </div>
-        <div class="panel" id="carriers_part" style="display:none;">
-            <div class="panel-heading">
-                <i class="icon-truck"></i>
-                {l s='Shipping'}
-            </div>
-            <div id="carriers_err" style="display:none;" class="alert alert-warning"></div>
-            <div id="carrier_form">
-                <div class="form-group">
-                    <label class="control-label col-lg-3">
-                        {l s='Delivery option'}
-                    </label>
-                    <div class="col-lg-9">
-                        <select name="delivery_option" id="delivery_option">
-                        </select>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="control-label col-lg-3" for="shipping_price">
-                        {l s='Shipping price (Tax incl.)'}
-                    </label>
-                    <div class="col-lg-9">
-                        <p id="shipping_price" class="form-control-static" name="shipping_price"></p>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="control-label col-lg-3" for="free_shipping">
-                        {l s='Free shipping'}
-                    </label>
-                    <div class="input-group col-lg-9 fixed-width-lg">
-                        <span class="switch prestashop-switch">
-                            <input type="radio" name="free_shipping" id="free_shipping" value="1">
-                            <label for="free_shipping" class="radioCheck">
-                                {l s='yes'}
-                            </label>
-                            <input type="radio" name="free_shipping" id="free_shipping_off" value="0" checked="checked">
-                            <label for="free_shipping_off" class="radioCheck">
-                                {l s='No'}
-                            </label>
-                            <a class="slide-button btn"></a>
-                        </span>
-                    </div>
-                </div>
-
-                {if $recyclable_pack}
-                <div class="form-group">
-                    <div class="checkbox col-lg-9 col-offset-3">
-                        <label for="carrier_recycled_package">
-                            <input type="checkbox" name="carrier_recycled_package" value="1" id="carrier_recycled_package" />
-                            {l s='Recycled package'}
-                        </label>
-                    </div>
-                </div>
-                {/if}
-
-                {if $gift_wrapping}
-                <div class="form-group">
-                    <div class="checkbox col-lg-9 col-offset-3">
-                        <label for="order_gift">
-                            <input type="checkbox" name="order_gift" id="order_gift" value="1" />
-                            {l s='Gift'}
-                        </label>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="control-label col-lg-3" for="gift_message">{l s='Gift message'}</label>
-                    <div class="col-lg-9">
-                        <textarea id="gift_message" class="form-control" cols="40" rows="4"></textarea>
-                    </div>
-                </div>
-                {/if}
-            </div>
-        </div>
-        <div class="panel" id="summary_part" style="display:none;">
-            <div class="panel-heading">
-                <i class="icon-align-justify"></i>
-                {l s='Summary'}
-            </div>
-
-            <div id="send_email_feedback" class="hide alert"></div>
-
-            <div id="cart_summary" class="panel row-margin-bottom text-center">
-                <div class="row">
-                    <div class="col-lg-2">
-                        <div class="data-focus">
-                            <span>{l s='Total rooms (Tax excl.)'}</span><br/>
-                            <span id="total_rooms" class="size_l text-success"></span>
-                        </div>
-                    </div>
-                    {* <div class="col-lg-2">
-                        <div class="data-focus">
-                            <span>{l s='Total extra services (Tax excl.)'}</span><br/>
-                            <span id="total_extra_services" class="size_l text-success"></span>
-                        </div>
-                    </div> *}
-                    {* <div class="col-lg-2">
-                        <div class="data-focus">
-                            <span>{l s='Total Total service products (Tax excl.)'}</span><br/>
-                            <span id="total_service_products" class="size_l text-success"></span>
-                        </div>
-                    </div> *}
-					<div class="col-lg-2">
-						<div class="data-focus">
-							<span>{l s='Convenience fees (Tax excl.)'}</span><br/>
-							<span id="total_convenience_fees" class="size_l"></span>
+	<div class="panel form-horizontal" id="customer_part" {if isset($is_order_created) && $is_order_created}style="display:none;"{/if}>
+		<div class="panel-heading">
+			<i class="icon-user"></i>
+			{l s='Customer'}
+		</div>
+		<div id="search-customer-form-group" class="form-group">
+			<label class="control-label col-lg-3">
+				<span title="" data-toggle="tooltip" class="label-tooltip" data-original-title="{l s='Search for an existing customer by typing the first letters of his/her name.'}">
+					{l s='Search for a customer'}
+				</span>
+			</label>
+			<div class="col-lg-9">
+				<div class="row">
+					<div class="col-lg-6">
+						<div class="input-group">
+							<input type="text" id="customer" value="" />
+							<span class="input-group-addon">
+								<i class="icon-search"></i>
+							</span>
 						</div>
 					</div>
-					<div class="col-lg-2">
-						<div class="data-focus">
-							<span>{l s='Total (Tax excl.)'}</span><br/>
-							<span id="total_without_taxes" class="size_l"></span>
-						</div>
+					<div class="col-lg-6">
+						<span class="form-control-static">{l s='Or'}&nbsp;</span>
+						<a class="fancybox_customer btn btn-default" href="{$link->getAdminLink('AdminCustomers')|escape:'html':'UTF-8'}&amp;addcustomer&amp;liteDisplaying=1&amp;submitFormAjax=1#">
+							<i class="icon-plus-sign-alt"></i>
+							{l s='Add new customer'}
+						</a>
 					</div>
-					<div class="col-lg-2">
-						<div class="data-focus">
-							<span>{l s='Total taxes'}</span><br/>
-							<span id="total_taxes" class="size_l"></span>
-						</div>
-					</div>
-                    <div class="col-lg-2">
-                        <div class="data-focus">
-                            <span>{l s='Total vouchers'}</span><br/>
-                            <span id="total_vouchers" class="size_l text-danger"></span>
-                        </div>
-                    </div>
-                    <div class="col-lg-2">
-                        <div class="data-focus data-focus-primary">
-                            <span>{l s='Total (Tax incl.)'}</span><br/>
-                            <span id="total_with_taxes" class="size_l"></span>
-                        </div>
-                    </div>
-                </div>
-            </div>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div id="customers"></div>
+		</div>
+		{*<div id="carts">
+			<button type="button" id="show_old_carts" class="btn btn-default pull-right" data-toggle="collapse" data-target="#old_carts_orders">
+				<i class="icon-caret-down"></i>
+			</button>
 
-            <div class="row">
-                <div class="order_message_right col-lg-12">
-                    <div class="form-group">
-                        <label class="control-label col-lg-3" for="order_message">{l s='Order message'}</label>
-                        <div class="col-lg-6">
-                            <textarea name="order_message" id="order_message" rows="3" cols="45"></textarea>
-                        </div>
-                    </div>
-                    <div class="form-group" {if $order_total <= 0}style="display: none;"{/if}>
-                        {if !$PS_CATALOG_MODE}
-                        <div class="col-lg-9 col-lg-offset-3">
-                            <a href="javascript:void(0);" id="send_email_to_customer" class="btn btn-default">
-                                <i class="icon-credit-card"></i>
-                                {l s='Send an email to the customer with the link to process the payment.'}
-                            </a>
-                            <a id="go_order_process" href="" class="btn btn-link _blank">
-                                {l s='Go on payment page to process the payment.'}
-                                <i class="icon-external-link"></i>
-                            </a>
-                        </div>
-                        {/if}
-                    </div>
-                    {if isset($smarty.post.is_full_payment)}
-                        {assign var=is_full_payment value=((bool) $smarty.post.is_full_payment)}
-                    {else}
-                        {assign var=is_full_payment value=true}
-                    {/if}
-                    <div class="form-group" {if $order_total <= 0}style="display: none;"{/if}>
-                        <label class="control-label col-lg-3">{l s="Full payment"}</label>
-                        <div class="col-lg-9">
-                            <span class="switch prestashop-switch fixed-width-lg">
-                                <input type="radio" name="is_full_payment" id="is_full_payment_on" value="1" {if $is_full_payment}checked="checked"{/if}>
-                                <label for="is_full_payment_on">{l s="Yes"}</label>
-                                <input type="radio" name="is_full_payment" id="is_full_payment_off" value="0" {if !$is_full_payment}checked="checked"{/if}>
-                                <label for="is_full_payment_off">{l s="No"}</label>
-                                <a class="slide-button btn"></a>
-                            </span>
-                            <p class="help-block">{l s='Keep this option enabled for full payment and disable it to take partial payment of the booking.'}</p>
-                        </div>
-                    </div>
-                    <div class="form-group" {if $order_total <= 0}style="display: none;"{/if}>
-                        <label class="control-label required col-lg-3">{l s='Payment amount'}</label>
-                        <div class="col-lg-9">
-                            <div class="input-group fixed-width-xxl">
-                                <span class="input-group-addon">{$currency->sign}</span>
-                                <input type="text" name="payment_amount" id="payment_amount" value="{if isset($smarty.post.payment_amount)}{$smarty.post.payment_amount|escape:'html':'UTF-8'}{elseif $is_full_payment}{$order_total}{/if}" {if $is_full_payment}disabled{/if} />
-                            </div>
-                            <p class="help-block" id="advance_payment_amount_block" {if isset($is_advance_payment_active) && $is_advance_payment_active}style="display: block;"{else}style="display: none;"{/if}>
-                                <span>{l s='Advance payment amount: '}</span>
-                                <span id="advance_payment_amount">{displayPrice price=$advance_payment_amount_with_tax currency=$currency->id}</span>
-                            </p>
-                        </div>
-                    </div>
-                    <div class="form-group" {if $order_total <= 0}style="display: none;"{/if}>
-                        <label class="control-label col-lg-3">{l s='Payment source'}</label>
-                        <div class="col-lg-9">
-                            <select class="fixed-width-xxl" name="payment_type" id="payment_type">
-                                {foreach from=$payment_types item=payment_type}
-                                    <option value="{$payment_type.value}" {if isset($smarty.post.payment_type) && $payment_type.value == $smarty.post.payment_type}selected="selected"{/if}>
-                                        {$payment_type.name}
-                                    </option>
-                                {/foreach}
-                            </select>
-                        </div>
-                    </div>
-                    <div class="form-group" {if $order_total <= 0}style="display: none;"{/if}>
-                        <label class="control-label col-lg-3 required">{l s='Payment method'}</label>
-                        <div class="col-lg-9">
-                            <input name="payment_module_name" id="payment_module_name" list="payment_module_name_list" class="form-control fixed-width-xxl" {if isset($smarty.post.payment_module_name) && $smarty.post.payment_module_name}value="{$smarty.post.payment_module_name|escape:'html':'UTF-8'}"{/if}>
-                            <datalist id="payment_module_name_list">
-                                {foreach from=$payment_modules item=payment_module}
-                                    <option value="{$payment_module->displayName}" data-name="{$payment_module->name}" data-payment-type="{$payment_module->payment_type}">
-                                {/foreach}
-                            </datalist>
-                            <p class="help-block">{l s='Select or type the payment method using which payment for booking will be made.'}</p>
-                        </div>
-                    </div>
-                    <div class="form-group" {if $order_total <= 0}style="display: none;"{/if}>
-                        <label class="control-label col-lg-3">{l s='Transaction ID'}</label>
-                        <div class="col-lg-9">
-                            <input type="text" class="fixed-width-xxl" name="payment_transaction_id" id="payment_transaction_id" value="{if isset($smarty.post.payment_transaction_id)}{$smarty.post.payment_transaction_id}{/if}" />
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <div class="col-lg-9 col-lg-offset-3">
-                            <button type="submit" name="submitAddOrder" class="btn btn-default" />
-                                <i class="icon-check"></i>
-                                {l s='Create the order'}
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </form>
+			<ul id="old_carts_orders_navtab" class="nav nav-tabs">
+				<li class="active">
+					<a href="#nonOrderedCarts" data-toggle="tab">
+						<i class="icon-shopping-cart"></i>
+						{l s='Carts'}
+					</a>
+				</li>
+				<li>
+					<a href="#lastOrders" data-toggle="tab">
+						<i class="icon-credit-card"></i>
+						{l s='Orders'}
+					</a>
+				</li>
+			</ul>
+			<div id="old_carts_orders" class="tab-content panel collapse in">
+				<div id="nonOrderedCarts" class="tab-pane active">
+					<table class="table">
+						<thead>
+							<tr>
+								<th><span class="title_box">{l s='ID'}</span></th>
+								<th><span class="title_box">{l s='Date'}</span></th>
+								<th><span class="title_box">{l s='Total'}</span></th>
+								<th></th>
+							</tr>
+						</thead>
+						<tbody>
+						</tbody>
+					</table>
+				</div>
+				<div id="lastOrders" class="tab-pane">
+					<table class="table">
+						<thead>
+							<tr>
+								<th><span class="title_box">{l s='ID'}</span></th>
+								<th><span class="title_box">{l s='Date'}</span></th>
+								<th><span class="title_box">{l s='Products'}</span></th>
+								<th><span class="title_box">{l s='Total paid'}</span></th>
+								<th><span class="title_box">{l s='Payment'}</span></th>
+								<th><span class="title_box">{l s='Status'}</span></th>
+								<th></th>
+							</tr>
+						</thead>
+						<tbody>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div> -->*}<!-- by webkul to hide unnessesary content -->
+	</div>
+
+<form class="form-horizontal" action="{$link->getAdminLink('AdminOrders')|escape:'html':'UTF-8'}&amp;submitAdd{$table|escape:'html':'UTF-8'}=1" method="post" autocomplete="off" style="display:none" id="cart_detail_form">
+	<div class="panel" id="products_part" style="display:none;">
+		<div class="panel-heading">
+			<i class="icon-shopping-cart"></i>
+			{l s='Cart'}
+		</div>
+		<div class="form-group">
+			<input type="hidden" value="{$cart->id}" id="id_cart" name="id_cart" />
+		</div>
+		{*<div class="form-group">
+			<label class="control-label col-lg-3">
+				<span title="" data-toggle="tooltip" class="label-tooltip" data-original-title="{l s='Search for an existing product by typing the first letters of its name.'}">
+					{l s='Search for a product'}
+				</span>
+			</label>
+			<div class="col-lg-9">
+				<input type="hidden" value="{$cart->id}" id="id_cart" name="id_cart" />
+				<div class="input-group">
+					<input type="text" id="product" value="" />
+					<span class="input-group-addon">
+						<i class="icon-search"></i>
+					</span>
+				</div>
+			</div>
+		</div>
+
+		<div id="products_found">
+			<hr/>
+			<div id="product_list" class="form-group"></div>
+			<div id="attributes_list" class="form-group"></div> -->
+			<!-- @TODO: please be kind refacto -->
+			<div class="form-group">
+				<div class="col-lg-9 col-lg-offset-3">
+					<iframe id="customization_list" seamless>
+						<html>
+						<head>
+							{if isset($css_files_orders)}
+								{foreach from=$css_files_orders key=css_uri item=media}
+									<link href="{$css_uri}" rel="stylesheet" type="text/css" media="{$media}" />
+								{/foreach}
+							{/if}
+						</head>
+						<body>
+						</body>
+						</html>
+					</iframe>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="control-label col-lg-3" for="qty">{l s='Quantity'}</label>
+				<div class="col-lg-9">
+					<input type="text" name="qty" id="qty" class="form-control fixed-width-sm" value="1" />
+					<p class="help-block">{l s='In stock'} <span id="qty_in_stock"></span></p>
+				</div>
+			</div>
+
+			<div class="form-group">
+				<div class="col-lg-9 col-lg-offset-3">
+					<button type="button" class="btn btn-default" id="submitAddProduct" />
+					<i class="icon-ok text-success"></i>
+					{l s='Add to cart'}
+				</div>
+			</div>
+		</div>
+
+		<div id="products_err" class="hide alert alert-danger"></div>
+
+		<hr/>
+
+		<div class="row">
+			<div class="col-lg-12">
+				<table class="table" id="customer_cart">
+					<thead>
+						<tr>
+							<th><span class="title_box">{l s='Product'}</span></th>
+							<th><span class="title_box">{l s='Description'}</span></th>
+							<th><span class="title_box">{l s='Reference'}</span></th>
+							<th><span class="title_box">{l s='Unit price'}</span></th>
+							<th><span class="title_box">{l s='Quantity'}</span></th>
+							<th><span class="title_box">{l s='Price'}</span></th>
+						</tr>
+					</thead>
+					<tbody>
+					</tbody>
+				</table>
+			</div>
+		</div>
+
+		<div class="form-group">
+			<div class="col-lg-9 col-lg-offset-3">
+				<div class="alert alert-warning">{l s='The prices are without taxes.'}</div>
+			</div>
+		</div> *}<!-- by webkul to hide unnessesary content -->
+
+
+		<div class="form-group">
+			<label class="control-label col-lg-3" for="id_currency">
+				{l s='Currency'}
+			</label>
+			<script type="text/javascript">
+				{foreach from=$currencies item='currency'}
+					currencies['{$currency.id_currency}'] = '{$currency.sign}';
+				{/foreach}
+			</script>
+			<div class="col-lg-9">
+				<select id="id_currency" name="id_currency">
+					{foreach from=$currencies item='currency'}
+						<option rel="{$currency.iso_code}" value="{$currency.id_currency}">{$currency.name}</option>
+					{/foreach}
+				</select>
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="control-label col-lg-3" for="id_lang">
+				{l s='Language'}
+			</label>
+			<div class="col-lg-9">
+				<select id="id_lang" name="id_lang">
+					{foreach from=$langs item='lang'}
+						<option value="{$lang.id_lang}">{$lang.name}</option>
+					{/foreach}
+				</select>
+			</div>
+		</div>
+	</div>
+
+	<div class="panel" id="vouchers_part" style="display:none;">
+		<div class="panel-heading">
+			<i class="icon-ticket"></i>
+			{l s='Vouchers'}
+		</div>
+		<div class="form-group">
+			<label class="control-label col-lg-3">
+				{l s='Search for a voucher'}
+			</label>
+			<div class="col-lg-9">
+				<div class="row">
+					<div class="col-lg-6">
+						<div class="input-group">
+							<input type="text" id="voucher" value="" />
+							<div class="input-group-addon">
+								<i class="icon-search"></i>
+							</div>
+						</div>
+					</div>
+					<div class="col-lg-6">
+						<span class="form-control-static">{l s='Or'}&nbsp;</span>
+						<a class="fancybox btn btn-default" href="{$link->getAdminLink('AdminCartRules')|escape:'html':'UTF-8'}&amp;addcart_rule&amp;liteDisplaying=1&amp;submitFormAjax=1#">
+							<i class="icon-plus-sign-alt"></i>
+							{l s='Add new voucher'}
+						</a>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<table class="table" id="voucher_list">
+				<thead>
+					<tr>
+						<th><span class="title_box">{l s='Name'}</span></th>
+						<th><span class="title_box">{l s='Description'}</span></th>
+						<th><span class="title_box">{l s='Value'}</span></th>
+						<th></th>
+					</tr>
+				</thead>
+				<tbody>
+				</tbody>
+			</table>
+		</div>
+		<div id="vouchers_err" class="alert alert-warning" style="display:none;"></div>
+	</div>
+
+	<div class="panel" id="address_part" style="">
+		<div class="panel-heading">
+			<i class="icon-envelope"></i>
+			{l s='Addresses'}
+		</div>
+		<div id="addresses_err" class="alert alert-warning" style="display:none;"></div>
+
+		<div class="row">
+			<div id="address_delivery" class="col-xs-6 col-sm-6">
+				<h4>
+					<i class="icon-map-marker"></i>
+					{l s='Customer Address'}
+				</h4>
+				<div class="row-margin-bottom">
+					<select id="id_address_delivery" name="id_address_delivery"></select>
+				</div>
+				<div class="well">
+					<a href="" id="edit_delivery_address" class="btn btn-default pull-right fancybox"><i class="icon-pencil"></i> {l s='Edit'}</a>
+					<div id="address_delivery_detail"></div>
+				</div>
+			</div>
+			<div id="address_invoice" class="col-lg-6 hidden">
+				<h4>
+					<i class="icon-file-text"></i>
+					{l s='Invoice'}
+				</h4>
+				<div class="row-margin-bottom">
+					<select id="id_address_invoice" name="id_address_invoice"></select>
+				</div>
+				<div class="well">
+					<a href="" id="edit_invoice_address" class="btn btn-default pull-right fancybox"><i class="icon-pencil"></i> {l s='Edit'}</a>
+					<div id="address_invoice_detail"></div>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-lg-12">
+				<a class="fancybox btn btn-default" id="new_address" href="{$link->getAdminLink('AdminAddresses')|escape:'html':'UTF-8'}&amp;addaddress&amp;id_customer=42&amp;liteDisplaying=1&amp;submitFormAjax=1#">
+					<i class="icon-plus-sign-alt"></i>
+					{l s='Add a new address'}
+				</a>
+			</div>
+		</div>
+	</div>
+	<div class="panel" id="carriers_part" style="display:none;">
+		<div class="panel-heading">
+			<i class="icon-truck"></i>
+			{l s='Shipping'}
+		</div>
+		<div id="carriers_err" style="display:none;" class="alert alert-warning"></div>
+		<div id="carrier_form">
+			<div class="form-group">
+				<label class="control-label col-lg-3">
+					{l s='Delivery option'}
+				</label>
+				<div class="col-lg-9">
+					<select name="delivery_option" id="delivery_option">
+					</select>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="control-label col-lg-3" for="shipping_price">
+					{l s='Shipping price (Tax incl.)'}
+				</label>
+				<div class="col-lg-9">
+					<p id="shipping_price" class="form-control-static" name="shipping_price"></p>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="control-label col-lg-3" for="free_shipping">
+					{l s='Free shipping'}
+				</label>
+				<div class="input-group col-lg-9 fixed-width-lg">
+					<span class="switch prestashop-switch">
+						<input type="radio" name="free_shipping" id="free_shipping" value="1">
+						<label for="free_shipping" class="radioCheck">
+							{l s='yes'}
+						</label>
+						<input type="radio" name="free_shipping" id="free_shipping_off" value="0" checked="checked">
+						<label for="free_shipping_off" class="radioCheck">
+							{l s='No'}
+						</label>
+						<a class="slide-button btn"></a>
+					</span>
+				</div>
+			</div>
+
+			{if $recyclable_pack}
+			<div class="form-group">
+				<div class="checkbox col-lg-9 col-offset-3">
+					<label for="carrier_recycled_package">
+						<input type="checkbox" name="carrier_recycled_package" value="1" id="carrier_recycled_package" />
+						{l s='Recycled package'}
+					</label>
+				</div>
+			</div>
+			{/if}
+
+			{if $gift_wrapping}
+			<div class="form-group">
+				<div class="checkbox col-lg-9 col-offset-3">
+					<label for="order_gift">
+						<input type="checkbox" name="order_gift" id="order_gift" value="1" />
+						{l s='Gift'}
+					</label>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="control-label col-lg-3" for="gift_message">{l s='Gift message'}</label>
+				<div class="col-lg-9">
+					<textarea id="gift_message" class="form-control" cols="40" rows="4"></textarea>
+				</div>
+			</div>
+			{/if}
+		</div>
+	</div>
+	<div class="panel" id="summary_part" style="display:none;">
+		<div class="panel-heading">
+			<i class="icon-align-justify"></i>
+			{l s='Summary'}
+		</div>
+
+		<div id="send_email_feedback" class="hide alert"></div>
+
+		<div id="cart_summary" class="panel row-margin-bottom text-center">
+			<div class="row">
+				<div class="col-lg-2">
+					<div class="data-focus">
+						<span>{l s='Total rooms (Tax excl.)'}</span><br/>
+						<span id="total_rooms" class="size_l text-success"></span>
+					</div>
+				</div>
+				{* <div class="col-lg-2">
+					<div class="data-focus">
+						<span>{l s='Total extra services (Tax excl.)'}</span><br/>
+						<span id="total_extra_services" class="size_l text-success"></span>
+					</div>
+				</div> *}
+				{* <div class="col-lg-2">
+					<div class="data-focus">
+						<span>{l s='Total Total service products (Tax excl.)'}</span><br/>
+						<span id="total_service_products" class="size_l text-success"></span>
+					</div>
+				</div> *}
+				<div class="col-lg-2">
+					<div class="data-focus">
+						<span>{l s='Total vouchers (Tax excl.)'}</span><br/>
+						<span id="total_vouchers" class="size_l text-danger"></span>
+					</div>
+				</div>
+				<div class="col-lg-2">
+					<div class="data-focus">
+						<span>{l s='Total (Tax excl.)'}</span><br/>
+						<span id="total_without_taxes" class="size_l"></span>
+					</div>
+				</div>
+				<div class="col-lg-2">
+					<div class="data-focus">
+						<span>{l s='Convenience fees (Tax excl.)'}</span><br/>
+						<span id="total_convenience_fees" class="size_l"></span>
+					</div>
+				</div>
+				<div class="col-lg-2">
+					<div class="data-focus">
+						<span>{l s='Total taxes'}</span><br/>
+						<span id="total_taxes" class="size_l"></span>
+					</div>
+				</div>
+				<div class="col-lg-2">
+					<div class="data-focus data-focus-primary">
+						<span>{l s='Total (Tax incl.)'}</span><br/>
+						<span id="total_with_taxes" class="size_l"></span>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="order_message_right col-lg-12">
+				<div class="form-group">
+					<label class="control-label col-lg-3" for="order_message">{l s='Order message'}</label>
+					<div class="col-lg-6">
+						<textarea name="order_message" id="order_message" rows="3" cols="45"></textarea>
+					</div>
+				</div>
+				<div class="form-group">
+					{if !$PS_CATALOG_MODE}
+					<div class="col-lg-9 col-lg-offset-3">
+						<a href="javascript:void(0);" id="send_email_to_customer" class="btn btn-default">
+							<i class="icon-credit-card"></i>
+							{l s='Send an email to the customer with the link to process the payment.'}
+						</a>
+						<a id="go_order_process" href="" class="btn btn-link _blank">
+							{l s='Go on payment page to process the payment.'}
+							<i class="icon-external-link"></i>
+						</a>
+					</div>
+					{/if}
+				</div>
+				<div class="form-group">
+					<label class="control-label col-lg-3">{l s='Payment'}</label>
+					<div class="col-lg-9">
+						<select name="payment_module_name" id="payment_module_name">
+							{if !$PS_CATALOG_MODE}
+							{foreach from=$payment_modules item='module'}
+								<option value="{$module->name}" {if isset($smarty.post.payment_module_name) && $module->name == $smarty.post.payment_module_name}selected="selected"{/if}>{$module->displayName}</option>
+							{/foreach}
+							{else}
+								<option value="boorder">{l s='Back office order'}</option>
+							{/if}
+						</select>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label col-lg-3">{l s='Order status'}</label>
+					<div class="col-lg-9">
+						<select name="id_order_state" id="id_order_state">
+							{foreach from=$order_states item='order_state'}
+								<option value="{$order_state.id_order_state}" {if isset($smarty.post.id_order_state) && $order_state.id_order_state == $smarty.post.id_order_state}selected="selected"{/if}>{$order_state.name}</option>
+							{/foreach}
+						</select>
+					</div>
+				</div>
+				<div class="form-group">
+					<div class="col-lg-9 col-lg-offset-3">
+						<button type="submit" name="submitAddOrder" class="btn btn-default" />
+							<i class="icon-check"></i>
+							{l s='Create the order'}
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</form>
 {strip}
 	{addJsDef max_child_age=$max_child_age}
 	{addJsDef max_child_in_room=$max_child_in_room}
@@ -2272,13 +2131,7 @@
 	{addJsDefL name='below_txt'}{l s='Below' js=1}{/addJsDefL}
 	{addJsDefL name='years_txt'}{l s='years' js=1}{/addJsDefL}
 	{addJsDefL name='all_children_txt'}{l s='All Children' js=1}{/addJsDefL}
-	{addJsDefL name='max_occupancy_reached_txt'}{l s='Maximum room occupancy reached' js=1}{/addJsDefL}
-	{addJsDefL name='max_adults_txt'}{l s='Maximum adult occupancy reached' js=1}{/addJsDefL}
-	{addJsDefL name='max_children_txt'}{l s='Maximum children occupancy reached' js=1}{/addJsDefL}
-	{addJsDefL name='no_children_allowed_txt'}{l s='Only adults can be accommodated' js=1}{/addJsDefL}
 	{addJsDefL name='invalid_occupancy_txt'}{l s='Invalid occupancy(adults/children) found.' js=1}{/addJsDefL}
-
-
 {/strip}
 
 <div id="loader_container">

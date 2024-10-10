@@ -17,17 +17,21 @@
 * @license LICENSE.txt
 *}
 
-{l s='This room already has a booking for the selected date range.'}
-<div class="row">
-    <div class="col-xs-12">
-        <span class="error_message_label">{l s='Order ID'}:</span> <a href="{$link->getAdminLink('AdminOrders')}&id_order={$orderDetails->id_order}&vieworder" target="_blank"><strong>#{$orderDetails->id_order|intval}</strong></a>
-    </div>
-    <div class="col-xs-12">
-        <span class="error_message_label">{l s='Date From'}:</span> {dateFormat date=$orderDetails->date_from}
-    </div>
-    <div class="col-xs-12">
-        <span class="error_message_label">{l s='Date To'}:</span> {dateFormat date=$orderDetails->date_to}
-    </div>
-    <div>
-    </div>
-</div>
+{l s='This room already has bookings for highlighted date range(s):'}
+
+<table width="70%">
+    <tr>
+        <th class="text-center">{l s='Order ID'}</th>
+        <th class="text-center">{l s='Date From'}</th>
+        <th class="text-center">{l s='Date To'}</th>
+    </tr>
+    {foreach from=$booked_rows_list item=booked_row}
+        <tr>
+            <td class="text-center">
+                <a href="{$link->getAdminLink('AdminOrders')}&id_order={$booked_row->id_order}&vieworder" target="_blank"><strong>#{$booked_row->id_order|intval}</strong></a>
+            </td>
+            <td class="text-center">{dateFormat date=$booked_row->date_from}</td>
+            <td class="text-center">{dateFormat date=$booked_row->date_to}</td>
+        </tr>
+    {/foreach}
+</table>

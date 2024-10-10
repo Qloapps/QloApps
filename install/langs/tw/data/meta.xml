@@ -19,9 +19,9 @@
     <url_rewrite>contact-us</url_rewrite>
   </meta>
   <meta id="index" id_shop="1">
-    <title>Prime 酒店</title>
-    <description>一個舒適與奢華與自然融合的地方！</description>
-    <keywords/>
+    <title/>
+    <description>網站以 PrestaShop 建置</description>
+    <keywords>shop, prestashop</keywords>
     <url_rewrite/>
   </meta>
   <meta id="manufacturer" id_shop="1">
@@ -95,12 +95,6 @@
     <description/>
     <keywords/>
     <url_rewrite>order-history</url_rewrite>
-  </meta>
-  <meta id="order-detail" id_shop="1">
-    <title>預訂明細</title>
-    <description/>
-    <keywords/>
-    <url_rewrite>yùdìng-míngxi</url_rewrite>
   </meta>
   <meta id="identity" id_shop="1">
     <title>識別</title>

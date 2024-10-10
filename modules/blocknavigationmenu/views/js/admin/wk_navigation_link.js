@@ -37,12 +37,6 @@ $(document).ready(function() {
 			$(".custom_redirect_page_div").removeClass('hidden');
 		}
 	});
-
-	$(document).on('change', '#id_cms_category', function(){
-		var id_cat = parseInt($('#id_cms_category').val());
-		$('.cms_pages_table').hide();
-		$('#cms_pages_table_'+id_cat).show();
-	});
 });
 
 function showNavigationLinkLangField(lang_iso_code, id_lang)

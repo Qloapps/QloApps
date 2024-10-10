@@ -141,17 +141,18 @@ class AdminOrderRefundRulesController extends ModuleAdminController
         $smartyVars = array();
         $objCurrency = new Currency(Configuration::get('PS_CURRENCY_DEFAULT'));
         $smartyVars['objCurrency'] = $objCurrency;
-        if (($refundRuleInfo = $this->loadObject(true))
-            && $this->object->id
+
+        if ($this->display == 'edit'
+            && $refundRuleInfo = $this->loadObject(true)
         ) {
             $smartyVars['edit'] = 1;
             $idRefundRule = Tools::getValue('id_refund_rule');
             $objRefundRule = new HotelOrderRefundRules();
-            $smartyVars['refund_rules_info'] = (array) $refundRuleInfo;
+            $smartyVars['refund_rules_info'] = (array)$refundRuleInfo;
         }
 
         //lang vars
-        $currentLangId = $this->default_form_language ? $this->default_form_language : Configuration::get('PS_LANG_DEFAULT');
+        $currentLangId = Configuration::get('PS_LANG_DEFAULT');
         $smartyVars['languages'] = Language::getLanguages(false);
         $smartyVars['currentLang'] = Language::getLanguage((int) $currentLangId);
 
@@ -212,10 +213,10 @@ class AdminOrderRefundRulesController extends ModuleAdminController
         if ($paymentType == '') {
             $this->errors[] = $this->l('Invalid payment type.');
         }
-        if (!$fullPayAmount && floatval($fullPayAmount) != 0) {
+        if (!$fullPayAmount) {
             $this->errors[] = $this->l('Enter deduction value for full payment.');
         }
-        if (!$advPayAmount && floatval($advPayAmount) != 0) {
+        if (!$advPayAmount) {
             $this->errors[] = $this->l('Enter deduction value for advance payment.');
         }
 
@@ -243,6 +244,14 @@ class AdminOrderRefundRulesController extends ModuleAdminController
             $this->errors[] = $this->l('Enter number of days before check-in date for this rule to be applicable.');
         } else if (!Validate::isUnsignedInt($cancelationDays)) {
             $this->errors[] = $this->l('Enter valid number of days.');
+        } else if ($objRefundRule->checkIfRuleExistsByCancelationdays($cancelationDays)) {
+            if ($idRefundRule) {
+                if ($objRefundRule->days != $cancelationDays) {
+                    $this->errors[] = $this->l('Refund rule for ').$cancelationDays.$this->l(' days already exists.');
+                }
+            } else {
+                $this->errors[] = $this->l('Refund rule for ').$cancelationDays.$this->l(' days already exists.');
+            }
         }
 
         if (!count($this->errors)) {

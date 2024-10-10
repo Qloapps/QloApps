@@ -216,16 +216,6 @@ class AdminFeaturesControllerCore extends AdminController
             'title' => $this->l('Save'),
         );
 
-        $this->fields_form['buttons'] = array(
-            'save-and-stay' => array(
-                'title' => $this->l('Save and stay'),
-                'name' => 'submitAdd'.$this->table.'AndStay',
-                'type' => 'submit',
-                'class' => 'btn btn-default pull-right',
-                'icon' => 'process-icon-save',
-            )
-        );
-
         return parent::renderForm();
     }
 
@@ -452,9 +442,10 @@ class AdminFeaturesControllerCore extends AdminController
             $this->initToolbar();
             $this->initPageHeaderToolbar();
             if ($this->display == 'edit' || $this->display == 'add') {
-                if ($this->loadObject(true)) {
-                    $this->content .= $this->renderForm();
+                if (!$this->loadObject(true)) {
+                    return;
                 }
+                $this->content .= $this->renderForm();
             } elseif ($this->display == 'view') {
                 // Some controllers use the view action without an object
                 if ($this->className) {
@@ -553,9 +544,9 @@ class AdminFeaturesControllerCore extends AdminController
             if ($this->table == 'feature_value' && ($this->display == 'edit' || $this->display == 'add')) {
                 $this->redirect_after = self::$currentIndex.'&addfeature_value&id_feature='.(int)Tools::getValue('id_feature').'&token='.$this->token;
             } else {
-                $this->redirect_after = self::$currentIndex.'&'.$this->identifier.'='.(int) $object->id.'&conf=3&update'.$this->table.'&token='.$this->token;
+                $this->redirect_after = self::$currentIndex.'&'.$this->identifier.'=&conf=3&update'.$this->table.'&token='.$this->token;
             }
-        } elseif (Tools::isSubmit('submitAdd'.$this->table.'AndStay') && count($this->errors) && $this->table == 'feature_value') { // enter only if feature is submitted
+        } elseif (Tools::isSubmit('submitAdd'.$this->table.'AndStay') && count($this->errors)) {
             $this->display = 'editFeatureValue';
         }
 
@@ -571,7 +562,7 @@ class AdminFeaturesControllerCore extends AdminController
         $object = parent::processUpdate();
 
         if (Tools::isSubmit('submitAdd'.$this->table.'AndStay') && !count($this->errors)) {
-            $this->redirect_after = self::$currentIndex.'&'.$this->identifier.'='.(int) Tools::getValue('id_feature').'&conf=4&update'.$this->table.'&token='.$this->token;
+            $this->redirect_after = self::$currentIndex.'&'.$this->identifier.'=&conf=3&update'.$this->table.'&token='.$this->token;
         }
 
         return $object;

@@ -195,12 +195,10 @@ class AdminInvoicesControllerCore extends AdminController
         );
 
         $result = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS('
-			SELECT COUNT(DISTINCT(o.id_order)) AS nbOrders, o.current_state as id_order_state
+			SELECT COUNT( o.id_order ) AS nbOrders, o.current_state as id_order_state
 			FROM `'._DB_PREFIX_.'order_invoice` oi
 			LEFT JOIN `'._DB_PREFIX_.'orders` o ON oi.id_order = o.id_order
-            INNER JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd ON (oi.id_order = hbd.id_order)
 			WHERE o.id_shop IN('.implode(', ', Shop::getContextListShopID()).')
-            '.HotelBranchInformation::addHotelRestriction(false, 'hbd').'
 			AND oi.number > 0
 			GROUP BY o.current_state
 		 ');
@@ -326,11 +324,4 @@ class AdminInvoicesControllerCore extends AdminController
 
         return $templates;
     }
-
-    public function setMedia()
-    {
-        parent::setMedia();
-        $this->addJS(_PS_JS_DIR_.'admin/invoices.js');
-    }
-
 }

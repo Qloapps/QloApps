@@ -31,7 +31,7 @@
 /* end */
 #dashactivity .activity-section {
 	position: relative;
-	padding-bottom: 10px;
+	padding-bottom: 2px;
 	margin-bottom: 15px;
 	border-bottom: 2px solid #D3D8DB;
 }
@@ -39,13 +39,15 @@
 #dashactivity .title span {
 	margin-bottom: 4px;
 	font-weight: bold;
-	font-size: 16px;
+	font-size: 18px;
 	color: #555555;
 }
 
-#dashactivity .dash-live {
-	display: flex;
-	justify-content: space-between;
+#dashactivity .value {
+	position: absolute;
+	top: 0;
+	right: 0;
+	text-align: right;
 }
 
 #dashactivity .value span {
@@ -73,18 +75,13 @@
 	padding-top: 10px;
 }
 
-#dashactivity .stats-list > li {
-	display: flex;
-	justify-content: space-between;
-}
-
 #dashactivity .stats-list > li:not(:last-child) {
 	margin-bottom: 10px;
 }
 
 #dashactivity .stats-list .item-label span {
 	margin-bottom: 4px;
-	font-size: 14px;
+	font-size: 16px;
 	color: #555555;
 }
 
@@ -93,9 +90,15 @@
 	font-weight: bold;
 }
 
+#dashactivity .stats-list .item-value {
+	position: absolute;
+	right: 0;
+	text-align: right;
+}
+
 #dashactivity .stats-list .item-value span {
 	font-weight: bold;
-	font-size: 16px;
+	font-size: 18px;
 	text-align: right;
 	color: #555555;
 }

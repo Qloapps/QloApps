@@ -65,7 +65,7 @@
 				margin-bottom: 0 !important
 			#addressInvoice
 				width: 49% !important
-				float: right !important
+				float: right !important	
 				margin-bottom: 0 !important
 			#status
 				tr:first-child td
@@ -81,14 +81,15 @@
 				i
 					display: none !important
 			.kpi-container.panel
+				margin: 30px 0 20px 0 !important
 				border: solid 1px black !important
-				.actions-wrap
-					display: none
 				.box-stats
+					padding: 10px 0 !important
 					height: auto !important
+					width: 25% !important
 					font-size: 8pt !important
-					span.arrow
-						display: none
+					i
+						font-size: 20pt !important
 			.alert
 				border: 1px solid black !important
 				&:before
@@ -98,38 +99,3 @@
 				margin: 0 !important
 			.panel-total td
 				font-size: 13pt!important
-
-
-			#customer_cart_details
-				thead
-					display: none
-				tr
-					display: block
-					border: 1px solid #ccc
-					-webkit-box-shadow: #EAEDEF 0 2px 0 0
-					box-shadow: #EAEDEF 0 2px 0 0
-					width: 100%
-					margin-bottom: 6px
-				td
-					display: block
-					display: grid
-					grid-template-columns: 2fr 3fr
-					text-align: center !important
-					position: relative
-					width: 100% !important
-					text-align: left !important
-					line-height: 2em !important
-					font-size: 1.15em !important
-					white-space: nowrap
-					overflow: hidden
-					text-overflow: ellipsis
-					> span
-						padding: 0px 5px
-					> span:nth-child(1)
-						border-right: 1px solid #EAEDEF
-						padding-right: 10px
-						white-space: nowrap
-						color: #aaa
-						text-align: right
-						font-size: .9em
-						font-style: italic

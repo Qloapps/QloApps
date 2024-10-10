@@ -19,9 +19,9 @@
     <url_rewrite>contactanos</url_rewrite>
   </meta>
   <meta id='index' id_shop='1'>
-    <title>Hotel Prime</title>
-    <description>¡Un lugar donde el confort y el lujo se mezclan con la naturaleza!</description>
-    <keywords/>
+    <title/>
+    <description>Tienda creada con PrestaShop</description>
+    <keywords>tienda, prestashop</keywords>
     <url_rewrite/>
   </meta>
   <meta id='manufacturer' id_shop='1'>
@@ -95,12 +95,6 @@
     <description/>
     <keywords/>
     <url_rewrite>historial-compra</url_rewrite>
-  </meta>
-  <meta id="order-detail" id_shop="1">
-    <title>Detalle de reserva</title>
-    <description/>
-    <keywords/>
-    <url_rewrite>detalle-de-reserva</url_rewrite>
   </meta>
   <meta id='identity' id_shop='1'>
     <title>Datos personales</title>

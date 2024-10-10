@@ -48,8 +48,6 @@ class OrderSlipControllerCore extends FrontController
      */
     public function initContent()
     {
-        $this->show_breadcrump = true;
-
         parent::initContent();
 
         $this->context->smarty->assign('ordersSlip', OrderSlip::getOrdersSlip((int)$this->context->cookie->id_customer));

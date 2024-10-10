@@ -134,20 +134,6 @@ class QhrHotelReviewDb
         );
     }
 
-    public static function truncateUserData()
-    {
-        $userTables = array('qhr_hotel_review',
-            'qhr_review_category_rating',
-            'qhr_review_usefulness',
-            'qhr_review_report',
-            'qhr_review_reply'
-        );
-        foreach ($userTables as $table) {
-            DB::getInstance()->execute('TRUNCATE TABLE `'._DB_PREFIX_.bqSQL($table).'`');
-        }
-        QhrHotelReview::cleanImagesDirectory();
-    }
-
     public static function getModuleDefaultConfig()
     {
         return array(

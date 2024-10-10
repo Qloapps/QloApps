@@ -413,7 +413,7 @@ class OrderInvoiceCore extends ObjectModel
         // 	- 'total_price_tax_excl'
         // 	- 'total_amount'
         $breakdown = array();
-        $order_detail = $this->getProducts();
+        $order_detail = $order->getOrderDetailList();
         $order_detail = array_filter($order_detail, function($v) {
             return ($v['is_booking_product']
                 || ($v['product_auto_add']
@@ -443,27 +443,23 @@ class OrderInvoiceCore extends ObjectModel
             $details = $grouped_details;
         }
         foreach ($details as $row) {
-            if (!$sum_composite_taxes) {
-                $key = $row['id_tax'];
-            } else {
-                $key = sprintf('%.3f', $row['tax_rate']);
-            }
-            if (!isset($breakdown[$key])) {
-                $breakdown[$key] = array(
+            $rate = sprintf('%.3f', $row['tax_rate']);
+            if (!isset($breakdown[$rate])) {
+                $breakdown[$rate] = array(
                     'total_price_tax_excl' => 0,
                     'total_amount' => 0,
                     'id_tax' => $row['id_tax'],
-                    'rate' => sprintf('%.3f', $row['tax_rate']),
+                    'rate' => $rate,
                 );
             }
 
-            $breakdown[$key]['total_price_tax_excl'] += $row['total_tax_base'];
-            $breakdown[$key]['total_amount'] += $row['total_amount'];
+            $breakdown[$rate]['total_price_tax_excl'] += $row['total_tax_base'];
+            $breakdown[$rate]['total_amount'] += $row['total_amount'];
         }
 
-        foreach ($breakdown as $key => $data) {
-            $breakdown[$key]['total_price_tax_excl'] = Tools::ps_round($data['total_price_tax_excl'], _PS_PRICE_COMPUTE_PRECISION_, $order->round_mode);
-            $breakdown[$key]['total_amount'] = Tools::ps_round($data['total_amount'], _PS_PRICE_COMPUTE_PRECISION_, $order->round_mode);
+        foreach ($breakdown as $rate => $data) {
+            $breakdown[$rate]['total_price_tax_excl'] = Tools::ps_round($data['total_price_tax_excl'], _PS_PRICE_COMPUTE_PRECISION_, $order->round_mode);
+            $breakdown[$rate]['total_amount'] = Tools::ps_round($data['total_amount'], _PS_PRICE_COMPUTE_PRECISION_, $order->round_mode);
         }
 
         ksort($breakdown);
@@ -482,7 +478,7 @@ class OrderInvoiceCore extends ObjectModel
         // 	- 'total_price_tax_excl'
         // 	- 'total_amount'
         $breakdown = array();
-        $order_detail = $this->getProducts();
+        $order_detail = $order->getOrderDetailList();
         $order_detail = array_filter($order_detail, function($v) {
             return (!$v['is_booking_product'] && !$v['product_auto_add'] && $v['product_service_type'] == Product::SERVICE_PRODUCT_WITH_ROOMTYPE);
         });
@@ -507,27 +503,23 @@ class OrderInvoiceCore extends ObjectModel
             $details = $grouped_details;
         }
         foreach ($details as $row) {
-            if (!$sum_composite_taxes) {
-                $key = $row['id_tax'];
-            } else {
-                $key = sprintf('%.3f', $row['tax_rate']);
-            }
-            if (!isset($breakdown[$key])) {
-                $breakdown[$key] = array(
+            $rate = sprintf('%.3f', $row['tax_rate']);
+            if (!isset($breakdown[$rate])) {
+                $breakdown[$rate] = array(
                     'total_price_tax_excl' => 0,
                     'total_amount' => 0,
                     'id_tax' => $row['id_tax'],
-                    'rate' => sprintf('%.3f', $row['tax_rate']),
+                    'rate' => $rate,
                 );
             }
 
-            $breakdown[$key]['total_price_tax_excl'] += $row['total_tax_base'];
-            $breakdown[$key]['total_amount'] += $row['total_amount'];
+            $breakdown[$rate]['total_price_tax_excl'] += $row['total_tax_base'];
+            $breakdown[$rate]['total_amount'] += $row['total_amount'];
         }
 
-        foreach ($breakdown as $key => $data) {
-            $breakdown[$key]['total_price_tax_excl'] = Tools::ps_round($data['total_price_tax_excl'], _PS_PRICE_COMPUTE_PRECISION_, $order->round_mode);
-            $breakdown[$key]['total_amount'] = Tools::ps_round($data['total_amount'], _PS_PRICE_COMPUTE_PRECISION_, $order->round_mode);
+        foreach ($breakdown as $rate => $data) {
+            $breakdown[$rate]['total_price_tax_excl'] = Tools::ps_round($data['total_price_tax_excl'], _PS_PRICE_COMPUTE_PRECISION_, $order->round_mode);
+            $breakdown[$rate]['total_amount'] = Tools::ps_round($data['total_amount'], _PS_PRICE_COMPUTE_PRECISION_, $order->round_mode);
         }
 
         ksort($breakdown);
@@ -546,7 +538,7 @@ class OrderInvoiceCore extends ObjectModel
         // 	- 'total_price_tax_excl'
         // 	- 'total_amount'
         $breakdown = array();
-        $order_detail = $this->getProducts();
+        $order_detail = $order->getOrderDetailList();
         $order_detail = array_filter($order_detail, function($v) {
             return (!$v['is_booking_product']
                 && $v['product_auto_add']
@@ -577,27 +569,23 @@ class OrderInvoiceCore extends ObjectModel
         }
 
         foreach ($details as $row) {
-            if (!$sum_composite_taxes) {
-                $key = $row['id_tax'];
-            } else {
-                $key = sprintf('%.3f', $row['tax_rate']);
-            }
-            if (!isset($breakdown[$key])) {
-                $breakdown[$key] = array(
+            $rate = sprintf('%.3f', $row['tax_rate']);
+            if (!isset($breakdown[$rate])) {
+                $breakdown[$rate] = array(
                     'total_price_tax_excl' => 0,
                     'total_amount' => 0,
                     'id_tax' => $row['id_tax'],
-                    'rate' => sprintf('%.3f', $row['tax_rate']),
+                    'rate' => $rate,
                 );
             }
 
-            $breakdown[$key]['total_price_tax_excl'] += $row['total_tax_base'];
-            $breakdown[$key]['total_amount'] += $row['total_amount'];
+            $breakdown[$rate]['total_price_tax_excl'] += $row['total_tax_base'];
+            $breakdown[$rate]['total_amount'] += $row['total_amount'];
         }
 
-        foreach ($breakdown as $key => $data) {
-            $breakdown[$key]['total_price_tax_excl'] = Tools::ps_round($data['total_price_tax_excl'], _PS_PRICE_COMPUTE_PRECISION_, $order->round_mode);
-            $breakdown[$key]['total_amount'] = Tools::ps_round($data['total_amount'], _PS_PRICE_COMPUTE_PRECISION_, $order->round_mode);
+        foreach ($breakdown as $rate => $data) {
+            $breakdown[$rate]['total_price_tax_excl'] = Tools::ps_round($data['total_price_tax_excl'], _PS_PRICE_COMPUTE_PRECISION_, $order->round_mode);
+            $breakdown[$rate]['total_amount'] = Tools::ps_round($data['total_amount'], _PS_PRICE_COMPUTE_PRECISION_, $order->round_mode);
         }
 
         ksort($breakdown);
@@ -616,7 +604,7 @@ class OrderInvoiceCore extends ObjectModel
         // 	- 'total_price_tax_excl'
         // 	- 'total_amount'
         $breakdown = array();
-        $order_detail = $this->getProducts();
+        $order_detail = $order->getOrderDetailList();
         $order_detail = array_filter($order_detail, function($v) {
             return (!$v['is_booking_product'] && $v['product_service_type'] == Product::SERVICE_PRODUCT_WITHOUT_ROOMTYPE);
         });
@@ -641,27 +629,23 @@ class OrderInvoiceCore extends ObjectModel
             $details = $grouped_details;
         }
         foreach ($details as $row) {
-            if (!$sum_composite_taxes) {
-                $key = $row['id_tax'];
-            } else {
-                $key = sprintf('%.3f', $row['tax_rate']);
-            }
-            if (!isset($breakdown[$key])) {
-                $breakdown[$key] = array(
+            $rate = sprintf('%.3f', $row['tax_rate']);
+            if (!isset($breakdown[$rate])) {
+                $breakdown[$rate] = array(
                     'total_price_tax_excl' => 0,
                     'total_amount' => 0,
                     'id_tax' => $row['id_tax'],
-                    'rate' => $key,
+                    'rate' => $rate,
                 );
             }
 
-            $breakdown[$key]['total_price_tax_excl'] += $row['total_tax_base'];
-            $breakdown[$key]['total_amount'] += $row['total_amount'];
+            $breakdown[$rate]['total_price_tax_excl'] += $row['total_tax_base'];
+            $breakdown[$rate]['total_amount'] += $row['total_amount'];
         }
 
-        foreach ($breakdown as $key => $data) {
-            $breakdown[$key]['total_price_tax_excl'] = Tools::ps_round($data['total_price_tax_excl'], _PS_PRICE_COMPUTE_PRECISION_, $order->round_mode);
-            $breakdown[$key]['total_amount'] = Tools::ps_round($data['total_amount'], _PS_PRICE_COMPUTE_PRECISION_, $order->round_mode);
+        foreach ($breakdown as $rate => $data) {
+            $breakdown[$rate]['total_price_tax_excl'] = Tools::ps_round($data['total_price_tax_excl'], _PS_PRICE_COMPUTE_PRECISION_, $order->round_mode);
+            $breakdown[$rate]['total_amount'] = Tools::ps_round($data['total_amount'], _PS_PRICE_COMPUTE_PRECISION_, $order->round_mode);
         }
 
         ksort($breakdown);
@@ -674,10 +658,8 @@ class OrderInvoiceCore extends ObjectModel
             $order = $this->getOrder();
         }
         $breakdown = array();
-        $order_details = $this->getProducts();
         $objBookingDemand = new HotelBookingDemands();
-        $order_details = array_column($order_details, 'id_order_detail');
-        $details = $objBookingDemand->getExtraDemandsTaxesDetails($order->id, $order_details);
+        $details = $objBookingDemand->getExtraDemandsTaxesDetails($order->id);
         if (!$this->useOneAfterAnotherTaxComputationMethod()) {
             $grouped_details = array();
             foreach ($details as $row) {
@@ -711,18 +693,17 @@ class OrderInvoiceCore extends ObjectModel
             }
         } else {
             foreach ($details as $row) {
-                $key = $row['id_tax'];
                 $rate = sprintf('%.3f', $row['rate']);
-                if (!isset($breakdown[$key])) {
-                    $breakdown[$key] = array(
+                if (!isset($breakdown[$rate])) {
+                    $breakdown[$rate] = array(
                         'total_price_tax_excl' => 0,
                         'total_amount' => 0,
                         'id_tax' => $row['id_tax'],
-                        'rate' => $rate,
+                        'rate' =>$rate,
                     );
                 }
-                $breakdown[$key]['total_price_tax_excl'] += $row['total_tax_base'];
-                $breakdown[$key]['total_amount'] += $row['total_amount'];
+                $breakdown[$rate]['total_price_tax_excl'] += $row['total_tax_base'];
+                $breakdown[$rate]['total_amount'] += $row['total_amount'];
             }
         }
         foreach ($breakdown as $rate => $data) {
@@ -906,11 +887,9 @@ class OrderInvoiceCore extends ObjectModel
 			SELECT oi.*
 			FROM `'._DB_PREFIX_.'order_invoice` oi
 			LEFT JOIN `'._DB_PREFIX_.'orders` o ON (o.`id_order` = oi.`id_order`)
-            INNER JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd ON (oi.id_order = hbd.id_order)
 			WHERE DATE_ADD(oi.date_add, INTERVAL -1 DAY) <= \''.pSQL($date_to).'\'
 			AND oi.date_add >= \''.pSQL($date_from).'\'
-			'.Shop::addSqlRestriction(Shop::SHARE_ORDER, 'o')
-            .HotelBranchInformation::addHotelRestriction(false, 'hbd').'
+			'.Shop::addSqlRestriction(Shop::SHARE_ORDER, 'o').'
 			AND oi.number > 0
 			ORDER BY oi.date_add ASC
 		');
@@ -929,10 +908,8 @@ class OrderInvoiceCore extends ObjectModel
 			SELECT oi.*
 			FROM `'._DB_PREFIX_.'order_invoice` oi
 			LEFT JOIN `'._DB_PREFIX_.'orders` o ON (o.`id_order` = oi.`id_order`)
-            INNER JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd ON (oi.id_order = hbd.id_order)
 			WHERE '.(int)$id_order_state.' = o.current_state
-			'.Shop::addSqlRestriction(Shop::SHARE_ORDER, 'o')
-            .HotelBranchInformation::addHotelRestriction(false, 'hbd').'
+			'.Shop::addSqlRestriction(Shop::SHARE_ORDER, 'o').'
 			AND oi.number > 0
 			ORDER BY oi.`date_add` ASC
 		');
@@ -1011,24 +988,12 @@ class OrderInvoiceCore extends ObjectModel
     {
         $cache_id = 'order_invoice_paid_'.(int)$this->id;
         if (!Cache::isStored($cache_id)) {
-            $objOrder = new Order($this->id_order);
             $amount = 0;
-
             $payments = OrderPaymentDetail::getByInvoiceId($this->id);
             foreach ($payments as $payment) {
                 /** @var OrderPayment $payment */
-                if ($payment['id_currency'] == $objOrder->id_currency) {
-                    $amount += $payment['amount'];
-                } else {
-                    $amountConverted = Tools::convertPrice($payment['amount'], $payment['id_currency'], false);
-                    if ($objOrder->id_currency == Configuration::get('PS_CURRENCY_DEFAULT')) {
-                        $amount += $amountConverted;
-                    } else {
-                        $amount += Tools::convertPrice($amountConverted, $objOrder->id_currency, true);
-                    }
-                }
+                $amount += $payment['amount'];
             }
-
             Cache::store($cache_id, $amount);
             return $amount;
         }

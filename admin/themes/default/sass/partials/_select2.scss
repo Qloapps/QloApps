@@ -86,7 +86,7 @@ Version: 3.4.6 Timestamp: Sat Mar 22 22:30:15 EDT 2014
     text-decoration: none;
 
     border: 0;
-    background: url('#{$img-path}/select2.png') right top no-repeat;
+    background: url('../img/select2.png') right top no-repeat;
     cursor: pointer;
     outline: 0;
 }
@@ -182,7 +182,7 @@ Version: 3.4.6 Timestamp: Sat Mar 22 22:30:15 EDT 2014
     display: block;
     width: 100%;
     height: 100%;
-    background: url('#{$img-path}/select2.png') no-repeat 0 1px;
+    background: url('../img/select2.png') no-repeat 0 1px;
 }
 
 .select2-search {
@@ -215,8 +215,8 @@ Version: 3.4.6 Timestamp: Sat Mar 22 22:30:15 EDT 2014
     -webkit-box-shadow: none;
             box-shadow: none;
 
-    background: #fff url('#{$img-path}/select2.png') no-repeat 100% -22px;
-    background: url('#{$img-path}/select2.png') no-repeat 100% -22px;
+    background: #fff url('../img/select2.png') no-repeat 100% -22px;
+    background: url('../img/select2.png') no-repeat 100% -22px;
 }
 
 .select2-drop.select2-drop-above .select2-search input {
@@ -224,8 +224,8 @@ Version: 3.4.6 Timestamp: Sat Mar 22 22:30:15 EDT 2014
 }
 
 .select2-search input.select2-active {
-    background: #fff url('#{$img-path}/select2-spinner.gif') no-repeat 100%;
-    background: url('#{$img-path}/select2-spinner.gif') no-repeat 100%;
+    background: #fff url('../img/select2-spinner.gif') no-repeat 100%;
+    background: url('../img/select2-spinner.gif') no-repeat 100%;
 }
 
 .select2-container-active .select2-choice,
@@ -369,7 +369,7 @@ disabled look for disabled choices in the results dropdown
 }
 
 .select2-more-results.select2-active {
-    background: #f4f4f4 url('#{$img-path}/select2-spinner.gif') no-repeat 100%;
+    background: #f4f4f4 url('../img/select2-spinner.gif') no-repeat 100%;
 }
 
 .select2-more-results {
@@ -456,7 +456,7 @@ html[dir="rtl"] .select2-container-multi .select2-choices li
 }
 
 .select2-container-multi .select2-choices .select2-search-field input.select2-active {
-    background: #fff url('#{$img-path}/select2-spinner.gif') no-repeat 100% !important;
+    background: #fff url('../img/select2-spinner.gif') no-repeat 100% !important;
 }
 
 .select2-default {
@@ -512,7 +512,7 @@ html[dir="rtl"] .select2-container-multi .select2-choices .select2-search-choice
 
     font-size: 1px;
     outline: none;
-    background: url('#{$img-path}/select2.png') right top no-repeat;
+    background: url('../img/select2.png') right top no-repeat;
 }
 html[dir="rtl"] .select2-search-choice-close {
     right: auto;
@@ -590,7 +590,7 @@ html[dir="rtl"] .select2-search-choice-close {
     .select2-search-choice-close,
     .select2-container .select2-choice abbr,
     .select2-container .select2-choice .select2-arrow b {
-        background-image: url('#{$img-path}/select2x2.png') !important;
+        background-image: url('../img/select2x2.png') !important;
         background-repeat: no-repeat !important;
         background-size: 60px 40px !important;
     }
@@ -607,7 +607,7 @@ html[dir="rtl"] .select2-search-choice-close {
 }
 
 .form-control .select2-choice .select2-arrow {
-    border-radius: 0 2px 2px 0;
+    border-radius: 0 2px 2px 0;   
 }
 
 .form-control.select2-container {

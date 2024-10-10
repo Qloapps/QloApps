@@ -37,7 +37,7 @@ class StatsVisits extends ModuleGraph
     {
         $this->name = 'statsvisits';
         $this->tab = 'analytics_stats';
-        $this->version = '1.6.3';
+        $this->version = '1.6.2';
         $this->author = 'PrestaShop';
         $this->need_instance = 0;
 
@@ -137,12 +137,9 @@ class StatsVisits extends ModuleGraph
     {
         switch ($option) {
             case 3:
-                if (Tools::getValue('export')) {
-                    $this->_titles['main'][] = $this->l('Date');
-                }
-
-                $this->_titles['main'][] = $this->l('Visits');
-                $this->_titles['main'][] = $this->l('Number of visits and unique visitors');
+                $this->_titles['main'][0] = $this->l('Visits');
+                $this->_titles['main'][1] = $this->l('Number of visits and unique visitors');
+                $this->_titles['main'][2] = $this->l('Visitors');
                 $this->query[0] = 'SELECT date_add, COUNT(`date_add`) as total
 					FROM `'._DB_PREFIX_.'connections`
 					WHERE 1
@@ -160,7 +157,6 @@ class StatsVisits extends ModuleGraph
     protected function getData($layers)
     {
         $this->setDateGraph($layers, true);
-        $this->_formats['y'] = 'd';
     }
 
     protected function setAllTimeValues($layers)

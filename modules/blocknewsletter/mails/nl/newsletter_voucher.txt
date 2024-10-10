@@ -1,0 +1,11 @@
+
+[{shop_url}]
+
+Hallo,
+
+Naar aanleiding van uw nieuwsbrief inschrijving bieden wij u graag
+de volgende waardebon aan: {discount}
+
+{shop_name} [{shop_url}] gebouwd met
+Webkul(tm) [https://webkul.com]
+

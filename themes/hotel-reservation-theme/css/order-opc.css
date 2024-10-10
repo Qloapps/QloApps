@@ -167,8 +167,7 @@
 }
 #order-opc .room_type_old_price {
 	text-decoration: line-through;
-	color:#FF4B4B;
-	display: block;
+	color:#979797;
 	font-size:12px;
 }
 #order-opc .block-small-header {
@@ -234,32 +233,8 @@
 	font-size: 24px;
 	color: #333333;
 }
-.order-detail-content .room_price_detail_block{
-	clear: both;
-}
-.order-detail-content .room_price_detail_block .plus-sign:after{
+.order-detail-content .room_price_detail_block .plus-sign, .order-detail-content .product_price_detail_block .plus-sign {
 	color: #777;
-	content: '+';
-}
-.room_price_detail_block .demand_total_price, .room_price_detail_block .total_price {
-	line-height: 28px;
-}
-
-@media (max-width: 1199px) {
-	.order-detail-content .room_price_detail_block .plus-sign:after{
-		transform: translate(5px, 0px);
-	}
-}
-@media (max-width: 430px) {
-	.order-detail-content .room_price_detail_block .plus-sign:after{
-		transform: translate(15px, 0px);
-	}
-}
-.room_price_detail_block .price_block .total_price, .room_price_detail_block .demand_price_block .demand_total_price{
-	word-break: break-word;
-}
-.order-detail-content .room_price_detail_block .plus-sign{
-	display: flex;
 }
 .product_price_detail_block .product_quantity_block, .product_price_detail_block .price_block {
 	display: inline-block;
@@ -283,8 +258,10 @@
     border-radius: 6px;
 }
 .order-detail-content .cart_section_title {
-	font-size: 14px;
-	text-transform: capitalize;
+	font-size: 12px;
+	color: #777777;
+	text-transform: uppercase;
+	font-family: OpenSans-Semibold;
 }
 .order-detail-content .room_unit_price{
 	font-size: 24px;
@@ -432,15 +409,14 @@
     font-size: 14px;
     color: #0000FF;
 }
+#order-opc .avail_vouchers_block .avail_voucher_des {
+	font-size: 12px;
+	color: #777777;
+	margin-bottom: 2px;
+}
 #order-opc .avail_vouchers_block .seperator {
 	margin-top: 10px;
     margin-bottom: 10px;
-}
-#order-opc .cart_total_detail_block hr {
-	margin: 9px 0;
-}
-#order-opc .cart_total_detail_block .strong {
-	font-weight: 600;
 }
 #order-opc .cart_total_detail_block .cart_total_values {
 	float: right;
@@ -449,7 +425,6 @@
 	color: #459C3D;
 }
 #order-opc .cart_total_detail_block .cart_final_total_block {
-	margin-bottom: 0;
 	line-height: 40px;
 }
 #order-opc .cart_total_detail_block .cart_final_total_block > .cart_total_values {
@@ -464,8 +439,8 @@
 	font-weight: normal!important;
 }
 @media (max-width: 767px) {
-	.room_price_detail_block .price_block, .room_type_old_price{
-		padding-left: 15px;
+	.order-detail-content .room_price_detail_block .plus-sign, .order-detail-content .product_price_detail_block .plus-sign {
+		display: none;
 	}
 	#order-opc .cart_voucher_detail_block .submit_discount_div {
 		margin-top: 10px;

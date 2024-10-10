@@ -59,6 +59,7 @@ class CategoryControllerCore extends FrontController
 
         $this->addCSS(_THEME_CSS_DIR_.'occupancy.css');
         $this->addJS(_THEME_JS_DIR_.'occupancy.js');
+
         $scenes = Scene::getScenes($this->category->id, $this->context->language->id, true, false);
         if ($scenes && count($scenes)) {
             $this->addJS(_THEME_JS_DIR_.'scenes.js');
@@ -100,8 +101,16 @@ class CategoryControllerCore extends FrontController
         // validate dates if available
         $dateFrom = Tools::getValue('date_from');
         $dateTo = Tools::getValue('date_to');
-        $idHotel = HotelBranchInformation::getHotelIdByIdCategory($id_category);
-        if (!HotelHelper::validateDateRangeForHotel($dateFrom, $dateTo, $idHotel)) {
+
+        $currentTimestamp = strtotime(date('Y-m-d'));
+        $dateFromTimestamp = strtotime($dateFrom);
+        $dateToTimestamp = strtotime($dateTo);
+
+        if ($dateFrom != '' && ($dateFromTimestamp === false || ($dateFromTimestamp < $currentTimestamp))) {
+            Tools::redirect($this->context->link->getPageLink('pagenotfound'));
+        }
+
+        if ($dateTo != '' && ($dateToTimestamp === false || ($dateToTimestamp < $currentTimestamp))) {
             Tools::redirect($this->context->link->getPageLink('pagenotfound'));
         }
 
@@ -156,16 +165,6 @@ class CategoryControllerCore extends FrontController
         $currency = new Currency($this->context->currency->id);
 
         if ($id_hotel = HotelBranchInformation::getHotelIdByIdCategory($id_category)) {
-            $preparationTime = (int) HotelOrderRestrictDate::getPreparationTime($id_hotel);
-            if ($preparationTime
-                && strtotime(date('Y-m-d', strtotime('+'. ($preparationTime) .' days'))) > strtotime($date_from)
-            ) {
-                $date_from = date('Y-m-d', strtotime('+ '.$preparationTime.' day'));
-                if (strtotime($date_from) >= strtotime($date_to)) {
-                    $date_to = date('Y-m-d', strtotime($date_from) + 86400);
-                }
-            }
-
             $id_cart = $this->context->cart->id;
             $id_guest = $this->context->cookie->id_guest;
 
@@ -182,7 +181,10 @@ class CategoryControllerCore extends FrontController
 
             $booking_data = $objBookingDetail->dataForFrontSearch($bookingParams);
 
-            $num_days = $objBookingDetail->getNumberOfDays($date_from, $date_to);
+
+
+            $obj_booking_detail = new HotelBookingDetail();
+            $num_days = $obj_booking_detail->getNumberOfDays($date_from, $date_to);
 
             $warning_num = Configuration::get('WK_ROOM_LEFT_WARNING_NUMBER');
 
@@ -209,7 +211,7 @@ class CategoryControllerCore extends FrontController
                 'order_date_restrict' => $order_date_restrict
             ));
         } else {
-            Tools::redirect($this->context->link->getPageLink('pagenotfound'));
+            Tools::redirect($this->context->link->getPageLink('index'));
         }
 
         $feat_img_dir = _PS_IMG_.'rf/';

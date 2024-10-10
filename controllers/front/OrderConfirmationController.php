@@ -67,16 +67,9 @@ class OrderConfirmationControllerCore extends FrontController
         if (!Validate::isLoadedObject($order) || $order->id_customer != $this->context->customer->id || $this->secure_key != $order->secure_key) {
             Tools::redirect($redirectLink);
         }
-
-        if ($this->id_module == -1) {
-            if ($order->module != 'free_order') {
-                Tools::redirect($redirectLink);
-            }
-        } else {
-            $module = Module::getInstanceById((int)($this->id_module));
-            if ($order->module != $module->name) {
-                Tools::redirect($redirectLink);
-            }
+        $module = Module::getInstanceById((int)($this->id_module));
+        if ($order->module != $module->name) {
+            Tools::redirect($redirectLink);
         }
     }
 
@@ -108,9 +101,9 @@ class OrderConfirmationControllerCore extends FrontController
         $order = new Order($this->id_order);
         $cart = new Cart($order->id_cart);
         /*By webkul to show order details properly on order history page*/
-        $totalRoomsBooked = 0;
         if (Module::isInstalled('hotelreservationsystem')) {
             require_once _PS_MODULE_DIR_.'hotelreservationsystem/define.php';
+            $non_requested_rooms = 0;
             $any_back_order = 0;
             $processed_product = array();
             $orderTotalInfo = array();
@@ -176,7 +169,6 @@ class OrderConfirmationControllerCore extends FrontController
                                 $order_bk_data = $obj_htl_bk_dtl->getOnlyOrderBookingData($idOrder, $customer->id_guest, $type_value['product_id']);
                             }
                             if ($rm_dtl = $obj_rm_type->getRoomTypeInfoByIdProduct($type_value['product_id'])) {
-                                $cart_htl_data[$type_key]['id_order'] = $idOrder;
                                 $cart_htl_data[$type_key]['id_product'] = $type_value['product_id'];
                                 $cart_htl_data[$type_key]['cover_img'] = $cover_img;
                                 $cart_htl_data[$type_key]['adults'] = $rm_dtl['adults'];
@@ -187,6 +179,12 @@ class OrderConfirmationControllerCore extends FrontController
                                     /*Product price when order was created*/
                                     $order_details_obj = new OrderDetail($data_v['id_order_detail']);
                                     $cart_htl_data[$type_key]['name'] = $order_details_obj->product_name;
+                                    // $ord_refnd_info = $obj_ord_ref_info->getOderRefundInfoByIdOrderIdProductByDate($this->id_order, $type_value['product_id'], $data_v['date_from'], $data_v['date_to']);
+                                    // if ($ord_refnd_info) {
+                                    //     $stage_name = $obj_refund_stages->getNameById($ord_refnd_info['refund_stage_id']);
+                                    // } else {
+                                        //     $non_requested_rooms = 1;
+                                        // }
                                     $stage_name = '';
                                     if (isset($cart_htl_data[$type_key]['date_diff'][$date_join])) {
                                         $cart_htl_data[$type_key]['date_diff'][$date_join]['num_rm'] += 1;
@@ -352,8 +350,6 @@ class OrderConfirmationControllerCore extends FrontController
                                         1,
                                         Product::PRICE_ADDITION_TYPE_WITH_ROOM
                                     );
-
-                                    $totalRoomsBooked += 1;
                                 }
                             } else if ($product->service_product_type == Product::SERVICE_PRODUCT_WITHOUT_ROOMTYPE) {
                                 $cover_image_arr = $product->getCover($type_value['product_id']);
@@ -370,6 +366,9 @@ class OrderConfirmationControllerCore extends FrontController
                             }
                         }
 
+                        if (!empty($cart_htl_data)) {
+                            $this->context->smarty->assign('cart_htl_data', $cart_htl_data);
+                        }
                         if (!empty($cart_service_products)) {
                             $this->context->smarty->assign('cart_service_products', $cart_service_products);
                         }
@@ -394,33 +393,22 @@ class OrderConfirmationControllerCore extends FrontController
                     $orderTotalInfo['total_paid'] += $objCartOrder->total_paid;
                     $orderTotalInfo['total_paid_real'] += $objCartOrder->total_paid_real;
                 }
-
-                $totalTaxIncl = $orderTotalInfo['total_rooms_ti'] + $orderTotalInfo['total_services_ti'] + $orderTotalInfo['total_convenience_fee_ti'] + $orderTotalInfo['total_auto_add_services_ti'] + $orderTotalInfo['total_demands_price_ti'];
-                $totalTaxExcl = $orderTotalInfo['total_rooms_te'] + $orderTotalInfo['total_services_te'] + $orderTotalInfo['total_convenience_fee_te'] + $orderTotalInfo['total_auto_add_services_te'] + $orderTotalInfo['total_demands_price_te'];
-                $orderTotalInfo['total_tax_without_discount'] = $totalTaxIncl - $totalTaxExcl;
             }
 
             $this->context->smarty->assign('orderTotalInfo', $orderTotalInfo);
+            $this->context->smarty->assign('non_requested_rooms', $non_requested_rooms);
             $this->context->smarty->assign('orders_has_invoice', $orders_has_invoice);
-        }
-
-        if (!empty($cart_htl_data)) {
-            $this->context->smarty->assign('cart_htl_data', $cart_htl_data);
         }
 
         $shw_bo_msg = Configuration::get('WK_SHOW_MSG_ON_BO');
         $bo_msg = Configuration::get('WK_BO_MESSAGE');
-
         $this->context->smarty->assign(
             array(
-                'total_rooms_booked' => $totalRoomsBooked,
                 'refund_allowed' => (int) $order->isReturnable(),
-                'is_free_order' => $this->id_module == -1 && $order->module == 'free_order',
                 'any_back_order' => $any_back_order,
                 'shw_bo_msg' => $shw_bo_msg,
                 'back_ord_msg' => $bo_msg,
                 'order' => $order,
-                'objOrderCurrency' => (new Currency($order->id_currency)),
                 'use_tax' => Configuration::get('PS_TAX'),
                 'group_use_tax' => (Group::getPriceDisplayMethod($customer->id_default_group) == PS_TAX_INC),
             )
@@ -478,8 +466,8 @@ class OrderConfirmationControllerCore extends FrontController
     {
         if (Tools::getValue('ajax') != 'true') {
             parent::setMedia();
-            $this->addJS(_THEME_JS_DIR_.'order-confirmation.js');
-            $this->addCSS(_THEME_CSS_DIR_.'order-confirmation.css');
+            $this->addCSS(_THEME_CSS_DIR_.'history.css');
+            $this->addJS(_THEME_JS_DIR_.'history.js');
             $this->addJqueryPlugin(array('fancybox')); //fancybox not found for some client theme
             $this->addJqueryUI('ui.tooltip', 'base', true);
         }

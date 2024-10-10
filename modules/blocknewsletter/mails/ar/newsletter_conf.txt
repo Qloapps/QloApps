@@ -1,0 +1,10 @@
+
+[/{shop_url}]
+
+مرحباً
+
+شكراً لإشتراكك في النشرة البريدية.
+
+{shop_name} [/{shop_url}] Webkul(tm)
+[https://webkul.com]
+

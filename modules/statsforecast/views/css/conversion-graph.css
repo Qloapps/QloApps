@@ -26,8 +26,7 @@
     min-width: 150px;
     margin-bottom: 25px;
     padding: 10px 15px;
-    border: 1.5px solid transparent;
-    border-radius: 2px;
+    border: 1.5px solid #555;
     background-color: #CFE2F3;
     color: #111;
 }
@@ -38,7 +37,7 @@
 }
 
 connection {
-    border: 1px solid #777;
+    border: 1px solid #000;
 }
 
 connection span {

@@ -33,15 +33,8 @@
 		</td> -->
 		<td width="33%"></td>
 		<td  width="33%"></td>
-		<td width="33%">
-			<span class="bold">{l s='Customer Detail' pdf='true'}</span><br/><br/>
-			{if $invoice_address}
+		<td width="33%"><span class="bold">{l s='Customer Address' pdf='true'}</span><br/><br/>
 				{$invoice_address}
-			{else}
-				{$customer->firstname} {$customer->lastname}
-				<br>
-				{$customer->phone}
-			{/if}
 		</td>
 	</tr>
 </table>

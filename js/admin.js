@@ -504,14 +504,6 @@ function changeCMSActivationAuthorization()
 		getE('PS_CONDITIONS_CMS_ID').disabled = 'disabled';
 }
 
-function changeOverbookingOrderAction()
-{
-    if (getE('PS_OVERBOOKING_ORDER_ACTION').value == $("input[name='OVERBOOKING_ORDER_CANCEL_ACTION']").val())
-        $('#PS_MAX_OVERBOOKING_PER_HOTEL_PER_DAY').closest('.form-group').hide();
-    else
-        $('#PS_MAX_OVERBOOKING_PER_HOTEL_PER_DAY').closest('.form-group').show();
-}
-
 function disableZipFormat()
 {
 	if ($('#need_zip_code_on').prop('checked') == false)
@@ -687,7 +679,7 @@ function doAdminAjax(data, success_func, error_func)
 				return success_func(data);
 
 			data = $.parseJSON(data);
-			if (data.confirmations && data.confirmations.length != 0)
+			if (data.confirmations.length != 0)
 				showSuccessMessage(data.confirmations);
 			else
 				showErrorMessage(data.error);
@@ -764,10 +756,7 @@ $(document).ready(function()
 
 
 	$('select.chosen').each(function(k, item){
-		$(item).chosen({
-			disable_search_threshold: 5,
-			search_contains: true,
-		});
+		$(item).chosen({disable_search_threshold: 10, search_contains: true});
 	});
 	// Apply chosen() when modal is loaded
 	$(document).on('shown.bs.modal', function (e) {
@@ -1230,24 +1219,6 @@ function sendBulkAction(form, action)
 	$(form).submit();
 }
 
-function checkIfEmployeeIsLoggedIn() {
-	return new Promise(function (resolve) {
-		$.ajax({
-			url : window.location.pathname,
-			type: 'POST',
-			dataType: 'JSON',
-			data : {
-				ajax : '1',
-				controller : 'AdminLogin',
-				action : 'checkLoginStatus',
-			},
-			success : function(response) {
-				resolve(response.is_logged_in);
-			}
-		});
-	});
-}
-
 function openModulesList()
 {
 	if (!modules_list_loaded)
@@ -1580,61 +1551,6 @@ function refresh_kpis()
 	});
 }
 
-$(document).on('change', '.kpi-container .kpi-display-toggle', function (e) {
-	let kpiCheckbox = $(this);
-	let isVisible = parseInt(kpiCheckbox.is(':checked') & 1);
-
-	// hide or show the KPI
-	$('#' + kpiCheckbox.attr('data-kpi-id')).parent().toggle(isVisible);
-
-	// save visibility state to cookie
-	$.ajax({
-		type: 'POST',
-		headers: { 'cache-control': 'no-cache' },
-		url: window.location,
-		cache: false,
-		dataType: 'json',
-		data: {
-			ajax: 1,
-			controller: help_class_name,
-			action: 'changeKpiVisibility',
-			kpi_id: kpiCheckbox.attr('data-kpi-id'),
-			is_visible: isVisible,
-		}
-	});
-
-	// at least one KPI must be displayed
-	if ($(kpiCheckbox).closest('.actions-wrap').find('.kpi-display-toggle:checked').length == 1) {
-		$(kpiCheckbox).closest('.actions-wrap').find('.kpi-display-toggle:checked').attr('disabled', true);
-	} else {
-		$(kpiCheckbox).closest('.actions-wrap').find('.kpi-display-toggle').attr('disabled', false);
-	}
-});
-
-// prevent dropdown from closing on clicking its body
-$(document).on('click', '.kpi-container .dropdown-menu', function (e) {
-	e.stopPropagation();
-});
-
-function toggleKpiView() {
-	$('.kpi-container').toggleClass('no-wrapping'); // default view is to wrap KPIs
-
-	// save view to cookie
-	$.ajax({
-		type: 'POST',
-		headers: { 'cache-control': 'no-cache' },
-		url: window.location,
-		cache: false,
-		dataType: 'json',
-		data: {
-			ajax: 1,
-			controller: help_class_name,
-			action: 'saveKpiView',
-			no_wrapping: parseInt($('.kpi-container').hasClass('no-wrapping') & 1),
-		}
-	});
-}
-
 function createSqlQueryName()
 {
 	var container = false;
@@ -1700,9 +1616,9 @@ function loadRecommendation()
 			token: token
 		},
 		success: function(res) {
-			if (res.success && res.html && res.html.trim()) {
+			if (res.success && res.content && res.content.trim()) {
 				$('#recommendation-wrapper-skeleton').fadeIn('slow');
-				$('#recommendation-wrapper').html(res.html);
+				$('#recommendation-wrapper').html(res.content);
 				let images = $('#recommendation-wrapper img');
 				let loaded = 0;
 				let total = $(images).length;

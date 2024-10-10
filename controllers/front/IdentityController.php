@@ -53,14 +53,12 @@ class IdentityControllerCore extends FrontController
 
             $email = trim(Tools::getValue('email'));
 
-            if (Configuration::get('PS_CUSTOMER_BIRTHDATE')) {
-                if (Tools::getValue('months') != '' && Tools::getValue('days') != '' && Tools::getValue('years') != '') {
-                    $this->customer->birthday = (int)Tools::getValue('years').'-'.(int)Tools::getValue('months').'-'.(int)Tools::getValue('days');
-                } elseif (Tools::getValue('months') == '' && Tools::getValue('days') == '' && Tools::getValue('years') == '') {
-                    $this->customer->birthday = null;
-                } else {
-                    $this->errors[] = Tools::displayError('Invalid date of birth.');
-                }
+            if (Tools::getValue('months') != '' && Tools::getValue('days') != '' && Tools::getValue('years') != '') {
+                $this->customer->birthday = (int)Tools::getValue('years').'-'.(int)Tools::getValue('months').'-'.(int)Tools::getValue('days');
+            } elseif (Tools::getValue('months') == '' && Tools::getValue('days') == '' && Tools::getValue('years') == '') {
+                $this->customer->birthday = null;
+            } else {
+                $this->errors[] = Tools::displayError('Invalid date of birth.');
             }
 
             if (Tools::getIsset('old_passwd')) {
@@ -80,22 +78,6 @@ class IdentityControllerCore extends FrontController
 
                 // Merge all errors of this file and of the Object Model
                 $this->errors = array_merge($this->errors, $this->customer->validateController());
-            }
-
-            $phone = Tools::getValue('phone');
-            if (Configuration::get('PS_ONE_PHONE_AT_LEAST')) {
-                if ($phone == '') {
-                    $this->errors[] = Tools::displayError('Phone number is required.');
-                }
-            }
-            $className = 'CartCustomerGuestDetail';
-            $rules = call_user_func(array($className, 'getValidationRules'), $className);
-            if ($phone && !Validate::isPhoneNumber($phone)) {
-                $this->errors[] = Tools::displayError('Invaid phone number.');
-            } elseif ($phone && Tools::strlen($phone) > $rules['size']['phone']) {
-                $this->errors[] = sprintf(Tools::displayError('Phone number is too long. (%s chars max).'), $rules['size']['phone']);;
-            } else {
-                $this->customer->phone = $phone;
             }
 
             if (!count($this->errors)) {
@@ -134,7 +116,6 @@ class IdentityControllerCore extends FrontController
             }
         } else {
             $_POST = array_map('stripslashes', $this->customer->getFields());
-            $_POST['phone'] = $this->customer->phone;
         }
 
         return $this->customer;
@@ -145,8 +126,6 @@ class IdentityControllerCore extends FrontController
      */
     public function initContent()
     {
-        $this->show_breadcrump = true;
-
         parent::initContent();
 
         if ($this->customer->birthday) {
@@ -165,7 +144,6 @@ class IdentityControllerCore extends FrontController
                 'sl_day' => $birthday[2],
                 'errors' => $this->errors,
                 'genders' => Gender::getGenders(),
-                'one_phone_at_least' => (int)Configuration::get('PS_ONE_PHONE_AT_LEAST'),
             ));
 
         // Call a hook to display more information
@@ -174,7 +152,6 @@ class IdentityControllerCore extends FrontController
         ));
 
         $newsletter = Configuration::get('PS_CUSTOMER_NWSL') || (Module::isInstalled('blocknewsletter') && Module::getInstanceByName('blocknewsletter')->active);
-        $this->context->smarty->assign('birthday', (bool) Configuration::get('PS_CUSTOMER_BIRTHDATE'));
         $this->context->smarty->assign('newsletter', $newsletter);
         $this->context->smarty->assign('optin', (bool)Configuration::get('PS_CUSTOMER_OPTIN'));
 

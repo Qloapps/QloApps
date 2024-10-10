@@ -43,7 +43,7 @@ class AdminHotelGeneralSettingsController extends ModuleAdminController
         $this->fields_options = array(
             'hotelsearchpanel' => array(
                 'icon' => 'icon-search',
-                'title' => $this->l('Search Panel Setting'),
+                'title' => $this->l('Hotel Search Setting'),
                 'fields' => array(
                     'WK_HOTEL_LOCATION_ENABLE' => array(
                         'title' => $this->l('Enable Hotel Location'),
@@ -81,31 +81,30 @@ class AdminHotelGeneralSettingsController extends ModuleAdminController
                         'hint' => $this->l('This option can be disabled if only one active hotel in the website.
                         In case of more than one active hotel, Hotel Name will always be shown in the search panel.'),
                     ),
-                    'WK_SEARCH_AUTO_FOCUS_NEXT_FIELD' => array(
-                        'title' => $this->l('Focus next field automatically'),
-                        'cast' => 'intval',
-                        'type' => 'bool',
-                        'default' => '0',
-                        'values' => array(
-                            array(
-                                'id' => 'active_on',
-                                'value' => 1,
-                            ),
-                            array(
-                                'id' => 'active_off',
-                                'value' => 0,
-                            ),
-                        ),
-                        'hint' => $this->l('Enable if you want the next booking search field to be focused automatically after setting value for a field.'),
-                    ),
-                    'WK_HOTEL_NAME_SEARCH_THRESHOLD' => array(
-                        'title' => $this->l('Hotel name search threshold'),
+                ),
+                'submit' => array(
+                    'title' => $this->l('Save'),
+                ),
+            ),
+            'occupancypanel' => array(
+                'icon' => 'icon-users',
+                'title' => $this->l('Occupancy Setting'),
+                'fields' => array(
+                    // max age of child
+                    'WK_GLOBAL_CHILD_MAX_AGE' => array(
+                        'title' => $this->l('Consider guest as child below age'),
                         'type' => 'text',
                         'required' => true,
                         'validation' => 'isUnsignedInt',
-                        'hint' => $this->l('Enter the number of hotels after which user can search hotel by name.'),
-                        'desc' => $this->l('Set to 0 to always show the search box.'),
-                        'class' => 'fixed-width-xxl',
+                        'hint' => $this->l('Enter the age of the guest,  which that guest will be considered as child.'),
+                    ),
+                    'WK_GLOBAL_MAX_CHILD_IN_ROOM' => array(
+                        'title' => $this->l('Maximum children allowed in a room'),
+                        'type' => 'text',
+                        'required' => true,
+                        'validation' => 'isUnsignedInt',
+                        'hint' => $this->l('Enter number of the child allowed in a room.'),
+                        'desc' => $this->l('Set as 0 if you do not want to limit children in a room.')
                     ),
                 ),
                 'submit' => array(
@@ -113,8 +112,46 @@ class AdminHotelGeneralSettingsController extends ModuleAdminController
                 ),
             ),
             'generalsetting' => array(
-                'title' => $this->l('Website Configuration'),
+                'title' => $this->l('Configuration'),
                 'fields' => array(
+                    'WK_ROOM_LEFT_WARNING_NUMBER' => array(
+                        'title' => $this->l('Display remaining Number of rooms when the rooms are lower than or equal to'),
+                        'hint' => $this->l('Mention the minimum quantity of rooms after which alert message of remaining rooms will get displayed to users.'),
+                        'validation' => 'isInt',
+                        'cast' => 'intval',
+                        'type' => 'text',
+                        'visibility' => Shop::CONTEXT_ALL,
+                    ),
+                    'WK_HOTEL_GLOBAL_ADDRESS' => array(
+                        'title' => $this->l('Global Address'),
+                        'hint' => $this->l('Hotel global address which you want to show to your customers. It will be
+                        shown at contact us page.'),
+                        'type' => 'text',
+                        'isCleanHtml' => true,
+                    ),
+                    'WK_HOTEL_GLOBAL_CONTACT_EMAIL' => array(
+                        'title' => $this->l('Global Email'),
+                        'hint' => $this->l('Email which you want to show a customer to email you.'),
+                        'type' => 'text',
+                    ),
+                    'WK_HOTEL_GLOBAL_CONTACT_NUMBER' => array(
+                        'title' => $this->l('Global Contact Number'),
+                        'hint' => $this->l('Phone Number which you want to show a customer to contact you.'),
+                        'type' => 'text',
+                        'validation' => 'isPhoneNumber',
+                    ),
+                    'WK_HTL_ESTABLISHMENT_YEAR' => array(
+                        'title' => $this->l('Website Launch Year'),
+                        'hint' => $this->l('The year when your hotel site was launched.'),
+                        'type' => 'text',
+                    ),
+                    'WK_PRIMARY_HOTEL' => array(
+                        'title' => $this->l('Primary hotel'),
+                        'hint' => $this->l('Primary hotel is used to default address for your business. The hotel address will be considered as your registered business address.'),
+                        'type' => 'select',
+                        'identifier' => 'id',
+                        'list' => $hotelsInfo,
+                    ),
                     'WK_HTL_CHAIN_NAME' => array(
                         'title' => $this->l('Hotel Name'),
                         'type' => 'textLang',
@@ -141,73 +178,16 @@ class AdminHotelGeneralSettingsController extends ModuleAdminController
                         'validation' => 'isGenericName',
                         'hint' => $this->l('This will display hotel short description in footer. Note: number of letters must be less than 220.'),
                     ),
-                    'WK_PRIMARY_HOTEL' => array(
-                        'title' => $this->l('Primary hotel'),
-                        'hint' => $this->l('Primary hotel is used to default address for your business. The hotel address will be considered as your registered business address.'),
-                        'type' => 'select',
-                        'identifier' => 'id',
-                        'list' => $hotelsInfo,
-                    ),
-                    'WK_HTL_ESTABLISHMENT_YEAR' => array(
-                        'title' => $this->l('Website Launch Year'),
-                        'hint' => $this->l('The year when your hotel site was launched.'),
-                        'type' => 'text',
-                        'class' => 'fixed-width-xxl',
-                    ),
                     'WK_HTL_HEADER_IMAGE' => array(
                         'title' => $this->l('Header Background Image'),
                         'type' => 'file',
                         'image' => $imgExist ? $image : false,
                         'hint' => $this->l('This image appears as header background image on home page.'),
-                        'name' => 'WK_HOTEL_HEADER_IMAGE',
+                        'name' => 'htl_header_image',
                         'url' => _PS_IMG_,
                     ),
                 ),
                 'submit' => array('title' => $this->l('Save')),
-            ),
-            'contactdetail' => array(
-                'icon' => 'icon-phone',
-                'title' => $this->l('Website Contact Details'),
-                'fields' => array(
-                    'WK_HOTEL_GLOBAL_ADDRESS' => array(
-                        'title' => $this->l('Main Branch Address'),
-                        'hint' => $this->l('The address of the main branch. It will be shown on Contact Us page.'),
-                        'type' => 'text',
-                        'isCleanHtml' => true,
-                        'class' => 'fixed-width-xxl',
-                        'required' => true,
-                    ),
-                    'WK_HOTEL_GLOBAL_CONTACT_NUMBER' => array(
-                        'title' => $this->l('Main Branch Phone Number'),
-                        'hint' => $this->l('The phone number of the main branch. It will be shown on Contact Us page.'),
-                        'type' => 'text',
-                        'validation' => 'isPhoneNumber',
-                        'class' => 'fixed-width-xxl',
-                        'required' => true,
-                    ),
-                    'WK_HOTEL_GLOBAL_CONTACT_EMAIL' => array(
-                        'title' => $this->l('Main Branch Email'),
-                        'hint' => $this->l('The email address of the main branch. It will be shown on Contact Us page.'),
-                        'type' => 'text',
-                        'class' => 'fixed-width-xxl',
-                        'required' => true,
-                    ),
-                    'WK_CUSTOMER_SUPPORT_PHONE_NUMBER' => array(
-                        'title' => $this->l('Support Phone Number'),
-                        'type' => 'text',
-                        'hint' => $this->l('The phone number used for customer service. It will be shown on navigation bar.'),
-                        'class' => 'fixed-width-xxl',
-                    ),
-                    'WK_CUSTOMER_SUPPORT_EMAIL' => array(
-                        'title' => $this->l('Support Email'),
-                        'type' => 'text',
-                        'hint' => $this->l('The email used for customer service. It will be shown on navigation bar.'),
-                        'class' => 'fixed-width-xxl',
-                    ),
-                ),
-                'submit' => array(
-                    'title' => $this->l('Save'),
-                ),
             ),
             'advancedPayment' => array(
                 'title' => $this->l('Advance Payment Global Setting'),
@@ -235,7 +215,6 @@ class AdminHotelGeneralSettingsController extends ModuleAdminController
                         'type' => 'text',
                         'validation' => 'isUnsignedFloat',
                         'suffix' => $this->l('%'),
-                        'class' => 'fixed-width-xxl',
                     ),
                     'WK_ADVANCED_PAYMENT_INC_TAX' => array(
                         'title' => $this->l('Global Booking Amount Include Tax'),
@@ -256,33 +235,6 @@ class AdminHotelGeneralSettingsController extends ModuleAdminController
                     ),
                 ),
                 'submit' => array('title' => $this->l('Save')),
-            ),
-            'occupancypanel' => array(
-                'icon' => 'icon-users',
-                'title' => $this->l('Occupancy Settings'),
-                'fields' => array(
-                    // max age of child
-                    'WK_GLOBAL_CHILD_MAX_AGE' => array(
-                        'title' => $this->l('Consider guest as child below age'),
-                        'type' => 'text',
-                        'required' => true,
-                        'validation' => 'isUnsignedInt',
-                        'hint' => $this->l('Enter the age of the guest,  which that guest will be considered as child.'),
-                        'class' => 'fixed-width-xxl',
-                    ),
-                    'WK_GLOBAL_MAX_CHILD_IN_ROOM' => array(
-                        'title' => $this->l('Maximum children allowed in a room'),
-                        'type' => 'text',
-                        'required' => true,
-                        'validation' => 'isUnsignedInt',
-                        'hint' => $this->l('Enter number of the child allowed in a room.'),
-                        'desc' => $this->l('Set as 0 if you do not want to limit children in a room.'),
-                        'class' => 'fixed-width-xxl',
-                    ),
-                ),
-                'submit' => array(
-                    'title' => $this->l('Save'),
-                ),
             ),
             'googleMap' => array(
                 'title' => $this->l('Google Maps Settings'),
@@ -307,7 +259,7 @@ class AdminHotelGeneralSettingsController extends ModuleAdminController
                                 'value' => 0,
                             ),
                         ),
-                        'hint' => $this->l('Enable to display Google Maps for hotel locations. If disabled, Google Maps will not be shown.'),
+                        'hint' => $this->l('If set to No, Google Maps will not be displayed for hotel location. You need to set hotels location from edit hotel page to display location on the map at contact-us page.'),
                     ),
                     'WK_MAP_HOTEL_ACTIVE_ONLY' => array(
                         'title' => $this->l('Display Active Hotels Only'),
@@ -338,8 +290,6 @@ class AdminHotelGeneralSettingsController extends ModuleAdminController
     public function postProcess()
     {
         if (Tools::isSubmit('submitOptions'.$this->table)) {
-            $hotelNameSearchThreshold = Tools::getValue('WK_HOTEL_NAME_SEARCH_THRESHOLD');
-
             // check if field is atleast in default language. Not available in default prestashop
             $defaultLangId = Configuration::get('PS_LANG_DEFAULT');
             $objDefaultLanguage = Language::getLanguage((int) $defaultLangId);
@@ -349,19 +299,8 @@ class AdminHotelGeneralSettingsController extends ModuleAdminController
             // max age of infant after which guest will considered as child // below 18
             $globalChildMaxAge = Tools::getValue('WK_GLOBAL_CHILD_MAX_AGE');
             $globalMaxChildInRoom = Tools::getValue('WK_GLOBAL_MAX_CHILD_IN_ROOM');
-            if (!Validate::isUnsignedInt($globalChildMaxAge)) {
-                $this->errors[] = $this->l('Invalid value for "Consider guest as child below age".');
-            } else if ($globalChildMaxAge <= 0) {
-                $this->errors[] = $this->l('The value for "Consider guest as child below age" must be at least 1.');
-            }
 
             // End occupancy fields validation
-
-            if (!$hotelNameSearchThreshold && $hotelNameSearchThreshold !== '0') {
-                $this->errors[] = $this->l('Hotel name search threshold field is required.');
-            } elseif (!Validate::isUnsignedInt($hotelNameSearchThreshold)) {
-                $this->errors[] = $this->l('Hotel name search threshold field is invalid.');
-            }
 
             if (!trim(Tools::getValue('WK_HTL_CHAIN_NAME_'.$defaultLangId))) {
                 $this->errors[] = $this->l('Hotel chain name is required at least in ').$objDefaultLanguage['name'];
@@ -397,8 +336,8 @@ class AdminHotelGeneralSettingsController extends ModuleAdminController
                     }
                 }
             }
-            if ($_FILES['WK_HOTEL_HEADER_IMAGE']['name']) {
-                if ($error = ImageManager::validateUpload($_FILES['WK_HOTEL_HEADER_IMAGE'], Tools::getMaxUploadSize())) {
+            if ($_FILES['htl_header_image']['name']) {
+                if ($error = ImageManager::validateUpload($_FILES['htl_header_image'], Tools::getMaxUploadSize())) {
                     $this->errors[] = $error;
                 }
 
@@ -406,10 +345,8 @@ class AdminHotelGeneralSettingsController extends ModuleAdminController
                     $file_name = 'hotel_header_image_'.time().'.jpg';
                     $img_path = _PS_IMG_DIR_.$file_name;
 
-                    if (ImageManager::resize($_FILES['WK_HOTEL_HEADER_IMAGE']['tmp_name'], $img_path)) {
-                        $olderHeaderImg = _PS_IMG_DIR_.Configuration::get('WK_HOTEL_HEADER_IMAGE');
+                    if (ImageManager::resize($_FILES['htl_header_image']['tmp_name'], $img_path)) {
                         Configuration::updateValue('WK_HOTEL_HEADER_IMAGE', $file_name);
-                        Tools::deleteFile($olderHeaderImg);
                     } else {
                         $this->errors[] = $this->l('Some error occured while uoploading image.Please try again.');
                     }
@@ -439,16 +376,6 @@ class AdminHotelGeneralSettingsController extends ModuleAdminController
                 $this->errors[] = $this->l('Hotel global contact email field is required');
             } elseif (!Validate::isEmail(Tools::getValue('WK_HOTEL_GLOBAL_CONTACT_EMAIL'))) {
                 $this->errors[] = $this->l('Hotel global contact email field is invalid');
-            }
-            if (trim(Tools::getValue('WK_CUSTOMER_SUPPORT_PHONE_NUMBER')) != '') {
-                if (!Validate::isPhoneNumber(trim(Tools::getValue('WK_CUSTOMER_SUPPORT_PHONE_NUMBER')))) {
-                    $this->errors[] = $this->l('Support Phone Number is invalid.');
-                }
-            }
-            if (trim(Tools::getValue('WK_CUSTOMER_SUPPORT_EMAIL')) != '') {
-                if (!Validate::isEmail(trim(Tools::getValue('WK_CUSTOMER_SUPPORT_EMAIL')))) {
-                    $this->errors[] = $this->l('Support Email is invalid.');
-                }
             }
 
             if (!count($this->errors)) {

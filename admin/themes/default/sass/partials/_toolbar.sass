@@ -1,6 +1,6 @@
 .page-head
 	width: 100%
-	height: 78px
+	height: 100px
 	padding: 0
 	margin: 0
 	position: fixed
@@ -14,11 +14,10 @@
 		@include float(left)
 		position: relative
 		margin: 0
-		font: 14pt $font-family-sans-serif
-		font-weight: bold
+		font: 20pt $font-family-sans-serif
 		color: #363A41
 		white-space: nowrap
-		@include padding(31px, 0, 0, ($widthSidebarNav+20px))
+		@include padding(26px, 0, 0, ($widthSidebarNav+20px))
 		@media (max-width: $screen-tablet)
 			@include padding(26px, 0, 0, 70px)
 		a
@@ -41,7 +40,6 @@
 		position: absolute
 		background-color: transparent!important
 		@include right(0)
-		top: 18px
 		@media (max-width: $screen-sm)
 		#toolbar-nav
 			border: none
@@ -50,54 +48,37 @@
 			@include padding(3px, 0, 0, 0)
 			.toolbar_btn
 				position: relative
-				padding: 10px 10px !important
+				padding: 20px 5px !important
 				font-size: 12px
 				line-height: 8px
-				color: $toolbar-buttons-color
+				color: $main-color
 				text-align: center
 				text-shadow: none
 				white-space: nowrap
 				overflow: hidden
 				text-overflow: ellipsis
-				border: 1px solid $toolbar-buttons-color
-				border-radius: 2px
 				@include margin(0, 3px, 2px, 0)
 				@media (max-width: $screen-desktop)
 					width: 46px
 					font-size: 11px
-					div
-						color: #363A41
 				i
-					display: inline
-					font-size: 18px
+					color: $toolbar-buttons-color
 					&:hover
 						color: $toolbar-buttons-hover-color
-				span
-					position: relative
-					top: -2px
-					left: 2px
-					color: #363A41
-					font-weight: 400
+				div
+					padding-top: 10px
 			.dropdown-toolbar
 				display: none
 				@include float(right)
 				@include border-radius(3px)
 				@media (max-width: $screen-sm)
 					display: block
-					padding: 6px 10px !important
-					margin-right: 10px
-				@media (max-width: $screen-xs)
-					margin-right: 5px
-
-		#toolbar-nav
-			li + li
-				margin-left: 8px
 	ul.page-breadcrumb
 		position: absolute
 		list-style: none
 		margin: 0
 		padding: 0
-		top: 9px
+		top: 4px
 		height: 20px
 		line-height: 20px
 		color: black

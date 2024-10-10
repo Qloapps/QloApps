@@ -154,8 +154,7 @@ class HTMLTemplateOrderSlipCore extends HTMLTemplateInvoice
             'invoice_address' => $formatted_invoice_address,
             'addresses' => array('invoice' => $invoice_address, 'delivery' => $delivery_address),
             'tax_excluded_display' => $tax_excluded_display,
-            'total_cart_rule' => $total_cart_rule,
-            'customer' => $customer
+            'total_cart_rule' => $total_cart_rule
         ));
 
         $tpls = array(
@@ -201,6 +200,8 @@ class HTMLTemplateOrderSlipCore extends HTMLTemplateInvoice
     {
         $address = new Address((int)$this->order->id_address_tax);
         $this->smarty->assign(array(
+            'product_tax_breakdown' => $this->getProductTaxesBreakdown(),
+            'shipping_tax_breakdown' => $this->getShippingTaxesBreakdown(),
             'order' => $this->order,
             'ecotax_tax_breakdown' => $this->order_slip->getEcoTaxTaxesBreakdown(),
             'is_order_slip' => true,
@@ -219,7 +220,7 @@ class HTMLTemplateOrderSlipCore extends HTMLTemplateInvoice
     protected function getTaxBreakdown()
     {
         $breakdowns = array(
-            'room_tax' => $this->getRoomTypeTaxesBreakdown(),
+            'product_tax' => $this->getProductTaxesBreakdown(),
             'shipping_tax' => $this->getShippingTaxesBreakdown(),
             'ecotax_tax' => $this->order_slip->getEcoTaxTaxesBreakdown(),
         );
@@ -250,78 +251,33 @@ class HTMLTemplateOrderSlipCore extends HTMLTemplateInvoice
         return $breakdowns;
     }
 
-    public function useOneAfterAnotherTaxComputationMethod()
+    public function getProductTaxesBreakdown()
     {
-        // if one of the order details use the tax computation method the display will be different
-        return Db::getInstance()->getValue('
-    		SELECT od.`tax_computation_method`
-    		FROM `' . _DB_PREFIX_ . 'order_detail_tax` odt
-    		LEFT JOIN `' . _DB_PREFIX_ . 'order_detail` od ON (od.`id_order_detail` = odt.`id_order_detail`)
-    		WHERE od.`id_order` = ' . (int) $this->order->id . '
-    		AND od.`tax_computation_method` = ' . (int) TaxCalculator::ONE_AFTER_ANOTHER_METHOD)
-            || Configuration::get('PS_INVOICE_TAXES_BREAKDOWN');
-    }
-
-    public function getRoomTypeTaxesBreakdown()
-    {
-        $sum_composite_taxes = !$this->useOneAfterAnotherTaxComputationMethod();
-
         // $breakdown will be an array with tax rates as keys and at least the columns:
         // 	- 'total_price_tax_excl'
         // 	- 'total_amount'
         $breakdown = array();
 
-        $order_detail = array_filter($this->order->products, function($v) {
-            return ((isset($v['is_booking_product']) && $v['is_booking_product'])
-                || ((isset($v['product_auto_add']) && $v['product_auto_add'])
-                    && $v['product_service_type'] == Product::SERVICE_PRODUCT_WITH_ROOMTYPE
-                    && $v['product_price_addition_type'] == ProductCore::PRICE_ADDITION_TYPE_WITH_ROOM)
-            );
-        });
-
-        $details = $this->order->getProductTaxesDetails($order_detail);
-
-        if ($sum_composite_taxes) {
-            $grouped_details = array();
-            foreach ($details as $row) {
-                if (!isset($grouped_details[$row['id_order_detail']])) {
-                    $grouped_details[$row['id_order_detail']] = array(
-                        'tax_rate' => 0,
-                        'total_tax_base' => 0,
-                        'total_amount' => 0,
-                        'id_tax' => $row['id_tax'],
-                    );
-                }
-
-                $grouped_details[$row['id_order_detail']]['tax_rate'] += $row['tax_rate'];
-                $grouped_details[$row['id_order_detail']]['total_tax_base'] += $row['total_tax_base'];
-                $grouped_details[$row['id_order_detail']]['total_amount'] += $row['total_amount'];
-            }
-            $details = $grouped_details;
-        }
+        $details = $this->order->getProductTaxesDetails($this->order->products);
 
         foreach ($details as $row) {
-            if (!$sum_composite_taxes) {
-                $key = $row['id_tax'];
-            } else {
-                $key = sprintf('%.3f', $row['tax_rate']);
-            }
-            if (!isset($breakdown[$key])) {
-                $breakdown[$key] = array(
+            $rate = sprintf('%.3f', $row['tax_rate']);
+            if (!isset($breakdown[$rate])) {
+                $breakdown[$rate] = array(
                     'total_price_tax_excl' => 0,
                     'total_amount' => 0,
                     'id_tax' => $row['id_tax'],
-                    'rate' => sprintf('%.3f', $row['tax_rate']),
+                    'rate' =>$rate,
                 );
             }
 
-            $breakdown[$key]['total_price_tax_excl'] += $row['total_tax_base'];
-            $breakdown[$key]['total_amount'] += $row['total_amount'];
+            $breakdown[$rate]['total_price_tax_excl'] += $row['total_tax_base'];
+            $breakdown[$rate]['total_amount'] += $row['total_amount'];
         }
 
-        foreach ($breakdown as $key => $data) {
-            $breakdown[$key]['total_price_tax_excl'] = Tools::ps_round($data['total_price_tax_excl'], _PS_PRICE_COMPUTE_PRECISION_, $this->order->round_mode);
-            $breakdown[$key]['total_amount'] = Tools::ps_round($data['total_amount'], _PS_PRICE_COMPUTE_PRECISION_, $this->order->round_mode);
+        foreach ($breakdown as $rate => $data) {
+            $breakdown[$rate]['total_price_tax_excl'] = Tools::ps_round($data['total_price_tax_excl'], _PS_PRICE_COMPUTE_PRECISION_, $this->order->round_mode);
+            $breakdown[$rate]['total_amount'] = Tools::ps_round($data['total_amount'], _PS_PRICE_COMPUTE_PRECISION_, $this->order->round_mode);
         }
 
         ksort($breakdown);

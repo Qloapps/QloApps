@@ -40,7 +40,7 @@ class Cheque extends PaymentModule
 	{
 		$this->name = 'cheque';
 		$this->tab = 'payments_gateways';
-		$this->version = '2.6.7';
+		$this->version = '2.6.6';
 		$this->author = 'PrestaShop';
 		$this->controllers = array('payment', 'validation');
 		$this->is_eu_compatible = 1;
@@ -191,15 +191,13 @@ class Cheque extends PaymentModule
             return;
 		}
 		$objOrder = $params['objOrder'];
-		$idOrderState = $objOrder->getCurrentState();
-        $objOrderState = new OrderState($idOrderState);
-        $history = $objOrder->getHistory($this->context->language->id);
-        $initialStatus = array_pop($history);
-        if ($idOrderState == Configuration::get('PS_OS_AWAITING_PAYMENT')
-            || ($objOrderState->logable
-                && $initialStatus['id_order_state'] == Configuration::get('PS_OS_AWAITING_PAYMENT')
-            )
-        ) {
+        $orderState = $objOrder->getCurrentState();
+        if (in_array(
+			$orderState,
+			array(
+				Configuration::get('PS_OS_AWAITING_PAYMENT')
+			)
+		)) {
 			$objCart = new Cart($objOrder->id_cart);
             if ($objCart->is_advance_payment) {
                 $cartTotal = $objOrder->getOrdersTotalPaid(1);
@@ -207,10 +205,6 @@ class Cheque extends PaymentModule
                 $cartTotal = $objOrder->getOrdersTotalPaid();
 			}
 
-            // Get rooms bookings in the order
-            $objHotelBooking = new HotelBookingDetail();
-            $cartRoomBookings = $objHotelBooking->getBookingDataByOrderReference($objOrder->reference);
-            $smartyVars['cart_room_bookings'] = $cartRoomBookings;
 			$smartyVars['total_to_pay'] = Tools::displayPrice($cartTotal, $params['currencyObj'], false);
             $smartyVars['chequeName'] = $this->chequeName;
             $smartyVars['chequeAddress'] = Tools::nl2br($this->address);

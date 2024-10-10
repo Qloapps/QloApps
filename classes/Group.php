@@ -372,16 +372,4 @@ class GroupCore extends ObjectModel
 			WHERE `name` = \''.pSQL($query).'\'
 		');
     }
-
-    public function searchGroupsByName($query)
-    {
-        return Db::getInstance()->executeS('
-			SELECT g.*, gl.*
-			FROM `'._DB_PREFIX_.'group` g
-			LEFT JOIN `'._DB_PREFIX_.'group_lang` gl
-				ON (g.`id_group` = gl.`id_group`)
-			WHERE `name` LIKE \'%'.pSQL($query).'%\'
-		');
-    }
-
 }

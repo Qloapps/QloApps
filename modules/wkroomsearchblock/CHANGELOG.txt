@@ -1,22 +1,4 @@
 ------------------------------
-# V1.1.3 to V1.1.4
-------------------------------
-
-## Improved/Changed Features:
-
-* [FO] : [#758] Updated redirect to Page not found for invalid search results page URL
-* [FO] : [#781] Improved room search user experience at front office
-* [FO] : [#839] Added error message for maximum occupancy in room occupancy dropdown.
-* [FO] : [#966] Added done button in the occupancy popup in the front office.
-* [FO] : [#977] Fixed search panel issue on room type page when hotel is disabled
-* [CO] : [#1018] Fixed notices and display issue when there is no rooms and no hotel available.
-* [CO] : [#1100] Fixed calendar opens for pervious month of max order date is for current month
-* [FO] : [#1171] Fixed the RTL languages design issues on the front office.
-* [CO] : [#1195] Added process for smarty template overriding.
-* [CO] : [#1217] Added changes in core algo for managing booking for hourly basis
-* [FO] : [#1263] Fixed responsive design issue in front office search block
-
-------------------------------
 # V1.1.2 to V1.1.3
 ------------------------------
 

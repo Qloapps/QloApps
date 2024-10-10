@@ -64,7 +64,7 @@ class CacheMemcachedCore extends Cache
 			$this->memcached = new Memcached();
 		else
 			return;
-
+		
 		$servers = self::getMemcachedServers();
 		if (!$servers)
 			return;
@@ -81,16 +81,7 @@ class CacheMemcachedCore extends Cache
 	{
 		if (!$this->is_connected)
 			return false;
-
-		$result = $this->memcached->set($key, $value, $ttl);
-
-        if ($result === false) {
-            if ($this->memcached->getResultCode() === memcached::RES_E2BIG) {
-                $this->setAdjustTableCacheSize(true);
-            }
-        }
-
-        return $result;
+		return $this->memcached->set($key, $value, $ttl);
 	}
 
 	/**

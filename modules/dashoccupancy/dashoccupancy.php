@@ -28,7 +28,7 @@ class DashOccupancy extends Module
     {
         $this->name = 'dashoccupancy';
         $this->tab = 'dashboard';
-        $this->version = '1.0.2';
+        $this->version = '1.0.1';
         $this->ps_versions_compliancy = array('min' => '1.6', 'max' => '1.6');
         $this->author = 'Webkul';
         $this->bootstrap = true;
@@ -74,7 +74,11 @@ class DashOccupancy extends Module
             $tmp = $tmp - $occupancyData['count_available'];
             $occupancyData['count_unavailable'] = sprintf('%02d', $tmp);
         } else {
-            $occupancyData = AdminStatsController::getOccupancyData($params['date_from'], $params['date_to'], $params['id_hotel']);
+            $occupancyData = AdminStatsController::getOccupancyData(
+                $params['date_from'],
+                $params['date_to'],
+                $params['id_hotel']
+            );
         }
 
         $dataValue = array(
@@ -87,25 +91,22 @@ class DashOccupancy extends Module
         if ($occupancyData['count_total']) {
             $dataPieChartBig = array(
                 array(
-                    'label' => $this->l('Occupied Rooms'),
-                    'value' => $occupancyData['count_occupied'],
-                    'percent' => Tools::ps_round(($occupancyData['count_total']
+                    'label' => $this->l('Occupied'),
+                    'value' => $occupancyData['count_total']
                         ? ($occupancyData['count_occupied'] / $occupancyData['count_total']) * 100
-                        : 0), 2),
+                        : 0,
                 ),
                 array(
-                    'label' => $this->l('Available Rooms'),
-                    'value' => $occupancyData['count_available'],
-                    'percent' => Tools::ps_round(($occupancyData['count_total']
+                    'label' => $this->l('Available'),
+                    'value' => $occupancyData['count_total']
                         ? ($occupancyData['count_available'] / $occupancyData['count_total']) * 100
-                        : 0), 2),
+                        : 0,
                 ),
                 array(
-                    'label' => $this->l('Unavailable Rooms'),
-                    'value' => $occupancyData['count_unavailable'],
-                    'percent' => Tools::ps_round(($occupancyData['count_total']
+                    'label' => $this->l('Unavailable'),
+                    'value' => $occupancyData['count_total']
                         ? ($occupancyData['count_unavailable'] / $occupancyData['count_total']) * 100
-                        : 0), 2),
+                        : 0,
                 ),
             );
         } else {

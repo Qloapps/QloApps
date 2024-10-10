@@ -1,13 +1,4 @@
 ------------------------------
-# V1.0.1 to V1.0.2
-------------------------------
-
-## Improved/Changed Features:
-
-* [BO] : [#900] Fixed dashboard stats issues and also improved the view of the dashboard
-* [BO] : [#1129] Fixed Dashboard issues on different sections
-
-------------------------------
 # V1.0.0 to V1.0.1
 ------------------------------
 

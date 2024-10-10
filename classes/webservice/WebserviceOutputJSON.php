@@ -104,7 +104,7 @@ class WebserviceOutputJSON implements WebserviceOutputInterface
         }
         // Case 1 : fields of the current entity (not an association)
         if (!$is_association) {
-            $this->currentEntity[$field['sqlId']] = $field['value'];
+            $this->currentEntity[$field['sqlId']]  = $field['value'];
         } else { // Case 2 : fields of an associated entity to the current one
             $this->currentAssociatedEntity[] = array('name' => $field['entities_name'], 'key' => $field['sqlId'], 'value' => $field['value']);
         }
@@ -146,7 +146,7 @@ class WebserviceOutputJSON implements WebserviceOutputInterface
             }
             $this->currentEntity = array();
         }
-        if (is_array($this->currentAssociatedEntity) && count($this->currentAssociatedEntity)) {
+        if (count($this->currentAssociatedEntity)) {
             $current = array();
             foreach ($this->currentAssociatedEntity as $element) {
                 $current[$element['key']] = $element['value'];
@@ -159,6 +159,9 @@ class WebserviceOutputJSON implements WebserviceOutputInterface
 
     public function overrideContent($content)
     {
+        array_walk($this->content, function (&$item) {
+            $item = array_filter($item);
+        });
         $content = json_encode($this->content, JSON_UNESCAPED_UNICODE);
 
         return (false !== $content) ? $content : '';
@@ -184,23 +187,20 @@ class WebserviceOutputJSON implements WebserviceOutputInterface
     }
     public function renderAssociationFooter($obj, $params, $assoc_name)
     {
+        return;
     }
-
     public function renderErrorsHeader()
     {
         return '';
     }
-
     public function renderErrorsFooter()
     {
         return '';
     }
-
     public function renderAssociationField($field)
     {
         return '';
     }
-
     public function renderi18nField($field)
     {
         return '';

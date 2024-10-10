@@ -323,9 +323,4 @@ p.capa_txt {
   text-decoration: line-through;
   color:#e85757;
   font-size:18px;
-  display: block;
-}
-
-.rm_desc .view_more {
-    display: inline-block;
 }

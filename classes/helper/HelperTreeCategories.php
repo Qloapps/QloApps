@@ -32,7 +32,6 @@ class HelperTreeCategoriesCore extends TreeCore
 
     private $_disabled_categories;
     private $_input_name;
-    private $_input_id;
     private $_lang;
     private $_root_category;
     private $_selected_categories;
@@ -70,7 +69,6 @@ class HelperTreeCategoriesCore extends TreeCore
         foreach ($categories[$rootCategoryId] as $category) {
             $categoryId = (int)$category['id_category'];
             $tree[$categoryId] = $category;
-            $tree[$categoryId]['value'] = $category['id_category'];
 
             if (Category::hasChildren($categoryId, $this->getLang(), false, $this->getShop()->id)) {
                 $categoryChildren = Category::getChildren(
@@ -146,8 +144,7 @@ class HelperTreeCategoriesCore extends TreeCore
                 }
 
                 $tree = Category::getCategoryInformations(array($root_category), $lang);
-                $tree[$root_category]['value'] = $tree[$root_category]['id_category'];
-                $tree[$root_category]['input_name'] = 'categoryBox';
+
                 $children = $this->fillTree($categories, $root_category);
 
                 if (!empty($children)) {
@@ -217,21 +214,6 @@ class HelperTreeCategoriesCore extends TreeCore
         return $this->_input_name;
     }
 
-    public function setInputId($value)
-    {
-        $this->_input_id = $value;
-        return $this;
-    }
-
-    public function getInputId()
-    {
-        if (!isset($this->_input_id)) {
-            $this->setInputId('id_category');
-        }
-
-        return $this->_input_id;
-    }
-
     public function setLang($value)
     {
         $this->_lang = $value;
@@ -245,6 +227,24 @@ class HelperTreeCategoriesCore extends TreeCore
         }
 
         return $this->_lang;
+    }
+
+    public function getNodeFolderTemplate()
+    {
+        if (!isset($this->_node_folder_template)) {
+            $this->setNodeFolderTemplate(self::DEFAULT_NODE_FOLDER_TEMPLATE);
+        }
+
+        return $this->_node_folder_template;
+    }
+
+    public function getNodeItemTemplate()
+    {
+        if (!isset($this->_node_item_template)) {
+            $this->setNodeItemTemplate(self::DEFAULT_NODE_ITEM_TEMPLATE);
+        }
+
+        return $this->_node_item_template;
     }
 
     public function setRootCategory($value)
@@ -302,6 +302,15 @@ class HelperTreeCategoriesCore extends TreeCore
         }
 
         return $this->_shop;
+    }
+
+    public function getTemplate()
+    {
+        if (!isset($this->_template)) {
+            $this->setTemplate(self::DEFAULT_TEMPLATE);
+        }
+
+        return $this->_template;
     }
 
     public function setUseCheckBox($value)
@@ -421,7 +430,7 @@ class HelperTreeCategoriesCore extends TreeCore
     }
 
     /* Override */
-    public function renderNodes($data = null, $root = false)
+    public function renderNodes($data = null)
     {
         if (!isset($data)) {
             $data = $this->getData();
@@ -433,14 +442,13 @@ class HelperTreeCategoriesCore extends TreeCore
 
         $html = '';
         foreach ($data as $item) {
-            $item['input_name'] = $this->getInputName();
             if (array_key_exists('children', $item)
                 && !empty($item['children'])) {
                 $html .= $this->getContext()->smarty->createTemplate(
                     $this->getTemplateFile($this->getNodeFolderTemplate()),
                     $this->getContext()->smarty
                 )->assign(array(
-                    'input_id' => $this->getInputId(),
+                    'input_name' => $this->getInputName(),
                     'children' => $this->renderNodes($item['children']),
                     'node'     => $item
                 ))->fetch();
@@ -449,7 +457,7 @@ class HelperTreeCategoriesCore extends TreeCore
                     $this->getTemplateFile($this->getNodeItemTemplate()),
                     $this->getContext()->smarty
                 )->assign(array(
-                    'input_id' => $this->getInputId(),
+                    'input_name' => $this->getInputName(),
                     'node' => $item
                 ))->fetch();
             }

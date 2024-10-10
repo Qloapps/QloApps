@@ -1,0 +1,10 @@
+
+[{shop_url}]
+
+Halo,
+
+TERIMA KASIH TELAH BERLANGGANAN NEWSLETTER KAMI.
+
+{shop_name} [{shop_url}] didukung oleh
+Webkul(tm) [https://webkul.com]
+

@@ -45,26 +45,12 @@ class HotelRoomDisableDates extends ObjectModel
 
     public function getRoomDisableDates($id_room)
     {
-        $objModule = Module::getInstanceByName('hotelreservationsystem');
-        $disabledDates =  Db::getInstance()->executeS('SELECT `id`, `date_from`, `date_to`, `reason`, `date_add`,
-            NULL AS `id_event`, NULL AS `event_url`, "'.$objModule->l('Disabled', 'HotelRoomDisableDates').'" AS `event_title`,
-            1 AS `is_editable`, 1 AS `is_deletable`
-            FROM `'._DB_PREFIX_.'htl_room_disable_dates` WHERE `id_room`='.(int) $id_room
-        );
-
-        Hook::exec('actionRoomDisabledDatesModifier',
-            array(
-                'disable_dates' => &$disabledDates,
-                'id_room' => $id_room
-            )
-        );
-
-        return $disabledDates;
+        return Db::getInstance()->executeS('SELECT `date_from`, `date_to`, `reason` FROM `'._DB_PREFIX_.'htl_room_disable_dates` WHERE `id_room`='.(int)$id_room);
     }
 
     public function checkIfRoomAlreadyDisabled($params)
     {
-        return Db::getInstance()->executeS('SELECT * FROM `'._DB_PREFIX_.'htl_room_disable_dates` WHERE `id_room` = '.(int)$params['id_room'].' AND `date_from` < \''.pSQL($params['date_to']).'\' AND `date_to` > \''.pSQL($params['date_from']).'\'');
+        return Db::getInstance()->executeS('SELECT * FROM `'._DB_PREFIX_.'htl_room_disable_dates` WHERE `id_room` = '.(int)$params['id_room'].' AND `date_from` <= \''.pSQL($params['date_from']).'\' AND `date_to` >= \''.pSQL($params['date_to']).'\'');
     }
 
     public function updateDisableDateRanges($params)
@@ -132,5 +118,4 @@ class HotelRoomDisableDates extends ObjectModel
 
         return Db::getInstance()->delete('htl_room_disable_dates', '`id_room_type`='.(int)$idRoomType);
     }
-
 }

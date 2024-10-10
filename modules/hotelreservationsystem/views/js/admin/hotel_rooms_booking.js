@@ -28,8 +28,6 @@ $(document).ready(function() {
                 url: rooms_booking_url,
                 method: 'POST',
                 extraParams: function() {
-                    removeInitializedTooltips();
-
                     return $.extend(
                         {
                             ajax: true,
@@ -185,14 +183,6 @@ $(document).ready(function() {
         calendar.render();
     }
 
-    function removeInitializedTooltips() {
-        $('#fullcalendar a.day-info, #fullcalendar .fc-daygrid-event').each(function () {
-            if ($(this).data('ui-tooltip')) {
-                $(this).tooltip('destroy');
-            }
-        });
-    }
-
     function getSearchData()
     {
         return {
@@ -230,15 +220,14 @@ $(document).ready(function() {
         dateFormat: 'dd-mm-yy',
         altFormat: 'yy-mm-dd',
         altField: '#date_from',
-        minDate: PS_BACKDATE_ORDER_ALLOW == 1 ? null : 0,
         beforeShowDay: function (date) {
             return highlightDateBorder($("#from_date").val(), date);
         },
         onSelect: function(selectedDate) {
-            let objDateToMin = $.datepicker.parseDate('dd-mm-yy', selectedDate);
-            objDateToMin.setDate(objDateToMin.getDate() + 1);
-
-            $('#to_date').datepicker('option', 'minDate', objDateToMin);
+            var date_format = selectedDate.split("-");
+            var selectedDate = new Date($.datepicker.formatDate('yy-mm-dd', new Date(date_format[2], date_format[1] - 1, date_format[0])));
+            selectedDate.setDate(selectedDate.getDate() + 1);
+            $("#to_date").datepicker("option", "minDate", selectedDate);
         },
     });
 
@@ -247,11 +236,6 @@ $(document).ready(function() {
         dateFormat: 'dd-mm-yy',
         altFormat: 'yy-mm-dd',
         altField: '#date_to',
-        beforeShow: function () {
-            from_date = $.datepicker.parseDate('dd-mm-yy', $("#from_date").val());
-            from_date.setDate(from_date.getDate() + 1);
-            $("#to_date").datepicker("option", "minDate", from_date);
-        },
         beforeShowDay: function (date) {
             return highlightDateBorder($("#to_date").val(), date);
         },
@@ -417,7 +401,7 @@ $(document).ready(function() {
         var date_to = $(this).attr('data-date-to');
 
         var sub_key = $(this).attr('data-sub-key');
-        var booking_type = $(this).closest('tr').find("input.par_bk_type:checked").val();
+        var booking_type = $("input[name='bk_type_" + id_room + "_" + sub_key + "']:checked").val();
         var comment = $("#comment_" + id_room + "_" + sub_key).val();
         var btn = $(this);
         $(this).closest('tr').find('.booking_occupancy_wrapper').parent().removeClass('open');
@@ -593,7 +577,6 @@ $(document).ready(function() {
 
     $(document).on('click', '.booking_occupancy_wrapper .remove-room-link', function(e) {
         e.preventDefault();
-        e.stopPropagation();
 
 		booking_occupancy_inner = $(this).closest('.booking_occupancy_inner');
         $(this).closest('.occupancy_info_block').remove();
@@ -604,90 +587,54 @@ $(document).ready(function() {
     });
 
     $(document).on('change', '.num_occupancy', function(e) {
-        let elementVal = parseInt($(this).val());
+
         let current_room_occupancy = 0;
 		$(this).closest('.occupancy_info_block').find('.num_occupancy').each(function(){
             current_room_occupancy += parseInt($(this).val());
 		});
         let max_guests_in_room = $(this).closest(".booking_occupancy_wrapper").find('.max_guests').val();
 		let max_allowed_for_current = (max_guests_in_room - current_room_occupancy) + parseInt($(this).val());
-        let haserror = false
+        if ($(this).val() > $(this).attr('max')) {
+            $(this).val($(this).attr('max'));
+        }
+        if ($(this).val() > max_allowed_for_current) {
+            $(this).val(max_allowed_for_current);
+        }
+
         if ($(this).hasClass('num_children')) {
-            max_child_in_room = $(this).closest(".booking_occupancy_wrapper").find('.max_children').val();
-            if (elementVal > max_child_in_room) {
-                $(this).val(max_child_in_room);
-                if (elementVal == 1) {
-                    showOccupancyError(no_children_allowed_txt, $(this).closest(".occupancy_info_block"));
-                    haserror = true;
-                } else {
-                    showOccupancyError(max_children_txt, $(this).closest(".occupancy_info_block"));
-                    haserror = true;
+            let totalChilds = $(this).closest('.occupancy_info_block').find('.guest_child_age').length;
+            if (totalChilds < $(this).val()) {
+                $(this).closest('.occupancy_info_block').find('.children_age_info_block').show();
+                while ($(this).closest('.occupancy_info_block').find('.guest_child_age').length < $(this).val()) {
+                    var roomBlockIndex = parseInt($(this).closest('.occupancy_info_block').attr('occ_block_index'));
+                    var childAgeSelect = '<div class="form-group col-xs-12 col-sm-12 col-md-6 col-lg-6">';
+                        childAgeSelect += '<select class="guest_child_age room_occupancies" name="occupancy[' +roomBlockIndex+ '][child_ages][]">';
+                            childAgeSelect += '<option value="-1">' + select_age_txt + '</option>';
+                            childAgeSelect += '<option value="0">' + under_1_age + '</option>';
+                            for (let age = 1; age < max_child_age; age++) {
+                                childAgeSelect += '<option value="'+age+'">'+age+'</option>';
+                            }
+                        childAgeSelect += '</select>';
+                    childAgeSelect += '</div>';
+                    $(this).closest('.occupancy_info_block').find('.children_ages').append(childAgeSelect);
                 }
-            } else if (elementVal > max_allowed_for_current)  {
-                $(this).val(max_allowed_for_current);
-                showOccupancyError(max_occupancy_reached_txt, $(this).closest(".occupancy_info_block"));
-                haserror = true;
-            }
-        } else {
-            max_adults_in_room = $(this).closest(".booking_occupancy_wrapper").find('.max_adults').val();
-            if (elementVal >= max_adults_in_room) {
-                $(this).val(max_adults_in_room);
-                showOccupancyError(max_adults_txt, $(this).closest(".occupancy_info_block"));
-                haserror = true;
-            } else if (elementVal > max_allowed_for_current)  {
-                $(this).val(max_allowed_for_current);
-                showOccupancyError(max_occupancy_reached_txt, $(this).closest(".occupancy_info_block"));
-                haserror = true;
+            } else {
+                let child = $(this).val();
+                $(this).closest('.occupancy_info_block').find('.guest_child_age').each(function(ind, element) {
+                    if (child <= ind) {
+                        $(element).parent().remove();
+                    }
+                });
+                if (child == 0) {
+                    $(this).closest('.occupancy_info_block').find('.children_age_info_block').hide();
+                }
+
             }
         }
 
-        if (!haserror) {
-            if ($(this).hasClass('num_children')) {
-                let totalChilds = $(this).closest('.occupancy_info_block').find('.guest_child_age').length;
-                if (totalChilds < $(this).val()) {
-                    $(this).closest('.occupancy_info_block').find('.children_age_info_block').show();
-                    while ($(this).closest('.occupancy_info_block').find('.guest_child_age').length < $(this).val()) {
-                        var roomBlockIndex = parseInt($(this).closest('.occupancy_info_block').attr('occ_block_index'));
-                        var childAgeSelect = '<div class="form-group col-xs-12 col-sm-12 col-md-6 col-lg-6">';
-                            childAgeSelect += '<select class="guest_child_age room_occupancies" name="occupancy[' +roomBlockIndex+ '][child_ages][]">';
-                                childAgeSelect += '<option value="-1">' + select_age_txt + '</option>';
-                                childAgeSelect += '<option value="0">' + under_1_age + '</option>';
-                                for (let age = 1; age < max_child_age; age++) {
-                                    childAgeSelect += '<option value="'+age+'">'+age+'</option>';
-                                }
-                            childAgeSelect += '</select>';
-                        childAgeSelect += '</div>';
-                        $(this).closest('.occupancy_info_block').find('.children_ages').append(childAgeSelect);
-                    }
-                } else {
-                    let child = $(this).val();
-                    $(this).closest('.occupancy_info_block').find('.guest_child_age').each(function(ind, element) {
-                        if (child <= ind) {
-                            $(element).parent().remove();
-                        }
-                    });
-                    if (child == 0) {
-                        $(this).closest('.occupancy_info_block').find('.children_age_info_block').hide();
-                    }
-
-                }
-            }
-        }
         setRoomTypeGuestOccupancy($(this).closest('.booking_occupancy_wrapper'));
+
     });
-
-    var errorMsgTime;
-    $('.occupancy-input-errors').parent().hide();
-    function showOccupancyError(msg, occupancy_info_block)
-    {
-        var errorMsgBlock = $(occupancy_info_block).find('.occupancy-input-errors')
-        $(errorMsgBlock).html(msg).parent().show('fast');
-        clearTimeout(errorMsgTime);
-        errorMsgTime = setTimeout(function() {
-            $(errorMsgBlock).parent().hide('fast');
-        }, 1000);
-    }
-
 
 	$(document).on('click', '.booking_guest_occupancy', function(e) {
 		$(this).parent().toggleClass('open');
@@ -781,8 +728,8 @@ $(document).ready(function() {
                     occupancy_block += '</div>';
                 occupancy_block += '</div>';
             occupancy_block += '</div>';
-            occupancy_block += '<hr class="occupancy-info-separator col-sm-12">';
         occupancy_block += '</div>';
+        occupancy_block += '<hr class="occupancy-info-separator col-sm-12">';
 
         $(booking_occupancy_wrapper).find('.booking_occupancy_inner').append(occupancy_block);
 
@@ -922,12 +869,6 @@ $(document).ready(function() {
                         $("#cartModal").html(result.cart_content);
                     }
                     $("#cart_record").html(result.total_products_in_cart);
-
-                    if (parseInt(result.total_products_in_cart) > 0) {
-                        $('#cart_record').closest('button').removeClass('disabled');
-                    } else {
-                        $('#cart_record').closest('button').addClass('disabled');
-                    }
                 }
             }
         });
@@ -935,67 +876,27 @@ $(document).ready(function() {
 
     function refreshStatsData()
     {
-        var formData = new FormData($('form#room-search-form').get(0));
-        formData.append('ajax', true);
-        formData.append('action', 'getBookingStats');
+        var search_id_room_type = $("#search_id_room_type").val();
+        var search_id_hotel = $("#search_id_hotel").val();
+        var search_date_from = $("#search_date_from").val();
+        var search_date_to = $("#search_date_to").val();
 
         $.ajax({
             url: rooms_booking_url,
             type: 'POST',
             dataType: 'JSON',
-            data: formData,
-            processData: false,
-            contentType: false,
+            data: {
+                ajax: true,
+                action: 'getBookingStats',
+                search_id_room_type: search_id_room_type,
+                search_id_hotel: search_id_hotel,
+                search_date_from: search_date_from,
+                search_date_to: search_date_to,
+            },
             success: function(result) {
                 if (result.success) {
                     $(".htl_room_data_cont").html(result.data.stats_panel);
-                    initstatstooltip();
                 }
-            }
-        });
-    }
-    initstatstooltip();
-
-    function initstatstooltip()
-    {
-        $(".htl_room_data_cont").find('.status-info-tooltip').tooltip({
-            trigger : 'hover',
-            show: {
-                delay: 100,
-            },
-            hide: {
-                delay: 300,
-            },
-            open: function(event, ui)
-            {
-                if(event.buttons == 1 || event.buttons == 3){
-                    ui.tooltip.remove();
-                }
-
-                if (typeof(event.originalEvent) === 'undefined') {
-                    return false;
-                }
-
-                var $id = $(ui.tooltip).attr('id');
-
-                // close any lingering tooltips
-                if ($('div.ui-tooltip').not('#' + $id).length) {
-                    return false;
-                }
-
-                // ajax function to pull in data and add it to the tooltip goes here
-            },
-            close: function(event, ui)
-            {
-                ui.tooltip.hover(function() {
-                    $(this).stop(true).fadeTo(300, 1);
-                },
-                function() {
-                    $(this).fadeOut('300', function()
-                    {
-                        $(this).remove();
-                    });
-                });
             }
         });
     }
@@ -1006,24 +907,27 @@ $(document).ready(function() {
 	};
     initBookingList();
     function initBookingList() {
-        $('.booking_type_comment').hide();
+        $('.avai_comment, .par_comment').hide();
         $('.avai_bk_type').on('change', function() {
+            var id_room = $(this).attr('data-id-room');
             var booking_type = $(this).val();
 
             if (booking_type == allotmentTypes.auto) {
-                $(this).closest('td').find('.booking_type_comment').hide().val('');
+                $('#comment_'+id_room).hide().val('');
             } else if (booking_type == allotmentTypes.manual) {
-                $(this).closest('td').find('.booking_type_comment').show();
+                $('#comment_'+id_room).show();
             }
         });
 
         $('.par_bk_type').on('change', function() {
+            var id_room = $(this).attr('data-id-room');
+            var sub_key = $(this).attr('data-sub-key');
             var booking_type = $(this).val();
 
             if (booking_type == allotmentTypes.auto) {
-                $(this).closest('td').find('.booking_type_comment').hide().val('');
+                $('#comment_'+id_room+'_'+sub_key).hide().val('');
             } else if (booking_type == allotmentTypes.manual) {
-                $(this).closest('td').find('.booking_type_comment').show();
+                $('#comment_'+id_room+'_'+sub_key).show();
             }
         });
     }
@@ -1031,8 +935,18 @@ $(document).ready(function() {
     function highlightDateBorder(elementVal, date)
     {
         if (elementVal) {
-            let selectedDate = $.datepicker.formatDate('dd-mm-yy', date);
-            if (selectedDate == elementVal) {
+            var currentDate = date.getDate();
+            var currentMonth = date.getMonth()+1;
+            if (currentMonth < 10) {
+                currentMonth = '0' + currentMonth;
+            }
+            if (currentDate < 10) {
+                currentDate = '0' + currentDate;
+            }
+            dmy = date.getFullYear() + "-" + currentMonth + "-" + currentDate;
+            var date_format = elementVal.split("-");
+            var check_in_time = (date_format[2]) + '-' + (date_format[1]) + '-' + (date_format[0]);
+            if (dmy == check_in_time) {
                 return [true, "selectedCheckedDate", "Check-In date"];
             } else {
                 return [true, ""];
@@ -1041,4 +955,61 @@ $(document).ready(function() {
             return [true, ""];
         }
     }
+
+    /*For swaping rooms in the modal*/
+    $("#realloc_allocated_rooms").on('click', function(e) {
+        $(".error_text").text('');
+        if ($('#realloc_avail_rooms').val() == 0) {
+            $("#realloc_sel_rm_err_p").text(slct_rm_err);
+            return false;
+        }
+    });
+    $("#swap_allocated_rooms").on('click', function(e) {
+        $(".error_text").text('');
+        if ($('#swap_avail_rooms').val() == 0) {
+            $("#swap_sel_rm_err_p").text(slct_rm_err);
+            return false;
+        }
+    });
+
+    $('#mySwappigModal').on('hidden.bs.modal', function(e) {
+        $(".modal_date_from").val('');
+        $(".modal_date_to").val('');
+        $(".modal_id_room").val('');
+        $(".modal_curr_room_num").val('');
+        $(".cust_name").text('');
+        $(".cust_email").text('');
+        $(".swp_rm_opts").remove();
+        $(".realloc_rm_opts").remove();
+    });
+
+    $('#mySwappigModal').on('shown.bs.modal', function(e) {
+        $(".modal_date_from").val(e.relatedTarget.dataset.date_from);
+        $(".modal_date_to").val(e.relatedTarget.dataset.date_to);
+        $(".modal_id_room").val(e.relatedTarget.dataset.id_room);
+        $(".modal_curr_room_num").val(e.relatedTarget.dataset.room_num);
+        $(".cust_name").text(e.relatedTarget.dataset.cust_name);
+        $(".cust_email").text(e.relatedTarget.dataset.cust_email);
+        html = '';
+        if (e.relatedTarget.dataset.avail_rm_realloc) {
+            var json_arr_rm_swp = JSON.parse(e.relatedTarget.dataset.avail_rm_swap);
+            $.each(json_arr_rm_swp, function(key, val) {
+                html += '<option class="swp_rm_opts" value="' + val.id_room + '" >' + val.room_num + '</option>';
+            });
+        }
+        if (html != '') {
+            $("#swap_avail_rooms").append(html);
+        }
+
+        html = '';
+        if (e.relatedTarget.dataset.avail_rm_realloc) {
+            var json_arr_rm_realloc = JSON.parse(e.relatedTarget.dataset.avail_rm_realloc);
+            $.each(json_arr_rm_realloc, function(key, val) {
+                html += '<option class="realloc_rm_opts" value="' + val.id_room + '" >' + val.room_num + '</option>';
+            });
+        }
+        if (html != '') {
+            $("#realloc_avail_rooms").append(html);
+        }
+    });
 });

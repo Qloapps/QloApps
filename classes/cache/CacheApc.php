@@ -81,13 +81,7 @@ class CacheApcCore extends Cache
      */
     protected function _set($key, $value, $ttl = 0)
     {
-
-        $result = (($this->apcu) ? apcu_store($key, $value, $ttl) : apc_store($key, $value, $ttl));
-        if ($result === false) {
-            $this->setAdjustTableCacheSize(true);
-        }
-
-        return $result;
+        return (($this->apcu) ? apcu_store($key, $value, $ttl) : apc_store($key, $value, $ttl));
     }
 
     /**

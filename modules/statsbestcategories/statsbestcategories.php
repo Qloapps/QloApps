@@ -42,7 +42,7 @@ class StatsBestCategories extends ModuleGrid
     {
         $this->name = 'statsbestcategories';
         $this->tab = 'analytics_stats';
-        $this->version = '1.5.4';
+        $this->version = '1.5.3';
         $this->author = 'PrestaShop';
         $this->need_instance = 0;
 
@@ -62,7 +62,7 @@ class StatsBestCategories extends ModuleGrid
             ),
             array(
                 'id' => 'totalRoomsBooked',
-                'header' => $this->l('Room nights booked'),
+                'header' => $this->l('Rooms booked'),
                 'dataIndex' => 'totalRoomsBooked',
                 'align' => 'center',
                 'tooltip' => $this->l('The room nights booked for the hotel.'),
@@ -130,6 +130,10 @@ class StatsBestCategories extends ModuleGrid
 			<div class="panel-heading">
 				<i class="icon-sitemap"></i> '.$this->displayName.'
 			</div>';
+        if (!(Module::isEnabled('statsdata') && Configuration::get('PS_STATSDATA_PAGESVIEWS'))) {
+			$link = $this->context->link->getAdminLink('AdminModules').'&configure=statsdata';
+            $this->html .= '<div class="alert alert-info">'.$this->l('You must enable the "Save global page views" option from ').'<u><a href="'.$link.'" target="_blank">Data mining for statistics</a></u>'.$this->l(' module in order to display the most viewed hotels, or use the QloApps Google Analytics module.').'</div>';
+        }
 
         $this->html .= $this->engine($engine_params).'
             <div class="row form-horizontal">
@@ -165,7 +169,7 @@ class StatsBestCategories extends ModuleGrid
             SELECT IFNULL(SUM(DATEDIFF(LEAST(hbd.`date_to`, "'.pSQL($date_to).'"), GREATEST(hbd.`date_from`, "'.pSQL($date_from).'"))), 0)
             FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
             LEFT JOIN `'._DB_PREFIX_.'orders` o ON (o.`id_order` = hbd.`id_order`)
-            WHERE hbd.`id_hotel` = hbi.`id` AND o.`valid` = 1 AND is_refunded = 0
+            WHERE hbd.`id_hotel` = hbi.`id` AND o.`valid` = 1
             AND hbd.`date_to` > "'.pSQL($date_from).'" AND hbd.`date_from` < "'.pSQL($date_to).'"
         ) AS totalRoomsBooked,
         (
@@ -191,7 +195,7 @@ class StatsBestCategories extends ModuleGrid
             AND hbd.`date_to` > "'.pSQL($date_from).'" AND hbd.`date_from` < "'.pSQL($date_to).'"
         ) AS totalOrders,
         (
-            SELECT IFNULL(SUM(ROUND((DATEDIFF(LEAST(hbd.`date_to`, "'.pSQL($date_to).'"), GREATEST(hbd.`date_from`, "'.pSQL($date_from).'")) / DATEDIFF(hbd.`date_to`, hbd.`date_from`)) * (hbd.`total_price_tax_excl` / o.`conversion_rate`), 2)), 0)
+            SELECT IFNULL(SUM(ROUND((DATEDIFF(LEAST(hbd.`date_to`, "'.pSQL($date_to).'"), GREATEST(hbd.`date_from`, "'.pSQL($date_from).'")) / DATEDIFF(hbd.`date_to`, hbd.`date_from`)) * hbd.`total_price_tax_excl`, 2)), 0)
             FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
             LEFT JOIN `'._DB_PREFIX_.'orders` o
             ON (o.`id_order` = hbd.`id_order`)
@@ -219,7 +223,6 @@ class StatsBestCategories extends ModuleGrid
         FROM `'._DB_PREFIX_.'htl_branch_info` hbi
         LEFT JOIN `'._DB_PREFIX_.'htl_branch_info_lang` hbil
         ON (hbil.`id` = hbi.`id` AND hbil.`id_lang` = '.(int)$id_lang .')
-        WHERE 1 '.HotelBranchInformation::addHotelRestriction(false, 'hbi', 'id').'
         GROUP BY (hbi.`id`)';
 
         if (Validate::IsName($this->_sort)) {

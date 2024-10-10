@@ -6533,14 +6533,13 @@ table.table_block td {
   .input-date span i, .form-control .input-date span i {
     transform: scale(0.8, 0.6);}
 
-.input-location, .form-control .input-location {
-  background: url("../img/icon/icon-location.svg") no-repeat 6px 50%;
+.input-hotel, .form-control .input-hotel, .input-location, .form-control .input-location {
+  background: url("../img/icon/icon-hotel.svg") no-repeat 10px 50%;
   padding-left: 35px;
   background-color: #FFF;
 }
 .input-occupancy, .form-control .input-occupancy {
   text-align: left;
-  overflow: hidden;
 }
 
 .page-product-box {
@@ -7224,9 +7223,7 @@ div.star a:hover {
   background: none repeat scroll 0 0 lightyellow; }
 
 #page .rte {
-  background: transparent none repeat scroll 0 0;
-  color : #333;
-}
+  background: transparent none repeat scroll 0 0; }
   #page .rte em {
     font-style: italic !important; }
 
@@ -7531,6 +7528,7 @@ div.star a:hover {
 #tinymce ol,
 #tinymce dl {
   margin-left: 20px; }
+
 .rte ul {
   list-style-type: disc;
   padding-left: 15px; }
@@ -7740,10 +7738,7 @@ a.price_discount_delete {
   #order-detail-content #cart_summary tfoot tr .text-right, #order-detail-content #cart_summary tfoot tr tbody td.cart_unit, #order-detail-content #cart_summary tbody tfoot tr td.cart_unit, #order-detail-content #cart_summary tfoot tr tbody td.cart_total, #order-detail-content #cart_summary tbody tfoot tr td.cart_total, #order-detail-content #cart_summary tfoot tr .price {
     display: block;
     float: left;
-    width: 50%; }
-    .margin-btm-sm-10 {
-      margin-bottom: 10px
-    } }
+    width: 50%; } }
 @media (max-width: 768px) {
   #order-detail-content #cart_summary tbody td .price {
     text-align: center; }
@@ -8317,36 +8312,47 @@ table.discount i {
 
 #pagenotfound .pagenotfound {
   max-width: 824px;
-  margin: 0px auto;
+  margin: 100px auto 100px auto;
   text-align: center; }
-  #pagenotfound .pagenotfound img {
-    margin: 0 auto; }
+  #pagenotfound .pagenotfound .img-404 {
+    padding: 8px 0 27px 0; }
+    #pagenotfound .pagenotfound .img-404 img {
+      max-width: 100%; }
   #pagenotfound .pagenotfound h1 {
-    font-size: 40px;
-    font-weight: 700;
+    font: 600 28px/34px 'Oxygen', serif;
     color: #333;
+    text-transform: uppercase;
     margin-bottom: 7px; }
   #pagenotfound .pagenotfound p {
+    font: 600 16px/20px 'Oxygen', serif;
     color: #555454;
+    text-transform: uppercase;
+    border-bottom: 1px solid #d6d4d4;
     padding-bottom: 19px;
-    margin-top: 30px;
-    font-size: 18px;
-    line-height: 24px;
-    margin-bottom: 0; }
+    margin-bottom: 20px; }
+  #pagenotfound .pagenotfound h3 {
+    font-weight: bold;
+    color: #333;
+    font-size: 13px;
+    line-height: normal;
+    margin-bottom: 18px; }
+  #pagenotfound .pagenotfound label {
+    font-weight: normal; }
+    @media (max-width: 767px) {
+      #pagenotfound .pagenotfound label {
+        display: block; } }
+  #pagenotfound .pagenotfound .form-control {
+    max-width: 293px;
+    display: inline-block;
+    margin-right: 5px; }
+    @media (max-width: 767px) {
+      #pagenotfound .pagenotfound .form-control {
+        margin: 0 auto 15px auto;
+        display: block; } }
   #pagenotfound .pagenotfound .buttons {
-    margin-top: 5px; }
-    #pagenotfound .pagenotfound .buttons a.btn-primary {
-      border: none;
-      border-radius: 2px;
-      font-size: 14px;
-      padding: 15px 20px;
-      font-weight: 600;
-      background-color: #1292FF;
-      color: #FFFFFF; }
-      #pagenotfound .pagenotfound .buttons a.btn-primary:hover {
-        opacity: 0.8; }
-        #pagenotfound .pagenotfound .buttons a.btn-primary:hover span {
-          background: none; }
+    padding: 48px 0 20px 0; }
+    #pagenotfound .pagenotfound .buttons .button-medium i.left {
+      font-size: 17px; }
 
 #account-creation_form fieldset.reversoform {
   padding: 10px !important; }
@@ -8981,6 +8987,7 @@ a.open_rooms_extra_services_panel {
   margin-bottom: 18px;} */
 
 #rooms_extra_services .room_demand_block {
+  margin-bottom: 15px;
   color: #333;
   font-size: 14px;}
 #rooms_extra_services .checkbox {

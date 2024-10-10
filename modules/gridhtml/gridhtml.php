@@ -40,7 +40,7 @@ class GridHtml extends ModuleGridEngine
 		{
 			$this->name = 'gridhtml';
 			$this->tab = 'administration';
-			$this->version = '1.3.4';
+			$this->version = '1.3.3';
 			$this->author = 'PrestaShop';
 			$this->need_instance = 0;
 
@@ -58,8 +58,6 @@ class GridHtml extends ModuleGridEngine
 
 	public static function hookGridEngine($params, $grider)
 	{
-        static $divid = 1;
-
 		$objModule = Module::getInstanceByName('gridhtml');
 		self::$_columns = $params['columns'];
 		if (!isset($params['emptyMsg']))
@@ -73,32 +71,32 @@ class GridHtml extends ModuleGridEngine
         }
 
 		$html = '
-		<table class="table" id="grid_'.$divid.'">
+		<table class="table" id="grid_1">
 			<thead>
 				<tr>';
 		foreach ($params['columns'] as $column)
-			$html .= '<th class="'.((isset($column['align']) && $column['align']) ? $column['align'] : 'center').'" '.((isset($column['tooltip']) && $column['tooltip']) ? ('data-toggle="tooltip" title="'.$column['tooltip'].'"') : '').'><span class="title_box active">'.$column['header'].'</span></th>';
+			$html .= '<th class="center" '.((isset($column['tooltip']) && $column['tooltip']) ? ('data-toggle="tooltip" title="'.$column['tooltip'].'"') : '').'><span class="title_box active">'.$column['header'].'</span></th>';
 		$html .= '</tr>
 			</thead>
 			<tbody></tbody>
 			<tfoot><tr><th colspan="'.count($params['columns']).'"></th></tr></tfoot>
 		</table>
 		<script type="text/javascript">
-			function getGridData'.$divid.'(url)
+			function getGridData(url)
 			{
-				$("#grid_'.$divid.' tbody").html("<tr><td style=\"text-align:center\" colspan=\"" + '.count($params['columns']).' + "\"><img src=\"../img/loadingAnimation.gif\" /></td></tr>");
+				$("#grid_1 tbody").html("<tr><td style=\"text-align:center\" colspan=\"" + '.count($params['columns']).' + "\"><img src=\"../img/loadingAnimation.gif\" /></td></tr>");
 				$.get(url, "", function(json) {
-					$("#grid_'.$divid.' tbody").html("");
+					$("#grid_1 tbody").html("");
 					var array = $.parseJSON(json);
-					$("#grid_'.$divid.' tfoot tr th").html("'.addslashes($params['pagingMessage']).'");
-					$("#grid_'.$divid.' tfoot tr th").html($("#grid_'.$divid.' tfoot tr th").html().replace("{0}", array["from"]));
-					$("#grid_'.$divid.' tfoot tr th").html($("#grid_'.$divid.' tfoot tr th").html().replace("{1}", array["to"]));
-					$("#grid_'.$divid.' tfoot tr th").html($("#grid_'.$divid.' tfoot tr th").html().replace("{2}", array["total"]));
+					$("#grid_1 tfoot tr th").html("'.addslashes($params['pagingMessage']).'");
+					$("#grid_1 tfoot tr th").html($("#grid_1 tfoot tr th").html().replace("{0}", array["from"]));
+					$("#grid_1 tfoot tr th").html($("#grid_1 tfoot tr th").html().replace("{1}", array["to"]));
+					$("#grid_1 tfoot tr th").html($("#grid_1 tfoot tr th").html().replace("{2}", array["total"]));
 
 					if (array["from"] > 1)
-						$("#grid_'.$divid.' tfoot tr th").html($("#grid_'.$divid.' tfoot tr th").html() + " &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a style=\\"cursor:pointer;text-decoration:none\\" onclick=\\"gridPrevPage(\'"+ url +"\');\\">&lt;&lt;</a>");
+						$("#grid_1 tfoot tr th").html($("#grid_1 tfoot tr th").html() + " &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a style=\\"cursor:pointer;text-decoration:none\\" onclick=\\"gridPrevPage(\'"+ url +"\');\\">&lt;&lt;</a>");
 					if (array["to"] < array["total"])
-						$("#grid_'.$divid.' tfoot tr th").html($("#grid_'.$divid.' tfoot tr th").html() + " | <a style=\\"cursor:pointer;text-decoration:none\\" onclick=\\"gridNextPage(\'"+ url +"\');\\">&gt;&gt;</a>");
+						$("#grid_1 tfoot tr th").html($("#grid_1 tfoot tr th").html() + " | <a style=\\"cursor:pointer;text-decoration:none\\" onclick=\\"gridNextPage(\'"+ url +"\');\\">&gt;&gt;</a>");
 					var values = array["values"];
 					if (values.length > 0)
 						$.each(values, function(index, row){
@@ -109,10 +107,10 @@ class GridHtml extends ModuleGridEngine
 				$params['defaultSortColumn'] = false;
 			if (!isset($params['defaultSortDirection']))
 				$params['defaultSortDirection'] = false;
-			$html .= '		$("#grid_'.$divid.' tbody").append(newLine);
+			$html .= '		$("#grid_1 tbody").append(newLine);
 						});
 					else
-						$("#grid_'.$divid.' tbody").append("<tr><td class=\"center\" colspan=\"" + '.count($params['columns']).' + "\">'.$params['emptyMsg'].'</td></tr>");
+						$("#grid_1 tbody").append("<tr><td class=\"center\" colspan=\"" + '.count($params['columns']).' + "\">'.$params['emptyMsg'].'</td></tr>");
 				});
 			}
 
@@ -144,9 +142,8 @@ class GridHtml extends ModuleGridEngine
 				getGridData(url);
 			}
 
-			$(document).ready(function(){getGridData'.$divid.'("'.$grider.'&sort='.urlencode($params['defaultSortColumn']).'&dir='.urlencode($params['defaultSortDirection']).$customParams.'");});
+			$(document).ready(function(){getGridData("'.$grider.'&sort='.urlencode($params['defaultSortColumn']).'&dir='.urlencode($params['defaultSortDirection']).$customParams.'");});
 		</script>';
-		$divid++;
 		return $html;
 	}
 

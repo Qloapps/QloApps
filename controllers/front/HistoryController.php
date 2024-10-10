@@ -36,9 +36,15 @@ class HistoryControllerCore extends FrontController
         parent::setMedia();
         $this->addCSS(array(
             _THEME_CSS_DIR_.'history.css',
+            _THEME_CSS_DIR_.'addresses.css'
         ));
-
-        $this->addJqueryPlugin(array('footable', 'footable-sort'));
+        $this->addJS(array(
+            _THEME_JS_DIR_.'history.js',
+            _THEME_JS_DIR_.'tools.js' // retro compat themes 1.5
+        ));
+        $this->addJqueryPlugin(array('fancybox')); //fancybox not found for some client theme
+        $this->addJqueryPlugin(array('scrollTo', 'footable', 'footable-sort'));
+        $this->addJqueryUI('ui.tooltip', 'base', true);
     }
 
     /**
@@ -47,8 +53,6 @@ class HistoryControllerCore extends FrontController
      */
     public function initContent()
     {
-        $this->show_breadcrump = true;
-
         parent::initContent();
         if ($orders = Order::getCustomerOrders($this->context->customer->id)) {
             foreach ($orders as &$order) {
@@ -60,7 +64,6 @@ class HistoryControllerCore extends FrontController
         }
         $this->context->smarty->assign(array(
             'orders' => $orders,
-            'overbooking_order_states' => OrderState::getOverBookingStates(),
             'invoiceAllowed' => (int)Configuration::get('PS_INVOICE'),
             'reorderingAllowed' => !(bool)Configuration::get('PS_DISALLOW_HISTORY_REORDERING'),
             'slowValidation' => Tools::isSubmit('slowvalidation')

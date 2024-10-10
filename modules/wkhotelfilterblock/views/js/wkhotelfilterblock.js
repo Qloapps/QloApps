@@ -87,8 +87,8 @@ $(document).ready(function()
 		values: [min_price, max_price],
 		slide: function(event, ui)
 		{
-			$("#filter_price_from").html(formatCurrency(ui.values[0], currencyFormat, currencySign, currencyBlank));
-			$("#filter_price_to").html(formatCurrency(ui.values[1], currencyFormat, currencySign, currencyBlank));
+			$("#filter_price_from").html(ui.values[0]);
+			$("#filter_price_to").html(ui.values[1]);
 		},
 		change: function(event, ui)
 		{
@@ -109,12 +109,12 @@ $(document).ready(function()
 		$('.sort_btn_span').attr('data-sort-value', 0);
 
 		$('#gst_rating .sort_btn_span').html($('#gst_rating .sort_btn_span').attr('data-sort-for'));
+		$('#price_ftr .sort_btn_span').html($('#price_ftr .sort_btn_span').attr('data-sort-for'));
 
 		// select btn data enter
 		var sort_text = $(this).html();
 		var dp_btn_span = $(this).parents('div.filter_dw_cont').find('button span.sort_btn_span');
 		dp_btn_span.html(sort_text);
-		dp_btn_span.attr('data-sort-for', sort_text);
 		dp_btn_span.attr('data-sort-by', $(this).attr('data-sort-by'));
 		dp_btn_span.attr('data-sort-value', $(this).attr('data-value'));
 

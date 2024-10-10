@@ -626,27 +626,12 @@ class WebserviceOutputBuilderCore
                 }
                 $output_details = '';
                 foreach ($objects_assoc as $object_assoc) {
-                    if (isset($association['only_leaf_nodes']) && $association['only_leaf_nodes']) {
-                        unset($association['only_leaf_nodes']);
-                        unset($association['getter']);
-                        unset($association['setter']);
-                        foreach ($association as $associationKey => $resource) {
-                            $field = array();
-                            $field['sqlId'] = $associationKey;
-                            $field['value'] = null;
-                            if (!is_null($this->schemaToDisplay)) {
-                                $field['synopsis_details'] = $this->getSynopsisDetails($resource);
-                            }
-
-                            $output_details .= $this->setIndent($depth - 1).$this->objectRender->renderField($field);
-                        }
-                    } elseif ($depth == 0 || $class_name === null) {
+                    if ($depth == 0 || $class_name === null) {
                         $value = null;
                         if (!empty($object_assoc)) {
                             $value = $object_assoc;
                         }
                         if (empty($fields_assoc)) {
-                            $value['id'] = isset($value['id']) ? $value['id'] : '';
                             $fields_assoc = array(array('id' => $value['id']));
                         }
                         $output_details .= $this->renderFlatAssociation($object, $depth, $assoc_name, $association['resource'], $fields_assoc, $value, $parent_details);
@@ -690,35 +675,12 @@ class WebserviceOutputBuilderCore
         $output .= $this->setIndent($depth - 1).$this->objectRender->renderNodeHeader($resource_name, array(), $more_attr);
 
         foreach ($fields_assoc as $field_name => $field) {
-            if (isset($field['resource']) && isset($field['fields'])) {
-                $parent_details = array(
-                    'object_id'    => null,
-                    'entity_name'    => $field['resource'],
-                    'entities_name'    => $field_name,
-                );
-                $output_details = '';
-                $output_details = $this->renderFlatAssociation(
-                    $object,
-                    $depth,
-                    $field_name,
-                    $field['resource'],
-                    $field['fields'],
-                    $object_assoc,
-                    $parent_details
-                );
-                if ($output_details != '') {
-                    $output .= $this->setIndent($depth).$this->objectRender->renderNodeHeader($field_name, array());
-                    $output .= $output_details;
-                    $output .= $this->setIndent($depth).$this->objectRender->renderNodeFooter($field_name, array());
-                } else {
-                    $output .= $this->setIndent($depth).$this->objectRender->renderNodeHeader($field_name, array());
-                }
-            } elseif (!is_array($this->fieldsToDisplay) || in_array($field_name, $this->fieldsToDisplay[$assoc_name])) {
+            if (!is_array($this->fieldsToDisplay) || in_array($field_name, $this->fieldsToDisplay[$assoc_name])) {
                 if (isset($field['id']) && !isset($field['sqlId'])) {
                     $field['sqlId'] = 'id';
                     $field['value'] = isset($object_assoc['id']) ? $object_assoc['id'] : null;
                 } elseif (!isset($field['sqlId'])) {
-                    $field['sqlId'] = $field_name ? $field_name : 'id';
+                    $field['sqlId'] = $field_name;
                     $field['value'] = isset($object_assoc[$field_name]) ? $object_assoc[$field_name] : null;
                 }
 
@@ -867,10 +829,4 @@ class WebserviceOutputBuilderCore
     {
         $this->fieldsToDisplay = $fields;
     }
-
-    public function setWsParameters($class, $parameters)
-    {
-        WebserviceOutputBuilder::$_cache_ws_parameters[$class] = $parameters;
-    }
-
 }

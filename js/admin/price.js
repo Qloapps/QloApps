@@ -123,12 +123,15 @@ function calcPrice()
 function calcPriceTI()
 {
 
-	var priceTE = parseFloat($('#priceTEReal').val().replace(/,/g, '.'));
+	var priceTE = parseFloat(document.getElementById('priceTEReal').value.replace(/,/g, '.'));
 	var newPrice = addTaxes(priceTE);
 
-	$('#priceTI').val((isNaN(newPrice) == true || newPrice < 0) ? '' : ps_round(newPrice, priceDisplayPrecision));
-	$('#finalPrice').html((isNaN(newPrice) == true || newPrice < 0) ? '' : ps_round(newPrice, priceDisplayPrecision).toFixed(priceDisplayPrecision));
-	$('#finalPriceWithoutTax').html((isNaN(priceTE) == true || priceTE < 0) ? '' : (ps_round(priceTE, 6)).toFixed(6));
+	document.getElementById('priceTI').value = (isNaN(newPrice) == true || newPrice < 0) ? '' :
+		ps_round(newPrice, priceDisplayPrecision);
+	document.getElementById('finalPrice').innerHTML = (isNaN(newPrice) == true || newPrice < 0) ? '' :
+		ps_round(newPrice, priceDisplayPrecision).toFixed(priceDisplayPrecision);
+	document.getElementById('finalPriceWithoutTax').innerHTML = (isNaN(priceTE) == true || priceTE < 0) ? '' :
+		(ps_round(priceTE, 6)).toFixed(6);
 	calcReduction();
 
 	if (isNaN(parseFloat($('#priceTI').val())))
@@ -146,13 +149,15 @@ function calcPriceTI()
 function calcPriceTE()
 {
 	ecotax_tax_excl =  $('#ecotax').val() / (1 + ecotaxTaxRate);
-	var priceTI = parseFloat($('#priceTI').val().replace(/,/g, '.'));
+	var priceTI = parseFloat(document.getElementById('priceTI').value.replace(/,/g, '.'));
 	var newPrice = removeTaxes(ps_round(priceTI - getEcotaxTaxIncluded(), priceDisplayPrecision));
-
-	$('#priceTE').val((isNaN(newPrice) == true || newPrice < 0) ? '' : ps_round(newPrice, 6).toFixed(6));
-	$('#priceTEReal').val((isNaN(newPrice) == true || newPrice < 0) ? 0 : ps_round(newPrice, 9));
-	$('#finalPrice').html((isNaN(newPrice) == true || newPrice < 0) ? '' : ps_round(priceTI, priceDisplayPrecision).toFixed(priceDisplayPrecision));
-	$('#finalPriceWithoutTax').html((isNaN(newPrice) == true || newPrice < 0) ? '' : (ps_round(newPrice, 6)).toFixed(6));
+	document.getElementById('priceTE').value = (isNaN(newPrice) == true || newPrice < 0) ? '' :
+		ps_round(newPrice, 6).toFixed(6);
+	document.getElementById('priceTEReal').value = (isNaN(newPrice) == true || newPrice < 0) ? 0 : ps_round(newPrice, 9);
+	document.getElementById('finalPrice').innerHTML = (isNaN(newPrice) == true || newPrice < 0) ? '' :
+		ps_round(priceTI, priceDisplayPrecision).toFixed(priceDisplayPrecision);
+	document.getElementById('finalPriceWithoutTax').innerHTML = (isNaN(newPrice) == true || newPrice < 0) ? '' :
+		(ps_round(newPrice, 6)).toFixed(6);
 	calcReduction();
 }
 

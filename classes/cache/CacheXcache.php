@@ -43,13 +43,7 @@ class CacheXcacheCore extends Cache
 	 */
 	protected function _set($key, $value, $ttl = 0)
 	{
-		$result = xcache_set($key, $value, $ttl);
-
-        if ($result === false) {
-            $this->setAdjustTableCacheSize(true);
-        }
-
-        return $result;
+		return xcache_set($key, $value, $ttl);
 	}
 
 	/**

@@ -186,8 +186,8 @@ class AdminThemesControllerCore extends AdminController
                         'thumb' => $this->context->link->getMediaLink(_PS_IMG_.Configuration::get('PS_FAVICON').(Tools::getValue('conf') ? sprintf('?%04d', rand(0, 9999)) : ''))
                     ),
                     'PS_STORES_ICON' => array(
-                        'title' => $this->l('Map icon'),
-                        'hint' => $this->l('This icon will be displayed at hotel locations on Google Maps.').'<br />'.$this->l('Suggested size: 30x30, transparent GIF.'),
+                        'title' => $this->l('Store icon'),
+                        'hint' => $this->l('Will appear on the store locator (inside Google Maps).').'<br />'.$this->l('Suggested size: 30x30, transparent GIF.'),
                         'type' => 'file',
                         'name' => 'PS_STORES_ICON',
                         'tab' => 'icons',
@@ -358,16 +358,7 @@ class AdminThemesControllerCore extends AdminController
             ),
             'submit' => array(
                 'title' => $this->l('Save'),
-            ),
-            'buttons' => array(
-                'save-and-stay' => array(
-                    'title' => $this->l('Save and stay'),
-                    'name' => 'submitAdd'.$this->table.'AndStay',
-                    'type' => 'submit',
-                    'class' => 'btn btn-default pull-right',
-                    'icon' => 'process-icon-save',
-                ),
-            ),
+            )
         );
         // adding a new theme, you can create a directory, and copy from an existing theme
         if ($this->display == 'add' || !Validate::isLoadedObject($this->object)) {
@@ -653,12 +644,7 @@ class AdminThemesControllerCore extends AdminController
                 }
                 $theme->update();
             }
-
-            if (Tools::isSubmit('submitAdd'.$this->table.'AndStay')) {
-                Tools::redirectAdmin(self::$currentIndex.'&update'.$this->table.'&id_theme='.$theme->id.'&token='.$this->token.'&conf=4');
-            } else {
-                Tools::redirectAdmin(self::$currentIndex.'&token='.$this->token.'&conf=4');
-            }
+            Tools::redirectAdmin(Context::getContext()->link->getAdminLink('AdminThemes').'&conf=29');
         }
     }
 
@@ -677,8 +663,6 @@ class AdminThemesControllerCore extends AdminController
 
         if (!count($this->errors)) {
             Tools::redirectAdmin(Context::getContext()->link->getAdminLink('AdminThemes').'&conf=6');
-        } else {
-            $this->redirect_after = '';
         }
     }
 
@@ -1983,7 +1967,7 @@ class AdminThemesControllerCore extends AdminController
             }
         }
         if ($xml_version_too_old && !$this->_checkConfigForFeatures(array_keys(AdminThemes::$check_features))) {
-            $this->errors[] = Tools::displayError('The config.xml file has not been created for this version of QloApps.');
+            $this->errors[] .= Tools::displayError('The config.xml file has not been created for this version of PrestaShop.');
             $return = false;
         }
 
@@ -2113,6 +2097,7 @@ class AdminThemesControllerCore extends AdminController
             'blockcart',
             'blockcurrencies',
             'blocklanguages',
+            'qloblockcontact',
             'blockmyaccount',
             'blocknewsletter',
             'blocksocial',

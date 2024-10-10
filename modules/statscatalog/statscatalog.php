@@ -40,7 +40,7 @@ class StatsCatalog extends Module
     {
         $this->name = 'statscatalog';
         $this->tab = 'analytics_stats';
-        $this->version = '1.4.3';
+        $this->version = '1.4.2';
         $this->author = 'PrestaShop';
         $this->need_instance = 0;
 
@@ -64,7 +64,6 @@ class StatsCatalog extends Module
         INNER JOIN `'._DB_PREFIX_.'htl_room_type` hrt ON (hrt.`id_product` = p.`id_product`)
         '.$this->join.'
         WHERE p.`active` = 1
-        '.HotelBranchInformation::addHotelRestriction(false, 'hrt').'
         '.$this->where;
         if ($this->id_hotel) {
             $sql .= ' AND hrt.`id_hotel` = '.(int)$this->id_hotel;
@@ -83,7 +82,6 @@ class StatsCatalog extends Module
         LEFT JOIN `'._DB_PREFIX_.'htl_branch_info` hbi ON (hbi.`id_category` = cl.`id_category`)
         '.$this->join.'
         WHERE pt.`name` = "'.pSQL('category').'"
-        '.HotelBranchInformation::addHotelRestriction(false, 'hbi', 'id').'
         '.$this->where;
 
         if ($this->id_hotel) {
@@ -105,7 +103,6 @@ class StatsCatalog extends Module
 		LEFT JOIN `'._DB_PREFIX_.'page_viewed` pv ON pv.`id_page` = pa.`id_page`
 		'.$this->join.'
 		WHERE product_shop.`active` = 1
-        '.HotelBranchInformation::addHotelRestriction(false, 'hrt').'
 		'.$this->where;
 
         if ($this->id_hotel) {
@@ -127,7 +124,6 @@ class StatsCatalog extends Module
 		'.$this->join.'
 		WHERE pt.`name` IN ("product.php", "product")
 		AND product_shop.`active` = 1
-        '.HotelBranchInformation::addHotelRestriction(false, 'hrt').'
 		'.$this->where;
 
         if ($this->id_hotel) {
@@ -158,7 +154,6 @@ class StatsCatalog extends Module
                     WHERE hrt.`id_hotel` = hbi.`id`
                 ) AS room_type_images
                 FROM `'._DB_PREFIX_.'htl_branch_info` hbi
-                WHERE 1 '.HotelBranchInformation::addHotelRestriction(false, 'hbi', 'id').'
             ) AS t
             '.($this->id_hotel ? ' WHERE t.`id` = '.(int) $this->id_hotel : '')
         );
@@ -169,8 +164,7 @@ class StatsCatalog extends Module
         return Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue(
             'SELECT IFNULL(SUM(DATEDIFF(hbd.`date_to`, hbd.`date_from`)), 0)
             FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
-            WHERE 1 '.HotelBranchInformation::addHotelRestriction(false, 'hbd').'
-            '.($this->id_hotel ? ' AND hbd.`id_hotel` = '.(int) $this->id_hotel : '')
+            '.($this->id_hotel ? ' WHERE hbd.`id_hotel` = '.(int) $this->id_hotel : '')
         );
     }
 
@@ -184,7 +178,6 @@ class StatsCatalog extends Module
 				'.Shop::addSqlAssociation('product', 'p').'
 				'.$this->join.'
 				WHERE o.valid = 1
-                    '.HotelBranchInformation::addHotelRestriction(false, 'hrt').'
 					'.$this->where.'
 					AND product_shop.`active` = 1';
         if ($this->id_hotel) {
@@ -207,7 +200,6 @@ class StatsCatalog extends Module
 				'.$this->join.'
 				WHERE product_shop.`active` = 1
 					'.(count($precalc2) ? 'AND p.`id_product` NOT IN ('.implode(',', $precalc2).')' : '').'
-                    '.HotelBranchInformation::addHotelRestriction(false, 'hrt').'
 					'.$this->where;
         if ($this->id_hotel) {
             $sql .= ' AND hrt.`id_hotel` = '.(int)$this->id_hotel;
@@ -220,7 +212,7 @@ class StatsCatalog extends Module
     public function hookAdminStatsModules($params)
     {
         $objBranchInfo = new HotelBranchInformation();
-        $hotels = $objBranchInfo->getProfileAccessedHotels($this->context->employee->id_profile, 1);
+        $hotels = $objBranchInfo->hotelBranchesInfo((int)$this->context->language->id);
 
         $product_token = Tools::getAdminToken('AdminProducts'.(int)Tab::getIdFromClassName('AdminProducts').(int)$this->context->employee->id);
         $irow = 0;
@@ -231,7 +223,6 @@ class StatsCatalog extends Module
 
         $result1 = $this->getQuery1();
         $total = $result1['total'];
-
         $average_price = $result1['average_price'];
         $available_images = $this->getAvailableImages();
 
@@ -266,7 +257,7 @@ class StatsCatalog extends Module
 						<select name="id_hotel" onchange="$(\'#hotelForm\').submit();">
 							<option value="0">'.$this->l('All').'</option>';
         foreach ($hotels as $hotel) {
-            $html .= '<option value="'.$hotel['id_hotel'].'"'.($id_hotel == $hotel['id_hotel'] ? ' selected="selected"' : '').'>'.
+            $html .= '<option value="'.$hotel['id'].'"'.($id_hotel == $hotel['id'] ? ' selected="selected"' : '').'>'.
                 $hotel['hotel_name'].'
 							</option>';
         }

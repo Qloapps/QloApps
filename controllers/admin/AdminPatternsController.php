@@ -375,7 +375,7 @@ class AdminPatternsControllerCore extends AdminController
                         'root_category' => 1,
                         'id' => 'id_category',
                         'name' => 'name_category',
-                        'selected_categories' => array(3, 8),
+                        'selected_categories' => array(3),
                     )
                 ),
                 array(

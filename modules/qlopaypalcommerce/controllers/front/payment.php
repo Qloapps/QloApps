@@ -278,6 +278,10 @@ class QloPaypalCommercePaymentModuleFrontController extends ModuleFrontControlle
         $customer = new Customer((int)$cart->id_customer);
 
         $ppHelper = new WkPaypalCommerceHelper();
+        $bilAddr = $ppHelper->getSimpleAddress(
+            (int)$cart->id_customer,
+            (int)$cart->id_address_invoice
+        );
 
         $orderData['payer'] = array(
             'name' => array(
@@ -287,20 +291,14 @@ class QloPaypalCommercePaymentModuleFrontController extends ModuleFrontControlle
             'email_address' => $customer->email
         );
 
-        // address is not required in paypal payment, if customer has added an address then we add tha address to paypal payer object
-        if ($bilAddr = $ppHelper->getSimpleAddress(
-            (int)$cart->id_customer,
-            (int)$cart->id_address_invoice
-        )) {
-            $orderData['payer']['address'] = array(
-                'address_line_1' => $bilAddr['address1'],
-                'address_line_2' => $bilAddr['address2'],
-                'admin_area_2' => $bilAddr['city'],
-                'admin_area_1' => $bilAddr['state_iso'],
-                'postal_code' => $bilAddr['postcode'],
-                'country_code' => $bilAddr['country_iso'],
-            );
-        }
+        $orderData['payer']['address'] = array(
+            'address_line_1' => $bilAddr['address1'],
+            'address_line_2' => $bilAddr['address2'],
+            'admin_area_2' => $bilAddr['city'],
+            'admin_area_1' => $bilAddr['state_iso'],
+            'postal_code' => $bilAddr['postcode'],
+            'country_code' => $bilAddr['country_iso'],
+        );
 
         $timestamp = time().rand(100, 999);
         $currency = Currency::getCurrency((int) $cart->id_currency);

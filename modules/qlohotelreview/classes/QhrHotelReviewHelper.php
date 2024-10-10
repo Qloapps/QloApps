@@ -29,8 +29,6 @@ class QhrHotelReviewHelper
         return (bool) !Db::getInstance()->getValue(
             'SELECT COUNT(*) FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
             WHERE hbd.`id_status` != '.(int) HotelBookingDetail::STATUS_CHECKED_OUT.'
-            AND hbd.`is_refunded` != 1
-            AND hbd.`is_cancelled` != 1
             AND hbd.`id_order` = '.(int) $idOrder
         );
     }
@@ -56,11 +54,6 @@ class QhrHotelReviewHelper
     public static function getIsReviewable($idOrder)
     {
         if (!$idOrder) {
-            return false;
-        }
-
-        $objOrder = new Order($idOrder);
-        if ($objOrder->hasCompletelyRefunded()) {
             return false;
         }
 
@@ -125,6 +118,12 @@ class QhrHotelReviewHelper
             'SELECT `id_hotel`, `hotel_name` FROM `'._DB_PREFIX_.'htl_booking_detail`
             WHERE `id_order` = '.(int) $idOrder
         );
+    }
+
+    public static function getPathForCreation($idHotelReview)
+    {
+        $folders = str_split((string)$id_image);
+        return implode('/', $folders).'/';
     }
 
     public static function createDirectory($dir)

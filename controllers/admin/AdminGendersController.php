@@ -77,7 +77,7 @@ class AdminGendersControllerCore extends AdminController
                 'list' => array(
                     0 => $this->l('Male'),
                     1 => $this->l('Female'),
-                    2 => $this->l('Other')
+                    2 => $this->l('Neutral')
                 ),
                 'filter_key' => 'a!type',
                 'callback' => 'displayGenderType',
@@ -145,7 +145,7 @@ class AdminGendersControllerCore extends AdminController
                         array(
                             'id' => 'type_neutral',
                             'value' => 2,
-                            'label' => $this->l('Other')
+                            'label' => $this->l('Neutral')
                         )
                     )
                 ),
@@ -173,16 +173,7 @@ class AdminGendersControllerCore extends AdminController
             ),
             'submit' => array(
                 'title' => $this->l('Save'),
-            ),
-            'buttons' => array(
-                'save-and-stay' => array(
-                    'title' => $this->l('Save and stay'),
-                    'name' => 'submitAdd'.$this->table.'AndStay',
-                    'type' => 'submit',
-                    'class' => 'btn btn-default pull-right',
-                    'icon' => 'process-icon-save',
-                ),
-            ),
+            )
         );
 
         /** @var Gender $obj */

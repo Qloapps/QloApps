@@ -22,16 +22,10 @@
 *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 *}
-<li class="tree-item{if isset($node['disabled']) && $node['disabled'] == true} tree-item-disable{/if}" {if isset($node['hidden']) && $node['hidden'] == true} hidden="hidden"{/if}>
+<li class="tree-item{if isset($node['disabled']) && $node['disabled'] == true} tree-item-disable{/if}">
 	<span class="tree-item-name{if isset($node['disabled']) && $node['disabled'] == true} tree-item-name-disable{/if}">
-		<input type="checkbox" name="{$node['input_name']}[]" value="{$node['value']}"{if isset($node['selected']) && $node['selected'] == true} checked="checked"{/if}{if isset($node['disabled']) && $node['disabled'] == true} disabled="disabled"{/if} {if isset($node['hidden']) && $node['hidden'] == true} hidden="hidden"{/if} />
+		<input type="checkbox" name="{$input_name}[]" value="{$node['id_category']}"{if isset($node['disabled']) && $node['disabled'] == true} disabled="disabled"{/if} />
 		<i class="tree-dot"></i>
 		<label class="tree-toggler">{$node['name']}</label>
 	</span>
-	{if isset($node['badge'])}
-		<span class="badge {if isset($node['badge']['class'])}{$node['badge']['class']}{/if}">{$node['badge']['title']}</span>
-	{/if}
-	{if isset($node['hint'])}
-		<div class="node-hint">{$node['hint']}</div>
-	{/if}
 </li>

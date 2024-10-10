@@ -85,7 +85,6 @@ class AdminCmsContentControllerCore extends AdminController
 
     public function initContent()
     {
-        $this->loadObject(true);
         $this->initTabModuleList();
         $this->renderPageHeaderToolbar();
 
@@ -152,9 +151,8 @@ class AdminCmsContentControllerCore extends AdminController
 
             if (Tools::getValue('addcms') !== false) {
                 $this->toolbar_title[] = $this->l('Add new');
-            } elseif ($id_cms_page
-                && Validate::isLoadedObject($cms_page = new CMS($id_cms_page))
-            ) {
+            } elseif ($id_cms_page) {
+                $cms_page = new CMS($id_cms_page);
                 $this->toolbar_title[] = sprintf($this->l('Edit: %s'), $cms_page->meta_title[$this->context->employee->id_lang]);
             }
         } else {

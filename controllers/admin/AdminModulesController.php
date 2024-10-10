@@ -444,12 +444,8 @@ class AdminModulesControllerCore extends AdminController
         @unlink($file);
         $this->recursiveDeleteOnDisk($tmp_folder);
 
-        if ($success) {
-            if ($redirect) {
-                Tools::redirectAdmin(self::$currentIndex.'&conf=8&anchor='.ucfirst($folder).'&token='.$this->token);
-            } else {
-                $success = $folder;
-            }
+        if ($success && $redirect) {
+            Tools::redirectAdmin(self::$currentIndex.'&conf=8&anchor='.ucfirst($folder).'&token='.$this->token);
         }
 
         return $success;
@@ -614,7 +610,7 @@ class AdminModulesControllerCore extends AdminController
             } elseif (!move_uploaded_file($_FILES['file']['tmp_name'], _PS_MODULE_DIR_.$_FILES['file']['name'])) {
                 $this->errors[] = Tools::displayError('An error occurred while copying the archive to the module directory.');
             } else {
-                return $this->extractArchive(_PS_MODULE_DIR_.$_FILES['file']['name'], $redirect);
+                $this->extractArchive(_PS_MODULE_DIR_.$_FILES['file']['name'], $redirect);
             }
         } else {
             $this->errors[] = Tools::displayError('You do not have permission to add this.');
@@ -1333,7 +1329,7 @@ class AdminModulesControllerCore extends AdminController
         $helper->color = 'color1';
         $helper->title = $this->l('Installed Modules', null, null, false);
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=installed_modules';
-        $this->kpis[] = $helper;
+        $kpis[] = $helper->generate();
 
         $helper = new HelperKpi();
         $helper->id = 'box-disabled-modules';
@@ -1341,7 +1337,7 @@ class AdminModulesControllerCore extends AdminController
         $helper->color = 'color2';
         $helper->title = $this->l('Disabled Modules', null, null, false);
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=disabled_modules';
-        $this->kpis[] = $helper;
+        $kpis[] = $helper->generate();
 
         $helper = new HelperKpi();
         $helper->id = 'box-update-modules';
@@ -1349,9 +1345,11 @@ class AdminModulesControllerCore extends AdminController
         $helper->color = 'color3';
         $helper->title = $this->l('Modules to Update', null, null, false);
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=update_modules';
-        $this->kpis[] = $helper;
+        $kpis[] = $helper->generate();
 
-        return parent::renderKpis();
+        $helper = new HelperKpiRow();
+        $helper->kpis = $kpis;
+        return $helper->generate();
     }
 
     public function initModal()
@@ -1377,6 +1375,14 @@ class AdminModulesControllerCore extends AdminController
             'modal_id' => 'moduleNotTrusted',
             'modal_class' => 'modal-lg',
             'modal_title' => ($this->context->mode == Context::MODE_HOST) ? $this->l('This module cannot be installed') : $this->l('Important Notice'),
+            'modal_content' => $modal_content
+        );
+
+        $modal_content = $this->context->smarty->fetch('controllers/modules/modal_not_trusted_country.tpl');
+        $this->modals[] = array(
+            'modal_id' => 'moduleNotTrustedCountry',
+            'modal_class' => 'modal-lg',
+            'modal_title' => $this->l('This module is Untrusted for your country'),
             'modal_content' => $modal_content
         );
     }
@@ -1671,9 +1677,11 @@ class AdminModulesControllerCore extends AdminController
     public function ajaxProcessUploadModule()
     {
         $response = array('success' => false);
-        $folder = $this->postProcessDownload(false);
+        $this->postProcessDownload(false);
         if (!count($this->errors)) {
-            if ($folder && $module = Module::getInstanceByName($folder)) {
+            $filename = $_FILES['file']['name'];
+            $filename = explode('.', $filename);
+            if ($module = Module::getInstanceByName($filename[0])) {
                 $response['success'] = true;
                 if (Module::isInstalled($module->name)) {
                     $response['msg'] = $this->l('module already installed, update if available');
@@ -1692,9 +1700,6 @@ class AdminModulesControllerCore extends AdminController
                     'author' => $module->author,
                     'image' => $module->image ? $module->image : ''
                 );
-            } else {
-                $this->errors[] = $this->l('The uploaded file does not contain a valid module.');
-                $response['errors'] = $this->errors;
             }
         } else {
             $response['errors'] = $this->errors;

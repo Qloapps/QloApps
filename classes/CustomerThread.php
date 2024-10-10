@@ -120,17 +120,7 @@ class CustomerThreadCore extends ObjectModel
         return $return;
     }
 
-    /**
-     * Retrieves customer messages based on specified conditions.
-     *
-     * @param int          $id_customer  Customer ID.
-     * @param bool|null    $read         Return read (true), unread (false), or all messages (null).
-     * @param int|null     $id_order     Filter messages by order ID.
-     * @param int|null     $messageBy    Filter messages by sender (employees, customer, or both).
-     *
-     * @return array List of messages matching the conditions.
-     */
-    public static function getCustomerMessages($id_customer, $read = null, $id_order = null, $messageBy = null)
+    public static function getCustomerMessages($id_customer, $read = null, $id_order = null)
     {
         $sql = 'SELECT *
 			FROM '._DB_PREFIX_.'customer_thread ct
@@ -145,28 +135,19 @@ class CustomerThreadCore extends ObjectModel
             $sql .= ' AND ct.`id_order` = '.(int)$id_order;
         }
 
-        if ($messageBy !== null) {
-            if (CustomerMessage::QLO_CUSTOMER_MESSAGE_BY_EMPLOYEE == $messageBy) {
-                $sql .= ' AND cm.`id_employee` != 0';
-            } else if (CustomerMessage::QLO_CUSTOMER_MESSAGE_BY_CUSTOMER == $messageBy) {
-                $sql .= ' AND cm.`id_employee` = 0';
-            }
-        }
-
         $sql .= ' ORDER BY cm.date_add DESC';
 
         return Db::getInstance()->executeS($sql);
     }
 
-    public static function getIdCustomerThreadByEmailAndIdOrder($email, $id_order, $id_contact = false)
+    public static function getIdCustomerThreadByEmailAndIdOrder($email, $id_order)
     {
         return Db::getInstance()->getValue('
 			SELECT cm.id_customer_thread
 			FROM '._DB_PREFIX_.'customer_thread cm
 			WHERE cm.email = \''.pSQL($email).'\'
 				AND cm.id_shop = '.(int)Context::getContext()->shop->id.'
-				AND cm.id_order = '.(int)$id_order.' '.
-                (($id_contact) ? ' AND cm.id_contact='.(int) $id_contact : ' ')
+				AND cm.id_order = '.(int)$id_order
         );
     }
 

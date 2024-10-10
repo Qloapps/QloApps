@@ -95,12 +95,9 @@ class HotelRoomTypeDemandPrice extends ObjectModel
                         }
                     }
                 }
-
-                // Rounding as per configurations
-                $totalDemandsPrice += Tools::processPriceRounding($price);
+                $totalDemandsPrice += $price;
             }
         }
-
         return $totalDemandsPrice;
     }
 

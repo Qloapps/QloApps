@@ -908,7 +908,7 @@ class LanguageCore extends ObjectModel
         }
 
         if ($version == null) {
-            $version = _QLOAPPS_VERSION_;
+            $version = _PS_VERSION_;
         }
 
         $lang_pack = false;

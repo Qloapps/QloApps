@@ -177,7 +177,7 @@ class AdminEmployeesControllerCore extends AdminController
     {
         parent::initPageHeaderToolbar();
 
-        if (empty($this->display) || $this->display == 'list') {
+        if (empty($this->display)) {
             $this->page_header_toolbar_btn['new_employee'] = array(
                 'href' => self::$currentIndex.'&addemployee&token='.$this->token,
                 'desc' => $this->l('Add new employee', null, null, false),
@@ -401,16 +401,6 @@ class AdminEmployeesControllerCore extends AdminController
 
         $this->fields_form['submit'] = array(
             'title' => $this->l('Save'),
-        );
-
-        $this->fields_form['buttons'] = array(
-            'save-and-stay' => array(
-                'title' => $this->l('Save and stay'),
-                'name' => 'submitAdd'.$this->table.'AndStay',
-                'type' => 'submit',
-                'class' => 'btn btn-default pull-right',
-                'icon' => 'process-icon-save',
-            )
         );
 
         $this->fields_value['passwd'] = false;

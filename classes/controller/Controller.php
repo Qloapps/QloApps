@@ -78,8 +78,6 @@ abstract class ControllerCore
     /** @var string Controller name */
     public $php_self;
 
-    public $show_full_date = false;
-
     /**
      * Check if the controller is available for the current user/visitor
      */

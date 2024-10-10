@@ -19,9 +19,7 @@
 
 <div class="review-list">
     {foreach $reviews as $review}
-        {block name='review'}
-            {include file='./review.tpl' review=$review}
-        {/block}
+        {include file='./review.tpl' review=$review}
     {/foreach}
 </div>
 

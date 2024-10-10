@@ -1,17 +1,4 @@
 ------------------------------
-# V2.6.6 to V2.6.7
-------------------------------
-
-## Improved/Changed Features:
-
-* [FO] : [#724] Updated bankwire and cheque payment details on order confirmation page
-* [CO] : [#895] Fixed overbooking issues in QloApps and added new configurations for overbooking handling
-* [CO] : [#881] Address is not required in booking/order flow
-* [CO] : [#895] Fixed overbooking issues in QloApps and added new configurations for overbooking handling
-* [FO] : [#1089] Fixed error on order confirmation page when order status is updated
-* [FO] : [#1272] Fixed order confirmation and Guest tracking flow issues and order emails are improved
-
-------------------------------
 # V2.6.5 to V2.6.6
 ------------------------------
 

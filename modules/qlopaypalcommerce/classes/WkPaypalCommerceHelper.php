@@ -325,7 +325,12 @@ class WkPaypalCommerceHelper
             $sql .= ' AND a.`id_address` = ' . (int) $idAddress;
         }
 
-        return Db::getInstance()->getRow($sql);
+        $res = Db::getInstance()->executeS($sql);
+        if (count($res) === 1) {
+            return $res[0];
+        } else {
+            return $res;
+        }
     }
 
     public static function getOrdersByCartId($idCart)

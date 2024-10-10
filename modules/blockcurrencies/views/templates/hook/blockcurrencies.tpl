@@ -23,32 +23,30 @@
 *  International Registered Trademark & Property of PrestaShop SA
 *}
 
-{block name='block_currencies'}
-    {if count($currencies) > 1}
-        <div id="currencies-block-top" class="currencies-block-wrap nav-main-item-right hidden-xs pull-right">
-            <div class="dropdown">
-                <button class="btn dropdown-toggle" type="button" data-toggle="dropdown">
-                    {foreach from=$currencies key=k item=f_currency}
-                        {if $cookie->id_currency == $f_currency.id_currency}{$f_currency.iso_code}{/if}
-                    {/foreach}
-                    <span class="caret"></span>
-                </button>
+{if count($currencies) > 1}
+    <div id="currencies-block-top" class="currencies-block-wrap nav-main-item-right hidden-xs pull-right">
+        <div class="dropdown">
+            <button class="btn dropdown-toggle" type="button" data-toggle="dropdown">
+                {foreach from=$currencies key=k item=f_currency}
+                    {if $cookie->id_currency == $f_currency.id_currency}{$f_currency.iso_code}{/if}
+                {/foreach}
+                <span class="caret"></span>
+            </button>
 
-                <ul class="dropdown-menu">
-                    {foreach from=$currencies key=k item=f_currency}
-                        {if strpos($f_currency.name, '('|cat:$f_currency.iso_code:')') === false}
-                            {assign var="currency_name" value={l s='%s (%s)' sprintf=[$f_currency.name, $f_currency.iso_code]}}
-                        {else}
-                            {assign var="currency_name" value=$f_currency.name}
-                        {/if}
-                        <li {if $cookie->id_currency == $f_currency.id_currency}class="disabled"{/if}>
-                            <a href="javascript:setCurrency({$f_currency.id_currency});" title="{$currency_name}">
-                                {$currency_name}
-                            </a>
-                        </li>
-                    {/foreach}
-                </ul>
-            </div>
+            <ul class="dropdown-menu">
+                {foreach from=$currencies key=k item=f_currency}
+                    {if strpos($f_currency.name, '('|cat:$f_currency.iso_code:')') === false}
+                        {assign var="currency_name" value={l s='%s (%s)' sprintf=[$f_currency.name, $f_currency.iso_code]}}
+                    {else}
+                        {assign var="currency_name" value=$f_currency.name}
+                    {/if}
+                    <li {if $cookie->id_currency == $f_currency.id_currency}class="disabled"{/if}>
+                        <a href="javascript:setCurrency({$f_currency.id_currency});" title="{$currency_name}">
+                            {$currency_name}
+                        </a>
+                    </li>
+                {/foreach}
+            </ul>
         </div>
-    {/if}
-{/block}
+    </div>
+{/if}

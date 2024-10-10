@@ -27,7 +27,7 @@
 <!--[if IE 7]><html class="no-js lt-ie9 lt-ie8 ie7"{if isset($language_code) && $language_code} lang="{$language_code|escape:'html':'UTF-8'}"{/if}><![endif]-->
 <!--[if IE 8]><html class="no-js lt-ie9 ie8"{if isset($language_code) && $language_code} lang="{$language_code|escape:'html':'UTF-8'}"{/if}><![endif]-->
 <!--[if gt IE 8]> <html class="no-js ie9"{if isset($language_code) && $language_code} lang="{$language_code|escape:'html':'UTF-8'}"{/if}><![endif]-->
-<html{if isset($language_code) && $language_code} lang="{$language_code|escape:'html':'UTF-8'}"{/if} {if isset($language_is_rtl) && $language_is_rtl}dir="rtl"{/if} style="{if $page_name == 'index'}height: 100%;{/if}">
+<html{if isset($language_code) && $language_code} lang="{$language_code|escape:'html':'UTF-8'}"{/if} style="{if $page_name == 'index'}height: 100%;{/if}">
 	<head>
 		<meta charset="utf-8" />
 		<title>{$meta_title|escape:'html':'UTF-8'}</title>
@@ -40,7 +40,7 @@
 		<meta name="generator" content="QloApps" />
 		<meta name="robots" content="{if isset($nobots)}no{/if}index,{if isset($nofollow) && $nofollow}no{/if}follow" />
 		<meta name="viewport" content="width=device-width, minimum-scale=0.25, maximum-scale=1.6, initial-scale=1.0" />
-		<meta name="mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-capable" content="yes" />
 		<link rel="icon" type="image/vnd.microsoft.icon" href="{$favicon_url}?{$img_update_time}" />
 		<link rel="shortcut icon" type="image/x-icon" href="{$favicon_url}?{$img_update_time}" />
 		{if isset($css_files)}
@@ -62,9 +62,7 @@
 			<script type="text/javascript" src="{$js_uri|escape:'html':'UTF-8'}"></script>
 			{/foreach}
 		{/if}
-		{block name='displayHeader'}
-			{$HOOK_HEADER}
-		{/block}
+		{$HOOK_HEADER}
 		<!-- <link rel="stylesheet" href="http{if Tools::usingSecureMode()}s{/if}://fonts.googleapis.com/css?family=Open+Sans:300,600&amp;subset=latin,latin-ext" type="text/css" media="all" /> -->
 
 		<!--[if IE 8]>
@@ -90,57 +88,41 @@
 					<div class="banner">
 						<div class="container">
 							<div class="row">
-								{block name='displayBanner'}
-									{hook h="displayBanner"}
-								{/block}
+								{hook h="displayBanner"}
 							</div>
 						</div>
 					</div>
-					{block name='header_nav'}
-						<div id="nav-main">
-							<div class="container">
-								<div class="row">
-									{block name='displayNav'}
-										<nav>{hook h="displayNav"}</nav>
-									{/block}
-								</div>
+					<div id="nav-main">
+						<div class="container">
+							<div class="row">
+								<nav>{hook h="displayNav"}</nav>
 							</div>
 						</div>
-					{/block}
-					{block name='header_top'}
-						<div class="header-top">
-							<div class="container">
-								<div class="row">
-									<div class="col-xs-12">
-										<div id="header_logo">
-											<a href="{if isset($force_ssl) && $force_ssl}{$base_dir_ssl}{else}{$base_dir}{/if}" title="{$shop_name|escape:'html':'UTF-8'}">
-												<img class="logo img-responsive" src="{$logo_url}" alt="{$shop_name|escape:'html':'UTF-8'}"/>
-											</a>
-										</div>
-										<div class="header-top-menu">
-											{block name='displayTop'}
-												{if isset($HOOK_TOP)}{$HOOK_TOP}{/if}
-											{/block}
-										</div>
+					</div>
+					<div class="header-top">
+						<div class="container">
+							<div class="row">
+								<div class="col-xs-12">
+									<div id="header_logo">
+										<a href="{if isset($force_ssl) && $force_ssl}{$base_dir_ssl}{else}{$base_dir}{/if}" title="{$shop_name|escape:'html':'UTF-8'}">
+											<img class="logo img-responsive" src="{$logo_url}" alt="{$shop_name|escape:'html':'UTF-8'}"/>
+										</a>
+									</div>
+									<div class="header-top-menu">
+										{if isset($HOOK_TOP)}{$HOOK_TOP}{/if}
 									</div>
 								</div>
-								{block name='displaySearchHotelPanel'}
-									{hook h='displaySearchHotelPanel'}
-								{/block}
 							</div>
+							{hook h='displaySearchHotelPanel'}
 						</div>
-					{/block}
-					{block name='displayAfterHookTop'}
-						{hook h='displayAfterHookTop'}
-					{/block}
+					</div>
+					{hook h='displayAfterHookTop'}
 				</header>
 			</div>
 			<div class="columns-container">
 				<div id="columns" class="container">
 					{if $show_breadcrump}
-						{block name='breadcrumb'}
-							{include file="$tpl_dir./breadcrumb.tpl"}
-						{/block}
+						{include file="$tpl_dir./breadcrumb.tpl"}
 					{/if}
 					<div id="slider_row" class="row">
 						<div id="top_column" class="center_column col-xs-12 col-sm-12">{hook h="displayTopColumn"}</div>
