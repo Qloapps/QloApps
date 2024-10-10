@@ -22,6 +22,7 @@
 *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 *}
+
 <table id="shipping-tab" width="100%">
 	<tr>
 		<td class="shipping center small grey bold" width="44%">{l s='Carrier' pdf='true'}</td>

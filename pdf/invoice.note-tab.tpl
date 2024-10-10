@@ -26,7 +26,7 @@
 	<tr>
 		<td colspan="12" height="10">&nbsp;</td>
 	</tr>
-	
+
 	<tr>
 		<td colspan="6" class="left">
 			<table id="note-tab" style="width: 100%">
