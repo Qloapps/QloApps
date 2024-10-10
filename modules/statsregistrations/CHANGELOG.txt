@@ -1,4 +1,14 @@
 ------------------------------
+# V1.4.2 to V1.4.3
+------------------------------
+
+## Improved/Changed Features:
+
+* [BO] : [#865] Updated stats are now shown according to employee hotel access
+* [BO] : [#866] Arrangement of row and column in csv file is wrong
+* [BO] : [#873] Removed decimal values from admin stats graph axis where not required
+
+------------------------------
 # V1.4.1 to V1.4.2
 ------------------------------
 

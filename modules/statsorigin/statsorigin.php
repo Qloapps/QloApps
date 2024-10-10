@@ -36,7 +36,7 @@ class StatsOrigin extends ModuleGraph
     {
         $this->name = 'statsorigin';
         $this->tab = 'analytics_stats';
-        $this->version = '1.4.2';
+        $this->version = '1.4.3';
         $this->author = 'PrestaShop';
         $this->need_instance = 0;
 

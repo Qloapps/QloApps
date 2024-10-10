@@ -33,7 +33,7 @@ class BlockUserInfo extends Module
 	{
 		$this->name = 'blockuserinfo';
 		$this->tab = 'front_office_features';
-		$this->version = '0.4.1';
+		$this->version = '1.0.0';
 		$this->author = 'PrestaShop';
 		$this->need_instance = 0;
 
@@ -46,9 +46,9 @@ class BlockUserInfo extends Module
 
 	public function install()
 	{
-		return (parent::install() && 
-			$this->registerHook('displayTop') && 
-			$this->registerHook('displayExternalNavigationHook') && 
+		return (parent::install() &&
+			$this->registerHook('displayTop') &&
+			$this->registerHook('displayExternalNavigationHook') &&
 			$this->registerHook('displayHeader'));
 	}
 

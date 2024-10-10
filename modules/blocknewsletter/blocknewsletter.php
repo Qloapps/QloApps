@@ -57,7 +57,7 @@ class Blocknewsletter extends Module
         $this->ps_versions_compliancy = array('min' => '1.6', 'max' => _PS_VERSION_);
         $this->secure_key = Tools::encrypt($this->name);
 
-        $this->version = '2.2.2';
+        $this->version = '2.3.0';
         $this->author = 'PrestaShop';
         $this->error = false;
         $this->valid = false;

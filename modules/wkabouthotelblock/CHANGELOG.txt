@@ -1,4 +1,16 @@
 ------------------------------
+# V1.1.8 to V1.1.9
+------------------------------
+
+## Improved/Changed Features:
+
+* [FO] : [#860] Fixed front office 'hotel-reservation-theme' RTL compatibility
+* [CO] : [#1156] Updated the demo data added to the database for the QloApps on installation.
+* [BO] : [#1165] Displayed image Upload Sizes for Hotel Amenities and Interior Blocks
+* [CO] : [#1195] Added process for smarty template overriding.
+
+
+------------------------------
 # V1.1.7 to V1.1.8
 ------------------------------
 

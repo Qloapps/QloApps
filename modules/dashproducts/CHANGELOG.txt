@@ -1,4 +1,15 @@
 ------------------------------
+# V1.0.2 to V1.0.3
+------------------------------
+
+## Improved/Changed Features:
+
+* [BO] : [#900] Fixed dashboard stats issues and also improved the view of the dashboard
+* [CO] : [#909] Fixed missing translation from the templates of the modules.
+* [BO] : [#1248] Fixed wrong process for the hotel name for 'most viewed' room types for dashboard in the back-office.
+
+
+------------------------------
 # V1.0.1 to V1.0.2
 ------------------------------
 

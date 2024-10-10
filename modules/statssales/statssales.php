@@ -42,7 +42,7 @@ class StatsSales extends ModuleGraph
     {
         $this->name = 'statssales';
         $this->tab = 'analytics_stats';
-        $this->version = '1.3.2';
+        $this->version = '1.3.3';
         $this->author = 'PrestaShop';
         $this->need_instance = 0;
 

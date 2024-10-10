@@ -29,7 +29,7 @@ class blocknavigationmenu extends Module
     {
         $this->name = 'blocknavigationmenu';
         $this->tab = 'front_office_features';
-        $this->version = '1.1.2';
+        $this->version = '1.1.3';
         $this->author = 'Webkul';
         $this->need_instance = 0;
 

@@ -1,4 +1,15 @@
 ------------------------------
+# V1.0.2 to V1.0.3
+------------------------------
+
+## Improved/Changed Features:
+
+* [BO] : [#900] Fixed dashboard stats issues and also improved the view of the dashboard
+* [CO] : [#909] Fixed missing translation from the templates of the modules.
+* [BO] : [#1023] Fixed backoffice design issue in RTL language
+* [BO] : [#1129] Fixed Dashboard issues on different sections
+
+------------------------------
 # V1.0.1 to V1.0.2
 ------------------------------
 

@@ -1,4 +1,17 @@
 -------------------------------
+# Change Log V2.2.2 to V2.3.0
+-------------------------------
+
+## Improved/Changed Features:
+
+* [CO] : [#804] Updated flow of blocknewsletter module
+* [CO] : [#1148] Fixed welcome voucher is available for every customer and also for guest user
+* [BO] : [#1088] Updated customer deletion and ban process and added filters for the admin to view the banned customers
+* [CO] : [#1132] Added new hooks
+* [CO] : [#1142] Optimized the flow of the blocknewsletter module
+* [FO] : [#1236] Fixed cart rule without code is not being applied automatically to the cart in the front-office.
+
+-------------------------------
 # Change Log V2.2.1 to V2.2.2
 -------------------------------
 
