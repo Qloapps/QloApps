@@ -19,9 +19,9 @@
     <url_rewrite>contact-met-ons-opnemen</url_rewrite>
   </meta>
   <meta id='index' id_shop='1'>
-    <title/>
-    <description>Winkel gerund met behulp van PrestaShop</description>
-    <keywords>shop, prestashop</keywords>
+    <title>Hotel Prime</title>
+    <description>Een plek waar comfort en luxe samengaan met de natuur!</description>
+    <keywords/>
     <url_rewrite/>
   </meta>
   <meta id='manufacturer' id_shop='1'>
@@ -95,6 +95,12 @@
     <description/>
     <keywords/>
     <url_rewrite>bestel-overzicht</url_rewrite>
+  </meta>
+  <meta id="order-detail" id_shop="1">
+    <title>Boekingsdetails</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>boekingsdetails</url_rewrite>
   </meta>
   <meta id='identity' id_shop='1'>
     <title>Identiteit</title>

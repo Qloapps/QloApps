@@ -62,7 +62,7 @@
 							<td width="10">&nbsp;</td>
 							<td align="right"  class="text-center">
 								<font size="2" face="Open-sans, sans-serif" color="#555454">
-									{convertPrice price=$rm_v['avg_paid_unit_price_tax_incl']}
+									{convertPrice price=$rm_v['avg_paid_unit_price_tax_excl']}
 								</font>
 							</td>
 							<td width="10">&nbsp;</td>
@@ -114,7 +114,7 @@
 							<td width="10">&nbsp;</td>
 							<td align="right"  class="text-center">
 								<font size="2" face="Open-sans, sans-serif" color="#555454">
-									{convertPrice price=$rm_v['amount_tax_incl']}
+									{convertPrice price=$rm_v['amount_tax_excl']}
 								</font>
 							</td>
 							<td width="10">&nbsp;</td>

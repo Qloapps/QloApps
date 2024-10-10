@@ -7,4 +7,489 @@
 #page {
   text-align: right !important; }
 
+/* globals - start */
+.pull-left {
+  float: right !important;
+}
+.pull-right {
+  float: left !important;
+}
+.text-right {
+  text-align: left !important;
+}
+.text-left {
+  text-align: right !important;
+}
+
+#growls {
+  left: 10px;
+  right: unset !important;
+}
+
+.growl .growl-close{
+  float: left;
+}
+
+.icon-angle-double-left:before,
+.icon-double-angle-left:before {
+  content: "" !important;
+}
+
+.icon-angle-double-right:before,
+.icon-double-angle-right:before {
+  content: "" !important;
+}
+
+.icon-angle-left:before {
+  content: "" !important;
+}
+
+.icon-angle-right:before {
+  content: "" !important;
+}
+.btn-edit-guest-info {
+  margin-left: 10px;
+}
+
+.header-rmsearch-wrapper .filter_header .header-bottom-hr {
+  float: right !important;
+}
+
+.booking_guest_occupancy.input-occupancy {
+  padding-right: 35px;
+  background-position-x: calc(100% - 10px), 10px !important;
+}
+
+.booking_guest_occupancy.input-occupancy .pull-left {
+  float: right !important;
+}
+
+.owl-stage-outer {
+  direction: rtl !important;
+}
+
+.nav-tabs > li {
+  float: right !important;
+}
+
+.fancybox-close {
+  right: unset;
+  left: -18px;
+}
+
+.radio-inline .checker,
+.checkbox .checker {
+  float: right;
+  margin-left: 5px;
+}
+
+ul.footer_links li {
+  float: right;
+}
+
+ul.footer_links li + li {
+  margin-left: unset;
+  margin-right: 10px;
+}
+
+.icon-chevron-left:before {
+  content: "";
+}
+
+ul.footer_links li .button.button-small span i {
+  margin-right: unset;
+  margin-left: 5px;
+}
+
+.button.button-medium span {
+  padding: 10px 14px 10px 10px;
+}
+
+.button.button-medium span i.right {
+  margin-left: 0;
+  margin-right: 9px;
+}
+
+.button.button-small span i.right {
+  margin-left: 0;
+  margin-right: 5px;
+}
+
+.icon-chevron-left:before {
+  content: "";
+}
+
+.icon-chevron-right:before {
+  content: "";
+}
+
+@media (min-width: 1200px) {
+  #address .form-group.phone-number,
+  #identity .form-group.phone-number,
+  #account-creation_form .form-group.phone-number,
+  #new_account_form .form-group.phone-number,
+  #opc_account_form .form-group.phone-number,
+  #authentication .form-group.phone-number {
+    float: right;
+    margin-right: unset;
+    margin-left: 13px;
+  }
+}
+
+.booking-actions-wrap .btn.pull-right {
+  float: left !important;
+  margin-left: unset;
+  margin-right: 10px;
+}
+
+#search_occupancy_wrapper .occupancy_info_block .row > [class*=col] {
+  float: right !important;
+}
+
+#search_occupancy_wrapper .pull-left {
+  float: right !important;
+}
+
+#search_occupancy_wrapper .pull-right {
+  float: left !important;
+}
+
+#search_occupancy_wrapper .occupancy_info_block .qty_direction {
+  margin-left: unset;
+  margin-right: 3px;
+}
+
+#header .cart_block {
+  right: unset;
+  left: 0;
+}
+
+.cart_block .cart-images {
+  float: right !important;
+}
+
+.cart_block .cart_block_list .remove_link {
+  right: unset;
+  left: 10px;
+}
+
+.cart_block_list table th,
+.cart_block_list table td {
+  text-align: right !important;
+}
+
+.cart_block .cart_block_shipping_cost,
+.cart_block .cart_block_tax_cost,
+.cart_block .cart_block_total,
+.cart_block .cart_block_wrapping_cost,
+.cart_block .cart_block_convenience_fee {
+  float: left !important;
+}
+
+#currencies-block-top .dropdown-menu,
+#languages-block-top .dropdown-menu {
+  left: 0;
+  right: unset;
+}
+
+/* filters */
+#filter_results .lf_headingmain_wrapper.pull-left {
+  float: right !important;
+}
+
+#filter_results hr.theme-text-underline {
+  float: right !important;
+}
+
+#filter_results .clear_filter.pull-right {
+  float: left !important;
+}
+
+/* globals - end */
+
+
+#nav-main #currencies-block-top.pull-right,
+#nav-main #languages-block-top.pull-right {
+  float: left !important;
+}
+
+#nav-main .nav-main-item-right:not(:last-of-type) {
+  margin-left: 0;
+  margin-right: 24px;
+}
+
+#nav-main .contact-item:first-of-type {
+  margin-right: 0;
+}
+
+div.uploader .filename, div.uploader .action {
+  float : right !important;
+  margin-right: 2px;
+}
+
+/* room search block - start */
+#search_hotel_block_form .header-rmsearch-input.input-location {
+  padding-right: 35px;
+  padding-left: 0;
+  background-position-x: 95%;
+}
+
+#search_hotel_block_form .header-rmsearch-input.input-hotel {
+  padding-right: 35px;
+  padding-left: 0;
+  background-position-x: calc(100% - 10px), 10px !important;
+}
+
+#search_hotel_block_form .header-rmsearch-input.input-hotel .pull-left {
+  float: right !important;
+}
+
+.header-rmsearch-wrapper .location_search_results_ul li,
+.header-rmsearch-wrapper .hotel_dropdown_ul li {
+  text-align: right;
+}
+
+#search_hotel_block_form .header-rmsearch-input.input-date {
+  padding-right: 35px;
+  padding-left: 0;
+  background-position-x: calc(100% - 10px), 10px !important;
+}
+
+#search_hotel_block_form .header-rmsearch-input.input-occupancy {
+  padding-right: 35px;
+  padding-left: 0;
+  background-position-x: calc(100% - 10px), 10px !important;
+}
+
+#search_hotel_block_form .header-rmsearch-input.input-occupancy .pull-left {
+  float: right !important;
+}
+
+#search_hotel_block_form #id_hotel_button{
+  background-position-x: calc(100% - 10px), 10px !important;
+}
+
+#search_hotel_block_form #id_hotel_button_chosen .chosen-single, #search_hotel_block_form .chosen-container-single .chosen-search input[type="text"]{
+  padding-right: 35px;
+  background-position-x: calc(100% - 10px), 10px !important;
+}
+
+#search_hotel_block_form .chosen-container-single .chosen-single div {
+  right: unset !important;
+  left: 5px !important;
+}
+
+#search_hotel_block_form .chosen-container-single .chosen-search::after {
+  right: unset !important;
+  left: 10px !important;
+}
+
+#search_hotel_block_form .chosen-container-single .chosen-single span {
+  margin-right: unset;
+}
+
+/* room search block - end */
+
+/* sidebar - start */
+#menu_cont.menu_cont_right {
+  left: 0;
+  right: unset;
+  transform: translate(-295px);
+}
+#menu_cont.menu_cont_left {
+  left: 0;
+  right: unset;
+}
+#menu_cont .close_navbar.pull-right {
+  float: left !important;
+}
+/* sidebar - end */
+
+/* search-results-page - start */
+.cat_cont .room_cont .row [class*=col] {
+  float: right !important;
+}
+
+.cat_cont .room_cont .rm_left  {
+  text-align: left !important;
+}
+
+.cat_cont .room_cont .capa_txt  {
+  padding-left: unset;
+  padding-right: 15px;
+}
+
+.cat_cont .room_cont .rm_price_cont  {
+  text-align: left !important;
+}
+/* search-results-page - end */
+
+
+/* room-type-detail page - start */
+#layer_cart .layer_cart_cart .button-container span.exclusive-medium i {
+  padding-left: 5px;
+}
+
+#booking-form #room_date_range,
+#booking-form .input-occupancy {
+  padding-right: 35px;
+  padding-left: 20px;
+  text-align: right;
+  background-position-x: calc(100% - 8px), 8px;
+}
+
+.booking_occupancy_wrapper .row [class*=col] {
+  float: right !important;
+}
+
+.booking_occupancy_wrapper .qty_direction {
+  margin-left: unset;
+  margin-right: 3px;
+}
+
+.booking_occupancy_wrapper .pull-left {
+  float: right !important;
+}
+
+.booking_occupancy_wrapper .pull-right {
+  float: left !important;
+}
+
+#booking-form #booking_action_block [class*="col-"] {
+  float: right;
+}
+
+#service_products_cont .service-product-element > [class*=col] {
+  float: right !important;
+}
+/* room-type-detail page - end */
+
+/* abc - start */
+#layer_cart [class*=layer_cart][class*=col] {
+  float: right !important;
+}
+/* abc - end */
+
+/* my account - start */
+#my-account .addresses-lists > [class*=col] {
+  float: right !important;
+}
+
+#my-account ul.myaccount-link-list li a i {
+  left: unset;
+  right: 0;
+}
+
+#my-account ul.myaccount-link-list li a span {
+  margin-left: unset;
+  margin-right: 52px;
+  border-color: #fff #c8c8c8 #fff #fff;
+}
+
+#identity #center_column form.std .row .col-xs-4,
+#authentication #center_column form.std .row .col-xs-4 {
+  float: right !important;
+}
+
+#history .adresses_bloc .address li > [class*=col] {
+  float: right !important;
+}
+/* my account - end */
+
+/* Room type - start */
+#image-block-cont {
+  padding-left: 15px !important;
+}
+.close_room_serach_wrapper {
+  right: unset !important;
+  left: 0px;
+}
+/* Room type - end */
+
+/* order-opc - start */
+
+#order-opc .avail_vouchers_block .avail_voucher_name>.voucher_name,
+#tc_txt, .product_info_label{
+  float: right !important;
+}
+#order-opc .cart_total_detail_block .cart_total_values {
+  float: left !important;
+}
+
+p.payment_module a:after {
+  right: unset !important;
+  content: "\f053" !important;
+  left: 12px !important;
+}
+
+p.payment_module a {
+  padding: 30px 100px 27px 25px;
+  background-position-x: calc(100% - 10px) !important;
+}
+
+.room-type-feature {
+  float: right !important;
+  margin-bottom: 5px;
+  padding: 0px 0px 0px 10px !important;
+  line-height: 24px !important;
+}
+
+/* order-opc - end */
+
+/* contact-us - start */
+
+#contact_type {
+  text-align: right !important;
+}
+/* contact-us - end */
+
+/* order-detail - start */
+@media (min-width: 576px) {
+  .booking-room-detail .num-refunded-rooms {
+    float: left !important;
+  }
+}
+.fancybox-order-detail .fancybox-close {
+  right: unset !important;
+  left: 12px !important;
+}
+/* order-detail - end */
+
+/* order-confirmation - start */
+.fancybox-extra-services .fancybox-close {
+  right: unset !important;
+  left: 12px !important;
+}
+
+/* order-confirmation - end */
+
+
+/* Booking refund requests - start */
+#order-return .form-group.row div {
+  float: right !important;
+}
+/* Booking refund requests - end */
+
+/* footer - start */
+.footer-section-heading hr {
+  float: right !important;
+}
+
+.footer-payment-block img {
+  margin-right: unset;
+  margin-left: 15px;
+}
+
+.footer-container #footer #social_block ul {
+  float: right !important;
+}
+
+.footer-container #footer #social_block ul li {
+  margin-right: unset;
+  margin-left: 15px;
+}
+/* footer - end */
+
+
+
 /*# sourceMappingURL=rtl.css.map */

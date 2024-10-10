@@ -46,12 +46,13 @@
 						{assign var=curr_id value=$cart->id_currency|intval}
 						{foreach from=$cart_detail_data item=data}
 							<tr  data-id-booking-data="{$data.id}" data-id-product="{$data.id_product}" data-id-room="{$data.id_room}" data-date-from="{$data.date_from}" data-date-to="{$data.date_to}" >
-								<td>{$data.room_num|escape:'html':'UTF-8'}</td>
+								<td>{$data.room_num|escape:'html':'UTF-8'} {hook h='displayRoomNumAfter' data=$data type='adminOrder'}</td>
 								<td><img src="{$data.image_link|escape:'html':'UTF-8'}" title="Room image" /></td>
 								<td>
 									<p>{$data.room_type|escape:'html':'UTF-8'}</p>
 								</td>
-								<td>{dateFormat date=$data.date_from} - {dateFormat date=$data.date_to}</td>
+                                {assign var="is_full_date" value=($show_full_date && ($data['date_from']|date_format:'%D' == $data['date_to']|date_format:'%D'))}
+								<td>{dateFormat date=$data.date_from full=$is_full_date} - {dateFormat date=$data.date_to full=$is_full_date}</td>
 								{if $occupancy_required_for_booking}
 									<td>
 										<div class="dropdown">
@@ -71,17 +72,18 @@
 															<div class="col-xs-6 occupancy_count_block">
 																<div class="col-sm-12">
 																	<label>{l s='Adults'}</label>
-																	<input type="number" class="form-control num_occupancy num_adults" name="occupancy[0][adults]" value="{$data['adults']}" min="1" max="{$data['room_type_info']['max_adults']|escape:'html':'UTF-8'}">
+																	<input type="number" class="form-control num_occupancy num_adults" name="occupancy[0][adults]" value="{$data['adults']}" min="1">
 																</div>
 															</div>
 															<div class="col-xs-6 occupancy_count_block">
 																<div class="col-sm-12">
 																	<label>{l s='Children'} <span class="label-desc-txt"></span></label>
-																	<input type="number" class="form-control num_occupancy num_children" name="occupancy[0][children]" value="{$data['children']}" min="0" max="{$data['room_type_info']['max_children']|escape:'html':'UTF-8'}">
+																	<input type="number" class="form-control num_occupancy num_children" name="occupancy[0][children]" value="{$data['children']}" min="0">
 																	({l s='Below'}  {$max_child_age|escape:'htmlall':'UTF-8'} {l s='years'})
 																</div>
 															</div>
 														</div>
+														<p style="display:none;"><span class="text-danger occupancy-input-errors"></span></p>
 														<div class="row children_age_info_block" {if !isset($data['child_ages']) || !$data['child_ages']}style="display:none"{/if}>
 															<div class="col-sm-12">
 																<label class="col-sm-12">{l s='All Children'}</label>
@@ -91,7 +93,7 @@
 																			{foreach $data['child_ages'] as $childAge}
 																				<p class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
 																					<select class="guest_child_age room_occupancies" name="occupancy[0][child_ages][]">
-																						<option value="-1" {if $childAge == -1}selected{/if}>{l s='Select 1'}</option>
+																						<option value="-1" {if $childAge == -1}selected{/if}>{l s='Select age'}</option>
 																						<option value="0" {if $childAge == 0}selected{/if}>{l s='Under 1'}</option>
 																						{for $age=1 to ($max_child_age-1)}
 																							<option value="{$age|escape:'htmlall':'UTF-8'}" {if $childAge == $age}selected{/if}>{$age|escape:'htmlall':'UTF-8'}</option>
@@ -117,7 +119,7 @@
 										{assign var=shown_room_type_price value=$data.product_price_tax_excl}
 									{/if}
 									<div class="input-group">
-										<input type="text" class="room_unit_price" value="{$shown_room_type_price|escape:'html':'UTF-8'}">
+										<input type="text" class="room_unit_price" value="{Tools::ps_round($shown_room_type_price, $smarty.const._PS_PRICE_DISPLAY_PRECISION_)|escape:'html':'UTF-8'}">
 										<span class="input-group-addon">{$currency->prefix}{$currency->suffix}</span>
 									</div>
 								</td>
@@ -138,12 +140,12 @@
 									{/if}
 								</td>
 								<td>
-									<button class="delete_hotel_cart_data btn btn-danger" data-id_room={$data.id_room|escape:'html':'UTF-8'} data-id_product={$data.id_product|escape:'html':'UTF-8'} data-id = {$data.id|escape:'html':'UTF-8'} data-id_cart = {$data.id_cart|escape:'html':'UTF-8'} data-date_to = {$data.date_to|escape:'html':'UTF-8'} data-date_from = {$data.date_from|escape:'html':'UTF-8'}>
+									<button class="delete_hotel_cart_data btn btn-danger" data-id_room="{$data.id_room|escape:'html':'UTF-8'}" data-id_product="{$data.id_product|escape:'html':'UTF-8'}" data-id="{$data.id|escape:'html':'UTF-8'}" data-id_cart="{$data.id_cart|escape:'html':'UTF-8'}" data-date_to="{$data.date_to|escape:'html':'UTF-8'}" data-date_from="{$data.date_from|escape:'html':'UTF-8'}">
 										<i class="icon-trash"></i>&nbsp;{l s='Delete'}
 									</button>
 									{if (isset($data.extra_demands) && $data.extra_demands) || isset($data.additional_service) && $data.additional_service}
 										<br />
-										<a href="#" id_room={$data.id_room|escape:'html':'UTF-8'} date_from="{$data.date_from|escape:'html':'UTF-8'}" date_to="{$data.date_to|escape:'html':'UTF-8'}" id_product="{$data.id_product|escape:'html':'UTF-8'}" id_cart="{$data.id_cart|escape:'html':'UTF-8'}" class="open_rooms_extra_demands btn btn-success" title="{l s='Click here to add or remove the extra services of this room type.'}">
+										<a href="#" id_room="{$data.id_room|escape:'html':'UTF-8'}" date_from="{$data.date_from|escape:'html':'UTF-8'}" date_to="{$data.date_to|escape:'html':'UTF-8'}" id_product="{$data.id_product|escape:'html':'UTF-8'}" id_cart="{$data.id_cart|escape:'html':'UTF-8'}" class="open_rooms_extra_demands btn btn-success" title="{l s='Click here to add or remove the extra services of this room type.'}">
 											<i class="icon-pencil"></i>&nbsp;{l s='Services'}
 										</a>
 									{/if}

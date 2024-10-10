@@ -44,13 +44,25 @@ class WkHotelRoomDisplay extends ObjectModel
         );
     }
 
-    public function getHotelRoomDisplayData($active = true)
+    public function getHotelRoomDisplayData($active = true, $checkShowAtFront = true)
     {
-        $sql = 'SELECT * FROM `'._DB_PREFIX_.'htl_room_block_data` WHERE 1';
-        if ($active !== false) {
-            $sql .= ' AND `active` = '.(int)$active;
+        $sql = 'SELECT hrbd.* FROM `'._DB_PREFIX_.'htl_room_block_data` hrbd';
+
+        if ($checkShowAtFront) {
+            $sql .= ' INNER JOIN `'._DB_PREFIX_.'product` p ON (p.`id_product` = hrbd.`id_product`)';
         }
-        $sql .= ' ORDER BY `position`';
+
+        $sql .= ' WHERE 1';
+
+        if ($active) {
+            $sql .= ' AND hrbd.`active` = 1';
+        }
+
+        if ($checkShowAtFront) {
+            $sql .= ' AND p.`show_at_front` = 1';
+        }
+
+        $sql .= ' ORDER BY hrbd.`position`';
 
         $result = DB::getInstance()->executeS($sql);
         if ($result) {
@@ -144,15 +156,36 @@ class WkHotelRoomDisplay extends ObjectModel
         $languages = Language::getLanguages(false);
         $HOTEL_ROOM_DISPLAY_HEADING = array();
         $HOTEL_ROOM_DISPLAY_DESCRIPTION = array();
+        $htlRoomHeading = array(
+            'en' => 'Our Rooms',
+            'nl' => 'Onze Kamers',
+            'fr' => 'Nos Chambres',
+            'de' => 'Unsere Zimmer',
+            'ru' => 'Наши номера',
+            'es' => 'Nuestras Habitaciones',
+        );
+        $htlRoomDesc = array(
+            'en' => 'Relax in the comfort of our rooms. With modern amenities, serene decor, and stunning lake or city views, each room offers a peaceful retreat for your stay.',
+            'nl' => 'Ontspan in het comfort van onze kamers. Met moderne voorzieningen, een serene inrichting en een prachtig uitzicht op het meer of de stad, biedt elke kamer een rustige toevluchtsoord voor uw verblijf.',
+            'fr' => 'Détendez-vous dans le confort de nos chambres. Avec des équipements modernes, une décoration sereine et une vue imprenable sur le lac ou la ville, chaque chambre offre un refuge paisible pour votre séjour.',
+            'de' => 'Entspannen Sie im Komfort unserer Zimmer. Mit modernen Annehmlichkeiten, ruhiger Dekoration und herrlichem Blick auf den See oder die Stadt bietet jeder Raum einen friedlichen Rückzugsort für Ihren Aufenthalt.',
+            'ru' => 'Отдохните в комфорте наших номеров. С современными удобствами, спокойным декором и потрясающим видом на озеро или город, каждый номер предлагает мирное убежище для вашего пребывания.',
+            'es' => 'Relájese en la comodidad de nuestras habitaciones. Con comodidades modernas, decoración serena e impresionantes vistas al lago o a la ciudad, cada habitación ofrece un retiro tranquilo para su estancia.',
+        );
         foreach ($languages as $lang) {
-            $HOTEL_ROOM_DISPLAY_HEADING[$lang['id_lang']] = 'Our Rooms';
-            $HOTEL_ROOM_DISPLAY_DESCRIPTION[$lang['id_lang']] = 'Families travelling with kids will find Amboseli national park a safari destination matched to no other, with less tourist traffic, breathtaking open space.';
+            if (isset($htlRoomHeading[$lang['iso_code']])) {
+                $HOTEL_ROOM_DISPLAY_HEADING[$lang['id_lang']] = $htlRoomHeading[$lang['iso_code']];
+                $HOTEL_ROOM_DISPLAY_DESCRIPTION[$lang['id_lang']] = $htlRoomDesc[$lang['iso_code']];
+            } else {
+                $HOTEL_ROOM_DISPLAY_HEADING[$lang['id_lang']] = $htlRoomHeading['en'];
+                $HOTEL_ROOM_DISPLAY_DESCRIPTION[$lang['id_lang']] = $htlRoomDesc['en'];
+            }
         }
 
         // update global configuration values in multilang
         Configuration::updateValue('HOTEL_ROOM_DISPLAY_HEADING', $HOTEL_ROOM_DISPLAY_HEADING);
         Configuration::updateValue('HOTEL_ROOM_DISPLAY_DESCRIPTION', $HOTEL_ROOM_DISPLAY_DESCRIPTION);
-        if ($roomTypes = HotelHelper::getPsProducts(Configuration::get('PS_LANG_DEFAULT'), 0, 5)) {
+        if ($roomTypes = HotelHelper::getPsProducts(Configuration::get('PS_LANG_DEFAULT'), 0, 5, 1)) {
             foreach ($roomTypes as $product) {
                 if (Validate::isLoadedObject($objProduct = new Product($product['id_product']))) {
                     $objRoomBlock = new WkHotelRoomDisplay();

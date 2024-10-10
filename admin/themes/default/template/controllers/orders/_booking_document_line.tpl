@@ -35,9 +35,11 @@
                 <a class="btn btn-info" href="{$link->getAdminLink('AdminBookingDocument')}&action=getDocument&id_document={$booking_document.id_htl_booking_document}">
                     <i class="icon icon-cloud-download"></i>
                 </a>
-                <a class="btn btn-danger btn-delete-document" data-id-htl-booking-document="{$booking_document.id_htl_booking_document}">
-                    <i class="icon icon-trash"></i>
-                </a>
+                {if $can_edit}
+                    <a class="btn btn-danger btn-delete-document" data-id-htl-booking-document="{$booking_document.id_htl_booking_document}">
+                        <i class="icon icon-trash"></i>
+                    </a>
+                {/if}
             </td>
         </tr>
     {/foreach}

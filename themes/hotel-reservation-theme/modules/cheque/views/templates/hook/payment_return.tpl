@@ -24,16 +24,18 @@
 *}
 
 {if $status == 'ok'}
-	<p class="alert alert-success">{l s='Your order on %s is complete.' sprintf=$shop_name mod='cheque'}</p><br />
+        <p class="alert alert-success">{l s='Your' mod='cheque'} {if $cart_room_bookings|count > 1}{l s='bookings have' mod='cheque'}{else}{l s='booking has' mod='cheque'}{/if} {l s='been created successfully!' mod='cheque'}</p><br /><br />
 		{l s='Your check must include:' mod='cheque'}<br />
 		- {l s='Payment amount.' mod='cheque'} <span class="price"><strong>{$total_to_pay}</strong></span>
 		<br />- {l s='Payable to the order of' mod='cheque'} <strong>{if $chequeName}{$chequeName}{else}___________{/if}</strong>
 		<br />- {l s='Mail to' mod='cheque'} <strong>{if $chequeAddress}{$chequeAddress}{else}___________{/if}</strong>
 		{if !isset($reference) && isset($id_order) && $id_order}
-			<br />- {l s='Do not forget to insert your order number #%d.' sprintf=$id_order mod='cheque'}
+			<br /><br />- {l s='Do not forget to insert your order number #%d.' sprintf=$id_order mod='cheque'}
 		{else}
-			<br />- {l s='Do not forget to insert your order reference %s.' sprintf=$reference mod='cheque'}
+			<br /><br />- {l s='Do not forget to insert your order reference %s.' sprintf=$reference mod='cheque'}
 		{/if}
+		<br />
+		<br />
 {else}
 	<p class="alert alert-warning">
 		{l s='We noticed a problem with your order. If you think this is an error, feel free to contact our' mod='cheque'}

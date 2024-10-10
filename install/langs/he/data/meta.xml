@@ -19,8 +19,8 @@
     <url_rewrite>צור-קשר</url_rewrite>
   </meta>
   <meta id="index" id_shop="1">
-    <title/>
-    <description>החנות מופעלת באמצעות פרסטהשופ</description>
+    <title>מלון פריים</title>
+    <description>מקום שבו נוחות ולוקסוס משתלבים עם הטבע!</description>
     <keywords/>
     <url_rewrite/>
   </meta>
@@ -95,6 +95,12 @@
     <description/>
     <keywords/>
     <url_rewrite>הסטוריית-הזמנות</url_rewrite>
+  </meta>
+  <meta id="order-detail" id_shop="1">
+    <title>פרטי ההזמנה</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>partei-hahazmana</url_rewrite>
   </meta>
   <meta id="identity" id_shop="1">
     <title>זהות</title>

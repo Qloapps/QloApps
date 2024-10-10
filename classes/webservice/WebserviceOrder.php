@@ -26,5 +26,7 @@ class WebserviceOrderCore extends PaymentModule
     public function __construct()
     {
         $this->displayName = $this->l('Order from API');
+        $this->validateOrderAmount = false;
+        $this->payment_type = OrderPayment::PAYMENT_TYPE_ONLINE;
     }
 }

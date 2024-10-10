@@ -41,7 +41,7 @@
 	top: -50px;
 	bottom: 50px;
 	left: -50px;
-	right: 50px;
+	right: -50px;
 	width: calc(100% + 100px);
 	height: calc(100% + 100px);
 }
@@ -69,6 +69,10 @@
 	text-align: center;
 }
 
-.nv-label text {
-	fill: #fff !important;
+#dashoccupancy .label-tooltip {
+    color: #00aff0;
+    cursor: pointer;
+}
+#dashoccupancy .tooltip {
+    text-transform: none;
 }

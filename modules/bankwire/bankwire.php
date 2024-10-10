@@ -41,7 +41,7 @@ class Bankwire extends PaymentModule
     {
         $this->name = 'bankwire';
         $this->tab = 'payments_gateways';
-        $this->version = '1.1.5';
+        $this->version = '1.1.6';
         $this->author = 'PrestaShop';
         $this->controllers = array('payment', 'validation');
         $this->is_eu_compatible = 1;
@@ -208,14 +208,16 @@ class Bankwire extends PaymentModule
         }
 
         $objOrder = $params['objOrder'];
-        $orderState = $objOrder->getCurrentState();
+        $idOrderState = $objOrder->getCurrentState();
+        $objOrderState = new OrderState($idOrderState);
+        $history = $objOrder->getHistory($this->context->language->id);
+        $initialStatus = array_pop($history);
         $smartyVars = array();
-        if (in_array(
-            $orderState,
-            array(
-                Configuration::get('PS_OS_AWAITING_PAYMENT'),
+        if ($idOrderState == Configuration::get('PS_OS_AWAITING_PAYMENT')
+            || ($objOrderState->logable
+                && $initialStatus['id_order_state'] == Configuration::get('PS_OS_AWAITING_PAYMENT')
             )
-        )) {
+        ) {
             $objCart = new Cart($objOrder->id_cart);
             if ($objCart->is_advance_payment) {
                 $cartTotal = $objOrder->getOrdersTotalPaid(1);
@@ -223,6 +225,10 @@ class Bankwire extends PaymentModule
                 $cartTotal = $objOrder->getOrdersTotalPaid();
 			}
 
+            // Get rooms bookings in the order
+            $objHotelBooking = new HotelBookingDetail();
+            $cartRoomBookings = $objHotelBooking->getBookingDataByOrderReference($objOrder->reference);
+            $smartyVars['cart_room_bookings'] = $cartRoomBookings;
             $smartyVars['total_to_pay'] = Tools::displayPrice($cartTotal, $params['currencyObj'], false);
             $smartyVars['bankwireDetails'] = Tools::nl2br($this->details);
             $smartyVars['bankwireAddress'] = Tools::nl2br($this->address);

@@ -19,8 +19,8 @@
     <url_rewrite>contact-us</url_rewrite>
   </meta>
   <meta id="index" id_shop="1">
-    <title/>
-    <description>Website powered by Webkul</description>
+    <title>Hotel Prime</title>
+    <description>A place where comfort and luxury are blended with nature!</description>
     <keywords/>
     <url_rewrite/>
   </meta>
@@ -95,6 +95,12 @@
     <description/>
     <keywords/>
     <url_rewrite>order-history</url_rewrite>
+  </meta>
+  <meta id="order-detail" id_shop="1">
+    <title>预订详情</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>yùdìng-xiángqíng</url_rewrite>
   </meta>
   <meta id="identity" id_shop="1">
     <title>Identity</title>

@@ -19,9 +19,9 @@
     <url_rewrite>kontaktieren-sie-uns</url_rewrite>
   </meta>
   <meta id="index" id_shop="1">
-    <title/>
-    <description>Website powered by Webkul</description>
-    <keywords>Shop, prestashop</keywords>
+    <title>Hotel Prime</title>
+    <description>Ein Ort, an dem Komfort und Luxus mit der Natur verschmelzen!</description>
+    <keywords/>
     <url_rewrite/>
   </meta>
   <meta id="manufacturer" id_shop="1">
@@ -95,6 +95,12 @@
     <description/>
     <keywords/>
     <url_rewrite>bestellungsverlauf</url_rewrite>
+  </meta>
+  <meta id="order-detail" id_shop="1">
+    <title>Buchungsdetails</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>buchungsdetails</url_rewrite>
   </meta>
   <meta id="identity" id_shop="1">
     <title>Kennung</title>

@@ -35,24 +35,20 @@
   .header-rmsearch-wrapper #search_hotel_block_form {
     grid-template-columns: 1fr;
   }
-  .header-rmsearch-wrapper #search_hotel_block_form #daterange_value.grid {
-    display: grid;
-    column-gap: 5px;
+  .header-rmsearch-wrapper #search_hotel_block_form #daterange_value.multi-date {
     grid-template-columns: 1fr;
   }
-  #search_hotel_block_form .header-rmsearch-input {
-    height: unset;
+  #search_hotel_block_form .hotel-selector-wrap .chosen-container-single .chosen-single {
     min-height: 45px;
   }
-  #search_hotel_block_form #search_room_submit {
-    height: unset;
-    min-height: 45px;
-  }
-  /* #search_hotel_block_form #search_room_submit {
+  #search_hotel_block_form .hotel-selector-wrap .chosen-container-single .chosen-search {
     height: 45px;
-  } */
-  #search_hotel_block_form {
-    grid-template-columns: 1fr;
+  }
+  #search_hotel_block_form .grid {
+    display: block;
+  }
+  #search_hotel_block_form .grid > div {
+    display: block;
   }
   #search_hotel_block_form > div {
     grid-column-end: unset!important;

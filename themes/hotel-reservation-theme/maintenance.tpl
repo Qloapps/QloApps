@@ -39,15 +39,40 @@
 	<link rel="shortcut icon" href="{$favicon_url}">
 	<link href="{$css_dir}maintenance.css" rel="stylesheet">
 	<script src="{$base_dir}js/jquery/jquery-1.11.0.min.js"></script>
-	<script src="{$base_dir}js/maintenance.js"></script>
+	<script src="{$js_dir}maintenance.js"></script>
 	<link href='//fonts.googleapis.com/css?family=Open+Sans:600' rel='stylesheet'>
 </head>
 
 <body>
 	<div id="maintenance">
-		<div class="logo">
-			<img src="{$logo_url}" {if $logo_image_width}width="{$logo_image_width}" {/if}
-				{if $logo_image_height}height="{$logo_image_height}" {/if} alt="logo" />
+		<div class="header-container{if count($languages) > 1} multilang{/if}">
+			<div class="logo-container">
+				<img src="{$logo_url}" alt="logo" />
+			</div>
+			{if count($languages) > 1}
+				<div class="language-selector-wrap">
+					<div class="dropdown">
+						{foreach from=$languages item=language}
+							{if $language.iso_code == $lang_iso}
+								<button class="dropdown-toggle" type="button" data-toggle="dropdown">
+									{$language.name|regex_replace:'/\s\(.*\)$/':''}
+									<span class="caret"></span>
+								</button>
+							{/if}
+						{/foreach}
+
+						<ul class="dropdown-menu">
+							{foreach from=$languages item=language}
+								<li {if $language.iso_code == $lang_iso}class="disabled"{/if}>
+									<a href="{$link->getLanguageLink($language.id_lang)|escape:'html':'UTF-8'}" title="{$language.name}">
+										<span>{$language.name|regex_replace:'/\s\(.*\)$/':''}</span>
+									</a>
+								</li>
+							{/foreach}
+						</ul>
+					</div>
+				</div>
+			{/if}
 		</div>
 		<div class="margin-l-r">
 			{if isset($errors) && $errors}
@@ -73,37 +98,33 @@
 				<p>{l s='Thanks for your patience!'}</p>
 				{if isset($allowEmployee) && $allowEmployee}
 					<div>
-						<p class="clicker blue" tabindex="1">{l s='Are you member?'}</p>
-						<div class="hiddendiv">
-							<div class="allow-conatainer">
-								<form action="index.php" method="post">
-									<div class="form_content clearfix">
-										<div class="form-group form-ok">
-											<label class="" for="email">{l s='Email address'}</label>
-											<br>
-											<input class="form-control" placeholder="Email" type="email" id="email"
-												name="email" value="">
-										</div>
-										<div class="form-group form-ok">
-											<label class="" for="passwd">{l s='Password'}</label>
-											<br>
-											<input class="form-control" type="password" placeholder="Password" id="passwd"
-												name="passwd" value="">
-										</div>
-										<button type="submit" id="SubmitLogin" name="SubmitLogin" class="btn btn-primary">
-											<span>
-												{l s='Log in'}
-											</span>
-										</button>
-										<button type="button" id="cancelLogin" name="cancelLogin"
-											class="btn btn-primary cancel-login">
-											<span>
-												{l s='Cancel'}
-											</span>
-										</button>
+						<p class="clicker blue" tabindex="1">{l s='Are you a member?'}</p>
+						<div class="login-form-wrap" {if !isset($smarty.post.SubmitLogin)}style="display:none;"{/if}>
+							<form action="" method="post">
+								<div class="form_content clearfix">
+									<div class="form-group form-ok">
+										<label class="" for="email">{l s='Email address'}</label>
+										<br>
+										<input class="form-control" placeholder="{l s='Email'}" type="email" id="email" name="email" {if isset($smarty.post.SubmitLogin)}value="{$smarty.post.email|escape:'html':'UTF-8'}"{/if}>
 									</div>
-								</form>
-							</div>
+									<div class="form-group form-ok">
+										<label class="" for="passwd">{l s='Password'}</label>
+										<br>
+										<input class="form-control" type="password" placeholder="{l s='Password'}" id="passwd" name="passwd" value="">
+									</div>
+									<button type="submit" id="SubmitLogin" name="SubmitLogin" class="btn btn-primary">
+										<span>
+											{l s='Log in'}
+										</span>
+									</button>
+									<button type="button" id="cancelLogin" name="cancelLogin"
+										class="btn btn-primary cancel-login">
+										<span>
+											{l s='Cancel'}
+										</span>
+									</button>
+								</div>
+							</form>
 						</div>
 					</div>
 				{/if}

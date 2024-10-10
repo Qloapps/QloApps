@@ -212,27 +212,27 @@ class AdminPerformanceControllerCore extends AdminController
                     'type' => 'hidden',
                     'name' => 'features_detachables_up'
                 ),
-                array(
-                    'type' => 'switch',
-                    'label' => $this->l('Combinations'),
-                    'name' => 'combination',
-                    'is_bool' => true,
-                    'disabled' => Combination::isCurrentlyUsed(),
-                    'values' => array(
-                        array(
-                            'id' => 'combination_1',
-                            'value' => 1,
-                            'label' => $this->l('Yes'),
-                        ),
-                        array(
-                            'id' => 'combination_0',
-                            'value' => 0,
-                            'label' => $this->l('No')
-                        )
-                    ),
-                    'hint' => $this->l('Choose "No" to disable Product Combinations.'),
-                    'desc' => Combination::isCurrentlyUsed() ? $this->l('You cannot set this parameter to No when combinations are already used by some of your products') : null
-                ),
+                // array(
+                //     'type' => 'switch',
+                //     'label' => $this->l('Combinations'),
+                //     'name' => 'combination',
+                //     'is_bool' => true,
+                //     'disabled' => Combination::isCurrentlyUsed(),
+                //     'values' => array(
+                //         array(
+                //             'id' => 'combination_1',
+                //             'value' => 1,
+                //             'label' => $this->l('Yes'),
+                //         ),
+                //         array(
+                //             'id' => 'combination_0',
+                //             'value' => 0,
+                //             'label' => $this->l('No')
+                //         )
+                //     ),
+                //     'hint' => $this->l('Choose "No" to disable Product Combinations.'),
+                //     'desc' => Combination::isCurrentlyUsed() ? $this->l('You cannot set this parameter to No when combinations are already used by some of your products') : null
+                // ),
                 array(
                     'type' => 'switch',
                     'label' => $this->l('Features'),

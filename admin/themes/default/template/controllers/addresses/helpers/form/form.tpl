@@ -29,31 +29,29 @@
 	{if $input.name == 'vat_number'}
 		<div id="vat_area" style="display: visible">
 	{/if}
-
-	{if $input.type == 'text_customer' && !isset($customer)}
-		<label class="control-label col-lg-3 required" for="email">{l s='Customer email'}</label>
-	{else}
-		{$smarty.block.parent}
-	{/if}
+	{$smarty.block.parent}
 {/block}
 
-{block name="field"}
+{block name="input"}
 	{if $input.type == 'text_customer'}
 		{if isset($customer)}
-			<div class="col-lg-9">
-				<a class="btn btn-default" href="?tab=AdminCustomers&amp;id_customer={$customer->id|intval}&amp;viewcustomer&amp;token={$tokenCustomer}">
-					<i class="icon-eye-open"></i> {$customer->lastname} {$customer->firstname} ({$customer->email})
-				</a>
-			</div>
+			<a class="btn btn-default" href="?tab=AdminCustomers&amp;id_customer={$customer->id|intval}&amp;viewcustomer&amp;token={$tokenCustomer}">
+				<i class="icon-eye-open"></i> {$customer->lastname} {$customer->firstname} ({$customer->email})
+			</a>
 			<input type="hidden" name="id_customer" value="{$customer->id}" />
 			<input type="hidden" name="email" value="{$customer->email}" />
-		{else}
-			<script type="text/javascript">
-			$('input[name=email]').live('blur', function(e)
+		{/if}
+	{else if $input.type == 'select' && $input.name == 'id_customer'}
+		{$smarty.block.parent}
+		<input type="hidden" name="email" id="email" value="">
+		<script type="text/javascript">
+			$('#id_customer').on('change', function(e)
 			{
-				var email = $(this).val();
-				if (email.length > 5)
-				{
+				var id_customer = parseInt($(this).val());
+				$('#email').val('');
+				if (!isNaN(id_customer)) {
+					var email = $(this).find('[value="'+id_customer+'"]').text();
+					$('#email').val(email);
 					var data = {};
 					data.email = email;
 					data.token = "{$token|escape:'html':'UTF-8'}";
@@ -66,31 +64,30 @@
 						data: data,
 						dataType: 'json',
 						async : true,
-						success: function(msg)
-						{
-							if (msg)
-							{
+						success: function(msg) {
+							if (msg) {
 								var infos = msg.infos.replace("\\'", "'").split('_');
-
 								$('input[name=firstname]').val(infos[0]);
 								$('input[name=lastname]').val(infos[1]);
 								$('input[name=company]').val(infos[2]);
 								$('input[name=id_customer]').val(infos[3]);
+								$('input[name=phone]').val(infos[4]);
+							} else {
+								resetCustomerRelatedAddressFields();
 							}
-						},
-						error: function(msg)
-						{
 						}
 					});
+				} else {
+					resetCustomerRelatedAddressFields();
 				}
 			});
-			</script>
-
-			<div class="col-lg-4">
-				<input type="hidden" name="id_customer" value="{$fields_value[$input.name]}" />
-				<input type="email" id="email" name="email" value="{$fields_value[$input.name]|escape:'html':'UTF-8'}"/>
-			</div>
-		{/if}
+			function resetCustomerRelatedAddressFields() {
+				$('input[name=firstname]').val('');
+				$('input[name=lastname]').val('');
+				$('input[name=company]').val('');
+				$('input[name=id_customer]').val('');
+			}
+		</script>
 	{else}
 		{$smarty.block.parent}
 	{/if}

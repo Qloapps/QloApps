@@ -234,13 +234,13 @@
 	</div>
 	<div class="form-group" id="associated_hotel_rooms_tree" {if $product->service_product_type == Product::SERVICE_PRODUCT_WITHOUT_ROOMTYPE}style="display:none;"{/if}>
 		<div class="col-lg-1"><span class="pull-right">{include file="controllers/products/multishop/checkbox.tpl" field="category_box" type="category_box"}</span></div>
-		<label class="control-label col-lg-2" for="category_block">
+		<label class="control-label col-lg-2" for="hotel_block">
 			<span class="label-tooltip" data-toggle="tooltip" title="{l s='Select room type and hotels for which this service will be available.'}">
 				{l s='Associated Hotels and Room Types'}
 			</span>
 		</label>
 		<div class="col-lg-9">
-			<div id="category_block">
+			<div id="hotel_block">
 				{$hotel_tree}
 			</div>
 		</div>
@@ -391,7 +391,7 @@
 		</div>
 	</div>
 
-	<div id="allow_multiple_quantity_container" {if (!$product->available_for_order && $product->isAssociatedToShop()) || $product->auto_add_to_cart}style="display:none;"{/if}>
+	<div id="allow_multiple_quantity_container" {if $product->auto_add_to_cart && $product->isAssociatedToShop()}style="display:none;"{/if}>
 		<div class="form-group">
 			<label class="control-label col-lg-3">
 				<span class="label-tooltip" data-toggle="tooltip" title="{l s='When enabled, customer can order multiple quantity of product otherwise only one quantity can be purchased by customer per room/hotel'}">
@@ -412,21 +412,23 @@
 				</span>
 			</div>
 		</div>
-		<div id="max_quantity_container" class="form-group" {if (!$product->available_for_order && $product->isAssociatedToShop()) || $product->auto_add_to_cart || !$product->allow_multiple_quantity}style="display:none;"{/if}>
-			<label class="control-label col-lg-3" for="max_quantity">
-				<span class="label-tooltip" data-toggle="tooltip"
-					title="{l s='Enter max allowed quantity per room, enter 0 for unlimited.'}">
-					{l s='Max quantity allow'}
-				</span>
-			</label>
-			<div class="col-lg-3">
-				<input type="text" id="max_quantity" name="max_quantity" value="{$product->max_quantity|escape:'html':'UTF-8'}" />
+		<div id="max_quantity_container" {if ($product->auto_add_to_cart && $product->isAssociatedToShop()) || !$product->allow_multiple_quantity}style="display:none;"{/if}>
+			<div class="form-group">
+				<label class="control-label col-lg-3" for="max_quantity">
+					<span class="label-tooltip" data-toggle="tooltip"
+						title="{l s='Enter max allowed quantity per room, enter 0 for unlimited.'}">
+						{l s='Max quantity allow'}
+					</span>
+				</label>
+				<div class="col-lg-3">
+					<input type="text" id="max_quantity" name="max_quantity" value="{$product->max_quantity|escape:'html':'UTF-8'}" />
+				</div>
 			</div>
-		</div>
-		<div class="form-group">
-			<div class="col-lg-6 col-lg-offset-3">
-				<div class="alert alert-info">
-				{l s='By default all products have infinte quantity, Using this setting you can restrict customer to purchase only one product per room.'}
+			<div class="form-group">
+				<div class="col-lg-6 col-lg-offset-3">
+					<div class="alert alert-info">
+					{l s='By default all products have infinte quantity, Using this setting you can restrict customer to purchase only one product per room.'}
+					</div>
 				</div>
 			</div>
 		</div>

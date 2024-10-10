@@ -1,4 +1,24 @@
 ------------------------------
+# V1.1.8 to V1.1.9
+------------------------------
+
+## Improved/Changed Features:
+
+* [FO] : [#735] Updated open room type detail page in same tab from Our Rooms block on landing page
+* [BO] : [#775] Added demo service products for categories Meals and Transfers.
+* [FO] : [#782] Updated make Our Rooms images on landing page clickable to open room type detail page
+* [BO] : [#822] Fixed service products are displayed when searching for room types at back office
+* [FO] : [#833] Added 'Show at front office' option to enable/disable booking from front office.
+* [FO] : [#934] Fixed if advance price rule discount is applied on a room type having auto add service with "Add price in room price", discounted price is not displayed on room block section in front office.
+* [FO] : [#959] Updated design for the our room block
+* [BO] : [#1025] Added hotel name and room type name in the list in the hotel room block module, added hotel search option while creating new room block.
+* [CO] : [#1040] Updated Qloapps cleaner | Added hook for data cleaning in other module and fixed incorrect data being deleted.
+* [FO] : [#1133] Updated original price will now be displayed with discounted amount.
+* [CO] : [#1156] Updated the demo data added to the database for the QloApps on installation.
+* [CO] : [#1195] Added process for smarty template overriding.
+* [FO] : [#1292] Fixed design issues on the order-opc page and growl notifications in RTL mode in the front-office.
+
+------------------------------
 # V1.1.7 to V1.1.8
 ------------------------------
 

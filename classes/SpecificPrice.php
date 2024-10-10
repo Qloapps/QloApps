@@ -145,7 +145,12 @@ class SpecificPriceCore extends ObjectModel
 			FROM `'._DB_PREFIX_.'specific_price`
 			WHERE 1 '.self::filterOutField('id_product', $id_product).
             ($id_product_attribute ? ' AND id_product_attribute = '.(int) $id_product_attribute : '').'
-			AND id_cart = '.(int) $id_cart
+			AND id_cart = '.(int) $id_cart.'
+            GROUP BY
+                case when id_specific_price_rule <> 0
+                    then id_specific_price_rule
+                    else id_specific_price
+                end'
         );
     }
 
@@ -175,6 +180,12 @@ class SpecificPriceCore extends ObjectModel
         $select = '(';
 
         $priority = SpecificPrice::getPriority($id_product);
+        if (!Group::isFeatureActive()) {
+            if (($key = array_search('id_group', $priority)) !== false) {
+                unset($priority[$key]);
+            }
+        }
+
         foreach (array_reverse($priority) as $k => $field) {
             if (!empty($field)) {
                 $select .= ' IF (`'.bqSQL($field).'` = '.(int)$$field.', '.pow(2, $k + 1).', 0) + ';
@@ -353,8 +364,8 @@ class SpecificPriceCore extends ObjectModel
 				WHERE
                 `id_shop` '.self::formatIntInQuery(0, $id_shop).' AND
                 `id_currency` '.self::formatIntInQuery(0, $id_currency).' AND
-                `id_country` '.self::formatIntInQuery(0, $id_country).' AND
-                `id_group` '.self::formatIntInQuery(0, $id_group).' '.$query_extra.'
+                `id_country` '.self::formatIntInQuery(0, $id_country).
+                (Group::isFeatureActive() ? ' AND `id_group` '.self::formatIntInQuery(0, $id_group) : '').' '.$query_extra.'
 				AND IF(`from_quantity` > 1, `from_quantity`, 0) <= ';
 
             $query .= (Configuration::get('PS_QTY_DISCOUNT_ON_COMBINATION') || !$id_cart || !$real_quantity) ? (int)$quantity : max(1, (int)$real_quantity);

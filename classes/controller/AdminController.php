@@ -197,6 +197,9 @@ class AdminControllerCore extends Controller
     /** @var string */
     protected $_filterHaving;
 
+    /** @var string */
+    protected $_new_list_header_design = false;
+
     /** @var array Temporary SQL table WHERE clause determined by filter fields */
     protected $_tmpTableFilter = '';
 
@@ -317,6 +320,9 @@ class AdminControllerCore extends Controller
     /** @var string */
     protected $display;
 
+    /** @var array  */
+    public $kpis = array();
+
     /** @var bool */
     protected $_includeContainer = true;
 
@@ -397,6 +403,17 @@ class AdminControllerCore extends Controller
 
     /** @var int level for permissions View/read */
     const LEVEL_VIEW = 1;
+    const QLO_SEARCH_TYPE_CATELOG = 1;
+    const QLO_SEARCH_TYPE_CUSTOMER_BY_NAME = 2;
+    const QLO_SEARCH_TYPE_ORDER = 3;
+    const QLO_SEARCH_TYPE_INVOICE = 4;
+    const QLO_SEARCH_TYPE_CART = 5;
+    const QLO_SEARCH_TYPE_CUSTOMER_BY_IP = 6;
+    const QLO_SEARCH_TYPE_MODULE = 7;
+    const QLO_SEARCH_TYPE_HOTEL = 8;
+
+    /** @var string path for recomendation content */
+    const RECOMMENDATION_CONTENT_FILE_PATH = '';
 
     public function __construct()
     {
@@ -407,6 +424,9 @@ class AdminControllerCore extends Controller
 
         $this->controller_type = 'admin';
         $this->controller_name = get_class($this);
+        if (strpos($this->controller_name, 'ControllerOverride')) {
+            $this->controller_name = substr($this->controller_name, 0, -18);
+        }
         if (strpos($this->controller_name, 'Controller')) {
             $this->controller_name = substr($this->controller_name, 0, -10);
         }
@@ -749,7 +769,7 @@ class AdminControllerCore extends Controller
             }
 
             if (count($filters)) {
-                return sprintf($this->l('filter by %s'), implode(', ', $filters));
+                return sprintf($this->l('Filter by %s'), implode(', ', $filters));
             }
         }
     }
@@ -824,13 +844,13 @@ class AdminControllerCore extends Controller
         $this->ensureListIdDefinition();
 
         $prefix = $this->getCookieFilterPrefix();
-
+        $filters = array();
         if (isset($this->list_id)) {
             foreach ($_POST as $key => $value) {
                 if ($value === '') {
                     unset($this->context->cookie->{$prefix.$key});
                 } elseif (stripos($key, $this->list_id.'Filter_') === 0) {
-                    $this->context->cookie->{$prefix.$key} = !is_array($value) ? $value : json_encode($value);
+                    $filters[$prefix.$key] = !is_array($value) ? $value : json_encode($value);
                 } elseif (stripos($key, 'submitFilter') === 0) {
                     $this->context->cookie->$key = !is_array($value) ? $value : json_encode($value);
                 }
@@ -838,7 +858,7 @@ class AdminControllerCore extends Controller
 
             foreach ($_GET as $key => $value) {
                 if (stripos($key, $this->list_id.'Filter_') === 0) {
-                    $this->context->cookie->{$prefix.$key} = !is_array($value) ? $value : json_encode($value);
+                    $filters[$prefix.$key] = !is_array($value) ? $value : json_encode($value);
                 } elseif (stripos($key, 'submitFilter') === 0) {
                     $this->context->cookie->$key = !is_array($value) ? $value : json_encode($value);
                 }
@@ -846,107 +866,169 @@ class AdminControllerCore extends Controller
                     if ($value === '' || $value == $this->_defaultOrderBy) {
                         unset($this->context->cookie->{$prefix.$key});
                     } else {
-                        $this->context->cookie->{$prefix.$key} = $value;
+                        $filters[$prefix.$key] = $value;
                     }
                 } elseif (stripos($key, $this->list_id.'Orderway') === 0 && Validate::isOrderWay($value)) {
                     if ($value === '' || $value == $this->_defaultOrderWay) {
                         unset($this->context->cookie->{$prefix.$key});
                     } else {
-                        $this->context->cookie->{$prefix.$key} = $value;
+                        $filters[$prefix.$key] = $value;
                     }
                 }
             }
         }
 
-        $filters = $this->context->cookie->getFamily($prefix.$this->list_id.'Filter_');
-        $definition = false;
-        if (isset($this->className) && $this->className) {
-            $definition = ObjectModel::getDefinition($this->className);
+        if (empty($filters)) {
+            $filters = $this->context->cookie->getFamily($prefix.$this->list_id.'Filter_');
         }
 
         foreach ($filters as $key => $value) {
-            /* Extracting filters from $_POST on key filter_ */
-            if ($value != null && !strncmp($key, $prefix.$this->list_id.'Filter_', 7 + Tools::strlen($prefix.$this->list_id))) {
-                $key_org = $key;
-                $key = Tools::substr($key, 7 + Tools::strlen($prefix.$this->list_id));
-                /* Table alias could be specified using a ! eg. alias!field */
-                $tmp_tab = explode('!', $key);
-                $filter = count($tmp_tab) > 1 ? $tmp_tab[1] : $tmp_tab[0];
-
-                if ($field = $this->filterToField($key, $filter)) {
-                    $type = (array_key_exists('filter_type', $field) ? $field['filter_type'] : (array_key_exists('type', $field) ? $field['type'] : false));
-                    if (($type == 'date' || $type == 'datetime' || $type == 'range') && is_string($value)) {
-                        $value = json_decode($value, true);
+            $key_org = $key;
+            $key = Tools::substr($key, 7 + Tools::strlen($prefix.$this->list_id));
+            /* Table alias could be specified using a ! eg. alias!field */
+            $tmp_tab = explode('!', $key);
+            $filter = count($tmp_tab) > 1 ? $tmp_tab[1] : $tmp_tab[0];
+            if ($field = $this->filterToField($key, $filter)) {
+                $type = (array_key_exists('filter_type', $field) ? $field['filter_type'] : (array_key_exists('type', $field) ? $field['type'] : false));
+                if (($type == 'date' || $type == 'datetime' || $type == 'range')) {
+                    if (is_string($value)) {
+                        $filter_value = json_decode($value, true);
                     }
-                    $key = isset($tmp_tab[1]) ? $tmp_tab[0].'.`'.$tmp_tab[1].'`' : '`'.$tmp_tab[0].'`';
-
-                    // as in database 0 means position 1 in the renderlist
-                    if (isset($field['position'])) {
-                        $value -= 1;
-                    }
-
-                    // Assignment by reference
-                    if (array_key_exists('tmpTableFilter', $field)) {
-                        $sql_filter = & $this->_tmpTableFilter;
-                    } elseif (array_key_exists('havingFilter', $field)) {
-                        $sql_filter = & $this->_filterHaving;
-                    } else {
-                        $sql_filter = & $this->_filter;
-                    }
-                    /* Only for date filtering (from, to) */
-                    if (is_array($value)) {
+                    if (is_array($filter_value)) {
                         if ($type == 'range') {
-                            if (isset($value[0]) && !empty($value[0])) {
-                                if (!Validate::isUnsignedInt($value[0])) {
-                                    $this->errors[] = Tools::displayError('The \'From\' value is invalid');
-                                } else {
-                                    $sql_filter .= ' AND '.pSQL($key).' >= '.pSQL($value[0]);
+                            // set validation type
+                            if (isset($field['validation']) && $field['validation'] && method_exists('Validate', $field['validation'])) {
+                                $validation = $field['validation'];
+                            } else {
+                                $validation = 'isUnsignedInt';
+                            }
+
+                            if (isset($filter_value[0]) && ($filter_value[0] !== '' || $filter_value[0] === 0)) {
+                                if (!Validate::$validation($filter_value[0])) {
+                                    $this->errors[] = sprintf(Tools::displayError('The %s field \'From\' value is invalid'), $field['title']);
                                 }
                             }
-                            if (isset($value[1]) && !empty($value[1])) {
-                                if (!Validate::isUnsignedInt($value[1])) {
-                                    $this->errors[] = Tools::displayError('The \'From\' value is invalid');
-                                } elseif (isset($value[0]) && !empty($value[0]) && $value[0] > $value[1]) {
-                                    $this->errors[] = Tools::displayError('The \'To\' value cannot be less than from value');
-                                } else {
-                                    $sql_filter .= ' AND '.pSQL($key).' <= '.pSQL($value[1]);
+                            if (isset($filter_value[1]) && ($filter_value[1] !== '' || $filter_value[1] === 0)) {
+                                if (!Validate::$validation($filter_value[1])) {
+                                    $this->errors[] = sprintf(Tools::displayError('The %s field \'To\' value is invalid'), $field['title']);
+                                } elseif ((isset($filter_value[0]) && ($filter_value[0] !== '' || $filter_value[0] === 0)) && $filter_value[0] > $filter_value[1]) {
+                                    $this->errors[] = sprintf(Tools::displayError('The %s field \'To\' value cannot be less than \'From\' value'), $field['title']);
                                 }
                             }
                         } else {
-                            if (isset($value[0]) && !empty($value[0])) {
-                                if (!Validate::isDate($value[0])) {
-                                    $this->errors[] = Tools::displayError('The \'From\' date format is invalid (YYYY-MM-DD)');
-                                } else {
-                                    $sql_filter .= ' AND '.pSQL($key).' >= \''.pSQL(Tools::dateFrom($value[0])).'\'';
+                            if (isset($filter_value[0]) && !empty($filter_value[0])) {
+                                if (!Validate::isDate($filter_value[0])) {
+                                    $this->errors[] = sprintf(Tools::displayError('The %s field \'From\' date format is invalid (YYYY-MM-DD)'), $field['title']);
                                 }
                             }
 
-                            if (isset($value[1]) && !empty($value[1])) {
-                                if (!Validate::isDate($value[1])) {
-                                    $this->errors[] = Tools::displayError('The \'To\' date format is invalid (YYYY-MM-DD)');
-                                } elseif (isset($value[0]) && !empty($value[0]) && strtotime($value[0]) > strtotime($value[1])) {
-                                    $this->errors[] = Tools::displayError('The \'To\' date cannot be before than from date');
-                                } else {
-                                    $sql_filter .= ' AND '.pSQL($key).' <= \''.pSQL(Tools::dateTo($value[1])).'\'';
+                            if (isset($filter_value[1]) && !empty($filter_value[1])) {
+                                if (!Validate::isDate($filter_value[1])) {
+                                    $this->errors[] = sprintf(Tools::displayError('The %s field \'To\' date format is invalid (YYYY-MM-DD)'), $field['title']);
+                                } elseif (isset($filter_value[0]) && !empty($filter_value[0]) && strtotime($filter_value[0]) > strtotime($filter_value[1])) {
+                                    $this->errors[] = sprintf(Tools::displayError('The %s field \'To\' date cannot be earlier than \'From\' date'), $field['title']);
                                 }
                             }
                         }
-                    } else {
-                        $sql_filter .= ' AND ';
-                        $check_key = ($key == $this->identifier || $key == '`'.$this->identifier.'`');
-                        $alias = ($definition && !empty($definition['fields'][$filter]['shop'])) ? 'sa' : 'a';
-
-                        if ($type == 'int' || $type == 'bool') {
-                            $sql_filter .= (($check_key || $key == '`active`') ?  $alias.'.' : '').pSQL($key).' = '.(int)$value.' ';
-                        } elseif ($type == 'decimal') {
-                            $sql_filter .= ($check_key ?  $alias.'.' : '').pSQL($key).' = '.(float)$value.' ';
-                        } elseif ($type == 'select') {
-                            $sql_filter .= ($check_key ?  $alias.'.' : '').pSQL($key).' = \''.pSQL($value).'\' ';
-                        } elseif ($type == 'price') {
-                            $value = (float)str_replace(',', '.', $value);
-                            $sql_filter .= ($check_key ?  $alias.'.' : '').pSQL($key).' = '.pSQL(trim($value)).' ';
+                    }
+                } else {
+                    if (isset($value) && ($value !== '' || !$value === 0)) {
+                        if (preg_match('/¤|\|/', $value)) {
+                            $this->errors[] = sprintf(Tools::displayError('The %s field is invalid'), $field['title']);
                         } else {
-                            $sql_filter .= ($check_key ?  $alias.'.' : '').pSQL($key).' LIKE \'%'.pSQL(trim($value)).'%\' ';
+                            if (isset($field['validation']) && $field['validation'] && method_exists('Validate', $field['validation'])) {
+                                if (!Validate::{$field['validation']}($value)) {
+                                    $this->errors[] = sprintf(Tools::displayError('The %s field is invalid'), $field['title']);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        if (empty($this->errors)) {
+            $definition = false;
+            if (isset($this->className) && $this->className) {
+                $definition = ObjectModel::getDefinition($this->className);
+            }
+            if ($filters) {
+                foreach ($filters as $key => $value) {
+                    $this->context->cookie->$key = $value;
+
+                    /* Extracting filters from $_POST on key filter_ */
+                    if ($value != null && !strncmp($key, $prefix.$this->list_id.'Filter_', 7 + Tools::strlen($prefix.$this->list_id))) {
+                        $key_org = $key;
+                        $key = Tools::substr($key, 7 + Tools::strlen($prefix.$this->list_id));
+                        /* Table alias could be specified using a ! eg. alias!field */
+                        $tmp_tab = explode('!', $key);
+                        $filter = count($tmp_tab) > 1 ? $tmp_tab[1] : $tmp_tab[0];
+
+                        if ($field = $this->filterToField($key, $filter)) {
+                            $type = (array_key_exists('filter_type', $field) ? $field['filter_type'] : (array_key_exists('type', $field) ? $field['type'] : false));
+                            if ((($type == 'date' || $type == 'datetime' || $type == 'range') || ($type == 'select' && (isset($field['multiple']) && $field['multiple'])))
+                                && is_string($value)
+                            ) {
+                                $value = json_decode($value, true);
+                            }
+                            $key = isset($tmp_tab[1]) ? $tmp_tab[0].'.`'.$tmp_tab[1].'`' : '`'.$tmp_tab[0].'`';
+
+                            // as in database 0 means position 1 in the renderlist
+                            if (isset($field['position']) && Validate::isInt($value)) {
+                                $value -= 1;
+                            }
+
+                            // Assignment by reference
+                            if (array_key_exists('tmpTableFilter', $field)) {
+                                $sql_filter = & $this->_tmpTableFilter;
+                            } elseif (array_key_exists('havingFilter', $field)) {
+                                $sql_filter = & $this->_filterHaving;
+                            } else {
+                                $sql_filter = & $this->_filter;
+                            }
+
+                            if (is_array($value)) {
+                                if ($type == 'select' && (isset($field['multiple']) && $field['multiple']) && isset($field['operator'])) {
+                                    if ($field['operator'] == 'and') {
+                                        $sql_filter .= ' AND '.pSQL($key).' IN ('.pSQL(implode(',', $value)).')';
+                                        $this->_filterHaving .= ' AND COUNT(DISTINCT '.pSQL($key).') = '.(int) count($value);
+                                    } elseif ($field['operator'] == 'or') {
+                                        $sql_filter .= ' AND '.pSQL($key).' IN ('.pSQL(implode(',', $value)).')';
+                                    }
+                                } elseif ($type == 'range') {
+
+                                    if (isset($value[0]) && ($value[0] !== '' || $value[0] === 0)) {
+                                        $sql_filter .= ' AND '.pSQL($key).' >= '.pSQL($value[0]);
+                                    }
+                                    if (isset($value[1]) && ($value[1] !== '' || $value[1] === 0)) {
+                                        $sql_filter .= ' AND '.pSQL($key).' <= '.pSQL($value[1]);
+                                    }
+                                } else {
+                                    if (isset($value[0]) && !empty($value[0])) {
+                                        $sql_filter .= ' AND '.pSQL($key).' >= \''.pSQL(Tools::dateFrom($value[0])).'\'';
+                                    }
+                                    if (isset($value[1]) && !empty($value[1])) {
+                                        $sql_filter .= ' AND '.pSQL($key).' <= \''.pSQL(Tools::dateTo($value[1])).'\'';
+                                    }
+                                }
+                            } else {
+                                $sql_filter .= ' AND ';
+                                $check_key = ($key == $this->identifier || $key == '`'.$this->identifier.'`');
+                                $alias = ($definition && !empty($definition['fields'][$filter]['shop'])) ? 'sa' : 'a';
+
+                                if ($type == 'int' || $type == 'bool') {
+                                    $sql_filter .= (($check_key || $key == '`active`') ?  $alias.'.' : '').pSQL($key).' = '.(int)$value.' ';
+                                } elseif ($type == 'decimal') {
+                                    $sql_filter .= ($check_key ?  $alias.'.' : '').pSQL($key).' = '.(float)$value.' ';
+                                } elseif ($type == 'select') {
+                                    $sql_filter .= ($check_key ?  $alias.'.' : '').pSQL($key).' = \''.pSQL($value).'\' ';
+                                } elseif ($type == 'price') {
+                                    $value = (float)str_replace(',', '.', $value);
+                                    $sql_filter .= ($check_key ?  $alias.'.' : '').pSQL($key).' = '.pSQL(trim($value)).' ';
+                                } else {
+                                    $sql_filter .= ($check_key ?  $alias.'.' : '').pSQL($key).' LIKE \'%'.pSQL(trim($value)).'%\' ';
+                                }
+                            }
                         }
                     }
                 }
@@ -956,11 +1038,23 @@ class AdminControllerCore extends Controller
 
     public function processListVisibility()
     {
-        $listFieldsVisibility = Tools::getValue('list_fields_visibility');
-        $controller = 'list_visibility_'.$this->context->controller->className;
+        $listFieldsVisibility = Tools::getValue('list_fields_visibility', array()); //  To set optional list empty in case none is selected
+        $controller = 'list_visibility_'.$this->context->controller->controller_name;
         $this->context->cookie->$controller = json_encode($listFieldsVisibility);
 
         return true;
+    }
+
+    protected function ajaxProcessChangeKpiVisibility()
+    {
+        $cookieKey = 'kpi_visibility_'.$this->context->controller->className.'_'.Tools::getValue('kpi_id');
+        $this->context->cookie->$cookieKey = (int) Tools::getValue('is_visible');
+    }
+
+    protected function ajaxProcessSaveKpiView()
+    {
+        $cookieKey = 'kpi_wrapping_'.$this->context->controller->className;
+        $this->context->cookie->$cookieKey = (int) Tools::getValue('no_wrapping');
     }
 
     /**
@@ -997,7 +1091,7 @@ class AdminControllerCore extends Controller
                 if ($this->filter && $this->action != 'reset_filters') {
                     $this->processFilter();
                 }
-                if (isset($_POST) && count($_POST) && (int)Tools::getValue('submitFilter'.$this->list_id) || Tools::isSubmit('submitReset'.$this->list_id)) {
+                if (empty($this->errors) && isset($_POST) && count($_POST) && (int)Tools::getValue('submitFilter'.$this->list_id) || Tools::isSubmit('submitReset'.$this->list_id)) {
                     $this->setRedirectAfter(self::$currentIndex.'&token='.$this->token.(Tools::isSubmit('submitFilter'.$this->list_id) ? '&submitFilter'.$this->list_id.'='.(int)Tools::getValue('submitFilter'.$this->list_id) : '').(isset($_GET['id_'.$this->list_id]) ? '&id_'.$this->list_id.'='.(int)$_GET['id_'.$this->list_id] : ''));
                 }
 
@@ -2030,6 +2124,14 @@ class AdminControllerCore extends Controller
                 'employee' => $this->context->employee,
                 'search_type' => Tools::getValue('bo_search_type'),
                 'bo_query' => Tools::safeOutput(Tools::stripslashes(Tools::getValue('bo_query'))),
+                'QLO_SEARCH_TYPE_CATELOG' => self::QLO_SEARCH_TYPE_CATELOG,
+                'QLO_SEARCH_TYPE_CUSTOMER_BY_NAME' => self::QLO_SEARCH_TYPE_CUSTOMER_BY_NAME,
+                'QLO_SEARCH_TYPE_CUSTOMER_BY_IP' => self::QLO_SEARCH_TYPE_CUSTOMER_BY_IP,
+                'QLO_SEARCH_TYPE_ORDER' => self::QLO_SEARCH_TYPE_ORDER,
+                'QLO_SEARCH_TYPE_INVOICE' => self::QLO_SEARCH_TYPE_INVOICE,
+                'QLO_SEARCH_TYPE_CART' => self::QLO_SEARCH_TYPE_CART,
+                'QLO_SEARCH_TYPE_MODULE' => self::QLO_SEARCH_TYPE_MODULE,
+                'QLO_SEARCH_TYPE_HOTEL' => self::QLO_SEARCH_TYPE_HOTEL,
                 'quick_access' => $quick_access,
                 'multi_shop' => Shop::isFeatureActive(),
                 'shop_list' => $helperShop->getRenderedShopList(),
@@ -2070,7 +2172,7 @@ class AdminControllerCore extends Controller
             'currentIndex' => self::$currentIndex,
             'bootstrap' => $this->bootstrap,
             'default_language' => (int)Configuration::get('PS_LANG_DEFAULT'),
-            'display_addons_connection' => Tab::checkTabRights(Tab::getIdFromClassName('AdminModulesController'))
+            'display_addons_connection' => Tab::checkTabRights(Tab::getIdFromClassName('AdminModulesController')),
         ));
 
         $module = Module::getInstanceByName('themeconfigurator');
@@ -2171,6 +2273,8 @@ class AdminControllerCore extends Controller
      */
     protected function initTabModuleList()
     {
+        $this->tab_modules_list = Tab::getTabModulesList($this->id);
+
         if (is_array($this->tab_modules_list['default_list']) && count($this->tab_modules_list['default_list'])) {
             $this->filter_modules_list = $this->tab_modules_list['default_list'];
         } elseif (is_array($this->tab_modules_list['slider_list']) && count($this->tab_modules_list['slider_list'])) {
@@ -2195,7 +2299,7 @@ class AdminControllerCore extends Controller
         ) {
             $this->page_header_toolbar_btn['modules-list'] = array(
                 'href' => '#',
-                'desc' => $this->l('Recommended Modules and Services')
+                'desc' => $this->l('Recommendations')
             );
         }
     }
@@ -2258,6 +2362,7 @@ class AdminControllerCore extends Controller
     public function ajaxProcessRefreshModuleList($force_reload_cache = false)
     {
         $this->status = Module::refreshModuleList($force_reload_cache);
+        $this->ajaxDie(json_encode(array('status' => $this->status)));
     }
 
     /**
@@ -2343,16 +2448,6 @@ class AdminControllerCore extends Controller
 
         //Force override translation key
         Context::getContext()->override_controller_name_for_translations = 'AdminModules';
-
-        $this->modals[] = array(
-            'modal_id' => 'modal_addons_connect',
-            'modal_class' => 'modal-md',
-            'modal_title' => '<i class="icon-puzzle-piece"></i> <a target="_blank" href="http://addons.prestashop.com/'
-            .'?utm_source=back-office&utm_medium=modules'
-            .'&utm_campaign=back-office-'.Tools::strtoupper($this->context->language->iso_code)
-            .'&utm_content='.(defined('_PS_HOST_MODE_') ? 'cloud' : 'download').'">PrestaShop Addons</a>',
-            'modal_content' => $this->context->smarty->fetch('controllers/modules/login_addons.tpl'),
-        );
 
         //After override translation, remove it
         Context::getContext()->override_controller_name_for_translations = null;
@@ -2472,6 +2567,7 @@ class AdminControllerCore extends Controller
         }
 
         $this->setHelperDisplay($helper);
+        $helper->_new_list_header_design = $this->_new_list_header_design;
         $helper->_default_pagination = $this->_default_pagination;
         $helper->_pagination = $this->_pagination;
         $helper->tpl_vars = $this->getTemplateListVars();
@@ -2601,6 +2697,24 @@ class AdminControllerCore extends Controller
 
     public function renderKpis()
     {
+        Hook::exec('action'.$this->controller_name.'KPIListingModifier', array(
+            'kpis' => &$this->kpis,
+        ));
+
+        if (count($this->kpis)) {
+            foreach ($this->kpis as $key => &$kpi) {
+                if (count($kpi->exclude_id_hotels)) {
+                    if (empty($kpi->id_hotels)) {
+                        $kpi->id_hotels = HotelBranchInformation::getProfileAccessedHotels($this->context->employee->id_profile, 1, 1);
+                    }
+                    $kpi->id_hotels = array_diff($kpi->id_hotels, $kpi->exclude_id_hotels);
+                }
+            }
+
+            $helper = new HelperKpiRow();
+            $helper->kpis = $this->kpis;
+            return $helper->generate();
+        }
     }
 
     /**
@@ -2836,7 +2950,9 @@ class AdminControllerCore extends Controller
             'current' => self::$currentIndex,
             'token' => $this->token,
             'host_mode' => defined('_PS_HOST_MODE_') ? 1 : 0,
-            'stock_management' => (int)Configuration::get('PS_STOCK_MANAGEMENT')
+            'stock_management' => (int)Configuration::get('PS_STOCK_MANAGEMENT'),
+            'language_is_rtl' => $this->context->language->is_rtl,
+            'show_full_date' => $this->show_full_date,
         ));
 
         if ($this->display_header) {
@@ -2950,6 +3066,9 @@ class AdminControllerCore extends Controller
             || $this->context->cookie->{'submitFilter'.$this->list_id} !== false
             || Tools::getValue($this->list_id.'Orderby')
             || Tools::getValue($this->list_id.'Orderway')) {
+            if (Tools::isSubmit('submitReset'.$this->list_id)) {
+                $this->processResetFilters($this->list_id);
+            }
             $this->filter = true;
         }
 
@@ -3946,17 +4065,65 @@ class AdminControllerCore extends Controller
     public function ajaxProcessGetRecommendationContent()
     {
         $response = array('success' => false);
-        if (isset($this->context->cookie->{$this->controller_name.'_closed'}) && $this->context->cookie->{$this->controller_name.'_closed'}) {
-            $response['success'] = true;
-        } else {
-            if (method_exists($this, 'getRecommendationContent')) {
-                if ($content = $this->getRecommendationContent()) {
-                    $response['success'] = true;
-                    $response['content'] = $content;
+        if ($this->context->controller->getRecommendationFilePath()) {
+            $response = $this->getRecommendationContent();
+        }
+        $this->context->cookie->write();
+        $this->ajaxDie(json_encode($response));
+    }
+
+    public function getRecommendationContent()
+    {
+        $content = array(
+            'success' => false,
+            'cache' => true,
+            'html' => ''
+        );
+
+        if ($recommendationContent = $this->updateRecommendationContent()) {
+            $content['cache'] = false;
+        }
+        if (file_exists(_PS_ROOT_DIR_.$this->context->controller->getRecommendationFilePath())) {
+            $content['success'] = true;
+            if (!isset($this->context->cookie->{$this->controller_name.'_closed'}) || !$this->context->cookie->{$this->controller_name.'_closed'}) {
+                $content['html'] = file_get_contents(_PS_ROOT_DIR_.$this->context->controller->getRecommendationFilePath());
+            }
+        }
+
+        return $content;
+    }
+
+    public function updateRecommendationContent()
+    {
+        if (!Tools::isFresh($this->context->controller->getRecommendationFilePath(), _TIME_1_DAY_, false)) {
+            if ($recommendationContent =  Tools::addonsRequest(
+                'recommendation',
+                array('controller' => $this->context->controller->controller_name)
+            )) {
+                $recommendationContent = json_decode($recommendationContent, true);
+                if (!isset($this->context->cookie->{$this->context->controller->controller_name.'_key'})) {
+                    $this->context->cookie->{$this->context->controller->controller_name.'_key'} = '';
+                }
+                if ($this->context->cookie->{$this->context->controller->controller_name.'_key'} != $recommendationContent['key']) {
+                    unset($this->context->cookie->{$this->context->controller->controller_name.'_closed'});
+                }
+                $this->context->cookie->{$this->context->controller->controller_name.'_key'} = $recommendationContent['key'];
+                if (isset($recommendationContent['success']) && $recommendationContent['success']) {
+                    @file_put_contents(
+                        _PS_ROOT_DIR_.$this->context->controller->getRecommendationFilePath(),
+                        $recommendationContent['html']
+                    );
+                } elseif (file_exists(_PS_ROOT_DIR_.$this->context->controller->getRecommendationFilePath())) {
+                    unlink(_PS_ROOT_DIR_.$this->context->controller->getRecommendationFilePath());
+                }
+                return $recommendationContent;
+            } else {
+                if (file_exists(_PS_ROOT_DIR_.$this->context->controller->getRecommendationFilePath())) {
+                    unlink(_PS_ROOT_DIR_.$this->context->controller->getRecommendationFilePath());
                 }
             }
         }
-        $this->ajaxDie(json_encode($response));
+        return false;
     }
 
     public function ajaxProcessRecommendationClosed()
@@ -3964,6 +4131,11 @@ class AdminControllerCore extends Controller
         $this->context->cookie->{Tools::getValue('tab').'_closed'} = true;
         $response = array('success' => true);
         $this->ajaxDie(json_encode($response));
+    }
+
+    public function getRecommendationFilePath()
+    {
+        return static::RECOMMENDATION_CONTENT_FILE_PATH;
     }
 
     /**
@@ -4018,9 +4190,23 @@ class AdminControllerCore extends Controller
                 $object = new $this->className((int)$id);
                 $object->setFieldsToUpdate(array('active' => true));
                 $object->active = (int)$status;
-                $result &= $object->update();
+                $isUpdated = (bool) $object->update();
+                $result &= $isUpdated;
+
+                if (!$isUpdated) {
+                    $this->errors[] = sprintf($this->l('Can\'t update #%d status.'), (int) $id);
+                }
             }
+
+            if ($result) {
+                $this->redirect_after = self::$currentIndex.'&conf=5&token='.$this->token;
+            } else {
+                $this->errors[] = $this->l('An error occurred while updating the status.');
+            }
+        } else {
+            $this->errors[] = $this->l('You must select at least one item to perform a bulk action.');
         }
+
         return $result;
     }
 

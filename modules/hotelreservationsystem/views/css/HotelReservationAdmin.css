@@ -191,6 +191,10 @@ a.deleteHtlImage {
     margin: 2px 20px;
 }
 
+#room-search-form .booking_occupancy_wrapper {
+    min-width: 250px;
+}
+
 .htl_room_data_cont > div.row > div + div > div.row{
     border-left: 1px solid #C7D6DB;
 }
@@ -216,7 +220,13 @@ p.room_cat_data
     font-weight: 700;
     margin-bottom: 0px;
 }
-
+.status-info-tooltip {
+    position: relative;
+    display: inline-block;
+    left: 100%;
+    margin-left: -10px;
+    padding: 0px;
+}
 .color_indicate
 {
     width: 10px;
@@ -238,6 +248,7 @@ p.room_cat_data
 {
     margin: 10px 0px;
 }
+
 
 .cart-table-thead
 {
@@ -261,6 +272,10 @@ p.room_cat_data
     font-weight: 600;
     font-size: 13px!important;
 }
+.cart_amt_div .table tbody>tr>td, .cart_amt_div .table tbody>tr>th {
+    border: none;
+    padding: 2px 8px;
+}
 
 .margin-div
 {
@@ -275,7 +290,10 @@ p.room_cat_data
     font-size: 14px!important;
     font-weight: 600!important;
 }
-
+#htl_rooms_list table td {
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
 #room-status-tabs li
 {
     font-size: 14px;
@@ -323,7 +341,6 @@ p.room_cat_data
 .cart_table_container
 {
     max-height: 393px;
-    min-height: 150px;
     overflow-y: auto;
 }
 
@@ -472,9 +489,31 @@ p.room_cat_data
     border-color: #4d90fe;
 }
 
+.gm-style-iw-d h6 {
+    font-family: unset;
+    font-size: 14px;
+    color: #333;
+    font-weight: 500;
+    margin: 0;
+}
+
+.gm-style-iw-d p {
+    font-family: unset;
+    font-size: 13px;
+    color: #333;
+    font-weight: 400;
+    margin: 0;
+}
+
 /* ==== AdminHotelFeaturePricesSettingsController ==== */
 .week_days {
     display: none;
+}
+.week_days .checkboxes-wrap {
+    display: flex;
+}
+.week_days .checkboxes-wrap .day-wrap {
+    min-width: 50px;
 }
 .room_type_search_results_ul {
     padding: 0px;
@@ -573,4 +612,12 @@ body.adminhotelroomsbooking .ui-tooltip {
     border: unset;
     padding: 10px;
     box-shadow: 0px 0px 15px 0px #00000026;
+}
+
+#room-reallocation-modal .modal-footer {
+	padding: 15px 0px 0px 0px
+}
+#room-reallocation-modal .modal-body, #room-reallocation-modal .tab-content {
+	padding: 15px;
+	border: 1px solid #ddd
 }

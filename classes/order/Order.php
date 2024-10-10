@@ -34,6 +34,18 @@ class OrderCore extends ObjectModel
     const ORDER_PAYMENT_TYPE_FULL = 1;
     const ORDER_PAYMENT_TYPE_ADVANCE = 2;
 
+    // actions when overbooking will be created
+    const OVERBOOKING_ORDER_CANCEL_ACTION = 1;
+    const OVERBOOKING_ORDER_NO_ACTION = 2;
+
+    //Consts for: In the order list in which currency prices should be displayed
+    const ORDER_LIST_PRICE_DISPLAY_IN_PAYMENT_CURRENCY = 1;
+    const ORDER_LIST_PRICE_DISPLAY_IN_DEFAULT_CURRENCY = 2;
+
+    const ORDER_COMPLETE_REFUND_FLAG = 1;
+    const ORDER_COMPLETE_CANCELLATION_FLAG = 2;
+    const ORDER_COMPLETE_CANCELLATION_OR_REFUND_REQUEST_FLAG = 3;
+
     /** @var int Delivery address id */
     public $id_address_delivery;
 
@@ -590,13 +602,19 @@ class OrderCore extends ObjectModel
         $is_booking = null,
         $product_service_type = null,
         $product_auto_add = null,
-        $product_price_addition_type = null
+        $product_price_addition_type = null,
+        $ids_order_detail = []
     ) {
         $sql = 'SELECT *
             FROM `'._DB_PREFIX_.'order_detail` od
             LEFT JOIN `'._DB_PREFIX_.'product` p ON (p.id_product = od.product_id)
             LEFT JOIN `'._DB_PREFIX_.'product_shop` ps ON (ps.id_product = p.id_product AND ps.id_shop = od.id_shop)
             WHERE od.`id_order` = '.(int)$this->id;
+
+        if ($ids_order_detail) {
+            $sql .= ' AND od.`id_order_detail` IN ('.implode(',', $ids_order_detail).')';
+        }
+
         if ($is_booking !== null) {
             $sql .= ' AND od.`is_booking_product` = '. (int)$is_booking;
             if (!$is_booking && $product_service_type !== null) {
@@ -785,8 +803,9 @@ class OrderCore extends ObjectModel
 
     public function getTaxesAverageUsed()
     {
-        // @todo should use order table to get tax average
-        return Cart::getTaxesAverageUsed((int)$this->id_cart);
+        $cart = new Cart((int) $this->id_cart);
+
+        return $cart->getAverageProductsTaxRate() * 100;
     }
 
     /**
@@ -846,6 +865,12 @@ class OrderCore extends ObjectModel
 		SELECT *
 		FROM `'._DB_PREFIX_.'order_cart_rule` ocr
 		WHERE ocr.`id_order` = '.(int)$this->id);
+    }
+
+    public function getCartRulesTotal($useTax = false)
+    {
+        return Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue(
+            'SELECT '.($useTax ? 'SUM(ocr.`value`)' : 'SUM(ocr.`value_tax_excl`)').' FROM `'._DB_PREFIX_.'order_cart_rule` ocr WHERE ocr.`id_order` = '.(int)$this->id);
     }
 
     public static function getDiscountsCustomer($id_customer, $id_cart_rule)
@@ -941,21 +966,30 @@ class OrderCore extends ObjectModel
      *
      * @param int $id_customer Customer id
      * @param bool $show_hidden_status Display or not hidden order statuses
+     * @param bool $skip_id_address_invoice Skip orders from this id_address_invoice
      * @return array Customer orders
      */
-    public static function getCustomerOrders($id_customer, $show_hidden_status = false, Context $context = null)
+    public static function getCustomerOrders($id_customer, $show_hidden_status = false, Context $context = null, $id_address_invoice = null, $skip_address = 0)
     {
         if (!$context) {
             $context = Context::getContext();
         }
 
-        $res = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS('
-        SELECT o.*, (SELECT SUM(od.`product_quantity`) FROM `'._DB_PREFIX_.'order_detail` od WHERE od.`id_order` = o.`id_order`) nb_products
+        $sql = 'SELECT o.*, (SELECT SUM(od.`product_quantity`) FROM `'._DB_PREFIX_.'order_detail` od WHERE od.`id_order` = o.`id_order`) nb_products
         FROM `'._DB_PREFIX_.'orders` o
-        WHERE o.`id_customer` = '.(int)$id_customer.
-        Shop::addSqlRestriction(Shop::SHARE_ORDER).'
+        WHERE o.`id_customer` = '.(int)$id_customer;
+
+        // if you want orders from / not from a specific id_address_invoice
+        if (!is_null($id_address_invoice)) {
+            $sql .= ' AND o.`id_address_invoice`';
+            $sql .= ($skip_address ? ' != ' : ' = ').(int)$id_address_invoice;
+        }
+
+        $sql .= Shop::addSqlRestriction(Shop::SHARE_ORDER).'
         GROUP BY o.`id_order`
-        ORDER BY o.`date_add` DESC');
+        ORDER BY o.`date_add` DESC';
+
+        $res = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql);
         if (!$res) {
             return array();
         }
@@ -1078,11 +1112,12 @@ class OrderCore extends ObjectModel
         $bookingProducts = null,
         $product_service_type = null,
         $product_auto_add = null,
-        $product_price_addition_type = null
+        $product_price_addition_type = null,
+        $ids_order_detail = []
     ) {
         // update
         if (!$products) {
-            $products = $this->getProductsDetail($bookingProducts, $product_service_type, $product_auto_add, $product_price_addition_type);
+            $products = $this->getProductsDetail($bookingProducts, $product_service_type, $product_auto_add, $product_price_addition_type, $ids_order_detail);
         }
 
         $return = 0;
@@ -1103,11 +1138,12 @@ class OrderCore extends ObjectModel
         $bookingProducts = null,
         $product_service_type = null,
         $product_auto_add = null,
-        $product_price_addition_type = null
+        $product_price_addition_type = null,
+        $ids_order_detail = []
     ) {
         /* Retro-compatibility (now set directly on the validateOrder() method) */
         if (!$products) {
-            $products = $this->getProductsDetail($bookingProducts, $product_service_type, $product_auto_add, $product_price_addition_type);
+            $products = $this->getProductsDetail($bookingProducts, $product_service_type, $product_auto_add, $product_price_addition_type, $ids_order_detail);
         }
 
         $return = 0;
@@ -1792,7 +1828,7 @@ class OrderCore extends ObjectModel
             SELECT opd.`amount` as `real_paid_amount`, opd.*, op.*
             FROM `'._DB_PREFIX_.'order_payment_detail` opd
             INNER JOIN `'._DB_PREFIX_.'order_payment` op ON (opd.`id_order_payment` = op.`id_order_payment`)
-            WHERE `id_order` = '.$this->id
+            WHERE `id_order` = '.(int) $this->id
         );
     }
 
@@ -1815,7 +1851,11 @@ class OrderCore extends ObjectModel
         $order_payment->order_reference = $this->reference;
         $order_payment->id_currency = ($currency ? $currency->id : $this->id_currency);
         // we kept the currency rate for historization reasons
-        $order_payment->conversion_rate = ($currency ? $currency->conversion_rate : 1);
+        $order_payment->conversion_rate = (
+            $currency ?
+            $currency->conversion_rate :
+            (new Currency($this->id_currency))->getConversationRate()
+        );
         // if payment_method is define, we used this
         $order_payment->payment_method = ($payment_method ? $payment_method : $this->payment);
         $order_payment->payment_type = ($payment_type ? $payment_type : $this->payment_type);
@@ -1835,6 +1875,12 @@ class OrderCore extends ObjectModel
             }
         }
 
+        // Whenever payment is adding in any order then set a cumulative conversion rate for the payment currency in the order
+        if ($avgConversionRate = $order_payment->getAverageConversionRate($this->reference, $this->id_currency)) {
+            $this->conversion_rate = $avgConversionRate;
+        }
+        $this->save();
+
         return $res;
     }
 
@@ -1852,7 +1898,10 @@ class OrderCore extends ObjectModel
             if ($payment->id_currency == $this->id_currency) {
                 $this->total_paid_real += $order_payment_detail->amount;
             } else {
-                $this->total_paid_real += Tools::ps_round(Tools::convertPrice($order_payment_detail->amount, $payment->id_currency, false), 2);
+                $this->total_paid_real += Tools::ps_round(
+                    Tools::convertPriceFull($order_payment_detail->amount, new Currency($payment->id_currency), new Currency($this->id_currency)),
+                    6
+                );
             }
 
             if (!validate::isPrice($this->total_paid_real)) {
@@ -1891,18 +1940,18 @@ class OrderCore extends ObjectModel
                 unset($invoices[$key]);
             }
         }
-        $delivery_slips = $this->getDeliverySlipsCollection()->getResults();
-        // @TODO review
-        foreach ($delivery_slips as $key => $delivery) {
-            $delivery->is_delivery = true;
-            $delivery->date_add = $delivery->delivery_date;
-            if (!$invoice->delivery_number) {
-                unset($delivery_slips[$key]);
-            }
-        }
+        // $delivery_slips = $this->getDeliverySlipsCollection()->getResults();
+        // // @TODO review
+        // foreach ($delivery_slips as $key => $delivery) {
+        //     $delivery->is_delivery = true;
+        //     $delivery->date_add = $delivery->delivery_date;
+        //     if (!$invoice->delivery_number) {
+        //         unset($delivery_slips[$key]);
+        //     }
+        // }
         $order_slips = $this->getOrderSlipsCollection()->getResults();
 
-        $documents = array_merge($invoices, $order_slips, $delivery_slips);
+        $documents = array_merge($invoices, $order_slips);
         usort($documents, array('Order', 'sortDocuments'));
 
         return $documents;
@@ -2492,20 +2541,8 @@ class OrderCore extends ObjectModel
             }
             foreach ($tax_calculator->getTaxesAmount($discounted_price_tax_excl) as $id_tax => $unit_amount) {
                 $total_tax_base = 0;
-                switch ($round_type) {
-                    case Order::ROUND_ITEM:
-                        $total_tax_base = $quantity * Tools::ps_round($discounted_price_tax_excl, _PS_PRICE_COMPUTE_PRECISION_, $this->round_mode);
-                        $total_amount = $quantity * Tools::ps_round($unit_amount, _PS_PRICE_COMPUTE_PRECISION_, $this->round_mode);
-                        break;
-                    case Order::ROUND_LINE:
-                        $total_tax_base = Tools::ps_round($quantity * $discounted_price_tax_excl, _PS_PRICE_COMPUTE_PRECISION_, $this->round_mode);
-                        $total_amount = Tools::ps_round($quantity * $unit_amount, _PS_PRICE_COMPUTE_PRECISION_, $this->round_mode);
-                        break;
-                    case Order::ROUND_TOTAL:
-                        $total_tax_base = $quantity * $discounted_price_tax_excl;
-                        $total_amount = $quantity * $unit_amount;
-                        break;
-                }
+                $total_tax_base = Tools::processPriceRounding($discounted_price_tax_excl, $quantity);
+                $total_amount = Tools::processPriceRounding($unit_amount, $quantity);
 
                 if (!isset($breakdown[$id_tax])) {
                     $breakdown[$id_tax] = array('tax_base' => 0, 'tax_amount' => 0);
@@ -2534,12 +2571,12 @@ class OrderCore extends ObjectModel
             $order_ecotax_tax = Tools::ps_round($order_ecotax_tax, _PS_PRICE_COMPUTE_PRECISION_, $this->round_mode);
 
             $tax_rounding_error = $expected_total_tax - $actual_total_tax - $order_ecotax_tax;
-            if ($tax_rounding_error !== 0) {
+            if ($tax_rounding_error != 0) {
                 Tools::spreadAmount($tax_rounding_error, _PS_PRICE_COMPUTE_PRECISION_, $order_detail_tax_rows, 'total_amount');
             }
 
             $base_rounding_error = $expected_total_base - $actual_total_base;
-            if ($base_rounding_error !== 0) {
+            if ($base_rounding_error != 0) {
                 Tools::spreadAmount($base_rounding_error, _PS_PRICE_COMPUTE_PRECISION_, $order_detail_tax_rows, 'total_tax_base');
             }
         }
@@ -2599,51 +2636,73 @@ class OrderCore extends ObjectModel
         return Db::getInstance()->executeS('SELECT  * FROM '._DB_PREFIX_.'orders WHERE id_cart = '.(int)$id_cart);
     }
 
-    // Order is considered as refunded if all bookings are requested for refund and all are with refunded status
-    // $refundFlag [ORDER_RETURN_STATE_FLAG_REFUNDED || ORDER_RETURN_STATE_FLAG_DENIED]
-    public function hasCompletelyRefunded($refundFlag = 0)
+    /**
+     * Function to check if order has been completely refunded
+     * @param integer action: can have 3 values as below
+     * Order::ORDER_COMPLETE_REFUND_FLAG for complete refunded and
+     * Order::ORDER_COMPLETE_CANCELLATION_FLAG for completely cancelled and
+     * Order::ORDER_COMPLETE_CANCELLATION_OR_REFUND_REQUEST_FLAG for all rooms are either cancelled or requested for refunded
+     *
+     * @param integer includeCheckIn = 1: If you want to get result for rooms that are refunded or cancelled Or Checkin/Checkout. Send $action = 0
+     *
+     * @return boolean: true if order has been completely refunded as per requested parameters or false
+     */
+    public function hasCompletelyRefunded($action = 0, $includeCheckIn = 0)
     {
         $objHotelBooking = new HotelBookingdetail();
-        if ($refundBookings = OrderReturn::getOrdersReturnDetail($this->id)) {
-            if ($orderBookings = $objHotelBooking->getOrderCurrentDataByOrderId($this->id)) {
-                if (count($refundBookings) == count($orderBookings)) {
-                    if ($refundFlag) {
-                        foreach ($refundBookings as $refundRow) {
-                            if (Validate::isLoadedObject(
-                                $objReturnState = new OrderReturnState($refundRow['state']
-                            ))) {
-                                if ($refundFlag == OrderReturnState::ORDER_RETURN_STATE_FLAG_REFUNDED
-                                    && !$objReturnState->refunded
-                                ) {
-                                    return false;
-                                }
-                                if ($refundFlag == OrderReturnState::ORDER_RETURN_STATE_FLAG_DENIED
-                                    && !$objReturnState->denied
-                                ) {
-                                    return false;
-                                }
+        if ($orderBookings = $objHotelBooking->getOrderCurrentDataByOrderId($this->id)) {
+            // If action is Order::ORDER_COMPLETE_REFUND_FLAG (for refunded) then we will check
+            // that all rooms must be refunded and at least one booking is not cancelled
+            if ($action == Order::ORDER_COMPLETE_REFUND_FLAG) {
+                $uniqueRefundedBookings = array_unique(array_column($orderBookings, 'is_refunded'));
+                if (count($uniqueRefundedBookings) == 1 && $uniqueRefundedBookings[0] == 1) {
+                    foreach ($orderBookings as $booking) {
+                        if ($booking['is_cancelled'] == 0) {
+                            return true;
+                        }
+                    }
+                }
+            // If action is Order::ORDER_COMPLETE_CANCELLATION_FLAG (for cancelled) then we will check that all rooms must be cancelled
+            } elseif ($action == Order::ORDER_COMPLETE_CANCELLATION_FLAG) {
+                $uniqueRefundedBookings = array_unique(array_column($orderBookings, 'is_cancelled'));
+                if (count($uniqueRefundedBookings) == 1 && $uniqueRefundedBookings[0] == 1) {
+                    return true;
+                }
+            // If action is Order::ORDER_COMPLETE_CANCELLATION_OR_REFUND_REQUEST_FLAG (for cancelled and refund requests) then we will check that all rooms are either cancelled or requested for refund
+            } elseif ($action == Order::ORDER_COMPLETE_CANCELLATION_OR_REFUND_REQUEST_FLAG) {
+                foreach ($orderBookings as $booking) {
+                    if (!$booking['is_refunded']) {
+                        // If booking refund request is created and request is completed but booking is not refunded then return false
+                        if ($bookingRefundDetail = OrderReturn::getOrdersReturnDetail($this->id, 0, $booking['id'])) {
+                            $bookingRefundDetail = reset($bookingRefundDetail);
+                            if ($bookingRefundDetail['refunded']) {
+                                return false;
                             }
+                        } else {
+                            return false;
+                        }
+                    }
+                }
+
+                return true;
+            // Default process to check if order is fully refunded or cancelled or not
+            } else {
+                // if is_refunded is 1 means booking either is cancelled or refunded. So check all bookings must have is_refunded = 1
+                $uniqueRefundedBookings = array_unique(array_column($orderBookings, 'is_refunded'));
+                if (count($uniqueRefundedBookings) == 1 && $uniqueRefundedBookings[0] == 1) {
+                    return true;
+                } elseif ($includeCheckIn) {
+                    foreach ($orderBookings as $booking) {
+                        if ($booking['is_refunded'] == 0
+                            && !OrderReturn::getOrdersReturnDetail($this->id, 0, $booking['id'])
+                            && $booking['id_status'] == HotelBookingDetail::STATUS_ALLOTED
+                        ) {
+                            return false;
                         }
                     }
                     return true;
                 }
             }
-        } elseif ($orderBookings = $objHotelBooking->getOrderCurrentDataByOrderId($this->id)) {
-            if (count(array_unique(array_column($orderBookings, 'is_cancelled'))) === 1
-                && array_unique(array_column($orderBookings, 'is_cancelled'))[0] != 0
-            ) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    // Order is considered as denied if all bookings are requested for refund and all are with denied status
-    public function orderRefundHasBeenDenied()
-    {
-        if (OrderReturn::getOrdersReturn($this->id_customer, $this->id)) {
-
         }
 
         return false;
@@ -2659,5 +2718,167 @@ class OrderCore extends ObjectModel
     public function setWsTransactionId($transactionId)
     {
         $this->transaction_id = $transactionId;
+    }
+
+    /**
+     * Validate and change order status
+     * @return array of status, errors, has_mail_error(if order status is changes but mail error occurs while sending mail)
+     */
+    public function ChangeOrderStatus()
+    {
+        $result = array();
+        $result['status'] = false;
+        $result['has_mail_error'] = false;
+        $result['errors'] = array();
+        $objNewOrderState = new OrderState(Tools::getValue('id_order_state'));
+        if (!Validate::isLoadedObject($objNewOrderState)) {
+            $result['errors'][] = Tools::displayError('The new order status is invalid.');
+        } else {
+            $objHotelBooking = new HotelBookingDetail();
+            $objCurrentOrderState = $this->getCurrentOrderState();
+
+            if ($objCurrentOrderState->id == Configuration::get('PS_OS_REFUND')) {
+                $result['errors'][] = Tools::displayError('Order status can not be changed once order status is set to Refunded.');
+            } elseif ($objCurrentOrderState->id == Configuration::get('PS_OS_CANCELED')) {
+                $result['errors'][] = Tools::displayError('Order status can not be changed once order status is set to Cancelled.');
+            } elseif (in_array($objNewOrderState->id, array (Configuration::get('PS_OS_OVERBOOKING_PAID'), Configuration::get('PS_OS_OVERBOOKING_UNPAID'), Configuration::get('PS_OS_OVERBOOKING_PARTIAL_PAID')))) {
+                if (!$objHotelBooking->getOverbookedRooms($this->id)) {
+                    $result['errors'][] = Tools::displayError('Order status can not be changed to any overbooking status as there are no overbooked rooms in the order.');
+                }
+            } elseif ($objNewOrderState->id == Configuration::get('PS_OS_REFUND')
+                && !$this->hasCompletelyRefunded(Order::ORDER_COMPLETE_REFUND_FLAG)
+            ) {
+                $result['errors'][] = Tools::displayError('Order status can not be set to Refunded until all bookings in the order are completely refunded.');
+            } elseif ($objNewOrderState->id == Configuration::get('PS_OS_CANCELED')
+                && !$this->hasCompletelyRefunded(Order::ORDER_COMPLETE_CANCELLATION_FLAG)
+            ) {
+                $result['errors'][] = Tools::displayError('Order status can not be set to Cancelled until all bookings in the order are cancelled.');
+            } elseif ($objCurrentOrderState->id == Configuration::get('PS_OS_ERROR') && !($objNewOrderState->id == Configuration::get('PS_OS_ERROR'))) {
+                // All rooms must be available before changing status from Payment Error to Other status in which rooms are getting blocked again
+                if ($orderBookings = $objHotelBooking->getOrderCurrentDataByOrderId($this->id)) {
+                    foreach ($orderBookings as $orderBooking) {
+                        // If booking is refunded then no need to check inventory
+                        if ($bookingRefundDetail = OrderReturn::getOrdersReturnDetail($this->id, 0, $orderBooking['id'])) {
+                            $bookingRefundDetail = reset($bookingRefundDetail);
+                        }
+
+                        // $bookingRefundDetail['id_customization'] is 1 for only refunded request completed and refunded bookings
+                        if (($bookingRefundDetail && $bookingRefundDetail['refunded'] && $orderBooking['is_refunded'] && $bookingRefundDetail['id_customization'])
+                            || ($orderBooking['is_cancelled'] && $orderBooking['is_refunded'])
+                        ) {
+                            continue;
+                        } else {
+                            // if inventory is available for that booking
+                            $bookingParams = array(
+                                'date_from' => $orderBooking['date_from'],
+                                'date_to' => $orderBooking['date_to'],
+                                'hotel_id' => $orderBooking['id_hotel'],
+                                'id_room_type' => $orderBooking['id_product'],
+                                'only_search_data' => 1
+                            );
+
+                            $objHotelBookingDetail = new HotelBookingDetail($orderBooking['id']);
+                            if ($searchRoomsInfo = $objHotelBooking->getBookingData($bookingParams)) {
+                                if (isset($searchRoomsInfo['rm_data'][$orderBooking['id_product']]['data']['available'])
+                                    && $searchRoomsInfo['rm_data'][$orderBooking['id_product']]['data']['available']
+                                ) {
+                                    $availableRoomsInfo = $searchRoomsInfo['rm_data'][$orderBooking['id_product']]['data']['available'];
+                                    if ($roomIdsAvailable = array_column($availableRoomsInfo, 'id_room')) {
+                                        // Check If room is still there in the available rooms list
+                                        if (!in_array($orderBooking['id_room'], $roomIdsAvailable)) {
+                                            $result['errors'][] = Tools::displayError('You can not change the order status as some rooms are not available now in this order. You can reallocate/swap rooms with other rooms to make rooms available and then change the order status.');
+
+                                            break;
+                                        } else {
+                                            $objHotelBookingDetail->is_refunded = 0;
+                                            $objHotelBookingDetail->save();
+                                        }
+                                    } else {
+                                        $result['errors'][] = Tools::displayError('You can not change the order status as some rooms are not available now in this order. You can reallocate/swap rooms with other rooms to make rooms available and then change the order status.');
+                                        break;
+                                    }
+                                }
+                            } else {
+                                $result['errors'][] = Tools::displayError('You can not change the order status as some rooms are not available now in this order. You can reallocate/swap rooms with other rooms to make rooms available and then change the order status.');
+
+                                break;
+                            }
+                        }
+                    }
+                }
+            } elseif ($objCurrentOrderState->id == $objNewOrderState->id) {
+                $result['errors'][] = Tools::displayError('The order has already been assigned this status.');
+            }
+        }
+
+        if (!count($result['errors'])) {
+            // Create new OrderHistory
+            $context = Context::getContext();
+            $history = new OrderHistory();
+            $history->id_order = $this->id;
+            $history->id_employee = (int)$context->employee->id;
+
+            $useExistingsPayment = false;
+            if (!$this->hasInvoice()) {
+                $useExistingsPayment = true;
+            }
+            $history->changeIdOrderState((int)$objNewOrderState->id, $this, $useExistingsPayment);
+
+            // Save all changes
+            $templateVars = array();
+            if ($history->add(true)) {
+                if (!$history->sendEmail($this, $templateVars)) {
+                    // if an error occurred while sending an email the set has_mail_error to true
+                    $result['has_mail_error'] = true;
+                    $result['errors'][] = Tools::displayError('We were unable to send an email to the customer while changing order status.');
+                }
+
+                // synchronizes quantities if needed..
+                if (Configuration::get('PS_ADVANCED_STOCK_MANAGEMENT')) {
+                    foreach ($this->getProducts() as $product) {
+                        if (StockAvailable::dependsOnStock($product['product_id'])) {
+                            StockAvailable::synchronize($product['product_id'], (int)$product['id_shop']);
+                        }
+                    }
+                }
+            } else {
+                $result['errors'][] = Tools::displayError('An error occurred while changing order status.');
+            }
+        }
+
+        // if no errors then return status true
+        if (!count($result['errors'])) {
+            $result['status'] = true;
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param bool $useTax: if true, total with tax, if false, total without tax
+     * @param bool $withDiscounts: if true, total including discount, if false, total excluding discount
+     * @return float total of the order
+     */
+    public function getOrderTotal($useTax = true, $withDiscounts = true)
+    {
+        // Get total of rooms and services
+        if ($useTax) {
+            $totalRoomsAndServices = $this->getTotalProductsWithTaxes();
+        } else {
+            $totalRoomsAndServices = $this->getTotalProductsWithoutTaxes();
+        }
+
+        // Get total of extra demands
+        $objBookingDemand = new HotelBookingDemands();
+        $totalExtraDemands = $objBookingDemand->getRoomTypeBookingExtraDemands($this->id, 0, 0, 0, 0, 0, 1, $useTax);
+
+        // Get cart rules total
+        $orderTotalDiscount = $this->getCartRulesTotal($useTax);
+
+        // Update order with new amounts after removing cart rule
+        $totalOrder = ($totalExtraDemands + $totalRoomsAndServices) - $orderTotalDiscount;
+        $totalOrder = $totalOrder > 0 ? $totalOrder : 0;
+
+        return $totalOrder;
     }
 }

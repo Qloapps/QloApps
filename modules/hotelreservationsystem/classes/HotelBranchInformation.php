@@ -44,24 +44,37 @@ class HotelBranchInformation extends ObjectModel
         'multilang' => true,
         'fields' => array(
             'id_category' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
-            'email' => array('type' => self::TYPE_STRING,'validate' => 'isEmail', 'size' => 255),
-            'rating' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
-            'check_in' => array('type' => self::TYPE_STRING),
-            'check_out' => array('type' => self::TYPE_STRING),
+            'email' => array('type' => self::TYPE_STRING,'validate' => 'isEmail', 'size' => 255, 'required' => true),
+            'rating' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId', 'required' => true),
+            'check_in' => array('type' => self::TYPE_STRING, 'required' => true),
+            'check_out' => array('type' => self::TYPE_STRING, 'required' => true),
             'active' => array('type' => self::TYPE_BOOL, 'validate' => 'isBool'),
-            'latitude' => array('type' => self::TYPE_FLOAT),
-            'longitude' => array('type' => self::TYPE_FLOAT),
+            'latitude' => array('type' => self::TYPE_FLOAT, 'validate' => 'isFloat'),
+            'longitude' => array('type' => self::TYPE_FLOAT, 'validate' => 'isFloat'),
             'map_formated_address' => array('type' => self::TYPE_HTML, 'validate' => 'isCleanHtml'),
             'map_input_text' => array('type' => self::TYPE_STRING, 'validate' => 'isString'),
             'active_refund' => array('type' => self::TYPE_BOOL, 'validate' => 'isBool'),
             'date_add' => array('type' => self::TYPE_DATE, 'validate' => 'isDate', 'copy_post' => false),
             'date_upd' => array('type' => self::TYPE_DATE, 'validate' => 'isDate', 'copy_post' => false),
+
             //lang fields
             'policies' => array('type' => self::TYPE_HTML, 'validate' => 'isCleanHtml', 'lang' => true),
-            'hotel_name' => array('type' => self::TYPE_STRING, 'lang' => true),
+            'hotel_name' => array('type' => self::TYPE_STRING, 'lang' => true, 'required' => true, 'validate' => 'isGenericName'),
             'description' => array('type' => self::TYPE_HTML, 'validate' => 'isCleanHtml', 'lang' => true),
             'short_description' => array('type' => self::TYPE_HTML, 'validate' => 'isCleanHtml', 'lang' => true),
     ), );
+
+    // Webservice fields
+    public $id_country;
+    public $id_state;
+    public $city;
+    public $zipcode;
+    public $address;
+    public $phone;
+    public $use_global_max_order_date = 1;
+    public $max_order_date = '0000-00-00';
+    public $use_global_preparation_time = 1;
+    public $preparation_time = '0000-00-00';
 
     protected $webserviceParameters = array(
         'objectsNodeName' => 'hotels',
@@ -71,28 +84,40 @@ class HotelBranchInformation extends ObjectModel
             'delete' => 'deleteWs',
             'update' => 'updateWs',
         ),
-
         'fields' => array(
+            'phone' => array('required' => true),
+            'address' => array('required' => true),
+            'id_country' => array(
+                'required' => true,
+                'xlink_resource'=> 'countries',
+            ),
+            'id_state' => array(
+                'xlink_resource'=> 'states',
+            ),
+            'city' => array(
+                'required' => true,
+            ),
+            'zipcode' => array(),
             'id_default_image' => array(
                 'getter' => 'getCoverWs',
+                'setter' => 'setCoverWs',
                 'xlink_resource' => array(
-                    'resourceName' => 'hotel_images',
+                    'resourceName' => 'images',
+                    'subResourceName' => 'hotels'
                 )
             ),
-            'max_order_date' => array(
-                'getter' => 'getWsMaxOrderDate',
-                'setter' => 'setWsMaxOrderDate',
-            ),
+            'use_global_max_order_date' => array(),
+            'max_order_date' => array(),
+            'use_global_preparation_time' => array(),
+            'preparation_time' => array(),
         ),
-
         'associations' => array(
             'room_types' => array(
                 'setter' => false,
                 'resource' => 'room_types',
                 'fields' => array('id' => array())
             ),
-            'hotel_images' => array(
-                'setter' => false,
+            'images' => array(
                 'resource' => 'image',
                 'fields' => array('id' => array())
             ),
@@ -111,6 +136,25 @@ class HotelBranchInformation extends ObjectModel
     {
         $this->moduleInstance = Module::getInstanceByName('hotelreservationsystem');
         parent::__construct($id, $id_lang, $id_shop);
+
+        $this->id_country = $this->id_state = $this->city = $this->zipcode = $this->address = $this->phone = null;
+        if ($id) {
+            if ($hotelAddress = $this->getAddress($id)) {
+                $this->id_country = $hotelAddress['id_country'];
+                $this->id_state = $hotelAddress['id_state'];
+                $this->city = $hotelAddress['city'];
+                $this->zipcode = $hotelAddress['postcode'];
+                $this->address = $hotelAddress['address1'];
+                $this->phone = $hotelAddress['phone'];
+            }
+
+            if ($hotelRestrictions = HotelOrderRestrictDate::getDataByHotelId($id)) {
+                $this->use_global_max_order_date = $hotelRestrictions['use_global_max_order_date'];
+                $this->max_order_date = $hotelRestrictions['max_order_date'];
+                $this->use_global_preparation_time = $hotelRestrictions['use_global_preparation_time'];
+                $this->preparation_time = $hotelRestrictions['preparation_time'];
+            }
+        }
     }
 
     public function add($autodate = true, $null_values = false)
@@ -136,10 +180,10 @@ class HotelBranchInformation extends ObjectModel
 
         /* Query definition */
         $query = 'REPLACE INTO `'._DB_PREFIX_.'htl_access` (`id_profile`, `id_hotel`, `access`)';
-        $query .= ' VALUES '.'(1, '.(int)$idHotel.', 1)';
+        $query .= ' VALUES '.'('.(int) _PS_ADMIN_PROFILE_.', '.(int)$idHotel.', 1)';
         /* Profile selection */
-        $profiles = Db::getInstance()->executeS('SELECT `id_profile` FROM '._DB_PREFIX_.'profile WHERE `id_profile` != 1');
-        if (!$profiles || empty($profiles)) {
+        $profiles = Db::getInstance()->executeS('SELECT `id_profile` FROM '._DB_PREFIX_.'profile WHERE `id_profile` != '.(int) _PS_ADMIN_PROFILE_);
+        if ($profiles) {
             foreach ($profiles as $profile) {
                 $access = 0;
                 if (isset($context->employee->id_profile)) {
@@ -228,8 +272,8 @@ class HotelBranchInformation extends ObjectModel
     public static function filterDataByHotelAccess(
         $dataArray,
         $idProfile,
-        $idAsIdHotel = 0,
-        $idAsIdProduct = 0,
+        $idHotelAlias = false,
+        $idProductAlias = false,
         $addAccessKey = 0
     ) {
         if ($hotelAccessInfo =  Db::getInstance()->executeS(
@@ -252,20 +296,20 @@ class HotelBranchInformation extends ObjectModel
                                 unset($dataArray[$key]);
                             }
                         }
-                    } elseif ($idAsIdHotel && isset($row['id'])) {
+                    } elseif ($idHotelAlias && isset($row[$idHotelAlias])) {
                         if ($addAccessKey) {
                             $dataArray[$key]['htl_access'] = 0;
-                            if (in_array($row['id'], $hotels)) {
+                            if (in_array($row[$idHotelAlias], $hotels)) {
                                 $dataArray[$key]['htl_access'] = 1;
                             }
                         } else {
-                            if (!in_array($row['id'], $hotels)) {
+                            if (!in_array($row[$idHotelAlias], $hotels)) {
                                 unset($dataArray[$key]);
                             }
                         }
-                    } elseif ($idAsIdProduct && isset($row['id'])) {
+                    } elseif ($idProductAlias && isset($row[$idProductAlias])) {
                         $objRoomType = new HotelRoomType();
-                        if ($roomTypeInfo = $objRoomType->getRoomTypeInfoByIdProduct($row['id'])) {
+                        if ($roomTypeInfo = $objRoomType->getRoomTypeInfoByIdProduct($row[$idProductAlias])) {
                             if ($addAccessKey) {
                                 $dataArray[$key]['htl_access'] = 0;
                                 if (in_array($roomTypeInfo['id_hotel'], $hotels)) {
@@ -606,7 +650,7 @@ class HotelBranchInformation extends ObjectModel
         return $return;
     }
 
-    public function addCategory($name, $parent_cat = false, $group_ids, $ishotel = false, $idHotel = false)
+    public function addCategory($name, $parent_cat = false, $group_ids, $ishotel = false, $idHotel = false, $link_rewrite = false, $meta_title = false, $meta_description = false, $meta_keywords = false)
     {
         $context = Context::getContext();
         if (!$parent_cat) {
@@ -622,6 +666,15 @@ class HotelBranchInformation extends ObjectModel
             $catName,
             $parent_cat
         )) {
+            if (is_array($link_rewrite)) {
+                $objCategory = new Category($categoryExists['id_category']);
+
+                foreach (Language::getLanguages() as $lang) {
+                    $objCategory->link_rewrite[$lang['id_lang']] = $link_rewrite[$lang['id_lang']];
+                }
+
+                $objCategory->save();
+            }
             return $categoryExists['id_category'];
         } else {
             $category = new Category();
@@ -635,10 +688,24 @@ class HotelBranchInformation extends ObjectModel
                 $category->description[$lang['id_lang']] = $this->moduleInstance->l(
                     'Hotel Branch Category', 'HotelBranchInformation'
                 );
-                $category->link_rewrite[$lang['id_lang']] = Tools::link_rewrite($catName);
+
+                if (is_array($link_rewrite)) {
+                    $category->link_rewrite[$lang['id_lang']] = $link_rewrite[$lang['id_lang']];
+                } else {
+                    $category->link_rewrite[$lang['id_lang']] = Tools::link_rewrite($catName);
+                }
             }
             $category->id_parent = $parent_cat;
             $category->groupBox = $group_ids;
+            if ($meta_title) {
+                $category->meta_title = $meta_title;
+            }
+            if ($meta_description) {
+                $category->meta_description = $meta_description;
+            }
+            if ($meta_keywords) {
+                $category->meta_keywords = $meta_keywords;
+            }
             $category->add();
             return $category->id;
         }
@@ -711,13 +778,18 @@ class HotelBranchInformation extends ObjectModel
      * @param array $excludeIdHotels  [array of the hotels which categories you dont want]
      * @return [array] returns array of all the categories used by all the hotels
      */
-    public function getAllHotelCategories($excludeIdHotels = array())
+    public function getAllHotelCategories($excludeIdHotels = array(), $idHotel = false)
     {
         $hotelrelatedCategs = array();
-        $sql = 'SELECT `id_category` FROM `'._DB_PREFIX_.'htl_branch_info`';
+        $sql = 'SELECT `id_category` FROM `'._DB_PREFIX_.'htl_branch_info` WHERE 1';
         if ($excludeIdHotels && count($excludeIdHotels)) {
-            $sql .= ' WHERE `id` NOT IN ('.implode(',', $excludeIdHotels).')';
+            $sql .= ' AND `id` NOT IN ('.implode(',', $excludeIdHotels).')';
         }
+
+        if ($idHotel) {
+            $sql .= ' AND `id`='.(int) $idHotel;
+        }
+
         // get all the hotel name categories
         if ($hotelCategs = Db::getInstance()->executeS($sql)) {
             foreach ($hotelCategs as $rowCateg) {
@@ -764,6 +836,22 @@ class HotelBranchInformation extends ObjectModel
         return true;
     }
 
+    public function updateRoomTypeCategories()
+    {
+        if (!Validate::isLoadedObject($this)) {
+            return false;
+        }
+
+        $hotelCategories = $this->getAllHotelCategories(array(), $this->id);
+        $objHotelRoomType = new HotelRoomType();
+        if ($roomTypes = $objHotelRoomType->getRoomTypeByHotelId($this->id, Context::getContext()->language->id)) {
+            foreach ($roomTypes as $roomType) {
+                $objProduct = new Product($roomType['id_product']);
+                $objProduct->updateCategories($hotelCategories);
+            }
+        }
+    }
+
     public function isRefundable()
     {
         return (Configuration::get('WK_ORDER_REFUND_ALLOWED') && $this->active_refund);
@@ -775,11 +863,19 @@ class HotelBranchInformation extends ObjectModel
             $idProfile = Context::getContext()->employee->id_profile;
         }
 
+        $accessedIds = self::getProfileAccessedHotels($idProfile, 1, 1);
         if (!$idsHotel) {
-            $idsHotel = self::getProfileAccessedHotels($idProfile, 1, 1);
+            $idsHotel = $accessedIds;
         } else {
-            $idsHotel = array($idsHotel);
+            if (!is_array($idsHotel)) {
+                $idsHotel = array($idsHotel);
+            }
+            // check if passed hotel id's are available for current employee
+            $idsHotel = array_filter($idsHotel, function ($idHotel) use($accessedIds)  {
+                return in_array($idHotel, $accessedIds);
+            });
         }
+
         $restriction = ' AND ';
         if (count($idsHotel)) {
             if ($alias) {
@@ -789,7 +885,7 @@ class HotelBranchInformation extends ObjectModel
             $identifier = "`$identifier`";
             $restriction .= $alias.$identifier.' IN ('.implode(', ', $idsHotel).') ';
         } else {
-            $restriction .= 1;
+            $restriction .= 0;
         }
 
         return $restriction;
@@ -800,7 +896,7 @@ class HotelBranchInformation extends ObjectModel
     {
         if ($result = HotelImage::getCover($this->id)) {
             // we are sending id_hotel/id_image as per the url set for the hotel images
-            return $result['id_hotel'].'/'.$result['id'];
+            return $result['id'];
         }
         return false;
     }
@@ -811,24 +907,26 @@ class HotelBranchInformation extends ObjectModel
     */
     public function setCoverWs($id_image)
     {
-        // first unset the cover
-        Db::getInstance()->execute('UPDATE `'._DB_PREFIX_.'htl_image` SET `cover` = NULL
-			WHERE `id_hotel` = '.(int)$this->id);
+        if ($id_image) {
+            // first unset the cover
+            Db::getInstance()->execute('UPDATE `'._DB_PREFIX_.'htl_image` SET `cover` = NULL
+                WHERE `id_hotel` = '.(int)$this->id);
 
-        // set the sent id of the image to the cover of the hotel
-        Db::getInstance()->execute('UPDATE `'._DB_PREFIX_.'htl_image` SET `cover` = 1 WHERE `id_image` = '.(int)$id_image);
+            // set the sent id of the image to the cover of the hotel
+            Db::getInstance()->execute('UPDATE `'._DB_PREFIX_.'htl_image` SET `cover` = 1 WHERE `id` = '.(int)$id_image.' AND `id_hotel` = '.(int)$this->id);
+        }
 
         return true;
     }
 
     // Webservice:: function to prepare id parameter for hotel images in a hotel api
-    public function getWsHotelImages()
+    public function getWsImages()
     {
         $ids = array();
         if ($hotelImages =  Db::getInstance()->executeS('SELECT * FROM `'._DB_PREFIX_.'htl_image` WHERE `id_hotel` = '.(int)$this->id)) {
             foreach ($hotelImages as $key => $image) {
                 // we are sending id_hotel/id_image as per the url set for the hotel images
-                $ids[$key]['id'] = $image['id_hotel'].'/'.$image['id'];
+                $ids[$key]['id'] = $image['id'];
             }
         }
         return $ids;
@@ -852,7 +950,7 @@ class HotelBranchInformation extends ObjectModel
         );
 
         foreach ($branchFeatures as $feature) {
-            Db::getInstance()->execute('INSERT INTO `'._DB_PREFIX_.'htl_branch_features` (`id_hotel`, `feature_id`) VALUES ('.(int)$this->id.', '.(int)$feature['id'].')');
+            Db::getInstance()->execute('INSERT INTO `'._DB_PREFIX_.'htl_branch_features` (`id_hotel`, `feature_id`, `date_add`, `date_upd`) VALUES ('.(int)$this->id.', '.(int)$feature['id'].', NOW(), NOW())');
         }
 
         return true;
@@ -875,7 +973,7 @@ class HotelBranchInformation extends ObjectModel
         );
 
         foreach ($refundRules as $rule) {
-            Db::getInstance()->execute('INSERT INTO `'._DB_PREFIX_.'htl_branch_refund_rules` (`id_hotel`, `id_refund_rule`) VALUES ('.(int)$this->id.', '.(int)$rule['id'].')');
+            Db::getInstance()->execute('INSERT INTO `'._DB_PREFIX_.'htl_branch_refund_rules` (`id_hotel`, `id_refund_rule`, `date_add`, `date_upd`) VALUES ('.(int)$this->id.', '.(int)$rule['id'].', NOW(), NOW())');
         }
 
         return true;
@@ -889,49 +987,22 @@ class HotelBranchInformation extends ObjectModel
         );
     }
 
-    // Webservice :: get max order date of the hotel
-    public function getWsMaxOrderDate()
-    {
-        return Db::getInstance()->getValue(
-            'SELECT `max_order_date` FROM `'._DB_PREFIX_.'htl_order_restrict_date` WHERE `id_hotel` = '.(int)$this->id.' ORDER BY `id` ASC'
-        );
-    }
-
-    // Webservice :: set max order date of the hotel
-    public function setWsMaxOrderDate($maxOrderDate)
-    {
-        if ($this->id) {
-            // delete previous
-            Db::getInstance()->execute('
-                DELETE FROM `'._DB_PREFIX_.'htl_order_restrict_date`
-                WHERE `id_hotel` = '.(int)$this->id
-            );
-
-            // set max_order_date for the hotel from request
-            return Db::getInstance()->execute('INSERT INTO `'._DB_PREFIX_.'htl_order_restrict_date` (`id_hotel`, `max_order_date`) VALUES ('.(int)$this->id.', \''.pSQL($maxOrderDate).'\')');
-        }
-    }
-
     // Webservice :: function will run when hotel added from API
     public function addWs($autodate = true, $null_values = false)
     {
         if ($this->add($autodate, $null_values)) {
+            // Set hotel address
+            $this->setWsHotelAddress();
+
+            // set hotel restrictions
+            $this->setWsHotelRestrictions();
+
             // set categories of the hotel
             $this->setWsHotelCategories();
 
-            $postData = trim(file_get_contents('php://input'));
-            libxml_use_internal_errors(true);
-            $xml = simplexml_load_string(utf8_decode($postData));
-
-            $hotelData = json_decode(json_encode($xml));
-            if (isset($hotelData->hotel->max_order_date)) {
-                if ($maxOrderDate = $hotelData->hotel->max_order_date) {
-                    $this->setWsMaxOrderDate($maxOrderDate);
-                }
-            }
-
             return true;
         }
+
         return false;
     }
 
@@ -939,23 +1010,180 @@ class HotelBranchInformation extends ObjectModel
     public function updateWs($null_values = false)
     {
         if ($this->update($null_values)) {
+            // Set hotel address
+            $this->setWsHotelAddress();
+
+            // set hotel restrictions
+            $this->setWsHotelRestrictions();
+
             // set categories of the hotel
             $this->setWsHotelCategories();
 
-            $postData = trim(file_get_contents('php://input'));
-            libxml_use_internal_errors(true);
-            $xml = simplexml_load_string(utf8_decode($postData));
-
-            $hotelData = json_decode(json_encode($xml));
-            if (isset($hotelData->hotel->max_order_date)) {
-                if ($maxOrderDate = $hotelData->hotel->max_order_date) {
-                    $this->setWsMaxOrderDate($maxOrderDate);
-                }
-            }
+            // update room categories after the hotel category is updated.
+            $this->updateRoomTypeCategories();
 
             return true;
         }
+
         return false;
+    }
+
+    public function setWsHotelAddress()
+    {
+        if ($idHotelAddress = $this->getHotelIdAddress()) {
+            $objAddress = new Address($idHotelAddress);
+        } else {
+            $objAddress = new Address();
+        }
+
+        $hotelName = $this->hotel_name[Configuration::get('PS_LANG_DEFAULT')];
+        $hotelName = trim(preg_replace('/[0-9!<>,;?=+()@#"°{}_$%:]*$/u', '', $hotelName));
+        $objAddress->id_hotel = $this->id;
+        $objAddress->id_country = $this->id_country;
+        $objAddress->id_state = $this->id_state;
+        $objAddress->city = $this->city;
+        $objAddress->postcode = $this->zipcode;
+        $objAddress->address1 = $this->address;
+        $objAddress->phone = $this->phone;
+        $objAddress->alias = substr($hotelName, 0, 32);
+        $addressFirstName = $hotelName;
+        $addressLastName = $hotelName;
+        if (Tools::strlen($hotelName) > 32) {
+            $addressFirstName = trim(substr($hotelName, 0, 32));
+            if (!$addressLastName = trim(substr($hotelName, 32, 32))) {
+                $addressLastName = $addressFirstName;
+            }
+        }
+
+        $objAddress->firstname = $addressFirstName;
+        $objAddress->lastname = $addressLastName;
+
+        return $objAddress->save();
+    }
+
+    public function setWsHotelRestrictions()
+    {
+        if ($this->id) {
+            // save maximum booking date and preparation time
+            if ($restrictDateInfo = HotelOrderRestrictDate::getDataByHotelId($this->id)) {
+                $objHotelRestrictDate = new HotelOrderRestrictDate($restrictDateInfo['id']);
+            } else {
+                $objHotelRestrictDate = new HotelOrderRestrictDate();
+            }
+
+            $objHotelRestrictDate->id_hotel = $this->id;
+            $objHotelRestrictDate->use_global_max_order_date = $this->use_global_max_order_date;
+            if (!$this->use_global_max_order_date) {
+                $objHotelRestrictDate->max_order_date = $this->max_order_date;
+            }
+            $objHotelRestrictDate->use_global_preparation_time = $this->use_global_preparation_time;
+            if (!$this->use_global_preparation_time) {
+                $objHotelRestrictDate->preparation_time = $this->preparation_time;
+            }
+
+            return $objHotelRestrictDate->save();
+        }
+    }
+
+    public function validateFields($die = true, $error_return = false)
+    {
+        // set additional hotel address and restriction fields validations here
+        if (isset($this->webservice_validation) && $this->webservice_validation) {
+            if ($this->rating < 1 || $this->rating > 5) {
+                $message = Tools::displayError('Rating must be between 1 and 5.');
+            } elseif (!strtotime($this->check_in)) {
+                $message = Tools::displayError('Check In time is invalid.');
+            } elseif (!strtotime($this->check_out)) {
+                $message = Tools::displayError('Check out time is invalid.');
+            } elseif ($this->check_in && $this->check_out && strtotime($this->check_out) >= strtotime($this->check_in)) {
+                $message = Tools::displayError('Check Out time must be before Check In time.');
+            } elseif (!trim($this->phone)) {
+                $message = Tools::displayError('Phone number is required field.');
+            } elseif (!Validate::isPhoneNumber($this->phone)) {
+                $message = Tools::displayError('Please enter a valid phone number.');
+            } elseif (trim($this->address) == '') {
+                $message = Tools::displayError('Address is required field.');
+            } elseif (!Validate::isAddress($this->address)) {
+                $message = Tools::displayError('Address is invalid.');
+            } elseif (!$this->id_country) {
+                $message = Tools::displayError('Country is required field.');
+            } elseif ($this->city == '') {
+                $message = Tools::displayError('City is required field.');
+            } elseif (!Validate::isCityName($this->city)) {
+                $message = Tools::displayError('Enter a Valid City Name.');
+            } elseif (!Validate::isBool($this->use_global_max_order_date)) {
+                $message = Tools::displayError('invalid value for use_global_max_order_date.');
+            } elseif (!Validate::isBool($this->use_global_preparation_time)) {
+                $message = Tools::displayError('invalid value for use_global_preparation_time.');
+            } elseif (!$this->use_global_max_order_date && $this->max_order_date == '') {
+                $message = Tools::displayError('Maximum date to book a room is required.');
+            } elseif (!$this->use_global_max_order_date && !Validate::isDate($this->max_order_date)) {
+                $message = Tools::displayError('Maximum date to book a room is invalid.');
+            } elseif (!$this->use_global_max_order_date
+                && ($maxOrderDateFormatted = date('Y-m-d', strtotime($this->max_order_date)))
+                && strtotime($maxOrderDateFormatted) < strtotime(date('Y-m-d'))
+            ) {
+                $message = Tools::displayError('Maximum Global Date to book a room can not be a past date. Please use a future date.');
+            } elseif (!$this->use_global_preparation_time && $this->preparation_time === '') {
+                $message = Tools::displayError('Minimum booking offset is a required.');
+            } elseif (!$this->use_global_preparation_time && $this->preparation_time !== '0' && !Validate::isUnsignedInt($this->preparation_time)) {
+                $message = Tools::displayError('Minimum booking offset is invalid.');
+            } elseif (!Validate::isLoadedObject($objCountry = new Country($this->id_country))) {
+                $message = Tools::displayError('country is invalid.');
+            } elseif ($this->id_state
+                && (!Validate::isLoadedObject($objState = new State($this->id_state)) || $objState->id_country != $this->id_country)
+            ) {
+                $message = Tools::displayError('State is invalid.');
+            } elseif (State::getStatesByIdCountry($this->id_country) && !$this->id_state) {
+                $message = Tools::displayError('State is required field.');
+            } elseif (empty($this->zipcode) && $objCountry->need_zip_code) {
+                $message = Tools::displayError('A Zip / Postal code is required.');
+            } elseif ($objCountry->zip_code_format && !$objCountry->checkZipCode($this->zipcode)) {
+                $message = sprintf(Tools::displayError('The Zip/Postal code you have entered is invalid. It must follow this format: %s'), str_replace('C', $objCountry->iso_code, str_replace('N', '0', str_replace('L', 'A', $objCountry->zip_code_format))));
+            } elseif ($this->zipcode && !Validate::isPostCode($this->zipcode)) {
+                $message = Tools::displayError('The Zip / Postal code is invalid.');
+            } else {
+                if ($addressValidation = Address::getValidationRules('Address')) {
+                    foreach ($addressValidation['size'] as $field => $maxSize) {
+                        if ('phone' == $field && Tools::strlen($this->phone) > $maxSize) {
+                            $message = sprintf(
+                                Tools::displayError('The Hotel phone number is too long (%1$d chars max).'),
+                                $maxSize
+                            );
+                            break;
+                        } elseif ('address1' == $field && Tools::strlen($this->address) > $maxSize) {
+                            $message = sprintf(
+                                Tools::displayError('The Hotel address is too long (%1$d chars max).'),
+                                $maxSize
+                            );
+                            break;
+                        }  elseif ('city' == $field && Tools::strlen($this->city) > $maxSize) {
+                            $message = sprintf(
+                                Tools::displayError('The Hotel city name is too long (%1$d chars max).'),
+                                $maxSize
+                            );
+                            break;
+                        } elseif ('postcode' == $field && Tools::strlen($this->zipcode) > $maxSize) {
+                            $message = sprintf(
+                                Tools::displayError('The Hotel zip code is too long (%1$d chars max).'),
+                                $maxSize
+                            );
+                            break;
+                        }
+                    }
+                }
+            }
+
+            if (isset($message) && $message != '') {
+                if ($die) {
+                    throw new PrestaShopException($message);
+                }
+
+                return $error_return ? $message : false;
+            }
+        }
+
+        return parent::validateFields($die, $error_return);
     }
 
     // Webservice :: function will run when hotel deleted from API
@@ -983,20 +1211,26 @@ class HotelBranchInformation extends ObjectModel
                 }
             }
             $objCountry = new Country();
-            $countryName = $objCountry->getNameById($idLang, $this->country_id);
+            $countryName = $objCountry->getNameById($idLang, $this->id_country);
+            $linkRewriteArray =  array();
+            foreach (Language::getLanguages(true) as $lang) {
+                $linkRewriteArray[$lang['id_lang']] = Tools::link_rewrite($this->hotel_name[$lang['id_lang']]);
+            }
+
             if ($catCountry = $this->addCategory($countryName, false, $groupIds)) {
-                if ($this->state_id) {
+                if ($this->id_state) {
                     $objState = new State();
-                    $stateName = $objState->getNameById($this->state_id);
+                    $stateName = $objState->getNameById($this->id_state);
+
                     $catState = $this->addCategory($stateName, $catCountry, $groupIds);
                 } else {
                     $catState = $this->addCategory($this->city, $catCountry, $groupIds);
                 }
                 if ($catState) {
                     if ($catCity = $this->addCategory($this->city, $catState, $groupIds)) {
-                        $hotelCatName = $this->hotel_name;
+                        $hotelCatName = $this->hotel_name[Configuration::get('PS_LANG_DEFAULT')];
                         if ($catHotel = $this->addCategory(
-                            $hotelCatName, $catCity, $groupIds, 1, $this->id
+                            $hotelCatName, $catCity, $groupIds, 1, $this->id, $linkRewriteArray
                         )) {
                             $this->id_category = $catHotel;
                             $this->save();
@@ -1027,4 +1261,24 @@ class HotelBranchInformation extends ObjectModel
 
         return false;
     }
+
+    public function searchByName($query, $idEmployeeProfile, $idLang = false)
+    {
+        if (!$idLang) {
+            $idLang = Context::getContext()->language->id;
+        }
+
+        $sql = 'SELECT a.`id`, a.`active`, hbl.`hotel_name`, aa.`city`, s.`name` AS `state_name`, cl.`name` AS `country_name`
+            FROM `'._DB_PREFIX_.'htl_branch_info` a
+            LEFT JOIN  `'._DB_PREFIX_.'htl_branch_info_lang` hbl ON hbl.`id` = a.`id` AND hbl.`id_lang` = '.(int)$idLang.'
+            LEFT JOIN  `'._DB_PREFIX_.'address` aa ON aa.`id_hotel` = a.`id`
+            LEFT JOIN `'._DB_PREFIX_.'state` s ON s.`id_state` = aa.`id_state`
+            LEFT JOIN `'._DB_PREFIX_.'country_lang` cl ON cl.`id_country` = aa.`id_country` AND cl.`id_lang` = hbl.`id_lang`
+            LEFT JOIN `'._DB_PREFIX_.'htl_access` ha ON a.`id` = ha.`id_hotel`
+            WHERE hbl.`hotel_name` LIKE \'%'.pSQL($query).'%\'
+            AND ha.`access`= 1 AND ha.`id_profile` = '.(int) $idEmployeeProfile;
+
+        return Db::getInstance()->executeS($sql);
+    }
+
 }
