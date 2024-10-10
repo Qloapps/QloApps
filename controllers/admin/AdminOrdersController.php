@@ -2515,7 +2515,7 @@ class AdminOrdersControllerCore extends AdminController
             $helper->color = 'color2';
             $helper->title = $this->l('Total Due Amount', null, null, false);
             $minValue = ('0.' . str_repeat('0', (Configuration::get('PS_PRICE_DISPLAY_PRECISION') - 1)) . '1');
-            $helper->href = $this->context->link->getAdminLink('AdminOrders').'&submitFilterorder=1&orderFilter_hbd!is_refunded=0&orderFilter_amount_due%5B0%5D='.$minValue;
+            $helper->href = $this->context->link->getAdminLink('AdminOrders').'&submitResetorder&submitFilterorder=1&orderFilter_hbd!is_refunded=0&orderFilter_amount_due%5B0%5D='.$minValue;
             $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=total_due_amount';
             $helper->tooltip = $this->l('Total due amount of all the orders created.', null, null, false);
             $this->kpis[] = $helper;
@@ -2527,7 +2527,7 @@ class AdminOrdersControllerCore extends AdminController
             $helper->color = 'color1';
             $helper->title = $this->l('Arrivals', null, null, false);
             $helper->subtitle = $this->l('Today', null, null, false);
-            $helper->href = $this->context->link->getAdminLink('AdminOrders').'&submitFilterorder=1&orderFilter_hbd!is_refunded=0&orderFilter_hbd!id_status='.HotelBookingDetail::STATUS_ALLOTED.'&orderFilter_hbd!date_from[]='.pSQL(date('Y-m-d')).'&orderFilter_hbd!date_from[]='.pSQL(date('Y-m-d'));
+            $helper->href = $this->context->link->getAdminLink('AdminOrders').'&submitResetorder&submitFilterorder=1&orderFilter_hbd!is_refunded=0&orderFilter_hbd!id_status='.HotelBookingDetail::STATUS_ALLOTED.'&orderFilter_hbd!date_from[]='.pSQL(date('Y-m-d')).'&orderFilter_hbd!date_from[]='.pSQL(date('Y-m-d'));
             $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=today_arrivals';
             $helper->tooltip = $this->l('Total number of arrivals for today.', null, null, false);
             $this->kpis[] = $helper;
@@ -2539,7 +2539,7 @@ class AdminOrdersControllerCore extends AdminController
             $helper->color = 'color2';
             $helper->title = $this->l('Departures', null, null, false);
             $helper->subtitle = $this->l('Today', null, null, false);
-            $helper->href = $this->context->link->getAdminLink('AdminOrders').'&submitFilterorder=1&orderFilter_hbd!is_refunded=0&orderFilter_hbd!id_status='.HotelBookingDetail::STATUS_CHECKED_IN.'&orderFilter_hbd!date_to[]='.pSQL(date('Y-m-d')).'&orderFilter_hbd!date_to[]='.pSQL(date('Y-m-d'));
+            $helper->href = $this->context->link->getAdminLink('AdminOrders').'&submitResetorder&submitFilterorder=1&orderFilter_hbd!is_refunded=0&orderFilter_hbd!id_status='.HotelBookingDetail::STATUS_CHECKED_IN.'&orderFilter_hbd!date_to[]='.pSQL(date('Y-m-d')).'&orderFilter_hbd!date_to[]='.pSQL(date('Y-m-d'));
             $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=today_departures';
             $helper->tooltip = $this->l('Total number of departures for today.', null, null, false);
             $this->kpis[] = $helper;
@@ -2552,7 +2552,7 @@ class AdminOrdersControllerCore extends AdminController
             $helper->color = 'color4';
             $helper->title = $this->l('Stay Overs', null, null, false);
             $helper->subtitle = $this->l('Today', null, null, false);
-            $helper->href = $this->context->link->getAdminLink('AdminOrders').'&submitFilterorder=1&orderFilter_hbd!is_refunded=0&orderFilter_hbd!id_status='.HotelBookingDetail::STATUS_CHECKED_IN.'&orderFilter_hbd!date_to[]='.pSQL(date('Y-m-d', strtotime('+ 1 days'))).'&orderFilter_hbd!date_to[]=';
+            $helper->href = $this->context->link->getAdminLink('AdminOrders').'&submitResetorder&submitFilterorder=1&orderFilter_hbd!is_refunded=0&orderFilter_hbd!id_status='.HotelBookingDetail::STATUS_CHECKED_IN.'&orderFilter_hbd!date_to[]='.pSQL(date('Y-m-d', strtotime('+ 1 days'))).'&orderFilter_hbd!date_to[]=';
             $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=today_stay_over';
             $helper->tooltip = $this->l('Total number of stay overs for today.', null, null, false);
             $this->kpis[] = $helper;
