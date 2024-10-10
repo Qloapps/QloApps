@@ -2551,7 +2551,7 @@ class AdminProductsControllerCore extends AdminController
         $helper->color = 'color2';
         $helper->title = $this->l('Disabled Room Types', null, null, false);
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=disabled_room_types';
-        $helper->href = Context::getContext()->link->getAdminLink('AdminProducts').'&submitResetproduct&submitFilterproduct=1&&productFilter_sa!active=0&submitFilterproduct=1';
+        $helper->href = Context::getContext()->link->getAdminLink('AdminProducts').'&submitResetproduct&submitFilterproduct=1&productFilter_sa!active=0&submitFilterproduct=1';
         $helper->tooltip = $this->l('The total number of room types that are currently disabled.', null, null, false);
         $this->kpis[] = $helper;
 
