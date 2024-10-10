@@ -219,7 +219,7 @@ class Dashactivity extends Module
 			FROM `'._DB_PREFIX_.'orders` o
             LEFT JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd ON (hbd.`id_order` = o.`id_order`)
 			LEFT JOIN `'._DB_PREFIX_.'order_state` os ON (o.`current_state` = os.`id_order_state`)
-			WHERE os.`paid` = 0
+			WHERE (o.total_paid - o.total_paid_real) > 0
             AND o.`current_state` NOT IN ('.implode(',', array(
                 Configuration::get('PS_OS_CANCELED'),
                 Configuration::get('PS_OS_REFUND'),
@@ -536,6 +536,7 @@ class Dashactivity extends Module
             'DASHACTIVITY_CART_ABANDONED_MIN' => Tools::getValue('DASHACTIVITY_CART_ABANDONED_MIN', Configuration::get('DASHACTIVITY_CART_ABANDONED_MIN')),
             'DASHACTIVITY_CART_ABANDONED_MAX' => Tools::getValue('DASHACTIVITY_CART_ABANDONED_MAX', Configuration::get('DASHACTIVITY_CART_ABANDONED_MAX')),
             'DASHACTIVITY_VISITOR_ONLINE' => Tools::getValue('DASHACTIVITY_VISITOR_ONLINE', Configuration::get('DASHACTIVITY_VISITOR_ONLINE')),
+            'min_due_amount' => ('0.' . str_repeat('0', (Configuration::get('PS_PRICE_DISPLAY_PRECISION') - 1)) . '1')
         );
     }
 
