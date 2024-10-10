@@ -1751,7 +1751,7 @@ class CartCore extends ObjectModel
                 if ($servicesWithRoom = $objRoomTypeServiceProductCartDetail->getServiceProductsInCart(
                     $this->id,
                     (int)$product['id_product'],
-                    0,
+                    isset($product['id_hotel']) ? $product['id_hotel'] : 0,
                     0,
                     0,
                     0,

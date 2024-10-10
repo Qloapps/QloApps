@@ -1046,7 +1046,7 @@ class HotelHelper
 
         Configuration::updateValue(
             'WK_HOTEL_GLOBAL_ADDRESS',
-            'The Hotel Prime, Monticello Dr, Montgomery, AL 36117, USA'
+            'The Hotel Prime, Monticello Dr, Montgomery, 10010'
         );
         Configuration::updateValue('WK_HOTEL_GLOBAL_CONTACT_NUMBER', '0987654321');
         Configuration::updateValue('WK_HOTEL_GLOBAL_CONTACT_EMAIL', 'hotelprime@htl.com');
@@ -1612,7 +1612,7 @@ class HotelHelper
         $objAddress->id_state = $state_id;
         $objAddress->id_country = $def_cont_id;
         $objAddress->postcode = Tools::generateRandomZipcode($def_cont_id);
-        $objAddress->address1 = 'Monticello Dr, Montgomery, AL 36117, USA';
+        $objAddress->address1 = 'Monticello Dr, Montgomery, 10010';
         $objAddress->alias = 'The Hotel Prime';
         $objAddress->lastname = 'The Hotel Prime';
         $objAddress->firstname = 'The Hotel Prime';
