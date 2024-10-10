@@ -80,7 +80,7 @@
     - #815: Updated added Rooms filter and added suggestions for Hotel and Room type filter inputs on admin orders list page
     - #807: Added Warning for maximum quantity of service products in Extra Services popup when creating or editing a booking at back office.
     - #789: Updated set default occupancy chosen on search results, room type detail and admin book now pages
-    - #1169:: Updated info for convenience fees products and taxes breakup in admin order detail page.
+    - #1169: Updated info for convenience fees products and taxes breakup in admin order detail page.
     - #771: Updated design of 'Delete voucher' button has been changed to button instead of text on admin Order detail page
     - #770: Updated disable cart popup button on admin Book Now page if cart is empty
     - #987: Improved Statstics data in admin stats page
@@ -102,7 +102,7 @@
     - #865: Updated stats are now shown according to employee hotel access
     - #851: Updated same day room checkin - checkout and select time along with checkin - checkout
     - #841: Updated prevent room deletion and room status update to inactive when room has future booking
-    - #1145:: Updated empty dropdown will appear if no options are available and empty message is not set.
+    - #1145: Updated empty dropdown will appear if no options are available and empty message is not set.
     - #1070: Updated validations for Hotel address when add a new hotel
     - #837: Updated resolve multiple specific price visible for a single catalog rule
     - #1146: Udpated Text of column 'tax' to 'Tax rule' in both 'Additional Facilities' & 'Service Products' tab of room type detail page
@@ -121,6 +121,7 @@
     - #1016: Added display global max order date and global preparation time in the restriction tab in manage hotels.
 
 - Bugs Fixed:
+    - #866:  Fixed Arrangement of row and column in csv files.
     - #1284: Fixed getting fatal error on AdminHotelRoomsBookingController when an employee adds an invalid date in the search booking form in back-office.
     - #1257: Fixed available fields column of one tab is reset from another tab in backoffice
     - #1251: Fixed occupancy selection panel design issue in Backoffice book now page
@@ -137,9 +138,9 @@
     - #1212: Fixed wrong total number of customers in the render-list in the AdminCustomerController in the back-office
     - #1159: Fixed total count for the service products is incorrect in the list in back office.
     - #1125: Fixed invoice data is not correct when multiple invoices created in an order from back-office
-    - #1122 Fixed currency conversion issue in order if default currency is changed while creating booking from back-office
+    - #1122: Fixed currency conversion issue in order if default currency is changed while creating booking from back-office
     - #1106: Fixed refund amount not converted while changing the currency of the Order in back office
-    - #1102 Fixed unable to add discount coupon of 100% on order detail page from back-office
+    - #1102: Fixed unable to add discount coupon of 100% on order detail page from back-office
     - #1063: Fixed order prices decimal value not shown according to configuration when booking from back office
     - #1049: Fixed warnings for invalid IMAP configuration after saving the default message in the contact in the back office.
     - #1046: Fixed getting errors in the back office if the id in the URL is updated manually to an invalid one.

@@ -1,4 +1,15 @@
 ------------------------------
+# V1.4.2 to V1.4.3
+------------------------------
+
+## Improved/Changed Features:
+
+* [BO] : [#866] Arrangement of row and column in csv file is wrong
+* [CO] : [#867] Fixed when customer age is not available then it is considered 60+ age as default
+* [BO] : [#987] Improved Statstics data in admin stats page
+
+
+------------------------------
 # V1.4.1 to V1.4.2
 ------------------------------
 
