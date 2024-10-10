@@ -3066,6 +3066,9 @@ class AdminControllerCore extends Controller
             || $this->context->cookie->{'submitFilter'.$this->list_id} !== false
             || Tools::getValue($this->list_id.'Orderby')
             || Tools::getValue($this->list_id.'Orderway')) {
+            if (Tools::isSubmit('submitReset'.$this->list_id)) {
+                $this->processResetFilters($this->list_id);
+            }
             $this->filter = true;
         }
 
