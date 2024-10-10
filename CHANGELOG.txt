@@ -3,46 +3,46 @@
 ####################################
 
 ## Added Features:
-- #941: Admin can add custom prices for facilities and services while editing order.
-- #890: Service products can now be assigned to a room type from room type edit page at back office.
-- #881: Address is not required in booking/order flow
-- #784: Admin can add partial order payment when creating a new booking.
-- #901: Added upgrade/degrade of rooms while reallocation and also fixed reallocation and swapping issues.
-- #833: Added 'Show at front office' option to enable/disable booking from front office.
-- #877: Added new module for extra service and facilities statistics.
-- #830: Added option to disable backdate order from superadmin and employees.
-- #896: Added configuration for showing prices in Order list in (Default currency or Payment Currency).
-- #1105: Added option for modules to manipulate KPI data.
-- #918: New design of order detail page of the customer
-- #918: New design of order detail page of the admin in back-office
-- #870: New design for KPIs in back-office
-- #1080: Added option 'Maximum Login Attempts' on Preferences > Maintenance page to allow certain number of employee login attempts.
-- #947: Added KPIs on orders list page in back-office.
-- #1124: Added new KPIs in order view page in the Back-office.
-- #1264: Added Seo fields in manage hotel controller in the back-office
-- #850: Added language dropdown on maintenance page.
-- #1108: Added email template for Partial payment received status.
-- #1164: Added option to add/edit customer address from order detail page of Back office.
-- #819: Added configuration to show or hide 'Date of Birth' field in customer registration and customer information form at front office.
-- #1065: Added Option to view frequent customer in back office customer page.
-- #1094: Added Admin can set voucher expiry along with voucher when managing refund request.
-- #1167: Added Confirmation modal when deleting cart rules and while changing credit slip status.
-- #1204: Added option to show page loader in back office.
-- #1191: Added webservice for bookings management.
-- #1170: Added date wise breakdown in Availability and rates search API
-- #776: Added breadcrumbs on my account pages at front office.
-- #894: Added process to allow modules to override module admin and front controllers.
-- #1168: Added hotel description in room type page in front office.
-- #1092: Added new sorting option "recommended" in search result page.
-- #775: Added demo service products for categories Meals and Transfers.
-- #962: Added new categories in demo data.
-- #882: Added links of Suggested Modules and Themes during installation.
-- #1195: Added process for smarty template overriding.
-- #937: Added hotel wise restriction on the customer messages belonging to an order.
-- #1028: Added hotel wise restrictions on the order notifications for the employee.
-- #1138: Added parameters in PatmentModule::validateOrder() function to prevent the emails on the order validation process.
-- #883: Added 'Save and stay' button on missing pages at back office.
-- Added new hooks in #938, #880, #928, #935, #1121, #1132, #1197, #812, #887, #1197, #1271
+  - #941: Admin can add custom prices for facilities and services while editing order.
+  - #890: Service products can now be assigned to a room type from room type edit page at back office.
+  - #881: Address is not required in booking/order flow
+  - #784: Admin can add partial order payment when creating a new booking.
+  - #901: Added upgrade/degrade of rooms while reallocation and also fixed reallocation and swapping issues.
+  - #833: Added 'Show at front office' option to enable/disable booking from front office.
+  - #877: Added new module for extra service and facilities statistics.
+  - #830: Added option to disable backdate order from superadmin and employees.
+  - #896: Added configuration for showing prices in Order list in (Default currency or Payment Currency).
+  - #1105: Added option for modules to manipulate KPI data.
+  - #918: New design of order detail page of the customer
+  - #918: New design of order detail page of the admin in back-office
+  - #870: New design for KPIs in back-office
+  - #1080: Added option 'Maximum Login Attempts' on Preferences > Maintenance page to allow certain number of employee login attempts.
+  - #947: Added KPIs on orders list page in back-office.
+  - #1124: Added new KPIs in order view page in the Back-office.
+  - #1264: Added Seo fields in manage hotel controller in the back-office
+  - #850: Added language dropdown on maintenance page.
+  - #1108: Added email template for Partial payment received status.
+  - #1164: Added option to add/edit customer address from order detail page of Back office.
+  - #819: Added configuration to show or hide 'Date of Birth' field in customer registration and customer information form at front office.
+  - #1065: Added Option to view frequent customer in back office customer page.
+  - #1094: Added Admin can set voucher expiry along with voucher when managing refund request.
+  - #1167: Added Confirmation modal when deleting cart rules and while changing credit slip status.
+  - #1204: Added option to show page loader in back office.
+  - #1191: Added webservice for bookings management.
+  - #1170: Added date wise breakdown in Availability and rates search API
+  - #776: Added breadcrumbs on my account pages at front office.
+  - #894: Added process to allow modules to override module admin and front controllers.
+  - #1168: Added hotel description in room type page in front office.
+  - #1092: Added new sorting option "recommended" in search result page.
+  - #775: Added demo service products for categories Meals and Transfers.
+  - #962: Added new categories in demo data.
+  - #882: Added links of Suggested Modules and Themes during installation.
+  - #1195: Added process for smarty template overriding.
+  - #937: Added hotel wise restriction on the customer messages belonging to an order.
+  - #1028: Added hotel wise restrictions on the order notifications for the employee.
+  - #1138: Added parameters in PatmentModule::validateOrder() function to prevent the emails on the order validation process.
+  - #883: Added 'Save and stay' button on missing pages at back office.
+  - Added new hooks in #938, #880, #928, #935, #1121, #1132, #1197, #812, #887, #1197, #1271
 
 ## Back Office:
 - Improvements:
