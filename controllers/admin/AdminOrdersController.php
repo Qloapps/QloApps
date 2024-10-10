@@ -991,9 +991,46 @@ class AdminOrdersControllerCore extends AdminController
             $objOrderReturn = new OrderReturn();
             $refundReqBookings = $objOrderReturn->getOrderRefundRequestedBookings($objOrder->id, 0, 1, 0, 1);
             if ($bookingOrderInfo = $objBookingDetail->getBookingDataByOrderId($objOrder->id)) {
+                $objBookingDemand = new HotelBookingDemands();
+                $objRoomTypeServiceProductOrderDetail = new RoomTypeServiceProductOrderDetail();
                 foreach($bookingOrderInfo as $key => $booking) {
                     if ((in_array($booking['id'], $refundReqBookings)) || $booking['is_refunded']) {
                         unset($bookingOrderInfo[$key]);
+                    } else {
+                        $bookingOrderInfo[$key]['total_price_tax_incl'] += $objBookingDemand->getRoomTypeBookingExtraDemands(
+                            $objOrder->id,
+                            $booking['id_product'],
+                            $booking['id_room'],
+                            $booking['date_from'],
+                            $booking['date_to'],
+                            0,
+                            1,
+                            1,
+                            $booking['id']
+                        );
+                        $bookingOrderInfo[$key]['total_price_tax_excl'] += $objBookingDemand->getRoomTypeBookingExtraDemands(
+                            $objOrder->id,
+                            $booking['id_product'],
+                            $booking['id_room'],
+                            $booking['date_from'],
+                            $booking['date_to'],
+                            0,
+                            1,
+                            0,
+                            $booking['id']
+                        );
+                        $bookingOrderInfo[$key]['total_price_tax_incl'] += $objRoomTypeServiceProductOrderDetail->getSelectedServicesForRoom(
+                            $booking['id'],
+                            1,
+                            1,
+                            null
+                        );
+                        $bookingOrderInfo[$key]['total_price_tax_excl'] += $objRoomTypeServiceProductOrderDetail->getSelectedServicesForRoom(
+                            $booking['id'],
+                            1,
+                            0,
+                            null
+                        );
                     }
                 }
             }
