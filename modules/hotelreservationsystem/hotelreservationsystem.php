@@ -30,7 +30,7 @@ class HotelReservationSystem extends Module
     {
         $this->name = 'hotelreservationsystem';
         $this->tab = 'administration';
-        $this->version = '1.5.1';
+        $this->version = '1.6.0';
         $this->author = 'Webkul';
         $this->need_instance = 0;
         $this->bootstrap = true;
