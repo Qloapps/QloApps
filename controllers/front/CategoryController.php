@@ -166,21 +166,23 @@ class CategoryControllerCore extends FrontController
                 }
             }
 
-            $id_cart = $this->context->cart->id;
-            $id_guest = $this->context->cookie->id_guest;
+            $booking_data = array();
+            if (Tools::getValue('action') != 'FilterResults') {
+                $id_cart = $this->context->cart->id;
+                $id_guest = $this->context->cookie->id_guest;
 
-            $objBookingDetail = new HotelBookingDetail();
-            $bookingParams = array(
-                'date_from' => $date_from,
-                'date_to' => $date_to,
-                'occupancy' => $occupancy,
-                'hotel_id' => $id_hotel,
-                'get_total_rooms' => 0,
-                'id_cart' => $id_cart,
-                'id_guest' => $id_guest,
-            );
-
-            $booking_data = $objBookingDetail->dataForFrontSearch($bookingParams);
+                $objBookingDetail = new HotelBookingDetail();
+                $bookingParams = array(
+                    'date_from' => $date_from,
+                    'date_to' => $date_to,
+                    'occupancy' => $occupancy,
+                    'hotel_id' => $id_hotel,
+                    'get_total_rooms' => 0,
+                    'id_cart' => $id_cart,
+                    'id_guest' => $id_guest,
+                );
+                $booking_data = $objBookingDetail->dataForFrontSearch($bookingParams);
+            }
 
             $num_days = $objBookingDetail->getNumberOfDays($date_from, $date_to);
 
