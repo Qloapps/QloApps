@@ -1504,9 +1504,11 @@ class ProductCore extends ObjectModel
             $idLang = Context::getContext()->language->id;
         }
 
+        $id_shop = Context::getContext()->shop->id;
+
         $sql = 'SELECT p.*, pl.*, i.`id_image`, il.`legend` AS legend
         FROM `'._DB_PREFIX_.'product` p
-        LEFT JOIN `'._DB_PREFIX_.'product_lang` pl ON (pl.`id_product` = p.`id_product` AND pl.`id_lang` = '.(int) $idLang.')
+        LEFT JOIN `'._DB_PREFIX_.'product_lang` pl ON (pl.`id_product` = p.`id_product` AND pl.`id_lang` = '.(int) $idLang.' AND pl.id_shop = '.(int) $id_shop.')
         LEFT JOIN `'._DB_PREFIX_.'image` i ON (i.`id_product` = p.`id_product` AND i.`cover` = 1)
         LEFT JOIN `'._DB_PREFIX_.'image_lang` il ON (il.`id_image` = i.`id_image` AND il.`id_lang` = '.(int) $idLang.')
         WHERE p.`booking_product` = 0'.
