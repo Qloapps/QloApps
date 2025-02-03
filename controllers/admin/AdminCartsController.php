@@ -1121,7 +1121,10 @@ class AdminCartsControllerCore extends AdminController
                         null
                     );
                 }
+                $objCart = new Cart($idCart);
+                $cartCurrency = new Currency($objCart->id_currency);
                 $this->context->smarty->assign(array(
+                    'cartCurrency' => $cartCurrency,
                     'roomTypeServiceProducts' => $roomTypeServiceProducts,
                     'selectedRoomServiceProduct' => $selectedRoomServiceProduct
                 ));

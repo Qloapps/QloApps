@@ -1613,6 +1613,10 @@
 		$(document).on('click', '.change_room_type_service_product', function() {
 			updateServiceProducts(this);
 		});
+        // when the price of a service product is changed and focus is out
+        $(document).on('focusout', '.service_cart_price_input', function() {
+			updateServiceProducts(this);
+		});
 
 		$(document).on('focusout', '#rooms_type_extra_demands .qty', function(e) {
 			var qty_wntd = $(this).val();
@@ -1684,10 +1688,21 @@
 
 		function updateServiceProducts(element)
 		{
-			var operator = $(element).is(':checked') ? 'up' : 'down';
-			var id_product = $(element).val();
-			var id_cart_booking = $(element).data('id_cart_booking');
 			var qty = $(element).closest('.room_demand_block').find('input.qty').val();
+            var dataElement = $(element).closest('.room_demand_block').find('.change_room_type_service_product');
+			var operator = $(dataElement).is(':checked') ? 'up' : 'down';
+			var id_product = $(dataElement).val();
+			var id_cart_booking = $(dataElement).data('id_cart_booking');
+			var service_price = $("#service_cart_price_"+id_cart_booking+"_"+id_product).val();
+
+            if (operator == 'up') {
+                $("#service_cart_price_"+id_cart_booking+"_"+id_product+"_input").show();
+                $("#service_cart_price_"+id_cart_booking+"_"+id_product+"_txt").hide();
+            } else {
+                $("#service_cart_price_"+id_cart_booking+"_"+id_product+"_input").hide();
+                $("#service_cart_price_"+id_cart_booking+"_"+id_product+"_txt").show();
+            }
+
 			if (typeof(qty) == 'undefined') {
 				qty = 1;
 			}
@@ -1704,6 +1719,7 @@
 					id_product: id_product,
 					id_cart_booking: id_cart_booking,
 					qty: qty,
+					price: service_price,
 					action: 'updateServiceProduct',
 					ajax: true
 				},

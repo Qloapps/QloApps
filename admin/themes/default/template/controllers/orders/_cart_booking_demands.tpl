@@ -153,7 +153,13 @@
 														</div>
 														<div class="col-xs-4">
 															{if ($product.show_price && !isset($restricted_country_mode)) || isset($groups)}
-																<span class="pull-right">{convertPrice price=$product.price_tax_exc}</span>
+                                                                <div id="service_cart_price_{$selectedRoomServiceProduct['id']}_{$product['id_product']}_input" class="input-group" {if !isset($selectedRoomServiceProduct['selected_service']) || !$selectedRoomServiceProduct['selected_service'] || !($product['id_product']|array_key_exists:$selectedRoomServiceProduct['selected_service'])}style="display:none;"{/if}>
+                                                                    <span class="input-group-addon">
+                                                                        {$cartCurrency->sign}
+                                                                    </span>
+                                                                    <input class="service_cart_price_input" id="service_cart_price_{$selectedRoomServiceProduct['id']}_{$product['id_product']}" type="text" value="{$product.price_tax_exc}"/>
+                                                                </div>
+																<span id="service_cart_price_{$selectedRoomServiceProduct['id']}_{$product['id_product']}_txt" class="pull-right" {if isset($selectedRoomServiceProduct['selected_service']) && $selectedRoomServiceProduct['selected_service'] && ($product['id_product']|array_key_exists:$selectedRoomServiceProduct['selected_service'])}style="display:none;"{/if}>{convertPrice price=$product.price_tax_exc}</span>
 															{/if}
 														</div>
 													</div>
