@@ -7149,7 +7149,7 @@ class AdminOrdersControllerCore extends AdminController
                             1,
                             0,
                             $objCart->id_customer,
-                            $objCart->id_cart
+                            $objCart->id
                         )) {
                             $objSpecificPrice = new SpecificPrice($specificPriceInfo['id_specific_price']);
                         } else {
@@ -7176,7 +7176,7 @@ class AdminOrdersControllerCore extends AdminController
                                 'hasError' => false
                             )));
                         } else {
-                            $this->errors[] = Tools::displayError('Sone error has been occurred. Please try reloading the page.');
+                            $this->errors[] = Tools::displayError('Some error has been occurred. Please try reloading the page.');
                         }
                     } else {
                         // delete specific price if price is same as original price

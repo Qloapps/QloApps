@@ -1614,7 +1614,7 @@
 			updateServiceProducts(this);
 		});
         // when the price of a service product is changed and focus is out
-        $(document).on('focusout', '.service_cart_price_input', function() {
+        $(document).on('change', '.service_cart_price_input', function() {
 			updateServiceProducts(this);
 		});
 
