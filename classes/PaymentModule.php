@@ -266,6 +266,7 @@ abstract class PaymentModuleCore extends Module
             }
 
             $orderTotals = array();
+            $objFreeOrder= new FreeOrder();
             Hook::exec('actionPackageListGenerateOrder', array('package_list' => &$package_list));
             foreach ($package_list as $id_address => $packageByAddress) {
                 foreach ($packageByAddress as $id_package => $package) {
@@ -297,7 +298,6 @@ abstract class PaymentModuleCore extends Module
                     $order->id_shop_group = (int)$this->context->shop->id_shop_group;
 
                     $order->secure_key = ($secure_key ? pSQL($secure_key) : pSQL($this->context->customer->secure_key));
-                    $order->payment = $payment_method;
                     $order->payment_type = $this->payment_type;
                     if (isset($this->name)) {
                         $order->module = $this->name;
@@ -330,6 +330,7 @@ abstract class PaymentModuleCore extends Module
 
                     $order->total_paid_tax_excl = (float)Tools::ps_round((float)$this->context->cart->getOrderTotal(false, Cart::BOTH, $order->product_list, $id_carrier), _PS_PRICE_COMPUTE_PRECISION_);
                     $order->total_paid_tax_incl = (float)Tools::ps_round((float)$this->context->cart->getOrderTotal(true, Cart::BOTH, $order->product_list, $id_carrier), _PS_PRICE_COMPUTE_PRECISION_);
+                    $order->payment =$order->total_paid_tax_incl==0?$objFreeOrder->displayName:$payment_method;
 
                     $order->total_paid = $order->total_paid_tax_incl;
                     $order->round_mode = Configuration::get('PS_PRICE_ROUND_MODE');
@@ -998,7 +999,8 @@ abstract class PaymentModuleCore extends Module
                     if (self::DEBUG_MODE) {
                         PrestaShopLogger::addLog('PaymentModule::validateOrder - Order Status is about to be added', 1, null, 'Cart', (int)$id_cart, true);
                     }
-
+                    //FreeOrder status
+                    $id_order_state =$order->total_paid_tax_incl==0&&$order->total_paid_tax_incl == $order->total_paid_real?Configuration::get('PS_OS_PAYMENT_ACCEPTED'):$id_order_state;
                     // Set the order status
                     $new_history = new OrderHistory();
                     $new_history->id_order = (int)$order->id;
