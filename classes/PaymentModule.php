@@ -266,6 +266,7 @@ abstract class PaymentModuleCore extends Module
             }
 
             $orderTotals = array();
+            $objFreeOrder= new FreeOrder();
             Hook::exec('actionPackageListGenerateOrder', array('package_list' => &$package_list));
             foreach ($package_list as $id_address => $packageByAddress) {
                 foreach ($packageByAddress as $id_package => $package) {
@@ -297,7 +298,6 @@ abstract class PaymentModuleCore extends Module
                     $order->id_shop_group = (int)$this->context->shop->id_shop_group;
 
                     $order->secure_key = ($secure_key ? pSQL($secure_key) : pSQL($this->context->customer->secure_key));
-                    $order->payment = $payment_method;
                     $order->payment_type = $this->payment_type;
                     if (isset($this->name)) {
                         $order->module = $this->name;
@@ -330,6 +330,7 @@ abstract class PaymentModuleCore extends Module
 
                     $order->total_paid_tax_excl = (float)Tools::ps_round((float)$this->context->cart->getOrderTotal(false, Cart::BOTH, $order->product_list, $id_carrier), _PS_PRICE_COMPUTE_PRECISION_);
                     $order->total_paid_tax_incl = (float)Tools::ps_round((float)$this->context->cart->getOrderTotal(true, Cart::BOTH, $order->product_list, $id_carrier), _PS_PRICE_COMPUTE_PRECISION_);
+                    $order->payment = ($order->total_paid_tax_incl == 0) ? $objFreeOrder->displayName : $payment_method;
 
                     $order->total_paid = $order->total_paid_tax_incl;
                     $order->round_mode = Configuration::get('PS_PRICE_ROUND_MODE');
@@ -495,11 +496,18 @@ abstract class PaymentModuleCore extends Module
             // Make sure CartRule caches are empty
             CartRule::cleanCache();
             $objRoomType = new HotelRoomType();
+            $prev_id_order_state = $id_order_state;
             $cart_rules = $this->context->cart->getCartRules();
             foreach ($order_detail_list as $key => $order_detail) {
                 /** @var OrderDetail $order_detail */
 
                 $order = $order_list[$key];
+                if($order->total_paid_tax_incl == 0 && $order->total_paid_tax_incl == $order->total_paid_real){
+                    $id_order_state = Configuration::get('PS_OS_PAYMENT_ACCEPTED');
+                }else{
+                    $id_order_state = $prev_id_order_state;
+                }
+
                 if (!$order_creation_failed && isset($order->id)) {
                     // first set if_hotel as 0 and get the hotel id from room type info -> below
                     $idHotel = 0;
