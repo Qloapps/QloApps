@@ -1000,7 +1000,12 @@ abstract class PaymentModuleCore extends Module
                         PrestaShopLogger::addLog('PaymentModule::validateOrder - Order Status is about to be added', 1, null, 'Cart', (int)$id_cart, true);
                     }
                     //FreeOrder status
-                    $new_id_order_state =$order->total_paid_tax_incl==0&&$order->total_paid_tax_incl == $order->total_paid_real?Configuration::get('PS_OS_PAYMENT_ACCEPTED'):$id_order_state;
+                    if($order->total_paid_tax_incl == 0 && $order->total_paid_tax_incl == $order->total_paid_real){
+                        $new_id_order_state = Configuration::get('PS_OS_PAYMENT_ACCEPTED');
+                        $order_status->logable = Configuration::get('PS_OS_PAYMENT_ACCEPTED');
+                    }else{
+                        $new_id_order_state = $id_order_state;
+                    }
                     // Set the order status
                     $new_history = new OrderHistory();
                     $new_history->id_order = (int)$order->id;
