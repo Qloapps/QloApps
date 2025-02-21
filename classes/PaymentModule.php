@@ -330,7 +330,7 @@ abstract class PaymentModuleCore extends Module
 
                     $order->total_paid_tax_excl = (float)Tools::ps_round((float)$this->context->cart->getOrderTotal(false, Cart::BOTH, $order->product_list, $id_carrier), _PS_PRICE_COMPUTE_PRECISION_);
                     $order->total_paid_tax_incl = (float)Tools::ps_round((float)$this->context->cart->getOrderTotal(true, Cart::BOTH, $order->product_list, $id_carrier), _PS_PRICE_COMPUTE_PRECISION_);
-                    $order->payment =$order->total_paid_tax_incl==0?$objFreeOrder->displayName:$payment_method;
+                    $order->payment = ($order->total_paid_tax_incl == 0) ? $objFreeOrder->displayName : $payment_method;
 
                     $order->total_paid = $order->total_paid_tax_incl;
                     $order->round_mode = Configuration::get('PS_PRICE_ROUND_MODE');
@@ -1000,11 +1000,11 @@ abstract class PaymentModuleCore extends Module
                         PrestaShopLogger::addLog('PaymentModule::validateOrder - Order Status is about to be added', 1, null, 'Cart', (int)$id_cart, true);
                     }
                     //FreeOrder status
-                    $id_order_state =$order->total_paid_tax_incl==0&&$order->total_paid_tax_incl == $order->total_paid_real?Configuration::get('PS_OS_PAYMENT_ACCEPTED'):$id_order_state;
+                    $new_id_order_state =$order->total_paid_tax_incl==0&&$order->total_paid_tax_incl == $order->total_paid_real?Configuration::get('PS_OS_PAYMENT_ACCEPTED'):$id_order_state;
                     // Set the order status
                     $new_history = new OrderHistory();
                     $new_history->id_order = (int)$order->id;
-                    $new_history->changeIdOrderState((int)$id_order_state, $order, true);
+                    $new_history->changeIdOrderState((int)$new_id_order_state, $order, true);
 
                     // Emails regarding awaiting payment should not be sent to customers if the payment amount in the order is 0.
                     $sendOrderStatusMail = (($id_order_state == Configuration::get('PS_OS_AWAITING_REMOTE_PAYMENT') || $id_order_state == Configuration::get('PS_OS_AWAITING_PAYMENT')) && $order->total_paid > 0) ? true : false;
