@@ -497,10 +497,18 @@ abstract class PaymentModuleCore extends Module
             CartRule::cleanCache();
             $objRoomType = new HotelRoomType();
             $cart_rules = $this->context->cart->getCartRules();
+            $prev_order_state = $id_order_state;
             foreach ($order_detail_list as $key => $order_detail) {
                 /** @var OrderDetail $order_detail */
 
                 $order = $order_list[$key];
+                //FreeOrder status
+                if($order->total_paid_tax_incl == 0 && $order->total_paid_tax_incl == $order->total_paid_real){
+                    $id_order_state = Configuration::get('PS_OS_PAYMENT_ACCEPTED');
+                }else{
+                    $id_order_state = $prev_order_state;
+                }
+
                 if (!$order_creation_failed && isset($order->id)) {
                     // first set if_hotel as 0 and get the hotel id from room type info -> below
                     $idHotel = 0;
@@ -999,17 +1007,10 @@ abstract class PaymentModuleCore extends Module
                     if (self::DEBUG_MODE) {
                         PrestaShopLogger::addLog('PaymentModule::validateOrder - Order Status is about to be added', 1, null, 'Cart', (int)$id_cart, true);
                     }
-                    //FreeOrder status
-                    if($order->total_paid_tax_incl == 0 && $order->total_paid_tax_incl == $order->total_paid_real){
-                        $new_id_order_state = Configuration::get('PS_OS_PAYMENT_ACCEPTED');
-                        $order_status->logable = Configuration::get('PS_OS_PAYMENT_ACCEPTED');
-                    }else{
-                        $new_id_order_state = $id_order_state;
-                    }
                     // Set the order status
                     $new_history = new OrderHistory();
                     $new_history->id_order = (int)$order->id;
-                    $new_history->changeIdOrderState((int)$new_id_order_state, $order, true);
+                    $new_history->changeIdOrderState((int)$id_order_state, $order, true);
 
                     // Emails regarding awaiting payment should not be sent to customers if the payment amount in the order is 0.
                     $sendOrderStatusMail = (($id_order_state == Configuration::get('PS_OS_AWAITING_REMOTE_PAYMENT') || $id_order_state == Configuration::get('PS_OS_AWAITING_PAYMENT')) && $order->total_paid > 0) ? true : false;
