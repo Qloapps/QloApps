@@ -101,8 +101,10 @@
 								</td>
 								<td class="col-sm-1 center">
 									{if isset($room_info['id'])}
-                                        <input type="hidden" class="booked-dates" name="{$var_name_room_info|cat:'[booked_dates]'}" value="{$room_info['booked_dates']|escape:'html':'UTF-8'}">
-                                        <a href="#" class="view_htl_room btn btn-default" data-toggle="modal" data-target="#room-dates-modal" data-id-room="{$room_info['id']}"><i class="icon-info"></i></a>
+                                        {if $room_info['booked_dates']}
+                                            <input type="hidden" class="booked-dates" name="{$var_name_room_info|cat:'[booked_dates]'}" value='{$room_info['booked_dates']|json_encode|escape:'html':'UTF-8'}'>
+                                            <a href="#" class="view_htl_room btn btn-default" data-toggle="modal" data-target="#room-dates-modal" data-id-room="{$room_info['id']}"><i class="icon-info"></i></a>
+                                        {/if}
 										<a href="#" class="rm_htl_room btn btn-default" data-id-htl-info="{$room_info['id']}"><i class="icon-trash"></i></a>
 										<input type="hidden" name="{$var_name_room_info|cat:'[id]'}" value="{$room_info['id']}">
 									{else}
@@ -564,15 +566,19 @@
             if (confirm(confirmText)) {
                 var calendarEventId = parseInt($(this).parent().find('.fc-event-title').attr('data-id_calendar_event'));
                 var calendarEvent = DisableDatesCalendar.getEventById(calendarEventId);
-                if (DisableDatesObj.deleteDisableDate(calendarEvent.extendedProps.id_disable_date)) {
-                    $('#disable_dates_full_calendar .id_calendar_event_'+calendarEventId).find('.fc-event-main-frame').tooltip('destroy');
-                    calendarEvent.remove();
-                    var formEventId = parseInt($('#disable_dates_form .id_calendar_event').val());
-                    if (!isNaN(formEventId) && formEventId == eventId) {
-                        DisableDatesForm.resetForm();
-                        DisableDatesForm.hideForm();
-                    }
-                }
+                $('#disable_dates_full_calendar .id_calendar_event_'+calendarEventId).find('.fc-event-main-frame').tooltip('hide');
+                DisableDatesObj.deleteDisableDate(calendarEvent.extendedProps.id_disable_date)
+                    .then(function(response) {
+                        if (response) {
+                            $('#disable_dates_full_calendar .id_calendar_event_'+calendarEventId).find('.fc-event-main-frame').tooltip('destroy');
+                            calendarEvent.remove();
+                            var formEventId = parseInt($('#disable_dates_form .id_calendar_event').val());
+                            if (!isNaN(formEventId) && formEventId == eventId) {
+                                DisableDatesForm.resetForm();
+                                DisableDatesForm.hideForm();
+                            }
+                        }
+                    });
             }
         });
 
@@ -1188,20 +1194,24 @@
             },
             // This is called to delete the disable date object using the idDisableDate.
             deleteDisableDate: function(idDisableDate) {
-                $.ajax({
-                    url: prod_link,
-                    type: 'POST',
-                    data: {
-                        ajax: true,
-                        action: 'deleteDisableDate',
-                        id_disable_date : idDisableDate,
-                    },
-                    dataType: 'JSON',
-                    success: function(response) {
-                        DisableDatesForm.showMessages(response.msg);
-
-                        return response.status;
-                    }
+                return new Promise(function(resolve, reject) {
+                    $.ajax({
+                        url: prod_link,
+                        type: 'POST',
+                        data: {
+                            ajax: true,
+                            action: 'deleteDisableDate',
+                            id_disable_date : idDisableDate,
+                        },
+                        dataType: 'JSON',
+                        success: function(response) {
+                            DisableDatesForm.showMessages(response.msg);
+                            resolve(response.status)
+                        },
+                        error: function(xhr, status, error) {
+                            reject(error);
+                        }
+                    })
                 });
             },
             // This is called to get the all disable dates from the calander.

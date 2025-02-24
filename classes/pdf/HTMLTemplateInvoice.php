@@ -473,7 +473,7 @@ class HTMLTemplateInvoiceCore extends HTMLTemplate
                                 $num_days = $obj_htl_bk_dtl->getNumberOfDays($data_v['date_from'], $data_v['date_to']);
 
                                 $cart_htl_data[$type_key]['date_diff'][$date_join]['num_rm'] = 1;
-                                $fullDate = ($this->context->controller->show_full_date && (date('Y-m-d', strtotime($data_v['date_from'])) == date('Y-m-d', strtotime($data_v['date_to']))) ? true : false);
+                                $fullDate = (isset($this->context->controller->show_full_date) && $this->context->controller->show_full_date && (date('Y-m-d', strtotime($data_v['date_from'])) == date('Y-m-d', strtotime($data_v['date_to'])))) ? true : false;
                                 $cart_htl_data[$type_key]['date_diff'][$date_join]['data_form'] = Tools::displayDate($data_v['date_from'], null, $fullDate);
                                 $cart_htl_data[$type_key]['date_diff'][$date_join]['data_to'] = Tools::displayDate($data_v['date_to'], null, $fullDate);
                                 $cart_htl_data[$type_key]['date_diff'][$date_join]['num_days'] = $num_days;

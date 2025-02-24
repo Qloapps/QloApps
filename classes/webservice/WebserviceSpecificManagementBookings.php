@@ -3499,7 +3499,8 @@ class WebserviceSpecificManagementBookingsCore Extends ObjectModel implements We
                         $orderData['date_to'],
                         $orderData['id_room'],
                         0,
-                        $useTax
+                        $useTax,
+                        null
                     )) {
                         $roomInfo['services'] = array();
                         foreach ($additionalServices as $additionalService) {

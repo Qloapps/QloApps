@@ -976,9 +976,6 @@ abstract class PaymentModuleCore extends Module
                         }
                     }
 
-                    // delete cart feature prices after booking creation success
-                    HotelRoomTypeFeaturePricing::deleteByIdCart($id_cart);
-
                     if (self::DEBUG_MODE) {
                         PrestaShopLogger::addLog('PaymentModule::validateOrder - Hook validateOrder is about to be called', 1, null, 'Cart', (int)$id_cart, true);
                     }
@@ -1006,7 +1003,11 @@ abstract class PaymentModuleCore extends Module
                     $new_history = new OrderHistory();
                     $new_history->id_order = (int)$order->id;
                     $new_history->changeIdOrderState((int)$id_order_state, $order, true);
-                    if ($send_mails) {
+
+                    // Emails regarding awaiting payment should not be sent to customers if the payment amount in the order is 0.
+                    $sendOrderStatusMail = (($id_order_state == Configuration::get('PS_OS_AWAITING_REMOTE_PAYMENT') || $id_order_state == Configuration::get('PS_OS_AWAITING_PAYMENT')) && $order->total_paid > 0) ? true : false;
+
+                    if ($send_mails && $sendOrderStatusMail) {
                         $new_history->addWithemail(true, $extra_vars);
                     } else {
                         $new_history->add(true);
@@ -1381,6 +1382,9 @@ abstract class PaymentModuleCore extends Module
                     die($error);
                 }
             } // End foreach $order_detail_list
+
+            // delete cart feature prices after booking creation success
+            HotelRoomTypeFeaturePricing::deleteByIdCart($id_cart);
 
             if (count($cart_rules)) {
                 foreach ($cart_rules as $idCartRule => $cartRule) {

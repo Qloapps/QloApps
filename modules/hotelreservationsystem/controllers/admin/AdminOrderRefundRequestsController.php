@@ -34,11 +34,12 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
 
         $this->_orderWay = 'DESC';
         if ($idOrder = Tools::getValue('id_order')) {
-            $this->_select .= ', orsl.`name` as `status_name`, ors.`color`';
+            $this->_select .= ', orsl.`name` as `status_name`, ors.`color`, COUNT(ordrd.`id_order_return_detail`) as num_rooms';
             $this->_join .= 'LEFT JOIN '._DB_PREFIX_.'order_return_state ors ON (ors.`id_order_return_state` = a.`state`)';
             $this->_join .= 'LEFT JOIN '._DB_PREFIX_.'order_return_state_lang orsl ON (orsl.`id_order_return_state` = a.`state` AND orsl.`id_lang` = '.(int)$this->context->language->id.')';
+            $this->_join .= ' LEFT JOIN `'._DB_PREFIX_.'order_return_detail` ordrd ON (a.`id_order_return` = ordrd.`id_order_return`)';
             $this->_where = ' AND a.`id_order`='. (int)$idOrder;
-            $this->_group = '';
+            $this->_group = 'GROUP BY a.`id_order_return`';
         } else {
             $this->_select .= ', ord.`total_paid_tax_incl` AS total_order, os.`id_order_state`, os.`color`, COUNT(IF(a.`state` = '.(int) Configuration::get('PS_ORS_PENDING').', 1, NULL)) AS total_pending_requests, SUM(a.`refunded_amount`) AS refunded_amount';
             $this->_join .= 'LEFT JOIN '._DB_PREFIX_.'order_state os ON (os.`id_order_state` = ord.`current_state`)';
@@ -78,6 +79,11 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
                 'align' => 'center',
                 'havingFilter' => true,
                 'callback' => 'setCustomerLink',
+            );
+            $this->fields_list['num_rooms'] = array(
+                'title' => $this->l('Total Rooms'),
+                'align' => 'center',
+                'havingFilter' => true,
             );
             $this->fields_list['refunded_amount'] = array(
                 'title' => $this->l('Refunded Amount'),

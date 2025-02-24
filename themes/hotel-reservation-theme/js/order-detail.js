@@ -134,12 +134,11 @@ function initRefundDeniedTooltip() {
 }
 
 function initMap() {
-    const hotelLocation = {
-        lat: Number(hotel_location.latitude),
-        lng: Number(hotel_location.longitude),
-    };
-
     $('.booking-hotel-map-container').each(function (i, element) {
+        const hotelLocation = {
+            lat: Number($(this).attr('latitude')),
+            lng: Number($(this).attr('longitude')),
+        };
         const map = new google.maps.Map(element, {
             zoom: 10,
             center: hotelLocation,
@@ -150,16 +149,16 @@ function initMap() {
         const marker = new google.maps.Marker({
             position: hotelLocation,
             map: map,
-            title: hotel_name,
+            title: $(this).attr('title'),
             icon: PS_STORES_ICON
         });
 
         marker.addListener('click', function() {
             let query = '';
-            if (hotel_location.map_input_text != '') {
-                query = hotel_location.map_input_text;
+            if ($(this).attr('query') != '') {
+                query = $(this).attr('query');
             } else {
-                query = hotel_location.latitude + ',' + hotel_location.longitude;
+                query = $(this).attr('latitude') + ',' + $(this).attr('longitude');
             }
 
             window.open('https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(query), '_blank');
@@ -377,7 +376,8 @@ $(document).ready(function () {
 
     if (typeof google === 'object'
         && typeof google.maps === 'object'
-        && typeof hotel_location === 'object'
+        && typeof initiateMap !== 'undefined'
+        && initiateMap === 1
     ) {
         initMap();
     }

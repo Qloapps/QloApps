@@ -87,7 +87,7 @@ const RoomReallocationModal = {
 
                     // For Rooms Swapping
                     var json_arr_rm_swp = roomObj.data('avail_rm_swap');
-                    if (roomObj.data('avail_rm_swap') != 'false' && json_arr_rm_swp.length != 0) {
+                    if (json_arr_rm_swp != false && json_arr_rm_swp.length != 0) {
                         html = '<select class="form-control" name="swap_avail_rooms" id="swap_avail_rooms">';
                             $.each(json_arr_rm_swp, function(key,val) {
                                 html += '<option class="swp_rm_opts" value="'+val.id_hotel_booking+'" >'+val.room_num+'</option>';
@@ -101,7 +101,7 @@ const RoomReallocationModal = {
 
                     // For Rooms Reallocation
                     var json_arr_realloc_room_types = roomObj.data('avail_realloc_room_types');
-                    if (roomObj.data('avail_realloc_room_types') != 'false' && json_arr_realloc_room_types.length != 0) {
+                    if (json_arr_realloc_room_types != false && json_arr_realloc_room_types.length != 0) {
                         var idCurrentRoomType = roomObj.data('id_room_type');
                         var roomsTypesHtml = '<select data-id_htl_booking="' + roomObj.data('id_htl_booking') + '" class="form-control" name="realloc_avail_room_type" id="realloc_avail_room_type">';
                             $.each(json_arr_realloc_room_types, function(key, room_type) {

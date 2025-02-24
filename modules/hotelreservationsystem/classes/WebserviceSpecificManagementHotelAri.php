@@ -270,11 +270,18 @@ class WebserviceSpecificManagementHotelAri extends ObjectModel implements Webser
                                         if (count($roomType['data']['unavailable'])) {
                                             foreach ($roomType['data']['unavailable'] as $unavailableRooms) {
                                                 foreach ($unavailableRooms['detail'] as $unavailableDetail) {
-                                                    for ($currentDate = date('Y-m-d', strtotime($unavailableDetail['date_from']));
-                                                        $currentDate < date('Y-m-d', strtotime($unavailableDetail['date_to']));
+                                                    if ($unavailableDetail['date_from'] && $unavailableDetail['date_to']) {
+                                                        $startDate = date('Y-m-d', strtotime($unavailableDetail['date_from']));
+                                                        $endDate = date('Y-m-d', strtotime($unavailableDetail['date_to']));
+                                                    } else {
+                                                        $startDate = $bookingParams['date_from'];
+                                                        $endDate = $bookingParams['date_to'];
+                                                    }
+                                                    for ($currentDate = $startDate;
+                                                        $currentDate < $endDate;
                                                         $currentDate = date('Y-m-d', strtotime('+1 day', strtotime($currentDate)))
                                                     ) {
-                                                        $unavailableDates[$currentDate][$roomType['id_product']][$bookedRoom['id_room']] = $bookedRoom['id_room'];
+                                                        $unavailableDates[$currentDate][$roomType['id_product']][$unavailableRooms['id_room']] = $unavailableRooms['id_room'];
                                                     }
                                                 }
                                             }
@@ -328,12 +335,12 @@ class WebserviceSpecificManagementHotelAri extends ObjectModel implements Webser
                                                 unset($roomDetail['available']);
                                             }
                                             if ($getUnavai) {
-                                                $ariDateInfo['total_unavailable_rooms'] += count($roomDetail['available']);
+                                                $ariDateInfo['total_unavailable_rooms'] += count($roomDetail['unavailable']);
                                             } else {
                                                 unset($roomDetail['unavailable']);
                                             }
                                             if ($getBooked) {
-                                                $ariDateInfo['total_booked_rooms'] += count($roomDetail['available']);
+                                                $ariDateInfo['total_booked_rooms'] += count($roomDetail['booked']);
                                             } else {
                                                 unset($roomDetail['booked']);
                                             }

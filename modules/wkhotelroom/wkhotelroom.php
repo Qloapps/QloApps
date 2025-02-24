@@ -69,7 +69,7 @@ class WkHotelRoom extends Module
                     $idProduct,
                     $dateFrom,
                     $dateTo,
-                    $useTax,
+                    1,
                     0,
                     0,
                     0,

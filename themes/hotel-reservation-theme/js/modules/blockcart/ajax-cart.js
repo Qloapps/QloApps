@@ -939,7 +939,7 @@ var ajaxCart = {
                                 content += '<td class="num_rooms_in_date">' + date_diff_v.num_rm + '</td>';
                                 content += '<td>' + formatCurrency(parseFloat(date_diff_v.amount) + parseFloat(date_diff_v.demand_price), currency_format, currency_sign, currency_blank) + '</td>';
                                 content += '<td>';
-                                content += '<a class="remove_rooms_from_cart_link" href="#" rm_price=' + date_diff_v.amount + ' id_product=' + productId + ' date_from=' + date_diff_v.data_form + ' date_to=' + date_diff_v.data_to + ' num_rooms=' + date_diff_v.num_rm + ' title="' + remove_rm_title + '"></a>';
+                                content += '<a class="remove_rooms_from_cart_link" href="#" rm_price="' + date_diff_v.amount + '" id_product="' + productId + '" date_from="' + date_diff_v.data_form + '" date_to="' + date_diff_v.data_to + '" num_rooms="' + date_diff_v.num_rm + '" title="' + remove_rm_title + '"></a>';
                                 content += '</td>';
                                 content += '</tr>';
                             });

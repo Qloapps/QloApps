@@ -126,7 +126,7 @@ class OrderOpcControllerCore extends ParentOrderController
                             } elseif (Tools::strlen($phone) > $rules['size']['phone']) {
                                 $this->errors[] = sprintf(Tools::displayError('Mobile phone number is too long. (%s chars max).'), $rules['size']['phone']);
                             } else {
-                                $this->context->customer = $phone;
+                                $this->context->customer->phone = $phone;
                             }
 
                             $_POST['lastname'] = $_POST['customer_lastname'];
@@ -692,7 +692,7 @@ class OrderOpcControllerCore extends ParentOrderController
             'id_country' => (int)$address_delivery->id_country,
             'id_state' => (int)$address_delivery->id_state,
             'id_gender' => (int)$customer->id_gender,
-            'phone' => (int)$customer->phone,
+            'phone' => $customer->phone,
             'sl_year' => $birthday[0],
             'sl_month' => $birthday[1],
             'sl_day' => $birthday[2],

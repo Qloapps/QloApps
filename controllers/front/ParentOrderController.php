@@ -24,16 +24,6 @@
 *  International Registered Trademark & Property of PrestaShop SA
 */
 
-/**
- * Class FreeOrder to use PaymentModule (abstract class, cannot be instancied)
- */
-class FreeOrder extends PaymentModule
-{
-    public $active = 1;
-    public $name = 'free_order';
-    public $displayName = 'free_order';
-}
-
 class ParentOrderControllerCore extends FrontController
 {
     public $ssl = true;
@@ -187,7 +177,7 @@ class ParentOrderControllerCore extends FrontController
                 $orderStatus = Configuration::get('PS_OS_PAYMENT_ACCEPTED');
             }
 
-            $order->validateOrder($this->context->cart->id, $orderStatus, 0, Tools::displayError('Free order', false), null, array(), null, false, $this->context->cart->secure_key);
+            $order->validateOrder($this->context->cart->id, $orderStatus, 0, $order->displayName, null, array(), null, false, $this->context->cart->secure_key);
             return (int)Order::getOrderByCartId($this->context->cart->id);
         }
         return false;

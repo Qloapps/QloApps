@@ -437,6 +437,7 @@ class AdminOrdersControllerCore extends AdminController
                     'langs' => Language::getLanguages(true, Context::getContext()->shop->id),
                     'payment_modules' => $payment_modules,
                     'payment_types' => $paymentTypes,
+                    'PAYMENT_TYPE_PAY_AT_HOTEL' => OrderPayment::PAYMENT_TYPE_PAY_AT_HOTEL,
                     'currency' => new Currency((int)$cart->id_currency),
                     'max_child_in_room' => Configuration::get('WK_GLOBAL_MAX_CHILD_IN_ROOM'),
                     'max_child_age' => Configuration::get('WK_GLOBAL_CHILD_MAX_AGE'),
@@ -1750,18 +1751,15 @@ class AdminOrdersControllerCore extends AdminController
                             // Set transaction ID
                             $extraVars = $paymentTransactionId ? array('transaction_id' => $paymentTransactionId) : array();
                         } else {
+                            $objPaymentModule = new FreeOrder();
                             // Set order state
                             if ($objCart->is_advance_payment) {
                                 if ($advancePaymentAmount <= $orderTotal) {
                                     $idOrderState = Configuration::get('PS_OS_PARTIAL_PAYMENT_ACCEPTED');
                                 } else {
-                                    $objPaymentModule->name = 'free_order';
-                                    $objPaymentModule->displayName = $this->l('Free order');
                                     $idOrderState = Configuration::get('PS_OS_PAYMENT_ACCEPTED');
                                 }
                             } else {
-                                $objPaymentModule->name = 'free_order';
-                                $objPaymentModule->displayName = $this->l('Free order');
                                 $idOrderState = Configuration::get('PS_OS_PAYMENT_ACCEPTED');
                             }
 
@@ -6063,15 +6061,15 @@ class AdminOrdersControllerCore extends AdminController
     protected function getPaymentsTypes()
     {
         return array(
-            OrderPayment::PAYMENT_TYPE_ONLINE => array(
-                'key' => 'PAYMENT_TYPE_ONLINE',
-                'value' => OrderPayment::PAYMENT_TYPE_ONLINE,
-                'name' => $this->l('Online')
-            ),
             OrderPayment::PAYMENT_TYPE_PAY_AT_HOTEL => array(
                 'key' => 'PAYMENT_TYPE_PAY_AT_HOTEL',
                 'value' => OrderPayment::PAYMENT_TYPE_PAY_AT_HOTEL,
                 'name' => $this->l('Pay at hotel')
+            ),
+            OrderPayment::PAYMENT_TYPE_ONLINE => array(
+                'key' => 'PAYMENT_TYPE_ONLINE',
+                'value' => OrderPayment::PAYMENT_TYPE_ONLINE,
+                'name' => $this->l('Online')
             ),
             OrderPayment::PAYMENT_TYPE_REMOTE_PAYMENT => array(
                 'key' => 'PAYMENT_TYPE_REMOTE_PAYMENT',
@@ -6142,7 +6140,10 @@ class AdminOrdersControllerCore extends AdminController
         if ($deleted) {
             HotelRoomTypeFeaturePricing::deleteByIdCart($cart_id, $id_product, $room_id, $dt_frm, $dt_to );
             $obj_product_process = new HotelCartBookingData();
-            $num_cart_rooms = $obj_product_process->getCountRoomsByIdCartIdProduct($cart_id, $id_product, $dt_frm, $dt_to);
+            $num_cart_rooms = 0;
+            if ($rooms = $obj_hotel_cart_detail->getCartCurrentDataByCartId($cart_id)) {
+                $num_cart_rooms = count($rooms);
+            }
 
             $numDays = HotelHelper::getNumberOfDays($dt_frm, $dt_to);
             $changed = $obj_product_process->changeProductDataByRoomId($room_id, $id_product, $numDays, $cart_id);

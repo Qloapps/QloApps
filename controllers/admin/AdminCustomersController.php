@@ -447,7 +447,6 @@ class AdminCustomersControllerCore extends AdminController
                     'type' => 'password',
                     'label' => $this->l('Password'),
                     'name' => 'passwd',
-                    'required' => ($obj->id ? false : true),
                     'col' => '4',
                     'hint' => ($obj->id ? $this->l('Leave this field blank if there\'s no change.') :
                         sprintf($this->l('Password should be at least %s characters long.'), Validate::PASSWORD_LENGTH))
@@ -1088,6 +1087,10 @@ class AdminCustomersControllerCore extends AdminController
         // Check that the new email is not already in use
         $customer_email = trim(strval(Tools::getValue('email')));
         $customer = new Customer();
+        if (trim(Tools::getValue('passwd')) == '') {
+            $_POST['passwd'] = md5(time()._COOKIE_KEY_);
+        }
+
         if (Validate::isEmail($customer_email)) {
             $customer->getByEmail($customer_email);
             if ($customer->id) {
@@ -1096,10 +1099,6 @@ class AdminCustomersControllerCore extends AdminController
                 return $customer;
             } elseif (Customer::customerExists($customer_email, false, false)) {
                 $this->errors[] = Tools::displayError('The email is already associated with a banned account. Please use a different one.');
-                $this->display = 'edit';
-            } elseif (trim(Tools::getValue('passwd')) == '') {
-                $this->validateRules();
-                $this->errors[] = Tools::displayError('Password can not be empty.');
                 $this->display = 'edit';
             } elseif ($customer = parent::processAdd()) {
                 $this->context->smarty->assign('new_customer', $customer);

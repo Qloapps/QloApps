@@ -2737,7 +2737,10 @@ class OrderCore extends ObjectModel
             $objHotelBooking = new HotelBookingDetail();
             $objCurrentOrderState = $this->getCurrentOrderState();
 
-            if ($objCurrentOrderState->id == Configuration::get('PS_OS_REFUND')) {
+            // if new status is partial payment then do not allow if no entry is done for the payment in that order
+            if (($objNewOrderState->id == Configuration::get('PS_OS_PARTIAL_PAYMENT_ACCEPTED')) && $this->total_paid_real <= 0) {
+                $result['errors'][] = Tools::displayError('The order status cannot be changed to Partial payment received until at least one partial payment has been made for this order.');
+            } elseif ($objCurrentOrderState->id == Configuration::get('PS_OS_REFUND')) {
                 $result['errors'][] = Tools::displayError('Order status can not be changed once order status is set to Refunded.');
             } elseif ($objCurrentOrderState->id == Configuration::get('PS_OS_CANCELED')) {
                 $result['errors'][] = Tools::displayError('Order status can not be changed once order status is set to Cancelled.');

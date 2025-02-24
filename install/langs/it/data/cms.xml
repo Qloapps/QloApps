@@ -93,7 +93,7 @@
     </content>
     <link_rewrite>note-legali</link_rewrite>
   </cms>
-  <cms id='Terms_and_conditions_of_use'>
+  <cms id="Terms_and_conditions_of_use">
     <meta_title>Condizioni d'Uso</meta_title>
     <meta_description>Le nostre Condizioni d'Uso</meta_description>
     <meta_keywords>condizioni, termini, utilizzo, vendita</meta_keywords>

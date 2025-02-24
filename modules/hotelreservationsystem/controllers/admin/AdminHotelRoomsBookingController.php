@@ -88,6 +88,7 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
         $this->context->cart->save();
 
         $this->context->cookie->id_cart = (int) $this->context->cart->id;
+        $this->context->cookie->write();
     }
 
     public function postProcess()

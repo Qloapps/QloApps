@@ -27,5 +27,7 @@ class BoOrder extends PaymentModule
     {
         $this->displayName = $this->l('Back office order');
         $this->validateOrderAmount = false;
+        // Default payment type for backoffice order should be PAY_AT_HOTEL
+        $this->payment_type = OrderPayment::PAYMENT_TYPE_PAY_AT_HOTEL;
     }
 }
