@@ -1679,8 +1679,17 @@ class HotelBookingDetail extends ObjectModel
 
         if (!$only_search_data) {
             if (!empty($bookingData)) {
-                $objRoomType = new HotelRoomType();
-
+                $idProducts = array_keys($bookingData['rm_data']);
+                $productsFeaturePrice = HotelRoomTypeFeaturePricing::getRoomTypesTotalPrices(
+                    $idProducts,
+                    $date_from,
+                    $date_to
+                );
+                if (!($numDays = HotelHelper::getNumberOfDays($date_from, $date_to))) {
+                    $numDays = 1;
+                }
+                $useTax = self::useTax();
+                $productsFeaturePriceWithoutReduction = HotelRoomTypeFeaturePricing::getRoomTypesTotalPrices($idProducts, $date_from, $date_to, 0, 1, 0);
                 foreach ($bookingData['rm_data'] as $key => $value) {
                     $product_feature = Product::getFrontFeaturesStatic($this->context->language->id, $value['id_product']);
                     $prod_amen = array();
@@ -1699,14 +1708,23 @@ class HotelBookingDetail extends ObjectModel
                             continue;
                         }
                     }
-                    $productFeaturePrice = HotelRoomTypeFeaturePricing::getRoomTypeFeaturePricesPerDay($value['id_product'], $date_from, $date_to, self::useTax());
+                    if ($useTax) {
+                        $prod_price = $productsFeaturePrice[$value['id_product']]['product_price_tax_incl'];
+                        $productFeaturePrice = $productsFeaturePrice[$value['id_product']]['total_price_tax_incl'] / $numDays;
+                    } else {
+                        $prod_price = $productsFeaturePrice[$value['id_product']]['product_price_tax_excl'];
+                        $productFeaturePrice = $productsFeaturePrice[$value['id_product']]['total_price_tax_excl'] / $numDays;
+                    }
                     if (!empty($price) && ($price['from'] > $productFeaturePrice || $price['to'] < $productFeaturePrice)) {
                         unset($bookingData['rm_data'][$key]);
                         continue;
                     }
                     if (count($value['data']['available'])) {
-                        $prod_price = Product::getPriceStatic($value['id_product'], self::useTax());
-                        $productPriceWithoutReduction = HotelRoomTypeFeaturePricing::getRoomTypeFeaturePricesPerDay($value['id_product'], $date_from, $date_to, self::useTax(), 0, 0, 0, 0, 1, 0);
+                        if ($useTax) {
+                            $productPriceWithoutReduction = $productsFeaturePriceWithoutReduction[$value['id_product']]['total_price_tax_incl'] / $numDays;
+                        } else {
+                            $productPriceWithoutReduction = $productsFeaturePriceWithoutReduction[$value['id_product']]['total_price_tax_excl'] / $numDays;
+                        }
                         $cover_image_arr = Product::getCover($value['id_product']);
                         if (!empty($cover_image_arr)) {
                             $cover_img = $this->context->link->getImageLink($value['link_rewrite'], $value['id_product'].'-'.$cover_image_arr['id_image'], 'home_default');

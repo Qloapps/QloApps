@@ -198,8 +198,24 @@ class wkhotelfilterblock extends Module
 
                     $prod_price = array();
                     if ($room_types) {
-                        foreach ($room_types as $key => $value) {
-                            $prod_price[] = HotelRoomTypeFeaturePricing::getRoomTypeFeaturePricesPerDay($value['id_product'], $date_from, $date_to, HotelBookingDetail::useTax());
+                        $idProducts = array_column($room_types, 'id_product');
+                        $productsFeaturePrice = HotelRoomTypeFeaturePricing::getRoomTypesTotalPrices(
+                            $idProducts,
+                            $date_from,
+                            $date_to
+                        );
+
+                        $useTax = HotelBookingDetail::useTax();
+                        if (!($numDays = HotelHelper::getNumberOfDays($date_from, $date_to))) {
+                            $numDays = 1;
+                        }
+
+                        foreach ($room_types as $value) {
+                            if ($useTax) {
+                                $prod_price[] = $productsFeaturePrice[$value['id_product']]['total_price_tax_incl'] / $numDays;
+                            } else {
+                                $prod_price[] = $productsFeaturePrice[$value['id_product']]['total_price_tax_excl'] / $numDays;
+                            }
                         }
                     }
 

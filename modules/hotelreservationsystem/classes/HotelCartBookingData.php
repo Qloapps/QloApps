@@ -1415,6 +1415,63 @@ class HotelCartBookingData extends ObjectModel
         return false;
     }
 
+    public static function getProductsWiseFeaturePricePlansByDateRangeByPriority(
+        $idProducts,
+        $dateFrom,
+        $dateTo,
+        $idGroup
+    ) {
+        $featurePricePriority = Configuration::get('HTL_FEATURE_PRICING_PRIORITY');
+        if ($featurePricePriority = explode(';', $featurePricePriority)) {
+            if ($featurePrices = Db::getInstance()->executeS(
+                'SELECT fp.`id_feature_price`, fp.`id_product`, fp.`date_from`, fp.`date_to`, fp.`impact_way`, fp.`is_special_days_exists`,
+                fp.`date_selection_type`, fp.`special_days`, fp.`impact_type`, fp.`impact_value`
+                FROM `'._DB_PREFIX_.'htl_room_type_feature_pricing` fp'.
+                (Group::isFeatureActive() ? ' INNER JOIN `'._DB_PREFIX_.'htl_room_type_feature_pricing_group` fpg
+                ON (fp.`id_feature_price` = fpg.`id_feature_price` AND fpg.`id_group` = '.(int) $idGroup.')' : '').'
+                WHERE fp.`id_cart` = 0 AND fp.`id_product` IN('.implode(', ', $idProducts).')  AND fp.`active`=1
+                AND fp.`date_from` <= \''.pSQL($dateTo).'\' AND fp.`date_to` >= \''.pSQL($dateFrom).'\' '
+            )) {
+                $idProductsWisefeaturePrice = array();
+                foreach ($featurePrices as $featurePriceKey => $featurePrice) {
+                    for ($currentDate = strtotime($featurePrice['date_from']); $currentDate <= strtotime($featurePrice['date_to']); $currentDate += _TIME_1_DAY_) {
+                        if (!isset($featurePrice['priority'])) {
+                            if ($featurePrice['date_selection_type'] == HotelRoomTypeFeaturePricing::DATE_SELECTION_TYPE_SPECIFIC) {
+                                $featurePrices[$featurePriceKey]['priority'] = $featurePrice['priority'] = array_search('specific_date', $featurePricePriority);
+                            } else if ($featurePrice['is_special_days_exists']) {
+                                $featurePrices[$featurePriceKey]['priority'] = $featurePrice['priority'] = array_search('special_day', $featurePricePriority);
+                            } else if ($featurePrice['date_selection_type'] == HotelRoomTypeFeaturePricing::DATE_SELECTION_TYPE_RANGE) {
+                                $featurePrices[$featurePriceKey]['priority'] = $featurePrice['priority'] = array_search('date_range', $featurePricePriority);
+                            }
+                        }
+
+                        if ((int) $featurePrice['is_special_days_exists']) {
+                            $specialDays = json_decode($featurePrice['special_days']);
+                            if (!in_array(strtolower(date('D', $currentDate)), $specialDays)) {
+                                continue;
+                            }
+                        } else if ($featurePrice['date_selection_type'] == HotelRoomTypeFeaturePricing::DATE_SELECTION_TYPE_SPECIFIC && $currentDate != strtotime($featurePrice['date_from'])) {
+                            continue;
+                        }
+
+                        if (isset($idProductsWisefeaturePrice[$featurePrice['id_product']][$currentDate])
+                            && $idProductsWisefeaturePrice[$featurePrice['id_product']][$currentDate]['priority'] > $featurePrice['priority']
+                        ) {
+                            // replacing the feature prices if a feature price of more priority is available.
+                            $idProductsWisefeaturePrice[$featurePrice['id_product']][$currentDate] = $featurePrice;
+                        } else {
+                            $idProductsWisefeaturePrice[$featurePrice['id_product']][$currentDate] = $featurePrice;
+                        }
+                    }
+                }
+
+                return $idProductsWisefeaturePrice;
+            }
+        }
+
+        return false;
+    }
+
     /**
      * Returns booking info of the current cart
      * @param integer $detailed : send 1 for detailedd info and 0 for normal info

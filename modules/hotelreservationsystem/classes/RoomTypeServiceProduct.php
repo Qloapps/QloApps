@@ -167,6 +167,41 @@ class RoomTypeServiceProduct extends ObjectModel
         return false;
     }
 
+    public static function getAutoAddServicesByIdProducts($idProducts = array(), $dateFrom = null, $dateTo = null, $priceAdditionType = null, $useTax = null, $use_reduc = 1)
+    {
+        if ($idProducts) {
+            $sql = 'SELECT p.`id_product`, `id_element` AS `id_room_type` FROM  `'._DB_PREFIX_.'htl_room_type_service_product` rsp
+            INNER JOIN `'._DB_PREFIX_.'product` p ON (rsp.`id_product` = p.`id_product` AND p.`auto_add_to_cart` = 1)
+            WHERE p.`active` = 1 AND `id_element` IN( '.implode(', ', $idProducts).') AND `element_type` = '.self::WK_ELEMENT_TYPE_ROOM_TYPE;
+            if (!is_null($priceAdditionType)) {
+                $sql .= ' AND p.`price_addition_type` = '.$priceAdditionType;
+            }
+
+            if ($services = Db::getInstance()->executeS($sql)) {
+                $objRoomTypeServiceProductPrice = new RoomTypeServiceProductPrice();
+                $productWiseServices = array();
+                foreach($services as $service) {
+                    $service['price'] = $objRoomTypeServiceProductPrice->getServicePrice(
+                        (int)$service['id_product'],
+                        (int)$service['id_room_type'],
+                        1,
+                        $dateFrom,
+                        $dateTo,
+                        $useTax,
+                        false,
+                        null,
+                        $use_reduc
+                    );
+                    $productWiseServices[$service['id_room_type']][] = $service;
+                }
+
+                return $productWiseServices;
+            }
+        }
+
+        return false;
+    }
+
     public function getServiceProductsData($idProductRoomType, $p = 1, $n = 0, $front = false, $available_for_order = 2, $auto_add_to_cart = 0, $subCategory = false, $idLang = false)
     {
         if (!$idLang) {
