@@ -1,4 +1,17 @@
 ------------------------------
+# V2.0.6 to V2.0.7
+------------------------------
+
+## Improved/Changed Features:
+
+* [FO] : [#800] Fixed wrong Amenities block height on landing page in mobile view
+* [BO] : [#883] Added 'Save and stay' button on missing pages at back office.
+* [FO] : [#968] Fixed display issue with the amenity block in page load/reload in the home page
+* [CO] : [#1156] Updated the demo data added to the database for the QloApps on installation.
+* [BO] : [#1165] Displayed image Upload Sizes for Hotel Amenities and Interior Blocks
+* [CO] : [#1195] Added process for smarty template overriding.
+
+------------------------------
 # V2.0.5 to V2.0.6
 ------------------------------
 

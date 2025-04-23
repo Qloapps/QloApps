@@ -230,7 +230,7 @@ class AdminImportControllerCore extends AdminController
                     'no' => array('label' => $this->l('Ignore this column')),
                     'room_num' => array('label' => $this->l('Room No *'),),
                     'floor' => array('label' => $this->l('Floor')),
-                    'id_product' => array('label' => $this->l('Product ID *')),
+                    'id_product' => array('label' => $this->l('Room Type ID *')),
                     'id_status' => array(
                         'label' => $this->l('Room status (1/2/3)'),
                         'help' => $this->l('1 = Active, 2 = Inactive, 3 = Temporarily Inactive')),
@@ -2039,7 +2039,7 @@ class AdminImportControllerCore extends AdminController
                     }
                 } else {
                     $this->errors[] = sprintf(
-                        Tools::displayError('Invalid ID Product for %1$s (ID: %2$s).'),
+                        Tools::displayError('Invalid ID Room Type for %1$s (ID: %2$s).'),
                         (isset($info['room_num']) && !empty($info['room_num']))? Tools::safeOutput($info['room_num']) : 'No Name',
                         (isset($info['id']) && !empty($info['id']))? Tools::safeOutput($info['id']) : 'No ID'
                     );

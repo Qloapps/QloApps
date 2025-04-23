@@ -939,7 +939,7 @@ var ajaxCart = {
                                 content += '<td class="num_rooms_in_date">' + date_diff_v.num_rm + '</td>';
                                 content += '<td>' + formatCurrency(parseFloat(date_diff_v.amount) + parseFloat(date_diff_v.demand_price), currency_format, currency_sign, currency_blank) + '</td>';
                                 content += '<td>';
-                                content += '<a class="remove_rooms_from_cart_link" href="#" rm_price=' + date_diff_v.amount + ' id_product=' + productId + ' date_from=' + date_diff_v.data_form + ' date_to=' + date_diff_v.data_to + ' num_rooms=' + date_diff_v.num_rm + ' title="' + remove_rm_title + '"></a>';
+                                content += '<a class="remove_rooms_from_cart_link" href="#" rm_price="' + date_diff_v.amount + '" id_product="' + productId + '" date_from="' + date_diff_v.data_form + '" date_to="' + date_diff_v.data_to + '" num_rooms="' + date_diff_v.num_rm + '" title="' + remove_rm_title + '"></a>';
                                 content += '</td>';
                                 content += '</tr>';
                             });
@@ -1267,18 +1267,21 @@ function crossselling_serialScroll() {
         });
 }
 
-function resetRoomtypeServices() {
+function resetRoomtypeServices(refresh = true) {
     $('.room_demands_container').find('input.id_room_type_demand:checked').prop('checked', false).uniform();
     $('#additional_products').empty();
     $('#additional_products div')
     $('.remove_roomtype_product').text(select_txt).removeClass('btn-danger remove_roomtype_product').addClass('btn-success add_roomtype_product');
-    BookingForm.refresh();
+    if (refresh) {
+        BookingForm.refresh();
+    }
 }
 
 function disableRoomTypeDemands(show) {
     if (show) {
         $('.room_demands_container_overlay').show();
         $('.room_demands_container').find('input:checkbox.id_room_type_demand').prop('checked', false);
+        $('.room_demand_block').find('.id_room_type_demand').prop('checked', false).parent().removeClass('checked');
         $('.room_demands_container').find('input:checkbox.id_room_type_demand').attr('disabled', 'disabled');
     } else {
         $('.room_demands_container_overlay').hide();
@@ -1289,6 +1292,7 @@ function disableRoomTypeDemands(show) {
 
 function disableRoomTypeServices(disable) {
     if (disable) {
+        resetRoomtypeServices(false);
         $('#service_products_cont').find('button.add_roomtype_product').attr('disabled', 'disabled');
         $('#service_products_cont').find('.qty_container .qty_direction a').attr('disabled', 'disabled');
     } else {

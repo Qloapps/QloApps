@@ -666,7 +666,7 @@ class AdminControllerCore extends Controller
         ));
 
         /* BEGIN - Backward compatibility < 1.6.0.3 */
-        $this->breadcrumbs[] = $tabs[0]['name'];
+        $this->breadcrumbs[] = isset($tabs[0]['name']) ? $tabs[0]['name'] : '' ;
         $navigation_pipe = (Configuration::get('PS_NAVIGATION_PIPE') ? Configuration::get('PS_NAVIGATION_PIPE') : '>');
         $this->context->smarty->assign('navigationPipe', $navigation_pipe);
         /* END - Backward compatibility < 1.6.0.3 */
@@ -3066,6 +3066,9 @@ class AdminControllerCore extends Controller
             || $this->context->cookie->{'submitFilter'.$this->list_id} !== false
             || Tools::getValue($this->list_id.'Orderby')
             || Tools::getValue($this->list_id.'Orderway')) {
+            if (Tools::isSubmit('submitReset'.$this->list_id)) {
+                $this->processResetFilters($this->list_id);
+            }
             $this->filter = true;
         }
 

@@ -305,6 +305,7 @@ class WebserviceSpecificManagementImagesCore implements WebserviceSpecificManage
             case 'stores':
             case 'features':
             case 'hotels':
+            case 'extra_services':
             case 'room_types':
                 switch ($this->wsObject->urlSegment[1]) {
                     case 'categories':
@@ -323,6 +324,9 @@ class WebserviceSpecificManagementImagesCore implements WebserviceSpecificManage
                         $directory = _PS_IMG_DIR_.'rf/';
                         break;
                     case 'room_types':
+                        $directory = _PS_PROD_IMG_DIR_;
+                        break;
+                    case 'extra_services':
                         $directory = _PS_PROD_IMG_DIR_;
                         break;
                     case 'hotels':
@@ -622,7 +626,6 @@ class WebserviceSpecificManagementImagesCore implements WebserviceSpecificManage
                 }
             }
             $available_image_ids = array_unique($available_image_ids, SORT_NUMERIC);
-
             if ($this->wsObject->urlSegment[3] != '') {
                 if ($this->wsObject->urlSegment[3] == 'bin') {
                     $hotelCoverImage = HotelImage::getCover($object_id);
@@ -873,6 +876,9 @@ class WebserviceSpecificManagementImagesCore implements WebserviceSpecificManage
                 if ($this->imageType == 'products') {
                     $image = new Image((int)$this->wsObject->urlSegment[3]);
                     return $image->delete();
+                } if ($this->imageType == 'hotels') {
+                    $image = new HotelImage((int)$this->wsObject->urlSegment[3]);
+                    return $image->deleteImage();
                 } elseif ($filename_exists) {
                     if (in_array($this->imageType, array('categories', 'manufacturers', 'suppliers', 'stores'))) {
                         /** @var ObjectModel $object */
@@ -888,7 +894,6 @@ class WebserviceSpecificManagementImagesCore implements WebserviceSpecificManage
                 break;
             // Add the image
             case 'POST':
-
                 if ($filename_exists) {
                     throw new WebserviceException('This image already exists. To modify it, please use the PUT method', array(65, 400));
                 } else {
@@ -1123,7 +1128,6 @@ class WebserviceSpecificManagementImagesCore implements WebserviceSpecificManage
                 throw new WebserviceException('Please set an "image" parameter with image data for value', array(76, 400));
             }
         } elseif ($this->wsObject->method == 'POST') {
-
             if (isset($_FILES['image']['tmp_name']) && $_FILES['image']['tmp_name']) {
                 $file = $_FILES['image'];
 
@@ -1134,7 +1138,6 @@ class WebserviceSpecificManagementImagesCore implements WebserviceSpecificManage
                 if ($error = ImageManager::validateUpload($file)) {
                     throw new WebserviceException('Image upload error : '.$error, array(76, 400));
                 }
-
                 if (isset($file['tmp_name']) && $file['tmp_name'] != null) {
                     if ($this->imageType == 'products') {
                         $product = new Product((int)$this->wsObject->urlSegment[2]);
@@ -1191,6 +1194,23 @@ class WebserviceSpecificManagementImagesCore implements WebserviceSpecificManage
                         $this->output = $this->objOutput->renderEntity($image, 1);
                         $image_content = array('sqlId' => 'content', 'value' => base64_encode(file_get_contents($this->imgToDisplay)), 'encode' => 'base64');
                         $this->output .= $this->objOutput->objectRender->renderField($image_content);
+                    } if ($this->imageType == 'hotels') {
+                        $objHotelBranchInfo = new HotelBranchInformation((int)$this->wsObject->urlSegment[2]);
+                        if (!Validate::isLoadedObject($objHotelBranchInfo)) {
+                            throw new WebserviceException('Hotel '.(int)$this->wsObject->urlSegment[2].' does not exist', array(76, 400));
+                        }
+                        $objHotelImage = new HotelImage();
+                        $addedImage = $objHotelImage->uploadHotelImages($file, $objHotelBranchInfo->id);
+                        if (isset($addedImage['id'])) {
+                            $objHotelImage = new HotelImage($addedImage['id']);
+                            $this->imgToDisplay = _PS_HOTEL_IMG_DIR_.$objHotelImage->getImagePath().'.'.$objHotelImage->image_format;
+                            $this->objOutput->setFieldsToDisplay('full');
+                            $this->output = $this->objOutput->renderEntity($objHotelImage, 1);
+                            $image_content = array('sqlId' => 'content', 'value' => base64_encode(file_get_contents($this->imgToDisplay)), 'encode' => 'base64');
+                            $this->output .= $this->objOutput->objectRender->renderField($image_content);
+                        } else {
+                            throw new WebserviceException('An error occurred during the image upload', array(76, 400));
+                        }
                     } elseif (in_array($this->imageType, array('categories', 'manufacturers', 'suppliers', 'stores'))) {
                         if (!($tmp_name = tempnam(_PS_TMP_IMG_DIR_, 'PS')) || !move_uploaded_file($file['tmp_name'], $tmp_name)) {
                             throw new WebserviceException('An error occurred during the image upload', array(76, 400));

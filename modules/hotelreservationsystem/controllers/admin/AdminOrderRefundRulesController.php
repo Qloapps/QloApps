@@ -324,6 +324,23 @@ class AdminOrderRefundRulesController extends ModuleAdminController
         }
     }
 
+    protected function processUpdateOptions()
+    {
+        parent::processUpdateOptions();
+        if (empty($this->errors) && !Tools::getValue('WK_ORDER_REFUND_ALLOWED')) {
+            $objHotelBranchInfo = new HotelBranchInformation();
+            if ($hotels = $objHotelBranchInfo->getAllHotels()) {
+                foreach ($hotels as $hotel) {
+                    $objHotelBranchInfo = new HotelBranchInformation($hotel['id']);
+                    if ($objHotelBranchInfo->active_refund) {
+                        $objHotelBranchInfo->active_refund = 0;
+                        $objHotelBranchInfo->save();
+                    }
+                }
+            }
+        }
+    }
+
     public function setMedia()
     {
         parent::setMedia();

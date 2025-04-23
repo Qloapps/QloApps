@@ -1875,6 +1875,7 @@ class HotelBookingDetail extends ObjectModel
         $reallocatedBookingId = 0;
         // get the cart booking data for the given booking
         if (Validate::isLoadedObject($objOldHotelBooking = new HotelBookingDetail($idHotelBooking))) {
+            $objectHotelBookingFrom = clone $objOldHotelBooking;
             $objHotelRoomInfo = new HotelRoomInformation($idRoom);
             $idNewRoomType = $objHotelRoomInfo->id_product;
             if ($objOldHotelBooking->id_product != $idNewRoomType) {
@@ -2101,6 +2102,7 @@ class HotelBookingDetail extends ObjectModel
 
                         if ($result &= $objBookingDetail->save()) {
                             $reallocatedBookingId = $objBookingDetail->id;
+                            $objectHotelBookingTo = $objBookingDetail;
                             // Get Booking Demands of the old booking to add in the new booking creation
                             $objBookingDemand = new HotelBookingDemands();
                             if ($oldBookingDemands = $objBookingDemand->getRoomTypeBookingExtraDemands(
@@ -2281,6 +2283,7 @@ class HotelBookingDetail extends ObjectModel
                 $result &= $objOldHotelBooking->save();
 
                 $reallocatedBookingId = $objOldHotelBooking->id;
+                $objectHotelBookingTo = $objOldHotelBooking;
             }
 
             if ($result && $reallocatedBookingId) {
@@ -2289,6 +2292,8 @@ class HotelBookingDetail extends ObjectModel
                     array(
                         'id_htl_booking_from' => $idHotelBooking,
                         'id_htl_booking_to' => $reallocatedBookingId,
+                        'objectHotelBookingFrom' => $objectHotelBookingFrom,
+                        'objectHotelBookingTo' => $objectHotelBookingTo,
                     )
                 );
 
@@ -2372,8 +2377,12 @@ class HotelBookingDetail extends ObjectModel
                 if (Validate::isLoadedObject($objHotelCartBookingFrom = new HotelCartBookingData($cartBookingInfoFrom['id']))
                     && Validate::isLoadedObject($objHotelCartBookingTo = new HotelCartBookingData($cartBookingInfoTo['id']))
                 ) {
-                    $objHotelCartBookingFrom->id_room = $objHotelCartBookingTo->id_room;
-                    $objHotelCartBookingTo->id_room = $objHotelCartBookingFrom->id_room;
+                    $idRoomFrom = $objHotelCartBookingFrom->id_room;
+                    $idRoomTo = $objHotelCartBookingTo->id_room;
+
+                    $objHotelCartBookingFrom->id_room = $idRoomTo;
+                    $objHotelCartBookingTo->id_room = $idRoomFrom;
+
                     $result &= $objHotelCartBookingFrom->save();
                     $result &= $objHotelCartBookingTo->save();
                 }
@@ -2399,7 +2408,6 @@ class HotelBookingDetail extends ObjectModel
 
             $result &= $objHotelBookingFrom->save();
             $result &= $objHotelBookingTo->save();
-
             if ($result) {
                 Hook::exec(
                     'actionRoomSwapAfter',

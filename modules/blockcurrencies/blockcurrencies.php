@@ -34,7 +34,7 @@ class BlockCurrencies extends Module
     {
         $this->name = 'blockcurrencies';
         $this->tab = 'front_office_features';
-        $this->version = '1.1.0';
+        $this->version = '1.1.1';
         $this->author = 'PrestaShop';
         $this->need_instance = 0;
 
@@ -44,7 +44,7 @@ class BlockCurrencies extends Module
         $this->description = $this->l('Adds a block allowing customers to select their preferred booking currency.');
         $this->ps_versions_compliancy = array('min' => '1.6', 'max' => _PS_VERSION_);
     }
- 
+
     public function install()
     {
         if (!parent::install()

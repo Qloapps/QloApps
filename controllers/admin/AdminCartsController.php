@@ -612,10 +612,24 @@ class AdminCartsControllerCore extends AdminController
             $cart_detail_data = array();
             $cart_detail_data_obj = new HotelCartBookingData();
             $cart_detail_data_obj->updateIdCurrencyByIdCart($id_cart, $currency->id);
-            $cart_detail_data = $cart_detail_data_obj->getCartFormatedBookinInfoByIdCart((int) $id_cart);
+
+            if ($cart_detail_data = $cart_detail_data_obj->getCartFormatedBookinInfoByIdCart((int) $id_cart)) {
+                $objRoomType = new HotelRoomType();
+                foreach ($cart_detail_data as $key => $cart_data) {
+
+                    $cart_detail_data[$key]['room_type_info'] = $objRoomType->getRoomTypeInfoByIdProduct($cart_data['id_product']);
+                }
+            }
+            $occupancyRequiredForBooking = false;
+            if (Configuration::get('PS_BACKOFFICE_ROOM_BOOKING_TYPE') == HotelBookingDetail::PS_ROOM_UNIT_SELECTION_TYPE_OCCUPANCY) {
+                $occupancyRequiredForBooking = true;
+            }
+
             $this->context->smarty->assign(array(
                 'cart_detail_data' => $cart_detail_data,
                 'currency' => new Currency((int)$this->context->cart->id_currency),
+                'occupancy_required_for_booking' => $occupancyRequiredForBooking,
+                'ajax' => true
             ));
 
             $tpl_path = 'default/template/controllers/orders/_current_cart_details_data.tpl';

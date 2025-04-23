@@ -199,7 +199,7 @@ class ContactControllerCore extends FrontController
                             Mail::Send(
                                 $this->context->language->id,
                                 'contact',
-                                Mail::l('Message from contact form').' [no_sync]',
+                                Mail::l('Message from contact form'),
                                 $var_list,
                                 $contact->email,
                                 $contact->name,

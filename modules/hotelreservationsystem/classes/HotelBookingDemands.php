@@ -106,8 +106,8 @@ class HotelBookingDemands extends ObjectModel
             $sql .= ' AND hb.`id_room`='.(int)$idRoom;
         }
         if ($dateFrom && $dateTo) {
-            $dateFrom = date('Y-m-d', strtotime($dateFrom));
-            $dateTo = date('Y-m-d', strtotime($dateTo));
+            $dateFrom = date('Y-m-d H:i:s', strtotime($dateFrom));
+            $dateTo = date('Y-m-d H:i:s', strtotime($dateTo));
             $sql .= ' AND hb.`date_from`=\''.pSQL($dateFrom).'\' AND hb.`date_to`= \''.pSQL($dateTo).'\'';
         }
 
@@ -207,7 +207,7 @@ class HotelBookingDemands extends ObjectModel
                     }
 
                     // Rounding as per configurations
-                    $totalAmount += Tools::processPriceRounding($amount, $quantity);
+                    $totalAmount = Tools::processPriceRounding($amount, $quantity);
 
                     $values .= '('.(int)$this->id.','.(int)$idTax.','.(float)$amount.','.
                     (float)$totalAmount.'),';

@@ -3191,8 +3191,6 @@ abstract class ModuleCore
 
         // Make a reflection of the override class and the module override class
         $overrideClassFileArray = file($overrideClassFilePath);
-        $moduleClassFileArray = array_diff($moduleClassFileArray, array("\n")); // remove empty lines from array
-
         eval(
             preg_replace(
                 array(
@@ -3209,6 +3207,7 @@ abstract class ModuleCore
         $reflectionClassOverride = new ReflectionClass($overrideClassName.'Original_remove'.$uniq);
 
         $moduleClassFileArray = file($this->getLocalPath().'override/'.$parentClassFilePath);
+        $moduleClassFileArray = array_diff($moduleClassFileArray, array("\n")); // remove empty lines from array
         eval(
             preg_replace(
                 array(

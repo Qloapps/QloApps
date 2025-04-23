@@ -242,6 +242,13 @@ class RoomTypeServiceProductOrderDetail extends ObjectModel
                         $totalPrice += $product['total_price_tax_excl'];
                     }
                 } else {
+                    $taxes = OrderDetailCore::getTaxListStatic($product['id_order_detail']);
+                    $tax_temp = array();
+                    foreach ($taxes as $tax) {
+                        $obj = new Tax($tax['id_tax']);
+                        $tax_temp[] = sprintf('%1$s%2$s%%', ($obj->rate + 0), '&nbsp;');
+                    }
+                    $product_tax_label = implode(', ', $tax_temp);
                     if (isset($selectedAdditionalServices['additional_services'])) {
                         $selectedAdditionalServices['total_price_tax_excl'] += $product['total_price_tax_excl'];
                         $selectedAdditionalServices['total_price_tax_incl'] += $product['total_price_tax_incl'];
@@ -260,6 +267,7 @@ class RoomTypeServiceProductOrderDetail extends ObjectModel
                             'unit_price_tax_incl' => $product['unit_price_tax_incl'],
                             'total_price_tax_excl' => $product['total_price_tax_excl'],
                             'total_price_tax_incl' => $product['total_price_tax_incl'],
+                            'product_tax_label' => $product_tax_label,
                         );
                     } else {
                         $selectedAdditionalServices['id_order'] = $product['id_order'];
@@ -285,6 +293,7 @@ class RoomTypeServiceProductOrderDetail extends ObjectModel
                                 'unit_price_tax_incl' => $product['unit_price_tax_incl'],
                                 'total_price_tax_excl' => $product['total_price_tax_excl'],
                                 'total_price_tax_incl' => $product['total_price_tax_incl'],
+                                'product_tax_label' => $product_tax_label,
                             ),
                         );
                     }

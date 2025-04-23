@@ -447,7 +447,6 @@ class AdminCustomersControllerCore extends AdminController
                     'type' => 'password',
                     'label' => $this->l('Password'),
                     'name' => 'passwd',
-                    'required' => ($obj->id ? false : true),
                     'col' => '4',
                     'hint' => ($obj->id ? $this->l('Leave this field blank if there\'s no change.') :
                         sprintf($this->l('Password should be at least %s characters long.'), Validate::PASSWORD_LENGTH))
@@ -720,7 +719,7 @@ class AdminCustomersControllerCore extends AdminController
         $helper->color = 'color2';
         $helper->title = $this->l('Total Frequent Customers', null, null, false);
         $helper->subtitle = $this->l('1 year', null, null, false);
-        $helper->href = $this->context->link->getAdminLink('AdminCustomers').'&submitFiltercustomer=1&customerFilter_total_orders%5B0%5D='.Configuration::get('PS_KPI_FREQUENT_CUSTOMER_NB_ORDERS').'&customerFilter_o%21date_add%5B0%5D='.date('Y-m-d', strtotime('-365 day')).'&customerFilter_o%21date_add%5B1%5D='.date('Y-m-d');
+        $helper->href = $this->context->link->getAdminLink('AdminCustomers').'&submitResetcustomer&submitFiltercustomer=1&customerFilter_total_orders%5B0%5D='.Configuration::get('PS_KPI_FREQUENT_CUSTOMER_NB_ORDERS').'&customerFilter_o%21date_add%5B0%5D='.date('Y-m-d', strtotime('-365 day')).'&customerFilter_o%21date_add%5B1%5D='.date('Y-m-d');
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=total_frequent_customers';
         $helper->tooltip = $this->l('The total number of frequent customers in given period of time.', null, null, false);
         $this->kpis[] = $helper;
@@ -765,7 +764,7 @@ class AdminCustomersControllerCore extends AdminController
         $nbDaysNewCustomers = Validate::isUnsignedInt(Configuration::get('PS_KPI_NEW_CUSTOMERS_NB_DAYS')) ? Configuration::get('PS_KPI_NEW_CUSTOMERS_NB_DAYS') : 30;
         $date_from = date('Y-m-d', strtotime('-'.$nbDaysNewCustomers.' day'));
         $date_to = date('Y-m-d');
-        $helper->href = $this->context->link->getAdminLink('AdminCustomers').'&customerFilter_a!date_add[]='.$date_from.'&customerFilter_a!date_add[]='.$date_to;
+        $helper->href = $this->context->link->getAdminLink('AdminCustomers').'&submitResetcustomer&submitFiltercustomer=1&customerFilter_a!date_add[]='.$date_from.'&customerFilter_a!date_add[]='.$date_to;
         $helper->subtitle = sprintf($this->l('%d Days', null, null, false), (int) $nbDaysNewCustomers);
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=total_new_customers';
         $helper->tooltip = $this->l('The total number of new customers who registered in given period of time.', null, null, false);
@@ -777,7 +776,7 @@ class AdminCustomersControllerCore extends AdminController
         $helper->color = 'color2';
         $helper->title = $this->l('Banned Customers', null, null, false);
         $helper->subtitle = $this->l('All Time', null, null, false);
-        $helper->href = $this->context->link->getAdminLink('AdminCustomers').'&customerFilter_deleted=1';
+        $helper->href = $this->context->link->getAdminLink('AdminCustomers').'&submitResetcustomer&submitFiltercustomer=1&customerFilter_deleted=1';
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=total_banned_customers';
         $helper->tooltip = $this->l('The total number of banned customers.', null, null, false);
         $this->kpis[] = $helper;
@@ -1088,6 +1087,10 @@ class AdminCustomersControllerCore extends AdminController
         // Check that the new email is not already in use
         $customer_email = trim(strval(Tools::getValue('email')));
         $customer = new Customer();
+        if (trim(Tools::getValue('passwd')) == '') {
+            $_POST['passwd'] = md5(time()._COOKIE_KEY_);
+        }
+
         if (Validate::isEmail($customer_email)) {
             $customer->getByEmail($customer_email);
             if ($customer->id) {
@@ -1096,10 +1099,6 @@ class AdminCustomersControllerCore extends AdminController
                 return $customer;
             } elseif (Customer::customerExists($customer_email, false, false)) {
                 $this->errors[] = Tools::displayError('The email is already associated with a banned account. Please use a different one.');
-                $this->display = 'edit';
-            } elseif (trim(Tools::getValue('passwd')) == '') {
-                $this->validateRules();
-                $this->errors[] = Tools::displayError('Password can not be empty.');
                 $this->display = 'edit';
             } elseif ($customer = parent::processAdd()) {
                 $this->context->smarty->assign('new_customer', $customer);

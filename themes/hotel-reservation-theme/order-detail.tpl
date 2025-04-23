@@ -177,7 +177,13 @@
 
                             {if ($obj_hotel_branch_information->latitude|floatval != 0 && $obj_hotel_branch_information->longitude|floatval != 0) && $view_on_map}
                                 <div class="hotel-location-map">
-                                    <div class="booking-hotel-map-container"></div>
+                                    <div
+                                        class="booking-hotel-map-container"
+                                        latitude="{$obj_hotel_branch_information->latitude|escape:'html':'UTF-8'}"
+                                        longitude="{$obj_hotel_branch_information->longitude|escape:'html':'UTF-8'}"
+                                        query="{$obj_hotel_branch_information->map_input_text|escape:'html':'UTF-8'}"
+                                        title="{$obj_hotel_branch_information->hotel_name|escape:'html':'UTF-8'}">
+                                    </div>
                                 </div>
                             {/if}
 
@@ -626,7 +632,13 @@
 
                             {if ($obj_hotel_branch_information->latitude|floatval != 0 && $obj_hotel_branch_information->longitude|floatval != 0) && $view_on_map}
                                 <div class="hotel-location-map">
-                                    <div class="booking-hotel-map-container"></div>
+                                    <div
+                                        class="booking-hotel-map-container"
+                                        latitude="{$obj_hotel_branch_information->latitude|escape:'html':'UTF-8'}"
+                                        longitude="{$obj_hotel_branch_information->longitude|escape:'html':'UTF-8'}"
+                                        query="{$obj_hotel_branch_information->map_input_text|escape:'html':'UTF-8'}"
+                                        title="{$obj_hotel_branch_information->hotel_name|escape:'html':'UTF-8'}">
+                                    </div>
                                 </div>
                             {/if}
 

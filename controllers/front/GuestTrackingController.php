@@ -478,39 +478,7 @@ class GuestTrackingControllerCore extends FrontController
                                         Product::PRICE_ADDITION_TYPE_WITH_ROOM
                                     );
                                 }
-                                // get auto added price to be displayed with room price
-                                if (empty($cartHotelData[$type_key]['date_diff'][$date_join]['additional_services_price_auto_add_ti'])) {
-                                    $cartHotelData[$type_key]['date_diff'][$date_join]['additional_services_price_auto_add_ti'] = 0;
-                                }
-                                $cartHotelData[$type_key]['date_diff'][$date_join]['additional_services_price_auto_add_ti'] += $objRoomTypeServiceProductOrderDetail->getroomTypeServiceProducts(
-                                    $idOrder,
-                                    0,
-                                    0,
-                                    $type_value['product_id'],
-                                    $data_v['date_from'],
-                                    $data_v['date_to'],
-                                    $data_v['id_room'],
-                                    1,
-                                    1,
-                                    1,
-                                    Product::PRICE_ADDITION_TYPE_WITH_ROOM
-                                );
-                                if (empty($cartHotelData[$type_key]['date_diff'][$date_join]['additional_services_price_auto_add_te'])) {
-                                    $cartHotelData[$type_key]['date_diff'][$date_join]['additional_services_price_auto_add_te'] = 0;
-                                }
-                                $cartHotelData[$type_key]['date_diff'][$date_join]['additional_services_price_auto_add_te'] += $objRoomTypeServiceProductOrderDetail->getroomTypeServiceProducts(
-                                    $idOrder,
-                                    0,
-                                    0,
-                                    $type_value['product_id'],
-                                    $data_v['date_from'],
-                                    $data_v['date_to'],
-                                    $data_v['id_room'],
-                                    1,
-                                    0,
-                                    1,
-                                    Product::PRICE_ADDITION_TYPE_WITH_ROOM
-                                );
+
                                 // calculate averages now
                                 foreach ($cartHotelData[$type_key]['date_diff'] as $key => &$value) {
                                     $value['avg_paid_unit_price_tax_excl'] = Tools::ps_round($value['avg_paid_unit_price_tax_excl'] / $value['num_rm'], 6);
@@ -640,31 +608,30 @@ class GuestTrackingControllerCore extends FrontController
 
             // load Google Maps library if configured
             if (!count($this->errors)) {
-                $ordersCollection = Order::getByReference(Tools::getValue('order_reference'));
-                if ($objOrder = $ordersCollection->getFirst()) {
-                    if ($idHotel = HotelBookingDetail::getIdHotelByIdOrder($objOrder->id)) {
-                        $objHotelBranchInformation = new HotelBranchInformation($idHotel, $this->context->language->id);
-                        if (Validate::isLoadedObject($objHotelBranchInformation)) {
-                            if (($apiKey = Configuration::get('PS_API_KEY'))
-                                && Configuration::get('WK_GOOGLE_ACTIVE_MAP')
-                            ) {
-                                if (floatval($objHotelBranchInformation->latitude) != 0
-                                    && floatval($objHotelBranchInformation->longitude) != 0
+                if ($ordersCollection = Order::getByReference(Tools::getValue('order_reference'))) {
+                    foreach ($ordersCollection as $objOrder) {
+                        if ($idHotel = HotelBookingDetail::getIdHotelByIdOrder($objOrder->id)) {
+                            $objHotelBranchInformation = new HotelBranchInformation($idHotel, $this->context->language->id);
+                            if (Validate::isLoadedObject($objHotelBranchInformation)) {
+                                if (($apiKey = Configuration::get('PS_API_KEY'))
+                                    && Configuration::get('WK_GOOGLE_ACTIVE_MAP')
                                 ) {
-                                    Media::addJsDef(array(
-                                        'hotel_location' => array(
-                                            'latitude' => $objHotelBranchInformation->latitude,
-                                            'longitude' => $objHotelBranchInformation->longitude,
-                                            'map_input_text' => $objHotelBranchInformation->map_input_text,
-                                        ),
-                                        'hotel_name' => $objHotelBranchInformation->hotel_name,
-                                        'PS_STORES_ICON' => $this->context->link->getMediaLink(_PS_IMG_.Configuration::get('PS_STORES_ICON'))
-                                    ));
+                                    if (floatval($objHotelBranchInformation->latitude) != 0
+                                        && floatval($objHotelBranchInformation->longitude) != 0
+                                    ) {
+                                        Media::addJsDef(array(
+                                            'PS_STORES_ICON' => $this->context->link->getMediaLink(_PS_IMG_.Configuration::get('PS_STORES_ICON')),
+                                            'initiateMap' => 1,
+                                        ));
 
-                                    $this->addJS(
-                                        'https://maps.googleapis.com/maps/api/js?key='.$apiKey.'&libraries=places&language='.
-                                        $this->context->language->iso_code.'&region='.$this->context->country->iso_code
-                                    );
+                                        $this->addJS(
+                                            'https://maps.googleapis.com/maps/api/js?key='.$apiKey.'&libraries=places&language='.
+                                            $this->context->language->iso_code.'&region='.$this->context->country->iso_code
+                                        );
+
+                                        // just need to load the map once for the first order with map details. So break the loop.
+                                        break;
+                                    }
                                 }
                             }
                         }

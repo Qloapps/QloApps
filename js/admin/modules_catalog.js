@@ -55,6 +55,7 @@ $('document').ready( function() {
 
 	function filterPanel(val, element_class)
 	{
+		val = $.trim(val);
 		$('#'+element_class+' .list-empty').hide();
         $('#'+element_class+' .element-panel').css('display', 'flex').removeClass('hidden');
 

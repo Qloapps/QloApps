@@ -1,4 +1,15 @@
 -----------------------------
+# V1.1.2 to V1.1.3
+-----------------------------
+
+## Improved/Changed Features:
+
+* [CO] : [#935] Added new hooks
+* [CO] : [#1021] Improvement in the block navigation link module regarding CMS pages.
+* [CO] : [#1195] Added process for smarty template overriding.
+* [BO] : [#1241] Updated condition to assign default category on the AdminCustomNavigationLinkSettingController in the back-office.
+
+-----------------------------
 # V1.1.1 to V1.1.2
 -----------------------------
 
