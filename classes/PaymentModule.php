@@ -264,7 +264,7 @@ abstract class PaymentModuleCore extends Module
                     }
                 }
             }
-               
+
             $objFreeOrder= new FreeOrder();
             $orderTotals = array();
             Hook::exec('actionPackageListGenerateOrder', array('package_list' => &$package_list));
@@ -496,7 +496,7 @@ abstract class PaymentModuleCore extends Module
             // Make sure CartRule caches are empty
             CartRule::cleanCache();
             $objRoomType = new HotelRoomType();
-            $prev_id_order_state = $id_order_state;
+            $orgIdOrderState = $id_order_state;
             $cart_rules = $this->context->cart->getCartRules();
             foreach ($order_detail_list as $key => $order_detail) {
                 /** @var OrderDetail $order_detail */
@@ -505,7 +505,7 @@ abstract class PaymentModuleCore extends Module
                 if($order->total_paid_tax_incl == 0 && $order->total_paid_tax_incl == $order->total_paid_real){
                     $id_order_state = Configuration::get('PS_OS_PAYMENT_ACCEPTED');
                 }else{
-                    $id_order_state = $prev_id_order_state;
+                    $id_order_state = $orgIdOrderState;
                 }
 
                 if (!$order_creation_failed && isset($order->id)) {
@@ -988,6 +988,7 @@ abstract class PaymentModuleCore extends Module
                         PrestaShopLogger::addLog('PaymentModule::validateOrder - Hook validateOrder is about to be called', 1, null, 'Cart', (int)$id_cart, true);
                     }
 
+                    $order_status = new OrderState((int)$id_order_state, (int)$this->context->language->id);
                     // Hook validate order
                     Hook::exec('actionValidateOrder', array(
                         'cart' => $this->context->cart,
