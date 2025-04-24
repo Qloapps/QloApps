@@ -23,7 +23,7 @@
             {if isset($hotels_info) && count($hotels_info)}
                 <div class="header-rmsearch-wrapper" id="xs_room_search_form">
                     <div class="header-rmsearch-primary">
-                        <div class="fancy_search_header_xs">
+                        <div class="fancy_search_header_xs" style="display:none;">
                             <p>{l s='Search Rooms' mod='wkroomsearchblock'}</p>
                             <hr>
                         </div>

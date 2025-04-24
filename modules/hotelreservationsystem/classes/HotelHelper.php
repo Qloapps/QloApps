@@ -24,17 +24,17 @@ class HotelHelper
     {
         $objModule = new HotelreservationSystem();
         $jsVars = array(
-                'display_name' => $objModule->l('Display', 'HotelHelper', false, true),
-                'records_name' => $objModule->l('records per page', 'HotelHelper', false, true),
-                'no_product' => $objModule->l('No records found', 'HotelHelper', false, true),
-                'show_page' => $objModule->l('Showing page', 'HotelHelper', false, true),
-                'show_of' => $objModule->l('of', 'HotelHelper', false, true),
-                'no_record' => $objModule->l('No records available', 'HotelHelper', false, true),
-                'filter_from' => $objModule->l('filtered from', 'HotelHelper', false, true),
-                't_record' => $objModule->l('total records', 'HotelHelper', false, true),
-                'search_item' => $objModule->l('Search', 'HotelHelper', false, true),
-                'p_page' => $objModule->l('Previous', 'HotelHelper', false, true),
-                'n_page' => $objModule->l('Next', 'HotelHelper', false, true),
+                'display_name' => $objModule->l('Display', 'HotelHelper', true),
+                'records_name' => $objModule->l('records per page', 'HotelHelper', true),
+                'no_product' => $objModule->l('No records found', 'HotelHelper', true),
+                'show_page' => $objModule->l('Showing page', 'HotelHelper', true),
+                'show_of' => $objModule->l('of', 'HotelHelper', true),
+                'no_record' => $objModule->l('No records available', 'HotelHelper',true),
+                'filter_from' => $objModule->l('filtered from', 'HotelHelper', true),
+                't_record' => $objModule->l('total records', 'HotelHelper', true),
+                'search_item' => $objModule->l('Search', 'HotelHelper', true),
+                'p_page' => $objModule->l('Previous', 'HotelHelper', true),
+                'n_page' => $objModule->l('Next', 'HotelHelper', true),
             );
 
         Media::addJsDef($jsVars);
@@ -2231,6 +2231,10 @@ class HotelHelper
             $objProduct->price_calculation_method = $serviceProduct['price_calculation_method'];
             $objProduct->is_virtual = 1;
             $objProduct->indexed = 1;
+            if ($objProduct->auto_add_to_cart && $objProduct->price_addition_type == Product::PRICE_ADDITION_TYPE_WITH_ROOM) {
+                $objProduct->id_tax_rules_group = 0;
+            }
+
             $objProduct->save();
             $idProduct = $objProduct->id;
 

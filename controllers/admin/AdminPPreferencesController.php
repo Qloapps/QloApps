@@ -85,11 +85,12 @@ class AdminPPreferencesControllerCore extends AdminController
                     'PS_PRODUCT_SHORT_DESC_LIMIT' => array(
                         'title' => $this->l('Max size of short description'),
                         'hint' => $this->l('Set the maximum size of room type short description (in characters).'),
-                        'validation' => 'isInt',
+                        'validation' => 'isUnsignedInt',
                         'cast' => 'intval',
                         'type' => 'text',
                         'suffix' => $this->l('characters'),
                         'class' => 'fixed-width-xl',
+                        'desc' => $this->l('If set to 0, the maximum limit will be 400 characters.')
                     ),
                     /*'PS_QTY_DISCOUNT_ON_COMBINATION' => array(
                         'title' => $this->l('Quantity discounts based on'),

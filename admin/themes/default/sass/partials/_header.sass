@@ -24,6 +24,10 @@
 #header_shopname
 	@extend .navbar-brand
 	text-decoration: none
+.bootstrap
+	#header_shopname
+		@media (max-width: $screen-tablet)
+			@include padding(9px, 5px, 9px, 40px)
 
 #header_notifs_icon_wrapper
 	@extend .nav

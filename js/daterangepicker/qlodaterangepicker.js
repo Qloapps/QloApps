@@ -77,11 +77,13 @@
             const inputElementHeight = dateRangePickerInput.outerHeight();
             const spaceTop = dateRangePickerInput.offset().top - $(window).scrollTop();
             const spaceBottom = $(window).height() - inputElementHeight - spaceTop;
-            const maxHeightNeeded = $(calendarDom).get(0).scrollHeight;
+            // 20 added for padding
+            const maxHeightNeeded = $(calendarDom).get(0).scrollHeight  + 20;
 
             let positionClass = 'bottom';
             // determine position class
-            if (spaceBottom < maxHeightNeeded && spaceTop > spaceBottom) {
+            if (spaceBottom < maxHeightNeeded && spaceTop > maxHeightNeeded && spaceTop > spaceBottom) {
+
                 positionClass = 'top';
             }
 

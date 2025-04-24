@@ -747,13 +747,13 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
             }
         } else {
             // remove room from cart
-            $objHotelCartBookingData = new HotelCartBookingData($id_cart_book_data);
-            if ($objHotelCartBookingData->deleteCartBookingData(
-                $obj_booking_dtl->id_cart,
-                $objHotelCartBookingData->id_product,
-                $objHotelCartBookingData->id_room,
-                $objHotelCartBookingData->date_from,
-                $objHotelCartBookingData->date_to
+            if ((Validate::isLoadedObject($objHotelCartBookingData = new HotelCartBookingData((int) $id_cart_book_data)))
+                && $objHotelCartBookingData->deleteCartBookingData(
+                    $objHotelCartBookingData->id_cart,
+                    $objHotelCartBookingData->id_product,
+                    $objHotelCartBookingData->id_room,
+                    $objHotelCartBookingData->date_from,
+                    $objHotelCartBookingData->date_to
             )) {
                 $response['success'] = true;
                 if ($ajax_delete) {
@@ -994,7 +994,7 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
             'invalid_occupancy_txt' => $this->l('Invalid occupancy(adults/children) found.', null, true),
             'PS_BACKDATE_ORDER_ALLOW' => $PS_BACKDATE_ORDER_ALLOW,
             // 'check_calender_var' => $check_calender_var,
-            'txtSomeErr' => $this->l('Some error occurred. Please try again.'),
+            'txtSomeErr' => $this->l('Some error occurred. Please try again.', null, true),
             'no_rm_avail_txt' => $this->l('No room available.', null, true),
             'no_realloc_rm_avail_txt' => $this->l('No room available for reallocation.', null, true),
             'no_realloc_rm_type_avail_txt' => $this->l('No room type available for reallocation.', null, true),

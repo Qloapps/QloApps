@@ -17,7 +17,9 @@
 *  @license   https://store.webkul.com/license.html
 *}
 
+{if !isset($ajax) || !$ajax}
 <div class="panel form-horizontal" id="customer_cart_details">
+{/if}
 	<div class="panel-heading">
 		<i class="icon-shopping-cart"></i>
 		{l s='Cart Details'}
@@ -51,7 +53,7 @@
 								<td>
 									<p>{$data.room_type|escape:'html':'UTF-8'}</p>
 								</td>
-                                {assign var="is_full_date" value=($show_full_date && ($data['date_from']|date_format:'%D' == $data['date_to']|date_format:'%D'))}
+								{assign var="is_full_date" value=($show_full_date && ($data['date_from']|date_format:'%D' == $data['date_to']|date_format:'%D'))}
 								<td>{dateFormat date=$data.date_from full=$is_full_date} - {dateFormat date=$data.date_to full=$is_full_date}</td>
 								{if $occupancy_required_for_booking}
 									<td>
@@ -187,6 +189,7 @@
 			</table>
 		</div>
 	</div>
+{if !isset($ajax) || !$ajax}
 </div>
 
 {* Modal for extra demands *}
@@ -229,3 +232,4 @@
 	#rooms_extra_demands .room_demand_detail {
 		padding: 15px 15px 0px 15px;}
 </style>
+{/if}

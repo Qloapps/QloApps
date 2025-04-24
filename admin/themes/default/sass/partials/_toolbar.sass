@@ -1,6 +1,5 @@
 .page-head
 	width: 100%
-	height: 78px
 	padding: 0
 	margin: 0
 	position: fixed
@@ -18,14 +17,22 @@
 		font-weight: bold
 		color: #363A41
 		white-space: nowrap
-		@include padding(31px, 0, 0, ($widthSidebarNav+20px))
-		@media (max-width: $screen-tablet)
-			@include padding(26px, 0, 0, 70px)
+		@include padding(31px, 0, 20px, ($widthSidebarNav+20px))
+		@media (max-width: $screen-phone)
+			@include padding(26px, 0, 55px, 70px)
+		@media (min-width: $screen-phone) and (max-width: $screen-tablet)
+			@include padding(26px, 0, 25px, 70px)
 		a
 			border-bottom: dotted 1px white
 			&:hover
 				color: black
 				border-color: black
+	h2.page-title.configure
+		@include padding(31px, 0, 35px, ($widthSidebarNav+20px))
+		@media (max-width: $screen-phone)
+			@include padding(26px, 0, 60px, 70px)
+		@media (min-width: $screen-phone) and (max-width: $screen-tablet)
+			@include padding(26px, 0, 40px, 70px)
 	a
 		color: white
 		text-decoration: none
@@ -42,6 +49,8 @@
 		background-color: transparent!important
 		@include right(0)
 		top: 18px
+		@media (max-width: $screen-tablet)
+			top: 25px
 		@media (max-width: $screen-sm)
 		#toolbar-nav
 			border: none

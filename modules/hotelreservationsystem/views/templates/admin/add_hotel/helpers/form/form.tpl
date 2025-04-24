@@ -482,20 +482,20 @@
 					{hook h='displayAdminAddHotelFormRefundPoliciesTabBefore' id_hotel=$hook_arg_id_hotel}
 
 					{if isset($hotel_info.id) && $hotel_info.id}
+						{if isset($WK_ORDER_REFUND_ALLOWED) && !$WK_ORDER_REFUND_ALLOWED}
+							<div class="alert alert-info">
+								{l s='To enable hotel-wise refunds, activate order refunds in' mod='hotelreservationsystem'} <a href="{$link->getAdminLink('AdminOrderRefundRules')|escape:'html':'UTF-8'}" target="_blank">{l s='Manage Order Refund Rules' mod='hotelreservationsystem'}</a>
+							</div>
+						{/if}
 						<div class="form-group">
 							<label for="active_refund" class="control-label col-sm-5">
 								<span title="" data-toggle="tooltip" class="label-tooltip" data-original-title='{l s='Enable, if you want to enable refund for this hotel.' mod='hotelreservationsystem'}'>{l s='Enable refund' mod='hotelreservationsystem'}</span>
 							</label>
 							<div class="col-sm-7">
 								<span class="switch prestashop-switch fixed-width-lg">
-									<input type="radio" value="1" id="active_refund_on" name="active_refund"
-									{if isset($smarty.post.active_refund)}{if $smarty.post.active_refund}checked="checked"{/if}{elseif isset($hotel_info) && $hotel_info.active_refund}checked="checked"{/if}>
-
+									<input type="radio" value="1" id="active_refund_on" name="active_refund" {if isset($WK_ORDER_REFUND_ALLOWED) && !$WK_ORDER_REFUND_ALLOWED} disabled="disabled" {elseif isset($smarty.post.active_refund)}{if $smarty.post.active_refund}checked="checked"{/if}{elseif isset($hotel_info) && $hotel_info.active_refund}checked="checked"{/if}>
 									<label for="active_refund_on">{l s='Yes' mod='hotelreservationsystem'}</label>
-
-									<input type="radio" value="0" id="active_refund_off" name="active_refund"
-									{if isset($smarty.post.active_refund)}{if !$smarty.post.active_refund}checked="checked"{/if}{elseif !isset($hotel_info)}checked="checked"{elseif isset($hotel_info) && !$hotel_info.active_refund}checked="checked"{/if}>
-
+									<input type="radio" value="0" id="active_refund_off" name="active_refund" {if isset($WK_ORDER_REFUND_ALLOWED) && !$WK_ORDER_REFUND_ALLOWED} disabled="disabled" checked="checked" {elseif isset($smarty.post.active_refund)}{if !$smarty.post.active_refund}checked="checked"{/if}{elseif !isset($hotel_info)}checked="checked"{elseif isset($hotel_info) && !$hotel_info.active_refund}checked="checked"{/if}>
 									<label for="active_refund_off">{l s='No' mod='hotelreservationsystem'}</label>
 									<a class="slide-button btn"></a>
 								</span>

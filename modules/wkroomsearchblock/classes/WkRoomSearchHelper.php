@@ -264,6 +264,21 @@ class WkRoomSearchHelper
             ));
         }
 
+        $totalColumns = 9;// min value
+        if ($locationEnabled) {
+            $totalColumns += 4;
+        }
+
+        if (!(count($hotelsInfo) <= 1 && !$smartyVars['show_hotel_name'])) {
+            $totalColumns += 5;
+        }
+
+        if (Configuration::get('PS_FRONT_SEARCH_TYPE') == HotelBookingDetail::SEARCH_TYPE_OWS) {
+            $totalColumns += 4;
+        }
+
+        $smartyVars['total_columns'] = $totalColumns;
+
         Context::getContext()->smarty->assign($smartyVars);
     }
 }

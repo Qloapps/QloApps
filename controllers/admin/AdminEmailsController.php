@@ -218,7 +218,7 @@ class AdminEmailsControllerCore extends AdminController
 
         if (!defined('_PS_HOST_MODE_')) {
             $this->fields_options['email']['fields']['PS_MAIL_METHOD']['choices'][1] =
-                $this->l('Use PHP\'s mail() function (recommended; works in most cases)');
+                $this->l('Use PHP\'s mail() function');
         }
 
         ksort($this->fields_options['email']['fields']['PS_MAIL_METHOD']['choices']);

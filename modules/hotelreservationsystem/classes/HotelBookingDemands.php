@@ -204,7 +204,7 @@ class HotelBookingDemands extends ObjectModel
                     }
 
                     // Rounding as per configurations
-                    $totalAmount += Tools::processPriceRounding($amount, $quantity);
+                    $totalAmount = Tools::processPriceRounding($amount, $quantity);
 
                     $values .= '('.(int)$this->id.','.(int)$idTax.','.(float)$amount.','.
                     (float)$totalAmount.'),';

@@ -409,7 +409,7 @@
                     html += '</select>';
                 html += '</td>';
                 html += '<td class="col-sm-3 center">';
-                    html += '<input class="form-control" type="text" name="'+prefix+'[floor]">';
+                    html += '<input class="form-control" type="text" name="'+prefix+'[comment]">';
                 html += '</td>';
                 html += '<td class="center col-sm-2">';
                     html += '<a class="btn btn-default deactiveDatesModal disabled" data-toggle="modal" data-target="#deactiveDatesModal">';

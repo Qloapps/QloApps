@@ -127,6 +127,15 @@
                 </div>
             </div>
         </div>
+        <div class="product_invoice" style="display: none;">
+            <select name="product_invoice" class="edit_product_invoice">
+                {foreach from=$invoices_collection item=invoice}
+                    <option value="{$invoice->id}" {if $invoice->id == $data.id_order_invoice}selected="selected"{/if}>
+                        #{Configuration::get('PS_INVOICE_PREFIX', $current_id_lang, null, $order->id_shop)}{'%06d'|sprintf:$invoice->number}
+                    </option>
+                {/foreach}
+            </select>
+        </div>
     </div>
     <div class="modal-footer">
         <button type="button" id="submitRoomChange" class="btn btn-primary"><i class="icon icon-bed"></i> &nbsp;{l s="Update Rooms"}</button>

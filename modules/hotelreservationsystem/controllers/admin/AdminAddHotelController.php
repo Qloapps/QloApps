@@ -222,6 +222,7 @@ class AdminAddHotelController extends ModuleAdminController
         $smartyVars['ps_img_dir'] = _PS_IMG_.'l/';
         $smartyVars['MAX_GLOBAL_BOOKING_DATE'] = (Configuration::get('MAX_GLOBAL_BOOKING_DATE'));
         $smartyVars['GLOBAL_PREPARATION_TIME'] = Configuration::get('GLOBAL_PREPARATION_TIME');
+        $smartyVars['WK_ORDER_REFUND_ALLOWED'] = Configuration::get('WK_ORDER_REFUND_ALLOWED');
 
         $this->context->smarty->assign($smartyVars);
 
@@ -320,6 +321,10 @@ class AdminAddHotelController extends ModuleAdminController
 
                 }
             }
+        }
+
+        if ($activeRefund && !Configuration::get('WK_ORDER_REFUND_ALLOWED')) {
+            $this->errors[] = $this->l('Enable order refunds to allow hotel-wise refunds.');
         }
 
         // validate Friendly URL values
