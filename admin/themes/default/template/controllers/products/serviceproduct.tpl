@@ -124,17 +124,21 @@
                                     </div>
                                 </td>
                                 <td>
-                                    <div class="fixed-width-xl">
-                                        <select class="service_product_id_tax_rules_group" name="{$inputs_prefix}id_tax_rules_group">
-                                            <option value="0">{l s='No Tax'}</option>
-                                            {foreach from=$tax_rules_groups item=tax_rules_group}
-                                                <option value="{$tax_rules_group.id_tax_rules_group}" {if isset($smarty.post["{$inputs_prefix}id_tax_rules_group"])}{if $tax_rules_group.id_tax_rules_group == $smarty.post["{$inputs_prefix}id_tax_rules_group"]}{/if}{elseif $tax_rules_group.id_tax_rules_group == $service_product.id_tax_rules_group}selected{/if}>
-                                                    {$tax_rules_group['name']|htmlentitiesUTF8}
-                                                </option>
-                                            {/foreach}
-                                        </select>
-                                    </div>
-                                    <div class="help-block">{l s='Default tax rule: %s' sprintf=$service_product.tax_rules_group_name}</div>
+                                    {if $service_product.auto_add_to_cart&& $service_product.price_addition_type == Product::PRICE_ADDITION_TYPE_WITH_ROOM}
+                                        {l s='-'}
+                                    {else}
+                                        <div class="fixed-width-xl">
+                                            <select class="service_product_id_tax_rules_group" name="{$inputs_prefix}id_tax_rules_group">
+                                                <option value="0">{l s='No Tax'}</option>
+                                                {foreach from=$tax_rules_groups item=tax_rules_group}
+                                                    <option value="{$tax_rules_group.id_tax_rules_group}" {if isset($smarty.post["{$inputs_prefix}id_tax_rules_group"])}{if $tax_rules_group.id_tax_rules_group == $smarty.post["{$inputs_prefix}id_tax_rules_group"]}{/if}{elseif $tax_rules_group.id_tax_rules_group == $service_product.id_tax_rules_group}selected{/if}>
+                                                        {$tax_rules_group['name']|htmlentitiesUTF8}
+                                                    </option>
+                                                {/foreach}
+                                            </select>
+                                        </div>
+                                        <div class="help-block">{l s='Default tax rule: %s' sprintf=$service_product.tax_rules_group_name}</div>
+                                    {/if}           
                                 </td>
                             </tr>
                         {/foreach}

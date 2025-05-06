@@ -3146,14 +3146,14 @@ class WebserviceSpecificManagementBookingsCore Extends ObjectModel implements We
 
                     $totalPriceTaxExcl = $unitPriceTaxExcl * $quantity;
                     $totalPriceTaxIncl = $unitPriceTaxIncl * $quantity;
-                    if (isset($service['unit_price_without_tax'])) {
-                        $unitPriceTaxExcl = $service['unit_price_without_tax'];
+                    if (isset($services[$product['id_product']]['unit_price_without_tax'])) {
+                        $unitPriceTaxExcl = $services[$product['id_product']]['unit_price_without_tax'];
                         $unitPriceTaxIncl = $unitPriceTaxExcl * $oldTaxMultiplier;
 
                         $totalPriceTaxExcl = $unitPriceTaxExcl * $quantity;
                         $totalPriceTaxIncl =  $unitPriceTaxIncl * $quantity;
-                    } else if (isset($service['total_price_without_tax'])) {
-                        $totalPriceTaxExcl = $service['total_price_without_tax'];
+                    } else if (isset($services[$product['id_product']]['total_price_without_tax'])) {
+                        $totalPriceTaxExcl = $services[$product['id_product']]['total_price_without_tax'];
                         $totalPriceTaxIncl = $totalPriceTaxExcl * $oldTaxMultiplier;
 
                         $unitPriceTaxExcl = $totalPriceTaxExcl / $quantity;

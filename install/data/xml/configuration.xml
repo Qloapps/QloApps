@@ -785,6 +785,9 @@
 	<configuration id="PS_MAIL_METHOD" name="PS_MAIL_METHOD">
 		<value>1</value>
 	</configuration>
+	<configuration id="PS_MAIL_SUBJECT_PREFIX" name="PS_MAIL_SUBJECT_PREFIX">
+    	<value>1</value>
+  	</configuration>
 	<configuration id="PS_SHOP_ACTIVITY" name="PS_SHOP_ACTIVITY">
 		<value>Animaux</value>
 	</configuration>

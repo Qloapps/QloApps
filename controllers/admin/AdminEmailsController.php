@@ -109,6 +109,12 @@ class AdminEmailsControllerCore extends AdminController
                             2 => $this->l('Set my own SMTP parameters (for advanced users ONLY)')
                         )
                     ),
+                    'PS_MAIL_SUBJECT_PREFIX' => array(
+                        'title' => $this->l('Enable the website name as a prefix in the email\'s subject'),
+                        'validation' => 'isBool',
+                        'cast' => 'intval',
+                        'type' => 'bool',
+                    ),
                     'PS_MAIL_TYPE' => array(
                         'title' => '',
                         'validation' => 'isGenericName',
@@ -125,7 +131,7 @@ class AdminEmailsControllerCore extends AdminController
                         'validation' => 'isBool',
                         'cast' => 'intval',
                         'type' => 'bool'
-                    ),
+                    )
                 ),
                 'submit' => array('title' => $this->l('Save'))
             ),

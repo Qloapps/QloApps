@@ -506,16 +506,14 @@ $(document).ready(function() {
                 opt: 0,
             },
             success: function(result) {
-                if (result) {
-                    if (!(result.success)) {
-                        $(".cart_booking_btn").attr('disabled', 'true');
-                    }
+                if (!result.success) {
+                    $(".cart_booking_btn").attr('disabled', 'true');
+                } else {
                     $("#htl_rooms_list").empty().append(result.data.room_tpl);
                     refreshCartData();
                     refreshStatsData();
                     calendar.refetchEvents();
                     initBookingList();
-
                     var panel_btn = $(".tab-pane tr td button[data-id-cart-book-data='" + id_cart_book_data + "']");
 
                     panel_btn.attr('data-id-cart', '');
@@ -527,7 +525,6 @@ $(document).ready(function() {
                         panel_btn.removeClass('part_delete_cart_data').addClass('par_add_cart');
 
                     panel_btn.removeClass('btn-danger').addClass('btn-primary').html(add_to_cart);
-
                 }
             }
         });

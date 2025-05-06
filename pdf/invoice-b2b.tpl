@@ -294,8 +294,7 @@
 <div style="line-height: 1pt">&nbsp;</div>
 <table style="width: 100%">
 	<tr>
-		<td style="width: 15%"></td>
-		<td style="width: 85%">{$HOOK_DISPLAY_PDF}</td>
+		<td style="width: 100%">{$HOOK_DISPLAY_PDF}</td>
 	</tr>
 </table>
 {/if}

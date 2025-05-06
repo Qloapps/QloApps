@@ -20,6 +20,10 @@
 (function($) {
 
     var dateRangePickerOrg = $.fn.dateRangePicker;
+    Object.assign($.dateRangePickerLanguages, {
+        zh: $.dateRangePickerLanguages.cn,
+        tw: $.dateRangePickerLanguages.tc
+    });
     $.fn.dateRangePicker = function(opt) {
         if(typeof opt === "object") {
             let container = $(this).parent();

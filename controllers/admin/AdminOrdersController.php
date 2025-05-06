@@ -1776,6 +1776,7 @@ class AdminOrdersControllerCore extends AdminController
 
                         $amountPaid = Tools::ps_round($amountPaid, 6);
                         $objEmployee = new Employee($this->context->cookie->id_employee);
+                        $sendMails = Tools::getValue('send_mails', true);
 
                         $objPaymentModule->validateOrder(
                             $objCart->id,
@@ -1786,7 +1787,9 @@ class AdminOrdersControllerCore extends AdminController
                             $extraVars,
                             null,
                             false,
-                            $objCart->secure_key
+                            $objCart->secure_key,
+                            null,
+                            $sendMails
                         );
 
                         if (isset($this->context->cookie->id_cart)) {
