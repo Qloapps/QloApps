@@ -80,4 +80,10 @@ class BankwirePaymentModuleFrontController extends ModuleFrontController
 
         $this->setTemplate('payment_execution.tpl');
     }
+
+    public function setMedia()
+    {
+        parent::setMedia();
+        $this->addJS($this->module->getLocalPath().'views/js/front/payment.js');
+    }
 }

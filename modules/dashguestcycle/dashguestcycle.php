@@ -79,7 +79,7 @@ class DashGuestCycle extends Module
             $dataValue['dgc_total_departures'] = sprintf('%02d', rand(100, 1000));
             $dataValue['dgc_departed'] = sprintf('%02d', rand(0, $dataValue['dgc_total_departures']));
             $dataValue['dgc_new_bookings'] = sprintf('%02d', rand(10, 500));
-            $dataValue['dgc_stay_overs'] = sprintf('%02d', rand(10, 500));
+            $dataValue['dgc_occupied'] = sprintf('%02d', rand(10, 500));
             $dataValue['dgc_new_messages'] = sprintf('%02d', rand(0, 20));
             $dataValue['dgc_cancelled_bookings'] = sprintf('%02d', rand(0, 20));
             $dataValue['dgc_guests_adults'] = sprintf('%02d', rand(100, 1000));
@@ -94,7 +94,12 @@ class DashGuestCycle extends Module
             $dataValue['dgc_departed'] = sprintf('%02d', $departuresData['departed']);
             $dataValue['dgc_total_departures'] = sprintf('%02d', $departuresData['total_departures']);
             $dataValue['dgc_new_bookings'] = sprintf('%02d', count(AdminStatsController::getNewBookingsInfoByDate($dateToday, $params['id_hotel'])));
-            $dataValue['dgc_stay_overs'] = sprintf('%02d', AdminStatsController::getStayOversByDate($dateToday, $params['id_hotel']));
+            $dataValue['dgc_occupied'] = sprintf('%02d', AdminStatsController::getDistinctRoomBookingsCount(
+                date('Y-m-d', strtotime('-1 day')),
+                $dateToday,
+                $params['id_hotel'],
+                HotelBookingDetail::STATUS_CHECKED_IN
+            ));
             $dataValue['dgc_new_messages'] = sprintf('%02d', CustomerMessage::getMessagesByDate($dateToday));
             $dataValue['dgc_cancelled_bookings'] = sprintf('%02d', AdminStatsController::getCancelledBookingsByDate($dateToday, $params['id_hotel']));
             $dataValue['dgc_guests_adults'] = sprintf('%02d', $guestsData['adults']);

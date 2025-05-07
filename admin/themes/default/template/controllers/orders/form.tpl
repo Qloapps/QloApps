@@ -1696,7 +1696,7 @@
 				headers: {
 					"cache-control": "no-cache"
 				},
-				url: "{$link->getAdminLink('AdminOrders')|addslashes}",
+				url: "{$link->getAdminLink('AdminCarts')|addslashes}",
 				dataType: 'JSON',
 				cache: false,
 				data: {

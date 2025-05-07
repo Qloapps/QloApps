@@ -85,12 +85,12 @@
             </p>
         </div><!-- .cheque-box -->
         <p class="cart_navigation clearfix" id="cart_navigation">
-            <a class="btn" href="{$link->getPageLink('order', true, NULL, "step=3")|escape:'html':'UTF-8'}">
-                <i class="icon-chevron-left"></i>&nbsp;{l s='Other payment methods' mod='bankwire'}
-            </a>
+            <a href="{$link->getPageLink('order', true, NULL, "step=3")|escape:'html':'UTF-8'}" class="button-exclusive btn btn-default">
+				<i class="icon-chevron-left"></i>{l s='Other payment methods' mod='bankwire'}
+			</a>
             {*By webkul To Check Order restrict condition before Payment by the customer*}
             {if !$restrict_order}
-                <button class="btn pull-right button button-medium" type="submit">
+                <button class="btn pull-right button button-medium confirm_order" type="submit">
                     <span>{l s='I confirm my order' mod='bankwire'}&nbsp;<i class="icon-chevron-right right"></i></span>
                 </button>
             {/if}

@@ -68,15 +68,15 @@
 					</div>
 				</div>
 				<div class="badge-wrapper">
-					<div class="badge-item label-tooltip" data-toggle="tooltip" data-original-title="{l s='The number of stay overs scheduled for today.' mod='dashguestcycle'}">
+					<div class="badge-item label-tooltip" data-toggle="tooltip" data-original-title="{l s='The count of rooms that are currently occupied by guests.' mod='dashguestcycle'}">
 						<div class="badge-strip" style="background-color: #FFC148;"></div>
 						<div class="badge-content-wrapper">
 							<div class="title-wrapper">
-								<p class="text-center">{l s="Stay Overs" mod='dashguestcycle'}</p>
+								<p class="text-center">{l s='Occupied Rooms' mod='dashguestcycle'}</p>
 							</div>
 							<div class="value-wrapper">
 								<p class="text-center">
-									<span id="dgc_stay_overs"></span>
+									<span id="dgc_occupied"></span>
 								</p>
 							</div>
 						</div>
