@@ -414,17 +414,17 @@ $(document).ready(function () {
 								{$featurePlan['feature_price_name']}
 							</td>
 							<td>
-								{if $featurePlan['impact_type'] == HotelRoomTypeFeaturePricing::IMPACT_TYPE_PERCENTAGE}
-									{l s='Percentage'}
-								{else}
-									{l s='Fixed Amount'}
-								{/if}
-							</td>
-							<td>
 								{if $featurePlan['impact_way'] == HotelRoomTypeFeaturePricing::IMPACT_WAY_DECREASE}
 									{l s='Decrease'}
 								{else}
 									{l s='Increase'}
+								{/if}
+							</td>
+							<td>
+								{if $featurePlan['impact_type'] == HotelRoomTypeFeaturePricing::IMPACT_TYPE_PERCENTAGE}
+									{l s='Percentage'}
+								{else}
+									{l s='Fixed Amount'}
 								{/if}
 							</td>
 							<td>

@@ -62,6 +62,7 @@ class HotelBookingDetail extends ObjectModel
     public $adults;
     public $children;
     public $child_ages;
+    public $planned_check_out;
 
     public $date_add;
     public $date_upd;
@@ -124,6 +125,7 @@ class HotelBookingDetail extends ObjectModel
             'email' => array('type' => self::TYPE_STRING, 'validate' => 'isEmail', 'size' => 255, 'required' => true),
             'check_in_time' => array('type' => self::TYPE_STRING, 'required' => true),
             'check_out_time' => array('type' => self::TYPE_STRING, 'required' => true),
+            'planned_check_out' => array('type' => self::TYPE_STRING, 'required' => true),
             'adults' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId', 'required' => true),
             'children' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
             'child_ages' => array('type' => self::TYPE_STRING),
@@ -2154,7 +2156,7 @@ class HotelBookingDetail extends ObjectModel
                 }
 
                 // delete cart feature prices after room addition success
-                HotelRoomTypeFeaturePricing::deleteByIdCart($this->context->cart->id);
+                HotelRoomTypeFeaturePricing::deleteFeaturePrices($this->context->cart->id);
 
                 // ===============================================================
                 // END: Add Process of the old booking
@@ -3682,5 +3684,19 @@ class HotelBookingDetail extends ObjectModel
         }
 
         return $result;
+    }
+
+    public function add($auto_date = true, $null_values = false)
+    {
+        if (!$this->planned_check_out) {
+            $objHotelBranchInfo  = new HotelBranchInformation((int) $this->id_hotel);
+            $dateTo = new DateTime($this->date_to);
+            $timeParts = explode(':', $objHotelBranchInfo->check_out);
+            $dateTo->setTime($timeParts[0], $timeParts[1]);
+
+            $this->planned_check_out = $dateTo->format('Y-m-d H:i:s');
+        }
+
+        return parent::add($auto_date, $null_values);
     }
 }

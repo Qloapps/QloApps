@@ -149,8 +149,7 @@ class CustomerCore extends ObjectModel
             'last_passwd_gen' => array('setter' => null),
             'secure_key' => array('setter' => null),
             'deleted' => array(),
-            'passwd' => array('setter' => 'setWsPasswd'),
-            'phone' => array()
+            'passwd' => array('setter' => 'setWsPasswd')
         ),
         'associations' => array(
             'groups' => array('resource' => 'group'),
@@ -180,6 +179,7 @@ class CustomerCore extends ObjectModel
             'company' =>                    array('type' => self::TYPE_STRING, 'validate' => 'isGenericName'),
             'siret' =>                        array('type' => self::TYPE_STRING, 'validate' => 'isSiret'),
             'ape' =>                        array('type' => self::TYPE_STRING, 'validate' => 'isApe'),
+            'phone' =>                      array('type' => self::TYPE_STRING, 'validate' => 'isPhoneNumber', 'size' => 32),
             'outstanding_allow_amount' =>    array('type' => self::TYPE_FLOAT, 'validate' => 'isFloat', 'copy_post' => false),
             'show_public_prices' =>            array('type' => self::TYPE_BOOL, 'validate' => 'isBool', 'copy_post' => false),
             'id_risk' =>                    array('type' => self::TYPE_INT, 'validate' => 'isUnsignedInt', 'copy_post' => false),
@@ -206,12 +206,8 @@ class CustomerCore extends ObjectModel
         $this->id_default_group = (int)Configuration::get('PS_CUSTOMER_GROUP');
         parent::__construct($id);
 
-        if ($this->email) {
-            $this->phone = CartCustomerGuestDetail::getCustomerPhone($this->email);
-        }
-
         if (Configuration::get('PS_ONE_PHONE_AT_LEAST')) {
-            $this->webserviceParameters['fields']['phone']['required'] = true;
+            self::$definition['fields']['phone']['required'] = true;
         }
     }
 
@@ -264,7 +260,7 @@ class CustomerCore extends ObjectModel
         }
         $success = parent::add($autodate, $null_values);
         $this->updateGroup($this->groupBox);
-        $this->updateCustomerAdditionalDetails(CartCustomerGuestDetail::getIdCustomerGuest($this->email));
+
         return $success;
     }
 
@@ -289,20 +285,7 @@ class CustomerCore extends ObjectModel
 
         $objOldCustomer = new Customer($this->id);
         $success = parent::update(true);
-        $this->updateCustomerAdditionalDetails(CartCustomerGuestDetail::getIdCustomerGuest($objOldCustomer->email));
         return $success;
-    }
-
-    public function updateCustomerAdditionalDetails($idCustomerGuest)
-    {
-        $objCartCustomerGuestDetail = new CartCustomerGuestDetail($idCustomerGuest);
-        $objCartCustomerGuestDetail->id_cart = 0;
-        $objCartCustomerGuestDetail->id_gender = $this->id_gender;
-        $objCartCustomerGuestDetail->firstname = $this->firstname;
-        $objCartCustomerGuestDetail->lastname = $this->lastname;
-        $objCartCustomerGuestDetail->email = $this->email;
-        $objCartCustomerGuestDetail->phone = $this->phone;
-        return $objCartCustomerGuestDetail->save();
     }
 
     public function delete()
@@ -344,8 +327,6 @@ class CustomerCore extends ObjectModel
 
         CartRule::deleteByIdCustomer((int)$this->id);
         // delete customer data from customerGuest table
-        $objCartCustomerGuestDetail = new CartCustomerGuestDetail(CartCustomerGuestDetail::getIdCustomerGuest($this->email));
-        $objCartCustomerGuestDetail->delete();
         return parent::delete();
     }
 

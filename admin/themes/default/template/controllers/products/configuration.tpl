@@ -101,8 +101,8 @@
 								</td>
 								<td class="col-sm-1 center">
 									{if isset($room_info['id'])}
-                                        {if $room_info['booked_dates']}
-                                            <input type="hidden" class="booked-dates" name="{$var_name_room_info|cat:'[booked_dates]'}" value='{$room_info['booked_dates']|json_encode|escape:'html':'UTF-8'}'>
+                                        {if isset($room_info['booked_dates']) && $room_info['booked_dates']}
+                                            <input type="hidden" class="booked-dates" name="{$var_name_room_info|cat:'[booked_dates]'}" value='{$room_info['booked_dates']|escape:'html':'UTF-8'}'>
                                             <a href="#" class="view_htl_room btn btn-default" data-toggle="modal" data-target="#room-dates-modal" data-id-room="{$room_info['id']}"><i class="icon-info"></i></a>
                                         {/if}
 										<a href="#" class="rm_htl_room btn btn-default" data-id-htl-info="{$room_info['id']}"><i class="icon-trash"></i></a>

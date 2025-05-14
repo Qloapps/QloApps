@@ -606,6 +606,7 @@ CREATE TABLE `PREFIX_customer` (
   `max_payment_days` int(10) unsigned NOT NULL DEFAULT '60',
   `secure_key` varchar(32) NOT NULL DEFAULT '-1',
   `note` text,
+  `phone` varchar(32) DEFAULT NULL,
   `active` tinyint(1) unsigned NOT NULL DEFAULT '0',
   `is_guest` tinyint(1) NOT NULL DEFAULT '0',
   `deleted` tinyint(1) NOT NULL DEFAULT '0',

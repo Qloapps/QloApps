@@ -110,7 +110,8 @@ class RoomTypeServiceProductPrice extends ObjectModel
         $useTax = null,
         $id_cart = false,
         $id_address = null,
-        $use_reduc= 1
+        $use_reduc= 1,
+        $idGroup = null
     ) {
         if ($useTax === null)
             $useTax = Product::$_taxCalculationMethod == PS_TAX_EXC ? false : true;
@@ -135,7 +136,8 @@ class RoomTypeServiceProductPrice extends ObjectModel
             true,
             null,
             true,
-            (int)$idProductRoomType
+            (int)$idProductRoomType,
+            $idGroup
         );
 
         Hook::exec('actionServicePriceModifier',

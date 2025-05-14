@@ -153,6 +153,7 @@ class HotelReservationSystemDb
                 `comment` text NOT NULL,
                 `check_in` datetime NOT NULL,
                 `check_out` datetime NOT NULL,
+                `planned_check_out` datetime NOT NULL,
                 `date_from` datetime NOT NULL,
                 `date_to` datetime NOT NULL,
                 `total_price_tax_excl` decimal(20,6) NOT NULL,

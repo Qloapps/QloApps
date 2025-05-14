@@ -1680,6 +1680,8 @@ class AdminOrdersControllerCore extends AdminController
                     $this->context->cart = $objCart;
                     $this->context->currency = new Currency((int)$objCart->id_currency);
 
+                    // Setting the customer in context to get the order total with the group discount.
+                    $this->context->customer = new Customer($objCart->id_customer);
                     $this->errors = HotelCartBookingData::validateCartBookings();
                     $orderTotal = $objCart->getOrderTotal(true, Cart::BOTH);
                     if ($objCart->is_advance_payment) {
@@ -4684,7 +4686,7 @@ class AdminOrdersControllerCore extends AdminController
         }
 
         // delete cart feature prices after room addition success
-        HotelRoomTypeFeaturePricing::deleteByIdCart($this->context->cart->id);
+        HotelRoomTypeFeaturePricing::deleteFeaturePrices($this->context->cart->id);
 
         die(json_encode(array(
             'result' => true,
@@ -4845,7 +4847,7 @@ class AdminOrdersControllerCore extends AdminController
         }
 
         // delete cart feature prices after booking update success
-        HotelRoomTypeFeaturePricing::deleteByIdCart($cart->id);
+        HotelRoomTypeFeaturePricing::deleteFeaturePrices($cart->id);
 
         // Calculate differences of price (Before / After)
         $diff_price_tax_incl = $totalRoomPriceAfterTI - $totalRoomPriceBeforeTI;
@@ -6148,7 +6150,6 @@ class AdminOrdersControllerCore extends AdminController
         $obj_hotel_cart_detail = new HotelCartBookingData();
         $deleted = $obj_hotel_cart_detail->deleteCartBookingData($cart_id, $id_product, $room_id, $dt_frm, $dt_to);
         if ($deleted) {
-            HotelRoomTypeFeaturePricing::deleteByIdCart($cart_id, $id_product, $room_id, $dt_frm, $dt_to );
             $obj_product_process = new HotelCartBookingData();
             $num_cart_rooms = 0;
             if ($rooms = $obj_hotel_cart_detail->getCartCurrentDataByCartId($cart_id)) {
@@ -6156,6 +6157,8 @@ class AdminOrdersControllerCore extends AdminController
             }
 
             $numDays = HotelHelper::getNumberOfDays($dt_frm, $dt_to);
+            $dt_to = date('Y-m-d H:i:s', strtotime($dt_to) - _TIME_1_DAY_);
+            HotelRoomTypeFeaturePricing::deleteFeaturePrices($cart_id, $id_product, $room_id, $dt_frm, $dt_to);
             $changed = $obj_product_process->changeProductDataByRoomId($room_id, $id_product, $numDays, $cart_id);
             if ($changed) {
                 $result['status'] = 'deleted';

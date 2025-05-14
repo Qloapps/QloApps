@@ -141,6 +141,11 @@ class AdminCustomersControllerCore extends AdminController
                 'align' => 'text-right',
                 'badge_success' => true
             ),
+            'phone' => array(
+                'title' => $this->l('Phone'),
+                'optional' => true,
+                'visible_default' => false,
+            ),
             'active' => array(
                 'title' => $this->l('Enabled'),
                 'align' => 'text-center',

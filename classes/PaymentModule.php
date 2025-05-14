@@ -1384,7 +1384,7 @@ abstract class PaymentModuleCore extends Module
             } // End foreach $order_detail_list
 
             // delete cart feature prices after booking creation success
-            HotelRoomTypeFeaturePricing::deleteByIdCart($id_cart);
+            HotelRoomTypeFeaturePricing::deleteFeaturePrices($id_cart);
 
             if (count($cart_rules)) {
                 foreach ($cart_rules as $idCartRule => $cartRule) {

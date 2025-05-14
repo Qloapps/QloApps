@@ -2966,7 +2966,7 @@ class AdminProductsControllerCore extends AdminController
                                     $bookedDate['date_from_formatted'] = Tools::displayDate($bookedDate['date_from']);
                                     $bookedDate['date_to_formatted'] = Tools::displayDate($bookedDate['date_to']);
                                 }
-                                $room['booked_dates'] = $bookedDates;
+                                $room['booked_dates'] = json_encode($bookedDates);
 
                                 if ($room['id_status'] == HotelRoomInformation::STATUS_TEMPORARY_INACTIVE) {
                                     $disableDates = $objRoomDisableDates->getRoomDisableDates($room['id']);

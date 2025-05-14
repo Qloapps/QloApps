@@ -952,7 +952,7 @@ class AdminCartsControllerCore extends AdminController
         $this->context->cart = new Cart($id_cart);
 
         $date_from = date('Y-m-d H:i:s', strtotime($date_from));
-        $date_to = date('Y-m-d H:i:s', strtotime($date_to));
+        $date_to = date('Y-m-d H:i:s', strtotime($date_to) - _TIME_1_DAY_);
 
         if ($this->context->cart->id_currency != (int)Configuration::get('PS_CURRENCY_DEFAULT')) {
             $currency = Currency::getCurrencyInstance($this->context->cart->id_currency);
@@ -960,7 +960,7 @@ class AdminCartsControllerCore extends AdminController
         }
 
         if ($this->tabAccess['edit'] === '1') {
-            HotelRoomTypeFeaturePricing::deleteByIdCart($id_cart, $id_product, $id_room, $date_from, $date_to);
+            HotelRoomTypeFeaturePricing::deleteFeaturePrices($id_cart, $id_product, $id_room, $date_from, $date_to);
             $feature_price_name = array();
             foreach (Language::getIDs(true) as $id_lang) {
                 $feature_price_name[$id_lang] = 'Auto-generated';

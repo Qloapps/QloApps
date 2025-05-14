@@ -458,7 +458,7 @@
                                         <tr>
                                             <td>{dateFormat date=$payment['date_add'] full=true}</td>
                                             <td>{$payment['payment_method']|escape:'html':'UTF-8'}</td>
-                                            <td>{$payment_types[$payment['payment_type']]['name']|escape:'html':'UTF-8'}</td>
+                                            <td>{$payment_types[$payment['payment_type']]['name']|escape:'UTF-8'}</td>
                                             <td>{$payment['transaction_id']|escape:'html':'UTF-8'}</td>
                                             <td>{displayPrice price=$payment['real_paid_amount'] currency=$payment['id_currency']}</td>
                                             <td>{if isset($payment['invoice_number'])}{$payment['invoice_number']}{else}--{/if}</td>

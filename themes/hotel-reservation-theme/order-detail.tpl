@@ -406,20 +406,6 @@
                                                     <td class="text-right">{$guestInformations['phone']|escape:'html':'UTF-8'} </td>
                                                 </tr>
                                             {/if}
-
-                                            {if isset($address_invoice->phone_mobile) && $address_invoice->phone_mobile}
-                                                <tr>
-                                                    <td>{l s='Mobile'}</td>
-                                                    <td class="text-right">{$address_invoice->phone_mobile|escape:'html':'UTF-8'}</td>
-                                                </tr>
-                                            {/if}
-
-                                            {if isset($address_invoice->phone) && $address_invoice->phone}
-                                                <tr>
-                                                    <td>{l s='Phone'}</td>
-                                                    <td class="text-right">{$address_invoice->phone|escape:'html':'UTF-8'}</td>
-                                                </tr>
-                                            {/if}
                                         {/if}
 
                                         {block name='displayOrderDetailGuestDetailsRow'}
@@ -796,19 +782,6 @@
                                                 <tr>
                                                     <td>{l s='Phone'}</td>
                                                     <td class="text-right">{$guestInformations['phone']|escape:'html':'UTF-8'} </td>
-                                                </tr>
-                                            {/if}
-                                            {if isset($address_invoice->phone_mobile) && $address_invoice->phone_mobile}
-                                                <tr>
-                                                    <td>{l s='Mobile'}</td>
-                                                    <td class="text-right">{$address_invoice->phone_mobile|escape:'html':'UTF-8'}</td>
-                                                </tr>
-                                            {/if}
-
-                                            {if isset($address_invoice->phone) && $address_invoice->phone}
-                                                <tr>
-                                                    <td>{l s='Phone'}</td>
-                                                    <td class="text-right">{$address_invoice->phone|escape:'html':'UTF-8'}</td>
                                                 </tr>
                                             {/if}
                                         {/if}

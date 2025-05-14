@@ -90,6 +90,7 @@ abstract class CacheCore
         'page_viewed',
         'employee',
         'log',
+        'htl_cart_booking_data',
     );
 
     /**

@@ -1269,7 +1269,7 @@ class WebserviceSpecificManagementBookingsCore Extends ObjectModel implements We
             $this->bookingCustomer = $objCustomer;
         } else {
             $objCustomer = new Customer();
-            $this->bookingCustomer = $objCustomer->getByEmail($guestDetails['email']);
+            $this->bookingCustomer = $objCustomer->getByEmail($guestDetails['email'], null, false);
         }
 
         if (isset($this->bookingCustomer->id)
@@ -1710,7 +1710,7 @@ class WebserviceSpecificManagementBookingsCore Extends ObjectModel implements We
                                     'id_cart' => (int) $this->context->cart->id,
                                     'id_guest' => (int) $this->context->cart->id_guest,
                                     'date_from' => date('Y-m-d', strtotime($dateFrom)),
-                                    'date_to' => date('Y-m-d', strtotime($dateTo)),
+                                    'date_to' => date('Y-m-d', strtotime($dateTo) - _TIME_1_DAY_),
                                     'id_room' => $objCartBookingData->id_room,
                                     'price' => $room['unit_price_without_tax']
                                 )
@@ -2331,7 +2331,7 @@ class WebserviceSpecificManagementBookingsCore Extends ObjectModel implements We
         }
 
         $this->deleteWsFeaturePrices();
-        HotelRoomTypeFeaturePricing::deleteByIdCart($this->context->cart->id);
+        HotelRoomTypeFeaturePricing::deleteFeaturePrices($this->context->cart->id);
     }
 
     /**
@@ -2878,8 +2878,8 @@ class WebserviceSpecificManagementBookingsCore Extends ObjectModel implements We
         $objRoomTypeFeaturePricing->id_room = (int) $params['id_room'];
         $objRoomTypeFeaturePricing->feature_price_name = $feature_price_name;
         $objRoomTypeFeaturePricing->date_selection_type = HotelRoomTypeFeaturePricing::DATE_SELECTION_TYPE_RANGE;
-        $objRoomTypeFeaturePricing->date_from = date('Y-m-d', strtotime($params['date_from']));
-        $objRoomTypeFeaturePricing->date_to = date('Y-m-d', strtotime($params['date_to']));
+        $objRoomTypeFeaturePricing->date_from = $params['date_from'];
+        $objRoomTypeFeaturePricing->date_to = $params['date_to'];
         $objRoomTypeFeaturePricing->is_special_days_exists = 0;
         $objRoomTypeFeaturePricing->special_days = json_encode(false);
         $objRoomTypeFeaturePricing->impact_way = HotelRoomTypeFeaturePricing::IMPACT_WAY_FIX_PRICE;
@@ -2970,7 +2970,7 @@ class WebserviceSpecificManagementBookingsCore Extends ObjectModel implements We
                         'id_cart' => (int) $objCart->id,
                         'id_guest' => (int) $objCart->id_guest,
                         'date_from' => date('Y-m-d', strtotime($objHotelBookingDetail->date_from)),
-                        'date_to' => date('Y-m-d', strtotime($objHotelBookingDetail->date_to)),
+                        'date_to' => date('Y-m-d', strtotime($objHotelBookingDetail->date_to) - _TIME_1_DAY_),
                         'id_room' => $objHotelBookingDetail->id_room,
                         'price' => $room['unit_price_without_tax']
                     )
@@ -3006,7 +3006,7 @@ class WebserviceSpecificManagementBookingsCore Extends ObjectModel implements We
             $objOrder->total_products_wt += $objHotelBookingDetail->total_price_tax_incl;
             $objOrder->update();
 
-            HotelRoomTypeFeaturePricing::deleteByIdCart($objCart->id);
+            HotelRoomTypeFeaturePricing::deleteFeaturePrices($objCart->id);
             $this->deleteWsFeaturePrices();
         }
     }
