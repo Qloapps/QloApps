@@ -58,6 +58,16 @@ class AdminProductsControllerCore extends AdminController
 
     protected $id_current_category;
 
+    public $access_join;
+
+    public $access_where;
+
+    public $locationsAndHotels;
+
+    public $objLocationsCategory;
+
+    public $_lang;
+
     public function __construct()
     {
         $this->bootstrap = true;
