@@ -24,6 +24,8 @@ if (!defined('_PS_VERSION_')) {
 
 class DashInsights extends Module
 {
+    public $confirmUnsinstall;
+
     public function __construct()
     {
         $this->name = 'dashinsights';
