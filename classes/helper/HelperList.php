@@ -123,6 +123,8 @@ class HelperListCore extends Helper
 
     public $sql;
 
+    public $id;
+
     public function __construct()
     {
         $this->base_folder = 'helpers/list/';
