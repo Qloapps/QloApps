@@ -121,6 +121,8 @@ class HelperListCore extends Helper
 
     public $page;
 
+    public $sql;
+
     public function __construct()
     {
         $this->base_folder = 'helpers/list/';
@@ -377,7 +379,7 @@ class HelperListCore extends Helper
     /**
      * Display duplicate action link
      */
-    public function displayDuplicateLink($token = null, $id, $name = null)
+    public function displayDuplicateLink($token, $id, $name = null)
     {
         $tpl = $this->createTemplate('list_action_duplicate.tpl');
         if (!array_key_exists('Bad SQL query', self::$cache_lang)) {
@@ -427,7 +429,7 @@ class HelperListCore extends Helper
      *     fields_display: // attribute $fields_list of the admin controller
      *   }
      */
-    public function displayDetailsLink($token = null, $id, $name = null)
+    public function displayDetailsLink($token, $id, $name = null)
     {
         $tpl = $this->createTemplate('list_action_details.tpl');
         if (!array_key_exists('Details', self::$cache_lang)) {
@@ -454,7 +456,7 @@ class HelperListCore extends Helper
     /**
      * Display view action link
      */
-    public function displayViewLink($token = null, $id, $name = null)
+    public function displayViewLink($token, $id, $name = null)
     {
         $tpl = $this->createTemplate('list_action_view.tpl');
         if (!array_key_exists('View', self::$cache_lang)) {
@@ -472,7 +474,7 @@ class HelperListCore extends Helper
     /**
      * Display edit action link
      */
-    public function displayEditLink($token = null, $id, $name = null)
+    public function displayEditLink($token, $id, $name = null)
     {
         $tpl = $this->createTemplate('list_action_edit.tpl');
         if (!array_key_exists('Edit', self::$cache_lang)) {
@@ -491,7 +493,7 @@ class HelperListCore extends Helper
     /**
      * Display delete action link
      */
-    public function displayDeleteLink($token = null, $id, $name = null)
+    public function displayDeleteLink($token, $id, $name = null)
     {
         $tpl = $this->createTemplate('list_action_delete.tpl');
 
@@ -529,7 +531,7 @@ class HelperListCore extends Helper
     /**
      * Display default action link
      */
-    public function displayDefaultLink($token = null, $id, $name = null)
+    public function displayDefaultLink($token, $id, $name = null)
     {
         $tpl = $this->createTemplate('list_action_default.tpl');
         if (!array_key_exists('Default', self::$cache_lang)) {
