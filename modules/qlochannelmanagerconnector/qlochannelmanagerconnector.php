@@ -26,6 +26,9 @@ require_once dirname(__FILE__).'/classes/QcmcClassInclude.php';
 
 class QloChannelManagerConnector extends Module
 {
+    public $secure_key;
+    public $html;
+
     public function __construct()
     {
         $this->name = 'qlochannelmanagerconnector';
