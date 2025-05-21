@@ -263,7 +263,7 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
      * @param  [date]  $date_to    [end date of the date range]
      * @return [array|false]       [returns array containing rates of room type of a hotel if found else returns false]
      */
-    public function getHotelRoomTypesRatesAndInventoryByDate($id_hotel, $id_product=0, $date_from, $date_to)
+    public function getHotelRoomTypesRatesAndInventoryByDate($id_hotel, $id_product, $date_from, $date_to)
     {
         $hotelRoomType = new HotelRoomType();
         $context = Context::getContext();
@@ -275,7 +275,7 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
         for($date = $date_from; $date < $date_to; $date = date('Y-m-d', strtotime('+1 day', strtotime($date)))) {
             $currentDate = date('Y-m-d', strtotime($date));
             $nextDayDate = date('Y-m-d', strtotime('+1 day', strtotime($currentDate)));
-            if ($id_product) {
+            if ($id_product > 0) {
                 $bookingParams = array(
                     'date_from' => $currentDate,
                     'date_to' => $nextDayDate,
@@ -596,9 +596,9 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
      * @param  [array]  $params            [Room type rate plan info]
      * @return [bool]                     [returns true is successfuly added or updated else returns false]
      */
-    public function saveFeaturePricePlan($id = 0, $dateSelectionType, $params)
+    public function saveFeaturePricePlan($id, $dateSelectionType, $params)
     {
-        if ($id) {
+        if ($id > 0) {
             $roomTypeFeaturePricing = new HotelRoomTypeFeaturePricing($id);
         } else {
             $roomTypeFeaturePricing = new HotelRoomTypeFeaturePricing();
