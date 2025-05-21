@@ -39,7 +39,7 @@ class UploaderCore
     {
         $this->setName($name);
         $this->setCheckFileSize(true);
-        $this->files = array();
+        $this->_files = array();
     }
 
     public function setAcceptTypes($value)
