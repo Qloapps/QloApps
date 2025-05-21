@@ -24,6 +24,8 @@ if (!defined('_PS_VERSION_')) {
 
 class DashGuestCycle extends Module
 {
+    public $confirmUnsinstall;
+
     public function __construct()
     {
         $this->name = 'dashguestcycle';
