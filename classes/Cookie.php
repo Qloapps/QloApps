@@ -351,7 +351,7 @@ class CookieCore
      */
     protected function _setcookie($cookie = null)
     {
-        $length = (ini_get('mbstring.func_overload') & 2) ? mb_strlen($cookie, ini_get('default_charset')) : strlen($cookie);
+        $length = (ini_get('mbstring.func_overload') & 2) ? mb_strlen($cookie, ini_get('default_charset')) : strlen($cookie ?? '');
         if ($length >= 1048576) {
             return false;
         }
