@@ -1069,8 +1069,8 @@ class AdminControllerCore extends Controller
                 $action = Tools::getValue('action');
                 // no need to use displayConf() here
                 if (!empty($action) && method_exists($this, 'ajaxProcess'.Tools::toCamelCase($action))) {
-                    Hook::exec('actionAdmin'.ucfirst($this->action).'Before', array('controller' => $this));
-                    Hook::exec('action'.get_class($this).ucfirst($this->action).'Before', array('controller' => $this));
+                    Hook::exec('actionAdmin'.ucfirst($this->action ?? '').'Before', array('controller' => $this));
+                    Hook::exec('action'.get_class($this).ucfirst($this->action ?? '').'Before', array('controller' => $this));
 
                     $return = $this->{'ajaxProcess'.Tools::toCamelCase($action)}();
 
@@ -2057,7 +2057,7 @@ class AdminControllerCore extends Controller
                 $img = '../img/t/'.$tab['class_name'].'.png';
             }
 
-            if (trim($tab['module']) != '') {
+            if (trim($tab['module'] ?? '') != '') {
                 $path_img = _PS_MODULE_DIR_.$tab['module'].'/'.$tab['class_name'].'.png';
                 // Relative link will always work, whatever the base uri set in the admin
                 $img = '../modules/'.$tab['module'].'/'.$tab['class_name'].'.png';
