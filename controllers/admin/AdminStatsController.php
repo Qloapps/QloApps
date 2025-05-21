@@ -26,12 +26,12 @@
 
 class AdminStatsControllerCore extends AdminStatsTabController
 {
-    public static function getVisits($unique = false, $date_from, $date_to, $granularity = false)
+    public static function getVisits($unique, $date_from, $date_to, $granularity = false)
     {
         $visits = ($granularity == false) ? 0 : array();
         $objGoogleAnalytics = Module::isEnabled('qlogoogleanalytics') ? Module::getInstanceByName('qlogoogleanalytics') : false;
         if (Validate::isLoadedObject($objGoogleAnalytics) && $objGoogleAnalytics->isConfigured()) {
-            $metric = $unique ? 'visitors' : 'visits';
+            $metric = (bool)$unique ? 'visitors' : 'visits';
             if ($result = $objGoogleAnalytics->requestReportData($granularity ? 'ga:date' : '', 'ga:'.$metric, $date_from, $date_to, null, null, 1, 5000)) {
                 foreach ($result as $row) {
                     if ($granularity == 'day') {
@@ -49,7 +49,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
         } else {
             if ($granularity == 'day') {
                 $result = Db::getInstance(_PS_USE_SQL_SLAVE_)->ExecuteS('
-				SELECT LEFT(`date_add`, 10) as date, COUNT('.($unique ? 'DISTINCT id_guest' : '*').') as visits
+				SELECT LEFT(`date_add`, 10) as date, COUNT('.((bool)$unique ? 'DISTINCT id_guest' : '*').') as visits
 				FROM `'._DB_PREFIX_.'connections`
 				WHERE `date_add` BETWEEN "'.pSQL($date_from).' 00:00:00" AND "'.pSQL($date_to).' 23:59:59"
 				'.Shop::addSqlRestriction().'
@@ -59,7 +59,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
                 }
             } elseif ($granularity == 'month') {
                 $result = Db::getInstance(_PS_USE_SQL_SLAVE_)->ExecuteS('
-				SELECT LEFT(`date_add`, 7) as date, COUNT('.($unique ? 'DISTINCT id_guest' : '*').') as visits
+				SELECT LEFT(`date_add`, 7) as date, COUNT('.((bool)$unique ? 'DISTINCT id_guest' : '*').') as visits
 				FROM `'._DB_PREFIX_.'connections`
 				WHERE `date_add` BETWEEN "'.pSQL($date_from).' 00:00:00" AND "'.pSQL($date_to).' 23:59:59"
 				'.Shop::addSqlRestriction().'
@@ -69,7 +69,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
                 }
             } else {
                 $visits = Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue('
-				SELECT COUNT('.($unique ? 'DISTINCT id_guest' : '*').') as visits
+				SELECT COUNT('.((bool)$unique ? 'DISTINCT id_guest' : '*').') as visits
 				FROM `'._DB_PREFIX_.'connections`
 				WHERE `date_add` BETWEEN "'.pSQL($date_from).' 00:00:00" AND "'.pSQL($date_to).' 23:59:59"
 				'.Shop::addSqlRestriction());
