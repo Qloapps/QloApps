@@ -97,10 +97,10 @@ class TranslateCore
      * @param array $lang_array Global array of admin translations
      * @return string translation
      */
-    public static function getGenericAdminTranslation($string, $key = null, &$lang_array)
+    public static function getGenericAdminTranslation($string, $key, &$lang_array)
     {
         $string = preg_replace("/\\\*'/", "\'", $string);
-        if (is_null($key)) {
+        if (is_null($key) || empty($key)) {
             $key = md5($string);
         }
 
