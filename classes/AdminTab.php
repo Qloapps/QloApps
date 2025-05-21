@@ -1801,7 +1801,7 @@ abstract class AdminTabCore
 	        alt="'.((bool)$value ? $this->l('Enabled') : $this->l('Disabled')).'" title="'.((bool)$value ? $this->l('Enabled') : $this->l('Disabled')).'" /></a>';
     }
 
-    protected function _displayDuplicate($token = null, $id)
+    protected function _displayDuplicate($token, $id)
     {
         $_cacheLang['Duplicate'] = $this->l('Duplicate');
         $_cacheLang['Copy images too?'] = $this->l('This will copy the images too. If you wish to proceed, click "OK". If not, click "Cancel".', __CLASS__, true, false);
@@ -1811,7 +1811,7 @@ abstract class AdminTabCore
     		<img src="../img/admin/duplicate.png" alt="'.$_cacheLang['Duplicate'].'" title="'.$_cacheLang['Duplicate'].'" /></a>';
     }
 
-    protected function _displayViewLink($token = null, $id)
+    protected function _displayViewLink($token, $id)
     {
         $_cacheLang['View'] = $this->l('View');
         $href = Tools::safeOutput(self::$currentIndex.'&'.$this->identifier.'='.(int)$id.'&view'.$this->table.'&token='.($token != null ? $token : $this->token));
@@ -1820,7 +1820,7 @@ abstract class AdminTabCore
 			<img src="../img/admin/details.gif" alt="'.$_cacheLang['View'].'" title="'.$_cacheLang['View'].'" /></a>';
     }
 
-    protected function _displayEditLink($token = null, $id)
+    protected function _displayEditLink($token, $id)
     {
         $_cacheLang['Edit'] = $this->l('Edit');
         $href = Tools::safeOutput(self::$currentIndex.'&'.$this->identifier.'='.(int)$id.'&update'.$this->table.'&token='.($token != null ? $token : $this->token));
@@ -1829,7 +1829,7 @@ abstract class AdminTabCore
     		<img src="../img/admin/edit.gif" alt="" title="'.$_cacheLang['Edit'].'" /></a>';
     }
 
-    protected function _displayDeleteLink($token = null, $id)
+    protected function _displayDeleteLink($token, $id)
     {
         $_cacheLang['Delete'] = $this->l('Delete');
         $_cacheLang['DeleteItem'] = $this->l('Delete item #', __CLASS__, true, false);
