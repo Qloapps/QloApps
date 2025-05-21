@@ -31,6 +31,7 @@ if (!defined('_PS_VERSION_')) {
 class DashProducts extends Module
 {
 	public $push_filename;
+	public $fields_form = array();
 
 	public function __construct()
 	{
