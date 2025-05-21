@@ -392,6 +392,9 @@ class AdminControllerCore extends Controller
     /** @var bool if logged employee has access to AdminImport */
     protected $can_import = false;
 
+    /** @var float */
+    protected $timer_start;
+
     /** @var int level for permissions Delete */
     const LEVEL_DELETE = 4;
 
