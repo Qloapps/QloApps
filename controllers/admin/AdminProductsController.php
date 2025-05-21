@@ -2644,7 +2644,7 @@ class AdminProductsControllerCore extends AdminController
         return parent::renderList();
     }
 
-    public function displayDuplicateLink($token = null, $id, $name = null)
+    public function displayDuplicateLink($token, $id, $name = null)
     {
         return '<a href="#" title="'.$this->l('Duplicate').'"
         onclick="initDuplicateRoomType('.(int)$id.');return false;"><i class="icon-copy"></i>'.$this->l('Duplicate').'</a>';
@@ -5572,7 +5572,7 @@ class AdminProductsControllerCore extends AdminController
         }
     }
 
-    public function displayPreviewLink($token = null, $id, $name = null)
+    public function displayPreviewLink($token, $id, $name = null)
     {
         $tpl = $this->createTemplate('helpers/list/list_action_preview.tpl');
         if (!array_key_exists('Bad SQL query', self::$cache_lang)) {
