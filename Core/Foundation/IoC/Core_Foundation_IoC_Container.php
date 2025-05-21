@@ -123,7 +123,7 @@ class Core_Foundation_IoC_Container
                     } else {
                         throw new Core_Foundation_IoC_Exception(sprintf('Cannot build a `%s`.', $className));
                     }
-				}
+                }
             }
         }
 
