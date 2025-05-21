@@ -335,6 +335,15 @@ class AdminControllerCore extends Controller
     /** @var string */
     protected $bo_theme;
 
+    /** @var string */
+    protected $bo_css;
+
+    /** @var array */
+    protected $_conf;
+
+    /** @var string */
+    protected $override_folder;
+
     /** @var bool Redirect or not after a creation */
     protected $_redirect = true;
 
