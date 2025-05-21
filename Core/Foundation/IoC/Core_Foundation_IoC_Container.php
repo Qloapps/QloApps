@@ -105,14 +105,25 @@ class Core_Foundation_IoC_Container
 
         if ($classConstructor) {
             foreach ($classConstructor->getParameters() as $param) {
-                $paramClass = $param->getClass();
-                if ($paramClass) {
-                    $args[] = $this->doMake($param->getClass()->getName(), $alreadySeen);
-                } elseif ($param->isDefaultValueAvailable()) {
-                    $args[] = $param->getDefaultValue();
-                } else {
-                    throw new Core_Foundation_IoC_Exception(sprintf('Cannot build a `%s`.', $className));
-                }
+                if (method_exists($param, 'getType')) {
+                    $type = $param->getType();
+                    if ($type instanceof \ReflectionNamedType && !$type->isBuiltin()) {
+                        $args[] = $this->doMake($type->getName(), $alreadySeen);
+                    } elseif ($param->isDefaultValueAvailable()) {
+                        $args[] = $param->getDefaultValue();
+                    } else {
+                        throw new Core_Foundation_IoC_Exception(sprintf('Cannot build a `%s`.', $className));
+                    }
+				} else {
+                    $paramClass = $param->getClass();
+                    if ($paramClass) {
+                        $args[] = $this->doMake($paramClass->getName(), $alreadySeen);
+                    } elseif ($param->isDefaultValueAvailable()) {
+                        $args[] = $param->getDefaultValue();
+                    } else {
+                        throw new Core_Foundation_IoC_Exception(sprintf('Cannot build a `%s`.', $className));
+                    }
+				}
             }
         }
 
