@@ -254,13 +254,13 @@ class CountryCore extends ObjectModel
      * @param string $country Country Name
      * @return int Country ID
      */
-    public static function getIdByName($id_lang = null, $country)
+    public static function getIdByName($id_lang, $country)
     {
         $sql = '
 		SELECT `id_country`
 		FROM `'._DB_PREFIX_.'country_lang`
 		WHERE `name` = \''.pSQL($country).'\'';
-        if ($id_lang) {
+        if ($id_lang > 0) {
             $sql .= ' AND `id_lang` = '.(int)$id_lang;
         }
 
