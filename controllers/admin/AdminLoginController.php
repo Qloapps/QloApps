@@ -26,6 +26,8 @@
 
 class AdminLoginControllerCore extends AdminController
 {
+    public $access_query;
+
     public function __construct()
     {
         $this->bootstrap = true;
