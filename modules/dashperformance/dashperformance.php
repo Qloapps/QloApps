@@ -24,6 +24,8 @@ if (!defined('_PS_VERSION_')) {
 
 class DashPerformance extends Module
 {
+    public $confirmUnsinstall;
+
     public function __construct()
     {
         $this->name = 'dashperformance';
