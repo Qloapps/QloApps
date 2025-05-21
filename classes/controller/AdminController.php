@@ -344,6 +344,9 @@ class AdminControllerCore extends Controller
     /** @var string */
     protected $override_folder;
 
+    /** @var string */
+    public $_lang;
+
     /** @var bool Redirect or not after a creation */
     protected $_redirect = true;
 
