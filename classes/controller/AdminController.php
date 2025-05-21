@@ -132,7 +132,7 @@ class AdminControllerCore extends Controller
     public $multiple_fieldsets = false;
 
     /** @var array|false */
-    public $fields_value = false;
+    public $fields_value = [];
 
     /** @var array Errors displayed after post processing */
     public $errors = array();
@@ -3367,7 +3367,7 @@ class AdminControllerCore extends Controller
 
         if ($this->multishop_context && Shop::isTableAssociated($this->table) && !empty($this->className)) {
             if (Shop::getContext() != Shop::CONTEXT_ALL || !$this->context->employee->isSuperAdmin()) {
-                $test_join = !preg_match('#`?'.preg_quote(_DB_PREFIX_.$this->table.'_shop').'`? *sa#', $this->_join);
+                $test_join = !preg_match('#`?'.preg_quote(_DB_PREFIX_.$this->table.'_shop').'`? *sa#', $this->_join ?? '');
                 if (Shop::isFeatureActive() && $test_join && Shop::isTableAssociated($this->table)) {
                     $this->_where .= ' AND EXISTS (
 						SELECT 1
