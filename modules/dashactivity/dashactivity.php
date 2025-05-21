@@ -31,6 +31,8 @@ if (!defined('_PS_VERSION_')) {
 class Dashactivity extends Module
 {
     protected static $colors = array('#1F77B4', '#FF7F0E', '#2CA02C');
+    public $push_filename;
+    public $fields_form;
 
     public function __construct()
     {
