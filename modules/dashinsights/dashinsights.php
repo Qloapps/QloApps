@@ -25,6 +25,9 @@ if (!defined('_PS_VERSION_')) {
 class DashInsights extends Module
 {
     public $confirmUnsinstall;
+    public $accessibleIdsHotel;
+    public $discreteDates = array();
+    public $chartColors = array();
 
     public function __construct()
     {
