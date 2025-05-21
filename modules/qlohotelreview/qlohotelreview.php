@@ -26,6 +26,9 @@ require_once 'classes/RequiredFiles.php';
 
 class QloHotelReview extends Module
 {
+    public $secure_key;
+    public $confirmUnsinstall;
+
     public function __construct()
     {
         $this->name = 'qlohotelreview';
