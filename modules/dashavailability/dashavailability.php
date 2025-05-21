@@ -24,6 +24,8 @@ if (!defined('_PS_VERSION_')) {
 
 class DashAvailability extends Module
 {
+    public $confirmUnsinstall;
+
     public function __construct()
     {
         $this->name = 'dashavailability';
