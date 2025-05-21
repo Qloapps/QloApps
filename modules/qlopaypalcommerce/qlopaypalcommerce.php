@@ -35,6 +35,7 @@ class QloPaypalCommerce extends PaymentModule
     public $paypalEmail;
     public $clientId;
     public $clientSecret;
+    public $secure_key;
 
     public function __construct()
     {
