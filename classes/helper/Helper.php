@@ -37,6 +37,31 @@ class HelperCore
     public $context;
     public $toolbar_scroll = false;
     public $bootstrap = false;
+    public $actions = array();
+    public $simple_header = true;
+    public $bulk_actions = array();
+    public $className;
+    public $name_controller;
+    public $orderBy;
+    public $orderWay;
+    public $listTotal;
+    public $shopLink;
+    public $shopLinkType;
+    public $languages = array();
+    public $specificConfirmDelete;
+    public $imageType;
+    public $no_link;
+    public $colorOnBackground;
+    public $ajax_params;
+    public $default_form_language;
+    public $allow_employee_form_lang;
+    public $multiple_fieldsets;
+    public $row_hover;
+    public $position_identifier;
+    public $position_group_identifier;
+    public $controller_name;
+    public $list_id;
+    public $list_skip_actions;
 
     /**
      * @var Module
