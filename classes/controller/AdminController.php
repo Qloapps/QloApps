@@ -356,6 +356,9 @@ class AdminControllerCore extends Controller
     /** @var string */
     protected $optionTitle;
 
+    /** @var string */
+    protected $addressType;
+
     /** @var bool Redirect or not after a creation */
     protected $_redirect = true;
 
