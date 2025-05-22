@@ -218,6 +218,8 @@ class ProductCore extends ObjectModel
     /*** @var array Tags */
     public $tags;
 
+    public $minimum_quantity;
+
     /**
      * @var float Base price of the product
      * @deprecated 1.6.0.13
