@@ -68,6 +68,12 @@ class AdminProductsControllerCore extends AdminController
 
     public $_lang;
 
+    public $tpl_form;
+
+    public $product_exists_in_shop;
+
+    public $product_name;
+
     public function __construct()
     {
         $this->bootstrap = true;
