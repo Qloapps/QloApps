@@ -1615,7 +1615,7 @@ class ProductCore extends ObjectModel
      * @deprecated since 1.5.0
      */
     public function addProductAttribute($price, $weight, $unit_impact, $ecotax, $quantity, $id_images, $reference,
-        $id_supplier = null, $ean13, $default, $location = null, $upc = null, $minimal_quantity = 1)
+        $id_supplier, $ean13, $default, $location = null, $upc = null, $minimal_quantity = 1)
     {
         Tools::displayAsDeprecated();
 
@@ -1783,7 +1783,7 @@ class ProductCore extends ObjectModel
     *
     */
     public function updateProductAttribute($id_product_attribute, $wholesale_price, $price, $weight, $unit, $ecotax,
-        $id_images, $reference, $id_supplier = null, $ean13, $default, $location = null, $upc = null, $minimal_quantity, $available_date)
+        $id_images, $reference, $id_supplier, $ean13, $default, $location = null, $upc = null, $minimal_quantity = 1, $available_date = null)
     {
         Tools::displayAsDeprecated();
 
