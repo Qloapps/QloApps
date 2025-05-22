@@ -32,6 +32,8 @@ class HTMLPurifier_Lexer_DOMLex extends HTMLPurifier_Lexer
      */
     private $factory;
 
+    public $_entity_parser;
+
     public function __construct()
     {
         // setup the factory
