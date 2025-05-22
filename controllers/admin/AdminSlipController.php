@@ -279,7 +279,7 @@ class AdminSlipControllerCore extends AdminController
         return '--';
     }
 
-    public function displayStatusChangeLink($token = null, $id)
+    public function displayStatusChangeLink($token, $id)
     {
         $objOrderSlip = new OrderSlip($id);
         if ($objOrderSlip->redeem_status != OrderSlip::REDEEM_STATUS_REDEEMED) {
