@@ -53,6 +53,9 @@ class    PrestaShopLoggerCore extends ObjectModel
     /** @var string Object last modification date */
     public $date_upd;
 
+    /** @var string */
+    public $hash;
+
     /**
      * @see ObjectModel::$definition
      */
