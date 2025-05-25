@@ -189,6 +189,12 @@ abstract class ModuleCore
     const OVERRIDE_TYPE_MODULE = 2;
     const OVERRIDE_TYPE_MODULE_CONTROLLER = 3;
 
+    public $bootstrap;
+    public $confirmUninstall;
+    public $is_configurable;
+    public $is_eu_compatible;
+    public $is_needed;
+
     /**
      * Set the flag to indicate we are doing an import
      *
@@ -1440,7 +1446,7 @@ abstract class ModuleCore
                     $item->version = $tmp_module->version;
                     $item->tab = $tmp_module->tab;
                     $item->displayName = $tmp_module->displayName;
-                    $item->description = stripslashes($tmp_module->description);
+                    $item->description = stripslashes($tmp_module->description ?? '');
                     $item->author = $tmp_module->author;
                     $item->author_uri = (isset($tmp_module->author_uri) && $tmp_module->author_uri) ? $tmp_module->author_uri : false;
                     $item->limited_countries = $tmp_module->limited_countries;
@@ -1452,7 +1458,7 @@ abstract class ModuleCore
                     $item->currencies = isset($tmp_module->currencies) ? $tmp_module->currencies : null;
                     $item->currencies_mode = isset($tmp_module->currencies_mode) ? $tmp_module->currencies_mode : null;
                     $item->confirmUninstall = isset($tmp_module->confirmUninstall) ? html_entity_decode($tmp_module->confirmUninstall) : null;
-                    $item->description_full = stripslashes($tmp_module->description_full);
+                    $item->description_full = stripslashes($tmp_module->description_full ?? '');
                     $item->additional_description = isset($tmp_module->additional_description) ? stripslashes($tmp_module->additional_description) : null;
                     $item->compatibility = isset($tmp_module->compatibility) ? (array)$tmp_module->compatibility : null;
                     $item->nb_rates = isset($tmp_module->nb_rates) ? (array)$tmp_module->nb_rates : null;
