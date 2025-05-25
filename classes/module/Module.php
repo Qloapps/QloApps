@@ -1633,7 +1633,7 @@ abstract class ModuleCore
                     $item->tab = strip_tags((string)$modaddons->tab);
                     $item->displayName = strip_tags((string)$modaddons->displayName);
                     $item->description = stripslashes(strip_tags((string)$modaddons->description));
-                    $item->description_full = stripslashes(strip_tags((string)$modaddons->description_full));
+                    $item->description_full = stripslashes(strip_tags((string)$modaddons->description_full ?? ''));
                     $item->author = strip_tags((string)$modaddons->author);
                     $item->limited_countries = array();
                     $item->parent_class = '';
