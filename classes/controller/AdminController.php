@@ -419,6 +419,9 @@ class AdminControllerCore extends Controller
     /** @var float */
     protected $timer_start;
 
+    public default_image_width;
+    public default_image_height;
+
     /** @var int level for permissions Delete */
     const LEVEL_DELETE = 4;
 
