@@ -1101,8 +1101,8 @@ class AdminControllerCore extends Controller
 
                     $return = $this->{'ajaxProcess'.Tools::toCamelCase($action)}();
 
-                    Hook::exec('actionAdmin'.ucfirst($this->action).'After', array('controller' => $this, 'return' => $return));
-                    Hook::exec('action'.get_class($this).ucfirst($this->action).'After', array('controller' => $this, 'return' => $return));
+                    Hook::exec('actionAdmin'.ucfirst($this->action ?? '').'After', array('controller' => $this, 'return' => $return));
+                    Hook::exec('action'.get_class($this).ucfirst($this->action ?? '').'After', array('controller' => $this, 'return' => $return));
 
                     return $return;
                 } elseif (!empty($action) && $this->controller_name == 'AdminModules' && Tools::getIsset('configure')) {
