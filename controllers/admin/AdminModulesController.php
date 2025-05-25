@@ -147,10 +147,10 @@ class AdminModulesControllerCore extends AdminController
     public function checkCategoriesNames($a, $b)
     {
         if ($a['name'] === $this->l('Other Modules')) {
-            return true;
+            return 1;
         }
 
-        return (bool)($a['name'] > $b['name']);
+        return strcmp($a['name'], $b['name']);
     }
 
     public function setMedia()
@@ -1257,7 +1257,7 @@ class AdminModulesControllerCore extends AdminController
 
             // Filter on module category
             $category_filtered = array();
-            $filter_categories = explode('|', Configuration::get('PS_SHOW_CAT_MODULES_'.(int)$this->id_employee));
+            $filter_categories = explode('|', Configuration::get('PS_SHOW_CAT_MODULES_'.(int)$this->id_employee) ?? '');
             if (count($filter_categories) > 0) {
                 foreach ($filter_categories as $fc) {
                     if (!empty($fc)) {
