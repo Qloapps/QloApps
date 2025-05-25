@@ -420,7 +420,13 @@ class AdminControllerCore extends Controller
     protected $timer_start;
 
     public $default_image_width;
+
     public $default_image_height;
+
+    /** @var string */
+    public $tpl_form;
+
+    public $product_exists_in_shop;
 
     /** @var int level for permissions Delete */
     const LEVEL_DELETE = 4;
