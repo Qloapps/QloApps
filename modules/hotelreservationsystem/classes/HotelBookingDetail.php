@@ -1998,7 +1998,7 @@ class HotelBookingDetail extends ObjectModel
                                 $featurePriceParams,
                                 array('date_from' => $objOldHotelBooking->date_from, 'date_to' => $objOldHotelBooking->date_to)
                             );
-                            HotelRoomTypeFeaturePricing::createAutoFeaturePrice($featurePriceParams);
+                            HotelRoomTypeFeaturePricing::createRoomTypeFeaturePrice($featurePriceParams);
                         }
                     } else {
                         return false;

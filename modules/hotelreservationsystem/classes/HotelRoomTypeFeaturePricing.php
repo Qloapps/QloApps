@@ -26,8 +26,6 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
     public $id_room = 0;
     public $feature_price_name;
     public $date_selection_type;
-    public $date_from;
-    public $date_to;
     public $is_special_days_exists;
     public $special_days;
     public $impact_way;
@@ -41,6 +39,7 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
 
     const DATE_SELECTION_TYPE_RANGE = 1;
     const DATE_SELECTION_TYPE_SPECIFIC = 2;
+    const DATE_SELECTION_TYPE_SPECIAL_DAYS = 3;
 
     const IMPACT_WAY_DECREASE = 1;
     const IMPACT_WAY_INCREASE = 2;
@@ -58,8 +57,6 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
             'id_cart' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
             'id_guest' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
             'id_room' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
-            'date_from' => array('type' => self::TYPE_DATE, 'validate' => 'isDate', 'required' => true),
-            'date_to' => array('type' => self::TYPE_DATE, 'validate' => 'isDate'),
             'impact_way' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId', 'required' => true),
             'is_special_days_exists' => array('type' => self::TYPE_INT, 'required' => true),
             'date_selection_type' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId', 'required' => true),
@@ -121,6 +118,8 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
     {
         // first call to delete all the group entries
         $this->cleanGroups();
+        $this->deleteDatesByIdFeature($this->id);
+
         return parent::delete();
     }
 
@@ -164,76 +163,128 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
         );
     }
 
+    public function getDatesByIdFeature($idFeaturePrice)
+    {
+        $sql = 'SELECT * FROM `'._DB_PREFIX_.'htl_room_type_feature_pricing_date_range`
+            WHERE `id_feature_price` ='.(int) $idFeaturePrice;
+
+        return Db::getInstance()->executeS($sql);
+    }
+
+    public function deleteDatesByIdFeature($idFeaturePrice)
+    {
+        $sql = 'DELETE FROM `'._DB_PREFIX_.'htl_room_type_feature_pricing_date_range`
+            WHERE `id_feature_price` ='.(int) $idFeaturePrice;
+
+        return Db::getInstance()->execute($sql);
+    }
+
+    public function saveUpdateDateRanges($idFeaturePrice, $dateRanges)
+    {
+        $this->deleteDatesByIdFeature($idFeaturePrice);
+        $featurePriceDates = array();
+        foreach ($dateRanges as $dateRange) {
+            $featurePriceDates[] = array(
+                'date_from' => pSQL($dateRange['date_from']),
+                'date_to' => pSQL($dateRange['date_to']),
+                'id_feature_price' => $idFeaturePrice
+            );
+        }
+
+        return Db::getInstance()->insert('htl_room_type_feature_pricing_date_range', $featurePriceDates);
+    }
+
     /**
-     * [checkRoomTypeFeaturePriceExistance returns room type active feature price plan by supplied date Range and supplied feature price plan type else returns false]
-     * @param  [int] $id_product [id of the product]
-     * @param  [date] $date_from  [start date of the date range]
-     * @param  [date] $date_to    [end date of the date range]
-     * @param  [type] $type       [Type of the feature price plan must be among 'specific_date', 'special_day' and 'date_range']
-     * @return [array|false]      [returns room type active feature price plan by supplied date Range and supplied feature price plan type else returns false]
+     * [checkRoomTypeFeaturePriceExistanceForDateRanges returns room type active feature price plan by supplied date Ranges and supplied feature price plan type else returns false]
+     * @param  [int] $idProduct [id of the product]
+     * @param  [date] $dateRanges  [date ranges]
+     * @param  [type] $type       [Type of the feature price plan.]
+     * @return [array|false]      [returns room type active feature price plan by supplied date Ranges and supplied feature price plan type else returns false]
      */
-    public function checkRoomTypeFeaturePriceExistance(
-        $id_product,
-        $date_from,
-        $date_to,
-        $groups,
-        $type = 'date_range',
-        $current_Special_days = false,
-        $id_feature_price = 0
+    public function checkRoomTypeFeaturePriceExistanceForDateRanges(
+        $idProduct,
+        $dateRanges,
+        $groups = array(),
+        $type = self::DATE_SELECTION_TYPE_RANGE,
+        $currentSpecialDays = false,
+        $idFeaturePrice = 0
     ) {
-        $date_from = date('Y-m-d', strtotime($date_from));
-        $date_to = date('Y-m-d', strtotime($date_to));
-        if ($type == 'specific_date') {
-            return Db::getInstance()->getRow(
-                'SELECT * FROM `'._DB_PREFIX_.'htl_room_type_feature_pricing` rtfp
+        $dateRangeCondition = '';
+        foreach ($dateRanges as $dateRange) {
+            if ($dateRangeCondition != '') {
+                $dateRangeCondition .= ' OR ';
+            }
+
+            $dateRangeCondition .= '(rtfpd.`date_from` <= "'.pSQL($dateRange['date_to']).'" AND rtfpd.`date_to` >= "'.pSQL($dateRange['date_from']).'")';
+        }
+
+        if ($dateRangeCondition != '') {
+            $dateRangeCondition = ' AND ('.$dateRangeCondition.')';
+        }
+
+        if ($type == self::DATE_SELECTION_TYPE_SPECIFIC) {
+            return Db::getInstance()->executeS(
+                'SELECT rtfp.*, rtfpd.`date_from`, GROUP_CONCAT(rtfpg.`id_group`) AS `id_groups`, rtfpd.`date_to`
+                FROM `'._DB_PREFIX_.'htl_room_type_feature_pricing` rtfp
                 INNER JOIN `'._DB_PREFIX_.'htl_room_type_feature_pricing_group` rtfpg
                 ON (rtfp.`id_feature_price` = rtfpg.`id_feature_price`)
-                WHERE rtfp.`id_product`='.(int) $id_product.' AND rtfp.`active`=1
+                LEFT JOIN `'._DB_PREFIX_.'htl_room_type_feature_pricing_date_range` rtfpd
+                ON (rtfp.`id_feature_price` = rtfpd.`id_feature_price`)
+                WHERE rtfp.`id_product`='.(int) $idProduct.' AND rtfp.`active` = 1 AND rtfp.`id_cart` = 0
                 AND rtfp.`date_selection_type` = '.(int) self::DATE_SELECTION_TYPE_SPECIFIC.'
-                AND rtfp.`date_from` = \''.pSQL($date_from).'\'
-                AND rtfp.`id_feature_price`!='.(int) $id_feature_price.'
-                AND rtfpg.`id_group` IN ('.pSQL(implode(', ',$groups)).')'
+                AND rtfp.`id_feature_price`!='.(int) $idFeaturePrice.'
+                '.($groups ? ' AND rtfpg.`id_group` IN ('.pSQL(implode(', ',$groups)).') ' : '').
+                $dateRangeCondition.'
+                GROUP BY rtfp.`id_feature_price`, rtfpd.`date_from`'
             );
-        } elseif ($type == 'special_day') {
+        } elseif ($type == self::DATE_SELECTION_TYPE_SPECIAL_DAYS) {
             $featurePrices = Db::getInstance()->executeS(
-                'SELECT * FROM `'._DB_PREFIX_.'htl_room_type_feature_pricing` rtfp
+                'SELECT rtfp.*, rtfpd.`date_from`, GROUP_CONCAT(rtfpg.`id_group`) AS `id_groups`, rtfpd.`date_to`
+                FROM `'._DB_PREFIX_.'htl_room_type_feature_pricing` rtfp
                 INNER JOIN `'._DB_PREFIX_.'htl_room_type_feature_pricing_group` rtfpg
                 ON (rtfp.`id_feature_price` = rtfpg.`id_feature_price`)
-                WHERE rtfp.`id_product`='.(int) $id_product.'
-                AND rtfp.`is_special_days_exists`=1 AND `active`=1
-                AND rtfp.`date_from` < \''.pSQL($date_to).'\'
-                AND rtfp.`date_to` > \''.pSQL($date_from).'\'
-                AND rtfp.`id_feature_price`!='.(int) $id_feature_price.'
-                AND rtfpg.`id_group` IN ('.pSQL(implode(', ',$groups)).')'
+                LEFT JOIN `'._DB_PREFIX_.'htl_room_type_feature_pricing_date_range` rtfpd
+                ON (rtfp.`id_feature_price` = rtfpd.`id_feature_price`)
+                WHERE rtfp.`id_product`='.(int) $idProduct.'
+                AND rtfp.`is_special_days_exists`=1 AND `active`=1 AND rtfp.`id_cart` = 0
+                AND rtfp.`id_feature_price`!='.(int) $idFeaturePrice.'
+                '.($groups ? ' AND rtfpg.`id_group` IN ('.pSQL(implode(', ',$groups)).') ' : '').
+                $dateRangeCondition.'
+                GROUP BY rtfp.`id_feature_price`, rtfpd.`date_from`'
             );
+            $commonFeaturePrices = array();
             if ($featurePrices) {
                 foreach ($featurePrices as $featurePrice) {
                     $specialDays = json_decode($featurePrice['special_days']);
-                    $currentSpecialDays = json_decode($current_Special_days);
+                    $currentSpecialDays = json_decode($currentSpecialDays);
                     $commonValues = array_intersect($specialDays, $currentSpecialDays);
                     if ($commonValues) {
-                        return $featurePrice;
+                        $commonFeaturePrices[] = $featurePrice;
                     }
                 }
             }
-            return false;
-        } elseif ($type == 'date_range') {
-            return Db::getInstance()->getRow(
-                'SELECT * FROM `'._DB_PREFIX_.'htl_room_type_feature_pricing` rtfp
+
+            return $commonFeaturePrices;
+        } elseif ($type == self::DATE_SELECTION_TYPE_RANGE) {
+            return Db::getInstance()->executeS(
+                'SELECT rtfp.*, rtfpd.`date_from`, GROUP_CONCAT(rtfpg.`id_group`) AS `id_groups`, rtfpd.`date_to`
+                FROM `'._DB_PREFIX_.'htl_room_type_feature_pricing` rtfp
                 INNER JOIN `'._DB_PREFIX_.'htl_room_type_feature_pricing_group` rtfpg
                 ON (rtfp.`id_feature_price` = rtfpg.`id_feature_price`)
-                WHERE rtfp.`id_product`='.(int) $id_product.' AND rtfp.`active`=1
+                LEFT JOIN `'._DB_PREFIX_.'htl_room_type_feature_pricing_date_range` rtfpd
+                ON (rtfp.`id_feature_price` = rtfpd.`id_feature_price`)
+                WHERE rtfp.`id_product`='.(int) $idProduct.' AND rtfp.`active` = 1 AND rtfp.`id_cart` = 0
                 AND rtfp.`date_selection_type` = '.(int) self::DATE_SELECTION_TYPE_RANGE.'
-                AND rtfp.`is_special_days_exists`=0
-                AND rtfp.`date_from` <= \''.pSQL($date_to).'\'
-                AND rtfp.`date_to` >= \''.pSQL($date_from).'\'
-                AND rtfp.`id_feature_price`!='.(int) $id_feature_price.'
-                AND rtfpg.`id_group` IN ('.pSQL(implode(', ',$groups)).')'
+                AND rtfp.`is_special_days_exists`= 0
+                AND rtfp.`id_feature_price`!='.(int) $idFeaturePrice.'
+                '.($groups ? ' AND rtfpg.`id_group` IN ('.pSQL(implode(', ',$groups)).') ' : '').
+                $dateRangeCondition.'
+                GROUP BY rtfp.`id_feature_price`, rtfpd.`date_from`'
             );
         }
+
         return false;
     }
-
     /**
      * [countFeaturePriceSpecialDays returns number of special days between a date range]
      * @param  [array] $specialDays [array containing special days to be counted]
@@ -374,37 +425,39 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
                                     $nextDate = date('Y-m-d', strtotime('+1 day', strtotime($dateFrom)));
                                     if ($nextDate == $dateTo) {
                                         $params['dateSelectionType'] = self::DATE_SELECTION_TYPE_SPECIFIC;
-                                        $featurePriceExists = $this->checkRoomTypeFeaturePriceExistance(
+                                        if ($featurePriceExists = $this->checkRoomTypeFeaturePriceExistanceForDateRanges(
                                             $id_product,
-                                            $dateFrom,
-                                            $featurePriceDateTo,
-                                            'specific_date'
-                                        );
+                                            array(array('date_from' => $dateFrom, 'date_to' => $featurePriceDateTo)),
+                                            self::DATE_SELECTION_TYPE_SPECIFIC
+                                        )) {
+                                            $featurePriceExists = reset($featurePriceDateTo);
+                                        }
+
                                         if ($featurePriceExists) {
-                                            if (!$this->saveFeaturePricePlan($featurePriceExists['id'], 2, $params)) {
+                                            if (!$this->saveFeaturePricePlan($params, $featurePriceExists['id_feature_price'])) {
                                                 $this->errors[] = $this->moduleInstance->l('Some error occured while saving Feature Price Plan Info:: Date From : ', 'HotelRoomTypeFeaturePricing').$params['dateFrom'].$this->moduleInstance->l(' Date To : ', 'HotelRoomTypeFeaturePricing').$params['dateFrom'].$this->moduleInstance->l(' Room Type Id : ', 'HotelRoomTypeFeaturePricing').$params['roomTypeId'];
                                             }
                                         } else {
-                                            if (!$this->saveFeaturePricePlan(0, 2, $params)) {
+                                            if (!$this->saveFeaturePricePlan($params)) {
                                                 $this->errors[] = $this->moduleInstance->l('Some error occured while saving Feature Price Plan Info:: Date From : ', 'HotelRoomTypeFeaturePricing').$params['dateFrom'].$this->moduleInstance->l(' Date To : ', 'HotelRoomTypeFeaturePricing').$params['dateFrom'].$this->moduleInstance->l(' Room Type Id : ', 'HotelRoomTypeFeaturePricing').$params['roomTypeId'];
                                             }
                                         }
                                     } else {
                                         $params['dateSelectionType'] = self::DATE_SELECTION_TYPE_RANGE;
-                                        $featurePriceExists = $this->checkRoomTypeFeaturePriceExistance(
+                                        if ($featurePriceExists = $this->checkRoomTypeFeaturePriceExistanceForDateRanges(
                                             $id_product,
-                                            $dateFrom,
-                                            $featurePriceDateTo,
-                                            'date_range'
-                                        );
+                                            array(array('date_from' => $dateFrom, 'date_to' => $featurePriceDateTo)),
+                                            self::DATE_SELECTION_TYPE_RANGE
+                                        )) {
+                                            $featurePriceExists = reset($featurePriceDateTo);
+                                        }
                                         if ($featurePriceExists) {
                                             if ($featurePriceExists['date_from'] == $dateFrom
                                                 && $featurePriceExists['date_to'] == $featurePriceDateTo
                                             ) {
                                                 if (!$this->saveFeaturePricePlan(
-                                                    $featurePriceExists['id'],
-                                                    1,
-                                                    $params
+                                                    $params,
+                                                    $featurePriceExists['id_feature_price']
                                                 )) {
                                                     $this->errors[] = $this->moduleInstance->l('Some error occured while saving Feature Price Plan Info:: Date From : ', 'HotelRoomTypeFeaturePricing').$params['dateFrom'].$this->moduleInstance->l(' Date To : ', 'HotelRoomTypeFeaturePricing').$params['dateFrom'].$this->moduleInstance->l(' Room Type Id : ', 'HotelRoomTypeFeaturePricing').$params['roomTypeId'];
                                                 }
@@ -415,29 +468,27 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
                                                     $params['dateFrom'] = $currentDate;
                                                     $params['dateTo'] = $nextDayDate;
                                                     $params['dateSelectionType'] = self::DATE_SELECTION_TYPE_SPECIFIC;
-                                                    $featurePriceExists = $this->checkRoomTypeFeaturePriceExistance(
+                                                    $featurePriceExists = $this->checkRoomTypeFeaturePriceExistanceForDateRanges(
                                                         $id_product,
-                                                        $currentDate,
-                                                        $nextDayDate,
-                                                        'specific_date'
+                                                        array(array('date_from' => $currentDate, 'date_to' => $nextDayDate)),
+                                                        self::DATE_SELECTION_TYPE_SPECIFIC
                                                     );
                                                     if ($featurePriceExists) {
                                                         if (!$this->saveFeaturePricePlan(
-                                                            $featurePriceExists['id'],
-                                                            2,
-                                                            $params
+                                                            $params,
+                                                            $featurePriceExists['id_feature_price']
                                                         )) {
                                                             $this->errors[] = $this->moduleInstance->l('Some error occured while saving Feature Price Plan Info:: Date From : ', 'HotelRoomTypeFeaturePricing').$params['dateFrom'].$this->moduleInstance->l(' Date To : ', 'HotelRoomTypeFeaturePricing').$params['dateFrom'].$this->moduleInstance->l(' Room Type Id : ', 'HotelRoomTypeFeaturePricing').$params['roomTypeId'];
                                                         }
                                                     } else {
-                                                        if (!$this->saveFeaturePricePlan(0, 2, $params)) {
+                                                        if (!$this->saveFeaturePricePlan($params)) {
                                                             $this->errors[] = $this->moduleInstance->l('Some error occured while saving Feature Price Plan Info:: Date From : ', 'HotelRoomTypeFeaturePricing').$params['dateFrom'].$this->moduleInstance->l(' Date To : ', 'HotelRoomTypeFeaturePricing').$params['dateFrom'].$this->moduleInstance->l(' Room Type Id : ', 'HotelRoomTypeFeaturePricing').$params['roomTypeId'];
                                                         }
                                                     }
                                                 }
                                             }
                                         } else {
-                                            if (!$this->saveFeaturePricePlan(0, 1, $params)) {
+                                            if (!$this->saveFeaturePricePlan($params)) {
                                                 $this->errors[] = $this->moduleInstance->l('Some error occured while saving Feature Price Plan Info:: Date From : ', 'HotelRoomTypeFeaturePricing').$params['dateFrom'].$this->moduleInstance->l(' Date To : ', 'HotelRoomTypeFeaturePricing').$params['dateFrom'].$this->moduleInstance->l(' Room Type Id : ', 'HotelRoomTypeFeaturePricing').$params['roomTypeId'];
                                             }
                                         }
@@ -596,31 +647,24 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
      * @param  [array]  $params            [Room type rate plan info]
      * @return [bool]                     [returns true is successfuly added or updated else returns false]
      */
-    public function saveFeaturePricePlan($id = 0, $dateSelectionType, $params)
+    public function saveFeaturePricePlan($params, $id = 0)
     {
-        if ($id) {
-            $roomTypeFeaturePricing = new HotelRoomTypeFeaturePricing($id);
-        } else {
-            $roomTypeFeaturePricing = new HotelRoomTypeFeaturePricing();
-        }
-        $roomTypeFeaturePricing->id_product = $params['roomTypeId'];
-        // lang fields
-        $languages = Language::getLanguages(false);
-        foreach ($languages as $language) {
-            $roomTypeFeaturePricing->feature_price_name[$language['id_lang']] = $params['featurePriceName'];
-        }
-
-        $roomTypeFeaturePricing->date_selection_type = $params['dateSelectionType'];
-        $roomTypeFeaturePricing->date_from = $params['dateFrom'];
-        $roomTypeFeaturePricing->date_to = $params['dateTo'];
-        $roomTypeFeaturePricing->impact_way = $params['priceImpactWay'];
-        $roomTypeFeaturePricing->is_special_days_exists = $params['isSpecialDaysExists'];
-        $roomTypeFeaturePricing->special_days = $params['jsonSpecialDays'];
-        $roomTypeFeaturePricing->impact_type = $params['priceImpactType'];
-        $roomTypeFeaturePricing->impact_value = $params['impactValue'];
-        $roomTypeFeaturePricing->active = $params['enableFeaturePrice'];
-
-        return $roomTypeFeaturePricing->save();
+        return HotelRoomTypeFeaturePricing::createRoomTypeFeaturePrice(
+            array(
+                'id' => $id,
+                'id_product' => $params['roomTypeId'],
+                'name' => $params['featurePriceName'],
+                'date_selection_type' => $params['dateSelectionType'],
+                'date_from' => $params['dateFrom'],
+                'date_to' => $params['dateTo'],
+                'active' => $params['enableFeaturePrice'],
+                'impact_way' => $params['priceImpactWay'],
+                'is_special_days_exists' => $params['isSpecialDaysExists'],
+                'special_days' => $params['jsonSpecialDays'],
+                'impact_type' => $params['priceImpactType'],
+                'impact_value' => $params['impactValue'],
+            )
+        );
     }
 
     /**
@@ -675,9 +719,8 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
         $context = Context::getContext();
         $id_currency = Validate::isLoadedObject($context->currency) ? (int)$context->currency->id : (int)Configuration::get('PS_CURRENCY_DEFAULT');
 
-        $hotelCartBookingData = new HotelCartBookingData();
         for($currentDate = date('Y-m-d', strtotime($date_from)); $currentDate < date('Y-m-d', strtotime($date_to)); $currentDate = date('Y-m-d', strtotime('+1 day', strtotime($currentDate)))) {
-            if ($use_reduc && ($featurePrice = $hotelCartBookingData->getProductFeaturePricePlanByDateByPriority(
+            if ($use_reduc && ($featurePrice = HotelCartBookingData::getProductFeaturePricePlanByDateByPriority(
                 $id_product,
                 $currentDate,
                 $id_group,
@@ -911,13 +954,15 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
         }
 
         $idfeaturePrices = Db::getInstance()->executeS(
-            'SELECT `id_feature_price`  FROM `'._DB_PREFIX_.'htl_room_type_feature_pricing`
+            'SELECT rtfpd.`id_feature_price` FROM `'._DB_PREFIX_.'htl_room_type_feature_pricing` rtfp
+            LEFT JOIN `'._DB_PREFIX_.'htl_room_type_feature_pricing_date_range` rtfpd
+            ON (rtfp.`id_feature_price` = rtfpd.`id_feature_price`)
             WHERE 1'.
-            ($id_cart ? ' AND `id_cart` = '.(int) $id_cart : '').
-            ($id_product ? ' AND `id_product` = '.(int) $id_product : '').
-            ($id_room ? ' AND `id_room` = '.(int) $id_room : '').
-            ($date_from ? ' AND `date_from` = "'.pSQL($date_from) .'"' : '').
-            ($date_to ? ' AND `date_to` = "'.pSQL($date_to) .'"' : '')
+            ($id_cart ? ' AND rtfp.`id_cart` = '.(int) $id_cart : '').
+            ($id_product ? ' AND rtfp.`id_product` = '.(int) $id_product : '').
+            ($id_room ? ' AND rtfp.`id_room` = '.(int) $id_room : '').
+            ($date_from ? ' AND rtfpd.`date_from` = "'.pSQL($date_from) .'"' : '').
+            ($date_to ? ' AND rtfpd.`date_to` = "'.pSQL($date_to) .'"' : '')
         );
         $res = true;
         foreach ($idfeaturePrices as $featurePrice) {
@@ -942,7 +987,7 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
     /**
      * Deletes groups entries in the table. Send id_group if you want to delete entries by group i.e. when group deletes
      * @param integer $idGroup
-     * @return void
+     * @return bool
      */
     public function cleanGroups($idGroup = 0)
     {
@@ -1037,30 +1082,45 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
 
         return parent::validateFields($die, $error_return);
     }
-    public static function createAutoFeaturePrice($params)
+
+    public static function createRoomTypeFeaturePrice($params)
     {
         $context = Context::getContext();
         $featurePriceName = array();
         foreach (Language::getIDs(true) as $idLang) {
-            $featurePriceName[$idLang] = 'Auto-generated';
+            $featurePriceName[$idLang] = !empty($params['name']) ? $params['name'] : 'Auto-generated';
         }
 
-        $objFeaturePricing = new HotelRoomTypeFeaturePricing();
+        if (!empty($params['id'])) {
+            $objFeaturePricing = new HotelRoomTypeFeaturePricing((int) $params['id']);
+        } else {
+            $objFeaturePricing = new HotelRoomTypeFeaturePricing();
+        }
+
         $objFeaturePricing->id_product = (int) $params['id_product'];
-        $objFeaturePricing->id_cart = (int) $params['id_cart'];
-        $objFeaturePricing->id_guest = (int) $params['id_guest'];
-        $objFeaturePricing->id_room = (int) $params['id_room'];
+        $objFeaturePricing->id_cart = !empty($params['id_cart']) ? $params['id_cart'] : (int) $params['id_cart'];
+        $objFeaturePricing->id_guest = !empty($params['id_guest']) ? $params['id_guest'] : (int) $params['id_guest'];
+        $objFeaturePricing->id_room = !empty($params['id_room']) ? $params['id_room'] : (int) $params['id_room'];
         $objFeaturePricing->feature_price_name = $featurePriceName;
-        $objFeaturePricing->date_selection_type = HotelRoomTypeFeaturePricing::DATE_SELECTION_TYPE_RANGE;
-        $objFeaturePricing->date_from = date('Y-m-d', strtotime($params['date_from']));
-        $objFeaturePricing->date_to = date('Y-m-d', strtotime($params['date_to']));
-        $objFeaturePricing->is_special_days_exists = 0;
-        $objFeaturePricing->special_days = json_encode(false);
-        $objFeaturePricing->impact_way = HotelRoomTypeFeaturePricing::IMPACT_WAY_FIX_PRICE;
-        $objFeaturePricing->impact_type = HotelRoomTypeFeaturePricing::IMPACT_TYPE_FIXED_PRICE;
+        $objFeaturePricing->date_selection_type = !empty($params['date_selection_type']) ? $params['date_selection_type'] : HotelRoomTypeFeaturePricing::DATE_SELECTION_TYPE_RANGE;
+        $objFeaturePricing->is_special_days_exists = !empty($params['is_special_days_exists']) ? $params['is_special_days_exists'] : 0;
+        $objFeaturePricing->special_days = !empty($params['special_days']) ? json_encode($params['special_days']) : json_encode(array());
+        $objFeaturePricing->impact_way = !empty($params['impact_way']) ? $params['impact_way'] : HotelRoomTypeFeaturePricing::IMPACT_WAY_FIX_PRICE;
+        $objFeaturePricing->impact_type = !empty($params['impact_type']) ? $params['impact_type'] :  HotelRoomTypeFeaturePricing::IMPACT_TYPE_FIXED_PRICE;
         $objFeaturePricing->impact_value = $params['price'];
-        $objFeaturePricing->active = 1;
-        $objFeaturePricing->groupBox = array_column(Group::getGroups($context->language->id), 'id_group');
-        $objFeaturePricing->add();
+        $objFeaturePricing->active = isset($params['active']) ? (int) $params['active'] : 1;
+        $objFeaturePricing->groupBox = !empty($params['id_groups']) ? $params['id_groups'] : array_column(Group::getGroups($context->language->id), 'id_group');
+        if ($objFeaturePricing->save()) {
+            $objFeaturePricing->saveUpdateDateRanges($objFeaturePricing->id,
+                array(
+                    array(
+                        'date_from' => date('Y-m-d', strtotime($params['date_from'])),
+                        'date_to' => date('Y-m-d', strtotime($params['date_to']))
+                    )
+                )
+            );
+        }
+
+        return $objFeaturePricing->id;
     }
 }

@@ -615,3 +615,7 @@ body.adminhotelroomsbooking .ui-tooltip {
 	padding: 15px;
 	border: 1px solid #ddd
 }
+.error-border {
+    outline: rgb(210, 124, 130) solid 1px;
+    border-radius: 2px;
+}

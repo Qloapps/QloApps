@@ -111,17 +111,6 @@ class AdminHotelFeaturePricesSettingsController extends ModuleAdminController
                 'callback' => 'setGroupAccessLabel',
                 'search' => false,
             ),
-            'date_from' => array(
-                'title' => $this->l('Date From'),
-                'align' => 'center',
-                'type' => 'date',
-            ),
-            'date_to' => array(
-                'title' => $this->l('Date To'),
-                'align' => 'center',
-                'type' => 'date',
-                'callback' => 'getDateToValue',
-            ),
             'active' => array(
                 'align' => 'center',
                 'title' => $this->l('Status'),
@@ -180,14 +169,11 @@ class AdminHotelFeaturePricesSettingsController extends ModuleAdminController
             if ($this->validateExistingFeaturePrice(
                 $objFeaturePricing->date_selection_type,
                 $objFeaturePricing->id_product,
-                $objFeaturePricing->date_from,
-                $objFeaturePricing->date_to,
+                array(array('date_from' => $objFeaturePricing->date_from, 'date_to' => $objFeaturePricing->date_to)),
                 $objFeaturePricing->getGroups($objFeaturePricing->id),
                 $objFeaturePricing->id,
                 $objFeaturePricing->is_special_days_exists,
                 $objFeaturePricing->special_days
-
-
             )) {
                 $this->errors[] = $this->l('An advanced price rule already exists in which some dates are common with this plan. Please select a different date range.');
                 return ;
@@ -245,8 +231,13 @@ class AdminHotelFeaturePricesSettingsController extends ModuleAdminController
                 $smartyVars['special_days'] =  (array)json_decode($objFeaturePrice->special_days);
             }
             $smartyVars['objFeaturePrice'] = $objFeaturePrice;
-            $smartyVars['edit'] = 1;
+            if ($objFeaturePrice->date_selection_type == HotelRoomTypeFeaturePricing::DATE_SELECTION_TYPE_SPECIFIC) {
+                $smartyVars['featurePriceDates'] = $objFeaturePrice->getDatesByIdFeature($idFeaturePrice);
+            } else if ($objFeaturePrice->date_selection_type == HotelRoomTypeFeaturePricing::DATE_SELECTION_TYPE_RANGE) {
+                $smartyVars['featurePriceDatesRanges'] = $objFeaturePrice->getDatesByIdFeature($idFeaturePrice);
+            }
 
+            $smartyVars['edit'] = 1;
             $smartyVars['feature_price_groups'] = $objFeaturePrice->getGroups($idFeaturePrice);
         } else {
             $tree = new HelperTree('hotels-tree');
@@ -310,8 +301,7 @@ class AdminHotelFeaturePricesSettingsController extends ModuleAdminController
     public function validateExistingFeaturePrice(
         $dateSelectionType,
         $roomTypeId,
-        $dateFrom,
-        $dateTo,
+        $dateRanges,
         $group,
         $idFeaturePrice,
         $isSpecialDaysExists = false,
@@ -319,59 +309,46 @@ class AdminHotelFeaturePricesSettingsController extends ModuleAdminController
     ) {
         $objFeaturePricing = new HotelRoomTypeFeaturePricing();
         if ($dateSelectionType == HotelRoomTypeFeaturePricing::DATE_SELECTION_TYPE_SPECIFIC) {
-            return $objFeaturePricing->checkRoomTypeFeaturePriceExistance(
-                $roomTypeId,
-                $dateFrom,
-                $dateTo,
-                $group,
-                'specific_date',
-                false,
-                $idFeaturePrice
-            );
+            $type = HotelRoomTypeFeaturePricing::DATE_SELECTION_TYPE_SPECIFIC;
+            $jsonSpecialDays = false;
         } elseif (isset($isSpecialDaysExists) && $isSpecialDaysExists && $jsonSpecialDays != "false") {
-            return $objFeaturePricing->checkRoomTypeFeaturePriceExistance(
-                $roomTypeId,
-                $dateFrom,
-                $dateTo,
-                $group,
-                'special_day',
-                $jsonSpecialDays,
-                $idFeaturePrice
-            );
+            $type = HotelRoomTypeFeaturePricing::DATE_SELECTION_TYPE_SPECIAL_DAYS;
         } else {
-            return $objFeaturePricing->checkRoomTypeFeaturePriceExistance(
-                $roomTypeId,
-                $dateFrom,
-                $dateTo,
-                $group,
-                'date_range',
-                false,
-                $idFeaturePrice
-            );
+            $type = HotelRoomTypeFeaturePricing::DATE_SELECTION_TYPE_RANGE;
+            $jsonSpecialDays = false;
         }
+
+        return $objFeaturePricing->checkRoomTypeFeaturePriceExistanceForDateRanges(
+            $roomTypeId,
+            $dateRanges,
+            $group,
+            $type,
+            $jsonSpecialDays,
+            $idFeaturePrice
+        );
     }
 
     public function processSave()
     {
-        $idFeaturePrice = Tools::getValue('id_feature_price');
-        if (!isset($idFeaturePrice) || !$idFeaturePrice) {
-            $idFeaturePrice = 0;
+        if (!$this->loadObject(true)) {
+            return;
         }
+
+        $idFeaturePrice = (int) $this->object->id;
         $enableFeaturePrice = Tools::getValue('enable_feature_price');
         $roomTypeId = Tools::getValue('room_type_id');
-        $dateFrom = Tools::getValue('date_from');
-        $dateTo = Tools::getValue('date_to');
         $isSpecialDaysExists = Tools::getValue('is_special_days_exists');
         $specialDays = Tools::getValue('special_days');
         $priceImpactWay = Tools::getValue('price_impact_way');
         $priceImpactType = Tools::getValue('price_impact_type');
         $impactValue = Tools::getValue('impact_value');
         $dateSelectionType = Tools::getValue('date_selection_type');
-        $specificDate = date('Y-m-d', strtotime(Tools::getValue('specific_date')));
         $groups = Tools::getValue('groupBox');
         $jsonSpecialDays = json_encode($specialDays);
         $defaultLangId = Configuration::get('PS_LANG_DEFAULT');
         $createMultiple = Tools::getValue('create_multiple');
+        $dateRanges = Tools::getValue('date_ranges', []);
+        $specificDates = Tools::getValue('specific_dates', []);
 
         $objFeaturePricing = new HotelRoomTypeFeaturePricing();
         if ($priceImpactWay == HotelRoomTypeFeaturePricing::IMPACT_WAY_FIX_PRICE) {
@@ -448,39 +425,86 @@ class AdminHotelFeaturePricesSettingsController extends ModuleAdminController
             }
         }
 
+        $hasError = false;
+        $rowsToHighlight = array();
         if ($dateSelectionType == HotelRoomTypeFeaturePricing::DATE_SELECTION_TYPE_SPECIFIC) {
-            $dateFrom = $specificDate;
-            $dateTo = date('Y-m-d', strtotime("+1 day", strtotime($specificDate)));
+            $dateRanges = array();
+            if ($specificDates) {
+                foreach ($specificDates as $dateKey => $specificDate) {
+                    if (!$specificDate['date_from']) {
+                        continue;
+                    }
+
+                    $specificDate['date_from'] = date('Y-m-d', strtotime($specificDate['date_from']));
+                    if (!Validate::isDate($specificDate['date_from'])) {
+                    }
+
+                    $specificDate['date_to'] = date('Y-m-d', strtotime("+1 day", strtotime($specificDate['date_from'])));
+                    $dateRangeKey = strtotime($specificDate['date_from']).strtotime($specificDate['date_to']);
+                    $dateRanges[$dateRangeKey] = array(
+                        'date_from' => $specificDate['date_from'],
+                        'date_to' => $specificDate['date_to'],
+                    );
+                }
+
+                $dateRanges = array_values($dateRanges);
+            }
+
+            if (!$dateRanges) {
+                $this->errors[] = $this->l('Specific date(s) are required while creating advance price rule.');
+            }
         } else if ($dateSelectionType == HotelRoomTypeFeaturePricing::DATE_SELECTION_TYPE_RANGE) {
-            if ($dateFrom == '') {
-                $this->errors[] = $this->l('Please choose Date from for the advanced price rule.');
+            if ($dateRanges) {
+                // To filter empty rows
+                foreach ($dateRanges as $dateKey => $dateRange) {
+                    if (!$dateRange['date_from'] && !$dateRange['date_to']) {
+                        unset($dateRanges[$dateKey]);
+                        continue;
+                    }
+
+                    $dateRanges[$dateKey] = array(
+                        'date_from' => date('Y-m-d', strtotime($dateRange['date_from'])),
+                        'date_to' => date('Y-m-d', strtotime($dateRange['date_to']))
+                    );
+                }
+
+                if ($dateRanges) {
+                    $dateRanges = array_values($dateRanges);
+                    foreach ($dateRanges as $dateKey => $dateRange) {
+                        if (!Validate::isDate($dateRange['date_from'])
+                            || !Validate::isDate($dateRange['date_to'])
+                            || strtotime($dateRange['date_from']) > strtotime($dateRange['date_to'])
+                        ) {
+                            $hasError = true;
+                        }
+
+                        foreach ($dateRanges as $disable_key => $disDate) {
+                            if ($dateKey != $disable_key) {
+                                if ((($dateRange['date_from'] < $disDate['date_from']) && ($dateRange['date_to'] <= $disDate['date_from'])) || (($dateRange['date_from'] > $disDate['date_from']) && ($dateRange['date_from'] >= $disDate['date_to']))) {
+                                    continue;
+                                } else {
+                                    $this->errors[] = Tools::displayError('Some dates are conflicting. Please check and reselect the date ranges.');
+                                    $rowsToHighlight[] = $dateKey;
+                                }
+                            }
+                        }
+                    }
+
+                    $this->context->smarty->assign(['rowsToHighlight' => $rowsToHighlight]);
+                 } else {
+                    $this->errors[] = $this->l('Date ranges are required while creating advance price rule.');
+                }
+            } else {
+                $this->errors[] = $this->l('Date ranges are required while creating advance price rule.');
             }
-            if ($dateTo == '') {
-                $this->errors[] = $this->l('Please choose Date to for the advanced price rule.');
-            }
-            $dateFrom = date('Y-m-d', strtotime($dateFrom));
-            $dateTo = date('Y-m-d', strtotime($dateTo));
-            if (!Validate::isDate($dateFrom)) {
-                $this->errors[] = $this->l('Invalid Date From.');
-            }
-            if (!Validate::isDate($dateTo)) {
-                $this->errors[] = $this->l('Invalid Date To.');
-            }
-            if ($dateTo < $dateFrom) {
-                $this->errors[] = $this->l('Date To cannot be smaller than Date From.');
+
+            if ($hasError) {
+                $this->errors[] = $this->l('Some date ranges are Invalid.');
             }
             if ($isSpecialDaysExists) {
                 if (!isset($specialDays) || !$specialDays) {
                     $this->errors[] = $this->l('Please select at least one day for week days restriction.');
                 }
-            }
-        } else {
-            if ($specificDate == '') {
-                $this->errors[] = $this->l('Please choose Date from for the advanced price rule.');
-            }
-            $specificDate = date('Y-m-d', strtotime($specificDate));
-            if (!Validate::isDate($specificDate)) {
-                $this->errors[] = $this->l('Invalid Date From.');
             }
         }
 
@@ -494,40 +518,53 @@ class AdminHotelFeaturePricesSettingsController extends ModuleAdminController
             $this->errors[] = $this->l('Please select at least one group for the group access');
         }
 
-        $isPlanTypeExists = 0;
+        $ratePlans = [];
         if ($isSpecialDaysExists && $jsonSpecialDays == 'false') {
             $this->errors[] = $this->l('Please select at least one day for week days restriction.');
         }
 
         if (empty($this->errors)) {
             foreach ($roomTypeIds as $idRoomType)   {
-                $isPlanTypeExists = $this->validateExistingFeaturePrice(
+                $ratePlans = $this->validateExistingFeaturePrice(
                     $dateSelectionType,
                     $idRoomType,
-                    $dateFrom,
-                    $dateTo,
+                    $dateRanges,
                     $groups,
                     $idFeaturePrice,
                     $isSpecialDaysExists,
                     $jsonSpecialDays
                 );
 
-                if ($isPlanTypeExists) {
+                if ($ratePlans) {
                     $objProduct = new Product((int) $idRoomType, false, $this->context->language->id);
                     $this->errors[] = sprintf($this->l('An advanced price rule already exists for "%s" for the selected date range. Please select a different date range.'), $objProduct->name);
+                    foreach ($ratePlans as $ratePlan) {
+                        foreach ($dateRanges as $dateKey => $dateRange) {
+                            if ((($ratePlan['date_from'] < $dateRange['date_from']) && ($ratePlan['date_to'] <= $dateRange['date_from'])) || (($ratePlan['date_from'] > $dateRange['date_from']) && ($ratePlan['date_from'] >= $dateRange['date_to']))) {
+                                continue;
+                            } else {
+                                $rowsToHighlight[] = $dateKey;
+                            }
+                        }
+                    }
+
                 }
+            }
+
+            if ($dateSelectionType == HotelRoomTypeFeaturePricing::DATE_SELECTION_TYPE_SPECIFIC) {
+                $this->context->smarty->assign(['specificDatesToHighlight' => $rowsToHighlight]);
+            } else {
+                $this->context->smarty->assign(['rowsToHighlight' => $rowsToHighlight]);
             }
         }
 
-        if (!$isPlanTypeExists && !count($this->errors)) {
+        if (!$ratePlans && !count($this->errors)) {
             if ($idFeaturePrice) {
                 $objFeaturePricing = new HotelRoomTypeFeaturePricing($idFeaturePrice);
             }
 
             // lang fields
             $objFeaturePricing->date_selection_type = $dateSelectionType;
-            $objFeaturePricing->date_from = $dateFrom;
-            $objFeaturePricing->date_to = $dateTo;
             $objFeaturePricing->impact_way = $priceImpactWay;
             $objFeaturePricing->is_special_days_exists = $isSpecialDaysExists;
             $objFeaturePricing->special_days = $jsonSpecialDays;
@@ -543,6 +580,7 @@ class AdminHotelFeaturePricesSettingsController extends ModuleAdminController
                     $objFeaturePricing->id_product = $idRoomType;
                     $objFeaturePricing->feature_price_name = $featurePricingName[$idRoomType];
                     $objFeaturePricing->add();
+                    $objFeaturePricing->saveUpdateDateRanges($objFeaturePricing->id, $dateRanges);
                 }
 
                 Tools::redirectAdmin(self::$currentIndex.'&conf=3&token='.$this->token);
@@ -551,6 +589,7 @@ class AdminHotelFeaturePricesSettingsController extends ModuleAdminController
             }
 
             if ($objFeaturePricing->save()) {
+                $objFeaturePricing->saveUpdateDateRanges($objFeaturePricing->id, $dateRanges);
                 if (Tools::isSubmit('submitAdd'.$this->table.'AndStay')) {
                     Tools::redirectAdmin(
                         self::$currentIndex.'&id_feature_price='.(int) $objFeaturePricing->id.

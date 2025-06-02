@@ -676,63 +676,89 @@ $(document).ready(function() {
         $('.room_type_search_results_ul').empty().hide();
     });
 
-    $("#feature_plan_date_from").datepicker({
-	      showOtherMonths: true,
-	      dateFormat: 'dd-mm-yy',
-	      minDate: 0,
-	      //for calender Css
-	      beforeShowDay: function (date) {
-	          return highlightDateBorder($("#feature_plan_date_from").val(), date);
-	      },
-	      onSelect: function(selectedDate) {
-            let objDateToMin = $.datepicker.parseDate('dd-mm-yy', selectedDate);
-            objDateToMin.setDate(objDateToMin.getDate());
-
-            $('#feature_plan_date_to').datepicker('option', 'minDate', objDateToMin);
-	      },
-    });
-
-    $("#specific_date").datepicker({
-        showOtherMonths: true,
-        dateFormat: 'dd-mm-yy',
-        minDate: 0,
-    });
-
-    $("#feature_plan_date_to").datepicker({
-        showOtherMonths: true,
-        dateFormat: 'dd-mm-yy',
-        beforeShow: function () {
-            let dateFrom = $('#feature_plan_date_from').val();
-
-            let objDateToMin = null;
-            if (typeof dateFrom != 'undefined' && dateFrom != '') {
-                objDateToMin = $.datepicker.parseDate('dd-mm-yy', dateFrom);
-            } else {
-                objDateToMin = new Date();
+    initFeaturePricesDatePickers();
+    function initFeaturePricesDatePickers() {
+        $(".feature_plan_date_from").datepicker({
+            showOtherMonths: true,
+            dateFormat: 'yy-mm-dd',
+            minDate: 0,
+            onSelect: function(selectedDate) {
+                let objDateToMin = $.datepicker.parseDate('yy-mm-dd', selectedDate);
+                objDateToMin.setDate(objDateToMin.getDate());
+                $(this).closest('tr').find('.feature_plan_date_to').datepicker('option', 'minDate', objDateToMin);
             }
+        });
+        $(".specific_date").datepicker({
+            showOtherMonths: true,
+            dateFormat: 'yy-mm-dd',
+            minDate: 0,
+        });
+        $(".feature_plan_date_to").datepicker({
+            showOtherMonths: true,
+            dateFormat: 'yy-mm-dd',
+            beforeShow: function () {
+                let dateFrom = $(this).closest('tr').find('.feature_plan_date_from').val();
+                let objDateToMin = null;
+                if (typeof dateFrom != 'undefined' && dateFrom != '') {
+                    objDateToMin = $.datepicker.parseDate('yy-mm-dd', dateFrom);
+                } else {
+                    objDateToMin = new Date();
+                }
 
-            objDateToMin.setDate(objDateToMin.getDate());
-            $('#feature_plan_date_to').datepicker('option', 'minDate', objDateToMin);
-        },
-        //for calender Css
-        beforeShowDay: function (date) {
-            return highlightDateBorder($("#feature_plan_date_to").val(), date);
-        }
-    });
-
-    function highlightDateBorder(elementVal, date)
-    {
-        if (elementVal) {
-            let selectedDate = $.datepicker.formatDate('dd-mm-yy', date);
-            if (selectedDate == elementVal) {
-                return [true, "selectedCheckedDate", "Check-In date"];
-            } else {
-                return [true, ""];
+                objDateToMin.setDate(objDateToMin.getDate());
+                $(this).closest('tr').find('.feature_plan_date_to').datepicker('option', 'minDate', objDateToMin);
             }
-        } else {
-            return [true, ""];
-        }
+        });
     }
+
+    $(document).on('click', '.remove_date_range, .remove_specific_date', function(e) {
+        e.preventDefault();
+        $(this).closest('tr').remove();
+    });
+
+    $(document).on('click', '#add_more_date_button', function() {
+        let index = parseInt($('.dates_ranges_table tr').last().data('row_index'));
+        if (isNaN(index)) {
+            index = 0;
+        } else {
+            index++;
+        }
+        let specificDateElem = $('<td>').addClass('center').append(
+            $('<input>').attr('type', 'text').attr('name', 'specific_dates['+index+'][date_from]').addClass('form-control specific_date').prop('readonly', 'readonly')
+        );
+        let removeRowElem = $('<td>').addClass('center').append(
+            $('<a>').attr('href', '#').addClass('remove_specific_date btn btn-default').append(
+                $('<i>').addClass('icon-trash'))
+            );
+        let rowElem = $('<tr>').attr('data-row_index', index).append(specificDateElem).append(removeRowElem);
+
+        $('.specific_dates_table').append($(rowElem).prop('outerHTML'));
+        initFeaturePricesDatePickers();
+    });
+
+    $(document).on('click', '#add_more_date_range_button', function() {
+        let index = parseInt($('.dates_ranges_table tr').last().data('row_index'));
+         if (isNaN(index)) {
+            index = 0;
+        } else {
+            index++;
+        }
+        let dateFromElem = $('<td>').addClass('center').append(
+            $('<input>').attr('type', 'text').attr('name', 'date_ranges['+index+'][date_from]').addClass('form-control feature_plan_date_from').prop('readonly', 'readonly')
+        );
+        let dateToElem = $('<td>').addClass('center').append(
+            $('<input>').attr('type', 'text').attr('name', 'date_ranges['+index+'][date_to]').addClass('form-control feature_plan_date_to').prop('readonly', 'readonly')
+        );
+        let removeRowElem = $('<td>').addClass('center').append(
+            $('<a>').attr('href', '#').addClass('remove_date_range btn btn-default').append(
+                $('<i>').addClass('icon-trash'))
+            );
+        let rowElem = $('<tr>').attr('data-row_index', index).append(dateFromElem).append(dateToElem).append(removeRowElem);
+
+        $('.dates_ranges_table').append($(rowElem).prop('outerHTML'));
+        initFeaturePricesDatePickers();
+    });
+
 
     // search panel configuration
     $("input[name='WK_HOTEL_NAME_ENABLE']").on('change', function () {

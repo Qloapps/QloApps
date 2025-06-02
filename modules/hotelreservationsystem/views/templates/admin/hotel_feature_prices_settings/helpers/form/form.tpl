@@ -98,8 +98,8 @@
 				{l s='Room Type' mod='hotelreservationsystem'}
 			</label>
 			<div class="col-sm-3">
-				<input autocomplete="off" type="text" id="room_type_name" name="room_type_name" class="form-control" placeholder= "{l s='Enter room type name' mod='hotelreservationsystem'}" value="{if isset($productName)}{$productName}{/if}"/>
-				<input type="hidden" id="room_type_id" name="room_type_id" class="form-control" value="{if isset($objFeaturePrice->id_product)}{$objFeaturePrice->id_product}{else}0{/if}"/>
+				<input autocomplete="off" type="text" id="room_type_name" name="room_type_name" class="form-control" placeholder= "{l s='Enter room type name' mod='hotelreservationsystem'}" value="{if (isset($smarty.post.room_type_name) && $smarty.post.room_type_name)}{$smarty.post.room_type_name}{elseif isset($productName)}{$productName}{/if}"/>
+				<input type="hidden" id="room_type_id" name="room_type_id" class="form-control" value="{if (isset($smarty.post.room_type_id) && $smarty.post.room_type_id)}{$smarty.post.room_type_id}{elseif isset($objFeaturePrice->id_product)}{$objFeaturePrice->id_product}{else}0{/if}"/>
 				<div class="dropdown">
 					<ul class="room_type_search_results_ul"></ul>
 				</div>
@@ -118,39 +118,130 @@
             </label>
             <div class="col-lg-3">
 				<select class="form-control" name="date_selection_type" id="date_selection_type">
-					<option value="{HotelRoomTypeFeaturePricing::DATE_SELECTION_TYPE_RANGE}" {if (isset($smarty.post.date_selection_type) && $smarty.post.date_selection_type == HotelRoomTypeFeaturePricing::DATE_SELECTION_TYPE_RANGE) || (isset($objFeaturePrice->date_selection_type) && $objFeaturePrice->date_selection_type == HotelRoomTypeFeaturePricing::DATE_SELECTION_TYPE_RANGE)}selected = "selected"{/if}>
-					  {l s='Date Range' mod='hotelreservationsystem'}
+					<option value="{HotelRoomTypeFeaturePricing::DATE_SELECTION_TYPE_RANGE}" {if (isset($smarty.post.date_selection_type) && $smarty.post.date_selection_type == HotelRoomTypeFeaturePricing::DATE_SELECTION_TYPE_RANGE) || (!isset($smarty.post.date_selection_type) && isset($objFeaturePrice->date_selection_type) && $objFeaturePrice->date_selection_type == HotelRoomTypeFeaturePricing::DATE_SELECTION_TYPE_RANGE)}selected = "selected"{/if}>
+					  	{l s='Date Ranges' mod='hotelreservationsystem'}
 					</option>
-					<option value="{HotelRoomTypeFeaturePricing::DATE_SELECTION_TYPE_SPECIFIC}" {if (isset($smarty.post.date_selection_type) && $smarty.post.date_selection_type == HotelRoomTypeFeaturePricing::DATE_SELECTION_TYPE_SPECIFIC) || (isset($objFeaturePrice->date_selection_type) && $objFeaturePrice->date_selection_type == HotelRoomTypeFeaturePricing::DATE_SELECTION_TYPE_SPECIFIC)}selected = "selected"{/if}>
-					  {l s='Specific Date' mod='hotelreservationsystem'}
+					<option value="{HotelRoomTypeFeaturePricing::DATE_SELECTION_TYPE_SPECIFIC}" {if (isset($smarty.post.date_selection_type) && $smarty.post.date_selection_type == HotelRoomTypeFeaturePricing::DATE_SELECTION_TYPE_SPECIFIC) || (!isset($smarty.post.date_selection_type) && isset($objFeaturePrice->date_selection_type) && $objFeaturePrice->date_selection_type == HotelRoomTypeFeaturePricing::DATE_SELECTION_TYPE_SPECIFIC)}selected = "selected"{/if}>
+					  	{l s='Specific Date' mod='hotelreservationsystem'}
 					</option>
 				</select>
 			</div>
 		</div>
 
-		<div class="form-group specific_date_type" {if (isset($smarty.post.date_selection_type) && $smarty.post.date_selection_type != HotelRoomTypeFeaturePricing::DATE_SELECTION_TYPE_SPECIFIC) || (isset($objFeaturePrice->date_selection_type) && $objFeaturePrice->date_selection_type != HotelRoomTypeFeaturePricing::DATE_SELECTION_TYPE_SPECIFIC)}style="display:none;"{else if !isset($edit) && !isset($smarty.post.date_selection_type)}style="display:none;"{/if}>
-			<label class="col-sm-3 control-label required" for="specific_date" >
-				{l s='Specific Date' mod='hotelreservationsystem'}
+		<div class="form-group specific_date_type" {if (isset($smarty.post.date_selection_type) && $smarty.post.date_selection_type != HotelRoomTypeFeaturePricing::DATE_SELECTION_TYPE_SPECIFIC) || (!isset($smarty.post.date_selection_type) && isset($objFeaturePrice->date_selection_type) && $objFeaturePrice->date_selection_type != HotelRoomTypeFeaturePricing::DATE_SELECTION_TYPE_SPECIFIC)}style="display:none;"{else if !isset($edit) && !isset($smarty.post.date_selection_type)}style="display:none;"{/if}>
+			<label class="col-sm-3 control-label required" for="specific_date">
+				{l s='Specific Dates' mod='hotelreservationsystem'}
 			</label>
-			<div class="col-sm-3">
-				<input type="text" id="specific_date" name="specific_date" class="form-control datepicker-input" value="{if isset($objFeaturePrice->date_from)}{$objFeaturePrice->date_from}{else}{$date_from}{/if}" readonly/>
+			<div class="col-sm-5">
+				<div class="table-responsive-row clearfix">
+					<table class="table table-bordered specific_dates_table">
+						<tr class="nodrag nodrop">
+							<th class="left">
+								<span>{l s='Date' mod='hotelreservationsystem'}</span>
+							</th>
+							<th class="center">
+								<span>{l s='Action' mod='hotelreservationsystem'}</span>
+							</th>
+						</tr>
+						{if isset($smarty.post.specific_dates) && $smarty.post.specific_dates}
+							{assign var="featurePriceDates" value=$smarty.post.specific_dates}
+						{/if}
+						{if isset($featurePriceDates) && $featurePriceDates}
+							{foreach from=$featurePriceDates key=key item=featurePriceDate}
+								<tr data-row_index="{$key}" {if !empty($specificDatesToHighlight) && in_array($key, $specificDatesToHighlight)}class="error-border"{/if}>
+									<td class="center">
+										<input type="text" name="specific_dates[{$key}][date_from]" value="{$featurePriceDate['date_from']}" class="form-control specific_date" readonly/>
+									</td>
+									<td class="center">
+										<a href="#" class="remove_specific_date btn btn-default"><i class="icon-trash"></i></a>
+									</td>
+								</tr>
+							{/foreach}
+						{else}
+							{for $k=0 to 1}
+								<tr data-row_index="{$k}">
+									<td class="center">
+										<input type="text" name="specific_dates[{$k}][date_from]" value="" class="form-control specific_date" readonly/>
+									</td>
+									<td class="center">
+										<a href="#" class="remove_specific_date btn btn-default"><i class="icon-trash"></i></a>
+									</td>
+								</tr>
+							{/for}
+						{/if}
+					</table>
+					<div class="form-group">
+						<div class="col-sm-12">
+							<button id="add_more_date_button" class="btn btn-default" type="button">
+								<i class="icon-plus-circle"></i>
+								{l s='Add More Dates' mod='hotelreservationsystem'}
+							</button>
+						</div>
+					</div>
+				</div>
 			</div>
 		</div>
-
-		<div class="form-group date_range_type" {if (isset($objFeaturePrice->date_selection_type) && $objFeaturePrice->date_selection_type == HotelRoomTypeFeaturePricing::DATE_SELECTION_TYPE_SPECIFIC) || (isset($smarty.post.date_selection_type) && $smarty.post.date_selection_type != HotelRoomTypeFeaturePricing::DATE_SELECTION_TYPE_RANGE)}style="display:none;"{/if}>
+		<div class="form-group date_range_type" {if (!isset($smarty.post.date_selection_type) && isset($objFeaturePrice->date_selection_type) && $objFeaturePrice->date_selection_type == HotelRoomTypeFeaturePricing::DATE_SELECTION_TYPE_SPECIFIC) || (isset($smarty.post.date_selection_type) && $smarty.post.date_selection_type != HotelRoomTypeFeaturePricing::DATE_SELECTION_TYPE_RANGE)}style="display:none;"{/if}>
 			<label class="col-sm-3 control-label required" for="date_form" >
-				{l s='Date From' mod='hotelreservationsystem'}
+				{l s='Date Ranges' mod='hotelreservationsystem'}
 			</label>
-			<div class="col-sm-3">
-				<input type="text" id="feature_plan_date_from" name="date_from" class="form-control datepicker-input" value="{if isset($smarty.post.date_from) && $smarty.post.date_from}{$smarty.post.date_from}{elseif isset($objFeaturePrice->date_from)}{$objFeaturePrice->date_from|date_format:'%d-%m-%Y'}{else}{$date_from|date_format:'%d-%m-%Y'}{/if}" readonly/>
-			</div>
-		</div>
-		<div class="form-group date_range_type" {if (isset($objFeaturePrice->date_selection_type) && $objFeaturePrice->date_selection_type == HotelRoomTypeFeaturePricing::DATE_SELECTION_TYPE_SPECIFIC) || (isset($smarty.post.date_selection_type) && $smarty.post.date_selection_type != HotelRoomTypeFeaturePricing::DATE_SELECTION_TYPE_RANGE)}style="display:none;"{/if}>
-			<label class="col-sm-3 control-label required" for="date_to" >
-				{l s='Date To' mod='hotelreservationsystem'}
-			</label>
-			<div class="col-sm-3">
-				<input type="text" id="feature_plan_date_to" name="date_to" class="form-control datepicker-input" value="{if isset($smarty.post.date_to) && $smarty.post.date_to}{$smarty.post.date_to}{elseif isset($objFeaturePrice->date_to)}{$objFeaturePrice->date_to|date_format:'%d-%m-%Y'}{else}{$date_to|date_format:'%d-%m-%Y'}{/if}" readonly/>
+			<div class="col-sm-9">
+				<div class="table-responsive-row clearfix">
+					<table class="table table-bordered dates_ranges_table">
+						<tr class="nodrag nodrop">
+							<th class="left">
+								<span>{l s='Date From' mod='hotelreservationsystem'}</span>
+							</th>
+							<th class="left">
+								<span>{l s='Date To' mod='hotelreservationsystem'}</span>
+							</th>
+							<th class="center">
+								<span>{l s='Action' mod='hotelreservationsystem'}</span>
+							</th>
+						</tr>
+						{if isset($smarty.post.date_ranges) && $smarty.post.date_ranges}
+							{assign var="featurePriceDatesRanges" value=$smarty.post.date_ranges}
+						{/if}
+
+						{if isset($featurePriceDatesRanges) && $featurePriceDatesRanges}
+							{foreach from=$featurePriceDatesRanges key=key item=featurePriceDate}
+								<tr data-row_index="{$key}" {if !empty($rowsToHighlight) && in_array($key, $rowsToHighlight)}class="error-border"{/if}>
+									<td class="center">
+										<input type="text" name="date_ranges[{$key}][date_from]" value="{$featurePriceDate['date_from']}" class="form-control feature_plan_date_from" readonly/>
+									</td>
+									<td class="center">
+										<input type="text" name="date_ranges[{$key}][date_to]" value="{$featurePriceDate['date_to']}" class="form-control feature_plan_date_to" readonly/>
+									</td>
+									<td class="center">
+										<a href="#" class="remove_date_range btn btn-default"><i class="icon-trash"></i></a>
+									</td>
+								</tr>
+							{/foreach}
+						{else}
+							{for $k=0 to 1}
+								<tr data-row_index="{$k}">
+									<td class="center">
+										<input type="text" name="date_ranges[{$k}][date_from]" value="" class="form-control feature_plan_date_from" readonly/>
+									</td>
+									<td class="center">
+										<input type="text" name="date_ranges[{$k}][date_to]" value="" class="form-control feature_plan_date_to" readonly/>
+									</td>
+									<td class="center">
+										<a href="#" class="remove_date_range btn btn-default"><i class="icon-trash"></i></a>
+									</td>
+								</tr>
+							{/for}
+						{/if}
+					</table>
+					<div class="form-group">
+						<div class="col-sm-12">
+							<button id="add_more_date_range_button" class="btn btn-default" type="button">
+								<i class="icon-plus-circle"></i>
+								{l s='Add More Date Ranges' mod='hotelreservationsystem'}
+							</button>
+						</div>
+					</div>
+				</div>
 			</div>
 		</div>
 

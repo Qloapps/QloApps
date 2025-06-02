@@ -1443,7 +1443,7 @@ class HotelCartBookingData extends ObjectModel
      * @param [int] $id_group    [id_group for which price is need (if available for the passed group)]
      * @return [array|false] [returns array containg info of the feature plan if foung otherwise returns false]
      */
-    public function getProductFeaturePricePlanByDateByPriority(
+    public static function getProductFeaturePricePlanByDateByPriority(
         $id_product,
         $date,
         $id_group,
@@ -1453,10 +1453,12 @@ class HotelCartBookingData extends ObjectModel
     ) {
         if ($id_cart && $id_room) {
             if ($featurePrice = Db::getInstance()->getRow('SELECT * FROM `'._DB_PREFIX_.'htl_room_type_feature_pricing` fp
+                LEFT JOIN `'._DB_PREFIX_.'htl_room_type_feature_pricing_date_range` rtfpd
+                ON (fp.`id_feature_price` = rtfpd.`id_feature_price`)
                 WHERE fp.`id_product` = '.(int) $id_product.' AND fp.`id_cart` = '.(int) $id_cart.'
                 AND fp.`id_guest` = '.(int) $id_guest.' AND fp.`id_room` = '.(int) $id_room.'
-                AND fp.`active` = 1 AND fp.`date_from` <= \''.pSQL($date).'\'
-                AND fp.`date_to` >= \''.pSQL($date).'\'')
+                AND fp.`active` = 1 AND rtfpd.`date_from` <= \''.pSQL($date).'\'
+                AND rtfpd.`date_to` >= \''.pSQL($date).'\'')
             ) {
                 return $featurePrice;
             }
@@ -1472,8 +1474,10 @@ class HotelCartBookingData extends ObjectModel
                         'SELECT * FROM `'._DB_PREFIX_.'htl_room_type_feature_pricing` fp'.
                         (Group::isFeatureActive() ? ' INNER JOIN `'._DB_PREFIX_.'htl_room_type_feature_pricing_group` fpg
                         ON (fp.`id_feature_price` = fpg.`id_feature_price` AND fpg.`id_group` = '.(int) $id_group.')' : '').'
+                        LEFT JOIN `'._DB_PREFIX_.'htl_room_type_feature_pricing_date_range` rtfpd
+                        ON (fp.`id_feature_price` = rtfpd.`id_feature_price`)
                         WHERE fp.`id_cart` = 0 AND fp.`id_product`='.(int) $id_product.' AND fp.`active`=1
-                        AND fp.`date_selection_type` = '.(int) HotelRoomTypeFeaturePricing::DATE_SELECTION_TYPE_SPECIFIC.' AND fp.`date_from` = \''.pSQL($date).'\''
+                        AND fp.`date_selection_type` = '.(int) HotelRoomTypeFeaturePricing::DATE_SELECTION_TYPE_SPECIFIC.' AND rtfpd.`date_from` = \''.pSQL($date).'\''
                     )) {
                         return $featurePrice;
                     }
@@ -1482,9 +1486,11 @@ class HotelCartBookingData extends ObjectModel
                         'SELECT * FROM `'._DB_PREFIX_.'htl_room_type_feature_pricing` fp'.
                         (Group::isFeatureActive() ? ' INNER JOIN `'._DB_PREFIX_.'htl_room_type_feature_pricing_group` fpg
                         ON (fp.`id_feature_price` = fpg.`id_feature_price` AND fpg.`id_group` = '.(int) $id_group.')' : '').'
+                        LEFT JOIN `'._DB_PREFIX_.'htl_room_type_feature_pricing_date_range` rtfpd
+                        ON (fp.`id_feature_price` = rtfpd.`id_feature_price`)
                         WHERE fp.`id_cart` = 0 AND fp.`id_product`='.(int) $id_product.'
-                        AND fp.`is_special_days_exists`=1 AND fp.`active`=1 AND fp.`date_from` <= \''.pSQL($date).'\'
-                        AND fp.`date_to` >= \''.pSQL($date).'\''
+                        AND fp.`is_special_days_exists`=1 AND fp.`active`=1 AND rtfpd.`date_from` <= \''.pSQL($date).'\'
+                        AND rtfpd.`date_to` >= \''.pSQL($date).'\''
                     )) {
                         foreach ($featurePrice as $fRow) {
                             $specialDays = json_decode($fRow['special_days']);
@@ -1498,9 +1504,11 @@ class HotelCartBookingData extends ObjectModel
                         'SELECT * FROM `'._DB_PREFIX_.'htl_room_type_feature_pricing` fp'.
                         (Group::isFeatureActive() ? ' INNER JOIN `'._DB_PREFIX_.'htl_room_type_feature_pricing_group` fpg
                         ON (fp.`id_feature_price` = fpg.`id_feature_price` AND fpg.`id_group` = '.(int) $id_group.')' : '').'
+                        LEFT JOIN `'._DB_PREFIX_.'htl_room_type_feature_pricing_date_range` rtfpd
+                        ON (fp.`id_feature_price` = rtfpd.`id_feature_price`)
                         WHERE fp.`id_cart` = 0 AND fp.`id_product`='.(int) $id_product.' AND fp.`date_selection_type` = '.(int) HotelRoomTypeFeaturePricing::DATE_SELECTION_TYPE_RANGE.'
                         AND `is_special_days_exists`=0 AND `active`=1
-                        AND fp.`date_from` <= \''.pSQL($date).'\' AND fp.`date_to` >= \''.pSQL($date).'\''
+                        AND rtfpd.`date_from` <= \''.pSQL($date).'\' AND rtfpd.`date_to` >= \''.pSQL($date).'\''
                     )) {
                         return $featurePrice;
                     }

@@ -284,8 +284,6 @@ class HotelReservationSystemDb
                 `id_cart` int(11) NOT NULL DEFAULT '0',
                 `id_guest` int(11) NOT NULL DEFAULT '0',
                 `id_room` int(11) NOT NULL DEFAULT '0',
-                `date_from` date NOT NULL,
-                `date_to` date NOT NULL,
                 `is_special_days_exists` tinyint(1) NOT NULL,
                 `date_selection_type` tinyint(1) NOT NULL,
                 `special_days` text,
@@ -297,9 +295,14 @@ class HotelReservationSystemDb
                 `date_upd` datetime NOT NULL,
                 PRIMARY KEY (`id_feature_price`)
             ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;",
-
+            "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."htl_room_type_feature_pricing_date_range` (
+                `id_feature_price` int(11) NOT NULL,
+                `date_from` date NOT NULL,
+                `date_to` date NOT NULL,
+                PRIMARY KEY (`id_feature_price`, `date_from`, `date_to`)
+            ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;",
             "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."htl_room_type_feature_pricing_lang` (
-                `id_feature_price` int(10) unsigned NOT NULL,
+                `id_feature_price` int(10) unsigned NOT NULL AUTO_INCREMENT,
                 `id_lang` int(10) unsigned NOT NULL,
                 `feature_price_name` varchar(255) character set utf8 NOT NULL,
                 PRIMARY KEY (`id_feature_price`, `id_lang`)
@@ -582,6 +585,7 @@ class HotelReservationSystemDb
             `'._DB_PREFIX_.'htl_room_type_feature_pricing`,
             `'._DB_PREFIX_.'htl_room_type_feature_pricing_lang`,
             `'._DB_PREFIX_.'htl_room_type_feature_pricing_group`,
+            `'._DB_PREFIX_.'htl_room_type_feature_pricing_date_range`,
             `'._DB_PREFIX_.'htl_room_type_global_demand`,
             `'._DB_PREFIX_.'htl_room_type_global_demand_lang`,
             `'._DB_PREFIX_.'htl_room_type_global_demand_advance_option`,

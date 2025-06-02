@@ -2930,38 +2930,16 @@ class WebserviceSpecificManagementBookingsCore Extends ObjectModel implements We
      */
     public function createFeaturePrice($params)
     {
-        $feature_price_name = array();
-        foreach (Language::getIDs(true) as $idLang) {
-            $feature_price_name[$idLang] = 'Api-Booking-Price';
+        if ($numDays = HotelHelper::getNumberOfDays($params['date_from'], $params['date_to'])) {
+            $params['price'] = $params['price'] / (int) $numDays;
         }
 
-        $numDays = HotelHelper::getNumberOfDays($params['date_from'], $params['date_to']);
-        if (!$numDays) {
-            $numDays = 1;
+        $params['name'] = 'Api-Booking-Price';
+        if ($this->context->currency->id != Configuration::get('PS_CURRENCY_DEFAULT')) {
+            $params['price'] = Tools::convertPrice($params['price'], $this->context->currency, false);
         }
 
-        $objRoomTypeFeaturePricing = new HotelRoomTypeFeaturePricing();
-        $objRoomTypeFeaturePricing->id_product = (int) $params['id_product'];
-        $objRoomTypeFeaturePricing->id_cart = (int) $params['id_cart'];
-        $objRoomTypeFeaturePricing->id_guest = (int) $params['id_guest'];
-        $objRoomTypeFeaturePricing->id_room = (int) $params['id_room'];
-        $objRoomTypeFeaturePricing->feature_price_name = $feature_price_name;
-        $objRoomTypeFeaturePricing->date_selection_type = HotelRoomTypeFeaturePricing::DATE_SELECTION_TYPE_RANGE;
-        $objRoomTypeFeaturePricing->date_from = $params['date_from'];
-        $objRoomTypeFeaturePricing->date_to = $params['date_to'];
-        $objRoomTypeFeaturePricing->is_special_days_exists = 0;
-        $objRoomTypeFeaturePricing->special_days = json_encode(false);
-        $objRoomTypeFeaturePricing->impact_way = HotelRoomTypeFeaturePricing::IMPACT_WAY_FIX_PRICE;
-        $objRoomTypeFeaturePricing->impact_type = HotelRoomTypeFeaturePricing::IMPACT_TYPE_FIXED_PRICE;
-        $objRoomTypeFeaturePricing->impact_value = $params['price']/$numDays;
-        $objRoomTypeFeaturePricing->active = 1;
-        $objRoomTypeFeaturePricing->groupBox = array_column(Group::getGroups(Configuration::get('PS_LANG_DEFAULT')), 'id_group');
-
-        if ($objRoomTypeFeaturePricing->add()) {
-            return $objRoomTypeFeaturePricing->id;
-        }
-
-        return false;
+        return HotelRoomTypeFeaturePricing::createRoomTypeFeaturePrice($params);
     }
 
     /**

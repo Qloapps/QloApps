@@ -2598,27 +2598,18 @@ class AdminImportControllerCore extends AdminController
                                 if (isset($orderProduct['amount'])) {
                                     $orderProduct['amount'] = (float)$orderProduct['amount']/(1+$taxRateM);
                                     foreach ($idRooms as $idRoom) {
-                                        $objRoomFeaturePrice = new HotelRoomTypeFeaturePricing();
-                                        $objRoomFeaturePrice->id_product = (int) $orderProduct['id_product'];
-                                        $objRoomFeaturePrice->id_cart = (int) $this->context->cart->id;
-                                        $objRoomFeaturePrice->id_guest = (int) $this->context->cart->id_guest;
-                                        foreach(Language::getLanguages(true) as $lang) {
-                                            $objRoomFeaturePrice->feature_price_name[$lang['id_lang']] = 'csvprice';
-                                        }
-
-                                        $objRoomFeaturePrice->date_selection_type = HotelRoomTypeFeaturePricing::DATE_SELECTION_TYPE_RANGE;
-                                        $objRoomFeaturePrice->date_from = date('Y-m-d', strtotime($dateFrom));
-                                        $objRoomFeaturePrice->date_to = date('Y-m-d', strtotime($dateTo));
-                                        $objRoomFeaturePrice->is_special_days_exists = 0;
-                                        $objRoomFeaturePrice->id_room = $idRoom['id_room'];
-                                        $objRoomFeaturePrice->special_days = json_encode(false);
-                                        $objRoomFeaturePrice->impact_way = HotelRoomTypeFeaturePricing::IMPACT_WAY_FIX_PRICE;
-                                        $objRoomFeaturePrice->impact_type = HotelRoomTypeFeaturePricing::IMPACT_TYPE_FIXED_PRICE;
-                                        $objRoomFeaturePrice->impact_value = $orderProduct['amount'];
-                                        $objRoomFeaturePrice->active = 1;
-                                        $objRoomFeaturePrice->groupBox = array_column(Group::getGroups($this->context->language->id), 'id_group');
-                                        $objRoomFeaturePrice->add();
-                                        $featurePrices[] = $objRoomFeaturePrice->id;
+                                        $featurePrices[] = HotelRoomTypeFeaturePricing::createRoomTypeFeaturePrice(
+                                            array(
+                                                'id_product' => $orderProduct['id_product'],
+                                                'id_cart' => $this->context->cart->id,
+                                                'id_guest' => $this->context->cart->id_guest,
+                                                'name' => 'csvprice',
+                                                'id_room' => $idRoom['id_room'],
+                                                'price' => $orderProduct['amount'],
+                                                'date_from' => date('Y-m-d', strtotime($dateFrom)),
+                                                'date_to' => date('Y-m-d', strtotime($dateTo))
+                                            )
+                                        );
                                     }
                                 }
                             }
