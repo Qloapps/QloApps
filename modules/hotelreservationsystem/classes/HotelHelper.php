@@ -1755,29 +1755,34 @@ class HotelHelper
         }
         $obj_country = new Country();
         $country_name = $obj_country->getNameById(Configuration::get('PS_LANG_DEFAULT'), $def_cont_id);
-        $cat_country = $this->addCategory($country_name, false, $grp_ids);
 
-        if ($cat_country) {
+        if ($cat_country = $this->addCategory(array('name' => $country_name, 'group_ids' => $grp_ids, 'parent_category' => false))) {
             $states = State::getStatesByIdCountry($def_cont_id);
             if (count($states) > 0) {
                 $state_name = $states[0]['name'];
-                $cat_state = $this->addCategory($state_name, $cat_country, $grp_ids);
+                $cat_state = $this->addCategory(array('name' => $state_name, 'group_ids' => $grp_ids, 'parent_category' => $cat_country));
             }
         }
         if (count($states) > 0) {
-            if ($cat_state) {
-                $cat_city = $this->addCategory('Demo City', $cat_state, $grp_ids);
+            if (!empty($cat_state)) {
+                $cat_city = $this->addCategory(array('name' => 'Demo City', 'group_ids' => $grp_ids, 'parent_category' => $cat_state));
             }
         } else {
-            $cat_city = $this->addCategory('Demo City', $cat_country, $grp_ids);
+            $cat_city = $this->addCategory(array('name' => 'Demo City', 'group_ids' => $grp_ids, 'parent_category' => $cat_country));
         }
-        if ($cat_city) {
-            $cat_hotel = $this->addCategory('The Hotel Prime', $cat_city, $grp_ids, 1, $htl_id);
-        }
-        if ($cat_hotel) {
-            $obj_hotel_info = new HotelBranchInformation($htl_id);
-            $obj_hotel_info->id_category = $cat_hotel;
-            $obj_hotel_info->save();
+        if (!empty($cat_city)) {
+            if ($cat_hotel = $this->addCategory(array(
+                    'name' => 'The Hotel Prime',
+                    'group_ids' => $grp_ids,
+                    'parent_category' => $cat_city,
+                    'is_hotel' => 1,
+                    'id_hotel' => $htl_id
+                )
+            )) {
+                $obj_hotel_info = new HotelBranchInformation($htl_id);
+                $obj_hotel_info->id_category = $cat_hotel;
+                $obj_hotel_info->save();
+            }
         }
         // save dummy hotel as primary hotel
         Configuration::updateValue('WK_PRIMARY_HOTEL', $htl_id);
@@ -2125,7 +2130,7 @@ class HotelHelper
         );
 
         foreach ($categories as &$category) {
-            $idCategory = $this->addCategory($category['name'], $idCategoryServices, $idsGroup);
+            $idCategory = $this->addCategory(array('name' => $category['name'], 'group_ids' => $idsGroup, 'parent_category' => $idCategoryServices));
             $category['id_category'] = $idCategory;
         }
 
@@ -2462,10 +2467,58 @@ class HotelHelper
         return true;
     }
 
-    public function addCategory($name, $parent_cat = false, $group_ids, $ishotel = false, $hotel_id = false)
+    public function getCategoryParams($params)
     {
-        if (!$parent_cat) {
-            $parent_cat = Configuration::get('PS_LOCATIONS_CATEGORY');
+        if (!isset($params['parent_category'])) {
+            $params['parent_category'] = false;
+        }
+
+        if (!isset($params['is_hotel'])) {
+            $params['is_hotel'] = false;
+        }
+
+        if (!isset($params['id_hotel'])) {
+            $params['id_hotel'] = 0;
+        }
+
+        if (!isset($params['link_rewrite'])) {
+            $params['link_rewrite'] = false;
+        }
+
+        if (!isset($params['meta_title'])) {
+            $params['meta_title'] = false;
+        }
+
+        if (!isset($params['meta_description'])) {
+            $params['meta_description'] = false;
+        }
+
+        if (!isset($params['meta_keywords'])) {
+            $params['meta_keywords'] = false;
+        }
+
+        return $params;
+    }
+
+    /**
+     * Send parameters in array form
+     * @param array $params
+     *  $params['name']: [name of the category]
+     *  $params['group_ids']: [group_ids of the category]
+     *  $params['parent_category']: [parent_category of the category]
+     *  $params['is_hotel']: [is_hotel = 1 if category is for hotel]
+     *  $params['id_hotel']: [id_hotel of the category, if category is for hotel]
+     *  $params['link_rewrite']: [link_rewrite of the category]
+     *  $params['meta_title']: [meta_title of the category]
+     *  $params['meta_description']: [meta_description of the category]
+     *  $params['meta_keywords']: [meta_keywords of the category]
+     * @return int  returns ID of the category added.
+     */
+    public function addCategory(array $params)
+    {
+        extract($this->getCategoryParams($params));
+        if (!$parent_category) {
+            $parent_category = Configuration::get('PS_LOCATIONS_CATEGORY');
         }
 
         if (!is_array($name)) {
@@ -2474,9 +2527,9 @@ class HotelHelper
 
         $defaultCatName = $name['en'];
         $languages = Language::getLanguages(true);
-        if ($ishotel && $hotel_id) {
+        if ($is_hotel && $id_hotel) {
             $cat_id_hotel = Db::getInstance()->getValue(
-                'SELECT `id_category` FROM `'._DB_PREFIX_.'htl_branch_info` WHERE id='.$hotel_id
+                'SELECT `id_category` FROM `'._DB_PREFIX_.'htl_branch_info` WHERE id='.$id_hotel
             );
             if ($cat_id_hotel) {
                 $obj_cat = new Category($cat_id_hotel);
@@ -2494,7 +2547,7 @@ class HotelHelper
                         $obj_cat->link_rewrite[$lang['id_lang']] = Tools::link_rewrite($defaultCatName);
                     }
                 }
-                $obj_cat->id_parent = $parent_cat;
+                $obj_cat->id_parent = $parent_category;
                 $obj_cat->groupBox = $group_ids;
                 $obj_cat->save();
                 $cat_id = $obj_cat->id;
@@ -2504,7 +2557,7 @@ class HotelHelper
         }
 
         $context = Context::getContext();
-        $check_category_exists = Category::searchByNameAndParentCategoryId($context->language->id, $defaultCatName, $parent_cat);
+        $check_category_exists = Category::searchByNameAndParentCategoryId($context->language->id, $defaultCatName, $parent_category);
 
         if ($check_category_exists) {
             return $check_category_exists['id_category'];
@@ -2524,7 +2577,7 @@ class HotelHelper
                     $obj->link_rewrite[$lang['id_lang']] = Tools::link_rewrite($defaultCatName);
                 }
             }
-            $obj->id_parent = $parent_cat;
+            $obj->id_parent = $parent_category;
             $obj->groupBox = $group_ids;
             $obj->add();
             $cat_id = $obj->id;
@@ -2629,6 +2682,10 @@ class HotelHelper
 
     public static function getNumberOfDays($dateFrom, $dateTo)
     {
+        if (empty($dateFrom) || empty($dateTo)) {
+            return 0;
+        }
+
         $startDate = new DateTime($dateFrom);
         $endDate = new DateTime($dateTo);
         $daysDifference = $startDate->diff($endDate)->days;

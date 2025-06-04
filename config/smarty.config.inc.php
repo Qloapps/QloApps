@@ -62,7 +62,7 @@ if (defined('_PS_ADMIN_DIR_')) {
 } else {
     require_once(dirname(__FILE__).'/smartyfront.config.inc.php');
 }
-require_once SMARTY_PLUGINS_DIR.'modifier.truncate.php';
+require_once SMARTY_PLUGINS_DIR . 'modifier.truncate.php';
 
 // This escape modifier is required for invoice PDF generation
 function smartyEscape($string, $esc_type = 'html', $char_set = null, $double_encode = true)

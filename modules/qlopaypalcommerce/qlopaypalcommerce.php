@@ -35,6 +35,7 @@ class QloPaypalCommerce extends PaymentModule
     public $paypalEmail;
     public $clientId;
     public $clientSecret;
+    public $secure_key;
 
     public function __construct()
     {
@@ -203,7 +204,6 @@ class QloPaypalCommerce extends PaymentModule
         $helper->table = $this->table;
         $lang = new Language((int) Configuration::get('PS_LANG_DEFAULT'));
         $helper->default_form_language = $lang->id;
-        $this->fields_form = array();
         $helper->identifier = $this->identifier;
         $helper->submit_action = 'btnConfigSubmit';
         $helper->currentIndex = $this->context->link->getAdminLink('AdminModules', false).

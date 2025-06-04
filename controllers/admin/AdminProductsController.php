@@ -58,6 +58,14 @@ class AdminProductsControllerCore extends AdminController
 
     protected $id_current_category;
 
+    protected $objLocationsCategory;
+
+    protected $locationsAndHotels;
+
+    protected $product_name;
+
+    protected $product_exists_in_shop;
+
     public function __construct()
     {
         $this->bootstrap = true;
@@ -1035,7 +1043,7 @@ class AdminProductsControllerCore extends AdminController
 
     protected function processBulkDelete()
     {
-        if ($this->tabAccess['delete'] === '1') {
+        if ($this->tabAccess['delete'] === 1) {
             if (is_array($this->boxes) && !empty($this->boxes)) {
                 $object = new $this->className();
 
@@ -1301,7 +1309,7 @@ class AdminProductsControllerCore extends AdminController
 
     public function ajaxProcessDeleteSpecificPrice()
     {
-        if ($this->tabAccess['delete'] === '1') {
+        if ($this->tabAccess['delete'] === 1) {
             $id_specific_price = (int)Tools::getValue('id_specific_price');
             if (!$id_specific_price || !Validate::isUnsignedId($id_specific_price)) {
                 $error = Tools::displayError('The specific price ID is invalid.');
@@ -1405,7 +1413,7 @@ class AdminProductsControllerCore extends AdminController
 
         // Delete a product in the download folder
         if (Tools::getValue('deleteVirtualProduct')) {
-            if ($this->tabAccess['delete'] === '1') {
+            if ($this->tabAccess['delete'] === 1) {
                 $this->action = 'deleteVirtualProduct';
             } else {
                 $this->errors[] = Tools::displayError('You do not have permission to delete this.');
@@ -1420,7 +1428,7 @@ class AdminProductsControllerCore extends AdminController
                 $this->object = new Product((int)Tools::getValue('id_product'));
             }
         } elseif (Tools::isSubmit('submitAttachments')) {
-            if ($this->tabAccess['edit'] === '1') {
+            if ($this->tabAccess['edit'] === 1) {
                 $this->action = 'attachments';
                 $this->tab_display = 'attachments';
             } else {
@@ -1429,7 +1437,7 @@ class AdminProductsControllerCore extends AdminController
         }
         // Product duplication
         elseif (Tools::getIsset('duplicate'.$this->table)) {
-            if ($this->tabAccess['add'] === '1') {
+            if ($this->tabAccess['add'] === 1) {
                 $this->action = 'duplicate';
             } else {
                 $this->errors[] = Tools::displayError('You do not have permission to add this.');
@@ -1437,7 +1445,7 @@ class AdminProductsControllerCore extends AdminController
         }
         // Toggle Show at front
         elseif (Tools::getIsset('show_at_front'.$this->table)) {
-            if ($this->tabAccess['edit'] === '1') {
+            if ($this->tabAccess['edit'] === 1) {
                 $this->action = 'toggleShowAtFront';
             } else {
                 $this->errors[] = Tools::displayError('You do not have permission to edit this.');
@@ -1445,7 +1453,7 @@ class AdminProductsControllerCore extends AdminController
         }
         // Product images management
         elseif (Tools::getValue('id_image') && Tools::getValue('ajax')) {
-            if ($this->tabAccess['edit'] === '1') {
+            if ($this->tabAccess['edit'] === 1) {
                 $this->action = 'image';
             } else {
                 $this->errors[] = Tools::displayError('You do not have permission to edit this.');
@@ -1453,7 +1461,7 @@ class AdminProductsControllerCore extends AdminController
         }
         // Product attributes management
         elseif (Tools::isSubmit('submitProductAttribute')) {
-            if ($this->tabAccess['edit'] === '1') {
+            if ($this->tabAccess['edit'] === 1) {
                 $this->action = 'productAttribute';
             } else {
                 $this->errors[] = Tools::displayError('You do not have permission to edit this.');
@@ -1461,7 +1469,7 @@ class AdminProductsControllerCore extends AdminController
         }
         // Product features management
         elseif (Tools::isSubmit('submitFeatures') || Tools::isSubmit('submitFeaturesAndStay')) {
-            if ($this->tabAccess['edit'] === '1') {
+            if ($this->tabAccess['edit'] === 1) {
                 $this->action = 'features';
             } else {
                 $this->errors[] = Tools::displayError('You do not have permission to edit this.');
@@ -1469,19 +1477,19 @@ class AdminProductsControllerCore extends AdminController
         }
         // Product specific prices management NEVER USED
         elseif (Tools::isSubmit('submitPricesModification')) {
-            if ($this->tabAccess['add'] === '1') {
+            if ($this->tabAccess['add'] === 1) {
                 $this->action = 'pricesModification';
             } else {
                 $this->errors[] = Tools::displayError('You do not have permission to add this.');
             }
         } elseif (Tools::isSubmit('deleteSpecificPrice')) {
-            if ($this->tabAccess['delete'] === '1') {
+            if ($this->tabAccess['delete'] === 1) {
                 $this->action = 'deleteSpecificPrice';
             } else {
                 $this->errors[] = Tools::displayError('You do not have permission to delete this.');
             }
         } elseif (Tools::isSubmit('submitSpecificPricePriorities')) {
-            if ($this->tabAccess['edit'] === '1') {
+            if ($this->tabAccess['edit'] === 1) {
                 $this->action = 'specificPricePriorities';
                 $this->tab_display = 'prices';
             } else {
@@ -1490,7 +1498,7 @@ class AdminProductsControllerCore extends AdminController
         }
         // Customization management
         elseif (Tools::isSubmit('submitCustomizationConfiguration')) {
-            if ($this->tabAccess['edit'] === '1') {
+            if ($this->tabAccess['edit'] === 1) {
                 $this->action = 'customizationConfiguration';
                 $this->tab_display = 'customization';
                 $this->display = 'edit';
@@ -1503,7 +1511,7 @@ class AdminProductsControllerCore extends AdminController
             $this->action = 'bulkDeleteRooms';
             $this->display = 'edit';
         } elseif (Tools::isSubmit('submitProductCustomization')) {
-            if ($this->tabAccess['edit'] === '1') {
+            if ($this->tabAccess['edit'] === 1) {
                 $this->action = 'productCustomization';
                 $this->tab_display = 'customization';
                 $this->display = 'edit';
@@ -1560,7 +1568,7 @@ class AdminProductsControllerCore extends AdminController
         ));
 
         if (in_array($this->display, array('add', 'edit'))
-            && $this->tabAccess['view'] == '1'
+            && $this->tabAccess['view'] === 1
             && $this->loadObject(true)
         ) {
             $this->addJqueryUI(array(
@@ -2646,7 +2654,7 @@ class AdminProductsControllerCore extends AdminController
         return parent::renderList();
     }
 
-    public function displayDuplicateLink($token = null, $id, $name = null)
+    public function displayDuplicateLink($token, $id, $name = null)
     {
         return '<a href="#" title="'.$this->l('Duplicate').'"
         onclick="initDuplicateRoomType('.(int)$id.');return false;"><i class="icon-copy"></i>'.$this->l('Duplicate').'</a>';
@@ -3445,7 +3453,7 @@ class AdminProductsControllerCore extends AdminController
 
     public function processLengthOfStay()
     {
-        if ($this->tabAccess['edit'] == 1) {
+        if ($this->tabAccess['edit'] === 1) {
 
             $idProduct = Tools::getValue('id_product');
             if (Validate::isLoadedObject($product = new Product((int)$idProduct))) {
@@ -3534,7 +3542,7 @@ class AdminProductsControllerCore extends AdminController
     // delete the rows of length of stay on date range
     public function ajaxProcessDeleteRoomTypeLengthOfStayRestriction()
     {
-        if ($this->tabAccess['edit'] == 1) {
+        if ($this->tabAccess['edit'] === 1) {
             $objRoomTypeRestrictionDates = new HotelRoomTypeRestrictionDateRange(Tools::getValue('id_rt_restriction'));
             if ($objRoomTypeRestrictionDates->delete()) {
                 die(json_encode(array('success' => $this->l('Successfully deleted'))));
@@ -3548,7 +3556,7 @@ class AdminProductsControllerCore extends AdminController
 
     public function processBulkDeleteRooms()
     {
-        if ($this->tabAccess['edit'] == 1) {
+        if ($this->tabAccess['edit'] === 1) {
             if ($idRooms = Tools::getValue('selected_room_ids')) {
                 foreach ($idRooms as $idRoom) {
                     $objRoomInfo = new HotelRoomInformation((int)$idRoom);
@@ -3575,7 +3583,7 @@ class AdminProductsControllerCore extends AdminController
     public function processConfiguration()
     {
         // Check if save of configuration tab is submitted
-        if ($this->tabAccess['edit'] == 1) {
+        if ($this->tabAccess['edit'] === 1) {
             if (Tools::getValue('checkConfSubmit')) {
                 $id_product = Tools::getValue('id_product');
                 $id_hotel = Tools::getValue('id_hotel');
@@ -3674,7 +3682,7 @@ class AdminProductsControllerCore extends AdminController
         $response = array(
             'success' => false
         );
-        if ($this->tabAccess['edit'] == 1) {
+        if ($this->tabAccess['edit'] === 1) {
             $idRoom = Tools::getValue('id');
             $objRoomInfo = new HotelRoomInformation((int) $idRoom);
             if ($objRoomInfo->getFutureBookings($idRoom)) {
@@ -4427,7 +4435,7 @@ class AdminProductsControllerCore extends AdminController
         // prices
         array_push($product_props,
             'price', 'wholesale_price', 'id_tax_rules_group', 'unit_price_ratio', 'on_sale',
-            'unity', 'minimum_quantity', 'additional_shipping_cost',
+            'unity', 'minimal_quantity', 'additional_shipping_cost',
             'available_now', 'available_later', 'available_date'
         );
 
@@ -4991,7 +4999,7 @@ class AdminProductsControllerCore extends AdminController
 
     public function ajaxProcessCheckProductName()
     {
-        if ($this->tabAccess['view'] === '1') {
+        if ($this->tabAccess['view'] === 1) {
             $search = Tools::getValue('q');
             $id_lang = Tools::getValue('id_lang');
             $limit = Tools::getValue('limit');
@@ -5014,7 +5022,7 @@ class AdminProductsControllerCore extends AdminController
 
     public function ajaxProcessUpdatePositions()
     {
-        if ($this->tabAccess['edit'] === '1') {
+        if ($this->tabAccess['edit'] === 1) {
             $way = (int)(Tools::getValue('way'));
             $id_product = (int)Tools::getValue('id_product');
             $id_category = (int)Tools::getValue('id_category_hotel');
@@ -5054,7 +5062,7 @@ class AdminProductsControllerCore extends AdminController
 
     public function ajaxProcessPublishProduct()
     {
-        if ($this->tabAccess['edit'] === '1') {
+        if ($this->tabAccess['edit'] === 1) {
             if ($id_product = (int)Tools::getValue('id_product')) {
                 $bo_product_url = dirname($_SERVER['PHP_SELF']).'/index.php?tab=AdminProducts&id_product='.$id_product.'&updateproduct&token='.$this->token;
 
@@ -5107,7 +5115,7 @@ class AdminProductsControllerCore extends AdminController
         $dateFrom = Tools::getValue('date_from');
         $dateTo = Tools::getValue('date_to');
         $idProduct = Tools::getValue('id_product');
-        if ($this->tabAccess['edit'] === '1') {
+        if ($this->tabAccess['edit'] === 1) {
             if (!Validate::isDate($dateFrom) || !Validate::isDate($dateTo)) {
                 $this->errors[] = $this->l('Please select a valid date range to temporary disable this room');
             } else if ($idRoom && Validate::isLoadedObject($objHotelRoomInfo = new HotelRoomInformation((int) $idRoom))) {
@@ -5174,7 +5182,7 @@ class AdminProductsControllerCore extends AdminController
         $idRoom = (int) Tools::getValue('id_room');
         $dateFrom = date('Y-m-d', strtotime(Tools::getValue('date_from')));
         $dateTo = date('Y-m-d', strtotime(Tools::getValue('date_to')));
-        if ($this->tabAccess['edit'] === '1') {
+        if ($this->tabAccess['edit'] === 1) {
             if (!Tools::getValue('date_from') || !Tools::getValue('date_to')) {
                 $this->errors[] = Tools::displayError('Please select valid date range.');
             } else {
@@ -5262,7 +5270,7 @@ class AdminProductsControllerCore extends AdminController
     public function ajaxProcessDeleteDisableDate()
     {
         $response = array('status' => false);
-        if ($this->tabAccess['edit'] === '1') {
+        if ($this->tabAccess['edit'] === 1) {
             $idDisableDate = Tools::getValue('id_disable_date');
             Hook::exec('actionDisableDateDeleteBefore', array('id_disable_date' => $idDisableDate));
             if (empty($this->errors)
@@ -5300,7 +5308,7 @@ class AdminProductsControllerCore extends AdminController
     {
         $response = array('status' => false);
         $roomsInfo = array();
-        if ($this->tabAccess['edit'] === '1') {
+        if ($this->tabAccess['edit'] === 1) {
             if ($idRooms = Tools::getValue('id_rooms')) {
                 $rowsToHighlight = array();
                 $room = array();
@@ -5437,7 +5445,7 @@ class AdminProductsControllerCore extends AdminController
     public function ajaxProcessBulkCreateRooms()
     {
         $response = array('status' => false);
-        if ($this->tabAccess['edit'] === '1') {
+        if ($this->tabAccess['edit'] === 1) {
             if (($idProduct = Tools::getValue('id_product'))
                 && Validate::isLoadedObject($objProduct = new Product($idProduct, null, $this->context->language->id))
                 && $objProduct->booking_product
@@ -5574,7 +5582,7 @@ class AdminProductsControllerCore extends AdminController
         }
     }
 
-    public function displayPreviewLink($token = null, $id, $name = null)
+    public function displayPreviewLink($token, $id, $name = null)
     {
         $tpl = $this->createTemplate('helpers/list/list_action_preview.tpl');
         if (!array_key_exists('Bad SQL query', self::$cache_lang)) {

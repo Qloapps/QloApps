@@ -31,6 +31,9 @@ class HelperOptionsCore extends Helper
 {
     public $required = false;
 
+    /** @var int */
+    public $id;
+
     public function __construct()
     {
         $this->base_folder = 'helpers/options/';

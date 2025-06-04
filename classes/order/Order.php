@@ -201,7 +201,7 @@ class OrderCore extends ObjectModel
     public $is_advance_payment;
 
     /**
-    * @var int advance_paid_amount used to save paid amount for the advance payment
+    * @var float advance_paid_amount used to save paid amount for the advance payment
     */
     public $advance_paid_amount;
 
@@ -209,6 +209,16 @@ class OrderCore extends ObjectModel
     * @var int is occupancy provided in this order
     */
     public $with_occupancy;
+
+    /**
+     * @var float
+     */
+    public $amount_paid;
+
+    /**
+     * @var array
+     */
+    public $product_list = [];
 
     /**
      * @see ObjectModel::$definition
@@ -969,7 +979,7 @@ class OrderCore extends ObjectModel
      * @param bool $skip_id_address_invoice Skip orders from this id_address_invoice
      * @return array Customer orders
      */
-    public static function getCustomerOrders($id_customer, $show_hidden_status = false, Context $context = null, $id_address_invoice = null, $skip_address = 0)
+    public static function getCustomerOrders($id_customer, $show_hidden_status = false, ?Context $context = null, $id_address_invoice = null, $skip_address = 0)
     {
         if (!$context) {
             $context = Context::getContext();
@@ -1028,7 +1038,7 @@ class OrderCore extends ObjectModel
         return $orders;
     }
 
-    public static function getOrdersWithInformations($limit = null, Context $context = null)
+    public static function getOrdersWithInformations($limit = null, ?Context $context = null)
     {
         if (!$context) {
             $context = Context::getContext();
@@ -1349,7 +1359,7 @@ class OrderCore extends ObjectModel
 
             // Save Order invoice
 
-            $this->setInvoiceDetails($order_invoice);
+            Order::setInvoiceDetails($order_invoice);
 
             if (Configuration::get('PS_INVOICE')) {
                 $this->setLastInvoiceNumber($order_invoice->id, $this->id_shop);

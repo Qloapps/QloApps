@@ -88,7 +88,7 @@ class MessageCore extends ObjectModel
      * @param bool $private return WITH private messages
      * @return array Messages
      */
-    public static function getMessagesByOrderId($id_order, $private = null, Context $context = null)
+    public static function getMessagesByOrderId($id_order, $private = null, ?Context $context = null)
     {
         if (!Validate::isBool($private)) {
             die(Tools::displayError());
@@ -121,7 +121,7 @@ class MessageCore extends ObjectModel
      * @param bool $private return WITH private messages
      * @return array Messages
      */
-    public static function getMessagesByCartId($id_cart, $private = false, Context $context = null)
+    public static function getMessagesByCartId($id_cart, $private = false, ?Context $context = null)
     {
         if (!Validate::isBool($private)) {
             die(Tools::displayError());

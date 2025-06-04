@@ -35,7 +35,7 @@ class DashOccupancy extends Module
         parent::__construct();
         $this->displayName = $this->l('Dashboard Occupancy');
         $this->description = $this->l('Adds a block with a graphical representation of occupancy of your hotel`s room.');
-        $this->confirmUnsinstall = $this->l('Are you sure you want to uninstall?');
+        $this->confirmUninstall = $this->l('Are you sure you want to uninstall?');
 
         $this->allow_push = true;
     }

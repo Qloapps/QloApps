@@ -371,7 +371,7 @@ class AdminStockConfigurationControllerCore extends AdminController
         $this->displayInformation($this->l('This interface allows you to configure your supply order status and stock movement labels.').'<br />');
 
         // Checks access
-        if (!($this->tabAccess['add'] === '1')) {
+        if (!($this->tabAccess['add'] === 1)) {
             unset($this->toolbar_btn['new']);
         }
 
@@ -546,7 +546,7 @@ class AdminStockConfigurationControllerCore extends AdminController
             }
         }
     }
-    
+
     public function initContent()
     {
         if (!Configuration::get('PS_ADVANCED_STOCK_MANAGEMENT')) {
@@ -555,7 +555,7 @@ class AdminStockConfigurationControllerCore extends AdminController
         }
         parent::initContent();
     }
-    
+
     public function initProcess()
     {
         if (!Configuration::get('PS_ADVANCED_STOCK_MANAGEMENT')) {

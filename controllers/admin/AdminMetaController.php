@@ -36,6 +36,11 @@ class AdminMetaControllerCore extends AdminController
     /** @var ShopUrl */
     protected $url = false;
     protected $toolbar_scroll = false;
+    protected $ht_file;
+    protected $rb_file;
+    protected $rb_data;
+    protected $sm_file;
+    protected $explicitSelect;
 
     public function __construct()
     {

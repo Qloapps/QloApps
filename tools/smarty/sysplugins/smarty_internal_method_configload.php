@@ -22,7 +22,7 @@ class Smarty_Internal_Method_ConfigLoad
      * load a config file, optionally load just selected sections
      *
      * @api  Smarty::configLoad()
-     * @link http://www.smarty.net/docs/en/api.config.load.tpl
+     * @link https://www.smarty.net/docs/en/api.config.load.tpl
      *
      * @param \Smarty_Internal_Data|\Smarty_Internal_Template|\Smarty $data
      * @param string                                                  $config_file filename
@@ -42,7 +42,7 @@ class Smarty_Internal_Method_ConfigLoad
      * load a config file, optionally load just selected sections
      *
      * @api  Smarty::configLoad()
-     * @link http://www.smarty.net/docs/en/api.config.load.tpl
+     * @link https://www.smarty.net/docs/en/api.config.load.tpl
      *
      * @param \Smarty|\Smarty_Internal_Data|\Smarty_Internal_Template $data
      * @param string                                                  $config_file filename

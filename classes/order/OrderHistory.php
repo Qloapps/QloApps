@@ -408,7 +408,7 @@ class OrderHistoryCore extends ObjectModel
      * @param Context $context Deprecated
      * @return bool
      */
-    public function addWithemail($autodate = true, $template_vars = false, Context $context = null)
+    public function addWithemail($autodate = true, $template_vars = false, ?Context $context = null)
     {
         $order = new Order($this->id_order);
 

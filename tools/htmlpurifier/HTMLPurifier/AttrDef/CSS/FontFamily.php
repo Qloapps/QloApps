@@ -10,23 +10,21 @@ class HTMLPurifier_AttrDef_CSS_FontFamily extends HTMLPurifier_AttrDef
 
     public function __construct()
     {
-        $this->mask = '_- ';
-        for ($c = 'a'; $c <= 'z'; $c++) {
-            $this->mask .= $c;
-        }
-        for ($c = 'A'; $c <= 'Z'; $c++) {
-            $this->mask .= $c;
-        }
-        for ($c = '0'; $c <= '9'; $c++) {
-            $this->mask .= $c;
-        } // cast-y, but should be fine
-        // special bytes used by UTF-8
-        for ($i = 0x80; $i <= 0xFF; $i++) {
-            // We don't bother excluding invalid bytes in this range,
-            // because the our restriction of well-formed UTF-8 will
-            // prevent these from ever occurring.
-            $this->mask .= chr($i);
-        }
+        // Lowercase letters
+        $l = range('a', 'z');
+        // Uppercase letters
+        $u = range('A', 'Z');
+        // Digits
+        $d = range('0', '9');
+        // Special bytes used by UTF-8
+        $b = array_map('chr', range(0x80, 0xFF));
+        // All valid characters for the mask
+        $c = array_merge($l, $u, $d, $b);
+        // Concatenate all valid characters into a string 
+        // Use '_- ' as an initial value
+        $this->mask = array_reduce($c, function ($carry, $value) {
+            return $carry . $value;
+        }, '_- ');
 
         /*
             PHP's internal strcspn implementation is

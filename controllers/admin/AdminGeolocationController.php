@@ -139,9 +139,9 @@ class AdminGeolocationControllerCore extends AdminController
     {
         $this->display = 'options';
         if (!$this->isGeoLiteCityAvailable()) {
-            $this->displayWarning($this->l('In order to use Geolocation, please download the file').'
-				<a href="https://github.com/mbcc2006/GeoLiteCity-data/blob/master/GeoLiteCity.dat" target="_blank">GeoLiteCity.dat</a> '.
-                $this->l('from GitHub and copy into the /tools/geoip/ directory.'));
+            $this->displayWarning($this->l('Since December 30, 2019, you need to register for a ').
+            '<a href="https://www.maxmind.com/en/geolite2/signup" target="_blank">'.' '.$this->l('MaxMind account').'</a>'.' '.
+            $this->l('to get a license key to be able to download the geolocation data. Once downloaded, extract the GeoLite2 City(.mmdb) data using Winrar or Gzip into the /tools/geoip/ directory'));
             Configuration::updateValue('PS_GEOLOCATION_ENABLED', 0);
         }
 
@@ -150,7 +150,7 @@ class AdminGeolocationControllerCore extends AdminController
 
     protected function isGeoLiteCityAvailable()
     {
-        if (@filemtime(_PS_GEOIP_DIR_._PS_GEOIP_CITY_FILE_)) {
+        if (file_exists(_PS_GEOIP_DIR_._PS_GEOIP_CITY_FILE_) && @filemtime(_PS_GEOIP_DIR_._PS_GEOIP_CITY_FILE_)) {
             return true;
         }
 

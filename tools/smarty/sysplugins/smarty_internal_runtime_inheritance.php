@@ -168,7 +168,7 @@ class Smarty_Internal_Runtime_Inheritance
     public function process(
         Smarty_Internal_Template $tpl,
         Smarty_Internal_Block $block,
-        Smarty_Internal_Block $parent = null
+        ?Smarty_Internal_Block $parent = null
     ) {
         if ($block->hide && !isset($block->child)) {
             return;

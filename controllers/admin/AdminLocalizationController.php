@@ -218,12 +218,12 @@ class AdminLocalizationControllerCore extends AdminController
 
     public function sortLocalizationsPack($a, $b)
     {
-        return $a['name'] > $b['name'];
+        return ($a['name'] > $b['name']) ? 1 : 0;
     }
 
     public function renderForm()
     {
-        $localizations_pack = false;
+        $localizations_pack = [];
         $this->tpl_option_vars['options_content'] = $this->renderOptions();
 
         $xml_localization = Tools::simplexml_load_file(_QLO_API_URL_.'/xml/localization.xml');

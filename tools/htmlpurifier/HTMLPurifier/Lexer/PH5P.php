@@ -4410,7 +4410,7 @@ class HTML5TreeConstructer
 
         foreach ($token['attr'] as $attr) {
             if (!$el->hasAttribute($attr['name'])) {
-                $el->setAttribute($attr['name'], $attr['value']);
+                $el->setAttribute($attr['name'], (string)$attr['value']);
             }
         }
 

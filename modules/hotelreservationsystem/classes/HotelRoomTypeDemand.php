@@ -20,8 +20,8 @@
 
 class HotelRoomTypeDemand extends ObjectModel
 {
-    public $idProduct;
-    public $idGlobalDemand;
+    public $id_product;
+    public $id_global_demand;
     public $date_add;
     public $date_upd;
 
@@ -205,7 +205,7 @@ class HotelRoomTypeDemand extends ObjectModel
         $idCustomer = null,
         $idCart = null,
         $id_address = null,
-        Context $context = null,
+        ?Context $context = null,
         $customPrice = null
     ) {
         if (!$context) {

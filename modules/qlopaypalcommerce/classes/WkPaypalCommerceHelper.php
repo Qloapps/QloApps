@@ -475,7 +475,7 @@ class WkPaypalCommerceHelper
         $roomTypeTotalTI = $roomTotalPrice['total_price_tax_incl'];
         $roomTypeTotalTE = $roomTotalPrice['total_price_tax_excl'];
 
-        $rmQty = $objBookingDetail->getNumberOfDays($dateFrom, $dateTo);
+        $rmQty = HotelHelper::getNumberOfDays($dateFrom, $dateTo);
 
         $objAdvPayment = new HotelAdvancedPayment();
         if ($advInfo = $objAdvPayment->getIdAdvPaymentByIdProduct($idProduct)) {

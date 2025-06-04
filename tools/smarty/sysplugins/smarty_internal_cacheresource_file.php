@@ -88,15 +88,15 @@ class Smarty_Internal_CacheResource_File extends Smarty_CacheResource
     /**
      * Read the cached template and process its header
      *
-     * @param \Smarty_Internal_Template $_smarty_tpl do not change variable name, is used by compiled template
-     * @param Smarty_Template_Cached    $cached      cached object
-     * @param bool                      $update      flag if called because cache update
+     * @param \Smarty_Internal_Template   $_smarty_tpl do not change variable name, is used by compiled template
+     * @param Smarty_Template_Cached|null $cached      cached object
+     * @param bool                        $update      flag if called because cache update
      *
      * @return boolean true or false if the cached content does not exist
      */
     public function process(
         Smarty_Internal_Template $_smarty_tpl,
-        Smarty_Template_Cached $cached = null,
+        ?Smarty_Template_Cached $cached = null,
         $update = false
     ) {
         $_smarty_tpl->cached->valid = false;
@@ -196,12 +196,8 @@ class Smarty_Internal_CacheResource_File extends Smarty_CacheResource
      */
     public function hasLock(Smarty $smarty, Smarty_Template_Cached $cached)
     {
-        if (version_compare(PHP_VERSION, '5.3.0', '>=')) {
-            clearstatcache(true, $cached->lock_id);
-        } else {
-            clearstatcache();
-        }
-        if (is_file($cached->lock_id)) {
+        clearstatcache(true, $cached->lock_id ?? '');
+        if (null !== $cached->lock_id && is_file($cached->lock_id)) {
             $t = filemtime($cached->lock_id);
             return $t && (time() - $t < $smarty->locking_timeout);
         } else {

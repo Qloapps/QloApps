@@ -318,7 +318,7 @@ class AdminEmailsControllerCore extends AdminController
             die(Tools::displayError('This functionality has been disabled.'));
         }
         /* PrestaShop demo mode */
-        if ($this->tabAccess['view'] === '1') {
+        if ($this->tabAccess['view'] === 1) {
             $smtpChecked = (trim(Tools::getValue('mailMethod')) == 'smtp');
             $smtpServer = Tools::getValue('smtpSrv');
             $content = html_entity_decode(urldecode(Tools::getValue('testMsg')));

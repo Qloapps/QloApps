@@ -625,9 +625,11 @@ class AdminPerformanceControllerCore extends AdminController
             return;
         }
 
-        Hook::exec('action'.get_class($this).ucfirst($this->action).'Before', array('controller' => $this));
+        if (!empty($this->action)) {
+            Hook::exec('action'.get_class($this).ucfirst($this->action).'Before', array('controller' => $this));
+        }
         if (Tools::isSubmit('submitAddServer')) {
-            if ($this->tabAccess['add'] === '1') {
+            if ($this->tabAccess['add'] === 1) {
                 if (!Tools::getValue('memcachedIp')) {
                     $this->errors[] = Tools::displayError('The Memcached IP is missing.');
                 }
@@ -652,7 +654,7 @@ class AdminPerformanceControllerCore extends AdminController
         }
 
         if (Tools::getValue('deleteMemcachedServer')) {
-            if ($this->tabAccess['add'] === '1') {
+            if ($this->tabAccess['add'] === 1) {
                 if (CacheMemcache::deleteServer((int)Tools::getValue('deleteMemcachedServer'))) {
                     Tools::redirectAdmin(self::$currentIndex.'&token='.Tools::getValue('token').'&conf=4');
                 } else {
@@ -665,7 +667,7 @@ class AdminPerformanceControllerCore extends AdminController
 
         $redirectAdmin = false;
         if ((bool)Tools::getValue('smarty_up')) {
-            if ($this->tabAccess['edit'] === '1') {
+            if ($this->tabAccess['edit'] === 1) {
                 Configuration::updateValue('PS_SMARTY_FORCE_COMPILE', Tools::getValue('smarty_force_compile', _PS_SMARTY_NO_COMPILE_));
 
                 if (Configuration::get('PS_SMARTY_CACHE') != Tools::getValue('smarty_cache') || Configuration::get('PS_SMARTY_CACHING_TYPE') != Tools::getValue('smarty_caching_type')) {
@@ -682,7 +684,7 @@ class AdminPerformanceControllerCore extends AdminController
         }
 
         if ((bool)Tools::getValue('features_detachables_up')) {
-            if ($this->tabAccess['edit'] === '1') {
+            if ($this->tabAccess['edit'] === 1) {
                 if (Tools::isSubmit('combination')) {
                     if ((!Tools::getValue('combination') && Combination::isCurrentlyUsed()) === false) {
                         Configuration::updateValue('PS_COMBINATION_FEATURE_ACTIVE', (bool)Tools::getValue('combination'));
@@ -703,7 +705,7 @@ class AdminPerformanceControllerCore extends AdminController
         }
 
         if ((bool)Tools::getValue('ccc_up')) {
-            if ($this->tabAccess['edit'] === '1') {
+            if ($this->tabAccess['edit'] === 1) {
                 $theme_cache_directory = _PS_ALL_THEMES_DIR_.$this->context->shop->theme_directory.'/cache/';
                 if (((bool)Tools::getValue('PS_CSS_THEME_CACHE') || (bool)Tools::getValue('PS_JS_THEME_CACHE')) && !is_writable($theme_cache_directory)) {
                     $this->errors[] = sprintf(Tools::displayError('To use Smart Cache directory %s must be writable.'), realpath($theme_cache_directory));
@@ -751,7 +753,7 @@ class AdminPerformanceControllerCore extends AdminController
         }
 
         if ((bool)Tools::getValue('media_server_up') && !defined('_PS_HOST_MODE_')) {
-            if ($this->tabAccess['edit'] === '1') {
+            if ($this->tabAccess['edit'] === 1) {
                 if (Tools::getValue('_MEDIA_SERVER_1_') != null && !Validate::isFileName(Tools::getValue('_MEDIA_SERVER_1_'))) {
                     $this->errors[] = Tools::displayError('Media server #1 is invalid');
                 }
@@ -798,7 +800,7 @@ class AdminPerformanceControllerCore extends AdminController
         }
 
         if ((bool)Tools::getValue('cache_up')) {
-            if ($this->tabAccess['edit'] === '1') {
+            if ($this->tabAccess['edit'] === 1) {
                 $new_settings = $prev_settings = file_get_contents(_PS_ROOT_DIR_.'/config/settings.inc.php');
                 $cache_active = (bool)Tools::getValue('cache_active');
 

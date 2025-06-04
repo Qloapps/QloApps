@@ -31,6 +31,7 @@ abstract class AbstractCheckoutStepCore implements CheckoutStepInterface
     public $step_is_current = 0;
     public $step_key;
     private $checkoutProcess;
+    protected $context;
 
     public function __construct()
     {

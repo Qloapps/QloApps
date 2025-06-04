@@ -89,7 +89,6 @@ class AdminSlipControllerCore extends AdminController
         );
 
         $this->_select = 'a.id_order_slip AS id_pdf';
-        $this->optionTitle = $this->l('Slip');
 
         $this->fields_options = array(
             'general' => array(
@@ -279,7 +278,7 @@ class AdminSlipControllerCore extends AdminController
         return '--';
     }
 
-    public function displayStatusChangeLink($token = null, $id)
+    public function displayStatusChangeLink($token, $id)
     {
         $objOrderSlip = new OrderSlip($id);
         if ($objOrderSlip->redeem_status != OrderSlip::REDEEM_STATUS_REDEEMED) {

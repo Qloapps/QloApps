@@ -46,6 +46,7 @@ final class Encoding
      * @throws Ex\EnvironmentIsBrokenException
      *
      * @return string
+     * @psalm-suppress TypeDoesNotContainType
      */
     public static function hexToBin($hex_string)
     {
@@ -76,6 +77,62 @@ final class Encoding
             ++$hex_pos;
         }
         return $bin;
+    }
+    
+    /**
+     * Remove trialing whitespace without table look-ups or branches.
+     *
+     * Calling this function may leak the length of the string as well as the
+     * number of trailing whitespace characters through side-channels.
+     *
+     * @param string $string
+     * @return string
+     */
+    public static function trimTrailingWhitespace($string = '')
+    {
+        $length = Core::ourStrlen($string);
+        if ($length < 1) {
+            return '';
+        }
+        do {
+            $prevLength = $length;
+            $last = $length - 1;
+            $chr = \ord($string[$last]);
+
+            /* Null Byte (0x00), a.k.a. \0 */
+            // if ($chr === 0x00) $length -= 1;
+            $sub = (($chr - 1) >> 8 ) & 1;
+            $length -= $sub;
+            $last -= $sub;
+
+            /* Horizontal Tab (0x09) a.k.a. \t */
+            $chr = \ord($string[$last]);
+            // if ($chr === 0x09) $length -= 1;
+            $sub = (((0x08 - $chr) & ($chr - 0x0a)) >> 8) & 1;
+            $length -= $sub;
+            $last -= $sub;
+
+            /* New Line (0x0a), a.k.a. \n */
+            $chr = \ord($string[$last]);
+            // if ($chr === 0x0a) $length -= 1;
+            $sub = (((0x09 - $chr) & ($chr - 0x0b)) >> 8) & 1;
+            $length -= $sub;
+            $last -= $sub;
+
+            /* Carriage Return (0x0D), a.k.a. \r */
+            $chr = \ord($string[$last]);
+            // if ($chr === 0x0d) $length -= 1;
+            $sub = (((0x0c - $chr) & ($chr - 0x0e)) >> 8) & 1;
+            $length -= $sub;
+            $last -= $sub;
+
+            /* Space */
+            $chr = \ord($string[$last]);
+            // if ($chr === 0x20) $length -= 1;
+            $sub = (((0x1f - $chr) & ($chr - 0x21)) >> 8) & 1;
+            $length -= $sub;
+        } while ($prevLength !== $length && $length > 0);
+        return (string) Core::ourSubstr($string, 0, $length);
     }
 
     /*
@@ -118,15 +175,18 @@ final class Encoding
      *
      * @return string
      */
-    public static function saveBytesToChecksummedAsciiSafeString($header, $bytes)
+    public static function saveBytesToChecksummedAsciiSafeString(
+        $header,
+        #[\SensitiveParameter]
+        $bytes
+    )
     {
         // Headers must be a constant length to prevent one type's header from
         // being a prefix of another type's header, leading to ambiguity.
-        if (Core::ourStrlen($header) !== self::SERIALIZE_HEADER_BYTES) {
-            throw new Ex\EnvironmentIsBrokenException(
-                'Header must be ' . self::SERIALIZE_HEADER_BYTES . ' bytes.'
-            );
-        }
+        Core::ensureTrue(
+            Core::ourStrlen($header) === self::SERIALIZE_HEADER_BYTES,
+            'Header must be ' . self::SERIALIZE_HEADER_BYTES . ' bytes.'
+        );
 
         return Encoding::binToHex(
             $header .
@@ -151,16 +211,21 @@ final class Encoding
      *
      * @return string
      */
-    public static function loadBytesFromChecksummedAsciiSafeString($expected_header, $string)
+    public static function loadBytesFromChecksummedAsciiSafeString(
+        $expected_header,
+        #[\SensitiveParameter]
+        $string
+    )
     {
         // Headers must be a constant length to prevent one type's header from
         // being a prefix of another type's header, leading to ambiguity.
-        if (Core::ourStrlen($expected_header) !== self::SERIALIZE_HEADER_BYTES) {
-            throw new Ex\EnvironmentIsBrokenException(
-                'Header must be 4 bytes.'
-            );
-        }
+        Core::ensureTrue(
+            Core::ourStrlen($expected_header) === self::SERIALIZE_HEADER_BYTES,
+            'Header must be 4 bytes.'
+        );
 
+        /* If you get an exception here when attempting to load from a file, first pass your
+           key to Encoding::trimTrailingWhitespace() to remove newline characters, etc.      */
         $bytes = Encoding::hexToBin($string);
 
         /* Make sure we have enough bytes to get the version header and checksum. */
@@ -171,7 +236,7 @@ final class Encoding
         }
 
         /* Grab the version header. */
-        $actual_header = Core::ourSubstr($bytes, 0, self::SERIALIZE_HEADER_BYTES);
+        $actual_header = (string) Core::ourSubstr($bytes, 0, self::SERIALIZE_HEADER_BYTES);
 
         if ($actual_header !== $expected_header) {
             throw new Ex\BadFormatException(
@@ -180,14 +245,14 @@ final class Encoding
         }
 
         /* Grab the bytes that are part of the checksum. */
-        $checked_bytes = Core::ourSubstr(
+        $checked_bytes = (string) Core::ourSubstr(
             $bytes,
             0,
             Core::ourStrlen($bytes) - self::CHECKSUM_BYTE_SIZE
         );
 
         /* Grab the included checksum. */
-        $checksum_a = Core::ourSubstr(
+        $checksum_a = (string) Core::ourSubstr(
             $bytes,
             Core::ourStrlen($bytes) - self::CHECKSUM_BYTE_SIZE,
             self::CHECKSUM_BYTE_SIZE
@@ -203,7 +268,7 @@ final class Encoding
             );
         }
 
-        return Core::ourSubstr(
+        return (string) Core::ourSubstr(
             $bytes,
             self::SERIALIZE_HEADER_BYTES,
             Core::ourStrlen($bytes) - self::SERIALIZE_HEADER_BYTES - self::CHECKSUM_BYTE_SIZE

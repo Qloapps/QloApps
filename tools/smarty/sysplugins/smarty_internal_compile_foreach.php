@@ -219,9 +219,9 @@ class Smarty_Internal_Compile_Foreach extends Smarty_Internal_Compile_Private_Fo
         if (isset($itemAttr[ 'index' ])) {
             $output .= "{$itemVar}->index = -1;\n";
         }
-	    $output .= "{$itemVar}->do_else = true;\n";
+        $output .= "{$itemVar}->do_else = true;\n";
         $output .= "if (\$_from !== null) foreach (\$_from as {$keyTerm}{$itemVar}->value) {\n";
-	    $output .= "{$itemVar}->do_else = false;\n";
+        $output .= "{$itemVar}->do_else = false;\n";
         if (isset($attributes[ 'key' ]) && isset($itemAttr[ 'key' ])) {
             $output .= "\$_smarty_tpl->tpl_vars['{$key}']->value = {$itemVar}->key;\n";
         }

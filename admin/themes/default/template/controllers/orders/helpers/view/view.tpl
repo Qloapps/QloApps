@@ -217,8 +217,8 @@
                                         {foreach from=$history item=row key=key}
                                             {if ($key == 0)}
                                                 <tr>
-                                                    <td style="background-color:{$row['color']}"><img src="{$link->getMediaLink("`$img_dir`os/`$row['id_order_state']|intval`.gif")}" width="16" height="16" alt="{$row['ostate_name']|stripslashes}" /></td> {* by webkul to get media link *}
-                                                    <td style="background-color:{$row['color']};color:{$row['text-color']}">{$row['ostate_name']|stripslashes}</td>
+                                                    <td style="background-color:{$row['color']}"><img src="{$link->getMediaLink("`$img_dir`os/`$row['id_order_state']|intval`.gif")}" width="16" height="16" alt="{if !empty($row['ostate_name'])}{$row['ostate_name']|stripslashes}{/if}" /></td> {* by webkul to get media link *}
+                                                    <td style="background-color:{$row['color']};color:{$row['text-color']}">{if !empty($row['ostate_name'])}{$row['ostate_name']|stripslashes}{/if}</td>
                                                     <td style="background-color:{$row['color']};color:{$row['text-color']}">{if $row['employee_lastname']}{$row['employee_firstname']|stripslashes} {$row['employee_lastname']|stripslashes}{/if}</td>
                                                     <td style="background-color:{$row['color']};color:{$row['text-color']}">{dateFormat date=$row['date_add'] full=true}</td>
 
@@ -236,7 +236,7 @@
                                             {else}
                                                 <tr>
                                                     <td><img src="{$link->getMediaLink("`$img_dir`os/`$row['id_order_state']|intval`.gif")}" width="16" height="16" /></td>
-                                                    <td>{$row['ostate_name']|stripslashes}</td>
+                                                    <td>{if !empty($row['ostate_name'])}{$row['ostate_name']|stripslashes}{/if}</td>
                                                     <td>{if $row['employee_lastname']}{$row['employee_firstname']|stripslashes} {$row['employee_lastname']|stripslashes}{else}&nbsp;{/if}</td>
                                                     <td>{dateFormat date=$row['date_add'] full=true}</td>
                                                     {if $can_edit}
@@ -459,7 +459,7 @@
                                         <tr>
                                             <td>{dateFormat date=$payment['date_add'] full=true}</td>
                                             <td>{$payment['payment_method']|escape:'html':'UTF-8'}</td>
-                                            <td>{$payment_types[$payment['payment_type']]['name']|escape:'UTF-8'}</td>
+                                            <td>{$payment_types[$payment['payment_type']]['name']|escape:'html'}</td>
                                             <td>{$payment['transaction_id']|escape:'html':'UTF-8'}</td>
                                             <td>{displayPrice price=$payment['real_paid_amount'] currency=$payment['id_currency']}</td>
                                             <td>{if isset($payment['invoice_number'])}{$payment['invoice_number']}{else}--{/if}</td>
@@ -595,7 +595,7 @@
 
                                         <dd><b><i class="icon-calendar"></i> &nbsp; {$customer->date_add|date_format:"%d %b, %Y"}</b> ({l s='Member since'})</dd>
                                         <dd><b><i class="icon-list"></i> &nbsp; {$customerStats['nb_orders']|intval}</b> ({l s='Total valid order placed'})</dd>
-                                        <dd><b><i class="icon-credit-card"></i> &nbsp; {displayPrice price=Tools::ps_round(Tools::convertPrice($customerStats['total_spent'], $currency), 2) currency=$currency->id}</b> ({l s='Total spent since registration'})</dd>
+                                        <dd><b><i class="icon-credit-card"></i> &nbsp; {displayPrice price=Tools::ps_round(Tools::convertPrice($customerStats['total_spent']|floatval, $currency), 2) currency=$currency->id}</b> ({l s='Total spent since registration'})</dd>
                                         {if Configuration::get('PS_B2B_ENABLE')}
                                             <dd><b>{$customer->siret}</b> ({l s='Siret'})</dd>
                                             <dd><b>{$customer->ape|date_format:"%d %b, %Y"}</b> ({l s='APE'})</dd>

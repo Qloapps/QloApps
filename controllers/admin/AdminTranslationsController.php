@@ -1112,7 +1112,7 @@ class AdminTranslationsControllerCore extends AdminController
 
                 foreach ($matches as $key) {
                     $md5_key = md5($key);
-                    $module_key = '<{'.Tools::strtolower($module_name).'}'.strtolower($theme_name).'>'.Tools::strtolower($template_name).'_'.$md5_key;
+                    $module_key = '<{'.Tools::strtolower($module_name).'}'.Tools::strtolower($theme_name).'>'.Tools::strtolower($template_name).'_'.$md5_key;
                     $default_key = '<{'.Tools::strtolower($module_name).'}prestashop>'.Tools::strtolower($template_name).'_'.$md5_key;
                     // to avoid duplicate entry
                     if (!in_array($module_key, $array_check_duplicate)) {
@@ -1416,31 +1416,31 @@ class AdminTranslationsControllerCore extends AdminController
 
         try {
             if (Tools::isSubmit('submitCopyLang')) {
-                if ($this->tabAccess['add'] === '1') {
+                if ($this->tabAccess['add'] === 1) {
                     $this->submitCopyLang();
                 } else {
                     $this->errors[] = Tools::displayError('You do not have permission to add this.');
                 }
             } elseif (Tools::isSubmit('submitExport')) {
-                if ($this->tabAccess['add'] === '1') {
+                if ($this->tabAccess['add'] === 1) {
                     $this->submitExportLang();
                 } else {
                     $this->errors[] = Tools::displayError('You do not have permission to add this.');
                 }
             } elseif (Tools::isSubmit('submitImport')) {
-                if ($this->tabAccess['add'] === '1') {
+                if ($this->tabAccess['add'] === 1) {
                     $this->submitImportLang();
                 } else {
                     $this->errors[] = Tools::displayError('You do not have permission to add this.');
                 }
             } elseif (Tools::isSubmit('submitAddLanguage')) {
-                if ($this->tabAccess['add'] === '1') {
+                if ($this->tabAccess['add'] === 1) {
                     $this->submitAddLang();
                 } else {
                     $this->errors[] = Tools::displayError('You do not have permission to add this.');
                 }
             } elseif (Tools::isSubmit('submitTranslationsPdf')) {
-                if ($this->tabAccess['edit'] === '1') {
+                if ($this->tabAccess['edit'] === 1) {
                     // Only the PrestaShop team should write the translations into the _PS_TRANSLATIONS_DIR_
                     if (!$this->theme_selected) {
                         $this->writeTranslationFile();
@@ -1451,19 +1451,19 @@ class AdminTranslationsControllerCore extends AdminController
                     $this->errors[] = Tools::displayError('You do not have permission to edit this.');
                 }
             } elseif (Tools::isSubmit('submitTranslationsBack') || Tools::isSubmit('submitTranslationsErrors') || Tools::isSubmit('submitTranslationsFields') || Tools::isSubmit('submitTranslationsFront')) {
-                if ($this->tabAccess['edit'] === '1') {
+                if ($this->tabAccess['edit'] === 1) {
                     $this->writeTranslationFile();
                 } else {
                     $this->errors[] = Tools::displayError('You do not have permission to edit this.');
                 }
             } elseif (Tools::isSubmit('submitTranslationsMails') || Tools::isSubmit('submitTranslationsMailsAndStay')) {
-                if ($this->tabAccess['edit'] === '1') {
+                if ($this->tabAccess['edit'] === 1) {
                     $this->submitTranslationsMails();
                 } else {
                     $this->errors[] = Tools::displayError('You do not have permission to edit this.');
                 }
             } elseif (Tools::isSubmit('submitTranslationsModules')) {
-                if ($this->tabAccess['edit'] === '1') {
+                if ($this->tabAccess['edit'] === 1) {
                     // Get list of modules
                     if ($modules = $this->getListModules()) {
                         // Get files of all modules
@@ -2805,7 +2805,7 @@ class AdminTranslationsControllerCore extends AdminController
      *
      * @return array
      */
-    protected function getAllModuleFiles($modules, $root_dir = null, $lang, $is_default = false)
+    protected function getAllModuleFiles(array $modules, ?string $root_dir, string $lang, bool $is_default = false)
     {
         $array_files = array();
         $initial_root_dir = $root_dir;

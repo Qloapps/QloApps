@@ -24,6 +24,7 @@
  *  International Registered Trademark & Property of PrestaShop SA
  */
 
+#[\AllowDynamicProperties]
 abstract class ObjectModelCore implements Core_Foundation_Database_EntityInterface
 {
     /**
@@ -397,7 +398,7 @@ abstract class ObjectModelCore implements Core_Foundation_Database_EntityInterfa
                 return (int)$value;
 
             case self::TYPE_FLOAT:
-                return (float)str_replace(',', '.', $value);
+                return (float)str_replace(',', '.', $value ?? '');
 
             case self::TYPE_DATE:
                 if (!$value) {
@@ -1024,7 +1025,7 @@ abstract class ObjectModelCore implements Core_Foundation_Database_EntityInterfa
             ) {
                 if (Tools::isEmpty($value)) {
                     if ($human_errors) {
-                        return sprintf(Tools::displayError('The %s field is required.'), $this->displayFieldName($field, get_class($this)));
+                        return sprintf(Tools::displayError('The %s field is required.'), self::displayFieldName($field, get_class($this)));
                     } else {
                         return 'Property '.get_class($this).'->'.$field.' is empty';
                     }
@@ -1055,9 +1056,9 @@ abstract class ObjectModelCore implements Core_Foundation_Database_EntityInterfa
                 if ($human_errors) {
                     if (isset($data['lang']) && $data['lang']) {
                         $language = new Language((int)$id_lang);
-                        return sprintf(Tools::displayError('The field %1$s (%2$s) is too long (%3$d chars max, html chars including).'), $this->displayFieldName($field, get_class($this)), $language->name, $size['max']);
+                        return sprintf(Tools::displayError('The field %1$s (%2$s) is too long (%3$d chars max, html chars including).'), self::displayFieldName($field, get_class($this)), $language->name, $size['max']);
                     } else {
-                        return sprintf(Tools::displayError('The %1$s field is too long (%2$d chars max).'), $this->displayFieldName($field, get_class($this)), $size['max']);
+                        return sprintf(Tools::displayError('The %1$s field is too long (%2$d chars max).'), self::displayFieldName($field, get_class($this)), $size['max']);
                     }
                 } else {
                     return 'Property '.get_class($this).'->'.$field.' length ('.$length.') must be between '.$size['min'].' and '.$size['max'];
@@ -1084,7 +1085,7 @@ abstract class ObjectModelCore implements Core_Foundation_Database_EntityInterfa
                 }
                 if (!$res) {
                     if ($human_errors) {
-                        return sprintf(Tools::displayError('The %s field is invalid.'), $this->displayFieldName($field, get_class($this)));
+                        return sprintf(Tools::displayError('The %s field is invalid.'), self::displayFieldName($field, get_class($this)));
                     } else {
                         return 'Property '.get_class($this).'->'.$field.' is not valid';
                     }
@@ -1105,7 +1106,7 @@ abstract class ObjectModelCore implements Core_Foundation_Database_EntityInterfa
      *
      * @return string
      */
-    public static function displayFieldName($field, $class = __CLASS__, $htmlentities = true, Context $context = null)
+    public static function displayFieldName($field, $class = __CLASS__, $htmlentities = true, ?Context $context = null)
     {
         global $_FIELDS;
 

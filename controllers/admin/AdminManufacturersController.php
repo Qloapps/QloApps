@@ -279,7 +279,7 @@ class AdminManufacturersControllerCore extends AdminController
      * @param int $id the identifier to add to the link
      * @return string
      */
-    public function displayEditaddressesLink($token = null, $id)
+    public function displayEditaddressesLink($token, $id)
     {
         if (!array_key_exists('editaddresses', self::$cache_lang)) {
             self::$cache_lang['editaddresses'] = $this->l('Edit');

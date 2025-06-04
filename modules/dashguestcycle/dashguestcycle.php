@@ -35,7 +35,7 @@ class DashGuestCycle extends Module
         parent::__construct();
         $this->displayName = $this->l('Dashboard Guest Cycle');
         $this->description = $this->l('Adds a block with a graphical representation of guest cycle stats.');
-        $this->confirmUnsinstall = $this->l('Are you sure you want to uninstall?');
+        $this->confirmUninstall = $this->l('Are you sure you want to uninstall?');
 
         $this->allow_push = true;
     }

@@ -22,7 +22,7 @@ class Smarty_Internal_Method_UnregisterPlugin
      * Registers plugin to be used in templates
      *
      * @api  Smarty::unregisterPlugin()
-     * @link http://www.smarty.net/docs/en/api.unregister.plugin.tpl
+     * @link https://www.smarty.net/docs/en/api.unregister.plugin.tpl
      *
      * @param \Smarty_Internal_TemplateBase|\Smarty_Internal_Template|\Smarty $obj
      * @param string                                                          $type plugin type

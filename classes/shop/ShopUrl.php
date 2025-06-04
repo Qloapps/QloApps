@@ -76,9 +76,9 @@ class ShopUrlCore extends ObjectModel
             $this->physical_uri = '/';
         }
 
-        $this->virtual_uri = trim(str_replace(' ', '', $this->virtual_uri), '/');
+        $this->virtual_uri = trim(str_replace(' ', '', $this->virtual_uri ?? ''), '/');
         if ($this->virtual_uri) {
-            $this->virtual_uri = preg_replace('#/+#', '/', trim($this->virtual_uri, '/')).'/';
+            $this->virtual_uri = preg_replace('#/+#', '/', trim($this->virtual_uri, '/')) . '/';
         }
 
         return parent::getFields();

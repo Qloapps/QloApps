@@ -214,10 +214,8 @@ class AdminTaxRulesGroupControllerCore extends AdminController
             return;
         }
         if (!isset($obj->id)) {
-            $this->no_back = false;
             $content = parent::renderForm();
         } else {
-            $this->no_back = true;
             $this->page_header_toolbar_btn['new'] = array(
                 'href' => '#',
                 'desc' => $this->l('Add a new tax rule')
@@ -379,19 +377,19 @@ class AdminTaxRulesGroupControllerCore extends AdminController
     public function initProcess()
     {
         if (Tools::isSubmit('deletetax_rule')) {
-            if ($this->tabAccess['delete'] === '1') {
+            if ($this->tabAccess['delete'] === 1) {
                 $this->action = 'delete_tax_rule';
             } else {
                 $this->errors[] = Tools::displayError('You do not have permission to delete this.');
             }
         } elseif (Tools::isSubmit('submitBulkdeletetax_rule')) {
-            if ($this->tabAccess['delete'] === '1') {
+            if ($this->tabAccess['delete'] === 1) {
                 $this->action = 'bulk_delete_tax_rules';
             } else {
                 $this->errors[] = Tools::displayError('You do not have permission to delete this.');
             }
         } elseif (Tools::getValue('action') == 'create_rule') {
-            if ($this->tabAccess['add'] === '1') {
+            if ($this->tabAccess['add'] === 1) {
                 $this->action = 'create_rule';
             } else {
                 $this->errors[] = Tools::displayError('You do not have permission to add this.');
@@ -539,7 +537,7 @@ class AdminTaxRulesGroupControllerCore extends AdminController
 
     protected function displayAjaxUpdateTaxRule()
     {
-        if ($this->tabAccess['view'] === '1') {
+        if ($this->tabAccess['view'] === 1) {
             $id_tax_rule = Tools::getValue('id_tax_rule');
             $tax_rules = new TaxRule((int)$id_tax_rule);
             $output = array();

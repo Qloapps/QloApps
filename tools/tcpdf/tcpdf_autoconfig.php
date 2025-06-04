@@ -228,6 +228,10 @@ if (!defined('K_TCPDF_CALLS_IN_HTML')) {
 	define('K_TCPDF_CALLS_IN_HTML', false);
 }
 
+if (!defined('K_ALLOWED_TCPDF_TAGS')) {
+	define('K_ALLOWED_TCPDF_TAGS', '');
+}
+
 if (!defined('K_TCPDF_THROW_EXCEPTION_ERROR')) {
 	define('K_TCPDF_THROW_EXCEPTION_ERROR', false);
 }

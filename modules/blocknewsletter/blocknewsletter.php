@@ -40,6 +40,14 @@ class Blocknewsletter extends Module
     const EXPORT_SUBSCRIBERS_WITHOUT_ACCOUNT = 3;
     const EXPORT_NON_SUBSCRIBERS = 4;
 
+    public $secure_key;
+    protected $hookPrepared = false;
+    protected $_html;
+    protected $_files;
+    public $valid;
+    public $error;
+
+
     public function __construct()
     {
         $this->name = 'blocknewsletter';
@@ -748,7 +756,7 @@ class Blocknewsletter extends Module
         if (!$this->uninstall(false)) {
             return false;
         }
-        if (!$this->install(false)) {
+        if (!$this->install()) {
             return false;
         }
 

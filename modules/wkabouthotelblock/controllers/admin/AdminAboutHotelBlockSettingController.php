@@ -367,9 +367,7 @@ class AdminAboutHotelBlockSettingController extends ModuleAdminController
 
             if (isset($pos[2]) && (int) $pos[2] === $idInteriorImage) {
                 if ($objInteriorImg = new WkHotelInteriorImage((int) $pos[2])) {
-                    if (isset($position)
-                        && $objInteriorImg->updatePosition($way, $position, $idInteriorImage)
-                    ) {
+                    if (isset($position) && $objInteriorImg->updatePosition($way, $position)) {
                         echo 'ok position '.(int) $position.' for testimonial block '.(int) $pos[1].'\r\n';
                     } else {
                         echo '{"hasError" : true, "errors" : "Can not update testimonial block position '.

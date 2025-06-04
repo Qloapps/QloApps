@@ -33,8 +33,6 @@ class QloChannelManagerConnector extends Module
         $this->version = '1.0.0';
         $this->author = 'Webkul';
         $this->bootstrap = true;
-        $this->secure_key = Tools::encrypt($this->name);
-        $this->html = '';
         $this->ps_versions_compliancy = array('min' => '1.6', 'max' => '1.6');
 
         parent::__construct();

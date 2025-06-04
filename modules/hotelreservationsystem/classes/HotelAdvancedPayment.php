@@ -370,8 +370,7 @@ class HotelAdvancedPayment extends ObjectModel
                         $prodAdvPayInfo['value'] = Tools::convertPrice($prodAdvPayInfo['value']);
 
                         $numdays = 0;
-                        $objBookingDtl = new HotelBookingDetail();
-                        $numdays = $objBookingDtl->getNumberOfDays($dateFrom, $dateTo);
+                        $numdays = HotelHelper::getNumberOfDays($dateFrom, $dateTo);
 
                         if ($prodRawPriceTE < $prodAdvPayInfo['value']) {
                             $advPaymentAmount = $prodRawPriceTE * $numdays;

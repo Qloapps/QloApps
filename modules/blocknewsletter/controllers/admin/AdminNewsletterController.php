@@ -135,7 +135,7 @@ class AdminNewsletterController extends ModuleAdminController
         return $tpl->fetch();
     }
 
-    public function displayViewCustomerLink($token = null, $id, $name = null)
+    public function displayViewCustomerLink($token, $id, $name = null)
     {
         if (Customer::customerIdExistsStatic($id)) {
             $tpl = $this->context->smarty->createTemplate(

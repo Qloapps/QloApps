@@ -201,8 +201,13 @@ class MetaCore extends ObjectModel
      */
     public static function getMetaTags($id_lang, $page_name, $title = '')
     {
-        if (!(!Configuration::get('PS_SHOP_ENABLE')
-            && !in_array(Tools::getRemoteAddr(), explode(',', Configuration::get('PS_MAINTENANCE_IP'))))) {
+         $allowedIps = array();
+        if (Configuration::get('PS_MAINTENANCE_IP')) {
+            $allowedIps = explode(',', Configuration::get('PS_MAINTENANCE_IP'));
+        }
+        if (Configuration::get('PS_SHOP_ENABLE')
+            || ($allowedIps && in_array(Tools::getRemoteAddr(), $allowedIps))
+        ) {
             if ($page_name == 'product' && ($id_product = Tools::getValue('id_product'))) {
                 return Meta::getProductMetas($id_product, $id_lang, $page_name);
             } elseif ($page_name == 'category' && ($id_category = Tools::getValue('id_category'))) {
@@ -426,7 +431,7 @@ class MetaCore extends ObjectModel
     /**
      * @since 1.5.0
      */
-    public static function completeMetaTags($meta_tags, $default_value, Context $context = null)
+    public static function completeMetaTags($meta_tags, $default_value, ?Context $context = null)
     {
         if (!$context) {
             $context = Context::getContext();

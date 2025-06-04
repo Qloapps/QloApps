@@ -81,7 +81,9 @@ class WebserviceSpecificManagementQlo implements WebserviceSpecificManagementInt
             if (isset($this->wsObject->urlFragments['outputformat']) && $this->wsObject->urlFragments['outputformat'] == 'json') {
                 $outputXML = simplexml_load_string($outputXML, null, LIBXML_NOCDATA);
                 $json = json_encode($outputXML);
-                $content = preg_replace("/\\\\u([a-f0-9]{4})/e", "iconv('UCS-4LE','UTF-8',pack('V', hexdec('U$1')))", $json);
+                $content = preg_replace_callback("/\\\\u([a-f0-9]{4})/", function ($matches) {
+                    return iconv('UCS-4LE', 'UTF-8', pack('V', hexdec($matches[1])));
+                }, $json);
                 header('Content-Type: application/json');
                 die($content);
             } else {

@@ -363,7 +363,7 @@ class AdminCartsControllerCore extends AdminController
     ##################################################################
     public function ajaxPreProcess()
     {
-        if ($this->tabAccess['edit'] === '1') {
+        if ($this->tabAccess['edit'] === 1) {
             // prevent cart creation when kpi visibility or kpi view is updated.
             // @todo: move the below cart creation process required function.
             if (in_array(Tools::getValue('action'), array('changeKpiVisibility', 'saveKpiView'))) {
@@ -437,7 +437,7 @@ class AdminCartsControllerCore extends AdminController
 
     public function ajaxProcessDeleteProduct()
     {
-        if ($this->tabAccess['edit'] === '1') {
+        if ($this->tabAccess['edit'] === 1) {
             $errors = array();
             if ((!$id_product = (int)Tools::getValue('id_product')) || !Validate::isInt($id_product)) {
                 $errors[] = Tools::displayError('Invalid product');
@@ -457,7 +457,7 @@ class AdminCartsControllerCore extends AdminController
     public function ajaxProcessUpdateCustomizationFields()
     {
         $errors = array();
-        if ($this->tabAccess['edit'] === '1') {
+        if ($this->tabAccess['edit'] === 1) {
             $errors = array();
             if (Tools::getValue('only_display') != 1) {
                 if (!$this->context->cart->id || (!$id_product = (int)Tools::getValue('id_product'))) {
@@ -517,7 +517,7 @@ class AdminCartsControllerCore extends AdminController
 
     public function ajaxProcessUpdateQty()
     {
-        if ($this->tabAccess['edit'] === '1') {
+        if ($this->tabAccess['edit'] === 1) {
             $errors = array();
             if (!$this->context->cart->id) {
                 return;
@@ -533,7 +533,7 @@ class AdminCartsControllerCore extends AdminController
             // Don't try to use a product if not instanciated before due to errors
             if (isset($product) && $product->id) {
                 if (($id_product_attribute = Tools::getValue('id_product_attribute')) != 0) {
-                    if (!Product::isAvailableWhenOutOfStock($product->out_of_stock) && !Attribute::checkAttributeQty((int)$id_product_attribute, (int)$qty)) {
+                    if (!Product::isAvailableWhenOutOfStock($product->out_of_stock) && !ProductAttribute::checkAttributeQty((int)$id_product_attribute, (int)$qty)) {
                         $errors[] = Tools::displayError('There is not enough product in stock.');
                     }
                 } elseif (!$product->checkQty((int)$qty)) {
@@ -558,7 +558,7 @@ class AdminCartsControllerCore extends AdminController
                 if (!($qty_upd = $this->context->cart->updateQty($qty, $id_product, (int)$id_product_attribute, (int)$id_customization, $operator))) {
                     $errors[] = Tools::displayError('You already have the maximum quantity available for this product.');
                 } elseif ($qty_upd < 0) {
-                    $minimal_qty = $id_product_attribute ? Attribute::getAttributeMinimalQty((int)$id_product_attribute) : $product->minimal_quantity;
+                    $minimal_qty = $id_product_attribute ? ProductAttribute::getAttributeMinimalQty((int)$id_product_attribute) : $product->minimal_quantity;
                     $errors[] = sprintf(Tools::displayError('You must add a minimum quantity of %d', false), $minimal_qty);
                 }
             }
@@ -569,7 +569,7 @@ class AdminCartsControllerCore extends AdminController
 
     public function ajaxProcessUpdateDeliveryOption()
     {
-        if ($this->tabAccess['edit'] === '1') {
+        if ($this->tabAccess['edit'] === 1) {
             $delivery_option = Tools::getValue('delivery_option');
             if ($delivery_option !== false) {
                 $this->context->cart->setDeliveryOption(array($this->context->cart->id_address_delivery => $delivery_option));
@@ -590,7 +590,7 @@ class AdminCartsControllerCore extends AdminController
 
     public function ajaxProcessUpdateOrderMessage()
     {
-        if ($this->tabAccess['edit'] === '1') {
+        if ($this->tabAccess['edit'] === 1) {
             $id_message = false;
             if ($old_message = Message::getMessageByCartId((int)$this->context->cart->id)) {
                 $id_message = $old_message['id_message'];
@@ -612,7 +612,7 @@ class AdminCartsControllerCore extends AdminController
 
     public function ajaxProcessUpdateCurrency()
     {
-        if ($this->tabAccess['edit'] === '1') {
+        if ($this->tabAccess['edit'] === 1) {
             $currency = new Currency((int)Tools::getValue('id_currency'));
             if (Validate::isLoadedObject($currency) && !$currency->deleted && $currency->active) {
                 $this->context->cart->id_currency = (int)$currency->id;
@@ -623,6 +623,7 @@ class AdminCartsControllerCore extends AdminController
             #Code is added by webkul to change current cart tpl dinamically
             #################################################################
             $id_cart = Tools::getValue('id_cart');//get cart id from url
+            $objCart = new Cart($id_cart);
             $cart_detail_data = array();
             $cart_detail_data_obj = new HotelCartBookingData();
             $cart_detail_data_obj->updateIdCurrencyByIdCart($id_cart, $currency->id);
@@ -641,6 +642,7 @@ class AdminCartsControllerCore extends AdminController
 
             $this->context->smarty->assign(array(
                 'cart_detail_data' => $cart_detail_data,
+                'cart' => $objCart,
                 'currency' => new Currency((int)$this->context->cart->id_currency),
                 'occupancy_required_for_booking' => $occupancyRequiredForBooking,
                 'ajax' => true
@@ -656,7 +658,7 @@ class AdminCartsControllerCore extends AdminController
     }
     public function ajaxProcessUpdateLang()
     {
-        if ($this->tabAccess['edit'] === '1') {
+        if ($this->tabAccess['edit'] === 1) {
             $lang = new Language((int)Tools::getValue('id_lang'));
             if (Validate::isLoadedObject($lang) && $lang->active) {
                 $this->context->cart->id_lang = (int)$lang->id;
@@ -668,7 +670,7 @@ class AdminCartsControllerCore extends AdminController
 
     public function ajaxProcessDuplicateOrder()
     {
-        if ($this->tabAccess['edit'] === '1') {
+        if ($this->tabAccess['edit'] === 1) {
             $errors = array();
             if (!$id_order = Tools::getValue('id_order')) {
                 $errors[] = Tools::displayError('Invalid order');
@@ -688,7 +690,7 @@ class AdminCartsControllerCore extends AdminController
 
     public function ajaxProcessDeleteVoucher()
     {
-        if ($this->tabAccess['edit'] === '1') {
+        if ($this->tabAccess['edit'] === 1) {
             if ($this->context->cart->removeCartRule((int)Tools::getValue('id_cart_rule'))) {
                 echo json_encode($this->ajaxReturnVars());
             }
@@ -697,7 +699,7 @@ class AdminCartsControllerCore extends AdminController
 
     public function ajaxProcessupdateFreeShipping()
     {
-        if ($this->tabAccess['edit'] === '1') {
+        if ($this->tabAccess['edit'] === 1) {
             if (!$id_cart_rule = CartRule::getIdByCode(CartRule::BO_ORDER_CODE_PREFIX.(int)$this->context->cart->id)) {
                 $cart_rule = new CartRule();
                 $cart_rule->code = CartRule::BO_ORDER_CODE_PREFIX.(int)$this->context->cart->id;
@@ -727,7 +729,7 @@ class AdminCartsControllerCore extends AdminController
 
     public function ajaxProcessAddVoucher()
     {
-        if ($this->tabAccess['edit'] === '1') {
+        if ($this->tabAccess['edit'] === 1) {
             $errors = array();
             if (!($id_cart_rule = Tools::getValue('id_cart_rule')) || !$cart_rule = new CartRule((int)$id_cart_rule)) {
                 $errors[] = Tools::displayError('Invalid voucher.');
@@ -745,14 +747,14 @@ class AdminCartsControllerCore extends AdminController
 
     public function ajaxProcessUpdateAddress()
     {
-        if ($this->tabAccess['edit'] === '1') {
+        if ($this->tabAccess['edit'] === 1) {
             echo json_encode(array('addresses' => $this->context->customer->getAddresses((int)$this->context->cart->id_lang)));
         }
     }
 
     public function ajaxProcessUpdateAddresses()
     {
-        if ($this->tabAccess['edit'] === '1') {
+        if ($this->tabAccess['edit'] === 1) {
             if (($id_address_delivery = (int)Tools::getValue('id_address_delivery')) &&
                 ($address_delivery = new Address((int)$id_address_delivery)) &&
                 $address_delivery->id_customer == $this->context->cart->id_customer) {
@@ -973,7 +975,7 @@ class AdminCartsControllerCore extends AdminController
             $price = Tools::ps_round($price/$currency->conversion_rate, 6);
         }
 
-        if ($this->tabAccess['edit'] === '1') {
+        if ($this->tabAccess['edit'] === 1) {
             HotelRoomTypeFeaturePricing::deleteFeaturePrices($id_cart, $id_product, $id_room, $date_from, $date_to);
             HotelRoomTypeFeaturePricing::createRoomTypeFeaturePrice(
                 array(
@@ -1014,7 +1016,7 @@ class AdminCartsControllerCore extends AdminController
 
         $this->context->cart = new Cart($idCart);
 
-        if ($this->tabAccess['edit'] === '1') {
+        if ($this->tabAccess['edit'] === 1) {
             // validate occupancy is correct
             $hasError = false;
             if (is_array($occupancy)) {
@@ -1085,7 +1087,7 @@ class AdminCartsControllerCore extends AdminController
 
         $idCart = (int) $params['id_cart'];
         $this->context->cart = new Cart($idCart);
-        if ($this->tabAccess['edit'] === '1') {
+        if ($this->tabAccess['edit'] === 1) {
             $product = new Product($idProduct, true, $this->context->language->id);
         }
     }
@@ -1215,7 +1217,7 @@ class AdminCartsControllerCore extends AdminController
     // Process when admin changes extra demands of any room while order creation process form.tpl
     public function ajaxProcessChangeRoomDemands()
     {
-        if ($this->tabAccess['edit'] === '1') {
+        if ($this->tabAccess['edit'] === 1) {
             $response = array('status' => false);
             if ($idCartBooking = Tools::getValue('id_cart_booking')) {
                 if (Validate::isLoadedObject($objCartbookingCata = new HotelCartBookingData($idCartBooking))) {
@@ -1241,7 +1243,7 @@ class AdminCartsControllerCore extends AdminController
         return Cart::getTotalCart($id_cart, true, Cart::BOTH_WITHOUT_SHIPPING);
     }
 
-    public function displayDeleteLink($token = null, $id, $name = null)
+    public function displayDeleteLink($token, $id, $name = null)
     {
         // don't display ordered carts
         foreach ($this->_list as $row) {
@@ -1302,7 +1304,7 @@ class AdminCartsControllerCore extends AdminController
     {
         $response = array('hasError' => false);
         // Check tab access is allowed to edit
-        if ($this->tabAccess['add'] == 1) {
+        if ($this->tabAccess['add'] === 1) {
             if (Configuration::get('PS_ALLOW_CREATE_CUSTOM_SERVICES_IN_BOOKING')) {
                 $idHotelCartBooking = Tools::getValue('id_hotel_cart_booking');
                 // valiadate services being added
@@ -1518,7 +1520,7 @@ class AdminCartsControllerCore extends AdminController
     {
         $response = array('hasError' => false);
         // Check tab access is allowed to edit
-        if ($this->tabAccess['add'] == 1) {
+        if ($this->tabAccess['add'] === 1) {
             $idCartBooking = Tools::getValue('id_hotel_cart_booking');
             if (Validate::isLoadedObject($objHotelCartBookingData = new HotelCartBookingData($idCartBooking))) {
                 $objCart = new Cart($objHotelCartBookingData->id_cart);

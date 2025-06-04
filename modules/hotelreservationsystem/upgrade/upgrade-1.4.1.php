@@ -124,9 +124,8 @@ function populateRefundData()
         )
         '
     );
-    $objHtlBooking = new HotelBookingDetail();
     foreach($odrRefunds as $odrRefund) {
-        $numDays = $objHtlBooking->getNumberOfDays(
+        $numDays = HotelHelper::getNumberOfDays(
             $odrRefund['date_from'],
             $odrRefund['date_to']
         );

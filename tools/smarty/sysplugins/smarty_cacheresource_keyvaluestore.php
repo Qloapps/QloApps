@@ -88,15 +88,15 @@ abstract class Smarty_CacheResource_KeyValueStore extends Smarty_CacheResource
     /**
      * Read the cached template and process the header
      *
-     * @param \Smarty_Internal_Template $_smarty_tpl do not change variable name, is used by compiled template
-     * @param Smarty_Template_Cached    $cached      cached object
-     * @param boolean                   $update      flag if called because cache update
+     * @param \Smarty_Internal_Template   $_smarty_tpl do not change variable name, is used by compiled template
+     * @param Smarty_Template_Cached|null $cached      cached object
+     * @param boolean                     $update      flag if called because cache update
      *
      * @return boolean                 true or false if the cached content does not exist
      */
     public function process(
         Smarty_Internal_Template $_smarty_tpl,
-        Smarty_Template_Cached $cached = null,
+        ?Smarty_Template_Cached $cached = null,
         $update = false
     ) {
         if (!$cached) {
@@ -244,7 +244,7 @@ abstract class Smarty_CacheResource_KeyValueStore extends Smarty_CacheResource
      */
     protected function sanitize($string)
     {
-        $string = trim($string, '|');
+        $string = trim((string)$string, '|');
         if (!$string) {
             return '';
         }
@@ -428,7 +428,7 @@ abstract class Smarty_CacheResource_KeyValueStore extends Smarty_CacheResource
             $t[] = 'IVK#COMPILE' . $_compile;
         }
         $_name .= '#';
-        $cid = trim($cache_id, '|');
+        $cid = trim((string)$cache_id, '|');
         if (!$cid) {
             return $t;
         }

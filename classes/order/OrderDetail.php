@@ -170,6 +170,12 @@ class OrderDetailCore extends ObjectModel
     /** @var float */
     public $original_wholesale_price;
 
+    /** @var bool */
+    public $product_auto_add;
+
+    /** @var int */
+    public $product_price_addition_type;
+
     /**
      * @see ObjectModel::$definition
      */
@@ -437,7 +443,7 @@ class OrderDetailCore extends ObjectModel
 
     public function getTaxList()
     {
-        return self::getTaxList($this->id);
+        return self::getTaxListStatic($this->id);
     }
 
     public static function getTaxListStatic($id_order_detail)

@@ -199,7 +199,7 @@ class HotelReservationSystem extends Module
                                     1
                                 );
                             } else {
-                                $num_days = $obj_htl_bk_dtl->getNumberOfDays($data_v['date_from'], $data_v['date_to']);
+                                $num_days = HotelHelper::getNumberOfDays($data_v['date_from'], $data_v['date_to']);
 
                                 $cart_htl_data[$type_key]['date_diff'][$date_join]['num_rm'] = 1;
                                 $cart_htl_data[$type_key]['date_diff'][$date_join]['data_form'] = $data_v['date_from'];

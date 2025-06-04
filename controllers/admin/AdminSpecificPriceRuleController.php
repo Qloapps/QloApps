@@ -40,9 +40,9 @@ class AdminSpecificPriceRuleControllerCore extends AdminController
         $this->multishop_context = Shop::CONTEXT_ALL;
 
         /* if $_GET['id_shop'] is transmitted, virtual url can be loaded in config.php, so we wether transmit shop_id in herfs */
-        if ($this->id_shop = (int)Tools::getValue('shop_id')) {
-            $_GET['id_shop'] = $this->id_shop;
-            $_POST['id_shop'] = $this->id_shop;
+        if ($id_shop = (int)Tools::getValue('shop_id')) {
+            $_GET['id_shop'] = $id_shop;
+            $_POST['id_shop'] = $id_shop;
         }
 
         $this->list_reduction_type = array(
@@ -317,7 +317,7 @@ class AdminSpecificPriceRuleControllerCore extends AdminController
         );
 
         $attribute_groups = array();
-        $attributes = Attribute::getAttributes((int)$this->context->language->id);
+        $attributes = ProductAttribute::getAttributes((int)$this->context->language->id);
         foreach ($attributes as $attribute) {
             if (!isset($attribute_groups[$attribute['id_attribute_group']])) {
                 $attribute_groups[$attribute['id_attribute_group']]  = array(

@@ -554,7 +554,7 @@ class OrderSlipCore extends ObjectModel
     public function getEcoTaxTaxesBreakdown()
     {
         $ecotax_detail = array();
-        foreach ($this->getOrdersSlipDetail((int)$this->id) as $order_slip_details) {
+        foreach (OrderSlip::getOrdersSlipDetail((int)$this->id) as $order_slip_details) {
             $row = Db::getInstance()->getRow('
 					SELECT `ecotax_tax_rate` as `rate`, `ecotax` as `ecotax_tax_excl`, `ecotax` as `ecotax_tax_incl`, `product_quantity`
 					FROM `'._DB_PREFIX_.'order_detail`

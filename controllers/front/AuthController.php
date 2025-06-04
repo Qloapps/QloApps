@@ -35,6 +35,9 @@ class AuthControllerCore extends FrontController
      */
     protected $create_account;
     protected $id_country;
+    public $informations;
+    public $confirmations;
+    protected $ajaxExtraData;
 
     /**
      * Initialize auth controller
@@ -567,7 +570,9 @@ class AuthControllerCore extends FrontController
                     }
                 }
             }
-            if (!@checkdate(Tools::getValue('months'), Tools::getValue('days'), Tools::getValue('years')) && !(Tools::getValue('months') == '' && Tools::getValue('days') == '' && Tools::getValue('years') == '')) {
+            if (!(Tools::getValue('months') == '' && Tools::getValue('days') == '' && Tools::getValue('years') == '')
+                && !@checkdate((int) Tools::getValue('months'), (int) Tools::getValue('days'), (int) Tools::getValue('years'))
+            ) {
                 $this->errors[] = Tools::displayError('Invalid date of birth');
             }
 

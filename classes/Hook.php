@@ -618,7 +618,7 @@ class HookCore extends ObjectModel
     {
         return '<script type="text/javascript"> modules_list.push(\''.Tools::safeOutput($moduleInstance->name).'\');</script>
 				<div id="hook_'.(int)$id_hook.'_module_'.(int)$moduleInstance->id.'_moduleName_'.str_replace('_', '-', Tools::safeOutput($moduleInstance->name)).'"
-				class="dndModule" style="border: 1px dotted red;'.(!strlen($display) ? 'height:50px;' : '').'">
+				class="dndModule" style="border: 1px dotted red;'.(!Tools::strlen($display) ? 'height:50px;' : '').'">
 					<span style="font-family: Georgia;font-size:13px;font-style:italic;">
 						<img style="padding-right:5px;" src="'._MODULE_DIR_.Tools::safeOutput($moduleInstance->name).'/logo.gif">'
                 .Tools::safeOutput($moduleInstance->displayName).'<span style="float:right">

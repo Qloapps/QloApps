@@ -257,8 +257,9 @@ class HTMLPurifier_HTMLModule
      */
     public function makeLookup($list)
     {
+        $args = func_get_args();
         if (is_string($list)) {
-            $list = func_get_args();
+            $list = $args;
         }
         $ret = array();
         foreach ($list as $value) {

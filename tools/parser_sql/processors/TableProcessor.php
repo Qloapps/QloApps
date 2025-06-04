@@ -83,7 +83,7 @@ class TableProcessor extends AbstractProcessor {
 
         $currCategory = 'TABLE_NAME';
         $result = array('base_expr' => false, 'name' => false, 'no_quotes' => false, 'create-def' => false,
-                        'options' => false, 'like' => false, 'select-option' => false);
+                        'options' => array(), 'like' => false, 'select-option' => false);
         $expr = array();
         $base_expr = '';
         $skip = 0;
@@ -365,6 +365,9 @@ class TableProcessor extends AbstractProcessor {
         }
         if ($result['select-option'] === false) {
             unset($result['select-option']);
+        }
+        if ($result['options'] === array()) {
+            $result['options'] = false;
         }
 
         return $result;

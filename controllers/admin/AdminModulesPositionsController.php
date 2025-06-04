@@ -53,7 +53,7 @@ class AdminModulesPositionsControllerCore extends AdminController
 
         // Change position in hook
         if (array_key_exists('changePosition', $_GET)) {
-            if ($this->tabAccess['edit'] === '1') {
+            if ($this->tabAccess['edit'] === 1) {
                 $id_module = (int)Tools::getValue('id_module');
                 $id_hook = (int)Tools::getValue('id_hook');
                 $module = Module::getInstanceById($id_module);
@@ -70,7 +70,7 @@ class AdminModulesPositionsControllerCore extends AdminController
 
         // Add new module in hook
         elseif (Tools::isSubmit('submitAddToHook')) {
-            if ($this->tabAccess['add'] === '1') {
+            if ($this->tabAccess['add'] === 1) {
                 // Getting vars...
                 $id_module = (int)Tools::getValue('id_module');
                 $module = Module::getInstanceById($id_module);
@@ -118,7 +118,7 @@ class AdminModulesPositionsControllerCore extends AdminController
 
         // Edit module from hook
         elseif (Tools::isSubmit('submitEditGraft')) {
-            if ($this->tabAccess['add'] === '1') {
+            if ($this->tabAccess['add'] === 1) {
                 // Getting vars...
                 $id_module = (int)Tools::getValue('id_module');
                 $module = Module::getInstanceById($id_module);
@@ -179,7 +179,7 @@ class AdminModulesPositionsControllerCore extends AdminController
 
         // Delete module from hook
         elseif (array_key_exists('deleteGraft', $_GET)) {
-            if ($this->tabAccess['delete'] === '1') {
+            if ($this->tabAccess['delete'] === 1) {
                 $id_module = (int)Tools::getValue('id_module');
                 $module = Module::getInstanceById($id_module);
                 $id_hook = (int)Tools::getValue('id_hook');
@@ -492,7 +492,7 @@ class AdminModulesPositionsControllerCore extends AdminController
 
     public function ajaxProcessUpdatePositions()
     {
-        if ($this->tabAccess['edit'] === '1') {
+        if ($this->tabAccess['edit'] === 1) {
             $id_module = (int)(Tools::getValue('id_module'));
             $id_hook = (int)(Tools::getValue('id_hook'));
             $way = (int)(Tools::getValue('way'));
@@ -513,7 +513,7 @@ class AdminModulesPositionsControllerCore extends AdminController
 
     public function ajaxProcessGetHookableList()
     {
-        if ($this->tabAccess['view'] === '1') {
+        if ($this->tabAccess['view'] === 1) {
             /* PrestaShop demo mode */
             if (_PS_MODE_DEMO_) {
                 die('{"hasError" : true, "errors" : ["Live Edit: This functionality has been disabled."]}');
@@ -558,7 +558,7 @@ class AdminModulesPositionsControllerCore extends AdminController
 
     public function ajaxProcessGetHookableModuleList()
     {
-        if ($this->tabAccess['view'] === '1') {
+        if ($this->tabAccess['view'] === 1) {
             /* PrestaShop demo mode */
             if (_PS_MODE_DEMO_) {
                 die('{"hasError" : true, "errors" : ["Live Edit: This functionality has been disabled."]}');
@@ -587,7 +587,7 @@ class AdminModulesPositionsControllerCore extends AdminController
     }
     public function ajaxProcessSaveHook()
     {
-        if ($this->tabAccess['edit'] === '1') {
+        if ($this->tabAccess['edit'] === 1) {
             /* PrestaShop demo mode */
             if (_PS_MODE_DEMO_) {
                 die('{"hasError" : true, "errors" : ["Live Edit: This functionality has been disabled."]}');

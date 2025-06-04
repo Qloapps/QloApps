@@ -25,6 +25,7 @@ class HTMLPurifier_AttrDef_CSS_Background extends HTMLPurifier_AttrDef
         $this->info['background-repeat'] = $def->info['background-repeat'];
         $this->info['background-attachment'] = $def->info['background-attachment'];
         $this->info['background-position'] = $def->info['background-position'];
+        $this->info['background-size'] = $def->info['background-size'];
     }
 
     /**
@@ -53,6 +54,7 @@ class HTMLPurifier_AttrDef_CSS_Background extends HTMLPurifier_AttrDef
         $caught['repeat'] = false;
         $caught['attachment'] = false;
         $caught['position'] = false;
+        $caught['size'] = false;
 
         $i = 0; // number of catches
 

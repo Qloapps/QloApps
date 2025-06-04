@@ -30,7 +30,7 @@ class UploaderCore
 
     private $_check_file_size;
     private $_accept_types;
-    private $_files;
+    private $_files = [];
     private $_max_size;
     private $_name;
     private $_save_path;
@@ -39,7 +39,6 @@ class UploaderCore
     {
         $this->setName($name);
         $this->setCheckFileSize(true);
-        $this->files = array();
     }
 
     public function setAcceptTypes($value)
@@ -164,13 +163,13 @@ class UploaderCore
                     'error'    => $upload['error'][$index]
                 );
 
-                $this->files[] = $this->upload($tmp[$index], $dest);
+                $this->_files[] = $this->upload($tmp[$index], $dest);
             }
         } elseif ($upload) {
-            $this->files[] = $this->upload($upload, $dest);
+            $this->_files[] = $this->upload($upload, $dest);
         }
 
-        return $this->files;
+        return $this->_files;
     }
 
     public function upload($file, $dest = null)

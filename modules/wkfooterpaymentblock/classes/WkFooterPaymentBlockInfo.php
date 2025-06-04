@@ -52,7 +52,7 @@ class WkFooterPaymentBlockInfo extends ObjectModel
     {
         if (!parent::delete()
             || !$this->deleteImage(true)
-            || !$this->cleanPositions()
+            || !self::cleanPositions()
         ) {
             return false;
         }

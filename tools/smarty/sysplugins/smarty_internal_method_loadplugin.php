@@ -40,7 +40,7 @@ class Smarty_Internal_Method_LoadPlugin
             throw new SmartyException("plugin {$plugin_name} is not a valid name format");
         }
         if (!empty($match[ 2 ])) {
-            $file = SMARTY_SYSPLUGINS_DIR . strtolower($plugin_name) . '.php';
+            $file = SMARTY_SYSPLUGINS_DIR . smarty_strtolower_ascii($plugin_name) . '.php';
             if (isset($this->plugin_files[ $file ])) {
                 if ($this->plugin_files[ $file ] !== false) {
                     return $this->plugin_files[ $file ];
@@ -60,7 +60,7 @@ class Smarty_Internal_Method_LoadPlugin
         }
         // plugin filename is expected to be: [type].[name].php
         $_plugin_filename = "{$match[1]}.{$match[4]}.php";
-        $_lower_filename = strtolower($_plugin_filename);
+        $_lower_filename = smarty_strtolower_ascii($_plugin_filename);
         if (isset($this->plugin_files)) {
             if (isset($this->plugin_files[ 'plugins_dir' ][ $_lower_filename ])) {
                 if (!$smarty->use_include_path || $this->plugin_files[ 'plugins_dir' ][ $_lower_filename ] !== false) {

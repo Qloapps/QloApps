@@ -85,7 +85,7 @@ class CustomerGuestDetailCore extends ObjectModel
      * @param int id_cart
      * @return bool True on success, false on failure
      */
-    public function deleteCustomerGuestInCart($idCart)
+    public static function deleteCustomerGuestInCart($idCart)
     {
         return Db::getInstance()->delete(
             'cart_customer_guest',

@@ -1,0 +1,328 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   version="1.1"
+   width="12cm"
+   height="6cm"
+   id="svg2">
+  <desc
+     id="desc4">TCPDF SVG EXAMPLE</desc>
+  <defs
+     id="defs42">
+    <radialGradient
+       cx="85"
+       cy="15"
+       r="5.25"
+       fx="85"
+       fy="15"
+       id="radialGradient2865"
+       xlink:href="#MyRGradient"
+       gradientUnits="userSpaceOnUse" />
+    <radialGradient
+       cx="60"
+       cy="25"
+       r="10.5"
+       fx="60"
+       fy="25"
+       id="radialGradient2867"
+       xlink:href="#MyRGradient"
+       gradientUnits="userSpaceOnUse" />
+    <radialGradient
+       cx="17.82198"
+       cy="28.055244"
+       r="10.871407"
+       fx="17.82198"
+       fy="28.055244"
+       id="radialGradient2869"
+       xlink:href="#MyRGradient"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(3.6200333,0,0,1.8396889,173.9517,-9.005912)" />
+    <radialGradient
+       cx="184.10963"
+       cy="476.55164"
+       r="74.151497"
+       fx="184.10963"
+       fy="476.55164"
+       id="radialGradient5087"
+       xlink:href="#linearGradient5075"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(3.2520801,0,0,1.0907419,-234.6921,-1.613686)" />
+    <linearGradient
+       id="linearGradient5075">
+      <stop
+         id="stop5077"
+         style="stop-color:#ffff00;stop-opacity:1"
+         offset="0" />
+      <stop
+         id="stop5079"
+         style="stop-color:#ff0000;stop-opacity:1"
+         offset="1" />
+    </linearGradient>
+    <radialGradient
+       cx="184.10963"
+       cy="476.55164"
+       r="74.151497"
+       fx="184.10963"
+       fy="476.55164"
+       id="radialGradient2846"
+       xlink:href="#linearGradient5075"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(3.2520801,0,0,1.0907419,-234.6921,-1.613686)" />
+    <linearGradient
+       id="linearGradient2848">
+      <stop
+         id="stop2850"
+         style="stop-color:#ffff00;stop-opacity:1"
+         offset="0" />
+      <stop
+         id="stop2852"
+         style="stop-color:#ff0000;stop-opacity:1"
+         offset="1" />
+    </linearGradient>
+    <radialGradient
+       cx="184.10963"
+       cy="476.55164"
+       r="74.151497"
+       fx="184.10963"
+       fy="476.55164"
+       id="radialGradient2854"
+       xlink:href="#linearGradient5075"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(3.2520801,0,0,1.0907419,-234.6921,-1.613686)" />
+    <linearGradient
+       id="linearGradient2856">
+      <stop
+         id="stop2858"
+         style="stop-color:#ffff00;stop-opacity:1"
+         offset="0" />
+      <stop
+         id="stop2860"
+         style="stop-color:#ff0000;stop-opacity:1"
+         offset="1" />
+    </linearGradient>
+    <radialGradient
+       cx="184.10963"
+       cy="476.55164"
+       r="74.151497"
+       fx="184.10963"
+       fy="476.55164"
+       id="radialGradient2862"
+       xlink:href="#linearGradient5075"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(3.2520801,0,0,1.0907419,-234.6921,-1.613686)" />
+    <linearGradient
+       id="linearGradient2864">
+      <stop
+         id="stop2866"
+         style="stop-color:#ffff00;stop-opacity:1"
+         offset="0" />
+      <stop
+         id="stop2868"
+         style="stop-color:#ff0000;stop-opacity:1"
+         offset="1" />
+    </linearGradient>
+    <radialGradient
+       cx="184.10963"
+       cy="476.55164"
+       r="74.151497"
+       fx="184.10963"
+       fy="476.55164"
+       id="radialGradient2885"
+       xlink:href="#linearGradient5075"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(3.2520801,0,0,1.0907419,-234.6921,-1.613686)" />
+    <radialGradient
+       cx="60"
+       cy="25"
+       r="10.5"
+       fx="60"
+       fy="25"
+       id="radialGradient5215"
+       xlink:href="#MyRGradient"
+       gradientUnits="userSpaceOnUse" />
+    <radialGradient
+       cx="184.10963"
+       cy="476.55164"
+       r="74.151497"
+       fx="184.10963"
+       fy="476.55164"
+       id="radialGradient5223"
+       xlink:href="#linearGradient5075"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(3.2520801,0,0,1.0907419,-234.6921,-1.613686)" />
+    <radialGradient
+       cx="184.10963"
+       cy="476.55164"
+       r="74.151497"
+       fx="184.10963"
+       fy="476.55164"
+       id="radialGradient5245"
+       xlink:href="#linearGradient5075"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(3.2520801,0,0,1.0907419,-234.6921,-1.613686)" />
+    <radialGradient
+       cx="184.10963"
+       cy="476.55164"
+       r="74.151497"
+       fx="184.10963"
+       fy="476.55164"
+       id="radialGradient5261"
+       xlink:href="#linearGradient5075"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(3.2520801,0,0,1.0907419,-234.6921,-1.613686)" />
+    <radialGradient
+       cx="184.10963"
+       cy="476.55164"
+       r="74.151497"
+       fx="184.10963"
+       fy="476.55164"
+       id="radialGradient5264"
+       xlink:href="#linearGradient5075"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(0.53063427,0,0,0.17133835,-41.5959,-53.579631)" />
+    <radialGradient
+       cx="184.10963"
+       cy="476.55164"
+       r="74.151497"
+       fx="184.10963"
+       fy="476.55164"
+       id="radialGradient5267"
+       xlink:href="#linearGradient5075"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(0.53063427,0,0,0.17133835,-41.5959,-53.579631)" />
+    <radialGradient
+       cx="184.10963"
+       cy="476.55164"
+       r="74.151497"
+       fx="184.10963"
+       fy="476.55164"
+       id="radialGradient5270"
+       xlink:href="#linearGradient5075"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(0.53063427,0,0,0.17133835,-41.5959,-53.579631)" />
+    <radialGradient
+       cx="85"
+       cy="15"
+       r="5.25"
+       fx="85"
+       fy="15"
+       id="radialGradient5295"
+       xlink:href="#MyRGradient"
+       gradientUnits="userSpaceOnUse" />
+  </defs>
+  <linearGradient
+     x1="2.4930596"
+     y1="8.1225491"
+     x2="58.448399"
+     y2="8.1225491"
+     id="MyLGradient"
+     gradientUnits="userSpaceOnUse"
+     gradientTransform="matrix(2.1674701,3.2244804e-8,-1.0401032e-8,0.46846403,253.27742,-193.75856)">
+    <stop
+       id="stop7"
+       style="stop-color:#ff6600;stop-opacity:1"
+       offset="0.05" />
+    <stop
+       id="stop9"
+       style="stop-color:#ffff66;stop-opacity:1"
+       offset="0.94999999" />
+  </linearGradient>
+  <radialGradient
+     id="MyRGradient">
+    <stop
+       id="stop12"
+       style="stop-color:#0033ff;stop-opacity:1"
+       offset="0.05" />
+    <stop
+       id="stop14"
+       style="stop-color:#ffff66;stop-opacity:1"
+       offset="0.94999999" />
+  </radialGradient>
+  <rect
+     width="120.08073"
+     height="25.367481"
+     rx="3.602421"
+     ry="2.5367482"
+     x="259.28146"
+     y="-189.53065"
+     transform="matrix(0.71626866,0.69782463,-0.72008162,0.69388937,0,0)"
+     id="rect16"
+     style="fill:url(#MyLGradient);stroke:#0000ff;stroke-width:1.00766146" />
+  <ellipse
+     cx="90"
+     cy="30"
+     rx="20"
+     ry="10"
+     transform="matrix(1.4285714,0,0,1.4285714,178.03709,88.814199)"
+     id="ellipse20"
+     style="fill:#00ff00;stroke:#008000;stroke-width:1" />
+  <path
+     d="m 199.75816,42.607008 c 0,-25.80645 38.7097,-25.80645 38.7097,0 0,25.80645 38.70969,25.80645 38.70969,0 z"
+     id="path30"
+     style="fill:url(#radialGradient2869);stroke:#0000ff;stroke-width:1.29032314" />
+  <path
+     d="m 56.981711,101.40999 q 38.411107,-48.013879 76.822209,0 38.41109,48.01387 76.8222,0"
+     id="path32"
+     style="fill:none;stroke:#008000;stroke-width:0.96027768" />
+  <path
+     d="m 56.981711,101.40999 38.411107,-48.013879 38.411102,48.013879 38.41109,48.01387 38.41111,-48.01387"
+     id="path34"
+     style="fill:none;stroke:#888888;stroke-width:0.38411102" />
+  <line
+     x1="158.17"
+     y1="196.27382"
+     x2="403.61057"
+     y2="196.27382"
+     id="line22"
+     style="fill:#ff0000;stroke:#ff0000;stroke-width:2.72711658;stroke-opacity:1" />
+  <text
+     x="158.15259"
+     y="182.61755"
+     id="text38"
+     style="font-size:35.67964172px;font-weight:bold;fill:#0000ff;font-family:Helvetica">www.tcpdf.org</text>
+  <polygon
+     points="80,10 90,10 90,20 80,20 80,10 "
+     transform="matrix(4.7619048,0,0,4.7619048,-28.55484,-29.862646)"
+     id="polygon26"
+     style="fill:url(#radialGradient5295);stroke:#ff0000;stroke-width:0.5" />
+  <path
+     d="M 172.22678,86.983374 H 140.4086 A 31.818187,31.818187 0 1 0 172.22678,55.16517 z"
+     id="path10"
+     style="fill:#ff0000;stroke:#0000ff;stroke-width:1.06060624" />
+  <path
+     d="M 166.92376,81.680334 V 49.86215 a 31.818187,31.818187 0 0 0 -31.81821,31.818184 z"
+     id="path12"
+     style="fill:#ffff00;stroke:#0000ff;stroke-width:1.06060624" />
+  <path
+     d="m 191.9699,155.18875 13.78038,-6.89018 a 7.7034622,7.7034622 0 1 1 13.78037,-6.89018 l 13.78033,-6.89018 a 15.386158,7.6930793 60 0 1 13.78034,-6.89016 l 13.78034,-6.89017 a 23.073485,7.6911617 60 0 1 13.78037,-6.89019 l 13.78037,-6.89017 a 30.761945,7.6904861 60 1 1 13.78036,-6.89019 l 13.78034,-6.890167"
+     id="path14"
+     style="fill:none;stroke:#ff0000;stroke-width:1.37803578" />
+  <circle
+     cx="60"
+     cy="25"
+     r="10"
+     transform="matrix(2.3809524,0,0,2.3809524,-86.105483,113.11357)"
+     id="circle18"
+     style="fill:url(#radialGradient5215);stroke:#ff0000;stroke-width:1" />
+  <path
+     d="m 32.361418,52.28906 48.780487,0 -24.39025,48.78049 z"
+     id="path28"
+     style="fill:#ffff00;stroke:#0000ff;stroke-width:1.21951222" />
+  <image
+     xlink:href="tcpdf_logo.jpg"
+     id="image36"
+     height="26.666664"
+     width="80"
+     y="111.32501"
+     x="16.751661" />
+  <text
+     x="13.399332"
+     y="41.580627"
+     id="text5343"
+     xml:space="preserve"
+     style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;fill:#008000;font-family:helvetica;font-size:30pt">SVG</text>
+</svg>

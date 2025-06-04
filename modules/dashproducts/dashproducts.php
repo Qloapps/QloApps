@@ -30,6 +30,8 @@ if (!defined('_PS_VERSION_')) {
 
 class DashProducts extends Module
 {
+	protected $push_filename;
+
 	public function __construct()
 	{
 		$this->name = 'dashproducts';
@@ -124,7 +126,7 @@ class DashProducts extends Module
 		$table_recent_orders = $this->getTableRecentOrders($params['id_hotel']);
 		$table_best_sellers = $this->getTableBestSellers($params['date_from'], $params['date_to'], $params['id_hotel']);
 		$table_most_viewed = $this->getTableMostViewed($params['date_from'], $params['date_to'], $params['id_hotel']);
-		$table_top_10_most_search = $this->getTableTop10MostSearch($params['date_from'], $params['date_to'], $params['id_hotel']);
+		$table_top_10_most_search = $this->getTableTop10MostSearch($params['date_from'], $params['date_to']);
 
 		//$table_top_5_search = $this->getTableTop5Search();
 		return array(
@@ -685,7 +687,6 @@ class DashProducts extends Module
 		$lang = new Language((int)Configuration::get('PS_LANG_DEFAULT'));
 		$helper->default_form_language = $lang->id;
 		$helper->allow_employee_form_lang = Configuration::get('PS_BO_ALLOW_EMPLOYEE_FORM_LANG') ? Configuration::get('PS_BO_ALLOW_EMPLOYEE_FORM_LANG') : 0;
-		$this->fields_form = array();
 		$helper->id = (int)Tools::getValue('id_carrier');
 		$helper->identifier = $this->identifier;
 		$helper->submit_action = 'submitDashConfig';

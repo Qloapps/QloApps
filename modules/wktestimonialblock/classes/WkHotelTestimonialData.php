@@ -232,7 +232,6 @@ class WkHotelTestimonialData extends ObjectModel
                             }
                         }
                         $objTestimonialData->position = $this->getHigherPosition();
-                        $objTestimonialData->testimonial_image = ($i+1).'.jpg';
                         $objTestimonialData->active = 1;
                         $objTestimonialData->save();
                     }

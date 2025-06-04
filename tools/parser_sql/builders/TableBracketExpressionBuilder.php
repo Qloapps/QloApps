@@ -84,6 +84,16 @@ class TableBracketExpressionBuilder implements Builder {
         return $builder->build($parsed);
     }
     
+    protected function buildUniqueIndex($parsed) {
+        $builder = new UniqueIndexBuilder();
+        return $builder->build($parsed);
+    }
+    
+    protected function buildFulltextIndex($parsed) {
+        $builder = new FulltextIndexBuilder();
+        return $builder->build($parsed);
+    }
+    
     public function build(array $parsed) {
         if ($parsed['expr_type'] !== ExpressionType::BRACKET_EXPRESSION) {
             return "";
@@ -97,6 +107,8 @@ class TableBracketExpressionBuilder implements Builder {
             $sql .= $this->buildLikeExpression($v);
             $sql .= $this->buildForeignKey($v);
             $sql .= $this->buildIndexKey($v);
+            $sql .= $this->buildUniqueIndex($v);
+            $sql .= $this->buildFulltextIndex($v);
                         
             if ($len == strlen($sql)) {
                 throw new UnableToCreateSQLException('CREATE TABLE create-def expression subtree', $k, $v, 'expr_type');

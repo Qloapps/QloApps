@@ -22,16 +22,16 @@ class Smarty_Internal_Method_CreateData
      * creates a data object
      *
      * @api  Smarty::createData()
-     * @link http://www.smarty.net/docs/en/api.create.data.tpl
+     * @link https://www.smarty.net/docs/en/api.create.data.tpl
      *
-     * @param \Smarty_Internal_TemplateBase|\Smarty_Internal_Template|\Smarty      $obj
-     * @param \Smarty_Internal_Template|\Smarty_Internal_Data|\Smarty_Data|\Smarty $parent next higher level of Smarty
-     *                                                                                     variables
-     * @param string                                                               $name   optional data block name
+     * @param \Smarty_Internal_TemplateBase|\Smarty_Internal_Template|\Smarty           $obj
+     * @param \Smarty_Internal_Template|\Smarty_Internal_Data|\Smarty_Data|\Smarty|null $parent next higher level of Smarty
+     *                                                                                          variables
+     * @param string                                                                    $name   optional data block name
      *
      * @return \Smarty_Data data object
      */
-    public function createData(Smarty_Internal_TemplateBase $obj, Smarty_Internal_Data $parent = null, $name = null)
+    public function createData(Smarty_Internal_TemplateBase $obj, ?Smarty_Internal_Data $parent = null, $name = null)
     {
         /* @var Smarty $smarty */
         $smarty = $obj->_getSmartyObj();

@@ -150,12 +150,7 @@ class Datas
             'name' => 'newsletter',
             'default' => 1,
             'help' => 'Get news from QloApps',
-        ),
-        'send_email' => array(
-            'name' => 'send_email',
-            'default' => 1,
-            'help' => 'Send an email to the administrator after installation',
-        ),
+        )
     );
 
     protected $datas = array();

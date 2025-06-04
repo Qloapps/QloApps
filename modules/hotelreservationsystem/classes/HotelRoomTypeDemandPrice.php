@@ -89,7 +89,7 @@ class HotelRoomTypeDemandPrice extends ObjectModel
                 }
                 if ($objGlobalDemand->price_calc_method == HotelRoomTypeGlobalDemand::WK_PRICE_CALC_METHOD_EACH_DAY) {
                     if ($dateFrom && $dateTo) {
-                        $numDays = $objBookingDetail->getNumberOfDays($dateFrom, $dateTo);
+                        $numDays = HotelHelper::getNumberOfDays($dateFrom, $dateTo);
                         if ($numDays > 1) {
                             $price *= $numDays;
                         }

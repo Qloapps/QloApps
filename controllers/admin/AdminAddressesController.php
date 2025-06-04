@@ -31,6 +31,7 @@ class AdminAddressesControllerCore extends AdminController
 {
     /** @var array countries list */
     protected $countries_array = array();
+    protected $addressType;
 
     public function __construct()
     {

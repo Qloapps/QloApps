@@ -308,7 +308,7 @@ class HTMLTemplateInvoiceCore extends HTMLTemplate
         }
         $order_obj = new Order($this->order->id);
 
-        $this->context = Context::getContext();
+        $context = Context::getContext();
 
         $cart_htl_data = array();
         $service_product_data = array();
@@ -318,7 +318,7 @@ class HTMLTemplateInvoiceCore extends HTMLTemplate
         if (Module::isInstalled('hotelreservationsystem')) {
             $obj_htl_bk_dtl = new HotelBookingDetail();
             $objServiceProductOrderDetail = new ServiceProductOrderDetail();
-            $objHotelBranchInfo = new HotelBranchInformation((int) HotelBookingDetail::getIdHotelByIdOrder($order_obj->id), $this->context->language->id);
+            $objHotelBranchInfo = new HotelBranchInformation((int) HotelBookingDetail::getIdHotelByIdOrder($order_obj->id), $context->language->id);
             $invoiceAddressPatternRules['avoid'][] = 'lastname';
             if ($idHotelAddress = $objHotelBranchInfo->getHotelIdAddress()) {
                 $objHotelAddress = new Address((int) $idHotelAddress);
@@ -340,14 +340,14 @@ class HTMLTemplateInvoiceCore extends HTMLTemplate
 
                     if ($type_value['is_booking_product']) {
                         if ($display_product_images) {
-                            $product = new Product($type_value['product_id'], false, $this->context->language->id);
+                            $product = new Product($type_value['product_id'], false, $context->language->id);
                             $cover_image_arr = $product->getCover($type_value['product_id']);
 
                             if (!empty($cover_image_arr)) {
                                 $coverImageObj = new Image($cover_image_arr['id_image']);
                                 $cover_img = _PS_PROD_IMG_DIR_.$coverImageObj->getExistingImgPath().'.jpg';
                             } else {
-                                $cover_img = _PS_PROD_IMG_DIR_.$this->context->language->iso_code.'-default-small_default.jpg';
+                                $cover_img = _PS_PROD_IMG_DIR_.$context->language->iso_code.'-default-small_default.jpg';
                             }
                             $cart_htl_data[$type_key]['cover_img']    = $cover_img;
                         }
@@ -474,7 +474,7 @@ class HTMLTemplateInvoiceCore extends HTMLTemplate
                                 $num_days = HotelHelper::getNumberOfDays($data_v['date_from'], $data_v['date_to']);
 
                                 $cart_htl_data[$type_key]['date_diff'][$date_join]['num_rm'] = 1;
-                                $fullDate = (isset($this->context->controller->show_full_date) && $this->context->controller->show_full_date && (date('Y-m-d', strtotime($data_v['date_from'])) == date('Y-m-d', strtotime($data_v['date_to'])))) ? true : false;
+                                $fullDate = (isset($context->controller->show_full_date) && $context->controller->show_full_date && (date('Y-m-d', strtotime($data_v['date_from'])) == date('Y-m-d', strtotime($data_v['date_to'])))) ? true : false;
                                 $cart_htl_data[$type_key]['date_diff'][$date_join]['data_form'] = Tools::displayDate($data_v['date_from'], null, $fullDate);
                                 $cart_htl_data[$type_key]['date_diff'][$date_join]['data_to'] = Tools::displayDate($data_v['date_to'], null, $fullDate);
                                 $cart_htl_data[$type_key]['date_diff'][$date_join]['num_days'] = $num_days;

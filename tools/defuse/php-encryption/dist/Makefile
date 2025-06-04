@@ -2,14 +2,15 @@
 # must be installed and in your $PATH. Run it from inside the dist/ directory.
 
 box := $(shell which box)
-composer := "composer"
+composer := $(shell which composer)
+gitcommit := $(shell git rev-parse HEAD)
 
 .PHONY: all
 all: build-phar
 
 .PHONY: sign-phar
 sign-phar:
-	gpg -u 7B4B2D98 --armor --output defuse-crypto.phar.sig --detach-sig defuse-crypto.phar
+	gpg -u DD2E507F7BDB1669 --armor --output defuse-crypto.phar.sig --detach-sig defuse-crypto.phar
 
 # ensure we run in clean tree. export git tree and run there.
 .PHONY: build-phar
@@ -30,8 +31,9 @@ clean:
 
 defuse-crypto.phar: dist/box.json composer.lock
 	cp dist/box.json .
-	php -d phar.readonly=0 $(box) build -c box.json -v
+	php $(box) compile -c box.json -v
 
 composer.lock:
+	$(composer) config autoloader-suffix $(gitcommit)
 	$(composer) install --no-dev
 

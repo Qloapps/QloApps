@@ -35,7 +35,7 @@ class DashInsights extends Module
         parent::__construct();
         $this->displayName = $this->l('Dashboard Booking Insights');
         $this->description = $this->l('Adds a block with a graphical representation of booking insights.');
-        $this->confirmUnsinstall = $this->l('Are you sure you want to uninstall?');
+        $this->confirmUninstall = $this->l('Are you sure you want to uninstall?');
 
         $this->allow_push = true;
     }

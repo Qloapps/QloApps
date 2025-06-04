@@ -95,8 +95,8 @@ class SearchCore
 {
     public static function sanitize($string, $id_lang, $indexation = false, $iso_code = false)
     {
-        $string = trim($string);
-        if (empty($string)) {
+        // If some invalid or space, return empty string
+        if (null === $string || empty($string = trim($string))) {
             return '';
         }
 
@@ -170,7 +170,7 @@ class SearchCore
     }
 
     public static function find($id_lang, $expr, $page_number = 1, $page_size = 1, $order_by = 'position',
-        $order_way = 'desc', $ajax = false, $use_cookie = true, Context $context = null)
+        $order_way = 'desc', $ajax = false, $use_cookie = true, ?Context $context = null)
     {
         if (!$context) {
             $context = Context::getContext();
@@ -766,8 +766,7 @@ class SearchCore
         $queryArray3 = array();
     }
 
-    public static function searchTag($id_lang, $tag, $count = false, $pageNumber = 0, $pageSize = 10, $orderBy = false, $orderWay = false,
-            $useCookie = true, Context $context = null)
+    public static function searchTag($id_lang, $tag, $count = false, $pageNumber = 0, $pageSize = 10, $orderBy = false, $orderWay = false, $useCookie = true, ?Context $context = null)
     {
         if (!$context) {
             $context = Context::getContext();

@@ -16,7 +16,7 @@ class Smarty_Internal_Method_UnloadFilter extends Smarty_Internal_Method_LoadFil
      *
      * @api  Smarty::unloadFilter()
      *
-     * @link http://www.smarty.net/docs/en/api.unload.filter.tpl
+     * @link https://www.smarty.net/docs/en/api.unload.filter.tpl
      *
      * @param \Smarty_Internal_TemplateBase|\Smarty_Internal_Template|\Smarty $obj
      * @param string                                                          $type filter type

@@ -145,14 +145,14 @@ class ConfigurationTestCore
     public static function test_phpversion()
     {
         return (
-            version_compare(substr(phpversion(), 0, 5), '5.6.0', '>=')
-            && version_compare(substr(phpversion(), 0, 5), '8.0', '<')
+            version_compare(substr(phpversion(), 0, 5), '8.1.0', '>=')
+            && version_compare(substr(phpversion(), 0, 5), '8.5', '<')
         );
     }
 
     public static function test_new_phpversion()
     {
-        return version_compare(substr(phpversion(), 0, 5), '5.6.0', '>=');
+        return version_compare(substr(phpversion(), 0, 5), '8.1.0', '>=');
     }
 
     public static function test_mysql_support()
@@ -188,7 +188,7 @@ class ConfigurationTestCore
     public static function test_upload_max_filesize()
     {
         $upload_max_filesize = preg_replace('/[^0-9\.-]/', '', ini_get('upload_max_filesize'));
-        if ($upload_max_filesize >= 16) {
+        if ($upload_max_filesize >= 2) {
             return true;
         }
         return false;

@@ -511,7 +511,7 @@ class AdminOrdersControllerCore extends AdminController
                     'class' => 'icon-print',
                 );
 
-                if ($this->tabAccess['edit'] == 1) {
+                if ($this->tabAccess['edit'] === 1) {
                     if (((int) $order->isReturnable())
                         && !$order->hasCompletelyRefunded(Order::ORDER_COMPLETE_CANCELLATION_OR_REFUND_REQUEST_FLAG)
                     ) {
@@ -550,7 +550,7 @@ class AdminOrdersControllerCore extends AdminController
                 'modal_content' => $this->context->smarty->fetch('controllers/orders/modals/_booking_documents.tpl'),
             );
 
-            if ($this->tabAccess['edit'] == 1) {
+            if ($this->tabAccess['edit'] === 1) {
                 $modal['modal_actions'][] = array(
                     'type' => 'button',
                     'value' => 'submitDocument',
@@ -586,7 +586,7 @@ class AdminOrdersControllerCore extends AdminController
                 'modal_content' => $this->context->smarty->fetch('controllers/orders/modals/_document_note.tpl'),
             );
 
-            if ($this->tabAccess['edit'] == 1) {
+            if ($this->tabAccess['edit'] === 1) {
                 $modal['modal_actions'][] = array(
                     'type' => 'button',
                     'value' => 'submitDocumentNote',
@@ -1315,7 +1315,7 @@ class AdminOrdersControllerCore extends AdminController
 
         if (Tools::isSubmit('submitUpdateOrderStatus')
             && ($id_order_state = (int)Tools::getValue('id_order_state'))) {
-            if ($this->tabAccess['edit'] !== '1') {
+            if ($this->tabAccess['edit'] !== 1) {
                 $this->errors[] = Tools::displayError('You do not have permission to edit this order.');
             } else {
                 $order_state = new OrderState($id_order_state);
@@ -1502,7 +1502,7 @@ class AdminOrdersControllerCore extends AdminController
     {
         // Process reallocation of rooms
         if (Tools::isSubmit('realloc_allocated_rooms')) {
-            if ($this->tabAccess['edit'] === '1') {
+            if ($this->tabAccess['edit'] === 1) {
                 $idOrder = Tools::getValue('id_order');
                 $idHtlBookingFrom = Tools::getValue('id_htl_booking');
                 $idNewRoomType = Tools::getValue('realloc_avail_room_type');
@@ -1551,7 +1551,7 @@ class AdminOrdersControllerCore extends AdminController
 
         // Process swap of rooms
         if (Tools::isSubmit('swap_allocated_rooms')) {
-            if ($this->tabAccess['edit'] === '1') {
+            if ($this->tabAccess['edit'] === 1) {
                 $idOrder = Tools::getValue('id_order');
                 $idHtlBookingFrom = Tools::getValue('id_htl_booking');
                 $idHtlBookingToSwap = Tools::getValue('swap_avail_rooms');
@@ -1592,7 +1592,7 @@ class AdminOrdersControllerCore extends AdminController
         }
         // To update order status when admin changes from order detail page
         if (Tools::isSubmit('submitbookingOrderStatus')) {
-            if ($this->tabAccess['edit'] === '1') {
+            if ($this->tabAccess['edit'] === 1) {
                 $this->changeRoomStatus();
             } else {
                 $this->errors[] = $this->l('You do not have permission to edit this order.');
@@ -1610,7 +1610,7 @@ class AdminOrdersControllerCore extends AdminController
 
         /* Update shipping number */
         if (Tools::isSubmit('submitShippingNumber') && isset($order)) {
-            if ($this->tabAccess['edit'] === '1') {
+            if ($this->tabAccess['edit'] === 1) {
                 $order_carrier = new OrderCarrier(Tools::getValue('id_order_carrier'));
                 if (!Validate::isLoadedObject($order_carrier)) {
                     $this->errors[] = Tools::displayError('The order carrier ID is invalid.');
@@ -1673,7 +1673,7 @@ class AdminOrdersControllerCore extends AdminController
 
         /* Change order status, add a new entry in order history and send an e-mail to the customer if needed */
         elseif (Tools::isSubmit('submitState') && isset($order)) {
-            if ($this->tabAccess['edit'] === '1') {
+            if ($this->tabAccess['edit'] === 1) {
                 $result = $order->changeOrderStatus();
                 if ($result['status']) {
                     Tools::redirectAdmin(self::$currentIndex.'&id_order='.(int)$order->id.'&conf=5&vieworder&token='.$this->token);
@@ -1687,7 +1687,7 @@ class AdminOrdersControllerCore extends AdminController
 
         /* Add a new message for the current order and send an e-mail to the customer if needed */
         elseif (Tools::isSubmit('submitMessage') && isset($order)) {
-            if ($this->tabAccess['edit'] === '1') {
+            if ($this->tabAccess['edit'] === 1) {
                 $customer = new Customer(Tools::getValue('id_customer'));
                 $message = Tools::getValue('message');
                 if (!Validate::isLoadedObject($customer)) {
@@ -1794,7 +1794,7 @@ class AdminOrdersControllerCore extends AdminController
 
         /* booking refunds from order */
         elseif (Tools::isSubmit('initiateRefund') && isset($order)) {
-            if ($this->tabAccess['edit'] === '1') {
+            if ($this->tabAccess['edit'] === 1) {
                 $objOrderReturn = new OrderReturn();
                 $bookings = Tools::getValue('id_htl_booking');
                 if ($bookings && count($bookings)) {
@@ -1842,7 +1842,7 @@ class AdminOrdersControllerCore extends AdminController
                         if ($bookings) {
                             foreach ($bookings as $idHtlBooking) {
                                 $objHtlBooking = new HotelBookingDetail($idHtlBooking);
-                                $numDays = $objHtlBooking->getNumberOfDays(
+                                $numDays = HotelHelper::getNumberOfDays(
                                     $objHtlBooking->date_from,
                                     $objHtlBooking->date_to
                                 );
@@ -1932,7 +1932,7 @@ class AdminOrdersControllerCore extends AdminController
         } elseif (Tools::isSubmit('messageReaded')) {
             Message::markAsReaded(Tools::getValue('messageReaded'), $this->context->employee->id);
         } elseif (Tools::isSubmit('submitAddPayment') && isset($order)) {
-            if ($this->tabAccess['edit'] === '1') {
+            if ($this->tabAccess['edit'] === 1) {
                 $amount = str_replace(',', '.', Tools::getValue('payment_amount'));
                 $currency = new Currency(Tools::getValue('payment_currency'));
                 $payment_type = Tools::getValue('payment_type');
@@ -2001,7 +2001,7 @@ class AdminOrdersControllerCore extends AdminController
             $order_invoice = new OrderInvoice((int)Tools::getValue('id_order_invoice'));
             if (Validate::isLoadedObject($order_invoice)) {
                 if (Validate::isCleanHtml($note)) {
-                    if ($this->tabAccess['edit'] === '1') {
+                    if ($this->tabAccess['edit'] === 1) {
                         $order_invoice->note = $note;
                         if ($order_invoice->save()) {
                             Tools::redirectAdmin(self::$currentIndex.'&id_order='.$order_invoice->id_order.'&vieworder&conf=4&token='.$this->token);
@@ -2018,7 +2018,7 @@ class AdminOrdersControllerCore extends AdminController
                 $this->errors[] = Tools::displayError('The invoice for edit note was unable to load. ');
             }
         } elseif (Tools::isSubmit('submitAddOrder') && ($id_cart = Tools::getValue('id_cart'))) {
-            if ($this->tabAccess['add'] === '1') {
+            if ($this->tabAccess['add'] === 1) {
                 $objCart = new Cart($id_cart);
                 if (Validate::isLoadedObject($objCart)) {
                     $this->context->cart = $objCart;
@@ -2046,6 +2046,8 @@ class AdminOrdersControllerCore extends AdminController
                             } else {
                                 $paymentAmount = (float) $paymentAmount;
                             }
+                        } else {
+                            $paymentAmount = $orderTotal;
                         }
 
                         if ($paymentAmount >= 0) {
@@ -2154,7 +2156,7 @@ class AdminOrdersControllerCore extends AdminController
                 $this->errors[] = Tools::displayError('You do not have permission to add this.');
             }
         } elseif ((Tools::isSubmit('submitAddressShipping') || Tools::isSubmit('submitAddressInvoice')) && isset($order)) {
-            if ($this->tabAccess['edit'] === '1') {
+            if ($this->tabAccess['edit'] === 1) {
                 $address = new Address(Tools::getValue('id_address'));
                 if (Validate::isLoadedObject($address)) {
                     // Update the address on order
@@ -2172,7 +2174,7 @@ class AdminOrdersControllerCore extends AdminController
                 $this->errors[] = Tools::displayError('You do not have permission to edit this order.');
             }
         } elseif (Tools::isSubmit('submitChangeCurrency') && isset($order)) {
-            if ($this->tabAccess['edit'] === '1') {
+            if ($this->tabAccess['edit'] === 1) {
                 if (Tools::getValue('new_currency') != $order->id_currency && !$order->valid) {
                     $old_currency = new Currency($order->id_currency);
                     $currency = new Currency(Tools::getValue('new_currency'));
@@ -2429,7 +2431,7 @@ class AdminOrdersControllerCore extends AdminController
                 Tools::redirectAdmin(self::$currentIndex.'&id_order='.$order->id.'&vieworder&conf=4&token='.$this->token);
             }
         } elseif (Tools::isSubmit('submitDeleteVoucher') && isset($order)) {
-            if ($this->tabAccess['edit'] === '1') {
+            if ($this->tabAccess['edit'] === 1) {
                 $order_cart_rule = new OrderCartRule(Tools::getValue('id_order_cart_rule'));
                 if (Validate::isLoadedObject($order_cart_rule) && $order_cart_rule->id_order == $order->id) {
                     if ($order_cart_rule->id_order_invoice) {
@@ -2478,7 +2480,7 @@ class AdminOrdersControllerCore extends AdminController
                 $this->errors[] = Tools::displayError('You do not have permission to edit this order.');
             }
         } elseif (Tools::isSubmit('submitNewVoucher') && isset($order)) {
-            if ($this->tabAccess['edit'] === '1') {
+            if ($this->tabAccess['edit'] === 1) {
                 if (!Tools::getValue('discount_name')) {
                     $this->errors[] = Tools::displayError('You must specify a name in order to create a new discount.');
                 } elseif ((float)Tools::getValue('discount_value') <= 0) {
@@ -2653,7 +2655,7 @@ class AdminOrdersControllerCore extends AdminController
                 $this->errors[] = Tools::displayError('You do not have permission to edit this order.');
             }
         } elseif (Tools::isSubmit('sendStateEmail') && Tools::getValue('sendStateEmail') > 0 && Tools::getValue('id_order') > 0) {
-            if ($this->tabAccess['edit'] === '1') {
+            if ($this->tabAccess['edit'] === 1) {
                 $order_state = new OrderState((int)Tools::getValue('sendStateEmail'));
 
                 if (!Validate::isLoadedObject($order_state)) {
@@ -3388,7 +3390,7 @@ class AdminOrdersControllerCore extends AdminController
                 /*Product price when order was created*/
                 $totalRoomsCostTE += $value['total_price_tax_excl'];
                 $total_room_tax += $value['total_price_tax_incl']-$value['total_price_tax_excl'];
-                $num_days = $objBookingDetail->getNumberOfDays($value['date_from'], $value['date_to']);
+                $num_days = HotelHelper::getNumberOfDays($value['date_from'], $value['date_to']);
                 $order_detail_data[$key]['unit_amt_tax_excl'] = $value['total_price_tax_excl']/$num_days;
                 $order_detail_data[$key]['unit_amt_tax_incl'] = $value['total_price_tax_incl']/$num_days;
                 $order_detail_data[$key]['amt_with_qty_tax_excl'] = $value['total_price_tax_excl'];
@@ -3580,7 +3582,7 @@ class AdminOrdersControllerCore extends AdminController
             'carrierModuleCall' => $carrier_module_call,
             'iso_code_lang' => $this->context->language->iso_code,
             'id_lang' => $this->context->language->id,
-            'can_edit' => ($this->tabAccess['edit'] == 1),
+            'can_edit' => ($this->tabAccess['edit'] === 1),
             'current_id_lang' => $this->context->language->id,
             'invoices_collection' => $order->getInvoicesCollection(),
             'not_paid_invoices_collection' => $order->getNotPaidInvoicesCollection(),
@@ -3725,7 +3727,7 @@ class AdminOrdersControllerCore extends AdminController
     {
         $response = array('status' => false);
 
-        if ($this->tabAccess['edit'] === '1') {
+        if ($this->tabAccess['edit'] === 1) {
             $idHtlBooking = (int) Tools::getValue('id_htl_booking');
             $title = Tools::getValue('title');
 
@@ -3745,7 +3747,7 @@ class AdminOrdersControllerCore extends AdminController
 
             $objHotelBookingDocument = new HotelBookingDocument();
             $objHotelBookingDocument->setFileInfoForUploadedDocument('booking_document');
-            if (!count($objHotelBookingDocument->fileInfo)) {
+            if (!$objHotelBookingDocument->fileInfo || !count($objHotelBookingDocument->fileInfo)) {
                 $this->errors[] = $this->l('Please select a file to upload.');
             } elseif ($objHotelBookingDocument->fileInfo['size'] > Tools::getMaxUploadSize()) {
                 $this->errors[] = $this->l('Uploaded file size is too large.');
@@ -3789,7 +3791,7 @@ class AdminOrdersControllerCore extends AdminController
     {
         $response = array('status' => false);
 
-        if ($this->tabAccess['edit'] == '1') {
+        if ($this->tabAccess['edit'] === 1) {
             $idHtlBookingDocument = (int) Tools::getValue('id_htl_booking_document');
 
             $objHotelBookingDocument = new HotelBookingDocument($idHtlBookingDocument);
@@ -3819,7 +3821,7 @@ class AdminOrdersControllerCore extends AdminController
         );
 
         // Check tab access is allowed to edit
-        if ($this->tabAccess['edit'] == 1) {
+        if ($this->tabAccess['edit'] === 1) {
             if (Validate::isLoadedObject($order = new Order(Tools::getValue('id_order')))) {
                 $objCustomerGuestDetail = new OrderCustomerGuestDetail();
                 $response['errors'] = $objCustomerGuestDetail->validateController();
@@ -4111,7 +4113,7 @@ class AdminOrdersControllerCore extends AdminController
 
     public function ajaxProcessSendMailValidateOrder()
     {
-        if ($this->tabAccess['edit'] === '1') {
+        if ($this->tabAccess['edit'] === 1) {
             $cart = new Cart((int)Tools::getValue('id_cart'));
             if (Validate::isLoadedObject($cart)) {
                 $customer = new Customer((int)$cart->id_customer);
@@ -4147,7 +4149,7 @@ class AdminOrdersControllerCore extends AdminController
     public function ajaxProcessAddServiceProductOnOrder()
     {
         // Check tab access is allowed to edit
-        if (!$this->tabAccess['edit'] == 1) {
+        if (!$this->tabAccess['edit'] === 1) {
             die(json_encode(array(
                 'result' => false,
                 'error' => Tools::displayError('You do not have permission to edit this order.')
@@ -4274,7 +4276,7 @@ class AdminOrdersControllerCore extends AdminController
 
         if ($update_quantity < 0) {
             // If product has attribute, minimal quantity is set with minimal quantity of attribute
-            $minimal_quantity = ($product_informations['product_attribute_id']) ? Attribute::getAttributeMinimalQty($product_informations['product_attribute_id']) : $product->minimal_quantity;
+            $minimal_quantity = ($product_informations['product_attribute_id']) ? ProductAttribute::getAttributeMinimalQty($product_informations['product_attribute_id']) : $product->minimal_quantity;
             die(Tools::jsonEncode(array('error' => sprintf(Tools::displayError('You must add %d minimum quantity', false), $minimal_quantity))));
         } elseif (!$update_quantity) {
             die(Tools::jsonEncode(array('error' => Tools::displayError('You already have the maximum quantity available for this product.', false))));
@@ -4514,7 +4516,7 @@ class AdminOrdersControllerCore extends AdminController
     public function ajaxProcessAddRoomOnOrder()
     {
         // Check tab access is allowed to edit
-        if (!$this->tabAccess['edit'] == 1) {
+        if (!$this->tabAccess['edit'] === 1) {
             die(json_encode(array(
                 'result' => false,
                 'error' => Tools::displayError('You do not have permission to edit this order.')
@@ -4651,7 +4653,7 @@ class AdminOrdersControllerCore extends AdminController
             $req_rm = $product_informations['product_quantity'];
         }
         $obj_booking_detail = new HotelBookingDetail();
-        $num_days = $obj_booking_detail->getNumberOfDays($date_from, $date_to);
+        $num_days = HotelHelper::getNumberOfDays($date_from, $date_to);
         $product_informations['product_quantity'] = $product_informations['product_quantity'] * (int) $num_days;
 
         $obj_room_type = new HotelRoomType();
@@ -4845,7 +4847,7 @@ class AdminOrdersControllerCore extends AdminController
 
         if ($update_quantity < 0) {
             // If product has attribute, minimal quantity is set with minimal quantity of attribute
-            $minimal_quantity = ($product_informations['product_attribute_id']) ? Attribute::getAttributeMinimalQty($product_informations['product_attribute_id']) : $product->minimal_quantity;
+            $minimal_quantity = ($product_informations['product_attribute_id']) ? ProductAttribute::getAttributeMinimalQty($product_informations['product_attribute_id']) : $product->minimal_quantity;
             die(json_encode(array('error' => sprintf(Tools::displayError('You must add %d minimum quantity', false), $minimal_quantity))));
         } elseif (!$update_quantity) {
             die(json_encode(array('error' => Tools::displayError('You already have the maximum quantity available for this product.', false))));
@@ -5262,7 +5264,7 @@ class AdminOrdersControllerCore extends AdminController
         $objOrder = new Order($idOrder);
         $idProductOption = null;
         $addressTax = new Address($objOrder->id_address_tax, $this->context->language->id);
-        if (!$this->tabAccess['edit'] == 1) {
+        if (!$this->tabAccess['edit'] === 1) {
             $response['status'] = false;
             $response['error'] = Tools::displayError('You do not have permission to edit this order.');
         } elseif (!Validate::isLoadedObject($objOrder)) {
@@ -5545,7 +5547,7 @@ class AdminOrdersControllerCore extends AdminController
     /**
      * This function is called when order is changed (Add/Edit/Delete room on order)
      */
-    public function sendChangedNotification(Order $order = null)
+    public function sendChangedNotification(?Order $order = null)
     {
         if (is_null($order)) {
             $order = new Order(Tools::getValue('id_order'));
@@ -5606,7 +5608,7 @@ class AdminOrdersControllerCore extends AdminController
     public function ajaxProcessEditRoomOnOrder()
     {
         // Check tab access is allowed to edit
-        if (!$this->tabAccess['edit'] == 1) {
+        if (!$this->tabAccess['edit'] === 1) {
             die(json_encode(array(
                 'result' => false,
                 'error' => Tools::displayError('You do not have permission to edit this order.')
@@ -5638,8 +5640,8 @@ class AdminOrdersControllerCore extends AdminController
         $id_room = trim(Tools::getValue('id_room'));
         $id_product = trim(Tools::getValue('id_product'));
         $room_unit_price = trim(Tools::getValue('room_unit_price'));
-        $product_quantity = (int) $obj_booking_detail->getNumberOfDays($new_date_from, $new_date_to);
-        $old_product_quantity =  (int) $obj_booking_detail->getNumberOfDays($old_date_from, $old_date_to);
+        $product_quantity = (int) HotelHelper::getNumberOfDays($new_date_from, $new_date_to);
+        $old_product_quantity =  (int) HotelHelper::getNumberOfDays($old_date_from, $old_date_to);
         $qty_diff = $product_quantity - $old_product_quantity;
         $occupancy = array_shift(Tools::getValue('occupancy'));
         $adults = $occupancy['adults'];
@@ -5888,7 +5890,7 @@ class AdminOrdersControllerCore extends AdminController
                             if ($rDemand['price_calc_method'] == HotelRoomTypeGlobalDemand::WK_PRICE_CALC_METHOD_EACH_DAY) {
                                 $objBookingDemand = new HotelBookingDemands($rDemand['id_booking_demand']);
 
-                                $numDays = $obj_booking_detail->getNumberOfDays($new_date_from, $new_date_to);
+                                $numDays = HotelHelper::getNumberOfDays($new_date_from, $new_date_to);
                                 $demandPriceTE = Tools::processPriceRounding(
                                     ($objBookingDemand->unit_price_tax_excl * $numDays),
                                     1,
@@ -6029,7 +6031,7 @@ class AdminOrdersControllerCore extends AdminController
         $idOrder = (int) Tools::getValue('id_order');
         $objOrder = new Order($idOrder);
         $editProductInfo = Tools::getValue('edit_product');
-        if (!$this->tabAccess['edit'] == 1) {
+        if (!$this->tabAccess['edit'] === 1) {
             $response['status'] = false;
             $response['error'] = Tools::displayError('You do not have permission to edit this order.');
         } elseif (!Validate::isLoadedObject($objOrder)) {
@@ -6146,7 +6148,7 @@ class AdminOrdersControllerCore extends AdminController
     public function ajaxProcessDeleteRoomLine()
     {
         // Check tab access is allowed to edit
-        if (!$this->tabAccess['edit'] == 1) {
+        if (!$this->tabAccess['edit'] === 1) {
             die(json_encode(array(
                 'result' => false,
                 'error' => Tools::displayError('You do not have permission to edit this order.')
@@ -6170,7 +6172,7 @@ class AdminOrdersControllerCore extends AdminController
                 'error' => Tools::displayError('Booking Detail not found.'),
             )));
         }
-        $product_quantity = (int) $objBookingDetail->getNumberOfDays($objBookingDetail->date_from, $objBookingDetail->date_to);
+        $product_quantity = (int) HotelHelper::getNumberOfDays($objBookingDetail->date_from, $objBookingDetail->date_to);
         if (!Validate::isUnsignedInt($product_quantity)) {
             die(json_encode(array(
                 'result' => false,
@@ -6221,7 +6223,7 @@ class AdminOrdersControllerCore extends AdminController
             1,
             1,
             0,
-            l,
+            null,
             0,
             $idHotelBooking
         );
@@ -6237,7 +6239,7 @@ class AdminOrdersControllerCore extends AdminController
             1,
             0,
             0,
-            l,
+            null,
             0,
             $idHotelBooking
         );
@@ -6484,7 +6486,7 @@ class AdminOrdersControllerCore extends AdminController
 
         $objOrder = new Order($idOrder);
         $objOrderDetail = new OrderDetail($idOrderDetail);
-        if (!$this->tabAccess['edit'] == 1) {
+        if (!$this->tabAccess['edit'] === 1) {
             $response['status'] = false;
             $response['error'] = Tools::displayError('You do not have permission to edit this order.');
         } elseif (!Validate::isLoadedObject($objOrder)) {
@@ -6554,7 +6556,7 @@ class AdminOrdersControllerCore extends AdminController
         $this->ajaxDie(json_encode($response));
     }
 
-    protected function doEditProductValidation(OrderDetail $order_detail, Order $order, OrderInvoice $order_invoice = null)
+    protected function doEditProductValidation(OrderDetail $order_detail, Order $order, ?OrderInvoice $order_invoice = null)
     {
         $this->doEditValidation($order_detail, $order, $order_invoice);
 
@@ -6588,7 +6590,7 @@ class AdminOrdersControllerCore extends AdminController
      * @param OrderInvoice $order_invoice
      * @return bool
      */
-    protected function doEditRoomValidation(OrderDetail $order_detail, Order $order, OrderInvoice $order_invoice = null)
+    protected function doEditRoomValidation(OrderDetail $order_detail, Order $order, ?OrderInvoice $order_invoice = null)
     {
         $this->doEditValidation($order_detail, $order, $order_invoice);
 
@@ -6605,8 +6607,8 @@ class AdminOrdersControllerCore extends AdminController
         $id_product = trim(Tools::getValue('id_product'));
         $room_unit_price = trim(Tools::getValue('room_unit_price'));
         $obj_booking_detail = new HotelBookingDetail();
-        $product_quantity = (int) $obj_booking_detail->getNumberOfDays($new_date_from, $new_date_to);
-        $old_product_quantity =  (int) $obj_booking_detail->getNumberOfDays($old_date_from, $old_date_to);
+        $product_quantity = (int) HotelHelper::getNumberOfDays($new_date_from, $new_date_to);
+        $old_product_quantity =  (int) HotelHelper::getNumberOfDays($old_date_from, $old_date_to);
         $qty_diff = $product_quantity - $old_product_quantity;
         $occupancy = array_shift(Tools::getValue('occupancy'));
         $adults = $occupancy['adults'];
@@ -6783,7 +6785,7 @@ class AdminOrdersControllerCore extends AdminController
         }
     }
 
-    protected function doEditValidation(OrderDetail $order_detail, Order $order, OrderInvoice $order_invoice = null)
+    protected function doEditValidation(OrderDetail $order_detail, Order $order, ?OrderInvoice $order_invoice = null)
     {
         if (!Validate::isLoadedObject($order_detail)) {
             die(json_encode(array(
@@ -7248,7 +7250,7 @@ class AdminOrdersControllerCore extends AdminController
     {
         $response = array('hasError' => false);
         // Check tab access is allowed to edit
-        if ($this->tabAccess['edit'] == 1) {
+        if ($this->tabAccess['edit'] === 1) {
             if ($selectedServicesOrderDetails = Tools::getValue('id_service_product_order_detail')) {
                 $serviceQuantities = Tools::getValue('service_qty');
                 $serviceUnitPrices = Tools::getValue('service_price');
@@ -7401,7 +7403,7 @@ class AdminOrdersControllerCore extends AdminController
     {
         $response = array('hasError' => false);
         // Check tab access is allowed to edit
-        if ($this->tabAccess['edit'] == 1) {
+        if ($this->tabAccess['edit'] === 1) {
             $idBookingDetail = Tools::getValue('id_booking_detail');
             if ($selectedServices = Tools::getValue('selected_service')) {
                 // valiadate services being added
@@ -7414,7 +7416,7 @@ class AdminOrdersControllerCore extends AdminController
                     $this->context->currency = new Currency($objOrder->id_currency);
 
                     $objRoomTypeServiceProduct = new RoomTypeServiceProduct();
-                    $qty = Tools::getValue('service_qty');
+                    $qty = Tools::getValue('service_qty', []);
                     $price = Tools::getValue('service_price');
                     foreach ($selectedServices as $key => $service) {
                         $objProduct = new Product($service, false, $this->context->language->id);
@@ -7615,7 +7617,7 @@ class AdminOrdersControllerCore extends AdminController
 
                             // Save changes of order
                             $order->update();
-                            if (Validate::isLoadedObject($specific_price)) {
+                            if (isset($specific_price) && Validate::isLoadedObject($specific_price)) {
                                 $specific_price->delete();
                                 unset($specific_price);
                             }
@@ -7648,7 +7650,7 @@ class AdminOrdersControllerCore extends AdminController
     {
         $response = array('hasError' => false);
         // Check tab access is allowed to edit
-        if ($this->tabAccess['edit'] == 1) {
+        if ($this->tabAccess['edit'] === 1) {
             if (Configuration::get('PS_ALLOW_CREATE_CUSTOM_SERVICES_IN_BOOKING')) {
                 $idBookingDetail = Tools::getValue('id_booking_detail');
                 // valiadate services being added
@@ -7970,7 +7972,7 @@ class AdminOrdersControllerCore extends AdminController
     {
         $response = array('hasError' => false);
         // Check tab access is allowed to edit
-        if ($this->tabAccess['edit'] == 1) {
+        if ($this->tabAccess['edit'] === 1) {
             $idServiceProductOrderDetail = Tools::getValue('id_service_product_order_detail');
             if (Validate::isLoadedObject($objServiceProductOrderDetail = new ServiceProductOrderDetail($idServiceProductOrderDetail))) {
                 $objOrderDetail = new OrderDetail($objServiceProductOrderDetail->id_order_detail);
@@ -8094,7 +8096,7 @@ class AdminOrdersControllerCore extends AdminController
     public function ajaxProcessAddRoomExtraDemands()
     {
         $response = array('success' => false, 'hasError' => false);
-        if ($this->tabAccess['edit'] == 1) {
+        if ($this->tabAccess['edit'] === 1) {
             if ($idHtlBooking = Tools::getValue('id_htl_booking')) {
                 if (Validate::isLoadedObject($objBookingDetail = new HotelBookingDetail($idHtlBooking))) {
                     $roomDemands = Tools::getValue('room_demands');
@@ -8144,7 +8146,7 @@ class AdminOrdersControllerCore extends AdminController
                                 );
                                 $numDays = 1;
                                 if ($objGlobalDemand->price_calc_method == HotelRoomTypeGlobalDemand::WK_PRICE_CALC_METHOD_EACH_DAY) {
-                                    $numDays = $objHtlBkDtl->getNumberOfDays(
+                                    $numDays = HotelHelper::getNumberOfDays(
                                         $objBookingDetail->date_from,
                                         $objBookingDetail->date_to
                                     );
@@ -8216,7 +8218,7 @@ class AdminOrdersControllerCore extends AdminController
     public function ajaxProcessUpdateRoomExtraDemands()
     {
         $response = array('success' => false);
-        if ($this->tabAccess['edit'] == 1) {
+        if ($this->tabAccess['edit'] === 1) {
             if ($idBookingDemand = Tools::getValue('id_booking_demand')) {
                 if (Validate::isLoadedObject($objBookingDemand = new HotelBookingDemands($idBookingDemand))) {
                     $unitPrice = Tools::getValue('unit_price');
@@ -8238,7 +8240,7 @@ class AdminOrdersControllerCore extends AdminController
                     $objBookingDetail = new HotelBookingDetail($objBookingDemand->id_htl_booking);
                     $order = new Order($objBookingDetail->id_order);
                     if ($objBookingDemand->price_calc_method == HotelRoomTypeGlobalDemand::WK_PRICE_CALC_METHOD_EACH_DAY) {
-                        $numDays = $objBookingDetail->getNumberOfDays(
+                        $numDays = HotelHelper::getNumberOfDays(
                             $objBookingDetail->date_from,
                             $objBookingDetail->date_to
                         );
@@ -8314,7 +8316,7 @@ class AdminOrdersControllerCore extends AdminController
     {
         $response = array('success' => false);
         // Check tab access is allowed to edit
-        if ($this->tabAccess['edit'] == 1) {
+        if ($this->tabAccess['edit'] === 1) {
             $res = true;
             if ($idBookingDemand = Tools::getValue('id_booking_demand')) {
                 if (Validate::isLoadedObject($objBookingDemand = new HotelBookingDemands($idBookingDemand))) {

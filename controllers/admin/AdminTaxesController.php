@@ -138,7 +138,7 @@ class AdminTaxesControllerCore extends AdminController
      * @throws Exception
      * @throws SmartyException
      */
-    public function displayDeleteLink($token = null, $id)
+    public function displayDeleteLink($token, $id)
     {
         if (!array_key_exists('Delete', self::$cache_lang)) {
             self::$cache_lang['Delete'] = $this->l('Delete');

@@ -16,7 +16,7 @@ class Smarty_Internal_Method_UnregisterFilter extends Smarty_Internal_Method_Reg
      *
      * @api  Smarty::unregisterFilter()
      *
-     * @link http://www.smarty.net/docs/en/api.unregister.filter.tpl
+     * @link https://www.smarty.net/docs/en/api.unregister.filter.tpl
      *
      * @param \Smarty_Internal_TemplateBase|\Smarty_Internal_Template|\Smarty $obj
      * @param string                                                          $type filter type

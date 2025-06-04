@@ -27,6 +27,13 @@ class HTMLPurifier_AttrDef_CSS extends HTMLPurifier_AttrDef
         $definition = $config->getCSSDefinition();
         $allow_duplicates = $config->get("CSS.AllowDuplicates");
 
+        $universal_attrdef = new HTMLPurifier_AttrDef_Enum(
+            array(
+                'initial',
+                'inherit',
+                'unset',
+            )
+        );
 
         // According to the CSS2.1 spec, the places where a
         // non-delimiting semicolon can appear are in strings
@@ -96,16 +103,13 @@ class HTMLPurifier_AttrDef_CSS extends HTMLPurifier_AttrDef
             if (!$ok) {
                 continue;
             }
-            // inefficient call, since the validator will do this again
-            if (strtolower(trim($value)) !== 'inherit') {
-                // inherit works for everything (but only on the base property)
+            $result = $universal_attrdef->validate($value, $config, $context);
+            if ($result === false) {
                 $result = $definition->info[$property]->validate(
                     $value,
                     $config,
                     $context
                 );
-            } else {
-                $result = 'inherit';
             }
             if ($result === false) {
                 continue;

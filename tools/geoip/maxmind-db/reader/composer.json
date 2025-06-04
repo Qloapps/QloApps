@@ -1,0 +1,42 @@
+{
+    "name": "maxmind-db/reader",
+    "description": "MaxMind DB Reader API",
+    "keywords": ["database", "geoip", "geoip2", "geolocation", "maxmind"],
+    "homepage": "https://github.com/maxmind/MaxMind-DB-Reader-php",
+    "type": "library",
+    "license": "Apache-2.0",
+    "authors": [
+        {
+            "name": "Gregory J. Oschwald",
+            "email": "goschwald@maxmind.com",
+            "homepage": "https://www.maxmind.com/"
+        }
+    ],
+    "require": {
+        "php": ">=7.2"
+    },
+    "suggest": {
+        "ext-bcmath": "bcmath or gmp is required for decoding larger integers with the pure PHP decoder",
+        "ext-gmp": "bcmath or gmp is required for decoding larger integers with the pure PHP decoder",
+        "ext-maxminddb": "A C-based database decoder that provides significantly faster lookups"
+    },
+    "conflict": {
+        "ext-maxminddb": "<1.11.1 || >=2.0.0"
+    },
+    "require-dev": {
+        "friendsofphp/php-cs-fixer": "3.*",
+        "phpunit/phpunit": ">=8.0.0,<10.0.0",
+        "squizlabs/php_codesniffer": "3.*",
+        "phpstan/phpstan": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "MaxMind\\Db\\": "src/MaxMind/Db"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "MaxMind\\Db\\Test\\Reader\\": "tests/MaxMind/Db/Test/Reader"
+        }
+    }
+}

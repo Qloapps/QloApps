@@ -362,19 +362,19 @@ class AdminCustomersControllerCore extends AdminController
         parent::initProcess();
 
         if (Tools::isSubmit('submitGuestToCustomer') && $this->id_object) {
-            if ($this->tabAccess['edit'] === '1') {
+            if ($this->tabAccess['edit'] === 1) {
                 $this->action = 'guest_to_customer';
             } else {
                 $this->errors[] = Tools::displayError('You do not have permission to edit this.');
             }
         } elseif (Tools::isSubmit('changeNewsletterVal') && $this->id_object) {
-            if ($this->tabAccess['edit'] === '1') {
+            if ($this->tabAccess['edit'] === 1) {
                 $this->action = 'change_newsletter_val';
             } else {
                 $this->errors[] = Tools::displayError('You do not have permission to edit this.');
             }
         } elseif (Tools::isSubmit('changeOptinVal') && $this->id_object) {
-            if ($this->tabAccess['edit'] === '1') {
+            if ($this->tabAccess['edit'] === 1) {
                 $this->action = 'change_optin_val';
             } else {
                 $this->errors[] = Tools::displayError('You do not have permission to edit this.');
@@ -393,7 +393,7 @@ class AdminCustomersControllerCore extends AdminController
 
     public function renderList()
     {
-        if ((Tools::isSubmit('submitBulkdelete'.$this->table) || Tools::isSubmit('delete'.$this->table)) && $this->tabAccess['delete'] === '1') {
+        if ((Tools::isSubmit('submitBulkdelete'.$this->table) || Tools::isSubmit('delete'.$this->table)) && $this->tabAccess['delete'] === 1) {
             $this->tpl_list_vars = array(
                 'delete_customer' => true,
                 'REQUEST_URI' => $_SERVER['REQUEST_URI'],
@@ -1333,7 +1333,7 @@ class AdminCustomersControllerCore extends AdminController
      * @param string $name
      * @return mixed
      */
-    public function displayDeleteLink($token = null, $id, $name = null)
+    public function displayDeleteLink($token, $id, $name = null)
     {
         $tpl = $this->createTemplate('helpers/list/list_action_delete.tpl');
 
@@ -1392,7 +1392,7 @@ class AdminCustomersControllerCore extends AdminController
      */
     public function ajaxProcessUpdateCustomerNote()
     {
-        if ($this->tabAccess['edit'] === '1') {
+        if ($this->tabAccess['edit'] === 1) {
             $note = Tools::htmlentitiesDecodeUTF8(Tools::getValue('note'));
             $customer = new Customer((int)Tools::getValue('id_customer'));
             if (!Validate::isLoadedObject($customer)) {
@@ -1467,7 +1467,7 @@ class AdminCustomersControllerCore extends AdminController
     {
         $response = array('hasError' => 0, 'errors' => array());
         // Check tab access is allowed to edit
-        if ($this->tabAccess['edit'] == 1) {
+        if ($this->tabAccess['edit'] === 1) {
             if (Validate::isLoadedObject($objCustomerGuestDetail = new CustomerGuestDetail((int) Tools::getValue('id_customer_guest_detail')))) {
                 $response['errors'] = $objCustomerGuestDetail->validateController();
                 if (!Tools::getValue('lastname')) {
@@ -1520,7 +1520,7 @@ class AdminCustomersControllerCore extends AdminController
     {
         $response = array('hasError' => 1, 'errors' => array());
         // Check tab access is allowed to edit
-        if ($this->tabAccess['delete'] == 1) {
+        if ($this->tabAccess['delete'] === 1) {
             if (Validate::isLoadedObject($objCustomerGuestDetail = new CustomerGuestDetail((int) Tools::getValue('id_customer_guest_detail')))) {
                 if ($objCustomerGuestDetail->delete()) {
                     $response['hasError'] = false;

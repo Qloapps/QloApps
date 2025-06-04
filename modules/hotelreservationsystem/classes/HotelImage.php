@@ -23,7 +23,8 @@ class HotelImage extends ObjectModel
     public $id;
     public $id_hotel;
     public $cover;
-
+    public $source_index;
+    public $image_dir;
     public $image_format = 'jpg';
 
     protected static $access_rights = 0755;

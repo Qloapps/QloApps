@@ -158,12 +158,6 @@ class InstallControllerConsoleProcess extends InstallControllerConsole
                 ));
             Tools::file_get_contents('http://www.prestashop.com/ajax/controller.php?'.$params);
         }
-
-        if ($this->datas->send_email) {
-            if (!$this->processSendEmail()) {
-                $this->printErrors();
-            }
-        }
     }
 
     /**
@@ -299,44 +293,4 @@ class InstallControllerConsoleProcess extends InstallControllerConsole
         return $this->model_install->installModulesAddons();
     }
 
-  /**
-  * PROCESS : sendEmail
-  * Send information e-mail
-  */
-  public function processSendEmail()
-  {
-      require_once _PS_INSTALL_MODELS_PATH_.'mail.php';
-      $mail = new InstallModelMail(
-      false,
-      $this->datas->smtp_server,
-      $this->datas->smtp_login,
-      $this->datas->smtp_password,
-      $this->datas->smtp_port,
-      $this->datas->smtp_encryption,
-      $this->datas->admin_email
-    );
-
-      if (file_exists(_PS_INSTALL_LANGS_PATH_.$this->language->getLanguageIso().'/mail_identifiers.txt')) {
-          $content = file_get_contents(_PS_INSTALL_LANGS_PATH_.$this->language->getLanguageIso().'/mail_identifiers.txt');
-      } else {
-          $content = file_get_contents(_PS_INSTALL_LANGS_PATH_.InstallLanguages::DEFAULT_ISO.'/mail_identifiers.txt');
-      }
-
-      $vars = array(
-      '{firstname}' => $this->datas->admin_firstname,
-      '{lastname}' => $this->datas->admin_lastname,
-      '{shop_name}' => $this->datas->shop_name,
-      '{passwd}' => $this->datas->admin_password,
-      '{email}' => $this->datas->admin_email,
-      '{shop_url}' => Tools::getHttpHost(true).__PS_BASE_URI__,
-    );
-      $content = str_replace(array_keys($vars), array_values($vars), $content);
-
-      $mail->send(
-      $this->l('%s Login information', $this->datas->shop_name),
-      $content
-    );
-
-      return true;
-  }
 }

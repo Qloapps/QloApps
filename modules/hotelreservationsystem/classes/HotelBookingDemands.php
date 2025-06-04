@@ -35,6 +35,10 @@ class HotelBookingDemands extends ObjectModel
     /** @var TaxCalculator object */
     public $tax_calculator = null;
 
+    protected $documentsBaseDir;
+    protected $sourceIndexFile;
+    protected $documentFolder;
+
     public static $definition = array(
         'table' => 'htl_booking_demands',
         'primary' => 'id_booking_demand',
@@ -200,7 +204,7 @@ class HotelBookingDemands extends ObjectModel
                     $quantity = 1;
                     if ($this->price_calc_method == HotelRoomTypeGlobalDemand::WK_PRICE_CALC_METHOD_EACH_DAY) {
                         $objBkDetail = new HotelBookingDetail($this->id_htl_booking);
-                        $quantity = $objBkDetail->getNumberOfDays($objBkDetail->date_from, $objBkDetail->date_to);
+                        $quantity = HotelHelper::getNumberOfDays($objBkDetail->date_from, $objBkDetail->date_to);
                     }
 
                     // Rounding as per configurations
@@ -265,7 +269,7 @@ class HotelBookingDemands extends ObjectModel
                 $objBkDemand = new HotelBookingDemands($detail['id_booking_demand']);
                 if ($objBkDemand->price_calc_method == HotelRoomTypeGlobalDemand::WK_PRICE_CALC_METHOD_EACH_DAY) {
                     $objBkDetail = new HotelBookingDetail($detail['id_htl_booking']);
-                    $numDays = $objBkDetail->getNumberOfDays($objBkDetail->date_from, $objBkDetail->date_to);
+                    $numDays = HotelHelper::getNumberOfDays($objBkDetail->date_from, $objBkDetail->date_to);
                 }
 
                 $totalTaxBase = $priceTaxExcl * $numDays;

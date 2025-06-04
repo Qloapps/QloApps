@@ -229,8 +229,7 @@ class StatsBestProducts extends ModuleGrid
         $values = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($this->query);
         $this->_totalCount = Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue('SELECT FOUND_ROWS()');
 
-        $objHotelBookingDetail = new HotelBookingDetail();
-        $numberOfDays = $objHotelBookingDetail->getNumberOfDays($date_from, $date_to);
+        $numberOfDays = HotelHelper::getNumberOfDays($date_from, $date_to);
         foreach ($values as &$value) {
             if (Tools::getValue('export') == false) {
                 $value['roomTypeName'] = '<a href="'.$this->context->link->getAdminLink('AdminProducts').'&id_product='.$value['id_product'].'&updateproduct" target="_blank">'.$value['roomTypeName'].'</a>';

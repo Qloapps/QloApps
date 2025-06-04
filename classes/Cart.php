@@ -1028,7 +1028,7 @@ class CartCore extends ObjectModel
      * @param string $operator Indicate if quantity must be increased or decreased
      */
     public function updateQty($quantity, $id_product, $id_product_attribute = null, $id_customization = false,
-        $operator = 'up', $id_address_delivery = 0, Shop $shop = null, $auto_add_cart_rule = true)
+        $operator = 'up', $id_address_delivery = 0, ?Shop $shop = null, $auto_add_cart_rule = true)
     {
         if (!$shop) {
             $shop = Context::getContext()->shop;
@@ -1056,7 +1056,7 @@ class CartCore extends ObjectModel
 
         /* If we have a product combination, the minimal quantity is set with the one of this combination */
         if (!empty($id_product_attribute)) {
-            $minimal_quantity = (int)Attribute::getAttributeMinimalQty($id_product_attribute);
+            $minimal_quantity = (int)ProductAttribute::getAttributeMinimalQty($id_product_attribute);
         } else {
             $minimal_quantity = (int)$product->minimal_quantity;
         }
@@ -1620,7 +1620,7 @@ class CartCore extends ObjectModel
         $param_product = true;
         if (is_null($products)) {
             $param_product = false;
-            $products = $this->getProducts(false, false, null, false);
+            $products = $this->getProducts(false, false, null);
         }
 
         if ($type == Cart::ONLY_PHYSICAL_PRODUCTS_WITHOUT_SHIPPING) {
@@ -2150,7 +2150,7 @@ class CartCore extends ObjectModel
             return $cache[$cache_key];
         }
 
-        $product_list = $this->getProducts($flush, false, null, true);
+        $product_list = $this->getProducts($flush, false, null);
         // Step 1 : Get product informations (warehouse_list and carrier_list), count warehouse
         // Determine the best warehouse to determine the packages
         // For that we count the number of time we can use a warehouse for a specific delivery address
@@ -2643,7 +2643,7 @@ class CartCore extends ObjectModel
      *               );
      *               If there are no carriers available for an address, return an empty  array
      */
-    public function getDeliveryOptionList(Country $default_country = null, $flush = false)
+    public function getDeliveryOptionList(?Country $default_country = null, $flush = false)
     {
         static $cache = array();
         if (isset($cache[$this->id]) && !$flush) {
@@ -2979,7 +2979,7 @@ class CartCore extends ObjectModel
      * @param bool $flush Force flushing cache
      *
      */
-    public function simulateCarriersOutput(Country $default_country = null, $flush = false)
+    public function simulateCarriersOutput(?Country $default_country = null, $flush = false)
     {
         $delivery_option_list = $this->getDeliveryOptionList($default_country, $flush);
 
@@ -3293,7 +3293,7 @@ class CartCore extends ObjectModel
     * @param Country|null $default_country
     * @return float Shipping total
     */
-    public function getTotalShippingCost($delivery_option = null, $use_tax = true, Country $default_country = null)
+    public function getTotalShippingCost($delivery_option = null, $use_tax = true, ?Country $default_country = null)
     {
         if (isset(Context::getContext()->cookie->id_country)) {
             $default_country = new Country(Context::getContext()->cookie->id_country);
@@ -3328,7 +3328,7 @@ class CartCore extends ObjectModel
      * @param array|null $delivery_option
      * @return float Shipping total
      */
-    public function getCarrierCost($id_carrier, $useTax = true, Country $default_country = null, $delivery_option = null)
+    public function getCarrierCost($id_carrier, $useTax = true, ?Country $default_country = null, $delivery_option = null)
     {
         if (is_null($delivery_option)) {
             $delivery_option = $this->getDeliveryOption($default_country);
@@ -3357,7 +3357,7 @@ class CartCore extends ObjectModel
     /**
      * @deprecated 1.5.0, use Cart->getPackageShippingCost()
      */
-    public function getOrderShippingCost($id_carrier = null, $use_tax = true, Country $default_country = null, $product_list = null)
+    public function getOrderShippingCost($id_carrier = null, $use_tax = true, ?Country $default_country = null, $product_list = null)
     {
         Tools::displayAsDeprecated();
         return $this->getPackageShippingCost((int)$id_carrier, $use_tax, $default_country, $product_list);
@@ -3375,7 +3375,7 @@ class CartCore extends ObjectModel
      *
      * @return float Shipping total
      */
-    public function getPackageShippingCost($id_carrier = null, $use_tax = true, Country $default_country = null, $product_list = null, $id_zone = null)
+    public function getPackageShippingCost($id_carrier = null, $use_tax = true, ?Country $default_country = null, $product_list = null, $id_zone = null)
     {
         if ($this->isVirtualCart()) {
             return 0;
@@ -4827,7 +4827,7 @@ class CartCore extends ObjectModel
         // get bookings xaml data
         $postData = trim(file_get_contents('php://input'));
         libxml_use_internal_errors(true);
-        $xml = simplexml_load_string(utf8_decode($postData));
+        $xml = simplexml_load_string(mb_convert_encoding($postData, 'ISO-8859-1'));
         $cartData = json_decode(json_encode($xml, true));
 
         $this->id_address_delivery = $cartData->cart->id_address_delivery;
@@ -4847,7 +4847,7 @@ class CartCore extends ObjectModel
         return false;
     }
 
-    public function updateWs($autodate = true, $null_values = false)
+    public function updateWs($null_values = false)
     {
         $this->id_shop = Configuration::get('PS_SHOP_DEFAULT');
         $objShop = new Shop($this->id_shop);
@@ -4856,14 +4856,14 @@ class CartCore extends ObjectModel
         // get bookings xml data
         $postData = trim(file_get_contents('php://input'));
         libxml_use_internal_errors(true);
-        $xml = simplexml_load_string(utf8_decode($postData));
+        $xml = simplexml_load_string(mb_convert_encoding($postData, 'ISO-8859-1'));
         $cartData = json_decode(json_encode($xml, true));
 
 
         $this->id_address_delivery = $cartData->cart->id_address_delivery;
         $this->id_address_invoice = $cartData->cart->id_address_invoice;
 
-        if ($this->update($autodate, $null_values)) {
+        if ($this->update($null_values)) {
             // set bookings for the cart
             $bookingRows = $cartData->cart->associations->cart_bookings->booking;
             if (isset($bookingRows->id_hotel)) {
@@ -4937,7 +4937,7 @@ class CartCore extends ObjectModel
                         }
 
                         if (!count($errors)) {
-                            $numDays = $objBookingDetail->getNumberOfDays($dateFrom, $dateTo);
+                            $numDays = HotelHelper::getNumberOfDays($dateFrom, $dateTo);
                             $prodQty = $prodQty * (int) $numDays;
                             $reqRooms = 1;
 

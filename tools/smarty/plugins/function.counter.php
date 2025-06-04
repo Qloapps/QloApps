@@ -12,7 +12,7 @@
  * Purpose:  print out a counter value
  *
  * @author Monte Ohrt <monte at ohrt dot com>
- * @link   http://www.smarty.net/manual/en/language.function.counter.php {counter}
+ * @link   https://www.smarty.net/manual/en/language.function.counter.php {counter}
  *         (Smarty online manual)
  *
  * @param array                    $params   parameters

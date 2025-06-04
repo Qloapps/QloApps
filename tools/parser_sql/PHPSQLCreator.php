@@ -65,6 +65,8 @@ use PHPSQLParser\builders\AlterStatementBuilder;
  */
 class PHPSQLCreator {
 
+    public $created;
+
     public function __construct($parsed = false) {
         if ($parsed) {
             $this->create($parsed);

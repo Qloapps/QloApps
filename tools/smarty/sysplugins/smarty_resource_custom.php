@@ -42,12 +42,12 @@ abstract class Smarty_Resource_Custom extends Smarty_Resource
     /**
      * populate Source Object with meta data from Resource
      *
-     * @param Smarty_Template_Source   $source    source object
-     * @param Smarty_Internal_Template $_template template object
+     * @param Smarty_Template_Source        $source    source object
+     * @param Smarty_Internal_Template|null $_template template object
      */
-    public function populate(Smarty_Template_Source $source, Smarty_Internal_Template $_template = null)
+    public function populate(Smarty_Template_Source $source, ?Smarty_Internal_Template $_template = null)
     {
-        $source->filepath = $source->type . ':' . substr(preg_replace('/[^A-Za-z0-9.]/', '', $source->name), 0, 25);
+        $source->filepath = $source->type . ':' . $this->generateSafeName($source->name);
         $source->uid = sha1($source->type . ':' . $source->name);
         $mtime = $this->fetchTimestamp($source->name);
         if ($mtime !== null) {
@@ -88,6 +88,17 @@ abstract class Smarty_Resource_Custom extends Smarty_Resource
      */
     public function getBasename(Smarty_Template_Source $source)
     {
-        return basename(substr(preg_replace('/[^A-Za-z0-9.]/', '', $source->name), 0, 25));
+        return basename($this->generateSafeName($source->name));
+    }
+
+    /**
+     * Removes special characters from $name and limits its length to 127 characters.
+     *
+     * @param $name
+     *
+     * @return string
+     */
+    private function generateSafeName($name): string {
+        return substr(preg_replace('/[^A-Za-z0-9._]/', '', (string) $name), 0, 127);
     }
 }

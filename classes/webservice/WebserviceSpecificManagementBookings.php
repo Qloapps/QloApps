@@ -762,7 +762,7 @@ class WebserviceSpecificManagementBookingsCore Extends ObjectModel implements We
     /**
      * Checking room type information validity.
      */
-    public function validateRequestedRoomTypes($roomTypes = array(), $idHotel)
+    public function validateRequestedRoomTypes($roomTypes = array(), $idHotel = 0)
     {
         $objBookingDetail = new HotelBookingDetail();
         $objRoomType = new HotelRoomType();
@@ -3305,7 +3305,7 @@ class WebserviceSpecificManagementBookingsCore Extends ObjectModel implements We
 
                     $qty = 1;
                     if ($objGlobalDemand->price_calc_method == HotelRoomTypeGlobalDemand::WK_PRICE_CALC_METHOD_EACH_DAY) {
-                        $numDays = $objHtlBkDtl->getNumberOfDays(
+                        $numDays = HotelHelper::getNumberOfDays(
                             $objBookingDetail->date_from,
                             $objBookingDetail->date_to
                         );

@@ -33,6 +33,8 @@ class AdminCmsControllerCore extends AdminController
 
     public $id_cms_category;
 
+    protected $_category;
+
     protected $position_identifier = 'id_cms';
 
     public function __construct()
@@ -306,7 +308,7 @@ class AdminCmsControllerCore extends AdminController
             }
         }/* Delete multiple objects */
         elseif (Tools::getValue('submitDel'.$this->table)) {
-            if ($this->tabAccess['delete'] === '1') {
+            if ($this->tabAccess['delete'] === 1) {
                 if (Tools::isSubmit($this->table.'Box')) {
                     $cms = new CMS();
                     $result = true;
@@ -354,7 +356,7 @@ class AdminCmsControllerCore extends AdminController
             }
         } elseif (Tools::isSubmit('way') && Tools::isSubmit('id_cms') && (Tools::isSubmit('position'))) {
             /** @var CMS $object */
-            if ($this->tabAccess['edit'] !== '1') {
+            if ($this->tabAccess['edit'] !== 1) {
                 $this->errors[] = Tools::displayError('You do not have permission to edit this.');
             } elseif (!Validate::isLoadedObject($object = $this->loadObject())) {
                 $this->errors[] = Tools::displayError('An error occurred while updating the status for an object.')
@@ -367,7 +369,7 @@ class AdminCmsControllerCore extends AdminController
         }
         /* Change object statuts (active, inactive) */
         elseif (Tools::isSubmit('statuscms') && Tools::isSubmit($this->identifier)) {
-            if ($this->tabAccess['edit'] === '1') {
+            if ($this->tabAccess['edit'] === 1) {
                 if (Validate::isLoadedObject($object = $this->loadObject())) {
                     /** @var CMS $object */
                     if ($object->toggleStatus()) {
@@ -385,7 +387,7 @@ class AdminCmsControllerCore extends AdminController
         }
         /* Delete multiple CMS content */
         elseif (Tools::isSubmit('submitBulkdeletecms')) {
-            if ($this->tabAccess['delete'] === '1') {
+            if ($this->tabAccess['delete'] === 1) {
                 $this->action = 'bulkdelete';
                 $this->boxes = Tools::getValue($this->table.'Box');
                 if (is_array($this->boxes) && array_key_exists(0, $this->boxes)) {

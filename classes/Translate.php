@@ -74,7 +74,7 @@ class TranslateCore
         if (isset(self::$adminTranslations[$iso][$class.$key])) {
             $str = self::$adminTranslations[$iso][$class.$key];
         } else {
-            $str = Translate::getGenericAdminTranslation($string, $key, self::$adminTranslations[$iso]);
+            $str = Translate::getGenericAdminTranslation($string, self::$adminTranslations[$iso], $key);
         }
 
         if ($htmlentities) {
@@ -97,7 +97,7 @@ class TranslateCore
      * @param array $lang_array Global array of admin translations
      * @return string translation
      */
-    public static function getGenericAdminTranslation($string, $key = null, &$lang_array)
+    public static function getGenericAdminTranslation($string, &$lang_array, $key = null)
     {
         $string = preg_replace("/\\\*'/", "\'", $string);
         if (is_null($key)) {
@@ -205,7 +205,7 @@ class TranslateCore
             }
             // if translation was not found in module, look for it in AdminController or Helpers
             elseif (isset(self::$adminTranslations[$iso]) && !empty(self::$adminTranslations[$iso])) {
-                $ret = stripslashes(Translate::getGenericAdminTranslation($string, $key, self::$adminTranslations[$iso]));
+                $ret = stripslashes(Translate::getGenericAdminTranslation($string, self::$adminTranslations[$iso], $key));
             } else {
                 $ret = stripslashes($string);
             }

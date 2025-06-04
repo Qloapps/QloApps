@@ -22,7 +22,7 @@ class Smarty_Internal_Runtime_Make_Nocache
     {
         if (isset($tpl->tpl_vars[ $var ])) {
             $export =
-                preg_replace('/^Smarty_Variable::__set_state[(]|[)]$/', '', var_export($tpl->tpl_vars[ $var ], true));
+                preg_replace('/^\\\\?Smarty_Variable::__set_state[(]|[)]$/', '', var_export($tpl->tpl_vars[ $var ], true));
             if (preg_match('/(\w+)::__set_state/', $export, $match)) {
                 throw new SmartyException("{make_nocache \${$var}} in template '{$tpl->source->name}': variable does contain object '{$match[1]}' not implementing method '__set_state'");
             }

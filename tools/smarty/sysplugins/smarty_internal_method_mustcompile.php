@@ -32,7 +32,7 @@ class Smarty_Internal_Method_MustCompile
     {
         if (!$_template->source->exists) {
             if ($_template->_isSubTpl()) {
-                $parent_resource = " in '$_template->parent->template_resource}'";
+                $parent_resource = " in '{$_template->parent->template_resource}'";
             } else {
                 $parent_resource = '';
             }

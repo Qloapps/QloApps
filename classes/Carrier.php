@@ -1057,12 +1057,12 @@ class CarrierCore extends ObjectModel
         return $suffix;
     }
 
-    public function getIdTaxRulesGroup(Context $context = null)
+    public function getIdTaxRulesGroup(?Context $context = null)
     {
         return Carrier::getIdTaxRulesGroupByIdCarrier((int)$this->id, $context);
     }
 
-    public static function getIdTaxRulesGroupByIdCarrier($id_carrier, Context $context = null)
+    public static function getIdTaxRulesGroupByIdCarrier($id_carrier, ?Context $context = null)
     {
         if (!$context) {
             $context = Context::getContext();
@@ -1079,7 +1079,7 @@ class CarrierCore extends ObjectModel
         return Cache::retrieve($key);
     }
 
-    public function deleteTaxRulesGroup(array $shops = null)
+    public function deleteTaxRulesGroup(?array $shops = null)
     {
         if (!$shops) {
             $shops = Shop::getContextListShopID();

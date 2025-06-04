@@ -48,6 +48,8 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
     const IMPACT_TYPE_PERCENTAGE = 1;
     const IMPACT_TYPE_FIXED_PRICE = 2;
 
+    protected $moduleInstance;
+
     public static $definition = array(
         'table' => 'htl_room_type_feature_pricing',
         'primary' => 'id_feature_price',
@@ -314,7 +316,7 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
      * @param  [date]  $date_to    [end date of the date range]
      * @return [array|false]       [returns array containing rates of room type of a hotel if found else returns false]
      */
-    public function getHotelRoomTypesRatesAndInventoryByDate($id_hotel, $id_product=0, $date_from, $date_to)
+    public function getHotelRoomTypesRatesAndInventoryByDate($id_hotel, $id_product, $date_from, $date_to)
     {
         $hotelRoomType = new HotelRoomType();
         $context = Context::getContext();
@@ -390,7 +392,7 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
      */
     public function updateRoomTypesFeaturePricesAvailability($featurePricePlans)
     {
-        $this->errors = array();
+        $errors = [];
         if ($featurePricePlans) {
             if (isset($featurePricePlans['data']) && $featurePricePlans['data']) {
                 foreach ($featurePricePlans['data'] as $roomTypeRatesData) {
@@ -459,7 +461,7 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
                                                     $params,
                                                     $featurePriceExists['id_feature_price']
                                                 )) {
-                                                    $this->errors[] = $this->moduleInstance->l('Some error occured while saving Feature Price Plan Info:: Date From : ', 'HotelRoomTypeFeaturePricing').$params['dateFrom'].$this->moduleInstance->l(' Date To : ', 'HotelRoomTypeFeaturePricing').$params['dateFrom'].$this->moduleInstance->l(' Room Type Id : ', 'HotelRoomTypeFeaturePricing').$params['roomTypeId'];
+                                                    $errors[] = $this->moduleInstance->l('Some error occured while saving Feature Price Plan Info:: Date From : ', 'HotelRoomTypeFeaturePricing').$params['dateFrom'].$this->moduleInstance->l(' Date To : ', 'HotelRoomTypeFeaturePricing').$params['dateFrom'].$this->moduleInstance->l(' Room Type Id : ', 'HotelRoomTypeFeaturePricing').$params['roomTypeId'];
                                                 }
                                             } else {
                                                 for($date = $dateFrom; $date < $dateTo; $date = date('Y-m-d', strtotime('+1 day', strtotime($date)))) {
@@ -478,7 +480,7 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
                                                             $params,
                                                             $featurePriceExists['id_feature_price']
                                                         )) {
-                                                            $this->errors[] = $this->moduleInstance->l('Some error occured while saving Feature Price Plan Info:: Date From : ', 'HotelRoomTypeFeaturePricing').$params['dateFrom'].$this->moduleInstance->l(' Date To : ', 'HotelRoomTypeFeaturePricing').$params['dateFrom'].$this->moduleInstance->l(' Room Type Id : ', 'HotelRoomTypeFeaturePricing').$params['roomTypeId'];
+                                                            $errors[] = $this->moduleInstance->l('Some error occured while saving Feature Price Plan Info:: Date From : ', 'HotelRoomTypeFeaturePricing').$params['dateFrom'].$this->moduleInstance->l(' Date To : ', 'HotelRoomTypeFeaturePricing').$params['dateFrom'].$this->moduleInstance->l(' Room Type Id : ', 'HotelRoomTypeFeaturePricing').$params['roomTypeId'];
                                                         }
                                                     } else {
                                                         if (!$this->saveFeaturePricePlan($params)) {
@@ -548,7 +550,7 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
                                                                 if (!$objRoomDisableDates->updateDisableDateRanges(
                                                                     $params
                                                                 )) {
-                                                                    $this->errors[] = $this->moduleInstance->l('Some error occurred while saving disable dates for '.$dateFrom.' To '.$dateTo.' for room id-'.$room['id'], 'HotelRoomTypeFeaturePricing');
+                                                                    $errors[] = $this->moduleInstance->l('Some error occurred while saving disable dates for '.$dateFrom.' To '.$dateTo.' for room id-'.$room['id'], 'HotelRoomTypeFeaturePricing');
                                                                 }
                                                             } else {
                                                                 $hotelRoomInformation->id_status = 3;
@@ -585,7 +587,7 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
                                                         if (!$objRoomDisableDates->deleteDisabledDatesForDateRange(
                                                             $params
                                                         )) {
-                                                            $this->errors[] = $this->moduleInstance->l('Some error occurred while saving deleting dates for '.$dateFrom.' To '.$dateTo.' for room id-'.$disableRoom['id'], 'HotelRoomTypeFeaturePricing');
+                                                            $errors[] = $this->moduleInstance->l('Some error occurred while saving deleting dates for '.$dateFrom.' To '.$dateTo.' for room id-'.$disableRoom['id'], 'HotelRoomTypeFeaturePricing');
                                                         }
                                                         $disabledDates = $objRoomDisableDates->getRoomDisableDates(
                                                             $disableRoom['id']
@@ -603,36 +605,24 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
                                     }
                                 }
                             } else {
-                                $this->errors[] = $this->moduleInstance->l(
-                                    'Requested rooms inventory is not available.',
-                                    'HotelRoomTypeFeaturePricing'
-                                );
+                                $errors[] = $this->moduleInstance->l('Requested rooms inventory is not available.', 'HotelRoomTypeFeaturePricing');
                             }
                         }
                     } else {
-                        $this->errors[] = $this->moduleInstance->l(
-                            'Room Types for which Feature prices to be updated are not found.',
-                            'HotelRoomTypeFeaturePricing'
-                        );
+                        $errors[] = $this->moduleInstance->l('Room Types for which Feature prices to be updated are not found.', 'HotelRoomTypeFeaturePricing');
                     }
                 }
             } else {
-                $this->errors[] = $this->moduleInstance->l(
-                    'Update Information not found.',
-                    'HotelRoomTypeFeaturePricing'
-                );
+                $errors[] = $this->moduleInstance->l('Update Information not found.', 'HotelRoomTypeFeaturePricing');
             }
         } else {
-            $this->errors[] = $this->moduleInstance->l(
-                'Update Information not found.',
-                'HotelRoomTypeFeaturePricing'
-            );
+            $errors[] = $this->moduleInstance->l('Update Information not found.', 'HotelRoomTypeFeaturePricing');
         }
 
         $result = array();
-        if (count($this->errors)) {
+        if (count($errors)) {
             $result['status'] = 'failed';
-            $result['errors'] = $this->errors;
+            $result['errors'] = $errors;
         } else {
             $result['status'] = 'success';
         }
@@ -642,9 +632,9 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
 
     /**
      * [saveFeaturePricePlan add or update feature price plan]
-     * @param  integer $id                [id of the feature price plan if 0 means to add else to update the feature price plan]
      * @param  [int]  $dateSelectionType [date selection type 1 or 2 (date range or specific date)]
      * @param  [array]  $params            [Room type rate plan info]
+     * @param  integer $id [id of the feature price plan if 0 means to add else to update the feature price plan]
      * @return [bool]                     [returns true is successfuly added or updated else returns false]
      */
     public function saveFeaturePricePlan($params, $id = 0)

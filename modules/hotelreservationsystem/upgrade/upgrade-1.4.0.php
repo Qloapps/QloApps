@@ -26,7 +26,7 @@ function upgrade_module_1_4_0($module)
     return ($module->registerHook('actionObjectProfileAddAfter')
         && $module->registerHook('actionObjectProfileDeleteBefore')
         && updateTables()
-        && createDataForNewTables($module)
+        && createDataForNewTables()
     );
 }
 

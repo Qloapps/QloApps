@@ -178,7 +178,7 @@ class OrderDetailControllerCore extends FrontController
                                         }
                                     }
                                 } else {
-                                    $num_days = $objBookingDetail->getNumberOfDays($data_v['date_from'], $data_v['date_to']);
+                                    $num_days = HotelHelper::getNumberOfDays($data_v['date_from'], $data_v['date_to']);
                                     $cartHotelData[$type_key]['date_diff'][$date_join]['num_rm'] = 1;
                                     $cartHotelData[$type_key]['date_diff'][$date_join]['data_form'] = $data_v['date_from'];
                                     $cartHotelData[$type_key]['date_diff'][$date_join]['data_to'] = $data_v['date_to'];
@@ -648,7 +648,7 @@ class OrderDetailControllerCore extends FrontController
                     if ($idsHtlBooking) {
                         foreach ($idsHtlBooking as $idHtlBooking) {
                             $objHtlBooking = new HotelBookingDetail($idHtlBooking);
-                            $numDays = $objHtlBooking->getNumberOfDays(
+                            $numDays = HotelHelper::getNumberOfDays(
                                 $objHtlBooking->date_from,
                                 $objHtlBooking->date_to
                             );

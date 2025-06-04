@@ -47,8 +47,8 @@ The system compatibility will also be checked by the system with installation an
 #### Hosted Server Configurations
 
 * **Web server**: Apache 1.3, Apache 2.x, Nginx or Microsoft IIS
-* **PHP  version**: PHP 5.6+ to PHP 7.4
-* **MySQL version**:  5.1+ to 5.7 installed with a database created
+* **PHP  version**: PHP 8.1+ to PHP 8.4
+* **MySQL version**:  5.7+ to 8.4 installed with a database created
 * SSH or FTP access (ask your hosting service for your credentials)
 * In the PHP configuration ask your provider to set memory_limit to "128M", upload_max_filesize to "16M" ,    max_execution_time to "500" and allow_url_fopen "on"
 * SSL certificate if you plan to process payments internally (not using PayPal for instance)
@@ -59,8 +59,8 @@ The system compatibility will also be checked by the system with installation an
 * **Supported operating system**: Windows, Mac, and Linux
 * **A prepared package**: WampServer (for Windows), Xampp (for Windows and Mac) or EasyPHP (for Windows)
 * **Web server**: Apache 1.3, Apache 2.x, Nginx or Microsoft IIS
-* **PHP**: PHP 5.6+ to PHP 7.4
-* **MySQL** 5.1+ to 5.7 installed with a database created
+* **PHP**: PHP 8.1+ to PHP 8.4
+* **MySQL** 5.7+ to 8.4 installed with a database created
 * In the PHP configuration, set memory_limit to "128M", upload_max_filesize to "16M" and max_execution_time to "500"
 * **Required PHP extensions**: PDO_MySQL, cURL, OpenSSL, SOAP, GD, SimpleXML, DOM, Zip, Phar
 
@@ -88,7 +88,7 @@ Please don't disclose security vulnerabilities publicly. If you find any securit
 
 ### Documentation & Demo
 
-#### QloApps Documentation 
+#### QloApps Documentation
 [https://qloapps.com/qlo-reservation-system](https://qloapps.com/qlo-reservation-system)
 #### QloApps Demo
 **Link** : https://demo.qloapps.com </br>

@@ -468,7 +468,7 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
 
                         if (Tools::isSubmit('generateCreditSlip')) {
                             if ($idHtlBooking = $objOrderReturnDetail->id_htl_booking) {
-                                $numDays = $objHtlBooking->getNumberOfDays(
+                                $numDays = HotelHelper::getNumberOfDays(
                                     $objHtlBooking->date_from,
                                     $objHtlBooking->date_to
                                 );

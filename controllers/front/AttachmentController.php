@@ -42,7 +42,7 @@ class AttachmentControllerCore extends FrontController
         header('Content-Transfer-Encoding: binary');
         header('Content-Type: '.$a->mime);
         header('Content-Length: '.filesize(_PS_DOWNLOAD_DIR_.$a->file));
-        header('Content-Disposition: attachment; filename="'.utf8_decode($a->file_name).'"');
+        header('Content-Disposition: attachment; filename="'.mb_convert_encoding($a->file_name, 'ISO-8859-1').'"');
         @set_time_limit(0);
         readfile(_PS_DOWNLOAD_DIR_.$a->file);
         exit;

@@ -121,7 +121,7 @@ abstract class Smarty_Internal_Data
      * appends values to template variables
      *
      * @api  Smarty::append()
-     * @link http://www.smarty.net/docs/en/api.append.tpl
+     * @link https://www.smarty.net/docs/en/api.append.tpl
      *
      * @param array|string $tpl_var the template variable name(s)
      * @param mixed        $value   the value to append
@@ -182,7 +182,7 @@ abstract class Smarty_Internal_Data
      * Returns a single or all template variables
      *
      * @api  Smarty::getTemplateVars()
-     * @link http://www.smarty.net/docs/en/api.get.template.vars.tpl
+     * @link https://www.smarty.net/docs/en/api.get.template.vars.tpl
      *
      * @param string                                                  $varName       variable name or null
      * @param \Smarty_Internal_Data|\Smarty_Internal_Template|\Smarty $_ptr          optional pointer to data object
@@ -190,29 +190,9 @@ abstract class Smarty_Internal_Data
      *
      * @return mixed variable value or or array of variables
      */
-    public function getTemplateVars($varName = null, Smarty_Internal_Data $_ptr = null, $searchParents = true)
+    public function getTemplateVars($varName = null, ?Smarty_Internal_Data $_ptr = null, $searchParents = true)
     {
         return $this->ext->getTemplateVars->getTemplateVars($this, $varName, $_ptr, $searchParents);
-    }
-
-    /**
-     * gets the object of a Smarty variable
-     *
-     * @param string               $variable      the name of the Smarty variable
-     * @param Smarty_Internal_Data $_ptr          optional pointer to data object
-     * @param boolean              $searchParents search also in parent data
-     * @param bool                 $error_enable
-     *
-     * @return     Smarty_Variable|Smarty_Undefined_Variable the object of the variable
-     * @deprecated since 3.1.28 please use Smarty_Internal_Data::getTemplateVars() instead.
-     */
-    public function getVariable(
-        $variable = null,
-        Smarty_Internal_Data $_ptr = null,
-        $searchParents = true,
-        $error_enable = true
-    ) {
-        return $this->ext->getTemplateVars->_getVariable($this, $variable, $_ptr, $searchParents, $error_enable);
     }
 
     /**
@@ -220,7 +200,7 @@ abstract class Smarty_Internal_Data
      *
      * @param \Smarty_Internal_Data|null $data
      */
-    public function _mergeVars(Smarty_Internal_Data $data = null)
+    public function _mergeVars(?Smarty_Internal_Data $data = null)
     {
         if (isset($data)) {
             if (!empty($this->tpl_vars)) {

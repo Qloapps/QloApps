@@ -26,6 +26,7 @@ require_once 'classes/RequiredFiles.php';
 
 class QloHotelReview extends Module
 {
+    public $secure_key;
     public function __construct()
     {
         $this->name = 'qlohotelreview';
@@ -34,11 +35,13 @@ class QloHotelReview extends Module
         $this->ps_versions_compliancy = array('min' => '1.6', 'max' => '1.6');
         $this->author = 'Webkul';
         $this->bootstrap = true;
+
         parent::__construct();
+
         $this->secure_key = Tools::encrypt($this->name);
         $this->displayName = $this->l('QloApps Hotel Reviews');
         $this->description = $this->l('This module allows guests to review hotels on specific categories.');
-        $this->confirmUnsinstall = $this->l('Are you sure you want to uninstall?');
+        $this->confirmUninstall = $this->l('Are you sure you want to uninstall?');
     }
 
     public function install()
@@ -372,7 +375,7 @@ class QloHotelReview extends Module
         if (!$this->uninstall(false)) {
             return false;
         }
-        if (!$this->install(false)) {
+        if (!$this->install()) {
             return false;
         }
         return true;

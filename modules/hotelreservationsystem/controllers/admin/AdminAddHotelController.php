@@ -693,16 +693,34 @@ class AdminAddHotelController extends ModuleAdminController
                 }
                 $objCountry = new Country();
                 $countryName = $objCountry->getNameById(Configuration::get('PS_LANG_DEFAULT'), $country);
-                if ($catCountry = $objHotelBranch->addCategory($countryName, false, $groupIds)) {
+                if ($catCountry = $objHotelBranch->addCategory(
+                    array (
+                        'name' => $countryName,
+                        'group_ids' => $groupIds,
+                        'parent_category' => false
+                    )
+                )) {
                     if ($state) {
                         $objState = new State();
                         $stateName = $objState->getNameById($state);
-                        $catState = $objHotelBranch->addCategory($stateName, $catCountry, $groupIds);
                     } else {
-                        $catState = $objHotelBranch->addCategory($city, $catCountry, $groupIds);
+                        $stateName = $city;
                     }
-                    if ($catState) {
-                        if ($catCity = $objHotelBranch->addCategory($city, $catState, $groupIds)) {
+
+                    if ($catState = $objHotelBranch->addCategory(
+                        array (
+                            'name' => $stateName,
+                            'group_ids' => $groupIds,
+                            'parent_category' => $catCountry
+                        )
+                    )) {
+                        if ($catCity = $objHotelBranch->addCategory(
+                            array (
+                                'name' => $city,
+                                'group_ids' => $groupIds,
+                                'parent_category' => $catState
+                            )
+                        )) {
                             $hotelCatName = $objHotelBranch->hotel_name;
                             // add/update hotel category
                             if ($objHotelBranch->id_category) {
@@ -717,15 +735,17 @@ class AdminAddHotelController extends ModuleAdminController
                                 Category::regenerateEntireNtree();
                             } else {
                                 if ($catHotel = $objHotelBranch->addCategory(
-                                    $hotelCatName,
-                                    $catCity,
-                                    $groupIds,
-                                    1,
-                                    $newIdHotel,
-                                    $linkRewriteArray,
-                                    $metaTitleArray,
-                                    $metaDescriptionArray,
-                                    $metaKeywordsArray
+                                    array (
+                                        'name' => $hotelCatName,
+                                        'group_ids' => $groupIds,
+                                        'parent_category' => $catCity,
+                                        'is_hotel' => 1,
+                                        'id_hotel' => $newIdHotel,
+                                        'link_rewrite' => $linkRewriteArray,
+                                        'meta_title' => $metaTitleArray,
+                                        'meta_description' => $metaDescriptionArray,
+                                        'meta_keywords' => $metaKeywordsArray
+                                    )
                                 )) {
                                     $objHotelBranch = new HotelBranchInformation($newIdHotel);
                                     $objHotelBranch->id_category = $catHotel;

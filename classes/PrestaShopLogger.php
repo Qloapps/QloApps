@@ -53,6 +53,9 @@ class    PrestaShopLoggerCore extends ObjectModel
     /** @var string Object last modification date */
     public $date_upd;
 
+    /** @var string|null */
+    public $hash;
+
     /**
      * @see ObjectModel::$definition
      */
@@ -125,7 +128,7 @@ class    PrestaShopLoggerCore extends ObjectModel
             $log->object_id = (int)$object_id;
         }
 
-        if ($object_type != 'Swift_Message') {
+        if ($object_type != 'MailerMessage') {
             PrestaShopLogger::sendByMail($log);
         }
 

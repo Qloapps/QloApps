@@ -26,7 +26,7 @@
 
 class AdminStatsControllerCore extends AdminStatsTabController
 {
-    public static function getVisits($unique = false, $date_from, $date_to, $granularity = false)
+    public static function getVisits($unique, $date_from, $date_to, $granularity = false)
     {
         $visits = ($granularity == false) ? 0 : array();
         $objGoogleAnalytics = Module::isEnabled('qlogoogleanalytics') ? Module::getInstanceByName('qlogoogleanalytics') : false;

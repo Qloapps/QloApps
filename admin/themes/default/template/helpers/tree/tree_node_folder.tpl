@@ -34,6 +34,6 @@
 		<div class="node-hint">{$node['hint']}</div>
 	{/if}
 	<ul class="tree">
-		{$children|escape:'UTF-8'}
+		{$children}
 	</ul>
 </li>

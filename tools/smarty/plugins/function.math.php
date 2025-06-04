@@ -12,7 +12,7 @@
  * Name:     math
  * Purpose:  handle math computations in template
  *
- * @link   http://www.smarty.net/manual/en/language.function.math.php {math}
+ * @link   https://www.smarty.net/manual/en/language.function.math.php {math}
  *           (Smarty online manual)
  * @author Monte Ohrt <monte at ohrt dot com>
  *
@@ -28,7 +28,12 @@ function smarty_function_math($params, $template)
             'int'   => true,
             'abs'   => true,
             'ceil'  => true,
+            'acos'   => true,
+            'acosh'   => true,
             'cos'   => true,
+            'cosh'   => true,
+            'deg2rad'   => true,
+            'rad2deg'   => true,
             'exp'   => true,
             'floor' => true,
             'log'   => true,
@@ -39,27 +44,51 @@ function smarty_function_math($params, $template)
             'pow'   => true,
             'rand'  => true,
             'round' => true,
+            'asin'   => true,
+            'asinh'   => true,
             'sin'   => true,
+            'sinh'   => true,
             'sqrt'  => true,
             'srand' => true,
-            'tan'   => true
+            'atan'   => true,
+            'atanh'   => true,
+            'tan'   => true,
+            'tanh'   => true
         );
+
     // be sure equation parameter is present
     if (empty($params[ 'equation' ])) {
         trigger_error("math: missing equation parameter", E_USER_WARNING);
         return;
     }
     $equation = $params[ 'equation' ];
+
+    // Remove whitespaces
+    $equation = preg_replace('/\s+/', '', $equation);
+
+    // Adapted from https://www.php.net/manual/en/function.eval.php#107377
+    $number = '-?(?:\d+(?:[,.]\d+)?|pi|π)'; // What is a number
+    $functionsOrVars = '((?:0x[a-fA-F0-9]+)|([a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*))';
+    $operators = '[,+\/*\^%-]'; // Allowed math operators
+    $regexp = '/^(('.$number.'|'.$functionsOrVars.'|('.$functionsOrVars.'\s*\((?1)*\)|\((?1)*\)))(?:'.$operators.'(?1))?)+$/';
+
+    if (!preg_match($regexp, $equation)) {
+        trigger_error("math: illegal characters", E_USER_WARNING);
+        return;
+    }
+
     // make sure parenthesis are balanced
     if (substr_count($equation, '(') !== substr_count($equation, ')')) {
         trigger_error("math: unbalanced parenthesis", E_USER_WARNING);
         return;
     }
+
     // disallow backticks
     if (strpos($equation, '`') !== false) {
         trigger_error("math: backtick character not allowed in equation", E_USER_WARNING);
         return;
     }
+
     // also disallow dollar signs
     if (strpos($equation, '$') !== false) {
         trigger_error("math: dollar signs not allowed in equation", E_USER_WARNING);
@@ -96,6 +125,7 @@ function smarty_function_math($params, $template)
     }
     $smarty_math_result = null;
     eval("\$smarty_math_result = " . $equation . ";");
+
     if (empty($params[ 'format' ])) {
         if (empty($params[ 'assign' ])) {
             return $smarty_math_result;

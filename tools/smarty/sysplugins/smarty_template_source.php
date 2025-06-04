@@ -148,16 +148,16 @@ class Smarty_Template_Source
      * initialize Source Object for given resource
      * Either [$_template] or [$smarty, $template_resource] must be specified
      *
-     * @param Smarty_Internal_Template $_template         template object
-     * @param Smarty                   $smarty            smarty object
-     * @param string                   $template_resource resource identifier
+     * @param Smarty_Internal_Template|null $_template         template object
+     * @param Smarty|null                   $smarty            smarty object
+     * @param string                        $template_resource resource identifier
      *
      * @return Smarty_Template_Source Source Object
      * @throws SmartyException
      */
     public static function load(
-        Smarty_Internal_Template $_template = null,
-        Smarty $smarty = null,
+        ?Smarty_Internal_Template $_template = null,
+        ?Smarty $smarty = null,
         $template_resource = null
     ) {
         if ($_template) {

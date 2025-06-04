@@ -35,6 +35,7 @@ class Dashtrends extends Module
     protected $dashboard_data_sum;
     protected $dashboard_data_sum_compare;
     protected $data_trends;
+    protected $push_filename;
 
     public function __construct()
     {

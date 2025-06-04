@@ -212,7 +212,7 @@ class AdminHotelReviewHotelReviewController extends ModuleAdminController
         return $tpl->fetch();
     }
 
-    public function displayApproveLink($token = null, $id, $name = null)
+    public function displayApproveLink($token, $id, $name = null)
     {
         $status = null;
         if (array_key_exists($id, $this->cacheStatus)) {
@@ -241,7 +241,7 @@ class AdminHotelReviewHotelReviewController extends ModuleAdminController
         }
     }
 
-    public function displayDisapproveLink($token = null, $id, $name = null)
+    public function displayDisapproveLink($token, $id, $name = null)
     {
         $status = null;
         if (array_key_exists($id, $this->cacheStatus)) {

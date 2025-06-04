@@ -40,14 +40,12 @@ class QloCleaner extends Module
         $this->version = '1.0.1';
         $this->author = 'PrestaShop';
         $this->need_instance = 0;
-        $this->multishop_context = Shop::CONTEXT_ALL;
 
         $this->bootstrap = true;
         parent::__construct();
 
         $this->displayName = $this->l('QloApps Data Cleaner');
         $this->description = $this->l('Check and fix functional integrity constraints and remove default data');
-        $this->secure_key = Tools::encrypt($this->name);
     }
 
     public function install()
@@ -502,7 +500,6 @@ class QloCleaner extends Module
         $lang = new Language((int)Configuration::get('PS_LANG_DEFAULT'));
         $helper->default_form_language = $lang->id;
         $helper->allow_employee_form_lang = Configuration::get('PS_BO_ALLOW_EMPLOYEE_FORM_LANG') ? Configuration::get('PS_BO_ALLOW_EMPLOYEE_FORM_LANG') : 0;
-        $this->fields_form = array();
         $helper->id = (int)Tools::getValue('id_carrier');
         $helper->identifier = $this->identifier;
         $helper->submit_action = 'btnSubmit';

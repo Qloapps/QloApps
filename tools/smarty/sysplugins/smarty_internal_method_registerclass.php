@@ -22,7 +22,7 @@ class Smarty_Internal_Method_RegisterClass
      * Registers static classes to be used in templates
      *
      * @api  Smarty::registerClass()
-     * @link http://www.smarty.net/docs/en/api.register.class.tpl
+     * @link https://www.smarty.net/docs/en/api.register.class.tpl
      *
      * @param \Smarty_Internal_TemplateBase|\Smarty_Internal_Template|\Smarty $obj
      * @param string                                                          $class_name

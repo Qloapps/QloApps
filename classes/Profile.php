@@ -134,10 +134,10 @@ class ProfileCore extends ObjectModel
                         'id_profile' => _PS_ADMIN_PROFILE_,
                         'id_tab' => $tab['id_tab'],
                         'class_name' => $tab['class_name'],
-                        'view' => '1',
-                        'add' => '1',
-                        'edit' => '1',
-                        'delete' => '1',
+                        'view' => 1,
+                        'add' => 1,
+                        'edit' => 1,
+                        'delete' => 1,
                     );
                 }
             } else {

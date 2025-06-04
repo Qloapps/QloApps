@@ -19,21 +19,9 @@
 /**
  * This class does contain the security settings
  */
+#[\AllowDynamicProperties]
 class Smarty_Security
 {
-    /**
-     * This determines how Smarty handles "<?php ... ?>" tags in templates.
-     * possible values:
-     * <ul>
-     *   <li>Smarty::PHP_PASSTHRU -> echo PHP tags as they are</li>
-     *   <li>Smarty::PHP_QUOTE    -> escape tags as entities</li>
-     *   <li>Smarty::PHP_REMOVE   -> remove php tags</li>
-     *   <li>Smarty::PHP_ALLOW    -> execute php tags</li>
-     * </ul>
-     *
-     * @var integer
-     */
-    public $php_handling = Smarty::PHP_PASSTHRU;
 
     /**
      * This is the list of template directories that are considered secure.
@@ -118,7 +106,7 @@ class Smarty_Security
      *
      * @var array
      */
-    public $php_modifiers = array('escape', 'count', 'nl2br',);
+    public $php_modifiers = array('escape', 'count', 'sizeof', 'nl2br',);
 
     /**
      * This is an array of allowed tags.
@@ -265,7 +253,7 @@ class Smarty_Security
      *
      * @param string $function_name
      * @param object $compiler compiler object
-     *
+     * @deprecated
      * @return boolean                 true if function is trusted
      */
     public function isTrustedPhpFunction($function_name, $compiler)
@@ -341,7 +329,7 @@ class Smarty_Security
      *
      * @param string $modifier_name
      * @param object $compiler compiler object
-     *
+     * @deprecated
      * @return boolean                 true if modifier is trusted
      */
     public function isTrustedPhpModifier($modifier_name, $compiler)
@@ -566,35 +554,6 @@ class Smarty_Security
             }
         }
         throw new SmartyException("URI '{$uri}' not allowed by security setting");
-    }
-
-    /**
-     * Check if directory of file resource is trusted.
-     *
-     * @param string $filepath
-     *
-     * @return boolean         true if directory is trusted
-     * @throws SmartyException if PHP directory is not trusted
-     */
-    public function isTrustedPHPDir($filepath)
-    {
-        if (empty($this->trusted_dir)) {
-            throw new SmartyException("directory '{$filepath}' not allowed by security setting (no trusted_dir specified)");
-        }
-        // check if index is outdated
-        if (!$this->_trusted_dir || $this->_trusted_dir !== $this->trusted_dir) {
-            $this->_php_resource_dir = array();
-            $this->_trusted_dir = $this->trusted_dir;
-            foreach ((array)$this->trusted_dir as $directory) {
-                $directory = $this->smarty->_realpath($directory . '/', true);
-                $this->_php_resource_dir[ $directory ] = true;
-            }
-        }
-        $addPath = $this->_checkDir($filepath, $this->_php_resource_dir);
-        if ($addPath !== false) {
-            $this->_php_resource_dir = array_merge($this->_php_resource_dir, $addPath);
-        }
-        return true;
     }
 
     /**

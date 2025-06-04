@@ -1,16 +1,211 @@
-6.2.25
+6.7.8 (2024-12-13)
+	- Improve SVG detection by checking for (mandatory) namespace.
+	- Use late state binding now that minimum PHP version is 5.5.
+
+6.7.7 (2024-10-26)
+	- Update regular expression to avoid ReDoS (CVE-2024-22641)
+	- [PHP 8.4] Fix: Curl CURLOPT_BINARYTRANSFER deprecated #675
+	- SVG detection fix for inline data images #646
+	- Fix count svg #647
+	- Since the version 6.7.4, the "0" is considered like empty string and not displayed
+	- Fixed handling of transparency in PDF/A mode in addExtGState method
+	- Encrypt /DA string when document is encrypted
+	- Improve quality of generated seed, avoid potential security pitfall
+	- Try to use random_bytes() first if it's available
+	- Do not include the server parameters in the generated seed, as they might contain sensitive data
+	- Fix bug on _getannotsrefs when there are empty signature appearances but not other annot on a page
+	- Fix SVG coordinate parser that caused drawing artifacts
+	- Remove usage of xml_set_object() function
+
+6.7.6 (2024-10-06)
+	- Forbid access to parent folder in HTML images.
+
+6.7.5 (2024-04-20)
+	- Update GitHub actions
+	- fix: CSV-2024-22640 (#712)
+
+6.7.4 (2024-03-24)
+	- Upgrade tcpdf tag encryption algorithm.
+	- Fix regression issue #699.
+	- Fix security issue.
+	- [BREAKING CHANGE] The tcpdf HTML tag syntax has changed, see example_049.php.
+	- New K_ALLOWED_TCPDF_TAGS configuration constant to set the allowed methods for the tcdpf HTML tag.
+	- Raised minimum PHP version to PHP 5.5.0.
+
+6.6.5 (2023-09-02)
+	- Fix corrupted file.
+	- Fix GitHub automation tests.
+	- Fix SPDX license ID (#591)
+	- Fix warning "array offset on value of type null" (#620)
+	- Improve the README about the status of this library (#589)
+	- Fix deprecation warning with PHP 8.1 (#614)
+	- Fixes for PHP 8.2 in tcpdf_fonts.php (#632)
+	- Fix some php 8+ edge cases (#630)
+	- Fix composite glyph output (#581)
+	- Fix "access array offset on value of type bool" with PDF/A (#583)
+	- Fix non-numeric value warning (#627)
+	- Fix issues with S25 barcode (#611)
+	- Fix return type annotations (#613)
+	- Fix some inconsistencies in type hints (#598)
+
+6.6.2 (2022-12-17)
+	- Ensure pregSplit return type is always array.
+	- Add ability to run tests on various operating systems (#566)
+	- Avoid a deprecated error from PHP8.1 (#573)
+
+6.6.1 (2022-12-12)
+	- Add PHPStan and fix level 1 errors (#307)
+
+6.6.0 (2022-12-06)
+	- Multi-byte character support for filename during output (#561). (#562)
+	- Fix garbage collection (#509)
+	- FIX: PDF417 corrupt output problem, solution set bcmath scale parameter to zero (#534)
+	- Fix TypeError: count() in PHP8 (#556)
+	- Fix-getHTMLFontUnits (#547)
+	- Improved embedded image in HTML allowing src="data:..." format (#552)
+	- Fix image abscissa when in RTL (#510)
+	- fix: php 8.1 notices (#548)
+	- Optimize PNG files (#563)
+	- Update documentation for a known issue. (#569)
+	- Fix for PHP 8.1 (#571)
+
+6.5.0 (2022-08-12)
+	- encodeUrlQuery takes into account the port (#493)
+	- Fixing undefined offset error in writeHTML() when last DOM element ha…
+	- correct some type hints (#495)
+	- fix: php 8.1 notices (#481)
+	- Fixed: null check for PHP 8.1 (#476)
+	- Fix Infinite Loop in Multicell with Auto Page Breaks Off (#473)
+	- GetCssBorderStyle Has Problem When !important Is Specified (#467)
+	- Support Apache 2.4 directives in htaccess file (#530)
+	- Remove examples from dist package (#542)
+
+6.4.4 (2021-12-31)
+	- PHP 8.1 fixes
+
+6.4.3 (2021-12-28)
+	- Fix MultiCell PHPDoc typehint (#407)
+	- Fix type hint for \TCPDF_STATIC::_freadint (#414)
+	- Footer and Header font phpdoc fixes + constructor $pdfa phpdoc fix + setHeaderData lw param fix (#402)
+	- Fix text-annotation state options (#412)
+	- Fix - Named links have been broken. This fixes. (#415)
+	- Fixed type in comment for $lw header image logo width in mm
+	- Change Set to set. Fixes #419 (#421)
+	- Fix failing tests and failing tests not marking exit code as 1 (#426)
+	- Fix phpdoc and prefer null as default value (#444)
+	- Run on PHP 8.1 normally and add nightly PHP as allowed to fail (#452)
+	- Fix AES128 encryption if the OpenSSL extension is installed (#453)
+	- Explicitly cast values to int for imagesetpixel (#460)
+	- Fix cell_height_ratio type (#405)
+	- Leave &NBSP; lowercase when using text-transform (#403)
+
+6.4.2 (2021-07-20)
+	- Fix PHP 8.1 type error with TCPDF_STATIC::pregSplit on preg_split
+	- Fix a PHP array offset error
+	- Fixed phpdoc blocks
+	- Drop a PHP 4 polyfill and add a .gitattributes file
+	- Added a test-suite
+	- Removed pointless assignments
+	- Fix docblock spelling error
+	- Update version info
+	- Fix color being filled to type 0 with PHP 8
+	- Fix warnings for undefined tags for $lineStyle
+	- Normalized composer.json
+	- Allowed transparency in PDF/A-2 and PDF/A-3
+	- Add a TCPDF composer example
+	- Fixed implicit conversion from float to int for PHP 8.1
+	- Removed status.txt from font directories, because of filesize
+	- Fixed type hints
+	- Removed "U" modifier from regexes
+
+6.4.1 (2021-03-27)
+	- Update tcpdf version (no code changes)
+
+6.4.0 (2021-03-27)
+	- allow styles on <HR> tags
+	- check if file exists before calling unlink
+	- Fix image file type for urls with query params
+	- Fix SVGPath should accept 1.19.30 (equiv 1.19,.30) compacted values list
+	- Fix Second parameter of TCPDF::cell() must be a number
+	- PHP 8.0 function signature fixes
+	- Fix vulnerability to roman numeral bombs
+	- Optimized a regular expression
+	- Cache file get contents calls
+	- Remove mb_internal encoding handling
+
+6.3.5 (2020-02-14)
+	- Fixed curly braces in pdf417
+	- Fixed a syntax error issue when accessing an index of a casted variable
+
+6.3.4 (2020-02-12)
+	- Check if imagekeys exist
+	- Unlink only images in cache
+
+6.3.3 (2020-02-12)
+	- Fixed PHP 7.4 - cannot use array offset on integers
+	- Fixed PDF/A-3B validation issue caused by missing pdfaSchema:property.
+	- Removed backup changelog files from repo
+	- Prevents the deletion of non-existent files in /tmp
+	- Prevent crash in case of no list access in cache path
+	- Check existence of file before delete it
+	- Fixed erase users pictures
+	- Fixed problem with $imagekeys undefined or unlinked
+	- Fix SVGPath elliptical arc with rx/ry=0 + z should return to initial point
+	- Fixed PHP 7.4 errors
+	- handle integers for pages
+	- Fixed background image doesn't work in RTL
+	- Fixed PDF/A validity
+	- Fixed datamatrix.php for PHP 7.4
+	- Fixed deprecated PHP features
+
+6.3.2 (2019-09-20)
+	- Update ICC profile
+
+6.3.1 (2019-09-20)
+	- Fix reported version
+	- Fix Undefined property: GLPIPDF::$imagekeys
+
+6.3.0 (2019-09-19)
+	- fix SpotColor handling in HTML
+	- Add an additional empty test to prevent error in PHP 7.2
+	- Fix the documentation how to calculate the cell height
+	- Drop duplicated array indices
+	- Fix TCPDF_STATIC::fileGetContents()
+	- Introduce other version of pdfA (2 and 3)
+	- Add UF and AFRelationship missing
+	- Fix performance issue of cloned instances
+	- Change glob to readdir which performs better
+	- URI in PDF can result in E_NOTICE
+	- Fix a warning for PHP 7.4
+	- Fixed gradient offsets for percentage-based stops.
+	- Fixed file_get_contents return value should also be checked for a non-empty string
+	- Fix Array and string offset access syntax with curly braces is deprecated
+	- Fix PHP Warning: chr() expects parameter 1 to be int
+	- Add a VERSION file
+
+6.2.26 (2018-10-16)
+	- Update sRGB.icc with the one from the Debian package icc-profiles-free
+	- Fix unsupported operand types error when codepoints arrays are merged
+
+6.2.25 (2018-09-23)
 	- Fix support for image URLs.
 
 6.2.24
 	- Support remote urls when checking if file exists.
 
-6.2.23
+6.2.23 (2018-09-22)
 	- Simplify file_exists function.
 
-6.2.22
+6.2.22 (2018-09-14)
+	- Fixes on `include/tcpdf_images.php`, `include/tcpdf_static.php` and `tcpdf.php` about file handling
+
+6.2.21 (2018-09-14)
+	- _no code changes_
+
+6.2.20 (2018-09-14)
 	- Fix for security vulnerability: Using the phar:// wrapper it was possible to trigger the unserialization of user provided data.
 
-6.2.19
+6.2.19 (2018-09-14)
 	- Merge various fixes for PHP 7.3 compatibility and security.
 
 6.2.13 (2016-06-10)

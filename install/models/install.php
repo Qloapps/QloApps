@@ -34,6 +34,11 @@ class InstallModelInstall extends InstallAbstractModel
      */
     public $logger;
 
+    /**
+    * @var array
+    */
+    public $xml_loader_ids = [];
+
     public function __construct()
     {
         parent::__construct();
