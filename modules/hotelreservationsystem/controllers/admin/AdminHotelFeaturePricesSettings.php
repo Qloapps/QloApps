@@ -57,12 +57,25 @@ class AdminHotelFeaturePricesSettingsController extends ModuleAdminController
 
         $this->_where = ' AND a.`id_cart` = 0 AND a.`id_guest` = 0 AND a.`id_room` = 0';
 
-        $impactWays = array(1 => $this->l('Decrease'), 2 => $this->l('Increase'), 3 => $this->l('Fix'));
-        $impactTypes = array(1 => $this->l('Percentage'), 2 => $this->l('Fixed Price'));
+        $impactWays = array(
+            HotelRoomTypeFeaturePricing::IMPACT_WAY_DECREASE => $this->l('Decrease'),
+            HotelRoomTypeFeaturePricing::IMPACT_WAY_INCREASE => $this->l('Increase'),
+            HotelRoomTypeFeaturePricing::IMPACT_WAY_FIX_PRICE => $this->l('Fix')
+        );
+
+        $impactTypes = array(
+            HotelRoomTypeFeaturePricing::IMPACT_TYPE_PERCENTAGE => $this->l('Percentage'),
+            HotelRoomTypeFeaturePricing::IMPACT_TYPE_FIXED_PRICE => $this->l('Fixed Price')
+        );
+        $dateSelectionTypes= array(
+            HotelRoomTypeFeaturePricing::DATE_SELECTION_TYPE_RANGE => $this->l('Date Range(s)'),
+            HotelRoomTypeFeaturePricing::DATE_SELECTION_TYPE_SPECIFIC => $this->l('Specific Date(s)')
+        );
 
         $priorities = Configuration::get('HTL_FEATURE_PRICING_PRIORITY');
         $this->context->smarty->assign('featurePricePriority', explode(';', $priorities));
         $this->fields_options = array('feature_price_priority' => array());
+        $this->_new_list_header_design = true;
         $this->fields_list = array(
             'id_feature_price' => array(
                 'title' => $this->l('ID'),
@@ -88,6 +101,7 @@ class AdminHotelFeaturePricesSettingsController extends ModuleAdminController
                 'align' => 'center',
                 'type' => 'select',
                 'list' => $impactWays,
+                'optional' => true,
                 'filter_key' => 'a!impact_way',
             ),
             'impact_type' => array(
@@ -95,7 +109,17 @@ class AdminHotelFeaturePricesSettingsController extends ModuleAdminController
                 'align' => 'center',
                 'type' => 'select',
                 'list' => $impactTypes,
+                'optional' => true,
                 'filter_key' => 'a!impact_type',
+            ),
+            'date_selection_type' => array(
+                'title' => $this->l('Date Selection type'),
+                'align' => 'center',
+                'type' => 'select',
+                'optional' => true,
+                'list' => $dateSelectionTypes,
+                'filter_key' => 'a!date_selection_type',
+                'callback' => 'setDateSelectionType',
             ),
             'impact_value' => array(
                 'title' => $this->l('Impact Value'),
@@ -148,6 +172,20 @@ class AdminHotelFeaturePricesSettingsController extends ModuleAdminController
         return $displayData;
     }
 
+    public function setDateSelectionType($val)
+    {
+        $dateSelectionTypes= array(
+            HotelRoomTypeFeaturePricing::DATE_SELECTION_TYPE_RANGE => $this->l('Date Range(s)'),
+            HotelRoomTypeFeaturePricing::DATE_SELECTION_TYPE_SPECIFIC => $this->l('Specific Date(s)')
+        );
+
+        if (isset($dateSelectionTypes[$val])) {
+            return $dateSelectionTypes[$val];
+        }
+
+        return '--';
+    }
+
     //A callback function for setting currency sign with amount
     public static function setOrderCurrency($echo, $row)
     {
@@ -166,10 +204,11 @@ class AdminHotelFeaturePricesSettingsController extends ModuleAdminController
     {
         $objFeaturePricing = $this->loadObject();
         if (!$objFeaturePricing->active) {
+            $dateRages = $objFeaturePricing->getDatesByIdFeature($objFeaturePricing->id);
             if ($this->validateExistingFeaturePrice(
                 $objFeaturePricing->date_selection_type,
                 $objFeaturePricing->id_product,
-                array(array('date_from' => $objFeaturePricing->date_from, 'date_to' => $objFeaturePricing->date_to)),
+                $dateRages,
                 $objFeaturePricing->getGroups($objFeaturePricing->id),
                 $objFeaturePricing->id,
                 $objFeaturePricing->is_special_days_exists,
@@ -207,6 +246,10 @@ class AdminHotelFeaturePricesSettingsController extends ModuleAdminController
 
     public function renderForm()
     {
+        if (!$this->loadObject(true)) {
+            return false;
+        }
+
         $smartyVars = array();
         $objCurrency = new Currency(Configuration::get('PS_CURRENCY_DEFAULT'));
         $currencySign = $objCurrency->sign;
@@ -217,7 +260,7 @@ class AdminHotelFeaturePricesSettingsController extends ModuleAdminController
         $smartyVars['languages'] = Language::getLanguages(false);
         $smartyVars['currentLang'] = Language::getLanguage((int) $currentLangId);
 
-        if ($this->display == 'edit') {
+        if ($this->display == 'edit' && $this->object->id) {
             $idFeaturePrice = Tools::getValue('id_feature_price');
             if (Validate::isLoadedObject(
                 $objFeaturePrice = new HotelRoomTypeFeaturePricing($idFeaturePrice)

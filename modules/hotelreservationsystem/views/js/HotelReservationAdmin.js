@@ -717,7 +717,7 @@ $(document).ready(function() {
     });
 
     $(document).on('click', '#add_more_date_button', function() {
-        let index = parseInt($('.dates_ranges_table tr').last().data('row_index'));
+        let index = parseInt($('.specific_dates_table tr').last().data('row_index'));
         if (isNaN(index)) {
             index = 0;
         } else {
