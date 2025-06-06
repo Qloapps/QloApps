@@ -1,0 +1,361 @@
+/* --- General Header Styles --- */
+.custom-header {
+    position: relative; /* Or sticky/fixed as needed */
+    width: 100%;
+    z-index: 1000; /* Ensure it's above other content */
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.custom-header .container {
+    width: 100%;
+    padding-right: 15px;
+    padding-left: 15px;
+    margin-right: auto;
+    margin-left: auto;
+}
+
+@media (min-width: 768px) {
+    .custom-header .container {
+        max-width: 750px;
+    }
+}
+@media (min-width: 992px) {
+    .custom-header .container {
+        max-width: 970px;
+    }
+}
+@media (min-width: 1200px) {
+    .custom-header .container {
+        max-width: 1170px;
+    }
+}
+
+/* --- Desktop Header Styles --- */
+.bh-desktop-header {
+    display: none; /* Hidden by default, shown by media query */
+    background-color: #fff; /* Example background */
+}
+
+.bh-top-bar {
+    background-color: #333; /* Dark background */
+    color: #fff; /* Light text */
+    padding: 10px 0;
+    font-size: 0.9em;
+}
+
+.bh-top-bar .row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.bh-top-left {
+    display: flex;
+    align-items: center;
+}
+
+.bh-top-left .bh-top-link {
+    color: #fff;
+    text-decoration: none;
+    padding: 0 10px;
+}
+.bh-top-left .bh-top-link:hover {
+    text-decoration: underline;
+}
+
+.bh-top-left .bh-separator {
+    margin: 0 5px;
+    color: #777;
+}
+
+.bh-top-center {
+    text-align: center;
+}
+
+.bh-logo {
+    max-height: 50px; /* Adjust as needed */
+    margin-bottom: 5px;
+}
+
+.bh-brand-text-1, .bh-brand-text-2 {
+    font-size: 0.8em;
+    line-height: 1.2;
+    color: #ccc; /* Lighter text for sub-branding */
+}
+.bh-brand-text-1 {
+    font-weight: bold;
+    color: #fff;
+}
+
+
+.bh-top-right {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.bh-phone-number {
+    margin-right: 15px;
+    color: #fff;
+}
+
+.bh-language-selector-placeholder {
+    position: relative; /* For dropdown positioning */
+}
+.bh-language-selector-placeholder .dropdown-toggle { /* Example styling for prestashop lang selector */
+    color: #fff;
+    text-decoration: none;
+    padding: 5px;
+    border: 1px solid #555;
+    border-radius: 3px;
+}
+
+
+.bh-bottom-bar {
+    background-color: #f8f8f8; /* Subtle background */
+    padding: 15px 0;
+    border-top: 1px solid #eee;
+}
+
+.bh-main-nav {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    justify-content: center; /* Or flex-start, space-around */
+}
+
+.bh-main-nav li a {
+    padding: 10px 15px;
+    text-decoration: none;
+    color: #333; /* Dark text for nav links */
+    font-weight: bold;
+}
+.bh-main-nav li a:hover {
+    background-color: #eee;
+    color: #000;
+}
+
+.bh-desktop-cta-button {
+    position: absolute;
+    right: 20px; /* Adjust as needed */
+    top: 50%;
+    transform: translateY(-50%); /* Vertically center if top/bottom bars are roughly equal */
+    /* Alternative: top: 10px; if aligned with top bar only */
+    background-color: #555; /* Contrasting dark background */
+    color: #fff; /* Light text */
+    padding: 15px 25px; /* Make it prominent */
+    text-decoration: none;
+    font-weight: bold;
+    border: 1px solid #444;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+.bh-desktop-cta-button:hover {
+    background-color: #222;
+    color: #fff;
+}
+
+
+/* --- Mobile Header Styles --- */
+.bh-mobile-header {
+    display: block; /* Shown by default, hidden by media query for larger screens */
+    background-color: #333; /* Default if no image */
+    color: #fff;
+    padding: 10px;
+    position: relative; /* For child absolute positioning */
+    /* background-size: cover; */ /* Set this if BH_MOBILE_BG_IMAGE is always present or via inline style */
+    /* background-position: center; */
+}
+
+.bh-mobile-top-overlay {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 10px; /* Space for elements before nav panel */
+}
+
+.bh-mobile-branding {
+    text-align: center;
+    flex-grow: 1; /* Allow it to take space */
+}
+
+.bh-logo-mobile {
+    max-height: 40px; /* Smaller logo for mobile */
+    margin-bottom: 3px;
+}
+.bh-brand-text-1-mobile, .bh-brand-text-2-mobile {
+    font-size: 0.7em;
+    line-height: 1.1;
+    color: #ccc;
+}
+.bh-brand-text-1-mobile {
+    font-weight: bold;
+    color: #fff;
+}
+
+
+.bh-mobile-language-selector {
+    position: relative;
+}
+.bh-mobile-language-selector .dropdown-toggle { /* Example styling for prestashop lang selector */
+    color: #fff;
+    padding: 5px;
+}
+
+
+.bh-mobile-nav-toggle {
+    background: transparent;
+    border: 1px solid #fff;
+    color: #fff;
+    padding: 5px 8px;
+    cursor: pointer;
+    border-radius: 3px;
+    font-size: 1.2em; /* Make icon bars larger if using text */
+}
+.bh-mobile-nav-toggle .bh-icon-bar {
+    display: block;
+    width: 22px;
+    height: 2px;
+    background-color: #fff;
+    margin: 4px 0;
+}
+
+.bh-mobile-nav-panel {
+    display: none; /* Hidden by default, shown by JS */
+    position: fixed; /* Or absolute if header itself is not fixed */
+    top: 0;
+    left: 0;
+    width: 280px; /* Example width */
+    height: 100%;
+    background-color: #222; /* Dark background for panel */
+    padding: 20px;
+    z-index: 1005; /* Above header, below modals if any */
+    overflow-y: auto;
+    box-shadow: 2px 0 5px rgba(0,0,0,0.2);
+}
+.bh-mobile-nav-panel.open {
+    display: block;
+}
+
+.bh-mobile-nav-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+.bh-mobile-nav-list li a {
+    display: block;
+    padding: 12px 0;
+    color: #fff;
+    text-decoration: none;
+    font-size: 1.1em;
+    border-bottom: 1px solid #444;
+}
+.bh-mobile-nav-list li:last-child a {
+    border-bottom: none;
+}
+.bh-mobile-nav-list li a:hover {
+    background-color: #444;
+}
+
+
+.bh-mobile-bottom-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: #282828; /* Dark background */
+    color: #fff;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 8px 0;
+    box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
+    z-index: 1000;
+}
+
+.bh-mobile-bottom-link {
+    color: #fff;
+    text-decoration: none;
+    text-align: center;
+    font-size: 0.8em;
+    flex: 1; /* Equal width */
+    padding: 5px;
+}
+.bh-mobile-bottom-link i {
+    display: block;
+    font-size: 1.5em; /* Icon size */
+    margin-bottom: 3px;
+}
+.bh-mobile-bottom-link.bh-mobile-cta {
+    background-color: #555; /* Different background for CTA */
+    font-weight: bold;
+    border-radius: 3px; /* Slight rounding */
+    margin: 0 5px; /* Some spacing */
+}
+.bh-mobile-bottom-link.bh-mobile-cta:hover {
+    background-color: #777;
+}
+
+
+/* --- Sticky Behavior --- */
+.custom-header.is-sticky-desktop .bh-desktop-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    animation: slideDownDesktop 0.3s ease-out;
+}
+
+.custom-header.is-sticky-mobile .bh-mobile-header .bh-mobile-top-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background-color: #333; /* Ensure background for sticky top part */
+    z-index: 1001; /* Above content, below nav panel if open */
+    padding: 10px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    animation: slideDownMobile 0.3s ease-out;
+}
+/* Add padding to body when mobile header is sticky to prevent content overlap, if needed */
+/* body.has-sticky-mobile-header { padding-top: 60px; } */ /* Adjust 60px to actual height */
+
+
+@keyframes slideDownDesktop {
+    from { transform: translateY(-100%); }
+    to { transform: translateY(0); }
+}
+@keyframes slideDownMobile {
+    from { transform: translateY(-100%); }
+    to { transform: translateY(0); }
+}
+
+
+/* --- Media Queries for Responsive Layout --- */
+@media (min-width: 992px) { /* Desktop view */
+    .bh-desktop-header {
+        display: block;
+    }
+    .bh-mobile-header {
+        display: none;
+    }
+}
+
+@media (max-width: 991px) { /* Mobile view */
+    .bh-desktop-header {
+        display: none;
+    }
+    .bh-mobile-header {
+        display: block;
+         /* If mobile bg image is used, ensure it covers area */
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+    }
+    /* Adjust padding for fixed bottom bar if content is obscured */
+    body {
+        /* padding-bottom: 60px; */ /* Adjust to height of .bh-mobile-bottom-bar if it causes overlap */
+    }
+}
