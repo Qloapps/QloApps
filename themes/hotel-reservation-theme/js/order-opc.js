@@ -118,14 +118,12 @@ $(document).ready(function()
 		validateCustomerGuestDetailForm();
 	}
 	$(document).on('click', '.submit-guest-details', function(e) {
-		e.preventDefault();
 		if ($('#customer_guest_detail').prop('checked')) {
 			validateCustomerGuestDetailForm();
+			e.preventDefault();
 			if ($('#customer_guest_detail_form').find('.form-error').length == 0) {
 				$('#customer_guest_detail_form').get(0).submit();
 			}
-		} else {
-			$('#customer_guest_detail_form').get(0).submit();
 		}
 	});
 

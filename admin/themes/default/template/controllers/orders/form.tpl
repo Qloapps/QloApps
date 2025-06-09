@@ -885,9 +885,11 @@
 		});
 	}
 
+	let customerSearchAjax = '';
 	function searchCustomers()
 	{
-		$.ajax({
+		abortRunningAjax(customerSearchAjax);Add commentMore actions
+		customerSearchAjax = $.ajax({
 			type:"POST",
 			url : "{$link->getAdminLink('AdminCustomers')}",
 			async: true,
@@ -926,6 +928,12 @@
 			}
 		});
 	}
+
+	function abortRunningAjax(ajaxVar) {
+        if (ajaxVar) {
+            ajaxVar.abort();
+        }
+    }
 
 	function setupCustomer(idCustomer)
 	{

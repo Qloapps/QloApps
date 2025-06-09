@@ -51,7 +51,7 @@ class WebserviceSpecificManagementImagesCore implements WebserviceSpecificManage
         'room_types' => array(),
         'hotels' => array(),
         'categories' => array(),
-        'extra_service' => array(),
+        'services' => array(),
         // 'manufacturers' => array(),
         // 'suppliers' => array(),
         // 'stores' => array(),
@@ -288,7 +288,7 @@ class WebserviceSpecificManagementImagesCore implements WebserviceSpecificManage
         $this->imageType = $this->wsObject->urlSegment[1];
         // if image type requested is room_types then process products images
         if ($this->imageType == 'room_types'
-            || $this->imageType == 'extra_services'
+            || $this->imageType == 'services'
         ) {
             $this->imageType = 'products';
         }
@@ -305,7 +305,7 @@ class WebserviceSpecificManagementImagesCore implements WebserviceSpecificManage
             case 'stores':
             case 'features':
             case 'hotels':
-            case 'extra_services':
+            case 'services':
             case 'room_types':
                 switch ($this->wsObject->urlSegment[1]) {
                     case 'categories':
@@ -326,7 +326,7 @@ class WebserviceSpecificManagementImagesCore implements WebserviceSpecificManage
                     case 'room_types':
                         $directory = _PS_PROD_IMG_DIR_;
                         break;
-                    case 'extra_services':
+                    case 'services':
                         $directory = _PS_PROD_IMG_DIR_;
                         break;
                     case 'hotels':
@@ -511,14 +511,20 @@ class WebserviceSpecificManagementImagesCore implements WebserviceSpecificManage
 
         if ($this->imageType == 'products') {
             $ids = array();
-            $images = Image::getAllImages();
+            if ($this->wsObject->urlSegment[1] == 'services') {
+                $resourceType = 'services';
+                $images = Image::getAllImages(0);
+            } else {
+                $resourceType = 'room_types';
+                $images = Image::getAllImages(1);
+            }
             foreach ($images as $image) {
                 $ids[] = $image['id_product'];
             }
             $ids = array_unique($ids, SORT_NUMERIC);
             asort($ids);
             foreach ($ids as $id) {
-                $this->output .= $this->objOutput->getObjectRender()->renderNodeHeader('image', array(), array('id' => $id, 'xlink_resource'=>$this->wsObject->wsUrl.'images/'.'room_types'.'/'.$id), false);
+                $this->output .= $this->objOutput->getObjectRender()->renderNodeHeader('image', array(), array('id' => $id, 'xlink_resource'=>$this->wsObject->wsUrl.'images/'.$resourceType.'/'.$id), false);
             }
         } else if ($this->imageType == 'hotels') {
             $ids = array();
@@ -567,10 +573,17 @@ class WebserviceSpecificManagementImagesCore implements WebserviceSpecificManage
         if ($this->imageType == 'products') {
             // Get available image ids
             $available_image_ids = array();
+            if ($this->wsObject->urlSegment[1] == 'services') {
+                $resourceType = 'services';
+                $bookingProduct = 0;
+            } else {
+                $bookingProduct = 1;
+                $resourceType = 'room_types';
+            }
 
             // New Behavior
             foreach (Language::getIDs() as $id_lang) {
-                foreach (Image::getImages($id_lang, $object_id) as $image) {
+                foreach (Image::getImages($id_lang, $object_id, null, $bookingProduct) as $image) {
                     $available_image_ids[] = $image['id_image'];
                 }
             }
@@ -607,7 +620,7 @@ class WebserviceSpecificManagementImagesCore implements WebserviceSpecificManage
                 if ($available_image_ids) {
                     $this->output .= $this->objOutput->getObjectRender()->renderNodeHeader('image', array(), array('id'=>$object_id));
                     foreach ($available_image_ids as $available_image_id) {
-                        $this->output .= $this->objOutput->getObjectRender()->renderNodeHeader('declination', array(), array('id'=>$available_image_id, 'xlink_resource'=>$this->wsObject->wsUrl.'images/'.'room_types'.'/'.$object_id.'/'.$available_image_id), false);
+                        $this->output .= $this->objOutput->getObjectRender()->renderNodeHeader('declination', array(), array('id'=>$available_image_id, 'xlink_resource'=>$this->wsObject->wsUrl.'images/'.$resourceType.'/'.$object_id.'/'.$available_image_id), false);
                     }
                     $this->output .= $this->objOutput->getObjectRender()->renderNodeFooter('image', array());
                 } else {

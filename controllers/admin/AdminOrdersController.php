@@ -1386,13 +1386,12 @@ class AdminOrdersControllerCore extends AdminController
         $id_lang_shop = false
     ){
         if ($this->action == 'export' && empty($this->_listsql)) {
-            $this->_select .= ', c.`email`, cgd.`phone`, a.`total_paid_real`,
+            $this->_select .= ', c.`email`, c.`phone`, a.`total_paid_real`,
                 orf.`cancellation_date`, orf.`cancellation_fee`,
                 cy.`iso_code` AS country, st.`iso_code` as state, ad.`city`,
                 CONCAT(ad.`address1`, \', \', ad.`postcode`) AS `cus_address`, hbdtl.*';
 
-            $this->_join .= ' LEFT JOIN `'._DB_PREFIX_.'cart_customer_guest_detail` cgd ON cgd.`email` = c.`email` AND cgd.`id_cart` = 0
-                LEFT JOIN `'._DB_PREFIX_.'address` ad ON a.`id_customer`= ad.`id_customer` AND ad.`id_customer`!=0
+            $this->_join .= ' LEFT JOIN `'._DB_PREFIX_.'address` ad ON a.`id_customer`= ad.`id_customer` AND ad.`id_customer`!=0
                 LEFT JOIN `'._DB_PREFIX_.'country` cy ON cy.`id_country`= ad.`id_country`
                 LEFT JOIN `'._DB_PREFIX_.'state` st ON st.`id_state`= ad.`id_state`
                 LEFT JOIN (

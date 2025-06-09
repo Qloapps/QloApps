@@ -192,7 +192,7 @@ class wkhotelfilterblock extends Module
                     if (!($date_to = Tools::getValue('date_to'))) {
                         $date_to = date('Y-m-d H:i:s', strtotime($date_from) + 86400);
                     } else {
-                        $urlData['date_from'] = $date_to;
+                        $urlData['date_to'] = $date_to;
                     }
 
                     if ($occupancy = Tools::getValue('occupancy')) {

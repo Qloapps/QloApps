@@ -211,6 +211,9 @@ class InstallModelInstall extends InstallAbstractModel
         Configuration::updateGlobalValue('PS_LANG_DEFAULT', $id_lang);
         Configuration::updateGlobalValue('PS_VERSION_DB', _PS_INSTALL_VERSION_);
         Configuration::updateGlobalValue('PS_INSTALL_VERSION', _PS_INSTALL_VERSION_);
+        Configuration::updateGlobalValue('QLO_VERSION_DB', _QLO_INSTALL_VERSION_);
+        Configuration::updateGlobalValue('QLO_INSTALL_VERSION', _QLO_INSTALL_VERSION_);
+
         return true;
     }
 
@@ -475,6 +478,7 @@ class InstallModelInstall extends InstallAbstractModel
         Configuration::updateGlobalValue('PS_SHOP_DOMAIN',                Tools::getHttpHost());
         Configuration::updateGlobalValue('PS_SHOP_DOMAIN_SSL',            Tools::getHttpHost());
         Configuration::updateGlobalValue('PS_INSTALL_VERSION',            _PS_INSTALL_VERSION_);
+        Configuration::updateGlobalValue('QLO_INSTALL_VERSION',          _QLO_INSTALL_VERSION_);
         Configuration::updateGlobalValue('PS_LOCALE_LANGUAGE',            $this->language->getLanguageIso());
         Configuration::updateGlobalValue('PS_SHOP_NAME',                $data['shop_name']);
         Configuration::updateGlobalValue('PS_SHOP_ACTIVITY',                $data['shop_activity']);

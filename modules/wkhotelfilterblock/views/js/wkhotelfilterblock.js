@@ -41,8 +41,8 @@ $(document).ready(function()
 				$("#filter_price_silder").slider("values", [min_price, max_price]);
 
 				var slider_price_cont = filter_wrapper.find("div.price_filter_subcont");
-				slider_price_cont.find("span#filter_price_from").html(min_price);
-				slider_price_cont.find("span#filter_price_to").html(max_price);
+				slider_price_cont.find("span#filter_price_from").html(formatCurrency(min_price, currencyFormat, currencySign, currencyBlank));
+				slider_price_cont.find("span#filter_price_to").html(formatCurrency(max_price, currencyFormat, currencySign, currencyBlank));
 
 				/* -------NOTICE------- */
 				//triggerFilter();

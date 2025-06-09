@@ -385,7 +385,7 @@ class AdminAddressesControllerCore extends AdminController
     {
         $this->fields_list = array_merge($this->fields_list, array(
             'email' => array('title' => $this->l('Customer Email')),
-            'phone' => array('title' => $this->l('Phone')),
+            'phone' => array('title' => $this->l('Phone'), 'filter_key' => 'a!phone'),
             'phone_mobile' => array('title' => $this->l('Mobile phone')),
             'address1' => array('title' => $this->l('Address (2)')),
             'dni' => array('title' => $this->l('Identification Number')),

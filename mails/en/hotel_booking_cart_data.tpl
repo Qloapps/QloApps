@@ -38,6 +38,7 @@
                         {$rm_v['num_rm']}
                     </td>
                     <td>
+                        {if !isset($show_full_date)}{assign var="show_full_date" value=0}{/if}
                         {assign var="is_full_date" value=($show_full_date && ($rm_v['data_form']|date_format:'%D' == $rm_v['data_to']|date_format:'%D'))}
                         {$rm_v['data_form']|date_format:"%d-%b-%G"}{if $is_full_date} {$rm_v['data_form']|date_format:"%I:%M %p"}{/if}
                     </td>

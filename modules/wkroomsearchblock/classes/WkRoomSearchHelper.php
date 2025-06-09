@@ -192,8 +192,6 @@ class WkRoomSearchHelper
                             $searchedData['order_date_restrict'] = true;
                         }
                     }
-
-                    $smartyVars['search_data'] = $searchedData;
                 }
 
                 if ($occupancyEnabled) {

@@ -388,10 +388,11 @@ $(document).ready(function() {
             start_date.setHours(0, 0, 0, 0);
         }
 
-        let selectedDateFrom = new Date(Date.parse(dateFrom));
-        let selectedDateTo = new Date(Date.parse(dateTo));
+        // Using the Date object will also add extra hours according to the timezone.
+        let selectedDateFrom = $.datepicker.parseDate('yy-mm-dd', dateFrom);
+        let selectedDateTo = $.datepicker.parseDate('yy-mm-dd', dateTo);
         if (max_order_date) {
-            max_order_date = $.datepicker.parseDate('yy-mm-dd', max_order_date );
+            max_order_date = $.datepicker.parseDate('yy-mm-dd', max_order_date);
         } else {
             max_order_date = false;
         }

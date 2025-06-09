@@ -145,6 +145,7 @@ class AdminImportControllerCore extends AdminController
                     'id_state' => array('label' => $this->l('State ID')),
                     'city' => array('label' => $this->l('City *')),
                     'postcode' => array('label' => $this->l('Zip Code *')),
+                    'fax' => array('label' => $this->l('Fax')),
                     'policies' => array('label' => $this->l('Hotel Policies')),
                     'active_refund' => array('label' => $this->l('Allow Refund (0 = No, 1 = Yes)')),
                     'refund_ids' => array('label' => $this->l('Refund IDs (x,y,z...)')),
@@ -1200,6 +1201,11 @@ class AdminImportControllerCore extends AdminController
                         $this->l('Zip code is invalid for (ID: %1$s)'),
                         (isset($info['id']) && !empty($info['id']))? $info['id'] : 'null'
                     );
+                } else if (isset($info['fax']) && !Validate::isGenericName($info['fax'])) {
+                    $this->errors[] = sprintf(
+                        $this->l('Fax is invalid for (ID: %1$s)'),
+                        (isset($info['id']) && !empty($info['id']))? $info['id'] : 'null'
+                    );
                 } else if ($objCountry->active) {
                     if ($objCountry->contains_states) {
                         if (!isset($info['id_state'])
@@ -1254,6 +1260,7 @@ class AdminImportControllerCore extends AdminController
                             $objAddress->id_state = $info['id_state'];
                             $objAddress->city = $info['city'];
                             $objAddress->postcode = $info['postcode'];
+                            $objHotelBranch->fax = $info['fax'];
                             $hotelName = $objHotelBranch->hotel_name[$idLangDefault];
                             $objAddress->alias = $hotelName;
                             $hotelName = trim(preg_replace('/[0-9!<>,;?=+()@#"°{}_$%:]*$/u', '', $hotelName));
@@ -1438,16 +1445,18 @@ class AdminImportControllerCore extends AdminController
                         $objHotelOrderRestrictDate->use_global_min_booking_offset = true;
 
                         if (isset($info['max_checkout_offset'])
-                            && (Configuration::get('PS_MIN_BOOKING_OFFSET') < $info['max_checkout_offset']
-                            || isset($info['min_booking_offset']) && $info['min_booking_offset'] < $info['max_checkout_offset'])
+                            && ((Configuration::get('PS_MIN_BOOKING_OFFSET') < $info['max_checkout_offset'])
+                                || (isset($info['min_booking_offset']) && ($info['min_booking_offset'] < $info['max_checkout_offset']))
+                            )
                         ) {
                             $objHotelOrderRestrictDate->use_global_max_checkout_offset = false;
                             $objHotelOrderRestrictDate->max_checkout_offset = $info['max_checkout_offset'];
                         }
 
                         if (isset($info['min_booking_offset'])
-                            && (Configuration::get('PS_MAX_CHECKOUT_OFFSET') > $info['min_booking_offset']
-                            || isset($info['max_checkout_offset']) && $info['max_checkout_offset'] > $info['min_booking_offset'])
+                            && ((Configuration::get('PS_MAX_CHECKOUT_OFFSET') > $info['min_booking_offset'])
+                                || (isset($info['max_checkout_offset']) && ($info['max_checkout_offset'] > $info['min_booking_offset']))
+                            )
                         ) {
                             $objHotelOrderRestrictDate->use_global_min_booking_offset = false;
                             $objHotelOrderRestrictDate->min_booking_offset = $info['min_booking_offset'];
@@ -2449,39 +2458,41 @@ class AdminImportControllerCore extends AdminController
                 $idHotel = 0;
                 $objCustomer = new Customer($info['id_customer']);
                 $objProduct = new Product($info['id_product']);
-                if (Validate::isLoadedObject($objCustomer)
-                    && Validate::isLoadedObject($objProduct)
-                ) {
-                    if (!isset($hotelRoomTypeInfo[$info['id_product']])) {
-                        if ($roomInfo = $objHotelRoomType->getRoomTypeInfoByIdProduct($singleRow->id_product)) {
+                if (Validate::isLoadedObject($objCustomer)) {
+                    if (Validate::isLoadedObject($objProduct) || $objProduct->booking_product) {
+                        if (!isset($hotelRoomTypeInfo[$info['id_product']])) {
+                            if ($roomInfo = $objHotelRoomType->getRoomTypeInfoByIdProduct($singleRow->id_product)) {
+                                $singleRow->id_hotel = $roomInfo['id_hotel'];
+                                $idHotel = $roomInfo['id_hotel'];
+                                $singleRow->adults = $roomInfo['adults'];
+                                $singleRow->children = $roomInfo['children'];
+                                $hotelRoomTypeInfo[$info['id_product']] = $roomInfo;
+                            }
+                        } else {
+                            $roomInfo = $hotelRoomTypeInfo[$info['id_product']];
                             $singleRow->id_hotel = $roomInfo['id_hotel'];
                             $idHotel = $roomInfo['id_hotel'];
                             $singleRow->adults = $roomInfo['adults'];
                             $singleRow->children = $roomInfo['children'];
-                            $hotelRoomTypeInfo[$info['id_product']] = $roomInfo;
+                        }
+
+                        $ordersRow[$info['id_order']][$singleRow->id_hotel][] = (array) $singleRow;
+                        if (!isset($orderInfo[$info['id_order']])) {
+                            $orderInfo[$info['id_order']]['id_customer'] = $singleRow->id_customer;
+                            if (isset($singleRow->id_order_status)) {
+                                $orderInfo[$info['id_order']]['id_order_status'] = $singleRow->id_order_status;
+                            } else {
+                                $orderInfo[$info['id_order']]['id_order_status'] = Configuration::get('PS_OS_AWAITING_REMOTE_PAYMENT');
+                            }
+
+                            if (isset($singleRow->id_currency)) {
+                                $orderInfo[$info['id_order']]['id_currency'] = $singleRow->id_currency   ;
+                            } else {
+                                $orderInfo[$info['id_order']]['id_currency'] = Configuration::get('PS_CURRENCY_DEFAULT');
+                            }
                         }
                     } else {
-                        $roomInfo = $hotelRoomTypeInfo[$info['id_product']];
-                        $singleRow->id_hotel = $roomInfo['id_hotel'];
-                        $idHotel = $roomInfo['id_hotel'];
-                        $singleRow->adults = $roomInfo['adults'];
-                        $singleRow->children = $roomInfo['children'];
-                    }
-
-                    $ordersRow[$info['id_order']][$singleRow->id_hotel][] = (array) $singleRow;
-                    if (!isset($orderInfo[$info['id_order']])) {
-                        $orderInfo[$info['id_order']]['id_customer'] = $singleRow->id_customer;
-                        if (isset($singleRow->id_order_status)) {
-                            $orderInfo[$info['id_order']]['id_order_status'] = $singleRow->id_order_status;
-                        } else {
-                            $orderInfo[$info['id_order']]['id_order_status'] = Configuration::get('PS_OS_AWAITING_REMOTE_PAYMENT');
-                        }
-
-                        if (isset($singleRow->id_currency)) {
-                            $orderInfo[$info['id_order']]['id_currency'] = $singleRow->id_currency   ;
-                        } else {
-                            $orderInfo[$info['id_order']]['id_currency'] = Configuration::get('PS_CURRENCY_DEFAULT');
-                        }
+                        $this->warnings[] = $this->l('Invalid room type Id: ').$info['id_product'];
                     }
                 }
             }
@@ -2658,7 +2669,7 @@ class AdminImportControllerCore extends AdminController
                         null,
                         false
                     )) {
-                        $this->errors[] = $this->l('Failed to create order for order reference '.$orderRefKey);
+                        $this->errors[] = $this->l('Failed to create booking for reference').' '.$orderRefKey;
                     }
 
                     foreach ($featurePrices as $idPrice) {
