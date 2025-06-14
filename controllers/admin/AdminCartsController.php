@@ -1395,6 +1395,7 @@ class AdminCartsControllerCore extends AdminController
 
                         // ======= Create Service product END =========
                         if ($objServiceProduct->save()) {
+                            $objServiceProduct->updateCategories([Configuration::get('PS_SERVICE_CATEGORY')]);
                             $objRoomTypeServiceProduct = new RoomTypeServiceProduct();
                             $objRoomTypeServiceProduct->addRoomProductLink(
                                 $objServiceProduct->id,
