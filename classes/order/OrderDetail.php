@@ -398,16 +398,84 @@ class OrderDetailCore extends ObjectModel
             }
         }
 
-        $ratio = $this->unit_price_tax_excl / $order->total_products;
-        $order_reduction_amount = ($order->total_discounts_tax_excl - $shipping_tax_amount) * $ratio;
-        $discounted_price_tax_excl = $this->unit_price_tax_excl - $order_reduction_amount;
-
         $values = '';
-        foreach ($this->tax_calculator->getTaxesAmount($discounted_price_tax_excl) as $id_tax => $amount) {
+        $idCart = $order->id_cart;
+        if (!Product::isBookingProduct($this->product_id)) {
+            $idCart = $order->id_cart;
 
-            $total_amount = Tools::processPriceRounding($amount, $this->product_quantity, $order->round_type, $order->round_mode);
+            // Get all associated room type IDs for this service product and cart
+            $associatedRoomTypes = Db::getInstance()->executeS(
+                'SELECT hcbd.`id_product` 
+                FROM `'._DB_PREFIX_.'htl_cart_booking_data` hcbd
+                INNER JOIN `'._DB_PREFIX_.'service_product_cart_detail` spcd 
+                ON spcd.`htl_cart_booking_id` = hcbd.`id`
+                WHERE spcd.`id_product` = '.(int)$this->product_id.'
+                AND spcd.`id_cart` = '.(int)$idCart
+            );
 
-            $values .= '('.(int)$this->id.','.(int)$id_tax.','.(float)$amount.','.(float)$total_amount.'),';
+            if (!empty($associatedRoomTypes)) {
+                $associatedRoomTypeIds = array_column($associatedRoomTypes, 'id_product');
+                $taxGroupInfoList = array();
+
+                foreach ($associatedRoomTypeIds as $idRoomType) {
+                    $taxGroupInfo = Db::getInstance()->getRow(
+                        'SELECT `id_element`, `id_tax_rules_group` 
+                        FROM `'._DB_PREFIX_.'htl_room_type_service_product_price`
+                        WHERE `id_product` = '.(int)$this->product_id.'
+                        AND `id_element` = '.(int)$idRoomType
+                    );
+
+                    if ($taxGroupInfo) {
+                        // Specific tax rules found
+                        $taxGroupInfoList[] = $taxGroupInfo;
+                    } else {
+                        // Use default tax rule for the service product
+                        $defaultTaxGroupId = (int)Product::getIdTaxRulesGroupByIdProduct($this->product_id, $this->context);
+                        $taxGroupInfoList[] = array(
+                            'id_element' => $idRoomType,
+                            'id_tax_rules_group' => $defaultTaxGroupId
+                        );
+                    }
+                }
+            }
+        }
+
+        if (!Product::isBookingProduct($this->product_id) && isset($taxGroupInfoList) && $taxGroupInfoList) {
+            $objServiceProductCartDetail = new ServiceProductCartDetail();
+            // Saving tax details according to the service product tax groups for different rooms
+            foreach ($taxGroupInfoList as $taxGroupInfo) {
+                $tax_manager = TaxManagerFactory::getManager($this->vat_address, $taxGroupInfo['id_tax_rules_group']);
+                $this->tax_calculator = $tax_manager->getTaxCalculator();
+                $serviceProductCartData = $objServiceProductCartDetail->getServiceProductsInCart(
+                    $idCart,
+                    array(),
+                    null,
+                    null,
+                    $taxGroupInfo['id_element'],
+                    $this->product_id
+                );
+                $serviceProduct = array_shift($serviceProductCartData);
+                $ratio = $serviceProduct['unit_price_tax_excl'] / $order->total_products;
+                $order_reduction_amount = ($order->total_discounts_tax_excl - $shipping_tax_amount) * $ratio;
+                $discounted_price_tax_excl = $serviceProduct['unit_price_tax_excl'] - $order_reduction_amount;
+                foreach ($this->tax_calculator->getTaxesAmount($discounted_price_tax_excl) as $id_tax => $amount) {
+        
+                    $total_amount = Tools::processPriceRounding($amount, $serviceProduct['quantity'], $order->round_type, $order->round_mode);
+        
+                    $values .= '('.(int)$this->id.','.(int)$id_tax.','.(float)$amount.','.(float)$total_amount.'),';
+                }
+            }
+        } else {
+            $ratio = $this->unit_price_tax_excl / $order->total_products;
+            $order_reduction_amount = ($order->total_discounts_tax_excl - $shipping_tax_amount) * $ratio;
+            $discounted_price_tax_excl = $this->unit_price_tax_excl - $order_reduction_amount;
+
+            foreach ($this->tax_calculator->getTaxesAmount($discounted_price_tax_excl) as $id_tax => $amount) {
+
+                $total_amount = Tools::processPriceRounding($amount, $this->product_quantity, $order->round_type, $order->round_mode);
+
+                $values .= '('.(int)$this->id.','.(int)$id_tax.','.(float)$amount.','.(float)$total_amount.'),';
+            }
         }
 
         if ($replace) {

@@ -1571,8 +1571,6 @@ abstract class PaymentModuleCore extends Module
                             }
                         }
                     }
-
-                    $order->updateOrderDetailTax();
                 } else {
                     $error = Tools::displayError('Order creation failed');
                     PrestaShopLogger::addLog($error, 4, '0000002', 'Cart', intval($order->id_cart));
