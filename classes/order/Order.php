@@ -2523,7 +2523,10 @@ class OrderCore extends ObjectModel
         foreach ($order_details as $order_detail) {
             $tax_rates = array();
             $id_order_detail = $order_detail['id_order_detail'];
+            $quantity = $order_detail['product_quantity'];
             $tax_calculator = OrderDetail::getTaxCalculatorStatic($id_order_detail);
+            $unit_price_tax_excl = $order_detail['total_price_tax_excl'] / $quantity;
+            $order_detail['unit_price_tax_excl'] = $unit_price_tax_excl;
 
             // TODO: probably need to make an ecotax tax breakdown here instead,
             // but it seems unlikely there will be different tax rates applied to the
@@ -2544,7 +2547,7 @@ class OrderCore extends ObjectModel
                 $discounted_price_tax_excl -= $product_specific_discounts[$order_detail['product_id']];
             }
 
-            $quantity = $order_detail['product_quantity'];
+            
 
             foreach ($tax_calculator->taxes as $tax) {
                 $tax_rates[$tax->id] = $tax->rate;
@@ -2555,7 +2558,7 @@ class OrderCore extends ObjectModel
                 continue;
             }
 
-            $totalTaxBase = Tools::processPriceRounding($discounted_price_tax_excl, $quantity);
+            $totalTaxBase = Tools::processPriceRounding($unit_price_tax_excl, $quantity);
             $objServiceProductOrderDetail = new ServiceProductOrderDetail();
             if (
                 Product::isBookingProduct($order_detail['product_id']) &&

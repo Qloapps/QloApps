@@ -372,23 +372,6 @@ class OrderDetailCore extends ObjectModel
      */
     public function saveTaxCalculator(Order $order, $replace = false)
     {
-        // Nothing to save
-        if ($this->tax_calculator == null) {
-            return true;
-        }
-
-        if (!($this->tax_calculator instanceof TaxCalculator)) {
-            return false;
-        }
-
-        if (count($this->tax_calculator->taxes) == 0) {
-            return true;
-        }
-
-        if ($order->total_products <= 0) {
-            return true;
-        }
-
         $shipping_tax_amount = 0;
 
         foreach ($order->getCartRules() as $cart_rule) {
@@ -444,8 +427,21 @@ class OrderDetailCore extends ObjectModel
             $objServiceProductCartDetail = new ServiceProductCartDetail();
             // Saving tax details according to the service product tax groups for different rooms
             foreach ($taxGroupInfoList as $taxGroupInfo) {
-                $tax_manager = TaxManagerFactory::getManager($this->vat_address, $taxGroupInfo['id_tax_rules_group']);
+                $tax_manager = TaxManagerFactory::getManager($this->vat_address, (int)$taxGroupInfo['id_tax_rules_group']);
                 $this->tax_calculator = $tax_manager->getTaxCalculator();
+                // Nothing to save
+                if ($this->tax_calculator == null) {
+                    continue;
+                }
+
+                if (!($this->tax_calculator instanceof TaxCalculator)) {
+                    continue;
+                }
+
+                if (count($this->tax_calculator->taxes) == 0) {
+                    continue;
+                }
+
                 $serviceProductCartData = $objServiceProductCartDetail->getServiceProductsInCart(
                     $idCart,
                     array(),
@@ -466,9 +462,27 @@ class OrderDetailCore extends ObjectModel
                 }
             }
         } else {
-            $ratio = $this->unit_price_tax_excl / $order->total_products;
+            // Nothing to save
+            if ($this->tax_calculator == null) {
+                return true;
+            }
+
+            if (!($this->tax_calculator instanceof TaxCalculator)) {
+                return false;
+            }
+
+            if (count($this->tax_calculator->taxes) == 0) {
+                return true;
+            }
+
+            if ($order->total_products <= 0) {
+                return true;
+            }
+            
+            $unit_price_tax_excl = $this->total_price_tax_excl / $this->product_quantity;
+            $ratio = $unit_price_tax_excl / $order->total_products;
             $order_reduction_amount = ($order->total_discounts_tax_excl - $shipping_tax_amount) * $ratio;
-            $discounted_price_tax_excl = $this->unit_price_tax_excl - $order_reduction_amount;
+            $discounted_price_tax_excl = $unit_price_tax_excl - $order_reduction_amount;
 
             foreach ($this->tax_calculator->getTaxesAmount($discounted_price_tax_excl) as $id_tax => $amount) {
 
@@ -478,15 +492,20 @@ class OrderDetailCore extends ObjectModel
             }
         }
 
-        if ($replace) {
-            Db::getInstance()->execute('DELETE FROM `'._DB_PREFIX_.'order_detail_tax` WHERE id_order_detail='.(int)$this->id);
+        $values = rtrim($values, ',');
+
+        if ($values) {
+            if ($replace) {
+                Db::getInstance()->execute('DELETE FROM `'._DB_PREFIX_.'order_detail_tax` WHERE id_order_detail='.(int)$this->id);
+            }
+    
+            $sql = 'INSERT INTO `'._DB_PREFIX_.'order_detail_tax` (id_order_detail, id_tax, unit_amount, total_amount)
+                    VALUES '.$values;
+    
+            return Db::getInstance()->execute($sql);
         }
 
-        $values = rtrim($values, ',');
-        $sql = 'INSERT INTO `'._DB_PREFIX_.'order_detail_tax` (id_order_detail, id_tax, unit_amount, total_amount)
-				VALUES '.$values;
-
-        return Db::getInstance()->execute($sql);
+        return true;
     }
 
     public function updateTaxAmount($order)
