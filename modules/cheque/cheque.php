@@ -40,7 +40,7 @@ class Cheque extends PaymentModule
 	{
 		$this->name = 'cheque';
 		$this->tab = 'payments_gateways';
-		$this->version = '2.6.7';
+		$this->version = '2.6.8';
 		$this->author = 'PrestaShop';
 		$this->controllers = array('payment', 'validation');
 

@@ -30,7 +30,7 @@ class QloChannelManagerConnector extends Module
     {
         $this->name = 'qlochannelmanagerconnector';
         $this->tab = 'analytics_stats';
-        $this->version = '1.0.0';
+        $this->version = '1.0.1';
         $this->author = 'Webkul';
         $this->bootstrap = true;
         $this->ps_versions_compliancy = array('min' => '1.6', 'max' => '1.6');

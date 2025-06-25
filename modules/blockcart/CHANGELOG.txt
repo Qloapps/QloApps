@@ -1,4 +1,13 @@
 -----------------------------
+# V1.6.6 to V1.6.7
+-----------------------------
+
+## Improved/Changed Features:
+
+* [CO] : [#1399] Added Standard product flow in QloApps
+* [CO] : [#1464] Updated for PHP version 8.1 to 8.4 and MYSql 8 compatibility
+
+-----------------------------
 # V1.6.5 to V1.6.6
 -----------------------------
 

@@ -34,7 +34,7 @@ class Blockcart extends Module
     {
         $this->name = 'blockcart';
         $this->tab = 'front_office_features';
-        $this->version = '1.6.6';
+        $this->version = '1.6.7';
         $this->author = 'PrestaShop';
         $this->need_instance = 0;
 

@@ -1,4 +1,13 @@
 ------------------------------
+# V1.1.6 to V1.1.7
+------------------------------
+
+## Improved/Changed Features:
+
+* [FO] : [#1396] Fixed Multiple orders creation issue in cheque and bankwire payment gateways in front office.
+* [CO] : [#1464] Updated for PHP version 8.1 to 8.4 and MYSql 8 compatibility
+
+------------------------------
 # V1.1.5 to V1.1.6
 ------------------------------
 

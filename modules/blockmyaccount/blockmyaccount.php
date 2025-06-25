@@ -33,7 +33,7 @@ class BlockMyAccount extends Module
 	{
 		$this->name = 'blockmyaccount';
 		$this->tab = 'front_office_features';
-		$this->version = '1.4.2';
+		$this->version = '1.4.3';
 		$this->author = 'PrestaShop';
 		$this->need_instance = 0;
 

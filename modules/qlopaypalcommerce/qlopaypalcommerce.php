@@ -41,7 +41,7 @@ class QloPaypalCommerce extends PaymentModule
     {
         $this->name = 'qlopaypalcommerce';
         $this->tab = 'payments_gateways';
-        $this->version = '1.0.4';
+        $this->version = '1.0.5';
         $this->author = 'Webkul';
         $this->bootstrap = true;
         $this->secure_key = Tools::encrypt($this->name);

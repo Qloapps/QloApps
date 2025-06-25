@@ -42,7 +42,7 @@ class StatsBestCategories extends ModuleGrid
     {
         $this->name = 'statsbestcategories';
         $this->tab = 'analytics_stats';
-        $this->version = '1.5.4';
+        $this->version = '1.5.5';
         $this->author = 'PrestaShop';
         $this->need_instance = 0;
 

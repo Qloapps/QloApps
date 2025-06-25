@@ -33,7 +33,7 @@ class QloStatsServiceProducts extends ModuleGrid
     {
         $this->name = 'qlostatsserviceproducts';
         $this->tab = 'analytics_stats';
-        $this->version = '1.0.0';
+        $this->version = '1.0.1';
         $this->author = 'Webkul';
         $this->need_instance = 0;
 

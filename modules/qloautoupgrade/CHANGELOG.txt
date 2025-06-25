@@ -1,11 +1,19 @@
 ------------------------------
+# V1.0.2 to V1.0.3
+------------------------------
+
+## Improved/Changed Features:
+
+* [BO] : [#1464] Updated Upgrade for PHP version 8.1 to 8.4 and MYSql 8 compatibility
+
+------------------------------
 # V1.0.1 to V1.0.2
 ------------------------------
 
 ## Improved/Changed Features:
 
 * [CO] : #415 Removed qlo_mod_list.xml
-* [CO] : #370 Added Autoupgrade and Paypal modules in QloApps 
+* [CO] : #370 Added Autoupgrade and Paypal modules in QloApps
 
 
 -----------------------------

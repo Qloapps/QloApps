@@ -88,9 +88,11 @@
   - #1478: Fixed Tax label is displayed on order detail and order confirmation pages in the front-office even if the 'Display tax label' is disabled for the country.
   - #1526: Fixed If available for order is disabled, then name of the extra service does not show on checkout page in front office
   - #1410: Fixed The hotel name in the search panel was exceeding the parent container's width In front office.
+  - #1406: Fixed Translation issues in the front office
   - #1396: Fixed Multiple orders creation issue in cheque and bankwire payment gateways in front office.
   - #1372: Fixed Date range picker opens at the top even when there's insufficient space.
   - #1359: Fixed Emails regarding awaiting payment should not be sent to customers if the payment amount in the order is 0.
+  - #1348: Fixed Search panel on landing page in front office does not displays properly if there are any issues in the JS.
   - #1324: Fixed undefined index when a product in cart is neither a booking product nor service product in front-office
   - #1328: Fixed Same location is showing on map for all hotels at order detail page of guest order tracking
   - #1330: Fixed Getting issue when guest user try to change his mobile number.
@@ -130,7 +132,7 @@
 
 ## Web Services:
 - Bugs Fixed:
-  - #1471: Fixed issues in bookings and services webservices and removed the specific managemenet qlo webservice.
+  - #1471: Fixed issues in bookings and services webservices and removed the specific management qlo webservice.
   - #1402: Fixed Create new customer if guest email is sent via booking webservice.
   - #1407: Fixed Services Prices are set incorrectly in the bookings webservice PUT request
   - #1361: Fixed Unable to upload Images of Hotels and Extra Services through API

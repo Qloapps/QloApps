@@ -31,7 +31,7 @@ class WkFooterPaymentBlock extends Module
     {
         $this->name = 'wkfooterpaymentblock';
         $this->tab = 'front_office_features';
-        $this->version = '1.1.5';
+        $this->version = '1.1.6';
         $this->author = 'Webkul';
         $this->need_instance = 0;
 
@@ -62,7 +62,7 @@ class WkFooterPaymentBlock extends Module
     {
         return $this->hookFooter($params);
     }
-    
+
     public function callInstallTab()
     {
         //Controllers which are to be used in this modules but we have not to create tab for those controllers...

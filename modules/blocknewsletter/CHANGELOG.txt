@@ -1,4 +1,12 @@
 -------------------------------
+# Change Log V2.3.0 to V2.3.1
+-------------------------------
+
+## Improved/Changed Features:
+
+* [CO] : [#1464] Updated for PHP version 8.1 to 8.4 and MYSql 8 compatibility
+
+-------------------------------
 # Change Log V2.2.2 to V2.3.0
 -------------------------------
 
