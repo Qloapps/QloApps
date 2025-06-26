@@ -169,8 +169,23 @@ class CategoryControllerCore extends FrontController
                 }
             }
 
-            $id_cart = $this->context->cart->id;
-            $id_guest = $this->context->cookie->id_guest;
+            $sort_by = Tools::getValue('sort_by');
+            $sort_value = Tools::getValue('sort_value');
+            $filter_data = Tools::getValue('filter_data');
+            $amenities = [];
+            $price = [];
+            if (!empty($filter_data)) {
+                foreach ($filter_data as $key => $value) {
+                    if ($key == 'amenities') {
+                        foreach ($value as $a_k => $a_v) {
+                            $amenities[] = $a_v;
+                        }
+                    } elseif ($key == 'price') {
+                        $price['from'] = $value[0];
+                        $price['to'] = $value[1];
+                    }
+                }
+            }
 
             $objBookingDetail = new HotelBookingDetail();
             $bookingParams = array(
@@ -179,20 +194,36 @@ class CategoryControllerCore extends FrontController
                 'occupancy' => $occupancy,
                 'hotel_id' => $id_hotel,
                 'get_total_rooms' => 0,
-                'id_cart' => $id_cart,
-                'id_guest' => $id_guest,
+                'id_cart' => $this->context->cart->id,
+                'id_guest' => $this->context->cookie->id_guest,
+                'amenities' => $amenities,
+                'price' => $price,
             );
 
             if ($displayAllRoomsTypes) {
                 $bookingParams['get_all_room_types'] = 1;
             }
 
-            $booking_data = $objBookingDetail->dataForFrontSearch($bookingParams);
+            if ($booking_data = $objBookingDetail->dataForFrontSearch($bookingParams)) {
+                $booking_data['rm_data'] = array_values($booking_data['rm_data']);
+                if ($sort_by && $sort_value) {
+                    $indi_arr = array();
+
+                    if ($sort_value == 1) {
+                        $direction = SORT_ASC;
+                    } elseif ($sort_value == 2) {
+                        $direction = SORT_DESC;
+                    }
+                    foreach ($booking_data['rm_data'] as $s_k => $s_v) {
+                        $indi_arr[$s_k] = $s_v['price'];
+                    }
+
+                    array_multisort($indi_arr, $direction, $booking_data['rm_data']);
+                }
+            }
 
             $num_days = HotelHelper::getNumberOfDays($date_from, $date_to);
-
             $warning_num = Configuration::get('WK_ROOM_LEFT_WARNING_NUMBER');
-
             /*Max date of ordering for order restrict*/
             $order_date_restrict = false;
             $max_order_date = HotelOrderRestrictDate::getMaxOrderDate($id_hotel);
@@ -204,8 +235,9 @@ class CategoryControllerCore extends FrontController
                     $order_date_restrict = true;
                 }
             }
-            /*End*/
 
+            $feat_img_dir = _PS_IMG_.'rf/';
+            $ratting_img = _MODULE_DIR_.'hotelreservationsystem/views/img/Slices/icons-sprite.png';
             $this->context->smarty->assign(array(
                 'warning_num' => $warning_num,
                 'num_days' => $num_days,
@@ -214,23 +246,25 @@ class CategoryControllerCore extends FrontController
                 'booking_data' => $booking_data,
                 'max_order_date' => $max_order_date,
                 'order_date_restrict' => $order_date_restrict,
-                'display_all_room_types' => $displayAllRoomsTypes
+                'display_all_room_types' => $displayAllRoomsTypes,
+                'id_hotel' => $id_hotel,
+                'currency' => $currency,
+                'feat_img_dir' => $feat_img_dir,
+                'ratting_img' => $ratting_img,
             ));
+
+            $action = Tools::toCamelCase(Tools::getValue('action'), true);
+            if ($this->ajax && $action == 'Filterresults') {
+                $response = array(
+                    'status' => true,
+                    'html_room_type_list' => $this->context->smarty->fetch('_partials/room_type_list.tpl')
+                );
+                $this->ajaxDie(json_encode($response));
+            }
         } else {
             Tools::redirect($this->context->link->getPageLink('pagenotfound'));
         }
-
-        $feat_img_dir = _PS_IMG_.'rf/';
-        $ratting_img = _MODULE_DIR_.'hotelreservationsystem/views/img/Slices/icons-sprite.png';
-
-        $this->context->smarty->assign(array(
-            'id_hotel' => $id_hotel,
-            'currency' => $currency,
-            'feat_img_dir' => $feat_img_dir,
-            'ratting_img' => $ratting_img,
-        ));
-
-
+        /*End*/
 
         /*if (isset($this->context->cookie->id_compare))
             $this->context->smarty->assign('compareProducts', CompareProduct::getCompareProducts((int)$this->context->cookie->id_compare));
@@ -260,109 +294,6 @@ class CategoryControllerCore extends FrontController
             'suppliers'            => Supplier::getSuppliers(),
             'body_classes'         => array($this->php_self.'-'.$this->category->id, $this->php_self.'-'.$this->category->link_rewrite)
         ));*/
-    }
-
-    public function displayAjaxFilterResults()
-    {
-        $response = array('status' => false);
-
-        $this->display_header = false;
-        $this->display_footer = false;
-
-        $displayAllRoomsTypes = false;
-        if (!($date_from = Tools::getValue('date_from'))) {
-            $date_from = date('Y-m-d H:i:s');
-            $date_to = date('Y-m-d H:i:s', strtotime($date_from) + 86400);
-            $displayAllRoomsTypes = true;
-        }
-
-        if (!($date_to = Tools::getValue('date_to'))) {
-            $date_to = date('Y-m-d H:i:s', strtotime($date_from) + 86400);
-            $displayAllRoomsTypes = true;
-        }
-
-        $htl_id_category = Tools::getValue('id_category');
-
-        // occupancy of the search
-        $occupancy = Tools::getValue('occupancy');
-        if (!Validate::isOccupancy($occupancy)) {
-            $occupancy = array();
-        }
-        $sort_by = Tools::getValue('sort_by');
-        $sort_value = Tools::getValue('sort_value');
-        $filter_data = Tools::getValue('filter_data');
-
-        $adults = 0;
-        $children = 0;
-        $amenities = 0;
-        $price = 0;
-
-        if (!empty($filter_data)) {
-            foreach ($filter_data as $key => $value) {
-                if ($key == 'adults') {
-                    $adults = min($value);
-                } elseif ($key == 'children') {
-                    $children = min($value);
-                } elseif ($key == 'amenities') {
-                    $amenities = array();
-                    foreach ($value as $a_k => $a_v) {
-                        $amenities[] = $a_v;
-                    }
-                } elseif ($key == 'price') {
-                    $price = array();
-                    $price['from'] = $value[0];
-                    $price['to'] = $value[1];
-                }
-            }
-        }
-
-        if (Module::isInstalled('hotelreservationsystem')) {
-            require_once _PS_MODULE_DIR_.'hotelreservationsystem/define.php';
-
-            $id_hotel = HotelBranchInformation::getHotelIdByIdCategory($htl_id_category);
-
-            $objBookingDetail = new HotelBookingDetail();
-
-            $bookingParams = array(
-                'date_from' => $date_from,
-                'date_to' => $date_to,
-                'hotel_id' => $id_hotel,
-                'occupancy' => $occupancy,
-                'amenities' => $amenities,
-                'price' => $price,
-                'get_total_rooms' => 0,
-                'id_cart' => $this->context->cart->id,
-                'id_guest' => $this->context->cookie->id_guest,
-            );
-
-            if ($displayAllRoomsTypes) {
-                $bookingParams['get_all_room_types'] = 1;
-            }
-
-            $booking_data = $objBookingDetail->dataForFrontSearch($bookingParams);
-            // reset array keys from 0
-            $booking_data['rm_data'] = array_values($booking_data['rm_data']);
-            if ($sort_by && $sort_value) {
-                $indi_arr = array();
-
-                if ($sort_value == 1) {
-                    $direction = SORT_ASC;
-                } elseif ($sort_value == 2) {
-                    $direction = SORT_DESC;
-                }
-                foreach ($booking_data['rm_data'] as $s_k => $s_v) {
-                    $indi_arr[$s_k] = $s_v['price'];
-                }
-
-                array_multisort($indi_arr, $direction, $booking_data['rm_data']);
-            }
-
-            $this->context->smarty->assign(array('booking_data' => $booking_data));
-            $html = $this->context->smarty->fetch('_partials/room_type_list.tpl');
-            $response['status'] = true;
-            $response['html_room_type_list'] = $html;
-        }
-        $this->ajaxDie(json_encode($response));
     }
 
     /**
