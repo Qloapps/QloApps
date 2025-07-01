@@ -2358,6 +2358,12 @@ class AdminOrdersControllerCore extends AdminController
                         }
                     }
 
+                    $fields = array(
+                        'unit_price_tax_excl',
+                        'unit_price_tax_incl',
+                        'total_price_tax_excl',
+                        'total_price_tax_incl',
+                    );
                     // Update order service product prices
                     $objRoomTypeServProdOrderDtl = new ServiceProductOrderDetail();
                     if ($orderServiceProducts = $objRoomTypeServProdOrderDtl->getRoomTypeServiceProducts(
@@ -2372,13 +2378,6 @@ class AdminOrdersControllerCore extends AdminController
                         null,
                         null
                     )) {
-                        $fields = array(
-                            'unit_price_tax_excl',
-                            'unit_price_tax_incl',
-                            'total_price_tax_excl',
-                            'total_price_tax_incl',
-                        );
-
                         foreach ($orderServiceProducts as $htlBokingServices) {
                             if (isset($htlBokingServices['additional_services']) && $htlBokingServices['additional_services']) {
                                 foreach ($htlBokingServices['additional_services'] as $serviceProduct) {
@@ -2396,6 +2395,37 @@ class AdminOrdersControllerCore extends AdminController
                             }
                         }
                     }
+
+                    if ($hotelProducts = $objRoomTypeServProdOrderDtl->getServiceProductsInOrder($order->id, 0, 0, Product::SELLING_PREFERENCE_HOTEL_STANDALONE)) {
+                        foreach ($hotelProducts as $serviceProduct) {
+                            $objRoomTypeServProdOrderDtl = new ServiceProductOrderDetail($serviceProduct['id_service_product_order_detail']);
+                            foreach ($fields as $field) {
+                                $objRoomTypeServProdOrderDtl->{$field} = Tools::convertPriceFull(
+                                    $objRoomTypeServProdOrderDtl->{$field},
+                                    $old_currency,
+                                    $currency
+                                );
+                            }
+
+                            $objRoomTypeServProdOrderDtl->save();
+                        }
+                    }
+
+                    if ($standaloneProducts = $objRoomTypeServProdOrderDtl->getServiceProductsInOrder($order->id, 0, 0, Product::SELLING_PREFERENCE_STANDALONE)) {
+                        foreach ($standaloneProducts as $serviceProduct) {
+                            $objRoomTypeServProdOrderDtl = new ServiceProductOrderDetail($serviceProduct['id_service_product_order_detail']);
+                            foreach ($fields as $field) {
+                                $objRoomTypeServProdOrderDtl->{$field} = Tools::convertPriceFull(
+                                    $objRoomTypeServProdOrderDtl->{$field},
+                                    $old_currency,
+                                    $currency
+                                );
+                            }
+
+                            $objRoomTypeServProdOrderDtl->save();
+                        }
+                    }
+
 
                     // update Order refund prices (order_return and order_return_detail)
                     if ($orderReturns = OrderReturn::getOrdersReturn($order->id_customer, $order->id)) {
