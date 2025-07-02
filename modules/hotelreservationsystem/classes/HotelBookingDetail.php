@@ -3453,7 +3453,7 @@ class HotelBookingDetail extends ObjectModel
                             }
 
                             $objOrderDetail->total_price_tax_excl -= (float) Tools::processPriceRounding(
-                                $objOrderDetail->total_price_tax_excl,
+                                $objServiceProductOrderDetail->total_price_tax_excl,
                                 1,
                                 $objOrder->round_type,
                                 $objOrder->round_mode
@@ -3461,14 +3461,18 @@ class HotelBookingDetail extends ObjectModel
                             $objOrderDetail->total_price_tax_excl = $objOrderDetail->total_price_tax_excl > 0 ? $objOrderDetail->total_price_tax_excl : 0;
 
                             $objOrderDetail->total_price_tax_incl -= (float) Tools::processPriceRounding(
-                                $objOrderDetail->total_price_tax_incl,
+                                $objServiceProductOrderDetail->total_price_tax_incl,
                                 1,
                                 $objOrder->round_type,
                                 $objOrder->round_mode
                             );
                             $objOrderDetail->total_price_tax_incl = $objOrderDetail->total_price_tax_incl > 0 ? $objOrderDetail->total_price_tax_incl : 0;
 
-                            $objOrderDetail->save();
+                            $objServiceProductOrderDetail->total_price_tax_excl = 0;
+                            $objServiceProductOrderDetail->total_price_tax_incl = 0;
+                            $objServiceProductOrderDetail->save();
+
+                            $objOrderDetail->updateTaxAmount($objOrder) && $objOrderDetail->save();
                         }
 
                         $objServiceProductOrderDetail->total_price_tax_excl = 0;
@@ -3537,6 +3541,16 @@ class HotelBookingDetail extends ObjectModel
                         $objOrder->total_products_wt = $objOrder->total_products_wt > 0 ? $objOrder->total_products_wt : 0;
 
                         $objOrder->save();
+                    }
+
+                    // Update OrderInvoice
+                    if ($objOrder->hasInvoice()) {
+                        $objOrderInvoice = new OrderInvoice($objOrderDetail->id_order_invoice);
+                        $objOrderInvoice->total_products -= $reduction_amount['total_products_tax_excl'];
+                        $objOrderInvoice->total_products_wt -= $reduction_amount['total_products_tax_incl'];
+                        $objOrderInvoice->total_paid_tax_excl -= $reduction_amount['total_price_tax_excl'];
+                        $objOrderInvoice->total_paid_tax_incl -= $reduction_amount['total_price_tax_incl'];
+                        $objOrderInvoice->update();
                     }
                 }
 

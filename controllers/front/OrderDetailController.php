@@ -700,6 +700,9 @@ class OrderDetailControllerCore extends FrontController
                         }
                     }
 
+                    // As object order is already changed in processRefundInBookingTables
+                    $objOrder = new Order($objOrder->id);
+                    
                     // complete the booking refund directly in the refund request
                     $objOrderReturn->changeIdOrderReturnState(Configuration::get('PS_ORS_REFUNDED'));
 
