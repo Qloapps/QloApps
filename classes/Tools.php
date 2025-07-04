@@ -3817,7 +3817,7 @@ exit;
         }
         switch ($roundType) {
             case Order::ROUND_TOTAL:
-                $value = $value;
+                $value = $value * $qty;
                 break;
             case Order::ROUND_LINE:
                 $value = Tools::ps_round(($value * $qty), _PS_PRICE_COMPUTE_PRECISION_, $roundMode);
