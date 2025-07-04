@@ -2565,7 +2565,7 @@ class OrderCore extends ObjectModel
                 $tax_rates[$tax->id] = $tax->rate;
             }
 
-            $totalTaxBase = Tools::processPriceRounding($unit_price_tax_excl, $quantity);
+            $totalTaxBase = $order_detail['total_price_tax_excl'];
 
             // Note: Only calculate in case of Order Invoice
             if (!$id_order_slip) {

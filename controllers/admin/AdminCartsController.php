@@ -1205,6 +1205,10 @@ class AdminCartsControllerCore extends AdminController
 
             if ($serviceProducts) {
                 foreach ($serviceProducts as $key => $servProduct) {
+                    $numDays = 1;
+                    if (Product::PRICE_CALCULATION_METHOD_PER_DAY == $servProduct['price_calculation_method']) {
+                        $numDays = HotelHelper::getNumberOfDays($dateFrom, $dateTo);
+                    }
                     $serviceProducts[$key]['price_tax_exc'] = Product::getServiceProductPrice(
                         $servProduct['id_product'],
                         0,
@@ -1215,7 +1219,7 @@ class AdminCartsControllerCore extends AdminController
                         $dateFrom,
                         $dateTo,
                         $idCart
-                    );
+                    )/$numDays;
                 }
             }
 

@@ -5918,6 +5918,10 @@ class AdminOrdersControllerCore extends AdminController
             $order_detail->total_price_tax_incl += (float)$diff_price_tax_incl;
             $order_detail->total_price_tax_excl += (float)$diff_price_tax_excl;
 
+            $order_detail->unit_price_tax_incl = $order_detail->total_price_tax_incl / ($order_detail->product_quantity + $qty_diff);
+            $order_detail->unit_price_tax_excl = $order_detail->total_price_tax_excl / ($order_detail->product_quantity + $qty_diff);
+
+
             if (isset($order_invoice)) {
                 // Apply changes on OrderInvoice
                 $order_invoice->total_paid_tax_excl += (float)$diff_price_tax_excl;
