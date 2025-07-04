@@ -2527,11 +2527,6 @@ class OrderCore extends ObjectModel
             $id_order_detail = $order_detail['id_order_detail'];
             $id_order_slip = $order_detail['id_order_slip'] ?? 0; // Only in case of order slip
 
-            $taxesList = OrderDetail::getTaxListStatic($id_order_detail);
-            if (!$taxesList) {
-                continue;
-            }
-
             $tax_calculator = OrderDetail::getTaxCalculatorStatic($id_order_detail);
 
             $quantity = $order_detail['product_quantity'];
@@ -2569,18 +2564,30 @@ class OrderCore extends ObjectModel
 
             // Note: Only calculate in case of Order Invoice
             if (!$id_order_slip) {
+                $taxesList = OrderDetail::getTaxListStatic($id_order_detail);
+                if (!$taxesList) {
+                    continue;
+                }
+
                 if (!$order_detail['is_booking_product']) {
                     $objServiceProductOrderDetail = new ServiceProductOrderDetail();
                     if ($serviceProductDetail = $objServiceProductOrderDetail->getServiceProductsInOrder(
                         $order_detail['id_order'],
                         $id_order_detail
                     )) {
-                        $totals = array_reduce($serviceProductDetail, function ($carry, $item) {
+                        $totals = array_reduce($serviceProductDetail, function ($carry, $item) use ($order_detail) {
+                            $objHotelBookingDetail = new HotelBookingDetail((int) $item['id_htl_booking_detail']);
+                            if ((Product::PRICE_CALCULATION_METHOD_PER_DAY == $order_detail['product_price_calculation_method'])
+                                && (!$numDays = HotelHelper::getNumberOfDays($objHotelBookingDetail->date_from, $objHotelBookingDetail->date_to))
+                            ) {
+                                $numDays = 1;
+                            }
+
                             if (!empty($item['id_tax_rules_group'])) {
                                 $qty = isset($item['quantity']) ? $item['quantity'] : 0;
                                 $price = isset($item['total_price_tax_excl']) ? $item['total_price_tax_excl'] : 0;
 
-                                $carry['quantity'] += $qty;
+                                $carry['quantity'] += ($qty * $numDays);
                                 $carry['total_price_tax_excl'] += $price;
                             }
                             return $carry;
@@ -2625,6 +2632,12 @@ class OrderCore extends ObjectModel
                     // We are getting auto added service for specific room.There will be only on htl_booking_detail but can have multiple auto added service with room.
                     // Note: All the auto added service with room  have same id_tax_rule group 
                     $autoAddedServiceData = array_shift($autoAddedServiceData);
+                    $numDays = 1;
+                    if ((Product::PRICE_CALCULATION_METHOD_PER_DAY == $order_detail['product_price_calculation_method'])
+                        && (!$numDays = HotelHelper::getNumberOfDays($autoAddedServiceData['date_from'], $autoAddedServiceData['date_to']))
+                    ) {
+                        $numDays = 1;
+                    }
                     $autoAddedServices = $autoAddedServiceData['additional_services'];
 
                     // Calculate total quantity of auto-added services
@@ -2632,6 +2645,8 @@ class OrderCore extends ObjectModel
                         $qty = isset($service['quantity']) ? $service['quantity'] : 0;
                         return $quantity + $qty;
                     }, 0);
+
+                    $totalAutoAddedQty = $totalAutoAddedQty * $numDays;
 
                     $firstAutoAddedService = array_shift($autoAddedServices);
                     $idTaxRuleGroup = $firstAutoAddedService['id_tax_rules_group'];

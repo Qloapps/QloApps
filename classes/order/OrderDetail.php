@@ -450,6 +450,12 @@ class OrderDetailCore extends ObjectModel
                         $taxGroupInfo['id_room_type'],
                 )) {
                     $serviceProductData = array_shift($serviceProductData);
+                    $numDays = 1;
+                    if ((Product::PRICE_CALCULATION_METHOD_PER_DAY == $this->product_price_calculation_method)
+                        && (!$numDays = HotelHelper::getNumberOfDays($serviceProductData['date_from'], $serviceProductData['date_to']))
+                    ) {
+                        $numDays = 1;
+                    }
 
                     $unit_price_tax_excl = array_reduce($serviceProductData['additional_services'], function ($totalPriceTaxExcl, $item) {
                         return $totalPriceTaxExcl + (isset($item['unit_price_tax_excl']) ? $item['unit_price_tax_excl'] : 0);
@@ -458,6 +464,8 @@ class OrderDetailCore extends ObjectModel
                     $quantity = array_reduce($serviceProductData['additional_services'], function ($totalQty, $item) {
                         return $totalQty + (isset($item['quantity']) ? $item['quantity'] : 0);
                     }, 0);
+
+                    $quantity = $quantity * $numDays;
 
                     $firstServiceProduct = array_shift($serviceProductData['additional_services']);
                     $tax_manager = TaxManagerFactory::getManager($this->vat_address, (int)$firstServiceProduct['id_tax_rules_group']);
@@ -477,6 +485,18 @@ class OrderDetailCore extends ObjectModel
                     $quantity = array_reduce($serviceProductData, function ($totalQty, $item) {
                         return $totalQty + (isset($item['quantity']) ? $item['quantity'] : 0);
                     }, 0);
+
+                    $serviceProductData = array_shift($serviceProductData);
+
+                    $numDays = 1;
+                    if ((Product::PRICE_CALCULATION_METHOD_PER_DAY == $this->product_price_calculation_method)
+                        && (!$numDays = HotelHelper::getNumberOfDays($serviceProductData['date_from'], $serviceProductData['date_to']))
+                    ) {
+                        $numDays = 1;
+                    }
+
+
+                    $quantity = $quantity * $numDays;
                 }
 
                 if ($this->tax_calculator == null) {

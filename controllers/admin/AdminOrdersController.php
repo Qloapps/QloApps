@@ -6169,7 +6169,9 @@ class AdminOrdersControllerCore extends AdminController
                                 $oldProductQuantity = $objServiceProductOrderDetail->quantity * $oldNumDays;
                                 $newProductQuantity = $objServiceProductOrderDetail->quantity * $newNumDays;
                                 $objOrderDetail->product_quantity += ($newProductQuantity - $oldProductQuantity);
+
                                 $objOrderDetail->save();
+                                $objOrderDetail->updateTaxAmount($order);
 
                                 if (isset($order_invoice)) {
                                     $order_invoice->total_paid_tax_excl -= $objServiceProductOrderDetail->total_price_tax_excl;
