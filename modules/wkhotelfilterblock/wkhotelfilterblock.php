@@ -244,8 +244,8 @@ class wkhotelfilterblock extends Module
                         'date_to' => $date_to,
                         'num_days' => $num_days,
                         'config' => $config,
-                        'min_price' => $prod_price ? min($prod_price) : 0,
-                        'max_price' => $prod_price ? max($prod_price) : 0,
+                        'min_price' => $prod_price ? floor(min($prod_price)) : 0,
+                        'max_price' => $prod_price ? ceil(max($prod_price)) : 0,
                     ));
 
                     return $this->display(__FILE__, 'htlfilterblock.tpl');
