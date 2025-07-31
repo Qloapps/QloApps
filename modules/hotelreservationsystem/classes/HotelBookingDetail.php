@@ -1718,7 +1718,7 @@ class HotelBookingDetail extends ObjectModel
                         }
                     }
                     $productFeaturePrice = HotelRoomTypeFeaturePricing::getRoomTypeFeaturePricesPerDay($value['id_product'], $date_from, $date_to, self::useTax(), 0, 0, 0, 0, 1, 1, $bookingParams['occupancy']);
-                    if (!empty($price) && ($price['from'] > $productFeaturePrice || $price['to'] < $productFeaturePrice)) {
+                    if (!empty($price) && ((bccomp($productFeaturePrice, $price['from'], _PS_PRICE_COMPUTE_PRECISION_) == -1) || (bccomp($price['to'], $productFeaturePrice, _PS_PRICE_COMPUTE_PRECISION_) == -1))) {
                         unset($bookingData['rm_data'][$key]);
                         continue;
                     }
