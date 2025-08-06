@@ -285,8 +285,7 @@ class AdminStatusesControllerCore extends AdminController
         //init and render the second list
         $this->list_skip_actions = array();
         $this->_filter = false;
-        $unremovableOrs = Configuration::getMultiple(array('PS_ORS_PENDING', 'PS_ORS_DENIED', 'PS_ORS_REFUNDED'));
-        $this->addRowActionSkipList('delete', $unremovableOrs);
+        $this->addRowActionSkipList('delete', array(1, 2, 3, 4, 5));
         $this->initOrdersReturnsList();
         $this->checkFilterForOrdersReturnsList();
 

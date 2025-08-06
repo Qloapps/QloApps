@@ -51,7 +51,7 @@ class ChequePaymentModuleFrontController extends ModuleFrontController
 		}
 
         // check all service products are available
-        ServiceProductCartDetail::validateServiceProductsInCart();
+        RoomTypeServiceProductCartDetail::validateServiceProductsInCart();
 
         $restrict_order = false;
         /*Check Order restrict condition before Payment by the customer*/
@@ -82,11 +82,5 @@ class ChequePaymentModuleFrontController extends ModuleFrontController
         ));
 
         $this->setTemplate('payment_execution.tpl');
-    }
-
-    public function setMedia()
-    {
-        parent::setMedia();
-        $this->addJS($this->module->getLocalPath().'views/js/front/payment.js');
     }
 }

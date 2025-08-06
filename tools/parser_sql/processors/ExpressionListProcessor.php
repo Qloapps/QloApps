@@ -256,15 +256,8 @@ class ExpressionListProcessor extends AbstractProcessor {
                     // if the last token is colref, const or expression
                     // then * is an operator
                     // but if the previous colref ends with a dot, the * is the all-columns-alias
-                    if (
-                        !$prev->isColumnReference()
-                        && !$prev->isConstant()
-                        && !$prev->isExpression()
-                        && !$prev->isBracketExpression()
-                        && !$prev->isAggregateFunction()
-                        && !$prev->isVariable()
-                        && !$prev->isFunction()
-                    ) {
+                    if (!$prev->isColumnReference() && !$prev->isConstant() && !$prev->isExpression()
+                        && !$prev->isBracketExpression() && !$prev->isAggregateFunction() && !$prev->isVariable()) {
                         $curr->setTokenType(ExpressionType::COLREF);
                         break;
                     }

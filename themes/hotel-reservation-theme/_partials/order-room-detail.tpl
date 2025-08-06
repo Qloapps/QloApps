@@ -1,26 +1,23 @@
 {*
+* 2010-2024 Webkul.
+*
 * NOTICE OF LICENSE
 *
-* This source file is subject to the Open Software License version 3.0
-* that is bundled with this package in the file LICENSE.md
-* It is also available through the world-wide-web at this URL:
-* https://opensource.org/license/osl-3-0-php
-* If you did not receive a copy of the license and are unable to
-* obtain it through the world-wide-web, please send an email
-* to support@qloapps.com so we can send you a copy immediately.
+* All right is reserved,
+* Please go through LICENSE.txt file inside our module
 *
 * DISCLAIMER
 *
-* Do not edit or add to this file if you wish to upgrade this module to a newer
-* versions in the future. If you wish to customize this module for your needs
-* please refer to https://store.webkul.com/customisation-guidelines for more information.
+* Do not edit or add to this file if you wish to upgrade this module to newer
+* versions in the future. If you wish to customize this module for your
+* needs please refer to CustomizationPolicy.txt file inside our module for more information.
 *
 * @author Webkul IN
-* @copyright Since 2010 Webkul
-* @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
+* @copyright 2010-2024 Webkul IN
+* @license LICENSE.txt
 *}
 
-<div class="product-detail" data-id-product="{$data_v.id_product}" data-date-diff="{$rm_k}">
+<div class="booking-room-detail" data-id-product="{$data_v.id_product}" data-date-diff="{$rm_k}">
     <div class="row">
         {block name='order_room_detail_room_image'}
             <div class="col-xs-3 col-sm-2">
@@ -33,7 +30,7 @@
             <div class="col-xs-9 col-sm-10 info-wrap">
                 <div class="row">
                     <div class="col-xs-12">
-                        <a href="{$link->getProductLink($data_v.id_product)|escape:'html':'UTF-8'}" title="{$data_v.name|escape:'html':'UTF-8'}" target="_blank" class="product-name">
+                        <a href="{$link->getProductLink($data_v.id_product)|escape:'html':'UTF-8'}" title="{$data_v.name|escape:'html':'UTF-8'}" target="_blank" class="room-type-name">
                             <h3>{$data_v.name|escape:'html':'UTF-8'}</h3>
                         </a>
 

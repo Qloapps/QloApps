@@ -1,0 +1,10 @@
+{lastname}{firstname}您好，
+
+您在 {shop_name} 的帳號資訊如下：
+
+密碼： {passwd}
+信箱： {email}
+
+{shop_name} - {shop_url}
+
+{shop_url} 是透過 Webkul™ 建置

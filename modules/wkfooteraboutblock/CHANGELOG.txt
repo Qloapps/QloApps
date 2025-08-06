@@ -1,0 +1,52 @@
+------------------------------
+# V1.0.3 to V1.0.4
+------------------------------
+
+## Improved/Changed Features:
+
+* [CO] : [#528] licenses updated
+* [FO] : [#387] Add nav bar and move language and currency selector at top at front office
+
+
+------------------------------
+# V1.0.2 to V1.0.3
+------------------------------
+
+## Improved/Changed Features:
+
+[*] FO : [#290] Using $this->_path for including css and js
+
+
+-------------------------------
+# V1.0.1 to V1.0.2
+-------------------------------
+
+## Improved/changed features
+
+[*] FO : Translations are corrected.
+
+## Update Policy
+
+- Mobule need only file update, can be updated only by UPLOADING new version on module
+
+
+
+-----------------------------
+# V1.0.0 to V1.0.1
+-----------------------------
+
+## Added features
+
++ [CO] : index.php added/Updated in all folders
++ [CO] : License.txt added.
++ [CO] : License added in every file.
++ [CO] : logo.gif file added.
+
+
+## Improved/changed features
+
+- [CO] : WK_HTL_SHORT_DESC (configuration key) is called as multilang field now.
+
+## Update Policy
+
+- Mobule need only file update, can be updated only by UPLOADING new version on module

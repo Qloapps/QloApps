@@ -77,9 +77,6 @@ class StoreCore extends ObjectModel
     /** @var bool Store status */
     public $active = true;
 
-    /** @var int Image id */
-    public $id_image;
-
     /**
      * @see ObjectModel::$definition
      */

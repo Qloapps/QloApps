@@ -1,24 +1,21 @@
 <?php
 /**
+* Since 2010 Webkul.
+*
 * NOTICE OF LICENSE
 *
-* This source file is subject to the Open Software License version 3.0
-* that is bundled with this package in the file LICENSE.md
-* It is also available through the world-wide-web at this URL:
-* https://opensource.org/license/osl-3-0-php
-* If you did not receive a copy of the license and are unable to
-* obtain it through the world-wide-web, please send an email
-* to support@qloapps.com so we can send you a copy immediately.
+* All right is reserved,
+* Please go through this link for complete license : https://store.webkul.com/license.html
 *
 * DISCLAIMER
 *
-* Do not edit or add to this file if you wish to upgrade this module to a newer
-* versions in the future. If you wish to customize this module for your needs
-* please refer to https://store.webkul.com/customisation-guidelines for more information.
+* Do not edit or add to this file if you wish to upgrade this module to newer
+* versions in the future. If you wish to customize this module for your
+* needs please refer to https://store.webkul.com/customisation-guidelines/ for more information.
 *
-* @author Webkul IN
-* @copyright Since 2010 Webkul
-* @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
+*  @author    Webkul IN <support@webkul.com>
+*  @copyright Since 2010 Webkul IN
+*  @license   https://store.webkul.com/license.html
 */
 
 if (!defined('_PS_VERSION_')) {
@@ -36,7 +33,7 @@ class QloStatsServiceProducts extends ModuleGrid
     {
         $this->name = 'qlostatsserviceproducts';
         $this->tab = 'analytics_stats';
-        $this->version = '1.0.1';
+        $this->version = '1.0.0';
         $this->author = 'Webkul';
         $this->need_instance = 0;
 
@@ -184,43 +181,30 @@ class QloStatsServiceProducts extends ModuleGrid
             od.`product_price_addition_type` as price_addition_type,
             ROUND(IFNULL(SUM(spod.`total_price_tax_excl` / o.`conversion_rate`), 0), 2) / SUM(
                 IF(od.`product_price_calculation_method` = '.(int)Product::PRICE_CALCULATION_METHOD_PER_DAY.',
-                    (IF(spod.`id_htl_booking_detail`,
-                        DATEDIFF(hbd.`date_to`, hbd.`date_from`),
-                    1)) * spod.`quantity`,
+                    DATEDIFF(hbd.`date_to`, hbd.`date_from`) * spod.`quantity`,
                     spod.`quantity`
                 )
             ) AS avgPriceSold,
             IFNULL(SUM(
                 IF(od.`product_price_calculation_method` = '.(int)Product::PRICE_CALCULATION_METHOD_PER_DAY.',
-                    (IF(spod.`id_htl_booking_detail`,
-                        DATEDIFF(hbd.`date_to`, hbd.`date_from`),
-                    1)) * spod.`quantity`,
+                    DATEDIFF(hbd.`date_to`, hbd.`date_from`) * spod.`quantity`,
                     spod.`quantity`
                 )
             ), 0) AS totalQuantitySold,
             ROUND(IFNULL(SUM(spod.`total_price_tax_excl` / o.`conversion_rate`), 0), 2) AS totalPriceSold
-            FROM '._DB_PREFIX_.'service_product_order_detail spod
-            LEFT JOIN  '._DB_PREFIX_.'product p ON (spod.`id_product` = p.`id_product`)
-            LEFT JOIN '._DB_PREFIX_.'product_lang pl ON (p.id_product = pl.id_product AND pl.id_lang = '.(int)$this->getLang().')
-            INNER JOIN '._DB_PREFIX_.'orders o ON (spod.id_order = o.id_order)
-            LEFT JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd ON (spod.`id_htl_booking_detail` = hbd.`id`)
-            INNER JOIN '._DB_PREFIX_.'order_detail od ON (spod.`id_order_detail` = od.`id_order_detail`)
+            FROM '._DB_PREFIX_.'htl_room_type_service_product_order_detail spod
+            LEFT JOIN  '._DB_PREFIX_.'product p
+            ON (spod.`id_product` = p.`id_product`)
+            LEFT JOIN '._DB_PREFIX_.'product_lang pl
+            ON (p.id_product = pl.id_product AND pl.id_lang = '.(int)$this->getLang().')
+            INNER JOIN '._DB_PREFIX_.'orders o
+            ON (spod.id_order = o.id_order)
+            INNER JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd
+            ON (spod.`id_htl_booking_detail` = hbd.`id`)
+            INNER JOIN '._DB_PREFIX_.'order_detail od
+            ON (spod.`id_order_detail` = od.`id_order_detail`)
             WHERE o.valid = 1 AND o.invoice_date BETWEEN '.$dateBetween.'
-            AND (
-                EXISTS (
-                    SELECT 1
-                    FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
-                    WHERE hbd.`id_order` = o.`id_order`' . HotelBranchInformation::addHotelRestriction(false).'
-                ) OR EXISTS (
-                    SELECT 1
-                    FROM `'._DB_PREFIX_.'service_product_order_detail` spod
-                    WHERE spod.`id_order` = o.`id_order`' . HotelBranchInformation::addHotelRestriction(false, 'spod').'
-                ) OR EXISTS (
-                    SELECT 1
-                    FROM `'._DB_PREFIX_.'service_product_order_detail` spod
-                    WHERE spod.`id_order` = o.`id_order` AND spod.`id_hotel` = 0 AND spod.`id_htl_booking_detail` = 0
-                )
-            )
+            '.HotelBranchInformation::addHotelRestriction(false, 'hbd').'
             AND od.`is_booking_product` = 0
             GROUP BY spod.id_product, od.`product_auto_add`, od.`product_price_addition_type`)
             UNION
@@ -233,28 +217,14 @@ class QloStatsServiceProducts extends ModuleGrid
             ON (p.`id_product` = pl.`id_product` AND pl.`id_lang` = '.(int)$this->getLang().')
             WHERE p.`id_product` NOT IN (
                 SELECT DISTINCT(spod.`id_product`)
-                FROM '._DB_PREFIX_.'service_product_order_detail spod
+                FROM '._DB_PREFIX_.'htl_room_type_service_product_order_detail spod
                 INNER JOIN '._DB_PREFIX_.'orders o ON (spod.id_order = o.id_order)
                 INNER JOIN '._DB_PREFIX_.'order_detail od ON (od.id_order = o.id_order)
-                LEFT JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd ON (spod.`id_htl_booking_detail` = hbd.`id`)
+                INNER JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd ON (spod.`id_htl_booking_detail` = hbd.`id`)
                 INNER JOIN `'._DB_PREFIX_.'product`
                 ON (od.`product_id` = p.`id_product` AND od.`product_auto_add` = p.`auto_add_to_cart` AND od.`product_price_addition_type` = p.`price_addition_type`)
                 WHERE o.valid = 1 AND o.invoice_date BETWEEN '.$dateBetween.'
-                AND (
-                EXISTS (
-                    SELECT 1
-                    FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
-                    WHERE hbd.`id_order` = o.`id_order`' . HotelBranchInformation::addHotelRestriction(false).'
-                ) OR EXISTS (
-                    SELECT 1
-                    FROM `'._DB_PREFIX_.'service_product_order_detail` spod
-                    WHERE spod.`id_order` = o.`id_order`' . HotelBranchInformation::addHotelRestriction(false, 'spod').'
-                ) OR EXISTS (
-                    SELECT 1
-                    FROM `'._DB_PREFIX_.'service_product_order_detail` spod
-                    WHERE spod.`id_order` = o.`id_order` AND spod.`id_hotel` = 0 AND spod.`id_htl_booking_detail` = 0
-                )
-            )
+                '.HotelBranchInformation::addHotelRestriction(false, 'hbd').'
                 AND od.`is_booking_product` = 0
             )
             AND p.`booking_product` = 0)';
@@ -282,21 +252,7 @@ class QloStatsServiceProducts extends ModuleGrid
             INNER JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd ON (bd.`id_htl_booking` = hbd.`id`)
             INNER JOIN '._DB_PREFIX_.'orders o ON (hbd.id_order = o.id_order)
             WHERE o.valid = 1 AND o.invoice_date BETWEEN '.$dateBetween.'
-            AND (
-                EXISTS (
-                    SELECT 1
-                    FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
-                    WHERE hbd.`id_order` = o.`id_order`' . HotelBranchInformation::addHotelRestriction(false).'
-                ) OR EXISTS (
-                    SELECT 1
-                    FROM `'._DB_PREFIX_.'service_product_order_detail` spod
-                    WHERE spod.`id_order` = o.`id_order`' . HotelBranchInformation::addHotelRestriction(false, 'spod').'
-                ) OR EXISTS (
-                    SELECT 1
-                    FROM `'._DB_PREFIX_.'service_product_order_detail` spod
-                    WHERE spod.`id_order` = o.`id_order` AND spod.`id_hotel` = 0 AND spod.`id_htl_booking_detail` = 0
-                )
-            )
+            '.HotelBranchInformation::addHotelRestriction(false, 'hbd').'
             GROUP BY bd.`name`)
             UNION
             (SELECT IFNULL(gdaol.`name`, gdl.`name`) as `display_name`,
@@ -316,22 +272,7 @@ class QloStatsServiceProducts extends ModuleGrid
             INNER JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd ON (bd.`id_htl_booking` = hbd.`id`)
             INNER JOIN '._DB_PREFIX_.'orders o ON (hbd.id_order = o.id_order)
             WHERE o.valid = 1 AND o.invoice_date BETWEEN '.$dateBetween.'
-            AND (
-                EXISTS (
-                    SELECT 1
-                    FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
-                    WHERE hbd.`id_order` = o.`id_order`' . HotelBranchInformation::addHotelRestriction(false).'
-                ) OR EXISTS (
-                    SELECT 1
-                    FROM `'._DB_PREFIX_.'service_product_order_detail` spod
-                    WHERE spod.`id_order` = o.`id_order`' . HotelBranchInformation::addHotelRestriction(false, 'spod').'
-                ) OR EXISTS (
-                    SELECT 1
-                    FROM `'._DB_PREFIX_.'service_product_order_detail` spod
-                    WHERE spod.`id_order` = o.`id_order` AND spod.`id_hotel` = 0 AND spod.`id_htl_booking_detail` = 0
-                )
-            )
-            ))';
+            '.HotelBranchInformation::addHotelRestriction(false, 'hbd').' ))';
 
         $this->option = 'facilities';
     }

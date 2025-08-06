@@ -24,7 +24,6 @@
  *
  * @method bool mustCompile()
  */
-#[\AllowDynamicProperties]
 class Smarty_Internal_Template extends Smarty_Internal_TemplateBase
 {
     /**
@@ -149,7 +148,7 @@ class Smarty_Internal_Template extends Smarty_Internal_TemplateBase
     public function __construct(
         $template_resource,
         Smarty $smarty,
-        ?Smarty_Internal_Data $_parent = null,
+        Smarty_Internal_Data $_parent = null,
         $_cache_id = null,
         $_compile_id = null,
         $_caching = null,
@@ -293,7 +292,7 @@ class Smarty_Internal_Template extends Smarty_Internal_TemplateBase
         $smarty = &$this->smarty;
         $_templateId = $smarty->_getTemplateId($template, $cache_id, $compile_id, $caching, $tpl);
         // recursive call ?
-        if ((isset($tpl->templateId) ? $tpl->templateId : $tpl->_getTemplateId()) !== $_templateId) {
+        if (isset($tpl->templateId) ? $tpl->templateId : $tpl->_getTemplateId() !== $_templateId) {
             // already in template cache?
             if (isset(self::$tplObjCache[ $_templateId ])) {
                 // copy data from cached object
@@ -359,7 +358,7 @@ class Smarty_Internal_Template extends Smarty_Internal_TemplateBase
         }
         if ($tpl->caching === 9999) {
             if (!isset($tpl->compiled)) {
-                $tpl->loadCompiled(true);
+                $this->loadCompiled(true);
             }
             if ($tpl->compiled->has_nocache_code) {
                 $this->cached->hashes[ $tpl->compiled->nocache_hash ] = true;

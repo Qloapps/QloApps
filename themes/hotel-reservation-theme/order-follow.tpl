@@ -32,13 +32,13 @@
 			{$navigationPipe}
 		</span>
 		<span class="navigation_page">
-			{l s='Refund requests'}
+			{l s='Booking refund requests'}
 		</span>
 	{/capture}
 	<div class="panel">
 		{block name='order_follow_heading'}
 			<h1 class="page-heading bottom-indent">
-				<i class="icon-tasks"></i> &nbsp;{l s='Refund Requests'}
+				<i class="icon-tasks"></i> &nbsp;{l s='Booking Refund Requests'}
 			</h1>
 		{/block}
 		{if $ordersReturns && $ordersReturns|count}
@@ -47,12 +47,7 @@
 					<thead>
 						<tr>
 							<th>{l s='Order'}</th>
-							{if isset($hasRoomRefunds) && $hasRoomRefunds}
-                                <th>{l s='Total rooms'}</th>
-                            {/if}
-                            {if isset($hasProductRefunds) && $hasProductRefunds}
-                                <th>{l s='Total products'}</th>
-                            {/if}
+							<th>{l s='Total rooms'}</th>
 							<th>{l s='Refund status'}</th>
 							<th>{l s='Date requested'}</th>
 							<th>{l s='Actions'}</th>
@@ -64,16 +59,9 @@
 								<td>
 									#{$return.reference|escape:'html':'UTF-8'}
 								</td>
-                                {if isset($hasRoomRefunds) && $hasRoomRefunds}
-                                    <td>
-                                        {$return.total_rooms|escape:'html':'UTF-8'}
-                                    </td>
-                                {/if}
-                                {if isset($hasProductRefunds) && $hasProductRefunds}
-                                    <td>
-                                        {$return.total_products|escape:'html':'UTF-8'}
-                                    </td>
-                                {/if}
+								<td>
+									{$return.total_rooms|escape:'html':'UTF-8'}
+								</td>
 								<td>
 									<span class="badge wk-badge" style="background-color:{$return.state_color|escape:'html':'UTF-8'}">{$return.state_name|escape:'html':'UTF-8'}
 								</td>

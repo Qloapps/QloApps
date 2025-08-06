@@ -149,7 +149,8 @@ class CustomerCore extends ObjectModel
             'last_passwd_gen' => array('setter' => null),
             'secure_key' => array('setter' => null),
             'deleted' => array(),
-            'passwd' => array('setter' => 'setWsPasswd')
+            'passwd' => array('setter' => 'setWsPasswd'),
+            'phone' => array()
         ),
         'associations' => array(
             'groups' => array('resource' => 'group'),
@@ -179,7 +180,6 @@ class CustomerCore extends ObjectModel
             'company' =>                    array('type' => self::TYPE_STRING, 'validate' => 'isGenericName'),
             'siret' =>                        array('type' => self::TYPE_STRING, 'validate' => 'isSiret'),
             'ape' =>                        array('type' => self::TYPE_STRING, 'validate' => 'isApe'),
-            'phone' =>                      array('type' => self::TYPE_STRING, 'validate' => 'isPhoneNumber', 'size' => 32),
             'outstanding_allow_amount' =>    array('type' => self::TYPE_FLOAT, 'validate' => 'isFloat', 'copy_post' => false),
             'show_public_prices' =>            array('type' => self::TYPE_BOOL, 'validate' => 'isBool', 'copy_post' => false),
             'id_risk' =>                    array('type' => self::TYPE_INT, 'validate' => 'isUnsignedInt', 'copy_post' => false),
@@ -206,8 +206,12 @@ class CustomerCore extends ObjectModel
         $this->id_default_group = (int)Configuration::get('PS_CUSTOMER_GROUP');
         parent::__construct($id);
 
+        if ($this->email) {
+            $this->phone = CartCustomerGuestDetail::getCustomerPhone($this->email);
+        }
+
         if (Configuration::get('PS_ONE_PHONE_AT_LEAST')) {
-            self::$definition['fields']['phone']['required'] = true;
+            $this->webserviceParameters['fields']['phone']['required'] = true;
         }
     }
 
@@ -242,9 +246,7 @@ class CustomerCore extends ObjectModel
         $this->secure_key = md5(uniqid(rand(), true));
         $this->last_passwd_gen = date('Y-m-d H:i:s', strtotime('-'.Configuration::get('PS_PASSWD_TIME_FRONT').'minutes'));
 
-        if ($this->newsletter
-            && (!$this->newsletter_date_add || !Validate::isDate($this->newsletter_date_add))
-        ) {
+        if ($this->newsletter && !Validate::isDate($this->newsletter_date_add)) {
             $this->newsletter_date_add = date('Y-m-d H:i:s');
         }
 
@@ -262,7 +264,7 @@ class CustomerCore extends ObjectModel
         }
         $success = parent::add($autodate, $null_values);
         $this->updateGroup($this->groupBox);
-
+        $this->updateCustomerAdditionalDetails(CartCustomerGuestDetail::getIdCustomerGuest($this->email));
         return $success;
     }
 
@@ -285,7 +287,22 @@ class CustomerCore extends ObjectModel
             }
         }
 
-        return  parent::update(true);
+        $objOldCustomer = new Customer($this->id);
+        $success = parent::update(true);
+        $this->updateCustomerAdditionalDetails(CartCustomerGuestDetail::getIdCustomerGuest($objOldCustomer->email));
+        return $success;
+    }
+
+    public function updateCustomerAdditionalDetails($idCustomerGuest)
+    {
+        $objCartCustomerGuestDetail = new CartCustomerGuestDetail($idCustomerGuest);
+        $objCartCustomerGuestDetail->id_cart = 0;
+        $objCartCustomerGuestDetail->id_gender = $this->id_gender;
+        $objCartCustomerGuestDetail->firstname = $this->firstname;
+        $objCartCustomerGuestDetail->lastname = $this->lastname;
+        $objCartCustomerGuestDetail->email = $this->email;
+        $objCartCustomerGuestDetail->phone = $this->phone;
+        return $objCartCustomerGuestDetail->save();
     }
 
     public function delete()
@@ -306,12 +323,11 @@ class CustomerCore extends ObjectModel
         if ($carts) {
             $objHtlCartData = new HotelCartBookingData();
             foreach ($carts as $cart) {
-                if ($cart['id_cart']) {
-                    Db::getInstance()->execute('DELETE FROM '._DB_PREFIX_.'cart WHERE id_cart='.(int)$cart['id_cart']);
-                    Db::getInstance()->execute('DELETE FROM '._DB_PREFIX_.'cart_product WHERE id_cart='.(int)$cart['id_cart']);
-                    // delete rows from hotel booking cart table
-                    $objHtlCartData->deleteCartBookingData($cart['id_cart'], 0, 0, 0, 0, 0);
-                }
+                $objCart = new Cart($cart['id_cart']);
+                Db::getInstance()->execute('DELETE FROM '._DB_PREFIX_.'cart WHERE id_cart='.(int)$cart['id_cart']);
+                Db::getInstance()->execute('DELETE FROM '._DB_PREFIX_.'cart_product WHERE id_cart='.(int)$cart['id_cart']);
+                // delete rows from hotel booking cart table
+                $objHtlCartData->deleteCartBookingData($cart['id_cart'], 0, 0, 0, 0, 0);
             }
         }
 
@@ -327,9 +343,8 @@ class CustomerCore extends ObjectModel
 
         CartRule::deleteByIdCustomer((int)$this->id);
         // delete customer data from customerGuest table
-        $objCustomerGuestDetail = new CustomerGuestDetail();
-        $objCustomerGuestDetail->deleteCustomerGuestByIdCustomer($this->id);
-
+        $objCartCustomerGuestDetail = new CartCustomerGuestDetail(CartCustomerGuestDetail::getIdCustomerGuest($this->email));
+        $objCartCustomerGuestDetail->delete();
         return parent::delete();
     }
 
@@ -519,6 +534,18 @@ class CustomerCore extends ObjectModel
             return $result;
         }
         return Cache::retrieve($cache_id);
+    }
+
+    public static function getPhone($id_customer)
+    {
+
+        return Db::getInstance()->getValue(
+            'SELECT cgd.`phone`
+            FROM `'._DB_PREFIX_.'customer` c
+            INNER JOIN `'._DB_PREFIX_.'cart_customer_guest_detail` cgd
+            ON (cgd.`email` = c.`email`)
+            WHERE `id_cart` = 0 AND c.`id_customer` = '.(int)($id_customer)
+        );
     }
 
     public static function getCustomerIdAddress($id_customer, $use_cache = true)
@@ -797,7 +824,7 @@ class CustomerCore extends ObjectModel
         return self::$_defaultGroupId[(int)$id_customer];
     }
 
-    public static function getCurrentCountry($id_customer, ?Cart $cart = null)
+    public static function getCurrentCountry($id_customer, Cart $cart = null)
     {
         if (!$cart) {
             $cart = Context::getContext()->cart;

@@ -530,9 +530,7 @@ class System
                 // It's possible to run a .bat on Windows that is_executable
                 // would return false for. The is_executable check is meaningless...
                 if (OS_WINDOWS) {
-                    if (file_exists($file)) {
-                        return $file;
-                    }
+                    return $file;
                 } else {
                     if (is_executable($file)) {
                         return $file;

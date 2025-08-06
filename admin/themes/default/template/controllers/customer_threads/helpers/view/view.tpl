@@ -30,9 +30,9 @@
 	<div class="panel-heading">
 		<i class="icon-comments"></i>
 		{l s="Thread"}: <span class="badge">#{$id_customer_thread|intval}</span>
-		{if isset($thread->id_customer) && $thread->id_customer}
-			<a class="pull-right" href="{$link->getAdminLink('AdminCustomers')|escape:'html':'UTF-8'}&amp;id_customer={$customer->id|intval}&amp;viewcustomer&">
-				{$customer->firstname} {$customer->lastname}<small>({$customer->email|escape:'html':'UTF-8'})</small>
+		{if isset($next_thread) && $next_thread}
+			<a class="btn btn-default pull-right" href="{$next_thread.href|escape:'html':'UTF-8'}">
+				{$next_thread.name} <i class="icon-forward"></i>
 			</a>
 		{/if}
 	</div>
@@ -50,25 +50,24 @@
 	</div>
 	<div class="row">
 		<div class="message-item-initial media">
-			<span class="avatar-md pull-left"><i class="icon-user icon-3x"></i></span>
+			<a href="{if isset($customer->id)}{$link->getAdminLink('AdminCustomers')|escape:'html':'UTF-8'}&amp;id_customer={$customer->id|intval}&amp;viewcustomer&{else}#{/if}" class="avatar-lg pull-left"><i class="icon-user icon-3x"></i></a>
 			<div class="media-body">
 				<div class="row">
 					<div class="col-sm-6">
-					{if isset($thread->user_name) && trim($thread->user_name)}
+					{if isset($customer->firstname)}
 						<h2>
-							{$thread->user_name|escape:'html':'UTF-8'} <small>({$thread->email|escape:'html':'UTF-8'})</small>
+							<a href="{$link->getAdminLink('AdminCustomers')|escape:'html':'UTF-8'}&amp;id_customer={$customer->id|intval}&amp;viewcustomer&">
+							{$customer->firstname|escape:'html':'UTF-8'} {$customer->lastname|escape:'html':'UTF-8'} <small>({$customer->email|escape:'html':'UTF-8'})</small>
+							</a>
 						</h2>
 					{else}
 						<h2>{$thread->email|escape:'html':'UTF-8'}</h2>
 					{/if}
-					{if isset($thread->phone) && trim($thread->phone) != ''}
-						<p>{l s='Phone:'} {$thread->phone|escape:'html':'UTF-8'}</p>
-					{/if}
 					{if isset($contact) && trim($contact) != ''}
-						<span>{l s='To:'} </span><span class="badge">{$contact|escape:'html':'UTF-8'}</span>
+						<span>{l s="To:"} </span><span class="badge">{$contact|escape:'html':'UTF-8'}</span>
 					{/if}
 					</div>
-					{if isset($customer->email) && $customer->email == $thread->email}
+					{if isset($customer->firstname)}
 						<div class="col-sm-6">
 							<p>
 							{if $count_ok}
@@ -117,9 +116,7 @@
 			{l s="Choose a template"}
 		</button>
 		-->
-		<button class="btn btn-default" name="submitReplyAndClose"><i class="process-icon-reply-all"></i> {l s='Reply And Close'}</button>
-		<button class="btn btn-default pull-right" name="submitReply"><i class="process-icon-mail-reply"></i> {l s='Reply And Open'}</button>
-		<button class="btn btn-default pull-right" name="submitReplyAsPrivate"><i class="process-icon-lock"></i> {l s='Add Private Message'}</button>
+		<button class="btn btn-default pull-right" name="submitReply"><i class="process-icon-mail-reply"></i> {l s="Send"}</button>
 		<input type="hidden" name="id_customer_thread" value="{$thread->id|intval}" />
 		<input type="hidden" name="msg_email" value="{$thread->email}" />
 	</div>
@@ -183,3 +180,5 @@
 </script>
 
 {/block}
+
+

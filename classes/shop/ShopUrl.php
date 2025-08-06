@@ -49,8 +49,8 @@ class ShopUrlCore extends ObjectModel
             'domain' =>        array('type' => self::TYPE_STRING, 'required' => true, 'size' => 255, 'validate' => 'isCleanHtml'),
             'domain_ssl' =>    array('type' => self::TYPE_STRING, 'size' => 255, 'validate' => 'isCleanHtml'),
             'id_shop' =>        array('type' => self::TYPE_INT, 'required' => true),
-            'physical_uri' =>    array('type' => self::TYPE_STRING, 'size' => 256),
-            'virtual_uri' =>    array('type' => self::TYPE_STRING, 'size' => 256),
+            'physical_uri' =>    array('type' => self::TYPE_STRING, 'size' => 64),
+            'virtual_uri' =>    array('type' => self::TYPE_STRING, 'size' => 64),
         ),
     );
 
@@ -76,9 +76,9 @@ class ShopUrlCore extends ObjectModel
             $this->physical_uri = '/';
         }
 
-        $this->virtual_uri = trim(str_replace(' ', '', $this->virtual_uri ?? ''), '/');
+        $this->virtual_uri = trim(str_replace(' ', '', $this->virtual_uri), '/');
         if ($this->virtual_uri) {
-            $this->virtual_uri = preg_replace('#/+#', '/', trim($this->virtual_uri, '/')) . '/';
+            $this->virtual_uri = preg_replace('#/+#', '/', trim($this->virtual_uri, '/')).'/';
         }
 
         return parent::getFields();

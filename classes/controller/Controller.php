@@ -28,7 +28,6 @@
  * @TODO Move undeclared variables and methods to this (base) class: $errors, $layout, checkLiveEditAccess, etc.
  * @since 1.5.0
  */
-#[\AllowDynamicProperties]
 abstract class ControllerCore
 {
     /** @var Context */
@@ -598,12 +597,7 @@ abstract class ControllerCore
      */
     public static function myErrorHandler($errno, $errstr, $errfile, $errline)
     {
-         /**
-         * Before PHP 8.0.0, the $errno was always if expression prepended by the @ error-control operator.
-         * @see https://www.php.net/manual/fr/function.set-error-handler.php
-         * @see https://www.php.net/manual/en/language.operators.errorcontrol.php
-         */
-        if (!(error_reporting() & $errno)) {
+        if (error_reporting() === 0) {
             return false;
         }
 
@@ -655,8 +649,8 @@ abstract class ControllerCore
             $method = $bt[1]['function'];
         }
 
-        Hook::exec('actionBeforeAjaxDie', array('controller' => $controller, 'method' => $method, 'value' => &$value));
-        Hook::exec('actionBeforeAjaxDie'.$controller.$method, array('value' => &$value));
+        Hook::exec('actionBeforeAjaxDie', array('controller' => $controller, 'method' => $method, 'value' => $value));
+        Hook::exec('actionBeforeAjaxDie'.$controller.$method, array('value' => $value));
 
         die($value);
     }

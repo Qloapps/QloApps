@@ -29,8 +29,7 @@
  *
  * @since 1.5.0.1
  */
-#[\AllowDynamicProperties]
- class ContextCore
+class ContextCore
 {
     /* @var Context */
     protected static $instance;
@@ -125,8 +124,8 @@
     public function getMobileDetect()
     {
         if ($this->mobile_detect === null) {
-            require_once(_PS_TOOL_DIR_.'mobile_detect/autoload.php');
-            $this->mobile_detect = new Detection\MobileDetect();
+            require_once(_PS_TOOL_DIR_.'mobile_Detect/Mobile_Detect.php');
+            $this->mobile_detect = new Mobile_Detect();
         }
         return $this->mobile_detect;
     }

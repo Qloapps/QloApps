@@ -22,7 +22,7 @@ class Smarty_Internal_Method_RegisterCacheResource
      * Registers a resource to fetch a template
      *
      * @api  Smarty::registerCacheResource()
-     * @link https://www.smarty.net/docs/en/api.register.cacheresource.tpl
+     * @link http://www.smarty.net/docs/en/api.register.cacheresource.tpl
      *
      * @param \Smarty_Internal_TemplateBase|\Smarty_Internal_Template|\Smarty $obj
      * @param string                                                          $name name of resource type

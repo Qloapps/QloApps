@@ -82,6 +82,15 @@ class AdminPPreferencesControllerCore extends AdminController
                             1 => $this->l('Cart summary')
                         )
                     ),*/
+                    'PS_PRODUCT_SHORT_DESC_LIMIT' => array(
+                        'title' => $this->l('Max size of short description'),
+                        'hint' => $this->l('Set the maximum size of room type short description (in characters).'),
+                        'validation' => 'isInt',
+                        'cast' => 'intval',
+                        'type' => 'text',
+                        'suffix' => $this->l('characters'),
+                        'class' => 'fixed-width-xl',
+                    ),
                     /*'PS_QTY_DISCOUNT_ON_COMBINATION' => array(
                         'title' => $this->l('Quantity discounts based on'),
                         'hint' => $this->l('How to calculate quantity discounts.'),
@@ -353,56 +362,56 @@ class AdminPPreferencesControllerCore extends AdminController
             //                 'off' => 'onchange="stockManagementActivationAuthorization()"'
             //             )
             //         ),
-            //         // 'PS_ADVANCED_STOCK_MANAGEMENT' => array(
-            //         //     'title' => $this->l('Enable advanced stock management'),
-            //         //     'hint' => $this->l('Allows you to manage physical stock, warehouses and supply orders in a new Stock menu.'),
-            //         //     'validation' => 'isBool',
-            //         //     'cast' => 'intval',
-            //         //     'required' => false,
-            //         //     'type' => 'bool',
-            //         //     'visibility' => Shop::CONTEXT_ALL,
-            //         //     'js' => array(
-            //         //         'on' => 'onchange="advancedStockManagementActivationAuthorization()"',
-            //         //         'off' => 'onchange="advancedStockManagementActivationAuthorization()"'
-            //         //     )
-            //         // ),
-            //         // 'PS_FORCE_ASM_NEW_PRODUCT' => array(
-            //         //     'title' => $this->l('New products use advanced stock management'),
-            //         //     'hint' => $this->l('New products will automatically use advanced stock management and depends on stock, but no warehouse will be selected'),
-            //         //     'validation' => 'isBool',
-            //         //     'cast' => 'intval',
-            //         //     'required' => false,
-            //         //     'type' => 'bool',
-            //         //     'visibility' => Shop::CONTEXT_ALL,
-            //         // ),
-            //         // 'PS_DEFAULT_WAREHOUSE_NEW_PRODUCT' => array(
-            //         //     'title' => $this->l('Default warehouse on new products'),
-            //         //     'hint' => $this->l('Automatically set a default warehouse when new product is created'),
-            //         //     'type' => 'select',
-            //         //     'list' => $warehouse_list,
-            //         //     'identifier' => 'id_warehouse'
-            //         // ),
-            //         // 'PS_PACK_STOCK_TYPE' => array(
-            //         //     'title' =>  $this->l('Default pack stock management'),
-            //         //     'type' => 'select',
-            //         //     'list' =>array(
-            //         //         array(
-            //         //             'pack_stock' => 0,
-            //         //             'name' => $this->l('Decrement pack only.')
-            //         //         ),
-            //         //         array(
-            //         //             'pack_stock' => 1,
-            //         //             'name' => $this->l('Decrement products in pack only.')
-            //         //         ),
-            //         //         array(
-            //         //             'pack_stock' => 2,
-            //         //             'name' => $this->l('Decrement both.')
-            //         //         ),
-            //         //     ),
-            //         //     'identifier' => 'pack_stock',
-            //         // ),
+            //         'PS_ADVANCED_STOCK_MANAGEMENT' => array(
+            //             'title' => $this->l('Enable advanced stock management'),
+            //             'hint' => $this->l('Allows you to manage physical stock, warehouses and supply orders in a new Stock menu.'),
+            //             'validation' => 'isBool',
+            //             'cast' => 'intval',
+            //             'required' => false,
+            //             'type' => 'bool',
+            //             'visibility' => Shop::CONTEXT_ALL,
+            //             'js' => array(
+            //                 'on' => 'onchange="advancedStockManagementActivationAuthorization()"',
+            //                 'off' => 'onchange="advancedStockManagementActivationAuthorization()"'
+            //             )
+            //         ),
+            //         'PS_FORCE_ASM_NEW_PRODUCT' => array(
+            //             'title' => $this->l('New products use advanced stock management'),
+            //             'hint' => $this->l('New products will automatically use advanced stock management and depends on stock, but no warehouse will be selected'),
+            //             'validation' => 'isBool',
+            //             'cast' => 'intval',
+            //             'required' => false,
+            //             'type' => 'bool',
+            //             'visibility' => Shop::CONTEXT_ALL,
+            //         ),
+            //         'PS_DEFAULT_WAREHOUSE_NEW_PRODUCT' => array(
+            //             'title' => $this->l('Default warehouse on new products'),
+            //             'hint' => $this->l('Automatically set a default warehouse when new product is created'),
+            //             'type' => 'select',
+            //             'list' => $warehouse_list,
+            //             'identifier' => 'id_warehouse'
+            //         ),
+            //         'PS_PACK_STOCK_TYPE' => array(
+            //             'title' =>  $this->l('Default pack stock management'),
+            //             'type' => 'select',
+            //             'list' =>array(
+            //                 array(
+            //                     'pack_stock' => 0,
+            //                     'name' => $this->l('Decrement pack only.')
+            //                 ),
+            //                 array(
+            //                     'pack_stock' => 1,
+            //                     'name' => $this->l('Decrement products in pack only.')
+            //                 ),
+            //                 array(
+            //                     'pack_stock' => 2,
+            //                     'name' => $this->l('Decrement both.')
+            //                 ),
+            //             ),
+            //             'identifier' => 'pack_stock',
+            //         ),
             //     ),
-            //     // 'bottom' => '<script type="text/javascript">stockManagementActivationAuthorization();advancedStockManagementActivationAuthorization();</script>',
+            //     'bottom' => '<script type="text/javascript">stockManagementActivationAuthorization();advancedStockManagementActivationAuthorization();</script>',
             //     'submit' => array('title' => $this->l('Save'))
             // ),
         );
@@ -413,11 +422,6 @@ class AdminPPreferencesControllerCore extends AdminController
         if (!Tools::getValue('PS_STOCK_MANAGEMENT', true)) {
             $_POST['PS_ORDER_OUT_OF_STOCK'] = 1;
             $_POST['PS_DISPLAY_QTIES'] = 0;
-        }
-
-        $bestSellingField = $this->fields_options['products']['fields']['PS_KPI_BEST_SELLING_ROOM_TYPE_NB_DAYS'];
-        if (!Tools::getValue('PS_KPI_BEST_SELLING_ROOM_TYPE_NB_DAYS')) {
-            $this->errors[] = sprintf(Tools::displayError('field %s must be greater than 0.'), $bestSellingField['title']);;
         }
 
         // if advanced stock management is disabled, updates concerned tables

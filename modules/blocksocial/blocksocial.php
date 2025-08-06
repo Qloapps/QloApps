@@ -34,7 +34,7 @@ class BlockSocial extends Module
 	{
 		$this->name = 'blocksocial';
 		$this->tab = 'front_office_features';
-		$this->version = '1.2.2';
+		$this->version = '1.2.1';
 		$this->author = 'PrestaShop';
 
 		$this->bootstrap = true;
@@ -55,7 +55,7 @@ class BlockSocial extends Module
 			|| !Configuration::updateValue('BLOCKSOCIAL_PINTEREST', '')
 			|| !Configuration::updateValue('BLOCKSOCIAL_VIMEO', '')
 			|| !Configuration::updateValue('BLOCKSOCIAL_INSTAGRAM', '')
-			|| !$this->registerHook('displayFooterMostLeftBlock')
+			|| !$this->registerHook('displayFooterNotificationHook')
 		) {
 			return false;
 		}
@@ -100,7 +100,7 @@ class BlockSocial extends Module
 		return $output.$this->renderForm();
 	}
 
-	public function hookDisplayFooterMostLeftBlock()
+	public function hookDisplayFooterNotificationHook()
 	{
 		$this->smarty->assign(array(
 			'facebook_url' => Configuration::get('BLOCKSOCIAL_FACEBOOK'),

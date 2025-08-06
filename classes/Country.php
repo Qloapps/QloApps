@@ -254,7 +254,7 @@ class CountryCore extends ObjectModel
      * @param string $country Country Name
      * @return int Country ID
      */
-    public static function getIdByName($id_lang, $country)
+    public static function getIdByName($id_lang = null, $country)
     {
         $sql = '
 		SELECT `id_country`

@@ -1,23 +1,20 @@
 {**
+* 2010-2023 Webkul.
+*
 * NOTICE OF LICENSE
 *
-* This source file is subject to the Open Software License version 3.0
-* that is bundled with this package in the file LICENSE.md
-* It is also available through the world-wide-web at this URL:
-* https://opensource.org/license/osl-3-0-php
-* If you did not receive a copy of the license and are unable to
-* obtain it through the world-wide-web, please send an email
-* to support@qloapps.com so we can send you a copy immediately.
+* All right is reserved,
+* Please go through LICENSE.txt file inside our module
 *
 * DISCLAIMER
 *
-* Do not edit or add to this file if you wish to upgrade this module to a newer
-* versions in the future. If you wish to customize this module for your needs
-* please refer to https://store.webkul.com/customisation-guidelines for more information.
+* Do not edit or add to this file if you wish to upgrade this module to newer
+* versions in the future. If you wish to customize this module for your
+* needs please refer to CustomizationPolicy.txt file inside our module for more information.
 *
 * @author Webkul IN
-* @copyright Since 2010 Webkul
-* @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
+* @copyright 2010-2023 Webkul IN
+* @license LICENSE.txt
 *}
 
 {block name='cart_booking_demands'}
@@ -29,7 +26,7 @@
 						<li class="active"><a href="#room_type_demands_desc" data-toggle="tab">{l s='Facilities'}</a></li>
 					{/if}
 					{if isset($roomTypeServiceProducts) && $roomTypeServiceProducts}
-						<li {if !isset($selectedRoomDemands) || !$selectedRoomDemands} class="active"{/if}><a href="#room_type_service_product_desc" data-toggle="tab">{l s='Services'}</a></li>
+						<li{if !isset($selectedRoomDemands) || !$selectedRoomDemands} class="active"{/if}><a href="#room_type_service_product_desc" data-toggle="tab">{l s='Services'}</a></li>
 					{/if}
 				</ul>
 			{/block}
@@ -116,20 +113,13 @@
 											<div id="accordion_service_{$key|escape:'html':'UTF-8'}" class=" col-sm-12 room_demand_detail accordion-section-content {if $roomCount == 1}open{/if}" {if $roomCount == 1}style="display: block;"{/if}>
 												{if isset($roomTypeServiceProducts) && $roomTypeServiceProducts}
 													{foreach $roomTypeServiceProducts as $product}
-														{if isset($cartRoom['selected_service']) && $cartRoom['selected_service'] && ($product['id_product']|array_key_exists:$cartRoom['selected_service'])}
-															{assign var='serviceSelected' value=true}
-															{$product.price_tax_incl = $cartRoom['selected_service'][$product['id_product']]['unit_price_tax_incl']}
-															{$product.price_tax_exc = $cartRoom['selected_service'][$product['id_product']]['unit_price_tax_excl']}
-														{else}
-															{assign var='serviceSelected' value=false}
-														{/if}
 														<div class="row room_demand_block">
 															<div class="col-xs-8">
 																<div class="row">
 																	<div class="col-xs-2">
 																		{if $product.available_for_order}
 																			<p class="checkbox">
-																				<input data-id_cart_booking="{$cartRoom['id']}" value="{$product['id_product']|escape:'html':'UTF-8'}" type="checkbox" class="change_room_type_service_product" {if $serviceSelected}checked{/if} />
+																				<input data-id_cart_booking="{$cartRoom['id']}" value="{$product['id_product']|escape:'html':'UTF-8'}" type="checkbox" class="change_room_type_service_product" {if  isset($cartRoom['selected_service']) && $cartRoom['selected_service'] && ($product['id_product']|array_key_exists:$cartRoom['selected_service'])}checked{/if} />
 																			</p>
 																		{/if}
 																	</div>
@@ -137,8 +127,7 @@
 																		<p>{$product['name']|escape:'html':'UTF-8'}</p>
 																		{if $product.allow_multiple_quantity}
 																			<div class="qty_container">
-																				<input type="text" class="form-control qty" id="qty_{$product.id_product}" name="room_service_product_qty_{$product.id_product}" data-id-product="{$product.id_product}" data-max_quantity="{$product.max_quantity}" value="{if $serviceSelected}{$cartRoom['selected_service'][$product['id_product']]['quantity']}{else}1{/if}">
-																				<input type="hidden" class="qty_hidden" id="qty_{$product.id_product}_hidden" value="{if $serviceSelected}{$cartRoom['selected_service'][$product['id_product']]['quantity']}{else}0{/if}">
+																				<input type="text" class="form-control qty" id="qty_{$product.id_product}" name="service_product_qty_{$product.id_product}" data-id-product="{$product.id_product}" data-max_quantity="{$product.max_quantity}" value="{if  isset($cartRoom['selected_service']) && $cartRoom['selected_service'] && ($product['id_product']|array_key_exists:$cartRoom['selected_service'])}{$cartRoom['selected_service'][$product['id_product']]['quantity']}{else}1{/if}">
 																				<div class="qty_controls">
 																					<a href="#" class="qty_up"><span><i class="icon-plus"></i></span></a>
 																					<a href="#" class="qty_down"><span><i class="icon-minus"></i></span></a>

@@ -35,9 +35,6 @@ class AuthControllerCore extends FrontController
      */
     protected $create_account;
     protected $id_country;
-    public $informations;
-    public $confirmations;
-    protected $ajaxExtraData;
 
     /**
      * Initialize auth controller
@@ -425,8 +422,16 @@ class AuthControllerCore extends FrontController
                 $addresses_types[] = 'address_invoice';
             }
 
+            $className = 'CartCustomerGuestDetail';
+            $rules = call_user_func(array($className, 'getValidationRules'), $className);
             if (Configuration::get('PS_ONE_PHONE_AT_LEAST') && !Tools::getValue('phone')) {
                 $this->errors[] = Tools::displayError('Phone number is required.');
+            } else {
+                if (Tools::getValue('phone') && !Validate::isPhoneNumber(Tools::getValue('phone'))) {
+                    $this->errors[] = Tools::displayError('Invald phone number.');
+                } elseif (Tools::getValue('phone') && Tools::strlen(Tools::getValue('phone')) > $rules['size']['phone']) {
+                    $this->errors[] = sprintf(Tools::displayError('Phone number is too long. (%s chars max).'), $rules['size']['phone']);
+                }
             }
 
             if (!Tools::getValue('is_new_customer', 1)) {
@@ -570,9 +575,7 @@ class AuthControllerCore extends FrontController
                     }
                 }
             }
-            if (!(Tools::getValue('months') == '' && Tools::getValue('days') == '' && Tools::getValue('years') == '')
-                && !@checkdate((int) Tools::getValue('months'), (int) Tools::getValue('days'), (int) Tools::getValue('years'))
-            ) {
+            if (!@checkdate(Tools::getValue('months'), Tools::getValue('days'), Tools::getValue('years')) && !(Tools::getValue('months') == '' && Tools::getValue('days') == '' && Tools::getValue('years') == '')) {
                 $this->errors[] = Tools::displayError('Invalid date of birth');
             }
 

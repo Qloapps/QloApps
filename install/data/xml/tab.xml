@@ -225,9 +225,9 @@
     <tab id="Images" id_parent="Preferences" active="1" hide_host_mode="0">
       <class_name>AdminImages</class_name>
     </tab>
-    <!-- <tab id="Store_Contacts" id_parent="Preferences" active="1" hide_host_mode="0">
+    <tab id="Store_Contacts" id_parent="Preferences" active="1" hide_host_mode="0">
       <class_name>AdminStores</class_name>
-    </tab> -->
+    </tab>
     <tab id="Search_1" id_parent="Preferences" active="1" hide_host_mode="0">
       <class_name>AdminSearchConf</class_name>
     </tab>

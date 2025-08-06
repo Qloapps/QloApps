@@ -120,12 +120,6 @@
     <keywords/>
     <url_rewrite>acompanhar-encomenda</url_rewrite>
   </meta>
-  <meta id='our-properties' id_shop='1'>
-    <title>Nossas propriedades</title>
-    <description/>
-    <keywords/>
-    <url_rewrite>our-properties</url_rewrite>
-  </meta>
   <meta id="order-slip" id_shop="1">
     <title>Nota de Encomenda</title>
     <description/>

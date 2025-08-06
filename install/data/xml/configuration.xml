@@ -230,12 +230,6 @@
 	<configuration id="PS_ORDER_LIST_PRICE_DISPLAY_CURRENCY" name="PS_ORDER_LIST_PRICE_DISPLAY_CURRENCY">
 		<value>1</value>
 	</configuration>
-    <configuration id="PS_ALLOW_ADD_ALL_SERVICES_IN_BOOKING" name="PS_ALLOW_ADD_ALL_SERVICES_IN_BOOKING">
-		<value>1</value>
-	</configuration>
-    <configuration id="PS_ALLOW_CREATE_CUSTOM_SERVICES_IN_BOOKING" name="PS_ALLOW_CREATE_CUSTOM_SERVICES_IN_BOOKING">
-		<value>1</value>
-	</configuration>
 	<configuration id="TRACKING_DIRECT_TRAFFIC" name="TRACKING_DIRECT_TRAFFIC">
 		<value>0</value>
 	</configuration>
@@ -342,7 +336,7 @@
 		<value>1</value>
 	</configuration>
 	<configuration id="PS_DIMENSION_UNIT" name="PS_DIMENSION_UNIT">
-		<value>ft</value>
+		<value>cm</value>
 	</configuration>
 	<configuration id="PS_GUEST_CHECKOUT_ENABLED" name="PS_GUEST_CHECKOUT_ENABLED">
 		<value>0</value>
@@ -791,9 +785,6 @@
 	<configuration id="PS_MAIL_METHOD" name="PS_MAIL_METHOD">
 		<value>1</value>
 	</configuration>
-	<configuration id="PS_MAIL_SUBJECT_PREFIX" name="PS_MAIL_SUBJECT_PREFIX">
-    	<value>1</value>
-  	</configuration>
 	<configuration id="PS_SHOP_ACTIVITY" name="PS_SHOP_ACTIVITY">
 		<value>Animaux</value>
 	</configuration>
@@ -955,27 +946,6 @@
     </configuration>
 	<configuration id="PS_BACKDATE_ORDER_EMPLOYEES" name="PS_BACKDATE_ORDER_EMPLOYEES">
       <value>0</value>
-    </configuration>
-	<configuration id="PS_CUSTOMER_SERVICE_REQUIRED_NAME" name="PS_CUSTOMER_SERVICE_REQUIRED_NAME">
-      <value>1</value>
-    </configuration>
-	<configuration id="PS_CUSTOMER_SERVICE_DISPLAY_NAME" name="PS_CUSTOMER_SERVICE_DISPLAY_NAME">
-      <value>1</value>
-    </configuration>
-	<configuration id="PS_CUSTOMER_SERVICE_REQUIRED_PHONE" name="PS_CUSTOMER_SERVICE_REQUIRED_PHONE">
-      <value>1</value>
-    </configuration>
-	<configuration id="PS_CUSTOMER_SERVICE_DISPLAY_PHONE" name="PS_CUSTOMER_SERVICE_DISPLAY_PHONE">
-      <value>1</value>
-    </configuration>
-	<configuration id="PS_CUSTOMER_SERVICE_DISPLAY_CONTACT" name="PS_CUSTOMER_SERVICE_DISPLAY_CONTACT">
-      <value>1</value>
-    </configuration>
-	<configuration id="PS_STANDARD_PRODUCT_ORDER_ADDRESS_PREFRENCE" name="PS_STANDARD_PRODUCT_ORDER_ADDRESS_PREFRENCE">
-      <value>1</value>
-    </configuration>
-	<configuration id="PS_CUSTOMER_GUEST_MAX_LIMIT" name="PS_CUSTOMER_GUEST_MAX_LIMIT">
-      <value>5</value>
     </configuration>
   </entities>
 </entity_configuration>

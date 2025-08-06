@@ -173,7 +173,10 @@ class AdminHotelConfigurationSettingController extends ModuleAdminController
     public function renderForm()
     {
         $smartyVars = array();
+        $idSettingsLink = (int) Tools::getValue($this->identifier);
         $objHotelSettingsLink = $this->loadObject(true);
+
+        $smartyVars['id_hotel_settings_link'] = $idSettingsLink;
         $smartyVars['currentTab'] = $this;
         $smartyVars['currentObject'] = $objHotelSettingsLink;
 
@@ -305,7 +308,7 @@ class AdminHotelConfigurationSettingController extends ModuleAdminController
 
             if (isset($pos[2]) && (int) $pos[2] === $idSettingsLink) {
                 if ($objHotelSettingsLink = new HotelSettingsLink((int) $pos[2])) {
-                    if (isset($position) && $objHotelSettingsLink->updatePosition($way, $position)) {
+                    if (isset($position) && $objHotelSettingsLink->updatePosition($way, $position, $idSettingsLink)) {
                         $this->ajaxDie(json_encode(true));
                     } else {
                         $this->ajaxDie(json_encode(array(

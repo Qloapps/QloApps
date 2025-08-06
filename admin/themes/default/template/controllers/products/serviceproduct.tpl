@@ -1,25 +1,3 @@
-{**
-* NOTICE OF LICENSE
-*
-* This source file is subject to the Open Software License version 3.0
-* that is bundled with this package in the file LICENSE.md
-* It is also available through the world-wide-web at this URL:
-* https://opensource.org/license/osl-3-0-php
-* If you did not receive a copy of the license and are unable to
-* obtain it through the world-wide-web, please send an email
-* to support@qloapps.com so we can send you a copy immediately.
-*
-* DISCLAIMER
-*
-* Do not edit or add to this file if you wish to upgrade this module to a newer
-* versions in the future. If you wish to customize this module for your needs
-* please refer to https://store.webkul.com/customisation-guidelines for more information.
-*
-* @author Webkul IN
-* @copyright Since 2010 Webkul
-* @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
-*}
-
 {if isset($product->id)}
     <div id="product-configuration" class="panel product-tab">
 		<input type="hidden" name="submitted_tabs[]" value="ServiceProduct" />
@@ -146,21 +124,17 @@
                                     </div>
                                 </td>
                                 <td>
-                                    {if $service_product.auto_add_to_cart&& $service_product.price_addition_type == Product::PRICE_ADDITION_TYPE_WITH_ROOM}
-                                        {l s='-'}
-                                    {else}
-                                        <div class="fixed-width-xl">
-                                            <select class="service_product_id_tax_rules_group" name="{$inputs_prefix}id_tax_rules_group">
-                                                <option value="0">{l s='No Tax'}</option>
-                                                {foreach from=$tax_rules_groups item=tax_rules_group}
-                                                    <option value="{$tax_rules_group.id_tax_rules_group}" {if isset($smarty.post["{$inputs_prefix}id_tax_rules_group"])}{if $tax_rules_group.id_tax_rules_group == $smarty.post["{$inputs_prefix}id_tax_rules_group"]}{/if}{elseif $tax_rules_group.id_tax_rules_group == $service_product.id_tax_rules_group}selected{/if}>
-                                                        {$tax_rules_group['name']|htmlentitiesUTF8}
-                                                    </option>
-                                                {/foreach}
-                                            </select>
-                                        </div>
-                                        <div class="help-block">{l s='Default tax rule: %s' sprintf=$service_product.tax_rules_group_name}</div>
-                                    {/if}
+                                    <div class="fixed-width-xl">
+                                        <select class="service_product_id_tax_rules_group" name="{$inputs_prefix}id_tax_rules_group">
+                                            <option value="0">{l s='No Tax'}</option>
+                                            {foreach from=$tax_rules_groups item=tax_rules_group}
+                                                <option value="{$tax_rules_group.id_tax_rules_group}" {if isset($smarty.post["{$inputs_prefix}id_tax_rules_group"])}{if $tax_rules_group.id_tax_rules_group == $smarty.post["{$inputs_prefix}id_tax_rules_group"]}{/if}{elseif $tax_rules_group.id_tax_rules_group == $service_product.id_tax_rules_group}selected{/if}>
+                                                    {$tax_rules_group['name']|htmlentitiesUTF8}
+                                                </option>
+                                            {/foreach}
+                                        </select>
+                                    </div>
+                                    <div class="help-block">{l s='Default tax rule: %s' sprintf=$service_product.tax_rules_group_name}</div>
                                 </td>
                             </tr>
                         {/foreach}

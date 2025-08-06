@@ -60,7 +60,7 @@ class TCPDF_FILTERS {
 
 	/**
 	 * Get a list of available decoding filters.
-	 * @return array Array of available filter decoders.
+	 * @return (array) Array of available filter decoders.
 	 * @since 1.0.000 (2011-05-23)
 	 * @public static
 	 */
@@ -70,9 +70,9 @@ class TCPDF_FILTERS {
 
 	/**
 	 * Decode data using the specified filter type.
-	 * @param string $filter Filter name.
-	 * @param string $data Data to decode.
-	 * @return string Decoded data string.
+	 * @param $filter (string) Filter name.
+	 * @param $data (string) Data to decode.
+	 * @return Decoded data string.
 	 * @since 1.0.000 (2011-05-23)
 	 * @public static
 	 */
@@ -130,8 +130,8 @@ class TCPDF_FILTERS {
 	/**
 	 * Standard
 	 * Default decoding filter (leaves data unchanged).
-	 * @param string $data Data to decode.
-	 * @return string Decoded data string.
+	 * @param $data (string) Data to decode.
+	 * @return Decoded data string.
 	 * @since 1.0.000 (2011-05-23)
 	 * @public static
 	 */
@@ -142,8 +142,8 @@ class TCPDF_FILTERS {
 	/**
 	 * ASCIIHexDecode
 	 * Decodes data encoded in an ASCII hexadecimal representation, reproducing the original binary data.
-	 * @param string $data Data to decode.
-	 * @return string Decoded data string.
+	 * @param $data (string) Data to decode.
+	 * @return Decoded data string.
 	 * @since 1.0.000 (2011-05-23)
 	 * @public static
 	 */
@@ -182,8 +182,8 @@ class TCPDF_FILTERS {
 	/**
 	 * ASCII85Decode
 	 * Decodes data encoded in an ASCII base-85 representation, reproducing the original binary data.
-	 * @param string $data Data to decode.
-	 * @return string Decoded data string.
+	 * @param $data (string) Data to decode.
+	 * @return Decoded data string.
 	 * @since 1.0.000 (2011-05-23)
 	 * @public static
 	 */
@@ -266,8 +266,8 @@ class TCPDF_FILTERS {
 	/**
 	 * LZWDecode
 	 * Decompresses data encoded using the LZW (Lempel-Ziv-Welch) adaptive compression method, reproducing the original text or binary data.
-	 * @param string $data Data to decode.
-	 * @return string Decoded data string.
+	 * @param $data (string) Data to decode.
+	 * @return Decoded data string.
 	 * @since 1.0.000 (2011-05-23)
 	 * @public static
 	 */
@@ -347,8 +347,8 @@ class TCPDF_FILTERS {
 	/**
 	 * FlateDecode
 	 * Decompresses data encoded using the zlib/deflate compression method, reproducing the original text or binary data.
-	 * @param string $data Data to decode.
-	 * @return string Decoded data string.
+	 * @param $data (string) Data to decode.
+	 * @return Decoded data string.
 	 * @since 1.0.000 (2011-05-23)
 	 * @public static
 	 */
@@ -364,7 +364,7 @@ class TCPDF_FILTERS {
 	/**
 	 * RunLengthDecode
 	 * Decompresses data encoded using a byte-oriented run-length encoding algorithm.
-	 * @param string $data Data to decode.
+	 * @param $data (string) Data to decode.
 	 * @since 1.0.000 (2011-05-23)
 	 * @public static
 	 */
@@ -400,8 +400,8 @@ class TCPDF_FILTERS {
 	/**
 	 * CCITTFaxDecode (NOT IMPLEMETED - RETURN AN EXCEPTION)
 	 * Decompresses data encoded using the CCITT facsimile standard, reproducing the original data (typically monochrome image data at 1 bit per pixel).
-	 * @param string $data Data to decode.
-	 * @return string Decoded data string.
+	 * @param $data (string) Data to decode.
+	 * @return Decoded data string.
 	 * @since 1.0.000 (2011-05-23)
 	 * @public static
 	 */
@@ -413,8 +413,8 @@ class TCPDF_FILTERS {
 	/**
 	 * JBIG2Decode (NOT IMPLEMETED - RETURN AN EXCEPTION)
 	 * Decompresses data encoded using the JBIG2 standard, reproducing the original monochrome (1 bit per pixel) image data (or an approximation of that data).
-	 * @param string $data Data to decode.
-	 * @return string Decoded data string.
+	 * @param $data (string) Data to decode.
+	 * @return Decoded data string.
 	 * @since 1.0.000 (2011-05-23)
 	 * @public static
 	 */
@@ -426,8 +426,8 @@ class TCPDF_FILTERS {
 	/**
 	 * DCTDecode (NOT IMPLEMETED - RETURN AN EXCEPTION)
 	 * Decompresses data encoded using a DCT (discrete cosine transform) technique based on the JPEG standard, reproducing image sample data that approximates the original data.
-	 * @param string $data Data to decode.
-	 * @return string Decoded data string.
+	 * @param $data (string) Data to decode.
+	 * @return Decoded data string.
 	 * @since 1.0.000 (2011-05-23)
 	 * @public static
 	 */
@@ -439,8 +439,8 @@ class TCPDF_FILTERS {
 	/**
 	 * JPXDecode (NOT IMPLEMETED - RETURN AN EXCEPTION)
 	 * Decompresses data encoded using the wavelet-based JPEG2000 standard, reproducing the original image data.
-	 * @param string $data Data to decode.
-	 * @return string Decoded data string.
+	 * @param $data (string) Data to decode.
+	 * @return Decoded data string.
 	 * @since 1.0.000 (2011-05-23)
 	 * @public static
 	 */
@@ -452,8 +452,8 @@ class TCPDF_FILTERS {
 	/**
 	 * Crypt (NOT IMPLEMETED - RETURN AN EXCEPTION)
 	 * Decrypts data encrypted by a security handler, reproducing the data as it was before encryption.
-	 * @param string $data Data to decode.
-	 * @return string Decoded data string.
+	 * @param $data (string) Data to decode.
+	 * @return Decoded data string.
 	 * @since 1.0.000 (2011-05-23)
 	 * @public static
 	 */
@@ -466,7 +466,7 @@ class TCPDF_FILTERS {
 
 	/**
 	 * Throw an exception.
-	 * @param string $msg The error message
+	 * @param $msg (string) The error message
 	 * @since 1.0.000 (2011-05-23)
 	 * @public static
 	 */

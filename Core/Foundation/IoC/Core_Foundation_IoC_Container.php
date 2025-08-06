@@ -105,9 +105,9 @@ class Core_Foundation_IoC_Container
 
         if ($classConstructor) {
             foreach ($classConstructor->getParameters() as $param) {
-                $paramClass = ($param->getType() && !$param->getType()->isBuiltin()) ? new ReflectionClass($param->getType()>getName()) : null;
+                $paramClass = $param->getClass();
                 if ($paramClass) {
-                    $args[] = $this->doMake($paramClass->getName(), $alreadySeen);
+                    $args[] = $this->doMake($param->getClass()->getName(), $alreadySeen);
                 } elseif ($param->isDefaultValueAvailable()) {
                     $args[] = $param->getDefaultValue();
                 } else {

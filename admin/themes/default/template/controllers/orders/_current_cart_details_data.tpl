@@ -1,28 +1,23 @@
 {*
+* 2010-2019 Webkul.
+*
 * NOTICE OF LICENSE
 *
-* This source file is subject to the Open Software License version 3.0
-* that is bundled with this package in the file LICENSE.md
-* It is also available through the world-wide-web at this URL:
-* https://opensource.org/license/osl-3-0-php
-* If you did not receive a copy of the license and are unable to
-* obtain it through the world-wide-web, please send an email
-* to support@qloapps.com so we can send you a copy immediately.
+* All right is reserved,
+* Please go through this link for complete license : https://store.webkul.com/license.html
 *
 * DISCLAIMER
 *
-* Do not edit or add to this file if you wish to upgrade this module to a newer
-* versions in the future. If you wish to customize this module for your needs
-* please refer to https://store.webkul.com/customisation-guidelines for more information.
+* Do not edit or add to this file if you wish to upgrade this module to newer
+* versions in the future. If you wish to customize this module for your
+* needs please refer to https://store.webkul.com/customisation-guidelines/ for more information.
 *
-* @author Webkul IN
-* @copyright Since 2010 Webkul
-* @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
+*  @author    Webkul IN <support@webkul.com>
+*  @copyright 2010-2019 Webkul IN
+*  @license   https://store.webkul.com/license.html
 *}
 
-{if !isset($ajax) || !$ajax}
 <div class="panel form-horizontal" id="customer_cart_details">
-{/if}
 	<div class="panel-heading">
 		<i class="icon-shopping-cart"></i>
 		{l s='Cart Details'}
@@ -56,7 +51,7 @@
 								<td>
 									<p>{$data.room_type|escape:'html':'UTF-8'}</p>
 								</td>
-								{assign var="is_full_date" value=($show_full_date && ($data['date_from']|date_format:'%D' == $data['date_to']|date_format:'%D'))}
+                                {assign var="is_full_date" value=($show_full_date && ($data['date_from']|date_format:'%D' == $data['date_to']|date_format:'%D'))}
 								<td>{dateFormat date=$data.date_from full=$is_full_date} - {dateFormat date=$data.date_to full=$is_full_date}</td>
 								{if $occupancy_required_for_booking}
 									<td>
@@ -118,14 +113,22 @@
 									</td>
 								{/if}
 								<td id="cart_detail_data_unit_price_{$data.id|escape:'html':'UTF-8'}">
-									{assign var=shown_room_type_price value=$data.feature_price_tax_excl}
+									{if $data.feature_price_diff != 0}
+										{assign var=shown_room_type_price value=$data.feature_price_tax_excl}
+									{else}
+										{assign var=shown_room_type_price value=$data.product_price_tax_excl}
+									{/if}
 									<div class="input-group">
 										<input type="text" class="room_unit_price" value="{Tools::ps_round($shown_room_type_price, $smarty.const._PS_PRICE_DISPLAY_PRECISION_)|escape:'html':'UTF-8'}">
 										<span class="input-group-addon">{$currency->prefix}{$currency->suffix}</span>
 									</div>
 								</td>
 								<td>
-                                    {displayPrice price=($data.demand_price + $data.additional_service_price + $data.additional_services_auto_add_price)|escape:'html':'UTF-8'}
+									{if (isset($data.extra_demands) && $data.extra_demands) || (isset($data.additional_service) && $data.additional_service)}
+										{displayPrice price=($data.demand_price + $data.additional_service_price + $data.additional_services_auto_add_price)|escape:'html':'UTF-8'}
+									{else}
+										{displayPrice price=0}
+									{/if}
 								</td>
 								{* <td class="cart_line_total_rooms_price" id="cart_detail_data_price_{$data.id|escape:'html':'UTF-8'}">
 									{displayPrice price=$data.amt_with_qty}</td> *}
@@ -140,10 +143,42 @@
 									<button class="delete_hotel_cart_data btn btn-danger" data-id_room="{$data.id_room|escape:'html':'UTF-8'}" data-id_product="{$data.id_product|escape:'html':'UTF-8'}" data-id="{$data.id|escape:'html':'UTF-8'}" data-id_cart="{$data.id_cart|escape:'html':'UTF-8'}" data-date_to="{$data.date_to|escape:'html':'UTF-8'}" data-date_from="{$data.date_from|escape:'html':'UTF-8'}">
 										<i class="icon-trash"></i>&nbsp;{l s='Delete'}
 									</button>
-                                    <br />
-                                    <a href="#" id_hotel_cart_booking="{$data.id|escape:'html':'UTF-8'}" id_room="{$data.id_room|escape:'html':'UTF-8'}" date_from="{$data.date_from|escape:'html':'UTF-8'}" date_to="{$data.date_to|escape:'html':'UTF-8'}" id_product="{$data.id_product|escape:'html':'UTF-8'}" id_cart="{$data.id_cart|escape:'html':'UTF-8'}" class="open_rooms_extra_demands btn btn-success" title="{l s='Click here to add or remove the extra services of this room type.'}">
-                                        <i class="icon-pencil"></i>&nbsp;{l s='Services'}
-                                    </a>
+									{if (isset($data.extra_demands) && $data.extra_demands) || isset($data.additional_service) && $data.additional_service}
+										<br />
+										<a href="#" id_room="{$data.id_room|escape:'html':'UTF-8'}" date_from="{$data.date_from|escape:'html':'UTF-8'}" date_to="{$data.date_to|escape:'html':'UTF-8'}" id_product="{$data.id_product|escape:'html':'UTF-8'}" id_cart="{$data.id_cart|escape:'html':'UTF-8'}" class="open_rooms_extra_demands btn btn-success" title="{l s='Click here to add or remove the extra services of this room type.'}">
+											<i class="icon-pencil"></i>&nbsp;{l s='Services'}
+										</a>
+									{/if}
+								</td>
+							</tr>
+						{/foreach}
+					</tbody>
+				{/if}
+				{if isset($cart_normal_data) && $cart_normal_data}
+					<thead>
+						<tr>
+							<th><span class="title_box">{l s='Image'}</th>
+							<th><span class="title_box">{l s='Name'}</span></th>
+							<th colspan="2"><span class="title_box">{l s='Hotel Name'}</span></th>
+							<th colspan="2"><span class="title_box">{l s='Unit Price (tax excl)'}</span></th>
+							<th><span class="title_box">{l s='Quantity'}</span></th>
+							<th><span class="title_box">{l s='Total Price (Tax incl.)'}</span></th>
+							<th></th>
+						</tr>
+					</thead>
+					<tbody>
+						{foreach $cart_normal_data as $product}
+							<tr>
+								<td><img src="{$product['cover_img']|escape:'html':'UTF-8'}" class="img-responsive" /></td>
+								<td><p>{$product['name']|escape:'html':'UTF-8'}</p></td>
+								<td colspan="2">{$product['hotel_name']}</td>
+								<td colspan="2">{displayPrice price=$product['unit_price_tax_incl']}</td>
+								<td>{$product['quantity']|escape:'htmlall':'UTF-8'}</td>
+								<td>{displayPrice price=$product['total_price_tax_incl']}</td>
+								<td>
+									<button class="delete_service_product btn btn-danger" data-id-hotel="{$product['id_hotel']|escape:'htmlall':'UTF-8'}" data-id_product={$product['id_product']|escape:'html':'UTF-8'} data-id_cart = {$cart->id|escape:'html':'UTF-8'}>
+										<i class="icon-trash"></i>&nbsp;{l s='Delete'}
+									</button>
 								</td>
 							</tr>
 						{/foreach}
@@ -152,7 +187,6 @@
 			</table>
 		</div>
 	</div>
-{if !isset($ajax) || !$ajax}
 </div>
 
 {* Modal for extra demands *}
@@ -176,14 +210,22 @@
 		color:#979797;
 		font-size:12px;}
 	/*Extra demands CSS*/
+	#rooms_type_extra_demands .modal-header {
+		padding-bottom: 0px}
+	#rooms_extra_demands {
+		font-size: 16px;}
+	#rooms_extra_demands .room_demands_container {
+		border: 1px solid #ddd;}
+	#rooms_extra_demands .demand_header {
+		padding: 10px;
+		color: #333;
+		border-bottom: 1px solid #ddd;}
 	#rooms_extra_demands .rooms_extra_demands_head {
 		margin-bottom: 18px;}
 	#rooms_extra_demands .room_demand_block {
 		margin-bottom: 15px;
-		color: #333;}
-    #room_type_service_product_desc #back_to_service_btn {
-		display: none;}
-    #add_new_room_services_block {
-		display: none;}
+		color: #333;
+		font-size: 14px;}
+	#rooms_extra_demands .room_demand_detail {
+		padding: 15px 15px 0px 15px;}
 </style>
-{/if}

@@ -26,7 +26,7 @@
 
 
 {block name=pageTitle}
-<h2 class="page-title configure">
+<h2 class="page-title">
 	{l s='Configure'}
 </h2>
 <h4 class="page-subtitle">{$module_display_name}</h4>

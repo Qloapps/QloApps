@@ -1,23 +1,20 @@
 /**
-* NOTICE OF LICENSE
-*
-* This source file is subject to the Open Software License version 3.0
-* that is bundled with this package in the file LICENSE.md
-* It is also available through the world-wide-web at this URL:
-* https://opensource.org/license/osl-3-0-php
-* If you did not receive a copy of the license and are unable to
-* obtain it through the world-wide-web, please send an email
-* to support@qloapps.com so we can send you a copy immediately.
-*
-* DISCLAIMER
-*
-* Do not edit or add to this file if you wish to upgrade this module to a newer
-* versions in the future. If you wish to customize this module for your needs
-* please refer to https://store.webkul.com/customisation-guidelines for more information.
-*
-* @author Webkul IN
-* @copyright Since 2010 Webkul
-* @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
+ * 2010-2023 Webkul.
+ *
+ * NOTICE OF LICENSE
+ *
+ * All right is reserved,
+ * Please go through LICENSE.txt file inside our module
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade this module to newer
+ * versions in the future. If you wish to customize this module for your
+ * needs please refer to CustomizationPolicy.txt file inside our module for more information.
+ *
+ * @author Webkul IN
+ * @copyright 2010-2023 Webkul IN
+ * @license LICENSE.txt
  */
 
 /* elements - start */
@@ -248,22 +245,22 @@
     color: #333;
 }
 
-.hotel-details .card-header {
+.room-details .card-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 
-.hotel-details .card-header .booking-actions-wrap {
+.room-details .card-header .booking-actions-wrap {
     margin: -6px 0;
 }
 
-.hotel-details .card-header .booking-actions-wrap .col-xs-12 {
+.room-details .card-header .booking-actions-wrap .col-xs-12 {
     display: flex;
     flex-wrap: wrap;
 }
 
-.room-details .card-body, .service-product-details .card-body {
+.room-details .card-body {
     padding: 0;
 }
 
@@ -271,59 +268,59 @@
     padding: 18px;
 }
 
-.product-detail {
+.room-details .booking-room-detail {
     padding: 18px;
     position: relative;
 }
 
-.product-detail:not(:last-of-type) {
+.room-details .booking-room-detail:not(:last-of-type) {
     border-bottom: 1px solid #E5E5E5;
 }
 
 @media (min-width: 576px) {
-    .product-detail .num-refunded-rooms {
+    .booking-room-detail .num-refunded-rooms {
         float: right;
         display: inline-block;
     }
 }
 
 @media (max-width: 576px) {
-    .refund_element_details .card-header {
+    .room-details .card-header {
         flex-direction: column;
         align-items: flex-start;
     }
 
-    .refund_element_details .card-header .booking-actions-wrap {
+    .room-details .card-header .booking-actions-wrap {
         margin-top: 10px;
         margin-left: -10px;
     }
 
-    .product-detail .num-refunded-rooms {
+    .booking-room-detail .num-refunded-rooms {
         display: block;
         float: none;
     }
 }
 
 @media (min-width: 768px) and (max-width: 1200px) {
-    .refund_element_details .card-header .booking-actions-wrap .col-xs-12, .service-product-details .card-header .booking-actions-wrap .col-xs-12 {
+    .room-details .card-header .booking-actions-wrap .col-xs-12 {
         flex-wrap: nowrap;
     }
 }
 
-.product-detail .description-list dt {
+.booking-room-detail .description-list dt {
     font-weight: 400;
 }
 
-.product-detail .description-list dd {
+.booking-room-detail .description-list dd {
     font-weight: 600;
 }
 
-.product-detail .img-room-type {
+.booking-room-detail .img-room-type {
     width: 100%;
     border-radius: 2px;
 }
 
-.product-detail .product-name h3 {
+.booking-room-detail .room-type-name h3 {
     display: inline-block;
     margin: 0;
     font-size: 20px;
@@ -331,12 +328,12 @@
     color: #333;
 }
 
-.product-detail .order-price-info {
+.booking-room-detail .order-price-info {
     position: relative;
     top: -1px;
 }
 
-.product-detail .num-refunded-rooms .badge {
+.booking-room-detail .num-refunded-rooms .badge {
     padding: 5px;
     font-weight: normal;
     font-size: 12px;
@@ -344,7 +341,7 @@
     margin-top: 5px;
 }
 
-.product-detail .btn-view-extra-services {
+.booking-room-detail .btn-view-extra-services {
     color: #167BFF;
 }
 
@@ -609,7 +606,7 @@
     color: #55c65e;
 }
 
-#sendOrderMessage, .select-room-type .card-subheader {
+#sendOrderMessage {
     margin-bottom: 10px;
 }
 
@@ -718,18 +715,18 @@
     padding-left: 6px;
 }
 
-#order-detail .order_refund_request {
+#order-detail #order_refund_request {
     background-color: #ff4b4b;
     border: 1px solid #ff4b4b;
     color: #FFF;
 }
 
-#order-detail .order_refund_request:focus,
-#order-detail .order_refund_request:hover {
+#order-detail #order_refund_request:focus,
+#order-detail #order_refund_request:hover {
     opacity: 0.8;
 }
 
-#order-detail .order_refund_request_submit {
+#order-detail #order_refund_request_submit {
     background-color: #36BA46;
     border: 1px solid #36BA46;
     color: #fff;
@@ -862,35 +859,35 @@
     background-color: #1292FF;
 }
 
-#create-new-refund-popup .nav-tabs li a .refund_element_name {
+#create-new-refund-popup .nav-tabs li a .room-type-name {
     font-size: 14px;
     font-weight: 600;
     margin-bottom: 2px;
 }
 
-#create-new-refund-popup .tab-content .refund_element_summary {
+#create-new-refund-popup .tab-content .room-type-summary {
     padding: 10px 15px;
     border-bottom: 1px solid #E5E5E5;
 }
 
-#create-new-refund-popup .tab-content .refund_element_summary .refund_element_name {
+#create-new-refund-popup .tab-content .room-type-summary .room-type-name {
     font-size: 16px;
     font-weight: bold;
 }
 
-#create-new-refund-popup .tab-content .refund_element_summary > [class*=col-xs-] > p {
+#create-new-refund-popup .tab-content .room-type-summary > [class*=col-xs-] > p {
     font-size: 10px;
     margin-bottom: 0px;
 }
 
-#create-new-refund-popup .tab-content .refund_element_details {
+#create-new-refund-popup .tab-content .room-details {
     padding: 13px 15px 10px;
 }
 
-#create-new-refund-popup .tab-content .refund_element_details.cancelled {
+#create-new-refund-popup .tab-content .room-details.cancelled {
     background-color: #F5F5F5;
 }
-#create-new-refund-popup .tab-content .refund_element_details.cancelled .badge-cancelled {
+#create-new-refund-popup .tab-content .room-details.cancelled .badge-cancelled {
     margin-left: 6px;
     padding: 5px 10px;
     border-radius: 31px;
@@ -898,35 +895,35 @@
     background-color: #FF4B4B;
 }
 
-#create-new-refund-popup .refund_element_details .occupancy-wrap {
+#create-new-refund-popup .room-details .occupancy-wrap {
     position: relative;
 }
 
-#create-new-refund-popup .refund_element_details .checkbox {
+#create-new-refund-popup .room-details .occupancy-wrap .checkbox {
     margin: 0;
 }
 
-#create-new-refund-popup .refund_element_details .checker {
+#create-new-refund-popup .room-details .occupancy-wrap .checker {
     margin-right: 8px;
 }
 
-#create-new-refund-popup .refund_element_details .checkbox label {
+#create-new-refund-popup .room-details .checkbox label {
     font-size: 14px;
     font-weight: 600;
     color: #333;
 }
 
-#create-new-refund-popup .refund_element_details .checkbox label + span {
+#create-new-refund-popup .room-details .checkbox label + span {
     font-size: 12px;
 }
 
-#create-new-refund-popup .refund_element_details .extra-services-wrap, #create-new-refund-popup .refund_element_details .quantity-wrap {
+#create-new-refund-popup .room-details .extra-services-wrap {
     margin-top: 4px;
     padding-left: 23px;
     font-size: 10px;
 }
 
-#create-new-refund-popup .refund_element_details .extra-services-wrap > div:not(:first-of-type) {
+#create-new-refund-popup .room-details .extra-services-wrap > div:not(:first-of-type) {
     margin-top: 4px;
 }
 

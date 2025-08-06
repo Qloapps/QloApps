@@ -51,22 +51,10 @@ class AdminCustomerThreadsControllerCore extends AdminController
         }
 
         $icon_array = array(
-            CustomerThread::QLO_CUSTOMER_THREAD_STATUS_OPEN => array(
-                'class' => 'icon-circle text-success',
-                'alt' => $this->l('Open')
-            ),
-            CustomerThread::QLO_CUSTOMER_THREAD_STATUS_CLOSED => array(
-                'class' => 'icon-circle text-danger',
-                'alt' => $this->l('Closed')
-            ),
-            CustomerThread::QLO_CUSTOMER_THREAD_STATUS_PENDING1 => array(
-                'class' => 'icon-circle text-warning',
-                'alt' => $this->l('Pending 1')
-            ),
-            CustomerThread::QLO_CUSTOMER_THREAD_STATUS_PENDING2 => array(
-                'class' => 'icon-circle text-warning',
-                'alt' => $this->l('Pending 2')
-            ),
+            'open' => array('class' => 'icon-circle text-success', 'alt' => $this->l('Open')),
+            'closed' => array('class' => 'icon-circle text-danger', 'alt' => $this->l('Closed')),
+            'pending1' => array('class' => 'icon-circle text-warning', 'alt' => $this->l('Pending 1')),
+            'pending2' => array('class' => 'icon-circle text-warning', 'alt' => $this->l('Pending 2')),
         );
 
         $status_array = array();
@@ -79,9 +67,7 @@ class AdminCustomerThreadsControllerCore extends AdminController
         $this->access_join = ' LEFT JOIN '._DB_PREFIX_.'orders ord ON (a.id_order = ord.id_order)';
         $this->access_join .= ' LEFT JOIN '._DB_PREFIX_.'htl_booking_detail hbd ON (hbd.id_order = ord.id_order)';
         if ($acsHtls = HotelBranchInformation::getProfileAccessedHotels($this->context->employee->id_profile, 1, 1)) {
-            $this->access_where = ' WHERE IF(a.`id_order`, hbd.`id_hotel` IN ('.implode(',', $acsHtls).'), 1)';
-        } else {
-            $this->access_where = ' WHERE a.`id_order` = 0';
+            $this->access_where = ' AND IF(a.`id_order`, hbd.`id_hotel` IN ('.implode(',', $acsHtls).'), 1)';
         }
 
         $this->fields_list = array(
@@ -93,33 +79,18 @@ class AdminCustomerThreadsControllerCore extends AdminController
             'customer' => array(
                 'title' => $this->l('Customer'),
                 'filter_key' => 'customer',
-                'callback' => 'getCustomerLink',
                 'tmpTableFilter' => true,
             ),
             'email' => array(
                 'title' => $this->l('Email'),
                 'filter_key' => 'a!email',
             ),
-            'phone' => array(
-                'title' => $this->l('Phone'),
-                'filter_key' => 'a!phone',
-                'optional' => true,
-                'visible_default' => true,
-            ),
             'contact' => array(
-                'title' => $this->l('Contact'),
+                'title' => $this->l('Type'),
                 'type' => 'select',
                 'list' => $contact_array,
                 'filter_key' => 'cl!id_contact',
                 'filter_type' => 'int',
-            ),
-            'subject' => array(
-                'title' => $this->l('Title'),
-                'filter_key' => 'a!subject',
-                'tmpTableFilter' => true,
-                'maxlength' => 30,
-                'optional' => true,
-                'visible_default' => true,
             ),
             'language' => array(
                 'title' => $this->l('Language'),
@@ -127,7 +98,6 @@ class AdminCustomerThreadsControllerCore extends AdminController
                 'list' => $language_array,
                 'filter_key' => 'l!id_lang',
                 'filter_type' => 'int',
-                'optional' => true,
             ),
             'status' => array(
                 'title' => $this->l('Status'),
@@ -142,42 +112,29 @@ class AdminCustomerThreadsControllerCore extends AdminController
                 'title' => $this->l('Employee'),
                 'filter_key' => 'employee',
                 'tmpTableFilter' => true,
-                'optional' => true,
-                'hint' => $this->l('The first employee to reply becomes responsible. They can then forward the message to another employee if needed.')
-            ),
-            'last_employee' => array(
-                'title' => $this->l('Last Reply by'),
-                'filter_key' => 'employee',
-                'tmpTableFilter' => true,
-                'optional' => true,
             ),
             'messages' => array(
                 'title' => $this->l('Messages'),
                 'filter_key' => 'messages',
                 'tmpTableFilter' => true,
-                'maxlength' => 30,
-                'optional' => true,
+                'maxlength' => 40,
             ),
-            'has_private' => array(
-                'title' => $this->l('Has Private'),
-                'type' => 'bool',
-                'havingFilter' => true,
-                'filter_key' => 'has_private',
+            'private' => array(
+                'title' => $this->l('Private'),
+                'type' => 'select',
+                'filter_key' => 'private',
                 'align' => 'center',
+                'cast' => 'intval',
                 'callback' => 'printOptinIcon',
+                'list' => array(
+                    '0' => $this->l('No'),
+                    '1' => $this->l('Yes')
+                )
             ),
             'date_upd' => array(
                 'title' => $this->l('Last message'),
                 'havingFilter' => true,
                 'type' => 'datetime',
-                'optional' => true,
-            ),
-            'id_order' => array(
-                'title' => $this->l('ID Order'),
-                'filter_key' => 'a!id_order',
-                'optional' => false,
-                'visible_default' => false,
-                'displayed' => false,
             ),
         );
 
@@ -190,71 +147,22 @@ class AdminCustomerThreadsControllerCore extends AdminController
         );
 
         $this->shopLinkType = 'shop';
-        $arr = array();
-        if ($contacts = Contact::getContacts($this->context->language->id)) {
-            foreach ($contacts as $contact) {
-                $arr[] = array('email_message' => $contact['id_contact'], 'name' => $contact['name']);
-            }
-        }
 
         $this->fields_options = array(
             'contact' => array(
-                'title' => $this->l('Contact options'),
-                'fields' => array(
-                    'PS_CUSTOMER_SERVICE_SIGNATURE' => array(
-                        'title' => $this->l('Default message'),
-                        'hint' => $this->l('Please fill out the message fields that appear by default when you answer a thread on the customer service page.'),
-                        'type' => 'textareaLang',
-                        'lang' => true
-                    ),
-                     'PS_MAIL_EMAIL_MESSAGE' => array(
-                        'title' => $this->l('Send messages from order page to'),
-                        'desc' => $this->l('Where customers send messages from the order page.'),
-                        'validation' => 'isUnsignedId',
-                        'type' => 'select',
-                        'cast' => 'intval',
-                        'identifier' => 'email_message',
-                        'list' => $arr
-                    ),
-                    'PS_CUSTOMER_SERVICE_DISPLAY_CONTACT' => array(
-                        'title' => $this->l('Select contact on contact page'),
-                        'hint' => $this->l('Allow guest to select the contact while sending message from the contact page.'),
-                        'type' => 'bool'
-                    ),
-                    'PS_CUSTOMER_SERVICE_CONTACT' => array(
-                        'title' => $this->l('Send messages from contact page to'),
-                        'desc' => $this->l('Where customers send messages from the Contact page.'),
-                        'validation' => 'isUnsignedId',
-                        'type' => 'select',
-                        'cast' => 'intval',
-                        'identifier' => 'email_message',
-                        'list' => $arr
-                    ),
-                    'PS_CUSTOMER_SERVICE_DISPLAY_NAME' => array(
-                        'title' => $this->l('Display name on contact page'),
-                        'hint' => $this->l('Display name field on contact page.'),
-                        'type' => 'bool',
-                    ),
-                    'PS_CUSTOMER_SERVICE_REQUIRED_NAME' => array(
-                        'title' => $this->l('Set name as required'),
-                        'hint' => $this->l('Set name as required while submitting message from the contact page.'),
-                        'type' => 'bool'
-                    ),
-                    'PS_CUSTOMER_SERVICE_DISPLAY_PHONE' => array(
-                        'title' => $this->l('Display phone on contact page'),
-                        'hint' => $this->l('Display phone field on contact page.'),
-                        'type' => 'bool',
-                    ),
-                    'PS_CUSTOMER_SERVICE_REQUIRED_PHONE' => array(
-                        'title' => $this->l('Set phone as required'),
-                        'hint' => $this->l('Set phone as required while submitting message from the contact page.'),
-                        'type' => 'bool'
-                    ),
+                'title' =>    $this->l('Contact options'),
+                'fields' =>    array(
                     'PS_CUSTOMER_SERVICE_FILE_UPLOAD' => array(
-                        'title' => $this->l('Allow file uploading'),
-                        'hint' => $this->l('Allow customers to upload files using the contact page.'),
-                        'type' => 'bool'
-                    ),
+                            'title' => $this->l('Allow file uploading'),
+                            'hint' => $this->l('Allow customers to upload files using the contact page.'),
+                            'type' => 'bool'
+                        ),
+                    'PS_CUSTOMER_SERVICE_SIGNATURE' => array(
+                            'title' => $this->l('Default message'),
+                            'hint' => $this->l('Please fill out the message fields that appear by default when you answer a thread on the customer service page.'),
+                            'type' => 'textareaLang',
+                            'lang' => true
+                        )
                 ),
                 'submit' => array(
                     'title' => $this->l('Save'),
@@ -334,25 +242,6 @@ class AdminCustomerThreadsControllerCore extends AdminController
         );
 
         parent::__construct();
-        $this->_new_list_header_design = true;
-        $this->list_no_link = true;
-    }
-
-    public function getCustomerLink($customer, $tr)
-    {
-        if ($tr['id_customer']) {
-            return '<a href="'.$this->context->link->getAdminLink('AdminCustomers').'&viewcustomer&id_customer='.$tr['id_customer'].'">'.$customer.' (#'.$tr['id_customer'].')</a>';
-        }
-
-        return $customer;
-    }
-
-    public function setMedia()
-    {
-        parent::setMedia();
-        if (!$this->display || $this->display == 'list') {
-            $this->addJS(_PS_JS_DIR_.'admin/customer_thread.js');
-        }
     }
 
     public function renderList()
@@ -364,8 +253,7 @@ class AdminCustomerThreadsControllerCore extends AdminController
         $this->addRowAction('delete');
 
         $this->_select = '
-			IF(a.`user_name`="", CONCAT(c.`firstname`," ",c.`lastname`), a.`user_name`) AS customer, cl.`name` as contact, l.`name` as language, group_concat(message) as messages,
-            cm.private, IF(COUNT(CASE WHEN cm.`private` = 1 THEN 1 END), 1, 0) AS `has_private`,
+			CONCAT(c.`firstname`," ",c.`lastname`) as customer, cl.`name` as contact, l.`name` as language, group_concat(message) as messages, cm.private,
 			(
 				SELECT IFNULL(CONCAT(LEFT(e.`firstname`, 1),". ",e.`lastname`), "--")
 				FROM `'._DB_PREFIX_.'customer_message` cm2
@@ -374,12 +262,9 @@ class AdminCustomerThreadsControllerCore extends AdminController
 				WHERE cm2.id_employee > 0
 					AND cm2.`id_customer_thread` = a.`id_customer_thread`
 				ORDER BY cm2.`date_add` DESC LIMIT 1
-			) AS last_employee,
-            IFNULL(CONCAT(LEFT(emp.`firstname`, 1),". ",emp.`lastname`), "--") AS employee';
+			) as employee';
 
         $this->_join = '
-            LEFT JOIN `'._DB_PREFIX_.'employee` emp
-                ON emp.`id_employee` = a.`id_employee`
 			LEFT JOIN `'._DB_PREFIX_.'customer` c
 				ON c.`id_customer` = a.`id_customer`
 			LEFT JOIN `'._DB_PREFIX_.'customer_message` cm
@@ -389,9 +274,32 @@ class AdminCustomerThreadsControllerCore extends AdminController
 			LEFT JOIN `'._DB_PREFIX_.'contact_lang` cl
 				ON (cl.`id_contact` = a.`id_contact` AND cl.`id_lang` = '.(int)$this->context->language->id.')';
 
+        if ($id_order = Tools::getValue('id_order')) {
+            $this->_where .= ' AND id_order = '.(int)$id_order;
+        }
+
         $this->_group = 'GROUP BY cm.id_customer_thread';
         $this->_orderBy = 'id_customer_thread';
         $this->_orderWay = 'DESC';
+
+        $contacts = CustomerThread::getContacts();
+
+        $categories = Contact::getCategoriesContacts();
+
+        $params = array(
+            $this->l('Total threads') => $all = CustomerThread::getTotalCustomerThreads(),
+            $this->l('Threads pending') => $pending = CustomerThread::getTotalCustomerThreads('status LIKE "%pending%"'),
+            $this->l('Total number of customer messages') => CustomerMessage::getTotalCustomerMessages('id_employee = 0'),
+            $this->l('Total number of employee messages') => CustomerMessage::getTotalCustomerMessages('id_employee != 0'),
+            $this->l('Unread threads') => $unread = CustomerThread::getTotalCustomerThreads('status = "open"'),
+            $this->l('Closed threads') => $all - ($unread + $pending)
+        );
+
+        $this->tpl_list_vars = array(
+            'contacts' => $contacts,
+            'categories' => $categories,
+            'params' => $params
+        );
 
         return parent::renderList();
     }
@@ -409,19 +317,12 @@ class AdminCustomerThreadsControllerCore extends AdminController
 
     public function postProcess()
     {
-        if ($this->tabAccess['edit'] === 1) {
+        if ($this->tabAccess['edit'] === '1') {
             // using this to separate the saving process for the both option fields
             $fields = $this->fields_options;
             if (Tools::isSubmit('submitOptionsCustomerService')) {
                 unset($this->fields_options['general']);
                 $this->processUpdateOptions();
-                if (!Tools::getValue('PS_CUSTOMER_SERVICE_DISPLAY_NAME')) {
-                    Configuration::updateValue('PS_CUSTOMER_SERVICE_REQUIRED_NAME', 0);
-                }
-
-                if (!Tools::getValue('PS_CUSTOMER_SERVICE_DISPLAY_PHONE')) {
-                    Configuration::updateValue('PS_CUSTOMER_SERVICE_REQUIRED_PHONE', 0);
-                }
             } else if (Tools::isSubmit('submitOptionsIMAPConfig')) {
                 unset($this->fields_options['contact']);
                 $this->processUpdateOptions();
@@ -441,14 +342,14 @@ class AdminCustomerThreadsControllerCore extends AdminController
                 );
             }
             if ($id_status = (int)Tools::getValue('setstatus')) {
+                $status_array = array(1 => 'open', 2 => 'closed', 3 => 'pending1', 4 => 'pending2');
                 Db::getInstance()->execute('
 					UPDATE '._DB_PREFIX_.'customer_thread
-					SET status = "'.(int) $id_status.'"
+					SET status = "'.$status_array[$id_status].'"
 					WHERE id_customer_thread = '.(int)$id_customer_thread.' LIMIT 1
 				');
             }
-            $ct = new CustomerThread($id_customer_thread);
-            if ($id_employee = (int) Tools::getValue('id_employee_forward')) {
+            if (isset($_POST['id_employee_forward'])) {
                 $messages = Db::getInstance()->getRow('
 					SELECT ct.*, cm.*, cl.name subject, CONCAT(e.firstname, \' \', e.lastname) employee_name,
 						CONCAT(c.firstname, \' \', c.lastname) customer_name, c.firstname
@@ -462,7 +363,7 @@ class AdminCustomerThreadsControllerCore extends AdminController
 					LEFT OUTER JOIN '._DB_PREFIX_.'customer c
 						ON (c.email = ct.email)
 					WHERE ct.id_customer_thread = '.(int)Tools::getValue('id_customer_thread').'
-					ORDER BY cm.id_employee, cm.private, cm.date_add DESC
+					ORDER BY cm.date_add DESC
 				');
                 $output = $this->displayMessage($messages, true, (int)Tools::getValue('id_employee_forward'));
                 $cm = new CustomerMessage();
@@ -494,10 +395,7 @@ class AdminCustomerThreadsControllerCore extends AdminController
                         $employee->firstname.' '.$employee->lastname,
                         $current_employee->email,
                         $current_employee->firstname.' '.$current_employee->lastname,
-                        null, null, _PS_MAIL_DIR_, true)
-                    ) {
-                        $ct->id_employee = $employee->id;
-                        $ct->save();
+                        null, null, _PS_MAIL_DIR_, true)) {
                         $cm->id_employee = (int)$employee->id;
                         $cm->private = 1;
                         $cm->message = $this->l('Message forwarded to').' '.$employee->firstname.' '.$employee->lastname."\n".$this->l('Comment:').' '.$message;
@@ -526,14 +424,13 @@ class AdminCustomerThreadsControllerCore extends AdminController
                     $this->errors[] = '<div class="alert error">'.Tools::displayError('The email address is invalid.').'</div>';
                 }
             }
-            if (Tools::isSubmit('submitReply') || Tools::isSubmit('submitReplyAndClose')) {
+            if (Tools::isSubmit('submitReply')) {
+                $ct = new CustomerThread($id_customer_thread);
+
                 ShopUrl::cacheMainDomainForShop((int)$ct->id_shop);
 
                 $cm = new CustomerMessage();
                 $cm->id_employee = (int)$this->context->employee->id;
-                if (!$ct->id_employee) {
-                    $ct->id_employee = $this->context->employee->id;
-                }
                 $cm->id_customer_thread = $ct->id;
                 $cm->ip_address = (int)ip2long(Tools::getRemoteAddr());
                 $cm->message = Tools::getValue('reply_message');
@@ -549,7 +446,15 @@ class AdminCustomerThreadsControllerCore extends AdminController
                         $file_attachment['mime'] = $_FILES['joinFile']['type'];
                     }
                     $customer = new Customer($ct->id_customer);
-
+                    $params = array(
+                        '{reply}' => Tools::nl2br(Tools::getValue('reply_message')),
+                        '{link}' => Tools::url(
+                            $this->context->link->getPageLink('contact', true, (int)$ct->id_lang, null, false, $ct->id_shop),
+                            'id_customer_thread='.(int)$ct->id.'&token='.$ct->token
+                        ),
+                        '{firstname}' => $customer->firstname,
+                        '{lastname}' => $customer->lastname
+                    );
                     //#ct == id_customer_thread    #tc == token of thread   <== used in the synchronization imap
                     $contact = new Contact((int)$ct->id_contact, (int)$ct->id_lang);
 
@@ -561,80 +466,13 @@ class AdminCustomerThreadsControllerCore extends AdminController
                         $from_email = null;
                     }
 
-                    if ($ct->id_order) {
-                        $link = Tools::url(
-                            $this->context->link->getPageLink('order-detail', true, (int)$ct->id_lang, null, false, $ct->id_shop),
-                            'id_order='.$ct->id_order
-                        );
-                        $objOrder = new Order($ct->id_order);
-                        $message = $cm->message;
-                        if (Configuration::get('PS_MAIL_TYPE', null, null, $objOrder->id_shop) != Mail::TYPE_TEXT) {
-                            $message = Tools::nl2br($cm->message);
-                        }
-
-                        $objCustomer = new Customer($objOrder->id_customer);
-                        $idShop = $objOrder->id_shop;
-                        $params = array(
-                            '{lastname}' => $objCustomer->lastname,
-                            '{firstname}' => $objCustomer->firstname,
-                            '{id_order}' => $objOrder->id,
-                            '{order_name}' => $objOrder->getUniqReference(),
-                            '{message}' => $message
-                        );
-                        $toEmail = $objCustomer->email;
-                        $toName = $objCustomer->firstname.' '.$objCustomer->lastname;
-                        $title = Mail::l('New message regarding your booking', (int)$objOrder->id_lang);
-                        $template = 'order_merchant_comment';
-                        $idLang = $objOrder->id_lang;
-                    } else {
-                        $link = Tools::url(
-                            $this->context->link->getPageLink('contact', true, (int)$ct->id_lang, null, false, $ct->id_shop),
-                            'token='.$ct->token
-                        );
-                        $headingText = $this->l('Hi').' '.$ct->user_name.',';
-                        $idShop = $ct->id_shop;
-                        $params = array(
-                            '{reply}' => Tools::nl2br(Tools::getValue('reply_message')),
-                            '{link}' => $link,
-                            '{headingtext}' => $headingText,
-                            '{contact_name}' => $contact->name,
-                        );
-                        if (!empty(trim($ct->subject))) {
-                            $params['{subject}'] = $ct->subject;
-                        }
-
-                        $idLang = $ct->id_lang;
-                        $toEmail = Tools::getValue('msg_email');
-                        $toName = null;
-                        $template = 'reply_msg';
-                        $title = Mail::l('An answer to your message is available', $ct->id_lang);
-                        if ($customer->id) {
-                            $headingText .= ' '.$customer->firstname.' '.$customer->lastname;
-                        }
-                        $headingText .= ',';
-                    }
-
                     if (Mail::Send(
-                        (int) $idLang,
-                        $template,
-                        $title,
-                        $params,
-                        $toEmail,
-                        $toName,
-                        $from_email,
-                        $from_name,
-                        $file_attachment,
-                        null,
-                        _PS_MAIL_DIR_,
-                        true,
-                        $idShop
-                    )) {
-                        if (Tools::isSubmit('submitReplyAndClose')) {
-                            $ct->status = CustomerThread::QLO_CUSTOMER_THREAD_STATUS_CLOSED;
-                        } else {
-                            $ct->status = CustomerThread::QLO_CUSTOMER_THREAD_STATUS_OPEN;
-                        }
-
+                        (int)$ct->id_lang,
+                        'reply_msg',
+                        sprintf(Mail::l('An answer to your message is available #ct%1$s #tc%2$s', $ct->id_lang), $ct->id, $ct->token),
+                        $params, Tools::getValue('msg_email'), null, $from_email, $from_name, $file_attachment, null,
+                        _PS_MAIL_DIR_, true, $ct->id_shop)) {
+                        $ct->status = 'closed';
                         $ct->update();
                     }
                     Tools::redirectAdmin(
@@ -642,24 +480,6 @@ class AdminCustomerThreadsControllerCore extends AdminController
                     );
                 } else {
                     $this->errors[] = Tools::displayError('An error occurred. Your message was not sent. Please contact your system administrator.');
-                }
-            } else if (Tools::isSubmit('submitReplyAsPrivate')) {
-                if (!$ct->id_employee) {
-                    $ct->id_employee = $this->context->employee->id;
-                    $ct->update();
-                }
-                ShopUrl::cacheMainDomainForShop((int)$ct->id_shop);
-                $cm = new CustomerMessage();
-                $cm->id_employee = (int)$this->context->employee->id;
-                $cm->id_customer_thread = $ct->id;
-                $cm->ip_address = (int)ip2long(Tools::getRemoteAddr());
-                $cm->message = Tools::getValue('reply_message');
-                $cm->private = 1;
-                $cm->read = 1;
-                if (($error = $cm->validateField('message', $cm->message, null, array(), true)) !== true) {
-                    $this->errors[] = $error;
-                } elseif (!$cm->add()) {
-                    $this->errors[] = Tools::displayError('Some error occured while saving the message');
                 }
             }
         }
@@ -719,34 +539,19 @@ class AdminCustomerThreadsControllerCore extends AdminController
         $time = time();
         $kpis = array();
 
-        $all = CustomerThread::getTotalCustomerThreads();
-        $pending = (int)AdminStatsController::getPendingMessages();
-        $open = CustomerThread::getTotalCustomerThreads('status='.CustomerThread::QLO_CUSTOMER_THREAD_STATUS_OPEN);
-
-        $helper = new HelperKpi();
-        $helper->id = 'box-messages';
-        $helper->icon = 'icon-envelope';
-        $helper->color = 'color1';
-        $helper->title = $this->l('Total threads');
-        $helper->tooltip = $this->l('Total number of threads.');
-        $helper->value = $all;
-        $this->kpis[] = $helper;
-
         $helper = new HelperKpi();
         $helper->id = 'box-pending-messages';
         $helper->icon = 'icon-envelope';
-        $helper->color = 'color2';
-        $helper->title = $this->l('Threads pending', null, null, false);
-        $helper->value = $pending + $open;
-        $helper->tooltip = $this->l('Total number of threads having "open", "pending 1" and "pending 2" statuses.');
+        $helper->color = 'color1';
+        $helper->title = $this->l('Pending Discussion Threads', null, null, false);
+        $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=pending_messages';
         $this->kpis[] = $helper;
 
         $helper = new HelperKpi();
         $helper->id = 'box-age';
         $helper->icon = 'icon-time';
-        $helper->color = 'color3';
+        $helper->color = 'color2';
         $helper->title = $this->l('Average Response Time', null, null, false);
-        $helper->tooltip = $this->l('The average response time.');
         $helper->subtitle = $this->l('30 days', null, null, false);
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=avg_msg_response_time';
         $this->kpis[] = $helper;
@@ -754,78 +559,11 @@ class AdminCustomerThreadsControllerCore extends AdminController
         $helper = new HelperKpi();
         $helper->id = 'box-messages-per-thread';
         $helper->icon = 'icon-copy';
-        $helper->color = 'color4';
-        $helper->title = $this->l('Average Messages per Thread', null, null, false);
+        $helper->color = 'color3';
+        $helper->title = $this->l('Messages per Thread', null, null, false);
         $helper->subtitle = $this->l('30 day', null, null, false);
-        $helper->tooltip = $this->l('The average number of messages in each thread.');
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=messages_per_thread';
         $this->kpis[] = $helper;
-
-        $helper = new HelperKpi();
-        $helper->id = 'box-pending-messages';
-        $helper->icon = 'icon-envelope';
-        $helper->color = 'color1';
-        $helper->title = $this->l('Customer messages', null, null, false);
-        $helper->tooltip = $this->l('Total number of messages sent by customers.');
-        $helper->value = (int) CustomerMessage::getTotalCustomerMessages('cm.`id_employee` = 0');
-        $this->kpis[] = $helper;
-
-        $helper = new HelperKpi();
-        $helper->id = 'box-pending-messages';
-        $helper->icon = 'icon-envelope';
-        $helper->color = 'color4';
-        $helper->title = $this->l('Employee messages', null, null, false);
-        $helper->tooltip = $this->l('Total number of messages sent by employees.');
-        $helper->value = (int) CustomerMessage::getTotalCustomerMessages('cm.`id_employee` != 0');
-        $this->kpis[] = $helper;
-
-
-        $helper = new HelperKpi();
-        $helper->id = 'box-pending-messages';
-        $helper->icon = 'icon-envelope';
-        $helper->color = 'color2';
-        $helper->title = $this->l('Unread threads', null, null, false);
-        $helper->tooltip = $this->l('Total number of messages having open status.');
-        $helper->value = (int) $open;
-        $this->kpis[] = $helper;
-
-        $helper = new HelperKpi();
-        $helper->id = 'box-pending-messages';
-        $helper->icon = 'icon-envelope';
-        $helper->color = 'color3';
-        $helper->title = $this->l('Closed threads', null, null, false);
-        $helper->value = (int) ($all - ($open + $pending));
-        $helper->tooltip = $this->l('Total number of messages having closed status.');
-        $this->kpis[] = $helper;
-
-        $contacts = CustomerThread::getContacts();
-        $categories = Contact::getCategoriesContacts();
-        if ($contacts) {
-            $contacts = array_column($contacts, null, 'id_contact');
-        }
-
-        if ($categories) {
-            foreach ($categories as $idContact => $category) {
-                $helper = new HelperKpi();
-                $helper->id = 'box-pending-messages';
-                $helper->icon = 'icon-envelope';
-                $helper->color = 'color'.(($idContact+1)%3 ? ($idContact+1)%3 : '4');
-                $helper->title = $category['name'];
-                if (isset($contacts[$category['id_contact']])) {
-                    $helper->href = self::$currentIndex.'&token='.$this->token.'&id_customer_thread='.$contacts[$category['id_contact']]['id_customer_thread'].'&viewcustomer_thread';
-                    if ($contacts[$category['id_contact']]['total'] > 1) {
-                        $helper->value = $contacts[$category['id_contact']]['total'].' '.$this->l('New messages');
-                    } else {
-                        $helper->value = $contacts[$category['id_contact']]['total'].' '.$this->l('New message');
-                    }
-                } else {
-                    $helper->value = $this->l('No new messages');
-                }
-
-                $helper->tooltip = $this->l('Total number of messages sent to').' '.$category['name'];
-                $this->kpis[] = $helper;
-            }
-        }
 
         return parent::renderKpis();
     }
@@ -860,64 +598,69 @@ class AdminCustomerThreadsControllerCore extends AdminController
                 $product = new Product((int)$mess['id_product'], false, $this->context->language->id);
                 if (Validate::isLoadedObject($product)) {
                     $messages[$key]['product_name'] = $product->name;
-                    $messages[$key]['booking_product'] = $product->booking_product;
-                    if ($product->booking_product) {
-                        $messages[$key]['product_link'] = $this->context->link->getAdminLink('AdminProducts').'&updateproduct&id_product='.(int)$product->id;
-                    } else {
-                        $messages[$key]['product_link'] = $this->context->link->getAdminLink('AdminNormalProducts').'&updateproduct&id_product='.(int)$product->id;
-                    }
+                    $messages[$key]['product_link'] = $this->context->link->getAdminLink('AdminProducts').'&updateproduct&id_product='.(int)$product->id;
                 }
             }
         }
 
+        $next_thread = CustomerThread::getNextThread((int)$thread->id);
+
         $contacts = Contact::getContacts($this->context->language->id);
+
         $actions = array();
 
-        if ($thread->status != CustomerThread::QLO_CUSTOMER_THREAD_STATUS_CLOSED) {
-            $actions[CustomerThread::QLO_CUSTOMER_THREAD_STATUS_CLOSED] = array(
-                'href' => self::$currentIndex.'&viewcustomer_thread&setstatus='.CustomerThread::QLO_CUSTOMER_THREAD_STATUS_CLOSED.'&id_customer_thread='.(int)Tools::getValue('id_customer_thread').'&viewmsg&token='.$this->token,
+        if ($next_thread) {
+            $next_thread = array(
+                'href' => self::$currentIndex.'&id_customer_thread='.(int)$next_thread.'&viewcustomer_thread&token='.$this->token,
+                'name' => $this->l('Reply to the next unanswered message in this thread')
+            );
+        }
+
+        if ($thread->status != 'closed') {
+            $actions['closed'] = array(
+                'href' => self::$currentIndex.'&viewcustomer_thread&setstatus=2&id_customer_thread='.(int)Tools::getValue('id_customer_thread').'&viewmsg&token='.$this->token,
                 'label' => $this->l('Mark as "handled"'),
                 'name' => 'setstatus',
-                'value' => CustomerThread::QLO_CUSTOMER_THREAD_STATUS_CLOSED
+                'value' => 2
             );
         } else {
-            $actions[CustomerThread::QLO_CUSTOMER_THREAD_STATUS_OPEN] = array(
-                'href' => self::$currentIndex.'&viewcustomer_thread&setstatus='.CustomerThread::QLO_CUSTOMER_THREAD_STATUS_OPEN.'&id_customer_thread='.(int)Tools::getValue('id_customer_thread').'&viewmsg&token='.$this->token,
+            $actions['open'] = array(
+                'href' => self::$currentIndex.'&viewcustomer_thread&setstatus=1&id_customer_thread='.(int)Tools::getValue('id_customer_thread').'&viewmsg&token='.$this->token,
                 'label' => $this->l('Re-open'),
                 'name' => 'setstatus',
-                'value' => CustomerThread::QLO_CUSTOMER_THREAD_STATUS_OPEN
+                'value' => 1
             );
         }
 
-        if ($thread->status != CustomerThread::QLO_CUSTOMER_THREAD_STATUS_PENDING1) {
-            $actions[CustomerThread::QLO_CUSTOMER_THREAD_STATUS_PENDING1] = array(
-                'href' => self::$currentIndex.'&viewcustomer_thread&setstatus='.CustomerThread::QLO_CUSTOMER_THREAD_STATUS_PENDING1.'&id_customer_thread='.(int)Tools::getValue('id_customer_thread').'&viewmsg&token='.$this->token,
+        if ($thread->status != 'pending1') {
+            $actions['pending1'] = array(
+                'href' => self::$currentIndex.'&viewcustomer_thread&setstatus=3&id_customer_thread='.(int)Tools::getValue('id_customer_thread').'&viewmsg&token='.$this->token,
                 'label' => $this->l('Mark as "pending 1" (will be answered later)'),
                 'name' => 'setstatus',
-                'value' => CustomerThread::QLO_CUSTOMER_THREAD_STATUS_PENDING1
+                'value' => 3
             );
         } else {
-            $actions[CustomerThread::QLO_CUSTOMER_THREAD_STATUS_PENDING1] = array(
-                'href' => self::$currentIndex.'&viewcustomer_thread&setstatus='.CustomerThread::QLO_CUSTOMER_THREAD_STATUS_OPEN.'&id_customer_thread='.(int)Tools::getValue('id_customer_thread').'&viewmsg&token='.$this->token,
+            $actions['pending1'] = array(
+                'href' => self::$currentIndex.'&viewcustomer_thread&setstatus=1&id_customer_thread='.(int)Tools::getValue('id_customer_thread').'&viewmsg&token='.$this->token,
                 'label' => $this->l('Disable pending status'),
                 'name' => 'setstatus',
-                'value' => CustomerThread::QLO_CUSTOMER_THREAD_STATUS_OPEN
+                'value' => 1
             );
         }
 
-        if ($thread->status != CustomerThread::QLO_CUSTOMER_THREAD_STATUS_PENDING2) {
-            $actions[CustomerThread::QLO_CUSTOMER_THREAD_STATUS_PENDING2] = array(
-                'href' => self::$currentIndex.'&viewcustomer_thread&setstatus='.CustomerThread::QLO_CUSTOMER_THREAD_STATUS_PENDING2.'&id_customer_thread='.(int)Tools::getValue('id_customer_thread').'&viewmsg&token='.$this->token,
+        if ($thread->status != 'pending2') {
+            $actions['pending2'] = array(
+                'href' => self::$currentIndex.'&viewcustomer_thread&setstatus=4&id_customer_thread='.(int)Tools::getValue('id_customer_thread').'&viewmsg&token='.$this->token,
                 'label' => $this->l('Mark as "pending 2" (will be answered later)'),
                 'name' => 'setstatus',
-                'value' => CustomerThread::QLO_CUSTOMER_THREAD_STATUS_PENDING2
+                'value' => 4
             );
         } else {
-            $actions[CustomerThread::QLO_CUSTOMER_THREAD_STATUS_PENDING2] = array(
-                'href' => self::$currentIndex.'&viewcustomer_thread&setstatus='.CustomerThread::QLO_CUSTOMER_THREAD_STATUS_OPEN.'&id_customer_thread='.(int)Tools::getValue('id_customer_thread').'&viewmsg&token='.$this->token,
+            $actions['pending2'] = array(
+                'href' => self::$currentIndex.'&viewcustomer_thread&setstatus=1&id_customer_thread='.(int)Tools::getValue('id_customer_thread').'&viewmsg&token='.$this->token,
                 'label' => $this->l('Disable pending status'),
                 'name' => 'setstatus',
-                'value' => CustomerThread::QLO_CUSTOMER_THREAD_STATUS_OPEN
+                'value' => 1
             );
         }
 
@@ -958,7 +701,6 @@ class AdminCustomerThreadsControllerCore extends AdminController
             }
         }
 
-        $this->context->smarty->assign('display', 'view');
         $this->tpl_view_vars = array(
             'id_customer_thread' => $id_customer_thread,
             'thread' => $thread,
@@ -968,6 +710,7 @@ class AdminCustomerThreadsControllerCore extends AdminController
             'messages' => $messages,
             'first_message' => $first_message,
             'contact' => $contact,
+            'next_thread' => $next_thread,
             'orders' => isset($orders) ? $orders : false,
             'customer' => isset($customer) ? $customer : false,
             'products' => isset($products) ? $products : false,
@@ -978,6 +721,10 @@ class AdminCustomerThreadsControllerCore extends AdminController
             'timeline_items' => $timeline_items,
         );
 
+        if ($next_thread) {
+            $this->tpl_view_vars['next_thread'] = $next_thread;
+        }
+
         return parent::renderView();
     }
 
@@ -986,30 +733,14 @@ class AdminCustomerThreadsControllerCore extends AdminController
         $timeline = array();
         foreach ($messages as $message) {
             $product = new Product((int)$message['id_product'], false, $this->context->language->id);
+            $link_product = $this->context->link->getAdminLink('AdminOrders').'&vieworder&id_order='.(int)$product->id;
+
             $content = '';
             if (!$message['private']) {
-                $customerName = false;
-                if (!$message['id_customer']) {
-                    $customerName = $message['user_name'];
-                } else if ($message['customer_name']) {
-                    $customerName = $message['customer_name'];
-                }
-
-                if ($message['id_employee'] && $customerName) {
-                    $content .= $this->l('Message to: ').' <span class="badge">'.($customerName).'</span><br/><br/>';
-                }
-            } else {
-                $content .= '<span class="label label-info">'.$this->l('Private').'</span><br/><br/>';
+                $content .= $this->l('Message to: ').' <span class="badge">'.(!$message['id_employee'] ? $message['subject'] : $message['customer_name']).'</span><br/>';
             }
-
             if (Validate::isLoadedObject($product)) {
-                if ($product->booking_product) {
-                    $content .= $this->l('Room type:');
-                } else {
-                    $content .= $this->l('Product:');
-                }
-
-                $content .= ' <span class="label label-info">'.$product->name.'</span><br/><br/>';
+                $content .= '<br/>'.$this->l('Room type: ').'<span class="label label-info">'.$product->name.'</span><br/><br/>';
             }
             $content .= Tools::safeOutput($message['message']);
 
@@ -1045,22 +776,6 @@ class AdminCustomerThreadsControllerCore extends AdminController
         }
         krsort($timeline);
         return $timeline;
-    }
-
-     public function initToolbarTitle()
-    {
-        parent::initToolbarTitle();
-        switch ($this->display) {
-            case 'view':
-                if (!($thread = $this->loadObject())) {
-                    return;
-                }
-
-                if ($thread->id) {
-                    $this->toolbar_title[] = sprintf($this->l('Title: %1$s'), $thread->subject);
-                }
-                break;
-        }
     }
 
     protected function displayMessage($message, $email = false, $id_employee = null)
@@ -1160,7 +875,7 @@ class AdminCustomerThreadsControllerCore extends AdminController
 
     public function updateOptionPsSavImapOpt($value)
     {
-        if ($this->tabAccess['edit'] !== 1) {
+        if ($this->tabAccess['edit'] != '1') {
             throw new PrestaShopException(Tools::displayError('You do not have permission to edit this.'));
         }
 
@@ -1171,7 +886,7 @@ class AdminCustomerThreadsControllerCore extends AdminController
 
     public function ajaxProcessMarkAsRead()
     {
-        if ($this->tabAccess['edit'] !== 1) {
+        if ($this->tabAccess['edit'] != '1') {
             throw new PrestaShopException(Tools::displayError('You do not have permission to edit this.'));
         }
 
@@ -1189,7 +904,7 @@ class AdminCustomerThreadsControllerCore extends AdminController
      */
     public function ajaxProcessSyncImap()
     {
-        if ($this->tabAccess['edit'] !== 1) {
+        if ($this->tabAccess['edit'] != '1') {
             throw new PrestaShopException(Tools::displayError('You do not have permission to edit this.'));
         }
 
@@ -1364,7 +1079,7 @@ class AdminCustomerThreadsControllerCore extends AdminController
                         $ct->id_contact = $id_contact;
                         $ct->id_lang = (int)Configuration::get('PS_LANG_DEFAULT');
                         $ct->id_shop = $this->context->shop->id; //new customer threads for unrecognized mails are not shown without shop id
-                        $ct->status = CustomerThread::QLO_CUSTOMER_THREAD_STATUS_OPEN;
+                        $ct->status = 'open';
                         $ct->token = Tools::passwdGen(12);
                         $ct->add();
                     } else {
@@ -1374,7 +1089,7 @@ class AdminCustomerThreadsControllerCore extends AdminController
                     if (Validate::isLoadedObject($ct) && ((isset($matches2[1]) && $ct->token == $matches2[1]) || $new_ct)) {
                         $message = imap_fetchbody($mbox, $overview->msgno, 1);
                         $message = quoted_printable_decode($message);
-                        $message = mb_convert_encoding($message, 'UTF-8', 'ISO-8859-1');
+                        $message = utf8_encode($message);
                         $message = quoted_printable_decode($message);
                         $message = nl2br($message);
                         $message = Tools::substr($message, 0, (int) CustomerMessage::$definition['fields']['message']['size']);

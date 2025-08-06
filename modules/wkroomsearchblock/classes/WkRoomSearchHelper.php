@@ -1,24 +1,21 @@
 <?php
 /**
+* 2010-2020 Webkul.
+*
 * NOTICE OF LICENSE
 *
-* This source file is subject to the Open Software License version 3.0
-* that is bundled with this package in the file LICENSE.md
-* It is also available through the world-wide-web at this URL:
-* https://opensource.org/license/osl-3-0-php
-* If you did not receive a copy of the license and are unable to
-* obtain it through the world-wide-web, please send an email
-* to support@qloapps.com so we can send you a copy immediately.
+* All right is reserved,
+* Please go through this link for complete license : https://store.webkul.com/license.html
 *
 * DISCLAIMER
 *
-* Do not edit or add to this file if you wish to upgrade this module to a newer
-* versions in the future. If you wish to customize this module for your needs
-* please refer to https://store.webkul.com/customisation-guidelines for more information.
+* Do not edit or add to this file if you wish to upgrade this module to newer
+* versions in the future. If you wish to customize this module for your
+* needs please refer to https://store.webkul.com/customisation-guidelines/ for more information.
 *
-* @author Webkul IN
-* @copyright Since 2010 Webkul
-* @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
+*  @author    Webkul IN <support@webkul.com>
+*  @copyright 2010-2020 Webkul IN
+*  @license   https://store.webkul.com/license.html
 */
 
 class WkRoomSearchHelper
@@ -59,41 +56,39 @@ class WkRoomSearchHelper
 
         // Lets validate guest occupancy fields
         // Get guest occupancy variable
-        if (Configuration::get('PS_FRONT_SEARCH_TYPE') == HotelBookingDetail::SEARCH_TYPE_OWS) {
-            $guestOccupancy = Tools::getValue('occupancy');
-            if (!count($guestOccupancy)) {
-                $errors[] = $objModule->l('Invalid occupancy', 'WkRoomSearchHelper');
-            } else {
-                $adultTypeErr = 0;
-                $childTypeErr = 0;
-                $childAgeErr = 0;
-                foreach ($guestOccupancy as $occupancy) {
-                    if (!isset($occupancy['adults']) || !Validate::isUnsignedInt($occupancy['adults'])) {
-                        $adultTypeErr = 1;
-                    }
-                    if (!isset($occupancy['children']) || !Validate::isUnsignedInt($occupancy['children'])) {
-                        $childTypeErr = 1;
-                    } elseif ($occupancy['children']) {
-                        if (!isset($occupancy['child_ages']) || ($occupancy['children'] != count($occupancy['child_ages']))) {
-                            $childAgeErr = 1;
-                        } else {
-                            foreach ($occupancy['child_ages'] as $childAge) {
-                                if (!Validate::isUnsignedInt($childAge)) {
-                                    $childAgeErr = 1;
-                                }
+        $guestOccupancy = Tools::getValue('occupancy');
+        if (!count($guestOccupancy)) {
+            $errors[] = $objModule->l('Invalid occupancy', 'WkRoomSearchHelper');
+        } else {
+            $adultTypeErr = 0;
+            $childTypeErr = 0;
+            $childAgeErr = 0;
+            foreach ($guestOccupancy as $occupancy) {
+                if (!isset($occupancy['adults']) || !Validate::isUnsignedInt($occupancy['adults'])) {
+                    $adultTypeErr = 1;
+                }
+                if (!isset($occupancy['children']) || !Validate::isUnsignedInt($occupancy['children'])) {
+                    $childTypeErr = 1;
+                } elseif ($occupancy['children']) {
+                    if (!isset($occupancy['child_ages']) || ($occupancy['children'] != count($occupancy['child_ages']))) {
+                        $childAgeErr = 1;
+                    } else {
+                        foreach ($occupancy['child_ages'] as $childAge) {
+                            if (!Validate::isUnsignedInt($childAge)) {
+                                $childAgeErr = 1;
                             }
                         }
                     }
                 }
-                if ($adultTypeErr) {
-                    $errors[] = $objModule->l('Invalid adults', 'WkRoomSearchHelper');
-                }
-                if ($childTypeErr) {
-                    $errors[] = $objModule->l('Invalid children', 'WkRoomSearchHelper');
-                }
-                if ($childAgeErr) {
-                    $errors[] = $objModule->l('Invalid children ages', 'WkRoomSearchHelper');
-                }
+            }
+            if ($adultTypeErr) {
+                $errors[] = $objModule->l('Invalid adults', 'WkRoomSearchHelper');
+            }
+            if ($childTypeErr) {
+                $errors[] = $objModule->l('Invalid children', 'WkRoomSearchHelper');
+            }
+            if ($childAgeErr) {
+                $errors[] = $objModule->l('Invalid children ages', 'WkRoomSearchHelper');
             }
         }
 
@@ -149,11 +144,11 @@ class WkRoomSearchHelper
                     $idHotel = HotelBranchInformation::getHotelIdByIdCategory($idHotelCategory);
                     $htlCategoryInfo = $objHotelInfo->getCategoryDataByIdCategory((int) $objCategory->id_parent);
                     $searchedData['htl_dtl'] = $objHotelInfo->hotelBranchesInfo(0, 1, 1, $idHotel);
-                    $minBookingOffset = (int) HotelOrderRestrictDate::getMinimumBookingOffset($idHotel);
-                    if ($minBookingOffset
-                        && strtotime(date('Y-m-d', strtotime('+'. ($minBookingOffset) .' days'))) > strtotime($dateFrom)
+                    $preparationTime = (int) HotelOrderRestrictDate::getPreparationTime($idHotel);
+                    if ($preparationTime
+                        && strtotime(date('Y-m-d', strtotime('+'. ($preparationTime) .' days'))) > strtotime($dateFrom)
                     ) {
-                        $dateFrom = date('Y-m-d', strtotime(date('Y-m-d', strtotime('+'. ($minBookingOffset) .' days'))));
+                        $dateFrom = date('Y-m-d', strtotime(date('Y-m-d', strtotime('+'. ($preparationTime) .' days'))));
                         if (strtotime($dateFrom) >= strtotime($dateTo)) {
                             $controller = Tools::getValue('controller');
                             if ($controller == 'product'
@@ -168,22 +163,30 @@ class WkRoomSearchHelper
                         }
                     }
 
-                    $searchedData['num_days'] = HotelHelper::getNumberOfDays($dateFrom, $dateTo);
+                    $smartyVars['date_from'] = $dateFrom;
+                    $smartyVars['date_to'] = $dateTo;
+
+                    $objBookingDetail = new HotelBookingDetail();
+                    $searchedData['num_days'] = $objBookingDetail->getNumberOfDays($dateFrom, $dateTo);
+
                     $searchedData['parent_data'] = $htlCategoryInfo;
-                    if (Tools::getValue('date_from') && Tools::getValue('date_to')) {
-                        $searchedData['date_from'] = $dateFrom;
-                        $searchedData['date_to'] = $dateTo;
-                    }
+                    $searchedData['date_from'] = $dateFrom;
+                    $searchedData['date_to'] = $dateTo;
 
                     if ($locationCategoryId) {
                         $objLocationCategory = new Category($locationCategoryId, $context->language->id);
-                        if ($objLocationCategory->hasParent(Configuration::get('PS_LOCATIONS_CATEGORY'))) {
-                            $searchedData['location'] = $objLocationCategory->name;
-                            $searchedData['location_category_id'] = $locationCategoryId;
-                        } else {
-                            $locationCategoryId = false;
+                        $searchedData['location'] = $objLocationCategory->name;
+                    } else {
+                        $locationCategoryId = $objCategory->id_parent;
+                        if ($searchedData['htl_dtl']) {
+                            $searchedData['location'] = $searchedData['htl_dtl']['city'];
+                            if (isset($searchedData['htl_dtl']['state_name'])) {
+                                $searchedData['location'] .= ', '.$searchedData['htl_dtl']['state_name'];
+                            }
+                            $searchedData['location'] .= ', '.$searchedData['htl_dtl']['country_name'];
                         }
                     }
+                    $searchedData['location_category_id'] = $locationCategoryId;
 
                     $searchedData['order_date_restrict'] = false;
                     $max_order_date = HotelOrderRestrictDate::getMaxOrderDate($idHotel);
@@ -195,6 +198,8 @@ class WkRoomSearchHelper
                             $searchedData['order_date_restrict'] = true;
                         }
                     }
+
+                    $smartyVars['search_data'] = $searchedData;
                 }
 
                 if ($occupancyEnabled) {
@@ -208,6 +213,9 @@ class WkRoomSearchHelper
                                 $searchedData['occupancy_children'] = array_sum(
                                     array_column($searchedData['occupancies'], 'children')
                                 );
+                                $searchedData['occupancy_child_ages'] = array_sum(
+                                    array_column($searchedData['occupancies'], 'child_ages')
+                                );
                             }
                         }
                     }
@@ -216,7 +224,7 @@ class WkRoomSearchHelper
             }
 
             // if location is enabled the send hotels of the selected location only
-            if ($locationEnabled && $locationCategoryId) {
+            if ($locationEnabled) {
                 $hotelsInfo = Category::getAllCategoriesName($locationCategoryId);
             }
         }
@@ -229,7 +237,7 @@ class WkRoomSearchHelper
                 $hotelsInfo[$key]['id'] = $hotel_info['id'];
                 $hotelsInfo[$key]['hotel_name'] = $hotel_info['hotel_name'];
                 $hotelsInfo[$key]['max_order_date'] = date('Y-m-d', strtotime($maxOrderDate));
-                $hotelsInfo[$key]['min_booking_offset'] = (int) HotelOrderRestrictDate::getMinimumBookingOffset($hotel_info['id']);
+                $hotelsInfo[$key]['preparation_time'] = (int) HotelOrderRestrictDate::getPreparationTime($hotel_info['id']);
             } else {
                 unset($hotelsInfo[$key]);
             }
@@ -243,7 +251,7 @@ class WkRoomSearchHelper
 
         $maxOrderDate = HotelOrderRestrictDate::getMaxOrderDate($idHotel);
         $smartyVars['max_order_date'] = date('Y-m-d', strtotime($maxOrderDate));
-        $smartyVars['min_booking_offset'] = (int) HotelOrderRestrictDate::getMinimumBookingOffset($idHotel);
+        $smartyVars['preparation_time'] = (int) HotelOrderRestrictDate::getPreparationTime($idHotel);
 
         if (!$locationEnabled
             && !$smartyVars['show_hotel_name']
@@ -255,22 +263,6 @@ class WkRoomSearchHelper
                 'multiple_dates_input' => true
             ));
         }
-
-        $totalColumns = 9;// min value
-        if ($locationEnabled) {
-            $totalColumns += 4;
-        }
-
-        if (!(count($hotelsInfo) <= 1 && !$smartyVars['show_hotel_name'])) {
-            $totalColumns += 5;
-        }
-
-        if (Configuration::get('PS_FRONT_SEARCH_TYPE') == HotelBookingDetail::SEARCH_TYPE_OWS) {
-            $totalColumns += 4;
-        }
-
-        $smartyVars['total_columns'] = $totalColumns;
-        Hook::exec('actionSearchPanelParamsModifier', array('params' => &$smartyVars));
 
         Context::getContext()->smarty->assign($smartyVars);
     }

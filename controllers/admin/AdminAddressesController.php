@@ -31,7 +31,6 @@ class AdminAddressesControllerCore extends AdminController
 {
     /** @var array countries list */
     protected $countries_array = array();
-    protected $addressType;
 
     public function __construct()
     {
@@ -381,21 +380,6 @@ class AdminAddressesControllerCore extends AdminController
         return parent::renderForm();
     }
 
-    public function processExport($text_delimiter = '"')
-    {
-        $this->fields_list = array_merge($this->fields_list, array(
-            'email' => array('title' => $this->l('Customer Email')),
-            'phone' => array('title' => $this->l('Phone'), 'filter_key' => 'a!phone'),
-            'phone_mobile' => array('title' => $this->l('Mobile phone')),
-            'address1' => array('title' => $this->l('Address (2)')),
-            'dni' => array('title' => $this->l('Identification Number')),
-            'vat_number' => array('title' => $this->l('VAT number')),
-            'other' => array('title' => $this->l('Other')),
-        ));
-
-        return parent::processExport($text_delimiter);
-    }
-
     // public function postProcess()
     // {
 
@@ -475,19 +459,6 @@ class AdminAddressesControllerCore extends AdminController
             $this->_redirect = false;
             // set deleted=1 as customer can have only one address and this address is for an order only
             $_POST['deleted'] = 1;
-            // if the deleted address is the customer current address then we will create a new one using the same information.
-            if (($customerAddressId = Address::getFirstCustomerAddressId((int) $address->id_customer))
-                && $customerAddressId == $address->id
-            ) {
-                // initialized with the old address information
-                $objAddress = new Address($address->id);
-                $objAddress->id = $objAddress->id_address = null;
-            }
-
-            if ($address->isUsed() > 1) {
-                // If this address is used in other orders, we will create a new address, and will not update the older addresses.
-                $this->id_object = null;
-            }
         }
 
         // Check the requires fields which are settings in the BO
@@ -497,10 +468,6 @@ class AdminAddressesControllerCore extends AdminController
         $return = false;
         if (empty($this->errors)) {
             $return = parent::processSave();
-            // creating new address here since the customer older address needs to be set as deleted first as customer can only have one active address.
-            if (isset($objAddress)) {
-                $objAddress->save();
-            }
         } else {
             // if we have errors, we stay on the form instead of going back to the list
             $this->display = 'edit';
@@ -580,7 +547,8 @@ class AdminAddressesControllerCore extends AdminController
             $customer = Customer::searchByName($email);
             if (!empty($customer)) {
                 $customer = $customer['0'];
-                echo json_encode(array('infos' => pSQL($customer['firstname']).'_'.pSQL($customer['lastname']).'_'.pSQL($customer['company']).'_'.pSQL($customer['id_customer']).'_'.pSQL($customer['phone'])));
+                $phone = Customer::getPhone($customer['id_customer']);
+                echo json_encode(array('infos' => pSQL($customer['firstname']).'_'.pSQL($customer['lastname']).'_'.pSQL($customer['company']).'_'.pSQL($customer['id_customer']).'_'.pSQL($phone)));
             }
         }
         die;

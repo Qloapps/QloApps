@@ -1,23 +1,20 @@
 /**
+* 2010-2018 Webkul.
+*
 * NOTICE OF LICENSE
 *
-* This source file is subject to the Open Software License version 3.0
-* that is bundled with this package in the file LICENSE.md
-* It is also available through the world-wide-web at this URL:
-* https://opensource.org/license/osl-3-0-php
-* If you did not receive a copy of the license and are unable to
-* obtain it through the world-wide-web, please send an email
-* to support@qloapps.com so we can send you a copy immediately.
+* All right is reserved,
+* Please go through this link for complete license : https://store.webkul.com/license.html
 *
 * DISCLAIMER
 *
-* Do not edit or add to this file if you wish to upgrade this module to a newer
-* versions in the future. If you wish to customize this module for your needs
-* please refer to https://store.webkul.com/customisation-guidelines for more information.
+* Do not edit or add to this file if you wish to upgrade this module to newer
+* versions in the future. If you wish to customize this module for your
+* needs please refer to https://store.webkul.com/customisation-guidelines/ for more information.
 *
-* @author Webkul IN
-* @copyright Since 2010 Webkul
-* @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
+*  @author    Webkul IN <support@webkul.com>
+*  @copyright 2010-2018 Webkul IN
+*  @license   https://store.webkul.com/license.html
 */
 
 $(document).ready(function()
@@ -44,8 +41,8 @@ $(document).ready(function()
 				$("#filter_price_silder").slider("values", [min_price, max_price]);
 
 				var slider_price_cont = filter_wrapper.find("div.price_filter_subcont");
-				slider_price_cont.find("span#filter_price_from").html(formatCurrency(min_price, currencyFormat, currencySign, currencyBlank));
-				slider_price_cont.find("span#filter_price_to").html(formatCurrency(max_price, currencyFormat, currencySign, currencyBlank));
+				slider_price_cont.find("span#filter_price_from").html(min_price);
+				slider_price_cont.find("span#filter_price_to").html(max_price);
 
 				/* -------NOTICE------- */
 				//triggerFilter();

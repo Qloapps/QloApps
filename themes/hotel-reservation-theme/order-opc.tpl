@@ -98,22 +98,11 @@
 																			{if $is_logged || $isGuest}
 																				{if $is_logged}
 																					{block name='order_opc_guest_detail_form'}
-																						<form id="customer_guest_detail_form" method="post" action="{$link->getPageLink('order-opc', null, null)}">
-																							<input type="hidden" name="submitGuestDetails" value="1">
+																						<form id="customer_guest_detail_form">
 																							<p class="checkbox">
 																								<input type="checkbox" name="customer_guest_detail" id="customer_guest_detail" value="1" {if $id_customer_guest_detail}checked="checked"{/if}/>
 																								<label for="customer_guest_detail" id="customer_guest_detail_txt">{l s='Booking for someone else?'}</label>
 																							</p>
-																							{if isset($customerGuestDetailErrors) && $customerGuestDetailErrors}
-																								<div class="alert alert-danger" id="customer_guest_detail_errors">
-																									<p>{if $customerGuestDetailErrors|@count > 1}{l s='There are %d errors' sprintf=$customerGuestDetailErrors|@count}{else}{l s='There is %d error' sprintf=$customerGuestDetailErrors|@count}{/if}</p>
-																									<ol>
-																										{foreach from=$customerGuestDetailErrors key=k item=customerGuestDetailError}
-																											<li>{$customerGuestDetailError}</li>
-																										{/foreach}
-																									</ol>
-																								</div>
-																							{/if}
 																							<div id="customer-guest-detail-container" {if !$id_customer_guest_detail}style="display: none;"{/if}>
 																								<div class="row">
 																									<div class="required clearfix gender-line col-sm-2">
@@ -184,7 +173,7 @@
 																						<hr>
 																						<div class="row">
 																							<div class="col-sm-12 proceed_btn_block">
-																								<a class="btn btn-default button button-medium pull-right submit-guest-details" href="{$link->getPageLink('order-opc', null, null, ['proceed_to_payment' => 1])}" title="Proceed to Payment" rel="nofollow">
+																								<a class="btn btn-default button button-medium pull-right" href="{$link->getPageLink('order-opc', null, null, ['proceed_to_payment' => 1])}" title="Proceed to Payment" rel="nofollow">
 																									<span>
 																										{l s='Proceed'}
 																									</span>
@@ -258,7 +247,113 @@
 								<div class="col-md-4">
 									{block name='order_opc_cart_total_detail'}
 										{* Total cart details, tax details, advance payment details and voucher details *}
-										{include file="$tpl_dir./cart-total-block.tpl"}
+										<div class="col-sm-12 card cart_total_detail_block">
+											{* {if $total_service_products}
+												<p>
+													<span>{l s='Total service products cost'}{if $display_tax_label}{l s=' (tax excl.)'}{/if}</span>
+													<span class="cart_total_values">{displayPrice price=$total_service_products}</span>
+												</p>
+											{/if} *}
+											<p>
+												<span>
+													{l s='Total rooms cost'}
+													{if $display_tax_label}
+														{if $use_taxes && $priceDisplay == 0}
+															{l s='(tax incl)'}
+														{else}
+															{l s='(tax excl)'}
+														{/if}
+													{/if}
+												</span>
+												<span class="cart_total_values">
+													{if $use_taxes && $priceDisplay == 0}
+														{assign var='total_rooms_cost' value=($total_rooms_wt + $total_extra_demands_wt + $total_additional_services_wt + $total_additional_services_auto_add_wt)}
+													{else}
+														{assign var='total_rooms_cost' value=($total_rooms + $total_extra_demands + $total_additional_services + $total_additional_services_auto_add)}
+													{/if}
+													{displayPrice price=$total_rooms_cost}
+												</span>
+											</p>
+											{if $convenience_fee_wt}
+												<p>
+													<span>
+														{l s='Convenience Fees'}
+														{if $display_tax_label}
+															{if $use_taxes && $priceDisplay == 0}
+																{l s='(tax incl)'}
+															{else}
+																{l s='(tax excl)'}
+															{/if}
+														{/if}
+													</span>
+													<span class="cart_total_values">
+													{if $use_taxes && $priceDisplay == 0}
+														{displayPrice price=$convenience_fee_wt}
+													{else}
+														{displayPrice price=$convenience_fee}
+													{/if}
+													</span>
+												</p>
+											{/if}
+											{block name='displayBeforeCartTotalTax'}
+												{hook h='displayBeforeCartTotalTax'}
+											{/block}
+											{if $show_taxes}
+												<p class="cart_total_tax">
+													<span>{l s='Total tax'}</span>
+													<span class="cart_total_values">{displayPrice price=($total_tax_without_discount)}</span>
+												</p>
+											{/if}
+											<p class="total_discount_block {if $total_discounts == 0}unvisible{/if}">
+												<span>
+													{if $display_tax_label}
+														{if $use_taxes && $priceDisplay == 0}
+															{l s='Total Discount (tax incl)'}
+														{else}
+															{l s='Total Discount (tax excl)'}
+														{/if}
+													{else}
+														{l s='Total Discount'}
+													{/if}
+												</span>
+												<span class="cart_total_values">
+													{if $use_taxes && $priceDisplay == 0}
+														{assign var='total_discounts_negative' value=$total_discounts * -1}
+													{else}
+														{assign var='total_discounts_negative' value=$total_discounts_tax_exc * -1}
+													{/if}
+													{displayPrice price=$total_discounts_negative}
+												</span>
+											</p>
+												<hr>
+												<p {if !isset($is_advance_payment) || !$is_advance_payment}class="cart_final_total_block"{/if}>
+													<span class="strong">{l s='Total'}</span>
+													{block name='displayCartTotalPriceLabelTotal'}
+														{hook h="displayCartTotalPriceLabel" type='total'}
+													{/block}
+												<span class="cart_total_values {if isset($is_advance_payment) && $is_advance_payment} strong{/if}">
+														{if $use_taxes}
+															{displayPrice price=$total_price}
+														{else}
+															{displayPrice price=$total_price_without_tax}
+														{/if}
+													</span>
+												</p>
+												{if isset($is_advance_payment) && $is_advance_payment}
+													<hr>
+													<p>
+														<span>{l s='Due Amount'}</span>
+														<span class="cart_total_values">{displayPrice price=$dueAmount}</span>
+													</p>
+													<p class="cart_final_total_block">
+														<span class="strong">{l s='Partially Payable Total'}</span>
+														{block name='displayCartTotalPriceLabelPartial'}
+															{hook h="displayCartTotalPriceLabel" type='partial'}
+														{/block}
+														<span class="cart_total_values">{displayPrice price=$advPaymentAmount}</span>
+													</p>
+												{/if}
+										</div>
 									{/block}
 									{block name='order_opc_vouchers'}
 										{* Check if voucher feature is enabled currently *}
@@ -340,7 +435,7 @@
 								{include file="$tpl_dir./errors.tpl"}
 							{/block}
 
-							<p class="alert alert-warning">{l s='You have not added any rooms or products to your cart yet.'}</p>
+							<p class="alert alert-warning">{l s='You have not added any room to your cart yet.'}</p>
 						{/if}
 						{block name='order_opc_js_vars'}
 							{strip}

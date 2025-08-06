@@ -134,46 +134,35 @@ function initRefundDeniedTooltip() {
 }
 
 function initMap() {
+    const hotelLocation = {
+        lat: Number(hotel_location.latitude),
+        lng: Number(hotel_location.longitude),
+    };
+
     $('.booking-hotel-map-container').each(function (i, element) {
-        const hotelLocation = {
-            lat: Number($(this).attr('latitude')),
-            lng: Number($(this).attr('longitude')),
-        };
         const map = new google.maps.Map(element, {
             zoom: 10,
             center: hotelLocation,
             disableDefaultUI: true,
             fullscreenControl: true,
-            mapId: PS_MAP_ID
         });
 
-        let icon = document.createElement('img');
-        icon.src = PS_STORES_ICON;
-        icon.style.width = '24px';
-        icon.style.height = '24px';
-
-        const marker = new google.maps.marker.AdvancedMarkerElement({
+        const marker = new google.maps.Marker({
             position: hotelLocation,
             map: map,
-            title: location.hotel_name,
-            content: icon,
+            title: hotel_name,
+            icon: PS_STORES_ICON
         });
-
-        marker.query = location.query || null;
-        marker.latitude = hotelLocation.lat;
-        marker.longitude = hotelLocation.lng;
 
         marker.addListener('click', function() {
             let query = '';
-            if (this.query) {
-                query = this.query;
-            } else if (this.latitude && this.longitude) {
-                query = `${this.latitude},${this.longitude}`;
+            if (hotel_location.map_input_text != '') {
+                query = hotel_location.map_input_text;
+            } else {
+                query = hotel_location.latitude + ',' + hotel_location.longitude;
             }
 
-            if (query) {
-                window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`, '_blank');
-            }
+            window.open('https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(query), '_blank');
         });
     });
 }
@@ -290,14 +279,11 @@ const BookingRefundManager = {
             href: '#popup-cancellation-order-cancel-success',
             wrapCSS: 'fancybox-order-detail feedback',
             padding: 0,
-            afterClose: function() {
-                location.reload();
-            },
         });
     },
 }
 
-$(document).on('click', '.order_refund_request', function(e) {
+$(document).on('click', '#order_refund_request', function(e) {
     e.preventDefault();
     BookingRefundManager.show();
 });
@@ -388,5 +374,13 @@ $(document).ready(function () {
     });
 
     initPriceTooltip();
+
+    if (typeof google === 'object'
+        && typeof google.maps === 'object'
+        && typeof hotel_location === 'object'
+    ) {
+        initMap();
+    }
+
     initRefundDeniedTooltip();
 });

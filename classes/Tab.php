@@ -121,7 +121,7 @@ class TabCore extends ObjectModel
      * @param Context $context
      * @return bool true if succeed
      */
-    public static function initAccess($id_tab, ?Context $context = null)
+    public static function initAccess($id_tab, Context $context = null)
     {
         if (!$context) {
             $context = Context::getContext();
@@ -288,16 +288,14 @@ class TabCore extends ObjectModel
      */
     public static function getIdFromClassName($class_name)
     {
-        if ($class_name) {
-            $class_name = strtolower($class_name);
-            if (self::$_getIdFromClassName === null) {
-                self::$_getIdFromClassName = array();
-                $result = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS('SELECT id_tab, class_name FROM `'._DB_PREFIX_.'tab`', true, false);
+        $class_name = strtolower($class_name);
+        if (self::$_getIdFromClassName === null) {
+            self::$_getIdFromClassName = array();
+            $result = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS('SELECT id_tab, class_name FROM `'._DB_PREFIX_.'tab`', true, false);
 
-                if (is_array($result)) {
-                    foreach ($result as $row) {
-                        self::$_getIdFromClassName[strtolower($row['class_name'])] = $row['id_tab'];
-                    }
+            if (is_array($result)) {
+                foreach ($result as $row) {
+                    self::$_getIdFromClassName[strtolower($row['class_name'])] = $row['id_tab'];
                 }
             }
         }
@@ -498,18 +496,17 @@ class TabCore extends ObjectModel
         }
 
         if (isset($tabAccesses[(int)$id_tab]['view'])) {
-            return ($tabAccesses[(int)$id_tab]['view'] === 1);
+            return ($tabAccesses[(int)$id_tab]['view'] === '1');
         }
         return false;
     }
 
     public static function recursiveTab($id_tab, $tabs)
     {
-        if ($admin_tab = Tab::getTab((int)Context::getContext()->language->id, $id_tab)) {
-            $tabs[] = $admin_tab;
-            if (isset($admin_tab['id_parent']) && $admin_tab['id_parent'] > 0) {
-                $tabs = Tab::recursiveTab($admin_tab['id_parent'], $tabs);
-            }
+        $admin_tab = Tab::getTab((int)Context::getContext()->language->id, $id_tab);
+        $tabs[] = $admin_tab;
+        if ($admin_tab['id_parent'] > 0) {
+            $tabs = Tab::recursiveTab($admin_tab['id_parent'], $tabs);
         }
         return $tabs;
     }

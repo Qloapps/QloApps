@@ -185,16 +185,6 @@ class AdminPreferencesControllerCore extends AdminController
                     'type' => 'text',
                     'class' => 'fixed-width-xxl'
                 ),
-                'PS_SHORT_DESC_LIMIT' => array(
-                    'title' => $this->l('Short description Max Size'),
-                    'hint' => $this->l('Set the maximum size of room type, services and hotel short description (in characters).'),
-                    'validation' => 'isUnsignedInt',
-                    'cast' => 'intval',
-                    'type' => 'text',
-                    'suffix' => $this->l('characters'),
-                    'class' => 'fixed-width-xl',
-                    'desc' => sprintf($this->l('If set to 0, the maximum limit will be %d characters.'), Configuration::PS_SHORT_DESC_LIMIT)
-                ),
                 // 'PS_DISPLAY_SUPPLIERS' => array(
                 //     'title' => $this->l('Display suppliers and manufacturers'),
                 //     'desc' => $this->l('Enable suppliers and manufacturers pages on your front office even when their respective modules are disabled.'),

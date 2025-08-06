@@ -7,7 +7,6 @@
  * @package    Smarty
  * @subpackage Template
  */
-#[\AllowDynamicProperties]
 class Smarty_Variable
 {
     /**

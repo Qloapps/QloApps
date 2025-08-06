@@ -30,8 +30,6 @@
 class TranslateCore
 {
     public static $ignore_folder = array('.', '..', '.svn', '.git', '.htaccess', 'index.php');
-    public static $adminTranslations = array();
-    public static $moduleTranslations = array();
 
     /**
      * Get a translation for an admin controller
@@ -45,19 +43,21 @@ class TranslateCore
     public static function getAdminTranslation($string, $class = 'AdminTab', $addslashes = false, $htmlentities = true, $sprintf = null)
     {
         static $modules_tabs = null;
+
+        // @todo remove global keyword in translations files and use static
+        global $_LANGADM;
+
         if ($modules_tabs === null) {
             $modules_tabs = Tab::getModuleTabList();
         }
 
-        $iso = Context::getContext()->language->iso_code;
-        if (empty($iso)) {
-            $iso = Language::getIsoById((int)Configuration::get('PS_LANG_DEFAULT'));
-        }
-
-        if (!isset(self::$adminTranslations[$iso])) {
+        if ($_LANGADM == null) {
+            $iso = Context::getContext()->language->iso_code;
+            if (empty($iso)) {
+                $iso = Language::getIsoById((int)Configuration::get('PS_LANG_DEFAULT'));
+            }
             if (file_exists(_PS_TRANSLATIONS_DIR_.$iso.'/admin.php')) {
                 include_once(_PS_TRANSLATIONS_DIR_.$iso.'/admin.php');
-                self::$adminTranslations[$iso] = $GLOBALS['_LANGADM'];
             }
         }
 
@@ -71,10 +71,10 @@ class TranslateCore
 
         $string = preg_replace("/\\\*'/", "\'", $string);
         $key = md5($string);
-        if (isset(self::$adminTranslations[$iso][$class.$key])) {
-            $str = self::$adminTranslations[$iso][$class.$key];
+        if (isset($_LANGADM[$class.$key])) {
+            $str = $_LANGADM[$class.$key];
         } else {
-            $str = Translate::getGenericAdminTranslation($string, self::$adminTranslations[$iso], $key);
+            $str = Translate::getGenericAdminTranslation($string, $key, $_LANGADM);
         }
 
         if ($htmlentities) {
@@ -97,7 +97,7 @@ class TranslateCore
      * @param array $lang_array Global array of admin translations
      * @return string translation
      */
-    public static function getGenericAdminTranslation($string, &$lang_array, $key = null)
+    public static function getGenericAdminTranslation($string, $key = null, &$lang_array)
     {
         $string = preg_replace("/\\\*'/", "\'", $string);
         if (is_null($key)) {
@@ -128,7 +128,7 @@ class TranslateCore
      */
     public static function getModuleTranslation($module, $string, $source, $sprintf = null, $addslashes = false, $language = null)
     {
-        global $_MODULE;
+        global $_MODULES, $_MODULE, $_LANGADM;
 
         static $lang_cache = array();
         // $_MODULES is a cache of translations for all module.
@@ -146,19 +146,15 @@ class TranslateCore
             $force_refresh = true;
         }
 
-        $iso = $language->iso_code;
-        if (!isset(self::$moduleTranslations[$iso])) {
-            self::$moduleTranslations[$iso] = array();
-        }
-        if ((isset(Context::getContext()->language) && !isset($translations_merged[$name])) || $force_refresh) {
+        if ((!isset($translations_merged[$name]) && isset(Context::getContext()->language)) || $force_refresh) {
             $files_by_priority = array(
                 // Translations in theme
-                _PS_THEME_DIR_.'modules/'.$name.'/translations/'.$iso.'.php',
-                _PS_THEME_DIR_.'modules/'.$name.'/'.$iso.'.php',
+                _PS_THEME_DIR_.'modules/'.$name.'/translations/'.$language->iso_code.'.php',
+                _PS_THEME_DIR_.'modules/'.$name.'/'.$language->iso_code.'.php',
                 // PrestaShop 1.5 translations
-                _PS_MODULE_DIR_.$name.'/translations/'.$iso.'.php',
+                _PS_MODULE_DIR_.$name.'/translations/'.$language->iso_code.'.php',
                 // PrestaShop 1.4 translations
-                _PS_MODULE_DIR_.$name.'/'.$iso.'.php'
+                _PS_MODULE_DIR_.$name.'/'.$language->iso_code.'.php'
             );
             // if force_refresh is set reverse the list because array_merge will overrite the previous file with new file
             if ($force_refresh) {
@@ -167,8 +163,8 @@ class TranslateCore
             foreach ($files_by_priority as $file) {
                 if (file_exists($file)) {
                     include_once($file);
-                    self::$moduleTranslations[$iso] = !empty(self::$moduleTranslations[$iso]) ? ($force_refresh ? array_merge(self::$moduleTranslations[$iso], $_MODULE) : self::$moduleTranslations[$iso] + $_MODULE) : $_MODULE; //we use "+" instead of array_merge() when force_refresh is false because array merge erase existing values.
-                    $translations_merged[$language->iso_code][$name] = true;
+                    $_MODULES = !empty($_MODULES) ? ($force_refresh ? array_merge($_MODULES, $_MODULE) : $_MODULES + $_MODULE) : $_MODULE; //we use "+" instead of array_merge() when force_refresh is false because array merge erase existing values.
+                    $translations_merged[$name] = true;
                 }
             }
         }
@@ -178,7 +174,7 @@ class TranslateCore
         $cache_key = $name.'|'.$string.'|'.$source.'|'.(int)$addslashes;
 
         if (!isset($lang_cache[$cache_key])) {
-            if (self::$moduleTranslations[$iso] == null) {
+            if ($_MODULES == null) {
                 if ($sprintf !== null) {
                     $string = Translate::checkAndReplaceArgs($string, $sprintf);
                 }
@@ -194,18 +190,18 @@ class TranslateCore
                  $default_key_file = strtolower('<{'.$name.'}prestashop>'.$file).'_'.$key;
             }
 
-            if (isset($current_key_file) && !empty(self::$moduleTranslations[$iso][$current_key_file])) {
-                $ret = stripslashes(self::$moduleTranslations[$iso][$current_key_file]);
-            } elseif (isset($default_key_file) && !empty(self::$moduleTranslations[$iso][$default_key_file])) {
-                $ret = stripslashes(self::$moduleTranslations[$iso][$default_key_file]);
-            } elseif (!empty(self::$moduleTranslations[$iso][$current_key])) {
-                $ret = stripslashes(self::$moduleTranslations[$iso][$current_key]);
-            } elseif (!empty(self::$moduleTranslations[$iso][$default_key])) {
-                $ret = stripslashes(self::$moduleTranslations[$iso][$default_key]);
+            if (isset($current_key_file) && !empty($_MODULES[$current_key_file])) {
+                $ret = stripslashes($_MODULES[$current_key_file]);
+            } elseif (isset($default_key_file) && !empty($_MODULES[$default_key_file])) {
+                $ret = stripslashes($_MODULES[$default_key_file]);
+            } elseif (!empty($_MODULES[$current_key])) {
+                $ret = stripslashes($_MODULES[$current_key]);
+            } elseif (!empty($_MODULES[$default_key])) {
+                $ret = stripslashes($_MODULES[$default_key]);
             }
             // if translation was not found in module, look for it in AdminController or Helpers
-            elseif (isset(self::$adminTranslations[$iso]) && !empty(self::$adminTranslations[$iso])) {
-                $ret = stripslashes(Translate::getGenericAdminTranslation($string, self::$adminTranslations[$iso], $key));
+            elseif (!empty($_LANGADM)) {
+                $ret = stripslashes(Translate::getGenericAdminTranslation($string, $key, $_LANGADM));
             } else {
                 $ret = stripslashes($string);
             }

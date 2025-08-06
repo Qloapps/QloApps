@@ -35,6 +35,7 @@ class AdminStatesControllerCore extends AdminController
         $this->table = 'state';
         $this->className = 'State';
         $this->lang = false;
+        $this->requiredDatabase = true;
 
         $this->addRowAction('edit');
         $this->addRowAction('delete');
@@ -57,12 +58,12 @@ class AdminStatesControllerCore extends AdminController
         $this->_use_found_rows = false;
 
         $countries_array = $zones_array = array();
-        $zones = Zone::getZones();
-        $countries = Country::getCountries($this->context->language->id, false, true, false);
-        foreach ($zones as $zone) {
+        $this->zones = Zone::getZones();
+        $this->countries = Country::getCountries($this->context->language->id, false, true, false);
+        foreach ($this->zones as $zone) {
             $zones_array[$zone['id_zone']] = $zone['name'];
         }
-        foreach ($countries as $country) {
+        foreach ($this->countries as $country) {
             $countries_array[$country['id_country']] = $country['name'];
         }
 
@@ -233,7 +234,7 @@ class AdminStatesControllerCore extends AdminController
 
         /* Delete state */
         if (Tools::isSubmit('delete'.$this->table)) {
-            if ($this->tabAccess['delete'] === 1) {
+            if ($this->tabAccess['delete'] === '1') {
                 if (Validate::isLoadedObject($object = $this->loadObject())) {
                     /** @var State $object */
                     if (!$object->isUsed()) {

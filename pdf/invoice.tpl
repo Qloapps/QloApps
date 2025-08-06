@@ -62,6 +62,10 @@
 		</td>
 	</tr>
 
+	<tr>
+		<td colspan="12" height="20">&nbsp;</td>
+	</tr>
+
 	<!-- Product -->
 	<tr>
 		<td colspan="12">
@@ -69,11 +73,17 @@
 		</td>
 	</tr>
 
+	<tr>
+		<td colspan="12" height="10">&nbsp;</td>
+	</tr>
+
 	<!-- TVA -->
 	<tr>
 		<!-- Code TVA -->
 		<td colspan="12" class="left">
+
 			{$tax_tab}
+
 		</td>
 	</tr>
 
@@ -121,7 +131,8 @@
 	</tr>
 
 	<tr>
-		<td colspan="12">
+		<td colspan="2">&nbsp;</td>
+		<td colspan="10">
 			{$HOOK_DISPLAY_PDF}
 		</td>
 	</tr>

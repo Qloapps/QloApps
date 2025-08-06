@@ -1,24 +1,21 @@
 <?php
 /**
+* 2010-2022 Webkul.
+*
 * NOTICE OF LICENSE
 *
-* This source file is subject to the Open Software License version 3.0
-* that is bundled with this package in the file LICENSE.md
-* It is also available through the world-wide-web at this URL:
-* https://opensource.org/license/osl-3-0-php
-* If you did not receive a copy of the license and are unable to
-* obtain it through the world-wide-web, please send an email
-* to support@qloapps.com so we can send you a copy immediately.
+* All right is reserved,
+* Please go through LICENSE.txt file inside our module
 *
 * DISCLAIMER
 *
-* Do not edit or add to this file if you wish to upgrade this module to a newer
-* versions in the future. If you wish to customize this module for your needs
-* please refer to https://store.webkul.com/customisation-guidelines for more information.
+* Do not edit or add to this file if you wish to upgrade this module to newer
+* versions in the future. If you wish to customize this module for your
+* needs please refer to CustomizationPolicy.txt file inside our module for more information.
 *
 * @author Webkul IN
-* @copyright Since 2010 Webkul
-* @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
+* @copyright 2010-2022 Webkul IN
+* @license LICENSE.txt
 */
 
 class HotelReservationSystemDb
@@ -68,7 +65,6 @@ class HotelReservationSystemDb
                 `map_formated_address` text NOT NULL,
                 `map_input_text` text NOT NULL,
                 `active_refund` tinyint(1) unsigned NOT NULL DEFAULT '0',
-                `fax` varchar(255) DEFAULT NULL,
                 `date_add` datetime NOT NULL,
                 `date_upd` datetime NOT NULL,
                 PRIMARY KEY (`id`)
@@ -157,7 +153,6 @@ class HotelReservationSystemDb
                 `comment` text NOT NULL,
                 `check_in` datetime NOT NULL,
                 `check_out` datetime NOT NULL,
-                `planned_check_out` datetime NOT NULL,
                 `date_from` datetime NOT NULL,
                 `date_to` datetime NOT NULL,
                 `total_price_tax_excl` decimal(20,6) NOT NULL,
@@ -272,10 +267,10 @@ class HotelReservationSystemDb
             "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."htl_order_restrict_date` (
                 `id` int(11) NOT NULL AUTO_INCREMENT,
                 `id_hotel` int(11) NOT NULL,
-                `use_global_max_checkout_offset` tinyint(1) NOT NULL,
-                `max_checkout_offset` int(11) NOT NULL,
-                `use_global_min_booking_offset` tinyint(1) NOT NULL,
-                `min_booking_offset` int(11) NOT NULL,
+                `use_global_max_order_date` tinyint(1) NOT NULL,
+                `max_order_date` date NOT NULL,
+                `use_global_preparation_time` tinyint(1) NOT NULL,
+                `preparation_time` int(11) NOT NULL,
                 `date_add` datetime NOT NULL,
                 `date_upd` datetime NOT NULL,
                 PRIMARY KEY (`id`)
@@ -287,6 +282,11 @@ class HotelReservationSystemDb
                 `id_cart` int(11) NOT NULL DEFAULT '0',
                 `id_guest` int(11) NOT NULL DEFAULT '0',
                 `id_room` int(11) NOT NULL DEFAULT '0',
+                `date_from` date NOT NULL,
+                `date_to` date NOT NULL,
+                `is_special_days_exists` tinyint(1) NOT NULL,
+                `date_selection_type` tinyint(1) NOT NULL,
+                `special_days` text,
                 `impact_way` tinyint(1) NOT NULL,
                 `impact_type` tinyint(1) NOT NULL,
                 `impact_value` decimal(20,6) NOT NULL DEFAULT '0.000000',
@@ -294,19 +294,6 @@ class HotelReservationSystemDb
                 `date_add` datetime NOT NULL,
                 `date_upd` datetime NOT NULL,
                 PRIMARY KEY (`id_feature_price`)
-            ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;",
-
-            "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."htl_room_type_feature_pricing_restriction` (
-                `id_feature_price_restriction` int(11) NOT NULL AUTO_INCREMENT,
-                `id_feature_price` int(11) NOT NULL,
-                `is_special_days_exists` tinyint(1) NOT NULL,
-                `date_selection_type` tinyint(1) NOT NULL,
-                `special_days` text,
-                `date_from` date NOT NULL,
-                `date_to` date NOT NULL,
-                `date_add` datetime NOT NULL,
-                `date_upd` datetime NOT NULL,
-                PRIMARY KEY (`id_feature_price_restriction`)
             ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;",
 
             "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."htl_room_type_feature_pricing_lang` (
@@ -375,7 +362,7 @@ class HotelReservationSystemDb
                 PRIMARY KEY (`id_room_type_demand`)
             ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;",
 
-            "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."htl_room_type_service_product` (
+            "CREATE TABLE `"._DB_PREFIX_."htl_room_type_service_product` (
                 `id_room_type_service_product` int(11) UNSIGNED NOT NULL AUTO_INCREMENT,
                 `id_product` int(11) UNSIGNED NOT NULL,
                 `position` smallint(2) unsigned NOT NULL DEFAULT '0',
@@ -385,7 +372,7 @@ class HotelReservationSystemDb
                 KEY `id_product` (`id_product`)
             ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;",
 
-            "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."htl_room_type_service_product_price` (
+            "CREATE TABLE `"._DB_PREFIX_."htl_room_type_service_product_price` (
                 `id_room_type_service_product_price` int(11) UNSIGNED NOT NULL AUTO_INCREMENT,
                 `id_product` int(11) UNSIGNED NOT NULL,
                 `price` decimal(20,6) NOT NULL DEFAULT '0.000000',
@@ -396,59 +383,43 @@ class HotelReservationSystemDb
                 KEY `id_product` (`id_product`)
             ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;",
 
-            "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."product_option` (
-                `id_product_option` int(11) UNSIGNED NOT NULL AUTO_INCREMENT,
-                `id_product` int(11) UNSIGNED NOT NULL,
-                `price_impact` decimal(20,6) NOT NULL DEFAULT '0.000000',
-                `date_add` datetime NOT NULL,
-                `date_upd` datetime NOT NULL,
-                PRIMARY KEY (`id_product_option`)
-            ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;",
-
-            "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."product_option_lang` (
-                `id_product_option` int(10) unsigned NOT NULL,
-                `id_lang` int(10) unsigned NOT NULL,
-                `name` varchar(255) character set utf8 NOT NULL,
-                PRIMARY KEY (`id_product_option`, `id_lang`)
-            ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8;",
-
-            "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."service_product_cart_detail` (
-                `id_service_product_cart_detail` int(11) UNSIGNED NOT NULL AUTO_INCREMENT,
-                `id_product` int(11) UNSIGNED NOT NULL,
-                `quantity` int(11) UNSIGNED NOT NULL,
+            "CREATE TABLE `"._DB_PREFIX_."htl_hotel_service_product_cart_detail` (
+                `id_hotel_service_product_cart_detail` int(11) UNSIGNED NOT NULL AUTO_INCREMENT,
                 `id_cart` int(11) unsigned NOT NULL,
+                `id_product` int(11) UNSIGNED NOT NULL,
                 `id_hotel` int(11) UNSIGNED NOT NULL,
-                `htl_cart_booking_id` int(11) unsigned NOT NULL,
-                `id_product_option` int(11) UNSIGNED NOT NULL,
-                PRIMARY KEY (`id_service_product_cart_detail`),
+                `quantity` int(11) UNSIGNED NOT NULL,
+                PRIMARY KEY (`id_hotel_service_product_cart_detail`),
                 KEY `id_product` (`id_product`)
             ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;",
 
-            "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."service_product_order_detail` (
-                `id_service_product_order_detail` int(11) NOT NULL AUTO_INCREMENT,
+            "CREATE TABLE `"._DB_PREFIX_."htl_room_type_service_product_cart_detail` (
+                `id_room_type_service_product_cart_detail` int(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+                `id_product` int(11) UNSIGNED NOT NULL,
+                `quantity` int(11) UNSIGNED NOT NULL,
+                `id_cart` int(11) unsigned NOT NULL,
+                `htl_cart_booking_id` int(11) unsigned NOT NULL,
+                PRIMARY KEY (`id_room_type_service_product_cart_detail`),
+                KEY `id_product` (`id_product`)
+            ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;",
+
+            "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."htl_room_type_service_product_order_detail` (
+                `id_room_type_service_product_order_detail` int(11) NOT NULL AUTO_INCREMENT,
                 `id_product` int(11) NOT NULL,
                 `id_order` int(11) NOT NULL,
                 `id_order_detail` int(11) NOT NULL,
                 `id_cart` int(11) NOT NULL,
-                `id_hotel` int(11) NOT NULL,
                 `id_htl_booking_detail` int(11) NOT NULL,
-                `id_product_option` int(11) NOT NULL,
-                `tax_computation_method` tinyint(1) unsigned NOT NULL DEFAULT '0',
-                `id_tax_rules_group` int(11) unsigned NOT NULL DEFAULT '0',
                 `unit_price_tax_excl` decimal(20,6) NOT NULL,
                 `unit_price_tax_incl` decimal(20,6) NOT NULL,
                 `total_price_tax_excl` decimal(20,6) NOT NULL,
                 `total_price_tax_incl` decimal(20,6) NOT NULL,
                 `name` varchar(255) DEFAULT NULL,
-                `option_name` varchar(255) DEFAULT NULL,
-                `hotel_name` varchar(255) DEFAULT NULL,
                 `quantity` INT(11) UNSIGNED NOT NULL,
                 `auto_added` tinyint(1) unsigned NOT NULL,
-                `is_refunded` tinyint(1) NOT NULL DEFAULT '0',
-                `is_cancelled` tinyint(1) NOT NULL DEFAULT '0',
                 `date_add` datetime NOT NULL,
                 `date_upd` datetime NOT NULL,
-                PRIMARY KEY (`id_service_product_order_detail`)
+                PRIMARY KEY (`id_room_type_service_product_order_detail`)
             ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;",
 
             "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."htl_room_disable_dates` (
@@ -493,24 +464,6 @@ class HotelReservationSystemDb
                 `date_add` datetime NOT NULL,
                 `date_upd` datetime NOT NULL,
                 PRIMARY KEY (`id_settings_link`)
-            ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;",
-            "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."htl_bed_type` (
-                `id_bed_type` INT(11) NOT NULL AUTO_INCREMENT,
-                `length` DECIMAL(20,6) NOT NULL DEFAULT '0.000000',
-                `width` DECIMAL(20,6) NOT NULL DEFAULT '0.000000',
-                PRIMARY KEY (`id_bed_type`)
-            ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;",
-            "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."htl_bed_type_lang`(
-                `id_bed_type` INT(11) NOT NULL,
-                `name` VARCHAR(255) DEFAULT NULL,
-                `id_lang` INT(11) NOT NULL,
-                PRIMARY KEY (`id_bed_type`, `id_lang`)
-            ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;",
-            "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."htl_room_type_bed_type` (
-                `id_room_type_bed_type` INT(11) NOT NULL AUTO_INCREMENT,
-                `id_product` INT(11) NOT NULL,
-                `id_bed_type` INT(11) NOT NULL,
-                PRIMARY KEY (`id_room_type_bed_type`)
             ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;",
 
             "INSERT INTO `"._DB_PREFIX_."htl_settings_link` (`id_settings_link`, `icon`, `link`, `new_window`, `position`, `unremovable`, `active`, `date_add`, `date_upd`) VALUES
@@ -587,6 +540,7 @@ class HotelReservationSystemDb
             `'._DB_PREFIX_.'htl_booking_demands`,
             `'._DB_PREFIX_.'htl_booking_demands_tax`,
             `'._DB_PREFIX_.'htl_room_status`,
+            `'._DB_PREFIX_.'htl_room_allotment_type`,
             `'._DB_PREFIX_.'htl_advance_payment`,
             `'._DB_PREFIX_.'htl_order_refund_rules`,
             `'._DB_PREFIX_.'htl_order_refund_rules_lang`,
@@ -595,27 +549,17 @@ class HotelReservationSystemDb
             `'._DB_PREFIX_.'htl_room_type_feature_pricing`,
             `'._DB_PREFIX_.'htl_room_type_feature_pricing_lang`,
             `'._DB_PREFIX_.'htl_room_type_feature_pricing_group`,
-            `'._DB_PREFIX_.'htl_room_type_feature_pricing_restriction`,
             `'._DB_PREFIX_.'htl_room_type_global_demand`,
             `'._DB_PREFIX_.'htl_room_type_global_demand_lang`,
             `'._DB_PREFIX_.'htl_room_type_global_demand_advance_option`,
             `'._DB_PREFIX_.'htl_room_type_global_demand_advance_option_lang`,
             `'._DB_PREFIX_.'htl_room_type_demand_price`,
             `'._DB_PREFIX_.'htl_room_type_demand`,
-            `'._DB_PREFIX_.'htl_room_type_service_product`,
-            `'._DB_PREFIX_.'htl_room_type_service_product_price`,
-            `'._DB_PREFIX_.'product_option`,
-            `'._DB_PREFIX_.'product_option_lang`,
-            `'._DB_PREFIX_.'service_product_cart_detail`,
-            `'._DB_PREFIX_.'service_product_order_detail`,
             `'._DB_PREFIX_.'htl_room_disable_dates`,
-            `'._DB_PREFIX_.'htl_room_type_restriction_date_range`,
-            `'._DB_PREFIX_.'htl_bed_type`,
-            `'._DB_PREFIX_.'htl_bed_type_lang`,
-            `'._DB_PREFIX_.'htl_room_type_bed_type`,
-            `'._DB_PREFIX_.'htl_access`,
             `'._DB_PREFIX_.'htl_settings_link`,
-            `'._DB_PREFIX_.'htl_settings_link_lang`'
+            `'._DB_PREFIX_.'htl_settings_link_lang`,
+            `'._DB_PREFIX_.'htl_room_type_restriction_date_range`,
+            `'._DB_PREFIX_.'htl_access`'
         );
     }
 }

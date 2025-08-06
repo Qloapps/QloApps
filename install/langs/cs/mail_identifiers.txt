@@ -1,0 +1,10 @@
+Hi {firstname} {lastname},
+
+Here is your personal login information for {shop_name}:
+
+Password: {passwd}
+E-mail address: {email}
+
+{shop_name} - {shop_url}
+
+{shop_url} powered by Webkul™

@@ -1,23 +1,20 @@
 {**
+* 2010-2021 Webkul.
+*
 * NOTICE OF LICENSE
 *
-* This source file is subject to the Open Software License version 3.0
-* that is bundled with this package in the file LICENSE.md
-* It is also available through the world-wide-web at this URL:
-* https://opensource.org/license/osl-3-0-php
-* If you did not receive a copy of the license and are unable to
-* obtain it through the world-wide-web, please send an email
-* to support@qloapps.com so we can send you a copy immediately.
+* All right is reserved,
+* Please go through LICENSE.txt file inside our module
 *
 * DISCLAIMER
 *
-* Do not edit or add to this file if you wish to upgrade this module to a newer
-* versions in the future. If you wish to customize this module for your needs
-* please refer to https://store.webkul.com/customisation-guidelines for more information.
+* Do not edit or add to this file if you wish to upgrade this module to newer
+* versions in the future. If you wish to customize this module for your
+* needs please refer to CustomizationPolicy.txt file inside our module for more information.
 *
 * @author Webkul IN
-* @copyright Since 2010 Webkul
-* @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
+* @copyright 2010-2021 Webkul IN
+* @license LICENSE.txt
 *}
 
 <div class="row">
@@ -71,15 +68,15 @@
 					</div>
 				</div>
 				<div class="badge-wrapper">
-					<div class="badge-item label-tooltip" data-toggle="tooltip" data-original-title="{l s='The count of rooms that are currently occupied by guests.' mod='dashguestcycle'}">
+					<div class="badge-item label-tooltip" data-toggle="tooltip" data-original-title="{l s='The number of stay overs scheduled for today.' mod='dashguestcycle'}">
 						<div class="badge-strip" style="background-color: #FFC148;"></div>
 						<div class="badge-content-wrapper">
 							<div class="title-wrapper">
-								<p class="text-center">{l s='Occupied Rooms' mod='dashguestcycle'}</p>
+								<p class="text-center">{l s="Stay Overs" mod='dashguestcycle'}</p>
 							</div>
 							<div class="value-wrapper">
 								<p class="text-center">
-									<span id="dgc_occupied"></span>
+									<span id="dgc_stay_overs"></span>
 								</p>
 							</div>
 						</div>

@@ -49,7 +49,7 @@
 					</div>
 					<div class="form-group">
 						<label class="col-lg-3 control-label">{l s='Total spent since registration:'}</label>
-						<div class="col-lg-3"><p class="form-control-static">{displayWtPriceWithCurrency price=Tools::convertPrice($customer_stats.total_orders|floatval, $currency) currency=$currency}</p></div>
+						<div class="col-lg-3"><p class="form-control-static">{displayWtPriceWithCurrency price=$customer_stats.total_orders currency=$currency}</p></div>
 					</div>
 				</div>
 			{else}
@@ -67,7 +67,7 @@
 				{l s='Created on:'} {dateFormat date=$cart_order.date_add}
 			{else}
 				<h2>{l s='No order was created from this cart.'}</h2>
-				{if $customer->id && !$hotel_products && !$standalone_products}
+				{if $customer->id}
 					<a class="btn btn-default" href="{$link->getAdminLink('AdminOrders')|escape:'html':'UTF-8'}&amp;cart_id={$cart->id|intval}&amp;addorder"><i class="icon-shopping-cart"></i> {l s='Create an order from this cart.'}</a>
 				{/if}
 			{/if}
@@ -109,7 +109,7 @@
 						</td>
 						<td>{displayWtPriceWithCurrency price=$room['feature_price_tax_excl'] currency=$currency}</td>
 						<td>
-							{if (isset($room['selected_demands']) && $room['selected_demands']) || (isset($room['selected_services']) && $room['selected_services'])}
+							{if (isset($room['extra_demands']) && $room['extra_demands']) || (isset($room['additional_service']) && $room['additional_service'])}
 								<a href="#" data-toggle="modal" data-target="#rooms_type_extra_demands_{$room['id']}">
 									{displayWtPriceWithCurrency price=($room['demand_price'] + $room['additional_service_price'] + $room['additional_services_auto_add_price'])|escape:'html':'UTF-8' currency=$currency}
 								</a>
@@ -118,7 +118,7 @@
 							{/if}
 						</td>
 						<td class="text-right">
-							{if (isset($room['selected_demands']) && $room['selected_demands']) || (isset($room['selected_services']) && $room['selected_services'])}
+							{if (isset($room['extra_demands']) && $room['extra_demands']) || (isset($room['additional_service']) && $room['additional_service'])}
 								{displayWtPriceWithCurrency price=($room['amt_with_qty'] + $room['additional_services_auto_add_price'] + $room['demand_price'] +  $room['additional_service_price'])|escape:'html':'UTF-8' currency=$currency}
 							{else}
 								{displayWtPriceWithCurrency price=$room['amt_with_qty']|escape:'html':'UTF-8' currency=$currency}
@@ -166,13 +166,7 @@
 																						</div>
 																					</div>
 																					<div class="col-xs-6">
-																						<p><span class="pull-right extra_demand_option_price">
-																							{if isset($roomDemand['adv_option']) && $roomDemand['adv_option']}
-																								{convertPrice price = $roomDemand['adv_option'][$demand['id_option']]['price_tax_excl']|escape:'html':'UTF-8'}
-																							{else}
-																								{convertPrice price = $roomDemand['price_tax_excl']|escape:'html':'UTF-8'}
-																							{/if}
-																						</span></p>
+																						<p><span class="pull-right extra_demand_option_price">{if isset($roomDemand['adv_option']) && $roomDemand['adv_option']}{convertPrice price = $roomDemand['adv_option'][$idGlobalDemand]['price']|escape:'html':'UTF-8'}{else}{convertPrice price = $roomDemand['price']|escape:'html':'UTF-8'}{/if}</span></p>
 																					</div>
 																				</div>
 																			{/if}
@@ -195,31 +189,30 @@
 															{if isset($room['selected_services']) && $room['selected_services']}
 																{foreach $room['selected_services'] as $service}
 																	<div class="row room_demand_block">
-																		<div class="col-xs-5">
-																			<div class="row">
-																				<div class="col-xs-10">
-																					<div>{$service['name']|escape:'html':'UTF-8'}</div>
-																					{if $service.allow_multiple_quantity}
-																						<div class="qty_container">
-																						{l s='Quantity:'} {$service.quantity}
-																						</div>
-																					{/if}
+																			<div class="col-xs-5">
+																				<div class="row">
+																					<div class="col-xs-10">
+																						<p>{$service['name']|escape:'html':'UTF-8'}</p>
+																						{if $service.allow_multiple_quantity}
+																							<div class="qty_container">
+																							{l s='Quantity:'} {$service.quantity}
+																							</div>
+																						{/if}
+																					</div>
 																				</div>
 																			</div>
+																			<div class="col-xs-3">
+																				{if $service['auto_add_to_cart'] && $service['price_addition_type'] == Product::PRICE_ADDITION_TYPE_INDEPENDENT}
+																					<span class="badge badge-info label">{l s='Convenience fee'}</span>
+																				{/if}
+																				{if $service['auto_add_to_cart'] && $service['price_addition_type'] == Product::PRICE_ADDITION_TYPE_WITH_ROOM}
+																					<span class="badge badge-info label">{l s='Auto added'}</span>
+																				{/if}
+																			</div>
+																			<div class="col-xs-4">
+																				<span class="pull-right">{convertPrice price=$service.total_price}</span>
+																			</div>
 																		</div>
-																		<div class="col-xs-3">
-																			{if $service['auto_add_to_cart'] && $service['price_addition_type'] == Product::PRICE_ADDITION_TYPE_INDEPENDENT}
-																				<span class="badge badge-info label">{l s='Convenience fee'}</span>
-																			{/if}
-																			{if $service['auto_add_to_cart'] && $service['price_addition_type'] == Product::PRICE_ADDITION_TYPE_WITH_ROOM}
-																				<span class="badge badge-info label">{l s='Auto added'}</span>
-																			{/if}
-																		</div>
-																		<div class="col-xs-4">
-																			<span class="pull-right">{convertPrice price=$service.total_price_tax_excl}</span>
-																		</div>
-																	</div>
-																	<p></p>
 																{/foreach}
 															{/if}
 														</div>
@@ -239,7 +232,7 @@
 			</tbody>
 			<tfoot>
 				<tr>
-					<td colspan="7">{l s='Total cost:'}</td>
+					<td colspan="7">{l s='Total cost of room types:'}</td>
 					<td class="text-right">{displayWtPriceWithCurrency price=$total_products currency=$currency}</td>
 				</tr>
 				{if $total_discounts != 0}

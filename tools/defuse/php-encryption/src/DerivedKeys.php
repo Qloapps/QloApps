@@ -2,25 +2,13 @@
 
 namespace Defuse\Crypto;
 
-/**
- * Class DerivedKeys
- * @package Defuse\Crypto
- */
 final class DerivedKeys
 {
-    /**
-     * @var string
-     */
-    private $akey = '';
-
-    /**
-     * @var string
-     */
-    private $ekey = '';
+    private $akey = null;
+    private $ekey = null;
 
     /**
      * Returns the authentication key.
-     * @return string
      */
     public function getAuthenticationKey()
     {
@@ -29,7 +17,6 @@ final class DerivedKeys
 
     /**
      * Returns the encryption key.
-     * @return string
      */
     public function getEncryptionKey()
     {

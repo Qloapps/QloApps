@@ -445,7 +445,7 @@ p.payment_module a {
 
 /* order-detail - start */
 @media (min-width: 576px) {
-  .product-detail .num-refunded-rooms {
+  .booking-room-detail .num-refunded-rooms {
     float: left !important;
   }
 }

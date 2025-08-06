@@ -30,7 +30,7 @@ class Smarty_Internal_Method_RegisterFilter
      *
      * @api  Smarty::registerFilter()
      *
-     * @link https://www.smarty.net/docs/en/api.register.filter.tpl
+     * @link http://www.smarty.net/docs/en/api.register.filter.tpl
      *
      * @param \Smarty_Internal_TemplateBase|\Smarty_Internal_Template|\Smarty $obj
      * @param string                                                          $type filter type

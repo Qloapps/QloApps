@@ -44,7 +44,6 @@ class HelperKpiCore extends Helper
     public $target;
     public $tooltip;
     public $visible;
-    public $refresh = true;
 
     public function generate()
     {

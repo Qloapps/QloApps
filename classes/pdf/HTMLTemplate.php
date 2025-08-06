@@ -27,7 +27,6 @@
 /**
  * @since 1.5
  */
-#[\AllowDynamicProperties]
 abstract class HTMLTemplateCore
 {
     public $title;

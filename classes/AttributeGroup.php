@@ -161,7 +161,7 @@ class AttributeGroupCore extends ObjectModel
                     return false;
                 }
             }
-            AttributeGroup::cleanPositions();
+            $this->cleanPositions();
         }
         $return = parent::delete();
         if ($return) {

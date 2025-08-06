@@ -1,0 +1,22 @@
+------------------------------
+# V1.0.1 to V1.0.2
+------------------------------
+
+## Improved/Changed Features:
+
+* [CO] : #415 Removed qlo_mod_list.xml
+* [CO] : #370 Added Autoupgrade and Paypal modules in QloApps 
+
+
+-----------------------------
+# V1.0.0 to V1.0.1
+-----------------------------
+
+## Fixed Bug:
+
+- [CO] : Resloved : channel not available issue.
+- [CO] : Resloved : Room features not images not availabe after upgrade.
+
+
+## New Feature:
+- [CO] : Support QloApps upgrade to QloApps:1.5.2.0

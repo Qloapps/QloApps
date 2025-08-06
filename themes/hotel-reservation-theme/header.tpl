@@ -121,11 +121,6 @@
 											{block name='displayTop'}
 												{if isset($HOOK_TOP)}{$HOOK_TOP}{/if}
 											{/block}
-											{if isset($WK_DISPLAY_PROPERTIES_LINK_IN_HEADER) && $WK_DISPLAY_PROPERTIES_LINK_IN_HEADER}
-												<div>
-													<a href="{$link->getPageLink('our-properties')}" class="our_properties_link">{l s='Our Properties'}</a>
-												</div>
-											{/if}
 										</div>
 									</div>
 								</div>

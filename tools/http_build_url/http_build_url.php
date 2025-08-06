@@ -5,6 +5,7 @@
  * http_build_url()".
  *
  * @see http://us2.php.net/manual/en/http.constants.php#http.constants.url
+ * @see https://github.com/jakeasmith/http_build_url
  */
 if (!defined('HTTP_URL_REPLACE')) {
 	define('HTTP_URL_REPLACE', 1);
@@ -92,8 +93,6 @@ if (!function_exists('http_build_url')) {
 		} else {
 			if (isset($parts['path']) && ($flags & HTTP_URL_JOIN_PATH)) {
 				if (isset($url['path']) && substr($parts['path'], 0, 1) !== '/') {
-					// Workaround for trailing slashes
-					$url['path'] .= 'a';
 					$url['path'] = rtrim(
 							str_replace(basename($url['path']), '', $url['path']),
 							'/'
@@ -120,10 +119,6 @@ if (!function_exists('http_build_url')) {
 			}
 		}
 
-		if (isset($url['path']) && $url['path'] !== '' && substr($url['path'], 0, 1) !== '/') {
-			$url['path'] = '/' . $url['path'];
-		}
-
 		foreach ($keys as $key) {
 			$strip = 'HTTP_URL_STRIP_' . strtoupper($key);
 			if ($flags & constant($strip)) {
@@ -133,11 +128,11 @@ if (!function_exists('http_build_url')) {
 
 		$parsed_string = '';
 
-		if (!empty($url['scheme'])) {
+		if (isset($url['scheme'])) {
 			$parsed_string .= $url['scheme'] . '://';
 		}
 
-		if (!empty($url['user'])) {
+		if (isset($url['user'])) {
 			$parsed_string .= $url['user'];
 
 			if (isset($url['pass'])) {
@@ -147,23 +142,25 @@ if (!function_exists('http_build_url')) {
 			$parsed_string .= '@';
 		}
 
-		if (!empty($url['host'])) {
+		if (isset($url['host'])) {
 			$parsed_string .= $url['host'];
 		}
 
-		if (!empty($url['port'])) {
+		if (isset($url['port'])) {
 			$parsed_string .= ':' . $url['port'];
 		}
 
 		if (!empty($url['path'])) {
 			$parsed_string .= $url['path'];
+		} else {
+			$parsed_string .= '/';
 		}
 
-		if (!empty($url['query'])) {
+		if (isset($url['query'])) {
 			$parsed_string .= '?' . $url['query'];
 		}
 
-		if (!empty($url['fragment'])) {
+		if (isset($url['fragment'])) {
 			$parsed_string .= '#' . $url['fragment'];
 		}
 

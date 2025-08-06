@@ -260,7 +260,6 @@
 }
 .order-detail-content .room_price_detail_block .plus-sign{
 	display: flex;
-	justify-content: space-between;
 }
 .product_price_detail_block .product_quantity_block, .product_price_detail_block .price_block {
 	display: inline-block;
@@ -683,29 +682,3 @@
     line-height: 19px;
     color: #333;
     margin-bottom: 15px; }
-
-/* Customer guest suggetions Css */
-.customer_guest_detail_ul {
-    overflow-x: hidden;
-    overflow-y: auto;
-    max-height: 200px;
-    background: #fff;
-	z-index: 10;
-	box-shadow: 0 4px 5px rgba(0, 0, 0, 0.15);
-	position: absolute;
-	width: 90%;}
-.customer_guest_detail_email_list{
-	width: 92%;}
-.customer_guest_detail_li {
-    display: block;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-	padding: 10px;}
-.customer_guest_detail_li.active {
-	color: #fff;
-	background-color: #379bf0;}
-.customer_guest_detail_li:hover {
-	cursor: pointer;
-	background-color: #379bf0;
-	color: #fff;}

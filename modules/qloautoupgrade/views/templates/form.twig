@@ -1,0 +1,16 @@
+<div class="bootstrap" id="{{ name }}Block">
+    <div class="panel">
+        <div class="panel-heading">
+            {{ tabName }}
+        </div>
+        <div class="form-wrapper">
+            {% for field in fields %}
+                {{ field|raw }}
+            {% endfor %}
+        </div>
+        <div class="panel-footer">
+            <button type="submit" class="btn btn-default pull-right" value="{{ 'Save'|trans({}, 'Admin.Actions') }}" name="customSubmitAutoUpgrade"><i class="process-icon-save"></i>
+                {{ 'Save'|trans({}, 'Admin.Actions') }}</button>
+        </div>
+    </div>
+</div>

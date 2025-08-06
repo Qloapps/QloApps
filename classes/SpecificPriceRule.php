@@ -266,8 +266,6 @@ class SpecificPriceRuleCore extends ObjectModel
 
                 $result = array_merge($result, Db::getInstance()->executeS($query));
             }
-            // Remove duplicate after the array_merge
-            $result = array_unique($result, SORT_REGULAR);
         } else {
             // All products without conditions
             if ($products && count($products)) {

@@ -1,24 +1,21 @@
 <?php
 /**
+* 2010-2020 Webkul.
+*
 * NOTICE OF LICENSE
 *
-* This source file is subject to the Open Software License version 3.0
-* that is bundled with this package in the file LICENSE.md
-* It is also available through the world-wide-web at this URL:
-* https://opensource.org/license/osl-3-0-php
-* If you did not receive a copy of the license and are unable to
-* obtain it through the world-wide-web, please send an email
-* to support@qloapps.com so we can send you a copy immediately.
+* All right is reserved,
+* Please go through this link for complete license : https://store.webkul.com/license.html
 *
 * DISCLAIMER
 *
-* Do not edit or add to this file if you wish to upgrade this module to a newer
-* versions in the future. If you wish to customize this module for your needs
-* please refer to https://store.webkul.com/customisation-guidelines for more information.
+* Do not edit or add to this file if you wish to upgrade this module to newer
+* versions in the future. If you wish to customize this module for your
+* needs please refer to https://store.webkul.com/customisation-guidelines/ for more information.
 *
-* @author Webkul IN
-* @copyright Since 2010 Webkul
-* @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
+*  @author    Webkul IN <support@webkul.com>
+*  @copyright 2010-2020 Webkul IN
+*  @license   https://store.webkul.com/license.html
 */
 
 class AdminOrderRefundRequestsController extends ModuleAdminController
@@ -36,15 +33,12 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
         $this->_join .= ' LEFT JOIN `'._DB_PREFIX_.'customer` cust ON (cust.`id_customer` = ord.`id_customer`)';
 
         $this->_orderWay = 'DESC';
-        $this->allow_export = true;
-        $this->_new_list_header_design = true;
         if ($idOrder = Tools::getValue('id_order')) {
-            $this->_select .= ', orsl.`name` as `status_name`, ors.`color`, SUM(IF((ordrd.id_htl_booking != 0) , 1, 0)) as num_rooms, SUM(IF((ordrd.id_service_product_order_detail != 0) , 1, 0)) as num_products';
+            $this->_select .= ', orsl.`name` as `status_name`, ors.`color`';
             $this->_join .= 'LEFT JOIN '._DB_PREFIX_.'order_return_state ors ON (ors.`id_order_return_state` = a.`state`)';
             $this->_join .= 'LEFT JOIN '._DB_PREFIX_.'order_return_state_lang orsl ON (orsl.`id_order_return_state` = a.`state` AND orsl.`id_lang` = '.(int)$this->context->language->id.')';
-            $this->_join .= ' LEFT JOIN `'._DB_PREFIX_.'order_return_detail` ordrd ON (a.`id_order_return` = ordrd.`id_order_return`)';
             $this->_where = ' AND a.`id_order`='. (int)$idOrder;
-            $this->_group = 'GROUP BY a.`id_order_return`';
+            $this->_group = '';
         } else {
             $this->_select .= ', ord.`total_paid_tax_incl` AS total_order, os.`id_order_state`, os.`color`, COUNT(IF(a.`state` = '.(int) Configuration::get('PS_ORS_PENDING').', 1, NULL)) AS total_pending_requests, SUM(a.`refunded_amount`) AS refunded_amount';
             $this->_join .= 'LEFT JOIN '._DB_PREFIX_.'order_state os ON (os.`id_order_state` = ord.`current_state`)';
@@ -62,11 +56,6 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
 
         if ($idOrder = Tools::getValue('id_order')) {
             $refundStatuses = OrderReturnStateCore::getOrderReturnStates($this->context->language->id);
-
-            // to set columns for products and rooms count in render list
-            $objOrderReturn = new OrderReturn();
-            $refundReqBookings = $objOrderReturn->getOrderRefundRequestedBookings($idOrder);
-            $refundReqProducts = $objOrderReturn->getOrderRefundRequestedProducts($idOrder);
 
             $retStatuses = array();
             foreach ($refundStatuses as $status) {
@@ -90,21 +79,6 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
                 'havingFilter' => true,
                 'callback' => 'setCustomerLink',
             );
-
-            if ($refundReqBookings) {
-                $this->fields_list['num_rooms'] = array(
-                    'title' => $this->l('Total Rooms'),
-                    'align' => 'center',
-                    'havingFilter' => true,
-                );
-            }
-            if ($refundReqProducts) {
-                $this->fields_list['num_products'] = array(
-                    'title' => $this->l('Total Products'),
-                    'align' => 'center',
-                    'havingFilter' => true,
-                );
-            }
             $this->fields_list['refunded_amount'] = array(
                 'title' => $this->l('Refunded Amount'),
                 'align' => 'center',
@@ -196,81 +170,7 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
 
     public function setCustomerLink($customerName, $row)
     {
-        if ($this->action == 'export') {
-            return  $customerName.' (#'.$row['id_customer'].')';
-        }
-
         return '<a href="'.$this->context->link->getAdminLink('AdminCustomers').'&id_customer='.$row['id_customer'].'&viewcustomer">'.$customerName.' (#'.$row['id_customer'].')</a>';
-    }
-
-    public function getList(
-        $id_lang,
-        $order_by = null,
-        $order_way = null,
-        $start = 0,
-        $limit = null,
-        $id_lang_shop = false
-    ){
-        if ($this->action == 'export' && empty($this->_listsql)) {
-            if (Tools::getValue('id_order')) {
-                $this->_select .= ', ordtl.*';
-            }  else {
-                $this->_select .= ', GROUP_CONCAT(ordtl.`room_num`) AS `room_num`,
-                    GROUP_CONCAT(DISTINCT ordtl.`room_type_name`) AS `room_type_name`,
-                    ordtl.`hotel_name`, ordtl.`id_order`,
-                    GROUP_CONCAT(ordtl.`date_from`) AS `date_from`,
-                    GROUP_CONCAT(ordtl.`date_to`) AS `date_to`';
-            }
-
-            $this->_join .= ' LEFT JOIN (
-                SELECT GROUP_CONCAT(hbd.`room_num`) AS room_num,
-                GROUP_CONCAT(DISTINCT(hbd.`room_type_name`)) AS room_type_name,
-                ord.`id_order_return`, hbd.`hotel_name`, hbd.`id_order`,
-                GROUP_CONCAT(hbd.`date_from`) AS date_from,
-                GROUP_CONCAT(hbd.`date_to`) AS date_to
-                FROM `'._DB_PREFIX_.'order_return_detail` ord
-                LEFT JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd ON ord.`id_htl_booking` = hbd.`id`
-                GROUP BY ord.`id_order_return`
-            ) AS ordtl ON (ordtl.`id_order_return` = a.`id_order_return`)';
-            $this->fields_list = array_merge($this->fields_list, array(
-                'room_num' => array(
-                    'title' => $this->l('Room num(s)')
-                ),
-                'room_type_name' => array(
-                    'title' => $this->l('Room type(s)'),
-                    'callback' => 'getUniqueRoomTypeNames'
-                ),
-                'hotel_name' => array(
-                    'title' => $this->l('Hotel')
-                ),
-                'date_from' => array(
-                    'title' => $this->l('Date From')
-                ),
-                'date_to' => array(
-                    'title' => $this->l('Date To')
-                ),
-            ));
-        }
-
-        parent::getList(
-            $id_lang,
-            $order_by,
-            $order_way,
-            $start,
-            $limit,
-            $id_lang_shop
-        );
-    }
-
-    public function getUniqueRoomTypeNames($roomTypeNames, $tr)
-    {
-        if ($roomTypeNames) {
-            $roomTypeNames = explode(',', $roomTypeNames);
-            $roomTypeNames = array_unique($roomTypeNames);
-            $roomTypeNames = implode(',', $roomTypeNames);
-        }
-
-        return $roomTypeNames;
     }
 
     public function initToolbar()
@@ -299,7 +199,6 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
         if (!($objOrderReturn = $this->loadObject())) {
             return;
         }
-
         $refundStatuses = OrderReturnStateCore::getOrderReturnStates($this->context->language->id);
         $objCustomer = new Customer($objOrderReturn->id_customer);
         $objOrder = new Order($objOrderReturn->id_order);
@@ -316,8 +215,6 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
                 $booking = array_merge($booking, array_shift($bookingCharges));
             }
         }
-
-        $refundReqProducts = $objOrderReturn->getOrderRefundRequestedProducts($objOrderReturn->id_order, $objOrderReturn->id);
 
         $paymentMethods = array();
         foreach (PaymentModule::getInstalledPaymentModules() as $payment) {
@@ -338,7 +235,6 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
                 'customer_email' => $objCustomer->email,
                 'orderReturnInfo' => (array)$objOrderReturn,
                 'refundReqBookings' => $refundReqBookings,
-                'refundReqProducts' => $refundReqProducts,
                 'orderInfo' => (array) $objOrder,
                 'orderCurrency' => (array) $orderCurrency,
                 'currentOrderStateInfo' => (array) new OrderState($objOrder->current_state,
@@ -456,21 +352,17 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
                     foreach ($idsReturnDetail as $idRetDetail) {
                         $objOrderReturnDetail = new OrderReturnDetail($idRetDetail);
                         // set booking as refunded if return state is refunded/denied
+                        $idHtlBooking = $objOrderReturnDetail->id_htl_booking;
                         $reduction_amount = array(
                             'total_price_tax_excl' => 0,
                             'total_price_tax_incl' => 0,
                             'total_products_tax_excl' => 0,
                             'total_products_tax_incl' => 0,
                         );
-                        if ($idHtlBooking = $objOrderReturnDetail->id_htl_booking) {
-                            $objHtlBooking = new HotelBookingDetail($idHtlBooking);
-                            // perform booking refund processes in the booking tables
-                            $objHtlBooking->processRefundInBookingTables();
-                        } elseif ($id_service_product_order_detail = $objOrderReturnDetail->id_service_product_order_detail) {
-                            $objServiceProductOrderDetail = new ServiceProductOrderDetail($id_service_product_order_detail);
-                            // perform booking refund processes in the service product order tables
-                            $objServiceProductOrderDetail->processRefundInTables();
-                        }
+
+                        $objHtlBooking = new HotelBookingDetail($idHtlBooking);
+                        // perform booking refund processes in the booking tables
+                        $objHtlBooking->processRefundInBookingTables();
 
                         // save individual booking amount for every booking refund
                         $refundedAmount = $refundedAmounts[$idRetDetail];
@@ -483,33 +375,22 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
                         $totalRefundedAmount += $refundedAmount;
 
                         if (Tools::isSubmit('generateCreditSlip')) {
-                            if ($idHtlBooking = $objOrderReturnDetail->id_htl_booking) {
-                                $numDays = HotelHelper::getNumberOfDays(
-                                    $objHtlBooking->date_from,
-                                    $objHtlBooking->date_to
-                                );
+                            $numDays = $objHtlBooking->getNumberOfDays(
+                                $objHtlBooking->date_from,
+                                $objHtlBooking->date_to
+                            );
 
-                                $objHtlBooking = new HotelBookingDetail($idHtlBooking);
-                                $idOrderDetail = $objHtlBooking->id_order_detail;
+                            $objHtlBooking = new HotelBookingDetail($idHtlBooking);
+                            $idOrderDetail = $objHtlBooking->id_order_detail;
 
-                                $bookingList[$idRetDetail] = array(
-                                    'id_htl_booking' => $idHtlBooking,
-                                    'id_order_detail' => $idOrderDetail,
-                                    'quantity' => $numDays,
-                                    'num_days' => $numDays,
-                                    'unit_price' => $refundedAmount / $numDays,
-                                    'amount' => $refundedAmount,
-                                );
-                            } elseif ($idServiceProductOrder = $objOrderReturnDetail->id_service_product_order_detail) {
-                                $objServiceProductOrderDetail = new ServiceProductOrderDetail($idServiceProductOrder);
-                                $bookingList[$idRetDetail] = array(
-                                    'id_service_product_order_detail' => $idServiceProductOrder,
-                                    'id_order_detail' => $objServiceProductOrderDetail->id_order_detail,
-                                    'quantity' => $objServiceProductOrderDetail->quantity,
-                                    'unit_price' => $refundedAmount / $objServiceProductOrderDetail->quantity,
-                                    'amount' => $refundedAmount,
-                                );
-                            }
+                            $bookingList[$idHtlBooking] = array(
+                                'id_htl_booking' => $idHtlBooking,
+                                'id_order_detail' => $idOrderDetail,
+                                'quantity' => $numDays,
+                                'num_days' => $numDays,
+                                'unit_price' => $refundedAmount / $numDays,
+                                'amount' => $refundedAmount,
+                            );
                         }
                     }
 
@@ -534,7 +415,12 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
 
                     // change state of the order to refunded if all the room bookings in the order are completely refunded
                     if ($objRefundState->refunded) {
-                        $idOrderState = $objOrder->getOrderCompleteRefundStatus();
+                        $idOrderState = 0;
+                        if ($objOrder->hasCompletelyRefunded(Order::ORDER_COMPLETE_REFUND_FLAG)) {
+                            $idOrderState = Configuration::get('PS_OS_REFUND');
+                        } elseif ($objOrder->hasCompletelyRefunded(Order::ORDER_COMPLETE_CANCELLATION_FLAG)) {
+                            $idOrderState = Configuration::get('PS_OS_CANCELED');
+                        }
 
                         // If order is completely refunded or cancelled then change the order state
                         if ($idOrderState) {

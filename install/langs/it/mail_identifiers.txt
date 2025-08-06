@@ -1,0 +1,12 @@
+Salve {firstname} {lastname},
+
+I dati personali di login del tuo negozio {shop_name}:
+
+* Password: {passwd}
+* Indirizzo e-mail: {email}
+
+{shop_name} - {shop_url}
+
+
+
+{shop_url} powered by Webkul™

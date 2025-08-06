@@ -1,24 +1,21 @@
 <?php
 /**
+* 2010-2020 Webkul.
+*
 * NOTICE OF LICENSE
 *
-* This source file is subject to the Open Software License version 3.0
-* that is bundled with this package in the file LICENSE.md
-* It is also available through the world-wide-web at this URL:
-* https://opensource.org/license/osl-3-0-php
-* If you did not receive a copy of the license and are unable to
-* obtain it through the world-wide-web, please send an email
-* to support@qloapps.com so we can send you a copy immediately.
+* All right is reserved,
+* Please go through this link for complete license : https://store.webkul.com/license.html
 *
 * DISCLAIMER
 *
-* Do not edit or add to this file if you wish to upgrade this module to a newer
-* versions in the future. If you wish to customize this module for your needs
-* please refer to https://store.webkul.com/customisation-guidelines for more information.
+* Do not edit or add to this file if you wish to upgrade this module to newer
+* versions in the future. If you wish to customize this module for your
+* needs please refer to https://store.webkul.com/customisation-guidelines/ for more information.
 *
-* @author Webkul IN
-* @copyright Since 2010 Webkul
-* @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
+*  @author    Webkul IN <support@webkul.com>
+*  @copyright 2010-2020 Webkul IN
+*  @license   https://store.webkul.com/license.html
 */
 
 class WkRoomSearchBlockAutoCompleteSearchModuleFrontController extends ModuleFrontController
@@ -50,13 +47,13 @@ class WkRoomSearchBlockAutoCompleteSearchModuleFrontController extends ModuleFro
                     if ($hotelInfo = $obj_htl_info->hotelBranchInfoByCategoryId($category['id_category'])) {
                         $maxOrderDate = HotelOrderRestrictDate::getMaxOrderDate($hotelInfo['id']);
                         $maxOrderDate = date('Y-m-d', strtotime($maxOrderDate));
-                        $minBookingOffset = (int) HotelOrderRestrictDate::getMinimumBookingOffset($hotelInfo['id']);
+                        $preparationTime = (int) HotelOrderRestrictDate::getPreparationTime($hotelInfo['id']);
                         $hotelsInfo[] = array(
                             'id_hotel' => $hotelInfo['id'],
                             'id_category' => $hotelInfo['id_category'],
                             'hotel_name' => $hotelInfo['hotel_name'],
                             'max_order_date' => $maxOrderDate,
-                            'min_booking_offset' => $minBookingOffset
+                            'preparation_time' => $preparationTime
                         );
                     }
                 }

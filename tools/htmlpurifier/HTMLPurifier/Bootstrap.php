@@ -79,11 +79,44 @@ class HTMLPurifier_Bootstrap
     public static function registerAutoload()
     {
         $autoload = array('HTMLPurifier_Bootstrap', 'autoload');
-        if (spl_autoload_functions() === false) {
+        if (($funcs = spl_autoload_functions()) === false) {
             spl_autoload_register($autoload);
-        } else {
-            // prepend flag exists, no need for shenanigans
-            spl_autoload_register($autoload, true, true);
+        } elseif (function_exists('spl_autoload_unregister')) {
+            if (version_compare(PHP_VERSION, '5.3.0', '>=')) {
+                // prepend flag exists, no need for shenanigans
+                spl_autoload_register($autoload, true, true);
+            } else {
+                $buggy  = version_compare(PHP_VERSION, '5.2.11', '<');
+                $compat = version_compare(PHP_VERSION, '5.1.2', '<=') &&
+                          version_compare(PHP_VERSION, '5.1.0', '>=');
+                foreach ($funcs as $func) {
+                    if ($buggy && is_array($func)) {
+                        // :TRICKY: There are some compatibility issues and some
+                        // places where we need to error out
+                        $reflector = new ReflectionMethod($func[0], $func[1]);
+                        if (!$reflector->isStatic()) {
+                            throw new Exception(
+                                'HTML Purifier autoloader registrar is not compatible
+                                with non-static object methods due to PHP Bug #44144;
+                                Please do not use HTMLPurifier.autoload.php (or any
+                                file that includes this file); instead, place the code:
+                                spl_autoload_register(array(\'HTMLPurifier_Bootstrap\', \'autoload\'))
+                                after your own autoloaders.'
+                            );
+                        }
+                        // Suprisingly, spl_autoload_register supports the
+                        // Class::staticMethod callback format, although call_user_func doesn't
+                        if ($compat) {
+                            $func = implode('::', $func);
+                        }
+                    }
+                    spl_autoload_unregister($func);
+                }
+                spl_autoload_register($autoload);
+                foreach ($funcs as $func) {
+                    spl_autoload_register($func);
+                }
+            }
         }
     }
 }

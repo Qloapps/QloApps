@@ -22,7 +22,7 @@ class Smarty_Internal_Method_ClearAllCache
      * Empty cache folder
      *
      * @api  Smarty::clearAllCache()
-     * @link https://www.smarty.net/docs/en/api.clear.all.cache.tpl
+     * @link http://www.smarty.net/docs/en/api.clear.all.cache.tpl
      *
      * @param \Smarty $smarty
      * @param integer $exp_time expiration time

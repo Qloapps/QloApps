@@ -90,8 +90,7 @@ class HTMLTemplateOrderSlipCore extends HTMLTemplateInvoice
 
         $customer = new Customer((int)$this->order->id_customer);
         $this->order->total_paid_tax_excl = $this->order->total_paid_tax_incl = $this->order->total_products = $this->order->total_products_wt = 0;
-        $roomsDetails = array();
-        $productsDetails = array();
+
         if ($this->order_slip->amount > 0) {
             foreach ($this->order->products as &$product) {
                 // $product['total_price_tax_excl'] = $product['unit_price_tax_excl'] * $product['product_quantity'];
@@ -102,10 +101,9 @@ class HTMLTemplateOrderSlipCore extends HTMLTemplateInvoice
 						SELECT * FROM `'._DB_PREFIX_.'order_slip_detail`
 						WHERE `id_order_slip` = '.(int)$this->order_slip->id.'
                         AND `id_order_detail` = '.(int)$product['id_order_detail'].'
-                        AND `id_htl_booking` = '.(int)$product['id_htl_booking'].'
-                        AND `id_service_product_order_detail` = '.(int)$product['id_service_product_order_detail']);
+                        AND `id_htl_booking` = '.(int)$product['id_htl_booking']);
 
-                        $product['total_price_tax_excl'] = $order_slip_detail['amount_tax_excl'];
+                    $product['total_price_tax_excl'] = $order_slip_detail['amount_tax_excl'];
                     $product['total_price_tax_incl'] = $order_slip_detail['amount_tax_incl'];
                 }
 
@@ -113,12 +111,6 @@ class HTMLTemplateOrderSlipCore extends HTMLTemplateInvoice
                 $this->order->total_products_wt += $product['total_price_tax_incl'];
                 $this->order->total_paid_tax_excl = $this->order->total_products;
                 $this->order->total_paid_tax_incl = $this->order->total_products_wt;
-
-                if ($product['id_htl_booking']) {
-                    $roomsDetails[] = $product;
-                } else {
-                    $productsDetails[] = $product;
-                }
             }
         } else {
             $this->order->products = null;
@@ -152,13 +144,10 @@ class HTMLTemplateOrderSlipCore extends HTMLTemplateInvoice
                 }
             }
         }
-
         $this->smarty->assign(array(
             'order' => $this->order,
             'order_slip' => $this->order_slip,
             'order_details' => $this->order->products,
-            'roomsDetails' => $roomsDetails,
-            'productsDetails' => $productsDetails,
             'cart_rules' => $this->order_slip->order_slip_type == 1 ? $this->order->getCartRules($this->order_invoice->id) : false,
             'amount_choosen' => $this->order_slip->order_slip_type == 2 ? true : false,
             'delivery_address' => $formatted_delivery_address,
@@ -231,11 +220,10 @@ class HTMLTemplateOrderSlipCore extends HTMLTemplateInvoice
     {
         $breakdowns = array(
             'room_tax' => $this->getRoomTypeTaxesBreakdown(),
-            'service_products_tax' => $this->getServiceProductsTaxesBreakdown(),
             'shipping_tax' => $this->getShippingTaxesBreakdown(),
             'ecotax_tax' => $this->order_slip->getEcoTaxTaxesBreakdown(),
         );
-        
+
         foreach ($breakdowns as $type => $bd) {
             if (empty($bd)) {
                 unset($breakdowns[$type]);
@@ -286,7 +274,7 @@ class HTMLTemplateOrderSlipCore extends HTMLTemplateInvoice
         $order_detail = array_filter($this->order->products, function($v) {
             return ((isset($v['is_booking_product']) && $v['is_booking_product'])
                 || ((isset($v['product_auto_add']) && $v['product_auto_add'])
-                    && $v['selling_preference_type'] == Product::SELLING_PREFERENCE_WITH_ROOM_TYPE
+                    && $v['product_service_type'] == Product::SERVICE_PRODUCT_WITH_ROOMTYPE
                     && $v['product_price_addition_type'] == ProductCore::PRICE_ADDITION_TYPE_WITH_ROOM)
             );
         });
@@ -299,79 +287,19 @@ class HTMLTemplateOrderSlipCore extends HTMLTemplateInvoice
                 if (!isset($grouped_details[$row['id_order_detail']])) {
                     $grouped_details[$row['id_order_detail']] = array(
                         'tax_rate' => 0,
-                        'total_tax_base' => $row['total_tax_base'],
+                        'total_tax_base' => 0,
                         'total_amount' => 0,
                         'id_tax' => $row['id_tax'],
                     );
                 }
 
                 $grouped_details[$row['id_order_detail']]['tax_rate'] += $row['tax_rate'];
+                $grouped_details[$row['id_order_detail']]['total_tax_base'] += $row['total_tax_base'];
                 $grouped_details[$row['id_order_detail']]['total_amount'] += $row['total_amount'];
             }
             $details = $grouped_details;
         }
 
-        foreach ($details as $row) {
-            if (!$sum_composite_taxes) {
-                $key = $row['id_tax'];
-            } else {
-                $key = sprintf('%.3f', $row['tax_rate']);
-            }
-            if (!isset($breakdown[$key])) {
-                $breakdown[$key] = array(
-                    'total_price_tax_excl' => 0,
-                    'total_amount' => 0,
-                    'id_tax' => $row['id_tax'],
-                    'rate' => sprintf('%.3f', $row['tax_rate']),
-                );
-            }
-
-            $breakdown[$key]['total_price_tax_excl'] += $row['total_tax_base'];
-            $breakdown[$key]['total_amount'] += $row['total_amount'];
-        }
-
-        foreach ($breakdown as $key => $data) {
-            $breakdown[$key]['total_price_tax_excl'] = Tools::ps_round($data['total_price_tax_excl'], _PS_PRICE_COMPUTE_PRECISION_, $this->order->round_mode);
-            $breakdown[$key]['total_amount'] = Tools::ps_round($data['total_amount'], _PS_PRICE_COMPUTE_PRECISION_, $this->order->round_mode);
-        }
-
-        return $breakdown;
-    }
-
-    public function getServiceProductsTaxesBreakdown()
-    {
-        $sum_composite_taxes = !$this->useOneAfterAnotherTaxComputationMethod();
-
-        // $breakdown will be an array with tax rates as keys and at least the columns:
-        // 	- 'total_price_tax_excl'
-        // 	- 'total_amount'
-        $breakdown = array();
-        $order_detail = array_filter($this->order->products, function($v) {
-            return (!$v['is_booking_product'] && (
-                $v['selling_preference_type'] == Product::SELLING_PREFERENCE_STANDALONE
-                || $v['selling_preference_type'] == Product::SELLING_PREFERENCE_HOTEL_STANDALONE
-            ));
-        });
-
-        $details = $this->order->getProductTaxesDetails($order_detail, false);
-
-        if ($sum_composite_taxes) {
-            $grouped_details = array();
-            foreach ($details as $row) {
-                if (!isset($grouped_details[$row['id_order_detail']])) {
-                    $grouped_details[$row['id_order_detail']] = array(
-                        'tax_rate' => 0,
-                        'total_tax_base' => $row['total_tax_base'],
-                        'total_amount' => 0,
-                        'id_tax' => $row['id_tax'],
-                    );
-                }
-
-                $grouped_details[$row['id_order_detail']]['tax_rate'] += $row['tax_rate'];
-                $grouped_details[$row['id_order_detail']]['total_amount'] += $row['total_amount'];
-            }
-            $details = $grouped_details;
-        }
         foreach ($details as $row) {
             if (!$sum_composite_taxes) {
                 $key = $row['id_tax'];
@@ -397,6 +325,7 @@ class HTMLTemplateOrderSlipCore extends HTMLTemplateInvoice
         }
 
         ksort($breakdown);
+
         return $breakdown;
     }
 

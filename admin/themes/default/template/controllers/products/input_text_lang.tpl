@@ -38,7 +38,7 @@
 			id="{$input_name}_{$language.id_lang}"
 			class="form-control {if isset($input_class)}{$input_class} {/if}"
 			name="{$input_name}_{$language.id_lang}"
-			value="{$input_value[$language.id_lang]|default:''|escape:'html'}"
+			value="{$input_value[$language.id_lang]|htmlentitiesUTF8|default:''}"
 			onkeyup="if (isArrowKey(event)) return ;updateFriendlyURL();"
 			onblur="updateLinkRewrite();"
 			{if isset($required)} required="required"{/if}

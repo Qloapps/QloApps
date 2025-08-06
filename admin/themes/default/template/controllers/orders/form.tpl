@@ -177,7 +177,7 @@
 		$('body').on('click', '.delete_service_product', function(){
 			if (confirm("{l s='Are you sure?'}"))
         	{
-                $(".loading_overlay").show();
+
 				$.ajax({
 					type:"POST",
 					url: "{$link->getAdminLink('AdminOrders')|addslashes}",
@@ -204,10 +204,7 @@
 						{
 							alert("l s='Some error occured.please try again.'}");
 						}
-					},
-                    complete: function(){
-                        $(".loading_overlay").hide();
-                    }
+					}
 				});
 				$(this).closest("tr").remove();
 			}
@@ -283,27 +280,6 @@
 			};
 			updateProductPrice(params, cart_row);
 		})
-		$(document).on('change', '.product_quantity', function(e) {
-			var cart_row = $(this).closest('tr');
-			var qty = parseInt($(this).val());
-			var qtyhidden= parseInt($(this).siblings('.product_quantity_hidden').val());
-			var qty_to_update = qty - qtyhidden;
-			if ((qty_to_update) > 0) {
-				var opt = 'up';
-			} else {
-				var opt = 'down';
-			}
-
-			var params = {
-				id_product: parseInt($(cart_row).attr('data-id-product')),
-				qty: qty_to_update,
-				opt: opt,
-				id_cart: id_cart
-			};
-
-			updateQuantity(params, cart_row);
-			$(this).siblings('.product_quantity_hidden').val($(this).val())
-		});
 		$('#order_message').live('change', function(e) {
 			e.preventDefault();
 			$.ajax({
@@ -319,7 +295,7 @@
 					id_cart: id_cart,
 					id_customer: id_customer,
 					message: $(this).val()
-				},
+					},
 				success : function(res)
 				{
 					displaySummary(res);
@@ -635,10 +611,7 @@
 			'width': '90%',
 			'height': '90%',
 			'afterClose' : function () {
-				let customer = $('#customer').val();
-				if (customer != '' && customer.length > 3) {
-					searchCustomers();
-				}
+				searchCustomers();
 			}
 		});
 		/*$("#new_address").fancybox({
@@ -699,7 +672,6 @@
 			success : function(response) {
 				updateCartLine(response.curr_booking_info, cart_row);
 				updateCartSummaryData(response.cart_info);
-				updateCartVouchers(response.cart_info.summary.discounts);
 			}
 		});
 	}
@@ -725,26 +697,6 @@
 		});
 	}
 
-	function updateQuantity(params, cart_row)
-	{
-		$.ajax({
-			type:"POST",
-			url: "{$link->getAdminLink('AdminCarts')|addslashes}",
-			async: true,
-			dataType: "JSON",
-			data: {
-				ajax: "1",
-				token: "{getAdminToken tab='AdminCarts'}",
-				tab: "AdminCarts",
-				action: "updateProductQuantity",
-				params: params,
-			},
-			success : function(response) {
-				// updateCartLine(response.curr_booking_info, cart_row);
-				// updateCartSummaryData(response.cart_info);
-			}
-		});
-	}
 
 	function updateCartLine(data, cart_row) {
 		$(cart_row).find('.cart_line_total_rooms_price').html(data.amt_with_qty);
@@ -889,11 +841,9 @@
 		});
 	}
 
-	let customerSearchAjax = '';
 	function searchCustomers()
 	{
-		abortRunningAjax(customerSearchAjax);
-		customerSearchAjax = $.ajax({
+		$.ajax({
 			type:"POST",
 			url : "{$link->getAdminLink('AdminCustomers')}",
 			async: true,
@@ -932,12 +882,6 @@
 			}
 		});
 	}
-
-	function abortRunningAjax(ajaxVar) {
-        if (ajaxVar) {
-            ajaxVar.abort();
-        }
-    }
 
 	function setupCustomer(idCustomer)
 	{
@@ -1555,9 +1499,6 @@
 			var idRoom = $(this).attr('id_room');
 			var dateFrom = $(this).attr('date_from');
 			var dateTo = $(this).attr('date_to');
-            var idHotelCartBooking = $(this).attr('id_hotel_cart_booking');
-
-            $(".loading_overlay").show();
 			$.ajax({
 				type: 'POST',
 				dataType: 'JSON',
@@ -1572,29 +1513,17 @@
 					id_room: idRoom,
 					id_cart: idCart,
 					id_product: idProduct,
-					id_hotel_cart_booking: idHotelCartBooking,
 					action: 'getRoomTypeCartDemands',
 					ajax: true
 				},
 				success: function(response) {
-                    if (response.hasError) {
-                        var errorHtml = error_found_txt + ':<br>';
-                        errorHtml += '<ol>';
-                        $.each(response.errors, function(key, errorMsg) {
-                            errorHtml += '<li>' + errorMsg + '</li>';
-                        });
-                        errorHtml += '</ol>';
-                        showErrorMessage(errorHtml);
-                    } else {
-                        $('#customer_cart_details').after(response.html_exta_demands);
+					if (response.status) {
+						$('#customer_cart_details').after(response.html_exta_demands);
 						// $('#rooms_type_extra_demands').find('#room_type_demands_desc').html('');
 						// $('#rooms_type_extra_demands').find('#room_type_demands_desc').append(response.html_exta_demands);
 						$('#rooms_type_extra_demands').modal('show');
-                    }
+					}
 				},
-                complete: function() {
-                    $(".loading_overlay").hide();
-                }
 			});
 		});
 		$(document).on('hidden.bs.modal', '#rooms_type_extra_demands', function (e) {
@@ -1613,7 +1542,6 @@
 				});
 			});
 			var idBookingCart = $(this).attr('id_cart_booking');
-            $(".loading_overlay").show();
 			$.ajax({
 				type: 'POST',
 				dataType: 'JSON',
@@ -1635,10 +1563,7 @@
 					} else {
 						showErrorMessage(txtExtraDemandErr);
 					}
-				},
-                complete: function() {
-                    $(".loading_overlay").hide();
-                }
+				}
 			});
 		});
 
@@ -1659,7 +1584,6 @@
 					});
 				});
 				var idBookingCart = $(this).closest('.room_demand_block').find('.id_room_type_demand').attr('id_cart_booking');
-                $(".loading_overlay").show();
 				$.ajax({
 					type: 'POST',
 					dataType: 'JSON',
@@ -1681,11 +1605,22 @@
 						} else {
 							showErrorMessage(txtExtraDemandErr);
 						}
-					},
-                    complete: function() {
-                        $(".loading_overlay").hide();
-                    }
+					}
 				});
+			}
+		});
+
+		$(document).on('click', '.change_room_type_service_product', function() {
+			updateServiceProducts(this);
+		});
+
+		$(document).on('focusout', '#rooms_type_extra_demands .qty', function(e) {
+			var qty_wntd = $(this).val();
+			if (qty_wntd == '' || !$.isNumeric(qty_wntd)) {
+				$(this).val(1);
+			}
+			if ($(this).closest('.room_demand_block').find('.change_room_type_service_product').is(':checked')) {
+				updateServiceProducts($(this).closest('.room_demand_block').find('.change_room_type_service_product'));
 			}
 		});
 
@@ -1747,130 +1682,47 @@
 			}
 		});
 
-        // click on back button on created facilities while additional facilities edit
-        $(document).on('click', '#back_to_service_btn', function() {
-            $('#room_type_services_desc').show();
-            $('#add_new_room_services_block').hide();
-            $('#back_to_service_btn').hide();
-			$('#btn_new_room_service').show();
-        });
-
-		// Add new custom service: Show hide new custom service form
-		$(document).on('click', '#btn_new_room_service', function() {
-			$('#add_new_room_services_block').show();
-			$('#back_to_service_btn').show();
-			$('#room_type_services_desc').hide();
-			$('#btn_new_room_service').hide();
-		});
-
-		// Add new custom service: change auto added option
-		$(document).on('change', '#add_new_room_services_form input[name="new_service_auto_added"]', function() {
-			var room_type_tax_rule_group_exist = $("#room_type_tax_rule_group_exist").val();
-			if ($(this).val() == 1) {
-				$("#new_service_price_tax_rule_container").hide();
-				$("#new_service_price_addition_type_container").show();
-				$("#new_service_qty_container").hide();
-			} else {
-				$("#new_service_price_addition_type_container").hide();
-				$("#new_service_qty_container").show();
-				$("#new_service_price_tax_rule_container").show();
+		function updateServiceProducts(element)
+		{
+			var operator = $(element).is(':checked') ? 'up' : 'down';
+			var id_product = $(element).val();
+			var id_cart_booking = $(element).data('id_cart_booking');
+			var qty = $(element).closest('.room_demand_block').find('input.qty').val();
+			if (typeof(qty) == 'undefined') {
+				qty = 1;
 			}
-		});
-
-		// Add new custom service to the room
-		$(document).on('submit', '#add_new_room_services_form', function(e) {
-			e.preventDefault();
-			var form_data = new FormData(this);
-			form_data.append('ajax', true);
-			form_data.append('action', 'addNewRoomServices');
-
-			$(".loading_overlay").show();
 			$.ajax({
 				type: 'POST',
 				headers: {
 					"cache-control": "no-cache"
 				},
-				url: "{$link->getAdminLink('AdminCarts')|addslashes}",
+				url: "{$link->getAdminLink('AdminOrders')|addslashes}",
 				dataType: 'JSON',
 				cache: false,
-				data: form_data,
-				processData: false,
-				contentType: false,
+				data: {
+					operator: operator,
+					id_product: id_product,
+					id_cart_booking: id_cart_booking,
+					qty: qty,
+					action: 'updateServiceProduct',
+					ajax: true
+				},
 				success: function(jsonData) {
 					if (!jsonData.hasError) {
-						if (jsonData.service_panel) {
-							$('#room_type_service_product_desc').replaceWith(jsonData.service_panel);
-						}
 						showSuccessMessage(txtExtraDemandSucc);
 					} else {
-						var errorHtml = error_found_txt + ':<br>';
-						errorHtml += '<ol>';
-						$.each(jsonData.errors, function(key, errorMsg) {
-							errorHtml += '<li>' + errorMsg + '</li>';
-						});
-						errorHtml += '</ol>';
-						showErrorMessage(errorHtml);
+						showErrorMessage(jsonData.errors);
+
 					}
-				},
-				complete: function() {
-					$(".loading_overlay").hide();
 				}
 			});
-		});
 
-        $(document).on('click', '.change_room_type_service_product', function() {
-            if ($(this).prop('checked')) {
-                $("#selected_service_product_"+$(this).val()).val(1);
-            } else {
-                $("#selected_service_product_"+$(this).val()).val(0);
-            }
-		});
-
-        $(document).on('submit', '#update_selected_room_services_form', function(e) {
-            e.preventDefault();
-            var form_data = new FormData(this);
-            form_data.append('ajax', true);
-            form_data.append('action', 'updateSelectedRoomServices');
-
-            $(".loading_overlay").show();
-            $.ajax({
-                type: 'POST',
-                headers: {
-                    "cache-control": "no-cache"
-                },
-                url: "{$link->getAdminLink('AdminCarts')|addslashes}",
-                dataType: 'JSON',
-                cache: false,
-                data: form_data,
-                processData: false,
-                contentType: false,
-                success: function(jsonData) {
-                    if (!jsonData.hasError) {
-                        if (jsonData.service_panel) {
-                            $('#room_type_service_product_desc').replaceWith(jsonData.service_panel);
-                        }
-                        showSuccessMessage(txtExtraDemandSucc);
-                    } else {
-                        if (jsonData.errors != 'undefined' && jsonData.errors.length) {
-                            var errorHtml = error_found_txt + ':<br>';
-                            errorHtml += '<ol>';
-                            $.each(jsonData.errors, function(key, errorMsg) {
-                                errorHtml += '<li>' + errorMsg + '</li>';
-                            });
-                            errorHtml += '</ol>';
-                            showErrorMessage(errorHtml);
-                        }
-                    }
-                },
-                complete: function() {
-                    $(".loading_overlay").hide();
-                }
-            });
-        });
+		}
 	});
 </script>
 
 <div class="leadin">{block name="leadin"}{/block}</div>
+{include file='controllers/orders/_current_cart_details_data.tpl'}
     {* If cart has errors the do not allow to proceed with this cart *}
     <div class="panel form-horizontal" id="customer_part" {if isset($is_order_created) && $is_order_created}style="display:none;"{/if}>
         <div class="panel-heading">
@@ -1960,7 +1812,6 @@
             </div>
         </div> -->*}<!-- by webkul to hide unnessesary content -->
     </div>
-	{include file='controllers/orders/_current_cart_details_data.tpl'}
 
     <form class="form-horizontal" action="{$link->getAdminLink('AdminOrders')|escape:'html':'UTF-8'}&amp;addorder=1&amp;cart_id={$cart->id}" method="post" style="display:none" id="cart_detail_form">
         <div class="panel" id="products_part" style="display:none;">
@@ -2319,15 +2170,6 @@
                             <textarea name="order_message" id="order_message" rows="3" cols="45"></textarea>
                         </div>
                     </div>
-					<div class="form-group col-lg-12">
-						<span class="col-lg-3"></span>
-						<p class="checkbox col-lg-6">
-							<label class="control-label" for="visibility">
-								<input type="checkbox" name="visibility" id="visibility" value="1" />
-								{l s='Display Message to Customer?'}
-							</label>
-						</p>
-					</div>
                     <div class="form-group" {if $order_total <= 0}style="display: none;"{/if}>
                         {if !$PS_CATALOG_MODE}
                         <div class="col-lg-9 col-lg-offset-3">
@@ -2347,19 +2189,6 @@
                     {else}
                         {assign var=is_full_payment value=true}
                     {/if}
-					<div class="form-group">
-						<label class="control-label col-lg-3">{l s="Send mails"}</label>
-						<div class="col-lg-9">
-							<span class="switch prestashop-switch fixed-width-lg">
-								<input type="radio" name="send_mails" id="send_mails_on" value="1" checked="checked">
-								<label for="send_mails_on">{l s="Yes"}</label>
-								<input type="radio" name="send_mails" id="send_mails_off" value="0">
-								<label for="send_mails_off">{l s="No"}</label>
-								<a class="slide-button btn"></a>
-							</span>
-							<p class="help-block">{l s='If disabled, no mail related to this order will be sent during order creation.'}</p>
-						</div>
-					</div>
                     <div class="form-group" {if $order_total <= 0}style="display: none;"{/if}>
                         <label class="control-label col-lg-3">{l s="Full payment"}</label>
                         <div class="col-lg-9">
@@ -2448,7 +2277,8 @@
 	{addJsDefL name='max_children_txt'}{l s='Maximum children occupancy reached' js=1}{/addJsDefL}
 	{addJsDefL name='no_children_allowed_txt'}{l s='Only adults can be accommodated' js=1}{/addJsDefL}
 	{addJsDefL name='invalid_occupancy_txt'}{l s='Invalid occupancy(adults/children) found.' js=1}{/addJsDefL}
-    {addJsDefL name='error_found_txt'}{l s='Errors found' js=1}{/addJsDefL}
+
+
 {/strip}
 
 <div id="loader_container">

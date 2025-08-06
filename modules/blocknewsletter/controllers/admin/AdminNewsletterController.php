@@ -1,24 +1,21 @@
 <?php
 /**
+* 2010-2024 Webkul.
+*
 * NOTICE OF LICENSE
 *
-* This source file is subject to the Open Software License version 3.0
-* that is bundled with this package in the file LICENSE.md
-* It is also available through the world-wide-web at this URL:
-* https://opensource.org/license/osl-3-0-php
-* If you did not receive a copy of the license and are unable to
-* obtain it through the world-wide-web, please send an email
-* to support@qloapps.com so we can send you a copy immediately.
+* All right is reserved,
+* Please go through LICENSE.txt file inside our module
 *
 * DISCLAIMER
 *
-* Do not edit or add to this file if you wish to upgrade this module to a newer
-* versions in the future. If you wish to customize this module for your needs
-* please refer to https://store.webkul.com/customisation-guidelines for more information.
+* Do not edit or add to this file if you wish to upgrade this module to newer
+* versions in the future. If you wish to customize this module for your
+* needs please refer to CustomizationPolicy.txt file inside our module for more information.
 *
 * @author Webkul IN
-* @copyright Since 2010 Webkul
-* @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
+* @copyright 2010-2024 Webkul IN
+* @license LICENSE.txt
 */
 
 class AdminNewsletterController extends ModuleAdminController
@@ -138,7 +135,7 @@ class AdminNewsletterController extends ModuleAdminController
         return $tpl->fetch();
     }
 
-    public function displayViewCustomerLink($token, $id, $name = null)
+    public function displayViewCustomerLink($token = null, $id, $name = null)
     {
         if (Customer::customerIdExistsStatic($id)) {
             $tpl = $this->context->smarty->createTemplate(
@@ -319,7 +316,7 @@ class AdminNewsletterController extends ModuleAdminController
 
                 $fileHandle = fopen($filePath, 'w+');
                 foreach ($subscribers as $subscriber) {
-                    fputcsv($fileHandle, $subscriber, ';', escape: "");
+                    fputcsv($fileHandle, $subscriber);
                 }
 
                 if (Tools::file_exists_cache($filePath)) {

@@ -1,0 +1,13 @@
+Bonjour {firstname} {lastname},
+
+Voici les informations personnelles concernant votre nouvelle boutique {shop_name} :
+
+Mot de passe : {passwd}
+Adresse électronique : {email}
+
+
+{shop_name} - {shop_url}
+
+
+
+{shop_url} propulsé par Webkul™

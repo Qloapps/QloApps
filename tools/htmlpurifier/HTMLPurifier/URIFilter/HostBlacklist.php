@@ -35,7 +35,7 @@ class HTMLPurifier_URIFilter_HostBlacklist extends HTMLPurifier_URIFilter
     public function filter(&$uri, $config, $context)
     {
         foreach ($this->blacklist as $blacklisted_host_fragment) {
-            if ($uri->host !== null && strpos($uri->host, $blacklisted_host_fragment) !== false) {
+            if (strpos($uri->host, $blacklisted_host_fragment) !== false) {
                 return false;
             }
         }

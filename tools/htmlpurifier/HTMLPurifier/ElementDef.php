@@ -176,7 +176,7 @@ class HTMLPurifier_ElementDef
 
         if (!empty($def->content_model)) {
             $this->content_model =
-                str_replace("#SUPER", (string)$this->content_model, $def->content_model);
+                str_replace("#SUPER", $this->content_model, $def->content_model);
             $this->child = false;
         }
         if (!empty($def->content_model_type)) {

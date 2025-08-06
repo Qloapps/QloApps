@@ -1,23 +1,20 @@
 {**
+* 2010-2022 Webkul.
+*
 * NOTICE OF LICENSE
 *
-* This source file is subject to the Open Software License version 3.0
-* that is bundled with this package in the file LICENSE.md
-* It is also available through the world-wide-web at this URL:
-* https://opensource.org/license/osl-3-0-php
-* If you did not receive a copy of the license and are unable to
-* obtain it through the world-wide-web, please send an email
-* to support@qloapps.com so we can send you a copy immediately.
+* All right is reserved,
+* Please go through LICENSE.txt file inside our module
 *
 * DISCLAIMER
 *
-* Do not edit or add to this file if you wish to upgrade this module to a newer
-* versions in the future. If you wish to customize this module for your needs
-* please refer to https://store.webkul.com/customisation-guidelines for more information.
+* Do not edit or add to this file if you wish to upgrade this module to newer
+* versions in the future. If you wish to customize this module for your
+* needs please refer to CustomizationPolicy.txt file inside our module for more information.
 *
 * @author Webkul IN
-* @copyright Since 2010 Webkul
-* @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
+* @copyright 2010-2022 Webkul IN
+* @license LICENSE.txt
 *}
 
 <div class="panel">
@@ -153,9 +150,8 @@
 									<textarea
 									name="short_description_{$language.id_lang}"
 									id="short_description_{$language.id_lang}"
-									{if isset($PS_SHORT_DESC_LIMIT) && $PS_SHORT_DESC_LIMIT} maxlength="{$PS_SHORT_DESC_LIMIT|intval}"{/if}
 									cols="2" rows="3"
-									class="form-control">{if isset($smarty.post.$short_desc_name)}{$smarty.post.$short_desc_name}{elseif isset($edit)}{$hotel_info.short_description[{$language.id_lang}]}{/if}</textarea>
+									class="wk_tinymce form-control">{if isset($smarty.post.$short_desc_name)}{$smarty.post.$short_desc_name}{elseif isset($edit)}{$hotel_info.short_description[{$language.id_lang}]}{/if}</textarea>
 								</div>
 							{/foreach}
 						</div>
@@ -199,12 +195,6 @@
 						<label class="col-sm-3 control-label required">{l s='Address :' mod='hotelreservationsystem'}</label>
 						<div class="col-sm-6">
 							<textarea name="address" rows="4" cols="35" >{if isset($smarty.post.address)}{$smarty.post.address}{elseif isset($edit)}{$address_info.address1|escape:'htmlall':'UTF-8'}{/if}</textarea>
-						</div>
-					</div>
-					<div class="form-group check_in_div" style="position:relative">
-						<label class="col-sm-3 control-label" for="fax">{l s='Fax' mod='hotelreservationsystem'}</label>
-						<div class="col-sm-6">
-							<input autocomplete="off" type="text" class="form-control" id="fax" name="fax" value="{if isset($smarty.post.fax)}{$smarty.post.fax}{elseif isset($edit)}{$hotel_info.fax|escape:'htmlall':'UTF-8'}{/if}" />
 						</div>
 					</div>
 					<div class="form-group">
@@ -306,7 +296,7 @@
 								<input type="hidden" id="loclongitude" name="loclongitude" value="{if isset($edit)}{$hotel_info.longitude|escape:'htmlall':'UTF-8'}{/if}" />
 								<input type="hidden" id="locformatedAddr" name="locformatedAddr" value="{if isset($edit)}{$hotel_info.map_formated_address}{/if}" />
 								<input type="hidden" id="googleInputField" name="googleInputField" value="{if isset($edit)}{$hotel_info.map_input_text}{/if}" />
-								<div id="pac-input" class="controls" type="text"></div>
+								<input id="pac-input" class="controls" type="text" placeholder="{l s='Search' mod='hotelreservationsystem'}">
 								<div id="map"></div>
 							</div>
 						</div>
@@ -437,23 +427,23 @@
 					{if isset($hotel_info.id) && $hotel_info.id}
 						<div class="form-group">
 							<label class="control-label col-lg-3">
-								<span>{l s='Use Global Maximum checkout offset:' mod='hotelreservationsystem'}</span>
+								<span>{l s='Use Global Maximum Order date :' mod='hotelreservationsystem'}</span>
 							</label>
 							<div class="col-lg-6">
 								<span class="switch prestashop-switch fixed-width-lg">
-									<input type="radio" {if isset($smarty.post.enable_use_global_max_checkout_offset)} {if $smarty.post.enable_use_global_max_checkout_offset} checked="checked"{/if} {elseif isset($edit) && isset($order_restrict_date_info.use_global_max_checkout_offset) && $order_restrict_date_info.use_global_max_checkout_offset} checked="checked" {else if isset($order_restrict_date_info) && !$order_restrict_date_info} checked="checked" {/if} value="1" id="enable_use_global_max_checkout_offset_on" name="enable_use_global_max_checkout_offset">
-									<label for="enable_use_global_max_checkout_offset_on">{l s='Yes' mod='hotelreservationsystem'}</label>
-									<input type="radio" {if isset($smarty.post.enable_use_global_max_checkout_offset)} {if !$smarty.post.enable_use_global_max_checkout_offset} checked="checked"{/if} {elseif isset($edit) && isset($order_restrict_date_info.use_global_max_checkout_offset) && !$order_restrict_date_info.use_global_max_checkout_offset} checked="checked" {/if} value="0" id="enable_use_global_max_checkout_offset_off" name="enable_use_global_max_checkout_offset">
-									<label for="enable_use_global_max_checkout_offset_off">{l s='No' mod='hotelreservationsystem'}</label>
+									<input type="radio" {if isset($edit) && isset($order_restrict_date_info.use_global_max_order_date) && $order_restrict_date_info.use_global_max_order_date} checked="checked" {else} checked="checked" {/if} value="1" id="enable_use_global_max_order_date_on" name="enable_use_global_max_order_date">
+									<label for="enable_use_global_max_order_date_on">{l s='Yes' mod='hotelreservationsystem'}</label>
+									<input {if isset($edit) && isset($order_restrict_date_info.use_global_max_order_date) && !$order_restrict_date_info.use_global_max_order_date} checked="checked" {/if} type="radio" value="0" id="enable_use_global_max_order_date_off" name="enable_use_global_max_order_date">
+									<label for="enable_use_global_max_order_date_off">{l s='No' mod='hotelreservationsystem'}</label>
 									<a class="slide-button btn"></a>
 								</span>
-								<div class="help-block">{l s='Global Maximum checkout offset:' mod='hotelreservationsystem'} {$PS_MAX_CHECKOUT_OFFSET}</div>
+								<div class="help-block">{l s='Global max order date:' mod='hotelreservationsystem'} {dateFormat date=$MAX_GLOBAL_BOOKING_DATE}</div>
 							</div>
 						</div>
-						<div class="form-group" {if isset($smarty.post.enable_use_global_max_checkout_offset)} {if !$smarty.post.enable_use_global_max_checkout_offset} style="display:block;" {else} style="display:none;" {/if} {elseif isset($order_restrict_date_info.use_global_max_checkout_offset) && !$order_restrict_date_info.use_global_max_checkout_offset} style="display:block;" {else} style="display:none;" {/if}>
-							<label class="control-label col-sm-3 required" for="max_checkout_offset">{l s='Maximum checkout offset :' mod='hotelreservationsystem'}</label>
+						<div class="form-group" {if isset($smarty.post.enable_use_global_max_order_date)}{if !$smarty.post.enable_use_global_max_order_date}style="display:block;"{else}style="display:none;"{/if}{elseif isset($order_restrict_date_info.use_global_max_order_date) && !$order_restrict_date_info.use_global_max_order_date}style="display:block;" {else} style="display:none;" {/if}>
+							<label class="control-label col-sm-3 required" for="maximum_booking_date">{l s='Maximum Check-out Date to book a room :' mod='hotelreservationsystem'}</label>
 							<div class="col-sm-2">
-								<input type="text" class="form-control" id="max_checkout_offset" name="max_checkout_offset" value="{if isset($smarty.post.max_checkout_offset)}{$smarty.post.max_checkout_offset}{elseif isset($order_restrict_date_info.max_checkout_offset)}{$order_restrict_date_info.max_checkout_offset|escape:'htmlall':'UTF-8'}{/if}" />
+								<input type="text" class="form-control" id="maximum_booking_date" name="maximum_booking_date" value="{if isset($order_restrict_date_info.max_order_date)}{$order_restrict_date_info.max_order_date|escape:'htmlall':'UTF-8'}{/if}" />
 							</div>
 						</div>
 						<div class="form-group">
@@ -462,19 +452,19 @@
 							</label>
 							<div class="col-lg-6">
 								<span class="switch prestashop-switch fixed-width-lg">
-									<input type="radio" {if isset($smarty.post.enable_use_global_min_booking_offset)} {if $smarty.post.enable_use_global_min_booking_offset} checked="checked" {/if} {elseif isset($edit) && isset($order_restrict_date_info.use_global_min_booking_offset) && $order_restrict_date_info.use_global_min_booking_offset} checked="checked" {else if isset($order_restrict_date_info) && !$order_restrict_date_info} checked="checked" {/if} value="1" id="enable_use_global_min_booking_offset_on" name="enable_use_global_min_booking_offset">
-									<label for="enable_use_global_min_booking_offset_on">{l s='Yes' mod='hotelreservationsystem'}</label>
-									<input type="radio" {if isset($smarty.post.enable_use_global_min_booking_offset)} {if !$smarty.post.enable_use_global_min_booking_offset} checked="checked" {/if} {elseif isset($edit) && isset($order_restrict_date_info.use_global_min_booking_offset) && !$order_restrict_date_info.use_global_min_booking_offset} checked="checked" {/if} value="0" id="enable_use_global_min_booking_offset_off" name="enable_use_global_min_booking_offset">
-									<label for="enable_use_global_min_booking_offset_off">{l s='No' mod='hotelreservationsystem'}</label>
+									<input type="radio" {if isset($edit) && isset($order_restrict_date_info.use_global_preparation_time) && $order_restrict_date_info.use_global_preparation_time} checked="checked" {else} checked="checked" {/if} value="1" id="enable_use_global_preparation_time_on" name="enable_use_global_preparation_time">
+									<label for="enable_use_global_preparation_time_on">{l s='Yes' mod='hotelreservationsystem'}</label>
+									<input {if isset($edit) && isset($order_restrict_date_info.use_global_preparation_time) && !$order_restrict_date_info.use_global_preparation_time} checked="checked" {/if} type="radio" value="0" id="enable_use_global_preparation_time_off" name="enable_use_global_preparation_time">
+									<label for="enable_use_global_preparation_time_off">{l s='No' mod='hotelreservationsystem'}</label>
 									<a class="slide-button btn"></a>
 								</span>
-								<div class="help-block">{l s='Global minimum booking offset :' mod='hotelreservationsystem'} {$PS_MIN_BOOKING_OFFSET}</div>
+								<div class="help-block">{l s='Global minimum booking offset :' mod='hotelreservationsystem'} {$GLOBAL_PREPARATION_TIME}</div>
 							</div>
 						</div>
-						<div class="form-group" {if isset($smarty.post.enable_use_global_min_booking_offset)} {if !$smarty.post.enable_use_global_min_booking_offset} style="display:block;" {else} style="display:none;" {/if} {else if isset($edit) && isset($order_restrict_date_info.use_global_min_booking_offset) && !$order_restrict_date_info.use_global_min_booking_offset} style="display:block;" {else} style="display:none;" {/if}>
-							<label class="control-label col-sm-3 required" for="min_booking_offset">{l s='Minimum booking offset :' mod='hotelreservationsystem'}</label>
+						<div class="form-group" {if isset($smarty.post.enable_use_global_preparation_time)}{if !$smarty.post.enable_use_global_preparation_time}style="display:block;"{else}style="display:none;"{/if}{elseif isset($order_restrict_date_info.use_global_preparation_time) && !$order_restrict_date_info.use_global_preparation_time}style="display:block;" {else} style="display:none;" {/if}>
+							<label class="control-label col-sm-3 required" for="preparation_time">{l s='Minimum booking offset :' mod='hotelreservationsystem'}</label>
 							<div class="col-sm-2">
-								<input type="text" class="form-control" id="min_booking_offset" name="min_booking_offset" value="{if isset($smarty.post.min_booking_offset)}{$smarty.post.min_booking_offset|escape:'html':'UTF-8'}{elseif isset($edit) && isset($order_restrict_date_info.min_booking_offset)}{$order_restrict_date_info.min_booking_offset|escape:'htmlall':'UTF-8'}{/if}" />
+								<input type="text" class="form-control" id="preparation_time" name="preparation_time" value="{if isset($smarty.post.preparation_time)}{$smarty.post.preparation_time|escape:'html':'UTF-8'}{elseif isset($edit) && isset($order_restrict_date_info.preparation_time)}{$order_restrict_date_info.preparation_time|escape:'htmlall':'UTF-8'}{/if}" />
 							</div>
 							<div class="col-lg-9 col-lg-offset-3">
 								<div class="help-block">{l s='Set to 0 to disable this feature.' mod='hotelreservationsystem'}</div>
@@ -492,20 +482,20 @@
 					{hook h='displayAdminAddHotelFormRefundPoliciesTabBefore' id_hotel=$hook_arg_id_hotel}
 
 					{if isset($hotel_info.id) && $hotel_info.id}
-						{if isset($WK_ORDER_REFUND_ALLOWED) && !$WK_ORDER_REFUND_ALLOWED}
-							<div class="alert alert-info">
-								{l s='To enable hotel-wise refunds, activate order refunds in' mod='hotelreservationsystem'} <a href="{$link->getAdminLink('AdminOrderRefundRules')|escape:'html':'UTF-8'}" target="_blank">{l s='Manage Order Refund Rules' mod='hotelreservationsystem'}</a>
-							</div>
-						{/if}
 						<div class="form-group">
 							<label for="active_refund" class="control-label col-sm-5">
 								<span title="" data-toggle="tooltip" class="label-tooltip" data-original-title='{l s='Enable, if you want to enable refund for this hotel.' mod='hotelreservationsystem'}'>{l s='Enable refund' mod='hotelreservationsystem'}</span>
 							</label>
 							<div class="col-sm-7">
 								<span class="switch prestashop-switch fixed-width-lg">
-									<input type="radio" value="1" id="active_refund_on" name="active_refund" {if isset($WK_ORDER_REFUND_ALLOWED) && !$WK_ORDER_REFUND_ALLOWED} disabled="disabled" {elseif isset($smarty.post.active_refund)}{if $smarty.post.active_refund}checked="checked"{/if}{elseif isset($hotel_info) && $hotel_info.active_refund}checked="checked"{/if}>
+									<input type="radio" value="1" id="active_refund_on" name="active_refund"
+									{if isset($smarty.post.active_refund)}{if $smarty.post.active_refund}checked="checked"{/if}{elseif isset($hotel_info) && $hotel_info.active_refund}checked="checked"{/if}>
+
 									<label for="active_refund_on">{l s='Yes' mod='hotelreservationsystem'}</label>
-									<input type="radio" value="0" id="active_refund_off" name="active_refund" {if isset($WK_ORDER_REFUND_ALLOWED) && !$WK_ORDER_REFUND_ALLOWED} disabled="disabled" checked="checked" {elseif isset($smarty.post.active_refund)}{if !$smarty.post.active_refund}checked="checked"{/if}{elseif !isset($hotel_info)}checked="checked"{elseif isset($hotel_info) && !$hotel_info.active_refund}checked="checked"{/if}>
+
+									<input type="radio" value="0" id="active_refund_off" name="active_refund"
+									{if isset($smarty.post.active_refund)}{if !$smarty.post.active_refund}checked="checked"{/if}{elseif !isset($hotel_info)}checked="checked"{elseif isset($hotel_info) && !$hotel_info.active_refund}checked="checked"{/if}>
+
 									<label for="active_refund_off">{l s='No' mod='hotelreservationsystem'}</label>
 									<a class="slide-button btn"></a>
 								</span>

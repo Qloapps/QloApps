@@ -120,12 +120,6 @@
     <keywords/>
     <url_rewrite>returnari</url_rewrite>
   </meta>
-  <meta id='our-properties' id_shop='1'>
-    <title>Proprietățile noastre</title>
-    <description/>
-    <keywords/>
-    <url_rewrite>our-properties</url_rewrite>
-  </meta>
   <meta id="order-slip" id_shop="1">
     <title>Bon de comandă</title>
     <description/>

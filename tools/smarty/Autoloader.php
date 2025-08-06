@@ -5,11 +5,6 @@
  * @package Smarty
  */
 
-
-if (!defined('SMARTY_HELPER_FUNCTIONS_LOADED')) {
-	include __DIR__ . '/functions.php';
-}
-
 /**
  * Smarty Autoloader
  *
@@ -44,7 +39,7 @@ class Smarty_Autoloader
      *
      * @var array
      */
-    public static $rootClasses = array('smarty' => 'Smarty.class.php');
+    public static $rootClasses = array('smarty' => 'Smarty.class.php', 'smartybc' => 'SmartyBC.class.php',);
 
     /**
      * Registers Smarty_Autoloader backward compatible to older installations.
@@ -78,10 +73,14 @@ class Smarty_Autoloader
      */
     public static function register($prepend = false)
     {
-        self::$SMARTY_DIR = defined('SMARTY_DIR') ? SMARTY_DIR : __DIR__ . DIRECTORY_SEPARATOR;
+        self::$SMARTY_DIR = defined('SMARTY_DIR') ? SMARTY_DIR : dirname(__FILE__) . DIRECTORY_SEPARATOR;
         self::$SMARTY_SYSPLUGINS_DIR = defined('SMARTY_SYSPLUGINS_DIR') ? SMARTY_SYSPLUGINS_DIR :
             self::$SMARTY_DIR . 'sysplugins' . DIRECTORY_SEPARATOR;
-        spl_autoload_register(array(__CLASS__, 'autoload'), true, $prepend);
+        if (version_compare(PHP_VERSION, '5.3.0', '>=')) {
+            spl_autoload_register(array(__CLASS__, 'autoload'), true, $prepend);
+        } else {
+            spl_autoload_register(array(__CLASS__, 'autoload'));
+        }
     }
 
     /**
@@ -94,7 +93,7 @@ class Smarty_Autoloader
         if ($class[ 0 ] !== 'S' || strpos($class, 'Smarty') !== 0) {
             return;
         }
-        $_class = smarty_strtolower_ascii($class);
+        $_class = strtolower($class);
         if (isset(self::$rootClasses[ $_class ])) {
             $file = self::$SMARTY_DIR . self::$rootClasses[ $_class ];
             if (is_file($file)) {

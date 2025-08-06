@@ -71,7 +71,7 @@ class HTMLPurifier_DefinitionCacheFactory
             return $this->caches[$method][$type];
         }
         if (isset($this->implementations[$method]) &&
-            class_exists($class = $this->implementations[$method])) {
+            class_exists($class = $this->implementations[$method], false)) {
             $cache = new $class($type);
         } else {
             if ($method != 'Serializer') {

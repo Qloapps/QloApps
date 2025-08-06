@@ -39,40 +39,16 @@ class ContactControllerCore extends FrontController
             $saveContactKey = $this->context->cookie->contactFormKey;
             $extension = array('.txt', '.rtf', '.doc', '.docx', '.pdf', '.zip', '.png', '.jpeg', '.gif', '.jpg');
             $file_attachment = Tools::fileAttachment('fileUpload');
-            $message = trim(Tools::getValue('message')); // Html entities is not usefull, iscleanHtml check there is no bad html tags.
+            $message = Tools::getValue('message'); // Html entities is not usefull, iscleanHtml check there is no bad html tags.
             $url = Tools::getValue('url');
-            $phone = Tools::getValue('phone');
-            $subject = trim(Tools::getValue('subject'));
-            $userName = Tools::getValue('user_name');
-            $id_contact = (int)Tools::getValue('id_contact');
-            $objCustomerThread = new CustomerThread();
-            $id_customer_thread = (int)$objCustomerThread->getIdCustomerThreadByToken(Tools::getValue('token'));
-            $nameRequired = Configuration::get('PS_CUSTOMER_SERVICE_REQUIRED_NAME');
-            $phoneRequired = Configuration::get('PS_CUSTOMER_SERVICE_REQUIRED_PHONE');
-            if (!Configuration::get('PS_CUSTOMER_SERVICE_DISPLAY_CONTACT')) {
-                $id_contact = (int) Configuration::get('PS_CUSTOMER_SERVICE_CONTACT');
-            }
-
             if (!($from = trim(Tools::getValue('from'))) || !Validate::isEmail($from)) {
                 $this->errors[] = Tools::displayError('Invalid email address.');
             } elseif (!$message) {
                 $this->errors[] = Tools::displayError('The message cannot be blank.');
             } elseif (!Validate::isCleanHtml($message)) {
                 $this->errors[] = Tools::displayError('Invalid message');
-            } elseif (!$id_customer_thread && !$subject) {
-                $this->errors[] = Tools::displayError('The title cannot be blank.');
-            } elseif (!$id_customer_thread && !Validate::isCleanHtml($subject)) {
-                $this->errors[] = Tools::displayError('Invalid subject$subject');
-            } else if (!$id_customer_thread && $nameRequired && !trim($userName)) {
-                $this->errors[] = Tools::displayError('Name is required.');
-            } else if (!$id_customer_thread && trim($nameRequired) && !Validate::isGenericName($userName)) {
-                $this->errors[] = Tools::displayError('Invalid name.');
-            } else if (!$id_customer_thread && $phoneRequired && !trim($phone)) {
-                $this->errors[] = Tools::displayError('Phone is required.');
-            } else if (!$id_customer_thread && trim($phone) && !Validate::isPhoneNumber($phone)) {
-                $this->errors[] = Tools::displayError('Invalid Phone number.');
-            } elseif (!Validate::isLoadedObject($contact = new Contact($id_contact, $this->context->language->id))) {
-                $this->errors[] = Tools::displayError('Please choose who to send the message to.');
+            } elseif (!($id_contact = (int)Tools::getValue('id_contact')) || !(Validate::isLoadedObject($contact = new Contact($id_contact, $this->context->language->id)))) {
+                $this->errors[] = Tools::displayError('Please select a subject from the list provided. ');
             } elseif (!empty($file_attachment['name']) && $file_attachment['error'] != 0) {
                 $this->errors[] = Tools::displayError('An error occurred during the file-upload process.');
             } elseif (!empty($file_attachment['name']) && !in_array(Tools::strtolower(substr($file_attachment['name'], -4)), $extension) && !in_array(Tools::strtolower(substr($file_attachment['name'], -5)), $extension)) {
@@ -95,15 +71,44 @@ class ContactControllerCore extends FrontController
                     $id_order = (int) $order->id_customer === (int) $customer->id ? $id_order : 0;
                 }
 
-                if (!$id_customer_thread) {
-                    $id_customer_thread = CustomerThread::getIdCustomerThreadByEmailAndIdOrder(
-                        $from,
-                        $id_order,
-                        $id_contact,
-                        ' AND a.`status` !='. CustomerThread::QLO_CUSTOMER_THREAD_STATUS_CLOSED
-                    );
+                if (!((
+                        ($id_customer_thread = (int)Tools::getValue('id_customer_thread'))
+                        && (int)Db::getInstance()->getValue('
+						SELECT cm.id_customer_thread FROM '._DB_PREFIX_.'customer_thread cm
+						WHERE cm.id_customer_thread = '.(int)$id_customer_thread.' AND cm.id_shop = '.(int)$this->context->shop->id.' AND token = \''.pSQL(Tools::getValue('token')).'\'')
+                    ) || (
+                        $id_customer_thread = CustomerThread::getIdCustomerThreadByEmailAndIdOrder($from, $id_order, $id_contact)
+                    ))) {
+                    $fields = Db::getInstance()->executeS('
+					SELECT cm.id_customer_thread, cm.id_contact, cm.id_customer, cm.id_order, cm.id_product, cm.email
+					FROM '._DB_PREFIX_.'customer_thread cm
+					WHERE email = \''.pSQL($from).'\' AND cm.id_shop = '.(int)$this->context->shop->id.' AND ('.
+                        ($customer->id ? 'id_customer = '.(int)$customer->id.' OR ' : '').'
+						id_order = '.(int)$id_order.')');
+                    $score = 0;
+                    foreach ($fields as $key => $row) {
+                        $tmp = 0;
+                        if ((int)$row['id_customer'] && $row['id_customer'] != $customer->id && $row['email'] != $from) {
+                            continue;
+                        }
+                        if ($row['id_order'] != 0 && $id_order != $row['id_order']) {
+                            continue;
+                        }
+                        if ($row['email'] == $from) {
+                            $tmp += 4;
+                        }
+                        if ($row['id_contact'] == $id_contact) {
+                            $tmp++;
+                        }
+                        if (Tools::getValue('id_product') != 0 && $row['id_product'] == Tools::getValue('id_product')) {
+                            $tmp += 2;
+                        }
+                        if ($tmp >= 5 && $tmp >= $score) {
+                            $score = $tmp;
+                            $id_customer_thread = $row['id_customer_thread'];
+                        }
+                    }
                 }
-
                 $old_message = Db::getInstance()->getValue('
 					SELECT cm.message FROM '._DB_PREFIX_.'customer_message cm
 					LEFT JOIN '._DB_PREFIX_.'customer_thread cc on (cm.id_customer_thread = cc.id_customer_thread)
@@ -118,31 +123,36 @@ class ContactControllerCore extends FrontController
                     if ($contact->customer_service) {
                         if ((int)$id_customer_thread) {
                             $ct = new CustomerThread($id_customer_thread);
+                            $ct->status = 'open';
+                            $ct->id_lang = (int)$this->context->language->id;
+                            $ct->id_contact = (int)$id_contact;
                             $ct->id_order = (int)$id_order;
+                            if ($id_product = (int)Tools::getValue('id_product')) {
+                                $ct->id_product = $id_product;
+                            }
+                            $ct->update();
                         } else {
                             $ct = new CustomerThread();
                             if (isset($customer->id)) {
                                 $ct->id_customer = (int)$customer->id;
                             }
                             $ct->id_shop = (int)$this->context->shop->id;
-                            $ct->phone = $phone;
-                            $ct->user_name = $userName;
-                            $ct->subject = $subject;
+                            $ct->id_order = (int)$id_order;
+                            if ($id_product = (int)Tools::getValue('id_product')) {
+                                $ct->id_product = $id_product;
+                            }
+                            $ct->id_contact = (int)$id_contact;
+                            $ct->id_lang = (int)$this->context->language->id;
                             $ct->email = $from;
+                            $ct->status = 'open';
                             $ct->token = Tools::passwdGen(12);
+                            $ct->add();
                         }
 
-                        $ct->status = CustomerThread::QLO_CUSTOMER_THREAD_STATUS_OPEN;
-                        $ct->id_lang = (int)$this->context->language->id;
-                        $ct->id_contact = (int)$id_contact;
-
-                        if ($ct->save()) {
+                        if ($ct->id) {
                             $cm = new CustomerMessage();
                             $cm->id_customer_thread = $ct->id;
                             $cm->message = $message;
-                            if ($id_product = (int)Tools::getValue('id_product')) {
-                                $cm->id_product = $id_product;
-                            }
                             if (isset($file_attachment['rename']) && !empty($file_attachment['rename']) && rename($file_attachment['tmp_name'], _PS_UPLOAD_DIR_.basename($file_attachment['rename']))) {
                                 $cm->file_name = $file_attachment['rename'];
                                 @chmod(_PS_UPLOAD_DIR_.basename($file_attachment['rename']), 0664);
@@ -158,22 +168,33 @@ class ContactControllerCore extends FrontController
                     }
 
                     if (!count($this->errors)) {
-                        $smartyMailVars['message'] = Tools::nl2br(stripslashes($message));
-                        $smartyMailVars['email'] = $ct->email;
-                        $smartyMailVars['subject'] = $ct->subject;
-                        $smartyMailVars['phone'] = $ct->phone;
-                        $smartyMailVars['user_name'] = $ct->user_name;
+                        $var_list = array(
+                                        '{order_name}' => '-',
+                                        '{attached_file}' => '-',
+                                        '{message}' => Tools::nl2br(stripslashes($message)),
+                                        '{email}' =>  $from,
+                                        '{product_name}' => '',
+                                    );
 
                         if (isset($file_attachment['name'])) {
-                            $smartyMailVars['attached_file'] = $file_attachment['name'];
+                            $var_list['{attached_file}'] = $file_attachment['name'];
                         }
 
-                        $contact_content_txt = $this->getEmailTemplateContent('contact_content_txt.tpl', Mail::TYPE_TEXT, $smartyMailVars);
-                        $contact_content_html = $this->getEmailTemplateContent('contact_content_html.tpl', Mail::TYPE_TEXT, $smartyMailVars);
-                        $var_list = array(
-                            '{contact_content_txt}' => $contact_content_txt,
-                            '{contact_content_html}' => $contact_content_html,
-                        );
+                        $id_product = (int)Tools::getValue('id_product');
+
+                        if (isset($ct) && Validate::isLoadedObject($ct) && $ct->id_order) {
+                            $order = new Order((int)$ct->id_order);
+                            $var_list['{order_name}'] = $order->getUniqReference();
+                            $var_list['{id_order}'] = (int)$order->id;
+                        }
+
+                        if ($id_product) {
+                            $product = new Product((int)$id_product);
+                            if (Validate::isLoadedObject($product) && isset($product->name[Context::getContext()->language->id])) {
+                                $var_list['{product_name}'] = $product->name[Context::getContext()->language->id];
+                            }
+                        }
+
                         if (!empty($contact->email)) {
                             Mail::Send(
                                 $this->context->language->id,
@@ -205,30 +226,6 @@ class ContactControllerCore extends FrontController
         }
     }
 
-    protected function getEmailTemplateContent($template_name, $mail_type, $var)
-    {
-        $email_configuration = Configuration::get('PS_MAIL_TYPE');
-        if ($email_configuration != $mail_type && $email_configuration != Mail::TYPE_BOTH) {
-            return '';
-        }
-
-        $pathToFindEmail = array(
-            _PS_THEME_DIR_.'mails'.DIRECTORY_SEPARATOR.$this->context->language->iso_code.DIRECTORY_SEPARATOR.$template_name,
-            _PS_THEME_DIR_.'mails'.DIRECTORY_SEPARATOR.'en'.DIRECTORY_SEPARATOR.$template_name,
-            _PS_MAIL_DIR_.$this->context->language->iso_code.DIRECTORY_SEPARATOR.$template_name,
-            _PS_MAIL_DIR_.'en'.DIRECTORY_SEPARATOR.$template_name,
-        );
-
-        foreach ($pathToFindEmail as $path) {
-            if (Tools::file_exists_cache($path)) {
-                $this->context->smarty->assign($var);
-                return $this->context->smarty->fetch($path);
-            }
-        }
-
-        return '';
-    }
-
     public function setMedia()
     {
         parent::setMedia();
@@ -237,16 +234,15 @@ class ContactControllerCore extends FrontController
         $this->addJS(_PS_JS_DIR_.'validate.js');
 
         // GOOGLE MAP
-        if (($PS_API_KEY = Configuration::get('PS_API_KEY')) && ($PS_MAP_ID = Configuration::get('PS_MAP_ID')) && Configuration::get('WK_GOOGLE_ACTIVE_MAP')) {
+        if (($PS_API_KEY = Configuration::get('PS_API_KEY')) && Configuration::get('WK_GOOGLE_ACTIVE_MAP')) {
             Media::addJsDef(
                 array(
                     'PS_STORES_ICON' => $this->context->link->getMediaLink(_PS_IMG_.Configuration::get('PS_STORES_ICON')),
-                    'PS_MAP_ID' => $PS_MAP_ID,
                 )
             );
             $this->addJS(
                 'https://maps.googleapis.com/maps/api/js?key='.$PS_API_KEY.
-                '&libraries=places,marker&loading=async&callback=initMap&language='.$this->context->language->iso_code.'&region='.$this->context->country->iso_code
+                '&libraries=places&language='.$this->context->language->iso_code.'&region='.$this->context->country->iso_code
             );
         }
     }
@@ -263,44 +259,32 @@ class ContactControllerCore extends FrontController
 
         $email = Tools::safeOutput(Tools::getValue('from',
         ((isset($this->context->cookie) && isset($this->context->cookie->email) && Validate::isEmail($this->context->cookie->email)) ? $this->context->cookie->email : '')));
-        $customerName = isset($this->context->customer) ? $this->context->customer->firstname.' '.$this->context->customer->lastname : '';
-        $customerPhone = isset($this->context->customer) ? $this->context->customer->phone: '';
         $this->context->smarty->assign(array(
             'errors' => $this->errors,
             'email' => $email,
-            'customerName' => $customerName,
-            'customerPhone' => $customerPhone,
             'fileupload' => Configuration::get('PS_CUSTOMER_SERVICE_FILE_UPLOAD'),
             'max_upload_size' => (int)Tools::getMaxUploadSize()
         ));
 
-        if ($token = Tools::getValue('token')) {
-            if ($customer_thread = Db::getInstance()->getRow('
+        if (($id_customer_thread = (int)Tools::getValue('id_customer_thread')) && $token = Tools::getValue('token')) {
+            $customer_thread = Db::getInstance()->getRow('
 				SELECT cm.*
 				FROM '._DB_PREFIX_.'customer_thread cm
-				WHERE cm.id_shop = '.(int)$this->context->shop->id.'
+				WHERE cm.id_customer_thread = '.(int)$id_customer_thread.'
+				AND cm.id_shop = '.(int)$this->context->shop->id.'
 				AND token = \''.pSQL($token).'\'
-			')) {
-                $order = new Order((int)$customer_thread['id_order']);
-                if (Validate::isLoadedObject($order)) {
-                    $customer_thread['reference'] = $order->getUniqReference();
-                }
-                $this->context->smarty->assign('customerThread', $customer_thread);
+			');
+
+            $order = new Order((int)$customer_thread['id_order']);
+            if (Validate::isLoadedObject($order)) {
+                $customer_thread['reference'] = $order->getUniqReference();
             }
+            $this->context->smarty->assign('customerThread', $customer_thread);
         }
-
-        $objShop = new Shop();
-        $shopAddress = '';
-        $shopAddress_obj = $objShop->getAddress();
-        if (isset($shopAddress_obj) && $shopAddress_obj instanceof Address) {
-            $shopAddress = AddressFormat::generateAddress($shopAddress_obj, array(), ', ', ' ');
-        }
-
-        $gblHtlAddress = $shopAddress;
-        $gblHtlPhone = Configuration::get('PS_SHOP_PHONE');
-        $gblHtlEmail = Configuration::get('PS_SHOP_EMAIL');
-        $gblHtlRegistrationNumber = Configuration::get('PS_SHOP_DETAILS');
-        $gblHtlFax = Configuration::get('PS_SHOP_FAX');
+        // Send Hotel location information
+        $gblHtlAddress = Configuration::get('WK_HOTEL_GLOBAL_ADDRESS');
+        $gblHtlPhone = Configuration::get('WK_HOTEL_GLOBAL_CONTACT_NUMBER');
+        $gblHtlEmail = Configuration::get('WK_HOTEL_GLOBAL_CONTACT_EMAIL');
         $objHotelInfo = new HotelBranchInformation();
         if ($hotelsInfo = $objHotelInfo->hotelBranchesInfo(false, 1, 1)) {
             foreach ($hotelsInfo as &$hotel) {
@@ -326,33 +310,24 @@ class ContactControllerCore extends FrontController
 
 	    $contactKey = md5(uniqid(microtime(), true));
         $this->context->cookie->__set('contactFormKey', $contactKey);
-        $displayHotelMap = Configuration::get('WK_DISPLAY_CONTACT_PAGE_GOOLGE_MAP');
         $this->context->smarty->assign(
             array(
                 'hotelsInfo' => $hotelsInfo,
                 'viewOnMap' => Configuration::get('WK_GOOGLE_ACTIVE_MAP'),
-                'displayHotels' => Configuration::get('WK_DISPLAY_CONTACT_PAGE_HOTEL_LIST'),
                 'gblHtlPhone' => $gblHtlPhone,
                 'gblHtlEmail' => $gblHtlEmail,
-                'displayHotelMap' => $displayHotelMap,
                 'gblHtlAddress' => $gblHtlAddress,
-                'gblHtlRegistrationNumber' => $gblHtlRegistrationNumber,
-                'gblHtlFax' => $gblHtlFax,
                 'contacts' => Contact::getContacts($this->context->language->id),
                 'message' => html_entity_decode(Tools::getValue('message')),
 	            'contactKey' => $contactKey,
-                'contactNameRequired' => Configuration::get('PS_CUSTOMER_SERVICE_REQUIRED_NAME'),
-                'displayContactName' => Configuration::get('PS_CUSTOMER_SERVICE_DISPLAY_NAME'),
-                'contactPhoneRequired' => Configuration::get('PS_CUSTOMER_SERVICE_REQUIRED_PHONE'),
-                'displayContactPhone' => Configuration::get('PS_CUSTOMER_SERVICE_DISPLAY_PHONE'),
-                'allowContactSelection' => Configuration::get('PS_CUSTOMER_SERVICE_DISPLAY_CONTACT')
             )
         );
 
         //By webkul to send hotels Map Informations for google Map.
-        if ($displayHotelMap && Configuration::get('PS_API_KEY') && Configuration::get('WK_GOOGLE_ACTIVE_MAP')) {
-            if ($hotelLocationArray = $objHotelInfo->getMapFormatHotelsInfo(Configuration::get('WK_MAP_HOTEL_ACTIVE_ONLY'))) {
-                $this->context->smarty->assign('hotelLocationArray', str_replace(array('\n', '\r'), '', json_encode($hotelLocationArray)));
+        if (Configuration::get('PS_API_KEY') && Configuration::get('WK_GOOGLE_ACTIVE_MAP')) {
+            $hotelLocationArray = $objHotelInfo->getMapFormatHotelsInfo(Configuration::get('WK_MAP_HOTEL_ACTIVE_ONLY'));
+            if ($hotelLocationArray) {
+                $this->context->smarty->assign('hotelLocationArray', json_encode($hotelLocationArray));
             }
         }
         //End

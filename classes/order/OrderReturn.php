@@ -189,8 +189,8 @@ class OrderReturnCore extends ObjectModel
     public function getOrderRefundRequestedBookings($idOrder, $idOrderReturn = 0, $onlyBookingIds = 0, $customerView = 0, $skipReqCompletedNonRefunded = 0)
     {
         $sql = 'SELECT hbd.*, ord.*, orr.`state` as id_return_state FROM `'._DB_PREFIX_.'order_return` orr';
-        $sql .= ' INNER JOIN `'._DB_PREFIX_.'order_return_detail` ord ON (orr.`id_order_return` = ord.`id_order_return`)';
-        $sql .= ' INNER JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd ON (hbd.`id` = ord.`id_htl_booking`)';
+        $sql .= ' LEFT JOIN `'._DB_PREFIX_.'order_return_detail` ord ON (orr.`id_order_return` = ord.`id_order_return`)';
+        $sql .= ' LEFT JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd ON (hbd.`id` = ord.`id_htl_booking`)';
         $sql .= ' WHERE orr.`id_order` = '.(int)$idOrder;
 
         if ($idOrderReturn) {
@@ -204,7 +204,7 @@ class OrderReturnCore extends ObjectModel
 
             $objOrder = new Order($idOrder);
             $objBookingDemands = new HotelBookingDemands();
-            $objServiceProductOrderDetail = new ServiceProductOrderDetail();
+            $objRoomTypeServiceProductOrderDetail = new RoomTypeServiceProductOrderDetail();
 
             $calcServicePriceFirst = false;
             if ($objOrder->is_advance_payment && $objOrder->advance_paid_amount <= $objOrder->total_paid_real) {
@@ -251,23 +251,11 @@ class OrderReturnCore extends ObjectModel
                         }
                     }
 
-                    if ($roomSelectedServices = $objServiceProductOrderDetail->getRoomTypeServiceProducts(
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        null,
-                        null,
-                        null,
-                        0,
+                    if ($roomSelectedServices = $objRoomTypeServiceProductOrderDetail->getSelectedServicesForRoom(
                         $bookingRow['id_htl_booking']
                     )) {
-                        if (isset($roomSelectedServices[$bookingRow['id_htl_booking']]['additional_services']) && $roomSelectedServices[$bookingRow['id_htl_booking']]['additional_services']) {
-                            foreach ($roomSelectedServices[$bookingRow['id_htl_booking']]['additional_services'] as $service) {
+                        if (count($roomSelectedServices['additional_services'])) {
+                            foreach ($roomSelectedServices['additional_services'] as $service) {
                                 if ($service['total_price_tax_incl'] > 0) {
                                     if ($objOrder->total_paid_real > 0) {
                                         if ($calcServicePriceFirst) {
@@ -321,62 +309,19 @@ class OrderReturnCore extends ObjectModel
         return $returnDetails;
     }
 
-    /**
-     * Get order refund request products
-     */
-    public function getOrderRefundRequestedProducts($idOrder, $idOrderReturn = 0, $onlyIds = 0, $skipReqCompletedNonRefunded = 0)
-    {
-        $sql = 'SELECT spod.*, ord.*, orr.`state` as id_return_state, p.`allow_multiple_quantity` FROM `'._DB_PREFIX_.'order_return` orr';
-        $sql .= ' INNER JOIN `'._DB_PREFIX_.'order_return_detail` ord ON (orr.`id_order_return` = ord.`id_order_return`)';
-        $sql .= ' INNER JOIN `'._DB_PREFIX_.'service_product_order_detail` spod ON (spod.`id_service_product_order_detail` = ord.`id_service_product_order_detail`)';
-        $sql .= ' LEFT  JOIN `'._DB_PREFIX_.'product` p ON (p.`id_product` = spod.`id_product`)';
-        $sql .= ' WHERE orr.`id_order` = '.(int)$idOrder;
-
-        if ($idOrderReturn) {
-            $sql .= ' AND ord.`id_order_return` = '.(int)$idOrderReturn;
-        }
-        if ($returnDetails = Db::getInstance()->executeS($sql)) {
-            $objOrder = new Order($idOrder);
-            foreach ($returnDetails as $key => &$product) {
-                if ($skipReqCompletedNonRefunded) {
-                    $objReturnState = new OrderReturnState($product['id_return_state']);
-                    if ($objReturnState->refunded && !$product['is_refunded']) {
-                        unset($returnDetails[$key]);
-                        continue;
-                    }
-                }
-
-                $product['paid_amount'] = 0;
-                if ($product['total_price_tax_incl'] > 0) {
-                    if ($objOrder->total_paid_real > 0) {
-                        $product['paid_amount'] = ($objOrder->total_paid_real*$product['total_price_tax_incl'])/ ($objOrder->total_paid_tax_incl + $objOrder->total_discounts_tax_incl);
-                    }
-                }
-            }
-
-            if ($onlyIds) {
-                return array_column($returnDetails, 'id_service_product_order_detail');
-            }
-        }
-
-        return $returnDetails;
-    }
-
-    public static function getOrdersReturn($customer_id, $order_id = false, $no_denied = false, $only_customer = 0, ?Context $context = null)
+    public static function getOrdersReturn($customer_id, $order_id = false, $no_denied = false, $only_customer = 0, Context $context = null)
     {
         if (!$context) {
             $context = Context::getContext();
         }
         $sql = 'SELECT orr.`id_order`, orr.`state`, orr.`id_order_return`, orr.`payment_mode`, orr.`id_transaction`,
             orr.`id_return_type`, orr.`return_type`, ors.`id_cart_rule`, orr.`date_add`, orr.`date_upd`, orr.`refunded_amount`,
-            hbd.`is_cancelled`, SUM(IF(ord.`id_htl_booking`, 1, 0)) AS total_rooms, SUM(IF(ord.`id_service_product_order_detail`, 1, 0)) AS total_products
+            hbd.`is_cancelled`, COUNT(ord.`id_order_return_detail`) AS total_rooms
             FROM `'._DB_PREFIX_.'order_return` orr
             LEFT JOIN `'._DB_PREFIX_.'order_return_detail` ord
             ON (ord.`id_order_return` = orr.`id_order_return`)
             LEFT JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd
             ON (hbd.`id` = ord.`id_htl_booking`)
-            LEFT JOIN `'._DB_PREFIX_.'service_product_order_detail` rtspod
-            ON (rtspod.`id_service_product_order_detail` = ord.`id_service_product_order_detail`)
             LEFT JOIN `'._DB_PREFIX_.'order_slip` ors
             ON (ors.`id_order_slip` = orr.`id_return_type` AND orr.`return_type` = '.(int) self::RETURN_TYPE_ORDER_SLIP.')
             WHERE orr.`id_customer` = '.(int)$customer_id.
@@ -408,7 +353,6 @@ class OrderReturnCore extends ObjectModel
         $idOrder,
         $idOrderReturn = 0,
         $idHtlBooking = 0,
-        $idServiceProductOrderOetail = 0,
         $idLang = 0,
         $orderByLatestRequest = 1
     ) {
@@ -427,10 +371,6 @@ class OrderReturnCore extends ObjectModel
 
         if ($idHtlBooking) {
             $sql .= ' AND ord.`id_htl_booking` = '.(int)$idHtlBooking;
-        }
-
-        if ($idServiceProductOrderOetail) {
-            $sql .= ' AND ord.`id_service_product_order_detail` = '.(int)$idServiceProductOrderOetail;
         }
 
         if ($orderByLatestRequest) {
@@ -574,36 +514,6 @@ class OrderReturnCore extends ObjectModel
                         '{id_transaction}' => $this->id_transaction ? $this->id_transaction : '--',
                     );
 
-                    $data['{refundBookingHtml}'] = '';
-                    $data['{refundBookingTxt}'] = '';
-                    $data['{refundServiceProductsHtml}'] = '';
-                    $data['{refundServiceProductsTxt}'] = '';
-                    $data['{refund_for_txt}'] = Mail::l('products', (int)$idLang);
-                    if ($refundReqProducts = $this->getOrderRefundRequestedProducts(
-                        $this->id_order,
-                        $this->id,
-                        0
-                    )) {
-                        $serviceProductsData = array(
-                            'is_hotel_products' => false,
-                            'service_products' => $refundReqProducts
-                        );
-                        $addressTax = new Address((int)$objOrder->id_address_tax);
-                        if ($addressTax->id_hotel) {
-                            $serviceProductsData['is_hotel_products'] = true;
-                        }
-                        $data['{refundServiceProductsHtml}'] = $objMail->getEmailTemplateContent(
-                            'service_products_refund_request_detail',
-                            Mail::TYPE_HTML,
-                            $serviceProductsData
-                        );
-                        $data['{refundServiceProductsTxt}'] = $objMail->getEmailTemplateContent(
-                            'service_products_refund_request_detail_text',
-                            Mail::TYPE_TEXT,
-                            $serviceProductsData
-                        );
-                    }
-
                     // if mail is true for the customer then send mail to customer with selected template
                     $objCustomer = new Customer($this->id_customer);
                     if ($objOrderReturnState->send_email_to_customer && $objOrderReturnState->customer_template) {
@@ -614,10 +524,13 @@ class OrderReturnCore extends ObjectModel
                             1
                         )) {
                             $idHotel = reset($refundReqBookings)['id_hotel'];
-                            $data['{refundBookingHtml}'] = $objMail->getEmailTemplateContent('bookings_refund_request_detail_customer', Mail::TYPE_HTML, $refundReqBookings);
-                            $data['{refundBookingTxt}'] = $objMail->getEmailTemplateContent('bookings_refund_request_detail_customer_text', Mail::TYPE_TEXT, $refundReqBookings);
-                            $data['{refund_for_txt}'] = Mail::l('bookings', (int)$idLang);
                         }
+
+                        $refBookHtml = $objMail->getEmailTemplateContent('refund_request_detail_customer', Mail::TYPE_HTML, $refundReqBookings);
+                        $refBookTxt = $objMail->getEmailTemplateContent('refund_request_detail_customer', Mail::TYPE_TEXT, $refundReqBookings);
+
+                        $data['{refundBookingHtml}'] = $refBookHtml;
+                        $data['{refundBookingTxt}'] = $refBookTxt;
 
                         // send customer information
                         $link = new Link();
@@ -648,12 +561,14 @@ class OrderReturnCore extends ObjectModel
                             $this->id
                         )) {
                             $idHotel = $refundReqBookings[0]['id_hotel'];
-                            $data['{refundBookingHtml}'] = $objMail->getEmailTemplateContent('bookings_refund_request_detail_admin', Mail::TYPE_HTML, $refundReqBookings);
-                            $data['{refundBookingTxt}'] = $objMail->getEmailTemplateContent('bookings_refund_request_detail_admin_text', Mail::TYPE_TEXT, $refundReqBookings);
-                            $data['{refund_for_txt}'] = Mail::l('bookings', (int)$idLang);
                         }
 
+                        $refBookHtml = $objMail->getEmailTemplateContent('refund_request_detail_admin', Mail::TYPE_HTML, $refundReqBookings);
+                        $refBookTxt = $objMail->getEmailTemplateContent('refund_request_detail_admin', Mail::TYPE_TEXT, $refundReqBookings);
+
                         $data['{cancelation_reason}'] = $this->question;
+                        $data['{refundBookingHtml}'] = $refBookHtml;
+                        $data['{refundBookingTxt}'] = $refBookTxt;
 
                         // send mail to the super admin
                         if ($objOrderReturnState->send_email_to_superadmin) {

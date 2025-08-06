@@ -1,24 +1,21 @@
 <?php
 /**
+* 2010-2020 Webkul.
+*
 * NOTICE OF LICENSE
 *
-* This source file is subject to the Open Software License version 3.0
-* that is bundled with this package in the file LICENSE.md
-* It is also available through the world-wide-web at this URL:
-* https://opensource.org/license/osl-3-0-php
-* If you did not receive a copy of the license and are unable to
-* obtain it through the world-wide-web, please send an email
-* to support@qloapps.com so we can send you a copy immediately.
+* All right is reserved,
+* Please go through this link for complete license : https://store.webkul.com/license.html
 *
 * DISCLAIMER
 *
-* Do not edit or add to this file if you wish to upgrade this module to a newer
-* versions in the future. If you wish to customize this module for your needs
-* please refer to https://store.webkul.com/customisation-guidelines for more information.
+* Do not edit or add to this file if you wish to upgrade this module to newer
+* versions in the future. If you wish to customize this module for your
+* needs please refer to https://store.webkul.com/customisation-guidelines/ for more information.
 *
-* @author Webkul IN
-* @copyright Since 2010 Webkul
-* @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
+*  @author    Webkul IN <support@webkul.com>
+*  @copyright 2010-2020 Webkul IN
+*  @license   https://store.webkul.com/license.html
 */
 
 class HotelHelper
@@ -27,17 +24,17 @@ class HotelHelper
     {
         $objModule = new HotelreservationSystem();
         $jsVars = array(
-                'display_name' => $objModule->l('Display', 'HotelHelper', true),
-                'records_name' => $objModule->l('records per page', 'HotelHelper', true),
-                'no_product' => $objModule->l('No records found', 'HotelHelper', true),
-                'show_page' => $objModule->l('Showing page', 'HotelHelper', true),
-                'show_of' => $objModule->l('of', 'HotelHelper', true),
-                'no_record' => $objModule->l('No records available', 'HotelHelper',true),
-                'filter_from' => $objModule->l('filtered from', 'HotelHelper', true),
-                't_record' => $objModule->l('total records', 'HotelHelper', true),
-                'search_item' => $objModule->l('Search', 'HotelHelper', true),
-                'p_page' => $objModule->l('Previous', 'HotelHelper', true),
-                'n_page' => $objModule->l('Next', 'HotelHelper', true),
+                'display_name' => $objModule->l('Display', 'HotelHelper', false, true),
+                'records_name' => $objModule->l('records per page', 'HotelHelper', false, true),
+                'no_product' => $objModule->l('No records found', 'HotelHelper', false, true),
+                'show_page' => $objModule->l('Showing page', 'HotelHelper', false, true),
+                'show_of' => $objModule->l('of', 'HotelHelper', false, true),
+                'no_record' => $objModule->l('No records available', 'HotelHelper', false, true),
+                'filter_from' => $objModule->l('filtered from', 'HotelHelper', false, true),
+                't_record' => $objModule->l('total records', 'HotelHelper', false, true),
+                'search_item' => $objModule->l('Search', 'HotelHelper', false, true),
+                'p_page' => $objModule->l('Previous', 'HotelHelper', false, true),
+                'n_page' => $objModule->l('Next', 'HotelHelper', false, true),
             );
 
         Media::addJsDef($jsVars);
@@ -1047,13 +1044,14 @@ class HotelHelper
         Configuration::updateValue('WK_ROOM_LEFT_WARNING_NUMBER', 10);
         Configuration::updateValue('WK_HTL_ESTABLISHMENT_YEAR', 2010);
 
-        Configuration::updateValue('PS_SHOP_ADDR1', 'The Hotel Prime, Monticello Dr, Montgomery, 10010');
-        Configuration::updateValue('PS_SHOP_PHONE', '0987654321');
-        Configuration::updateValue('PS_SHOP_EMAIL', 'hotelprime@htl.com');
-
+        Configuration::updateValue(
+            'WK_HOTEL_GLOBAL_ADDRESS',
+            'The Hotel Prime, Monticello Dr, Montgomery, 10010'
+        );
+        Configuration::updateValue('WK_HOTEL_GLOBAL_CONTACT_NUMBER', '0987654321');
+        Configuration::updateValue('WK_HOTEL_GLOBAL_CONTACT_EMAIL', 'hotelprime@htl.com');
         Configuration::updateValue('WK_CUSTOMER_SUPPORT_PHONE_NUMBER', '0987654321');
         Configuration::updateValue('WK_CUSTOMER_SUPPORT_EMAIL', 'hotelprime@htl.com');
-        Configuration::updateValue('WK_DISPLAY_CONTACT_PAGE_HOTEL_LIST', 0);
 
         Configuration::updateValue('WK_TITLE_HEADER_BLOCK', $home_banner_default_title);
         Configuration::updateValue('WK_CONTENT_HEADER_BLOCK', $home_banner_default_content);
@@ -1065,8 +1063,12 @@ class HotelHelper
         Configuration::updateValue('WK_GLOBAL_CHILD_MAX_AGE', 15);
         Configuration::updateValue('WK_GLOBAL_MAX_CHILD_IN_ROOM', 0);
 
-        Configuration::updateValue('PS_MAX_CHECKOUT_OFFSET', 365);
-        Configuration::updateValue('PS_MIN_BOOKING_OFFSET', 0);
+        Configuration::updateValue(
+            'MAX_GLOBAL_BOOKING_DATE',
+            date('Y-m-d', strtotime(date('Y-m-d', time()).' + 1 year'))
+        );
+
+        Configuration::updateValue('GLOBAL_PREPARATION_TIME', 0);
 
         Configuration::updateValue('HTL_FEATURE_PRICING_PRIORITY', 'specific_date;special_day;date_range');
         Configuration::updateValue('WK_GOOGLE_ACTIVE_MAP', 0);
@@ -1097,26 +1099,16 @@ class HotelHelper
             'ru' => 'Мы предлагаем элегантные номера, изысканную кухню и внимательное обслуживание для незабываемого отдыха.',
             'es' => 'Ofrecemos habitaciones elegantes, comidas gourmet y un servicio atento para una estadía inolvidable.',
         );
-        $defaultDimensionUnitLang = array(
-            'en' => 'ft',
-            'nl' => 'ft',
-            'fr' => 'pi',
-            'de' => 'ft',
-            'ru' => 'фут',
-            'es' => 'ft',
-        );
+
         $WK_HTL_CHAIN_NAME = array();
         $WK_HTL_TAG_LINE = array();
         $WK_HTL_SHORT_DESC = array();
-        $defaultDimensionUnit = array();
         foreach ($languages as $lang) {
             if (isset($htlTagLineLang[$lang['iso_code']])) {
                 $WK_HTL_TAG_LINE[$lang['id_lang']] = $htlTagLineLang[$lang['iso_code']];
                 $WK_HTL_SHORT_DESC[$lang['id_lang']] = $htlShortDescLang[$lang['iso_code']];
                 $WK_HTL_CHAIN_NAME[$lang['id_lang']] = $homeBannerTitleLang[$lang['iso_code']];
-                $defaultDimensionUnit[$lang['id_lang']] = $defaultDimensionUnitLang[$lang['iso_code']];
             } else {
-                $defaultDimensionUnit[$lang['id_lang']] = $defaultDimensionUnitLang['en'];
                 $WK_HTL_CHAIN_NAME[$lang['id_lang']] = $homeBannerTitleLang['en'];
                 $WK_HTL_TAG_LINE[$lang['id_lang']] = $htlTagLineLang['en'];
                 $WK_HTL_SHORT_DESC[$lang['id_lang']] = $htlShortDescLang['en'];
@@ -1126,7 +1118,6 @@ class HotelHelper
         Configuration::updateValue('WK_HTL_CHAIN_NAME', $WK_HTL_CHAIN_NAME);
         Configuration::updateValue('WK_HTL_TAG_LINE', $WK_HTL_TAG_LINE);
         Configuration::updateValue('WK_HTL_SHORT_DESC', $WK_HTL_SHORT_DESC);
-        Configuration::updateValue('WK_DIMENSION_UNIT', $defaultDimensionUnit);
 
         // Search Fields
         Configuration::updateValue('PS_FRONT_SEARCH_TYPE', HotelBookingDetail::SEARCH_TYPE_OWS);
@@ -1231,138 +1222,6 @@ class HotelHelper
             }
 
             $pos++;
-        }
-
-        return true;
-    }
-
-    public function createHotelDefaultBedTypes()
-    {
-        $htlBedTypes = array(
-            array(
-                'length' => '6.25',
-                'width'  => '3.16',
-                'name' => array(
-                    'en' => 'Twin Bed',
-                    'nl' => 'Eenpersoonsbed',
-                    'fr' => 'Lit simple',
-                    'de' => 'Einzelbett',
-                    'ru' => 'Односпальная кровать',
-                    'es' => 'Cama individual',
-                ),
-            ),
-            array(
-                'length' => '6.66',
-                'width'  => '3.16',
-                'name' => array(
-                    'en' => 'Twin XL Bed',
-                    'nl' => 'Eenpersoonsbed XL',
-                    'fr' => 'Lit simple XL',
-                    'de' => 'Einzelbett XL',
-                    'ru' => 'Односпальная кровать XL',
-                    'es' => 'Cama individual XL',
-                ),
-            ),
-            array(
-                'length' => '6.25',
-                'width'  => '4.5',
-                'name' => array(
-                    'en' => 'Full Bed',
-                    'nl' => 'Tweepersoonsbed',
-                    'fr' => 'Lit double',
-                    'de' => 'Doppelbett',
-                    'ru' => 'Двуспальная кровать',
-                    'es' => 'Cama doble',
-                ),
-            ),
-            array(
-                'length' => '6.66',
-                'width'  => '5',
-                'name' => array(
-                    'en' => 'Queen Bed',
-                    'nl' => 'Queen size bed',
-                    'fr' => 'Lit Queen',
-                    'de' => 'Queen-Size-Bett',
-                    'ru' => 'Кровать Queen Size',
-                    'es' => 'Cama Queen',
-                ),
-            ),
-            array(
-                'length' => '6.66',
-                'width'  => '6.33',
-                'name' => array(
-                    'en' => 'King Bed',
-                    'nl' => 'King size bed',
-                    'fr' => 'Lit King',
-                    'de' => 'King-Size-Bett',
-                    'ru' => 'Кровать King Size',
-                    'es' => 'Cama King',
-                ),
-            ),
-            array(
-                'length' => '7',
-                'width'  => '6',
-                'name' => array(
-                    'en' => 'California King Bed',
-                    'nl' => 'California King bed',
-                    'fr' => 'Lit California King',
-                    'de' => 'California King-Bett',
-                    'ru' => 'Калифорнийская кровать King Size',
-                    'es' => 'Cama California King',
-                ),
-            ),
-            array(
-                'length' => '6.25',
-                'width'  => '3.16',
-                'name' => array(
-                    'en' => 'Bunk Bed',
-                    'nl' => 'Stapelbed',
-                    'fr' => 'Lit superposé',
-                    'de' => 'Etagenbett',
-                    'ru' => 'Двухъярусная кровать',
-                    'es' => 'Litera',
-                ),
-            ),
-            array(
-                'length' => '6.25',
-                'width'  => '4.5',
-                'name' => array(
-                    'en' => 'Sofa Bed',
-                    'nl' => 'Slaapbank',
-                    'fr' => 'Canapé-lit',
-                    'de' => 'Schlafsofa',
-                    'ru' => 'Диван-кровать',
-                    'es' => 'Sofá cama',
-                ),
-            ),
-            array(
-                'length' => '6.66',
-                'width'  => '5',
-                'name' => array(
-                    'en' => 'Murphy Bed',
-                    'nl' => 'Inklapbed',
-                    'fr' => 'Lit escamotable',
-                    'de' => 'Klappbett',
-                    'ru' => 'Откидная кровать',
-                    'es' => 'Cama abatible',
-                ),
-            ),
-        );
-
-        $languages = Language::getLanguages(true);
-        foreach ($htlBedTypes as $htlBedType) {
-            $objBedType = new HotelBedType();
-            foreach ($languages as $lang) {
-                if (isset($htlBedType['name'][$lang['iso_code']])) {
-                    $objBedType->name[$lang['id_lang']] = $htlBedType['name'][$lang['iso_code']];
-                } else {
-                    $objBedType->name[$lang['id_lang']] = $htlBedType['name']['en'];
-                }
-
-                $objBedType->width = $htlBedType['width'];
-                $objBedType->length = $htlBedType['length'];
-                $objBedType->save();
-            }
         }
 
         return true;
@@ -1769,34 +1628,29 @@ class HotelHelper
         }
         $obj_country = new Country();
         $country_name = $obj_country->getNameById(Configuration::get('PS_LANG_DEFAULT'), $def_cont_id);
+        $cat_country = $this->addCategory($country_name, false, $grp_ids);
 
-        if ($cat_country = $this->addCategory(array('name' => $country_name, 'group_ids' => $grp_ids, 'parent_category' => false))) {
+        if ($cat_country) {
             $states = State::getStatesByIdCountry($def_cont_id);
             if (count($states) > 0) {
                 $state_name = $states[0]['name'];
-                $cat_state = $this->addCategory(array('name' => $state_name, 'group_ids' => $grp_ids, 'parent_category' => $cat_country));
+                $cat_state = $this->addCategory($state_name, $cat_country, $grp_ids);
             }
         }
         if (count($states) > 0) {
-            if (!empty($cat_state)) {
-                $cat_city = $this->addCategory(array('name' => 'Demo City', 'group_ids' => $grp_ids, 'parent_category' => $cat_state));
+            if ($cat_state) {
+                $cat_city = $this->addCategory('Demo City', $cat_state, $grp_ids);
             }
         } else {
-            $cat_city = $this->addCategory(array('name' => 'Demo City', 'group_ids' => $grp_ids, 'parent_category' => $cat_country));
+            $cat_city = $this->addCategory('Demo City', $cat_country, $grp_ids);
         }
-        if (!empty($cat_city)) {
-            if ($cat_hotel = $this->addCategory(array(
-                    'name' => 'The Hotel Prime',
-                    'group_ids' => $grp_ids,
-                    'parent_category' => $cat_city,
-                    'is_hotel' => 1,
-                    'id_hotel' => $htl_id
-                )
-            )) {
-                $obj_hotel_info = new HotelBranchInformation($htl_id);
-                $obj_hotel_info->id_category = $cat_hotel;
-                $obj_hotel_info->save();
-            }
+        if ($cat_city) {
+            $cat_hotel = $this->addCategory('The Hotel Prime', $cat_city, $grp_ids, 1, $htl_id);
+        }
+        if ($cat_hotel) {
+            $obj_hotel_info = new HotelBranchInformation($htl_id);
+            $obj_hotel_info->id_category = $cat_hotel;
+            $obj_hotel_info->save();
         }
         // save dummy hotel as primary hotel
         Configuration::updateValue('WK_PRIMARY_HOTEL', $htl_id);
@@ -1820,7 +1674,6 @@ class HotelHelper
         $roomTypeDemoDataLang = array(
             array(
                 'price' => 1000,
-                'id_bed_types' => array(4),
                 'en' => array(
                     'name' => 'General Rooms',
                     'description_short' => 'Our General Rooms offer space and comfort with multiple bedrooms and a cozy living area. Enjoy flat-screen TVs, complimentary Wi-Fi, and a kitchenette for a perfect family getaway.',
@@ -1854,7 +1707,6 @@ class HotelHelper
             ),
             array(
                 'price' => 1500,
-                'id_bed_types' => array(4, 5),
                 'en' => array(
                     'name' => 'Delux Rooms',
                     'description_short' => 'Enjoy lake views from our Deluxe Rooms with a king-sized bed, elegant furnishings, and a spacious sitting area. Perfect for guests seeking comfort, luxury, and modern amenities.',
@@ -1888,7 +1740,6 @@ class HotelHelper
             ),
             array(
                 'price' => 2000,
-                'id_bed_types' => array(5, 6),
                 'en' => array(
                     'name' => 'Executive Rooms',
                     'description_short' => 'Indulge in our Executive Rooms, featuring separate living and sleeping areas, a luxurious bathroom, and exclusive lounge access. Ideal for business travelers seeking privacy',
@@ -1922,7 +1773,6 @@ class HotelHelper
             ),
             array(
                 'price' => 2500,
-                'id_bed_types' => array(6, 8),
                 'en' => array(
                     'name' => 'Luxury Rooms',
                     'description_short' => 'Retreat to tranquility in our Luxury Rooms with expansive views. Featuring a queen-sized bed, workspace, and serene decor, perfect for business and leisure travelers alike.',
@@ -1956,7 +1806,6 @@ class HotelHelper
             ),
         );
 
-        $objHotelRoomTypeBedType = new HotelRoomTypeBedType();
         $languages = Language::getLanguages(true);
         foreach ($roomTypeDemoDataLang as $key => $roomTypeData) {
             // Add Product
@@ -2086,7 +1935,6 @@ class HotelHelper
 
             // save advance payment information
             $this->saveAdvancedPaymentInfo($product_id);
-            $objHotelRoomTypeBedType->updateRoomTypeBedTypes($roomTypeData['id_bed_types'], $product_id);
         }
     }
 
@@ -2144,7 +1992,7 @@ class HotelHelper
         );
 
         foreach ($categories as &$category) {
-            $idCategory = $this->addCategory(array('name' => $category['name'], 'group_ids' => $idsGroup, 'parent_category' => $idCategoryServices));
+            $idCategory = $this->addCategory($category['name'], $idCategoryServices, $idsGroup);
             $category['id_category'] = $idCategory;
         }
 
@@ -2375,7 +2223,7 @@ class HotelHelper
             $objProduct->active = 1;
             $objProduct->quantity = 999999999;
             $objProduct->booking_product = 0;
-            $objProduct->selling_preference_type = Product::SELLING_PREFERENCE_WITH_ROOM_TYPE;
+            $objProduct->service_product_type = Product::SERVICE_PRODUCT_WITH_ROOMTYPE;
             $objProduct->auto_add_to_cart = $serviceProduct['auto_add_to_cart'];
             $objProduct->show_at_front = $serviceProduct['show_at_front'];
             $objProduct->available_for_order = 1;
@@ -2383,10 +2231,6 @@ class HotelHelper
             $objProduct->price_calculation_method = $serviceProduct['price_calculation_method'];
             $objProduct->is_virtual = 1;
             $objProduct->indexed = 1;
-            if ($objProduct->auto_add_to_cart && $objProduct->price_addition_type == Product::PRICE_ADDITION_TYPE_WITH_ROOM) {
-                $objProduct->id_tax_rules_group = 0;
-            }
-
             $objProduct->save();
             $idProduct = $objProduct->id;
 
@@ -2481,58 +2325,10 @@ class HotelHelper
         return true;
     }
 
-    public function getCategoryParams($params)
+    public function addCategory($name, $parent_cat = false, $group_ids, $ishotel = false, $hotel_id = false)
     {
-        if (!isset($params['parent_category'])) {
-            $params['parent_category'] = false;
-        }
-
-        if (!isset($params['is_hotel'])) {
-            $params['is_hotel'] = false;
-        }
-
-        if (!isset($params['id_hotel'])) {
-            $params['id_hotel'] = 0;
-        }
-
-        if (!isset($params['link_rewrite'])) {
-            $params['link_rewrite'] = false;
-        }
-
-        if (!isset($params['meta_title'])) {
-            $params['meta_title'] = false;
-        }
-
-        if (!isset($params['meta_description'])) {
-            $params['meta_description'] = false;
-        }
-
-        if (!isset($params['meta_keywords'])) {
-            $params['meta_keywords'] = false;
-        }
-
-        return $params;
-    }
-
-    /**
-     * Send parameters in array form
-     * @param array $params
-     *  $params['name']: [name of the category]
-     *  $params['group_ids']: [group_ids of the category]
-     *  $params['parent_category']: [parent_category of the category]
-     *  $params['is_hotel']: [is_hotel = 1 if category is for hotel]
-     *  $params['id_hotel']: [id_hotel of the category, if category is for hotel]
-     *  $params['link_rewrite']: [link_rewrite of the category]
-     *  $params['meta_title']: [meta_title of the category]
-     *  $params['meta_description']: [meta_description of the category]
-     *  $params['meta_keywords']: [meta_keywords of the category]
-     * @return int  returns ID of the category added.
-     */
-    public function addCategory(array $params)
-    {
-        extract($this->getCategoryParams($params));
-        if (!$parent_category) {
-            $parent_category = Configuration::get('PS_LOCATIONS_CATEGORY');
+        if (!$parent_cat) {
+            $parent_cat = Configuration::get('PS_LOCATIONS_CATEGORY');
         }
 
         if (!is_array($name)) {
@@ -2541,9 +2337,9 @@ class HotelHelper
 
         $defaultCatName = $name['en'];
         $languages = Language::getLanguages(true);
-        if ($is_hotel && $id_hotel) {
+        if ($ishotel && $hotel_id) {
             $cat_id_hotel = Db::getInstance()->getValue(
-                'SELECT `id_category` FROM `'._DB_PREFIX_.'htl_branch_info` WHERE id='.(int) $id_hotel
+                'SELECT `id_category` FROM `'._DB_PREFIX_.'htl_branch_info` WHERE id='.$hotel_id
             );
             if ($cat_id_hotel) {
                 $obj_cat = new Category($cat_id_hotel);
@@ -2561,7 +2357,7 @@ class HotelHelper
                         $obj_cat->link_rewrite[$lang['id_lang']] = Tools::link_rewrite($defaultCatName);
                     }
                 }
-                $obj_cat->id_parent = $parent_category;
+                $obj_cat->id_parent = $parent_cat;
                 $obj_cat->groupBox = $group_ids;
                 $obj_cat->save();
                 $cat_id = $obj_cat->id;
@@ -2571,7 +2367,7 @@ class HotelHelper
         }
 
         $context = Context::getContext();
-        $check_category_exists = Category::searchByNameAndParentCategoryId($context->language->id, $defaultCatName, $parent_category);
+        $check_category_exists = Category::searchByNameAndParentCategoryId($context->language->id, $defaultCatName, $parent_cat);
 
         if ($check_category_exists) {
             return $check_category_exists['id_category'];
@@ -2591,7 +2387,7 @@ class HotelHelper
                     $obj->link_rewrite[$lang['id_lang']] = Tools::link_rewrite($defaultCatName);
                 }
             }
-            $obj->id_parent = $parent_category;
+            $obj->id_parent = $parent_cat;
             $obj->groupBox = $group_ids;
             $obj->add();
             $cat_id = $obj->id;
@@ -2696,45 +2492,28 @@ class HotelHelper
 
     public static function getNumberOfDays($dateFrom, $dateTo)
     {
-        if (empty($dateFrom) || empty($dateTo)) {
-            return 0;
-        }
-
         $startDate = new DateTime($dateFrom);
         $endDate = new DateTime($dateTo);
         $daysDifference = $startDate->diff($endDate)->days;
-        Hook::exec('actionDatesDifferenceModifier', array('date_from'=> $dateFrom, 'date_to'=> $dateTo, 'days_difference'=> &$daysDifference));
 
         return $daysDifference;
     }
 
-    /**
-     * Validate the date range for a hotel booking.
-     *
-     * @param string $dateFrom Start date (format: 'Y-m-d H:i:s')
-     * @param string $dateTo End date (format: 'Y-m-d H:i:s')
-     * @param int $idHotel Hotel ID
-     * @return bool True if the date range is valid, otherwise false
-     */
     public static function validateDateRangeForHotel($dateFrom, $dateTo, $idHotel)
     {
         $validStartDateTimeStamp = strtotime(date('Y-m-d'));
-        if ($minBookingOffset = (int) HotelOrderRestrictDate::getMinimumBookingOffset($idHotel)) {
-            $validStartDateTimeStamp = strtotime('+ '.$minBookingOffset.' day', $validStartDateTimeStamp);
+        if ($preparationTime = (int) HotelOrderRestrictDate::getPreparationTime($idHotel)) {
+            $validStartDateTimeStamp = strtotime(date('Y-m-d', strtotime('+ '.$preparationTime.' day')));
         }
 
-        $maxOrderDateTimestamp = strtotime(HotelOrderRestrictDate::getMaxOrderDate($idHotel));
         $dateFromTimestamp = strtotime($dateFrom);
         $dateToTimestamp = strtotime($dateTo);
-
         $isValid = true;
         if ($dateFrom != '' && ($dateFromTimestamp === false || ($dateFromTimestamp < $validStartDateTimeStamp))) {
             $isValid = false;
         } else if ($dateTo != '' && ($dateToTimestamp === false || ($dateToTimestamp < $validStartDateTimeStamp))) {
             $isValid = false;
         } else if ($dateTo != '' && $dateFrom != '' && $dateFromTimestamp >= $dateToTimestamp) {
-            $isValid = false;
-        } else if ($dateToTimestamp > $maxOrderDateTimestamp) {
             $isValid = false;
         }
 
@@ -2788,23 +2567,20 @@ class HotelHelper
         if (!isset($rootNodeId)) {
             $rootNodeId = false;
         }
-        if (!isset($prefix)) {
-            $prefix = '';
-        }
         $treeData = array();
 
         if ($rootNode == self::NODE_COUNTRY) {
-            $treeData = self::generateCountryNodes($rootNodeId, $leafNode, $selectedElements, false, $prefix);
+            $treeData = self::generateCountryNodes($rootNodeId, $leafNode, $selectedElements);
         } else if ($rootNode == self::NODE_STATE) {
-            $treeData = self::generateStateNodes($rootNodeId, $leafNode, $selectedElements, false, $prefix);
+            $treeData = self::generateStateNodes($rootNodeId, $leafNode, $selectedElements);
         } else if ($rootNode == self::NODE_CITY) {
-            $treeData = self::generateCityNodes($rootNodeId, $leafNode, $selectedElements, false, $prefix);
+            $treeData = self::generateCityNodes($rootNodeId, $leafNode, $selectedElements);
         } else if ($rootNode == self::NODE_HOTEL) {
-            $treeData = self::generateHotelNodes($rootNodeId, $leafNode, $selectedElements, false, $prefix);
+            $treeData = self::generateHotelNodes($rootNodeId, $leafNode, $selectedElements);
         } else if ($rootNode == self::NODE_ROOM_TYPE) {
-            $treeData = self::generateRoomTypeNodes($rootNodeId, $leafNode, $selectedElements, false, $prefix);
+            $treeData = self::generateRoomTypeNodes($rootNodeId, $leafNode, $selectedElements);
         } else if ($rootNode == self::NODE_ROOM) {
-            $treeData = self::generateRoomNodes($rootNodeId, $leafNode, $selectedElements, false, $prefix);
+            $treeData = self::generateRoomNodes($rootNodeId, $leafNode, $selectedElements);
         }
 
         return $treeData;
@@ -2813,18 +2589,18 @@ class HotelHelper
     /**
      * Generate the node data for country
      */
-    protected static function generateCountryNodes($rootNodeId, $leafNode, $selectedElements, $previousElements = false, $prefix = '')
+    protected static function generateCountryNodes($rootNodeId, $leafNode, $selectedElements, $previousElements = false)
     {
         $return = array();
-        $countries = self::getcategoryByParent($previousElements, 3, $prefix.'country', $rootNodeId);
+        $countries = self::getcategoryByParent($previousElements, 3, 'country', $rootNodeId);
         $countriesIds = array_column($countries, 'value');
 
         if ($leafNode > self::NODE_COUNTRY) {
-            $states = self::generateStateNodes(false, $leafNode, $selectedElements, $countriesIds, $prefix);
+            $states = self::generateStateNodes(false, $leafNode, $selectedElements, $countriesIds);
         }
 
         foreach ($countries as $country) {
-            if (isset($selectedElements['country']) && in_array($country['value'], $selectedElements['country'])) {
+            if (isset($selectedElements['state']) && in_array($country['value'], $selectedElements['state'])) {
                 $country['selected'] = true;
             }
 
@@ -2845,14 +2621,14 @@ class HotelHelper
     /**
      * Generate the node data for state
      */
-    protected static function generateStateNodes($rootNodeId, $leafNode, $selectedElements, $previousElements = false, $prefix = '')
+    protected static function generateStateNodes($rootNodeId, $leafNode, $selectedElements, $previousElements = false)
     {
         $return = array();
-        $states = self::getcategoryByParent($previousElements, 4, $prefix.'state', $rootNodeId);
+        $states = self::getcategoryByParent($previousElements, 4, 'state', $rootNodeId);
         $stateIds = array_column($states, 'value');
 
         if ($leafNode > self::NODE_STATE) {
-            $cities = self::generateCityNodes(false, $leafNode, $selectedElements, $stateIds, $prefix);
+            $cities = self::generateCityNodes(false, $leafNode, $selectedElements, $stateIds);
         }
 
         foreach ($states as $state) {
@@ -2877,14 +2653,14 @@ class HotelHelper
     /**
      * Generate the node data for city
      */
-    protected static function generateCityNodes($rootNodeId, $leafNode, $selectedElements, $previousElements = false, $prefix = '')
+    protected static function generateCityNodes($rootNodeId, $leafNode, $selectedElements, $previousElements = false)
     {
         $return = array();
-        $cities = self::getcategoryByParent($previousElements, 5, $prefix.'city', $rootNodeId);
+        $cities = self::getcategoryByParent($previousElements, 5, 'city', $rootNodeId);
         $cityIds = array_column($cities, 'value');
 
         if ($leafNode > self::NODE_CITY) {
-            $hotels = self::generateHotelNodes(false, $leafNode, $selectedElements, $cityIds, $prefix);
+            $hotels = self::generateHotelNodes(false, $leafNode, $selectedElements, $cityIds);
         }
 
         foreach ($cities as $city) {
@@ -2909,10 +2685,10 @@ class HotelHelper
     /**
      * Generate the node data for hotels
      */
-    protected static function generateHotelNodes($rootNodeId, $leafNode, $selectedElements, $previousElements = false, $prefix = '')
+    protected static function generateHotelNodes($rootNodeId, $leafNode, $selectedElements, $previousElements = false)
     {
         $return = array();
-        $hotels = self::getHotelsByIdCity($previousElements, $rootNodeId, $prefix);
+        $hotels = self::getHotelsByIdCity($previousElements, $rootNodeId);
         $hotelIds = array_column($hotels, 'value');
 
         if (Validate::isLoadedObject(Context::getContext()->employee)){
@@ -2922,7 +2698,7 @@ class HotelHelper
         }
 
         if ($leafNode > self::NODE_HOTEL) {
-            $roomTypes = self::generateRoomTypeNodes(false, $leafNode, $selectedElements, $hotelIds, $prefix);
+            $roomTypes = self::generateRoomTypeNodes(false, $leafNode, $selectedElements, $hotelIds);
         }
 
         foreach ($hotels as $hotel) {
@@ -2951,10 +2727,10 @@ class HotelHelper
     /**
      * Generate the node data for room types
      */
-    protected static function generateRoomTypeNodes($rootNodeId, $leafNode, $selectedElements, $previousElements = false, $prefix = '')
+    protected static function generateRoomTypeNodes($rootNodeId, $leafNode, $selectedElements, $previousElements = false)
     {
         $return = array();
-        $roomTypes = self::getRoomTypesByHotelsId($previousElements, $rootNodeId, $prefix);
+        $roomTypes = self::getRoomTypesByHotelsId($previousElements, $rootNodeId);
         $roomTypeIds = array_column($roomTypes, 'value');
 
         if (Validate::isLoadedObject(Context::getContext()->employee)){
@@ -2970,7 +2746,7 @@ class HotelHelper
         }
 
         if ($leafNode > self::NODE_ROOM_TYPE) {
-            $rooms = self::generateRoomNodes(false, $leafNode, $selectedElements, $roomTypeIds, $prefix);
+            $rooms = self::generateRoomNodes(false, $leafNode, $selectedElements, $roomTypeIds);
         }
 
         foreach ($roomTypes as $roomType) {
@@ -2999,10 +2775,10 @@ class HotelHelper
     /**
      * Generate the node data for rooms
      */
-    protected static function generateRoomNodes($rootNodeId, $leafNode, $selectedElements, $previousElements = false, $prefix = '')
+    protected static function generateRoomNodes($rootNodeId, $leafNode, $selectedElements, $previousElements = false)
     {
         $return = array();
-        $rooms = self::getRoomsByRoomTypeId($previousElements, $rootNodeId, $prefix);
+        $rooms = self::getRoomsByRoomTypeId($previousElements, $rootNodeId);
         if (Validate::isLoadedObject(Context::getContext()->employee)){
             if (!Context::getContext()->employee->isSuperAdmin()) {
                 $rooms = HotelBranchInformation::filterDataByHotelAccess(
@@ -3060,10 +2836,10 @@ class HotelHelper
     /**
      * Get all the hotels of the passed cities (city id_category)
      */
-    protected static function getHotelsByIdCity($cities, $rootNodeId, $prefix = '')
+    protected static function getHotelsByIdCity($cities, $rootNodeId)
     {
 
-        $sql = 'SELECT hbi.`id` as `value` , hbil.`hotel_name` as `name`, "'.$prefix.'hotel_box" as `input_name`, c.`id_parent`
+        $sql = 'SELECT hbi.`id` as `value` , hbil.`hotel_name` as `name`, "hotel_box" as `input_name`, c.`id_parent`
         FROM `'._DB_PREFIX_.'htl_branch_info` AS hbi
         INNER JOIN `'._DB_PREFIX_.'htl_branch_info_lang` AS hbil
         ON (hbi.`id` = hbil.`id` AND hbil.`id_lang`='.(int)Context::getContext()->language->id.')
@@ -3082,9 +2858,9 @@ class HotelHelper
     /**
      * Get all the room types of the passed hotels
      */
-    protected static function getRoomTypesByHotelsId($hotels, $rootNodeId, $prefix = '')
+    protected static function getRoomTypesByHotelsId($hotels, $rootNodeId)
     {
-        $sql = 'SELECT p.`id_product` AS `value`, pl.`name`, "'.$prefix.'room_type_box" as `input_name`, rt.`id_hotel`
+        $sql = 'SELECT p.`id_product` AS `value`, pl.`name`, "room_type_box" as `input_name`, rt.`id_hotel`
 			FROM `'._DB_PREFIX_.'htl_room_type` AS rt';
 
         $sql .= ' INNER JOIN `'._DB_PREFIX_.'product` AS p ON (rt.`id_product` = p.`id_product`)
@@ -3105,9 +2881,9 @@ class HotelHelper
     /**
      * Get all the rooms of the passed room types (city id_category)
      */
-    protected static function getRoomsByRoomTypeId($roomTypes, $rootNodeId, $prefix = '')
+    protected static function getRoomsByRoomTypeId($roomTypes, $rootNodeId)
     {
-        $sql = 'SELECT `id` as `value`, `room_num` as `name`, "'.$prefix.'room_box" as `input_name`, `id_product`
+        $sql = 'SELECT `id` as `value`, `room_num` as `name`, "room_box" as `input_name`, `id_product`
         FROM `'._DB_PREFIX_.'htl_room_information`
         WHERE 1';
         if ($roomTypes) {

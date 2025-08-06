@@ -41,9 +41,10 @@ class Bankwire extends PaymentModule
     {
         $this->name = 'bankwire';
         $this->tab = 'payments_gateways';
-        $this->version = '1.1.7';
+        $this->version = '1.1.6';
         $this->author = 'PrestaShop';
         $this->controllers = array('payment', 'validation');
+        $this->is_eu_compatible = 1;
 
         $this->currencies = true;
         $this->currencies_mode = 'checkbox';
@@ -83,8 +84,7 @@ class Bankwire extends PaymentModule
                 'bankwire_owner' => Configuration::get('BANK_WIRE_OWNER'),
                 'bankwire_details' => nl2br(Configuration::get('BANK_WIRE_DETAILS')),
                 'bankwire_address' => nl2br(Configuration::get('BANK_WIRE_ADDRESS')),
-                'lang' => new Language($order->id_lang),
-                'total_paid' => Tools::displayPrice($order->total_paid, $this->context->currency, false)
+                'lang' => new Language($order->id_lang)
             ));
 
             return array(
@@ -300,6 +300,7 @@ class Bankwire extends PaymentModule
         $lang = new Language((int)Configuration::get('PS_LANG_DEFAULT'));
         $helper->default_form_language = $lang->id;
         $helper->allow_employee_form_lang = Configuration::get('PS_BO_ALLOW_EMPLOYEE_FORM_LANG') ? Configuration::get('PS_BO_ALLOW_EMPLOYEE_FORM_LANG') : 0;
+        $this->fields_form = array();
         $helper->id = (int)Tools::getValue('id_carrier');
         $helper->identifier = $this->identifier;
         $helper->submit_action = 'btnSubmit';

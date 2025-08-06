@@ -146,7 +146,10 @@ class HTMLPurifier_HTMLModule_Tidy extends HTMLPurifier_HTMLModule
                         $type = "info_$type";
                         $e = $this;
                     }
-                    $e->{$type}[$attr] = $fix;
+                    // PHP does some weird parsing when I do
+                    // $e->$type[$attr], so I have to assign a ref.
+                    $f =& $e->$type;
+                    $f[$attr] = $fix;
                     break;
                 case 'tag_transform':
                     $this->info_tag_transform[$params['element']] = $fix;
@@ -221,7 +224,6 @@ class HTMLPurifier_HTMLModule_Tidy extends HTMLPurifier_HTMLModule
      */
     public function makeFixes()
     {
-        return array();
     }
 }
 

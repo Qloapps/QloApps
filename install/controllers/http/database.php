@@ -34,6 +34,11 @@ class InstallControllerHttpDatabase extends InstallControllerHttp
      */
     public $model_database;
 
+    /**
+     * @var InstallModelMail
+     */
+    public $model_mail;
+
     public function init()
     {
         require_once _PS_INSTALL_MODELS_PATH_.'database.php';

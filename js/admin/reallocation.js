@@ -1,23 +1,20 @@
 /**
+* Since 2010 Webkul.
+*
 * NOTICE OF LICENSE
 *
-* This source file is subject to the Open Software License version 3.0
-* that is bundled with this package in the file LICENSE.md
-* It is also available through the world-wide-web at this URL:
-* https://opensource.org/license/osl-3-0-php
-* If you did not receive a copy of the license and are unable to
-* obtain it through the world-wide-web, please send an email
-* to support@qloapps.com so we can send you a copy immediately.
+* All right is reserved,
+* Please go through this link for complete license : https://store.webkul.com/license.html
 *
 * DISCLAIMER
 *
-* Do not edit or add to this file if you wish to upgrade this module to a newer
-* versions in the future. If you wish to customize this module for your needs
-* please refer to https://store.webkul.com/customisation-guidelines for more information.
+* Do not edit or add to this file if you wish to upgrade this module to newer
+* versions in the future. If you wish to customize this module for your
+* needs please refer to https://store.webkul.com/customisation-guidelines/ for more information.
 *
-* @author Webkul IN
-* @copyright Since 2010 Webkul
-* @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
+*  @author    Webkul IN <support@webkul.com>
+*  @copyright Since 2010 Webkul IN
+*  @license   https://store.webkul.com/license.html
 */
 
 
@@ -34,17 +31,13 @@ $(document).ready(function() {
 
     /*For reallocating rooms in the modal*/
     $(document).on('click', '#realloc_allocated_rooms', function(e){
-        $(".loading_overlay").show();
         if (RoomReallocationModal.reallocate() == false) {
-            $(".loading_overlay").hide();
             return false;
         }
     });
     /*For swaping rooms in the modal*/
     $(document).on('click', '#swap_allocated_rooms', function(){
-        $(".loading_overlay").show();
         if (RoomReallocationModal.swap() == false) {
-            $(".loading_overlay").hide();
             return false;
         }
     });
@@ -94,7 +87,7 @@ const RoomReallocationModal = {
 
                     // For Rooms Swapping
                     var json_arr_rm_swp = roomObj.data('avail_rm_swap');
-                    if (json_arr_rm_swp != false && json_arr_rm_swp.length != 0) {
+                    if (roomObj.data('avail_rm_swap') != 'false' && json_arr_rm_swp.length != 0) {
                         html = '<select class="form-control" name="swap_avail_rooms" id="swap_avail_rooms">';
                             $.each(json_arr_rm_swp, function(key,val) {
                                 html += '<option class="swp_rm_opts" value="'+val.id_hotel_booking+'" >'+val.room_num+'</option>';
@@ -108,7 +101,7 @@ const RoomReallocationModal = {
 
                     // For Rooms Reallocation
                     var json_arr_realloc_room_types = roomObj.data('avail_realloc_room_types');
-                    if (json_arr_realloc_room_types != false && json_arr_realloc_room_types.length != 0) {
+                    if (roomObj.data('avail_realloc_room_types') != 'false' && json_arr_realloc_room_types.length != 0) {
                         var idCurrentRoomType = roomObj.data('id_room_type');
                         var roomsTypesHtml = '<select data-id_htl_booking="' + roomObj.data('id_htl_booking') + '" class="form-control" name="realloc_avail_room_type" id="realloc_avail_room_type">';
                             $.each(json_arr_realloc_room_types, function(key, room_type) {

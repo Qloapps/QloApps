@@ -32,7 +32,6 @@ abstract class Controller extends ControllerCore
     protected $total_modules_time = 0;
     protected $total_modules_memory = 0;
     protected $global_var_size = array();
-    protected $total_cache_size = 0;
 
     protected $modules_perfs = array();
     protected $hooks_perfs = array();
@@ -40,7 +39,6 @@ abstract class Controller extends ControllerCore
     protected $array_queries = array();
 
     protected $profiler = array();
-
 
     private function getMemoryColor($n)
     {
@@ -338,7 +336,7 @@ abstract class Controller extends ControllerCore
             );
             if (preg_match('/^\s*select\s+/i', $data['query'])) {
                 $explain = Db::getInstance()->executeS('explain '.$data['query']);
-                if (isset($explain[0]['Extra']) && stristr($explain[0]['Extra'], 'filesort')) {
+                if (stristr($explain[0]['Extra'], 'filesort')) {
                     $query_row['filesort'] = true;
                 }
                 foreach ($explain as $row) {

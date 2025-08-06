@@ -43,8 +43,6 @@ class ConfigurationCore extends ObjectModel
     /** @var string Object last modification date */
     public $date_upd;
 
-    const PS_SHORT_DESC_LIMIT = 400;
-
     /**
      * @see ObjectModel::$definition
      */

@@ -147,7 +147,6 @@
 		{/if}
 	</div>
 
-
 	<div class="form-group hidden">
 		<label class="control-label col-lg-3" for="reference">
 			<span class="label-tooltip" data-toggle="tooltip"
@@ -358,7 +357,7 @@
 				languages=$languages
 				input_name='description_short'
 				input_value=$product->description_short
-				maxlength=$PS_SHORT_DESC_LIMIT}
+				maxlength=$PS_PRODUCT_SHORT_DESC_LIMIT}
 		</div>
 	</div>
 	<div class="form-group">
@@ -455,26 +454,11 @@
 				<p class="help-block">{l s='Please note that position numbering starts from 0. A position of 0 means room type will be displayed at the topmost position.'}</p>
 				<div class="alert alert-info">
 					{l s='You can manage positions of the room types of this hotel from'}
-					<a href="{$link->getAdminLink('AdminProducts')}&submitResetproduct&submitFilterproduct=1&productFilter_a!id_category_default={$htl_full_info['id_category']}">{l s='here.'}</a>
+					<a href="{$link->getAdminLink('AdminProducts')}&id_category={$htl_full_info['id_category']}">{l s='here.'}</a>
 				</div>
 			</div>
 		</div>
 	{/if}
-
-	<div class="form-group" id="bed_types_selection">
-		<label class="control-label col-sm-3">
-			<span class="label-tooltip" data-toggle="tooltip" title="{l s='Select all bed types available for this room type.'}">
-				{l s='Bed Types'}
-			</span>
-		</label>
-		<div class="col-sm-5">
-			<select name="id_bed_types[]" id="id_bed_types" class="form-control chosen" multiple>
-				{foreach from=$bed_types_info item=bed_type_info}
-					<option value="{$bed_type_info['id_bed_type']}" {if isset($selected_bed_types) && in_array($bed_type_info['id_bed_type'], $selected_bed_types)}selected{/if}>{$bed_type_info['name']}</option>
-				{/foreach}
-			</select>
-		</div>
-	</div>
 
 	{* <div class="form-group">
 		<label class="control-label col-lg-3" for="tags_{$id_lang}">

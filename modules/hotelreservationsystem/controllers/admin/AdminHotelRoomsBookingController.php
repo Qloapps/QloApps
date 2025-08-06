@@ -1,36 +1,25 @@
 <?php
 /**
+* 2010-2020 Webkul.
+*
 * NOTICE OF LICENSE
 *
-* This source file is subject to the Open Software License version 3.0
-* that is bundled with this package in the file LICENSE.md
-* It is also available through the world-wide-web at this URL:
-* https://opensource.org/license/osl-3-0-php
-* If you did not receive a copy of the license and are unable to
-* obtain it through the world-wide-web, please send an email
-* to support@qloapps.com so we can send you a copy immediately.
+* All right is reserved,
+* Please go through this link for complete license : https://store.webkul.com/license.html
 *
 * DISCLAIMER
 *
-* Do not edit or add to this file if you wish to upgrade this module to a newer
-* versions in the future. If you wish to customize this module for your needs
-* please refer to https://store.webkul.com/customisation-guidelines for more information.
+* Do not edit or add to this file if you wish to upgrade this module to newer
+* versions in the future. If you wish to customize this module for your
+* needs please refer to https://store.webkul.com/customisation-guidelines/ for more information.
 *
-* @author Webkul IN
-* @copyright Since 2010 Webkul
-* @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
+*  @author    Webkul IN <support@webkul.com>
+*  @copyright 2010-2020 Webkul IN
+*  @license   https://store.webkul.com/license.html
 */
 
 class AdminHotelRoomsBookingController extends ModuleAdminController
 {
-    protected $id_cart;
-    protected $id_guest;
-    protected $id_hotel;
-    protected $id_room_type;
-    protected $date_from;
-    protected $date_to;
-    protected $booking_product;
-    protected $occupancy;
     public function __construct()
     {
         $this->table = 'htl_booking_detail';
@@ -99,7 +88,6 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
         $this->context->cart->save();
 
         $this->context->cookie->id_cart = (int) $this->context->cart->id;
-        $this->context->cookie->write();
     }
 
     public function postProcess()
@@ -186,7 +174,7 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
 
         // Process reallocation of rooms
         if (Tools::isSubmit('realloc_allocated_rooms')) {
-            if ($this->tabAccess['edit'] === 1) {
+            if ($this->tabAccess['edit'] === '1') {
                 $idOrder = Tools::getValue('id_order');
                 $idHtlBookingFrom = Tools::getValue('id_htl_booking');
                 $idNewRoomType = Tools::getValue('realloc_avail_room_type');
@@ -235,7 +223,7 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
 
         // Process swap of rooms
         if (Tools::isSubmit('swap_allocated_rooms')) {
-            if ($this->tabAccess['edit'] === 1) {
+            if ($this->tabAccess['edit'] === '1') {
                 $idOrder = Tools::getValue('id_order');
                 $idHtlBookingFrom = Tools::getValue('id_htl_booking');
                 $idHtlBookingToSwap = Tools::getValue('swap_avail_rooms');
@@ -393,6 +381,7 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
             $this->context->smarty->assign(array(
                 'occupancy_adults' => array_sum(array_column($this->occupancy, 'adults')),
                 'occupancy_children' => array_sum(array_column($this->occupancy, 'children')),
+                'occupancy_child_ages' => array_sum(array_column($this->occupancy, 'child_ages')),
             ));
         }
     }
@@ -404,22 +393,16 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
             'id_guest' => $this->id_guest,
         );
         $objHotelCartBookingData = new HotelCartBookingData();
-        $objServiceProductCartDetail = new ServiceProductCartDetail();
+        $objHotelServiceProductCartDetail = new HotelServiceProductCartDetail();
 
         if ($cartProducts = $this->context->cart->getProducts()) {
-            if ($cartBookingData = $objHotelCartBookingData->getCartFormatedBookinInfoByIdCart(
+            if ($cart_bdata = $objHotelCartBookingData->getCartFormatedBookinInfoByIdCart(
                 $this->context->cart->id
             )) {
-                $smartyVars['cart_bdata'] = $cartBookingData;
+                $smartyVars['cart_bdata'] = $cart_bdata;
             }
-
-            if ($cartServiceProduct = $objServiceProductCartDetail->getServiceProductsInCart(
-                $this->context->cart->id,
-                [],
-                null,
-                0
-            )) {
-                $smartyVars['cart_standard_products_data'] = $cartServiceProduct;
+            if ($normalCartProduct = $objHotelServiceProductCartDetail->getHotelProducts($this->context->cart->id)) {
+                $smartyVars['cart_normal_data'] = $normalCartProduct;
             }
         }
         $rms_in_cart = $objHotelCartBookingData->getCountRoomsInCart($this->id_cart, $this->id_guest);
@@ -613,19 +596,17 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
         );
         $id_product = Tools::getValue('id_product');
         $quantity = Tools::getValue('qty', 1);
+        $id_cart = $this->context->cart->id;
         $id_hotel = Tools::getValue('id_hotel');
         $opt = Tools::getValue('opt', 1);
-        if (!Validate::isLoadedObject($this->context->cart)) {
-            $this->createNewCart();
-        }
-        $id_cart = $this->context->cart->id;
+
         if ($opt) {
             // validation for adding product in cart
             $product = new Product($id_product, true, $this->context->language->id);
             if (!$product->id || !$product->active) {
                 $this->errors[] = $this->l('This product is no longer available.');
             }
-            if ($product->booking_product || ($product->selling_preference_type != Product::SELLING_PREFERENCE_STANDALONE)) {
+            if ($product->booking_product || ($product->service_product_type != Product::SERVICE_PRODUCT_WITHOUT_ROOMTYPE)) {
                 // cannot be added without room type or is a booking product.
                 $this->errors[] = $this->l('This product is either a room type or additional service and cannot be added thorugh this method.');
             } elseif (!$product->allow_multiple_quantity) {
@@ -647,16 +628,16 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
 
         if (empty($this->errors)) {
             if ($opt) {
-                $objServiceProductCartDetail = new ServiceProductCartDetail();
-                if ($objServiceProductCartDetail->addServiceProductInCart($id_cart, $product->id, $quantity, $id_hotel, $quantity)) {
+                $objHotelServiceProductCartDetail = new HotelServiceProductCartDetail();
+                if ($objHotelServiceProductCartDetail->addHotelProductInCart($product->id, $quantity, $id_hotel)) {
                     $response = array(
                         'status' => true,
                         'total_amount' => $this->context->cart->getOrderTotal()
                     );
                 }
             } else {
-                $objServiceProductCartDetail = new ServiceProductCartDetail();
-                if ($objServiceProductCartDetail->removeCartServiceProduct($id_cart, $id_product, false, $id_hotel)) {
+                $objHotelServiceProductCartDetail = new HotelServiceProductCartDetail();
+                if ($objHotelServiceProductCartDetail->removeProductFromCart($id_product, $id_hotel)) {
                     $response = array(
                         'status' => true,
                         'total_amount' => $this->context->cart->getOrderTotal()
@@ -705,7 +686,8 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
 
         $opt = Tools::getValue('opt'); // if 1 then add quantity or if 0 means delete quantity
 
-        $num_day = HotelHelper::getNumberOfDays($date_from, $date_to); //quantity of product
+        $obj_booking_dtl = new HotelBookingDetail();
+        $num_day = $obj_booking_dtl->getNumberOfDays($date_from, $date_to); //quantity of product
 
         if ($opt) {
             $unit_price = Product::getPriceStatic(
@@ -764,13 +746,13 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
             }
         } else {
             // remove room from cart
-            if ((Validate::isLoadedObject($objHotelCartBookingData = new HotelCartBookingData((int) $id_cart_book_data)))
-                && $objHotelCartBookingData->deleteCartBookingData(
-                    $objHotelCartBookingData->id_cart,
-                    $objHotelCartBookingData->id_product,
-                    $objHotelCartBookingData->id_room,
-                    $objHotelCartBookingData->date_from,
-                    $objHotelCartBookingData->date_to
+            $objHotelCartBookingData = new HotelCartBookingData($id_cart_book_data);
+            if ($objHotelCartBookingData->deleteCartBookingData(
+                $obj_booking_dtl->id_cart,
+                $objHotelCartBookingData->id_product,
+                $objHotelCartBookingData->id_room,
+                $objHotelCartBookingData->date_from,
+                $objHotelCartBookingData->date_to
             )) {
                 $response['success'] = true;
                 if ($ajax_delete) {
@@ -796,7 +778,7 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
     public function assignServiceProductsForm()
     {
         $objProduct = new Product();
-        $serviceProducts = $objProduct->getServiceProducts(null, Product::SELLING_PREFERENCE_STANDALONE);
+        $serviceProducts = $objProduct->getServiceProducts(null, Product::SERVICE_PRODUCT_WITHOUT_ROOMTYPE);
         $hotelAddressInfo = HotelBranchInformation::getAddress($this->id_hotel);
         $serviceProducts = Product::getProductsProperties($this->context->language->id, $serviceProducts);
         $this->context->smarty->assign(array(
@@ -892,18 +874,11 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
                 // if room is changing in the reallocation
                 if ($objHotelBooking->id_product != $idNewRoomType) {
                     $result['has_room_type_change'] = 1;
-                    $occupancy = array(
-                        array(
-                            'adults' => $objHotelBooking->adults,
-                            'children' => $objHotelBooking->children,
-                            'child_ages' => json_decode($objHotelBooking->child_ages)
-                        )
-                    );
                     $newRoomTotalPrice = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice(
                         $idNewRoomType,
                         $objHotelBooking->date_from,
                         $objHotelBooking->date_to,
-                        $occupancy,
+                        0,
                         0,
                         0,
                         0,
@@ -913,7 +888,7 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
 
                     if ($objHotelBooking->total_price_tax_excl != $newRoomTotalPrice['total_price_tax_excl']) {
                         $result['has_price_changes'] = 1;
-                        $result['price_diff'] = Tools::ps_round((float)($newRoomTotalPrice['total_price_tax_excl'] - $objHotelBooking->total_price_tax_excl), _PS_PRICE_COMPUTE_PRECISION_);
+                        $result['price_diff'] = $newRoomTotalPrice['total_price_tax_excl'] - $objHotelBooking->total_price_tax_excl;
                     }
                 }
             } else {
@@ -978,8 +953,8 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
             'currency_blank' => $currency->blank,
             'ALLOTMENT_AUTO' => HotelBookingDetail::ALLOTMENT_AUTO,
             'ALLOTMENT_MANUAL' => HotelBookingDetail::ALLOTMENT_MANUAL,
-            'SELLING_PREFERENCE_WITH_ROOM_TYPE' => Product::SELLING_PREFERENCE_WITH_ROOM_TYPE,
-            'SELLING_PREFERENCE_STANDALONE' => Product::SELLING_PREFERENCE_STANDALONE,
+            'SERVICE_PRODUCT_WITH_ROOMTYPE' => Product::SERVICE_PRODUCT_WITH_ROOMTYPE,
+            'SERVICE_PRODUCT_WITHOUT_ROOMTYPE' => Product::SERVICE_PRODUCT_WITHOUT_ROOMTYPE,
             'max_child_age' => Configuration::get('WK_GLOBAL_CHILD_MAX_AGE'),
             'max_child_in_room' => Configuration::get('WK_GLOBAL_MAX_CHILD_IN_ROOM'),
             'occupancy_required_for_booking' => $occupancyRequiredForBooking,
@@ -1018,7 +993,7 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
             'invalid_occupancy_txt' => $this->l('Invalid occupancy(adults/children) found.', null, true),
             'PS_BACKDATE_ORDER_ALLOW' => $PS_BACKDATE_ORDER_ALLOW,
             // 'check_calender_var' => $check_calender_var,
-            'txtSomeErr' => $this->l('Some error occurred. Please try again.', null, true),
+            'txtSomeErr' => $this->l('Some error occurred. Please try again.'),
             'no_rm_avail_txt' => $this->l('No room available.', null, true),
             'no_realloc_rm_avail_txt' => $this->l('No room available for reallocation.', null, true),
             'no_realloc_rm_type_avail_txt' => $this->l('No room type available for reallocation.', null, true),

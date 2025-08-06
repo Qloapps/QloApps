@@ -1,24 +1,21 @@
 <?php
 /**
+* 2010-2023 Webkul.
+*
 * NOTICE OF LICENSE
 *
-* This source file is subject to the Open Software License version 3.0
-* that is bundled with this package in the file LICENSE.md
-* It is also available through the world-wide-web at this URL:
-* https://opensource.org/license/osl-3-0-php
-* If you did not receive a copy of the license and are unable to
-* obtain it through the world-wide-web, please send an email
-* to support@qloapps.com so we can send you a copy immediately.
+* All right is reserved,
+* Please go through this link for complete license : https://store.webkul.com/license.html
 *
 * DISCLAIMER
 *
-* Do not edit or add to this file if you wish to upgrade this module to a newer
-* versions in the future. If you wish to customize this module for your needs
-* please refer to https://store.webkul.com/customisation-guidelines for more information.
+* Do not edit or add to this file if you wish to upgrade this module to newer
+* versions in the future. If you wish to customize this module for your
+* needs please refer to https://store.webkul.com/customisation-guidelines/ for more information.
 *
-* @author Webkul IN
-* @copyright Since 2010 Webkul
-* @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
+*  @author    Webkul IN <support@webkul.com>
+*  @copyright 2010-2023 Webkul IN
+*  @license   https://store.webkul.com/license.html
 */
 
 class WebserviceSpecificManagementHotelAri extends ObjectModel implements WebserviceSpecificManagementInterface
@@ -273,18 +270,11 @@ class WebserviceSpecificManagementHotelAri extends ObjectModel implements Webser
                                         if (count($roomType['data']['unavailable'])) {
                                             foreach ($roomType['data']['unavailable'] as $unavailableRooms) {
                                                 foreach ($unavailableRooms['detail'] as $unavailableDetail) {
-                                                    if ($unavailableDetail['date_from'] && $unavailableDetail['date_to']) {
-                                                        $startDate = date('Y-m-d', strtotime($unavailableDetail['date_from']));
-                                                        $endDate = date('Y-m-d', strtotime($unavailableDetail['date_to']));
-                                                    } else {
-                                                        $startDate = $bookingParams['date_from'];
-                                                        $endDate = $bookingParams['date_to'];
-                                                    }
-                                                    for ($currentDate = $startDate;
-                                                        $currentDate < $endDate;
+                                                    for ($currentDate = date('Y-m-d', strtotime($unavailableDetail['date_from']));
+                                                        $currentDate < date('Y-m-d', strtotime($unavailableDetail['date_to']));
                                                         $currentDate = date('Y-m-d', strtotime('+1 day', strtotime($currentDate)))
                                                     ) {
-                                                        $unavailableDates[$currentDate][$roomType['id_product']][$unavailableRooms['id_room']] = $unavailableRooms['id_room'];
+                                                        $unavailableDates[$currentDate][$roomType['id_product']][$bookedRoom['id_room']] = $bookedRoom['id_room'];
                                                     }
                                                 }
                                             }
@@ -338,12 +328,12 @@ class WebserviceSpecificManagementHotelAri extends ObjectModel implements Webser
                                                 unset($roomDetail['available']);
                                             }
                                             if ($getUnavai) {
-                                                $ariDateInfo['total_unavailable_rooms'] += count($roomDetail['unavailable']);
+                                                $ariDateInfo['total_unavailable_rooms'] += count($roomDetail['available']);
                                             } else {
                                                 unset($roomDetail['unavailable']);
                                             }
                                             if ($getBooked) {
-                                                $ariDateInfo['total_booked_rooms'] += count($roomDetail['booked']);
+                                                $ariDateInfo['total_booked_rooms'] += count($roomDetail['available']);
                                             } else {
                                                 unset($roomDetail['booked']);
                                             }

@@ -501,22 +501,13 @@
 				{if count($messages)}
 					<table class="table">
 						<thead>
-							<th class="fixed-width-sm"><span class="title_box">{l s='Status'}</span></th>
+							<th><span class="title_box">{l s='Status'}</span></th>
 							<th><span class="title_box">{l s='Message'}</span></th>
-							<th class="fixed-width-lg"><span class="title_box">{l s='Sent on'}</span></th>
+							<th><span class="title_box">{l s='Sent on'}</span></th>
 						</thead>
 						{foreach $messages AS $message}
 							<tr>
-								<td>{if $message['status'] == CustomerThread::QLO_CUSTOMER_THREAD_STATUS_OPEN}
-										{l s='Open'}
-									{elseif $message['status'] == CustomerThread::QLO_CUSTOMER_THREAD_STATUS_CLOSED}
-										{l s='Closed'}
-									{elseif $message['status'] == CustomerThread::QLO_CUSTOMER_THREAD_STATUS_PENDING1}
-										{l s='Pending 1'}
-									{elseif $message['status'] == CustomerThread::QLO_CUSTOMER_THREAD_STATUS_PENDING2}
-										{l s='Pending 2'}
-									{/if}
-								</td>
+								<td>{$message['status']}</td>
 								<td>
 									<a href="index.php?tab=AdminCustomerThreads&amp;id_customer_thread={$message.id_customer_thread}&amp;viewcustomer_thread&amp;token={getAdminToken tab='AdminCustomerThreads'}">
 										{$message['message']}...
@@ -673,38 +664,6 @@
 				</table>
 				{/if}
 			</div>
-			{if $customer_guests && count($customer_guests)}
-				<div class="panel">
-					<div class="panel-heading">
-						<i class="icon-user"></i>
-						{l s='Customer Guests'}
-						<span class="badge customer-guests-count">{count($customer_guests)}</span>
-					</div>
-					<table class="table customer-guests">
-						<thead>
-							<tr>
-								<th><span class="title_box ">{l s='Email'}</span></th>
-								<th><span class="title_box ">{l s='First name'}</span></th>
-								<th><span class="title_box ">{l s='Last name'}</span></th>
-								<th><span class="title_box ">{l s='phone'}</span></th>
-								<th colspan="2"><span class="title_box ">{l s='Actions'}</span></th>
-							</tr>
-						</thead>
-						<tbody>
-							{foreach $customer_guests AS $key => $customer_guest}
-								<tr class="customer_guest_detail_{$customer_guest['id_customer_guest_detail']} customer_guest_details">
-									<td>{$customer_guest['email']}</td>
-									<td>{$customer_guest['firstname']}</td>
-									<td>{$customer_guest['lastname']}</td>
-									<td>{$customer_guest['phone']}</td>
-									<td><a href="#" class="edit-customer-guest-detail" data-id_customer_guest_detail="{$customer_guest['id_customer_guest_detail']}"><i class="icon-pencil"></i></a></td>
-									<td><a href="#" class="delete-customer-guest-detail" data-id_customer_guest_detail="{$customer_guest['id_customer_guest_detail']}"><i class="icon-trash"></i></a></td>
-								</tr>
-							{/foreach}
-						</tbody>
-					</table>
-				</div>
-			{/if}
 		</div>
 	</div>
 

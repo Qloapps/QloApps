@@ -541,17 +541,15 @@ class LanguageCore extends ObjectModel
             $modList = scandir(_PS_MODULE_DIR_);
             foreach ($modList as $mod) {
                 Language::recurseDeleteDir(_PS_MODULE_DIR_.$mod.'/mails/'.$this->iso_code);
-                if (($files = @scandir(_PS_MODULE_DIR_.$mod.'/mails/'))
-                    && (count($files) <= 2)
-                ) {
+                $files = @scandir(_PS_MODULE_DIR_.$mod.'/mails/');
+                if (count($files) <= 2) {
                     Language::recurseDeleteDir(_PS_MODULE_DIR_.$mod.'/mails/');
                 }
 
                 if (file_exists(_PS_MODULE_DIR_.$mod.'/'.$this->iso_code.'.php')) {
                     unlink(_PS_MODULE_DIR_.$mod.'/'.$this->iso_code.'.php');
-                    if (($files = @scandir(_PS_MODULE_DIR_.$mod))
-                        && (count($files) <= 2)
-                    ) {
+                    $files = @scandir(_PS_MODULE_DIR_.$mod);
+                    if (count($files) <= 2) {
                         Language::recurseDeleteDir(_PS_MODULE_DIR_.$mod);
                     }
                 }

@@ -1,24 +1,21 @@
 <?php
 /**
+* 2010-2020 Webkul.
+*
 * NOTICE OF LICENSE
 *
-* This source file is subject to the Open Software License version 3.0
-* that is bundled with this package in the file LICENSE.md
-* It is also available through the world-wide-web at this URL:
-* https://opensource.org/license/osl-3-0-php
-* If you did not receive a copy of the license and are unable to
-* obtain it through the world-wide-web, please send an email
-* to support@qloapps.com so we can send you a copy immediately.
+* All right is reserved,
+* Please go through this link for complete license : https://store.webkul.com/license.html
 *
 * DISCLAIMER
 *
-* Do not edit or add to this file if you wish to upgrade this module to a newer
-* versions in the future. If you wish to customize this module for your needs
-* please refer to https://store.webkul.com/customisation-guidelines for more information.
+* Do not edit or add to this file if you wish to upgrade this module to newer
+* versions in the future. If you wish to customize this module for your
+* needs please refer to https://store.webkul.com/customisation-guidelines/ for more information.
 *
-* @author Webkul IN
-* @copyright Since 2010 Webkul
-* @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
+*  @author    Webkul IN <support@webkul.com>
+*  @copyright 2010-2020 Webkul IN
+*  @license   https://store.webkul.com/license.html
 */
 
 class RoomTypeServiceProductPrice extends ObjectModel
@@ -72,39 +69,23 @@ class RoomTypeServiceProductPrice extends ObjectModel
 
     public static function getProductRoomTypePriceAndTax($idProduct, $idElement, $elementType)
     {
-        $cache_key = 'RoomTypeServiceProductPrice::getProductRoomTypePriceAndTax'.$idProduct.'_'.$idElement.'_'.$elementType;
-        if (!Cache::isStored($cache_key)) {
-            $objServiceProduct = new Product((int)$idProduct);
-            if ($result = Db::getInstance()->getRow('
-                SELECT spp.`price`, spp.`id_tax_rules_group`, p.`auto_add_to_cart`, p.`price_addition_type`
-                FROM `'._DB_PREFIX_.'product` p
-                LEFT JOIN `'._DB_PREFIX_.'htl_room_type_service_product` sp
-                ON (sp.`id_product` = p.`id_product`)
-                LEFT JOIN `'._DB_PREFIX_.'htl_room_type_service_product_price` spp
-                ON (spp.`id_product` = sp.`id_product` AND spp.`id_element` = sp.`id_element` AND spp.`element_type` = sp.`element_type`)
-                WHERE p.`id_product`='.(int)$idProduct.
-                ' AND sp.`id_element`='.(int)$idElement.
-                ' AND sp.`element_type`='.(int)$elementType)
-            ) {
-                if ($result['auto_add_to_cart'] && $result['price_addition_type'] == Product::PRICE_ADDITION_TYPE_WITH_ROOM) {
-                    // if service is auto add to cart and added in room price, we need to find room type tax rule group
-                    if ($elementType == RoomTypeServiceProduct::WK_ELEMENT_TYPE_ROOM_TYPE) {
-                        $result['id_tax_rules_group'] = Product::getIdTaxRulesGroupByIdProduct((int)$idElement);
-                    }
+        if ($result = Db::getInstance()->getRow('
+            SELECT spp.`price`, spp.`id_tax_rules_group`, p.`auto_add_to_cart`, p.`price_addition_type`
+            FROM `'._DB_PREFIX_.'product` p
+            LEFT JOIN `'._DB_PREFIX_.'htl_room_type_service_product` sp
+            ON (sp.`id_product` = p.`id_product`)
+            LEFT JOIN `'._DB_PREFIX_.'htl_room_type_service_product_price` spp
+            ON (spp.`id_product` = sp.`id_product` AND spp.`id_element` = sp.`id_element` AND spp.`element_type` = sp.`element_type`)
+            WHERE p.`id_product`='.(int)$idProduct.
+            ' AND sp.`id_element`='.(int)$idElement.
+            ' AND sp.`element_type`='.(int)$elementType)
+        ) {
+            if ($result['auto_add_to_cart'] && $result['price_addition_type'] == Product::PRICE_ADDITION_TYPE_WITH_ROOM) {
+                // if service is auto add to cart and added in room price, we need to find room type tax rule group
+                if ($elementType == RoomTypeServiceProduct::WK_ELEMENT_TYPE_ROOM_TYPE) {
+                    $result['id_tax_rules_group'] = Product::getIdTaxRulesGroupByIdProduct((int)$idElement);
                 }
-            } elseif ($objServiceProduct->auto_add_to_cart
-                && $elementType == RoomTypeServiceProduct::WK_ELEMENT_TYPE_ROOM_TYPE
-                && $objServiceProduct->price_addition_type == Product::PRICE_ADDITION_TYPE_WITH_ROOM
-            ) {
-                $result = array();
-                $result['auto_add_to_cart'] = 1;
-                $result['price_addition_type'] = Product::PRICE_ADDITION_TYPE_WITH_ROOM;
-                $result['id_tax_rules_group'] = Product::getIdTaxRulesGroupByIdProduct((int)$idElement);
             }
-
-            Cache::store($cache_key, $result);
-        } else {
-            $result = Cache::retrieve($cache_key);
         }
 
         return $result;
@@ -120,29 +101,61 @@ class RoomTypeServiceProductPrice extends ObjectModel
         );
     }
 
-    public static function getPrice(
+    public function getServicePrice(
         $idProduct,
-        $idHotel,
-        $idProductOption = null,
-        $useTax = null,
+        $idProductRoomType,
         $quantity = 1,
-        $useReduc = true
+        $dateFrom = null,
+        $dateTo = null,
+        $useTax = null,
+        $id_cart = false,
+        $id_address = null,
+        $use_reduc= 1
     ) {
-        $idHotelAddress = Cart::getIdAddressForTaxCalculation($idProduct, $idHotel);
-        $price =  Product::getPriceStatic(
-            $idProduct,
+        if ($useTax === null)
+            $useTax = Product::$_taxCalculationMethod == PS_TAX_EXC ? false : true;
+
+        $id_address =  $id_address ? $id_address : Cart::getIdAddressForTaxCalculation($idProductRoomType);
+
+        $price = Product::getPriceStatic(
+            (int)$idProduct,
             $useTax,
-            $idProductOption,
+            null,
             6,
             null,
             false,
-            $useReduc,
-            $quantity,
+            $use_reduc,
+            (int)$quantity,
             false,
             null,
+            $id_cart,
+            $id_address,
+            $specificPrice,
+            true,
+            true,
             null,
-            $idHotelAddress
+            true,
+            (int)$idProductRoomType
         );
+
+        Hook::exec('actionServicePriceModifier',
+            array(
+                'price' => &$price,
+                'id_service_product' => $idProduct,
+                'id_room_type' => $idProductRoomType,
+                'date_from' => $dateFrom,
+                'date_to' => $dateTo,
+                'use_tax' => $useTax,
+                'id_cart' => $id_cart,
+                'use_reduc' => $use_reduc
+            )
+        );
+
+        if (Product::getProductPriceCalculation($idProduct) == Product::PRICE_CALCULATION_METHOD_PER_DAY
+            && $dateFrom && $dateTo
+        ) {
+            $price = $price * HotelHelper::getNumberOfDays($dateFrom, $dateTo);
+        }
 
         return $price * (int)$quantity;
     }

@@ -1,23 +1,20 @@
 /**
-* NOTICE OF LICENSE
-*
-* This source file is subject to the Open Software License version 3.0
-* that is bundled with this package in the file LICENSE.md
-* It is also available through the world-wide-web at this URL:
-* https://opensource.org/license/osl-3-0-php
-* If you did not receive a copy of the license and are unable to
-* obtain it through the world-wide-web, please send an email
-* to support@qloapps.com so we can send you a copy immediately.
-*
-* DISCLAIMER
-*
-* Do not edit or add to this file if you wish to upgrade this module to a newer
-* versions in the future. If you wish to customize this module for your needs
-* please refer to https://store.webkul.com/customisation-guidelines for more information.
-*
-* @author Webkul IN
-* @copyright Since 2010 Webkul
-* @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
+ * 2010-2023 Webkul.
+ *
+ * NOTICE OF LICENSE
+ *
+ * All right is reserved,
+ * Please go through LICENSE.txt file inside our module
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade this module to newer
+ * versions in the future. If you wish to customize this module for your
+ * needs please refer to CustomizationPolicy.txt file inside our module for more information.
+ *
+ * @author Webkul IN
+ * @copyright 2010-2023 Webkul IN
+ * @license LICENSE.txt
  */
 
 function line_chart_dashinsights(widget_name, chart_details) {
@@ -108,7 +105,7 @@ function multibar_chart_dotw_dashinsights(widget_name, chart_details) {
         // create content for the tooltip of chart
         chart.tooltip.contentGenerator((obj, element) => {
             var tooltipContent = '<p>' + hotel_txt + ': <b>' + obj.data.key + '</b></p>';
-            tooltipContent += '<p>' + nights_booked_txt + ': <b>' + obj.data.y + '</b> (' + obj.data.percent + '%)</p>';
+            tooltipContent += '<p>' + room_occupied_txt + ': <b>' + obj.data.y + '</b> (' + obj.data.percent + '%)</p>';
 
             return getTooltipContent(obj.data.day, tooltipContent, obj.color);
         });
@@ -165,7 +162,7 @@ function multibar_chart_los_dashinsights(widget_name, chart_details) {
             var tooltipLabel = length_of_stay_txt + ': ' + obj.data.x;
 
             var tooltipContent = '<p>' + hotel_txt + ': <b>' + obj.data.key + '</b></p>';
-            tooltipContent += '<p>' + room_booked_txt + ': <b>' + obj.data.rooms_occupied + '</b> (' + obj.data.percent + '%)</p>';
+            tooltipContent += '<p>' + room_occupied_txt + ': <b>' + obj.data.rooms_occupied + '</b> (' + obj.data.percent + '%)</p>';
 
             return getTooltipContent(tooltipLabel, tooltipContent, obj.color);
         });

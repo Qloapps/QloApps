@@ -1,23 +1,20 @@
 {**
+* 2010-2023 Webkul.
+*
 * NOTICE OF LICENSE
 *
-* This source file is subject to the Open Software License version 3.0
-* that is bundled with this package in the file LICENSE.md
-* It is also available through the world-wide-web at this URL:
-* https://opensource.org/license/osl-3-0-php
-* If you did not receive a copy of the license and are unable to
-* obtain it through the world-wide-web, please send an email
-* to support@qloapps.com so we can send you a copy immediately.
+* All right is reserved,
+* Please go through LICENSE.txt file inside our module
 *
 * DISCLAIMER
 *
-* Do not edit or add to this file if you wish to upgrade this module to a newer
-* versions in the future. If you wish to customize this module for your needs
-* please refer to https://store.webkul.com/customisation-guidelines for more information.
+* Do not edit or add to this file if you wish to upgrade this module to newer
+* versions in the future. If you wish to customize this module for your
+* needs please refer to CustomizationPolicy.txt file inside our module for more information.
 *
 * @author Webkul IN
-* @copyright Since 2010 Webkul
-* @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
+* @copyright 2010-2023 Webkul IN
+* @license LICENSE.txt
 *}
 
 {if isset($service_product) && $service_product}
@@ -70,13 +67,13 @@
                                 <div class="service-product-actions">
                                     {if $service_product.allow_multiple_quantity && $service_product.available_for_order}
                                         <div class="qty_container">
-                                            <input type="hidden" class="room_service_product_qty" id="room_service_product_qty_{$service_product.id_product}" name="room_service_product_qty_{$service_product.id_product}" data-id-product="{$service_product.id_product}" data-max_quantity="{$service_product.max_quantity}" value="{if isset($service_product.quantity_added) && $service_product.quantity_added}{$service_product.quantity_added|escape:'html':'UTF-8'}{else}1{/if}">
+                                            <input type="hidden" class="service_product_qty" id="service_product_qty_{$service_product.id_product}" name="service_product_qty_{$service_product.id_product}" data-id-product="{$service_product.id_product}" data-max_quantity="{$service_product.max_quantity}" value="{if isset($service_product.quantity_added) && $service_product.quantity_added}{$service_product.quantity_added|escape:'html':'UTF-8'}{else}1{/if}">
                                             <div class="qty_count pull-left">
                                                 <span>{if isset($service_product.quantity_added) && $service_product.quantity_added}{$service_product.quantity_added|escape:'html':'UTF-8'}{else}1{/if}</span>
                                             </div>
                                             <div class="qty_direction pull-left">
-                                                <a href="#" class="btn btn-default quantity_up room_service_product_qty_up"><span><i class="icon-plus"></i></span></a>
-                                                <a href="#" class="btn btn-default quantity_down room_service_product_qty_down"><span><i class="icon-minus"></i></span></a>
+                                                <a href="#" class="btn btn-default quantity_up service_product_qty_up"><span><i class="icon-plus"></i></span></a>
+                                                <a href="#" class="btn btn-default quantity_down service_product_qty_down"><span><i class="icon-minus"></i></span></a>
                                             </div>
                                         </div>
                                     {/if}

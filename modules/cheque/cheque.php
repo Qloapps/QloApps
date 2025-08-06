@@ -40,9 +40,10 @@ class Cheque extends PaymentModule
 	{
 		$this->name = 'cheque';
 		$this->tab = 'payments_gateways';
-		$this->version = '2.6.8';
+		$this->version = '2.6.7';
 		$this->author = 'PrestaShop';
 		$this->controllers = array('payment', 'validation');
+		$this->is_eu_compatible = 1;
 
 		$this->currencies = true;
 		$this->currencies_mode = 'checkbox';
@@ -78,8 +79,7 @@ class Cheque extends PaymentModule
 				'cheque_name' => Configuration::get('CHEQUE_NAME'),
 				'cheque_address' => Configuration::get('CHEQUE_ADDRESS'),
 				'cheque_address_html' => str_replace("\n", '<br />', Configuration::get('CHEQUE_ADDRESS')),
-                'lang' => new Language($order->id_lang),
-                'total_paid' => Tools::displayPrice($order->total_paid, $this->context->currency, false)
+                'lang' => new Language($order->id_lang)
 			));
 
 			return array(
@@ -272,6 +272,7 @@ class Cheque extends PaymentModule
 		$lang = new Language((int)Configuration::get('PS_LANG_DEFAULT'));
 		$helper->default_form_language = $lang->id;
 		$helper->allow_employee_form_lang = Configuration::get('PS_BO_ALLOW_EMPLOYEE_FORM_LANG') ? Configuration::get('PS_BO_ALLOW_EMPLOYEE_FORM_LANG') : 0;
+		$this->fields_form = array();
 		$helper->id = (int)Tools::getValue('id_carrier');
 		$helper->identifier = $this->identifier;
 		$helper->submit_action = 'btnSubmit';

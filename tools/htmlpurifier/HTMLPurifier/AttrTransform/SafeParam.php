@@ -24,11 +24,6 @@ class HTMLPurifier_AttrTransform_SafeParam extends HTMLPurifier_AttrTransform
      */
     private $uri;
 
-    /**
-     * @type HTMLPurifier_AttrDef_Enum
-     */
-    public $wmode;
-
     public function __construct()
     {
         $this->uri = new HTMLPurifier_AttrDef_URI(true); // embedded

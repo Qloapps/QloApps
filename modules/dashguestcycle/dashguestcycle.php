@@ -1,24 +1,21 @@
 <?php
 /**
+* 2010-2021 Webkul.
+*
 * NOTICE OF LICENSE
 *
-* This source file is subject to the Open Software License version 3.0
-* that is bundled with this package in the file LICENSE.md
-* It is also available through the world-wide-web at this URL:
-* https://opensource.org/license/osl-3-0-php
-* If you did not receive a copy of the license and are unable to
-* obtain it through the world-wide-web, please send an email
-* to support@qloapps.com so we can send you a copy immediately.
+* All right is reserved,
+* Please go through LICENSE.txt file inside our module
 *
 * DISCLAIMER
 *
-* Do not edit or add to this file if you wish to upgrade this module to a newer
-* versions in the future. If you wish to customize this module for your needs
-* please refer to https://store.webkul.com/customisation-guidelines for more information.
+* Do not edit or add to this file if you wish to upgrade this module to newer
+* versions in the future. If you wish to customize this module for your
+* needs please refer to CustomizationPolicy.txt file inside our module for more information.
 *
 * @author Webkul IN
-* @copyright Since 2010 Webkul
-* @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
+* @copyright 2010-2021 Webkul IN
+* @license LICENSE.txt
 */
 
 if (!defined('_PS_VERSION_')) {
@@ -31,14 +28,14 @@ class DashGuestCycle extends Module
     {
         $this->name = 'dashguestcycle';
         $this->tab = 'dashboard';
-        $this->version = '1.0.3';
+        $this->version = '1.0.2';
         $this->ps_versions_compliancy = array('min' => '1.6', 'max' => '1.6');
         $this->author = 'Webkul';
         $this->bootstrap = true;
         parent::__construct();
         $this->displayName = $this->l('Dashboard Guest Cycle');
         $this->description = $this->l('Adds a block with a graphical representation of guest cycle stats.');
-        $this->confirmUninstall = $this->l('Are you sure you want to uninstall?');
+        $this->confirmUnsinstall = $this->l('Are you sure you want to uninstall?');
 
         $this->allow_push = true;
     }
@@ -82,7 +79,7 @@ class DashGuestCycle extends Module
             $dataValue['dgc_total_departures'] = sprintf('%02d', rand(100, 1000));
             $dataValue['dgc_departed'] = sprintf('%02d', rand(0, $dataValue['dgc_total_departures']));
             $dataValue['dgc_new_bookings'] = sprintf('%02d', rand(10, 500));
-            $dataValue['dgc_occupied'] = sprintf('%02d', rand(10, 500));
+            $dataValue['dgc_stay_overs'] = sprintf('%02d', rand(10, 500));
             $dataValue['dgc_new_messages'] = sprintf('%02d', rand(0, 20));
             $dataValue['dgc_cancelled_bookings'] = sprintf('%02d', rand(0, 20));
             $dataValue['dgc_guests_adults'] = sprintf('%02d', rand(100, 1000));
@@ -97,12 +94,7 @@ class DashGuestCycle extends Module
             $dataValue['dgc_departed'] = sprintf('%02d', $departuresData['departed']);
             $dataValue['dgc_total_departures'] = sprintf('%02d', $departuresData['total_departures']);
             $dataValue['dgc_new_bookings'] = sprintf('%02d', count(AdminStatsController::getNewBookingsInfoByDate($dateToday, $params['id_hotel'])));
-            $dataValue['dgc_occupied'] = sprintf('%02d', AdminStatsController::getDistinctRoomBookingsCount(
-                date('Y-m-d', strtotime('-1 day')),
-                $dateToday,
-                $params['id_hotel'],
-                HotelBookingDetail::STATUS_CHECKED_IN
-            ));
+            $dataValue['dgc_stay_overs'] = sprintf('%02d', AdminStatsController::getStayOversByDate($dateToday, $params['id_hotel']));
             $dataValue['dgc_new_messages'] = sprintf('%02d', CustomerMessage::getMessagesByDate($dateToday));
             $dataValue['dgc_cancelled_bookings'] = sprintf('%02d', AdminStatsController::getCancelledBookingsByDate($dateToday, $params['id_hotel']));
             $dataValue['dgc_guests_adults'] = sprintf('%02d', $guestsData['adults']);

@@ -126,12 +126,6 @@
     <keywords/>
     <url_rewrite>order-slip</url_rewrite>
   </meta>
-  <meta id='our-properties' id_shop='1'>
-    <title>Our Properties</title>
-    <description/>
-    <keywords/>
-    <url_rewrite>our-properties</url_rewrite>
-  </meta>
   <meta id="order" id_shop="1">
     <title>Order</title>
     <description/>

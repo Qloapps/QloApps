@@ -46,7 +46,7 @@
 			<p>
 				- {l s='The total amount of your order comes to:' mod='cheque'}
 				<span id="amount" class="price">{displayPrice price=$total}</span>
-				{if $use_taxes == 1 && $display_tax_label}
+				{if $use_taxes == 1}
 					{l s='(tax incl.)' mod='cheque'}
 				{/if}
 			</p>
@@ -82,7 +82,7 @@
 			</a>
 			{*By webkul To Check Order restrict condition before Payment by the customer*}
 			{if !$restrict_order}
-                <button class="btn pull-right button button-medium confirm_order" type="submit">
+                <button class="btn pull-right button button-medium" type="submit">
                     <span>{l s='I confirm my order' mod='cheque'}&nbsp;<i class="icon-chevron-right right"></i></span>
                 </button>
             {/if}

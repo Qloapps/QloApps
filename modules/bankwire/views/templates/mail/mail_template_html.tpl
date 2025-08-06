@@ -1,23 +1,20 @@
 {*
+* 2010-2022 Webkul.
+*
 * NOTICE OF LICENSE
 *
-* This source file is subject to the Open Software License version 3.0
-* that is bundled with this package in the file LICENSE.md
-* It is also available through the world-wide-web at this URL:
-* https://opensource.org/license/osl-3-0-php
-* If you did not receive a copy of the license and are unable to
-* obtain it through the world-wide-web, please send an email
-* to support@qloapps.com so we can send you a copy immediately.
+* All right is reserved,
+* Please go through this link for complete license : https://store.webkul.com/license.html
 *
 * DISCLAIMER
 *
-* Do not edit or add to this file if you wish to upgrade this module to a newer
-* versions in the future. If you wish to customize this module for your needs
-* please refer to https://store.webkul.com/customisation-guidelines for more information.
+* Do not edit or add to this file if you wish to upgrade this module to newer
+* versions in the future. If you wish to customize this module for your
+* needs please refer to https://store.webkul.com/customisation-guidelines/ for more information.
 *
-* @author Webkul IN
-* @copyright Since 2010 Webkul
-* @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
+*  @author    Webkul IN <support@webkul.com>
+*  @copyright 2010-2022 Webkul IN
+*  @license   https://store.webkul.com/license.html
 *}
 <tr>
 	<td class="box" style="border:1px solid #D6D4D4;background-color:#f8f8f8;padding:7px 0">
@@ -30,7 +27,7 @@
                             {l s='Here are the bank details for your transfer:' mod='bankwire' lang=$lang}
                         </p>
                         <span style="color:#777">
-                            <span style="color:#333"><strong>{l s='Amount:' mod='bankwire' lang=$lang}</strong></span> {$total_paid}<br />
+                            <span style="color:#333"><strong>{l s='Amount:' mod='bankwire' lang=$lang}</strong></span> {literal}{total_paid}{/literal}<br />
                             <span style="color:#333"><strong>{l s='Account owner:' mod='bankwire' lang=$lang}</strong></span> {$bankwire_owner}<br />
                             <span style="color:#333"><strong>{l s='Account details:' mod='bankwire' lang=$lang}</strong></span> {$bankwire_details}<br />
                             <span style="color:#333"><strong>{l s='Bank address:' mod='bankwire' lang=$lang}</strong></span> {$bankwire_address}

@@ -251,15 +251,11 @@ p.capa_txt {
 .booking_guest_occupancy_conatiner {
     display: flex;
 }
-.room_type_list_actions .rm_price_cont {
-    margin-bottom: 0px;
-}
 @media (min-width: 992px) {
     .booking_guest_occupancy_conatiner .booking_occupancy_wrapper {
         left: unset;
     }
     .room_features_cont > div {
-        min-height: 47px;
         display: flex;
         flex-wrap: wrap;
         align-items: center;

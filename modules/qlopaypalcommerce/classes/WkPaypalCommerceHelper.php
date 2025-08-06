@@ -1,24 +1,21 @@
 <?php
 /**
+* 2010-2021 Webkul.
+*
 * NOTICE OF LICENSE
 *
-* This source file is subject to the Open Software License version 3.0
-* that is bundled with this package in the file LICENSE.md
-* It is also available through the world-wide-web at this URL:
-* https://opensource.org/license/osl-3-0-php
-* If you did not receive a copy of the license and are unable to
-* obtain it through the world-wide-web, please send an email
-* to support@qloapps.com so we can send you a copy immediately.
+* All right is reserved,
+* Please go through LICENSE.txt file inside our module
 *
 * DISCLAIMER
 *
-* Do not edit or add to this file if you wish to upgrade this module to a newer
-* versions in the future. If you wish to customize this module for your needs
-* please refer to https://store.webkul.com/customisation-guidelines for more information.
+* Do not edit or add to this file if you wish to upgrade this module to newer
+* versions in the future. If you wish to customize this module for your
+* needs please refer to CustomizationPolicy.txt file inside our module for more information.
 *
 * @author Webkul IN
-* @copyright Since 2010 Webkul
-* @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
+* @copyright 2010-2021 Webkul IN
+* @license LICENSE.txt
 */
 
 class WkPaypalCommerceHelper
@@ -354,18 +351,10 @@ class WkPaypalCommerceHelper
                     $idProduct
                 )) {
                     foreach ($roomTypeBookings as $cartRoomInfo) {
-                        $occupancy = array(
-                            array(
-                                'adults' => $cartRoomInfo['adults'],
-                                'children' => $cartRoomInfo['children'],
-                                'child_ages' => json_decode($cartRoomInfo['child_ages'])
-                            )
-                        );
                         $roomTotalPrice = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice(
                             $idProduct,
                             $cartRoomInfo['date_from'],
-                            $cartRoomInfo['date_to'],
-                            $occupancy
+                            $cartRoomInfo['date_to']
                         );
                         $roomTotalPriceTE = $roomTotalPrice['total_price_tax_excl'];
                         $roomTotalPriceTI = $roomTotalPrice['total_price_tax_incl'];
@@ -478,7 +467,7 @@ class WkPaypalCommerceHelper
         $roomTypeTotalTI = $roomTotalPrice['total_price_tax_incl'];
         $roomTypeTotalTE = $roomTotalPrice['total_price_tax_excl'];
 
-        $rmQty = HotelHelper::getNumberOfDays($dateFrom, $dateTo);
+        $rmQty = $objBookingDetail->getNumberOfDays($dateFrom, $dateTo);
 
         $objAdvPayment = new HotelAdvancedPayment();
         if ($advInfo = $objAdvPayment->getIdAdvPaymentByIdProduct($idProduct)) {

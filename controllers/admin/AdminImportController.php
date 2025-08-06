@@ -145,12 +145,11 @@ class AdminImportControllerCore extends AdminController
                     'id_state' => array('label' => $this->l('State ID')),
                     'city' => array('label' => $this->l('City *')),
                     'postcode' => array('label' => $this->l('Zip Code *')),
-                    'fax' => array('label' => $this->l('Fax')),
                     'policies' => array('label' => $this->l('Hotel Policies')),
                     'active_refund' => array('label' => $this->l('Allow Refund (0 = No, 1 = Yes)')),
                     'refund_ids' => array('label' => $this->l('Refund IDs (x,y,z...)')),
-                    'max_checkout_offset' => array('label' => $this->l('Maximum checkout offset')),
-                    'min_booking_offset' => array('label' => $this->l('Minimum booking offset')),
+                    'max_order_date' => array('label' => $this->l('Max Order Date')),
+                    'preparation_time' => array('label' => $this->l('Prepration Time')),
                     'image' => array('label' => $this->l('Image URLs (x,y,z...)')),
                     'delete_existing_images' => array(
                         'label' => $this->l('Delete existing images (0 = No, 1 = Yes)')
@@ -231,7 +230,7 @@ class AdminImportControllerCore extends AdminController
                     'no' => array('label' => $this->l('Ignore this column')),
                     'room_num' => array('label' => $this->l('Room No *'),),
                     'floor' => array('label' => $this->l('Floor')),
-                    'id_product' => array('label' => $this->l('Room Type ID *')),
+                    'id_product' => array('label' => $this->l('Product ID *')),
                     'id_status' => array(
                         'label' => $this->l('Room status (1/2/3)'),
                         'help' => $this->l('1 = Active, 2 = Inactive, 3 = Temporarily Inactive')),
@@ -602,7 +601,7 @@ class AdminImportControllerCore extends AdminController
         $html .= '</tr></thead><tbody>';
 
         AdminImportController::setLocale();
-        for ($current_line = 0; $current_line < 10 && $line = fgetcsv($handle, MAX_LINE_SIZE, $glue, escape: ""); $current_line++) {
+        for ($current_line = 0; $current_line < 10 && $line = fgetcsv($handle, MAX_LINE_SIZE, $glue); $current_line++) {
             /* UTF-8 conversion */
             if (Tools::getValue('convert')) {
                 $line = $this->utf8EncodeArray($line);
@@ -696,7 +695,7 @@ class AdminImportControllerCore extends AdminController
         $tab = '';
         if (!empty($uniqid_path)) {
             $fd = fopen($uniqid_path, 'r');
-            $tab = fgetcsv($fd, MAX_LINE_SIZE, $separator, escape: "");
+            $tab = fgetcsv($fd, MAX_LINE_SIZE, $separator);
             fclose($fd);
             if (file_exists($uniqid_path)) {
                 @unlink($uniqid_path);
@@ -865,7 +864,7 @@ class AdminImportControllerCore extends AdminController
      * @param bool $regenerate
      * @return bool
      */
-    protected static function copyImg($id_entity, $id_image = null, $url = '', $entity = 'products', $regenerate = true)
+    protected static function copyImg($id_entity, $id_image = null, $url, $entity = 'products', $regenerate = true)
     {
         $tmpfile = tempnam(_PS_TMP_IMG_DIR_, 'ps_import');
         $watermark_types = explode(',', Configuration::get('WATERMARK_TYPES'));
@@ -998,7 +997,7 @@ class AdminImportControllerCore extends AdminController
             Configuration::get('PS_LOCATIONS_CATEGORY'),
         );
 
-        for ($current_line = 0; $line = fgetcsv($handle, MAX_LINE_SIZE, $this->separator, escape: ""); $current_line++) {
+        for ($current_line = 0; $line = fgetcsv($handle, MAX_LINE_SIZE, $this->separator); $current_line++) {
             if ($convert) {
                 $line = $this->utf8EncodeArray($line);
             }
@@ -1080,7 +1079,7 @@ class AdminImportControllerCore extends AdminController
                 ) {
                     $cat_moved[$category->id] = (int) $category_already_created['id_category'];
                     $category->id = (int)$category_already_created['id_category'];
-                    if ($category_already_created['date_add'] &&  Validate::isDate($category_already_created['date_add'])) {
+                    if (Validate::isDate($category_already_created['date_add'])) {
                         $category->date_add = $category_already_created['date_add'];
                     }
                 }
@@ -1164,7 +1163,7 @@ class AdminImportControllerCore extends AdminController
         $force_ids = Tools::getValue('forceIDs');
         $regenerate = Tools::getValue('regenerate');
         $objHotelImage = new HotelImage();
-        for ($current_line = 0; $line = fgetcsv($handle, MAX_LINE_SIZE, $this->separator, escape: ""); $current_line++) {
+        for ($current_line = 0; $line = fgetcsv($handle, MAX_LINE_SIZE, $this->separator); $current_line++) {
             if ($convert) {
                 $line = $this->utf8EncodeArray($line);
             }
@@ -1199,11 +1198,6 @@ class AdminImportControllerCore extends AdminController
                 ) {
                     $this->errors[] = sprintf(
                         $this->l('Zip code is invalid for (ID: %1$s)'),
-                        (isset($info['id']) && !empty($info['id']))? $info['id'] : 'null'
-                    );
-                } else if (isset($info['fax']) && !Validate::isGenericName($info['fax'])) {
-                    $this->errors[] = sprintf(
-                        $this->l('Fax is invalid for (ID: %1$s)'),
                         (isset($info['id']) && !empty($info['id']))? $info['id'] : 'null'
                     );
                 } else if ($objCountry->active) {
@@ -1260,7 +1254,6 @@ class AdminImportControllerCore extends AdminController
                             $objAddress->id_state = $info['id_state'];
                             $objAddress->city = $info['city'];
                             $objAddress->postcode = $info['postcode'];
-                            $objHotelBranch->fax = $info['fax'];
                             $hotelName = $objHotelBranch->hotel_name[$idLangDefault];
                             $objAddress->alias = $hotelName;
                             $hotelName = trim(preg_replace('/[0-9!<>,;?=+()@#"°{}_$%:]*$/u', '', $hotelName));
@@ -1356,34 +1349,17 @@ class AdminImportControllerCore extends AdminController
                             }
 
                             $country = Country::getNameById($idLangDefault, $info['id_country']);
-                             if ($catCountry = $objHotelBranch->addCategory(
-                                array (
-                                    'name' => $country,
-                                    'group_ids' => $groupIds,
-                                    'parent_category' => false
-                                )
-                            )) {
+                            if ($catCountry = $objHotelBranch->addCategory($country, false, $groupIds)) {
                                 if ($info['id_state']) {
                                     $objState = new State();
                                     $stateName = $objState->getNameById($info['id_state']);
+                                    $catState = $objHotelBranch->addCategory($stateName, $catCountry, $groupIds);
                                 } else {
-                                    $stateName = $info['city'];
+                                    $catState = $objHotelBranch->addCategory($info['city'], $catCountry, $groupIds);
                                 }
 
-                                if ($catState = $objHotelBranch->addCategory(
-                                    array (
-                                        'name' => $stateName,
-                                        'group_ids' => $groupIds,
-                                        'parent_category' => $catCountry
-                                    )
-                                )) {
-                                     if ($catCity = $objHotelBranch->addCategory(
-                                        array (
-                                            'name' => $info['city'],
-                                            'group_ids' => $groupIds,
-                                            'parent_category' => $catState
-                                        )
-                                    )) {
+                                if ($catState) {
+                                    if ($catCity = $objHotelBranch->addCategory($info['city'], $catState, $groupIds)) {
                                         if ($objHotelBranch->id_category) {
                                             $objCategory = new Category($objHotelBranch->id_category);
                                             $objCategory->name = $objHotelBranch->hotel_name;
@@ -1396,14 +1372,7 @@ class AdminImportControllerCore extends AdminController
                                             Category::regenerateEntireNtree();
                                         } else {
                                             if ($catHotel = $objHotelBranch->addCategory(
-                                                array (
-                                                    'name' => $objHotelBranch->hotel_name,
-                                                    'group_ids' => $groupIds,
-                                                    'parent_category' => $catCity,
-                                                    'is_hotel' => 1,
-                                                    'id_hotel' => $objHotelBranch->id,
-                                                    'link_rewrite' => $linkRewriteArray
-                                                )
+                                                $objHotelBranch->hotel_name, $catCity, $groupIds, 1, $objHotelBranch->id, $linkRewriteArray
                                             )) {
                                                 $objHotelBranch = new HotelBranchInformation($objHotelBranch->id);
                                                 $objHotelBranch->id_category = $catHotel;
@@ -1441,25 +1410,19 @@ class AdminImportControllerCore extends AdminController
                         }
 
                         $objHotelOrderRestrictDate->id_hotel = $objHotelBranch->id;
-                        $objHotelOrderRestrictDate->use_global_max_checkout_offset = true;
-                        $objHotelOrderRestrictDate->use_global_min_booking_offset = true;
-
-                        if (isset($info['max_checkout_offset'])
-                            && ((Configuration::get('PS_MIN_BOOKING_OFFSET') < $info['max_checkout_offset'])
-                                || (isset($info['min_booking_offset']) && ($info['min_booking_offset'] < $info['max_checkout_offset']))
-                            )
+                        $objHotelOrderRestrictDate->use_global_max_order_date = true;
+                        if (isset($info['max_order_date'])
+                            && strtotime('now') < strtotime($info['max_order_date'])
                         ) {
-                            $objHotelOrderRestrictDate->use_global_max_checkout_offset = false;
-                            $objHotelOrderRestrictDate->max_checkout_offset = $info['max_checkout_offset'];
+                            $objHotelOrderRestrictDate->use_global_max_order_date = false;
+                            $date = date('Y-m-d', strtotime($info['max_order_date']));
+                            $objHotelOrderRestrictDate->max_order_date = $date;
                         }
 
-                        if (isset($info['min_booking_offset'])
-                            && ((Configuration::get('PS_MAX_CHECKOUT_OFFSET') > $info['min_booking_offset'])
-                                || (isset($info['max_checkout_offset']) && ($info['max_checkout_offset'] > $info['min_booking_offset']))
-                            )
-                        ) {
-                            $objHotelOrderRestrictDate->use_global_min_booking_offset = false;
-                            $objHotelOrderRestrictDate->min_booking_offset = $info['min_booking_offset'];
+                        $objHotelOrderRestrictDate->use_global_preparation_time = true;
+                        if (isset($info['preparation_time']) && $info['preparation_time']) {
+                            $objHotelOrderRestrictDate->use_global_preparation_time = false;
+                            $objHotelOrderRestrictDate->preparation_time = $info['preparation_time'];
                         }
 
                         $objHotelOrderRestrictDate->save();
@@ -1507,7 +1470,7 @@ class AdminImportControllerCore extends AdminController
         Module::setBatchMode(true);
         $objRoomType = new HotelRoomType();
         $objAdvancePayment = new HotelAdvancedPayment();
-        for ($current_line = 0; $line = fgetcsv($handle, MAX_LINE_SIZE, $this->separator, escape: ""); $current_line++) {
+        for ($current_line = 0; $line = fgetcsv($handle, MAX_LINE_SIZE, $this->separator); $current_line++) {
             if ($convert) {
                 $line = $this->utf8EncodeArray($line);
             }
@@ -1901,7 +1864,7 @@ class AdminImportControllerCore extends AdminController
                                 }
 
                                 $objServiceProduct = new Product($idServiceProduct);
-                                if (Product::SELLING_PREFERENCE_WITH_ROOM_TYPE == $objServiceProduct->selling_preference_type) {
+                                if (Product::SERVICE_PRODUCT_WITH_ROOMTYPE == $objServiceProduct->service_product_type) {
                                     $objRoomTypeServiceProduct->addRoomProductLink(
                                         $objServiceProduct->id,
                                         $product->id,
@@ -1991,7 +1954,7 @@ class AdminImportControllerCore extends AdminController
         $objHotelRoomType = new HotelRoomType();
         $objHotelRoomInformation = new HotelRoomInformation();
         $statuses = array_column($objHotelRoomInformation->getAllRoomStatus(), 'id');
-        for ($current_line = 0; $line = fgetcsv($handle, MAX_LINE_SIZE, $this->separator, escape: ""); $current_line++) {
+        for ($current_line = 0; $line = fgetcsv($handle, MAX_LINE_SIZE, $this->separator); $current_line++) {
             if ($convert) {
                 $line = $this->utf8EncodeArray($line);
             }
@@ -2076,7 +2039,7 @@ class AdminImportControllerCore extends AdminController
                     }
                 } else {
                     $this->errors[] = sprintf(
-                        Tools::displayError('Invalid ID Room Type for %1$s (ID: %2$s).'),
+                        Tools::displayError('Invalid ID Product for %1$s (ID: %2$s).'),
                         (isset($info['room_num']) && !empty($info['room_num']))? Tools::safeOutput($info['room_num']) : 'No Name',
                         (isset($info['id']) && !empty($info['id']))? Tools::safeOutput($info['id']) : 'No ID'
                     );
@@ -2105,7 +2068,7 @@ class AdminImportControllerCore extends AdminController
         $regenerate = Tools::getValue('regenerate');
         $shop_is_feature_active = Shop::isFeatureActive();
         Module::setBatchMode(true);
-        for ($current_line = 0; $line = fgetcsv($handle, MAX_LINE_SIZE, $this->separator, escape: ""); $current_line++) {
+        for ($current_line = 0; $line = fgetcsv($handle, MAX_LINE_SIZE, $this->separator); $current_line++) {
             if ($convert) {
                 $line = $this->utf8EncodeArray($line);
             }
@@ -2273,7 +2236,7 @@ class AdminImportControllerCore extends AdminController
                         $product->price_addition_type = Product::PRICE_ADDITION_TYPE_WITH_ROOM;
                     }
 
-                    $product->selling_preference_type = Product::SELLING_PREFERENCE_WITH_ROOM_TYPE;
+                    $product->service_product_type = Product::SERVICE_PRODUCT_WITH_ROOMTYPE;
                     if (!$serviceProductExists) {
                         if (isset($product->date_add) && $product->date_add != '') {
                             $res = $product->add(false);
@@ -2329,7 +2292,7 @@ class AdminImportControllerCore extends AdminController
                     $info['shop'] = explode($this->multiple_value_separator, $info['shop']);
 
                     RoomTypeServiceProduct::deleteRoomProductLink($product->id);
-                    if (Product::SELLING_PREFERENCE_WITH_ROOM_TYPE == $product->selling_preference_type) {
+                    if (Product::SERVICE_PRODUCT_WITH_ROOMTYPE == $product->service_product_type) {
                         $objRoomTypeServiceProduct = new RoomTypeServiceProduct();
                         if (isset($info['id_room_types']) && $info['id_room_types']) {
                             $objRoomTypeServiceProduct->addRoomProductLink(
@@ -2445,7 +2408,7 @@ class AdminImportControllerCore extends AdminController
         $ordersRow = array();
         $hotelRoomTypeInfo = array();
         $orderInfo = array();
-        for ($current_line = 0; $line = fgetcsv($handle, MAX_LINE_SIZE, $this->separator, escape: ""); $current_line++) {
+        for ($current_line = 0; $line = fgetcsv($handle, MAX_LINE_SIZE, $this->separator); $current_line++) {
             if ($convert) {
                 $line = $this->utf8EncodeArray($line);
             }
@@ -2458,41 +2421,39 @@ class AdminImportControllerCore extends AdminController
                 $idHotel = 0;
                 $objCustomer = new Customer($info['id_customer']);
                 $objProduct = new Product($info['id_product']);
-                if (Validate::isLoadedObject($objCustomer)) {
-                    if (Validate::isLoadedObject($objProduct) || $objProduct->booking_product) {
-                        if (!isset($hotelRoomTypeInfo[$info['id_product']])) {
-                            if ($roomInfo = $objHotelRoomType->getRoomTypeInfoByIdProduct($singleRow->id_product)) {
-                                $singleRow->id_hotel = $roomInfo['id_hotel'];
-                                $idHotel = $roomInfo['id_hotel'];
-                                $singleRow->adults = $roomInfo['adults'];
-                                $singleRow->children = $roomInfo['children'];
-                                $hotelRoomTypeInfo[$info['id_product']] = $roomInfo;
-                            }
-                        } else {
-                            $roomInfo = $hotelRoomTypeInfo[$info['id_product']];
+                if (Validate::isLoadedObject($objCustomer)
+                    && Validate::isLoadedObject($objProduct)
+                ) {
+                    if (!isset($hotelRoomTypeInfo[$info['id_product']])) {
+                        if ($roomInfo = $objHotelRoomType->getRoomTypeInfoByIdProduct($singleRow->id_product)) {
                             $singleRow->id_hotel = $roomInfo['id_hotel'];
                             $idHotel = $roomInfo['id_hotel'];
                             $singleRow->adults = $roomInfo['adults'];
                             $singleRow->children = $roomInfo['children'];
-                        }
-
-                        $ordersRow[$info['id_order']][$singleRow->id_hotel][] = (array) $singleRow;
-                        if (!isset($orderInfo[$info['id_order']])) {
-                            $orderInfo[$info['id_order']]['id_customer'] = $singleRow->id_customer;
-                            if (isset($singleRow->id_order_status)) {
-                                $orderInfo[$info['id_order']]['id_order_status'] = $singleRow->id_order_status;
-                            } else {
-                                $orderInfo[$info['id_order']]['id_order_status'] = Configuration::get('PS_OS_AWAITING_REMOTE_PAYMENT');
-                            }
-
-                            if (isset($singleRow->id_currency)) {
-                                $orderInfo[$info['id_order']]['id_currency'] = $singleRow->id_currency   ;
-                            } else {
-                                $orderInfo[$info['id_order']]['id_currency'] = Configuration::get('PS_CURRENCY_DEFAULT');
-                            }
+                            $hotelRoomTypeInfo[$info['id_product']] = $roomInfo;
                         }
                     } else {
-                        $this->warnings[] = $this->l('Invalid room type Id: ').$info['id_product'];
+                        $roomInfo = $hotelRoomTypeInfo[$info['id_product']];
+                        $singleRow->id_hotel = $roomInfo['id_hotel'];
+                        $idHotel = $roomInfo['id_hotel'];
+                        $singleRow->adults = $roomInfo['adults'];
+                        $singleRow->children = $roomInfo['children'];
+                    }
+
+                    $ordersRow[$info['id_order']][$singleRow->id_hotel][] = (array) $singleRow;
+                    if (!isset($orderInfo[$info['id_order']])) {
+                        $orderInfo[$info['id_order']]['id_customer'] = $singleRow->id_customer;
+                        if (isset($singleRow->id_order_status)) {
+                            $orderInfo[$info['id_order']]['id_order_status'] = $singleRow->id_order_status;
+                        } else {
+                            $orderInfo[$info['id_order']]['id_order_status'] = Configuration::get('PS_OS_AWAITING_REMOTE_PAYMENT');
+                        }
+
+                        if (isset($singleRow->id_currency)) {
+                            $orderInfo[$info['id_order']]['id_currency'] = $singleRow->id_currency   ;
+                        } else {
+                            $orderInfo[$info['id_order']]['id_currency'] = Configuration::get('PS_CURRENCY_DEFAULT');
+                        }
                     }
                 }
             }
@@ -2615,7 +2576,7 @@ class AdminImportControllerCore extends AdminController
                                 $this->context->cart->id_guest
                             );
                             $objHotelCartBookingData = new HotelCartBookingData();
-                            if ($bookingCartData = $objHotelCartBookingData->getCustomerIdRoomsByIdCartIdProduct(
+                            if ($idRooms = $objHotelCartBookingData->getCustomerIdRoomsByIdCartIdProduct(
                                 $this->context->cart->id,
                                 $orderProduct['id_product'],
                                 date('Y-m-d', strtotime($dateFrom)),
@@ -2632,26 +2593,28 @@ class AdminImportControllerCore extends AdminController
                                 $taxRateM =  $taxRate/100;
                                 if (isset($orderProduct['amount'])) {
                                     $orderProduct['amount'] = (float)$orderProduct['amount']/(1+$taxRateM);
-                                    foreach ($bookingCartData as $bookingCart) {
-                                        $featurePrices[] = HotelRoomTypeFeaturePricing::createRoomTypeFeaturePrice(
-                                            array(
-                                                'name' => 'csvprice',
-                                                'id_product' => (int) $orderProduct['id_product'],
-                                                'id_cart' => (int) $this->context->cart->id,
-                                                'id_guest' => (int) $this->context->cart->id_guest,
-                                                'is_special_days_exists' => 0,
-                                                'id_room' => $bookingCart['id_room'],
-                                                'impact_way' => HotelRoomTypeFeaturePricing::IMPACT_WAY_FIX_PRICE,
-                                                'impact_type' => HotelRoomTypeFeaturePricing::IMPACT_TYPE_FIXED_PRICE,
-                                                'impact_value' => $orderProduct['amount'],
-                                                'restrictions' => array(
-                                                    array(
-                                                        'date_from' => date('Y-m-d', strtotime($dateFrom)),
-                                                        'date_to' => date('Y-m-d', strtotime($dateTo)),
-                                                    )
-                                                )
-                                            )
-                                        );
+                                    foreach ($idRooms as $idRoom) {
+                                        $objRoomFeaturePrice = new HotelRoomTypeFeaturePricing();
+                                        $objRoomFeaturePrice->id_product = (int) $orderProduct['id_product'];
+                                        $objRoomFeaturePrice->id_cart = (int) $this->context->cart->id;
+                                        $objRoomFeaturePrice->id_guest = (int) $this->context->cart->id_guest;
+                                        foreach(Language::getLanguages(true) as $lang) {
+                                            $objRoomFeaturePrice->feature_price_name[$lang['id_lang']] = 'csvprice';
+                                        }
+
+                                        $objRoomFeaturePrice->date_selection_type = HotelRoomTypeFeaturePricing::DATE_SELECTION_TYPE_RANGE;
+                                        $objRoomFeaturePrice->date_from = date('Y-m-d', strtotime($dateFrom));
+                                        $objRoomFeaturePrice->date_to = date('Y-m-d', strtotime($dateTo));
+                                        $objRoomFeaturePrice->is_special_days_exists = 0;
+                                        $objRoomFeaturePrice->id_room = $idRoom['id_room'];
+                                        $objRoomFeaturePrice->special_days = json_encode(false);
+                                        $objRoomFeaturePrice->impact_way = HotelRoomTypeFeaturePricing::IMPACT_WAY_FIX_PRICE;
+                                        $objRoomFeaturePrice->impact_type = HotelRoomTypeFeaturePricing::IMPACT_TYPE_FIXED_PRICE;
+                                        $objRoomFeaturePrice->impact_value = $orderProduct['amount'];
+                                        $objRoomFeaturePrice->active = 1;
+                                        $objRoomFeaturePrice->groupBox = array_column(Group::getGroups($this->context->language->id), 'id_group');
+                                        $objRoomFeaturePrice->add();
+                                        $featurePrices[] = $objRoomFeaturePrice->id;
                                     }
                                 }
                             }
@@ -2676,7 +2639,7 @@ class AdminImportControllerCore extends AdminController
                         null,
                         false
                     )) {
-                        $this->errors[] = $this->l('Failed to create booking for reference').' '.$orderRefKey;
+                        $this->errors[] = $this->l('Failed to create order for order reference '.$orderRefKey);
                     }
 
                     foreach ($featurePrices as $idPrice) {
@@ -2746,7 +2709,7 @@ class AdminImportControllerCore extends AdminController
             $phoneRequired = true;
         }
 
-        for ($current_line = 0; $line = fgetcsv($handle, MAX_LINE_SIZE, $this->separator, escape: ""); $current_line++) {
+        for ($current_line = 0; $line = fgetcsv($handle, MAX_LINE_SIZE, $this->separator); $current_line++) {
             if ($convert) {
                 $line = $this->utf8EncodeArray($line);
             }
@@ -2932,7 +2895,7 @@ class AdminImportControllerCore extends AdminController
         $convert = Tools::getValue('convert');
         $force_ids = Tools::getValue('forceIDs');
 
-        for ($current_line = 0; $line = fgetcsv($handle, MAX_LINE_SIZE, $this->separator, escape: ""); $current_line++) {
+        for ($current_line = 0; $line = fgetcsv($handle, MAX_LINE_SIZE, $this->separator); $current_line++) {
             if ($convert) {
                 $line = $this->utf8EncodeArray($line);
             }
@@ -2999,7 +2962,7 @@ class AdminImportControllerCore extends AdminController
         $force_ids = Tools::getValue('forceIDs');
 
         // main loop, for each supply orders to import
-        for ($current_line = 0; $line = fgetcsv($handle, MAX_LINE_SIZE, $this->separator, escape: ""); ++$current_line) {
+        for ($current_line = 0; $line = fgetcsv($handle, MAX_LINE_SIZE, $this->separator); ++$current_line) {
             // if convert requested
             if ($convert) {
                 $line = $this->utf8EncodeArray($line);
@@ -3115,7 +3078,7 @@ class AdminImportControllerCore extends AdminController
         $force_ids = Tools::getValue('forceIDs');
 
         // main loop, for each supply orders details to import
-        for ($current_line = 0; $line = fgetcsv($handle, MAX_LINE_SIZE, $this->separator, escape: ""); ++$current_line) {
+        for ($current_line = 0; $line = fgetcsv($handle, MAX_LINE_SIZE, $this->separator); ++$current_line) {
             // if convert requested
             if ($convert) {
                 $line = $this->utf8EncodeArray($line);
@@ -3223,7 +3186,7 @@ class AdminImportControllerCore extends AdminController
 
     public function utf8EncodeArray($array)
     {
-        return (is_array($array) ? array_map('utf8_encode', $array) : mb_convert_encoding($array, 'UTF-8', 'ISO-8859-1'));
+        return (is_array($array) ? array_map('utf8_encode', $array) : utf8_encode($array));
     }
 
     protected function getNbrColumn($handle, $glue)
@@ -3231,7 +3194,7 @@ class AdminImportControllerCore extends AdminController
         if (!is_resource($handle)) {
             return false;
         }
-        $tmp = fgetcsv($handle, MAX_LINE_SIZE, $glue, escape: "");
+        $tmp = fgetcsv($handle, MAX_LINE_SIZE, $glue);
         AdminImportController::rewindBomAware($handle);
         return count($tmp);
     }
@@ -3259,7 +3222,7 @@ class AdminImportControllerCore extends AdminController
         AdminImportController::rewindBomAware($handle);
 
         for ($i = 0; $i < (int)Tools::getValue('skip'); ++$i) {
-            $line = fgetcsv($handle, MAX_LINE_SIZE, $this->separator, escape: "");
+            $line = fgetcsv($handle, MAX_LINE_SIZE, $this->separator);
         }
         return $handle;
     }
@@ -3311,6 +3274,7 @@ class AdminImportControllerCore extends AdminController
                 Db::getInstance()->execute('TRUNCATE TABLE `'._DB_PREFIX_.'htl_cart_booking_data`');
                 Db::getInstance()->execute('TRUNCATE TABLE `'._DB_PREFIX_.'htl_branch_refund_rules`');
                 Db::getInstance()->execute('TRUNCATE TABLE `'._DB_PREFIX_.'htl_order_restrict_date`');
+                Db::getInstance()->execute('TRUNCATE TABLE `'._DB_PREFIX_.'htl_hotel_service_product_cart_detail`');
                 Db::getInstance()->execute('TRUNCATE TABLE `'._DB_PREFIX_.'htl_branch_info`');
                 $objHotelReservation = Module::getInstanceByName('hotelreservationsystem');
                 $hotelImages = $objHotelReservation->getLocalPath().'views/img/hotel_img/';
@@ -3352,7 +3316,7 @@ class AdminImportControllerCore extends AdminController
                 Db::getInstance()->execute('TRUNCATE TABLE `'._DB_PREFIX_.'htl_room_type_demand_price`');
                 Db::getInstance()->execute('TRUNCATE TABLE `'._DB_PREFIX_.'htl_room_type_demand`');
                 Db::getInstance()->execute('TRUNCATE TABLE `'._DB_PREFIX_.'htl_room_type_service_product_price`');
-                Db::getInstance()->execute('TRUNCATE TABLE `'._DB_PREFIX_.'service_product_cart_detail`');
+                Db::getInstance()->execute('TRUNCATE TABLE `'._DB_PREFIX_.'htl_room_type_service_product_cart_detail`');
                 Db::getInstance()->execute('TRUNCATE TABLE `'._DB_PREFIX_.'htl_room_type_restriction_date_range`');
                 Db::getInstance()->execute('TRUNCATE TABLE `'._DB_PREFIX_.'feature_product`');
 
@@ -3418,7 +3382,7 @@ class AdminImportControllerCore extends AdminController
 
                 Db::getInstance()->execute('TRUNCATE TABLE `'._DB_PREFIX_.'htl_room_type_service_product`');
                 Db::getInstance()->execute('TRUNCATE TABLE `'._DB_PREFIX_.'htl_room_type_service_product_price`');
-                Db::getInstance()->execute('TRUNCATE TABLE `'._DB_PREFIX_.'service_product_cart_detail`');
+                Db::getInstance()->execute('TRUNCATE TABLE `'._DB_PREFIX_.'htl_room_type_service_product_cart_detail`');
                 Db::getInstance()->execute('DELETE FROM `'._DB_PREFIX_.'product` WHERE booking_product=0');
             break;
             case $this->entities[$this->l('Customers')]:
@@ -3455,8 +3419,9 @@ class AdminImportControllerCore extends AdminController
                     'htl_booking_detail',
                     'htl_booking_demands',
                     'htl_booking_demands_tax',
-                    'service_product_order_detail',
-                    'service_product_cart_detail',
+                    'htl_room_type_service_product_order_detail',
+                    'htl_room_type_service_product_cart_detail',
+                    'htl_hotel_service_product_cart_detail',
                 );
                 foreach($orderRelatedTables as $table) {
                     Db::getInstance()->execute('TRUNCATE TABLE `'._DB_PREFIX_.$table.'`');
@@ -3593,7 +3558,7 @@ class AdminImportControllerCore extends AdminController
 
     public function ajaxProcessSaveImportMatchs()
     {
-        if ($this->tabAccess['edit'] === 1) {
+        if ($this->tabAccess['edit'] === '1') {
             $match = implode('|', Tools::getValue('type_value'));
             Db::getInstance()->execute('INSERT IGNORE INTO  `'._DB_PREFIX_.'import_match` (
                                         `id_import_match` ,
@@ -3614,7 +3579,7 @@ class AdminImportControllerCore extends AdminController
 
     public function ajaxProcessLoadImportMatchs()
     {
-        if ($this->tabAccess['edit'] === 1) {
+        if ($this->tabAccess['edit'] === '1') {
             $return = Db::getInstance()->executeS('SELECT * FROM `'._DB_PREFIX_.'import_match` WHERE `id_import_match` = '
                 .(int)Tools::getValue('idImportMatchs'), true, false);
             die('{"id" : "'.$return[0]['id_import_match'].'", "matchs" : "'.$return[0]['match'].'", "skip" : "'
@@ -3624,7 +3589,7 @@ class AdminImportControllerCore extends AdminController
 
     public function ajaxProcessDeleteImportMatchs()
     {
-        if ($this->tabAccess['edit'] === 1) {
+        if ($this->tabAccess['edit'] === '1') {
             Db::getInstance()->execute('DELETE FROM `'._DB_PREFIX_.'import_match` WHERE `id_import_match` = '
                 .(int)Tools::getValue('idImportMatchs'), false);
             die;

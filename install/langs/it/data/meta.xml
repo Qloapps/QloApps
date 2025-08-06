@@ -126,12 +126,6 @@
     <keywords/>
     <url_rewrite>buono-ordine</url_rewrite>
   </meta>
-   <meta id='our-properties' id_shop='1'>
-    <title>Le nostre proprietà</title>
-    <description/>
-    <keywords/>
-    <url_rewrite>our-properties</url_rewrite>
-  </meta>
   <meta id='order' id_shop='1'>
     <title>Ordine</title>
     <description/>

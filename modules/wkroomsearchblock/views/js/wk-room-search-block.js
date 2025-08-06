@@ -1,23 +1,20 @@
 /**
+* 2010-2020 Webkul.
+*
 * NOTICE OF LICENSE
 *
-* This source file is subject to the Open Software License version 3.0
-* that is bundled with this package in the file LICENSE.md
-* It is also available through the world-wide-web at this URL:
-* https://opensource.org/license/osl-3-0-php
-* If you did not receive a copy of the license and are unable to
-* obtain it through the world-wide-web, please send an email
-* to support@qloapps.com so we can send you a copy immediately.
+* All right is reserved,
+* Please go through this link for complete license : https://store.webkul.com/license.html
 *
 * DISCLAIMER
 *
-* Do not edit or add to this file if you wish to upgrade this module to a newer
-* versions in the future. If you wish to customize this module for your needs
-* please refer to https://store.webkul.com/customisation-guidelines for more information.
+* Do not edit or add to this file if you wish to upgrade this module to newer
+* versions in the future. If you wish to customize this module for your
+* needs please refer to https://store.webkul.com/customisation-guidelines/ for more information.
 *
-* @author Webkul IN
-* @copyright Since 2010 Webkul
-* @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
+*  @author    Webkul IN <support@webkul.com>
+*  @copyright 2010-2020 Webkul IN
+*  @license   https://store.webkul.com/license.html
 */
 
 const BookingSearchManager = {
@@ -118,8 +115,6 @@ const BookingSearchManager = {
                                 }
                             }
                         });
-                    } else {
-                        $('#location_category_id').val('');
                     }
                 }
             },
@@ -144,10 +139,10 @@ const BookingSearchManager = {
                             $('#id_hotel_button').html(result.html_hotel_options);
                             $('#id_hotel_button').trigger('chosen:updated');
                             // Resetting the data from previously selected hotel
-                            $('#min_booking_offset').val(0);
+                            $('#preparation_time').val(0);
                             var max_order_date = $('#max_order_date').val();
-                            var min_booking_offset = 0;
-                            createDateRangePicker(max_order_date, min_booking_offset, $('#check_in_time').val(), $('#check_out_time').val());
+                            var preparation_time = 0;
+                            createDateRangePicker(max_order_date, preparation_time, $('#check_in_time').val(), $('#check_out_time').val());
                             if (search_auto_focus_next_field) {
                                 BookingSearchManager.activateStep('hotel');
                             }
@@ -228,12 +223,12 @@ const BookingSearchManager = {
 
                 if ($(selectedHotel).val().trim() != '') {
                     const maxOrderDate = $(selectedHotel).attr('data-max_order_date');
-                    const minBookingOffset = $(selectedHotel).attr('data-min_booking_offset')
+                    const preparationTime = $(selectedHotel).attr('data-preparation_time')
 
-                    createDateRangePicker(maxOrderDate, minBookingOffset, $('#check_in_time').val(), $('#check_out_time').val());
+                    createDateRangePicker(maxOrderDate, preparationTime, $('#check_in_time').val(), $('#check_out_time').val());
 
                     $('#max_order_date').val(maxOrderDate);
-                    $('#min_booking_offset').val(minBookingOffset);
+                    $('#preparation_time').val(preparationTime);
                     $('#id_hotel').val($(selectedHotel).attr('data-id-hotel'));
                     $('#hotel_cat_id').val($(selectedHotel).attr('data-hotel-cat-id'));
 
@@ -342,6 +337,23 @@ const BookingSearchManager = {
         return true;
     },
 }
+function updateGridColumns() {
+    const gridContainer = $('#search_hotel_block_form > .grid');
+    $(gridContainer).each(function() {
+        const gridItems = $(this).find('div.grid-item');
+        let totalColumns = 0;
+
+        Array.from(gridItems).forEach(item => {
+            totalColumns += parseInt(getComputedStyle(item).getPropertyValue('--col-span'));
+        });
+
+        $(this).css('grid-template-columns', `repeat(${totalColumns}, 1fr)`);
+
+        Array.from(gridItems).forEach(item => {
+            item.style.gridColumn = `span ${getComputedStyle(item).getPropertyValue('--col-span')}`;
+        });
+    })
+}
 
 $(document).ready(function() {
     // initialize booking search fields
@@ -384,28 +396,25 @@ $(document).ready(function() {
     /*END*/
     var ajax_check_var = '';
 
-    createDateRangePicker = function (max_order_date, min_booking_offset, dateFrom, dateTo) {
+    createDateRangePicker = function (max_order_date, preparation_time, dateFrom, dateTo) {
         let start_date = new Date();
-        if (min_booking_offset) {
-            start_date.setDate(start_date.getDate() + parseInt(min_booking_offset));
+        if (preparation_time) {
+            start_date.setDate(start_date.getDate() + parseInt(preparation_time));
             start_date.setHours(0, 0, 0, 0);
+            let selectedDateFrom = new Date(Date.parse(dateFrom));
+            let selectedDateTo = new Date(Date.parse(dateTo));
+            if (selectedDateFrom < start_date
+                || selectedDateTo < start_date
+            ) {
+                $('#check_in_time').val('');
+                $('#check_out_time').val('');
+            }
         }
 
-        // Using the Date object will also add extra hours according to the timezone.
-        let selectedDateFrom = $.datepicker.parseDate('yy-mm-dd', dateFrom);
-        let selectedDateTo = $.datepicker.parseDate('yy-mm-dd', dateTo);
         if (max_order_date) {
-            max_order_date = $.datepicker.parseDate('yy-mm-dd', max_order_date);
+            max_order_date = $.datepicker.parseDate('yy-mm-dd', max_order_date );
         } else {
             max_order_date = false;
-        }
-
-        if (selectedDateFrom < start_date
-            || selectedDateTo < start_date
-            || (max_order_date && (max_order_date < selectedDateTo))
-        ) {
-            $('#check_in_time').val('');
-            $('#check_out_time').val('');
         }
 
         if (typeof $('#daterange_value').data('dateRangePicker') != 'undefined') {
@@ -540,8 +549,8 @@ $(document).ready(function() {
 
     // If only one hotel then set max order date on date pickers
     var max_order_date = $('#max_order_date').val();
-    var min_booking_offset = $('#min_booking_offset').val();
-    createDateRangePicker(max_order_date, min_booking_offset, $('#check_in_time').val(), $('#check_out_time').val());
+    var preparation_time = $('#preparation_time').val();
+    createDateRangePicker(max_order_date, preparation_time, $('#check_in_time').val(), $('#check_out_time').val());
 
     // validations on the submit of the search fields
     $(document).on('click', '#search_room_submit', function() {

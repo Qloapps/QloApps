@@ -49,9 +49,7 @@ $GLOBALS['_PEAR_destructor_object_list'] = array();
 $GLOBALS['_PEAR_shutdown_funcs']         = array();
 $GLOBALS['_PEAR_error_handler_stack']    = array();
 
-if(function_exists('ini_set')) {
-    @ini_set('track_errors', true);
-}
+@ini_set('track_errors', true);
 
 /**
  * Base class for other PEAR classes.  Provides rudimentary
@@ -221,7 +219,7 @@ class PEAR
             );
         }
         return call_user_func_array(
-            array(__CLASS__, '_' . $method),
+            array(get_class(), '_' . $method),
             array_merge(array($this), $arguments)
         );
     }
@@ -234,7 +232,7 @@ class PEAR
             );
         }
         return call_user_func_array(
-            array(__CLASS__, '_' . $method),
+            array(get_class(), '_' . $method),
             array_merge(array(null), $arguments)
         );
     }
@@ -861,7 +859,6 @@ class PEAR_Error
     var $message              = '';
     var $userinfo             = '';
     var $backtrace            = null;
-    var $callback             = null;
 
     /**
      * PEAR_Error constructor

@@ -1,0 +1,176 @@
+{% import "@ModuleAutoUpgrade/macros/icons.twig" as icons %}
+
+
+<div class="bootstrap" id="currentConfigurationBlock">
+    <div class="panel">
+        <div class="panel-heading">
+            {{ 'The pre-Upgrade checklist'|trans }}
+        </div>
+        {% if showErrorMessage %}
+        <p class="alert alert-warning">{{ 'The checklist is not OK. You can only upgrade your shop once all indicators are green.'|trans }}</p>
+        {% endif %}
+        <div id="currentConfiguration">
+            <p class="alert alert-info">{{ 'Before starting the upgrade process, please make sure this checklist is all green.'|trans }}</p>
+            <table class="table" cellpadding="0" cellspacing="0">
+                <tr>
+                    <td>{{ 'The 1-click upgrade module is up-to-date (your current version is v%s)'|trans([moduleVersion]) }}
+                        {% if not moduleIsUpToDate %}
+                            {# {% if versionGreaterThan1_5_3 %} #}
+                            {# <strong><a href="index.php?controller=AdminModules&amp;token={{ adminToken|url_encode }}&update=autoupgrade">{{ 'Update'|trans({}, 'Admin.Actions') }}</a></strong> #}
+                            {# {% endif %} #}
+                            {# <strong><a class="_blank" href="http://addons.prestashop.com/en/administration-tools-prestashop-modules/5496-1-click-upgrade-autoupgrade.html">{{ 'Download'|trans }}</a></strong> #}
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if moduleIsUpToDate %}
+                            {{ icons.ok }}
+                        {% else %}
+                            {{ icons.nok }}
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        {% if not phpUpgradeRequired %}
+                            {{ 'Your server is running on a supported PHP version.'|trans }}
+                        {% else %}
+                            {{ 'The PHP version your server is running on is obsolete and needs to be upgraded. [1]Learn more why[/1] or [2]ignore[/2].'|trans({
+                                '[1]': '<a href="' ~ phpUpgradeRequired|trans ~'" target="_blank">',
+                                '[/1]': '</a>',
+                                '[2]': '<a href="' ~ currentIndex ~ '&token=' ~ token ~ '&ignorePhpOutdated=1">',
+                                '[/2]': '</a>',
+                            })|raw }}
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if not phpUpgradeRequired %}
+                            {{ icons.ok }}
+                        {% else %}
+                            {{ icons.warning }}
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <td>{{ 'Your store\'s root directory is writable (with appropriate CHMOD permissions)'|trans }}</td>
+                    <td>
+                        {% if rootDirectoryIsWritable %}
+                            {{ icons.ok }}
+                        {% else %}
+                            {{ icons.nok }} {{ rootDirectoryWritableReport }}
+                        {% endif %}
+                    </td>
+                </tr>
+                {% if adminDirectoryWritableReport %}
+                    <tr>
+                        <td>{{ 'The "/admin/autoupgrade" directory is writable (appropriate CHMOD permissions)'|trans|raw }}</td>
+                        <td>
+                            {% if adminDirectoryIsWritable %}
+                                {{ icons.ok }}
+                            {% else %}
+                                {{ icons.nok }} {{ adminDirectoryWritableReport }}
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endif %}
+                <tr>
+                    <td>{{ 'PHP\'s "Safe mode" option is turned off'|trans|raw }}</td>
+                    <td>
+                        {% if safeModeIsDisabled %}
+                            {{ icons.ok }}
+                        {% else %}
+                            {{ icons.warning }}
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <td>{{ 'PHP\'s "allow_url_fopen" option is turned on, or cURL is installed'|trans|raw }}</td>
+                    <td>
+                        {% if allowUrlFopenOrCurlIsEnabled %}
+                            {{ icons.ok }}
+                        {% else %}
+                            {{ icons.nok }}
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <td>{{ 'PHP\'s "zip" extension is enabled'|trans|raw }}</td>
+                    <td>
+                        {% if zipIsEnabled %}
+                            {{ icons.ok }}
+                        {% else %}
+                            {{ icons.nok }}
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        {{ 'Your store is in maintenance mode'|trans }}
+                        {% if not storeIsInMaintenance %}
+                            <br><form method="post" action="{{ currentIndex }}&token={{ token }}">
+                                <input type="submit" class="button" name="putUnderMaintenance" value="{{ 'Click here to put your shop under maintenance'|trans }}">
+                            </form>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if storeIsInMaintenance %}
+                            {{ icons.ok }}
+                        {% else %}
+                            {{ icons.nok }}
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <td>{{ 'QloApps\'s caching features are disabled'|trans }}</td>
+                    <td>
+                        {% if cachingIsDisabled %}
+                            {{ icons.ok }}
+                        {% else %}
+                            {{ icons.nok }}
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        {% if maxExecutionTime == 0 %}
+                            {{ 'PHP\'s max_execution_time setting has a high value or is disabled entirely (current value: unlimited)'|trans }}
+                        {% elseif maxExecutionTime >= 500 %}
+                            {{ 'PHP\'s max_execution_time setting has a high value or is disabled entirely (current value: %s seconds)'|trans([maxExecutionTime]) }}
+                        {% else %}
+                            {{ 'PHP\'s max_execution_time setting has a low value (current value: %s seconds)'|trans([maxExecutionTime]) }}
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if maxExecutionTime == 0 or maxExecutionTime >= 500 %}
+                            {{ icons.ok }}
+                        {% else %}
+                            {{ icons.warning }}
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        {% if isPrestaShopReady %}
+                            {{ 'QloApps requirements are satisfied.'|trans }}
+                        {% else %}
+                            {{ 'QloApps requirements are not satisfied. [1]See details[/1] or [2]ignore[/2].'|trans({
+                                '[1]': '<a href="https://qloapps.com/install-qloapps/">',
+                                '[/1]': '</a>',
+                                '[2]': '<a href="' ~ currentIndex ~ '&token=' ~ token ~ '&ignorePsRequirements=1">',
+                                '[/2]': '</a>',
+                            })|raw }}
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if isPrestaShopReady %}
+                            {{ icons.ok }}
+                        {% else %}
+                            {{ icons.warning }}
+                        {% endif %}
+                    </td>
+                </tr>
+            </table>
+            <br>
+            <p class="alert alert-info">{{ 'Please also make sure you make a full manual backup of your files and database.'|trans }}</p>
+        </div>
+    </div>
+</div>

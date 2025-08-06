@@ -1,24 +1,21 @@
 <?php
 /**
+* 2010-2020 Webkul.
+*
 * NOTICE OF LICENSE
 *
-* This source file is subject to the Open Software License version 3.0
-* that is bundled with this package in the file LICENSE.md
-* It is also available through the world-wide-web at this URL:
-* https://opensource.org/license/osl-3-0-php
-* If you did not receive a copy of the license and are unable to
-* obtain it through the world-wide-web, please send an email
-* to support@qloapps.com so we can send you a copy immediately.
+* All right is reserved,
+* Please go through this link for complete license : https://store.webkul.com/license.html
 *
 * DISCLAIMER
 *
-* Do not edit or add to this file if you wish to upgrade this module to a newer
-* versions in the future. If you wish to customize this module for your needs
-* please refer to https://store.webkul.com/customisation-guidelines for more information.
+* Do not edit or add to this file if you wish to upgrade this module to newer
+* versions in the future. If you wish to customize this module for your
+* needs please refer to https://store.webkul.com/customisation-guidelines/ for more information.
 *
-* @author Webkul IN
-* @copyright Since 2010 Webkul
-* @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
+*  @author    Webkul IN <support@webkul.com>
+*  @copyright 2010-2020 Webkul IN
+*  @license   https://store.webkul.com/license.html
 */
 
 class AdminAddHotelController extends ModuleAdminController
@@ -126,10 +123,6 @@ class AdminAddHotelController extends ModuleAdminController
         $smartyVars['currentLang'] = Language::getLanguage((int) $currentLangId);
 
         $smartyVars['defaultCurrency'] = Configuration::get('PS_CURRENCY_DEFAULT');
-        $smartyVars['PS_SHORT_DESC_LIMIT'] = Configuration::get('PS_SHORT_DESC_LIMIT');
-        if (!$smartyVars['PS_SHORT_DESC_LIMIT']) {
-            $smartyVars['PS_SHORT_DESC_LIMIT'] = Configuration::PS_SHORT_DESC_LIMIT;
-        }
 
         $countries = Country::getCountries($this->context->language->id, true);
         $smartyVars['country_var'] = $countries;
@@ -175,7 +168,15 @@ class AdminAddHotelController extends ModuleAdminController
                 }
             }
 
-            $smartyVars['order_restrict_date_info'] = HotelOrderRestrictDate::getDataByHotelId($idHotel);
+            $restrictDateInfo = HotelOrderRestrictDate::getDataByHotelId($idHotel);
+            if ($restrictDateInfo) {
+                if ($restrictDateInfo['max_order_date'] == '0000-00-00') {
+                    $restrictDateInfo['max_order_date'] = date('d-m-Y', strtotime('1 year'));
+                } else {
+                    $restrictDateInfo['max_order_date'] = date('d-m-Y', strtotime($restrictDateInfo['max_order_date']));
+                }
+            }
+            $smartyVars['order_restrict_date_info'] = $restrictDateInfo;
             $objHotelFeatures = new HotelFeatures();
             $hotelFeatures = $this->object->getFeaturesOfHotelByHotelId($this->object->id);
             if ($features = $objHotelFeatures->HotelBranchSelectedFeaturesArray($hotelFeatures)) {
@@ -217,11 +218,10 @@ class AdminAddHotelController extends ModuleAdminController
         }
 
         $smartyVars['state_var'] = $stateOptions;
-        $smartyVars['enabledDisplayMap'] = Configuration::get('PS_API_KEY') && Configuration::get('PS_MAP_ID') && Configuration::get('WK_GOOGLE_ACTIVE_MAP');
+        $smartyVars['enabledDisplayMap'] = Configuration::get('PS_API_KEY') && Configuration::get('WK_GOOGLE_ACTIVE_MAP');
         $smartyVars['ps_img_dir'] = _PS_IMG_.'l/';
-        $smartyVars['PS_MAX_CHECKOUT_OFFSET'] = (int) Configuration::get('PS_MAX_CHECKOUT_OFFSET');
-        $smartyVars['PS_MIN_BOOKING_OFFSET'] = (int) Configuration::get('PS_MIN_BOOKING_OFFSET');
-        $smartyVars['WK_ORDER_REFUND_ALLOWED'] = Configuration::get('WK_ORDER_REFUND_ALLOWED');
+        $smartyVars['MAX_GLOBAL_BOOKING_DATE'] = (Configuration::get('MAX_GLOBAL_BOOKING_DATE'));
+        $smartyVars['GLOBAL_PREPARATION_TIME'] = Configuration::get('GLOBAL_PREPARATION_TIME');
 
         $this->context->smarty->assign($smartyVars);
 
@@ -241,10 +241,6 @@ class AdminAddHotelController extends ModuleAdminController
 
     public function processSave()
     {
-        if (!$this->loadObject(true)) {
-            return false;
-        }
-
         $idHotel = Tools::getValue('id');
         $phone = Tools::getValue('phone');
         $email = Tools::getValue('email');
@@ -257,18 +253,16 @@ class AdminAddHotelController extends ModuleAdminController
         $zipcode = Tools::getValue('hotel_postal_code');
         $address = Tools::getValue('address');
         $active = Tools::getValue('ENABLE_HOTEL');
-        $fax = Tools::getValue('fax');
         $activeRefund = Tools::getValue('active_refund');
-        $enableUseGlobalMaxCheckoutOffset = Tools::getValue('enable_use_global_max_checkout_offset');
-        $maxCheckoutOffset = trim(Tools::getValue('max_checkout_offset'));
-        $enableUseGlobalMinBookingOffset = Tools::getValue('enable_use_global_min_booking_offset');
-        $minBookingOffset = trim(Tools::getValue('min_booking_offset'));
+        $enableUseGlobalMaxOrderDate = Tools::getValue('enable_use_global_max_order_date');
+        $maximumBookingDate = Tools::getValue('maximum_booking_date');
+        $enableUseGlobalPreparationTime = Tools::getValue('enable_use_global_preparation_time');
+        $preparationTime = Tools::getValue('preparation_time');
         $latitude = Tools::getValue('loclatitude');
         $longitude = Tools::getValue('loclongitude');
         $map_formated_address = Tools::getValue('locformatedAddr');
         $map_input_text = Tools::getValue('googleInputField');
         $hotelFeatures = Tools::getValue('id_features', array());
-        $shortDescriptionMaxChar = Configuration::get('PS_SHORT_DESC_LIMIT') ? Configuration::get('PS_SHORT_DESC_LIMIT') : Configuration::PS_SHORT_DESC_LIMIT;
 
         // check if field is atleast in default language. Not available in default prestashop
         $defaultLangId = Configuration::get('PS_LANG_DEFAULT');
@@ -285,59 +279,47 @@ class AdminAddHotelController extends ModuleAdminController
                         $this->errors[] = $this->l('Invalid Hotel name in ').$lang['name'];
                     }
                 }
-            }
-        }
-
-        foreach ($languages as $lang) {
-            if ($shortDescription = html_entity_decode(Tools::getValue('short_description_'.$lang['id_lang']))) {
-                if (!Validate::isCleanHtml($shortDescription)) {
-                    $this->errors[] = sprintf($this->l('Short description is not valid in %s'), $lang['name']);
+                if ($shortDescription = html_entity_decode(Tools::getValue('short_description_'.$lang['id_lang']))) {
+                    if (!Validate::isCleanHtml($shortDescription)) {
+                        $this->errors[] = sprintf($this->l('Short description is not valid in %s'), $lang['name']);
+                    }
+                }
+                if ($description = html_entity_decode(Tools::getValue('description_'.$lang['id_lang']))) {
+                    if (!Validate::isCleanHtml($description)) {
+                        $this->errors[] = sprintf($this->l('Description is not valid in %s'), $lang['name']);
+                    }
+                }
+                if ($policies = html_entity_decode(Tools::getValue('policies_'.$lang['id_lang']))) {
+                    if (!Validate::isCleanHtml($policies)) {
+                        $this->errors[] = sprintf($this->l('policies are not valid in %s'), $lang['name']);
+                    }
                 }
 
-                $shortDescriptionLength = Tools::strlen($shortDescription);
-                if ($shortDescriptionLength > $shortDescriptionMaxChar) {
-                    $this->errors[] = sprintf($this->l('Short description cannot exceed %s characters in '), $shortDescriptionMaxChar).$lang['name'];
+                if ($metaTitle = trim(Tools::getValue('meta_title_'.$lang['id_lang']))) {
+                    if (!Validate::isGenericName($metaTitle)) {
+                        $this->errors[] = $this->l('Invalid Meta title in ').$lang['name'];
+                    } else if (Tools::strlen($metaTitle) > 128) {
+                        $this->errors[] = $this->l('Meta title cannot be longer than 128  in ').$lang['name'];
+                    }
                 }
-            }
 
-            if ($description = html_entity_decode(Tools::getValue('description_'.$lang['id_lang']))) {
-                if (!Validate::isCleanHtml($description)) {
-                    $this->errors[] = sprintf($this->l('Description is not valid in %s'), $lang['name']);
+                if ($metaDescription = trim(Tools::getValue('meta_description_'.$lang['id_lang']))) {
+                    if (!Validate::isGenericName($metaDescription)) {
+                        $this->errors[] = $this->l('Invalid Meta description in ').$lang['name'];
+                    } else if (Tools::strlen($metaDescription) > 255) {
+                        $this->errors[] = $this->l('Meta description cannot be longer than 128  in ').$lang['name'];
+                    }
                 }
-            }
-            if ($policies = html_entity_decode(Tools::getValue('policies_'.$lang['id_lang']))) {
-                if (!Validate::isCleanHtml($policies)) {
-                    $this->errors[] = sprintf($this->l('policies are not valid in %s'), $lang['name']);
-                }
-            }
 
-            if ($metaTitle = trim(Tools::getValue('meta_title_'.$lang['id_lang']))) {
-                if (!Validate::isGenericName($metaTitle)) {
-                    $this->errors[] = $this->l('Invalid Meta title in ').$lang['name'];
-                } else if (Tools::strlen($metaTitle) > 128) {
-                    $this->errors[] = $this->l('Meta title cannot exceed 128 characters in ').$lang['name'];
+                if ($metaKeyWords = trim(Tools::getValue('meta_keywords_'.$lang['id_lang']))) {
+                    if (!Validate::isGenericName($metaKeyWords)) {
+                        $this->errors[] = $this->l('Invalid Meta keywords in ').$lang['name'];
+                    } else if (Tools::strlen($metaKeyWords) > 255) {
+                        $this->errors[] = $this->l('Meta keywords cannot be longer than 128  in ').$lang['name'];
+                    }
+
                 }
             }
-
-            if ($metaDescription = trim(Tools::getValue('meta_description_'.$lang['id_lang']))) {
-                if (!Validate::isGenericName($metaDescription)) {
-                    $this->errors[] = $this->l('Invalid Meta description in ').$lang['name'];
-                } else if (Tools::strlen($metaDescription) > 255) {
-                    $this->errors[] = $this->l('Meta description cannot exceed 128 characters in ').$lang['name'];
-                }
-            }
-
-            if ($metaKeyWords = trim(Tools::getValue('meta_keywords_'.$lang['id_lang']))) {
-                if (!Validate::isGenericName($metaKeyWords)) {
-                    $this->errors[] = $this->l('Invalid Meta keywords in ').$lang['name'];
-                } else if (Tools::strlen($metaKeyWords) > 255) {
-                    $this->errors[] = $this->l('Meta keywords cannot exceed 128 characters in ').$lang['name'];
-                }
-            }
-        }
-
-        if ($activeRefund && !Configuration::get('WK_ORDER_REFUND_ALLOWED')) {
-            $this->errors[] = $this->l('Enable order refunds to allow hotel-wise refunds.');
         }
 
         // validate Friendly URL values
@@ -382,10 +364,6 @@ class AdminAddHotelController extends ModuleAdminController
 
         if (!$address = trim($address)) {
             $this->errors[] = $this->l('Address is required field.');
-        }
-
-        if ($fax && !Validate::isGenericName($fax)) {
-            $this->errors[] = $this->l('Field fax in invalid.');
         }
 
         if (!$country) {
@@ -449,33 +427,22 @@ class AdminAddHotelController extends ModuleAdminController
         }
 
         if ($idHotel) {
-            if (!$enableUseGlobalMaxCheckoutOffset) {
-                if ($maxCheckoutOffset === '') {
-                    $this->errors[] = $this->l('Maximum checkout offset is a required field.');
-                } elseif (!$maxCheckoutOffset || !Validate::isUnsignedInt($maxCheckoutOffset)) {
-                    $this->errors[] = $this->l('Maximum checkout offset is invalid.');
+            if (!$enableUseGlobalMaxOrderDate) {
+                $maximumBookingDateFormatted = date('Y-m-d', strtotime($maximumBookingDate));
+                if ($maximumBookingDate == '') {
+                    $this->errors[] = $this->l('Maximum Check-out Date to book a room is a required field.');
+                } elseif (!Validate::isDate($maximumBookingDateFormatted)) {
+                    $this->errors[] = $this->l('Maximum Check-out Date to book a room is invalid.');
+                } elseif (strtotime($maximumBookingDateFormatted) < strtotime(date('Y-m-d'))) {
+                    $this->errors[] = $this->l('Maximum Check-out Date to book a room can not be a past date. Please use a future date.');
                 }
             }
 
-            if (!$enableUseGlobalMinBookingOffset) {
-                if ($minBookingOffset === '') {
+            if (!$enableUseGlobalPreparationTime) {
+                if ($preparationTime === '') {
                     $this->errors[] = $this->l('Minimum booking offset is a required field.');
-                } elseif (!Validate::isUnsignedInt($minBookingOffset)) {
+                } elseif ($preparationTime !== '0' && !Validate::isUnsignedInt($preparationTime)) {
                     $this->errors[] = $this->l('Minimum booking offset is invalid.');
-                }
-            }
-
-            if (empty($this->errors)) {
-                if (!$enableUseGlobalMaxCheckoutOffset && !$enableUseGlobalMinBookingOffset) {
-                    if ($maxCheckoutOffset && $maxCheckoutOffset <= $minBookingOffset) {
-                        $this->errors[] = $this->l('Field Maximum checkout offset cannot be be less than or equal to Minimum booking offset.');
-                    }
-                } else {
-                    if (!$enableUseGlobalMaxCheckoutOffset && $maxCheckoutOffset <= Configuration::get('PS_MIN_BOOKING_OFFSET')) {
-                        $this->errors[] = $this->l('Field Maximum checkout offset cannot be be less than or equal to global Minimum booking offset.');
-                    } else if (!$enableUseGlobalMinBookingOffset && $minBookingOffset >= Configuration::get('PS_MAX_CHECKOUT_OFFSET')) {
-                        $this->errors[] = $this->l('Field Minimum booking offset cannot be be greater than or equal to Global Maximum checkout offset.');
-                    }
                 }
             }
         }
@@ -502,7 +469,6 @@ class AdminAddHotelController extends ModuleAdminController
             }
             $objHotelBranch->active = $active;
             $objHotelBranch->active_refund = $activeRefund;
-            $objHotelBranch->fax = $fax;
 
             // lang fields
             $hotelCatName = array();
@@ -531,16 +497,18 @@ class AdminAddHotelController extends ModuleAdminController
                     );
                 }
 
-                $cleanShortDescription = Tools::getDescriptionClean(Tools::getValue('short_description_'.$lang['id_lang']));
+                $cleanShortDescription = Tools::getDescriptionClean(
+                    Tools::getValue('short_description_'.$lang['id_lang'])
+                );
                 //Remove TinyMCE's Non-Breaking Spaces
                 $cleanShortDescription = str_replace(chr(0xC2).chr(0xA0), "", $cleanShortDescription);
                 if (!trim($cleanShortDescription)) {
-                    $objHotelBranch->short_description[$lang['id_lang']] = Tools::getDescriptionClean(
-                        Tools::getValue('short_description_'.$defaultLangId)
+                    $objHotelBranch->short_description[$lang['id_lang']] = Tools::getValue(
+                        'short_description_'.$defaultLangId
                     );
                 } else {
-                    $objHotelBranch->short_description[$lang['id_lang']] = Tools::getDescriptionClean(
-                        Tools::getValue('short_description_'.$lang['id_lang'])
+                    $objHotelBranch->short_description[$lang['id_lang']] = Tools::getValue(
+                        'short_description_'.$lang['id_lang']
                     );
                 }
                 $cleanDescription = Tools::getDescriptionClean(
@@ -608,8 +576,8 @@ class AdminAddHotelController extends ModuleAdminController
             $objHotelBranch->check_in = $check_in;
             $objHotelBranch->check_out = $check_out;
             $objHotelBranch->rating = $rating;
-            $objHotelBranch->latitude = Validate::isFloat($latitude) ? Tools::ps_round($latitude, 8) : $latitude;
-            $objHotelBranch->longitude = Validate::isFloat($longitude) ? Tools::ps_round($longitude, 8) : $longitude;
+            $objHotelBranch->latitude = $latitude;
+            $objHotelBranch->longitude = $longitude;
             $objHotelBranch->map_formated_address = $map_formated_address;
             $objHotelBranch->map_input_text = $map_input_text;
             $objHotelBranch->save();
@@ -696,34 +664,16 @@ class AdminAddHotelController extends ModuleAdminController
                 }
                 $objCountry = new Country();
                 $countryName = $objCountry->getNameById(Configuration::get('PS_LANG_DEFAULT'), $country);
-                if ($catCountry = $objHotelBranch->addCategory(
-                    array (
-                        'name' => $countryName,
-                        'group_ids' => $groupIds,
-                        'parent_category' => false
-                    )
-                )) {
+                if ($catCountry = $objHotelBranch->addCategory($countryName, false, $groupIds)) {
                     if ($state) {
                         $objState = new State();
                         $stateName = $objState->getNameById($state);
+                        $catState = $objHotelBranch->addCategory($stateName, $catCountry, $groupIds);
                     } else {
-                        $stateName = $city;
+                        $catState = $objHotelBranch->addCategory($city, $catCountry, $groupIds);
                     }
-
-                    if ($catState = $objHotelBranch->addCategory(
-                        array (
-                            'name' => $stateName,
-                            'group_ids' => $groupIds,
-                            'parent_category' => $catCountry
-                        )
-                    )) {
-                        if ($catCity = $objHotelBranch->addCategory(
-                            array (
-                                'name' => $city,
-                                'group_ids' => $groupIds,
-                                'parent_category' => $catState
-                            )
-                        )) {
+                    if ($catState) {
+                        if ($catCity = $objHotelBranch->addCategory($city, $catState, $groupIds)) {
                             $hotelCatName = $objHotelBranch->hotel_name;
                             // add/update hotel category
                             if ($objHotelBranch->id_category) {
@@ -738,17 +688,15 @@ class AdminAddHotelController extends ModuleAdminController
                                 Category::regenerateEntireNtree();
                             } else {
                                 if ($catHotel = $objHotelBranch->addCategory(
-                                    array (
-                                        'name' => $hotelCatName,
-                                        'group_ids' => $groupIds,
-                                        'parent_category' => $catCity,
-                                        'is_hotel' => 1,
-                                        'id_hotel' => $newIdHotel,
-                                        'link_rewrite' => $linkRewriteArray,
-                                        'meta_title' => $metaTitleArray,
-                                        'meta_description' => $metaDescriptionArray,
-                                        'meta_keywords' => $metaKeywordsArray
-                                    )
+                                    $hotelCatName,
+                                    $catCity,
+                                    $groupIds,
+                                    1,
+                                    $newIdHotel,
+                                    $linkRewriteArray,
+                                    $metaTitleArray,
+                                    $metaDescriptionArray,
+                                    $metaKeywordsArray
                                 )) {
                                     $objHotelBranch = new HotelBranchInformation($newIdHotel);
                                     $objHotelBranch->id_category = $catHotel;
@@ -781,25 +729,24 @@ class AdminAddHotelController extends ModuleAdminController
             $objHotelBranch->updateRoomTypeCategories();
 
             if ($idHotel) {
-                // save Maximum checkout offset and minimum booking offset
+                // save maximum booking date and preparation time
                 $objHotelOrderRestrictDate = new HotelOrderRestrictDate();
                 $restrictDateInfo = HotelOrderRestrictDate::getDataByHotelId($newIdHotel);
                 if ($restrictDateInfo) {
                     $objHotelOrderRestrictDate = new HotelOrderRestrictDate($restrictDateInfo['id']);
+                } else {
+                    $objHotelOrderRestrictDate = new HotelOrderRestrictDate();
                 }
 
                 $objHotelOrderRestrictDate->id_hotel = $newIdHotel;
-                $objHotelOrderRestrictDate->use_global_max_checkout_offset = $enableUseGlobalMaxCheckoutOffset;
-                $objHotelOrderRestrictDate->use_global_min_booking_offset = $enableUseGlobalMinBookingOffset;
-
-                if (!$enableUseGlobalMaxCheckoutOffset) {
-                    $objHotelOrderRestrictDate->max_checkout_offset = $maxCheckoutOffset;
+                $objHotelOrderRestrictDate->use_global_max_order_date = $enableUseGlobalMaxOrderDate;
+                if (!$enableUseGlobalMaxOrderDate) {
+                    $objHotelOrderRestrictDate->max_order_date = $maximumBookingDateFormatted;
                 }
-
-                if (!$enableUseGlobalMinBookingOffset) {
-                    $objHotelOrderRestrictDate->min_booking_offset = $minBookingOffset;
+                $objHotelOrderRestrictDate->use_global_preparation_time = $enableUseGlobalPreparationTime;
+                if (!$enableUseGlobalPreparationTime) {
+                    $objHotelOrderRestrictDate->preparation_time = $preparationTime;
                 }
-
                 $objHotelOrderRestrictDate->save();
 
                 $objHotelFeatures = new HotelBranchFeatures();
@@ -809,25 +756,32 @@ class AdminAddHotelController extends ModuleAdminController
                 }
             }
 
-            $conf = 3;
-            if ($idHotel) {
-                $conf = 4;
-            }
-
             if (Tools::isSubmit('submitAdd'.$this->table.'AndStay')) {
-                Tools::redirectAdmin(self::$currentIndex.'&id='.(int) $newIdHotel.'&update'.$this->table.'&conf='.$conf.'&token='.$this->token                );
+                if ($idHotel) {
+                    Tools::redirectAdmin(
+                        self::$currentIndex.'&id='.(int) $newIdHotel.'&update'.$this->table.'&conf=4&token='.
+                        $this->token
+                    );
+                } else {
+                    Tools::redirectAdmin(
+                        self::$currentIndex.'&id='.(int) $newIdHotel.'&update'.$this->table.'&conf=3&token='.
+                        $this->token
+                    );
+                }
             } else {
-                Tools::redirectAdmin(self::$currentIndex.'&conf='.$conf.'&token='.$this->token);
+                if ($idHotel) {
+                    Tools::redirectAdmin(self::$currentIndex.'&conf=4&token='.$this->token);
+                } else {
+                    Tools::redirectAdmin(self::$currentIndex.'&conf=3&token='.$this->token);
+                }
             }
         }
-
         if ($idHotel) {
             $this->display = 'edit';
         } else {
             $this->display = 'add';
         }
     }
-
     public function processStatus()
     {
         parent::processStatus();
@@ -987,16 +941,15 @@ class AdminAddHotelController extends ModuleAdminController
                 'primaryHotelId' => Configuration::get('WK_PRIMARY_HOTEL'),
                 'disableHotelMsg' => $this->l('Primary hotel for website will be updated to first available active hotel.', null, true),
                 'PS_STORES_ICON' => $this->context->link->getMediaLink(_PS_IMG_.Configuration::get('PS_STORES_ICON')),
-                'PS_MAP_ID' => ($PS_MAP_ID = Configuration::get('PS_MAP_ID'))
             )
         );
         // GOOGLE MAP
         $language = $this->context->language;
         $country = $this->context->country;
-        if (($PS_API_KEY = Configuration::get('PS_API_KEY')) && $PS_MAP_ID) {
+        if ($PS_API_KEY = Configuration::get('PS_API_KEY')) {
             $this->addJS(
-                'https://maps.googleapis.com/maps/api/js?key='.$PS_API_KEY.'&libraries=places,marker&loading=async&language='.
-                $language->iso_code.'&region='.$country->iso_code.'&callback=initGoogleMaps'
+                'https://maps.googleapis.com/maps/api/js?key='.$PS_API_KEY.'&libraries=places&language='.
+                $language->iso_code.'&region='.$country->iso_code
             );
         }
         //tinymce

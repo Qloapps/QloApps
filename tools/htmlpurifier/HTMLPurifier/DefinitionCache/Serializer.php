@@ -287,14 +287,13 @@ class HTMLPurifier_DefinitionCache_Serializer extends HTMLPurifier_DefinitionCac
             } elseif (filegroup($dir) === posix_getgid()) {
                 $chmod = $chmod | 0070;
             } else {
-              // PHP's probably running as nobody, it is
-              // not obvious how to fix this (777 is probably
-              // bad if you are multi-user), let the user figure it out
-                $chmod = null;
+                // PHP's probably running as nobody, so we'll
+                // need to give global permissions
+                $chmod = $chmod | 0777;
             }
             trigger_error(
-                'Directory ' . $dir . ' not writable. ' .
-                ($chmod === null ? '' : 'Please chmod to ' . decoct($chmod)),
+                'Directory ' . $dir . ' not writable, ' .
+                'please chmod to ' . decoct($chmod),
                 E_USER_WARNING
             );
         } else {

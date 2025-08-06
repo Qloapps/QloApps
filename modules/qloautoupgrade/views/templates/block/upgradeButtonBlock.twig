@@ -1,0 +1,170 @@
+<div class="bootstrap" id="upgradeButtonBlock">
+    <div class="panel">
+        <div class="panel-heading">
+            {{ 'Start your Upgrade'|trans }}
+        </div>
+        <div class="blocOneClickUpgrade">
+            {% if versionCompare > 0 %}
+            <p class="alert alert-warning">{{ 'You come from the future! You are using a more recent version than the latest available!'|trans }}</p>
+            {% elseif versionCompare == 0 %}
+            <p class="alert alert-success">{{ 'Congratulations, you are already using the latest version available!'|trans }}</p>
+            {% endif %}
+            <p>
+                {{ 'Your current Qloapps version'|trans }}: <strong>{{ currentPsVersion }}</strong>
+            </p>
+            <p>
+                {{ 'Latest official version for %s channel.'|trans([channel]) }}: <strong>{{ latestChannelVersion }}</strong>
+            </p>
+        </div>
+        <br>
+        {% if showUpgradeButton %}
+            <div>
+                <a href="#" id="upgradeNow" class="button-autoupgrade upgradestep btn btn-primary">{{ 'Upgrade QloApps now!'|trans }}</a>
+                {% if showUpgradeLink %}
+                    <small><a href="{{ upgradeLink }}">{{ 'QloApps will be downloaded from %s'|trans([upgradeLink]) }}</a></small>
+                    {% if changelogLink is not empty %}
+                    <p>
+                        <a href="{{ changelogLink }}" target="_blank" >{{ 'Open changelog in a new window'|trans }}</a>
+                    </p>
+                    {% endif %}
+                {% else %}
+                    {{ 'No file will be downloaded (channel %s is used)'|trans([channel]) }}
+                {% endif %}
+            </div>
+            {% if skipActions is not empty %}
+                <div id="skipAction-list" class="alert alert-warning">
+                    <p>{{ 'The following action are automatically replaced'|trans }}</p>
+                    <ul>
+                        {% for old, new in skipActions %}
+                            <li>
+                                {{ '%old% will be replaced by %new%'|trans({'%old%': old, '%new%': new}) }}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                    <p>{{ 'To change this behavior, you need to manually edit your php files'|trans }}</p>
+                </div>
+            {% endif %}
+        {% endif %}
+        <br>
+        <p>
+            {% if showUpgradeButton %}
+            <a class="button button-autoupgrade btn btn-default" href="index.php?tab=AdminSelfUpgrade&amp;token={{ token }}&amp;refreshCurrentVersion=1">{{ 'Refresh the page'|trans }}</a> -
+            {% else %}
+            <a class="button button-autoupgrade btn btn-primary" href="index.php?tab=AdminSelfUpgrade&amp;token={{ token }}&amp;refreshCurrentVersion=1">{{ 'Check if a new version is available'|trans }}</a> -
+            {% endif %}
+            <span style="font-style: italic; font-size: 11px;">{% if lastVersionCheck %}
+                {{ 'Last check: %s'|trans([lastVersionCheck|date('Y-m-d H:i:s')]) }}
+                {% else %}
+                {{ 'Last check: never'|trans }}
+                {% endif %}
+            </span>
+        </p>
+
+        <!-- advanced configuration -->
+        <div class="row">
+            <div class="pull-right">
+                <p><input type="button" class="button btn btn-warning" name="btn_adv" value="{{ 'More options (Expert mode)'|trans }}"/></p>
+            </div>
+            <div class="col-xs-12">
+                <p class="alert alert-info" style="display:none;" id="configResult">&nbsp;</p>
+                <div id="advanced" style="margin-top: 30px;">
+                    <h3>{{ 'Expert mode'|trans }}</h3>
+                    <h4 style="margin-top: 0">{{ 'Please select your channel:'|trans }}</h4>
+                    <p>
+                        {{ 'Channels are offering you different ways to perform an upgrade. You can either upload the new version manually or let the 1-Click Upgrade module download it for you.'|trans }}<br>
+                        {# {{ 'The Alpha, Beta and Private channels give you the ability to upgrade to a non-official or unstable release (for testing purposes only).'|trans }}<br> #}
+                        {{ 'By default, you should use the "Minor release" channel which is offering the latest stable version of your QloApps with bugs fixes and additional features.'|trans|raw }}<br>
+                        {{ 'Use "Major release" channel to upgrade to the latest stable version available.'|trans|raw }}
+                    </p>
+                    <br>
+                    <label for="channel">{{ 'Channel:'|trans }}</label>
+                    <select name="channel" id="channel">
+                        {% for channelOpt in channelOptions %}
+                            {% set selected = (channel == channelOpt[1]) %}
+                            <option id="{{ channelOpt[0] }}" value="{{ channelOpt[1] }}" {% if selected %}class="current" selected{% endif %}>
+                                {% if selected %}* {% endif %}{{ channelOpt[2] }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                    {{ channelInfoBlock|raw }}
+                    <div id="for-useMinor">
+                        <div class="margin-form margin-form-small">
+                            {{ 'This option regroup all stable versions.'|trans }}
+                        </div>
+                    </div>
+                    <div id="for-usePrivate">
+                        <p><label for="private_release_link">{{ 'Link:'|trans }} *</label>
+                            <input type="text" size="50" id="private_release_link" name="private_release_link" value="{{ privateChannel.releaseLink }}">
+                        </p>
+                        <p><label for="private_release_md5">{{ 'Hash key:'|trans }} *</label>
+                            <input type="text" size="32" id="private_release_md5" name="private_release_md5" value="{{ privateChannel.releaseMd5 }}">
+                        </p>
+                        <p><label for="private_allow_major">{{ 'Allow major upgrade:'|trans }}</label>
+                            <input type="checkbox" id="private_allow_major" name="private_allow_major" value="1"{% if privateChannel.allowMajor %} checked{% endif %}>
+                        </p>
+                    </div>
+                    <div id="for-useArchive">
+                        {% if archiveFiles is not empty %}
+                            <label for="archive_prestashop">{{ 'Archive to use:'|trans }}</label>
+                            <div>
+                                <select id="archive_prestashop" name="archive_prestashop">
+                                    <option value="">{{ 'Choose an archive'|trans }}</option>
+                                    {% for file in archiveFiles %}
+                                        {% set fileName = file|replace({(downloadPath): ''}) %}
+                                        <option {% if archiveFileName == fileName %} selected{% endif %} value="{{ fileName }}">{{ fileName }}</option>
+                                    {% endfor %}
+                                </select>
+                                <br>
+                                <label for="archive_num">{{ 'Number of the version you want to upgrade to:'|trans }} * </label>
+                                <input type="text" size="10" id="archive_num" name="archive_num" value="{{ archiveVersionNumber }}" placeholder="1.7.0.1" />
+                            </div>
+                        {% else %}
+                            <div class="alert alert-warning">{{ 'No archive found in your admin/autoupgrade/download directory'|trans }}</div>
+                        {% endif %}
+                        <div class="margin-form">
+                            {{ 'Save in the following directory the archive file of the version you want to upgrade to: %s'|trans(['<b>/admin/autoupgrade/download/</b>'])|raw }}<br>
+                            {{ 'Click "Save" once the archive is there.'|trans }}<br>
+                            {{ 'This option will skip the download step.'|trans }}
+                        </div>
+                    </div>
+                    <div id="for-useDirectory">
+                        <div>
+                            {{ 'Save in the following directory the uncompressed PrestaShop files of the version you want to upgrade to: %s'|trans(['<b>/admin/autoupgrade/latest/</b>'])|raw }}
+                            <br><br>
+                            <label for="directory_num">{{ 'Please tell us which version you are upgrading to [1](1.7.0.1 for instance)[/1]'|trans({'[1]': '<small>', '[/1]': '</small>'})|raw }}</label>
+                            <input type="text" size="10" id="directory_num" name="directory_num" value="{{ directoryVersionNumber }}" placeholder="1.7.0.1">
+                            <div class="margin-form">
+                                {{ 'Click "Save" once the archive is there.'|trans }}<br>
+                                * {{ 'This option will skip both download and unzip steps and will use %1$s as the source directory'|trans(['<b>/admin/autoupgrade/latest/</b>'])|raw }}
+                            </div>
+                        </div>
+                    </div>
+                    <br>
+                    <p>
+                        <input type="button" class="button btn btn-primary" value="{{ 'Save'|trans({}, 'Admin.Actions') }}" name="submitConf-channel">
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        {% if manualMode %}
+            <br class="clear"/>
+            <fieldset class="autoupgradeSteps"><legend>{{ 'Step'|trans }}</legend>
+                <h4>{{ 'Upgrade steps'|trans }} : </h4>
+                <div>
+                    <a id="download" class="upgradestep">download</a>
+                    <a id="unzip" class="upgradestep">unzip</a>{# unzip in autoupgrade/latest #}
+                    <a id="removeSamples" class="upgradestep">removeSamples</a> {# remove samples (iWheel images) #}
+                    <a id="backupFiles" class="upgradestep">backupFiles</a>
+                    <a id="backupDb" class="upgradestep">backupDb</a>
+                    <a id="upgradeFiles" class="upgradestep">upgradeFiles</a>
+                    <a id="upgradeDb" class="upgradestep">upgradeDb</a>
+                    <a id="upgradeModules" class="upgradestep">upgradeModules</a>
+                    <a id="cleanDatabase" class="upgradestep">cleanDb</a>
+                    <a id="upgradeComplete" class="upgradestep">upgradeComplete</a>
+                </div>
+            </fieldset>
+        {% endif %}
+
+    </div>
+</div>

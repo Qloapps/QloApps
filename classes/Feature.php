@@ -151,7 +151,7 @@ class FeatureCore extends ObjectModel
         }
 
         /* Reinitializing position */
-        static::cleanPositions();
+        $this->cleanPositions();
 
         return $return;
     }

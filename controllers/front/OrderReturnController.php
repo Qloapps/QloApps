@@ -57,8 +57,6 @@ class OrderReturnControllerCore extends FrontController
                     ) {
                         $isCanceledBookings = true;
                     }
-                    $refundReqProducts = $objOrderReturn->getOrderRefundRequestedProducts($objOrderReturn->id_order, $objOrderReturn->id);
-
                     $voucher = '';
                     if (Validate::isLoadedObject($objCartRule = new CartRule($objOrderReturn->id_return_type))) {
                         $voucher = $objCartRule->name[$this->context->language->id];
@@ -68,7 +66,6 @@ class OrderReturnControllerCore extends FrontController
                         array (
                             'orderReturnInfo' => (array)$objOrderReturn,
                             'refundReqBookings' => $refundReqBookings,
-                            'refundReqProducts' => $refundReqProducts,
                             'isCanceledBookings' => $isCanceledBookings,
                             'orderInfo' => (array) $objOrder,
                             'orderCurrency' => (array) $orderCurrency,

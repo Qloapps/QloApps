@@ -1,24 +1,21 @@
 <?php
 /**
+* 2010-2018 Webkul.
+*
 * NOTICE OF LICENSE
 *
-* This source file is subject to the Open Software License version 3.0
-* that is bundled with this package in the file LICENSE.md
-* It is also available through the world-wide-web at this URL:
-* https://opensource.org/license/osl-3-0-php
-* If you did not receive a copy of the license and are unable to
-* obtain it through the world-wide-web, please send an email
-* to support@qloapps.com so we can send you a copy immediately.
+* All right is reserved,
+* Please go through this link for complete license : https://store.webkul.com/license.html
 *
 * DISCLAIMER
 *
-* Do not edit or add to this file if you wish to upgrade this module to a newer
-* versions in the future. If you wish to customize this module for your needs
-* please refer to https://store.webkul.com/customisation-guidelines for more information.
+* Do not edit or add to this file if you wish to upgrade this module to newer
+* versions in the future. If you wish to customize this module for your
+* needs please refer to https://store.webkul.com/customisation-guidelines/ for more information.
 *
-* @author Webkul IN
-* @copyright Since 2010 Webkul
-* @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
+*  @author    Webkul IN <support@webkul.com>
+*  @copyright 2010-2018 Webkul IN
+*  @license   https://store.webkul.com/license.html
 */
 
 if (!defined('_PS_VERSION_')) {
@@ -34,7 +31,7 @@ class wkhotelfilterblock extends Module
         $this->name = 'wkhotelfilterblock';
         $this->author = 'Webkul';
         $this->tab = 'front_office_features';
-        $this->version = '1.0.7';
+        $this->version = '1.0.6';
         $this->context = Context::getContext();
 
         $this->bootstrap = true;
@@ -114,6 +111,7 @@ class wkhotelfilterblock extends Module
         $helper->table = $this->table;
         $lang = new Language((int) Configuration::get('PS_LANG_DEFAULT'));
         $helper->default_form_language = $lang->id;
+        $this->fields_form = array();
         $helper->identifier = $this->identifier;
         $helper->submit_action = 'btnConfigSubmit';
         $helper->currentIndex = $this->context->link->getAdminLink('AdminModules', false).
@@ -169,6 +167,7 @@ class wkhotelfilterblock extends Module
     public function hookDisplayLeftColumn()
     {
         if ($this->context->controller->php_self == 'category') {
+
             $htl_id_category = Tools::getValue('id_category');
             if (Validate::isLoadedObject($objCategory = new Category((int) $htl_id_category))
                 && ($id_hotel = HotelBranchInformation::getHotelIdByIdCategory($htl_id_category))
@@ -184,34 +183,33 @@ class wkhotelfilterblock extends Module
                     $max_adult = HotelRoomType::getMaxAdults($id_hotel);
                     $max_child = HotelRoomType::getMaxChild($id_hotel);
 
-                    $urlData = array ();
+                    $category = new Category($htl_id_category);
+
                     if (!($date_from = Tools::getValue('date_from'))) {
-                        $date_from = date('Y-m-d H:i:s');
-                        $date_to = date('Y-m-d H:i:s', strtotime($date_from) + 86400);
-                    } else {
-                        $urlData['date_from'] = $date_from;
+                        $date_from = date('Y-m-d');
+                        $date_to = date('Y-m-d', strtotime($date_from) + 86400);
                     }
-
                     if (!($date_to = Tools::getValue('date_to'))) {
-                        $date_to = date('Y-m-d H:i:s', strtotime($date_from) + 86400);
-                    } else {
-                        $urlData['date_to'] = $date_to;
-                    }
-
-                    if ($occupancy = Tools::getValue('occupancy')) {
-                        $urlData['occupancy'] = $occupancy;
+                        $date_to = date('Y-m-d', strtotime($date_from) + 86400);
                     }
 
                     $obj_rm_type = new HotelRoomType();
                     $room_types = $obj_rm_type->getIdProductByHotelId($id_hotel, 0, 1, 1);
-                    $occupancy = Tools::getValue('occupancy');
 
                     $prod_price = array();
                     if ($room_types) {
                         foreach ($room_types as $key => $value) {
-                            $prod_price[] = HotelRoomTypeFeaturePricing::getRoomTypeFeaturePricesPerDay($value['id_product'], $date_from, $date_to, HotelBookingDetail::useTax(), 0, 0, 0, 0, 1, 1, $occupancy);
+                            $prod_price[] = HotelRoomTypeFeaturePricing::getRoomTypeFeaturePricesPerDay($value['id_product'], $date_from, $date_to, HotelBookingDetail::useTax());
                         }
                     }
+
+                    // Create URL of category
+                    $occupancy = Tools::getValue('occupancy');
+                    $urlData = array (
+                        'date_from' => $date_from,
+                        'date_to' => $date_to,
+                        'occupancy' => $occupancy,
+                    );
 
                     if (Configuration::get('PS_REWRITING_SETTINGS')) {
                         $categoryUrl = $this->context->link->getCategoryLink(
@@ -230,7 +228,8 @@ class wkhotelfilterblock extends Module
 
                     $config = $this->getConfigFieldsValues();
 
-                    $num_days = HotelHelper::getNumberOfDays($date_from, $date_to);
+                    $obj_booking_detail = new HotelBookingDetail();
+                    $num_days = $obj_booking_detail->getNumberOfDays($date_from, $date_to);
 
                     $warning_num = Configuration::get('WK_ROOM_LEFT_WARNING_NUMBER');
                     $this->context->smarty->assign(array(

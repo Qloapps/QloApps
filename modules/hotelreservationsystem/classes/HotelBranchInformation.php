@@ -1,24 +1,21 @@
 <?php
 /**
+* 2010-2020 Webkul.
+*
 * NOTICE OF LICENSE
 *
-* This source file is subject to the Open Software License version 3.0
-* that is bundled with this package in the file LICENSE.md
-* It is also available through the world-wide-web at this URL:
-* https://opensource.org/license/osl-3-0-php
-* If you did not receive a copy of the license and are unable to
-* obtain it through the world-wide-web, please send an email
-* to support@qloapps.com so we can send you a copy immediately.
+* All right is reserved,
+* Please go through this link for complete license : https://store.webkul.com/license.html
 *
 * DISCLAIMER
 *
-* Do not edit or add to this file if you wish to upgrade this module to a newer
-* versions in the future. If you wish to customize this module for your needs
-* please refer to https://store.webkul.com/customisation-guidelines for more information.
+* Do not edit or add to this file if you wish to upgrade this module to newer
+* versions in the future. If you wish to customize this module for your
+* needs please refer to https://store.webkul.com/customisation-guidelines/ for more information.
 *
-* @author Webkul IN
-* @copyright Since 2010 Webkul
-* @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
+*  @author    Webkul IN <support@webkul.com>
+*  @copyright 2010-2020 Webkul IN
+*  @license   https://store.webkul.com/license.html
 */
 
 class HotelBranchInformation extends ObjectModel
@@ -38,11 +35,8 @@ class HotelBranchInformation extends ObjectModel
     public $map_formated_address;
     public $map_input_text;
     public $active_refund;
-    public $fax;
     public $date_add;
     public $date_upd;
-
-    public $moduleInstance;
 
     public static $definition = array(
         'table' => 'htl_branch_info',
@@ -60,7 +54,6 @@ class HotelBranchInformation extends ObjectModel
             'map_formated_address' => array('type' => self::TYPE_HTML, 'validate' => 'isCleanHtml'),
             'map_input_text' => array('type' => self::TYPE_STRING, 'validate' => 'isString'),
             'active_refund' => array('type' => self::TYPE_BOOL, 'validate' => 'isBool'),
-            'fax' => array('type' => self::TYPE_STRING, 'validate' => 'isGenericName'),
             'date_add' => array('type' => self::TYPE_DATE, 'validate' => 'isDate', 'copy_post' => false),
             'date_upd' => array('type' => self::TYPE_DATE, 'validate' => 'isDate', 'copy_post' => false),
 
@@ -78,10 +71,10 @@ class HotelBranchInformation extends ObjectModel
     public $zipcode;
     public $address;
     public $phone;
-    public $use_global_max_checkout_offset = 1;
-    public $max_checkout_offset = '1000';
-    public $use_global_min_booking_offset = 1;
-    public $min_booking_offset = '0';
+    public $use_global_max_order_date = 1;
+    public $max_order_date = '0000-00-00';
+    public $use_global_preparation_time = 1;
+    public $preparation_time = '0000-00-00';
 
     protected $webserviceParameters = array(
         'objectsNodeName' => 'hotels',
@@ -113,10 +106,10 @@ class HotelBranchInformation extends ObjectModel
                     'subResourceName' => 'hotels'
                 )
             ),
-            'use_global_max_checkout_offset' => array(),
-            'max_checkout_offset' => array(),
-            'use_global_min_booking_offset' => array(),
-            'min_booking_offset' => array(),
+            'use_global_max_order_date' => array(),
+            'max_order_date' => array(),
+            'use_global_preparation_time' => array(),
+            'preparation_time' => array(),
         ),
         'associations' => array(
             'room_types' => array(
@@ -146,7 +139,7 @@ class HotelBranchInformation extends ObjectModel
 
         $this->id_country = $this->id_state = $this->city = $this->zipcode = $this->address = $this->phone = null;
         if ($id) {
-            if ($hotelAddress = self::getAddress($id)) {
+            if ($hotelAddress = $this->getAddress($id)) {
                 $this->id_country = $hotelAddress['id_country'];
                 $this->id_state = $hotelAddress['id_state'];
                 $this->city = $hotelAddress['city'];
@@ -156,10 +149,10 @@ class HotelBranchInformation extends ObjectModel
             }
 
             if ($hotelRestrictions = HotelOrderRestrictDate::getDataByHotelId($id)) {
-                $this->use_global_max_checkout_offset = $hotelRestrictions['use_global_max_checkout_offset'];
-                $this->max_checkout_offset = $hotelRestrictions['max_checkout_offset'];
-                $this->use_global_min_booking_offset = $hotelRestrictions['use_global_min_booking_offset'];
-                $this->min_booking_offset = $hotelRestrictions['min_booking_offset'];
+                $this->use_global_max_order_date = $hotelRestrictions['use_global_max_order_date'];
+                $this->max_order_date = $hotelRestrictions['max_order_date'];
+                $this->use_global_preparation_time = $hotelRestrictions['use_global_preparation_time'];
+                $this->preparation_time = $hotelRestrictions['preparation_time'];
             }
         }
     }
@@ -179,7 +172,7 @@ class HotelBranchInformation extends ObjectModel
      * @param Context $context
      * @return bool true if succeed
      */
-    protected function initAccess($idHotel, ?Context $context = null)
+    protected function initAccess($idHotel, Context $context = null)
     {
         if (!$context) {
             $context = Context::getContext();
@@ -534,17 +527,9 @@ class HotelBranchInformation extends ObjectModel
      */
     public static function getHotelIdByIdCategory($id_category)
     {
-        $cache_key = 'HotelBranchInformation::getHotelIdByIdCategory'.(int)$id_category;
-        if (!Cache::isStored($cache_key)) {
-            $res = Db::getInstance()->getValue(
-                'SELECT `id` FROM `'._DB_PREFIX_.'htl_branch_info` WHERE id_category = '.(int)$id_category
-            );
-            Cache::store($cache_key, $res);
-        } else {
-            $res = Cache::retrieve($cache_key);
-        }
-
-        return $res;
+        return Db::getInstance()->getValue(
+            'SELECT `id` FROM `'._DB_PREFIX_.'htl_branch_info` WHERE id_category = '.(int)$id_category
+        );
     }
 
     /**
@@ -665,61 +650,12 @@ class HotelBranchInformation extends ObjectModel
         return $return;
     }
 
-    public function getCategoryParams($params)
+    public function addCategory($name, $parent_cat = false, $group_ids, $ishotel = false, $idHotel = false, $link_rewrite = false, $meta_title = false, $meta_description = false, $meta_keywords = false)
     {
-        if (!isset($params['parent_category'])) {
-            $params['parent_category'] = false;
-        }
-
-        if (!isset($params['is_hotel'])) {
-            $params['is_hotel'] = false;
-        }
-
-        if (!isset($params['id_hotel'])) {
-            $params['id_hotel'] = 0;
-        }
-
-        if (!isset($params['link_rewrite'])) {
-            $params['link_rewrite'] = false;
-        }
-
-        if (!isset($params['meta_title'])) {
-            $params['meta_title'] = false;
-        }
-
-        if (!isset($params['meta_description'])) {
-            $params['meta_description'] = false;
-        }
-
-        if (!isset($params['meta_keywords'])) {
-            $params['meta_keywords'] = false;
-        }
-
-        return $params;
-    }
-
-    /**
-     * Send parameters in array form
-     * @param array $params
-     *  $params['name']: [name of the category]
-     *  $params['group_ids']: [group_ids of the category]
-     *  $params['parent_category']: [parent_category of the category]
-     *  $params['is_hotel']: [is_hotel = 1 if category is for hotel]
-     *  $params['id_hotel']: [id_hotel of the category, if category is for hotel]
-     *  $params['link_rewrite']: [link_rewrite of the category]
-     *  $params['meta_title']: [meta_title of the category]
-     *  $params['meta_description']: [meta_description of the category]
-     *  $params['meta_keywords']: [meta_keywords of the category]
-     * @return int  returns ID of the category added.
-     */
-    public function addCategory(array $params)
-    {
-        extract($this->getCategoryParams($params));
         $context = Context::getContext();
-        if (!$parent_category) {
-        $parent_category = Configuration::get('PS_LOCATIONS_CATEGORY');
+        if (!$parent_cat) {
+            $parent_cat = Configuration::get('PS_LOCATIONS_CATEGORY');
         }
-
         if (is_array($name) && isset($name[Configuration::get('PS_LANG_DEFAULT')])) {
             $catName = $name[Configuration::get('PS_LANG_DEFAULT')];
         } else {
@@ -728,7 +664,7 @@ class HotelBranchInformation extends ObjectModel
         if ($categoryExists = Category::searchByNameAndParentCategoryId(
             Configuration::get('PS_LANG_DEFAULT'),
             $catName,
-            $parent_category
+            $parent_cat
         )) {
             if (is_array($link_rewrite)) {
                 $objCategory = new Category($categoryExists['id_category']);
@@ -749,7 +685,9 @@ class HotelBranchInformation extends ObjectModel
                     $catName = $name;
                 }
                 $category->name[$lang['id_lang']] = $catName;
-                $category->description[$lang['id_lang']] = $this->moduleInstance->l('Hotel Branch Category', 'HotelBranchInformation');
+                $category->description[$lang['id_lang']] = $this->moduleInstance->l(
+                    'Hotel Branch Category', 'HotelBranchInformation'
+                );
 
                 if (is_array($link_rewrite)) {
                     $category->link_rewrite[$lang['id_lang']] = $link_rewrite[$lang['id_lang']];
@@ -757,7 +695,8 @@ class HotelBranchInformation extends ObjectModel
                     $category->link_rewrite[$lang['id_lang']] = Tools::link_rewrite($catName);
                 }
             }
-
+            $category->id_parent = $parent_cat;
+            $category->groupBox = $group_ids;
             if ($meta_title) {
                 $category->meta_title = $meta_title;
             }
@@ -767,11 +706,7 @@ class HotelBranchInformation extends ObjectModel
             if ($meta_keywords) {
                 $category->meta_keywords = $meta_keywords;
             }
-
-            $category->id_parent = $parent_category;
-            $category->groupBox = $group_ids;
             $category->add();
-
             return $category->id;
         }
     }
@@ -1129,7 +1064,7 @@ class HotelBranchInformation extends ObjectModel
     public function setWsHotelRestrictions()
     {
         if ($this->id) {
-            // save Maximum checkout offset and min booking offset
+            // save maximum booking date and preparation time
             if ($restrictDateInfo = HotelOrderRestrictDate::getDataByHotelId($this->id)) {
                 $objHotelRestrictDate = new HotelOrderRestrictDate($restrictDateInfo['id']);
             } else {
@@ -1137,13 +1072,13 @@ class HotelBranchInformation extends ObjectModel
             }
 
             $objHotelRestrictDate->id_hotel = $this->id;
-            $objHotelRestrictDate->use_global_max_checkout_offset = $this->use_global_max_checkout_offset;
-            if (!$this->use_global_max_checkout_offset) {
-                $objHotelRestrictDate->max_checkout_offset = $this->max_checkout_offset;
+            $objHotelRestrictDate->use_global_max_order_date = $this->use_global_max_order_date;
+            if (!$this->use_global_max_order_date) {
+                $objHotelRestrictDate->max_order_date = $this->max_order_date;
             }
-            $objHotelRestrictDate->use_global_min_booking_offset = $this->use_global_min_booking_offset;
-            if (!$this->use_global_min_booking_offset) {
-                $objHotelRestrictDate->min_booking_offset = $this->min_booking_offset;
+            $objHotelRestrictDate->use_global_preparation_time = $this->use_global_preparation_time;
+            if (!$this->use_global_preparation_time) {
+                $objHotelRestrictDate->preparation_time = $this->preparation_time;
             }
 
             return $objHotelRestrictDate->save();
@@ -1176,34 +1111,23 @@ class HotelBranchInformation extends ObjectModel
                 $message = Tools::displayError('City is required field.');
             } elseif (!Validate::isCityName($this->city)) {
                 $message = Tools::displayError('Enter a Valid City Name.');
-            } elseif (!Validate::isBool($this->use_global_max_checkout_offset)) {
-                $message = Tools::displayError('invalid value for use global max checkout offset.');
-            } elseif (!Validate::isBool($this->use_global_min_booking_offset)) {
-                $message = Tools::displayError('invalid value for use global min booking offset.');
-            } elseif (!$this->use_global_max_checkout_offset && $this->max_checkout_offset == '') {
-                $message = Tools::displayError('Maximum checkout offset is required.');
-            } elseif (!$this->use_global_max_checkout_offset && (!$this->max_checkout_offset || !Validate::isUnsignedInt($this->max_checkout_offset))) {
-                $message = Tools::displayError('Maximum checkout offset is invalid.');
-            } elseif (!$this->use_global_min_booking_offset && $this->min_booking_offset === '') {
+            } elseif (!Validate::isBool($this->use_global_max_order_date)) {
+                $message = Tools::displayError('invalid value for use_global_max_order_date.');
+            } elseif (!Validate::isBool($this->use_global_preparation_time)) {
+                $message = Tools::displayError('invalid value for use_global_preparation_time.');
+            } elseif (!$this->use_global_max_order_date && $this->max_order_date == '') {
+                $message = Tools::displayError('Maximum date to book a room is required.');
+            } elseif (!$this->use_global_max_order_date && !Validate::isDate($this->max_order_date)) {
+                $message = Tools::displayError('Maximum date to book a room is invalid.');
+            } elseif (!$this->use_global_max_order_date
+                && ($maxOrderDateFormatted = date('Y-m-d', strtotime($this->max_order_date)))
+                && strtotime($maxOrderDateFormatted) < strtotime(date('Y-m-d'))
+            ) {
+                $message = Tools::displayError('Maximum Global Date to book a room can not be a past date. Please use a future date.');
+            } elseif (!$this->use_global_preparation_time && $this->preparation_time === '') {
                 $message = Tools::displayError('Minimum booking offset is a required.');
-            } elseif (!$this->use_global_min_booking_offset && !Validate::isUnsignedInt($this->min_booking_offset)) {
+            } elseif (!$this->use_global_preparation_time && $this->preparation_time !== '0' && !Validate::isUnsignedInt($this->preparation_time)) {
                 $message = Tools::displayError('Minimum booking offset is invalid.');
-            } else if (!$this->use_global_min_booking_offset
-                && !$this->use_global_max_checkout_offset
-                && $this->max_checkout_offset
-                && $this->max_checkout_offset <= $this->min_booking_offset
-            ) {
-                $message = Tools::displayError('Maximum checkout offset cannot be less than or equal to Minimum booking offset.');
-            } else if (!$this->use_global_max_checkout_offset
-                && $this->use_global_min_booking_offset
-                && $this->max_checkout_offset <= Configuration::get('PS_MIN_BOOKING_OFFSET')
-            ) {
-                $message = Tools::displayError('Maximum checkout offset cannot be less than or equal to Global Minimum booking offset.');
-            } else if ($this->use_global_max_checkout_offset
-                && !$this->use_global_min_booking_offset
-                && $this->min_booking_offset >= Configuration::get('PS_MAX_CHECKOUT_OFFSET')
-            ) {
-                $message = Tools::displayError('Minimum booking offset cannot be be greater than or equal to Global Maximum checkout offset.');
             } elseif (!Validate::isLoadedObject($objCountry = new Country($this->id_country))) {
                 $message = Tools::displayError('country is invalid.');
             } elseif ($this->id_state
@@ -1218,8 +1142,6 @@ class HotelBranchInformation extends ObjectModel
                 $message = sprintf(Tools::displayError('The Zip/Postal code you have entered is invalid. It must follow this format: %s'), str_replace('C', $objCountry->iso_code, str_replace('N', '0', str_replace('L', 'A', $objCountry->zip_code_format))));
             } elseif ($this->zipcode && !Validate::isPostCode($this->zipcode)) {
                 $message = Tools::displayError('The Zip / Postal code is invalid.');
-            } elseif ($this->fax && !Validate::isGenericName($this->fax)) {
-                $message = Tools::displayError('The Fax is invalid.');
             } else {
                 if ($addressValidation = Address::getValidationRules('Address')) {
                     foreach ($addressValidation['size'] as $field => $maxSize) {
@@ -1264,23 +1186,6 @@ class HotelBranchInformation extends ObjectModel
         return parent::validateFields($die, $error_return);
     }
 
-    /**
-     * @see ObjectModel::validateField()
-     */
-    public function validateField($field, $value, $id_lang = null, $skip = array(), $human_errors = false)
-    {
-        if ($field == 'short_description') {
-            $limit = (int)Configuration::get('PS_SHORT_DESC_LIMIT');
-            if ($limit <= 0) {
-                $limit = Configuration::PS_SHORT_DESC_LIMIT;
-            }
-
-            $this->def['fields']['short_description']['size'] = $limit;
-        }
-
-        return parent::validateField($field, $value, $id_lang, $skip, $human_errors);
-    }
-
     // Webservice :: function will run when hotel deleted from API
     public function deleteWs()
     {
@@ -1312,44 +1217,20 @@ class HotelBranchInformation extends ObjectModel
                 $linkRewriteArray[$lang['id_lang']] = Tools::link_rewrite($this->hotel_name[$lang['id_lang']]);
             }
 
-            if ($catCountry = $this->addCategory(
-                array (
-                    'name' => $countryName,
-                    'group_ids' => $groupIds,
-                    'parent_category' => false
-                )
-            )) {
+            if ($catCountry = $this->addCategory($countryName, false, $groupIds)) {
                 if ($this->id_state) {
                     $objState = new State();
                     $stateName = $objState->getNameById($this->id_state);
-                } else {
-                    $stateName = $this->city;
-                }
 
-                if ($catState = $this->addCategory(
-                    array (
-                        'name' => $stateName,
-                        'group_ids' => $groupIds,
-                        'parent_category' => $catCountry
-                    )
-                )) {
-                    if ($catCity = $this->addCategory(
-                        array (
-                            'name' => $this->city,
-                            'group_ids' => $groupIds,
-                            'parent_category' => $catState
-                        )
-                    )) {
+                    $catState = $this->addCategory($stateName, $catCountry, $groupIds);
+                } else {
+                    $catState = $this->addCategory($this->city, $catCountry, $groupIds);
+                }
+                if ($catState) {
+                    if ($catCity = $this->addCategory($this->city, $catState, $groupIds)) {
                         $hotelCatName = $this->hotel_name[Configuration::get('PS_LANG_DEFAULT')];
                         if ($catHotel = $this->addCategory(
-                            array (
-                                'name' => $hotelCatName,
-                                'group_ids' => $groupIds,
-                                'parent_category' => $catCity,
-                                'is_hotel' => 1,
-                                'id_hotel' => $this->id,
-                                'link_rewrite' => $linkRewriteArray
-                            )
+                            $hotelCatName, $catCity, $groupIds, 1, $this->id, $linkRewriteArray
                         )) {
                             $this->id_category = $catHotel;
                             $this->save();

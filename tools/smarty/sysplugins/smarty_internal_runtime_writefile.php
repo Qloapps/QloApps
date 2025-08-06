@@ -29,6 +29,12 @@ class Smarty_Internal_Runtime_WriteFile
     {
         $_error_reporting = error_reporting();
         error_reporting($_error_reporting & ~E_NOTICE & ~E_WARNING);
+        $_file_perms = property_exists($smarty, '_file_perms') ? $smarty->_file_perms : 0644;
+        $_dir_perms =
+            property_exists($smarty, '_dir_perms') ? (isset($smarty->_dir_perms) ? $smarty->_dir_perms : 0777) : 0771;
+        if ($_file_perms !== null) {
+            $old_umask = umask(0);
+        }
         $_dirpath = dirname($_filepath);
         // if subdirs, create dir structure
         if ($_dirpath !== '.') {
@@ -36,7 +42,7 @@ class Smarty_Internal_Runtime_WriteFile
             // loop if concurrency problem occurs
             // see https://bugs.php.net/bug.php?id=35326
             while (!is_dir($_dirpath)) {
-                if (@mkdir($_dirpath, 0777, true)) {
+                if (@mkdir($_dirpath, $_dir_perms, true)) {
                     break;
                 }
                 clearstatcache();
@@ -83,8 +89,11 @@ class Smarty_Internal_Runtime_WriteFile
             error_reporting($_error_reporting);
             throw new SmartyException("unable to write file {$_filepath}");
         }
-        // set file permissions
-        @chmod($_filepath, 0666 & ~umask());
+        if ($_file_perms !== null) {
+            // set file permissions
+            chmod($_filepath, $_file_perms);
+            umask($old_umask);
+        }
         error_reporting($_error_reporting);
         return true;
     }

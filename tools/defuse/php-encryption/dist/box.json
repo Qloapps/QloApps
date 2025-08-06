@@ -15,6 +15,9 @@
             "exclude": "other"
         }
     ],
+    "compactors": [
+        "Herrera\\Box\\Compactor\\Php"
+    ],
     "main": "vendor/autoload.php",
     "output": "defuse-crypto.phar",
     "shebang": false,

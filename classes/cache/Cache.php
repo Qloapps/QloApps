@@ -24,7 +24,6 @@
 *  International Registered Trademark & Property of PrestaShop SA
 */
 
-#[\AllowDynamicProperties]
 abstract class CacheCore
 {
     /**
@@ -91,7 +90,6 @@ abstract class CacheCore
         'page_viewed',
         'employee',
         'log',
-        'htl_cart_booking_data',
     );
 
     /**

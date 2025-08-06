@@ -97,16 +97,13 @@ class AdminCustomersControllerCore extends AdminController
                 'order_key' => 'gl!name'
             ),
             'firstname' => array(
-                'title' => $this->l('First name'),
-                'filter_key' => 'a!firstname'
+                'title' => $this->l('First name')
             ),
             'lastname' => array(
-                'title' => $this->l('Last name'),
-                'filter_key' => 'a!lastname'
+                'title' => $this->l('Last name')
             ),
             'email' => array(
-                'title' => $this->l('Email address'),
-                'filter_key' => 'a!email'
+                'title' => $this->l('Email address')
             ),
         );
 
@@ -144,20 +141,13 @@ class AdminCustomersControllerCore extends AdminController
                 'align' => 'text-right',
                 'badge_success' => true
             ),
-            'phone' => array(
-                'title' => $this->l('Phone'),
-                'filter_key' => 'a!phone',
-                'optional' => true,
-                'visible_default' => false,
-            ),
             'active' => array(
                 'title' => $this->l('Enabled'),
                 'align' => 'text-center',
                 'active' => 'status',
                 'type' => 'bool',
                 'orderby' => false,
-                'filter_key' => 'a!active',
-                'callback' => 'formatStatusAsLabel',
+                'filter_key' => 'a!active'
             ),
             'newsletter' => array(
                 'title' => $this->l('Newsletter'),
@@ -189,7 +179,6 @@ class AdminCustomersControllerCore extends AdminController
                 'title' => $this->l('Banned'),
                 'type' => 'bool',
                 'displayed' => false,
-                'callback' => 'getCustomerStatusLabel',
             ),
             'order_date' => array(
                 'title' => $this->l('Order date'),
@@ -241,28 +230,6 @@ class AdminCustomersControllerCore extends AdminController
         }
     }
 
-    public function formatStatusAsLabel($val, $row)
-    {
-        if ($val) {
-            $str_return = $this->l('Yes');
-        } else {
-            $str_return = $this->l('No');
-        }
-
-        return $str_return;
-    }
-
-    public function getCustomerStatusLabel($deleted, $tr)
-    {
-        if ($deleted == Customer::STATUS_DELETED) {
-            return $this->l('Deleted');
-        } else if ($deleted == Customer::STATUS_BANNED) {
-            return $this->l('Banned');
-        }
-
-        return;
-    }
-
     public function initContent()
     {
         if ($this->action == 'select_delete') {
@@ -296,11 +263,8 @@ class AdminCustomersControllerCore extends AdminController
 
     public function getList($id_lang, $orderBy = null, $orderWay = null, $start = 0, $limit = null, $id_lang_shop = null)
     {
-        if ($this->action == 'export')  {
-            $this->deleted = false;
-        }
-
         parent::getList($id_lang, $orderBy, $orderWay, $start, $limit, $id_lang_shop);
+
         if ($this->_list) {
             foreach ($this->_list as &$row) {
                 $row['badge_success'] = $row['total_spent'] > 0;
@@ -362,19 +326,19 @@ class AdminCustomersControllerCore extends AdminController
         parent::initProcess();
 
         if (Tools::isSubmit('submitGuestToCustomer') && $this->id_object) {
-            if ($this->tabAccess['edit'] === 1) {
+            if ($this->tabAccess['edit'] === '1') {
                 $this->action = 'guest_to_customer';
             } else {
                 $this->errors[] = Tools::displayError('You do not have permission to edit this.');
             }
         } elseif (Tools::isSubmit('changeNewsletterVal') && $this->id_object) {
-            if ($this->tabAccess['edit'] === 1) {
+            if ($this->tabAccess['edit'] === '1') {
                 $this->action = 'change_newsletter_val';
             } else {
                 $this->errors[] = Tools::displayError('You do not have permission to edit this.');
             }
         } elseif (Tools::isSubmit('changeOptinVal') && $this->id_object) {
-            if ($this->tabAccess['edit'] === 1) {
+            if ($this->tabAccess['edit'] === '1') {
                 $this->action = 'change_optin_val';
             } else {
                 $this->errors[] = Tools::displayError('You do not have permission to edit this.');
@@ -393,7 +357,7 @@ class AdminCustomersControllerCore extends AdminController
 
     public function renderList()
     {
-        if ((Tools::isSubmit('submitBulkdelete'.$this->table) || Tools::isSubmit('delete'.$this->table)) && $this->tabAccess['delete'] === 1) {
+        if ((Tools::isSubmit('submitBulkdelete'.$this->table) || Tools::isSubmit('delete'.$this->table)) && $this->tabAccess['delete'] === '1') {
             $this->tpl_list_vars = array(
                 'delete_customer' => true,
                 'REQUEST_URI' => $_SERVER['REQUEST_URI'],
@@ -483,6 +447,7 @@ class AdminCustomersControllerCore extends AdminController
                     'type' => 'password',
                     'label' => $this->l('Password'),
                     'name' => 'passwd',
+                    'required' => ($obj->id ? false : true),
                     'col' => '4',
                     'hint' => ($obj->id ? $this->l('Leave this field blank if there\'s no change.') :
                         sprintf($this->l('Password should be at least %s characters long.'), Validate::PASSWORD_LENGTH))
@@ -766,13 +731,9 @@ class AdminCustomersControllerCore extends AdminController
         $helper->color = 'color3';
         $helper->title = $this->l('RevPAC', null, null, false);
         $nbDaysRevPac = Validate::isUnsignedInt(Configuration::get('PS_KPI_REVPAC_NB_DAYS')) ? Configuration::get('PS_KPI_REVPAC_NB_DAYS') : 30;
-        if ($nbDaysRevPac == 1) {
-            $helper->subtitle = sprintf($this->l('%d Day', null, null, false), (int) $nbDaysRevPac);
-        } else {
-            $helper->subtitle = sprintf($this->l('%d Days', null, null, false), (int) $nbDaysRevPac);
-        }
+        $helper->subtitle = sprintf($this->l('%d Days', null, null, false), (int) $nbDaysRevPac);
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=revenue_per_available_customer';
-        $helper->tooltip = sprintf($this->l('Revenue per Available Customer (RevPAC) in the last %s day(s).', null, null, false), $nbDaysRevPac);
+        $helper->tooltip = $this->l('Revenue per Available Customer (RevPAC) in given period of time.', null, null, false);
         $this->kpis[] = $helper;
 
         $helper = new HelperKpi();
@@ -791,13 +752,9 @@ class AdminCustomersControllerCore extends AdminController
         $helper->color = 'color1';
         $helper->title = $this->l('Conversion Rate', null, null, false);
         $nbDaysConversionRate = Validate::isUnsignedInt(Configuration::get('PS_KPI_CONVERSION_RATE_NB_DAYS')) ? Configuration::get('PS_KPI_CONVERSION_RATE_NB_DAYS') : 30;
-        if ($nbDaysConversionRate == 1) {
-            $helper->subtitle = $nbDaysConversionRate.' '.$this->l('day', null, null, false);
-        } else {
-            $helper->subtitle = $nbDaysConversionRate.' '.$this->l('days', null, null, false);
-        }
+        $helper->subtitle = sprintf($this->l('%d Days', null, null, false), (int) $nbDaysConversionRate);
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=conversion_rate';
-        $helper->tooltip = sprintf($this->l('The percentage of visitors who created a booking in last %s day(s).', null, null, false), $nbDaysConversionRate);
+        $helper->tooltip = $this->l('The percentage of visitors who created a booking in given period of time.', null, null, false);
         $this->kpis[] = $helper;
 
         $helper = new HelperKpi();
@@ -806,17 +763,12 @@ class AdminCustomersControllerCore extends AdminController
         $helper->color = 'color4';
         $helper->title = $this->l('New Customers', null, null, false);
         $nbDaysNewCustomers = Validate::isUnsignedInt(Configuration::get('PS_KPI_NEW_CUSTOMERS_NB_DAYS')) ? Configuration::get('PS_KPI_NEW_CUSTOMERS_NB_DAYS') : 30;
-        if ($nbDaysNewCustomers == 1) {
-            $helper->subtitle = sprintf($this->l('%d Day', null, null, false), (int) $nbDaysNewCustomers);
-            $date_from = date('Y-m-d');
-        } else {
-            $helper->subtitle = sprintf($this->l('%d Days', null, null, false), (int) $nbDaysNewCustomers);
-            $date_from = date('Y-m-d', strtotime('-'.($nbDaysNewCustomers - 1).' day'));
-        }
+        $date_from = date('Y-m-d', strtotime('-'.$nbDaysNewCustomers.' day'));
         $date_to = date('Y-m-d');
         $helper->href = $this->context->link->getAdminLink('AdminCustomers').'&submitResetcustomer&submitFiltercustomer=1&customerFilter_a!date_add[]='.$date_from.'&customerFilter_a!date_add[]='.$date_to;
+        $helper->subtitle = sprintf($this->l('%d Days', null, null, false), (int) $nbDaysNewCustomers);
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=total_new_customers';
-        $helper->tooltip = sprintf($this->l('The total number of new customers who registered in last %s day(s).', null, null, false), $nbDaysNewCustomers);
+        $helper->tooltip = $this->l('The total number of new customers who registered in given period of time.', null, null, false);
         $this->kpis[] = $helper;
 
         $helper = new HelperKpi();
@@ -988,9 +940,6 @@ class AdminCustomersControllerCore extends AdminController
 
         $customerLanguage = new Language($customer->id_lang);
         $shop = new Shop($customer->id_shop);
-
-        $objCustomerGuestDetail = new CustomerGuestDetail();
-        $customerGuests = $objCustomerGuestDetail->getCustomerGuestsByIdCustomer($customer->id);
         $this->tpl_view_vars = array(
             'customer' => $customer,
             'gender' => $gender,
@@ -1037,8 +986,7 @@ class AdminCustomersControllerCore extends AdminController
             'connections' => $connections,
             // Referrers
             'referrers' => $referrers,
-            'show_toolbar' => true,
-            'customer_guests' => $customerGuests,
+            'show_toolbar' => true
         );
         return parent::renderView();
     }
@@ -1055,11 +1003,11 @@ class AdminCustomersControllerCore extends AdminController
                     $this->errors[] = Tools::displayError('Some error ocurred while deleting the Customer');
                     return;
                 } else {
-                    if ($idCustomerGuest = CustomerGuestDetail::getCustomerGuestByEmail($customerEmail, false)) {
-                        $objCustomerGuestDetail = new CustomerGuestDetail($idCustomerGuest);
-                        $objCustomerGuestDetail->phone = preg_replace('/[0-9]/', '0', $objCustomer->phone);
-                        $objCustomerGuestDetail->email = $objCustomer->email;
-                        $objCustomerGuestDetail->save();
+                    if ($idCustomerGuest = CartCustomerGuestDetail::getIdCustomerGuest($customerEmail)) {
+                        $objCartCustomerGuestDetail = new CartCustomerGuestDetail($idCustomerGuest);
+                        $objCartCustomerGuestDetail->phone = preg_replace('/[0-9]/', '0', $objCustomer->phone);
+                        $objCartCustomerGuestDetail->email = $objCustomer->email;
+                        $objCartCustomerGuestDetail->save();
                     }
                 }
 
@@ -1086,14 +1034,6 @@ class AdminCustomersControllerCore extends AdminController
             $this->errors[] = Tools::displayError('Unknown delete mode:').' '.$this->deleted;
             return;
         }
-    }
-
-    public function processExport($text_delimiter = '"')
-    {
-        $this->fields_list['newsletter']['callback'] = 'formatStatusAsLabel';
-        $this->fields_list['optin']['callback'] = 'formatStatusAsLabel';
-
-        return parent::processExport($text_delimiter);
     }
 
     protected function processBulkDelete()
@@ -1148,10 +1088,6 @@ class AdminCustomersControllerCore extends AdminController
         // Check that the new email is not already in use
         $customer_email = trim(strval(Tools::getValue('email')));
         $customer = new Customer();
-        if (trim(Tools::getValue('passwd')) == '') {
-            $_POST['passwd'] = md5(time()._COOKIE_KEY_);
-        }
-
         if (Validate::isEmail($customer_email)) {
             $customer->getByEmail($customer_email);
             if ($customer->id) {
@@ -1160,6 +1096,10 @@ class AdminCustomersControllerCore extends AdminController
                 return $customer;
             } elseif (Customer::customerExists($customer_email, false, false)) {
                 $this->errors[] = Tools::displayError('The email is already associated with a banned account. Please use a different one.');
+                $this->display = 'edit';
+            } elseif (trim(Tools::getValue('passwd')) == '') {
+                $this->validateRules();
+                $this->errors[] = Tools::displayError('Password can not be empty.');
                 $this->display = 'edit';
             } elseif ($customer = parent::processAdd()) {
                 $this->context->smarty->assign('new_customer', $customer);
@@ -1237,6 +1177,14 @@ class AdminCustomersControllerCore extends AdminController
                 $this->errors[] = Tools::displayError('Phone number is required.');
             }
         }
+        $className = 'CartCustomerGuestDetail';
+        $rules = call_user_func(array($className, 'getValidationRules'), $className);
+        if ($phone && !Validate::isPhoneNumber($phone)) {
+            $this->errors[] = Tools::displayError('Invaid phone number.');
+        } elseif ($phone && Tools::strlen($phone) > $rules['size']['phone']) {
+            $this->errors[] = sprintf(Tools::displayError('Phone number is too long. (%s chars max).'), $rules['size']['phone']);
+        }
+
 
         $customer = new Customer();
         $this->errors = array_merge($this->errors, $customer->validateFieldsRequiredDatabase());
@@ -1346,7 +1294,7 @@ class AdminCustomersControllerCore extends AdminController
      * @param string $name
      * @return mixed
      */
-    public function displayDeleteLink($token, $id, $name = null)
+    public function displayDeleteLink($token = null, $id, $name = null)
     {
         $tpl = $this->createTemplate('helpers/list/list_action_delete.tpl');
 
@@ -1405,7 +1353,7 @@ class AdminCustomersControllerCore extends AdminController
      */
     public function ajaxProcessUpdateCustomerNote()
     {
-        if ($this->tabAccess['edit'] === 1) {
+        if ($this->tabAccess['edit'] === '1') {
             $note = Tools::htmlentitiesDecodeUTF8(Tools::getValue('note'));
             $customer = new Customer((int)Tools::getValue('id_customer'));
             if (!Validate::isLoadedObject($customer)) {
@@ -1442,128 +1390,17 @@ class AdminCustomersControllerCore extends AdminController
         $this->ajaxDie(json_encode($response));
     }
 
-    public function ajaxProcessInitGuestModal()
-    {
-        $response['hasError'] = 1;
-        if (Validate::isLoadedObject($objCustomerGuestDetail = new CustomerGuestDetail((int) Tools::getValue('id_customer_guest_detail')))) {
-            $this->context->smarty->assign(
-                array(
-                    'genders' => Gender::getGenders(),
-                    'customerGuestDetail' => $objCustomerGuestDetail,
-                )
-            );
-            $modal = array(
-                'modal_id' => 'customer-guest-modal',
-                'modal_class' => 'customer_guest_modal',
-                'modal_title' => '<i class="icon icon-user"></i> &nbsp'.$this->l('Guest details'),
-                'modal_content' => $this->context->smarty->fetch('controllers/customers/modals/_customer_guest_form.tpl'),
-                'modal_actions' => array(
-                    array(
-                        'type' => 'button',
-                        'value' => 'submitGuestInfo',
-                        'class' => 'submitGuestInfoInfo btn-primary pull-right',
-                        'label' => '<i class="icon-user"></i> '.$this->l('Save Guest'),
-                    ),
-                ),
-            );
-
-            $this->context->smarty->assign($modal);
-            $response['hasError'] = 0;
-            $response['modalHtml'] = $this->context->smarty->fetch('modal.tpl');
-        }
-
-        $this->ajaxDie(json_encode($response));
-    }
-
-
-    public function ajaxProcessUpdateGuestDetails()
-    {
-        $response = array('hasError' => 0, 'errors' => array());
-        // Check tab access is allowed to edit
-        if ($this->tabAccess['edit'] === 1) {
-            if (Validate::isLoadedObject($objCustomerGuestDetail = new CustomerGuestDetail((int) Tools::getValue('id_customer_guest_detail')))) {
-                $response['errors'] = $objCustomerGuestDetail->validateController();
-                if (!Tools::getValue('lastname')) {
-                    $response['errors']['lastname'] = Tools::displayError('lastname is required');
-                }
-                if (!Tools::getValue('firstname')) {
-                    $response['errors']['firstname'] = Tools::displayError('firstname is required');
-                }
-                if (!Tools::getValue('email')) {
-                    $response['errors']['email'] = Tools::displayError('email is required');
-                }
-                if (!Tools::getValue('phone')) {
-                    $response['errors']['phone'] = Tools::displayError('phone is required');
-                }
-                if (!$response['errors']) {
-                    $objCustomerGuestDetail->id_gender = Tools::getValue('id_gender');
-                    $objCustomerGuestDetail->firstname = Tools::getValue('firstname');
-                    $objCustomerGuestDetail->lastname = Tools::getValue('lastname');
-                    $objCustomerGuestDetail->phone = Tools::getValue('phone');
-                    if ($objCustomerGuestDetail->save()) {
-                        $gender = new Gender($objCustomerGuestDetail->id_gender, $this->context->language->id);
-                        $response['data']['gender'] = $gender->name;
-                        $response['data']['firstname'] = $objCustomerGuestDetail->firstname;
-                        $response['data']['lastname'] = $objCustomerGuestDetail->lastname ;
-                        $response['data']['email'] = $objCustomerGuestDetail->email;
-                        $response['data']['phone'] = $objCustomerGuestDetail->phone;
-                        $response['data']['id'] = $objCustomerGuestDetail->id;
-                        $response['msg'] = $this->l('Guest details are updated.');
-                    } else {
-                        $response['errors'][] = Tools::displayError('Unable to save guest details.');
-                    }
-                }
-            } else {
-                $response['errors'][] = Tools::displayError('Guest details not found.');
-            }
-        } else {
-            $response['errors'][] = Tools::displayError('You do not have permission to edit this.');
-        }
-
-        if ($response['errors']) {
-            $response['hasError'] = 1;
-            $this->context->smarty->assign('errors', $response['errors']);
-            $response['errorsHtml'] = $this->context->smarty->fetch('alerts.tpl');
-        }
-
-        $this->ajaxDie(json_encode($response));
-    }
-
-    public function ajaxProcessDeleteGuest()
-    {
-        $response = array('hasError' => 1, 'errors' => array());
-        // Check tab access is allowed to edit
-        if ($this->tabAccess['delete'] === 1) {
-            if (Validate::isLoadedObject($objCustomerGuestDetail = new CustomerGuestDetail((int) Tools::getValue('id_customer_guest_detail')))) {
-                if ($objCustomerGuestDetail->delete()) {
-                    $response['hasError'] = false;
-                    $response['msg'] = $this->l('Successful deletion.');
-                } else {
-                    $response['msg'] = $this->l('Unable to delete guest details.');
-                }
-            } else {
-                $response['msg'] = $this->l('Guest details not found.');
-            }
-        } else {
-            $response['msg'] = $this->l('You do not have permission to delete this.');
-        }
-
-        $this->ajaxDie(json_encode($response));
-    }
-
     public function setMedia()
     {
         parent::setMedia();
         if ($this->loadObject(true)
-            && ($this->display == 'edit' || $this->display == 'add' || $this->display == 'view')
+            && ($this->display == 'edit' || $this->display == 'add')
         ) {
             $idCustomer = $this->object->id ? $this->object->id : 0;
             Media::addJSDef(
                 array(
                     'customer_controller_url' => self::$currentIndex.'&token='.$this->token,
-                    'id_customer' => $idCustomer,
-                    'txtSomeErr' => $this->l('Some error occurred. Please try again.', null, true),
-                    'confirmTxt' => $this->l('Are you sure you want to delete this guest details?', null, true)
+                    'id_customer' => $idCustomer
                 )
             );
             $this->addJS(_PS_JS_DIR_.'admin/customers.js');

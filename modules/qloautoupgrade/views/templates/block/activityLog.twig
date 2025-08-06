@@ -1,0 +1,25 @@
+<div class="bootstrap" id="activityLogBlock" style="display:none">
+    <div class="panel">
+        <div class="panel-heading">
+            {{ 'Activity Log'|trans }}
+        </div>
+        <p id="upgradeResultCheck" style="display: none;" class="alert alert-success"></p>
+
+        <div><div id="upgradeResultToDoList" style="display: none;" class="alert alert-info col-xs-12"></div></div><br>
+
+        <div class="row">
+            <div id="currentlyProcessing" class="col-xs-12" style="display:none;">
+                <h4 id="pleaseWait">{{ 'Currently processing'|trans }} <img class="pleaseWait" src="{{ psBaseUri }}img/loader.gif"/></h4>
+                <div id="infoStep" class="processing">{{ 'Analyzing the situation...'|trans }}</div>
+            </div>
+        </div><br>
+        <div id="quickInfo" class="clear processing col-xs-12"></div>
+        {# this block will show errors and important warnings that happens during upgrade #}
+        <div class="row">
+            <div id="errorDuringUpgrade" class="col-xs-12" style="display:none;">
+                <h4>{{ 'Errors'|trans }}</h4>
+                <div id="infoError" class="processing"></div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -136,8 +136,10 @@ class CategoryCore extends ObjectModel
     {
         parent::__construct($id_category, $id_lang, $id_shop);
 
+        $link = new Link();
+        $imgLink = $link->getMediaLink(_PS_CAT_IMG_DIR_.(int)$this->id.'.jpg'); // by webkul use media link for images
+        $this->id_image = ($this->id && (bool)Tools::file_get_contents($imgLink)) ? (int)$this->id : false;
         $this->image_dir = _PS_CAT_IMG_DIR_;
-        $this->id_image = ($this->id && file_exists($this->image_dir . (int) $this->id . '.jpg')) ? (int) $this->id : false;
     }
 
     public static function getDescriptionClean($description)
@@ -219,7 +221,7 @@ class CategoryCore extends ObjectModel
 
         $ret = parent::update($null_values);
         if ($changed && (!isset($this->doNotRegenerateNTree) || !$this->doNotRegenerateNTree)) {
-            Category::cleanPositions((int)$this->id_parent);
+            $this->cleanPositions((int)$this->id_parent);
             Category::regenerateEntireNtree();
             $this->recalculateLevelDepth($this->id);
         }
@@ -701,7 +703,7 @@ class CategoryCore extends ObjectModel
      * @return array|int|false Products, number of products or false (no access)
      * @throws PrestaShopDatabaseException
      */
-    public function getProducts($id_lang, $p, $n, $order_by = null, $order_way = null, $get_total = false, $active = true, $random = false, $random_number_products = 1, $check_access = true, ?Context $context = null)
+    public function getProducts($id_lang, $p, $n, $order_by = null, $order_way = null, $get_total = false, $active = true, $random = false, $random_number_products = 1, $check_access = true, Context $context = null)
     {
         if (!$context) {
             $context = Context::getContext();
@@ -821,7 +823,7 @@ class CategoryCore extends ObjectModel
         return self::getChildren(Configuration::get('PS_HOME_CATEGORY'), $id_lang, $active, $id_shop);
     }
 
-    public static function getRootCategory($id_lang = null, ?Shop $shop = null)
+    public static function getRootCategory($id_lang = null, Shop $shop = null)
     {
         $context = Context::getContext();
         if (is_null($id_lang)) {
@@ -968,7 +970,7 @@ class CategoryCore extends ObjectModel
      * @param int $id_lang
      * @return array
      */
-    public static function getChildrenWithNbSelectedSubCat($id_parent, $selected_cat, $id_lang, ?Shop $shop = null, $use_shop_context = true)
+    public static function getChildrenWithNbSelectedSubCat($id_parent, $selected_cat, $id_lang, Shop $shop = null, $use_shop_context = true)
     {
         if (!$shop) {
             $shop = Context::getContext()->shop;
@@ -1088,7 +1090,7 @@ class CategoryCore extends ObjectModel
         return self::$_links[$id_category.'-'.$id_lang];
     }
 
-    public function getLink(?Link $link = null, $id_lang = null)
+    public function getLink(Link $link = null, $id_lang = null)
     {
         if (!$link) {
             $link = Context::getContext()->link;
@@ -1427,7 +1429,7 @@ class CategoryCore extends ObjectModel
             '.Shop::addSqlAssociation('category', 'cp').'
             WHERE cp.`id_parent` = '.(int)$this->id_parent.'
             ORDER BY category_shop.`position` ASC')
-        ) {
+            ) {
             return false;
         }
 
@@ -1443,11 +1445,10 @@ class CategoryCore extends ObjectModel
         }
         // < and > statements rather than BETWEEN operator
         // since BETWEEN is treated differently according to databases
-        $increment = ($way ? '- 1' : '+ 1');
         $result = (Db::getInstance()->execute('
             UPDATE `'._DB_PREFIX_.'category` c '.Shop::addSqlAssociation('category', 'c').'
-            SET c.`position`= IF(cast(c.`position` as signed) '.$increment.' > 0, c.`position` '.$increment.', 0), ' .
-            'category_shop.`position` = IF(cast(category_shop.`position` as signed) '.$increment.' > 0, category_shop.`position` '.$increment.', 0),
+            SET c.`position`= c.`position` '.($way ? '- 1' : '+ 1').',
+            category_shop.`position`= category_shop.`position` '.($way ? '- 1' : '+ 1').',
             c.`date_upd` = "'.date('Y-m-d H:i:s').'"
             WHERE category_shop.`position`
             '.($way
@@ -1563,7 +1564,7 @@ class CategoryCore extends ObjectModel
      * @param Shop $shop
      * @return bool
      */
-    public function inShop(?Shop $shop = null)
+    public function inShop(Shop $shop = null)
     {
         if (!$shop) {
             $shop = Context::getContext()->shop;
@@ -1575,7 +1576,7 @@ class CategoryCore extends ObjectModel
         return ($this->nleft >= $interval['nleft'] && $this->nright <= $interval['nright']);
     }
 
-    public static function inShopStatic($id_category, ?Shop $shop = null)
+    public static function inShopStatic($id_category, Shop $shop = null)
     {
         if (!$shop || !is_object($shop)) {
             $shop = Context::getContext()->shop;

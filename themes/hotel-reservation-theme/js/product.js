@@ -1089,6 +1089,15 @@ $(document).ready(function() {
         }
         e.preventDefault();
 	});
+
+    if (typeof hotel_location == 'object'
+        && $('#room_type_map_tab .map-wrap').length
+        && typeof google == 'object'
+        && typeof google.maps == 'object'
+    ) {
+        initMap();
+    }
+
     // normal product
     $(document).on('click', '.add_roomtype_product', function(e){
         e.preventDefault();
@@ -1100,22 +1109,22 @@ $(document).ready(function() {
         removeRoomtypeProduct(this);
     });
 
-    $(document).on('click', '.room_service_product_qty_up', function(e) {
+    $(document).on('click', '.service_product_qty_up', function(e) {
         e.preventDefault();
-        qtyfield = $(this).closest('.qty_container').find('input.room_service_product_qty');
+        qtyfield = $(this).closest('.qty_container').find('input.service_product_qty');
         var newQuantity = parseInt(qtyfield.val()) + 1;
         if (qtyfield.data('max_quantity') && qtyfield.data('max_quantity') < newQuantity) {
             newQuantity = qtyfield.data('max_quantity');
         }
         $(this).closest('.qty_container').find('.qty_count span').text(newQuantity);
         qtyfield.val(newQuantity);
-        updateRoomServiceQuantity(this);
+        updateServiceQuantity(this);
     });
 
     // The button to decrement the product value
-    $(document).on('click', '.room_service_product_qty_down', function(e) {
+    $(document).on('click', '.service_product_qty_down', function(e) {
         e.preventDefault();
-        qtyfield = $(this).closest('.qty_container').find('input.room_service_product_qty');
+        qtyfield = $(this).closest('.qty_container').find('input.service_product_qty');
         var currentVal = parseInt(qtyfield.val());
         if (!isNaN(currentVal) && currentVal > 1) {
             $(this).closest('.qty_container').find('.qty_count span').text(currentVal - 1);
@@ -1124,7 +1133,7 @@ $(document).ready(function() {
             $(this).closest('.qty_container').find('.qty_count span').text(1);
             qtyfield.val(1);
         }
-        updateRoomServiceQuantity(this);
+        updateServiceQuantity(this);
     });
 
     var ajax_check_var = '';
@@ -1191,65 +1200,6 @@ $(document).ready(function() {
         });
     });
 
-    var timer = '';
-    // service Products
-    $(document).on('click', '.service_product_qty_up', function(e) {
-        e.preventDefault();
-        qtyfield = $(this).closest('.qty_container').find('input.service_product_qty');
-        var newQuantity = parseInt(qtyfield.val()) + 1;
-        let hasStockError = false;
-        if (parseInt($('#product_page_booking_product').val()) == 0) {
-            let stockQty = parseInt($(this).closest('.qty_container').find('.stock_qty').data('stock_quantity'));
-            let allow_oosp = parseInt($(this).closest('.qty_container').find('.stock_qty').data('allow_oosp'));
-            if (!allow_oosp && (stockQty < newQuantity)) {
-                showErrorMessage(out_of_stock_text);
-                newQuantity = stockQty;
-                hasStockError = true;
-            }
-        }
-        if (!hasStockError) {
-            if (qtyfield.data('max_quantity') && qtyfield.data('max_quantity') < newQuantity) {
-                // if max quantity is reached
-                newQuantity = qtyfield.data('max_quantity');
-                let cartQty = parseInt(qtyfield.data('cart_quantity'));
-                if (isNaN(cartQty)) {
-                    cartQty = 0;
-                }
-
-                showErrorMessage(max_service_product_qty_txt+' '+ (parseInt(qtyfield.data('max_quantity')) + cartQty));
-            }
-            $(this).closest('.qty_container').find('.qty_count span').text(newQuantity);
-        }
-        qtyfield.val(newQuantity);
-        clearTimeout(timer);
-        timer = setTimeout(function() {
-            BookingForm.refresh()
-        }, 500);
-    });
-
-    // The button to decrement the product value
-    $(document).on('click', '.service_product_qty_down', function(e) {
-        e.preventDefault();
-        qtyfield = $(this).closest('.qty_container').find('input.service_product_qty');
-        var currentVal = parseInt(qtyfield.val());
-        if (!isNaN(currentVal) && currentVal > 1) {
-            $(this).closest('.qty_container').find('.qty_count span').text(currentVal - 1);
-            qtyfield.val(currentVal - 1);
-        } else {
-            $(this).closest('.qty_container').find('.qty_count span').text(1);
-            qtyfield.val(1);
-        }
-        clearTimeout(timer);
-        timer = setTimeout(function() {
-            BookingForm.refresh()
-        }, 500);
-    });
-
-    $(document).on('change', 'input[name="id_product_option"]', function(e) {
-        BookingForm.refresh()
-    });
-
-
     function abortRunningAjax() {
         if (ajax_check_var) {
             ajax_check_var.abort();
@@ -1258,7 +1208,7 @@ $(document).ready(function() {
 });
 function addProductToRoomType(that) {
     var id_product = $(that).data('id-product');
-    var qty = $('input#room_service_product_qty_'+id_product).val();
+    var qty = $('input#service_product_qty_'+id_product).val();
     if (typeof(qty) == 'undefined') {
         qty = 1;
     }
@@ -1284,7 +1234,7 @@ function addProductToRoomType(that) {
 function removeRoomtypeProduct(that) {
     var id_product = $(that).data('id-product');
     $(document).find('input#service_product_'+ id_product).remove();
-    $('.select_room_service_'+ id_product).closest('.service_product_action_block').find('input.room_service_product_qty').val(1);
+    $('.select_room_service_'+ id_product).closest('.service_product_action_block').find('input.service_product_qty').val(1);
     $('.select_room_service_'+ id_product).closest('.service_product_action_block').find('.qty_count span').text(1);
     $(that).prop('disabled', true);
     BookingForm.refresh().then(function (res) {
@@ -1293,11 +1243,11 @@ function removeRoomtypeProduct(that) {
     });
 }
 
-function updateRoomServiceQuantity(that) {
+function updateServiceQuantity(that) {
     var buttonElement = $(that).closest('.service_product_action_block').find('.btn-service-product');
     if ($(buttonElement).hasClass('remove_roomtype_product')) {
         var id_product = $(buttonElement).data('id-product');
-        var newQuantity = parseInt($('#room_service_product_qty_'+id_product).val());
+        var newQuantity = parseInt($('#service_product_qty_'+id_product).val());
         var oldQuantity = parseInt($('#service_product_'+id_product).val());
         if (newQuantity != oldQuantity) {
             $('#service_product_'+id_product).val(newQuantity);
@@ -1313,7 +1263,6 @@ function initMap() {
     const map = new google.maps.Map($('#room_type_map_tab .map-wrap').get(0), {
         zoom: 10,
         streetViewControl: false,
-        mapId: PS_MAP_ID
     });
 
     const hotelLatLng = {
@@ -1322,14 +1271,11 @@ function initMap() {
     };
 
     map.setCenter(hotelLatLng);
-    let icon = document.createElement('img');
-    icon.src = PS_STORES_ICON;
-    icon.style.width = '24px';
-    icon.style.height = '24px';
-    let marker = new google.maps.marker.AdvancedMarkerElement({
+
+    const marker = new google.maps.Marker({
         position: hotelLatLng,
         map: map,
-        content: icon,
+        icon: PS_STORES_ICON
     });
 
     const uiContent = $('#room-info-map-ui-content .hotel-info-wrap').get(0);
@@ -1339,15 +1285,8 @@ function initMap() {
 var BookingForm = {
     currentRequest: null,
     init: function() {
-        $('form#booking-form input[type="radio"]').uniform();
-        $('select.input-hotel').chosen({
-            disable_search: true,
-            width: '100%',
-        });
         this.currentRequest = null;
-        if (parseInt($('#product_page_booking_product').val())) {
-            BookingForm.initDatepicker(max_order_date, min_booking_offset, $('#room_check_in').val(), $('#room_check_out').val());
-        }
+        BookingForm.initDatepicker(max_order_date, preparation_time, $('#room_check_in').val(), $('#room_check_out').val());
         // initialize tootltip for extra service
         if ($('.price_desc_block .services-info').length) {
             $('.price_desc_block .services-info img').tooltip({
@@ -1398,10 +1337,10 @@ var BookingForm = {
         }
         $(document).trigger("QloApps:afterBookingFormInit");
     },
-    initDatepicker: function(max_order_date, min_booking_offset, dateFrom, dateTo) {
+    initDatepicker: function(max_order_date, preparation_time, dateFrom, dateTo) {
         let start_date = new Date();
-        if (min_booking_offset) {
-            start_date.setDate(start_date.getDate() + parseInt(min_booking_offset));
+        if (preparation_time) {
+            start_date.setDate(start_date.getDate() + parseInt(preparation_time));
             start_date.setHours(0, 0, 0, 0);
             if (dateFrom && new Date(dateFrom + ' 00:00:00') < start_date) {
                 dateFrom = $.datepicker.formatDate('yy-mm-dd', start_date);
@@ -1430,6 +1369,9 @@ var BookingForm = {
             $("#room_date_range").off("datepicker-change");
         }
 
+        if (max_order_date) {
+            max_order_date = $.datepicker.formatDate('dd-mm-yy', max_order_date);
+        }
         $('#room_date_range').dateRangePicker({
             endDate: max_order_date,
             startDate: start_date,

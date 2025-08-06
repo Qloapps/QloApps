@@ -390,7 +390,7 @@ $(document).ready(function () {
 		<a target="_blank" href="{$link->getAdminLink('AdminHotelFeaturePricesSettings')}">{l s='create advanced price rules.'}</a>
 	</div>
 	<div class="table-responsive">
-		<table class="table">
+		<table class="table table-bordered">
 			<thead>
 				<tr>
 					<th>#{l s='Id'}</th>
@@ -414,17 +414,17 @@ $(document).ready(function () {
 								{$featurePlan['feature_price_name']}
 							</td>
 							<td>
-								{if $featurePlan['impact_way'] == HotelRoomTypeFeaturePricing::IMPACT_WAY_DECREASE}
-									{l s='Decrease'}
-								{else}
-									{l s='Increase'}
-								{/if}
-							</td>
-							<td>
 								{if $featurePlan['impact_type'] == HotelRoomTypeFeaturePricing::IMPACT_TYPE_PERCENTAGE}
 									{l s='Percentage'}
 								{else}
 									{l s='Fixed Amount'}
+								{/if}
+							</td>
+							<td>
+								{if $featurePlan['impact_way'] == HotelRoomTypeFeaturePricing::IMPACT_WAY_DECREASE}
+									{l s='Decrease'}
+								{else}
+									{l s='Increase'}
 								{/if}
 							</td>
 							<td>

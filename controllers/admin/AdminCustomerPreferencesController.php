@@ -121,16 +121,6 @@ class AdminCustomerPreferencesControllerCore extends AdminController
                         'cast' => 'intval',
                         'type' => 'bool'
                     ),
-                    'PS_CUSTOMER_GUEST_MAX_LIMIT' => array(
-                        'title' => $this->l('Maximum Guests per Customer'),
-                        'validation' => 'isUnsignedInt',
-                        'cast' => 'intval',
-                        'size' => 5,
-                        'type' => 'text',
-                        'class' => 'fixed-width-xl',
-                        'hint' => $this->l('Enter the maximum number of guest profiles a customer can create when using the "Booking for Someone Else" option.'),
-                        'desc' => $this->l('Set as 0 for no limit.')
-                    ),
                 ),
                 'submit' => array(
                     'title' => $this->l('Save'),
@@ -185,21 +175,9 @@ class AdminCustomerPreferencesControllerCore extends AdminController
 
     public function beforeUpdateOptions()
     {
-        $frequentCustomerField = $this->fields_options['customer_kpi']['fields']['PS_KPI_FREQUENT_CUSTOMER_NB_ORDERS'];
+        $fieldData = $this->fields_options['customer_kpi']['fields']['PS_KPI_FREQUENT_CUSTOMER_NB_ORDERS'];
         if (!Tools::getValue('PS_KPI_FREQUENT_CUSTOMER_NB_ORDERS')) {
-            $this->errors[] = sprintf(Tools::displayError('field %s must be greater than 0.'), $frequentCustomerField['title']);;
-        }
-        $revpacField = $this->fields_options['customer_kpi']['fields']['PS_KPI_REVPAC_NB_DAYS'];
-        if (!Tools::getValue('PS_KPI_REVPAC_NB_DAYS')) {
-            $this->errors[] = sprintf(Tools::displayError('field %s must be greater than 0.'), $revpacField['title']);;
-        }
-        $conversionRateField = $this->fields_options['customer_kpi']['fields']['PS_KPI_CONVERSION_RATE_NB_DAYS'];
-        if (!Tools::getValue('PS_KPI_CONVERSION_RATE_NB_DAYS')) {
-            $this->errors[] = sprintf(Tools::displayError('field %s must be greater than 0.'), $conversionRateField['title']);;
-        }
-        $newCustomerNumDaysField = $this->fields_options['customer_kpi']['fields']['PS_KPI_NEW_CUSTOMERS_NB_DAYS'];
-        if (!Tools::getValue('PS_KPI_NEW_CUSTOMERS_NB_DAYS')) {
-            $this->errors[] = sprintf(Tools::displayError('field %s must be greater than 0.'), $newCustomerNumDaysField['title']);;
+            $this->errors[] = sprintf(Tools::displayError('field %s must be greater than 0.'), $fieldData['title']);;
         }
     }
 

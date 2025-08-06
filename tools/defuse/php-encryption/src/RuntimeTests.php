@@ -17,7 +17,6 @@ class RuntimeTests extends Crypto
      * Runs the runtime tests.
      *
      * @throws Ex\EnvironmentIsBrokenException
-     * @return void
      */
     public static function runtimeTest()
     {
@@ -59,9 +58,13 @@ class RuntimeTests extends Crypto
             RuntimeTests::HKDFTestVector();
 
             RuntimeTests::testEncryptDecrypt();
-            Core::ensureTrue(Core::ourStrlen(Key::createNewRandomKey()->getRawBytes()) === Core::KEY_BYTE_SIZE);
+            if (Core::ourStrlen(Key::createNewRandomKey()->getRawBytes()) != Core::KEY_BYTE_SIZE) {
+                throw new Ex\EnvironmentIsBrokenException();
+            }
 
-            Core::ensureTrue(Core::ENCRYPTION_INFO_STRING !== Core::AUTHENTICATION_INFO_STRING);
+            if (Core::ENCRYPTION_INFO_STRING == Core::AUTHENTICATION_INFO_STRING) {
+                throw new Ex\EnvironmentIsBrokenException();
+            }
         } catch (Ex\EnvironmentIsBrokenException $ex) {
             // Do this, otherwise it will stay in the "tests are running" state.
             $test_state = 3;
@@ -76,7 +79,6 @@ class RuntimeTests extends Crypto
      * High-level tests of Crypto operations.
      *
      * @throws Ex\EnvironmentIsBrokenException
-     * @return void
      */
     private static function testEncryptDecrypt()
     {
@@ -93,7 +95,9 @@ class RuntimeTests extends Crypto
             // the user into thinking it's just an invalid ciphertext!
             throw new Ex\EnvironmentIsBrokenException();
         }
-        Core::ensureTrue($decrypted === $data);
+        if ($decrypted !== $data) {
+            throw new Ex\EnvironmentIsBrokenException();
+        }
 
         // Modifying the ciphertext: Appending a string.
         try {
@@ -144,7 +148,6 @@ class RuntimeTests extends Crypto
      * Test HKDF against test vectors.
      *
      * @throws Ex\EnvironmentIsBrokenException
-     * @return void
      */
     private static function HKDFTestVector()
     {
@@ -161,7 +164,9 @@ class RuntimeTests extends Crypto
             '34007208d5b887185865'
         );
         $computed_okm = Core::HKDF('sha256', $ikm, $length, $info, $salt);
-        Core::ensureTrue($computed_okm === $okm);
+        if ($computed_okm !== $okm) {
+            throw new Ex\EnvironmentIsBrokenException();
+        }
 
         // Test Case 7
         $ikm    = \str_repeat("\x0c", 22);
@@ -172,14 +177,15 @@ class RuntimeTests extends Crypto
             '673a081d70cce7acfc48'
         );
         $computed_okm = Core::HKDF('sha1', $ikm, $length, '', null);
-        Core::ensureTrue($computed_okm === $okm);
+        if ($computed_okm !== $okm) {
+            throw new Ex\EnvironmentIsBrokenException();
+        }
     }
 
     /**
      * Test HMAC against test vectors.
      *
      * @throws Ex\EnvironmentIsBrokenException
-     * @return void
      */
     private static function HMACTestVector()
     {
@@ -187,16 +193,15 @@ class RuntimeTests extends Crypto
         $key     = \str_repeat("\x0b", 20);
         $data    = 'Hi There';
         $correct = 'b0344c61d8db38535ca8afceaf0bf12b881dc200c9833da726e9376c2e32cff7';
-        Core::ensureTrue(
-            \hash_hmac(Core::HASH_FUNCTION_NAME, $data, $key) === $correct
-        );
+        if (\hash_hmac(Core::HASH_FUNCTION_NAME, $data, $key) !== $correct) {
+            throw new Ex\EnvironmentIsBrokenException();
+        }
     }
 
     /**
      * Test AES against test vectors.
      *
      * @throws Ex\EnvironmentIsBrokenException
-     * @return void
      */
     private static function AESTestVector()
     {
@@ -220,9 +225,18 @@ class RuntimeTests extends Crypto
         );
 
         $computed_ciphertext = Crypto::plainEncrypt($plaintext, $key, $iv);
-        Core::ensureTrue($computed_ciphertext === $ciphertext);
+        if ($computed_ciphertext !== $ciphertext) {
+            echo \str_repeat("\n", 30);
+            echo \bin2hex($computed_ciphertext);
+            echo "\n---\n";
+            echo \bin2hex($ciphertext);
+            echo \str_repeat("\n", 30);
+            throw new Ex\EnvironmentIsBrokenException();
+        }
 
         $computed_plaintext = Crypto::plainDecrypt($ciphertext, $key, $iv, Core::CIPHER_METHOD);
-        Core::ensureTrue($computed_plaintext === $plaintext);
+        if ($computed_plaintext !== $plaintext) {
+            throw new Ex\EnvironmentIsBrokenException();
+        }
     }
 }
