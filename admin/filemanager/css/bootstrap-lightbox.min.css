@@ -1,6 +1,0 @@
-/*!
-* bootstrap-lightbox.css v0.6.0 
-* Copyright 2013 Jason Butz
-* http://www.apache.org/licenses/LICENSE-2.0.txt
-*/
-.lightbox{position:relative;top:70px;z-index:1050;line-height:0;text-align:center;background-color:transparent;outline:0}.lightbox .hide{display:none}.lightbox .in{display:block}.lightbox-content{display:inline-block;-webkit-background-clip:padding-box;-moz-background-clip:padding-box;background-clip:padding-box}.lightbox-content .lightbox-caption{position:absolute;right:12px;bottom:11px;left:11px;padding:2%;font-size:14px;line-height:18px;color:white;text-align:center;text-shadow:0 -1px 0 #000;text-shadow:0 -1px 0 rgba(0,0,0,0.3);background:#000;background:rgba(0,0,0,0.6)}.lightbox-header .close{margin-top:-16px;margin-right:-16px;font-size:2em;color:white;opacity:.8;filter:alpha(opacity=80)}.lightbox-header .close :hover{opacity:.4;filter:alpha(opacity=40)}

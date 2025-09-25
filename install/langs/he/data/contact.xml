@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<entity_contact>
-  <contact id="Webmaster" name="Webmaster">
-    <description>אם אירעה תקלה טכנית באתר</description>
-  </contact>
-  <contact id="Customer_service" name="Customer service">
-    <description>לכל שאלה בקשר למוצר או הזמנה</description>
-  </contact>
-</entity_contact>

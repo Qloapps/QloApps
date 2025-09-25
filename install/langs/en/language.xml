@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<language>
-	<name><![CDATA[English (English)]]></name>
-	<language_code>en-us</language_code>
-	<date_format_lite>m/j/Y</date_format_lite>
-	<date_format_full>m/j/Y H:i:s</date_format_full>
-	<is_rtl>false</is_rtl>
-</language>

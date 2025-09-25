@@ -1,8 +1,0 @@
-<?xml version="1.0"?>
-<entity_quick_access>
-  <quick_access id="Home" name="Inicio"/>
-  <quick_access id="My_Shop" name="A Minha Loja"/>
-  <quick_access id="New_category" name="Nova Categoria"/>
-  <quick_access id="New_product" name="Novo Produto"/>
-  <quick_access id="New_voucher" name="Novo Voucher"/>
-</entity_quick_access>

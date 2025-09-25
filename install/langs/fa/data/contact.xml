@@ -1,9 +1,0 @@
-<?xml version="1.0"?>
-<entity_contact>
-  <contact id="Webmaster" name="مدیر سایت">
-    <description>اگر یک مشکل تکنیکی در این سایت روی داد</description>
-  </contact>
-  <contact id="Customer_service" name="خدمات مشتریان">
-    <description>برای هرگونه سوال در مورد یک محصول یا سفارش</description>
-  </contact>
-</entity_contact>

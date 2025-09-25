@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<language>
-	<name><![CDATA[Català (Catalan)]]></name>
-	<language_code>ca-es</language_code>
-	<date_format_lite>d/m/Y</date_format_lite>
-	<date_format_full>d/m/Y H:i:s</date_format_full>
-	<is_rtl>false</is_rtl>
-</language>

@@ -1,8 +1,0 @@
-<?xml version="1.0"?>
-<entity_quick_access>
-  <quick_access id="Home" name="Domů"/>
-  <quick_access id="My_Shop" name="Můj obchod"/>
-  <quick_access id="New_category" name="Novou kategorii"/>
-  <quick_access id="New_product" name="Nový produkt"/>
-  <quick_access id="New_voucher" name="Nový slevový kupón"/>
-</entity_quick_access>
