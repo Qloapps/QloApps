@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity_cms>
+  <cms id="Policies">
+    <meta_title>מדיניות</meta_title>
+    <meta_description>מדיניות הזמנות במלון</meta_description>
+    <meta_keywords>תנאים, מדיניות, הנחיות, פרוטוקול, חוק</meta_keywords>
+    <content>&lt;h2 class=&quot;page-heading bottom-indent&quot;&gt;מדיניות&lt;/h2&gt;
+      &lt;div&gt;
+      &lt;p style=&quot;border-left:2px solid #808080;padding-left:5px;&quot;&gt;דף זה מכיל תוכן דמו למטרות הדגמה בלבד. כל הדמיון למוצרים, שירותים או אירועים אמיתיים הוא באופן מקרי בלבד. תודה על ההבנה שלך.&lt;/p&gt;
+      &lt;hr /&gt;&lt;/div&gt;
+      &lt;div&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;מדיניות הזמנה:&lt;/p&gt;
+      &lt;ul class=&quot;margin-btm-30&quot;&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;האורחים חייבים לספק פרטי כרטיס אשראי תקפים כדי לאשר הזמנה.&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;מדיניות ביטולים עשויה להשתנות בהתאם לסוג החדר ותוכנית המחירים.&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;שינויים בהזמנות עשויים להיות מותנים בזמינות ובתשלום נוסף.&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;שעות כניסה ויציאה:&lt;/p&gt;
+      &lt;ul class=&quot;margin-btm-30&quot;&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;שעת כניסה: 11:00 בבוקר&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;שעת יציאה: 10:30 בבוקר&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;בקשות לצ'ק-אין מוקדם וצ'ק-אאוט מאוחר עשויות להיתקל בזמינות ולהוציא תשלום נוסף.&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;מדיניות תשלום:&lt;/p&gt;
+      &lt;ul class=&quot;margin-btm-30&quot;&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;תשלום עבור כל השהייה נדרש בזמן הצ'ק-אין.&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;צורות תשלום מקובלות: כרטיסי אשראי, מזומן, וכו'.&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;יתכן שיש להשאיל פיקדון אבטחה בעת הגעה.&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;מדיניות ביטולים ואי הגעה:&lt;/p&gt;
+      &lt;ul class=&quot;margin-btm-30&quot;&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;ביטולים שנעשים 7 ימים לפני הגעה זכאים להחזר מלא.&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;לא הופיעו יחויבו בתשלום מלא של סכום ההזמנה.&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;מדיניות לגבי חיות מחמד:&lt;/p&gt;
+      &lt;ul class=&quot;margin-btm-30&quot;&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;ברוכים הבאים לחיות מחמד עם הסדר מראש.&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;יתכנו תשלומים נוספים עבור אירוח ידידותי לחיות מחמד.&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;האורחים אחראים על כל נזק שיוביל לחיות המחמד שלהם.&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;מדיניות לגבי עישון:&lt;/p&gt;
+      &lt;ul class=&quot;margin-btm-30&quot;&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;המלון שלנו הוא ללא עישון. העישון אסור באופן מוחלט בפנים.&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;קיימים אזורים מיועדים לעישון מחוץ למתחם.&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;מדיניות פרטיות:&lt;/p&gt;
+      &lt;ul class=&quot;margin-btm-30&quot;&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;אנו מחויבים להגן על פרטיותך ומידע האישי שלך.&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;המידע שנאסף במהלך ההזמנה והשהייה משמש רק לצורכי תפעול.&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;מדיניות נגישות:&lt;/p&gt;
+      &lt;ul class=&quot;margin-btm-30&quot;&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;המלון מציע שירותים וציוד נגיש לנכים.&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;אנו מחויבים לספק גישה נוחה ומתוחזקת לכל אורח.&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;צוות מלון:&lt;/p&gt;
+      &lt;ul class=&quot;margin-btm-30&quot;&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;הצוות שלנו מוכן לספק שירות איכותי ואישי.&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;אנו מקפידים על ניקיון ואחריות בכל האזורים.&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;תנאי שימוש באתר:&lt;/p&gt;
+      &lt;ul class=&quot;margin-btm-30&quot;&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;התוכן באתר הינו למטרות מידע בלבד ועשוי להשתנות בלעדי הודעה מראש.&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;אין אחריות לדיוק, שלמות, או תפוקה של המידע הנמצא באתר.&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;כל שימוש במידע או בחומרים באתר הינו באחריות המשתמש בלבד.&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;פרטיות:&lt;/p&gt;
+      &lt;ul class=&quot;margin-btm-30&quot;&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;הפרטיות שלך חשובה לנו. אנא בדקו את מדיניות הפרטיות שלנו להבנת השימוש, איסוף וחשיפה של מידע עליך.&lt;/li&gt;
+      &lt;/ul&gt;
+    </content>
+    <link_rewrite>policies</link_rewrite>
+  </cms>
+  <cms id="Legal_notice">
+    <meta_title>הודעה משפטית</meta_title>
+    <meta_description>הודעה משפטית שלנו</meta_description>
+    <meta_keywords>משפטי, הודעה, חוק, רשימה</meta_keywords>
+    <content>&lt;h2 class=&quot;page-heading bottom-indent&quot;&gt;הודעה משפטית&lt;/h2&gt;
+      &lt;div&gt;
+      &lt;p style=&quot;border-left:2px solid #808080;padding-left:5px;&quot;&gt;דף זה מכיל תוכן דמו למטרות הדגמה בלבד. כל הדמיון למוצרים, שירותים או אירועים אמיתיים הוא באופן מקרי בלבד. תודה על ההבנה שלך.&lt;/p&gt;
+      &lt;hr /&gt;&lt;/div&gt;
+      &lt;div&gt;
+      &lt;p&gt;דף זה מהווה הודעה משפטית לגבי השירותים המוצעים על ידי המלון. השימוש באתר ובשירותים מהווה את הסכמתך לתנאים ולהגבלות המפורטים בהודעה זו.&lt;/p&gt;
+      &lt;p&gt;מבחינת זכויות היוצרים, תמונות ותוכן האתר נמצאים תחת זכויות יוצרים ואין להשתמש בהם ללא רשות כתובה מהמפרסם.&lt;/p&gt;
+      &lt;p&gt;אנו מתחייבים להגן על הפרטיות שלך ולאסוף רק את המידע הכרחי לצורך הזמנת השהייה במלון.&lt;/p&gt;
+      &lt;p&gt;לפרטים נוספים אודות תנאי השימוש, מדיניות הפרטיות ומדיניות הביטולים שלנו, אנא עיינו בדפים המתאימים באתר.&lt;/p&gt;
+      &lt;p&gt;עם השימוש באתר, אתה מסכים להיות חלק מתנאי השימוש שלנו ולהסכמה עם המדיניות הפרטית שלנו.&lt;/p&gt;
+      &lt;p&gt;תודה על בחירתך במלון שלנו. אנו מקווים שהשהייה שלך תהיה נעימה ומרגיעה.&lt;/p&gt;
+      &lt;/div&gt;
+    </content>
+    <link_rewrite>legal-notice</link_rewrite>
+  </cms>
+  <cms id="Terms_and_conditions_of_use">
+    <meta_title>תנאים והגבלות שימוש</meta_title>
+    <meta_description>התנאים וההגבלות שלנו</meta_description>
+    <meta_keywords>תנאים, הגבלות, שימוש, מכירה</meta_keywords>
+    <content>
+      &lt;h2 class=&quot;page-heading bottom-indent&quot;&gt;תנאים והגבלות שימוש&lt;/h2&gt;
+      &lt;div&gt;
+      &lt;p style=&quot;border-left:2px solid #808080;padding-left:5px;&quot;&gt;דף זה מכיל תוכן דמו למטרות הדגמה בלבד. כל הדמיון למוצרים, שירותים או אירועים אמיתיים הוא באופן מקרי בלבד. תודה על ההבנה שלך.&lt;/p&gt;
+      &lt;hr /&gt;&lt;/div&gt;
+      &lt;div&gt;
+      &lt;h3 class=&quot;page-subheading&quot;&gt;&lt;strong&gt;מדיניות ביטולים:&lt;/strong&gt;&lt;/h3&gt;
+      &lt;div&gt;
+      &lt;ul&gt;
+      &lt;li&gt;&lt;span&gt;ביטול חינם: עד 48 שעות לפני הגעה לשערוך סטנדרטי.&lt;/span&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;span&gt;ההזמנות שנעשו בתעריף בלתי ניתן להחזר אינן ניתנות לביטול או לשינוי.&lt;/span&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;span&gt;ביטולים בפחות מ-24 שעות לפני הגעה עלולים להיחשב בתשלום של לילה אחד.&lt;/span&gt;&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;/div&gt;
+      &lt;br /&gt;
+      &lt;h3 class=&quot;page-subheading&quot;&gt;&lt;strong&gt;שינויים בהזמנות:&lt;/strong&gt;&lt;/h3&gt;
+      &lt;div&gt;
+      &lt;ul&gt;
+      &lt;li&gt;&lt;span&gt;עלות של 25 דולר עשויה להיחשב עבור שינוי תאריכי ההזמנה לאחר ההזמנה.&lt;/span&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;span&gt;שינויים בסוג החדר או במספר האורחים כפופים לזמינות במלון.&lt;/span&gt;&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;/div&gt;
+      &lt;br /&gt;
+      &lt;h3 class=&quot;page-subheading&quot;&gt;&lt;strong&gt;אחריות האורח:&lt;/strong&gt;&lt;/h3&gt;
+      &lt;div&gt;
+      &lt;ul&gt;
+      &lt;li&gt;&lt;span&gt;כל האורחים חייבים להציג תעודת זהות תקפה עם תמונה במהלך הצ'ק-אין.&lt;/span&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;span&gt;המקסימום להכנסה לסוג החדר הוא 2 מבוגרים.&lt;/span&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;span&gt;העישון והשתייה באלכוהול אסורים בחדרי האורחים ובאזורים הציבוריים.&lt;/span&gt;&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;/div&gt;
+      &lt;/div&gt;
+    </content>
+    <link_rewrite>terms-and-conditions-of-use</link_rewrite>
+  </cms>
+  <cms id="About_us">
+    <meta_title>אודותינו</meta_title>
+    <meta_description>מידע נוסף עלינו</meta_description>
+    <meta_keywords>אודותינו, מידע</meta_keywords>
+    <content>&lt;h2 class=&quot;page-heading bottom-indent&quot;&gt;אודותינו&lt;/h2&gt;&lt;div&gt;
+      &lt;p style=&quot;border-left:2px solid #808080;padding-left:5px;&quot;&gt;דף זה מכיל תוכן דמו למטרות הדגמה בלבד. כל הדמיון למוצרים, שירותים או אירועים אמיתיים הוא באופן מקרי בלבד. תודה על ההבנה שלך.&lt;/p&gt;
+      &lt;hr /&gt;&lt;/div&gt;
+      &lt;div class=&quot;row&quot;&gt;
+      &lt;div class=&quot;col-xs-12 col-sm-8&quot;&gt;
+      &lt;div class=&quot;cms-block&quot;&gt;
+      &lt;div class=&quot;margin-btm-30&quot;&gt;
+      &lt;p class=&quot;dark&quot;&gt;ברוכים הבאים למקום המנוחה והיוקרה שלנו, היכן שכל השהייה מיועדת לספק לכם חוויה בלתי נשכחת. בין אם אתם מחפשים חופשה מרגיעה, נסיעת עסקים מוצלחת או אירוע לא נשכח, אנו מחויבים להבטיח כי ביקורכם אצלנו יהיה מיוחד במיוחד.&lt;/p&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;margin-btm-30&quot;&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;סיפור שלנו&lt;/p&gt;
+      &lt;p&gt;מאודר מסביר בינו ובין הסביבה המקומית העשירה, המלון שלנו משלב נוחות מודרנית עם אלגנטיות ללא תקדים. חדרינו המעוצבים בתשומת הלב, השירות הבלתי נגמר וההקפדה על פרטים משקפים את המחויבות שלנו לספק מקלט לנוסעים.&lt;/p&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;margin-btm-30&quot;&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;משימתנו&lt;/p&gt;
+      &lt;p&gt;המשימה שלנו היא ליצור בית גם מחוצה לבית, שמציע שירות אישי ופרטי, והגמיש לצרכים האישיים שלך. הנוחות והשביעות שלך הן העדיפויות העליונות שלנו, ואנו שואפים לחרות את ציפיותיך בכל תחום.&lt;/p&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;margin-btm-30&quot;&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;השירותים שלנו&lt;/p&gt;
+      &lt;p&gt;התענוגות במגוון השירותים הטובים ביותר במהלך השהייה שלך. הינה בחדרים וסוויטות מעוצבים בסגנון אלגנטי עם נוף מרהיב. תהנו מארוחת אוכל משובחת במסעדה שלנו במקום, התרפות עם קוקטייל בבר האופנתי שלנו והתחדשות במרכז הספא והכושר המתקדם שלנו. תיהנו מבריכת השחייה החיצונית השקטה שלנו, הגינות הירוקות והציוד העסקי המודרני המתאימים לכל צרכיכם.&lt;/p&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;margin-btm-30&quot;&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;הצוות שלנו&lt;/p&gt;
+      &lt;p&gt;צוות המקצוענים במגזר האירוח שלנו כאן כדי לשרת אותך עם תשוקה למצוינות. משירותי הקונסיירז' האישיים ועד לניקיון המדוקדק, כל אחד מהם מחויב להפוך את שהייתך למדהימה.&lt;/p&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;margin-btm-30&quot;&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;הצטרפו אלינו&lt;/p&gt;
+      &lt;p&gt;גלו את הקסם והאלגנטיות של מלוננו בעצמכם. בין אם אתם באים למנוחה או לעסקים, אנו מזמינים אתכם לחוות את אירוח החם שלנו ואת האירוחים היקרים. הזמינו את שהייתכם אצלנו היום ותגרמו לביקור שלכם להיות בלתי נשכח.&lt;/p&gt;
+      &lt;/div&gt;
+      &lt;/div&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;col-xs-12 col-sm-4&quot;&gt;
+      &lt;div class=&quot;cms-box&quot;&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;המלצות&lt;/p&gt;
+      &lt;div class=&quot;testimonials&quot;&gt;
+      &lt;div class=&quot;inner&quot;&gt;&lt;span class=&quot;before&quot;&gt;“&lt;/span&gt;מלון פריים חורג מהציפיות שלי בכל דרך. החדר האקזקוטיבי היה לא רק מפנק אלא גם מספק מנוחה שקטה עם נופים מרהיבים של האגם. הדגש על הפרטים והשירות האישי עשה את השהייה שלי אכן ללא תחרות. אני ממליץ בחום על מלון פריים לכל הנוסעים העסקיים והנופשים המחפשים תמצית של נוחות ויוקרה&lt;span class=&quot;after&quot;&gt;”&lt;/span&gt;&lt;/div&gt;
+      &lt;/div&gt;
+      &lt;p&gt;&lt;strong class=&quot;dark&quot;&gt;קלארק קנט&lt;/strong&gt;&lt;/p&gt;
+      &lt;div class=&quot;testimonials&quot;&gt;
+      &lt;div class=&quot;inner&quot;&gt;&lt;span class=&quot;before&quot;&gt;“&lt;/span&gt;כנסיעה תדירה, אני יכול להגיד בביטחון כי מלון פריים מתבלט בסביבה השקטה שלו ובאירוח המצוין שהוא מציע. החדר עם הנוף האורבני המרהיב שלו סיפק לי מנוחה מושלמת עם נוחות יציבה.&lt;span class=&quot;after&quot;&gt;”&lt;/span&gt;&lt;/div&gt;
+      &lt;/div&gt;
+      &lt;p&gt;&lt;strong class=&quot;dark&quot;&gt;ג'ון דו&lt;/strong&gt;&lt;/p&gt;
+      &lt;/div&gt;
+      &lt;/div&gt;
+      &lt;/div&gt;
+    </content>
+    <link_rewrite>about-us</link_rewrite>
+  </cms>
+  <cms id="Secure_payment">
+    <meta_title>תשלום מאובטח</meta_title>
+    <meta_description>שיטת התשלום המאובטחת שלנו</meta_description>
+    <meta_keywords>תשלום מאובטח, SSL, ויזה, מאסטרקארד, פייפאל</meta_keywords>
+    <content>&lt;h2 class=&quot;page-heading bottom-indent&quot;&gt;תשלום מאובטח&lt;/h2&gt;
+      &lt;div&gt;
+      &lt;p style=&quot;border-left:2px solid #808080;padding-left:5px;&quot;&gt;דף זה מכיל תוכן דמו למטרות הדגמה בלבד. כל הדמיון למוצרים, שירותים או אירועים אמיתיים הוא באופן מקרי בלבד. תודה על ההבנה שלך.&lt;/p&gt;
+      &lt;hr /&gt;&lt;/div&gt;
+      &lt;div&gt;אנו מעלים את הבטיחות שלכם לראש סדר העדיפויות שלנו. כל העסקאות שנעשות באתר שלנו מוצפנות באמצעות טכנולוגיית Secure Socket Layer (SSL) כדי להבטיח שהמידע האישי שלכם ופרטי התשלום שלכם מוגנים. אנו מקבלים כרטיסי אשראי ראשיים ומספקים סביבה מאובטחת לחוויית ההזמנה החלקה שלכם. לכל שאלה או בקשה בנוגע לביטחון התשלום, אנא צרו קשר עם צוות התמיכה שלנו.&lt;/div&gt;
+    </content>
+    <link_rewrite>secure-payment</link_rewrite>
+  </cms>
+</entity_cms>

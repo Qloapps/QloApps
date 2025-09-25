@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity_guest>
+  <fields class="Guest">
+    <field name="id_operating_system" relation="operating_system"/>
+    <field name="id_web_browser" relation="web_browser"/>
+    <field name="id_customer" relation="customer"/>
+    <field name="javascript"/>
+    <field name="screen_resolution_x"/>
+    <field name="screen_resolution_y"/>
+    <field name="screen_color"/>
+    <field name="sun_java"/>
+    <field name="adobe_flash"/>
+    <field name="adobe_director"/>
+    <field name="apple_quicktime"/>
+    <field name="real_player"/>
+    <field name="windows_media"/>
+    <field name="accept_language"/>
+  </fields>
+  <entities>
+    <guest id="guest_1" id_operating_system="operating_system_3" id_web_browser="web_browser_10" id_customer="John" javascript="0" screen_resolution_x="0" screen_resolution_y="0" screen_color="0" sun_java="0" adobe_flash="0" adobe_director="0" apple_quicktime="0" real_player="0" windows_media="0" accept_language=""/>
+  </entities>
+</entity_guest>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity_address>
+  <fields id="alias" class="Address">
+    <field name="id_country" relation="country"/>
+    <field name="id_state" relation="state"/>
+    <field name="id_customer" relation="customer"/>
+    <field name="id_manufacturer"/>
+    <field name="id_supplier"/>
+    <field name="id_warehouse"/>
+    <field name="alias"/>
+    <field name="company"/>
+    <field name="lastname"/>
+    <field name="firstname"/>
+    <field name="address1"/>
+    <field name="address2"/>
+    <field name="postcode"/>
+    <field name="city"/>
+    <field name="other"/>
+    <field name="phone"/>
+    <field name="phone_mobile"/>
+    <field name="vat_number"/>
+    <field name="dni"/>
+    <field name="active"/>
+  </fields>
+  <entities>
+    <address id="My_address" id_country="FR" id_state="" id_customer="John" id_manufacturer="" id_supplier="" id_warehouse="0" alias="My Address" lastname="Doe" firstname="John" postcode="75002" phone="0102030405" phone_mobile="" vat_number="" dni="" active="1">
+      <address1>16, Main street</address1>
+      <address2>2nd floor</address2>
+      <city>Demo City</city>
+      <other/>
+    </address>
+  </entities>
+</entity_address>

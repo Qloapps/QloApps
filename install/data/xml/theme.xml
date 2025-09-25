@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity_theme>
+    <fields id="name" class="Theme">
+        <field name="name"/>
+        <field name="directory"/>
+        <field name="responsive"/>
+        <field name="default_left_column"/>
+        <field name="default_right_column"/>
+        <field name="product_per_page"/>
+    </fields>
+    <entities>
+        <theme id="default">
+            <name>hotel-reservation-theme</name>
+            <directory>hotel-reservation-theme</directory>
+            <responsive>1</responsive>
+            <default_left_column>1</default_left_column>
+            <default_right_column>0</default_right_column>
+            <product_per_page>12</product_per_page>
+        </theme>
+    </entities>
+</entity_theme>
+
+

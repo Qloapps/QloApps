@@ -1,0 +1,241 @@
+<html>
+<head>
+	<title>Outil de synchronisation de l'installeur</title>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+	<script type="text/javascript" src="../../js/jquery/jquery-1.11.0.min.js"></script>
+	<link rel="stylesheet" type="text/css" media="all" href="style.css" />
+
+	<script type="text/javascript">
+	$().ready(function()
+	{
+		var select_entity = function(is_checked, container)
+		{
+			if (is_checked)
+			{
+				container.find('.column_list').show();
+				container.addClass('table_item_selected');
+			}
+			else
+			{
+				container.find('.column_list').hide();
+				container.removeClass('table_item_selected');
+			}
+		}
+
+		$('.select_box input[type=checkbox]').click(function(e)
+		{
+			select_entity($(this).prop('checked'), $(this).parent().parent());
+			e.stopImmediatePropagation();
+		});
+
+		$('.select_box').click(function()
+		{
+			var checkbox = $(this).find('input[type=checkbox]');
+			checkbox.attr('checked', !checkbox.prop('checked'));
+			select_entity(checkbox.prop('checked'), $(this).parent());
+		});
+	});
+
+	function check_dependencies(checked, type, entity)
+	{
+		var search_in = ['common'];
+		if (type == 'fixture')
+			search_in.push('fixture');
+
+		$(search_in).each(function(k, check_type)
+		{
+			if (!checked)
+			{
+				$(dependencies[check_type][entity]).each(function(k, child_entity)
+				{
+					$('input[name=\'entities['+check_type+']['+child_entity+']\']').attr('checked', false);
+					check_dependencies(false, check_type, child_entity);
+				});
+			}
+			else
+			{
+				$.each(dependencies[check_type], function(parent_entity, children_entity)
+				{
+					if ($.inArray(entity, children_entity) >= 0)
+					{
+						$('input[name=\'entities['+check_type+']['+parent_entity+']\']').attr('checked', true);
+						check_dependencies(true, check_type, parent_entity);
+					}
+				});
+			}
+		});
+	}
+	</script>
+</head>
+<body>
+	<?php if ($this->errors): ?>
+		<ul>
+			<?php foreach ($this->errors as $error): ?>
+				<li><?php echo $error ?></li>
+			<?php endforeach; ?>
+		</ul>
+	<?php endif; ?>
+
+	<ul class="menu">
+		<li <?php if ($this->type != 'demo' && $this->type != 'synchro'): ?>class="selected"<?php endif; ?>><a href="index.php">Schéma des données communes</a></li>
+		<li <?php if ($this->type == 'demo'): ?>class="selected"<?php endif; ?>><a href="index.php?type=demo">Schéma des produits de démo</a></li>
+		<li <?php if ($this->type == 'synchro'): ?>class="selected"<?php endif; ?>><a href="index.php?type=synchro">Synchroniser les données</a></li>
+		<li style="margin-left: 20px"><a href="#" onclick="if ($('#display_help').css('display') == 'none'){$('#display_help').show();} else {$('#display_help').hide();} return false">Afficher l'aide</a></li>
+	</ul>
+
+	<div id="display_help">
+		<h2>Aide pour la synchronisation de l'installeur</h2>
+		<p>Cet outil est destiné à synchroniser le contenu de la base de donnée courante avec l'installeur. Par exemple en synchronisant l'entité "country", toutes les données de la table seront prises et sauvées dans un fichier country.xml, qui sera utilisé lors des installations.</p>
+		<p><b>Veuillez vous assurer de n'exporter que les informations qui concernent les modifications que vous avez effectué</b>, pour cela il suffit de cocher les informations vous concernant sur l'écran de synchronisation.</p>
+		<p></p>
+		<p>
+			En cochant une entité (sur l'écran de génération des schémas), celle ci sera ajoutée dans les données exportables. Cependant seules les entités que vous validerez dans l'écran de synchronisation seront réellement exportées, afin d'éviter tout problème. Voici une description des différentes informations disponibles par entité :
+			<ul>
+				<li><b>Identifiant</b> : servira à générer les noms des ID uniques. Par défaut les ID sont du type <i>entity_42</i>.</li>
+				<li><b>Clef primaire</b> : laissez ce champ vide si l'entité possède un nom de clef primaire standard, c'est à dire <i>id_entity</i>. Entrez le nom de la clef primaire si elle est différente, entrez les différentes clef primaires séparées par une virgule s'il s'agit d'une table d'association.</li>
+				<li><b>Classe</b> : nom de classe qui servira à insérer les informations lors de l'installation. Attention il doit s'agir d'une classe ObjectModel. N'utilisez pas de classe s'il n'est pas nécessaire d'instancier l'objet pour créer l'entité.</li>
+				<li><b>Images</b> : nom du dossier d'images pour exporter / importer les images automatiquement. Pour les cas particuliers, il est possible de créer des méthodes dans InstallXmlLoader <i>backupImageEntity()</i> pour l'export des images depuis la synchronisation et <i>copyImagesEntity()</i> pour l'import des images durant l'installation.</li>
+				<li><b>Restriction SQL</b> : clauses WHERE à ajouter à la requête qui synchronise les données. Par exemple on ne souhaite exporter que la catégorie avec l'ID 1 pour les données communes, et les autres catégories pour les produits de démo.</li>
+				<li><b>Ordre SQL</b> : clause ORDER BY de la requête qui synchronise les données</li>
+			</ul>
+			Sélectionnez ensuite la liste des champs à utiliser, et pour les champs reliés à une autre entité précisez cette dernière en choisissant une relation (par exemple les champs id_country doivent être relié à l'entité country).
+		</p>
+	</div>
+
+	<?php if ($this->type == 'synchro'): ?>
+		<?php
+		$entities = $dependencies = array();
+		$entities['common'] = $this->loader->getEntitiesList();
+		$dependencies['common'] = $this->loader->getDependencies();
+		$this->loader->setFixturesPath();
+		$entities['fixture'] = $this->loader->getEntitiesList();
+		$dependencies['fixture'] = $this->loader->getDependencies();
+		$this->loader->setDefaultPath();
+		?>
+		<script type="text/javascript">
+		var dependencies = <?php echo json_encode($dependencies) ?>;
+		</script>
+		<form action="" method="post">
+			Selectionnez la liste des entités à resynchroniser. Afin d'éviter au maximum les erreurs, sélectionnez uniquement les entitiés que vous avez modifier.
+			<br />
+			(<a href="#" onclick="$('input[type=\'checkbox\']').attr('checked', true); return false">Tout cocher</a>
+			- <a href="#" onclick="$('input[type=\'checkbox\']').attr('checked', false); return false">Tout décocher</a>)
+			<ul class="type_list">
+			<?php foreach ($entities as $type => $list): ?>
+				<li style="float: left; padding-right: 40px">
+					<span>
+						<?php if ($type == 'fixture'): ?>Produits de démo<?php else: ?>Données communes<?php endif; ?>
+					</span>
+					<ul class="entity_list">
+						<?php foreach ($list as $entity): ?>
+							<li>
+								<label>
+									<input type="checkbox" name="entities[<?php echo $type ?>][<?php echo $entity ?>]" value="<?php echo $entity ?>" onclick="check_dependencies(this.checked, '<?php echo $type ?>', '<?php echo $entity ?>')" />
+									<?php echo $entity ?>
+								</label>
+							</li>
+						<?php endforeach; ?>
+					</ul>
+					<br /><br />
+				</li>
+			<?php endforeach; ?>
+			</ul>
+			<input type="submit" name="synchronize" value="Synchroniser" />
+		</form>
+	<?php else: ?>
+		<form action="" method="post">
+			<div align="right"><input type="submit" name="submit" value="Générer les schémas" /></div>
+
+			<ul class="table_list">
+				<?php foreach ($this->loader->getTables() as $entity => $is_multilang): ?>
+					<?php
+					$entity_exists = $this->loader->entityExists($entity);
+					$entity_info = $this->loader->getEntityInfo($entity);
+					?>
+					<li class="table_item <?php if ($entity_exists): ?>table_item_selected<?php endif; ?>" id="entity_<?php echo $entity ?>">
+						<label class="select_box">
+							<input type="checkbox" class="table_item_checkbox" name="tables[]" value="<?php echo $entity ?>" <?php if ($entity_exists): ?>checked="checked"<?php endif; ?> />
+							<a href="#" onclick="return false" class="table_name"><?php echo $entity ?></a>
+							<?php if ($this->loader->hasElements($entity)): ?>
+								*
+							<?php endif; ?>
+						</label>
+
+						<ul class="column_list" <?php if (!$entity_exists): ?>style="display: none"<?php endif; ?>>
+							<li>
+								<div class="options">
+									<label>
+										Identifiant
+										<select name="id[<?php echo $entity ?>]">
+											<option value="0">Normal (node_xx)</option>
+											<?php foreach (array_merge($this->loader->getColumns($entity), $this->loader->getColumns($entity, true)) as $column => $is_text): ?>
+												<option value="<?php echo $column ?>" <?php if (isset($entity_info['config']['id']) && $entity_info['config']['id'] == $column): ?>selected="selected"<?php endif; ?>>
+													<?php echo $column ?>
+												</option>
+											<?php endforeach; ?>
+										</select>
+									</label>
+									<label>
+										Clef primaire
+										<input type="text" name="primary[<?php echo $entity ?>]" value="<?php echo (isset($entity_info['config']['primary'])) ? $entity_info['config']['primary'] : '' ?>" />
+									</label>
+									<label>
+										Classe
+										<select name="class[<?php echo $entity ?>]">
+											<option value=""></option>
+											<?php foreach ($this->loader->getClasses() as $class): ?>
+												<option value="<?php echo $class ?>" <?php if (isset($entity_info['config']['class']) && $entity_info['config']['class'] == $class): ?>selected="selected"<?php endif; ?>><?php echo $class ?></option>
+											<?php endforeach; ?>
+										</select>
+									</label>
+									<label>
+										Images
+										<input type="text" name="image[<?php echo $entity ?>]" value="<?php echo (isset($entity_info['config']['image'])) ? $entity_info['config']['image'] : '' ?>" />
+									</label>
+								</div>
+								<div class="options">
+									<label>
+										Restriction SQL
+										<input type="text" name="sql[<?php echo $entity ?>]" value="<?php echo (isset($entity_info['config']['sql'])) ? $entity_info['config']['sql'] : '' ?>" />
+									</label>
+									<label>
+										Ordre SQL
+										<input type="text" name="order[<?php echo $entity ?>]" value="<?php echo (isset($entity_info['config']['ordersql'])) ? $entity_info['config']['ordersql'] : '' ?>" />
+									</label>
+									<label>
+										Valeurs NULL <input type="checkbox" name="null[<?php echo $entity ?>]" value="1" <?php if (isset($entity_info['config']['null']) && $entity_info['config']['null']): ?>checked="checked"<?php endif; ?> />
+									</label>
+								</div>
+							</li>
+							<?php foreach ($this->loader->getColumns($entity) as $column => $is_text): ?>
+								<li class="table_item_column" id="table_column_<?php echo $entity?>_<?php echo $column ?>">
+									<label class="column_left">
+										<input type="checkbox" name="columns[<?php echo $entity ?>][]" value="<?php echo $column ?>" <?php if (isset($entity_info['fields'][$column])): ?>checked="checked"<?php endif; ?> />
+										<b><?php echo $column ?></b>
+									</label>
+									<div>
+										<label>
+											Relation avec l'entité
+											<select name="relations[<?php echo $entity ?>][<?php echo $column ?>]">
+												<option value=""></option>
+												<?php foreach ($this->loader->getTables() as $subentity => $bar): ?>
+													<option value="<?php echo $subentity ?>" <?php if (isset($entity_info['fields'][$column]['relation']) && $entity_info['fields'][$column]['relation'] == $subentity): ?>selected="selected"<?php endif; ?>>
+														<?php echo $subentity ?>
+													</option>
+												<?php endforeach; ?>
+											</select>
+										</label>
+									</div>
+								</li>
+							<?php endforeach; ?>
+						</ul>
+					</li>
+				<?php endforeach; ?>
+			</ul>
+
+			<div align="right"><input type="submit" name="submit" value="Générer les schémas" /></div>
+		</form>
+	<?php endif; ?>
+</body>
+</html>
+

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity_stock_mvt_reason>
+  <stock_mvt_reason id="Increase">
+    <name>הוספה</name>
+  </stock_mvt_reason>
+  <stock_mvt_reason id="Decrease">
+    <name>החסרה</name>
+  </stock_mvt_reason>
+  <stock_mvt_reason id="Customer_Order">
+    <name>הזמנת לקוח</name>
+  </stock_mvt_reason>
+  <stock_mvt_reason id="Regulation_following_an_inventory_of_stock">
+    <name>רגולציה בעקבות ספירת מלאי</name>
+  </stock_mvt_reason>
+  <stock_mvt_reason id="Regulation_following_an_inventory_of_stock_1">
+    <name>רגולציה בעקבות ספירת מלאי</name>
+  </stock_mvt_reason>
+  <stock_mvt_reason id="Transfer_to_another_warehouse">
+    <name>העברה אל מחסן אחר</name>
+  </stock_mvt_reason>
+  <stock_mvt_reason id="Transfer_from_another_warehouse">
+    <name>העברה האת מחסן אחר</name>
+  </stock_mvt_reason>
+  <stock_mvt_reason id="Supply_Order">
+    <name>הזמנת ספק</name>
+  </stock_mvt_reason>
+</entity_stock_mvt_reason>

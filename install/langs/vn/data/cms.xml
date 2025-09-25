@@ -1,0 +1,200 @@
+<?xml version="1.0"?>
+<entity_cms>
+  <cms id="Policies">
+    <meta_title>Chính sách</meta_title>
+    <meta_description>Chính sách của chúng tôi về đặt phòng khách sạn</meta_description>
+    <meta_keywords>điều kiện, chính sách, hướng dẫn, quy định, qui định</meta_keywords>
+    <content>&lt;h2 class=&quot;page-heading bottom-indent&quot;&gt;Chính sách&lt;/h2&gt;
+      &lt;div&gt;
+      &lt;p style=&quot;border-left:2px solid #808080;padding-left:5px;&quot;&gt;Trang này chứa nội dung minh họa cho mục đích giải thích. Mọi sự giống nhau với các sản phẩm, dịch vụ hoặc sự kiện thực tế là hoàn toàn ngẫu nhiên. Cảm ơn bạn đã hiểu.&lt;/p&gt;
+      &lt;hr /&gt;&lt;/div&gt;
+      &lt;div&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;Chính sách đặt phòng:&lt;/p&gt;
+      &lt;ul class=&quot;margin-btm-30&quot;&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Khách hàng phải cung cấp thông tin thẻ tín dụng hợp lệ để đảm bảo việc đặt chỗ.&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Chính sách hủy đặt phòng thay đổi tùy theo loại phòng và kế hoạch giá cả.&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Thay đổi đặt phòng có thể phụ thuộc vào sự có sẵn và có thể có phí bổ sung.&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;Thời gian nhận phòng và trả phòng:&lt;/p&gt;
+      &lt;ul class=&quot;margin-btm-30&quot;&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Thời gian nhận phòng: 11:00 AM&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Thời gian trả phòng: 10:30 AM&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Yêu cầu nhận phòng sớm và trả phòng muộn có thể phụ thuộc vào sự có sẵn và có thể có phí bổ sung.&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;Chính sách thanh toán:&lt;/p&gt;
+      &lt;ul class=&quot;margin-btm-30&quot;&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Thanh toán cho toàn bộ thời gian lưu trú được thu khi nhận phòng.&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Hình thức thanh toán chấp nhận: thẻ tín dụng, tiền mặt, v.v...&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Có thể yêu cầu đặt cọc khi nhận phòng.&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;Chính sách hủy và không có mặt:&lt;/p&gt;
+      &lt;ul class=&quot;margin-btm-30&quot;&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Hủy đặt phòng trước 7 ngày trước khi đến sẽ được hoàn trả toàn bộ tiền.&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Khách không có mặt sẽ bị tính toàn bộ số tiền đặt phòng.&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;Chính sách về thú nuôi:&lt;/p&gt;
+      &lt;ul class=&quot;margin-btm-30&quot;&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Thú nuôi được chào đón với sự sắp xếp trước.&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Có thể áp dụng phí bổ sung cho các phòng cho thú cưng.&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Khách hàng chịu trách nhiệm về bất kỳ thiệt hại nào do thú cưng gây ra.&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;Chính sách không hút thuốc:&lt;/p&gt;
+      &lt;ul class=&quot;margin-btm-30&quot;&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Khách sạn của chúng tôi là không hút thuốc. Cấm hút thuốc tuyệt đối trong nhà.&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Có các khu vực hút thuốc được chỉ định bên ngoài khuôn viên.&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;Chính sách bảo mật:&lt;/p&gt;
+      &lt;ul class=&quot;margin-btm-30&quot;&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Chúng tôi cam kết bảo vệ quyền riêng tư và thông tin cá nhân của bạn.&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Thông tin được thu thập trong quá trình đặt phòng và lưu trú chỉ được sử dụng cho mục đích vận hành.&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;Chính sách về tiếp cận dễ dàng:&lt;/p&gt;
+      &lt;ul class=&quot;margin-btm-30&quot;&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Khách sạn của chúng tôi cam kết cung cấp các phòng nghỉ và cơ sở vật chất dễ dàng tiếp cận cho khách có khuyết tật.&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Vui lòng liên hệ trực tiếp với chúng tôi để yêu cầu cụ thể về tiếp cận dễ dàng.&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;Các chính sách bổ sung:&lt;/p&gt;
+      &lt;ul class=&quot;margin-btm-30&quot;&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Sử dụng các tiện nghi của khách sạn như phòng tập gym, spa, hồ bơi, v.v...&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Kỳ vọng hành vi và hành vi khi ở trong khuôn viên khách sạn.&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;/div&gt;
+    </content>
+    <link_rewrite>policies</link_rewrite>
+  </cms>
+  <cms id="Legal_Notice">
+    <meta_title>Thông báo pháp lý</meta_title>
+    <meta_description>Thông báo pháp lý của chúng tôi</meta_description>
+    <meta_keywords>thông báo, pháp lý, tín dụng</meta_keywords>
+    <content>
+        &lt;h2 class=&quot;page-heading bottom-indent&quot;&gt;&lt;strong&gt;Thông báo pháp lý&lt;/strong&gt;&lt;/h2&gt;
+        &lt;div&gt;
+        &lt;p style=&quot;border-left:2px solid #808080;padding-left:5px;&quot;&gt;Trang này chứa nội dung minh họa cho mục đích giảng dạy. Mọi sự tương đồng với sản phẩm, dịch vụ hoặc sự kiện thực tế là hoàn toàn ngẫu nhiên. Cảm ơn sự hiểu biết của bạn.&lt;/p&gt;
+        &lt;hr /&gt;&lt;/div&gt;
+        &lt;p class=&quot;margin-btm-30 page-subheading&quot;&gt;Điều khoản sử dụng Website:&lt;/p&gt;
+        &lt;ul class=&quot;margin-btm-30&quot;&gt;
+        &lt;li class=&quot;margin-btm-20&quot;&gt;Nội dung của các trang web này chỉ dành cho mục đích thông tin và sử dụng chung của bạn. Nó có thể thay đổi mà không cần thông báo trước.&lt;/li&gt;
+        &lt;li class=&quot;margin-btm-20&quot;&gt;Chúng tôi cũng như bên thứ ba không đảm bảo hoặc cam kết bất kỳ bảo hành nào về độ chính xác, tính kịp thời, hiệu suất, đầy đủ hoặc phù hợp của thông tin và tài liệu được tìm thấy hoặc cung cấp trên trang web này cho bất kỳ mục đích cụ thể nào. Bạn công nhận rằng thông tin và tài liệu này có thể chứa sai sót hoặc lỗi, và chúng tôi tuyên bố loại trừ trách nhiệm về bất kỳ sai sót hoặc lỗi này theo pháp luật cho phép.&lt;/li&gt;
+        &lt;li class=&quot;margin-btm-20&quot;&gt;Việc sử dụng bất kỳ thông tin hoặc tài liệu nào trên trang web này hoàn toàn thuộc trách nhiệm của bạn, mà chúng tôi sẽ không chịu trách nhiệm. Điều này sẽ là trách nhiệm của bạn để đảm bảo rằng bất kỳ sản phẩm, dịch vụ hoặc thông tin nào có sẵn thông qua trang web này đáp ứng đầy đủ yêu cầu cụ thể của bạn.&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p class=&quot;page-subheading&quot;&gt;Sở hữu trí tuệ:&lt;/p&gt;
+        &lt;ul class=&quot;margin-btm-30&quot;&gt;
+        &lt;li class=&quot;margin-btm-20&quot;&gt;Trang web này chứa tài liệu do chúng tôi sở hữu hoặc được cấp phép. Tài liệu này bao gồm nhưng không giới hạn đến thiết kế, bố cục, giao diện, và đồ họa. Sao chép là không được phép ngoại trừ theo thông báo bản quyền, là một phần của các điều khoản và điều kiện này.&lt;/li&gt;
+        &lt;li class=&quot;margin-btm-20&quot;&gt;Tất cả các nhãn hiệu được sao chép trong trang web này, không phải là tài sản của hoặc được cấp phép cho nhà khai thác, đều được công nhận trên trang web.&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p class=&quot;page-subheading&quot;&gt;Chính sách bảo mật:&lt;/p&gt;
+        &lt;ul class=&quot;margin-btm-30&quot;&gt;
+        &lt;li class=&quot;margin-btm-20&quot;&gt;Quyền riêng tư của bạn là rất quan trọng với chúng tôi. Vui lòng xem lại Chính sách Bảo mật của chúng tôi để hiểu cách chúng tôi thu thập, sử dụng và tiết lộ thông tin về bạn.&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p class=&quot;page-subheading&quot;&gt;Giới hạn trách nhiệm:&lt;/p&gt;
+        &lt;ul class=&quot;margin-btm-30&quot;&gt;
+        &lt;li class=&quot;margin-btm-20&quot;&gt;Chúng tôi cũng như bên thứ ba không đảm bảo hoặc cam kết bất kỳ bảo hành nào về độ chính xác, tính kịp thời, hiệu suất, đầy đủ hoặc phù hợp của thông tin và tài liệu được tìm thấy hoặc cung cấp trên trang web này cho bất kỳ mục đích cụ thể nào. Bạn công nhận rằng thông tin và tài liệu này có thể chứa sai sót hoặc lỗi, và chúng tôi tuyên bố loại trừ trách nhiệm về bất kỳ sai sót hoặc lỗi này theo pháp luật cho phép.&lt;/li&gt;
+        &lt;li class=&quot;margin-btm-20&quot;&gt;Việc sử dụng bất kỳ thông tin hoặc tài liệu nào trên trang web này hoàn toàn thuộc trách nhiệm của bạn, mà chúng tôi sẽ không chịu trách nhiệm. Điều này sẽ là trách nhiệm của bạn để đảm bảo rằng bất kỳ sản phẩm, dịch vụ, hoặc thông tin có sẵn qua trang web này đáp ứng đầy đủ yêu cầu cụ thể của bạn.&lt;/li&gt;
+        &lt;/ul&gt;
+    </content>
+    <link_rewrite>legal-notice</link_rewrite>
+  </cms>
+  <cms id="Terms_and_conditions_of_use">
+    <meta_title>Điều khoản và Điều kiện</meta_title>
+    <meta_description>Điều khoản và điều kiện của chúng tôi</meta_description>
+    <meta_keywords>điều khoản, điều kiện, sử dụng, bán hàng</meta_keywords>
+    <content>
+        &lt;h2 class=&quot;page-heading bottom-indent&quot;&gt;Điều khoản và Điều kiện&lt;/h2&gt;
+        &lt;div&gt;
+        &lt;p style=&quot;border-left:2px solid #808080;padding-left:5px;&quot;&gt;Trang này chứa nội dung minh họa cho mục đích giảng dạy. Mọi sự tương đồng với sản phẩm, dịch vụ hoặc sự kiện thực tế là hoàn toàn ngẫu nhiên. Cảm ơn sự hiểu biết của bạn.&lt;/p&gt;
+        &lt;hr /&gt;&lt;/div&gt;
+        &lt;div&gt;
+        &lt;h3 class=&quot;page-subheading&quot;&gt;&lt;strong&gt;Chính sách Hủy đặt phòng:&lt;/strong&gt;&lt;/h3&gt;
+        &lt;div&gt;
+        &lt;ul&gt;
+        &lt;li&gt;&lt;span&gt;Miễn phí Hủy đặt phòng: Được thực hiện trong vòng 48 giờ trước khi đến với giá chuẩn.&lt;/span&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;span&gt;Các đặt phòng với giá không hoàn lại không thể bị hủy hoặc sửa đổi.&lt;/span&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;span&gt;Việc hủy đặt phòng trong vòng 24 giờ trước khi đến sẽ phải chịu phí một đêm.&lt;/span&gt;&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;/div&gt;
+        &lt;br /&gt;
+        &lt;h3 class=&quot;page-subheading&quot;&gt;&lt;strong&gt;Thay đổi Đặt phòng:&lt;/strong&gt;&lt;/h3&gt;
+        &lt;div&gt;
+        &lt;ul&gt;
+        &lt;li&gt;&lt;span&gt;Có thể áp dụng phí $25 cho việc thay đổi ngày đặt phòng sau khi đặt.&lt;/span&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;span&gt;Thay đổi loại phòng hoặc số lượng khách là tùy thuộc vào sự có sẵn tại khách sạn.&lt;/span&gt;&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;/div&gt;
+        &lt;br /&gt;
+        &lt;h3 class=&quot;page-subheading&quot;&gt;&lt;strong&gt;Trách nhiệm của Khách:&lt;/strong&gt;&lt;/h3&gt;
+        &lt;div&gt;
+        &lt;ul&gt;
+        &lt;li&gt;&lt;span&gt;Tất cả khách hàng phải xuất trình giấy tờ tùy thân có hình ảnh do chính phủ cấp tại quầy nhận phòng.&lt;/span&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;span&gt;Sức chứa tối đa cho loại phòng là 2 người lớn.&lt;/span&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;span&gt;Hút thuốc và uống rượu là nghiêm cấm tại tất cả các phòng và khu vực công cộng.&lt;/span&gt;&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;/div&gt;
+        &lt;/div&gt;
+    </content>
+    <link_rewrite>terms-and-conditions</link_rewrite>
+  </cms>
+  <cms id="About_Us">
+    <meta_title>Về chúng tôi</meta_title>
+    <meta_description>Tìm hiểu thêm về chúng tôi</meta_description>
+    <meta_keywords>giới thiệu, thông tin</meta_keywords>
+    <content>&lt;h2 class=&quot;page-heading bottom-indent&quot;&gt;Về chúng tôi&lt;/h2&gt;&lt;div&gt;
+      &lt;p style=&quot;border-left:2px solid #808080;padding-left:5px;&quot;&gt;Trang này chứa nội dung minh họa cho mục đích giảng dạy. Mọi sự tương đồng với sản phẩm, dịch vụ hoặc sự kiện thực tế là hoàn toàn ngẫu nhiên. Cảm ơn sự hiểu biết của bạn.&lt;/p&gt;
+      &lt;hr /&gt;&lt;/div&gt;
+      &lt;div class=&quot;row&quot;&gt;
+      &lt;div class=&quot;col-xs-12 col-sm-8&quot;&gt;
+      &lt;div class=&quot;cms-block&quot;&gt;
+      &lt;div class=&quot;margin-btm-30&quot;&gt;
+      &lt;p class=&quot;dark&quot;&gt;Chào mừng bạn đến với lâu đài của sự sang trọng và bình yên, nơi mỗi lần lưu trú được tạo ra để mang lại một trải nghiệm không thể so sánh. Cho dù bạn đang tìm kiếm một kỳ nghỉ thư giãn, một chuyến công tác hiệu quả, hay một sự kiện đáng nhớ, chúng tôi cam kết làm cho chuyến viếng thăm của bạn trở nên đặc biệt.&lt;/p&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;margin-btm-30&quot;&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;Câu chuyện của chúng tôi&lt;/p&gt;
+      &lt;p&gt;Được truyền cảm hứng từ những cảnh vật yên bình và văn hóa địa phương phong phú, khách sạn của chúng tôi kết hợp sự thoải mái hiện đại với sự thanh lịch vượt thời gian. Các phòng được thiết kế có tâm huyết, dịch vụ hoàn hảo và sự chú ý đến từng chi tiết phản ánh cam kết của chúng tôi về việc cung cấp một nơi trú ẩn cho du khách.&lt;/p&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;margin-btm-30&quot;&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;Sứ mệnh của chúng tôi&lt;/p&gt;
+      &lt;p&gt;Sứ mệnh của chúng tôi là tạo ra một ngôi nhà ngoài xã hội, cung cấp dịch vụ cá nhân và tiện nghi sang trọng được điều chỉnh theo nhu cầu của bạn. Sự thoải mái và sự hài lòng của bạn là ưu tiên hàng đầu của chúng tôi, và chúng tôi luôn cố gắng vượt qua mong đợi của bạn mọi lúc mọi nơi.&lt;/p&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;margin-btm-30&quot;&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;Tiện nghi của chúng tôi&lt;/p&gt;
+      &lt;p&gt;Hãy thưởng thức những tiện nghi tốt nhất trong suốt kỳ nghỉ của bạn. Thư giãn trong các phòng và suite được bố trí tinh tế với khung cảnh tuyệt đẹp. Thưởng thức ẩm thực tinh tế tại nhà hàng trực thuộc, thư giãn với một ly cocktail tại quầy bar thời trang của chúng tôi, và tái tạo năng lượng tại spa và trung tâm thể dục hiện đại của chúng tôi. Hưởng thụ bể bơi ngoài trời thanh bình của chúng tôi, vườn xanh mướt và cơ sở kinh doanh hiện đại để đáp ứng tất cả nhu cầu của bạn.&lt;/p&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;margin-btm-30&quot;&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;Đội ngũ của chúng tôi&lt;/p&gt;
+      &lt;p&gt;Đội ngũ chuyên gia lưu trú tận tâm của chúng tôi luôn sẵn sàng phục vụ bạn với sự xuất sắc. Từ dịch vụ lễ tân cá nhân đến dọn phòng chi tiết, mỗi thành viên của đội ngũ của chúng tôi cam kết mang đến cho bạn một kỳ nghỉ đặc biệt.&lt;/p&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;margin-btm-30&quot;&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;Tham gia cùng chúng tôi&lt;/p&gt;
+      &lt;p&gt;Khám phá sự quyến rũ và thanh lịch của khách sạn của chúng tôi. Cho dù bạn đến để thư giãn hay công tác, chúng tôi mời bạn trải nghiệm sự mến mộ của chúng tôi và những phòng nghỉ sang trọng. Đặt phòng ngay hôm nay và để chúng tôi biến chuyến thăm của bạn trở thành một kỳ nghỉ đáng nhớ.&lt;/p&gt;
+      &lt;/div&gt;
+      &lt;/div&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;col-xs-12 col-sm-4&quot;&gt;
+      &lt;div class=&quot;cms-box&quot;&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;Nhận xét&lt;/p&gt;
+      &lt;div class=&quot;testimonials&quot;&gt;
+      &lt;div class=&quot;inner&quot;&gt;&lt;span class=&quot;before&quot;&gt;“&lt;/span&gt;Khách sạn Prime vượt qua mong đợi của tôi ở mọi khía cạnh. Phòng Executive không chỉ sang trọng mà còn mang lại một nơi yên bình với tầm nhìn hồ tuyệt đẹp. Sự chú ý đến từng chi tiết và dịch vụ cá nhân đã khiến kỳ nghỉ của tôi thực sự đáng nhớ. Tôi rất khuyến khích Khách sạn Prime cho cả du khách đi công tác và du lịch đang tìm kiếm sự kết hợp giữa sự thoải mái và tinh tế&lt;span class=&quot;after&quot;&gt;”&lt;/span&gt;&lt;/div&gt;
+      &lt;/div&gt;
+      &lt;p&gt;&lt;strong class=&quot;dark&quot;&gt;Clark Kent&lt;/strong&gt;&lt;/p&gt;
+      &lt;div class=&quot;testimonials&quot;&gt;
+      &lt;div class=&quot;inner&quot;&gt;&lt;span class=&quot;before&quot;&gt;“&lt;/span&gt;Là một du khách thường xuyên, tôi có thể tự tin khẳng định rằng Khách sạn Prime nổi bật với môi trường yên tĩnh và sự mến mộ ngoại giao đặc biệt. Phòng View cung cấp một nơi nghỉ ngơi hoàn hảo với tầm nhìn hoàn hảo của thành phố và chỗ ở thoải mái.&lt;span class=&quot;after&quot;&gt;”&lt;/span&gt;&lt;/div&gt;
+      &lt;/div&gt;
+      &lt;p&gt;&lt;strong class=&quot;dark&quot;&gt;John Doe&lt;/strong&gt;&lt;/p&gt;
+      &lt;/div&gt;
+      &lt;/div&gt;
+      &lt;/div&gt;
+    </content>
+    <link_rewrite>about-us</link_rewrite>
+  </cms>
+  <cms id="Secure_Payment">
+    <meta_title>Thanh toán an toàn</meta_title>
+    <meta_description>Phương thức thanh toán an toàn của chúng tôi</meta_description>
+    <meta_keywords>thanh toán an toàn, ssl, visa, mastercard, paypal</meta_keywords>
+    <content>&lt;h2 class=&quot;page-heading bottom-indent&quot;&gt;Thanh toán an toàn&lt;/h2&gt;
+      &lt;div&gt;
+      &lt;p style=&quot;border-left:2px solid #808080;padding-left:5px;&quot;&gt;Trang này chứa nội dung minh họa cho mục đích giảng dạy. Mọi sự tương đồng với sản phẩm, dịch vụ hoặc sự kiện thực tế là hoàn toàn ngẫu nhiên. Cảm ơn sự hiểu biết của bạn.&lt;/p&gt;
+      &lt;hr /&gt;&lt;/div&gt;
+      &lt;div&gt;Chúng tôi ưu tiên sự an toàn của bạn. Tất cả các giao dịch trên trang web của chúng tôi đều được mã hóa bằng công nghệ Secure Socket Layer (SSL) để đảm bảo thông tin cá nhân và chi tiết thanh toán của bạn được bảo vệ. Chúng tôi chấp nhận các thẻ tín dụng chính và cung cấp một môi trường an toàn cho trải nghiệm đặt phòng trơn tru. Đối với bất kỳ thắc mắc nào liên quan đến an toàn thanh toán, xin vui lòng liên hệ với đội ngũ hỗ trợ khách hàng của chúng tôi.&lt;/div&gt;
+    </content>
+    <link_rewrite>secure-payment</link_rewrite>
+  </cms>
+</entity_cms>

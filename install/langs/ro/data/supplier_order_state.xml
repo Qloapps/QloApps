@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity_supplier_order_state>
+	<supplier_order_state id="creation_in_progress">
+		<name><![CDATA[În procesare]]></name>
+	</supplier_order_state>
+	<supplier_order_state id="Order_validated">
+		<name><![CDATA[Comandă validată]]></name>
+	</supplier_order_state>
+	<supplier_order_state id="Pending_receipt">
+		<name><![CDATA[În așteptarea recepției]]></name>
+	</supplier_order_state>
+	<supplier_order_state id="Order_received_in_part">
+		<name><![CDATA[Comandă recepționată parțial]]></name>
+	</supplier_order_state>
+	<supplier_order_state id="Order_received_completely">
+		<name><![CDATA[Comandă recepționată complet]]></name>
+	</supplier_order_state>
+	<supplier_order_state id="order_fenced">
+		<name><![CDATA[Comandă blocată]]></name>
+	</supplier_order_state>
+</entity_supplier_order_state>

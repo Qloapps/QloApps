@@ -1,0 +1,200 @@
+<?xml version="1.0"?>
+<entity_cms>
+  <cms id="Policies">
+    <meta_title>Hotelrichtlinien</meta_title>
+    <meta_description>Unsere Richtlinien für Hotelbuchungen</meta_description>
+    <meta_keywords>Bedingungen, Richtlinie, Leitlinien, Protokoll, Regel</meta_keywords>
+    <content>&lt;h2 class=&quot;page-heading bottom-indent&quot;&gt;Hotelrichtlinien&lt;/h2&gt;
+      &lt;div&gt;
+      &lt;p style=&quot;border-left:2px solid #808080;padding-left:5px;&quot;&gt;Diese Seite enthält Demo-Inhalte nur zu Illustrationszwecken. Jegliche Ähnlichkeit mit tatsächlichen Produkten, Dienstleistungen oder Ereignissen ist rein zufällig. Vielen Dank für Ihr Verständnis.&lt;/p&gt;
+      &lt;hr /&gt;&lt;/div&gt;
+      &lt;div&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;Reservierungspolitik:&lt;/p&gt;
+      &lt;ul class=&quot;margin-btm-30&quot;&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Gäste müssen gültige Kreditkartendaten zur Sicherung einer Reservierung angeben.&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Stornierungsbedingungen variieren je nach Zimmertyp und Tarifplan.&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Änderungen an Reservierungen können je nach Verfügbarkeit und gegen Aufpreis erfolgen.&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;Check-in und Check-out-Zeiten:&lt;/p&gt;
+      &lt;ul class=&quot;margin-btm-30&quot;&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Check-in-Zeit: 11:00 Uhr&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Check-out-Zeit: 10:30 Uhr&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Früher Check-in und spätes Check-out unterliegen der Verfügbarkeit und können zusätzliche Gebühren verursachen.&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;Zahlungsbedingungen:&lt;/p&gt;
+      &lt;ul class=&quot;margin-btm-30&quot;&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Die Zahlung für den gesamten Aufenthalt erfolgt beim Check-in.&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Akzeptierte Zahlungsmethoden: Kreditkarten, Bargeld, etc.&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Eine Kaution kann bei der Ankunft erforderlich sein.&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;Stornierungs- und No-Show-Richtlinie:&lt;/p&gt;
+      &lt;ul class=&quot;margin-btm-30&quot;&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Stornierungen, die bis 7 Tage vor Ankunft vorgenommen werden, berechtigen zu einer vollständigen Rückerstattung.&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Bei Nichterscheinen wird der volle Betrag der Reservierung berechnet.&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;Haustier-Richtlinie:&lt;/p&gt;
+      &lt;ul class=&quot;margin-btm-30&quot;&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Haustiere sind nach vorheriger Absprache willkommen.&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Zusätzliche Gebühren können für haustierfreundliche Unterkünfte anfallen.&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Gäste haften für Schäden, die durch ihre Haustiere verursacht werden.&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;Rauchverbot:&lt;/p&gt;
+      &lt;ul class=&quot;margin-btm-30&quot;&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Unser Hotel ist rauchfrei. Rauchen ist strengstens in den Innenräumen untersagt.&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Ausgewiesene Raucherbereiche befinden sich außerhalb des Geländes.&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;Datenschutzrichtlinie:&lt;/p&gt;
+      &lt;ul class=&quot;margin-btm-30&quot;&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Wir verpflichten uns, Ihre Privatsphäre und persönlichen Informationen zu schützen.&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Die während der Buchung und des Aufenthalts erhobenen Informationen werden ausschließlich zu betrieblichen Zwecken verwendet.&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;Barrierefreiheitsrichtlinie:&lt;/p&gt;
+      &lt;ul class=&quot;margin-btm-30&quot;&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Unser Hotel setzt sich für barrierefreie Unterkünfte und Einrichtungen für Gäste mit Behinderungen ein.&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Bitte kontaktieren Sie uns direkt für spezifische Anfragen zur Barrierefreiheit.&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;Weitere Richtlinien:&lt;/p&gt;
+      &lt;ul class=&quot;margin-btm-30&quot;&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Nutzung der Hotelfeinrichtungen wie Fitnessraum, Spa, Pool usw.&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Verhalten und Verhaltenserwartungen während des Hotelaufenthalts.&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;/div&gt;
+    </content>
+    <link_rewrite>policies</link_rewrite>
+  </cms>
+  <cms id="Legal_Notice">
+    <meta_title>Impressum</meta_title>
+    <meta_description>Rechtliche Hinweise</meta_description>
+    <meta_keywords>Impressum, rechtlich, Hinweise</meta_keywords>
+    <content>
+        &lt;h2 class=&quot;page-heading bottom-indent&quot;&gt;&lt;strong&gt;Impressum&lt;/strong&gt;&lt;/h2&gt;
+        &lt;div&gt;
+        &lt;p style=&quot;border-left:2px solid #808080;padding-left:5px;&quot;&gt;Diese Seite enthält Demo-Inhalte nur zu Illustrationszwecken. Jegliche Ähnlichkeit mit tatsächlichen Produkten, Dienstleistungen oder Ereignissen ist rein zufällig. Vielen Dank für Ihr Verständnis.&lt;/p&gt;
+        &lt;hr /&gt;&lt;/div&gt;
+        &lt;p class=&quot;margin-btm-30 page-subheading&quot;&gt;Nutzungsbedingungen der Website:&lt;/p&gt;
+        &lt;ul class=&quot;margin-btm-30&quot;&gt;
+        &lt;li class=&quot;margin-btm-20&quot;&gt;Der Inhalt der Seiten dieser Website dient nur Ihrer allgemeinen Information und Nutzung. Er kann ohne vorherige Ankündigung geändert werden.&lt;/li&gt;
+        &lt;li class=&quot;margin-btm-20&quot;&gt;Wir übernehmen keine Gewähr für die Richtigkeit, Aktualität, Leistung, Vollständigkeit oder Eignung der auf dieser Website angebotenen Informationen und Materialien für einen bestimmten Zweck. Sie erkennen an, dass solche Informationen und Materialien Ungenauigkeiten oder Fehler enthalten können, und wir schließen jegliche Haftung für solche Ungenauigkeiten oder Fehler im gesetzlich zulässigen Rahmen aus.&lt;/li&gt;
+        &lt;li class=&quot;margin-btm-20&quot;&gt;Die Nutzung von Informationen oder Materialien auf dieser Website erfolgt auf eigene Gefahr. Es obliegt Ihrer eigenen Verantwortung sicherzustellen, dass Produkte, Dienstleistungen oder Informationen, die über diese Website angeboten werden, Ihren spezifischen Anforderungen entsprechen.&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p class=&quot;page-subheading&quot;&gt;Urheberrecht:&lt;/p&gt;
+        &lt;ul class=&quot;margin-btm-30&quot;&gt;
+        &lt;li class=&quot;margin-btm-20&quot;&gt;Diese Website enthält Material, das unser Eigentum ist oder für das wir eine Lizenz besitzen. Dieses Material umfasst, ist aber nicht beschränkt auf, das Design, Layout, Aussehen und die Grafiken. Jegliche Reproduktion ist nur in Übereinstimmung mit dem Urheberrechtshinweis gestattet, der Teil dieser Nutzungsbedingungen ist.&lt;/li&gt;
+        &lt;li class=&quot;margin-btm-20&quot;&gt;Alle auf dieser Website reproduzierten Marken, die nicht im Besitz des Betreibers sind oder für die keine Lizenz vorliegt, werden auf der Website anerkannt.&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p class=&quot;page-subheading&quot;&gt;Datenschutzrichtlinie:&lt;/p&gt;
+        &lt;ul class=&quot;margin-btm-30&quot;&gt;
+        &lt;li class=&quot;margin-btm-20&quot;&gt;Ihre Privatsphäre ist uns wichtig. Bitte lesen Sie unsere Datenschutzrichtlinie, um zu verstehen, wie wir Informationen über Sie sammeln, verwenden und offenlegen.&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p class=&quot;page-subheading&quot;&gt;Haftungsbeschränkung:&lt;/p&gt;
+        &lt;ul class=&quot;margin-btm-30&quot;&gt;
+        &lt;li class=&quot;margin-btm-20&quot;&gt;Wir übernehmen keine Gewähr für die Richtigkeit, Aktualität, Leistung, Vollständigkeit oder Eignung der auf dieser Website angebotenen Informationen und Materialien für einen bestimmten Zweck. Sie erkennen an, dass solche Informationen und Materialien Ungenauigkeiten oder Fehler enthalten können, und wir schließen jegliche Haftung für solche Ungenauigkeiten oder Fehler im gesetzlich zulässigen Rahmen aus.&lt;/li&gt;
+        &lt;li class=&quot;margin-btm-20&quot;&gt;Die Nutzung von Informationen oder Materialien auf dieser Website erfolgt auf eigene Gefahr. Es obliegt Ihrer eigenen Verantwortung sicherzustellen, dass Produkte, Dienstleistungen oder Informationen, die über diese Website angeboten werden, Ihren spezifischen Anforderungen entsprechen.&lt;/li&gt;
+        &lt;/ul&gt;
+    </content>
+    <link_rewrite>impressum</link_rewrite>
+  </cms>
+  <cms id="Terms_and_conditions_of_use">
+    <meta_title>Allgemeine Geschäftsbedingungen</meta_title>
+    <meta_description>Unsere Allgemeinen Geschäftsbedingungen</meta_description>
+    <meta_keywords>Bedingungen, Nutzungsbedingungen, verkaufen</meta_keywords>
+    <content>
+        &lt;h2 class=&quot;page-heading bottom-indent&quot;&gt;Allgemeine Geschäftsbedingungen&lt;/h2&gt;
+        &lt;div&gt;
+        &lt;p style=&quot;border-left:2px solid #808080;padding-left:5px;&quot;&gt;Diese Seite enthält Demo-Inhalte nur zu Illustrationszwecken. Jegliche Ähnlichkeit mit tatsächlichen Produkten, Dienstleistungen oder Ereignissen ist rein zufällig. Vielen Dank für Ihr Verständnis.&lt;/p&gt;
+        &lt;hr /&gt;&lt;/div&gt;
+        &lt;div&gt;
+        &lt;h3 class=&quot;page-subheading&quot;&gt;&lt;strong&gt;Stornierungsbedingungen:&lt;/strong&gt;&lt;/h3&gt;
+        &lt;div&gt;
+        &lt;ul&gt;
+        &lt;li&gt;&lt;span&gt;Kostenlose Stornierung: Bis zu 48 Stunden vor Ankunft für Standardtarife.&lt;/span&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;span&gt;Buchungen mit einem nicht erstattbaren Tarif können nicht storniert oder geändert werden.&lt;/span&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;span&gt;Stornierungen innerhalb von 24 Stunden vor Ankunft unterliegen einer Gebühr in Höhe einer Übernachtung.&lt;/span&gt;&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;/div&gt;
+        &lt;br /&gt;
+        &lt;h3 class=&quot;page-subheading&quot;&gt;&lt;strong&gt;Änderungen an Buchungen:&lt;/strong&gt;&lt;/h3&gt;
+        &lt;div&gt;
+        &lt;ul&gt;
+        &lt;li&gt;&lt;span&gt;Eine Gebühr von 25 $ kann anfallen, um Ihre Reservierungsdaten nach der Buchung zu ändern.&lt;/span&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;span&gt;Änderungen der Zimmerkategorie oder der Anzahl der Gäste unterliegen der Verfügbarkeit im Hotel.&lt;/span&gt;&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;/div&gt;
+        &lt;br /&gt;
+        &lt;h3 class=&quot;page-subheading&quot;&gt;&lt;strong&gt;Gästeverantwortung:&lt;/strong&gt;&lt;/h3&gt;
+        &lt;div&gt;
+        &lt;ul&gt;
+        &lt;li&gt;&lt;span&gt;Alle Gäste müssen beim Check-in einen gültigen Lichtbildausweis vorlegen.&lt;/span&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;span&gt;Die maximale Belegung für den Zimmertyp beträgt 2 Erwachsene.&lt;/span&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;span&gt;Rauchen und Alkohol sind in allen Gästezimmern und öffentlichen Bereichen strengstens untersagt.&lt;/span&gt;&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;/div&gt;
+        &lt;/div&gt;
+    </content>
+    <link_rewrite>allgemeine-geschaeftsbedingungen</link_rewrite>
+  </cms>
+  <cms id="About_us">
+    <meta_title>Über uns</meta_title>
+    <meta_description>Erfahren Sie mehr über uns</meta_description>
+    <meta_keywords>über uns, informationen</meta_keywords>
+    <content>&lt;h2 class=&quot;page-heading bottom-indent&quot;&gt;Über uns&lt;/h2&gt;&lt;div&gt;
+      &lt;p style=&quot;border-left:2px solid #808080;padding-left:5px;&quot;&gt;Diese Seite enthält Demo-Inhalte nur zu Illustrationszwecken. Jegliche Ähnlichkeit mit tatsächlichen Produkten, Dienstleistungen oder Ereignissen ist rein zufällig. Vielen Dank für Ihr Verständnis.&lt;/p&gt;
+      &lt;hr /&gt;&lt;/div&gt;
+      &lt;div class=&quot;row&quot;&gt;
+      &lt;div class=&quot;col-xs-12 col-sm-8&quot;&gt;
+      &lt;div class=&quot;cms-block&quot;&gt;
+      &lt;div class=&quot;margin-btm-30&quot;&gt;
+      &lt;p class=&quot;dark&quot;&gt;Willkommen in unserem Refugium aus Luxus und Ruhe, wo jeder Aufenthalt darauf ausgerichtet ist, ein unvergleichliches Erlebnis zu bieten. Ob Sie eine erholsame Auszeit, eine produktive Geschäftsreise oder ein unvergessliches Ereignis suchen – wir sind darauf spezialisiert, Ihren Besuch außergewöhnlich zu gestalten.&lt;/p&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;margin-btm-30&quot;&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;Unsere Geschichte&lt;/p&gt;
+      &lt;p&gt;Inspiriert von der ruhigen Umgebung und der reichen lokalen Kultur verbindet unser Hotel modernen Komfort mit zeitloser Eleganz. Unsere durchdacht gestalteten Zimmer, einwandfreier Service und Liebe zum Detail spiegeln unser Engagement wider, eine Oase für Reisende zu schaffen.&lt;/p&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;margin-btm-30&quot;&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;Unsere Mission&lt;/p&gt;
+      &lt;p&gt;Unsere Mission ist es, Ihnen ein Zuhause fernab von Zuhause zu bieten, mit persönlichem Service und luxuriösen Annehmlichkeiten, die auf Ihre Bedürfnisse zugeschnitten sind. Ihr Komfort und Ihre Zufriedenheit stehen bei uns an erster Stelle, und wir streben danach, Ihre Erwartungen in jeder Hinsicht zu übertreffen.&lt;/p&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;margin-btm-30&quot;&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;Unsere Annehmlichkeiten&lt;/p&gt;
+      &lt;p&gt;Genießen Sie während Ihres Aufenthalts die besten Annehmlichkeiten. Entspannen Sie sich in elegant eingerichteten Zimmern und Suiten mit atemberaubender Aussicht. Genießen Sie Gourmetküche in unserem hauseigenen Restaurant, entspannen Sie bei einem Cocktail in unserer stilvollen Bar und erholen Sie sich in unserem modernen Spa- und Fitnesscenter. Nutzen Sie unseren ruhigen Außenpool, unsere üppigen Gärten und modernen Geschäftseinrichtungen, die allen Ihren Bedürfnissen gerecht werden.&lt;/p&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;margin-btm-30&quot;&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;Unser Team&lt;/p&gt;
+      &lt;p&gt;Unser engagiertes Team von Gastfreundschaftsprofis steht Ihnen mit Leidenschaft für Exzellenz zur Seite. Vom persönlichen Concierge-Service bis zur akribischen Zimmerreinigung ist jedes Mitglied unseres Teams darauf bedacht, Ihren Aufenthalt außergewöhnlich zu gestalten.&lt;/p&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;margin-btm-30&quot;&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;Besuchen Sie uns&lt;/p&gt;
+      &lt;p&gt;Entdecken Sie den Charme und die Eleganz unseres Hotels selbst. Ob Sie aus geschäftlichen oder privaten Gründen zu uns kommen – wir laden Sie ein, unsere herzliche Gastfreundschaft und luxuriöse Unterkünfte zu erleben. Buchen Sie noch heute Ihren Aufenthalt bei uns und lassen Sie uns Ihren Besuch unvergesslich machen.&lt;/p&gt;
+      &lt;/div&gt;
+      &lt;/div&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;col-xs-12 col-sm-4&quot;&gt;
+      &lt;div class=&quot;cms-box&quot;&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;Kundenbewertungen&lt;/p&gt;
+      &lt;div class=&quot;testimonials&quot;&gt;
+      &lt;div class=&quot;inner&quot;&gt;&lt;span class=&quot;before&quot;&gt;“&lt;/span&gt;Das Hotel Prime hat meine Erwartungen in jeder Hinsicht übertroffen. Das Executive Zimmer war nicht nur luxuriös, sondern bot auch einen friedlichen Rückzugsort mit seinem atemberaubenden Blick auf den See. Die Liebe zum Detail und der persönliche Service haben meinen Aufenthalt wirklich unvergesslich gemacht. Ich empfehle das Hotel Prime sehr für Geschäftsreisende und Urlauber, die Komfort und Raffinesse suchen.&lt;span class=&quot;after&quot;&gt;”&lt;/span&gt;&lt;/div&gt;
+      &lt;/div&gt;
+      &lt;p&gt;&lt;strong class=&quot;dark&quot;&gt;Clark Kent&lt;/strong&gt;&lt;/p&gt;
+      &lt;div class=&quot;testimonials&quot;&gt;
+      &lt;div class=&quot;inner&quot;&gt;&lt;span class=&quot;before&quot;&gt;“&lt;/span&gt;Als häufiger Reisender kann ich mit Überzeugung sagen, dass das Hotel Prime durch seine ruhige Umgebung und außergewöhnliche Gastfreundschaft hervorsticht. Das View Zimmer bot einen perfekten Rückzugsort mit seinem atemberaubenden Stadtblick und komfortablen Unterkünften.&lt;span class=&quot;after&quot;&gt;”&lt;/span&gt;&lt;/div&gt;
+      &lt;/div&gt;
+      &lt;p&gt;&lt;strong class=&quot;dark&quot;&gt;John Doe&lt;/strong&gt;&lt;/p&gt;
+      &lt;/div&gt;
+      &lt;/div&gt;
+      &lt;/div&gt;
+    </content>
+    <link_rewrite>ueber-uns</link_rewrite>
+  </cms>
+  <cms id="Secure_payment">
+    <meta_title>Sichere Zahlung</meta_title>
+    <meta_description>Unsere sichere Zahlungsmethode</meta_description>
+    <meta_keywords>sichere Zahlung, SSL, Visa, Mastercard, PayPal</meta_keywords>
+    <content>&lt;h2 class=&quot;page-heading bottom-indent&quot;&gt;Sichere Zahlung&lt;/h2&gt;
+      &lt;div&gt;
+      &lt;p style=&quot;border-left:2px solid #808080;padding-left:5px;&quot;&gt;Diese Seite enthält Demo-Inhalte nur zu Illustrationszwecken. Jegliche Ähnlichkeit mit tatsächlichen Produkten, Dienstleistungen oder Ereignissen ist rein zufällig. Vielen Dank für Ihr Verständnis.&lt;/p&gt;
+      &lt;hr /&gt;&lt;/div&gt;
+      &lt;div&gt;Wir legen großen Wert auf Ihre Sicherheit. Alle Transaktionen auf unserer Website werden mit Secure Socket Layer (SSL) Technologie verschlüsselt, um sicherzustellen, dass Ihre persönlichen Informationen und Zahlungsdetails geschützt sind. Wir akzeptieren alle gängigen Kreditkarten und bieten eine sichere Umgebung für ein reibungsloses Buchungserlebnis. Bei Fragen zur Zahlungssicherheit können Sie sich gerne an unser Kundensupport-Team wenden.&lt;/div&gt;
+    </content>
+    <link_rewrite>sichere-zahlung</link_rewrite>
+  </cms>
+</entity_cms>

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity_web_browser>
+  <fields id="name">
+    <field name="name"/>
+  </fields>
+  <entities>
+    <web_browser id="Safari">
+      <name>Safari</name>
+    </web_browser>
+    <web_browser id="Safari_ipad">
+      <name>Safari iPad</name>
+    </web_browser>
+    <web_browser id="Firefox">
+      <name>Firefox</name>
+    </web_browser>
+    <web_browser id="Opera">
+      <name>Opera</name>
+    </web_browser>
+    <web_browser id="IE_6">
+      <name>IE 6</name>
+    </web_browser>
+    <web_browser id="IE_7">
+      <name>IE 7</name>
+    </web_browser>
+    <web_browser id="IE_8">
+      <name>IE 8</name>
+    </web_browser>
+    <web_browser id="IE_9">
+      <name>IE 9</name>
+    </web_browser>
+    <web_browser id="IE_10">
+      <name>IE 10</name>
+    </web_browser>
+    <web_browser id="IE_11">
+      <name>IE 11</name>
+    </web_browser>
+    <web_browser id="Chrome">
+      <name>Chrome</name>
+    </web_browser>
+  </entities>
+</entity_web_browser>

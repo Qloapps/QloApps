@@ -1,0 +1,200 @@
+<?xml version='1.0'?>
+<entity_cms>
+  <cms id="Policies">
+    <meta_title>Kebijakan</meta_title>
+    <meta_description>Kebijakan kami terkait pemesanan hotel</meta_description>
+    <meta_keywords>syarat, kebijakan, pedoman, protokol, aturan</meta_keywords>
+    <content>&lt;h2 class=&quot;page-heading bottom-indent&quot;&gt;Kebijakan&lt;/h2&gt;
+        &lt;div&gt;
+        &lt;p style=&quot;border-left:2px solid #808080;padding-left:5px;&quot;&gt;Halaman ini berisi konten demo untuk tujuan ilustratif saja. Segala kemiripan dengan produk, layanan, atau acara yang sebenarnya adalah kebetulan belaka. Terima kasih atas pengertian Anda.&lt;/p&gt;
+        &lt;hr /&gt;&lt;/div&gt;
+        &lt;div&gt;
+        &lt;p class=&quot;page-subheading&quot;&gt;Kebijakan Reservasi:&lt;/p&gt;
+        &lt;ul class=&quot;margin-btm-30&quot;&gt;
+        &lt;li class=&quot;margin-btm-10&quot;&gt;Tamu harus menyediakan rincian kartu kredit yang valid untuk mengamankan reservasi.&lt;/li&gt;
+        &lt;li class=&quot;margin-btm-10&quot;&gt;Kebijakan pembatalan bervariasi berdasarkan tipe kamar dan rencana tarif.&lt;/li&gt;
+        &lt;li class=&quot;margin-btm-10&quot;&gt;Perubahan reservasi dapat tunduk pada ketersediaan dan biaya tambahan.&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p class=&quot;page-subheading&quot;&gt;Waktu Check-in dan Check-out:&lt;/p&gt;
+        &lt;ul class=&quot;margin-btm-30&quot;&gt;
+        &lt;li class=&quot;margin-btm-10&quot;&gt;Waktu check-in: 11:00 Pagi&lt;/li&gt;
+        &lt;li class=&quot;margin-btm-10&quot;&gt;Waktu check-out: 10:30 Pagi&lt;/li&gt;
+        &lt;li class=&quot;margin-btm-10&quot;&gt;Permintaan check-in awal dan check-out terlambat tunduk pada ketersediaan dan dapat dikenakan biaya tambahan.&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p class=&quot;page-subheading&quot;&gt;Kebijakan Pembayaran:&lt;/p&gt;
+        &lt;ul class=&quot;margin-btm-30&quot;&gt;
+        &lt;li class=&quot;margin-btm-10&quot;&gt;Pembayaran untuk seluruh masa inap harus dilakukan saat check-in.&lt;/li&gt;
+        &lt;li class=&quot;margin-btm-10&quot;&gt;Jenis pembayaran yang diterima: kartu kredit, tunai, dll.&lt;/li&gt;
+        &lt;li class=&quot;margin-btm-10&quot;&gt;Mungkin diperlukan deposit keamanan saat kedatangan.&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p class=&quot;page-subheading&quot;&gt;Kebijakan Pembatalan dan No-show:&lt;/p&gt;
+        &lt;ul class=&quot;margin-btm-30&quot;&gt;
+        &lt;li class=&quot;margin-btm-10&quot;&gt;Pembatalan yang dilakukan 7 hari sebelum kedatangan memenuhi syarat untuk pengembalian dana penuh.&lt;/li&gt;
+        &lt;li class=&quot;margin-btm-10&quot;&gt;Tamu yang tidak hadir akan dikenakan biaya penuh dari reservasi.&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p class=&quot;page-subheading&quot;&gt;Kebijakan Hewan Peliharaan:&lt;/p&gt;
+        &lt;ul class=&quot;margin-btm-30&quot;&gt;
+        &lt;li class=&quot;margin-btm-10&quot;&gt;Hewan peliharaan diperbolehkan dengan pengaturan sebelumnya.&lt;/li&gt;
+        &lt;li class=&quot;margin-btm-10&quot;&gt;Biaya tambahan mungkin berlaku untuk akomodasi yang ramah hewan peliharaan.&lt;/li&gt;
+        &lt;li class=&quot;margin-btm-10&quot;&gt;Tamu bertanggung jawab atas kerusakan yang disebabkan oleh hewan peliharaan mereka.&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p class=&quot;page-subheading&quot;&gt;Kebijakan Merokok:&lt;/p&gt;
+        &lt;ul class=&quot;margin-btm-30&quot;&gt;
+        &lt;li class=&quot;margin-btm-10&quot;&gt;Hotel kami bebas asap rokok. Merokok dilarang keras di dalam ruangan.&lt;/li&gt;
+        &lt;li class=&quot;margin-btm-10&quot;&gt;Area merokok yang ditunjuk tersedia di luar gedung.&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p class=&quot;page-subheading&quot;&gt;Kebijakan Privasi:&lt;/p&gt;
+        &lt;ul class=&quot;margin-btm-30&quot;&gt;
+        &lt;li class=&quot;margin-btm-10&quot;&gt;Kami berkomitmen untuk melindungi privasi dan informasi pribadi Anda.&lt;/li&gt;
+        &lt;li class=&quot;margin-btm-10&quot;&gt;Informasi yang dikumpulkan selama pemesanan dan masa inap digunakan semata-mata untuk tujuan operasional.&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p class=&quot;page-subheading&quot;&gt;Kebijakan Aksesibilitas:&lt;/p&gt;
+        &lt;ul class=&quot;margin-btm-30&quot;&gt;
+        &lt;li class=&quot;margin-btm-10&quot;&gt;Hotel kami berkomitmen untuk menyediakan akomodasi dan fasilitas yang dapat diakses untuk tamu dengan disabilitas.&lt;/li&gt;
+        &lt;li class=&quot;margin-btm-10&quot;&gt;Silakan hubungi kami secara langsung untuk permintaan aksesibilitas khusus.&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p class=&quot;page-subheading&quot;&gt;Kebijakan Tambahan:&lt;/p&gt;
+        &lt;ul class=&quot;margin-btm-30&quot;&gt;
+        &lt;li class=&quot;margin-btm-10&quot;&gt;Penggunaan fasilitas hotel seperti gym, spa, kolam renang, dll.&lt;/li&gt;
+        &lt;li class=&quot;margin-btm-10&quot;&gt;Perilaku dan harapan perilaku selama berada di area hotel.&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;/div&gt;
+    </content>
+    <link_rewrite>kebijakan</link_rewrite>
+  </cms>
+  <cms id="Legal_Notice">
+    <meta_title>Pemberitahuan Hukum</meta_title>
+    <meta_description>Pemberitahuan hukum kami</meta_description>
+    <meta_keywords>pemberitahuan, hukum, kredit</meta_keywords>
+    <content>
+        &lt;h2 class=&quot;page-heading bottom-indent&quot;&gt;&lt;strong&gt;Pemberitahuan Hukum&lt;/strong&gt;&lt;/h2&gt;
+        &lt;div&gt;
+        &lt;p style=&quot;border-left:2px solid #808080;padding-left:5px;&quot;&gt;Halaman ini berisi konten demo untuk tujuan ilustratif saja. Segala kemiripan dengan produk, layanan, atau acara yang sebenarnya adalah kebetulan belaka. Terima kasih atas pengertian Anda.&lt;/p&gt;
+        &lt;hr /&gt;&lt;/div&gt;
+        &lt;p class=&quot;margin-btm-30 page-subheading&quot;&gt;Syarat Penggunaan Website:&lt;/p&gt;
+        &lt;ul class=&quot;margin-btm-30&quot;&gt;
+        &lt;li class=&quot;margin-btm-20&quot;&gt;Konten halaman website ini hanya untuk informasi umum dan penggunaan Anda. Bisa berubah tanpa pemberitahuan.&lt;/li&gt;
+        &lt;li class=&quot;margin-btm-20&quot;&gt;Kami tidak memberikan jaminan tentang keakuratan, ketepatan waktu, kinerja, kelengkapan, atau kesesuaian informasi dan materi yang ada atau ditawarkan di website ini untuk tujuan tertentu. Anda mengakui bahwa informasi dan materi tersebut dapat mengandung ketidakakuratan atau kesalahan, dan kami mengecualikan tanggung jawab atas ketidakakuratan atau kesalahan tersebut sejauh yang diizinkan oleh hukum.&lt;/li&gt;
+        &lt;li class=&quot;margin-btm-20&quot;&gt;Penggunaan informasi atau materi di website ini sepenuhnya menjadi tanggung jawab Anda sendiri, dan kami tidak bertanggung jawab atasnya. Anda bertanggung jawab untuk memastikan bahwa produk, layanan, atau informasi apa pun yang tersedia melalui website ini memenuhi persyaratan spesifik Anda.&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p class=&quot;page-subheading&quot;&gt;Kekayaan Intelektual:&lt;/p&gt;
+        &lt;ul class=&quot;margin-btm-30&quot;&gt;
+        &lt;li class=&quot;margin-btm-20&quot;&gt;Website ini berisi materi yang dimiliki atau dilisensikan oleh kami. Materi ini mencakup, namun tidak terbatas pada, desain, tata letak, tampilan, dan grafik. Pem reproduksi dilarang kecuali sesuai dengan pemberitahuan hak cipta, yang merupakan bagian dari syarat dan ketentuan ini.&lt;/li&gt;
+        &lt;li class=&quot;margin-btm-20&quot;&gt;Semua merek dagang yang direproduksi di website ini, yang bukan merupakan milik atau dilisensikan kepada operator, diakui di website.&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p class=&quot;page-subheading&quot;&gt;Kebijakan Privasi:&lt;/p&gt;
+        &lt;ul class=&quot;margin-btm-30&quot;&gt;
+        &lt;li class=&quot;margin-btm-20&quot;&gt;Privasi Anda penting bagi kami. Harap tinjau Kebijakan Privasi kami untuk memahami bagaimana kami mengumpulkan, menggunakan, dan mengungkapkan informasi tentang Anda.&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p class=&quot;page-subheading&quot;&gt;Batasan Tanggung Jawab:&lt;/p&gt;
+        &lt;ul class=&quot;margin-btm-30&quot;&gt;
+        &lt;li class=&quot;margin-btm-20&quot;&gt;Kami tidak memberikan jaminan atau garansi apa pun tentang keakuratan, ketepatan waktu, kinerja, kelengkapan, atau kesesuaian informasi dan materi yang ada atau ditawarkan di website ini untuk tujuan tertentu. Anda mengakui bahwa informasi dan materi tersebut dapat mengandung ketidakakuratan atau kesalahan, dan kami mengecualikan tanggung jawab atas ketidakakuratan atau kesalahan tersebut sejauh yang diizinkan oleh hukum.&lt;/li&gt;
+        &lt;li class=&quot;margin-btm-20&quot;&gt;Penggunaan informasi atau materi di website ini sepenuhnya menjadi tanggung jawab Anda sendiri, dan kami tidak bertanggung jawab atasnya. Anda bertanggung jawab untuk memastikan bahwa produk, layanan, atau informasi apa pun yang tersedia melalui website ini memenuhi persyaratan spesifik Anda.&lt;/li&gt;
+        &lt;/ul&gt;
+    </content>
+    <link_rewrite>pemberitahuan-hukum</link_rewrite>
+  </cms>
+  <cms id="Terms_and_conditions_of_use">
+    <meta_title>Syarat dan Ketentuan Penggunaan</meta_title>
+    <meta_description>Syarat dan ketentuan penggunaan kami</meta_description>
+    <meta_keywords>syarat, ketentuan, penggunaan, jual</meta_keywords>
+    <content>
+        &lt;h2 class=&quot;page-heading bottom-indent&quot;&gt;Syarat dan Ketentuan Penggunaan&lt;/h2&gt;
+        &lt;div&gt;
+        &lt;p style=&quot;border-left:2px solid #808080;padding-left:5px;&quot;&gt;Halaman ini berisi konten demo untuk tujuan ilustratif saja. Segala kemiripan dengan produk, layanan, atau acara yang sebenarnya adalah kebetulan belaka. Terima kasih atas pengertian Anda.&lt;/p&gt;
+        &lt;hr /&gt;&lt;/div&gt;
+        &lt;div&gt;
+        &lt;h3 class=&quot;page-subheading&quot;&gt;&lt;strong&gt;Kebijakan Pembatalan:&lt;/strong&gt;&lt;/h3&gt;
+        &lt;div&gt;
+        &lt;ul&gt;
+        &lt;li&gt;&lt;span&gt;Pembatalan Gratis: Hingga 48 jam sebelum kedatangan untuk tarif standar.&lt;/span&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;span&gt;Pemesanan dengan tarif non-refundable tidak dapat dibatalkan atau diubah.&lt;/span&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;span&gt;Pembatalan dalam 24 jam sebelum kedatangan akan dikenakan biaya satu malam menginap.&lt;/span&gt;&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;/div&gt;
+        &lt;br /&gt;
+        &lt;h3 class=&quot;page-subheading&quot;&gt;&lt;strong&gt;Perubahan pada Pemesanan:&lt;/strong&gt;&lt;/h3&gt;
+        &lt;div&gt;
+        &lt;ul&gt;
+        &lt;li&gt;&lt;span&gt;Biaya sebesar $25 dapat dikenakan untuk mengubah tanggal reservasi setelah pemesanan.&lt;/span&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;span&gt;Perubahan jenis kamar atau jumlah tamu tergantung pada ketersediaan di hotel.&lt;/span&gt;&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;/div&gt;
+        &lt;br /&gt;
+        &lt;h3 class=&quot;page-subheading&quot;&gt;&lt;strong&gt;Tanggung Jawab Tamu:&lt;/strong&gt;&lt;/h3&gt;
+        &lt;div&gt;
+        &lt;ul&gt;
+        &lt;li&gt;&lt;span&gt;Semua tamu harus menunjukkan ID foto resmi yang sah saat check-in.&lt;/span&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;span&gt;Kapasitas maksimum untuk jenis kamar adalah 2 orang dewasa.&lt;/span&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;span&gt;Merokok dan alkohol dilarang keras di semua kamar tamu dan area umum.&lt;/span&gt;&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;/div&gt;
+        &lt;/div&gt;
+    </content>
+    <link_rewrite>syarat-dan-ketentuan-penggunaan</link_rewrite>
+  </cms>
+  <cms id="About_us">
+    <meta_title>Tentang Kami</meta_title>
+    <meta_description>Pelajari lebih lanjut tentang kami</meta_description>
+    <meta_keywords>tentang kami, informasi</meta_keywords>
+    <content>&lt;h2 class=&quot;page-heading bottom-indent&quot;&gt;Tentang Kami&lt;/h2&gt;&lt;div&gt;
+      &lt;p style=&quot;border-left:2px solid #808080;padding-left:5px;&quot;&gt;Halaman ini berisi konten demo untuk tujuan ilustrasi saja. Segala kesamaan dengan produk, layanan, atau acara yang sebenarnya adalah kebetulan semata. Terima kasih atas pengertian Anda.&lt;/p&gt;
+      &lt;hr /&gt;&lt;/div&gt;
+      &lt;div class=&quot;row&quot;&gt;
+      &lt;div class=&quot;col-xs-12 col-sm-8&quot;&gt;
+      &lt;div class=&quot;cms-block&quot;&gt;
+      &lt;div class=&quot;margin-btm-30&quot;&gt;
+      &lt;p class=&quot;dark&quot;&gt;Selamat datang di tempat peristirahatan mewah dan kedamaian kami, di mana setiap kunjungan dirancang untuk memberikan pengalaman yang tak tertandingi. Baik Anda mencari liburan yang santai, perjalanan bisnis yang produktif, atau acara berkesan, kami berkomitmen untuk membuat kunjungan Anda luar biasa.&lt;/p&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;margin-btm-30&quot;&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;Kisah Kami&lt;/p&gt;
+      &lt;p&gt;Terinspirasi oleh lingkungan yang tenang dan budaya lokal yang kaya, hotel kami menggabungkan kenyamanan modern dengan kemewahan yang abadi. Kamar-kamar yang dirancang dengan teliti, layanan yang tak terbantahkan, dan perhatian terhadap detail mencerminkan komitmen kami untuk memberikan tempat perlindungan bagi para pelancong.&lt;/p&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;margin-btm-30&quot;&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;Misi Kami&lt;/p&gt;
+      &lt;p&gt;Misi kami adalah menciptakan rumah jauh dari rumah, menawarkan layanan personal dan fasilitas mewah yang disesuaikan dengan kebutuhan Anda. Kenyamanan dan kepuasan Anda adalah prioritas utama kami, dan kami berusaha melebihi harapan Anda dalam setiap kesempatan.&lt;/p&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;margin-btm-30&quot;&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;Fasilitas Kami&lt;/p&gt;
+      &lt;p&gt;Nikmati fasilitas terbaik selama menginap Anda. Bersantailah di kamar dan suite yang elegan dengan pemandangan yang memukau. Nikmati hidangan gourmet di restoran kami, bersantai dengan koktail di bar bergaya kami, dan segarkan diri di spa dan pusat kebugaran berteknologi tinggi kami. Nikmati kolam renang outdoor yang tenang, taman yang rindang, dan fasilitas bisnis modern untuk memenuhi semua kebutuhan Anda.&lt;/p&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;margin-btm-30&quot;&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;Tim Kami&lt;/p&gt;
+      &lt;p&gt;Tim profesional kami di bidang perhotelan siap melayani Anda dengan semangat untuk keunggulan. Mulai dari layanan concierge personal hingga kebersihan rumah tangga yang teliti, setiap anggota tim kami berkomitmen untuk membuat pengalaman menginap Anda luar biasa.&lt;/p&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;margin-btm-30&quot;&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;Bergabunglah Bersama Kami&lt;/p&gt;
+      &lt;p&gt;Temukan pesona dan kemewahan hotel kami sendiri. Baik Anda berkunjung untuk liburan atau bisnis, kami mengundang Anda untuk merasakan keramahan hangat dan akomodasi mewah kami. Pesan penginapan Anda bersama kami hari ini dan biarkan kami membuat kunjungan Anda tak terlupakan.&lt;/p&gt;
+      &lt;/div&gt;
+      &lt;/div&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;col-xs-12 col-sm-4&quot;&gt;
+      &lt;div class=&quot;cms-box&quot;&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;Testimoni&lt;/p&gt;
+      &lt;div class=&quot;testimonials&quot;&gt;
+      &lt;div class=&quot;inner&quot;&gt;&lt;span class=&quot;before&quot;&gt;“&lt;/span&gt;Hotel Prime melampaui harapan saya dalam setiap hal. Kamar Eksekutif tidak hanya mewah tetapi juga menyediakan tempat peristirahatan yang tenang dengan pemandangan danau yang menakjubkan. Perhatian terhadap detail dan layanan personal membuat pengalaman menginap saya benar-benar berkesan. Saya sangat merekomendasikan Hotel Prime baik untuk pelancong bisnis maupun liburan yang mencari kenyamanan dan keanggunan.&lt;span class=&quot;after&quot;&gt;”&lt;/span&gt;&lt;/div&gt;
+      &lt;/div&gt;
+      &lt;p&gt;&lt;strong class=&quot;dark&quot;&gt;Calrk Kent&lt;/strong&gt;&lt;/p&gt;
+      &lt;div class=&quot;testimonials&quot;&gt;
+      &lt;div class=&quot;inner&quot;&gt;&lt;span class=&quot;before&quot;&gt;“&lt;/span&gt;Sebagai pelancong yang sering, saya dengan yakin mengatakan bahwa Hotel Prime menonjol dengan lingkungan yang tenang dan keramahan yang luar biasa. Kamar View memberikan tempat peristirahatan yang sempurna dengan pemandangan perkotaan yang menakjubkan dan akomodasi yang nyaman.&lt;span class=&quot;after&quot;&gt;”&lt;/span&gt;&lt;/div&gt;
+      &lt;/div&gt;
+      &lt;p&gt;&lt;strong class=&quot;dark&quot;&gt;John Doe&lt;/strong&gt;&lt;/p&gt;
+      &lt;/div&gt;
+      &lt;/div&gt;
+      &lt;/div&gt;
+    </content>
+    <link_rewrite>tentang-kami</link_rewrite>
+  </cms>
+  <cms id="Secure_payment">
+    <meta_title>Pembayaran Aman</meta_title>
+    <meta_description>Metode pembayaran aman kami</meta_description>
+    <meta_keywords>pembayaran aman, ssl, visa, mastercard, paypal</meta_keywords>
+    <content>&lt;h2 class=&quot;page-heading bottom-indent&quot;&gt;Pembayaran Aman&lt;/h2&gt;
+      &lt;div&gt;
+      &lt;p style=&quot;border-left:2px solid #808080;padding-left:5px;&quot;&gt;Halaman ini berisi konten demo untuk tujuan ilustrasi saja. Segala kesamaan dengan produk, layanan, atau acara yang sebenarnya adalah kebetulan semata. Terima kasih atas pengertian Anda.&lt;/p&gt;
+      &lt;hr /&gt;&lt;/div&gt;
+      &lt;div&gt;Kami mengutamakan keamanan Anda. Semua transaksi yang dilakukan di situs web kami dienkripsi menggunakan teknologi Secure Socket Layer (SSL) untuk memastikan informasi pribadi dan detail pembayaran Anda terlindungi. Kami menerima kartu kredit utama dan menyediakan lingkungan yang aman untuk pengalaman pemesanan yang lancar. Untuk pertanyaan mengenai keamanan pembayaran, jangan ragu untuk menghubungi tim dukungan pelanggan kami.&lt;/div&gt;
+    </content>
+    <link_rewrite>pembayaran-aman</link_rewrite>
+  </cms>
+</entity_cms>

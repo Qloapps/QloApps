@@ -1,0 +1,27 @@
+<?xml version='1.0'?>
+<entity_stock_mvt_reason>
+  <stock_mvt_reason id='Increase'>
+    <name>Crescente</name>
+  </stock_mvt_reason>
+  <stock_mvt_reason id='Decrease'>
+    <name>Decrescente</name>
+  </stock_mvt_reason>
+  <stock_mvt_reason id='Customer_Order'>
+    <name>Pedido do cliente</name>
+  </stock_mvt_reason>
+  <stock_mvt_reason id='Regulation_following_an_inventory_of_stock'>
+    <name>Atualização após inventário de estoque</name>
+  </stock_mvt_reason>
+  <stock_mvt_reason id='Regulation_following_an_inventory_of_stock_1'>
+    <name>Atualização após inventário de estoque</name>
+  </stock_mvt_reason>
+  <stock_mvt_reason id='Transfer_to_another_warehouse'>
+    <name>Transferência para outro depósito</name>
+  </stock_mvt_reason>
+  <stock_mvt_reason id='Transfer_from_another_warehouse'>
+    <name>Transferência de outro depósito</name>
+  </stock_mvt_reason>
+  <stock_mvt_reason id='Supply_Order'>
+    <name>Pedido de fornecimento</name>
+  </stock_mvt_reason>
+</entity_stock_mvt_reason>

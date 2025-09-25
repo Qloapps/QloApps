@@ -1081,7 +1081,7 @@ class HotelHelper
         // lang fields
         $languages = Language::getLanguages(false);
         $htlTagLineLang = array(
-            'en' => 'A great!',
+            'en' => 'A place where comfort and luxury are blended with nature!',
             'nl' => 'Een plek waar comfort en luxe worden gecombineerd met de natuur!',
             'fr' => 'Un endroit où le confort et le luxe se mêlent à la nature!',
             'de' => 'Ein Ort, an dem Komfort und Luxus mit der Natur verschmelzen!',

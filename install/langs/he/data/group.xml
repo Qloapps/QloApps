@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity_group>
+  <group id="Visitor" name="מבקר"/>
+  <group id="Guest" name="אורח"/>
+  <group id="Customer" name="לקוח"/>
+</entity_group>

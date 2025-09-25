@@ -1,0 +1,198 @@
+<?xml version='1.0'?>
+<entity_cms>
+  <cms id="Policies">
+    <meta_title>Politiche</meta_title>
+    <meta_description>Le nostre politiche per le prenotazioni di hotel</meta_description>
+    <meta_keywords>condizioni, politica, linee guida, protocollo, regola</meta_keywords>
+    <content>&lt;h2 class=&quot;page-heading bottom-indent&quot;&gt;Politiche&lt;/h2&gt;
+      &lt;div&gt;
+      &lt;p style=&quot;border-left:2px solid #808080;padding-left:5px;&quot;&gt;Questa pagina contiene contenuti dimostrativi a scopo illustrativo. Ogni somiglianza con prodotti, servizi o eventi reali è puramente casuale. Grazie per la vostra comprensione.&lt;/p&gt;
+      &lt;hr /&gt;&lt;/div&gt;
+      &lt;div&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;Politica di Prenotazione:&lt;/p&gt;
+      &lt;ul class=&quot;margin-btm-30&quot;&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Gli ospiti devono fornire dati di carta di credito validi per garantire la prenotazione.&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Le politiche di cancellazione variano in base al tipo di camera e al piano tariffario.&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Le modifiche alle prenotazioni possono essere soggette a disponibilità e a spese aggiuntive.&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;Orari di Check-in e Check-out:&lt;/p&gt;
+      &lt;ul class=&quot;margin-btm-30&quot;&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Orario di check-in: 11:00 AM&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Orario di check-out: 10:30 AM&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Le richieste di check-in anticipato e check-out tardivo sono soggette a disponibilità e possono comportare costi aggiuntivi.&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;Politica di Pagamento:&lt;/p&gt;
+      &lt;ul class=&quot;margin-btm-30&quot;&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Il pagamento dell'intero soggiorno è dovuto al momento del check-in.&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Forme di pagamento accettate: carte di credito, contanti, ecc.&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Un deposito cauzionale potrebbe essere richiesto all'arrivo.&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;Politica di Cancellazione e No-show:&lt;/p&gt;
+      &lt;ul class=&quot;margin-btm-30&quot;&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Le cancellazioni effettuate 7 giorni prima dell'arrivo sono idonee per un rimborso completo.&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Il mancato arrivo comporterà il pagamento dell'intero importo della prenotazione.&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;Politica sugli Animali Domestici:&lt;/p&gt;
+      &lt;ul class=&quot;margin-btm-30&quot;&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Gli animali domestici sono i benvenuti previo accordo.&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Potrebbero essere applicati costi aggiuntivi per le sistemazioni pet-friendly.&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Gli ospiti sono responsabili di eventuali danni causati dai loro animali domestici.&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;Politica sul Fumo:&lt;/p&gt;
+      &lt;ul class=&quot;margin-btm-30&quot;&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Il nostro hotel è non fumatori. Il fumo è strettamente vietato negli interni.&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Sono disponibili aree fumatori designate all'esterno della struttura.&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;Politica sulla Privacy:&lt;/p&gt;
+      &lt;ul class=&quot;margin-btm-30&quot;&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Ci impegniamo a proteggere la tua privacy e le tue informazioni personali.&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Le informazioni raccolte durante la prenotazione e il soggiorno sono utilizzate esclusivamente per scopi operativi.&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;Politica sull'Accessibilità:&lt;/p&gt;
+      &lt;ul class=&quot;margin-btm-30&quot;&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Il nostro hotel si impegna a fornire alloggi e strutture accessibili per gli ospiti con disabilità.&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Ti preghiamo di contattarci direttamente per richieste specifiche di accessibilità.&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;Politiche Aggiuntive:&lt;/p&gt;
+      &lt;ul class=&quot;margin-btm-30&quot;&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Utilizzo delle strutture dell'hotel come palestra, spa, piscina, ecc.&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Comportamento e aspettative di condotta durante il soggiorno in hotel.&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;/div&gt;
+    </content>
+    <link_rewrite>politiche</link_rewrite>
+  </cms>
+  <cms id="Legal_Notice">
+    <meta_title>Avviso Legale</meta_title>
+    <meta_description>Avviso legale</meta_description>
+    <meta_keywords>avviso, legale, crediti</meta_keywords>
+    <content>&lt;h2 class=&quot;page-heading bottom-indent&quot;&gt;&lt;strong&gt;Avviso Legale&lt;/strong&gt;&lt;/h2&gt;
+      &lt;div&gt;
+      &lt;p style=&quot;border-left:2px solid #808080;padding-left:5px;&quot;&gt;Questa pagina contiene contenuti dimostrativi a scopo illustrativo. Ogni somiglianza con prodotti, servizi o eventi reali è puramente casuale. Grazie per la vostra comprensione.&lt;/p&gt;
+      &lt;hr /&gt;&lt;/div&gt;
+      &lt;p class=&quot;margin-btm-30 page-subheading&quot;&gt;Termini di Utilizzo del Sito Web:&lt;/p&gt;
+      &lt;ul class=&quot;margin-btm-30&quot;&gt;
+      &lt;li class=&quot;margin-btm-20&quot;&gt;I contenuti delle pagine di questo sito sono forniti solo a scopo informativo generale. Possono essere modificati senza preavviso.&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-20&quot;&gt;Né noi né terze parti forniamo alcuna garanzia sull'accuratezza, tempestività, prestazioni, completezza o idoneità delle informazioni e materiali presentati o offerti su questo sito per qualsiasi scopo particolare. Riconosci che tali informazioni e materiali possono contenere inaccuratezze o errori e escludiamo espressamente la responsabilità per tali inaccuratezze o errori nella misura massima consentita dalla legge.&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-20&quot;&gt;L'uso di qualsiasi informazione o materiale su questo sito è interamente a tuo rischio, per il quale non saremo responsabili. È tua responsabilità assicurarti che i prodotti, servizi o informazioni disponibili su questo sito soddisfino le tue esigenze specifiche.&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;Proprietà Intellettuale:&lt;/p&gt;
+      &lt;ul class=&quot;margin-btm-30&quot;&gt;
+      &lt;li class=&quot;margin-btm-20&quot;&gt;Questo sito contiene materiali che sono di nostra proprietà o concessi in licenza a noi. Questo materiale include, ma non è limitato a, design, layout, aspetto, grafica. La riproduzione è vietata tranne in conformità con l'avviso di copyright, che fa parte di questi termini e condizioni.&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-20&quot;&gt;Tutti i marchi riprodotti su questo sito, che non sono di nostra proprietà o concessi in licenza all'operatore, sono riconosciuti sul sito web.&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;Informativa sulla Privacy:&lt;/p&gt;
+      &lt;ul class=&quot;margin-btm-30&quot;&gt;
+      &lt;li class=&quot;margin-btm-20&quot;&gt;La tua privacy è importante per noi. Si prega di consultare la nostra Informativa sulla privacy per comprendere come raccogliamo, utilizziamo e divulgamo informazioni su di te.&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;Limitazione di Responsabilità:&lt;/p&gt;
+      &lt;ul class=&quot;margin-btm-30&quot;&gt;
+      &lt;li class=&quot;margin-btm-20&quot;&gt;Né noi né terze parti forniamo alcuna garanzia sull'accuratezza, tempestività, prestazioni, completezza o idoneità delle informazioni e materiali presentati o offerti su questo sito per qualsiasi scopo particolare. Riconosci che tali informazioni e materiali possono contenere inaccuratezze o errori e escludiamo espressamente la responsabilità per tali inaccuratezze o errori nella misura massima consentita dalla legge.&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-20&quot;&gt;L'uso di qualsiasi informazione o materiale su questo sito è interamente a tuo rischio, per il quale non saremo responsabili. È tua responsabilità assicurarti che i prodotti, servizi o informazioni disponibili su questo sito soddisfino le tue esigenze specifiche.&lt;/li&gt;
+      &lt;/ul&gt;
+    </content>
+    <link_rewrite>note-legali</link_rewrite>
+  </cms>
+  <cms id="Terms_and_conditions_of_use">
+    <meta_title>Condizioni d'Uso</meta_title>
+    <meta_description>Le nostre Condizioni d'Uso</meta_description>
+    <meta_keywords>condizioni, termini, utilizzo, vendita</meta_keywords>
+    <content>&lt;h2 class=&quot;page-heading bottom-indent&quot;&gt;Condizioni d'Uso&lt;/h2&gt;
+      &lt;div&gt;
+      &lt;p style=&quot;border-left:2px solid #808080;padding-left:5px;&quot;&gt;Questa pagina contiene contenuti dimostrativi a scopo illustrativo. Ogni somiglianza con prodotti, servizi o eventi reali è puramente casuale. Grazie per la vostra comprensione.&lt;/p&gt;
+      &lt;hr /&gt;&lt;/div&gt;
+      &lt;div&gt;
+      &lt;h3 class=&quot;page-subheading&quot;&gt;&lt;strong&gt;Politica di Cancellazione:&lt;/strong&gt;&lt;/h3&gt;
+      &lt;div&gt;
+      &lt;ul&gt;
+      &lt;li&gt;&lt;span&gt;Cancellazione Gratuita: Fino a 48 ore prima dell'arrivo per tariffe standard.&lt;/span&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;span&gt;Prenotazioni effettuate con tariffe non rimborsabili non possono essere cancellate o modificate.&lt;/span&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;span&gt;Le cancellazioni effettuate entro 24 ore dall'arrivo comporteranno un addebito pari a una notte di soggiorno.&lt;/span&gt;&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;/div&gt;
+      &lt;br /&gt;
+      &lt;h3 class=&quot;page-subheading&quot;&gt;&lt;strong&gt;Modifiche alle Prenotazioni:&lt;/strong&gt;&lt;/h3&gt;
+      &lt;div&gt;
+      &lt;ul&gt;
+      &lt;li&gt;&lt;span&gt;Potrebbe essere applicata una tariffa di $25 per modificare le date della prenotazione dopo aver prenotato.&lt;/span&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;span&gt;Le modifiche al tipo di camera o al numero di ospiti sono soggette a disponibilità presso l'hotel.&lt;/span&gt;&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;/div&gt;
+      &lt;br /&gt;
+      &lt;h3 class=&quot;page-subheading&quot;&gt;&lt;strong&gt;Responsabilità dell'Ospite:&lt;/strong&gt;&lt;/h3&gt;
+      &lt;div&gt;
+      &lt;ul&gt;
+      &lt;li&gt;&lt;span&gt;Tutti gli ospiti devono presentare un valido documento d'identità con foto rilasciato dal governo al check-in.&lt;/span&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;span&gt;La capienza massima per il tipo di camera è di 2 adulti.&lt;/span&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;span&gt;È severamente vietato fumare e consumare alcol nelle camere degli ospiti e nelle aree pubbliche.&lt;/span&gt;&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;/div&gt;
+      &lt;/div&gt;
+    </content>
+    <link_rewrite>termini-e-condizioni-di-uso</link_rewrite>
+  </cms>
+  <cms id="About_us">
+    <meta_title>Chi Siamo</meta_title>
+    <meta_description>Scopri di più su di noi</meta_description>
+    <meta_keywords>chi siamo, informazioni</meta_keywords>
+    <content>&lt;h2 class=&quot;page-heading bottom-indent&quot;&gt;Chi Siamo&lt;/h2&gt;&lt;div&gt;
+      &lt;p style=&quot;border-left:2px solid #808080;padding-left:5px;&quot;&gt;Questa pagina contiene contenuti dimostrativi a scopo illustrativo. Ogni somiglianza con prodotti, servizi o eventi reali è puramente casuale. Grazie per la vostra comprensione.&lt;/p&gt;
+      &lt;hr /&gt;&lt;/div&gt;
+      &lt;div class=&quot;row&quot;&gt;
+      &lt;div class=&quot;col-xs-12 col-sm-8&quot;&gt;
+      &lt;div class=&quot;cms-block&quot;&gt;
+      &lt;div class=&quot;margin-btm-30&quot;&gt;
+      &lt;p class=&quot;dark&quot;&gt;Benvenuti nel nostro santuario di lusso e tranquillità, dove ogni soggiorno è progettato per offrire un'esperienza senza pari. Che tu stia cercando una vacanza rilassante, un viaggio di lavoro produttivo o un evento memorabile, siamo dedicati a rendere la tua visita eccezionale.&lt;/p&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;margin-btm-30&quot;&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;La Nostra Storia&lt;/p&gt;
+      &lt;p&gt;Ispirato da un ambiente sereno e una ricca cultura locale, il nostro hotel combina comfort moderno con eleganza senza tempo. Le nostre camere pensate nei minimi dettagli, il servizio impeccabile e l'attenzione ai particolari riflettono il nostro impegno nel fornire un rifugio per i viaggiatori.&lt;/p&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;margin-btm-30&quot;&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;La Nostra Missione&lt;/p&gt;
+      &lt;p&gt;La nostra missione è creare una casa lontano da casa, offrendo un servizio personalizzato e comfort lussuosi su misura per le tue esigenze. Il tuo comfort e la tua soddisfazione sono le nostre priorità principali e ci sforziamo di superare le tue aspettative ad ogni passo.&lt;/p&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;margin-btm-30&quot;&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;I Nostri Servizi&lt;/p&gt;
+      &lt;p&gt;Goditi i migliori servizi durante il tuo soggiorno. Rilassati in camere e suite elegantemente arredate con viste mozzafiato. Gusta cucina gourmet presso il nostro ristorante interno, rilassati con un cocktail al nostro elegante bar e rigenerati presso il nostro centro benessere e fitness all'avanguardia. Approfitta della nostra serena piscina all'aperto, dei giardini rigogliosi e delle moderne strutture business per soddisfare tutte le tue esigenze.&lt;/p&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;margin-btm-30&quot;&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;Il Nostro Team&lt;/p&gt;
+      &lt;p&gt;Il nostro team dedicato di professionisti dell'ospitalità è qui per servirti con passione per l'eccellenza. Dal servizio concierge personalizzato alla minuziosa pulizia delle camere, ogni membro del nostro team è impegnato a rendere il tuo soggiorno straordinario.&lt;/p&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;margin-btm-30&quot;&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;Unisciti a Noi&lt;/p&gt;
+      &lt;p&gt;Scopri il fascino e l'eleganza del nostro hotel di persona. Che tu sia in visita per svago o per affari, ti invitiamo a vivere la nostra calorosa ospitalità e i nostri alloggi lussuosi. Prenota il tuo soggiorno con noi oggi stesso e lascia che rendiamo la tua visita indimenticabile.&lt;/p&gt;
+      &lt;/div&gt;
+      &lt;/div&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;col-xs-12 col-sm-4&quot;&gt;
+      &lt;div class=&quot;cms-box&quot;&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;Testimonianze&lt;/p&gt;
+      &lt;div class=&quot;testimonials&quot;&gt;
+      &lt;div class=&quot;inner&quot;&gt;&lt;span class=&quot;before&quot;&gt;“&lt;/span&gt;L'Hotel Prime ha superato le mie aspettative in ogni modo. La Camera Executive non era solo lussuosa ma ha anche fornito un rifugio tranquillo con la sua splendida vista sul lago. L'attenzione ai dettagli e il servizio personalizzato hanno reso il mio soggiorno veramente memorabile. Consiglio vivamente l'Hotel Prime sia per i viaggiatori d'affari che per quelli in vacanza che cercano un mix di comfort e sofisticatezza.&lt;span class=&quot;after&quot;&gt;”&lt;/span&gt;&lt;/div&gt;
+      &lt;/div&gt;
+      &lt;p&gt;&lt;strong class=&quot;dark&quot;&gt;Clark Kent&lt;/strong&gt;&lt;/p&gt;
+      &lt;div class=&quot;testimonials&quot;&gt;
+      &lt;div class=&quot;inner&quot;&gt;&lt;span class=&quot;before&quot;&gt;“&lt;/span&gt;Come viaggiatore frequente, posso dire con fiducia che l'Hotel Prime si distingue per il suo ambiente tranquillo e l'ospitalità eccezionale. La Camera Vista ha fornito un rifugio perfetto con la sua vista mozzafiato sulla città e i comfort confortevoli.&lt;span class=&quot;after&quot;&gt;”&lt;/span&gt;&lt;/div&gt;
+      &lt;/div&gt;
+      &lt;p&gt;&lt;strong class=&quot;dark&quot;&gt;John Doe&lt;/strong&gt;&lt;/p&gt;
+      &lt;/div&gt;
+      &lt;/div&gt;
+      &lt;/div&gt;
+    </content>
+    <link_rewrite>chi-siamo</link_rewrite>
+  </cms>
+  <cms id="Secure_payment">
+    <meta_title>Pagamento Sicuro</meta_title>
+    <meta_description>Il nostro metodo di pagamento sicuro</meta_description>
+    <meta_keywords>pagamento sicuro, ssl, visa, mastercard, paypal</meta_keywords>
+    <content>&lt;h2 class=&quot;page-heading bottom-indent&quot;&gt;Pagamento Sicuro&lt;/h2&gt;
+      &lt;div&gt;
+      &lt;p style=&quot;border-left:2px solid #808080;padding-left:5px;&quot;&gt;Questa pagina contiene contenuti dimostrativi a scopo illustrativo. Ogni somiglianza con prodotti, servizi o eventi reali è puramente casuale. Grazie per la vostra comprensione.&lt;/p&gt;
+      &lt;hr /&gt;&lt;/div&gt;
+      &lt;div&gt;Diamo la massima priorità alla tua sicurezza. Tutte le transazioni effettuate sul nostro sito web sono crittografate utilizzando la tecnologia Secure Socket Layer (SSL) per garantire la protezione delle tue informazioni personali e dei dettagli di pagamento. Accettiamo le principali carte di credito e forniamo un ambiente sicuro per un'esperienza di prenotazione senza problemi. Per eventuali domande sulla sicurezza dei pagamenti, non esitare a contattare il nostro servizio clienti.&lt;/div&gt;
+    </content>
+    <link_rewrite>pagamento-sicuro</link_rewrite>
+  </cms>
+</entity_cms>
