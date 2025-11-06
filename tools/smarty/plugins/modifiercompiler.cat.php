@@ -14,7 +14,7 @@
  * Input:    string to catenate
  * Example:  {$var|cat:"foo"}
  *
- * @link   http://smarty.php.net/manual/en/language.modifier.cat.php cat
+ * @link   https://www.smarty.net/manual/en/language.modifier.cat.php cat
  *           (Smarty online manual)
  * @author Uwe Tews
  *

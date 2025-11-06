@@ -318,14 +318,14 @@ class Smarty_Internal_Compile_Include extends Smarty_Internal_CompileBase
             }
             // get compiled code
             $compiled_code = "<?php\n\n";
-            $compiled_code .= "/* Start inline template \"{$sourceInfo}\" =============================*/\n";
+            $compiled_code .= $compiler->cStyleComment(" Start inline template \"{$sourceInfo}\" =============================") . "\n";
             $compiled_code .= "function {$tpl->compiled->unifunc} (Smarty_Internal_Template \$_smarty_tpl) {\n";
             $compiled_code .= "?>\n" . $tpl->compiler->compileTemplateSource($tpl, null, $compiler->parent_compiler);
             $compiled_code .= "<?php\n";
             $compiled_code .= "}\n?>\n";
             $compiled_code .= $tpl->compiler->postFilter($tpl->compiler->blockOrFunctionCode);
             $compiled_code .= "<?php\n\n";
-            $compiled_code .= "/* End inline template \"{$sourceInfo}\" =============================*/\n";
+            $compiled_code .= $compiler->cStyleComment(" End inline template \"{$sourceInfo}\" =============================") . "\n";
             $compiled_code .= '?>';
             unset($tpl->compiler);
             if ($tpl->compiled->has_nocache_code) {

@@ -48,15 +48,6 @@ $(document).ready(function() {
     });
 
     showProductSelect($('select[name=id_order]').attr('value'));
-
-    //By Webkul JS for Map locations of the hotels on google Map
-    if (typeof hotelLocationArray != 'undefined'
-        && $('#map').length
-        && typeof google == 'object'
-        && typeof google.maps == 'object'
-    ) {
-        initMap();
-    }
 });
 
 function showProductSelect(id_order) {
@@ -75,7 +66,7 @@ function initMap() {
     hotelLocationArray = JSON.parse(hotelLocationArray);
 
     // Display a map on the page
-    map = new google.maps.Map(document.getElementById("map"));
+    map = new google.maps.Map(document.getElementById("map"), {mapId: PS_MAP_ID});
     google.maps.event.trigger(map, 'resize');
 
     map.setTilt(45);
@@ -88,14 +79,17 @@ function initMap() {
     $.each(hotelLocationArray, function(i, location) {
         var position = new google.maps.LatLng(location.latitude, location.longitude);
         bounds.extend(position);
-        marker = new google.maps.Marker({
-            position: position,
-            map: map,
-            title: location.hotel_name,
-            animation: google.maps.Animation.DROP,
-            icon: PS_STORES_ICON
-        });
+        let icon = document.createElement('img');
+        icon.src = PS_STORES_ICON;
+        icon.style.width = '24px';
+        icon.style.height = '24px';
 
+        marker = new google.maps.marker.AdvancedMarkerElement({
+            map: map,
+            position: position,
+            title: location.hotel_name,
+            content: icon,
+        });
         // Allow each marker to have an info window
         google.maps.event.addListener(marker, 'click', (function(marker, i) {
             return function() {

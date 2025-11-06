@@ -22,7 +22,7 @@ class Smarty_Internal_Method_GetConfigVars
      * Returns a single or all config variables
      *
      * @api  Smarty::getConfigVars()
-     * @link http://www.smarty.net/docs/en/api.get.config.vars.tpl
+     * @link https://www.smarty.net/docs/en/api.get.config.vars.tpl
      *
      * @param \Smarty_Internal_Data|\Smarty_Internal_Template|\Smarty $data
      * @param string                                                  $varname        variable name or null

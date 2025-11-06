@@ -1,0 +1,10 @@
+Core.RemoveBlanks
+TYPE: bool
+DEFAULT: false
+VERSION: 4.18
+--DESCRIPTION--
+<p>
+    If set to true, blank nodes will be removed. This can be useful for maintaining
+    backwards compatibility when upgrading from previous versions of PHP.
+</p>
+--# vim: et sw=4 sts=4

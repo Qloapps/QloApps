@@ -108,7 +108,7 @@ class AdminInformationControllerCore extends AdminController
     public function getTestResult()
     {
         $tests_errors = array(
-            'phpversion' => $this->l('The required PHP version is between 5.6 to 7.4.'),
+            'phpversion' => $this->l('The required PHP version is between 8.1 to 8.4.'),
             'upload' => $this->l('Configure your server to allow file uploads.'),
             'system' => $this->l('Configure your server to allow the creation of directories and files with write permissions.'),
             'gd' => $this->l('Enable the GD library on your server.'),
@@ -130,7 +130,7 @@ class AdminInformationControllerCore extends AdminController
             'register_globals' => $this->l('Set PHP "register_globals" option to "Off".'),
             'gz' => $this->l('Enable GZIP compression on your server.'),
             'files' => $this->l('Some QloApps files are missing from your server.'),
-            'new_phpversion' => sprintf($this->l('You are using PHP %s version. Soon, the latest PHP version supported by QloApps will be PHP 5.6. To make sure you’re ready for the future, we recommend you to upgrade to PHP 5.6 now!'), phpversion()),
+             'new_phpversion' => sprintf($this->l('You are using PHP %s version. Soon, the latest PHP version supported by QloApps will be PHP 8.1. To make sure you’re ready for the future, we recommend you to upgrade to PHP 8.1 now!'), phpversion()),
             'pdo_mysql' => $this->l('PDO MySQL extension is not loaded.'),
             'openssl' => $this->l('PHP OpenSSL extension is not loaded.'),
             'curl' => $this->l('PHP Curl extension is not loaded.'),

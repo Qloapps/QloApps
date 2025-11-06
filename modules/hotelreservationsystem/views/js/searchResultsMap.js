@@ -1,20 +1,23 @@
 /**
-* 2010-2022 Webkul.
-*
 * NOTICE OF LICENSE
 *
-* All right is reserved,
-* Please go through LICENSE.txt file inside our module
+* This source file is subject to the Open Software License version 3.0
+* that is bundled with this package in the file LICENSE.md
+* It is also available through the world-wide-web at this URL:
+* https://opensource.org/license/osl-3-0-php
+* If you did not receive a copy of the license and are unable to
+* obtain it through the world-wide-web, please send an email
+* to support@qloapps.com so we can send you a copy immediately.
 *
 * DISCLAIMER
 *
-* Do not edit or add to this file if you wish to upgrade this module to newer
-* versions in the future. If you wish to customize this module for your
-* needs please refer to CustomizationPolicy.txt file inside our module for more information.
+* Do not edit or add to this file if you wish to upgrade this module to a newer
+* versions in the future. If you wish to customize this module for your needs
+* please refer to https://store.webkul.com/customisation-guidelines for more information.
 *
 * @author Webkul IN
-* @copyright 2010-2022 Webkul IN
-* @license LICENSE.txt
+* @copyright Since 2010 Webkul
+* @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
 */
 
 function initMap() {
@@ -28,33 +31,36 @@ function initMap() {
         center: hotelLocation,
         disableDefaultUI: true,
         fullscreenControl: true,
+        mapId: PS_MAP_ID
     });
 
-    const marker = new google.maps.Marker({
-        position: hotelLocation,
+    let icon = document.createElement('img');
+    icon.src = PS_STORES_ICON;
+    icon.style.width = '24px';
+    icon.style.height = '24px';
+
+    const marker = new google.maps.marker.AdvancedMarkerElement({
         map: map,
-        title: hotel_name,
-        icon: PS_STORES_ICON
+        position: hotelLocation,
+        title: location.hotel_name,
+        content: icon,
     });
+
+    marker.query = location.query || null;
+    marker.latitude = hotelLocation.lat;
+    marker.longitude = hotelLocation.lng;
 
     marker.addListener('click', function() {
         let query = '';
-        if (hotel_location.map_input_text != '') {
-            query = hotel_location.map_input_text;
-        } else {
-            query = hotel_location.latitude + ',' + hotel_location.longitude;
+        if (this.query) {
+            query = this.query;
+        } else if (this.latitude && this.longitude) {
+            query = `${this.latitude},${this.longitude}`;
         }
 
-        window.open('https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(query), '_blank');
+        if (query) {
+            window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`, '_blank');
+        }
     });
 }
 
-$(document).ready(function() {
-    if (typeof hotel_location == 'object'
-        && $('#search-results-wrap .map-wrap').length
-        && typeof google == 'object'
-        && typeof google.maps == 'object'
-    ) {
-        initMap();
-    }
-});

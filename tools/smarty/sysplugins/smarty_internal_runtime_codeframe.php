@@ -17,11 +17,11 @@ class Smarty_Internal_Runtime_CodeFrame
     /**
      * Create code frame for compiled and cached templates
      *
-     * @param Smarty_Internal_Template              $_template
-     * @param string                                $content   optional template content
-     * @param string                                $functions compiled template function and block code
-     * @param bool                                  $cache     flag for cache file
-     * @param \Smarty_Internal_TemplateCompilerBase $compiler
+     * @param Smarty_Internal_Template                   $_template
+     * @param string                                     $content   optional template content
+     * @param string                                     $functions compiled template function and block code
+     * @param bool                                       $cache     flag for cache file
+     * @param \Smarty_Internal_TemplateCompilerBase|null $compiler
      *
      * @return string
      */
@@ -30,7 +30,7 @@ class Smarty_Internal_Runtime_CodeFrame
         $content = '',
         $functions = '',
         $cache = false,
-        Smarty_Internal_TemplateCompilerBase $compiler = null
+        ?Smarty_Internal_TemplateCompilerBase $compiler = null
     ) {
         // build property code
         $properties[ 'version' ] = Smarty::SMARTY_VERSION;
@@ -44,9 +44,12 @@ class Smarty_Internal_Runtime_CodeFrame
             $properties[ 'file_dependency' ] = $_template->cached->file_dependency;
             $properties[ 'cache_lifetime' ] = $_template->cache_lifetime;
         }
-        $output = "<?php\n";
-        $output .= "/* Smarty version {$properties[ 'version' ]}, created on " . strftime("%Y-%m-%d %H:%M:%S") .
-                   "\n  from '" . str_replace('*/', '* /', $_template->source->filepath) . "' */\n\n";
+        $output = sprintf(
+			"<?php\n/* Smarty version %s, created on %s\n  from '%s' */\n\n",
+            $properties[ 'version' ],
+	        date("Y-m-d H:i:s"),
+	        str_replace('*/', '* /', $_template->source->filepath)
+        );
         $output .= "/* @var Smarty_Internal_Template \$_smarty_tpl */\n";
         $dec = "\$_smarty_tpl->_decodeProperties(\$_smarty_tpl, " . var_export($properties, true) . ',' .
                ($cache ? 'true' : 'false') . ')';

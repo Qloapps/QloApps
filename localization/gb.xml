@@ -130,7 +130,7 @@
   <units>
     <unit type="weight" value="Kg"/>
     <unit type="volume" value="L"/>
-    <unit type="short_distance" value="ft"/>
+    <unit type="short_distance" value="cm"/>
     <unit type="base_distance" value="m"/>
     <unit type="long_distance" value="mi"/>
   </units>

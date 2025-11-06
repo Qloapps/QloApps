@@ -50,7 +50,7 @@ class BankwireValidationModuleFrontController extends ModuleFrontController
 			die($this->module->l('This payment method is not available.', 'validation'));
 
 		// check all service products are available
-		RoomTypeServiceProductCartDetail::validateServiceProductsInCart();
+		ServiceProductCartDetail::validateServiceProductsInCart();
 
 		// Check Order restrict condition before Payment by the customer
 		if (Module::isInstalled('hotelreservationsystem') && Module::isEnabled('hotelreservationsystem')) {

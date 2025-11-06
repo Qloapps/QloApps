@@ -51,7 +51,7 @@ class BankwirePaymentModuleFrontController extends ModuleFrontController
 		}
 
         // check all service products are available
-        RoomTypeServiceProductCartDetail::validateServiceProductsInCart();
+        ServiceProductCartDetail::validateServiceProductsInCart();
 
         $restrict_order = false;
         /*Check Order restrict condition before Payment by the customer*/

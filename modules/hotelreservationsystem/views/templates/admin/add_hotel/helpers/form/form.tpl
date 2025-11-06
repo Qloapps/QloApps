@@ -1,20 +1,23 @@
 {**
-* 2010-2022 Webkul.
-*
 * NOTICE OF LICENSE
 *
-* All right is reserved,
-* Please go through LICENSE.txt file inside our module
+* This source file is subject to the Open Software License version 3.0
+* that is bundled with this package in the file LICENSE.md
+* It is also available through the world-wide-web at this URL:
+* https://opensource.org/license/osl-3-0-php
+* If you did not receive a copy of the license and are unable to
+* obtain it through the world-wide-web, please send an email
+* to support@qloapps.com so we can send you a copy immediately.
 *
 * DISCLAIMER
 *
-* Do not edit or add to this file if you wish to upgrade this module to newer
-* versions in the future. If you wish to customize this module for your
-* needs please refer to CustomizationPolicy.txt file inside our module for more information.
+* Do not edit or add to this file if you wish to upgrade this module to a newer
+* versions in the future. If you wish to customize this module for your needs
+* please refer to https://store.webkul.com/customisation-guidelines for more information.
 *
 * @author Webkul IN
-* @copyright 2010-2022 Webkul IN
-* @license LICENSE.txt
+* @copyright Since 2010 Webkul
+* @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
 *}
 
 <div class="panel">
@@ -303,7 +306,7 @@
 								<input type="hidden" id="loclongitude" name="loclongitude" value="{if isset($edit)}{$hotel_info.longitude|escape:'htmlall':'UTF-8'}{/if}" />
 								<input type="hidden" id="locformatedAddr" name="locformatedAddr" value="{if isset($edit)}{$hotel_info.map_formated_address}{/if}" />
 								<input type="hidden" id="googleInputField" name="googleInputField" value="{if isset($edit)}{$hotel_info.map_input_text}{/if}" />
-								<input id="pac-input" class="controls" type="text" placeholder="{l s='Search' mod='hotelreservationsystem'}">
+								<div id="pac-input" class="controls" type="text"></div>
 								<div id="map"></div>
 							</div>
 						</div>

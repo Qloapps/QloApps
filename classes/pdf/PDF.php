@@ -34,6 +34,7 @@ class PDFCore
     public $objects;
     public $template;
     public $send_bulk_flag = false;
+    protected $smarty;
 
     const TEMPLATE_INVOICE = 'Invoice';
     const TEMPLATE_ORDER_RETURN = 'OrderReturn';

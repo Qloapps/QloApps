@@ -455,7 +455,7 @@
 				<p class="help-block">{l s='Please note that position numbering starts from 0. A position of 0 means room type will be displayed at the topmost position.'}</p>
 				<div class="alert alert-info">
 					{l s='You can manage positions of the room types of this hotel from'}
-					<a href="{$link->getAdminLink('AdminProducts')}&id_category={$htl_full_info['id_category']}">{l s='here.'}</a>
+					<a href="{$link->getAdminLink('AdminProducts')}&submitResetproduct&submitFilterproduct=1&productFilter_a!id_category_default={$htl_full_info['id_category']}">{l s='here.'}</a>
 				</div>
 			</div>
 		</div>

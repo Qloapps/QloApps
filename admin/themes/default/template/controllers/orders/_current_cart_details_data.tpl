@@ -1,20 +1,23 @@
 {*
-* 2010-2019 Webkul.
-*
 * NOTICE OF LICENSE
 *
-* All right is reserved,
-* Please go through this link for complete license : https://store.webkul.com/license.html
+* This source file is subject to the Open Software License version 3.0
+* that is bundled with this package in the file LICENSE.md
+* It is also available through the world-wide-web at this URL:
+* https://opensource.org/license/osl-3-0-php
+* If you did not receive a copy of the license and are unable to
+* obtain it through the world-wide-web, please send an email
+* to support@qloapps.com so we can send you a copy immediately.
 *
 * DISCLAIMER
 *
-* Do not edit or add to this file if you wish to upgrade this module to newer
-* versions in the future. If you wish to customize this module for your
-* needs please refer to https://store.webkul.com/customisation-guidelines/ for more information.
+* Do not edit or add to this file if you wish to upgrade this module to a newer
+* versions in the future. If you wish to customize this module for your needs
+* please refer to https://store.webkul.com/customisation-guidelines for more information.
 *
-*  @author    Webkul IN <support@webkul.com>
-*  @copyright 2010-2019 Webkul IN
-*  @license   https://store.webkul.com/license.html
+* @author Webkul IN
+* @copyright Since 2010 Webkul
+* @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
 *}
 
 {if !isset($ajax) || !$ajax}
@@ -115,22 +118,14 @@
 									</td>
 								{/if}
 								<td id="cart_detail_data_unit_price_{$data.id|escape:'html':'UTF-8'}">
-									{if $data.feature_price_diff != 0}
-										{assign var=shown_room_type_price value=$data.feature_price_tax_excl}
-									{else}
-										{assign var=shown_room_type_price value=$data.product_price_tax_excl}
-									{/if}
+									{assign var=shown_room_type_price value=$data.feature_price_tax_excl}
 									<div class="input-group">
 										<input type="text" class="room_unit_price" value="{Tools::ps_round($shown_room_type_price, $smarty.const._PS_PRICE_DISPLAY_PRECISION_)|escape:'html':'UTF-8'}">
 										<span class="input-group-addon">{$currency->prefix}{$currency->suffix}</span>
 									</div>
 								</td>
 								<td>
-									{if (isset($data.extra_demands) && $data.extra_demands) || (isset($data.additional_service) && $data.additional_service)}
-										{displayPrice price=($data.demand_price + $data.additional_service_price + $data.additional_services_auto_add_price)|escape:'html':'UTF-8'}
-									{else}
-										{displayPrice price=0}
-									{/if}
+                                    {displayPrice price=($data.demand_price + $data.additional_service_price + $data.additional_services_auto_add_price)|escape:'html':'UTF-8'}
 								</td>
 								{* <td class="cart_line_total_rooms_price" id="cart_detail_data_price_{$data.id|escape:'html':'UTF-8'}">
 									{displayPrice price=$data.amt_with_qty}</td> *}
@@ -145,42 +140,10 @@
 									<button class="delete_hotel_cart_data btn btn-danger" data-id_room="{$data.id_room|escape:'html':'UTF-8'}" data-id_product="{$data.id_product|escape:'html':'UTF-8'}" data-id="{$data.id|escape:'html':'UTF-8'}" data-id_cart="{$data.id_cart|escape:'html':'UTF-8'}" data-date_to="{$data.date_to|escape:'html':'UTF-8'}" data-date_from="{$data.date_from|escape:'html':'UTF-8'}">
 										<i class="icon-trash"></i>&nbsp;{l s='Delete'}
 									</button>
-									{if (isset($data.extra_demands) && $data.extra_demands) || isset($data.additional_service) && $data.additional_service}
-										<br />
-										<a href="#" id_hotel_cart_booking="{$data.id|escape:'html':'UTF-8'}" id_room="{$data.id_room|escape:'html':'UTF-8'}" date_from="{$data.date_from|escape:'html':'UTF-8'}" date_to="{$data.date_to|escape:'html':'UTF-8'}" id_product="{$data.id_product|escape:'html':'UTF-8'}" id_cart="{$data.id_cart|escape:'html':'UTF-8'}" class="open_rooms_extra_demands btn btn-success" title="{l s='Click here to add or remove the extra services of this room type.'}">
-											<i class="icon-pencil"></i>&nbsp;{l s='Services'}
-										</a>
-									{/if}
-								</td>
-							</tr>
-						{/foreach}
-					</tbody>
-				{/if}
-				{if isset($cart_normal_data) && $cart_normal_data}
-					<thead>
-						<tr>
-							<th><span class="title_box">{l s='Image'}</th>
-							<th><span class="title_box">{l s='Name'}</span></th>
-							<th colspan="2"><span class="title_box">{l s='Hotel Name'}</span></th>
-							<th colspan="2"><span class="title_box">{l s='Unit Price (tax excl)'}</span></th>
-							<th><span class="title_box">{l s='Quantity'}</span></th>
-							<th><span class="title_box">{l s='Total Price (Tax incl.)'}</span></th>
-							<th></th>
-						</tr>
-					</thead>
-					<tbody>
-						{foreach $cart_normal_data as $product}
-							<tr>
-								<td><img src="{$product['cover_img']|escape:'html':'UTF-8'}" class="img-responsive" /></td>
-								<td><p>{$product['name']|escape:'html':'UTF-8'}</p></td>
-								<td colspan="2">{$product['hotel_name']}</td>
-								<td colspan="2">{displayPrice price=$product['unit_price_tax_incl']}</td>
-								<td>{$product['quantity']|escape:'htmlall':'UTF-8'}</td>
-								<td>{displayPrice price=$product['total_price_tax_incl']}</td>
-								<td>
-									<button class="delete_service_product btn btn-danger" data-id-hotel="{$product['id_hotel']|escape:'htmlall':'UTF-8'}" data-id_product={$product['id_product']|escape:'html':'UTF-8'} data-id_cart = {$cart->id|escape:'html':'UTF-8'}>
-										<i class="icon-trash"></i>&nbsp;{l s='Delete'}
-									</button>
+                                    <br />
+                                    <a href="#" id_hotel_cart_booking="{$data.id|escape:'html':'UTF-8'}" id_room="{$data.id_room|escape:'html':'UTF-8'}" date_from="{$data.date_from|escape:'html':'UTF-8'}" date_to="{$data.date_to|escape:'html':'UTF-8'}" id_product="{$data.id_product|escape:'html':'UTF-8'}" id_cart="{$data.id_cart|escape:'html':'UTF-8'}" class="open_rooms_extra_demands btn btn-success" title="{l s='Click here to add or remove the extra services of this room type.'}">
+                                        <i class="icon-pencil"></i>&nbsp;{l s='Services'}
+                                    </a>
 								</td>
 							</tr>
 						{/foreach}

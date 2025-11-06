@@ -434,6 +434,7 @@ if (empty($fail_result)) {
     Configuration::updateValue('PS_HIDE_OPTIMIZATION_TIPS', 0);
     Configuration::updateValue('PS_NEED_REBUILD_INDEX', 1);
     Configuration::updateValue('PS_VERSION_DB', _PS_INSTALL_VERSION_);
+    Configuration::updateGlobalValue('QLO_VERSION_DB', _QLO_INSTALL_VERSION_);
     $result .= $warningExist ? '<action result="fail" error="34">'."\n" : '<action result="ok" error="">'."\n";
     $result .= $requests;
     $result .= '</action>'."\n";

@@ -118,14 +118,12 @@ $(document).ready(function()
 		validateCustomerGuestDetailForm();
 	}
 	$(document).on('click', '.submit-guest-details', function(e) {
-		e.preventDefault();
 		if ($('#customer_guest_detail').prop('checked')) {
 			validateCustomerGuestDetailForm();
+			e.preventDefault();
 			if ($('#customer_guest_detail_form').find('.form-error').length == 0) {
 				$('#customer_guest_detail_form').get(0).submit();
 			}
-		} else {
-			$('#customer_guest_detail_form').get(0).submit();
 		}
 	});
 
@@ -715,10 +713,11 @@ $(document).ready(function()
 					maxWidth : '100%',
 					'hideOnContentClick': false,
 					afterClose: function() {
-						if (result.reload) {
-							// reload so that changes prices will reflect everywhere
-							location.reload();
-						}
+						updateOpcData();
+						// if (result.reload) {
+						// 	// reload so that changes prices will reflect everywhere
+						// 	location.reload();
+						// }
 					},
 				});
 			},
@@ -727,13 +726,30 @@ $(document).ready(function()
 
 	function updateServiceProducts(element)
 	{
-		var operator = $(element).is(':checked') ? 'up' : 'down';
 		var id_product = $(element).val();
 		var id_cart_booking = $(element).data('id_cart_booking');
-		var qty = $(element).closest('.room_demand_block').find('input.qty').val();
-		if (typeof(qty) == 'undefined') {
-			qty = 1;
+		var qty = $(element).closest('.room_demand_block').find('input.qty');
+
+		if (qty.length == 0) {
+			update_qty = 1;
+		} else {
+            var qty_hidden = $(element).closest('.room_demand_block').find('input.qty_hidden');
+            var update_qty = parseInt($(qty).val()) - parseInt($(qty_hidden).val());
+        }
+		var checked = $(element).is(':checked');
+
+		if (checked) {
+			if (update_qty > 0) {
+				var operator = 'up';
+			} else {
+				var operator = 'down'
+			}
+		} else {
+			var operator = 'down';
+			update_qty = 0;
 		}
+
+		$(qty_hidden).val($(qty).val());
 		$.ajax({
 			type: 'POST',
 			headers: {
@@ -746,7 +762,7 @@ $(document).ready(function()
 				operator: operator,
 				id_product: id_product,
 				id_cart_booking: id_cart_booking,
-				qty: qty,
+				qty: Math.abs(update_qty),
 				updateServiceProduct: true,
 				controller: 'cart',
 				ajax: true,
@@ -804,6 +820,44 @@ function updatePaymentMethodsDisplay()
 			}
 		});
 		$(this).fadeOut('slow');
+	});
+}
+
+function updateShoppingCart(json)
+{
+
+}
+
+function updateOpcData()
+{
+	var checked = '';
+	if ($('#cgv:checked').length !== 0)
+		checked = 1;
+	else
+		checked = 0;
+
+	$.ajax({
+		type: 'POST',
+		headers: { "cache-control": "no-cache" },
+		url: orderOpcUrl + '?rand=' + new Date().getTime(),
+		async: true,
+		cache: false,
+		dataType : 'JSON',
+		data: 'ajax=true&method=getOpcData&token=' + static_token ,
+		success: function(response)
+		{
+			if (response.success) {
+				$('.cart_total_detail_block').replaceWith(response.cart_total_block);
+				$('#collapse-shopping-cart .card-body').html(response.shopping_cart);
+				$('.cart_quantity_input').typeWatch({
+					highlight: true, wait: 600, captureLength: 0, callback: function(val){
+						updateQty(val, true, this.el);
+					}
+				});
+			} else {
+				location.reload();
+			}
+		}
 	});
 }
 

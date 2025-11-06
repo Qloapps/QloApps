@@ -14,7 +14,7 @@ var default_iso = '<?php echo $this->session->shop_country ?>';
 	<div class="field clearfix">
 		<label for="infosShop" class="aligned"><?php echo $this->l('Website name') ?> </label>
 		<div class="contentinput">
-			<input class="text required" type="text" id="infosShop" name="shop_name" value="<?php echo htmlspecialchars($this->session->shop_name) ?>" /> <sup class="required">*</sup>
+			<input class="text required" type="text" id="infosShop" name="shop_name" value="<?php echo htmlspecialchars($this->session->shop_name ?? '') ?>" /> <sup class="required">*</sup>
 		</div>
 		<?php echo $this->displayError('shop_name') ?>
 	</div>
@@ -120,7 +120,7 @@ var default_iso = '<?php echo $this->session->shop_country ?>';
 	<div class="field clearfix">
 		<label for="infosFirstname" class="aligned"><?php echo $this->l('First name') ?> </label>
 		<div class="contentinput">
-			<input class="text required" type="text" id="infosFirstname" name="admin_firstname" value="<?php echo htmlspecialchars($this->session->admin_firstname) ?>" />
+			<input class="text required" type="text" id="infosFirstname" name="admin_firstname" value="<?php echo htmlspecialchars($this->session->admin_firstname ?? '') ?>" />
 			<sup class="required">*</sup>
 		</div>
 		<?php echo $this->displayError('admin_firstname') ?>
@@ -130,7 +130,7 @@ var default_iso = '<?php echo $this->session->shop_country ?>';
 	<div class="field clearfix">
 		<label for="infosName" class="aligned"><?php echo $this->l('Last name') ?> </label>
 		<div class="contentinput">
-			<input class="text required" type="text" id="infosName" name="admin_lastname" value="<?php echo htmlspecialchars($this->session->admin_lastname) ?>" />
+			<input class="text required" type="text" id="infosName" name="admin_lastname" value="<?php echo htmlspecialchars($this->session->admin_lastname ?? '') ?>" />
 			<sup class="required">*</sup>
 		</div>
 		<?php echo $this->displayError('admin_lastname') ?>
@@ -140,7 +140,7 @@ var default_iso = '<?php echo $this->session->shop_country ?>';
 	<div class="field clearfix">
 		<label for="infosEmail" class="aligned"><?php echo $this->l('E-mail address') ?> </label>
 		<div class="contentinput">
-			<input type="text" class="text required" id="infosEmail" name="admin_email" value="<?php echo htmlspecialchars($this->session->admin_email) ?>" />
+			<input type="text" class="text required" id="infosEmail" name="admin_email" value="<?php echo htmlspecialchars($this->session->admin_email ?? '') ?>" />
 			<sup class="required">*</sup>
 		</div>
 		<p class="userInfos aligned"><?php echo $this->l('This email address will be your username to access your website\'s back office.') ?></p>
@@ -151,7 +151,7 @@ var default_iso = '<?php echo $this->session->shop_country ?>';
 	<div class="field clearfix">
 		<label for="infosPassword" class="aligned"><?php echo $this->l('Password') ?> </label>
 		<div class="contentinput">
-			<input autocomplete="off" type="password" class="text required" id="infosPassword" name="admin_password" value="<?php echo htmlspecialchars($this->session->admin_password) ?>" />
+			<input autocomplete="off" type="password" class="text required" id="infosPassword" name="admin_password" value="<?php echo htmlspecialchars($this->session->admin_password ?? '') ?>" />
 			<sup class="required">*</sup>
 		</div>
 		<?php if ($this->displayError('admin_password')): ?>
@@ -165,7 +165,7 @@ var default_iso = '<?php echo $this->session->shop_country ?>';
 	<div class="field clearfix">
 		<label class="aligned" for="infosPasswordRepeat"><?php echo $this->l('Re-type to confirm') ?> </label>
 		<div class="contentinput">
-			<input type="password" autocomplete="off" class="text required" id="infosPasswordRepeat" name="admin_password_confirm" value="<?php echo htmlspecialchars($this->session->admin_password_confirm) ?>" />
+			<input type="password" autocomplete="off" class="text required" id="infosPasswordRepeat" name="admin_password_confirm" value="<?php echo htmlspecialchars($this->session->admin_password_confirm ?? '') ?>" />
 			<sup class="required">*</sup>
 		</div>
 		<?php echo $this->displayError('admin_password_confirm') ?>

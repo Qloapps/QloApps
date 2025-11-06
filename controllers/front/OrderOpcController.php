@@ -29,6 +29,11 @@ class OrderOpcControllerCore extends ParentOrderController
     public $php_self = 'order-opc';
     public $isLogged;
 
+    /**
+     * @var CheckoutProcess
+     */
+    protected $checkoutProcess;
+
     protected $ajax_refresh = false;
 
     /**
@@ -383,6 +388,8 @@ class OrderOpcControllerCore extends ParentOrderController
                             $this->ajaxDie($this->getCustomerGuestDetail());
                             exit;
                             break;
+                        case 'getOpcData':
+                            $this->ajaxDie($this->getOpcData());
                         default:
                             throw new PrestaShopException('Unknown method "'.Tools::getValue('method').'"');
                     }
@@ -423,11 +430,7 @@ class OrderOpcControllerCore extends ParentOrderController
      */
     public function initContent()
     {
-        // validate room types before payment by customer
-        if ($orderRestrictErr = HotelCartBookingData::validateCartBookings()) {
-            $this->errors = array_merge($this->errors, $orderRestrictErr);
-        }
-
+        $this->_assignCheckoutValidationVars();
         parent::initContent();
 
         if (Tools::getValue('submitGuestDetails')) {
@@ -496,14 +499,12 @@ class OrderOpcControllerCore extends ParentOrderController
         // $objGlobalDemand = new HotelRoomTypeGlobalDemand();
         // $allDemands = $objGlobalDemand->getAllDemands();
         // $objCurrency = new Currency(Configuration::get('PS_CURRENCY_DEFAULT'));
+        $this->_assignCheckoutVars();
         $this->context->smarty->assign(
             array(
-                'orderRestrictErr' => count($orderRestrictErr) ? 1 : 0,
                 // 'allDemands' => $allDemands,
                 // 'defaultcurrencySign' => $objCurrency->sign,
-                'THEME_DIR' => _THEME_DIR_,
                 'PS_REGISTRATION_PROCESS_TYPE' => Configuration::get('PS_REGISTRATION_PROCESS_TYPE'),
-                'PS_ROOM_PRICE_AUTO_ADD_BREAKDOWN' => Configuration::get('PS_ROOM_PRICE_AUTO_ADD_BREAKDOWN'),
                 'free_shipping' => $free_shipping,
                 'isGuest' => isset($this->context->cookie->is_guest) ? $this->context->cookie->is_guest : 0,
                 'countries' => $countries,
@@ -571,7 +572,7 @@ class OrderOpcControllerCore extends ParentOrderController
             $date_from = Tools::getValue('date_from');
             $date_to = Tools::getValue('date_to');
             $objCartBookingData = new HotelCartBookingData();
-            if ($cart_data_dlt = $objCartBookingData->deleteRoomDataFromOrderLine(
+            if ($objCartBookingData->deleteRoomDataFromOrderLine(
                 $this->context->cart->id,
                 $this->context->cart->id_guest,
                 $id_product,
@@ -586,51 +587,7 @@ class OrderOpcControllerCore extends ParentOrderController
             $this->addJS(_THEME_JS_DIR_ . 'advanced-payment-api.js');
             $this->setTemplate(_PS_THEME_DIR_ . 'order-opc-advanced.tpl');
         } else {
-            // set used objects in the below code
-            // $objBookingDetail = new HotelBookingDetail();
-            // $objHtlRoomType = new HotelRoomType();
-
-            $cartProducts = $this->context->cart->getProducts();
-
-            if (!empty($cartProducts)) {
-
-                if ($cartBookingInfo = HotelCartBookingData::getHotelCartBookingData()) {
-                    $this->context->smarty->assign('cart_htl_data', $cartBookingInfo);
-                }
-                $objHotelServiceProductCartDetail = new HotelServiceProductCartDetail();
-                if ($normalCartProduct = $objHotelServiceProductCartDetail->getHotelProducts($this->context->cart->id, 0, 0, 0, null, null, true)) {
-                    $this->context->smarty->assign('cart_normal_data', $normalCartProduct);
-                }
-
-                // For Advanced Payment work
-                $objAdvPayment = new HotelAdvancedPayment();
-                if ($objAdvPayment->isAdvancePaymentAvailableForCurrentCart()) {
-                    if (Tools::isSubmit('submitAdvPayment')) {
-                        if (Tools::getValue('payment_type') == Order::ORDER_PAYMENT_TYPE_ADVANCE) {
-                            $this->context->cart->is_advance_payment = 1;
-                        } else {
-                            $this->context->cart->is_advance_payment = 0;
-                        }
-                        $this->context->cart->save();
-
-                        Tools::redirect($this->context->link->getPageLink('order-opc'));
-                    }
-
-                    // set if advance payment is selected by the customer
-                    if ($this->context->cart->is_advance_payment) {
-                        $this->context->smarty->assign('is_advance_payment', 1);
-                    }
-
-                    // get advance payment amount and send data to the template
-                    $advPaymentAmount = $this->context->cart->getOrderTotal(true, Cart::ADVANCE_PAYMENT);
-                    $this->context->smarty->assign(array(
-                        'advance_payment_active'=> 1,
-                        'advPaymentAmount'=> $advPaymentAmount,
-                        'dueAmount'=> ($this->context->cart->getOrderTotal() - $advPaymentAmount),
-                    ));
-                }
-            }
-
+            $this->_assignShoppingCart();
             $this->setTemplate(_PS_THEME_DIR_.'order-opc.tpl');
         }
     }
@@ -1024,21 +981,29 @@ class OrderOpcControllerCore extends ParentOrderController
 
                     }
                 }
-                $objRoomTypeServiceProductCartDetail = new RoomTypeServiceProductCartDetail();
+                $objServiceProductCartDetail = new ServiceProductCartDetail();
                 $objRoomTypeServiceProduct = new RoomTypeServiceProduct();
                 $roomTypeServiceProducts = $objRoomTypeServiceProduct->getServiceProductsData($idProduct, 1, 0, true, 1);
-                $cartRooms = $objCartBookingData->getHotelCartRoomsInfoByRoomType($this->context->cart->id, $idProduct,$dateFrom, $dateTo);
-                foreach($cartRooms as &$room) {
-                    $room['selected_service'] = $objRoomTypeServiceProductCartDetail->getRoomServiceProducts(
-                        $room['id'],
+                $cartBookings = $objCartBookingData->getHotelCartRoomsInfoByRoomType($this->context->cart->id, $idProduct,$dateFrom, $dateTo);
+                foreach($cartBookings as &$cartBookingData) {
+                    $cartBookingData['selected_service'] = $objServiceProductCartDetail->getServiceProductsInCart(
+                        $cartBookingData['id_cart'],
+                        [],
+                        null,
+                        $cartBookingData['id'],
+                        null,
+                        null,
+                        null,
+                        null,
                         0,
                         null,
-                        null
+                        null,
+                        1
                     );
                 }
                 $this->context->smarty->assign(array(
                     'roomTypeServiceProducts' => $roomTypeServiceProducts,
-                    'cartRooms' => $cartRooms
+                    'cartRooms' => $cartBookings
                 ));
             }
         }
@@ -1161,7 +1126,7 @@ class OrderOpcControllerCore extends ParentOrderController
                         $objCustomerGuestDetail->deleteCustomerGuestByIdCustomer($this->context->cart->id_customer, $maxGuestAccountAllowed);
                     }
                     // To prevent duplications for the same cart.
-                    $objCustomerGuestDetail->deleteCustomerGuestInCart($this->context->cart->id);
+                    CustomerGuestDetail::deleteCustomerGuestInCart($this->context->cart->id);
                     $objCustomerGuestDetail->saveCustomerGuestInCart($this->context->cart->id, $objCustomerGuestDetail->id);
                     Tools::redirect($this->context->link->getPageLink('order-opc', null, $this->context->language->id, array('proceed_to_payment' => 1)));
                 }
@@ -1174,5 +1139,23 @@ class OrderOpcControllerCore extends ParentOrderController
         }
 
         $this->context->cart->save();
+    }
+
+    public function getOpcData()
+    {
+        $response = array('success' => false);
+        if ($this->context->cart->getProducts()) {
+            $this->_assignCheckoutValidationVars();
+            $this->_assignCheckoutVars();
+            $this->_assignShoppingCart();
+            $this->_assignSummaryInformations();
+            $response['success'] = true;
+            $response['shopping_cart'] = $this->context->smarty->fetch(_PS_THEME_DIR_.'shopping-cart.tpl');
+            $response['cart_total_block'] = $this->context->smarty->fetch(_PS_THEME_DIR_.'cart-total-block.tpl');
+        } else {
+            $response['reload'] = 1;
+        }
+
+        return json_encode($response);
     }
 }

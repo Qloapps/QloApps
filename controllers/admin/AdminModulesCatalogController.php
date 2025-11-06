@@ -1,21 +1,24 @@
 <?php
 /**
-* 2010-2020 Webkul.
-*
 * NOTICE OF LICENSE
 *
-* All right is reserved,
-* Please go through this link for complete license : https://store.webkul.com/license.html
+* This source file is subject to the Open Software License version 3.0
+* that is bundled with this package in the file LICENSE.md
+* It is also available through the world-wide-web at this URL:
+* https://opensource.org/license/osl-3-0-php
+* If you did not receive a copy of the license and are unable to
+* obtain it through the world-wide-web, please send an email
+* to support@qloapps.com so we can send you a copy immediately.
 *
 * DISCLAIMER
 *
-* Do not edit or add to this file if you wish to upgrade this module to newer
-* versions in the future. If you wish to customize this module for your
-* needs please refer to https://store.webkul.com/customisation-guidelines/ for more information.
+* Do not edit or add to this file if you wish to upgrade this module to a newer
+* versions in the future. If you wish to customize this module for your needs
+* please refer to https://store.webkul.com/customisation-guidelines for more information.
 *
-*  @author    Webkul IN <support@webkul.com>
-*  @copyright 2010-2020 Webkul IN
-*  @license   https://store.webkul.com/license.html
+* @author Webkul IN
+* @copyright Since 2010 Webkul
+* @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
 */
 
 class AdminModulesCatalogControllerCore extends AdminController
@@ -29,6 +32,7 @@ class AdminModulesCatalogControllerCore extends AdminController
     const ELEMENT_TYPE_THEME = 2;
 
     const MODULES_PER_PAGE = 18;
+    protected $themes;
 
     public function __construct()
     {
@@ -73,12 +77,12 @@ class AdminModulesCatalogControllerCore extends AdminController
             $module->element_type = self::ELEMENT_TYPE_MODULE;
             $module->logo = '../../img/questionmark.png';
 
-            if (@filemtime(_PS_ROOT_DIR_.DIRECTORY_SEPARATOR.basename(_PS_MODULE_DIR_).DIRECTORY_SEPARATOR.$module->name
-                .DIRECTORY_SEPARATOR.'logo.gif')) {
+            $logoGifPath = _PS_ROOT_DIR_.DIRECTORY_SEPARATOR.basename(_PS_MODULE_DIR_).DIRECTORY_SEPARATOR.$module->name.DIRECTORY_SEPARATOR.'logo.gif';
+            if (file_exists($logoGifPath) && @filemtime($logoGifPath)) {
                 $module->logo = 'logo.gif';
             }
-            if (@filemtime(_PS_ROOT_DIR_.DIRECTORY_SEPARATOR.basename(_PS_MODULE_DIR_).DIRECTORY_SEPARATOR.$module->name
-                .DIRECTORY_SEPARATOR.'logo.png')) {
+            $logoPngPath = _PS_ROOT_DIR_.DIRECTORY_SEPARATOR.basename(_PS_MODULE_DIR_).DIRECTORY_SEPARATOR.$module->name.DIRECTORY_SEPARATOR.'logo.png';
+            if (file_exists($logoPngPath) && @filemtime($logoPngPath)) {
                 $module->logo = 'logo.png';
             }
 
@@ -254,7 +258,7 @@ class AdminModulesCatalogControllerCore extends AdminController
         if ($criteria != 'popularity') {
             usort($list, function($a, $b) use($criteria){
                 if ($criteria == 'name') {
-                    return strnatcasecmp($a->displayName, $b->displayName);
+                    return (strnatcasecmp($a->displayName, $b->displayName)) ? 1 : 0;
                 } else if ($criteria == 'price_increasing') {
                     $priceA = $priceB = 0;
                     if (isset($a->price)) {
@@ -263,7 +267,7 @@ class AdminModulesCatalogControllerCore extends AdminController
                     if (isset($b->price)) {
                         $priceB = $b->price;
                     }
-                    return $priceA > $priceB;
+                    return ($priceA > $priceB) ? 1 : 0;
                 } else if ($criteria == 'price_decreasing') {
                     $priceA = $priceB = 0;
                     if (isset($a->price)) {
@@ -272,7 +276,7 @@ class AdminModulesCatalogControllerCore extends AdminController
                     if (isset($b->price)) {
                         $priceB = $b->price;
                     }
-                    return $priceA < $priceB;
+                    return ($priceA < $priceB) ? 1 : 0;
                 }
 
             });

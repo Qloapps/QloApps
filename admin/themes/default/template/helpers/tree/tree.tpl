@@ -30,7 +30,7 @@
 		{/block}
 		{block name="tree"}
 			{if isset($nodes)}
-				<ul id="{$id|escape:'html':'UTF-8'}" class="tree top" style="max-height: {$max_height}px;">
+				<ul id="{$id|escape:'html':'UTF-8'}" class="tree top cattree" style="max-height: {$max_height}px;">
 				{$nodes}
 				</ul>
 			{/if}
@@ -121,20 +121,19 @@
 			});
 		{/if}
 
-		function startTree() {
+		function startTree(idElem) {
 			if (typeof $.fn.tree === 'undefined') {
 				setTimeout(startTree, 100);
 				return;
 			}
 
-			var tree = $("#{$id|escape:'html':'UTF-8'}").tree('collapseAll');
-
-			if ($("#{$id|escape:'html':'UTF-8'}").find(":input:checked").length > 1)
-					$('#expand-all-{$id|escape:'html':'UTF-8'}').hide();
+			let tree = $("#"+idElem).tree('collapseAll');
+			if ($("#"+idElem).find(":input:checked").length > 1)
+					$('#expand-all-'+idElem).hide();
 				else
-					$('#collapse-all-{$id|escape:'html':'UTF-8'}').hide();
+					$('#collapse-all-'+idElem).hide();
 
-			$("#{$id|escape:'html':'UTF-8'}").find(":input:checked").each(function(){
+			$("#"+idElem).find(":input:checked").each(function(){
 				$(this).parent().addClass("tree-selected");
 				$(this).parents('ul.tree').each(function(){
 					$(this).show();
@@ -144,7 +143,7 @@
 		}
 
 		$(document).ready(function () {
-			startTree();
+			startTree("{$id|escape:'html':'UTF-8'}");
 		});
 	{/block}
 </script>

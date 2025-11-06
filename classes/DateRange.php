@@ -55,7 +55,7 @@ class DateRangeCore extends ObjectModel
             $rangeSize = 86399;
             $dateRange = new DateRange();
             $dateRange->time_start = date('Y-m-d');
-            $dateRange->time_end = strftime('%Y-%m-%d %H:%M:%S', strtotime($dateRange->time_start) + $rangeSize);
+            $dateRange->time_end = date('Y-m-d H:i:s', strtotime($dateRange->time_start) + $rangeSize);
             $dateRange->add();
             return $dateRange->id;
         }

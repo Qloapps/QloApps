@@ -88,6 +88,7 @@ class AdminLogsControllerCore extends AdminController
                         'title' => $this->l('Minimum severity level'),
                         'hint' => $this->l('Enter "5" if you do not want to receive any emails.').'<br />'.$this->l('Emails will be sent to the website owner.'),
                         'cast' => 'intval',
+                        'validation' => 'isUnsignedInt',
                         'type' => 'text'
                     )
                 ),

@@ -75,38 +75,57 @@
                 {/block}
 
                 {block name='order_detail_hotel_details'}
-                    <div class="card hotel-details">
-                        <div class="card-header">
-                            {l s='Hotel Details'}
-                        </div>
-                        <div class="card-body">
-                            {if Validate::isLoadedObject($obj_hotel_branch_information)}
-                                <div class="description-list">
-                                    <dl class="">
-                                        <div class="row">
-                                            <dt class="col-xs-6 col-sm-3">{l s='Hotel Name'}</dt>
-                                            <dd class="col-xs-6 col-sm-3">{$obj_hotel_branch_information->hotel_name}</dd>
-                                            <dt class="col-xs-6 col-sm-3">{l s='Phone Number'}</dt>
-                                            <dd class="col-xs-6 col-sm-3">
-                                                <a href="tel:{if $hotel_address_info.phone_mobile}{$hotel_address_info.phone_mobile}{else}{$hotel_address_info.phone}{/if}">
-                                                    {if $hotel_address_info.phone_mobile}{$hotel_address_info.phone_mobile}{else}{$hotel_address_info.phone}{/if}
-                                                </a>
-                                            </dd>
-                                            <dt class="col-xs-6 col-sm-3">{l s='Email'}</dt>
-                                            <dd class="col-xs-6 col-sm-3">
-                                                <a href="mailto:{$obj_hotel_branch_information->email}" class="hotel-email">{$obj_hotel_branch_information->email}</a>
-                                            </dd>
-                                            {block name='displayOrderDetailHotelDetailsAfter'}
-                                                {hook h='displayOrderDetailHotelDetailsAfter' id_order=$order->id}
+                    {if isset($obj_hotel_branch_information) && $obj_hotel_branch_information}
+                        <div class="card hotel-details">
+                            <div class="card-header">
+                                {l s='Hotel Details'}
+                                <div class="booking-actions-wrap">
+                                    <div class="row">
+                                        <div class="col-xs-12 clearfix">
+                                            {if $refund_allowed}
+                                                {if isset($id_cms_refund_policy) && $id_cms_refund_policy}
+                                                    <a target="_blank" class="btn btn-default pull-right refund_policy_link" href="{$link->getCMSLink($id_cms_refund_policy)|escape:'html':'UTF-8'}">{l s='Refund Policies'}</a>
+                                                {/if}
+                                                {if !$completeRefundRequestOrCancel}
+                                                    <a class="btn btn-default pull-right order_refund_request" href="#" title="{l s='Proceed to refund'}"><span>{l s='Request Cancelation'}</span></a>
+                                                {/if}
+                                            {/if}
+                                            {block name='displayBookingAction'}
+                                                {hook h='displayBookingAction' id_order=$order->id}
                                             {/block}
                                         </div>
-                                    </dl>
+                                    </div>
                                 </div>
-                            {else}
-                                <div class="card-text">{l s='Hotel details not available.'}</div>
-                            {/if}
+                            </div>
+                            <div class="card-body">
+                                {if Validate::isLoadedObject($obj_hotel_branch_information)}
+                                    <div class="description-list">
+                                        <dl class="">
+                                            <div class="row">
+                                                <dt class="col-xs-6 col-sm-3">{l s='Hotel Name'}</dt>
+                                                <dd class="col-xs-6 col-sm-3">{$obj_hotel_branch_information->hotel_name}</dd>
+                                                <dt class="col-xs-6 col-sm-3">{l s='Phone Number'}</dt>
+                                                <dd class="col-xs-6 col-sm-3">
+                                                    <a href="tel:{if $hotel_address_info.phone_mobile}{$hotel_address_info.phone_mobile}{else}{$hotel_address_info.phone}{/if}">
+                                                        {if $hotel_address_info.phone_mobile}{$hotel_address_info.phone_mobile}{else}{$hotel_address_info.phone}{/if}
+                                                    </a>
+                                                </dd>
+                                                <dt class="col-xs-6 col-sm-3">{l s='Email'}</dt>
+                                                <dd class="col-xs-6 col-sm-3">
+                                                    <a href="mailto:{$obj_hotel_branch_information->email}" class="hotel-email">{$obj_hotel_branch_information->email}</a>
+                                                </dd>
+                                                {block name='displayOrderDetailHotelDetailsAfter'}
+                                                    {hook h='displayOrderDetailHotelDetailsAfter' id_order=$order->id}
+                                                {/block}
+                                            </div>
+                                        </dl>
+                                    </div>
+                                {else}
+                                    <div class="card-text">{l s='Hotel details not available.'}</div>
+                                {/if}
+                            </div>
                         </div>
-                    </div>
+                    {/if}
                 {/block}
 
                 {block name='order_details_payment_details_mobile'}
@@ -154,55 +173,51 @@
                 {/block}
 
                 {block name='order_detail_hotel_location_mobile'}
-                    <div class="card hotel-location visible-xs visible-sm hidden-md hidden-lg">
-                        <div class="card-header">
-                            {l s='Hotel Location'}
-                        </div>
-                        <div class="card-body">
-                            <p class="card-subtitle">
-                                {l s='Address'}
-                            </p>
-
-                            {if isset($hotel_address_info) && $hotel_address_info}
-                                <p class="hotel-address">
-                                    {$hotel_address_info['address1']},
-                                    {if {$hotel_address_info['address2']}}{$hotel_address_info['address2']},{/if}
-                                    {$hotel_address_info['city']},
-                                    {if {$hotel_address_info['state']}}{$hotel_address_info['state']},{/if}
-                                    {$hotel_address_info['country']}, {$hotel_address_info['postcode']}
+                    {if isset($obj_hotel_branch_information)}
+                        <div class="card hotel-location visible-xs visible-sm hidden-md hidden-lg">
+                            <div class="card-header">
+                                {l s='Hotel Location'}
+                            </div>
+                            <div class="card-body">
+                                <p class="card-subtitle">
+                                    {l s='Address'}
                                 </p>
-                            {else}
-                                <div class="card-text">{l s='Hotel location not available.'}</div>
-                            {/if}
+                                {if isset($hotel_address_info) && $hotel_address_info}
+                                    <p class="hotel-address">
+                                        {$hotel_address_info['address1']},
+                                        {if {$hotel_address_info['address2']}}{$hotel_address_info['address2']},{/if}
+                                        {$hotel_address_info['city']},
+                                        {if {$hotel_address_info['state']}}{$hotel_address_info['state']},{/if}
+                                        {$hotel_address_info['country']}, {$hotel_address_info['postcode']}
+                                    </p>
+                                {else}
+                                    <div class="card-text">{l s='Hotel location not available.'}</div>
+                                {/if}
 
-                            {if ($obj_hotel_branch_information->latitude|floatval != 0 && $obj_hotel_branch_information->longitude|floatval != 0) && $view_on_map}
-                                <div class="hotel-location-map">
-                                    <div
-                                        class="booking-hotel-map-container"
-                                        latitude="{$obj_hotel_branch_information->latitude|escape:'html':'UTF-8'}"
-                                        longitude="{$obj_hotel_branch_information->longitude|escape:'html':'UTF-8'}"
-                                        query="{$obj_hotel_branch_information->map_input_text|escape:'html':'UTF-8'}"
-                                        title="{$obj_hotel_branch_information->hotel_name|escape:'html':'UTF-8'}">
+                                {if ($obj_hotel_branch_information->latitude|floatval != 0 && $obj_hotel_branch_information->longitude|floatval != 0) && $view_on_map}
+                                    <div class="hotel-location-map">
+                                        <div
+                                            class="booking-hotel-map-container"
+                                            latitude="{$obj_hotel_branch_information->latitude|escape:'html':'UTF-8'}"
+                                            longitude="{$obj_hotel_branch_information->longitude|escape:'html':'UTF-8'}"
+                                            query="{$obj_hotel_branch_information->map_input_text|escape:'html':'UTF-8'}"
+                                            title="{$obj_hotel_branch_information->hotel_name|escape:'html':'UTF-8'}">
+                                        </div>
                                     </div>
-                                </div>
-                            {/if}
+                                {/if}
 
-                            {block name='displayOrderDetailHotelLocationAfter'}
-                                {hook h='displayOrderDetailHotelLocationAfter' id_order=$order->id}
-                            {/block}
+                                {block name='displayOrderDetailHotelLocationAfter'}
+                                    {hook h='displayOrderDetailHotelLocationAfter' id_order=$order->id}
+                                {/block}
+                            </div>
                         </div>
-                    </div>
+                    {/if}
                 {/block}
 
                 {block name='order_detail_refund_requests'}
-                    {if isset($refundReqBookings) && $refundReqBookings}
+                    {if (isset($refundReqBookings) && $refundReqBookings) || (isset($refundReqProducts) && $refundReqProducts)}
                         <div class="alert alert-info-light cancel_requests_link_wrapper">
-                            <i class="icon-info-circle"></i>
-                            {if count($refundReqBookings) <= 1}
-                                <span>{l s='Your cancellation request for 1 room is being processed. To check request status'} <a target="_blank" href="{$link->getPageLink('order-follow')|escape:'html':'UTF-8'}?id_order={$order->id|escape:'html':'UTF-8'}">{l s='click here.'}</a>
-                            {else}
-                                <span>{l s='Your cancellation request for %d rooms is being processed. To check request statuses' sprintf=[count($refundReqBookings)]} <a target="_blank" href="{$link->getPageLink('order-follow')|escape:'html':'UTF-8'}?id_order={$order->id|escape:'html':'UTF-8'}">{l s='click here.'}</a>
-                            {/if}
+                            <i class="icon-info-circle"></i> <span>{l s='Your cancellation request for'} {if (isset($refundReqBookings) && $refundReqBookings) && (isset($refundReqProducts) && $refundReqProducts)}{l s='%d room(s) and %d product(s)' sprintf=[count($refundReqBookings), count($refundReqProducts)]}{elseif isset($refundReqBookings) && $refundReqBookings}{l s='%d room(s)' sprintf=[count($refundReqBookings)]}{elseif isset($refundReqProducts) && $refundReqProducts}{l s='%d product(s)' sprintf=[count($refundReqProducts)]}{/if} {l s='is being processed. To check request status' sprintf=[count($refundReqBookings)]} <a target="_blank" href="{$link->getPageLink('order-follow')|escape:'html':'UTF-8'}?id_order={$order->id|escape:'html':'UTF-8'}">{l s='click here.'}</a>
                         </div>
                     {/if}
                 {/block}
@@ -212,47 +227,83 @@
                 {/block}
 
                 {block name='order_detail_room_details'}
-                    <div class="card room-details">
-                        <div class="card-header">
-                            {l s='Room Details'}
-                            <div class="booking-actions-wrap">
-                                <div class="row">
-                                    <div class="col-xs-12 clearfix">
-                                        {if $refund_allowed}
-                                            {if !$completeRefundRequestOrCancel}
-                                                <a id="order_refund_request" class="btn btn-default pull-right" href="#" title="{l s='Proceed to refund'}"><span>{l s='Cancel Bookings'}</span></a>
-                                            {/if}
-                                            {if isset($id_cms_refund_policy) && $id_cms_refund_policy}
-                                                <a target="_blank" class="btn btn-default pull-right refund_policy_link" href="{$link->getCMSLink($id_cms_refund_policy)|escape:'html':'UTF-8'}">{l s='Refund Policies'}</a>
-                                            {/if}
-                                        {/if}
-                                        {block name='displayBookingAction'}
-                                            {hook h='displayBookingAction' id_order=$order->id}
+                    {if isset($cart_htl_data) && $cart_htl_data}
+                        <div class="card room-details">
+                            <div class="card-header">
+                                {l s='Room Details'}
+                            </div>
+                            <div class="card-body">
+                                {if isset($cart_htl_data) && $cart_htl_data}
+                                    <div class="rooms-list">
+                                        {foreach from=$cart_htl_data key=data_k item=data_v}
+                                            {foreach from=$data_v['date_diff'] key=rm_k item=rm_v}
+                                                {block name='order_room_detail'}
+                                                    {include file='./_partials/order-room-detail.tpl'}
+                                                {/block}
+                                            {/foreach}
+                                        {/foreach}
+
+                                        {block name='displayOrderDetailRoomDetailsRoomsAfter'}
+                                            {hook h='displayOrderDetailRoomDetailsRoomsAfter' id_order=$order->id}
                                         {/block}
+                                    </div>
+                                {else}
+                                    <div class="no-rooms card-text">{l s='Room details not available.'}</div>
+                                {/if}
+                            </div>
+                        </div>
+                    {/if}
+                {/block}
+
+                {block name='hotel_service_products_block'}
+                    {if isset($hotel_service_products) && $hotel_service_products}
+                        <div class="card service-product-details">
+                            <div class="card-header">
+                                {l s='Product Details'}
+                            </div>
+                            <div class="card-body">
+                                {foreach from=$hotel_service_products key=data_k item=product}
+                                    {block name='hotel_service_products_detail'}
+                                        {include file='./_partials/order-hotel-service-detail.tpl'}
+                                    {/block}
+                                {/foreach}
+                            </div>
+                        </div>
+                    {/if}
+                {/block}
+
+                {block name='standalone_products_block'}
+                    {if isset($standalone_service_products) && $standalone_service_products}
+                        <div class="card service-product-details">
+                            <div class="card-header">
+                                {l s='Product Details'}
+                                <div class="booking-actions-wrap">
+                                    <div class="row">
+                                        <div class="col-xs-12 clearfix">
+                                            {if $refund_allowed}
+                                                {if !$completeRefundRequestOrCancel}
+                                                    <a class="btn btn-default pull-right order_refund_request" href="#" title="{l s='Proceed to refund'}"><span>{l s='Request Cancelation'}</span></a>
+                                                {/if}
+                                                {if isset($id_cms_refund_policy) && $id_cms_refund_policy}
+                                                    <a target="_blank" class="btn btn-default pull-right refund_policy_link" href="{$link->getCMSLink($id_cms_refund_policy)|escape:'html':'UTF-8'}">{l s='Refund Policies'}</a>
+                                                {/if}
+                                            {/if}
+                                            {block name='displayBookingAction'}
+                                                {hook h='displayBookingAction' id_order=$order->id}
+                                            {/block}
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="card-body">
-                            {if isset($cart_htl_data) && $cart_htl_data}
-                                <div class="rooms-list">
-                                    {foreach from=$cart_htl_data key=data_k item=data_v}
-                                        {foreach from=$data_v['date_diff'] key=rm_k item=rm_v}
-                                            {block name='order_room_detail'}
-                                                {include file='./_partials/order-room-detail.tpl'}
-                                            {/block}
-                                        {/foreach}
-                                    {/foreach}
-
-                                    {block name='displayOrderDetailRoomDetailsRoomsAfter'}
-                                        {hook h='displayOrderDetailRoomDetailsRoomsAfter' id_order=$order->id}
+                            <div class="card-body">
+                                {foreach from=$standalone_service_products key=data_k item=product}
+                                    {block name='standalone_service_products_detail'}
+                                        {include file='./_partials/order-standalone-service-detail.tpl'}
                                     {/block}
-                                </div>
-                            {else}
-                                <div class="no-rooms card-text">{l s='Room details not available.'}</div>
-                            {/if}
+                                {/foreach}
+                            </div>
                         </div>
-                    </div>
+                    {/if}
                 {/block}
 
                 {block name='order_detail_payment_summary_mobile'}
@@ -266,37 +317,48 @@
                                     <tbody>
                                         {assign var=room_price_tax_excl value=$order->getTotalProductsWithoutTaxes(false, true)}
                                         {assign var=room_price_tax_incl value=$order->getTotalProductsWithTaxes(false, true)}
-                                        {assign var=additional_service_price_tax_excl value=($order->getTotalProductsWithoutTaxes(false, false, Product::SERVICE_PRODUCT_WITH_ROOMTYPE) + $total_demands_price_te)}
-                                        {assign var=additional_service_price_tax_incl value=($order->getTotalProductsWithTaxes(false, false, Product::SERVICE_PRODUCT_WITH_ROOMTYPE) + $total_demands_price_ti)}
-                                        {assign var=total_tax_without_discount value=(($room_price_tax_incl - $room_price_tax_excl) + ($additional_service_price_tax_incl - $additional_service_price_tax_excl ))}
-                                        {if $priceDisplay && $use_tax && $room_price_tax_excl}
+
+                                        {assign var=room_services_price_tax_excl value=($order->getTotalProductsWithoutTaxes(false, false, Product::SELLING_PREFERENCE_WITH_ROOM_TYPE) + $total_demands_price_te)}
+                                        {assign var=room_services_price_tax_incl value=($order->getTotalProductsWithTaxes(false, false, Product::SELLING_PREFERENCE_WITH_ROOM_TYPE) + $total_demands_price_ti)}
+
+                                        {assign var=total_tax_without_discount value=(($room_price_tax_incl - $room_price_tax_excl) + ($room_services_price_tax_incl - $room_services_price_tax_excl ))}
+
+                                        {assign var=total_standard_products_tax_incl value=($order->getTotalProductsWithTaxes(false, false, Product::SELLING_PREFERENCE_STANDALONE) + $order->getTotalProductsWithTaxes(false, false, Product::SELLING_PREFERENCE_HOTEL_STANDALONE))}
+                                        {assign var=total_standard_products_tax_excl value=($order->getTotalProductsWithoutTaxes(false, false, Product::SELLING_PREFERENCE_STANDALONE) + $order->getTotalProductsWithoutTaxes(false, false, Product::SELLING_PREFERENCE_HOTEL_STANDALONE))}
+                                        {if isset($cart_htl_data) && $cart_htl_data}
                                             <tr>
-                                                <td>{l s='Total rooms cost (tax excl.)'}</td>
+                                                <td>{l s='Total rooms cost'} {if $use_taxes && $display_tax_label == 1}{if $priceDisplay == 1}{l s='(tax excl.)'}{elseif $priceDisplay == 0}{l s='(tax incl.)'}{/if} {/if}</td>
                                                 <td class="text-right">
-                                                    <span class="price">{displayWtPriceWithCurrency price=($room_price_tax_excl + $additional_service_price_tax_excl - $total_convenience_fee_te) currency=$currency}</span>
+                                                    {if $priceDisplay && $use_tax}
+                                                        <span class="price">{displayWtPriceWithCurrency price=($room_price_tax_excl + $room_services_price_tax_excl - $total_convenience_fee_te) currency=$currency}</span>
+                                                    {else}
+                                                        <span class="price">{displayWtPriceWithCurrency price=($room_price_tax_incl + $room_services_price_tax_incl - $total_convenience_fee_ti) currency=$currency}</span>
+                                                    {/if}
                                                 </td>
                                             </tr>
-                                        {else}
-                                            <tr>
-                                                <td>{l s='Total Rooms Cost'} {if $use_tax}{l s='(tax incl.)'}{/if} </td>
+                                        {/if}
+                                        {if (isset($hotel_service_products) && $hotel_service_products) || (isset($standalone_service_products) && $standalone_service_products)}
+                                            <tr class="item">
+                                                <td>{l s='Total products cost'} {if $use_taxes && $display_tax_label == 1}{if $priceDisplay == 1}{l s='(tax excl.)'}{elseif $priceDisplay == 0}{l s='(tax incl.)'}{/if}{/if}</td>
                                                 <td class="text-right">
-                                                    <span class="price">{displayWtPriceWithCurrency price=($room_price_tax_incl + $additional_service_price_tax_incl - $total_convenience_fee_ti) currency=$currency}</span>
+                                                    {if $priceDisplay && $use_tax}
+                                                        <span>{displayWtPriceWithCurrency price=$total_standard_products_tax_excl currency=$currency}</span>
+                                                    {else}
+                                                        <span>{displayWtPriceWithCurrency price=$total_standard_products_tax_incl currency=$currency}</span>
+                                                    {/if}
                                                 </td>
                                             </tr>
                                         {/if}
 
-                                        {if $priceDisplay && $use_tax && $total_convenience_fee_te}
-                                            <tr>
-                                                <td>{l s='Total Convenience Fees (tax excl.)'}</td>
+                                        {if $total_convenience_fee_te || $total_convenience_fee_te}
+                                             <tr class="item">
+                                                <td>{l s='Total Convenience Fees'} {if $use_taxes && $display_tax_label == 1}{if $priceDisplay == 1}{l s='(tax excl.)'}{elseif $priceDisplay == 0}{l s='(tax incl.)'}{/if}{/if}</td>
                                                 <td class="text-right">
-                                                    <span class="price">{displayWtPriceWithCurrency price=$total_convenience_fee_te currency=$currency}</span>
-                                                </td>
-                                            </tr>
-                                        {else if $total_convenience_fee_ti}
-                                            <tr>
-                                                <td>{l s='Total Convenience Fees (tax incl.)'}</td>
-                                                <td class="text-right">
-                                                    <span class="price">{displayWtPriceWithCurrency price=$total_convenience_fee_ti currency=$currency}</span>
+                                                    {if $priceDisplay && $use_tax}
+                                                        <span class="price">{displayWtPriceWithCurrency price=$total_convenience_fee_te currency=$currency}</span>
+                                                    {else}
+                                                        <span class="price">{displayWtPriceWithCurrency price=$total_convenience_fee_ti currency=$currency}</span>
+                                                    {/if}
                                                 </td>
                                             </tr>
                                         {/if}
@@ -423,52 +485,54 @@
                 {/block}
 
                 {block name='order_detail_hotel_policies'}
-                    {assign var=has_general_hotel_policies value=(isset($obj_hotel_branch_information->policies) && $obj_hotel_branch_information->policies)}
-                    {assign var=has_refund_hotel_policies value=($obj_hotel_branch_information->isRefundable() && $hotel_refund_rules)}
-                    {if $has_general_hotel_policies || $has_refund_hotel_policies}
-                        <div class="card hotel-policies card-tabs">
-                            <div class="card-header">
-                                <ul class="nav nav-tabs">
-                                    {if $has_general_hotel_policies}
-                                        <li class="active">
-                                            <a href="#tab-hotel-policies-general" data-toggle="tab">{l s='Hotel Policies'}</a>
-                                        </li>
-                                    {/if}
-                                    {if $has_refund_hotel_policies}
-                                        <li {if !$has_general_hotel_policies}class="active"{/if}>
-                                            <a href="#tab-hotel-policies-refund" data-toggle="tab">{l s='Refund Policies'}</a>
-                                        </li>
-                                    {/if}
-                                    {block name='displayOrderDetailPoliciesTab'}
-                                        {hook h='displayOrderDetailPoliciesTab' id_order=$order->id}
-                                    {/block}
-                                </ul>
-                            </div>
-                            <div class="card-body">
-                                <div class="tab-content">
-                                    {if $has_general_hotel_policies}
-                                        <div id="tab-hotel-policies-general" class="tab-pane active">
-                                            <div class="card-text">{$obj_hotel_branch_information->policies}</div>
-                                        </div>
-                                    {/if}
-                                    {if $has_refund_hotel_policies}
-                                        <div id="tab-hotel-policies-refund" class="tab-pane{if !$has_general_hotel_policies}active{/if}">
-                                            <div class="refund-policies-list">
-                                                {foreach from=$hotel_refund_rules item=hotel_refund_rule name=foreach_refund_rules}
-                                                    <div class="refund-policy">
-                                                        <p class="refund-rule-name">{l s='%s. ' sprintf=[$smarty.foreach.foreach_refund_rules.iteration]}{$hotel_refund_rule.name|escape:'html':'UTF-8'}</p>
-                                                        <div class="card-text refund-rule-description">{$hotel_refund_rule.description|escape:'html':'UTF-8'}</div>
-                                                    </div>
-                                                {/foreach}
+                    {if isset($obj_hotel_branch_information)}
+                        {assign var=has_general_hotel_policies value=(isset($obj_hotel_branch_information->policies) && $obj_hotel_branch_information->policies)}
+                        {assign var=has_refund_hotel_policies value=($obj_hotel_branch_information->isRefundable() && $hotel_refund_rules)}
+                        {if $has_general_hotel_policies || $has_refund_hotel_policies}
+                            <div class="card hotel-policies card-tabs">
+                                <div class="card-header">
+                                    <ul class="nav nav-tabs">
+                                        {if $has_general_hotel_policies}
+                                            <li class="active">
+                                                <a href="#tab-hotel-policies-general" data-toggle="tab">{l s='Hotel Policies'}</a>
+                                            </li>
+                                        {/if}
+                                        {if $has_refund_hotel_policies}
+                                            <li {if !$has_general_hotel_policies}class="active"{/if}>
+                                                <a href="#tab-hotel-policies-refund" data-toggle="tab">{l s='Refund Policies'}</a>
+                                            </li>
+                                        {/if}
+                                        {block name='displayOrderDetailPoliciesTab'}
+                                            {hook h='displayOrderDetailPoliciesTab' id_order=$order->id}
+                                        {/block}
+                                    </ul>
+                                </div>
+                                <div class="card-body">
+                                    <div class="tab-content">
+                                        {if $has_general_hotel_policies}
+                                            <div id="tab-hotel-policies-general" class="tab-pane active">
+                                                <div class="card-text">{$obj_hotel_branch_information->policies}</div>
                                             </div>
-                                        </div>
-                                    {/if}
-                                    {block name='displayOrderDetailPoliciesTabContent'}
-                                        {hook h='displayOrderDetailPoliciesTabContent' id_order=$order->id}
-                                    {/block}
+                                        {/if}
+                                        {if $has_refund_hotel_policies}
+                                            <div id="tab-hotel-policies-refund" class="tab-pane{if !$has_general_hotel_policies}active{/if}">
+                                                <div class="refund-policies-list">
+                                                    {foreach from=$hotel_refund_rules item=hotel_refund_rule name=foreach_refund_rules}
+                                                        <div class="refund-policy">
+                                                            <p class="refund-rule-name">{l s='%s. ' sprintf=[$smarty.foreach.foreach_refund_rules.iteration]}{$hotel_refund_rule.name|escape:'html':'UTF-8'}</p>
+                                                            <div class="card-text refund-rule-description">{$hotel_refund_rule.description|escape:'html':'UTF-8'}</div>
+                                                        </div>
+                                                    {/foreach}
+                                                </div>
+                                            </div>
+                                        {/if}
+                                        {block name='displayOrderDetailPoliciesTabContent'}
+                                            {hook h='displayOrderDetailPoliciesTabContent' id_order=$order->id}
+                                        {/block}
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        {/if}
                     {/if}
                 {/block}
 
@@ -513,15 +577,28 @@
                                 {block name='order_detail_add_order_messages_form'}
                                     <form action="{$link->getPageLink('order-detail', true)|escape:'html':'UTF-8'}" method="post" class="std" id="sendOrderMessage">
                                         <div class="form-group select-room-type">
-                                            <label for="id_product">{l s='Room Type'}</label>
-
+                                            <label for="id_product">{l s='Room Type'}{if $service_products_formatted}/{l s='Product'}{/if}</label>
+                                            <p class="card-subheader text-muted">
+                                                {if $service_products_formatted}
+                                                    {l s='To add a comment about a room type/product, please select one first.'}
+                                                {else}
+                                                    {l s='To add a comment about a room type, please select one first.'}
+                                                {/if}
+                                            </p>
                                             <select name="id_product" class="form-control">
                                                 <option value="0">{l s='-- Choose --'}</option>
-                                                {foreach from=$roomTypes item=product}
-                                                    {if $product.is_booking_product}
-                                                        <option value="{$product.product_id}">{$product.product_name|escape:'html':'UTF-8'}</option>
-                                                    {/if}
-                                                {/foreach}
+                                                {if $roomTypes}
+                                                    {foreach from=$roomTypes item=product}
+                                                        {if $product.is_booking_product}
+                                                            <option value="{$product.product_id}">{$product.product_name|escape:'html':'UTF-8'}</option>
+                                                        {/if}
+                                                    {/foreach}
+                                                {/if}
+                                                {if $service_products_formatted}
+                                                    {foreach from=$service_products_formatted item=product}
+                                                        <option value="{$product.id_product}">{$product.name|escape:'html':'UTF-8'}</option>
+                                                    {/foreach}
+                                                {/if}
                                             </select>
                                         </div>
 
@@ -595,44 +672,46 @@
                 {/block}
 
                 {block name='order_detail_hotel_location'}
-                    <div class="card hotel-location hidden-xs hidden-sm visible-md">
-                        <div class="card-header">
-                            {l s='Hotel Location'}
-                        </div>
-                        <div class="card-body">
-                            <p class="card-subtitle">
-                                {l s='Address'}
-                            </p>
-
-                            {if isset($hotel_address_info) && $hotel_address_info}
-                                <p class="hotel-address">
-                                    {$hotel_address_info['address1']},
-                                    {if {$hotel_address_info['address2']}}{$hotel_address_info['address2']},{/if}
-                                    {$hotel_address_info['city']},
-                                    {if {$hotel_address_info['state']}}{$hotel_address_info['state']},{/if}
-                                    {$hotel_address_info['country']}, {$hotel_address_info['postcode']}
+                    {if isset($obj_hotel_branch_information)}
+                        <div class="card hotel-location hidden-xs hidden-sm visible-md">
+                            <div class="card-header">
+                                {l s='Hotel Location'}
+                            </div>
+                            <div class="card-body">
+                                <p class="card-subtitle">
+                                    {l s='Address'}
                                 </p>
-                            {else}
-                                <div class="card-text">{l s='Hotel location not available.'}</div>
-                            {/if}
 
-                            {if ($obj_hotel_branch_information->latitude|floatval != 0 && $obj_hotel_branch_information->longitude|floatval != 0) && $view_on_map}
-                                <div class="hotel-location-map">
-                                    <div
-                                        class="booking-hotel-map-container"
-                                        latitude="{$obj_hotel_branch_information->latitude|escape:'html':'UTF-8'}"
-                                        longitude="{$obj_hotel_branch_information->longitude|escape:'html':'UTF-8'}"
-                                        query="{$obj_hotel_branch_information->map_input_text|escape:'html':'UTF-8'}"
-                                        title="{$obj_hotel_branch_information->hotel_name|escape:'html':'UTF-8'}">
+                                {if isset($hotel_address_info) && $hotel_address_info}
+                                    <p class="hotel-address">
+                                        {$hotel_address_info['address1']},
+                                        {if {$hotel_address_info['address2']}}{$hotel_address_info['address2']},{/if}
+                                        {$hotel_address_info['city']},
+                                        {if {$hotel_address_info['state']}}{$hotel_address_info['state']},{/if}
+                                        {$hotel_address_info['country']}, {$hotel_address_info['postcode']}
+                                    </p>
+                                {else}
+                                    <div class="card-text">{l s='Hotel location not available.'}</div>
+                                {/if}
+
+                                {if ($obj_hotel_branch_information->latitude|floatval != 0 && $obj_hotel_branch_information->longitude|floatval != 0) && $view_on_map}
+                                    <div class="hotel-location-map">
+                                        <div
+                                            class="booking-hotel-map-container"
+                                            latitude="{$obj_hotel_branch_information->latitude|escape:'html':'UTF-8'}"
+                                            longitude="{$obj_hotel_branch_information->longitude|escape:'html':'UTF-8'}"
+                                            query="{$obj_hotel_branch_information->map_input_text|escape:'html':'UTF-8'}"
+                                            title="{$obj_hotel_branch_information->hotel_name|escape:'html':'UTF-8'}">
+                                        </div>
                                     </div>
-                                </div>
-                            {/if}
+                                {/if}
 
-                            {block name='displayOrderDetailHotelLocationAfter'}
-                                {hook h='displayOrderDetailHotelLocationAfter' id_order=$order->id}
-                            {/block}
+                                {block name='displayOrderDetailHotelLocationAfter'}
+                                    {hook h='displayOrderDetailHotelLocationAfter' id_order=$order->id}
+                                {/block}
+                            </div>
                         </div>
-                    </div>
+                    {/if}
                 {/block}
 
                 {block name='order_detail_payment_summary'}
@@ -646,37 +725,49 @@
                                     <tbody>
                                         {assign var=room_price_tax_excl value=$order->getTotalProductsWithoutTaxes(false, true)}
                                         {assign var=room_price_tax_incl value=$order->getTotalProductsWithTaxes(false, true)}
-                                        {assign var=additional_service_price_tax_excl value=($order->getTotalProductsWithoutTaxes(false, false, Product::SERVICE_PRODUCT_WITH_ROOMTYPE) + $total_demands_price_te)}
-                                        {assign var=additional_service_price_tax_incl value=($order->getTotalProductsWithTaxes(false, false, Product::SERVICE_PRODUCT_WITH_ROOMTYPE) + $total_demands_price_ti)}
-                                        {assign var=total_tax_without_discount value=(($room_price_tax_incl - $room_price_tax_excl) + ($additional_service_price_tax_incl - $additional_service_price_tax_excl ))}
-                                        {if $priceDisplay && $use_tax && $room_price_tax_excl}
+
+                                        {assign var=room_services_price_tax_excl value=($order->getTotalProductsWithoutTaxes(false, false, Product::SELLING_PREFERENCE_WITH_ROOM_TYPE) + $total_demands_price_te)}
+                                        {assign var=room_services_price_tax_incl value=($order->getTotalProductsWithTaxes(false, false, Product::SELLING_PREFERENCE_WITH_ROOM_TYPE) + $total_demands_price_ti)}
+
+                                        {assign var=total_standard_products_tax_incl value=($order->getTotalProductsWithTaxes(false, false, Product::SELLING_PREFERENCE_STANDALONE) + $order->getTotalProductsWithTaxes(false, false, Product::SELLING_PREFERENCE_HOTEL_STANDALONE))}
+                                        {assign var=total_standard_products_tax_excl value=($order->getTotalProductsWithoutTaxes(false, false, Product::SELLING_PREFERENCE_STANDALONE) + $order->getTotalProductsWithoutTaxes(false, false, Product::SELLING_PREFERENCE_HOTEL_STANDALONE))}
+
+                                        {assign var=total_tax_without_discount value=(($room_price_tax_incl - $room_price_tax_excl) + ($room_services_price_tax_incl - $room_services_price_tax_excl) + ($total_standard_products_tax_incl - $total_standard_products_tax_excl))}
+
+                                        {if isset($cart_htl_data) && $cart_htl_data}
                                             <tr>
-                                                <td>{l s='Total rooms cost (tax excl.)'}</td>
+                                                <td>{l s='Total rooms cost'} {if $use_taxes && $display_tax_label == 1}{if $priceDisplay == 1}{l s='(tax excl.)'}{elseif $priceDisplay == 0}{l s='(tax incl.)'}{/if} {/if}</td>
                                                 <td class="text-right">
-                                                    <span class="price">{displayWtPriceWithCurrency price=($room_price_tax_excl + $additional_service_price_tax_excl - $total_convenience_fee_te) currency=$currency}</span>
+                                                    {if $priceDisplay && $use_tax}
+                                                        <span class="price">{displayWtPriceWithCurrency price=($room_price_tax_excl + $room_services_price_tax_excl - $total_convenience_fee_te) currency=$currency}</span>
+                                                    {else}
+                                                        <span class="price">{displayWtPriceWithCurrency price=($room_price_tax_incl + $room_services_price_tax_incl - $total_convenience_fee_ti) currency=$currency}</span>
+                                                    {/if}
                                                 </td>
                                             </tr>
-                                        {else}
-                                            <tr>
-                                                <td>{l s='Total Rooms Cost'} {if $use_tax}{l s='(tax incl.)'}{/if} </td>
+                                        {/if}
+                                        {if (isset($hotel_service_products) && $hotel_service_products) || (isset($standalone_service_products) && $standalone_service_products)}
+                                            <tr class="item">
+                                                <td>{l s='Total products cost'} {if $use_taxes && $display_tax_label == 1}{if $priceDisplay == 1}{l s='(tax excl.)'}{elseif $priceDisplay == 0}{l s='(tax incl.)'}{/if}{/if}</td>
                                                 <td class="text-right">
-                                                    <span class="price">{displayWtPriceWithCurrency price=($room_price_tax_incl + $additional_service_price_tax_incl - $total_convenience_fee_ti) currency=$currency}</span>
+                                                    {if $priceDisplay && $use_tax}
+                                                        <span>{displayWtPriceWithCurrency price=$total_standard_products_tax_excl currency=$currency}</span>
+                                                    {else}
+                                                        <span>{displayWtPriceWithCurrency price=$total_standard_products_tax_incl currency=$currency}</span>
+                                                    {/if}
                                                 </td>
                                             </tr>
                                         {/if}
 
-                                        {if $priceDisplay && $use_tax && $total_convenience_fee_te}
-                                            <tr>
-                                                <td>{l s='Total Convenience Fees (tax excl.)'}</td>
+                                        {if $total_convenience_fee_te || $total_convenience_fee_te}
+                                             <tr class="item">
+                                                <td>{l s='Total Convenience Fees'} {if $use_taxes && $display_tax_label == 1}{if $priceDisplay == 1}{l s='(tax excl.)'}{elseif $priceDisplay == 0}{l s='(tax incl.)'}{/if}{/if}</td>
                                                 <td class="text-right">
-                                                    <span class="price">{displayWtPriceWithCurrency price=$total_convenience_fee_te currency=$currency}</span>
-                                                </td>
-                                            </tr>
-                                        {else if $total_convenience_fee_ti}
-                                            <tr>
-                                                <td>{l s='Total Convenience Fees (tax incl.)'}</td>
-                                                <td class="text-right">
-                                                    <span class="price">{displayWtPriceWithCurrency price=$total_convenience_fee_ti currency=$currency}</span>
+                                                    {if $priceDisplay && $use_tax}
+                                                        <span class="price">{displayWtPriceWithCurrency price=$total_convenience_fee_te currency=$currency}</span>
+                                                    {else}
+                                                        <span class="price">{displayWtPriceWithCurrency price=$total_convenience_fee_ti currency=$currency}</span>
+                                                    {/if}
                                                 </td>
                                             </tr>
                                         {/if}
@@ -778,6 +869,7 @@
                                                 <td>{l s='Email'}</td>
                                                 <td class="text-right">{$guestInformations['email']|escape:'html':'UTF-8'}</td>
                                             </tr>
+
                                             {if isset($guestInformations['phone']) && $guestInformations['phone']}
                                                 <tr>
                                                     <td>{l s='Phone'}</td>
@@ -822,7 +914,7 @@
                             <input type="hidden" name="id_order" value="{$order->id}">
                             <div class="card cancel-booking">
                                 <div class="card-header">
-                                    {l s='Cancel Bookings'}
+                                    {l s='Cancel Bookings'}{if $service_products_formatted|count} | {l s='Products'}{/if}
                                 </div>
                                 <div class="card-body">
                                     <div class="errors" style="display: none;"></div>
@@ -832,18 +924,30 @@
                                             <div class="col-xs-4">
                                                 <ul class="nav nav-tabs nav-stacked">
                                                     {assign var='flag_is_first_iteration' value=true}
-                                                    {foreach from=$cart_htl_data key=data_k item=data_v}
-                                                        {foreach from=$data_v['date_diff'] key=rm_k item=rm_v}
-                                                            {assign var="is_full_date" value=($show_full_date && ($rm_v['data_form']|date_format:'%D' == $rm_v['data_to']|date_format:'%D'))}
+                                                    {if $cart_htl_data|count}
+                                                        {foreach from=$cart_htl_data key=data_k item=data_v}
+                                                            {foreach from=$data_v['date_diff'] key=rm_k item=rm_v}
+                                                                {assign var="is_full_date" value=($show_full_date && ($rm_v['data_form']|date_format:'%D' == $rm_v['data_to']|date_format:'%D'))}
+                                                                <li class="{if $flag_is_first_iteration}active{/if}">
+                                                                    <a href="#room-info-tab-{$data_v.id_product}-{$rm_k}" class="" data-toggle="tab">
+                                                                        <div class="refund_element_name">{$data_v.name}</div>
+                                                                        <div class="duration">{dateFormat date=$rm_v.data_form full=$is_full_date} - {dateFormat date=$rm_v.data_to full=$is_full_date}</div>
+                                                                    </a>
+                                                                </li>
+                                                                {if $flag_is_first_iteration}{assign var='flag_is_first_iteration' value=false}{/if}
+                                                            {/foreach}
+                                                        {/foreach}
+                                                    {/if}
+                                                    {if $service_products_formatted|count}
+                                                        {foreach from=$service_products_formatted key=data_k item=data_v}
                                                             <li class="{if $flag_is_first_iteration}active{/if}">
-                                                                <a href="#room-info-tab-{$data_v.id_product}-{$rm_k}" class="" data-toggle="tab">
-                                                                    <div class="room-type-name">{$data_v.name}</div>
-                                                                    <div class="duration">{dateFormat date=$rm_v.data_form full=$is_full_date} - {dateFormat date=$rm_v.data_to full=$is_full_date}</div>
+                                                                <a href="#product-info-tab-{$data_v.id_product}" class="" data-toggle="tab">
+                                                                    <div class="refund_element_name">{$data_v.name}</div>
                                                                 </a>
                                                             </li>
                                                             {if $flag_is_first_iteration}{assign var='flag_is_first_iteration' value=false}{/if}
                                                         {/foreach}
-                                                    {/foreach}
+                                                    {/if}
                                                 </ul>
                                             </div>
                                             <div class="col-xs-8">
@@ -852,8 +956,8 @@
                                                     {foreach from=$cart_htl_data key=data_k item=data_v}
                                                         {foreach from=$data_v['date_diff'] key=rm_k item=rm_v}
                                                             <div id="room-info-tab-{$data_v.id_product}-{$rm_k}" class="tab-pane {if $flag_is_first_iteration}active{/if}">
-                                                                <div class="room-type-summary clearfix">
-                                                                    <p class="room-type-name">{$data_v.name}</p>
+                                                                <div class="refund_element_summary clearfix">
+                                                                    <p class="refund_element_name">{$data_v.name}</p>
                                                                     <div class="col-xs-3">
                                                                         <p>{l s='Total Rooms'}</p>
                                                                         <strong>{$rm_v.num_rm|string_format:'%02d'}</strong>
@@ -866,7 +970,7 @@
                                                                 <div class="rooms-summary">
                                                                     {foreach from=$rm_v['hotel_booking_details'] item=$hotel_booking_detail name=foreachRefundRooms}
                                                                         {assign var=is_room_cancelled value=(isset($refundReqBookings) && in_array($hotel_booking_detail.id_htl_booking, $refundReqBookings))}
-                                                                        <div class="room-details {if $is_room_cancelled || ($hotel_booking_detail.id_status != $ROOM_STATUS_ALLOTED)}cancelled{/if} clearfix">
+                                                                        <div class="refund_element_details {if $is_room_cancelled || ($hotel_booking_detail.id_status != $ROOM_STATUS_ALLOTED)}cancelled{/if} clearfix">
                                                                             <div class="occupancy-wrap">
                                                                                 <div class="checkbox">
                                                                                     <label for="bookings_to_refund_{$hotel_booking_detail.id_htl_booking}">
@@ -922,6 +1026,30 @@
                                                             {if $flag_is_first_iteration}{assign var='flag_is_first_iteration' value=false}{/if}
                                                         {/foreach}
                                                     {/foreach}
+                                                    {foreach from=$service_products_formatted key=data_k item=data_v}
+                                                        <div id="product-info-tab-{$data_v.id_product}" class="tab-pane {if $flag_is_first_iteration}active{/if}">
+                                                            <div class="refund_element_summary">
+                                                                {foreach from=$data_v['options'] item=$product_option}
+                                                                    {assign var=is_product_cancelled value=(isset($refundReqProducts) && in_array($product_option.id_service_product_order_detail, $refundReqProducts))}
+                                                                    <div class="refund_element_details {if $is_product_cancelled}cancelled{/if} clearfix">
+                                                                        <div class="checkbox">
+                                                                            <label for="products_to_refund_{$product_option.id_service_product_order_detail}">
+                                                                                <input type="checkbox" class="bookings_to_refund" id="products_to_refund_{$product_option.id_service_product_order_detail}" name="id_service_product_order_detail[]" value="{$product_option.id_service_product_order_detail|escape:'html':'UTF-8'}" {if $is_product_cancelled }disabled{/if}/>
+                                                                                {$product_option.name}{if isset($product_option.option_name) && $product_option.option_name} : {$product_option.option_name}{/if}
+                                                                            </label>
+                                                                            {if $product_option.is_cancelled}<span class="badge badge-danger badge-cancelled">{l s='Cancelled'}</span>{else if $product_option.is_refunded}<span class="badge badge-danger badge-cancelled">{l s='Refunded'}</span>{else if isset($product_option.refund_denied) && $product_option.refund_denied}<span class="badge badge-danger badge-cancelled">{l s='Refund denied'}</span> <i class="icon-info-circle refund-denied-info" data-refund_denied_info="{l s='Refund for this product is denied. Please contact admin for more detail.'}"></i></span>{/if}
+                                                                        </div>
+                                                                        {if $product_option.allow_multiple_quantity}
+                                                                            <div class="quantity-wrap clearfix">
+                                                                                <span>{l s='Quantity'} : {$product_option.quantity}</span>
+                                                                            </div>
+                                                                        {/if}
+                                                                    </div>
+                                                                {/foreach}
+                                                            </div>
+                                                        </div>
+                                                        {if $flag_is_first_iteration}{assign var='flag_is_first_iteration' value=false}{/if}
+                                                    {/foreach}
                                                 </div>
                                             </div>
                                         </div>
@@ -929,7 +1057,7 @@
                                 </div>
                                 <div class="card-footer">
                                     <div class="selected-rooms-wrap">
-                                        {l s='Selected Rooms: '}<span class="num-selected-rooms">{l s='00'}</span>
+                                        {l s='Selected: '}<span class="num-selected-rooms">{l s='00'}</span>
                                     </div>
                                     <div class="actions-wrap">
                                         <button class="btn btn-secondary btn-cancel">
@@ -950,7 +1078,7 @@
                                     <div class="errors" style="display: none;"></div>
 
                                     <div class="well well-sm">
-                                        <p class="text">{l s='Total Rooms to Cancel:'} <span class="count-total-rooms">{l s='00'}</span></p>
+                                        <p class="text">{l s='Total cancel request:'} <span class="count-total-rooms">{l s='00'}</span></p>
                                     </div>
 
                                     <div class="form-group">

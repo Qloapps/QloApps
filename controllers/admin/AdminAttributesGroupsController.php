@@ -102,7 +102,7 @@ class AdminAttributesGroupsControllerCore extends AdminController
     {
         if (($id = Tools::getValue('id_attribute_group'))) {
             $this->table      = 'attribute';
-            $this->className  = 'Attribute';
+            $this->className  = 'ProductAttribute';
             $this->identifier = 'id_attribute';
             $this->position_identifier = 'id_attribute';
             $this->position_group_identifier = 'id_attribute_group';
@@ -345,13 +345,13 @@ class AdminAttributesGroupsControllerCore extends AdminController
 
         // Override var of Controller
         $this->table = 'attribute';
-        $this->className = 'Attribute';
+        $this->className = 'ProductAttribute';
         $this->identifier = 'id_attribute';
         $this->lang = true;
         $this->tpl_folder = 'attributes/';
 
         // Create object Attribute
-        if (!$obj = new Attribute((int)Tools::getValue($this->identifier))) {
+        if (!$obj = new ProductAttribute((int)Tools::getValue($this->identifier))) {
             return;
         }
 
@@ -480,7 +480,7 @@ class AdminAttributesGroupsControllerCore extends AdminController
             }
             $this->content .= $this->renderForm();
         } elseif ($this->display == 'editAttributes') {
-            if (!$this->object = new Attribute((int)Tools::getValue('id_attribute'))) {
+            if (!$this->object = new ProductAttribute((int)Tools::getValue('id_attribute'))) {
                 return;
             }
 
@@ -614,7 +614,7 @@ class AdminAttributesGroupsControllerCore extends AdminController
                         if (Validate::isLoadedObject($obj = new AttributeGroup((int)$id))) {
                             $bread_extended[] = '<a href="'.Context::getContext()->link->getAdminLink('AdminAttributesGroups').'&id_attribute_group='.$id.'&viewattribute_group">'.$obj->name[$this->context->employee->id_lang].'</a>';
                         }
-                        if (Validate::isLoadedObject($obj = new Attribute((int)$this->id_attribute))) {
+                        if (Validate::isLoadedObject($obj = new ProductAttribute((int)$this->id_attribute))) {
                             $bread_extended[] =  sprintf($this->l('Edit: %s'), $obj->name[$this->context->employee->id_lang]);
                         }
                     } else {
@@ -659,7 +659,7 @@ class AdminAttributesGroupsControllerCore extends AdminController
     {
         if (Tools::isSubmit('updateattribute') || Tools::isSubmit('deleteattribute') || Tools::isSubmit('submitAddattribute') || Tools::isSubmit('submitBulkdeleteattribute')) {
             $this->table = 'attribute';
-            $this->className = 'Attribute';
+            $this->className = 'ProductAttribute';
             $this->identifier = 'id_attribute';
 
             if ($this->display == 'edit') {
@@ -671,7 +671,7 @@ class AdminAttributesGroupsControllerCore extends AdminController
     public function processPosition()
     {
         if (Tools::getIsset('viewattribute_group')) {
-            $object = new Attribute((int)Tools::getValue('id_attribute'));
+            $object = new ProductAttribute((int)Tools::getValue('id_attribute'));
             self::$currentIndex = self::$currentIndex.'&viewattribute_group';
         } else {
             $object = new AttributeGroup((int)Tools::getValue('id_attribute_group'));
@@ -717,15 +717,15 @@ class AdminAttributesGroupsControllerCore extends AdminController
         if (!Tools::getValue($this->identifier) && Tools::getValue('id_attribute') && !Tools::getValue('attributeOrderby')) {
             // Override var of Controller
             $this->table = 'attribute';
-            $this->className = 'Attribute';
+            $this->className = 'ProductAttribute';
             $this->identifier = 'id_attribute';
         }
 
         // If it's an attribute, load object Attribute()
         if (Tools::getValue('updateattribute') || Tools::isSubmit('deleteattribute') || Tools::isSubmit('submitAddattribute')) {
-            if ($this->tabAccess['edit'] !== '1') {
+            if ($this->tabAccess['edit'] !== 1) {
                 $this->errors[] = Tools::displayError('You do not have permission to edit this.');
-            } elseif (!$object = new Attribute((int)Tools::getValue($this->identifier))) {
+            } elseif (!$object = new ProductAttribute((int)Tools::getValue($this->identifier))) {
                 $this->errors[] = Tools::displayError('An error occurred while updating the status for an object.').' <b>'.$this->table.'</b> '.Tools::displayError('(cannot load object)');
             }
 
@@ -766,7 +766,7 @@ class AdminAttributesGroupsControllerCore extends AdminController
             }
         } else {
             if (Tools::isSubmit('submitBulkdelete'.$this->table)) {
-                if ($this->tabAccess['delete'] === '1') {
+                if ($this->tabAccess['delete'] === 1) {
                     if (isset($_POST[$this->list_id.'Box'])) {
                         /** @var AttributeGroup $object */
                         $object = new $this->className();
@@ -864,7 +864,7 @@ class AdminAttributesGroupsControllerCore extends AdminController
     {
         // If we are deleting attributes instead of attribute_groups
         if (Tools::getIsset('attributeBox')) {
-            $this->className = 'Attribute';
+            $this->className = 'ProductAttribute';
             $this->table = 'attribute';
             $this->boxes = Tools::getValue($this->table.'Box');
         }
@@ -923,7 +923,7 @@ class AdminAttributesGroupsControllerCore extends AdminController
                 $pos = explode('_', $value);
 
                 if ((isset($pos[1]) && isset($pos[2])) && (int)$pos[2] === $id_attribute) {
-                    if ($attribute = new Attribute((int)$pos[2])) {
+                    if ($attribute = new ProductAttribute((int)$pos[2])) {
                         if (isset($position) && $attribute->updatePosition($way, $position)) {
                             echo 'ok position '.(int)$position.' for attribute '.(int)$pos[2].'\r\n';
                         } else {

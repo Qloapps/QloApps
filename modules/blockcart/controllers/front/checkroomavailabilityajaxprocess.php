@@ -18,7 +18,7 @@ class BlockcartCheckRoomAvailabilityAjaxProcessModuleFrontController extends Mod
             require_once (_PS_MODULE_DIR_.'hotelreservationsystem/define.php');
             if (Tools::getValue('delete_room_form_cart')) {
                 $objBookingDetail = new HotelBookingDetail();
-                $numDays = $objBookingDetail->getNumberOfDays($dateFrom, $dateTo);
+                $numDays = HotelHelper::getNumberOfDays($dateFrom, $dateTo);
                 $objCartBooking = new HotelCartBookingData();
                 $objRoomType = new HotelRoomType();
                 $totalAvailRooms = 0;

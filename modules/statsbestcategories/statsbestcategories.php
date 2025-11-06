@@ -42,7 +42,7 @@ class StatsBestCategories extends ModuleGrid
     {
         $this->name = 'statsbestcategories';
         $this->tab = 'analytics_stats';
-        $this->version = '1.5.4';
+        $this->version = '1.5.5';
         $this->author = 'PrestaShop';
         $this->need_instance = 0;
 
@@ -69,7 +69,7 @@ class StatsBestCategories extends ModuleGrid
             ),
             array(
                 'id' => 'availableRooms',
-                'header' => $this->l('Available rooms'),
+                'header' => $this->l('Available room nights'),
                 'dataIndex' => 'availableRooms',
                 'align' => 'center',
                 'tooltip' => $this->l('The total room nights available for booking for the hotel.'),
@@ -94,7 +94,7 @@ class StatsBestCategories extends ModuleGrid
             ),
             array(
                 'id' => 'averageRevenue',
-                'header' => $this->l('Avg. revenue'),
+                'header' => $this->l('Avg. revenue/order'),
                 'dataIndex' => 'averageRevenue',
                 'align' => 'center',
             ),
@@ -185,36 +185,62 @@ class StatsBestCategories extends ModuleGrid
             WHERE t.`id_hotel` = hbi.`id`
         ) AS totalRooms,
         (
-            SELECT COUNT(DISTINCT hbd.`id_order`) FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
-            LEFT JOIN `'._DB_PREFIX_.'orders` o ON (o.`id_order` = hbd.`id_order`)
-            WHERE hbd.`id_hotel` = hbi.`id` AND o.`valid` = 1
-            AND hbd.`date_to` > "'.pSQL($date_from).'" AND hbd.`date_from` < "'.pSQL($date_to).'"
+			SELECT COUNT(DISTINCT o.`id_order`)
+			FROM `'._DB_PREFIX_.'orders` o
+			WHERE `invoice_date` BETWEEN "'.pSQL($date_from).' 00:00:00" AND "'.pSQL($date_to).' 23:59:59" AND o.valid = 1
+            AND (
+                EXISTS (
+                    SELECT 1
+                    FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
+                    WHERE hbd.`id_order` = o.`id_order` AND hbd.`id_hotel` = hbi.`id`
+                ) OR EXISTS (
+                    SELECT 1
+                    FROM `'._DB_PREFIX_.'service_product_order_detail` spod
+                    WHERE spod.`id_order` = o.`id_order` AND spod.`id_hotel` = hbi.`id`
+                )
+            )
         ) AS totalOrders,
         (
-            SELECT IFNULL(SUM(ROUND((DATEDIFF(LEAST(hbd.`date_to`, "'.pSQL($date_to).'"), GREATEST(hbd.`date_from`, "'.pSQL($date_from).'")) / DATEDIFF(hbd.`date_to`, hbd.`date_from`)) * (hbd.`total_price_tax_excl` / o.`conversion_rate`), 2)), 0)
-            FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
-            LEFT JOIN `'._DB_PREFIX_.'orders` o
-            ON (o.`id_order` = hbd.`id_order`)
-            WHERE hbd.`id_hotel` = hbi.`id` AND o.`valid` = 1
-            AND hbd.`date_to` > "'.pSQL($date_from).'" AND hbd.`date_from` < "'.pSQL($date_to).'"
+            SELECT ROUND(SUM(total_paid_tax_excl / o.`conversion_rate`), 2)
+            FROM `'._DB_PREFIX_.'orders` o
+            WHERE o.valid = 1 AND `invoice_date` BETWEEN "'.pSQL($date_from).' 00:00:00" AND "'.pSQL($date_to).' 23:59:59"
+            AND (
+                EXISTS (
+                    SELECT 1
+                    FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
+                    WHERE hbd.`id_order` = o.`id_order` AND hbd.`id_hotel` = hbi.`id`
+                ) OR EXISTS (
+                    SELECT 1
+                    FROM `'._DB_PREFIX_.'service_product_order_detail` spod
+                    WHERE spod.`id_order` = o.`id_order` AND spod.`id_hotel` = hbi.`id`
+                )
+            )
         ) AS totalRevenue,
         (
-            SELECT IFNULL(SUM(ROUND((DATEDIFF(LEAST(hbd.`date_to`, "'.pSQL($date_to).'"), GREATEST(hbd.`date_from`, "'.pSQL($date_from).'")) / DATEDIFF(hbd.`date_to`, hbd.`date_from`)) * (
-                CASE
-                    WHEN od.`original_wholesale_price` <> "0.000000" THEN od.`original_wholesale_price`
-                    WHEN p.`wholesale_price` <> "0.000000" THEN p.`wholesale_price`
-                    ELSE 0
-                END
-            ), 2)), 0)
-            FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
-            LEFT JOIN `'._DB_PREFIX_.'orders` o
-            ON (o.`id_order` = hbd.`id_order`)
-            LEFT JOIN `'._DB_PREFIX_.'product` p
-            ON (p.`id_product` = hbd.`id_product`)
-            LEFT JOIN `'._DB_PREFIX_.'order_detail` od
-            ON (od.`id_order_detail` = hbd.`id_order_detail`)
-            WHERE hbd.`id_hotel` = hbi.`id` AND o.`valid` = 1
-            AND hbd.`date_to` > "'.pSQL($date_from).'" AND hbd.`date_from` < "'.pSQL($date_to).'"
+            SELECT IFNULL(
+                ROUND(SUM(
+                    CASE
+                        WHEN od.`original_wholesale_price` <> 0 THEN od.`original_wholesale_price`
+                        WHEN p.`wholesale_price` <> 0 THEN p.`wholesale_price`
+                        ELSE 0
+                    END
+                ), 2)
+            , 0)
+            FROM `'._DB_PREFIX_.'order_detail` od
+            LEFT JOIN `'._DB_PREFIX_.'orders` o ON (od.`id_order` = o.`id_order`)
+            LEFT JOIN `'._DB_PREFIX_.'product` p ON (p.`id_product` = od.`product_id`)
+            WHERE o.valid = 1 AND o.`invoice_date` BETWEEN "'.pSQL($date_from).' 00:00:00" AND "'.pSQL($date_to).' 23:59:59"
+            AND (
+                EXISTS (
+                    SELECT 1
+                    FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
+                    WHERE hbd.`id_order` = o.`id_order` AND hbd.`id_hotel` = hbi.`id`
+                ) OR EXISTS (
+                    SELECT 1
+                    FROM `'._DB_PREFIX_.'service_product_order_detail` spod
+                    WHERE spod.`id_order` = o.`id_order` AND spod.`id_hotel` = hbi.`id`
+                )
+            )
         ) AS totalOperatingCost
         FROM `'._DB_PREFIX_.'htl_branch_info` hbi
         LEFT JOIN `'._DB_PREFIX_.'htl_branch_info_lang` hbil
@@ -249,7 +275,7 @@ class StatsBestCategories extends ModuleGrid
 
             $value['availableRooms'] = max($value['totalRooms'] - $value['totalRoomsBooked'], 0); // availableRooms can be negative if more rooms are disabled than available for booking
 
-            $value['averageRevenue'] = $value['totalRoomsBooked'] ? ((float) $value['totalRevenue'] / (int) $value['totalRoomsBooked']) : 0;
+            $value['averageRevenue'] = $value['totalRoomsBooked'] ? ((float) $value['totalRevenue'] / (int) $value['totalOrders']) : 0;
             $value['averageRevenue'] = Tools::displayPrice((float) $value['averageRevenue'], $currency);
 
             $value['totalRevenue'] = Tools::displayPrice((float) $value['totalRevenue'], $currency);

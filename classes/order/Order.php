@@ -201,7 +201,7 @@ class OrderCore extends ObjectModel
     public $is_advance_payment;
 
     /**
-    * @var int advance_paid_amount used to save paid amount for the advance payment
+    * @var float advance_paid_amount used to save paid amount for the advance payment
     */
     public $advance_paid_amount;
 
@@ -209,6 +209,16 @@ class OrderCore extends ObjectModel
     * @var int is occupancy provided in this order
     */
     public $with_occupancy;
+
+    /**
+     * @var float
+     */
+    public $amount_paid;
+
+    /**
+     * @var array
+     */
+    public $product_list = [];
 
     /**
      * @see ObjectModel::$definition
@@ -600,12 +610,12 @@ class OrderCore extends ObjectModel
 
     public function getProductsDetail(
         $is_booking = null,
-        $product_service_type = null,
+        $selling_preference_type = null,
         $product_auto_add = null,
         $product_price_addition_type = null,
         $ids_order_detail = []
     ) {
-        $sql = 'SELECT *
+        $sql = 'SELECT *, od.`selling_preference_type` as selling_preference_type
             FROM `'._DB_PREFIX_.'order_detail` od
             LEFT JOIN `'._DB_PREFIX_.'product` p ON (p.id_product = od.product_id)
             LEFT JOIN `'._DB_PREFIX_.'product_shop` ps ON (ps.id_product = p.id_product AND ps.id_shop = od.id_shop)
@@ -617,13 +627,13 @@ class OrderCore extends ObjectModel
 
         if ($is_booking !== null) {
             $sql .= ' AND od.`is_booking_product` = '. (int)$is_booking;
-            if (!$is_booking && $product_service_type !== null) {
-                $sql .= ' AND od.`product_service_type` = '. (int)$product_service_type;
+            if (!$is_booking && $selling_preference_type !== null) {
+                $sql .= ' AND od.`selling_preference_type` = '. (int)$selling_preference_type;
             }
-            if (!$is_booking && $product_service_type == Product::SERVICE_PRODUCT_WITH_ROOMTYPE && $product_auto_add !== null) {
+            if (!$is_booking && $selling_preference_type == Product::SELLING_PREFERENCE_WITH_ROOM_TYPE && $product_auto_add !== null) {
                 $sql .= ' AND od.`product_auto_add` = '. (int)$product_auto_add;
             }
-            if (!$is_booking && $product_service_type == Product::SERVICE_PRODUCT_WITH_ROOMTYPE && $product_auto_add == 1 && $product_price_addition_type !== null) {
+            if (!$is_booking && $selling_preference_type == Product::SELLING_PREFERENCE_WITH_ROOM_TYPE && $product_auto_add == 1 && $product_price_addition_type !== null) {
                 $sql .= ' AND od.`product_price_addition_type` = '. (int)$product_price_addition_type;
             }
         }
@@ -969,7 +979,7 @@ class OrderCore extends ObjectModel
      * @param bool $skip_id_address_invoice Skip orders from this id_address_invoice
      * @return array Customer orders
      */
-    public static function getCustomerOrders($id_customer, $show_hidden_status = false, Context $context = null, $id_address_invoice = null, $skip_address = 0)
+    public static function getCustomerOrders($id_customer, $show_hidden_status = false, ?Context $context = null, $id_address_invoice = null, $skip_address = 0)
     {
         if (!$context) {
             $context = Context::getContext();
@@ -1028,7 +1038,7 @@ class OrderCore extends ObjectModel
         return $orders;
     }
 
-    public static function getOrdersWithInformations($limit = null, Context $context = null)
+    public static function getOrdersWithInformations($limit = null, ?Context $context = null)
     {
         if (!$context) {
             $context = Context::getContext();
@@ -1110,14 +1120,14 @@ class OrderCore extends ObjectModel
     public function getTotalProductsWithoutTaxes(
         $products = false,
         $bookingProducts = null,
-        $product_service_type = null,
+        $selling_preference_type = null,
         $product_auto_add = null,
         $product_price_addition_type = null,
         $ids_order_detail = []
     ) {
         // update
         if (!$products) {
-            $products = $this->getProductsDetail($bookingProducts, $product_service_type, $product_auto_add, $product_price_addition_type, $ids_order_detail);
+            $products = $this->getProductsDetail($bookingProducts, $selling_preference_type, $product_auto_add, $product_price_addition_type, $ids_order_detail);
         }
 
         $return = 0;
@@ -1136,14 +1146,14 @@ class OrderCore extends ObjectModel
     public function getTotalProductsWithTaxes(
         $products = false,
         $bookingProducts = null,
-        $product_service_type = null,
+        $selling_preference_type = null,
         $product_auto_add = null,
         $product_price_addition_type = null,
         $ids_order_detail = []
     ) {
         /* Retro-compatibility (now set directly on the validateOrder() method) */
         if (!$products) {
-            $products = $this->getProductsDetail($bookingProducts, $product_service_type, $product_auto_add, $product_price_addition_type, $ids_order_detail);
+            $products = $this->getProductsDetail($bookingProducts, $selling_preference_type, $product_auto_add, $product_price_addition_type, $ids_order_detail);
         }
 
         $return = 0;
@@ -1267,13 +1277,14 @@ class OrderCore extends ObjectModel
     */
     public function isReturnable()
     {
-        $objBookingDetail = new HotelBookingDetail();
-        if ($bookingInfo = $objBookingDetail->getBookingDataByOrderId($this->id)) {
-            $idHotel = reset($bookingInfo)['id_hotel'];
-            $objHotelBranch = new HotelBranchInformation($idHotel);
+        $vatAddress = new Address((int)$this->id_address_tax);
+        if ($vatAddress->id_hotel) {
+            $objHotelBranch = new HotelBranchInformation($vatAddress->id_hotel);
 
             // check if global as well as hotel refund is allowed
             return (Configuration::get('WK_ORDER_REFUND_ALLOWED') && $objHotelBranch->active_refund);
+        } else {
+            return Configuration::get('WK_ORDER_REFUND_ALLOWED');
         }
         return false;
     }
@@ -1348,7 +1359,7 @@ class OrderCore extends ObjectModel
 
             // Save Order invoice
 
-            $this->setInvoiceDetails($order_invoice);
+            Order::setInvoiceDetails($order_invoice);
 
             if (Configuration::get('PS_INVOICE')) {
                 $this->setLastInvoiceNumber($order_invoice->id, $this->id_shop);
@@ -2450,7 +2461,7 @@ class OrderCore extends ObjectModel
      * @param $limitToOrderDetails Optional array of OrderDetails to take into account. False by default to take all OrderDetails from the current Order.
      * @return array A list of tax rows applied to the given OrderDetails (or all OrderDetails linked to the current Order).
      */
-    public function getProductTaxesDetails($limitToOrderDetails = false, $bookingProducts = null, $product_service_type = null)
+    public function getProductTaxesDetails($limitToOrderDetails = false, $bookingProducts = null, $selling_preference_type = null)
     {
         $round_type = $this->round_type;
         if ($round_type == 0) {
@@ -2470,7 +2481,7 @@ class OrderCore extends ObjectModel
         $expected_total_base = (float)$this->getTotalProductsWithoutTaxes(
             $limitToOrderDetails,
             $bookingProducts,
-            $product_service_type
+            $selling_preference_type
         );
 
         foreach ($this->getCartRules() as $order_cart_rule) {
@@ -2509,78 +2520,283 @@ class OrderCore extends ObjectModel
 
         $order_ecotax_tax = 0;
 
-        $tax_rates = array();
-
+        $objAddress = new Address((int)$this->id_address_tax);
         foreach ($order_details as $order_detail) {
+            $tax_rates = array();
+            $groupedTaxDetails = array();
             $id_order_detail = $order_detail['id_order_detail'];
+            $id_order_slip = $order_detail['id_order_slip'] ?? 0; // Only in case of order slip
+
             $tax_calculator = OrderDetail::getTaxCalculatorStatic($id_order_detail);
 
-            // TODO: probably need to make an ecotax tax breakdown here instead,
-            // but it seems unlikely there will be different tax rates applied to the
-            // ecotax in the same order in the real world
-            $unit_ecotax_tax = $order_detail['ecotax'] * $order_detail['ecotax_tax_rate'] / 100.0;
-            $order_ecotax_tax += $order_detail['product_quantity'] * $unit_ecotax_tax;
-
-            $discount_ratio = 0;
-
-            if ($this->total_products > 0) {
-                $discount_ratio = ($order_detail['unit_price_tax_excl'] + $order_detail['ecotax']) / $this->total_products;
-            }
-
-            // share of global discount
-            $discounted_price_tax_excl = $order_detail['unit_price_tax_excl'] - $discount_ratio * $order_discount_tax_excl;
-            // specific discount
-            if (!empty($product_specific_discounts[$order_detail['product_id']])) {
-                $discounted_price_tax_excl -= $product_specific_discounts[$order_detail['product_id']];
-            }
-
             $quantity = $order_detail['product_quantity'];
+            $unit_price_tax_excl = $order_detail['unit_price_tax_excl'];
+
+            /*
+             * Discounted taxes are intentionally not calculated here, as we do not want to display them.
+             *
+             * TODO: Consider implementing a proper ecotax breakdown if needed in future.
+             * However, it is unlikely that different tax rates would apply to ecotax within the same order.
+             *
+             *
+             * $unit_ecotax_tax = $order_detail['ecotax'] * $order_detail['ecotax_tax_rate'] / 100.0;
+             * $order_ecotax_tax += $order_detail['product_quantity'] * $unit_ecotax_tax;
+             *
+             * $discount_ratio = 0;
+             * if ($this->total_products > 0) {
+             *     $discount_ratio = ($order_detail['unit_price_tax_excl'] + $order_detail['ecotax']) / $this->total_products;
+             * }
+             *
+             * // Apply share of global discount
+             * $discounted_price_tax_excl = $order_detail['unit_price_tax_excl'] - $discount_ratio * $order_discount_tax_excl;
+             *
+             * // Apply specific product-level discount
+             * if (!empty($product_specific_discounts[$order_detail['product_id']])) {
+             *     $discounted_price_tax_excl -= $product_specific_discounts[$order_detail['product_id']];
+             * }
+             */
 
             foreach ($tax_calculator->taxes as $tax) {
                 $tax_rates[$tax->id] = $tax->rate;
             }
-            foreach ($tax_calculator->getTaxesAmount($discounted_price_tax_excl) as $id_tax => $unit_amount) {
-                $total_tax_base = 0;
-                $total_tax_base = Tools::processPriceRounding($discounted_price_tax_excl, $quantity);
-                $total_amount = Tools::processPriceRounding($unit_amount, $quantity);
 
-                if (!isset($breakdown[$id_tax])) {
-                    $breakdown[$id_tax] = array('tax_base' => 0, 'tax_amount' => 0);
+            $totalTaxBase = $order_detail['total_price_tax_excl'];
+
+            // Note: Only calculate in case of Order Invoice
+            if (!$id_order_slip) {
+                $taxesList = OrderDetail::getTaxListStatic($id_order_detail);
+                if (!$taxesList) {
+                    continue;
                 }
 
-                $breakdown[$id_tax]['tax_base'] += $total_tax_base;
-                $breakdown[$id_tax]['tax_amount'] += $total_amount;
+                if (!$order_detail['is_booking_product']) {
+                    $objServiceProductOrderDetail = new ServiceProductOrderDetail();
+                    if ($serviceProductDetail = $objServiceProductOrderDetail->getServiceProductsInOrder(
+                        $order_detail['id_order'],
+                        $id_order_detail
+                    )) {
+                        $totals = array_reduce($serviceProductDetail, function ($carry, $item) use ($order_detail) {
+                            $objHotelBookingDetail = new HotelBookingDetail((int) $item['id_htl_booking_detail']);
+                            if ((Product::PRICE_CALCULATION_METHOD_PER_DAY == $order_detail['product_price_calculation_method'])
+                                && (!$numDays = HotelHelper::getNumberOfDays($objHotelBookingDetail->date_from, $objHotelBookingDetail->date_to))
+                            ) {
+                                $numDays = 1;
+                            }
 
-                $order_detail_tax_rows[] = array(
-                    'id_order_detail' => $id_order_detail,
-                    'id_tax' => $id_tax,
-                    'tax_rate' => $tax_rates[$id_tax],
-                    'unit_tax_base' => $discounted_price_tax_excl,
-                    'total_tax_base' => $total_tax_base,
-                    'unit_amount' => $unit_amount,
-                    'total_amount' => $total_amount
-                );
+                            if (!empty($item['id_tax_rules_group'])) {
+                                $qty = isset($item['quantity']) ? $item['quantity'] : 0;
+                                $price = isset($item['total_price_tax_excl']) ? $item['total_price_tax_excl'] : 0;
+
+                                $carry['quantity'] += ($qty * $numDays);
+                                $carry['total_price_tax_excl'] += $price;
+                            }
+                            return $carry;
+                        }, ['quantity' => 0, 'total_price_tax_excl' => 0]);
+                        $quantity = $totals['quantity'];
+                        $totalTaxBase = $totals['total_price_tax_excl'];
+                    }
+                }
+
+                $objServiceProductOrderDetail = new ServiceProductOrderDetail();
+                $additionalTaxAmounts = array();
+
+                if ($order_detail['is_booking_product']
+                    && ($autoAddedServiceData = $objServiceProductOrderDetail->getRoomTypeServiceProducts(
+                        $order_detail['id_order'],
+                        0,
+                        0,
+                        $order_detail['product_id'],
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        1,
+                        Product::PRICE_ADDITION_TYPE_WITH_ROOM
+                    ))
+                ) {
+                    $autoAddedPriceExcl = $objServiceProductOrderDetail->getRoomTypeServiceProducts(
+                        $order_detail['id_order'],
+                        0,
+                        0,
+                        $order_detail['product_id'],
+                        0,
+                        0,
+                        0,
+                        1,
+                        0,
+                        1,
+                        Product::PRICE_ADDITION_TYPE_WITH_ROOM
+                    );
+
+                    // We are getting auto added service for specific room.There will be only on htl_booking_detail but can have multiple auto added service with room.
+                    // Note: All the auto added service with room  have same id_tax_rule group 
+                    $autoAddedServiceData = array_shift($autoAddedServiceData);
+                    $numDays = 1;
+                    if ((Product::PRICE_CALCULATION_METHOD_PER_DAY == $order_detail['product_price_calculation_method'])
+                        && (!$numDays = HotelHelper::getNumberOfDays($autoAddedServiceData['date_from'], $autoAddedServiceData['date_to']))
+                    ) {
+                        $numDays = 1;
+                    }
+                    $autoAddedServices = $autoAddedServiceData['additional_services'];
+
+                    // Calculate total quantity of auto-added services
+                    $totalAutoAddedQty = array_reduce($autoAddedServices, function ($quantity, $service) {
+                        $qty = isset($service['quantity']) ? $service['quantity'] : 0;
+                        return $quantity + $qty;
+                    }, 0);
+
+                    $totalAutoAddedQty = $totalAutoAddedQty * $numDays;
+
+                    $firstAutoAddedService = array_shift($autoAddedServices);
+                    $idTaxRuleGroup = $firstAutoAddedService['id_tax_rules_group'];
+
+                    // If tax group is different from order detail, add tax info separately
+                    if ($order_detail['id_tax_rules_group'] != $idTaxRuleGroup) {
+                        $autoAddedServiceTaxManager = TaxManagerFactory::getManager($objAddress, (int)$idTaxRuleGroup);
+                        $autoAddedServiceTaxCalculator = $autoAddedServiceTaxManager->getTaxCalculator();
+                        // Calculate tax for the total price
+                        $additionalTaxAmounts = $autoAddedServiceTaxCalculator->getTaxesAmount($autoAddedPriceExcl);
+                        foreach ($additionalTaxAmounts as $taxId => $amount) {
+                            $objTax = new Tax((int)$taxId);
+                            $groupedTaxDetails[$taxId] = array(
+                                'id_order_detail' => $firstAutoAddedService['id_order_detail'],
+                                'id_tax' => $taxId,
+                                'tax_rate' => $objTax->rate,
+                                'unit_tax_base' => $autoAddedPriceExcl / $totalAutoAddedQty,
+                                'total_tax_base' => $autoAddedPriceExcl,
+                                'unit_amount' => $amount,
+                                'total_amount' => Tools::processPriceRounding($amount, $totalAutoAddedQty),
+                            );
+                        }
+                    } else {
+                        // Calculate tax for the total price
+                        $additionalTaxAmounts = $tax_calculator->getTaxesAmount($autoAddedPriceExcl);
+                        $totalTaxBase += $autoAddedPriceExcl;
+                    }
+                }
+
+                $taxBaseShare = $totalTaxBase;
+
+                // In case of Order Invoice, we need to calculate the tax base share as there are services
+                // which have different tax group with room types. So we are using order detail tax data
+                foreach ($taxesList as $detailTax) {
+                    if ($detailTax['total_amount'] > 0) {
+                        $taxId = $detailTax['id_tax'];
+
+                        $unitAmount = $detailTax['unit_amount'] + ($additionalTaxAmounts[$taxId] ?? 0);
+                        $totalAmount = $detailTax['total_amount'] + ($additionalTaxAmounts[$taxId] ?? 0);
+
+                        if (!isset($groupedTaxDetails[$taxId])) {
+                            $groupedTaxDetails[$taxId] = array(
+                                'id_order_detail' => $id_order_detail,
+                                'id_tax' => $taxId,
+                                'tax_rate' => $tax_rates[$taxId],
+                                'unit_tax_base' => $unit_price_tax_excl,
+                                'total_tax_base' => $taxBaseShare,
+                                // When order cancelled order detail amount is set to 0 but not the order detail tax. So we check is there any amount where the tax can be applied otherwise tax is 0
+                                'unit_amount' => $taxBaseShare > 0 ? $unitAmount : 0,
+                                'total_amount' => $taxBaseShare > 0 ? $totalAmount : 0,
+                            );
+                        } else {
+                            if ($taxBaseShare > 0) {
+                                $groupedTaxDetails[$taxId]['unit_amount'] += $unitAmount;
+                                $groupedTaxDetails[$taxId]['total_amount'] += $totalAmount;
+                            }
+                        }
+                    }
+                }
+            } else {
+                $taxBaseShare = $totalTaxBase;
+                $taxManager = TaxManagerFactory::getManager($objAddress, (int)$order_detail['id_tax_rules_group']);
+                $tax_calculator = $taxManager->getTaxCalculator();
+
+                foreach ($tax_calculator->getTaxesAmount($unit_price_tax_excl) as $id_tax => $unit_amount) {
+                    $total_tax_base = 0;
+                    $total_amount = Tools::processPriceRounding($unit_amount, $quantity);
+
+                    if (!isset($groupedTaxDetails[$id_tax])) {
+                        $groupedTaxDetails[$id_tax] = array(
+                            'id_order_detail' => $id_order_detail,
+                            'id_tax' => $id_tax,
+                            'tax_rate' => $tax_rates[$id_tax],
+                            'unit_tax_base' => $unit_price_tax_excl,
+                            'total_tax_base' => $taxBaseShare,
+                            'unit_amount' => $taxBaseShare > 0 ? $unit_amount : 0,
+                            'total_amount' => $taxBaseShare > 0 ? $total_amount : 0
+                        );
+                    } else {
+                        if ($taxBaseShare > 0) {
+                            $groupedTaxDetails[$id_tax]['unit_amount'] += $unit_amount;
+                            $groupedTaxDetails[$id_tax]['total_amount'] += $total_amount;
+                        }
+                    }
+                }
             }
+
+            if (!empty($groupedTaxDetails)) {
+                foreach ($groupedTaxDetails as $item) {
+                    $order_detail_tax_rows[] = $item;
+                }
+            }
+
+            /*
+             * This tax recalculation logic is intentionally disabled.
+             *
+             * Taxes have already been calculated and stored in the `order_detail_tax` table,
+             * so there is no need to recompute them here.
+             *
+             * foreach ($tax_calculator->getTaxesAmount($discounted_price_tax_excl) as $id_tax => $unit_amount) {
+             *     $total_tax_base = 0;
+             *     $total_tax_base = Tools::processPriceRounding($discounted_price_tax_excl, $quantity);
+             *     $total_amount = Tools::processPriceRounding($unit_amount, $quantity);
+             *
+             *     if (!isset($breakdown[$id_tax])) {
+             *         $breakdown[$id_tax] = array('tax_base' => 0, 'tax_amount' => 0);
+             *     }
+             *
+             *     $breakdown[$id_tax]['tax_base'] += $total_tax_base;
+             *     $breakdown[$id_tax]['tax_amount'] += $total_amount;
+             *
+             *     $order_detail_tax_rows[] = array(
+             *         'id_order_detail' => $id_order_detail,
+             *         'id_tax' => $id_tax,
+             *         'tax_rate' => $tax_rates[$id_tax],
+             *         'unit_tax_base' => $discounted_price_tax_excl,
+             *         'total_tax_base' => $total_tax_base,
+             *         'unit_amount' => $unit_amount,
+             *         'total_amount' => $total_amount
+             *     );
+             * }
+             */
+
         }
-        if (!empty($order_detail_tax_rows)) {
-            foreach ($breakdown as $data) {
-                $actual_total_tax += Tools::ps_round($data['tax_amount'], _PS_PRICE_COMPUTE_PRECISION_, $this->round_mode);
-                $actual_total_base += Tools::ps_round($data['tax_base'], _PS_PRICE_COMPUTE_PRECISION_, $this->round_mode);
-            }
 
-            $order_ecotax_tax = Tools::ps_round($order_ecotax_tax, _PS_PRICE_COMPUTE_PRECISION_, $this->round_mode);
+        /*
+         * The following tax adjustment logic was disabled as it is not currently in use.
+         * It was intended to handle rounding errors in tax and base amounts by spreading 
+         * the discrepancy across order detail tax rows. However, this logic is not required 
+         * due to updated tax calculation and breakdown handling.
+         */
 
-            $tax_rounding_error = $expected_total_tax - $actual_total_tax - $order_ecotax_tax;
-            if ($tax_rounding_error != 0) {
-                Tools::spreadAmount($tax_rounding_error, _PS_PRICE_COMPUTE_PRECISION_, $order_detail_tax_rows, 'total_amount');
-            }
+        // if (!empty($order_detail_tax_rows)) {
+        //     foreach ($breakdown as $data) {
+        //         $actual_total_tax += Tools::ps_round($data['tax_amount'], _PS_PRICE_COMPUTE_PRECISION_, $this->round_mode);
+        //         $actual_total_base += Tools::ps_round($data['tax_base'], _PS_PRICE_COMPUTE_PRECISION_, $this->round_mode);
+        //     }
 
-            $base_rounding_error = $expected_total_base - $actual_total_base;
-            if ($base_rounding_error != 0) {
-                Tools::spreadAmount($base_rounding_error, _PS_PRICE_COMPUTE_PRECISION_, $order_detail_tax_rows, 'total_tax_base');
-            }
-        }
+        //     $order_ecotax_tax = Tools::ps_round($order_ecotax_tax, _PS_PRICE_COMPUTE_PRECISION_, $this->round_mode);
 
+        //     $tax_rounding_error = $expected_total_tax - $actual_total_tax - $order_ecotax_tax;
+        //     if ($tax_rounding_error != 0) {
+        //         Tools::spreadAmount($tax_rounding_error, _PS_PRICE_COMPUTE_PRECISION_, $order_detail_tax_rows, 'total_amount');
+        //     }
+
+        //     $base_rounding_error = $expected_total_base - $actual_total_base;
+        //     if ($base_rounding_error != 0) {
+        //         Tools::spreadAmount($base_rounding_error, _PS_PRICE_COMPUTE_PRECISION_, $order_detail_tax_rows, 'total_tax_base');
+        //     }
+        // }
         return $order_detail_tax_rows;
     }
 
@@ -2647,65 +2863,112 @@ class OrderCore extends ObjectModel
      *
      * @return boolean: true if order has been completely refunded as per requested parameters or false
      */
-    public function hasCompletelyRefunded($action = 0, $includeCheckIn = 0)
+    public function hasCompletelyRefunded($action = 0, $includeCheckIn = 0, $mustHaveRoomsOrProducts = 1)
     {
+        $res = true;
+
+        // Check if order has bookings or products for refund
+        if ($mustHaveRoomsOrProducts) {
+            $hasRoomsOrProducts = 0;
+        } else {
+            $hasRoomsOrProducts = 1;
+        }
+
+        // check rooms in booking
         $objHotelBooking = new HotelBookingdetail();
         if ($orderBookings = $objHotelBooking->getOrderCurrentDataByOrderId($this->id)) {
-            // If action is Order::ORDER_COMPLETE_REFUND_FLAG (for refunded) then we will check
-            // that all rooms must be refunded and at least one booking is not cancelled
-            if ($action == Order::ORDER_COMPLETE_REFUND_FLAG) {
-                $uniqueRefundedBookings = array_unique(array_column($orderBookings, 'is_refunded'));
-                if (count($uniqueRefundedBookings) == 1 && $uniqueRefundedBookings[0] == 1) {
-                    foreach ($orderBookings as $booking) {
-                        if ($booking['is_cancelled'] == 0) {
-                            return true;
-                        }
-                    }
-                }
-            // If action is Order::ORDER_COMPLETE_CANCELLATION_FLAG (for cancelled) then we will check that all rooms must be cancelled
-            } elseif ($action == Order::ORDER_COMPLETE_CANCELLATION_FLAG) {
-                $uniqueRefundedBookings = array_unique(array_column($orderBookings, 'is_cancelled'));
-                if (count($uniqueRefundedBookings) == 1 && $uniqueRefundedBookings[0] == 1) {
-                    return true;
-                }
-            // If action is Order::ORDER_COMPLETE_CANCELLATION_OR_REFUND_REQUEST_FLAG (for cancelled and refund requests) then we will check that all rooms are either cancelled or requested for refund
-            } elseif ($action == Order::ORDER_COMPLETE_CANCELLATION_OR_REFUND_REQUEST_FLAG) {
-                foreach ($orderBookings as $booking) {
-                    if (!$booking['is_refunded']) {
-                        // If booking refund request is created and request is completed but booking is not refunded then return false
-                        if ($bookingRefundDetail = OrderReturn::getOrdersReturnDetail($this->id, 0, $booking['id'])) {
-                            $bookingRefundDetail = reset($bookingRefundDetail);
-                            if ($bookingRefundDetail['refunded']) {
-                                return false;
-                            }
-                        } else {
-                            return false;
-                        }
-                    }
-                }
+            $res &= $this->checkList($orderBookings, $action, $includeCheckIn);
+            $hasRoomsOrProducts = 1;
+        }
+        // check hotel linked products
+        $objServiceProductOrderDetail = new ServiceProductOrderDetail();
+        if ($hotelProducts = $objServiceProductOrderDetail->getServiceProductsInOrder($this->id, 0, 0, Product::SELLING_PREFERENCE_HOTEL_STANDALONE)) {
+            $res &= $this->checkList($hotelProducts, $action, false);
+            $hasRoomsOrProducts = 1;
+        }
 
+        if ($standaloneProducts = $objServiceProductOrderDetail->getServiceProductsInOrder($this->id, 0, 0, Product::SELLING_PREFERENCE_STANDALONE)) {
+            $res &= $this->checkList($standaloneProducts, $action, false);
+            $hasRoomsOrProducts = 1;
+        }
+
+        return ($hasRoomsOrProducts && $res);
+    }
+
+    public function checkList($list, $action = 0, $includeCheckIn = 0) {
+        // If action is Order::ORDER_COMPLETE_REFUND_FLAG (for refunded) then we will check
+        // that all rooms must be refunded and at least one booking is not cancelled
+        if ($action == Order::ORDER_COMPLETE_REFUND_FLAG) {
+            $uniqueRefunded = array_unique(array_column($list, 'is_refunded'));
+            if (count($uniqueRefunded) == 1 && $uniqueRefunded[0] == 1) {
+                foreach ($list as $product) {
+                    if ($product['is_cancelled'] == 0) {
+                        return true;
+                    }
+                }
+            }
+        // If action is Order::ORDER_COMPLETE_CANCELLATION_FLAG (for cancelled) then we will check that all rooms must be cancelled
+        } elseif ($action == Order::ORDER_COMPLETE_CANCELLATION_FLAG) {
+            $uniqueRefunded = array_unique(array_column($list, 'is_cancelled'));
+            if (count($uniqueRefunded) == 1 && $uniqueRefunded[0] == 1) {
                 return true;
-            // Default process to check if order is fully refunded or cancelled or not
-            } else {
-                // if is_refunded is 1 means booking either is cancelled or refunded. So check all bookings must have is_refunded = 1
-                $uniqueRefundedBookings = array_unique(array_column($orderBookings, 'is_refunded'));
-                if (count($uniqueRefundedBookings) == 1 && $uniqueRefundedBookings[0] == 1) {
-                    return true;
-                } elseif ($includeCheckIn) {
-                    foreach ($orderBookings as $booking) {
-                        if ($booking['is_refunded'] == 0
-                            && !OrderReturn::getOrdersReturnDetail($this->id, 0, $booking['id'])
-                            && $booking['id_status'] == HotelBookingDetail::STATUS_ALLOTED
-                        ) {
+            }
+        // If action is Order::ORDER_COMPLETE_CANCELLATION_OR_REFUND_REQUEST_FLAG (for cancelled and refund requests) then we will check that all rooms are either cancelled or requested for refund
+        } elseif ($action == Order::ORDER_COMPLETE_CANCELLATION_OR_REFUND_REQUEST_FLAG) {
+            foreach ($list as $product) {
+                if (!$product['is_refunded']) {
+                    // If booking refund request is created and request is completed but booking is not refunded then return false
+                    if ($refundDetail = OrderReturn::getOrdersReturnDetail(
+                        $this->id,
+                        0,
+                        isset($product['id']) ? $product['id'] : 0,
+                        isset($product['id_service_product_order_detail']) ? $product['id_service_product_order_detail'] : 0
+                    )) {
+                        $refundDetail = reset($refundDetail);
+                        if ($refundDetail['refunded']) {
                             return false;
                         }
+                    } else {
+                        return false;
                     }
-                    return true;
                 }
+            }
+
+            return true;
+        // Default process to check if order is fully refunded or cancelled or not
+        } else {
+            // if is_refunded is 1 means booking either is cancelled or refunded. So check all bookings must have is_refunded = 1
+            $uniqueRefunded = array_unique(array_column($list, 'is_refunded'));
+            if (count($uniqueRefunded) == 1 && $uniqueRefunded[0] == 1) {
+                return true;
+            } elseif ($includeCheckIn) {
+                foreach ($list as $product) {
+                    if ($product['is_refunded'] == 0
+                        && !OrderReturn::getOrdersReturnDetail($this->id, 0, isset($product['id']) ? $product['id'] : 0)
+                        && $product['id_status'] == HotelBookingDetail::STATUS_ALLOTED
+                    ) {
+                        return false;
+                    }
+                }
+                return true;
             }
         }
 
         return false;
+    }
+
+    public function getOrderCompleteRefundStatus()
+    {
+        $idOrderState = 0;
+        if ($this->hasCompletelyRefunded(Order::ORDER_COMPLETE_REFUND_FLAG)) {
+            $idOrderState = Configuration::get('PS_OS_REFUND');
+        } elseif ($this->hasCompletelyRefunded(Order::ORDER_COMPLETE_CANCELLATION_FLAG)) {
+            $idOrderState = Configuration::get('PS_OS_CANCELED');
+        } elseif ($this->hasCompletelyRefunded()) {
+            $idOrderState = Configuration::get('PS_OS_REFUND');
+        }
+
+        return $idOrderState;
     }
 
     public function getWsBookings()
@@ -2753,7 +3016,7 @@ class OrderCore extends ObjectModel
             ) {
                 $result['errors'][] = Tools::displayError('Order status can not be set to Refunded until all bookings in the order are completely refunded.');
             } elseif ($objNewOrderState->id == Configuration::get('PS_OS_CANCELED')
-                && !$this->hasCompletelyRefunded(Order::ORDER_COMPLETE_CANCELLATION_FLAG)
+                && !$this->hasCompletelyRefunded(Order::ORDER_COMPLETE_CANCELLATION_FLAG, 0, 1)
             ) {
                 $result['errors'][] = Tools::displayError('Order status can not be set to Cancelled until all bookings in the order are cancelled.');
             } elseif ($objCurrentOrderState->id == Configuration::get('PS_OS_ERROR') && !($objNewOrderState->id == Configuration::get('PS_OS_ERROR'))) {

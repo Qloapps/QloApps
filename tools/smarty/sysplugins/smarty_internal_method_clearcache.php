@@ -22,7 +22,7 @@ class Smarty_Internal_Method_ClearCache
      * Empty cache for a specific template
      *
      * @api  Smarty::clearCache()
-     * @link http://www.smarty.net/docs/en/api.clear.cache.tpl
+     * @link https://www.smarty.net/docs/en/api.clear.cache.tpl
      *
      * @param \Smarty $smarty
      * @param string  $template_name template name

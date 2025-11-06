@@ -1,21 +1,24 @@
 <?php
 /**
-* 2010-2020 Webkul.
-*
 * NOTICE OF LICENSE
 *
-* All right is reserved,
-* Please go through this link for complete license : https://store.webkul.com/license.html
+* This source file is subject to the Open Software License version 3.0
+* that is bundled with this package in the file LICENSE.md
+* It is also available through the world-wide-web at this URL:
+* https://opensource.org/license/osl-3-0-php
+* If you did not receive a copy of the license and are unable to
+* obtain it through the world-wide-web, please send an email
+* to support@qloapps.com so we can send you a copy immediately.
 *
 * DISCLAIMER
 *
-* Do not edit or add to this file if you wish to upgrade this module to newer
-* versions in the future. If you wish to customize this module for your
-* needs please refer to https://store.webkul.com/customisation-guidelines/ for more information.
+* Do not edit or add to this file if you wish to upgrade this module to a newer
+* versions in the future. If you wish to customize this module for your needs
+* please refer to https://store.webkul.com/customisation-guidelines for more information.
 *
-*  @author    Webkul IN <support@webkul.com>
-*  @copyright 2010-2020 Webkul IN
-*  @license   https://store.webkul.com/license.html
+* @author Webkul IN
+* @copyright Since 2010 Webkul
+* @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
 */
 
 class HotelBookingDemands extends ObjectModel
@@ -34,6 +37,10 @@ class HotelBookingDemands extends ObjectModel
 
     /** @var TaxCalculator object */
     public $tax_calculator = null;
+
+    protected $documentsBaseDir;
+    protected $sourceIndexFile;
+    protected $documentFolder;
 
     public static $definition = array(
         'table' => 'htl_booking_demands',
@@ -200,7 +207,7 @@ class HotelBookingDemands extends ObjectModel
                     $quantity = 1;
                     if ($this->price_calc_method == HotelRoomTypeGlobalDemand::WK_PRICE_CALC_METHOD_EACH_DAY) {
                         $objBkDetail = new HotelBookingDetail($this->id_htl_booking);
-                        $quantity = $objBkDetail->getNumberOfDays($objBkDetail->date_from, $objBkDetail->date_to);
+                        $quantity = HotelHelper::getNumberOfDays($objBkDetail->date_from, $objBkDetail->date_to);
                     }
 
                     // Rounding as per configurations
@@ -265,7 +272,7 @@ class HotelBookingDemands extends ObjectModel
                 $objBkDemand = new HotelBookingDemands($detail['id_booking_demand']);
                 if ($objBkDemand->price_calc_method == HotelRoomTypeGlobalDemand::WK_PRICE_CALC_METHOD_EACH_DAY) {
                     $objBkDetail = new HotelBookingDetail($detail['id_htl_booking']);
-                    $numDays = $objBkDetail->getNumberOfDays($objBkDetail->date_from, $objBkDetail->date_to);
+                    $numDays = HotelHelper::getNumberOfDays($objBkDetail->date_from, $objBkDetail->date_to);
                 }
 
                 $totalTaxBase = $priceTaxExcl * $numDays;

@@ -1,20 +1,23 @@
 {*
-* Since 2010 Webkul.
-*
 * NOTICE OF LICENSE
 *
-* All right is reserved,
-* Please go through this link for complete license : https://store.webkul.com/license.html
+* This source file is subject to the Open Software License version 3.0
+* that is bundled with this package in the file LICENSE.md
+* It is also available through the world-wide-web at this URL:
+* https://opensource.org/license/osl-3-0-php
+* If you did not receive a copy of the license and are unable to
+* obtain it through the world-wide-web, please send an email
+* to support@qloapps.com so we can send you a copy immediately.
 *
 * DISCLAIMER
 *
-* Do not edit or add to this file if you wish to upgrade this module to newer
-* versions in the future. If you wish to customize this module for your
-* needs please refer to https://store.webkul.com/customisation-guidelines/ for more information.
+* Do not edit or add to this file if you wish to upgrade this module to a newer
+* versions in the future. If you wish to customize this module for your needs
+* please refer to https://store.webkul.com/customisation-guidelines for more information.
 *
-*  @author    Webkul IN <support@webkul.com>
-*  @copyright Since 2010 Webkul IN
-*  @license   https://store.webkul.com/license.html
+* @author Webkul IN
+* @copyright Since 2010 Webkul
+* @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
 *}
 
 <div id="room_type_service_product_desc" class="tab-pane {if isset($show_active) && $show_active}active{/if} extra-services-container">
@@ -41,16 +44,17 @@
                             <th class="fixed-width-sm text-center">{l s='Quantity'}</th>
                             <th>{l s='Unit Price (tax excl.)'}</th>
                             <th>{l s='Total Price (tax excl.)'}</th>
+                            <th>{l s='Total Price (tax incl.)'}</th>
                             <th class="text-right">{l s='Action'}</th>
                         </tr>
                     </thead>
                     <tbody>
                         {if isset($additionalServices) && $additionalServices}
                             {foreach $additionalServices['additional_services'] as $service}
-                                <tr class="room_demand_block" data-id_room_type_service_product_order_detail="{$service['id_room_type_service_product_order_detail']}">
+                                <tr class="room_demand_block" data-id_service_product_order_detail="{$service['id_service_product_order_detail']}">
                                     <td>
                                         <div>{$service['name']|escape:'html':'UTF-8'}</div>
-                                        <input value="{$service['id_room_type_service_product_order_detail']|escape:'html':'UTF-8'}" name="id_service_product_order_detail[]" type="hidden"/>
+                                        <input value="{$service['id_service_product_order_detail']|escape:'html':'UTF-8'}" name="id_service_product_order_detail[]" type="hidden"/>
                                     </td>
                                     <td>
                                         {if $service['product_auto_add'] && $service['product_price_addition_type'] == Product::PRICE_ADDITION_TYPE_WITH_ROOM}
@@ -63,7 +67,7 @@
                                     <td class="text-center">
                                         {if $service['allow_multiple_quantity']}
                                             <div class="qty_container">
-                                                <input type="number" class="form-control qty" min="1" data-id_product="{$service['id_product']|escape:'html':'UTF-8'}" value="{$service['quantity']|escape:'html':'UTF-8'}" name="service_qty[{$service['id_room_type_service_product_order_detail']|escape:'html':'UTF-8'}]">
+                                                <input type="number" class="form-control qty" min="1" data-id_product="{$service['id_product']|escape:'html':'UTF-8'}" value="{$service['quantity']|escape:'html':'UTF-8'}" name="service_qty[{$service['id_service_product_order_detail']|escape:'html':'UTF-8'}]">
                                                 {if $service['max_quantity']}
                                                     <p style="display:{if $service['quantity'] > $service['max_quantity']}block{else}none{/if}; margin-top: 4px;">
                                                         <span class="label label-warning">{l s='Maximum allowed quantity: %s' sprintf=$service['max_quantity']}</span>
@@ -77,17 +81,15 @@
                                     <td>
                                         <div class="input-group">
                                             <span class="input-group-addon">{$currencySign}</span>
-                                            <input type="text" class="form-control unit_price" value="{Tools::ps_round($service['unit_price_tax_excl'], 2)}" data-id-product="{$service['id_product']}" name="service_price[{$service['id_room_type_service_product_order_detail']}]">
-                                            {if Product::PRICE_CALCULATION_METHOD_PER_DAY == $service.product_price_calculation_method}
+                                            <input type="text" class="form-control unit_price" value="{Tools::ps_round($service['unit_price_tax_excl'], 2)}" data-id-product="{$service['id_product']}" name="service_price[{$service['id_service_product_order_detail']}]">
+                                            {if Product::PRICE_CALCULATION_METHOD_PER_DAY == $service.price_calculation_method}
                                                 <span class="input-group-addon">{l s='/ night'}</span>
                                             {/if}
                                         </div>
-                                        {* {if $service['product_price_calculation_method'] == Product::PRICE_CALCULATION_METHOD_PER_DAY}
-                                            {l s='/ night'}
-                                        {/if} *}
                                     </td>
                                     <td>{displayPrice price=$service['total_price_tax_excl']|escape:'html':'UTF-8' currency=$orderCurrency}</td>
-                                    <td class="text-right"><a class="btn btn-danger pull-right del_room_additional_service" data-id_room_type_service_product_order_detail="{$service['id_room_type_service_product_order_detail']}" href="#"><i class="icon-trash"></i></a></td>
+                                    <td>{displayPrice price=$service['total_price_tax_incl']|escape:'html':'UTF-8' currency=$orderCurrency}</td>
+                                    <td class="text-right"><a class="btn btn-danger pull-right del_room_additional_service" data-id_service_product_order_detail="{$service['id_service_product_order_detail']}" href="#"><i class="icon-trash"></i></a></td>
                                 </tr>
                             {/foreach}
                         {else}
@@ -214,6 +216,7 @@
                     <div id="new_service_price_tax_rule_container" class="col-sm-6">
                         <label class="control-label">{l s='Tax rule'}</label>
                         <select name="new_service_price_tax_rule_group">
+                            <option value="0">{l s='No Tax'}</option>
                             {foreach from=$taxRulesGroups item=taxRuleGroup}
                                 <option value="{$taxRuleGroup.id_tax_rules_group}">{$taxRuleGroup.name}</option>
                             {/foreach}
@@ -253,15 +256,16 @@
 					<th>{l s='ID'}</th>
 					<th>{l s='Name'}</th>
 					<th></th>
-					<th>{l s='Unit Price'}</th>
-					<th>{l s='Total Price'}</th>
+					<th>{l s='Unit Price (tax excl.)'}</th>
+					<th>{l s='Total Price (tax excl.)'}</th>
+					<th>{l s='Total Price (tax incl.)'}</th>
 				</tr>
 			</thead>
 			</tbody>
 				{foreach $additionalServices['additional_services'] as $service}
 					<tr class="room_demand_block">
 						<td>
-							{$service['id_product']|escape:'html':'UTF-8'} <a target="blank" href="{$link->getAdminLink('AdminNormalProducts')|escape:'html':'UTF-8'}&amp;id_product={$service['id_product']|escape:'html':'UTF-8'}&amp;updateproduct"><i class="icon-external-link-sign"></i></a>
+							{$service['id_product']|escape:'html':'UTF-8'}{if !$service['product_deleted']} <a target="blank" href="{$link->getAdminLink('AdminNormalProducts')|escape:'html':'UTF-8'}&amp;id_product={$service['id_product']|escape:'html':'UTF-8'}&amp;updateproduct"><i class="icon-external-link-sign"></i></a>{/if}
 						</td>
 						<td>{$service['name']|escape:'html':'UTF-8'}</td>
 						<td>
@@ -274,12 +278,15 @@
 						</td>
 						<td>
 							{displayPrice price=$service['unit_price_tax_excl'] currency=$orderCurrency}
-							{if $service['product_price_calculation_method'] == Product::PRICE_CALCULATION_METHOD_PER_DAY}
+							{if $service['price_calculation_method'] == Product::PRICE_CALCULATION_METHOD_PER_DAY}
 								{l s='/ night'}
 							{/if}
 						</td>
 						<td>
 							{displayPrice price=$service['total_price_tax_excl'] currency=$orderCurrency}
+						</td>
+                        <td>
+							{displayPrice price=$service['total_price_tax_incl'] currency=$orderCurrency}
 						</td>
 					</tr>
 				{/foreach}

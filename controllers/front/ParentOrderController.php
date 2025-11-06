@@ -30,6 +30,7 @@ class ParentOrderControllerCore extends FrontController
     public $php_self = 'order';
 
     public $nbProducts;
+    public $link_conditions;
 
     /**
      * Initialize parent order controller
@@ -289,6 +290,101 @@ class ParentOrderControllerCore extends FrontController
         return true;
     }
 
+    protected function _assignCheckoutVars()
+    {
+        $show_option_allow_separate_package = (!$this->context->cart->isAllProductsInStock(true) && Configuration::get('PS_SHIP_WHEN_AVAILABLE'));
+        $advanced_payment_api = (bool)Configuration::get('PS_ADVANCED_PAYMENT_API');
+        $this->context->smarty->assign(array(
+            'THEME_DIR' => _THEME_DIR_,
+            'PS_ROOM_PRICE_AUTO_ADD_BREAKDOWN' => Configuration::get('PS_ROOM_PRICE_AUTO_ADD_BREAKDOWN'),
+            'show_option_allow_separate_package' => $show_option_allow_separate_package,
+            'advanced_payment_api' => $advanced_payment_api
+        ));
+    }
+
+    protected function _assignCheckoutValidationVars()
+    {
+        if ($orderRestrictErr = HotelCartBookingData::validateCartBookings()) {
+            $this->errors = array_merge($this->errors, $orderRestrictErr);
+        }
+        $this->context->smarty->assign(array(
+            'orderRestrictErr' => count($orderRestrictErr) ? 1 : 0,
+        ));
+    }
+
+    protected function _assignShoppingCart()
+    {
+        $summary = $this->context->cart->getSummaryDetails();
+        $cartProducts = $this->context->cart->getProducts();
+        if (!empty($cartProducts)) {
+
+            if ($cartBookingInfo = HotelCartBookingData::getHotelCartBookingData()) {
+                $this->context->smarty->assign('cart_htl_data', $cartBookingInfo);
+            }
+            $objServiceProductCartDetail = new ServiceProductCartDetail();
+            if ($hotelProducts = $objServiceProductCartDetail->getServiceProductsInCart(
+                $this->context->cart->id,
+                [Product::SELLING_PREFERENCE_HOTEL_STANDALONE, Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE],
+                $idHotel = null,
+                0,
+                null,
+                null,
+                null,
+                null,
+                0,
+                null,
+                0,
+                null,
+                1
+            )) {
+                $this->context->smarty->assign('hotel_products', $hotelProducts);
+            }
+
+            $standaloneProducts = $objServiceProductCartDetail->getServiceProductsInCart(
+                $this->context->cart->id,
+                [Product::SELLING_PREFERENCE_STANDALONE]
+            );
+
+            if (count($standaloneProducts)) {
+                $this->context->smarty->assign('standalone_products', $standaloneProducts);
+            }
+
+
+            // For Advanced Payment work
+            $objAdvPayment = new HotelAdvancedPayment();
+            if ($objAdvPayment->isAdvancePaymentAvailableForCurrentCart()) {
+                if (Tools::isSubmit('submitAdvPayment')) {
+                    if (Tools::getValue('payment_type') == Order::ORDER_PAYMENT_TYPE_ADVANCE) {
+                        $this->context->cart->is_advance_payment = 1;
+                    } else {
+                        $this->context->cart->is_advance_payment = 0;
+                    }
+                    $this->context->cart->save();
+
+                    Tools::redirect($this->context->link->getPageLink('order-opc'));
+                }
+
+                // set if advance payment is selected by the customer
+                if ($this->context->cart->is_advance_payment) {
+                    $this->context->smarty->assign('is_advance_payment', 1);
+                }
+
+                // get advance payment amount and send data to the template
+                $advPaymentAmount = $this->context->cart->getOrderTotal(true, Cart::ADVANCE_PAYMENT);
+                $this->context->smarty->assign(array(
+                    'advance_payment_active'=> 1,
+                    'advPaymentAmount'=> $advPaymentAmount,
+                    'dueAmount'=> ($this->context->cart->getOrderTotal() - $advPaymentAmount),
+                ));
+            }
+        }
+        $this->context->smarty->assign($summary);
+        $this->context->smarty->assign(array(
+            'HOOK_SHOPPING_CART' => Hook::exec('displayShoppingCartFooter', $summary),
+            'HOOK_SHOPPING_CART_EXTRA' => Hook::exec('displayShoppingCart', $summary)
+        ));
+    }
+
     protected function _assignSummaryInformations()
     {
         $summary = $this->context->cart->getSummaryDetails();
@@ -352,9 +448,6 @@ class ParentOrderControllerCore extends FrontController
             }
         }
 
-        $show_option_allow_separate_package = (!$this->context->cart->isAllProductsInStock(true) && Configuration::get('PS_SHIP_WHEN_AVAILABLE'));
-        $advanced_payment_api = (bool)Configuration::get('PS_ADVANCED_PAYMENT_API');
-
         $this->context->smarty->assign($summary);
         $this->context->smarty->assign(array(
             'token_cart' => Tools::getToken(false),
@@ -369,9 +462,7 @@ class ParentOrderControllerCore extends FrontController
             'CUSTOMIZE_TEXTFIELD' => Product::CUSTOMIZE_TEXTFIELD,
             'lastProductAdded' => $this->context->cart->getLastProduct(),
             'displayVouchers' => $available_cart_rules,
-            'show_option_allow_separate_package' => $show_option_allow_separate_package,
             'smallSize' => Image::getSize(ImageType::getFormatedName('small')),
-            'advanced_payment_api' => $advanced_payment_api
 
         ));
 
@@ -388,7 +479,14 @@ class ParentOrderControllerCore extends FrontController
             $this->context->customer->logout();
             Tools::redirect('');
         } elseif (!Customer::getAddressesTotalById($this->context->customer->id)) {
-            $multi = (int)Tools::getValue('multi-shipping');
+            $objServiceProductCartDetail = new ServiceProductCartDetail();
+            if (count($objServiceProductCartDetail->getServiceProductsInCart(
+                $this->context->cart->id,
+                [Product::SELLING_PREFERENCE_STANDALONE]
+            ))) {
+                $multi = (int)Tools::getValue('multi-shipping');
+                Tools::redirect('index.php?controller=address&back='.urlencode('order.php?step=1'.($multi ? '&multi-shipping='.$multi : '')));
+            }
         }
 
         $customer = $this->context->customer;

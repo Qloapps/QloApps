@@ -99,7 +99,7 @@
 			{foreach from=$languages item=language}
 			<div class="alert alert-warning translatable-field lang-{$language.id_lang}">
 				<i class="icon-link"></i> {l s='The product link will look like this:'}<br/>
-				<strong>{if isset($rewritten_links[$language.id_lang][0])}{$rewritten_links[$language.id_lang][0]|escape:'html':'UTF-8'}{/if}<span id="friendly-url_{$language.id_lang}">{$product->link_rewrite[$language.id_lang]|escape:'html':'UTF-8'}</span>{if isset($rewritten_links[$language.id_lang][1])}{$rewritten_links[$language.id_lang][1]|escape:'html':'UTF-8'}{/if}</strong>
+				<strong>{if isset($rewritten_links[$language.id_lang][0])}{$rewritten_links[$language.id_lang][0]|escape:'html':'UTF-8'}{/if}<span id="friendly-url_{$language.id_lang}">{if isset($product->id)}{$product->link_rewrite[$language.id_lang]|escape:'html':'UTF-8'}{/if}</span>{if isset($rewritten_links[$language.id_lang][1])}{$rewritten_links[$language.id_lang][1]|escape:'html':'UTF-8'}{/if}</strong>
 			</div>
 			{/foreach}
 		</div>

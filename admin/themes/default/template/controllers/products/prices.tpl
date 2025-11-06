@@ -390,7 +390,7 @@ $(document).ready(function () {
 		<a target="_blank" href="{$link->getAdminLink('AdminHotelFeaturePricesSettings')}">{l s='create advanced price rules.'}</a>
 	</div>
 	<div class="table-responsive">
-		<table class="table table-bordered">
+		<table class="table">
 			<thead>
 				<tr>
 					<th>#{l s='Id'}</th>

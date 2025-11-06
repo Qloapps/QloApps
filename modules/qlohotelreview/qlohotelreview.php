@@ -1,21 +1,24 @@
 <?php
 /**
-* 2010-2022 Webkul.
-*
 * NOTICE OF LICENSE
 *
-* All right is reserved,
-* Please go through LICENSE.txt file inside our module
+* This source file is subject to the Open Software License version 3.0
+* that is bundled with this package in the file LICENSE.md
+* It is also available through the world-wide-web at this URL:
+* https://opensource.org/license/osl-3-0-php
+* If you did not receive a copy of the license and are unable to
+* obtain it through the world-wide-web, please send an email
+* to support@qloapps.com so we can send you a copy immediately.
 *
 * DISCLAIMER
 *
-* Do not edit or add to this file if you wish to upgrade this module to newer
-* versions in the future. If you wish to customize this module for your
-* needs please refer to CustomizationPolicy.txt file inside our module for more information.
+* Do not edit or add to this file if you wish to upgrade this module to a newer
+* versions in the future. If you wish to customize this module for your needs
+* please refer to https://store.webkul.com/customisation-guidelines for more information.
 *
 * @author Webkul IN
-* @copyright 2010-2022 Webkul IN
-* @license LICENSE.txt
+* @copyright Since 2010 Webkul
+* @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
 */
 
 if (!defined('_PS_VERSION_')) {
@@ -26,19 +29,22 @@ require_once 'classes/RequiredFiles.php';
 
 class QloHotelReview extends Module
 {
+    public $secure_key;
     public function __construct()
     {
         $this->name = 'qlohotelreview';
         $this->tab = 'front_office_features';
-        $this->version = '1.0.1';
+        $this->version = '1.0.2';
         $this->ps_versions_compliancy = array('min' => '1.6', 'max' => '1.6');
         $this->author = 'Webkul';
         $this->bootstrap = true;
+
         parent::__construct();
+
         $this->secure_key = Tools::encrypt($this->name);
         $this->displayName = $this->l('QloApps Hotel Reviews');
         $this->description = $this->l('This module allows guests to review hotels on specific categories.');
-        $this->confirmUnsinstall = $this->l('Are you sure you want to uninstall?');
+        $this->confirmUninstall = $this->l('Are you sure you want to uninstall?');
     }
 
     public function install()
@@ -126,17 +132,20 @@ class QloHotelReview extends Module
     {
         if (Tools::getValue('controller') == 'product') {
             $idProduct = Tools::getValue('id_product');
-            $objHotelRoomType = new HotelRoomType();
-            $roomTypeInfo = $objHotelRoomType->getRoomTypeInfoByIdProduct($idProduct);
-            $idHotel = $roomTypeInfo['id_hotel'];
-            $reviewImages = QhrHotelReview::getAllImages($idHotel);
-
-            Media::addJsDef(array('qlo_hotel_review_js_vars' => array(
+            $qlo_hotel_review_js_vars = array(
                 'review_ajax_link' => $this->context->link->getModuleLink($this->name),
                 'review_ajax_token' => $this->secure_key,
                 'raty_img_path' => $this->getPathUri().'views/img/raty',
-                'review_images' => $reviewImages,
-            )));
+            );
+            $objHotelRoomType = new HotelRoomType();
+            if ($roomTypeInfo = $objHotelRoomType->getRoomTypeInfoByIdProduct($idProduct)) {
+                $idHotel = $roomTypeInfo['id_hotel'];
+                $reviewImages = QhrHotelReview::getAllImages($idHotel);
+                $qlo_hotel_review_js_vars['review_images'] = $reviewImages;
+
+            }
+            Media::addJsDef(array('qlo_hotel_review_js_vars' => $qlo_hotel_review_js_vars));
+
 
             $this->context->controller->addCSS(_PS_JS_DIR_.'raty/jquery.raty.css');
             $this->context->controller->addJS(_PS_JS_DIR_.'raty/jquery.raty.js');
@@ -215,17 +224,19 @@ class QloHotelReview extends Module
 
     public function hookDisplayRoomTypeDetailRoomTypeNameAfter($params)
     {
-        $idProduct = $params['id_product'];
-        $objHotelRoomType = new HotelRoomType();
-        $roomTypeInfo = $objHotelRoomType->getRoomTypeInfoByIdProduct($idProduct);
-        $idHotel = $roomTypeInfo['id_hotel'];
-        $this->smarty->assign(array(
-            'num_reviews' => QhrHotelReview::getReviewCountByIdHotel($idHotel),
-            'avg_rating' => QhrHotelReview::getAverageRatingByIdHotel($idHotel),
-            'ratting_img_path' => _MODULE_DIR_.'hotelreservationsystem/views/img/Slices/icons-sprite.png',
-        ));
+        if ($params['product']->booking_product) {
+            $idProduct = $params['id_product'];
+            $objHotelRoomType = new HotelRoomType();
+            $roomTypeInfo = $objHotelRoomType->getRoomTypeInfoByIdProduct($idProduct);
+            $idHotel = $roomTypeInfo['id_hotel'];
+            $this->smarty->assign(array(
+                'num_reviews' => QhrHotelReview::getReviewCountByIdHotel($idHotel),
+                'avg_rating' => QhrHotelReview::getAverageRatingByIdHotel($idHotel),
+                'ratting_img_path' => _MODULE_DIR_.'hotelreservationsystem/views/img/Slices/icons-sprite.png',
+            ));
 
-        return $this->display(__FILE__, 'room-type-name-after.tpl');
+            return $this->display(__FILE__, 'room-type-name-after.tpl');
+        }
     }
 
     public function hookActionRoomBookingStatusUpdateAfter($params)
@@ -236,48 +247,51 @@ class QloHotelReview extends Module
         }
     }
 
-    public function hookDisplayProductTab()
+    public function hookDisplayProductTab($params)
     {
-        return $this->display(__FILE__, 'product-tab.tpl');
+        if ($params['product']->booking_product) {
+            return $this->display(__FILE__, 'product-tab.tpl');
+        }
     }
 
-    public function hookDisplayProductTabContent()
+    public function hookDisplayProductTabContent($params)
     {
-        $idProduct = Tools::getValue('id_product');
-        $objHotelRoomType = new HotelRoomType();
-        $roomTypeInfo = $objHotelRoomType->getRoomTypeInfoByIdProduct($idProduct);
-        $idHotel = $roomTypeInfo['id_hotel'];
-        $reviewsAtOnce = (int) Configuration::get('QHR_REVIEWS_AT_ONCE');
-        $reviews = QhrHotelReview::getByHotel(
-            $idHotel,
-            1,
-            $reviewsAtOnce,
-            QhrHotelReview::QHR_SORT_BY_TIME_NEW,
-            $this->context->cookie->id_customer
-        );
+        if ($params['product']->booking_product) {
+            $idProduct = Tools::getValue('id_product');
+            $objHotelRoomType = new HotelRoomType();
+            $reviewsAtOnce = (int) Configuration::get('QHR_REVIEWS_AT_ONCE');
+            if ($roomTypeInfo = $objHotelRoomType->getRoomTypeInfoByIdProduct($idProduct)) {
+                $idHotel = $roomTypeInfo['id_hotel'];
+                $reviews = QhrHotelReview::getByHotel(
+                    $idHotel,
+                    1,
+                    $reviewsAtOnce,
+                    QhrHotelReview::QHR_SORT_BY_TIME_NEW,
+                    $this->context->cookie->id_customer
+                );
+                if (is_array($reviews) && count($reviews)) {
+                    foreach ($reviews as &$review) {
+                        $review['images'] = QhrHotelReview::getImagesById($review['id_hotel_review']);
+                    }
+                }
+                $summary = QhrHotelReview::getSummaryByHotel($idHotel);
+                if (is_array($summary['categories']) && count($summary['categories'])) {
+                    $summary = QhrHotelReviewHelper::prepareCategoriesData($summary);
+                }
 
-        if (is_array($reviews) && count($reviews)) {
-            foreach ($reviews as &$review) {
-                $review['images'] = QhrHotelReview::getImagesById($review['id_hotel_review']);
+                $hasNextPage = QhrHotelReview::hasNextPage($idHotel, 1, $reviewsAtOnce);
+
+                $this->smarty->assign(array(
+                    'id_hotel' => $idHotel,
+                    'reviews' => $reviews,
+                    'summary' => $summary,
+                    'images' => QhrHotelReview::getAllImages($idHotel),
+                    'logged' => $this->context->customer->isLogged(true),
+                    'show_load_more_btn' => $hasNextPage,
+                ));
+                return $this->display(__FILE__, 'product-tab-content.tpl');
             }
         }
-
-        $summary = QhrHotelReview::getSummaryByHotel($idHotel);
-        if (is_array($summary['categories']) && count($summary['categories'])) {
-            $summary = QhrHotelReviewHelper::prepareCategoriesData($summary);
-        }
-
-        $hasNextPage = QhrHotelReview::hasNextPage($idHotel, 1, $reviewsAtOnce);
-
-        $this->smarty->assign(array(
-            'id_hotel' => $idHotel,
-            'reviews' => $reviews,
-            'summary' => $summary,
-            'images' => QhrHotelReview::getAllImages($idHotel),
-            'logged' => $this->context->customer->isLogged(true),
-            'show_load_more_btn' => $hasNextPage,
-        ));
-        return $this->display(__FILE__, 'product-tab-content.tpl');
     }
 
     public function hookActionCleanData($params)
@@ -364,7 +378,7 @@ class QloHotelReview extends Module
         if (!$this->uninstall(false)) {
             return false;
         }
-        if (!$this->install(false)) {
+        if (!$this->install()) {
             return false;
         }
         return true;

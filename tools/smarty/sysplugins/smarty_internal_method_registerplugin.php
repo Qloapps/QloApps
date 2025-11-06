@@ -22,7 +22,7 @@ class Smarty_Internal_Method_RegisterPlugin
      * Registers plugin to be used in templates
      *
      * @api  Smarty::registerPlugin()
-     * @link http://www.smarty.net/docs/en/api.register.plugin.tpl
+     * @link https://www.smarty.net/docs/en/api.register.plugin.tpl
      *
      * @param \Smarty_Internal_TemplateBase|\Smarty_Internal_Template|\Smarty $obj
      * @param string                                                          $type       plugin type

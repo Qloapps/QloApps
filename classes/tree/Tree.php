@@ -415,7 +415,7 @@ class TreeCore
             $this->getContext()->smarty
         );
 
-        if (trim($this->getTitle()) != '' || $this->useToolbar()) {
+        if ($this->getTitle() !== null && trim($this->getTitle()) != '' || $this->useToolbar()) {
             //Create Tree Header Template
             $headerTemplate = $this->getContext()->smarty->createTemplate(
                 $this->getTemplateFile($this->getHeaderTemplate()),

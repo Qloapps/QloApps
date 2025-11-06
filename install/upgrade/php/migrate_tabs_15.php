@@ -166,7 +166,6 @@ function migrate_tabs_15()
     $sql = 'SELECT id_tab FROM '._DB_PREFIX_.'tab
 			WHERE id_tab NOT IN ('.implode(', ', $parent).')
 				AND id_parent = 0';
-    
     $id_tabs = Db::getInstance()->executeS($sql);
     if (is_array($id_tabs) && count($id_tabs)) {
         foreach (Db::getInstance()->executeS($sql) as $row) {

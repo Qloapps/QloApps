@@ -183,13 +183,19 @@ class OrderSlipCore extends ObjectModel
 
         $slipDetails = array();
         foreach ($productsRet as &$slipRow) {
-            $objHtlBooking = new HotelBookingDetail($slipRow['id_htl_booking']);
-            $slipRow['product_id'] = $objHtlBooking->id_product;
-            $slipRow['date_from'] = $objHtlBooking->date_from;
-            $slipRow['date_to'] = $objHtlBooking->date_to;
-            $slipRow['hotel_name'] = $objHtlBooking->hotel_name;
-            $slipRow['product_name'] = $objHtlBooking->room_type_name;
-            $slipRow['room_num'] = $objHtlBooking->room_num;
+            if ($slipRow['id_htl_booking']) {
+                $objHtlBooking = new HotelBookingDetail($slipRow['id_htl_booking']);
+                $slipRow['product_id'] = $objHtlBooking->id_product;
+                $slipRow['date_from'] = $objHtlBooking->date_from;
+                $slipRow['date_to'] = $objHtlBooking->date_to;
+                $slipRow['hotel_name'] = $objHtlBooking->hotel_name;
+                $slipRow['product_name'] = $objHtlBooking->room_type_name;
+                $slipRow['room_num'] = $objHtlBooking->room_num;
+            } else {
+                $objServiceProductOrderDetail = new ServiceProductOrderDetail($slipRow['id_service_product_order_detail']);
+                $slipRow['product_name'] = $objServiceProductOrderDetail->name;
+            }
+
 
             if (isset($orderDetailCustom[$slipRow['id_order_detail']])) {
                 $slipRow = array_merge($orderDetailCustom[$slipRow['id_order_detail']], $slipRow);
@@ -304,7 +310,7 @@ class OrderSlipCore extends ObjectModel
         return OrderSlip::create($order, $product_list, $shipping);
     }
 
-    public static function create(Order $order, $booking_list, $shipping_cost = false, $amount = 0, $amount_choosen = false, $add_tax = true)
+    public static function create(Order $order, $product_list, $shipping_cost = false, $amount = 0, $amount_choosen = false, $add_tax = true)
     {
         $currency = new Currency((int)$order->id_currency);
         $order_slip = new OrderSlip();
@@ -347,25 +353,31 @@ class OrderSlipCore extends ObjectModel
         $order_slip->{'total_products_tax_'.$inc_or_ex_2} = 0;
 
         $total_products = array();
-        foreach ($booking_list as &$booking) {
-            $objHtlBooking = new HotelBookingDetail($booking['id_htl_booking']);
-            $order_detail = new OrderDetail((int)$objHtlBooking->id_order_detail);
+        foreach ($product_list as &$product_row) {
+            if (isset($product_row['id_htl_booking'])) {
+                $objHtlBooking = new HotelBookingDetail($product_row['id_htl_booking']);
+                $order_detail = new OrderDetail((int)$objHtlBooking->id_order_detail);
+                $quantity = (int)$product_row['num_days'];
+            } else if (isset($product_row['id_service_product_order_detail'])) {
+                $objServiceProductOrderDetail = new ServiceProductOrderDetail($product_row['id_service_product_order_detail']);
+                $order_detail = new OrderDetail((int)$objServiceProductOrderDetail->id_order_detail);
+                $quantity = (int)$product_row['quantity'];
+            }
+            $price = (float)$product_row['unit_price'];
 
-            $price = (float)$booking['unit_price'];
-            $numDays = (int)$booking['num_days'];
 
             $order_slip_resume = OrderSlip::getProductSlipResume((int)$order_detail->id);
 
-            if ($numDays + $order_slip_resume['product_quantity'] > $order_detail->product_quantity) {
-                $numDays = $order_detail->product_quantity - $order_slip_resume['product_quantity'];
+            if ($quantity + $order_slip_resume['product_quantity'] > $order_detail->product_quantity) {
+                $quantity = $order_detail->product_quantity - $order_slip_resume['product_quantity'];
             }
 
-            if ($numDays == 0) {
+            if ($quantity == 0) {
                 continue;
             }
 
             if (!Tools::isSubmit('cancelProduct') && $order->hasBeenPaid()) {
-                $order_detail->product_quantity_refunded += $numDays;
+                $order_detail->product_quantity_refunded += $quantity;
             }
 
             $address = Address::initialize($order->id_address_tax, false);
@@ -385,7 +397,7 @@ class OrderSlipCore extends ObjectModel
             }
 
             $product_tax_inc_or_ex_1 = Tools::processPriceRounding(
-                ($price * $numDays),
+                ($price * $quantity),
                 1,
                 $order->round_type,
                 $order->round_mode
@@ -394,7 +406,7 @@ class OrderSlipCore extends ObjectModel
             $order_slip->{'total_products_tax_'.$inc_or_ex_1} += $product_tax_inc_or_ex_1;
 
             $product_tax_inc_or_ex_2 = Tools::processPriceRounding(
-                ($tax_calculator->{$add_or_remove.'Taxes'}($price * $numDays)),
+                ($tax_calculator->{$add_or_remove.'Taxes'}($price * $quantity)),
                 1,
                 $order->round_type,
                 $order->round_mode
@@ -405,10 +417,10 @@ class OrderSlipCore extends ObjectModel
                 $total_products[$id_tax_rules_group] += $product_tax_inc_or_ex_2;
             }
 
-            $booking['unit_price_tax_'.$inc_or_ex_1] = $price;
-            $booking['unit_price_tax_'.$inc_or_ex_2] = $tax_calculator->{$add_or_remove.'Taxes'}($price);
-            $booking['total_price_tax_'.$inc_or_ex_1] = $product_tax_inc_or_ex_1;
-            $booking['total_price_tax_'.$inc_or_ex_2] = $product_tax_inc_or_ex_2;
+            $product_row['unit_price_tax_'.$inc_or_ex_1] = $price;
+            $product_row['unit_price_tax_'.$inc_or_ex_2] = $tax_calculator->{$add_or_remove.'Taxes'}($price);
+            $product_row['total_price_tax_'.$inc_or_ex_1] = $product_tax_inc_or_ex_1;
+            $product_row['total_price_tax_'.$inc_or_ex_2] = $product_tax_inc_or_ex_2;
         }
 
         foreach ($total_products as $key => $price) {
@@ -441,26 +453,26 @@ class OrderSlipCore extends ObjectModel
             return false;
         }
 
-        foreach ($booking_list as $bookingRow) {
-            $order_slip->addProductOrderSlip($bookingRow);
+        foreach ($product_list as $productRow) {
+            $order_slip->addProductOrderSlip($productRow);
         }
-
         return $order_slip->id;
     }
 
-    protected function addProductOrderSlip($booking)
+    protected function addProductOrderSlip($product_row)
     {
         return Db::getInstance()->insert('order_slip_detail', array(
             'id_order_slip' => (int)$this->id,
-            'id_htl_booking' => (int)$booking['id_htl_booking'],
-            'id_order_detail' => (int)$booking['id_order_detail'],
-            'product_quantity' => $booking['quantity'],
-            'unit_price_tax_excl' => $booking['unit_price_tax_excl'],
-            'unit_price_tax_incl' => $booking['unit_price_tax_incl'],
-            'total_price_tax_excl' => $booking['total_price_tax_excl'],
-            'total_price_tax_incl' => $booking['total_price_tax_incl'],
-            'amount_tax_excl' => $booking['total_price_tax_excl'],
-            'amount_tax_incl' => $booking['total_price_tax_incl']
+            'id_htl_booking' => isset($product_row['id_htl_booking']) ? (int)$product_row['id_htl_booking'] : 0,
+            'id_service_product_order_detail' => isset($product_row['id_service_product_order_detail']) ? (int)$product_row['id_service_product_order_detail'] : 0,
+            'id_order_detail' => (int)$product_row['id_order_detail'],
+            'product_quantity' => $product_row['quantity'],
+            'unit_price_tax_excl' => $product_row['unit_price_tax_excl'],
+            'unit_price_tax_incl' => $product_row['unit_price_tax_incl'],
+            'total_price_tax_excl' => $product_row['total_price_tax_excl'],
+            'total_price_tax_incl' => $product_row['total_price_tax_incl'],
+            'amount_tax_excl' => $product_row['total_price_tax_excl'],
+            'amount_tax_incl' => $product_row['total_price_tax_incl']
         ));
     }
 
@@ -542,7 +554,7 @@ class OrderSlipCore extends ObjectModel
     public function getEcoTaxTaxesBreakdown()
     {
         $ecotax_detail = array();
-        foreach ($this->getOrdersSlipDetail((int)$this->id) as $order_slip_details) {
+        foreach (OrderSlip::getOrdersSlipDetail((int)$this->id) as $order_slip_details) {
             $row = Db::getInstance()->getRow('
 					SELECT `ecotax_tax_rate` as `rate`, `ecotax` as `ecotax_tax_excl`, `ecotax` as `ecotax_tax_incl`, `product_quantity`
 					FROM `'._DB_PREFIX_.'order_detail`

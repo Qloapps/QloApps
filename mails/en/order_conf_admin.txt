@@ -10,39 +10,15 @@ Email: {customer_email}
 Order details
 Order: {order_name} Placed on {date}
 Payment: {payment}
-Room Image
-Room Description
-Hotel
-Room Capcity
-Unit Price
-Rooms Qty
-Check-in Date
-Check-out Date
-Total
 
 {cart_booking_data_text}
 
 {extra_demands_details_text}
 
+{normal_products_data_txt}
+
 {discounts}
 
-Total Rooms Cost
-{total_products}
-
-Total Extra Services Cost
-{total_extra_demands_te}
-
-
-Total Rooms Tax
-{total_tax_paid}
-
-Extra Services Tax
-{extra_demands_tax}
-
-Discounts
-{total_discounts}
-
-Final Booking Amount
-{total_paid}
+{order_total_info_txt}
 
 {shop_name} powered by Webkul&trade;

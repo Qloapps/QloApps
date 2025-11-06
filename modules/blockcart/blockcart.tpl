@@ -63,117 +63,16 @@
 											<dl class="products">
 												{foreach from=$products key=data_k item='product' name='myLoop'}
 												{* only show products that are booking or global without room *}
-													{if $product.booking_product || ($product.service_product_type == Product::SERVICE_PRODUCT_WITHOUT_ROOMTYPE)}
-														{assign var='productId' value=$product.id_product}
-														{assign var='productAttributeId' value=$product.id_product_attribute}
-														<dt data-id="cart_block_product_{$product.id_product|intval}_{if $product.id_product_attribute}{$product.id_product_attribute|intval}{else}0{/if}_{if $product.id_address_delivery}{$product.id_address_delivery|intval}{else}0{/if}" class="{if $smarty.foreach.myLoop.first}first_item{elseif $smarty.foreach.myLoop.last}last_item{else}item{/if}">
-															<a class="cart-images" href="{$link->getProductLink($product.id_product, $product.link_rewrite, $product.category)|escape:'html':'UTF-8'}" title="{$product.name|escape:'html':'UTF-8'}"><img src="{$link->getImageLink($product.link_rewrite, $product.id_image, 'cart_default')}" alt="{$product.name|escape:'html':'UTF-8'}" /></a>
-															<div class="cart-info">
-																{block name='blockcart_shopping_cart_product_name'}
-																	<div class="product-name">
-																	<!-- quantity changed for number of rooms -->
-																		<!-- <span class="quantity-formated"><span class="quantity">{$cart_booking_data[$data_k]['total_num_rooms']}</span>&nbsp;x&nbsp;</span> -->
-																		<a class="cart_block_product_name" href="{$link->getProductLink($product, $product.link_rewrite, $product.category, null, null, $product.id_shop, $product.id_product_attribute)|escape:'html':'UTF-8'}" title="{$product.name|escape:'html':'UTF-8'}">{$product.name|truncate:30:'...':true|escape:'html':'UTF-8'}</a>
-																	</div>
-																{/block}
-
-																{if isset($product.attributes_small)}
-																	<div class="product-atributes">
-																		<a href="{$link->getProductLink($product, $product.link_rewrite, $product.category, null, null, $product.id_shop, $product.id_product_attribute)|escape:'html':'UTF-8'}" title="{l s='Product detail' mod='blockcart'}">{$product.attributes_small}</a>
-																	</div>
-																{/if}
-																{block name='blockcart_shopping_cart_product_total_price'}
-																	<div class="cart-info-sec rm_product_info_{$product.id_product}">
-																		<span class="product_info_label">{l s='Price' mod='blockcart'}:</span>
-																		<span class="price product_info_data" ttl_prod_price="{$product.bookingData.total_room_type_amount}">
-																			{if !isset($product.is_gift) || !$product.is_gift}
-																				{displayWtPrice p="`$product.bookingData.total_room_type_amount`"}
-																				<div id="hookDisplayProductPriceBlock-price">
-																					{block name='displayProductPriceBlock'}
-																						{hook h="displayProductPriceBlock" product=$product type="price" from="blockcart"}
-																					{/block}
-																				</div>
-																			{else}
-																				{l s='Free!' mod='blockcart'}
-																			{/if}
-																		</span>
-																	</div>
-																{/block}
-
-																{block name='blockcart_shopping_cart_product_quantity'}
-																	<div class="cart-info-sec rm_product_info_{$product.id_product}">
-																		<span class="product_info_label">{l s='Total Qty.' mod='blockcart'}:</span>
-																		<span class="quantity-formated">
-																			{if $product.booking_product}
-																				<span class="quantity product_info_data">{$product.bookingData['total_num_rooms']}</span>
-																			{else}
-																				<span class="quantity product_info_data">{$product.cart_quantity}</span>
-																			{/if}
-																		</span>
-																	</div>
-																{/block}
-															</div>
-															<span class="remove_link">
-																{if !isset($customizedDatas.$productId.$productAttributeId) && (!isset($product.is_gift) || !$product.is_gift)}
-																	<a class="ajax_cart_block_remove_link" href="{$link->getPageLink('cart', true, NULL, "delete=1&id_product={$product.id_product|intval}&ipa={$product.id_product_attribute|intval}&id_address_delivery={$product.id_address_delivery|intval}&token={$static_token}")|escape:'html':'UTF-8'}" rel="nofollow" title="{l s='remove this product from my cart' mod='blockcart'}">&nbsp;</a>
-																{/if}
-															</span>
-															<div style="clear:both"></div>
-															{if $product.booking_product}
-																{block name='blockcart_shopping_cart_dates'}
-																	<div id="booking_dates_container_{$product.id_product}" class="cart_prod_cont">
-																		<div class="table-responsive">
-																			<table class="table">
-																				<tbody>
-																					<tr>
-																						<th>{l s='Duration' mod='blockcart'}</th>
-																						<th>{l s='Qty.' mod='blockcart'}</th>
-																						<th>{l s='Price' mod='blockcart'}</th>
-																						<th>&nbsp;<!-- {l s='Remove' mod='blockcart'} --></th>
-																					</tr>
-																					{foreach from=$product.bookingData['date_diff'] key=data_k1 item=data_v}
-																						<tr class="rooms_remove_container">
-																							{assign var="is_full_date" value=($show_full_date && ($data_v['data_form']|date_format:'%D' == $data_v['data_to']|date_format:'%D'))}
-																							<td>
-																								{dateFormat date=$data_v['data_form'] full=$is_full_date}&nbsp;-&nbsp;{dateFormat date=$data_v['data_to'] full=$is_full_date}
-																							</td>
-																							<td class="num_rooms_in_date">{$data_v['num_rm']}</td>
-																							<td>{convertPrice price=($data_v['amount'] + $data_v['demand_price'])}</td>
-																							<td><a class="remove_rooms_from_cart_link" href="#" rm_price="{$data_v['amount']}" id_product="{$product.id_product|intval}" date_from="{$data_v['data_form']}" date_to="{$data_v['data_to']}" num_rooms="{$data_v['num_rm']}" title="{l s='remove this room from my cart' mod='blockcart'}"></a></td>
-																						</tr>
-																					{/foreach}
-																				</tbody>
-																			</table>
-																		</div>
-																	</div>
-																{/block}
-															{/if}
-														</dt>
-														{if isset($product.attributes_small)}
-															<dd data-id="cart_block_combination_of_{$product.id_product|intval}{if $product.id_product_attribute}_{$product.id_product_attribute|intval}{/if}_{$product.id_address_delivery|intval}" class="{if $smarty.foreach.myLoop.first}first_item{elseif $smarty.foreach.myLoop.last}last_item{else}item{/if}">
+													{if $product.booking_product || ($product.selling_preference_type == Product::SELLING_PREFERENCE_STANDALONE)|| ($product.selling_preference_type == Product::SELLING_PREFERENCE_HOTEL_STANDALONE) || ($product.selling_preference_type == Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE)}
+														{if $product.selling_preference_type == Product::SELLING_PREFERENCE_HOTEL_STANDALONE || $product.selling_preference_type == Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE}
+                                                            {if isset($product.hotel_wise_data) && $product.hotel_wise_data}
+                                                                {foreach $product.hotel_wise_data as $hotel_wise_data}
+                                                                    {include file="./cartrow.tpl" hotel_wise_data=$hotel_wise_data}
+                                                                {/foreach}
+                                                            {/if}
+														{else}
+															{include file="./cartrow.tpl" hotel_wise_data=false}
 														{/if}
-														<!-- Customizable datas -->
-														{if isset($customizedDatas.$productId.$productAttributeId[$product.id_address_delivery])}
-															{if !isset($product.attributes_small)}
-																<dd data-id="cart_block_combination_of_{$product.id_product|intval}_{if $product.id_product_attribute}{$product.id_product_attribute|intval}{else}0{/if}_{if $product.id_address_delivery}{$product.id_address_delivery|intval}{else}0{/if}" class="{if $smarty.foreach.myLoop.first}first_item{elseif $smarty.foreach.myLoop.last}last_item{else}item{/if}">
-															{/if}
-															<ul class="cart_block_customizations" data-id="customization_{$productId}_{$productAttributeId}">
-																{foreach from=$customizedDatas.$productId.$productAttributeId[$product.id_address_delivery] key='id_customization' item='customization' name='customizations'}
-																	<li name="customization">
-																		<div data-id="deleteCustomizableProduct_{$id_customization|intval}_{$product.id_product|intval}_{$product.id_product_attribute|intval}_{$product.id_address_delivery|intval}" class="deleteCustomizableProduct">
-																			<a class="ajax_cart_block_remove_link" href="{$link->getPageLink('cart', true, NULL, "delete=1&id_product={$product.id_product|intval}&ipa={$product.id_product_attribute|intval}&id_customization={$id_customization|intval}&token={$static_token}")|escape:'html':'UTF-8'}" rel="nofollow">&nbsp;</a>
-																		</div>
-																		{if isset($customization.datas.$CUSTOMIZE_TEXTFIELD.0)}
-																			{$customization.datas.$CUSTOMIZE_TEXTFIELD.0.value|replace:"<br />":" "|truncate:28:'...'|escape:'html':'UTF-8'}
-																		{else}
-																			{l s='Customization #%d:' sprintf=$id_customization|intval mod='blockcart'}
-																		{/if}
-																	</li>
-																{/foreach}
-															</ul>
-															{if !isset($product.attributes_small)}</dd>{/if}
-														{/if}
-														{if isset($product.attributes_small)}</dd>{/if}
 													{/if}
 												{/foreach}
 											</dl>
@@ -300,7 +199,7 @@
 									<i class="icon-check"></i>{l s='Room successfully added to your cart' mod='blockcart'}
 								</h2>
 								<h2 class="layer_cart_product_txt">
-									<i class="icon-check"></i>{l s='Item successfully added to your cart' mod='blockcart'}
+									<i class="icon-check"></i>{l s='Product successfully added to your cart' mod='blockcart'}
 								</h2>
 							{/block}
 							{block name='blockcart_layer_cart_product_image'}
@@ -314,6 +213,14 @@
 									<div class="layer_cart_room_txt">
 										<strong class="dark">{l s='Time Duration' mod='blockcart'} &nbsp;-&nbsp;</strong>
 										<span id="layer_cart_product_time_duration"></span>
+									</div>
+									<div>
+										<strong class="dark layer_cart_product_txt">{l s='Hotel Name' mod='blockcart'} &nbsp;-&nbsp;</strong>
+										<span id="layer_cart_product_hotel_name"></span>
+									</div>
+									<div>
+										<strong class="dark layer_cart_product_txt">{l s='Unit Price' mod='blockcart'} &nbsp;-&nbsp;</strong>
+										<span id="layer_cart_product_unit_price"></span>
 									</div>
 									<div>
 										<strong class="dark layer_cart_room_txt">{if isset($occupancy_required_for_booking) && $occupancy_required_for_booking}{l s='Room occupancy' mod='blockcart'}{else}{l s='Rooms quantity added' mod='blockcart'}{/if} &nbsp;-&nbsp;</strong>
@@ -345,7 +252,7 @@
 								</h2>
 							{/block}
 
-							{block name='blockcart_layer_cart_total_price'}
+							{block name='blockcart_layer_cart_room_total_price'}
 								<div class="layer_cart_row">
 									<strong class="dark">
 										{l s='Total Rooms Cost in cart' mod='blockcart'}
@@ -358,6 +265,25 @@
 										{/if}
 									</strong>
 									<span class="ajax_block_room_total pull-right">
+										{if $cart_qties > 0}
+											{convertPrice price=$cart->getOrderTotal(false, Cart::ONLY_PRODUCTS)}
+										{/if}
+									</span>
+								</div>
+							{/block}
+							{block name='blockcart_layer_cart_product_total_price'}
+								<div class="layer_cart_row">
+									<strong class="dark">
+										{l s='Total Product Cost in cart' mod='blockcart'}
+										{if $display_tax_label}
+											{if $priceDisplay == 1}
+												{l s='(tax excl.)' mod='blockcart'}
+											{else}
+												{l s='(tax incl.)' mod='blockcart'}
+											{/if}
+										{/if}
+									</strong>
+									<span class="ajax_block_product_total pull-right">
 										{if $cart_qties > 0}
 											{convertPrice price=$cart->getOrderTotal(false, Cart::ONLY_PRODUCTS)}
 										{/if}
@@ -476,6 +402,10 @@
 		{addJsDef generated_date=$smarty.now|intval}
 		{addJsDef ajax_allowed=$ajax_allowed|boolval}
 		{addJsDef hasDeliveryAddress=(isset($cart->id_address_delivery) && $cart->id_address_delivery)}
+		{addJsDef SELLING_PREFERENCE_WITH_ROOM_TYPE=Product::SELLING_PREFERENCE_WITH_ROOM_TYPE}
+		{addJsDef SELLING_PREFERENCE_STANDALONE=Product::SELLING_PREFERENCE_STANDALONE}
+		{addJsDef SELLING_PREFERENCE_HOTEL_STANDALONE=Product::SELLING_PREFERENCE_HOTEL_STANDALONE}
+		{addJsDef SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE=Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE}
 
 		{addJsDefL name=customizationIdMessage}{l s='Customization #' mod='blockcart' js=1}{/addJsDefL}
 		{addJsDefL name=removingLinkText}{l s='remove this product from my cart' mod='blockcart' js=1}{/addJsDefL}
@@ -498,6 +428,7 @@
 		{addJsDefL name=children_txt}{l s='Children' mod='blockcart' js=1}{/addJsDefL}
 		{addJsDefL name=price_txt}{l s='Price' mod='blockcart' js=1}{/addJsDefL}
 		{addJsDefL name=total_qty_txt}{l s='Total Qty.' mod='blockcart' js=1}{/addJsDefL}
+		{addJsDefL name=variant_txt}{l s='Variant' mod='blockcart' js=1}{/addJsDefL}
 		{addJsDefL name=qty_txt}{l s='Qty' mod='blockcart' js=1}{/addJsDefL}
 		{addJsDefL name=duration_txt}{l s='Duration' mod='blockcart' js=1}{/addJsDefL}
 		{addJsDefL name=capacity_txt}{l s='Capacity' mod='blockcart' js=1}{/addJsDefL}

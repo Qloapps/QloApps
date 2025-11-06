@@ -1,9 +1,9 @@
 {capture name='_smarty_debug' assign=debug_output}
-    <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
-    <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+    <!DOCTYPE html>
+    <html lang="en">
     <head>
         <title>Smarty Debug Console</title>
-        <style type="text/css">
+        <style>
             {literal}
             body, h1, h2, h3, td, th, p {
                 font-family: sans-serif;
@@ -31,6 +31,7 @@
                 padding: 2px;
                 border-top: 1px solid black;
             }
+
             h3 {
                 text-align: left;
                 font-weight: bold;
@@ -67,11 +68,11 @@
                 color: green;
             }
 
-            .odd {
+            tr:nth-child(odd) {
                 background-color: #eeeeee;
             }
 
-            .even {
+            tr:nth-child(even) {
                 background-color: #fafafa;
             }
 
@@ -84,13 +85,16 @@
                 color: black;
                 font-weight: bold;
             }
+
             #blue h3 {
                 color: blue;
             }
+
             #normal div {
                 color: black;
                 font-weight: normal;
             }
+
             #table_assigned_vars th {
                 color: blue;
                 font-weight: bold;
@@ -99,7 +103,6 @@
             #table_config_vars th {
                 color: maroon;
             }
-
             {/literal}
         </style>
     </head>
@@ -112,11 +115,11 @@
         <h2>included templates &amp; config files (load time in seconds)</h2>
         <div>
             {foreach $template_data as $template}
-                <font color=brown>{$template.name}</font>
-                <br />&nbsp;&nbsp;<span class="exectime">
+                <span style="color: brown;">{$template.name}</span>
+                <br>&nbsp;&nbsp;<span class="exectime">
                 (compile {$template['compile_time']|string_format:"%.5f"}) (render {$template['render_time']|string_format:"%.5f"}) (cache {$template['cache_time']|string_format:"%.5f"})
                  </span>
-                <br />
+                <br>
             {/foreach}
         </div>
     {/if}
@@ -125,13 +128,22 @@
 
     <table id="table_assigned_vars">
         {foreach $assigned_vars as $vars}
-            <tr class="{if $vars@iteration % 2 eq 0}odd{else}even{/if}">
-                <td><h3><font color=blue>${$vars@key}</font></h3>
-                    {if isset($vars['nocache'])}<b>Nocache</b><br />{/if}
-                    {if isset($vars['scope'])}<b>Origin:</b> {$vars['scope']|debug_print_var nofilter}{/if}
+            <tr>
+                <td>
+                    <h3 style="color: blue;">${$vars@key}</h3>
+                    {if isset($vars['nocache'])}<strong>Nocache</strong><br>{/if}
+                    {if isset($vars['scope'])}<strong>Origin:</strong> {$vars['scope']|debug_print_var nofilter}{/if}
                 </td>
-                <td><h3>Value</h3>{$vars['value']|debug_print_var:10:80 nofilter}</td>
-                <td>{if isset($vars['attributes'])}<h3>Attributes</h3>{$vars['attributes']|debug_print_var nofilter} {/if}</td>
+                <td>
+                    <h3>Value</h3>
+                    {$vars['value']|debug_print_var:10:80 nofilter}
+                </td>
+                <td>
+                    {if isset($vars['attributes'])}
+                        <h3>Attributes</h3>
+                        {$vars['attributes']|debug_print_var nofilter}
+                    {/if}
+                </td>
          {/foreach}
     </table>
 
@@ -139,11 +151,14 @@
 
     <table id="table_config_vars">
         {foreach $config_vars as $vars}
-            <tr class="{if $vars@iteration % 2 eq 0}odd{else}even{/if}">
-                <td><h3><font color=blue>#{$vars@key}#</font></h3>
-                    {if isset($vars['scope'])}<b>Origin:</b> {$vars['scope']|debug_print_var nofilter}{/if}
+            <tr>
+                <td>
+                    <h3 style="color: blue;">#{$vars@key}#</h3>
+                    {if isset($vars['scope'])}<strong>Origin:</strong> {$vars['scope']|debug_print_var nofilter}{/if}
                 </td>
-                <td>{$vars['value']|debug_print_var:10:80 nofilter}</td>
+                <td>
+                    {$vars['value']|debug_print_var:10:80 nofilter}
+                </td>
             </tr>
         {/foreach}
 
@@ -152,9 +167,7 @@
     </html>
 {/capture}
 <script type="text/javascript">
-    {$id = '__Smarty__'}
-    {if $display_mode}{$id = "$offset$template_name"|md5}{/if}
-    _smarty_console = window.open("", "console{$id}", "width=1024,height=600,left={$offset},top={$offset},resizable,scrollbars=yes");
+    _smarty_console = window.open("", "console{$targetWindow}", "width=1024,height=600,left={$offset},top={$offset},resizable,scrollbars=yes");
     _smarty_console.document.write("{$debug_output|escape:'javascript' nofilter}");
     _smarty_console.document.close();
 </script>

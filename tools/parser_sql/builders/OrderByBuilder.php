@@ -84,7 +84,7 @@ class OrderByBuilder implements Builder {
     }
     
     protected function buildPosition($parsed) {
-        $builder = new PositionBuilder();
+        $builder = new OrderByPositionBuilder();
         return $builder->build($parsed);
     }
 

@@ -110,6 +110,7 @@ class AdminThemesControllerCore extends AdminController
     public $table = 'theme';
     protected $toolbar_scroll = false;
     private $img_error;
+    protected $can_display_themes;
 
     public function init()
     {
@@ -579,7 +580,7 @@ class AdminThemesControllerCore extends AdminController
 
             if (0 !== $id_based = (int)Tools::getValue('based_on')) {
                 $base_theme = new Theme($id_based);
-                $this->copyTheme($base_theme->directory, $new_dir);
+                AdminThemesController::copyTheme($base_theme->directory, $new_dir);
                 $base_theme = new Theme((int)Tools::getValue('based_on'));
             }
 
@@ -2840,31 +2841,31 @@ class AdminThemesControllerCore extends AdminController
             $this->errors[] = Tools::displayError('You do not have permission to edit this.');
         }
         if ((isset($_GET['responsive'.$this->table]) || isset($_GET['responsive'])) && Tools::getValue($this->identifier)) {
-            if ($this->tabAccess['edit'] === '1') {
+            if ($this->tabAccess['edit'] === 1) {
                 $this->action = 'responsive';
             } else {
                 $this->errors[] = Tools::displayError('You do not have permission to edit this.');
             }
         } elseif ((isset($_GET['default_left_column'.$this->table]) || isset($_GET['default_left_column'])) && Tools::getValue($this->identifier)) {
-            if ($this->tabAccess['edit'] === '1') {
+            if ($this->tabAccess['edit'] === 1) {
                 $this->action = 'defaultleftcolumn';
             } else {
                 $this->errors[] = Tools::displayError('You do not have permission to edit this.');
             }
         } elseif ((isset($_GET['default_right_column'.$this->table]) || isset($_GET['default_right_column'])) && Tools::getValue($this->identifier)) {
-            if ($this->tabAccess['edit'] === '1') {
+            if ($this->tabAccess['edit'] === 1) {
                 $this->action = 'defaultrightcolumn';
             } else {
                 $this->errors[] = Tools::displayError('You do not have permission to edit this.');
             }
         } elseif (Tools::getIsset('id_theme_meta') && Tools::getIsset('leftmeta')) {
-            if ($this->tabAccess['edit'] === '1') {
+            if ($this->tabAccess['edit'] === 1) {
                 $this->action = 'leftmeta';
             } else {
                 $this->errors[] = Tools::displayError('You do not have permission to edit this.');
             }
         } elseif (Tools::getIsset('id_theme_meta') && Tools::getIsset('rightmeta')) {
-            if ($this->tabAccess['edit'] === '1') {
+            if ($this->tabAccess['edit'] === 1) {
                 $this->action = 'rightmeta';
             } else {
                 $this->errors[] = Tools::displayError('You do not have permission to edit this.');

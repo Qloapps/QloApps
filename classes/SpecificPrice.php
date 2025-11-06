@@ -43,6 +43,7 @@ class SpecificPriceCore extends ObjectModel
     public $reduction_type;
     public $from;
     public $to;
+    public $id_htl_cart_booking;
 
     /**
      * @see ObjectModel::$definition
@@ -68,6 +69,7 @@ class SpecificPriceCore extends ObjectModel
             'reduction_type' =>        array('type' => self::TYPE_STRING, 'validate' => 'isReductionType', 'required' => true),
             'from' =>                    array('type' => self::TYPE_DATE, 'validate' => 'isDateFormat', 'required' => true),
             'to' =>                    array('type' => self::TYPE_DATE, 'validate' => 'isDateFormat', 'required' => true),
+            'id_htl_cart_booking' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
         ),
     );
 
@@ -345,7 +347,7 @@ class SpecificPriceCore extends ObjectModel
         }
     }
 
-    public static function getSpecificPrice($id_product, $id_shop, $id_currency, $id_country, $id_group, $quantity, $id_product_attribute = null, $id_customer = 0, $id_cart = 0, $real_quantity = 0, $id_room = 0)
+    public static function getSpecificPrice($id_product, $id_shop, $id_currency, $id_country, $id_group, $quantity, $id_product_attribute = null, $id_customer = 0, $id_cart = 0, $real_quantity = 0, $id_htl_cart_booking = 0)
     {
         if (!SpecificPrice::isFeatureActive()) {
             return array();
@@ -355,7 +357,7 @@ class SpecificPriceCore extends ObjectModel
         ** The price must not change between the top and the bottom of the page
         */
 
-        $key = ((int)$id_product.'-'.(int)$id_shop.'-'.(int)$id_currency.'-'.(int)$id_country.'-'.(int)$id_group.'-'.(int)$quantity.'-'.(int)$id_product_attribute.'-'.(int)$id_cart.'-'.(int)$id_customer.'-'.(int)$real_quantity);
+        $key = ((int)$id_product.'-'.(int)$id_shop.'-'.(int)$id_currency.'-'.(int)$id_country.'-'.(int)$id_group.'-'.(int)$quantity.'-'.(int)$id_product_attribute.'-'.(int)$id_cart.'-'.(int)$id_customer.'-'.(int)$real_quantity.'-'.(int) $id_htl_cart_booking);
         if (!array_key_exists($key, SpecificPrice::$_specificPriceCache)) {
             $query_extra = self::computeExtraConditions($id_product, $id_product_attribute, $id_customer, $id_cart);
             $query = '
@@ -365,6 +367,7 @@ class SpecificPriceCore extends ObjectModel
                 `id_shop` '.self::formatIntInQuery(0, $id_shop).' AND
                 `id_currency` '.self::formatIntInQuery(0, $id_currency).' AND
                 `id_country` '.self::formatIntInQuery(0, $id_country).
+                ' AND `id_htl_cart_booking`='.(int)$id_htl_cart_booking.' '.
                 (Group::isFeatureActive() ? ' AND `id_group` '.self::formatIntInQuery(0, $id_group) : '').' '.$query_extra.'
 				AND IF(`from_quantity` > 1, `from_quantity`, 0) <= ';
 

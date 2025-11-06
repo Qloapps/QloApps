@@ -76,12 +76,12 @@ function update_order_canada()
                 // PS_TAX_EXC = 1, PS_TAX_INC = 0
                 if ($tax_calculation_method == 1) {
                     $total_product = $product['product_price'] * $product['product_quantity'];
-                    $amount_tmp = update_order_canada_ps_round($total_product * ($product['tax_rate'] / 100), 2);
-                    $amount[$product['tax_name']]['amount'] += update_order_canada_ps_round($total_product * ($product['tax_rate'] / 100), 2);
+                    $amount_tmp = update_order_canada_ps_round($total_product * ($product['tax_rate'] / 100));
+                    $amount[$product['tax_name']]['amount'] += update_order_canada_ps_round($total_product * ($product['tax_rate'] / 100));
                 } else {
                     $total_product = $product['product_price'] * $product['product_quantity'];
-                    $amount_tmp = update_order_canada_ps_round($total_product - ($total_product / (1 + ($product['tax_rate'] / 100))), 2);
-                    $amount[$product['tax_name']]['amount'] += update_order_canada_ps_round($total_product - ($total_product / (1 + ($product['tax_rate'] / 100))), 2);
+                    $amount_tmp = update_order_canada_ps_round($total_product - ($total_product / (1 + ($product['tax_rate'] / 100))));
+                    $amount[$product['tax_name']]['amount'] += update_order_canada_ps_round($total_product - ($total_product / (1 + ($product['tax_rate'] / 100))));
                 }
                 }
 

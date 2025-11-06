@@ -72,7 +72,7 @@ class IndexProcessor extends AbstractProcessor {
 
         $currCategory = 'INDEX_NAME';
         $result = array('base_expr' => false, 'name' => false, 'no_quotes' => false, 'index-type' => false, 'on' => false,
-                        'options' => false);
+                        'options' => array());
         $expr = array();
         $base_expr = '';
         $skip = 0;
@@ -300,6 +300,9 @@ class IndexProcessor extends AbstractProcessor {
             $currCategory = '';
         }
 
+        if ($result['options'] === array()) {
+            $result['options'] = false;
+        }
         return $result;
     }
 }

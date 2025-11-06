@@ -277,7 +277,10 @@ class AdminCartRulesControllerCore extends AdminController
             // If the reduction is associated to a specific product, then it must be part of the product restrictions
             if ((int)Tools::getValue('reduction_product') && Tools::getValue('apply_discount_to') == 'specific' && Tools::getValue('apply_discount') != 'off') {
                 $reduction_product = (int)Tools::getValue('reduction_product');
-
+                // In case the product_restriction was unchecked then remove the older products.
+                if (!Tools::getValue('product_restriction')) {
+                    $_POST['product_rule_group'] = array();
+                }
                 // First, check if it is not already part of the restrictions
                 $already_restricted = false;
                 if (is_array($rule_group_array = Tools::getValue('product_rule_group')) && count($rule_group_array) && Tools::getValue('product_restriction')) {
@@ -285,7 +288,7 @@ class AdminCartRulesControllerCore extends AdminController
                         if (is_array($rule_array = Tools::getValue('product_rule_'.$rule_group_id)) && count($rule_array)) {
                             foreach ($rule_array as $rule_id) {
                                 if (Tools::getValue('product_rule_'.$rule_group_id.'_'.$rule_id.'_type') == 'products'
-                                    && in_array($reduction_product, Tools::getValue('product_rule_select_'.$rule_group_id.'_'.$rule_id))) {
+                                    && in_array($reduction_product, Tools::getValue('product_rule_select_'.$rule_group_id.'_'.$rule_id, []))) {
                                     $already_restricted = true;
                                     break 2;
                                 }
@@ -432,23 +435,32 @@ class AdminCartRulesControllerCore extends AdminController
         // Add product rule restrictions
         if (Tools::getValue('product_restriction') && is_array($ruleGroupArray = Tools::getValue('product_rule_group')) && count($ruleGroupArray)) {
             foreach ($ruleGroupArray as $ruleGroupId) {
-                Db::getInstance()->execute('INSERT INTO `'._DB_PREFIX_.'cart_rule_product_rule_group` (`id_cart_rule`, `quantity`)
-				VALUES ('.(int)$currentObject->id.', '.(int)Tools::getValue('product_rule_group_'.$ruleGroupId.'_quantity').')');
-                $id_product_rule_group = Db::getInstance()->Insert_ID();
-
                 if (is_array($ruleArray = Tools::getValue('product_rule_'.$ruleGroupId)) && count($ruleArray)) {
-                    foreach ($ruleArray as $ruleId) {
-                        Db::getInstance()->execute('INSERT INTO `'._DB_PREFIX_.'cart_rule_product_rule` (`id_product_rule_group`, `type`)
-						VALUES ('.(int)$id_product_rule_group.', "'.pSQL(Tools::getValue('product_rule_'.$ruleGroupId.'_'.$ruleId.'_type')).'")');
-                        $id_product_rule = Db::getInstance()->Insert_ID();
-
-                        $values = array();
-                        foreach (Tools::getValue('product_rule_select_'.$ruleGroupId.'_'.$ruleId) as $id) {
-                            $values[] = '('.(int)$id_product_rule.','.(int)$id.')';
+                    foreach ($ruleArray as $ruleKey => $ruleId) {
+                        if (!Tools::getValue('product_rule_select_'.$ruleGroupId.'_'.$ruleId)) {
+                            unset($ruleArray[$ruleKey]);
                         }
-                        $values = array_unique($values);
-                        if (count($values)) {
-                            Db::getInstance()->execute('INSERT INTO `'._DB_PREFIX_.'cart_rule_product_rule_value` (`id_product_rule`, `id_item`) VALUES '.implode(',', $values));
+                    }
+
+                    if ($ruleArray) {
+                        Db::getInstance()->execute('INSERT INTO `'._DB_PREFIX_.'cart_rule_product_rule_group` (`id_cart_rule`, `quantity`)
+                        VALUES ('.(int)$currentObject->id.', '.(int)Tools::getValue('product_rule_group_'.$ruleGroupId.'_quantity').')');
+                        $id_product_rule_group = Db::getInstance()->Insert_ID();
+
+                        foreach ($ruleArray as $ruleId) {
+                            Db::getInstance()->execute('INSERT INTO `'._DB_PREFIX_.'cart_rule_product_rule` (`id_product_rule_group`, `type`)
+                            VALUES ('.(int)$id_product_rule_group.', "'.pSQL(Tools::getValue('product_rule_'.$ruleGroupId.'_'.$ruleId.'_type')).'")');
+                            $id_product_rule = Db::getInstance()->Insert_ID();
+                            $values = array();
+                            if ($selectedProducts = Tools::getValue('product_rule_select_'.$ruleGroupId.'_'.$ruleId)) {
+                                foreach ($selectedProducts as $id) {
+                                    $values[] = '('.(int)$id_product_rule.','.(int)$id.')';
+                                }
+                            }
+                            $values = array_unique($values);
+                            if (count($values)) {
+                                Db::getInstance()->execute('INSERT INTO `'._DB_PREFIX_.'cart_rule_product_rule_value` (`id_product_rule`, `id_item`) VALUES '.implode(',', $values));
+                            }
                         }
                     }
                 }

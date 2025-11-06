@@ -1,4 +1,35 @@
 ------------------------------
+# V1.6.0 to V1.7.0
+------------------------------
+
+## Improved/Changed Features:
+
+* [BO] : [#1524] Updated The hotel and room type filters on the advance price rules listing in the back-office.
+* [BO] : [#1382] Added New columns to exported CSV using admin export in back office.
+* [BO] : [#1337] Updated The flow of date from and date to for advance price rule create and update, and fixed price issue occurring during booking creation in back office.
+* [BO] : [#1469] Fixed Added missing validation in the back-office.
+* [BO] : [#1421] Fixed Translation issues in the back office
+* [BO] : [#1375] Fixed Refund can be enabled in Hotel even if it is Disabled from Refund Rules page Globally
+
+* [FO] : [#1324] Fixed undefined index when a product in cart is neither a booking product nor service product in front-office
+
+* [CO] : [#1492] Added new configuration for the dimension unit for the bed types in the back-office.
+* [CO] : [#1488] Updated the flow for feature prices, added option to add multiple restrictions in a single feature price for a room type in back-office.
+* [CO] : [#1464] Updated Upgrade for PHP version 8.1 to 8.4 and MYSql 8 compatibility
+* [CO] : [#1412] Added New option to add bed types for a room type in back office.
+* [CO] : [#1399] Added Standard product flow in QloApps
+* [CO] : [#1346] Added Feature to create Advanced price rules for multiple room types at once in the back office.
+* [CO] : [#1355] Updated The flow for the max order date and min booking offset.
+* [CO] : [#1528] Updated The Google Maps API endpoints for improved performance and compatibility for the front and back-office.
+* [CO] : [#1505] Added Secured queries with type casting to prevent SQL injection and sanitized values against XSS.
+* [CO] : [#1470] Optimized The tree creation process from the helper tree, added option to add prefix in hotel helper while generating the tree data.
+* [CO] : [#1378] Optimized Functions and removed unnecessary object initialization to reduce overhead.
+* [CO] : [#1357] Updated Date format in hotel booking demands and removed non required validation from validateCartBookings() function.
+* [CO] : [#1356] Added New column 'planned checkout' in the hotel booking detail.
+* [CO] : [#1347] Updated parameters in hook 'actionRoomReallocateAfter'.
+* [CO] : [#1342] Added occupancy in the functions and their calls in the QloApps core.
+
+------------------------------
 # V1.5.0 to V1.6.0
 ------------------------------
 

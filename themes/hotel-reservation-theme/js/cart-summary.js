@@ -23,19 +23,35 @@
 *  International Registered Trademark & Property of PrestaShop SA
 */
 
+var ajax_pre_check_var = '';
+
 $(document).ready(function(){
-	$('.cart_quantity_up').off('click').on('click', function(e){
+	$(document).on('click', '.cart_quantity_up', function(e){
 		e.preventDefault();
 		upQuantity($(this).attr('id').replace('cart_quantity_up_', ''));
 		$('#' + $(this).attr('id').replace('_up_', '_down_')).removeClass('disabled');
+	// 	var prefix = "";
+
+	// if (typeof(cart) == 'undefined' || cart)
+	// 	prefix = '.order-detail-content ';
+	// else
+	// 	prefix = '#fancybox-content ';
+	// 	var id = $(this).attr('id').replace('cart_quantity_up_', 'quantity_')
+	// 	var input = $(prefix + 'input[name=' + id + ']').val(parseInt($(prefix + 'input[name=' + id + ']').val()) + 1);
+
+	// 	updateQty(1, 1, input)
 	});
-	$('.cart_quantity_down').off('click').on('click', function(e){
+	$(document).on('click', '.cart_quantity_down', function(e){
 		e.preventDefault();
 		downQuantity($(this).attr('id').replace('cart_quantity_down_', ''));
 	});
-	$('.cart_quantity_delete' ).off('click').on('click', function(e){
+	$(document).on('click', '.cart_quantity_delete', function(e){
 		e.preventDefault();
 		deleteProductFromSummary($(this).attr('id'));
+	});
+	$(document).on('click', '.cart_room_delete', function(e){
+		e.preventDefault();
+		deleteRoomFromSummary(this);
 	});
 	$('.cart_address_delivery').on('change', function(e){
 		changeAddressDelivery($(this));
@@ -376,12 +392,11 @@ function updateQty(val, cart, el)
 	var prefix = "";
 
 	if (typeof(cart) == 'undefined' || cart)
-		prefix = '#order-detail-content ';
+		prefix = '.order-detail-content ';
 	else
 		prefix = '#fancybox-content ';
 
 	var id = $(el).attr('name');
-
 	var exp = new RegExp("^[0-9]+$");
 
 	if (exp.test(val) == true)
@@ -390,11 +405,13 @@ function updateQty(val, cart, el)
 		var input = $(prefix + 'input[name=' + id + ']').val();
 		var QtyToUp = parseInt(input) - parseInt(hidden);
 
+		var [productId, id_product_option, id_hotel] = getRequestData(id.replace('quantity_', ''));
+
 		if (parseInt(QtyToUp) > 0)
-			upQuantity(id.replace('quantity_', ''), QtyToUp);
+			updateQuantityRequest(productId, 'up', id_product_option, id_hotel, QtyToUp)
 		else if(parseInt(QtyToUp) < 0)
-			downQuantity(id.replace('quantity_', ''), QtyToUp);
-	}
+			updateQuantityRequest(productId, 'down', id_product_option, id_hotel, QtyToUp)
+		}
 	else
 		$(prefix + 'input[name=' + id + ']').val($(prefix + 'input[name=' + id + '_hidden]').val());
 
@@ -417,7 +434,15 @@ function deleteProductFromSummary(id)
 		customizationId = parseInt(ids[2]);
 	if (typeof(ids[3]) !== 'undefined')
 		id_address_delivery = parseInt(ids[3]);
-	$.ajax({
+
+	var id_product_option = 0;
+	var id_hotel = 0;
+
+	var [productId, id_product_option, id_hotel] = getRequestData(id);
+	if (ajax_pre_check_var) {
+		ajax_pre_check_var.abort();
+	}
+	ajax_pre_check_var = $.ajax({
 		type: 'POST',
 		headers: { "cache-control": "no-cache" },
 		url: baseUri + '?rand=' + new Date().getTime(),
@@ -427,6 +452,8 @@ function deleteProductFromSummary(id)
 		data: 'controller=cart'
 			+ '&ajax=true&delete=true&summary=true'
 			+ '&id_product='+productId
+			+ '&id_product_option=' + id_product_option
+			+ '&id_hotel=' + id_hotel
 			+ '&ipa='+productAttributeId
 			+ '&id_address_delivery='+id_address_delivery
 			+ ((customizationId !== 0) ? '&id_customization=' + customizationId : '')
@@ -519,6 +546,7 @@ function deleteProductFromSummary(id)
 						});
 				}
 				updateCartSummary(jsonData.summary);
+				updateOpcData();
 				if (window.ajaxCart != undefined)
 					ajaxCart.updateCart(jsonData);
 				updateCustomizedDatas(jsonData.customizedDatas);
@@ -552,6 +580,74 @@ function deleteProductFromSummary(id)
 	});
 }
 
+function deleteRoomFromSummary(el)
+{
+	var id_product = $(el).data('id_product');
+	var date_from = $(el).data('date_from');
+	var date_to = $(el).data('date_to');
+	var qty = $(el).data('qty');
+	if (ajax_pre_check_var) {
+		ajax_pre_check_var.abort();
+	}
+	ajax_pre_check_var = $.ajax({
+		type: 'POST',
+		headers: { "cache-control": "no-cache" },
+		url: baseUri + '?rand=' + new Date().getTime(),
+		async: true,
+		cache: false,
+		dataType: 'json',
+		data: 'controller=cart'
+			+ '&ajax=true&add=true&summary=true'
+			+ '&op=down'
+			+ '&qty='+qty
+			+ '&id_product='+id_product
+			+ '&dateFrom='+date_from
+			+ '&dateTo='+date_to
+			+ '&token=' + static_token
+			+ '&allow_refresh=1',
+		success: function(jsonData)
+		{
+			if (jsonData.hasError) {
+				var errors = '';
+				for(var error in jsonData.errors)
+					//IE6 bug fix
+					if(error !== 'indexOf')
+						errors += $('<div />').html(jsonData.errors[error]).text() + "\n";
+					if (!!$.prototype.fancybox)
+						$.fancybox.open([
+						{
+								type: 'inline',
+								autoScale: true,
+								minHeight: 30,
+								content: '<p class="fancybox-error">' + errors + '</p>'
+						}],
+						{
+								padding: 0
+						});
+					else
+						alert(errors);
+			} else {
+				if (jsonData.refresh)
+				{
+					location.reload();
+					return;
+				}
+				updateCartSummary(jsonData.summary);
+				updateOpcData();
+				if (window.ajaxCart != undefined)
+					ajaxCart.updateCart(jsonData);
+				updateCustomizedDatas(jsonData.customizedDatas);
+				updateHookShoppingCart(jsonData.HOOK_SHOPPING_CART);
+				updateHookShoppingCartExtra(jsonData.HOOK_SHOPPING_CART_EXTRA);
+				if (typeof(getCarrierListAndUpdate) !== 'undefined' && jsonData.summary.products.length > 0)
+					getCarrierListAndUpdate();
+				if (typeof(updatePaymentMethodsDisplay) !== 'undefined')
+					updatePaymentMethodsDisplay();
+			}
+		}
+	});
+}
+
 function refreshOddRow()
 {
 	var odd_class = 'odd';
@@ -574,26 +670,28 @@ function refreshOddRow()
 	});
 	$('.cart_item:last-child, .customization:last-child').addClass('last_item');
 }
+var timer = '';
+function debounce(func, delay) {
+	if (ajax_pre_check_var) {
+		ajax_pre_check_var.abort();
+	}
 
-function upQuantity(id, qty)
+	// return function() {
+	  const context = this;
+	  const args = arguments;
+	  clearTimeout(timer);
+	  timer = setTimeout(function() {
+		  func.apply(context, args);
+	  }, delay);
+	// };
+  }
+
+function updateQuantityRequest(productId, op, id_product_option, id_hotel, qty)
 {
-	if (typeof(qty) == 'undefined' || !qty)
-		qty = 1;
-	var customizationId = 0;
-	var productId = 0;
-	var productAttributeId = 0;
-	var id_address_delivery = 0;
-	var ids = 0;
-	ids = id.split('_');
-	productId = parseInt(ids[0]);
-	if (typeof(ids[1]) !== 'undefined')
-		productAttributeId = parseInt(ids[1]);
-	if (typeof(ids[2]) !== 'undefined' && ids[2] !== 'nocustom')
-		customizationId = parseInt(ids[2]);
-	if (typeof(ids[3]) !== 'undefined')
-		id_address_delivery = parseInt(ids[3]);
-
-	$.ajax({
+	if (ajax_pre_check_var) {
+		ajax_pre_check_var.abort();
+	}
+	ajax_pre_check_var = $.ajax({
 		type: 'POST',
 		headers: { "cache-control": "no-cache" },
 		url: baseUri + '?rand=' + new Date().getTime(),
@@ -606,10 +704,10 @@ function upQuantity(id, qty)
 			+ '&getproductprice=true'
 			+ '&summary=true'
 			+ '&id_product=' + productId
-			+ '&ipa=' + productAttributeId
-			+ '&id_address_delivery=' + id_address_delivery
-			+ ((customizationId !== 0) ? '&id_customization=' + customizationId : '')
+			+ '&id_product_option=' + id_product_option
+			+ '&id_hotel=' + id_hotel
 			+ '&qty=' + qty
+			+ '&op=' + op
 			+ '&token=' + static_token
 			+ '&allow_refresh=1',
 		success: function(jsonData)
@@ -617,40 +715,48 @@ function upQuantity(id, qty)
 			if (jsonData.hasError)
 			{
 				var errors = '';
-				for(var error in jsonData.errors)
+				for(var error in jsonData.errors) {
 					//IE6 bug fix
-					if(error !== 'indexOf')
+					if(error !== 'indexOf') {
 						errors += $('<div />').html(jsonData.errors[error]).text() + "\n";
-				if (!!$.prototype.fancybox)
-				    $.fancybox.open([
-			        {
-			            type: 'inline',
-			            autoScale: true,
-			            minHeight: 30,
-			            content: '<p class="fancybox-error">' + errors + '</p>'
-			        }],
+                    }
+                }
+
+				if (!!$.prototype.fancybox) {
+					$.fancybox.open([
 					{
-				        padding: 0
-				    });
-				else
-				    alert(errors);
-				$('input[name=quantity_'+ id +']').val($('input[name=quantity_'+ id +'_hidden]').val());
+						type: 'inline',
+						autoScale: true,
+						minHeight: 30,
+						content: '<p class="fancybox-error">' + errors + '</p>'
+					}],
+					{
+						padding: 0
+					});
+                } else {
+					alert(errors);
+                }
 			}
 			else
 			{
-				if (jsonData.refresh)
+				if (jsonData.refresh) {
 					window.location.href = window.location.href;
+                }
 				updateCartSummary(jsonData.summary);
-				if (window.ajaxCart != undefined)
+				updateOpcData();
+				if (window.ajaxCart != 'undefined') {
 					ajaxCart.updateCart(jsonData);
-				if (customizationId !== 0)
-					updateCustomizedDatas(jsonData.customizedDatas);
+                }
+				// if (customizationId !== 0)
+				// 	updateCustomizedDatas(jsonData.customizedDatas);
 				updateHookShoppingCart(jsonData.HOOK_SHOPPING_CART);
 				updateHookShoppingCartExtra(jsonData.HOOK_SHOPPING_CART_EXTRA);
-				if (typeof(getCarrierListAndUpdate) !== 'undefined')
+				if (typeof(getCarrierListAndUpdate) !== 'undefined') {
 					getCarrierListAndUpdate();
-				if (typeof(updatePaymentMethodsDisplay) !== 'undefined')
+                }
+				if (typeof(updatePaymentMethodsDisplay) !== 'undefined') {
 					updatePaymentMethodsDisplay();
+                }
 			}
 		},
 		error: function(XMLHttpRequest, textStatus, errorThrown) {
@@ -658,127 +764,84 @@ function upQuantity(id, qty)
 			{
 				error = "TECHNICAL ERROR: unable to save update quantity \n\nDetails:\nError thrown: " + XMLHttpRequest + "\n" + 'Text status: ' + textStatus;
 				if (!!$.prototype.fancybox)
-				    $.fancybox.open([
-			        {
-			            type: 'inline',
-			            autoScale: true,
-			            minHeight: 30,
-			            content: '<p class="fancybox-error">' + error + '</p>'
-			        }],
+					$.fancybox.open([
 					{
-				        padding: 0
-				    });
+						type: 'inline',
+						autoScale: true,
+						minHeight: 30,
+						content: '<p class="fancybox-error">' + error + '</p>'
+					}],
+					{
+						padding: 0
+					});
 				else
-				    alert(error);
+					alert(error);
 			}
 		}
 	});
+}
+
+function getRequestData(id)
+{
+	var ids = 0;
+	ids = id.split('_');
+	productId = parseInt(ids[0]);
+	id_product_option = 0;
+	id_hotel = 0;
+	if (typeof(ids[1]) !== 'undefined')
+		id_product_option = parseInt(ids[1]);
+	if (typeof(ids[2]) !== 'undefined' && ids[2] !== 'nocustom')
+		id_hotel = parseInt(ids[2]);
+
+	return [productId, id_product_option, id_hotel];
+}
+
+function upQuantity(id, qty)
+{
+	if (typeof(qty) == 'undefined' || !qty) {
+		qty = 1;
+    }
+	var productId = 0;
+	var id_product_option = 0;
+	var id_hotel = 0;
+
+	var [productId, id_product_option, id_hotel] = getRequestData(id);
+	if (typeof(cart) == 'undefined' || cart) {
+		prefix = '.order-detail-content ';
+    } else {
+		prefix = '#fancybox-content ';
+    }
+
+    updateQuantityRequest(productId, 'up', id_product_option, id_hotel, qty)
 }
 
 function downQuantity(id, qty)
 {
 	var val = $('input[name=quantity_' + id + ']').val();
 	var newVal = val;
-	if(typeof(qty) == 'undefined' || !qty)
-	{
+	if(typeof(qty) == 'undefined' || !qty) {
 		qty = 1;
 		newVal = val - 1;
-	}
-	else if (qty < 0)
+	} else if (qty < 0) {
 		qty = -qty;
+    }
 
-	var customizationId = 0;
 	var productId = 0;
-	var productAttributeId = 0;
-	var id_address_delivery = 0;
-	var ids = 0;
+	var id_product_option = 0;
+	var id_hotel = 0;
+	var [productId, id_product_option, id_hotel] = getRequestData(id);
 
-	ids = id.split('_');
-	productId = parseInt(ids[0]);
-	if (typeof(ids[1]) !== 'undefined')
-		productAttributeId = parseInt(ids[1]);
-	if (typeof(ids[2]) !== 'undefined' && ids[2] !== 'nocustom')
-		customizationId = parseInt(ids[2]);
-	if (typeof(ids[3]) !== 'undefined')
-		id_address_delivery = parseInt(ids[3]);
+	if (typeof(cart) == 'undefined' || cart) {
+		prefix = '.order-detail-content ';
+    } else {
+		prefix = '#fancybox-content ';
+    }
 
-	if (newVal > 0 || $('#product_' + id + '_gift').length)
-	{
-		$.ajax({
-			type: 'POST',
-			headers: { "cache-control": "no-cache" },
-			url: baseUri + '?rand=' + new Date().getTime(),
-			async: true,
-			cache: false,
-			dataType: 'json',
-			data: 'controller=cart'
-				+ '&ajax=true'
-				+ '&add=true'
-				+ '&getproductprice=true'
-				+ '&summary=true'
-				+ '&id_product='+productId
-				+ '&ipa='+productAttributeId
-				+ '&id_address_delivery='+id_address_delivery
-				+ '&op=down'
-				+ ((customizationId !== 0) ? '&id_customization='+customizationId : '')
-				+ '&qty='+qty
-				+ '&token='+static_token
-				+ '&allow_refresh=1',
-			success: function(jsonData)
-			{
-				if (jsonData.hasError)
-				{
-					var errors = '';
-					for(var error in jsonData.errors)
-						//IE6 bug fix
-						if(error !== 'indexOf')
-							errors += $('<div />').html(jsonData.errors[error]).text() + "\n";
-                    if (!!$.prototype.fancybox)
-                        $.fancybox.open([
-                            {
-                                type: 'inline',
-                                autoScale: true,
-                                minHeight: 30,
-                                content: '<p class="fancybox-error">' + errors + '</p>'
-                            }],
-                            {
-                                padding: 0
-                            });
-                    else
-                        alert(errors);
-					$('input[name=quantity_' + id + ']').val($('input[name=quantity_' + id + '_hidden]').val());
-				}
-				else
-				{
-					if (jsonData.refresh)
-						window.location.href = window.location.href;
-					updateCartSummary(jsonData.summary);
-
-					if (window.ajaxCart !== undefined)
-						ajaxCart.updateCart(jsonData);
-					if (customizationId !== 0)
-						updateCustomizedDatas(jsonData.customizedDatas);
-					updateHookShoppingCart(jsonData.HOOK_SHOPPING_CART);
-					updateHookShoppingCartExtra(jsonData.HOOK_SHOPPING_CART_EXTRA);
-
-					if (newVal == 0)
-						$('#product_' + id).hide();
-
-					if (typeof(getCarrierListAndUpdate) !== 'undefined')
-						getCarrierListAndUpdate();
-					if (typeof(updatePaymentMethodsDisplay) !== 'undefined')
-						updatePaymentMethodsDisplay();
-				}
-			},
-			error: function(XMLHttpRequest, textStatus, errorThrown) {
-				if (textStatus !== 'abort')
-					alert("TECHNICAL ERROR: unable to save update quantity \n\nDetails:\nError thrown: " + XMLHttpRequest + "\n" + 'Text status: ' + textStatus);
-			}
-		});
-
-	}
-	else
-	{
+	if (newVal > 0 || $('#product_' + id + '_gift').length) {
+		updateQuantityRequest(productId, 'down', id_product_option, id_hotel, qty)
+		$(prefix + 'input[name=quantity_' + id + ']').val(newVal);
+		$(prefix + 'input[name=quantity_' + id + '_hidden]').val(newVal);
+	} else {
 		deleteProductFromSummary(id);
 	}
 }
@@ -866,10 +929,12 @@ function updateCartSummary(json)
 		var key_for_blockcart_nocustom = product_list[i].id_product + '_' + product_list[i].id_product_attribute + '_' + ((product_list[i].id_customization && product_list[i].quantity_without_customization != product_list[i].quantity)? 'nocustom' : '0') + '_' + product_list[i].id_address_delivery;
 
 		$('#product_price_' + key_for_blockcart).html('<li class="' + current_price_class + '">' + current_price + '</li>' + initial_price_text);
-		if (typeof(product_list[i].customizationQuantityTotal) !== 'undefined' && product_list[i].customizationQuantityTotal > 0)
+		if (typeof(product_list[i].customizationQuantityTotal) !== 'undefined' && product_list[i].customizationQuantityTotal > 0) {
 			$('#total_product_price_' + key_for_blockcart).html(formatCurrency(product_customization_total, currencyFormat, currencySign, currencyBlank));
-		else
+		}
+		else {
 			$('#total_product_price_' + key_for_blockcart).html(formatCurrency(product_total, currencyFormat, currencySign, currencyBlank));
+		}
 		if (product_list[i].quantity_without_customization != product_list[i].quantity)
 			$('#total_product_price_' + key_for_blockcart_nocustom).html(formatCurrency(product_total, currencyFormat, currencySign, currencyBlank));
 

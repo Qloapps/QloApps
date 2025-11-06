@@ -32,13 +32,13 @@
 			{$navigationPipe}
 		</span>
 		<a href="{$link->getPageLink('order-follow', true)|escape:'html':'UTF-8'}">
-			{l s='Booking refund requests'}
+			{l s='Refund requests'}
 		</a>
 		<span class="navigation-pipe">
 			{$navigationPipe}
 		</span>
 		<span class="navigation_page">
-			{l s='Booking refund detail'}
+			{l s='Refund detail'}
 		</span>
 	{/capture}
 
@@ -48,52 +48,95 @@
 	<div class="panel card">
 		{block name='order_return_heading'}
 			<h1 class="page-heading bottom-indent">
-				<i class="icon-tasks"></i> &nbsp;{l s='Booking Refund Requests'}
+				<i class="icon-tasks"></i> &nbsp;{l s='Refund Requests'}
 			</h1>
 		{/block}
 		{block name='order_return_detail'}
-			<div class="table-responsive wk-datatable-wrapper">
-				<table class="table table-bordered">
-					<tr>
-						<th>{l s='Rooms'}</th>
-						<th>{l s='Room type'}</th>
-						<th>{l s='Hotel'}</th>
-						<th>{l s='Duration'}</th>
-						<th>{l s='Total rooms price (tax incl.)'}</th>
-						<th>{l s='Extra services price (tax incl.)'}</th>
-						{if $isRefundCompleted}
-							<th>{l s='Refund amount'}</th>
-							<th>{l s='Refund Status'}</th>
-						{/if}
-					</tr>
-					{foreach from=$refundReqBookings item=$booking name=refundRequest}
+			{if $refundReqBookings}
+                {if isset($refundReqProducts) && $refundReqProducts}
+                    <h1 class="page-subheading">{l s='Rooms refund requests'}</h1>
+                {/if}
+				<div class="table-responsive wk-datatable-wrapper">
+					<table class="table table-bordered">
 						<tr>
-							<td>{l s='Room'} - {$smarty.foreach.refundRequest.iteration|string_format:'%02d'}</td>
-							<td>{$booking['room_type_name']|escape:'htmlall':'UTF-8'}</td>
-							<td>{$booking['hotel_name']|escape:'htmlall':'UTF-8'}</td>
-							{assign var="is_full_date" value=($show_full_date && ($booking['date_from']|date_format:'%D' == $booking['date_to']|date_format:'%D'))}
-							<td>{dateFormat date=$booking['date_from'] full=$is_full_date} {l s='To'} {dateFormat date=$booking['date_to'] full=$is_full_date}</td>
-							<td>{displayPrice price=$booking['total_price_tax_incl'] currency=$orderCurrency['id']}</td>
-							<td>{displayPrice price=$booking['extra_service_total_price_tax_incl'] currency=$orderCurrency['id']}</td>
+							<th>{l s='Rooms'}</th>
+							<th>{l s='Room type'}</th>
+							<th>{l s='Hotel'}</th>
+							<th>{l s='Duration'}</th>
+							<th>{l s='Total rooms price (tax incl.)'}</th>
+							<th>{l s='Extra services price (tax incl.)'}</th>
 							{if $isRefundCompleted}
-								<td>
-									{displayPrice price=$booking['refunded_amount'] currency=$orderCurrency['id']}
-								</td>
-								<td>
-									{if $booking['is_cancelled']}
-										<span class="badge badge-danger">{l s='Cancelled' mod='hotelreservationsystem'}</span>
-									{* used id_customization to check if in this request which bookings are refunded or not*}
-									{else if $booking['id_customization']}
-										<span class="badge badge-success">{l s='Refunded' mod='hotelreservationsystem'}</span>
-									{else}
-										<span class="badge badge-danger">{l s='Denied' mod='hotelreservationsystem'}</span>
-									{/if}
-								</td>
+								<th>{l s='Refund amount'}</th>
+								<th>{l s='Refund Status'}</th>
 							{/if}
 						</tr>
-					{/foreach}
-				</table>
-			</div>
+						{foreach from=$refundReqBookings item=$booking name=refundRequest}
+							<tr>
+								<td>{l s='Room'} - {$smarty.foreach.refundRequest.iteration|string_format:'%02d'}</td>
+								<td>{$booking['room_type_name']|escape:'htmlall':'UTF-8'}</td>
+								<td>{$booking['hotel_name']|escape:'htmlall':'UTF-8'}</td>
+								{assign var="is_full_date" value=($show_full_date && ($booking['date_from']|date_format:'%D' == $booking['date_to']|date_format:'%D'))}
+								<td>{dateFormat date=$booking['date_from'] full=$is_full_date} {l s='To'} {dateFormat date=$booking['date_to'] full=$is_full_date}</td>
+								<td>{displayPrice price=$booking['total_price_tax_incl'] currency=$orderCurrency['id']}</td>
+								<td>{displayPrice price=$booking['extra_service_total_price_tax_incl'] currency=$orderCurrency['id']}</td>
+								{if $isRefundCompleted}
+									<td>
+										{displayPrice price=$booking['refunded_amount'] currency=$orderCurrency['id']}
+									</td>
+									<td>
+										{if $booking['is_cancelled']}
+											<span class="badge badge-danger">{l s='Cancelled' mod='hotelreservationsystem'}</span>
+										{* used id_customization to check if in this request which bookings are refunded or not*}
+										{else if $booking['id_customization']}
+											<span class="badge badge-success">{l s='Refunded' mod='hotelreservationsystem'}</span>
+										{else}
+											<span class="badge badge-danger">{l s='Denied' mod='hotelreservationsystem'}</span>
+										{/if}
+									</td>
+								{/if}
+							</tr>
+						{/foreach}
+					</table>
+				</div>
+			{/if}
+			{if $refundReqProducts}
+                <h1 class="page-subheading">{l s='Products refund requests'}</h1>
+				<div class="table-responsive wk-datatable-wrapper">
+					<table class="table table-bordered">
+						<tr>
+							<th>{l s='Product name'}</th>
+							<th>{l s='Quantity'}</th>
+							<th>{l s='Total price (tax incl.)'}</th>
+							{if $isRefundCompleted}
+								<th>{l s='Refund amount'}</th>
+								<th>{l s='Refund Status'}</th>
+							{/if}
+						</tr>
+						{foreach from=$refundReqProducts item=$product name=refundRequest}
+							<tr>
+								<td>{$product['name']|escape:'htmlall':'UTF-8'}{if isset($product['option_name']) && $product['option_name']} : {$product['option_name']}{/if}</td>
+								<td>{if $product['allow_multiple_quantity']}{$product['quantity']|escape:'htmlall':'UTF-8'}{else}--{/if}</td>
+								<td>{displayPrice price=$product['total_price_tax_incl'] currency=$orderCurrency['id']}</td>
+								{if $isRefundCompleted}
+									<td>
+										{displayPrice price=$product['refunded_amount'] currency=$orderCurrency['id']}
+									</td>
+									<td>
+										{if $product['is_cancelled']}
+											<span class="badge badge-danger">{l s='Cancelled' mod='hotelreservationsystem'}</span>
+										{* used id_customization to check if in this request which bookings are refunded or not*}
+										{else if $product['id_customization']}
+											<span class="badge badge-success">{l s='Refunded' mod='hotelreservationsystem'}</span>
+										{else}
+											<span class="badge badge-danger">{l s='Denied' mod='hotelreservationsystem'}</span>
+										{/if}
+									</td>
+								{/if}
+							</tr>
+						{/foreach}
+					</table>
+				</div>
+			{/if}
 		{/block}
 
 		{block name='order_return_current_status'}

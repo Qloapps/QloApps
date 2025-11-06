@@ -185,9 +185,21 @@ class AdminCustomerPreferencesControllerCore extends AdminController
 
     public function beforeUpdateOptions()
     {
-        $fieldData = $this->fields_options['customer_kpi']['fields']['PS_KPI_FREQUENT_CUSTOMER_NB_ORDERS'];
+        $frequentCustomerField = $this->fields_options['customer_kpi']['fields']['PS_KPI_FREQUENT_CUSTOMER_NB_ORDERS'];
         if (!Tools::getValue('PS_KPI_FREQUENT_CUSTOMER_NB_ORDERS')) {
-            $this->errors[] = sprintf(Tools::displayError('field %s must be greater than 0.'), $fieldData['title']);;
+            $this->errors[] = sprintf(Tools::displayError('field %s must be greater than 0.'), $frequentCustomerField['title']);;
+        }
+        $revpacField = $this->fields_options['customer_kpi']['fields']['PS_KPI_REVPAC_NB_DAYS'];
+        if (!Tools::getValue('PS_KPI_REVPAC_NB_DAYS')) {
+            $this->errors[] = sprintf(Tools::displayError('field %s must be greater than 0.'), $revpacField['title']);;
+        }
+        $conversionRateField = $this->fields_options['customer_kpi']['fields']['PS_KPI_CONVERSION_RATE_NB_DAYS'];
+        if (!Tools::getValue('PS_KPI_CONVERSION_RATE_NB_DAYS')) {
+            $this->errors[] = sprintf(Tools::displayError('field %s must be greater than 0.'), $conversionRateField['title']);;
+        }
+        $newCustomerNumDaysField = $this->fields_options['customer_kpi']['fields']['PS_KPI_NEW_CUSTOMERS_NB_DAYS'];
+        if (!Tools::getValue('PS_KPI_NEW_CUSTOMERS_NB_DAYS')) {
+            $this->errors[] = sprintf(Tools::displayError('field %s must be greater than 0.'), $newCustomerNumDaysField['title']);;
         }
     }
 

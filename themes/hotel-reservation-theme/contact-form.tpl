@@ -42,7 +42,7 @@
 						<div class="htl-global-address-div col-md-8 col-sm-12">
 							{if isset($gblHtlPhone) && $gblHtlPhone }
 								<div>
-									<p class="global-address-header">{l s='Main Branch'}</p>
+									<p class="global-address-header"><i class="icon-building"></i> {l s='Main Branch'}</p>
 									<p class="global-address-value">
 										{$gblHtlAddress}
 									</p>
@@ -50,7 +50,7 @@
 							{/if}
 							{if isset($gblHtlPhone) && $gblHtlPhone}
 								<div>
-									<p class="global-address-header">{l s='Phone'}</p>
+									<p class="global-address-header"><i class="icon-phone"></i> {l s='Phone'}</p>
 									<p class="global-address-value">
 										{$gblHtlPhone}
 									</p>
@@ -58,9 +58,25 @@
 							{/if}
 							{if isset($gblHtlEmail) && $gblHtlEmail}
 								<div>
-									<p class="global-address-header">{l s='Mail Us'}</p>
+									<p class="global-address-header"><i class="icon-envelope"></i> {l s='Mail Us'}</p>
 									<p class="global-address-value">
 										{$gblHtlEmail}
+									</p>
+								</div>
+							{/if}
+							{if isset($gblHtlRegistrationNumber) && $gblHtlRegistrationNumber}
+								<div>
+									<p class="global-address-header"><i class="icon-book"></i> {l s='Registration number'}</p>
+									<p class="global-address-value">
+										{$gblHtlRegistrationNumber}
+									</p>
+								</div>
+							{/if}
+							{if isset($gblHtlFax) && $gblHtlFax}
+								<div>
+									<p class="global-address-header"><i class="icon-fax"></i> {l s='Fax'}</p>
+									<p class="global-address-value">
+										{$gblHtlFax}
 									</p>
 								</div>
 							{/if}
@@ -70,25 +86,56 @@
 			{/if}
 			<div class="col-sm-6 {if !(isset($gblHtlAddress) && $gblHtlAddress) && !(isset($gblHtlPhone) && $gblHtlPhone) && !(isset($gblHtlEmail) && $gblHtlEmail)} col-sm-offset-3 {/if}">
 				{block name='contact_form_content'}
+				{if isset($customerThread.token)}
+					<form action="{$link->getPageLink('contact', null, null, array('token' => $customerThread.token))}" method="post" class="contact-form-box" enctype="multipart/form-data">
+				{else}
 					<form action="{$link->getPageLink('contact')}" method="post" class="contact-form-box" enctype="multipart/form-data">
-						{if isset($customerThread.id_contact) && $customerThread.id_contact && $contacts|count}
-							{assign var=flag value=true}
-							{foreach from=$contacts item=contact}
-								{if $contact.id_contact == $customerThread.id_contact}
-									<input type="text" class="form-control" id="contact_name" name="contact_name" value="{$contact.name|escape:'html':'UTF-8'}" readonly="readonly" />
-									<input type="hidden" name="id_contact" value="{$contact.id_contact|intval}" />
-									{$flag=false}
+				{/if}
+					{if isset($displayContactName) && $displayContactName}
+						<div class="form-group row">
+							<div class="col-sm-12">
+								<label for="user_name" class="control-label">
+									{l s='Name'}{if isset($contactNameRequired) && $contactNameRequired}*{/if}
+								</label>
+								<input class="form-control contact_input" type="text" id="user_name" name="user_name" value="{if isset($smarty.post.user_name)}{$smarty.post.user_name}{elseif isset($customerThread.user_name)}{$customerThread.user_name|escape:'html':'UTF-8'}{elseif isset($customerName)}{$customerName}{/if}" {if isset($customerThread.user_name)} readonly{/if}/>
+							</div>
+						</div>
+					{/if}
+						<div class="form-group row">
+							<div class="col-sm-12">
+								<label for="Email" class="control-label">
+									{l s='Email'}*
+								</label>
+								{if isset($customerThread.email)}
+									<input class="form-control contact_input" type="email" id="email" name="from" value="{if isset($customerThread.email)}{$customerThread.email|escape:'html':'UTF-8'}" readonly="readonly"{/if} />
+								{else}
+									<input class="form-control contact_input validate" type="email" id="email" name="from" data-validate="isEmail" value="{if isset($smarty.post.email)}{$smarty.post.email}{else}{$email|escape:'html':'UTF-8'}{/if}" />
 								{/if}
-							{/foreach}
-							{if $flag && isset($contacts.0.id_contact)}
-								<input type="text" class="form-control" id="contact_name" name="contact_name" value="{$contacts.0.name|escape:'html':'UTF-8'}" readonly="readonly" />
-								<input type="hidden" name="id_contact" value="{$contacts.0.id_contact|intval}" />
-							{/if}
-						{else}
+							</div>
+						</div>
+					{if isset($displayContactPhone) && $displayContactPhone}
+						<div class="form-group row">
+							<div class="col-sm-12">
+								<label for="phone" class="control-label">
+									{l s='Phone'}{if isset($contactPhoneRequired) && $contactPhoneRequired}*{/if}
+								</label>
+								<input class="form-control contact_input" type="text" id="phone" name="phone" value="{if isset($smarty.post.phone)}{$smarty.post.phone}{else if isset($customerThread.phone)}{$customerThread.phone|escape:'html':'UTF-8'}{elseif isset($customerPhone)}{$customerPhone}{/if}" {if isset($customerThread.phone)}readonly="readonly"{/if}/>
+							</div>
+						</div>
+					{/if}
+						<div class="form-group row">
+							<div class="col-sm-12">
+								<label for="subject" class="control-label">
+									{l s='Title'}*
+								</label>
+								<input class="form-control contact_input" type="text" id="subject" name="subject" value="{if isset($smarty.post.subject)}{$smarty.post.subject}{else if isset($customerThread.subject)}{$customerThread.subject|escape:'html':'UTF-8'}{/if}" {if isset($customerThread.subject)}readonly="readonly"{/if}/>
+							</div>
+						</div>
+						{if !isset($customerThread.id_contact) && isset($allowContactSelection) && $allowContactSelection}
 							<div class="form-group row">
 								<div class="col-sm-12">
 									<label for="message" class="control-label">
-										{l s='Subject'}
+										{l s='Send To'}*
 									</label>
 									<div class="dropdown">
 										<button class="form-control contact_type_input" type="button" data-toggle="dropdown">
@@ -112,23 +159,13 @@
 									</div>
 								</div>
 							</div>
+						{elseif isset($customerThread.id_contact) && isset($allowContactSelection) && $allowContactSelection}
+							<input type="hidden" id="id_contact" name="id_contact" value="{$customerThread.id_contact|escape:'html':'UTF-8'}"/>
 						{/if}
 						<div class="form-group row">
 							<div class="col-sm-12">
-								<label for="price" class="control-label">
-									{l s='Email'}
-								</label>
-								{if isset($customerThread.email)}
-									<input class="form-control contact_input" type="email" id="email" name="from" value="{$customerThread.email|escape:'html':'UTF-8'}" readonly="readonly" />
-								{else}
-									<input class="form-control contact_input validate" type="email" id="email" name="from" data-validate="isEmail" value="{$email|escape:'html':'UTF-8'}" />
-								{/if}
-							</div>
-						</div>
-						<div class="form-group row">
-							<div class="col-sm-12">
 								<label for="message" class="control-label">
-									{l s='Message/Query'}
+									{l s='Message/Query'}*
 								</label>
 								<textarea class="form-control contact_textarea" id="message" name="message">{if isset($message)}{$message|escape:'html':'UTF-8'|stripslashes}{/if}</textarea>
 							</div>
@@ -144,6 +181,9 @@
 								</div>
 							</div>
 						{/if}
+						<div class="form-group">
+							{l s='* Required fields'}
+						</div>
 						{hook h='displayGDPRConsent' moduleName='contactform'}
 						{hook h='displayContactFormFieldsAfter'}
 						<div class="form-group">

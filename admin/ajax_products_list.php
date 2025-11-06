@@ -75,7 +75,7 @@ $sqlJoin ='	LEFT JOIN `'._DB_PREFIX_.'product_lang` pl ON (pl.`id_product` = p.`
 
 $sqlWhere =	' WHERE (pl.name LIKE \'%'.pSQL($query).'%\' OR p.reference LIKE \'%'.pSQL($query).'%\')'.
         (!empty($excludeIds) ? ' AND p.id_product NOT IN ('.$excludeIds.') ' : ' ').
-        (!empty($excludePackItself) ? ' AND p.id_product <> '.$excludePackItself.' ' : ' ').
+        (!empty($excludePackItself) ? ' AND p.id_product <> '.(int) $excludePackItself.' ' : ' ').
         ($excludeVirtuals ? 'AND NOT EXISTS (SELECT 1 FROM `'._DB_PREFIX_.'product_download` pd WHERE (pd.id_product = p.id_product))' : '').
         ($exclude_packs ? 'AND (p.cache_is_pack IS NULL OR p.cache_is_pack = 0)' : '').
         ($bookingProduct ? 'AND p.`booking_product` = '.(int) $bookingProduct : '');
@@ -96,7 +96,7 @@ $sql = $sqlSelect.' '.$sqlFrom.' '.$sqlJoin.' '.$sqlWhere.' '.$sqlGroupBy;
 
 $items = Db::getInstance()->executeS($sql);
 
-if ($items && ($excludeIds || strpos($_SERVER['HTTP_REFERER'], 'AdminScenes') !== false)) {
+if ($items && ($excludeIds || (isset($_SERVER['HTTP_REFERER']) && Tools::strpos($_SERVER['HTTP_REFERER'], 'AdminScenes') !== false))) {
     foreach ($items as $item) {
     	$item['name'] = str_replace('|', '&#124;', $item['name']);
         echo trim($item['name']).(!empty($item['reference']) ? ' (ref: '.$item['reference'].')' : '').'|'.(int)($item['id_product'])."\n";
@@ -151,7 +151,7 @@ if ($items && ($excludeIds || strpos($_SERVER['HTTP_REFERER'], 'AdminScenes') !=
                 'id' => (int)($item['id_product']),
                 'name' => $item['name'],
                 'ref' => (!empty($item['reference']) ? $item['reference'] : ''),
-                'image' => str_replace('http://', Tools::getShopProtocol(), $context->link->getImageLink($item['link_rewrite'], $item['id_image'], 'home_default')),
+                'image' => $item['id_image'] ? str_replace('http://', Tools::getShopProtocol(), $context->link->getImageLink($item['link_rewrite'], $item['id_image'], 'home_default')) : false,
             );
             array_push($results, $product);
         }

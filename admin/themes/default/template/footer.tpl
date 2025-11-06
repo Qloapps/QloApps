@@ -72,7 +72,7 @@
 				{l s='Addons'}
 			</a>
 			/&nbsp;
-			<a href="https://qloapps.com/qlo-reservation-system/" class="footer_link _blank">
+			<a href="https://docs.qloapps.com/" class="footer_link _blank">
 				<i class="icon-book"></i>
 				{l s='Training'}
 			</a>

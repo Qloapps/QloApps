@@ -1,20 +1,23 @@
 /**
-* 2010-2022 Webkul.
-*
 * NOTICE OF LICENSE
 *
-* All right is reserved,
-* Please go through LICENSE.txt file inside our module
+* This source file is subject to the Open Software License version 3.0
+* that is bundled with this package in the file LICENSE.md
+* It is also available through the world-wide-web at this URL:
+* https://opensource.org/license/osl-3-0-php
+* If you did not receive a copy of the license and are unable to
+* obtain it through the world-wide-web, please send an email
+* to support@qloapps.com so we can send you a copy immediately.
 *
 * DISCLAIMER
 *
-* Do not edit or add to this file if you wish to upgrade this module to newer
-* versions in the future. If you wish to customize this module for your
-* needs please refer to CustomizationPolicy.txt file inside our module for more information.
+* Do not edit or add to this file if you wish to upgrade this module to a newer
+* versions in the future. If you wish to customize this module for your needs
+* please refer to https://store.webkul.com/customisation-guidelines for more information.
 *
 * @author Webkul IN
-* @copyright 2010-2022 Webkul IN
-* @license LICENSE.txt
+* @copyright Since 2010 Webkul
+* @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
 */
 
 #header .shopping_cart > a:first-child:after {
@@ -98,6 +101,9 @@
       font-size: 13px;
       line-height: 18px;
       display: inline-block; }
+  .cart_block .cart-info .hotel-name {
+    padding-bottom: 4px;
+    margin-top: -8px; }
   .cart_block .cart-info .quantity-formated {
     display: inline-block;
     color: #9c9b9b;
@@ -184,8 +190,6 @@
       width: 100%; } }*/
   #header .cart_block a {
     color: #fff; }
-    #header .cart_block a:hover {
-      color: #9c9b9b; }
   #header .cart_block .cart_block_list .remove_link a,
   #header .cart_block .cart_block_list .ajax_cart_block_remove_link {
     color: #fff;
@@ -465,18 +469,18 @@
 /*# sourceMappingURL=blockcart.css.map */
 
 
-.remove_rooms_from_cart_link {
+.ajax_remove_product_option, .remove_rooms_from_cart_link {
   color: #777;
   display: block;
   width: 100%;
   height: 100%; }
-  .remove_rooms_from_cart_link:before {
+  .ajax_remove_product_option:before, .remove_rooms_from_cart_link:before {
     display: inline-block;
     content: "\f057";
     font-family: "FontAwesome";
     font-size: 18px;
     line-height: 18px; }
-  .remove_rooms_from_cart_link:hover {
+  .ajax_remove_product_option:hover, .remove_rooms_from_cart_link:hover {
     color: #515151; }
 
 .badge_style {

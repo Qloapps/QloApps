@@ -1,7 +1,7 @@
 <?php
 return array(
 	'informations' => array(
-		'documentation' => 'https://qloapps.com/qlo-reservation-system/',
+		'documentation' => 'https://docs.qloapps.com/',
 		'documentation_upgrade' => 'https://webkul.uvdesk.com/',
 		'forum' => 'https://forums.qloapps.com/',
 		'blog' => 'https://qloapps.com/blog/',
@@ -63,7 +63,7 @@ return array(
 		'Install Addons modules' => 'Add-Ons-Module installieren',
 		'Install theme' => 'Theme installieren',
 		'Required PHP parameters' => 'Erforderliche PHP-Parameter',
-		'The required PHP version is between 5.6 to 7.4' => 'Die erforderliche PHP-Version liegt zwischen 5.6 und 7.4',
+		'The required PHP version is between 8.1 to 8.4' => 'Die erforderliche PHP-Version liegt zwischen 8.1 und 8.4',
 		'Cannot upload files' => 'Dateien können nicht hochgeladen werden',
 		'Cannot create new files and folders' => 'Es können keine neuen Dateien und Ordner erstellt werden',
 		'GD library is not installed' => 'Die GD-Bibliothek ist nicht installiert',
@@ -81,7 +81,7 @@ return array(
 		'Permissions on files and folders' => 'Berechtigungen für Dateien und Ordner',
 		'Recursive write permissions for %1$s user on %2$s' => 'Rekursive Schreibberechtigungen für Benutzer %1$s auf %2$s',
 		'Recommended PHP parameters' => 'Empfohlene PHP-Parameter',
-		'You are using PHP %s version. Soon, the latest PHP version supported by QloApps will be PHP 5.6. To make sure you’re ready for the future, we recommend you to upgrade to PHP 5.6 now!' => 'Sie verwenden die PHP-Version %s. Bald wird die neueste von QloApps unterstützte PHP-Version PHP 5.6 sein. Um sicherzustellen, dass Sie für die Zukunft gerüstet sind, empfehlen wir Ihnen, jetzt auf PHP 5.6 zu aktualisieren!',
+		'You are using PHP %s version. Soon, the latest PHP version supported by QloApps will be PHP 8.1. To make sure you’re ready for the future, we recommend you to upgrade to PHP 8.1 now!' => 'Sie verwenden die PHP-Version %s. Bald wird die neueste von QloApps unterstützte PHP-Version PHP 8.1 sein. Um sicherzustellen, dass Sie für die Zukunft gerüstet sind, empfehlen wir Ihnen, jetzt auf PHP 8.1 zu aktualisieren!',
 		'PHP register_globals option is enabled' => 'Die PHP-Option „register_globals“ ist aktiviert',
 		'GZIP compression is not activated' => 'Die GZIP-Komprimierung ist nicht aktiviert',
 		'Mbstring extension is not enabled' => 'Die Mbstring-Erweiterung ist nicht aktiviert',
@@ -204,7 +204,7 @@ return array(
 		'Discover Your Website' => 'Entdecken Sie Ihre Website',
 		'Share your experience with your friends!' => 'Teilen Sie Ihre Erfahrungen mit Ihren Freunden!',
 		'I just built an online hotel booking website with QloApps!' => 'Ich habe gerade mit QloApps eine Online-Website zur Hotelbuchung erstellt!',
-		'See all the features here : https://qloapps.com/qlo-reservation-system/' => 'Alle Funktionen finden Sie hier: https://qloapps.com/qlo-reservation-system/',
+		'See all the features here : https://docs.qloapps.com/' => 'Alle Funktionen finden Sie hier: https://docs.qloapps.com/',
 		'Tweet' => 'Tweet',
 		'Share' => 'Aktie',
 		'Google+' => 'Google+',

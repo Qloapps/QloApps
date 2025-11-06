@@ -446,7 +446,7 @@ class StockAvailableCore extends ObjectModel
 			AND id_product_attribute <> 0 '.
             StockAvailable::addSqlShopRestriction(null, $id_shop)
         );
-        $this->setQuantity($this->id_product, 0, $total_quantity, $id_shop);
+        StockAvailable::setQuantity($this->id_product, 0, $total_quantity, $id_shop);
 
         return true;
     }

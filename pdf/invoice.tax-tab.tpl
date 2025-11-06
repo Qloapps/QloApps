@@ -74,7 +74,7 @@
 							{elseif $label == 'convenience_fee_tax'}
 								{l s='Convenience Fees' pdf='true'}
 							{elseif $label == 'service_products_tax'}
-								{l s='Service Products' pdf='true'}
+								{l s='Products' pdf='true'}
 							{elseif $label == 'shipping_tax'}
 								{l s='Shipping' pdf='true'}
 							{elseif $label == 'ecotax_tax'}
@@ -122,5 +122,8 @@
 
 		</tbody>
 	</table>
+    <tr>
+		<td colspan="12" height="10"></td>
+	</tr>
 {/if}
 <!--  / TAX DETAILS -->

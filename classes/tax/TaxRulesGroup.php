@@ -102,6 +102,10 @@ class TaxRulesGroupCore extends ObjectModel
 		SET id_tax_rules_group='.(int)$tax_rules_group->id.'
 		WHERE id_tax_rules_group='.(int)$this->id) &&
         Db::getInstance()->execute('
+        UPDATE '._DB_PREFIX_.'htl_room_type_service_product_price
+		SET id_tax_rules_group='.(int)$tax_rules_group->id.'
+		WHERE id_tax_rules_group='.(int)$this->id) &&
+        Db::getInstance()->execute('
 		UPDATE '._DB_PREFIX_.'product_shop
 		SET id_tax_rules_group='.(int)$tax_rules_group->id.'
 		WHERE id_tax_rules_group='.(int)$this->id) &&
@@ -117,20 +121,22 @@ class TaxRulesGroupCore extends ObjectModel
 
     public function getIdTaxRuleGroupFromHistorizedId($id_tax_rule)
     {
-        $params = Db::getInstance()->getRow('
-		SELECT id_country, id_state, zipcode_from, zipcode_to, id_tax, behavior
-		FROM '._DB_PREFIX_.'tax_rule
-		WHERE id_tax_rule='.(int)$id_tax_rule
-        );
+        if ($params = Db::getInstance()->getRow('
+            SELECT id_country, id_state, zipcode_from, zipcode_to, id_tax, behavior
+            FROM '._DB_PREFIX_.'tax_rule
+            WHERE id_tax_rule='.(int)$id_tax_rule
+        )) {
+            return Db::getInstance()->getValue('
+            SELECT id_tax_rule
+            FROM '._DB_PREFIX_.'tax_rule
+            WHERE
+                id_tax_rules_group = '.(int)$this->id.' AND
+                id_country='.(int)$params['id_country'].' AND id_state='.(int)$params['id_state'].' AND id_tax='.(int)$params['id_tax'].' AND
+                zipcode_from=\''.pSQL($params['zipcode_from']).'\' AND zipcode_to=\''.pSQL($params['zipcode_to']).'\' AND behavior='.(int)$params['behavior']
+            );
+        }
 
-        return Db::getInstance()->getValue('
-		SELECT id_tax_rule
-		FROM '._DB_PREFIX_.'tax_rule
-		WHERE
-			id_tax_rules_group = '.(int)$this->id.' AND
-			id_country='.(int)$params['id_country'].' AND id_state='.(int)$params['id_state'].' AND id_tax='.(int)$params['id_tax'].' AND
-			zipcode_from=\''.pSQL($params['zipcode_from']).'\' AND zipcode_to=\''.pSQL($params['zipcode_to']).'\' AND behavior='.(int)$params['behavior']
-        );
+        return false;
     }
 
     public static function getTaxRulesGroups($only_active = true)

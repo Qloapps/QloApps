@@ -442,7 +442,7 @@ class AdminSuppliersControllerCore extends AdminController
     public function postProcess()
     {
         // checks access
-        if (Tools::isSubmit('submitAdd'.$this->table) && !($this->tabAccess['add'] === '1')) {
+        if (Tools::isSubmit('submitAdd'.$this->table) && !($this->tabAccess['add'] === 1)) {
             $this->errors[] = Tools::displayError('You do not have permission to add suppliers.');
             return parent::postProcess();
         }

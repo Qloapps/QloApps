@@ -32,8 +32,8 @@
 			{/if}
 		</td> -->
 		<td width="33%">
-			<span class="bold">{l s='Hotel Detail' pdf='true'}</span><br/><br/>
-			{if $hotel_address}
+			{if !empty($hotel_address)}
+				<span class="bold">{l s='Hotel Detail' pdf='true'}</span><br/><br/>
 				{$hotel_address}
 			{/if}
 		</td>

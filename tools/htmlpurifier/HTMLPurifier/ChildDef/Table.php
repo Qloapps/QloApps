@@ -164,7 +164,7 @@ class HTMLPurifier_ChildDef_Table extends HTMLPurifier_ChildDef
             }
         }
 
-        if (empty($content)) {
+        if (empty($content) && $thead === false && $tfoot === false) {
             return false;
         }
 
@@ -190,6 +190,9 @@ class HTMLPurifier_ChildDef_Table extends HTMLPurifier_ChildDef
             $current_tr_tbody = null;
 
             foreach($content as $node) {
+                if (!isset($node->name)) {
+                    continue;
+                }
                 switch ($node->name) {
                 case 'tbody':
                     $current_tr_tbody = null;

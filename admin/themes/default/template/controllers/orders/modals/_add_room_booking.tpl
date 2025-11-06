@@ -1,24 +1,27 @@
 {*
-* Since 2010 Webkul.
-*
 * NOTICE OF LICENSE
 *
-* All right is reserved,
-* Please go through this link for complete license : https://store.webkul.com/license.html
+* This source file is subject to the Open Software License version 3.0
+* that is bundled with this package in the file LICENSE.md
+* It is also available through the world-wide-web at this URL:
+* https://opensource.org/license/osl-3-0-php
+* If you did not receive a copy of the license and are unable to
+* obtain it through the world-wide-web, please send an email
+* to support@qloapps.com so we can send you a copy immediately.
 *
 * DISCLAIMER
 *
-* Do not edit or add to this file if you wish to upgrade this module to newer
-* versions in the future. If you wish to customize this module for your
-* needs please refer to https://store.webkul.com/customisation-guidelines/ for more information.
+* Do not edit or add to this file if you wish to upgrade this module to a newer
+* versions in the future. If you wish to customize this module for your needs
+* please refer to https://store.webkul.com/customisation-guidelines for more information.
 *
-*  @author    Webkul IN <support@webkul.com>
-*  @copyright Since 2010 Webkul IN
-*  @license   https://store.webkul.com/license.html
+* @author Webkul IN
+* @copyright Since 2010 Webkul
+* @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
 *}
 
 <div class="modal-body">
-    <div id="new_product">
+    <div id="new_room">
         <input type="hidden" id="add_product_product_id" name="add_product[product_id]" value="0" />
         <div class="form-group">
             <label class="control-label">{l s='Room Type:'}</label>
@@ -126,7 +129,7 @@
                 {/if}
             </div>
 
-            {if sizeof($invoices_collection)}
+            {if isset($invoices_collection) && sizeof($invoices_collection)}
                 <div class="form-group" style="display: none;">
                     <label class="control-label">{l s='Invoice'}</label>
                     <select class="form-control" name="add_product[invoice]" id="add_product_product_invoice" disabled="disabled">
@@ -142,7 +145,7 @@
                 </div>
             {/if}
         </div>
-        <button type="button" class="btn btn-default" id="submitAddProduct" disabled="disabled" style="display:none;"></button>
+        <button type="button" class="btn btn-default" id="submitAddRoom" disabled="disabled" style="display:none;"></button>
     </div>
 
     {if isset($loaderImg) && $loaderImg}

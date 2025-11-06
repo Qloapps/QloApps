@@ -260,6 +260,7 @@
 }
 .order-detail-content .room_price_detail_block .plus-sign{
 	display: flex;
+	justify-content: space-between;
 }
 .product_price_detail_block .product_quantity_block, .product_price_detail_block .price_block {
 	display: inline-block;

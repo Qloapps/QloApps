@@ -501,13 +501,22 @@
 				{if count($messages)}
 					<table class="table">
 						<thead>
-							<th><span class="title_box">{l s='Status'}</span></th>
+							<th class="fixed-width-sm"><span class="title_box">{l s='Status'}</span></th>
 							<th><span class="title_box">{l s='Message'}</span></th>
-							<th><span class="title_box">{l s='Sent on'}</span></th>
+							<th class="fixed-width-lg"><span class="title_box">{l s='Sent on'}</span></th>
 						</thead>
 						{foreach $messages AS $message}
 							<tr>
-								<td>{$message['status']}</td>
+								<td>{if $message['status'] == CustomerThread::QLO_CUSTOMER_THREAD_STATUS_OPEN}
+										{l s='Open'}
+									{elseif $message['status'] == CustomerThread::QLO_CUSTOMER_THREAD_STATUS_CLOSED}
+										{l s='Closed'}
+									{elseif $message['status'] == CustomerThread::QLO_CUSTOMER_THREAD_STATUS_PENDING1}
+										{l s='Pending 1'}
+									{elseif $message['status'] == CustomerThread::QLO_CUSTOMER_THREAD_STATUS_PENDING2}
+										{l s='Pending 2'}
+									{/if}
+								</td>
 								<td>
 									<a href="index.php?tab=AdminCustomerThreads&amp;id_customer_thread={$message.id_customer_thread}&amp;viewcustomer_thread&amp;token={getAdminToken tab='AdminCustomerThreads'}">
 										{$message['message']}...

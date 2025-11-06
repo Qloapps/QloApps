@@ -24,7 +24,7 @@
 *}
 
 {if isset($cart_htl_data) && $cart_htl_data}
-	<table class="product" class="bordered-table" width="100%" cellpadding="4" cellspacing="0">
+	<table class="bordered-table" width="100%" cellpadding="4" cellspacing="0">
 		<thead>
 			<tr>
 				<th colspan="{if $display_product_images}8{else}7{/if}" class="header">{l s='Rooms Details' pdf='true'}</th>
@@ -50,7 +50,7 @@
 				{foreach from=$cart_htl_data key=data_k item=data_v}
 					{foreach from=$data_v['date_diff'] key=rm_k item=rm_v}
 						{cycle values=["color_line_even", "color_line_odd"] assign=bgcolor_class}
-						<tr class="product {$bgcolor_class}">
+						<tr class="{$bgcolor_class}">
 							{if $display_product_images}
 								<td class="cart_product">
 									<img src="{$data_v['cover_img']}" class="thumbnail" />
@@ -114,4 +114,7 @@
 			{/foreach} *}
 		</tbody>
 	</table>
+    <tr>
+		<td colspan="12" height="10"></td>
+	</tr>
 {/if}

@@ -31,6 +31,16 @@ class HTMLPurifier_Injector_RemoveSpansWithoutAttributes extends HTMLPurifier_In
      */
     private $context;
 
+    /**
+     * @type SplObjectStorage
+     */
+    private $markForDeletion;
+
+    public function __construct()
+    {
+        $this->markForDeletion = new SplObjectStorage();
+    }
+
     public function prepare($config, $context)
     {
         $this->attrValidator = new HTMLPurifier_AttrValidator();
@@ -64,7 +74,7 @@ class HTMLPurifier_Injector_RemoveSpansWithoutAttributes extends HTMLPurifier_In
 
         if ($current instanceof HTMLPurifier_Token_End && $current->name === 'span') {
             // Mark closing span tag for deletion
-            $current->markForDeletion = true;
+            $this->markForDeletion->attach($current);
             // Delete open span tag
             $token = false;
         }
@@ -75,7 +85,8 @@ class HTMLPurifier_Injector_RemoveSpansWithoutAttributes extends HTMLPurifier_In
      */
     public function handleEnd(&$token)
     {
-        if ($token->markForDeletion) {
+        if ($this->markForDeletion->contains($token)) {
+            $this->markForDeletion->detach($token);
             $token = false;
         }
     }

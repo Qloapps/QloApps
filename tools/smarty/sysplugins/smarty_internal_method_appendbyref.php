@@ -15,7 +15,7 @@ class Smarty_Internal_Method_AppendByRef
      * appends values to template variables by reference
      *
      * @api  Smarty::appendByRef()
-     * @link http://www.smarty.net/docs/en/api.append.by.ref.tpl
+     * @link https://www.smarty.net/docs/en/api.append.by.ref.tpl
      *
      * @param \Smarty_Internal_Data|\Smarty_Internal_Template|\Smarty $data
      * @param string                                                  $tpl_var the template variable name

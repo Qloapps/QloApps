@@ -408,7 +408,7 @@ class OrderHistoryCore extends ObjectModel
      * @param Context $context Deprecated
      * @return bool
      */
-    public function addWithemail($autodate = true, $template_vars = false, Context $context = null)
+    public function addWithemail($autodate = true, $template_vars = false, ?Context $context = null)
     {
         $order = new Order($this->id_order);
 
@@ -450,6 +450,14 @@ class OrderHistoryCore extends ObjectModel
                 '{payment_method}' => '',
             );
 
+            $hotelName = '';
+            $hotelDetail = '';
+            $data['{order_hotel_detail_html}'] = '';
+            $data['{order_hotel_detail_txt}'] = '';
+            $data['{order_header_line_html}'] = '';
+            $data['{order_header_line_txt}'] = '';
+            $context = Context::getContext();
+            $objMail = new Mail();
             if ($idHotel = HotelBookingDetail::getIdHotelByIdOrder($order->id)) {
                 $objHotelBranchInformation = new HotelBranchInformation($idHotel);
                 $fields = array_merge(
@@ -460,10 +468,30 @@ class OrderHistoryCore extends ObjectModel
                 foreach ($fields as $key => $value) {
                     $data['{hotel_'.$key.'}'] = $value;
                 }
+
+                $hotelName = $fields['hotel_name'];
                 $objHotelBookingDetail = new HotelBookingDetail();
                 $hotelBookingDetail = $objHotelBookingDetail->getBookingDataByOrderId($order->id);
                 $data['{num_rooms}'] = count($hotelBookingDetail);
+
+                // order_hotel_detail tpl for using on different emails as per conditions for hotel or not hotel orders
+                $params = array(
+                    'hotel_name' => $fields['hotel_name'],
+                    'hotel_phone' => $fields['phone'],
+                    'hotel_email' => $fields['email'],
+                    'num_rooms' => $data['{num_rooms}']
+                );
+                $data['{order_hotel_detail_html}'] = $objMail->getEmailTemplateContent('order_hotel_detail', Mail::TYPE_HTML, $params);
+                $data['{order_hotel_detail_txt}'] = $objMail->getEmailTemplateContent('order_hotel_detail_text', Mail::TYPE_TEXT, $params);
             }
+            // order_header_line tpl for using on different emails as per conditions for hotel or not hotel orders
+            $params = array(
+                'hotel_name' => $hotelName,
+                'has_room_bookings' => HotelBookingDetail::getIdHotelByIdOrder($order->id, false)
+
+            );
+            $data['{order_header_line_html}'] = trim($objMail->getEmailTemplateContent('order_header_line', Mail::TYPE_HTML, $params));
+            $data['{order_header_line_txt}'] = trim($objMail->getEmailTemplateContent('order_header_line_text', Mail::TYPE_TEXT, $params));
 
             if ($result['module_name']) {
                 if (Validate::isLoadedObject($module = Module::getInstanceByName($result['module_name']))) {
@@ -491,7 +519,6 @@ class OrderHistoryCore extends ObjectModel
             if (Validate::isLoadedObject($order)) {
                 // Attach invoice and / or delivery-slip if they exists and status is set to attach them
                 if (($result['pdf_invoice'] || $result['pdf_delivery'])) {
-                    $context = Context::getContext();
                     $invoice = $order->getInvoicesCollection();
                     $file_attachement = array();
 

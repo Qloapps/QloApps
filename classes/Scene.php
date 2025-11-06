@@ -200,8 +200,7 @@ class SceneCore extends ObjectModel
      *
      * @return array Products
      */
-    public static function getScenes($id_category, $id_lang = null, $only_active = true, $lite_result = true, $hide_scene_position = true,
-        Context $context = null)
+    public static function getScenes($id_category, $id_lang = null, $only_active = true, $lite_result = true, $hide_scene_position = true, ?Context $context = null)
     {
         if (!Scene::isFeatureActive()) {
             return array();
@@ -242,7 +241,7 @@ class SceneCore extends ObjectModel
     *
     * @return array Products
     */
-    public function getProducts($only_active = true, $id_lang = null, $lite_result = true, Context $context = null)
+    public function getProducts($only_active = true, $id_lang = null, $lite_result = true, ?Context $context = null)
     {
         if (!Scene::isFeatureActive()) {
             return array();

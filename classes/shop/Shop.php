@@ -65,6 +65,9 @@ class ShopCore extends ObjectModel
     /** @var ShopGroup Shop group object */
     protected $group;
 
+    /** @var Address|null */
+    public $address;
+
     /**
      * @see ObjectModel::$definition
      */
@@ -743,7 +746,7 @@ class ShopCore extends ObjectModel
         $query->from('shop_url');
         $query->where('main = 1');
         $query->where('active = 1');
-        $query .= $this->addSqlRestriction(Shop::SHARE_ORDER);
+        $query .= Shop::addSqlRestriction(Shop::SHARE_ORDER);
         $domains = array();
         foreach (Db::getInstance()->executeS($query) as $row) {
             $domains[] = $row['domain'];

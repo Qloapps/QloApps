@@ -44,15 +44,15 @@ abstract class Smarty_CacheResource
     /**
      * Read the cached template and process header
      *
-     * @param Smarty_Internal_Template $_template template object
-     * @param Smarty_Template_Cached   $cached    cached object
-     * @param boolean                  $update    flag if called because cache update
+     * @param Smarty_Internal_Template    $_template template object
+     * @param Smarty_Template_Cached|null $cached    cached object
+     * @param boolean                     $update    flag if called because cache update
      *
      * @return boolean true or false if the cached content does not exist
      */
     abstract public function process(
         Smarty_Internal_Template $_template,
-        Smarty_Template_Cached $cached = null,
+        ?Smarty_Template_Cached $cached = null,
         $update = false
     );
 
@@ -205,11 +205,11 @@ abstract class Smarty_CacheResource
         }
         // try sysplugins dir
         if (isset(self::$sysplugins[ $type ])) {
-            $cache_resource_class = 'Smarty_Internal_CacheResource_' . ucfirst($type);
+            $cache_resource_class = 'Smarty_Internal_CacheResource_' . smarty_ucfirst_ascii($type);
             return $smarty->_cache[ 'cacheresource_handlers' ][ $type ] = new $cache_resource_class();
         }
         // try plugins dir
-        $cache_resource_class = 'Smarty_CacheResource_' . ucfirst($type);
+        $cache_resource_class = 'Smarty_CacheResource_' . smarty_ucfirst_ascii($type);
         if ($smarty->loadPlugin($cache_resource_class)) {
             return $smarty->_cache[ 'cacheresource_handlers' ][ $type ] = new $cache_resource_class();
         }

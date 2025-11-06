@@ -105,7 +105,7 @@ if (!defined('_PS_GEOIP_DIR_')) {
     define('_PS_GEOIP_DIR_',             _PS_TOOL_DIR_.'geoip/');
 }
 if (!defined('_PS_GEOIP_CITY_FILE_')) {
-    define('_PS_GEOIP_CITY_FILE_',       'GeoLiteCity.dat');
+    define('_PS_GEOIP_CITY_FILE_',       'GeoLite2-City.mmdb');
 }
 define('_PS_SWIFT_DIR_',             _PS_TOOL_DIR_.'swift/');
 define('_PS_TAASC_PATH_',            _PS_TOOL_DIR_.'taasc/');

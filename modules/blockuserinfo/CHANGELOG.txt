@@ -1,4 +1,13 @@
 ------------------------------
+# V1.0.0 to V1.0.1
+------------------------------
+
+## Improved/Changed Features:
+
+* [FO] : [#1411] Text changes in the front offfice.
+* [FO] : [#1388] Added CSRF token validation on user logout at Front office
+
+------------------------------
 # V0.4.1 to V1.0.0
 ------------------------------
 

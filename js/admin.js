@@ -512,6 +512,14 @@ function changeOverbookingOrderAction()
         $('#PS_MAX_OVERBOOKING_PER_HOTEL_PER_DAY').closest('.form-group').show();
 }
 
+function changeStandardProductAddressType()
+{
+    if (getE('PS_STANDARD_PRODUCT_ORDER_ADDRESS_PREFRENCE').value == STANDARD_PRODUCT_ADDRESS_PREFERENCE_CUSTOM)
+		$('#conf_id_PS_STANDARD_PRODUCT_ORDER_ADDRESS').closest('.form-group').show();
+	else
+		$('#conf_id_PS_STANDARD_PRODUCT_ORDER_ADDRESS').closest('.form-group').hide();
+}
+
 function disableZipFormat()
 {
 	if ($('#need_zip_code_on').prop('checked') == false)

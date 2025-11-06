@@ -1,28 +1,31 @@
 {**
-* 2010-2023 Webkul.
-*
 * NOTICE OF LICENSE
 *
-* All right is reserved,
-* Please go through LICENSE.txt file inside our module
+* This source file is subject to the Open Software License version 3.0
+* that is bundled with this package in the file LICENSE.md
+* It is also available through the world-wide-web at this URL:
+* https://opensource.org/license/osl-3-0-php
+* If you did not receive a copy of the license and are unable to
+* obtain it through the world-wide-web, please send an email
+* to support@qloapps.com so we can send you a copy immediately.
 *
 * DISCLAIMER
 *
-* Do not edit or add to this file if you wish to upgrade this module to newer
-* versions in the future. If you wish to customize this module for your
-* needs please refer to CustomizationPolicy.txt file inside our module for more information.
+* Do not edit or add to this file if you wish to upgrade this module to a newer
+* versions in the future. If you wish to customize this module for your needs
+* please refer to https://store.webkul.com/customisation-guidelines for more information.
 *
 * @author Webkul IN
-* @copyright 2010-2023 Webkul IN
-* @license LICENSE.txt
+* @copyright Since 2010 Webkul
+* @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
 *}
 
 {block name='displayRoomTypeListBefore'}
 	{hook h='displayRoomTypeListBefore'}
 {/block}
-{if isset($booking_data['stats']) && $booking_data['stats']['num_avail'] || isset($display_all_room_types) && $display_all_room_types && isset($booking_data['rm_data'])}
+{if !empty($booking_data['rm_data']) && (isset($booking_data['stats']) && $booking_data['stats']['num_avail'] || !empty($display_all_room_types))}
 	{foreach from=$booking_data['rm_data'] key=room_k item=room_v}
-		{if $room_v['data']['available']|count || isset($display_all_room_types) && $display_all_room_types }
+		{if $room_v['data']['available']|count || !empty($display_all_room_types) }
 			<div class="col-sm-12 room_cont" data-id-product="{$room_v['id_product']|escape:'htmlall':'UTF-8'}">
 				<div class="row">
 					{block name='room_type_list_room_image'}
@@ -41,7 +44,7 @@
 								<div class="row">
 									<p class="rm_heading col-sm-12 col-md-7">{$room_v['name']|escape:'htmlall':'UTF-8'}</p>
 									{if !isset($restricted_country_mode) && !$PS_CATALOG_MODE && !$order_date_restrict}
-										<p class="rm_left col-sm-12 col-md-5" {if isset($display_all_room_types) && $display_all_room_types || $room_v['room_left'] > $warning_num} style="display:none"{/if}>
+										<p class="rm_left col-sm-12 col-md-5" {if !empty($display_all_room_types) || $room_v['room_left'] > $warning_num} style="display:none"{/if}>
 											{l s='Hurry!'} <span class="remain_rm_qty">{$room_v['room_left']|escape:'htmlall':'UTF-8'}</span> {l s='rooms left'}
 										</p>
 									{/if}
@@ -74,12 +77,12 @@
 												<p class="rm_price_cont">
 													{if $room_v['feature_price_diff'] >= 0}
 														<span class="rm_price_val {if $room_v['feature_price_diff']>0}room_type_old_price{/if}">
-															{displayPrice price = $room_v['price_without_reduction']|round:2|floatVal}
+															{displayPrice price = $room_v['price_without_reduction']|floatVal}
 														</span>
 													{/if}
 													{if $room_v['feature_price_diff']}
 														<span class="rm_price_val">
-															{displayPrice price = $room_v['feature_price']|round:2|floatVal}
+															{displayPrice price = $room_v['feature_price']|floatVal}
 														</span>
 													{/if}
 													<span class="rm_price_txt">/{l s='Per Night'}</span>
@@ -124,12 +127,12 @@
 														<div class="rm_price_cont">
 															{if $room_v['feature_price_diff'] >= 0}
 																<span class="rm_price_val {if $room_v['feature_price_diff']>0}room_type_old_price{/if}">
-																	{displayPrice price = $room_v['price_without_reduction']|round:2|floatVal}
+																	{displayPrice price = $room_v['price_without_reduction']|floatVal}
 																</span>
 															{/if}
 															{if $room_v['feature_price_diff']}
 																<span class="rm_price_val">
-																	{displayPrice price = $room_v['feature_price']|round:2|floatVal}
+																	{displayPrice price = $room_v['feature_price']|floatVal}
 																</span>
 															{/if}
 															<span class="rm_price_txt">/{l s='Per Night'}</span>

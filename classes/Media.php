@@ -174,7 +174,7 @@ class MediaCore
         if (!empty($js_content)) {
             require_once(_PS_TOOL_DIR_.'js_minify/jsmin.php');
             try {
-                $js_content = JSMin::minify($js_content);
+                $js_content = \JShrink\Minifier::minify($js_content);
             } catch (Exception $e) {
                 if (_PS_MODE_DEV_) {
                     echo $e->getMessage();
@@ -286,7 +286,7 @@ class MediaCore
             $file_uri = _PS_ROOT_DIR_.Tools::str_replace_once(__PS_BASE_URI__, DIRECTORY_SEPARATOR, $media_uri);
             $file_uri_host_mode = _PS_CORE_DIR_.Tools::str_replace_once(__PS_BASE_URI__, DIRECTORY_SEPARATOR, Tools::str_replace_once(_PS_CORE_DIR_, '', $media_uri));
 
-            if (!@filemtime($file_uri) || @filesize($file_uri) === 0) {
+            if (!file_exists($file_uri) || !@filemtime($file_uri) || @filesize($file_uri) === 0) {
                 if (!defined('_PS_HOST_MODE_')) {
                     return false;
                 } elseif (!@filemtime($file_uri_host_mode) || @filesize($file_uri_host_mode) === 0) {

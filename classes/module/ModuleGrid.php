@@ -52,6 +52,8 @@ abstract class ModuleGridCore extends Module
     /** @var ModuleGridEngine grid engine */
     protected $_render;
 
+    protected $_csv;
+
     abstract protected function getData();
 
     public function setEmployee($id_employee)

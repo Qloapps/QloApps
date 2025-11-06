@@ -272,7 +272,7 @@ class ManufacturerCore extends ObjectModel
     }
 
     public static function getProducts($id_manufacturer, $id_lang, $p, $n, $order_by = null, $order_way = null,
-        $get_total = false, $active = true, $active_category = true, Context $context = null)
+        $get_total = false, $active = true, $active_category = true, ?Context $context = null)
     {
         if (!$context) {
             $context = Context::getContext();

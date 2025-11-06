@@ -42,7 +42,7 @@ class StatsBestCustomers extends ModuleGrid
     {
         $this->name = 'statsbestcustomers';
         $this->tab = 'analytics_stats';
-        $this->version = '1.5.3';
+        $this->version = '1.5.4';
         $this->author = 'PrestaShop';
         $this->need_instance = 0;
 
@@ -159,24 +159,31 @@ class StatsBestCustomers extends ModuleGrid
 				WHERE o.id_customer = c.id_customer
 				AND o.`invoice_date` BETWEEN '.$this->getDate().'
 				AND o.valid
-                AND o.`id_order` IN (
-                    SELECT id_order FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
-                    WHERE 1 '.HotelBranchInformation::addHotelRestriction(false, 'hbd').'
-                    )
 			), 0) as totalMoneySpent,
 			IFNULL((
-				SELECT COUNT(DISTINCT(hbd.id_order))
-				FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
-                INNER JOIN `'._DB_PREFIX_.'orders` o ON (hbd.`id_order` = o.`id_order`)
-				WHERE 1 '.HotelBranchInformation::addHotelRestriction(false, 'hbd').'
-                AND hbd.`id_customer` = c.`id_customer`
-				AND o.`invoice_date` BETWEEN '.$this->getDate().'
-				AND o.valid
-			), 0) as totalValidOrders
-		FROM `'._DB_PREFIX_.'customer` c
-		LEFT JOIN `'._DB_PREFIX_.'guest` g ON c.`id_customer` = g.`id_customer`
-		LEFT JOIN `'._DB_PREFIX_.'connections` co ON g.`id_guest` = co.`id_guest`
-		WHERE co.date_add BETWEEN '.$this->getDate()
+                SELECT COUNT(DISTINCT o.`id_order`) as orders
+                FROM `'._DB_PREFIX_.'orders` o
+                WHERE `invoice_date` BETWEEN '.$this->getDate().' AND o.`valid` = 1 AND o.`id_customer` = c.`id_customer`
+                '.Shop::addSqlRestriction(false, 'o').'
+                AND (
+                    EXISTS (
+                        SELECT 1
+                        FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
+                        WHERE hbd.`id_order` = o.`id_order`' . HotelBranchInformation::addHotelRestriction(false).'
+                    ) OR EXISTS (
+                        SELECT 1
+                        FROM `'._DB_PREFIX_.'service_product_order_detail` spod
+                        WHERE spod.`id_order` = o.`id_order`' . HotelBranchInformation::addHotelRestriction(false, 'spod').'
+                    ) OR EXISTS (
+                        SELECT 1
+                        FROM `'._DB_PREFIX_.'service_product_order_detail` spod
+                        WHERE spod.`id_order` = o.`id_order` AND spod.`id_hotel` = 0 AND spod.`id_htl_booking_detail` = 0
+                    )
+            )), 0) as totalValidOrders
+            FROM `'._DB_PREFIX_.'customer` c
+            LEFT JOIN `'._DB_PREFIX_.'guest` g ON c.`id_customer` = g.`id_customer`
+            LEFT JOIN `'._DB_PREFIX_.'connections` co ON g.`id_guest` = co.`id_guest`
+            WHERE co.date_add BETWEEN '.$this->getDate()
             .Shop::addSqlRestriction(Shop::SHARE_CUSTOMER, 'c').
             'GROUP BY c.`id_customer`, c.`lastname`, c.`firstname`, c.`email`';
 

@@ -1,20 +1,23 @@
 /**
-* 2010-2020 Webkul.
-*
 * NOTICE OF LICENSE
 *
-* All right is reserved,
-* Please go through this link for complete license : https://store.webkul.com/license.html
+* This source file is subject to the Open Software License version 3.0
+* that is bundled with this package in the file LICENSE.md
+* It is also available through the world-wide-web at this URL:
+* https://opensource.org/license/osl-3-0-php
+* If you did not receive a copy of the license and are unable to
+* obtain it through the world-wide-web, please send an email
+* to support@qloapps.com so we can send you a copy immediately.
 *
 * DISCLAIMER
 *
-* Do not edit or add to this file if you wish to upgrade this module to newer
-* versions in the future. If you wish to customize this module for your
-* needs please refer to https://store.webkul.com/customisation-guidelines/ for more information.
+* Do not edit or add to this file if you wish to upgrade this module to a newer
+* versions in the future. If you wish to customize this module for your needs
+* please refer to https://store.webkul.com/customisation-guidelines for more information.
 *
-*  @author    Webkul IN <support@webkul.com>
-*  @copyright 2010-2020 Webkul IN
-*  @license   https://store.webkul.com/license.html
+* @author Webkul IN
+* @copyright Since 2010 Webkul
+* @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
 */
 
 /*----- Hotel Images -----*/
@@ -472,10 +475,7 @@ p.room_cat_data
 }
 
 #pac-input {
-    background-color: #fff;
-    height: 38px;
     width: 300px;
-    font-size: 14px;
     text-overflow: ellipsis;
 }
 
@@ -507,7 +507,7 @@ p.room_cat_data
     display: flex;
 }
 .week_days .checkboxes-wrap .day-wrap {
-    min-width: 50px;
+    min-width: 45px;
 }
 .room_type_search_results_ul {
     padding: 0px;
@@ -615,3 +615,23 @@ body.adminhotelroomsbooking .ui-tooltip {
 	padding: 15px;
 	border: 1px solid #ddd
 }
+
+#advanced_price_rule_group .panel.advanced_price_rule {
+    padding: 10px 0px;}
+#advanced_price_rule_group .advance_price_rule_header_container, .advanced_price_rule_body {
+    padding: 0px 20px;}
+#advanced_price_rule_group .advance_price_rule_header_container:hover {
+    cursor: pointer;}
+.advance_price_rule_header_container {
+    display: none;}
+.advance_price_rule_header_container.shown{
+    align-items: center;
+    display: flex;}
+.special_days_heading{
+    font-size: 11px;
+}
+.advanced_price_rule_body .form-group:first-child {
+    margin-top: 15px;}
+.error-border {
+    outline: rgb(210, 124, 130) solid 1px;
+    border-radius: 2px;}

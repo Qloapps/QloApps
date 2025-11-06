@@ -1,4 +1,14 @@
 ------------------------------
+# V1.1.9 to V1.2.0
+------------------------------
+
+## Improved/Changed Features:
+
+* [CO] : [#1464] Updated for PHP version 8.1 to 8.4 and MYSql 8 compatibility
+* [FO] : [#1480] Fixed Text, filter and display issues in the hotel filter block module in the front-office.
+* [FO] : [#1334] Fixed Wrong parameter sent instead of quantity parameter in function call in room block module.
+
+------------------------------
 # V1.1.8 to V1.1.9
 ------------------------------
 

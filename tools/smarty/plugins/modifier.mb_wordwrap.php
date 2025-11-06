@@ -11,7 +11,7 @@
  * Name:     mb_wordwrap
  * Purpose:  Wrap a string to a given number of characters
  *
- * @link   http://php.net/manual/en/function.wordwrap.php for similarity
+ * @link   https://php.net/manual/en/function.wordwrap.php for similarity
  *
  * @param string  $str   the string to wrap
  * @param int     $width the width of the output

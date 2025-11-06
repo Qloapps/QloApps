@@ -56,7 +56,7 @@ class ConnectionsSourceCore extends ObjectModel
         return $result;
     }
 
-    public static function logHttpReferer(Cookie $cookie = null)
+    public static function logHttpReferer(?Cookie $cookie = null)
     {
         if (!$cookie) {
             $cookie = Context::getContext()->cookie;
@@ -86,7 +86,7 @@ class ConnectionsSourceCore extends ObjectModel
                 return false;
             }
 
-            if ((preg_replace('/^www./', '', $parsed['host']) == preg_replace('/^www./', '', Tools::getHttpHost(false, false))) && !strncmp($parsed['path'], $parsed_host['path'], strlen(__PS_BASE_URI__))) {
+            if ((preg_replace('/^www./', '', $parsed['host']) == preg_replace('/^www./', '', Tools::getHttpHost(false, false, true))) && !strncmp($parsed['path'], $parsed_host['path'], strlen(__PS_BASE_URI__))) {
                 return false;
             }
 

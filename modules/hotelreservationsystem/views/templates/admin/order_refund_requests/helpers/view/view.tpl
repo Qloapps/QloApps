@@ -81,14 +81,26 @@
 								{displayPrice price=$orderTotalPaid currency=$orderInfo['id_currency']}
 							</div>
 						</div>
-                        <div class="form-group row">
-							<div class="col-sm-3">
-								<strong>{l s='Total rooms' mod='hotelreservationsystem'} :</strong>
-							</div>
-							<div class="col-sm-9">
-								{$refundReqBookings|count}
-							</div>
-						</div>
+                        {if isset($refundReqBookings) && $refundReqBookings}
+                            <div class="form-group row">
+                                <div class="col-sm-3">
+                                    <strong>{l s='Total rooms' mod='hotelreservationsystem'} :</strong>
+                                </div>
+                                <div class="col-sm-9">
+                                    {$refundReqBookings|count}
+                                </div>
+                            </div>
+                        {/if}
+                        {if isset($refundReqProducts) && $refundReqProducts}
+                            <div class="form-group row">
+                                <div class="col-sm-3">
+                                    <strong>{l s='Total products' mod='hotelreservationsystem'} :</strong>
+                                </div>
+                                <div class="col-sm-9">
+                                    {$refundReqProducts|count}
+                                </div>
+                            </div>
+                        {/if}
 						<div class="form-group row">
 							<div class="col-sm-3">
 								<strong>{l s='Way of payment' mod='hotelreservationsystem'} :</strong>
@@ -221,6 +233,75 @@
                                                             {/if}
                                                         </td>
                                                     {/if}
+												{/if}
+											</tr>
+										{/foreach}
+									</table>
+								</div>
+							</div>
+						{/if}
+
+						{if isset($refundReqProducts) && $refundReqProducts}
+							<br>
+							<div class="form-group">
+								<div class="col-sm-12">
+									<label for="id_refund_state" class="control-label">
+										<p><span title="" data-toggle="tooltip" class="label-tooltip" data-original-title='{l s="List of product requested for refund by the customer." mod='hotelreservationsystem'}'><strong>{l s="Products requested for refund" mod='hotelreservationsystem'}</strong></span> :
+										</p>
+									</label>
+								</div>
+								<div class="col-sm-12">
+									<table class="table" id="rooms_refund_info">
+										<tr>
+											{if !$isRefundCompleted}
+												<th></th>
+											{/if}
+											<th>{l s='Name' mod='hotelreservationsystem'}</th>
+											<th>{l s='Quantity' mod='hotelreservationsystem'}</th>
+											<th>{l s='Total cost (tax incl.)' mod='hotelreservationsystem'}</th>
+											<th>{l s='Total paid amount (tax incl.)' mod='hotelreservationsystem'}</th>
+
+											{if $hasOrderDiscountOrPayment || $isRefundCompleted}
+												<th>{l s='Refund amount' mod='hotelreservationsystem'}</th>
+
+												{if $isRefundCompleted}
+													<th>{l s='Refund status' mod='hotelreservationsystem'}</th>
+												{/if}
+											{/if}
+										</tr>
+										{foreach $refundReqProducts as $product}
+											<tr>
+												{if !$isRefundCompleted}
+													<td><input type="checkbox" name="id_order_return_detail[]" value="{$product['id_order_return_detail']|escape:'html':'UTF-8'}" checked/></td>
+												{/if}
+												<td>{$product['name']|escape:'htmlall':'UTF-8'}{if isset($product['option_name']) && $product['option_name']} : {$product['option_name']|escape:'htmlall':'UTF-8'}{/if}</td>
+												<td>{if $product['allow_multiple_quantity']}{$product['quantity']|escape:'htmlall':'UTF-8'}{else}--{/if}</td>
+												<td>{displayPrice price=$product['total_price_tax_incl'] currency=$orderCurrency['id']}</td>
+												<td>{displayPrice price=$product['paid_amount'] currency=$orderCurrency['id']}</td>
+												{if $hasOrderDiscountOrPayment || $isRefundCompleted}
+													<td>
+														<div class="input-group">
+															{if $isRefundCompleted}
+																{displayPrice price=$product['refunded_amount'] currency=$orderCurrency['id']}
+															{else}
+																<span class="input-group-addon">{$orderCurrency['sign']|escape:'html':'UTF-8'}</span>
+																<input placeholder="" type="text" name="refund_amounts[{$product['id_order_return_detail']|escape:'html':'UTF-8'}]" value="0">
+																<span class="input-group-addon">{l s='tax incl.' mod='hotelreservationsystem'}</span>
+															{/if}
+														</div>
+													</td>
+													{if $isRefundCompleted}
+														<td>
+															{if $product['is_cancelled']}
+																<span class="badge badge-danger">{l s='Cancelled' mod='hotelreservationsystem'}</span>
+															{* used id_customization to check if in this request which bookings are refunded or not*}
+															{else if $product['id_customization']}
+																<span class="badge badge-success">{l s='Refunded' mod='hotelreservationsystem'}</span>
+															{else}
+																<span class="badge badge-danger">{l s='Denied' mod='hotelreservationsystem'}</span>
+															{/if}
+														</td>
+													{/if}
 												{/if}
 											</tr>
 										{/foreach}

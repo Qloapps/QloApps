@@ -175,7 +175,7 @@ class DiscountCore extends CartRule
     /**
      * @deprecated 1.5.0.1
      */
-    public static function getCustomerDiscounts($id_lang, $id_customer, $active = false, $includeGenericOnes = true, $hasStock = false, Cart $cart = null)
+    public static function getCustomerDiscounts($id_lang, $id_customer, $active = false, $includeGenericOnes = true, $hasStock = false, ?Cart $cart = null)
     {
         return parent::getCustomerCartRules($id_lang, $id_customer, $active, $includeGenericOnes, $hasStock, $cart);
     }
@@ -191,7 +191,7 @@ class DiscountCore extends CartRule
     /**
      * @deprecated 1.5.0.1
      */
-    public function getValue($nb_discounts = 0, $order_total_products = 0, $shipping_fees = 0, $id_cart = false, $useTax = true, Currency $currency = null, Shop $shop = null)
+    public function getValue($nb_discounts = 0, $order_total_products = 0, $shipping_fees = 0, $id_cart = false, $useTax = true, ?Currency $currency = null, ?Shop $shop = null)
     {
         $context = Context::getContext();
         if ((int)$id_cart) {

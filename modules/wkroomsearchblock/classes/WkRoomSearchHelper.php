@@ -1,21 +1,24 @@
 <?php
 /**
-* 2010-2020 Webkul.
-*
 * NOTICE OF LICENSE
 *
-* All right is reserved,
-* Please go through this link for complete license : https://store.webkul.com/license.html
+* This source file is subject to the Open Software License version 3.0
+* that is bundled with this package in the file LICENSE.md
+* It is also available through the world-wide-web at this URL:
+* https://opensource.org/license/osl-3-0-php
+* If you did not receive a copy of the license and are unable to
+* obtain it through the world-wide-web, please send an email
+* to support@qloapps.com so we can send you a copy immediately.
 *
 * DISCLAIMER
 *
-* Do not edit or add to this file if you wish to upgrade this module to newer
-* versions in the future. If you wish to customize this module for your
-* needs please refer to https://store.webkul.com/customisation-guidelines/ for more information.
+* Do not edit or add to this file if you wish to upgrade this module to a newer
+* versions in the future. If you wish to customize this module for your needs
+* please refer to https://store.webkul.com/customisation-guidelines for more information.
 *
-*  @author    Webkul IN <support@webkul.com>
-*  @copyright 2010-2020 Webkul IN
-*  @license   https://store.webkul.com/license.html
+* @author Webkul IN
+* @copyright Since 2010 Webkul
+* @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
 */
 
 class WkRoomSearchHelper
@@ -56,39 +59,41 @@ class WkRoomSearchHelper
 
         // Lets validate guest occupancy fields
         // Get guest occupancy variable
-        $guestOccupancy = Tools::getValue('occupancy');
-        if (!count($guestOccupancy)) {
-            $errors[] = $objModule->l('Invalid occupancy', 'WkRoomSearchHelper');
-        } else {
-            $adultTypeErr = 0;
-            $childTypeErr = 0;
-            $childAgeErr = 0;
-            foreach ($guestOccupancy as $occupancy) {
-                if (!isset($occupancy['adults']) || !Validate::isUnsignedInt($occupancy['adults'])) {
-                    $adultTypeErr = 1;
-                }
-                if (!isset($occupancy['children']) || !Validate::isUnsignedInt($occupancy['children'])) {
-                    $childTypeErr = 1;
-                } elseif ($occupancy['children']) {
-                    if (!isset($occupancy['child_ages']) || ($occupancy['children'] != count($occupancy['child_ages']))) {
-                        $childAgeErr = 1;
-                    } else {
-                        foreach ($occupancy['child_ages'] as $childAge) {
-                            if (!Validate::isUnsignedInt($childAge)) {
-                                $childAgeErr = 1;
+        if (Configuration::get('PS_FRONT_SEARCH_TYPE') == HotelBookingDetail::SEARCH_TYPE_OWS) {
+            $guestOccupancy = Tools::getValue('occupancy');
+            if (!count($guestOccupancy)) {
+                $errors[] = $objModule->l('Invalid occupancy', 'WkRoomSearchHelper');
+            } else {
+                $adultTypeErr = 0;
+                $childTypeErr = 0;
+                $childAgeErr = 0;
+                foreach ($guestOccupancy as $occupancy) {
+                    if (!isset($occupancy['adults']) || !Validate::isUnsignedInt($occupancy['adults'])) {
+                        $adultTypeErr = 1;
+                    }
+                    if (!isset($occupancy['children']) || !Validate::isUnsignedInt($occupancy['children'])) {
+                        $childTypeErr = 1;
+                    } elseif ($occupancy['children']) {
+                        if (!isset($occupancy['child_ages']) || ($occupancy['children'] != count($occupancy['child_ages']))) {
+                            $childAgeErr = 1;
+                        } else {
+                            foreach ($occupancy['child_ages'] as $childAge) {
+                                if (!Validate::isUnsignedInt($childAge)) {
+                                    $childAgeErr = 1;
+                                }
                             }
                         }
                     }
                 }
-            }
-            if ($adultTypeErr) {
-                $errors[] = $objModule->l('Invalid adults', 'WkRoomSearchHelper');
-            }
-            if ($childTypeErr) {
-                $errors[] = $objModule->l('Invalid children', 'WkRoomSearchHelper');
-            }
-            if ($childAgeErr) {
-                $errors[] = $objModule->l('Invalid children ages', 'WkRoomSearchHelper');
+                if ($adultTypeErr) {
+                    $errors[] = $objModule->l('Invalid adults', 'WkRoomSearchHelper');
+                }
+                if ($childTypeErr) {
+                    $errors[] = $objModule->l('Invalid children', 'WkRoomSearchHelper');
+                }
+                if ($childAgeErr) {
+                    $errors[] = $objModule->l('Invalid children ages', 'WkRoomSearchHelper');
+                }
             }
         }
 
@@ -190,8 +195,6 @@ class WkRoomSearchHelper
                             $searchedData['order_date_restrict'] = true;
                         }
                     }
-
-                    $smartyVars['search_data'] = $searchedData;
                 }
 
                 if ($occupancyEnabled) {
@@ -204,9 +207,6 @@ class WkRoomSearchHelper
                                 );
                                 $searchedData['occupancy_children'] = array_sum(
                                     array_column($searchedData['occupancies'], 'children')
-                                );
-                                $searchedData['occupancy_child_ages'] = array_sum(
-                                    array_column($searchedData['occupancies'], 'child_ages')
                                 );
                             }
                         }

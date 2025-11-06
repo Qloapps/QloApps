@@ -80,7 +80,7 @@ class ImageManagerCore
                     $size = $y / ($x / $max_x);
                 }
 
-                ImageManager::resize($image, _PS_TMP_IMG_DIR_.$cache_image, $ratio_x, $size, $image_type);
+                ImageManager::resize($image, _PS_TMP_IMG_DIR_.$cache_image, (int)$ratio_x, (int)$size, $image_type);
             }
         }
         // Relative link will always work, whatever the base uri set in the admin

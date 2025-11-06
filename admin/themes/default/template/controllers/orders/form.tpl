@@ -283,6 +283,27 @@
 			};
 			updateProductPrice(params, cart_row);
 		})
+		$(document).on('change', '.product_quantity', function(e) {
+			var cart_row = $(this).closest('tr');
+			var qty = parseInt($(this).val());
+			var qtyhidden= parseInt($(this).siblings('.product_quantity_hidden').val());
+			var qty_to_update = qty - qtyhidden;
+			if ((qty_to_update) > 0) {
+				var opt = 'up';
+			} else {
+				var opt = 'down';
+			}
+
+			var params = {
+				id_product: parseInt($(cart_row).attr('data-id-product')),
+				qty: qty_to_update,
+				opt: opt,
+				id_cart: id_cart
+			};
+
+			updateQuantity(params, cart_row);
+			$(this).siblings('.product_quantity_hidden').val($(this).val())
+		});
 		$('#order_message').live('change', function(e) {
 			e.preventDefault();
 			$.ajax({
@@ -298,7 +319,7 @@
 					id_cart: id_cart,
 					id_customer: id_customer,
 					message: $(this).val()
-					},
+				},
 				success : function(res)
 				{
 					displaySummary(res);
@@ -614,7 +635,10 @@
 			'width': '90%',
 			'height': '90%',
 			'afterClose' : function () {
-				searchCustomers();
+				let customer = $('#customer').val();
+				if (customer != '' && customer.length > 3) {
+					searchCustomers();
+				}
 			}
 		});
 		/*$("#new_address").fancybox({
@@ -675,6 +699,7 @@
 			success : function(response) {
 				updateCartLine(response.curr_booking_info, cart_row);
 				updateCartSummaryData(response.cart_info);
+				updateCartVouchers(response.cart_info.summary.discounts);
 			}
 		});
 	}
@@ -700,6 +725,26 @@
 		});
 	}
 
+	function updateQuantity(params, cart_row)
+	{
+		$.ajax({
+			type:"POST",
+			url: "{$link->getAdminLink('AdminCarts')|addslashes}",
+			async: true,
+			dataType: "JSON",
+			data: {
+				ajax: "1",
+				token: "{getAdminToken tab='AdminCarts'}",
+				tab: "AdminCarts",
+				action: "updateProductQuantity",
+				params: params,
+			},
+			success : function(response) {
+				// updateCartLine(response.curr_booking_info, cart_row);
+				// updateCartSummaryData(response.cart_info);
+			}
+		});
+	}
 
 	function updateCartLine(data, cart_row) {
 		$(cart_row).find('.cart_line_total_rooms_price').html(data.amt_with_qty);
@@ -844,9 +889,11 @@
 		});
 	}
 
+	let customerSearchAjax = '';
 	function searchCustomers()
 	{
-		$.ajax({
+		abortRunningAjax(customerSearchAjax);
+		customerSearchAjax = $.ajax({
 			type:"POST",
 			url : "{$link->getAdminLink('AdminCustomers')}",
 			async: true,
@@ -885,6 +932,12 @@
 			}
 		});
 	}
+
+	function abortRunningAjax(ajaxVar) {
+        if (ajaxVar) {
+            ajaxVar.abort();
+        }
+    }
 
 	function setupCustomer(idCustomer)
 	{
@@ -1699,6 +1752,7 @@
             $('#room_type_services_desc').show();
             $('#add_new_room_services_block').hide();
             $('#back_to_service_btn').hide();
+			$('#btn_new_room_service').show();
         });
 
 		// Add new custom service: Show hide new custom service form
@@ -1706,6 +1760,7 @@
 			$('#add_new_room_services_block').show();
 			$('#back_to_service_btn').show();
 			$('#room_type_services_desc').hide();
+			$('#btn_new_room_service').hide();
 		});
 
 		// Add new custom service: change auto added option
@@ -2264,6 +2319,15 @@
                             <textarea name="order_message" id="order_message" rows="3" cols="45"></textarea>
                         </div>
                     </div>
+					<div class="form-group col-lg-12">
+						<span class="col-lg-3"></span>
+						<p class="checkbox col-lg-6">
+							<label class="control-label" for="visibility">
+								<input type="checkbox" name="visibility" id="visibility" value="1" />
+								{l s='Display Message to Customer?'}
+							</label>
+						</p>
+					</div>
                     <div class="form-group" {if $order_total <= 0}style="display: none;"{/if}>
                         {if !$PS_CATALOG_MODE}
                         <div class="col-lg-9 col-lg-offset-3">

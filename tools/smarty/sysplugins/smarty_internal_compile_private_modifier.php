@@ -109,6 +109,11 @@ class Smarty_Internal_Compile_Private_Modifier extends Smarty_Internal_CompileBa
                             if (!is_object($compiler->smarty->security_policy)
                                 || $compiler->smarty->security_policy->isTrustedPhpModifier($modifier, $compiler)
                             ) {
+                                if (!in_array($modifier, ['time', 'join', 'is_array', 'in_array'])) {
+                                    // trigger_error('Using unregistered function "' . $modifier . '" in a template is deprecated and will be ' .
+                                    //     'removed in a future release. Use Smarty::registerPlugin to explicitly register ' .
+                                    //     'a custom modifier.', E_USER_DEPRECATED);
+                                }
                                 $output = "{$modifier}({$params})";
                             }
                             $compiler->known_modifier_type[ $modifier ] = $type;

@@ -1,4 +1,12 @@
 ------------------------------
+# V1.4.2 to V1.4.3
+------------------------------
+
+## Improved/Changed Features:
+
+* [FO] : [#1388] Added CSRF token validation on user logout at Front office
+
+------------------------------
 # V1.4.1 to V1.4.2
 ------------------------------
 

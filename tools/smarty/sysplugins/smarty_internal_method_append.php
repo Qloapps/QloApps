@@ -22,7 +22,7 @@ class Smarty_Internal_Method_Append
      * appends values to template variables
      *
      * @api  Smarty::append()
-     * @link http://www.smarty.net/docs/en/api.append.tpl
+     * @link https://www.smarty.net/docs/en/api.append.tpl
      *
      * @param \Smarty_Internal_Data|\Smarty_Internal_Template|\Smarty $data
      * @param array|string                                            $tpl_var the template variable name(s)

@@ -80,25 +80,11 @@ class AdminEmailsControllerCore extends AdminController
         }
 
         parent::__construct();
-
-        foreach (Contact::getContacts($this->context->language->id) as $contact) {
-            $arr[] = array('email_message' => $contact['id_contact'], 'name' => $contact['name']);
-        }
-
         $this->fields_options = array(
             'email' => array(
                 'title' => $this->l('Email'),
                 'icon' => 'icon-envelope',
-                'fields' =>    array(
-                    'PS_MAIL_EMAIL_MESSAGE' => array(
-                        'title' => $this->l('Send email to'),
-                        'desc' => $this->l('Where customers send messages from the order page.'),
-                        'validation' => 'isUnsignedId',
-                        'type' => 'select',
-                        'cast' => 'intval',
-                        'identifier' => 'email_message',
-                        'list' => $arr
-                    ),
+                'fields' => array(
                     'PS_MAIL_METHOD' => array(
                         'title' => '',
                         'validation' => 'isGenericName',
@@ -332,7 +318,7 @@ class AdminEmailsControllerCore extends AdminController
             die(Tools::displayError('This functionality has been disabled.'));
         }
         /* PrestaShop demo mode */
-        if ($this->tabAccess['view'] === '1') {
+        if ($this->tabAccess['view'] === 1) {
             $smtpChecked = (trim(Tools::getValue('mailMethod')) == 'smtp');
             $smtpServer = Tools::getValue('smtpSrv');
             $content = html_entity_decode(urldecode(Tools::getValue('testMsg')));

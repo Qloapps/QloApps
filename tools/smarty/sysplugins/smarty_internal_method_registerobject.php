@@ -22,7 +22,7 @@ class Smarty_Internal_Method_RegisterObject
      * Registers object to be used in templates
      *
      * @api  Smarty::registerObject()
-     * @link http://www.smarty.net/docs/en/api.register.object.tpl
+     * @link https://www.smarty.net/docs/en/api.register.object.tpl
      *
      * @param \Smarty_Internal_TemplateBase|\Smarty_Internal_Template|\Smarty $obj
      * @param string                                                          $object_name

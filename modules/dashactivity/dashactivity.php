@@ -32,11 +32,13 @@ class Dashactivity extends Module
 {
     protected static $colors = array('#1F77B4', '#FF7F0E', '#2CA02C');
 
+    protected $push_filename;
+
     public function __construct()
     {
         $this->name = 'dashactivity';
         $this->tab = 'dashboard';
-        $this->version = '1.0.3';
+        $this->version = '1.0.4';
         $this->author = 'PrestaShop';
         $this->push_filename = _PS_CACHE_DIR_.'push/activity';
         $this->allow_push = true;
@@ -484,7 +486,6 @@ class Dashactivity extends Module
         $lang = new Language((int)Configuration::get('PS_LANG_DEFAULT'));
         $helper->default_form_language = $lang->id;
         $helper->allow_employee_form_lang = Configuration::get('PS_BO_ALLOW_EMPLOYEE_FORM_LANG') ? Configuration::get('PS_BO_ALLOW_EMPLOYEE_FORM_LANG') : 0;
-        $this->fields_form = array();
         $helper->id = (int)Tools::getValue('id_carrier');
         $helper->identifier = $this->identifier;
         $helper->submit_action = 'submitDashConfig';

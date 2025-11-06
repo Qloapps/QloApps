@@ -28,7 +28,7 @@
  *            - 2.0 complete rewrite for performance,
  *              added attributes month_names, *_id
  *
- * @link    http://www.smarty.net/manual/en/language.function.html.select.date.php {html_select_date}
+ * @link    https://www.smarty.net/manual/en/language.function.html.select.date.php {html_select_date}
  *           (Smarty online manual)
  * @version 2.0
  * @author  Andrei Zmievski
@@ -101,6 +101,7 @@ function smarty_function_html_select_date($params, Smarty_Internal_Template $tem
     $field_separator = "\n";
     $option_separator = "\n";
     $time = null;
+
     // $all_empty = null;
     // $day_empty = null;
     // $month_empty = null;
@@ -113,17 +114,7 @@ function smarty_function_html_select_date($params, Smarty_Internal_Template $tem
     foreach ($params as $_key => $_value) {
         switch ($_key) {
             case 'time':
-                if (!is_array($_value) && $_value !== null) {
-                    $template->_checkPlugins(
-                        array(
-                            array(
-                                'function' => 'smarty_make_timestamp',
-                                'file'     => SMARTY_PLUGINS_DIR . 'shared.make_timestamp.php'
-                            )
-                        )
-                    );
-                    $time = smarty_make_timestamp($_value);
-                }
+                $$_key = $_value; // we'll handle conversion below
                 break;
             case 'month_names':
                 if (is_array($_value) && count($_value) === 12) {
@@ -178,43 +169,59 @@ function smarty_function_html_select_date($params, Smarty_Internal_Template $tem
     }
     // Note: date() is faster than strftime()
     // Note: explode(date()) is faster than date() date() date()
-    if (isset($params[ 'time' ]) && is_array($params[ 'time' ])) {
-        if (isset($params[ 'time' ][ $prefix . 'Year' ])) {
+
+    if (isset($time) && is_array($time)) {
+        if (isset($time[$prefix . 'Year'])) {
             // $_REQUEST[$field_array] given
-            foreach (array(
-                'Y' => 'Year',
-                'm' => 'Month',
-                'd' => 'Day'
-            ) as $_elementKey => $_elementName) {
+            foreach ([
+                         'Y' => 'Year',
+                         'm' => 'Month',
+                         'd' => 'Day'
+                     ] as $_elementKey => $_elementName) {
                 $_variableName = '_' . strtolower($_elementName);
                 $$_variableName =
-                    isset($params[ 'time' ][ $prefix . $_elementName ]) ? $params[ 'time' ][ $prefix . $_elementName ] :
+                    isset($time[$prefix . $_elementName]) ? $time[$prefix . $_elementName] :
                         date($_elementKey);
             }
-        } elseif (isset($params[ 'time' ][ $field_array ][ $prefix . 'Year' ])) {
+        } elseif (isset($time[$field_array][$prefix . 'Year'])) {
             // $_REQUEST given
-            foreach (array(
-                'Y' => 'Year',
-                'm' => 'Month',
-                'd' => 'Day'
-            ) as $_elementKey => $_elementName) {
+            foreach ([
+                         'Y' => 'Year',
+                         'm' => 'Month',
+                         'd' => 'Day'
+                     ] as $_elementKey => $_elementName) {
                 $_variableName = '_' . strtolower($_elementName);
-                $$_variableName = isset($params[ 'time' ][ $field_array ][ $prefix . $_elementName ]) ?
-                    $params[ 'time' ][ $field_array ][ $prefix . $_elementName ] : date($_elementKey);
+                $$_variableName = isset($time[$field_array][$prefix . $_elementName]) ?
+                    $time[$field_array][$prefix . $_elementName] : date($_elementKey);
             }
         } else {
             // no date found, use NOW
-            list($_year, $_month, $_day) = $time = explode('-', date('Y-m-d'));
+            [$_year, $_month, $_day] = explode('-', date('Y-m-d'));
         }
+    } elseif (isset($time) && preg_match("/(\d*)-(\d*)-(\d*)/", $time, $matches)) {
+        $_year = $_month = $_day = null;
+        if ($matches[1] > '') $_year = (int) $matches[1];
+        if ($matches[2] > '') $_month = (int) $matches[2];
+        if ($matches[3] > '') $_day = (int) $matches[3];
     } elseif ($time === null) {
         if (array_key_exists('time', $params)) {
-            $_year = $_month = $_day = $time = null;
+            $_year = $_month = $_day = null;
         } else {
-            list($_year, $_month, $_day) = $time = explode('-', date('Y-m-d'));
+            [$_year, $_month, $_day] = explode('-', date('Y-m-d'));
         }
     } else {
-        list($_year, $_month, $_day) = $time = explode('-', date('Y-m-d', $time));
+        $template->_checkPlugins(
+            array(
+                array(
+                    'function' => 'smarty_make_timestamp',
+                    'file'     => SMARTY_PLUGINS_DIR . 'shared.make_timestamp.php'
+                )
+            )
+        );
+        $time = smarty_make_timestamp($time);
+        [$_year, $_month, $_day] = explode('-', date('Y-m-d', $time));
     }
+
     // make syntax "+N" or "-N" work with $start_year and $end_year
     // Note preg_match('!^(\+|\-)\s*(\d+)$!', $end_year, $match) is slower than trim+substr
     foreach (array(
@@ -309,8 +316,8 @@ function smarty_function_html_select_date($params, Smarty_Internal_Template $tem
         for ($i = 1; $i <= 12; $i++) {
             $_val = sprintf('%02d', $i);
             $_text = isset($month_names) ? smarty_function_escape_special_chars($month_names[ $i ]) :
-                ($month_format === '%m' ? $_val : strftime($month_format, $_month_timestamps[ $i ]));
-            $_value = $month_value_format === '%m' ? $_val : strftime($month_value_format, $_month_timestamps[ $i ]);
+                ($month_format === '%m' ? $_val : @strftime($month_format, $_month_timestamps[ $i ]));
+            $_value = $month_value_format === '%m' ? $_val : @strftime($month_value_format, $_month_timestamps[ $i ]);
             $_html_months .= '<option value="' . $_value . '"' . ($_val == $_month ? ' selected="selected"' : '') .
                              '>' . $_text . '</option>' . $option_separator;
         }

@@ -42,7 +42,7 @@
 			</tr>
 		</thead>
 		<tbody>
-            {if $orderDocuments|count}
+            {if isset($orderDocuments) && $orderDocuments|count}
                 {foreach from=$orderDocuments item=document}
                     {if get_class($document) eq 'OrderInvoice'}
                         <tr id="invoice_{$document->id}">

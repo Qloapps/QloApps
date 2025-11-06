@@ -97,7 +97,7 @@ class DbPDOCore extends Db
     public function connect()
     {
         try {
-            $this->link = $this->_getPDO($this->server, $this->user, $this->password, $this->database, 5);
+            $this->link = DbPDO::_getPDO($this->server, $this->user, $this->password, $this->database, 5);
         } catch (PDOException $e) {
             throw new PrestaShopException('Link to database cannot be established:'.$e->getMessage());
         }
@@ -253,8 +253,13 @@ class DbPDOCore extends Db
      */
     public function _escape($str)
     {
-        $search = array("\\", "\0", "\n", "\r", "\x1a", "'", '"');
-        $replace = array("\\\\", "\\0", "\\n", "\\r", "\Z", "\'", '\"');
+        if (null === $str) {
+            return '';
+        }
+
+        $search = ['\\', "\0", "\n", "\r", "\x1a", "'", '"'];
+        $replace = ['\\\\', '\\0', '\\n', '\\r', "\Z", "\'", '\"'];
+
         return str_replace($search, $replace, $str);
     }
 

@@ -102,7 +102,7 @@ class OrderDetailCore extends ObjectModel
     public $is_booking_product;
 
     /** @var int */
-    public $product_service_type;
+    public $selling_preference_type;
 
     /** @var bool */
     public $product_allow_multiple_quantity;
@@ -170,6 +170,12 @@ class OrderDetailCore extends ObjectModel
     /** @var float */
     public $original_wholesale_price;
 
+    /** @var bool */
+    public $product_auto_add;
+
+    /** @var int */
+    public $product_price_addition_type;
+
     /**
      * @see ObjectModel::$definition
      */
@@ -197,7 +203,7 @@ class OrderDetailCore extends ObjectModel
             'group_reduction' =>            array('type' => self::TYPE_FLOAT, 'validate' => 'isFloat'),
             'product_quantity_discount' =>    array('type' => self::TYPE_FLOAT, 'validate' => 'isFloat'),
             'is_booking_product' =>                array('type' => self::TYPE_BOOL, 'validate' => 'isBool'),
-            'product_service_type' =>        array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
+            'selling_preference_type' =>        array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
             'product_auto_add' =>            array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
             'product_price_addition_type' =>    array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
             'product_allow_multiple_quantity' => array('type' => self::TYPE_BOOL, 'validate' => 'isBool'),
@@ -366,23 +372,6 @@ class OrderDetailCore extends ObjectModel
      */
     public function saveTaxCalculator(Order $order, $replace = false)
     {
-        // Nothing to save
-        if ($this->tax_calculator == null) {
-            return true;
-        }
-
-        if (!($this->tax_calculator instanceof TaxCalculator)) {
-            return false;
-        }
-
-        if (count($this->tax_calculator->taxes) == 0) {
-            return true;
-        }
-
-        if ($order->total_products <= 0) {
-            return true;
-        }
-
         $shipping_tax_amount = 0;
 
         foreach ($order->getCartRules() as $cart_rule) {
@@ -392,27 +381,192 @@ class OrderDetailCore extends ObjectModel
             }
         }
 
-        $ratio = $this->unit_price_tax_excl / $order->total_products;
-        $order_reduction_amount = ($order->total_discounts_tax_excl - $shipping_tax_amount) * $ratio;
-        $discounted_price_tax_excl = $this->unit_price_tax_excl - $order_reduction_amount;
-
         $values = '';
-        foreach ($this->tax_calculator->getTaxesAmount($discounted_price_tax_excl) as $id_tax => $amount) {
-
-            $total_amount = Tools::processPriceRounding($amount, $this->product_quantity, $order->round_type, $order->round_mode);
-
-            $values .= '('.(int)$this->id.','.(int)$id_tax.','.(float)$amount.','.(float)$total_amount.'),';
+        $idCart = $this->context->cart->id ?? $order->id_cart;
+        if (empty($this->vat_address)) {
+            $this->vat_address = new Address((int)$order->id_address_tax);
         }
 
-        if ($replace) {
-            Db::getInstance()->execute('DELETE FROM `'._DB_PREFIX_.'order_detail_tax` WHERE id_order_detail='.(int)$this->id);
+        /**
+         * Calculate tax rule groups for the service product based on each associated room type.
+         */
+        if (!$this->is_booking_product && $this->selling_preference_type == Product::SELLING_PREFERENCE_WITH_ROOM_TYPE) {
+            if ($this->product_auto_add && $this->product_price_addition_type == Product::PRICE_ADDITION_TYPE_WITH_ROOM) {
+                return true;
+            }
+            // Get all associated room type IDs for this service product and cart
+            $associatedRoomTypes = Db::getInstance()->executeS(
+                'SELECT hcbd.`id_product`
+                FROM `'._DB_PREFIX_.'htl_cart_booking_data` hcbd
+                INNER JOIN `'._DB_PREFIX_.'service_product_cart_detail` spcd
+                ON spcd.`htl_cart_booking_id` = hcbd.`id`
+                WHERE spcd.`id_product` = '.(int)$this->product_id.'
+                AND spcd.`id_cart` = '.(int)$idCart
+            );
+
+            if (!empty($associatedRoomTypes)) {
+                $associatedRoomTypeIds = array_column($associatedRoomTypes, 'id_product');
+                $taxGroupInfoList = array();
+                $objRoomTypeServiceProductPrice = new RoomTypeServiceProductPrice();
+                foreach ($associatedRoomTypeIds as $idRoomType) {
+                    $key = $this->product_id.'_'.$idRoomType;
+                    if ($serviceProductPriceRoomInfo = $objRoomTypeServiceProductPrice->getProductRoomTypeLinkPriceInfo(
+                        $this->product_id,
+                        $idRoomType,
+                        RoomTypeServiceProduct::WK_ELEMENT_TYPE_ROOM_TYPE
+                    )) {
+                        //Special tax rule group for the Service product accroding to Room type
+                        $taxGroupInfoList[$key] = array(
+                            'id_room_type' => $idRoomType,
+                            'id_tax_rules_group' => $serviceProductPriceRoomInfo['id_tax_rules_group']
+                        );
+                    } else {
+                        // Use default tax rule group for the service product
+                        $taxGroupInfoList[$key] = array(
+                            'id_room_type' => $idRoomType,
+                            'id_tax_rules_group' => $this->id_tax_rules_group
+                        );
+                    }
+                }
+            }
+        }
+
+        /**
+         * Calculate service product tax separately for each room type because
+         * a service product can be attached to multiple room types with different tax rules.
+         */
+        if (!$this->is_booking_product && isset($taxGroupInfoList) && $taxGroupInfoList) {
+            $objServiceProductCartDetail = new ServiceProductCartDetail();
+            $objServiceProductOrderDetail = new ServiceProductOrderDetail();
+            // Saving tax details according to the service product tax groups for different rooms
+            foreach ($taxGroupInfoList as $taxGroupInfo) {
+                $tax_manager = TaxManagerFactory::getManager($this->vat_address, (int)$taxGroupInfo['id_tax_rules_group']);
+                $this->tax_calculator = $tax_manager->getTaxCalculator();
+
+                if ($serviceProductData = $objServiceProductOrderDetail->getRoomTypeServiceProducts(
+                        $this->id_order,
+                        $this->product_id,
+                        0,
+                        $taxGroupInfo['id_room_type'],
+                )) {
+                    $serviceProductData = array_shift($serviceProductData);
+                    $numDays = 1;
+                    if ((Product::PRICE_CALCULATION_METHOD_PER_DAY == $this->product_price_calculation_method)
+                        && (!$numDays = HotelHelper::getNumberOfDays($serviceProductData['date_from'], $serviceProductData['date_to']))
+                    ) {
+                        $numDays = 1;
+                    }
+
+                    $unit_price_tax_excl = array_reduce($serviceProductData['additional_services'], function ($unitPriceTaxExcl, $item) {
+                        return $unitPriceTaxExcl + (isset($item['unit_price_tax_excl']) ? $item['unit_price_tax_excl'] : 0);
+                    }, 0);
+
+                    $quantity = array_reduce($serviceProductData['additional_services'], function ($totalQty, $item) {
+                        return $totalQty + (isset($item['quantity']) ? $item['quantity'] : 0);
+                    }, 0);
+
+                    $quantity = $quantity * $numDays;
+
+                    $firstServiceProduct = array_shift($serviceProductData['additional_services']);
+                    $tax_manager = TaxManagerFactory::getManager($this->vat_address, (int)$firstServiceProduct['id_tax_rules_group']);
+                    $this->tax_calculator = $tax_manager->getTaxCalculator();
+                } elseif ($serviceProductData = $objServiceProductCartDetail->getServiceProductsInCart(
+                    $idCart,
+                    array(),
+                    null,
+                    null,
+                    $taxGroupInfo['id_room_type'],
+                    $this->product_id
+                )) {
+                    $unit_price_tax_excl = array_reduce($serviceProductData, function ($unitPriceTaxExcl, $item) {
+                        return $unitPriceTaxExcl + (isset($item['unit_price_tax_excl']) ? $item['unit_price_tax_excl'] : 0);
+                    }, 0);
+
+                    $quantity = array_reduce($serviceProductData, function ($totalQty, $item) {
+                        return $totalQty + (isset($item['quantity']) ? $item['quantity'] : 0);
+                    }, 0);
+
+                    $serviceProductData = array_shift($serviceProductData);
+
+                    $numDays = 1;
+                    if ((Product::PRICE_CALCULATION_METHOD_PER_DAY == $this->product_price_calculation_method)
+                        && (!$numDays = HotelHelper::getNumberOfDays($serviceProductData['date_from'], $serviceProductData['date_to']))
+                    ) {
+                        $numDays = 1;
+                    }
+
+                    $quantity = $quantity * $numDays;
+                }
+
+                if ($this->tax_calculator == null) {
+                    continue;
+                }
+
+                if (!($this->tax_calculator instanceof TaxCalculator)) {
+                    continue;
+                }
+
+                if (count($this->tax_calculator->taxes) == 0) {
+                    continue;
+                }
+
+                if (isset($quantity) && isset($unit_price_tax_excl)) {
+                    foreach ($this->tax_calculator->getTaxesAmount($unit_price_tax_excl) as $id_tax => $amount) {
+
+                        $total_amount = Tools::processPriceRounding($amount, $quantity, $order->round_type, $order->round_mode);
+
+                        $values .= '('.(int)$this->id.','.(int)$id_tax.','.(float)$amount.','.(float)$total_amount.'),';
+                    }
+                }
+            }
+        } else {
+            if ($this->tax_calculator == null) {
+                return true;
+            }
+
+            if (!($this->tax_calculator instanceof TaxCalculator)) {
+                return false;
+            }
+
+            if (count($this->tax_calculator->taxes) == 0) {
+                return true;
+            }
+
+            if ($order->total_products <= 0) {
+                return true;
+            }
+
+            /*
+             * The logic for distributing discount proportionally across products is intentionally skipped,
+             * as we do not want to save taxes on discounted amounts.
+             *
+             * $ratio = $this->unit_price_tax_excl / $order->total_products;
+             * $order_reduction_amount = ($order->total_discounts_tax_excl - $shipping_tax_amount) * $ratio;
+             * $discounted_price_tax_excl = $this->unit_price_tax_excl - $order_reduction_amount;
+             */
+
+            foreach ($this->tax_calculator->getTaxesAmount($this->unit_price_tax_excl) as $id_tax => $amount) {
+
+                $total_amount = Tools::processPriceRounding($amount, $this->product_quantity, $order->round_type, $order->round_mode);
+
+                $values .= '('.(int)$this->id.','.(int)$id_tax.','.(float)$amount.','.(float)$total_amount.'),';
+            }
         }
 
         $values = rtrim($values, ',');
-        $sql = 'INSERT INTO `'._DB_PREFIX_.'order_detail_tax` (id_order_detail, id_tax, unit_amount, total_amount)
-				VALUES '.$values;
 
-        return Db::getInstance()->execute($sql);
+        if ($values) {
+            if ($replace) {
+                Db::getInstance()->execute('DELETE FROM `'._DB_PREFIX_.'order_detail_tax` WHERE id_order_detail='.(int)$this->id);
+            }
+
+            $sql = 'INSERT INTO `'._DB_PREFIX_.'order_detail_tax` (id_order_detail, id_tax, unit_amount, total_amount)
+                VALUES '.$values;
+
+            return Db::getInstance()->execute($sql);
+        }
+
+        return true;
     }
 
     public function updateTaxAmount($order)
@@ -437,7 +591,7 @@ class OrderDetailCore extends ObjectModel
 
     public function getTaxList()
     {
-        return self::getTaxList($this->id);
+        return self::getTaxListStatic($this->id);
     }
 
     public static function getTaxListStatic($id_order_detail)
@@ -478,14 +632,16 @@ class OrderDetailCore extends ObjectModel
             /*
             *By webkul so that product quantity will not be decreased when product is ordered
              */
-            /*$update_quantity = true;
-            if (!StockAvailable::dependsOnStock($product['id_product'])) {
-                $update_quantity = StockAvailable::updateQuantity($product['id_product'], $product['id_product_attribute'], -(int)$product['cart_quantity']);
-            }
+            if (!$product['booking_product']) {
+                $update_quantity = true;
+                if (!StockAvailable::dependsOnStock($product['id_product'])) {
+                    $update_quantity = StockAvailable::updateQuantity($product['id_product'], $product['id_product_attribute'], -(int)$product['cart_quantity']);
+                }
 
-            if ($update_quantity) {
-                $product['stock_quantity'] -= $product['cart_quantity'];
-            }*/
+                if ($update_quantity) {
+                    $product['stock_quantity'] -= $product['cart_quantity'];
+                }
+            }
 
             if ($product['stock_quantity'] < 0 && Configuration::get('PS_STOCK_MANAGEMENT')) {
                 $this->outOfStock = true;
@@ -542,7 +698,7 @@ class OrderDetailCore extends ObjectModel
                     if ($product !== null) {
                         $this->setContext((int)$product['id_shop']);
                     }
-                    $id_tax_rules = (int)Product::getIdTaxRulesGroupByIdProduct((int)$this->specificPrice['id_product'], $this->context);
+                    $id_tax_rules = (int)Product::getIdTaxRulesGroupByIdProduct((int)$this->product_id, $this->context);
                     $tax_manager = TaxManagerFactory::getManager($this->vat_address, $id_tax_rules);
                     $this->tax_calculator = $tax_manager->getTaxCalculator();
 
@@ -645,7 +801,7 @@ class OrderDetailCore extends ObjectModel
             $product_quantity : (int)$product['cart_quantity'];
 
         $this->is_booking_product = $product['booking_product'];
-        $this->product_service_type = $product['service_product_type'];
+        $this->selling_preference_type = $product['selling_preference_type'];
         $this->product_auto_add = $product['auto_add_to_cart'];
         $this->product_price_addition_type = $product['price_addition_type'];
         $this->product_allow_multiple_quantity = $product['allow_multiple_quantity'];

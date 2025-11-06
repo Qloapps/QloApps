@@ -22,11 +22,11 @@ class Smarty_Internal_Resource_String extends Smarty_Resource
      * populate Source Object with meta data from Resource
      *
      * @param Smarty_Template_Source   $source    source object
-     * @param Smarty_Internal_Template $_template template object
+     * @param Smarty_Internal_Template|null $_template template object
      *
      * @return void
      */
-    public function populate(Smarty_Template_Source $source, Smarty_Internal_Template $_template = null)
+    public function populate(Smarty_Template_Source $source, ?Smarty_Internal_Template $_template = null)
     {
         $source->uid = $source->filepath = sha1($source->name . $source->smarty->_joined_template_dir);
         $source->timestamp = $source->exists = true;

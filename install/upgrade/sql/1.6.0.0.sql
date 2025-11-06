@@ -41,8 +41,8 @@ set `id_address_tax` = `id_address_invoice`;
 
 ALTER TABLE `PREFIX_order_detail`
 ADD `is_booking_product` tinyint(1) NOT NULL DEFAULT '0' AFTER `product_quantity_discount`,
-ADD `product_service_type` tinyint(1) NOT NULL DEFAULT '1' AFTER `is_booking_product`,
-ADD `product_auto_add` tinyint(1) NOT NULL DEFAULT '0' AFTER `product_service_type`,
+ADD `selling_preference_type` tinyint(1) NOT NULL DEFAULT '1' AFTER `is_booking_product`,
+ADD `product_auto_add` tinyint(1) NOT NULL DEFAULT '0' AFTER `selling_preference_type`,
 ADD `product_price_addition_type` tinyint(1) NOT NULL DEFAULT '0' AFTER `product_auto_add`,
 ADD `product_allow_multiple_quantity` tinyint(1) unsigned NOT NULL DEFAULT '1' AFTER `product_price_addition_type`,
 ADD `product_price_calculation_method` tinyint(1) unsigned NOT NULL DEFAULT '1' AFTER `product_allow_multiple_quantity`;
@@ -86,8 +86,8 @@ ADD `price_calculation_method` tinyint(1) unsigned NOT NULL DEFAULT '1' AFTER `m
 ADD `auto_add_to_cart` tinyint(1) NOT NULL DEFAULT '0' AFTER `available_for_order`,
 ADD `price_addition_type` tinyint(1) NOT NULL DEFAULT '1' AFTER `auto_add_to_cart`,
 ADD `show_at_front` tinyint(1) NOT NULL DEFAULT '1' AFTER `price_addition_type`,
-ADD `service_product_type` tinyint(1) NOT NULL DEFAULT '1' AFTER `show_at_front`,
-ADD `price_display_method` tinyint(1) NOT NULL DEFAULT '1' AFTER `service_product_type`,
+ADD `selling_preference_type` tinyint(1) NOT NULL DEFAULT '1' AFTER `show_at_front`,
+ADD `price_display_method` tinyint(1) NOT NULL DEFAULT '1' AFTER `selling_preference_type`,
 ADD `booking_product` tinyint(1) NOT NULL DEFAULT '1' AFTER `is_virtual`;
 
 ALTER TABLE `PREFIX_product_shop`

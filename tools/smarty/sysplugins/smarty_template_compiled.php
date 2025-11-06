@@ -85,7 +85,7 @@ class Smarty_Template_Compiled extends Smarty_Template_Resource_Base
      *
      * @param Smarty_Internal_Template $_template
      *
-     * @return string
+     * @return void
      * @throws Exception
      */
     public function render(Smarty_Internal_Template $_template)

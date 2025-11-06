@@ -128,7 +128,7 @@
                     <section class="dash_links widget panel">
                         <h3><i class="icon-link"></i> {l s="Help Center"}</h3>
                             <dl>
-                                <dt><a href="https://qloapps.com/qlo-reservation-system/" class="_blank">{l s="Official Documentation"}</a></dt>
+                                <dt><a href="https://docs.qloapps.com/" class="_blank">{l s="Official Documentation"}</a></dt>
                                 <dd>{l s="QloApps User Guide"}</dd>
                             </dl>
                             <dl>

@@ -78,7 +78,7 @@ interface StockManagerInterface
         $id_order = null,
         $ignore_pack = 0,
         $employee = null,
-        Stock $stock = null
+        ?Stock $stock = null
     );
 
     /**

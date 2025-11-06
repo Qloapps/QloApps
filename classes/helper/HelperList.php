@@ -29,6 +29,11 @@
  */
 class HelperListCore extends Helper
 {
+    /**
+     * @var int|null
+     */
+    public $id;
+
     /** @var array Cache for query results */
     protected $_list = array();
 
@@ -70,6 +75,27 @@ class HelperListCore extends Helper
     public $position_identifier;
 
     public $table_id;
+
+    /**
+     * @var string
+     */
+    public $shopLinkType;
+
+    /**
+     * @var string Image type
+     */
+    public $imageType;
+
+    /**
+     * @var string|null
+     */
+    public $list_id;
+
+    /**
+     * Raw sql query string of a list
+     * @var string|null
+     */
+    public $sql;
 
     /**
      * @var array Customize list display
@@ -152,8 +178,13 @@ class HelperListCore extends Helper
         $this->_list = $list;
         $this->fields_list = $fields_display;
 
-        $this->orderBy = preg_replace('/^([a-z _]*!)/Ui', '', $this->orderBy);
-        $this->orderWay = preg_replace('/^([a-z _]*!)/Ui', '', $this->orderWay);
+        if ($this->orderBy !== null) {
+            $this->orderBy = preg_replace('/^([a-z _]*!)/Ui', '', $this->orderBy);
+        }
+
+        if ($this->orderWay !== null) {
+            $this->orderWay = preg_replace('/^([a-z _]*!)/Ui', '', $this->orderWay);
+        }
 
         $this->tpl->assign(array(
             'header' => $this->displayListHeader(), // Display list header (filtering, pagination and column names)
@@ -377,7 +408,7 @@ class HelperListCore extends Helper
     /**
      * Display duplicate action link
      */
-    public function displayDuplicateLink($token = null, $id, $name = null)
+    public function displayDuplicateLink($token, $id, $name = null)
     {
         $tpl = $this->createTemplate('list_action_duplicate.tpl');
         if (!array_key_exists('Bad SQL query', self::$cache_lang)) {
@@ -427,7 +458,7 @@ class HelperListCore extends Helper
      *     fields_display: // attribute $fields_list of the admin controller
      *   }
      */
-    public function displayDetailsLink($token = null, $id, $name = null)
+    public function displayDetailsLink($token, $id, $name = null)
     {
         $tpl = $this->createTemplate('list_action_details.tpl');
         if (!array_key_exists('Details', self::$cache_lang)) {
@@ -454,7 +485,7 @@ class HelperListCore extends Helper
     /**
      * Display view action link
      */
-    public function displayViewLink($token = null, $id, $name = null)
+    public function displayViewLink($token, $id, $name = null)
     {
         $tpl = $this->createTemplate('list_action_view.tpl');
         if (!array_key_exists('View', self::$cache_lang)) {
@@ -472,7 +503,7 @@ class HelperListCore extends Helper
     /**
      * Display edit action link
      */
-    public function displayEditLink($token = null, $id, $name = null)
+    public function displayEditLink($token, $id, $name = null)
     {
         $tpl = $this->createTemplate('list_action_edit.tpl');
         if (!array_key_exists('Edit', self::$cache_lang)) {
@@ -491,7 +522,7 @@ class HelperListCore extends Helper
     /**
      * Display delete action link
      */
-    public function displayDeleteLink($token = null, $id, $name = null)
+    public function displayDeleteLink($token, $id, $name = null)
     {
         $tpl = $this->createTemplate('list_action_delete.tpl');
 
@@ -529,7 +560,7 @@ class HelperListCore extends Helper
     /**
      * Display default action link
      */
-    public function displayDefaultLink($token = null, $id, $name = null)
+    public function displayDefaultLink($token, $id, $name = null)
     {
         $tpl = $this->createTemplate('list_action_default.tpl');
         if (!array_key_exists('Default', self::$cache_lang)) {
@@ -571,11 +602,6 @@ class HelperListCore extends Helper
         $total_pages = max(1, ceil($this->listTotal / $pagination));
 
         $identifier = Tools::getIsset($this->identifier) ? '&'.$this->identifier.'='.(int)Tools::getValue($this->identifier) : '';
-        $order = '';
-        if (Tools::getIsset($this->table.'Orderby')) {
-            $order = '&'.$this->table.'Orderby='.urlencode($this->orderBy).'&'.$this->table.'Orderway='.urlencode(strtolower($this->orderWay));
-        }
-
         $action = $this->currentIndex.$identifier.'&token='.$token.'#'.$this->list_id;
 
         /* Determine current page number */

@@ -1,4 +1,16 @@
 ------------------------------
+# V1.0.1 to V1.0.2
+------------------------------
+
+## Improved/Changed Features:
+
+* [CO] : [#1417] Fixed Cache is not cleaned and some data is deleted incorrectly when using cleaner module.
+* [CO] : [#1412] Added New option to add bed types for a room type in back office.
+* [CO] : [#1464] Upgrade for PHP version 8.1 to 8.4 and MYSql 8 compatibility
+* [CO] : [#1488] Updated the flow for feature prices, added option to add multiple restrictions in a single feature price for a room type in back-office.
+* [CO] : [#1516] Fixed The docs and customer guest are not deleted on order and customer delete process using the data cleaner in back-office.
+
+------------------------------
 # V1.0.0 to V1.0.1
 ------------------------------
 

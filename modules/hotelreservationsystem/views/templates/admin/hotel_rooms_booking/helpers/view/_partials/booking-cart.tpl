@@ -36,7 +36,7 @@
 								</tbody>
 							</table>
 						{/if}
-						{if isset($cart_normal_data)}
+						{if isset($cart_standard_products_data)}
                             <table class="table table-responsive addtocart-table">
                                 <thead class="cart-table-thead">
                                     <tr>
@@ -48,8 +48,8 @@
                                         <th></th>
                                     </tr>
                                     <tbody class="cart_tbody">
-                                        {if isset($cart_normal_data)}
-                                            {foreach $cart_normal_data as $cart_data}
+                                        {if isset($cart_standard_products_data)}
+                                            {foreach $cart_standard_products_data as $cart_data}
                                                 <tr>
                                                     <td>{$cart_data['id_product']|escape:'htmlall':'UTF-8'}</td>
                                                     <td>{$cart_data['name']|escape:'htmlall':'UTF-8'}</td>

@@ -144,7 +144,7 @@ class Smarty_Internal_TestInstall
         }
         // test if all registered plugins_dir are accessible
         // and if core plugins directory is still registered
-        $_core_plugins_dir = realpath(dirname(__FILE__) . '/../plugins');
+        $_core_plugins_dir = realpath(__DIR__ . '/../plugins');
         $_core_plugins_available = false;
         foreach ($smarty->getPluginsDir() as $plugin_dir) {
             $_plugin_dir = $plugin_dir;
@@ -362,7 +362,6 @@ class Smarty_Internal_TestInstall
                 'smarty_internal_compile_function.php'                      => true,
                 'smarty_internal_compile_if.php'                            => true,
                 'smarty_internal_compile_include.php'                       => true,
-                'smarty_internal_compile_include_php.php'                   => true,
                 'smarty_internal_compile_insert.php'                        => true,
                 'smarty_internal_compile_ldelim.php'                        => true,
                 'smarty_internal_compile_make_nocache.php'                  => true,
@@ -373,7 +372,6 @@ class Smarty_Internal_TestInstall
                 'smarty_internal_compile_private_modifier.php'              => true,
                 'smarty_internal_compile_private_object_block_function.php' => true,
                 'smarty_internal_compile_private_object_function.php'       => true,
-                'smarty_internal_compile_private_php.php'                   => true,
                 'smarty_internal_compile_private_print_expression.php'      => true,
                 'smarty_internal_compile_private_registered_block.php'      => true,
                 'smarty_internal_compile_private_registered_function.php'   => true,
@@ -388,7 +386,6 @@ class Smarty_Internal_TestInstall
                 'smarty_internal_config_file_compiler.php'                  => true,
                 'smarty_internal_data.php'                                  => true,
                 'smarty_internal_debug.php'                                 => true,
-                'smarty_internal_errorhandler.php'                          => true,
                 'smarty_internal_extension_handler.php'                     => true,
                 'smarty_internal_method_addautoloadfilters.php'             => true,
                 'smarty_internal_method_adddefaultmodifiers.php'            => true,
@@ -450,7 +447,6 @@ class Smarty_Internal_TestInstall
                 'smarty_internal_resource_extends.php'                      => true,
                 'smarty_internal_resource_file.php'                         => true,
                 'smarty_internal_resource_php.php'                          => true,
-                'smarty_internal_resource_registered.php'                   => true,
                 'smarty_internal_resource_stream.php'                       => true,
                 'smarty_internal_resource_string.php'                       => true,
                 'smarty_internal_runtime_cachemodify.php'                   => true,

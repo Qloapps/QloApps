@@ -57,7 +57,7 @@
 					<img class="img img-responsive" width="15px" src="{$base_url}img/rf/{$value.value}" title="Room image" />
 				</td>
 				{/foreach}
-				<!--<td>
+				{*--<td>
 				 {if sizeof($available_feature.featureValues)}
 					<select id="feature_{$available_feature.id_feature}_value" name="feature_{$available_feature.id_feature}_value"
 						onchange="$('.custom_{$available_feature.id_feature}_').val('');">
@@ -74,9 +74,9 @@
 						<a href="{$link->getAdminLink('AdminFeatures')|escape:'html':'UTF-8'}&amp;addfeature_value&amp;id_feature={$available_feature.id_feature}"
 					 	class="confirm_leave btn btn-link"><i class="icon-plus-sign"></i> {l s='Add pre-defined values first'} <i class="icon-external-link-sign"></i></a>
 					</span>
-				{/if} --><!-- By Webkul -->
+				{/if} *}<!-- By Webkul -->
 				</td>
-				<!-- <td>
+				{* <td>
 
 				<div class="row lang-0" style='display: none;'>
 					<div class="col-lg-9">
@@ -132,7 +132,7 @@
 					</div>
 					{/if}
 					{/foreach}
-				</td> --><!-- By Webkul -->
+				</td> *}<!-- By Webkul -->
 
 			</tr>
 			{foreachelse}

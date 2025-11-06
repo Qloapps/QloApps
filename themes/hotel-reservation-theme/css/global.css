@@ -6322,7 +6322,7 @@ table.table_block td {
   font-size: 17px;
   line-height: 23px;
   color: #3a3939;
-  margin-bottom: 0; }
+  margin-bottom: 4px; }
   .product-name a {
     font-size: 17px;
     line-height: 23px;
@@ -6536,6 +6536,12 @@ table.table_block td {
 .input-location, .form-control .input-location {
   background: url("../img/icon/icon-location.svg") no-repeat 6px 50%;
   padding-left: 35px;
+  background-color: #FFF;
+}
+.input-hotel, .form-control .input-hotel {
+  background: url("../img/icon/icon-hotel.svg") no-repeat 6px 50%;
+  padding-left: 35px;
+  padding-right: 20px;
   background-color: #FFF;
 }
 .input-occupancy, .form-control .input-occupancy {
@@ -7594,6 +7600,33 @@ div.star a:hover {
   padding: 0;
   text-align: center;
   width: 57px; }
+
+.quantity_cont {
+  display: flex;
+  gap: 4px;
+}
+.quantity_cont .cart_quantity_input {
+  padding: 14px 10px;
+  border: 1px solid #E1E3E7;
+  font-size: 14px;
+  font-weight: 600;
+  color: #333333;
+  text-align: center;
+  border-radius: 4px;
+}
+.quantity_cont .cart_quantity_button {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.quantity_cont .cart_quantity_button a {
+  padding: 1px 5px;
+  border: 0px;
+  border: 1px solid #E1E3E7;
+  color: #333;
+  border-radius: 4px;
+  font-weight: 400;
+}
 
 .cart_gift_quantity .cart_quantity_input {
   height: 27px;
@@ -8981,6 +9014,7 @@ a.open_rooms_extra_services_panel {
   margin-bottom: 18px;} */
 
 #rooms_extra_services .room_demand_block {
+  margin-bottom: 10px;
   color: #333;
   font-size: 14px;}
 #rooms_extra_services .checkbox {

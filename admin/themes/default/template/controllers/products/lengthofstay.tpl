@@ -1,3 +1,25 @@
+{**
+* NOTICE OF LICENSE
+*
+* This source file is subject to the Open Software License version 3.0
+* that is bundled with this package in the file LICENSE.md
+* It is also available through the world-wide-web at this URL:
+* https://opensource.org/license/osl-3-0-php
+* If you did not receive a copy of the license and are unable to
+* obtain it through the world-wide-web, please send an email
+* to support@qloapps.com so we can send you a copy immediately.
+*
+* DISCLAIMER
+*
+* Do not edit or add to this file if you wish to upgrade this module to a newer
+* versions in the future. If you wish to customize this module for your needs
+* please refer to https://store.webkul.com/customisation-guidelines for more information.
+*
+* @author Webkul IN
+* @copyright Since 2010 Webkul
+* @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
+*}
+
 {if isset($product->id)}
 	<div id="product-lengthofstay" class="panel product-tab">
 		<h3 class="tab"><i class="icon-calendar"></i> {l s='Length Of Stay'}</h3>
@@ -19,24 +41,42 @@
 				<label class="control-label col-sm-3 required" for="min_los">
 					<span title="" data-toggle="tooltip" class="label-tooltip" data-original-title="{l s='Enter minimum length of stay for the hotel. set 1 day for setting no limit on minimum length of stay.'}">{l s='Minimum length of stay'}</span>
 				</label>
-				<div class="col-sm-2">
-					<div class="input-group">
-						<input type="text" id="min_los" name="min_los" value="{if isset($smarty.post.min_los)}{$smarty.post.min_los|escape:'html':'UTF-8'}{elseif isset($roomTypeInfo['min_los']) && $roomTypeInfo['min_los']}{$roomTypeInfo['min_los']|escape:'html':'UTF-8'}{else}1{/if}">
-						<span class="input-group-addon">{l s='Day(s)'}</span>
-					</div>
-				</div>
+                <div class="col-sm-9">
+                    <div class="row">
+                        <div class="col-md-4 col-lg-3">
+                            <div class="input-group">
+                                <input type="text" id="min_los" name="min_los" value="{if isset($smarty.post.min_los)}{$smarty.post.min_los|escape:'html':'UTF-8'}{elseif isset($roomTypeInfo['min_los']) && $roomTypeInfo['min_los']}{$roomTypeInfo['min_los']|escape:'html':'UTF-8'}{else}1{/if}">
+                                <span class="input-group-addon">{l s='Day(s)'}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <p class="help-block">{l s='Set 1 for no limit'}</p>
+                        </div>
+                    </div>
+                </div>
 			</div>
 
 			<div class="form-group">
 				<label class="control-label col-sm-3 required" for="max_los">
 					<span title="" data-toggle="tooltip" class="label-tooltip" data-original-title="{l s='Enter maximum length of stay for the hotel. set 0 day for setting no limit on maximum length of stay.'}">{l s='Maximum length of stay'}</span>
 				</label>
-				<div class="col-sm-2">
-					<div class="input-group">
-						<input type="text" id="max_los" name="max_los" value="{if isset($smarty.post.max_los)}{$smarty.post.max_los|escape:'html':'UTF-8'}{elseif isset($roomTypeInfo['max_los'])}{$roomTypeInfo['max_los']|escape:'html':'UTF-8'}{else}0{/if}">
-						<span class="input-group-addon">{l s='Day(s)'}</span>
-					</div>
-				</div>
+                <div class="col-sm-9">
+                    <div class="row">
+                        <div class="col-md-4 col-lg-3">
+                            <div class="input-group">
+                                <input type="text" id="max_los" name="max_los" value="{if isset($smarty.post.max_los)}{$smarty.post.max_los|escape:'html':'UTF-8'}{elseif isset($roomTypeInfo['max_los'])}{$roomTypeInfo['max_los']|escape:'html':'UTF-8'}{else}0{/if}">
+                                <span class="input-group-addon">{l s='Day(s)'}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <p class="help-block">{l s='Set 0 for no limit'}</p>
+                        </div>
+                    </div>
+                </div>
 			</div>
 		</div>
 
@@ -62,8 +102,16 @@
 				<thead>
 					<th>{l s='Date From'}</th>
 					<th>{l s='Date To'}</th>
-					<th>{l s='Minimum length of stay'}</th>
-					<th>{l s='Maximum length of stay'}</th>
+                    <th>
+                        <label class="control-label">
+                            <span class="label-tooltip" data-toggle="tooltip" data-original-title="{l s='Set 1 for no limit.'}">{l s='Minimum length of stay'}</span>
+                        </label>
+                    </th>
+                    <th>
+                        <label class="control-label">
+                            <span class="label-tooltip" data-toggle="tooltip" data-original-title="{l s='Set 0 for no limit.'}">{l s='Maximum length of stay'}</span>
+                        </label>
+                    </th>
 					<th></th>
 				</thead>
 				<tbody>

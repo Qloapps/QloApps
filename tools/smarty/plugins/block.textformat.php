@@ -20,7 +20,7 @@
  * - indent_char   - string (" ")
  * - wrap_boundary - boolean (true)
  *
- * @link   http://www.smarty.net/manual/en/language.function.textformat.php {textformat}
+ * @link   https://www.smarty.net/manual/en/language.function.textformat.php {textformat}
  *         (Smarty online manual)
  *
  * @param array                    $params   parameters

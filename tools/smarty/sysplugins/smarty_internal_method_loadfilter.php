@@ -30,7 +30,7 @@ class Smarty_Internal_Method_LoadFilter
      *
      * @api  Smarty::loadFilter()
      *
-     * @link http://www.smarty.net/docs/en/api.load.filter.tpl
+     * @link https://www.smarty.net/docs/en/api.load.filter.tpl
      *
      * @param \Smarty_Internal_TemplateBase|\Smarty_Internal_Template|\Smarty $obj
      * @param string                                                          $type filter type

@@ -261,7 +261,7 @@ class HTMLPurifier_UnitConverter
      */
     private function round($n, $sigfigs)
     {
-        $new_log = (int)floor(log(abs($n), 10)); // Number of digits left of decimal - 1
+        $new_log = (int)floor(log(abs((float)$n), 10)); // Number of digits left of decimal - 1
         $rp = $sigfigs - $new_log - 1; // Number of decimal places needed
         $neg = $n < 0 ? '-' : ''; // Negative sign
         if ($this->bcmath) {
@@ -276,7 +276,7 @@ class HTMLPurifier_UnitConverter
             }
             return $n;
         } else {
-            return $this->scale(round($n, $sigfigs - $new_log - 1), $rp + 1);
+            return $this->scale(round((float)$n, $sigfigs - $new_log - 1), $rp + 1);
         }
     }
 
@@ -300,7 +300,7 @@ class HTMLPurifier_UnitConverter
             // Now we return it, truncating the zero that was rounded off.
             return substr($precise, 0, -1) . str_repeat('0', -$scale + 1);
         }
-        return sprintf('%.' . $scale . 'f', (float)$r);
+        return number_format((float)$r, $scale, '.', '');
     }
 }
 

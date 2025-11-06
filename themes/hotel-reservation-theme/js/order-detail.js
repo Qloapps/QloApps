@@ -144,24 +144,36 @@ function initMap() {
             center: hotelLocation,
             disableDefaultUI: true,
             fullscreenControl: true,
+            mapId: PS_MAP_ID
         });
 
-        const marker = new google.maps.Marker({
+        let icon = document.createElement('img');
+        icon.src = PS_STORES_ICON;
+        icon.style.width = '24px';
+        icon.style.height = '24px';
+
+        const marker = new google.maps.marker.AdvancedMarkerElement({
             position: hotelLocation,
             map: map,
-            title: $(this).attr('title'),
-            icon: PS_STORES_ICON
+            title: location.hotel_name,
+            content: icon,
         });
+
+        marker.query = location.query || null;
+        marker.latitude = hotelLocation.lat;
+        marker.longitude = hotelLocation.lng;
 
         marker.addListener('click', function() {
             let query = '';
-            if ($(this).attr('query') != '') {
-                query = $(this).attr('query');
-            } else {
-                query = $(this).attr('latitude') + ',' + $(this).attr('longitude');
+            if (this.query) {
+                query = this.query;
+            } else if (this.latitude && this.longitude) {
+                query = `${this.latitude},${this.longitude}`;
             }
 
-            window.open('https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(query), '_blank');
+            if (query) {
+                window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`, '_blank');
+            }
         });
     });
 }
@@ -278,11 +290,14 @@ const BookingRefundManager = {
             href: '#popup-cancellation-order-cancel-success',
             wrapCSS: 'fancybox-order-detail feedback',
             padding: 0,
+            afterClose: function() {
+                location.reload();
+            },
         });
     },
 }
 
-$(document).on('click', '#order_refund_request', function(e) {
+$(document).on('click', '.order_refund_request', function(e) {
     e.preventDefault();
     BookingRefundManager.show();
 });
@@ -373,14 +388,5 @@ $(document).ready(function () {
     });
 
     initPriceTooltip();
-
-    if (typeof google === 'object'
-        && typeof google.maps === 'object'
-        && typeof initiateMap !== 'undefined'
-        && initiateMap === 1
-    ) {
-        initMap();
-    }
-
     initRefundDeniedTooltip();
 });

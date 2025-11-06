@@ -344,7 +344,7 @@ class AdminCurrenciesControllerCore extends AdminController
     public function initProcess()
     {
         if (Tools::isSubmit('SubmitExchangesRates')) {
-            if ($this->tabAccess['edit'] === '1') {
+            if ($this->tabAccess['edit'] === 1) {
                 $this->action = 'exchangeRates';
             } else {
                 $this->errors[] = Tools::displayError('You do not have permission to edit this.');

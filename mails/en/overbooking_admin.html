@@ -126,205 +126,26 @@
 							</td>
 						</tr>
 						<tr>
-							<td style="padding:7px 0">
-								<font size="2" face="Open-sans, sans-serif" color="#555454">
-									<table class="table table-recap" bgcolor="#ffffff" style="width:100%;border-collapse:collapse"><!-- Title -->
-										<tr>
-											<tr>
-												<th bgcolor="#f8f8f8" style="border:1px solid #D6D4D4;background-color: #fbfbfb;color: #333;font-family: Arial;font-size: 13px;padding: 10px;">Room Image</th>
-												<th bgcolor="#f8f8f8" style="border:1px solid #D6D4D4;background-color: #fbfbfb;color: #333;font-family: Arial;font-size: 13px;padding: 10px;">Room Description</th>
-												<th bgcolor="#f8f8f8" style="border:1px solid #D6D4D4;background-color: #fbfbfb;color: #333;font-family: Arial;font-size: 13px;padding: 10px;">Hotel</th>
-												<th bgcolor="#f8f8f8" style="border:1px solid #D6D4D4;background-color: #fbfbfb;color: #333;font-family: Arial;font-size: 13px;padding: 10px;" width="17%">Room Capcity</th>
-												<th bgcolor="#f8f8f8" style="border:1px solid #D6D4D4;background-color: #fbfbfb;color: #333;font-family: Arial;font-size: 13px;padding: 10px;">Unit Price</th>
-												<th bgcolor="#f8f8f8" style="border:1px solid #D6D4D4;background-color: #fbfbfb;color: #333;font-family: Arial;font-size: 13px;padding: 10px;" width="17%">Rooms Qty</th>
-												<th bgcolor="#f8f8f8" style="border:1px solid #D6D4D4;background-color: #fbfbfb;color: #333;font-family: Arial;font-size: 13px;padding: 10px;" width="17%">Check-in Date</th>
-												<th bgcolor="#f8f8f8" style="border:1px solid #D6D4D4;background-color: #fbfbfb;color: #333;font-family: Arial;font-size: 13px;padding: 10px;" width="17%">Check-out Date</th>
-												<th bgcolor="#f8f8f8" style="border:1px solid #D6D4D4;background-color: #fbfbfb;color: #333;font-family: Arial;font-size: 13px;padding: 10px;" width="17%">Total</th>
-											</tr>
-										<tr>
-											<td colspan="9" style="border:1px solid #D6D4D4;text-align:center;color:#777;padding:7px 0">
-												&nbsp;&nbsp;{cart_booking_data_html}
-											</td>
-										</tr>
+                            <td style="padding:7px 0">
+                                {cart_booking_data_html}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="padding:7px 0">
+                                {extra_demands_details_html}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="padding:7px 0">
+                                {normal_products_data_html}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="padding:7px 0">
+                                {order_total_info_html}
+                            </td>
+                        </tr>
 
-										<tr>
-											<td colspan="9" style="border:1px solid #D6D4D4;text-align:center;color:#777;padding:7px 0">
-												{extra_demands_details_html}
-											</td>
-										</tr>
-										<tr class="conf_body">
-											<td bgcolor="#f8f8f8" colspan="4" style="border:1px solid #D6D4D4;color:#333;padding:7px 0">
-												<table class="table" style="width:100%;border-collapse:collapse">
-													<tr>
-														<td width="10" style="color:#333;padding:0">&nbsp;</td>
-														<td align="right" style="color:#333;padding:0">
-															<font size="2" face="Open-sans, sans-serif" color="#555454">
-																<strong>Total Rooms Cost</strong>
-															</font>
-														</td>
-														<td width="10" style="color:#333;padding:0">&nbsp;</td>
-													</tr>
-												</table>
-											</td>
-											<td bgcolor="#f8f8f8" align="right" colspan="5" style="border:1px solid #D6D4D4;color:#333;padding:7px 0">
-												<table class="table" style="width:100%;border-collapse:collapse">
-													<tr>
-														<td width="10" style="color:#333;padding:0">&nbsp;</td>
-														<td align="right" style="color:#333;padding:0">
-															<font size="2" face="Open-sans, sans-serif" color="#555454">
-																{room_price_tax_excl}
-															</font>
-														</td>
-														<td width="10" style="color:#333;padding:0">&nbsp;</td>
-													</tr>
-												</table>
-											</td>
-										</tr>
-										<tr class="conf_body">
-											<td bgcolor="#f8f8f8" colspan="4" style="border:1px solid #D6D4D4;color:#333;padding:7px 0">
-												<table class="table" style="width:100%;border-collapse:collapse">
-													<tr>
-														<td width="10" style="color:#333;padding:0">&nbsp;</td>
-														<td align="right" style="color:#333;padding:0">
-															<font size="2" face="Open-sans, sans-serif" color="#555454">
-																<strong>Extra Services Cost</strong>
-															</font>
-														</td>
-														<td width="10" style="color:#333;padding:0">&nbsp;</td>
-													</tr>
-												</table>
-											</td>
-											<td bgcolor="#f8f8f8" align="right" colspan="5" style="border:1px solid #D6D4D4;color:#333;padding:7px 0">
-												<table class="table" style="width:100%;border-collapse:collapse">
-													<tr>
-														<td width="10" style="color:#333;padding:0">&nbsp;</td>
-														<td align="right" style="color:#333;padding:0">
-															<font size="2" face="Open-sans, sans-serif" color="#555454">
-																{additional_service_price_tax_excl}
-															</font>
-														</td>
-														<td width="10" style="color:#333;padding:0">&nbsp;</td>
-													</tr>
-												</table>
-											</td>
-										</tr>
-										<tr class="conf_body">
-											<td bgcolor="#f8f8f8" colspan="4" style="border:1px solid #D6D4D4;color:#333;padding:7px 0">
-												<table class="table" style="width:100%;border-collapse:collapse">
-													<tr>
-														<td width="10" style="color:#333;padding:0">&nbsp;</td>
-														<td align="right" style="color:#333;padding:0">
-															<font size="2" face="Open-sans, sans-serif" color="#555454">
-																<strong>Total Convenience Fees</strong>
-															</font>
-														</td>
-														<td width="10" style="color:#333;padding:0">&nbsp;</td>
-													</tr>
-												</table>
-											</td>
-											<td bgcolor="#f8f8f8" colspan="5" style="border:1px solid #D6D4D4;color:#333;padding:7px 0">
-												<table class="table" style="width:100%;border-collapse:collapse">
-													<tr>
-														<td width="10" style="color:#333;padding:0">&nbsp;</td>
-														<td align="right" style="color:#333;padding:0">
-															<font size="2" face="Open-sans, sans-serif" color="#555454">
-																{total_convenience_fee_te}
-															</font>
-														</td>
-														<td width="10" style="color:#333;padding:0">&nbsp;</td>
-													</tr>
-												</table>
-											</td>
-										</tr>
-										<tr class="conf_body">
-											<td bgcolor="#f8f8f8" colspan="4" style="border:1px solid #D6D4D4;color:#333;padding:7px 0">
-												<table class="table" style="width:100%;border-collapse:collapse">
-													<tr>
-														<td width="10" style="color:#333;padding:0">&nbsp;</td>
-														<td align="right" style="color:#333;padding:0">
-															<font size="2" face="Open-sans, sans-serif" color="#555454">
-																<strong>Total Tax</strong>
-															</font>
-														</td>
-														<td width="10" style="color:#333;padding:0">&nbsp;</td>
-													</tr>
-												</table>
-											</td>
-											<td bgcolor="#f8f8f8" colspan="5" style="border:1px solid #D6D4D4;color:#333;padding:7px 0">
-												<table class="table" style="width:100%;border-collapse:collapse">
-													<tr>
-														<td width="10" style="color:#333;padding:0">&nbsp;</td>
-														<td align="right" style="color:#333;padding:0">
-															<font size="2" face="Open-sans, sans-serif" color="#555454">
-																{total_order_tax}
-															</font>
-														</td>
-														<td width="10" style="color:#333;padding:0">&nbsp;</td>
-													</tr>
-												</table>
-											</td>
-										</tr>
-										<tr class="conf_body">
-											<td bgcolor="#f8f8f8" colspan="4" style="border:1px solid #D6D4D4;color:#333;padding:7px 0">
-												<table class="table" style="width:100%;border-collapse:collapse">
-													<tr>
-														<td width="10" style="color:#333;padding:0">&nbsp;</td>
-														<td align="right" style="color:#333;padding:0">
-															<font size="2" face="Open-sans, sans-serif" color="#555454">
-																<strong>Discounts</strong>
-															</font>
-														</td>
-														<td width="10" style="color:#333;padding:0">&nbsp;</td>
-													</tr>
-												</table>
-											</td>
-											<td bgcolor="#f8f8f8" colspan="5" style="border:1px solid #D6D4D4;color:#333;padding:7px 0">
-												<table class="table" style="width:100%;border-collapse:collapse">
-													<tr>
-														<td width="10" style="color:#333;padding:0">&nbsp;</td>
-														<td align="right" style="color:#333;padding:0">
-															<font size="2" face="Open-sans, sans-serif" color="#555454">
-																{total_discounts}
-															</font>
-														</td>
-														<td width="10" style="color:#333;padding:0">&nbsp;</td>
-													</tr>
-												</table>
-											</td>
-										</tr>
-										<tr class="conf_body">
-											<td bgcolor="#f8f8f8" colspan="4" style="border:1px solid #D6D4D4;color:#333;padding:7px 0">
-												<table class="table" style="width:100%;border-collapse:collapse">
-													<tr>
-														<td width="10" style="color:#333;padding:0">&nbsp;</td>
-														<td align="right" style="color:#333;padding:0">
-															<font size="2" face="Open-sans, sans-serif" color="#555454">
-																<strong>Final Booking Amount</strong>
-															</font>
-														</td>
-														<td width="10" style="color:#333;padding:0">&nbsp;</td>
-													</tr>
-												</table>
-											</td>
-											<td bgcolor="#f8f8f8" colspan="5" style="border:1px solid #D6D4D4;color:#333;padding:7px 0">
-												<table class="table" style="width:100%;border-collapse:collapse">
-													<tr>
-														<td width="10" style="color:#333;padding:0">&nbsp;</td>
-														<td align="right" style="color:#333;padding:0">
-															<font size="4" face="Open-sans, sans-serif" color="#555454">
-																{total_paid}
-															</font>
-														</td>
-														<td width="10" style="color:#333;padding:0">&nbsp;</td>
-													</tr>
-												</table>
-											</td>
-										</tr>
-										</tbody>
-									</table>
-								</font>
-							</td>
-						</tr>
 						<tr>
 							<td class="space_footer" style="padding:0!important">&nbsp;</td>
 						</tr>

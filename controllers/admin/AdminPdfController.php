@@ -39,7 +39,7 @@ class AdminPdfControllerCore extends AdminController
         parent::initProcess();
         $this->checkCacheFolder();
         $access = Profile::getProfileAccess($this->context->employee->id_profile, (int)Tab::getIdFromClassName('AdminOrders'));
-        if ($access['view'] === '1' && ($action = Tools::getValue('submitAction'))) {
+        if ($access['view'] === 1 && ($action = Tools::getValue('submitAction'))) {
             $this->action = $action;
         } else {
             $this->errors[] = Tools::displayError('You do not have permission to view this.');

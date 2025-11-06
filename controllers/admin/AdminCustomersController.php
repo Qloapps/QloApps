@@ -362,19 +362,19 @@ class AdminCustomersControllerCore extends AdminController
         parent::initProcess();
 
         if (Tools::isSubmit('submitGuestToCustomer') && $this->id_object) {
-            if ($this->tabAccess['edit'] === '1') {
+            if ($this->tabAccess['edit'] === 1) {
                 $this->action = 'guest_to_customer';
             } else {
                 $this->errors[] = Tools::displayError('You do not have permission to edit this.');
             }
         } elseif (Tools::isSubmit('changeNewsletterVal') && $this->id_object) {
-            if ($this->tabAccess['edit'] === '1') {
+            if ($this->tabAccess['edit'] === 1) {
                 $this->action = 'change_newsletter_val';
             } else {
                 $this->errors[] = Tools::displayError('You do not have permission to edit this.');
             }
         } elseif (Tools::isSubmit('changeOptinVal') && $this->id_object) {
-            if ($this->tabAccess['edit'] === '1') {
+            if ($this->tabAccess['edit'] === 1) {
                 $this->action = 'change_optin_val';
             } else {
                 $this->errors[] = Tools::displayError('You do not have permission to edit this.');
@@ -393,7 +393,7 @@ class AdminCustomersControllerCore extends AdminController
 
     public function renderList()
     {
-        if ((Tools::isSubmit('submitBulkdelete'.$this->table) || Tools::isSubmit('delete'.$this->table)) && $this->tabAccess['delete'] === '1') {
+        if ((Tools::isSubmit('submitBulkdelete'.$this->table) || Tools::isSubmit('delete'.$this->table)) && $this->tabAccess['delete'] === 1) {
             $this->tpl_list_vars = array(
                 'delete_customer' => true,
                 'REQUEST_URI' => $_SERVER['REQUEST_URI'],
@@ -766,9 +766,13 @@ class AdminCustomersControllerCore extends AdminController
         $helper->color = 'color3';
         $helper->title = $this->l('RevPAC', null, null, false);
         $nbDaysRevPac = Validate::isUnsignedInt(Configuration::get('PS_KPI_REVPAC_NB_DAYS')) ? Configuration::get('PS_KPI_REVPAC_NB_DAYS') : 30;
-        $helper->subtitle = sprintf($this->l('%d Days', null, null, false), (int) $nbDaysRevPac);
+        if ($nbDaysRevPac == 1) {
+            $helper->subtitle = sprintf($this->l('%d Day', null, null, false), (int) $nbDaysRevPac);
+        } else {
+            $helper->subtitle = sprintf($this->l('%d Days', null, null, false), (int) $nbDaysRevPac);
+        }
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=revenue_per_available_customer';
-        $helper->tooltip = $this->l('Revenue per Available Customer (RevPAC) in given period of time.', null, null, false);
+        $helper->tooltip = sprintf($this->l('Revenue per Available Customer (RevPAC) in the last %s day(s).', null, null, false), $nbDaysRevPac);
         $this->kpis[] = $helper;
 
         $helper = new HelperKpi();
@@ -787,9 +791,13 @@ class AdminCustomersControllerCore extends AdminController
         $helper->color = 'color1';
         $helper->title = $this->l('Conversion Rate', null, null, false);
         $nbDaysConversionRate = Validate::isUnsignedInt(Configuration::get('PS_KPI_CONVERSION_RATE_NB_DAYS')) ? Configuration::get('PS_KPI_CONVERSION_RATE_NB_DAYS') : 30;
-        $helper->subtitle = sprintf($this->l('%d Days', null, null, false), (int) $nbDaysConversionRate);
+        if ($nbDaysConversionRate == 1) {
+            $helper->subtitle = $nbDaysConversionRate.' '.$this->l('day', null, null, false);
+        } else {
+            $helper->subtitle = $nbDaysConversionRate.' '.$this->l('days', null, null, false);
+        }
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=conversion_rate';
-        $helper->tooltip = $this->l('The percentage of visitors who created a booking in given period of time.', null, null, false);
+        $helper->tooltip = sprintf($this->l('The percentage of visitors who created a booking in last %s day(s).', null, null, false), $nbDaysConversionRate);
         $this->kpis[] = $helper;
 
         $helper = new HelperKpi();
@@ -798,12 +806,17 @@ class AdminCustomersControllerCore extends AdminController
         $helper->color = 'color4';
         $helper->title = $this->l('New Customers', null, null, false);
         $nbDaysNewCustomers = Validate::isUnsignedInt(Configuration::get('PS_KPI_NEW_CUSTOMERS_NB_DAYS')) ? Configuration::get('PS_KPI_NEW_CUSTOMERS_NB_DAYS') : 30;
-        $date_from = date('Y-m-d', strtotime('-'.$nbDaysNewCustomers.' day'));
+        if ($nbDaysNewCustomers == 1) {
+            $helper->subtitle = sprintf($this->l('%d Day', null, null, false), (int) $nbDaysNewCustomers);
+            $date_from = date('Y-m-d');
+        } else {
+            $helper->subtitle = sprintf($this->l('%d Days', null, null, false), (int) $nbDaysNewCustomers);
+            $date_from = date('Y-m-d', strtotime('-'.($nbDaysNewCustomers - 1).' day'));
+        }
         $date_to = date('Y-m-d');
         $helper->href = $this->context->link->getAdminLink('AdminCustomers').'&submitResetcustomer&submitFiltercustomer=1&customerFilter_a!date_add[]='.$date_from.'&customerFilter_a!date_add[]='.$date_to;
-        $helper->subtitle = sprintf($this->l('%d Days', null, null, false), (int) $nbDaysNewCustomers);
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=total_new_customers';
-        $helper->tooltip = $this->l('The total number of new customers who registered in given period of time.', null, null, false);
+        $helper->tooltip = sprintf($this->l('The total number of new customers who registered in last %s day(s).', null, null, false), $nbDaysNewCustomers);
         $this->kpis[] = $helper;
 
         $helper = new HelperKpi();
@@ -1333,7 +1346,7 @@ class AdminCustomersControllerCore extends AdminController
      * @param string $name
      * @return mixed
      */
-    public function displayDeleteLink($token = null, $id, $name = null)
+    public function displayDeleteLink($token, $id, $name = null)
     {
         $tpl = $this->createTemplate('helpers/list/list_action_delete.tpl');
 
@@ -1392,7 +1405,7 @@ class AdminCustomersControllerCore extends AdminController
      */
     public function ajaxProcessUpdateCustomerNote()
     {
-        if ($this->tabAccess['edit'] === '1') {
+        if ($this->tabAccess['edit'] === 1) {
             $note = Tools::htmlentitiesDecodeUTF8(Tools::getValue('note'));
             $customer = new Customer((int)Tools::getValue('id_customer'));
             if (!Validate::isLoadedObject($customer)) {
@@ -1467,7 +1480,7 @@ class AdminCustomersControllerCore extends AdminController
     {
         $response = array('hasError' => 0, 'errors' => array());
         // Check tab access is allowed to edit
-        if ($this->tabAccess['edit'] == 1) {
+        if ($this->tabAccess['edit'] === 1) {
             if (Validate::isLoadedObject($objCustomerGuestDetail = new CustomerGuestDetail((int) Tools::getValue('id_customer_guest_detail')))) {
                 $response['errors'] = $objCustomerGuestDetail->validateController();
                 if (!Tools::getValue('lastname')) {
@@ -1520,7 +1533,7 @@ class AdminCustomersControllerCore extends AdminController
     {
         $response = array('hasError' => 1, 'errors' => array());
         // Check tab access is allowed to edit
-        if ($this->tabAccess['delete'] == 1) {
+        if ($this->tabAccess['delete'] === 1) {
             if (Validate::isLoadedObject($objCustomerGuestDetail = new CustomerGuestDetail((int) Tools::getValue('id_customer_guest_detail')))) {
                 if ($objCustomerGuestDetail->delete()) {
                     $response['hasError'] = false;

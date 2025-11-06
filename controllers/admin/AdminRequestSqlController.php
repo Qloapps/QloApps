@@ -37,6 +37,8 @@ class AdminRequestSqlControllerCore extends AdminController
         array('value' => 2, 'name' => 'iso-8859-1')
     );
 
+    protected $export;
+
     public function __construct()
     {
         $this->bootstrap = true;

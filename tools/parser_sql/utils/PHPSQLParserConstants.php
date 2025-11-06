@@ -71,7 +71,7 @@ class PHPSQLParserConstants {
                                 'DAY_MICROSECOND', 'DAY_MINUTE', 'DAY_SECOND', 'DEC', 'DECIMAL', 'DECLARE', 'DEFAULT',
                                 'DELAYED', 'DELETE', 'DESC', 'DESCRIBE', 'DETERMINISTIC', 'DISTINCT', 'DISTINCTROW',
                                 'DIV', 'DOUBLE', 'DROP', 'ELSE', 'ELSEIF', 'END', 'ENCLOSED', 'ESCAPED', 'EXISTS',
-                                'EXIT', 'EXPLAIN', 'FALSE', 'FETCH', 'FIELDS', 'FLOAT', 'FOR', 'FORCE', 'FOREIGN',
+                                'EXIT', 'EXPLAIN',  'FETCH', 'FIELDS', 'FLOAT', 'FOR', 'FORCE', 'FOREIGN',
                                 'FOUND', 'FRAC_SECOND', 'FROM', 'FULLTEXT', 'GRANT', 'GROUP', 'HAVING',
                                 'HIGH_PRIORITY', 'HOUR_MICROSECOND', 'HOUR_MINUTE', 'HOUR_SECOND', 'IF', 'IGNORE',
                                 'IN', 'INDEX', 'INFILE', 'INNER', 'INNODB', 'INOUT', 'INSENSITIVE', 'INSERT', 'INT',
@@ -90,7 +90,7 @@ class PHPSQLParserConstants {
                                 'SQL_TSI_MINUTE', 'SQL_TSI_MONTH', 'SQL_TSI_QUARTER', 'SQL_TSI_SECOND', 'SQL_TSI_WEEK',
                                 'SQL_TSI_YEAR', 'SSL', 'STARTING', 'STRAIGHT_JOIN', 'STRIPED', 'TABLE', 'TABLES',
                                 'TEMPORARY', 'TERMINATED', 'THEN', 'TIMESTAMPADD', 'TIMESTAMPDIFF', 'TINYBLOB',
-                                'TINYINT', 'TINYTEXT', 'TO', 'TRAILING', 'TRUE', 'UNDO', 'UNION', 'UNIQUE', 'UNLOCK',
+                                'TINYINT', 'TINYTEXT', 'TO', 'TRAILING', 'UNDO', 'UNION', 'UNIQUE', 'UNLOCK',
                                 'UNSIGNED', 'UPDATE', 'USAGE', 'USE', 'USER_RESOURCES', 'USING', 'UTC_DATE',
                                 'UTC_TIME', 'UTC_TIMESTAMP', 'VALUES', 'VARBINARY', 'VARCHAR', 'VARCHARACTER',
                                 'VARYING', 'WHEN', 'WHERE', 'WHILE', 'WITH', 'WRITE', 'XOR', 'YEAR_MONTH', 'ZEROFILL');

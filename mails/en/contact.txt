@@ -1,16 +1,10 @@
 
-[/{shop_url}] 
+[/{shop_url}]
 
-Message from a {shop_name} customer 
+Message from a {shop_name} customer
 
-CUSTOMER E-MAIL ADDRESS: {email}
-
-CUSTOMER MESSAGE: {message}
-
-ORDER ID: {order_name}
-
-ATTACHED FILE: {attached_file} 		 
+{contact_content_txt}
 
 {shop_name} [/{shop_url}] powered by Webkul(tm)
-[https://webkul.com] 
+[https://webkul.com]
 

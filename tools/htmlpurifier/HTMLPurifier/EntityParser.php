@@ -116,8 +116,8 @@ class HTMLPurifier_EntityParser
     protected function entityCallback($matches)
     {
         $entity = $matches[0];
-        $hex_part = @$matches[1];
-        $dec_part = @$matches[2];
+        $hex_part = isset($matches[1]) ? $matches[1] : null;
+        $dec_part = isset($matches[2]) ? $matches[2] : null;
         $named_part = empty($matches[3]) ? (empty($matches[4]) ? "" : $matches[4]) : $matches[3];
         if ($hex_part !== NULL && $hex_part !== "") {
             return HTMLPurifier_Encoder::unichr(hexdec($hex_part));

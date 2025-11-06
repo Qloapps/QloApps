@@ -175,7 +175,7 @@ class AdminReferrersControllerCore extends AdminController
                 'icon' => 'process-icon-new'
             );
         }
-        
+
         parent::initPageHeaderToolbar();
     }
 
@@ -444,7 +444,7 @@ class AdminReferrersControllerCore extends AdminController
         }
 
         if (Tools::isSubmit('submitSettings')) {
-            if ($this->tabAccess['edit'] === '1') {
+            if ($this->tabAccess['edit'] === 1) {
                 if (Configuration::updateValue('TRACKING_DIRECT_TRAFFIC', (int)Tools::getValue('tracking_dt'))) {
                     Tools::redirectAdmin(self::$currentIndex.'&conf=4&token='.Tools::getValue('token'));
                 }

@@ -156,7 +156,7 @@ class ProductSaleCore
     ** @param int $nb_products Number of products to return (optional)
     ** @return array keys : id_product, link_rewrite, name, id_image, legend, sales, ean13, upc, link
     */
-    public static function getBestSalesLight($id_lang, $page_number = 0, $nb_products = 10, Context $context = null)
+    public static function getBestSalesLight($id_lang, $page_number = 0, $nb_products = 10, ?Context $context = null)
     {
         if (!$context) {
             $context = Context::getContext();

@@ -17,30 +17,30 @@
 class Smarty_Internal_ParseTree_Text extends Smarty_Internal_ParseTree
 {
 
-	/**
-	 * Wether this section should be stripped on output to smarty php
-	 * @var bool
-	 */
-	private $toBeStripped = false;
+    /**
+     * Wether this section should be stripped on output to smarty php
+     * @var bool
+     */
+    private $toBeStripped = false;
 
-	/**
-	 * Create template text buffer
-	 *
-	 * @param string $data text
-	 * @param bool $toBeStripped wether this section should be stripped on output to smarty php
-	 */
+    /**
+     * Create template text buffer
+     *
+     * @param string $data text
+     * @param bool $toBeStripped wether this section should be stripped on output to smarty php
+     */
     public function __construct($data, $toBeStripped = false)
     {
         $this->data = $data;
         $this->toBeStripped = $toBeStripped;
     }
 
-	/**
-	 * Wether this section should be stripped on output to smarty php
-	 * @return bool
-	 */
-	public function isToBeStripped() {
-    	return $this->toBeStripped;
+    /**
+     * Wether this section should be stripped on output to smarty php
+     * @return bool
+     */
+    public function isToBeStripped() {
+        return $this->toBeStripped;
     }
 
     /**

@@ -22,7 +22,7 @@ class Smarty_Internal_Method_ClearConfig
      * clear a single or all config variables
      *
      * @api  Smarty::clearConfig()
-     * @link http://www.smarty.net/docs/en/api.clear.config.tpl
+     * @link https://www.smarty.net/docs/en/api.clear.config.tpl
      *
      * @param \Smarty_Internal_Data|\Smarty_Internal_Template|\Smarty $data
      * @param string|null                                             $name variable name or null

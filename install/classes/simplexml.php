@@ -31,6 +31,7 @@ class InstallSimplexmlElement extends SimpleXMLElement
      *
      * @see SimpleXMLElement::addChild()
      */
+    #[\ReturnTypeWillChange]
     public function addChild($name, $value = null, $namespace = null)
     {
         if ($value instanceof SimplexmlElement) {
@@ -57,6 +58,7 @@ class InstallSimplexmlElement extends SimpleXMLElement
      *
      * @see SimpleXMLElement::asXML()
      */
+    #[\ReturnTypeWillChange]
     public function asXML($filename = null)
     {
         $dom = new DOMDocument('1.0');

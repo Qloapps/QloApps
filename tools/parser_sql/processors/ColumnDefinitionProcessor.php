@@ -82,6 +82,19 @@ class ColumnDefinitionProcessor extends AbstractProcessor {
         return $expr;
     }
 
+    protected function peekAtNextToken($tokens, $index)
+    {
+        $offset = $index + 1;
+        while (isset($tokens[$offset])) {
+            $token = trim($tokens[$offset]);
+            if ($token !== '') {
+                return strtoupper($token);
+            }
+            $offset++;
+        }
+        return '';
+    }
+
     public function process($tokens) {
 
         $trim = '';
@@ -123,6 +136,7 @@ class ColumnDefinitionProcessor extends AbstractProcessor {
                 break 2;
 
             case 'VARCHAR':
+            case 'VARCHARACTER': // Alias for VARCHAR
                 $expr[] = array('expr_type' => ExpressionType::DATA_TYPE, 'base_expr' => $trim, 'length' => false);
                 $prevCategory = 'TEXT';
                 $currCategory = 'SINGLE_PARAM_PARENTHESIS';
@@ -155,10 +169,15 @@ class ColumnDefinitionProcessor extends AbstractProcessor {
             case 'TINYBIT':
             case 'TINYINT':
             case 'SMALLINT':
+            case 'INT2':        // Alias of SMALLINT
             case 'MEDIUMINT':
+            case 'INT3':        // Alias of MEDIUMINT
+            case 'MIDDLEINT':   // Alias of MEDIUMINT
             case 'INT':
             case 'INTEGER':
+            case 'INT4':        // Alias of INT
             case 'BIGINT':
+            case 'INT8':        // Alias of BIGINT
             case 'BOOL':
             case 'BOOLEAN':
                 $expr[] = array('expr_type' => ExpressionType::DATA_TYPE, 'base_expr' => $trim, 'unsigned' => false,
@@ -188,7 +207,9 @@ class ColumnDefinitionProcessor extends AbstractProcessor {
 
             case 'REAL':
             case 'DOUBLE':
+            case 'FLOAT8':      // Alias for DOUBLE
             case 'FLOAT':
+            case 'FLOAT4':      // Alias for FLOAT
                 $expr[] = array('expr_type' => ExpressionType::DATA_TYPE, 'base_expr' => $trim, 'unsigned' => false,
                                 'zerofill' => false);
                 $currCategory = 'TWO_PARAM_PARENTHESIS';
@@ -250,9 +271,23 @@ class ColumnDefinitionProcessor extends AbstractProcessor {
                 // spatial types
                 continue 2;
 
-            case 'CHARACTER':
+            case 'CHARSET':
                 $currCategory = 'CHARSET';
                 $options['sub_tree'][] = array('expr_type' => ExpressionType::RESERVED, 'base_expr' => $trim);
+                continue 2;
+
+            case 'CHARACTER':
+                // Alias of CHAR as well as pre-running for CHARACTER SET
+                // To determine which we peek at the next token to see if it's a SET or not.
+                if ($this->peekAtNextToken($tokens, $key) == 'SET') {
+                    $currCategory = 'CHARSET';
+                    $options['sub_tree'][] = array('expr_type' => ExpressionType::RESERVED, 'base_expr' => $trim);
+                // If it's not a SET we assume that it is a CHARACTER type definition
+                } else {
+                    $expr[] = array('expr_type' => ExpressionType::DATA_TYPE, 'base_expr' => $trim, 'length' => false);
+                    $currCategory = 'SINGLE_PARAM_PARENTHESIS';
+                    $prevCategory = 'TEXT';
+                }
                 continue 2;
 
             case 'SET':

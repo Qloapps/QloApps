@@ -1,21 +1,24 @@
 <?php
 /**
-* 2010-2020 Webkul.
-*
 * NOTICE OF LICENSE
 *
-* All right is reserved,
-* Please go through this link for complete license : https://store.webkul.com/license.html
+* This source file is subject to the Open Software License version 3.0
+* that is bundled with this package in the file LICENSE.md
+* It is also available through the world-wide-web at this URL:
+* https://opensource.org/license/osl-3-0-php
+* If you did not receive a copy of the license and are unable to
+* obtain it through the world-wide-web, please send an email
+* to support@qloapps.com so we can send you a copy immediately.
 *
 * DISCLAIMER
 *
-* Do not edit or add to this file if you wish to upgrade this module to newer
-* versions in the future. If you wish to customize this module for your
-* needs please refer to https://store.webkul.com/customisation-guidelines/ for more information.
+* Do not edit or add to this file if you wish to upgrade this module to a newer
+* versions in the future. If you wish to customize this module for your needs
+* please refer to https://store.webkul.com/customisation-guidelines for more information.
 *
-*  @author    Webkul IN <support@webkul.com>
-*  @copyright 2010-2020 Webkul IN
-*  @license   https://store.webkul.com/license.html
+* @author Webkul IN
+* @copyright Since 2010 Webkul
+* @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
 */
 
 class RoomTypeServiceProduct extends ObjectModel
@@ -100,10 +103,10 @@ class RoomTypeServiceProduct extends ObjectModel
         return Db::getInstance()->insert($this->def['table'], $rowData);
     }
 
-    public function getAssociatedHotelsAndRoomType($idProduct, $formated = true) {
+    public function getAssociatedHotelsAndRoomType($idProduct, $elementType = 0, $idElement = 0, $formated = true) {
         $rows = Db::getInstance()->executeS(
             'SELECT * FROM `'._DB_PREFIX_.'htl_room_type_service_product` AS rsp
-            WHERE `id_product` = '.(int)$idProduct
+            WHERE `id_product` = '.(int)$idProduct . ($elementType ? ' AND rsp.`element_type` = ' . (int)$elementType : "" . ($idElement ? ' AND rsp.`id_element` = ' . (int)$idElement : ""))
         );
 
         if ($formated) {
@@ -114,6 +117,7 @@ class RoomTypeServiceProduct extends ObjectModel
             }
             return $response;
         }
+
         return $rows;
     }
 
@@ -138,22 +142,30 @@ class RoomTypeServiceProduct extends ObjectModel
     public static function getAutoAddServices($idProduct, $dateFrom = null, $dateTo = null, $priceAdditionType = null, $useTax = null, $use_reduc = 1)
     {
         if (Product::isBookingProduct($idProduct)) {
+            $context = Context::getContext();
+            $front = true;
+            if (isset($context->controller->controller_type) && !in_array($context->controller->controller_type, array('front', 'modulefront'))) {
+                $front = false;
+            }
+
             $sql = 'SELECT p.`id_product` FROM  `'._DB_PREFIX_.'htl_room_type_service_product` rsp
             INNER JOIN `'._DB_PREFIX_.'product` p ON (rsp.`id_product` = p.`id_product` AND p.`auto_add_to_cart` = 1)
-            WHERE p.`active` = 1 AND `id_element` = '.(int)$idProduct.' AND `element_type` = '.self::WK_ELEMENT_TYPE_ROOM_TYPE;
+            WHERE p.`active` = 1 AND `id_element` = '.(int)$idProduct.' AND `element_type` = '.self::WK_ELEMENT_TYPE_ROOM_TYPE.
+            ($front ? ' AND p.`available_for_order` = 1':'');
             if (!is_null($priceAdditionType)) {
                 $sql .= ' AND p.`price_addition_type` = '.$priceAdditionType;
             }
             if ($services = Db::getInstance()->executeS($sql)) {
-                $objRoomTypeServiceProductPrice = new RoomTypeServiceProductPrice();
                 foreach($services as &$service) {
-                    $service['price'] = $objRoomTypeServiceProductPrice->getServicePrice(
+                    $service['price'] = Product::getServiceProductPrice(
                         (int)$service['id_product'],
+                        0,
+                        false,
                         (int)$idProduct,
+                        $useTax,
                         1,
                         $dateFrom,
                         $dateTo,
-                        $useTax,
                         false,
                         null,
                         $use_reduc
@@ -188,36 +200,44 @@ class RoomTypeServiceProduct extends ObjectModel
             $subCategory
         )) {
             $serviceProducts = Product::getProductsProperties($idLang, $serviceProducts);
-            $objRoomTypeServiceProductPrice = new RoomTypeServiceProductPrice();
             foreach($serviceProducts as &$serviceProduct) {
-                $serviceProduct['price_tax_exc'] = $objRoomTypeServiceProductPrice->getServicePrice(
+                $serviceProduct['price_tax_exc'] = Product::getServiceProductPrice(
                     (int)$serviceProduct['id_product'],
-                    (int)$idProductRoomType,
+                    0,
+                    false,
+                    (int) $idProductRoomType,
+                    false,
                     1,
                     null,
                     null,
-                    false,
                     $context->cart->id
                 );
 
-                $serviceProduct['price_tax_incl'] = $objRoomTypeServiceProductPrice->getServicePrice(
+                $serviceProduct['price_tax_incl'] = Product::getServiceProductPrice(
                     (int)$serviceProduct['id_product'],
-                    (int)$idProductRoomType,
+                    0,
+                    false,
+                    (int) $idProductRoomType,
+                    true,
                     1,
                     null,
                     null,
-                    true,
                     $context->cart->id
                 );
+
                 $useTax = Product::$_taxCalculationMethod == PS_TAX_EXC ? false : true;
-                $serviceProduct['price_without_reduction'] = $objRoomTypeServiceProductPrice->getServicePrice(
+                $serviceProduct['price_without_reduction'] = Product::getServiceProductPrice(
                     (int)$serviceProduct['id_product'],
+                    0,
+                    false,
                     (int)$idProductRoomType,
+                    $useTax,
                     1,
                     null,
                     null,
-                    $useTax,
-                    $context->cart->id
+                    $context->cart->id,
+                    null,
+                    false // for price without reduct
                 );
                 $serviceProduct['images'] = Image::getImages((int)Context::getContext()->language->id, $serviceProduct['id_product']);
             }

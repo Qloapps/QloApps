@@ -54,6 +54,11 @@ class HTMLPurifier_Filter_ExtractStyleBlocks extends HTMLPurifier_Filter
      */
     private $_enum_attrdef;
 
+    /**
+     * @type HTMLPurifier_AttrDef_Enum
+     */
+    private $_universal_attrdef;
+
     public function __construct()
     {
         $this->_tidy = new csstidy();
@@ -68,6 +73,13 @@ class HTMLPurifier_Filter_ExtractStyleBlocks extends HTMLPurifier_Filter
                 'active',
                 'hover',
                 'focus'
+            )
+        );
+        $this->_universal_attrdef = new HTMLPurifier_AttrDef_Enum(
+            array(
+                'initial',
+                'inherit',
+                'unset',
             )
         );
     }
@@ -146,175 +158,184 @@ class HTMLPurifier_Filter_ExtractStyleBlocks extends HTMLPurifier_Filter
         foreach ($this->_tidy->css as $k => $decls) {
             // $decls are all CSS declarations inside an @ selector
             $new_decls = array();
-            foreach ($decls as $selector => $style) {
-                $selector = trim($selector);
-                if ($selector === '') {
-                    continue;
-                } // should not happen
-                // Parse the selector
-                // Here is the relevant part of the CSS grammar:
-                //
-                // ruleset
-                //   : selector [ ',' S* selector ]* '{' ...
-                // selector
-                //   : simple_selector [ combinator selector | S+ [ combinator? selector ]? ]?
-                // combinator
-                //   : '+' S*
-                //   : '>' S*
-                // simple_selector
-                //   : element_name [ HASH | class | attrib | pseudo ]*
-                //   | [ HASH | class | attrib | pseudo ]+
-                // element_name
-                //   : IDENT | '*'
-                //   ;
-                // class
-                //   : '.' IDENT
-                //   ;
-                // attrib
-                //   : '[' S* IDENT S* [ [ '=' | INCLUDES | DASHMATCH ] S*
-                //     [ IDENT | STRING ] S* ]? ']'
-                //   ;
-                // pseudo
-                //   : ':' [ IDENT | FUNCTION S* [IDENT S*]? ')' ]
-                //   ;
-                //
-                // For reference, here are the relevant tokens:
-                //
-                // HASH         #{name}
-                // IDENT        {ident}
-                // INCLUDES     ==
-                // DASHMATCH    |=
-                // STRING       {string}
-                // FUNCTION     {ident}\(
-                //
-                // And the lexical scanner tokens
-                //
-                // name         {nmchar}+
-                // nmchar       [_a-z0-9-]|{nonascii}|{escape}
-                // nonascii     [\240-\377]
-                // escape       {unicode}|\\[^\r\n\f0-9a-f]
-                // unicode      \\{h}}{1,6}(\r\n|[ \t\r\n\f])?
-                // ident        -?{nmstart}{nmchar*}
-                // nmstart      [_a-z]|{nonascii}|{escape}
-                // string       {string1}|{string2}
-                // string1      \"([^\n\r\f\\"]|\\{nl}|{escape})*\"
-                // string2      \'([^\n\r\f\\"]|\\{nl}|{escape})*\'
-                //
-                // We'll implement a subset (in order to reduce attack
-                // surface); in particular:
-                //
-                //      - No Unicode support
-                //      - No escapes support
-                //      - No string support (by proxy no attrib support)
-                //      - element_name is matched against allowed
-                //        elements (some people might find this
-                //        annoying...)
-                //      - Pseudo-elements one of :first-child, :link,
-                //        :visited, :active, :hover, :focus
+            if (is_array($decls)) {
+                foreach ($decls as $selector => $style) {
+                    $selector = trim($selector);
+                    if ($selector === '') {
+                        continue;
+                    } // should not happen
+                    // Parse the selector
+                    // Here is the relevant part of the CSS grammar:
+                    //
+                    // ruleset
+                    //   : selector [ ',' S* selector ]* '{' ...
+                    // selector
+                    //   : simple_selector [ combinator selector | S+ [ combinator? selector ]? ]?
+                    // combinator
+                    //   : '+' S*
+                    //   : '>' S*
+                    // simple_selector
+                    //   : element_name [ HASH | class | attrib | pseudo ]*
+                    //   | [ HASH | class | attrib | pseudo ]+
+                    // element_name
+                    //   : IDENT | '*'
+                    //   ;
+                    // class
+                    //   : '.' IDENT
+                    //   ;
+                    // attrib
+                    //   : '[' S* IDENT S* [ [ '=' | INCLUDES | DASHMATCH ] S*
+                    //     [ IDENT | STRING ] S* ]? ']'
+                    //   ;
+                    // pseudo
+                    //   : ':' [ IDENT | FUNCTION S* [IDENT S*]? ')' ]
+                    //   ;
+                    //
+                    // For reference, here are the relevant tokens:
+                    //
+                    // HASH         #{name}
+                    // IDENT        {ident}
+                    // INCLUDES     ==
+                    // DASHMATCH    |=
+                    // STRING       {string}
+                    // FUNCTION     {ident}\(
+                    //
+                    // And the lexical scanner tokens
+                    //
+                    // name         {nmchar}+
+                    // nmchar       [_a-z0-9-]|{nonascii}|{escape}
+                    // nonascii     [\240-\377]
+                    // escape       {unicode}|\\[^\r\n\f0-9a-f]
+                    // unicode      \\{h}}{1,6}(\r\n|[ \t\r\n\f])?
+                    // ident        -?{nmstart}{nmchar*}
+                    // nmstart      [_a-z]|{nonascii}|{escape}
+                    // string       {string1}|{string2}
+                    // string1      \"([^\n\r\f\\"]|\\{nl}|{escape})*\"
+                    // string2      \'([^\n\r\f\\"]|\\{nl}|{escape})*\'
+                    //
+                    // We'll implement a subset (in order to reduce attack
+                    // surface); in particular:
+                    //
+                    //      - No Unicode support
+                    //      - No escapes support
+                    //      - No string support (by proxy no attrib support)
+                    //      - element_name is matched against allowed
+                    //        elements (some people might find this
+                    //        annoying...)
+                    //      - Pseudo-elements one of :first-child, :link,
+                    //        :visited, :active, :hover, :focus
 
-                // handle ruleset
-                $selectors = array_map('trim', explode(',', $selector));
-                $new_selectors = array();
-                foreach ($selectors as $sel) {
-                    // split on +, > and spaces
-                    $basic_selectors = preg_split('/\s*([+> ])\s*/', $sel, -1, PREG_SPLIT_DELIM_CAPTURE);
-                    // even indices are chunks, odd indices are
-                    // delimiters
-                    $nsel = null;
-                    $delim = null; // guaranteed to be non-null after
-                    // two loop iterations
-                    for ($i = 0, $c = count($basic_selectors); $i < $c; $i++) {
-                        $x = $basic_selectors[$i];
-                        if ($i % 2) {
-                            // delimiter
-                            if ($x === ' ') {
-                                $delim = ' ';
-                            } else {
-                                $delim = ' ' . $x . ' ';
-                            }
-                        } else {
-                            // simple selector
-                            $components = preg_split('/([#.:])/', $x, -1, PREG_SPLIT_DELIM_CAPTURE);
-                            $sdelim = null;
-                            $nx = null;
-                            for ($j = 0, $cc = count($components); $j < $cc; $j++) {
-                                $y = $components[$j];
-                                if ($j === 0) {
-                                    if ($y === '*' || isset($html_definition->info[$y = strtolower($y)])) {
-                                        $nx = $y;
-                                    } else {
-                                        // $nx stays null; this matters
-                                        // if we don't manage to find
-                                        // any valid selector content,
-                                        // in which case we ignore the
-                                        // outer $delim
-                                    }
-                                } elseif ($j % 2) {
-                                    // set delimiter
-                                    $sdelim = $y;
+                    // handle ruleset
+                    $selectors = array_map('trim', explode(',', $selector));
+                    $new_selectors = array();
+                    foreach ($selectors as $sel) {
+                        // split on +, > and spaces
+                        $basic_selectors = preg_split('/\s*([+> ])\s*/', $sel, -1, PREG_SPLIT_DELIM_CAPTURE);
+                        // even indices are chunks, odd indices are
+                        // delimiters
+                        $nsel = null;
+                        $delim = null; // guaranteed to be non-null after
+                        // two loop iterations
+                        for ($i = 0, $c = count($basic_selectors); $i < $c; $i++) {
+                            $x = $basic_selectors[$i];
+                            if ($i % 2) {
+                                // delimiter
+                                if ($x === ' ') {
+                                    $delim = ' ';
                                 } else {
-                                    $attrdef = null;
-                                    if ($sdelim === '#') {
-                                        $attrdef = $this->_id_attrdef;
-                                    } elseif ($sdelim === '.') {
-                                        $attrdef = $this->_class_attrdef;
-                                    } elseif ($sdelim === ':') {
-                                        $attrdef = $this->_enum_attrdef;
-                                    } else {
-                                        throw new HTMLPurifier_Exception('broken invariant sdelim and preg_split');
-                                    }
-                                    $r = $attrdef->validate($y, $config, $context);
-                                    if ($r !== false) {
-                                        if ($r !== true) {
-                                            $y = $r;
-                                        }
-                                        if ($nx === null) {
-                                            $nx = '';
-                                        }
-                                        $nx .= $sdelim . $y;
-                                    }
-                                }
-                            }
-                            if ($nx !== null) {
-                                if ($nsel === null) {
-                                    $nsel = $nx;
-                                } else {
-                                    $nsel .= $delim . $nx;
+                                    $delim = ' ' . $x . ' ';
                                 }
                             } else {
-                                // delimiters to the left of invalid
-                                // basic selector ignored
+                                // simple selector
+                                $components = preg_split('/([#.:])/', $x, -1, PREG_SPLIT_DELIM_CAPTURE);
+                                $sdelim = null;
+                                $nx = null;
+                                for ($j = 0, $cc = count($components); $j < $cc; $j++) {
+                                    $y = $components[$j];
+                                    if ($j === 0) {
+                                        if ($y === '*' || isset($html_definition->info[$y = strtolower($y)])) {
+                                            $nx = $y;
+                                        } else {
+                                            // $nx stays null; this matters
+                                            // if we don't manage to find
+                                            // any valid selector content,
+                                            // in which case we ignore the
+                                            // outer $delim
+                                        }
+                                    } elseif ($j % 2) {
+                                        // set delimiter
+                                        $sdelim = $y;
+                                    } else {
+                                        $attrdef = null;
+                                        if ($sdelim === '#') {
+                                            $attrdef = $this->_id_attrdef;
+                                        } elseif ($sdelim === '.') {
+                                            $attrdef = $this->_class_attrdef;
+                                        } elseif ($sdelim === ':') {
+                                            $attrdef = $this->_enum_attrdef;
+                                        } else {
+                                            throw new HTMLPurifier_Exception('broken invariant sdelim and preg_split');
+                                        }
+                                        $r = $attrdef->validate($y, $config, $context);
+                                        if ($r !== false) {
+                                            if ($r !== true) {
+                                                $y = $r;
+                                            }
+                                            if ($nx === null) {
+                                                $nx = '';
+                                            }
+                                            $nx .= $sdelim . $y;
+                                        }
+                                    }
+                                }
+                                if ($nx !== null) {
+                                    if ($nsel === null) {
+                                        $nsel = $nx;
+                                    } else {
+                                        $nsel .= $delim . $nx;
+                                    }
+                                } else {
+                                    // delimiters to the left of invalid
+                                    // basic selector ignored
+                                }
+                            }
+                        }
+                        if ($nsel !== null) {
+                            if (!empty($scopes)) {
+                                foreach ($scopes as $s) {
+                                    $new_selectors[] = "$s $nsel";
+                                }
+                            } else {
+                                $new_selectors[] = $nsel;
                             }
                         }
                     }
-                    if ($nsel !== null) {
-                        if (!empty($scopes)) {
-                            foreach ($scopes as $s) {
-                                $new_selectors[] = "$s $nsel";
-                            }
-                        } else {
-                            $new_selectors[] = $nsel;
-                        }
-                    }
-                }
-                if (empty($new_selectors)) {
-                    continue;
-                }
-                $selector = implode(', ', $new_selectors);
-                foreach ($style as $name => $value) {
-                    if (!isset($css_definition->info[$name])) {
-                        unset($style[$name]);
+                    if (empty($new_selectors)) {
                         continue;
                     }
-                    $def = $css_definition->info[$name];
-                    $ret = $def->validate($value, $config, $context);
-                    if ($ret === false) {
-                        unset($style[$name]);
-                    } else {
-                        $style[$name] = $ret;
+                    $selector = implode(', ', $new_selectors);
+                    foreach ($style as $name => $value) {
+                        if (!isset($css_definition->info[$name])) {
+                            unset($style[$name]);
+                            continue;
+                        }
+                        $uni_ret = $this->_universal_attrdef->validate($value, $config, $context);
+                        if ($uni_ret !== false) {
+                            $style[$name] = $uni_ret;
+                            continue;
+                        }
+                        $def = $css_definition->info[$name];
+                        $ret = $def->validate($value, $config, $context);
+                        if ($ret === false) {
+                            unset($style[$name]);
+                        } else {
+                            $style[$name] = $ret;
+                        }
                     }
+                    $new_decls[$selector] = $style;
                 }
-                $new_decls[$selector] = $style;
+            } else {
+                continue;
             }
             $new_css[$k] = $new_decls;
         }

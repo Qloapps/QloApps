@@ -37,17 +37,15 @@ class QloCleaner extends Module
     {
         $this->name = 'qlocleaner';
         $this->tab = 'administration';
-        $this->version = '1.0.1';
+        $this->version = '1.0.2';
         $this->author = 'PrestaShop';
         $this->need_instance = 0;
-        $this->multishop_context = Shop::CONTEXT_ALL;
 
         $this->bootstrap = true;
         parent::__construct();
 
         $this->displayName = $this->l('QloApps Data Cleaner');
         $this->description = $this->l('Check and fix functional integrity constraints and remove default data');
-        $this->secure_key = Tools::encrypt($this->name);
     }
 
     public function install()
@@ -312,7 +310,19 @@ class QloCleaner extends Module
                 foreach ($tables as $table) {
                     $db->execute('TRUNCATE TABLE `'._DB_PREFIX_.bqSQL($table).'`');
                 }
+
+                $objHotelBookingDocument =  new HotelBookingDocument();
+                if ($objHotelBookingDocument->documentsBaseDir && file_exists($objHotelBookingDocument->documentsBaseDir) && ($docs = scandir($objHotelBookingDocument->documentsBaseDir))) {
+                    foreach ($docs as $doc) {
+                        if ($doc != '.' && $doc != '..' && $doc != 'index.php') {
+                            if (is_dir($objHotelBookingDocument->documentsBaseDir.'/'.$doc)) {
+                                Tools::deleteDirectory($objHotelBookingDocument->documentsBaseDir.'/'.$doc, true);
+                            }
+                        }
+                    }
+                }
                 $db->execute('DELETE FROM `'._DB_PREFIX_.'address` WHERE id_customer > 0');
+                $db->execute('DELETE FROM `'._DB_PREFIX_.'specific_price` WHERE id_cart > 0');
                 $db->execute('UPDATE `'._DB_PREFIX_.'employee` SET `id_last_order` = 0,`id_last_customer_message` = 0,`id_last_customer` = 0');
 
                 break;
@@ -502,7 +512,6 @@ class QloCleaner extends Module
         $lang = new Language((int)Configuration::get('PS_LANG_DEFAULT'));
         $helper->default_form_language = $lang->id;
         $helper->allow_employee_form_lang = Configuration::get('PS_BO_ALLOW_EMPLOYEE_FORM_LANG') ? Configuration::get('PS_BO_ALLOW_EMPLOYEE_FORM_LANG') : 0;
-        $this->fields_form = array();
         $helper->id = (int)Tools::getValue('id_carrier');
         $helper->identifier = $this->identifier;
         $helper->submit_action = 'btnSubmit';
@@ -686,6 +695,8 @@ class QloCleaner extends Module
                 array('htl_room_type_demand', 'id_global_demand', 'htl_room_type_global_demand', 'id_global_demand'),
                 array('htl_room_type_demand', 'id_product', 'product', 'id_product'),
                 array('htl_room_type_demand_price', 'id_product', 'product', 'id_product'),
+                array('htl_room_type_feature_pricing', 'id_product', 'product', 'id_product'),
+                array('htl_room_type_feature_pricing_restriction', 'id_feature_price', 'htl_room_type_feature_pricing', 'id_feature_price'),
                 array('htl_room_type_feature_pricing_group', 'id_group', 'group', 'id_group'),
                 array('htl_booking_demands_tax', 'id_tax', 'tax', 'id_tax'),
                 array('htl_booking_detail', 'id_product', 'product', 'id_product'),
@@ -807,6 +818,7 @@ class QloCleaner extends Module
                 'htl_branch_refund_rules',
                 'htl_order_restrict_date',
                 'htl_room_type_feature_pricing',
+                'htl_room_type_feature_pricing_restriction',
                 'htl_room_type_feature_pricing_lang',
                 'htl_room_type_feature_pricing_group',
                 'htl_room_type_demand_price',
@@ -869,10 +881,11 @@ class QloCleaner extends Module
             'htl_booking_detail',
             'htl_booking_demands',
             'htl_booking_demands_tax',
-
-            'htl_room_type_service_product_order_detail',
-            'htl_room_type_service_product_cart_detail',
-            'htl_hotel_service_product_cart_detail',
+            'service_product_order_detail',
+            'service_product_cart_detail',
+            'order_customer_guest_detail',
+            'customer_guest_detail',
+            'cart_customer_guest'
         );
     }
 }

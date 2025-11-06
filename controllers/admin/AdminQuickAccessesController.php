@@ -149,7 +149,7 @@ class AdminQuickAccessesControllerCore extends AdminController
     public function initProcess()
     {
         if ((isset($_GET['new_window'.$this->table]) || isset($_GET['new_window'])) && Tools::getValue($this->identifier)) {
-            if ($this->tabAccess['edit'] === '1') {
+            if ($this->tabAccess['edit'] === 1) {
                 $this->action = 'newWindow';
             } else {
                 $this->errors[] = Tools::displayError('You do not have permission to edit this.');

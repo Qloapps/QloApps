@@ -88,7 +88,7 @@ class MessageCore extends ObjectModel
      * @param bool $private return WITH private messages
      * @return array Messages
      */
-    public static function getMessagesByOrderId($id_order, $private = false, Context $context = null)
+    public static function getMessagesByOrderId($id_order, $private = null, ?Context $context = null)
     {
         if (!Validate::isBool($private)) {
             die(Tools::displayError());
@@ -108,7 +108,7 @@ class MessageCore extends ObjectModel
 				AND mr.`id_employee` = '.(isset($context->employee) ? (int)$context->employee->id : '\'\'').'
 			LEFT OUTER JOIN `'._DB_PREFIX_.'employee` e ON e.`id_employee` = m.`id_employee`
 			WHERE id_order = '.(int)$id_order.'
-			'.(!$private ? ' AND m.`private` = 0' : '').'
+			'.(!is_null($private) ? ' AND m.`private` = '.(int) $private : '').'
 			GROUP BY m.id_message
 			ORDER BY m.date_add DESC
 		');
@@ -121,7 +121,7 @@ class MessageCore extends ObjectModel
      * @param bool $private return WITH private messages
      * @return array Messages
      */
-    public static function getMessagesByCartId($id_cart, $private = false, Context $context = null)
+    public static function getMessagesByCartId($id_cart, $private = false, ?Context $context = null)
     {
         if (!Validate::isBool($private)) {
             die(Tools::displayError());

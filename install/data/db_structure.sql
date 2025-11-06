@@ -634,6 +634,7 @@ CREATE TABLE `PREFIX_customer_message` (
   `id_customer_thread` int(11) DEFAULT NULL,
   `id_employee` int(10) unsigned DEFAULT NULL,
   `message` MEDIUMTEXT NOT NULL,
+  `id_product` int(10) unsigned DEFAULT NULL,
   `file_name` varchar(18) DEFAULT NULL,
   `ip_address`  varchar(16) DEFAULT NULL,
   `user_agent` varchar(128) DEFAULT NULL,
@@ -658,9 +659,12 @@ CREATE TABLE `PREFIX_customer_thread` (
   `id_lang` int(10) unsigned NOT NULL,
   `id_contact` int(10) unsigned NOT NULL,
   `id_customer` int(10) unsigned DEFAULT NULL,
+  `id_employee` int(10) unsigned DEFAULT NULL,
   `id_order` int(10) unsigned DEFAULT NULL,
-  `id_product` int(10) unsigned DEFAULT NULL,
-  `status` enum('open','closed','pending1','pending2') NOT NULL DEFAULT 'open',
+  `user_name` VARCHAR(128) DEFAULT NULL,
+  `phone` VARCHAR(32) DEFAULT NULL,
+  `subject` TEXT DEFAULT NULL,
+  `status` INT(10) NOT NULL DEFAULT 1,
   `email` varchar(128) NOT NULL,
   `token` varchar(12) DEFAULT NULL,
   `date_add` datetime NOT NULL,
@@ -670,8 +674,7 @@ CREATE TABLE `PREFIX_customer_thread` (
 	KEY `id_lang` (`id_lang`),
 	KEY `id_contact` (`id_contact`),
 	KEY `id_customer` (`id_customer`),
-	KEY `id_order` (`id_order`),
-	KEY `id_product` (`id_product`)
+	KEY `id_order` (`id_order`)
 ) ENGINE=ENGINE_TYPE DEFAULT CHARSET=utf8 COLLATION;
 
 CREATE TABLE `PREFIX_order_customer_guest_detail` (
@@ -1257,7 +1260,7 @@ CREATE TABLE `PREFIX_order_detail` (
   `group_reduction` DECIMAL(10, 2) NOT NULL DEFAULT '0.000000',
   `product_quantity_discount` decimal(20,6) NOT NULL DEFAULT '0.000000',
   `is_booking_product` tinyint(1) NOT NULL DEFAULT '0',
-  `product_service_type` tinyint(1) NOT NULL DEFAULT '1',
+  `selling_preference_type` tinyint(1) NOT NULL DEFAULT '1',
   `product_auto_add` tinyint(1) NOT NULL DEFAULT '0',
   `product_price_addition_type` tinyint(1) NOT NULL DEFAULT '0',
   `product_allow_multiple_quantity` tinyint(1) unsigned NOT NULL DEFAULT '1',
@@ -1356,12 +1359,14 @@ CREATE TABLE `PREFIX_order_return` (
 CREATE TABLE `PREFIX_order_return_detail` (
   `id_order_return_detail` int(10) unsigned NOT NULL auto_increment,
   `id_order_return` int(10) unsigned NOT NULL,
-	`id_htl_booking` int(11) NOT NULL,
+  `id_htl_booking` int(11) NOT NULL,
+  `id_service_product_order_detail` int(11) NOT NULL,
   `refunded_amount` decimal(20,6) NOT NULL DEFAULT '0.000000',
   `id_order_detail` int(10) unsigned NOT NULL DEFAULT '0',
   `id_customization` int(10) unsigned NOT NULL DEFAULT '0',
   `product_quantity` int(10) unsigned NOT NULL DEFAULT '0',
   KEY `id_htl_booking` (`id_htl_booking`),
+  KEY `id_service_product_order_detail` (`id_service_product_order_detail`),
   PRIMARY KEY (`id_order_return_detail`)
 ) ENGINE=ENGINE_TYPE DEFAULT CHARSET=utf8 COLLATION;
 
@@ -1414,6 +1419,7 @@ CREATE TABLE `PREFIX_order_slip_detail` (
   `id_order_slip` int(10) unsigned NOT NULL,
   `id_order_detail` int(10) unsigned NOT NULL,
   `id_htl_booking` int(10) unsigned NOT NULL,
+  `id_service_product_order_detail` int(10) unsigned NOT NULL,
   `product_quantity` int(10) unsigned NOT NULL DEFAULT '0',
   `unit_price_tax_excl` DECIMAL(20, 6) NULL,
   `unit_price_tax_incl` DECIMAL(20, 6) NULL,
@@ -1421,7 +1427,7 @@ CREATE TABLE `PREFIX_order_slip_detail` (
   `total_price_tax_incl` DECIMAL(20, 6),
   `amount_tax_excl` DECIMAL(20, 6) DEFAULT NULL,
   `amount_tax_incl` DECIMAL(20, 6) DEFAULT NULL,
-  PRIMARY KEY (`id_order_slip`,`id_htl_booking`)
+  PRIMARY KEY (`id_order_slip`,`id_htl_booking`,`id_service_product_order_detail`)
 ) ENGINE=ENGINE_TYPE DEFAULT CHARSET=utf8 COLLATION;
 
 CREATE TABLE `PREFIX_order_state` (
@@ -1553,7 +1559,7 @@ CREATE TABLE `PREFIX_product` (
   `auto_add_to_cart` tinyint(1) NOT NULL DEFAULT '0',
   `price_addition_type` tinyint(1) NOT NULL DEFAULT '1',
   `show_at_front` tinyint(1) NOT NULL DEFAULT '1',
-  `service_product_type` tinyint(1) NOT NULL DEFAULT '1',
+  `selling_preference_type` tinyint(1) NOT NULL DEFAULT '1',
   `price_display_method` tinyint(1) NOT NULL DEFAULT '1',
   `available_date` date NOT NULL DEFAULT '0000-00-00',
   `condition` ENUM('new', 'used', 'refurbished') NOT NULL DEFAULT 'new',
@@ -1882,6 +1888,7 @@ CREATE TABLE `PREFIX_specific_price` (
 	`id_country` INT UNSIGNED NOT NULL,
 	`id_group` INT UNSIGNED NOT NULL,
 	`id_customer` INT UNSIGNED NOT NULL,
+	`id_htl_cart_booking` INT UNSIGNED NOT NULL,
 	`id_product_attribute` INT UNSIGNED NOT NULL,
 	`price` DECIMAL(20, 6) NOT NULL,
 	`from_quantity` mediumint(8) UNSIGNED NOT NULL,
@@ -1900,7 +1907,7 @@ CREATE TABLE `PREFIX_specific_price` (
   KEY `id_customer` (`id_customer`),
   KEY `from` (`from`),
   KEY `to` (`to`),
-  UNIQUE KEY `id_product_2` (`id_product`,`id_product_attribute`,`id_customer`,`id_cart`,`from`,`to`,`id_shop`,`id_shop_group`,`id_currency`,`id_country`,`id_group`,`from_quantity`,`id_specific_price_rule`)
+  UNIQUE KEY `id_product_2` (`id_product`,`id_product_attribute`,`id_customer`,`id_cart`,`from`,`to`,`id_shop`,`id_shop_group`,`id_currency`,`id_country`,`id_group`,`from_quantity`,`id_specific_price_rule`, `id_htl_cart_booking`)
 ) ENGINE=ENGINE_TYPE DEFAULT CHARSET=utf8 COLLATION;
 
 CREATE TABLE `PREFIX_state` (
@@ -2169,8 +2176,8 @@ CREATE TABLE IF NOT EXISTS `PREFIX_shop_url` (
   `id_shop` int(11) unsigned NOT NULL,
   `domain` varchar(150) NOT NULL,
   `domain_ssl` varchar(150) NOT NULL,
-  `physical_uri` varchar(64) NOT NULL,
-  `virtual_uri` varchar(64) NOT NULL,
+  `physical_uri` varchar(256) NOT NULL,
+  `virtual_uri` varchar(256) NOT NULL,
   `main` TINYINT(1) NOT NULL,
   `active` TINYINT(1) NOT NULL,
   PRIMARY KEY (`id_shop_url`),

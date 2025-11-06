@@ -29,7 +29,7 @@ class Smarty_Internal_Compile_Private_Special_Variable extends Smarty_Internal_C
     public function compile($args, Smarty_Internal_TemplateCompilerBase $compiler, $parameter)
     {
         $_index = preg_split("/\]\[/", substr($parameter, 1, strlen($parameter) - 2));
-        $variable = strtolower($compiler->getId($_index[ 0 ]));
+        $variable = smarty_strtolower_ascii($compiler->getId($_index[ 0 ]));
         if ($variable === false) {
             $compiler->trigger_template_error("special \$Smarty variable name index can not be variable", null, true);
         }
@@ -40,7 +40,7 @@ class Smarty_Internal_Compile_Private_Special_Variable extends Smarty_Internal_C
                 case 'foreach':
                 case 'section':
                     if (!isset(Smarty_Internal_TemplateCompilerBase::$_tag_objects[ $variable ])) {
-                        $class = 'Smarty_Internal_Compile_' . ucfirst($variable);
+                        $class = 'Smarty_Internal_Compile_' . smarty_ucfirst_ascii($variable);
                         Smarty_Internal_TemplateCompilerBase::$_tag_objects[ $variable ] = new $class;
                     }
                     return Smarty_Internal_TemplateCompilerBase::$_tag_objects[ $variable ]->compileSpecialVariable(
@@ -76,7 +76,7 @@ class Smarty_Internal_Compile_Private_Special_Variable extends Smarty_Internal_C
                         $compiler->trigger_template_error("(secure mode) super globals not permitted");
                         break;
                     }
-                    $compiled_ref = '$_' . strtoupper($variable);
+                    $compiled_ref = '$_' . smarty_strtoupper_ascii($variable);
                     break;
                 case 'template':
                     return 'basename($_smarty_tpl->source->filepath)';

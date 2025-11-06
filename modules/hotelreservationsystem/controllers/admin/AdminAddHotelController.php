@@ -1,21 +1,24 @@
 <?php
 /**
-* 2010-2020 Webkul.
-*
 * NOTICE OF LICENSE
 *
-* All right is reserved,
-* Please go through this link for complete license : https://store.webkul.com/license.html
+* This source file is subject to the Open Software License version 3.0
+* that is bundled with this package in the file LICENSE.md
+* It is also available through the world-wide-web at this URL:
+* https://opensource.org/license/osl-3-0-php
+* If you did not receive a copy of the license and are unable to
+* obtain it through the world-wide-web, please send an email
+* to support@qloapps.com so we can send you a copy immediately.
 *
 * DISCLAIMER
 *
-* Do not edit or add to this file if you wish to upgrade this module to newer
-* versions in the future. If you wish to customize this module for your
-* needs please refer to https://store.webkul.com/customisation-guidelines/ for more information.
+* Do not edit or add to this file if you wish to upgrade this module to a newer
+* versions in the future. If you wish to customize this module for your needs
+* please refer to https://store.webkul.com/customisation-guidelines for more information.
 *
-*  @author    Webkul IN <support@webkul.com>
-*  @copyright 2010-2020 Webkul IN
-*  @license   https://store.webkul.com/license.html
+* @author Webkul IN
+* @copyright Since 2010 Webkul
+* @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
 */
 
 class AdminAddHotelController extends ModuleAdminController
@@ -214,7 +217,7 @@ class AdminAddHotelController extends ModuleAdminController
         }
 
         $smartyVars['state_var'] = $stateOptions;
-        $smartyVars['enabledDisplayMap'] = Configuration::get('PS_API_KEY') && Configuration::get('WK_GOOGLE_ACTIVE_MAP');
+        $smartyVars['enabledDisplayMap'] = Configuration::get('PS_API_KEY') && Configuration::get('PS_MAP_ID') && Configuration::get('WK_GOOGLE_ACTIVE_MAP');
         $smartyVars['ps_img_dir'] = _PS_IMG_.'l/';
         $smartyVars['PS_MAX_CHECKOUT_OFFSET'] = (int) Configuration::get('PS_MAX_CHECKOUT_OFFSET');
         $smartyVars['PS_MIN_BOOKING_OFFSET'] = (int) Configuration::get('PS_MIN_BOOKING_OFFSET');
@@ -605,8 +608,8 @@ class AdminAddHotelController extends ModuleAdminController
             $objHotelBranch->check_in = $check_in;
             $objHotelBranch->check_out = $check_out;
             $objHotelBranch->rating = $rating;
-            $objHotelBranch->latitude = $latitude;
-            $objHotelBranch->longitude = $longitude;
+            $objHotelBranch->latitude = Validate::isFloat($latitude) ? Tools::ps_round($latitude, 8) : $latitude;
+            $objHotelBranch->longitude = Validate::isFloat($longitude) ? Tools::ps_round($longitude, 8) : $longitude;
             $objHotelBranch->map_formated_address = $map_formated_address;
             $objHotelBranch->map_input_text = $map_input_text;
             $objHotelBranch->save();
@@ -693,16 +696,34 @@ class AdminAddHotelController extends ModuleAdminController
                 }
                 $objCountry = new Country();
                 $countryName = $objCountry->getNameById(Configuration::get('PS_LANG_DEFAULT'), $country);
-                if ($catCountry = $objHotelBranch->addCategory($countryName, false, $groupIds)) {
+                if ($catCountry = $objHotelBranch->addCategory(
+                    array (
+                        'name' => $countryName,
+                        'group_ids' => $groupIds,
+                        'parent_category' => false
+                    )
+                )) {
                     if ($state) {
                         $objState = new State();
                         $stateName = $objState->getNameById($state);
-                        $catState = $objHotelBranch->addCategory($stateName, $catCountry, $groupIds);
                     } else {
-                        $catState = $objHotelBranch->addCategory($city, $catCountry, $groupIds);
+                        $stateName = $city;
                     }
-                    if ($catState) {
-                        if ($catCity = $objHotelBranch->addCategory($city, $catState, $groupIds)) {
+
+                    if ($catState = $objHotelBranch->addCategory(
+                        array (
+                            'name' => $stateName,
+                            'group_ids' => $groupIds,
+                            'parent_category' => $catCountry
+                        )
+                    )) {
+                        if ($catCity = $objHotelBranch->addCategory(
+                            array (
+                                'name' => $city,
+                                'group_ids' => $groupIds,
+                                'parent_category' => $catState
+                            )
+                        )) {
                             $hotelCatName = $objHotelBranch->hotel_name;
                             // add/update hotel category
                             if ($objHotelBranch->id_category) {
@@ -717,15 +738,17 @@ class AdminAddHotelController extends ModuleAdminController
                                 Category::regenerateEntireNtree();
                             } else {
                                 if ($catHotel = $objHotelBranch->addCategory(
-                                    $hotelCatName,
-                                    $catCity,
-                                    $groupIds,
-                                    1,
-                                    $newIdHotel,
-                                    $linkRewriteArray,
-                                    $metaTitleArray,
-                                    $metaDescriptionArray,
-                                    $metaKeywordsArray
+                                    array (
+                                        'name' => $hotelCatName,
+                                        'group_ids' => $groupIds,
+                                        'parent_category' => $catCity,
+                                        'is_hotel' => 1,
+                                        'id_hotel' => $newIdHotel,
+                                        'link_rewrite' => $linkRewriteArray,
+                                        'meta_title' => $metaTitleArray,
+                                        'meta_description' => $metaDescriptionArray,
+                                        'meta_keywords' => $metaKeywordsArray
+                                    )
                                 )) {
                                     $objHotelBranch = new HotelBranchInformation($newIdHotel);
                                     $objHotelBranch->id_category = $catHotel;
@@ -964,15 +987,16 @@ class AdminAddHotelController extends ModuleAdminController
                 'primaryHotelId' => Configuration::get('WK_PRIMARY_HOTEL'),
                 'disableHotelMsg' => $this->l('Primary hotel for website will be updated to first available active hotel.', null, true),
                 'PS_STORES_ICON' => $this->context->link->getMediaLink(_PS_IMG_.Configuration::get('PS_STORES_ICON')),
+                'PS_MAP_ID' => ($PS_MAP_ID = Configuration::get('PS_MAP_ID'))
             )
         );
         // GOOGLE MAP
         $language = $this->context->language;
         $country = $this->context->country;
-        if ($PS_API_KEY = Configuration::get('PS_API_KEY')) {
+        if (($PS_API_KEY = Configuration::get('PS_API_KEY')) && $PS_MAP_ID) {
             $this->addJS(
-                'https://maps.googleapis.com/maps/api/js?key='.$PS_API_KEY.'&libraries=places&language='.
-                $language->iso_code.'&region='.$country->iso_code
+                'https://maps.googleapis.com/maps/api/js?key='.$PS_API_KEY.'&libraries=places,marker&loading=async&language='.
+                $language->iso_code.'&region='.$country->iso_code.'&callback=initGoogleMaps'
             );
         }
         //tinymce

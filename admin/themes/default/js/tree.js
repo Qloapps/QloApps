@@ -101,8 +101,8 @@ Tree.prototype =
 		this.$element.find("li").click(
 			function ()
 			{
-				$('.tree-selected').removeClass("tree-selected");
-				$('li input:checked').parent().addClass("tree-selected");
+				$('#'+idTree+' .tree-selected').removeClass("tree-selected");
+				$('#'+idTree+' li input:checked').parent().addClass("tree-selected");
 			}
 		);
 

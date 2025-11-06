@@ -96,7 +96,7 @@ class AdminAttributeGeneratorControllerCore extends AdminController
         }
 
         if (Tools::isSubmit('generate')) {
-            if ($this->tabAccess['edit'] === '1') {
+            if ($this->tabAccess['edit'] === 1) {
                 $this->action = 'generate';
             } else {
                 $this->errors[] = Tools::displayError('You do not have permission to add this.');
@@ -239,7 +239,7 @@ class AdminAttributeGeneratorControllerCore extends AdminController
         $this->initPageHeaderToolbar();
         $this->initGroupTable();
 
-        $attributes = Attribute::getAttributes(Context::getContext()->language->id, true);
+        $attributes = ProductAttribute::getAttributes(Context::getContext()->language->id, true);
         $attribute_js = array();
 
         foreach ($attributes as $k => $attribute) {

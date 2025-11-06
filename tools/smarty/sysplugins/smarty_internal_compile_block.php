@@ -125,7 +125,7 @@ class Smarty_Internal_Compile_Blockclose extends Smarty_Internal_Compile_Shared_
         // setup buffer for template function code
         $compiler->parser->current_buffer = new Smarty_Internal_ParseTree_Template();
         $output = "<?php\n";
-        $output .= "/* {block {$_name}} */\n";
+        $output .= $compiler->cStyleComment(" {block {$_name}} ") . "\n";
         $output .= "class {$_className} extends Smarty_Internal_Block\n";
         $output .= "{\n";
         foreach ($_block as $property => $value) {
@@ -155,7 +155,7 @@ class Smarty_Internal_Compile_Blockclose extends Smarty_Internal_Compile_Shared_
         }
         $output .= "}\n";
         $output .= "}\n";
-        $output .= "/* {/block {$_name}} */\n\n";
+        $output .= $compiler->cStyleComment(" {/block {$_name}} ") . "\n\n";
         $output .= "?>\n";
         $compiler->parser->current_buffer->append_subtree(
             $compiler->parser,

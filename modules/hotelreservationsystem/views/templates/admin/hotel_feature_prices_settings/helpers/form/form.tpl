@@ -1,20 +1,23 @@
 {*
-* 2010-2020 Webkul.
-*
 * NOTICE OF LICENSE
 *
-* All right is reserved,
-* Please go through this link for complete license : https://store.webkul.com/license.html
+* This source file is subject to the Open Software License version 3.0
+* that is bundled with this package in the file LICENSE.md
+* It is also available through the world-wide-web at this URL:
+* https://opensource.org/license/osl-3-0-php
+* If you did not receive a copy of the license and are unable to
+* obtain it through the world-wide-web, please send an email
+* to support@qloapps.com so we can send you a copy immediately.
 *
 * DISCLAIMER
 *
-* Do not edit or add to this file if you wish to upgrade this module to newer
-* versions in the future. If you wish to customize this module for your
-* needs please refer to https://store.webkul.com/customisation-guidelines/ for more information.
+* Do not edit or add to this file if you wish to upgrade this module to a newer
+* versions in the future. If you wish to customize this module for your needs
+* please refer to https://store.webkul.com/customisation-guidelines for more information.
 *
-*  @author    Webkul IN <support@webkul.com>
-*  @copyright 2010-2020 Webkul IN
-*  @license   https://store.webkul.com/license.html
+* @author Webkul IN
+* @copyright Since 2010 Webkul
+* @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
 *}
 
 <div class="panel">
@@ -81,7 +84,7 @@
 			</div>
 			{if isset($hotel_tree)}
 				<div class="form-group room-type-name-tree" style="display:none;">
-					<label class="col-sm-3 control-label required" for="feature_price_name" >
+					<label class="col-sm-3 control-label required" for="room_types">
 						<span class="label-tooltip" data-toggle="tooltip" data-html="true" title="" data-original-title="{l s='Select the room types for which you are going to create this advanced price rule.' mod='hotelreservationsystem'}">
 							{l s='Room Types' mod='hotelreservationsystem'}
 						</span>
@@ -94,12 +97,12 @@
 		{/if}
 
 		<div class="form-group room-type-name">
-			<label class="col-sm-3 control-label required" for="feature_price_name" >
+			<label class="col-sm-3 control-label required" for="room_type_name" >
 				{l s='Room Type' mod='hotelreservationsystem'}
 			</label>
 			<div class="col-sm-3">
-				<input autocomplete="off" type="text" id="room_type_name" name="room_type_name" class="form-control" placeholder= "{l s='Enter room type name' mod='hotelreservationsystem'}" value="{if isset($productName)}{$productName}{/if}"/>
-				<input type="hidden" id="room_type_id" name="room_type_id" class="form-control" value="{if isset($objFeaturePrice->id_product)}{$objFeaturePrice->id_product}{else}0{/if}"/>
+				<input autocomplete="off" type="text" id="room_type_name" name="room_type_name" class="form-control" placeholder= "{l s='Enter room type name' mod='hotelreservationsystem'}" value="{if isset($smarty.post.room_type_name)}{$smarty.post.room_type_name}{elseif isset($productName)}{$productName}{/if}"/>
+				<input type="hidden" id="room_type_id" name="room_type_id" class="form-control" value="{if isset($smarty.post.room_type_id)}{$smarty.post.room_type_id}{elseif isset($objFeaturePrice->id_product)}{$objFeaturePrice->id_product}{else}0{/if}"/>
 				<div class="dropdown">
 					<ul class="room_type_search_results_ul"></ul>
 				</div>
@@ -112,125 +115,27 @@
 			</div>
 		</div>
 
-		<div class="form-group">
-            <label for="date_selection_type" class="control-label col-lg-3">
-              {l s='Date Selection type' mod='hotelreservationsystem'}
-            </label>
-            <div class="col-lg-3">
-				<select class="form-control" name="date_selection_type" id="date_selection_type">
-					<option value="{HotelRoomTypeFeaturePricing::DATE_SELECTION_TYPE_RANGE}" {if (isset($smarty.post.date_selection_type) && $smarty.post.date_selection_type == HotelRoomTypeFeaturePricing::DATE_SELECTION_TYPE_RANGE) || (isset($objFeaturePrice->date_selection_type) && $objFeaturePrice->date_selection_type == HotelRoomTypeFeaturePricing::DATE_SELECTION_TYPE_RANGE)}selected = "selected"{/if}>
-					  {l s='Date Range' mod='hotelreservationsystem'}
-					</option>
-					<option value="{HotelRoomTypeFeaturePricing::DATE_SELECTION_TYPE_SPECIFIC}" {if (isset($smarty.post.date_selection_type) && $smarty.post.date_selection_type == HotelRoomTypeFeaturePricing::DATE_SELECTION_TYPE_SPECIFIC) || (isset($objFeaturePrice->date_selection_type) && $objFeaturePrice->date_selection_type == HotelRoomTypeFeaturePricing::DATE_SELECTION_TYPE_SPECIFIC)}selected = "selected"{/if}>
-					  {l s='Specific Date' mod='hotelreservationsystem'}
-					</option>
-				</select>
-			</div>
-		</div>
-
-		<div class="form-group specific_date_type" {if (isset($smarty.post.date_selection_type) && $smarty.post.date_selection_type != HotelRoomTypeFeaturePricing::DATE_SELECTION_TYPE_SPECIFIC) || (isset($objFeaturePrice->date_selection_type) && $objFeaturePrice->date_selection_type != HotelRoomTypeFeaturePricing::DATE_SELECTION_TYPE_SPECIFIC)}style="display:none;"{else if !isset($edit) && !isset($smarty.post.date_selection_type)}style="display:none;"{/if}>
-			<label class="col-sm-3 control-label required" for="specific_date" >
-				{l s='Specific Date' mod='hotelreservationsystem'}
+		<div class="row">
+			<label class="col-sm-3 control-label required" for="feature_price_name" >
+				{l s='Restrictions' mod='hotelreservationsystem'}
 			</label>
-			<div class="col-sm-3">
-				<input type="text" id="specific_date" name="specific_date" class="form-control datepicker-input" value="{if isset($objFeaturePrice->date_from)}{$objFeaturePrice->date_from}{else}{$date_from}{/if}" readonly/>
-			</div>
-		</div>
-
-		<div class="form-group date_range_type" {if (isset($objFeaturePrice->date_selection_type) && $objFeaturePrice->date_selection_type == HotelRoomTypeFeaturePricing::DATE_SELECTION_TYPE_SPECIFIC) || (isset($smarty.post.date_selection_type) && $smarty.post.date_selection_type != HotelRoomTypeFeaturePricing::DATE_SELECTION_TYPE_RANGE)}style="display:none;"{/if}>
-			<label class="col-sm-3 control-label required" for="date_form" >
-				{l s='Date From' mod='hotelreservationsystem'}
-			</label>
-			<div class="col-sm-3">
-				<input type="text" id="feature_plan_date_from" name="date_from" class="form-control datepicker-input" value="{if isset($smarty.post.date_from) && $smarty.post.date_from}{$smarty.post.date_from}{elseif isset($objFeaturePrice->date_from)}{$objFeaturePrice->date_from|date_format:'%d-%m-%Y'}{else}{$date_from|date_format:'%d-%m-%Y'}{/if}" readonly/>
-			</div>
-		</div>
-		<div class="form-group date_range_type" {if (isset($objFeaturePrice->date_selection_type) && $objFeaturePrice->date_selection_type == HotelRoomTypeFeaturePricing::DATE_SELECTION_TYPE_SPECIFIC) || (isset($smarty.post.date_selection_type) && $smarty.post.date_selection_type != HotelRoomTypeFeaturePricing::DATE_SELECTION_TYPE_RANGE)}style="display:none;"{/if}>
-			<label class="col-sm-3 control-label required" for="date_to" >
-				{l s='Date To' mod='hotelreservationsystem'}
-			</label>
-			<div class="col-sm-3">
-				<input type="text" id="feature_plan_date_to" name="date_to" class="form-control datepicker-input" value="{if isset($smarty.post.date_to) && $smarty.post.date_to}{$smarty.post.date_to}{elseif isset($objFeaturePrice->date_to)}{$objFeaturePrice->date_to|date_format:'%d-%m-%Y'}{else}{$date_to|date_format:'%d-%m-%Y'}{/if}" readonly/>
-			</div>
-		</div>
-
-		<div class="form-group special_days_content" {if (isset($objFeaturePrice->date_selection_type) && $objFeaturePrice->date_selection_type == HotelRoomTypeFeaturePricing::DATE_SELECTION_TYPE_SPECIFIC) || (isset($smarty.post.date_selection_type) && $smarty.post.date_selection_type != HotelRoomTypeFeaturePricing::DATE_SELECTION_TYPE_RANGE)}style="display:none;"{/if}>
-			<label class="control-label col-lg-3">
-				<span class="label-tooltip" data-toggle="tooltip" data-html="true" title="" data-original-title="{l s='Enable this option to restrict this rule to specific week days (for example, weekends) of the selected date range. If disabled, rule will be applicable to all week days.' mod='hotelreservationsystem'}">
-					{l s='Restrict to Week Days' mod='hotelreservationsystem'}
-				</span>
-			</label>
-			<div class="col-lg-9 ">
-				<span class="switch prestashop-switch fixed-width-lg">
-					<input type="radio" {if isset($smarty.post.is_special_days_exists) && $smarty.post.is_special_days_exists == 1}checked="checked"{elseif isset($edit) && $objFeaturePrice->is_special_days_exists == 1}checked="checked"{/if} value="1" id="is_special_days_exists_on" name="is_special_days_exists">
-					<label for="is_special_days_exists_on">{l s='Yes' mod='hotelreservationsystem'}</label>
-					<input {if isset($smarty.post.is_special_days_exists) && $smarty.post.is_special_days_exists == 0} checked="checked" {elseif (isset($edit) && $objFeaturePrice->is_special_days_exists == 0) || !isset($edit)} checked="checked"{/if} type="radio" value="0" id="is_special_days_exists_off" name="is_special_days_exists">
-					<label for="is_special_days_exists_off">{l s='No' mod='hotelreservationsystem'}</label>
-					<a class="slide-button btn"></a>
-				</span>
-			</div>
-		</div>
-
-		<div class="form-group week_days" {if (isset($smarty.post.is_special_days_exists) && $smarty.post.is_special_days_exists) 	|| (isset($objFeaturePrice->is_special_days_exists) && $objFeaturePrice->is_special_days_exists)}style="display:block;"{/if}>
-			<label for="special_days" class="control-label col-lg-3">
-				{l s='Select Week Days' mod='hotelreservationsystem'}
-			</label>
-			<div class="col-lg-3 checkboxes-wrap">
-				<div class="day-wrap">
-					<input type="checkbox" name="special_days[]" value="mon"
-					{if (isset($smarty.post.special_days) && in_array('mon', $smarty.post.special_days))
-						|| (isset($special_days) && $special_days && in_array('mon', $special_days))}
-						checked="checked"
-					{/if}/>
-					<p>{l s='Mon' mod='hotelreservationsystem'}</p>
-				</div>
-				<div class="day-wrap">
-					<input type="checkbox" name="special_days[]" value="tue"
-					{if (isset($smarty.post.special_days) && in_array('tue', $smarty.post.special_days))
-						|| (isset($special_days) && $special_days && in_array('tue', $special_days))}
-						checked="checked"
-					{/if}/>
-					<p>{l s='Tue' mod='hotelreservationsystem'}</p>
-				</div>
-				<div class="day-wrap">
-					<input type="checkbox" name="special_days[]" value="wed"
-					{if (isset($smarty.post.special_days) && in_array('wed', $smarty.post.special_days))
-						|| (isset($special_days) && $special_days && in_array('wed', $special_days))}
-						checked="checked"
-					{/if}/>
-					<p>{l s='Wed' mod='hotelreservationsystem'}</p>
-				</div>
-				<div class="day-wrap">
-					<input type="checkbox" name="special_days[]" value="thu"
-					{if (isset($smarty.post.special_days) && in_array('thu', $smarty.post.special_days))
-						|| (isset($special_days) && $special_days && in_array('thu', $special_days))}
-						checked="checked"
-					{/if}/>
-					<p>{l s='Thu' mod='hotelreservationsystem'}</p>
-				</div>
-				<div class="day-wrap">
-					<input type="checkbox" name="special_days[]" value="fri"
-					{if (isset($smarty.post.special_days) && in_array('fri', $smarty.post.special_days))
-						|| (isset($special_days) && $special_days && in_array('fri', $special_days))}
-						checked="checked"
-					{/if}/>
-					<p>{l s='Fri' mod='hotelreservationsystem'}</p>
-				</div>
-				<div class="day-wrap">
-					<input type="checkbox" name="special_days[]" value="sat"
-					{if (isset($smarty.post.special_days) && in_array('sat', $smarty.post.special_days))
-						|| (isset($special_days) && $special_days && in_array('sat', $special_days))}
-						checked="checked"
-					{/if}/>
-					<p>{l s='Sat' mod='hotelreservationsystem'}</p>
-				</div>
-				<div class="day-wrap">
-					<input type="checkbox" name="special_days[]" value="sun"
-					{if (isset($smarty.post.special_days) && in_array('sun', $smarty.post.special_days))
-						|| (isset($special_days) && $special_days && in_array('sun', $special_days))}
-						checked="checked"
-					{/if}/>
-					<p>{l s='Sun' mod='hotelreservationsystem'}</p>
+			<div class="col-sm-6 col-xs-9">
+				<div class="panel">
+					<div id="advanced_price_rule_group">
+						{if isset($smarty.post.restriction) && $smarty.post.restriction}
+							{assign var='restrictions' value=$smarty.post.restriction}
+						{/if}
+						{if isset($restrictions) && $restrictions}
+							{foreach $restrictions as $key => $restriction}
+								{include file="../../../_partials/feature_price_rules.tpl" key=$key}
+							{/foreach}
+						{else}
+							{include file="../../../_partials/feature_price_rules.tpl" key=0 collapse=true}
+						{/if}
+					</div>
+					<a id="add_more_dates_button" class="btn btn-default">
+						<i class="icon icon-plus"></i> {l s='Add More Restrictions' mod='hotelreservationsystem'}
+					</a>
 				</div>
 			</div>
 		</div>
@@ -271,14 +176,13 @@
 		</div>
 
 		<div class="form-group">
-			<label class="col-sm-3 control-label required" for="feature_price_name" >
+			<label class="col-sm-3 control-label required" for="impact_value" >
 				{l s='Impact Value' mod='hotelreservationsystem'}({l s='tax excl.' mod='hotelreservationsystem'})
 			</label>
 			<div class="col-lg-3">
 				<div class="input-group">
 					<span class="input-group-addon payment_type_icon">{if isset($edit)} {if $objFeaturePrice->impact_type == HotelRoomTypeFeaturePricing::IMPACT_TYPE_FIXED_PRICE}{$defaultcurrency_sign}{else}%{/if}{else}%{/if}</span>
-					<input type="text" id="impact_value" name="impact_value"
-					value="{if isset($smarty.post.impact_value) && $smarty.post.impact_value}{$smarty.post.impact_value}{elseif isset($objFeaturePrice->impact_value)}{$objFeaturePrice->impact_value}{/if}"/>
+					<input type="text" id="impact_value" name="impact_value" value="{if isset($smarty.post.impact_value) && $smarty.post.impact_value}{$smarty.post.impact_value}{elseif isset($objFeaturePrice->impact_value)}{$objFeaturePrice->impact_value}{/if}"/>
 				</div>
 			</div>
 		</div>
@@ -291,9 +195,9 @@
 			</label>
 			<div class="col-lg-9 ">
 				<span class="switch prestashop-switch fixed-width-lg">
-					<input type="radio" {if isset($edit) && $objFeaturePrice->active==1} checked="checked" {else}checked="checked"{/if} value="1" id="enable_feature_price_on" name="enable_feature_price">
+					<input type="radio" {if isset($smarty.post.enable_feature_price)} {if $smarty.post.enable_feature_price} checked="checked" {/if}{elseif isset($edit) && $objFeaturePrice->active==1} checked="checked" {else}checked="checked"{/if} value="1" id="enable_feature_price_on" name="enable_feature_price">
 					<label for="enable_feature_price_on">{l s='Yes' mod='hotelreservationsystem'}</label>
-					<input {if isset($edit) && $objFeaturePrice->active==0} checked="checked" {/if} type="radio" value="0" id="enable_feature_price_off" name="enable_feature_price">
+					<input  {if isset($smarty.post.enable_feature_price)} {if !$smarty.post.enable_feature_price} checked="checked"{/if} {elseif isset($edit) && $objFeaturePrice->active==0} checked="checked" {/if} type="radio" value="0" id="enable_feature_price_off" name="enable_feature_price">
 					<label for="enable_feature_price_off">{l s='No' mod='hotelreservationsystem'}</label>
 					<a class="slide-button btn"></a>
 				</span>

@@ -157,10 +157,12 @@ class Smarty_Internal_Config_File_Compiler
             $this->smarty->_debug->end_compile($this->template);
         }
         // template header code
-        $template_header =
-            "<?php /* Smarty version " . Smarty::SMARTY_VERSION . ", created on " . strftime("%Y-%m-%d %H:%M:%S") .
-            "\n";
-        $template_header .= "         compiled from '{$this->template->source->filepath}' */ ?>\n";
+        $template_header = sprintf(
+            "<?php /* Smarty version %s, created on %s\n         compiled from '%s' */ ?>\n",
+            Smarty::SMARTY_VERSION,
+            date("Y-m-d H:i:s"),
+            str_replace('*/', '* /' , $this->template->source->filepath)
+        );
         $code = '<?php $_smarty_tpl->smarty->ext->configLoad->_loadConfigVars($_smarty_tpl, ' .
                 var_export($this->config_data, true) . '); ?>';
         return $template_header . $this->template->smarty->ext->_codeFrame->create($this->template, $code);

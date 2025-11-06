@@ -59,6 +59,8 @@
 			{assign var=back_ord_msg value=$order->back_ord_msg}
 			{assign var=order_has_invoice value=$order->order_has_invoice}
 			{assign var=cart_htl_data value=$order->cart_htl_data}
+			{assign var=hotel_service_products value=$order->hotel_service_products}
+			{assign var=standalone_service_products value=$order->standalone_service_products}
 			{assign var=customerGuestDetail value=$order->customerGuestDetail}
 			{assign var=obj_hotel_branch_information value=$order->obj_hotel_branch_information}
 			{assign var=hotel_address_info value=$order->hotel_address_info}

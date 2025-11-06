@@ -168,9 +168,11 @@ class HTMLPurifier_HTMLModule_Tidy_XHTMLAndHTML4 extends HTMLPurifier_HTMLModule
         // @vspace for img ------------------------------------------------
         $r['img@vspace'] = new HTMLPurifier_AttrTransform_ImgSpace('vspace');
 
-        // @width for hr, td, th ------------------------------------------
+        // @width for table, hr, td, th, col ------------------------------------------
+        $r['table@width'] =
         $r['td@width'] =
         $r['th@width'] =
+        $r['col@width'] =
         $r['hr@width'] = new HTMLPurifier_AttrTransform_Length('width');
 
         return $r;

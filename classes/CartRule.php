@@ -263,7 +263,7 @@ class CartRuleCore extends ObjectModel
      * @return array
      * @throws PrestaShopDatabaseException
      */
-    public static function getCustomerCartRules($id_lang, $id_customer, $active = false, $includeGeneric = true, $inStock = false, Cart $cart = null, $free_shipping_only = false, $highlight_only = false)
+    public static function getCustomerCartRules($id_lang, $id_customer, $active = false, $includeGeneric = true, $inStock = false, ?Cart $cart = null, $free_shipping_only = false, $highlight_only = false)
     {
         if (!CartRule::isFeatureActive()) {
             return array();
@@ -926,7 +926,7 @@ class CartRuleCore extends ObjectModel
      * @param bool $only_advance_payment_products to calculate discount applied only on products that have advance payment
      * @return float|int|string
      */
-    public function getContextualValue($use_tax, Context $context = null, $filter = null, $package = null, $use_cache = true, $only_advance_payment_products = false)
+    public function getContextualValue($use_tax, ?Context $context = null, $filter = null, $package = null, $use_cache = true, $only_advance_payment_products = false)
     {
         if (!CartRule::isFeatureActive()) {
             return 0;
@@ -1361,8 +1361,7 @@ class CartRuleCore extends ObjectModel
                 .(in_array($type, array('carrier', 'shop')) ? ' AND t.deleted = 0' : '').
                 (in_array($type, array('carrier', 'shop')) ? ' ORDER BY t.name ASC ' : '').
                 (in_array($type, array('country', 'group', 'cart_rule')) && $i18n ? ' ORDER BY tl.name ASC ' : '').
-                $sql_limit,
-                false);
+                $sql_limit);
                 while ($row = Db::getInstance()->nextRow($resource)) {
                     $array[($row['selected'] || $this->{$type.'_restriction'} == 0) ? 'selected' : 'unselected'][] = $row;
                 }
@@ -1403,7 +1402,7 @@ class CartRuleCore extends ObjectModel
      * @param Context|null $context
      * @return mixed
      */
-    public static function autoAddToCart(Context $context = null)
+    public static function autoAddToCart(?Context $context = null)
     {
         if ($context === null) {
             $context = Context::getContext();

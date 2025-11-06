@@ -11,7 +11,7 @@
  * Name:     regex_replace
  * Purpose:  regular expression search/replace
  *
- * @link   http://smarty.php.net/manual/en/language.modifier.regex.replace.php
+ * @link   https://www.smarty.net/manual/en/language.modifier.regex.replace.php
  *          regex_replace (Smarty online manual)
  * @author Monte Ohrt <monte at ohrt dot com>
  *

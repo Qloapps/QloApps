@@ -42,7 +42,7 @@ class StatsSales extends ModuleGraph
     {
         $this->name = 'statssales';
         $this->tab = 'analytics_stats';
-        $this->version = '1.3.3';
+        $this->version = '1.3.4';
         $this->author = 'PrestaShop';
         $this->need_instance = 0;
 
@@ -192,20 +192,27 @@ class StatsSales extends ModuleGraph
 
     private function getTotals()
     {
-        $sql = 'SELECT COUNT(id_order) AS orderCount, ROUND(SUM(total_paid_real), 2) AS orderSum
-        FROM (
-            SELECT o.`id_order`, (o.`total_paid_real` / o.`conversion_rate`) AS total_paid_real, hbd.`id_hotel`
+        $idHotel = (int)Tools::getValue('id_hotel');
+        $sql = 'SELECT COUNT(id_order) AS orderCount, IFNULL(ROUND(SUM(total_paid_tax_excl), 2), 0) AS orderSum
             FROM `'._DB_PREFIX_.'orders` o
-            INNER JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd ON (hbd.`id_order` = o.`id_order`)
             '.((int)Tools::getValue('id_country') ? 'LEFT JOIN `'._DB_PREFIX_.'address` a ON o.`id_address_delivery` = a.`id_address`' : '').'
-            WHERE o.`valid` = 1
-            '.HotelBranchInformation::addHotelRestriction(false, 'hbd').'
-            '.Shop::addSqlRestriction(Shop::SHARE_ORDER, 'o').'
+            WHERE o.valid = 1 AND o.`invoice_date` BETWEEN '.ModuleGraph::getDateBetween().'
             '.((int)Tools::getValue('id_country') ? ' AND a.`id_country` = '.(int)Tools::getValue('id_country') : '').'
-            AND o.`invoice_date` BETWEEN '.ModuleGraph::getDateBetween().'
-            GROUP BY o.`id_order`
-        ) AS t
-        '.((int)Tools::getValue('id_hotel') ? ' WHERE id_hotel = '.(int)Tools::getValue('id_hotel') : '');
+            AND (
+                EXISTS (
+                    SELECT 1
+                    FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
+                    WHERE hbd.`id_order` = o.`id_order`' . HotelBranchInformation::addHotelRestriction($idHotel).'
+                ) OR EXISTS (
+                    SELECT 1
+                    FROM `'._DB_PREFIX_.'service_product_order_detail` spod
+                    WHERE spod.`id_order` = o.`id_order`' . HotelBranchInformation::addHotelRestriction($idHotel, 'spod').'
+                )'.(!$idHotel ? ' OR EXISTS (
+                    SELECT 1
+                    FROM `'._DB_PREFIX_.'service_product_order_detail` spod
+                    WHERE spod.`id_order` = o.`id_order` AND spod.`id_hotel` = 0 AND spod.`id_htl_booking_detail` = 0
+                )' : '').'
+            )';
 
         return Db::getInstance(_PS_USE_SQL_SLAVE_)->getRow($sql);
     }
@@ -246,23 +253,28 @@ class StatsSales extends ModuleGraph
             $this->_formats['y'] = 'd';
         }
 
-        $this->query = 'SELECT o.`invoice_date`, ROUND(o.`total_paid_real` / o.`conversion_rate`, 2) as total_paid_real,
-        (
-            SELECT hbd.`id_hotel`
-            FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
-            WHERE hbd.`id_order` = o.`id_order`
-            LIMIT 1
-        ) AS id_hotel
-        FROM `'._DB_PREFIX_.'orders` o
-        INNER JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd ON (hbd.`id_order` = o.`id_order`)
-        '.((int)$this->id_country ? 'LEFT JOIN `'._DB_PREFIX_.'address` a ON o.`id_address_delivery` = a.`id_address`' : '').'
-        WHERE o.`valid` = 1
-        '.HotelBranchInformation::addHotelRestriction(false, 'hbd').'
-        '.Shop::addSqlRestriction(Shop::SHARE_ORDER, 'o').'
-        '.((int)$this->id_country ? ' AND a.`id_country` = '.(int)$this->id_country : '').'
-        AND o.`invoice_date` BETWEEN';
+        $this->query = 'SELECT o.`invoice_date`, ROUND(total_paid_tax_excl) AS total_revenue
+            FROM `'._DB_PREFIX_.'orders` o
+            '.((int)$this->id_country ? 'LEFT JOIN `'._DB_PREFIX_.'address` a ON o.`id_address_delivery` = a.`id_address`' : '').'
+            WHERE o.valid = 1
+            '.((int)$this->id_country ? ' AND a.`id_country` = '.(int)$this->id_country : '').'
+            AND (
+                EXISTS (
+                    SELECT 1
+                    FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
+                    WHERE hbd.`id_order` = o.`id_order`' . HotelBranchInformation::addHotelRestriction($this->id_hotel).'
+                ) OR EXISTS (
+                    SELECT 1
+                    FROM `'._DB_PREFIX_.'service_product_order_detail` spod
+                    WHERE spod.`id_order` = o.`id_order`' . HotelBranchInformation::addHotelRestriction($this->id_hotel, 'spod').'
+                )'.(!$this->id_hotel ? ' OR EXISTS (
+                    SELECT 1
+                    FROM `'._DB_PREFIX_.'service_product_order_detail` spod
+                    WHERE spod.`id_order` = o.`id_order` AND spod.`id_hotel` = 0 AND spod.`id_htl_booking_detail` = 0
+                )' : '').'
+            ) AND o.`invoice_date` BETWEEN';
+
         $this->query_group_by = ' GROUP BY o.`id_order`';
-        $this->query_having_filter = ((int) $this->id_hotel) ? 'HAVING id_hotel = '.(int) $this->id_hotel : '';
         $this->setDateGraph($layers, true);
     }
 
@@ -273,7 +285,7 @@ class StatsSales extends ModuleGraph
             if ($this->option == 1) {
                 $this->_values[(int)substr($row['invoice_date'], 0, 4)] += 1;
             } else {
-                $this->_values[(int)substr($row['invoice_date'], 0, 4)] += $row['total_paid_real'];
+                $this->_values[(int)substr($row['invoice_date'], 0, 4)] += $row['total_revenue'];
             }
         }
     }
@@ -289,7 +301,7 @@ class StatsSales extends ModuleGraph
             if ($this->option == 1) {
                 $this->_values[$mounth] += 1;
             } else {
-                $this->_values[$mounth] += $row['total_paid_real'];
+                $this->_values[$mounth] += $row['total_revenue'];
             }
         }
     }
@@ -301,7 +313,7 @@ class StatsSales extends ModuleGraph
             if ($this->option == 1) {
                 $this->_values[(int)substr($row['invoice_date'], 8, 2)] += 1;
             } else {
-                $this->_values[(int)substr($row['invoice_date'], 8, 2)] += $row['total_paid_real'];
+                $this->_values[(int)substr($row['invoice_date'], 8, 2)] += $row['total_revenue'];
             }
         }
     }
@@ -313,7 +325,7 @@ class StatsSales extends ModuleGraph
             if ($this->option == 1) {
                 $this->_values[(int)substr($row['invoice_date'], 11, 2)] += 1;
             } else {
-                $this->_values[(int)substr($row['invoice_date'], 11, 2)] += $row['total_paid_real'];
+                $this->_values[(int)substr($row['invoice_date'], 11, 2)] += $row['total_revenue'];
             }
         }
     }
@@ -322,18 +334,11 @@ class StatsSales extends ModuleGraph
     {
         $sql = 'SELECT t.`name`, COUNT(t.`id_order`) AS total
         FROM (
-            SELECT osl.`id_order_state`, osl.`name`, oh.`id_order`,
-            (
-                SELECT hbd.`id_hotel`
-                FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
-                WHERE hbd.`id_order` = o.`id_order`
-                LIMIT 1
-            ) AS id_hotel
+            SELECT osl.`id_order_state`, osl.`name`, oh.`id_order`
             FROM `'._DB_PREFIX_.'order_state` os
             LEFT JOIN `'._DB_PREFIX_.'order_state_lang` osl ON (os.`id_order_state` = osl.`id_order_state` AND osl.`id_lang` = '.(int)$this->getLang().')
             LEFT JOIN `'._DB_PREFIX_.'order_history` oh ON os.`id_order_state` = oh.`id_order_state`
             LEFT JOIN `'._DB_PREFIX_.'orders` o ON o.`id_order` = oh.`id_order`
-            INNER JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd ON (hbd.`id_order` = o.`id_order`)
             '.((int)$this->id_country ? 'LEFT JOIN `'._DB_PREFIX_.'address` a ON o.id_address_delivery = a.id_address' : '').'
             WHERE oh.`id_order_history` = (
                 SELECT ios.`id_order_history`
@@ -342,12 +347,25 @@ class StatsSales extends ModuleGraph
                 ORDER BY ios.`date_add` DESC, oh.`id_order_history` DESC
                 LIMIT 1
             )
-            '.HotelBranchInformation::addHotelRestriction(false, 'hbd').'
-            '.((int)$this->id_country ? 'AND a.id_country = '.(int)$this->id_country : '').'
+            AND (
+                EXISTS (
+                    SELECT 1
+                    FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
+                    WHERE hbd.`id_order` = o.`id_order`' . HotelBranchInformation::addHotelRestriction($this->id_hotel).'
+                ) OR EXISTS (
+                    SELECT 1
+                    FROM `'._DB_PREFIX_.'service_product_order_detail` spod
+                    WHERE spod.`id_order` = o.`id_order`' . HotelBranchInformation::addHotelRestriction($this->id_hotel, 'spod').'
+                )'.(!$this->id_hotel ? ' OR EXISTS (
+                    SELECT 1
+                    FROM `'._DB_PREFIX_.'service_product_order_detail` spod
+                    WHERE spod.`id_order` = o.`id_order` AND spod.`id_hotel` = 0 AND spod.`id_htl_booking_detail` = 0
+                )' : '').'
+            )'
+            .((int)$this->id_country ? 'AND a.id_country = '.(int)$this->id_country : '').'
             AND o.`date_add` BETWEEN '.ModuleGraph::getDateBetween().'
             GROUP BY o.`id_order`
         ) AS t
-        '.(((int) $this->id_hotel) ? ' WHERE id_hotel = '.(int) $this->id_hotel : '').'
         GROUP BY t.`id_order_state`';
 
         $result = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql);

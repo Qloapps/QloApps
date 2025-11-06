@@ -1,21 +1,24 @@
 <?php
 /**
-* 2010-2021 Webkul.
-*
 * NOTICE OF LICENSE
 *
-* All right is reserved,
-* Please go through this link for complete license : https://store.webkul.com/license.html
+* This source file is subject to the Open Software License version 3.0
+* that is bundled with this package in the file LICENSE.md
+* It is also available through the world-wide-web at this URL:
+* https://opensource.org/license/osl-3-0-php
+* If you did not receive a copy of the license and are unable to
+* obtain it through the world-wide-web, please send an email
+* to support@qloapps.com so we can send you a copy immediately.
 *
 * DISCLAIMER
 *
-* Do not edit or add to this file if you wish to upgrade this module to newer
-* versions in the future. If you wish to customize this module for your
-* needs please refer to https://store.webkul.com/customisation-guidelines/ for more information.
+* Do not edit or add to this file if you wish to upgrade this module to a newer
+* versions in the future. If you wish to customize this module for your needs
+* please refer to https://store.webkul.com/customisation-guidelines for more information.
 *
-*  @author    Webkul IN <support@webkul.com>
-*  @copyright 2010-2021 Webkul IN
-*  @license   https://store.webkul.com/license.html
+* @author Webkul IN
+* @copyright Since 2010 Webkul
+* @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
 */
 
 if (!defined('_PS_VERSION_')) {
@@ -35,12 +38,13 @@ class QloPaypalCommerce extends PaymentModule
     public $paypalEmail;
     public $clientId;
     public $clientSecret;
+    public $secure_key;
 
     public function __construct()
     {
         $this->name = 'qlopaypalcommerce';
         $this->tab = 'payments_gateways';
-        $this->version = '1.0.4';
+        $this->version = '1.0.5';
         $this->author = 'Webkul';
         $this->bootstrap = true;
         $this->secure_key = Tools::encrypt($this->name);
@@ -203,7 +207,6 @@ class QloPaypalCommerce extends PaymentModule
         $helper->table = $this->table;
         $lang = new Language((int) Configuration::get('PS_LANG_DEFAULT'));
         $helper->default_form_language = $lang->id;
-        $this->fields_form = array();
         $helper->identifier = $this->identifier;
         $helper->submit_action = 'btnConfigSubmit';
         $helper->currentIndex = $this->context->link->getAdminLink('AdminModules', false).

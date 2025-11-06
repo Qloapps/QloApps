@@ -98,40 +98,40 @@ class AdminAdminPreferencesControllerCore extends AdminController
                 ),
                 'submit' => array('title' => $this->l('Save'))
             ),
-            'upload' => array(
-                'title' =>    $this->l('Upload quota'),
-                'icon' =>    'icon-cloud-upload',
-                'fields' => array(
-                    'PS_ATTACHMENT_MAXIMUM_SIZE' => array(
-                        'title' => $this->l('Maximum size for attachment'),
-                        'hint' =>  sprintf($this->l('Set the maximum size allowed for attachment files (in megabytes). This value has to be lower or equal to the maximum file upload allotted by your server (currently: %s MB).'), $upload_mb),
-                        'validation' => 'isInt',
-                        'cast' => 'intval',
-                        'type' => 'text',
-                        'suffix' => $this->l('megabytes'),
-                        'default' => '2'
-                    ),
-                    'PS_LIMIT_UPLOAD_FILE_VALUE' => array(
-                        'title' => $this->l('Maximum size for a downloadable product'),
-                        'hint' => sprintf($this->l('Define the upload limit for a downloadable product (in megabytes). This value has to be lower or equal to the maximum file upload allotted by your server (currently: %s MB).'), $upload_mb),
-                        'validation' => 'isInt',
-                        'cast' => 'intval',
-                        'type' => 'text',
-                        'suffix' => $this->l('megabytes'),
-                        'default' => '1'
-                    ),
-                    'PS_LIMIT_UPLOAD_IMAGE_VALUE' => array(
-                        'title' => $this->l('Maximum size for a product\'s image'),
-                        'hint' => sprintf($this->l('Define the upload limit for an image (in megabytes). This value has to be lower or equal to the maximum file upload allotted by your server (currently: %s MB).'), $upload_mb),
-                        'validation' => 'isInt',
-                        'cast' => 'intval',
-                        'type' => 'text',
-                        'suffix' => $this->l('megabytes'),
-                        'default' => '1'
-                    ),
-                ),
-                'submit' => array('title' => $this->l('Save'))
-            ),
+            // 'upload' => array(
+            //     'title' =>    $this->l('Upload quota'),
+            //     'icon' =>    'icon-cloud-upload',
+            //     'fields' => array(
+            //         'PS_ATTACHMENT_MAXIMUM_SIZE' => array(
+            //             'title' => $this->l('Maximum size for attachment'),
+            //             'hint' =>  sprintf($this->l('Set the maximum size allowed for attachment files (in megabytes). This value has to be lower or equal to the maximum file upload allotted by your server (currently: %s MB).'), $upload_mb),
+            //             'validation' => 'isInt',
+            //             'cast' => 'intval',
+            //             'type' => 'text',
+            //             'suffix' => $this->l('megabytes'),
+            //             'default' => '2'
+            //         ),
+            //         'PS_LIMIT_UPLOAD_FILE_VALUE' => array(
+            //             'title' => $this->l('Maximum size for a downloadable product'),
+            //             'hint' => sprintf($this->l('Define the upload limit for a downloadable product (in megabytes). This value has to be lower or equal to the maximum file upload allotted by your server (currently: %s MB).'), $upload_mb),
+            //             'validation' => 'isInt',
+            //             'cast' => 'intval',
+            //             'type' => 'text',
+            //             'suffix' => $this->l('megabytes'),
+            //             'default' => '1'
+            //         ),
+            //         'PS_LIMIT_UPLOAD_IMAGE_VALUE' => array(
+            //             'title' => $this->l('Maximum size for a product\'s image'),
+            //             'hint' => sprintf($this->l('Define the upload limit for an image (in megabytes). This value has to be lower or equal to the maximum file upload allotted by your server (currently: %s MB).'), $upload_mb),
+            //             'validation' => 'isInt',
+            //             'cast' => 'intval',
+            //             'type' => 'text',
+            //             'suffix' => $this->l('megabytes'),
+            //             'default' => '1'
+            //         ),
+            //     ),
+            //     'submit' => array('title' => $this->l('Save'))
+            // ),
             'notifications' => array(
                 'title' =>    $this->l('Notifications'),
                 'icon' =>    'icon-list-alt',

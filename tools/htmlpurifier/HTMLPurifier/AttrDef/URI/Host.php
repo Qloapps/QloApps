@@ -63,24 +63,18 @@ class HTMLPurifier_AttrDef_URI_Host extends HTMLPurifier_AttrDef
         // This doesn't match I18N domain names, but we don't have proper IRI support,
         // so force users to insert Punycode.
 
-        // There is not a good sense in which underscores should be
-        // allowed, since it's technically not! (And if you go as
-        // far to allow everything as specified by the DNS spec...
-        // well, that's literally everything, modulo some space limits
-        // for the components and the overall name (which, by the way,
-        // we are NOT checking!).  So we (arbitrarily) decide this:
-        // let's allow underscores wherever we would have allowed
-        // hyphens, if they are enabled.  This is a pretty good match
-        // for browser behavior, for example, a large number of browsers
-        // cannot handle foo_.example.com, but foo_bar.example.com is
-        // fairly well supported.
+        // Underscores defined as Unreserved Characters in RFC 3986 are
+        // allowed in a URI. There are cases where we want to consider a
+        // URI containing "_" such as "_dmarc.example.com".
+        // Underscores are not allowed in the default. If you want to
+        // allow it, set Core.AllowHostnameUnderscore to true.
         $underscore = $config->get('Core.AllowHostnameUnderscore') ? '_' : '';
 
         // Based off of RFC 1738, but amended so that
         // as per RFC 3696, the top label need only not be all numeric.
         // The productions describing this are:
         $a   = '[a-z]';     // alpha
-        $an  = '[a-z0-9]';  // alphanum
+        $an  = "[a-z0-9$underscore]";  // alphanum
         $and = "[a-z0-9-$underscore]"; // alphanum | "-"
         // domainlabel = alphanum | alphanum *( alphanum | "-" ) alphanum
         $domainlabel = "$an(?:$and*$an)?";
@@ -106,7 +100,7 @@ class HTMLPurifier_AttrDef_URI_Host extends HTMLPurifier_AttrDef
         // If we have Net_IDNA2 support, we can support IRIs by
         // punycoding them. (This is the most portable thing to do,
         // since otherwise we have to assume browsers support
-        } elseif ($config->get('Core.EnableIDNA')) {
+        } elseif ($config->get('Core.EnableIDNA') && class_exists('Net_IDNA2')) {
             $idna = new Net_IDNA2(array('encoding' => 'utf8', 'overlong' => false, 'strict' => true));
             // we need to encode each period separately
             $parts = explode('.', $string);

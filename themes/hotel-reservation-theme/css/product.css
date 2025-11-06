@@ -1372,6 +1372,26 @@ Quick View Styles
   color: #333;
   border: 1px solid #d6d4d4;
 }
+#product select.input-hotel {
+  max-width: 100%;
+  background-color: #fff;
+  height: 48px;
+  border-radius: 4px;
+  padding-left: 35px;
+  padding-right: 20px;
+  color: #333;
+  font-size: 14px;
+  box-shadow: 0 1px 0 0 rgba(0, 0, 0, 0.13);
+  border: 1px solid #999999;
+}
+
+.product-options-block {
+  margin-top: 20px;
+}
+.product-options-block div.radio span {
+  top: 0;
+}
+
 .room_demands_container .room_demand_block {
   margin-bottom: 15px;
   color: #333;

@@ -38,6 +38,8 @@ class AdminCmsContentControllerCore extends AdminController
     /** @var object Category() instance for navigation*/
     protected static $category = null;
 
+    protected $id_cms_category;
+
     public function __construct()
     {
         $this->bootstrap = true;
@@ -233,7 +235,7 @@ class AdminCmsContentControllerCore extends AdminController
 
     public function ajaxProcessUpdateCmsPositions()
     {
-        if ($this->tabAccess['edit'] === '1') {
+        if ($this->tabAccess['edit'] === 1) {
             $id_cms = (int)Tools::getValue('id_cms');
             $id_category = (int)Tools::getValue('id_cms_category');
             $way = (int)Tools::getValue('way');
@@ -262,7 +264,7 @@ class AdminCmsContentControllerCore extends AdminController
 
     public function ajaxProcessUpdateCmsCategoriesPositions()
     {
-        if ($this->tabAccess['edit'] === '1') {
+        if ($this->tabAccess['edit'] === 1) {
             $id_cms_category_to_move = (int)Tools::getValue('id_cms_category_to_move');
             $id_cms_category_parent = (int)Tools::getValue('id_cms_category_parent');
             $way = (int)Tools::getValue('way');
@@ -291,7 +293,7 @@ class AdminCmsContentControllerCore extends AdminController
 
     public function ajaxProcessPublishCMS()
     {
-        if ($this->tabAccess['edit'] === '1') {
+        if ($this->tabAccess['edit'] === 1) {
             if ($id_cms = (int)Tools::getValue('id_cms')) {
                 $bo_cms_url = _PS_BASE_URL_.__PS_BASE_URI__.basename(_PS_ADMIN_DIR_).'/index.php?tab=AdminCmsContent&id_cms='.(int)$id_cms.'&updatecms&token='.$this->token;
 

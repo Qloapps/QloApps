@@ -22,7 +22,7 @@ class Smarty_Internal_Method_UnregisterObject
      * Registers plugin to be used in templates
      *
      * @api  Smarty::unregisterObject()
-     * @link http://www.smarty.net/docs/en/api.unregister.object.tpl
+     * @link https://www.smarty.net/docs/en/api.unregister.object.tpl
      *
      * @param \Smarty_Internal_TemplateBase|\Smarty_Internal_Template|\Smarty $obj
      * @param string                                                          $object_name name of object

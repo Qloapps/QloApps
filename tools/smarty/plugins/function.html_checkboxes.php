@@ -29,7 +29,7 @@
  * - assign     (optional) - assign the output as an array to this variable
  * - escape     (optional) - escape the content (not value), defaults to true
  *
- * @link    http://www.smarty.net/manual/en/language.function.html.checkboxes.php {html_checkboxes}
+ * @link    https://www.smarty.net/manual/en/language.function.html.checkboxes.php {html_checkboxes}
  *             (Smarty online manual)
  * @author  Christopher Kvarme <christopher.kvarme@flashjab.com>
  * @author  credits to Monte Ohrt <monte at ohrt dot com>

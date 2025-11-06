@@ -189,7 +189,7 @@ class GroupCore extends ObjectModel
             Db::getInstance()->execute('DELETE FROM `'._DB_PREFIX_.'category_group` WHERE `id_group` = '.(int)$this->id);
             Db::getInstance()->execute('DELETE FROM `'._DB_PREFIX_.'group_reduction` WHERE `id_group` = '.(int)$this->id);
             Db::getInstance()->execute('DELETE FROM `'._DB_PREFIX_.'product_group_reduction_cache` WHERE `id_group` = '.(int)$this->id);
-            $this->truncateModulesRestrictions($this->id);
+            self::truncateModulesRestrictions($this->id);
 
             // Add default group (id 3) to customers without groups
             Db::getInstance()->execute('INSERT INTO `'._DB_PREFIX_.'customer_group` (

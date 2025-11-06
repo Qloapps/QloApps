@@ -35,12 +35,13 @@ class Dashtrends extends Module
     protected $dashboard_data_sum;
     protected $dashboard_data_sum_compare;
     protected $data_trends;
+    protected $push_filename;
 
     public function __construct()
     {
         $this->name = 'dashtrends';
         $this->tab = 'dashboard';
-        $this->version = '1.0.3';
+        $this->version = '1.0.4';
         $this->author = 'PrestaShop';
 
         $this->push_filename = _PS_CACHE_DIR_.'push/trends';

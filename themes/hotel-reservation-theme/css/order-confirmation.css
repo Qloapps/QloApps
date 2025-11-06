@@ -1,22 +1,30 @@
 /**
- * 2010-2023 Webkul.
- *
- * NOTICE OF LICENSE
- *
- * All right is reserved,
- * Please go through LICENSE.txt file inside our module
- *
- * DISCLAIMER
- *
- * Do not edit or add to this file if you wish to upgrade this module to newer
- * versions in the future. If you wish to customize this module for your
- * needs please refer to CustomizationPolicy.txt file inside our module for more information.
- *
- * @author Webkul IN
- * @copyright 2010-2023 Webkul IN
- * @license LICENSE.txt
+* NOTICE OF LICENSE
+*
+* This source file is subject to the Open Software License version 3.0
+* that is bundled with this package in the file LICENSE.md
+* It is also available through the world-wide-web at this URL:
+* https://opensource.org/license/osl-3-0-php
+* If you did not receive a copy of the license and are unable to
+* obtain it through the world-wide-web, please send an email
+* to support@qloapps.com so we can send you a copy immediately.
+*
+* DISCLAIMER
+*
+* Do not edit or add to this file if you wish to upgrade this module to a newer
+* versions in the future. If you wish to customize this module for your needs
+* please refer to https://store.webkul.com/customisation-guidelines for more information.
+*
+* @author Webkul IN
+* @copyright Since 2010 Webkul
+* @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
  */
 
+.order-confirmation-column {
+    font-size: 16px;
+    line-height: 23px;
+    color: #3C3C3C;
+}
 .fancybox-wrap.fancybox-extra-services .card {
     width: 650px;
     margin-bottom: 0;
@@ -70,6 +78,10 @@
     padding: 18px;
 }
 
+.order-product-summary .card .card-body {
+    padding: 0;
+}
+
 .card .card-body .card-title {
     margin: 0;
     font-size: 18px;
@@ -112,6 +124,34 @@
     margin-top: 0;
 }
 /* card-tabs - end */
+
+.product-detail {
+    padding: 18px;
+    position: relative;
+}
+.product-detail:not(:last-of-type) {
+    border-bottom: 1px solid #E5E5E5;
+}
+.product-detail .product-name a {
+    display: inline-block;
+    margin: 0;
+    font-size: 20px;
+    font-weight: bold;
+    color: #333;
+}
+.product-detail dt {
+    margin: 7px 0;
+    font-weight: 400;
+}
+.product-detail .hotel-location {
+    font-size: 14px;
+    padding: 10px 0px 0px 0px;
+    color: #777777;
+}
+.product-detail dd {
+    margin: 7px 0;
+    font-weight: 700;
+}
 
 #rooms_extra_services .card-body{
     padding: 0px 18px;
@@ -212,4 +252,19 @@
 
 .price-info-tooltip-cont .list-row p {
     margin: 0;
+}
+
+.table.table-summary.table-sm td {
+    padding: 8px 0;
+}
+.table.table-summary td {
+    border-top: none;
+    /* font-size: 16px; */
+}
+
+.label {
+    font-size: 14px;
+    color: #333;
+    font-weight: normal;
+    border-radius: 2px;
 }

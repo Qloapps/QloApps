@@ -46,7 +46,7 @@
 			<p>
 				- {l s='The total amount of your order comes to:' mod='cheque'}
 				<span id="amount" class="price">{displayPrice price=$total}</span>
-				{if $use_taxes == 1}
+				{if $use_taxes == 1 && $display_tax_label}
 					{l s='(tax incl.)' mod='cheque'}
 				{/if}
 			</p>

@@ -194,237 +194,241 @@
 	</script>
 	{block name="updatelist"}
 		{if $new_list_header_design}
-			<div class="list_action_wrapper">
-				<div class="row">
-					{if $fields_optional|count}
-						<div class="col-xs-4 col-sm-3 col-md-2">
-							<div class="list_availibility_container">
-								<button type="button" class="btn btn-default btn-left btn-block dropdown-toggle" data-toggle="dropdown">
-									<span>{l s='Available Fields'}
-									<i class="icon-caret-down pull-right"></i>
-								</button>
-								<ul id="optional-list-toggle" class="dropdown-menu">
-									{foreach $fields_optional as $key => $field}
-										<li>
-											<label>
-												<input type="checkbox" name="list_fields_visibility" value="{$key}" {if isset($field['selected']) && $field['selected']}checked="checked"{/if}>
-												{$field['title']}
-											</label>
-										</li>
-									{/foreach}
-								</ul>
-							</div>
-						</div>
-					{/if}
-					{if !$simple_header && $show_filters}
-						<div class="col-xs-3 col-xs-offset-{if $fields_optional|count}}5{else}9{/if} col-sm-2 col-sm-offset-{if $fields_optional|count}}7{else}10{/if} col-md-1 col-md-offset-{if $fields_optional|count}9{else}11{/if}">
-							<div class="list_filter_container">
-								<button type="button" class="btn btn-default btn-block" data-toggle="collapse" data-target="#list_filters_panel">
-									<i class="icon-sliders"></i>
-									<span>{l s='Filters'}
-								</button>
-							</div>
-						</div>
-					{/if}
-				</div>
-				<div class="row">
-					<div class="col-sm-12">
-						{if $filters_has_value}
-							<div id="selected_filter_container">
-								{l s='Filters: '}
-								<span class="selected_filters">
-									{foreach $fields_display AS $key => $params}
-										{if (!isset($params.search) || $params.search) && $params.value != ''}
-											{if ($params.type == 'date' || $params.type == 'datetime' || $params.type == 'range') && $params.value|is_array}
-												{assign var="filter_value" value=''}
-												{foreach $params.value as $value}
-													{if (isset($value) && ($value !== '' || $value === 0))}
-														{if !(isset($filter_value) && ($filter_value !== '' || $filter_value === 0))}
-															{assign var="filter_value" value=$value}
-														{else}
-															{assign var="filter_value" value="`$filter_value` - `$value`"}
+			{block name="list_action_wrapper"}
+				<div class="list_action_wrapper">
+					<div class="row">
+						{block name="list_filter_items"}
+							{if $fields_optional|count}
+								<div class="col-xs-4 col-sm-3 col-md-2">
+									<div class="list_availibility_container">
+										<button type="button" class="btn btn-default btn-left btn-block dropdown-toggle" data-toggle="dropdown">
+											<span>{l s='Available Fields'}
+											<i class="icon-caret-down pull-right"></i>
+										</button>
+										<ul id="optional-list-toggle" class="dropdown-menu">
+											{foreach $fields_optional as $key => $field}
+												<li>
+													<label>
+														<input type="checkbox" name="list_fields_visibility" value="{$key}" {if isset($field['selected']) && $field['selected']}checked="checked"{/if}>
+														{$field['title']}
+													</label>
+												</li>
+											{/foreach}
+										</ul>
+									</div>
+								</div>
+							{/if}
+							{if !$simple_header && $show_filters}
+								<div class="col-xs-3 col-sm-2 col-md-1 pull-right">
+									<div class="list_filter_container">
+										<button type="button" class="btn btn-default btn-block" data-toggle="collapse" data-target="#list_filters_panel">
+											<i class="icon-sliders"></i>
+											<span>{l s='Filters'}
+										</button>
+									</div>
+								</div>
+							{/if}
+						{/block}
+					</div>
+					<div class="row">
+						<div class="col-sm-12">
+							{if $filters_has_value}
+								<div id="selected_filter_container">
+									{l s='Filters: '}
+									<span class="selected_filters">
+										{foreach $fields_display AS $key => $params}
+											{if (!isset($params.search) || $params.search) && $params.value != ''}
+												{if ($params.type == 'date' || $params.type == 'datetime' || $params.type == 'range') && $params.value|is_array}
+													{assign var="filter_value" value=''}
+													{foreach $params.value as $value}
+														{if (isset($value) && ($value !== '' || $value === 0))}
+															{if !(isset($filter_value) && ($filter_value !== '' || $filter_value === 0))}
+																{assign var="filter_value" value=$value}
+															{else}
+																{assign var="filter_value" value="`$filter_value` - `$value`"}
+															{/if}
 														{/if}
-													{/if}
-												{/foreach}
-												{if (isset($filter_value) && ($filter_value !== '' || $filter_value === 0))}
-													<span data-filter_key="{if isset($params.name_date)}{$params.name_date}{else}{$key}{/if}" data-filter_type="{$params.type}">
-														{$params['title']|escape:'html':'UTF-8'}: <span class="filter_value">{$filter_value|escape:'html':'UTF-8'}</span>
-														<i class="icon-times"></i>
-													</span>
-												{/if}
-											{elseif $params.type == 'select'}
-												{if isset($params.multiple) && $params.multiple}
-													<span data-filter_key="{if isset($params.filter_key)}{$params.filter_key}{else}{$key}{/if}" data-filter_type="{$params.type}" data-multiple="{$params.multiple|intval}" data-operator="{$params.operator}">
-														{$params['title']|escape:'html':'UTF-8'}:
-														<span class="filter_value">
-															{foreach from=$params.value item=option name=foreachInfo}
-																{$params.list[$option]}{if !$smarty.foreach.foreachInfo.last}{if $params.operator == 'or'} | {else}, {/if}{/if}
-															{/foreach}
+													{/foreach}
+													{if (isset($filter_value) && ($filter_value !== '' || $filter_value === 0))}
+														<span data-filter_key="{if isset($params.name_date)}{$params.name_date}{else}{$key}{/if}" data-filter_type="{$params.type}">
+															{$params['title']|escape:'html':'UTF-8'}: <span class="filter_value">{$filter_value|escape:'html':'UTF-8'}</span>
+															<i class="icon-times"></i>
 														</span>
+													{/if}
+												{elseif $params.type == 'select'}
+													{if isset($params.multiple) && $params.multiple}
+														<span data-filter_key="{if isset($params.filter_key)}{$params.filter_key}{else}{$key}{/if}" data-filter_type="{$params.type}" data-multiple="{$params.multiple|intval}" data-operator="{$params.operator}">
+															{$params['title']|escape:'html':'UTF-8'}:
+															<span class="filter_value">
+																{foreach from=$params.value item=option name=foreachInfo}
+																	{$params.list[$option]}{if !$smarty.foreach.foreachInfo.last}{if $params.operator == 'or'} | {else}, {/if}{/if}
+																{/foreach}
+															</span>
+															<i class="icon-times"></i>
+														</span>
+													{else}
+														<span data-filter_key="{if isset($params.filter_key)}{$params.filter_key}{else}{$key}{/if}" data-filter_type="{$params.type}">
+															{$params['title']|escape:'html':'UTF-8'}: <span class="filter_value">{$params['list'][$params['value']]|replace: '&nbsp;' : ''}</span>
+															<i class="icon-times"></i>
+														</span>
+													{/if}
+												{elseif $params.type == 'bool'}
+													<span data-filter_key="{if isset($params.filter_key)}{$params.filter_key}{else}{$key}{/if}" data-filter_type="{$params.type}">
+														{$params['title']|escape:'html':'UTF-8'}: <span class="filter_value">{if $params['value'] == 1}{l s='Yes'}{else}{l s='No'}{/if}</span>
 														<i class="icon-times"></i>
 													</span>
 												{else}
 													<span data-filter_key="{if isset($params.filter_key)}{$params.filter_key}{else}{$key}{/if}" data-filter_type="{$params.type}">
-														{$params['title']|escape:'html':'UTF-8'}: <span class="filter_value">{$params['list'][$params['value']]|replace: '&nbsp;' : ''}</span>
+														{$params['title']|escape:'html':'UTF-8'}: <span class="filter_value">{$params['value']|escape:'html':'UTF-8'}</span>
 														<i class="icon-times"></i>
 													</span>
 												{/if}
-											{elseif $params.type == 'bool'}
-												<span data-filter_key="{if isset($params.filter_key)}{$params.filter_key}{else}{$key}{/if}" data-filter_type="{$params.type}">
-													{$params['title']|escape:'html':'UTF-8'}: <span class="filter_value">{if $params['value'] == 1}{l s='Yes'}{else}{l s='No'}{/if}</span>
-													<i class="icon-times"></i>
-												</span>
-											{else}
-												<span data-filter_key="{if isset($params.filter_key)}{$params.filter_key}{else}{$key}{/if}" data-filter_type="{$params.type}">
-													{$params['title']|escape:'html':'UTF-8'}: <span class="filter_value">{$params['value']|escape:'html':'UTF-8'}</span>
-													<i class="icon-times"></i>
-												</span>
 											{/if}
-										{/if}
-									{/foreach}
-								</span>
-							</div>
-						{/if}
-						<div class="panel collapse" id="list_filters_panel">
-							<div class="row">
-								<div class="col-sm-12">
-									<div class="list_filters">
-										{foreach $fields_display AS $key => $params}
-											{if !isset($params.search) || $params.search}
-												<div class="row">
-													<label class="col-xs-3" for="filter_input_{$key}">{$params['title']|escape:'html':'UTF-8'}</label>
-													<div class="col-xs-9">
-														{if $params.type == 'range'}
-															{$field_name="`$list_id`Filter_{if isset($params.filter_key)}`$params.filter_key`{else}`$key`{/if}"}
-															<div class="input_range">
-																<input type="text" class="filter form-control" name="{$field_name}[0]" placeholder="{l s='From'}" value="{if isset($smarty.post[$field_name][0]) && $smarty.post[$field_name][0]}{$smarty.post[$field_name][0]}{elseif isset($params.value.0)}{$params.value.0}{/if}">
-																<input type="text" class="filter form-control" name="{$field_name}[1]" placeholder="{l s='To'}" value="{if isset($smarty.post[$field_name][1]) && $smarty.post[$field_name][1]}{$smarty.post[$field_name][1]}{elseif isset($params.value.1)}{$params.value.1}{/if}">
-															</div>
-														{elseif $params.type == 'bool'}
-															{$field_name="`$list_id`Filter_{if isset($params.filter_key)}`$params.filter_key`{else}`$key`{/if}"}
-															<select id="filter_input_{$key}" class="filter center" name="{$field_name}">
-																<option value="">-</option>
-																<option value="1" {if isset($smarty.post.$field_name) && $smarty.post.$field_name == 1} selected="selected"{elseif $params.value == 1} selected="selected" {/if}>{l s='Yes'}</option>
-																<option value="0" {if isset($smarty.post.$field_name) && $smarty.post.$field_name != '' && $smarty.post.$field_name == 0} selected="selected"{elseif $params.value == 0 && $params.value != ''} selected="selected" {/if}>{l s='No'}</option>
-															</select>
-														{elseif $params.type == 'date' || $params.type == 'datetime'}
-															<div class="date_range">
-																<div class="input-group center">
-																	<input type="text" class="filter datepicker date-input form-control" id="local_{$params.id_date}_0" name="local_{$params.name_date}[0]"  placeholder="{l s='From'}" autocomplete="off"/>
-																	<input type="hidden" id="{$params.id_date}_0" name="{$params.name_date}[0]" value="{if isset($smarty.post[$params.name_date][0]) && $smarty.post[$params.name_date][0]}{$smarty.post[$params.name_date][0]}{elseif isset($params.value.0)}{$params.value.0}{/if}">
-																	<span class="input-group-addon">
-																		<i class="icon-calendar"></i>
-																	</span>
+										{/foreach}
+									</span>
+								</div>
+							{/if}
+							<div class="panel collapse" id="list_filters_panel">
+								<div class="row">
+									<div class="col-sm-12">
+										<div class="list_filters">
+											{foreach $fields_display AS $key => $params}
+												{if !isset($params.search) || $params.search}
+													<div class="row">
+														<label class="col-xs-3" for="filter_input_{$key}">{$params['title']|escape:'html':'UTF-8'}</label>
+														<div class="col-xs-9">
+															{if $params.type == 'range'}
+																{$field_name="`$list_id`Filter_{if isset($params.filter_key)}`$params.filter_key`{else}`$key`{/if}"}
+																<div class="input_range">
+																	<input type="text" class="filter form-control" name="{$field_name}[0]" placeholder="{l s='From'}" value="{if isset($smarty.post[$field_name][0]) && $smarty.post[$field_name][0]}{$smarty.post[$field_name][0]}{elseif isset($params.value.0)}{$params.value.0}{/if}">
+																	<input type="text" class="filter form-control" name="{$field_name}[1]" placeholder="{l s='To'}" value="{if isset($smarty.post[$field_name][1]) && $smarty.post[$field_name][1]}{$smarty.post[$field_name][1]}{elseif isset($params.value.1)}{$params.value.1}{/if}">
 																</div>
-																<div class="input-group center">
-																	<input type="text" class="filter datepicker date-input form-control" id="local_{$params.id_date}_1" name="local_{$params.name_date}[1]"  placeholder="{l s='To'}"  autocomplete="off"/>
-																	<input type="hidden" id="{$params.id_date}_1" name="{$params.name_date}[1]" value="{if isset($smarty.post[$params.name_date][1]) && $smarty.post[$params.name_date][1]}{$smarty.post[$params.name_date][1]}{elseif isset($params.value.1)}{$params.value.1}{/if}">
-																	<span class="input-group-addon">
-																		<i class="icon-calendar"></i>
-																	</span>
-																</div>
-																<script>
-																	$(function() {
-																		var dateStart = parseDate($("#{$params.id_date}_0").val());
-																		var dateEnd = parseDate($("#{$params.id_date}_1").val());
-																		$("#local_{$params.id_date}_0").datepicker("option", "altField", "#{$params.id_date}_0");
-																		$("#local_{$params.id_date}_1").datepicker("option", "altField", "#{$params.id_date}_1");
-																		if (dateStart !== null){
-																			$("#local_{$params.id_date}_0").datepicker("setDate", dateStart);
-																		}
-																		if (dateEnd !== null){
-																			$("#local_{$params.id_date}_1").datepicker("setDate", dateEnd);
-																		}
-
-																		$('#local_{$params.id_date}_0').datepicker('option', {
-																			prevText: '',
-																			nextText: '',
-																			dateFormat: 'yy-mm-dd',
-																			onClose: function() {
-																				let dateFrom = $('#local_{$params.id_date}_0').val().trim();
-																				let dateTo = $('#local_{$params.id_date}_1').val().trim();
-
-																				if ((dateFrom && dateTo) && (dateFrom >= dateTo)) {
-																					let objDateToMin = $.datepicker.parseDate('yy-mm-dd', dateFrom);
-																					objDateToMin.setDate(objDateToMin.getDate());
-
-																					$('#local_{$params.id_date}_1').datepicker('option', 'minDate', objDateToMin);
-																				}
-																			},
-																		});
-
-																		$('#local_{$params.id_date}_1').datepicker('option', {
-																			prevText: '',
-																			nextText: '',
-																			dateFormat: 'yy-mm-dd',
-																			beforeShow: function() {
-																				let dateFrom = $('#local_{$params.id_date}_0').val().trim();
-
-																				if (typeof dateFrom != 'undefined' && dateFrom != '') {
-																					let objDateToMin = $.datepicker.parseDate('yy-mm-dd', dateFrom);
-																					objDateToMin.setDate(objDateToMin.getDate());
-
-																					$('#local_{$params.id_date}_1').datepicker('option', 'minDate', objDateToMin);
-																				}
-																			},
-																		});
-																	});
-																</script>
-															</div>
-														{elseif $params.type == 'select'}
-															{$field_name="`$list_id`Filter_`$params.filter_key`"}
-															{if isset($params.multiple) && $params.multiple}
-																<select id="filter_input_{$key}" class="filter{if isset($params.align) && $params.align == 'center'}center{/if} select_multiple_{$params.operator} chosen" multiple name="{$field_name}[]" {if isset($params.width)} style="width:{$params.width}px"{/if}>
-																	{if isset($params.list) && is_array($params.list)}
-																		{foreach $params.list AS $option_value => $option_display}
-																			<option value="{$option_value}" {if isset($smarty.post.$field_name) && $smarty.post.$field_name && in_array($option_value, $smarty.post.$field_name)} selected="selected"{elseif isset($params.value) && $params.value}{if in_array($option_value, $params.value)} selected="selected"{/if}{/if}>{$option_display}</option>
-																		{/foreach}
-																	{/if}
+															{elseif $params.type == 'bool'}
+																{$field_name="`$list_id`Filter_{if isset($params.filter_key)}`$params.filter_key`{else}`$key`{/if}"}
+																<select id="filter_input_{$key}" class="filter center" name="{$field_name}">
+																	<option value="">-</option>
+																	<option value="1" {if isset($smarty.post.$field_name) && $smarty.post.$field_name == 1} selected="selected"{elseif $params.value == 1} selected="selected" {/if}>{l s='Yes'}</option>
+																	<option value="0" {if isset($smarty.post.$field_name) && $smarty.post.$field_name != '' && $smarty.post.$field_name == 0} selected="selected"{elseif $params.value == 0 && $params.value != ''} selected="selected" {/if}>{l s='No'}</option>
 																</select>
-															{else}
-																{if isset($params.filter_key)}
-																	<select id="filter_input_{$key}" class="filter{if isset($params.align) && $params.align == 'center'}center{/if} {if isset($params.class)}{$params.class}{/if}" name="{$field_name}" {if isset($params.width)} style="width:{$params.width}px"{/if}>
-																		<option value="" {if $params.value == ''} selected="selected" {/if}>-</option>
+															{elseif $params.type == 'date' || $params.type == 'datetime'}
+																<div class="date_range">
+																	<div class="input-group center">
+																		<input type="text" class="filter datepicker date-input form-control" id="local_{$params.id_date}_0" name="local_{$params.name_date}[0]"  placeholder="{l s='From'}" autocomplete="off"/>
+																		<input type="hidden" id="{$params.id_date}_0" name="{$params.name_date}[0]" value="{if isset($smarty.post[$params.name_date][0]) && $smarty.post[$params.name_date][0]}{$smarty.post[$params.name_date][0]}{elseif isset($params.value.0)}{$params.value.0}{/if}">
+																		<span class="input-group-addon">
+																			<i class="icon-calendar"></i>
+																		</span>
+																	</div>
+																	<div class="input-group center">
+																		<input type="text" class="filter datepicker date-input form-control" id="local_{$params.id_date}_1" name="local_{$params.name_date}[1]"  placeholder="{l s='To'}"  autocomplete="off"/>
+																		<input type="hidden" id="{$params.id_date}_1" name="{$params.name_date}[1]" value="{if isset($smarty.post[$params.name_date][1]) && $smarty.post[$params.name_date][1]}{$smarty.post[$params.name_date][1]}{elseif isset($params.value.1)}{$params.value.1}{/if}">
+																		<span class="input-group-addon">
+																			<i class="icon-calendar"></i>
+																		</span>
+																	</div>
+																	<script>
+																		$(function() {
+																			var dateStart = parseDate($("#{$params.id_date}_0").val());
+																			var dateEnd = parseDate($("#{$params.id_date}_1").val());
+																			$("#local_{$params.id_date}_0").datepicker("option", "altField", "#{$params.id_date}_0");
+																			$("#local_{$params.id_date}_1").datepicker("option", "altField", "#{$params.id_date}_1");
+																			if (dateStart !== null){
+																				$("#local_{$params.id_date}_0").datepicker("setDate", dateStart);
+																			}
+																			if (dateEnd !== null){
+																				$("#local_{$params.id_date}_1").datepicker("setDate", dateEnd);
+																			}
+
+																			$('#local_{$params.id_date}_0').datepicker('option', {
+																				prevText: '',
+																				nextText: '',
+																				dateFormat: 'yy-mm-dd',
+																				onClose: function() {
+																					let dateFrom = $('#local_{$params.id_date}_0').val().trim();
+																					let dateTo = $('#local_{$params.id_date}_1').val().trim();
+
+																					if ((dateFrom && dateTo) && (dateFrom >= dateTo)) {
+																						let objDateToMin = $.datepicker.parseDate('yy-mm-dd', dateFrom);
+																						objDateToMin.setDate(objDateToMin.getDate());
+
+																						$('#local_{$params.id_date}_1').datepicker('option', 'minDate', objDateToMin);
+																					}
+																				},
+																			});
+
+																			$('#local_{$params.id_date}_1').datepicker('option', {
+																				prevText: '',
+																				nextText: '',
+																				dateFormat: 'yy-mm-dd',
+																				beforeShow: function() {
+																					let dateFrom = $('#local_{$params.id_date}_0').val().trim();
+
+																					if (typeof dateFrom != 'undefined' && dateFrom != '') {
+																						let objDateToMin = $.datepicker.parseDate('yy-mm-dd', dateFrom);
+																						objDateToMin.setDate(objDateToMin.getDate());
+
+																						$('#local_{$params.id_date}_1').datepicker('option', 'minDate', objDateToMin);
+																					}
+																				},
+																			});
+																		});
+																	</script>
+																</div>
+															{elseif $params.type == 'select'}
+																{$field_name="`$list_id`Filter_`$params.filter_key`"}
+																{if isset($params.multiple) && $params.multiple}
+																	<select id="filter_input_{$key}" class="filter{if isset($params.align) && $params.align == 'center'}center{/if} select_multiple_{$params.operator} chosen" multiple name="{$field_name}[]" {if isset($params.width)} style="width:{$params.width}px"{/if}>
 																		{if isset($params.list) && is_array($params.list)}
 																			{foreach $params.list AS $option_value => $option_display}
-																				<option value="{$option_value}" {if isset($smarty.post.$field_name) && $smarty.post.$field_name != '' && $smarty.post.$field_name == $option_value} selected="selected"{elseif (string)$option_display === (string)$params.value ||  (string)$option_value === (string)$params.value} selected="selected"{/if}>{$option_display}</option>
+																				<option value="{$option_value}" {if isset($smarty.post.$field_name) && $smarty.post.$field_name && in_array($option_value, $smarty.post.$field_name)} selected="selected"{elseif isset($params.value) && $params.value}{if in_array($option_value, $params.value)} selected="selected"{/if}{/if}>{$option_display}</option>
 																			{/foreach}
 																		{/if}
 																	</select>
+																{else}
+																	{if isset($params.filter_key)}
+																		<select id="filter_input_{$key}" class="filter{if isset($params.align) && $params.align == 'center'}center{/if} {if isset($params.class)}{$params.class}{/if}" name="{$field_name}" {if isset($params.width)} style="width:{$params.width}px"{/if}>
+																			<option value="" {if $params.value == ''} selected="selected" {/if}>-</option>
+																			{if isset($params.list) && is_array($params.list)}
+																				{foreach $params.list AS $option_value => $option_display}
+																					<option value="{$option_value}" {if isset($smarty.post.$field_name) && $smarty.post.$field_name != '' && $smarty.post.$field_name == $option_value} selected="selected"{elseif (string)$option_display === (string)$params.value ||  (string)$option_value === (string)$params.value} selected="selected"{/if}>{$option_display}</option>
+																				{/foreach}
+																			{/if}
+																		</select>
+																	{/if}
 																{/if}
+															{else}
+																{$field_name="`$list_id`Filter_{if isset($params.filter_key)}`$params.filter_key`{else}`$key`{/if}"}
+																<input type="text" id="filter_input_{$key}" class="filter" name="{$field_name}" value="{if isset($smarty.post.$field_name) && $smarty.post.$field_name}{$smarty.post.$field_name}{else}{$params.value|escape:'html':'UTF-8'}{/if}" {if isset($params.width) && $params.width != 'auto'} style="width:{$params.width}px"{/if} />
 															{/if}
-														{else}
-															{$field_name="`$list_id`Filter_{if isset($params.filter_key)}`$params.filter_key`{else}`$key`{/if}"}
-															<input type="text" id="filter_input_{$key}" class="filter" name="{$field_name}" value="{if isset($smarty.post.$field_name) && $smarty.post.$field_name}{$smarty.post.$field_name}{else}{$params.value|escape:'html':'UTF-8'}{/if}" {if isset($params.width) && $params.width != 'auto'} style="width:{$params.width}px"{/if} />
-														{/if}
+														</div>
 													</div>
+												{/if}
+											{/foreach}
+											{if $has_actions || $show_filters}
+												<div class="actions">
+													<hr>
+													{if $show_filters}
+													<span class="pull-right">
+														<button type="submit" id="submitFilterButton{$list_id}" name="submitFilter" class="btn btn-default" data-list-id="{$list_id}">
+															<i class="icon-search"></i> {l s='Search'}
+														</button>
+														{if $filters_has_value}
+															<button type="submit" name="submitReset{$list_id}" class="btn btn-warning">
+																<i class="icon-eraser"></i> {l s='Reset'}
+															</button>
+														{/if}
+													</span>
+													{/if}
 												</div>
 											{/if}
-										{/foreach}
-										{if $has_actions || $show_filters}
-											<div class="actions">
-												<hr>
-												{if $show_filters}
-												<span class="pull-right">
-													<button type="submit" id="submitFilterButton{$list_id}" name="submitFilter" class="btn btn-default" data-list-id="{$list_id}">
-														<i class="icon-search"></i> {l s='Search'}
-													</button>
-													{if $filters_has_value}
-														<button type="submit" name="submitReset{$list_id}" class="btn btn-warning">
-															<i class="icon-eraser"></i> {l s='Reset'}
-														</button>
-													{/if}
-												</span>
-												{/if}
-											</div>
-										{/if}
+										</div>
 									</div>
 								</div>
 							</div>
 						</div>
 					</div>
 				</div>
-			</div>
+			{/block}
 		{/if}
 	{/block}
 	<div class="panel col-lg-12">

@@ -95,20 +95,20 @@ class InstallControllerHttpConfigure extends InstallControllerHttp
         // Check shop name
         if ($this->session->shop_name && !Validate::isGenericName($this->session->shop_name)) {
             $this->errors['shop_name'] = $this->l('Invalid shop name');
-        } elseif (strlen($this->session->shop_name) > 64) {
+        } elseif (Tools::strlen($this->session->shop_name) > 64) {
             $this->errors['shop_name'] = $this->l('The field %s is limited to %d characters', $this->l('shop name'), 64);
         }
 
         // Check admin name
         if ($this->session->admin_firstname && !Validate::isName($this->session->admin_firstname)) {
             $this->errors['admin_firstname'] = $this->l('Your firstname contains some invalid characters');
-        } elseif (strlen($this->session->admin_firstname) > 32) {
+        } elseif (Tools::strlen($this->session->admin_firstname) > 32) {
             $this->errors['admin_firstname'] = $this->l('The field %s is limited to %d characters', $this->l('firstname'), 32);
         }
 
         if ($this->session->admin_lastname && !Validate::isName($this->session->admin_lastname)) {
             $this->errors['admin_lastname'] = $this->l('Your lastname contains some invalid characters');
-        } elseif (strlen($this->session->admin_lastname) > 32) {
+        } elseif (Tools::strlen($this->session->admin_lastname) > 32) {
             $this->errors['admin_lastname'] = $this->l('The field %s is limited to %d characters', $this->l('lastname'), 32);
         }
 
@@ -147,7 +147,7 @@ class InstallControllerHttpConfigure extends InstallControllerHttp
         if (isset($_FILES['fileToUpload']['tmp_name']) && $_FILES['fileToUpload']['tmp_name']) {
             $file = $_FILES['fileToUpload'];
             $error = ImageManager::validateUpload($file, 300000);
-            if (!strlen($error)) {
+            if (!Tools::strlen($error)) {
                 $tmp_name = tempnam(_PS_TMP_IMG_DIR_, 'PS');
                 if (!$tmp_name || !move_uploaded_file($file['tmp_name'], $tmp_name)) {
                     return false;

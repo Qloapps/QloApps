@@ -43,7 +43,7 @@ class StatsCheckUp extends Module
     {
         $this->name = 'statscheckup';
         $this->tab = 'analytics_stats';
-        $this->version = '1.5.3';
+        $this->version = '1.5.4';
         $this->author = 'PrestaShop';
         $this->need_instance = 0;
 
@@ -687,11 +687,20 @@ class StatsCheckUp extends Module
             WHERE hi.`id_hotel` = hbi.`id`
         ) AS nbImages,
         (
-            SELECT COUNT(DISTINCT hbd.`id_order`) FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
-            LEFT JOIN `'._DB_PREFIX_.'orders` o
-            ON (o.`id_order` = hbd.`id_order`)
-            WHERE hbd.`id_hotel` = hbi.`id` AND o.`valid` = 1
-            AND hbd.`date_to` > "'.pSQL($date_from).'" AND hbd.`date_from` < "'.pSQL($date_to).'"
+            SELECT COUNT(DISTINCT o.`id_order`)
+			FROM `'._DB_PREFIX_.'orders` o
+			WHERE `invoice_date` BETWEEN "'.pSQL($date_from).' 00:00:00" AND "'.pSQL($date_to).' 23:59:59" AND o.valid = 1
+            AND (
+                EXISTS (
+                    SELECT 1
+                    FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
+                    WHERE hbd.`id_order` = o.`id_order` AND hbd.`id_hotel` = hbi.`id`
+                ) OR EXISTS (
+                    SELECT 1
+                    FROM `'._DB_PREFIX_.'service_product_order_detail` spod
+                    WHERE spod.`id_order` = o.`id_order` AND spod.`id_hotel` = hbi.`id`
+                )
+            )
         ) AS nbOrders,
         (
             SELECT COUNT(*)
@@ -770,13 +779,26 @@ class StatsCheckUp extends Module
             WHERE i.`id_product` = p.`id_product`
         ) AS nbImages,
         (
-            SELECT COUNT(DISTINCT rsod.`id_order`)
-            FROM `'._DB_PREFIX_.'htl_room_type_service_product_order_detail` rsod
-            LEFT JOIN `'._DB_PREFIX_.'orders` o ON (o.`id_order` = rsod.`id_order`)
-            LEFT JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd ON (hbd.`id` = rsod.`id_htl_booking_detail`)
-            WHERE rsod.`id_product` = p.`id_product` AND o.`valid` = 1
-            '.HotelBranchInformation::addHotelRestriction(false, 'hbd').'
-            AND hbd.`date_to` > "'.pSQL($date_from).'" AND hbd.`date_from` < "'.pSQL($date_to).'"
+            SELECT COUNT(DISTINCT spod.`id_order`)
+			FROM `'._DB_PREFIX_.'service_product_order_detail` spod
+            LEFT JOIN `'._DB_PREFIX_.'orders` o ON (o.`id_order` = spod.`id_order`)
+			WHERE `invoice_date` BETWEEN "'.pSQL($date_from).' 00:00:00" AND "'.pSQL($date_to).' 23:59:59" AND o.valid = 1
+            AND spod.`id_product` = p.`id_product`
+            AND (
+                EXISTS (
+                    SELECT 1
+                    FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
+                    WHERE hbd.`id_order` = o.`id_order`' . HotelBranchInformation::addHotelRestriction(false).'
+                ) OR EXISTS (
+                    SELECT 1
+                    FROM `'._DB_PREFIX_.'service_product_order_detail` spod
+                    WHERE spod.`id_order` = o.`id_order`' . HotelBranchInformation::addHotelRestriction(false, 'spod').'
+                ) OR EXISTS (
+                    SELECT 1
+                    FROM `'._DB_PREFIX_.'service_product_order_detail` spod
+                    WHERE spod.`id_order` = o.`id_order` AND spod.`id_hotel` = 0 AND spod.`id_htl_booking_detail` = 0
+                )
+            )
         ) AS nbOrders,
         (
             SELECT COUNT(*)

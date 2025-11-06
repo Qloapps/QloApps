@@ -49,7 +49,7 @@
 					</div>
 					<div class="form-group">
 						<label class="col-lg-3 control-label">{l s='Total spent since registration:'}</label>
-						<div class="col-lg-3"><p class="form-control-static">{displayWtPriceWithCurrency price=$customer_stats.total_orders currency=$currency}</p></div>
+						<div class="col-lg-3"><p class="form-control-static">{displayWtPriceWithCurrency price=Tools::convertPrice($customer_stats.total_orders|floatval, $currency) currency=$currency}</p></div>
 					</div>
 				</div>
 			{else}
@@ -67,7 +67,7 @@
 				{l s='Created on:'} {dateFormat date=$cart_order.date_add}
 			{else}
 				<h2>{l s='No order was created from this cart.'}</h2>
-				{if $customer->id}
+				{if $customer->id && !$hotel_products && !$standalone_products}
 					<a class="btn btn-default" href="{$link->getAdminLink('AdminOrders')|escape:'html':'UTF-8'}&amp;cart_id={$cart->id|intval}&amp;addorder"><i class="icon-shopping-cart"></i> {l s='Create an order from this cart.'}</a>
 				{/if}
 			{/if}
@@ -168,9 +168,9 @@
 																					<div class="col-xs-6">
 																						<p><span class="pull-right extra_demand_option_price">
 																							{if isset($roomDemand['adv_option']) && $roomDemand['adv_option']}
-																								{convertPrice price = $roomDemand['adv_option'][$demand['id_option']]['price']|escape:'html':'UTF-8'}
+																								{convertPrice price = $roomDemand['adv_option'][$demand['id_option']]['price_tax_excl']|escape:'html':'UTF-8'}
 																							{else}
-																								{convertPrice price = $roomDemand['price']|escape:'html':'UTF-8'}
+																								{convertPrice price = $roomDemand['price_tax_excl']|escape:'html':'UTF-8'}
 																							{/if}
 																						</span></p>
 																					</div>
@@ -216,7 +216,7 @@
 																			{/if}
 																		</div>
 																		<div class="col-xs-4">
-																			<span class="pull-right">{convertPrice price=$service.total_price}</span>
+																			<span class="pull-right">{convertPrice price=$service.total_price_tax_excl}</span>
 																		</div>
 																	</div>
 																	<p></p>
@@ -239,7 +239,7 @@
 			</tbody>
 			<tfoot>
 				<tr>
-					<td colspan="7">{l s='Total cost of room types:'}</td>
+					<td colspan="7">{l s='Total cost:'}</td>
 					<td class="text-right">{displayWtPriceWithCurrency price=$total_products currency=$currency}</td>
 				</tr>
 				{if $total_discounts != 0}
