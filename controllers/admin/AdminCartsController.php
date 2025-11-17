@@ -1366,6 +1366,7 @@ class AdminCartsControllerCore extends AdminController
                 $idHotelCartBooking = Tools::getValue('id_hotel_cart_booking');
                 // valiadate services being added
                 if (Validate::isLoadedObject($objHtlCartBooking = new HotelCartBookingData($idHotelCartBooking))) {
+                    $objCart = new Cart($objHtlCartBooking->id_cart);
                     $name = trim(Tools::getValue('new_service_name'));
                     $price = Tools::getValue('new_service_price');
                     $priceCalcMethod = Tools::getValue('new_service_price_calc_method');
@@ -1412,6 +1413,12 @@ class AdminCartsControllerCore extends AdminController
                     // if no validation errors then add service
                     if (!$response['hasError']) {
                         // ======= START: Create Service product  =========
+                        if ($objCart->id_currency != (int)Configuration::get('PS_CURRENCY_DEFAULT')) {
+                            $currency = Currency::getCurrencyInstance($objCart->id_currency);
+                            $price = Tools::ps_round($price/$currency->conversion_rate, 6);
+                            $this->context->currency = new Currency((int) $objCart->id_currency);
+                        }
+
                         $objServiceProduct = new Product();
                         $objServiceProduct->price_calculation_method = $priceCalcMethod;
                         $objServiceProduct->selling_preference_type = Product::SELLING_PREFERENCE_WITH_ROOM_TYPE;
@@ -1451,7 +1458,6 @@ class AdminCartsControllerCore extends AdminController
                                 RoomTypeServiceProduct::WK_ELEMENT_TYPE_ROOM_TYPE
                             );
                             // If service product is create successfully the start adding the product in cart and order
-                            $objCart = new Cart($objHtlCartBooking->id_cart);
                             $objServiceProduct = new Product($objServiceProduct->id, false, $objCart->id_lang);
 
                             $objServiceProductCartDetail = new ServiceProductCartDetail();
@@ -1528,7 +1534,21 @@ class AdminCartsControllerCore extends AdminController
 
             if ($serviceProducts) {
                 foreach ($serviceProducts as $key => $servProduct) {
-                    $serviceProducts[$key]['price_tax_exc'] = $servProduct['price'];
+                    $numDays = 1;
+                    if (Product::PRICE_CALCULATION_METHOD_PER_DAY == $servProduct['price_calculation_method']) {
+                        $numDays = HotelHelper::getNumberOfDays($objCartBookingData->date_from, $objCartBookingData->date_to);
+                    }
+                    $serviceProducts[$key]['price_tax_exc'] = Product::getServiceProductPrice(
+                        $servProduct['id_product'],
+                        0,
+                        0,
+                        $objCartBookingData->id_product,
+                        false,
+                        1,
+                        $objCartBookingData->date_from,
+                        $objCartBookingData->date_to,
+                        $objCartBookingData->id_cart
+                    )/$numDays;
                 }
             }
 

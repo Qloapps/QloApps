@@ -993,7 +993,24 @@ class AdminOrdersControllerCore extends AdminController
                     $objProduct = new Product();
                     $hotelServiceProducts = $objProduct->getServiceProducts(true, Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE);
                     $roomTypeServiceProducts = $objProduct->getServiceProducts(true, Product::SELLING_PREFERENCE_WITH_ROOM_TYPE);
-                    $serviceProducts = array_merge($roomTypeServiceProducts, $hotelServiceProducts);
+                    if ($serviceProducts = array_merge($roomTypeServiceProducts, $hotelServiceProducts)) {
+                        foreach ($serviceProducts as $key => $servProduct) {
+                            $numDays = 1;
+                            if (Product::PRICE_CALCULATION_METHOD_PER_DAY == $servProduct['price_calculation_method']) {
+                                $numDays = HotelHelper::getNumberOfDays($dateFrom, $dateTo);
+                            }
+                            $serviceProducts[$key]['price_tax_exc'] = Product::getServiceProductPrice(
+                                $servProduct['id_product'],
+                                0,
+                                0,
+                                $idProduct,
+                                false,
+                                1,
+                                $dateFrom,
+                                $dateTo
+                            )/$numDays;
+                        }
+                    }
                 } else {
                     $objRoomTypeServiceProduct = new RoomTypeServiceProduct();
                     $serviceProducts = $objRoomTypeServiceProduct->getServiceProductsData($idProduct, 1, 0, false, 2, null);
@@ -1001,7 +1018,6 @@ class AdminOrdersControllerCore extends AdminController
 
                 if ($serviceProducts) {
                     foreach ($serviceProducts as $key => $servProduct) {
-                        $serviceProducts[$key]['price_tax_exc'] = $servProduct['price'];
                         if (isset($additionalServices[$productLineData['id']])
                             && in_array($servProduct['id_product'], array_column($additionalServices[$productLineData['id']]['additional_services'], 'id_product'))
                         ) {
@@ -3591,10 +3607,11 @@ class AdminOrdersControllerCore extends AdminController
                 }
             }
 
-            $messages = array_merge($customerMessages, $messages);
-            usort($messages, function ($a, $b) {
-                return strtotime($a['date_add']) < strtotime($b['date_add']);
-            });
+            if ($messages = array_merge($customerMessages, $messages)) {
+                usort($messages, function ($a, $b) {
+                    return (int) (strtotime($a['date_add']) < strtotime($b['date_add']));
+                });
+            }
         }
 
         // send hotel standalone and standalone products
@@ -7369,7 +7386,24 @@ class AdminOrdersControllerCore extends AdminController
                 $objProduct = new Product();
                 $hotelServiceProducts = $objProduct->getServiceProducts(true, Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE);
                 $roomTypeServiceProducts = $objProduct->getServiceProducts(true, Product::SELLING_PREFERENCE_WITH_ROOM_TYPE);
-                $serviceProducts = array_merge($roomTypeServiceProducts, $hotelServiceProducts);
+                if ($serviceProducts = array_merge($roomTypeServiceProducts, $hotelServiceProducts)) {
+                    foreach ($serviceProducts as $key => $servProduct) {
+                        $numDays = 1;
+                        if (Product::PRICE_CALCULATION_METHOD_PER_DAY == $servProduct['price_calculation_method']) {
+                            $numDays = HotelHelper::getNumberOfDays($dateFrom, $dateTo);
+                        }
+                        $serviceProducts[$key]['price_tax_exc'] = Product::getServiceProductPrice(
+                            $servProduct['id_product'],
+                            0,
+                            0,
+                            $idProduct,
+                            false,
+                            1,
+                            $dateFrom,
+                            $dateTo
+                        )/$numDays;
+                    }
+                }
             } else {
                 $objRoomTypeServiceProduct = new RoomTypeServiceProduct();
                 $serviceProducts = $objRoomTypeServiceProduct->getServiceProductsData($idProduct, 1, 0, false, 2, null);
@@ -7377,7 +7411,6 @@ class AdminOrdersControllerCore extends AdminController
 
             if ($serviceProducts) {
                 foreach ($serviceProducts as $key => $servProduct) {
-                    $serviceProducts[$key]['price_tax_exc'] = $servProduct['price'];
                     if (isset($additionalServices[$idHtlBookingDetail]) && $additionalServices[$idHtlBookingDetail]) {
                         if (in_array($servProduct['id_product'], array_column($additionalServices[$idHtlBookingDetail]['additional_services'], 'id_product'))) {
                             unset($serviceProducts[$key]);
