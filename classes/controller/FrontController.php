@@ -428,7 +428,13 @@ class FrontControllerCore extends Controller
             }
         }
 
-        $languages = Language::getLanguages(true, $this->context->shop->id);
+        if ($languages = Language::getLanguages(true, $this->context->shop->id)) {
+            $languages = array_column($languages, null, 'id_lang');
+        }
+        if ($currencies = Currency::getCurrencies()) {
+            $currencies = array_column($currencies, null, 'id_currency');
+        }
+
         $meta_language = array();
         foreach ($languages as $lang) {
             $meta_language[] = $lang['iso_code'];
@@ -471,7 +477,7 @@ class FrontControllerCore extends Controller
             'lang_id'             => (int)$this->context->language->id,
             'come_from'           => Tools::getHttpHost(true, true).Tools::htmlentitiesUTF8(str_replace(array('\'', '\\'), '', urldecode($_SERVER['REQUEST_URI']))),
             'cart_qties'          => (int)$cart->nbProducts(),
-            'currencies'          => Currency::getCurrencies(),
+            'currencies'          => $currencies,
             'languages'           => $languages,
             'meta_language'       => implode(',', $meta_language),
             'priceDisplay'        => Product::getTaxCalculationMethod((int)$this->context->cookie->id_customer),
@@ -1143,7 +1149,10 @@ class FrontControllerCore extends Controller
         }
 
         $this->addCSS(_THEME_CSS_DIR_.'grid_prestashop.css', 'all');  // retro compat themes 1.5.0.1
+        $this->addCSS(_THEME_CSS_DIR_.'bootstrap.css', 'all');
+        $this->addCSS(_THEME_CSS_DIR_.'icons.css', 'all');
         $this->addCSS(_THEME_CSS_DIR_.'global.css', 'all');
+
         $this->addJquery();
         $this->addJqueryPlugin('easing');
         $this->addJS(_PS_JS_DIR_.'tools.js');

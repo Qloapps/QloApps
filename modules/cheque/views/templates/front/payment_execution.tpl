@@ -82,10 +82,10 @@
 			</a>
 			{*By webkul To Check Order restrict condition before Payment by the customer*}
 			{if !$restrict_order}
-				<button class="btn pull-right button button-medium confirm_order" type="submit">
-					<span>{l s='I confirm my order' mod='cheque'}&nbsp;<i class="icon-chevron-right right"></i></span>
-				</button>
-			{/if}
+                <button class="btn pull-right button button-medium confirm_order" type="submit">
+                    <span>{l s='I confirm my order' mod='cheque'}&nbsp;<i class="icon-chevron-right right"></i></span>
+                </button>
+            {/if}
 		</p>
 	</form>
 {/if}
