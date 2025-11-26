@@ -57,7 +57,6 @@ class BlocknewsletterVerificationModuleFrontController extends ModuleFrontContro
 	{
 		parent::setMedia();
 
-		$this->addCSS($this->module->getPathUri().'views/css/front/verification.css');
 		$this->addJS($this->module->getPathUri().'views/js/front/redirect.js');
 
 		Media::addJsDef(array(

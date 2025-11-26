@@ -50,7 +50,6 @@ class WkAboutHotelBlock extends Module
         $this->context->controller->addCSS(_PS_JS_DIR_.'owl-carousel/assets/owl.carousel.min.css');
         $this->context->controller->addCSS(_PS_JS_DIR_.'owl-carousel/assets/owl.theme.default.min.css');
         $this->context->controller->addJS(_PS_JS_DIR_.'owl-carousel/owl.carousel.min.js');
-        $this->context->controller->addCSS($this->_path.'/views/css/WkAboutHotelBlockFront.css');
         $this->context->controller->addJS($this->_path.'/views/js/WkAboutHotelBlockFront.js');
 
         $HOTEL_INTERIOR_HEADING = Configuration::get('HOTEL_INTERIOR_HEADING', $this->context->language->id);

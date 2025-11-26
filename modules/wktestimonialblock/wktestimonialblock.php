@@ -53,7 +53,6 @@ class WkTestimonialBlock extends Module
         $this->context->controller->addCSS(_PS_JS_DIR_.'/owl-carousel/assets/owl.theme.default.min.css');
         $this->context->controller->addJS(_PS_JS_DIR_.'/owl-carousel/owl.carousel.min.js');
 
-        $this->context->controller->addCSS($this->_path.'/views/css/WkTestimonialBlockFront.css');
         $this->context->controller->addJS($this->_path.'/views/js/WkTestimonialBlockFront.js');
 
         $HOTEL_TESIMONIAL_BLOCK_HEADING = Configuration::get(

@@ -385,11 +385,6 @@ class QloPaypalCommerce extends PaymentModule
                 // // add PayPal script
                 $this->context->controller->addJS('https://www.paypal.com/sdk/js?client-id='.Configuration::get('WK_PAYPAL_COMMERCE_CLIENT_ID').'&commit=true&components=buttons&debug=false&currency='.$currency['iso_code'].'&intent=capture');
 
-                $this->context->controller->addCSS($this->_path.'views/css/front/wk_payment.css');
-
-                if (Tools::getValue('pp_cancel')) {
-                    $this->context->controller->addCSS($this->_path.'views/css/front/wk_payment_cancel.css');
-                }
             }
         }
     }

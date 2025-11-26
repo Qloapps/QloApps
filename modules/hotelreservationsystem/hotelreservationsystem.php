@@ -74,18 +74,7 @@ class HotelReservationSystem extends Module
             }
         }
         //End
-        $this->context->controller->addCSS($this->_path.'/views/css/HotelReservationFront.css');
         $this->context->controller->addJS($this->_path.'/views/js/HotelReservationFront.js');
-    }
-
-    public function hookActionFrontControllerSetMedia()
-    {
-        if (Configuration::get('WK_CUSTOMER_SUPPORT_PHONE_NUMBER') != ''
-            || Configuration::get('WK_CUSTOMER_SUPPORT_EMAIL') != ''
-        ) {
-            $this->context->controller->addCSS($this->getPathUri().'views/css/hook/display-nav.css');
-        }
-
     }
 
     public function hookDisplayNav()
@@ -313,7 +302,6 @@ class HotelReservationSystem extends Module
                         '&libraries=places,marker&loading=async&callback=initMap&language='.$this->context->language->iso_code.'&region='.$this->context->country->iso_code
                     );
                     $this->context->controller->addJS($this->getPathUri().'views/js/searchResultsMap.js');
-                    $this->context->controller->addCSS($this->getPathUri().'views/css/searchResultsMap.css');
 
                     $this->context->smarty->assign('hotel', $objHotel);
                     return $this->display(__FILE__, 'searchResultsMap.tpl');
@@ -646,7 +634,6 @@ class HotelReservationSystem extends Module
                 'actionOrderStatusPostUpdate',
                 'displayLeftColumn',
                 'actionCartSummary',
-                'actionFrontControllerSetMedia',
                 'displayNav',
                 'displayExternalNavigationHook',
             )

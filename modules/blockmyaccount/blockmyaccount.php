@@ -104,9 +104,4 @@ class BlockMyAccount extends Module
 	{
 		return Db::getInstance()->execute('DELETE FROM `'._DB_PREFIX_.'hook` WHERE `name` = \'displayMyAccountBlock\'');
 	}
-
-	public function hookDisplayHeader($params)
-	{
-		$this->context->controller->addCSS(($this->_path).'blockmyaccount.css', 'all');
-	}
 }

@@ -72,10 +72,6 @@ class BlockUserInfo extends Module
 		return $this->hookdisplayNav($params);
 	}
 
-	public function hookDisplayHeader($params)
-	{
-		$this->context->controller->addCSS(($this->_path).'blockuserinfo.css', 'all');
-	}
 
 	public function hookdisplayNav($params)
 	{

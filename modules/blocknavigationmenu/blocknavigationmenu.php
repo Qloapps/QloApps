@@ -58,7 +58,6 @@ class blocknavigationmenu extends Module
     {
         Media::addJsDef(array('currentPage' => $this->context->controller->php_self));
         $this->context->controller->addJS($this->_path.'/views/js/htlnevigationmenu.js');
-        $this->context->controller->addCSS($this->_path.'/views/css/blocknavigation.css');
 
         $objCustomNavigationLink = new WkCustomNavigationLink();
         if ($navigationLinks = $objCustomNavigationLink->getCustomNavigationLinks(1, false, 1)) {
@@ -82,7 +81,6 @@ class blocknavigationmenu extends Module
                         $link['link'] = $this->context->link->getPageLink($link['link']);
                     }
                 }
-                $this->context->controller->addCSS($this->_path.'/views/css/wkFooterNavigationBlock.css');
                 $this->context->smarty->assign('navigation_links', $navigationLinks);
                 return $this->display(__FILE__, 'wkFooterNavigationBlock.tpl');
             }

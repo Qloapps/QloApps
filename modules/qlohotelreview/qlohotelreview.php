@@ -150,7 +150,6 @@ class QloHotelReview extends Module
             $this->context->controller->addCSS(_PS_JS_DIR_.'raty/jquery.raty.css');
             $this->context->controller->addJS(_PS_JS_DIR_.'raty/jquery.raty.js');
             $this->context->controller->addJS(_PS_JS_DIR_.'jquery-circle-progress/circle-progress.min-1.2.2.js');
-            $this->context->controller->addCSS($this->getPathUri().'views/css/front/review-list.css');
             $this->context->controller->addJS($this->getPathUri().'views/js/front/review-list.js');
         }
     }
@@ -164,7 +163,6 @@ class QloHotelReview extends Module
 
             $this->context->controller->addCSS(_PS_JS_DIR_.'raty/jquery.raty.css');
             $this->context->controller->addJS(_PS_JS_DIR_.'raty/jquery.raty.js');
-            $this->context->controller->addCSS($this->getPathUri().'views/css/front/room-type-detail.css');
             $this->context->controller->addJS($this->getPathUri().'views/js/front/room-type-detail.js');
         }
     }
@@ -187,7 +185,6 @@ class QloHotelReview extends Module
 
         $this->context->controller->addCSS(_PS_JS_DIR_.'raty/jquery.raty.css');
         $this->context->controller->addJS(_PS_JS_DIR_.'raty/jquery.raty.js');
-        $this->context->controller->addCSS($this->getPathUri().'views/css/front/review.css');
         $this->context->controller->addJS($this->getPathUri().'views/js/hook/review.js');
     }
 

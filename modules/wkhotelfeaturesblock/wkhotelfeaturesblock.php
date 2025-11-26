@@ -47,7 +47,6 @@ class WkHotelFeaturesBlock extends Module
 
     public function hookDisplayHome()
     {
-        $this->context->controller->addCSS($this->_path.'/views/css/wkHotelFeaturesBlockFront.css');
         $this->context->controller->addJS($this->_path.'/views/js/wkHotelFeaturesBlockFront.js');
 
         $objFeaturesData = new WkHotelFeaturesData();

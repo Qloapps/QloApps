@@ -59,7 +59,6 @@ class BlockLanguages extends Module
 
     public function hookActionFrontControllerSetMedia()
     {
-        $this->context->controller->addCSS($this->getPathUri().'views/css/hook/blocklanguages.css');
         $this->context->controller->addJS($this->getPathUri().'views/js/hook/blocklanguages.js');
     }
 
