@@ -1206,7 +1206,8 @@ class AdminThemesControllerCore extends AdminController
 		');
 
         foreach ($hook_list as &$row) {
-            $row['exceptions'] = trim(preg_replace('/(,,+)/', ',', $row['exceptions']), ',');
+            $exception = $row['exceptions'] ? $row['exceptions'] : '';
+            $row['exceptions'] = trim(preg_replace('/(,,+)/', ',', $exception), ',');
         }
 
         $native_modules = $this->getNativeModule();
