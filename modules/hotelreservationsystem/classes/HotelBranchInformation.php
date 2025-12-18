@@ -789,20 +789,14 @@ class HotelBranchInformation extends ObjectModel
                 foreach ($idsProduct as $key_prod => $value_prod) {
                     $objProduct = new Product($value_prod['id_product']);
                     if (!$objProduct->delete()) {
-                        $contextController->errors[] = $this->moduleInstance->l(
-                            'Some error has occurred while deleting products of this hotel.',
-                            'HotelBranchInformation'
-                        );
+                        $contextController->errors[] = $this->moduleInstance->l('Some error has occurred while deleting products of this hotel.', 'HotelBranchInformation');
                     }
                 }
             }
             $objHotelfeatures = new HotelBranchFeatures();
             $objHotelImage = new HotelImage();
             if (!$objHotelfeatures->deleteBranchFeaturesByHotelId($idHotel)) {
-                $contextController->errors[] = $this->moduleInstance->l(
-                    'Some error has occurred while deleting hotel feature data.',
-                    'HotelBranchInformation'
-                );
+                $contextController->errors[] = $this->moduleInstance->l('Some error has occurred while deleting hotel feature data.', 'HotelBranchInformation');
             }
             $hotelAllImages = $objHotelImage->getImagesByHotelId($idHotel);
             if ($hotelAllImages) {
@@ -813,17 +807,11 @@ class HotelBranchInformation extends ObjectModel
                 }
             }
             if (!$objHotelImage->deleteByHotelId($idHotel)) {
-                $contextController->errors[] = $this->moduleInstance->l(
-                    'Some error has occurred while deleting images of hotel.',
-                    'HotelBranchInformation'
-                );
+                $contextController->errors[] = $this->moduleInstance->l('Some error has occurred while deleting images of hotel.', 'HotelBranchInformation');
             }
             // delete hotel unused categories of this hotel
             if (!$this->deleteUnusedHotelCategories($idHotel)) {
-                $contextController->errors[] = $this->moduleInstance->l(
-                    'Some error has occurred while deleting unused hotel categories.',
-                    'HotelBranchInformation'
-                );
+                $contextController->errors[] = $this->moduleInstance->l('Some error has occurred while deleting unused hotel categories.', 'HotelBranchInformation');
             }
         }
         if (!count($contextController->errors)) {

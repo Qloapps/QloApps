@@ -19,4 +19,30 @@ $(document).ready(function() {
             });
         });
     }
+
+	var prevBtn = $('<div>', { class: 'nav-direction-wrapper ' })
+		.append($('<div>', { class: 'nav-direction-primary' })
+			.append($('<div>', { class: 'nav-direction-secondary' }).append($('<i>', { class: 'icon-angle-left' }))
+		)
+	);
+	var nextBtn = $('<div>', { class: 'nav-direction-wrapper' })
+		.append($('<div>', { class: 'nav-direction-primary' })
+			.append($('<div>', { class: 'nav-direction-secondary' }).append($('<i>', { class: 'icon-angle-right' }))
+		)
+	);
+	$('.htlDisplayBlock-owlCarousel .owl-carousel').owlCarousel({
+		loop:true,
+	    nav:false,
+	    navSpeed:1000,
+		navText: [prevBtn, nextBtn],
+	    dots:false,
+	    items: 1,
+	    autoHeight:true,
+	    autoplay:true,
+	    autoplaySpeed:1000,
+	    autoplayTimeout:5000,
+		autoplayHoverPause:true,
+	    responsiveClass:true,
+		rtl: language_is_rtl,
+	});
 });

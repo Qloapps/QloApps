@@ -512,13 +512,23 @@ class HotelReservationSystemDb
                 `id_bed_type` INT(11) NOT NULL,
                 PRIMARY KEY (`id_room_type_bed_type`)
             ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;",
+            "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."htl_block_data` (
+                `id_hotel_block` int(11) NOT NULL AUTO_INCREMENT,
+                `id_hotel` int(11) NOT NULL,
+                `active` tinyint(4) NOT NULL,
+                `position` int(11) NOT NULL,
+                `date_add` datetime NOT NULL,
+                `date_upd` datetime NOT NULL,
+                PRIMARY KEY (`id_hotel_block`)
+            ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;",
 
             "INSERT INTO `"._DB_PREFIX_."htl_settings_link` (`id_settings_link`, `icon`, `link`, `new_window`, `position`, `unremovable`, `active`, `date_add`, `date_upd`) VALUES
             (1, 'icon-cogs', 'index.php?controller=AdminHotelGeneralSettings', 0, 0, 1, 1, NOW(), NOW()),
             (2, 'icon-dollar', 'index.php?controller=AdminHotelFeaturePricesSettings', 0, 2, 1, 1, NOW(), NOW()),
             (3, 'icon-plus-square', 'index.php?controller=AdminRoomTypeGlobalDemand', 0, 3, 1, 1, NOW(), NOW()),
             (4, 'icon-file-text', 'index.php?controller=AdminAboutHotelBlockSetting', 0, 4, 0, 1, NOW(), NOW()),
-            (5, 'icon-th-list', 'index.php?controller=AdminFeaturesModuleSetting', 0, 5, 0, 1, NOW(), NOW());",
+            (5, 'icon-th-list', 'index.php?controller=AdminFeaturesModuleSetting', 0, 5, 0, 1, NOW(), NOW()),
+            (6, 'icon-th-list', 'index.php?controller=AdminHotelDisplay', 0, 6, 0, 1, NOW(), NOW());",
 
             "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."htl_settings_link_lang` (
                 `id_settings_link` int(10) unsigned NOT NULL,
@@ -550,6 +560,11 @@ class HotelReservationSystemDb
 
             "INSERT INTO `"._DB_PREFIX_."htl_settings_link_lang` (`id_settings_link`, `id_lang`, `name`, `hint`)
             SELECT 5, `id_lang`, 'Hotel Amenities Block', 'Configure Hotels Amenities settings. You can display hotel amenities images using this block. This block will be displayed on home page.'
+            FROM `"._DB_PREFIX_."lang`
+            ORDER BY `id_lang`;",
+
+            "INSERT INTO `"._DB_PREFIX_."htl_settings_link_lang` (`id_settings_link`, `id_lang`, `name`, `hint`)
+            SELECT 6, `id_lang`, 'Display Hotel Block', 'Configure Hotels Display block. You can display about hotels using this block. This block will be displayed on home page.'
             FROM `"._DB_PREFIX_."lang`
             ORDER BY `id_lang`;",
         );
@@ -614,6 +629,7 @@ class HotelReservationSystemDb
             `'._DB_PREFIX_.'htl_bed_type_lang`,
             `'._DB_PREFIX_.'htl_room_type_bed_type`,
             `'._DB_PREFIX_.'htl_access`,
+            `'._DB_PREFIX_.'htl_block_data`,
             `'._DB_PREFIX_.'htl_settings_link`,
             `'._DB_PREFIX_.'htl_settings_link_lang`'
         );

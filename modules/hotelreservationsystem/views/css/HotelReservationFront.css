@@ -80,3 +80,39 @@
         margin: 0;
         text-align: center;
         line-height: 23px; }
+
+@media (min-width: 768px) {
+    .htlDisplayBlock-owlCarousel .aboutHotelContainer {
+        display: flex;
+        flex-direction: row-reverse;
+        justify-content: space-between;
+    }
+}
+
+a.hotel_block_view_hotel {
+	font-size: 15px;
+	color: #333333;
+	font-weight: 400;
+    background-color: #FFFFFF;
+    border: 1px solid #333333;
+    border-radius: 2px;
+    padding: 10px 30px;
+    text-transform: capitalize;
+    margin-top: 20px;
+}
+.htlDisplayBlock-owlCarousel .owl-prev {
+    left: 1px;
+}
+.htlDisplayBlock-owlCarousel .owl-next {
+    right: 1px;
+}
+
+.htlDisplayBlock-owlCarousel .hotelBlockBox {
+    width: 66%;
+}
+
+.htlDisplayBlock-owlCarousel .hotelBlockInfo {
+    width: 32%;
+    background-color: #F5F5F5;
+    padding: 40px;
+}

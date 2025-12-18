@@ -88,6 +88,50 @@ class HotelReservationSystem extends Module
 
     }
 
+    public function hookDisplayHome()
+    {
+        $this->context->controller->addCSS(_PS_JS_DIR_.'owl-carousel/assets/owl.carousel.min.css');
+        $this->context->controller->addCSS(_PS_JS_DIR_.'owl-carousel/assets/owl.theme.default.min.css');
+        $this->context->controller->addJS(_PS_JS_DIR_.'owl-carousel/owl.carousel.min.js');
+        $this->context->controller->addJS($this->_path.'/views/js/HotelReservationFront.js');
+
+        $HOTEL_BLOCK_DISPLAY_HEADING = Configuration::get('HOTEL_BLOCK_DISPLAY_HEADING', $this->context->language->id);
+        $HOTEL_BLOCK_DISPLAY_DESCRIPTION = Configuration::get('HOTEL_BLOCK_DISPLAY_DESCRIPTION', $this->context->language->id);
+
+        $objHotelDisplayBlock = new HotelDisplayBlock();
+        if ($hotelInfoData = $objHotelDisplayBlock->getHotelBlockData($this->context->language->id, true)) {
+            $hotelInfoData = array_column($hotelInfoData, null, 'id_hotel');
+            $defaultImageLink = $this->context->link->getImageLink(
+                '',
+                $this->context->language->iso_code."-default",
+                ImageType::getFormatedName('large')
+            );
+
+            $objHotelImage = new HotelImage();
+            foreach ($hotelInfoData as $idHotel => $hotelInfo) {
+                if ($hotelInfo['id_cover_image']) {
+                    $hotelInfoData[$idHotel]['image_link'] = $this->context->link->getMediaLink(
+                        $objHotelImage->getImageLink($hotelInfo['id_cover_image'], ImageType::getFormatedName('large'))
+                    );
+                } else {
+                    $hotelInfoData[$idHotel]['image_link'] = $defaultImageLink;
+                }
+            }
+        }
+
+        $this->context->smarty->assign(
+            array(
+                'HOTEL_BLOCK_DISPLAY_HEADING' => $HOTEL_BLOCK_DISPLAY_HEADING,
+                'HOTEL_BLOCK_DISPLAY_DESCRIPTION' => $HOTEL_BLOCK_DISPLAY_DESCRIPTION,
+                'hotelInfoData' => $hotelInfoData,
+            )
+        );
+
+        return $this->display(__FILE__, 'hotelInfoBlock.tpl');
+    }
+
+
+
     public function hookDisplayNav()
     {
         $this->smarty->assign(array(
@@ -566,12 +610,14 @@ class HotelReservationSystem extends Module
         $this->installTab('AdminRoomTypeGlobalDemand', 'Additional Demand Configuration', 'AdminHotelConfigurationSetting', false);
         $this->installTab('AdminBookingDocument', 'Booking Documents', false, false);
 
+        $this->installTab('AdminHotelDisplay', 'Display Hotel Block', false, false);
+
         return true;
     }
 
     public function installTab($class_name, $tab_name, $tab_parent_name = false, $need_tab = true)
     {
-        $tab = new Tab();
+        $tab = new Tab((int) Tab::getIdFromClassName($class_name));
         $tab->active = 1;
         $tab->class_name = $class_name;
         $tab->name = array();
@@ -648,6 +694,7 @@ class HotelReservationSystem extends Module
                 'actionCartSummary',
                 'actionFrontControllerSetMedia',
                 'displayNav',
+                'displayHome',
                 'displayExternalNavigationHook',
             )
         );

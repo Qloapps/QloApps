@@ -1105,9 +1105,32 @@ class HotelHelper
             'ru' => 'фут',
             'es' => 'ft',
         );
+
+       $hotelBlockHeading = array(
+            'en' => 'Hotel',
+            'nl' => 'Hotel',
+            'fr' => 'Hôtel',
+            'de' => 'Hotel',
+            'ru' => 'Отель',
+            'es' => 'Hotel',
+        );
+
+
+        $hotelBlockDescription = array(
+            'en' => 'Experience a warm welcome at our hotel, where comfort meets convenience. With thoughtfully designed spaces, modern facilities, and attentive service, we ensure a memorable and relaxing stay.',
+            'nl' => 'Ervaar een warm welkom in ons hotel, waar comfort en gemak samenkomen. Met zorgvuldig ontworpen ruimtes, moderne faciliteiten en attente service zorgen wij voor een onvergetelijk en ontspannen verblijf.',
+            'fr' => 'Découvrez un accueil chaleureux dans notre hôtel, où le confort rencontre la praticité. Avec des espaces soigneusement conçus, des installations modernes et un service attentionné, nous vous garantissons un séjour mémorable et relaxant.',
+            'de' => 'Erleben Sie einen herzlichen Empfang in unserem Hotel, wo Komfort auf Bequemlichkeit trifft. Mit durchdacht gestalteten Räumen, modernen Einrichtungen und aufmerksamem Service sorgen wir für einen unvergesslichen und erholsamen Aufenthalt.',
+            'ru' => 'Ощутите тёплый приём в нашем отеле, где комфорт сочетается с удобством. Продуманные интерьеры, современные удобства и внимательный сервис обеспечат вам незабываемое и спокойное пребывание.',
+            'es' => 'Disfrute de una cálida bienvenida en nuestro hotel, donde el confort se une a la comodidad. Con espacios cuidadosamente diseñados, instalaciones modernas y un servicio atento, garantizamos una estancia memorable y relajante.',
+        );
+
         $WK_HTL_CHAIN_NAME = array();
         $WK_HTL_TAG_LINE = array();
         $WK_HTL_SHORT_DESC = array();
+        $HOTEL_BLOCK_DISPLAY_HEADING = array();
+        $HOTEL_BLOCK_DISPLAY_DESCRIPTION = array();
+
         $defaultDimensionUnit = array();
         foreach ($languages as $lang) {
             if (isset($htlTagLineLang[$lang['iso_code']])) {
@@ -1115,13 +1138,21 @@ class HotelHelper
                 $WK_HTL_SHORT_DESC[$lang['id_lang']] = $htlShortDescLang[$lang['iso_code']];
                 $WK_HTL_CHAIN_NAME[$lang['id_lang']] = $homeBannerTitleLang[$lang['iso_code']];
                 $defaultDimensionUnit[$lang['id_lang']] = $defaultDimensionUnitLang[$lang['iso_code']];
+                $HOTEL_BLOCK_DISPLAY_HEADING[$lang['id_lang']] = $hotelBlockHeading[$lang['iso_code']];
+                $HOTEL_BLOCK_DISPLAY_DESCRIPTION[$lang['id_lang']] = $hotelBlockDescription[$lang['iso_code']];
             } else {
+                $HOTEL_BLOCK_DISPLAY_HEADING[$lang['id_lang']] = $hotelBlockHeading['en'];
+                $HOTEL_BLOCK_DISPLAY_DESCRIPTION[$lang['id_lang']] = $hotelBlockDescription['en'];
                 $defaultDimensionUnit[$lang['id_lang']] = $defaultDimensionUnitLang['en'];
                 $WK_HTL_CHAIN_NAME[$lang['id_lang']] = $homeBannerTitleLang['en'];
                 $WK_HTL_TAG_LINE[$lang['id_lang']] = $htlTagLineLang['en'];
                 $WK_HTL_SHORT_DESC[$lang['id_lang']] = $htlShortDescLang['en'];
             }
         }
+
+        // update global configuration values in multilang
+        Configuration::updateValue('HOTEL_BLOCK_DISPLAY_HEADING', $HOTEL_BLOCK_DISPLAY_HEADING);
+        Configuration::updateValue('HOTEL_BLOCK_DISPLAY_DESCRIPTION', $HOTEL_BLOCK_DISPLAY_DESCRIPTION);
 
         Configuration::updateValue('WK_HTL_CHAIN_NAME', $WK_HTL_CHAIN_NAME);
         Configuration::updateValue('WK_HTL_TAG_LINE', $WK_HTL_TAG_LINE);
