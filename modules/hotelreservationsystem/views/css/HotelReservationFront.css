@@ -87,6 +87,12 @@
         flex-direction: row-reverse;
         justify-content: space-between;
     }
+    .htlDisplayBlock-owlCarousel .hotelBlockInfo {
+        width: 32%;
+    }
+    .htlDisplayBlock-owlCarousel .hotelBlockBox {
+        width: 66%;
+    }
 }
 
 a.hotel_block_view_hotel {
@@ -100,19 +106,7 @@ a.hotel_block_view_hotel {
     text-transform: capitalize;
     margin-top: 20px;
 }
-.htlDisplayBlock-owlCarousel .owl-prev {
-    left: 1px;
-}
-.htlDisplayBlock-owlCarousel .owl-next {
-    right: 1px;
-}
-
-.htlDisplayBlock-owlCarousel .hotelBlockBox {
-    width: 66%;
-}
-
 .htlDisplayBlock-owlCarousel .hotelBlockInfo {
-    width: 32%;
     background-color: #F5F5F5;
     padding: 40px;
 }
