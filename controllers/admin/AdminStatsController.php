@@ -1625,8 +1625,8 @@ class AdminStatsControllerCore extends AdminStatsTabController
         LEFT JOIN `'._DB_PREFIX_.'orders` o ON (o.`id_order` = hbd.`id_order`)
         LEFT JOIN `'._DB_PREFIX_.'customer` c ON (c.`id_customer` = hbd.`id_customer`)
         WHERE hbd.`is_refunded` = 0
-        AND (hbd.`id_status` = '.(int) HotelBookingDetail::STATUS_CHECKED_IN.'
-        OR (hbd.`id_status` = '.(int) HotelBookingDetail::STATUS_CHECKED_OUT.' AND hbd.`check_out` > "'.pSQL(date('Y-m-d')).' 00:00:00"))
+        AND hbd.`id_status` = '.(int) HotelBookingDetail::STATUS_CHECKED_IN.'
+        AND hbd.`id_status` != '.(int) HotelBookingDetail::STATUS_CHECKED_OUT.'
         AND hbd.`date_to` != "'.pSQL(date('Y-m-d')).' 00:00:00"'.
         (!is_null($idHotel) ? HotelBranchInformation::addHotelRestriction($idHotel, 'hbd') : '');
         $result = Db::getInstance()->executeS($sql);
