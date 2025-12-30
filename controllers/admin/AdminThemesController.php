@@ -1206,8 +1206,14 @@ class AdminThemesControllerCore extends AdminController
 		');
 
         foreach ($hook_list as &$row) {
+<<<<<<< HEAD
             $exception = $row['exceptions'] ? $row['exceptions'] : '';
             $row['exceptions'] = trim(preg_replace('/(,,+)/', ',', $exception), ',');
+=======
+            if($row['exceptions']){
+                $row['exceptions'] = trim(preg_replace('/(,,+)/', ',', $row['exceptions']), ',');
+            }
+>>>>>>> 7a5087a68 (Fixed: add condition to check variable value)
         }
 
         $native_modules = $this->getNativeModule();
