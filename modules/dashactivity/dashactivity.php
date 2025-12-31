@@ -532,12 +532,13 @@ class Dashactivity extends Module
 
     public function getConfigFieldsValues()
     {
+        $priceDisplayPrecision = (int)Configuration::get('PS_PRICE_DISPLAY_PRECISION');
         return array(
             'DASHACTIVITY_CART_ACTIVE' => Tools::getValue('DASHACTIVITY_CART_ACTIVE', Configuration::get('DASHACTIVITY_CART_ACTIVE')),
             'DASHACTIVITY_CART_ABANDONED_MIN' => Tools::getValue('DASHACTIVITY_CART_ABANDONED_MIN', Configuration::get('DASHACTIVITY_CART_ABANDONED_MIN')),
             'DASHACTIVITY_CART_ABANDONED_MAX' => Tools::getValue('DASHACTIVITY_CART_ABANDONED_MAX', Configuration::get('DASHACTIVITY_CART_ABANDONED_MAX')),
             'DASHACTIVITY_VISITOR_ONLINE' => Tools::getValue('DASHACTIVITY_VISITOR_ONLINE', Configuration::get('DASHACTIVITY_VISITOR_ONLINE')),
-            'min_due_amount' => ('0.' . str_repeat('0', (Configuration::get('PS_PRICE_DISPLAY_PRECISION') - 1)) . '1')
+            'min_due_amount' => ('0.' . ($priceDisplayPrecision ? str_repeat('0', ($priceDisplayPrecision - 1)) : '') . '1')
         );
     }
 
