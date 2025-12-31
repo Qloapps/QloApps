@@ -1197,30 +1197,28 @@ class AdminCartsControllerCore extends AdminController
                 $objProduct = new Product();
                 $hotelServiceProducts = $objProduct->getServiceProducts(true, Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE);
                 $roomTypeServiceProducts = $objProduct->getServiceProducts(true, Product::SELLING_PREFERENCE_WITH_ROOM_TYPE);
-                $serviceProducts = array_merge($roomTypeServiceProducts, $hotelServiceProducts);
+                if ($serviceProducts = array_merge($roomTypeServiceProducts, $hotelServiceProducts)) {
+                    foreach ($serviceProducts as $key => $servProduct) {
+                        $numDays = 1;
+                        if (Product::PRICE_CALCULATION_METHOD_PER_DAY == $servProduct['price_calculation_method']) {
+                            $numDays = HotelHelper::getNumberOfDays($dateFrom, $dateTo);
+                        }
+                        $serviceProducts[$key]['price_tax_exc'] = Product::getServiceProductPrice(
+                            $servProduct['id_product'],
+                            0,
+                            0,
+                            $idProduct,
+                            false,
+                            1,
+                            $dateFrom,
+                            $dateTo,
+                            $idCart
+                        )/$numDays;
+                    }
+                }
             } else {
                 $objRoomTypeServiceProduct = new RoomTypeServiceProduct();
                 $serviceProducts = $objRoomTypeServiceProduct->getServiceProductsData($idProduct, 1, 0, false, 2, null);
-            }
-
-            if ($serviceProducts) {
-                foreach ($serviceProducts as $key => $servProduct) {
-                    $numDays = 1;
-                    if (Product::PRICE_CALCULATION_METHOD_PER_DAY == $servProduct['price_calculation_method']) {
-                        $numDays = HotelHelper::getNumberOfDays($dateFrom, $dateTo);
-                    }
-                    $serviceProducts[$key]['price_tax_exc'] = Product::getServiceProductPrice(
-                        $servProduct['id_product'],
-                        0,
-                        0,
-                        $idProduct,
-                        false,
-                        1,
-                        $dateFrom,
-                        $dateTo,
-                        $idCart
-                    )/$numDays;
-                }
             }
 
             $objServiceProductCartDetail = new ServiceProductCartDetail();
@@ -1526,30 +1524,28 @@ class AdminCartsControllerCore extends AdminController
                 $objProduct = new Product();
                 $hotelServiceProducts = $objProduct->getServiceProducts(true, Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE);
                 $roomTypeServiceProducts = $objProduct->getServiceProducts(true, Product::SELLING_PREFERENCE_WITH_ROOM_TYPE);
-                $serviceProducts = array_merge($roomTypeServiceProducts, $hotelServiceProducts);
+                if ($serviceProducts = array_merge($roomTypeServiceProducts, $hotelServiceProducts)) {
+                    foreach ($serviceProducts as $key => $servProduct) {
+                        $numDays = 1;
+                        if (Product::PRICE_CALCULATION_METHOD_PER_DAY == $servProduct['price_calculation_method']) {
+                            $numDays = HotelHelper::getNumberOfDays($objCartBookingData->date_from, $objCartBookingData->date_to);
+                        }
+                        $serviceProducts[$key]['price_tax_exc'] = Product::getServiceProductPrice(
+                            $servProduct['id_product'],
+                            0,
+                            0,
+                            $objCartBookingData->id_product,
+                            false,
+                            1,
+                            $objCartBookingData->date_from,
+                            $objCartBookingData->date_to,
+                            $objCartBookingData->id_cart
+                        )/$numDays;
+                    }
+                }
             } else {
                 $objRoomTypeServiceProduct = new RoomTypeServiceProduct();
                 $serviceProducts = $objRoomTypeServiceProduct->getServiceProductsData($objCartBookingData->id_product, 1, 0, false, 2, null);
-            }
-
-            if ($serviceProducts) {
-                foreach ($serviceProducts as $key => $servProduct) {
-                    $numDays = 1;
-                    if (Product::PRICE_CALCULATION_METHOD_PER_DAY == $servProduct['price_calculation_method']) {
-                        $numDays = HotelHelper::getNumberOfDays($objCartBookingData->date_from, $objCartBookingData->date_to);
-                    }
-                    $serviceProducts[$key]['price_tax_exc'] = Product::getServiceProductPrice(
-                        $servProduct['id_product'],
-                        0,
-                        0,
-                        $objCartBookingData->id_product,
-                        false,
-                        1,
-                        $objCartBookingData->date_from,
-                        $objCartBookingData->date_to,
-                        $objCartBookingData->id_cart
-                    )/$numDays;
-                }
             }
 
             $objServiceProductCartDetail = new ServiceProductCartDetail();
