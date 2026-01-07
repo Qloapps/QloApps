@@ -64,14 +64,20 @@ class WkTestimonialBlock extends Module
             $this->context->language->id
         );
 
+        Media::addJsDef([
+            'HOTEL_TESIMONIAL_BLOCK_NAV_TYPE' => Configuration::get('HOTEL_TESIMONIAL_BLOCK_NAV_TYPE'),
+            'SLIDER_NAV_TYPE_DOTS' => HotelHelper::SLIDER_NAV_TYPE_DOTS,
+            'SLIDER_NAV_TYPE_BUTTON' => HotelHelper::SLIDER_NAV_TYPE_BUTTON,
+        ]);
+
         $objTestimonialData = new WkHotelTestimonialData();
         $testimonialsData = $objTestimonialData->getTestimonialData(1);
         foreach($testimonialsData as &$testimonials) {
-            $imgUrl = $this->context->link->getMediaLink(_MODULE_DIR_.$this->name.'/views/img/hotels_testimonials_img/'.$testimonials['id_testimonial_block'].'.jpg');
+            $imgUrl = $this->context->link->getMediaLink($this->getPathUri().'/views/img/hotels_testimonials_img/'.$testimonials['id_testimonial_block'].'.jpg');
             if ((bool)Tools::file_get_contents($imgUrl)) {
                 $testimonials['img_url'] = $imgUrl;
             } else {
-                $testimonials['img_url'] = $this->context->link->getMediaLink(_MODULE_DIR_.$this->name.'/views/img/default-user.jpg');
+                $testimonials['img_url'] = $this->context->link->getMediaLink($this->getPathUri().'/views/img/default-user.jpg');
             }
         }
 

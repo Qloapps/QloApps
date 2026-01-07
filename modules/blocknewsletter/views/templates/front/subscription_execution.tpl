@@ -21,8 +21,8 @@
  *}
 
 {if isset($message_type) && isset($message)}
-    <p class="alert {if $message_type == 'success'}alert-success{elseif $message_type == 'error'}alert-danger{/if} alert-dismissable">
+    <span class="alert {if $message_type == 'success'}alert-success{elseif $message_type == 'error'}alert-danger{/if} alert-dismissable d-block mb-2">
         {$message}
         <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-    </p>
+    </span>
 {/if}

@@ -21,18 +21,18 @@
 *}
 
 {if ($email != '') || ($phone != '')}
-    <ul class="nav nav-pills nav-stacked visible-xs wk-nav-style">
+    <ul class="nav d-block d-md-none">
         {if $email != ''}
             <li>
-                <a href="mailto:{$email}">
-                    <i class="icon-envelope-o"></i>
+                <a class="navigation-link" href="mailto:{$email}">
+                    <i class="icon-regular icon-envelope"></i>
                     {$email}
                 </a>
             </li>
         {/if}
         {if $phone != ''}
             <li>
-                <a href="tel:{$phone}">
+                <a class="navigation-link" href="tel:{$phone}">
                     <i class="icon-phone"></i>
                     {$phone}
                 </a>

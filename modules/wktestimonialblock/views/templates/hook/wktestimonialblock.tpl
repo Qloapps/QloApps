@@ -22,51 +22,60 @@
 
 {block name='testimonial_block'}
     {if isset($testimonials_data) && $testimonials_data}
-        <div id="hotelTestimonialBlock" class="row home_block_container">
-            <div class="col-xs-12 col-sm-12">
-                {if $HOTEL_TESIMONIAL_BLOCK_HEADING && $HOTEL_TESIMONIAL_BLOCK_CONTENT}
-                    <div class="row home_block_desc_wrapper">
-                        <div class="col-md-offset-1 col-md-10 col-lg-offset-2 col-lg-8">
-                            {block name='testimonial_block_heading'}
-                                <p class="home_block_heading">{$HOTEL_TESIMONIAL_BLOCK_HEADING|escape:'htmlall':'UTF-8'}</p>
-                            {/block}
-                            {block name='testimonial_block_description'}
-                                <p class="home_block_description">{$HOTEL_TESIMONIAL_BLOCK_CONTENT|escape:'htmlall':'UTF-8'}</p>
-                            {/block}
-                            <hr class="home_block_desc_line"/>
-                        </div>
-                    </div>
-                {/if}
-                {block name='testimonial_block_content'}
-                    <div class="row home_block_content htlTestemonial-owlCarousel">
-                        <div class="col-sm-12 col-xs-12">
-                            <div class="owl-carousel">
-                                {foreach $testimonials_data as $tesimonial}
-                                    <div class="row">
-                                        <div class='col-xs-4 col-sm-offset-1 col-sm-2'>
-                                            <img src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/icon-double-codes.png" class="img-responsive">
-                                        </div>
-                                        <div class='col-xs-12 col-sm-7'>
-                                            <div class="row">
-                                                <div class="col-sm-12 testimonialContentContainer">
-                                                    <p class="testimonialContentText">{$tesimonial.testimonial_content|escape:'htmlall':'UTF-8'}</p>
-                                                </div>
-                                            </div>
-                                            <div class="row">
-                                                <div class="col-sm-12 testimonialPersonDetail">
-                                                    <img width="60px" src="{$tesimonial.img_url}" class="testimonialPersonImg">
-                                                    <p class="testimonialPersonName">{$tesimonial.name|escape:'htmlall':'UTF-8'}</p>
-                                                    <p class="testimonialPersonDesig">{$tesimonial.designation|escape:'htmlall':'UTF-8'}</p>
-                                                </div>
-                                            </div>
-                                        </div>
+        <div class="container">
+            <div id="hotelTestimonialBlock" class="home_block_container">
+                <div class="col-12">
+                    {if $HOTEL_TESIMONIAL_BLOCK_HEADING && $HOTEL_TESIMONIAL_BLOCK_CONTENT}
+                        <div class="home_block_desc_wrapper">
+                            <div>
+                                {block name='testimonial_block_heading'}
+                                    <p class="home_block_heading">{$HOTEL_TESIMONIAL_BLOCK_HEADING|escape:'htmlall':'UTF-8'}</p>
+                                {/block}
+                                {block name='testimonial_block_description'}
+                                    <div class="block_description">
+                                        {$HOTEL_TESIMONIAL_BLOCK_CONTENT|escape:'htmlall':'UTF-8'}
+                                        <hr class="block_desc_line"/>
                                     </div>
-                                {/foreach}
+                                {/block}
                             </div>
                         </div>
-                    </div>
-                {/block}
+                    {/if}
+                    {block name='testimonial_block_content'}
+                        <div class="home_block_content htlTestemonial-owlCarousel container">
+                            <div class="testimonial_container">
+                                <div class="testimonial_cards_container">
+                                    <div class="owl-carousel owl-theme owl-loaded">
+                                        {foreach $testimonials_data as $tesimonial}
+                                            <div class="col-12">
+                                                <div class="col-12 testimonial_card">
+                                                    <div class="row pt-4">
+                                                        <div class="testimonial_content col-12">
+                                                            <div class="testimonial_content_quote">
+                                                                <img src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/icon-double-codes.png" class="img-responsive">
+                                                            </div>
+                                                            <div class="testimonial_content_comment">{$tesimonial.testimonial_content|escape:'htmlall':'UTF-8'|truncate:270:"...":true}</div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row col-12 testimonial_card_user_info">
+                                                        <div class="testimonial_card_user_icon">
+                                                            <span class="btn-secondary">{$tesimonial.name|escape:'htmlall':'UTF-8'|truncate:1:"":true}</span>
+                                                        </div>
+                                                        <div class="testimonialPersonDetail">
+                                                            <div class="testimonialPersonName">{$tesimonial.name|escape:'htmlall':'UTF-8'}</div>
+                                                            <div class="testimonialPersonDesig">{$tesimonial.designation|escape:'htmlall':'UTF-8'}</div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        {/foreach}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {/block}
+                </div>
             </div>
         </div>
+        <hr class="block_seperator"/>
     {/if}
 {/block}

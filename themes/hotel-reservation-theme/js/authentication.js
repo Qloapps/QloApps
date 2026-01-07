@@ -24,10 +24,10 @@
 */
 
 $(document).ready(function() {
-	$(document).on('click', '#SubmitCreate', function(e) {
-		e.preventDefault();
-		submitFunction('SubmitCreate');
-	});
+	// $(document).on('click', '#SubmitCreate', function(e) {
+	// 	e.preventDefault();
+	// 	submitFunction('SubmitCreate');
+	// });
 
 	$(document).on('click', '.btn-transform', function(e) {
 		e.preventDefault();
@@ -36,85 +36,85 @@ $(document).ready(function() {
 	$('.is_customer_param').hide();
 });
 
-function submitFunction(submitAction) {
-	$('#create_account_error').html('').hide();
-	var data = {
-		controller: 'authentication',
-		ajax: true,
-		email_create: $('#email_create').val(), // for login page
-		email: $('#email').val(), // for personal info page
-		back: $('input[name=back]').val(),
-		token: token
-	};
-	data[submitAction] = 1;
+// function submitFunction(submitAction) {
+// 	$('#create_account_error').html('').hide();
+// 	var data = {
+// 		controller: 'authentication',
+// 		ajax: true,
+// 		email_create: $('#email_create').val(), // for login page
+// 		email: $('#email').val(), // for personal info page
+// 		back: $('input[name=back]').val(),
+// 		token: token
+// 	};
+// 	data[submitAction] = 1;
 
-	$.ajax({
-		type: 'POST',
-		url: baseUri + '?rand=' + new Date().getTime(),
-		async: true,
-		cache: false,
-		dataType : "json",
-		headers: { "cache-control": "no-cache" },
-		data: data,
-		success: function(jsonData) {
-			// display confirmations
-			if (jsonData.hasConfirmation) {
-				if (in_array('TRANSFORM_OK', jsonData.confirmations)) {
-					window.location = jsonData.ajaxExtraData.redirect_link
-				}
-				return;
-			}
-			if (jsonData.hasInformation) {
-				var informations = '';
-				for(information in jsonData.informations) {
-					//IE6 bug fix
-					if(information != 'indexOf') {
-						informations += '<li>' + jsonData.informations[information] + '</li>';
-					}
-				}
-				$('#create_account_information').html('<ol>' + informations + '</ol>').show();
-				return;
-			}
-			if (jsonData.hasError) {
-				var errors = '';
-				for(error in jsonData.errors) {
-					//IE6 bug fix
-					if(error != 'indexOf') {
-						errors += '<li>' + jsonData.errors[error] + '</li>';
-					}
-				}
-				$('#create_account_error').html('<ol>' + errors + '</ol>').show();
-			} else {
-				// adding a div to display a transition
-				$('#center_column').html('<div id="noSlide">' + $('#center_column').html() + '</div>');
-				$('#noSlide').fadeOut('slow', function() {
-					$('#noSlide').html(jsonData.page);
-					$(this).fadeIn('slow', function() {
-						if (typeof bindUniform !=='undefined') {
-							bindUniform();
-						}
-						if (typeof bindStateInputAndUpdate !=='undefined') {
-							bindStateInputAndUpdate();
-						}
-						document.location = '#account-creation';
-					});
-				});
-			}
-		},
-		error: function(XMLHttpRequest, textStatus, errorThrown) {
-			error = "TECHNICAL ERROR: unable to load form.\n\nDetails:\nError thrown: " + XMLHttpRequest + "\n" + 'Text status: ' + textStatus;
-			if (!!$.prototype.fancybox) {
-				$.fancybox.open([{
-					type: 'inline',
-					autoScale: true,
-					minHeight: 30,
-					content: "<p class='fancybox-error'>" + error + '</p>'
-				}], {
-					padding: 0
-				});
-			} else {
-				alert(error);
-			}
-		}
-	});
-}
+// 	$.ajax({
+// 		type: 'POST',
+// 		url: baseUri + '?rand=' + new Date().getTime(),
+// 		async: true,
+// 		cache: false,
+// 		dataType : "json",
+// 		headers: { "cache-control": "no-cache" },
+// 		data: data,
+// 		success: function(jsonData) {
+// 			// display confirmations
+// 			if (jsonData.hasConfirmation) {
+// 				if (in_array('TRANSFORM_OK', jsonData.confirmations)) {
+// 					window.location = jsonData.ajaxExtraData.redirect_link
+// 				}
+// 				return;
+// 			}
+// 			if (jsonData.hasInformation) {
+// 				var informations = '';
+// 				for(information in jsonData.informations) {
+// 					//IE6 bug fix
+// 					if(information != 'indexOf') {
+// 						informations += '<li>' + jsonData.informations[information] + '</li>';
+// 					}
+// 				}
+// 				$('#create_account_information').html('<ol>' + informations + '</ol>').show();
+// 				return;
+// 			}
+// 			if (jsonData.hasError) {
+// 				var errors = '';
+// 				for(error in jsonData.errors) {
+// 					//IE6 bug fix
+// 					if(error != 'indexOf') {
+// 						errors += '<li>' + jsonData.errors[error] + '</li>';
+// 					}
+// 				}
+// 				$('#create_account_error').html('<ol>' + errors + '</ol>').show();
+// 			} else {
+// 				// adding a div to display a transition
+// 				$('#center_column').html('<div id="noSlide">' + $('#center_column').html() + '</div>');
+// 				$('#noSlide').fadeOut('slow', function() {
+// 					$('#noSlide').html(jsonData.page);
+// 					$(this).fadeIn('slow', function() {
+// 						if (typeof bindUniform !=='undefined') {
+// 							bindUniform();
+// 						}
+// 						if (typeof bindStateInputAndUpdate !=='undefined') {
+// 							bindStateInputAndUpdate();
+// 						}
+// 						document.location = '#account-creation';
+// 					});
+// 				});
+// 			}
+// 		},
+// 		error: function(XMLHttpRequest, textStatus, errorThrown) {
+// 			error = "TECHNICAL ERROR: unable to load form.\n\nDetails:\nError thrown: " + XMLHttpRequest + "\n" + 'Text status: ' + textStatus;
+// 			if (!!$.prototype.fancybox) {
+// 				$.fancybox.open([{
+// 					type: 'inline',
+// 					autoScale: true,
+// 					minHeight: 30,
+// 					content: "<p class='fancybox-error'>" + error + '</p>'
+// 				}], {
+// 					padding: 0
+// 				});
+// 			} else {
+// 				alert(error);
+// 			}
+// 		}
+// 	});
+// }

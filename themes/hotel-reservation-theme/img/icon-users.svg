@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="17px" viewBox="0 0 20 17" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 51.3 (57544) - http://www.bohemiancoding.com/sketch -->
+    <title>icon-users</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" stroke-linecap="round" stroke-linejoin="round">
+        <g id="Occupancy-Wise-Search-1" transform="translate(-364.000000, -521.000000)" stroke="#000000" stroke-width="1.5">
+            <g id="hero">
+                <g id="search" transform="translate(319.000000, 170.000000)">
+                    <g id="all-actionables-[20v]" transform="translate(30.000000, 108.000000)">
+                        <g id="guests-occupancy" transform="translate(0.000000, 225.000000)">
+                            <g id="icon-users" transform="translate(16.000000, 19.000000)">
+                                <path d="M13.0909091,14.7272727 L13.0909091,13.0909091 C13.0909091,11.2834317 11.6256592,9.81818182 9.81818182,9.81818182 L3.27272727,9.81818182 C1.46524991,9.81818182 1.81672859e-16,11.2834317 0,13.0909091 L0,14.7272727" id="Shape"></path>
+                                <circle id="Oval" cx="6.54545455" cy="3.27272727" r="3.27272727"></circle>
+                                <path d="M18,14.7272727 L18,13.0909091 C17.9988875,11.59946 16.9895445,10.2974074 15.5454545,9.92454545" id="Shape"></path>
+                                <path d="M12.2727273,0.106363636 C13.7208394,0.477138917 14.7336899,1.78199276 14.7336899,3.27681818 C14.7336899,4.77164361 13.7208394,6.07649745 12.2727273,6.44727273" id="Shape"></path>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

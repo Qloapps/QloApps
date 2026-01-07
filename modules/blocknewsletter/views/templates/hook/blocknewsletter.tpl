@@ -25,29 +25,30 @@
 
 <!-- Block Newsletter module-->
 <div class="row">
-    <section class="col-xs-12 col-sm-12" id="blocknewsletter">
-        <div class="row margin-lr-0 footer-section-heading">
-            <p>{l s='GET NOTIFICATIONS' mod='blocknewsletter'}</p>
-            <hr/>
+    <section class="col-sm-12" id="blocknewsletter">
+        <div class="d-flex footer-section-item footer-section-heading">
+            <span>{l s='GET NOTIFICATIONS' mod='blocknewsletter'}</span>
         </div>
-        <div class="row margin-lr-0">
+        <div class="d-flex footer-section-item">
             <form action="{$link->getModuleLink('newsletter', 'subscription')|escape:'html':'UTF-8'}" method="post">
-                <div class="form-group">
+                <div>
                     <input type="hidden" name="ajax" value="1" />
                     <input type="hidden" name="action" value="SubscribeNewsletter" />
                     <input type="hidden" name="token" value="{$csrf_token}" />
                     <input type="hidden" name="newsletter_action" value="0" />
-                    <input type="text" class="inputNew form-control newsletter-input" id="newsletter-input" name="email" placeholder="{l s='Your email address' mod='blocknewsletter'}" />
+                    <input type="text" class="inputNew form-control mb-2 newsletter-input" id="newsletter-input" name="email" placeholder="{l s='Your email address' mod='blocknewsletter'}" />
                     <div class="message-block" style="display: none;"></div>
                     {* Hook added for GDPR *}
                     {if isset($id_module)}
                         {hook h='displayGDPRConsent' id_module=$id_module}
                     {/if}
                     {hook h='displayNewsletterFormFieldsAfter'}
-                    <button type="submit" name="submitNewsletter" class="btn button button-medium newsletter-btn">
-                        <span>{l s='Subscribe' mod='blocknewsletter'}</span>
-                    </button>
-                    <span class="loader loading" style="display: none;"></span>
+                    <div class="blocknewsletter_actions">
+                        <button type="submit" name="submitNewsletter" class="btn btn-primary newsletter-btn">
+                            <span>{l s='Subscribe' mod='blocknewsletter'}</span>
+                        </button>
+                        <span class="spinner spinner-small spinner-secondary spinner-width-4" style="display: none;"></span>
+                    </div>
                 </div>
             </form>
         </div>

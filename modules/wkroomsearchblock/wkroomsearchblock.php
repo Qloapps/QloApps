@@ -55,7 +55,6 @@ class WkRoomSearchBlock extends Module
             $hotelBranchesInfo = $objHotelBranchInformation->hotelBranchesInfo(0, 1);
             if (is_array($hotelBranchesInfo) && count($hotelBranchesInfo)) {
                 $this->context->controller->addJS(_PS_JS_DIR_.'jquery/plugins/jquery.chosen.js');
-                $this->context->controller->addCSS($this->_path.'/views/css/chosen.css');
 
                 $this->context->controller->addJS($this->_path.'/views/js/wk-room-search-block.js');
 
@@ -97,13 +96,7 @@ class WkRoomSearchBlock extends Module
                 );
             }
         }
-
-        // apply assets as per pages
-        if ('product' == $controller) {
-            $this->context->controller->addJS($this->_path.'views/js/wk-roomtype-search.js');
-        }
     }
-
 
     // search panel block on the landing page
     public function hookDisplayAfterHookTop($params)
@@ -112,7 +105,12 @@ class WkRoomSearchBlock extends Module
             $objSearchHelper = new WkRoomSearchHelper();
             $objSearchHelper->assignSearchPanelVariables();
             return $this->display(__FILE__, 'landingPageSearch.tpl');
-        } elseif ('product' == Tools::getValue('controller')) {
+        }
+    }
+
+    public function hookDisplayRoomTypeDetailRoomTypeNameBlock($params)
+    {
+        if ('product' == Tools::getValue('controller')) {
             $objSearchHelper = new WkRoomSearchHelper();
             $objSearchHelper->assignSearchPanelVariables();
             return $this->display(__FILE__, 'roomTypePageSearch.tpl');
@@ -128,8 +126,15 @@ class WkRoomSearchBlock extends Module
         }
     }
 
+    public function hookDisplayFooterBefore($params)
+    {
+        if ('index' == Tools::getValue('controller')) {
+            return $this->display(__FILE__, 'searchModal.tpl');
+        }
+    }
+
     // search panel block on the category page on left block
-    public function hookDisplayLeftColumn()
+    public function hookDisplayTopColumn()
     {
         if ('category' == Tools::getValue('controller')) {
             $idCategory = Tools::getValue('id_category');
@@ -233,6 +238,9 @@ class WkRoomSearchBlock extends Module
                 'displayAfterHookTop',
                 'displayAfterHeaderHotelDesc',
                 'displayAddModuleSettingLink',
+                'displayFooterBefore', // for modal in the homepage
+                'displayRoomTypeDetailRoomTypeNameBlock',// for room type page
+                'displayTopColumn'
             )
         );
     }

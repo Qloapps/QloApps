@@ -47,15 +47,10 @@ class BlockSocial extends Module
 
 	public function install()
 	{
+		// $objModuleDb = new BlockSocialLinks();
 		if (!parent::install()
-			|| !Configuration::updateValue('BLOCKSOCIAL_FACEBOOK', '')
-			|| !Configuration::updateValue('BLOCKSOCIAL_TWITTER', '')
-			|| !Configuration::updateValue('BLOCKSOCIAL_RSS', '')
-			|| !Configuration::updateValue('BLOCKSOCIAL_YOUTUBE', '')
-			|| !Configuration::updateValue('BLOCKSOCIAL_PINTEREST', '')
-			|| !Configuration::updateValue('BLOCKSOCIAL_VIMEO', '')
-			|| !Configuration::updateValue('BLOCKSOCIAL_INSTAGRAM', '')
-			|| !$this->registerHook('displayFooterMostLeftBlock')
+            // || !$objModuleDb->createTables()
+			|| !$this->registerHook('footer')
 		) {
 			return false;
 		}
@@ -100,7 +95,7 @@ class BlockSocial extends Module
 		return $output.$this->renderForm();
 	}
 
-	public function hookDisplayFooterMostLeftBlock()
+	public function hookFooter()
 	{
 		$this->smarty->assign(array(
 			'facebook_url' => Configuration::get('BLOCKSOCIAL_FACEBOOK'),

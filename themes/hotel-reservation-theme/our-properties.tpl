@@ -24,10 +24,10 @@
 {capture name=path}{l s='Our Properties'}{/capture}
 	{if isset($hotelsInfo) && $hotelsInfo}
 		{block name='our_properties_list_title'}
-			<div class="title-container">
+			<div class="title-container mt-5">
 				<h1 class="text-center our-properties-header">{l s='Our Properties'}</h1>
-				<div class="text-center our-properties-desc">
-					<p>{$WK_HTL_SHORT_DESC|escape:'html':'UTF-8'}</p>
+				<div class="text-center our-properties-desc mb-4">
+					<div>{$WK_HTL_SHORT_DESC|escape:'html':'UTF-8'}</div>
 				</div>
 			</div>
 		{/block}
@@ -39,7 +39,7 @@
 		{block name='our_properties_location'}
 			{if isset($hotelLocationArray) && $hotelLocationArray && isset($displayHotelMap) && $displayHotelMap}
 				<div class="margin-top-20 margin-btm-20">
-					<div class="col-xs-12 col-sm-12" id="googleMapWrapper">
+					<div class="col-12 col-sm-12" id="googleMapWrapper">
 						<div id="map"></div>
 					</div>
 				</div>
@@ -55,29 +55,31 @@
 			{hook h='displayPropertiesListBefore'}
 		{/block}
 
-		<div class="properties-page">
+		<div class="properties-page p-4">
 			{block name='our_properties_list'}
-				<div class="row hotels-container">
+				<div class="row col-12 hotels-container {if $hotelsInfo|count == 1}justify-content-center{/if} ">
 					{foreach $hotelsInfo as $hotel}
-						<div class="{if $hotelsInfo|count != 1}col-md-6 col-xs-12{else}col-md-6 col-md-offset-3{/if} margin-btm-30">
-							<div class="hotel-address-container">
-								<div class="col-xs-5">
-									<img class="htl-img" style="width:100%" src="{$hotel['image_url']}">
-								</div>
-								<div class="col-xs-7">
-									<p class="hotel-name"><span>{$hotel['hotel_name']}</span></p>
-									<p class="hotel-branch-info-value"><span class="htl-map-icon"></span>{$hotel['address']}, {$hotel['city']}, {if {$hotel['state_name']}}{$hotel['state_name']},{/if} {$hotel['country_name']}, {$hotel['postcode']}</p>
-									<p class="hotel-branch-info-value">
-										<span class="htl-address-icon htl-phone-icon"></span>{$hotel['phone']}
-									</p>
-									<p class="hotel-branch-info-value">
-										<span class="htl-address-icon htl-email-icon"></span>{$hotel['email']}
-									</p>
-									<div class="hotel-branch-info-actions">
-										<a href="{$hotel['view_rooms_link']}" target="_blank" class="btn btn-primary view_rooms_btn col-sm-6 col-xs-12">{l s='View Rooms'}</a>
-										{if ($hotel['latitude'] != 0 || $hotel['longitude'] != 0) && $viewOnMap}
-											<a class="btn htl-map-direction-btn col-sm-6 col-xs-12" href="http://maps.google.com/maps?daddr=({$hotel['latitude']},{$hotel['longitude']})" target="_blank">{l s='View on map'}</a>
-										{/if}
+						<div class="rounded-lg  mb-4 col-6">
+							<div class="card shadow-sm p-3">
+								<div class="hotel-address-container row ">
+									<div class="col-5">
+										<img class="max-width-200 rounded-sm" style="width:100%" src="{$hotel['image_url']}">
+									</div>
+									<div class="col-7 p-1">
+										<div class="hotel-name h9 mb-2"><span>{$hotel['hotel_name']}</span></div>
+										<div class="hotel-branch-info-value mb-2 small"><i class="icon-location-dot"></i> {$hotel['address']}, {$hotel['city']}, {if {$hotel['state_name']}}{$hotel['state_name']},{/if} {$hotel['country_name']}, {$hotel['postcode']}</div>
+										<div class="hotel-branch-info-value mb-2 small">
+											<i class="icon-solid icon-mobile-screen"></i> {$hotel['phone']}
+										</div>
+										<div class="hotel-branch-info-value mb-2 small">
+											<i class="icon-regular icon-envelope"></i> {$hotel['email']}
+										</div>
+										<div class="hotel-branch-info-actions">
+											<a href="{$hotel['view_rooms_link']}" target="_blank" class="btn btn-primary view_rooms_btn col-sm-6 col-12">{l s='View Rooms'}</a>
+											{if ($hotel['latitude'] != 0 || $hotel['longitude'] != 0) && $viewOnMap}
+												<a class="btn htl-map-direction-btn col-sm-6 col-12" href="http://maps.google.com/maps?daddr=({$hotel['latitude']},{$hotel['longitude']})" target="_blank">{l s='View on map'}</a>
+											{/if}
+										</div>
 									</div>
 								</div>
 							</div>
@@ -94,22 +96,22 @@
 				<form id="our-properties-list" method="post" action="{$currentPageUrl}">
 					<input type="hidden" value="" name="pagination" id="pagination"/>
 				</form>
-				<div class="row pagination-container">
+				<div class="d-flex pagination-container justify-content-center">
 					<ul class="pagination">
 						{if !isset($pagination[1])}
-							<li><a href="{$currentIndex}" data-pagination="1">1</a></li>
+							<li class="pagination-item"><a href="{$currentIndex}" data-pagination="1">1</a></li>
 							{if !isset($pagination[2])}
-								<li><span disabled>...</span></li>
+								<li class="pagination-item disabled"><span >...</span></li>
 							{/if}
 						{/if}
 						{foreach $pagination as $page}
-							<li><a href="{$currentIndex}" data-pagination="{$page}" {if $page == $currentPage}class="active"{/if}>{$page}</a></li>
+							<li class="pagination-item {if $page == $currentPage}active{/if}"><a href="{$currentIndex}" data-pagination="{$page}">{$page}</a></li>
 						{/foreach}
 						{if !isset($pagination[$pageLimit])}
 							{if !isset($pagination[$pageLimit-1])}
-								<li><span disabled>...</span></li>
+								<li class="pagination-item disabled"><span >...</span></li>
 							{/if}
-							<li><a href="{$currentIndex}" data-pagination="{$pageLimit}">{$pageLimit}</a></li>
+							<li class="pagination-item"><a href="{$currentIndex}" data-pagination="{$pageLimit}">{$pageLimit}</a></li>
 						{/if}
 					</ul>
 				</div>

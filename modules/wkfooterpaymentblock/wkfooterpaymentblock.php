@@ -51,18 +51,13 @@ class WkFooterPaymentBlock extends Module
         Tools::redirectAdmin($this->context->link->getAdminLink('AdminFooterPaymentBlockSetting'));
     }
 
-    public function hookFooter($params)
+    public function hookDisplayAfterDefautlFooterHook($params)
     {
         $objPaymentBlockInfo = new WkFooterPaymentBlockInfo();
         if ($allPaymentBlocks = $objPaymentBlockInfo->getAllPaymentBlocks(1, 'position')) {
             $this->context->smarty->assign('allPaymentBlocks', $allPaymentBlocks);
             return $this->display(__FILE__, 'wkFooterPaymentBlock.tpl');
         }
-    }
-
-    public function hookdisplayFooterPaymentInfo($params)
-    {
-        return $this->hookFooter($params);
     }
 
     public function callInstallTab()
@@ -100,7 +95,7 @@ class WkFooterPaymentBlock extends Module
         $objFooterPaymentBlockDb = new WkFooterPaymentBlockDb();
         if (!parent::install()
             || !$objFooterPaymentBlockDb->createTables()
-            ||!$this->registerHook('displayFooterPaymentInfo')
+            || !$this->registerHook('displayAfterDefautlFooterHook')
             || !$this->callInstallTab()
             || !$this->insertDefaultModuleData()
         ) {

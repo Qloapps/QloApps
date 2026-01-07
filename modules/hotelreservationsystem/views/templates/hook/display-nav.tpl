@@ -20,15 +20,19 @@
 * @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
 *}
 
-{if $email != ''}
-    <div class="contact-item">
-        <i class="icon-envelope-o"></i>
-        <a href="mailto:{$email}">{$email}</a>
-    </div>
-{/if}
-{if $phone != ''}
-    <div class="contact-item">
-        <i class="icon-phone"></i>
-        <a href="tel:{$phone}">{$phone}</a>
+{if $email != '' && $phone != ''}
+    <div class="header-nav">
+        {if $email != ''}
+            <div class="header-nav-item">
+                <i class="icon-regular icon-envelope"></i>
+                <a href="mailto:{$email}">{$email}</a>
+            </div>
+        {/if}
+        {if $phone != ''}
+            <div class="header-nav-item">
+                <i class="icon-phone"></i>
+                <a href="tel:{$phone}">{$phone}</a>
+            </div>
+        {/if}
     </div>
 {/if}

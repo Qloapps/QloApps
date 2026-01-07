@@ -20,29 +20,42 @@
 * @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
 */
 
-$(document).ready(function(){
-  	$('.htlInterior-owlCarousel .owl-carousel').owlCarousel({
-  		loop:true,
-	    nav:true,
-	    navSpeed:1000,
-	    navText:['<div class="nav-direction-wrapper"><div class="nav-direction-primary"><div class="nav-direction-secondary"><i class="icon-angle-left"></i></div></div></div>','<div class="nav-direction-wrapper"><div class="nav-direction-primary"><div class="nav-direction-secondary"><i class="icon-angle-right"></i></div></div></div>'],
-	    dots:false,
-	    items: 1,
-	    autoHeight:true,
-	    autoplay:true,
-	    autoplaySpeed:1000,
-	    autoplayTimeout:5000,
-		autoplayHoverPause:true,
-	    responsiveClass:true,
+$(document).ready(function () {
+	let prevBtn = $('<div>', { class: 'nav-direction-wrapper ' })
+		.append($('<div>', { class: 'nav-direction-primary' })
+			.append($('<div>', { class: 'nav-direction-secondary' }).append($('<i>', { class: 'icon-angle-left' }))
+		)
+	);
+	let nextBtn = $('<div>', { class: 'nav-direction-wrapper' })
+		.append($('<div>', { class: 'nav-direction-primary' })
+			.append($('<div>', { class: 'nav-direction-secondary' }).append($('<i>', { class: 'icon-angle-right' }))
+		)
+	);
+	$('.htlInterior-owlCarousel .owl-carousel').owlCarousel({
+		loop: true,
+		nav: (HOTEL_INTERIOR_NAV_TYPE == SLIDER_NAV_TYPE_BUTTON),
+		navSpeed: 1000,
+		navText: [prevBtn, nextBtn],
+		dots: (HOTEL_INTERIOR_NAV_TYPE == SLIDER_NAV_TYPE_DOTS),
+		items: 1,
+		autoHeight: true,
+		autoplay: true,
+		autoplaySpeed: 1000,
+		autoplayTimeout: 5000,
+		autoplayHoverPause: true,
+		responsiveClass: true,
 		rtl: language_is_rtl,
-	    responsive:{
-	        1200:{
-	            items:3
-	        },
-	        480:{
-	            items:2
-	        },
-	    }
+		padding: 10,
+		responsive: {
+			0: { items: 1 },
+			600: { items: 2 },
+			1000: { items: 4 }
+		},
+		onInitialized: function (event) {
+			var nav = $(event.target).find('.owl-nav');
+			nav.find('.owl-prev').attr('tabindex', '-1');
+            nav.find('.owl-next').attr('tabindex', '-1');
+		},
 	});
 
 	$('.interiorbox').on('mouseenter', function(){
@@ -52,7 +65,7 @@ $(document).ready(function(){
 		$(this).find('div.interiorHoverBlockWrapper').hide();
 	});
 
-    $("div.interiorbox").fancybox({
+	$("div.interiorbox").fancybox({
 	    autoDimensions: true,
 	    autoScale: true,
 	    autoSize: true,

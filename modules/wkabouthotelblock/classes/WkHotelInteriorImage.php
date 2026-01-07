@@ -171,6 +171,7 @@ class WkHotelInteriorImage extends ObjectModel
         }
         // update global configuration values in multilang
         Configuration::updateValue('HOTEL_INTERIOR_HEADING', $HOTEL_INTERIOR_HEADING);
+        Configuration::updateValue('HOTEL_INTERIOR_NAV_TYPE', 1);
         Configuration::updateValue('HOTEL_INTERIOR_DESCRIPTION', $HOTEL_INTERIOR_DESCRIPTION);
 
         // Database Entry

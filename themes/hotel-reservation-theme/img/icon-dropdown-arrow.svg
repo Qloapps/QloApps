@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="6px" height="12px" viewBox="0 0 6 12" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 51.3 (57544) - http://www.bohemiancoding.com/sketch -->
+    <title>icon-dropdown-arrow</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Occupancy-Wise-Search-1" transform="translate(-676.000000, -525.000000)" fill="#000000" fill-rule="nonzero">
+            <g id="hero">
+                <g id="search" transform="translate(319.000000, 170.000000)">
+                    <g id="all-actionables-[20v]" transform="translate(30.000000, 108.000000)">
+                        <g id="guests-occupancy" transform="translate(0.000000, 225.000000)">
+                            <path d="M330,22 L333,26.7142857 L327,26.7142857 L330,22 Z M330,33.7142857 L327,29 L333,29 L330,33.7142857 Z" id="icon-dropdown-arrow"></path>
+                        </g>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

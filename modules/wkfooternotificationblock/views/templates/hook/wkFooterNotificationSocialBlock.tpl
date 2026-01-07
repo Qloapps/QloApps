@@ -20,6 +20,6 @@
 * @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
 *}
 
-<div class="col-sm-3">
+<div class="col-md-3">
 	{hook h="displayFooterNotificationHook"}
 </div>

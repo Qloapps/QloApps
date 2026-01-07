@@ -52,6 +52,12 @@ class WkAboutHotelBlock extends Module
         $this->context->controller->addJS(_PS_JS_DIR_.'owl-carousel/owl.carousel.min.js');
         $this->context->controller->addJS($this->_path.'/views/js/WkAboutHotelBlockFront.js');
 
+        Media::addJsDef([
+            'HOTEL_INTERIOR_NAV_TYPE' => Configuration::get('HOTEL_INTERIOR_NAV_TYPE'),
+            'SLIDER_NAV_TYPE_DOTS' => HotelHelper::SLIDER_NAV_TYPE_DOTS,
+            'SLIDER_NAV_TYPE_BUTTON' => HotelHelper::SLIDER_NAV_TYPE_BUTTON,
+        ]);
+
         $HOTEL_INTERIOR_HEADING = Configuration::get('HOTEL_INTERIOR_HEADING', $this->context->language->id);
         $HOTEL_INTERIOR_DESCRIPTION = Configuration::get('HOTEL_INTERIOR_DESCRIPTION', $this->context->language->id);
 
@@ -117,11 +123,29 @@ class WkAboutHotelBlock extends Module
     {
         return $this->registerHook(
             array(
+                'footer',
                 'displayHome',
-                'displayFooterExploreSectionHook',
                 'actionObjectLanguageAddAfter'
             )
         );
+    }
+
+    public function hookFooter($params)
+    {
+        $objShop = new Shop();
+        $shopAddress = '';
+        $objShopAddress = $objShop->getAddress();
+        if (isset($objShopAddress) && $objShopAddress instanceof Address) {
+            $shopAddress = AddressFormat::generateAddress($objShopAddress, array(), ', ', ' ');
+        }
+
+        $this->context->smarty->assign(array(
+            'gblHtlAddress' => $shopAddress,
+            'gblHtlPhone' => Configuration::get('PS_SHOP_PHONE'),
+            'gblHtlEmail' => Configuration::get('PS_SHOP_EMAIL'),
+        ));
+
+        return $this->display(__FILE__, 'aboutHotelBlock.tpl');
     }
 
     public function callInstallTab()

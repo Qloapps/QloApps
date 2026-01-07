@@ -20,18 +20,12 @@
 * @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
 *}
 
-<div class="row">
-	<section class="col-xs-12 col-sm-12">
-		<div class="row margin-lr-0 footer-section-heading">
-			<p>{l s='payment accepted' mod='wkfooterpaymentblock'}</p>
-			<hr/>
-		</div>
-		<div class="row margin-lr-0 footer-payment-block">
-			{if isset($allPaymentBlocks) && $allPaymentBlocks}
-				{foreach $allPaymentBlocks as $paymentBlock}
-					<img src="{$link->getMediaLink("`$module_dir`views/img/payment_img/`$paymentBlock['id_payment_block']`.jpg")}">
-				{/foreach}
-			{/if}
-		</div>
-	</section>
+<div class="d-inline-block">
+	<div class="footer-payment-block">
+		{if isset($allPaymentBlocks) && $allPaymentBlocks}
+			{foreach $allPaymentBlocks as $paymentBlock}
+				<img height="24px" src="{$link->getMediaLink("`$module_dir`views/img/payment_img/`$paymentBlock['id_payment_block']`.jpg")}">
+			{/foreach}
+		{/if}
+	</div>
 </div>

@@ -75,7 +75,6 @@
 		<!-- by webkul -->
 		<!-- <link href='https://fonts.googleapis.com/css?family=Parisienne' rel='stylesheet' type='text/css'> -->
 		<!-- <link href='https://fonts.googleapis.com/css?family=PT+Serif:400,400italic,700,700italic' rel='stylesheet' type='text/css'> -->
-		<link href='//fonts.googleapis.com/css?family=Oxygen:400,300,700' rel='stylesheet' type='text/css'>
 	</head>
 	<body{if isset($page_name)} id="{$page_name|escape:'html':'UTF-8'}"{/if} class="{if isset($page_name)}{$page_name|escape:'html':'UTF-8'}{/if}{if isset($body_classes) && $body_classes|@count} {' '|implode:$body_classes}{/if}{if $hide_left_column} hide-left-column{else} show-left-column{/if}{if $hide_right_column} hide-right-column{else} hide-right-column{/if}{if isset($content_only) && $content_only} content_only{/if} lang_{$lang_iso}" style="{if $page_name == 'index'}height: 100%;{/if}">
 	{if !isset($content_only) || !$content_only}
@@ -86,7 +85,16 @@
 		{/if}
 		<div id="page" style="{if $page_name == 'index'}height: 100%;{/if}">
 			<div class="header-container" style="{if $page_name == 'index'}height: 100%;{/if}">
-				<header id="header" style='{if $page_name == "index"}background-image:url("{$link->getMediaLink("`$smarty.const._PS_IMG_`{Configuration::get('WK_HOTEL_HEADER_IMAGE')}")}"); height: 100%;{else}background-color:#252525;{/if}' >
+				<header id="header" class="{if $page_name == "index"}home-page-header home-header-image{else}bg-white pb-2 shadow-sm border-bottom{/if}" style='{if $page_name == "index"}background-image:url("{$link->getMediaLink("`$smarty.const._PS_IMG_`{Configuration::get('WK_HOTEL_HEADER_IMAGE')}")}"); height: 100%;{/if}' >
+
+					{* <header id="header" class="{if $page_name == "index"}z-index-5000{/if}"><!--  @todo -->
+					{if $page_name == "index"}
+						<div class="header-carousel owl-carousel">
+							{foreach from=$header_images item=img}
+								<div class="header-slide" style='background-image:url("{$link->getMediaLink("`$smarty.const._PS_IMG_`{$img}")}");'></div>
+							{/foreach}
+						</div>
+					{/if} *}
 					<div class="banner">
 						<div class="container">
 							<div class="row">
@@ -97,36 +105,34 @@
 						</div>
 					</div>
 					{block name='header_nav'}
-						<div id="nav-main">
-							<div class="container">
-								<div class="row">
+						<div id="nav-main" class="container">
+							<div class="nav-contaner">
+								<div class="small ">
 									{block name='displayNav'}
-										<nav>{hook h="displayNav"}</nav>
+										{hook h="displayNav"}
 									{/block}
 								</div>
 							</div>
 						</div>
 					{/block}
 					{block name='header_top'}
-						<div class="header-top">
-							<div class="container">
-								<div class="row">
-									<div class="col-xs-12">
-										<div id="header_logo">
-											<a href="{if isset($force_ssl) && $force_ssl}{$base_dir_ssl}{else}{$base_dir}{/if}" title="{$shop_name|escape:'html':'UTF-8'}">
-												<img class="logo img-responsive" src="{$logo_url}" alt="{$shop_name|escape:'html':'UTF-8'}"/>
-											</a>
-										</div>
-										<div class="header-top-menu">
-											{block name='displayTop'}
-												{if isset($HOOK_TOP)}{$HOOK_TOP}{/if}
-											{/block}
-											{if isset($WK_DISPLAY_PROPERTIES_LINK_IN_HEADER) && $WK_DISPLAY_PROPERTIES_LINK_IN_HEADER}
-												<div>
-													<a href="{$link->getPageLink('our-properties')}" class="our_properties_link">{l s='Our Properties'}</a>
-												</div>
-											{/if}
-										</div>
+						<div class="header-top container-md">
+							<div>
+								<div class="header-top-items-container">
+									<div id="header_logo" class="col-auto">
+										<a href="{if isset($force_ssl) && $force_ssl}{$base_dir_ssl}{else}{$base_dir}{/if}" title="{$shop_name|escape:'html':'UTF-8'}">
+											<img src="{$logo_url}" alt="{$shop_name|escape:'html':'UTF-8'}"/>
+										</a>
+									</div>
+									<div class="header-top-items">
+										{block name='displayTop'}
+											{if isset($HOOK_TOP)}{$HOOK_TOP}{/if}
+										{/block}
+										{if isset($WK_DISPLAY_PROPERTIES_LINK_IN_HEADER) && $WK_DISPLAY_PROPERTIES_LINK_IN_HEADER}
+											<div class=" d-flex flex-nowrap">
+												<a href="{$link->getPageLink('our-properties')}" class=" p-2">{l s='Our Properties'}</a>
+											</div>
+										{/if}
 									</div>
 								</div>
 								{block name='displaySearchHotelPanel'}
@@ -141,19 +147,19 @@
 				</header>
 			</div>
 			<div class="columns-container">
-				<div id="columns" class="container">
+				<div id="columns">
 					{if $show_breadcrump}
 						{block name='breadcrumb'}
 							{include file="$tpl_dir./breadcrumb.tpl"}
 						{/block}
 					{/if}
-					<div id="slider_row" class="row">
-						<div id="top_column" class="center_column col-xs-12 col-sm-12">{hook h="displayTopColumn"}</div>
+					<div id="slider_row">
+						<div id="top_column" class="center_column">{hook h="displayTopColumn"}</div>
 					</div>
-					<div class="row">
+					<div>
 						{if isset($left_column_size) && !empty($left_column_size)}
-						<div id="left_column" class="column col-xs-12 col-sm-{$left_column_size|intval}">{$HOOK_LEFT_COLUMN}</div>
+						<div id="left_column" class="column col-sm-{$left_column_size|intval}">{$HOOK_LEFT_COLUMN}</div>
 						{/if}
 						{if isset($left_column_size) && isset($right_column_size)}{assign var='cols' value=(12 - $left_column_size - $right_column_size)}{else}{assign var='cols' value=12}{/if}
-						<div id="center_column" class="center_column col-xs-12 col-sm-{$cols|intval}">
+						<div id="center_column" class="center_column">
 	{/if}

@@ -29,6 +29,17 @@ var onlineFlag = true;
 
 
 $(document).ready(function(){
+	$('.tab_container a[data-toggle="tab"]').on('click', function (e) {
+        e.stopPropagation();
+        e.preventDefault();
+        let targetTab = $(this).attr('href');
+        if ($(targetTab).length) {
+            $('html, body').animate({
+                scrollTop: $(targetTab).offset().top - 10 // adjust header offset
+            }, 400);
+        }
+    });
+
 	highdpiInit();
 	responsiveResize();
 	$(window).resize(responsiveResize);
@@ -400,12 +411,10 @@ function accordionFooter(status)
 			$(this).toggleClass('active').parent().find('.toggle-footer').stop().slideToggle('medium');
 			e.preventDefault();
 		})
-		$('#footer').addClass('accordion').find('.toggle-footer').slideUp('fast');
 	}
 	else
 	{
 		$('.footer-block h4').removeClass('active').off().parent().find('.toggle-footer').removeAttr('style').slideDown('fast');
-		$('#footer').removeClass('accordion');
 	}
 }
 

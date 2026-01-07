@@ -60,6 +60,8 @@ require_once 'classes/ServiceProductOption.php';
 
 require_once 'classes/HotelSettingsLink.php';
 require_once 'classes/HotelBookingDocument.php';
+// @todo: add demo data for hotel display block
+require_once 'classes/HotelDisplayBlock.php';
 
 // Web services classes
 require_once 'classes/WebserviceSpecificManagementHotelAri.php';

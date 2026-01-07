@@ -21,15 +21,13 @@
 *}
 
 {if count($languages) > 1}
-    <ul class="nav nav-pills nav-stacked visible-xs wk-nav-style">
+    <ul class="nav d-block d-md-none">
         <li>
-            <a class="btn-language-selector-popup">
-                {foreach from=$languages item=language}
-                    {if $language.iso_code == $lang_iso}
-                        {$language.name|regex_replace:"/\s\(.*\)$/":""}
-                        <span class="caret"></span>
-                    {/if}
-                {/foreach}
+            <a class="btn-language-selector-popup navigation-link">
+                {if isset($languages[$lang_id]['iso_code'])}
+                    {$languages[$lang_id]['name']|regex_replace:"/\s\(.*\)$/":""}
+                    <span class="icon-caret-down"></span>
+                {/if}
             </a>
         </li>
     </ul>

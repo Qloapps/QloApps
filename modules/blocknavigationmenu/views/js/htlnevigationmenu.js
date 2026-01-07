@@ -20,8 +20,7 @@
 * @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
 */
 
-$(document).ready(function()
-{
+$(document).ready(function() {
 	$(document).on("click", ".navigation-link", function(e) {
 		if (typeof $(this).context.hash !== 'undefined') {
 			var block = $(this).context.hash;
@@ -37,18 +36,18 @@ $(document).ready(function()
 		}
 	});
 
-	$(".nav_toggle").on("click", function()
-	{
+	$(document).on("click", '.nav_toggle', function(e) {
 		var menu_cont = $("#menu_cont");
-		if (menu_cont.hasClass("menu_cont_right"))
-			menu_cont.removeClass("menu_cont_right").addClass("menu_cont_left");
+		if (menu_cont.hasClass("nav_cont_right"))
+			menu_cont.removeClass("nav_cont_right").addClass("nav_cont_left");
+
+		e.stopPropagation();
 	});
 
-	$(".close_navbar").on("click", function()
-	{
+	$(".close_navbar").on("click", function() {
 		var menu_cont = $("#menu_cont");
-		if (menu_cont.hasClass("menu_cont_left"))
-			menu_cont.removeClass("menu_cont_left").addClass("menu_cont_right");
+		if (menu_cont.hasClass("nav_cont_left"))
+			menu_cont.removeClass("nav_cont_left").addClass("nav_cont_right");
 	});
 
 	$(document).on('click', function(e) {
@@ -57,8 +56,8 @@ $(document).ready(function()
 			if (!($(e.target).closest('#menu_cont').length
 				|| $(e.target).closest('.header-top .header-top-menu .nav_toggle').length
 			)) {
-				if (navigationMenu.hasClass('menu_cont_left')) {
-					navigationMenu.removeClass('menu_cont_left').addClass('menu_cont_right');
+				if (navigationMenu.hasClass('nav_cont_left')) {
+					navigationMenu.removeClass('nav_cont_left').addClass('nav_cont_right');
 				}
 			}
 		}

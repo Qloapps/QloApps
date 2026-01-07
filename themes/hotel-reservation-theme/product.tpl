@@ -38,15 +38,23 @@
 			{assign var='productPrice' value=$product->getPrice(false, $smarty.const.NULL, 6)}
 			{assign var='productPriceWithoutReduction' value=$product->getPriceWithoutReduct(true, $smarty.const.NULL)}
 		{/if}
-	<div class="product_wrapper" itemscope itemtype="http://schema.org/Product">
+	<div class="product_wrapper mt-3 container-lg pb-4" itemscope itemtype="http://schema.org/Product">
+		<div class="product_breadcrumb">
+			<ol class="breadcrumb help_block bg-white mb-3 p-0">
+				<li class="breadcrumb-item">{l s='Home'}</li>
+				{if !empty($id_hotel)}
+					<li class="breadcrumb-item">{$hotel_name}</li>
+				{/if}
+				{if $product->booking_product}
+					<li class="breadcrumb-item">{l s='Rooms'}</li>
+				{else}
+					<li class="breadcrumb-item">{l s='Service'}</li>
+				{/if}
+			</ol>
+		</div>
 		{if isset($product) && $product}
 			<meta itemprop="url" content="{$link->getProductLink($product)}">
 			<div class="primary_block row">
-				<!-- {if !$content_only}
-					<div class="container">
-						<div class="top-hr"></div>
-					</div>
-				{/if} --><!-- by webkul -->
 				{if isset($adminActionDisplay) && $adminActionDisplay}
 					<div id="admin-action" class="container">
 						<p class="alert alert-info">{l s='This room type is not visible to your customers.'}
@@ -67,16 +75,33 @@
 					</p>
 				{/if}
 				<!-- left infos-->
-				{block name='product_left_column'}
-					<div class="pb-left-column col-xs-12 col-sm-8 col-md-8">
-						<div class="room_type_img_containter card">
-							<div class="room_hotel_name_block {if isset($language_is_rtl) && $language_is_rtl}rtl{/if}">
+				{block name='product_container'}
+					<div class="col-12">
+						<div class="room_type_img_containter">
+							<div class="room_type_name_block mb-4 {if isset($language_is_rtl) && $language_is_rtl}rtl{/if}">
 								{block name='product_name'}
 									<div class="hotel_name_block">
-										<h1><span class="hotel_name">{$product->name}
-											{* Block for booking products *}
-											{if isset($id_hotel) && $id_hotel}&nbsp;-&nbsp;{$hotel_name}{/if}</span>{if isset($hotel_rating) && $hotel_rating}<div id="hotel_rating">{for $i=0; $i < $hotel_rating; $i++}<i class="icon-star"></i>{/for}</div>{/if}
-										</h1>
+										<div class="d-inline-block">
+											<div class="block_title"><span class="hotel_name">{$product->name}
+												{if isset($id_hotel) && $id_hotel}&nbsp;-&nbsp;{$hotel_name}{/if}</span>
+											</div>
+											{if isset($id_hotel) && $id_hotel}
+												<div class="small">
+													<span>
+														<i class="icon-location-dot"></i>
+														{$hotel_location}
+													</span>
+													<span class="seprator-pipe">
+														<i class="icon-envelope"></i>
+														{$hotel_email}
+													</span>
+													<span class="seprator-pipe">
+														<i class="icon-phone"></i>
+														{$hotel_phone}
+													</span>
+												</div>
+											{/if}
+										</div>
 										{block name='displayRoomTypeDetailRoomTypeNameBlock'}
 											{hook h='displayRoomTypeDetailRoomTypeNameBlock' id_product=$product->id}
 										{/block}
@@ -198,286 +223,229 @@
 							{/block}
 						</div>
 
-						<div id="service_products_cont">
-							{if isset($service_products_exists) && $service_products_exists}
-								{block name='service_products'}
-									{include file="{$tpl_dir}_partials/service-products.tpl"}
-								{/block}
-							{/if}
-						</div>
-
-						<div class="product_info_containter">
-							<!-- tab hook is added here -->
-							<!--HOOK_PRODUCT_TAB -->
-							<section class="page-product-box">
-								{block name='product_tabs'}
-									<ul class="nav nav-tabs product_description_tabs">
-									<li class="active"><a href="#product_info_tab" class="idTabHrefShort" data-toggle="tab">{if $product->booking_product}{l s='Room Information'}{else}{l s='Product Information'}{/if}</a></li>
-										{* Block for booking products *}
-										{if isset($id_hotel) && $id_hotel}
-											<li><a href="#refund_policies_tab" class="idTabHrefShort" data-toggle="tab">{l s='Refund Policies'}</a></li>
-										{/if}
-										{if $display_google_maps && !empty($hotel_latitude) && !empty($hotel_longitude) && ($hotel_latitude|floatval != 0 && $hotel_longitude|floatval != 0)}
-											<li><a href="#room_type_map_tab" class="idTabHrefShort" data-toggle="tab">{l s='View on Map'}</a></li>
-										{/if}
-										{block name='displayProductTab'}
-											{$HOOK_PRODUCT_TAB}
-										{/block}
-									</ul>
-								{/block}
-								{block name='product_tabs_content'}
-									<div class="tab-content product_description_tabs_contents">
-										{block name='product_info_tab_content'}
-											<div id="product_info_tab" class="tab-pane active card">
-												<div id="product_info_tab_information">
-													{block name='product_info_tab_room_description'}
-														<div class="row info_margin_div room_description">
-															<div class="col-sm-12">
-																{$product->description}
+							<div class="product_info_containter ">
+								<!-- tab hook is added here -->
+								<!--HOOK_PRODUCT_TAB -->
+								<section class="page-product-box">
+									{block name='product_tabs'}
+										<div class="tab_container">
+											<ul class="nav nav-pills tab_list_headings">
+												<li class="nav-item"><a href="#product_info_tab" data-toggle="tab" class="idTabHrefShort nav-pill active">{l s='Overview'}</a></li>
+												{* Block for booking products *}
+												{if isset($features) && $features}
+													<li class="nav-item "><a href="#room_features_tab" data-toggle="tab" class="idTabHrefShort nav-pill">{l s='Amenities'}</a></li>
+												{/if}
+												{if isset($service_products_exists) && $service_products_exists}
+													<li class="nav-item "><a href="#service_product_tab" data-toggle="tab" class="idTabHrefShort nav-pill">{l s='Additional Services'}</a></li>
+												{/if}
+												{if isset($id_hotel) && $id_hotel}
+													<li class="nav-item "><a href="#hotel_features_tab" data-toggle="tab" class="idTabHrefShort nav-pill">{l s='Hotel Amenities'}</a></li>
+													<li class="nav-item "><a href="#refund_policies_tab" data-toggle="tab" class="idTabHrefShort nav-pill">{l s='Refund Policies'}</a></li>
+												{/if}
+												{if isset($hotel_policies) && $hotel_policies}
+													<li class="nav-item "><a href="#hotel_policies_tab" data-toggle="tab" class="idTabHrefShort nav-pill">{l s='Hotel Policies'}</a></li>
+												{/if}
+												{if $display_google_maps && !empty($hotel_latitude) && !empty($hotel_longitude) && ($hotel_latitude|floatval != 0 && $hotel_longitude|floatval != 0)}
+													<li class="nav-item"><a href="#room_type_map_tab" data-toggle="tab" class="idTabHrefShort nav-pill">{l s='View on Map'}</a></li>
+												{/if}
+												{block name='displayProductTab'}
+													{$HOOK_PRODUCT_TAB}
+												{/block}
+											</ul>
+										</div>
+									{/block}
+									{block name='product_tabs_content'}
+										<div class="row">
+											{block name='product_left_column'}
+												<div class="tab-content mt-4 col-md-8 col-12">
+													{block name='product_info_tab_content'}
+														<div id="product_info_tab" class=" active">
+															<div id="product_info_tab_information">
+																{block name='product_info_tab_room_description'}
+																	<div class="room_description_heading block_heading">
+																		{l s='About'} {$product->name}
+																	</div>
+																	<div class="row info_margin_div room_description_content">
+																		{* @todo:add view more *}
+																		<div class="col-12">
+																			{$product->description}
+																		</div>
+																	</div>
+																{/block}
 															</div>
 														</div>
-													{/block}
-													{block name='product_info_tab_room_guests'}
-														{if isset($room_type_info['adults']) && isset($room_type_info['children']) }
-															<div class="info_margin_div">
-																<div class="room_info_heading">
-																	<span>{l s='Max Capacity'}</span>
-																</div>
-																<div class="room_info_content">
-																	<p>{$room_type_info['adults']} {l s='Adults'}, {$room_type_info['children']} {if $room_type_info['children'] > 1}{l s='Children'}{else}{l s='Child'}{/if} ({l s='Max guests'}: {$room_type_info['max_guests']|escape:'htmlall':'UTF-8'})</p>
-																</div>
-															</div>
-														{/if}
-													{/block}
-													{block name='product_info_tab_room_timing'}
-														{if isset($id_hotel) && $id_hotel}
-															<div class="info_margin_div">
-																<div class="room_info_heading">
-																	<span>{l s='Check-in and check-out time'}</span>
-																</div>
-																<div class="room_info_content">
-																	<p>{l s='Check-in: '}{$hotel_check_in|escape:'html':'UTF-8'}</p>
-																	<p>{l s='Check-out: '}{$hotel_check_out|escape:'html':'UTF-8'}</p>
-																</div>
-															</div>
-														{/if}
-													{/block}
-													{block name='product_info_tab_room_bed_type'}
-														{if isset($selected_bed_types) && $selected_bed_types && isset($bed_types_info) && $bed_types_info}
-															<div class="info_margin_div">
-																<div class="room_info_heading">
-																	<span>{l s='Bed Types'}</span>
-																</div>
-																<div class="room_info_content">
-																	{foreach $selected_bed_types as $selected_bed_type}
-																		{if isset($bed_types_info[$selected_bed_type])}
-																			<p>{$bed_types_info[$selected_bed_type]['name']}: {$bed_types_info[$selected_bed_type]['area']} {l s='sq.'}{$dimension_unit}</p>
-																		{/if}
-																	{/foreach}
-																</div>
-															</div>
-														{/if}
+														<hr class="block_seperator"/>
 													{/block}
 													{block name='product_info_tab_room_features'}
 														{if isset($features) && $features}
-															<div class="info_margin_div">
-																<div class="room_info_heading">
-																	<span>{l s='Room Features'}</span>
+															<div id="room_features_tab" class="info_margin_div">
+																<div class="block_heading">
+																	<span>{l s='Amenities'}</span>
 																</div>
-																<div class="room_info_content row">
+																{* @todo:add view more *}
+																<div class="room_info_content amenity_wrapper">
 																	{foreach from=$features key=ftr_k item=ftr_v}
-																		<div class="col-md-3 col-sm-4 col-xs-6">
-																			<div class="rm_ftr_wrapper" title="{$ftr_v.name|escape:'html':'UTF-8'}" alt="{$ftr_v.name|escape:'html':'UTF-8'}" >
-																				<img src="{$link->getMediaLink("`$ftr_img_src|escape:'html':'UTF-8'`{$ftr_v.value|escape:'html':'UTF-8'}")}">  {$ftr_v.name|escape:'html':'UTF-8'}
-																			</div>
+																		<div class="rm_ftr_wrapper amenity" title="{$ftr_v.name|escape:'html':'UTF-8'}" alt="{$ftr_v.name|escape:'html':'UTF-8'}" >
+																			<span>
+																				<img src="{$link->getMediaLink("`$ftr_img_src|escape:'html':'UTF-8'`{$ftr_v.value|escape:'html':'UTF-8'}")}">
+																			</span>
+																			<span>{$ftr_v.name|escape:'html':'UTF-8'}</span>
 																		</div>
 																	{/foreach}
 																</div>
 															</div>
+															<hr class="block_seperator"/>
 														{/if}
 													{/block}
-													{* Block for booking products *}
+													{if isset($service_products_exists) && $service_products_exists}
+														<div id="service_product_tab">
+															<div class="block_heading">
+																<span>{l s='Additional Services'}</span>
+															</div>
+															{block name='service_products'}
+																{include file="{$tpl_dir}_partials/service-products.tpl"}
+															{/block}
+														</div>
+														<hr class="block_seperator"/>
+													{/if}
+
 													{if isset($id_hotel) && $id_hotel}
 														{block name='product_info_tab_hotel_features'}
 															{if isset($hotel_features) && $hotel_features}
-																<div class="info_margin_div">
-																	<div class="room_info_heading">
-																		<span>{l s='Hotel Features'}</span>
+																<div id="hotel_features_tab" class="info_margin_div">
+																	<div class="block_heading">
+																		<span>{l s='Hotel Amenities'}</span>
 																	</div>
 																	<div class="room_info_content row">
 																		{foreach from=$hotel_features key=ftr_k item=ftr_v}
-																			<div class="col-sm-4 col-xs-12"><i class="circle-small">o</i> {$ftr_v|escape:'html':'UTF-8'}</div>
+																			<div class="col-sm-4 col-xs-12"><i class="icon-check small"></i> {$ftr_v|escape:'html':'UTF-8'}</div>
 																		{/foreach}
 																	</div>
 																</div>
-															{/if}
-														{/block}
-														{block name='product_info_tab_hotel_description'}
-															{if isset($hotel_description) && $hotel_description}
-																<div class="info_margin_div">
-																	<div class="room_info_heading">
-																		<span>{l s='Hotel Description'}</span>
-																	</div>
-																	<div class="room_info_content">
-																		{$hotel_description}
-																	</div>
-																</div>
+																<hr class="block_seperator"/>
 															{/if}
 														{/block}
 													{/if}
-													{block name='product_info_tab_hotel_images'}
-														{if isset($hotel_has_images) && $hotel_has_images}
-															<div class="room_info_hotel_images_wrap">
-																<div class="info_margin_div">
-																	<div class="room_info_heading">
-																		<span>{l s='Hotel Images'}</span>
-																	</div>
-																	<div class="room_info_content" id="room_info_hotel_images">
-																		<div class="row images-wrap"></div>
-																		<div class="row skeleton-loading-wrap">
-																			<div class="skeleton-loading-wave clearfix">
-																				<div class="col-sm-4">
-																					<div class="loading-container-box"></div>
-																				</div>
-																				<div class="col-sm-4">
-																					<div class="loading-container-box"></div>
-																				</div>
-																				<div class="col-sm-4">
-																					<div class="loading-container-box"></div>
+													{block name='product_refund_policies_tab_content'}
+														{* Block for booking products *}
+														{if isset($id_hotel) && $id_hotel}
+															<div id="refund_policies_tab" class="">
+																<div class="block_heading">
+																	<span>{l s='Refund Policies'}</span>
+																</div>
+																{if isset($isHotelRefundable) && $isHotelRefundable}
+																	{if isset($hotelRefundRules) && $hotelRefundRules}
+																		{foreach $hotelRefundRules as $refundRule}
+																			<div class="info_margin_div">
+																				<div class="room_info_content">
+																					<i class="circle-small">o</i> <span class="refund-rule-name">{$refundRule['name']|escape:'html':'UTF-8'} - </span> <span>{$refundRule['description']|escape:'html':'UTF-8'}</span>
 																				</div>
 																			</div>
-																		</div>
-																	</div>
-																	<a class="btn btn-primary btn-show-more-images hide" data-id-product="{$product->id}" data-next-page="1">
-																		<span>{l s='SHOW MORE'}</span>
-																	</a>
-																</div>
+																		{/foreach}
+																	{else}
+																		{l s='N/A'}
+																	{/if}
+																{else}
+																	<span class="non_refundable_txt error_msg">{l s='Non Refundable'}</span>
+																{/if}
 															</div>
+															<hr class="block_seperator"/>
 														{/if}
 													{/block}
-													<!-- <div class="info_margin_div">
-														<div class="room_info_heading">
-															<span>{l s='Rooms'}</span>
-														</div>
-														<div class="room_info_content row"></div>
-													</div> -->
 													{block name='product_info_tab_hotel_policies'}
 														{if isset($hotel_policies) && $hotel_policies}
-															<div class="info_margin_div">
-																<div class="room_info_heading">
+															<div id="hotel_policies_tab" class="info_margin_div">
+																<div class="block_heading">
 																	<span>{l s='Hotel Policies'}</span>
 																</div>
 																<div class="room_info_content">
 																	<p class="">{$hotel_policies}</p>
 																</div>
 															</div>
+															<hr class="block_seperator"/>
 														{/if}
 													{/block}
-												</div>
-											</div>
-										{/block}
-										{block name='product_refund_policies_tab_content'}
-											{* Block for booking products *}
-											{if isset($id_hotel) && $id_hotel}
-												<div id="refund_policies_tab" class="tab-pane card">
-													{if isset($isHotelRefundable) && $isHotelRefundable}
-														{if isset($hotelRefundRules) && $hotelRefundRules}
-															{foreach $hotelRefundRules as $refundRule}
-																<div class="info_margin_div">
-																	<div class="room_info_content">
-																		<i class="circle-small">o</i> <span class="refund-rule-name">{$refundRule['name']|escape:'html':'UTF-8'} - </span> <span>{$refundRule['description']|escape:'html':'UTF-8'}</span>
+													{* {block name='product_map_tab_content'}
+														{if $display_google_maps && !empty($hotel_latitude) && !empty($hotel_longitude) && ($hotel_latitude|floatval != 0 && $hotel_longitude|floatval != 0)}
+															<div id="room_type_map_tab" class=" card">
+																<div class="map-wrap"></div>
+																<div id="room-info-map-ui-content" style="display: none;">
+																	<div class="hotel-info-wrap">
+																		{if isset($hotel_image_link) && $hotel_image_link}
+																			<div class="hotel-image-wrap">
+																				<img class="img img-responsive" src="{$hotel_image_link}">
+																			</div>
+																		{/if}
+																		<div>
+																			<p class="name">{$hotel_name|escape:'html':'UTF-8'}</p>
+																			<p class="address">{$hotel_address1|escape:'html':'UTF-8'}</p>
+																			<p class="contact">{l s='Contact:'} {$hotel_phone|escape:'html':'UTF-8'}</p>
+																			<a class="btn view-on-map" href="https://www.google.com/maps/search/?api=1&query={if $hotel_map_input_text != ''}{$hotel_map_input_text|urlencode}{else}{($hotel_latitude|cat:','|cat:$hotel_longitude)|urlencode}{/if}" target="_blank">
+																				<span>{l s='View on Map'}</span>
+																			</a>
+																		</div>
 																	</div>
 																</div>
-															{/foreach}
-														{else}
-															{l s='N/A'}
+															</div>
 														{/if}
-													{else}
-														<span class="non_refundable_txt error_msg">{l s='Non Refundable'}</span>
-													{/if}
+													{/block} *}
+													{block name='displayProductTabContent'}
+														{if isset($HOOK_PRODUCT_TAB_CONTENT) && $HOOK_PRODUCT_TAB_CONTENT}{$HOOK_PRODUCT_TAB_CONTENT}{/if}
+													{/block}
 												</div>
-											{/if}
-										{/block}
-										{block name='product_map_tab_content'}
-											{if $display_google_maps && !empty($hotel_latitude) && !empty($hotel_longitude) && ($hotel_latitude|floatval != 0 && $hotel_longitude|floatval != 0)}
-												<div id="room_type_map_tab" class="tab-pane card">
-													<div class="map-wrap"></div>
-													<div id="room-info-map-ui-content" style="display: none;">
-														<div class="hotel-info-wrap">
-															{if isset($hotel_image_link) && $hotel_image_link}
-																<div class="hotel-image-wrap">
-																	<img class="img img-responsive" src="{$hotel_image_link}">
+											{/block}
+											{block name='product_right_column'}
+												<div class="col-12 col-md-4 mt-4">
+													{if ($product->show_price && !isset($restricted_country_mode)) || isset($groups) || $product->reference || (isset($HOOK_PRODUCT_ACTIONS) && $HOOK_PRODUCT_ACTIONS)}
+
+														{block name='booking_form'}
+															{include file='./_partials/booking-form.tpl'}
+														{/block}
+
+														{block name='product_demands'}
+															{* extra room type demands *}
+															{if isset($room_type_demands) && $room_type_demands}
+																<div class="col-sm-12 card room_demands_container">
+																	<label for="" class="control-label">{l s='Additional Facilities'}</label>
+																	{foreach $room_type_demands as $idGlobalDemand => $demand}
+																		<div class="row room_demand_block">
+																			{if $product->show_price && !isset($restricted_country_mode) && !$PS_CATALOG_MODE}
+																				<div class="col-xs-1">
+																					<p class="checkbox">
+																						<input value="{$idGlobalDemand|escape:'html':'UTF-8'}" type="checkbox" class="id_room_type_demand" data-id_global_demand="{$idGlobalDemand|escape:'html':'UTF-8'}" />
+																					</p>
+																				</div>
+																			{/if}
+																			<div class="col-xs-11 demand_adv_option_block">
+																				<p>{$demand['name']|escape:'html':'UTF-8'} {if $product->show_price && !isset($restricted_country_mode) && !$PS_CATALOG_MODE}<span class="pull-right"><span class="extra_demand_option_price">{convertPrice price = $demand['price']}</span>{if $demand['price_calc_method'] == $WK_PRICE_CALC_METHOD_EACH_DAY}{l s='/Night'}{/if}</span>{/if}</p>
+																				{if isset($demand['adv_option']) && $demand['adv_option']}
+																					<select class="id_option">
+																						{foreach $demand['adv_option'] as $idOption => $option}
+																							<option optionPrice="{$option['price']|escape:'html':'UTF-8'}" value="{$idOption|escape:'html':'UTF-8'}">{$option['name']|escape:'html':'UTF-8'}</option>
+																						{/foreach}
+																					</select>
+																				{else}
+																					<input type="hidden" class="id_option" value="0" />
+																				{/if}
+																			</div>
+																		</div>
+																	{/foreach}
+																	<div class="room_demands_container_overlay">
+																	</div>
 																</div>
 															{/if}
-															<div>
-																<p class="name">{$hotel_name|escape:'html':'UTF-8'}</p>
-																<p class="address">{$hotel_address1|escape:'html':'UTF-8'}</p>
-																<p class="contact">{l s='Contact:'} {$hotel_phone|escape:'html':'UTF-8'}</p>
-																<a class="btn view-on-map" href="https://www.google.com/maps/search/?api=1&query={if $hotel_map_input_text != ''}{$hotel_map_input_text|urlencode}{else}{($hotel_latitude|cat:','|cat:$hotel_longitude)|urlencode}{/if}" target="_blank">
-																	<span>{l s='View on Map'}</span>
-																</a>
-															</div>
-														</div>
-													</div>
-												</div>
-											{/if}
-										{/block}
-										{block name='displayProductTabContent'}
-											{if isset($HOOK_PRODUCT_TAB_CONTENT) && $HOOK_PRODUCT_TAB_CONTENT}{$HOOK_PRODUCT_TAB_CONTENT}{/if}
-										{/block}
-									</div>
-								{/block}
-							</section>
-						</div>
-					</div> <!-- end pb-left-column -->
-				{/block}
-
-				{block name='product_right_column'}
-					<div class="pb-right-column col-xs-12 col-sm-4 col-md-4">
-						{if ($product->show_price && !isset($restricted_country_mode)) || isset($groups) || $product->reference || (isset($HOOK_PRODUCT_ACTIONS) && $HOOK_PRODUCT_ACTIONS)}
-
-							{block name='booking_form'}
-								{include file='./_partials/booking-form.tpl'}
-							{/block}
-
-							{block name='product_demands'}
-								{* extra room type demands *}
-								{if isset($room_type_demands) && $room_type_demands}
-									<div class="col-sm-12 card room_demands_container">
-										<label for="" class="control-label">{l s='Additional Facilities'}</label>
-										{foreach $room_type_demands as $idGlobalDemand => $demand}
-											<div class="row room_demand_block">
-												{if $product->show_price && !isset($restricted_country_mode) && !$PS_CATALOG_MODE}
-													<div class="col-xs-1">
-														<p class="checkbox">
-															<input value="{$idGlobalDemand|escape:'html':'UTF-8'}" type="checkbox" class="id_room_type_demand" data-id_global_demand="{$idGlobalDemand|escape:'html':'UTF-8'}" />
-														</p>
-													</div>
-												{/if}
-												<div class="col-xs-11 demand_adv_option_block">
-													<p>{$demand['name']|escape:'html':'UTF-8'} {if $product->show_price && !isset($restricted_country_mode) && !$PS_CATALOG_MODE}<span class="pull-right"><span class="extra_demand_option_price">{convertPrice price = $demand['price']}</span>{if $demand['price_calc_method'] == $WK_PRICE_CALC_METHOD_EACH_DAY}{l s='/Night'}{/if}</span>{/if}</p>
-													{if isset($demand['adv_option']) && $demand['adv_option']}
-														<select class="id_option">
-															{foreach $demand['adv_option'] as $idOption => $option}
-																<option optionPrice="{$option['price']|escape:'html':'UTF-8'}" value="{$idOption|escape:'html':'UTF-8'}">{$option['name']|escape:'html':'UTF-8'}</option>
-															{/foreach}
-														</select>
-													{else}
-														<input type="hidden" class="id_option" value="0" />
+														{/block}
 													{/if}
+													{block name='displayRightColumnProduct'}
+														{if isset($HOOK_EXTRA_RIGHT) && $HOOK_EXTRA_RIGHT}{$HOOK_EXTRA_RIGHT}{/if}
+													{/block}
 												</div>
-											</div>
-										{/foreach}
-										<div class="room_demands_container_overlay">
+											{/block}
 										</div>
-									</div>
-								{/if}
-							{/block}
-						{/if}
-						{block name='displayRightColumnProduct'}
-							{if isset($HOOK_EXTRA_RIGHT) && $HOOK_EXTRA_RIGHT}{$HOOK_EXTRA_RIGHT}{/if}
-						{/block}
-					</div>
+									{/block}
+								</section>
+							</div>
+					</div> <!-- end pb-left-column -->
 				{/block}
 
 			</div> <!-- end primary_block -->

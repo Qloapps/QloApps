@@ -23,7 +23,7 @@
 
 class AdminHotelRoomModuleSettingController extends ModuleAdminController
 {
-    protected $position_identifier = 'id_room_block_to_move';
+    protected $position_identifier = 'id_room_block';
     public function __construct()
     {
         $this->table = 'htl_room_block_data';
@@ -46,6 +46,15 @@ class AdminHotelRoomModuleSettingController extends ModuleAdminController
                 'title' => $this->l('Hotel Room Display Setting'),
                 'icon' => 'icon-cogs',
                 'fields' => array(
+                    'HOTEL_ROOM_NAV_TYPE' => array(
+                        'title' => $this->l('Slider navigation type'),
+                        'hint' => $this->l('Select slider navigation type for the hotel rooms slider in the front office'),
+                        'validation' => 'isInt',
+                        'type' => 'select',
+                        'list' => HotelHelper::getSliderNavigationTypes(),
+                        'identifier' => 'id',
+                        'cast' => 'intval'
+                    ),
                     'HOTEL_ROOM_DISPLAY_HEADING' => array(
                         'title' => $this->l('Hotel Room Block Title'),
                         'type' => 'textLang',
@@ -185,10 +194,12 @@ class AdminHotelRoomModuleSettingController extends ModuleAdminController
     public function initToolbar()
     {
         parent::initToolbar();
-        $this->page_header_toolbar_btn['new'] = array(
-            'href' => self::$currentIndex.'&add'.$this->table.'&token='.$this->token,
-            'desc' => $this->l('Add New Hotel Room Block')
-        );
+        if (empty($this->display) || $this->display == 'list') {
+            $this->page_header_toolbar_btn['new'] = array(
+                'href' => self::$currentIndex.'&add'.$this->table.'&token='.$this->token,
+                'desc' => $this->l('Add New Hotel Room Block')
+            );
+        }
     }
 
     public function renderForm()
@@ -293,9 +304,7 @@ class AdminHotelRoomModuleSettingController extends ModuleAdminController
             }
             if (Validate::isLoadedObject($objProduct = new Product($idProduct))) {
                 if ($active && !$objProduct->active) {
-                    $this->errors[] = $this->l(
-                        'Hotel room block can not be active because selected room type is not active'
-                    );
+                    $this->errors[] = $this->l('Hotel room block can not be active because selected room type is not active');
                 }
             } else {
                 $this->errors[] = $this->l('Product not found');
@@ -387,9 +396,7 @@ class AdminHotelRoomModuleSettingController extends ModuleAdminController
             if (!$object->active) {
                 if (Validate::isLoadedObject($objProduct = new Product($object->id_product))) {
                     if (!$objProduct->active) {
-                        $this->errors[] = $this->l(
-                            'Hotel room block can not be active because selected room type is not active'
-                        );
+                        $this->errors[] = $this->l('Hotel room block can not be active because selected room type is not active');
                     }
                 } else {
                     $this->errors[] = $this->l('Product not found');
@@ -412,8 +419,7 @@ class AdminHotelRoomModuleSettingController extends ModuleAdminController
                     if (!$object->active) {
                         if (Validate::isLoadedObject($objProduct = new Product($object->id_product))) {
                             if (!$objProduct->active) {
-                                $this->errors[] = $this->l('Because selected room type is not active so hotel room
-                                block can not be active for Id = ').$id;
+                                $this->errors[] = $this->l('Because selected room type is not active so hotel room block can not be active for Id = ').$id;
                             }
                         } else {
                             $this->errors[] = $this->l('Product not found for Id = ').$id;

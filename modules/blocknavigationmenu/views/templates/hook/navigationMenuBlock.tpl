@@ -21,38 +21,34 @@
 *}
 
 {block name='navigation_menu'}
-	<div class="header-top-item">
-		<button type="button" class="nav_toggle">
-			<span class="icon-bar"></span>
-			<span class="icon-bar"></span>
-			<span class="icon-bar"></span>
+	<div class="header-top-item p-0">
+		<button class="btn nav_toggle">
+			<i class="icon-solid icon-bars"></i>
 		</button>
 	</div>
 
-	<div id="menu_cont" class="menu_cont_right">
-		<div class="row margin-lr-0">
-			<div class="col-xs-12 col-sm-12">
-				<div class="row margin-lr-0">
-					<span class="pull-right close_navbar"><i class="icon-close"></i></span>
-				</div>
-				<div class="row">
-					<ul class="nav nav-pills nav-stacked wk-nav-style">
-						{if isset($navigation_links) && $navigation_links}
-							{foreach $navigation_links as $navigationLink}
-								<li>
-									<a class="navigation-link" href="{$navigationLink['link']}">{$navigationLink['name']}</a>
-								</li>
-							{/foreach}
-						{/if}
-						{block name='displayDefaultNavigationHook'}
-							{hook h="displayDefaultNavigationHook"}
-						{/block}
-					</ul>
-					{block name='displayExternalNavigationHook'}
-						{hook h="displayExternalNavigationHook"}
-					{/block}
-				</div>
-			</div>
+	<div id="menu_cont" class="nav_cont_right">
+		<div class="d-md-none row justify-content-end col-12 p-0 mt-2">
+			<span class="close_navbar"><i class="icon-close"></i></span>
 		</div>
+		<ul class="nav main-nav">
+			{if isset($navigation_links) && $navigation_links}
+				{foreach $navigation_links as $navigationLink}
+					<li>
+						<a class="navigation-link" href="{$navigationLink['link']}">
+							{$navigationLink['name']}
+						</a>
+					</li>
+				{/foreach}
+			{/if}
+
+			{block name='displayDefaultNavigationHook'}
+				{hook h="displayDefaultNavigationHook"}
+			{/block}
+		</ul>
+
+		{block name='displayExternalNavigationHook'}
+			{hook h="displayExternalNavigationHook"}
+		{/block}
 	</div>
 {/block}

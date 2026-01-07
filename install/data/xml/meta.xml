@@ -152,5 +152,9 @@
 			<page>our-properties</page>
 			<configurable>1</configurable>
 		</meta>
+		<meta id="register">
+			<page>register</page>
+			<configurable>1</configurable>
+		</meta>
 	</entities>
 </entity_meta>

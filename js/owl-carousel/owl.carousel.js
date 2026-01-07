@@ -1,11 +1,11 @@
 /**
- * Owl Carousel v2.1.0
- * Copyright 2013-2016 David Deutsch
- * Licensed under MIT (https://github.com/OwlCarousel2/OwlCarousel2/blob/master/LICENSE)
+ * Owl Carousel v2.3.4
+ * Copyright 2013-2018 David Deutsch
+ * Licensed under: SEE LICENSE IN https://github.com/OwlCarousel2/OwlCarousel2/blob/master/LICENSE
  */
 /**
  * Owl carousel
- * @version 2.1.0
+ * @version 2.3.4
  * @author Bartosz Wojciechowski
  * @author David Deutsch
  * @license The MIT License (MIT)
@@ -57,7 +57,7 @@
 		this._plugins = {};
 
 		/**
-		 * Currently suppressed events to prevent them from beeing retriggered.
+		 * Currently suppressed events to prevent them from being retriggered.
 		 * @protected
 		 */
 		this._supress = {};
@@ -188,6 +188,7 @@
 		loop: false,
 		center: false,
 		rewind: false,
+		checkVisibility: true,
 
 		mouseDrag: true,
 		touchDrag: true,
@@ -213,6 +214,7 @@
 		responsiveBaseElement: window,
 
 		fallbackEasing: 'swing',
+		slideTransition: '',
 
 		info: false,
 
@@ -326,6 +328,7 @@
 			var clones = [],
 				items = this._items,
 				settings = this.settings,
+				// TODO: Should be computed from number of min width items in stage
 				view = Math.max(settings.items * 2, 4),
 				size = Math.ceil(items.length / 2) * 2,
 				repeat = settings.loop && items.length ? settings.rewind ? view : Math.max(view, size) : 0,
@@ -334,11 +337,13 @@
 
 			repeat /= 2;
 
-			while (repeat--) {
+			while (repeat > 0) {
+				// Switch to only using appended clones
 				clones.push(this.normalize(clones.length / 2, true));
 				append = append + items[clones[clones.length - 1]][0].outerHTML;
 				clones.push(this.normalize(items.length - 1 - (clones.length - 1) / 2, true));
 				prepend = items[clones[clones.length - 1]][0].outerHTML + prepend;
+				repeat -= 1;
 			}
 
 			this._clones = clones;
@@ -433,12 +438,74 @@
 			this.$stage.children('.active').removeClass('active');
 			this.$stage.children(':eq(' + matches.join('), :eq(') + ')').addClass('active');
 
+			this.$stage.children('.center').removeClass('center');
 			if (this.settings.center) {
-				this.$stage.children('.center').removeClass('center');
 				this.$stage.children().eq(this.current()).addClass('center');
 			}
 		}
 	} ];
+
+	/**
+	 * Create the stage DOM element
+	 */
+	Owl.prototype.initializeStage = function() {
+		this.$stage = this.$element.find('.' + this.settings.stageClass);
+
+		// if the stage is already in the DOM, grab it and skip stage initialization
+		if (this.$stage.length) {
+			return;
+		}
+
+		this.$element.addClass(this.options.loadingClass);
+
+		// create stage
+		this.$stage = $('<' + this.settings.stageElement + '>', {
+			"class": this.settings.stageClass
+		}).wrap( $( '<div/>', {
+			"class": this.settings.stageOuterClass
+		}));
+
+		// append stage
+		this.$element.append(this.$stage.parent());
+	};
+
+	/**
+	 * Create item DOM elements
+	 */
+	Owl.prototype.initializeItems = function() {
+		var $items = this.$element.find('.owl-item');
+
+		// if the items are already in the DOM, grab them and skip item initialization
+		if ($items.length) {
+			this._items = $items.get().map(function(item) {
+				return $(item);
+			});
+
+			this._mergers = this._items.map(function() {
+				return 1;
+			});
+
+			this.refresh();
+
+			return;
+		}
+
+		// append content
+		this.replace(this.$element.children().not(this.$stage.parent()));
+
+		// check visibility
+		if (this.isVisible()) {
+			// update view
+			this.refresh();
+		} else {
+			// invalidate width
+			this.invalidate('width');
+		}
+
+		this.$element
+			.removeClass(this.options.loadingClass)
+			.addClass(this.options.loadedClass);
+	};
 
 	/**
 	 * Initializes the carousel.
@@ -461,36 +528,25 @@
 			}
 		}
 
-		this.$element.addClass(this.options.loadingClass);
-
-		// create stage
-		this.$stage = $('<' + this.settings.stageElement + ' class="' + this.settings.stageClass + '"/>')
-			.wrap('<div class="' + this.settings.stageOuterClass + '"/>');
-
-		// append stage
-		this.$element.append(this.$stage.parent());
-
-		// append content
-		this.replace(this.$element.children().not(this.$stage.parent()));
-
-		// check visibility
-		if (this.$element.is(':visible')) {
-			// update view
-			this.refresh();
-		} else {
-			// invalidate width
-			this.invalidate('width');
-		}
-
-		this.$element
-			.removeClass(this.options.loadingClass)
-			.addClass(this.options.loadedClass);
+		this.initializeStage();
+		this.initializeItems();
 
 		// register event handlers
 		this.registerEventHandlers();
 
 		this.leave('initializing');
 		this.trigger('initialized');
+	};
+
+	/**
+	 * @returns {Boolean} visibility of $element
+	 *                    if you know the carousel will always be visible you can set `checkVisibility` to `false` to
+	 *                    prevent the expensive browser layout forced reflow the $element.is(':visible') does
+	 */
+	Owl.prototype.isVisible = function() {
+		return this.settings.checkVisibility
+			? this.$element.is(':visible')
+			: true;
 	};
 
 	/**
@@ -515,6 +571,9 @@
 			});
 
 			settings = $.extend({}, this.options, overwrites[match]);
+			if (typeof settings.stagePadding === 'function') {
+				settings.stagePadding = settings.stagePadding();
+			}
 			delete settings.responsive;
 
 			// responsive class
@@ -525,13 +584,11 @@
 			}
 		}
 
-		if (this.settings === null || this._breakpoint !== match) {
-			this.trigger('change', { property: { name: 'settings', value: settings } });
-			this._breakpoint = match;
-			this.settings = settings;
-			this.invalidate('settings');
-			this.trigger('changed', { property: { name: 'settings', value: this.settings } });
-		}
+		this.trigger('change', { property: { name: 'settings', value: settings } });
+		this._breakpoint = match;
+		this.settings = settings;
+		this.invalidate('settings');
+		this.trigger('changed', { property: { name: 'settings', value: this.settings } });
 	};
 
 	/**
@@ -647,7 +704,7 @@
 			return false;
 		}
 
-		if (!this.$element.is(':visible')) {
+		if (!this.isVisible()) {
 			return false;
 		}
 
@@ -853,7 +910,7 @@
 				} else if (direction === 'right' && coordinate > value - width - pull && coordinate < value - width + pull) {
 					position = index + 1;
 				} else if (this.op(coordinate, '<', value)
-					&& this.op(coordinate, '>', coordinates[index + 1] || value - width)) {
+					&& this.op(coordinate, '>', coordinates[index + 1] !== undefined ? coordinates[index + 1] : value - width)) {
 					position = direction === 'left' ? index + 1 : index;
 				}
 				return position === -1;
@@ -891,7 +948,9 @@
 		if ($.support.transform3d && $.support.transition) {
 			this.$stage.css({
 				transform: 'translate3d(' + coordinate + 'px,0px,0px)',
-				transition: (this.speed() / 1000) + 's'
+				transition: (this.speed() / 1000) + 's' + (
+					this.settings.slideTransition ? ' ' + this.settings.slideTransition : ''
+				)
 			});
 		} else if (animate) {
 			this.$stage.animate({
@@ -1022,17 +1081,25 @@
 	Owl.prototype.maximum = function(relative) {
 		var settings = this.settings,
 			maximum = this._coordinates.length,
-			boundary = Math.abs(this._coordinates[maximum - 1]) - this._width,
-			i = -1, j;
+			iterator,
+			reciprocalItemsWidth,
+			elementWidth;
 
 		if (settings.loop) {
 			maximum = this._clones.length / 2 + this._items.length - 1;
 		} else if (settings.autoWidth || settings.merge) {
-			// binary search
-			while (maximum - i > 1) {
-				Math.abs(this._coordinates[j = maximum + i >> 1]) < boundary
-					? i = j : maximum = j;
+			iterator = this._items.length;
+			if (iterator) {
+				reciprocalItemsWidth = this._items[--iterator].width();
+				elementWidth = this.$element.width();
+				while (iterator--) {
+					reciprocalItemsWidth += this._items[iterator].width() + this.settings.margin;
+					if (reciprocalItemsWidth > elementWidth) {
+						break;
+					}
+				}
 			}
+			maximum = iterator + 1;
 		} else if (settings.center) {
 			maximum = this._items.length - 1;
 		} else {
@@ -1207,7 +1274,7 @@
 		this.speed(this.duration(current, position, speed));
 		this.current(position);
 
-		if (this.$element.is(':visible')) {
+		if (this.isVisible()) {
 			this.update();
 		}
 	};
@@ -1267,7 +1334,7 @@
 		} else if (document.documentElement && document.documentElement.clientWidth) {
 			width = document.documentElement.clientWidth;
 		} else {
-			throw 'Can not detect viewport width.';
+			console.warn('Can not detect viewport width.');
 		}
 		return width;
 	};
@@ -1295,7 +1362,7 @@
 			item = this.prepare(item);
 			this.$stage.append(item);
 			this._items.push(item);
-			this._mergers.push(item.find('[data-merge]').andSelf('[data-merge]').attr('data-merge') * 1 || 1);
+			this._mergers.push(item.find('[data-merge]').addBack('[data-merge]').attr('data-merge') * 1 || 1);
 		}, this));
 
 		this.reset(this.isNumeric(this.settings.startPosition) ? this.settings.startPosition : 0);
@@ -1324,11 +1391,11 @@
 			this._items.length === 0 && this.$stage.append(content);
 			this._items.length !== 0 && this._items[position - 1].after(content);
 			this._items.push(content);
-			this._mergers.push(content.find('[data-merge]').andSelf('[data-merge]').attr('data-merge') * 1 || 1);
+			this._mergers.push(content.find('[data-merge]').addBack('[data-merge]').attr('data-merge') * 1 || 1);
 		} else {
 			this._items[position].before(content);
 			this._items.splice(position, 0, content);
-			this._mergers.splice(position, 0, content.find('[data-merge]').andSelf('[data-merge]').attr('data-merge') * 1 || 1);
+			this._mergers.splice(position, 0, content.find('[data-merge]').addBack('[data-merge]').attr('data-merge') * 1 || 1);
 		}
 
 		this._items[current] && this.reset(this._items[current].index());
@@ -1404,7 +1471,7 @@
 		this.$stage.unwrap();
 		this.$stage.children().contents().unwrap();
 		this.$stage.children().unwrap();
-
+		this.$stage.remove();
 		this.$element
 			.removeClass(this.options.refreshClass)
 			.removeClass(this.options.loadingClass)
@@ -1689,7 +1756,7 @@
 
 /**
  * AutoRefresh Plugin
- * @version 2.1.0
+ * @version 2.3.4
  * @author Artus Kolanowski
  * @author David Deutsch
  * @license The MIT License (MIT)
@@ -1760,7 +1827,7 @@
 			return;
 		}
 
-		this._visible = this._core.$element.is(':visible');
+		this._visible = this._core.isVisible();
 		this._interval = window.setInterval($.proxy(this.refresh, this), this._core.settings.autoRefreshInterval);
 	};
 
@@ -1768,7 +1835,7 @@
 	 * Refreshes the element.
 	 */
 	AutoRefresh.prototype.refresh = function() {
-		if (this._core.$element.is(':visible') === this._visible) {
+		if (this._core.isVisible() === this._visible) {
 			return;
 		}
 
@@ -1801,7 +1868,7 @@
 
 /**
  * Lazy Plugin
- * @version 2.1.0
+ * @version 2.3.4
  * @author Bartosz Wojciechowski
  * @author David Deutsch
  * @license The MIT License (MIT)
@@ -1851,6 +1918,15 @@
 						position = (e.property && e.property.value !== undefined ? e.property.value : this._core.current()) + i,
 						clones = this._core.clones().length,
 						load = $.proxy(function(i, v) { this.load(v) }, this);
+					//TODO: Need documentation for this new option
+					if (settings.lazyLoadEager > 0) {
+						n += settings.lazyLoadEager;
+						// If the carousel is looping also preload images that are to the "left"
+						if (settings.loop) {
+              position -= settings.lazyLoadEager;
+              n++;
+            }
+					}
 
 					while (i++ < n) {
 						this.load(clones / 2 + this._core.relative(position));
@@ -1873,7 +1949,8 @@
 	 * @public
 	 */
 	Lazy.Defaults = {
-		lazyLoad: false
+		lazyLoad: false,
+		lazyLoadEager: 0
 	};
 
 	/**
@@ -1891,7 +1968,7 @@
 
 		$elements.each($.proxy(function(index, element) {
 			var $element = $(element), image,
-				url = (window.devicePixelRatio > 1 && $element.attr('data-src-retina')) || $element.attr('data-src');
+                url = (window.devicePixelRatio > 1 && $element.attr('data-src-retina')) || $element.attr('data-src') || $element.attr('data-srcset');
 
 			this._core.trigger('load', { element: $element, url: url }, 'lazy');
 
@@ -1900,11 +1977,15 @@
 					$element.css('opacity', 1);
 					this._core.trigger('loaded', { element: $element, url: url }, 'lazy');
 				}, this)).attr('src', url);
+            } else if ($element.is('source')) {
+                $element.one('load.owl.lazy', $.proxy(function() {
+                    this._core.trigger('loaded', { element: $element, url: url }, 'lazy');
+                }, this)).attr('srcset', url);
 			} else {
 				image = new Image();
 				image.onload = $.proxy(function() {
 					$element.css({
-						'background-image': 'url(' + url + ')',
+						'background-image': 'url("' + url + '")',
 						'opacity': '1'
 					});
 					this._core.trigger('loaded', { element: $element, url: url }, 'lazy');
@@ -1937,7 +2018,7 @@
 
 /**
  * AutoHeight Plugin
- * @version 2.1.0
+ * @version 2.3.4
  * @author Bartosz Wojciechowski
  * @author David Deutsch
  * @license The MIT License (MIT)
@@ -1957,6 +2038,8 @@
 		 */
 		this._core = carousel;
 
+		this._previousHeight = null;
+
 		/**
 		 * All event handlers.
 		 * @protected
@@ -1969,7 +2052,7 @@
 				}
 			}, this),
 			'changed.owl.carousel': $.proxy(function(e) {
-				if (e.namespace && this._core.settings.autoHeight && e.property.name == 'position'){
+				if (e.namespace && this._core.settings.autoHeight && e.property.name === 'position'){
 					this.update();
 				}
 			}, this),
@@ -1986,6 +2069,32 @@
 
 		// register event handlers
 		this._core.$element.on(this._handlers);
+		this._intervalId = null;
+		var refThis = this;
+
+		// These changes have been taken from a PR by gavrochelegnou proposed in #1575
+		// and have been made compatible with the latest jQuery version
+		$(window).on('load', function() {
+			if (refThis._core.settings.autoHeight) {
+				refThis.update();
+			}
+		});
+
+		// Autoresize the height of the carousel when window is resized
+		// When carousel has images, the height is dependent on the width
+		// and should also change on resize
+		$(window).resize(function() {
+			if (refThis._core.settings.autoHeight) {
+				if (refThis._intervalId != null) {
+					clearTimeout(refThis._intervalId);
+				}
+
+				refThis._intervalId = setTimeout(function() {
+					refThis.update();
+				}, 250);
+			}
+		});
+
 	};
 
 	/**
@@ -2003,6 +2112,7 @@
 	AutoHeight.prototype.update = function() {
 		var start = this._core._current,
 			end = start + this._core.settings.items,
+			lazyLoadEnabled = this._core.settings.lazyLoad,
 			visible = this._core.$stage.children().toArray().slice(start, end),
 			heights = [],
 			maxheight = 0;
@@ -2012,6 +2122,12 @@
 		});
 
 		maxheight = Math.max.apply(null, heights);
+
+		if (maxheight <= 1 && lazyLoadEnabled && this._previousHeight) {
+			maxheight = this._previousHeight;
+		}
+
+		this._previousHeight = maxheight;
 
 		this._core.$stage.parent()
 			.height(maxheight)
@@ -2025,7 +2141,7 @@
 			this._core.$element.off(handler, this._handlers[handler]);
 		}
 		for (property in Object.getOwnPropertyNames(this)) {
-			typeof this[property] != 'function' && (this[property] = null);
+			typeof this[property] !== 'function' && (this[property] = null);
 		}
 	};
 
@@ -2035,7 +2151,7 @@
 
 /**
  * Video Plugin
- * @version 2.1.0
+ * @version 2.3.4
  * @author Bartosz Wojciechowski
  * @author David Deutsch
  * @license The MIT License (MIT)
@@ -2163,10 +2279,10 @@
 					https://vimeo.com/groups/:group/videos/:id
 					https://app.vzaar.com/videos/:id
 
-					Visual example: http://regexper.com/#(http%3A%7Chttps%3A%7C)%5C%2F%5C%2F(player.%7Cwww.%7Capp.)%3F(vimeo%5C.com%7Cyoutu(be%5C.com%7C%5C.be%7Cbe%5C.googleapis%5C.com)%7Cvzaar%5C.com)%5C%2F(video%5C%2F%7Cvideos%5C%2F%7Cembed%5C%2F%7Cchannels%5C%2F.%2B%5C%2F%7Cgroups%5C%2F.%2B%5C%2F%7Cwatch%5C%3Fv%3D%7Cv%5C%2F)%3F(%5BA-Za-z0-9._%25-%5D*)(%5C%26%5CS%2B)%3F
+					Visual example: https://regexper.com/#(http%3A%7Chttps%3A%7C)%5C%2F%5C%2F(player.%7Cwww.%7Capp.)%3F(vimeo%5C.com%7Cyoutu(be%5C.com%7C%5C.be%7Cbe%5C.googleapis%5C.com)%7Cvzaar%5C.com)%5C%2F(video%5C%2F%7Cvideos%5C%2F%7Cembed%5C%2F%7Cchannels%5C%2F.%2B%5C%2F%7Cgroups%5C%2F.%2B%5C%2F%7Cwatch%5C%3Fv%3D%7Cv%5C%2F)%3F(%5BA-Za-z0-9._%25-%5D*)(%5C%26%5CS%2B)%3F
 			*/
 
-			id = url.match(/(http:|https:|)\/\/(player.|www.|app.)?(vimeo\.com|youtu(be\.com|\.be|be\.googleapis\.com)|vzaar\.com)\/(video\/|videos\/|embed\/|channels\/.+\/|groups\/.+\/|watch\?v=|v\/)?([A-Za-z0-9._%-]*)(\&\S+)?/);
+			id = url.match(/(http:|https:|)\/\/(player.|www.|app.)?(vimeo\.com|youtu(be\.com|\.be|be\.googleapis\.com|be\-nocookie\.com)|vzaar\.com)\/(video\/|videos\/|embed\/|channels\/.+\/|groups\/.+\/|watch\?v=|v\/)?([A-Za-z0-9._%-]*)(\&\S+)?/);
 
 			if (id[3].indexOf('youtu') > -1) {
 				type = 'youtube';
@@ -2205,7 +2321,7 @@
 		var tnLink,
 			icon,
 			path,
-			dimensions = video.width && video.height ? 'style="width:' + video.width + 'px;height:' + video.height + 'px;"' : '',
+			dimensions = video.width && video.height ? 'width:' + video.width + 'px;height:' + video.height + 'px;' : '',
 			customTn = target.find('img'),
 			srcType = 'src',
 			lazyClass = '',
@@ -2214,16 +2330,25 @@
 				icon = '<div class="owl-video-play-icon"></div>';
 
 				if (settings.lazyLoad) {
-					tnLink = '<div class="owl-video-tn ' + lazyClass + '" ' + srcType + '="' + path + '"></div>';
+					tnLink = $('<div/>',{
+						"class": 'owl-video-tn ' + lazyClass,
+						"srcType": path
+					});
 				} else {
-					tnLink = '<div class="owl-video-tn" style="opacity:1;background-image:url(' + path + ')"></div>';
+					tnLink = $( '<div/>', {
+						"class": "owl-video-tn",
+						"style": 'opacity:1;background-image:url(' + path + ')'
+					});
 				}
 				target.after(tnLink);
 				target.after(icon);
 			};
 
 		// wrap video content into owl-video-wrapper div
-		target.wrap('<div class="owl-video-wrapper"' + dimensions + '></div>');
+		target.wrap( $( '<div/>', {
+			"class": "owl-video-wrapper",
+			"style": dimensions
+		}));
 
 		if (this._core.settings.lazyLoad) {
 			srcType = 'data-src';
@@ -2289,7 +2414,8 @@
 			video = this._videos[item.attr('data-video')],
 			width = video.width || '100%',
 			height = video.height || this._core.$stage.height(),
-			html;
+			html,
+			iframe;
 
 		if (this._playing) {
 			return;
@@ -2302,20 +2428,18 @@
 
 		this._core.reset(item.index());
 
+		html = $( '<iframe frameborder="0" allowfullscreen mozallowfullscreen webkitAllowFullScreen ></iframe>' );
+		html.attr( 'height', height );
+		html.attr( 'width', width );
 		if (video.type === 'youtube') {
-			html = '<iframe width="' + width + '" height="' + height + '" src="//www.youtube.com/embed/' +
-				video.id + '?autoplay=1&v=' + video.id + '" frameborder="0" allowfullscreen></iframe>';
+			html.attr( 'src', '//www.youtube.com/embed/' + video.id + '?autoplay=1&rel=0&v=' + video.id );
 		} else if (video.type === 'vimeo') {
-			html = '<iframe src="//player.vimeo.com/video/' + video.id +
-				'?autoplay=1" width="' + width + '" height="' + height +
-				'" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>';
+			html.attr( 'src', '//player.vimeo.com/video/' + video.id + '?autoplay=1' );
 		} else if (video.type === 'vzaar') {
-			html = '<iframe frameborder="0"' + 'height="' + height + '"' + 'width="' + width +
-				'" allowfullscreen mozallowfullscreen webkitAllowFullScreen ' +
-				'src="//view.vzaar.com/' + video.id + '/player?autoplay=true"></iframe>';
+			html.attr( 'src', '//view.vzaar.com/' + video.id + '/player?autoplay=true' );
 		}
 
-		$('<div class="owl-video-frame">' + html + '</div>').insertAfter(item.find('.owl-video'));
+		iframe = $(html).wrap( '<div class="owl-video-frame" />' ).insertAfter(item.find('.owl-video'));
 
 		this._playing = item.addClass('owl-video-playing');
 	};
@@ -2355,7 +2479,7 @@
 
 /**
  * Animate Plugin
- * @version 2.1.0
+ * @version 2.3.4
  * @author Bartosz Wojciechowski
  * @author David Deutsch
  * @license The MIT License (MIT)
@@ -2477,10 +2601,11 @@
 
 /**
  * Autoplay Plugin
- * @version 2.1.0
+ * @version 2.3.4
  * @author Bartosz Wojciechowski
  * @author Artus Kolanowski
  * @author David Deutsch
+ * @author Tom De Caluwé
  * @license The MIT License (MIT)
  */
 ;(function($, window, document, undefined) {
@@ -2499,16 +2624,31 @@
 		this._core = carousel;
 
 		/**
-		 * The autoplay timeout.
-		 * @type {Timeout}
+		 * The autoplay timeout id.
+		 * @type {Number}
 		 */
-		this._timeout = null;
+		this._call = null;
+
+		/**
+		 * Depending on the state of the plugin, this variable contains either
+		 * the start time of the timer or the current timer value if it's
+		 * paused. Since we start in a paused state we initialize the timer
+		 * value.
+		 * @type {Number}
+		 */
+		this._time = 0;
+
+		/**
+		 * Stores the timeout currently used.
+		 * @type {Number}
+		 */
+		this._timeout = 0;
 
 		/**
 		 * Indicates whenever the autoplay is paused.
 		 * @type {Boolean}
 		 */
-		this._paused = false;
+		this._paused = true;
 
 		/**
 		 * All event handlers.
@@ -2523,11 +2663,10 @@
 					} else {
 						this.stop();
 					}
-				} else if (e.namespace && e.property.name === 'position') {
-					//console.log('play?', e);
-					if (this._core.settings.autoplay) {
-						this._setAutoPlayInterval();
-					}
+				} else if (e.namespace && e.property.name === 'position' && this._paused) {
+					// Reset the timer. This code is triggered when the position
+					// of the carousel was changed through user interaction.
+					this._time = 0;
 				}
 			}, this),
 			'initialized.owl.carousel': $.proxy(function(e) {
@@ -2586,48 +2725,63 @@
 	};
 
 	/**
+	 * Transition to the next slide and set a timeout for the next transition.
+	 * @private
+	 * @param {Number} [speed] - The animation speed for the animations.
+	 */
+	Autoplay.prototype._next = function(speed) {
+		this._call = window.setTimeout(
+			$.proxy(this._next, this, speed),
+			this._timeout * (Math.round(this.read() / this._timeout) + 1) - this.read()
+		);
+
+		if (this._core.is('interacting') || document.hidden) {
+			return;
+		}
+		this._core.next(speed || this._core.settings.autoplaySpeed);
+	}
+
+	/**
+	 * Reads the current timer value when the timer is playing.
+	 * @public
+	 */
+	Autoplay.prototype.read = function() {
+		return new Date().getTime() - this._time;
+	};
+
+	/**
 	 * Starts the autoplay.
 	 * @public
 	 * @param {Number} [timeout] - The interval before the next animation starts.
 	 * @param {Number} [speed] - The animation speed for the animations.
 	 */
 	Autoplay.prototype.play = function(timeout, speed) {
-		this._paused = false;
+		var elapsed;
 
-		if (this._core.is('rotating')) {
-			return;
+		if (!this._core.is('rotating')) {
+			this._core.enter('rotating');
 		}
 
-		this._core.enter('rotating');
+		timeout = timeout || this._core.settings.autoplayTimeout;
 
-		this._setAutoPlayInterval();
-	};
+		// Calculate the elapsed time since the last transition. If the carousel
+		// wasn't playing this calculation will yield zero.
+		elapsed = Math.min(this._time % (this._timeout || timeout), timeout);
 
-	/**
-	 * Gets a new timeout
-	 * @private
-	 * @param {Number} [timeout] - The interval before the next animation starts.
-	 * @param {Number} [speed] - The animation speed for the animations.
-	 * @return {Timeout}
-	 */
-	Autoplay.prototype._getNextTimeout = function(timeout, speed) {
-		if ( this._timeout ) {
-			window.clearTimeout(this._timeout);
+		if (this._paused) {
+			// Start the clock.
+			this._time = this.read();
+			this._paused = false;
+		} else {
+			// Clear the active timeout to allow replacement.
+			window.clearTimeout(this._call);
 		}
-		return window.setTimeout($.proxy(function() {
-			if (this._paused || this._core.is('busy') || this._core.is('interacting') || document.hidden) {
-				return;
-			}
-			this._core.next(speed || this._core.settings.autoplaySpeed);
-		}, this), timeout || this._core.settings.autoplayTimeout);
-	};
 
-	/**
-	 * Sets autoplay in motion.
-	 * @private
-	 */
-	Autoplay.prototype._setAutoPlayInterval = function() {
-		this._timeout = this._getNextTimeout();
+		// Adjust the origin of the timer to match the new timeout value.
+		this._time += this.read() % timeout - elapsed;
+
+		this._timeout = timeout;
+		this._call = window.setTimeout($.proxy(this._next, this, speed), timeout - elapsed);
 	};
 
 	/**
@@ -2635,24 +2789,28 @@
 	 * @public
 	 */
 	Autoplay.prototype.stop = function() {
-		if (!this._core.is('rotating')) {
-			return;
-		}
+		if (this._core.is('rotating')) {
+			// Reset the clock.
+			this._time = 0;
+			this._paused = true;
 
-		window.clearTimeout(this._timeout);
-		this._core.leave('rotating');
+			window.clearTimeout(this._call);
+			this._core.leave('rotating');
+		}
 	};
 
 	/**
-	 * Stops the autoplay.
+	 * Pauses the autoplay.
 	 * @public
 	 */
 	Autoplay.prototype.pause = function() {
-		if (!this._core.is('rotating')) {
-			return;
-		}
+		if (this._core.is('rotating') && !this._paused) {
+			// Pause the clock.
+			this._time = this.read();
+			this._paused = true;
 
-		this._paused = true;
+			window.clearTimeout(this._call);
+		}
 	};
 
 	/**
@@ -2677,7 +2835,7 @@
 
 /**
  * Navigation Plugin
- * @version 2.1.0
+ * @version 2.3.4
  * @author Artus Kolanowski
  * @author David Deutsch
  * @license The MIT License (MIT)
@@ -2804,12 +2962,18 @@
 	 */
 	Navigation.Defaults = {
 		nav: false,
-		navText: [ 'prev', 'next' ],
+		navText: [
+			'<span aria-label="' + 'Previous' + '">&#x2039;</span>',
+			'<span aria-label="' + 'Next' + '">&#x203a;</span>'
+		],
 		navSpeed: false,
-		navElement: 'div',
+		navElement: 'button type="button" role="presentation"',
 		navContainer: false,
 		navContainerClass: 'owl-nav',
-		navClass: [ 'owl-prev', 'owl-next' ],
+		navClass: [
+			'owl-prev',
+			'owl-next'
+		],
 		slideBy: 1,
 		dotClass: 'owl-dot',
 		dotsClass: 'owl-dots',
@@ -2849,7 +3013,7 @@
 
 		// create DOM structure for absolute navigation
 		if (!settings.dotsData) {
-			this._templates = [ $('<div>')
+			this._templates = [ $('<button role="button">')
 				.addClass(settings.dotClass)
 				.append($('<span>'))
 				.prop('outerHTML') ];
@@ -2858,7 +3022,7 @@
 		this._controls.$absolute = (settings.dotsContainer ? $(settings.dotsContainer)
 			: $('<div>').addClass(settings.dotsClass).appendTo(this.$element)).addClass('disabled');
 
-		this._controls.$absolute.on('click', 'div', $.proxy(function(e) {
+		this._controls.$absolute.on('click', 'button', $.proxy(function(e) {
 			var index = $(e.target).parent().is(this._controls.$absolute)
 				? $(e.target).index() : $(e.target).parent().index();
 
@@ -2866,6 +3030,19 @@
 
 			this.to(index, settings.dotsSpeed);
 		}, this));
+
+		/*$el.on('focusin', function() {
+			$(document).off(".carousel");
+
+			$(document).on('keydown.carousel', function(e) {
+				if(e.keyCode == 37) {
+					$el.trigger('prev.owl')
+				}
+				if(e.keyCode == 39) {
+					$el.trigger('next.owl')
+				}
+			});
+		});*/
 
 		// override public methods of the carousel
 		for (override in this._overrides) {
@@ -2878,13 +3055,18 @@
 	 * @protected
 	 */
 	Navigation.prototype.destroy = function() {
-		var handler, control, property, override;
+		var handler, control, property, override, settings;
+		settings = this._core.settings;
 
 		for (handler in this._handlers) {
 			this.$element.off(handler, this._handlers[handler]);
 		}
 		for (control in this._controls) {
-			this._controls[control].remove();
+			if (control === '$relative' && settings.navContainer) {
+				this._controls[control].html('');
+			} else {
+				this._controls[control].remove();
+			}
 		}
 		for (override in this.overides) {
 			this._core[override] = this._overrides[override];
@@ -3060,7 +3242,7 @@
 
 /**
  * Hash Plugin
- * @version 2.1.0
+ * @version 2.3.4
  * @author Artus Kolanowski
  * @author David Deutsch
  * @license The MIT License (MIT)
@@ -3184,7 +3366,7 @@
 /**
  * Support Plugin
  *
- * @version 2.1.0
+ * @version 2.3.4
  * @author Vivid Planet Software GmbH
  * @author Artus Kolanowski
  * @author David Deutsch

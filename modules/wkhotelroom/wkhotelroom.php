@@ -100,6 +100,7 @@ class WkHotelRoom extends Module
                     $dateTo,
                     $useTax
                 );
+                $htlRoom['features'] = $product->getFrontFeatures($this->context->language->id);
                 $htlRoom['feature_price'] = $featurePrice;
                 $htlRoom['feature_price_diff'] = (float)($priceWithoutReduction - $featurePrice);
             }
@@ -114,11 +115,22 @@ class WkHotelRoom extends Module
                     'HOTEL_ROOM_DISPLAY_DESCRIPTION',
                     $this->context->language->id
                 ),
+                'ftr_img_src' => _PS_IMG_.'rf/',
                 'hotelRoomDisplay' => $hotelRoomDisplay
             )
         );
 
+        $this->context->controller->addCSS(_PS_JS_DIR_.'owl-carousel/assets/owl.carousel.min.css');
+        $this->context->controller->addCSS(_PS_JS_DIR_.'owl-carousel/assets/owl.theme.default.min.css');
+        $this->context->controller->addJS(_PS_JS_DIR_.'owl-carousel/owl.carousel.min.js');
         $this->context->controller->addJs($this->_path.'/views/js/WkHotelRoomBlockFront.js');
+
+        Media::addJsDef([
+            'HOTEL_ROOM_NAV_TYPE' => Configuration::get('HOTEL_ROOM_NAV_TYPE'),
+            'SLIDER_NAV_TYPE_DOTS' => HotelHelper::SLIDER_NAV_TYPE_DOTS,
+            'SLIDER_NAV_TYPE_BUTTON' => HotelHelper::SLIDER_NAV_TYPE_BUTTON,
+        ]);
+
 
         return $this->display(__FILE__, 'hotelRoomDisplayBlock.tpl');
     }

@@ -38,7 +38,6 @@ class blocknavigationmenu extends Module
 
         $this->bootstrap = true;
         parent::__construct();
-
         $this->displayName = $this->l('Navigation block');
         $this->description = $this->l('Adds a navigation block at top and footer section.');
         $this->ps_versions_compliancy = array('min' => '1.6', 'max' => _PS_VERSION_);
@@ -50,11 +49,6 @@ class blocknavigationmenu extends Module
     }
 
     public function hookTop($params)
-    {
-        return $this->hookDisplayTopSubSecondaryBlock($params);
-    }
-
-    public function hookDisplayTopSubSecondaryBlock($params)
     {
         Media::addJsDef(array('currentPage' => $this->context->controller->php_self));
         $this->context->controller->addJS($this->_path.'/views/js/htlnevigationmenu.js');

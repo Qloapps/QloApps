@@ -20,62 +20,41 @@
 * @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
 */
 
-$(document).ready(function() {
-    applyChangesToDescription();
-    $(window).on('resize', function() {
-        resetDescriptionChanges();
-        applyChangesToDescription();
-    });
-
-    $(document).on('click', '.htlRoomTypeDescReadmore', function(e) {
-        e.preventDefault();
-        var target = (e.target).closest(".htlRoomTypeDescText");
-        $(target).removeClass('htlRoomTypeDescTextContainer');
-        $(target).html($(e.target).closest(".hotelRoomDescContainer").find('.htlRoomTypeDescOriginal').html());
-        $(target).append($('.htlRoomTypeDescExtras').html());
-        $(target).find('.htlRoomTypeDescReadless').show().css('display', 'inline-block');
-    });
-
-    $(document).on('click', '.htlRoomTypeDescReadless', function(e) {
-        e.preventDefault();
-        var target = (e.target).closest(".htlRoomTypeDescText");
-        $(target).addClass('htlRoomTypeDescTextContainer');
-        initToggleOptions($(target));
-    });
-});
-
-function resetDescriptionChanges() {
-    $(document).find('.htlRoomTypeDescText').each(function() {
-        $(this).addClass('htlRoomTypeDescTextContainer');
-        $(this).html($(this).parent().find('.htlRoomTypeDescOriginal').html());
-    });
-}
-
-function applyChangesToDescription() {
-    $(document).find('.htlRoomTypeDescText').each(function() {
-        // checking if the display:overFlow has been applied to the description. using 14px since font size is 14px.
-        if ($(this).prop('scrollHeight') - $(this).prop('clientHeight') > 14) {
-            initToggleOptions($(this)[0]);
+$(document).ready(function () {
+    let prevBtn = $('<div>', { class: 'nav-direction-wrapper ' })
+        .append($('<div>', { class: 'nav-direction-primary' })
+            .append($('<div>', { class: 'nav-direction-secondary' }).append($('<i>', { class: 'icon-angle-left' }))
+            )
+        );
+    let nextBtn = $('<div>', { class: 'nav-direction-wrapper' })
+        .append($('<div>', { class: 'nav-direction-primary' })
+            .append($('<div>', { class: 'nav-direction-secondary' }).append($('<i>', { class: 'icon-angle-right' }))
+            )
+        );
+    $('#hotelRoomsBlock .owl-carousel').owlCarousel({
+        loop: true,
+        nav: (HOTEL_ROOM_NAV_TYPE == SLIDER_NAV_TYPE_BUTTON),
+        navSpeed: 1000,
+        navText: [prevBtn, nextBtn],
+        dots: (HOTEL_ROOM_NAV_TYPE == SLIDER_NAV_TYPE_DOTS),
+        items: 1,
+        autoHeight: true,
+        autoplay: true,
+        autoplaySpeed: 1000,
+        autoplayTimeout: 5000,
+        autoplayHoverPause: true,
+        responsiveClass: true,
+        rtl: language_is_rtl,
+        padding: 10,
+        responsive: {
+            0: { items: 1 },
+            600: { items: 2 },
+            1000: { items: 3 }
+        },
+        onInitialized: function (event) {
+            var nav = $(event.target).find('.owl-nav');
+			nav.find('.owl-prev').attr('tabindex', '-1');
+            nav.find('.owl-next').attr('tabindex', '-1');
         }
     });
-}
-
-function initToggleOptions(target) {
-    truncatedText = truncateText(target);
-    $(target).text(truncatedText);
-    $(target).append($('.htlRoomTypeDescExtras').html());
-    $(target).find('.htlRoomTypeDescReadmore').first().show().css('display', 'inline-block');
-}
-
-function truncateText(target) {
-    var lineHeight = parseInt($(target).css('line-height'), 10);
-    var containerHeight = lineHeight * 3;
-
-    text = $(target).text();
-    while ($(target).prop('scrollHeight') > containerHeight) {
-        text = text.slice(0, -10);
-        $(target).text(text + ' ... ' + $('.htlRoomTypeDescReadmore').first().text());
-    }
-
-    return text;
-}
+});

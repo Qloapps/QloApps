@@ -30,7 +30,7 @@ $(document).on('click', '#blocknewsletter .newsletter-btn', function (e) {
             let messageBlock = $('#blocknewsletter .message-block');
             $(messageBlock).fadeOut('fast');
 
-            $('#blocknewsletter .loader').show();
+            $('#blocknewsletter .spinner').show();
         },
         success: function (response) {
             let messageBlock = $('#blocknewsletter .message-block');
@@ -42,7 +42,7 @@ $(document).on('click', '#blocknewsletter .newsletter-btn', function (e) {
             }
         },
         complete: function () {
-            $('#blocknewsletter .loader').hide();
+            $('#blocknewsletter .spinner').hide();
         }
     });
 });

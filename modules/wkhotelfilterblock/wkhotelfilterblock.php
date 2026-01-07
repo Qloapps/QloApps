@@ -85,23 +85,6 @@ class wkhotelfilterblock extends Module
                     ),
                     'hint' => $this->l('Enable to display Amenities filter.'),
                 ),
-                array(
-                    'type' => 'switch',
-                    'label' => $this->l('Show Price filter'),
-                    'name' => 'SHOW_PRICE_FILTER',
-                    'is_bool' => true,
-                    'values' => array(
-                        array(
-                            'id' => 'active_on',
-                            'value' => 1,
-                        ),
-                        array(
-                            'id' => 'active_off',
-                            'value' => 0,
-                        ),
-                    ),
-                    'hint' => $this->l('Enable to display Price filter.'),
-                ),
             ),
             'submit' => array(
                 'title' => $this->l('Save'),
@@ -136,7 +119,6 @@ class wkhotelfilterblock extends Module
                 'SHOW_AMENITIES_FILTER',
                 Tools::getValue('SHOW_AMENITIES_FILTER')
             );
-            Configuration::updateValue('SHOW_PRICE_FILTER', Tools::getValue('SHOW_PRICE_FILTER'));
 
             // redirect after saving the configuration
             Tools::redirectAdmin(
@@ -149,11 +131,8 @@ class wkhotelfilterblock extends Module
     public function install()
     {
         if (!parent::install()
-            || !$this->registerHook('header')
-            || !$this->registerHook('addOtherModuleSetting')
-            || !$this->registerHook('displayLeftColumn')
+            || !$this->registerModuleHooks()
             || !Configuration::updateValue('SHOW_AMENITIES_FILTER', 1)
-            || !Configuration::updateValue('SHOW_PRICE_FILTER', 1)
         ) {
             return false;
         }
@@ -161,39 +140,35 @@ class wkhotelfilterblock extends Module
         return true;
     }
 
+    public function registerModuleHooks()
+    {
+        return $this->registerHook(array(
+            'header',
+            'addOtherModuleSetting',
+            'actionFrontControllerSetMedia',
+            'displayRoomTypeCategoryFilter'
+        ));
+    }
+
     public function hookHeader()
     {
         $this->context->controller->addJQueryUI('ui.slider');
     }
 
-    public function hookDisplayLeftColumn()
+    public function hookActionFrontControllerSetMedia()
     {
         if ($this->context->controller->php_self == 'category') {
             $htl_id_category = Tools::getValue('id_category');
             if (Validate::isLoadedObject($objCategory = new Category((int) $htl_id_category))
-                && ($id_hotel = HotelBranchInformation::getHotelIdByIdCategory($htl_id_category))
+                && (HotelBranchInformation::getHotelIdByIdCategory($htl_id_category))
             ) {
                 if ($objCategory->hasParent(Configuration::get('PS_LOCATIONS_CATEGORY'))) {
-                    Media::addJsDef(array('noRoomAvailTxt' => $this->l('No room available', false, true)));
-
-                    $this->context->controller->addJS($this->_path.'/views/js/wkhotelfilterblock.js');
-                    $id_lang = $this->context->language->id;
-                    $all_feat = FeatureCore::getFeatures($id_lang);
-
-                    $max_adult = HotelRoomType::getMaxAdults($id_hotel);
-                    $max_child = HotelRoomType::getMaxChild($id_hotel);
-
                     $urlData = array ();
-                    if (!($date_from = Tools::getValue('date_from'))) {
-                        $date_from = date('Y-m-d H:i:s');
-                        $date_to = date('Y-m-d H:i:s', strtotime($date_from) + 86400);
-                    } else {
+                    if ($date_from = Tools::getValue('date_from')) {
                         $urlData['date_from'] = $date_from;
                     }
 
-                    if (!($date_to = Tools::getValue('date_to'))) {
-                        $date_to = date('Y-m-d H:i:s', strtotime($date_from) + 86400);
-                    } else {
+                    if ($date_to = Tools::getValue('date_to')) {
                         $urlData['date_to'] = $date_to;
                     }
 
@@ -201,16 +176,7 @@ class wkhotelfilterblock extends Module
                         $urlData['occupancy'] = $occupancy;
                     }
 
-                    $obj_rm_type = new HotelRoomType();
-                    $room_types = $obj_rm_type->getIdProductByHotelId($id_hotel, 0, 1, 1);
                     $occupancy = Tools::getValue('occupancy');
-
-                    $prod_price = array();
-                    if ($room_types) {
-                        foreach ($room_types as $key => $value) {
-                            $prod_price[] = HotelRoomTypeFeaturePricing::getRoomTypeFeaturePricesPerDay($value['id_product'], $date_from, $date_to, HotelBookingDetail::useTax(), 0, 0, 0, 0, 1, 1, $occupancy);
-                        }
-                    }
 
                     if (Configuration::get('PS_REWRITING_SETTINGS')) {
                         $categoryUrl = $this->context->link->getCategoryLink(
@@ -225,30 +191,50 @@ class wkhotelfilterblock extends Module
                             $this->context->language->id
                         ).'&'.http_build_query($urlData);
                     }
-                    $currency = $this->context->currency;
 
-                    $config = $this->getConfigFieldsValues();
+                    Media::addJsDef(
+                        array(
+                            'cat_link' => $categoryUrl,
+                            'date_from' => $date_from,
+                            'date_to' => $date_to,
+                        )
+                    );
 
-                    $num_days = HotelHelper::getNumberOfDays($date_from, $date_to);
-
-                    $warning_num = Configuration::get('WK_ROOM_LEFT_WARNING_NUMBER');
-                    $this->context->smarty->assign(array(
-                        'warning_num' => $warning_num,
-                        'all_feat' => $all_feat,
-                        'max_adult' => $max_adult,
-                        'max_child' => $max_child,
-                        'cat_link' => $categoryUrl,
-                        'currency' => $currency,
-                        'date_from' => $date_from,
-                        'date_to' => $date_to,
-                        'num_days' => $num_days,
-                        'config' => $config,
-                        'min_price' => $prod_price ? min($prod_price) : 0,
-                        'max_price' => $prod_price ? max($prod_price) : 0,
-                    ));
-
-                    return $this->display(__FILE__, 'htlfilterblock.tpl');
+                    $this->context->controller->addJS($this->_path.'/views/js/wkhotelfilterblock.js');
                 }
+            }
+        }
+    }
+
+    public function hookDisplayRoomTypeCategoryFilter($params)
+    {
+        $htl_id_category = Tools::getValue('id_category');
+        if (Validate::isLoadedObject($objCategory = new Category((int) $htl_id_category))
+            && (HotelBranchInformation::getHotelIdByIdCategory($htl_id_category))
+        ) {
+            if ($objCategory->hasParent(Configuration::get('PS_LOCATIONS_CATEGORY'))) {
+                if (!($date_from = Tools::getValue('date_from'))) {
+                    $date_from = date('Y-m-d H:i:s');
+                    $date_to = date('Y-m-d H:i:s', strtotime($date_from) + 86400);
+                }
+
+                if (!($date_to = Tools::getValue('date_to'))) {
+                    $date_to = date('Y-m-d H:i:s', strtotime($date_from) + 86400);
+                }
+
+                $id_lang = $this->context->language->id;
+                $all_feat = FeatureCore::getFeatures($id_lang);
+
+                $config = $this->getConfigFieldsValues();
+
+                $this->context->smarty->assign(array(
+                    'all_feat' => $all_feat,
+                    'config' => $config,
+                    'date_from'=> $date_from,
+                    'date_to'=> $date_to,
+                ));
+
+                return $this->display(__FILE__, 'htlfilterblock.tpl');
             }
         }
     }
@@ -257,7 +243,6 @@ class wkhotelfilterblock extends Module
     {
         return array(
             'SHOW_AMENITIES_FILTER' => Configuration::get('SHOW_AMENITIES_FILTER'),
-            'SHOW_PRICE_FILTER' => Configuration::get('SHOW_PRICE_FILTER'),
         );
     }
 
@@ -265,7 +250,6 @@ class wkhotelfilterblock extends Module
     {
         if (!parent::uninstall()
             || !Configuration::deleteByName('SHOW_AMENITIES_FILTER')
-            || !Configuration::deleteByName('SHOW_PRICE_FILTER')
         ) {
             return false;
         }

@@ -677,11 +677,6 @@ class Blocknewsletter extends Module
         return Mail::Send($this->context->language->id, 'newsletter_verif', Mail::l('Email verification', $this->context->language->id), array('{verif_url}' => $verif_url), $email, null, null, null, null, null, dirname(__FILE__).'/mails/', false, $this->context->shop->id);
     }
 
-    public function hookDisplayRightColumn($params)
-    {
-        return $this->hookDisplayLeftColumn($params);
-    }
-
     protected function _prepareHook($params)
     {
         if (!$this->hookPrepared) {
@@ -697,7 +692,7 @@ class Blocknewsletter extends Module
         }
     }
 
-    public function hookDisplayLeftColumn($params)
+    protected function _getNewsLetterHookForm($params)
     {
         $this->_prepareHook($params);
 
@@ -706,21 +701,19 @@ class Blocknewsletter extends Module
         return $this->display(__FILE__, 'blocknewsletter.tpl');
     }
 
-    // by webkul
-    public function hookDisplayFooterNotificationHook($params)
-    {
-        return $this->hookDisplayLeftColumn($params);
-    }
-
-    // By webkul
     // public function hookFooter($params)
     // {
-    // 	return $this->hookDisplayLeftColumn($params);
+    //     return $this->_getNewsLetterHookForm($params);
     // }
 
-    public function hookdisplayMaintenance($params)
+    public function hookDisplayFooterNotificationHook($params)
     {
-        return $this->hookDisplayLeftColumn($params);
+        return $this->_getNewsLetterHookForm($params);
+    }
+
+    public function hookDisplayMaintenance($params)
+    {
+        return $this->_getNewsLetterHookForm($params);
     }
 
     public function hookDisplayHeader($params)

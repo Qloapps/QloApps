@@ -22,7 +22,7 @@
 *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 *}
-<div class="pagenotfound">
+<div class="pagenotfound text-center pt-2 pb-5">
 	<img class="img-responsive" src="{$img_dir}404.png">
 
 	<h1>{l s='Page not found!!!'}</h1>
@@ -32,7 +32,7 @@
 	</p>
 
 	<div class="buttons">
-		<a class="btn btn-primary" href="{if isset($force_ssl) && $force_ssl}{$base_dir_ssl}{else}{$base_dir}{/if}" title="{l s='Home'}">
+		<a class="btn btn-primary btn-lg" href="{if isset($force_ssl) && $force_ssl}{$base_dir_ssl}{else}{$base_dir}{/if}" title="{l s='Home'}">
 			<span>{l s='Home Page'}</span>
 		</a>
 	</div>

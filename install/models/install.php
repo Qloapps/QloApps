@@ -671,12 +671,9 @@ class InstallModelInstall extends InstallAbstractModel
                 'blockcurrencies',
                 'blocklanguages',
                 'qlohotelreview',
-                'wkfooterlangcurrencyblock',
-                'wkfooterpaymentinfoblockcontainer',
                 'wkfooteraboutblock',
                 'wkfooterpaymentblock',
                 'wkfooternotificationblock',
-                'blocknavigationmenu',
                 'dashguestcycle',
                 'dashoccupancy',
                 'dashactivity',
@@ -709,6 +706,8 @@ class InstallModelInstall extends InstallAbstractModel
                 'qlostatsserviceproducts',
                 'blockcart',
                 'blockuserinfo',
+                'blocknavigationmenu',
+                'qlohotelofferings',
                 'qlochannelmanagerconnector',
             );
         }

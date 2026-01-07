@@ -37,8 +37,17 @@ class AdminTestimonialsModuleSettingController extends ModuleAdminController
 
         $this->fields_options = array(
             'modulesetting' => array(
-                'title' =>    $this->l('Hotel Testimonials Setting'),
-                'fields' =>    array(
+                'title' => $this->l('Hotel Testimonials Setting'),
+                'fields' => array(
+                    'HOTEL_TESIMONIAL_BLOCK_NAV_TYPE' => array(
+                        'title' => $this->l('Slider navigation type'),
+                        'hint' => $this->l('Select slider navigation type for the testimonial block slider in the front office'),
+                        'validation' => 'isInt',
+                        'type' => 'select',
+                        'list' => HotelHelper::getSliderNavigationTypes(),
+                        'identifier' => 'id',
+                        'cast' => 'intval'
+                    ),
                     'HOTEL_TESIMONIAL_BLOCK_HEADING' => array(
                         'title' => $this->l('Testimonial block title'),
                         'type' => 'textLang',

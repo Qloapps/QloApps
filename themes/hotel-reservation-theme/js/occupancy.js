@@ -28,7 +28,7 @@ $(document).ready(function(){
 		booking_occupancy_inner = $(this).closest('.booking_occupancy_inner');
         var booking_occupancy_wrapper = $(this).closest('.booking_occupancy_wrapper');
         $(this).closest('.occupancy_info_block').hide('fast', function(){
-            $(this).remove()
+            $(this).remove();
             $(booking_occupancy_inner).find('.room_num_wrapper').each(function(key, val) {
                 $(this).text(room_txt + ' - '+ (key+1) );
             });
@@ -66,19 +66,24 @@ $(document).ready(function(){
                 $(this).closest('.occupancy_info_block').find('.children_age_info_block').show();
 
                 let roomBlockIndex = parseInt($(this).closest('.occupancy_info_block').attr('occ_block_index'));
+                var childAgeSelectWrapper = $('<div>');
+                var childAgeSelect = $('<select>', {
+                    class: 'guest_child_age custom-select small room_occupancies',
+                    name: 'occupancy[' + roomBlockIndex + '][child_ages][]'
+                });
 
-                let childAgeSelect = '<div>';
-                    childAgeSelect += '<select class="guest_child_age room_occupancies" name="occupancy[' +roomBlockIndex+ '][child_ages][]">';
-                        childAgeSelect += '<option value="-1">' + select_age_txt + '</option>';
-                        childAgeSelect += '<option value="0">' + under_1_age + '</option>';
-                        for (let age = 1; age < max_child_age; age++) {
-                            childAgeSelect += '<option value="'+age+'">'+age+'</option>';
-                        }
-                    childAgeSelect += '</select>';
-                childAgeSelect += '</div>';
+                childAgeSelect.append($('<option>', { value: -1, text: select_age_txt }), $('<option>', { value: 0, text: under_1_age }));
+                for (let age = 1; age < max_child_age; age++) {
+                    childAgeSelect.append(
+                        $('<option>', {
+                            value: age,
+                            text: age
+                        })
+                    );
+                }
 
-                $(this).closest('.occupancy_info_block').find('.children_ages').append(childAgeSelect);
-
+                childAgeSelectWrapper.append(childAgeSelect);
+                $(this).closest('.occupancy_info_block').find('.children_ages').append(childAgeSelectWrapper);
                 // set input field value
                 $(this).closest('.occupancy_count_block').find('.occupancy_count > span').text(elementVal + 1);
             } else {
@@ -155,12 +160,7 @@ $(document).ready(function(){
     });
 
 	$(document).on('click', '.booking_guest_occupancy', function(e) {
-        if ($(this).parent().hasClass('open')) {
-            $('.booking_guest_occupancy_conatiner .dropdown').removeClass('open');
-        } else {
-            $('.booking_guest_occupancy_conatiner .dropdown').removeClass('open');
-            $(this).parent().toggleClass('open');
-        }
+        $(this).parent().find('.booking_occupancy_wrapper').toggle();
     });
 
     $(document).on('click', '.booking_occupancy_wrapper .submit_occupancy_btn', function(e) {
@@ -195,27 +195,27 @@ $(document).ready(function(){
             hasErrors = 1;
             showErrorMessage(invalid_occupancy_txt);
         } else {
-            $(occupancy_wrapper).find('.occupancy_count').removeClass('error_border');
+            $(occupancy_wrapper).find('.occupancy_count').removeClass('border-danger');
 
             // validate values of adults and children
             adults.forEach(function (item, index) {
                 if (isNaN(item) || parseInt(item) < 1) {
                     hasErrors = 1;
-                    $(occupancy_wrapper).find(".num_adults").eq(index).closest('.occupancy_count_block').find('.occupancy_count').addClass('error_border');
+                    $(occupancy_wrapper).find(".num_adults").eq(index).closest('.occupancy_count_block').find('.occupancy_count').addClass('border-danger');
                 }
                 if (isNaN(children[index])) {
                     hasErrors = 1;
-                    $(occupancy_wrapper).find(".num_children").eq(index).closest('.occupancy_count_block').find('.occupancy_count').addClass('error_border');
+                    $(occupancy_wrapper).find(".num_children").eq(index).closest('.occupancy_count_block').find('.occupancy_count').addClass('border-danger');
                 }
             });
 
             // validate values of selected child ages
-            $(occupancy_wrapper).find('.guest_child_age').removeClass('error_border');
+            $(occupancy_wrapper).find('.guest_child_age').removeClass('border-danger');
             child_ages.forEach(function (age, index) {
                 age = parseInt(age);
                 if (isNaN(age) || (age < 0) || (age >= parseInt(max_child_age))) {
                     hasErrors = 1;
-                    $(occupancy_wrapper).find(".guest_child_age").eq(index).addClass('error_border');
+                    $(occupancy_wrapper).find(".guest_child_age").eq(index).addClass('border-danger');
                 }
             });
         }
@@ -223,12 +223,12 @@ $(document).ready(function(){
             if (!($(e.target).closest(".ajax_add_to_cart_button").length
                 || $(e.target).closest(".exclusive.book_now_submit").length
             )) {
-                $(occupancy_wrapper).parent().removeClass('open');
-                $(occupancy_wrapper).siblings(".booking_guest_occupancy").removeClass('error_border');
+                $(occupancy_wrapper).css({'display' : 'none'});
+                $(occupancy_wrapper).siblings(".booking_guest_occupancy").removeClass('border-danger');
                 $(document).trigger( "QloApps:updateRoomOccupancy", [occupancy_wrapper]);
             }
         } else {
-            $(occupancy_wrapper).siblings(".booking_guest_occupancy").addClass('error_border');
+            $(occupancy_wrapper).siblings(".booking_guest_occupancy").addClass('border-danger');
 
             return false;
         }
@@ -238,72 +238,85 @@ $(document).ready(function(){
 
 	$(document).on('click', '.booking_occupancy_wrapper .add_new_occupancy_btn', function(e) {
         e.preventDefault();
-
         var booking_occupancy_wrapper = $(this).closest('.booking_occupancy_wrapper');
-        var occupancy_block = '';
         var roomBlockIndex = parseInt($(booking_occupancy_wrapper).find(".occupancy_info_block").last().attr('occ_block_index'));
         roomBlockIndex += 1;
-
-        var max_children = parseInt($(booking_occupancy_wrapper).find('.max_children').val());
 
         var countRooms = parseInt($(booking_occupancy_wrapper).find('.occupancy_info_block').length);
         countRooms += 1
         if ($(booking_occupancy_wrapper).find('.max_avail_type_qty').val() > 0
 			&& countRooms <= $(booking_occupancy_wrapper).find('.max_avail_type_qty').val()
 		) {
-            occupancy_block += '<div class="occupancy_info_block" occ_block_index="'+roomBlockIndex+'" style="display:none;">';
-                occupancy_block += '<div class="occupancy_info_head"><span class="room_num_wrapper">'+ room_txt + ' - ' + countRooms + '</span><a class="remove-room-link pull-right" href="#">' + remove_txt + '</a></div>';
-                occupancy_block += '<div class="row">';
-                    occupancy_block += '<div class="form-group col-sm-5 col-xs-6 occupancy_count_block">';
-                        occupancy_block += '<div class="row">';
-                            occupancy_block += '<label class="col-sm-12">' + adults_txt + '</label>';
-                            occupancy_block += '<div class="col-sm-12">';
-                                occupancy_block += '<input type="hidden" class="num_occupancy num_adults" name="occupancy['+roomBlockIndex+'][adults]" value="1">';
-                                occupancy_block += '<div class="occupancy_count pull-left">';
-                                    occupancy_block += '<span>1</span>';
-                                occupancy_block += '</div>';
-                                occupancy_block += '<div class="qty_direction pull-left">';
-                                    occupancy_block += '<a href="#" data-field-qty="qty" class="btn btn-default occupancy_quantity_up">';
-                                        occupancy_block += '<span><i class="icon-plus"></i></span>';
-                                    occupancy_block += '</a>';
-                                    occupancy_block += '<a href="#" data-field-qty="qty" class="btn btn-default occupancy_quantity_down">';
-                                        occupancy_block += '<span><i class="icon-minus"></i></span>';
-                                    occupancy_block += '</a>';
-                                occupancy_block += '</div>';
-                            occupancy_block += '</div>';
-                        occupancy_block += '</div>';
-                    occupancy_block += '</div>';
-                    occupancy_block += '<div class="form-group col-sm-7 col-xs-6 occupancy_count_block ' + (!max_children ? 'hide' : '') +' ">';
-                        occupancy_block += '<div class="row">';
-                            occupancy_block += '<label class="col-sm-12">' + children_txt + '</label>';
-                            occupancy_block += '<div class="col-sm-12 clearfix">';
-                                occupancy_block += '<input type="hidden" class="num_occupancy num_children room_occupancies" name="occupancy['+roomBlockIndex+'][children]" value="0">';
-                                occupancy_block += '<div class="occupancy_count pull-left">';
-                                    occupancy_block += '<span>0</span>';
-                                occupancy_block += '</div>';
-                                occupancy_block += '<div class="qty_direction pull-left">';
-                                    occupancy_block += '<a href="#" data-field-qty="qty" class="btn btn-default occupancy_quantity_up">';
-                                        occupancy_block += '<span><i class="icon-plus"></i></span>';
-                                    occupancy_block += '</a>';
-                                    occupancy_block += '<a href="#" data-field-qty="qty" class="btn btn-default occupancy_quantity_down">';
-                                        occupancy_block += '<span><i class="icon-minus"></i></span>';
-                                    occupancy_block += '</a>';
-                                occupancy_block += '</div>';
-                            occupancy_block += '</div>';
-                            occupancy_block += '<div class="col-sm-12"><span class="label-desc-txt">(' + below_txt + ' ' + max_child_age + ' ' + years_txt + ')</span></div>';
-                        occupancy_block += '</div>';
-                    occupancy_block += '</div>';
-                occupancy_block += '</div>';
-                occupancy_block += '<p style="display:none;"><span class="text-danger occupancy-input-errors"></span></p>';
-                occupancy_block += '<div class="form-group row children_age_info_block">';
-                    occupancy_block += '<label class="col-sm-12">' + all_children_txt + '</label>';
-                    occupancy_block += '<div class="col-sm-12">';
-                        occupancy_block += '<div class="children_ages">';
-                        occupancy_block += '</div>';
-                    occupancy_block += '</div>';
-                occupancy_block += '</div>';
-                occupancy_block += '<hr class="occupancy-info-separator">';
-            occupancy_block += '</div>';
+            var occupancy_adults_block = $('<div>', { class: 'form-group occupancy_count_block col-sm-5 col-6' }).append(
+                $('<label>').text(adults_txt),
+                $('<div>', { class: 'clearfix d-flex' }).append(
+                    $('<input>', {
+                        type: 'hidden',
+                        class: 'num_occupancy num_adults room_occupancies',
+                        name: 'occupancy[' + roomBlockIndex + '][adults]',
+                        value: 1
+                    }),
+                    $('<div>', {
+                        class: 'occupancy_count border p-small rounded float-left mr-1 max-width-7'
+                    }).append($('<span>', {class : 'min-width-3 d-block text-center'}).text('1')),
+                    $('<div>', { class: 'qty_direction d-flex flex-column gap-1' }).append(
+                        $('<a>', { href: '#', class: 'p-0 border rounded occupancy_quantity_up' }).append($('<i>', { class: 'icon-plus' })),
+                        $('<a>', { href: '#', class: 'p-0 border rounded occupancy_quantity_down' }).append($('<i>', { class: 'icon-minus' }))
+                    )
+                )
+            );
+
+            var occupancy_children_block = $('<div>', { class: 'form-group occupancy_count_block col-sm-7 col-6' }).append(
+                $('<label>').text(children_txt),
+                $('<div>', { class: 'clearfix d-flex' }).append(
+                    $('<input>', {
+                        type: 'hidden',
+                        class: 'num_occupancy num_children room_occupancies',
+                        name: 'occupancy[' + roomBlockIndex + '][children]',
+                        value: 0
+                    }),
+                    $('<div>', {
+                        class: 'occupancy_count border p-small rounded float-left mr-1 max-width-7'
+                    }).append($('<span>', {class: 'min-width-3 d-block text-center'}).text('0')),
+                    $('<div>', { class: 'qty_direction d-flex flex-column gap-1' }).append(
+                        $('<a>', { href: '#', class: 'p-0 border rounded occupancy_quantity_up' }).append($('<i>', { class: 'icon-plus' })),
+                        $('<a>', { href: '#', class: 'p-0 border rounded occupancy_quantity_down' }).append($('<i>', { class: 'icon-minus' }))
+                    )
+                ),
+                $('<div>', {
+                    class: 'label-desc-txt help_block',
+                    text: '(' + below_txt + ' ' + max_child_age + ' ' + years_txt + ')'
+                })
+            );
+
+            var occupancy_row = $('<div>', { class: 'row' }).append(occupancy_adults_block, occupancy_children_block);
+
+            var occupancy_children_age_block = $('<div>', { class: 'row' }).append(
+                $('<div>', { class: 'form-group children_age_info_block col-sm-12' }).append(
+                    $('<label>', {class: 'help_block'}).text(all_children_txt),
+                    $('<div>', { class: 'children_ages d-grid gap-1 justify-content-between' })
+                ).css('display', 'none')
+            );
+
+            var occupancy_info_block = $('<div>', {
+                class: 'occupancy_info_block',
+                occ_block_index: roomBlockIndex
+            }).append(occupancy_row, occupancy_children_age_block);
+
+            var occupancy_header = $('<div>', { class: 'occupancy_info_head font-weight-bold mb-2' }).append(
+                $('<span>', {
+                    class: 'room_num_wrapper',
+                    text: room_txt + ' - ' + countRooms
+                }),
+                $('<a>', {
+                    href: '#',
+                    class: 'remove-room-link float-right text-danger text-decoration-none',
+                    text: remove_txt
+                })
+            );
+
+            var occupancy_block = $('<div>', { class: 'occupancy_info_block' })
+                .append(occupancy_header, occupancy_info_block, $('<hr>', { class: 'occupancy-info-separator ml-n3 mr-n3' }));
 
             $(booking_occupancy_wrapper).find('.booking_occupancy_inner').append(occupancy_block).find('[occ_block_index="'+roomBlockIndex+'"]').show('fast');
 
@@ -401,16 +414,16 @@ function getRoomTypeGuestOccupancyFormated(adults, children, rooms)
 
 function resetOccupancyField(booking_occupancy_wrapper)
 {
-	$(booking_occupancy_wrapper).siblings('.booking_guest_occupancy').find('span').text(select_occupancy_txt);
-	$(booking_occupancy_wrapper).find('.booking_occupancy_inner > div').each(function(index, element){
-		let num_adults = $(booking_occupancy_wrapper).find('.base_adult').val();
-		if (index == 0) {
-			$(this).removeClass('selected');
-			$(this).find('.num_adults').val(num_adults).siblings('.occupancy_count').find('span').text(num_adults);
-			$(this).find('.num_children').val(0).siblings('.occupancy_count').find('span').text(0);
-			$(this).find('.children_ages > div').remove();
-		} else {
-			$(element).remove();
-		}
-	});
+	// $(booking_occupancy_wrapper).siblings('.booking_guest_occupancy').find('span').text(select_occupancy_txt);
+	// $(booking_occupancy_wrapper).find('.booking_occupancy_inner > div').each(function(index, element){
+	// 	let num_adults = $(booking_occupancy_wrapper).find('.base_adult').val();
+	// 	if (index == 0) {
+	// 		$(this).removeClass('selected');
+	// 		$(this).find('.num_adults').val(num_adults).siblings('.occupancy_count').find('span').text(num_adults);
+	// 		$(this).find('.num_children').val(0).siblings('.occupancy_count').find('span').text(0);
+	// 		$(this).find('.children_ages > div').remove();
+	// 	} else {
+	// 		$(element).remove();
+	// 	}
+	// });
 }

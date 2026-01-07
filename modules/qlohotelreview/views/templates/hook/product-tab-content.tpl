@@ -21,7 +21,10 @@
 *}
 
 {block name='hotel_reviews'}
-    <div id="hotel-reviews" class="tab-pane card {if isset($language_is_rtl) && $language_is_rtl} rtl {/if}">
+    <div id="hotel-reviews" class="{if isset($language_is_rtl) && $language_is_rtl} rtl {/if}">
+        <div class="block_heading">
+            {l s='Reviews' mod='qlohotelreview'}
+        </div>
         {if is_array($reviews) && count($reviews)}
             {block name='review_summary'}
                 {include file='./_partials/review-summary.tpl'}
@@ -39,4 +42,6 @@
             {l s='No reviews.' mod='qlohotelreview'}
         {/if}
     </div>
+    <hr class="block_seperator"/>
+
 {/block}

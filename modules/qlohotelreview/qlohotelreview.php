@@ -219,22 +219,6 @@ class QloHotelReview extends Module
         }
     }
 
-    public function hookDisplayRoomTypeDetailRoomTypeNameAfter($params)
-    {
-        if ($params['product']->booking_product) {
-            $idProduct = $params['id_product'];
-            $objHotelRoomType = new HotelRoomType();
-            $roomTypeInfo = $objHotelRoomType->getRoomTypeInfoByIdProduct($idProduct);
-            $idHotel = $roomTypeInfo['id_hotel'];
-            $this->smarty->assign(array(
-                'num_reviews' => QhrHotelReview::getReviewCountByIdHotel($idHotel),
-                'avg_rating' => QhrHotelReview::getAverageRatingByIdHotel($idHotel),
-                'ratting_img_path' => _MODULE_DIR_.'hotelreservationsystem/views/img/Slices/icons-sprite.png',
-            ));
-
-            return $this->display(__FILE__, 'room-type-name-after.tpl');
-        }
-    }
 
     public function hookActionRoomBookingStatusUpdateAfter($params)
     {

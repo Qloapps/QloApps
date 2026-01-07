@@ -72,15 +72,9 @@ class BlockUserInfo extends Module
 		return $this->hookdisplayNav($params);
 	}
 
-
 	public function hookdisplayNav($params)
 	{
 		return $this->display(__FILE__, 'nav.tpl');
-	}
-
-	public function hookDisplayTopSubSecondaryBlock($params)
-	{
-		return $this->hookdisplayNav($params);
 	}
 
 	public function hookDisplayExternalNavigationHook($params)

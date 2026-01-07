@@ -52,12 +52,6 @@ UPDATE `PREFIX_configuration` SET value = 'CAT3,CAT8,CAT5,LNK1' WHERE name = 'MO
 UPDATE `PREFIX_configuration` SET value = '0' WHERE name = 'MOD_BLOCKTOPMENU_SEARCH';
 UPDATE `PREFIX_configuration` SET value = 'https://www.facebook.com/qloapps' WHERE name = 'BLOCKSOCIAL_FACEBOOK';
 UPDATE `PREFIX_configuration` SET value = 'https://twitter.com/qloapps' WHERE name = 'BLOCKSOCIAL_TWITTER';
-UPDATE `PREFIX_configuration` SET value = 'My Company' WHERE name = 'BLOCKCONTACTINFOS_COMPANY';
-UPDATE `PREFIX_configuration` SET value = '42 Puffin street\n12345 Puffinville\nFrance' WHERE name = 'BLOCKCONTACTINFOS_ADDRESS';
-UPDATE `PREFIX_configuration` SET value = '0123-456-789' WHERE name = 'BLOCKCONTACTINFOS_PHONE';
-UPDATE `PREFIX_configuration` SET value = 'sales@yourcompany.com' WHERE name = 'BLOCKCONTACTINFOS_EMAIL';
-UPDATE `PREFIX_configuration` SET value = '0123-456-789' WHERE name = 'BLOCKCONTACT_TELNUMBER';
-UPDATE `PREFIX_configuration` SET value = 'sales@yourcompany.com' WHERE name = 'BLOCKCONTACT_EMAIL';
 UPDATE `PREFIX_configuration` SET value = '1' WHERE name = 'SUPPLIER_DISPLAY_TEXT';
 UPDATE `PREFIX_configuration` SET value = '5' WHERE name = 'SUPPLIER_DISPLAY_TEXT_NB';
 UPDATE `PREFIX_configuration` SET value = '1' WHERE name = 'SUPPLIER_DISPLAY_FORM';
@@ -73,15 +67,27 @@ DELETE FROM `PREFIX_hook_module` WHERE id_hook = (SELECT id_hook FROM `PREFIX_ho
 /* displayHome */
 SET @id_hook = (SELECT id_hook FROM `PREFIX_hook` WHERE name = 'displayHome');
 UPDATE `PREFIX_hook_module` SET position = 1
-WHERE id_module = (SELECT id_module FROM `PREFIX_module` WHERE name = 'themeconfigurator')
+WHERE id_module = (SELECT id_module FROM `PREFIX_module` WHERE name = 'wkhotelroom')
 AND id_hook = @id_hook;
 
 UPDATE `PREFIX_hook_module` SET position = 2
-WHERE id_module = (SELECT id_module FROM `PREFIX_module` WHERE name = 'blockfacebook')
+WHERE id_module = (SELECT id_module FROM `PREFIX_module` WHERE name = 'wkhotelfeaturesblock')
 AND id_hook = @id_hook;
 
 UPDATE `PREFIX_hook_module` SET position = 3
-WHERE id_module = (SELECT id_module FROM `PREFIX_module` WHERE name = 'blockcmsinfo')
+WHERE id_module = (SELECT id_module FROM `PREFIX_module` WHERE name = 'hotelreservationsystem')
+AND id_hook = @id_hook;
+
+UPDATE `PREFIX_hook_module` SET position = 4
+WHERE id_module = (SELECT id_module FROM `PREFIX_module` WHERE name = 'qlohotelofferings')
+AND id_hook = @id_hook;
+
+UPDATE `PREFIX_hook_module` SET position = 5
+WHERE id_module = (SELECT id_module FROM `PREFIX_module` WHERE name = 'wktestimonialblock')
+AND id_hook = @id_hook;
+
+UPDATE `PREFIX_hook_module` SET position = 6
+WHERE id_module = (SELECT id_module FROM `PREFIX_module` WHERE name = 'wkabouthotelblock')
 AND id_hook = @id_hook;
 
 /* displayNav */
@@ -96,10 +102,6 @@ AND id_hook = @id_hook;
 
 UPDATE `PREFIX_hook_module` SET position = 3
 WHERE id_module = (SELECT id_module FROM `PREFIX_module` WHERE name = 'blocklanguages')
-AND id_hook = @id_hook;
-
-UPDATE `PREFIX_hook_module` SET position = 4
-WHERE id_module = (SELECT id_module FROM `PREFIX_module` WHERE name = 'blockcontact')
 AND id_hook = @id_hook;
 
 /* displayTop */
@@ -150,20 +152,33 @@ AND id_hook = @id_hook;
 /* displayFooter */
 SET @id_hook = (SELECT id_hook FROM `PREFIX_hook` WHERE name = 'displayFooter');
 UPDATE `PREFIX_hook_module` SET position = 1
-WHERE id_module = (SELECT id_module FROM `PREFIX_module` WHERE name = 'blocknewsletter')
+WHERE id_module = (SELECT id_module FROM `PREFIX_module` WHERE name = 'hotelreservationsystem')
 AND id_hook = @id_hook;
 
 UPDATE `PREFIX_hook_module` SET position = 2
+WHERE id_module = (SELECT id_module FROM `PREFIX_module` WHERE name = 'wkabouthotelblock')
+AND id_hook = @id_hook;
+
+UPDATE `PREFIX_hook_module` SET position = 3
+WHERE id_module = (SELECT id_module FROM `PREFIX_module` WHERE name = 'blocknavigationmenu')
+AND id_hook = @id_hook;
+
+UPDATE `PREFIX_hook_module` SET position = 4
 WHERE id_module = (SELECT id_module FROM `PREFIX_module` WHERE name = 'blocksocial')
 AND id_hook = @id_hook;
 
 UPDATE `PREFIX_hook_module` SET position = 5
-WHERE id_module = (SELECT id_module FROM `PREFIX_module` WHERE name = 'blockmyaccountfooter')
+WHERE id_module = (SELECT id_module FROM `PREFIX_module` WHERE name = 'blocknewsletter')
 AND id_hook = @id_hook;
 
 UPDATE `PREFIX_hook_module` SET position = 6
-WHERE id_module = (SELECT id_module FROM `PREFIX_module` WHERE name = 'blockcontactinfos')
+WHERE id_module = (SELECT id_module FROM `PREFIX_module` WHERE name = 'wkfooternotificationblock')
 AND id_hook = @id_hook;
+
+UPDATE `PREFIX_hook_module` SET position = 9
+WHERE id_module = (SELECT id_module FROM `PREFIX_module` WHERE name = 'statsdata')
+AND id_hook = @id_hook;
+
 
 /* displayProductButtons */
 SET @id_hook = (SELECT id_hook FROM `PREFIX_hook` WHERE name = 'displayProductButtons');

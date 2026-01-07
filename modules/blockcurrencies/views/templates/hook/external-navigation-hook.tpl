@@ -21,15 +21,13 @@
 *}
 
 {if count($currencies) > 1}
-    <ul class="nav nav-pills nav-stacked visible-xs wk-nav-style">
+    <ul class="nav d-block d-md-none">
         <li>
-            <a class="btn-currency-selector-popup">
-                {foreach from=$currencies item=currency}
-                    {if $cookie->id_currency == $currency.id_currency}
-                        {$currency.iso_code}
-                        <span class="caret"></span>
-                    {/if}
-                {/foreach}
+            <a class="btn-currency-selector-popup navigation-link">
+                {if (isset($currencies[$cookie->id_currency]))}
+                    {$currencies[$cookie->id_currency]['iso_code']}
+                    <span class="icon-caret-down"></span>
+                {/if}
             </a>
         </li>
     </ul>

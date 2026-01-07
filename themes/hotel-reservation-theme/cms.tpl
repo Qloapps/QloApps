@@ -38,7 +38,7 @@
 				<p id="admin-action-result"></p>
 			</div>
 		{/if}
-		<div class="rte{if $content_only} content_only{/if}">
+		<div class="rte{if $content_only} content_only{/if} container">
 			{$cms->content}
 		</div>
 	{elseif isset($cms_category)}

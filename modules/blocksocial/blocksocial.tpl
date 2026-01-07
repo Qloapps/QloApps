@@ -24,72 +24,66 @@
 *  International Registered Trademark & Property of PrestaShop SA
 *}
 
-<div class="row">
-    <section class="col-xs-12 col-sm-12">
-        <div class="row margin-lr-0 footer-section-heading">
-            <p>{l s='Follow us on' mod='blocksocial'}</p>
-            <hr/>
-        </div>
-        <div class="row margin-lr-0" id="social_block">
-            <ul>
-                {if isset($facebook_url) && $facebook_url != ''}
-                    <li class="facebook">
-                        <a class="_blank" href="{$facebook_url|escape:html:'UTF-8'}">
-                            <span>{l s='Facebook' mod='blocksocial'}</span>
-                        </a>
-                    </li>
-                {/if}
-                {if isset($twitter_url) && $twitter_url != ''}
-                    <li class="twitter">
-                        <a class="_blank" href="{$twitter_url|escape:html:'UTF-8'}">
-                            <span>{l s='Twitter' mod='blocksocial'}</span>
-                        </a>
-                    </li>
-                {/if}
-                {if isset($rss_url) && $rss_url != ''}
-                    <li class="rss">
-                        <a class="_blank" href="{$rss_url|escape:html:'UTF-8'}">
-                            <span>{l s='RSS' mod='blocksocial'}</span>
-                        </a>
-                    </li>
-                {/if}
-                {if isset($youtube_url) && $youtube_url != ''}
-                    <li class="youtube">
-                        <a class="_blank" href="{$youtube_url|escape:html:'UTF-8'}">
-                            <span>{l s='Youtube' mod='blocksocial'}</span>
-                        </a>
-                    </li>
-                {/if}
-                {if isset($google_plus_url) && $google_plus_url != ''}
-                    <li class="google-plus">
-                        <a class="_blank" href="{$google_plus_url|escape:html:'UTF-8'}">
-                            <span>{l s='Google Plus' mod='blocksocial'}</span>
-                        </a>
-                    </li>
-                {/if}
-                {if isset($pinterest_url) && $pinterest_url != ''}
-                    <li class="pinterest">
-                        <a class="_blank" href="{$pinterest_url|escape:html:'UTF-8'}">
-                            <span>{l s='Pinterest' mod='blocksocial'}</span>
-                        </a>
-                    </li>
-                {/if}
-                {if isset($vimeo_url) && $vimeo_url != ''}
-                    <li class="vimeo">
-                        <a class="_blank" href="{$vimeo_url|escape:html:'UTF-8'}">
-                            <span>{l s='Vimeo' mod='blocksocial'}</span>
-                        </a>
-                    </li>
-                {/if}
-                {if isset($instagram_url) && $instagram_url != ''}
-                    <li class="instagram">
-                        <a class="_blank" href="{$instagram_url|escape:html:'UTF-8'}">
-                            <span>{l s='Instagram' mod='blocksocial'}</span>
-                        </a>
-                    </li>
-                {/if}
-            </ul>
-            <div class="clearfix"></div>
-        </div>
-    </section>
-</div>
+<section class="col-md-3">
+    <div class="footer-section-heading footer-section-item ">
+        <span>{l s='SOCIAL LINK' mod='blocksocial'}</span>
+    </div>
+    <ul class="row list-style-none gap-3 mb-0 d-block blocksocial">
+        {if isset($facebook_url) && $facebook_url != ''}
+            <li class="facebook footer-section-item">
+                <a class="_blank" href="{$facebook_url|escape:html:'UTF-8'}">
+                    <i class="icon-brands icon-facebook"></i>
+                    <span>{l s='Facebook' mod='blocksocial'}</span>
+                </a>
+            </li>
+        {/if}
+        {if isset($twitter_url) && $twitter_url != ''}
+            <li class="twitter footer-section-item">
+                <a class="_blank" href="{$twitter_url|escape:html:'UTF-8'}">
+                    <i class="icon-brands icon-x-twitter"></i>
+                    <span>{l s='Twitter' mod='blocksocial'}</span>
+                </a>
+            </li>
+        {/if}
+        {if isset($rss_url) && $rss_url != ''}
+            <li class="rss footer-section-item">
+                <a class="_blank" href="{$rss_url|escape:html:'UTF-8'}">
+                    <i class="icon-rss"></i>
+                    <span>{l s='RSS' mod='blocksocial'}</span>
+                </a>
+            </li>
+        {/if}
+        {if isset($youtube_url) && $youtube_url != ''}
+            <li class="youtube footer-section-item">
+                <a class="_blank" href="{$youtube_url|escape:html:'UTF-8'}">
+                    <i class="icon-brands icon-youtube"></i>
+                    <span>{l s='Youtube' mod='blocksocial'}</span>
+                </a>
+            </li>
+        {/if}
+        {if isset($pinterest_url) && $pinterest_url != ''}
+            <li class="pinterest footer-section-item">
+                <a class="_blank" href="{$pinterest_url|escape:html:'UTF-8'}">
+                    <i class="icon-brands icon-pinterest"></i>
+                    <span>{l s='Pinterest' mod='blocksocial'}</span>
+                </a>
+            </li>
+        {/if}
+        {if isset($vimeo_url) && $vimeo_url != ''}
+            <li class="vimeo footer-section-item">
+                <a class="_blank" href="{$vimeo_url|escape:html:'UTF-8'}">
+                    <i class="icon-brands icon-vimeo"></i>
+                    <span>{l s='Vimeo' mod='blocksocial'}</span>
+                </a>
+            </li>
+        {/if}
+        {if isset($instagram_url) && $instagram_url != ''}
+            <li class="instagram footer-section-item">
+                <a class="_blank" href="{$instagram_url|escape:html:'UTF-8'}">
+                    <i class="icon-brands icon-square-instagram"></i>
+                    <span>{l s='Instagram' mod='blocksocial'}</span>
+                </a>
+            </li>
+        {/if}
+    </ul>
+</section>

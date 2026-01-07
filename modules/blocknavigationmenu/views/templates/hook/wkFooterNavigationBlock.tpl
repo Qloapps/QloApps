@@ -22,17 +22,16 @@
 
 {block name='footer_navigation'}
 	{if isset($navigation_links) && $navigation_links}
-		<div class="col-sm-3">
-			<div class="row">
-				<section class="col-xs-12 col-sm-12">
-					<div class="row margin-lr-0 footer-section-heading">
-						<p>{l s='Explore' mod='blocknavigationmenu'}</p>
-						<hr/>
+		<div class="col-md-3">
+			<div>
+				<section>
+					<div class="footer-section-heading footer-section-item ">
+						<span>{l s='QUICK LINKS' mod='blocknavigationmenu'}</span>
 					</div>
-					<div class="row margin-lr-0">
-						<ul class="footer-navigation-section">
+					<div>
+						<ul class="footer-navigation-section list-style-none">
 						{foreach $navigation_links as $navigationLink}
-							<li class="item">
+							<li class="footer-section-item">
 								<a title="{$navigationLink['name']}" href="{$navigationLink['link']}">{$navigationLink['name']}</a>
 							</li>
 						{/foreach}

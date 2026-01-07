@@ -1255,6 +1255,17 @@ $(document).ready(function() {
             ajax_check_var.abort();
         }
     }
+
+    $('.tab_container a[data-toggle="tab"]').on('click', function (e) {
+        e.stopPropagation();
+        e.preventDefault();
+        let targetTab = $(this).attr('href');
+        if ($(targetTab).length) {
+            $('html, body').animate({
+                scrollTop: $(targetTab).offset().top - 10 // adjust header offset
+            }, 400);
+        }
+    });
 });
 function addProductToRoomType(that) {
     var id_product = $(that).data('id-product');
@@ -1339,7 +1350,6 @@ function initMap() {
 var BookingForm = {
     currentRequest: null,
     init: function() {
-        $('form#booking-form input[type="radio"]').uniform();
         $('select.input-hotel').chosen({
             disable_search: true,
             width: '100%',
@@ -1475,7 +1485,7 @@ var BookingForm = {
                         BookingForm.currentRequest.abort();
                     }
                     $('.book_now_submit').prop('disabled', true).find('span:not(#booking_action_loader)').hide();
-                    $('#booking_action_block').find('#booking_action_loader').addClass('active');
+                    $('#booking_action_block').find('#booking_action_loader').removeClass('d-none').addClass('d-block');
                 },
                 success: function(response) {
                     if (response.status == true) {

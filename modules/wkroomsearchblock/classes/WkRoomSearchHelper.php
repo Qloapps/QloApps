@@ -146,7 +146,11 @@ class WkRoomSearchHelper
                         $dateTo = date('Y-m-d', strtotime('+1 day', strtotime($dateFrom)));
                     }
 
-                    $idHotel = HotelBranchInformation::getHotelIdByIdCategory($idHotelCategory);
+                    if ($idHotel = HotelBranchInformation::getHotelIdByIdCategory($idHotelCategory)) {
+                        $hotel = $objHotelInfo->hotelBranchesInfo(false, 2, 1, $idHotel);
+                        $hotelLocation = $hotel['hotel_name'].', '.$hotel['city'].(isset($hotel['state_name']) ? ', '.$hotel['state_name'] : '');
+                        $smartyVars['hotel_location'] = $hotelLocation;
+                    }
                     $htlCategoryInfo = $objHotelInfo->getCategoryDataByIdCategory((int) $objCategory->id_parent);
                     $searchedData['htl_dtl'] = $objHotelInfo->hotelBranchesInfo(0, 1, 1, $idHotel);
                     $minBookingOffset = (int) HotelOrderRestrictDate::getMinimumBookingOffset($idHotel);

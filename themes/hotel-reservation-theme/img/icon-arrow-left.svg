@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="20px" height="8px" viewBox="0 0 20 8" version="1.1">
+<!-- Generator: Sketch 51.2 (57519) - http://www.bohemiancoding.com/sketch -->
+    <title>icon-forward-arrow</title>
+    <desc>Created with Sketch.</desc>
+    <defs/>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Product-Page-8" transform="translate(-374.000000, -135.000000)" fill="#333333">
+            <g id="searched-results" transform="translate(162.000000, 105.000000)">
+                <g id="padding-[15h]" transform="translate(0.000000, 23.000000)">
+                    <path d="M226,10 L226,7 L232,11 L226,15 L226,12 L212,12 L212,10 L226,10 Z" id="icon-forward-arrow"/>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

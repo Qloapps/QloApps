@@ -24,34 +24,93 @@
 *}
 
 {block name='category'}
-    <div class="row cat_cont">
-        <div class="col-sm-12">
-            {block name='category_top_left'}
-                <div class="row margin-lr-0 catSortBlock">
-                    <div class="col-sm-2 sortBlockHeading">
-                        <p>{l s='Sort By:'}</p>
-                    </div>
-                    <div class="col-sm-3">
-                        <div class="filter_dw_cont">
-                            <button class="btn btn-default dropdown-toggle" type="button" id="price_ftr" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <span class="pull-left sort_btn_span" data-sort-by="0" data-sort-value="0" data-sort-for="{l s='Recommended'}">{l s='Recommended'}</span>
-                                <span class="caret pull-right margin-top-7"></span>
-                            </button>
-                            <ul class="dropdown-menu" aria-labelledby="price_ftr">
-                                <li><a href="#" class="sort_result" data-sort-by="0" data-value="0">{l s='Recommended'}</a></li>
-                                <li><a href="#" class="sort_result" data-sort-by="2" data-value="1">{l s='Price : Lowest First'}</a></li>
-                                <li><a href="#" class="sort_result" data-sort-by="2" data-value="2">{l s='Price : Highest first '}</a></li>
-                            </ul>
-                        </div>
-                    </div>
+    {* todo: add hotel images *}
+    <div class="cat_cont container p-0">
+        <div class="col-12">
+            <div class="category_info_block">
+                <div class="category_heading">
+                    <span class="block_title">
+                        {$objHotel->hotel_name}
+                    </span>
+                    {if isset($hotel_address) && $hotel_address != ''}
+                        <span class="d-block">
+                        <i class="icon-location-dot"></i>
+                            {$hotel_address}
+                        </span>
+                    {/if}
+                    <span>
+                        <i class="icon-envelope"></i>
+                        {$objHotel->email}
+                    </span>
+                    {if isset($hotel_contact) && $hotel_contact != ''}
+                        <span class="seprator-pipe">
+                        <i class="icon-phone"></i>
+                            {$hotel_contact}
+                        </span>
+                    {/if}
+                    <span class="seprator-pipe">
+                        <span id="hotel_rating">{for $i=0; $i < $objHotel->rating; $i++}<i class="icon-star"></i>{/for}{for $i=$objHotel->rating; $i < 5; $i++}<i class="icon-star text-grey"></i>{/for}</span>
+                    </span>
+                </div>
+                <div class="">
+                </div>
+            </div>
+            {block name='category_tabs'}
+                <div class="tab_container">
+                    <ul class="nav nav-pills tab_list_headings">
+                        <li class="nav-item"><a href="#category_info_tab" data-toggle="tab" class="idTabHrefShort nav-pill active">{l s='Overview'}</a></li>
+                        {* <li class="nav-item"><a href="#hotel_amenities" data-toggle="tab" class="idTabHrefShort nav-pill">{l s='Room Types'}</a></li> *}
+                        <li class="nav-item"><a href="#room_types_list_tab" data-toggle="tab" class="idTabHrefShort nav-pill">{l s='Room Types'}</a></li>
+                        <li class="nav-item"><a href="#location_tab" data-toggle="tab" class="idTabHrefShort nav-pill">{l s='Location'}</a></li>
+                        <li class="nav-item"><a href="#about_us_tab" data-toggle="tab" class="idTabHrefShort nav-pill">{l s='About us'}</a></li>
+                        <li class="nav-item"><a href="#policies_tab" data-toggle="tab" class="idTabHrefShort nav-pill">{l s='Policies'}</a></li>
+                        {* <li class="nav-item"><a href="#review_tab" data-toggle="tab" class="idTabHrefShort nav-pill">{l s='Review'}</a></li> *}
+                        {block name='displayCategoryTab'}
+                            {hook h='displayCategoryTab'}
+                        {/block}
+                    </ul>
                 </div>
             {/block}
-            <input type="hidden" id="max_order_date" name="max_order_date" value="{$max_order_date}">
-            <div class="row margin-lr-0" id="category_data_cont">
-                {block name='room_type_list'}
-                    {include file="./_partials/room_type_list.tpl"}
-                {/block}
-            </div>
+            {block name='category_tabs_content'}
+                <div class="tab-content">
+                    {block name='category_info_tab_content'}
+                        <div id="category_info_tab" class=" active">
+                            <div id="category_info_tab_content">
+                                {block name='category_info_description'}
+                                    <div class="category_description_heading block_heading">
+                                        {$objHotel->hotel_name}
+                                    </div>
+                                    <div class="row info_margin_div category_description_content">
+                                        <div class="col-12">
+                                            {$objHotel->description}
+                                        </div>
+                                    </div>
+                                {/block}
+                            </div>
+                        </div>
+                        <hr class="block_seperator"/>
+                    {/block}
+                    {block name='room_types_list_tab'}
+                        <div id="room_types_list_tab">
+                            <div class="room_type_section_heading block_heading">
+                                {l s='Room Types'}
+                            </div>
+                            <input type="hidden" id="max_order_date" name="max_order_date" value="{$max_order_date}">
+                            <div id="room_type_list_filters" class="col-12 row">
+                                {block name='room_type_list_filters'}
+                                    {include file="./_partials/room_type_list_filters.tpl"}
+                                {/block}
+                            </div>
+                            <div id="category_data_cont">
+                                {block name='room_type_list'}
+                                    {include file="./_partials/room_type_list.tpl"}
+                                {/block}
+                            </div>
+                        </div>
+                    {/block}
+                    <hr class="block_seperator"/>
+                </div>
+            {/block}
         </div>
     </div>
 

@@ -21,9 +21,14 @@
 *}
 
 {block name='room_types_filters_block'}
-	<div id="filter_results" class="row block">
-		<div class="col-sm-12">
-			{block name='room_types_amenities_filter'}
+	<div id="filter_results" class="block">
+		{*  to be udpated *}
+		<div>
+			<input type="hidden" id="filter_check_in_time" name="filter_check_in_time" {if isset($date_from)}value="{$date_from|escape:'htmlall':'UTF-8'}"{/if}>
+			<input type="hidden" id="filter_check_out_time" name="filter_check_in_time" {if isset($date_to)}value="{$date_to|escape:'htmlall':'UTF-8'}"{/if}>
+			<div class="form-control input-date " id="filter_daterange_value"  autocomplete="off" placeholder="{l s='Check-in - Check-out' mod='wkhotelfilterblock'}" tabindex="-1"><span class="align-self-center">{l s='Check-in' mod='wkhotelfilterblock'} <i class="icon icon-minus"></i> {l s='Check-out' mod='wkhotelfilterblock'}</span></div>
+		</div>
+			{* {block name='room_types_amenities_filter'}
 				{if isset($config) && $config['SHOW_AMENITIES_FILTER'] && $all_feat}
 					<div class="row margin-lr-0 layered_filter_cont">
 						<div class="col-sm-12 layered_filter_heading">
@@ -45,45 +50,7 @@
 						</div>
 					</div>
 				{/if}
-			{/block}
+			{/block} *}
 
-			{block name='room_types_price_filter'}
-				{if isset($config) && $config['SHOW_PRICE_FILTER']}
-					<div class="row margin-lr-0 layered_filter_cont">
-						<div class="col-sm-12 layered_filter_heading">
-							<div class="row margin-lr-0">
-								<div class="pull-left lf_headingmain_wrapper">
-									<span>{l s='Price' mod='wkhotelfilterblock'}</span>
-									<hr class="theme-text-underline">
-								</div>
-								<span class="pull-right clear_filter">{l s='Clear Filter' mod='wkhotelfilterblock'}</span>
-							</div>
-						</div>
-						<div class="col-sm-12 lf_sub_cont">
-							<div class="row margin-lr-0 price_filter_subcont">
-								<span class="pull-left"><span id="filter_price_from">{displayPrice price=$min_price}</span></span>
-								<span class="pull-right"><span id="filter_price_to">{displayPrice price=$max_price}</span></span>
-							</div>
-							<div id="filter_price_silder"></div>
-						</div>
-					</div>
-				{/if}
-			{/block}
-		</div>
 	</div>
-	{block name='room_types_filters_js_vars'}
-		{strip}
-			{addJsDef num_days = $num_days}
-			{addJsDef date_from = $date_from}
-			{addJsDef date_to = $date_to}
-
-			{addJsDef cat_link = $cat_link}
-			{addJsDef min_price = $min_price}
-			{addJsDef max_price = $max_price}
-			{addJsDef warning_num = $warning_num}
-
-			{addJsDefL name=viewMoreTxt}{l s='View More' js=1 mod='wkhotelfilterblock'}{/addJsDefL}
-			{addJsDefL name=bookNowTxt}{l s='Book Now' js=1 mod='wkhotelfilterblock'}{/addJsDefL}
-		{/strip}
-	{/block}
 {/block}

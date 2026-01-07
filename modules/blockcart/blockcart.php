@@ -548,11 +548,6 @@ class Blockcart extends Module
         return $this->hookTop($params);
     }
 
-    public function hookDisplayTopSubSecondaryBlock($params)
-    {
-        return $this->hookTop($params);
-    }
-
     public function renderForm()
     {
         $fields_form = array(

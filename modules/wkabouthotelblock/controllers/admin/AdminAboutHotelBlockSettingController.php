@@ -34,11 +34,21 @@ class AdminAboutHotelBlockSettingController extends ModuleAdminController
         $this->identifier_name = 'display_name';
         $this->identifier = 'id_interior_image';
 
+        parent::__construct();
         $this->fields_options = array(
             'global' => array(
                 'title' =>  $this->l('Hotel Interior Description'),
                 'icon' =>   'icon-cogs',
                 'fields' => array(
+                    'HOTEL_INTERIOR_NAV_TYPE' => array(
+                        'title' => $this->l('Slider navigation type'),
+                        'hint' => $this->l('Select slider navigation type for the hotel interior images slider in the front office'),
+                        'validation' => 'isInt',
+                        'type' => 'select',
+                        'list' => HotelHelper::getSliderNavigationTypes(),
+                        'identifier' => 'id',
+                        'cast' => 'intval'
+                    ),
                     'HOTEL_INTERIOR_HEADING' => array(
                         'title' => $this->l('Interior Block Title'),
                         'type' => 'textLang',
@@ -114,17 +124,8 @@ class AdminAboutHotelBlockSettingController extends ModuleAdminController
                 'text' => $this->l('Delete selected'),
                 'icon' => 'icon-trash',
                 'confirm' => $this->l('Delete selected items?'),
-            ),
-            'enableSelection' => array(
-                'text' => $this->l('Enable selection'),
-                'icon' => 'icon-power-off text-success',
-            ),
-            'disableSelection' => array(
-                'text' => $this->l('Disable selection'),
-                'icon' => 'icon-power-off text-danger',
-            ),
+            )
         );
-        parent::__construct();
     }
 
     public function initContent()

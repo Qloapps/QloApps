@@ -172,6 +172,7 @@ class WkHotelTestimonialData extends ObjectModel
 
         // update global configuration values in multilang
         Configuration::updateValue('HOTEL_TESIMONIAL_BLOCK_HEADING', $HOTEL_TESIMONIAL_BLOCK_HEADING);
+        Configuration::updateValue('HOTEL_TESIMONIAL_BLOCK_NAV_TYPE', 0);
         Configuration::updateValue('HOTEL_TESIMONIAL_BLOCK_CONTENT', $HOTEL_TESIMONIAL_BLOCK_CONTENT);
 
         $testimonialDemoContent = array(

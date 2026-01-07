@@ -20,24 +20,28 @@
 * @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
 *}
 
-<div class="booking-form card">
+<div class="booking-form card shadow p-3">
     <div class="booking_room_fields">
         {block name='booking_form_content'}
             <form id="booking-form" action="" method="post">
                 {block name='product_hidden_fields'}
-                    <p class="hidden">
+                    <div class="hidden">
                         <input type="hidden" name="token" value="{$static_token}" />
                         <input type="hidden" name="id_product" value="{$product->id|intval}" id="product_page_product_id" />
                         <input type="hidden" name="booking_product" value="{$product->booking_product|intval}" id="product_page_booking_product" />
                         <input type="hidden" name="add" value="1" />
                         <input type="hidden" name="id_product_attribute" id="idCombination" value="" />
-                    </p>
+                    </div>
                 {/block}
                 {block name='booking_form_hotel_location'}
                     {if isset($id_hotel) && $id_hotel}
                         <div class="form-group htl_location_block">
-                            <label for="" class="control-label">{l s='Hotel Location'}</label>
-                            <p>{$hotel_location|escape:'html':'UTF-8'}</p>
+                            <label for="" class="control-label help_block">{l s='Hotel Location'}</label>
+                            <div class="font-weight-bold mb-2">{$hotel_location|escape:'html':'UTF-8'}</div>
+                            <div class="help_block">
+                                <div class="">{l s='Check-in: '}{$hotel_check_in|escape:'html':'UTF-8'}</div>
+                                <div class="">{l s='Check-out: '}{$hotel_check_out|escape:'html':'UTF-8'}</div>
+                            </div>
                         </div>
                     {/if}
                 {/block}
@@ -50,7 +54,7 @@
                                 {block name='booking_form_dates'}
                                     <div class="form-group col-sm-12">
                                         <label class="control-label">{l s='Check In - Check Out'}</label>
-                                        <div class="form-control input-date" id="room_date_range"  autocomplete="off" placeholder="{l s='Check-in - Check-out'}"><span>{l s='Check-in'} &nbsp;<i class="icon icon-minus"></i>&nbsp; {l s='Check-out'}</span></div>
+                                        <div class="form-control input-date min-height-7 d-grid " id="room_date_range"  autocomplete="off" placeholder="{l s='Check-in - Check-out'}"><span class="align-self-center">{l s='Check-in'} &nbsp;<i class="icon icon-minus"></i>&nbsp; {l s='Check-out'}</span></div>
                                         <input type="hidden" class="input-date" name="room_check_in" id="room_check_in" value="{if isset($date_from)}{$date_from}{/if}" />
                                         <input type="hidden" class="input-date" name="room_check_out" id="room_check_out" value="{if isset($date_to)}{$date_to}{/if}" />
                                     </div>
@@ -59,7 +63,7 @@
                             {if $total_available_rooms > 0}
                                 {block name='booking_form_quantity_wrapper'}
                                     <div class="row">
-                                        <div class="form-group col-sm-12"{if !$product->available_for_order || $PS_CATALOG_MODE} style="display: none;"{/if}>
+                                        <div class="form-group col-sm-12 mb-2"{if !$product->available_for_order || $PS_CATALOG_MODE} style="display: none;"{/if}>
                                             {if isset($occupancy_required_for_booking) && $occupancy_required_for_booking}
                                                 <label class="control-label">{l s='Guests'}</label>
                                                 {block name='occupancy_field'}
@@ -79,15 +83,15 @@
                                         <hr class="separator-hr-mg-10">
                                         <div class="row price_desc_block">
                                             <div class="col-sm-6">
-                                                <label class="control-label">{l s='Room Price'}</label>
+                                                <label class="control-label help_block">{l s='Room Price'}</label>
                                                     <p>
-                                                        <span class="total_price_block">{convertPrice price=$rooms_price|floatval}</span>
-                                                        <span class="pull-right plus-sign">+</span>
+                                                        <span class="total_price_block font-weight-bold">{convertPrice price=$rooms_price|floatval}</span>
+                                                        <span class="float-right plus-sign">+</span>
                                                     </p>
                                             </div>
                                             <div class="col-sm-6">
-                                                <label class="control-label">{l s='Extra Services'}</label>
-                                                <p class="extra_demands_price_block">
+                                                <label class="control-label help_block">{l s='Extra Services'}</label>
+                                                <p class="extra_demands_price_block font-weight-bold">
                                                     {if isset($demands_price)}{convertPrice price=$demands_price}{else}{convertPrice price=0}{/if}
                                                     {if (isset($selected_demands) && $selected_demands) || (isset($selected_service_product) && $selected_service_product)}
                                                         <span class="services-info">
@@ -97,13 +101,13 @@
                                                 </p>
                                                 {if (isset($selected_demands) && $selected_demands) || (isset($selected_service_product) && $selected_service_product)}
                                                     <div class="services-info-container" style="display: none;">
-                                                        <div class="services-info-tooltip-cont">
+                                                        <div class="services-info-tooltip-cont small m-2">
                                                             {if isset($selected_service_product) && $selected_service_product}
                                                                 <div class="extra-service-panel">
-                                                                    <p class="panel_title">{l s='Selected services'} <span>{l s='(Per room)'}</span></p>
+                                                                    <div class="panel_title font-weight-bold">{l s='Selected services'} <span>{l s='(Per room)'}</span></div>
                                                                     <div class="services-list">
                                                                         {foreach $selected_service_product as $product}
-                                                                            <div class="services-list-row">
+                                                                            <div class="services-list-row services-list-row row col-12 justify-content-between mt-3 pr-0">
                                                                                 <div>
                                                                                     {$product['name']}
                                                                                     {if $product['allow_multiple_quantity']}
@@ -111,8 +115,8 @@
                                                                                     {/if}
                                                                                 </div>
                                                                                 <div class="text-right">
-                                                                                    <p>{displayPrice price=$product['price']}</p>
-                                                                                    <a class="btn btn-sm btn-default remove_roomtype_product" data-id-product="{$product['id_product']}"><i class="icon-trash"></i></a>
+                                                                                    <div class="mb-2">{displayPrice price=$product['price']}</div>
+                                                                                    <a class="btn btn-sm btn-default remove_roomtype_product text-small border" data-id-product="{$product['id_product']}"><i class="icon-trash"></i></a>
                                                                                 </div>
                                                                             </div>
                                                                         {/foreach}
@@ -120,8 +124,8 @@
                                                                 </div>
                                                             {/if}
                                                             {if isset($selected_demands) && $selected_demands}
-                                                                <div class="extra-service-panel">
-                                                                    <p class="panel_title">{l s='Selected facilities'} <span>{l s='(Per room)'}</span></p>
+                                                                <div class="extra-service-panel small m-2">
+                                                                    <p class="panel_title font-weight-bold">{l s='Selected facilities'} <span>{l s='(Per room)'}</span></p>
                                                                     <div class="services-list">
                                                                         {foreach $selected_demands as $product}
                                                                             <div class="services-list-row">
@@ -133,7 +137,7 @@
                                                                                 </div>
                                                                                 <div class="text-right">
                                                                                     <p>{displayPrice price=$product['price']}</p>
-                                                                                    <a class="btn btn-sm btn-default remove_roomtype_demand" data-id_global_demand="{$product['id_global_demand']}"><i class="icon-trash"></i></a>
+                                                                                    <a class="btn btn-sm btn-default  text-small remove_roomtype_demand" data-id_global_demand="{$product['id_global_demand']}"><i class="icon-trash"></i></a>
                                                                                 </div>
                                                                             </div>
                                                                         {/foreach}
@@ -141,14 +145,14 @@
                                                                 </div>
                                                             {/if}
                                                             <hr>
-                                                            <div class="extra-service-panel">
-                                                                <div class="summary-row">
+                                                            <div class="extra-service-panel min-width-300">
+                                                                <div class="summary-row row col-12 justify-content-between flex-nowrap">
                                                                     <div>{l s='Total price per room'}</div>
-                                                                    <div><p class="service_price">{displayPrice price=$demands_price_per_room}</p></div>
+                                                                    <div class="font-weight-bold"><p class="service_price">{displayPrice price=$demands_price_per_room}</p></div>
                                                                 </div>
-                                                                <div class="summary-row">
+                                                                <div class="summary-row row col-12 justify-content-between flex-nowrap">
                                                                     <div>{l s='Total price:'}</div>
-                                                                    <div><p class="service_price">{displayPrice price=$demands_price}</p></div>
+                                                                    <div class="font-weight-bold"><p class="service_price">{displayPrice price=$demands_price}</p></div>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -161,23 +165,25 @@
                                 {/block}
                                 {block name='booking_form_actions'}
                                     <div id="booking_action_block">
-                                        <div class="row">
+                                        <div class="col-12 justify-content-between  row pr-0">
                                             {block name='booking_form_total_price'}
-                                                <div class="total_price_block col-xs-7 form-group">
-                                                    <label class="control-label">{l s='Total'}</label>
-                                                    <p>
+                                                <div class="total_price_block row col-7 flex-column form-group">
+                                                    <label class="control-label help_block">{l s='Total'}</label>
+                                                    <div>
                                                         {if $total_price && $total_price_without_discount > $total_price}
                                                             <span class="room_type_old_price">
                                                                 {convertPrice price=$total_price_without_discount|floatval}
                                                             </span>
                                                         {/if}
-                                                        {convertPrice price=$total_price|floatval}
-                                                    </p>
+                                                        <span class="h9 font-weight-bold d-flex">
+                                                            {convertPrice price=$total_price|floatval}
+                                                        </span>
+                                                    </div>
                                                 </div>
                                             {/block}
                                             {block name='booking_form_available_quantity'}
                                                 {if $total_available_rooms <= $warning_count}
-                                                    <div class="col-xs-5 form-group text-right num_quantity_alert">
+                                                    <div class="col-5 form-group remain_rm_qty text-right small">
                                                         <span class="num_searched_avail_rooms">
                                                             {$total_available_rooms|escape:'html':'UTF-8'}
                                                         </span>
@@ -192,17 +198,17 @@
                                                 <div id="additional_products" class="hidden">
                                                     {if isset($selected_service_product) && $selected_service_product}
                                                         {foreach $selected_service_product as $product}
-                                                            <input type="hidded" id="service_product_{$product['id_product']}" name="service_product[{$product['id_product']}][]" class="service_product" data-id_product="{$product['id_product']}" value="{$product['quantity']}">
+                                                            <input type="hidden" id="service_product_{$product['id_product']}" name="service_product[{$product['id_product']}][]" class="service_product" data-id_product="{$product['id_product']}" value="{$product['quantity']}">
                                                         {/foreach}
                                                     {/if}
                                                 </div>
                                                 {block name='booking_form_book_now_button'}
                                                     <p id="add_to_cart" class="buttons_bottom_block no-print">
-                                                        <button type="submit" name="Submit" class="exclusive book_now_submit">
+                                                        <button type="submit" name="Submit" class="exclusive book_now_submit max-height-6 btn w-100 btn-lg btn-success">
                                                             <span>
                                                                 {if isset($content_only) && $content_only && (isset($product->customization_required) && $product->customization_required)}{l s='Customize'}{else}{l s='Book Now'}{/if}
                                                             </span>
-                                                            <span id="booking_action_loader"></span>
+                                                            <span id="booking_action_loader" class="dot-loader w-15 p-3 d-none"></span>
                                                         </button>
                                                     </p>
                                                 {/block}
@@ -211,7 +217,7 @@
                                     </div>
                                 {/block}
                             {else}
-                                <div class="sold_out_alert">
+                                <div class="sold_out_alert text-danger">
                                     <span>{l s='All rooms sold out!'}</span>
                                 </div>
                             {/if}
@@ -231,15 +237,15 @@
                         {/block}
                         {block name='booking_form_product_option'}
                             {if isset($product_option) && $product_option}
-                                <label class="control-label">{l s='Variants'}</label>
+                                <label class="control-label m-0">{l s='Variants'}</label>
                                 <hr>
-                                <div class="product-options-block">
+                                <div class="product-options-block small">
                                     {foreach $product_option as $option}
                                         <div class="form-group">
-                                            <label for="id_product_option{$option['id_product_option']}" class="top">
+                                            <label for="id_product_option{$option['id_product_option']}" class="top m-0 d-block">
                                                 <input type="radio" name="id_product_option" id="id_product_option{$option['id_product_option']}" value="{$option['id_product_option']}" {if isset($id_product_option) && $id_product_option == $option['id_product_option']}checked="checked"{else if $option@first}checked="checked"{/if}/>
                                                 {$option['name']}
-                                                <span class="pull-right">{convertPrice price=$option['price']}</span>
+                                                <span class="float-right">{convertPrice price=$option['price']}</span>
                                             </label>
                                         </div>
                                         <hr>
@@ -267,12 +273,12 @@
                                             <div class="qty_container">
                                                 <input type="hidden" class="stock_qty" id="stock_qty" name="stock_qty" data-id-product="{$product->id}" data-stock_quantity="{$product->quantity}" data-allow_oosp="{$allow_oosp}" >
                                                 <input type="hidden" class="service_product_qty" id="service_product_qty" name="service_product_qty" data-id-product="{$product->id}" data-cart_quantity="{if isset($product->cart_quantity) && $product->cart_quantity}{$product->cart_quantity}{else}0{/if}" data-max_quantity="{if isset($product->max_quantity)}{$product->max_quantity|escape:'html':'UTF-8'}{else}{$product->quantity}{/if}" value="{if isset($quantity)}{$quantity|intval}{else}{if $product->minimal_quantity > 1}{$product->minimal_quantity}{else}1{/if}{/if}">
-                                                <div class="qty_count pull-left">
-                                                    <span>{if isset($quantity)}{$quantity|intval}{else}{if $product->minimal_quantity > 1}{$product->minimal_quantity}{else}1{/if}{/if}</span>
+                                                <div class="qty_count border p-small rounded float-left mr-1 max-width-7">
+                                                    <span class="min-width-3 d-block text-center">{if isset($quantity)}{$quantity|intval}{else}{if $product->minimal_quantity > 1}{$product->minimal_quantity}{else}1{/if}{/if}</span>
                                                 </div>
-                                                <div class="qty_direction pull-left">
-                                                    <a href="#" class="btn btn-default quantity_up service_product_qty_up"><span><i class="icon-plus"></i></span></a>
-                                                    <a href="#" class="btn btn-default quantity_down service_product_qty_down"><span><i class="icon-minus"></i></span></a>
+                                                <div class="qty_direction d-flex flex-column gap-1">
+                                                    <a href="#" class="quantity_up service_product_qty_up"><span class="p-0 border rounded"><i class="icon-plus"></i></span></a>
+                                                    <a href="#" class="quantity_down service_product_qty_down"><span class="p-0 border rounded"><i class="icon-minus"></i></span></a>
                                                 </div>
                                             </div>
                                         <span class="clearfix"></span>
@@ -287,11 +293,11 @@
                         {/block}
                         {block name='booking_form_actions'}
                             <div id="booking_action_block">
-                                <div class="row">
+                                <div class="col-12 row">
                                     {block name='booking_form_total_price'}
-                                        <div class="total_price_block col-xs-7 form-group">
-                                            <label class="control-label">{l s='Price'}</label>
-                                            <p>
+                                        <div class="total_price_block form-group">
+                                            <label class="control-label help_block">{l s='Price'}</label>
+                                            <p class=" font-weight-bold">
                                                 {if $service_price && $service_price_without_reduction > $service_price}
                                                     <span class="room_type_old_price">
                                                         {convertPrice price=$service_price_without_reduction|floatval}
@@ -314,21 +320,21 @@
                                 </div>
                                 <div>
                                    {if $is_out_of_stock}
-                                        <div class="sold_out_alert">
+                                        <div class="sold_out_alert text-danger">
                                             <span>{l s='Product is out of stock!'}</span>
                                         </div>
                                     {else if $max_qty_reached}
-                                        <div class="sold_out_alert">
+                                        <div class="sold_out_alert text-danger">
                                             <span>{l s='Max. quantity reached for cart!'}</span>
                                         </div>
                                     {else}
                                         {block name='booking_form_book_now_button'}
                                                 <p id="add_to_cart" class="buttons_bottom_block no-print">
-                                                    <button type="submit" name="Submit" class="exclusive book_now_submit">
+                                                    <button type="submit" name="Submit" class="exclusive book_now_submit max-height-6 btn w-100 btn-lg btn-success">
                                                         <span>
                                                             {if isset($content_only) && $content_only && (isset($product->customization_required) && $product->customization_required)}{l s='Customize'}{else}{l s='Book Now'}{/if}
                                                         </span>
-                                                        <span id="booking_action_loader"></span>
+                                                        <span id="booking_action_loader" class="dot-loader w-15 p-3 d-none"></span>
                                                     </button>
                                                 </p>
                                         {/block}

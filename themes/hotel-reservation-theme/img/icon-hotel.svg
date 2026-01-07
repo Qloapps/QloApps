@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="17px" height="18px" viewBox="0 0 17 18" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 51.3 (57544) - http://www.bohemiancoding.com/sketch -->
+    <title>icon-hotel</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Occupancy-Wise-Search-1" transform="translate(-367.000000, -370.000000)" fill-rule="nonzero" stroke="#000000" stroke-width="1.5">
+            <g id="hero">
+                <g id="search" transform="translate(319.000000, 170.000000)">
+                    <g id="all-actionables-[20v]" transform="translate(30.000000, 108.000000)">
+                        <g id="select-hotel" transform="translate(0.000000, 75.000000)">
+                            <g id="icon-hotel" transform="translate(18.000000, 17.000000)">
+                                <rect id="Rectangle-Copy" x="4.75" y="4.75" width="11.5" height="12.5" rx="2"></rect>
+                                <rect id="Rectangle" fill="#F0F0F0" x="0.75" y="0.75" width="11.5" height="16.5" rx="2"></rect>
+                                <rect id="Rectangle-4" x="4.75" y="3.75" width="3.5" height="3.5" rx="1"></rect>
+                                <rect id="Rectangle-4-Copy" x="4.75" y="9.75" width="3.5" height="3.5" rx="1"></rect>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

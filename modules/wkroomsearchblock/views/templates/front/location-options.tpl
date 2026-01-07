@@ -22,6 +22,6 @@
 
 {if isset($location_categories) && is_array($location_categories)}
     {foreach from=$location_categories item=category}
-        <li class="search_result_li" value="{$category.id_category}" tabindex="-1">{$category.name}</li>
+        <li class="search_result_li dropdown-item " value="{$category.id_category}" tabindex="-1">{$category.name}</li>
     {/foreach}
 {/if}

@@ -65,8 +65,9 @@ $(document).ready(function() {
     $("#header .shopping_cart a:first").hover(
         function() {
             if (!is_touch_enabled) {
-                if (ajaxCart.nb_total_products > 0 || parseInt($('.ajax_cart_quantity').html()) > 0)
+                if (ajaxCart.nb_total_products > 0 || parseInt($('.ajax_cart_quantity').html()) > 0) {
                     $("#header .cart_block").stop(true, true).slideDown(450);
+                }
             }
         },
         function() {
@@ -867,7 +868,7 @@ var ajaxCart = {
 
         if ($('dt[data-id="cart_block_product_' + productDomId + '"]').length == 0) {
             var productAttributeId = (product.hasAttributes ? parseInt(product.attributes) : 0);
-            var content = '<dt class="unvisible" data-id="cart_block_product_' + productDomId + '">';
+            var content = '<dt class="d-none" data-id="cart_block_product_' + productDomId + '">';
             var name = $.trim($('<span />').html(product.name).text());
             name = (name.length > 30 ? name.substring(0, 27) + '...' : name);
             content += '<a class="cart-images" href="' + product.link + '" title="' + name + '"><img  src="' + product.image_cart + '" alt="' + product.name + '"></a>';
@@ -1006,7 +1007,7 @@ var ajaxCart = {
             content += '</dt>';
 
             if (product.hasAttributes)
-                content += '<dd data-id="cart_block_combination_of_' + productDomId + '" class="unvisible">';
+                content += '<dd data-id="cart_block_combination_of_' + productDomId + '" class="d-none">';
             if (product.hasCustomizedDatas)
                 content += ajaxCart.displayNewCustomizedDatas(product);
             if (product.hasAttributes) content += '</dd>';
@@ -1117,7 +1118,7 @@ var ajaxCart = {
                 }
             }
         }
-        $('.cart_block dl.products .unvisible').slideDown(450).removeClass('unvisible');
+        $('.cart_block dl.products .d-none').slideDown(450).removeClass('d-none');
 
         var removeLinks = $('dt[data-id="cart_block_product_' + productDomId + '"]').find('a.ajax_cart_block_remove_link');
         if (product.hasCustomizedDatas && removeLinks.length)
@@ -1134,7 +1135,7 @@ var ajaxCart = {
 
         if (!hasAlreadyCustomizations) {
             if (!product.hasAttributes)
-                content += '<dd data-id="cart_block_combination_of_' + productId + '" class="unvisible">';
+                content += '<dd data-id="cart_block_combination_of_' + productId + '" class="d-none">';
             if ($('ul[data-id="customization_' + productId + '_' + productAttributeId + '"]').val() == undefined)
                 content += '<ul class="cart_block_customizations" data-id="customization_' + productId + '_' + productAttributeId + '">';
         }
@@ -1229,16 +1230,14 @@ var ajaxCart = {
         }
         $('#layer_cart_product_quantity').text(product_quantity_text);
 
-        $('.layer_cart_img').html('<img class="layer_cart_img img-responsive" src="' + product.image + '" alt="' + product.name + '" title="' + product.name + '" />');
+        $('.layer_cart_img').html('<img class="layer_cart_img img-responsive max-width-200 rounded-sm" src="' + product.image + '" alt="' + product.name + '" title="' + product.name + '" />');
 
         var n = parseInt($(window).scrollTop()+50) + 'px';
 
         $('.layer_cart_overlay').css('width', '100%');
         $('.layer_cart_overlay').css('height', '100%');
         $('.layer_cart_overlay').show();
-        $('#layer_cart').css({
-            'top': n
-        }).fadeIn('fast');
+        $('#layer_cart').modal('show');
         crossselling_serialScroll();
     },
 
@@ -1284,14 +1283,14 @@ var ajaxCart = {
             hasDeliveryAddress = false;
 
         if (parseFloat(jsonData.shipping_cost_float) > 0)
-            $('.ajax_cart_shipping_cost').text(jsonData.shipping_cost).parent().find('.unvisible').show();
+            $('.ajax_cart_shipping_cost').text(jsonData.shipping_cost).parent().find('.d-none').show();
         else if ((hasDeliveryAddress || typeof(orderProcess) !== 'undefined' && orderProcess == 'order-opc') && typeof(freeShippingTranslation) != 'undefined')
             $('.ajax_cart_shipping_cost').html(freeShippingTranslation);
         else if (!hasDeliveryAddress)
             $('.ajax_cart_shipping_cost').html(toBeDetermined);
 
         if (hasDeliveryAddress)
-            $('.ajax_cart_shipping_cost').parent().find('.unvisible').show();
+            $('.ajax_cart_shipping_cost').parent().find('.d-none').show();
 
         $('.ajax_cart_tax_cost').text(jsonData.tax_cost);
         $('.cart_block_wrapping_cost').text(jsonData.wrapping_cost);
@@ -1389,7 +1388,6 @@ function crossselling_serialScroll() {
 }
 
 function resetRoomtypeServices(refresh = true) {
-    $('.room_demands_container').find('input.id_room_type_demand:checked').prop('checked', false).uniform();
     $('#additional_products').empty();
     $('#additional_products div')
     $('.remove_roomtype_product').text(select_txt).removeClass('btn-danger remove_roomtype_product').addClass('btn-success add_roomtype_product');
@@ -1469,7 +1467,7 @@ function getBookingOccupancyDetails(bookingform, booking_product)
                         });
                         if ($(element).find('.num_children').val()) {
                             if (child_ages.length != $(element).find('.num_children').val()) {
-                                $(bookingform).find('.booking_occupancy_wrapper').parent().addClass('open')
+                                $(bookingform).find('.booking_occupancy_wrapper').css({'display': 'block'});
                                 occupancy = false;
                             }
                         }
@@ -1479,12 +1477,12 @@ function getBookingOccupancyDetails(bookingform, booking_product)
                             'child_ages': child_ages
                         });
                     } else {
-                        $(bookingform).find('.booking_occupancy_wrapper').parent().addClass('open')
+                        $(bookingform).find('.booking_occupancy_wrapper').css({'display': 'block'});
                         occupancy = false;
                     }
                 });
             } else {
-                $(bookingform).find('.booking_occupancy_wrapper').parent().addClass('open')
+                $(bookingform).find('.booking_occupancy_wrapper').css({'display': 'block'});
                 occupancy = false;
             }
         } else {

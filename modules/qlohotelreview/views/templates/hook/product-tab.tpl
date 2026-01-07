@@ -20,4 +20,4 @@
 * @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
 *}
 
-<li><a href="#hotel-reviews" class="active idTabHrefShort" data-toggle="tab">{l s='Reviews' mod='qlohotelreview'}</a></li>
+<li class="nav-item"><a href="#hotel-reviews" class="idTabHrefShort nav-pill" data-toggle="tab">{l s='Reviews' mod='qlohotelreview'}</a></li>

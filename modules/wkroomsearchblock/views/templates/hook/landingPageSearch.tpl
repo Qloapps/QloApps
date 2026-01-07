@@ -22,7 +22,7 @@
 
 {block name='landing_page_search_panel'}
     {if isset($is_index_page) && $is_index_page}
-        <div class="header-rmsearch-container header-rmsearch-hide-xs hidden-xs">
+        <div class="header-rmsearch-container">
             {if isset($hotels_info) && count($hotels_info)}
                 <div class="header-rmsearch-wrapper" id="xs_room_search_form">
                     <div class="header-rmsearch-primary">
@@ -30,8 +30,8 @@
                             <p>{l s='Search Rooms' mod='wkroomsearchblock'}</p>
                             <hr>
                         </div>
-                        <div class="container">
-                            <div class="header-rmsearch-inner-wrapper">
+                        <div class="container p-0">
+                            <div class="header-rmsearch-inner-wrapper mb-2 ml-n3 mr-n3">
                             {block name='search_form'}
                                 {include file="./searchForm.tpl"}
                             {/block}

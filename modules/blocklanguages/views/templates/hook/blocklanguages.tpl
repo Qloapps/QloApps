@@ -22,25 +22,22 @@
 
 {block name='block_languages'}
     {if count($languages) > 1}
-        <div id="languages-block-top" class="languages-block-wrap nav-main-item-right hidden-xs pull-right">
+        <div id="languages-block-top" class="languages-block-wrap header-nav-option">
             <div class="dropdown">
-                {foreach from=$languages key=k item=language}
-                    {if $language.iso_code == $lang_iso}
-                        <button class="btn dropdown-toggle" type="button" data-toggle="dropdown">
-                            {$language.name|regex_replace:"/\s\(.*\)$/":""}
-                            <span class="caret"></span>
-                        </button>
-                    {/if}
-                {/foreach}
+                {if isset($languages[$lang_id]['iso_code'])}
+                    <button class="btn dropdown-toggle btn-sm" type="button" data-toggle="dropdown">
+                        {$languages[$lang_id]['name']|regex_replace:"/\s\(.*\)$/":""}
+                    </button>
+                {/if}
 
-                <ul class="dropdown-menu">
+                <ul class="dropdown-menu dropdown-menu-right">
                     {foreach from=$languages key=k item=language}
-                        <li {if $language.iso_code == $lang_iso}class="disabled"{/if}>
+                        <li>
                             {assign var=indice_lang value=$language.id_lang}
                             {if isset($lang_rewrite_urls.$indice_lang)}
-                                <a href="{$lang_rewrite_urls.$indice_lang|escape:'html':'UTF-8'}" title="{$language.name}">
+                                <a class="dropdown-item {if $language.iso_code == $lang_iso}disabled{/if}" href="{$lang_rewrite_urls.$indice_lang|escape:'html':'UTF-8'}" title="{$language.name}">
                             {else}
-                                <a href="{$link->getLanguageLink($language.id_lang)|escape:'html':'UTF-8'}" title="{$language.name}">
+                                <a class="dropdown-item {if $language.iso_code == $lang_iso}disabled{/if}" href="{$link->getLanguageLink($language.id_lang)|escape:'html':'UTF-8'}" title="{$language.name}">
                             {/if}
                                 <span>{$language.name|regex_replace:"/\s\(.*\)$/":""}</span>
                             </a>

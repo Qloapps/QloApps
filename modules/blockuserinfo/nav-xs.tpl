@@ -20,7 +20,7 @@
 * @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
 *}
 
-<ul class="nav nav-pills nav-stacked visible-xs wk-nav-style">
+<ul class="nav d-block d-md-none">
 	{if $logged}
 		<li>
 			<a class="navigation-link" href="{$link->getPageLink('history', true)|escape:'html'}" title="{l s='Bookings' mod='blockuserinfo'}">{l s='Bookings' mod='blockuserinfo'}</a>

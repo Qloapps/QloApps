@@ -32,7 +32,7 @@
 
 	<section id="wrapper">
 		<div class="container">
-			<section id="content">
+			<section id="content" class="container">
 				<div class="row">
 					{if $PS_CATALOG_MODE}
 						{capture name=path}{l s='Your booking cart'}{/capture}
