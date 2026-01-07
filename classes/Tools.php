@@ -2996,7 +2996,7 @@ exit;
      * @param bool $die
      * @return bool success of logging
      */
-    public static function dieOrLog($msg, $die = true)
+    public static function dieOrLog($msg, $die = false)
     {
         if ($die || (defined('_PS_MODE_DEV_') && _PS_MODE_DEV_)) {
             die($msg);
