@@ -1110,7 +1110,7 @@
                 <div class="panel panel-vouchers">
                     <div class="panel-heading">
                         <span><i class="icon-tag"></i> &nbsp;{l s='Voucher'}</span>
-                        {if $can_edit && $order->total_paid > 0}
+                        {if $can_edit && $order->total_paid > 0 && $cartRuleAccess['add'] === 1}
                             <button id="add_voucher" class="btn btn-primary pull-right" type="button" >
                                 <i class="icon-ticket"></i> {l s='Add new voucher'}
                             </button>
