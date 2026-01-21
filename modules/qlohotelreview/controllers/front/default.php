@@ -86,7 +86,7 @@ class QloHotelReviewDefaultModuleFrontController extends ModuleFrontController
         }
 
         if (is_array($_FILES) && array_key_exists('images', $_FILES) ) {
-            $allowedExtensions = array('jpg', 'png');
+            $allowedExtensions = array('jpg', 'png', 'jpeg',);
             foreach ($_FILES['images']['name'] as $key => $imageName) {
                 $extension = Tools::strtolower(pathinfo($imageName, PATHINFO_EXTENSION));
                 if (!in_array($extension, $allowedExtensions)) {
