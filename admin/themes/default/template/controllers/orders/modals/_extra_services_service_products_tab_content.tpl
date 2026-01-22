@@ -256,6 +256,7 @@
 					<th>{l s='ID'}</th>
 					<th>{l s='Name'}</th>
 					<th></th>
+                    <th class="fixed-width-sm text-center">{l s='Quantity'}</th>
 					<th>{l s='Unit Price (tax excl.)'}</th>
 					<th>{l s='Total Price (tax excl.)'}</th>
 					<th>{l s='Total Price (tax incl.)'}</th>
@@ -276,6 +277,13 @@
 								<span class="badge badge-info label">{l s='Auto added'}</span>
 							{/if}
 						</td>
+                        <td class="text-center">
+                            {if isset($service['allow_multiple_quantity']) && $service['allow_multiple_quantity']}
+                                {$service['quantity']}
+                            {else}
+                                {l s='--'}
+                            {/if}
+                        </td>
 						<td>
 							{displayPrice price=$service['unit_price_tax_excl'] currency=$orderCurrency}
 							{if $service['price_calculation_method'] == Product::PRICE_CALCULATION_METHOD_PER_DAY}

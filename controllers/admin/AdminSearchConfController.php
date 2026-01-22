@@ -33,6 +33,7 @@ class AdminSearchConfControllerCore extends AdminController
 
     public function __construct()
     {
+        Tools::redirectAdmin(Context::getContext()->link->getAdminLink('AdminDashboard'));
         $this->bootstrap = true;
         $this->table = 'alias';
         $this->className = 'Alias';

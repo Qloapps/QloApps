@@ -1718,7 +1718,7 @@ class HotelBookingDetail extends ObjectModel
                         }
                     }
                     $productFeaturePrice = HotelRoomTypeFeaturePricing::getRoomTypeFeaturePricesPerDay($value['id_product'], $date_from, $date_to, self::useTax(), 0, 0, 0, 0, 1, 1, $bookingParams['occupancy']);
-                    if (!empty($price) && ($price['from'] > $productFeaturePrice || $price['to'] < $productFeaturePrice)) {
+                    if (!empty($price) && ((float) $price['from'] > $productFeaturePrice || (float) $price['to'] < $productFeaturePrice)) {
                         unset($bookingData['rm_data'][$key]);
                         continue;
                     }
