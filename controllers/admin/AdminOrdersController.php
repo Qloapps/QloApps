@@ -2992,7 +2992,8 @@ class AdminOrdersControllerCore extends AdminController
             $helper->icon = 'icon-money';
             $helper->color = 'color2';
             $helper->title = $this->l('Total Due Amount', null, null, false);
-            $minValue = ('0.' . str_repeat('0', (Configuration::get('PS_PRICE_DISPLAY_PRECISION') - 1)) . '1');
+            $priceDisplayPrecision = (int)Configuration::get('PS_PRICE_DISPLAY_PRECISION');
+            $minValue = ('0.' . ($priceDisplayPrecision ? str_repeat('0', ($priceDisplayPrecision - 1)) : '') . '1');
 
             // get all valid order states for due amount calculations
             $validOrderStatesFilter = '';

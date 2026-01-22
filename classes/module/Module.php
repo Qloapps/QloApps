@@ -3044,7 +3044,7 @@ abstract class ModuleCore
             );
             $reflectionClassModule = new ReflectionClass($overrideClassName.'Override'.$uniq);
 
-            $moduleClassFileArray = $this->getCommentedClass($moduleClassFileArray, $reflectionClassModule, $reflectionClassOverride, $overrideClassFileArray);
+            $moduleClassFileArray = $this->getCommentedClass($moduleClassFileArray, $reflectionClassModule, $reflectionClassOverride, $overrideClassFileArray, $overrideClassName);
 
             // Insert the methods from module override in override
             $generatedCodeToCopy = array_slice($moduleClassFileArray, $reflectionClassModule->getStartLine() + 1, $reflectionClassModule->getEndLine() - $reflectionClassModule->getStartLine() - 2);
@@ -3091,7 +3091,7 @@ abstract class ModuleCore
             );
             $reflectionClassModule = new ReflectionClass($overrideClassName.'Override'.$uniq);
 
-            $moduleClassFileArray = $this->getCommentedClass($moduleClassFileArray, $reflectionClassModule);
+            $moduleClassFileArray = $this->getCommentedClass($moduleClassFileArray, $reflectionClassModule, null, null, $overrideClassName);
 
             file_put_contents($overrideClassFilePath, preg_replace($patternEscapeCommon, '', $moduleClassFileArray));
 
@@ -3102,7 +3102,7 @@ abstract class ModuleCore
         return true;
     }
 
-    private function getCommentedClass($moduleClassFileArray, $reflectionClassModule, $reflectionClassOverride = null, $overrideClassFileArray = null)
+    private function getCommentedClass($moduleClassFileArray, $reflectionClassModule, $reflectionClassOverride = null, $overrideClassFileArray = null, $className = '')
     {
         // Check if none of the methods already exists in the override class
         foreach ($reflectionClassModule->getMethods() as $method) {
@@ -3110,15 +3110,15 @@ abstract class ModuleCore
                 if ($reflectionClassOverride->hasMethod($method->getName())) {
                     $overrideMethodInfo = $reflectionClassOverride->getMethod($method->getName());
                     if (preg_match('/module: (.*)/ism', $overrideClassFileArray[$overrideMethodInfo->getStartLine() - 5], $name) && preg_match('/date: (.*)/ism', $overrideClassFileArray[$overrideMethodInfo->getStartLine() - 4], $date) && preg_match('/version: ([0-9.]+)/ism', $overrideClassFileArray[$overrideMethodInfo->getStartLine() - 3], $version)) {
-                        throw new Exception(sprintf(Tools::displayError('The method %1$s in the class %2$s is already overridden by the module %3$s version %4$s at %5$s.'), $method->getName(), $classname, $name[1], $version[1], $date[1]));
+                        throw new Exception(sprintf(Tools::displayError('The method %1$s in the class %2$s is already overridden by the module %3$s version %4$s at %5$s.'), $method->getName(), $className, $name[1], $version[1], $date[1]));
                     }
-                    throw new Exception(sprintf(Tools::displayError('The method %1$s in the class %2$s is already overridden.'), $method->getName(), $classname));
+                    throw new Exception(sprintf(Tools::displayError('The method %1$s in the class %2$s is already overridden.'), $method->getName(), $className));
                 }
             }
 
             $moduleClassFileArray = preg_replace('/((:?public|private|protected)\s+(static\s+)?function\s+(?:\b'.$method->getName().'\b))/ism', "/*\n    * module: ".$this->name."\n    * date: ".date('Y-m-d H:i:s')."\n    * version: ".$this->version."\n    */\n    $1", $moduleClassFileArray);
             if ($moduleClassFileArray === null) {
-                throw new Exception(sprintf(Tools::displayError('Failed to override method %1$s in class %2$s.'), $method->getName(), $classname));
+                throw new Exception(sprintf(Tools::displayError('Failed to override method %1$s in class %2$s.'), $method->getName(), $className));
             }
         }
 
@@ -3126,13 +3126,13 @@ abstract class ModuleCore
         foreach ($reflectionClassModule->getProperties() as $property) {
             if ($reflectionClassOverride) {
                 if ($reflectionClassOverride->hasProperty($property->getName())) {
-                    throw new Exception(sprintf(Tools::displayError('The property %1$s in the class %2$s is already defined.'), $property->getName(), $classname));
+                    throw new Exception(sprintf(Tools::displayError('The property %1$s in the class %2$s is already defined.'), $property->getName(), $className));
                 }
             }
 
             $moduleClassFileArray = preg_replace('/((?:public|private|protected)\s)\s*(static\s)?\s*(\$\b'.$property->getName().'\b)/ism', "/*\n    * module: ".$this->name."\n    * date: ".date('Y-m-d H:i:s')."\n    * version: ".$this->version."\n    */\n    $1$2$3", $moduleClassFileArray);
             if ($moduleClassFileArray === null) {
-                throw new Exception(sprintf(Tools::displayError('Failed to override property %1$s in class %2$s.'), $property->getName(), $classname));
+                throw new Exception(sprintf(Tools::displayError('Failed to override property %1$s in class %2$s.'), $property->getName(), $className));
             }
         }
 
@@ -3140,13 +3140,13 @@ abstract class ModuleCore
         foreach ($reflectionClassModule->getConstants() as $constant => $value) {
             if ($reflectionClassOverride) {
                 if ($reflectionClassOverride->hasConstant($constant)) {
-                    throw new Exception(sprintf(Tools::displayError('The constant %1$s in the class %2$s is already defined.'), $constant, $classname));
+                    throw new Exception(sprintf(Tools::displayError('The constant %1$s in the class %2$s is already defined.'), $constant, $className));
                 }
             }
 
             $moduleClassFileArray = preg_replace('/(const\s)\s*(\b'.$constant.'\b)/ism', "/*\n    * module: ".$this->name."\n    * date: ".date('Y-m-d H:i:s')."\n    * version: ".$this->version."\n    */\n    $1$2", $moduleClassFileArray);
             if ($moduleClassFileArray === null) {
-                throw new Exception(sprintf(Tools::displayError('Failed to override constant %1$s in class %2$s.'), $constant, $classname));
+                throw new Exception(sprintf(Tools::displayError('Failed to override constant %1$s in class %2$s.'), $constant, $className));
             }
         }
 

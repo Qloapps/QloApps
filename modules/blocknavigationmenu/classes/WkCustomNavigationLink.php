@@ -197,8 +197,8 @@ class WkCustomNavigationLink extends ObjectModel
                 'id_cms' => 0,
                 'show_at_navigation' => 1,
                 'show_at_footer' => 0,
-                'is_custom_link' => 1,
-                'link' => $objLink->getPageLink('our-properties'),
+                'is_custom_link' => 0,
+                'link' => 'our-properties',
             ),
         );
 
