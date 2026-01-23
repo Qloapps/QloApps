@@ -90,7 +90,7 @@ class QloHotelReviewDefaultModuleFrontController extends ModuleFrontController
             foreach ($_FILES['images']['name'] as $key => $imageName) {
                 $extension = Tools::strtolower(pathinfo($imageName, PATHINFO_EXTENSION));
                 if (!in_array($extension, $allowedExtensions)) {
-                    $errors['general'][] = $imageName . ' ' . $objModule->l('is not a supported image format.','default');
+                    $errors['general'][] = $objModule->l('Only images with the following extensions are allowed: jpg, jpeg, png','default');
                 }
             }
         }
