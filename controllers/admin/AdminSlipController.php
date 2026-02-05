@@ -118,7 +118,7 @@ class AdminSlipControllerCore extends AdminController
         if (empty($this->display)) {
             $this->page_header_toolbar_btn['new_credit_slip'] = array(
                 'href' => self::$currentIndex . '&add' . $this->table . '&token=' . $this->token,
-                'desc' => $this->l('Add new credit slip', null, null, false),
+                'desc' => $this->l('Add Credit Slip', null, null, false),
                 'icon' => 'process-icon-new'
             );
         }
@@ -148,7 +148,7 @@ class AdminSlipControllerCore extends AdminController
                         'label' => $this->l('Order id'),
                         'name' => 'id_order',
                         'required' => true,
-                        'hint' => $this->l('Select id order'),
+                        'hint' => $this->l('Select an Order ID to generate the credit slip'),
                         'class' => 'chosen',
                         'options' => array(
                             'query' => $orderList,
