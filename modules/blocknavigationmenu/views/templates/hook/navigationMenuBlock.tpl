@@ -26,7 +26,7 @@
 			<i class="icon-solid icon-bars"></i>
 		</button>
 	</div>
-
+	<div id="nav_overlay" class="nav-overlay"></div>
 	<div id="menu_cont" class="nav_cont_right">
 		<div class="d-md-none row justify-content-end col-12 p-0 mt-2">
 			<span class="close_navbar"><i class="icon-close"></i></span>

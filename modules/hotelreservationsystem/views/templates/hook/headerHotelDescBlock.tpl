@@ -28,17 +28,17 @@
 					<div>
 						<div class="header-desc-inner-wrapper">
 							{block name='header_hotel_chain_name'}
-								<h1 class="header-hotel-name">{$WK_HTL_CHAIN_NAME|escape:'htmlall':'UTF-8'}</h1>
+								<h8 class="h8">{$WK_HTL_CHAIN_NAME|escape:'htmlall':'UTF-8'}</h8>
 							{/block}
 							{block name='header_hotel_description'}
-								<p class="header-hotel-desc">{$WK_HTL_TAG_LINE|escape:'htmlall':'UTF-8'}</p>
+								<h1 class="h1">{$WK_HTL_TAG_LINE|escape:'htmlall':'UTF-8'}</h1>
 							{/block}
 						</div>
 					</div>
-					{block name='displayAfterHeaderHotelDesc'}
-						{hook h="displayAfterHeaderHotelDesc"}
-					{/block}
 				</div>
+				{block name='displayAfterHeaderHotelDesc'}
+					{hook h="displayAfterHeaderHotelDesc"}
+				{/block}
 			</div>
 		</div>
 	</div>

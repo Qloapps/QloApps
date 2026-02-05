@@ -21,7 +21,7 @@
 *}
 
 {block name='landing_page_search_button_mobile'}
-	<div class="d-block d-md-none">
+	<div class="d-md-none">
 		<button id="xs_room_search" class="btn btn-primary btn-lg" href="#xs_room_search_form"><span>{l s='Make Booking' mod='wkroomsearchblock'}</span></button>
 	</div>
 {/block}

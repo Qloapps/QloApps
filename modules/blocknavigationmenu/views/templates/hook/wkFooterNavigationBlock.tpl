@@ -22,7 +22,7 @@
 
 {block name='footer_navigation'}
 	{if isset($navigation_links) && $navigation_links}
-		<div class="col-md-3">
+		<div class="col-md-3 col-sm-6">
 			<div>
 				<section>
 					<div class="footer-section-heading footer-section-item ">

@@ -28,32 +28,48 @@
     <div class="cat_cont container p-0">
         <div class="col-12">
             <div class="category_info_block">
-                <div class="category_heading">
-                    <span class="block_title">
-                        {$objHotel->hotel_name}
-                    </span>
-                    {if isset($hotel_address) && $hotel_address != ''}
-                        <span class="d-block">
-                        <i class="icon-location-dot"></i>
-                            {$hotel_address}
+                <div class="col-6">
+                    <div class="category_heading">
+                        <span class="block_title">
+                            {$objHotel->hotel_name}
                         </span>
-                    {/if}
-                    <span>
-                        <i class="icon-envelope"></i>
-                        {$objHotel->email}
-                    </span>
-                    {if isset($hotel_contact) && $hotel_contact != ''}
+                        {if isset($hotel_address) && $hotel_address != ''}
+                            <span class="d-block">
+                            <i class="icon-location-dot"></i>
+                                {$hotel_address}
+                            </span>
+                        {/if}
+                        <span>
+                            <i class="icon-envelope"></i>
+                            {$objHotel->email}
+                        </span>
+                        {if isset($hotel_contact) && $hotel_contact != ''}
+                            <span class="seprator-pipe">
+                            <i class="icon-phone"></i>
+                                {$hotel_contact}
+                            </span>
+                        {/if}
                         <span class="seprator-pipe">
-                        <i class="icon-phone"></i>
-                            {$hotel_contact}
+                            <span id="hotel_rating">{for $i=0; $i < $objHotel->rating; $i++}<i class="icon-star"></i>{/for}{for $i=$objHotel->rating; $i < 5; $i++}<i class="icon-star text-grey"></i>{/for}</span>
                         </span>
-                    {/if}
-                    <span class="seprator-pipe">
-                        <span id="hotel_rating">{for $i=0; $i < $objHotel->rating; $i++}<i class="icon-star"></i>{/for}{for $i=$objHotel->rating; $i < 5; $i++}<i class="icon-star text-grey"></i>{/for}</span>
-                    </span>
+                    </div>
+                    <div class="category_sub_info">
+                        {* todo: reviews block *}
+                        <div class="col-6">
+                            <div class="category-meta">
+                                <div class="category-meta-item">
+                                    <span class="category-meta-label">{l s='Check-in'}</span>
+                                    <span class="category-meta-value">{$objHotel->check_in}</span>
+                                </div>
+                                <div class="category-meta-item">
+                                    <span class="category-meta-label">{l s='Check-out'}</span>
+                                    <span class="category-meta-value">{$objHotel->check_out}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="">
-                </div>
+                {* todo: google maps and cheapest room info block *}
             </div>
             {block name='category_tabs'}
                 <div class="tab_container">

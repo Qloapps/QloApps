@@ -20,7 +20,7 @@
 * @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
 *}
 
-<section class="col-md-3">
+<section class="col-md-3 col-sm-6">
     <div class="footer-section-heading footer-section-item">
         <span>{l s='CONTACT US' mod='wkabouthotelblock'}</span>
     </div>

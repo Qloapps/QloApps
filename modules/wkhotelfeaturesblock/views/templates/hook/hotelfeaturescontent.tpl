@@ -61,7 +61,6 @@
                                             <div class="amenity_desc_secondary">
                                                 <div class="mb-1 h8 font-weight-bold">{$amenity['feature_title']|escape:'htmlall':'UTF-8'}</div>
                                                 <div class="amenity_description p-2">{$amenity['feature_description']|escape:'htmlall':'UTF-8'}</div>
-                                                <hr class="block_desc_line" />
                                             </div>
                                         </div>
                                     </div>
