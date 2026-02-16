@@ -103,6 +103,23 @@
 					</div>
 				</div>
 				<div class="badge-wrapper">
+					<div class="badge-item label-tooltip" data-toggle="tooltip" data-original-title="{l s='The number of rooms with today as check-in date that have not been checked in.' mod='dashguestcycle'}">
+						<div class="badge-strip" style="background-color: #000;"></div>
+						<div class="badge-content-wrapper">
+							<div class="title-wrapper">
+								<p class="text-center">
+									{l s="No Show Bookings" mod='dashguestcycle'}
+								</p>
+							</div>
+							<div class="value-wrapper">
+								<p class="text-center">
+									<span id="dgc_no_show_bookings"></span>
+								</p>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="badge-wrapper">
 					<div class="badge-item label-tooltip" data-toggle="tooltip" data-original-title="{l s='The number of bookings cancelled today so far.' mod='dashguestcycle'}">
 						<div class="badge-strip" style="background-color: #FF4036;"></div>
 						<div class="badge-content-wrapper">

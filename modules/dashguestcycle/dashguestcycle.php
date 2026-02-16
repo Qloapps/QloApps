@@ -31,7 +31,7 @@ class DashGuestCycle extends Module
     {
         $this->name = 'dashguestcycle';
         $this->tab = 'dashboard';
-        $this->version = '1.0.3';
+        $this->version = '1.0.4';
         $this->ps_versions_compliancy = array('min' => '1.6', 'max' => '1.6');
         $this->author = 'Webkul';
         $this->bootstrap = true;
@@ -84,6 +84,7 @@ class DashGuestCycle extends Module
             $dataValue['dgc_new_bookings'] = sprintf('%02d', rand(10, 500));
             $dataValue['dgc_occupied'] = sprintf('%02d', rand(10, 500));
             $dataValue['dgc_new_messages'] = sprintf('%02d', rand(0, 20));
+            $dataValue['dgc_no_show_bookings'] = sprintf('%02d', rand(0, 20));
             $dataValue['dgc_cancelled_bookings'] = sprintf('%02d', rand(0, 20));
             $dataValue['dgc_guests_adults'] = sprintf('%02d', rand(100, 1000));
             $dataValue['dgc_guests_children'] = sprintf('%02d', rand(0, $dataValue['dgc_guests_adults']));
@@ -104,6 +105,7 @@ class DashGuestCycle extends Module
                 HotelBookingDetail::STATUS_CHECKED_IN
             ));
             $dataValue['dgc_new_messages'] = sprintf('%02d', CustomerMessage::getMessagesByDate($dateToday));
+            $dataValue['dgc_no_show_bookings'] = sprintf('%02d', AdminStatsController::getNoShowByDate($dateToday, $params['id_hotel']));
             $dataValue['dgc_cancelled_bookings'] = sprintf('%02d', AdminStatsController::getCancelledBookingsByDate($dateToday, $params['id_hotel']));
             $dataValue['dgc_guests_adults'] = sprintf('%02d', $guestsData['adults']);
             $dataValue['dgc_guests_children'] = sprintf('%02d', $guestsData['children']);

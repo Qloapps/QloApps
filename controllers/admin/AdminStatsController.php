@@ -1343,6 +1343,19 @@ class AdminStatsControllerCore extends AdminStatsTabController
         );
     }
 
+    public static function getNoShowByDate($date, $idHotel = false) {
+        return Db::getInstance()->getValue(
+            'SELECT COUNT(hbd.`id_room`)
+            FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
+            WHERE hbd.`is_refunded` = 0
+            AND hbd.`is_cancelled` = 0
+            AND hbd.`date_from` >= "'.pSQL($date).' 00:00:00"
+            AND (hbd.`check_in` = "0000-00-00 00:00:00"
+            OR hbd.`check_in` IS NULL)'.
+            HotelBranchInformation::addHotelRestriction($idHotel, 'hbd')
+        );
+    }
+
     public static function getCancelledBookingsByDate($date, $idHotel = false)
     {
         return Db::getInstance()->getValue(
