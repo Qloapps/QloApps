@@ -5646,4 +5646,114 @@ class AdminProductsControllerCore extends AdminController
 
         return $tpl->fetch();
     }
+
+    public function ajaxProcessGetModalConnectedRooms()
+    {
+        $roomId = (int) Tools::getValue('room_id');
+        $hotelId = (int) Tools::getValue('hotel_id');
+        if (!$roomId || !$hotelId) {
+            die(json_encode([
+                'success' => false,
+                'message' => $this->l('Invalid data.')
+            ]));
+        }
+        $objRoomType = new HotelRoomType();
+        $connectedRooms = HotelRoomConnected::getConnectedRoomsByHotel($hotelId, $this->context->language->id, $roomId, true);
+        $notConnectedRooms = HotelRoomConnected::getConnectedRoomsByHotel($hotelId, $this->context->language->id, $roomId, false);
+        $this->context->smarty->assign(array(
+            'htl_connected_rooms' => $connectedRooms,
+            'htl_not_connected_rooms' => $notConnectedRooms,
+            'main_room_id' => $roomId,
+            'hotel_id' => $hotelId,
+            'current_roomtype' => Tools::getValue('current_roomtype')
+        ));
+        $modalContent = $this->context->smarty->fetch(
+            'controllers/products/modal-connected-rooms.tpl'
+        );
+        die(json_encode([
+            'success' => true,
+            'html' => $modalContent
+        ]));
+    }
+
+    public function ajaxProcessManageConnectedRoom()
+    {
+        $mode = Tools::getValue('mode');
+        $roomId = (int) Tools::getValue('room_id');
+        $connectedRoomId = (int) Tools::getValue('connected_room_id');
+        $connectedId = (int) Tools::getValue('connected_id');
+        $hotelId = Tools::getValue('hotel_id');
+        if (!$roomId || !$connectedRoomId) {
+            die(json_encode([
+                'success' => false,
+                'message' => $this->l('Invalid room data.')
+            ]));
+        }
+        if ($roomId == $connectedRoomId) {
+            die(json_encode([
+                'success' => false,
+                'message' => $this->l('You cannot connect a room to itself.')
+            ]));
+        }
+        if ($mode === 'add') {
+            $connection = new HotelRoomConnected();
+            $connection->id_room_information = $roomId;
+            $connection->id_room = $connectedRoomId;
+            if ($connection->add()) {
+                $connectedRooms = HotelRoomConnected::getConnectedRoomsByHotel($hotelId, $this->context->language->id, $roomId, true);
+                $notConnectedRooms = HotelRoomConnected::getConnectedRoomsByHotel($hotelId, $this->context->language->id, $roomId, false);
+                $this->context->smarty->assign(array(
+                    'htl_connected_rooms' => $connectedRooms,
+                    'htl_not_connected_rooms' => $notConnectedRooms,
+                    'main_room_id' => $roomId,
+                    'hotel_id' => $hotelId,
+                    'current_roomtype' => Tools::getValue('current_roomtype')
+                ));
+                $modalContent = $this->context->smarty->fetch(
+                    'controllers/products/modal-connected-rooms.tpl'
+                );
+                die(json_encode([
+                    'html' => $modalContent,
+                    'success' => true,
+                    'message' => $this->l('Room connected successfully.')
+                ]));
+            }
+
+            die(json_encode([
+                'success' => false,
+                'message' => $this->l('Failed to connect room.')
+            ]));
+        }
+        //remove room
+        if ($mode === 'delete') {
+            $objHotelRoomConnected = new HotelRoomConnected($connectedId);
+            if ($objHotelRoomConnected->delete()) {
+                $connectedRooms = HotelRoomConnected::getConnectedRoomsByHotel($hotelId, $this->context->language->id, $roomId, true);
+                $notConnectedRooms = HotelRoomConnected::getConnectedRoomsByHotel($hotelId, $this->context->language->id, $roomId, false);
+                $this->context->smarty->assign(array(
+                    'htl_connected_rooms' => $connectedRooms,
+                    'htl_not_connected_rooms' => $notConnectedRooms,
+                    'main_room_id' => $roomId,
+                    'hotel_id' => $hotelId,
+                    'current_roomtype' => Tools::getValue('current_roomtype')
+                ));
+                $modalContent = $this->context->smarty->fetch(
+                    'controllers/products/modal-connected-rooms.tpl'
+                );
+                die(json_encode([
+                    'success' => true,
+                    'html' => $modalContent,
+                    'message' => $this->l('Connected room removed successfully.')
+                ]));
+            }
+            die(json_encode([
+                'success' => false,
+                'message' => $this->l('Failed to remove connected room.')
+            ]));
+        }
+        die(json_encode([
+            'success' => false,
+            'message' => $this->l('Invalid action.')
+        ]));
+    }
 }
