@@ -3485,6 +3485,7 @@ class AdminOrdersControllerCore extends AdminController
                 $order_detail_data[$key]['amt_with_qty_tax_incl'] = $value['total_price_tax_incl'];
                 $order_detail_data[$key]['room_type_info'] = $objHotelRoomType->getRoomTypeInfoByIdProduct($value['id_product']);
                 $order_detail_data[$key]['total_room_tax'] = $order_detail_data[$key]['total_room_price_ti'] - $order_detail_data[$key]['total_room_price_te'];
+                $order_detail_data[$key]['connected_rooms'] = HotelRoomConnected::getConnectedRoomsByHotel($value['id_hotel'], Context::getContext()->language->id, $value['id_room'], true);
 
                 if (isset($value['refund_info'])
                     && $value['refund_info']['refunded']

@@ -29,6 +29,9 @@
         {if $data.is_back_order}
             <span class="overbooked_room">{l s='overbooked'}</span>
         {/if}
+		{if isset($data['connected_rooms'][$data['id_room']]) && $data['connected_rooms'][$data['id_room']]|@count > 0}
+			{include file="controllers/products/connected-rooms.tpl" htl_connected_rooms=$data['connected_rooms'][$data['id_room']]}
+		{/if}
     </td>
 	<td><img src="{$data.image_link}" title="{l s='Room image'}"></td>
 	<td>

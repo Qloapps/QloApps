@@ -67,6 +67,14 @@
 								</span>
 							</label>
 						</th>
+                        <th class="col-sm-1 center">
+                            <label class="control-label">
+                                <span class="label-tooltip" data-toggle="tooltip"
+                                    data-original-title="{l s='Manage connected rooms for this room'}">
+                                    {l s='Connected Rooms'}
+                                </span>
+                            </label>
+                        </th>
                         {hook h='displayHotelRoomListTableHeaderColumn'}
                         <th class="col-sm-1 center">
                             {l s='--'}
@@ -108,6 +116,16 @@
 									<input type="hidden" class="form-control disable_dates_json" name="{$var_name_room_info|cat:'[disable_dates_json]'}" {if $room_info['id_status'] == $rm_status['STATUS_TEMPORARY_INACTIVE']['id']}value="{$room_info['disable_dates_json']|escape:'html':'UTF-8'}"{/if}>
 								</td>
                                 {* Since the data can also be used from post incase of errors, which will cause issues with the id index *}
+                                <td class="col-sm-1 center">
+                                    {if isset($room_info['id'])}
+                                        <a href="#" class="btn btn-default connectedRoomModal" data-toggle="modal"
+                                            data-target="#connectedRoomModal" data-id-room="{$room_info['id']}"
+                                            data-id-hotel="{$room_info['id_hotel']}" data-room-num="{$room_info['room_num']}"
+                                            data-room-type="{$room_info['id_product']}">
+                                            <i class="icon-random"></i>
+                                        </a>
+                                    {/if}
+                                </td>
                                 {if isset($room_info['id'])}
                                     {hook h='displayHotelRoomListTableRowColumn' index=$key id_room=$room_info['id']}
                                 {else}
@@ -1885,6 +1903,141 @@
                 return false;
             }
         }
+         //connected modal
+        $(document).on('click', '.connectedRoomModal', function(e) {
+            e.preventDefault();
+
+            let roomId = $(this).data('id-room');
+            let hotelId = $(this).data('id-hotel');
+            let currentRoomType = $('[name="id_product"]').val();
+            $.ajax({
+                type: 'POST',
+                url: prod_link,
+                dataType: 'json',
+                data: {
+                    ajax: true,
+                    action: 'getModalConnectedRooms',
+                    room_id: roomId,
+                    hotel_id: hotelId,
+                    current_roomtype: currentRoomType,
+                },
+                success: function(response) {
+                    $('#modalLoader').remove();
+                    if (response.success) {
+                        if ($('#connectedRoomModal').length) {
+                            $('#connectedRoomModal').modal('hide');
+                            $('#connectedRoomModal').data('bs.modal', null);
+                            $('#connectedRoomModal').remove();
+                        }
+                        $('.modal-backdrop').remove();
+                        $('body').removeClass('modal-open');
+                        $("#footer").next(".bootstrap").append(response.html);
+                        $('#connectedRoomModal').modal({
+                            backdrop: 'static',
+                            keyboard: true
+                        });
+                    } else {
+                        alert(response.message);
+                    }
+                }
+
+
+            });
+        });
+        function filterRoomsByType() {
+            var selectedType = $('#connect_room_type').val();
+            var firstVisible = null;
+            $('#connect_room option').each(function() {
+                if ($(this).data('type') == selectedType) {
+                    $(this).show();
+                    if (!firstVisible) firstVisible = $(this);
+                } else {
+                    $(this).hide();
+                }
+            });
+            if (firstVisible) {
+                firstVisible.prop('selected', true);
+            }
+        }
+        $(document).on('change', '#connect_room_type', function() {
+            filterRoomsByType();
+        });
+        $(document).on('shown.bs.modal', '#connectedRoomModal', function() {
+            filterRoomsByType();
+        });
+        //add connected room
+        $(document).on('click', '#save_connected_room', function() {
+            var mainRoomId = $('#connected_room_main_id').val();
+            var connectedRoomId = $('#connect_room').val();
+            var hotelId = $('#hotel_id').val();
+            let currentRoomType = $('[name="id_product"]').val();
+            if (!connectedRoomId) {
+                alert('Please select a room');
+                return;
+            }
+            $.ajax({
+                url: prod_link,
+                type: 'POST',
+                dataType: 'json',
+                data: {
+                    ajax: true,
+                    action: 'ManageConnectedRoom',
+                    mode: 'add',
+                    hotel_id: hotelId,
+                    room_id: mainRoomId,
+                    connected_room_id: connectedRoomId,
+                    current_roomtype: currentRoomType,
+                },
+                beforeSend: function() {
+                    $('#save_connected_room').prop('disabled', true);
+                },
+                success: function(response) {
+                    if (response.success) {
+                        showSuccessMessage(response.message);
+                        $('#connectedRoomModal .modal-content').replaceWith($(response.html).find('.modal-content'));
+                        filterRoomsByType();
+                    } else {
+                        alert(response.message);
+                    }
+                },
+                complete: function() {
+                    $('#save_connected_room').prop('disabled', false);
+                }
+            });
+        });
+        //remove connected room
+        $(document).on('click', '.delete-connected-room', function() {
+            var roomId = $(this).data('room-id');
+            var connectedRoomId = $(this).data('connected-room-id');
+            var connectedId = $(this).data('connected-id');
+            var hotelId = $(this).data('hotel-id');
+            let currentRoomType = $('[name="id_product"]').val();
+            $.ajax({
+                url: prod_link,
+                type: 'POST',
+                dataType: 'json',
+                data: {
+                    ajax: true,
+                    action: 'ManageConnectedRoom',
+                    mode: 'delete',
+                    room_id: roomId,
+                    connected_room_id: connectedRoomId,
+                    connected_id: connectedId,
+                    hotel_id: hotelId,
+                    current_roomtype: currentRoomType,
+                },
+                success: function(response) {
+                    if (response.success) {
+                        showSuccessMessage(response.message);
+                        $('#connectedRoomModal .modal-content').replaceWith($(response.html).find(
+                            '.modal-content'));
+                        filterRoomsByType();
+                    } else {
+                        alert(response.message);
+                    }
+                }
+            });
+        });
     });
 
 </script>

@@ -552,6 +552,14 @@ class HotelReservationSystemDb
             SELECT 5, `id_lang`, 'Hotel Amenities Block', 'Configure Hotels Amenities settings. You can display hotel amenities images using this block. This block will be displayed on home page.'
             FROM `"._DB_PREFIX_."lang`
             ORDER BY `id_lang`;",
+            "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."htl_connected_room` (
+                `id_connected_room` int(11) NOT NULL AUTO_INCREMENT,
+                `id_room_information` int(11) NOT NULL,
+                `id_room` int(11) NOT NULL,
+                `date_add` datetime NOT NULL,
+                `date_upd` datetime NOT NULL,
+                PRIMARY KEY (`id_connected_room`)
+            ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;",
         );
     }
 
@@ -615,7 +623,8 @@ class HotelReservationSystemDb
             `'._DB_PREFIX_.'htl_room_type_bed_type`,
             `'._DB_PREFIX_.'htl_access`,
             `'._DB_PREFIX_.'htl_settings_link`,
-            `'._DB_PREFIX_.'htl_settings_link_lang`'
+            `'._DB_PREFIX_.'htl_settings_link_lang`
+            `'._DB_PREFIX_.'htl_connected_room`'
         );
     }
 }

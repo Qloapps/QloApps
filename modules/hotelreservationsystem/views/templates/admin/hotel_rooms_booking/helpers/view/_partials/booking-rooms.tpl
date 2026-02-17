@@ -40,7 +40,11 @@
                                     <tbody>
                                         {foreach from=$book_v['data']['available'] key=avai_k item=avai_v}
                                             <tr>
-                                                <td>{$avai_v['room_num']|escape:'htmlall':'UTF-8'} {hook h='displayRoomNumAfter' data=$avai_v type='available'}</td>
+                                                <td>{$avai_v['room_num']|escape:'htmlall':'UTF-8'}
+                                                {if isset($htl_connected_rooms[$avai_v['id_room']]) && $htl_connected_rooms[$avai_v['id_room']]|@count > 0}
+                                                    {include file="controllers/products/connected-rooms.tpl" htl_connected_rooms=$htl_connected_rooms[$avai_v['id_room']]}
+                                                {/if}
+                                                {hook h='displayRoomNumAfter' data=$avai_v type='available'}</td>
                                                 {assign var="is_full_date" value=($show_full_date && ($date_from|date_format:'%D' == $date_to|date_format:'%D'))}
                                                 <td>{dateFormat date=$date_from full=$is_full_date} - {dateFormat date=$date_to full=$is_full_date}</td>
                                                 <td>{$avai_v['room_comment']|escape:'htmlall':'UTF-8'}</td>
