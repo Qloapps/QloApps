@@ -37,12 +37,12 @@
                         <label for="login_passwd">{l s='Password'}</label>
                         <input class="form-control validate" type="password" id="login_passwd" name="login_passwd" data-validate="isPasswd" />
                     </p>
-                    <a href="{$link->getPageLink('password', true)|escape:'html':'UTF-8'}" class="lost_password pull-right">{l s='Forgot your password?'}</a>
+                    <a href="{$link->getPageLink('password', true)|escape:'html':'UTF-8'}" class="lost_password">{l s='Forgot your password?'}</a>
                     <div style="clear:both"></div>
                     {block name='order_opc_edit_guest_info_login_submit'}
                         <p class="submit">
                             {if isset($back)}<input type="hidden" class="hidden" name="back" value="{$back|escape:'html':'UTF-8'}" />{/if}
-                            <button type="submit" id="SubmitLogin" name="SubmitLogin" class="button btn btn-default button-medium pull-right"><span><i class="icon-lock left"></i>{l s='Sign in'}</span></button>
+                            <button type="submit" id="SubmitLogin" name="SubmitLogin" class="button btn btn-default btn-medium pull-right"><span><i class="icon-lock left"></i>{l s='Sign in'}</span></button>
                         </p>
                     {/block}
                 </div>
@@ -50,7 +50,7 @@
         </form>
     {/block}
     {block name='order_opc_edit_guest_info_new_account_form'}
-        <form action="{$link->getPageLink('authentication', true)|escape:'html':'UTF-8'}" method="post" id="new_account_form" class="std" autocomplete="on" autofill="on">
+        <form action="{$link->getPageLink('register', true)|escape:'html':'UTF-8'}" method="post" id="new_account_form" class="std" autocomplete="on" autofill="on">
             <div id="opc_account_form" class="unvisible">
                 {block name='displayCustomerAccountFormTop'}
                     {$HOOK_CREATE_ACCOUNT_TOP}
@@ -121,7 +121,7 @@
                         <div class="select form-group date-select col-sm-12">
                             <label>{l s='Date of Birth'}</label>
                             <div class="row">
-                                <div class="col-xs-4">
+                                <div class="col-4">
                                     <select id="days" name="days">
                                         <option value="">-</option>
                                         {foreach from=$days item=day}
@@ -129,7 +129,7 @@
                                         {/foreach}
                                     </select>
                                 </div>
-                                <div class="col-xs-4">
+                                <div class="col-4">
                                     <select id="months" name="months">
                                         <option value="">-</option>
                                         {foreach from=$months key=k item=month}
@@ -137,7 +137,7 @@
                                         {/foreach}
                                     </select>
                                 </div>
-                                <div class="col-xs-4">
+                                <div class="col-4">
                                     <select id="years" name="years">
                                         <option value="">-</option>
                                         {foreach from=$years item=year}
@@ -297,8 +297,9 @@
                     {$HOOK_CREATE_ACCOUNT_FORM}
                 {/block}
                 {block name='order_opc_edit_guest_info_account_submit'}
-                    <div class="submit opc-add-save clearfix">
-                        <button type="submit" name="submitAccount" id="submitAccount" class="btn btn-default button button-medium pull-right"><span>{l s='Save'}<i class="icon-chevron-right right"></i></span></button>
+                    <hr>
+                    <div class="submit opc-add-save">
+                        <button type="submit" name="submitAccount" id="submitAccount" class="btn btn-primary btn-medium pull-right"><span>{l s='Proceed'}</span></button>
                     </div>
                 {/block}
             <!-- END Account -->

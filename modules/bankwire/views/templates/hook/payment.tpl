@@ -22,12 +22,12 @@
 *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 *}
-<div class="row">
-	<div class="col-xs-12">
-		<p class="payment_module">
-			<a class="bankwire" href="{$link->getModuleLink('bankwire', 'payment')|escape:'html':'UTF-8'}" title="{l s='Pay by bank wire' mod='bankwire'}">
-				{l s='Pay by bank wire' mod='bankwire'} <span>{l s='(order processing will be longer)' mod='bankwire'}</span>
-			</a>
-		</p>
-	</div>
-</div>
+<a class="payment-method-wrapper d-flex align-items-center" href="{$link->getModuleLink('bankwire', 'payment')|escape:'html':'UTF-8'}" title="{l s='Pay by bank wire' mod='bankwire'}">
+    <span class="payment-img-container mr-3">
+        <img src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/cheque.png" alt="{l s='Pay by bank wire' mod='bankwire'}" class="img-fluid">
+    </span>
+    <span class="payment-content">
+        <span class="payment-title">{l s='Pay by bank wire' mod='bankwire'}</span>
+        <span class="payment-subtitle">{l s='(order processing will be longer)' mod='bankwire'}</span>
+    </span>
+</a>

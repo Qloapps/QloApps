@@ -37,7 +37,7 @@
 	{assign var='stateExist' value=false}
 	{assign var="postCodeExist" value=false}
 	{assign var="dniExist" value=false}
-		<div class="row bg-color-grey-light p-md-5 justify-content-center">
+		<div class="m-0 row bg-color-grey-light p-md-5 justify-content-center">
 			{if isset($smarty.get.guest_transform_success) && $smarty.get.guest_transform_success}
 				<div class="col-12">
 					<div class="alert alert-success">
@@ -45,7 +45,7 @@
 					</div>
 				</div>
 			{/if}
-			<div class="card col-lg-5 col-md-8 p-5 mb-4">
+			<div class="card col-lg-5 col-md-8 p-5 mb-md-4">
 				{block name='authentication_login_form'}
 					<form action="{$link->getPageLink('authentication', true)|escape:'html':'UTF-8'}" method="post" id="login_form" class="box">
 						<h3 class="page-heading text-center text-bolder h5 font-weight-bold">{l s='Welcome Back!'}</h3>
@@ -120,7 +120,7 @@
 							<div class="form-group date-select">
 								<label>{l s='Date of Birth'}</label>
 								<div class="row">
-									<div class="col-xs-4">
+									<div class="col-4">
 										<select id="days" name="days" class="form-control">
 											<option value="">-</option>
 											{foreach from=$days item=day}
@@ -142,7 +142,7 @@
 											{l s='December'}
 										*}
 									</div>
-									<div class="col-xs-4">
+									<div class="col-4">
 										<select id="months" name="months" class="form-control">
 											<option value="">-</option>
 											{foreach from=$months key=k item=month}
@@ -150,7 +150,7 @@
 											{/foreach}
 										</select>
 									</div>
-									<div class="col-xs-4">
+									<div class="col-4">
 										<select id="years" name="years" class="form-control">
 											<option value="">-</option>
 											{foreach from=$years item=year}
@@ -392,7 +392,7 @@
 						<span><sup>*</sup>{l s='Required field'}</span>
 						<input type="hidden" name="display_guest_checkout" value="1" />
 						{block name='authentication_guest_submit'}
-							<button type="submit" class="button btn btn-default button-medium" name="submitGuestAccount" id="submitGuestAccount">
+							<button type="submit" class="button btn btn-default btn-medium" name="submitGuestAccount" id="submitGuestAccount">
 								<span>
 									{l s='Proceed to checkout'}
 									<i class="icon-chevron-right right"></i>

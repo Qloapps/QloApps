@@ -29,12 +29,12 @@
 					{block name='displayLoginFormFieldsAfter'}
 						{hook h='displayLoginFormFieldsAfter'}
 					{/block}
-					<a href="{$link->getPageLink('password', true)|escape:'html':'UTF-8'}" class="lost_password pull-right">{l s='Forgot your password?'}</a>
+					<a href="{$link->getPageLink('password', true)|escape:'html':'UTF-8'}" class="lost_password">{l s='Forgot your password?'}</a>
 					<div style="clear:both"></div>
 					{block name='order_opc_new_account_login_submit'}
 						<p class="submit">
 							{if isset($back)}<input type="hidden" class="hidden" name="back" value="{$back|escape:'html':'UTF-8'}" />{/if}
-							<button type="submit" id="SubmitLogin" name="SubmitLogin" class="button btn btn-default button-medium pull-right"><span>{l s='Sign in'}</span></button>
+							<button type="submit" id="SubmitLogin" name="SubmitLogin" class="btn btn-primary btn-medium"><span>{l s='Sign in'}</span></button>
 						</p>
 					{/block}
 					{block name='displayLoginFormBottom'}
@@ -45,12 +45,12 @@
 		</form>
 	{/block}
 	{block name='order_opc_new_account_new_account_form'}
-		<form action="{$link->getPageLink('authentication', true)|escape:'html':'UTF-8'}" method="post" id="new_account_form" class="std" autocomplete="on" autofill="on">
+		<form action="{$link->getPageLink('register', true)|escape:'html':'UTF-8'}" method="post" id="new_account_form" class="std" autocomplete="on" autofill="on">
 			<div id="opc_account_choice" class="row">
-				<div class="col-xs-12">
+				<div class="col-12">
 					<div class="opc-button">
 						<span>
-							<button type="submit" class="opc-button-small opc-btn-primary" id="opc_guestCheckout"><span>{l s='Guest checkout'}</span></button>
+							<button type="submit" class="btn-low btn-primary" id="opc_guestCheckout"><span>{l s='Guest checkout'}</span></button>
 						</span>
 						<span>
 							<button type="submit" class="opc-button-small opc-btn-default" id="opc_createAccount"><span>{l s='Create an account'}</span></button>
@@ -76,27 +76,28 @@
 				<input type="hidden" id="opc_id_customer" name="opc_id_customer" value="{if isset($guestInformations) && isset($guestInformations.id_customer) && $guestInformations.id_customer}{$guestInformations.id_customer}{else}0{/if}" />
 				<input type="hidden" id="opc_id_address_delivery" name="opc_id_address_delivery" value="{if isset($guestInformations) && isset($guestInformations.id_address_delivery) && $guestInformations.id_address_delivery}{$guestInformations.id_address_delivery}{else}0{/if}" />
 				<input type="hidden" id="opc_id_address_invoice" name="opc_id_address_invoice" value="{if isset($guestInformations) && isset($guestInformations.id_address_delivery) && $guestInformations.id_address_delivery}{$guestInformations.id_address_delivery}{else}0{/if}" />
-				<p class="required"><sup>*</sup>{l s='Required field'}</p>
-
-				<div class="row">
-					<div class="required clearfix gender-line col-sm-2">
-						<label>{l s='Social title'}</label>
-						<select name="id_gender" id="id_gender">
-							{foreach from=$genders key=k item=gender}
-								<option value="{$gender->id_gender}"{if isset($smarty.post.id_gender) && $smarty.post.id_gender == $gender->id_gender || (isset($guestInformations) && $guestInformations.id_gender == $gender->id_gender)} selected="selected"{/if}>{$gender->name}</option>
-							{/foreach}
-						</select>
+				<div  class="row mb-2">
+					<div class="required d-flex col-sm-12 ml-n3">
+						{foreach from=$genders key=k item=gender}
+                            <div class="radio-inline form-check">
+                                <label for="id_gender{$gender->id}" class="top">
+                                    <input checked="" type="radio" name="id_gender" id="id_gender{$gender->id}" value="{$gender->id}" {if isset($smarty.post.id_gender) && $smarty.post.id_gender == $gender->id || (isset($guestInformations) && $guestInformations.id_gender == $gender->id_gender)}checked="checked"{/if} />
+                                    {$gender->name}
+                                </label>
+                            </div>
+						{/foreach}
 					</div>
-					<div class="required form-group col-sm-5">
+				</div>
+				<div class="row">
+					<div class="required form-group col-sm-6">
 						<label for="firstname">{l s='First name'} <sup>*</sup></label>
 						<input type="text" class="text form-control validate" id="customer_firstname" name="customer_firstname" onblur="$('#firstname').val($(this).val());" data-validate="isName" value="{if isset($guestInformations) && isset($guestInformations.customer_firstname) && $guestInformations.customer_firstname}{$guestInformations.customer_firstname}{/if}" />
 					</div>
-					<div class="required form-group col-sm-5">
+					<div class="required form-group col-sm-6">
 						<label for="lastname">{l s='Last name'} <sup>*</sup></label>
 						<input type="text" class="form-control validate" id="customer_lastname" name="customer_lastname" onblur="$('#lastname').val($(this).val());" data-validate="isName" value="{if isset($guestInformations) && isset($guestInformations.customer_lastname) && $guestInformations.customer_lastname}{$guestInformations.customer_lastname}{/if}" />
 					</div>
 				</div>
-
 				<div class="row">
 					<div class="required text form-group col-sm-6">
 						<label for="email">{l s='Email'} <sup>*</sup></label>
@@ -122,7 +123,7 @@
 							<div class="select form-group date-select col-sm-12">
 								<label>{l s='Date of Birth'}</label>
 								<div class="row">
-									<div class="col-xs-4">
+									<div class="col-4">
 										<select id="days" name="days">
 											<option value="">-</option>
 											{foreach from=$days item=day}
@@ -130,7 +131,7 @@
 											{/foreach}
 										</select>
 									</div>
-									<div class="col-xs-4">
+									<div class="col-4">
 										<select id="months" name="months">
 											<option value="">-</option>
 											{foreach from=$months key=k item=month}
@@ -138,7 +139,7 @@
 											{/foreach}
 										</select>
 									</div>
-									<div class="col-xs-4">
+									<div class="col-4">
 										<select id="years" name="years">
 											<option value="">-</option>
 											{foreach from=$years item=year}
@@ -403,8 +404,11 @@
 					{$HOOK_CREATE_ACCOUNT_FORM}
 				{/block}
 				{block name='order_opc_new_account_submit'}
-					<div class="submit opc-add-save clearfix">
-						<button type="submit" name="submitAccount" id="submitAccount" class="btn btn-default button button-medium pull-right"><span>{l s='Save'}<i class="icon-chevron-right right"></i></span></button>
+					<hr>
+					<div class="row">
+						<div class="col-sm-12 submit opc-add-save">
+							<button type="submit" name="submitAccount" id="submitAccount" class="btn btn-primary btn-medium pull-right"><span>{l s='Proceed'}</span></button>
+						</div>
 					</div>
 				{/block}
 			<!-- END Account -->

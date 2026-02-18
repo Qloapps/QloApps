@@ -515,7 +515,7 @@ function initProductEvents()
 
 							var roomBlockIndex = parseInt($(this).closest('.occupancy_info_block').attr('occ_block_index'));
 
-							var childAgeSelect = '<p class="col-xs-12 col-sm-12 col-md-6 col-lg-6">';
+							var childAgeSelect = '<p class="col-12 col-sm-12 col-md-6 col-lg-6">';
 								childAgeSelect += '<select class="guest_child_age room_occupancies" name="occupancy[' +roomBlockIndex+ '][child_ages][]">';
 									childAgeSelect += '<option value="-1">' + select_age_txt + '</option>';
 									childAgeSelect += '<option value="0">' + under_1_age + '</option>';
@@ -631,11 +631,11 @@ function initProductEvents()
 			occupancy_block += '<div class="occupancy_info_head col-sm-12"><label class="room_num_wrapper">'+ room_txt + ' - ' + countRooms + '</label><a class="remove-room-link pull-right" href="#">' + remove_txt + '</a></div>';
 			occupancy_block += '<div class="col-sm-12">';
 				occupancy_block += '<div class="row">';
-					occupancy_block += '<div class="form-group col-xs-6 occupancy_count_block">';
+					occupancy_block += '<div class="form-group col-6 occupancy_count_block">';
 						occupancy_block += '<label>' + adults_txt + '</label>';
 						occupancy_block += '<input type="number" class="form-control num_occupancy num_adults" name="occupancy['+roomBlockIndex+'][adults]" value="1" min="1">';
 					occupancy_block += '</div>';
-					occupancy_block += '<div class="form-group col-xs-6 occupancy_count_block">';
+					occupancy_block += '<div class="form-group col-6 occupancy_count_block">';
 						occupancy_block += '<label>' + child_txt + '<span class="label-desc-txt"></span></label>';
 						occupancy_block += '<input type="number" class="form-control num_occupancy num_children" name="occupancy['+roomBlockIndex+'][children]" value="0" min="0">(' + below_txt + ' ' + max_child_age + ' ' + years_txt + ')';
 					occupancy_block += '</div>';

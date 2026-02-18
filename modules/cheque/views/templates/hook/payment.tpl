@@ -22,12 +22,12 @@
 *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 *}
-<div class="row">
-	<div class="col-xs-12">
-        <p class="payment_module">
-            <a class="cheque" href="{$link->getModuleLink('cheque', 'payment', [], true)|escape:'html':'UTF-8'}" title="{l s='Pay by check.' mod='cheque'}">
-                {l s='Pay by check' mod='cheque'} <span>{l s='(order processing will be longer)' mod='cheque'}</span>
-            </a>
-        </p>
-    </div>
-</div>
+<a class="payment-method-wrapper d-flex align-items-center" href="{$link->getModuleLink('cheque', 'payment', [], true)|escape:'html':'UTF-8'}" title="{l s='Pay by check.' mod='cheque'}">
+    <span class="payment-img-container mr-3">
+        <img src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/cheque.png" alt="{l s='Pay by check' mod='cheque'}" class="img-fluid">
+    </span>
+    <span class="payment-content">
+        <span class="payment-title">{l s='Pay by check' mod='cheque'}</span>
+        <span class="payment-subtitle">{l s='(order processing will be longer)' mod='cheque'}</span>
+    </span>
+</a>

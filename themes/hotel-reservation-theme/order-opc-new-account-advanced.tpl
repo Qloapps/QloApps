@@ -22,7 +22,7 @@
                     {block name='order_opc_new_account_advanced_login_submit'}
                         <p class="submit">
                             {if isset($back)}<input type="hidden" class="hidden" name="back" value="{$back|escape:'html':'UTF-8'}" />{/if}
-                            <button type="submit" id="SubmitLogin" name="SubmitLogin" data-adv-api="1" class="button btn btn-default button-medium"><span><i class="icon-lock left"></i>{l s='Sign in'}</span></button>
+                            <button type="submit" id="SubmitLogin" name="SubmitLogin" data-adv-api="1" class="button btn btn-default btn-medium"><span><i class="icon-lock left"></i>{l s='Sign in'}</span></button>
                         </p>
                     {/block}
                 </div>
@@ -30,18 +30,18 @@
         </form>
     {/block}
     {block name='order_opc_new_account_advanced_new_account_form'}
-        <form action="{$link->getPageLink('authentication', true)|escape:'html':'UTF-8'}" method="post" id="new_account_form" class="std" autocomplete="on" autofill="on">
+        <form action="{$link->getPageLink('register', true)|escape:'html':'UTF-8'}" method="post" id="new_account_form" class="std" autocomplete="on" autofill="on">
             <fieldset>
                 <div class="box">
                     <h3 id="new_account_title" class="page-subheading">{l s='New Customer'}</h3>
                     <div id="opc_account_choice" class="row">
-                        <div class="col-xs-12 col-md-6">
+                        <div class="col-12 col-md-6">
                             <p class="title_block">{l s='Instant Checkout'}</p>
                             <p class="opc-button">
-                                <button type="submit" class="btn btn-default button button-medium exclusive" id="opc_guestCheckout"><span>{l s='Guest checkout'}</span></button>
+                                <button type="submit" class="btn btn-primary btn-medium pull-right exclusive" id="opc_guestCheckout"><span>{l s='Guest checkout'}</span></button>
                             </p>
                         </div>
-                        <div class="col-xs-12 col-md-6">
+                        <div class="col-12 col-md-6">
                             <p class="title_block">{l s='Create your account today and enjoy:'}</p>
                             <ul class="bullet">
                                 <li>- {l s='Personalized and secure access'}</li>
@@ -49,7 +49,7 @@
                                 <li>- {l s='Separate billing and shipping addresses'}</li>
                             </ul>
                             <p class="opc-button">
-                                <button type="submit" class="btn btn-default button button-medium exclusive" id="opc_createAccount"><span><i class="icon-user left"></i>{l s='Create an account'}</span></button>
+                                <button type="submit" class="btn btn-primary btn-medium pull-right exclusive" id="opc_createAccount"><span><i class="icon-user left"></i>{l s='Create an account'}</span></button>
                             </p>
                         </div>
                     </div>
@@ -94,7 +94,7 @@
                         <div class="select form-group date-select">
                             <label>{l s='Date of Birth'}</label>
                             <div class="row">
-                                <div class="col-xs-4">
+                                <div class="col-4">
                                     <select id="days" name="days" class="form-control">
                                         <option value="">-</option>
                                         {foreach from=$days item=day}
@@ -116,7 +116,7 @@
                                     {l s='December'}
                                     *}
                                 </div>
-                                <div class="col-xs-4">
+                                <div class="col-4">
                                     <select id="months" name="months" class="form-control">
                                         <option value="">-</option>
                                         {foreach from=$months key=k item=month}
@@ -124,7 +124,7 @@
                                         {/foreach}
                                     </select>
                                 </div>
-                                <div class="col-xs-4">
+                                <div class="col-4">
                                     <select id="years" name="years" class="form-control">
                                         <option value="">-</option>
                                         {foreach from=$years item=year}
@@ -376,11 +376,12 @@
                             {$HOOK_CREATE_ACCOUNT_FORM}
                         {/block}
                         {block name='order_opc_new_account_advanced_account_submit'}
-                            <div class="submit opc-add-save clearfix">
+                            <hr>
+                            <div class="submit opc-add-save">
                                 <p class="required opc-required pull-right">
                                     <sup>*</sup>{l s='Required field'}
                                 </p>
-                                <button type="submit" name="submitAccount" id="submitAccount" data-adv-api="1" class="btn btn-default button button-medium"><span>{l s='Save'}<i class="icon-chevron-right right"></i></span></button>
+                                <button type="submit" name="submitAccount" id="submitAccount" data-adv-api="1" class="btn btn-primary btn-medium pull-right"><span>{l s='Proceed'}</span></button>
                             </div>
                         {/block}
                         <div style="display: none;" id="opc_account_saved" class="alert alert-success">

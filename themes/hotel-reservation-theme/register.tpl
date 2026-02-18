@@ -27,8 +27,8 @@
     {assign var=stateExist value=false}
     {assign var=postCodeExist value=false}
     {assign var=dniExist value=false}
-    <div class="row bg-color-grey-light p-md-5 justify-content-center">
-        <div class="card col-lg-7 col-md-9 p-5 mb-4">
+    <div class="m-0 row bg-color-grey-light p-md-5 justify-content-center">
+        <div class="card col-lg-7 col-md-9 p-5 mb-md-4">
             {block name='authentication_account_creation_form'}
                 <form action="{$link->getPageLink('register', true)|escape:'html':'UTF-8'}" method="post" id="account-creation_form" class="std box">
                     {block name='displayCustomerAccountFormTop'}
@@ -74,7 +74,7 @@
                                 <div class="form-group">
                                     <label>{l s='Date of Birth'}</label>
                                     <div class="row col-12 gap-1">
-                                        <div class="col-xs-4">
+                                        <div class="col-4">
                                             <select id="days" name="days" class="form-control">
                                                 <option value="">-</option>
                                                 {foreach from=$days item=day}
@@ -96,7 +96,7 @@
                                                 {l s='December'}
                                             *}
                                         </div>
-                                        <div class="col-xs-4">
+                                        <div class="col-4">
                                             <select id="months" name="months" class="form-control">
                                                 <option value="">-</option>
                                                 {foreach from=$months key=k item=month}
@@ -104,7 +104,7 @@
                                                 {/foreach}
                                             </select>
                                         </div>
-                                        <div class="col-xs-4">
+                                        <div class="col-4">
                                             <select id="years" name="years" class="form-control">
                                                 <option value="">-</option>
                                                 {foreach from=$years item=year}
@@ -282,7 +282,7 @@
                             <p class="float-right text-danger required"><span><sup>*</sup>{l s='Required field'}</span></p>
                             {block name='authentication_account_submit'}
                                 <button type="submit" name="submitAccount" id="submitAccount" class="btn btn-primary col-12">
-                                    <span>{l s='Register'}&nbsp;<i class="icon-chevron-right right"></i></span>
+                                    <span>{l s='Create An Account'}&nbsp;<i class="icon-chevron-right right"></i></span>
                                 </button>
                             {/block}
 

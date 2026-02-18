@@ -28,7 +28,7 @@
     <div class="cat_cont container p-0">
         <div class="col-12">
             <div class="category_info_block">
-                <div class="col-6">
+                <div class="col-md-6">
                     <div class="category_heading">
                         <span class="block_title">
                             {$objHotel->hotel_name}
@@ -55,7 +55,8 @@
                     </div>
                     <div class="category_sub_info">
                         {* todo: reviews block *}
-                        <div class="col-6">
+                        {*apply qlo-border-class where you want to add default qloapps border *}
+                        <div class="col-md-6 qlo-border-class">
                             <div class="category-meta">
                                 <div class="category-meta-item">
                                     <span class="category-meta-label">{l s='Check-in'}</span>

@@ -45,7 +45,7 @@
                                     {assign var=roomCount value=1}
                                     {foreach $additionalServices as $key => $roomAdditionalService}
                                         <div class="room_demands">
-                                            <div class="demand_header">
+                                            <div class="demand_header mb-3">
                                                 {l s='Room'} {$roomCount|string_format:'%02d'}&nbsp;
                                                 <span>({if {$roomAdditionalService['adults']} <= 9}0{$roomAdditionalService['adults']}{else}{$roomAdditionalService['adults']}{/if} {if $roomAdditionalService['adults'] > 1}{l s='Adults'}{else}{l s='Adult'}{/if}{if $roomAdditionalService['children'] > 0}, {if {$roomAdditionalService['children']} <= 9}0{$roomAdditionalService['children']}{else}{$roomAdditionalService['children']}{/if} {if $roomAdditionalService['children'] > 1}{l s='Children'}{else}{l s='Child'}{/if}{/if})</span>
                                             </div>
@@ -85,7 +85,7 @@
                                     {assign var=roomCount value=1}
                                     {foreach $extraDemands as $roomDemand}
                                         <div class="room_demands">
-                                            <div class="demand_header">
+                                            <div class="demand_header mb-3">
                                                 {l s='Room'} {$roomCount|string_format:'%02d'}&nbsp;
                                                 <span>({if {$roomDemand['adults']} <= 9}0{$roomDemand['adults']}{else}{$roomDemand['adults']}{/if} {if $roomDemand['adults'] > 1}{l s='Adults'}{else}{l s='Adult'}{/if}{if $roomDemand['children'] > 0}, {if {$roomDemand['children']} <= 9}0{$roomDemand['children']}{else}{$roomDemand['children']}{/if} {if $roomDemand['children'] > 1}{l s='Children'}{else}{l s='Child'}{/if}{/if})</span>
                                             </div>

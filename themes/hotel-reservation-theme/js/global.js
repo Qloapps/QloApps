@@ -30,8 +30,7 @@ var onlineFlag = true;
 
 $(document).ready(function(){
 	$('.tab_container a[data-toggle="tab"]').on('click', function (e) {
-        e.stopPropagation();
-        e.preventDefault();
+
         let targetTab = $(this).attr('href');
         if ($(targetTab).length) {
             $('html, body').animate({
@@ -118,7 +117,7 @@ $(document).ready(function(){
 			prev     : '<a title="' + FancyboxI18nPrev + '" class="fancybox-nav fancybox-prev" href="javascript:;"><span></span></a>'
 		});
 	// change default overlay for fancybox
-	$.extend(true, $.fancybox.helpers.overlay, {defaults : {css : {background: 'rgba(255, 255, 255, 0.95)'}}});
+	// $.extend(true, $.fancybox.helpers.overlay, {defaults : {css : {background: 'rgba(255, 255, 255, 0.95)'}}});
 
 	// Close Alert messages
 	$(".alert.alert-danger").on('click', this, function(e){
@@ -291,12 +290,12 @@ function display(view)
 	if (view == 'list')
 	{
 		$('ul.product_list').removeClass('grid').addClass('list row');
-		$('.product_list > li').removeClass('col-xs-12 col-sm-6 col-md-4').addClass('col-xs-12');
+		$('.product_list > li').removeClass('col-12 col-sm-6 col-md-4').addClass('col-12');
 		$('.product_list > li').each(function(index, element) {
 			var html = '';
 			html = '<div class="product-container"><div class="row">';
-				html += '<div class="left-block col-xs-4 col-sm-5 col-md-4">' + $(element).find('.left-block').html() + '</div>';
-				html += '<div class="center-block col-xs-4 col-sm-7 col-md-4">';
+				html += '<div class="left-block col-4 col-sm-5 col-md-4">' + $(element).find('.left-block').html() + '</div>';
+				html += '<div class="center-block col-4 col-sm-7 col-md-4">';
 					html += '<div class="product-flags">'+ $(element).find('.product-flags').html() + '</div>';
 					html += '<h5 itemprop="name">'+ $(element).find('h5').html() + '</h5>';
 					var rating = $(element).find('.comments_note').html(); // check : rating
@@ -313,12 +312,12 @@ function display(view)
 						html += '<span class="availability">'+ availability +'</span>';
 					}
 				html += '</div>';
-				html += '<div class="right-block col-xs-4 col-sm-12 col-md-4"><div class="right-block-content row">';
+				html += '<div class="right-block col-4 col-sm-12 col-md-4"><div class="right-block-content row">';
 					var price = $(element).find('.content_price').html();       // check : catalog mode is enabled
 					if (price != null) {
-						html += '<div class="content_price col-xs-5 col-md-12">'+ price + '</div>';
+						html += '<div class="content_price col-5 col-md-12">'+ price + '</div>';
 					}
-					html += '<div class="button-container col-xs-7 col-md-12">'+ $(element).find('.button-container').html() +'</div>';
+					html += '<div class="button-container col-7 col-md-12">'+ $(element).find('.button-container').html() +'</div>';
 					html += '<div class="functional-buttons clearfix col-sm-12">' + $(element).find('.functional-buttons').html() + '</div>';
 				html += '</div>';
 			html += '</div></div>';
@@ -331,7 +330,7 @@ function display(view)
 	else
 	{
 		$('ul.product_list').removeClass('list').addClass('grid row');
-		$('.product_list > li').removeClass('col-xs-12').addClass('col-xs-12 col-sm-6 col-md-4');
+		$('.product_list > li').removeClass('col-12').addClass('col-12 col-sm-6 col-md-4');
 		$('.product_list > li').each(function(index, element) {
 			var html = '';
 			html += '<div class="product-container">';

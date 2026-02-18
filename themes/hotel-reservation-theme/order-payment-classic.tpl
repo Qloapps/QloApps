@@ -23,7 +23,7 @@
 *  International Registered Trademark & Property of PrestaShop SA
 *}
 
-<div class="paiement_block">
+<div class="payment_block">
     {block name='order_opc_advanced_payment_option'}
         {include file="$tpl_dir./order-opc-advanced-payment-option.tpl"}
     {/block}
@@ -37,7 +37,6 @@
             </p>
         </div>
     {/block}
-    <p class="block-small-header">{l s='PAYMENT RESOURCE'}</p>
     {block name='displayPaymentTop'}
         <div id="HOOK_TOP_PAYMENT">{$HOOK_TOP_PAYMENT}</div>
     {/block}
@@ -291,7 +290,7 @@
                                     {continue}
                                 {/if}
                                 <tr class="cart_discount {if $smarty.foreach.discountLoop.last}last_item{elseif $smarty.foreach.discountLoop.first}first_item{else}item{/if}" id="cart_discount_{$discount.id_discount}">
-                                    <td class="cart_discount_name" colspan="{if $PS_STOCK_MANAGEMENT}3{else}2{/if}">{$discount.name}</td>
+                                    <td class="cart_discount_name voucher_txt_green" colspan="{if $PS_STOCK_MANAGEMENT}3{else}2{/if}">{$discount.name}</td>
                                     <td class="cart_discount_price">
                                                         <span class="price-discount">
                                                             {if $discount.value_real > 0}
@@ -324,7 +323,7 @@
             {/block}
         {/if}
         {if $opc}
-            <div id="opc_payment_methods-content">
+            <div id="opc_payment_methods-content" class="qlo-border-class">
         {/if}
         {block name='displayPayment'}
             <div id="HOOK_PAYMENT">

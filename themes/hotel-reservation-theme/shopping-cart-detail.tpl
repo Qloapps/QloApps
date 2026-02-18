@@ -22,9 +22,6 @@
 
 <div class="order-detail-content">
     {if isset($cart_htl_data) && $cart_htl_data}
-        {block name='shopping_cart_heading'}
-            <p class="cart_section_title">{l s='rooms information'}</p>
-        {/block}
         {foreach from=$cart_htl_data key=data_k item=data_v}
             {foreach from=$data_v['date_diff'] key=rm_k item=rm_v}
                 <div class="row cart_product_line">
@@ -55,6 +52,7 @@
                             {block name='shopping_cart_room_detail'}
                                 <div class="product-xs-info">
                                     {block name='shopping_cart_room_type_name'}
+                                        <div><span class="badge qlo-badge-primary">{$data_v['hotel_info']['hotel_name']}</span></div>
                                         <p class="product-name">
                                             <a href="{$link->getProductLink($data_v['id_product'])}">
                                                 {$data_v['name']}
@@ -68,7 +66,7 @@
                                     {block name='shopping_cart_room_type_hotel_location'}
                                         {if isset($data_v['hotel_info']['location'])}
                                             <p class="hotel-location">
-                                                <i class="icon-map-marker"></i> &nbsp;{$data_v['hotel_info']['location']}
+                                                <i class="icon-location-dot"></i> &nbsp;{$data_v['hotel_info']['location']}
                                             </p>
                                         {/if}
                                     {/block}
@@ -80,31 +78,52 @@
                         </div>
                         {block name='shopping_cart_room_type_features'}
                             {if isset($data_v['hotel_info']['room_features'])}
-                                <div class="room-type-features">
-                                {foreach $data_v['hotel_info']['room_features'] as $feature}
-                                    <span class="room-type-feature">
-                                        <img src="{$THEME_DIR}img/icon/form-ok-circle.svg" /> {$feature['name']}
-                                    </span>
-                                {/foreach}
+                                {assign var=totalAmenities value=$data_v['hotel_info']['room_features']|@count}
+                                <div class="room_features_cont">
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <div class="amenity_wrapper">
+                                                {foreach from=$data_v['hotel_info']['room_features'] key=feat_k item=feat_v name=amenityLoop}
+                                                    {if $smarty.foreach.amenityLoop.index < 3}
+                                                        <div class="rm_ftr_wrapper amenity" title="{$feat_v.name|escape:'html':'UTF-8'}" alt="{$feat_v.name|escape:'html':'UTF-8'}" >
+                                                            <span><img title="{$feat_v.name|escape:'htmlall':'UTF-8'}" src="{$link->getMediaLink("`$feat_img_dir`{$feat_v.value}")|escape:'htmlall':'UTF-8'}" class="rm_amen"></span>
+                                                            <span>{$feat_v.name|escape:'html':'UTF-8'}</span>
+                                                        </div>
+                                                    {else}
+                                                        <div class="rm_ftr_wrapper amenity extra-amenity" style="display:none;" title="{$feat_v.name|escape:'html':'UTF-8'}">
+                                                            <span>
+                                                                <img src="{$link->getMediaLink("`$feat_img_dir`{$feat_v.value}")|escape:'htmlall':'UTF-8'}"
+                                                                    class="rm_amen">
+                                                            </span>
+                                                            <span>{$feat_v.name|escape:'html':'UTF-8'}</span>
+                                                        </div>
+                                                    {/if}
+                                                {/foreach}
+                                                {if $totalAmenities > 3}
+                                                    <a href="javascript:void(0);" class="more-amenities-link" data-more="{l s='More Amenities'}" data-less="{l s='Show Less'}">{l s='More Amenities'}</a>
+                                                {/if}
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             {/if}
                         {/block}
                         {block name='shopping_cart_room_type_booking_information'}
                             {assign var="is_full_date" value=($show_full_date && ($rm_v['data_form']|date_format:'%D' == $rm_v['data_to']|date_format:'%D'))}
                             <div class="room_duration_block">
-                                <div class="col-sm-3 col-xs-6">
-                                    <p class="room_duration_block_head">{l s='CHECK IN'}</p>
+                                <div class="col-sm-3 col-6">
                                     <p class="room_duration_block_value">{$rm_v['data_form']|date_format:"%d %b, %a"}{if $is_full_date} {$rm_v['data_form']|date_format:"%H:%M"}{/if}</p>
+                                    <p class="room_duration_block_head">{l s='CHECK IN'}</p>
                                 </div>
-                                <div class="col-sm-3 col-xs-6">
-                                    <p class="room_duration_block_head">{l s='CHECK OUT'}</p>
+                                <div class="col-sm-3 col-6">
                                     <p class="room_duration_block_value">{$rm_v['data_to']|date_format:"%d %b, %a"}{if $is_full_date} {$rm_v['data_to']|date_format:"%H:%M"}{/if}</p>
+                                    <p class="room_duration_block_head">{l s='CHECK OUT'}</p>
                                 </div>
-                                <div class="col-sm-6 col-xs-6">
-                                    <p class="room_duration_block_head">{l s='OCCUPANCY'}</p>
+                                <div class="col-sm-6 col-6">
                                     <p class="room_duration_block_value">
                                         {if {$rm_v['adults']} <= 9}0{$rm_v['adults']}{else}{$rm_v['adults']}{/if} {if $rm_v['adults'] > 1}{l s='Adults'}{else}{l s='Adult'}{/if}{if $rm_v['children']}, {if $rm_v['children'] <= 9}0{$rm_v['children']}{else}{$rm_v['children']}{/if} {if $rm_v['children'] > 1}{l s='Children'}{else}{l s='Child'}{/if}{/if}, {if {$rm_v['num_rm']} <= 9}0{/if}{$rm_v['num_rm']}{if $rm_v['num_rm'] > 1} {l s='Rooms'}{else} {l s='Room'}{/if}
                                     </p>
+                                    <p class="room_duration_block_head">{l s='OCCUPANCY'}</p>
                                 </div>
                             </div>
                         {/block}
@@ -118,7 +137,7 @@
                                             </span>
                                         {/if}
                                         <div class="row">
-                                            <div class="{if (isset($data_v['extra_demands']) && $data_v['extra_demands']) || (isset($data_v['service_products']) && $data_v['service_products'])}col-xs-6 plus-sign{else}col-xs-12{/if}">
+                                            <div class="{if (isset($data_v['extra_demands']) && $data_v['extra_demands']) || (isset($data_v['service_products']) && $data_v['service_products'])}col-6 plus-sign{else}col-12{/if}">
                                                 <div class="price_block">
                                                     <p class="total_price">
                                                         <span>
@@ -136,20 +155,20 @@
                                                             </div>
                                                         {/if}
                                                     </p>
-                                                    <p class="total_price_detial">
+                                                    <p class="total_price_detail">
                                                         {l s='Total rooms price'} {if $display_tax_label}{if $priceDisplay} {l s='(Excl.'} {else}{l s='(Incl.)'}{/if} {l s='all taxes.)'}{/if}
                                                     </p>
                                                 </div>
                                             </div>
                                             {if (isset($data_v['extra_demands']) && $data_v['extra_demands']) || (isset($data_v['service_products']) && $data_v['service_products'])}
-                                                <div class="col-xs-6">
+                                                <div class="col-6">
                                                     <div class="demand_price_block">
                                                         <p class="demand_total_price">
                                                             <span>
                                                                 {displayPrice price=$rm_v['demand_price']}
                                                             </span>
                                                         </p>
-                                                        <p class="total_price_detial">
+                                                        <p class="total_price_detail">
                                                             <a data-date_from="{$rm_v['data_form']|escape:'html':'UTF-8'}" data-date_to="{$rm_v['data_to']|escape:'html':'UTF-8'}" data-id_product="{$data_v['id_product']|escape:'html':'UTF-8'}" data-action="{$link->getPageLink('order-opc')}" class="open_rooms_extra_services_panel" href="#rooms_type_extra_services_form">
                                                                 {l s='Extra Services'}
                                                             </a>
@@ -162,13 +181,13 @@
                                 {/block}
                                 {block name='shopping_cart_room_type_total_price'}
                                     <div class="col-sm-5">
-                                        <div class="total_price_block col-xs-12">
+                                        <div class="total_price_block col-12">
                                             <p class="total_price">
                                                 <span>
                                                     {displayPrice price=($rm_v['amount']+$rm_v['demand_price'])}
                                                 </span>
                                             </p>
-                                            <p class="total_price_detial">
+                                            <p class="total_price_detail">
                                                 {l s='Total price for'} {$rm_v['num_days']} {l s='Night(s) stay'}{if $display_tax_label}{if $priceDisplay} {l s='(Excl.'} {else}{l s='(Incl.'}{/if} {l s='all taxes.)'}{/if}
                                             </p>
                                         </div>
@@ -234,7 +253,7 @@
 
                             {if isset($product['hotel_info']['location'])}
                                 <p class="hotel-location">
-                                    <i class="icon-map-marker"></i> &nbsp;{$product['hotel_info']['location']}
+                                    <i class="icon-location-dot"></i> &nbsp;{$product['hotel_info']['location']}
                                 </p>
                                 {block name='displayCartProductHotelLocationAfter'}
                                     {hook h='displayCartProductHotelLocationAfter' id_product=$product['id_product']}
@@ -244,18 +263,18 @@
                     </div>
                     <div class="row product_price_detail_block">
                         <div class="col-sm-7">
-                            <div class="price_block col-xs-7">
+                            <div class="price_block col-7">
                                 <p class="total_price">
                                     <span>
                                         {if $priceDisplay}{displayPrice price=($product['unit_price_tax_excl'])}{else}{displayPrice price=($product['unit_price_tax_incl'])}{/if}
                                     </span>
                                 </p>
-                                <p class="total_price_detial">
+                                <p class="total_price_detail">
                                     {l s='Unit price'} {if $display_tax_label}{if $priceDisplay} {l s='(Excl.'} {else}{l s='(Incl.)'}{/if} {l s='all taxes.)'}{/if}
                                 </p>
                             </div>
                             {if $product.allow_multiple_quantity}
-                                <div class="col-xs-5">
+                                <div class="col-5">
                                     <div class="quantity_cont">
                                         <input type="hidden" value="{$product.quantity}" name="quantity_{$product.id_product}_{if $product.id_product_option}{$product.id_product_option}{else}0{/if}_{if $product.id_hotel}{$product.id_hotel}{else}0{/if}_hidden" />
                                         <input size="2" type="text" autocomplete="off" class="cart_quantity_input grey" value="{$product.quantity}"  name="quantity_{$product.id_product}_{if $product.id_product_option}{$product.id_product_option}{else}0{/if}_{if $product.id_hotel}{$product.id_hotel}{else}0{/if}" />
@@ -276,13 +295,13 @@
                             {/if}
                         </div>
                         <div class="col-sm-5">
-                            <div class="total_price_block col-xs-12">
+                            <div class="total_price_block col-12">
                                 <p class="total_price">
                                     <span>
                                         {if $priceDisplay}{displayPrice price=($product['total_price_tax_excl'])}{else}{displayPrice price=($product['total_price_tax_incl'])}{/if}
                                     </span>
                                 </p>
-                                <p class="total_price_detial">
+                                <p class="total_price_detail">
                                     {l s='Total price'} {if $display_tax_label}{if $priceDisplay} {l s='(Excl.'} {else}{l s='(Incl.)'}{/if} {l s='all taxes.)'}{/if}
                                 </p>
                             </div>
@@ -335,18 +354,18 @@
                     </div>
                     <div class="row product_price_detail_block">
                         <div class="col-sm-7">
-                            <div class="price_block col-xs-7">
+                            <div class="price_block col-7">
                                 <p class="total_price">
                                     <span>
                                         {if $priceDisplay}{displayPrice price=($product['unit_price_tax_excl'])}{else}{displayPrice price=($product['unit_price_tax_incl'])}{/if}
                                     </span>
                                 </p>
-                                <p class="total_price_detial">
+                                <p class="total_price_detail">
                                     {l s='Unit price'} {if $display_tax_label}{if $priceDisplay} {l s='(Excl.'} {else}{l s='(Incl.)'}{/if} {l s='all taxes.)'}{/if}
                                 </p>
                             </div>
                             {if $product.allow_multiple_quantity}
-                                <div class="col-xs-5">
+                                <div class="col-5">
                                     <div class="quantity_cont">
                                         <input type="hidden" value="{$product.quantity}" name="quantity_{$product.id_product}_{if $product.id_product_option}{$product.id_product_option}{else}0{/if}_0_hidden" />
                                         <input size="2" type="text" autocomplete="off" class="cart_quantity_input grey" value="{$product.quantity}"  name="quantity_{$product.id_product}_{if $product.id_product_option}{$product.id_product_option}{else}0{/if}_0" />
@@ -368,13 +387,13 @@
                             {/if}
                         </div>
                         <div class="col-sm-5">
-                            <div class="total_price_block col-xs-12">
+                            <div class="total_price_block col-12">
                                 <p class="total_price">
                                     <span>
                                         {if $priceDisplay}{displayPrice price=($product['total_price_tax_excl'])}{else}{displayPrice price=($product['total_price_tax_incl'])}{/if}
                                     </span>
                                 </p>
-                                <p class="total_price_detial">
+                                <p class="total_price_detail">
                                     {l s='Total price'} {if $display_tax_label}{if $priceDisplay} {l s='(Excl.'} {else}{l s='(Incl.)'}{/if} {l s='all taxes.)'}{/if}
                                 </p>
                             </div>
@@ -394,7 +413,7 @@
         {block name='shopping_cart_proceed_action'}
             <div class="row">
                 <div class="col-sm-12 proceed_btn_block">
-                    <a class="btn btn-default button button-medium pull-right" href="{$link->getPageLink('order-opc', null, null, ['proceed_to_customer_dtl' => 1])}" title="Proceed to checkout" rel="nofollow">
+                    <a class="btn btn-primary btn-medium pull-right pull-right" href="{$link->getPageLink('order-opc', null, null, ['proceed_to_customer_dtl' => 1])}" title="Proceed to checkout" rel="nofollow">
                         <span>
                             {l s='Proceed'}
                         </span>

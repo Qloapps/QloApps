@@ -388,7 +388,7 @@ $(document).ready(function()
 
 			if (parseInt($('#opc_id_customer').val()) == 0)
 			{
-				callingFile = authenticationUrl;
+				callingFile = registerUrl;
 				params = 'submitAccount=true&';
 			}
 			else
@@ -779,6 +779,24 @@ $(document).ready(function()
 		});
 
 	}
+
+	$(document).on('click', '.more-amenities-link', function () {
+		var $wrapper = $(this).closest('.amenity_wrapper');
+		$wrapper.find('.extra-amenity').slideToggle(300);
+
+		$(this).toggleClass('expanded');
+
+		if ($(this).hasClass('expanded')) {
+			$(this).text($(this).data('less'));
+		} else {
+			$(this).text($(this).data('more'));
+		}
+	});
+
+	$(document).on('change', 'input[name="payment_type"]', function() {
+		$('.payment-option').removeClass('border-active');
+		$(this).closest('.payment-option').addClass('border-active');
+	});
 });
 
 function updateCarrierList(json)

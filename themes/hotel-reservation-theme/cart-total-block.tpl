@@ -21,7 +21,7 @@
 *}
 
 
-<div class="col-sm-12 card cart_total_detail_block">
+<div class="col-sm-12 qlo-card cart_total_detail_block">
     {if $total_rooms_wt + $total_extra_demands_wt + $total_additional_services_wt + $total_additional_services_auto_add_wt}
         <p>
             <span>
