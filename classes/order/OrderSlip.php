@@ -277,7 +277,7 @@ class OrderSlipCore extends ObjectModel
 		FROM `'._DB_PREFIX_.'order_slip` os
 		LEFT JOIN `'._DB_PREFIX_.'orders` o ON (o.`id_order` = os.`id_order`)
 		WHERE os.`date_add` BETWEEN \''.pSQL($dateFrom).' 00:00:00\' AND \''.pSQL($dateTo).' 23:59:59\'
-		'.Shop::addSqlRestriction(Shop::SHARE_ORDER, 'o').'
+		'.Shop::addSqlRestriction(Shop::SHARE_ORDER, 'o'). ' ' .HotelBranchInformation::addHotelRestriction(false).'
 		ORDER BY os.`date_add` ASC');
 
         $slips = array();

@@ -107,7 +107,7 @@
 {if $transaction_data and $transaction_data.pp_payment_status == 'COMPLETED'}
     {* show refund form only if there is any remaing amount for refund *}
     {if $remaining_refund > 0}
-        <form action="" method="post" class="form-horizontal" id="refund_form">
+        <form action="{$transaction_url|escape:'html':'UTF-8'}" method="post" class="form-horizontal" id="refund_form">
             <div class="panel col-lg-12">
                 <div class="panel-heading">
                     <i class="icon-reply"></i>
