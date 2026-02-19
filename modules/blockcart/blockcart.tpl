@@ -49,7 +49,7 @@
 							{/if}
 						{/if}
 					</span>
-					<span class="badge badge_style ajax_cart_no_product {if $cart_qties > 0} d-none{/if}">0</span>
+					<span class="badge badge-primary badge_style ajax_cart_no_product {if $cart_qties > 0} d-none{/if}">0</span>
 					{if $ajax_allowed && isset($blockcart_top) && !$blockcart_top}
 						<span class="block_cart_expand{if !isset($colapseExpandStatus) || (isset($colapseExpandStatus) && $colapseExpandStatus eq 'expanded')} d-none{/if}">&nbsp;</span>
 						<span class="block_cart_collapse{if isset($colapseExpandStatus) && $colapseExpandStatus eq 'collapsed'} d-none{/if}">&nbsp;</span>

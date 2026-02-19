@@ -25,7 +25,7 @@
 
 <!-- Block Newsletter module-->
 <div class="row">
-    <section class="col-sm-12" id="blocknewsletter">
+    <section class="col-sm-12 col-12" id="blocknewsletter">
         <div class="d-flex footer-section-item footer-section-heading">
             <span>{l s='GET NOTIFICATIONS' mod='blocknewsletter'}</span>
         </div>

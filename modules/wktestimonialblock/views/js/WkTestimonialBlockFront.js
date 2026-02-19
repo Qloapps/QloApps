@@ -40,7 +40,7 @@ $(document).ready(function(){
 		dots: (HOTEL_TESIMONIAL_BLOCK_NAV_TYPE == SLIDER_NAV_TYPE_DOTS),
 		items: 1,
 		autoHeight: true,
-		autoplay: true,
+		autoplay: (HOTEL_TESIMONIAL_BLOCK_AUTOPLAY),
 		autoplaySpeed: 1000,
 		autoplayTimeout: 5000,
 		autoplayHoverPause: true,
@@ -57,4 +57,19 @@ $(document).ready(function(){
             nav.find('.owl-next').attr('tabindex', '-1');
 		},
     });
+	$(document).on('click', '.open_testimonial_popup', function(e) {
+		e.preventDefault();
+    	e.stopPropagation();
+		$.fancybox({
+			href: "#" + $(this).data('popup'),
+			autoSize : true,
+			autoScale : true,
+			maxWidth : '100%',
+			wrapCSS: 'fancybox-testamonial-popup',
+			padding: 0,
+			helpers: { overlay: { locked: false } },
+			hideOnContentClick: false
+		});
+	});
+
 });

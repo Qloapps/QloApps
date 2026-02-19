@@ -41,11 +41,11 @@
 					<!-- Footer -->
 					<div class="footer-container">
 						<footer id="footer" class="container-md">
-							<div class="d-flex flex-wrap">{$HOOK_FOOTER}</div>
+							<div class="d-flex flex-wrap qlo-gap-sm">{$HOOK_FOOTER}</div>
 						</footer>
 						{block name='displayAfterDefautlFooterHook'}
 							<div class="footer-bottom-section">
-								<div class="footer-bottom-section-content container-md">
+								<div class="footer-bottom-section-content container-md qlo-gap-sm">
 									{hook h="displayAfterDefautlFooterHook"}
 								</div>
 							</div>

@@ -24,7 +24,7 @@
 *  International Registered Trademark & Property of PrestaShop SA
 *}
 
-<section class="col-md-3 col-sm-6">
+<section class="col-md-3 col-12">
     <div class="footer-section-heading footer-section-item ">
         <span>{l s='SOCIAL LINK' mod='blocksocial'}</span>
     </div>

@@ -66,6 +66,7 @@ class WkTestimonialBlock extends Module
 
         Media::addJsDef([
             'HOTEL_TESIMONIAL_BLOCK_NAV_TYPE' => Configuration::get('HOTEL_TESIMONIAL_BLOCK_NAV_TYPE'),
+            'HOTEL_TESIMONIAL_BLOCK_AUTOPLAY' => (bool)Configuration::get('HOTEL_TESIMONIAL_BLOCK_AUTOPLAY'),
             'SLIDER_NAV_TYPE_DOTS' => HotelHelper::SLIDER_NAV_TYPE_DOTS,
             'SLIDER_NAV_TYPE_BUTTON' => HotelHelper::SLIDER_NAV_TYPE_BUTTON,
         ]);

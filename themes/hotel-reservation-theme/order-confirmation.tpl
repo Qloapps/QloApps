@@ -82,14 +82,14 @@
 												{foreach from=$data_v['date_diff'] key=rm_k item=rm_v}
 													<div class="product-detail" data-id-product="{$data_v.id_product}" data-date-diff="{$rm_k}">
 														<div class="row">
-															<div class="col-xs-3 col-sm-2">
+															<div class="col-3 col-sm-2">
 																<a href="{$link->getProductLink($data_v['id_product'])}">
 																	<img src="{$data_v['cover_img']}" class="img-responsive"/>
 																</a>
 															</div>
-															<div class="col-xs-9 col-sm-10">
+															<div class="col-9 col-sm-10">
 																<div class="row">
-																	<div class="col-xs-12">
+																	<div class="col-12">
 																		<p class="product-name">
 																			<a href="{$link->getProductLink($data_v['id_product'])}">
 																				{$data_v['name']}
@@ -100,41 +100,41 @@
 
 																<div class="row">
 																	{assign var="is_full_date" value=($show_full_date && ($rm_v['data_form']|date_format:'%D' == $rm_v['data_to']|date_format:'%D'))}
-																	<div class="col-xs-12 col-md-6">
+																	<div class="col-12 col-md-6">
 																		<div class="row">
-																			<dt class="col-xs-5">{l s='Check-in'}</dt>
-																			<dd class="col-xs-7">{dateFormat date=$rm_v.data_form full=$is_full_date}</dd>
+																			<dt class="col-5">{l s='Check-in'}</dt>
+																			<dd class="col-7">{dateFormat date=$rm_v.data_form full=$is_full_date}</dd>
 																		</div>
 																	</div>
-																	<div class="col-xs-12 col-md-6">
+																	<div class="col-12 col-md-6">
 																		<div class="row">
-																			<dt class="col-xs-5">{l s='Check-out'}</dt>
-																			<dd class="col-xs-7">{dateFormat date=$rm_v.data_to full=$is_full_date}</dd>
+																			<dt class="col-5">{l s='Check-out'}</dt>
+																			<dd class="col-7">{dateFormat date=$rm_v.data_to full=$is_full_date}</dd>
 																		</div>
 																	</div>
 																</div>
 
 																<div class="row">
-																	<div class="col-xs-12 col-md-6">
+																	<div class="col-12 col-md-6">
 																		<div class="row">
-																			<dt class="col-xs-5">{l s='Rooms'}</dt>
-																			<dd class="col-xs-7">{$rm_v.num_rm|string_format:'%02d'}</dd>
+																			<dt class="col-5">{l s='Rooms'}</dt>
+																			<dd class="col-7">{$rm_v.num_rm|string_format:'%02d'}</dd>
 																		</div>
 																	</div>
-																	<div class="col-xs-12 col-md-6">
+																	<div class="col-12 col-md-6">
 																		<div class="row">
-																			<dt class="col-xs-5">{l s='Guests'}</dt>
-																			<dd class="col-xs-7">
+																			<dt class="col-5">{l s='Guests'}</dt>
+																			<dd class="col-7">
 																				{$rm_v.adults|string_format:'%02d'} {if $rm_v.adults > 1}{l s='Adults'}{else}{l s='Adult'}{/if}{if $rm_v.children}, {$rm_v.children|string_format:'%02d'} {if $rm_v.children > 1}{l s='Children'}{else}{l s='Child'}{/if}{/if}
 																			</dd>
 																		</div>
 																	</div>
 																</div>
 																<div class="row">
-																	<div class="col-xs-12 col-md-6">
+																	<div class="col-12 col-md-6">
 																		<div class="row">
-																			<dt class="col-xs-5">{l s='Extra Services'}</dt>
-																			<dd class="col-xs-7">
+																			<dt class="col-5">{l s='Extra Services'}</dt>
+																			<dd class="col-7">
 																				{if (isset($rm_v['extra_demands']) && $rm_v['extra_demands']) || isset($rm_v['additional_services']) && $rm_v['additional_services']}
 																						<a data-date_from="{$rm_v['data_form']}" data-date_to="{$rm_v['data_to']}" data-id_product="{$data_v['id_product']}" data-id_order="{$data_v['id_order']}" data-action="{$link->getPageLink('order-detail')}" class="open_rooms_extra_services_panel" href="#rooms_type_extra_services_form">
 																				{/if}
@@ -149,10 +149,10 @@
 																			</dd>
 																		</div>
 																	</div>
-																	<div class="col-xs-12 col-md-6">
+																	<div class="col-12 col-md-6">
 																		<div class="row">
-																			<dt class="col-xs-5">{l s='Total Price'}</dt>
-																			<dd class="col-xs-7">
+																			<dt class="col-5">{l s='Total Price'}</dt>
+																			<dd class="col-7">
 																				{if $group_use_tax}
 																					{displayWtPriceWithCurrency price=($rm_v['amount_tax_incl'] + $rm_v['extra_demands_price_ti'] + $rm_v['additional_services_price_ti'] + $rm_v['additional_services_price_auto_add_ti']) currency=$objOrderCurrency}
 																				{else}
@@ -216,16 +216,16 @@
 													<div class="product-detail" data-id-product="{$product.id_product}">
 														<div class="row">
 															{block name='order_hotel_product_image'}
-																<div class="col-xs-3 col-sm-2">
+																<div class="col-3 col-sm-2">
 																	<a href="{$link->getProductLink($product.id_product)|escape:'html':'UTF-8'}" title="{$product.product_name|escape:'html':'UTF-8'}" target="_blank">
 																		<img class="img img-responsive img-room-type" src="{$product.cover_img|escape:'html':'UTF-8'}" />
 																	</a>
 																</div>
 															{/block}
 															{block name='order_hotel_product_detail'}
-																<div class="col-xs-9 col-sm-10 info-wrap">
+																<div class="col-9 col-sm-10 info-wrap">
 																	<div class="row">
-																		<div class="col-xs-12">
+																		<div class="col-12">
 																			<p class="product-name">
 																				<a href="{$link->getProductLink($product.id_product)|escape:'html':'UTF-8'}" title="{$product.product_name|escape:'html':'UTF-8'}" target="_blank" class="product-name">
 																					{$product.product_name|escape:'html':'UTF-8'}{if isset($product.option_name) && $product.option_name} : {$product.option_name|escape:'html':'UTF-8'}{/if}
@@ -237,22 +237,22 @@
                                                                                 </p>
                                                                             {/if}
 																		</div>
-																		<div class="col-xs-12">
+																		<div class="col-12">
 																			<div class="description-list">
 																				<dl class="">
 																					<div class="row">
 																						{if $product.allow_multiple_quantity}
-																							<div class="col-xs-12 col-md-6">
+																							<div class="col-12 col-md-6">
 																								<div class="row">
-																									<dt class="col-xs-5">{l s='Quantity'}</dt>
-																									<dd class="col-xs-7">{$product.product_quantity}</dd>
+																									<dt class="col-5">{l s='Quantity'}</dt>
+																									<dd class="col-7">{$product.product_quantity}</dd>
 																								</div>
 																							</div>
 																						{/if}
-																						<div class="col-xs-12 col-md-6">
+																						<div class="col-12 col-md-6">
 																							<div class="row">
-																								<dt class="col-xs-5">{l s='Unit Price'}</dt>
-																								<dd class="col-xs-7">
+																								<dt class="col-5">{l s='Unit Price'}</dt>
+																								<dd class="col-7">
 																									{if $group_use_tax}
 																										{displayWtPriceWithCurrency price=$product.unit_price_tax_incl  currency=$currency}
 																									{else}
@@ -264,13 +264,13 @@
 																					</div>
 																					<div class="row">
 																						{if $product.allow_multiple_quantity}
-																							<div class="col-xs-12 col-md-6">
+																							<div class="col-12 col-md-6">
 																							</div>
 																						{/if}
-																						<div class="col-xs-12 col-md-6">
+																						<div class="col-12 col-md-6">
 																							<div class="row">
-																								<dt class="col-xs-5">{l s='Total Pricing'}</dt>
-																								<dd class="col-xs-7">
+																								<dt class="col-5">{l s='Total Pricing'}</dt>
+																								<dd class="col-7">
 																									{if $group_use_tax}
 																										{displayWtPriceWithCurrency price=$product.total_price_tax_incl  currency=$currency}
 																									{else}
@@ -295,38 +295,38 @@
 													<div class="product-detail" data-id-product="{$product.id_product}">
 														<div class="row">
 															{block name='order_hotel_product_image'}
-																<div class="col-xs-3 col-sm-2">
+																<div class="col-3 col-sm-2">
 																	<a href="{$link->getProductLink($product.id_product)|escape:'html':'UTF-8'}" title="{$product.product_name|escape:'html':'UTF-8'}" target="_blank">
 																		<img class="img img-responsive img-room-type" src="{$product.cover_img|escape:'html':'UTF-8'}" />
 																	</a>
 																</div>
 															{/block}
 															{block name='order_hotel_product_detail'}
-																<div class="col-xs-9 col-sm-10 info-wrap">
+																<div class="col-9 col-sm-10 info-wrap">
 																	<div class="row">
-																		<div class="col-xs-12">
+																		<div class="col-12">
 																			<p class="product-name">
 																				<a href="{$link->getProductLink($product.id_product)|escape:'html':'UTF-8'}" title="{$product.product_name|escape:'html':'UTF-8'}" target="_blank" class="product-name">
 																					{$product.product_name|escape:'html':'UTF-8'}{if isset($product.option_name) && $product.option_name} : {$product.option_name|escape:'html':'UTF-8'}{/if}
 																				</a>
 																			</p>
 																		</div>
-																		<div class="col-xs-12">
+																		<div class="col-12">
 																			<div class="description-list">
 																				<dl class="">
 																					<div class="row">
 																						{if $product.allow_multiple_quantity}
-																							<div class="col-xs-12 col-md-6">
+																							<div class="col-12 col-md-6">
 																								<div class="row">
-																									<dt class="col-xs-5">{l s='Quantity'}</dt>
-																									<dd class="col-xs-7">{$product.product_quantity}</dd>
+																									<dt class="col-5">{l s='Quantity'}</dt>
+																									<dd class="col-7">{$product.product_quantity}</dd>
 																								</div>
 																							</div>
 																						{/if}
-																						<div class="col-xs-12 col-md-6">
+																						<div class="col-12 col-md-6">
 																							<div class="row">
-																								<dt class="col-xs-5">{l s='Unit Price'}</dt>
-																								<dd class="col-xs-7">
+																								<dt class="col-5">{l s='Unit Price'}</dt>
+																								<dd class="col-7">
 																									{if $group_use_tax}
 																										{displayWtPriceWithCurrency price=$product.unit_price_tax_incl  currency=$currency}
 																									{else}
@@ -338,13 +338,13 @@
 																					</div>
 																					<div class="row">
 																						{if $product.allow_multiple_quantity}
-																							<div class="col-xs-12 col-md-6">
+																							<div class="col-12 col-md-6">
 																							</div>
 																						{/if}
-																						<div class="col-xs-12 col-md-6">
+																						<div class="col-12 col-md-6">
 																							<div class="row">
-																								<dt class="col-xs-5">{l s='Total Pricing'}</dt>
-																								<dd class="col-xs-7">
+																								<dt class="col-5">{l s='Total Pricing'}</dt>
+																								<dd class="col-7">
 																									{if $group_use_tax}
 																										{displayWtPriceWithCurrency price=$product.total_price_tax_incl  currency=$currency}
 																									{else}
@@ -376,8 +376,8 @@
 										</div>
 										<div class="card-body">
 											<div class="row">
-												<label class="col-xs-6 title">{l s='Payment Method'}</label>
-												<div class="col-xs-6 text-right value payment-method">
+												<label class="col-6 title">{l s='Payment Method'}</label>
+												<div class="col-6 text-right value payment-method">
 													{* {if $invoice && $invoiceAllowed}
 														<span class="icon-pdf"></span>
 														<a target="_blank" href="{$link->getPageLink('pdf-invoice', true)}?id_order={$order->id|intval}{if $is_guest}&amp;secure_key={$order->secure_key|escape:'html':'UTF-8'}{/if}" title="{l s='Click here to download invoice.'}">
@@ -390,8 +390,8 @@
 											</div>
 											<br>
 											<div class="row">
-												<label class="col-xs-6 title">{l s='Status'}</label>
-												<div class="col-xs-6 text-right value status">
+												<label class="col-6 title">{l s='Status'}</label>
+												<div class="col-6 text-right value status">
 													{if isset($order_history[0]) && $order_history[0]}
 														<span{if isset($order_history[0].color) && $order_history[0].color} style="background-color:{$order_history[0].color|escape:'html':'UTF-8'}30; border: 1px solid {$order_history[0].color|escape:'html':'UTF-8'};" {/if} class="label">
 															{if $order_history[0].id_order_state|in_array:$overbooking_order_states}

@@ -47,7 +47,7 @@
                                     <div class="owl-carousel owl-theme owl-loaded">
                                         {foreach $testimonials_data as $tesimonial}
                                             <div class="col-12">
-                                                <div class="col-12 testimonial_card">
+                                                <div class="col-12 testimonial_card open_testimonial_popup" data-popup="testimonial-popup-{$tesimonial.id_testimonial_block}">
                                                     <div class="row pt-4">
                                                         <div class="testimonial_content col-12">
                                                             <div class="testimonial_content_quote">
@@ -77,5 +77,24 @@
             </div>
         </div>
         <hr class="block_seperator"/>
+        {block name='testimonial_block_popup_content'}
+            {foreach $testimonials_data as $tesimonial}
+                <div id="testimonial-popup-{$tesimonial.id_testimonial_block}" style="display:none;">
+                    <div class="testimonial_popup_card">
+                        <div class="testimonial_popup_image">
+                            <img src="{$tesimonial.img_url|escape:'htmlall':'UTF-8'}" />
+                        </div>
+                        <div class="testimonial_popup_content">
+                            <div class="testimonial_content_quote">
+                                <img src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/icon-double-codes.png" class="img-responsive">
+                            </div>
+                            <p>{$tesimonial.testimonial_content|escape:'htmlall':'UTF-8'}</p>
+                            <h4>{$tesimonial.name|escape:'htmlall':'UTF-8'}</h4>
+                            <span>{$tesimonial.designation|escape:'htmlall':'UTF-8'}</span>
+                        </div>
+                    </div>
+                </div>
+            {/foreach}
+        {/block}
     {/if}
 {/block}

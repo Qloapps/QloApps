@@ -85,7 +85,7 @@
 		{/if}
 		<div id="page" style="{if $page_name == 'index'}height: 100%;{/if}">
 			<div class="header-container" style="{if $page_name == 'index'}height: 100%;{/if}">
-				<header id="header" class="{if $page_name == "index"}home-page-header home-header-image{else}bg-white pb-2 shadow-sm border-bottom{/if}" style='{if $page_name == "index"}background-image:url("{$link->getMediaLink("`$smarty.const._PS_IMG_`{Configuration::get('WK_HOTEL_HEADER_IMAGE')}")}"); height: 100%;{/if}' >
+				<header id="header" class="{if $page_name == "index"}home-page-header home-header-image{else}secondary-page-header bg-white pb-2 shadow-sm border-bottom{/if}" style='{if $page_name == "index"}background-image:url("{$link->getMediaLink("`$smarty.const._PS_IMG_`{Configuration::get('WK_HOTEL_HEADER_IMAGE')}")}"); height: 100%;{/if}' >
 
 					{* <header id="header" class="{if $page_name == "index"}z-index-5000{/if}"><!--  @todo -->
 					{if $page_name == "index"}
@@ -117,7 +117,7 @@
 					{/block}
 					{block name='header_top'}
 						<div class="header-top container-md">
-							<div>
+							<div class="qlo-padding-sm">
 								<div class="header-top-items-container">
 									<div id="header_logo" class="col-auto">
 										<a href="{if isset($force_ssl) && $force_ssl}{$base_dir_ssl}{else}{$base_dir}{/if}" title="{$shop_name|escape:'html':'UTF-8'}">

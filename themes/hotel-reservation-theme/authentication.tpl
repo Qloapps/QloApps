@@ -50,15 +50,15 @@
 					<form action="{$link->getPageLink('authentication', true)|escape:'html':'UTF-8'}" method="post" id="login_form" class="box">
 						<h3 class="page-heading text-center text-bolder h5 font-weight-bold">{l s='Welcome Back!'}</h3>
 						<hr>
-						<div class="page-subheading text-center small">{l s='Please enter your details to login to your account.'}</div>
+						<div class="text-center small">{l s='Please enter your details to login to your account.'}</div>
 						<div class="mt-5">
 							<div class="form_content">
 								<div class="form-group required">
-									<label class="font-weight-bold" for="email">{l s='Email'}</label>
+									<label class="font-weight-bold" for="email">{l s='Email'} <sup>*</sup></label>
 									<input class="is_required validate account_input form-control" data-validate="isEmail" type="email" id="email" name="email" placeholder="{l s='Enter your email'}" value="{if isset($smarty.post.email)}{$smarty.post.email|stripslashes}{/if}" />
 								</div>
 								<div class="form-group">
-									<label class="font-weight-bold" for="passwd">{l s='Password'}</label>
+									<label class="font-weight-bold" for="passwd">{l s='Password'} <sup>*</sup></label>
 									<input class="is_required validate account_input form-control" type="password" data-validate="isPasswd" id="passwd" name="passwd" placeholder="{l s='Enter your password'}" value="" />
 								</div>
 								{block name='displayLoginFormFieldsAfter'}
@@ -127,20 +127,6 @@
 												<option value="{$day}" {if ($sl_day == $day)} selected="selected"{/if}>{$day}&nbsp;&nbsp;</option>
 											{/foreach}
 										</select>
-										{*
-											{l s='January'}
-											{l s='February'}
-											{l s='March'}
-											{l s='April'}
-											{l s='May'}
-											{l s='June'}
-											{l s='July'}
-											{l s='August'}
-											{l s='September'}
-											{l s='October'}
-											{l s='November'}
-											{l s='December'}
-										*}
 									</div>
 									<div class="col-4">
 										<select id="months" name="months" class="form-control">

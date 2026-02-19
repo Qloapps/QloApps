@@ -37,7 +37,7 @@
                     <div class="account_creation">
                         <h3 class="page-heading text-center text-bolder h5 font-weight-bold">{l s='Create Your Account'}</h3>
                         <hr>
-						<div class="page-subheading text-center small">{l s='Please enter your details to create your account.'}</div>
+						<div class="text-center small">{l s='Please enter your details to create your account.'}</div>
 						<div class="mt-5">
                             <div class="form-group d-flex ml-n3">
                                 {foreach from=$genders key=k item=gender}

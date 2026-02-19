@@ -48,6 +48,12 @@ class AdminTestimonialsModuleSettingController extends ModuleAdminController
                         'identifier' => 'id',
                         'cast' => 'intval'
                     ),
+                    'HOTEL_TESIMONIAL_BLOCK_AUTOPLAY' => array(
+                        'title' => $this->l('Enable Auto-play for Testimonial Slider'),
+                        'hint' => $this->l('Enable or disable automatic sliding of testimonials in the front office.'),
+                        'validation' => 'isInt',
+                        'type' => 'bool'
+                    ),
                     'HOTEL_TESIMONIAL_BLOCK_HEADING' => array(
                         'title' => $this->l('Testimonial block title'),
                         'type' => 'textLang',
