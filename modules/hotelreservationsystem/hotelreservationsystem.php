@@ -33,7 +33,7 @@ class HotelReservationSystem extends Module
     {
         $this->name = 'hotelreservationsystem';
         $this->tab = 'administration';
-        $this->version = '1.7.0';
+        $this->version = '1.7.1';
         $this->author = 'Webkul';
         $this->need_instance = 0;
         $this->bootstrap = true;
@@ -557,6 +557,7 @@ class HotelReservationSystem extends Module
         $this->installTab('AdminHotelFeatures', 'Manage Hotel Features', 'AdminHotelReservationSystemManagement');
         $this->installTab('AdminOrderRefundRules', 'Manage Order Refund Rules', 'AdminHotelReservationSystemManagement');
         $this->installTab('AdminOrderRefundRequests', 'Manage Order Refund Requests', 'AdminHotelReservationSystemManagement');
+        $this->installTab('AdminHotelImageCategory', 'Manage Hotel Image Category', 'AdminHotelReservationSystemManagement');
 
         $this->installTab('AdminHotelConfigurationSetting', 'General Settings', 'AdminHotelReservationSystemManagement');
         $this->installTab('AdminHotelBedTypes', 'Bed Types', 'AdminCatalog');
