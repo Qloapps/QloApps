@@ -25,52 +25,79 @@
 
 {block name='my_account'}
     {capture name=path}{l s='My account'}{/capture}
-
-    {block name='my_account_heading'}
-        <h1 class="page-heading">{l s='My account'}</h1>
-        {if isset($account_created)}
-            <p class="alert alert-success">
-                {l s='Your account has been created.'}
-            </p>
-        {/if}
-        <p class="info-account">{l s='Welcome to your account. Here you can manage all of your personal information and orders.'}</p>
-    {/block}
-    <div class="row addresses-lists">
-        <div class="col-xs-12 col-sm-6 col-lg-4">
-            {block name='my_account_tabs'}
-                <ul class="myaccount-link-list">
-                    <li><a href="{$link->getPageLink('address', true)|escape:'html':'UTF-8'}" title="{l s='Address'}"><i class="icon-building"></i><span>{l s='Address'}</span></a></li>
-                    <li><a href="{$link->getPageLink('history', true)|escape:'html':'UTF-8'}" title="{l s='Bookings'}"><i class="icon-list-ol"></i><span>{l s='Bookings'}</span></a></li>
-                    {if $refundAllowed}
-                        <li><a href="{$link->getPageLink('order-follow', true)|escape:'html':'UTF-8'}" title="{l s='Refund requests'}"><i class="icon-refresh"></i><span>{l s='Refund requests'}</span></a></li>
-                    {/if}
-                    <li><a href="{$link->getPageLink('order-slip', true)|escape:'html':'UTF-8'}" title="{l s='Credit slips'}"><i class="icon-file-o"></i><span>{l s='Credit slips'}</span></a></li>
-                    <li><a href="{$link->getPageLink('identity', true)|escape:'html':'UTF-8'}" title="{l s='Personal information'}"><i class="icon-user"></i><span>{l s='Personal information'}</span></a></li>
-                </ul>
-            {/block}
-        </div>
-        {block name='displayCustomerAccount'}
-            {if $voucherAllowed || isset($HOOK_CUSTOMER_ACCOUNT) && $HOOK_CUSTOMER_ACCOUNT !=''}
-                <div class="col-xs-12 col-sm-6 col-lg-4">
-                    <ul class="myaccount-link-list">
-                        {if $voucherAllowed}
-                            <li><a href="{$link->getPageLink('discount', true)|escape:'html':'UTF-8'}" title="{l s='Vouchers'}"><i class="icon-barcode"></i><span>{l s='Vouchers'}</span></a></li>
-                        {/if}
-                        {$HOOK_CUSTOMER_ACCOUNT}
-                    </ul>
+    <div class="container">
+        {block name='my_account_heading'}
+            <h1 class="page-heading text-center text-bolder h5 font-weight-bold">{l s='My account'}</h1>
+            <hr>
+            {if isset($account_created)}
+                <div class="text-center small">
+                    {l s='Your account has been created.'}
                 </div>
             {/if}
+            <div class="text-center small">{l s='Welcome to your account. Here you can manage all of your personal information and orders.'}</div>
+        {/block}
+        <div class="row m-4">
+            <div class="col-12">
+                <ul class="myaccount-link-list qlo-link-list">
+                    {block name='my_account_tabs'}
+                        <li class="qlo-item">
+                            <a class="qlo-action-card" href="{$link->getPageLink('address', true)|escape:'html':'UTF-8'}" title="{l s='Addresses'}">
+                                <span class="qlo-action-card__icon" aria-hidden="true"><i class="icon-map-marker"></i></span>
+                                <span class="qlo-action-card__title">{l s='Addresses'}</span>
+                            </a>
+                        </li>
+                        <li class="qlo-item">
+                            <a class="qlo-action-card" href="{$link->getPageLink('history', true)|escape:'html':'UTF-8'}" title="{l s='Order history and details'}">
+                                <span class="qlo-action-card__icon" aria-hidden="true"><i class="icon-list-alt"></i></span>
+                                <span class="qlo-action-card__title">{l s='Order history and details'}</span>
+                            </a>
+                        </li>
+                        {if $refundAllowed}
+                            <li class="qlo-item">
+                                <a class="qlo-action-card" href="{$link->getPageLink('order-follow', true)|escape:'html':'UTF-8'}" title="{l s='Booking refund requests'}">
+                                    <span class="qlo-action-card__icon" aria-hidden="true"><i class="icon-money"></i></span>
+                                    <span class="qlo-action-card__title">{l s='Booking refund requests'}</span>
+                                </a>
+                            </li>
+                        {/if}
+                        <li class="qlo-item">
+                            <a class="qlo-action-card" href="{$link->getPageLink('identity', true)|escape:'html':'UTF-8'}" title="{l s='Personal information'}">
+                                <span class="qlo-action-card__icon" aria-hidden="true"><i class="icon-user"></i></span>
+                                <span class="qlo-action-card__title">{l s='Personal information'}</span>
+                            </a>
+                        </li>
+                        <li class="qlo-item">
+                            <a class="qlo-action-card" href="{$link->getPageLink('order-slip', true)|escape:'html':'UTF-8'}" title="{l s='Credit slips'}">
+                                <span class="qlo-action-card__icon" aria-hidden="true"><i class="icon-file-text"></i></span>
+                                <span class="qlo-action-card__title">{l s='Credit slips'}</span>
+                            </a>
+                        </li>
+                    {/block}
+                    {block name='displayCustomerAccount'}
+                        {if $voucherAllowed}
+                            <li class="qlo-item">
+                                <a class="qlo-action-card" href="{$link->getPageLink('discount', true)|escape:'html':'UTF-8'}" title="{l s='Vouchers'}">
+                                    <span class="qlo-action-card__icon" aria-hidden="true"><i class="icon-ticket"></i></span>
+                                    <span class="qlo-action-card__title">{l s='Vouchers'}</span>
+                                </a>
+                            </li>
+                        {/if}
+                        {if isset($HOOK_CUSTOMER_ACCOUNT) && $HOOK_CUSTOMER_ACCOUNT !=''}
+                            {$HOOK_CUSTOMER_ACCOUNT}
+                        {/if}
+                    {/block}
+                </ul>
+            </div>
+        </div>
+
+        {block name='displayCustomerAccountAfterTabs'}
+            {hook h='displayCustomerAccountAfterTabs'}
+        {/block}
+
+        {block name='my_account_footer_links'}
+            <ul class="footer_links clearfix">
+            <li><a class="link text-secondary" href="{if isset($force_ssl) && $force_ssl}{$base_dir_ssl}{else}{$base_dir}{/if}" title="{l s='Home'}"><span><i class="icon-angles-left"></i> {l s='Home'}</span></a></li>
+            </ul>
         {/block}
     </div>
-
-    {block name='displayCustomerAccountAfterTabs'}
-        {hook h='displayCustomerAccountAfterTabs'}
-    {/block}
-
-    {block name='my_account_footer_links'}
-        <ul class="footer_links clearfix">
-        <li><a class="btn btn-default button button-small" href="{if isset($force_ssl) && $force_ssl}{$base_dir_ssl}{else}{$base_dir}{/if}" title="{l s='Home'}"><span><i class="icon-chevron-left"></i> {l s='Home'}</span></a></li>
-        </ul>
-    {/block}
-
 {/block}

@@ -21,36 +21,42 @@
 *}
 
 {block name='room_types_filters_block'}
-	<div id="filter_results" class="block">
-		{*  to be udpated *}
-		<div>
-			<input type="hidden" id="filter_check_in_time" name="filter_check_in_time" {if isset($date_from)}value="{$date_from|escape:'htmlall':'UTF-8'}"{/if}>
-			<input type="hidden" id="filter_check_out_time" name="filter_check_in_time" {if isset($date_to)}value="{$date_to|escape:'htmlall':'UTF-8'}"{/if}>
-			<div class="form-control input-date " id="filter_daterange_value"  autocomplete="off" placeholder="{l s='Check-in - Check-out' mod='wkhotelfilterblock'}" tabindex="-1"><span class="align-self-center">{l s='Check-in' mod='wkhotelfilterblock'} <i class="icon icon-minus"></i> {l s='Check-out' mod='wkhotelfilterblock'}</span></div>
-		</div>
-			{* {block name='room_types_amenities_filter'}
-				{if isset($config) && $config['SHOW_AMENITIES_FILTER'] && $all_feat}
-					<div class="row margin-lr-0 layered_filter_cont">
-						<div class="col-sm-12 layered_filter_heading">
-							<div class="row margin-lr-0">
-								<div class="pull-left lf_headingmain_wrapper">
-									<span>{l s='Amenities' mod='wkhotelfilterblock'}</span>
-									<hr class="theme-text-underline">
-								</div>
-								<span class="pull-right clear_filter">{l s='Clear Filter' mod='wkhotelfilterblock'}</span>
-							</div>
-						</div>
-						<div class="col-sm-12 lf_sub_cont">
-							{foreach $all_feat as $feat}
-								<div class="layered_filt">
-									<input type="checkbox" class="filter" data-type="amenities" value="{$feat.id_feature}">
-									<span class="filters_name">{$feat.name}</span>
-								</div>
-							{/foreach}
+	<form method="POST" id="search_room_block_form">
+		<div id="filter_results" class="row">
+			{hook h='displayRoomFilterBlockBefore'}
+			{block name='room_types_date_filter'}
+				<div class="form-group col-md-4 col-sm-12 mb-2 mb-sm-0 pl-0 pr-sm-2">
+					<input type="hidden" id="filter_check_in_time" name="filter_check_in_time" {if isset($date_from)}value="{$date_from|escape:'htmlall':'UTF-8'}"{/if}>
+					<input type="hidden" id="filter_check_out_time" name="filter_check_out_time" {if isset($date_to)}value="{$date_to|escape:'htmlall':'UTF-8'}"{/if}>
+					<div class="form-control header-rmsearch-input small input-date" id="filter_daterange_value" autocomplete="off" placeholder="{l s='Check-in - Check-out' mod='wkhotelfilterblock'}" tabindex="0" role="button" aria-label="{l s='Select check-in and check-out dates' mod='wkhotelfilterblock'}">
+						<span class="align-self-center filter-date-label">{l s='Check In - Check Out' mod='wkhotelfilterblock'}</span>
+					</div>
+				</div>
+			{/block}
+
+				{block name='room_types_occupancy_filter'}
+					<div class="form-group col-md-4 col-sm-12 mb-2 mb-sm-0 px-sm-2 px-0">
+						<div class="dropdown">
+							<button class="form-control input-occupancy header-rmsearch-input small text-left" type="button" id="filter_occupancy_value" aria-label="{l s='Modify occupancy' mod='wkhotelfilterblock'}">
+								<span class="float-left">
+									{if isset($occupancy_adults) && $occupancy_adults}
+										{$occupancy_adults|intval} {if $occupancy_adults > 1}{l s='Adult(s)' mod='wkhotelfilterblock'}{else}{l s='Adult' mod='wkhotelfilterblock'}{/if}{if isset($occupancy_children) && $occupancy_children}, {$occupancy_children|intval} {if $occupancy_children > 1}{l s='Children' mod='wkhotelfilterblock'}{else}{l s='Child' mod='wkhotelfilterblock'}{/if}{/if}
+									{else}
+										{l s='1 Adult(s), 0 Children' mod='wkhotelfilterblock'}
+									{/if}
+								</span>
+							</button>
 						</div>
 					</div>
-				{/if}
-			{/block} *}
+				{/block}
 
-	</div>
+			{block name='room_types_search_action'}
+				<div class="form-group col-md-4 col-sm-12 mb-0 pr-0 pl-sm-2 pl-0">
+					<button type="button" id="filter_search_now_submit" class="btn btn-primary btn-medium btn-block header-rmsearch-input">
+						{l s='Search Now' mod='wkhotelfilterblock'}
+					</button>
+				</div>
+			{/block}
+		</div>
+	</form>
 {/block}

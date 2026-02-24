@@ -244,6 +244,51 @@ class CategoryControllerCore extends FrontController
             $idHotelAddress = $objHotel->getHotelIdAddress();
             $objHotelAddress = new Address((int) $idHotelAddress);
             $formattedHotelAddress = AddressFormat::generateAddress($objHotelAddress, $invoiceAddressPatternRules, ', ', ' ');
+            $objHotelImage = new HotelImage();
+            $hotelImageLargeType = ImageType::getFormatedName('large');
+            $hotelImageSmallType = ImageType::getFormatedName('small');
+
+            $hotelImages = array();
+            if ($hotelImagesByHotel = $objHotelImage->getImagesByHotelId($id_hotel)) {
+                foreach ($hotelImagesByHotel as $hotelImage) {
+                    $hotelImages[] = array(
+                        'id' => (int) $hotelImage['id'],
+                        'cover' => (bool) $hotelImage['cover'],
+                        'large_link' => $this->context->link->getMediaLink(
+                            $objHotelImage->getImageLink((int) $hotelImage['id'], $hotelImageLargeType)
+                        ),
+                        'small_link' => $this->context->link->getMediaLink(
+                            $objHotelImage->getImageLink((int) $hotelImage['id'], $hotelImageSmallType)
+                        ),
+                    );
+                }
+            }
+            ddd($hotelImagesByHotel);
+            $hotelCoverImage = null;
+            if ($hotelImages) {
+                foreach ($hotelImages as $hotelImage) {
+                    if ($hotelImage['cover']) {
+                        $hotelCoverImage = $hotelImage;
+                        break;
+                    }
+                }
+
+                if ($hotelCoverImage === null) {
+                    $hotelCoverImage = $hotelImages[0];
+                }
+            }
+
+            $hotelGalleryImages = array();
+            if ($hotelCoverImage !== null && $hotelImages) {
+                foreach ($hotelImages as $hotelImage) {
+                    if ((int) $hotelImage['id'] === (int) $hotelCoverImage['id']) {
+                        continue;
+                    }
+                    $hotelGalleryImages[] = $hotelImage;
+                }
+            }
+
+            $hotelGalleryImages = array_slice($hotelGalleryImages, 0, 4);
 
             $this->context->smarty->assign(array(
                 'warning_num' => $warning_num,
@@ -259,6 +304,9 @@ class CategoryControllerCore extends FrontController
                 'objHotel' => $objHotel,
                 'hotel_contact' => $objHotelAddress->phone,
                 'hotel_address' => $formattedHotelAddress,
+                'hotel_cover_image' => $hotelCoverImage,
+                'hotel_gallery_images' => $hotelGalleryImages,
+                'hotel_images_total' => count($hotelImages),
                 'feat_img_dir' => $feat_img_dir,
                 'ratting_img' => $ratting_img,
             ));

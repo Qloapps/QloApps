@@ -34,7 +34,7 @@ class MyAccountControllerCore extends FrontController
     public function setMedia()
     {
         parent::setMedia();
-        $this->addCSS(_THEME_CSS_DIR_.'my-account.css');
+        // $this->addCSS(_THEME_CSS_DIR_.'my-account.css');
     }
 
     /**

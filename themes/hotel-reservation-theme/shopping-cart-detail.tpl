@@ -413,7 +413,7 @@
         {block name='shopping_cart_proceed_action'}
             <div class="row">
                 <div class="col-sm-12 proceed_btn_block">
-                    <a class="btn btn-primary btn-medium pull-right pull-right" href="{$link->getPageLink('order-opc', null, null, ['proceed_to_customer_dtl' => 1])}" title="Proceed to checkout" rel="nofollow">
+                    <a class="btn btn-primary btn-medium pull-right" href="{$link->getPageLink('order-opc', null, null, ['proceed_to_customer_dtl' => 1])}" title="Proceed to checkout" rel="nofollow">
                         <span>
                             {l s='Proceed'}
                         </span>

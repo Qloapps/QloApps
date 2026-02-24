@@ -24,11 +24,10 @@
 *}
 
 {block name='category'}
-    {* todo: add hotel images *}
     <div class="cat_cont container p-0">
         <div class="col-12">
             <div class="category_info_block">
-                <div class="col-md-6">
+                <div class="col-md-6 p-0">
                     <div class="category_heading">
                         <span class="block_title">
                             {$objHotel->hotel_name}
@@ -72,6 +71,38 @@
                 </div>
                 {* todo: google maps and cheapest room info block *}
             </div>
+            {block name='category_hotel_gallery'}
+                {if isset($hotel_cover_image) && $hotel_cover_image}
+                    <div class="qlo-category-gallery{if !(isset($hotel_gallery_images) && $hotel_gallery_images)} qlo-category-gallery--single{/if}">
+                        <div class="qlo-category-gallery__cover">
+                            <img
+                                src="{$hotel_cover_image.large_link|escape:'html':'UTF-8'}"
+                                alt="{$objHotel->hotel_name|escape:'html':'UTF-8'}"
+                                loading="lazy"
+                            />
+                        </div>
+                        {if isset($hotel_gallery_images) && $hotel_gallery_images}
+                            <div class="qlo-category-gallery__grid">
+                                {foreach from=$hotel_gallery_images item=hotel_image name=hotel_gallery_images}
+                                    <div class="qlo-category-gallery__thumb">
+                                        <img
+                                            src="{$hotel_image.small_link|escape:'html':'UTF-8'}"
+                                            alt="{$objHotel->hotel_name|escape:'html':'UTF-8'} {l s='Gallery image'} {$smarty.foreach.hotel_gallery_images.iteration|intval}"
+                                            loading="lazy"
+                                        />
+                                        {if $smarty.foreach.hotel_gallery_images.last && $hotel_gallery_images|@count >= 4}
+                                            <a href="javascript:void(0);" class="qlo-category-gallery__full-gallery js-category-full-gallery-trigger">
+                                                <span>{l s='See Full Gallery'}</span>
+                                                <i class="icon-long-arrow-right" aria-hidden="true"></i>
+                                            </a>
+                                        {/if}
+                                    </div>
+                                {/foreach}
+                            </div>
+                        {/if}
+                    </div>
+                {/if}
+            {/block}
             {block name='category_tabs'}
                 <div class="tab_container">
                     <ul class="nav nav-pills tab_list_headings">
@@ -113,7 +144,7 @@
                                 {l s='Room Types'}
                             </div>
                             <input type="hidden" id="max_order_date" name="max_order_date" value="{$max_order_date}">
-                            <div id="room_type_list_filters" class="col-12 row">
+                            <div id="room_type_list_filters" class="col-12">
                                 {block name='room_type_list_filters'}
                                     {include file="./_partials/room_type_list_filters.tpl"}
                                 {/block}

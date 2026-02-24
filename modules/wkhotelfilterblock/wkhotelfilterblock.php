@@ -163,20 +163,23 @@ class wkhotelfilterblock extends Module
                 && (HotelBranchInformation::getHotelIdByIdCategory($htl_id_category))
             ) {
                 if ($objCategory->hasParent(Configuration::get('PS_LOCATIONS_CATEGORY'))) {
-                    $urlData = array ();
-                    if ($date_from = Tools::getValue('date_from')) {
-                        $urlData['date_from'] = $date_from;
+                    $urlData = array();
+                    $dateFrom = Tools::getValue('date_from');
+                    $dateTo = Tools::getValue('date_to');
+
+                    if (!$dateFrom || !Validate::isDate($dateFrom)) {
+                        $dateFrom = date('Y-m-d');
+                    }
+                    if (!$dateTo || !Validate::isDate($dateTo) || strtotime($dateTo) <= strtotime($dateFrom)) {
+                        $dateTo = date('Y-m-d', strtotime($dateFrom.' +1 day'));
                     }
 
-                    if ($date_to = Tools::getValue('date_to')) {
-                        $urlData['date_to'] = $date_to;
-                    }
+                    $urlData['date_from'] = $dateFrom;
+                    $urlData['date_to'] = $dateTo;
 
                     if ($occupancy = Tools::getValue('occupancy')) {
                         $urlData['occupancy'] = $occupancy;
                     }
-
-                    $occupancy = Tools::getValue('occupancy');
 
                     if (Configuration::get('PS_REWRITING_SETTINGS')) {
                         $categoryUrl = $this->context->link->getCategoryLink(
@@ -195,12 +198,12 @@ class wkhotelfilterblock extends Module
                     Media::addJsDef(
                         array(
                             'cat_link' => $categoryUrl,
-                            'date_from' => $date_from,
-                            'date_to' => $date_to,
+                            'date_from' => $dateFrom,
+                            'date_to' => $dateTo,
                         )
                     );
 
-                    $this->context->controller->addJS($this->_path.'/views/js/wkhotelfilterblock.js');
+                    $this->context->controller->addJS($this->_path.'views/js/wkhotelfilterblock.js');
                 }
             }
         }
@@ -213,17 +216,27 @@ class wkhotelfilterblock extends Module
             && (HotelBranchInformation::getHotelIdByIdCategory($htl_id_category))
         ) {
             if ($objCategory->hasParent(Configuration::get('PS_LOCATIONS_CATEGORY'))) {
-                if (!($date_from = Tools::getValue('date_from'))) {
-                    $date_from = date('Y-m-d H:i:s');
-                    $date_to = date('Y-m-d H:i:s', strtotime($date_from) + 86400);
+                $date_from = Tools::getValue('date_from');
+                $date_to = Tools::getValue('date_to');
+
+                if (!$date_from || !Validate::isDate($date_from)) {
+                    $date_from = date('Y-m-d');
                 }
 
-                if (!($date_to = Tools::getValue('date_to'))) {
-                    $date_to = date('Y-m-d H:i:s', strtotime($date_from) + 86400);
+                if (!$date_to || !Validate::isDate($date_to) || strtotime($date_to) <= strtotime($date_from)) {
+                    $date_to = date('Y-m-d', strtotime($date_from.' +1 day'));
                 }
 
                 $id_lang = $this->context->language->id;
                 $all_feat = FeatureCore::getFeatures($id_lang);
+                $occupancy = Tools::getValue('occupancy');
+                $occupancyAdults = 1;
+                $occupancyChildren = 0;
+
+                if (Validate::isOccupancy($occupancy) && is_array($occupancy) && count($occupancy)) {
+                    $occupancyAdults = (int) array_sum(array_column($occupancy, 'adults'));
+                    $occupancyChildren = (int) array_sum(array_column($occupancy, 'children'));
+                }
 
                 $config = $this->getConfigFieldsValues();
 
@@ -232,6 +245,8 @@ class wkhotelfilterblock extends Module
                     'config' => $config,
                     'date_from'=> $date_from,
                     'date_to'=> $date_to,
+                    'occupancy_adults' => $occupancyAdults,
+                    'occupancy_children' => $occupancyChildren,
                 ));
 
                 return $this->display(__FILE__, 'htlfilterblock.tpl');
