@@ -153,7 +153,7 @@
 											<span class="input-group-addon">{$currencySign}</span>
 											<input type="text" class="form-control unit_price" name="service_price[{$product['id_product']|escape:'html':'UTF-8'}]" value="{$product['price_tax_exc']}" data-id-product="{$product.id_product}">
 											{if Product::PRICE_CALCULATION_METHOD_PER_DAY == $product['price_calculation_method']}
-												<span class="input-group-addon">{l s='/ night'}</span>
+												<span class="input-group-addon">{l s='/ nnnnight'}</span>
 											{/if}
 										</div>
 									</td>

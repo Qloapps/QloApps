@@ -431,6 +431,10 @@ class AdminOrdersControllerCore extends AdminController
                 }
 
                 $objHotelAdvancedPayment = new HotelAdvancedPayment();
+                $adminCartsAccess = Profile::getProfileAccess(
+                    (int) $this->context->employee->id_profile,
+                    (int) Tab::getIdFromClassName('AdminCarts')
+                );
                 $this->context->smarty->assign(array(
                     'order_total' => $cart->getOrderTotal(true),
                     'is_advance_payment_active' => $objHotelAdvancedPayment->isAdvancePaymentAvailableForCurrentCart(),
@@ -443,6 +447,7 @@ class AdminOrdersControllerCore extends AdminController
                     'payment_types' => $paymentTypes,
                     'PAYMENT_TYPE_PAY_AT_HOTEL' => OrderPayment::PAYMENT_TYPE_PAY_AT_HOTEL,
                     'currency' => new Currency((int)$cart->id_currency),
+                    'can_edit_booking_carts' => (!empty($adminCartsAccess['edit']) && (int) $adminCartsAccess['edit'] === 1),
                     'max_child_in_room' => Configuration::get('WK_GLOBAL_MAX_CHILD_IN_ROOM'),
                     'max_child_age' => Configuration::get('WK_GLOBAL_CHILD_MAX_AGE'),
                     'occupancy_required_for_booking' => $occupancyRequiredForBooking,
