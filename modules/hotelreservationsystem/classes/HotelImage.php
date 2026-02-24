@@ -99,7 +99,7 @@ class HotelImage extends ObjectModel
      * @param  [int] $n [number of images per page for paginated images data]
      * @return [array|boolean] [if data found returns array containing information of the images of the hotel which id is passed]
      */
-    public function getImagesByHotelId($id_hotel, $p = 1, $n = null)
+    public function getImagesByHotelId($id_hotel, $p = 1, $n = null, $idLang = null)
     {
         $p = (int) $p;
         $n = $n !== null ? (int) $n : $n; // n = null for no pagination
@@ -107,9 +107,16 @@ class HotelImage extends ObjectModel
             $p = 1;
         }
 
-        $sql = 'SELECT *
-        FROM `'._DB_PREFIX_.'htl_image`
-        WHERE `id_hotel` = '.(int) $id_hotel.
+        if (!$idLang) {
+            $idLang = (int) Context::getContext()->language->id;
+        }
+
+        $sql = 'SELECT hi.*, hicl.`name` AS `category_name`
+        FROM `'._DB_PREFIX_.'htl_image` hi
+        LEFT JOIN `'._DB_PREFIX_.'htl_image_category_lang` hicl
+            ON (hicl.`id_htl_image_category` = hi.`id_htl_image_category`
+            AND hicl.`id_lang` = '.(int) $idLang.')
+        WHERE hi.`id_hotel` = '.(int) $id_hotel.
         ($n ? ' LIMIT '.(int) (($p - 1) * $n).', '.(int) ($n) : '');
 
         return Db::getInstance()->executeS($sql);
@@ -174,11 +181,12 @@ class HotelImage extends ObjectModel
         );
     }
 
-    public function uploadHotelImages($images, $idHotel)
+    public function uploadHotelImages($images, $idHotel, $idHtlImageCategory = 0)
     {
         if (isset($images) && $idHotel) {
             $objHotelHelper = new HotelHelper();
             $hotelImages  = $images['tmp_name'];
+            $idHtlImageCategory = (int) $idHtlImageCategory;
             if (is_array($images['tmp_name'])) {
                 foreach ($hotelImages as $image) {
                     $objHtlImage = new HotelImage();
@@ -189,6 +197,7 @@ class HotelImage extends ObjectModel
                         $objHtlImage->cover = 1;
                     }
                     if ($objHtlImage->save()) {
+                        self::updateImageCategory($objHtlImage->id, $idHtlImageCategory ?: null);
                         if ($path = $objHtlImage->getPathForCreation()) {
                             if (ImageManager::resize(
                                 $image,
@@ -234,6 +243,7 @@ class HotelImage extends ObjectModel
                     $objHtlImage->cover = 1;
                 }
                 if ($objHtlImage->save()) {
+                    self::updateImageCategory($objHtlImage->id, $idHtlImageCategory ?: null);
                     if ($path = $objHtlImage->getPathForCreation()) {
                         if (ImageManager::resize(
                             $hotelImages,
@@ -265,6 +275,8 @@ class HotelImage extends ObjectModel
                             $addedImage = array(
                                 'id' => $objHtlImage->id,
                                 'cover' => $objHtlImage->cover,
+                                'id_htl_image_category' => $idHtlImageCategory,
+                                'category_name' => HotelImageCategory::getCategoryName($idHtlImageCategory),
                                 'image_link' => Context::getContext()->link->getMediaLink($objHtlImage->getImageLink($objHtlImage->id)),
                             );
                             return $addedImage;
@@ -311,5 +323,17 @@ class HotelImage extends ObjectModel
     public function getAllImages()
     {
         return Db::getInstance()->executeS('SELECT * FROM `'._DB_PREFIX_.'htl_image`');
+    }
+
+    public static function updateImageCategory($idImage, $idHtlImageCategory = null)
+    {
+        return Db::getInstance()->update('htl_image',
+            array(
+                'id_htl_image_category' => $idHtlImageCategory ? (int) $idHtlImageCategory : null,
+            ),
+            '`id` = '.(int) $idImage,
+            0,
+            true
+        );
     }
 }

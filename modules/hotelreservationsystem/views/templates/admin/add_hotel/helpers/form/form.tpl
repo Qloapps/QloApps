@@ -408,11 +408,39 @@
 
 					{if isset($hotel_info.id) && $hotel_info.id}
 						<div class="form-group row">
-							<label for="hotel_images" class="col-sm-3 control-label padding-top-0">
-								{l s='Upload images' mod='hotelreservationsystem'}&nbsp;:&nbsp;&nbsp;
+							<label for="hotel_images" class="col-sm-1 control-label">
+								{l s='Upload images' mod='hotelreservationsystem'}
 							</label>
-							<div class="col-sm-5">
-								<input class="form-control-static" type="file" accept="image/gif, image/jpg, image/jpeg, image/png" id="hotel_images" name="hotel_images[]" multiple>
+							<div class="col-sm-11">
+								<div class="panel panel-default" style="margin-bottom:0;">
+									<div class="panel-body" style="padding-bottom:10px;">
+										<div class="row">
+											<div class="col-sm-5">
+												<label class="control-label" for="hotel_images">{l s='Select images' mod='hotelreservationsystem'}</label>
+												<input class="form-control" type="file" accept="image/gif, image/jpg, image/jpeg, image/png" id="hotel_images" name="hotel_images[]" multiple>
+												<p class="help-block" style="margin-bottom:0;">{l s='You can select multiple images.' mod='hotelreservationsystem'}</p>
+											</div>
+											<div class="col-sm-4">
+												<label class="control-label" for="id_htl_image_category">{l s='Image category' mod='hotelreservationsystem'}</label>
+												<select class="form-control" id="id_htl_image_category" name="id_htl_image_category">
+													<option value="0">{l s='Select category (optional)' mod='hotelreservationsystem'}</option>
+													{if isset($hotelImageCategories) && $hotelImageCategories}
+														{foreach from=$hotelImageCategories item=hotelImageCategory}
+															<option value="{$hotelImageCategory.id_htl_image_category|intval}">{$hotelImageCategory.name|escape:'html':'UTF-8'}</option>
+														{/foreach}
+													{/if}
+												</select>
+												<p class="help-block" style="margin-bottom:0;">{l s='If not selected, image will be uncategorized.' mod='hotelreservationsystem'}</p>
+											</div>
+											<div class="col-sm-3">
+												<label class="control-label">&nbsp;</label>
+												<button class="btn btn-primary btn-block" id="upload_hotel_images_btn" type="button">
+													<i class="icon-upload"></i> {l s='Upload' mod='hotelreservationsystem'}
+												</button>
+											</div>
+										</div>
+									</div>
+								</div>
 							</div>
 						</div>
 						<hr>
@@ -621,10 +649,11 @@
 	</form>
 </div>
 
-{strip}
-	{addJsDef adminHotelCtrlUrl = $link->getAdminlink('AdminAddHotel')}
-		{addJsDefL name=imgUploadSuccessMsg}{l s='Image Successfully Uploaded' js=1 mod='hotelreservationsystem'}{/addJsDefL}
-	{addJsDefL name=imgUploadErrorMsg}{l s='Something went wrong while uploading images. Please try again later !!' js=1 mod='hotelreservationsystem'}{/addJsDefL}
+	{strip}
+		{addJsDef adminHotelCtrlUrl = $link->getAdminlink('AdminAddHotel')}
+			{addJsDefL name=imgUploadSuccessMsg}{l s='Image Successfully Uploaded' js=1 mod='hotelreservationsystem'}{/addJsDefL}
+		{addJsDefL name=imgSelectErrorMsg}{l s='Please select at least one image before uploading.' js=1 mod='hotelreservationsystem'}{/addJsDefL}
+		{addJsDefL name=imgUploadErrorMsg}{l s='Something went wrong while uploading images. Please try again later !!' js=1 mod='hotelreservationsystem'}{/addJsDefL}
 
 	{addJsDefL name=coverImgSuccessMsg}{l s='Cover image changed successfully' js=1 mod='hotelreservationsystem'}{/addJsDefL}
 	{addJsDefL name=coverImgErrorMsg}{l s='Error while changing cover image' js=1 mod='hotelreservationsystem'}{/addJsDefL}

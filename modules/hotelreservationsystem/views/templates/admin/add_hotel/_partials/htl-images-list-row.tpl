@@ -27,6 +27,13 @@
             <img class="img-thumbnail" width="100" src="{$image.image_link_small|escape:'html':'UTF-8'}"/>
         </a>
     </td>
+    <td class="text-center">
+        {if isset($image.category_name) && $image.category_name}
+            {$image.category_name|escape:'html':'UTF-8'}
+        {else}
+            {l s='Uncategorized' mod='hotelreservationsystem'}
+        {/if}
+    </td>
     <td class="text-center {if $image.cover == 1}cover-image-td{/if}">
         <a href="#" class="{if $image.cover == 1}text-success{else}text-danger{/if} changer-cover-image" data-id-hotel="{$hotel_info.id|escape:'html':'UTF-8'}" data-is-cover="{if $image.cover == 1}1{else}0{/if}" data-id-image="{$image.id|escape:'html':'UTF-8'}">
             {if $image.cover == 1}
