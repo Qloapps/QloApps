@@ -1613,30 +1613,11 @@ class AdminCartsControllerCore extends AdminController
                                 $response['errors'][] = Tools::displayError('Can not order multiple quanitity for service').': '.$objProduct->name;
                             }
 
-                            if ($canEdit) {
-                                if (!isset($serviceUnitPrices[$idServiceProduct])
-                                    || !ValidateCore::isPrice($serviceUnitPrices[$idServiceProduct])
-                                ) {
-                                    $response['hasError'] = true;
-                                    $response['errors'][] = Tools::displayError('Invalid unit price for service').': '.$objProduct->name;
-                                }
-                            } else {
-                                $serviceUnitPrices[$idServiceProduct] = Product::getPriceStatic($idServiceProduct, false);
-                                if ($specificPriceInfo = SpecificPrice::getSpecificPrice(
-                                    (int)$idServiceProduct,
-                                    0,
-                                    $objCart->id_currency,
-                                    0,
-                                    0,
-                                    1,
-                                    0,
-                                    0,
-                                    $objCart->id,
-                                    0,
-                                    $objHotelCartBookingData->id
-                                )) {
-                                    $serviceUnitPrices[$idServiceProduct] = $specificPriceInfo['price'];
-                                }
+                            if (!isset($serviceUnitPrices[$idServiceProduct])
+                                || !ValidateCore::isPrice($serviceUnitPrices[$idServiceProduct])
+                            ) {
+                                $response['hasError'] = true;
+                                $response['errors'][] = Tools::displayError('Invalid unit price for service').': '.$objProduct->name;
                             }
                         } else {
                             $response['errors'][] = Tools::displayError('Some services not found. please try after refreshing the page');
