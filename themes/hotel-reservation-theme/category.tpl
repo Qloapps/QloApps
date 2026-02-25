@@ -23,7 +23,81 @@
 *  International Registered Trademark & Property of PrestaShop SA
 *}
 
+{assign var=gallery_total value=$hotel_gallery_all_images|@count}
+{assign var=thumb_count value=$hotel_gallery_images|@count}
 {block name='category'}
+    {block name='category_hotel_gallery'}
+        {if isset($hotel_cover_image) && $hotel_cover_image}
+            <div class="qlo-category-gallery {if $thumb_count == 0}gallery--single {elseif $thumb_count == 1}gallery--two{/if}">
+                <div class="qlo-category-gallery__cover">
+                    <a href="{$hotel_cover_image.large_link}" class="js-hotel-image"><img src="{$hotel_cover_image.large_link}" alt="{$objHotel->hotel_name}" loading="lazy"/></a>
+                </div>
+                {if isset($hotel_gallery_images) && $hotel_gallery_images}
+                <div class="qlo-category-gallery__grid">
+                    {foreach from=$hotel_gallery_images item=hotel_image name=gallery}
+                    <div class="qlo-category-gallery__thumb">
+                        <a href="{$hotel_image.large_link}" class="js-hotel-image"><img src="{$hotel_image.large_link}" loading="lazy"/></a>
+                        {if $smarty.foreach.gallery.last}
+                            <a href="javascript:void(0);" class="qlo-category-gallery__full-gallery js-category-full-gallery-trigger"><span>{l s='View Full Gallery'}</span><i class="icon-long-arrow-right"></i></a>
+                        {/if}
+                    </div>
+                    {/foreach}
+                </div>
+                {/if}
+            </div>
+            <div class="mobile-hotel-gallery">
+                <div class="owl-carousel owl-theme">
+                    {foreach from=$hotel_gallery_all_images item=image}
+                        <div class="item">
+                            <a href="{$image.large_link}" class="js-hotel-image"><img src="{$image.large_link}"></a>
+                        </div>
+                    {/foreach}
+                </div>
+                <div class="gallery-counter">
+                    <span class="current">01</span>/<span class="total">{$gallery_total|string_format:"%02d"}</span>
+                </div>
+            </div>
+        {/if}
+
+        {block name='full_gallery_modal_block'}
+            <div class="qlo-full-gallery-modal" id="full-gallery-modal" style="display: none;">
+                <div class="qlo-full-gallery__overlay"></div>
+                <div class="qlo-full-gallery__container">
+                    <button class="qlo-full-gallery__close" type="button"><i class="icon-times"></i></button>
+                    
+                    {* Hotel Name Header *}
+                    <div class="qlo-full-gallery__header m-3"><h2 class="qlo-full-gallery__hotel-name">{$objHotel->hotel_name}</h2></div>
+                    
+                    {* Category Tabs - Centered *}
+                    <div class="qlo-full-gallery__tabs">
+                        <div class="qlo-full-gallery__tabs-wrapper">
+                            <button class="qlo-gallery-tab active" data-category="all">{l s='All photos'}</button>
+                            {foreach from=$hotel_image_categories item=category}
+                                <button class="qlo-gallery-tab" data-category="{$category.id_htl_image_category}">{$category.name}</button>
+                            {/foreach}
+                        </div>
+                    </div>
+                    
+                    {* Main Image Display - Desktop *}
+                    <div class="qlo-full-gallery__main qlo-full-gallery__main--desktop">
+                        <button class="qlo-full-gallery__nav qlo-full-gallery__nav--prev" type="button"><i class="icon-chevron-left"></i></button>
+                        <div class="qlo-full-gallery__image-container"><img src="" alt="" class="qlo-full-gallery__main-image" id="main-image-modal"></div>
+                        <button class="qlo-full-gallery__nav qlo-full-gallery__nav--next" type="button"><i class="icon-chevron-right"></i></button>
+                    </div>
+                    
+                    {* Mobile Owl Carousel *}
+                    <div class="qlo-full-gallery__main qlo-full-gallery__main--mobile">
+                        <div class="owl-carousel owl-theme" id="gallery-mobile-carousel"></div>
+                    </div>
+                    
+                    {* Thumbnails Strip - Desktop *}
+                    <div class="qlo-full-gallery__thumbnails qlo-full-gallery__thumbnails--desktop">
+                        <div class="qlo-gallery-thumbnails__scroll" id="gallery-thumbnail"></div>
+                    </div>
+                </div>
+            </div>
+        {/block}
+    {/block}
     <div class="cat_cont container p-0">
         <div class="col-12">
             <div class="category_info_block">
@@ -71,38 +145,6 @@
                 </div>
                 {* todo: google maps and cheapest room info block *}
             </div>
-            {block name='category_hotel_gallery'}
-                {if isset($hotel_cover_image) && $hotel_cover_image}
-                    <div class="qlo-category-gallery{if !(isset($hotel_gallery_images) && $hotel_gallery_images)} qlo-category-gallery--single{/if}">
-                        <div class="qlo-category-gallery__cover">
-                            <img
-                                src="{$hotel_cover_image.large_link|escape:'html':'UTF-8'}"
-                                alt="{$objHotel->hotel_name|escape:'html':'UTF-8'}"
-                                loading="lazy"
-                            />
-                        </div>
-                        {if isset($hotel_gallery_images) && $hotel_gallery_images}
-                            <div class="qlo-category-gallery__grid">
-                                {foreach from=$hotel_gallery_images item=hotel_image name=hotel_gallery_images}
-                                    <div class="qlo-category-gallery__thumb">
-                                        <img
-                                            src="{$hotel_image.small_link|escape:'html':'UTF-8'}"
-                                            alt="{$objHotel->hotel_name|escape:'html':'UTF-8'} {l s='Gallery image'} {$smarty.foreach.hotel_gallery_images.iteration|intval}"
-                                            loading="lazy"
-                                        />
-                                        {if $smarty.foreach.hotel_gallery_images.last && $hotel_gallery_images|@count >= 4}
-                                            <a href="javascript:void(0);" class="qlo-category-gallery__full-gallery js-category-full-gallery-trigger">
-                                                <span>{l s='See Full Gallery'}</span>
-                                                <i class="icon-long-arrow-right" aria-hidden="true"></i>
-                                            </a>
-                                        {/if}
-                                    </div>
-                                {/foreach}
-                            </div>
-                        {/if}
-                    </div>
-                {/if}
-            {/block}
             {block name='category_tabs'}
                 <div class="tab_container">
                     <ul class="nav nav-pills tab_list_headings">
@@ -171,6 +213,9 @@
             {addJsDef currency_suffix = $currency->suffix}
             {if isset($max_order_date)}
                 {addJsDef max_order_date = $max_order_date}
+            {/if}
+            {if isset($hotel_gallery_by_category)}
+                {addJsDef hotelGalleryByCategory = $hotel_gallery_by_category}
             {/if}
         {/strip}
     {/block}

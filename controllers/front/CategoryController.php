@@ -64,6 +64,9 @@ class CategoryControllerCore extends FrontController
             $this->addJS(_THEME_JS_DIR_.'scenes.js');
             $this->addJqueryPlugin(array('scrollTo', 'serialScroll'));
         }
+        $this->addCSS(_PS_JS_DIR_.'/owl-carousel/assets/owl.carousel.min.css');
+        $this->addCSS(_PS_JS_DIR_.'/owl-carousel/assets/owl.theme.default.min.css');
+        $this->addJS(_PS_JS_DIR_.'/owl-carousel/owl.carousel.min.js');
 
         $this->addJS(_THEME_JS_DIR_.'category.js');
     }
@@ -260,10 +263,11 @@ class CategoryControllerCore extends FrontController
                         'small_link' => $this->context->link->getMediaLink(
                             $objHotelImage->getImageLink((int) $hotelImage['id'], $hotelImageSmallType)
                         ),
+                        'id_htl_image_category' => $hotelImage['id_htl_image_category'],
+                        'category_name' => $hotelImage['category_name']
                     );
                 }
             }
-            ddd($hotelImagesByHotel);
             $hotelCoverImage = null;
             if ($hotelImages) {
                 foreach ($hotelImages as $hotelImage) {
@@ -288,7 +292,28 @@ class CategoryControllerCore extends FrontController
                 }
             }
 
-            $hotelGalleryImages = array_slice($hotelGalleryImages, 0, 4);
+            $hotelGalleryImages = array_slice($hotelGalleryImages, 0, 2);
+
+            // Organize all images by category for the full gallery
+            $hotelGalleryByIdCategory = array();
+            if ($hotelImages) {
+                foreach ($hotelImages as $image) {
+                    $categoryId = isset($image['id_htl_image_category']) && $image['id_htl_image_category'] ? $image['id_htl_image_category'] : 'uncategorized';
+                    $categoryName = isset($image['category_name']) && $image['category_name'] ? $image['category_name'] : 'Uncategorized';
+                    if (!isset($hotelGalleryByIdCategory[$categoryId])) {
+                        $hotelGalleryByIdCategory[$categoryId] = array('id' => $categoryId, 'name' => $categoryName, 'images' => array());
+                    }
+                    
+                    $hotelGalleryByIdCategory[$categoryId]['images'][] = array(
+                        'id' => $image['id'],
+                        'large_link' => $this->context->link->getMediaLink($objHotelImage->getImageLink((int) $image['id'], $hotelImageLargeType)),
+                        'small_link' => $this->context->link->getMediaLink($objHotelImage->getImageLink((int) $image['id'], $hotelImageSmallType)),
+                        'cover' => $image['cover']
+                    );
+                }
+            }
+            // Get all image categories for the hotel
+            $hotelImageCategories = HotelImageCategory::getImageCategories($this->context->language->id);
 
             $this->context->smarty->assign(array(
                 'warning_num' => $warning_num,
@@ -306,7 +331,9 @@ class CategoryControllerCore extends FrontController
                 'hotel_address' => $formattedHotelAddress,
                 'hotel_cover_image' => $hotelCoverImage,
                 'hotel_gallery_images' => $hotelGalleryImages,
-                'hotel_images_total' => count($hotelImages),
+                'hotel_gallery_all_images' => $hotelImages,
+                'hotel_gallery_by_category' => $hotelGalleryByIdCategory,
+                'hotel_image_categories' => $hotelImageCategories,
                 'feat_img_dir' => $feat_img_dir,
                 'ratting_img' => $ratting_img,
             ));
