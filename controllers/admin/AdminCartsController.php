@@ -354,7 +354,12 @@ class AdminCartsControllerCore extends AdminController
         $objServiceProductCartDetail = new ServiceProductCartDetail();
         $hotelProducts = $objServiceProductCartDetail->getServiceProductsInCart(
             $cart->id,
-            [Product::SELLING_PREFERENCE_HOTEL_STANDALONE, Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE],
+            [
+                Product::SELLING_PREFERENCE_HOTEL_STANDALONE,
+                Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE,
+                Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_STANDALONE,
+                Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE
+            ],
             $idHotel = null,
             0,
             null,
@@ -370,7 +375,12 @@ class AdminCartsControllerCore extends AdminController
 
         $standaloneProducts = $objServiceProductCartDetail->getServiceProductsInCart(
             $cart->id,
-            [Product::SELLING_PREFERENCE_STANDALONE]
+            [
+                Product::SELLING_PREFERENCE_STANDALONE,
+                Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_STANDALONE,
+                Product::SELLING_PREFERENCE_STANDALONE_AND_WITH_ROOM_TYPE,
+                Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE
+            ]
         );
 
         if (count($standaloneProducts)) {
@@ -1195,9 +1205,12 @@ class AdminCartsControllerCore extends AdminController
             if (Configuration::get('PS_ALLOW_ADD_ALL_SERVICES_IN_BOOKING')) {
                 // get all services
                 $objProduct = new Product();
-                $hotelServiceProducts = $objProduct->getServiceProducts(true, Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE);
-                $roomTypeServiceProducts = $objProduct->getServiceProducts(true, Product::SELLING_PREFERENCE_WITH_ROOM_TYPE);
-                $serviceProducts = array_merge($roomTypeServiceProducts, $hotelServiceProducts);
+                $serviceProducts = array_merge(
+                    $objProduct->getServiceProducts(true, Product::SELLING_PREFERENCE_WITH_ROOM_TYPE),
+                    $objProduct->getServiceProducts(true, Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE),
+                    $objProduct->getServiceProducts(true, Product::SELLING_PREFERENCE_STANDALONE_AND_WITH_ROOM_TYPE),
+                    $objProduct->getServiceProducts(true, Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE)
+                );
             } else {
                 $objRoomTypeServiceProduct = new RoomTypeServiceProduct();
                 $serviceProducts = $objRoomTypeServiceProduct->getServiceProductsData($idProduct, 1, 0, false, 2, null);
@@ -1518,9 +1531,12 @@ class AdminCartsControllerCore extends AdminController
             if (Configuration::get('PS_ALLOW_ADD_ALL_SERVICES_IN_BOOKING')) {
                 // get all services
                 $objProduct = new Product();
-                $hotelServiceProducts = $objProduct->getServiceProducts(true, Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE);
-                $roomTypeServiceProducts = $objProduct->getServiceProducts(true, Product::SELLING_PREFERENCE_WITH_ROOM_TYPE);
-                $serviceProducts = array_merge($roomTypeServiceProducts, $hotelServiceProducts);
+                $serviceProducts = array_merge(
+                    $objProduct->getServiceProducts(true, Product::SELLING_PREFERENCE_WITH_ROOM_TYPE),
+                    $objProduct->getServiceProducts(true, Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE),
+                    $objProduct->getServiceProducts(true, Product::SELLING_PREFERENCE_STANDALONE_AND_WITH_ROOM_TYPE),
+                    $objProduct->getServiceProducts(true, Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE)
+                );
             } else {
                 $objRoomTypeServiceProduct = new RoomTypeServiceProduct();
                 $serviceProducts = $objRoomTypeServiceProduct->getServiceProductsData($objCartBookingData->id_product, 1, 0, false, 2, null);

@@ -133,10 +133,14 @@ class ProductControllerCore extends FrontController
 
         // if product is a service product then check type of selling preference
         if (!$this->product->booking_product) {
-            if ($this->product->selling_preference_type == Product::SELLING_PREFERENCE_WITH_ROOM_TYPE) {
+            if (
+                Product::isSellableWithRoomType($this->product->selling_preference_type)
+                && !Product::isSellableWithHotel($this->product->selling_preference_type)
+                && !Product::isSellableAsStandalone($this->product->selling_preference_type)
+            ) {
                 Tools::redirect($this->context->link->getPageLink('pagenotfound'));
-            } elseif ($this->product->selling_preference_type == Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE) {
-                // if selling preference is hotel standalone and with room type then check if product is associated to any hotel
+            } elseif (Product::isSellableWithHotel($this->product->selling_preference_type)) {
+                // For any hotel-sellable service product, ensure hotel associations exist.
                 $objRoomTypeServiceProduct = new RoomTypeServiceProduct();
                 $associatedHotels = $objRoomTypeServiceProduct->getAssociatedHotelsAndRoomType($this->product->id);
                 if (!isset($associatedHotels['hotel']) || !$associatedHotels['hotel']) {
@@ -879,9 +883,7 @@ class ProductControllerCore extends FrontController
         $idHotel = false
     ) {
         $smartyVars = array();
-        if (Product::SELLING_PREFERENCE_HOTEL_STANDALONE == $this->product->selling_preference_type
-            || Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE == $this->product->selling_preference_type
-        ) {
+        if (Product::isSellableWithHotel($this->product->selling_preference_type)) {
             $objRoomTypeServiceProduct = new RoomTypeServiceProduct();
 
             if ($associatedHotels = $objRoomTypeServiceProduct->getAssociatedHotelsAndRoomType($this->product->id)['hotel']) {

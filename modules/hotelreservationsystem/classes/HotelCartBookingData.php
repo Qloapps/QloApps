@@ -961,10 +961,30 @@ class HotelCartBookingData extends ObjectModel
                         if (!$product->active || (!$forAdminCart && !$product->available_for_order)) {
                             $toRemoveService = 1;
                         } else if ($checkServiceRoomLink) {
-                            if ($product->selling_preference_type == Product::SELLING_PREFERENCE_WITH_ROOM_TYPE) {
-                                // service with room type must have association with valid hotel cart booking
-                                if (Validate::isLoadedObject($objHotelCartBooking = new HotelCartBookingData($service['id_hotel_cart_booking']))) {
-                                    // check if added room type is associated with valid service product
+                            $isSellableWithRoomType = Product::isSellableWithRoomType($product->selling_preference_type);
+                            $isSellableWithHotel = Product::isSellableWithHotel($product->selling_preference_type);
+                            $isSellableAsStandalone = Product::isSellableAsStandalone($product->selling_preference_type);
+
+                            if (ServiceProductOption::productHasOptions($service['id_product'])) {
+                                $skipOptionValidation = false;
+                                if ($isSellableWithRoomType && $service['id_hotel_cart_booking']) {
+                                    // For room-linked context, keep existing behavior and avoid strict option object removal.
+                                    $skipOptionValidation = true;
+                                }
+                                if (!$skipOptionValidation
+                                    && !Validate::isLoadedObject(new ServiceProductOption($service['id_product_option']))
+                                ) {
+                                    $toRemoveService = 1;
+                                }
+                            } elseif ($service['id_product_option']) {
+                                $toRemoveService = 1;
+                            }
+
+                            if (!$toRemoveService && $service['id_hotel_cart_booking']) {
+                                // If linked with room booking, product must support room-type selling and room association.
+                                if (!$isSellableWithRoomType) {
+                                    $toRemoveService = 1;
+                                } elseif (Validate::isLoadedObject($objHotelCartBooking = new HotelCartBookingData($service['id_hotel_cart_booking']))) {
                                     $serviceAssociations = $objRoomTypeServiceProduct->getAssociatedHotelsAndRoomType(
                                         $service['id_product'],
                                         RoomTypeServiceProduct::WK_ELEMENT_TYPE_ROOM_TYPE,
@@ -978,48 +998,32 @@ class HotelCartBookingData extends ObjectModel
                                 } else {
                                     $toRemoveService = 1;
                                 }
-                            } else {
-                                if (ServiceProductOption::productHasOptions($service['id_product'])) {
-                                    if ($product->selling_preference_type == Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE
-                                        && $service['id_hotel_cart_booking']
+                            }
+
+                            if (!$toRemoveService && $service['id_hotel']) {
+                                // If linked with hotel, product must support hotel selling and hotel association.
+                                if (!$isSellableWithHotel) {
+                                    $toRemoveService = 1;
+                                } elseif (Validate::isLoadedObject(new HotelBranchInformation($service['id_hotel']))) {
+                                    $serviceAssociations = $objRoomTypeServiceProduct->getAssociatedHotelsAndRoomType(
+                                        $service['id_product'],
+                                        RoomTypeServiceProduct::WK_ELEMENT_TYPE_HOTEL,
+                                        $service['id_hotel']
+                                    );
+                                    if (!isset($serviceAssociations['hotel'])
+                                        || !in_array($service['id_hotel'], $serviceAssociations['hotel'])
                                     ) {
-                                        // do nothing if service of type SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE is added with toom type
-                                        // then we will not check for options
-                                    } elseif (!Validate::isLoadedObject(new ServiceProductOption($service['id_product_option']))) {
                                         $toRemoveService = 1;
                                     }
-                                } elseif ($service['id_product_option']) {
+                                } else {
                                     $toRemoveService = 1;
                                 }
+                            }
 
-                                if (!$toRemoveService) {
-                                    if ($product->selling_preference_type == Product::SELLING_PREFERENCE_HOTEL_STANDALONE) {
-                                        // service with hotel must have association with valid hotel
-                                        if (Validate::isLoadedObject($objHotelBranch = new HotelBranchInformation($service['id_hotel']))) {
-                                            $serviceAssociations = $objRoomTypeServiceProduct->getAssociatedHotelsAndRoomType(
-                                                $service['id_product'],
-                                                RoomTypeServiceProduct::WK_ELEMENT_TYPE_HOTEL,
-                                                $service['id_hotel']
-                                            );
-                                            if (!isset($serviceAssociations['hotel'])
-                                                || !in_array($service['id_hotel'], $serviceAssociations['hotel'])
-                                            ) {
-                                                $toRemoveService = 1;
-                                            }
-                                        } else {
-                                            $toRemoveService = 1;
-                                        }
-                                    } elseif ($product->selling_preference_type == Product::SELLING_PREFERENCE_STANDALONE) {
-                                        // Standalone product must not have any association with hotel or hotel cart booking
-                                        if ($service['id_hotel'] || $service['id_hotel_cart_booking']) {
-                                            $toRemoveService = 1;
-                                        }
-                                    } elseif ($product->selling_preference_type == Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE) {
-                                        // service with hotel or room type must have association with hotel or hotel cart booking
-                                        if (!$service['id_hotel'] && !$service['id_hotel_cart_booking']) {
-                                            $toRemoveService = 1;
-                                        }
-                                    }
+                            if (!$toRemoveService && !$service['id_hotel'] && !$service['id_hotel_cart_booking']) {
+                                // Without hotel/booking context, service must be sellable standalone.
+                                if (!$isSellableAsStandalone) {
+                                    $toRemoveService = 1;
                                 }
                             }
                         }

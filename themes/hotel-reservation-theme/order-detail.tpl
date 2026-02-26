@@ -317,14 +317,27 @@
                                     <tbody>
                                         {assign var=room_price_tax_excl value=$order->getTotalProductsWithoutTaxes(false, true)}
                                         {assign var=room_price_tax_incl value=$order->getTotalProductsWithTaxes(false, true)}
-
-                                        {assign var=room_services_price_tax_excl value=($order->getTotalProductsWithoutTaxes(false, false, Product::SELLING_PREFERENCE_WITH_ROOM_TYPE) + $total_demands_price_te)}
-                                        {assign var=room_services_price_tax_incl value=($order->getTotalProductsWithTaxes(false, false, Product::SELLING_PREFERENCE_WITH_ROOM_TYPE) + $total_demands_price_ti)}
+                                        {assign var=room_services_price_tax_excl value=(
+                                            $order->getTotalProductsWithoutTaxes(false, false, null, null, null, null, Order::SERVICE_PRODUCT_CONTEXT_ROOM_LINKED)
+                                            + $total_demands_price_te
+                                        )}
+                                        {assign var=room_services_price_tax_incl value=(
+                                            $order->getTotalProductsWithTaxes(false, false, null, null, null, null, Order::SERVICE_PRODUCT_CONTEXT_ROOM_LINKED)
+                                            + $total_demands_price_ti
+                                        )}
+                                        {assign var=all_services_price_tax_incl value=$order->getTotalProductsWithTaxes(false, false)}
+                                        {assign var=all_services_price_tax_excl value=$order->getTotalProductsWithoutTaxes(false, false)}
+                                        {assign var=room_linked_services_price_tax_incl value=$order->getTotalProductsWithTaxes(false, false, null, null, null, null, Order::SERVICE_PRODUCT_CONTEXT_ROOM_LINKED)}
+                                        {assign var=room_linked_services_price_tax_excl value=$order->getTotalProductsWithoutTaxes(false, false, null, null, null, null, Order::SERVICE_PRODUCT_CONTEXT_ROOM_LINKED)}
 
                                         {assign var=total_tax_without_discount value=(($room_price_tax_incl - $room_price_tax_excl) + ($room_services_price_tax_incl - $room_services_price_tax_excl ))}
 
-                                        {assign var=total_standard_products_tax_incl value=($order->getTotalProductsWithTaxes(false, false, Product::SELLING_PREFERENCE_STANDALONE) + $order->getTotalProductsWithTaxes(false, false, Product::SELLING_PREFERENCE_HOTEL_STANDALONE))}
-                                        {assign var=total_standard_products_tax_excl value=($order->getTotalProductsWithoutTaxes(false, false, Product::SELLING_PREFERENCE_STANDALONE) + $order->getTotalProductsWithoutTaxes(false, false, Product::SELLING_PREFERENCE_HOTEL_STANDALONE))}
+                                        {assign var=total_standard_products_tax_incl value=(
+                                            $all_services_price_tax_incl - $room_linked_services_price_tax_incl
+                                        )}
+                                        {assign var=total_standard_products_tax_excl value=(
+                                            $all_services_price_tax_excl - $room_linked_services_price_tax_excl
+                                        )}
                                         {if isset($cart_htl_data) && $cart_htl_data}
                                             <tr>
                                                 <td>{l s='Total rooms cost'} {if $use_taxes && $display_tax_label == 1}{if $priceDisplay == 1}{l s='(tax excl.)'}{elseif $priceDisplay == 0}{l s='(tax incl.)'}{/if} {/if}</td>
@@ -350,7 +363,7 @@
                                             </tr>
                                         {/if}
 
-                                        {if $total_convenience_fee_te || $total_convenience_fee_te}
+                                        {if $total_convenience_fee_te || $total_convenience_fee_ti}
                                              <tr class="item">
                                                 <td>{l s='Total Convenience Fees'} {if $use_taxes && $display_tax_label == 1}{if $priceDisplay == 1}{l s='(tax excl.)'}{elseif $priceDisplay == 0}{l s='(tax incl.)'}{/if}{/if}</td>
                                                 <td class="text-right">
@@ -726,11 +739,25 @@
                                         {assign var=room_price_tax_excl value=$order->getTotalProductsWithoutTaxes(false, true)}
                                         {assign var=room_price_tax_incl value=$order->getTotalProductsWithTaxes(false, true)}
 
-                                        {assign var=room_services_price_tax_excl value=($order->getTotalProductsWithoutTaxes(false, false, Product::SELLING_PREFERENCE_WITH_ROOM_TYPE) + $total_demands_price_te)}
-                                        {assign var=room_services_price_tax_incl value=($order->getTotalProductsWithTaxes(false, false, Product::SELLING_PREFERENCE_WITH_ROOM_TYPE) + $total_demands_price_ti)}
+                                        {assign var=room_services_price_tax_excl value=(
+                                            $order->getTotalProductsWithoutTaxes(false, false, null, null, null, null, Order::SERVICE_PRODUCT_CONTEXT_ROOM_LINKED)
+                                            + $total_demands_price_te
+                                        )}
+                                        {assign var=room_services_price_tax_incl value=(
+                                            $order->getTotalProductsWithTaxes(false, false, null, null, null, null, Order::SERVICE_PRODUCT_CONTEXT_ROOM_LINKED)
+                                            + $total_demands_price_ti
+                                        )}
+                                        {assign var=all_services_price_tax_incl value=$order->getTotalProductsWithTaxes(false, false)}
+                                        {assign var=all_services_price_tax_excl value=$order->getTotalProductsWithoutTaxes(false, false)}
+                                        {assign var=room_linked_services_price_tax_incl value=$order->getTotalProductsWithTaxes(false, false, null, null, null, null, Order::SERVICE_PRODUCT_CONTEXT_ROOM_LINKED)}
+                                        {assign var=room_linked_services_price_tax_excl value=$order->getTotalProductsWithoutTaxes(false, false, null, null, null, null, Order::SERVICE_PRODUCT_CONTEXT_ROOM_LINKED)}
 
-                                        {assign var=total_standard_products_tax_incl value=($order->getTotalProductsWithTaxes(false, false, Product::SELLING_PREFERENCE_STANDALONE) + $order->getTotalProductsWithTaxes(false, false, Product::SELLING_PREFERENCE_HOTEL_STANDALONE))}
-                                        {assign var=total_standard_products_tax_excl value=($order->getTotalProductsWithoutTaxes(false, false, Product::SELLING_PREFERENCE_STANDALONE) + $order->getTotalProductsWithoutTaxes(false, false, Product::SELLING_PREFERENCE_HOTEL_STANDALONE))}
+                                        {assign var=total_standard_products_tax_incl value=(
+                                            $all_services_price_tax_incl - $room_linked_services_price_tax_incl
+                                        )}
+                                        {assign var=total_standard_products_tax_excl value=(
+                                            $all_services_price_tax_excl - $room_linked_services_price_tax_excl
+                                        )}
 
                                         {assign var=total_tax_without_discount value=(($room_price_tax_incl - $room_price_tax_excl) + ($room_services_price_tax_incl - $room_services_price_tax_excl) + ($total_standard_products_tax_incl - $total_standard_products_tax_excl))}
 
@@ -759,7 +786,7 @@
                                             </tr>
                                         {/if}
 
-                                        {if $total_convenience_fee_te || $total_convenience_fee_te}
+                                        {if $total_convenience_fee_te || $total_convenience_fee_ti}
                                              <tr class="item">
                                                 <td>{l s='Total Convenience Fees'} {if $use_taxes && $display_tax_label == 1}{if $priceDisplay == 1}{l s='(tax excl.)'}{elseif $priceDisplay == 0}{l s='(tax incl.)'}{/if}{/if}</td>
                                                 <td class="text-right">

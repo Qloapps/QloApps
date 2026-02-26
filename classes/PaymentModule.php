@@ -505,6 +505,7 @@ abstract class PaymentModuleCore extends Module
             $objMail = new Mail();
             $objServiceProductCartDetail = new ServiceProductCartDetail();
             $cart_rules = $this->context->cart->getCartRules();
+
             foreach ($order_detail_list as $key => $order_detail) {
                 /** @var OrderDetail $order_detail */
 
@@ -589,10 +590,11 @@ abstract class PaymentModuleCore extends Module
                             $virtual_product &= false;
                         }
 
-                        if (!$product['booking_product']
-                            && ($product['selling_preference_type'] == Product::SELLING_PREFERENCE_STANDALONE
-                                || $product['selling_preference_type'] == Product::SELLING_PREFERENCE_HOTEL_STANDALONE
-                                || $product['selling_preference_type'] == Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE
+                        if (
+                            !$product['booking_product']
+                            && (
+                                Product::isSellableAsStandalone($product['selling_preference_type'])
+                                || Product::isSellableWithHotel($product['selling_preference_type'])
                             )
                         ) {
                             $cover_image_arr = $objProduct->getCover($product['id_product']);
@@ -964,9 +966,117 @@ abstract class PaymentModuleCore extends Module
 
                     if (!empty($normalProducts)) {
                         $objServiceProductCartDetail = new ServiceProductCartDetail();
-                        foreach($normalProducts as $product) {
+                        foreach ($normalProducts as $product) {
                             $idProduct = $product['id_product'];
-                            if (Product::SELLING_PREFERENCE_WITH_ROOM_TYPE == $product['selling_preference_type']) {
+                            $canSellWithRoomType = Product::isSellableWithRoomType($product['selling_preference_type']);
+                            $canSellWithHotel = Product::isSellableWithHotel($product['selling_preference_type']);
+                            $canSellAsStandalone = Product::isSellableAsStandalone($product['selling_preference_type']);
+
+                            if ($canSellWithRoomType || $canSellWithHotel || $canSellAsStandalone) {
+                                $idProductRoomType = null;
+                                $idProductHotel = null;
+                                if (isset($product['id_room_type']) && $product['id_room_type']) {
+                                    $idProductRoomType = $product['id_room_type'];
+                                } elseif (isset($product['id_hotel']) && $product['id_hotel']) {
+                                    $idProductHotel = $product['id_hotel'];
+                                }
+
+                                if ($serviceProducts = $objServiceProductCartDetail->getServiceProductsInCart(
+                                    $this->context->cart->id,
+                                    [],
+                                    $idProductHotel,
+                                    null,
+                                    $idProductRoomType,
+                                    $product['id_product']
+                                )) {
+                                    foreach ($serviceProducts as $serviceProduct) {
+                                        $isRoomTypeService = !empty($serviceProduct['id_hotel_cart_booking']);
+                                        $isHotelService = !$isRoomTypeService && !empty($serviceProduct['id_hotel']);
+
+                                        if ($isRoomTypeService) {
+                                            $idOrderDetail = $objBookingDetail->getPsOrderDetailIdByIdProduct(
+                                                $idProduct,
+                                                $order->id,
+                                                Product::SELLING_PREFERENCE_WITH_ROOM_TYPE
+                                            );
+                                        } elseif ($isHotelService) {
+                                            $idOrderDetail = $objBookingDetail->getPsOrderDetailIdByIdProduct(
+                                                $idProduct,
+                                                $order->id,
+                                                Product::SELLING_PREFERENCE_HOTEL_STANDALONE
+                                            );
+                                        } else {
+                                            $idOrderDetail = $objBookingDetail->getPsOrderDetailIdByIdProduct(
+                                                $idProduct,
+                                                $order->id,
+                                                Product::SELLING_PREFERENCE_STANDALONE
+                                            );
+                                        }
+
+                                        if (!$idOrderDetail) {
+                                            $idOrderDetail = $objBookingDetail->getPsOrderDetailIdByIdProduct(
+                                                $idProduct,
+                                                $order->id,
+                                                $product['selling_preference_type']
+                                            );
+                                        }
+                                        if (!$idOrderDetail) {
+                                            $idOrderDetail = $objBookingDetail->getPsOrderDetailIdByIdProduct(
+                                                $idProduct,
+                                                $order->id
+                                            );
+                                        }
+                                        if (!$idOrderDetail) {
+                                            continue;
+                                        }
+
+                                        $objServiceProductOrderDetail = new ServiceProductOrderDetail();
+                                        $objServiceProductOrderDetail->id_product = $idProduct;
+                                        $objServiceProductOrderDetail->id_order = $order->id;
+                                        $objServiceProductOrderDetail->id_order_detail = $idOrderDetail;
+                                        $objServiceProductOrderDetail->id_cart = $this->context->cart->id;
+                                        $objServiceProductOrderDetail->unit_price_tax_excl = $serviceProduct['unit_price_tax_excl'];
+                                        $objServiceProductOrderDetail->unit_price_tax_incl = $serviceProduct['unit_price_tax_incl'];
+                                        $objServiceProductOrderDetail->total_price_tax_excl = $serviceProduct['total_price_tax_excl'];
+                                        $objServiceProductOrderDetail->total_price_tax_incl = $serviceProduct['total_price_tax_incl'];
+                                        $objServiceProductOrderDetail->name = $product['name'];
+                                        $objServiceProductOrderDetail->quantity = $serviceProduct['quantity'];
+                                        $objServiceProductOrderDetail->id_product_option = $serviceProduct['id_product_option'];
+                                        $objServiceProductOrderDetail->option_name = $serviceProduct['option_name'];
+                                        if ($isHotelService) {
+                                            $objServiceProductOrderDetail->id_hotel = $serviceProduct['id_hotel'];
+                                            if (Validate::isLoadedObject(
+                                                $objHotelBranch = new HotelBranchInformation($serviceProduct['id_hotel'], $this->context->cart->id_lang)
+                                            )) {
+                                                $objServiceProductOrderDetail->hotel_name = $objHotelBranch->hotel_name;
+                                            }
+                                        } elseif ($isRoomTypeService) {
+                                            if (!Validate::isDate($serviceProduct['date_from'])
+                                                || !Validate::isDate($serviceProduct['date_to'])
+                                                || !(int) $serviceProduct['id_room_type']
+                                            ) {
+                                                continue;
+                                            }
+                                            $roomBookingDetail = $objBookingDetail->getRowByIdOrderIdProductInDateRange(
+                                                $order->id,
+                                                $serviceProduct['id_room_type'],
+                                                $serviceProduct['date_from'],
+                                                $serviceProduct['date_to'],
+                                                $serviceProduct['id_room']
+                                            );
+                                            if (empty($roomBookingDetail['id'])) {
+                                                continue;
+                                            }
+                                            $objServiceProductOrderDetail->id_htl_booking_detail = $roomBookingDetail['id'];
+                                            $objServiceProductOrderDetail->auto_added = $product['auto_add_to_cart'];
+                                        }
+                                        $objServiceProductOrderDetail->save();
+                                    }
+                                }
+                                continue;
+                            }
+
+                            if ($canSellWithRoomType && !$canSellWithHotel && !$canSellAsStandalone) {
                                 if ($roomTypeServices = $objServiceProductCartDetail->getServiceProductsInCart(
                                     $this->context->cart->id,
                                     [],
@@ -975,8 +1085,18 @@ abstract class PaymentModuleCore extends Module
                                     null,
                                     $product['id_product']
                                 )) {
-                                    $idOrderDetail = $objBookingDetail->getPsOrderDetailIdByIdProduct($idProduct, $order->id, $product['selling_preference_type']);
+                                    $idOrderDetail = $objBookingDetail->getPsOrderDetailIdByIdProduct(
+                                        $idProduct,
+                                        $order->id,
+                                        $product['selling_preference_type']
+                                    );
                                     foreach ($roomTypeServices as $roomTypeService) {
+                                        if (!Validate::isDate($roomTypeService['date_from'])
+                                            || !Validate::isDate($roomTypeService['date_to'])
+                                            || !(int) $roomTypeService['id_room_type']
+                                        ) {
+                                            continue;
+                                        }
                                         $roomBookingDetail = $objBookingDetail->getRowByIdOrderIdProductInDateRange(
                                             $order->id,
                                             $roomTypeService['id_room_type'],
@@ -984,6 +1104,9 @@ abstract class PaymentModuleCore extends Module
                                             $roomTypeService['date_to'],
                                             $roomTypeService['id_room']
                                         );
+                                        if (empty($roomBookingDetail['id'])) {
+                                            continue;
+                                        }
                                         $objServiceProductOrderDetail = new ServiceProductOrderDetail();
                                         $objServiceProductOrderDetail->id_product = $idProduct;
                                         $objServiceProductOrderDetail->id_order = $order->id;
@@ -1000,7 +1123,7 @@ abstract class PaymentModuleCore extends Module
                                         $objServiceProductOrderDetail->save();
                                     }
                                 }
-                            } elseif (Product::SELLING_PREFERENCE_HOTEL_STANDALONE == $product['selling_preference_type']) {
+                            } elseif ($canSellWithHotel && !$canSellWithRoomType && !$canSellAsStandalone) {
                                 if ($hotelProducts = $objServiceProductCartDetail->getServiceProductsInCart(
                                     $this->context->cart->id,
                                     [],
@@ -1009,7 +1132,11 @@ abstract class PaymentModuleCore extends Module
                                     null,
                                     $product['id_product']
                                 )) {
-                                    $idOrderDetail = $objBookingDetail->getPsOrderDetailIdByIdProduct($idProduct, $order->id, $product['selling_preference_type']);
+                                    $idOrderDetail = $objBookingDetail->getPsOrderDetailIdByIdProduct(
+                                        $idProduct,
+                                        $order->id,
+                                        $product['selling_preference_type']
+                                    );
                                     foreach ($hotelProducts as $hotelProduct) {
                                         $objServiceProductOrderDetail = new ServiceProductOrderDetail();
                                         $objServiceProductOrderDetail->id_product = $idProduct;
@@ -1031,10 +1158,9 @@ abstract class PaymentModuleCore extends Module
                                         }
                                         $objServiceProductOrderDetail->quantity = $hotelProduct['quantity'];
                                         $objServiceProductOrderDetail->save();
-
                                     }
                                 }
-                            } elseif (Product::SELLING_PREFERENCE_STANDALONE == $product['selling_preference_type']) {
+                            } elseif ($canSellAsStandalone && !$canSellWithRoomType && !$canSellWithHotel) {
                                 if ($standaloneProducts = $objServiceProductCartDetail->getServiceProductsInCart(
                                     $this->context->cart->id,
                                     [Product::SELLING_PREFERENCE_STANDALONE],
@@ -1043,7 +1169,11 @@ abstract class PaymentModuleCore extends Module
                                     null,
                                     $product['id_product']
                                 )) {
-                                    $idOrderDetail = $objBookingDetail->getPsOrderDetailIdByIdProduct($idProduct, $order->id, $product['selling_preference_type']);
+                                    $idOrderDetail = $objBookingDetail->getPsOrderDetailIdByIdProduct(
+                                        $idProduct,
+                                        $order->id,
+                                        $product['selling_preference_type']
+                                    );
                                     foreach ($standaloneProducts as $standaloneProduct) {
                                         $objServiceProductOrderDetail = new ServiceProductOrderDetail();
                                         $objServiceProductOrderDetail->id_product = $idProduct;
@@ -1059,10 +1189,9 @@ abstract class PaymentModuleCore extends Module
                                         $objServiceProductOrderDetail->option_name = $standaloneProduct['option_name'];
                                         $objServiceProductOrderDetail->quantity = $standaloneProduct['quantity'];
                                         $objServiceProductOrderDetail->save();
-
                                     }
                                 }
-                            } elseif (Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE == $product['selling_preference_type']) {
+                            } elseif ($canSellWithRoomType || $canSellWithHotel || $canSellAsStandalone) {
                                 $idProductRoomType = null;
                                 $idProductHotel = null;
                                 if (isset($product['id_room_type']) && $product['id_room_type']) {
@@ -1070,6 +1199,7 @@ abstract class PaymentModuleCore extends Module
                                 } elseif (isset($product['id_hotel']) && $product['id_hotel']) {
                                     $idProductHotel = $product['id_hotel'];
                                 }
+
                                 if ($serviceProducts = $objServiceProductCartDetail->getServiceProductsInCart(
                                     $this->context->cart->id,
                                     [],
@@ -1079,11 +1209,46 @@ abstract class PaymentModuleCore extends Module
                                     $product['id_product']
                                 )) {
                                     foreach ($serviceProducts as $serviceProduct) {
-                                        if ($serviceProduct['id_hotel']) {
-                                            $idOrderDetail = $objBookingDetail->getPsOrderDetailIdByIdProduct($idProduct, $order->id, Product::SELLING_PREFERENCE_HOTEL_STANDALONE);
+                                        $isRoomTypeService = !empty($serviceProduct['id_hotel_cart_booking']);
+                                        $isHotelService = !$isRoomTypeService && !empty($serviceProduct['id_hotel']);
+
+                                        if ($isRoomTypeService) {
+                                            $idOrderDetail = $objBookingDetail->getPsOrderDetailIdByIdProduct(
+                                                $idProduct,
+                                                $order->id,
+                                                Product::SELLING_PREFERENCE_WITH_ROOM_TYPE
+                                            );
+                                        } elseif ($isHotelService) {
+                                            $idOrderDetail = $objBookingDetail->getPsOrderDetailIdByIdProduct(
+                                                $idProduct,
+                                                $order->id,
+                                                Product::SELLING_PREFERENCE_HOTEL_STANDALONE
+                                            );
                                         } else {
-                                            $idOrderDetail = $objBookingDetail->getPsOrderDetailIdByIdProduct($idProduct, $order->id, Product::SELLING_PREFERENCE_WITH_ROOM_TYPE);
+                                            $idOrderDetail = $objBookingDetail->getPsOrderDetailIdByIdProduct(
+                                                $idProduct,
+                                                $order->id,
+                                                Product::SELLING_PREFERENCE_STANDALONE
+                                            );
                                         }
+
+                                        if (!$idOrderDetail) {
+                                            $idOrderDetail = $objBookingDetail->getPsOrderDetailIdByIdProduct(
+                                                $idProduct,
+                                                $order->id,
+                                                $product['selling_preference_type']
+                                            );
+                                        }
+                                        if (!$idOrderDetail) {
+                                            $idOrderDetail = $objBookingDetail->getPsOrderDetailIdByIdProduct(
+                                                $idProduct,
+                                                $order->id
+                                            );
+                                        }
+                                        if (!$idOrderDetail) {
+                                            continue;
+                                        }
+
                                         $objServiceProductOrderDetail = new ServiceProductOrderDetail();
                                         $objServiceProductOrderDetail->id_product = $idProduct;
                                         $objServiceProductOrderDetail->id_order = $order->id;
@@ -1097,14 +1262,20 @@ abstract class PaymentModuleCore extends Module
                                         $objServiceProductOrderDetail->quantity = $serviceProduct['quantity'];
                                         $objServiceProductOrderDetail->id_product_option = $serviceProduct['id_product_option'];
                                         $objServiceProductOrderDetail->option_name = $serviceProduct['option_name'];
-                                        if ($serviceProduct['id_hotel']) {
+                                        if ($isHotelService) {
                                             $objServiceProductOrderDetail->id_hotel = $serviceProduct['id_hotel'];
                                             if (Validate::isLoadedObject(
                                                 $objHotelBranch = new HotelBranchInformation($serviceProduct['id_hotel'], $this->context->cart->id_lang)
                                             )) {
                                                 $objServiceProductOrderDetail->hotel_name = $objHotelBranch->hotel_name;
                                             }
-                                        } else {
+                                        } elseif ($isRoomTypeService) {
+                                            if (!Validate::isDate($serviceProduct['date_from'])
+                                                || !Validate::isDate($serviceProduct['date_to'])
+                                                || !(int) $serviceProduct['id_room_type']
+                                            ) {
+                                                continue;
+                                            }
                                             $roomBookingDetail = $objBookingDetail->getRowByIdOrderIdProductInDateRange(
                                                 $order->id,
                                                 $serviceProduct['id_room_type'],
@@ -1112,6 +1283,9 @@ abstract class PaymentModuleCore extends Module
                                                 $serviceProduct['date_to'],
                                                 $serviceProduct['id_room']
                                             );
+                                            if (empty($roomBookingDetail['id'])) {
+                                                continue;
+                                            }
                                             $objServiceProductOrderDetail->id_htl_booking_detail = $roomBookingDetail['id'];
                                             $objServiceProductOrderDetail->auto_added = $product['auto_add_to_cart'];
                                         }

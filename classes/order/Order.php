@@ -46,6 +46,10 @@ class OrderCore extends ObjectModel
     const ORDER_COMPLETE_CANCELLATION_FLAG = 2;
     const ORDER_COMPLETE_CANCELLATION_OR_REFUND_REQUEST_FLAG = 3;
 
+
+    const SERVICE_PRODUCT_CONTEXT_ROOM_LINKED = 1;
+    const SERVICE_PRODUCT_CONTEXT_NON_ROOM    = 2;
+
     /** @var int Delivery address id */
     public $id_address_delivery;
 
@@ -613,7 +617,8 @@ class OrderCore extends ObjectModel
         $selling_preference_type = null,
         $product_auto_add = null,
         $product_price_addition_type = null,
-        $ids_order_detail = []
+        $ids_order_detail = [],
+        $service_product_context = null
     ) {
         $sql = 'SELECT *, od.`selling_preference_type` as selling_preference_type
             FROM `'._DB_PREFIX_.'order_detail` od
@@ -630,11 +635,47 @@ class OrderCore extends ObjectModel
             if (!$is_booking && $selling_preference_type !== null) {
                 $sql .= ' AND od.`selling_preference_type` = '. (int)$selling_preference_type;
             }
-            if (!$is_booking && $selling_preference_type == Product::SELLING_PREFERENCE_WITH_ROOM_TYPE && $product_auto_add !== null) {
+            if (
+                !$is_booking
+                && $selling_preference_type !== null
+                && Product::isSellableWithRoomType($selling_preference_type)
+                && $product_auto_add !== null
+            ) {
                 $sql .= ' AND od.`product_auto_add` = '. (int)$product_auto_add;
             }
-            if (!$is_booking && $selling_preference_type == Product::SELLING_PREFERENCE_WITH_ROOM_TYPE && $product_auto_add == 1 && $product_price_addition_type !== null) {
+            if (
+                !$is_booking
+                && $selling_preference_type !== null
+                && Product::isSellableWithRoomType($selling_preference_type)
+                && $product_auto_add == 1
+                && $product_price_addition_type !== null
+            ) {
                 $sql .= ' AND od.`product_price_addition_type` = '. (int)$product_price_addition_type;
+            }
+
+            if (!$is_booking && $service_product_context !== null) {
+                if ((int) $service_product_context === self::SERVICE_PRODUCT_CONTEXT_ROOM_LINKED) {
+
+                    $sql .= '
+                        AND EXISTS (
+                            SELECT 1
+                            FROM ' . _DB_PREFIX_ . 'service_product_order_detail spod
+                            WHERE spod.id_order = od.id_order
+                            AND spod.id_order_detail = od.id_order_detail
+                            AND spod.id_htl_booking_detail > 0
+                        )';
+
+                } elseif ((int) $service_product_context === self::SERVICE_PRODUCT_CONTEXT_NON_ROOM) {
+
+                    $sql .= '
+                        AND EXISTS (
+                            SELECT 1
+                            FROM ' . _DB_PREFIX_ . 'service_product_order_detail spod
+                            WHERE spod.id_order = od.id_order
+                            AND spod.id_order_detail = od.id_order_detail
+                            AND spod.id_htl_booking_detail = 0
+                        )';
+                }
             }
         }
         return Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql);
@@ -1123,11 +1164,12 @@ class OrderCore extends ObjectModel
         $selling_preference_type = null,
         $product_auto_add = null,
         $product_price_addition_type = null,
-        $ids_order_detail = []
+        $ids_order_detail = [],
+        $service_product_context = null
     ) {
         // update
         if (!$products) {
-            $products = $this->getProductsDetail($bookingProducts, $selling_preference_type, $product_auto_add, $product_price_addition_type, $ids_order_detail);
+            $products = $this->getProductsDetail($bookingProducts, $selling_preference_type, $product_auto_add, $product_price_addition_type, $ids_order_detail, $service_product_context);
         }
 
         $return = 0;
@@ -1149,11 +1191,12 @@ class OrderCore extends ObjectModel
         $selling_preference_type = null,
         $product_auto_add = null,
         $product_price_addition_type = null,
-        $ids_order_detail = []
+        $ids_order_detail = [],
+        $service_product_context = null
     ) {
         /* Retro-compatibility (now set directly on the validateOrder() method) */
         if (!$products) {
-            $products = $this->getProductsDetail($bookingProducts, $selling_preference_type, $product_auto_add, $product_price_addition_type, $ids_order_detail);
+            $products = $this->getProductsDetail($bookingProducts, $selling_preference_type, $product_auto_add, $product_price_addition_type, $ids_order_detail, $service_product_context);
         }
 
         $return = 0;
@@ -2883,13 +2926,27 @@ class OrderCore extends ObjectModel
         }
         // check hotel linked products
         $objServiceProductOrderDetail = new ServiceProductOrderDetail();
-        if ($hotelProducts = $objServiceProductOrderDetail->getServiceProductsInOrder($this->id, 0, 0, Product::SELLING_PREFERENCE_HOTEL_STANDALONE)) {
-            $res &= $this->checkList($hotelProducts, $action, false);
-            $hasRoomsOrProducts = 1;
+        $serviceProducts = array();
+        $sellingPreferenceTypes = array(
+            Product::SELLING_PREFERENCE_HOTEL_STANDALONE,
+            Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE,
+            Product::SELLING_PREFERENCE_STANDALONE,
+            Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_STANDALONE,
+            Product::SELLING_PREFERENCE_STANDALONE_AND_WITH_ROOM_TYPE,
+            Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE,
+        );
+        foreach ($sellingPreferenceTypes as $sellingPreferenceType) {
+            $serviceProducts = array_merge(
+                $serviceProducts,
+                $objServiceProductOrderDetail->getServiceProductsInOrder($this->id, 0, 0, $sellingPreferenceType)
+            );
         }
+        $serviceProducts = array_filter($serviceProducts, function ($serviceProduct) {
+            return empty($serviceProduct['id_htl_booking_detail']);
+        });
 
-        if ($standaloneProducts = $objServiceProductOrderDetail->getServiceProductsInOrder($this->id, 0, 0, Product::SELLING_PREFERENCE_STANDALONE)) {
-            $res &= $this->checkList($standaloneProducts, $action, false);
+        if ($serviceProducts) {
+            $res &= $this->checkList($serviceProducts, $action, false);
             $hasRoomsOrProducts = 1;
         }
 

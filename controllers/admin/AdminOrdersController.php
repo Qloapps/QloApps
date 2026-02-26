@@ -991,9 +991,12 @@ class AdminOrdersControllerCore extends AdminController
                 if (Configuration::get('PS_ALLOW_ADD_ALL_SERVICES_IN_BOOKING')) {
                     // get all services
                     $objProduct = new Product();
-                    $hotelServiceProducts = $objProduct->getServiceProducts(true, Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE);
-                    $roomTypeServiceProducts = $objProduct->getServiceProducts(true, Product::SELLING_PREFERENCE_WITH_ROOM_TYPE);
-                    $serviceProducts = array_merge($roomTypeServiceProducts, $hotelServiceProducts);
+                    $serviceProducts = array_merge(
+                        $objProduct->getServiceProducts(true, Product::SELLING_PREFERENCE_WITH_ROOM_TYPE),
+                        $objProduct->getServiceProducts(true, Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE),
+                        $objProduct->getServiceProducts(true, Product::SELLING_PREFERENCE_STANDALONE_AND_WITH_ROOM_TYPE),
+                        $objProduct->getServiceProducts(true, Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE)
+                    );                
                 } else {
                     $objRoomTypeServiceProduct = new RoomTypeServiceProduct();
                     $serviceProducts = $objRoomTypeServiceProduct->getServiceProductsData($idProduct, 1, 0, false, 2, null);
@@ -1121,18 +1124,35 @@ class AdminOrdersControllerCore extends AdminController
             }
 
             $refundReqProducts = $objOrderReturn->getOrderRefundRequestedProducts($objOrder->id, 0, 1, 1);
-            $hotelProducts = $objServiceProductOrderDetail->getServiceProductsInOrder($objOrder->id, 0, 0, Product::SELLING_PREFERENCE_HOTEL_STANDALONE);
-            foreach($hotelProducts as $key => $product) {
+            $serviceProducts = array();
+            $sellingPreferenceTypes = array(
+                Product::SELLING_PREFERENCE_HOTEL_STANDALONE,
+                Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE,
+                Product::SELLING_PREFERENCE_STANDALONE,
+                Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_STANDALONE,
+                Product::SELLING_PREFERENCE_STANDALONE_AND_WITH_ROOM_TYPE,
+                Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE,
+            );
+            foreach ($sellingPreferenceTypes as $sellingPreferenceType) {
+                $serviceProducts = array_merge(
+                    $serviceProducts,
+                    $objServiceProductOrderDetail->getServiceProductsInOrder($objOrder->id, 0, 0, $sellingPreferenceType)
+                );
+            }
+
+            $hotelProducts = array();
+            $standaloneProducts = array();
+            foreach ($serviceProducts as $product) {
                 if ((in_array($product['id_service_product_order_detail'], $refundReqProducts)) || $product['is_refunded']) {
-                    unset($hotelProducts[$key]);
+                    continue;
+                }
+                if (!empty($product['id_hotel'])) {
+                    $hotelProducts[] = $product;
+                } else if (!$product['id_hotel'] && !$product['id_htl_booking_detail']) {
+                    $standaloneProducts[] = $product;
                 }
             }
-            $standaloneProducts = $objServiceProductOrderDetail->getServiceProductsInOrder($objOrder->id, 0, 0, Product::SELLING_PREFERENCE_STANDALONE);
-            foreach($standaloneProducts as $key => $product) {
-                if ((in_array($product['id_service_product_order_detail'], $refundReqProducts)) || $product['is_refunded']) {
-                    unset($standaloneProducts[$key]);
-                }
-            }
+
 
             $this->context->smarty->assign(
                 array(
@@ -2400,7 +2420,20 @@ class AdminOrdersControllerCore extends AdminController
                         }
                     }
 
-                    if ($hotelProducts = $objRoomTypeServProdOrderDtl->getServiceProductsInOrder($order->id, 0, 0, Product::SELLING_PREFERENCE_HOTEL_STANDALONE)) {
+                    $hotelProducts = array();
+                    $hotelSellingTypes = array(
+                        Product::SELLING_PREFERENCE_HOTEL_STANDALONE,
+                        Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE,
+                        Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_STANDALONE,
+                        Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE,
+                    );
+                    foreach ($hotelSellingTypes as $sellingPreferenceType) {
+                        $hotelProducts = array_merge(
+                            $hotelProducts,
+                            $objRoomTypeServProdOrderDtl->getServiceProductsInOrder($order->id, 0, 0, $sellingPreferenceType)
+                        );
+                    }
+                    if ($hotelProducts && is_array($hotelProducts)) {
                         foreach ($hotelProducts as $serviceProduct) {
                             $objRoomTypeServProdOrderDtl = new ServiceProductOrderDetail($serviceProduct['id_service_product_order_detail']);
                             foreach ($fields as $field) {
@@ -2414,8 +2447,20 @@ class AdminOrdersControllerCore extends AdminController
                             $objRoomTypeServProdOrderDtl->save();
                         }
                     }
-
-                    if ($standaloneProducts = $objRoomTypeServProdOrderDtl->getServiceProductsInOrder($order->id, 0, 0, Product::SELLING_PREFERENCE_STANDALONE)) {
+                    $standaloneProducts = array();
+                    $standaloneSellingTypes = array(
+                        Product::SELLING_PREFERENCE_STANDALONE,
+                        Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_STANDALONE,
+                        Product::SELLING_PREFERENCE_STANDALONE_AND_WITH_ROOM_TYPE,
+                        Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE,
+                    );
+                    foreach ($standaloneSellingTypes as $sellingPreferenceType) {
+                        $standaloneProducts = array_merge(
+                            $standaloneProducts,
+                            $objRoomTypeServProdOrderDtl->getServiceProductsInOrder($order->id, 0, 0, $sellingPreferenceType)
+                        );
+                    }
+                    if ($standaloneProducts && is_array($standaloneProducts)) {
                         foreach ($standaloneProducts as $serviceProduct) {
                             $objRoomTypeServProdOrderDtl = new ServiceProductOrderDetail($serviceProduct['id_service_product_order_detail']);
                             foreach ($fields as $field) {
@@ -2909,9 +2954,30 @@ class AdminOrdersControllerCore extends AdminController
 
             // if order has normal products the add kpi for total products
             $objServiceProductOrderDetail = new ServiceProductOrderDetail();
-            $hotelProducts = $objServiceProductOrderDetail->getServiceProductsInOrder($objOrder->id, 0, 0, Product::SELLING_PREFERENCE_HOTEL_STANDALONE);
-            $standaloneProducts = $objServiceProductOrderDetail->getServiceProductsInOrder($objOrder->id, 0, 0, Product::SELLING_PREFERENCE_STANDALONE);
-
+            $serviceProducts = array();
+            $sellingPreferenceTypes = array(
+                Product::SELLING_PREFERENCE_HOTEL_STANDALONE,
+                Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE,
+                Product::SELLING_PREFERENCE_STANDALONE,
+                Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_STANDALONE,
+                Product::SELLING_PREFERENCE_STANDALONE_AND_WITH_ROOM_TYPE,
+                Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE,
+            );
+            foreach ($sellingPreferenceTypes as $sellingPreferenceType) {
+                $serviceProducts = array_merge(
+                    $serviceProducts,
+                    $objServiceProductOrderDetail->getServiceProductsInOrder($objOrder->id, 0, 0, $sellingPreferenceType)
+                );
+            }
+            $hotelProducts = array();
+            $standaloneProducts = array();
+            foreach ($serviceProducts as $serviceProduct) {
+                if (!empty($serviceProduct['id_hotel'])) {
+                    $hotelProducts[] = $serviceProduct;
+                } else if (!$serviceProduct['id_hotel'] &&!$serviceProduct['id_htl_booking_detail']) {
+                    $standaloneProducts[] = $serviceProduct;
+                }
+            }
             if ($hotelProducts || $standaloneProducts) {
                 $helper = new HelperKpi();
                 $helper->id = 'box-total-products';
@@ -3260,16 +3326,16 @@ class AdminOrdersControllerCore extends AdminController
             } else {
                 $product['image_link'] = $this->context->link->getImageLink($objProduct->link_rewrite, $this->context->language->iso_code.'-default', 'small_default');
             }
-            if ($product['selling_preference_type'] == Product::SELLING_PREFERENCE_HOTEL_STANDALONE) {
-                $hotelProducts = $objServiceProductOrderDetail->getServiceProductsInOrder($order->id, $product['id_order_detail'], $product['product_id'], Product::SELLING_PREFERENCE_HOTEL_STANDALONE);
-                foreach ($hotelProducts as $hotelProduct) {
-                    $orderHotelServiceProducts[] = array_merge($product, $hotelProduct);
-                }
-            }
-            if ($product['selling_preference_type'] == Product::SELLING_PREFERENCE_STANDALONE) {
-                $standaloneProducts = $objServiceProductOrderDetail->getServiceProductsInOrder($order->id, $product['id_order_detail'], $product['product_id'], Product::SELLING_PREFERENCE_STANDALONE);
-                foreach ($standaloneProducts as $standaloneProduct) {
-                    $orderStandaloneServiceProducts[] = array_merge($product, $standaloneProduct);
+            if (Product::isSellableWithHotel($product['selling_preference_type'])
+                || Product::isSellableAsStandalone($product['selling_preference_type'])
+            ) {
+                $serviceProducts = $objServiceProductOrderDetail->getServiceProductsInOrder($order->id, $product['id_order_detail'], $product['product_id']);
+                foreach ($serviceProducts as $serviceProduct) {
+                    if (!empty($serviceProduct['id_hotel']) && Product::isSellableWithHotel($product['selling_preference_type'])) {
+                        $orderHotelServiceProducts[] = array_merge($product, $serviceProduct);
+                    } elseif (!$serviceProduct['id_hotel'] && !$serviceProduct['id_htl_booking_detail'] && Product::isSellableAsStandalone($product['selling_preference_type'])) {
+                        $orderStandaloneServiceProducts[] = array_merge($product, $serviceProduct);
+                    }
                 }
             }
         }
@@ -3600,9 +3666,17 @@ class AdminOrdersControllerCore extends AdminController
 
         // send hotel standalone and standalone products
         $objProduct = new Product();
-        $hotelStandaloneProducts = $objProduct->getServiceProducts(null, Product::SELLING_PREFERENCE_HOTEL_STANDALONE);
-        $standaloneProducts = $objProduct->getServiceProducts(null, Product::SELLING_PREFERENCE_STANDALONE);
-
+        $allServiceProducts = $objProduct->getServiceProducts(null);
+        $hotelStandaloneProducts = array();
+        $standaloneProducts = array();
+        foreach ($allServiceProducts as $serviceProduct) {
+            if (Product::isSellableWithHotel($serviceProduct['selling_preference_type'])) {
+                $hotelStandaloneProducts[] = $serviceProduct;
+            }
+            if (Product::isSellableAsStandalone($serviceProduct['selling_preference_type'])) {
+                $standaloneProducts[] = $serviceProduct;
+            }
+        }
         $this->tpl_view_vars = array(
             'hotelStandaloneProducts' => $hotelStandaloneProducts,
             'standaloneProducts' => $standaloneProducts,
@@ -4145,12 +4219,25 @@ class AdminOrdersControllerCore extends AdminController
                     }
                 }
             } else {
-                if ($products = Product::searchByName(
-                    (int)$this->context->language->id,
-                    pSQL(Tools::getValue('product_search')),
-                    0,
-                    Product::SELLING_PREFERENCE_STANDALONE
-                )) {
+                $products = array();
+                $standaloneSellingPreferenceTypes = array(
+                    Product::SELLING_PREFERENCE_STANDALONE,
+                    Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_STANDALONE,
+                    Product::SELLING_PREFERENCE_STANDALONE_AND_WITH_ROOM_TYPE,
+                    Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE,
+                );
+                foreach ($standaloneSellingPreferenceTypes as $sellingPreferenceType) {
+                    if ($productsByType = Product::searchByName(
+                        (int)$this->context->language->id,
+                        pSQL(Tools::getValue('product_search')),
+                        0,
+                        $sellingPreferenceType
+                    )) {
+                        $products = array_merge($products, $productsByType);
+                    }
+                }
+                if ($products) {
+                    $products = array_values(array_column($products, null, 'id_product'));
                     $objServiceProductOption = new ServiceProductOption();
                     $idAddress = 0;
                     if (Tools::isSubmit('id_address')) {
@@ -4363,8 +4450,13 @@ class AdminOrdersControllerCore extends AdminController
             }
         }
 
-        if ($product->booking_product || Product::SELLING_PREFERENCE_WITH_ROOM_TYPE == $product->selling_preference_type) {
-            die(Tools::jsonEncode(array(
+        if ($product->booking_product
+            || (
+                Product::isSellableWithRoomType($product->selling_preference_type)
+                && !Product::isSellableWithHotel($product->selling_preference_type)
+                && !Product::isSellableAsStandalone($product->selling_preference_type)
+            )
+        ) {  die(Tools::jsonEncode(array(
                 'result' => false,
                 'error' => Tools::displayError('The product cannot be added through this method.')
             )));
@@ -5459,11 +5551,15 @@ class AdminOrdersControllerCore extends AdminController
             $response['status'] = false;
             $response['error'] = Tools::displayError('The product object cannot be loaded.');
         }  elseif ($objProduct->booking_product
-            || $objProduct->selling_preference_type == Product::SELLING_PREFERENCE_WITH_ROOM_TYPE
+            || (
+                Product::isSellableWithRoomType($objProduct->selling_preference_type)
+                && !Product::isSellableWithHotel($objProduct->selling_preference_type)
+                && !Product::isSellableAsStandalone($objProduct->selling_preference_type)
+            )
         ) {
             $response['status'] = false;
             $response['error'] = Tools::displayError('Invalid product. Please try adding any other product.');
-        } elseif ($objProduct->selling_preference_type != Product::SELLING_PREFERENCE_STANDALONE
+        } elseif (!Product::isSellableAsStandalone($objProduct->selling_preference_type)
             && (!$addressTax->id_hotel
             || !Validate::isLoadedObject($objHotel = new HotelBranchInformation($addressTax->id_hotel)))
         ) {
@@ -5563,7 +5659,10 @@ class AdminOrdersControllerCore extends AdminController
             if ($response['status']) {
                 // If product is standalone and current order is for a hotel then we have to create a new order for this product
                 $response['new_id_order'] = 0;
-                if ($objProduct->selling_preference_type == Product::SELLING_PREFERENCE_STANDALONE && $addressTax->id_hotel) {
+                if (Product::isSellableAsStandalone($objProduct->selling_preference_type)
+                    && !Product::isSellableWithHotel($objProduct->selling_preference_type)
+                    && $addressTax->id_hotel
+                ) {
                     $objPaymentModule = new BoOrder();
                     $objEmployee = new Employee($this->context->cookie->id_employee);
 
@@ -5645,8 +5744,10 @@ class AdminOrdersControllerCore extends AdminController
 
                     $objOrderDetail = new OrderDetail();
                     $cartProducts = $objCart->getProducts();
-                    if ($cartProducts[0]['selling_preference_type'] == Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE) {
+                    if (Product::isSellableWithHotel($cartProducts[0]['selling_preference_type']) && $addressTax->id_hotel) {
                         $cartProducts[0]['selling_preference_type'] = Product::SELLING_PREFERENCE_HOTEL_STANDALONE;
+                    } elseif (Product::isSellableAsStandalone($cartProducts[0]['selling_preference_type'])) {
+                        $cartProducts[0]['selling_preference_type'] = Product::SELLING_PREFERENCE_STANDALONE;
                     }
                     $objOrderDetail->createList($objOrder, $objCart, $objOrder->getCurrentOrderState(), $cartProducts, (isset($objOrderInvoice) ? $objOrderInvoice->id : 0), $useTaxes, (int)Tools::getValue('add_product_warehouse'));
 
@@ -7368,9 +7469,12 @@ class AdminOrdersControllerCore extends AdminController
             if (Configuration::get('PS_ALLOW_ADD_ALL_SERVICES_IN_BOOKING')) {
                 // get all services
                 $objProduct = new Product();
-                $hotelServiceProducts = $objProduct->getServiceProducts(true, Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE);
-                $roomTypeServiceProducts = $objProduct->getServiceProducts(true, Product::SELLING_PREFERENCE_WITH_ROOM_TYPE);
-                $serviceProducts = array_merge($roomTypeServiceProducts, $hotelServiceProducts);
+                $serviceProducts = array_merge(
+                    $objProduct->getServiceProducts(true, Product::SELLING_PREFERENCE_WITH_ROOM_TYPE),
+                    $objProduct->getServiceProducts(true, Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE),
+                    $objProduct->getServiceProducts(true, Product::SELLING_PREFERENCE_STANDALONE_AND_WITH_ROOM_TYPE),
+                    $objProduct->getServiceProducts(true, Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE)
+                );
             } else {
                 $objRoomTypeServiceProduct = new RoomTypeServiceProduct();
                 $serviceProducts = $objRoomTypeServiceProduct->getServiceProductsData($idProduct, 1, 0, false, 2, null);
@@ -7811,7 +7915,7 @@ class AdminOrdersControllerCore extends AdminController
                                     $product['total'] = $totalPriceTaxExcl;
                                     $product['total_wt'] = $totalPriceTaxIncl;
 
-                                    if ($product['selling_preference_type'] == Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE) {
+                                    if (Product::isSellableWithRoomType($product['selling_preference_type'])) {
                                         $product['selling_preference_type'] = Product::SELLING_PREFERENCE_WITH_ROOM_TYPE;
                                     }
                                 }

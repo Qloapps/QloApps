@@ -230,7 +230,7 @@
 		</script>
 	</div>
     {* Code For Standard product working *}
-	{* <div class="form-group" id="global_product_type_container">
+	<div class="form-group" id="global_product_type_container">
 		<label class="control-label col-lg-3" for="selling_preference_type">
 			<span class="label-tooltip" data-toggle="tooltip" title="{l s='Select whether this product will be sold with room type or as an standalone product'}">
 				{l s='Product selling preference'}
@@ -242,10 +242,13 @@
                 <option value="{Product::SELLING_PREFERENCE_HOTEL_STANDALONE}" {if $product->selling_preference_type == Product::SELLING_PREFERENCE_HOTEL_STANDALONE}selected="selected"{/if} >{l s='Sell with hotels'}</option>
                 <option value="{Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE}" {if $product->selling_preference_type == Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE}selected="selected"{/if} >{l s='Sell with hotels and room types'}</option>
                 <option value="{Product::SELLING_PREFERENCE_STANDALONE}" {if $product->selling_preference_type == Product::SELLING_PREFERENCE_STANDALONE}selected="selected"{/if} >{l s='Sell as standalone product'}</option>
+                <option value="{Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_STANDALONE}" {if $product->selling_preference_type == Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_STANDALONE}selected="selected"{/if} >{l s='Sell with hotels and as standalone product'}</option>
+                <option value="{Product::SELLING_PREFERENCE_STANDALONE_AND_WITH_ROOM_TYPE}" {if $product->selling_preference_type == Product::SELLING_PREFERENCE_STANDALONE_AND_WITH_ROOM_TYPE}selected="selected"{/if} >{l s='Sell with room types and as standalone product'}</option>
+                <option value="{Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE}" {if $product->selling_preference_type == Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE}selected="selected"{/if} >{l s='Sell with hotels, room types and as standalone product'}</option>
 			</select>
 		</div>
-	</div> *}
-    <div class="form-group" id="associated_hotel_tree" {if ($product->selling_preference_type != Product::SELLING_PREFERENCE_HOTEL_STANDALONE && $product->selling_preference_type != Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE)}style="display:none;"{/if}>
+	</div>
+    <div class="form-group" id="associated_hotel_tree" {if ($product->selling_preference_type != Product::SELLING_PREFERENCE_HOTEL_STANDALONE && $product->selling_preference_type != Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE && $product->selling_preference_type != Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_STANDALONE && $product->selling_preference_type != Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE)}style="display:none;"{/if}>
 		<div class="col-lg-1"><span class="pull-right">{include file="controllers/products/multishop/checkbox.tpl" field="category_box" type="category_box"}</span></div>
 		<label class="control-label col-lg-2" for="hotel_block">
 			<span class="label-tooltip" data-toggle="tooltip" title="{l s='Select hotels for which this service will be available.'}">
@@ -258,7 +261,7 @@
 			</div>
 		</div>
 	</div>
-	<div class="form-group" id="associated_hotel_rooms_tree" {if ($product->selling_preference_type != Product::SELLING_PREFERENCE_WITH_ROOM_TYPE && $product->selling_preference_type != Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE && $product->selling_preference_type != 0)}style="display:none;"{/if}>
+	<div class="form-group" id="associated_hotel_rooms_tree" {if ($product->selling_preference_type != Product::SELLING_PREFERENCE_WITH_ROOM_TYPE && $product->selling_preference_type != Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE && $product->selling_preference_type != Product::SELLING_PREFERENCE_STANDALONE_AND_WITH_ROOM_TYPE && $product->selling_preference_type != Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE && $product->selling_preference_type != 0)}style="display:none;"{/if}>
 		<div class="col-lg-1"><span class="pull-right">{include file="controllers/products/multishop/checkbox.tpl" field="category_box" type="category_box"}</span></div>
 		<label class="control-label col-lg-2" for="hotel_room_block">
 			<span class="label-tooltip" data-toggle="tooltip" title="{l s='Select room type and hotels for which this service will be available.'}">
@@ -271,7 +274,7 @@
 			</div>
 		</div>
 	</div>
-	<div class="form-group" id="auto_add_to_cart_container" {if $product->selling_preference_type != Product::SELLING_PREFERENCE_WITH_ROOM_TYPE && $product->selling_preference_type != 0}style="display:none;"{/if}>
+	<div class="form-group" id="auto_add_to_cart_container" {if $product->selling_preference_type != Product::SELLING_PREFERENCE_WITH_ROOM_TYPE && $product->selling_preference_type != Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE && $product->selling_preference_type != Product::SELLING_PREFERENCE_STANDALONE_AND_WITH_ROOM_TYPE && $product->selling_preference_type != Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE && $product->selling_preference_type != 0}style="display:none;"{/if}>
 		<label class="control-label col-lg-3" for="">
 			<span class="label-tooltip" data-toggle="tooltip" title="{l s='When enabled, this service will be added in cart for each associated Room type or Hotel when they are added in cart. Also auto added services will not be visible to customers.'}">
 				{l s='Auto add to cart this product'}
@@ -604,4 +607,73 @@
 <script type="text/javascript">
 	hideOtherLanguage({$default_form_language});
 	var missing_product_name = '{l s='Please fill product name input field' js=1}';
+	var SELLING_PREFERENCE_WITH_ROOM_TYPE = {Product::SELLING_PREFERENCE_WITH_ROOM_TYPE|intval};
+	var SELLING_PREFERENCE_HOTEL_STANDALONE = {Product::SELLING_PREFERENCE_HOTEL_STANDALONE|intval};
+	var SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE = {Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE|intval};
+	var SELLING_PREFERENCE_STANDALONE = {Product::SELLING_PREFERENCE_STANDALONE|intval};
+	var SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_STANDALONE = {Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_STANDALONE|intval};
+	var SELLING_PREFERENCE_STANDALONE_AND_WITH_ROOM_TYPE = {Product::SELLING_PREFERENCE_STANDALONE_AND_WITH_ROOM_TYPE|intval};
+	var SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE = {Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE|intval};
+
+	function toggleAssociationFieldNames(containerSelector, shouldShow)
+	{
+		var $container = $(containerSelector);
+		if (shouldShow) {
+			$container.show('fast').find('input').each(function() {
+				$(this).attr('name', $(this).attr('data-name'));
+				$(this).removeAttr('data-name');
+			});
+		} else {
+			$container.hide('fast').find('input').each(function() {
+				$(this).attr('data-name', $(this).attr('name'));
+				$(this).removeAttr('name');
+			});
+		}
+	}
+
+	function applySellingPreferenceUIState()
+	{
+		var sellingPreference = parseInt($('#selling_preference_type').val(), 10);
+		var showHotelTree = $.inArray(sellingPreference, [
+			SELLING_PREFERENCE_HOTEL_STANDALONE,
+			SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE,
+			SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_STANDALONE,
+			SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE
+		]) !== -1;
+		var showRoomTypeTree = $.inArray(sellingPreference, [
+			0,
+			SELLING_PREFERENCE_WITH_ROOM_TYPE,
+			SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE,
+			SELLING_PREFERENCE_STANDALONE_AND_WITH_ROOM_TYPE,
+			SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE
+		]) !== -1;
+		var showAutoAddToCart = $.inArray(sellingPreference, [
+			0,
+			SELLING_PREFERENCE_WITH_ROOM_TYPE,
+			SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE,
+			SELLING_PREFERENCE_STANDALONE_AND_WITH_ROOM_TYPE,
+			SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE
+		]) !== -1;
+
+		toggleAssociationFieldNames('#associated_hotel_tree', showHotelTree);
+		toggleAssociationFieldNames('#associated_hotel_rooms_tree', showRoomTypeTree);
+		if (showAutoAddToCart) {
+			$('#auto_add_to_cart_container').show('fast');
+		} else {
+			$('#auto_add_to_cart_container').hide('fast');
+			$('input[name="auto_add_to_cart"]').trigger('change');
+		}
+		$('#show_at_front_container').show('fast');
+		$('#product_options').show('fast');
+	}
+
+	$(document).on('change.sellingPreferenceExtended', '#selling_preference_type', function() {
+		applySellingPreferenceUIState();
+	});
+
+	$(function() {
+		setTimeout(function() {
+			applySellingPreferenceUIState();
+		}, 0);
+	});
 </script>

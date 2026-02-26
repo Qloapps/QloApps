@@ -180,20 +180,10 @@ class CartControllerCore extends FrontController
             }
         } else {
             $idProductOption = Tools::getValue('id_product_option', null);
-            if ($product->selling_preference_type == Product::SELLING_PREFERENCE_STANDALONE) {
-                $objServiceProductCartDetail = new ServiceProductCartDetail();
-                $result = $objServiceProductCartDetail->removeCartServiceProduct(
-                    $this->context->cart->id,
-                    $this->id_product,
-                    false,
-                    false,
-                    false,
-                    $idProductOption ? $idProductOption : null
-                );
+            $canSellWithHotel = Product::isSellableWithHotel($product->selling_preference_type);
+            $canSellStandalone = Product::isSellableAsStandalone($product->selling_preference_type);
 
-            } elseif ($product->selling_preference_type == Product::SELLING_PREFERENCE_HOTEL_STANDALONE
-                || $product->selling_preference_type == Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE
-            ) {
+            if ($canSellWithHotel && $this->id_hotel) {
                 $objServiceProductCartDetail = new ServiceProductCartDetail();
 
                 $result = $objServiceProductCartDetail->removeCartServiceProduct(
@@ -201,6 +191,16 @@ class CartControllerCore extends FrontController
                     $this->id_product,
                     false,
                     $this->id_hotel,
+                    false,
+                    $idProductOption ? $idProductOption : null
+                );
+            } elseif ($canSellStandalone) {
+                $objServiceProductCartDetail = new ServiceProductCartDetail();
+                $result = $objServiceProductCartDetail->removeCartServiceProduct(
+                    $this->context->cart->id,
+                    $this->id_product,
+                    false,
+                    false,
                     false,
                     $idProductOption ? $idProductOption : null
                 );
@@ -459,7 +459,48 @@ class CartControllerCore extends FrontController
         } else {
             $objHotelCartBookingData = new HotelCartBookingData();
             $idProductOption = Tools::getValue('id_product_option');
-            if ($product->selling_preference_type == Product::SELLING_PREFERENCE_STANDALONE) {
+            $id_hotel = (int) Tools::getValue('id_hotel');
+            $canSellWithHotel = Product::isSellableWithHotel($product->selling_preference_type);
+            $canSellStandalone = Product::isSellableAsStandalone($product->selling_preference_type);
+
+            if ($canSellWithHotel && $id_hotel) {
+                if ($operator == 'up') {
+                    $objServiceProductCartDetail = new ServiceProductCartDetail();
+                    $productCartDetail = array();
+                    if ($id_cart) {
+                        if ($cartDetail = $objServiceProductCartDetail->getServiceProductsInCart(
+                            (int) $id_cart,
+                            [$product->selling_preference_type],
+                            $id_hotel,
+                            null,
+                            null,
+                            $this->id_product
+                        )) {
+                            $productCartDetail = array_shift($cartDetail);
+                        }
+                    }
+                    if ($product->allow_multiple_quantity) {
+                        $finalQuantity = $this->qty;
+                        if (isset($productCartDetail) && $productCartDetail) {
+                            $finalQuantity += $productCartDetail['quantity'];
+                        }
+                        if ($product->max_quantity && $finalQuantity > $product->max_quantity) {
+                            $this->errors[] = Tools::displayError(sprintf('You cannot add more than %d quantity for this product in the cart.', $product->max_quantity));
+                        }
+                    } elseif ($productCartDetail) {
+                        $this->errors[] = Tools::displayError('You can only order one quantity for this product.');
+                    }
+                    if (ServiceProductOption::productHasOptions($this->id_product)) {
+                        if (!$idProductOption) {
+                            $this->errors[] = Tools::displayError('Cannot add product without a option.');
+                        } else {
+                            if (!ServiceProductOption::productHasOptions($this->id_product, $idProductOption)) {
+                                $this->errors[] = Tools::displayError('The selected option is not available.');
+                            }
+                        }
+                    }
+                }
+            } elseif ($canSellStandalone) {
                 // if can be added without room type then we can directly add product in cart.
                 if ($operator == 'up') {
                     if ($product->allow_multiple_quantity) {
@@ -493,50 +534,8 @@ class CartControllerCore extends FrontController
                         }
                     }
                 }
-            } elseif ($product->selling_preference_type == Product::SELLING_PREFERENCE_HOTEL_STANDALONE
-                || $product->selling_preference_type == Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE
-            ) {
-                $id_hotel = Tools::getValue('id_hotel');
-                if ($operator == 'up') {
-                    if ($id_hotel) {
-                        $objServiceProductCartDetail = new ServiceProductCartDetail();
-                        $productCartDetail = array();
-                        if ($id_cart) {
-                            if ($cartDetail = $objServiceProductCartDetail->getServiceProductsInCart(
-                                (int) $id_cart,
-                                [$product->selling_preference_type],
-                                $id_hotel,
-                                null,
-                                null,
-                                $this->id_product
-                            )) {
-                                $productCartDetail = array_shift($cartDetail);
-                            }
-                        }
-                        if ($product->allow_multiple_quantity) {
-                            $finalQuantity = $this->qty;
-                            if (isset($productCartDetail) && $productCartDetail) {
-                                $finalQuantity += $productCartDetail['quantity'];
-                            }
-                            if ($product->max_quantity && $finalQuantity > $product->max_quantity) {
-                                $this->errors[] = Tools::displayError(sprintf('You cannot add more than %d quantity for this product in the cart.', $product->max_quantity));
-                            }
-                        } elseif ($productCartDetail) {
-                            $this->errors[] = Tools::displayError('You can only order one quantity for this product.');
-                        }
-                        if (ServiceProductOption::productHasOptions($this->id_product)) {
-                            if (!$idProductOption) {
-                                $this->errors[] = Tools::displayError('Cannot add product without a option.');
-                            } else {
-                                if (!ServiceProductOption::productHasOptions($this->id_product, $idProductOption)) {
-                                    $this->errors[] = Tools::displayError('The selected option is not available.');
-                                }
-                            }
-                        }
-                    } else {
-                        $this->errors[] = Tools::displayError('Cannot add product without a hotel.');
-                    }
-                }
+            } elseif ($canSellWithHotel) {
+                $this->errors[] = Tools::displayError('Cannot add product without a hotel.');
             } else {
                 $this->errors[] = Tools::displayError('Can not add product without room in cart');
             }
@@ -637,8 +636,9 @@ class CartControllerCore extends FrontController
                         $availQty = $total_available_rooms + $req_rm;
                     }
                     $this->context->cookie->avail_rooms = $availQty;
-                } elseif ($product->selling_preference_type == Product::SELLING_PREFERENCE_HOTEL_STANDALONE
-                    || $product->selling_preference_type == Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE
+                } elseif (
+                    Product::isSellableWithHotel($product->selling_preference_type)
+                    && $id_hotel
                 ) {
                     $objServiceProductCartDetail = new ServiceProductCartDetail();
                     $update_quantity = $objServiceProductCartDetail->updateCartServiceProduct(
@@ -658,7 +658,7 @@ class CartControllerCore extends FrontController
                             'id_product_option' => isset($idProductOption) ? $idProductOption : null
                         ));
                     }
-                } elseif ($product->selling_preference_type == Product::SELLING_PREFERENCE_STANDALONE) {
+                } elseif (Product::isSellableAsStandalone($product->selling_preference_type)) {
                     $objServiceProductCartDetail = new ServiceProductCartDetail();
                     $update_quantity = $objServiceProductCartDetail->updateCartServiceProduct(
                         $this->context->cart->id,
