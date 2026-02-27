@@ -2748,6 +2748,10 @@ class AdminControllerCore extends Controller
 
     public function renderKpis()
     {
+        if (!Profile::getProfileKpiAccess((int)$this->context->employee->id_profile)) {
+            return '';
+        }
+
         Hook::exec('action'.$this->controller_name.'KPIListingModifier', array(
             'kpis' => &$this->kpis,
         ));

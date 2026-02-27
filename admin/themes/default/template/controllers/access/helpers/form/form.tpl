@@ -187,6 +187,39 @@
 			});
 		});
 
+		$(".changeKpiAccess").change(function(){
+			var id_profile = $(this).data('profile');
+			var enabled = $(this).is(':checked') ? 1 : 0;
+
+			$.ajax({
+				url: "{$link->getAdminLink('AdminAccess')|addslashes}",
+				cache: false,
+				data : {
+					ajaxMode: '1',
+					enabled: enabled,
+					id_profile: id_profile,
+					changeKpiAccess: '1',
+					action: 'updateKpiAccess',
+					ajax: '1',
+					token: '{getAdminToken tab='AdminAccess'}'
+				},
+				success : function(res,textStatus,jqXHR)
+				{
+					try
+					{
+						if (res == 'ok')
+							showSuccessMessage("{l s='Update successful'}");
+						else
+							showErrorMessage("{l s='Update error'}");
+					}
+					catch(e)
+					{
+						jAlert('Technical error');
+					}
+				}
+			});
+		});
+
 		// Change Accesses of hotels
 		$(".changeHotelAccess").change(function(){
 			var tout = $(this).data('rel').split('||');
@@ -292,6 +325,20 @@
 							</table>
 						</div>
 					{/if}
+					<div class="panel">
+						<h3>{l s='KPI Permission'}</h3>
+						<table class="table">
+							<thead>
+								<tr>
+									<th>{l s='Access List'}</th>
+									<th>
+										<input type="checkbox"{if $access_edit == 1} class="changeKpiAccess" data-profile="{$profile.id_profile}"{else} disabled="disabled"{/if}{if isset($kpiAccess[$profile.id_profile]) && $kpiAccess[$profile.id_profile]} checked="checked"{/if}/>
+										{l s='KPI'}
+									</th>
+								</tr>
+							</thead>
+						</table>
+					</div>
 					<div class="panel">
 						<h3>{l s='Menu'}</h3>
 						<table class="table" id="table_{$profile.id_profile}">

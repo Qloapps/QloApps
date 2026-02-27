@@ -82,7 +82,10 @@ class AdminAccessControllerCore extends AdminController
 
         $modules = array();
         $hotelAccess = array();
+        $kpiAccess = array();
         foreach ($profiles as $profile) {
+            $kpiAccess[$profile['id_profile']] = Profile::getProfileKpiAccess($profile['id_profile']);
+
             // Get modules accesses by profiles
             $modules[$profile['id_profile']] = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS('
 				SELECT ma.`id_module`, m.`name`, ma.`view`, ma.`configure`, ma.`uninstall`
@@ -129,6 +132,7 @@ class AdminAccessControllerCore extends AdminController
             'access_edit' => $this->tabAccess['edit'],
             'perms' => array('view', 'add', 'edit', 'delete'),
             'modules' => $modules,
+            'kpiAccess' => $kpiAccess,
             'link' => $this->context->link
         );
 
@@ -291,6 +295,34 @@ class AdminAccessControllerCore extends AdminController
 					WHERE `id_module` = '.(int)$id_module.'
 						AND `id_profile` = '.(int)$id_profile;
             }
+
+            $res = Db::getInstance()->execute($sql) ? 'ok' : 'error';
+
+            die($res);
+        }
+    }
+
+    public function ajaxProcessUpdateKpiAccess()
+    {
+        if (_PS_MODE_DEMO_) {
+            throw new PrestaShopException(Tools::displayError('This functionality has been disabled.'));
+        }
+        if ($this->tabAccess['edit'] !== 1) {
+            throw new PrestaShopException(Tools::displayError('You do not have permission to edit this.'));
+        }
+
+        if (Tools::isSubmit('changeKpiAccess')) {
+            if (!Profile::hasShowKpiColumn()) {
+                die('error');
+            }
+
+            $enabled = (int) Tools::getValue('enabled');
+            $id_profile = (int) Tools::getValue('id_profile');
+
+            $sql = '
+				UPDATE `'._DB_PREFIX_.'profile`
+				SET `show_kpi` = '.(int)$enabled.'
+				WHERE `id_profile` = '.(int)$id_profile;
 
             $res = Db::getInstance()->execute($sql) ? 'ok' : 'error';
 

@@ -28,6 +28,8 @@ class ProfileCore extends ObjectModel
 {
     /** @var string Name */
     public $name;
+    /** @var bool KPI visibility on AdminModules page */
+    public $show_kpi = 1;
 
     /**
      * @see ObjectModel::$definition
@@ -37,12 +39,15 @@ class ProfileCore extends ObjectModel
         'primary' => 'id_profile',
         'multilang' => true,
         'fields' => array(
+            'show_kpi' => array('type' => self::TYPE_BOOL, 'validate' => 'isBool'),
             /* Lang fields */
             'name' => array('type' => self::TYPE_STRING, 'lang' => true, 'validate' => 'isGenericName', 'required' => true, 'size' => 32),
         ),
     );
 
     protected static $_cache_accesses = array();
+    protected static $_cache_show_kpi = array();
+    protected static $_has_show_kpi_column = null;
 
     /**
     * Get all available profiles
@@ -154,5 +159,50 @@ class ProfileCore extends ObjectModel
         }
 
         return self::$_cache_accesses[$id_profile][$type];
+    }
+
+    /**
+     * Check if KPI permission column exists on profile table.
+     *
+     * @return bool
+     */
+    public static function hasShowKpiColumn()
+    {
+        if (self::$_has_show_kpi_column === null) {
+            self::$_has_show_kpi_column = Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue(
+                "SELECT `COLUMN_NAME`
+                 FROM `INFORMATION_SCHEMA`.`COLUMNS`
+                 WHERE `TABLE_SCHEMA` = DATABASE()
+                 AND `TABLE_NAME` = '" . pSQL(_DB_PREFIX_.'profile') . "'
+                 AND `COLUMN_NAME` = 'show_kpi'"
+            );
+        }
+
+        return (bool) self::$_has_show_kpi_column;
+    }
+
+    /**
+     * Return KPI visibility permission for a profile.
+     *
+     * @param int $id_profile
+     * @return bool
+     */
+    public static function getProfileKpiAccess($id_profile)
+    {
+        if ((int)$id_profile === (int)_PS_ADMIN_PROFILE_) {
+            return true;
+        }
+
+        if (!self::hasShowKpiColumn()) {
+            return true;
+        }
+
+        if (!array_key_exists((int)$id_profile, self::$_cache_show_kpi)) {
+            self::$_cache_show_kpi[(int)$id_profile] = (bool) Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue(
+                'SELECT `show_kpi` FROM `'._DB_PREFIX_.'profile` WHERE `id_profile` = '.(int)$id_profile
+            );
+        }
+
+        return self::$_cache_show_kpi[(int)$id_profile];
     }
 }

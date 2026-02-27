@@ -248,6 +248,7 @@ class AdminDashboardControllerCore extends AdminController
             'date_to' => $this->context->employee->stats_date_to,
             'id_hotel' => (int) $this->context->cookie->stats_id_hotel,
         );
+        $canDisplayKpis = Profile::getProfileKpiAccess((int)$this->context->employee->id_profile);
 
         $objHotelInfo = new HotelBranchInformation();
         $idsHotel = $objHotelInfo->getProfileAccessedHotels($this->context->employee->id_profile, 1, 1);
@@ -274,7 +275,7 @@ class AdminDashboardControllerCore extends AdminController
             'date_to' => $this->context->employee->stats_date_to,
             'id_hotel' => (int) $this->context->cookie->stats_id_hotel,
             'hotel_options' => $hotelOptions,
-            'hookDashboardTop' => Hook::exec('dashboardTop', $params),
+            'hookDashboardTop' => $canDisplayKpis ? Hook::exec('dashboardTop', $params) : '',
             'hookDashboardZoneOne' => Hook::exec('dashboardZoneOne', $params),
             'hookDashboardZoneTwo' => Hook::exec('dashboardZoneTwo', $params),
             'hookDashboardZoneThree' => Hook::exec('dashboardZoneThree', $params),

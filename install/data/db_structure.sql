@@ -1736,6 +1736,7 @@ CREATE TABLE `PREFIX_product_tag` (
 
 CREATE TABLE `PREFIX_profile` (
   `id_profile` int(10) unsigned NOT NULL auto_increment,
+  `show_kpi` tinyint(1) unsigned NOT NULL DEFAULT '1',
   PRIMARY KEY (`id_profile`)
 ) ENGINE=ENGINE_TYPE DEFAULT CHARSET=utf8 COLLATION;
 
