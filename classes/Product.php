@@ -569,8 +569,15 @@ class ProductCore extends ObjectModel
     const PRICE_ADDITION_TYPE_WITH_ROOM = 1;
     const PRICE_ADDITION_TYPE_INDEPENDENT = 2;
 
-    const PRICE_CALCULATION_METHOD_PER_BOOKING = 1;
-    const PRICE_CALCULATION_METHOD_PER_DAY = 2;
+    const PRICE_CALCULATION_METHOD_PER_DAY = 1;
+
+    const PRICE_CALCULATION_METHOD_ONLY_CHECKIN_DAY = 1;
+    const PRICE_CALCULATION_METHOD_ONLY_CHECKOUT_DAY = 2;
+    const PRICE_CALCULATION_METHOD_ONLY_DURINGSTAY_DAY = 3;
+    const PRICE_CALCULATION_METHOD_CHECKIN_DAY_AND_CHECKOUT_DAY = 4;
+    const PRICE_CALCULATION_METHOD_CHECKIN_AND_DURINGSTAY = 5;
+    const PRICE_CALCULATION_METHOD_CHECKOUT_AND_DURINGSTAY = 6;
+    const PRICE_CALCULATION_METHOD_CHECKIN_AND_CHECKOUT_AND_DURINGSTAY = 7;
 
     const STANDARD_PRODUCT_ADDRESS_PREFERENCE_CUSTOMER = 1;
     const STANDARD_PRODUCT_ADDRESS_PREFERENCE_HOTEL = 2;
@@ -6876,16 +6883,55 @@ class ProductCore extends ObjectModel
             )
         );
 
-        if (Product::getProductPriceCalculation($idProduct) == Product::PRICE_CALCULATION_METHOD_PER_DAY
-            && $dateFrom && $dateTo
-        ) {
-            $price = $price * HotelHelper::getNumberOfDays($dateFrom, $dateTo);
-        }
+        $numdays = Product::getPriceCalculationApplicableDays(
+            Product::getProductPriceCalculation($idProduct),
+            $dateFrom,
+            $dateTo
+        );
+        $price = $price * $numdays;
 
         return $price * (int)$quantity;
     }
 
 
+    public static function getPriceCalculationApplicableDays(
+        $priceCalculationMethod,
+        $dateFrom,
+        $dateTo,
+        $defaultDays = 1
+    ) {
+        if (empty($dateFrom) || empty($dateTo)) {
+            return (int) $defaultDays;
+        }
+
+        $numNights = (int) HotelHelper::getNumberOfDays($dateFrom, $dateTo);
+        if ($numNights <= 0) {
+            return (int) $defaultDays;
+        }
+
+        switch ((int) $priceCalculationMethod) {
+            case self::PRICE_CALCULATION_METHOD_ONLY_CHECKIN_DAY:
+            case self::PRICE_CALCULATION_METHOD_ONLY_CHECKOUT_DAY:
+                return 1;
+
+            case self::PRICE_CALCULATION_METHOD_ONLY_DURINGSTAY_DAY:
+                return max($numNights - 1, 1);
+
+            case self::PRICE_CALCULATION_METHOD_CHECKIN_DAY_AND_CHECKOUT_DAY:
+                return 2;
+
+            case self::PRICE_CALCULATION_METHOD_CHECKIN_AND_DURINGSTAY:
+            case self::PRICE_CALCULATION_METHOD_CHECKOUT_AND_DURINGSTAY:
+                return $numNights;
+
+            case self::PRICE_CALCULATION_METHOD_CHECKIN_AND_CHECKOUT_AND_DURINGSTAY:
+                return $numNights + 1;
+
+            default:
+                return $numNights;
+        }
+    }
+    
     public static function getSellingPreferenceChannels($sellingPreferenceType)
     {
         $channels = [

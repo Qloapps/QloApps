@@ -148,12 +148,19 @@
 																	</div>
 																</div>
 															</div>
-															<div class="col-xs-4">
-																{if ($product.show_price && !isset($restricted_country_mode)) || isset($groups)}
-																	<span class="pull-right">{if !$priceDisplay}{convertPrice price=$product.price_tax_incl}{else}{convertPrice price=$product.price_tax_exc}{/if}{if $product.price_calculation_method == Product::PRICE_CALCULATION_METHOD_PER_DAY}{l s='/Night'}{/if}</span>
+																<div class="col-xs-4">
+																	{if ($product.show_price && !isset($restricted_country_mode)) || isset($groups)}
+																		<span class="pull-right">
+																			{if !$priceDisplay}{convertPrice price=$product.price_tax_incl}{else}{convertPrice price=$product.price_tax_exc}{/if}
+																			{if Product::getPriceCalculationApplicableDays(
+																				$product.price_calculation_method,
+																				$cartRoom.date_from|default:'',
+																				$cartRoom.date_to|default:''
+																			) > 1}{l s='/Night'}{/if}
+																		</span>
 
-																{/if}
-															</div>
+																	{/if}
+																</div>
 														</div>
 													{/foreach}
 												{/if}

@@ -5434,10 +5434,11 @@ class AdminOrdersControllerCore extends AdminController
                     )) {
                         foreach ($services as $service) {
                             $insertedServiceProductIdOrderDetail = $objBookingDetail->getLastInsertedServiceIdOrderDetail($order->id, $service['id_product']);
-                            $numDays = 1;
-                            if (Product::getProductPriceCalculation($service['id_product']) == Product::PRICE_CALCULATION_METHOD_PER_DAY) {
-                                $numDays = HotelHelper::getNumberOfDays($objBookingDetail->date_from, $objBookingDetail->date_to);
-                            }
+                            $numDays = Product::getPriceCalculationApplicableDays(
+                                Product::getProductPriceCalculation($service['id_product']),
+                                $objBookingDetail->date_from,
+                                $objBookingDetail->date_to
+                            );
 
                             $totalPriceTaxExcl = Product::getServiceProductPrice(
                                 (int) $service['id_product'],
@@ -6620,9 +6621,12 @@ class AdminOrdersControllerCore extends AdminController
                 $serviceOrderDetail = new OrderDetail($service['id_order_detail']);
 
                 $cart_quantity = $service['quantity'];
-                if ($service['price_calculation_method'] == Product::PRICE_CALCULATION_METHOD_PER_DAY) {
-                    $cart_quantity = $cart_quantity * $product_quantity;
-                }
+                $serviceApplicableDays = Product::getPriceCalculationApplicableDays(
+                    $service['price_calculation_method'],
+                    $selectedAdditonalServices[$idHotelBooking]['date_from'],
+                    $selectedAdditonalServices[$idHotelBooking]['date_to']
+                );
+                $cart_quantity = $cart_quantity * $serviceApplicableDays;
                 if ($cart_quantity >= $serviceOrderDetail->product_quantity) {
                     $serviceOrderDetail->delete();
                 } else {
@@ -7806,10 +7810,11 @@ class AdminOrdersControllerCore extends AdminController
                             $this->context->cart = $cart;
                             $this->context->customer = new Customer($order->id_customer);
 
-                            $numDays = 1;
-                            if (Product::getProductPriceCalculation($service['id']) == Product::PRICE_CALCULATION_METHOD_PER_DAY) {
-                                $numDays = HotelHelper::getNumberOfDays($objHotelBookingDetail->date_from, $objHotelBookingDetail->date_to);
-                            }
+                            $numDays = Product::getPriceCalculationApplicableDays(
+                                Product::getProductPriceCalculation($service['id']),
+                                $objHotelBookingDetail->date_from,
+                                $objHotelBookingDetail->date_to
+                            );
 
                             $objRoomTypeServiceProductPrice = new RoomTypeServiceProductPrice();
                             $initialServicePrice = Product::getServiceProductPrice(
@@ -8117,10 +8122,11 @@ class AdminOrdersControllerCore extends AdminController
 
                                             $objRoomTypeServiceProductPrice = new RoomTypeServiceProductPrice();
                                             $cartProductProcessed = 1;
-                                            $numDays = 1;
-                                            if (Product::getProductPriceCalculation($objServiceProduct->id) == Product::PRICE_CALCULATION_METHOD_PER_DAY) {
-                                                $numDays = HotelHelper::getNumberOfDays($objHotelBookingDetail->date_from, $objHotelBookingDetail->date_to);
-                                            }
+                                            $numDays = Product::getPriceCalculationApplicableDays(
+                                                Product::getProductPriceCalculation($objServiceProduct->id),
+                                                $objHotelBookingDetail->date_from,
+                                                $objHotelBookingDetail->date_to
+                                            );
                                             foreach ($productList as &$product) {
                                                 // This is used to get the actual quanity of the service as it is calculated incorrectly if the service is per night
                                                 if ($idRoomTypeServProductCart = $objServiceProductCartDetail->alreadyExists(
