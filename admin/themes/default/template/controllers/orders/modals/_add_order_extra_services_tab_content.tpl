@@ -91,7 +91,11 @@
                                                             {$cartCurrency->sign}
                                                         </span>
                                                         <input class="service_cart_price_input" id="service_cart_price_{$selectedRoomServiceProduct['id']}_{$product['id_product']}" type="text" value="{$product.price_tax_exc}" name="service_price[{$product['id_product']|escape:'html':'UTF-8'}]"/>
-                                                        {if Product::PRICE_CALCULATION_METHOD_PER_DAY == $product['price_calculation_method']}
+                                                        {if Product::getPriceCalculationApplicableDays(
+                                                            $product['price_calculation_method'],
+                                                            $selectedRoomServiceProduct['date_from'],
+                                                            $selectedRoomServiceProduct['date_to']
+                                                        ) > 1}
                                                             <span class="input-group-addon">{l s='/ night'}</span>
                                                         {/if}
                                                     </div>
@@ -132,8 +136,13 @@
                     <div class="col-sm-6">
                         <label class="control-label">{l s='Price calculation method'}</label>
                         <select class="form-control" name="new_service_price_calc_method">
-                            <option value="{Product::PRICE_CALCULATION_METHOD_PER_BOOKING}">{l s='Add price once for the booking range'}</option>
-                            <option value="{Product::PRICE_CALCULATION_METHOD_PER_DAY}">{l s='Add price for each day of booking'}</option>
+                            <option value="{Product::PRICE_CALCULATION_METHOD_ONLY_CHECKIN_DAY}" >{l s='Only check-in day'}</option>
+                            <option value="{Product::PRICE_CALCULATION_METHOD_ONLY_CHECKOUT_DAY}" >{l s='Only check-out day'}</option>
+                            <option value="{Product::PRICE_CALCULATION_METHOD_ONLY_DURINGSTAY_DAY}" >{l s='Only during-stay days'}</option>
+                            <option value="{Product::PRICE_CALCULATION_METHOD_CHECKIN_DAY_AND_CHECKOUT_DAY}" >{l s='Check-in and check-out days'}</option>
+                            <option value="{Product::PRICE_CALCULATION_METHOD_CHECKIN_AND_DURINGSTAY}" >{l s='Check-in and during-stay days'}</option>
+                            <option value="{Product::PRICE_CALCULATION_METHOD_CHECKOUT_AND_DURINGSTAY}" >{l s='Check-out and during-stay days'}</option>
+                            <option value="{Product::PRICE_CALCULATION_METHOD_CHECKIN_AND_CHECKOUT_AND_DURINGSTAY}" >{l s='Check-in, check-out, and during-stay days'}</option>
                         </select>
                     </div>
                     <div class="col-sm-6">

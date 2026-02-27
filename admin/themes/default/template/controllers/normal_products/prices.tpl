@@ -206,19 +206,24 @@ $(document).ready(function () {
 		</div>
 		{if isset($pack) && $pack->isPack($product->id)}<p class="col-lg-9 col-lg-offset-3 help-block">{l s='The sum of prices of the products in the pack is %s%s%s' sprintf=[$currency->prefix,{toolsConvertPrice price=$pack->noPackPrice($product->id)|string_format:$priceDisplayPrecisionFormat},$currency->suffix]}</p>{/if}
 	</div> *}
-	<div class="form-group">
-		<label class="control-label col-lg-3" for="price_calculation_method">
-			<span class="label-tooltip" data-toggle="tooltip" title="{l s='Select whether price for this service will be added for each day of the booking or price will be added to the entire date range of the booking'}">
-				{l s='Price calculation method'}
-			<span>
-		</label>
-		<div class="col-lg-4">
-			<select name="price_calculation_method" id="price_calculation_method">
-				<option value="{Product::PRICE_CALCULATION_METHOD_PER_BOOKING}" {if $product->price_calculation_method == Product::PRICE_CALCULATION_METHOD_PER_BOOKING}selected="selected"{/if} >{l s='Add price once for the booking range'}</option>
-				<option value="{Product::PRICE_CALCULATION_METHOD_PER_DAY}" {if $product->price_calculation_method == Product::PRICE_CALCULATION_METHOD_PER_DAY}selected="selected"{/if} >{l s='Add price for each day of booking'}</option>
-			</select>
+		<div class="form-group">
+			<label class="control-label col-lg-3" for="price_calculation_method">
+				<span class="label-tooltip" data-toggle="tooltip" title="{l s='Select which booking days should be counted when calculating the service price.'}">
+					{l s='Price calculation method'}
+				<span>
+			</label>
+			<div class="col-lg-4">
+				<select name="price_calculation_method" id="price_calculation_method">
+					<option value="{Product::PRICE_CALCULATION_METHOD_ONLY_CHECKIN_DAY}" {if $product->price_calculation_method == Product::PRICE_CALCULATION_METHOD_ONLY_CHECKIN_DAY}selected="selected"{/if}>{l s='Only check-in day'}</option>
+					<option value="{Product::PRICE_CALCULATION_METHOD_ONLY_CHECKOUT_DAY}" {if $product->price_calculation_method == Product::PRICE_CALCULATION_METHOD_ONLY_CHECKOUT_DAY}selected="selected"{/if}>{l s='Only check-out day'}</option>
+					<option value="{Product::PRICE_CALCULATION_METHOD_ONLY_DURINGSTAY_DAY}" {if $product->price_calculation_method == Product::PRICE_CALCULATION_METHOD_ONLY_DURINGSTAY_DAY}selected="selected"{/if}>{l s='Only during-stay days'}</option>
+					<option value="{Product::PRICE_CALCULATION_METHOD_CHECKIN_DAY_AND_CHECKOUT_DAY}" {if $product->price_calculation_method == Product::PRICE_CALCULATION_METHOD_CHECKIN_DAY_AND_CHECKOUT_DAY}selected="selected"{/if}>{l s='Check-in and check-out days'}</option>
+					<option value="{Product::PRICE_CALCULATION_METHOD_CHECKIN_AND_DURINGSTAY}" {if $product->price_calculation_method == Product::PRICE_CALCULATION_METHOD_CHECKIN_AND_DURINGSTAY}selected="selected"{/if}>{l s='Check-in and during-stay days'}</option>
+					<option value="{Product::PRICE_CALCULATION_METHOD_CHECKOUT_AND_DURINGSTAY}" {if $product->price_calculation_method == Product::PRICE_CALCULATION_METHOD_CHECKOUT_AND_DURINGSTAY}selected="selected"{/if}>{l s='Check-out and during-stay days'}</option>
+					<option value="{Product::PRICE_CALCULATION_METHOD_CHECKIN_AND_CHECKOUT_AND_DURINGSTAY}" {if $product->price_calculation_method == Product::PRICE_CALCULATION_METHOD_CHECKIN_AND_CHECKOUT_AND_DURINGSTAY}selected="selected"{/if}>{l s='Check-in, check-out, and during-stay days'}</option>
+				</select>
+			</div>
 		</div>
-	</div>
 	{* As no use in QloApps currently so commented *}
 	{* <div class="form-group">
 		<div class="col-lg-1"><span class="pull-right">{include file="controllers/products/multishop/checkbox.tpl" field="unit_price" type="unit_price"}</span></div>

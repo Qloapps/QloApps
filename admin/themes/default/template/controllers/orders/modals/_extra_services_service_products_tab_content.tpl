@@ -82,7 +82,11 @@
                                         <div class="input-group">
                                             <span class="input-group-addon">{$currencySign}</span>
                                             <input type="text" class="form-control unit_price" value="{Tools::ps_round($service['unit_price_tax_excl'], 2)}" data-id-product="{$service['id_product']}" name="service_price[{$service['id_service_product_order_detail']}]">
-                                            {if Product::PRICE_CALCULATION_METHOD_PER_DAY == $service.price_calculation_method}
+                                            {if Product::getPriceCalculationApplicableDays(
+                                                $service.price_calculation_method,
+                                                $additionalServices['date_from'],
+                                                $additionalServices['date_to']
+                                            ) > 1}
                                                 <span class="input-group-addon">{l s='/ night'}</span>
                                             {/if}
                                         </div>
@@ -152,9 +156,13 @@
 										<div class="input-group">
 											<span class="input-group-addon">{$currencySign}</span>
 											<input type="text" class="form-control unit_price" name="service_price[{$product['id_product']|escape:'html':'UTF-8'}]" value="{$product['price_tax_exc']}" data-id-product="{$product.id_product}">
-											{if Product::PRICE_CALCULATION_METHOD_PER_DAY == $product['price_calculation_method']}
-												<span class="input-group-addon">{l s='/ night'}</span>
-											{/if}
+												{if Product::getPriceCalculationApplicableDays(
+                                                    $product['price_calculation_method'],
+                                                    $additionalServices['date_from'],
+                                                    $additionalServices['date_to']
+                                                ) > 1}
+													<span class="input-group-addon">{l s='/ night'}</span>
+												{/if}
 										</div>
 									</td>
 								</tr>
@@ -191,8 +199,13 @@
                     <div class="col-sm-6">
                         <label class="control-label">{l s='Price calculation method'}</label>
                         <select class="form-control" name="new_service_price_calc_method">
-                            <option value="{Product::PRICE_CALCULATION_METHOD_PER_BOOKING}">{l s='Add price once for the booking range'}</option>
-                            <option value="{Product::PRICE_CALCULATION_METHOD_PER_DAY}">{l s='Add price for each day of booking'}</option>
+                            <option value="{Product::PRICE_CALCULATION_METHOD_ONLY_CHECKIN_DAY}" >{l s='Only check-in day'}</option>
+                            <option value="{Product::PRICE_CALCULATION_METHOD_ONLY_CHECKOUT_DAY}" >{l s='Only check-out day'}</option>
+                            <option value="{Product::PRICE_CALCULATION_METHOD_ONLY_DURINGSTAY_DAY}" >{l s='Only during-stay days'}</option>
+                            <option value="{Product::PRICE_CALCULATION_METHOD_CHECKIN_DAY_AND_CHECKOUT_DAY}" >{l s='Check-in and check-out days'}</option>
+                            <option value="{Product::PRICE_CALCULATION_METHOD_CHECKIN_AND_DURINGSTAY}" >{l s='Check-in and during-stay days'}</option>
+                            <option value="{Product::PRICE_CALCULATION_METHOD_CHECKOUT_AND_DURINGSTAY}" >{l s='Check-out and during-stay days'}</option>
+                            <option value="{Product::PRICE_CALCULATION_METHOD_CHECKIN_AND_CHECKOUT_AND_DURINGSTAY}" >{l s='Check-in, check-out, and during-stay days'}</option>
                         </select>
                     </div>
                     <div class="col-sm-6">
@@ -286,9 +299,13 @@
                         </td>
 						<td>
 							{displayPrice price=$service['unit_price_tax_excl'] currency=$orderCurrency}
-							{if $service['price_calculation_method'] == Product::PRICE_CALCULATION_METHOD_PER_DAY}
-								{l s='/ night'}
-							{/if}
+								{if Product::getPriceCalculationApplicableDays(
+                                    $service['price_calculation_method'],
+                                    $additionalServices['date_from'],
+                                    $additionalServices['date_to']
+                                ) > 1}
+									{l s='/ night'}
+								{/if}
 						</td>
 						<td>
 							{displayPrice price=$service['total_price_tax_excl'] currency=$orderCurrency}

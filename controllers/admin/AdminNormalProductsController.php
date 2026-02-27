@@ -200,8 +200,13 @@ class AdminNormalProductsControllerCore extends AdminController
             Product::PRICE_ADDITION_TYPE_INDEPENDENT => $this->l('Convenience Fee')
         );
         $priceCalculationMethod = array(
-            Product::PRICE_CALCULATION_METHOD_PER_BOOKING => $this->l('Add price once for the booking range'),
-            Product::PRICE_CALCULATION_METHOD_PER_DAY => $this->l('Add price for each day of booking')
+            Product::PRICE_CALCULATION_METHOD_ONLY_CHECKIN_DAY => $this->l('Only check-in day'),
+            Product::PRICE_CALCULATION_METHOD_ONLY_CHECKOUT_DAY => $this->l('Only check-out day'),
+            Product::PRICE_CALCULATION_METHOD_ONLY_DURINGSTAY_DAY => $this->l('Only during-stay days'),
+            Product::PRICE_CALCULATION_METHOD_CHECKIN_DAY_AND_CHECKOUT_DAY => $this->l('Check-in and check-out days'),
+            Product::PRICE_CALCULATION_METHOD_CHECKIN_AND_DURINGSTAY => $this->l('Check-in | during-stay days'),
+            Product::PRICE_CALCULATION_METHOD_CHECKOUT_AND_DURINGSTAY => $this->l('Check-out | during-stay days'),
+            Product::PRICE_CALCULATION_METHOD_CHECKIN_AND_CHECKOUT_AND_DURINGSTAY => $this->l('Check-in | check-out | during-stay days'),
         );
 
         $this->_join .= '
@@ -222,7 +227,7 @@ class AdminNormalProductsControllerCore extends AdminController
                 LEFT JOIN `'._DB_PREFIX_.'htl_room_type` hrt ON (rsp.`id_element` = hrt.`id_product` AND rsp.`element_type` = '.(int)RoomTypeServiceProduct::WK_ELEMENT_TYPE_ROOM_TYPE.')
                 '.HotelBranchInformation::addHotelRestriction(false, 'hrt');
 
-        $this->_select .= ' IF(a.`auto_add_to_cart`, "'.$this->l('Yes').'", "'.$this->l('No').'") as auto_added, IF(a.`auto_add_to_cart`, 1, 0) as badge_success, IF(a.`show_at_front`, "'.$this->l('Yes').'", "'.$this->l('No').'") as show_at_front_txt, IF(a.`price_calculation_method` = '.(int)Product::PRICE_CALCULATION_METHOD_PER_DAY.', "'.$this->l('Per Day').'", "'.$this->l('Per Booking').'") as price_calculation_method_txt, (SELECT COUNT(hri.`id`) FROM `'._DB_PREFIX_.'htl_room_information` hri WHERE hri.`id_product` = a.`id_product`) as num_rooms, ';
+        $this->_select .= ' IF(a.`auto_add_to_cart`, "'.$this->l('Yes').'", "'.$this->l('No').'") as auto_added, IF(a.`auto_add_to_cart`, 1, 0) as badge_success, IF(a.`show_at_front`, "'.$this->l('Yes').'", "'.$this->l('No').'") as show_at_front_txt, CASE a.`price_calculation_method` WHEN '.Product::PRICE_CALCULATION_METHOD_ONLY_CHECKIN_DAY.' THEN "'.$this->l('Only check-in day').'" WHEN '.Product::PRICE_CALCULATION_METHOD_ONLY_CHECKOUT_DAY.' THEN "'.$this->l('Only check-out day').'" WHEN '.Product::PRICE_CALCULATION_METHOD_ONLY_DURINGSTAY_DAY.' THEN "'.$this->l('Only during-stay days').'" WHEN '.Product::PRICE_CALCULATION_METHOD_CHECKIN_DAY_AND_CHECKOUT_DAY.' THEN "'.$this->l('Check-in and check-out days').'" WHEN '.Product::PRICE_CALCULATION_METHOD_CHECKIN_AND_DURINGSTAY.' THEN "'.$this->l('Check-in | during-stay days').'" WHEN '.Product::PRICE_CALCULATION_METHOD_CHECKOUT_AND_DURINGSTAY.' THEN "'.$this->l('Check-out | during-stay days').'" WHEN '.Product::PRICE_CALCULATION_METHOD_CHECKIN_AND_CHECKOUT_AND_DURINGSTAY.' THEN "'.$this->l('Check-in | check-out | during-stay days').'" ELSE "'.$this->l('Only check-in day').'" END as price_calculation_method_txt, (SELECT COUNT(hri.`id`) FROM `'._DB_PREFIX_.'htl_room_information` hri WHERE hri.`id_product` = a.`id_product`) as num_rooms, ';
         $this->_select .= ' COUNT(hrt.`id_product`) as products_associated, ';
         $this->_select .= 'shop.`name` AS `shopname`, a.`id_shop_default`, ';
         $this->_select .= $alias_image.'.`id_image` AS `id_image`, cl.`name` AS `name_category`, '.$alias.'.`price`, 0 AS `price_final`, a.`is_virtual`, pd.`nb_downloadable`, sav.`quantity` AS `sav_quantity`, '.$alias.'.`active`, IF(sav.`quantity`<=0, 1, 0) AS `badge_danger`';
