@@ -1791,42 +1791,59 @@ class CartCore extends ObjectModel
                     }
 
                 } else if ($canSellWithHotel) {
-                    if ($type == Cart::ONLY_ROOM_SERVICES
-                        || $type == Cart::ONLY_CONVENIENCE_FEE
-                        || $type == Cart::ONLY_ROOM_SERVICES_WITHOUT_AUTO_ADD
-                        || $type == Cart::ONLY_ROOM_SERVICES_WITHOUT_CONVENIENCE_FEE
-                        || $type == Cart::ONLY_ROOM_SERVICES_WITH_AUTO_ADD_WITHOUT_CONVENIENCE_FEE
-                    ) {
-                        $servicePorducts = $objServiceProductCartDetail->getServiceProductsInCart(
-                            $this->id,
-                            [],
-                            0,
-                            null,
-                            null,
-                            (int)$product['id_product']
-                        );
-                    } elseif ($type == Cart::ONLY_STANDALONE_PRODUCTS) {
-                        $servicePorducts = $objServiceProductCartDetail->getServiceProductsInCart(
-                            $this->id,
-                            [],
-                            null,
-                            0,
-                            null,
-                            (int)$product['id_product']
-                        );
-                    } else {
-                        $servicePorducts = $objServiceProductCartDetail->getServiceProductsInCart(
-                            $this->id,
-                            [],
-                            0,
-                            null,
-                            null,
-                            (int)$product['id_product']
-                        );
+                    $isRoomServiceTotalType = in_array($type, array(
+                        Cart::ONLY_ROOM_SERVICES,
+                        Cart::ONLY_CONVENIENCE_FEE,
+                        Cart::ONLY_ROOM_SERVICES_WITHOUT_AUTO_ADD,
+                        Cart::ONLY_ROOM_SERVICES_WITHOUT_CONVENIENCE_FEE,
+                        Cart::ONLY_ROOM_SERVICES_WITH_AUTO_ADD_WITHOUT_CONVENIENCE_FEE,
+                    ));
+                    $id_hotel = null;
+                    $id_hotel_cart_booking = null;
+                    if ($param_product) {
+                        if (isset($product['id_hotel']) && (int)$product['id_hotel']) {
+                            $id_hotel = (int)$product['id_hotel'];
+                        }
+                        if (isset($product['id_hotel_cart_booking']) && (int)$product['id_hotel_cart_booking']) {
+                            $id_hotel_cart_booking = (int)$product['id_hotel_cart_booking'];
+                        }
                     }
+
+                    $servicePorducts = $objServiceProductCartDetail->getServiceProductsInCart(
+                        $this->id,
+                        [],
+                        null,
+                        null,
+                        null,
+                        (int)$product['id_product']
+                    );
 
                     if ($servicePorducts) {
                         foreach ($servicePorducts as $servicePorduct) {
+                            if ($param_product) {
+                                if ($id_hotel_cart_booking !== null
+                                    && (int)$servicePorduct['id_hotel_cart_booking'] !== $id_hotel_cart_booking
+                                ) {
+                                    continue;
+                                }
+                                if ($id_hotel_cart_booking === null
+                                    && $id_hotel !== null
+                                    && (
+                                        !empty($servicePorduct['id_hotel_cart_booking'])
+                                        || (int)$servicePorduct['id_hotel'] !== $id_hotel
+                                    )
+                                ) {
+                                    continue;
+                                }
+                            }
+                            if ($isRoomServiceTotalType && empty($servicePorduct['id_hotel_cart_booking'])) {
+                                continue;
+                            }
+                            if ($type == Cart::ONLY_STANDALONE_PRODUCTS
+                                && !empty($servicePorduct['id_hotel_cart_booking'])
+                            ) {
+                                continue;
+                            }
                             if ($with_taxes) {
                                 $priceAdd = $servicePorduct['total_price_tax_incl'];
                             } else {

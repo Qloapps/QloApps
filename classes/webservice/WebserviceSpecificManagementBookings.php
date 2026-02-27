@@ -1015,7 +1015,15 @@ class WebserviceSpecificManagementBookingsCore Extends ObjectModel implements We
                         }
                     }
 
-                    $serviceProductPrice = $objOrder->getTotalProductsWithTaxes(false, false, Product::SELLING_PREFERENCE_WITH_ROOM_TYPE);
+                    $serviceProductPrice = $objOrder->getTotalProductsWithTaxes(
+                        false,
+                        false,
+                        null,
+                        null,
+                        null,
+                        [],
+                        Order::SERVICE_PRODUCT_CONTEXT_ROOM_LINKED
+                    );
                     if ($demands = $objHotelBookingDemands->getExtraDemandsTaxesDetails($objOrder->id)) {
                         $demandsPrice = array_sum(array_column($demands, 'total_price_tax_excl'));
                         // Adding the tax

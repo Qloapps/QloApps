@@ -625,9 +625,9 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
             if (!$product->id || !$product->active) {
                 $this->errors[] = $this->l('This product is no longer available.');
             }
-            if ($product->booking_product || ($product->selling_preference_type != Product::SELLING_PREFERENCE_STANDALONE)) {
+            if ($product->booking_product || !Product::isSellableAsStandalone($product->selling_preference_type)) {
                 // cannot be added without room type or is a booking product.
-                $this->errors[] = $this->l('This product is either a room type or additional service and cannot be added thorugh this method.');
+                $this->errors[] = $this->l('This product is either a room type or additional service and cannot be added through this method.');
             } elseif (!$product->allow_multiple_quantity) {
                 // check if product already exists in cart.
                 if ($id_cart) {

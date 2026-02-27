@@ -286,7 +286,7 @@ class HTMLTemplateOrderSlipCore extends HTMLTemplateInvoice
         $order_detail = array_filter($this->order->products, function($v) {
             return ((isset($v['is_booking_product']) && $v['is_booking_product'])
                 || ((isset($v['product_auto_add']) && $v['product_auto_add'])
-                    && $v['selling_preference_type'] == Product::SELLING_PREFERENCE_WITH_ROOM_TYPE
+                    &&  Product::isSellableWithRoomType($v['selling_preference_type'])
                     && $v['product_price_addition_type'] == ProductCore::PRICE_ADDITION_TYPE_WITH_ROOM)
             );
         });
@@ -347,10 +347,14 @@ class HTMLTemplateOrderSlipCore extends HTMLTemplateInvoice
         // 	- 'total_amount'
         $breakdown = array();
         $order_detail = array_filter($this->order->products, function($v) {
-            return (!$v['is_booking_product'] && (
-                $v['selling_preference_type'] == Product::SELLING_PREFERENCE_STANDALONE
-                || $v['selling_preference_type'] == Product::SELLING_PREFERENCE_HOTEL_STANDALONE
-            ));
+            return (
+                !$v['is_booking_product']
+                && empty($v['id_htl_booking'])
+                && (
+                    Product::isSellableAsStandalone($v['selling_preference_type'])
+                    || Product::isSellableWithHotel($v['selling_preference_type'])
+                )
+            );
         });
 
         $details = $this->order->getProductTaxesDetails($order_detail, false);

@@ -497,7 +497,7 @@ class GuestTrackingControllerCore extends FrontController
                                     $value['avg_price_diff_tax_excl'] = abs(Tools::ps_round($value['avg_paid_unit_price_tax_excl'] - $value['product_price_tax_excl'], 6));
                                     $value['avg_price_diff_tax_incl'] = abs(Tools::ps_round($value['avg_paid_unit_price_tax_incl'] - $value['product_price_tax_incl'], 6));
                                 }
-                            } elseif ($type_value['selling_preference_type'] == Product::SELLING_PREFERENCE_WITH_ROOM_TYPE) {
+                            } elseif (Product::isSellableWithRoomType($type_value['selling_preference_type'])) {
                                 if ($type_value['product_auto_add'] && $type_value['product_price_addition_type'] == Product::PRICE_ADDITION_TYPE_INDEPENDENT) {
                                     $total_convenience_fee_ti += $objServiceProductOrderDetail->getRoomTypeServiceProducts(
                                         $idOrder,
@@ -524,7 +524,10 @@ class GuestTrackingControllerCore extends FrontController
                                         1
                                     );
                                 }
-                            } else if ($type_value['selling_preference_type'] == Product::SELLING_PREFERENCE_HOTEL_STANDALONE) {
+                            } else if (
+                                Product::isSellableWithHotel($type_value['selling_preference_type'])
+                                || Product::isSellableAsStandalone($type_value['selling_preference_type'])
+                            ) {
                                 $cover_image_arr = $product->getCover($type_value['product_id']);
 
                                 if (!empty($cover_image_arr)) {
@@ -532,21 +535,21 @@ class GuestTrackingControllerCore extends FrontController
                                 } else {
                                     $type_value['cover_img'] = $this->context->link->getImageLink($product->link_rewrite, $this->context->language->iso_code.'-default', 'small_default');
                                 }
-                                $hotelProducts = $objServiceProductOrderDetail->getServiceProductsInOrder($idOrder, $type_value['id_order_detail'], $type_value['product_id']);
-                                foreach ($hotelProducts as $hotelProduct) {
-                                    $hotelServiceProducts[] = array_merge($type_value, $hotelProduct);
-                                }
-                            } else if ($type_value['selling_preference_type'] == Product::SELLING_PREFERENCE_STANDALONE) {
-                                $cover_image_arr = $product->getCover($type_value['product_id']);
 
-                                if (!empty($cover_image_arr)) {
-                                    $type_value['cover_img'] = $this->context->link->getImageLink($product->link_rewrite, $product->id.'-'.$cover_image_arr['id_image'], 'small_default');
-                                } else {
-                                    $type_value['cover_img'] = $this->context->link->getImageLink($product->link_rewrite, $this->context->language->iso_code.'-default', 'small_default');
-                                }
-                                $standaloneProducts = $objServiceProductOrderDetail->getServiceProductsInOrder($idOrder, $type_value['id_order_detail'], $type_value['product_id']);
-                                foreach ($standaloneProducts as $standaloneProduct) {
-                                    $standaloneServiceProducts[] = array_merge($type_value, $standaloneProduct);
+                                $serviceProducts = $objServiceProductOrderDetail->getServiceProductsInOrder(
+                                    $idOrder,
+                                    $type_value['id_order_detail'],
+                                    $type_value['product_id']
+                                );
+                                foreach ($serviceProducts as $serviceProduct) {
+                                    $isStandaloneRow = empty($serviceProduct['id_hotel']) && empty($serviceProduct['id_htl_booking_detail']);
+                                    $isHotelRow = !empty($serviceProduct['id_hotel']) && empty($serviceProduct['id_htl_booking_detail']);
+
+                                    if ($isHotelRow && Product::isSellableWithHotel($type_value['selling_preference_type'])) {
+                                        $hotelServiceProducts[] = array_merge($type_value, $serviceProduct);
+                                    } elseif ($isStandaloneRow && Product::isSellableAsStandalone($type_value['selling_preference_type'])) {
+                                        $standaloneServiceProducts[] = array_merge($type_value, $serviceProduct);
+                                    }
                                 }
                             }
                         }
