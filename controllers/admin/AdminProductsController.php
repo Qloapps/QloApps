@@ -1023,7 +1023,6 @@ class AdminProductsControllerCore extends AdminController
                     if ($object->delete()) {
                         $id_category = (int)Tools::getValue('id_category');
                         $category_url = empty($id_category) ? '' : '&id_category='.(int)$id_category;
-                        PrestaShopLogger::addLog(sprintf($this->l('%s deletion', 'AdminTab', false, false), $this->className), 1, null, $this->className, (int)$object->id, true, (int)$this->context->employee->id);
                         $this->redirect_after = self::$currentIndex.'&conf=1&token='.$this->token.$category_url;
                     } else {
                         $this->errors[] = Tools::displayError('An error occurred during deletion.');
@@ -1109,9 +1108,7 @@ class AdminProductsControllerCore extends AdminController
                                 }
                             }
                             if (!count($this->errors)) {
-                                if ($product->delete()) {
-                                    PrestaShopLogger::addLog(sprintf($this->l('%s deletion', 'AdminTab', false, false), $this->className), 1, null, $this->className, (int)$product->id, true, (int)$this->context->employee->id);
-                                } else {
+                                if (!$product->delete()) {
                                     $success = false;
                                 }
                             } else {
@@ -1933,9 +1930,6 @@ class AdminProductsControllerCore extends AdminController
 
             $this->assignRoomType($this->object);
 
-            PrestaShopLogger::addLog(sprintf($this->l('%s addition', 'AdminTab', false, false), $this->className), 1, null, $this->className, (int)$this->object->id, true, (int)$this->context->employee->id);
-
-
             if (Configuration::get('PS_FORCE_ASM_NEW_PRODUCT') && Configuration::get('PS_ADVANCED_STOCK_MANAGEMENT') && $this->object->getType() != Product::PTYPE_VIRTUAL) {
                 $this->object->advanced_stock_management = 1;
                 $this->object->save();
@@ -2123,7 +2117,6 @@ class AdminProductsControllerCore extends AdminController
                         StockAvailable::setProductDependsOnStock((int)$this->object->id, $depends_on_stock, $this->context->shop->id);
                     }
 
-                    PrestaShopLogger::addLog(sprintf($this->l('%s modification', 'AdminTab', false, false), $this->className), 1, null, $this->className, (int)$this->object->id, true, (int)$this->context->employee->id);
                     if (in_array($this->context->shop->getContext(), array(Shop::CONTEXT_SHOP, Shop::CONTEXT_ALL))) {
                         if ($this->isTabSubmitted('Shipping')) {
                             // $this->addCarriers();

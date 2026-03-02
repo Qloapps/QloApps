@@ -1298,9 +1298,6 @@ class AdminControllerCore extends Controller
                     $this->redirect_after = self::$currentIndex.'&conf=1&token='.$this->token;
                 }
                 $this->errors[] = Tools::displayError('An error occurred during deletion.');
-                if ($res) {
-                    PrestaShopLogger::addLog(sprintf($this->l('%s deletion', 'AdminTab', false, false), $this->className), 1, null, $this->className, (int)$this->object->id, true, (int)$this->context->employee->id);
-                }
             }
         } else {
             $this->errors[] = Tools::displayError('An error occurred while deleting the object.').
@@ -1347,7 +1344,6 @@ class AdminControllerCore extends Controller
                 $this->errors[] = Tools::displayError('An error occurred while creating an object.').
                     ' <b>'.$this->table.' ('.Db::getInstance()->getMsgError().')</b>';
             } elseif (($_POST[$this->identifier] = $this->object->id /* voluntary do affectation here */) && $this->postImage($this->object->id) && !count($this->errors) && $this->_redirect) {
-                PrestaShopLogger::addLog(sprintf($this->l('%s addition', 'AdminTab', false, false), $this->className), 1, null, $this->className, (int)$this->object->id, true, (int)$this->context->employee->id);
                 $parent_id = (int)Tools::getValue('id_parent', 1);
                 $this->afterAdd($this->object);
                 $this->updateAssoShop($this->object->id);
@@ -1450,7 +1446,6 @@ class AdminControllerCore extends Controller
                             $this->redirect_after = self::$currentIndex.($parent_id ? '&'.$this->identifier.'='.$object->id : '').'&conf=4&token='.$this->token;
                         }
                     }
-                    PrestaShopLogger::addLog(sprintf($this->l('%s modification', 'AdminTab', false, false), $this->className), 1, null, $this->className, (int)$object->id, true, (int)$this->context->employee->id);
                 } else {
                     $this->errors[] = Tools::displayError('An error occurred while updating an object.').
                         ' <b>'.$this->table.'</b> '.Tools::displayError('(cannot load object)');
@@ -1503,15 +1498,6 @@ class AdminControllerCore extends Controller
     {
         if (Validate::isLoadedObject($object = $this->loadObject())) {
             if ($object->toggleStatus()) {
-                PrestaShopLogger::addLog(
-                    sprintf($this->l('%s status switched to %s', 'AdminTab', false, false), $this->className, $object->active ? 'enable' : 'disable'),
-                    1,
-                    null,
-                    $this->className,
-                    (int)$object->id,
-                    true,
-                    (int)$this->context->employee->id
-                );
                 $matches = array();
                 if (preg_match('/[\?|&]controller=([^&]*)/', (string)$_SERVER['HTTP_REFERER'], $matches) !== false
                     && strtolower($matches[1]) != strtolower(preg_replace('/controller/i', '', get_class($this)))) {
@@ -4070,10 +4056,7 @@ class AdminControllerCore extends Controller
                         $result = false;
                         $delete_ok = false;
                     }
-
-                    if ($delete_ok) {
-                        PrestaShopLogger::addLog(sprintf($this->l('%s deletion', 'AdminTab', false, false), $this->className), 1, null, $this->className, (int)$to_delete->id, true, (int)$this->context->employee->id);
-                    } else {
+                    if (!$delete_ok) {
                         $this->errors[] = sprintf(Tools::displayError('Can\'t delete #%d'), $id);
                     }
                 }
