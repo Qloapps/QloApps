@@ -1427,10 +1427,8 @@ abstract class PaymentModuleCore extends Module
                         // extra services
                         $additional_service_price_tax_excl = (float) $cart_booking_data['total_extra_demands_te'];
                         $additional_service_price_tax_incl = (float) $cart_booking_data['total_extra_demands_ti'];
-                        foreach ($roomRelatedSellingTypes as $sellingType) {
-                            $additional_service_price_tax_excl += $order->getTotalProductsWithoutTaxes(false, false, $sellingType, 0, Product::PRICE_ADDITION_TYPE_INDEPENDENT);
-                            $additional_service_price_tax_incl += $order->getTotalProductsWithTaxes(false, false, $sellingType, 0, Product::PRICE_ADDITION_TYPE_INDEPENDENT);
-                        }
+                        $additional_service_price_tax_excl += $order->getTotalProductsWithoutTaxes(false, false, null, 0, Product::PRICE_ADDITION_TYPE_INDEPENDENT, null, Order::SERVICE_PRODUCT_CONTEXT_ROOM_LINKED);
+                        $additional_service_price_tax_incl += $order->getTotalProductsWithTaxes(false, false, null, 0, Product::PRICE_ADDITION_TYPE_INDEPENDENT,null,Order::SERVICE_PRODUCT_CONTEXT_ROOM_LINKED);
                         $additional_service_tax = ($additional_service_price_tax_incl - $additional_service_price_tax_excl);
 
                         // convenience fee price

@@ -635,21 +635,10 @@ class OrderCore extends ObjectModel
             if (!$is_booking && $selling_preference_type !== null) {
                 $sql .= ' AND od.`selling_preference_type` = '. (int)$selling_preference_type;
             }
-            if (
-                !$is_booking
-                && $selling_preference_type !== null
-                && Product::isSellableWithRoomType($selling_preference_type)
-                && $product_auto_add !== null
-            ) {
+            if (!$is_booking && $product_auto_add !== null) {
                 $sql .= ' AND od.`product_auto_add` = '. (int)$product_auto_add;
             }
-            if (
-                !$is_booking
-                && $selling_preference_type !== null
-                && Product::isSellableWithRoomType($selling_preference_type)
-                && $product_auto_add == 1
-                && $product_price_addition_type !== null
-            ) {
+            if (!$is_booking && $product_auto_add == 1 && $product_price_addition_type !== null) {
                 $sql .= ' AND od.`product_price_addition_type` = '. (int)$product_price_addition_type;
             }
 

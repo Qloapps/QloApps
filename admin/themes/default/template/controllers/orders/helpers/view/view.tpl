@@ -902,7 +902,8 @@
                 <div class="panel panel-total">
                     <div class="table-responsive">
                         <table class="table" id="order-details-price">
-                            {* Assign order price *}
+  
+                        {* Assign order price *}
                             {if ($order->getTaxCalculationMethod() == $smarty.const.PS_TAX_EXC)}
                                 {assign var=order_product_price value=($order->total_products)}
                                 {assign var=order_discount_price value=$order->total_discounts_tax_excl}
