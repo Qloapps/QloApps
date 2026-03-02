@@ -38,7 +38,7 @@
 {/if}
 <div class="addresses clearfix">
 	<div class="row">
-		<div class="col-xs-12 col-sm-6">
+		<div class="col-12 col-sm-6">
 			<div class="address_delivery select form-group selector1">
 				<label for="id_address_delivery">{if $cart->isVirtualCart()}{l s='Choose a billing address:'}{else}{l s='Choose a delivery address:'}{/if}</label>
 				<select name="id_address_delivery" id="id_address_delivery" class="address_select form-control">
@@ -54,7 +54,7 @@
 				<label for="addressesAreEquals">{l s='Use the delivery address as the billing address.'}</label>
 			</p>
 		</div>
-		<div class="col-xs-12 col-sm-6">
+		<div class="col-12 col-sm-6">
 			<div id="address_invoice_form" class="select form-group selector1"{if $cart->id_address_invoice == $cart->id_address_delivery} style="display: none;"{/if}>
 				{if $addresses|@count > 1}
 					<label for="id_address_invoice" class="strong">{l s='Choose a billing address:'}</label>
@@ -77,11 +77,11 @@
 		</div>
 	</div> <!-- end row -->
 	<div class="row">
-		<div class="col-xs-12 col-sm-6"{if $cart->isVirtualCart()} style="display:none;"{/if}>
+		<div class="col-12 col-sm-6"{if $cart->isVirtualCart()} style="display:none;"{/if}>
 			<ul class="address item box" id="address_delivery">
 			</ul>
 		</div>
-		<div class="col-xs-12 col-sm-6">
+		<div class="col-12 col-sm-6">
 			<ul class="address alternate_item{if $cart->isVirtualCart()} full_width{/if} box" id="address_invoice">
 			</ul>
 		</div>
@@ -106,7 +106,7 @@
 					<i class="icon-chevron-left"></i>
 					{l s='Continue Shopping'}
 				</a>
-				<button type="submit" name="processAddress" class="button btn btn-default button-medium">
+				<button type="submit" name="processAddress" class="button btn btn-default btn-medium">
 					<span>{l s='Proceed to checkout'}<i class="icon-chevron-right right"></i></span>
 				</button>
 			</p>

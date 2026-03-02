@@ -81,7 +81,7 @@
                                 {l s='Hotel Details'}
                                 <div class="booking-actions-wrap">
                                     <div class="row">
-                                        <div class="col-xs-12 clearfix">
+                                        <div class="col-12 clearfix">
                                             {if $refund_allowed}
                                                 {if isset($id_cms_refund_policy) && $id_cms_refund_policy}
                                                     <a target="_blank" class="btn btn-default pull-right refund_policy_link" href="{$link->getCMSLink($id_cms_refund_policy)|escape:'html':'UTF-8'}">{l s='Refund Policies'}</a>
@@ -102,16 +102,16 @@
                                     <div class="description-list">
                                         <dl class="">
                                             <div class="row">
-                                                <dt class="col-xs-6 col-sm-3">{l s='Hotel Name'}</dt>
-                                                <dd class="col-xs-6 col-sm-3">{$obj_hotel_branch_information->hotel_name}</dd>
-                                                <dt class="col-xs-6 col-sm-3">{l s='Phone Number'}</dt>
-                                                <dd class="col-xs-6 col-sm-3">
+                                                <dt class="col-6 col-sm-3">{l s='Hotel Name'}</dt>
+                                                <dd class="col-6 col-sm-3">{$obj_hotel_branch_information->hotel_name}</dd>
+                                                <dt class="col-6 col-sm-3">{l s='Phone Number'}</dt>
+                                                <dd class="col-6 col-sm-3">
                                                     <a href="tel:{if $hotel_address_info.phone_mobile}{$hotel_address_info.phone_mobile}{else}{$hotel_address_info.phone}{/if}">
                                                         {if $hotel_address_info.phone_mobile}{$hotel_address_info.phone_mobile}{else}{$hotel_address_info.phone}{/if}
                                                     </a>
                                                 </dd>
-                                                <dt class="col-xs-6 col-sm-3">{l s='Email'}</dt>
-                                                <dd class="col-xs-6 col-sm-3">
+                                                <dt class="col-6 col-sm-3">{l s='Email'}</dt>
+                                                <dd class="col-6 col-sm-3">
                                                     <a href="mailto:{$obj_hotel_branch_information->email}" class="hotel-email">{$obj_hotel_branch_information->email}</a>
                                                 </dd>
                                                 {block name='displayOrderDetailHotelDetailsAfter'}
@@ -279,7 +279,7 @@
                                 {l s='Product Details'}
                                 <div class="booking-actions-wrap">
                                     <div class="row">
-                                        <div class="col-xs-12 clearfix">
+                                        <div class="col-12 clearfix">
                                             {if $refund_allowed}
                                                 {if !$completeRefundRequestOrCancel}
                                                     <a class="btn btn-default pull-right order_refund_request" href="#" title="{l s='Proceed to refund'}"><span>{l s='Request Cancelation'}</span></a>
@@ -609,7 +609,7 @@
                                         <div class="submit">
                                             <input type="hidden" name="id_order" value="{$order->id|intval|escape:'html':'UTF-8'}" />
                                             <input type="submit" class="unvisible" name="submitMessage" value="{l s='Send'}" />
-                                            <button type="submit" name="submitMessage" id="submitMessage" class="button btn button-medium"><span>{l s='Send'}</span></button>
+                                            <button type="submit" name="submitMessage" id="submitMessage" class="button btn btn-medium"><span>{l s='Send'}</span></button>
                                         </div>
                                     </form>
                                 {/block}
@@ -919,9 +919,9 @@
                                 <div class="card-body">
                                     <div class="errors" style="display: none;"></div>
 
-                                    <div class="col-xs-12">
+                                    <div class="col-12">
                                         <div class="row no-gutters">
-                                            <div class="col-xs-4">
+                                            <div class="col-4">
                                                 <ul class="nav nav-tabs nav-stacked">
                                                     {assign var='flag_is_first_iteration' value=true}
                                                     {if $cart_htl_data|count}
@@ -950,7 +950,7 @@
                                                     {/if}
                                                 </ul>
                                             </div>
-                                            <div class="col-xs-8">
+                                            <div class="col-8">
                                                 <div class="tab-content clearfix">
                                                     {assign var='flag_is_first_iteration' value=true}
                                                     {foreach from=$cart_htl_data key=data_k item=data_v}
@@ -958,11 +958,11 @@
                                                             <div id="room-info-tab-{$data_v.id_product}-{$rm_k}" class="tab-pane {if $flag_is_first_iteration}active{/if}">
                                                                 <div class="refund_element_summary clearfix">
                                                                     <p class="refund_element_name">{$data_v.name}</p>
-                                                                    <div class="col-xs-3">
+                                                                    <div class="col-3">
                                                                         <p>{l s='Total Rooms'}</p>
                                                                         <strong>{$rm_v.num_rm|string_format:'%02d'}</strong>
                                                                     </div>
-                                                                    <div class="col-xs-3">
+                                                                    <div class="col-3">
                                                                         <p>{l s='Cancelled Rooms'}</p>
                                                                         <strong>{($rm_v.count_cancelled + $rm_v.count_refunded)|string_format:'%02d'}</strong>
                                                                     </div>
@@ -991,10 +991,10 @@
                                                                                 <div class="extra-services-wrap clearfix">
                                                                                     {if $has_services}
                                                                                         <div class="services-wrap clearfix">
-                                                                                            <div class="col-xs-3">
+                                                                                            <div class="col-3">
                                                                                                 <strong>{l s='Services'}</strong>
                                                                                             </div>
-                                                                                            <div class="col-xs-9">
+                                                                                            <div class="col-9">
                                                                                                 {foreach from=$rm_v.additional_services[$hotel_booking_detail.id_htl_booking]['additional_services'] item=service}
                                                                                                     <span class="service">{$service.name}</span>
                                                                                                 {/foreach}
@@ -1003,10 +1003,10 @@
                                                                                     {/if}
                                                                                     {if $has_facilities}
                                                                                         <div class="facilities-wrap clearfix">
-                                                                                            <div class="col-xs-3">
+                                                                                            <div class="col-3">
                                                                                                 <strong>{l s='Facilities'}</strong>
                                                                                             </div>
-                                                                                            <div class="col-xs-9">
+                                                                                            <div class="col-9">
                                                                                                 {foreach from=$rm_v.extra_demands[$hotel_booking_detail.id_room]['extra_demands'] item=facility}
                                                                                                     <span class="facility">{$facility.name}</span>
                                                                                                 {/foreach}

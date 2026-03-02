@@ -119,7 +119,7 @@
 								<div class="row">
 
 									{block name='product_cover_image'}
-										<div id="image-block-cont" class="col-xs-12 col-sm-9 col-sm-push-3 col-md-10 col-md-push-2">
+										<div id="image-block-cont" class="col-12 col-sm-9 col-sm-push-3 col-md-10 col-md-push-2">
 											<div id="image-block" class="clearfix">
 												<!-- {if $product->new}
 													<span class="new-box">
@@ -163,7 +163,7 @@
 										</div>
 									{/block}
 									{block name='product_thumbnails'}
-										<div class="col-xs-12 col-sm-3 col-sm-pull-9 col-md-2 col-md-pull-10">
+										<div class="col-12 col-sm-3 col-sm-pull-9 col-md-2 col-md-pull-10">
 											{if isset($images) && count($images) > 0}
 												<!-- thumbnails -->
 													<div id="views_block" class="clearfix {if isset($images) && count($images) < 2}hidden{/if}">
@@ -318,7 +318,7 @@
 																	</div>
 																	<div class="room_info_content row">
 																		{foreach from=$hotel_features key=ftr_k item=ftr_v}
-																			<div class="col-sm-4 col-xs-12"><i class="icon-check small"></i> {$ftr_v|escape:'html':'UTF-8'}</div>
+																			<div class="col-sm-4 col-12"><i class="icon-check small"></i> {$ftr_v|escape:'html':'UTF-8'}</div>
 																		{/foreach}
 																	</div>
 																</div>
@@ -410,13 +410,13 @@
 																	{foreach $room_type_demands as $idGlobalDemand => $demand}
 																		<div class="row room_demand_block">
 																			{if $product->show_price && !isset($restricted_country_mode) && !$PS_CATALOG_MODE}
-																				<div class="col-xs-1">
+																				<div class="col-1">
 																					<p class="checkbox">
 																						<input value="{$idGlobalDemand|escape:'html':'UTF-8'}" type="checkbox" class="id_room_type_demand" data-id_global_demand="{$idGlobalDemand|escape:'html':'UTF-8'}" />
 																					</p>
 																				</div>
 																			{/if}
-																			<div class="col-xs-11 demand_adv_option_block">
+																			<div class="col-11 demand_adv_option_block">
 																				<p>{$demand['name']|escape:'html':'UTF-8'} {if $product->show_price && !isset($restricted_country_mode) && !$PS_CATALOG_MODE}<span class="pull-right"><span class="extra_demand_option_price">{convertPrice price = $demand['price']}</span>{if $demand['price_calc_method'] == $WK_PRICE_CALC_METHOD_EACH_DAY}{l s='/Night'}{/if}</span>{/if}</p>
 																				{if isset($demand['adv_option']) && $demand['adv_option']}
 																					<select class="id_option">

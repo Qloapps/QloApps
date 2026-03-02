@@ -83,10 +83,10 @@
 	        {math equation="(total%perLineT)" total=$smarty.foreach.supplier.total perLineT=$nbItemsPerLineTablet assign=totModuloTablet}
 	        {if $totModulo == 0}{assign var='totModulo' value=$nbItemsPerLine}{/if}
 	        {if $totModuloTablet == 0}{assign var='totModuloTablet' value=$nbItemsPerLineTablet}{/if}
-			<li class="{if $smarty.foreach.supplier.iteration%$nbItemsPerLine == 0} last-in-line{elseif $smarty.foreach.supplier.iteration%$nbItemsPerLine == 1} first-in-line{/if} {if $smarty.foreach.supplier.iteration > ($smarty.foreach.supplier.total - $totModulo)}last-line{/if} {if $smarty.foreach.supplier.iteration%$nbItemsPerLineTablet == 0}last-item-of-tablet-line{elseif $smarty.foreach.supplier.iteration%$nbItemsPerLineTablet == 1}first-item-of-tablet-line{/if} {if $smarty.foreach.supplier.iteration > ($smarty.foreach.supplier.total - $totModuloTablet)}last-tablet-line{/if}col-xs-12">
+			<li class="{if $smarty.foreach.supplier.iteration%$nbItemsPerLine == 0} last-in-line{elseif $smarty.foreach.supplier.iteration%$nbItemsPerLine == 1} first-in-line{/if} {if $smarty.foreach.supplier.iteration > ($smarty.foreach.supplier.total - $totModulo)}last-line{/if} {if $smarty.foreach.supplier.iteration%$nbItemsPerLineTablet == 0}last-item-of-tablet-line{elseif $smarty.foreach.supplier.iteration%$nbItemsPerLineTablet == 1}first-item-of-tablet-line{/if} {if $smarty.foreach.supplier.iteration > ($smarty.foreach.supplier.total - $totModuloTablet)}last-tablet-line{/if}col-12">
 				<div class="mansup-container">
 					<div class="row">
-		            	<div class="left-side col-xs-12 col-sm-3">
+		            	<div class="left-side col-12 col-sm-3">
 							<!-- logo -->
 							<div class="logo">
 								{if isset($supplier.nb_products) && $supplier.nb_products > 0}
@@ -99,7 +99,7 @@
 							</div> <!-- .logo -->
 						</div> <!-- .left-side -->
 
-						<div class="middle-side col-xs-12 col-sm-5">
+						<div class="middle-side col-12 col-sm-5">
 							<h3>
 								{if isset($supplier.nb_products) && $supplier.nb_products > 0}
 									<a class="product-name" href="{$link->getsupplierLink($supplier.id_supplier, $supplier.link_rewrite)|escape:'html':'UTF-8'}">
@@ -114,7 +114,7 @@
 							</div>
 			            </div><!-- .middle-side -->
 
-						<div class="right-side col-xs-12 col-sm-4">
+						<div class="right-side col-12 col-sm-4">
 			            	<div class="right-side-content">
 			                    <p class="product-counter">
 			                        {if isset($supplier.nb_products) && $supplier.nb_products > 0}

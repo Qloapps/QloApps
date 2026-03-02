@@ -29,7 +29,7 @@
     {l s='Sitemap'}
 </h1>
 <div id="sitemap_content" class="row">
-	<div class="col-xs-12 col-sm-6">
+	<div class="col-12 col-sm-6">
 		<div class="sitemap_block box">
     		<h3 class="page-subheading">{l s='Our offers'}</h3>
     		<ul>
@@ -61,7 +61,7 @@
     		</ul>
 	   </div>
     </div>
-    <div class="col-xs-12 col-sm-6">
+    <div class="col-12 col-sm-6">
 		<div class="sitemap_block box">
     		<h3 class="page-subheading">
                 {l s='Your Account'}
@@ -143,7 +143,7 @@
     </div>
 </div>
 <div id="listpage_content" class="row">
-	<div class="col-xs-12 col-sm-6">
+	<div class="col-12 col-sm-6">
 		<div class="categTree box">
             <h3 class="page-subheading">{l s='Categories'}</h3>
             <div class="tree_top">
@@ -162,7 +162,7 @@
             </ul>
         </div>
     </div>
-    <div class="col-xs-12 col-sm-6">
+    <div class="col-12 col-sm-6">
 		<div class="sitemap_block box">
             <h3 class="page-subheading">{l s='Pages'}</h3>
             <ul>

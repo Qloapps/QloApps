@@ -101,7 +101,7 @@
                                     {l s='Date of Birth'}
                                 </label>
                                 <div class="row">
-                                    <div class="col-xs-4">
+                                    <div class="col-4">
                                         <select name="days" id="days" class="form-control">
                                             <option value="">-</option>
                                             {foreach from=$days item=v}
@@ -109,7 +109,7 @@
                                             {/foreach}
                                         </select>
                                     </div>
-                                    <div class="col-xs-4">
+                                    <div class="col-4">
                                         {*
                                             {l s='January'}
                                             {l s='February'}
@@ -131,7 +131,7 @@
                                             {/foreach}
                                         </select>
                                     </div>
-                                    <div class="col-xs-4">
+                                    <div class="col-4">
                                         <select id="years" name="years" class="form-control">
                                             <option value="">-</option>
                                             {foreach from=$years item=v}
@@ -210,7 +210,7 @@
                             {/if}
                         {/block}
                         <div class="form-group">
-                            <button type="submit" name="submitIdentity" class="btn btn-default button button-medium">
+                            <button type="submit" name="submitIdentity" class="btn btn-default button btn-medium">
                                 <span>{l s='Save'}<i class="icon-chevron-right right"></i></span>
                             </button>
                         </div>

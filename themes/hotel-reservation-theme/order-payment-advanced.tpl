@@ -68,7 +68,7 @@
             {if $HOOK_ADVANCED_PAYMENT && !$adv_payment_empty}
                 {foreach $HOOK_ADVANCED_PAYMENT as $advanced_payment_opt_list}
                     {foreach $advanced_payment_opt_list as $paymentOption}
-                        <div class="col-xs-12 col-md-6">
+                        <div class="col-12 col-md-6">
                             <p class="payment_module pointer-box">
                                 <a class="payment_module_adv">
                                     <img class="payment_option_logo" src="{$paymentOption->getLogo()}"/>
@@ -99,7 +99,7 @@
                 {/foreach}
             </div>
             {else}
-            <div class="col-xs-12 col-md-12">
+            <div class="col-12 col-md-12">
                 <p class="alert alert-warning ">{l s='Unable to find any available payment option for your cart. Please contact us if the problem persists'}</p>
             </div>
             {/if}
@@ -134,7 +134,7 @@
                 {$override_tos_display}
             {else}
                 <div class="row">
-                    <div class="col-xs-12 col-md-12">
+                    <div class="col-12 col-md-12">
                         <h2>{l s='Terms and Conditions'}</h2>
                         <div class="box">
                             <p class="checkbox">

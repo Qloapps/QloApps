@@ -23,13 +23,13 @@
 *  International Registered Trademark & Property of PrestaShop SA
 *}
 {if isset($htmlitems) && $htmlitems}
-<div id="htmlcontent_{$hook|escape:'htmlall':'UTF-8'}"{if $hook == 'footer'} class="footer-block col-xs-12 col-sm-4"{/if}>
+<div id="htmlcontent_{$hook|escape:'htmlall':'UTF-8'}"{if $hook == 'footer'} class="footer-block col-12 col-sm-4"{/if}>
 	<ul class="htmlcontent-home clearfix row">
 		{foreach name=items from=$htmlitems item=hItem}
 			{if $hook == 'left' || $hook == 'right'}
-				<li class="htmlcontent-item-{$smarty.foreach.items.iteration|escape:'htmlall':'UTF-8'} col-xs-12">
+				<li class="htmlcontent-item-{$smarty.foreach.items.iteration|escape:'htmlall':'UTF-8'} col-12">
 			{else}
-				<li class="htmlcontent-item-{$smarty.foreach.items.iteration|escape:'htmlall':'UTF-8'} col-xs-12">
+				<li class="htmlcontent-item-{$smarty.foreach.items.iteration|escape:'htmlall':'UTF-8'} col-12">
 			{/if}
 					<!-- {if $hItem.url}
 						<a href="{$hItem.url|escape:'htmlall':'UTF-8'}" class="item-link"{if $hItem.target == 1} onclick="return !window.open(this.href);"{/if} title="{$hItem.title|escape:'htmlall':'UTF-8'}">

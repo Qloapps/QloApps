@@ -38,7 +38,7 @@
 
 		{block name='our_properties_location'}
 			{if isset($hotelLocationArray) && $hotelLocationArray && isset($displayHotelMap) && $displayHotelMap}
-				<div class="margin-top-20 margin-btm-20">
+				<div class="margin-top-20 mb-4">
 					<div class="col-12 col-sm-12" id="googleMapWrapper">
 						<div id="map"></div>
 					</div>

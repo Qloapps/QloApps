@@ -21,7 +21,7 @@
 *}
 
 <div class="booking-form card shadow p-3">
-    <div class="booking_room_fields">
+    <div>
         {block name='booking_form_content'}
             <form id="booking-form" action="" method="post">
                 {block name='product_hidden_fields'}
@@ -309,7 +309,7 @@
                                     {/block}
                                     {block name='booking_form_available_quantity'}
                                         {* {if $product->quantity <= 20}
-                                            <div class="col-xs-5 form-group text-right num_quantity_alert">
+                                            <div class="col-5 form-group text-right num_quantity_alert">
                                                 <span class="num_searched_avail_rooms">
                                                     {$product->quantity|escape:'html':'UTF-8'}
                                                 </span>

@@ -23,16 +23,16 @@
 <div class="product-detail" data-id-product="{$product.id_product}">
     <div class="row">
         {block name='order_hotel_product_image'}
-            <div class="col-xs-3 col-sm-2">
+            <div class="col-3 col-sm-2">
                 <a href="{$link->getProductLink($product.id_product)|escape:'html':'UTF-8'}" title="{$product.name|escape:'html':'UTF-8'}" target="_blank">
                     <img class="img img-responsive img-room-type" src="{$product.cover_img|escape:'html':'UTF-8'}" />
                 </a>
             </div>
         {/block}
         {block name='order_hotel_product_detail'}
-            <div class="col-xs-9 col-sm-10 info-wrap">
+            <div class="col-9 col-sm-10 info-wrap">
                 <div class="row">
-                    <div class="col-xs-12">
+                    <div class="col-12">
                         <a href="{$link->getProductLink($product.id_product)|escape:'html':'UTF-8'}" title="{$product.name|escape:'html':'UTF-8'}" target="_blank" class="product-name">
                             <h3>{$product.name|escape:'html':'UTF-8'}{if $product.option_name} : {$product.option_name|escape:'html':'UTF-8'}{/if}</h3>
                         </a>
@@ -51,22 +51,22 @@
                             </div>
                         {/if}
                     </div>
-                    <div class="col-xs-12">
+                    <div class="col-12">
                         <div class="description-list">
                             <dl class="">
                                 <div class="row">
                                     {if $product.allow_multiple_quantity}
-                                        <div class="col-xs-12 col-md-6">
+                                        <div class="col-12 col-md-6">
                                             <div class="row">
-                                                <dt class="col-xs-5">{l s='Quantity'}</dt>
-                                                <dd class="col-xs-7">{$product.quantity}</dd>
+                                                <dt class="col-5">{l s='Quantity'}</dt>
+                                                <dd class="col-7">{$product.quantity}</dd>
                                             </div>
                                         </div>
                                     {/if}
-                                    <div class="col-xs-12 col-md-6">
+                                    <div class="col-12 col-md-6">
                                         <div class="row">
-                                            <dt class="col-xs-5">{l s='Unit Price'}</dt>
-                                            <dd class="col-xs-7">
+                                            <dt class="col-5">{l s='Unit Price'}</dt>
+                                            <dd class="col-7">
                                                 {if $group_use_tax}
                                                     {displayWtPriceWithCurrency price=$product.unit_price_tax_incl  currency=$currency}
                                                 {else}
@@ -78,13 +78,13 @@
                                 </div>
                                 <div class="row">
                                     {if $product.allow_multiple_quantity}
-                                        <div class="col-xs-12 col-md-6">
+                                        <div class="col-12 col-md-6">
                                         </div>
                                     {/if}
-                                    <div class="col-xs-12 col-md-6">
+                                    <div class="col-12 col-md-6">
                                         <div class="row">
-                                            <dt class="col-xs-5">{l s='Total Pricing'}</dt>
-                                            <dd class="col-xs-7">
+                                            <dt class="col-5">{l s='Total Pricing'}</dt>
+                                            <dd class="col-7">
                                                 {if $group_use_tax}
                                                     {displayWtPriceWithCurrency price=$product.total_price_tax_incl  currency=$currency}
                                                 {else}

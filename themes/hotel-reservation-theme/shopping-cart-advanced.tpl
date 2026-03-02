@@ -339,7 +339,7 @@
                         {continue}
                     {/if}
                     <tr class="cart_discount {if $discount@last}last_item{elseif $discount@first}first_item{else}item{/if}" id="cart_discount_{$discount.id_discount}">
-                        <td class="cart_discount_name" colspan="{if $PS_STOCK_MANAGEMENT}3{else}2{/if}">{$discount.name}</td>
+                        <td class="cart_discount_name voucher_txt_green" colspan="{if $PS_STOCK_MANAGEMENT}3{else}2{/if}">{$discount.name}</td>
                         <td class="cart_discount_price">
                                     <span class="price-discount">
                                     {if !$priceDisplay}{displayPrice price=$discount.value_real*-1}{else}{displayPrice price=$discount.value_tax_exc*-1}{/if}
@@ -379,7 +379,7 @@
         <i class="icon-chevron-left"></i>
         {l s='Continue shopping'}
     </a>
-    <button data-show-if-js="" style="" id="confirmOrder" type="button" class="button btn btn-default standard-checkout button-medium"><span>{l s='Order With Obligation To Pay'}</span></button>
+    <button data-show-if-js="" style="" id="confirmOrder" type="button" class="button btn btn-default standard-checkout btn-medium"><span>{l s='Order With Obligation To Pay'}</span></button>
 </p>
 
 {strip}

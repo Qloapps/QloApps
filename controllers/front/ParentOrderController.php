@@ -316,8 +316,9 @@ class ParentOrderControllerCore extends FrontController
     {
         $summary = $this->context->cart->getSummaryDetails();
         $cartProducts = $this->context->cart->getProducts();
+        $feat_img_dir = _PS_IMG_.'rf/';
         if (!empty($cartProducts)) {
-
+            $this->context->smarty->assign('feat_img_dir', $feat_img_dir);
             if ($cartBookingInfo = HotelCartBookingData::getHotelCartBookingData()) {
                 $this->context->smarty->assign('cart_htl_data', $cartBookingInfo);
             }

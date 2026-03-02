@@ -389,7 +389,7 @@
                         </a>
                     {/if}
                     {if isset($virtual_cart) && $virtual_cart || (isset($delivery_option_list) && !empty($delivery_option_list))}
-                        <button type="submit" name="processCarrier" class="button btn btn-default standard-checkout button-medium">
+                        <button type="submit" name="processCarrier" class="button btn btn-default standard-checkout btn-medium">
 							<span>
 								{l s='Proceed to checkout'}
                                 <i class="icon-chevron-right right"></i>
