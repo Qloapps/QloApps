@@ -2483,6 +2483,9 @@ class CartCore extends ObjectModel
                             )) {
                                 $array = array();
                                 foreach($selectedServiceProducts as $selectedProduct) {
+                                    if (empty($selectedProduct['id_hotel_cart_booking'])) {
+                                        continue;
+                                    }
                                     if (isset($array[$selectedProduct['id_room_type_hotel']])) {
                                         $array[$selectedProduct['id_room_type_hotel']]['total_price_tax_excl'] += $selectedProduct['total_price_tax_excl'];
                                         $array[$selectedProduct['id_room_type_hotel']]['total_price_tax_incl'] += $selectedProduct['total_price_tax_incl'];
@@ -2507,7 +2510,7 @@ class CartCore extends ObjectModel
 
                                     }
                                 }
-
+                                
                                 if ($array) {
                                     foreach($array as $selectedProduct) {
                                         $product['cart_quantity'] = $selectedProduct['quantity'];
@@ -2544,19 +2547,27 @@ class CartCore extends ObjectModel
                                 }
                             }
                         }
-                        if (Product::isSellableAsStandalone($product['selling_preference_type']) && !Product::isSellableWithRoomType($product['selling_preference_type'])) {
-                            if (!isset($standaloneProduct[$id_address])) {
-                                $standaloneProduct[$id_address] = array(
-                                    'product_list' => array(),
-                                    'warehouse_list' => $package['warehouse_list'],
-                                    'carrier_list' => $product['carrier_list'],
-                                    'id_warehouse' => $package['id_warehouse'],
-                                    'id_carrier' => isset($package['id_carrier']) ? $package['id_carrier'] : 0
-                                );
+                        if (Product::isSellableAsStandalone($product['selling_preference_type'])) { 
+                            if ($selectedServiceProducts = $objServiceProductCartDetail->getServiceProductsInCart(
+                                $this->id,
+                                [],
+                                0,
+                                0,
+                                null,
+                                (int)$product['id_product']
+                            )) {
+                                if (!isset($standaloneProduct[$id_address])) {
+                                    $standaloneProduct[$id_address] = array(
+                                        'product_list' => array(),
+                                        'warehouse_list' => $package['warehouse_list'],
+                                        'carrier_list' => $product['carrier_list'],
+                                        'id_warehouse' => $package['id_warehouse'],
+                                        'id_carrier' => isset($package['id_carrier']) ? $package['id_carrier'] : 0
+                                    );
+                                }
+                                $productinfo = $product;
+                                $standaloneProduct[$id_address]['product_list'][] = $product;
                             }
-                            $productinfo = $product;
-                        //    $productinfo['selling_preference_type'] = Product::SELLING_PREFERENCE_STANDALONE;
-                            $standaloneProduct[$id_address]['product_list'][] = $product;
                         }
 
                         if (Product::isSellableWithHotel($product['selling_preference_type'])) {
@@ -2600,7 +2611,6 @@ class CartCore extends ObjectModel
                                         // if (!empty($hotelProducts['products'])) {
                                         //     foreach($hotelProducts['products'] as $hotelProduct) {
                                         $productinfo = $serviceProduct;
-                                   //     $productinfo['selling_preference_type'] = Product::SELLING_PREFERENCE_HOTEL_STANDALONE;
                                         $orderPackage[$id_address][$hotelProduct['id_hotel']]['product_list'][] = $productinfo;
                                         if (!isset($orderPackage[$id_address][$hotelProduct['id_hotel']]['id_hotel'])) {
                                             $orderPackage[$id_address][$hotelProduct['id_hotel']]['id_hotel'] = $hotelProduct['id_hotel'];
