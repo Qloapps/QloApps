@@ -25,153 +25,160 @@
 
 {block name='history'}
 	{capture name=path}
-		<a href="{$link->getPageLink('my-account', true)|escape:'html':'UTF-8'}">
-			{l s='My account'}
-		</a>
-		<span class="navigation-pipe">{$navigationPipe}</span>
-		<span class="navigation_page">{l s='Bookings'}</span>
+		<li class="breadcrumb-item"><a href="{$link->getPageLink('my-account', true)|escape:'html':'UTF-8'}">{l s='My account'}</a></li>
+		<li class="breadcrumb-item"><span class="navigation_page">{l s='Bookings'}</span></li>
 	{/capture}
 	{block name='errors'}
 		{include file="$tpl_dir./errors.tpl"}
 	{/block}
-	{block name='history_heading'}
-		<h1 class="page-heading bottom-indent">{l s='Bookings'}</h1>
-	{/block}
-	<p class="info-title">{l s='Here are the orders you\'ve placed since your account was created.'}</p>
-
-	{if $slowValidation}
-		<p class="alert alert-warning">{l s='If you have just placed an order, it may take a few minutes for it to be validated. Please refresh this page if your order is missing.'}</p>
-	{/if}
-	<div class="block-center" id="block-history">
-		{if $orders && count($orders)}
-			{block name='bookings_list'}
-				<table id="order-list" class="table table-bordered footab">
-					<thead>
-						<tr>
-							<th class="first_item" data-sort-ignore="true">{l s='Order reference'}</th>
-							<th class="item">{l s='Date'}</th>
-							<th data-hide="phone" class="item">{l s='Total price'}</th>
-							{if isset($adv_active)}
-								<th data-hide="phone" class="item">{l s='Due Price'}</th>
-							{/if}
-							<th data-sort-ignore="true" data-hide="phone,tablet" class="item">{l s='Payment'}</th>
-							<th class="item">{l s='Status'}</th>
-
-							<th data-sort-ignore="true" data-hide="phone,tablet" class="item">{l s='Invoice'}</th>
-							<th data-sort-ignore="true" data-hide="phone,tablet" class="last_item">&nbsp;</th>
-							{block name='displayHistoryTableHeading'}
-								{hook h='displayHistoryTableHeading'}
-							{/block}
-						</tr>
-					</thead>
-					<tbody>
-						{foreach from=$orders item=order name=myLoop}
-							<tr class="{if $smarty.foreach.myLoop.first}first_item{elseif $smarty.foreach.myLoop.last}last_item{else}item{/if} {if $smarty.foreach.myLoop.index % 2}alternate_item{/if}">
-								{block name='booking_reference'}
-									<td class="history_link bold">
-									{* By webkul- no downloadable products *}
-									{* {if isset($order.invoice) && $order.invoice && isset($order.virtual) && $order.virtual}
-										<img class="icon" src="{$img_dir}icon/download_product.gif"	alt="{l s='Products to download'}" title="{l s='Products to download'}" />
-									{/if} *}
-										<a class="color-myaccount" href="{$link->getPageLink('order-detail', true, NULL, "id_order={$order.id_order|intval}")|escape:'html':'UTF-8'}">
-											{Order::getUniqReferenceOf($order.id_order)}
-										</a>
-									</td>
-								{/block}
-								{block name='booking_date'}
-									<td data-value="{$order.date_add|regex_replace:"/[\-\:\ ]/":""}" class="history_date bold">
-										{dateFormat date=$order.date_add full=0}
-									</td>
-								{/block}
-								{block name='booking_total_price'}
-									<td class="history_price" data-value="{$order.total_paid}">
-										<span class="price">
-											{displayPrice price=$order.total_paid currency=$order.id_currency no_utf8=false convert=false}
-										</span>
-									</td>
-								{/block}
-								{block name='booking_due_price'}
-									{if isset($adv_active)}
-										<td class="history_price" data-value="{$order.due_amount}">
-											<span class="price">
-												{displayPrice price=$order.due_amount currency=$order.id_currency no_utf8=false convert=false}
-											</span>
-										</td>
+	<div class="container-md">
+		<div class="d-flex justify-content-center">
+			<div class="qlo-account-card card col-12 p-5 mb-md-4">
+					{block name='history_heading'}
+						<h1 class="page-heading text-center text-bolder h5 font-weight-bold">{l s='Order History'}</h1>
+					{/block}
+					<hr>
+					<div class="text-center small">{l s='Here are the orders you\'ve placed since your account was created.'}</div>
+					{if $slowValidation}
+						<div class="alert alert-warning text-center small">{l s='If you have just placed an order, it may take a few minutes for it to be validated. Please refresh this page if your order is missing.'}</div>
+					{/if}
+					{if $orders && count($orders)}
+						<div class="row qlo-history-tools mb-3">
+							<div class="col-8 col-sm-6">
+								<label class="sr-only" for="history-search-order">{l s='Search Order'}</label>
+								<div class="input-group">
+									<input type="text" id="history-search-order" class="form-control" placeholder="{l s='Search Order'}" value="{if isset($history_search)}{$history_search|escape:'html':'UTF-8'}{/if}" />
+									<div class="input-group-append">
+										<span class="input-group-text"><i class="icon-search"></i></span>
+									</div>
+								</div>
+							</div>
+							<div class="col-4 col-sm-6">
+								<label class="sr-only" for="history-status-filter">{l s='Filters'}</label>
+								<select id="history-status-filter" class="form-control">
+									<option value="">{l s='All Statuses'}</option>
+									{if isset($order_states) && $order_states}
+										{foreach from=$order_states item=order_state}
+											<option value="{$order_state.id_order_state|intval}" {if isset($selected_order_state) && $selected_order_state == $order_state.id_order_state}selected="selected"{/if}>
+												{$order_state.name|escape:'html':'UTF-8'}
+											</option>
+										{/foreach}
 									{/if}
-								{/block}
-								{block name='booking_method'}
-									<td class="history_method">{$order.payment|escape:'html':'UTF-8'}</td>
-								{/block}
-								{block name='booking_state'}
-									<td {if isset($order.order_state)} data-value="{$order.id_order_state}"{/if} class="history_state">
-										{if isset($order.order_state)}
-											<span class="label{if isset($order.order_state_color) && Tools::getBrightness($order.order_state_color) > 128} dark{/if}"{if isset($order.order_state_color) && $order.order_state_color} style="background-color:{$order.order_state_color|escape:'html':'UTF-8'}; border-color:{$order.order_state_color|escape:'html':'UTF-8'};"{/if}>
-												{if $order.current_state|in_array:$overbooking_order_states}
-													{l s='Order Not Confirmed'}
-												{else}
-													{$order.order_state|escape:'html':'UTF-8'}
-												{/if}
-											</span>
-										{/if}
-									</td>
-								{/block}
-								{block name='booking_invoice'}
-									<td class="history_invoice">
-										{if (isset($order.invoice) && $order.invoice && isset($order.invoice_number) && $order.invoice_number) && isset($invoiceAllowed) && $invoiceAllowed == true}
-											<a class="link-button" href="{$link->getPageLink('pdf-invoice', true, NULL, "id_order={$order.id_order}")|escape:'html':'UTF-8'}" title="{l s='Invoice'}" target="_blank">
-												<i class="icon-file-text large"></i>{l s='PDF'}
-											</a>
-										{else}
-											-
-										{/if}
-									</td>
-								{/block}
-								{block name='booking_detail'}
-									<td class="history_detail">
-										<a class="btn btn-default button button-small" href="{$link->getPageLink('order-detail', true, NULL, "id_order={$order.id_order|intval}")|escape:'html':'UTF-8'}">
-											<span>
-												{l s='Details'}<i class="icon-chevron-right right"></i>
-											</span>
-										</a>
-										<!-- {if isset($opc) && $opc}
-											<a class="link-button" href="{$link->getPageLink('order-opc', true, NULL, "submitReorder&id_order={$order.id_order|intval}")|escape:'html':'UTF-8'}" title="{l s='Reorder'}">
-										{else}
-											<a class="link-button" href="{$link->getPageLink('order', true, NULL, "submitReorder&id_order={$order.id_order|intval}")|escape:'html':'UTF-8'}" title="{l s='Reorder'}">
-										{/if}
-											{if isset($reorderingAllowed) && $reorderingAllowed}
-												<i class="icon-refresh"></i>{l s='Reorder'}
+								</select>
+							</div>
+						</div>
+						{block name='bookings_list'}
+							<div class="table-responsive">
+								<table id="order-list" class="table table-striped footab">
+									<thead>
+										<tr>
+											<th class="first_item" data-sort-ignore="true">{l s='Order reference'}</th>
+											<th class="item">{l s='Date'}</th>
+											<th data-hide="phone" class="item">{l s='Total price'}</th>
+											{if isset($adv_active)}
+												<th data-hide="phone" class="item">{l s='Due Price'}</th>
 											{/if}
-										</a> --><!-- by webkul not to show reorder tab -->
-									</td>
-								{/block}
-								{block name='displayHistoryTableRow'}
-									{hook h='displayHistoryTableRow' id_order=$order.id_order}
-								{/block}
-							</tr>
-						{/foreach}
-					</tbody>
-				</table>
-			{/block}
-			<div id="block-order-detail" class="unvisible">&nbsp;</div>
-		{else}
-			<p class="alert alert-warning">{l s='You have not placed any orders.'}</p>
-		{/if}
+											<th data-sort-ignore="true" data-hide="phone,tablet" class="item">{l s='Payment'}</th>
+											<th class="item">{l s='Status'}</th>
+											<th data-sort-ignore="true" data-hide="phone,tablet" class="item">{l s='Invoice'}</th>
+											<th data-sort-ignore="true" data-hide="phone,tablet" class="last_item">&nbsp;</th>
+											{block name='displayHistoryTableHeading'}
+												{hook h='displayHistoryTableHeading'}
+											{/block}
+										</tr>
+									</thead>
+									<tbody>
+										{foreach from=$orders item=order name=myLoop}
+											<tr class="{if $smarty.foreach.myLoop.first}first_item{elseif $smarty.foreach.myLoop.last}last_item{else}item{/if} {if $smarty.foreach.myLoop.index % 2}alternate_item{/if}">
+												{block name='booking_reference'}
+													<td class="history_link bold">
+														<a class="color-myaccount" href="{$link->getPageLink('order-detail', true, NULL, "id_order={$order.id_order|intval}")|escape:'html':'UTF-8'}">
+															{Order::getUniqReferenceOf($order.id_order)}
+														</a>
+													</td>
+												{/block}
+												{block name='booking_date'}
+													<td data-value="{$order.date_add|regex_replace:"/[\-\:\ ]/":""}" class="history_date bold">
+														{dateFormat date=$order.date_add full=0}
+													</td>
+												{/block}
+												{block name='booking_total_price'}
+													<td class="history_price" data-value="{$order.total_paid}">
+														<span class="price">
+															{displayPrice price=$order.total_paid currency=$order.id_currency no_utf8=false convert=false}
+														</span>
+													</td>
+												{/block}
+												{block name='booking_due_price'}
+													{if isset($adv_active)}
+														<td class="history_price" data-value="{$order.due_amount}">
+															<span class="price">
+																{displayPrice price=$order.due_amount currency=$order.id_currency no_utf8=false convert=false}
+															</span>
+														</td>
+													{/if}
+												{/block}
+												{block name='booking_method'}
+													<td class="history_method">{$order.payment|escape:'html':'UTF-8'}</td>
+												{/block}
+												{block name='booking_state'}
+													<td {if isset($order.order_state)} data-value="{$order.id_order_state}" data-order-state-id="{$order.id_order_state|intval}"{/if} class="history_state">
+														{if isset($order.order_state)}
+															<span class="label{if isset($order.order_state_color) && Tools::getBrightness($order.order_state_color) > 128} dark{/if}"{if isset($order.order_state_color) && $order.order_state_color} style="background-color:{$order.order_state_color|escape:'html':'UTF-8'}; border-color:{$order.order_state_color|escape:'html':'UTF-8'};"{/if}>
+																{if $order.current_state|in_array:$overbooking_order_states}
+																	{l s='Order Not Confirmed'}
+																{else}
+																	{$order.order_state|escape:'html':'UTF-8'}
+																{/if}
+															</span>
+														{/if}
+													</td>
+												{/block}
+												{block name='booking_invoice'}
+													<td class="history_invoice">
+														{if (isset($order.invoice) && $order.invoice && isset($order.invoice_number) && $order.invoice_number) && isset($invoiceAllowed) && $invoiceAllowed == true}
+															<a class="link-button" href="{$link->getPageLink('pdf-invoice', true, NULL, "id_order={$order.id_order}")|escape:'html':'UTF-8'}" title="{l s='Invoice'}" target="_blank">
+																<i class="icon-file-text large"></i>{l s='PDF'}
+															</a>
+														{else}
+															-
+														{/if}
+													</td>
+												{/block}
+												{block name='booking_detail'}
+													<td class="history_detail">
+														<a class="btn btn-primary" href="{$link->getPageLink('order-detail', true, NULL, "id_order={$order.id_order|intval}")|escape:'html':'UTF-8'}">
+															<span>
+																{l s='Details'}<i class="icon-chevron-right right"></i>
+															</span>
+														</a>
+													</td>
+												{/block}
+												{block name='displayHistoryTableRow'}
+													{hook h='displayHistoryTableRow' id_order=$order.id_order}
+												{/block}
+											</tr>
+										{/foreach}
+									</tbody>
+								</table>
+							</div>
+						{/block}
+						<p id="history-empty-filter" class="alert alert-warning" style="display:none;">{l s='No orders match your search.'}</p>
+						<nav class="d-flex justify-content-center">
+							<ul id="history-pagination" class="pagination pagination-sm mb-0"></ul>
+						</nav>
+						<div id="block-order-detail" class="unvisible">&nbsp;</div>
+					{else}
+						<p class="alert alert-warning">{l s='You have not placed any orders.'}</p>
+					{/if}
+			</div>
+		</div>
+		{block name='history_footer_links'}
+			<ul class="footer_links clearfix">
+				<li>
+					<a class="link text-secondary" href="{$link->getPageLink('my-account', true)|escape:'html':'UTF-8'}"><span><i class="icon-angles-left"></i> {l s='Back to My account'}</span></a>
+				</li>
+			</ul>
+		{/block}
 	</div>
-	{block name='history_footer_links'}
-		<ul class="footer_links clearfix">
-			<li>
-				<a class="btn btn-default button button-small" href="{$link->getPageLink('my-account', true)|escape:'html':'UTF-8'}">
-					<span>
-						<i class="icon-chevron-left"></i> {l s='Back to My account'}
-					</span>
-				</a>
-			</li>
-			<li>
-				<a class="btn btn-default button button-small" href="{$base_dir}">
-					<span><i class="icon-chevron-left"></i> {l s='Home'}</span>
-				</a>
-			</li>
-		</ul>
-	{/block}
-
 {/block}

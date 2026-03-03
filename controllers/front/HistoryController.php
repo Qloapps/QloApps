@@ -39,6 +39,7 @@ class HistoryControllerCore extends FrontController
         ));
 
         $this->addJqueryPlugin(array('footable', 'footable-sort'));
+        $this->addJS(_THEME_JS_DIR_.'history.js');
     }
 
     /**
@@ -48,6 +49,8 @@ class HistoryControllerCore extends FrontController
     public function initContent()
     {
         $this->show_breadcrump = true;
+        $selectedOrderState = (int)Tools::getValue('id_order_state', 0);
+        $historySearch = trim(Tools::getValue('history_search', ''));
 
         parent::initContent();
         if ($orders = Order::getCustomerOrders($this->context->customer->id)) {
@@ -57,9 +60,21 @@ class HistoryControllerCore extends FrontController
                     $order['virtual'] = $myOrder->isVirtual(false);
                 }
             }
+
+            if ($selectedOrderState) {
+                $orders = array_values(array_filter($orders, function ($order) use ($selectedOrderState) {
+                    return (int)$order['id_order_state'] === $selectedOrderState;
+                }));
+            }
         }
+
+        $orderStates = OrderState::getOrderStates((int)$this->context->language->id);
+
         $this->context->smarty->assign(array(
             'orders' => $orders,
+            'order_states' => $orderStates,
+            'selected_order_state' => $selectedOrderState,
+            'history_search' => $historySearch,
             'overbooking_order_states' => OrderState::getOverBookingStates(),
             'invoiceAllowed' => (int)Configuration::get('PS_INVOICE'),
             'reorderingAllowed' => !(bool)Configuration::get('PS_DISALLOW_HISTORY_REORDERING'),

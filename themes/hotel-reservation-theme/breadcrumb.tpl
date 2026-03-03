@@ -25,16 +25,15 @@
 
 <!-- Breadcrumb -->
 {if isset($smarty.capture.path)}{assign var='path' value=$smarty.capture.path}{/if}
-<div class="breadcrumb clearfix">
-	<a class="home" href="{if isset($force_ssl) && $force_ssl}{$base_dir_ssl}{else}{$base_dir}{/if}" title="{l s='Return to Home'}"><i class="icon-home"></i></a>
-	{if isset($path) AND $path}
-		<span class="navigation-pipe"{if isset($category) && isset($category->id_category) && $category->id_category == (int)Configuration::get('PS_ROOT_CATEGORY')} style="display:none;"{/if}>{$navigationPipe|escape:'html':'UTF-8'}</span>
-		{if $path|strpos:'span' !== false}
-			<span class="navigation_page">{$path|@replace:'<a ': '<span itemscope itemtype="http://data-vocabulary.org/Breadcrumb"><a itemprop="url" '|@replace:'data-gg="">': '><span itemprop="title">'|@replace:'</a>': '</span></a></span>'}</span>
-		{else}
-			{$path}
-		{/if}
-	{/if}
+<div class="container-md">
+	<nav>
+		<ol class="breadcrumb clearfix">
+			<li class="breadcrumb-item"><a class="home" href="{if isset($force_ssl) && $force_ssl}{$base_dir_ssl}{else}{$base_dir}{/if}" title="{l s='Return to Home'}"><i class="icon-home"></i></a></li>
+			{if isset($path) AND $path}
+				{$path}
+			{/if}
+		</ol>
+	</nav>
 </div>
 {if isset($smarty.get.search_query) && isset($smarty.get.results) && $smarty.get.results > 1 && isset($smarty.server.HTTP_REFERER)}
 <div class="pull-right">
