@@ -1670,7 +1670,7 @@ class AdminCartsControllerCore extends AdminController
                                 $idServiceProduct,
                                 $operator,
                                 $quantity,
-                                0,
+                                false,
                                 $idCartBooking
                             ))) {
                                 $originalPrice = Product::getPriceStatic($idServiceProduct, false);

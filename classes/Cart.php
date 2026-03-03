@@ -2556,17 +2556,32 @@ class CartCore extends ObjectModel
                                 null,
                                 (int)$product['id_product']
                             )) {
-                                if (!isset($standaloneProduct[$id_address])) {
-                                    $standaloneProduct[$id_address] = array(
-                                        'product_list' => array(),
-                                        'warehouse_list' => $package['warehouse_list'],
-                                        'carrier_list' => $product['carrier_list'],
-                                        'id_warehouse' => $package['id_warehouse'],
-                                        'id_carrier' => isset($package['id_carrier']) ? $package['id_carrier'] : 0
-                                    );
+                                $hasStandaloneService = false;
+                                foreach ($selectedServiceProducts as $selectedServiceProduct) {
+                                    if ((int) $selectedServiceProduct['id_hotel'] === 0
+                                        && (int) $selectedServiceProduct['id_hotel_cart_booking'] === 0
+                                    ) {
+                                        $hasStandaloneService = true;
+                                        break;
+                                    }
                                 }
-                                $productinfo = $product;
-                                $standaloneProduct[$id_address]['product_list'][] = $product;
+
+                                if ($hasStandaloneService) {
+                                    if (!isset($standaloneProduct[$id_address])) {
+                                        $standaloneProduct[$id_address] = array(
+                                            'product_list' => array(),
+                                            'warehouse_list' => $package['warehouse_list'],
+                                            'carrier_list' => $product['carrier_list'],
+                                            'id_warehouse' => $package['id_warehouse'],
+                                            'id_carrier' => isset($package['id_carrier']) ? $package['id_carrier'] : 0
+                                        );
+                                    }
+                                    $productinfo = $product;
+                                    $productinfo['id_hotel'] = 0;
+                                    $productinfo['id_hotel_cart_booking'] = 0;
+                                    $productinfo['id_room_type'] = 0;
+                                    $standaloneProduct[$id_address]['product_list'][] = $productinfo;
+                                }
                             }
                         }
 

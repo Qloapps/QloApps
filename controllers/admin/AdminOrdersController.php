@@ -5644,7 +5644,7 @@ class AdminOrdersControllerCore extends AdminController
                     $idProduct,
                     'up',
                     $productInformations['product_quantity'],
-                    isset($addressTax->id_hotel) ? $addressTax->id_hotel : 0,
+                    isset($addressTax->id_hotel) ? $addressTax->id_hotel : false,
                     false,
                     isset($productInformations['product_option']) ? $productInformations['product_option'] : null
                 )) {

@@ -58,10 +58,10 @@ class ServiceProductCartDetail extends ObjectModel
         if ($idProduct) {
             $sql .= ' AND `id_product` = '.(int)$idProduct;
         }
-        if ($idHotel) {
+        if ($idHotel !== false && $idHotel !== null) {
             $sql .= ' AND `id_hotel` = '.(int)$idHotel;
         }
-        if ($idHtlCartData) {
+        if ($idHtlCartData !== false && $idHtlCartData !== null) {
             $sql .= ' AND `htl_cart_booking_id` = '.(int)$idHtlCartData;
         }
         if ($idProductOption) {

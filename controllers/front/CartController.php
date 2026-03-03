@@ -665,8 +665,8 @@ class CartControllerCore extends FrontController
                         $this->id_product,
                         $operator,
                         $this->qty,
-                        false,
-                        false,
+                        0,
+                        0,
                         isset($idProductOption) ? $idProductOption : null
                     );
                     if ($operator == 'up') {

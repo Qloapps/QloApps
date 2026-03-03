@@ -478,14 +478,16 @@ class OrderInvoiceCore extends ObjectModel
         // 	- 'total_price_tax_excl'
         // 	- 'total_amount'
         $breakdown = array();
-        $order_detail = $this->getProducts();
-        $order_detail = array_filter($order_detail, function($v) {
-            return (
-                !$v['is_booking_product']
-                && !$v['product_auto_add']
-                && Product::isSellableWithRoomType($v['selling_preference_type'])
-            );
-        });
+        $order_detail = $this->getProducts(
+            $order->getProductsDetail(
+                false,
+                null,
+                0,
+                Product::PRICE_ADDITION_TYPE_INDEPENDENT,
+                array(),
+                Order::SERVICE_PRODUCT_CONTEXT_ROOM_LINKED
+            )
+        );
         $details = $order->getProductTaxesDetails($order_detail, false);
 
         if ($sum_composite_taxes) {
