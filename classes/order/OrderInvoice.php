@@ -478,16 +478,32 @@ class OrderInvoiceCore extends ObjectModel
         // 	- 'total_price_tax_excl'
         // 	- 'total_amount'
         $breakdown = array();
-        $order_detail = $this->getProducts(
-            $order->getProductsDetail(
-                false,
-                null,
-                0,
-                Product::PRICE_ADDITION_TYPE_INDEPENDENT,
-                array(),
-                Order::SERVICE_PRODUCT_CONTEXT_ROOM_LINKED
-            )
-        );
+        $order_detail = array();
+        $products = $this->getProducts();
+        $objServiceProductOrderDetail = new ServiceProductOrderDetail();
+        foreach ($products as $product) {
+            if ($product['is_booking_product']
+                || $product['product_auto_add']
+                || !Product::isSellableWithRoomType($product['selling_preference_type'])
+            ) {
+                continue;
+            }
+
+            $serviceProductDetail = $objServiceProductOrderDetail->getServiceProductsInOrder(
+                $product['id_order'],
+                $product['id_order_detail']
+            );
+            if (!is_array($serviceProductDetail) || empty($serviceProductDetail)) {
+                continue;
+            }
+
+            foreach ($serviceProductDetail as $serviceProduct) {
+                if (!empty($serviceProduct['id_htl_booking_detail'])) {
+                    $order_detail[] = $product;
+                    break;
+                }
+            }
+        }
         $details = $order->getProductTaxesDetails($order_detail, false);
 
         if ($sum_composite_taxes) {
@@ -614,14 +630,32 @@ class OrderInvoiceCore extends ObjectModel
         // 	- 'total_price_tax_excl'
         // 	- 'total_amount'
         $breakdown = array();
-        $order_detail = $this->getProducts();
-        $order_detail = array_filter($order_detail, function($v) {
-            return (
-                !$v['is_booking_product']
-                && (Product::isSellableAsStandalone($v['selling_preference_type'])
-                    || Product::isSellableWithHotel($v['selling_preference_type']))
+        $order_detail = array();
+        $products = $this->getProducts();
+        $objServiceProductOrderDetail = new ServiceProductOrderDetail();
+        foreach ($products as $product) {
+            if ($product['is_booking_product']
+                || !Product::isSellableAsStandalone($product['selling_preference_type'])
+                || !Product::isSellableWithHotel($product['selling_preference_type'])
+            ) {
+                continue;
+            }
+
+            $serviceProductDetail = $objServiceProductOrderDetail->getServiceProductsInOrder(
+                $product['id_order'],
+                $product['id_order_detail']
             );
-        });
+            if (!is_array($serviceProductDetail) || empty($serviceProductDetail)) {
+                continue;
+            }
+
+            foreach ($serviceProductDetail as $serviceProduct) {
+                if (empty($serviceProduct['id_htl_booking_detail'])) {
+                    $order_detail[] = $product;
+                    break;
+                }
+            }
+        }
 
         $details = $order->getProductTaxesDetails($order_detail, false);
 
